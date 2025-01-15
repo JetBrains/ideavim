@@ -168,16 +168,6 @@ class MotionOuterBigWordActionTest : VimTestCase() {
     )
   }
 
-  @VimBehaviorDiffers(originalVimAfter =
-    """
-      |Lorem Ipsum
-      |
-      |Lorem ipsum dolor sit amet,
-      |${s}consectetur adipiscing elit.......${c}.${se}
-      |Sed in orci mauris.
-      |Cras id tellus in ex imperdiet egestas.
-    """
-  )
   @Test
   fun `test repeated text object expands selection to whitespace at end of line`() {
     doTest(
@@ -194,7 +184,7 @@ class MotionOuterBigWordActionTest : VimTestCase() {
         |Lorem Ipsum
         |
         |Lorem ipsum dolor sit amet,
-        |${s}consectetur adipiscing eli${c}t${se}........
+        |${s}consectetur adipiscing elit.......${c}.${se}
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin().dotToSpace(),
@@ -468,11 +458,26 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   }
 
   @Test
+  fun `test select outer WORD on last word on line selects trailing whitespace`() {
+    doTest("vaW", "    Lor${c}em    ", "    ${s}Lorem   ${c} ${se}", Mode.VISUAL(SelectionType.CHARACTER_WISE))
+  }
+
+  @Test
   fun `test select outer WORD with existing left-to-right selection selects rest of word and following whitespace`() {
     doTest(
       listOf("v", "l", "aW"),
       "Lo${c}rem    ipsum",
       "Lo${s}rem   ${c} ${se}ipsum",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test select outer WORD with existing left-to-right selection selects rest of word and trailing whitespace at end of line`() {
+    doTest(
+      listOf("v", "l", "aW"),
+      "Lo${c}rem    ",
+      "Lo${s}rem   ${c} ${se}",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }

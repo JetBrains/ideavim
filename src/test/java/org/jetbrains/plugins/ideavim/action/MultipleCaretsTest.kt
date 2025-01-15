@@ -476,7 +476,7 @@ $c  tw${c}o
       injector.parser.parseKeys("v" + "aW"),
       " a${c}bcd${c}e.abcde.a${c}bcde  a${c}bcde.abcde \n",
     )
-    assertState(" <selection>abcde.abcde.abcde  </selection><selection>abcde.abcde</selection> \n")
+    assertState(" <selection>abcde.abcde.abcde  </selection><selection>abcde.abcde </selection>\n")
   }
 
   @Test
@@ -1077,7 +1077,7 @@ $c  tw${c}o
       injector.parser.parseKeys("v" + "aW" + "l" + "h"),
       "a${c}bcde.abcde.abcde  ab${c}cde.abcde \n",
     )
-    assertState("<selection>abcde.abcde.abcde  abcde.abcde</selection> \n")
+    assertState("<selection>abcde.abcde.abcde  abcde.abcde </selection>\n")
   }
 
   @Test
