@@ -316,17 +316,19 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     spaceWords: Boolean,
   ): Int {
     var found = false
-    var _pos = if (pos < size) pos else min(size, (chars.length - 1))
+    var _pos = pos  // CAREFUL! This might be at the end of the file, but we need this for calculations below
+
     // For back searches, skip any current whitespace so we start at the end of a word
     if (step < 0 && _pos > 0) {
       if (charType(editor, chars[_pos - 1], bigWord) === CharacterHelper.CharacterType.WHITESPACE && !spaceWords) {
-        _pos = skipSpace(editor, chars, _pos - 1, step, size) + 1
+        _pos = skipSpace(editor, chars, pos - 1, step, size) + 1
       }
-      if (_pos > 0 && charType(editor, chars[_pos], bigWord) !== charType(editor, chars[_pos - 1], bigWord)) {
+      // _pos might be at the end of file. Handle this so we don't try to walk backwards based on incorrect char type
+      if (_pos == size || (_pos > 0 && charType(editor, chars[_pos], bigWord) !== charType(editor, chars[_pos - 1], bigWord))) {
         _pos += step
       }
     }
-    var res = _pos
+    var res = _pos.coerceAtMost(size - 1)
     if (_pos < 0 || _pos >= size) {
       return _pos
     }
