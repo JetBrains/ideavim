@@ -1484,10 +1484,11 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     logger.debug("goForward=$goForward")
 
     if (goForward) {
-      if (editor.anyNonWhitespace(end, 1)) {
-        while (end + 1 < max && charType(editor, chars[end + 1], false) === CharacterHelper.CharacterType.WHITESPACE) {
-          end++
-        }
+      while (end + 1 < max
+        && chars[end + 1] != '\n'
+        && charType(editor, chars[end + 1], false) === CharacterHelper.CharacterType.WHITESPACE
+      ) {
+        end++
       }
     }
     if (goBack) {
