@@ -510,6 +510,36 @@ class MotionOuterWordActionTest : VimTestCase() {
   }
 
   @Test
+  fun `test select outer word with existing right-to-left selection with caret at start of word selects previous word`() {
+    doTest(
+      listOf("v", "h", "aw"),
+      "Lorem   i${c}psum   dolor sit amet",
+      "${s}${c}Lorem   ip${se}sum   dolor sit amet",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test select outer word with existing right-to-left selection selects rest of word and leading whitespace at start of line`() {
+    doTest(
+      listOf("v", "h", "aw"),
+      "    Lo${c}rem ipsum dolor sit amet",
+      "${s}${c}    Lor${se}em ipsum dolor sit amet",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test select outer word with existing right-to-left selection on only word on line selects rest of word and leading whitespace`() {
+    doTest(
+      listOf("v", "h", "aw"),
+      "    Lo${c}rem",
+      "${s}${c}    Lor${se}em",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
   fun `test select outer word with existing right-to-left selection in whitespace selects rest of whitespace and preceding word`() {
     doTest(
       listOf("v", "h", "aw"),

@@ -106,14 +106,12 @@ class MotionInnerWordActionTest : VimTestCase() {
     )
   }
 
-  // TODO: Fix this bug
-  @VimBehaviorDiffers(originalVimAfter = "Lorem ipsum dolor sit amet, ${s}${c}consectet${se}ur adipiscing elit")
   @Test
   fun `test select word with existing right-to-left selection selects start of word`() {
     doTest(
       listOf("v", "h", "iw"),
       "Lorem ipsum dolor sit amet, consecte${c}tur adipiscing elit",
-      "Lorem ipsum dolor sit amet,${s}${c} consectet${se}ur adipiscing elit",
+      "Lorem ipsum dolor sit amet, ${s}${c}consectet${se}ur adipiscing elit",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
