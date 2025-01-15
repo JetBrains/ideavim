@@ -1392,39 +1392,29 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     logger.debug("hasSelection=$hasSelection")
 
     val chars: CharSequence = editor.text()
-    //int min = EditorHelper.getLineStartOffset(editor, EditorHelper.getCurrentLogicalLine(editor));
-    //int max = EditorHelper.getLineEndOffset(editor, EditorHelper.getCurrentLogicalLine(editor), true);
-    val min = 0
     val max: Int = editor.fileSize().toInt()
     if (max == 0) return TextRange(0, 0)
 
-    logger.debug("min=$min")
     logger.debug("max=$max")
 
     val pos: Int = caret.offset
     if (chars.length <= pos) return TextRange(chars.length - 1, chars.length - 1)
 
     val startSpace = charType(editor, chars[pos], isBig) === CharacterHelper.CharacterType.WHITESPACE
+
     // Find word start
-    val onWordStart = pos == min ||
-      charType(editor, chars[pos - 1], isBig) !==
-      charType(editor, chars[pos], isBig)
+    val onWordStart = pos == 0 || charType(editor, chars[pos - 1], isBig) !== charType(editor, chars[pos], isBig)
     var start = pos
 
     logger.debug("pos=$pos")
     logger.debug("onWordStart=$onWordStart")
 
-    if (!onWordStart && !(startSpace && isOuter) || hasSelection || count > 1 && dir == -1) {
+    if ((!onWordStart && !(startSpace && isOuter)) || hasSelection || (count > 1 && dir == -1)) {
       start = if (dir == 1) {
         findNextWord(editor, pos, -1, isBig, !isOuter)
       } else {
-        findNextWord(
-          editor,
-          pos,
-          -(count - if (onWordStart && !hasSelection) 1 else 0),
-          isBig,
-          !isOuter
-        )
+        val c = -(count - if (onWordStart && !hasSelection) 1 else 0)
+        findNextWord(editor, pos, c, isBig, !isOuter)
       }
       start = editor.normalizeOffset(start, false)
     }
@@ -1432,18 +1422,14 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     logger.debug("start=$start")
 
     // Find word end
-
-    // Find word end
-    val onWordEnd = pos >= max - 1 ||
-      charType(editor, chars[pos + 1], isBig) !==
-      charType(editor, chars[pos], isBig)
+    val onWordEnd = pos >= max - 1 || charType(editor, chars[pos + 1], isBig) !== charType(editor, chars[pos], isBig)
 
     logger.debug("onWordEnd=$onWordEnd")
 
     var end = pos
-    if (!onWordEnd || hasSelection || count > 1 && dir == 1 || startSpace && isOuter) {
+    if (!onWordEnd || hasSelection || (count > 1 && dir == 1) || (startSpace && isOuter)) {
       end = if (dir == 1) {
-        val c = count - if (onWordEnd && !hasSelection && (!(startSpace && isOuter) || startSpace && !isOuter)) 1 else 0
+        val c = count - if (onWordEnd && !hasSelection && (!(startSpace && isOuter) || (startSpace && !isOuter))) 1 else 0
         findNextWordEnd(editor, pos, c, isBig, !isOuter)
       } else {
         findNextWordEnd(editor, pos, 1, isBig, !isOuter)
@@ -1452,7 +1438,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
 
     logger.debug("end=$end")
 
-    var goBack = startSpace && !hasSelection || !startSpace && hasSelection && !onWordStart
+    var goBack = (startSpace && !hasSelection) || (!startSpace && hasSelection && !onWordStart)
     if (dir == 1 && isOuter) {
       var firstEnd = end
       if (count > 1) {
@@ -1465,14 +1451,14 @@ abstract class VimSearchHelperBase : VimSearchHelper {
       }
     }
     if (dir == -1 && isOuter && startSpace) {
-      if (pos > min) {
+      if (pos > 0) {
         if (charType(editor, chars[pos - 1], false) !== CharacterHelper.CharacterType.WHITESPACE) {
           goBack = true
         }
       }
     }
 
-    var goForward = dir == 1 && isOuter && (!startSpace && !onWordEnd || startSpace && onWordEnd && hasSelection)
+    var goForward = dir == 1 && isOuter && ((!startSpace && !onWordEnd) || (startSpace && onWordEnd && hasSelection))
     if (!goForward && dir == 1 && isOuter) {
       var firstEnd = end
       if (count > 1) {
@@ -1486,9 +1472,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     }
     if (!goForward && dir == 1 && isOuter && !startSpace && !hasSelection) {
       if (end < max - 1) {
-        if (charType(editor, chars[end + 1], !isBig) !==
-          charType(editor, chars[end], !isBig)
-        ) {
+        if (charType(editor, chars[end + 1], !isBig) !== charType(editor, chars[end], !isBig)) {
           goForward = true
         }
       }
@@ -1499,18 +1483,14 @@ abstract class VimSearchHelperBase : VimSearchHelper {
 
     if (goForward) {
       if (editor.anyNonWhitespace(end, 1)) {
-        while (end + 1 < max &&
-          charType(editor, chars[end + 1], false) === CharacterHelper.CharacterType.WHITESPACE
-        ) {
+        while (end + 1 < max && charType(editor, chars[end + 1], false) === CharacterHelper.CharacterType.WHITESPACE) {
           end++
         }
       }
     }
     if (goBack) {
       if (editor.anyNonWhitespace(start, -1)) {
-        while (start > min &&
-          charType(editor, chars[start - 1], false) === CharacterHelper.CharacterType.WHITESPACE
-        ) {
+        while (start > 0 && charType(editor, chars[start - 1], false) === CharacterHelper.CharacterType.WHITESPACE) {
           start--
         }
       }
@@ -1519,7 +1499,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     logger.debug("start=$start")
     logger.debug("end=$end")
 
-    // End offset is exclusive
+    // Text range's end offset is exclusive
     return TextRange(start, end + 1)
   }
 
