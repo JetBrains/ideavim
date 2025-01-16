@@ -192,17 +192,6 @@ class MotionOuterBigWordActionTest : VimTestCase() {
     )
   }
 
-  // TODO: Fix this bug
-  @VimBehaviorDiffers(originalVimAfter =
-    """
-      |Lorem Ipsum
-      |
-      |Lorem ipsum dolor sit amet,
-      |consectetur adipiscing${s} elit
-      |Sed${c} ${se}in orci mauris.
-      |Cras id tellus in ex imperdiet egestas.
-    """
-  )
   @Test
   fun `test repeated text object expands across new line`() {
     doTest(
@@ -220,7 +209,7 @@ class MotionOuterBigWordActionTest : VimTestCase() {
         |
         |Lorem ipsum dolor sit amet,
         |consectetur adipiscing${s} elit
-        |Se${c}d${se} in orci mauris.
+        |Sed${c} ${se}in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
