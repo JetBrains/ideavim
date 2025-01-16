@@ -190,17 +190,6 @@ class MotionOuterWordActionTest : VimTestCase() {
     )
   }
 
-  // TODO: Fix this bug
-  @VimBehaviorDiffers(originalVimAfter =
-    """
-      |Lorem Ipsum
-      |
-      |Lorem ipsum dolor sit amet,
-      |consectetur adipiscing${s} elit
-      |Sed${c} ${se}in orci mauris.
-      |Cras id tellus in ex imperdiet egestas.
-    """
-  )
   @Test
   fun `test repeated text object expands across new line`() {
     doTest(
@@ -218,7 +207,7 @@ class MotionOuterWordActionTest : VimTestCase() {
         |
         |Lorem ipsum dolor sit amet,
         |consectetur adipiscing${s} elit
-        |Se${c}d${se} in orci mauris.
+        |Sed${c} ${se}in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
@@ -263,6 +252,30 @@ class MotionOuterWordActionTest : VimTestCase() {
       """.trimMargin(),
       """
         |Lorem${s} Ipsum
+        |
+        |Lore${c}m${se} ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test repeated text object expands to empty line 2`() {
+    doTest(
+      listOf("vaw", "aw", "aw"),
+      """
+        |Lo${c}rem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |${s}Lorem Ipsum
         |
         |Lore${c}m${se} ipsum dolor sit amet,
         |consectetur adipiscing elit
@@ -378,15 +391,6 @@ class MotionOuterWordActionTest : VimTestCase() {
     )
   }
 
-  // TODO: Fix this bug
-  @VimBehaviorDiffers(originalVimAfter =
-    """
-      |Lorem Ipsum
-      |
-      |Lorem ipsum dolor sit${s} amet,${c} ${se}consectetur adipiscing elit
-      |Sed in orci mauris. Cras id tellus in ex imperdiet egestas.
-    """
-  )
   @Test
   fun `test repeated text object expands over non-word character`() {
     doTest(
@@ -400,7 +404,7 @@ class MotionOuterWordActionTest : VimTestCase() {
       """
         |Lorem Ipsum
         |
-        |Lorem ipsum dolor sit${s} amet${c},${se} consectetur adipiscing elit
+        |Lorem ipsum dolor sit${s} amet,${c} ${se}consectetur adipiscing elit
         |Sed in orci mauris. Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
       Mode.VISUAL(SelectionType.CHARACTER_WISE),

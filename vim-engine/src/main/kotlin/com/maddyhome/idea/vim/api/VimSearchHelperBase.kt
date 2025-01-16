@@ -1405,7 +1405,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     val pos: Int = caret.offset
     if (chars.length <= pos) return TextRange(chars.length - 1, chars.length - 1)
 
-    val startSpace = charType(editor, chars[pos], isBig) === CharacterHelper.CharacterType.WHITESPACE
+    val onSpace = charType(editor, chars[pos], isBig) === CharacterHelper.CharacterType.WHITESPACE
 
     // Find word start. Note that the caret might be on the word start, but the selection start might not be!
     val onWordStart = pos == 0 || charType(editor, chars[pos - 1], isBig) !== charType(editor, chars[pos], isBig)
@@ -1414,7 +1414,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     logger.debug("pos=$pos")
     logger.debug("onWordStart=$onWordStart")
 
-    if ((!onWordStart && !(startSpace && isOuter)) || hasSelection || (count > 1 && dir == -1)) {
+    if ((!onWordStart && !(onSpace && isOuter)) || hasSelection || (count > 1 && dir == -1)) {
       start = if (dir == 1) {
         findNextWord(editor, pos, -1, isBig, !isOuter)
       } else {
@@ -1432,9 +1432,9 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     logger.debug("onWordEnd=$onWordEnd")
 
     var end = pos
-    if (!onWordEnd || hasSelection || (count > 1 && dir == 1) || (startSpace && isOuter)) {
+    if (!onWordEnd || hasSelection || (count > 1 && dir == 1) || (onSpace && isOuter)) {
       end = if (dir == 1) {
-        val c = count - if (onWordEnd && !hasSelection && (!(startSpace && isOuter) || (startSpace && !isOuter))) 1 else 0
+        val c = count - if (onWordEnd && !hasSelection && (!(onSpace && isOuter) || (onSpace && !isOuter))) 1 else 0
         findNextWordEnd(editor, pos, c, isBig, !isOuter)
       } else {
         findNextWordEnd(editor, pos, 1, isBig, !isOuter)
@@ -1460,41 +1460,42 @@ abstract class VimSearchHelperBase : VimSearchHelper {
       // ✓ Started on word and has backward-facing selection
       // ✓ No whitespace after word under cursor (see `:help v_a'`), but only if there's a preceding word on the line
       !hasForwardHeadingSelection
-        && ((startSpace && !hasSelection)
-          || (hasBackwardHeadingSelection && !startSpace)
+        && ((onSpace && !hasSelection)
+          || (hasBackwardHeadingSelection && !onSpace)
           || (!hasFollowingWhitespace && editor.anyNonWhitespace(start, -1)))
     }
     else {
       // Inner word motion. Include preceding whitespace:
       // ✓ Start on space with backwards-facing selection
       // ✓ Start on space with no (forwards-facing) selection
-      startSpace && (hasBackwardHeadingSelection || !hasForwardHeadingSelection)
+      onSpace && (hasBackwardHeadingSelection || !hasForwardHeadingSelection)
     }
 
-    var goForward = dir == 1 && isOuter && ((!startSpace && !onWordEnd) || (startSpace && onWordEnd && hasSelection))
-    if (!goForward && dir == 1 && isOuter) {
-      var firstEnd = end
-      if (count > 1) {
-        firstEnd = findNextWordEnd(editor, pos, 1, isBig, false)
-      }
-      if (firstEnd < max - 1) {
-        if (charType(editor, chars[firstEnd + 1], false) !== CharacterHelper.CharacterType.WHITESPACE) {
-          goForward = true
-        }
-      }
-    }
-    if (!goForward && dir == 1 && isOuter && !startSpace && !hasSelection) {
-      if (end < max - 1) {
-        if (charType(editor, chars[end + 1], !isBig) !== charType(editor, chars[end], !isBig)) {
-          goForward = true
-        }
-      }
-    }
+    // Include following whitespace:
+    // * ALWAYS: outer word motions with forward direction, has following whitespace to select, and we're not already
+    //   about to extend the range with preceding whitespace (Vim usually only expands in one direction)
+    // * AND:
+    // ✓ Does not have a selection
+    // ✓ Has a selection that does not start on (preceding) whitespace
+    // ✓ The range between caret offset (exclusive) and end of word does not contain whitespace
+    //   This last one is subtle, and means we can expand in both directions (perhaps only through repeated motions,
+    //   such as `vawaw`). Examples:
+    //   * Wrapping across newlines. On the last word, there is no following whitespace, so we select preceding
+    //     whitespace. Repeating the motion expands to the end of the next word on a subsequent line. But if that word
+    //     has preceding whitespace, even on a prior line, then we don't expand the range to following whitespace
+    //   * If the next word is not space, but a non-word character, then we expand to include following whitespace
+    val selectionStartOnSpace = hasSelection && charType(editor, chars[caret.vimSelectionStart], isBig) === CharacterHelper.CharacterType.WHITESPACE
+    val hasIntermediateWhitespace =
+      (pos + 1 < max && chars[pos + 1] != '\n' && charType(editor, chars[pos + 1], isBig) === CharacterHelper.CharacterType.WHITESPACE)
+      || (pos + 2 < max && chars[pos + 1] == '\n' && charType(editor, chars[pos + 2], isBig) === CharacterHelper.CharacterType.WHITESPACE)
+    val includeFollowingWhitespace = isOuter && dir == 1
+      && !includePrecedingWhitespace && hasFollowingWhitespace
+      && (!hasSelection || (!selectionStartOnSpace && !hasIntermediateWhitespace) || !hasIntermediateWhitespace)
 
     logger.debug("goBack=$includePrecedingWhitespace")
-    logger.debug("goForward=$goForward")
+    logger.debug("goForward=$includeFollowingWhitespace")
 
-    if (goForward) {
+    if (includeFollowingWhitespace) {
       while (end + 1 < max
         && chars[end + 1] != '\n'
         && charType(editor, chars[end + 1], false) === CharacterHelper.CharacterType.WHITESPACE
