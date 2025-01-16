@@ -19,9 +19,10 @@ import com.maddyhome.idea.vim.state.mode.Mode
 
 fun charToNativeSelection(editor: VimEditor, start: Int, end: Int, mode: Mode): Pair<Int, Int> {
   val (nativeStart, nativeEnd) = sort(start, end)
+  // TODO: Remove this unnecessary restriction on not selecting the new line character
+  // When doing so, please remove the hack in VimSearchHelperBase.findWordUnderCursor
   val lineEnd = editor.getLineEndForOffset(nativeEnd)
-  val adj =
-    if (isExclusiveSelection() || nativeEnd == lineEnd || mode is Mode.SELECT) 0 else 1
+  val adj = if (isExclusiveSelection() || nativeEnd == lineEnd || mode is Mode.SELECT) 0 else 1
   val adjEnd = (nativeEnd + adj).coerceAtMost(editor.fileSize().toInt())
   return nativeStart to adjEnd
 }

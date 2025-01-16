@@ -379,13 +379,13 @@ abstract class VimSearchHelperBase : VimSearchHelper {
   private fun findNextWordEndOne(
     chars: CharSequence,
     editor: VimEditor,
-    pos: Int,
+    start: Int,
     size: Int,
     step: Int,
     bigWord: Boolean,
     spaceWords: Boolean,
   ): Int {
-    var pos = pos
+    var pos = start
     var found = false
     // For forward searches, skip any current whitespace so we start at the start of a word
     if (step > 0 && pos < size - 1) {
@@ -430,7 +430,10 @@ abstract class VimSearchHelperBase : VimSearchHelper {
         && (newChar == lastChar
           || (spaceWords && charType(editor, lastChar, bigWord) === CharacterHelper.CharacterType.WHITESPACE))
       ) {
-        res = if (step < 0) pos + 1 else pos - 1
+        // Add/subtract one so we don't take the current new line char as our end of word char.
+        // However, if we're matching empty lines and we start on an empty line, then we'll get two consecutive new line
+        // chars. Subtracting will put us back at the start character
+        res = if (step < 0) pos + 1 else (pos - 1).coerceAtLeast(start + 1)
         found = true
       }
       lastChar = newChar
@@ -1514,6 +1517,13 @@ abstract class VimSearchHelperBase : VimSearchHelper {
 
     logger.debug("start=$start")
     logger.debug("end=$end")
+
+    // TODO: Remove this when IdeaVim supports selecting the new line character
+    // A selection with start == end is perfectly valid, and will select a single character. However, IdeaVim
+    // unnecessarily prevents selecting the new line character at the end of a line. If the selection is just that new
+    // line character, then nothing is selected (we end up with a selection with range start==endInclusive, rather than
+    // start==endExclusive). This little hack makes sure that `viw` will (mostly) work on a single empty line
+    if (start == end && chars[start] == '\n') end++
 
     // Text range's end offset is exclusive
     return TextRange(start, end + 1)
