@@ -352,9 +352,8 @@ abstract class VimSearchHelperBase : VimSearchHelper {
         }
         type = charType(editor, chars[res], bigWord)
         found = true
-      }
-      else if (newChar == '\n' && lineLength == 0) {
-        // An empty line is considered a word/WORD
+      } else if (newChar == '\n' && (spaceWords || lineLength == 0)) {
+        // An empty line is considered a word/WORD, and if we're matching spaces as words, new line is a terminator
         res = if (step < 0) _pos + 1 else _pos
         found = true
       }
@@ -1447,18 +1446,23 @@ abstract class VimSearchHelperBase : VimSearchHelper {
       false
     }
 
-    // Include preceding whitespace:
-    // ✓ Outer text object (`aw`) AND
-    // ✓ No forward heading selection AND
-    // ✓ Started on space, and there's no selection
-    // ✓ OR backward heading selection, but didn't start on space
-    // ✓ OR no whitespace after the word under cursor (see `:help v_a'`), as long as there's another word before
-    val includePrecedingWhitespace = isOuter
-      && !hasForwardHeadingSelection
-      && ((startSpace && !hasSelection)
-        || (hasBackwardHeadingSelection && !startSpace)
-        || (!hasFollowingWhitespace && editor.anyNonWhitespace(start, -1))
-      )
+    val includePrecedingWhitespace = if (isOuter) {
+      // Outer word motion. Include preceding whitespace:
+      // ✗ NEVER: Has forward-facing selection
+      // ✓ Started on space, and there's no (forward-facing) selection
+      // ✓ Started on word and has backward-facing selection
+      // ✓ No whitespace after word under cursor (see `:help v_a'`), but only if there's a preceding word on the line
+      !hasForwardHeadingSelection
+        && ((startSpace && !hasSelection)
+          || (hasBackwardHeadingSelection && !startSpace)
+          || (!hasFollowingWhitespace && editor.anyNonWhitespace(start, -1)))
+    }
+    else {
+      // Inner word motion. Include preceding whitespace:
+      // ✓ Start on space with backwards-facing selection
+      // ✓ Start on space with no (forwards-facing) selection
+      startSpace && (hasBackwardHeadingSelection || !hasForwardHeadingSelection)
+    }
 
     var goForward = dir == 1 && isOuter && ((!startSpace && !onWordEnd) || (startSpace && onWordEnd && hasSelection))
     if (!goForward && dir == 1 && isOuter) {

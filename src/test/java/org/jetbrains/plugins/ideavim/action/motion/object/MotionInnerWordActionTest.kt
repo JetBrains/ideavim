@@ -67,6 +67,54 @@ class MotionInnerWordActionTest : VimTestCase() {
   }
 
   @Test
+  fun `test select word from whitespace at start of line with multiple lines`() {
+    doTest(
+      "viw",
+      """
+        |Lorem Ipsum
+        |
+        |    ${c}    Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |Lorem Ipsum
+        |
+        |${s}       ${c} ${se}Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test select word from whitespace at start of line with multiple lines 2`() {
+    doTest(
+      "viw",
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet
+        |    ${c}    consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet
+        |${s}       ${c} ${se}consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
   fun `test select word from whitespace at end of line`() {
     doTest(
       "viw",
@@ -122,6 +170,64 @@ class MotionInnerWordActionTest : VimTestCase() {
       listOf("v", "h", "iw"),
       "Lorem    ${c}  ipsum dolor sit amet",
       "Lorem${s}${c}     ${se} ipsum dolor sit amet",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test select word with existing right-to-left selection in whitespace selects leading whitespace at start of file`() {
+    doTest(
+      listOf("v", "h", "iw"),
+      "   ${c}   Lorem ipsum dolor sit amet",
+      "${s}${c}    ${se}  Lorem ipsum dolor sit amet",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test select word from whitespace at start of line with multiple lines and existing right-to-left selection`() {
+    doTest(
+      listOf("v", "h", "iw"),
+      """
+        |Lorem Ipsum
+        |
+        |    ${c}    Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |Lorem Ipsum
+        |
+        |${s}${c}     ${se}   Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test select word from whitespace at start of line with multiple lines and existing right-to-left-selection 2`() {
+    doTest(
+      listOf("v", "h", "iw"),
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet
+        |    ${c}    consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet
+        |${s}${c}     ${se}   consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
