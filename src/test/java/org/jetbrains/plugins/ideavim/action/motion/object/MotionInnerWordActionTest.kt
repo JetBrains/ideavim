@@ -125,6 +125,54 @@ class MotionInnerWordActionTest : VimTestCase() {
   }
 
   @Test
+  fun `test select word from whitespace at end of line with multiple lines`() {
+    doTest(
+      "viw",
+      """
+        |Lorem Ipsum....${c}....
+        |
+        |Lorem ipsum dolor sit amet
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin().dotToSpace(),
+      """
+        |Lorem Ipsum${s}.......${c}.${se}
+        |
+        |Lorem ipsum dolor sit amet
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin().dotToSpace(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test select word from whitespace at end of line with multiple lines 2`() {
+    doTest(
+      "viw",
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet....${c}....
+        |....consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin().dotToSpace(),
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet${s}.......${c}.${se}
+        |....consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin().dotToSpace(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
   fun `test select word selects up to punctuation`() {
     doTest(
       "viw",
@@ -150,6 +198,64 @@ class MotionInnerWordActionTest : VimTestCase() {
       listOf("v", "l", "iw"),
       "Lorem  ${c}    ipsum dolor sit amet",
       "Lorem  ${s}   ${c} ${se}ipsum dolor sit amet",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test select word with existing left-to-right selection in whitespace selects trailing whitespace at end of file`() {
+    doTest(
+      listOf("v", "l", "iw"),
+      "Lorem ipsum dolor sit amet  ${c}      ",
+      "Lorem ipsum dolor sit amet  ${s}     ${c} ${se}",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test select word from whitespace at end of line with multiple lines and existing left-to-right selection`() {
+    doTest(
+      listOf("v", "h", "iw"),
+      """
+        |Lorem Ipsum...${c}.....
+        |
+        |Lorem ipsum dolor sit amet
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin().dotToSpace(),
+      """
+        |Lorem Ipsum${s}${c}....${se}....
+        |
+        |Lorem ipsum dolor sit amet
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin().dotToSpace(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test select word from whitespace at end of line with multiple lines and existing left-to-right selection 2`() {
+    doTest(
+      listOf("v", "h", "iw"),
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet...${c}.....
+        |    consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin().dotToSpace(),
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet${s}${c}....${se}....
+        |    consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin().dotToSpace(),
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
@@ -421,18 +527,6 @@ class MotionInnerWordActionTest : VimTestCase() {
     )
   }
 
-  // TODO: Fix this bug
-  @VimBehaviorDiffers(originalVimAfter =
-    """
-      |Lorem Ipsum
-      |
-      |Lorem ipsum dolor sit amet,
-      |consectetur ${s}adipiscing elit.......${c}.${se}
-      |Sed in orci mauris.
-      |Cras id tellus in ex imperdiet egestas.
-    """,
-    description = "Caret placement is incorrect, but the selection is correct - it should not select the final newline char"
-  )
   @Test
   fun `test repeated text object expands selection to whitespace at end of line`() {
     doTest(
@@ -449,7 +543,7 @@ class MotionInnerWordActionTest : VimTestCase() {
         |Lorem Ipsum
         |
         |Lorem ipsum dolor sit amet,
-        |consectetur ${s}adipiscing elit........${c}${se}
+        |consectetur ${s}adipiscing elit.......${c}.${se}
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin().dotToSpace(),
@@ -576,25 +670,14 @@ class MotionInnerWordActionTest : VimTestCase() {
       """.trimMargin(),
       """
         |Lorem ${s}Ipsum
-        |
         |${c}${se}
+        |
         |Lorem ipsum dolor sit amet,
       """.trimMargin(),
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
-  @VimBehaviorDiffers(originalVimAfter =
-    """
-      |Lorem ${s}Ipsum
-      |.......${c}.${se}
-      |Lorem ipsum dolor sit amet,
-      |consectetur adipiscing elit
-      |Sed in orci mauris.
-      |Cras id tellus in ex imperdiet egestas.
-    """,
-    description = "Caret placement is incorrect, but selection is correct. It should not select trailing new line char"
-  )
   @Test
   fun `test repeated text object expands to whitespace on following blank line`() {
     doTest(
@@ -609,7 +692,7 @@ class MotionInnerWordActionTest : VimTestCase() {
       """.trimMargin().dotToSpace(),
       """
         |Lorem ${s}Ipsum
-        |........${c}${se}
+        |.......${c}.${se}
         |Lorem ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
@@ -652,8 +735,8 @@ class MotionInnerWordActionTest : VimTestCase() {
       """
         |Lorem ${s}Ipsum
         |
-        |........
-        |${c}${se}
+        |.......${c}.${se}
+        |
         |Lorem ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.

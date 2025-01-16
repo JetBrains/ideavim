@@ -421,9 +421,11 @@ abstract class VimSearchHelperBase : VimSearchHelper {
           res = pos
         }
         found = true
-      }
-      else if (newChar == '\n' && newChar == lastChar) {
-        res = if (step < 0) pos + 1 else pos
+      } else if (newChar == '\n'
+        && (newChar == lastChar
+          || (spaceWords && charType(editor, lastChar, bigWord) === CharacterHelper.CharacterType.WHITESPACE))
+      ) {
+        res = if (step < 0) pos + 1 else pos - 1
         found = true
       }
       lastChar = newChar
