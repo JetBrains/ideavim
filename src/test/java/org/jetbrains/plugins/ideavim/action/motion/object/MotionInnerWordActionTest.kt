@@ -338,6 +338,115 @@ class MotionInnerWordActionTest : VimTestCase() {
     )
   }
 
+  @VimBehaviorDiffers(originalVimAfter =
+    """
+      |Lorem ipsum dolor sit amet,
+      |
+      |${s}${c}
+      |${se}
+      |
+      |consectetur adipiscing elit
+    """,
+    description = "The caret and selection should not be at the same offset. This indicates that IdeaVim is " +
+      "shortening the selection range to (incorrectly) avoid selecting the end of line char. Once IdeaVim allows " +
+      "this, both caret and selection end offset will be incorrect, indicating an off-by-ine error somewhere, " +
+      "which will need fixing." +
+      "Fix when IdeaVim supports selecting end of line char"
+  )
+  @Test
+  fun `test select empty line`() {
+    doTest(
+      "viw",
+      """
+        |Lorem ipsum dolor sit amet,
+        |
+        |${c}
+        |
+        |
+        |consectetur adipiscing elit
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet,
+        |
+        |${s}
+        |${c}${se}
+        |
+        |consectetur adipiscing elit
+      """.trimMargin(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @VimBehaviorDiffers(originalVimAfter =
+    """
+      |Lorem ipsum dolor sit amet,
+      |
+      |${s}
+      |
+      |
+      |
+      |${c}${se}
+      |
+      |consectetur adipiscing elit
+    """,
+    description = "I don't understand Vim's logic for selecting mulitple empty lines with 'iw'." +
+      "E.g. `v3iw` will select 5 lines, `v4iw` will select 7, `v5iw` selects 9. " +
+      "Fix only when/if Vim's behaviour is clarified"
+  )
+  @Test
+  fun `test select multiple empty lines`() {
+    doTest(
+      "v3iw",
+      """
+        |Lorem ipsum dolor sit amet,
+        |
+        |${c}
+        |
+        |
+        |
+        |
+        |
+        |consectetur adipiscing elit
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet,
+        |
+        |${s}
+        |
+        |
+        |${c}${se}
+        |
+        |
+        |consectetur adipiscing elit
+      """.trimMargin(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test select blank line`() {
+    doTest(
+      "viw",
+      """
+        |Lorem ipsum dolor sit amet,
+        |
+        |..${c}..
+        |
+        |
+        |consectetur adipiscing elit
+      """.trimMargin().dotToSpace(),
+      """
+        |Lorem ipsum dolor sit amet,
+        |
+        |${s}...${c}.${se}
+        |
+        |
+        |consectetur adipiscing elit
+      """.trimMargin().dotToSpace(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
   @VimBehaviorDiffers(
     originalVimAfter = "${s}Lorem${c}${se} ipsum dolor sit amet, consectetur adipiscing elit",
     description = "Text objects are implicitly inclusive, because they set the selection." +
