@@ -49,6 +49,15 @@
       </aliases>
     </vimExtension>
 
+
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.miniai.MiniAI"
+                  name="mini-ai">
+      <aliases>
+        <alias name="https://github.com/echasnovski/mini.ai"/>
+        <alias name="echasnovski/mini.ai"/>
+      </aliases>
+    </vimExtension>
+
     <vimExtension implementation="com.maddyhome.idea.vim.extension.argtextobj.VimArgTextObjExtension"
                   name="argtextobj">
       <aliases>

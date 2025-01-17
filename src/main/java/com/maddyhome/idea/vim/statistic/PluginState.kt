@@ -45,7 +45,8 @@ internal class PluginState : ApplicationUsagesCollector() {
       "surround",
       "commentary",
       "matchit",
-      "textobj-indent"
+      "textobj-indent",
+      "mini-ai"
     )
     internal val enabledExtensions = HashSet<String>()
   }
