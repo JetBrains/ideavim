@@ -432,21 +432,21 @@ class SetglobalCommandTest : VimTestCase() {
     assertCommandOutput(
       "setglobal all", """
       |--- Global option values ---
-      |noargtextobj          ideamarks           scrolljump=1      notextobj-indent
-      |nobomb                ideawrite=all       scrolloff=0         textwidth=0
-      |nobreakindent       noignorecase          selectmode=         timeout
-      |  colorcolumn=      noincsearch           shellcmdflag=-x     timeoutlen=1000
-      |nocommentary        nolist                shellxescape=@    notrackactionids
-      |nocursorline        nomatchit             shellxquote={       undolevels=1000
-      |nodigraph             maxmapdepth=20      showcmd             virtualedit=
-      |noexchange            more                showmode          novisualbell
-      |  fileencoding=     nomultiple-cursors    sidescroll=0        visualdelay=100
-      |  fileformat=unix   noNERDTree            sidescrolloff=0     whichwrap=b,s
-      |nogdefault            nrformats=hex     nosmartcase           wrap
-      |nohighlightedyank   nonumber            nosneak               wrapscan
-      |  history=50          operatorfunc=       startofline
-      |nohlsearch          norelativenumber    nosurround
-      |noideajoin            scroll=0          notextobj-entire
+      |noargtextobj          ideamarks           scroll=0          notextobj-entire
+      |nobomb                ideawrite=all       scrolljump=1      notextobj-indent
+      |nobreakindent       noignorecase          scrolloff=0         textwidth=0
+      |  colorcolumn=      noincsearch           selectmode=         timeout
+      |nocommentary        nolist                shellcmdflag=-x     timeoutlen=1000
+      |nocursorline        nomatchit             shellxescape=@    notrackactionids
+      |nodigraph             maxmapdepth=20      shellxquote={       undolevels=1000
+      |noexchange          nomini-ai             showcmd             virtualedit=
+      |  fileencoding=       more                showmode          novisualbell
+      |  fileformat=unix   nomultiple-cursors    sidescroll=0        visualdelay=100
+      |nogdefault          noNERDTree            sidescrolloff=0     whichwrap=b,s
+      |nohighlightedyank     nrformats=hex     nosmartcase           wrap
+      |  history=50        nonumber            nosneak               wrapscan
+      |nohlsearch            operatorfunc=       startofline
+      |noideajoin          norelativenumber    nosurround
       |  clipboard=ideaput,autoselect
       |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
       |  ide=IntelliJ IDEA Community Edition
@@ -539,6 +539,7 @@ class SetglobalCommandTest : VimTestCase() {
       |nomatchit
       |  matchpairs=(:),{:},[:]
       |  maxmapdepth=20
+      |nomini-ai
       |  more
       |nomultiple-cursors
       |noNERDTree

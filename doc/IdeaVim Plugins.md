@@ -423,6 +423,24 @@ https://plugins.jetbrains.com/plugin/19417-ideavim-quickscope
 
 </details>
 
+<details>
+<summary><h2>Mini.ai: Extend and create a/i textobjects (IMPORTANT: The plugin is not related with artificial intelligence)</h2></summary>
+
+### Features: 
+Provides additional text object motions for handling quotes and brackets. The following motions are included:
+
+- aq: Around any quotes.
+- iq: Inside any quotes.
+- ab: Around any parentheses, curly braces, and square brackets.
+- ib: Inside any parentheses, curly braces, and square brackets.
+
+Original plugin: [mini.ai](https://github.com/echasnovski/mini.ai).
+
+### Setup:
+- Add the following command to `~/.ideavimrc`: `set mini-ai`
+
+</details>
+
 
 <details>
 <summary><h2>Which-Key</h2></summary>
@@ -484,4 +502,3 @@ or restart the IDE.
 
 https://plugins.jetbrains.com/plugin/25899-vim-switch
 
-</details>
