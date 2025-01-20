@@ -189,6 +189,7 @@ class UiTests {
   private fun IdeaFrame.wrapWithIf(editor: Editor) {
     editor.findText("System").click()
     remoteRobot.invokeActionJs("SurroundWith")
+    Thread.sleep(1000)
     editor.keyboard { enter() }
 
 //    assertFalse(editor.isBlockCursor)
