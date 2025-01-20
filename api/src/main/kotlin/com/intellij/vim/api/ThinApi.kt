@@ -32,7 +32,23 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
  * - How to obtain and keep the context?`
  */
 
-interface Read {}
+
+interface Scope {
+  val editor: VimEditor
+  val context: ExecutionContext
+
+  fun read(block: Transaction.() -> Unit)
+  fun change(block: Transaction.() -> Unit)
+}
+interface CaretScope: Scope {
+  val caretId: CaretId
+  
+  fun with(read: Read, block: CaretRead.() -> Unit)
+  fun with(read: Transaction, block: CaretTransaction.() -> Unit)
+}
+
+interface Read: Scope
+interface CaretRead: CaretScope
 
 fun Read.getReg(caretId: CaretId, name: Char): String? {
   return injector.registerGroup.getRegister(apiEditor, apiContext, name)?.text
@@ -61,22 +77,29 @@ val register: Char
   }
 
 
-interface Transaction : Read {}
+interface Transaction : Read
+interface CaretTransaction : Transaction, CaretRead
 
 
 lateinit var apiEditor: VimEditor // TODO Put this as argument for transaction
 lateinit var apiContext: ExecutionContext
 
 
-inline fun <T> read(block: Read.() -> T): T {
-  val read = object : Read {}
+inline fun <T> read(editor: VimEditor, context: ExecutionContext, block: Read.() -> T): T {
+  val read = object : Read {
+    override val editor: VimEditor = editor
+    override val context: ExecutionContext = context
+  }
   return read.block()
 }
 
-fun change(block: Transaction.() -> Unit) {
+fun change(editor: VimEditor, context: ExecutionContext, block: Transaction.() -> Unit) {
   injector.application.invokeAndWait {
     injector.application.runWriteAction {
-      val transaction = object : Transaction {}
+      val transaction = object : Transaction {
+        override val editor: VimEditor = editor
+        override val context: ExecutionContext = context
+      }
       transaction.block()
     }
   }
@@ -142,18 +165,9 @@ fun getSeleciton(): Pair<Int, Int> {
   return getpos() to getpos()
 }
 
-
-@JvmInline
-value class CaretId(val id: String)
-
 // TODO Handle selection direction
-data class CaretInfo(
-  val offset: Int,
-  val selection: Pair<Int, Int>?,
-)
 
 fun Transaction.setMap(mode: String, lhs: String, rhs: String) {
-
   val mode = MappingMode.parseModeChar(mode.single())
   val left = injector.parser.parseKeys(lhs)
   val right = injector.parser.parseKeys(rhs)
@@ -166,9 +180,6 @@ fun Transaction.setMap(mode: String, lhs: String, rhs: ExtensionHandler) {
   injector.keyGroup.putKeyMapping(setOf(mode), left, MappingOwner.Plugin.get("XXX"), rhs, false)
 }
 
-fun Transaction.deleteText(startOffset: Int, endOffset: Int) {
-  apiEditor.deleteString(TextRange(startOffset, endOffset))
-}
 
 fun Transaction.replaceText(startOffset: Int, endOffset: Int, text: String) {
   (apiEditor as MutableVimEditor).replaceString(startOffset, endOffset, text)
@@ -179,4 +190,3 @@ fun Transaction.replaceText(startOffset: Int, endOffset: Int, registerContent: R
   injector.put.smartPutText(apiEditor, apiContext, startOffset, registerContent.text, registerContent.transferableData, registerContent.type)
 }
 
-data class RegisterContent(val text: String, val type: SelectionType, val transferableData: Any)
