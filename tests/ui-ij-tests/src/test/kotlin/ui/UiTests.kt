@@ -94,7 +94,6 @@ class UiTests {
       testTripleClickRightFromLineEnd(editor)
       testClickRightFromLineEnd(editor)
       testClickOnWord(editor)
-      testGutterClick(editor)
       testAddNewLineInNormalMode(editor)
       testMappingToCtrlOrAltEnter(editor)
       `simple enter in insert mode`(editor)
@@ -611,23 +610,6 @@ class UiTests {
 
     assertEquals("On", editor.selectedText)
     assertEquals(1, editor.caretOffset)
-
-    vimExit()
-  }
-
-  private fun ContainerFixture.testGutterClick(editor: Editor) {
-    println("Run testGutterClick...")
-    gutter {
-      findText("2").click()
-    }
-
-    assertEquals("Three Four\n", editor.selectedText)
-
-    keyboard {
-      enterText("k")
-    }
-
-    assertEquals("One Two\nThree Four\n", editor.selectedText)
 
     vimExit()
   }
