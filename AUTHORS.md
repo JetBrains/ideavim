@@ -582,10 +582,6 @@ Previous contributors:
   [![icon][github]](https://github.com/kevin70)
   &nbsp;
   kk
-* [![icon][mail]](mailto:gregory.shrago@jetbrains.com)
-  [![icon][github]](https://github.com/gregsh)
-  &nbsp;
-  Greg Shrago
 
                         
 If you are a contributor and your name is not listed here, feel free to
