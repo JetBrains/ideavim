@@ -26,6 +26,13 @@ val VimEditor.inSelectMode: Boolean
 val VimEditor.inCommandLineMode: Boolean
   get() = this.mode is Mode.CMD_LINE
 
+/**
+ * Returns true if the current mode is Command-line and there is a pending Visual selection
+ *
+ * Returns false if the current mode isn't Command-line. For example, `v/foo` will return true, as the editor is in
+ * Command-line mode for the search, but was originally in Visual mode, and will return to Visual when the search is
+ * completed.
+ */
 val VimEditor.inCommandLineModeWithVisual: Boolean
   get() = (this.mode as? Mode.CMD_LINE)?.isVisualPending == true
 
