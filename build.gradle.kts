@@ -843,7 +843,7 @@ fun updateAuthors(uncheckedEmails: Set<String>) {
 }
 
 fun List<Author>.toMdString(): String {
-  return this.joinToString {
+  return this.joinToString(separator = "") {
     """
           |
           |* [![icon][mail]](mailto:${it.mail})

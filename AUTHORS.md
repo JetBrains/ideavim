@@ -498,7 +498,7 @@ Contributors:
 * [![icon][mail]](mailto:81118900+lippfi@users.noreply.github.com)
   [![icon][github]](https://github.com/lippfi)
   &nbsp;
-  lippfi, 
+  lippfi
 * [![icon][mail]](mailto:fillipser143@gmail.com)
   [![icon][github]](https://github.com/Parker7123)
   &nbsp;
@@ -514,7 +514,7 @@ Contributors:
 * [![icon][mail]](mailto:77796630+throwaway69420-69420@users.noreply.github.com)
   [![icon][github]](https://github.com/kun-codes)
   &nbsp;
-  Bishwa Saha, 
+  Bishwa Saha
 * [![icon][mail]](mailto:alexfu@fastmail.com)
   [![icon][github]](https://github.com/alexfu)
   &nbsp;
@@ -542,7 +542,7 @@ Contributors:
 * [![icon][mail]](mailto:kirill.karnaukhov@jetbrains.com)
   [![icon][github]](https://github.com/kkarnauk)
   &nbsp;
-  Kirill Karnaukhov, 
+  Kirill Karnaukhov
 * [![icon][mail]](mailto:sander.hestvik@gmail.com)
   [![icon][github]](https://github.com/SanderHestvik)
   &nbsp;
@@ -558,7 +558,7 @@ Contributors:
 * [![icon][mail]](mailto:j.trimailovas@gmail.com)
   [![icon][github]](https://github.com/trimailov)
   &nbsp;
-  Justas Trimailovas, 
+  Justas Trimailovas
 * [![icon][mail]](mailto:justast@wix.com)
   [![icon][github]](https://github.com/justast-wix)
   &nbsp;
