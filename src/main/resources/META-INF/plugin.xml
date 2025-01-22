@@ -103,7 +103,7 @@
 <!--    Do not care about red handlers in order. They are necessary for proper ordering, and they'll be resolved when needed -->
     <editorActionHandler action="EditorEnter" implementationClass="com.maddyhome.idea.vim.handler.VimEnterHandler"
                          id="ideavim-enter"
-                         order="before editorEnter, before inline.completion.enter, before rd.client.editor.enter, after smart-step-into-enter, after AceHandlerEnter, after jupyterCommandModeEnterKeyHandler, after swift.placeholder.enter"/>
+                         order="first, before editorEnter, before inline.completion.enter, before rd.client.editor.enter, after smart-step-into-enter, after AceHandlerEnter, after jupyterCommandModeEnterKeyHandler, after swift.placeholder.enter"/>
     <editorActionHandler action="EditorEnter" implementationClass="com.maddyhome.idea.vim.handler.CaretShapeEnterEditorHandler"
                          id="ideavim-enter-shape"
                          order="before jupyterCommandModeEnterKeyHandler"/>
