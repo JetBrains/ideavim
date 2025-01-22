@@ -571,6 +571,10 @@ Contributors:
   [![icon][github]](https://github.com/cypok)
   &nbsp;
   Vladimir Parfinenko
+* [![icon][mail]](mailto:sdoerner@google.com)
+  [![icon][github]](https://github.com/sdoerner)
+  &nbsp;
+  Sebastian Dörner
 
 Previous contributors:
 
