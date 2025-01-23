@@ -57,6 +57,7 @@ object Qodana : IdeaVimBuildType({
       branchFilter = "+:<default>"
     }
     schedule {
+      enabled = false
       schedulingPolicy = daily {
         hour = 12
         minute = 0
