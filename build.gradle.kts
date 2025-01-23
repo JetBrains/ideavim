@@ -139,6 +139,8 @@ dependencies {
       "LATEST-EAP-SNAPSHOT", "2024.3" -> bundledPlugins("com.intellij.modules.json")
       else -> error("Unsupported version: $ideaVersion")
     }
+
+    bundledPlugins("org.jetbrains.plugins.terminal")
   }
 
   moduleSources(project(":vim-engine", "sourcesJarArtifacts"))

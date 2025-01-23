@@ -36,6 +36,7 @@
   <!--suppress PluginXmlValidity -->
   <depends optional="true" config-file="ides/ideavim-withAppCode.xml">com.intellij.modules.appcode</depends>
   <depends optional="true" config-file="ideavim-withAceJump.xml">AceJump</depends>
+  <depends optional="true" config-file="features/ideavim-withTerminal.xml">org.jetbrains.plugins.terminal</depends>
 
   <applicationListeners>
     <listener class="com.maddyhome.idea.vim.PyNotebooksCloseWorkaround"
@@ -53,6 +54,8 @@
 
     </extensionPoint>
     <extensionPoint interface="com.maddyhome.idea.vim.ide.ClionNovaProvider" dynamic="true" name="clionNovaProvider"/>
+    <extensionPoint interface="com.maddyhome.idea.vim.key.IdeaVimDisablerExtensionPoint" dynamic="true"
+                    name="internal.disabler"/>
   </extensionPoints>
 
   <extensions defaultExtensionNs="com.intellij">
