@@ -11,9 +11,12 @@
 package com.maddyhome.idea.vim.helper
 
 import com.intellij.codeWithMe.ClientId
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.util.EditorUtil
+import com.intellij.openapi.editor.impl.EditorComponentImpl
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.util.ui.table.JBTableRowEditor
 import com.maddyhome.idea.vim.api.StringListOptionValue
@@ -98,3 +101,9 @@ internal val Caret.vimLine: Int
  */
 internal val Editor.vimLine: Int
   get() = this.caretModel.currentCaret.vimLine
+
+internal val DataContext.isNotEditorContextComponent: Boolean
+  get() {
+    val contextComponent = this.getData(PlatformDataKeys.CONTEXT_COMPONENT) ?: return true
+    return contextComponent !is EditorComponentImpl
+  }

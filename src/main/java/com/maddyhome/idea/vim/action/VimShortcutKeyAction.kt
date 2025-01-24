@@ -21,6 +21,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.util.Key
+import com.intellij.openapi.util.registry.Registry
 import com.intellij.ui.KeyStrokeAdapter
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
@@ -35,6 +36,7 @@ import com.maddyhome.idea.vim.helper.HandlerInjector
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
+import com.maddyhome.idea.vim.helper.isNotEditorContextComponent
 import com.maddyhome.idea.vim.helper.isPrimaryEditor
 import com.maddyhome.idea.vim.helper.isTemplateActive
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
@@ -126,6 +128,13 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
             LogLevel.ERROR
           )
         }
+      }
+      if (e.dataContext.isNotEditorContextComponent && Registry.`is`("ideavim.only.in.editor.component")) {
+        // Note: Currently, IdeaVim works ONLY in the editor component. However, the presence of the
+        //   PlatformDataKeys.EDITOR in the data context does not mean that the current focused component is editor.
+        // Note2: The registry key is needed for quick disabling in case something gets broken. It can be removed after
+        //   some time if no issues are found.
+        return ActionEnableStatus.no("Context component is not editor", LogLevel.INFO)
       }
       if (editor.isIdeaVimDisabledHere) {
         return ActionEnableStatus.no("IdeaVim is disabled in this place", LogLevel.INFO)

@@ -131,6 +131,8 @@
                          order="first"/>
     <editorFactoryDocumentListener
         implementation="com.maddyhome.idea.vim.listener.VimListenerManager$VimDocumentListener"/>
+    <registryKey defaultValue="true" description="Enable IdeaVim only in editor component and project tree"
+                 key="ideavim.only.in.editor.component"/>
   </extensions>
 
   <xi:include href="/META-INF/includes/ApplicationServices.xml" xpointer="xpointer(/idea-plugin/*)"/>
