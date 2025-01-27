@@ -41,8 +41,8 @@ internal class PluginStartup : ProjectActivity/*, LightEditCompatible*/ {
     if (firstInitializationOccurred) return
     firstInitializationOccurred = true
 
-    if (!VimPlugin.getVimState().wasSubscibedToEAPAutomatically && ApplicationManager.getApplication().isEAP && !JoinEap.eapActive()) {
-      VimPlugin.getVimState().wasSubscibedToEAPAutomatically = true
+    if (!VimPlugin.getVimState().wasSubscribedToEAPAutomatically && ApplicationManager.getApplication().isEAP && !JoinEap.eapActive()) {
+      VimPlugin.getVimState().wasSubscribedToEAPAutomatically = true
       UpdateSettings.getInstance().storedPluginHosts += EAP_LINK
     }
 

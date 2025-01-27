@@ -18,7 +18,7 @@ import kotlin.reflect.KProperty
 internal class VimState {
   var isIdeaJoinNotified by StateProperty("idea-join")
   var isIdeaPutNotified by StateProperty("idea-put")
-  var wasSubscibedToEAPAutomatically by StateProperty("was-automatically-subscribed-to-eap")
+  var wasSubscribedToEAPAutomatically by StateProperty("was-automatically-subscribed-to-eap")
 
   fun readData(element: Element) {
     val notifications = element.getChild("notifications")
