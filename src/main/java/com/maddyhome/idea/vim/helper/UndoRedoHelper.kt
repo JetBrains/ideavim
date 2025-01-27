@@ -18,9 +18,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.TextEditorWithPreview
 import com.intellij.openapi.fileEditor.impl.text.TextEditorProvider
-import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.registry.Registry
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -88,7 +86,6 @@ internal class UndoRedoHelper : VimTimestampBasedUndoService {
         removeSelections(editor)
       }
     } else {
-      notifyAboutNewUndo(editor.ij.project)
       runWithBooleanRegistryOption("ide.undo.transparent.caret.movement", true) {
         var nextUndoNanoTime = undoManager.getNextUndoNanoTime(fileEditor)
         val insertInfo = (editor.primaryCaret() as IjVimCaret).getInsertSequenceForTime(nextUndoNanoTime)
@@ -107,13 +104,6 @@ internal class UndoRedoHelper : VimTimestampBasedUndoService {
         removeSelections(editor)
       }
     }
-  }
-
-  private fun notifyAboutNewUndo(project: Project?) {
-    if (VimPlugin.getVimState().isNewUndoNotified) return
-    VimPlugin.getVimState().isNewUndoNotified = true
-
-    VimPlugin.getNotifications(project).notifyAboutNewUndo()
   }
 
   private fun hasSelection(editor: VimEditor): Boolean {
