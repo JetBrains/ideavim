@@ -1,21 +1,18 @@
 [![TeamCity Build][teamcity-build-status-svg]][teamcity-build-status]
 
-IdeaVim is an open source project created by 80+ contributors. Would you like to make it even better? That’s wonderful!
+IdeaVim is an open source project created by 130+ contributors. Would you like to make it even better? That’s wonderful!
 
 This page is created to help you start contributing. And who knows, maybe in a few days this project will be brighter than ever!
 
-:warning: The plugin is currently under a huge refactoring aiming to split into vim-engine and IdeaVim in order to
-support the new [Fleet IDE](https://www.jetbrains.com/fleet/). Please see [Fleet refactoring](#Fleet-refactoring).
-
 ## Before you begin
 
-- The project is written in Kotlin and Java. Choose whichever language you feel more comfortable with,
-or maybe one that you’d like to get to know better (why not start [learning Kotlin](https://kotlinlang.org/docs/tutorials/) right now?).
+- The project is primarily written in Kotlin with a few Java files. When contributing to the project, use Kotlin unless
+you’re working in areas where Java is explicitly used.
 
 - If you come across some IntelliJ Platform code, these links may prove helpful:
 
-    * [IntelliJ architectural overview](https://www.jetbrains.org/intellij/sdk/docs/platform/fundamentals.html)
-    * [IntelliJ plugin development resources](https://www.jetbrains.org/intellij/sdk/docs/welcome.html)
+    * [IntelliJ Platform SDK](https://plugins.jetbrains.com/docs/intellij/welcome.html)
+    * [IntelliJ architectural overview](https://plugins.jetbrains.com/docs/intellij/fundamentals.html)
 
 - Having any difficulties?
 Join the brand new
@@ -82,7 +79,7 @@ If you are looking for:
 
 - Common features:
     - State machine. How every particular keystroke is parsed in IdeaVim: `KeyHandler.handleKey()`.
-    - Options (`incsearch`, `iskeyword`, `relativenumber`): `OptionServiceImpl`.
+    - Options (`incsearch`, `iskeyword`, `relativenumber`): `VimOptionGroup`.
     - Plugin startup: `PluginStartup`.
     - Notifications: `NotificationService`.
     - Status bar icon: `StatusBar.kt`.
@@ -110,7 +107,7 @@ Cras id tellus in ex imperdiet egestas.
 carets, dollar motion, etc.
    
 ##### Neovim
-IdeaVim has an experimental integration with neovim in tests. Tests that are performed with `doTest` also executed in
+IdeaVim has an integration with neovim in tests. Tests that are performed with `doTest` also executed in
 neovim instance, and the state of IdeaVim is asserted to be the same as the state of neovim.
 - Only tests that use `doTest` are checked with neovim.
 - Tests with `@VimBehaviorDiffers` or `@TestWithoutNeovim` annotations don't use neovim.
@@ -136,14 +133,15 @@ We also support proper command mappings (functions are mapped to `<Plug>...`), t
 - Magic is supported as well. See `Magic`.
 
 
-## Fleet refactoring
-At the moment, IdeaVim is under an active refactoring aiming to split IdeaVim into two modules: vim-engine and IdeaVim.
+## Fleet
+
+The IdeaVim plugin is divided into two main modules: IdeaVim and vim-engine.
+IdeaVim serves as a plugin for JetBrains IDEs, while vim-engine is an IntelliJ Platform-independent Vim engine.
+This engine is utilized in both the Vim plugin for Fleet and IdeaVim.
 
 If you develop a plugin that depends on IdeaVim: We have an instrument to check that our changes don't affect
-the plugins in the marketplace. Also, we commit to support currently used API at least till the end of 2022.
+the plugins in the marketplace.
 If you still encounter any issues with the newer versions of IdeaVim, please [contact maintainers](https://github.com/JetBrains/ideavim#contact-maintainers).
-We kindly ask you not to use anything from the new API (like `VimEditor`, `injector`) because at the moment we don't
-guarantee the compatibility of this API in the future versions.
 
 
 -----
