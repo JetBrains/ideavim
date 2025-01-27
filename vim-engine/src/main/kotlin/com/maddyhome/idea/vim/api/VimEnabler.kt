@@ -14,4 +14,13 @@ package com.maddyhome.idea.vim.api
  */
 interface VimEnabler {
   fun isEnabled(): Boolean
+
+  /**
+   * Returns true if probably the current IDE session has an IdeaVim plugin just installed.
+   * A session is a time between IDE open and close.
+   *
+   * There is no guarantee that the user actually never tried the IdeaVim before, or the plugin was just installed,
+   *   so no important functionality should depend on this.
+   */
+  fun isNewIdeaVimUser(): Boolean
 }

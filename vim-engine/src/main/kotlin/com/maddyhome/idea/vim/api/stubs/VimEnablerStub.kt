@@ -16,7 +16,7 @@ class VimEnablerStub : VimEnabler {
     vimLogger<ExecutionContextManagerStub>().warn("VimEnablerStub is used. Please replace it with your own implementation of VimEnabler.")
   }
 
-  override fun isEnabled(): Boolean {
-    TODO("Not yet implemented")
-  }
+  override fun isEnabled(): Boolean = throw NotImplementedError()
+
+  override fun isNewIdeaVimUser(): Boolean = throw NotImplementedError()
 }

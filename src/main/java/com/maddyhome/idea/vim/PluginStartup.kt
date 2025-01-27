@@ -22,6 +22,7 @@ import com.intellij.openapi.updateSettings.impl.UpdateSettings
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.IjVimEnabler
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.initInjector
 import com.maddyhome.idea.vim.ui.JoinEap
@@ -48,6 +49,8 @@ internal class PluginStartup : ProjectActivity/*, LightEditCompatible*/ {
 
     // This code should be executed once
     VimPlugin.getInstance().initialize()
+
+    (injector.enabler as IjVimEnabler).ideOpened()
 
     // Uninstall survey. Should be registered once for all projects
     PluginStateManager.addStateListener(object : PluginStateListener {

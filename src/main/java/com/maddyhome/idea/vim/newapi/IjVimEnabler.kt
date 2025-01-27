@@ -14,7 +14,19 @@ import com.maddyhome.idea.vim.api.VimEnabler
 
 @Service
 internal class IjVimEnabler : VimEnabler {
+  private var isNewUser = false
+
   override fun isEnabled(): Boolean {
     return VimPlugin.isEnabled()
+  }
+
+  override fun isNewIdeaVimUser(): Boolean = isNewUser
+
+  fun ideOpened() {
+    val myFirstVersion = VimPlugin.getVimState().firstIdeaVimVersion
+    if (myFirstVersion == "-1") {
+      VimPlugin.getVimState().firstIdeaVimVersion = VimPlugin.getVersion()
+      this.isNewUser = true
+    }
   }
 }
