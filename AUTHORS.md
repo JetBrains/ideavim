@@ -575,6 +575,10 @@ Contributors:
   [![icon][github]](https://github.com/sdoerner)
   &nbsp;
   Sebastian Dörner
+* [![icon][mail]](mailto:ocordova@pulsarml.com)
+  [![icon][github]](https://github.com/oca159)
+  &nbsp;
+  Osvaldo
 
 Previous contributors:
 
