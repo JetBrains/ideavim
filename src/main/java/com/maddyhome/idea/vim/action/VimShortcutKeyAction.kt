@@ -91,9 +91,9 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
         keyHandler.handleKey(editor.vim, keyStroke, e.dataContext.vim, keyHandler.keyHandlerState)
         if (start != null) {
           val duration = System.currentTimeMillis() - start
-          LOG.info("VimShortcut update '$keyStroke': $duration ms")
+          LOG.info("VimShortcut execution '$keyStroke': $duration ms")
         }
-      } catch (ignored: ProcessCanceledException) {
+      } catch (_: ProcessCanceledException) {
         // Control-flow exceptions (like ProcessCanceledException) should never be logged
         // See {@link com.intellij.openapi.diagnostic.Logger.checkException}
       } catch (throwable: Throwable) {
@@ -119,120 +119,122 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
   }
 
   private fun isEnabled(e: AnActionEvent, keyStroke: KeyStroke?): ActionEnableStatus {
+    if (keyStroke == null) return ActionEnableStatus.no("Keystroke is null", LogLevel.DEBUG)
     if (VimPlugin.isNotEnabled()) return ActionEnableStatus.no("IdeaVim is disabled", LogLevel.DEBUG)
-    val editor = getEditor(e)
-    if (editor != null && keyStroke != null) {
-      if (enableOctopus) {
-        if (isOctopusEnabled(keyStroke, editor)) {
-          return ActionEnableStatus.no(
-            "Processing VimShortcutKeyAction for the key that is used in the octopus handler",
-            LogLevel.ERROR
-          )
-        }
-      }
-      if (e.dataContext.isNotSupportedContextComponent && Registry.`is`("ideavim.only.in.editor.component")) {
-        // Note: Currently, IdeaVim works ONLY in the editor & ExTextField component. However, the presence of the
-        //   PlatformDataKeys.EDITOR in the data context does not mean that the current focused component is editor.
-        // Note2: The registry key is needed for quick disabling in case something gets broken. It can be removed after
-        //   some time if no issues are found.
-        return ActionEnableStatus.no("Context component is not editor", LogLevel.INFO)
-      }
-      if (editor.isIdeaVimDisabledHere) {
-        return ActionEnableStatus.no("IdeaVim is disabled in this place", LogLevel.INFO)
-      }
-      // Workaround for smart step into
-      @Suppress("DEPRECATION", "LocalVariableName", "VariableNaming")
-      val SMART_STEP_INPLACE_DATA = Key.findKeyByName("SMART_STEP_INPLACE_DATA")
-      if (SMART_STEP_INPLACE_DATA != null && editor.getUserData(SMART_STEP_INPLACE_DATA) != null) {
-        LOG.trace("Do not execute shortcut because of smart step")
-        return ActionEnableStatus.no("Smart step into is active", LogLevel.INFO)
-      }
+    val editor = getEditor(e) ?: return ActionEnableStatus.no("Can't get Editor", LogLevel.DEBUG)
 
-      val keyCode = keyStroke.keyCode
-
-      if (HandlerInjector.notebookCommandMode(editor)) {
-        LOG.debug("Python Notebook command mode")
-        if (keyCode == KeyEvent.VK_RIGHT || keyCode == KeyEvent.VK_KP_RIGHT || keyCode == KeyEvent.VK_ENTER) {
-          invokeLater { editor.updateCaretsVisualAttributes() }
-        }
-        return ActionEnableStatus.no("Python notebook is in command mode", LogLevel.INFO)
-      }
-
-      if (AceJumpService.getInstance()?.isActive(editor) == true) {
-        return ActionEnableStatus.no("AceJump is active", LogLevel.INFO)
-      }
-
-      if (LookupManager.getActiveLookup(editor) != null && !LookupKeys.isEnabledForLookup(keyStroke)) {
-        return ActionEnableStatus.no("Lookup keys are active", LogLevel.INFO)
-      }
-
-      if (keyCode == KeyEvent.VK_ESCAPE) {
-        return if (isEnabledForEscape(editor)) {
-          ActionEnableStatus.yes("Is enabled for Esc", LogLevel.INFO)
-        } else {
-          ActionEnableStatus.no("Is disabled for Esc", LogLevel.INFO)
-        }
-      }
-
-      if (keyCode == KeyEvent.VK_TAB && editor.isTemplateActive()) {
-        return ActionEnableStatus.no("The key is tab and the template is active", LogLevel.INFO)
-      }
-
-      if ((keyCode == KeyEvent.VK_TAB || keyCode == KeyEvent.VK_ENTER) && editor.appCodeTemplateCaptured()) {
-        return ActionEnableStatus.no("App code template is active", LogLevel.INFO)
-      }
-
-      if (editor.inInsertMode) {
-        if (keyCode == KeyEvent.VK_TAB) {
-          // TODO: This stops VimEditorTab seeing <Tab> in insert mode and correctly scrolling the view
-          // There are multiple actions registered for VK_TAB. The important items, in order, are this, the Live
-          // Templates action and TabAction. Returning false in insert mode means that the Live Template action gets to
-          // execute, and this allows Emmet to work (VIM-674). But it also means that the VimEditorTab handle is never
-          // called, so we can't scroll the caret into view correctly.
-          // If we do return true, VimEditorTab handles the Vim side of things and then invokes
-          // IdeActions.ACTION_EDITOR_TAB, which inserts the tab. It also bypasses the Live Template action, and Emmet
-          // no longer works.
-          // This flag is used when recording text entry/keystrokes for repeated insertion. Because we return false and
-          // don't execute the VimEditorTab handler, we don't record tab as an action. Instead, we see an incoming text
-          // change of multiple whitespace characters, which is normally ignored because it's auto-indent content from
-          // hitting <Enter>. When this flag is set, we record the whitespace as the output of the <Tab>
-          VimPlugin.getChange().tabAction = true
-          return ActionEnableStatus.no("Tab action in insert mode", LogLevel.INFO)
-        }
-        // Debug watch, Python console, etc.
-        if (keyStroke in NON_FILE_EDITOR_KEYS && !EditorHelper.isFileEditor(editor)) {
-          return ActionEnableStatus.no("Non file editor keys", LogLevel.INFO)
-        }
-      }
-
-      if (keyStroke in VIM_ONLY_EDITOR_KEYS) {
-        return ActionEnableStatus.yes("Vim only editor keys", LogLevel.INFO)
-      }
-
-      val savedShortcutConflicts = VimPlugin.getKey().savedShortcutConflicts
-      val info = savedShortcutConflicts[keyStroke]
-      return when (info?.forEditor(editor.vim)) {
-        ShortcutOwner.VIM -> {
-          return ActionEnableStatus.yes("Owner is vim", LogLevel.DEBUG)
-        }
-
-        ShortcutOwner.IDE -> {
-          if (!isShortcutConflict(keyStroke)) {
-            ActionEnableStatus.yes("Owner is IDE, but no actionve shortcut conflict", LogLevel.DEBUG)
-          } else {
-            ActionEnableStatus.no("Owner is IDE", LogLevel.DEBUG)
-          }
-        }
-
-        else -> {
-          if (isShortcutConflict(keyStroke)) {
-            savedShortcutConflicts[keyStroke] = ShortcutOwnerInfo.allUndefined
-          }
-          ActionEnableStatus.yes("Enable vim for shortcut without owner", LogLevel.DEBUG)
-        }
+    if (enableOctopus) {
+      if (isOctopusEnabled(keyStroke, editor)) {
+        return ActionEnableStatus.no(
+          "Processing VimShortcutKeyAction for the key that is used in the octopus handler",
+          LogLevel.ERROR
+        )
       }
     }
-    return ActionEnableStatus.no("End of the selection", LogLevel.DEBUG)
+
+    if (e.dataContext.isNotSupportedContextComponent && Registry.`is`("ideavim.only.in.editor.component")) {
+      // Note: Currently, IdeaVim works ONLY in the editor & ExTextField component. However, the presence of the
+      //   PlatformDataKeys.EDITOR in the data context does not mean that the current focused component is editor.
+      // Note2: The registry key is needed for quick disabling in case something gets broken. It can be removed after
+      //   some time if no issues are found.
+      return ActionEnableStatus.no("Context component is not editor", LogLevel.INFO)
+    }
+
+    if (editor.isIdeaVimDisabledHere) {
+      return ActionEnableStatus.no("IdeaVim is disabled in this place", LogLevel.INFO)
+    }
+
+    // Workaround for smart step into
+    @Suppress("DEPRECATION", "LocalVariableName", "VariableNaming")
+    val SMART_STEP_INPLACE_DATA = Key.findKeyByName("SMART_STEP_INPLACE_DATA")
+    if (SMART_STEP_INPLACE_DATA != null && editor.getUserData(SMART_STEP_INPLACE_DATA) != null) {
+      LOG.trace("Do not execute shortcut because of smart step")
+      return ActionEnableStatus.no("Smart step into is active", LogLevel.INFO)
+    }
+
+    val keyCode = keyStroke.keyCode
+
+    if (HandlerInjector.notebookCommandMode(editor)) {
+      LOG.debug("Python Notebook command mode")
+      if (keyCode == KeyEvent.VK_RIGHT || keyCode == KeyEvent.VK_KP_RIGHT || keyCode == KeyEvent.VK_ENTER) {
+        invokeLater { editor.updateCaretsVisualAttributes() }
+      }
+      return ActionEnableStatus.no("Python notebook is in command mode", LogLevel.INFO)
+    }
+
+    if (AceJumpService.getInstance()?.isActive(editor) == true) {
+      return ActionEnableStatus.no("AceJump is active", LogLevel.INFO)
+    }
+
+    if (LookupManager.getActiveLookup(editor) != null && !LookupKeys.isEnabledForLookup(keyStroke)) {
+      return ActionEnableStatus.no("Lookup keys are active", LogLevel.INFO)
+    }
+
+    if (keyCode == KeyEvent.VK_ESCAPE) {
+      return if (isEnabledForEscape(editor)) {
+        ActionEnableStatus.yes("Is enabled for Esc", LogLevel.INFO)
+      } else {
+        ActionEnableStatus.no("Is disabled for Esc", LogLevel.INFO)
+      }
+    }
+
+    if (keyCode == KeyEvent.VK_TAB && editor.isTemplateActive()) {
+      return ActionEnableStatus.no("The key is tab and the template is active", LogLevel.INFO)
+    }
+
+    if ((keyCode == KeyEvent.VK_TAB || keyCode == KeyEvent.VK_ENTER) && editor.appCodeTemplateCaptured()) {
+      return ActionEnableStatus.no("App code template is active", LogLevel.INFO)
+    }
+
+    if (editor.inInsertMode) {
+      if (keyCode == KeyEvent.VK_TAB) {
+        // TODO: This stops VimEditorTab seeing <Tab> in insert mode and correctly scrolling the view
+        // There are multiple actions registered for VK_TAB. The important items, in order, are this, the Live
+        // Templates action and TabAction. Returning false in insert mode means that the Live Template action gets to
+        // execute, and this allows Emmet to work (VIM-674). But it also means that the VimEditorTab handle is never
+        // called, so we can't scroll the caret into view correctly.
+        // If we do return true, VimEditorTab handles the Vim side of things and then invokes
+        // IdeActions.ACTION_EDITOR_TAB, which inserts the tab. It also bypasses the Live Template action, and Emmet
+        // no longer works.
+        // This flag is used when recording text entry/keystrokes for repeated insertion. Because we return false and
+        // don't execute the VimEditorTab handler, we don't record tab as an action. Instead, we see an incoming text
+        // change of multiple whitespace characters, which is normally ignored because it's auto-indent content from
+        // hitting <Enter>. When this flag is set, we record the whitespace as the output of the <Tab>
+        VimPlugin.getChange().tabAction = true
+        return ActionEnableStatus.no("Tab action in insert mode", LogLevel.INFO)
+      }
+      // Debug watch, Python console, etc.
+      if (keyStroke in NON_FILE_EDITOR_KEYS && !EditorHelper.isFileEditor(editor)) {
+        return ActionEnableStatus.no("Non file editor keys", LogLevel.INFO)
+      }
+    }
+
+    if (keyStroke in VIM_ONLY_EDITOR_KEYS) {
+      return ActionEnableStatus.yes("Vim only editor keys", LogLevel.INFO)
+    }
+
+    val savedShortcutConflicts = VimPlugin.getKey().savedShortcutConflicts
+    val info = savedShortcutConflicts[keyStroke]
+    return when (info?.forEditor(editor.vim)) {
+      ShortcutOwner.VIM -> {
+        ActionEnableStatus.yes("Owner is vim", LogLevel.DEBUG)
+      }
+
+      ShortcutOwner.IDE -> {
+        if (!isShortcutConflict(keyStroke)) {
+          ActionEnableStatus.yes("Owner is IDE, but no actionve shortcut conflict", LogLevel.DEBUG)
+        } else {
+          ActionEnableStatus.no("Owner is IDE", LogLevel.DEBUG)
+        }
+      }
+
+      else -> {
+        if (isShortcutConflict(keyStroke)) {
+          savedShortcutConflicts[keyStroke] = ShortcutOwnerInfo.allUndefined
+        }
+        ActionEnableStatus.yes("Enable vim for shortcut without owner", LogLevel.DEBUG)
+      }
+    }
   }
 
   private fun isEnabledForEscape(editor: Editor): Boolean {
