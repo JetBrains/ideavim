@@ -220,11 +220,16 @@ private fun findClosestQuoteRange(
 }
 
 private fun TextRange.distanceTo(caretOffset: Int): Int {
-  return if (caretOffset < startOffset) {
-    startOffset - caretOffset
-  } else if (caretOffset > endOffset) {
-    caretOffset - endOffset
-  } else {
-    0 // Caret is inside the range
+  val rangeLength = endOffset - startOffset
+
+  // If caret is inside the range
+  if (caretOffset in startOffset..endOffset) {
+    // Return the length of the range - smaller ranges get priority
+    return rangeLength
   }
+
+  // If caret is outside, make the distance much larger
+  val startDistance = kotlin.math.abs(caretOffset - startOffset)
+  val endDistance = kotlin.math.abs(caretOffset - endOffset)
+  return (startDistance + endDistance) * 1000 + rangeLength
 }

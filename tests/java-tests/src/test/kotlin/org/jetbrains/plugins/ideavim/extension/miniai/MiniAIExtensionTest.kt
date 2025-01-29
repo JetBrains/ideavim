@@ -24,6 +24,200 @@ class MiniAIExtensionTest : VimJavaTestCase() {
   }
 
   @Test
+  fun testChangeInsideNestedQuotes() {
+    doTest(
+      "ciq",
+      "this 'simple<caret> \"test\"'",
+      "this '<caret>'",
+      Mode.INSERT,
+      JavaFileType.INSTANCE,
+    )
+    assertSelection(null)
+  }
+
+  @Test
+  fun testDeleteInsideNestedQuotes() {
+    doTest(
+      "diq",
+      "this 'simple<caret> \"test\"'",
+      "this '<caret>'",
+      Mode.NORMAL(),
+      JavaFileType.INSTANCE,
+    )
+    assertSelection(null)
+  }
+
+  @Test
+  fun testChangeInsideNestedQuotesDoubleInner() {
+    doTest(
+      "ciq",
+      "this \"simple<caret> 'test'\"",
+      "this \"<caret>\"",
+      Mode.INSERT,
+      JavaFileType.INSTANCE,
+    )
+    assertSelection(null)
+  }
+
+  @Test
+  fun testDeleteInsideNestedQuotesDoubleInner() {
+    doTest(
+      "diq",
+      "this \"simple<caret> 'test'\"",
+      "this \"<caret>\"",
+      Mode.NORMAL(),
+      JavaFileType.INSTANCE,
+    )
+    assertSelection(null)
+  }
+
+  @Test
+  fun testChangeInsideNestedQuotesBackQuote() {
+    doTest(
+      "ciq",
+      "this `simple<caret> \"test\"`",
+      "this `<caret>`",
+      Mode.INSERT,
+      JavaFileType.INSTANCE,
+    )
+    assertSelection(null)
+  }
+
+  @Test
+  fun testDeleteInsideNestedQuotesBackQuote() {
+    doTest(
+      "diq",
+      "this `simple<caret> \"test\"`",
+      "this `<caret>`",
+      Mode.NORMAL(),
+      JavaFileType.INSTANCE,
+    )
+    assertSelection(null)
+  }
+
+  @Test
+  fun testChangeAroundNestedSingleQuotes() {
+    doTest(
+      "caq",
+      "this 'simple<caret> \"test\"'",
+      "this <caret>",
+      Mode.INSERT,
+      JavaFileType.INSTANCE,
+    )
+    assertSelection(null)
+  }
+
+  @Test
+  fun testDeleteAroundNestedSingleQuotes() {
+    doTest(
+      "daq",
+      "this 'simple<caret> \"test\"' test",
+      "this <caret> test",
+      Mode.NORMAL(),
+      JavaFileType.INSTANCE,
+    )
+    assertSelection(null)
+  }
+
+  @Test
+  fun testChangeAroundNestedDoubleQuotes() {
+    doTest(
+      "caq",
+      "this \"simple<caret> 'test'\"",
+      "this <caret>",
+      Mode.INSERT,
+      JavaFileType.INSTANCE,
+    )
+    assertSelection(null)
+  }
+
+  @Test
+  fun testDeleteAroundNestedDoubleQuotes() {
+    doTest(
+      "daq",
+      "this \"simple<caret> 'test'\" test",
+      "this <caret> test",
+      Mode.NORMAL(),
+      JavaFileType.INSTANCE,
+    )
+    assertSelection(null)
+  }
+
+  @Test
+  fun testChangeAroundNestedBackQuotes() {
+    doTest(
+      "caq",
+      "this `simple<caret> \"test\"`",
+      "this <caret>",
+      Mode.INSERT,
+      JavaFileType.INSTANCE,
+    )
+    assertSelection(null)
+  }
+
+  @Test
+  fun testDeleteAroundNestedBackQuotes() {
+    doTest(
+      "daq",
+      "this `simple<caret> \"test\"` test",
+      "this <caret> test",
+      Mode.NORMAL(),
+      JavaFileType.INSTANCE,
+    )
+    assertSelection(null)
+  }
+
+  // Additional edge cases with cursor on different positions
+  @Test
+  fun testChangeAroundNestedQuotesOnInnerQuote() {
+    doTest(
+      "caq",
+      "this 'simple \"<caret>test\"'",
+      "this 'simple <caret>'",
+      Mode.INSERT,
+      JavaFileType.INSTANCE,
+    )
+    assertSelection(null)
+  }
+
+  @Test
+  fun testDeleteAroundNestedQuotesOnInnerQuote() {
+    doTest(
+      "daq",
+      "this 'simple \"<caret>test\"'",
+      "this 'simple '",
+      Mode.NORMAL(),
+      JavaFileType.INSTANCE,
+    )
+    assertSelection(null)
+  }
+
+  // Test with multiple levels of nesting
+  @Test
+  fun testChangeAroundTripleNestedQuotes() {
+    doTest(
+      "caq",
+      "this 'simple \"nested `<caret>test`\"'",
+      "this 'simple \"nested <caret>\"'",
+      Mode.INSERT,
+      JavaFileType.INSTANCE,
+    )
+    assertSelection(null)
+  }
+
+  @Test
+  fun testDeleteAroundTripleNestedQuotes() {
+    doTest(
+      "daq",
+      "this 'simple \"nested `<caret>test`\"'",
+      "this 'simple \"nested <caret>\"'",
+      Mode.NORMAL(),
+      JavaFileType.INSTANCE,
+    )
+    assertSelection(null)
+  }
+
+  @Test
   fun testChangeInsideSingleQuote() {
     doTest(
       "ciq",
