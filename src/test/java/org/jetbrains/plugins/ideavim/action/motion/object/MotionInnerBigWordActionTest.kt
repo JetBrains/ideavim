@@ -551,22 +551,10 @@ class MotionInnerBigWordActionTest : VimTestCase() {
     )
   }
 
-  // TODO: Fix this bug
-  @VimBehaviorDiffers(originalVimAfter =
-    """
-      |Lorem Ipsum
-      |
-      |Lorem ipsum dolor sit amet,
-      |consectetur adipiscing ${s}elit
-      |Se${c}d${se} in orci mauris.
-      |Cras id tellus in ex imperdiet egestas.
-    """,
-    description = "IdeaVim expands to include newline character"
-  )
   @Test
   fun `test repeated text object expands across new line`() {
     doTest(
-      listOf("viW", "iW", "iW"),  // TODO: This should be just listOf("viW", "iW")
+      listOf("viW", "iW"),
       """
         |Lorem Ipsum
         |
@@ -796,14 +784,6 @@ class MotionInnerBigWordActionTest : VimTestCase() {
     )
   }
 
-  // TODO: Fix this bug
-  @VimBehaviorDiffers(originalVimAfter =
-    """
-      |Lorem ipsum dolor sit amet, consectetur adipiscing ${s}elit
-      |Sed${c} ${se}in orci mauris. Cras id tellus in ex imperdiet egestas.
-    """,
-    description = "Unclear why this fails. IdeaVim seems to treat the new line char as a word"
-  )
   @Test
   fun `test select multiple words wraps to next line`() {
     doTest(
@@ -814,7 +794,7 @@ class MotionInnerBigWordActionTest : VimTestCase() {
       """.trimMargin(),
       """
         |Lorem ipsum dolor sit amet, consectetur adipiscing ${s}elit
-        |Se${c}d${se} in orci mauris. Cras id tellus in ex imperdiet egestas.
+        |Sed${c} ${se}in orci mauris. Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )

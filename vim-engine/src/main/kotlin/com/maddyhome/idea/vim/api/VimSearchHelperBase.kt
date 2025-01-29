@@ -389,6 +389,11 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     var found = false
     // For forward searches, skip any current whitespace so we start at the start of a word
     if (step > 0 && pos < size - 1) {
+      if (chars[pos + 1] == '\n'
+        && spaceWords
+        && charType(editor, chars[pos], bigWord) !== charType(editor, chars[pos + 1], bigWord)) {
+        pos++
+      }
       if (charType(editor, chars[pos + 1], bigWord) === CharacterHelper.CharacterType.WHITESPACE && !spaceWords) {
         pos = skipSpace(editor, chars, pos + 1, step, size, false) - 1
       }
