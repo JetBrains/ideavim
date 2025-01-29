@@ -14,10 +14,12 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.AnActionWrapper
+import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.impl.EditorComponentImpl
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.util.Key
@@ -36,7 +38,6 @@ import com.maddyhome.idea.vim.helper.HandlerInjector
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
-import com.maddyhome.idea.vim.helper.isNotEditorContextComponent
 import com.maddyhome.idea.vim.helper.isPrimaryEditor
 import com.maddyhome.idea.vim.helper.isTemplateActive
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
@@ -129,8 +130,8 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
           )
         }
       }
-      if (e.dataContext.isNotEditorContextComponent && Registry.`is`("ideavim.only.in.editor.component")) {
-        // Note: Currently, IdeaVim works ONLY in the editor component. However, the presence of the
+      if (e.dataContext.isNotSupportedContextComponent && Registry.`is`("ideavim.only.in.editor.component")) {
+        // Note: Currently, IdeaVim works ONLY in the editor & ExTextField component. However, the presence of the
         //   PlatformDataKeys.EDITOR in the data context does not mean that the current focused component is editor.
         // Note2: The registry key is needed for quick disabling in case something gets broken. It can be removed after
         //   some time if no issues are found.
@@ -400,3 +401,9 @@ private class ActionEnableStatus(
 private enum class LogLevel {
   DEBUG, INFO, ERROR,
 }
+
+private val DataContext.isNotSupportedContextComponent: Boolean
+  get() {
+    val contextComponent = this.getData(PlatformDataKeys.CONTEXT_COMPONENT) ?: return true
+    return contextComponent !is EditorComponentImpl && contextComponent !is ExTextField
+  }
