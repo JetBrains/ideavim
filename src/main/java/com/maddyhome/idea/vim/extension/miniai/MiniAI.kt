@@ -194,42 +194,60 @@ private fun addAction(action: TextObjectActionHandler) {
   keyHandlerState.commandBuilder.addAction(action)
 }
 
+private fun findClosestDelimitedRange(
+  caret: ImmutableVimCaret,
+  delimiters: List<Char>,
+  findRange: (Char) -> TextRange?
+): TextRange? {
+  val allRanges = delimiters.mapNotNull { char ->
+    findRange(char)?.let { range ->
+      DelimitedRange(range, char)
+    }
+  }
+
+  // First, find all ranges that contain the caret
+  val containingRanges = allRanges.filter {
+    caret.offset in it.range.startOffset..it.range.endOffset
+  }
+
+  // If we have containing ranges, return the smallest one
+  if (containingRanges.isNotEmpty()) {
+    return containingRanges.minBy {
+      it.range.endOffset - it.range.startOffset
+    }.range
+  }
+
+  // If no containing ranges, find the closest one
+  return allRanges
+    .minByOrNull { range ->
+      kotlin.math.abs(caret.offset - range.range.startOffset)
+    }?.range
+}
+
 private fun findClosestBracketRange(
   editor: VimEditor,
   caret: ImmutableVimCaret,
   count: Int,
-  isOuter: Boolean,
+  isOuter: Boolean
 ): TextRange? {
-  return listOf('(', '[', '{')
-    .mapNotNull { char ->
-      findBlockRange(editor, caret, char, count, isOuter)?.let { range -> range to char }
-    }
-    .minByOrNull { it.first.distanceTo(caret.offset) }?.first
+  val brackets = listOf('(', '[', '{')
+  return findClosestDelimitedRange(caret, brackets) { char ->
+    findBlockRange(editor, caret, char, count, isOuter)
+  }
 }
 
 private fun findClosestQuoteRange(
   editor: VimEditor,
   caret: ImmutableVimCaret,
-  isOuter: Boolean,
+  isOuter: Boolean
 ): TextRange? {
-  return listOf('`', '"', '\'')
-    .mapNotNull { char ->
-      injector.searchHelper.findBlockQuoteInLineRange(editor, caret, char, isOuter)?.let { range -> range to char }
-    }
-    .minByOrNull { it.first.distanceTo(caret.offset) }?.first
-}
-
-private fun TextRange.distanceTo(caretOffset: Int): Int {
-  val rangeLength = endOffset - startOffset
-
-  // If caret is inside the range
-  if (caretOffset in startOffset..endOffset) {
-    // Return the length of the range - smaller ranges get priority
-    return rangeLength
+  val quotes = listOf('`', '"', '\'')
+  return findClosestDelimitedRange(caret, quotes) { char ->
+    injector.searchHelper.findBlockQuoteInLineRange(editor, caret, char, isOuter)
   }
-
-  // If caret is outside, make the distance much larger
-  val startDistance = kotlin.math.abs(caretOffset - startOffset)
-  val endDistance = kotlin.math.abs(caretOffset - endOffset)
-  return (startDistance + endDistance) * 1000 + rangeLength
 }
+
+private data class DelimitedRange(
+  val range: TextRange,
+  val char: Char
+)
