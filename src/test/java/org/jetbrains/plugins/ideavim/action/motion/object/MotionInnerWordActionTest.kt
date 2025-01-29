@@ -183,6 +183,16 @@ class MotionInnerWordActionTest : VimTestCase() {
   }
 
   @Test
+  fun `test select word selects up to punctuation 2`() {
+    doTest(
+      "viw",
+      "Lorem ipsum dolor sit ame${c}t, consectetur adipiscing elit",
+      "Lorem ipsum dolor sit ${s}ame${c}t${se}, consectetur adipiscing elit",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
   fun `test select word with existing left-to-right selection selects rest of word`() {
     doTest(
       listOf("v", "l", "iw"),
@@ -377,24 +387,11 @@ class MotionInnerWordActionTest : VimTestCase() {
     )
   }
 
-  @VimBehaviorDiffers(originalVimAfter =
-    """
-      |Lorem ipsum dolor sit amet,
-      |
-      |${s}
-      |
-      |
-      |
-      |${c}${se}
-      |
-      |consectetur adipiscing elit
-    """,
-    description = "I don't understand Vim's logic for selecting mulitple empty lines with 'iw'." +
-      "E.g. `v3iw` will select 5 lines, `v4iw` will select 7, `v5iw` selects 9. " +
-      "Fix only when/if Vim's behaviour is clarified"
-  )
   @Test
   fun `test select multiple empty lines`() {
+    // I don't understand the logic of this. I would expect v3iw to select 3 lines, but instead it selects 5.
+    // And v4iw selects 7, v5iw selects 9. But this is how Vim behaves, and it's working and the other tests are working
+    // too. Let's not question it too hard.
     doTest(
       "v3iw",
       """
@@ -414,8 +411,8 @@ class MotionInnerWordActionTest : VimTestCase() {
         |${s}
         |
         |
-        |${c}${se}
         |
+        |${c}${se}
         |
         |consectetur adipiscing elit
       """.trimMargin(),
@@ -708,22 +705,11 @@ class MotionInnerWordActionTest : VimTestCase() {
     )
   }
 
-  @VimBehaviorDiffers(originalVimAfter =
-    """
-      |Lorem ${s}Ipsum
-      |
-      |${c}L${se}orem ipsum dolor sit amet,
-      |consectetur adipiscing elit
-      |Sed in orci mauris.
-      |Cras id tellus in ex imperdiet egestas.
-    """,
-    description = "Vim's behaviour is weird. Makes no sense that it selects the first character of the word. " +
-      "Possibly a bug in Vim: https://github.com/vim/vim/issues/16514 " +
-      "Unclear what the correct behaviour should be",
-    shouldBeFixed = false
-  )
   @Test
   fun `test repeated text object expands to empty line`() {
+    // Well. This behaviour is weird, and looks like a bug, but it matches Vim's behaviour.
+    // I'm not entirely sure why this happens, but it's a vote of confidence in IdeaVim's implementation that we're
+    // matching bugs! 😁
     doTest(
       listOf("viw", "iw"),
       """
@@ -736,8 +722,8 @@ class MotionInnerWordActionTest : VimTestCase() {
       """.trimMargin(),
       """
         |Lorem ${s}Ipsum
-        |${c}${se}
-        |Lorem ipsum dolor sit amet,
+        |
+        |${c}L${se}orem ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
@@ -767,8 +753,8 @@ class MotionInnerWordActionTest : VimTestCase() {
       """.trimMargin(),
       """
         |Lorem ${s}Ipsum
-        |${c}${se}
         |
+        |${c}${se}
         |Lorem ipsum dolor sit amet,
       """.trimMargin(),
       Mode.VISUAL(SelectionType.CHARACTER_WISE),

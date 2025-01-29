@@ -69,10 +69,9 @@ class MotionOuterBigWordActionTest : VimTestCase() {
       |
       |consectetur adipiscing elit
     """,
-//    description = "The caret at the same offset as the selection end is an indication that there is an off-by-one error." +
-//      "IdeaVim doesn't (currently) allow selecting the end of line char, so this inclusive range does not include the" +
-//      "(exclusive) end of line char. Once IdeaVim handles this, we might have to fix things"
-    description = "Not yet implemented"
+    description = "The caret at the same offset as the selection end is an indication that there is an off-by-one error." +
+      "IdeaVim doesn't (currently) allow selecting the end of line char, so this inclusive range does not include the" +
+      "(exclusive) end of line char. Once IdeaVim handles this, we might have to fix things"
   )
   @Test
   fun `test select empty line`() {
@@ -92,11 +91,11 @@ class MotionOuterBigWordActionTest : VimTestCase() {
         |Lorem ipsum dolor sit amet,
         |
         |${s}
+        |${c}${se}
         |
         |
         |
-        |
-        |consectetu${c}r${se} adipiscing elit
+        |consectetur adipiscing elit
       """.trimMargin(),
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
@@ -144,14 +143,37 @@ class MotionOuterBigWordActionTest : VimTestCase() {
     )
   }
 
+  @Test
+  fun `test select outer word skips following empty line`() {
+    doTest(
+      listOf("vaW", "aW"),
+      """
+        |Lorem ipsum dolor sit amet,
+        |
+        |con${c}sectetur
+        |
+        |adipiscing elit
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet,
+        |
+        |${s}consectetur
+        |
+        |adipiscin${c}g${se} elit
+      """.trimMargin(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
   @VimBehaviorDiffers(originalVimAfter =
     """
       |Lorem ipsum dolor sit amet,
       |
       |${s}
-      |
-      |${c}${se}consectetur adipiscing elit
+      |${c}
+      |${se}consectetur adipiscing elit
     """,
+    description = "Off by one because IdeaVim does not allow selecting a newline char"
   )
   @Test
   fun `test select empty line wraps to next line but does not wrap to following line`() {
@@ -168,8 +190,8 @@ class MotionOuterBigWordActionTest : VimTestCase() {
         |Lorem ipsum dolor sit amet,
         |
         |${s}
-        |
-        |consectetu${c}r${se} adipiscing elit
+        |${c}${se}
+        |consectetur adipiscing elit
       """.trimMargin(),
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
@@ -187,7 +209,8 @@ class MotionOuterBigWordActionTest : VimTestCase() {
       |${c}
       |${se}
       |consectetur adipiscing elit
-    """
+    """,
+    description = "Off by one because IdeaVim does not allow selecting a newline char"
   )
   @Test
   fun `test select multiple empty lines`() {
@@ -213,9 +236,9 @@ class MotionOuterBigWordActionTest : VimTestCase() {
         |
         |
         |
+        |${c}${se}
         |
-        |
-        |consectetur adipiscing eli${c}t${se}
+        |consectetur adipiscing elit
       """.trimMargin(),
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
@@ -231,10 +254,9 @@ class MotionOuterBigWordActionTest : VimTestCase() {
       |
       |consectetur adipiscing elit
     """,
-//    description = "The caret at the same offset as the selection end is an indication that there is an off-by-one error." +
-//      "IdeaVim doesn't (currently) allow selecting the end of line char, so this inclusive range does not include the" +
-//      "(exclusive) end of line char. Once IdeaVim handles this, we might have to fix things"
-    description = "Not yet implemented"
+    description = "The caret at the same offset as the selection end is an indication that there is an off-by-one error." +
+      "IdeaVim doesn't (currently) allow selecting the end of line char, so this inclusive range does not include the" +
+      "(exclusive) end of line char. Once IdeaVim handles this, we might have to fix things"
   )
   @Test
   fun `test select blank line`() {
@@ -253,10 +275,10 @@ class MotionOuterBigWordActionTest : VimTestCase() {
         |Lorem ipsum dolor sit amet,
         |
         |${s}....
+        |${c}${se}
         |
         |
-        |
-        |consectetu${c}r${se} adipiscing elit
+        |consectetur adipiscing elit
       """.trimMargin().dotToSpace(),
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
@@ -472,13 +494,14 @@ class MotionOuterBigWordActionTest : VimTestCase() {
     """
       |Lorem${s} Ipsum
       |
-      |${c}${se}
-      |
+      |${c}
+      |${se}
       |Lorem ipsum dolor sit amet,
       |consectetur adipiscing elit
       |Sed in orci mauris.
       |Cras id tellus in ex imperdiet egestas.
-    """
+    """,
+    description = "Off by one because IdeaVim does not currently support selecting newline char"
   )
   @Test
   fun `test repeated text object expands to multiple empty lines`() {
@@ -497,9 +520,9 @@ class MotionOuterBigWordActionTest : VimTestCase() {
       """
         |Lorem${s} Ipsum
         |
+        |${c}${se}
         |
-        |
-        |Lore${c}m${se} ipsum dolor sit amet,
+        |Lorem ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
@@ -532,7 +555,6 @@ class MotionOuterBigWordActionTest : VimTestCase() {
     )
   }
 
-  // TODO: Fix this bug
   @VimBehaviorDiffers(originalVimAfter =
     """
       |Lorem${s} Ipsum
@@ -543,7 +565,8 @@ class MotionOuterBigWordActionTest : VimTestCase() {
       |consectetur adipiscing elit
       |Sed in orci mauris.
       |Cras id tellus in ex imperdiet egestas.
-    """
+    """,
+    description = "Off by one because IdeaVim does not currently support selecting newline char"
   )
   @Test
   fun `test repeated text object expands to cover whitespace on following blank lines`() {
@@ -563,8 +586,8 @@ class MotionOuterBigWordActionTest : VimTestCase() {
         |Lorem${s} Ipsum
         |
         |........
-        |
-        |Lore${c}m${se} ipsum dolor sit amet,
+        |${c}${se}
+        |Lorem ipsum dolor sit amet,
         |consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.

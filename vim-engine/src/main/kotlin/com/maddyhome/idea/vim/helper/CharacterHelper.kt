@@ -47,6 +47,10 @@ object CharacterHelper {
   }
 
   @JvmStatic
+  fun isWhitespace(editor: VimEditor, ch: Char, isBig: Boolean): Boolean =
+    charType(editor, ch, isBig) == CharacterType.WHITESPACE
+
+  @JvmStatic
   fun isInvisibleControlCharacter(ch: Char): Boolean {
     val type = Character.getType(ch).toByte()
     return type == Character.CONTROL || type == Character.FORMAT || type == Character.PRIVATE_USE ||

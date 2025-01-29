@@ -139,31 +139,20 @@ interface VimSearchHelper {
    * @param searchFrom The offset in the document to search from
    * @param count      Return an offset to the [count] word from the starting position. Will search backwards if negative
    * @param bigWord    Use WORD instead of word boundaries
-   * @param spaceWords Include whitespace as part of a word, e.g. the difference between `iw` and `aw` motions
-   * @return The offset of the [count] next word, or `0` or the offset of the end of file if not found
-   */
-  fun findNextWordEnd(editor: VimEditor, searchFrom: Int, count: Int, bigWord: Boolean, spaceWords: Boolean): Int
-
-  /**
-   * Find the end offset in some text outside the editor (e.g., command line), from the given starting point
-   *
-   * @param text        The text to search in
-   * @param textLength  The text length
-   * @param editor Required because word boundaries depend on local-to-buffer options
-   * @param searchFrom The offset in the document to search from
-   * @param count      Return an offset to the [count] word from the starting position. Will search backwards if negative
-   * @param bigWord    Use WORD instead of word boundaries
-   * @param spaceWords Include whitespace as part of a word, e.g. the difference between `iw` and `aw` motions
-   * @return The offset of the [count] next word, or `0` or the offset of the end of file if not found
+   * @param stopOnEmptyLine Vim considers an empty line to be a word/WORD, but `e` and `E` don't respect this for vi
+   *                        compatibility reasons. Callers other than `e` and `E` should pass `true`
+   * @param allowMoveFromWordEnd If we're already at the word end, should we be able to move to the next word end? This
+   *                             is true for word/WORD motions `e`/`E`, but false for word text objects, which do not
+   *                             extend the selection/range forwards when at the end of a current word.
+   * @return The offset of the [count] next word/WORD. Will return document bounds if not found
    */
   fun findNextWordEnd(
-    text: CharSequence,
-    textLength: Int,
     editor: VimEditor,
     searchFrom: Int,
     count: Int,
     bigWord: Boolean,
-    spaceWords: Boolean,
+    stopOnEmptyLine: Boolean = true,
+    allowMoveFromWordEnd: Boolean = true,
   ): Int
 
   /**

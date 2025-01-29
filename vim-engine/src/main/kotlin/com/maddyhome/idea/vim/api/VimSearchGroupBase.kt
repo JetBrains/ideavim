@@ -622,7 +622,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     ) {
       start + 1
     } else {
-      injector.searchHelper.findNextWordEnd(editor, start, 1, bigWord = false, spaceWords = false) + 1
+      injector.searchHelper.findNextWordEnd(editor, start, 1, bigWord = false) + 1
     }
     return TextRange(start, end)
   }
