@@ -10,17 +10,58 @@ package org.jetbrains.plugins.ideavim.extension.miniai
 
 import com.intellij.ide.highlighter.JavaFileType
 import com.maddyhome.idea.vim.state.mode.Mode
-import org.jetbrains.plugins.ideavim.VimJavaTestCase
+import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 
 @Suppress("SpellCheckingInspection")
-class MiniAIExtensionTest : VimJavaTestCase() {
+class MiniAIExtensionTest : VimTestCase() {
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
     enableExtensions("mini-ai")
+  }
+
+
+  @Test
+  fun testFromAlex() {
+    doTest(
+      "ciq",
+      "<caret>This is a \"'simple'\" test",
+      "This is a \"<caret>\" test",
+      Mode.INSERT,
+      JavaFileType.INSTANCE,
+    )
+    assertSelection(null)
+  }
+
+
+  // To make sure the order in list is not relevant
+  @Test
+  fun testChangeInsideBackQuoteWithNestedSingleQuote() {
+    doTest(
+      "ciq",
+      "<caret>This is a `'simple'` test",
+      "This is a `<caret>` test",
+      Mode.INSERT,
+      JavaFileType.INSTANCE,
+    )
+    assertSelection(null)
+  }
+
+
+  // To make sure the order in list is not relevant
+  @Test
+  fun testChangeInsideSingleQuoteWithNestedDoubleQuote() {
+    doTest(
+      "ciq",
+      "<caret>This is a '\"simple\"' test",
+      "This is a '<caret>' test",
+      Mode.INSERT,
+      JavaFileType.INSTANCE,
+    )
+    assertSelection(null)
   }
 
   @Test
