@@ -21,14 +21,16 @@ import com.intellij.util.Consumer
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.common.ModeChangeListener
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import java.awt.Component
 import java.awt.event.MouseEvent
-import java.util.regex.Pattern
 
 internal object SearchIndex {
   internal const val ID = "IdeaVimSearchIndex"
@@ -119,35 +121,24 @@ internal class VimSearchIndexExtension : VimExtension, ModeChangeListener {
 
     LOG.info("Processing pattern: $pattern")
 
-    val document = editor.document
-    val text = document.text
-    val caretOffset = editor.caretModel.offset
+    // FIXME: global search option -> previous search option
+    val ignoreCase = injector.options(editor = editor.vim).ignorecase
+    LOG.info("Ignore case: $ignoreCase")
 
-    val compiledPattern = try {
-      val ignoreCase = true
-      LOG.info("Ignore case: $ignoreCase")
-      val flags = if (ignoreCase) Pattern.CASE_INSENSITIVE else 0
-      Pattern.compile(pattern, flags)
-    } catch (e: Exception) {
-      LOG.error("Failed to compile pattern: $pattern", e)
-      return
-    }
+    val results = injector.searchHelper.findAll(
+      editor = editor.vim,
+      pattern = pattern,
+      startLine = 0,
+      endLine = -1,
+      ignoreCase = ignoreCase,
+    )
 
-    val matcher = compiledPattern.matcher(text)
-    var total = 0
-    var current = 0
-
-    while (matcher.find()) {
-      total++
-      if (matcher.start() <= caretOffset && caretOffset <= matcher.end()) {
-        current = total
-      }
-    }
     val label = ExEntryPanel.getInstance().label
-    if (total > 0) {
-      LOG.info("Found $total matches, current position: $current")
+    if (results.isNotEmpty()) {
+      var current = getCurrentIndex(editor = editor, results = results)
+      LOG.info("Found ${results.size} matches, current position: $current")
       ApplicationManager.getApplication().invokeLater {
-        SearchIndex.update("[${current}/${total}] $label$pattern")
+        SearchIndex.update("[${current}/${results.size}] $label$pattern")
       }
     } else {
       LOG.info("No matches found")
@@ -155,5 +146,19 @@ internal class VimSearchIndexExtension : VimExtension, ModeChangeListener {
         SearchIndex.update("[0/0] $label$pattern")
       }
     }
+  }
+
+  private fun getCurrentIndex(
+    editor: Editor,
+    results: List<TextRange>,
+  ): Int {
+    val caretOffset = editor.caretModel.offset
+    var current = 0
+    results.forEachIndexed { index, range ->
+      if (range.startOffset <= caretOffset && caretOffset <= range.endOffset) {
+        current = index + 1
+      }
+    }
+    return current
   }
 }
