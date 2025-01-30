@@ -143,15 +143,16 @@ internal class VimSearchIndexExtension : VimExtension, ModeChangeListener {
         current = total
       }
     }
+    val label = ExEntryPanel.getInstance().label
     if (total > 0) {
       LOG.info("Found $total matches, current position: $current")
       ApplicationManager.getApplication().invokeLater {
-        SearchIndex.update("[${current}/${total}]")
+        SearchIndex.update("[${current}/${total}] $label$pattern")
       }
     } else {
       LOG.info("No matches found")
       ApplicationManager.getApplication().invokeLater {
-        SearchIndex.update("[0/0]")
+        SearchIndex.update("[0/0] $label$pattern")
       }
     }
   }
