@@ -149,7 +149,7 @@ internal class VimSearchIndexExtension : VimExtension, ModeChangeListener {
     LOG.info("Initializing SearchIndex extension")
     injector.listenersNotifier.modeChangeListeners.add(this)
 
-    listOf("n", "N", "*", "#").forEach {
+    listOf("n", "N", "*", "#", "g*", "g#").forEach {
       val key = injector.parser.parseKeys(it)
       VimExtensionFacade.putExtensionHandlerMapping(
         modes = setOf(MappingMode.NORMAL, MappingMode.VISUAL),
