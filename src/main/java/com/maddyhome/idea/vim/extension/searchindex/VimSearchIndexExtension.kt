@@ -19,12 +19,17 @@ import com.intellij.openapi.wm.WindowManager
 import com.intellij.openapi.wm.impl.status.EditorBasedWidget
 import com.intellij.util.Consumer
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
+import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.ModeChangeListener
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtension
+import com.maddyhome.idea.vim.extension.VimExtensionFacade
 import com.maddyhome.idea.vim.newapi.IjVimSearchGroup
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
@@ -32,6 +37,7 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import java.awt.Component
 import java.awt.event.MouseEvent
+import javax.swing.KeyStroke
 
 internal object SearchIndex {
   internal const val ID = "IdeaVimSearchIndex"
@@ -71,6 +77,13 @@ internal class SearchIndexWidget(project: Project) :
   override fun getAlignment() = Component.RIGHT_ALIGNMENT
 }
 
+private class SearchAgainHandler(private val keys: List<KeyStroke>) : ExtensionHandler {
+  override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
+    VimExtensionFacade.executeNormalWithoutMapping(keys, editor.ij)
+    VimSearchIndexExtension.updateSearchIndex(editor.ij, VimPlugin.getSearch())
+  }
+}
+
 internal class VimSearchIndexExtension : VimExtension, ModeChangeListener {
   init {
     LOG.info("Looking at SearchGroup implementation: ${VimPlugin.getSearch().javaClass}")
@@ -78,6 +91,56 @@ internal class VimSearchIndexExtension : VimExtension, ModeChangeListener {
 
   companion object {
     private val LOG = logger<VimSearchIndexExtension>()
+
+    fun updateSearchIndex(editor: Editor, searchGroup: IjVimSearchGroup) {
+      if (searchGroup.lastSearchPattern.isNullOrEmpty()) {
+        return
+      }
+      val pattern = searchGroup.lastSearchPattern
+      if (pattern.isNullOrEmpty()) {
+        return
+      }
+
+      LOG.info("search index - Processing pattern: $pattern")
+
+      // FIXME: global search option -> previous search option
+      val ignoreCase = injector.options(editor = editor.vim).ignorecase
+      LOG.info("Ignore case: $ignoreCase")
+
+      val results = injector.searchHelper.findAll(
+        editor = editor.vim,
+        pattern = pattern,
+        startLine = 0,
+        endLine = -1,
+        ignoreCase = ignoreCase,
+      )
+
+      val label = ExEntryPanel.getInstance().label
+      val (currentIndex: Int, resultSize: Int) = if (results.isNotEmpty()) {
+        Pair(first = getCurrentIndex(editor = editor, results = results), second = results.size)
+      } else {
+        Pair(first = 0, second = 0)
+      }
+
+      ApplicationManager.getApplication().invokeLater {
+        LOG.info("searchindex - [${currentIndex}/${resultSize}] $label$pattern")
+        SearchIndex.update("[${currentIndex}/${resultSize}] $label$pattern")
+      }
+    }
+
+    fun getCurrentIndex(
+      editor: Editor,
+      results: List<TextRange>,
+    ): Int {
+      val caretOffset = editor.caretModel.offset
+      var current = 0
+      results.forEachIndexed { index, range ->
+        if (range.startOffset <= caretOffset && caretOffset <= range.endOffset) {
+          current = index + 1
+        }
+      }
+      return current
+    }
   }
 
   override fun getName(): String = "searchindex"
@@ -85,6 +148,17 @@ internal class VimSearchIndexExtension : VimExtension, ModeChangeListener {
   override fun init() {
     LOG.info("Initializing SearchIndex extension")
     injector.listenersNotifier.modeChangeListeners.add(this)
+
+    listOf("n", "N", "*", "#").forEach {
+      val key = injector.parser.parseKeys(it)
+      VimExtensionFacade.putExtensionHandlerMapping(
+        modes = setOf(MappingMode.NORMAL, MappingMode.VISUAL),
+        fromKeys = key,
+        pluginOwner = owner,
+        extensionHandler = SearchAgainHandler(key),
+        recursive = false,
+      )
+    }
   }
 
   override fun dispose() {
@@ -106,55 +180,5 @@ internal class VimSearchIndexExtension : VimExtension, ModeChangeListener {
         }
       }
     }
-  }
-
-  private fun updateSearchIndex(editor: Editor, searchGroup: IjVimSearchGroup) {
-    if (searchGroup.lastSearchPattern.isNullOrEmpty()) {
-      return
-    }
-    val pattern = searchGroup.lastSearchPattern
-    if (pattern.isNullOrEmpty()) {
-      return
-    }
-
-    LOG.info("search index - Processing pattern: $pattern")
-
-    // FIXME: global search option -> previous search option
-    val ignoreCase = injector.options(editor = editor.vim).ignorecase
-    LOG.info("Ignore case: $ignoreCase")
-
-    val results = injector.searchHelper.findAll(
-      editor = editor.vim,
-      pattern = pattern,
-      startLine = 0,
-      endLine = -1,
-      ignoreCase = ignoreCase,
-    )
-
-    val label = ExEntryPanel.getInstance().label
-    val (currentIndex: Int, resultSize: Int) = if (results.isNotEmpty()) {
-      Pair(first = getCurrentIndex(editor = editor, results = results), second = results.size)
-    } else {
-      Pair(first = 0, second = 0)
-    }
-
-    ApplicationManager.getApplication().invokeLater {
-      LOG.info("searchindex - [${currentIndex}/${resultSize}] $label$pattern")
-      SearchIndex.update("[${currentIndex}/${resultSize}] $label$pattern")
-    }
-  }
-
-  private fun getCurrentIndex(
-    editor: Editor,
-    results: List<TextRange>,
-  ): Int {
-    val caretOffset = editor.caretModel.offset
-    var current = 0
-    results.forEachIndexed { index, range ->
-      if (range.startOffset <= caretOffset && caretOffset <= range.endOffset) {
-        current = index + 1
-      }
-    }
-    return current
   }
 }
