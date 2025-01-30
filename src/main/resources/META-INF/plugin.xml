@@ -65,6 +65,7 @@
     <statusBarWidgetFactory id="IdeaVim-Icon" implementation="com.maddyhome.idea.vim.ui.StatusBarIconFactory" order="last, before IdeaVimMode"/>
     <statusBarWidgetFactory id="IdeaVimShowCmd" implementation="com.maddyhome.idea.vim.ui.ShowCmdStatusBarWidgetFactory" order="first"/>
     <statusBarWidgetFactory id="IdeaVimMacro" implementation="com.maddyhome.idea.vim.ui.widgets.macro.MacroWidgetFactory" order="first, after IdeaVimShowCmd"/>
+    <statusBarWidgetFactory id="IdeaVimSearchIndex" implementation="com.maddyhome.idea.vim.extension.searchindex.SearchIndexWidgetFactory" order="after IdeaVimShowCmd" />
 
     <applicationService serviceImplementation="com.maddyhome.idea.vim.VimPlugin"/>
 

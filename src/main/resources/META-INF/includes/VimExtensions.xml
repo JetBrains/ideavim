@@ -142,6 +142,13 @@
         <alias name="vim-sneak"/>
       </aliases>
     </vimExtension>
+
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.searchindex.VimSearchIndexExtension" name="searchindex">
+      <aliases>
+        <alias name="https://github.com/google/vim-searchindex"/>
+        <alias name="google/vim-searchindex"/>
+      </aliases>
+    </vimExtension>
   </extensions>
 
   <!--  IdeaVim extensions-->
