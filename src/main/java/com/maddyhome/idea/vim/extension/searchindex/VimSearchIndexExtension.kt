@@ -128,7 +128,7 @@ internal class VimSearchIndexExtension : VimExtension, ModeChangeListener {
       }
     }
 
-    fun getCurrentIndex(
+    private fun getCurrentIndex(
       editor: Editor,
       results: List<TextRange>,
     ): Int {
@@ -166,7 +166,6 @@ internal class VimSearchIndexExtension : VimExtension, ModeChangeListener {
     injector.listenersNotifier.modeChangeListeners.remove(this)
   }
 
-  // TODO: should support * , #
   override fun modeChanged(editor: VimEditor, oldMode: Mode) {
     LOG.info("Mode changed from $oldMode to ${editor.mode}")
 
