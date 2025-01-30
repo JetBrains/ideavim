@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.common.ModeChangeListener
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.VimExtension
+import com.maddyhome.idea.vim.newapi.IjVimSearchGroup
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
@@ -91,6 +92,7 @@ internal class VimSearchIndexExtension : VimExtension, ModeChangeListener {
     injector.listenersNotifier.modeChangeListeners.remove(this)
   }
 
+  // TODO: should support * , #
   override fun modeChanged(editor: VimEditor, oldMode: Mode) {
     LOG.info("Mode changed from $oldMode to ${editor.mode}")
 
@@ -100,26 +102,22 @@ internal class VimSearchIndexExtension : VimExtension, ModeChangeListener {
 
       if (label == "/" || label == "?") {
         ApplicationManager.getApplication().invokeLater {
-          val searchGroup = VimPlugin.getSearch()
-          val pattern = searchGroup.lastSearchPattern
-          LOG.info("Last search pattern: $pattern")
-
-          if (!pattern.isNullOrEmpty()) {
-            updateSearchIndex(editor.ij)
-          }
+          updateSearchIndex(editor = editor.ij, searchGroup = VimPlugin.getSearch())
         }
       }
     }
   }
 
-  private fun updateSearchIndex(editor: Editor) {
-    LOG.info("Updating search index")
+  private fun updateSearchIndex(editor: Editor, searchGroup: IjVimSearchGroup) {
+    if (searchGroup.lastSearchPattern.isNullOrEmpty()) {
+      return
+    }
+    val pattern = searchGroup.lastSearchPattern
+    if (pattern.isNullOrEmpty()) {
+      return
+    }
 
-    val searchGroup = VimPlugin.getSearch()
-    val pattern = searchGroup.lastSearchPattern ?: return
-    if (pattern.isEmpty()) return
-
-    LOG.info("Processing pattern: $pattern")
+    LOG.info("search index - Processing pattern: $pattern")
 
     // FIXME: global search option -> previous search option
     val ignoreCase = injector.options(editor = editor.vim).ignorecase
@@ -134,17 +132,15 @@ internal class VimSearchIndexExtension : VimExtension, ModeChangeListener {
     )
 
     val label = ExEntryPanel.getInstance().label
-    if (results.isNotEmpty()) {
-      var current = getCurrentIndex(editor = editor, results = results)
-      LOG.info("Found ${results.size} matches, current position: $current")
-      ApplicationManager.getApplication().invokeLater {
-        SearchIndex.update("[${current}/${results.size}] $label$pattern")
-      }
+    val (currentIndex: Int, resultSize: Int) = if (results.isNotEmpty()) {
+      Pair(first = getCurrentIndex(editor = editor, results = results), second = results.size)
     } else {
-      LOG.info("No matches found")
-      ApplicationManager.getApplication().invokeLater {
-        SearchIndex.update("[0/0] $label$pattern")
-      }
+      Pair(first = 0, second = 0)
+    }
+
+    ApplicationManager.getApplication().invokeLater {
+      LOG.info("searchindex - [${currentIndex}/${resultSize}] $label$pattern")
+      SearchIndex.update("[${currentIndex}/${resultSize}] $label$pattern")
     }
   }
 
