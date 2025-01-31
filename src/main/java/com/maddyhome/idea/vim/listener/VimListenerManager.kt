@@ -99,6 +99,7 @@ import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.inSelectMode
 import com.maddyhome.idea.vim.state.mode.selectionType
+import com.maddyhome.idea.vim.troubleshooting.AccidentalInstallDetectorEditorListener
 import com.maddyhome.idea.vim.ui.ShowCmdOptionChangeListener
 import com.maddyhome.idea.vim.ui.ShowCmdWidgetUpdater
 import com.maddyhome.idea.vim.ui.widgets.macro.MacroWidgetListener
@@ -175,6 +176,8 @@ internal object VimListenerManager {
 
     injector.listenersNotifier.myEditorListeners.add(IJEditorFocusListener())
     injector.listenersNotifier.myEditorListeners.add(ShowCmdWidgetUpdater())
+
+    injector.listenersNotifier.myEditorListeners.add(AccidentalInstallDetectorEditorListener())
   }
 
   fun turnOff() {
