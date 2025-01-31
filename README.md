@@ -309,7 +309,9 @@ endif
 
 The power of contributing drives IdeaVim :muscle:. Even small contributions matter!
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) to start bringing your value to the project.
+See the contribution guide in [CONTRIBUTING.md](CONTRIBUTING.md) to start bringing your value to the project.
+
+😎 In 2025, we launched a rewards program. See the guide for details.
 
 Authors
 -------
