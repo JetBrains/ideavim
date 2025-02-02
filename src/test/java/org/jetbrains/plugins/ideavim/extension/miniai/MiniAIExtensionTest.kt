@@ -37,6 +37,157 @@ class MiniAIExtensionTest : VimTestCase() {
   }
 
 
+  @Test
+  fun testFalseSingleQuoteInTheMiddle() {
+    doTest(
+      "ciq",
+      "'balanced'false <caret>string'balanced'",
+      "'balanced'false string'<caret>'",
+      Mode.INSERT,
+      JavaFileType.INSTANCE,
+    )
+    assertSelection(null)
+  }
+
+
+  @Test
+  fun testFalseDoubleQuoteInTheMiddle() {
+    doTest(
+      "ciq",
+      "\"balanced\"false <caret>string\"balanced\"",
+      "\"balanced\"false string\"<caret>\"",
+      Mode.INSERT,
+      JavaFileType.INSTANCE,
+    )
+    assertSelection(null)
+  }
+
+
+  @Test
+  fun testFalseBackQuoteInTheMiddle() {
+    doTest(
+      "ciq",
+      "`balanced`false <caret>string`balanced`",
+      "`balanced`false string`<caret>`",
+      Mode.INSERT,
+      JavaFileType.INSTANCE,
+    )
+    assertSelection(null)
+  }
+
+
+  @Test
+  fun testInsideMultilineSingleQuote() {
+    doTest(
+      "ciq",
+      """'
+      something
+      <caret>
+      something
+      '""",
+      "''",
+      Mode.INSERT,
+      JavaFileType.INSTANCE,
+    )
+    assertSelection(null)
+  }
+
+  @Test
+  fun testInsideMultilineDoubleQuote() {
+    doTest(
+      "ciq",
+      """"
+      something
+      <caret>
+      something
+      """",
+      "\"\"",
+      Mode.INSERT,
+      JavaFileType.INSTANCE,
+    )
+    assertSelection(null)
+  }
+
+
+  @Test
+  fun testInsideMultilineBackQuote() {
+    doTest(
+      "ciq",
+      """`
+      something
+      <caret>
+      something
+      `""",
+      "``",
+      Mode.INSERT,
+      JavaFileType.INSTANCE,
+    )
+    assertSelection(null)
+  }
+
+  @Test
+  fun testNextInsideMultilineSingleQuote() {
+    doTest(
+      "ciq",
+      """
+      <caret>  
+       
+      '
+      something
+      '
+      """,
+      """
+        
+       
+      '<caret>'
+      """,
+      Mode.INSERT,
+      JavaFileType.INSTANCE,
+    )
+    assertSelection(null)
+  }
+
+  @Test
+  fun testNextInsideMultilineCurlyBracket() {
+    doTest(
+      "cib",
+      """
+{
+<caret>
+print(something)
+}
+      """,
+      """
+{}
+      """,
+      Mode.INSERT,
+      JavaFileType.INSTANCE,
+    )
+    assertSelection(null)
+  }
+
+
+  @Test
+  fun testNextBracketInCurrentLineHasPriority() {
+    // Test case 1: Next bracket in same line has priority
+    doTest(
+      "cib",
+      """
+    {
+      <caret> print(something) {nested}
+    }
+    """.trimIndent(),
+      """
+    {
+       print(<caret>) {nested}
+    }
+    """.trimIndent(),
+      Mode.INSERT,
+      JavaFileType.INSTANCE,
+    )
+    assertSelection(null)
+  }
+
   // To make sure the order in list is not relevant
   @Test
   fun testChangeInsideBackQuoteWithNestedSingleQuote() {
