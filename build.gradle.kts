@@ -195,13 +195,6 @@ tasks {
     }
 
     systemProperty("ideavim.nvim.test", System.getProperty("nvim") ?: false)
-
-    dependencies {
-      intellijPlatform {
-        // Temporal solution to make tests work on the latest EAP release. See LLM-13649
-        bundledPlugins("com.intellij.llmInstaller")
-      }
-    }
   }
 
   compileJava {
