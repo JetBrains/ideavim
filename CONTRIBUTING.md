@@ -18,7 +18,7 @@ Subscriptions can be awarded for merged pull requests that meet the following re
 - The change should fix an issue or implement a feature filed by another user. If you want to file an issue and provide a solution to it, your request for a license should be explicitly discussed with the IdeaVim team in the ticket comments.
 
 
-We'd like to make sure this award program is helpful and fair. Since we just started it and are fine-tuning the details, the final say on giving licenses remains with the IdeaVim team and the requirements might evolve over time.
+We'd like to make sure this award program is helpful and fair. Since we just started it and still fine-tuning the details, the final say on giving licenses remains with the IdeaVim team and the requirements might evolve over time.
 
 
 Also, a few notes:
