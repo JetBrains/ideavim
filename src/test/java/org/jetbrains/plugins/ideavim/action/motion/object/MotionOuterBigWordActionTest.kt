@@ -58,6 +58,210 @@ class MotionOuterBigWordActionTest : VimTestCase() {
     )
   }
 
+  @VimBehaviorDiffers(originalVimAfter =
+    """
+      |Lorem ipsum dolor sit amet,
+      |
+      |${s}
+      |${c}
+      |${se}
+      |
+      |
+      |consectetur adipiscing elit
+    """,
+//    description = "The caret at the same offset as the selection end is an indication that there is an off-by-one error." +
+//      "IdeaVim doesn't (currently) allow selecting the end of line char, so this inclusive range does not include the" +
+//      "(exclusive) end of line char. Once IdeaVim handles this, we might have to fix things"
+    description = "Not yet implemented"
+  )
+  @Test
+  fun `test select empty line`() {
+    doTest(
+      "vaW",
+      """
+        |Lorem ipsum dolor sit amet,
+        |
+        |${c}
+        |
+        |
+        |
+        |
+        |consectetur adipiscing elit
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet,
+        |
+        |${s}
+        |
+        |
+        |
+        |
+        |consectetu${c}r${se} adipiscing elit
+      """.trimMargin(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test select empty line wraps to next line`() {
+    doTest(
+      "vaW",
+      """
+        |Lorem ipsum dolor sit amet,
+        |
+        |${c}
+        |consectetur adipiscing elit
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet,
+        |
+        |${s}
+        |consectetu${c}r${se} adipiscing elit
+      """.trimMargin(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test select outer WORD skips following empty line`() {
+    doTest(
+      listOf("vaW", "aW"),
+      """
+        |Lorem ipsum dolor sit amet,
+        |
+        |con${c}sectetur
+        |
+        |adipiscing elit
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet,
+        |
+        |${s}consectetur
+        |
+        |adipiscin${c}g${se} elit
+      """.trimMargin(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @VimBehaviorDiffers(originalVimAfter =
+    """
+      |Lorem ipsum dolor sit amet,
+      |
+      |${s}
+      |
+      |${c}${se}consectetur adipiscing elit
+    """,
+  )
+  @Test
+  fun `test select empty line wraps to next line but does not wrap to following line`() {
+    doTest(
+      "vaW",
+      """
+        |Lorem ipsum dolor sit amet,
+        |
+        |${c}
+        |
+        |consectetur adipiscing elit
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet,
+        |
+        |${s}
+        |
+        |consectetu${c}r${se} adipiscing elit
+      """.trimMargin(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @VimBehaviorDiffers(originalVimAfter =
+    """
+      |Lorem ipsum dolor sit amet,
+      |
+      |${s}
+      |
+      |
+      |
+      |
+      |${c}
+      |${se}
+      |consectetur adipiscing elit
+    """
+  )
+  @Test
+  fun `test select multiple empty lines`() {
+    doTest(
+      "v3aW",
+      """
+        |Lorem ipsum dolor sit amet,
+        |
+        |${c}
+        |
+        |
+        |
+        |
+        |
+        |
+        |consectetur adipiscing elit
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet,
+        |
+        |${s}
+        |
+        |
+        |
+        |
+        |
+        |
+        |consectetur adipiscing eli${c}t${se}
+      """.trimMargin(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @VimBehaviorDiffers(originalVimAfter =
+    """
+      |Lorem ipsum dolor sit amet,
+      |
+      |${s}....
+      |${c}
+      |${se}
+      |
+      |consectetur adipiscing elit
+    """,
+//    description = "The caret at the same offset as the selection end is an indication that there is an off-by-one error." +
+//      "IdeaVim doesn't (currently) allow selecting the end of line char, so this inclusive range does not include the" +
+//      "(exclusive) end of line char. Once IdeaVim handles this, we might have to fix things"
+    description = "Not yet implemented"
+  )
+  @Test
+  fun `test select blank line`() {
+    doTest(
+      "vaW",
+      """
+        |Lorem ipsum dolor sit amet,
+        |
+        |..${c}..
+        |
+        |
+        |
+        |consectetur adipiscing elit
+      """.trimMargin().dotToSpace(),
+      """
+        |Lorem ipsum dolor sit amet,
+        |
+        |${s}....
+        |
+        |
+        |
+        |consectetu${c}r${se} adipiscing elit
+      """.trimMargin().dotToSpace(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
   @VimBehaviorDiffers(
     originalVimAfter = "Lorem ${s}ipsum ${c}${se}dolor sit amet, consectetur adipiscing elit",
     description = "Text objects are implicitly inclusive. Vim adjusts the caret location for inclusive motions"
