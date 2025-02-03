@@ -24,7 +24,7 @@ internal class IjVimEnabler : VimEnabler {
 
   fun ideOpened() {
     val myFirstVersion = VimPlugin.getVimState().firstIdeaVimVersion
-    if (myFirstVersion == "-1") {
+    if (myFirstVersion == null) {
       VimPlugin.getVimState().firstIdeaVimVersion = VimPlugin.getVersion()
       this.isNewUser = true
     }

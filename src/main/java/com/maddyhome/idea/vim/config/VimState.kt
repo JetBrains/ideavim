@@ -19,11 +19,7 @@ internal class VimState {
   var isIdeaJoinNotified by StateProperty("idea-join")
   var isIdeaPutNotified by StateProperty("idea-put")
   var wasSubscribedToEAPAutomatically by StateProperty("was-automatically-subscribed-to-eap")
-
-  /**
-   * First logged version of IdeaVim, or "-1" if no version logged
-   */
-  var firstIdeaVimVersion: String by StringProperty("first-ideavim-version", "-1")
+  var firstIdeaVimVersion: String? by StringProperty("first-ideavim-version", null)
 
   fun readData(element: Element) {
     val notifications = element.getChild("notifications")
@@ -57,7 +53,7 @@ internal class VimState {
 }
 
 private val map by lazy { mutableMapOf<String, Boolean>() }
-private val stringMap by lazy { mutableMapOf<String, String>() }
+private val stringMap by lazy { mutableMapOf<String, String?>() }
 
 private class StateProperty(val xmlName: String) : ReadWriteProperty<VimState, Boolean> {
 
@@ -72,16 +68,17 @@ private class StateProperty(val xmlName: String) : ReadWriteProperty<VimState, B
   }
 }
 
-private class StringProperty(val propertyName: String, val defaultValue: String) : ReadWriteProperty<VimState, String> {
+private class StringProperty(val propertyName: String, val defaultValue: String?) : ReadWriteProperty<VimState, String?> {
 
   init {
     stringMap[propertyName] = defaultValue
   }
 
-  override fun getValue(thisRef: VimState, property: KProperty<*>): String =
-    stringMap.getOrPut(propertyName) { defaultValue }
+  override fun getValue(thisRef: VimState, property: KProperty<*>): String? {
+    return stringMap.getOrPut(propertyName) { defaultValue }
+  }
 
-  override fun setValue(thisRef: VimState, property: KProperty<*>, value: String) {
+  override fun setValue(thisRef: VimState, property: KProperty<*>, value: String?) {
     stringMap[propertyName] = value
   }
 }
