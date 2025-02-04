@@ -1592,29 +1592,44 @@ abstract class VimSearchHelperBase : VimSearchHelper {
           // Inner object. Whitespace is not included in a move, but included as a separate (counted) move
           //
           // Selection ends on whitespace: Move to end of current character type or end of line.
+          //   Or: move to one char before next word
           //   "${s}  ${se}         word" -> "${s}           ${se}word"
           //   "${s}  ${se} \n      word" -> "${s}   ${se}\n      word"
           // Selection ends on end of whitespace: Move to end of next character type.
+          //   Or: move to end of next word
           //   "${s}           ${se}word" -> "${s}           word${se}"
           //   "${s}   ${se}\nword      " -> "${s}   \nword${se}      "
-          //   "${s}   ${se}\n      word" -> "${s}   \n      ${se}word"
+          //   "${s}   ${se}\n      word" -> "${s}   \n      ${se}word" // End of next word doesn't work here
           // Selection ends on word: Move to end of current character type.
+          //   Or: move to end of current word
           //   "${s}wo${se}rd       word" -> "${s}word${se}       word"
           //   "${s}wo${se}rd,      word" -> "${s}word${se},      word"
           // Selection ends on end of word: Move to end of next character type or end of line.
+          //   Or: move to one before next word, or end of line
           //   "${s}word${se}    word   " -> "${s}word    ${se}word   "
-          //   "${s}word${se},   word   " -> "${s}word,${se}   word   "
+          //   "${s}word${se},   word   " -> "${s}word,${se}   word   " // One before next word doesn't work here
           //   "${s}word${se}  \n  word " -> "${s}word  ${se}\n  word "
           // Selection ends on word char at end of line: Move to end of next character type SKIPPING NEWLINE!
+          //   Or: move to end of next word
           //   "${s}word${se}\nword     " -> "${s}word\nword${se}     "
           //   "${s}  word${se}\nword   " -> "${s}  word\nword${se}   "
-          //   "${s}word${se}\n  word   " -> "${s}word\n  ${se}word   "
+          //   "${s}word${se}\n  word   " -> "${s}word\n  ${se}word   " // End of next word doesn't work here
           // Selection ends on whitespace at end of line: Move to end of next character type SKIPPING NEWLINE!
+          //   Or: move to one before next word
           //   "${s}word    ${se}\n    word" -> "${s}word    \n    ${se}word"
-          //   "${s}word    ${se}\nword    " -> "${s}word    \nword${se}    "
+          //   "${s}word    ${se}\nword    " -> "${s}word    \nword${se}    " // Doesn't work
           //
           // This can be generalised to move forward on character, skip again if it's a newline, then move to end of
           // the now current character type.
+          // NEW: I think we can generalise to the same algorithm as outer motions, but flipped
+          // Move forward one char, and again if we land on newline
+          // If on whitespace, move to one char before start of next word (skipping following whitespace)
+          // If on word, move to end of current word (no preceding whitespace to skip)
+          // The trick is that we're deciding based on the moved offset, not the original offset. That's why the
+          // examples in the table above have some that don't work.
+          // Unfortunately, this doesn't work, possibly because findNextWord needs to be rewritten. E.g. we don't have a
+          // way of telling it to stop at the end of line
+          // TODO: Rewrite findNextWord and then try to rewrite this object to work the same for inner+outer motions
 
           // Increment, and skip the newline char, unless we've just landed on an empty line
           end++
