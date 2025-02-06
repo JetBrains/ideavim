@@ -31,7 +31,7 @@ class MoveToPreviousWordAction : VimActionHandler.SingleExecution() {
     val commandLine = injector.commandLine.getActiveCommandLine() ?: return false
 
     val text = commandLine.actualText
-    val motion = injector.motion.findOffsetOfNextWord(text, text.length, commandLine.caret.offset, -1, true, editor)
+    val motion = injector.motion.findOffsetOfNextWord(text, commandLine.caret.offset, -1, true, editor)
     when (motion) {
       is Motion.AbsoluteOffset -> {
         commandLine.caret.offset = motion.offset

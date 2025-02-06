@@ -788,19 +788,12 @@ class MotionOuterWordActionTest : VimTestCase() {
     )
   }
 
-  // TODO: Fix this bug
-  @VimBehaviorDiffers(originalVimAfter =
-    "Lorem${s}    ipsum --dolor${c} ${se}sit amet, consectetur adipiscing elit",
-    description = "First aw should select whitespace+'ipsum' " +
-      "second should select whitespace+'--' " +
-      "third should select 'dolor' and following whitespace",
-  )
   @Test
   fun `test select multiple outer words starting in whitespace`() {
     doTest(
       "v3aw",
       "Lorem  ${c}  ipsum --dolor sit amet, consectetur adipiscing elit",
-      "Lorem${s}    ipsum --dolo${c}r${se} sit amet, consectetur adipiscing elit",
+      "Lorem${s}    ipsum --dolor${c} ${se}sit amet, consectetur adipiscing elit",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
