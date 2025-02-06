@@ -99,36 +99,35 @@ interface VimSearchHelper {
   /**
    * Find the next word in the editor's document, from the given starting point
    *
+   * Note that this function can return an out of bounds index when there is no next word!
+   *
    * @param editor The editor's document to search in. Editor is required because word boundaries depend on
    *               local-to-buffer options
    * @param searchFrom The offset in the document to search from
    * @param count      Return an offset to the [count] word from the starting position. Will search backwards if negative
    * @param bigWord    Use WORD instead of word boundaries
-   * @param spaceWords Include whitespace as part of a word, e.g. the difference between `iw` and `aw` motions
    * @return The offset of the [count] next word, or `0` or the offset of the end of file if not found
    */
-  fun findNextWord(editor: VimEditor, searchFrom: Int, count: Int, bigWord: Boolean, spaceWords: Boolean): Int
+  fun findNextWord(editor: VimEditor, searchFrom: Int, count: Int, bigWord: Boolean): Int
 
   /**
    * Find the next word in some text outside the editor (e.g., command line), from the given starting point
    *
+   * Note that this function can return an out of bounds index when there is no next word!
+   *
    * @param text        The text to search in
-   * @param textLength  The text length
    * @param editor Required because word boundaries depend on local-to-buffer options
    * @param searchFrom The offset in the document to search from
    * @param count      Return an offset to the [count] word from the starting position. Will search backwards if negative
    * @param bigWord    Use WORD instead of word boundaries
-   * @param spaceWords Include whitespace as part of a word, e.g. the difference between `iw` and `aw` motions
    * @return The offset of the [count] next word, or `0` or the offset of the end of file if not found
    */
   fun findNextWord(
     text: CharSequence,
-    textLength: Int,
     editor: VimEditor,
     searchFrom: Int,
     count: Int,
     bigWord: Boolean,
-    spaceWords: Boolean,
   ): Int
 
   /**

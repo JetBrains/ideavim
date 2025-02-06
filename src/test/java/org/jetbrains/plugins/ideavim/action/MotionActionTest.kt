@@ -1044,8 +1044,17 @@ two
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   @Test
   fun testLastWord() {
-    typeTextInFile(injector.parser.parseKeys("w"), "${c}one\n")
+    typeTextInFile(injector.parser.parseKeys("w"), "${c}one")
     assertOffset(2)
+  }
+
+  @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
+  @Test
+  fun testLastWord2() {
+    typeTextInFile(injector.parser.parseKeys("w"), "${c}one\n")
+    // Counter-intuitive, but correct. There is no next word, so we get to the end of the current word, skip whitespace
+    // and move past the end of the file. Behaviour matches Vim - `w` will move to the next line (which is empty)
+    assertOffset(4)
   }
 
   // |b|

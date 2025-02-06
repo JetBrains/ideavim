@@ -128,7 +128,7 @@ class InsertDeletePreviousWordActionTest : VimTestCase() {
   fun `test delete starting from the last character of the file`() {
     // This test was originally trying to delete the previous word with the caret positioned at the end of line and
     // recorded different behaviour to Vim. The problem was that the caret was incorrectly positioned _passed_ the end
-    // of the line, and indeed passed the end of the file.
+    // of the line, and indeed past the end of the file.
     // This placement is valid, both in IdeaVim and Vim, but only when `:set virtualedit=onemore` is set. The test was
     // showing a bug in the implementation in this scenario. The test is now explicit in what it's trying to do, and
     // matches Vim's behaviour.

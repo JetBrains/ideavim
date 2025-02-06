@@ -98,25 +98,26 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     searchFrom: Int,
     count: Int,
     bigWord: Boolean,
-    spaceWords: Boolean,
   ): Int {
-    return findNextWord(editor.text(), editor.fileSize().toInt(), editor, searchFrom, count, bigWord, spaceWords)
+    return findNextWord(editor.text(), editor, searchFrom, count, bigWord)
   }
 
-  // TODO: Get rid of this overload when rewriting findNextWordOne
   override fun findNextWord(
     text: CharSequence,
-    textLength: Int,
     editor: VimEditor,
     searchFrom: Int,
     count: Int,
     bigWord: Boolean,
-    spaceWords: Boolean,
   ): Int {
-    val step = if (count >= 0) 1 else -1
     var pos = searchFrom
     repeat(abs(count)) {
-      pos = findNextWordOne(text, editor, pos, textLength, step, bigWord, spaceWords)
+      pos = if (count > 0) {
+        findNextWordOne(text, editor, pos, bigWord)
+      } else {
+        findPreviousWordOne(text, editor, pos, bigWord)
+      }
+
+      if (pos >= text.length) return pos
     }
     return pos
   }
@@ -287,7 +288,96 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     ).map { it.range }
   }
 
+  /**
+   * Find the next word from the current starting position, skipping current word and whitespace
+   *
+   * Note that this will return an out of bound index if there is no next word! This is necessary to distinguish between
+   * no next word and the next word being on the last character of the file.
+   *
+   * Also remember that two different "word" types can butt up against each other - e.g. KEYWORD followed by PUNCTUATION
+   */
   private fun findNextWordOne(
+    chars: CharSequence,
+    editor: VimEditor,
+    start: Int,
+    bigWord: Boolean,
+    stopAtEndOfLine: Boolean = false,
+  ): Int {
+    var pos = start
+    if (pos >= chars.length) return chars.length
+
+    val startingCharType = charType(editor, chars[start], bigWord)
+
+    // It is important to move first, to properly handle stopping at the end of a line and moving from an empty line
+    pos++
+
+    // If we're on a word, move past the end of it
+    if (pos < chars.length && startingCharType != CharacterHelper.CharacterType.WHITESPACE) {
+      pos = skipWhileCharacterType(editor, chars, pos, 1, startingCharType, bigWord)
+    }
+
+    // Skip following whitespace, optionally stopping at the end of the line (on the newline char).
+    // An empty line is a word, so stop when the offset is at the newline char of an empty line.
+    while (pos < chars.length && isWhitespace(editor, chars[pos], bigWord)) {
+      if (isEmptyLine(chars, pos) || (chars[pos] == '\n' && stopAtEndOfLine)) return pos
+      pos++
+    }
+
+    // We're now on the first character of a word or just past the end of the file
+    return pos.coerceAtMost(chars.length)
+  }
+
+  /**
+   * Find the start of the current word, skipping current whitespace
+   *
+   * This function will always return an in-bounds index. If there is no previous word (because we're at the start of
+   * the file), the offset will be `0`, the start of the current word or preceding whitespace.
+   */
+  private fun findPreviousWordOne(
+    chars: CharSequence,
+    editor: VimEditor,
+    start: Int,
+    bigWord: Boolean,
+  ): Int {
+    var pos = start
+
+    // Always move back one to make sure that we don't get stuck on the start of a word
+    pos--
+
+    // Skip any intermediate whitespace, stopping at an empty line (offset is the newline char of the empty line).
+    // This will leave us on the last character of the previous word.
+    while (pos >= 0 && isWhitespace(editor, chars[pos], bigWord)) {
+      if (isEmptyLine(chars, pos)) return pos
+      pos--
+    }
+
+    // We're now on a word character, or at the start of the file. Move back until we're past the start of the word,
+    // then move forward to the start of the word
+    if (pos >= 0) {
+      pos = skipWhileCharacterType(editor, chars, pos, -1, charType(editor, chars[pos], bigWord), bigWord) + 1
+    }
+
+    return pos.coerceAtLeast(0)
+  }
+
+  @Suppress("SameParameterValue")
+  private fun findCharBeforeNextWord(editor: VimEditor, pos: Int, isBig: Boolean, stopAtEndOfLine: Boolean): Int {
+    val chars = editor.text()
+
+    // Find the next word, and take the character before it. If there is no next word, we're at the end of the file, and
+    // offset will be chars.length. Subtracting one gives us an in-bounds index again
+    var offset = findNextWordOne(chars, editor, pos, isBig, stopAtEndOfLine) - 1
+
+    // Don't back up to the end of a non-empty line
+    if (chars[offset] == '\n' && !isEmptyLine(chars, offset)) {
+      offset--
+    }
+
+    return offset
+  }
+
+  // TODO: Remove this once findWordUnderCursor has been properly rewritten
+  private fun oldFindNextWordOne(
     chars: CharSequence,
     editor: VimEditor,
     pos: Int,
@@ -358,7 +448,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     return res
   }
 
-  @Suppress("GrazieInspection", "StructuralWrap")
+  @Suppress("GrazieInspection")
   private fun findNextWordEndOne(
     chars: CharSequence,
     editor: VimEditor,
@@ -1440,10 +1530,10 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     // TODO: This could be simplified to move backwards until char type changes
     if ((!onWordStart && !(onSpace && isOuter)) || hasSelection || (count > 1 && dir == -1)) {
       start = if (dir == 1) {
-        findNextWord(editor, pos, -1, isBig, !isOuter)
+        oldFindNextWordOne(editor.text(), editor, pos, editor.text().length, -1, isBig, spaceWords = !isOuter)
       } else {
         val c = -(count - if (onWordStart && !hasSelection) 1 else 0)
-        findNextWord(editor, pos, c, isBig, !isOuter)
+        oldFindNextWordOne(editor.text(), editor, pos, editor.text().length, c, isBig, spaceWords = !isOuter)
       }
       start = editor.normalizeOffset(start, false)
     }
@@ -1460,6 +1550,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     // TODO: Figure out the logic of this going backwards
     if (dir == 1) {
       var count = count
+      var shouldEndOnWhitespace = false
 
       // Selecting word/WORDs (forwards):
       // If there's no selection, we need to calculate the first range:
@@ -1508,16 +1599,18 @@ abstract class VimSearchHelperBase : VimSearchHelper {
 
           // We're on a word, move to the end, and include following whitespace by moving to the character before the
           // next word
-          isOuter && !onSpace ->            // "${s}word ${se}word"
-            findNextWord(chars, chars.length, editor, start, 1, isBig, spaceWords = true) - 1
+          isOuter && !onSpace -> {          // "${s}word ${se}word"
+            shouldEndOnWhitespace = true
+            findCharBeforeNextWord(editor, start, isBig, stopAtEndOfLine = true)
+          }
 
           // We're on a word, move to the end, not including trailing whitespace
           !isOuter && !onSpace ->           // "${s}word${se} word"
             findNextWordEnd(editor, start, 1, isBig, stopOnEmptyLine = true, allowMoveFromWordEnd = false)
 
           // We're on preceding whitespace, move to the character before the next word
-          else /* !isOuter && onSpace */ -> // "${s}     ${se}word"
-            findNextWord(chars, chars.length, editor, start, 1, isBig, spaceWords = true) - 1
+          else /* !isOuter && onSpace */ ->   // "${s}     ${se}word"
+            findCharBeforeNextWord(editor, start, isBig, stopAtEndOfLine = true)
         }
 
         count--
@@ -1585,7 +1678,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
           }
           else {
             // Move to one before start of next word (skips following whitespace)
-            findNextWord(chars, chars.length, editor, end, 1, isBig, spaceWords = true) - 1
+            findCharBeforeNextWord(editor, end, isBig, stopAtEndOfLine = true)
           }
 
         } else {
@@ -1657,6 +1750,23 @@ abstract class VimSearchHelperBase : VimSearchHelper {
           }
         }
       }
+
+      if (isOuter && shouldEndOnWhitespace && start > 0
+        && !isWhitespace(editor, chars[end], isBig)
+        && !isWhitespace(editor, chars[start], isBig)) {
+
+        // Outer word objects normally include following whitespace. But if there's no following whitespace to include,
+        // we should extend the range to include preceding whitespace. However, Vim doesn't select whitespace at the
+        // start of a line
+        var offset = start - 1
+        while (offset >= 0 && chars[offset] != '\n' && isWhitespace(editor, chars[offset], isBig)) {
+          offset--
+        }
+        if (offset > 0 && chars[offset] != '\n') start = offset + 1
+      }
+
+      if (start == end && chars[start] == '\n') end++
+      return TextRange(start, end + 1)
     }
     else if (!onWordEnd || hasSelection || (count > 1 && dir == 1) || (onSpace && isOuter)) {
       end = if (dir == 1) {
