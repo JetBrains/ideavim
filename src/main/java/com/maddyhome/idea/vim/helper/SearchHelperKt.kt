@@ -10,11 +10,9 @@ package com.maddyhome.idea.vim.helper
 
 import com.intellij.codeInsight.daemon.impl.DaemonCodeAnalyzerEx
 import com.intellij.codeInsight.daemon.impl.HighlightInfo
-import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.spellchecker.SpellCheckerSeveritiesProvider
-import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
@@ -50,48 +48,6 @@ private fun containsUpperCase(pattern: String): Boolean {
     }
   }
   return false
-}
-
-/**
- * This counts all the words in the file.
- */
-fun countWords(
-  vimEditor: VimEditor,
-  start: Int = 0,
-  end: Long = vimEditor.fileSize(),
-): CountPosition {
-  val offset = vimEditor.currentCaret().offset
-
-  var count = 1
-  var position = 0
-  var last = -1
-  var res = start
-  while (true) {
-    res = injector.searchHelper.findNextWord(vimEditor, res, 1, true, false)
-    if (res == start || res == 0 || res > end || res == last) {
-      break
-    }
-
-    count++
-
-    if (res == offset) {
-      position = count
-    } else if (last < offset && res >= offset) {
-      position = if (count == 2) {
-        1
-      } else {
-        count - 1
-      }
-    }
-
-    last = res
-  }
-
-  if (position == 0 && res == offset) {
-    position = count
-  }
-
-  return CountPosition(count, position)
 }
 
 /**
@@ -193,9 +149,3 @@ private fun skip(iterator: IntIterator, n: Int) {
   var i = n
   while (i-- != 0 && iterator.hasNext()) iterator.nextInt()
 }
-
-class CountPosition(val count: Int, val position: Int)
-
-private val logger = logger<SearchLogger>()
-
-private class SearchLogger
