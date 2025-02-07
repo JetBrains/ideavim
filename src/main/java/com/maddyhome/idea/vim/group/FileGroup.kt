@@ -32,17 +32,13 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimFileBase
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.LastTabService.Companion.getInstance
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper.message
-import com.maddyhome.idea.vim.helper.countWords
-import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.execute
 import com.maddyhome.idea.vim.newapi.globalIjOptions
-import com.maddyhome.idea.vim.state.mode.Mode.VISUAL
 import java.io.File
 import java.util.*
 
@@ -263,92 +259,6 @@ class FileGroup : VimFileBase() {
     }
 
     return null
-  }
-
-  override fun displayLocationInfo(vimEditor: VimEditor) {
-    val editor = (vimEditor as IjVimEditor).editor
-    val msg = StringBuilder()
-    val doc = editor.document
-
-    if (injector.vimState.mode !is VISUAL) {
-      val lp = editor.caretModel.logicalPosition
-      val col = editor.caretModel.offset - doc.getLineStartOffset(lp.line)
-      var endoff = doc.getLineEndOffset(lp.line)
-      if (endoff < editor.fileSize && doc.charsSequence[endoff] == '\n') {
-        endoff--
-      }
-      val ecol = endoff - doc.getLineStartOffset(lp.line)
-      val elp = editor.offsetToLogicalPosition(endoff)
-
-      msg.append("Col ").append(col + 1)
-      if (col != lp.column) {
-        msg.append("-").append(lp.column + 1)
-      }
-
-      msg.append(" of ").append(ecol + 1)
-      if (ecol != elp.column) {
-        msg.append("-").append(elp.column + 1)
-      }
-
-      val lline = editor.caretModel.logicalPosition.line
-      val total = IjVimEditor(editor).lineCount()
-
-      msg.append("; Line ").append(lline + 1).append(" of ").append(total)
-
-      val cp = countWords(vimEditor)
-
-      msg.append("; Word ").append(cp.position).append(" of ").append(cp.count)
-
-      val offset = editor.caretModel.offset
-      val size = editor.fileSize
-
-      msg.append("; Character ").append(offset + 1).append(" of ").append(size)
-    } else {
-      msg.append("Selected ")
-
-      val vr = TextRange(
-        editor.selectionModel.blockSelectionStarts,
-        editor.selectionModel.blockSelectionEnds
-      )
-      vr.normalize()
-
-      val lines: Int
-      var cp = countWords(vimEditor)
-      val words = cp.count
-      var word = 0
-      if (vr.isMultiple) {
-        lines = vr.size()
-        val cols = vr.maxLength
-
-        msg.append(cols).append(" Cols; ")
-
-        for (i in 0 until vr.size()) {
-          cp = countWords(vimEditor, vr.startOffsets[i], (vr.endOffsets[i] - 1).toLong())
-          word += cp.count
-        }
-      } else {
-        val slp = editor.offsetToLogicalPosition(vr.startOffset)
-        val elp = editor.offsetToLogicalPosition(vr.endOffset)
-
-        lines = elp.line - slp.line + 1
-
-        cp = countWords(vimEditor, vr.startOffset, (vr.endOffset - 1).toLong())
-        word = cp.count
-      }
-
-      val total = IjVimEditor(editor).lineCount()
-
-      msg.append(lines).append(" of ").append(total).append(" Lines")
-
-      msg.append("; ").append(word).append(" of ").append(words).append(" Words")
-
-      val chars = vr.selectionCount
-      val size = editor.fileSize
-
-      msg.append("; ").append(chars).append(" of ").append(size).append(" Characters")
-    }
-
-    VimPlugin.showMessage(msg.toString())
   }
 
   override fun displayFileInfo(vimEditor: VimEditor, fullPath: Boolean) {
