@@ -136,7 +136,7 @@ dependencies {
     //   supported version or not to prevent developers from figuring out what happened with JSON.
     when (ideaVersion) {
       "2024.2.1" -> { /* Nothing */ }
-      "LATEST-EAP-SNAPSHOT", "2024.3" -> bundledPlugins("com.intellij.modules.json")
+      "LATEST-EAP-SNAPSHOT", "2024.3", "2024.3.2.2" -> bundledPlugins("com.intellij.modules.json")
       else -> error("Unsupported version: $ideaVersion")
     }
 
