@@ -360,22 +360,6 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     return pos.coerceAtLeast(0)
   }
 
-  @Suppress("SameParameterValue")
-  private fun findCharBeforeNextWord(editor: VimEditor, pos: Int, isBig: Boolean, stopAtEndOfLine: Boolean): Int {
-    val chars = editor.text()
-
-    // Find the next word, and take the character before it. If there is no next word, we're at the end of the file, and
-    // offset will be chars.length. Subtracting one gives us an in-bounds index again
-    var offset = findNextWordOne(chars, editor, pos, isBig, stopAtEndOfLine) - 1
-
-    // Don't back up to the end of a non-empty line
-    if (chars[offset] == '\n' && !isEmptyLine(chars, offset)) {
-      offset--
-    }
-
-    return offset
-  }
-
   // TODO: Remove this once findWordUnderCursor has been properly rewritten
   private fun oldFindNextWordOne(
     chars: CharSequence,
@@ -581,6 +565,14 @@ abstract class VimSearchHelperBase : VimSearchHelper {
       offset += step
     }
     return offset
+  }
+
+  private fun skipOneCharacterBack(offset: Int): Int {
+    return (offset - 1).coerceAtLeast(0)
+  }
+
+  private fun skipOneCharacterBackOnCurrentLine(chars: CharSequence, offset: Int): Int {
+    return if (chars[offset - 1] != '\n') offset - 1 else offset
   }
 
   override fun findNextCamelStart(chars: CharSequence, startIndex: Int, count: Int): Int? {
@@ -1593,24 +1585,42 @@ abstract class VimSearchHelperBase : VimSearchHelper {
         // Note that `onSpace` is the character type of the original position, but this is also the character type of
         // the current start position
         end = when {
-          // We're on preceding whitespace. Include it, and move to the end of the next word/WORD
+          // We're on preceding whitespace. Include it, and move to the end of the next word/WORD. Newlines are
+          // considered whitespace and this can wrap to the next line. An empty line will be considered a word and
+          // included.
           isOuter && onSpace ->             // "${s}     word${se}"
             findNextWordEnd(editor, start, 1, isBig, stopOnEmptyLine = true, allowMoveFromWordEnd = false)
 
           // We're on a word, move to the end, and include following whitespace by moving to the character before the
-          // next word
+          // next word. Newlines are not considered part of whitespace, not included, and this does not wrap.
           isOuter && !onSpace -> {          // "${s}word ${se}word"
             shouldEndOnWhitespace = true
-            findCharBeforeNextWord(editor, start, isBig, stopAtEndOfLine = true)
+
+            // Outer object should include following whitespace. Skip forward over the current word and following
+            // whitespace. We know this isn't an empty line, and that we'll stop at the end of line, so it's always safe
+            // to move back one character.
+            val offset = findNextWordOne(chars, editor, start, isBig, stopAtEndOfLine = true)
+            skipOneCharacterBack(offset)
           }
 
-          // We're on a word, move to the end, not including trailing whitespace
+          // We're on a word, move to the end, not including trailing whitespace. This never includes whitespace, and so
+          // never wraps
           !isOuter && !onSpace ->           // "${s}word${se} word"
             findNextWordEnd(editor, start, 1, isBig, stopOnEmptyLine = true, allowMoveFromWordEnd = false)
 
-          // We're on preceding whitespace, move to the character before the next word
-          else /* !isOuter && onSpace */ ->   // "${s}     ${se}word"
-            findCharBeforeNextWord(editor, start, isBig, stopAtEndOfLine = true)
+          // We're on preceding whitespace, move to the character before the next word. Newlines are not considered
+          // whitespace and this does not wrap. Empty lines also do not wrap.
+          else /* !isOuter && onSpace */ -> { // "${s}     ${se}word"
+
+            // Inner object does not include whitespace, but does count it. Skip forward over the current whitespace
+            // until we find a new word or the end of line. The implementation of `findNextWordOne` will always move at
+            // least one character forward, so it's always safe to move one character back. If we are on an empty line,
+            // `findNextWordOne` will still move one character forward, taking us to the next line. Moving one back will
+            // return us to the original offset. You can see this with `viw` on an empty line - it only selects the
+            // current line.
+            val offset = findNextWordOne(chars, editor, start, isBig, stopAtEndOfLine = true)
+            skipOneCharacterBack(offset)
+          }
         }
 
         count--
@@ -1677,8 +1687,11 @@ abstract class VimSearchHelperBase : VimSearchHelper {
             findNextWordEnd(editor, end, 1, isBig, stopOnEmptyLine = true)
           }
           else {
-            // Move to one before start of next word (skips following whitespace)
-            findCharBeforeNextWord(editor, end, isBig, stopAtEndOfLine = true)
+            // Outer object includes whitespace. Starting on a word character, skip to the end of the current word and
+            // then move one character back. Since we're on a word character, we know this isn't an empty line, and we
+            // will therefore always move forward, and so it is always safe to move one character back.
+            val offset = findNextWordOne(chars, editor, end, isBig, stopAtEndOfLine = true)
+            skipOneCharacterBack(offset)
           }
 
         } else {
@@ -1714,15 +1727,6 @@ abstract class VimSearchHelperBase : VimSearchHelper {
           //
           // This can be generalised to move forward on character, skip again if it's a newline, then move to end of
           // the now current character type.
-          // NEW: I think we can generalise to the same algorithm as outer motions, but flipped
-          // Move forward one char, and again if we land on newline
-          // If on whitespace, move to one char before start of next word (skipping following whitespace)
-          // If on word, move to end of current word (no preceding whitespace to skip)
-          // The trick is that we're deciding based on the moved offset, not the original offset. That's why the
-          // examples in the table above have some that don't work.
-          // Unfortunately, this doesn't work, possibly because findNextWord needs to be rewritten. E.g. we don't have a
-          // way of telling it to stop at the end of line
-          // TODO: Rewrite findNextWord and then try to rewrite this object to work the same for inner+outer motions
 
           // Increment, and skip the newline char, unless we've just landed on an empty line
           end++
@@ -1735,18 +1739,31 @@ abstract class VimSearchHelperBase : VimSearchHelper {
             return@repeat
           }
 
-          val characterType = charType(editor, chars[end], isBig)
-          while (end < chars.length && charType(editor, chars[end], isBig) == characterType) {
-            end++
-
-            // Break at end of line. We only wrap when we start at the end of the line, and that's handled above
-            if (end < chars.length && chars[end] == '\n') break
+          end = if (isWhitespace(editor, chars[end], isBig)) {
+            // Inner object does not include whitespace, but does count it. Skip to the end of the whitespace by moving
+            // to one character before the next word or end of the current line.
+            // For a non-empty line, it is always possible to move forward and so it is always safe to move one
+            // character back.
+            // Things get weird with empty lines. When handling empty lines above (when there is no initial selection),
+            // we try to get to the character before the next word. We advance, wrap to the next line, and stop because
+            // we're on an empty line (normal before for e.g. `w`). We then come back one character and that puts us
+            // back at the initial offset, and the caret doesn't move.
+            // Vim does things differently if there's an existing selection, and we're moving on to an empty line. The
+            // algorithm needs to see what the next character is, so we move one char forward. This skips us past a
+            // newline char and onto an empty line. We then try to find the next word which automatically advances one,
+            // onto the start of the next line. And now Vim does NOT go back one character, because that would put us
+            // at the newline of the previous line.
+            // Interestingly, because we're not at the start of another line, this one might not be empty. But Vim still
+            // does not move back one, leading to an odd scenario where `iw` can select the *first* character of a word
+            // after whitespace/empty lines. See vim/vim#16514
+            // By refusing to move back even if the current line isn't empty, we're matching Vim's quirky behaviour!
+            val offset = findNextWordOne(chars, editor, end, isBig, stopAtEndOfLine = true)
+            skipOneCharacterBackOnCurrentLine(chars, offset)
           }
-
-          // We've gone past the current character type, or hit a newline. Go back, unless that would put us onto a
-          // newline char
-          if (chars[end - 1] != '\n' || end >= chars.length) {
-            end--
+          else {
+            // Skip to the end of the current word. This would skip preceding whitespace, but we know we're on a word
+            // character.
+            findNextWordEnd(editor, end, 1, isBig, stopOnEmptyLine = true, allowMoveFromWordEnd = false)
           }
         }
       }
