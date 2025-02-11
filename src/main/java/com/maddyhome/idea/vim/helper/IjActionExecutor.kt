@@ -20,6 +20,7 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.actionSystem.ex.ActionUtil
 import com.intellij.openapi.actionSystem.ex.ActionUtil.performDumbAwareWithCallbacks
 import com.intellij.openapi.actionSystem.impl.ProxyShortcutSet
+import com.intellij.openapi.actionSystem.impl.SimpleDataContext
 import com.intellij.openapi.application.ex.ApplicationManagerEx
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.command.UndoConfirmationPolicy
@@ -83,8 +84,7 @@ internal class IjActionExecutor : VimActionExecutor {
      * Data context that defines that some action was started from IdeaVim.
      * You can call use [runFromVimKey] key to define if intellij action was started from IdeaVim
      */
-    val dataContext = DataContextWrapper(context.ij)
-    dataContext.putUserData(runFromVimKey, true)
+    val dataContext = SimpleDataContext.getSimpleContext(runFromVimKey, true, context.ij)
 
     val actionId = ActionManager.getInstance().getId(ijAction)
     val event = AnActionEvent(
