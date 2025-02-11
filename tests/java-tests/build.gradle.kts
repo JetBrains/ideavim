@@ -42,7 +42,8 @@ dependencies {
     create(ideaType, ideaVersion, useInstaller)
     testFramework(TestFrameworkType.Platform)
     testFramework(TestFrameworkType.JUnit5)
-    bundledPlugins("com.intellij.java", "org.jetbrains.plugins.yaml")
+    bundledPlugins("com.intellij.java")
+    bundledModule("intellij.yaml.editing") // Note: This should be "org.jetbrains.plugins.yaml" plugin instead of module
     instrumentationTools()
   }
 }
