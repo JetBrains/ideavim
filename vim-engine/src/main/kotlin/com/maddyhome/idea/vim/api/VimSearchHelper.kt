@@ -140,9 +140,6 @@ interface VimSearchHelper {
    * @param bigWord    Use WORD instead of word boundaries
    * @param stopOnEmptyLine Vim considers an empty line to be a word/WORD, but `e` and `E` don't respect this for vi
    *                        compatibility reasons. Callers other than `e` and `E` should pass `true`
-   * @param allowMoveFromWordEnd If we're already at the word end, should we be able to move to the next word end? This
-   *                             is true for word/WORD motions `e`/`E`, but false for word text objects, which do not
-   *                             extend the selection/range forwards when at the end of a current word.
    * @return The offset of the [count] next word/WORD. Will return document bounds if not found
    */
   fun findNextWordEnd(
@@ -151,7 +148,6 @@ interface VimSearchHelper {
     count: Int,
     bigWord: Boolean,
     stopOnEmptyLine: Boolean = true,
-    allowMoveFromWordEnd: Boolean = true,
   ): Int
 
   /**
