@@ -57,7 +57,7 @@ buildscript {
     classpath("io.ktor:ktor-client-cio:3.0.3")
     classpath("io.ktor:ktor-client-auth:3.0.3")
     classpath("io.ktor:ktor-client-content-negotiation:3.0.3")
-    classpath("io.ktor:ktor-serialization-kotlinx-json:3.0.3")
+    classpath("io.ktor:ktor-serialization-kotlinx-json:3.1.0")
 
     // This comes from the changelog plugin
 //        classpath("org.jetbrains:markdown:0.3.1")
