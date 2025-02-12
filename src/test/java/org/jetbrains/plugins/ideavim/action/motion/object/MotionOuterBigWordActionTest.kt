@@ -708,6 +708,66 @@ class MotionOuterBigWordActionTest : VimTestCase() {
     )
   }
 
+  @VimBehaviorDiffers(
+    originalVimAfter =
+      """
+        |Lorem Ipsum...${s}.....
+        |${c}
+        |${se}Lorem ipsum dolor sit amet
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """,
+    description = "Off by one because IdeaVim does not currently support selecting newline char"
+  )
+  @Test
+  fun `test select outer WORD from whitespace at end of line with multiple lines and existing left-to-right selection`() {
+    doTest(
+      listOf("v", "l", "aW"),
+      """
+        |Lorem Ipsum...${c}.....
+        |
+        |Lorem ipsum dolor sit amet
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin().dotToSpace(),
+      """
+        |Lorem Ipsum...${s}.....
+        |${c}${se}
+        |Lorem ipsum dolor sit amet
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin().dotToSpace(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test select outer WORD from whitespace at end of line with multiple lines and existing left-to-right selection 2`() {
+    doTest(
+      listOf("v", "l", "aW"),
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet...${c}.....
+        |    consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin().dotToSpace(),
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet...${s}.....
+        |    consectetu${c}r${se} adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin().dotToSpace(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
   @Test
   fun `test select outer WORD with existing right-to-left selection selects rest of word and preceding whitespace`() {
     doTest(
@@ -754,6 +814,150 @@ class MotionOuterBigWordActionTest : VimTestCase() {
       listOf("v", "h", "aW"),
       "Lorem ipsum   ${c}   dolor sit amet",
       "Lorem ${s}${c}ipsum    ${se}  dolor sit amet",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test select outer WORD from whitespace at start of line with multiple lines and existing right-to-left selection`() {
+    doTest(
+      listOf("v", "h", "aW"),
+      """
+        |Lorem Ipsum
+        |
+        |    ${c}    Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |Lorem Ipsum
+        |${s}${c}
+        |     ${se}   Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test select outer WORD from whitespace at start of line with multiple lines and existing right-to-left-selection 2`() {
+    doTest(
+      listOf("v", "h", "aW"),
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |    ${c}    consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit ${s}${c}amet,
+        |     ${se}   consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test select outer WORD from whitespace at start of line with multiple lines and existing right-to-left-selection 3`() {
+    doTest(
+      listOf("v", "h", "aW"),
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,.......
+        |    ${c}    consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin().dotToSpace(),
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit ${s}${c}amet,.......
+        |     ${se}   consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin().dotToSpace(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test select outer WORD from start of line with existing right-to-left selection`() {
+    doTest(
+      listOf("v", "h", "aW"),
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |c${c}onsectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit${s}${c} amet,
+        |co${se}nsectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test select outer WORD from word at start of line with existing right-to-left selection and preceding whitespace on previous line`() {
+    doTest(
+      listOf("v", "h", "aW"),
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,........
+        |cons${c}ectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin().dotToSpace(),
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,........
+        |${s}${c}conse${se}ctetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin().dotToSpace(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test select outer WORD from word at start of line with existing right-to-left selection and preceding whitespace on previous line 2`() {
+    doTest(
+      listOf("v", "h", "aW"),
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,........
+        |    cons${c}ectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin().dotToSpace(),
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,........
+        |${s}${c}    conse${se}ctetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin().dotToSpace(),
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
