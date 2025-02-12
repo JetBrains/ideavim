@@ -225,7 +225,7 @@ class MotionInnerWordActionTest : VimTestCase() {
   @Test
   fun `test select word from whitespace at end of line with multiple lines and existing left-to-right selection`() {
     doTest(
-      listOf("v", "h", "iw"),
+      listOf("v", "l", "iw"),
       """
         |Lorem Ipsum...${c}.....
         |
@@ -235,7 +235,7 @@ class MotionInnerWordActionTest : VimTestCase() {
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin().dotToSpace(),
       """
-        |Lorem Ipsum${s}${c}....${se}....
+        |Lorem Ipsum...${s}....${c}.${se}
         |
         |Lorem ipsum dolor sit amet
         |consectetur adipiscing elit
@@ -249,7 +249,7 @@ class MotionInnerWordActionTest : VimTestCase() {
   @Test
   fun `test select word from whitespace at end of line with multiple lines and existing left-to-right selection 2`() {
     doTest(
-      listOf("v", "h", "iw"),
+      listOf("v", "l", "iw"),
       """
         |Lorem Ipsum
         |
@@ -261,7 +261,7 @@ class MotionInnerWordActionTest : VimTestCase() {
       """
         |Lorem Ipsum
         |
-        |Lorem ipsum dolor sit amet${s}${c}....${se}....
+        |Lorem ipsum dolor sit amet...${s}....${c}.${se}
         |    consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
@@ -341,6 +341,54 @@ class MotionInnerWordActionTest : VimTestCase() {
         |
         |Lorem ipsum dolor sit amet
         |${s}${c}     ${se}   consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test select word from start of line with existing right-to-left selection`() {
+    doTest(
+      listOf("v", "h", "iw"),
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |c${c}onsectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet${s}${c},
+        |co${se}nsectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test select word from whitespace at start of line with existing right-to-left selection`() {
+    doTest(
+      listOf("v", "h", "iw"),
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        | ${c}   consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |Lorem Ipsum
+        |
+        |Lorem ipsum dolor sit amet${s}${c},
+        |  ${se}  consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
@@ -708,8 +756,10 @@ class MotionInnerWordActionTest : VimTestCase() {
   @Test
   fun `test repeated text object expands to empty line`() {
     // Well. This behaviour is weird, and looks like a bug, but it matches Vim's behaviour.
-    // I'm not entirely sure why this happens, but it's a vote of confidence in IdeaVim's implementation that we're
-    // matching bugs! 😁
+    // There's an explanation of the behaviour in VimSearchHelperBase.findWordUnderCursor. Basically, Vim moves forward
+    // over an empty line, but when moving back, stops at the start of a line. This puts us off-by-one, but in the same
+    // way that Vim is off-by-one!
+    // See https://github.com/vim/vim/issues/16514
     doTest(
       listOf("viw", "iw"),
       """
