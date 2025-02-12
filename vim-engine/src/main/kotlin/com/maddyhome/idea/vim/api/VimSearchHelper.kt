@@ -195,14 +195,15 @@ interface VimSearchHelper {
     ch: Char,
   ): Int
 
-  fun findWordUnderCursor(
+  /**
+   * Find the range of the word text object at the location of the caret
+   */
+  fun findWordObject(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     count: Int,
-    dir: Int,
     isOuter: Boolean,
     isBig: Boolean,
-    hasSelection: Boolean,
   ): TextRange
 
   fun findSentenceRange(
