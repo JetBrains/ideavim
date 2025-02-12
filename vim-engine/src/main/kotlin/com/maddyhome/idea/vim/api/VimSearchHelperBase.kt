@@ -1477,18 +1477,13 @@ abstract class VimSearchHelperBase : VimSearchHelper {
       count--
     }
 
-    if (dir == 1) {
-      // Once we have an initial selection, loop over what's left of count.
-      // * For inner objects, move to the end of the current or next character type block, or the end of line.
-      //   If we're on the last character, it's the next block, otherwise it's the current block. Whitespace is not
-      //   included in the movement/skipped, but does count as part of the loop.
-      // * For outer objects, include whitespace. If we're on a word character, include any following whitespace by
-      //   moving to the character before the next word. If we're on whitespace, move to the end of the next word, which
-      //   includes the preceding whitespace
-      // Note that we can't make any assumptions about the location of `end` at this point. If there was no initial
-      // selection, it will be at the end of a character type block, word/WORD or whitespace. If there was an initial
-      // selection, it's wherever the user selected up to.
-      repeat (count) {
+    // We have an initial selection/range. Now loop over what's left of count.
+    // The actions are very similar, but there is subtly different handling of newlines and empty lines.
+    // Note that we can't make any assumptions about the start/end positions. If there was no initial selection, we know
+    // that start is at the beginning of the initial character type and end will be either at the end of a word, end of
+    // whitespace or end of line. But if there was an initial selection, it all depends on what the user selected.
+    repeat(count) {
+      if (dir == 1) {
         // Move forward (and skip end of line char) so we know if we need to move to the current or next word.
         // If we're at the end of a word, the next character will be a different character type/whitespace.
         // If we're in the middle of a word, the next character will still be the current word.
@@ -1503,16 +1498,17 @@ abstract class VimSearchHelperBase : VimSearchHelper {
         }
 
         end = if ((!isOuter && isWhitespace(editor, chars[end], isBig))
-          || (isOuter && !isWhitespace(editor, chars[end], isBig))) {
-
-          // * Inner object, on whitespace. Skip the current whitespace, up to the character before the next word.
+          || (isOuter && !isWhitespace(editor, chars[end], isBig))
+        ) {
+          // * Inner object, on whitespace. Whitespace is treated separately and included in the count. Skip the
+          //   current whitespace, up to the character before the next word, or the end of the line.
           //   For a non-empty line, this will always move forwards, so it is always safe to move one char back.
-          //   For empty lines, things are more complex, and different to the behaviour above, when we set the initial
-          //   range. In that case, we advance while trying to get to the next word, encounter an empty line and stop.
-          //   Then we always move one character back. This can put us back to the original offset (try `viw` on an
+          //   For empty lines, things are more complex and different to the behaviour above when we set the initial
+          //   range. In that case, we advance while trying to get to the next word, encounter an empty line, stop,
+          //   and then we always move one character back. This can put us back to the original offset (try `viw` on an
           //   empty line - the caret doesn't move).
-          //   Vim does things differently if there's an existing selection (i.e. this scenario) and we're moving on to
-          //   an empty line. The algorithm advances early (see above) and this skips us past a newline char and on to
+          //   Vim does things differently if there's an existing selection (i.e., this scenario) and we're moving on to
+          //   an empty line. The algorithm advances early (see above), and this skips us past a newline char and on to
           //   an empty line. We then try to find the next word, which automatically advances a character, on to the
           //   start of the next line. And now Vim does NOT go back one character, because that would put us at the
           //   newline char of the previous line.
@@ -1528,8 +1524,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
           //   character. It is therefore always safe to move back one character, without reaching the start of line.
           val offset = findNextWordOne(chars, editor, end, isBig, stopAtEndOfLine = true)
           skipOneCharacterBackOnCurrentLine(chars, offset)
-        }
-        else {
+        } else {
           // * Inner object, on a word character. Move to the end of the current word. This does not look at whitespace,
           //   and remains on the current line.
           // * Outer object, on whitespace. Move to the end of the next word, which will skip the current whitespace.
@@ -1538,11 +1533,8 @@ abstract class VimSearchHelperBase : VimSearchHelper {
           //   end of the subsequent word.
           findNextWordEndOne(chars, editor, end, isBig, stopOnEmptyLine = true, allowMoveFromWordEnd = false)
         }
-      }
-    }
-    else {
-      // If direction is backwards, then end is already correctly positioned, and we need to move start.
-      repeat(count) {
+      } else {
+        // If direction is backwards, then `end` is already correctly positioned, and we need to move `start`.
         // As above, move back early so we handle word boundaries correctly
         start--
         if (start > 0 && chars[start] == '\n' && !isEmptyLine(chars, start)) {
@@ -1559,8 +1551,9 @@ abstract class VimSearchHelperBase : VimSearchHelper {
         ) {
           // * Inner object, on whitespace. Move to start of whitespace, by moving to the end of the previous word and
           //   then moving forward. Newlines are whitespace, but we stop at the start of the line.
-          // * Outer object, on word. Move to start of current word, then include preceding whitespace, but stop at
-          //   start of line. This is the same as one past the end of the previous word.
+          // * Outer object, on word. Move to start of current word, then include and preceding whitespace, but stop at
+          //   the start of line. This is the same as one past the end of the previous word.
+          // Note that we actually stop at the end of the previous line, but the `+1` fixes things up.
           val offset = findPreviousWordEndOne(chars, editor, start, isBig, stopAtEndOfPreviousLine = true) + 1
           if (chars[offset] == '\n') offset + 1 else offset
         } else {
