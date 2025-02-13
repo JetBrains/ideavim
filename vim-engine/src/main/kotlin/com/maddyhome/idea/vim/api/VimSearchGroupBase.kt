@@ -13,7 +13,6 @@ import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.LineRange
-import com.maddyhome.idea.vim.helper.CharacterHelper
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.helper.SearchOptions
 import com.maddyhome.idea.vim.helper.enumSetOf
@@ -427,7 +426,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     whole: Boolean,
     dir: Direction,
   ): Int {
-    val range: TextRange = findWordUnderCursor(editor, caret) ?: return -1
+    val range = injector.searchHelper.findWordNearestCursor(editor, caret) ?: return -1
 
     val start = range.startOffset
     val end = range.endOffset
@@ -570,62 +569,6 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     return startIndex
   }
 
-
-  /**
-   * Find the word under the cursor or the next word to the right of the cursor on the current line.
-   *
-   * @param editor The editor to find the word in
-   * @param caret  The caret to find word under
-   * @return The text range of the found word or null if there is no word under/after the cursor on the line
-   */
-  private fun findWordUnderCursor(
-    editor: VimEditor,
-    caret: ImmutableVimCaret,
-  ): TextRange? {
-
-    val stop: Int = editor.getLineEndOffset(caret.getBufferPosition().line, true)
-    val pos: Int = caret.offset
-
-    // Technically the first condition is covered by the second one, but let it be
-    if (editor.text().isEmpty() || editor.text().length <= pos) return null
-    //if (pos == chars.length() - 1) return new TextRange(chars.length() - 1, chars.length());
-    var start = pos
-    val types = arrayOf(
-      CharacterHelper.CharacterType.KEYWORD,
-      CharacterHelper.CharacterType.PUNCTUATION
-    )
-    for (i in 0..1) {
-      start = pos
-      val type = CharacterHelper.charType(editor, editor.text()[start], false)
-      if (type === types[i]) {
-        // Search back for start of word
-        while (start > 0 && CharacterHelper.charType(editor, editor.text()[start - 1], false) === types[i]) {
-          start--
-        }
-      } else {
-        // Search forward for start of word
-        while (start < stop && CharacterHelper.charType(editor, editor.text()[start], false) !== types[i]) {
-          start++
-        }
-      }
-      if (start != stop) {
-        break
-      }
-    }
-    if (start == stop) {
-      return null
-    }
-    // Special case 1 character words because 'findNextWordEnd' returns one to many chars
-    val end: Int = if (start < stop &&
-      (start >= editor.text().length - 1 ||
-        CharacterHelper.charType(editor, editor.text()[start + 1], false) !== CharacterHelper.CharacterType.KEYWORD)
-    ) {
-      start + 1
-    } else {
-      injector.searchHelper.findNextWordEnd(editor, start, 1, bigWord = false) + 1
-    }
-    return TextRange(start, end)
-  }
 
   /****************************************************************************/
   /* Substitute related methods                                               */
