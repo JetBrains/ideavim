@@ -94,6 +94,56 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     }
   }
 
+  override fun findWordNearestCursor(editor: VimEditor, caret: ImmutableVimCaret): TextRange? {
+    val chars = editor.text()
+    val stop = editor.getLineEndOffset(caret.getBufferPosition().line, true)
+
+    val pos = caret.offset
+
+    if (chars.isEmpty() || chars.length <= pos) return null
+
+    var start = pos
+    val types = arrayOf(
+      CharacterHelper.CharacterType.KEYWORD,
+      CharacterHelper.CharacterType.PUNCTUATION
+    )
+    for (i in 0..1) {
+      start = pos
+      val type = charType(editor, chars[start], false)
+      if (type == types[i]) {
+        // Search back for start of word
+        while (start > 0 && charType(editor, chars[start - 1], false) == types[i]) {
+          start--
+        }
+      } else {
+        // Search forward for start of word
+        while (start < stop && charType(editor, chars[start], false) != types[i]) {
+          start++
+        }
+      }
+
+      if (start != stop) {
+        break
+      }
+    }
+
+    if (start == stop) {
+      return null
+    }
+
+    // Special case 1 character words because 'findNextWordEnd' returns one to many chars
+    val end = if (start < stop &&
+      (start >= chars.length - 1 ||
+        charType(editor, chars[start + 1], false) != CharacterHelper.CharacterType.KEYWORD)
+    ) {
+      start + 1
+    } else {
+      injector.searchHelper.findNextWordEnd(editor, start, 1, false, false) + 1
+    }
+
+    return TextRange(start, end)
+  }
+
   override fun findNextWord(
     editor: VimEditor,
     searchFrom: Int,

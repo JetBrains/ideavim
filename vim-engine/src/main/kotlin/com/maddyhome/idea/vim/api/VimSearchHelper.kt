@@ -196,6 +196,20 @@ interface VimSearchHelper {
   ): Int
 
   /**
+   * Find the word at or nearest to the current caret offset
+   *
+   * Note that this is not a word text object!
+   *
+   * This function is used to get the word to search for using the `*`/`#` and `g*`/`g#` operators. It will return:
+   * * the range of the keyword under the cursor
+   * * or the first keyword after the cursor on the current line,
+   * * or the non-blank word under the cursor,
+   * * or the first non-blank word after the cursor on the current line
+   * * or null, if none of the above are found
+   */
+  fun findWordNearestCursor(editor: VimEditor, caret: ImmutableVimCaret): TextRange?
+
+  /**
    * Find the range of the word text object at the location of the caret
    */
   fun findWordObject(
