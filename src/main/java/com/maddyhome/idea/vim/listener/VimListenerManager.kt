@@ -87,6 +87,7 @@ import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.forceBarCursor
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
+import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.resetVimLastColumn
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
@@ -642,7 +643,9 @@ internal object VimListenerManager {
     private var cutOffFixed = false
 
     override fun mouseDragged(e: EditorMouseEvent) {
-      val caret = e.editor.caretModel.primaryCaret
+      val editor = e.editor
+      if (editor.isIdeaVimDisabledHere) return
+      val caret = editor.caretModel.primaryCaret
 
       clearFirstSelectionEvents(e)
 
@@ -734,6 +737,7 @@ internal object VimListenerManager {
     }
 
     override fun mousePressed(event: EditorMouseEvent) {
+      if (event.editor.isIdeaVimDisabledHere) return
       MouseEventsDataHolder.dragEventCount = MouseEventsDataHolder.allowedSkippedDragEvents
       SelectionVimListenerSuppressor.reset()
     }
@@ -745,6 +749,7 @@ internal object VimListenerManager {
      * - Click-hold and switch editor (ctrl-tab)
      */
     override fun mouseReleased(event: EditorMouseEvent) {
+      if (event.editor.isIdeaVimDisabledHere) return
       SelectionVimListenerSuppressor.unlock()
 
       clearFirstSelectionEvents(event)
@@ -768,6 +773,7 @@ internal object VimListenerManager {
     }
 
     override fun mouseClicked(event: EditorMouseEvent) {
+      if (event.editor.isIdeaVimDisabledHere) return
       logger.debug("Mouse clicked")
 
       if (event.area == EditorMouseEventArea.EDITING_AREA) {
@@ -829,6 +835,7 @@ internal object VimListenerManager {
 
     override fun mousePressed(e: MouseEvent?) {
       val editor = (e?.component as? EditorComponentImpl)?.editor ?: return
+      if (editor.isIdeaVimDisabledHere) return
       val predictedMode = IdeaSelectionControl.predictMode(editor, SelectionSource.MOUSE)
       when (e.clickCount) {
         1 -> {
