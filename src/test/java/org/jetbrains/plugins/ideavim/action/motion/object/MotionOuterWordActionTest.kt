@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2025 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,18 +10,16 @@ package org.jetbrains.plugins.ideavim.action.motion.`object`
 
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import org.jetbrains.plugins.ideavim.SkipNeovimReason
-import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
-@Suppress("RemoveCurlyBracesFromTemplate", "SpellCheckingInspection")
-class MotionOuterBigWordActionTest : VimTestCase() {
+@Suppress("SpellCheckingInspection", "RemoveCurlyBracesFromTemplate")
+class MotionOuterWordActionTest : VimTestCase() {
   @Test
-  fun `test select outer WORD selects word and following whitespace`() {
+  fun `test select outer word selects word and following whitespace`() {
     doTest(
-      "vaW",
+      "vaw",
       "Lorem ip${c}sum dolor sit amet, consectetur adipiscing elit",
       "Lorem ${s}ipsum${c} ${se}dolor sit amet, consectetur adipiscing elit",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
@@ -29,9 +27,9 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test select outer WORD from beginning of word`() {
+  fun `test select outer word from beginning of word`() {
     doTest(
-      "vaW",
+      "vaw",
       "Lorem ${c}ipsum dolor sit amet, consectetur adipiscing elit",
       "Lorem ${s}ipsum${c} ${se}dolor sit amet, consectetur adipiscing elit",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
@@ -39,9 +37,9 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test select outer WORD from end of word`() {
+  fun `test select outer word from end of word`() {
     doTest(
-      "vaW",
+      "vaw",
       "Lorem ipsu${c}m dolor sit amet, consectetur adipiscing elit",
       "Lorem ${s}ipsum${c} ${se}dolor sit amet, consectetur adipiscing elit",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
@@ -49,9 +47,9 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test select outer WORD from inside whitespace selects word and not following whitespace`() {
+  fun `test select outer word from inside whitespace selects word and not following whitespace`() {
     doTest(
-      "vaW",
+      "vaw",
       "Lorem  ${c}  ipsum dolor sit amet, consectetur adipiscing elit",
       "Lorem${s}    ipsu${c}m${se} dolor sit amet, consectetur adipiscing elit",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
@@ -76,7 +74,7 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   @Test
   fun `test select empty line`() {
     doTest(
-      "vaW",
+      "vaw",
       """
         |Lorem ipsum dolor sit amet,
         |
@@ -104,7 +102,7 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   @Test
   fun `test select empty line wraps to next line`() {
     doTest(
-      "vaW",
+      "vaw",
       """
         |Lorem ipsum dolor sit amet,
         |
@@ -122,31 +120,9 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test select outer WORD skips following empty line`() {
-    doTest(
-      listOf("vaW", "aW"),
-      """
-        |Lorem ipsum dolor sit amet,
-        |
-        |con${c}sectetur
-        |
-        |adipiscing elit
-      """.trimMargin(),
-      """
-        |Lorem ipsum dolor sit amet,
-        |
-        |${s}consectetur
-        |
-        |adipiscin${c}g${se} elit
-      """.trimMargin(),
-      Mode.VISUAL(SelectionType.CHARACTER_WISE),
-    )
-  }
-
-  @Test
   fun `test select outer word skips following empty line`() {
     doTest(
-      listOf("vaW", "aW"),
+      listOf("vaw", "aw"),
       """
         |Lorem ipsum dolor sit amet,
         |
@@ -178,7 +154,7 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   @Test
   fun `test select empty line wraps to next line but does not wrap to following line`() {
     doTest(
-      "vaW",
+      "vaw",
       """
         |Lorem ipsum dolor sit amet,
         |
@@ -215,7 +191,7 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   @Test
   fun `test select multiple empty lines`() {
     doTest(
-      "v3aW",
+      "v3aw",
       """
         |Lorem ipsum dolor sit amet,
         |
@@ -261,7 +237,7 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   @Test
   fun `test select blank line`() {
     doTest(
-      "vaW",
+      "vaw",
       """
         |Lorem ipsum dolor sit amet,
         |
@@ -289,9 +265,9 @@ class MotionOuterBigWordActionTest : VimTestCase() {
     description = "Text objects are implicitly inclusive. Vim adjusts the caret location for inclusive motions"
   )
   @Test
-  fun `test select outer WORD with exclusive selection`() {
+  fun `test select outer word with exclusive selection`() {
     doTest(
-      "vaW",
+      "vaw",
       "Lorem ipsu${c}m dolor sit amet, consectetur adipiscing elit",
       "Lorem ${s}ipsum${c} ${se}dolor sit amet, consectetur adipiscing elit",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
@@ -299,9 +275,9 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test repeated text object expands selection to whitespace after next WORD`() {
+  fun `test repeated text object expands selection to whitespace after next word`() {
     doTest(
-      listOf("vaW", "aW"),
+      listOf("vaw", "aw"),
       """
         |Lorem Ipsum
         |
@@ -325,7 +301,7 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   @Test
   fun `test repeated text object starting from whitespace expands selection`() {
     doTest(
-      listOf("vaW", "aW"),
+      listOf("vaw", "aw"),
       """
         |Lorem Ipsum
         |
@@ -349,7 +325,7 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   @Test
   fun `test text object with count expands selection`() {
     doTest(
-      "v2aW",
+      "v2aw",
       """
         |Lorem Ipsum
         |
@@ -373,7 +349,7 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   @Test
   fun `test repeated text object expands selection to end of line`() {
     doTest(
-      listOf("v2aW", "aW"),
+      listOf("v2aw", "aw"),
       """
         |Lorem Ipsum
         |
@@ -397,7 +373,7 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   @Test
   fun `test repeated text object expands selection to whitespace at end of line`() {
     doTest(
-      listOf("v2aW", "aW"),
+      listOf("v2aw", "aw"),
       """
         |Lorem Ipsum
         |
@@ -421,7 +397,7 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   @Test
   fun `test repeated text object expands across new line`() {
     doTest(
-      listOf("vaW", "aW"),
+      listOf("vaw", "aw"),
       """
         |Lorem Ipsum
         |
@@ -445,7 +421,7 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   @Test
   fun `test repeated text object expands over whitespace following new line`() {
     doTest(
-      listOf("vaW", "aW"),
+      listOf("vaw", "aw"),
       """
         |Lorem Ipsum
         |
@@ -469,7 +445,7 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   @Test
   fun `test repeated text object expands to empty line`() {
     doTest(
-      listOf("vaW", "aW"),
+      listOf("vaw", "aw"),
       """
         |Lorem Ip${c}sum
         |
@@ -480,6 +456,30 @@ class MotionOuterBigWordActionTest : VimTestCase() {
       """.trimMargin(),
       """
         |Lorem${s} Ipsum
+        |
+        |Lore${c}m${se} ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test repeated text object expands to empty line 2`() {
+    doTest(
+      listOf("vaw", "aw", "aw"),
+      """
+        |Lo${c}rem Ipsum
+        |
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |${s}Lorem Ipsum
         |
         |Lore${c}m${se} ipsum dolor sit amet,
         |consectetur adipiscing elit
@@ -506,7 +506,7 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   @Test
   fun `test repeated text object expands to multiple empty lines`() {
     doTest(
-      listOf("vaW", "aW"),
+      listOf("vaw", "aw"),
       """
         |Lorem Ip${c}sum
         |
@@ -534,7 +534,7 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   @Test
   fun `test repeated text object expands to cover whitespace on following blank line`() {
     doTest(
-      listOf("vaW", "aW"),
+      listOf("vaw", "aw"),
       """
         |Lorem Ip${c}sum
         |........
@@ -571,7 +571,7 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   @Test
   fun `test repeated text object expands to cover whitespace on following blank lines`() {
     doTest(
-      listOf("vaW", "aW"),
+      listOf("vaw", "aw"),
       """
         |Lorem Ip${c}sum
         |
@@ -599,7 +599,7 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   @Test
   fun `test repeated text object expands over non-word character`() {
     doTest(
-      listOf("vaW", "aW"),
+      listOf("vaw", "aw"),
       """
         |Lorem Ipsum
         |
@@ -609,7 +609,7 @@ class MotionOuterBigWordActionTest : VimTestCase() {
       """
         |Lorem Ipsum
         |
-        |Lorem ipsum dolor sit ${s}amet, consectetur${c} ${se}adipiscing elit
+        |Lorem ipsum dolor sit${s} amet,${c} ${se}consectetur adipiscing elit
         |Sed in orci mauris. Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
@@ -617,9 +617,9 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test select outer WORD selects following whitespace up to punctuation`() {
+  fun `test select outer word selects following whitespace up to punctuation`() {
     doTest(
-      "vaW",
+      "vaw",
       "Lorem ipsu${c}m   ...dolor sit amet, consectetur adipiscing elit",
       "Lorem ${s}ipsum  ${c} ${se}...dolor sit amet, consectetur adipiscing elit",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
@@ -627,19 +627,19 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test select outer WORD with following non-word characters selects following WORD characters`() {
+  fun `test select outer word with following non-word characters selects preceding whitespace`() {
     doTest(
-      "vaW",
+      "vaw",
       "Lorem ipsum dolor sit a${c}met, consectetur adipiscing elit",
-      "Lorem ipsum dolor sit ${s}amet,${c} ${se}consectetur adipiscing elit",
+      "Lorem ipsum dolor sit${s} ame${c}t${se}, consectetur adipiscing elit",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
   @Test
-  fun `test select outer WORD at end of line selects preceding whitespace`() {
+  fun `test select outer word at end of line selects preceding whitespace`() {
     doTest(
-      "vaW",
+      "vaw",
       """
         |Lorem ipsum dolor sit amet, consectetur adipiscing e${c}lit
         |Sed in orci mauris. Cras id tellus in ex imperdiet egestas.
@@ -653,9 +653,9 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test select outer WORD at end of file selects preceding whitespace`() {
+  fun `test select outer word at end of file selects preceding whitespace`() {
     doTest(
-      "vaW",
+      "vaw",
       """
         |Lorem ipsum dolor sit amet, consectetur adipiscing elit
         |Sed in orci mauris. Cras id tellus in ex imperdiet eg${c}estas
@@ -669,19 +669,19 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test select outer WORD on only word on line does not select leading whitespace`() {
-    doTest("vaW", "    Lor${c}em", "    ${s}Lore${c}m${se}", Mode.VISUAL(SelectionType.CHARACTER_WISE))
+  fun `test select outer word on only word on line does not select leading whitespace`() {
+    doTest("vaw", "    Lor${c}em", "    ${s}Lore${c}m${se}", Mode.VISUAL(SelectionType.CHARACTER_WISE))
   }
 
   @Test
-  fun `test select outer WORD on last word on line selects trailing whitespace`() {
-    doTest("vaW", "    Lor${c}em    ", "    ${s}Lorem   ${c} ${se}", Mode.VISUAL(SelectionType.CHARACTER_WISE))
+  fun `test select outer word on last word on line selects trailing whitespace`() {
+    doTest("vaw", "    Lor${c}em    ", "    ${s}Lorem   ${c} ${se}", Mode.VISUAL(SelectionType.CHARACTER_WISE))
   }
 
   @Test
-  fun `test select outer WORD with existing left-to-right selection selects rest of word and following whitespace`() {
+  fun `test select outer word with existing left-to-right selection selects rest of word and following whitespace`() {
     doTest(
-      listOf("v", "l", "aW"),
+      listOf("v", "l", "aw"),
       "Lo${c}rem    ipsum",
       "Lo${s}rem   ${c} ${se}ipsum",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
@@ -689,9 +689,9 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test select outer WORD with existing left-to-right selection selects rest of word and trailing whitespace at end of line`() {
+  fun `test select outer word with existing left-to-right selection selects rest of word and trailing whitespace at end of line`() {
     doTest(
-      listOf("v", "l", "aW"),
+      listOf("v", "l", "aw"),
       "Lo${c}rem    ",
       "Lo${s}rem   ${c} ${se}",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
@@ -699,9 +699,9 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test select outer WORD with existing left-to-right selection in whitespace selects rest of whitespace and following word`() {
+  fun `test select outer word with existing left-to-right selection in whitespace selects rest of whitespace and following word`() {
     doTest(
-      listOf("v", "l", "aW"),
+      listOf("v", "l", "aw"),
       "Lorem   ${c}   ipsum dolor sit amet",
       "Lorem   ${s}   ipsu${c}m${se} dolor sit amet",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
@@ -721,9 +721,9 @@ class MotionOuterBigWordActionTest : VimTestCase() {
     description = "Off by one because IdeaVim does not currently support selecting newline char"
   )
   @Test
-  fun `test select outer WORD from whitespace at end of line with multiple lines and existing left-to-right selection`() {
+  fun `test select outer word from whitespace at end of line with multiple lines and existing left-to-right selection`() {
     doTest(
-      listOf("v", "l", "aW"),
+      listOf("v", "l", "aw"),
       """
         |Lorem Ipsum...${c}.....
         |
@@ -745,9 +745,9 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test select outer WORD from whitespace at end of line with multiple lines and existing left-to-right selection 2`() {
+  fun `test select word from whitespace at end of line with multiple lines and existing left-to-right selection 2`() {
     doTest(
-      listOf("v", "l", "aW"),
+      listOf("v", "l", "aw"),
       """
         |Lorem Ipsum
         |
@@ -769,9 +769,9 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test select outer WORD with existing right-to-left selection selects rest of word and preceding whitespace`() {
+  fun `test select outer word with existing right-to-left selection selects rest of word and preceding whitespace`() {
     doTest(
-      listOf("v", "h", "aW"),
+      listOf("v", "h", "aw"),
       "Lorem   ip${c}sum   dolor sit amet",
       "Lorem${s}${c}   ips${se}um   dolor sit amet",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
@@ -779,9 +779,9 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test select outer WORD with existing right-to-left selection with caret at start of word selects previous word`() {
+  fun `test select outer word with existing right-to-left selection with caret at start of word selects previous word`() {
     doTest(
-      listOf("v", "h", "aW"),
+      listOf("v", "h", "aw"),
       "Lorem   i${c}psum   dolor sit amet",
       "${s}${c}Lorem   ip${se}sum   dolor sit amet",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
@@ -789,9 +789,9 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test select outer WORD with existing right-to-left selection selects rest of word and leading whitespace at start of line`() {
+  fun `test select outer word with existing right-to-left selection selects rest of word and leading whitespace at start of line`() {
     doTest(
-      listOf("v", "h", "aW"),
+      listOf("v", "h", "aw"),
       "    Lo${c}rem ipsum dolor sit amet",
       "${s}${c}    Lor${se}em ipsum dolor sit amet",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
@@ -799,9 +799,9 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test select outer WORD with existing right-to-left selection on only word on line selects rest of word and leading whitespace`() {
+  fun `test select outer word with existing right-to-left selection on only word on line selects rest of word and leading whitespace`() {
     doTest(
-      listOf("v", "h", "aW"),
+      listOf("v", "h", "aw"),
       "    Lo${c}rem",
       "${s}${c}    Lor${se}em",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
@@ -809,9 +809,9 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test select outer WORD with existing right-to-left selection in whitespace selects rest of whitespace and preceding word`() {
+  fun `test select outer word with existing right-to-left selection in whitespace selects rest of whitespace and preceding word`() {
     doTest(
-      listOf("v", "h", "aW"),
+      listOf("v", "h", "aw"),
       "Lorem ipsum   ${c}   dolor sit amet",
       "Lorem ${s}${c}ipsum    ${se}  dolor sit amet",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
@@ -819,9 +819,9 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test select outer WORD from whitespace at start of line with multiple lines and existing right-to-left selection`() {
+  fun `test select outer word from whitespace at start of line with multiple lines and existing right-to-left selection`() {
     doTest(
-      listOf("v", "h", "aW"),
+      listOf("v", "h", "aw"),
       """
         |Lorem Ipsum
         |
@@ -843,9 +843,9 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test select outer WORD from whitespace at start of line with multiple lines and existing right-to-left-selection 2`() {
+  fun `test select outer word from whitespace at start of line with multiple lines and existing right-to-left-selection 2`() {
     doTest(
-      listOf("v", "h", "aW"),
+      listOf("v", "h", "aw"),
       """
         |Lorem Ipsum
         |
@@ -857,7 +857,7 @@ class MotionOuterBigWordActionTest : VimTestCase() {
       """
         |Lorem Ipsum
         |
-        |Lorem ipsum dolor sit ${s}${c}amet,
+        |Lorem ipsum dolor sit amet${s}${c},
         |     ${se}   consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
@@ -867,9 +867,9 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test select outer WORD from whitespace at start of line with multiple lines and existing right-to-left-selection 3`() {
+  fun `test select outer word from whitespace at start of line with multiple lines and existing right-to-left-selection 3`() {
     doTest(
-      listOf("v", "h", "aW"),
+      listOf("v", "h", "aw"),
       """
         |Lorem Ipsum
         |
@@ -881,7 +881,7 @@ class MotionOuterBigWordActionTest : VimTestCase() {
       """
         |Lorem Ipsum
         |
-        |Lorem ipsum dolor sit ${s}${c}amet,.......
+        |Lorem ipsum dolor sit amet${s}${c},.......
         |     ${se}   consectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
@@ -891,9 +891,9 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test select outer WORD from start of line with existing right-to-left selection`() {
+  fun `test select outer word from start of line with existing right-to-left selection`() {
     doTest(
-      listOf("v", "h", "aW"),
+      listOf("v", "h", "aw"),
       """
         |Lorem Ipsum
         |
@@ -905,7 +905,7 @@ class MotionOuterBigWordActionTest : VimTestCase() {
       """
         |Lorem Ipsum
         |
-        |Lorem ipsum dolor sit${s}${c} amet,
+        |Lorem ipsum dolor sit amet${s}${c},
         |co${se}nsectetur adipiscing elit
         |Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
@@ -915,9 +915,9 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test select outer WORD from word at start of line with existing right-to-left selection and preceding whitespace on previous line`() {
+  fun `test select outer word from word at start of line with existing right-to-left selection and preceding whitespace on previous line`() {
     doTest(
-      listOf("v", "h", "aW"),
+      listOf("v", "h", "aw"),
       """
         |Lorem Ipsum
         |
@@ -939,9 +939,9 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test select outer WORD from word at start of line with existing right-to-left selection and preceding whitespace on previous line 2`() {
+  fun `test select outer word from word at start of line with existing right-to-left selection and preceding whitespace on previous line 2`() {
     doTest(
-      listOf("v", "h", "aW"),
+      listOf("v", "h", "aw"),
       """
         |Lorem Ipsum
         |
@@ -963,9 +963,9 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test select multiple outer WORDs selects following whitespace`() {
+  fun `test select multiple outer words selects following whitespace`() {
     doTest(
-      "v2aW",
+      "v2aw",
       "Lorem ipsu${c}m dolor sit amet, consectetur adipiscing elit",
       "Lorem ${s}ipsum dolor${c} ${se}sit amet, consectetur adipiscing elit",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
@@ -973,9 +973,9 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test select multiple outer WORDs with non-word characters`() {
+  fun `test select multiple outer words with non-word characters`() {
     doTest(
-      "v2aW",
+      "v2aw",
       "Lorem ipsu${c}m -- dolor sit amet, consectetur adipiscing elit",
       "Lorem ${s}ipsum --${c} ${se}dolor sit amet, consectetur adipiscing elit",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
@@ -983,11 +983,11 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test select multiple outer WORDs with non-word characters 2`() {
+  fun `test select multiple outer words with no following whitespace selects preceding whitespace`() {
     doTest(
-      "v2aW",
+      "v2aw",
       "Lorem ipsu${c}m --dolor sit amet, consectetur adipiscing elit",
-      "Lorem ${s}ipsum --dolor${c} ${se}sit amet, consectetur adipiscing elit",
+      "Lorem${s} ipsum -${c}-${se}dolor sit amet, consectetur adipiscing elit",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
@@ -995,17 +995,28 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   @Test
   fun `test select multiple outer words starting in whitespace`() {
     doTest(
-      "v3aW",
+      "v3aw",
       "Lorem  ${c}  ipsum --dolor sit amet, consectetur adipiscing elit",
-      "Lorem${s}    ipsum --dolor si${c}t${se} amet, consectetur adipiscing elit",
+      "Lorem${s}    ipsum --dolor${c} ${se}sit amet, consectetur adipiscing elit",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
   @Test
-  fun `test select multiple outer WORDs crosses end of line`() {
+  fun `test select multiple outer words with no following whitespace selects preceding whitespace 2`() {
+    // Implementation bug: caret placed anywhere other than last character would not select preceding whitespace
     doTest(
-      "v2aW",
+      "v2aw",
+      "Lorem ip${c}sum --dolor sit amet, consectetur adipiscing elit",
+      "Lorem${s} ipsum -${c}-${se}dolor sit amet, consectetur adipiscing elit",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test select multiple outer words crosses end of line`() {
+    doTest(
+      "v2aw",
       """
         |Lorem ipsum dolor sit amet, consectetur adipiscing e${c}lit
         |Sed in orci mauris. Cras id tellus in ex imperdiet egestas.
@@ -1014,43 +1025,6 @@ class MotionOuterBigWordActionTest : VimTestCase() {
         |Lorem ipsum dolor sit amet, consectetur adipiscing ${s}elit
         |Sed${c} ${se}in orci mauris. Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
-      Mode.VISUAL(SelectionType.CHARACTER_WISE),
-    )
-  }
-
-  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, description = "Wrong caret position, but in real neovim works fine")
-  @Test
-  fun `test on last dot`() {
-    doTest(
-      "<aW",
-      """
-      I found it in a legendary land
-      all rocks and lavender and tufted grass,
-      where it was settled on some sodden sand
-      hard by the torrent of a mountain pass$c.
-      """.trimIndent(),
-      """
-      I found it in a legendary land
-      all rocks and lavender and tufted grass,
-      where it was settled on some sodden sand
-      ${c}hard by the torrent of a mountain pass.
-      """.trimIndent(),
-      Mode.NORMAL(),
-    )
-  }
-
-  @Test
-  fun `test past end in visual`() {
-    doTest(
-      "v\$aW",
-      """
-      I found it in a ${c}legendary land
-      }
-      """.trimIndent(),
-      """
-      I found it in a ${s}legendary land
-      $c}$se
-      """.trimIndent(),
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }

@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.CharacterHelper
 import com.maddyhome.idea.vim.helper.CharacterHelper.charType
+import com.maddyhome.idea.vim.helper.CharacterHelper.isWhitespace
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.helper.SearchOptions
 import com.maddyhome.idea.vim.helper.enumSetOf
@@ -21,12 +22,12 @@ import com.maddyhome.idea.vim.regexp.VimRegexException
 import com.maddyhome.idea.vim.regexp.VimRegexOptions
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.inVisualMode
 import org.jetbrains.annotations.Contract
 import org.jetbrains.annotations.Range
 import java.util.*
 import java.util.regex.Pattern
 import kotlin.math.abs
-import kotlin.math.min
 
 // todo all this methods should return Long since editor.fileSize is long
 // todo same for TextRange and motions
@@ -93,26 +94,83 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     }
   }
 
+  override fun findWordNearestCursor(editor: VimEditor, caret: ImmutableVimCaret): TextRange? {
+    val chars = editor.text()
+    val stop = editor.getLineEndOffset(caret.getBufferPosition().line, true)
+
+    val pos = caret.offset
+
+    if (chars.isEmpty() || chars.length <= pos) return null
+
+    var start = pos
+    val types = arrayOf(
+      CharacterHelper.CharacterType.KEYWORD,
+      CharacterHelper.CharacterType.PUNCTUATION
+    )
+    for (i in 0..1) {
+      start = pos
+      val type = charType(editor, chars[start], false)
+      if (type == types[i]) {
+        // Search back for start of word
+        while (start > 0 && charType(editor, chars[start - 1], false) == types[i]) {
+          start--
+        }
+      } else {
+        // Search forward for start of word
+        while (start < stop && charType(editor, chars[start], false) != types[i]) {
+          start++
+        }
+      }
+
+      if (start != stop) {
+        break
+      }
+    }
+
+    if (start == stop) {
+      return null
+    }
+
+    // Special case 1 character words because 'findNextWordEnd' returns one to many chars
+    val end = if (start < stop &&
+      (start >= chars.length - 1 ||
+        charType(editor, chars[start + 1], false) != CharacterHelper.CharacterType.KEYWORD)
+    ) {
+      start + 1
+    } else {
+      injector.searchHelper.findNextWordEnd(editor, start, 1, false, false) + 1
+    }
+
+    return TextRange(start, end)
+  }
+
   override fun findNextWord(
     editor: VimEditor,
     searchFrom: Int,
     count: Int,
     bigWord: Boolean,
-    spaceWords: Boolean,
   ): Int {
-    return findNextWord(editor.text(), editor.fileSize().toInt(), editor, searchFrom, count, bigWord, spaceWords)
+    return findNextWord(editor.text(), editor, searchFrom, count, bigWord)
   }
 
   override fun findNextWord(
     text: CharSequence,
-    textLength: Int,
     editor: VimEditor,
     searchFrom: Int,
     count: Int,
     bigWord: Boolean,
-    spaceWords: Boolean,
   ): Int {
-    return doFindNext(text, textLength, editor, searchFrom, count, bigWord, spaceWords, ::findNextWordOne)
+    var pos = searchFrom
+    repeat(abs(count)) {
+      pos = if (count > 0) {
+        findNextWordOne(text, editor, pos, bigWord)
+      } else {
+        findPreviousWordOne(text, editor, pos, bigWord)
+      }
+
+      if (pos >= text.length) return pos
+    }
+    return pos
   }
 
   override fun findNextWordEnd(
@@ -120,21 +178,18 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     searchFrom: Int,
     count: Int,
     bigWord: Boolean,
-    spaceWords: Boolean,
+    stopOnEmptyLine: Boolean,
   ): Int {
-    return findNextWordEnd(editor.text(), editor.fileSize().toInt(), editor, searchFrom, count, bigWord, spaceWords)
-  }
-
-  override fun findNextWordEnd(
-    text: CharSequence,
-    textLength: Int,
-    editor: VimEditor,
-    searchFrom: Int,
-    count: Int,
-    bigWord: Boolean,
-    spaceWords: Boolean,
-  ): Int {
-    return doFindNext(text, textLength, editor, searchFrom, count, bigWord, spaceWords, ::findNextWordEndOne)
+    val text = editor.text()
+    var pos = searchFrom
+    repeat(abs(count)) {
+      pos = if (count > 0) {
+        findNextWordEndOne(text, editor, pos, bigWord, stopOnEmptyLine, allowMoveFromWordEnd = true)
+      } else {
+        findPreviousWordEndOne(text, editor, pos, bigWord).coerceAtLeast(0)
+      }
+    }
+    return pos
   }
 
   override fun findPattern(
@@ -283,160 +338,218 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     ).map { it.range }
   }
 
-  private fun doFindNext(
-    text: CharSequence,
-    textLength: Int,
-    editor: VimEditor,
-    searchFrom: Int,
-    countDirection: Int,
-    bigWord: Boolean,
-    spaceWords: Boolean,
-    action: (text: CharSequence, editor: VimEditor, pos: Int, size: Int, step: Int, bigWord: Boolean, spaceWords: Boolean) -> Int,
-  ): Int {
-    var count = countDirection
-    val step = if (count >= 0) 1 else -1
-    count = abs(count)
-    var pos = searchFrom
-    for (i in 0 until count) {
-      pos = action(text, editor, pos, textLength, step, bigWord, spaceWords)
-      if (pos == searchFrom || pos == 0 || pos == textLength - 1) {
-        break
-      }
-    }
-    return pos
-  }
-
+  /**
+   * Find the next word from the current starting position, skipping current word and whitespace
+   *
+   * Note that this will return an out of bound index if there is no next word! This is necessary to distinguish between
+   * no next word and the next word being on the last character of the file.
+   *
+   * Also remember that two different "word" types can butt up against each other - e.g. KEYWORD followed by PUNCTUATION
+   */
   private fun findNextWordOne(
     chars: CharSequence,
     editor: VimEditor,
-    pos: Int,
-    size: Int,
-    step: Int,
+    start: Int,
     bigWord: Boolean,
-    spaceWords: Boolean,
+    stopAtEndOfLine: Boolean = false,
   ): Int {
-    var found = false
-    var _pos = if (pos < size) pos else min(size, (chars.length - 1))
-    // For back searches, skip any current whitespace so we start at the end of a word
-    if (step < 0 && _pos > 0) {
-      if (charType(editor, chars[_pos - 1], bigWord) === CharacterHelper.CharacterType.WHITESPACE && !spaceWords) {
-        _pos = skipSpace(editor, chars, _pos - 1, step, size) + 1
-      }
-      if (_pos > 0 && charType(editor, chars[_pos], bigWord) !== charType(editor, chars[_pos - 1], bigWord)) {
-        _pos += step
-      }
+    var pos = start
+    if (pos >= chars.length) return chars.length
+
+    val startingCharType = charType(editor, chars[start], bigWord)
+
+    // It is important to move first, to properly handle stopping at the end of a line and moving from an empty line
+    pos++
+
+    // If we're on a word, move past the end of it
+    if (pos < chars.length && startingCharType != CharacterHelper.CharacterType.WHITESPACE) {
+      pos = skipWhileCharacterType(editor, chars, pos, 1, startingCharType, bigWord)
     }
-    var res = _pos
-    if (_pos < 0 || _pos >= size) {
-      return _pos
+
+    // Skip following whitespace, optionally stopping at the end of the line (on the newline char).
+    // An empty line is a word, so stop when the offset is at the newline char of an empty line.
+    while (pos < chars.length && isWhitespace(editor, chars[pos], bigWord)) {
+      if (isEmptyLine(chars, pos) || (chars[pos] == '\n' && stopAtEndOfLine)) return pos
+      pos++
     }
-    var type = charType(editor, chars[_pos], bigWord)
-    if (type === CharacterHelper.CharacterType.WHITESPACE && step < 0 && _pos > 0 && !spaceWords) {
-      type = charType(editor, chars[_pos - 1], bigWord)
-    }
-    _pos += step
-    while (_pos in 0 until size && !found) {
-      val newType = charType(editor, chars[_pos], bigWord)
-      if (newType !== type) {
-        if (newType === CharacterHelper.CharacterType.WHITESPACE && step >= 0 && !spaceWords) {
-          _pos = skipSpace(editor, chars, _pos, step, size)
-          res = _pos
-        } else if (step < 0) {
-          res = _pos + 1
-        } else {
-          res = _pos
-        }
-        type = charType(editor, chars[res], bigWord)
-        found = true
-      }
-      _pos += step
-    }
-    if (found) {
-      if (res < 0) { // (pos <= 0)
-        res = 0
-      } else if (res >= size) { // (pos >= size)
-        res = size - 1
-      }
-    } else if (_pos <= 0) {
-      res = 0
-    } else if (_pos >= size) {
-      res = size
-    }
-    return res
+
+    // We're now on the first character of a word or just past the end of the file
+    return pos.coerceAtMost(chars.length)
   }
 
+  /**
+   * Find the start of the current word, skipping current whitespace
+   *
+   * This function will always return an in-bounds index. If there is no previous word (because we're at the start of
+   * the file), the offset will be `0`, the start of the current word or preceding whitespace.
+   */
+  private fun findPreviousWordOne(
+    chars: CharSequence,
+    editor: VimEditor,
+    start: Int,
+    bigWord: Boolean,
+    allowMoveFromWordStart: Boolean = true,
+  ): Int {
+    var pos = start
+    val startingCharType = charType(editor, chars[pos.coerceAtMost(chars.length - 1)], bigWord)
+
+    // Always move back one to make sure that we don't get stuck on the start of a word
+    pos--
+
+    if (allowMoveFromWordStart
+      || startingCharType == charType(editor, chars[pos], bigWord)
+      || isWhitespace(editor, chars[pos], bigWord)
+    ) {
+      // Skip any intermediate whitespace, stopping at an empty line (offset is the newline char of the empty line).
+      // This will leave us on the last character of the previous word.
+      while (pos >= 0 && isWhitespace(editor, chars[pos], bigWord)) {
+        if (isEmptyLine(chars, pos)) return pos
+        pos--
+      }
+
+      if (pos <= 0) return 0
+
+      // We're now on a word character, or at the start of the file. Move back until we're past the start of the word,
+      // then move forward to the start of the word
+      pos = skipWhileCharacterType(editor, chars, pos, -1, charType(editor, chars[pos], bigWord), bigWord)
+    }
+
+    return (pos + 1).coerceAtLeast(0)
+  }
+
+  @Suppress("GrazieInspection")
   private fun findNextWordEndOne(
     chars: CharSequence,
     editor: VimEditor,
-    pos: Int,
-    size: Int,
-    step: Int,
+    start: Int,
     bigWord: Boolean,
-    spaceWords: Boolean,
+    stopOnEmptyLine: Boolean,
+    allowMoveFromWordEnd: Boolean,
   ): Int {
-    var pos = pos
-    var found = false
-    // For forward searches, skip any current whitespace so we start at the start of a word
-    if (step > 0 && pos < size - 1) {
-      if (charType(editor, chars[pos + 1], bigWord) === CharacterHelper.CharacterType.WHITESPACE &&
-        !spaceWords
-      ) {
-        pos = skipSpace(editor, chars, pos + 1, step, size) - 1
+    // Scenarios:
+    // * Cursor on word/WORD: move to end of the current word/WORD group ("wo${c}rd    word" -> "wor${c}d    word")
+    // * Cursor on end of word/WORD: move to end of next word/WORD group ("wor${c}d    word" -> "word    wor${c}d")
+    // * Cursor on whitespace: move to end of next word/WORD group       (" ${c}       word" -> "        wor${c}d")
+    // * Visual on single char:
+    //   For `e`/`E`: move to end of next word/WORD group ("   ${s}d${se}    word" -> "   ${s}d    word${se}")
+    //   For `iw` and no selection: DO NOT MOVE!          ("   ${s}d${se}    word" -> "   ${s}d${se}    word")
+    //
+    // Note that newline characters are considered to be whitespace. This is USUALLY treated like whitespace, so
+    // moving through a new line to get to next word end is usually just the same as moving through other whitespace.
+    // Empty lines are an exception to this rule. Vim considers an empty line to be a word/WORD, but for vi
+    // compatibility reasons, `e` and `E` do not stop on empty lines, but text objects do.
+
+    var pos = start
+    val startingCharType = charType(editor, chars[pos], bigWord)
+
+    // If we process the loops below, we end up one character past the target offset. But we don't always process the
+    // loops. Move one character forward now so everything works cleanly
+    pos++
+
+    // When called by `e`/`E` and we're originally at the end of the current word, we want to move to end of the *next*
+    // word, so skip whitespace at the current pos and get to the start of the next word.
+    // When called by `iw` and we're at the end of the current word, we don't want to move, so if there's whitespace at
+    // the current position, don't skip it. We then won't be at the start of the next word, so we won't move further.
+    // We'll decrement before we return, so the cursor doesn't move.
+    // But if we start on whitespace, we always want to skip it, for both scenarios.
+    if (allowMoveFromWordEnd || startingCharType == CharacterHelper.CharacterType.WHITESPACE) {
+      while (pos < chars.length && isWhitespace(editor, chars[pos], bigWord)) {
+        if (stopOnEmptyLine && isEmptyLine(chars, pos)) return pos
+        pos++
       }
-      if (pos < size - 1 &&
-        charType(editor, chars[pos], bigWord) !==
-        charType(editor, chars[pos + 1], bigWord)
-      ) {
-        pos += step
-      }
     }
-    var res = pos
-    if (pos < 0 || pos >= size) {
-      return pos
+
+    // If we're on whitespace now, it's because we started on the end of a word and then immediately advanced to
+    // whitespace. We don't want to skip the current whitespace (as above) and we don't want to
+    if (pos < chars.length && !isWhitespace(editor, chars[pos], bigWord)) {
+      // We're currently at the start of, or inside, a word/WORD. Move to the start of the next charType segment, and
+      // return the character *before* it, so we get the end of the current word/WORD
+      val wordCharType = charType(editor, chars[pos], bigWord)
+      pos = skipWhileCharacterType(editor, chars, pos, 1, wordCharType, bigWord)
     }
-    var type = charType(editor, chars[pos], bigWord)
-    if (type === CharacterHelper.CharacterType.WHITESPACE && step >= 0 && pos < size - 1 && !spaceWords) {
-      type = charType(editor, chars[pos + 1], bigWord)
-    }
-    pos += step
-    while (pos >= 0 && pos < size && !found) {
-      val newType = charType(editor, chars[pos], bigWord)
-      if (newType !== type) {
-        if (step >= 0) {
-          res = pos - 1
-        } else if (newType === CharacterHelper.CharacterType.WHITESPACE && step < 0 && !spaceWords) {
-          pos = skipSpace(editor, chars, pos, step, size)
-          res = pos
-        } else {
-          res = pos
-        }
-        found = true
-      }
-      pos += step
-    }
-    if (found) {
-      if (res < 0) {
-        res = 0
-      } else if (res >= size) {
-        res = size - 1
-      }
-    } else if (pos == size) {
-      res = size - 1
-    }
-    return res
+
+    // The loops above have put us one char past the next word, or one past whitespace. Or just advanced one character
+    pos--
+
+    return pos.coerceIn(0, chars.length - 1)
   }
 
-  private fun skipSpace(editor: VimEditor, chars: CharSequence, offset: Int, step: Int, size: Int): Int {
-    var _offset = offset
-    var prev = 0.toChar()
-    while (_offset in 0 until size) {
-      val c = chars[_offset]
-      if (c == '\n' && c == prev) break
-      if (charType(editor, c, false) !== CharacterHelper.CharacterType.WHITESPACE) break
-      prev = c
-      _offset += step
+  /**
+   * Find the end of the previous word, skipping the current word and any intermediate whitespace
+   *
+   * Note that this will return `-1` if there is no previous word! This is necessary to distinguish between no previous
+   * word and the previous word being on the last character of the file.
+   */
+  private fun findPreviousWordEndOne(
+    chars: CharSequence,
+    editor: VimEditor,
+    start: Int,
+    bigWord: Boolean,
+    stopAtEndOfPreviousLine: Boolean = false,
+  ): Int {
+    var pos = start
+    val startingCharType = charType(editor, chars[pos], bigWord)
+
+    // We always have to move backwards
+    pos--
+
+    // Find the first preceding character with a different charType. Note that we use the starting charType here,
+    // because we might have already moved across a word/WORD/non-word boundary.
+    // We don't need to +/-1 here. This is returning the offset of the character at the end of the previous word/WORD
+    if (pos >= 0 && startingCharType != CharacterHelper.CharacterType.WHITESPACE) {
+      pos = skipWhileCharacterType(editor, chars, pos, -1, startingCharType, bigWord)
     }
-    return if (_offset < size) _offset else size - 1
+
+    // If we ended up on whitespace, skip backwards until we find either the last character of the previous word/WORD,
+    // or we have to stop at an empty line, which is considered a WORD
+    while (pos in 0 until chars.length && isWhitespace(editor, chars[pos], bigWord)) {
+      // Unlike moving forwards, we always check for empty lines.
+      // If requested, we stop when we wrap at the start of the current line. Ideally, we would stop when we hit the
+      // start of the current line (e.g. return `pos+1`), but this doesn't work with how the function is called. It's
+      // used when finding the word under the cursor - we move to the character after the end of the previous word. It's
+      // easier to return the newline at the end of the previous line so that adding one will move us to the start of
+      // the current line.
+      if (isEmptyLine(chars, pos) || (chars[pos] == '\n' && stopAtEndOfPreviousLine)) return pos
+      pos--
+    }
+
+    return pos
+  }
+
+  private fun isEmptyLine(chars: CharSequence, offset: Int): Boolean {
+    // The new line char belongs to the current line, so if the previous character is also a new line char, then the
+    // line for the current offset is empty
+    return (offset == 0 && chars[offset] == '\n')
+      || (chars[offset] == '\n' && chars[offset - 1] == '\n')
+  }
+
+  /**
+   * Skips characters in a given direction until reaching a different character type
+   *
+   * Returns the offset of the character with the different character type. Will return indexes out of bounds at the
+   * start and end of the file. Specifically, will return `-1` at the start of the file, `chars.length` at the end.
+   */
+  private fun skipWhileCharacterType(
+    editor: VimEditor,
+    chars: CharSequence,
+    start: Int,
+    step: Int,
+    type: CharacterHelper.CharacterType,
+    isBig: Boolean,
+  ): Int {
+    var offset = start
+    while (offset in 0 until chars.length && charType(editor, chars[offset], isBig) === type) {
+      offset += step
+    }
+    return offset
+  }
+
+  private fun skipOneCharacterBack(offset: Int): Int {
+    return (offset - 1).coerceAtLeast(0)
+  }
+
+  private fun skipOneCharacterBackOnCurrentLine(chars: CharSequence, offset: Int): Int {
+    return if (chars[offset - 1] != '\n') offset - 1 else offset
   }
 
   override fun findNextCamelStart(chars: CharSequence, startIndex: Int, count: Int): Int? {
@@ -1350,150 +1463,190 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     return i
   }
 
-  override fun findWordUnderCursor(
+  override fun findWordObject(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     count: Int,
-    dir: Int,
     isOuter: Boolean,
     isBig: Boolean,
-    hasSelection: Boolean,
   ): TextRange {
-    logger.debug("count=$count")
-    logger.debug("dir=$dir")
-    logger.debug("isOuter=$isOuter")
-    logger.debug("isBig=$isBig")
-    logger.debug("hasSelection=$hasSelection")
+    // Note: for more detailed comments with examples, check git history!
 
-    val chars: CharSequence = editor.text()
-    //int min = EditorHelper.getLineStartOffset(editor, EditorHelper.getCurrentLogicalLine(editor));
-    //int max = EditorHelper.getLineEndOffset(editor, EditorHelper.getCurrentLogicalLine(editor), true);
-    val min = 0
-    val max: Int = editor.fileSize().toInt()
-    if (max == 0) return TextRange(0, 0)
+    // Ignore single width selection. We still move both back and forwards with a single width selection
+    val hasSelection = editor.inVisualMode && caret.vimSelectionStart != caret.offset
+    val direction =
+      if (hasSelection && caret.vimSelectionStart > caret.offset) Direction.BACKWARDS else Direction.FORWARDS
 
-    logger.debug("min=$min")
-    logger.debug("max=$max")
-
-    val pos: Int = caret.offset
+    val pos = caret.offset
+    val chars = editor.text()
+    if (chars.isEmpty()) return TextRange(0, 0)
     if (chars.length <= pos) return TextRange(chars.length - 1, chars.length - 1)
 
-    val startSpace = charType(editor, chars[pos], isBig) === CharacterHelper.CharacterType.WHITESPACE
-    // Find word start
-    val onWordStart = pos == min ||
-      charType(editor, chars[pos - 1], isBig) !==
-      charType(editor, chars[pos], isBig)
     var start = pos
+    var end = start
+    var count = count
+    var shouldEndOnWhitespace = false
 
-    logger.debug("pos=$pos")
-    logger.debug("onWordStart=$onWordStart")
-
-    if (!onWordStart && !(startSpace && isOuter) || hasSelection || count > 1 && dir == -1) {
-      start = if (dir == 1) {
-        findNextWord(editor, pos, -1, isBig, !isOuter)
-      } else {
-        findNextWord(
-          editor,
-          pos,
-          -(count - if (onWordStart && !hasSelection) 1 else 0),
-          isBig,
-          !isOuter
-        )
-      }
-      start = editor.normalizeOffset(start, false)
-    }
-
-    logger.debug("start=$start")
-
-    // Find word end
-
-    // Find word end
-    val onWordEnd = pos >= max - 1 ||
-      charType(editor, chars[pos + 1], isBig) !==
-      charType(editor, chars[pos], isBig)
-
-    logger.debug("onWordEnd=$onWordEnd")
-
-    var end = pos
-    if (!onWordEnd || hasSelection || count > 1 && dir == 1 || startSpace && isOuter) {
-      end = if (dir == 1) {
-        val c = count - if (onWordEnd && !hasSelection && (!(startSpace && isOuter) || startSpace && !isOuter)) 1 else 0
-        findNextWordEnd(editor, pos, c, isBig, !isOuter)
-      } else {
-        findNextWordEnd(editor, pos, 1, isBig, !isOuter)
-      }
-    }
-
-    logger.debug("end=$end")
-
-    var goBack = startSpace && !hasSelection || !startSpace && hasSelection && !onWordStart
-    if (dir == 1 && isOuter) {
-      var firstEnd = end
-      if (count > 1) {
-        firstEnd = findNextWordEnd(editor, pos, 1, isBig, false)
-      }
-      if (firstEnd < max - 1) {
-        if (charType(editor, chars[firstEnd + 1], false) !== CharacterHelper.CharacterType.WHITESPACE) {
-          goBack = true
-        }
-      }
-    }
-    if (dir == -1 && isOuter && startSpace) {
-      if (pos > min) {
-        if (charType(editor, chars[pos - 1], false) !== CharacterHelper.CharacterType.WHITESPACE) {
-          goBack = true
-        }
-      }
-    }
-
-    var goForward = dir == 1 && isOuter && (!startSpace && !onWordEnd || startSpace && onWordEnd && hasSelection)
-    if (!goForward && dir == 1 && isOuter) {
-      var firstEnd = end
-      if (count > 1) {
-        firstEnd = findNextWordEnd(editor, pos, 1, isBig, false)
-      }
-      if (firstEnd < max - 1) {
-        if (charType(editor, chars[firstEnd + 1], false) !== CharacterHelper.CharacterType.WHITESPACE) {
-          goForward = true
-        }
-      }
-    }
-    if (!goForward && dir == 1 && isOuter && !startSpace && !hasSelection) {
-      if (end < max - 1) {
-        if (charType(editor, chars[end + 1], !isBig) !==
-          charType(editor, chars[end], !isBig)
-        ) {
-          goForward = true
-        }
-      }
-    }
-
-    logger.debug("goBack=$goBack")
-    logger.debug("goForward=$goForward")
-
-    if (goForward) {
-      if (editor.anyNonWhitespace(end, 1)) {
-        while (end + 1 < max &&
-          charType(editor, chars[end + 1], false) === CharacterHelper.CharacterType.WHITESPACE
-        ) {
-          end++
-        }
-      }
-    }
-    if (goBack) {
-      if (editor.anyNonWhitespace(start, -1)) {
-        while (start > min &&
-          charType(editor, chars[start - 1], false) === CharacterHelper.CharacterType.WHITESPACE
-        ) {
+    // If there's no selection, calculate the initial range by moving back to the start of the current character type
+    // on the current line (word/WORD or whitespace). Then move forward:
+    // * For inner objects, move to the end of the current word or whitespace block (or line).
+    // * For outer objects, whitespace is included. Move to the end of the current word (or line) and following
+    //   whitespace (if any), or move to the end of the current whitespace (possibly wrapping) and following word.
+    // Note that the flag for selection is only true if the selection is greater than a single char. Also remember
+    // that an empty line is a word and there are multiple word types not necessarily separated by whitespace.
+    if (!hasSelection) {
+      val startingCharacterType = charType(editor, chars[pos], isBig)
+      start = pos
+      if (!isEmptyLine(chars, start)) {
+        while (start >= 0 && chars[start] != '\n' && charType(editor, chars[start], isBig) == startingCharacterType) {
           start--
         }
+        start++
+      }
+
+      end = if ((!isOuter && isWhitespace(editor, chars[start], isBig))
+        || (isOuter && !isWhitespace(editor, chars[start], isBig))
+      ) {
+        // * Inner object, on whitespace. Skip forward to the end of the current whitespace, just before the next
+        //   word or end of line (no wrapping). This will always move us forward one character, so it's always safe to
+        //   move one character back. If we're moving on to an empty line (newline is whitespace!) this will move one
+        //   character forward and then one character back. I.e. `viw` on an empty line only selects the line!
+        // * Outer object, on word. Skip the current word and include any following whitespace. We know this isn't an
+        //   empty line and that we'll stop at the end of the current line, so it's always safe to move back on char.
+        if (isOuter) {
+          // Outer objects should include following whitespace. But if there isn't any, we should walk back and
+          // include any preceding whitespace.
+          shouldEndOnWhitespace = true
+        }
+
+        val offset = findNextWordOne(chars, editor, start, isBig, stopAtEndOfLine = true)
+        skipOneCharacterBack(offset)
+      } else {
+        // * Inner object, on word. Move to the end of the current word, do not bother with whitespace.
+        // * Outer object, on whitespace. Include whitespace and the following word by moving to the end of the next
+        //   word/WORD. Newlines are considered whitespace and so can wrap. Make sure that if we are currently at the
+        //   end of a word (because we advanced above) that we do not advance to the end of the subsequent word.
+        findNextWordEndOne(chars, editor, start, isBig, stopOnEmptyLine = true, allowMoveFromWordEnd = false)
+      }
+
+      count--
+    }
+
+    // We have an initial selection/range. Now loop over what's left of count.
+    // The actions are very similar, but there is subtly different handling of newlines and empty lines.
+    // Note that we can't make any assumptions about the start/end positions. If there was no initial selection, we know
+    // that start is at the beginning of the initial character type and end will be either at the end of a word, end of
+    // whitespace or end of line. But if there was an initial selection, it all depends on what the user selected.
+    repeat(count) {
+      when (direction) {
+        Direction.FORWARDS -> {
+          // Move forward (and skip end of line char) so we know if we need to move to the current or next word.
+          // If we're at the end of a word, the next character will be a different character type/whitespace.
+          // If we're in the middle of a word, the next character will still be the current word.
+          end++
+          if (end < chars.length && chars[end] == '\n' && !isEmptyLine(chars, end)) {
+            end++
+          }
+
+          if (end >= chars.length) {
+            end--
+            return@repeat
+          }
+
+          end = if ((!isOuter && isWhitespace(editor, chars[end], isBig))
+            || (isOuter && !isWhitespace(editor, chars[end], isBig))
+          ) {
+            // * Inner object, on whitespace. Whitespace is treated separately and included in the count. Skip the
+            //   current whitespace, up to the character before the next word, or the end of the line.
+            //   For a non-empty line, this will always move forwards, so it is always safe to move one char back.
+            //   For empty lines, things are more complex and different to the behaviour above when we set the initial
+            //   range. In that case, we advance while trying to get to the next word, encounter an empty line, stop,
+            //   and then we always move one character back. This can put us back to the original offset (try `viw` on
+            //   an empty line - the caret doesn't move).
+            //   Vim does things differently if there's an existing selection (i.e., this scenario) and we're moving on
+            //   to an empty line. The algorithm advances early (see above), and this skips us past a newline char and
+            //   on to an empty line. We then try to find the next word, which automatically advances a character, on to
+            //   the start of the next line. And now Vim does NOT go back one character, because that would put us at
+            //   the newline char of the previous line.
+            //   You can see this behaviour with `v2iw` on empty lines. Vim selects the first line while initialising
+            //   the range, and then advances 2 lines while handling the second iteration. Similarly, `v3iw` selects 5
+            //   lines. Interestingly, because we're now at the start of another line, the now-current line might not be
+            //   empty. That means Vim now has a "word" text object that selects just the first character in a line!
+            //   And because we've figured out this difference in handling empty lines, we match Vim's quirky behaviour!
+            //   See vim/vim#16514
+            // * Outer object, on a word character. Move to the end of the current word including following whitespace.
+            //   This is the same as moving to the character before the next word. Also stop at the end of the current
+            //   line. We know this isn't an empty line, so we will never wrap and will always move forward at least one
+            //   character. It is therefore always safe to move back one character, without reaching the start of line.
+            val offset = findNextWordOne(chars, editor, end, isBig, stopAtEndOfLine = true)
+            skipOneCharacterBackOnCurrentLine(chars, offset)
+          } else {
+            // * Inner object, on a word character. Move to the end of the current word. This does not look at
+            //   whitespace, and remains on the current line.
+            // * Outer object, on whitespace. Move to the end of the next word, which will skip the current whitespace.
+            //   Newline characters are whitespace, so this can wrap, although it will stop at an empty line. Make sure
+            //   that if we are currently at the end of a word (because we advanced above) that we do not advance to the
+            //   end of the subsequent word.
+            findNextWordEndOne(chars, editor, end, isBig, stopOnEmptyLine = true, allowMoveFromWordEnd = false)
+          }
+        }
+
+        Direction.BACKWARDS -> {
+          // If direction is backwards, then `end` is already correctly positioned, and we need to move `start`.
+          // As above, move back early so we handle word boundaries correctly
+          start--
+          if (start > 0 && chars[start] == '\n' && !isEmptyLine(chars, start)) {
+            start--
+          }
+
+          if (start < 0) {
+            start++
+            return@repeat
+          }
+
+          start = if ((!isOuter && isWhitespace(editor, chars[start], isBig))
+            || (isOuter && !isWhitespace(editor, chars[start], isBig))
+          ) {
+            // * Inner object, on whitespace. Move to start of whitespace, by moving to the end of the previous word and
+            //   then moving forward. Newlines are whitespace, but we stop at the start of the line.
+            // * Outer object, on word. Move to start of current word, then include and preceding whitespace, but stop
+            //   at the start of line. This is the same as one past the end of the previous word.
+            // Note that we actually stop at the end of the previous line, but the `+1` fixes things up.
+            val offset = findPreviousWordEndOne(chars, editor, start, isBig, stopAtEndOfPreviousLine = true) + 1
+            if (chars[offset] == '\n') offset + 1 else offset
+          } else {
+            // * Inner object, on word. Move back to the start of the current word. Ignore whitespace.
+            // * Outer object, on whitespace. Skip the current whitespace and move to the start of the previous word.
+            //   Newlines are whitespace, so this will wrap at the start of the line and move to the start of the last
+            //   word on the previous line, skipping trailing whitespace.
+            findPreviousWordOne(chars, editor, start, isBig, allowMoveFromWordStart = false)
+          }
+        }
       }
     }
 
-    logger.debug("start=$start")
-    logger.debug("end=$end")
+    if (isOuter && shouldEndOnWhitespace && start > 0
+      && !isWhitespace(editor, chars[end], isBig)
+      && !isWhitespace(editor, chars[start], isBig)) {
 
-    // End offset is exclusive
+      // Outer word objects normally include following whitespace. But if there's no following whitespace to include,
+      // we should extend the range to include preceding whitespace. However, Vim doesn't select whitespace at the
+      // start of a line
+      var offset = start - 1
+      while (offset >= 0 && chars[offset] != '\n' && isWhitespace(editor, chars[offset], isBig)) {
+        offset--
+      }
+      if (offset > 0 && chars[offset] != '\n') start = offset + 1
+    }
+
+    // TODO: Remove this when IdeaVim supports selecting the new line character
+    // A selection with start == end is perfectly valid, and will select a single character. However, IdeaVim
+    // unnecessarily prevents selecting the new line character at the end of a line. If the selection is just that new
+    // line character, then nothing is selected (we end up with a selection with range start==endInclusive, rather than
+    // start==endExclusive). This little hack makes sure that `viw` will (mostly) work on a single empty line
+    if (start == end && chars[start] == '\n') end++
+
+    // Text range's end offset is exclusive
     return TextRange(start, end + 1)
   }
 

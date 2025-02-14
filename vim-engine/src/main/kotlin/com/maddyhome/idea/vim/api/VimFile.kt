@@ -11,7 +11,7 @@ package com.maddyhome.idea.vim.api
 interface VimFile {
   fun displayFileInfo(vimEditor: VimEditor, fullPath: Boolean)
   fun displayHexInfo(editor: VimEditor)
-  fun displayLocationInfo(vimEditor: VimEditor)
+  fun displayLocationInfo(editor: VimEditor)
   fun selectPreviousTab(context: ExecutionContext)
   fun saveFile(editor: VimEditor, context: ExecutionContext)
   fun saveFiles(editor: VimEditor, context: ExecutionContext)

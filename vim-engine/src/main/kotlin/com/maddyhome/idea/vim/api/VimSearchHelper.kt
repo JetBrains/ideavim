@@ -99,36 +99,35 @@ interface VimSearchHelper {
   /**
    * Find the next word in the editor's document, from the given starting point
    *
+   * Note that this function can return an out of bounds index when there is no next word!
+   *
    * @param editor The editor's document to search in. Editor is required because word boundaries depend on
    *               local-to-buffer options
    * @param searchFrom The offset in the document to search from
    * @param count      Return an offset to the [count] word from the starting position. Will search backwards if negative
    * @param bigWord    Use WORD instead of word boundaries
-   * @param spaceWords Include whitespace as part of a word, e.g. the difference between `iw` and `aw` motions
    * @return The offset of the [count] next word, or `0` or the offset of the end of file if not found
    */
-  fun findNextWord(editor: VimEditor, searchFrom: Int, count: Int, bigWord: Boolean, spaceWords: Boolean): Int
+  fun findNextWord(editor: VimEditor, searchFrom: Int, count: Int, bigWord: Boolean): Int
 
   /**
    * Find the next word in some text outside the editor (e.g., command line), from the given starting point
    *
+   * Note that this function can return an out of bounds index when there is no next word!
+   *
    * @param text        The text to search in
-   * @param textLength  The text length
    * @param editor Required because word boundaries depend on local-to-buffer options
    * @param searchFrom The offset in the document to search from
    * @param count      Return an offset to the [count] word from the starting position. Will search backwards if negative
    * @param bigWord    Use WORD instead of word boundaries
-   * @param spaceWords Include whitespace as part of a word, e.g. the difference between `iw` and `aw` motions
    * @return The offset of the [count] next word, or `0` or the offset of the end of file if not found
    */
   fun findNextWord(
     text: CharSequence,
-    textLength: Int,
     editor: VimEditor,
     searchFrom: Int,
     count: Int,
     bigWord: Boolean,
-    spaceWords: Boolean,
   ): Int
 
   /**
@@ -139,31 +138,16 @@ interface VimSearchHelper {
    * @param searchFrom The offset in the document to search from
    * @param count      Return an offset to the [count] word from the starting position. Will search backwards if negative
    * @param bigWord    Use WORD instead of word boundaries
-   * @param spaceWords Include whitespace as part of a word, e.g. the difference between `iw` and `aw` motions
-   * @return The offset of the [count] next word, or `0` or the offset of the end of file if not found
-   */
-  fun findNextWordEnd(editor: VimEditor, searchFrom: Int, count: Int, bigWord: Boolean, spaceWords: Boolean): Int
-
-  /**
-   * Find the end offset in some text outside the editor (e.g., command line), from the given starting point
-   *
-   * @param text        The text to search in
-   * @param textLength  The text length
-   * @param editor Required because word boundaries depend on local-to-buffer options
-   * @param searchFrom The offset in the document to search from
-   * @param count      Return an offset to the [count] word from the starting position. Will search backwards if negative
-   * @param bigWord    Use WORD instead of word boundaries
-   * @param spaceWords Include whitespace as part of a word, e.g. the difference between `iw` and `aw` motions
-   * @return The offset of the [count] next word, or `0` or the offset of the end of file if not found
+   * @param stopOnEmptyLine Vim considers an empty line to be a word/WORD, but `e` and `E` don't respect this for vi
+   *                        compatibility reasons. Callers other than `e` and `E` should pass `true`
+   * @return The offset of the [count] next word/WORD. Will return document bounds if not found
    */
   fun findNextWordEnd(
-    text: CharSequence,
-    textLength: Int,
     editor: VimEditor,
     searchFrom: Int,
     count: Int,
     bigWord: Boolean,
-    spaceWords: Boolean,
+    stopOnEmptyLine: Boolean = true,
   ): Int
 
   /**
@@ -211,14 +195,29 @@ interface VimSearchHelper {
     ch: Char,
   ): Int
 
-  fun findWordUnderCursor(
+  /**
+   * Find the word at or nearest to the current caret offset
+   *
+   * Note that this is not a word text object!
+   *
+   * This function is used to get the word to search for using the `*`/`#` and `g*`/`g#` operators. It will return:
+   * * the range of the keyword under the cursor
+   * * or the first keyword after the cursor on the current line,
+   * * or the non-blank word under the cursor,
+   * * or the first non-blank word after the cursor on the current line
+   * * or null, if none of the above are found
+   */
+  fun findWordNearestCursor(editor: VimEditor, caret: ImmutableVimCaret): TextRange?
+
+  /**
+   * Find the range of the word text object at the location of the caret
+   */
+  fun findWordObject(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     count: Int,
-    dir: Int,
     isOuter: Boolean,
     isBig: Boolean,
-    hasSelection: Boolean,
   ): TextRange
 
   fun findSentenceRange(

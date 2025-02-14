@@ -97,29 +97,20 @@ abstract class VimMotionGroupBase : VimMotionGroup {
    * @return position
    */
   override fun findOffsetOfNextWord(editor: VimEditor, searchFrom: Int, count: Int, bigWord: Boolean): Motion {
-    return findOffsetOfNextWord(editor.text(), editor.fileSize().toInt(), searchFrom, count, bigWord, editor)
+    return findOffsetOfNextWord(editor.text(), searchFrom, count, bigWord, editor)
   }
 
   override fun findOffsetOfNextWord(
     text: CharSequence,
-    textLength: Int,
     searchFrom: Int,
     count: Int,
     bigWord: Boolean,
     editor: VimEditor,
   ): Motion {
-    if ((searchFrom == 0 && count < 0) || (searchFrom >= textLength - 1 && count > 0)) {
+    if ((searchFrom == 0 && count < 0) || (searchFrom >= text.length - 1 && count > 0)) {
       return Motion.Error
     }
-    return (injector.searchHelper.findNextWord(
-      text,
-      textLength,
-      editor,
-      searchFrom,
-      count,
-      bigWord,
-      false
-    )).toMotionOrError()
+    return (injector.searchHelper.findNextWord(text, editor, searchFrom, count, bigWord)).toMotionOrError()
   }
 
   override fun getHorizontalMotion(
