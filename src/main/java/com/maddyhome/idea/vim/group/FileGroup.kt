@@ -26,7 +26,10 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.psi.search.FilenameIndex
+import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.ProjectScope
+import com.intellij.util.containers.CollectionFactory
+import com.intellij.util.indexing.IdFilter
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
@@ -122,6 +125,23 @@ class FileGroup : VimFileBase() {
       }
     }
     return found
+  }
+
+  /**
+   * Find Filenames that start with `prefix`
+   */
+  override fun findFileStartingWith(prefix: String, context: ExecutionContext): Collection<String>? {
+    val project = PlatformDataKeys.PROJECT.getData((context as IjEditorExecutionContext).context) ?: return null;
+
+    val names = CollectionFactory.createSmallMemoryFootprintSet<String>()
+    FilenameIndex.processAllFileNames({ s: String ->
+      if (s.startsWith(prefix)){
+        names.add(s)
+      }
+      true
+    }, GlobalSearchScope.projectScope(project), null as IdFilter?)
+
+    return names
   }
 
   /**
