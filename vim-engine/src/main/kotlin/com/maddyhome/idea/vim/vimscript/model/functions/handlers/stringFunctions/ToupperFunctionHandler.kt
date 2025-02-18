@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.vimscript.model.functions.handlers
+package com.maddyhome.idea.vim.vimscript.model.functions.handlers.stringFunctions
 
 import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -18,8 +18,8 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 import java.util.*
 
-@VimscriptFunction(name = "tolower")
-internal class TolowerFunctionHandler : FunctionHandler() {
+@VimscriptFunction(name = "toupper")
+internal class ToupperFunctionHandler : FunctionHandler() {
   override val minimumNumberOfArguments: Int = 1
   override val maximumNumberOfArguments: Int = 1
 
@@ -30,6 +30,6 @@ internal class TolowerFunctionHandler : FunctionHandler() {
     vimContext: VimLContext,
   ): VimDataType {
     val argumentString = argumentValues[0].evaluate(editor, context, vimContext).asString()
-    return VimString(argumentString.lowercase(Locale.getDefault()))
+    return VimString(argumentString.uppercase(Locale.getDefault()))
   }
 }
