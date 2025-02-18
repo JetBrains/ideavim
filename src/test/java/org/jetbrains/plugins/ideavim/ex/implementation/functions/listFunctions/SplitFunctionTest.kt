@@ -9,34 +9,34 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.functions.listFunctions
 
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 
 class SplitFunctionTest : VimTestCase() {
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
+    configureByText("\n")
+  }
+
   @Test
   fun `test split with default delimiter`() {
-    configureByText("\n")
-    typeText(commandToKeys("echo split('Hello world')"))
-    assertExOutput("['Hello', 'world']")
+    assertCommandOutput("echo split('Hello world')", "['Hello', 'world']")
   }
 
   @Test
   fun `test split comma separated text`() {
-    configureByText("\n")
-    typeText(commandToKeys("echo split('a,b,c,d', ',')"))
-    assertExOutput("['a', 'b', 'c', 'd']")
+    assertCommandOutput("echo split('a,b,c,d', ',')", "['a', 'b', 'c', 'd']")
   }
 
   @Test
   fun `test split comma separated text 2`() {
-    configureByText("\n")
-    typeText(commandToKeys("echo split(',a,b,c,d,', ',')"))
-    assertExOutput("['a', 'b', 'c', 'd']")
+    assertCommandOutput("echo split(',a,b,c,d,', ',')", "['a', 'b', 'c', 'd']")
   }
 
   @Test
   fun `test split comma separated text with keepempty flag`() {
-    configureByText("\n")
-    typeText(commandToKeys("echo split(',a,b,c,,d,', ',', 1)"))
-    assertExOutput("['', 'a', 'b', 'c', '', 'd', '']")
+    assertCommandOutput("echo split(',a,b,c,,d,', ',', 1)", "['', 'a', 'b', 'c', '', 'd', '']")
   }
 }
