@@ -6,12 +6,12 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.vimscript.model.functions.handlers
+package com.maddyhome.idea.vim.vimscript.model.functions.handlers.listFunctions
 
 import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
@@ -19,10 +19,10 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
-@VimscriptFunction(name = "split")
-internal class SplitFunctionHandler : FunctionHandler() {
+@VimscriptFunction(name = "join")
+internal class JoinFunctionHandler : FunctionHandler() {
   override val minimumNumberOfArguments: Int = 1
-  override val maximumNumberOfArguments: Int = 3
+  override val maximumNumberOfArguments: Int = 2
 
   override fun doFunction(
     argumentValues: List<Expression>,
@@ -30,18 +30,11 @@ internal class SplitFunctionHandler : FunctionHandler() {
     context: ExecutionContext,
     vimContext: VimLContext,
   ): VimDataType {
-    val text = argumentValues[0].evaluate(editor, context, vimContext).asString()
-    val delimiter = argumentValues.getOrNull(1)?.evaluate(editor, context, vimContext)?.asString() ?: "\\s\\+"
-    val keepEmpty = argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext)?.asBoolean() ?: false
-
-    val delimiters: List<Pair<Int, Int>> =
-      injector.regexpService.getAllMatches(text, delimiter) + Pair(text.length, text.length)
-    val result = mutableListOf<String>()
-    var startIndex = 0
-    for (del in delimiters) {
-      if (startIndex != del.first || keepEmpty) result.add(text.substring(startIndex, del.first))
-      startIndex = del.second
+    val firstArgument = argumentValues[0].evaluate(editor, context, vimContext)
+    if (firstArgument !is VimList) {
+      throw ExException("E714: List required")
     }
-    return VimList(result.map { VimString(it) }.toMutableList())
+    val secondArgument = argumentValues.getOrNull(1)?.evaluate(editor, context, vimContext) ?: VimString(" ")
+    return VimString(firstArgument.values.joinToString(secondArgument.asString()) { it.toString() })
   }
 }

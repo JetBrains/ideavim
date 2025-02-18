@@ -29,7 +29,7 @@ import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.register.RegisterConstants
 import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
-import com.maddyhome.idea.vim.vimscript.model.functions.handlers.SubmatchFunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.handlers.stringFunctions.SubmatchFunctionHandler
 import org.jetbrains.annotations.TestOnly
 import java.text.NumberFormat
 import java.text.ParsePosition

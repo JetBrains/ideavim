@@ -6,23 +6,22 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.vimscript.model.functions.handlers
+package com.maddyhome.idea.vim.vimscript.model.functions.handlers.stringFunctions
 
 import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import java.util.*
 
-@VimscriptFunction(name = "join")
-internal class JoinFunctionHandler : FunctionHandler() {
+@VimscriptFunction(name = "tolower")
+internal class TolowerFunctionHandler : FunctionHandler() {
   override val minimumNumberOfArguments: Int = 1
-  override val maximumNumberOfArguments: Int = 2
+  override val maximumNumberOfArguments: Int = 1
 
   override fun doFunction(
     argumentValues: List<Expression>,
@@ -30,11 +29,7 @@ internal class JoinFunctionHandler : FunctionHandler() {
     context: ExecutionContext,
     vimContext: VimLContext,
   ): VimDataType {
-    val firstArgument = argumentValues[0].evaluate(editor, context, vimContext)
-    if (firstArgument !is VimList) {
-      throw ExException("E714: List required")
-    }
-    val secondArgument = argumentValues.getOrNull(1)?.evaluate(editor, context, vimContext) ?: VimString(" ")
-    return VimString(firstArgument.values.joinToString(secondArgument.asString()) { it.toString() })
+    val argumentString = argumentValues[0].evaluate(editor, context, vimContext).asString()
+    return VimString(argumentString.lowercase(Locale.getDefault()))
   }
 }

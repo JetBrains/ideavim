@@ -1,12 +1,12 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2025 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.vimscript.model.functions.handlers
+package com.maddyhome.idea.vim.vimscript.model.functions.handlers.variousFunctions
 
 import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -45,6 +45,6 @@ internal class ExistsFunctionHandler : FunctionHandler() {
 
       else -> throw ExException("exists function is not fully implemented")
     }
-    return if (result) VimInt.ONE else VimInt.ZERO
+    return if (result) VimInt.Companion.ONE else VimInt.Companion.ZERO
   }
 }
