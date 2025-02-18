@@ -11,11 +11,12 @@ package org.jetbrains.plugins.ideavim.ex.parser.expressions
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
+import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.ex.evaluate
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class NumberParsingTests {
+class NumberParsingTests : VimTestCase() {
 
   @Test
   fun `one digit decimal number`() {
@@ -75,6 +76,26 @@ class NumberParsingTests {
   @Test
   fun `negative octal number`() {
     assertEquals(VimInt(-24), VimscriptParser.parseExpression("-030")!!.evaluate())
+  }
+
+  @Test
+  fun `octal number with lowercase prefix`() {
+    assertEquals(VimInt(15), VimscriptParser.parseExpression("0o17")!!.evaluate())
+  }
+
+  @Test
+  fun `octal number with uppercase prefix`() {
+    assertEquals(VimInt(15), VimscriptParser.parseExpression("0O17")!!.evaluate())
+  }
+
+  @Test
+  fun `binary number with lowercase prefix`() {
+    assertEquals(VimInt(15), VimscriptParser.parseExpression("0b1111")!!.evaluate())
+  }
+
+  @Test
+  fun `binary number with uppercase prefix`() {
+    assertEquals(VimInt(15), VimscriptParser.parseExpression("0B1111")!!.evaluate())
   }
 
   @Test

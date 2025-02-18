@@ -22,8 +22,7 @@ class InvertFunctionTest : VimTestCase() {
 
   @Test
   fun `test invert function inverts bits`() {
-//    assertCommandOutput("echo invert(0b1010)", "-11")
-    assertCommandOutput("echo invert(10)", "-11")
+    assertCommandOutput("echo invert(0b1010)", "-11")
   }
 
   @Test

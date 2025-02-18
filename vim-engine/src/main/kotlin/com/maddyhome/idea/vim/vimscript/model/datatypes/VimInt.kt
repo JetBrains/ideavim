@@ -12,7 +12,7 @@ import java.util.*
 
 data class VimInt(val value: Int) : VimDataType() {
 
-  constructor(octalDecimalOrHexNumber: String) : this(parseNumber(octalDecimalOrHexNumber) ?: 0)
+  constructor(binaryOctalDecimalOrHexNumber: String) : this(parseNumber(binaryOctalDecimalOrHexNumber) ?: 0)
 
   override fun asDouble(): Double {
     return value.toDouble()
@@ -49,12 +49,13 @@ data class VimInt(val value: Int) : VimDataType() {
   }
 }
 
-fun parseNumber(octalDecimalOrHexNumber: String): Int? {
-  val n = octalDecimalOrHexNumber.lowercase(Locale.getDefault())
+fun parseNumber(binaryOctalDecimalOrHexNumber: String): Int? {
+  val n = binaryOctalDecimalOrHexNumber.lowercase(Locale.getDefault())
   return when {
-    n.matches(Regex("[-]?0[x][0-9a-f]+")) -> n.replaceFirst("0x", "").toInt(16)
-    n.matches(Regex("[-]?[0][0-7]+")) -> n.toInt(8)
-    n.matches(Regex("[-]?[0-9]+")) -> n.toInt()
+    n.matches(Regex("-?0x[0-9a-f]+")) -> n.replaceFirst("0x", "").toInt(16)
+    n.matches(Regex("-?0o?[0-7]+")) -> n.replaceFirst("0o", "").toInt(8)
+    n.matches(Regex("-?0b[0-1]+")) -> n.replaceFirst("0b", "").toInt(2)
+    n.matches(Regex("-?[0-9]+")) -> n.toInt()
     else -> null
   }
 }
