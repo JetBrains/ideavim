@@ -168,6 +168,8 @@ tmapclear
 
 getreg
 getregtype
+tolower
+toupper
 
 endfunction
 
