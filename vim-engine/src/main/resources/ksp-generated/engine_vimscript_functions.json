@@ -1,5 +1,6 @@
 {
     "abs": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.AbsFunctionHandler",
+    "and": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.bitwiseFunctions.AndFunctionHandler",
     "col": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.ColFunctionHandler",
     "empty": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.EmptyFunctionHandler",
     "escape": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.EscapeFunctionHandler",
@@ -8,12 +9,15 @@
     "function": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.FunctionFunctionHandler",
     "get": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.GetFunctionHandler",
     "getcmdtype": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.GetCmdTypeFunctionHandler",
+    "invert": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.bitwiseFunctions.InvertFunctionHandler",
     "join": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.JoinFunctionHandler",
     "len": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.LenFunctionHandler",
     "line": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.LineFunctionHandler",
+    "or": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.bitwiseFunctions.OrFunctionHandler",
     "sin": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.SinFunctionHandler",
     "split": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.SplitFunctionHandler",
     "submatch": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.SubmatchFunctionHandler",
     "tolower": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.TolowerFunctionHandler",
-    "toupper": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.ToupperFunctionHandler"
+    "toupper": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.ToupperFunctionHandler",
+    "xor": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.bitwiseFunctions.XorFunctionHandler"
 }
