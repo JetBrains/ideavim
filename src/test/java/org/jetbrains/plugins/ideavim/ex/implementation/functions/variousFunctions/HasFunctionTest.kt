@@ -11,36 +11,36 @@ package org.jetbrains.plugins.ideavim.ex.implementation.functions.variousFunctio
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 
 class HasFunctionTest : VimTestCase() {
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
+    configureByText("\n")
+  }
 
   @Test
   fun `test has for supported feature`() {
-    configureByText("\n")
-    typeText(commandToKeys("echo has('ide')"))
-    assertExOutput("1")
+    assertCommandOutput("echo has('ide')", "1")
   }
 
   @Test
   fun `test has for unsupported feature`() {
-    configureByText("\n")
-    typeText(commandToKeys("echo has('autocmd')"))
-    assertExOutput("0")
+    assertCommandOutput("echo has('autocmd')", "0")
   }
 
   @Test
   fun `test has for int as an argument`() {
-    configureByText("\n")
-    typeText(commandToKeys("echo has(42)"))
-    assertExOutput("0")
+    assertCommandOutput("echo has(42)", "0")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
   @Test
   fun `test has for list as an argument`() {
-    configureByText("\n")
-    typeText(commandToKeys("echo has([])"))
+    enterCommand("echo has([])")
     assertPluginError(true)
     assertPluginErrorMessageContains("E730: Using a List as a String")
   }

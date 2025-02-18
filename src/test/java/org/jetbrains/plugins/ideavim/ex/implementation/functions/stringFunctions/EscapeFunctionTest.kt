@@ -9,58 +9,50 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.functions.stringFunctions
 
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 
 class EscapeFunctionTest : VimTestCase() {
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
+    configureByText("\n")
+  }
+
   @Test
   fun `test escape windows path with spaces`() {
-    configureByText("\n")
-    typeText(commandToKeys("""echo escape('c:\program files\vim', ' \')"""))
-    assertExOutput("""c:\\program\ files\\vim""")
+    assertCommandOutput("""echo escape('c:\program files\vim', ' \')""", """c:\\program\ files\\vim""")
   }
 
   @Test
   fun `test escape multiple special characters`() {
-    configureByText("\n")
-    typeText(commandToKeys("""echo escape('special chars: #$^', '#$^')"""))
-    assertExOutput("""special chars: \#\$\^""")
+    assertCommandOutput("""echo escape('special chars: #$^', '#$^')""", """special chars: \#\$\^""")
   }
 
   @Test
   fun `test escape when no escaping needed`() {
-    configureByText("\n")
-    typeText(commandToKeys("""echo escape('no escaping needed', 'xyz')"""))
-    assertExOutput("no escaping needed")
+    assertCommandOutput("""echo escape('no escaping needed', 'xyz')""", "no escaping needed")
   }
 
   @Test
   fun `test escape empty strings`() {
-    configureByText("\n")
-    typeText(commandToKeys("""echo escape('', '')"""))
-    assertExOutput("")
+    assertCommandOutput("""echo escape('', '')""", "")
   }
 
   @Test
   fun `test escape consecutive special characters`() {
-    configureByText("\n")
-    typeText(commandToKeys("""echo escape('$$$$', '$')"""))
-    assertExOutput("""\$\$\$\$""")
+    assertCommandOutput("""echo escape('$$$$', '$')""", """\$\$\$\$""")
   }
 
   @Test
   fun `test escape with double backslashes`() {
-    configureByText("\n")
-    typeText(commandToKeys("""echo escape('test\\here', '\\')"""))
-    assertExOutput("""test\\\\here""")
+    assertCommandOutput("""echo escape('test\\here', '\\')""", """test\\\\here""")
   }
 
   @Test
   fun `test escape with unicode characters`() {
-    configureByText("\n")
-    typeText(commandToKeys("""echo escape('Hello 👋 #world', '#')"""))
-    assertExOutput("""Hello 👋 \#world""")
-
-    typeText(commandToKeys("""echo escape('🎉$🎊$', '$')"""))
-    assertExOutput("""🎉\$🎊\$""")
+    assertCommandOutput("""echo escape('Hello 👋 #world', '#')""", """Hello 👋 \#world""")
+    assertCommandOutput("""echo escape('🎉$🎊$', '$')""", """🎉\$🎊\$""")
   }
 }

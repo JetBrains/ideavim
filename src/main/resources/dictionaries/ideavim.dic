@@ -166,11 +166,14 @@ lmapclear
 cmapclear
 tmapclear
 
+funcref
+getcmdtype
 getreg
 getregtype
 tolower
 toupper
 
+delfunction
 endfunction
 
 consectetur

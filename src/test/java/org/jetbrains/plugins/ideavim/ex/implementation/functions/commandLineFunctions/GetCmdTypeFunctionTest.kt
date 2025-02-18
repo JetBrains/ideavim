@@ -11,14 +11,20 @@ package org.jetbrains.plugins.ideavim.ex.implementation.functions.commandLineFun
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 import kotlin.test.assertEquals
 
 class GetCmdTypeFunctionTest : VimTestCase() {
+  @BeforeEach
+  override fun setUp(testInfo: TestInfo) {
+    super.setUp(testInfo)
+    configureByText("\n")
+  }
 
   @Test
   fun `test getcmdtype() for a regular command`() {
-    configureByText("\n")
     enterCommand("cmap <expr> z getcmdtype()")
     typeText(":fooz")
     assertEquals("foo:", (injector.commandLine.getActiveCommandLine() as ExEntryPanel).visibleText)
@@ -26,7 +32,6 @@ class GetCmdTypeFunctionTest : VimTestCase() {
 
   @Test
   fun `test getcmdtype() for a forward search`() {
-    configureByText("\n")
     enterCommand("cmap <expr> z getcmdtype()")
     typeText("/fooz")
     assertEquals("foo/", (injector.commandLine.getActiveCommandLine() as ExEntryPanel).visibleText)
@@ -34,7 +39,6 @@ class GetCmdTypeFunctionTest : VimTestCase() {
 
   @Test
   fun `test getcmdtype() for a backward search`() {
-    configureByText("\n")
     enterCommand("cmap <expr> z getcmdtype()")
     typeText("?fooz")
     assertEquals("foo?", (injector.commandLine.getActiveCommandLine() as ExEntryPanel).visibleText)
@@ -42,10 +46,8 @@ class GetCmdTypeFunctionTest : VimTestCase() {
 
   @Test
   fun `test getcmdtype() for an expression command`() {
-    configureByText("\n")
     enterCommand("cmap <expr> z getcmdtype()")
     typeText("i<C-r>=fooz")
     assertEquals("foo=", (injector.commandLine.getActiveCommandLine() as ExEntryPanel).visibleText)
   }
-
 }
