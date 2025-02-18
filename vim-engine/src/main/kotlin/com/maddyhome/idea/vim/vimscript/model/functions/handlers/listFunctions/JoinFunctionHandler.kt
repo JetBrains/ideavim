@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2025 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -11,7 +11,7 @@ package com.maddyhome.idea.vim.vimscript.model.functions.handlers.listFunctions
 import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
@@ -30,11 +30,11 @@ internal class JoinFunctionHandler : FunctionHandler() {
     context: ExecutionContext,
     vimContext: VimLContext,
   ): VimDataType {
-    val firstArgument = argumentValues[0].evaluate(editor, context, vimContext)
-    if (firstArgument !is VimList) {
-      throw ExException("E714: List required")
+    val argument1 = argumentValues[0].evaluate(editor, context, vimContext)
+    if (argument1 !is VimList) {
+      throw exExceptionMessage("E1211", "1") // E1211: List required for argument 1
     }
-    val secondArgument = argumentValues.getOrNull(1)?.evaluate(editor, context, vimContext) ?: VimString(" ")
-    return VimString(firstArgument.values.joinToString(secondArgument.asString()) { it.toString() })
+    val argument2 = argumentValues.getOrNull(1)?.evaluate(editor, context, vimContext)?.asString() ?: " "
+    return VimString(argument1.values.joinToString(argument2) { it.toString() })
   }
 }

@@ -11,7 +11,7 @@ package com.maddyhome.idea.vim.vimscript.model.functions.handlers
 import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimBlob
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
@@ -40,7 +40,7 @@ internal class LenFunctionHandler : FunctionHandler() {
       is VimList -> VimInt(argument.values.size)
       is VimDictionary -> VimInt(argument.dictionary.entries.size)
       is VimBlob -> TODO()
-      else -> throw ExException("E701: Invalid type for len()")
+      else -> throw exExceptionMessage("E701") // E701; Invalid type for len()
     }
   }
 }
