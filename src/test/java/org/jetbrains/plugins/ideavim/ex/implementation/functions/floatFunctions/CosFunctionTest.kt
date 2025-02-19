@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 
-class SinFunctionTest : VimTestCase() {
+class CosFunctionTest : VimTestCase() {
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
@@ -21,41 +21,41 @@ class SinFunctionTest : VimTestCase() {
   }
 
   @Test
-  fun `test sin with Number`() {
-    assertCommandOutput("echo sin(100)", "-0.506366")
-    assertCommandOutput("echo sin(0) sin(1)", "0.0 0.841471")
+  fun `test cos with Number`() {
+    assertCommandOutput("echo cos(100)", "0.862319")
+    assertCommandOutput("echo cos(0) cos(1)", "1.0 0.540302")
   }
 
   @Test
-  fun `test sin with Float`() {
-    assertCommandOutput("echo sin(-4.01)", "0.763301")
-    assertCommandOutput("echo sin(0.0) sin(1.0)", "0.0 0.841471")
+  fun `test cos with Float`() {
+    assertCommandOutput("echo cos(-4.01)", "-0.646043")
+    assertCommandOutput("echo cos(0.0) cos(1.0)", "1.0 0.540302")
   }
 
   @Test
-  fun `test sin with string causes errors`() {
-    enterCommand("echo sin('1.0')")
+  fun `test cos with string causes errors`() {
+    enterCommand("echo cos('1.0')")
     assertPluginError(true)
     assertPluginErrorMessageContains("E808: Number or Float required")
   }
 
   @Test
-  fun `test sin with invalid string causes errors`() {
-    enterCommand("echo sin('cheese')")
+  fun `test cos with invalid string causes errors`() {
+    enterCommand("echo cos('cheese')")
     assertPluginError(true)
     assertPluginErrorMessageContains("E808: Number or Float required")
   }
 
   @Test
-  fun `test sin with list causes errors`() {
-    enterCommand("echo sin([1.0])")
+  fun `test cos with list causes errors`() {
+    enterCommand("echo cos([1.0])")
     assertPluginError(true)
     assertPluginErrorMessageContains("E808: Number or Float required")
   }
 
   @Test
-  fun `test sin with dictionary causes errors`() {
-    enterCommand("echo sin({1: 1.0})")
+  fun `test cos with dictionary causes errors`() {
+    enterCommand("echo cos({1: 1.0})")
     assertPluginError(true)
     assertPluginErrorMessageContains("E808: Number or Float required")
   }

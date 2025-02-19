@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 
-class SinFunctionTest : VimTestCase() {
+class AtanFunctionTest : VimTestCase() {
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
@@ -21,41 +21,40 @@ class SinFunctionTest : VimTestCase() {
   }
 
   @Test
-  fun `test sin with Number`() {
-    assertCommandOutput("echo sin(100)", "-0.506366")
-    assertCommandOutput("echo sin(0) sin(1)", "0.0 0.841471")
+  fun `test atan with Number`() {
+    assertCommandOutput("echo atan(100)", "1.560797")
+    assertCommandOutput("echo atan(0) atan(1)", "0.0 0.785398")
   }
 
   @Test
-  fun `test sin with Float`() {
-    assertCommandOutput("echo sin(-4.01)", "0.763301")
-    assertCommandOutput("echo sin(0.0) sin(1.0)", "0.0 0.841471")
+  fun `test atan with Float`() {
+    assertCommandOutput("echo atan(100.0) atan(-4.01)", "1.560797 -1.326405")
   }
 
   @Test
-  fun `test sin with string causes errors`() {
-    enterCommand("echo sin('1.0')")
+  fun `test atan with string causes errors`() {
+    enterCommand("echo atan('1.0')")
     assertPluginError(true)
     assertPluginErrorMessageContains("E808: Number or Float required")
   }
 
   @Test
-  fun `test sin with invalid string causes errors`() {
-    enterCommand("echo sin('cheese')")
+  fun `test atan with invalid string causes errors`() {
+    enterCommand("echo atan('cheese')")
     assertPluginError(true)
     assertPluginErrorMessageContains("E808: Number or Float required")
   }
 
   @Test
-  fun `test sin with list causes errors`() {
-    enterCommand("echo sin([1.0])")
+  fun `test atan with list causes errors`() {
+    enterCommand("echo atan([1.0])")
     assertPluginError(true)
     assertPluginErrorMessageContains("E808: Number or Float required")
   }
 
   @Test
-  fun `test sin with dictionary causes errors`() {
-    enterCommand("echo sin({1: 1.0})")
+  fun `test atan with dictionary causes errors`() {
+    enterCommand("echo atan({1: 1.0})")
     assertPluginError(true)
     assertPluginErrorMessageContains("E808: Number or Float required")
   }

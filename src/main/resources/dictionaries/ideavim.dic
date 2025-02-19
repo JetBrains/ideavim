@@ -170,6 +170,7 @@ funcref
 getcmdtype
 getreg
 getregtype
+isinf
 tolower
 toupper
 

@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 
-class SinFunctionTest : VimTestCase() {
+class CoshFunctionTest : VimTestCase() {
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
@@ -21,41 +21,42 @@ class SinFunctionTest : VimTestCase() {
   }
 
   @Test
-  fun `test sin with Number`() {
-    assertCommandOutput("echo sin(100)", "-0.506366")
-    assertCommandOutput("echo sin(0) sin(1)", "0.0 0.841471")
+  fun `test cosh with Number`() {
+    assertCommandOutput("echo cosh(100)", "1.344059e43")
+    assertCommandOutput("echo cosh(0) cosh(1)", "1.0 1.543081")
   }
 
   @Test
-  fun `test sin with Float`() {
-    assertCommandOutput("echo sin(-4.01)", "0.763301")
-    assertCommandOutput("echo sin(0.0) sin(1.0)", "0.0 0.841471")
+  fun `test cosh with Float`() {
+    // The Vim docs show cosh(-0.5) == -1.127626, but the function returns the positive value...
+    // We are matching Vim's actual behaviour here
+    assertCommandOutput("echo cosh(0.5) cosh(-0.5)", "1.127626 1.127626")
   }
 
   @Test
-  fun `test sin with string causes errors`() {
-    enterCommand("echo sin('1.0')")
+  fun `test cosh with string causes errors`() {
+    enterCommand("echo cosh('1.0')")
     assertPluginError(true)
     assertPluginErrorMessageContains("E808: Number or Float required")
   }
 
   @Test
-  fun `test sin with invalid string causes errors`() {
-    enterCommand("echo sin('cheese')")
+  fun `test cosh with invalid string causes errors`() {
+    enterCommand("echo cosh('cheese')")
     assertPluginError(true)
     assertPluginErrorMessageContains("E808: Number or Float required")
   }
 
   @Test
-  fun `test sin with list causes errors`() {
-    enterCommand("echo sin([1.0])")
+  fun `test cosh with list causes errors`() {
+    enterCommand("echo cosh([1.0])")
     assertPluginError(true)
     assertPluginErrorMessageContains("E808: Number or Float required")
   }
 
   @Test
-  fun `test sin with dictionary causes errors`() {
-    enterCommand("echo sin({1: 1.0})")
+  fun `test cosh with dictionary causes errors`() {
+    enterCommand("echo cosh({1: 1.0})")
     assertPluginError(true)
     assertPluginErrorMessageContains("E808: Number or Float required")
   }
