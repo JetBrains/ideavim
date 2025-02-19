@@ -42,23 +42,7 @@ dependencies {
     create(ideaType, ideaVersion, useInstaller)
     testFramework(TestFrameworkType.Platform)
     testFramework(TestFrameworkType.JUnit5)
-    bundledPlugins("com.intellij.java")
-
-    // [VERSION UPDATE] 2025.1+
-    // Dirty hack: in 2025.1+ the yaml plugin is extracted. So, the tests that use YAML don't work.
-    // This fixes the bug, but the proper fix should be provided by the gradle plugin
-    //   Internal information: https://jetbrains.slack.com/archives/C01F9VBU064/p1738921964822329
-    when (ideaVersion) {
-      "2024.2.1" -> {
-        bundledPlugins("org.jetbrains.plugins.yaml")
-      }
-
-      "LATEST-EAP-SNAPSHOT" -> {
-        bundledModule("intellij.yaml.editing") // Note: This should be "org.jetbrains.plugins.yaml" plugin instead of module
-      }
-
-      else -> error("Unsupported version: $ideaVersion")
-    }
+    bundledPlugins("com.intellij.java", "org.jetbrains.plugins.yaml")
     instrumentationTools()
   }
 }
