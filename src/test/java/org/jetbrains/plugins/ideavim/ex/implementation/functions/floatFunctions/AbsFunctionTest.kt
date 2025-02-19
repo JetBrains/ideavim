@@ -21,7 +21,37 @@ class AbsFunctionTest : VimTestCase() {
   }
 
   @Test
-  fun `test abs`() {
-    assertCommandOutput("echo abs(-123) abs(2)", "123 2")
+  fun `test abs with float value`() {
+    assertCommandOutput("echo abs(1.456)", "1.456")
+    assertCommandOutput("echo abs(-5.456)", "5.456")
+  }
+
+  @Test
+  fun `test abs with integer value`() {
+    assertCommandOutput("echo abs(-4)", "4")
+  }
+
+  @Test
+  fun `test abs with coerced float value`() {
+    assertCommandOutput("""echo abs("-5.456")""", "5")
+  }
+
+  @Test
+  fun `test abs with coerced integer value`() {
+    assertCommandOutput("""echo abs("-4")""", "4")
+  }
+
+  @Test
+  fun `test abs with list causes error`() {
+    enterCommand("""echo abs([-5.456])""")
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E745: Using a List as a Number")
+  }
+
+  @Test
+  fun `test abs with dictionary causes error`() {
+    enterCommand("""echo abs({1: -5.456})""")
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E728: Using a Dictionary as a Number")
   }
 }

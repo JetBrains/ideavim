@@ -9,8 +9,8 @@
 package com.maddyhome.idea.vim.vimscript.model.datatypes
 
 import com.maddyhome.idea.vim.ex.ExException
-import java.math.BigDecimal
-import java.math.RoundingMode
+import java.text.DecimalFormat
+import kotlin.math.abs
 
 data class VimFloat(val value: Double) : VimDataType() {
 
@@ -27,8 +27,15 @@ data class VimFloat(val value: Double) : VimDataType() {
   }
 
   override fun toString(): String {
-    val bigDecimal = BigDecimal(value).setScale(6, RoundingMode.HALF_UP)
-    return bigDecimal.toDouble().toString()
+    if (value.isNaN()) return "nan"
+    return if (abs(value) >= 1e6 || (abs(value) < 1e-3 && value != 0.0)) {
+      val formatter = DecimalFormat("0.0#####E0")
+      formatter.decimalFormatSymbols = formatter.decimalFormatSymbols.apply { exponentSeparator = "e" }
+      formatter.format(value)
+    }
+    else {
+      DecimalFormat("0.0#####").format(value)
+    }
   }
 
   override fun deepCopy(level: Int): VimFloat {

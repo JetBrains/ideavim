@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 
-class SinFunctionTest : VimTestCase() {
+class AcosFunctionTest : VimTestCase() {
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
@@ -21,41 +21,51 @@ class SinFunctionTest : VimTestCase() {
   }
 
   @Test
-  fun `test sin with Number`() {
-    assertCommandOutput("echo sin(100)", "-0.506366")
-    assertCommandOutput("echo sin(0) sin(1)", "0.0 0.841471")
+  fun `test acos with Number`() {
+    assertCommandOutput("echo acos(0)", "1.570796")
+    assertCommandOutput("echo acos(-1) acos(0) acos(1)", "3.141593 1.570796 0.0")
   }
 
   @Test
-  fun `test sin with Float`() {
-    assertCommandOutput("echo sin(-4.01)", "0.763301")
-    assertCommandOutput("echo sin(0.0) sin(1.0)", "0.0 0.841471")
+  fun `test acos with Float`() {
+    assertCommandOutput("echo acos(-0.5)", "2.094395")
+    assertCommandOutput("echo acos(-1.0) acos(0.0) acos(1.0)", "3.141593 1.570796 0.0")
   }
 
   @Test
-  fun `test sin with string causes errors`() {
-    enterCommand("echo sin('1.0')")
+  fun `test acos with value greater than 1 returns nan`() {
+    assertCommandOutput("echo acos(1.1)", "nan")
+  }
+
+  @Test
+  fun `test acos with value less than -1 returns nan`() {
+    assertCommandOutput("echo acos(-1.1)", "nan")
+  }
+
+  @Test
+  fun `test acos with string causes errors`() {
+    enterCommand("echo acos('1.0')")
     assertPluginError(true)
     assertPluginErrorMessageContains("E808: Number or Float required")
   }
 
   @Test
-  fun `test sin with invalid string causes errors`() {
-    enterCommand("echo sin('cheese')")
+  fun `test acos with invalid string causes errors`() {
+    enterCommand("echo acos('cheese')")
     assertPluginError(true)
     assertPluginErrorMessageContains("E808: Number or Float required")
   }
 
   @Test
-  fun `test sin with list causes errors`() {
-    enterCommand("echo sin([1.0])")
+  fun `test acos with list causes errors`() {
+    enterCommand("echo acos([1.0])")
     assertPluginError(true)
     assertPluginErrorMessageContains("E808: Number or Float required")
   }
 
   @Test
-  fun `test sin with dictionary causes errors`() {
-    enterCommand("echo sin({1: 1.0})")
+  fun `test acos with dictionary causes errors`() {
+    enterCommand("echo acos({1: 1.0})")
     assertPluginError(true)
     assertPluginErrorMessageContains("E808: Number or Float required")
   }

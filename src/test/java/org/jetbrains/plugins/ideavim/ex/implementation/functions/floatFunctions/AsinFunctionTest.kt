@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 
-class SinFunctionTest : VimTestCase() {
+class AsinFunctionTest : VimTestCase() {
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
@@ -21,41 +21,51 @@ class SinFunctionTest : VimTestCase() {
   }
 
   @Test
-  fun `test sin with Number`() {
-    assertCommandOutput("echo sin(100)", "-0.506366")
-    assertCommandOutput("echo sin(0) sin(1)", "0.0 0.841471")
+  fun `test asin with Number`() {
+    assertCommandOutput("echo asin(1)", "1.570796")
+    assertCommandOutput("echo asin(-1) asin(0) asin(1)", "-1.570796 0.0 1.570796")
   }
 
   @Test
-  fun `test sin with Float`() {
-    assertCommandOutput("echo sin(-4.01)", "0.763301")
-    assertCommandOutput("echo sin(0.0) sin(1.0)", "0.0 0.841471")
+  fun `test asin with Float`() {
+    assertCommandOutput("echo asin(1.0)", "1.570796")
+    assertCommandOutput("echo asin(0.8) asin(-0.5)", "0.927295 -0.523599")
   }
 
   @Test
-  fun `test sin with string causes errors`() {
-    enterCommand("echo sin('1.0')")
+  fun `test asin with value greater than 1 returns nan`() {
+    assertCommandOutput("echo asin(1.1)", "nan")
+  }
+
+  @Test
+  fun `test asin with value less than -1 returns nan`() {
+    assertCommandOutput("echo asin(-1.1)", "nan")
+  }
+
+  @Test
+  fun `test asin with string causes errors`() {
+    enterCommand("echo asin('1.0')")
     assertPluginError(true)
     assertPluginErrorMessageContains("E808: Number or Float required")
   }
 
   @Test
-  fun `test sin with invalid string causes errors`() {
-    enterCommand("echo sin('cheese')")
+  fun `test asin with invalid string causes errors`() {
+    enterCommand("echo asin('cheese')")
     assertPluginError(true)
     assertPluginErrorMessageContains("E808: Number or Float required")
   }
 
   @Test
-  fun `test sin with list causes errors`() {
-    enterCommand("echo sin([1.0])")
+  fun `test asin with list causes errors`() {
+    enterCommand("echo asin([1.0])")
     assertPluginError(true)
     assertPluginErrorMessageContains("E808: Number or Float required")
   }
 
   @Test
-  fun `test sin with dictionary causes errors`() {
-    enterCommand("echo sin({1: 1.0})")
+  fun `test asin with dictionary causes errors`() {
+    enterCommand("echo asin({1: 1.0})")
     assertPluginError(true)
     assertPluginErrorMessageContains("E808: Number or Float required")
   }
