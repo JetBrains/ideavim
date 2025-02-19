@@ -10,6 +10,7 @@
     "cos": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.CosFunctionHandler",
     "cosh": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.CoshFunctionHandler",
     "empty": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.EmptyFunctionHandler",
+    "err_teapot": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.variousFunctions.ErrTeapotFunctionHandler",
     "escape": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.stringFunctions.EscapeFunctionHandler",
     "exists": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.variousFunctions.ExistsFunctionHandler",
     "exp": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.ExpFunctionHandler",
