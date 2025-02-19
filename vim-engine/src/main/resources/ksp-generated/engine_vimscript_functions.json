@@ -13,6 +13,7 @@
     "escape": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.stringFunctions.EscapeFunctionHandler",
     "exists": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.variousFunctions.ExistsFunctionHandler",
     "exp": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.ExpFunctionHandler",
+    "float2nr": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.Float2NrFunctionHandler",
     "floor": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.FloorFunctionHandler",
     "fmod": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.FmodFunctionHandler",
     "funcref": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.varFunctions.FuncrefFunctionHandler",
