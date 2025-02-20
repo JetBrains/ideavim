@@ -21,16 +21,17 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.Motion.AbsoluteOffset
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 
-// Vim considers an empty line as a word/WORD, but for vi compatibility, `e` and `E` do not stop at empty lines (`ge`,
-// `gE` and `w`/`W` and `b`/`B` do)
+// Vim considers an empty line as a word/WORD, but for vi compatibility, `e` and `E` do not stop at empty lines.
+// This is only applicable for forwards motion (the "right" actions). The backwards ("left") actions `ge` and `gE`
+// always stop at empty lines (as do word forward/backward motions `w`/`W` and `b`/`B`).
 @CommandOrMotion(keys = ["gE"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-class MotionBigWordEndLeftAction : WordEndAction(Direction.BACKWARDS, bigWord = true, stopAtEmptyLine = true)
+class MotionBigWordEndLeftAction : WordEndAction(Direction.BACKWARDS, bigWord = true)
 
 @CommandOrMotion(keys = ["E"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 class MotionBigWordEndRightAction : WordEndAction(Direction.FORWARDS, bigWord = true, stopAtEmptyLine = false)
 
 @CommandOrMotion(keys = ["ge"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
-class MotionWordEndLeftAction : WordEndAction(Direction.BACKWARDS, bigWord = false, stopAtEmptyLine = false)
+class MotionWordEndLeftAction : WordEndAction(Direction.BACKWARDS, bigWord = false)
 
 @CommandOrMotion(keys = ["e"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 class MotionWordEndRightAction : WordEndAction(Direction.FORWARDS, bigWord = false, stopAtEmptyLine = false)
@@ -38,7 +39,7 @@ class MotionWordEndRightAction : WordEndAction(Direction.FORWARDS, bigWord = fal
 sealed class WordEndAction(
   private val direction: Direction,
   private val bigWord: Boolean,
-  private val stopAtEmptyLine: Boolean,
+  private val stopAtEmptyLine: Boolean = true,
 ) : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,
