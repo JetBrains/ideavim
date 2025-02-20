@@ -9,9 +9,9 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
 import com.intellij.openapi.util.Disposer
-import com.intellij.testFramework.TestLoggerFactory
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.newapi.vim
@@ -178,15 +178,17 @@ class MapCommandJavaTest : VimJavaTestCase() {
     typeText(commandToKeys("map kk l"))
     typeText(injector.parser.parseKeys("k"))
 
-    checkDelayedMapping(
-      text,
-      """
+    ApplicationManager.getApplication().invokeAndWait {
+      checkDelayedMapping(
+        text,
+        """
               -$c----
               12345
               abcde
               -----
       """.trimIndent(),
-    )
+      )
+    }
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
@@ -204,15 +206,17 @@ class MapCommandJavaTest : VimJavaTestCase() {
     typeText(commandToKeys("map kk l"))
     typeText(injector.parser.parseKeys("k"))
 
-    checkDelayedMapping(
-      text,
-      """
+    ApplicationManager.getApplication().invokeAndWait {
+      checkDelayedMapping(
+        text,
+        """
               -----
               12345
               a${c}bcde
               -----
       """.trimIndent(),
-    )
+      )
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -233,15 +237,17 @@ class MapCommandJavaTest : VimJavaTestCase() {
     typeText(commandToKeys("map jz w"))
     typeText(injector.parser.parseKeys("k"))
 
-    checkDelayedMapping(
-      text,
-      """
+    ApplicationManager.getApplication().invokeAndWait {
+      checkDelayedMapping(
+        text,
+        """
               -----
               ${c}12345
               abcde
               -----
       """.trimIndent(),
-    )
+      )
+    }
   }
 
   @Test
@@ -349,10 +355,10 @@ class MapCommandJavaTest : VimJavaTestCase() {
       indicateErrors = true,
       null,
     )
-    val exception = assertThrowsLogError<TestLoggerFactory.TestLoggerAssertionError> {
+    val exception = assertThrowsLogError<Throwable> {
       typeText(injector.parser.parseKeys("t"))
     }
-    assertIs<ExException>(exception.cause) // Exception is wrapped into LOG.error twice
+    assertIs<ExException>(exception.cause!!.cause) // Exception is wrapped into LOG.error twice
 
     assertPluginError(true)
     assertPluginErrorMessageContains("E121: Undefined variable: s:mapping")
@@ -374,15 +380,17 @@ class MapCommandJavaTest : VimJavaTestCase() {
     typeText(commandToKeys("map kk h"))
     typeText(injector.parser.parseKeys("kk"))
 
-    checkDelayedMapping(
-      text,
-      """
+    ApplicationManager.getApplication().invokeAndWait {
+      checkDelayedMapping(
+        text,
+        """
               -----
               ${c}12345
               abcde
               -----
       """.trimIndent(),
-    )
+      )
+    }
     assertMode(Mode.NORMAL())
   }
 
@@ -397,10 +405,11 @@ class MapCommandJavaTest : VimJavaTestCase() {
     """.trimIndent()
     configureByJavaText(text)
 
-    assertThrowsLogError<ExException> {
+    val exception = assertThrowsLogError<Throwable> {
       typeText(commandToKeys("inoremap <expr> <cr> unknownFunction() ? '\\<C-y>' : '\\<C-g>u\\<CR>'"))
       typeText(injector.parser.parseKeys("i<CR>"))
     }
+    assertIs<ExException>(exception.cause)
 
     assertPluginError(true)
     assertPluginErrorMessageContains("E117: Unknown function: unknownFunction")

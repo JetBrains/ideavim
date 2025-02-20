@@ -20,6 +20,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.PlatformCoreDataKeys
 import com.intellij.openapi.actionSystem.ex.ActionUtil
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.diagnostic.thisLogger
@@ -350,9 +351,15 @@ abstract class VimNoWriteActionTestCase {
 
   protected fun configureByText(fileType: FileType, content: String): Editor {
     fixture.configureByText(fileType, content)
-    setDefaultIntelliJSettings(fixture.editor)
+    // Note: Change to coroutines
+    ApplicationManager.getApplication().invokeAndWait {
+      setDefaultIntelliJSettings(fixture.editor)
+    }
     NeovimTesting.setupEditor(fixture.editor, testInfo)
-    setEditorVisibleSize(screenWidth, screenHeight)
+    // Note: Change to coroutines
+    ApplicationManager.getApplication().invokeAndWait {
+      setEditorVisibleSize(screenWidth, screenHeight)
+    }
     return fixture.editor
   }
 
@@ -444,7 +451,11 @@ abstract class VimNoWriteActionTestCase {
   protected fun typeText(vararg keys: String) = typeText(keys.flatMap { injector.parser.parseKeys(it) })
 
   protected fun typeText(keys: List<KeyStroke?>): Editor {
-    return typeText(fixture.editor, keys)
+    var editor: Editor? = null
+    ApplicationManager.getApplication().invokeAndWait {
+      editor = typeText(fixture.editor, keys)
+    }
+    return editor!!
   }
 
   protected fun typeText(editor: Editor, keys: List<KeyStroke?>): Editor {
@@ -601,8 +612,10 @@ abstract class VimNoWriteActionTestCase {
       )
     }
     assertEquals(expectedOffsets.size, carets.size, "Wrong amount of carets")
-    for (i in expectedOffsets.indices) {
-      assertEquals(expectedOffsets[i], carets[i].offset)
+    ApplicationManager.getApplication().runReadAction {
+      for (i in expectedOffsets.indices) {
+        assertEquals(expectedOffsets[i], carets[i].offset)
+      }
     }
 
     NeovimTesting.assertState(fixture.editor, testInfo)
@@ -700,7 +713,12 @@ abstract class VimNoWriteActionTestCase {
   }
 
   fun assertSelection(expected: String?) {
-    val selected = fixture.editor.selectionModel.selectedText
+    var selected: String? = null
+    ApplicationManager.getApplication().invokeAndWait {
+      ApplicationManager.getApplication().runReadAction {
+        selected = fixture.editor.selectionModel.selectedText
+      }
+    }
     assertEquals(expected, selected)
   }
 
@@ -890,7 +908,9 @@ abstract class VimNoWriteActionTestCase {
 
   protected fun performTest(keys: String, after: String, modeAfter: Mode) {
     typeText(keys)
-    PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+    ApplicationManager.getApplication().invokeAndWait {
+      PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+    }
     assertState(after)
     assertState(modeAfter)
   }

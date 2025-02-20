@@ -10,6 +10,6 @@ package org.jetbrains.plugins.ideavim
 
 import com.intellij.ide.highlighter.JavaFileType
 
-abstract class VimJavaTestCase : VimTestCase() {
+abstract class VimJavaTestCase : VimNoWriteActionTestCase() {
   protected fun configureByJavaText(content: String) = configureByText(JavaFileType.INSTANCE, content)
 }

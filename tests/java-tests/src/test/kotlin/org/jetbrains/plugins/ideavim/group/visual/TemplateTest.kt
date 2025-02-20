@@ -16,7 +16,9 @@ import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.intellij.ide.DataManager
 import com.intellij.injected.editor.EditorWindow
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
+import com.intellij.psi.PsiElement
 import com.intellij.refactoring.rename.inplace.VariableInplaceRenameHandler
 import com.intellij.testFramework.PlatformTestUtil
 import com.intellij.testFramework.fixtures.CodeInsightTestUtil.doInlineRename
@@ -65,7 +67,9 @@ class TemplateTest : VimJavaTestCase() {
             }
       """.trimIndent(),
     )
-    doInlineRename(VariableInplaceRenameHandler(), "myNewVar", fixture)
+    ApplicationManager.getApplication().invokeAndWait {
+      doInlineRename(VariableInplaceRenameHandler(), "myNewVar", fixture)
+    }
     assertState(
       """
             class Hello {
@@ -143,7 +147,9 @@ class TemplateTest : VimJavaTestCase() {
     waitAndAssertMode(fixture, Mode.SELECT(SelectionType.CHARACTER_WISE))
     assertState(Mode.SELECT(SelectionType.CHARACTER_WISE))
 
-    LookupManager.hideActiveLookup(fixture.project)
+    ApplicationManager.getApplication().invokeAndWait {
+      LookupManager.hideActiveLookup(fixture.project)
+    }
     typeText(injector.parser.parseKeys("<Left>"))
     assertState(Mode.INSERT)
     typeText(injector.parser.parseKeys("pre" + "<CR>"))
@@ -176,7 +182,9 @@ class TemplateTest : VimJavaTestCase() {
     waitAndAssertMode(fixture, Mode.SELECT(SelectionType.CHARACTER_WISE))
     assertState(Mode.SELECT(SelectionType.CHARACTER_WISE))
 
-    LookupManager.hideActiveLookup(fixture.project)
+    ApplicationManager.getApplication().invokeAndWait {
+      LookupManager.hideActiveLookup(fixture.project)
+    }
     typeText(injector.parser.parseKeys("<Right>"))
     assertState(Mode.INSERT)
     assertState(
@@ -206,7 +214,9 @@ class TemplateTest : VimJavaTestCase() {
     waitAndAssertMode(fixture, Mode.SELECT(SelectionType.CHARACTER_WISE))
     assertState(Mode.SELECT(SelectionType.CHARACTER_WISE))
 
-    LookupManager.hideActiveLookup(fixture.project)
+    ApplicationManager.getApplication().invokeAndWait {
+      LookupManager.hideActiveLookup(fixture.project)
+    }
     typeText(injector.parser.parseKeys("<Left>"))
     assertState(Mode.INSERT)
     assertState(
@@ -236,7 +246,9 @@ class TemplateTest : VimJavaTestCase() {
     waitAndAssertMode(fixture, Mode.SELECT(SelectionType.CHARACTER_WISE))
     assertState(Mode.SELECT(SelectionType.CHARACTER_WISE))
 
-    LookupManager.hideActiveLookup(fixture.project)
+    ApplicationManager.getApplication().invokeAndWait {
+      LookupManager.hideActiveLookup(fixture.project)
+    }
     typeText(injector.parser.parseKeys("<Right>"))
     assertState(Mode.INSERT)
     assertState(
@@ -527,8 +539,12 @@ class TemplateTest : VimJavaTestCase() {
     template.addVariable("V1", "", "\"123\"", true)
     template.addVariable("V2", "", "\"239\"", true)
 
-    manager.startTemplate(fixture.editor, template)
-    PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+    ApplicationManager.getApplication().invokeAndWait {
+      ApplicationManager.getApplication().runWriteAction {
+        manager.startTemplate(fixture.editor, template)
+      }
+      PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+    }
 
     assertMode(Mode.NORMAL())
     assertOffset(2)
@@ -555,7 +571,9 @@ class TemplateTest : VimJavaTestCase() {
     )
     startRenaming(VariableInplaceRenameHandler())
     val lookupValue = fixture.lookupElementStrings?.get(0) ?: kotlin.test.fail()
-    fixture.finishLookup(Lookup.NORMAL_SELECT_CHAR)
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.finishLookup(Lookup.NORMAL_SELECT_CHAR)
+    }
     assertState(
       """
             class Hello {
@@ -570,7 +588,15 @@ class TemplateTest : VimJavaTestCase() {
   private fun startRenaming(handler: VariableInplaceRenameHandler): Editor {
     val editor = if (fixture.editor is EditorWindow) (fixture.editor as EditorWindow).delegate else fixture.editor
 
-    handler.doRename(fixture.elementAtCaret, editor, dataContext)
+    var elementToRename: PsiElement? = null
+    ApplicationManager.getApplication().invokeAndWait {
+      ApplicationManager.getApplication().runReadAction {
+        elementToRename = fixture.elementAtCaret
+      }
+      ApplicationManager.getApplication().runWriteAction {
+        handler.doRename(elementToRename!!, editor, dataContext)
+      }
+    }
     return editor
   }
 

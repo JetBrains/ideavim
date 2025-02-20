@@ -10,6 +10,7 @@ package org.jetbrains.plugins.ideavim.action
 
 import com.intellij.codeInsight.folding.CodeFoldingManager
 import com.intellij.codeInsight.folding.impl.FoldingUtil
+import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -135,12 +136,24 @@ and some text after""",
           and some text after
       """.trimIndent(),
     )
-    CodeFoldingManager.getInstance(fixture.project).updateFoldRegions(fixture.editor)
-    assertEquals(FoldingUtil.findFoldRegionStartingAtLine(fixture.editor, 0)!!.isExpanded, true)
+    ApplicationManager.getApplication().invokeAndWait {
+      ApplicationManager.getApplication().runWriteAction {
+        CodeFoldingManager.getInstance(fixture.project).updateFoldRegions(fixture.editor)
+        assertEquals(FoldingUtil.findFoldRegionStartingAtLine(fixture.editor, 0)!!.isExpanded, true)
+      }
+    }
     typeText(injector.parser.parseKeys("za"))
-    assertEquals(FoldingUtil.findFoldRegionStartingAtLine(fixture.editor, 0)!!.isExpanded, false)
+    ApplicationManager.getApplication().invokeAndWait {
+      ApplicationManager.getApplication().runWriteAction {
+        assertEquals(FoldingUtil.findFoldRegionStartingAtLine(fixture.editor, 0)!!.isExpanded, false)
+      }
+    }
     typeText(injector.parser.parseKeys("za"))
-    assertEquals(FoldingUtil.findFoldRegionStartingAtLine(fixture.editor, 0)!!.isExpanded, true)
+    ApplicationManager.getApplication().invokeAndWait {
+      ApplicationManager.getApplication().runWriteAction {
+        assertEquals(FoldingUtil.findFoldRegionStartingAtLine(fixture.editor, 0)!!.isExpanded, true)
+      }
+    }
   }
 
   // VIM-287 |zc| |o|
@@ -158,9 +171,11 @@ and some text after""",
       """.trimIndent(),
     )
 
-    fixture.editor.foldingModel.runBatchFoldingOperation {
-      CodeFoldingManager.getInstance(fixture.project).updateFoldRegions(fixture.editor)
-      FoldingUtil.findFoldRegionStartingAtLine(fixture.editor, 0)!!.isExpanded = false
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.foldingModel.runBatchFoldingOperation {
+        CodeFoldingManager.getInstance(fixture.project).updateFoldRegions(fixture.editor)
+        FoldingUtil.findFoldRegionStartingAtLine(fixture.editor, 0)!!.isExpanded = false
+      }
     }
 
     typeText(injector.parser.parseKeys("o"))

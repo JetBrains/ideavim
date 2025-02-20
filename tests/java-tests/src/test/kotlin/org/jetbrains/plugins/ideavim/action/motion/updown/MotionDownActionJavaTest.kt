@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
+import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.api.getVisualLineCount
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.VimJavaTestCase
@@ -24,14 +25,18 @@ class MotionDownActionJavaTest : VimJavaTestCase() {
       */
     """.trimIndent())
 
-    val foldingModel = fixture.editor.foldingModel
-    foldingModel.runBatchFoldingOperation {
-      val foldRegion = foldingModel.addFoldRegion(61, 71, "pupa")
-      foldRegion!!.isExpanded = false
+    ApplicationManager.getApplication().invokeAndWait {
+      val foldingModel = fixture.editor.foldingModel
+      foldingModel.runBatchFoldingOperation {
+        val foldRegion = foldingModel.addFoldRegion(61, 71, "pupa")
+        foldRegion!!.isExpanded = false
+      }
+      assertEquals(2, fixture.editor.vim.getVisualLineCount())
     }
-    assertEquals(2, fixture.editor.vim.getVisualLineCount())
 
     typeText("gg" + "$" + "j")
-    assertEquals(2, fixture.editor.vim.getVisualLineCount())
+    ApplicationManager.getApplication().invokeAndWait {
+      assertEquals(2, fixture.editor.vim.getVisualLineCount())
+    }
   }
 }

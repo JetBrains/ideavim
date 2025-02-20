@@ -10,6 +10,7 @@ package org.jetbrains.plugins.ideavim.action.change.insert
 
 import com.intellij.codeInsight.folding.CodeFoldingManager
 import com.intellij.codeInsight.folding.impl.FoldingUtil
+import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -30,9 +31,11 @@ bar
 """,
     )
 
-    fixture.editor.foldingModel.runBatchFoldingOperation {
-      CodeFoldingManager.getInstance(fixture.project).updateFoldRegions(fixture.editor)
-      FoldingUtil.findFoldRegionStartingAtLine(fixture.editor, 0)!!.isExpanded = false
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.foldingModel.runBatchFoldingOperation {
+        CodeFoldingManager.getInstance(fixture.project).updateFoldRegions(fixture.editor)
+        FoldingUtil.findFoldRegionStartingAtLine(fixture.editor, 0)!!.isExpanded = false
+      }
     }
 
     typeText(injector.parser.parseKeys("j" + "<C-V>" + "j" + "I" + "X" + "<Esc>"))

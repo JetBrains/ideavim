@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim
 
 import com.intellij.ide.IdeEventQueue
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.util.containers.toArray
 import com.maddyhome.idea.vim.api.injector
@@ -55,14 +56,16 @@ annotation class VimBehaviorDiffers(
   val shouldBeFixed: Boolean = true,
 )
 
-inline fun waitAndAssert(timeInMillis: Int = 1000, condition: () -> Boolean) {
-  val end = System.currentTimeMillis() + timeInMillis
-  while (end > System.currentTimeMillis()) {
-    Thread.sleep(10)
-    IdeEventQueue.getInstance().flushQueue()
-    if (condition()) return
+inline fun waitAndAssert(timeInMillis: Int = 1000, crossinline condition: () -> Boolean) {
+  ApplicationManager.getApplication().invokeAndWait {
+    val end = System.currentTimeMillis() + timeInMillis
+    while (end > System.currentTimeMillis()) {
+      Thread.sleep(10)
+      IdeEventQueue.getInstance().flushQueue()
+      if (condition()) return@invokeAndWait
+    }
+    fail()
   }
-  fail()
 }
 
 fun assertHappened(timeInMillis: Int = 1000, precision: Int, condition: () -> Boolean) {
@@ -72,14 +75,16 @@ fun assertHappened(timeInMillis: Int = 1000, precision: Int, condition: () -> Bo
 }
 
 fun assertDoesntChange(timeInMillis: Int = 1000, condition: () -> Boolean) {
-  val end = System.currentTimeMillis() + timeInMillis
-  while (end > System.currentTimeMillis()) {
-    if (!condition()) {
-      fail()
-    }
+  ApplicationManager.getApplication().invokeAndWait {
+    val end = System.currentTimeMillis() + timeInMillis
+    while (end > System.currentTimeMillis()) {
+      if (!condition()) {
+        fail()
+      }
 
-    Thread.sleep(10)
-    IdeEventQueue.getInstance().flushQueue()
+      Thread.sleep(10)
+      IdeEventQueue.getInstance().flushQueue()
+    }
   }
 }
 
