@@ -114,7 +114,7 @@ import kotlin.test.assertTrue
  * This is done as we have no mechanism to guarantee compatibility as we update this test case.
  * Feel free to copy this class into your plugin, or copy just needed functions.
  *
- * Deprecated: Use [VimNoWriteActionTestCase]
+ * Deprecated: Use [IdeaVimTestCase]
  * Tests with [VimTestCase] are always started on the EDT with the write action. This is not only incorrect but also
  *   prevents an implementation of VIM-3376.
  *
@@ -135,10 +135,10 @@ import kotlin.test.assertTrue
 @RunInEdt(writeIntent = true)
 @ApiStatus.Internal
 @Deprecated(
-  "Use VimNoWriteActionTestCase instead",
-  replaceWith = ReplaceWith("VimNoWriteActionTestCase", "org.jetbrains.plugins.ideavim.VimNoWriteActionTestCase")
+  "Use IdeaVimTestCase instead",
+  replaceWith = ReplaceWith("IdeaVimTestCase", "org.jetbrains.plugins.ideavim.IdeaVimTestCase")
 )
-abstract class VimTestCase : VimNoWriteActionTestCase() {
+abstract class VimTestCase : IdeaVimTestCase() {
   object Checks {
     var caretShape: Boolean = true
 
@@ -171,7 +171,7 @@ abstract class VimTestCase : VimNoWriteActionTestCase() {
 }
 
 @ApiStatus.Internal
-abstract class VimNoWriteActionTestCase {
+abstract class IdeaVimTestCase {
   protected lateinit var fixture: CodeInsightTestFixture
 
   lateinit var testInfo: TestInfo
