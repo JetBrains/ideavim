@@ -113,9 +113,31 @@ import kotlin.test.assertTrue
  * To plugin writers: this class is internal, thus not allowed to be used by third-party plugins.
  * This is done as we have no mechanism to guarantee compatibility as we update this test case.
  * Feel free to copy this class into your plugin, or copy just needed functions.
+ *
+ * Deprecated: Use [VimNoWriteActionTestCase]
+ * Tests with [VimTestCase] are always started on the EDT with the write action. This is not only incorrect but also
+ *   prevents an implementation of VIM-3376.
+ *
+ * If your test fails because of:
+ * Missing EDT: Wrap with `ApplicationManager.getInstance().invokeAndWait { }`
+ * Missing Write Action: Wrap with `ApplicationManager.getInstance().runWriteAction { }`
+ * Missing Read Action: Wrap with `ApplicationManager.getInstance().runReadAction { }`
+ *
+ * This wrapping may be needed right in the test if there is a platform call in the test itself.
+ *    E.g. `fixture.editor.foldingModel.runBatchFoldingOperation`.
+ *
+ * However, there is a chance that the platform call happens deep in IdeaVim code. IdeaVim historically uses
+ *   very broad EDT and write action scopes. This means we wrap with the write action almost at the top of the
+ *   call stack. This is incorrect, the write action should be taken only in the place where it's necessary.
+ *   So, try to properly introduce a write/read action wrapping in the IdeaVim code. If it's too complicated,
+ *   wrap with write/read action the call in the test and mark it that the action wrapping should be done deeper in the code.
  */
 @RunInEdt(writeIntent = true)
 @ApiStatus.Internal
+@Deprecated(
+  "Use VimNoWriteActionTestCase instead",
+  replaceWith = ReplaceWith("VimNoWriteActionTestCase", "org.jetbrains.plugins.ideavim.VimNoWriteActionTestCase")
+)
 abstract class VimTestCase : VimNoWriteActionTestCase() {
   object Checks {
     var caretShape: Boolean = true
