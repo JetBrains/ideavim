@@ -38,3 +38,7 @@ and would like to share with you.
 - Vi (not Vim) is a POSIX standard, and [has a spec](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/vi.html)! Vim is mostly POSIX compliant when Vi compatibility is selected with the `'compatible'` option, but there are still some differences that can be changed with `'copoptions'`. The spec is interesting because it documents the behaviour of different commands in a stricter style than the user documentation, describing the current line and column after the command, for example. [More details can be found by reading `:help posix`](https://vimhelp.org/vi_diff.txt.html#posix).
 
 - The Vim documentation contains many easter eggs. We encounter them occasionally, but GitHub user mikesmithgh has compiled a substantial collection [here](https://github.com/mikesmithgh/vimpromptu).
+    - In addition to `:call err_teapot()`, which returns `E418: I'm a teapot`, there is also `:call err_teapot(1)`, which returns `E503: Coffee is currently not available`. Naturally, this is also supported in IdeaVim.
+
+- Insert mode has all `Ctrl` keys mapped, except `Ctrl-B`. In the documentation, it is marked as **"CTRL-B in Insert
+  mode gone"**. Call `:h i_CTRL-B-gone` in Vim to read why `Ctrl-B` was removed.
