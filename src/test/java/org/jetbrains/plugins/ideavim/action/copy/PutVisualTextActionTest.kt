@@ -10,6 +10,7 @@
 
 package org.jetbrains.plugins.ideavim.action.copy
 
+import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.SelectionType
@@ -78,14 +79,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      before rangeOf "legendary",
-      SelectionType.CHARACTER_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        before rangeOf "legendary",
+        SelectionType.CHARACTER_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("ve" + "p"))
     val after = "legendar${c}y it in a legendary land"
     assertState(after)
@@ -101,14 +104,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      before rangeOf "legendary",
-      SelectionType.CHARACTER_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        before rangeOf "legendary",
+        SelectionType.CHARACTER_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("v2e" + "2p"))
     val after = "legendarylegendar${c}y in a legendary land"
     assertState(after)
@@ -124,14 +129,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      before rangeOf "legendary",
-      SelectionType.CHARACTER_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        before rangeOf "legendary",
+        SelectionType.CHARACTER_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("v$" + "2p"))
     val after = "legendarylegendar${c}y"
     assertState(after)
@@ -173,14 +180,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      before rangeOf "legendary",
-      SelectionType.CHARACTER_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        before rangeOf "legendary",
+        SelectionType.CHARACTER_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("vb" + "p"))
     val after = "I legendar${c}y it in a legendary land"
     assertState(after)
@@ -205,14 +214,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      before rangeOf "A Discovery\n",
-      SelectionType.LINE_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        before rangeOf "A Discovery\n",
+        SelectionType.LINE_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("ve" + "p"))
     val after = """
             A Discovery
@@ -244,14 +255,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      before rangeOf "A Discovery\n",
-      SelectionType.LINE_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        before rangeOf "A Discovery\n",
+        SelectionType.LINE_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("ve" + "p"))
     val after = """
             A Discovery
@@ -283,14 +296,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      before rangeOf "A Discovery\n",
-      SelectionType.LINE_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        before rangeOf "A Discovery\n",
+        SelectionType.LINE_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("ve" + "p"))
     val after = """
             A Discovery
@@ -322,14 +337,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      before rangeOf "A Discovery\n",
-      SelectionType.LINE_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        before rangeOf "A Discovery\n",
+        SelectionType.LINE_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("v$" + "p"))
     val after = """
             A Discovery
@@ -562,14 +579,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      editor.rangeOf("|found|", 2),
-      SelectionType.BLOCK_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        editor.rangeOf("|found|", 2),
+        SelectionType.BLOCK_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("ve" + "p"))
     val after = """
             A Discovery
@@ -609,14 +628,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      editor.rangeOf("|found|", 2),
-      SelectionType.BLOCK_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        editor.rangeOf("|found|", 2),
+        SelectionType.BLOCK_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("ve" + "p"))
     val after = """
             A Discovery
@@ -658,14 +679,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      editor.rangeOf("|found|", 2),
-      SelectionType.BLOCK_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        editor.rangeOf("|found|", 2),
+        SelectionType.BLOCK_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("ve" + "2p"))
     val after = """
             A Discovery
@@ -704,7 +727,9 @@ class PutVisualTextActionTest : VimTestCase() {
     configureByText(before)
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
-    injector.registerGroup.storeText(vimEditor, context, '+', "|found|\n|l roc|\n|ere i|", SelectionType.BLOCK_WISE)
+    ApplicationManager.getApplication().runWriteAction {
+      injector.registerGroup.storeText(vimEditor, context, '+', "|found|\n|l roc|\n|ere i|", SelectionType.BLOCK_WISE)
+    }
 //    registerService.storeText(editor.vim context,, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
     typeText(injector.parser.parseKeys("ve" + "\"+p"))
     val after = """
@@ -744,7 +769,9 @@ class PutVisualTextActionTest : VimTestCase() {
     configureByText(before)
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
-    injector.registerGroup.storeText(vimEditor, context, '+', "|found|\n|l roc|\n|ere i|", SelectionType.BLOCK_WISE)
+    ApplicationManager.getApplication().runWriteAction {
+      injector.registerGroup.storeText(vimEditor, context, '+', "|found|\n|l roc|\n|ere i|", SelectionType.BLOCK_WISE)
+    }
 //    registerService.storeText(editor.vim context,, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
     typeText(injector.parser.parseKeys("ve" + "\"+p"))
     val after = """
@@ -784,14 +811,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      before rangeOf "Discovery",
-      SelectionType.CHARACTER_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        before rangeOf "Discovery",
+        SelectionType.CHARACTER_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("V" + "p"))
     val after = """
             A Discovery
@@ -821,14 +850,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      before rangeOf "Discovery",
-      SelectionType.CHARACTER_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        before rangeOf "Discovery",
+        SelectionType.CHARACTER_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("V" + "2p"))
     val after = """
             A Discovery
@@ -869,14 +900,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      before rangeOf "Discovery",
-      SelectionType.CHARACTER_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        before rangeOf "Discovery",
+        SelectionType.CHARACTER_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("V" + "p"))
     val after = """
             A Discovery
@@ -914,7 +947,9 @@ class PutVisualTextActionTest : VimTestCase() {
     configureByText(before)
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
-    injector.registerGroup.storeText(vimEditor, context, '*', "Discovery", SelectionType.CHARACTER_WISE)
+    ApplicationManager.getApplication().runWriteAction {
+      injector.registerGroup.storeText(vimEditor, context, '*', "Discovery", SelectionType.CHARACTER_WISE)
+    }
     typeText(injector.parser.parseKeys("V" + "\"*p"))
     val after = """
             A Discovery
@@ -952,7 +987,9 @@ class PutVisualTextActionTest : VimTestCase() {
     configureByText(before)
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
-    injector.registerGroup.storeText(vimEditor, context, '+', "Discovery", SelectionType.CHARACTER_WISE)
+    ApplicationManager.getApplication().runWriteAction {
+      injector.registerGroup.storeText(vimEditor, context, '+', "Discovery", SelectionType.CHARACTER_WISE)
+    }
     typeText(injector.parser.parseKeys("V" + "\"+p"))
     val after = """
             A Discovery
@@ -990,7 +1027,9 @@ class PutVisualTextActionTest : VimTestCase() {
     configureByText(before)
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
-    injector.registerGroup.storeText(vimEditor, context, '+', "Discovery", SelectionType.CHARACTER_WISE)
+    ApplicationManager.getApplication().runWriteAction {
+      injector.registerGroup.storeText(vimEditor, context, '+', "Discovery", SelectionType.CHARACTER_WISE)
+    }
     typeText(injector.parser.parseKeys("V" + "\"+p"))
     val after = """
             A Discovery
@@ -1028,7 +1067,9 @@ class PutVisualTextActionTest : VimTestCase() {
     configureByText(before)
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
-    injector.registerGroup.storeText(vimEditor, context, '+', "Discovery", SelectionType.CHARACTER_WISE)
+    ApplicationManager.getApplication().runWriteAction {
+      injector.registerGroup.storeText(vimEditor, context, '+', "Discovery", SelectionType.CHARACTER_WISE)
+    }
     typeText(injector.parser.parseKeys("V" + "\"+p"))
     val after = """
             A Discovery
@@ -1061,14 +1102,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      before rangeOf "A Discovery\n",
-      SelectionType.LINE_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        before rangeOf "A Discovery\n",
+        SelectionType.LINE_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("V" + "p"))
     val after = """
             A Discovery
@@ -1098,14 +1141,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      before rangeOf "A Discovery\n",
-      SelectionType.LINE_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        before rangeOf "A Discovery\n",
+        SelectionType.LINE_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("V" + "2p"))
     val after = """
             A Discovery
@@ -1146,14 +1191,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      before rangeOf "A Discovery\n",
-      SelectionType.LINE_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        before rangeOf "A Discovery\n",
+        SelectionType.LINE_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("V" + "p"))
     val after = """
             A Discovery
@@ -1191,7 +1238,9 @@ class PutVisualTextActionTest : VimTestCase() {
     configureByText(before)
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
-    injector.registerGroup.storeText(vimEditor, context, '*', "A Discovery\n", SelectionType.LINE_WISE)
+    ApplicationManager.getApplication().runWriteAction {
+      injector.registerGroup.storeText(vimEditor, context, '*', "A Discovery\n", SelectionType.LINE_WISE)
+    }
     typeText(injector.parser.parseKeys("V" + "\"*p"))
     val after = """
             A Discovery
@@ -1229,7 +1278,9 @@ class PutVisualTextActionTest : VimTestCase() {
     configureByText(before)
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
-    injector.registerGroup.storeText(vimEditor, context, '+', "A Discovery\n", SelectionType.LINE_WISE)
+    ApplicationManager.getApplication().runWriteAction {
+      injector.registerGroup.storeText(vimEditor, context, '+', "A Discovery\n", SelectionType.LINE_WISE)
+    }
     typeText(injector.parser.parseKeys("V" + "\"+p"))
     val after = """
             A Discovery
@@ -1267,7 +1318,9 @@ class PutVisualTextActionTest : VimTestCase() {
     configureByText(before)
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
-    injector.registerGroup.storeText(vimEditor, context, '+', "A Discovery\n", SelectionType.LINE_WISE)
+    ApplicationManager.getApplication().runWriteAction {
+      injector.registerGroup.storeText(vimEditor, context, '+', "A Discovery\n", SelectionType.LINE_WISE)
+    }
     typeText(injector.parser.parseKeys("V" + "\"+p"))
     val after = """
             A Discovery
@@ -1305,7 +1358,9 @@ class PutVisualTextActionTest : VimTestCase() {
     configureByText(before)
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
-    injector.registerGroup.storeText(vimEditor, context, '+', "A Discovery\n", SelectionType.LINE_WISE)
+    ApplicationManager.getApplication().runWriteAction {
+      injector.registerGroup.storeText(vimEditor, context, '+', "A Discovery\n", SelectionType.LINE_WISE)
+    }
     typeText(injector.parser.parseKeys("V" + "\"+p"))
     val after = """
             A Discovery
@@ -1343,14 +1398,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      editor.rangeOf("|found|", 2),
-      SelectionType.BLOCK_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        editor.rangeOf("|found|", 2),
+        SelectionType.BLOCK_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("V" + "p"))
     val after = """
             A Discovery
@@ -1409,14 +1466,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      editor.rangeOf("|found|", 2),
-      SelectionType.BLOCK_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        editor.rangeOf("|found|", 2),
+        SelectionType.BLOCK_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("V" + "p"))
     val after = """
             A Discovery
@@ -1481,14 +1540,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      editor.rangeOf("|found|", 2),
-      SelectionType.BLOCK_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        editor.rangeOf("|found|", 2),
+        SelectionType.BLOCK_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("V" + "2p"))
     val after = """
             A Discovery
@@ -1549,7 +1610,9 @@ class PutVisualTextActionTest : VimTestCase() {
     configureByText(before)
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
-    injector.registerGroup.storeText(vimEditor, context, '+', "|found|\n|l roc|\n|ere i|", SelectionType.BLOCK_WISE)
+    ApplicationManager.getApplication().runWriteAction {
+      injector.registerGroup.storeText(vimEditor, context, '+', "|found|\n|l roc|\n|ere i|", SelectionType.BLOCK_WISE)
+    }
     typeText(injector.parser.parseKeys("V" + "\"+p"))
     val after = """
             A Discovery
@@ -1612,7 +1675,9 @@ class PutVisualTextActionTest : VimTestCase() {
     configureByText(before)
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
-    injector.registerGroup.storeText(vimEditor, context, '+', "|found|\n|l roc|\n|ere i|", SelectionType.BLOCK_WISE)
+    ApplicationManager.getApplication().runWriteAction {
+      injector.registerGroup.storeText(vimEditor, context, '+', "|found|\n|l roc|\n|ere i|", SelectionType.BLOCK_WISE)
+    }
     typeText(injector.parser.parseKeys("V" + "\"+p"))
     val after = """
             A Discovery
@@ -1672,14 +1737,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      before rangeOf "Discovery",
-      SelectionType.CHARACTER_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        before rangeOf "Discovery",
+        SelectionType.CHARACTER_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("<C-V>2e2j" + "p"))
     val after = """
             A Discovery
@@ -1709,14 +1776,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      before rangeOf "Discovery",
-      SelectionType.CHARACTER_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        before rangeOf "Discovery",
+        SelectionType.CHARACTER_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("<C-V>3e2k" + "p"))
     val after = """
             A Discovery
@@ -1746,14 +1815,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      before rangeOf "Discovery",
-      SelectionType.CHARACTER_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        before rangeOf "Discovery",
+        SelectionType.CHARACTER_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("<C-V>2e2j" + "2p"))
     val after = """
             A Discovery
@@ -1783,14 +1854,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      before rangeOf "Discovery",
-      SelectionType.CHARACTER_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        before rangeOf "Discovery",
+        SelectionType.CHARACTER_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("<C-V>3j$" + "p"))
     val after = """
             A Discovery
@@ -1833,14 +1906,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      before rangeOf "A Discovery\n",
-      SelectionType.LINE_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        before rangeOf "A Discovery\n",
+        SelectionType.LINE_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("<C-V>2e2j" + "p"))
     val after = """
             A Discovery
@@ -1872,14 +1947,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      before rangeOf "A Discovery\n",
-      SelectionType.LINE_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        before rangeOf "A Discovery\n",
+        SelectionType.LINE_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("<C-V>2e2j" + "P"))
     val after = """
             A Discovery
@@ -1922,14 +1999,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      before rangeOf "A Discovery\n",
-      SelectionType.LINE_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        before rangeOf "A Discovery\n",
+        SelectionType.LINE_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("<C-V>2e2j" + "2p"))
     val after = """
             A Discovery
@@ -1973,14 +2052,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      before rangeOf "A Discovery\n",
-      SelectionType.LINE_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        before rangeOf "A Discovery\n",
+        SelectionType.LINE_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("<C-V>2e3j" + "p"))
     val after = """
             A Discovery
@@ -2023,14 +2104,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      before rangeOf "A Discovery\n",
-      SelectionType.LINE_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        before rangeOf "A Discovery\n",
+        SelectionType.LINE_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("<C-V>2j$" + "p"))
     val after = """
             A Discovery
@@ -2069,14 +2152,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      editor.rangeOf("|found|", 2),
-      SelectionType.BLOCK_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        editor.rangeOf("|found|", 2),
+        SelectionType.BLOCK_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("<C-V>2e2j" + "p"))
     val after = """
             A Discovery
@@ -2116,14 +2201,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      editor.rangeOf("|found|", 2),
-      SelectionType.BLOCK_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        editor.rangeOf("|found|", 2),
+        SelectionType.BLOCK_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("<C-V>2e3j" + "p"))
     val after = """
             A Discovery
@@ -2163,14 +2250,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      editor.rangeOf("|found|", 2),
-      SelectionType.BLOCK_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        editor.rangeOf("|found|", 2),
+        SelectionType.BLOCK_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("<C-V>2ej" + "p"))
     val after = """
             A Discovery
@@ -2209,14 +2298,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      editor.rangeOf("|found|", 2),
-      SelectionType.BLOCK_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        editor.rangeOf("|found|", 2),
+        SelectionType.BLOCK_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("<C-V>elj" + "p"))
     val after = """
             A Discovery
@@ -2257,14 +2348,16 @@ class PutVisualTextActionTest : VimTestCase() {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
 
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      editor.rangeOf("|found|", 2),
-      SelectionType.BLOCK_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runWriteAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        editor.rangeOf("|found|", 2),
+        SelectionType.BLOCK_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("<C-V>2j$" + "p"))
     val after = """
             A Discovery

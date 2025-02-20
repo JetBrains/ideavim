@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.action.change.insert
 
 import com.intellij.codeInsight.daemon.impl.HintRenderer
+import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -147,9 +148,11 @@ class VisualBlockInsertActionTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
     ) {
-      it.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
-      it.inlayModel.addInlineElement(before.indexOf("l rocks"), HintRenderer("Hello"))
-      it.inlayModel.addInlineElement(before.indexOf("ere it"), HintRenderer("Hello"))
+      ApplicationManager.getApplication().invokeAndWait {
+        it.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
+        it.inlayModel.addInlineElement(before.indexOf("l rocks"), HintRenderer("Hello"))
+        it.inlayModel.addInlineElement(before.indexOf("ere it"), HintRenderer("Hello"))
+      }
     }
   }
 

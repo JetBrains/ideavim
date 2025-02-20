@@ -264,7 +264,7 @@ class MacroActionTest : VimTestCase() {
         typeText("@q")
       }
     }
-    assertEquals(ExceptionHandler.exceptionMessage, exception.cause!!.cause!!.message)
+    assertEquals(ExceptionHandler.exceptionMessage, exception.cause!!.cause!!.cause!!.message)
 
     assertTrue(KeyHandler.getInstance().keyStack.isEmpty())
   }

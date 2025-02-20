@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.action.change
 
 import com.intellij.idea.TestFor
+import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.state.mode.Mode
@@ -31,7 +32,9 @@ class UndoActionTest : VimTestCase() {
     val after = before
     doTest(keys, before, after, Mode.NORMAL())
     val editor = fixture.editor
-    kotlin.test.assertFalse(editor.caretModel.primaryCaret.hasSelection())
+    ApplicationManager.getApplication().runReadAction {
+      kotlin.test.assertFalse(editor.caretModel.primaryCaret.hasSelection())
+    }
   }
 
   @Test
@@ -56,7 +59,9 @@ class UndoActionTest : VimTestCase() {
                 Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
       doTest(keys, before, after, Mode.NORMAL())
-      kotlin.test.assertFalse(hasSelection())
+      ApplicationManager.getApplication().runReadAction {
+        kotlin.test.assertFalse(hasSelection())
+      }
     }
   }
 
@@ -80,7 +85,9 @@ class UndoActionTest : VimTestCase() {
                 Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     doTest(keys, before, after, Mode.NORMAL())
-    kotlin.test.assertFalse(hasSelection())
+    ApplicationManager.getApplication().runReadAction {
+      kotlin.test.assertFalse(hasSelection())
+    }
   }
 
   @Test
@@ -105,7 +112,9 @@ class UndoActionTest : VimTestCase() {
                 Cras id tellus in ex imperdiet egestas.
       """.trimIndent()
       doTest(keys, before, after, Mode.NORMAL())
-      kotlin.test.assertFalse(hasSelection())
+      ApplicationManager.getApplication().runReadAction {
+        kotlin.test.assertFalse(hasSelection())
+      }
     }
   }
 

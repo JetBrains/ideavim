@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.helper
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.CaretVisualAttributes
 import com.intellij.openapi.editor.VisualPosition
@@ -330,9 +331,11 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   @Test
   fun `test adding new caret via IJ`() {
-    configureByText("${c}Lorem ipsum dolor sit amet,")
-    fixture.editor.caretModel.addCaret(VisualPosition(0, 5))
-    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0f)
+    ApplicationManager.getApplication().invokeAndWait {
+      configureByText("${c}Lorem ipsum dolor sit amet,")
+      fixture.editor.caretModel.addCaret(VisualPosition(0, 5))
+      assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0f)
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
@@ -344,13 +347,15 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
       |consectetur adipiscing elit
       """.trimMargin(),
     )
-    injector.actionExecutor.executeAction(
-      fixture.editor.vim,
-      name = "EditorCloneCaretBelow",
-      context = injector.executionContextManager.getEditorExecutionContext(fixture.editor.vim),
-    )
-    kotlin.test.assertEquals(2, fixture.editor.caretModel.caretCount)
-    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0f)
+    ApplicationManager.getApplication().invokeAndWait {
+      injector.actionExecutor.executeAction(
+        fixture.editor.vim,
+        name = "EditorCloneCaretBelow",
+        context = injector.executionContextManager.getEditorExecutionContext(fixture.editor.vim),
+      )
+      kotlin.test.assertEquals(2, fixture.editor.caretModel.caretCount)
+      assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0f)
+    }
   }
 
   private fun assertCaretVisualAttributes(expectedShape: CaretVisualAttributes.Shape, expectedThickness: Float) {

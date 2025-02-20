@@ -7,6 +7,7 @@
  */
 package org.jetbrains.plugins.ideavim.helper
 
+import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.findBlockRange
@@ -104,8 +105,10 @@ class SearchHelperTest : VimTestCase() {
   fun findBlockRange(testCase: FindBlockRangeTestCase) {
     val (_, text, type, count, isOuter, expected) = (testCase)
     configureByText(text)
-    val actual = findBlockRange(fixture.editor.vim, fixture.editor.vim.currentCaret(), type, count, isOuter)
-    kotlin.test.assertEquals(expected, actual)
+    ApplicationManager.getApplication().runReadAction {
+      val actual = findBlockRange(fixture.editor.vim, fixture.editor.vim.currentCaret(), type, count, isOuter)
+      kotlin.test.assertEquals(expected, actual)
+    }
   }
 
   companion object {

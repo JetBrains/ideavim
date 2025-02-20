@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.copy
 
+import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.SelectionType
@@ -33,14 +34,16 @@ class PutTextBeforeCursorActionTest : VimTestCase() {
     val vimEditor = editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      before rangeOf "Discovery",
-      SelectionType.CHARACTER_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runReadAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        before rangeOf "Discovery",
+        SelectionType.CHARACTER_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("V" + "P"))
     typeText(injector.parser.parseKeys("V" + "P"))
     val after = """

@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.extension.replacewithregister
 
+import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
@@ -50,8 +51,10 @@ class ReplaceWithRegisterTest : VimTestCase() {
     configureByText(text)
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
-    VimPlugin.getRegister()
-      .storeText(vimEditor, context, vimEditor.primaryCaret(), text rangeOf "one", SelectionType.CHARACTER_WISE, false)
+    ApplicationManager.getApplication().runReadAction {
+      VimPlugin.getRegister()
+        .storeText(vimEditor, context, vimEditor.primaryCaret(), text rangeOf "one", SelectionType.CHARACTER_WISE, false)
+    }
     typeText(injector.parser.parseKeys("griw"))
     assertState("one on${c}e three")
     val registerService = injector.registerGroup
@@ -177,8 +180,10 @@ class ReplaceWithRegisterTest : VimTestCase() {
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-    VimPlugin.getRegister()
-      .storeText(vimEditor, context, vimEditor.primaryCaret(), text rangeOf "one", SelectionType.CHARACTER_WISE, false)
+    ApplicationManager.getApplication().runReadAction {
+      VimPlugin.getRegister()
+        .storeText(vimEditor, context, vimEditor.primaryCaret(), text rangeOf "one", SelectionType.CHARACTER_WISE, false)
+    }
     typeText(injector.parser.parseKeys("3griw"))
     assertState("one on${c}e four")
     assertEquals("one", registerService.getRegister(vimEditor, context, registerService.lastRegisterChar)?.text)
@@ -193,8 +198,10 @@ class ReplaceWithRegisterTest : VimTestCase() {
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-    VimPlugin.getRegister()
-      .storeText(vimEditor, context, vimEditor.primaryCaret(), text rangeOf "one", SelectionType.CHARACTER_WISE, false)
+    ApplicationManager.getApplication().runReadAction {
+      VimPlugin.getRegister()
+        .storeText(vimEditor, context, vimEditor.primaryCaret(), text rangeOf "one", SelectionType.CHARACTER_WISE, false)
+    }
     typeText(injector.parser.parseKeys("griw"))
     assertState("one two one four")
     assertEquals("one", registerService.getRegister(vimEditor, context, registerService.lastRegisterChar)?.text)
@@ -208,8 +215,10 @@ class ReplaceWithRegisterTest : VimTestCase() {
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-    VimPlugin.getRegister()
-      .storeText(vimEditor, context, vimEditor.primaryCaret(), text rangeOf "one", SelectionType.CHARACTER_WISE, false)
+    ApplicationManager.getApplication().runReadAction {
+      VimPlugin.getRegister()
+        .storeText(vimEditor, context, vimEditor.primaryCaret(), text rangeOf "one", SelectionType.CHARACTER_WISE, false)
+    }
     typeText(injector.parser.parseKeys("griw" + "w" + "."))
     assertState("one one on${c}e four")
     assertEquals("one", registerService.getRegister(vimEditor, context, registerService.lastRegisterChar)?.text)
@@ -260,8 +269,8 @@ class ReplaceWithRegisterTest : VimTestCase() {
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-    VimPlugin.getRegister()
-      .storeText(
+    ApplicationManager.getApplication().runReadAction {
+      VimPlugin.getRegister().storeText(
         vimEditor,
         context,
         vimEditor.primaryCaret(),
@@ -269,6 +278,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
         SelectionType.CHARACTER_WISE,
         false
       )
+    }
     typeText(injector.parser.parseKeys("grr"))
     assertState(
       """
@@ -436,15 +446,17 @@ class ReplaceWithRegisterTest : VimTestCase() {
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-    VimPlugin.getRegister()
-      .storeText(
-        vimEditor,
-        context,
-        vimEditor.primaryCaret(),
-        text rangeOf "legendary",
-        SelectionType.CHARACTER_WISE,
-        false
-      )
+    ApplicationManager.getApplication().runReadAction {
+      VimPlugin.getRegister()
+        .storeText(
+          vimEditor,
+          context,
+          vimEditor.primaryCaret(),
+          text rangeOf "legendary",
+          SelectionType.CHARACTER_WISE,
+          false
+        )
+    }
     typeText(injector.parser.parseKeys("viw" + "gr"))
     assertState(
       """
@@ -515,15 +527,17 @@ class ReplaceWithRegisterTest : VimTestCase() {
     configureByText(text)
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
-    VimPlugin.getRegister()
-      .storeText(
-        vimEditor,
-        context,
-        vimEditor.primaryCaret(),
-        text rangeOf "legendary",
-        SelectionType.CHARACTER_WISE,
-        false
-      )
+    ApplicationManager.getApplication().runReadAction {
+      VimPlugin.getRegister()
+        .storeText(
+          vimEditor,
+          context,
+          vimEditor.primaryCaret(),
+          text rangeOf "legendary",
+          SelectionType.CHARACTER_WISE,
+          false
+        )
+    }
     typeText(injector.parser.parseKeys("V" + "gr"))
     assertState(
       """

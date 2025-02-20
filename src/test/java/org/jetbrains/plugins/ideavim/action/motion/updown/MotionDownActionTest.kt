@@ -11,6 +11,7 @@
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
 import com.intellij.codeInsight.daemon.impl.HintRenderer
+import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
@@ -219,7 +220,9 @@ class MotionDownActionTest : VimTestCase() {
             all rocks and la${c}vender and tufted grass,
     """.trimIndent()
     configureByText(before)
-    fixture.editor.inlayModel.addInlineElement(2, HintRenderer("Hello"))
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.inlayModel.addInlineElement(2, HintRenderer("Hello"))
+    }
     typeText(keys)
     assertState(after)
   }
@@ -236,7 +239,9 @@ class MotionDownActionTest : VimTestCase() {
             all rocks and la${c}vender and tufted grass,
     """.trimIndent()
     configureByText(before)
-    fixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
+    }
     typeText(keys)
     assertState(after)
   }
@@ -253,8 +258,10 @@ class MotionDownActionTest : VimTestCase() {
             all rocks and la${c}vender and tufted grass,
     """.trimIndent()
     configureByText(before)
-    fixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
-    fixture.editor.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
+      fixture.editor.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
+    }
     typeText(keys)
     assertState(after)
   }
@@ -271,7 +278,9 @@ class MotionDownActionTest : VimTestCase() {
             all rocks and lavende${c}r
     """.trimIndent()
     configureByText(before)
-    fixture.editor.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
+    }
     typeText(keys)
     assertState(after)
   }
@@ -288,7 +297,9 @@ class MotionDownActionTest : VimTestCase() {
             all rocks and lavender
     """.trimIndent()
     configureByText(before)
-    fixture.editor.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
+    }
     typeText(keys)
     assertState(after)
   }
@@ -321,7 +332,9 @@ class MotionDownActionTest : VimTestCase() {
             all rocks and lavende${c}r
     """.trimIndent()
     configureByText(before)
-    fixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
+    }
     typeText(keys)
     assertState(after)
   }
@@ -341,7 +354,9 @@ class MotionDownActionTest : VimTestCase() {
     """.trimIndent()
     configureByText(before)
     val inlayOffset = fixture.editor.document.getLineEndOffset(1)
-    fixture.editor.inlayModel.addInlineElement(inlayOffset, HintRenderer("Hello"))
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.inlayModel.addInlineElement(inlayOffset, HintRenderer("Hello"))
+    }
     typeText(keys)
     assertState(after)
   }
@@ -358,7 +373,9 @@ class MotionDownActionTest : VimTestCase() {
             all rocks and lavender
     """.trimIndent()
     configureByText(before)
-    fixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
+    }
     typeText(keys)
     assertState(after)
   }

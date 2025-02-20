@@ -1049,7 +1049,7 @@ class MapCommandTest : VimTestCase() {
         typeText("k")
       }
     }
-    assertEquals(ExceptionHandler.exceptionMessage, exception.cause!!.cause!!.message)
+    assertEquals(ExceptionHandler.exceptionMessage, exception.cause!!.cause!!.cause!!.message)
 
     assertTrue(KeyHandler.getInstance().keyStack.isEmpty())
   }

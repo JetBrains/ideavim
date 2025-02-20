@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
+import com.intellij.openapi.application.ApplicationManager
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -62,7 +63,9 @@ class MotionUpActionTest : VimTestCase() {
     ) {
       // Simulate the caret being moved without IdeaVim knowing and therefore without vimLastColumn being updated
       // This offset is effectively "lave${c}nder"
-      it.caretModel.primaryCaret.moveToOffset(49)
+      ApplicationManager.getApplication().invokeAndWait {
+        it.caretModel.primaryCaret.moveToOffset(49)
+      }
     }
   }
 }

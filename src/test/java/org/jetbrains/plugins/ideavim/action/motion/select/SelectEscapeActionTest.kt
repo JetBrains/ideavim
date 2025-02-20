@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.select
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Caret
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -341,9 +342,11 @@ class SelectEscapeActionTest : VimTestCase() {
       """.trimIndent(),
       Mode.NORMAL(),
     )
-    kotlin.test.assertFalse(fixture.editor.caretModel.allCarets.any(Caret::hasSelection))
-    kotlin.test.assertEquals(1, fixture.editor.caretModel.caretCount)
-    assertCaretsVisualAttributes()
+    ApplicationManager.getApplication().runReadAction {
+      kotlin.test.assertFalse(fixture.editor.caretModel.allCarets.any(Caret::hasSelection))
+      kotlin.test.assertEquals(1, fixture.editor.caretModel.caretCount)
+      assertCaretsVisualAttributes()
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
@@ -369,9 +372,11 @@ class SelectEscapeActionTest : VimTestCase() {
       """.trimIndent(),
       Mode.NORMAL(),
     )
-    kotlin.test.assertFalse(fixture.editor.caretModel.allCarets.any(Caret::hasSelection))
-    kotlin.test.assertEquals(1, fixture.editor.caretModel.caretCount)
-    assertCaretsVisualAttributes()
+    ApplicationManager.getApplication().runReadAction {
+      kotlin.test.assertFalse(fixture.editor.caretModel.allCarets.any(Caret::hasSelection))
+      kotlin.test.assertEquals(1, fixture.editor.caretModel.caretCount)
+      assertCaretsVisualAttributes()
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
@@ -397,9 +402,11 @@ class SelectEscapeActionTest : VimTestCase() {
       """.trimIndent(),
       Mode.NORMAL(),
     )
-    kotlin.test.assertFalse(fixture.editor.caretModel.allCarets.any(Caret::hasSelection))
-    kotlin.test.assertEquals(1, fixture.editor.caretModel.caretCount)
-    assertCaretsVisualAttributes()
+    ApplicationManager.getApplication().runReadAction {
+      kotlin.test.assertFalse(fixture.editor.caretModel.allCarets.any(Caret::hasSelection))
+      kotlin.test.assertEquals(1, fixture.editor.caretModel.caretCount)
+      assertCaretsVisualAttributes()
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
@@ -425,8 +432,10 @@ class SelectEscapeActionTest : VimTestCase() {
       """.trimIndent(),
       Mode.NORMAL(),
     )
-    kotlin.test.assertFalse(fixture.editor.caretModel.allCarets.any(Caret::hasSelection))
-    kotlin.test.assertEquals(1, fixture.editor.caretModel.caretCount)
-    assertCaretsVisualAttributes()
+    ApplicationManager.getApplication().runReadAction {
+      kotlin.test.assertFalse(fixture.editor.caretModel.allCarets.any(Caret::hasSelection))
+      kotlin.test.assertEquals(1, fixture.editor.caretModel.caretCount)
+      assertCaretsVisualAttributes()
+    }
   }
 }

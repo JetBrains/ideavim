@@ -11,6 +11,7 @@ package org.jetbrains.plugins.ideavim.action.copy
 import com.intellij.codeInsight.editorActions.CopyPastePostProcessor
 import com.intellij.codeInsight.editorActions.CopyPastePreProcessor
 import com.intellij.codeInsight.editorActions.TextBlockTransferableData
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.CaretStateTransferableData
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiFile
@@ -88,14 +89,16 @@ class PutTestAfterCursorActionTest : VimTestCase() {
     val vimEditor = editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      before rangeOf "A Discovery\n",
-      SelectionType.LINE_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runReadAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        before rangeOf "A Discovery\n",
+        SelectionType.LINE_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("p"))
     val after = """
             A Discovery
@@ -130,18 +133,22 @@ class PutTestAfterCursorActionTest : VimTestCase() {
     val editor = configureByText(before)
     // Add Guard to simulate Notebook behaviour. See (VIM-2577)
     val guardRange = before rangeOf "\nGUARD\n"
-    editor.document.createGuardedBlock(guardRange.startOffset, guardRange.endOffset)
+    ApplicationManager.getApplication().runReadAction {
+      editor.document.createGuardedBlock(guardRange.startOffset, guardRange.endOffset)
+    }
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      before rangeOf "I found it in a legendary land\n",
-      SelectionType.LINE_WISE,
-      false,
-    )
+    ApplicationManager.getApplication().runReadAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        before rangeOf "I found it in a legendary land\n",
+        SelectionType.LINE_WISE,
+        false,
+      )
+    }
     typeText(injector.parser.parseKeys("p"))
     val after = """
             A Discovery
@@ -168,14 +175,16 @@ class PutTestAfterCursorActionTest : VimTestCase() {
     val vimEditor = editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      before rangeOf "Discovery",
-      SelectionType.CHARACTER_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runReadAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        before rangeOf "Discovery",
+        SelectionType.CHARACTER_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("vep"))
     val after = """
             A Discovery

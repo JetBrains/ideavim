@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.scroll
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Inlay
 import com.maddyhome.idea.vim.helper.EditorHelper
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
@@ -68,13 +69,15 @@ class ScrollFirstScreenColumnActionTest : VimTestCase() {
     configureByColumns(200)
     val inlay = addInlay(99, false, 5)
     typeText("100|", "zs")
-    val visibleArea = fixture.editor.scrollingModel.visibleArea
-    val textWidth = visibleArea.width - inlay.widthInPixels
-    val availableColumns = (textWidth / EditorHelper.getPlainSpaceWidthFloat(fixture.editor)).roundToInt()
+    ApplicationManager.getApplication().invokeAndWait {
+      val visibleArea = fixture.editor.scrollingModel.visibleArea
+      val textWidth = visibleArea.width - inlay.widthInPixels
+      val availableColumns = (textWidth / EditorHelper.getPlainSpaceWidthFloat(fixture.editor)).roundToInt()
 
-    // The first visible text column will be 99, with the inlay positioned to the left of it
-    assertVisibleLineBounds(0, 99, 99 + availableColumns - 1)
-    assertEquals(visibleArea.x, inlay.bounds!!.x)
+      // The first visible text column will be 99, with the inlay positioned to the left of it
+      assertVisibleLineBounds(0, 99, 99 + availableColumns - 1)
+      assertEquals(visibleArea.x, inlay.bounds!!.x)
+    }
   }
 
   @Test
@@ -92,8 +95,10 @@ class ScrollFirstScreenColumnActionTest : VimTestCase() {
     configureByColumns(200)
     val inlay = addInlay(100, false, 5)
     typeText("100|", "zs")
-    val availableColumns = getAvailableColumns(inlay)
-    assertVisibleLineBounds(0, 99, 99 + availableColumns - 1)
+    ApplicationManager.getApplication().invokeAndWait {
+      val availableColumns = getAvailableColumns(inlay)
+      assertVisibleLineBounds(0, 99, 99 + availableColumns - 1)
+    }
   }
 
   @Test
@@ -102,8 +107,10 @@ class ScrollFirstScreenColumnActionTest : VimTestCase() {
     configureByColumns(200)
     val inlay = addInlay(100, true, 5)
     typeText("100|", "zs")
-    val availableColumns = getAvailableColumns(inlay)
-    assertVisibleLineBounds(0, 99, 99 + availableColumns - 1)
+    ApplicationManager.getApplication().invokeAndWait {
+      val availableColumns = getAvailableColumns(inlay)
+      assertVisibleLineBounds(0, 99, 99 + availableColumns - 1)
+    }
   }
 
   private fun getAvailableColumns(inlay: Inlay<*>): Int {

@@ -47,7 +47,6 @@ import com.intellij.testFramework.PlatformTestUtil
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
-import com.intellij.testFramework.junit5.RunInEdt
 import com.intellij.util.ui.EmptyClipboardOwner
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
@@ -78,7 +77,6 @@ import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.ToKeysMappingInfo
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.listener.VimListenerManager
-import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.ijOptions
 import com.maddyhome.idea.vim.newapi.vim
@@ -113,31 +111,8 @@ import kotlin.test.assertTrue
  * To plugin writers: this class is internal, thus not allowed to be used by third-party plugins.
  * This is done as we have no mechanism to guarantee compatibility as we update this test case.
  * Feel free to copy this class into your plugin, or copy just needed functions.
- *
- * Deprecated: Use [IdeaVimTestCase]
- * Tests with [VimTestCase] are always started on the EDT with the write action. This is not only incorrect but also
- *   prevents an implementation of VIM-3376.
- *
- * If your test fails because of:
- * Missing EDT: Wrap with `ApplicationManager.getInstance().invokeAndWait { }`
- * Missing Write Action: Wrap with `ApplicationManager.getInstance().runWriteAction { }`
- * Missing Read Action: Wrap with `ApplicationManager.getInstance().runReadAction { }`
- *
- * This wrapping may be needed right in the test if there is a platform call in the test itself.
- *    E.g. `fixture.editor.foldingModel.runBatchFoldingOperation`.
- *
- * However, there is a chance that the platform call happens deep in IdeaVim code. IdeaVim historically uses
- *   very broad EDT and write action scopes. This means we wrap with the write action almost at the top of the
- *   call stack. This is incorrect, the write action should be taken only in the place where it's necessary.
- *   So, try to properly introduce a write/read action wrapping in the IdeaVim code. If it's too complicated,
- *   wrap with write/read action the call in the test and mark it that the action wrapping should be done deeper in the code.
  */
-@RunInEdt(writeIntent = true)
 @ApiStatus.Internal
-@Deprecated(
-  "Use IdeaVimTestCase instead",
-  replaceWith = ReplaceWith("IdeaVimTestCase", "org.jetbrains.plugins.ideavim.IdeaVimTestCase")
-)
 abstract class VimTestCase : IdeaVimTestCase() {
   object Checks {
     var caretShape: Boolean = true
@@ -245,7 +220,9 @@ abstract class IdeaVimTestCase {
 
   private fun setDefaultIntelliJSettings(editor: Editor) {
     // These settings don't have a global setting...
-    editor.settings.isCaretRowShown = IjOptions.cursorline.defaultValue.asBoolean()
+    ApplicationManager.getApplication().invokeAndWait {
+      editor.settings.isCaretRowShown = IjOptions.cursorline.defaultValue.asBoolean()
+    }
   }
 
   protected open fun createFixture(factory: IdeaTestFixtureFactory): CodeInsightTestFixture {
@@ -324,13 +301,17 @@ abstract class IdeaVimTestCase {
   protected fun setEditorVisibleSize(width: Int, height: Int) {
     val w = (width * EditorHelper.getPlainSpaceWidthFloat(fixture.editor)).roundToInt()
     val h = height * fixture.editor.lineHeight
-    EditorTestUtil.setEditorVisibleSizeInPixels(fixture.editor, w, h)
+    ApplicationManager.getApplication().invokeAndWait {
+      EditorTestUtil.setEditorVisibleSizeInPixels(fixture.editor, w, h)
+    }
   }
 
   protected fun setEditorVirtualSpace() {
-    // Enable virtual space at the bottom of the file and force a layout to pick up the changes
-    fixture.editor.settings.isAdditionalPageAtBottom = true
-    (fixture.editor as EditorEx).scrollPane.viewport.doLayout()
+    ApplicationManager.getApplication().invokeAndWait {
+      // Enable virtual space at the bottom of the file and force a layout to pick up the changes
+      fixture.editor.settings.isAdditionalPageAtBottom = true
+      (fixture.editor as EditorEx).scrollPane.viewport.doLayout()
+    }
   }
 
   protected fun configureByText(content: String) = configureByText(PlainTextFileType.INSTANCE, content)
@@ -340,17 +321,21 @@ abstract class IdeaVimTestCase {
 
   protected fun configureAndGuard(content: String) {
     val ranges = extractBrackets(content)
-    for ((start, end) in ranges) {
-      fixture.editor.document.createGuardedBlock(start, end)
+    ApplicationManager.getApplication().runReadAction {
+      for ((start, end) in ranges) {
+        fixture.editor.document.createGuardedBlock(start, end)
+      }
     }
   }
 
   protected fun configureAndFold(content: String, @Suppress("SameParameterValue") placeholder: String) {
     val ranges = extractBrackets(content)
-    fixture.editor.foldingModel.runBatchFoldingOperation {
-      for ((start, end) in ranges) {
-        val foldRegion = fixture.editor.foldingModel.addFoldRegion(start, end, placeholder)
-        foldRegion?.isExpanded = false
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.foldingModel.runBatchFoldingOperation {
+        for ((start, end) in ranges) {
+          val foldRegion = fixture.editor.foldingModel.addFoldRegion(start, end, placeholder)
+          foldRegion?.isExpanded = false
+        }
       }
     }
   }
@@ -462,12 +447,14 @@ abstract class IdeaVimTestCase {
     assertTopLogicalLine(scrollToLogicalLine)
     assertPosition(caretLogicalLine, caretLogicalColumn)
 
-    // Belt and braces. Let's make sure that the caret is fully onscreen
-    val bottomLogicalLine = fixture.editor.vim.visualLineToBufferLine(
-      EditorHelper.getVisualLineAtBottomOfScreen(fixture.editor),
-    )
-    assertTrue(bottomLogicalLine >= caretLogicalLine)
-    assertTrue(caretLogicalLine >= scrollToLogicalLine)
+    ApplicationManager.getApplication().invokeAndWait {
+      // Belt and braces. Let's make sure that the caret is fully onscreen
+      val bottomLogicalLine = fixture.editor.vim.visualLineToBufferLine(
+        EditorHelper.getVisualLineAtBottomOfScreen(fixture.editor),
+      )
+      assertTrue(bottomLogicalLine >= caretLogicalLine)
+      assertTrue(caretLogicalLine >= scrollToLogicalLine)
+    }
   }
 
   protected fun typeText(vararg keys: String) = typeText(keys.flatMap { injector.parser.parseKeys(it) })
@@ -651,36 +638,46 @@ abstract class IdeaVimTestCase {
 
   // Use logical rather than visual lines, so we can correctly test handling of collapsed folds and soft wraps
   fun assertVisibleArea(topLogicalLine: Int, bottomLogicalLine: Int) {
-    assertTopLogicalLine(topLogicalLine)
-    assertBottomLogicalLine(bottomLogicalLine)
+    ApplicationManager.getApplication().invokeAndWait {
+      ApplicationManager.getApplication().runReadAction {
+        assertTopLogicalLine(topLogicalLine)
+        assertBottomLogicalLine(bottomLogicalLine)
+      }
+    }
   }
 
   fun assertTopLogicalLine(topLogicalLine: Int) {
-    val actualVisualTop = EditorHelper.getVisualLineAtTopOfScreen(fixture.editor)
-    val actualLogicalTop = fixture.editor.vim.visualLineToBufferLine(actualVisualTop)
+    ApplicationManager.getApplication().invokeAndWait {
+      val actualVisualTop = EditorHelper.getVisualLineAtTopOfScreen(fixture.editor)
+      val actualLogicalTop = fixture.editor.vim.visualLineToBufferLine(actualVisualTop)
 
-    assertEquals(topLogicalLine, actualLogicalTop, "Top logical lines don't match")
+      assertEquals(topLogicalLine, actualLogicalTop, "Top logical lines don't match")
+    }
   }
 
   fun assertBottomLogicalLine(bottomLogicalLine: Int) {
-    val actualVisualBottom = EditorHelper.getVisualLineAtBottomOfScreen(fixture.editor)
-    val actualLogicalBottom = fixture.editor.vim.visualLineToBufferLine(actualVisualBottom)
+    ApplicationManager.getApplication().invokeAndWait {
+      val actualVisualBottom = EditorHelper.getVisualLineAtBottomOfScreen(fixture.editor)
+      val actualLogicalBottom = fixture.editor.vim.visualLineToBufferLine(actualVisualBottom)
 
-    assertEquals(bottomLogicalLine, actualLogicalBottom, "Bottom logical lines don't match")
+      assertEquals(bottomLogicalLine, actualLogicalBottom, "Bottom logical lines don't match")
+    }
   }
 
   fun assertVisibleLineBounds(logicalLine: Int, leftLogicalColumn: Int, rightLogicalColumn: Int) {
-    val visualLine = IjVimEditor(fixture.editor).bufferLineToVisualLine(logicalLine)
-    val actualLeftVisualColumn = EditorHelper.getVisualColumnAtLeftOfDisplay(fixture.editor, visualLine)
-    val actualLeftLogicalColumn =
-      fixture.editor.visualToLogicalPosition(VisualPosition(visualLine, actualLeftVisualColumn)).column
-    val actualRightVisualColumn = EditorHelper.getVisualColumnAtRightOfDisplay(fixture.editor, visualLine)
-    val actualRightLogicalColumn =
-      fixture.editor.visualToLogicalPosition(VisualPosition(visualLine, actualRightVisualColumn)).column
+    ApplicationManager.getApplication().invokeAndWait {
+      val visualLine = fixture.editor.vim.bufferLineToVisualLine(logicalLine)
+      val actualLeftVisualColumn = EditorHelper.getVisualColumnAtLeftOfDisplay(fixture.editor, visualLine)
+      val actualLeftLogicalColumn =
+        fixture.editor.visualToLogicalPosition(VisualPosition(visualLine, actualLeftVisualColumn)).column
+      val actualRightVisualColumn = EditorHelper.getVisualColumnAtRightOfDisplay(fixture.editor, visualLine)
+      val actualRightLogicalColumn =
+        fixture.editor.visualToLogicalPosition(VisualPosition(visualLine, actualRightVisualColumn)).column
 
-    val expected = ScreenBounds(leftLogicalColumn, rightLogicalColumn)
-    val actual = ScreenBounds(actualLeftLogicalColumn, actualRightLogicalColumn)
-    assertEquals(expected, actual)
+      val expected = ScreenBounds(leftLogicalColumn, rightLogicalColumn)
+      val actual = ScreenBounds(actualLeftLogicalColumn, actualRightLogicalColumn)
+      assertEquals(expected, actual)
+    }
   }
 
   fun assertLineCount(expected: Int) {
@@ -953,8 +950,12 @@ abstract class IdeaVimTestCase {
     relatesToPrecedingText: Boolean,
     @Suppress("SameParameterValue") widthInColumns: Int,
   ): Inlay<*> {
-    val widthInPixels = (EditorHelper.getPlainSpaceWidthFloat(fixture.editor) * widthInColumns).roundToInt()
-    return EditorTestUtil.addInlay(fixture.editor, offset, relatesToPrecedingText, widthInPixels)
+    var inlay: Inlay<*>? = null
+    ApplicationManager.getApplication().invokeAndWait {
+      val widthInPixels = (EditorHelper.getPlainSpaceWidthFloat(fixture.editor) * widthInColumns).roundToInt()
+      inlay = EditorTestUtil.addInlay(fixture.editor, offset, relatesToPrecedingText, widthInPixels)
+    }
+    return inlay!!
   }
 
   // As for inline inlays, height is specified as a multiplier of line height, as we can't guarantee the same line
@@ -969,7 +970,11 @@ abstract class IdeaVimTestCase {
     val widthInColumns = 10 // Arbitrary width. We don't care.
     val widthInPixels = (EditorHelper.getPlainSpaceWidthFloat(fixture.editor) * widthInColumns).roundToInt()
     val heightInPixels = fixture.editor.lineHeight * heightInRows
-    return EditorTestUtil.addBlockInlay(fixture.editor, offset, false, showAbove, widthInPixels, heightInPixels)
+    var inlay: Inlay<*>? = null
+    ApplicationManager.getApplication().invokeAndWait {
+      inlay = EditorTestUtil.addBlockInlay(fixture.editor, offset, false, showAbove, widthInPixels, heightInPixels)
+    }
+    return inlay!!
   }
 
   // Disable or enable checks for the particular test

@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action
 
+import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
@@ -27,7 +28,9 @@ class ResetModeActionTest : VimTestCase() {
     val before = "Lorem Ipsum"
     val after = "Lorem Ipsum"
     doTest(keys, before, after, Mode.NORMAL())
-    kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
+    ApplicationManager.getApplication().runReadAction {
+      kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
+    }
   }
 
   @Test
@@ -36,7 +39,9 @@ class ResetModeActionTest : VimTestCase() {
     val before = "Lorem Ipsum"
     val after = "Lorem Ipsum"
     doTest(keys, before, after, Mode.NORMAL())
-    kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
+    ApplicationManager.getApplication().runReadAction {
+      kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
+    }
   }
 
   @Test
@@ -45,7 +50,9 @@ class ResetModeActionTest : VimTestCase() {
     val before = "A Disc${c}overy"
     val after = "A Dis${c}covery"
     doTest(keys, before, after, Mode.NORMAL())
-    kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
+    ApplicationManager.getApplication().runReadAction {
+      kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
+    }
   }
 
   @Test
@@ -54,7 +61,9 @@ class ResetModeActionTest : VimTestCase() {
     val before = "${c}Lorem Ipsum"
     val after = "Lorem Ipsum"
     doTest(keys, before, after, Mode.NORMAL())
-    kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
+    ApplicationManager.getApplication().runReadAction {
+      kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
+    }
   }
 
   @Test
@@ -63,7 +72,9 @@ class ResetModeActionTest : VimTestCase() {
     val before = "Lorem Ipsum"
     val after = "Lorem Ipsum"
     doTest(keys, before, after, Mode.NORMAL())
-    kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
+    ApplicationManager.getApplication().runReadAction {
+      kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
+    }
   }
 
   @Test
@@ -72,7 +83,9 @@ class ResetModeActionTest : VimTestCase() {
     val before = "Lorem Ipsum"
     val after = "Lorem Ipsum"
     doTest(keys, before, after, Mode.NORMAL())
-    kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
+    ApplicationManager.getApplication().runReadAction {
+      kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
+    }
   }
 
   @Test
@@ -81,7 +94,9 @@ class ResetModeActionTest : VimTestCase() {
     val before = "Lorem Ipsum"
     val after = "Lorem Ipsum"
     doTest(keys, before, after, Mode.NORMAL())
-    kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
+    ApplicationManager.getApplication().runReadAction {
+      kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
+    }
   }
 
   @Test
@@ -90,7 +105,9 @@ class ResetModeActionTest : VimTestCase() {
     val before = "Lorem Ipsum"
     val after = "Ipsum"
     doTest(keys, before, after, Mode.NORMAL())
-    kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
+    ApplicationManager.getApplication().runReadAction {
+      kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
+    }
   }
 
   @Test
@@ -99,7 +116,9 @@ class ResetModeActionTest : VimTestCase() {
     val before = "Lorem Ipsum"
     val after = "Ipsum"
     doTest(keys, before, after, Mode.NORMAL())
-    kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
+    ApplicationManager.getApplication().runReadAction {
+      kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
+    }
   }
 
   @Test
@@ -108,7 +127,9 @@ class ResetModeActionTest : VimTestCase() {
     val before = "Lorem Ipsum"
     val after = "Ipsum"
     doTest(keys, before, after, Mode.NORMAL())
-    kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
+    ApplicationManager.getApplication().runReadAction {
+      kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.CTRL_CODES)
@@ -118,7 +139,9 @@ class ResetModeActionTest : VimTestCase() {
     val before = "Lorem Ipsum"
     val after = "Ipsum"
     doTest(keys, before, after, Mode.NORMAL())
-    kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
+    ApplicationManager.getApplication().runReadAction {
+      kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.MAPPING)
@@ -137,7 +160,9 @@ class ResetModeActionTest : VimTestCase() {
     val before = "Lorem Ipsum"
     val after = "Ipsum"
     doTest(keys, before, after, Mode.NORMAL())
-    kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
+    ApplicationManager.getApplication().runReadAction {
+      kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
+    }
   }
 
   @Test
@@ -146,7 +171,9 @@ class ResetModeActionTest : VimTestCase() {
     val before = "Lorem Ipsum"
     val after = "Lnotherorem Ipsum"
     doTest(keys, before, after, Mode.INSERT)
-    kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
+    ApplicationManager.getApplication().runReadAction {
+      kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
+    }
   }
 
   @Test
@@ -155,6 +182,8 @@ class ResetModeActionTest : VimTestCase() {
     val before = "A ${c}Discovery"
     val after = "A "
     doTest(keys, before, after, Mode.NORMAL())
-    kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
+    ApplicationManager.getApplication().runReadAction {
+      kotlin.test.assertFalse(fixture.editor.selectionModel.hasSelection())
+    }
   }
 }

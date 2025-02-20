@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.scroll
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Inlay
 import com.maddyhome.idea.vim.helper.EditorHelper
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -103,17 +104,19 @@ class ScrollLastScreenColumnActionTest : VimTestCase() {
     configureByColumns(200)
     val inlay = addInlay(100, true, 5)
     typeText("100|", "ze")
-    val visibleArea = fixture.editor.scrollingModel.visibleArea
-    val textWidth = visibleArea.width - inlay.widthInPixels
-    val availableColumns = (textWidth / EditorHelper.getPlainSpaceWidthFloat(fixture.editor)).roundToInt()
+    ApplicationManager.getApplication().invokeAndWait {
+      val visibleArea = fixture.editor.scrollingModel.visibleArea
+      val textWidth = visibleArea.width - inlay.widthInPixels
+      val availableColumns = (textWidth / EditorHelper.getPlainSpaceWidthFloat(fixture.editor)).roundToInt()
 
-    // The last visible text column will be 99, but it will be positioned before the inlay
-    assertVisibleLineBounds(0, 99 - availableColumns + 1, 99)
+      // The last visible text column will be 99, but it will be positioned before the inlay
+      assertVisibleLineBounds(0, 99 - availableColumns + 1, 99)
 
-    // We have to assert the location of the inlay
-    val inlayX = fixture.editor.visualPositionToPoint2D(inlay.visualPosition).x.roundToInt()
-    assertEquals(visibleArea.x + textWidth, inlayX)
-    assertEquals(visibleArea.x + visibleArea.width, inlayX + inlay.widthInPixels)
+      // We have to assert the location of the inlay
+      val inlayX = fixture.editor.visualPositionToPoint2D(inlay.visualPosition).x.roundToInt()
+      assertEquals(visibleArea.x + textWidth, inlayX)
+      assertEquals(visibleArea.x + visibleArea.width, inlayX + inlay.widthInPixels)
+    }
   }
 
   @Test
@@ -127,7 +130,11 @@ class ScrollLastScreenColumnActionTest : VimTestCase() {
   }
 
   private fun getAvailableColumns(inlay: Inlay<*>): Int {
-    val textWidth = fixture.editor.scrollingModel.visibleArea.width - inlay.widthInPixels
-    return (textWidth / EditorHelper.getPlainSpaceWidthFloat(fixture.editor)).roundToInt()
+    var res: Int? = null
+    ApplicationManager.getApplication().invokeAndWait {
+      val textWidth = fixture.editor.scrollingModel.visibleArea.width - inlay.widthInPixels
+       res = (textWidth / EditorHelper.getPlainSpaceWidthFloat(fixture.editor)).roundToInt()
+    }
+    return res!!
   }
 }

@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.ex
 
 import com.intellij.idea.TestFor
+import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
@@ -96,7 +97,11 @@ class ExEntryTest : VimTestCase() {
     assertIsDeactivated()
 
     deactivateExEntry()
-    VimPlugin.getOptionGroup().resetAllOptions(fixture.editor.vim)
+    ApplicationManager.getApplication().invokeAndWait {
+      ApplicationManager.getApplication().runReadAction {
+        VimPlugin.getOptionGroup().resetAllOptions(fixture.editor.vim)
+      }
+    }
 
     assertFalse(options().incsearch)
     typeExInput(":set incsearch<C-J>")
@@ -104,7 +109,9 @@ class ExEntryTest : VimTestCase() {
     assertIsDeactivated()
 
     deactivateExEntry()
-    VimPlugin.getOptionGroup().resetAllOptions(fixture.editor.vim)
+    ApplicationManager.getApplication().runReadAction {
+      VimPlugin.getOptionGroup().resetAllOptions(fixture.editor.vim)
+    }
 
     assertFalse(options().incsearch)
     typeExInput(":set incsearch<C-M>")

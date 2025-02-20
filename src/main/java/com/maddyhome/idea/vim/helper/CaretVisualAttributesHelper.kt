@@ -15,6 +15,7 @@ import com.intellij.openapi.editor.CaretVisualAttributes
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
+import com.intellij.util.concurrency.annotations.RequiresEdt
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.globalOptions
@@ -88,7 +89,9 @@ private fun isBlockCursorOverride() = EditorSettingsExternalizable.getInstance()
 private fun Editor.updatePrimaryCaretVisualAttributes() {
   if (VimPlugin.isNotEnabled()) thisLogger().error("The caret attributes should not be updated if the IdeaVim is disabled")
   if (isIdeaVimDisabledHere) return
-  caretModel.primaryCaret.visualAttributes = AttributesCache.getCaretVisualAttributes(this)
+  ApplicationManager.getApplication().invokeAndWait {
+    caretModel.primaryCaret.visualAttributes = AttributesCache.getCaretVisualAttributes(this)
+  }
 
   // Make sure the caret is visible as soon as it's set. It might be invisible while blinking
   // NOTE: At the moment, this causes project leak in tests
@@ -163,12 +166,14 @@ class CaretVisualAttributesListener : IsReplaceCharListener, ModeChangeListener,
     updateCaretsVisual(editor)
   }
 
+  @RequiresEdt
   private fun updateCaretsVisual(editor: VimEditor) {
     val ijEditor = (editor as IjVimEditor).editor
     ijEditor.updateCaretsVisualAttributes()
     ijEditor.updateCaretsVisualPosition()
   }
 
+  @RequiresEdt
   fun updateAllEditorsCaretsVisual() {
     injector.editorGroup.getEditors().forEach { editor ->
       updateCaretsVisual(editor)

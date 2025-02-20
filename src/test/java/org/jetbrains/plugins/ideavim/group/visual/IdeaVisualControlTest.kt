@@ -13,6 +13,7 @@ package org.jetbrains.plugins.ideavim.group.visual
 import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.codeInsight.template.impl.ConstantNode
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl
+import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer
@@ -691,7 +692,9 @@ class IdeaVisualControlTest : VimTestCase() {
     VimListenerManager.EditorListeners.addAll()
     assertMode(Mode.NORMAL())
 
-    fixture.editor.selectionModel.setSelection(5, 10)
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.selectionModel.setSelection(5, 10)
+    }
 
     waitAndAssertMode(fixture, Mode.SELECT(SelectionType.CHARACTER_WISE))
   }
@@ -710,7 +713,9 @@ class IdeaVisualControlTest : VimTestCase() {
     VimListenerManager.EditorListeners.addAll()
     assertMode(Mode.NORMAL())
 
-    fixture.editor.selectionModel.setSelection(5, 10)
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.selectionModel.setSelection(5, 10)
+    }
 
     waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
   }
@@ -729,7 +734,9 @@ class IdeaVisualControlTest : VimTestCase() {
     typeText(injector.parser.parseKeys("V"))
     assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
 
-    fixture.editor.selectionModel.setSelection(2, 5)
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.selectionModel.setSelection(2, 5)
+    }
     IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
 
     waitAndAssert { fixture.editor.vim.mode.selectionType == SelectionType.CHARACTER_WISE }
@@ -751,17 +758,21 @@ class IdeaVisualControlTest : VimTestCase() {
 
     startDummyTemplate()
 
-    VimVisualTimer.doNow()
+    ApplicationManager.getApplication().invokeAndWait {
+      VimVisualTimer.doNow()
+    }
 
     typeText(injector.parser.parseKeys("<esc>V"))
     assertMode(Mode.VISUAL(SelectionType.LINE_WISE))
 
-    fixture.editor.selectionModel.setSelection(2, 5)
-    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.selectionModel.setSelection(2, 5)
+      IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
 
-    waitAndAssert { fixture.editor.vim.mode.selectionType == SelectionType.CHARACTER_WISE }
-    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
-    assertCaretsVisualAttributes()
+      waitAndAssert { fixture.editor.vim.mode.selectionType == SelectionType.CHARACTER_WISE }
+      assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
+      assertCaretsVisualAttributes()
+    }
   }
 
   @OptionTest(VimOption(TestOptionConstants.selectmode, limitedValues = [""]))
@@ -782,10 +793,14 @@ class IdeaVisualControlTest : VimTestCase() {
   }
 
   private fun startDummyTemplate() {
-    TemplateManagerImpl.setTemplateTesting(fixture.testRootDisposable)
-    val templateManager = TemplateManager.getInstance(fixture.project)
-    val createdTemplate = templateManager.createTemplate("", "")
-    createdTemplate.addVariable(ConstantNode("1"), true)
-    templateManager.startTemplate(fixture.editor, createdTemplate)
+    ApplicationManager.getApplication().invokeAndWait {
+      ApplicationManager.getApplication().runWriteIntentReadAction<Any, Throwable> {
+        TemplateManagerImpl.setTemplateTesting(fixture.testRootDisposable)
+        val templateManager = TemplateManager.getInstance(fixture.project)
+        val createdTemplate = templateManager.createTemplate("", "")
+        createdTemplate.addVariable(ConstantNode("1"), true)
+        templateManager.startTemplate(fixture.editor, createdTemplate)
+      }
+    }
   }
 }

@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.option.overrides
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
@@ -39,7 +40,9 @@ class SideScrollOptionMapperTest : VimTestCase() {
   @Suppress("SameParameterValue")
   private fun switchToNewFile(filename: String, content: String) {
     // This replaces fixture.editor
-    fixture.openFileInEditor(fixture.createFile(filename, content))
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.openFileInEditor(fixture.createFile(filename, content))
+    }
 
     // But our selection changed callback doesn't get called immediately, and that callback will deactivate the ex entry
     // panel (which causes problems if our next command is `:set`). So type something (`0` is a good no-op) to give time

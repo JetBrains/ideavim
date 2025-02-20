@@ -160,7 +160,9 @@ internal object VimListenerManager {
     injector.listenersNotifier.myEditorListeners.add(caretVisualAttributesListener)
     injector.listenersNotifier.modeChangeListeners.add(caretVisualAttributesListener)
     injector.listenersNotifier.isReplaceCharListeners.add(caretVisualAttributesListener)
-    caretVisualAttributesListener.updateAllEditorsCaretsVisual()
+    ApplicationManager.getApplication().invokeAndWait {
+      caretVisualAttributesListener.updateAllEditorsCaretsVisual()
+    }
 
     val insertTimeRecorder = InsertTimeRecorder()
     injector.listenersNotifier.modeChangeListeners.add(insertTimeRecorder)
@@ -328,7 +330,9 @@ internal object VimListenerManager {
       injector.listenersNotifier.notifyEditorCreated(vimEditor)
 
       Disposer.register(perEditorDisposable) {
-        VimPlugin.getEditor().editorDeinit(editor)
+        ApplicationManager.getApplication().invokeLater {
+          VimPlugin.getEditor().editorDeinit(editor)
+        }
       }
     }
 

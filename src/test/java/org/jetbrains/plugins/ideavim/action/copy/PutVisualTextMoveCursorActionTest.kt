@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.copy
 
+import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.newapi.vim
@@ -34,14 +35,16 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
     val vimEditor = editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      TextRange(16, 25),
-      SelectionType.CHARACTER_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runReadAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        TextRange(16, 25),
+        SelectionType.CHARACTER_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("v2e" + "2gp"))
     val after = "legendarylegendary$c in a legendary land"
     assertState(after)
@@ -55,14 +58,16 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
     val vimEditor = editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      TextRange(16, 25),
-      SelectionType.LINE_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runReadAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        TextRange(16, 25),
+        SelectionType.LINE_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("v2e" + "gp"))
     val after = """
 
@@ -80,14 +85,16 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
     val vimEditor = editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      TextRange(16, 25),
-      SelectionType.CHARACTER_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runReadAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        TextRange(16, 25),
+        SelectionType.CHARACTER_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("V" + "gp"))
     val after = "legendary\n$c"
     assertState(after)
@@ -116,14 +123,16 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
     val vimEditor = editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      TextRange(2, 11),
-      SelectionType.LINE_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runReadAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        TextRange(2, 11),
+        SelectionType.LINE_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("V" + "gp"))
     assertState(newFile)
   }
@@ -171,14 +180,16 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
     val vimEditor = editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      TextRange(16, 25),
-      SelectionType.LINE_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runReadAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        TextRange(16, 25),
+        SelectionType.LINE_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("v2e" + "gP"))
     val after = """
 
@@ -196,14 +207,16 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
     val vimEditor = editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      TextRange(16, 25),
-      SelectionType.CHARACTER_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runReadAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        TextRange(16, 25),
+        SelectionType.CHARACTER_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("v2e" + "2gP"))
     val after = "legendarylegendary$c in a legendary land"
     assertState(after)
@@ -217,14 +230,16 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
     val vimEditor = editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      TextRange(16, 25),
-      SelectionType.CHARACTER_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runReadAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        TextRange(16, 25),
+        SelectionType.CHARACTER_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("v$" + "2gP"))
     val after = "legendarylegendar${c}y"
     assertState(after)
@@ -238,14 +253,16 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
     val vimEditor = editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      TextRange(16, 25),
-      SelectionType.CHARACTER_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runReadAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        TextRange(16, 25),
+        SelectionType.CHARACTER_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("V" + "gP"))
     val after = "legendary\n$c"
     assertState(after)
@@ -385,14 +402,16 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
     val vimEditor = editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      TextRange(16, 19),
-      SelectionType.LINE_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runReadAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        TextRange(16, 19),
+        SelectionType.LINE_WISE,
+        false
+      )
+    }
     typeText(injector.parser.parseKeys("<C-v>" + "h" + "gp"))
     val after = """
             q

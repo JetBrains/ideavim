@@ -47,9 +47,11 @@ class NonVimVisualChangeTest : VimTestCase() {
     )
     typeText("i")
     assertMode(Mode.INSERT)
-    ApplicationManager.getApplication().runWriteAction {
-      CommandProcessor.getInstance().runUndoTransparentAction {
-        BackspaceHandler.deleteToTargetPosition(fixture.editor, LogicalPosition(2, 0))
+    ApplicationManager.getApplication().invokeAndWait {
+      ApplicationManager.getApplication().runWriteAction {
+        CommandProcessor.getInstance().runUndoTransparentAction {
+          BackspaceHandler.deleteToTargetPosition(fixture.editor, LogicalPosition(2, 0))
+        }
       }
     }
     assertState(
@@ -82,8 +84,10 @@ class NonVimVisualChangeTest : VimTestCase() {
     assertMode(Mode.INSERT)
 
     // Fast add and remove selection
-    fixture.editor.selectionModel.setSelection(0, 10)
-    fixture.editor.selectionModel.removeSelection()
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.selectionModel.setSelection(0, 10)
+      fixture.editor.selectionModel.removeSelection()
+    }
 
     assertDoesntChange { fixture.editor.vim.mode == Mode.INSERT }
   }
@@ -105,9 +109,11 @@ class NonVimVisualChangeTest : VimTestCase() {
     assertMode(Mode.INSERT)
 
     // Fast add and remove selection
-    fixture.editor.selectionModel.setSelection(0, 10)
-    fixture.editor.selectionModel.removeSelection()
-    fixture.editor.selectionModel.setSelection(0, 10)
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.selectionModel.setSelection(0, 10)
+      fixture.editor.selectionModel.removeSelection()
+      fixture.editor.selectionModel.setSelection(0, 10)
+    }
 
     waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
   }
@@ -128,12 +134,16 @@ class NonVimVisualChangeTest : VimTestCase() {
     assertMode(Mode.INSERT)
 
     val range = text.rangeOf("Discovery")
-    fixture.editor.selectionModel.setSelection(range.startOffset, range.endOffset)
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.selectionModel.setSelection(range.startOffset, range.endOffset)
+    }
     waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
     assertEquals(SelectionType.CHARACTER_WISE, fixture.editor.vim.mode.selectionType)
 
     val rangeLine = text.rangeOf("A Discovery\n")
-    fixture.editor.selectionModel.setSelection(rangeLine.startOffset, rangeLine.endOffset)
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.selectionModel.setSelection(rangeLine.startOffset, rangeLine.endOffset)
+    }
     waitAndAssert { fixture.editor.vim.mode.selectionType == SelectionType.LINE_WISE }
   }
 }

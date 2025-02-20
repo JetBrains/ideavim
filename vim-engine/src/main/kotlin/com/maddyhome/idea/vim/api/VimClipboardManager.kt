@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.VimCopiedText
+import com.maddyhome.idea.vim.helper.RWLockLabel
 import java.awt.datatransfer.Transferable
 
 /**
@@ -50,6 +51,7 @@ interface VimClipboardManager {
 
   fun dumbCopiedText(text: String): VimCopiedText // TODO this method is NOT preffered, it does not collect transferableData
 
+  @RWLockLabel.Readonly
   fun getTransferableData(vimEditor: VimEditor, textRange: TextRange): List<Any>
 
   fun preprocessText(

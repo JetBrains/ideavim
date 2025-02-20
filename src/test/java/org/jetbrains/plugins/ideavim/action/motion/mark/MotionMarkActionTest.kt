@@ -10,6 +10,7 @@ package org.jetbrains.plugins.ideavim.action.motion.mark
 
 import com.intellij.ide.bookmark.BookmarksManager
 import com.intellij.ide.bookmark.LineBookmark
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.createLineBookmark
@@ -101,7 +102,9 @@ class MotionMarkActionTest : VimTestCase() {
     """.trimIndent()
     configureByText(text)
     fixture.project.createLineBookmark(fixture.editor, 2, 'A')
-    PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+    ApplicationManager.getApplication().invokeAndWait {
+      PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+    }
     val vimMarks = injector.markService.getAllGlobalMarks()
     kotlin.test.assertEquals(1, vimMarks.size)
     kotlin.test.assertEquals('A', vimMarks.first().key)
@@ -123,7 +126,9 @@ class MotionMarkActionTest : VimTestCase() {
 
     BookmarksManager.getInstance(fixture.project)?.remove(bookmark!!)
     fixture.project.createLineBookmark(fixture.editor, 4, 'A')
-    PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+    ApplicationManager.getApplication().invokeAndWait {
+      PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+    }
     val vimMarks = injector.markService.getAllGlobalMarks()
     kotlin.test.assertEquals(1, vimMarks.size)
     val mark = vimMarks.first()

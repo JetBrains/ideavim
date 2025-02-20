@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.helper
 
+import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.helper.EditorHelper
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -21,10 +22,12 @@ class EditorHelperTest : VimTestCase() {
   @Test
   fun `test scroll column to left of screen`() {
     configureByColumns(100)
-    EditorHelper.scrollColumnToLeftOfScreen(fixture.editor, 0, 2)
-    val visibleArea = fixture.editor.scrollingModel.visibleArea
-    val columnWidth = EditorHelper.getPlainSpaceWidthFloat(fixture.editor)
-    assertEquals((2 * columnWidth).roundToInt(), visibleArea.x)
+    ApplicationManager.getApplication().invokeAndWait {
+      EditorHelper.scrollColumnToLeftOfScreen(fixture.editor, 0, 2)
+      val visibleArea = fixture.editor.scrollingModel.visibleArea
+      val columnWidth = EditorHelper.getPlainSpaceWidthFloat(fixture.editor)
+      assertEquals((2 * columnWidth).roundToInt(), visibleArea.x)
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
@@ -32,10 +35,12 @@ class EditorHelperTest : VimTestCase() {
   fun `test scroll column to right of screen`() {
     configureByColumns(100)
     val column = screenWidth + 2
-    EditorHelper.scrollColumnToRightOfScreen(fixture.editor, 0, column)
-    val visibleArea = fixture.editor.scrollingModel.visibleArea
-    val columnWidth = EditorHelper.getPlainSpaceWidthFloat(fixture.editor)
-    assertEquals(((column - screenWidth + 1) * columnWidth).roundToInt(), visibleArea.x)
+    ApplicationManager.getApplication().invokeAndWait {
+      EditorHelper.scrollColumnToRightOfScreen(fixture.editor, 0, column)
+      val visibleArea = fixture.editor.scrollingModel.visibleArea
+      val columnWidth = EditorHelper.getPlainSpaceWidthFloat(fixture.editor)
+      assertEquals(((column - screenWidth + 1) * columnWidth).roundToInt(), visibleArea.x)
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
@@ -45,10 +50,12 @@ class EditorHelperTest : VimTestCase() {
     // For an 80 column screen, moving a column to the centre should position it in column 41 (1 based) - 40 columns on
     // the left, mid point, 39 columns on the right
     // Put column 100 into position 41 -> offset is 59 columns
-    EditorHelper.scrollColumnToMiddleOfScreen(fixture.editor, 0, 99)
-    val visibleArea = fixture.editor.scrollingModel.visibleArea
-    val columnWidth = EditorHelper.getPlainSpaceWidthFloat(fixture.editor)
-    assertEquals((59 * columnWidth).roundToInt(), visibleArea.x)
+    ApplicationManager.getApplication().invokeAndWait {
+      EditorHelper.scrollColumnToMiddleOfScreen(fixture.editor, 0, 99)
+      val visibleArea = fixture.editor.scrollingModel.visibleArea
+      val columnWidth = EditorHelper.getPlainSpaceWidthFloat(fixture.editor)
+      assertEquals((59 * columnWidth).roundToInt(), visibleArea.x)
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
@@ -59,9 +66,11 @@ class EditorHelperTest : VimTestCase() {
     // For an 81 column screen, moving a column to the centre should position it in column 41 (1 based) - 40 columns on
     // the left, mid point, 40 columns on the right
     // Put column 100 into position 41 -> offset is 59 columns
-    EditorHelper.scrollColumnToMiddleOfScreen(fixture.editor, 0, 99)
-    val visibleArea = fixture.editor.scrollingModel.visibleArea
-    val columnWidth = EditorHelper.getPlainSpaceWidthFloat(fixture.editor)
-    assertEquals((59 * columnWidth).roundToInt(), visibleArea.x)
+    ApplicationManager.getApplication().invokeAndWait {
+      EditorHelper.scrollColumnToMiddleOfScreen(fixture.editor, 0, 99)
+      val visibleArea = fixture.editor.scrollingModel.visibleArea
+      val columnWidth = EditorHelper.getPlainSpaceWidthFloat(fixture.editor)
+      assertEquals((59 * columnWidth).roundToInt(), visibleArea.x)
+    }
   }
 }

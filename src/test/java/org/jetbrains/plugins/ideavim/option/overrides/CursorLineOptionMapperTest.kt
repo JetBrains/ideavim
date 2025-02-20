@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.option.overrides
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.intellij.openapi.editor.impl.SettingsImpl
 import com.maddyhome.idea.vim.group.IjOptions
@@ -32,7 +33,9 @@ class CursorLineOptionMapperTest : VimTestCase() {
   @Suppress("SameParameterValue")
   private fun switchToNewFile(filename: String, content: String) {
     // This replaces fixture.editor
-    fixture.openFileInEditor(fixture.createFile(filename, content))
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.openFileInEditor(fixture.createFile(filename, content))
+    }
 
     // But our selection changed callback doesn't get called immediately, and that callback will deactivate the ex entry
     // panel (which causes problems if our next command is `:set`). So type something (`0` is a good no-op) to give time
@@ -48,41 +51,51 @@ class CursorLineOptionMapperTest : VimTestCase() {
 
   @Test
   fun `test 'cursorline' defaults to global intellij setting`() {
-    (fixture.editor.settings as SettingsImpl).getState().apply { clearOverriding(this::myCaretRowShown) }
-    assertTrue(EditorSettingsExternalizable.getInstance().isCaretRowShown)
-    assertTrue(optionsIj().cursorline)
+    ApplicationManager.getApplication().invokeAndWait {
+      (fixture.editor.settings as SettingsImpl).getState().apply { clearOverriding(this::myCaretRowShown) }
+      assertTrue(EditorSettingsExternalizable.getInstance().isCaretRowShown)
+      assertTrue(optionsIj().cursorline)
+    }
   }
 
   @Test
   fun `test 'cursorline' option reports global intellij setting if not explicitly set`() {
-    (fixture.editor.settings as SettingsImpl).getState().apply { clearOverriding(this::myCaretRowShown) }
+    ApplicationManager.getApplication().invokeAndWait {
+      (fixture.editor.settings as SettingsImpl).getState().apply { clearOverriding(this::myCaretRowShown) }
+    }
     assertTrue(EditorSettingsExternalizable.getInstance().isCaretRowShown)
     assertCommandOutput("set cursorline?", "  cursorline")
   }
 
   @Test
   fun `test local 'cursorline' option reports global intellij setting if not explicitly set`() {
-    (fixture.editor.settings as SettingsImpl).getState().apply { clearOverriding(this::myCaretRowShown) }
-    assertTrue(EditorSettingsExternalizable.getInstance().isCaretRowShown)
-    assertCommandOutput("setlocal cursorline?", "  cursorline")
+    ApplicationManager.getApplication().invokeAndWait {
+      (fixture.editor.settings as SettingsImpl).getState().apply { clearOverriding(this::myCaretRowShown) }
+      assertTrue(EditorSettingsExternalizable.getInstance().isCaretRowShown)
+      assertCommandOutput("setlocal cursorline?", "  cursorline")
+    }
   }
 
   @Test
   fun `test 'cursorline' option reports local intellij setting if set via IDE`() {
-    fixture.editor.settings.isCaretRowShown = false
-    assertCommandOutput("set cursorline?", "nocursorline")
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.settings.isCaretRowShown = false
+      assertCommandOutput("set cursorline?", "nocursorline")
 
-    fixture.editor.settings.isCaretRowShown = true
-    assertCommandOutput("set cursorline?", "  cursorline")
+      fixture.editor.settings.isCaretRowShown = true
+      assertCommandOutput("set cursorline?", "  cursorline")
+    }
   }
 
   @Test
   fun `test local 'cursorline' option reports local intellij setting if set via IDE`() {
-    fixture.editor.settings.isCaretRowShown = false
-    assertCommandOutput("setlocal cursorline?", "nocursorline")
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.settings.isCaretRowShown = false
+      assertCommandOutput("setlocal cursorline?", "nocursorline")
 
-    fixture.editor.settings.isCaretRowShown = true
-    assertCommandOutput("setlocal cursorline?", "  cursorline")
+      fixture.editor.settings.isCaretRowShown = true
+      assertCommandOutput("setlocal cursorline?", "  cursorline")
+    }
   }
 
   @Test
@@ -184,14 +197,16 @@ class CursorLineOptionMapperTest : VimTestCase() {
   fun `test open new window without setting the option copies value as not-explicitly set`() {
     // New window will clone local and global local-to-window options, then apply global to local. This tests that our
     // handling of per-window "global" values is correct.
-    (fixture.editor.settings as SettingsImpl).getState().apply { clearOverriding(this::myCaretRowShown) }
-    assertCommandOutput("set cursorline?", "  cursorline")
+    ApplicationManager.getApplication().invokeAndWait {
+      (fixture.editor.settings as SettingsImpl).getState().apply { clearOverriding(this::myCaretRowShown) }
+      assertCommandOutput("set cursorline?", "  cursorline")
 
-    switchToNewFile("bbb.txt", "lorem ipsum")
+      switchToNewFile("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set cursorline?", "  cursorline")
+      assertCommandOutput("set cursorline?", "  cursorline")
 
-    // Can't prove that it was copied as a default value because we can't change the global value
+      // Can't prove that it was copied as a default value because we can't change the global value
+    }
   }
 
   @Test

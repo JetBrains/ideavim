@@ -13,6 +13,8 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.VisualPosition
+import com.intellij.util.concurrency.annotations.RequiresEdt
+import com.maddyhome.idea.vim.api.injector
 
 /**
  * Move the caret to the given offset, handling inline inlays
@@ -35,6 +37,7 @@ import com.intellij.openapi.editor.VisualPosition
  * It is recommended to call this method even if the caret hasn't been moved. It will handle the situation where the
  * document has been changed to add an inlay at the caret position, and will move the caret appropriately.
  */
+@RequiresEdt
 internal fun Caret.moveToInlayAwareOffset(offset: Int) {
   // If the target is inside a fold, call the standard moveToOffset to expand and move
   if (editor.foldingModel.isOffsetCollapsed(offset) || !editor.hasBlockOrUnderscoreCaret()) {
@@ -51,6 +54,7 @@ internal fun Caret.moveToInlayAwareLogicalPosition(pos: LogicalPosition) {
   moveToInlayAwareOffset(editor.logicalPositionToOffset(pos))
 }
 
+@RequiresEdt
 private fun getVisualPositionForTextAtOffset(editor: Editor, offset: Int): VisualPosition {
   var logicalPosition = editor.offsetToLogicalPosition(offset)
   val e = if (editor is EditorWindow) {
@@ -81,15 +85,18 @@ internal fun Editor.amountOfInlaysBeforeVisualPosition(pos: VisualPosition): Int
   return this.inlayModel.getInlineElementsInRange(lineStartOffset, offset).size
 }
 
+@RequiresEdt
 internal fun Editor.updateCaretsVisualPosition() {
   // Caret visual position depends on the current mode, especially with respect to inlays. E.g. if an inlay is
   // related to preceding text, the caret is placed between inlay and preceding text in insert mode (usually bar
   // caret) but after the inlay in normal mode (block caret).
   // By repositioning to the same offset, we will recalculate the expected visual position and put the caret in the
   // right location. Don't open a fold if the caret is inside
-  this.vimForEachCaret {
-    if (!this.foldingModel.isOffsetCollapsed(it.offset)) {
-      it.moveToInlayAwareOffset(it.offset)
+  injector.application.runReadAction {
+    this.vimForEachCaret {
+      if (!this.foldingModel.isOffsetCollapsed(it.offset)) {
+        it.moveToInlayAwareOffset(it.offset)
+      }
     }
   }
 }

@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.delete
 
+import com.intellij.openapi.application.ApplicationManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -118,7 +119,9 @@ class DeleteCharacterLeftActionTest : VimTestCase() {
     // Scroll 70 characters to the left. First character on line should now be 71. sidescrolloff puts us at 76
     typeText("70zl")
     assertVisualPosition(0, 75)
-    assertVisibleLineBounds(0, 70, 149)
+    ApplicationManager.getApplication().invokeAndWait {
+      assertVisibleLineBounds(0, 70, 149)
+    }
 
     typeText("20X")
 

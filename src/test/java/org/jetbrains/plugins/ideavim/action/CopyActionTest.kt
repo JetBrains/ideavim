@@ -8,6 +8,7 @@
 package org.jetbrains.plugins.ideavim.action
 
 import com.intellij.idea.TestFor
+import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
@@ -185,7 +186,9 @@ class CopyActionTest : VimTestCase() {
      
       """.trimIndent(),
     )
-    kotlin.test.assertEquals(0, editor.caretModel.offset)
+    ApplicationManager.getApplication().runReadAction {
+      kotlin.test.assertEquals(0, editor.caretModel.offset)
+    }
   }
 
   // VIM-632 |CTRL-V| |v_y| |p|

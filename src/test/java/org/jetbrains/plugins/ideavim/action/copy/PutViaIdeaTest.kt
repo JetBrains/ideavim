@@ -10,6 +10,7 @@ package org.jetbrains.plugins.ideavim.action.copy
 
 import com.intellij.codeInsight.editorActions.TextBlockTransferable
 import com.intellij.ide.CopyPasteManagerEx
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.ide.CopyPasteManager
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
@@ -58,14 +59,16 @@ class PutViaIdeaTest : VimTestCase() {
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      before rangeOf "legendary",
-      SelectionType.CHARACTER_WISE,
-      false
-    )
+    ApplicationManager.getApplication().runReadAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        before rangeOf "legendary",
+        SelectionType.CHARACTER_WISE,
+        false
+      )
+    }
 
     typeText("ppp")
     val after = "Ilegendarylegendarylegendar${c}y found it in a legendary land"
@@ -85,14 +88,16 @@ class PutViaIdeaTest : VimTestCase() {
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      before rangeOf "legendary$randomUUID",
-      SelectionType.CHARACTER_WISE,
-      false,
-    )
+    ApplicationManager.getApplication().runReadAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        before rangeOf "legendary$randomUUID",
+        SelectionType.CHARACTER_WISE,
+        false,
+      )
+    }
 
     val sizeBefore = CopyPasteManager.getInstance().allContents.size
     typeText("ve", "p")
@@ -114,14 +119,16 @@ class PutViaIdeaTest : VimTestCase() {
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val registerService = injector.registerGroup
-    registerService.storeText(
-      vimEditor,
-      context,
-      vimEditor.primaryCaret(),
-      before rangeOf "\nLorem ipsum dolor sit amet,\n",
-      SelectionType.CHARACTER_WISE,
-      false,
-    )
+    ApplicationManager.getApplication().runReadAction {
+      registerService.storeText(
+        vimEditor,
+        context,
+        vimEditor.primaryCaret(),
+        before rangeOf "\nLorem ipsum dolor sit amet,\n",
+        SelectionType.CHARACTER_WISE,
+        false,
+      )
+    }
 
     typeText("p")
     val after = """

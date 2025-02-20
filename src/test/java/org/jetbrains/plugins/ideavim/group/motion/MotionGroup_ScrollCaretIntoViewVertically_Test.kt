@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.group.motion
 
+import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.helper.EditorHelper
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -255,6 +256,8 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
   }
 
   private fun assertVisualLineAtMiddleOfScreen(expected: Int) {
-    kotlin.test.assertEquals(expected, EditorHelper.getVisualLineAtMiddleOfScreen(fixture.editor))
+    ApplicationManager.getApplication().invokeAndWait {
+      kotlin.test.assertEquals(expected, EditorHelper.getVisualLineAtMiddleOfScreen(fixture.editor))
+    }
   }
 }

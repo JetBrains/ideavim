@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.screen
 
+import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.api.getOffset
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -178,7 +179,9 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
   fun `test move caret to first line of screen with inlays`() {
     // We're not scrolling, so inlays don't affect anything. Just place the caret on the first visible line
     configureByLines(50, "    I found it in a legendary land")
-    addBlockInlay(fixture.editor.vim.getOffset(5, 5), true, 10)
+    ApplicationManager.getApplication().invokeAndWait {
+      addBlockInlay(fixture.editor.vim.getOffset(5, 5), true, 10)
+    }
     setPositionAndScroll(0, 20, 10)
     typeText("H")
     assertPosition(0, 4)

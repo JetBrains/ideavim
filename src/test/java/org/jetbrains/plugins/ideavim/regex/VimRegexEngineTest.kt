@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.regex
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.VisualPosition
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.TextRange
@@ -20,8 +21,12 @@ import kotlin.test.assertEquals
 
 class VimRegexEngineTest : VimTestCase() {
   private fun findAll(pattern: String): List<TextRange> {
-    val regex = VimRegex(pattern)
-    return regex.findAll(fixture.editor.vim).map { it.range }
+    var result: List<TextRange>? = null
+    ApplicationManager.getApplication().runReadAction {
+      val regex = VimRegex(pattern)
+      result = regex.findAll(fixture.editor.vim).map { it.range }
+    }
+    return result!!
   }
 
   @Test
@@ -79,11 +84,13 @@ class VimRegexEngineTest : VimTestCase() {
     configureByText("Lor${c}em ${c}Ipsum")
     val editor = fixture.editor.vim
     val mark = VimMark.create('m', 0, 0, editor.getPath(), editor.extractProtocol())!!
-    val secondCaret = editor.carets().maxByOrNull { it.offset }!!
-    secondCaret.markStorage.setMark(mark)
+    ApplicationManager.getApplication().invokeAndWait {
+      val secondCaret = editor.carets().maxByOrNull { it.offset }!!
+      secondCaret.markStorage.setMark(mark)
 
-    val result = findAll("\\%>'m\\%#.")
-    assertEquals(result, listOf(TextRange(6, 7)))
+      val result = findAll("\\%>'m\\%#.")
+      assertEquals(result, listOf(TextRange(6, 7)))
+    }
   }
 
   @Test
@@ -141,15 +148,17 @@ class VimRegexEngineTest : VimTestCase() {
 
     val caretModel = fixture.editor.caretModel
     typeText("v") // a workaround to trigger visual mode
-    caretModel.addCaret(VisualPosition(0, 2))
-    val caret = caretModel.getCaretAt(VisualPosition(0, 2))!!
-    caret.setSelection(0, 5)
-    caretModel.addCaret(VisualPosition(0, 0))
-    caretModel.addCaret(VisualPosition(0, 1))
-    caretModel.addCaret(VisualPosition(0, 3))
+    ApplicationManager.getApplication().invokeAndWait {
+      caretModel.addCaret(VisualPosition(0, 2))
+      val caret = caretModel.getCaretAt(VisualPosition(0, 2))!!
+      caret.setSelection(0, 5)
+      caretModel.addCaret(VisualPosition(0, 0))
+      caretModel.addCaret(VisualPosition(0, 1))
+      caretModel.addCaret(VisualPosition(0, 3))
 
-    val result = findAll("\\%V.\\{-}\\%#.")
-    assertEquals(result, listOf(TextRange(0, 3)))
+      val result = findAll("\\%V.\\{-}\\%#.")
+      assertEquals(result, listOf(TextRange(0, 3)))
+    }
   }
 
 }

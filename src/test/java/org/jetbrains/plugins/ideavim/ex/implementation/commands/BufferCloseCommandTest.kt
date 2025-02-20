@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
+import com.intellij.openapi.application.ApplicationManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -20,8 +21,10 @@ class BufferCloseCommandTest : VimTestCase() {
     val psiFile1 = fixture.configureByText("A_Discovery1", "Lorem ipsum dolor sit amet,")
     val psiFile2 = fixture.configureByText("A_Discovery2", "consectetur adipiscing elit")
 
-    fileManager.openFile(psiFile1.virtualFile, false)
-    fileManager.openFile(psiFile2.virtualFile, true)
+    ApplicationManager.getApplication().invokeAndWait {
+      fileManager.openFile(psiFile1.virtualFile, false)
+      fileManager.openFile(psiFile2.virtualFile, true)
+    }
     assertPluginError(false)
 
     typeText(commandToKeys("bd"))

@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.group
 
 import com.intellij.idea.TestFor
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction
@@ -915,16 +916,20 @@ class SearchGroupTest : VimTestCase() {
     val project = fixture.project
     val searchGroup = VimPlugin.getSearch()
     val ref = Ref.create(-1)
-    RunnableHelper.runReadCommand(
-      project,
-      {
-        // Does not move the caret!
-        val n = searchGroup.processSearchCommand(editor.vim, pattern, fixture.caretOffset, 1, Direction.FORWARDS)
-        ref.set(n?.first ?: -1)
-      },
-      null,
-      null,
-    )
+    ApplicationManager.getApplication().invokeAndWait {
+      ApplicationManager.getApplication().runWriteIntentReadAction<Any, Throwable> {
+        RunnableHelper.runReadCommand(
+          project,
+          {
+            // Does not move the caret!
+            val n = searchGroup.processSearchCommand(editor.vim, pattern, fixture.caretOffset, 1, Direction.FORWARDS)
+            ref.set(n?.first ?: -1)
+          },
+          null,
+          null,
+        )
+      }
+    }
     return ref.get()
   }
 }

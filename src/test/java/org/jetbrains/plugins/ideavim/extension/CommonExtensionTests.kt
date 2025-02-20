@@ -10,6 +10,7 @@ package org.jetbrains.plugins.ideavim.extension
 
 import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.util.Disposer
 import com.intellij.testFramework.PlatformTestUtil
@@ -182,11 +183,15 @@ class OpMappingTest : VimTestCase() {
   fun `test delayed action`() {
     configureByText("${c}I found it in a legendary land")
     typeText("R")
-    PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+    ApplicationManager.getApplication().invokeAndWait {
+      PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+    }
     assertState("I fou${c}nd it in a legendary land")
 
     typeText("dR")
-    PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+    ApplicationManager.getApplication().invokeAndWait {
+      PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+    }
     assertState("I fou$c in a legendary land")
   }
 
@@ -197,11 +202,15 @@ class OpMappingTest : VimTestCase() {
   fun `test delayed incorrect action`() {
     configureByText("${c}I found it in a legendary land")
     typeText("E")
-    PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+    ApplicationManager.getApplication().invokeAndWait {
+      PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+    }
     assertState("I fou${c}nd it in a legendary land")
 
     typeText("dE")
-    PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+    ApplicationManager.getApplication().invokeAndWait {
+      PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+    }
     assertState("I found it$c in a legendary land")
   }
 }

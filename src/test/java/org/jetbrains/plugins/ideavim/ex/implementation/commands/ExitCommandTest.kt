@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
+import com.intellij.openapi.application.ApplicationManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -22,7 +23,9 @@ class ExitCommandTest : VimTestCase() {
     }
     @Suppress("IdeaVimAssertState")
     val psiFile = fixture.configureByText("A_Discovery", "Lorem ipsum dolor sit amet,")
-    fileManager.openFile(psiFile.virtualFile, false)
+    ApplicationManager.getApplication().invokeAndWait {
+      fileManager.openFile(psiFile.virtualFile, false)
+    }
     kotlin.test.assertNotNull<Any>(fileManager.currentFile)
 
     typeText(commandToKeys("qa"))
@@ -36,7 +39,9 @@ class ExitCommandTest : VimTestCase() {
     }
     @Suppress("IdeaVimAssertState")
     val psiFile = fixture.configureByText("A_Discovery", "Lorem ipsum dolor sit amet,")
-    fileManager.openFile(psiFile.virtualFile, false)
+    ApplicationManager.getApplication().invokeAndWait {
+      fileManager.openFile(psiFile.virtualFile, false)
+    }
     kotlin.test.assertNotNull<Any>(fileManager.currentFile)
 
     typeText(commandToKeys("qall"))
@@ -51,8 +56,10 @@ class ExitCommandTest : VimTestCase() {
     }
     val psiFile1 = fixture.configureByText("A_Discovery1", "Lorem ipsum dolor sit amet,")
     val psiFile2 = fixture.configureByText("A_Discovery2", "consectetur adipiscing elit")
-    fileManager.openFile(psiFile1.virtualFile, false)
-    fileManager.openFile(psiFile2.virtualFile, false)
+    ApplicationManager.getApplication().invokeAndWait {
+      fileManager.openFile(psiFile1.virtualFile, false)
+      fileManager.openFile(psiFile2.virtualFile, false)
+    }
     kotlin.test.assertNotNull<Any>(fileManager.currentFile)
 
     typeText(commandToKeys("qa"))

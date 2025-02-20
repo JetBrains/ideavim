@@ -83,14 +83,16 @@ sealed class Command(
     if (Flag.SAVE_VISUAL !in argFlags.flags) {
       // Editor.inBlockSelection is not available, because we're not in Visual mode anymore. Check if the primary caret
       // currently has a selection and if (when we still in Visual) it was a block selection.
-      if (editor.primaryCaret().hasSelection() && editor.primaryCaret().lastSelectionInfo.selectionType.isBlock) {
-        editor.removeSecondaryCarets()
-      }
-      editor.nativeCarets().forEach {
-        if (it.hasSelection()) {
-          val offset = it.selectionStart
-          it.removeSelection()
-          it.moveToOffset(offset)
+      injector.application.runReadAction {
+        if (editor.primaryCaret().hasSelection() && editor.primaryCaret().lastSelectionInfo.selectionType.isBlock) {
+          editor.removeSecondaryCarets()
+        }
+        editor.nativeCarets().forEach {
+          if (it.hasSelection()) {
+            val offset = it.selectionStart
+            it.removeSelection()
+            it.moveToOffset(offset)
+          }
         }
       }
     }

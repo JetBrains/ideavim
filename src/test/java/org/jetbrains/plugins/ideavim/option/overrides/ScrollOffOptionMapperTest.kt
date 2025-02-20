@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.option.overrides
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
@@ -38,7 +39,9 @@ class ScrollOffOptionMapperTest : VimTestCase() {
   @Suppress("SameParameterValue")
   private fun switchToNewFile(filename: String, content: String) {
     // This replaces fixture.editor
-    fixture.openFileInEditor(fixture.createFile(filename, content))
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.openFileInEditor(fixture.createFile(filename, content))
+    }
 
     // But our selection changed callback doesn't get called immediately, and that callback will deactivate the ex entry
     // panel (which causes problems if our next command is `:set`). So type something (`0` is a good no-op) to give time
@@ -160,10 +163,13 @@ class ScrollOffOptionMapperTest : VimTestCase() {
   fun `test setting global IDE value will update IdeaVim value`() {
     enterCommand("set scrolloff=10")
 
-    EditorSettingsExternalizable.getInstance().verticalScrollOffset = 20
-    assertCommandOutput("set scrolloff?", "  scrolloff=20")
-    assertCommandOutput("setlocal scrolloff?", "  scrolloff=-1")
-    assertCommandOutput("setglobal scrolloff?", "  scrolloff=20")
+    ApplicationManager.getApplication().invokeAndWait {
+      EditorSettingsExternalizable.getInstance().verticalScrollOffset = 20
+
+      assertCommandOutput("set scrolloff?", "  scrolloff=20")
+      assertCommandOutput("setlocal scrolloff?", "  scrolloff=-1")
+      assertCommandOutput("setglobal scrolloff?", "  scrolloff=20")
+    }
   }
 
   @Test
@@ -199,16 +205,18 @@ class ScrollOffOptionMapperTest : VimTestCase() {
     assertCommandOutput("set scrolloff?", "  scrolloff=20")
 
     // Changing the global IntelliJ setting syncs with the global Vim value
-    EditorSettingsExternalizable.getInstance().verticalScrollOffset = 10
-    assertCommandOutput("set scrolloff?", "  scrolloff=10")
+    ApplicationManager.getApplication().invokeAndWait {
+      EditorSettingsExternalizable.getInstance().verticalScrollOffset = 10
+      assertCommandOutput("set scrolloff?", "  scrolloff=10")
 
-    // We don't support externally changing the local editor setting
-    enterCommand("setlocal scrolloff=30")
-    assertCommandOutput("set scrolloff?", "  scrolloff=30")
-    assertCommandOutput("setlocal scrolloff?", "  scrolloff=30")
-    assertCommandOutput("setglobal scrolloff?", "  scrolloff=10")
-    assertEquals(10, EditorSettingsExternalizable.getInstance().verticalScrollOffset)
-    assertEquals(0, fixture.editor.settings.verticalScrollOffset)
+      // We don't support externally changing the local editor setting
+      enterCommand("setlocal scrolloff=30")
+      assertCommandOutput("set scrolloff?", "  scrolloff=30")
+      assertCommandOutput("setlocal scrolloff?", "  scrolloff=30")
+      assertCommandOutput("setglobal scrolloff?", "  scrolloff=10")
+      assertEquals(10, EditorSettingsExternalizable.getInstance().verticalScrollOffset)
+      assertEquals(0, fixture.editor.settings.verticalScrollOffset)
+    }
   }
 
   @Test
@@ -270,29 +278,31 @@ class ScrollOffOptionMapperTest : VimTestCase() {
 
   @Test
   fun `test reset 'scrolloff' to default value resets global value to intellij global value for all editors`() {
-    EditorSettingsExternalizable.getInstance().verticalScrollOffset = 20
+    ApplicationManager.getApplication().invokeAndWait {
+      EditorSettingsExternalizable.getInstance().verticalScrollOffset = 20
 
-    val firstEditor = fixture.editor
+      val firstEditor = fixture.editor
 
-    switchToNewFile("bbb.txt", "lorem ipsum")
+      switchToNewFile("bbb.txt", "lorem ipsum")
 
-    enterCommand("set scrolloff=10")
-    assertCommandOutput("set scrolloff?", "  scrolloff=10")
-    assertCommandOutput("setglobal scrolloff?", "  scrolloff=10")
-    assertCommandOutput("setlocal scrolloff?", "  scrolloff=-1")
-    assertEquals(10, injector.options(firstEditor.vim).scrolloff) // Equivalent to `set scrolloff?`
+      enterCommand("set scrolloff=10")
+      assertCommandOutput("set scrolloff?", "  scrolloff=10")
+      assertCommandOutput("setglobal scrolloff?", "  scrolloff=10")
+      assertCommandOutput("setlocal scrolloff?", "  scrolloff=-1")
+      assertEquals(10, injector.options(firstEditor.vim).scrolloff) // Equivalent to `set scrolloff?`
 
-    enterCommand("set scrolloff&")
-    assertCommandOutput("set scrolloff?", "  scrolloff=20")
-    assertCommandOutput("setglobal scrolloff?", "  scrolloff=20")
-    assertCommandOutput("setlocal scrolloff?", "  scrolloff=-1")
-    assertEquals(20, injector.options(firstEditor.vim).scrolloff) // Equivalent to `set scrolloff?`
+      enterCommand("set scrolloff&")
+      assertCommandOutput("set scrolloff?", "  scrolloff=20")
+      assertCommandOutput("setglobal scrolloff?", "  scrolloff=20")
+      assertCommandOutput("setlocal scrolloff?", "  scrolloff=-1")
+      assertEquals(20, injector.options(firstEditor.vim).scrolloff) // Equivalent to `set scrolloff?`
 
-    EditorSettingsExternalizable.getInstance().verticalScrollOffset = 15
-    assertCommandOutput("set scrolloff?", "  scrolloff=15")
-    assertCommandOutput("setglobal scrolloff?", "  scrolloff=15")
-    assertCommandOutput("setlocal scrolloff?", "  scrolloff=-1")
-    assertEquals(15, injector.options(firstEditor.vim).scrolloff) // Equivalent to `set scrolloff?`
+      EditorSettingsExternalizable.getInstance().verticalScrollOffset = 15
+      assertCommandOutput("set scrolloff?", "  scrolloff=15")
+      assertCommandOutput("setglobal scrolloff?", "  scrolloff=15")
+      assertCommandOutput("setlocal scrolloff?", "  scrolloff=-1")
+      assertEquals(15, injector.options(firstEditor.vim).scrolloff) // Equivalent to `set scrolloff?`
+    }
   }
 
   @Test

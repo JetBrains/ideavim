@@ -10,6 +10,7 @@ package org.jetbrains.plugins.ideavim.option.overrides
 
 import com.intellij.application.options.CodeStyle
 import com.intellij.lang.Language
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.intellij.openapi.editor.impl.SettingsImpl
@@ -42,7 +43,9 @@ class ColorColumnOptionMapperTest : VimTestCase() {
   @Suppress("SameParameterValue")
   private fun openNewBufferWindow(filename: String, content: String): Editor {
     // This replaces fixture.editor
-    fixture.openFileInEditor(fixture.createFile(filename, content))
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.openFileInEditor(fixture.createFile(filename, content))
+    }
 
     // But our selection changed callback doesn't get called immediately, and that callback will deactivate the ex entry
     // panel (which causes problems if our next command is `:set`). So type something (`0` is a good no-op) to give time
@@ -100,93 +103,109 @@ class ColorColumnOptionMapperTest : VimTestCase() {
   fun `test 'colorcolumn' reports '+0' to show right margin is visible`() {
     // IntelliJ only has one setting for visual guides and hard-wrap typing margin, so we have to report a special value
     // of "+0", which makes Vim show a highlight column at 'textwidth' (IntelliJ shows it even if 'textwidth' is 0)
-    fixture.editor.settings.isRightMarginShown = true
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=+0")
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.settings.isRightMarginShown = true
+      assertCommandOutput("set colorcolumn?", "  colorcolumn=+0")
+    }
   }
 
   @Test
   fun `test 'colorcolumn' reports '+0' at end of visual guide list`() {
-    fixture.editor.settings.isRightMarginShown = true
-    fixture.editor.settings.setSoftMargins(listOf(10, 20, 30))
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=10,20,30,+0")
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.settings.isRightMarginShown = true
+      fixture.editor.settings.setSoftMargins(listOf(10, 20, 30))
+      assertCommandOutput("set colorcolumn?", "  colorcolumn=10,20,30,+0")
+    }
   }
 
   @Test
   fun `test 'colorcolumn' option reports global intellij setting if not explicitly set`() {
-    EditorSettingsExternalizable.getInstance().isRightMarginShown = true
-    setGlobalSoftMargins(listOf(10, 20, 30))
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=10,20,30,+0")
+    ApplicationManager.getApplication().invokeAndWait {
+      EditorSettingsExternalizable.getInstance().isRightMarginShown = true
+      setGlobalSoftMargins(listOf(10, 20, 30))
+      assertCommandOutput("set colorcolumn?", "  colorcolumn=10,20,30,+0")
 
-    setGlobalSoftMargins(listOf(90, 80, 70))
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=70,80,90,+0")
+      setGlobalSoftMargins(listOf(90, 80, 70))
+      assertCommandOutput("set colorcolumn?", "  colorcolumn=70,80,90,+0")
 
-    setGlobalSoftMargins(emptyList())
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=+0")
+      setGlobalSoftMargins(emptyList())
+      assertCommandOutput("set colorcolumn?", "  colorcolumn=+0")
 
-    EditorSettingsExternalizable.getInstance().isRightMarginShown = false
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=")
+      EditorSettingsExternalizable.getInstance().isRightMarginShown = false
+      assertCommandOutput("set colorcolumn?", "  colorcolumn=")
+    }
   }
 
   @Test
   fun `test local 'colorcolumn' option reports global intellij setting if not explicitly set`() {
-    EditorSettingsExternalizable.getInstance().isRightMarginShown = true
-    setGlobalSoftMargins(listOf(10, 20, 30))
-    assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=10,20,30,+0")
+    ApplicationManager.getApplication().invokeAndWait {
+      EditorSettingsExternalizable.getInstance().isRightMarginShown = true
+      setGlobalSoftMargins(listOf(10, 20, 30))
+      assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=10,20,30,+0")
 
-    setGlobalSoftMargins(listOf(90, 80, 70))
-    assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=70,80,90,+0")
+      setGlobalSoftMargins(listOf(90, 80, 70))
+      assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=70,80,90,+0")
 
-    setGlobalSoftMargins(emptyList())
-    assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=+0")
+      setGlobalSoftMargins(emptyList())
+      assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=+0")
 
-    EditorSettingsExternalizable.getInstance().isRightMarginShown = false
-    assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=")
+      EditorSettingsExternalizable.getInstance().isRightMarginShown = false
+      assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=")
+    }
   }
 
   @Test
   fun `test 'colorcolumn' option reports local intellij setting if set via IDE`() {
-    fixture.editor.settings.isRightMarginShown = true
-    fixture.editor.settings.setSoftMargins(listOf(10, 20, 30))
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=10,20,30,+0")
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.settings.isRightMarginShown = true
+      fixture.editor.settings.setSoftMargins(listOf(10, 20, 30))
+      assertCommandOutput("set colorcolumn?", "  colorcolumn=10,20,30,+0")
 
-    fixture.editor.settings.setSoftMargins(listOf(70, 80, 90))
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=70,80,90,+0")
+      fixture.editor.settings.setSoftMargins(listOf(70, 80, 90))
+      assertCommandOutput("set colorcolumn?", "  colorcolumn=70,80,90,+0")
 
-    fixture.editor.settings.setSoftMargins(emptyList())
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=+0")
+      fixture.editor.settings.setSoftMargins(emptyList())
+      assertCommandOutput("set colorcolumn?", "  colorcolumn=+0")
 
-    fixture.editor.settings.isRightMarginShown = false
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=")
+      fixture.editor.settings.isRightMarginShown = false
+      assertCommandOutput("set colorcolumn?", "  colorcolumn=")
+    }
   }
 
   @Test
   fun `test local 'colorcolumn' option reports local intellij setting if set via IDE`() {
-    fixture.editor.settings.isRightMarginShown = true
-    fixture.editor.settings.setSoftMargins(listOf(10, 20, 30))
-    assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=10,20,30,+0")
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.settings.isRightMarginShown = true
+      fixture.editor.settings.setSoftMargins(listOf(10, 20, 30))
+      assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=10,20,30,+0")
 
-    fixture.editor.settings.setSoftMargins(listOf(70, 80, 90))
-    assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=70,80,90,+0")
+      fixture.editor.settings.setSoftMargins(listOf(70, 80, 90))
+      assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=70,80,90,+0")
 
-    fixture.editor.settings.setSoftMargins(emptyList())
-    assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=+0")
+      fixture.editor.settings.setSoftMargins(emptyList())
+      assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=+0")
 
-    fixture.editor.settings.isRightMarginShown = false
-    assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=")
+      fixture.editor.settings.isRightMarginShown = false
+      assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=")
+    }
   }
 
   @Test
   fun `test 'colorcolumn' does not report current visual guides if global right margin option is disabled`() {
-    EditorSettingsExternalizable.getInstance().isRightMarginShown = false
-    fixture.editor.settings.setSoftMargins(listOf(10, 20, 30))
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=")
+    ApplicationManager.getApplication().invokeAndWait {
+      EditorSettingsExternalizable.getInstance().isRightMarginShown = false
+      fixture.editor.settings.setSoftMargins(listOf(10, 20, 30))
+      assertCommandOutput("set colorcolumn?", "  colorcolumn=")
+    }
   }
 
   @Test
   fun `test 'colorcolumn' does not report current visual guides if local right margin option is disabled`() {
-    fixture.editor.settings.isRightMarginShown = false
-    fixture.editor.settings.setSoftMargins(listOf(10, 20, 30))
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=")
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.settings.isRightMarginShown = false
+      fixture.editor.settings.setSoftMargins(listOf(10, 20, 30))
+      assertCommandOutput("set colorcolumn?", "  colorcolumn=")
+    }
   }
 
   @Test
@@ -260,8 +279,10 @@ class ColorColumnOptionMapperTest : VimTestCase() {
   fun `test setting IDE value is treated like setlocal`() {
     // If we use `:set`, it updates the local and per-window global values. If we set the value from the IDE, it only
     // affects the local value
-    fixture.editor.settings.isRightMarginShown = true
-    fixture.editor.settings.setSoftMargins(listOf(70, 80, 90))
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.settings.isRightMarginShown = true
+      fixture.editor.settings.setSoftMargins(listOf(70, 80, 90))
+    }
     assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=70,80,90,+0")
     assertCommandOutput("set colorcolumn?", "  colorcolumn=70,80,90,+0")
     assertCommandOutput("setglobal colorcolumn?", "  colorcolumn=")
@@ -282,66 +303,74 @@ class ColorColumnOptionMapperTest : VimTestCase() {
 
   @Test
   fun `test reset 'colorcolun' to default copies current global intellij setting`() {
-    fixture.editor.settings.isRightMarginShown = true
-    fixture.editor.settings.setSoftMargins(listOf(10, 20, 30))
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.settings.isRightMarginShown = true
+      fixture.editor.settings.setSoftMargins(listOf(10, 20, 30))
 
-    enterCommand("set colorcolumn&")
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=")
-    assertFalse(fixture.editor.settings.isRightMarginShown)
-    assertEmpty(fixture.editor.settings.softMargins)
+      enterCommand("set colorcolumn&")
+      assertCommandOutput("set colorcolumn?", "  colorcolumn=")
+      assertFalse(fixture.editor.settings.isRightMarginShown)
+      assertEmpty(fixture.editor.settings.softMargins)
 
-    // Verify that IntelliJ doesn't allow us to "unset" a local editor setting - it's a copy of the global value
-    EditorSettingsExternalizable.getInstance().isRightMarginShown = true
-    assertFalse(fixture.editor.settings.isRightMarginShown)
+      // Verify that IntelliJ doesn't allow us to "unset" a local editor setting - it's a copy of the global value
+      EditorSettingsExternalizable.getInstance().isRightMarginShown = true
+      assertFalse(fixture.editor.settings.isRightMarginShown)
+    }
   }
 
   @Test
   fun `test reset local 'colorcolun' to default copies current global intellij setting`() {
-    fixture.editor.settings.isRightMarginShown = true
-    fixture.editor.settings.setSoftMargins(listOf(10, 20, 30))
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.settings.isRightMarginShown = true
+      fixture.editor.settings.setSoftMargins(listOf(10, 20, 30))
 
-    enterCommand("setlocal colorcolumn&")
-    assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=")
-    assertFalse(fixture.editor.settings.isRightMarginShown)
-    assertEmpty(fixture.editor.settings.softMargins)
+      enterCommand("setlocal colorcolumn&")
+      assertCommandOutput("setlocal colorcolumn?", "  colorcolumn=")
+      assertFalse(fixture.editor.settings.isRightMarginShown)
+      assertEmpty(fixture.editor.settings.softMargins)
 
-    // Verify that IntelliJ doesn't allow us to "unset" a local editor setting - it's a copy of the global value
-    EditorSettingsExternalizable.getInstance().isRightMarginShown = true
-    assertFalse(fixture.editor.settings.isRightMarginShown)
+      // Verify that IntelliJ doesn't allow us to "unset" a local editor setting - it's a copy of the global value
+      EditorSettingsExternalizable.getInstance().isRightMarginShown = true
+      assertFalse(fixture.editor.settings.isRightMarginShown)
+    }
   }
 
   @Test
   fun `test open new window without setting ideavim option will initialise 'colorcolumn' to defaults`() {
-    EditorSettingsExternalizable.getInstance().isRightMarginShown = true
-    setGlobalSoftMargins(listOf(10, 20, 30))
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=10,20,30,+0")
+    ApplicationManager.getApplication().invokeAndWait {
+      EditorSettingsExternalizable.getInstance().isRightMarginShown = true
+      setGlobalSoftMargins(listOf(10, 20, 30))
+      assertCommandOutput("set colorcolumn?", "  colorcolumn=10,20,30,+0")
 
-    openNewBufferWindow("bbb.txt", "lorem ipsum")
+      openNewBufferWindow("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=10,20,30,+0")
+      assertCommandOutput("set colorcolumn?", "  colorcolumn=10,20,30,+0")
 
-    // Changing the global value should update the editor
-    setGlobalSoftMargins(listOf(40, 50, 60, 70))
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=40,50,60,70,+0")
+      // Changing the global value should update the editor
+      setGlobalSoftMargins(listOf(40, 50, 60, 70))
+      assertCommandOutput("set colorcolumn?", "  colorcolumn=40,50,60,70,+0")
 
-    EditorSettingsExternalizable.getInstance().isRightMarginShown = false
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=")
+      EditorSettingsExternalizable.getInstance().isRightMarginShown = false
+      assertCommandOutput("set colorcolumn?", "  colorcolumn=")
+    }
   }
 
   @Test
   fun `test open new window after setting ideavim option will initialise 'colorcolumn' to setglobal value`() {
-    EditorSettingsExternalizable.getInstance().isRightMarginShown = true
-    setGlobalSoftMargins(listOf(10, 20, 30))
-    enterCommand("set colorcolumn=40,50,60")
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=40,50,60,+0")
+    ApplicationManager.getApplication().invokeAndWait {
+      EditorSettingsExternalizable.getInstance().isRightMarginShown = true
+      setGlobalSoftMargins(listOf(10, 20, 30))
+      enterCommand("set colorcolumn=40,50,60")
+      assertCommandOutput("set colorcolumn?", "  colorcolumn=40,50,60,+0")
 
-    openNewBufferWindow("bbb.txt", "lorem ipsum")
+      openNewBufferWindow("bbb.txt", "lorem ipsum")
 
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=40,50,60,+0")
+      assertCommandOutput("set colorcolumn?", "  colorcolumn=40,50,60,+0")
 
-    // Changing the global value should NOT update the editor
-    setGlobalSoftMargins(listOf(10, 20, 30))
-    assertCommandOutput("set colorcolumn?", "  colorcolumn=40,50,60,+0")
+      // Changing the global value should NOT update the editor
+      setGlobalSoftMargins(listOf(10, 20, 30))
+      assertCommandOutput("set colorcolumn?", "  colorcolumn=40,50,60,+0")
+    }
   }
 
   @Test
@@ -358,19 +387,25 @@ class ColorColumnOptionMapperTest : VimTestCase() {
   }
 
   private fun getGlobalSoftMargins(): List<Int> {
-    val language = TextEditorImpl.getDocumentLanguage(fixture.editor)
-    return CodeStyle.getSettings(fixture.editor).getSoftMargins(language)
+    var res: List<Int>? = null
+    ApplicationManager.getApplication().runReadAction {
+      val language = TextEditorImpl.getDocumentLanguage(fixture.editor)
+      res = CodeStyle.getSettings(fixture.editor).getSoftMargins(language)
+    }
+    return res!!
   }
 
   private fun setGlobalSoftMargins(margins: List<Int>) {
-    val language = TextEditorImpl.getDocumentLanguage(fixture.editor)
-    val commonSettings = CodeStyle.getSettings(fixture.editor).getCommonSettings(language)
-    if (language == null || commonSettings.language == Language.ANY) {
-      CodeStyle.getSettings(fixture.editor).defaultSoftMargins = margins
-    } else {
-      CodeStyle.getSettings(fixture.editor).setSoftMargins(language, margins)
+    ApplicationManager.getApplication().runReadAction {
+      val language = TextEditorImpl.getDocumentLanguage(fixture.editor)
+      val commonSettings = CodeStyle.getSettings(fixture.editor).getCommonSettings(language)
+      if (language == null || commonSettings.language == Language.ANY) {
+        CodeStyle.getSettings(fixture.editor).defaultSoftMargins = margins
+      } else {
+        CodeStyle.getSettings(fixture.editor).setSoftMargins(language, margins)
+      }
+      // Setting the value directly doesn't invalidate the cached property value. Not sure if there's a better way
+      (fixture.editor.settings as SettingsImpl).reinitSettings()
     }
-    // Setting the value directly doesn't invalidate the cached property value. Not sure if there's a better way
-    (fixture.editor.settings as SettingsImpl).reinitSettings()
   }
 }
