@@ -9,7 +9,6 @@ package com.maddyhome.idea.vim.group
 
 import com.intellij.codeInsight.completion.CompletionPhase
 import com.intellij.codeInsight.completion.impl.CompletionServiceImpl
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.progress.ProcessCanceledException
@@ -40,9 +39,6 @@ internal class MacroGroup : VimMacroBase() {
     context: ExecutionContext,
     total: Int,
   ) {
-    // This is to make sure that we don't access potemkin progress from different threads
-    ApplicationManager.getApplication().assertWriteAccessAllowed()
-
     val project = (editor as IjVimEditor).editor.project
     val keyStack = getInstance().keyStack
     if (!keyStack.hasStroke()) {
