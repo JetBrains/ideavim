@@ -38,10 +38,8 @@ sealed class PutTextBaseAction(
     return if (sortedCarets.size > 1) {
       val caretToPutData = sortedCarets.associateWith { getPutDataForCaret(editor, context, it, count) }
       var result = true
-      injector.application.runWriteAction {
-        caretToPutData.forEach {
-          result = injector.put.putTextForCaret(editor, it.key, context, it.value) && result
-        }
+      caretToPutData.forEach {
+        result = injector.put.putTextForCaret(editor, it.key, context, it.value) && result
       }
       result
     } else {

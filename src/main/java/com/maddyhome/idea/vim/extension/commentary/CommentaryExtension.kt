@@ -9,7 +9,6 @@ package com.maddyhome.idea.vim.extension.commentary
 
 import com.intellij.codeInsight.actions.AsyncActionExecutionService
 import com.intellij.openapi.actionSystem.IdeActions
-import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Ref
@@ -65,18 +64,16 @@ internal class CommentaryExtension : VimExtension {
         editor.ij.selectionModel.setSelection(range.startOffset, range.endOffset)
       }
 
-      return runWriteAction {
-        // Treat block- and character-wise selections as block comments. Fall back if the first action isn't available
-        val actions = if (selectionType === SelectionType.LINE_WISE) {
-          listOf(IdeActions.ACTION_COMMENT_LINE, IdeActions.ACTION_COMMENT_BLOCK)
-        } else {
-          listOf(IdeActions.ACTION_COMMENT_BLOCK, IdeActions.ACTION_COMMENT_LINE)
-        }
-
-        val project = editor.ij.project!!
-        val callback = { afterCommenting(mode, editor, resetCaret, range) }
-        actions.any { executeActionWithCallbackOnSuccess(editor, it, project, context, callback) }
+      // Treat block- and character-wise selections as block comments. Fall back if the first action isn't available
+      val actions = if (selectionType === SelectionType.LINE_WISE) {
+        listOf(IdeActions.ACTION_COMMENT_LINE, IdeActions.ACTION_COMMENT_BLOCK)
+      } else {
+        listOf(IdeActions.ACTION_COMMENT_BLOCK, IdeActions.ACTION_COMMENT_LINE)
       }
+
+      val project = editor.ij.project!!
+      val callback = { afterCommenting(mode, editor, resetCaret, range) }
+      return actions.any { executeActionWithCallbackOnSuccess(editor, it, project, context, callback) }
     }
 
     private fun executeActionWithCallbackOnSuccess(

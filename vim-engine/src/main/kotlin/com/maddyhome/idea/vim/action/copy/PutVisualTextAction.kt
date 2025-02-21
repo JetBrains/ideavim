@@ -45,10 +45,8 @@ sealed class PutVisualTextBaseAction(
       editor.sortedCarets().associateWith { getPutDataForCaret(editor, context, it, caretsAndSelections[it], count) }
     injector.registerGroup.resetRegister()
     var result = true
-    injector.application.runWriteAction {
-      caretToPutData.forEach {
-        result = injector.put.putTextForCaret(editor, it.key, context, it.value, true, modifyRegister) && result
-      }
+    caretToPutData.forEach {
+      result = injector.put.putTextForCaret(editor, it.key, context, it.value, true, modifyRegister) && result
     }
     return result
   }
