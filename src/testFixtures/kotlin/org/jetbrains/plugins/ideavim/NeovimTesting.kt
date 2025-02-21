@@ -159,8 +159,10 @@ object NeovimTesting {
       neovimTestsCounter++
     }
     val vimCoords = getCaret()
-    val resultVimCoords = CharacterPosition.atCaret(editor).toVimCoords()
-    assertEquals(vimCoords.toString(), resultVimCoords.toString())
+    ApplicationManager.getApplication().runReadAction {
+      val resultVimCoords = CharacterPosition.atCaret(editor).toVimCoords()
+      assertEquals(vimCoords.toString(), resultVimCoords.toString())
+    }
   }
 
   private fun assertText(editor: Editor) {
