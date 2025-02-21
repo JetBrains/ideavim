@@ -30,7 +30,7 @@ import com.maddyhome.idea.vim.options.StringOption
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.IdeaVimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.waitUntil
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -43,7 +43,7 @@ import kotlin.test.assertEquals
 
 // Tests the implementation of global, local to buffer, local to window and global-local
 @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
-class OptionDeclaredScopeTest : IdeaVimTestCase() {
+class OptionDeclaredScopeTest : VimTestCase() {
   private val optionName = "test"
   private val defaultValue = VimString("defaultValue")
   private val setValue = VimString("setValue")

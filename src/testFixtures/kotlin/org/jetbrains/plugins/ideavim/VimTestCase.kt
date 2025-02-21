@@ -111,42 +111,11 @@ import kotlin.test.assertTrue
  * To plugin writers: this class is internal, thus not allowed to be used by third-party plugins.
  * This is done as we have no mechanism to guarantee compatibility as we update this test case.
  * Feel free to copy this class into your plugin, or copy just needed functions.
+ *
+ * The tests are started on non-EDT thread without any locks.
  */
 @ApiStatus.Internal
-abstract class VimTestCase : IdeaVimTestCase() {
-  object Checks {
-    var caretShape: Boolean = true
-
-    val neoVim = NeoVim()
-
-    var keyHandler = KeyHandlerMethod.VIA_IDE
-
-    fun reset() {
-      caretShape = true
-
-      neoVim.reset()
-      keyHandler = KeyHandlerMethod.VIA_IDE
-    }
-
-    class NeoVim {
-      var ignoredRegisters: Set<Char> = setOf()
-      var exitOnTearDown = true
-
-      fun reset() {
-        ignoredRegisters = setOf()
-        exitOnTearDown = true
-      }
-    }
-
-    enum class KeyHandlerMethod {
-      VIA_IDE,
-      DIRECT_TO_VIM,
-    }
-  }
-}
-
-@ApiStatus.Internal
-abstract class IdeaVimTestCase {
+abstract class VimTestCase {
   protected lateinit var fixture: CodeInsightTestFixture
 
   lateinit var testInfo: TestInfo
@@ -1053,6 +1022,36 @@ abstract class IdeaVimTestCase {
     object UNDEFINED : CharType
     class CharDetected(val char: Char) : CharType
     class EditorAction(val name: String) : CharType
+  }
+
+  object Checks {
+    var caretShape: Boolean = true
+
+    val neoVim = NeoVim()
+
+    var keyHandler = KeyHandlerMethod.VIA_IDE
+
+    fun reset() {
+      caretShape = true
+
+      neoVim.reset()
+      keyHandler = KeyHandlerMethod.VIA_IDE
+    }
+
+    class NeoVim {
+      var ignoredRegisters: Set<Char> = setOf()
+      var exitOnTearDown = true
+
+      fun reset() {
+        ignoredRegisters = setOf()
+        exitOnTearDown = true
+      }
+    }
+
+    enum class KeyHandlerMethod {
+      VIA_IDE,
+      DIRECT_TO_VIM,
+    }
   }
 
   companion object {

@@ -33,7 +33,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.IdeaVimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.waitUntil
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -46,7 +46,7 @@ private const val defaultValue = "defaultValue"
 private const val defaultNumberValue = 10
 
 @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
-class EffectiveOptionChangeListenerTest : IdeaVimTestCase() {
+class EffectiveOptionChangeListenerTest : VimTestCase() {
   private val optionName = "test"
   private lateinit var manager: FileEditorManagerImpl
   private lateinit var otherBufferWindow: Editor
