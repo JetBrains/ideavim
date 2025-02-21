@@ -12,6 +12,7 @@ import com.ensarsarajcic.neovim.java.api.NeovimApi
 import com.ensarsarajcic.neovim.java.api.NeovimApis
 import com.ensarsarajcic.neovim.java.api.types.api.VimCoords
 import com.ensarsarajcic.neovim.java.corerpc.client.ProcessRpcConnection
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
 import com.maddyhome.idea.vim.VimPlugin
@@ -113,8 +114,10 @@ object NeovimTesting {
   fun setupEditor(editor: Editor, test: TestInfo) {
     if (!neovimEnabled(test, editor)) return
     neovimApi.currentBuffer.get().setLines(0, -1, false, editor.document.text.split("\n")).get()
-    val charPosition = CharacterPosition.fromOffset(editor, editor.caretModel.offset)
-    neovimApi.currentWindow.get().setCursor(VimCoords(charPosition.line + 1, charPosition.column)).get()
+    ApplicationManager.getApplication().runReadAction {
+      val charPosition = CharacterPosition.fromOffset(editor, editor.caretModel.offset)
+      neovimApi.currentWindow.get().setCursor(VimCoords(charPosition.line + 1, charPosition.column)).get()
+    }
   }
 
   fun typeCommand(keys: String, test: TestInfo, editor: Editor) {
