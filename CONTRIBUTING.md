@@ -41,11 +41,10 @@ you’re working in areas where Java is explicitly used.
 
     * [IntelliJ Platform SDK](https://plugins.jetbrains.com/docs/intellij/welcome.html)
     * [IntelliJ architectural overview](https://plugins.jetbrains.com/docs/intellij/fundamentals.html)
+    * [IntelliJ Platform community space](https://platform.jetbrains.com/)
 
 - Having any difficulties?
-Join the brand new
-[![Join the chat at https://gitter.im/JetBrains/ideavim](https://badges.gitter.im/JetBrains/ideavim.svg)](https://gitter.im/JetBrains/ideavim?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-for IdeaVim developers and contributors! 
+Ask any questions in [GitHub discussions](https://github.com/JetBrains/ideavim/discussions) or [IntelliJ Platform community space](https://platform.jetbrains.com/).
 
 OK, ready to do some coding?
 
@@ -192,6 +191,7 @@ This is just terrible. [You know what to do](https://github.com/JetBrains/ideavi
 
 * [Continuous integration builds](https://ideavim.teamcity.com/)
 * [Bug tracker](https://youtrack.jetbrains.com/issues/VIM)
+* [IntelliJ Platform community space](https://platform.jetbrains.com/)
 * [Chat on gitter](https://gitter.im/JetBrains/ideavim)
 * [IdeaVim Channel](https://jb.gg/bi6zp7) on [JetBrains Server](https://discord.gg/jetbrains)
 * [Plugin homepage](https://plugins.jetbrains.com/plugin/164-ideavim)
