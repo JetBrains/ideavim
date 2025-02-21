@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.state.mode.isBlock
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
+import org.jetbrains.annotations.ApiStatus
 
 enum class CommandModifier {
   NONE,
@@ -104,12 +105,7 @@ sealed class Command(
 
     val operatorArguments = OperatorArguments(0, editor.mode)
 
-    val runCommand = { runCommand(editor, context, operatorArguments) }
-    return when (argFlags.access) {
-      Access.WRITABLE -> injector.application.runWriteAction(runCommand)
-      Access.READ_ONLY -> injector.application.runReadAction(runCommand)
-      Access.SELF_SYNCHRONIZED -> runCommand.invoke()
-    }
+    return runCommand(editor, context, operatorArguments)
   }
 
   private fun runCommand(
@@ -220,12 +216,20 @@ sealed class Command(
   enum class Access {
     /**
      * Indicates that this is a command that modifies the editor
+     *
+     * Obsolete: It used to start a write action automatically, but now all actions are supposed to take care of locks
+     * individually.
      */
+    @ApiStatus.Obsolete
     WRITABLE,
 
     /**
      * Indicates that this command does not modify the editor
+     *
+     * Obsolete: It used to start a read action automatically, but now all actions are supposed to take care of locks
+     * individually.
      */
+    @ApiStatus.Obsolete
     READ_ONLY,
 
     /**
