@@ -197,7 +197,9 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         editor,
         LineDeleteShift.NL_ON_END
       ) ?: continue
-      editor.deleteString(TextRange(newRange.first, newRange.second))
+      injector.application.runWriteAction {
+        editor.deleteString(TextRange(newRange.first, newRange.second))
+      }
     }
     if (type != null) {
       val start = updatedRange.startOffset
@@ -215,7 +217,9 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    * @param str    The text to insert
    */
   override fun insertText(editor: VimEditor, caret: VimCaret, offset: Int, str: String): VimCaret {
-    (editor as MutableVimEditor).insertText(caret, offset, str)
+    injector.application.runWriteAction {
+      (editor as MutableVimEditor).insertText(caret, offset, str)
+    }
     val newCaret = caret.moveToInlayAwareOffset(offset + str.length)
 
     injector.markService.setMark(newCaret, MARK_CHANGE_POS, offset)
@@ -1003,7 +1007,9 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     var processedCaret = editor.findLastVersionOfCaret(caret) ?: caret
     if (removeLastNewLine) {
       val textLength = editor.fileSize().toInt()
-      editor.deleteString(TextRange(textLength - 1, textLength))
+      injector.application.runWriteAction {
+        editor.deleteString(TextRange(textLength - 1, textLength))
+      }
       processedCaret = editor.findLastVersionOfCaret(caret) ?: caret
     }
 
@@ -1189,7 +1195,9 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    * @param str    The new text
    */
   override fun replaceText(editor: VimEditor, caret: VimCaret, start: Int, end: Int, str: String) {
-    (editor as MutableVimEditor).replaceString(start, end, str)
+    injector.application.runWriteAction {
+      (editor as MutableVimEditor).replaceString(start, end, str)
+    }
 
     val newEnd = start + str.length
     injector.markService.setChangeMarks(caret, TextRange(start, newEnd))

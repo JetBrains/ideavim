@@ -903,7 +903,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     }
 
     override fun executeInput(input: ReplaceConfirmationChoice, editor: VimEditor, context: ExecutionContext) {
-      injector.application.runWriteCommand(editor, "substitute-with-confirmation", modalInput) {
+      injector.actionExecutor.executeCommand(editor, {
         highlight.remove()
         injector.jumpService.saveJumpLocation(editor)
         val matchRange = nextSubstitute.first.range
@@ -931,7 +931,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
               options
             )
             closeModalInputPrompt()
-            return@runWriteCommand
+            return@executeCommand
           }
 
           ReplaceConfirmationChoice.QUIT -> {
@@ -965,7 +965,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
         column = replaceResult.column
 
         goToNextIteration()
-      }
+      }, "substitute-with-confirmation", modalInput)
     }
 
     private fun goToNextIteration() {

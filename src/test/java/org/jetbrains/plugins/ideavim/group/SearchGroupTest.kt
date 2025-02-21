@@ -14,7 +14,6 @@ import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction
 import com.maddyhome.idea.vim.common.Direction
-import com.maddyhome.idea.vim.helper.RunnableHelper
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
@@ -913,21 +912,13 @@ class SearchGroupTest : VimTestCase() {
   private fun search(pattern: String, input: String): Int {
     configureByText(input)
     val editor = fixture.editor
-    val project = fixture.project
     val searchGroup = VimPlugin.getSearch()
     val ref = Ref.create(-1)
     ApplicationManager.getApplication().invokeAndWait {
       ApplicationManager.getApplication().runWriteIntentReadAction<Any, Throwable> {
-        RunnableHelper.runReadCommand(
-          project,
-          {
-            // Does not move the caret!
-            val n = searchGroup.processSearchCommand(editor.vim, pattern, fixture.caretOffset, 1, Direction.FORWARDS)
-            ref.set(n?.first ?: -1)
-          },
-          null,
-          null,
-        )
+        // Does not move the caret!
+        val n = searchGroup.processSearchCommand(editor.vim, pattern, fixture.caretOffset, 1, Direction.FORWARDS)
+        ref.set(n?.first ?: -1)
       }
     }
     return ref.get()

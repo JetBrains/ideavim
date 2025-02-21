@@ -70,7 +70,6 @@ import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.swingTimer
 import com.maddyhome.idea.vim.handler.isOctopusEnabled
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.RunnableHelper.runWriteCommand
 import com.maddyhome.idea.vim.helper.TestInputModel
 import com.maddyhome.idea.vim.helper.getGuiCursorMode
 import com.maddyhome.idea.vim.key.MappingOwner
@@ -1063,8 +1062,8 @@ abstract class VimTestCase {
       val keyHandler = KeyHandler.getInstance()
       val dataContext = injector.executionContextManager.getEditorExecutionContext(editor.vim)
       TestInputModel.getInstance(editor).setKeyStrokes(keys.filterNotNull())
-      runWriteCommand(
-        project,
+      injector.actionExecutor.executeCommand(
+        editor.vim,
         Runnable {
           val inputModel = TestInputModel.getInstance(editor)
           var key = inputModel.nextKeyStroke()

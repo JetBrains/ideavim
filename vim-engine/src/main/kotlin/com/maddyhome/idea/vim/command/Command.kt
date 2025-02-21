@@ -96,12 +96,11 @@ data class Command(
     MODE_CHANGE,
     ;
 
-    val isRead: Boolean
-      get() = when (this) {
-        MOTION, COPY, OTHER_READONLY, MODE_CHANGE -> true
-        else -> false
-      }
-
+    /**
+     * Deprecated because not only this set of commands can be writable.
+     * A different way of detecting if a command is going to write something is needed.
+     */
+    @Deprecated("")
     val isWrite: Boolean
       get() = when (this) {
         INSERT, DELETE, CHANGE, PASTE, OTHER_WRITABLE -> true

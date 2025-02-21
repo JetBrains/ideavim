@@ -42,14 +42,6 @@ class VimApplicationStub : VimApplicationBase() {
     TODO("Not yet implemented")
   }
 
-  override fun runWriteCommand(editor: VimEditor, name: String?, groupId: Any?, command: Runnable) {
-    TODO("Not yet implemented")
-  }
-
-  override fun runReadCommand(editor: VimEditor, name: String?, groupId: Any?, command: Runnable) {
-    TODO("Not yet implemented")
-  }
-
   override fun <T> runWriteAction(action: () -> T): T {
     TODO("Not yet implemented")
   }

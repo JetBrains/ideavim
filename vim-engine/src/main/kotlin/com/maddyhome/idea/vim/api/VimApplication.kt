@@ -18,9 +18,6 @@ interface VimApplication {
   fun isInternal(): Boolean
   fun postKey(stroke: KeyStroke, editor: VimEditor)
 
-  fun runWriteCommand(editor: VimEditor, name: String?, groupId: Any?, command: Runnable)
-  fun runReadCommand(editor: VimEditor, name: String?, groupId: Any?, command: Runnable)
-
   fun <T> runWriteAction(action: () -> T): T
   fun <T> runReadAction(action: () -> T): T
 

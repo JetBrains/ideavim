@@ -130,7 +130,9 @@ class ChangeGroup : VimChangeGroupBase() {
     val project = (editor as IjVimEditor).editor.project ?: return
     val file = PsiUtilBase.getPsiFileInEditor(editor.editor, project) ?: return
     val textRange = com.intellij.openapi.util.TextRange.create(start, end)
-    CodeStyleManager.getInstance(project).reformatText(file, listOf(textRange))
+    injector.application.runWriteAction {
+      CodeStyleManager.getInstance(project).reformatText(file, listOf(textRange))
+    }
   }
 
   override fun autoIndentRange(

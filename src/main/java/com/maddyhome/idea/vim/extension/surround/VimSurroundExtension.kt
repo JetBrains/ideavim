@@ -176,7 +176,9 @@ internal class VimSurroundExtension : VimExtension {
           val currentSurrounding = getCurrentSurrounding(it.caret, pick(charFrom))
           if (currentSurrounding != null) {
             it.caret.moveToOffset(currentSurrounding.startOffset)
-            editor.deleteString(currentSurrounding)
+            injector.application.runWriteAction {
+              editor.deleteString(currentSurrounding)
+            }
           }
 
           val registerValue = getRegisterForCaret(editor, context, REGISTER, it.caret)

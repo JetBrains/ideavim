@@ -16,7 +16,6 @@ import com.intellij.util.ExceptionUtil
 import com.maddyhome.idea.vim.api.VimApplicationBase
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import com.maddyhome.idea.vim.helper.RunnableHelper
 import java.awt.Component
 import java.awt.Toolkit
 import java.awt.Window
@@ -56,14 +55,6 @@ internal class IjVimApplication : VimApplicationBase() {
       }
       Toolkit.getDefaultToolkit().systemEventQueue.postEvent(event)
     }
-  }
-
-  override fun runWriteCommand(editor: VimEditor, name: String?, groupId: Any?, command: Runnable) {
-    RunnableHelper.runWriteCommand((editor as IjVimEditor).editor.project, command, name, groupId)
-  }
-
-  override fun runReadCommand(editor: VimEditor, name: String?, groupId: Any?, command: Runnable) {
-    RunnableHelper.runReadCommand((editor as IjVimEditor).editor.project, command, name, groupId)
   }
 
   override fun <T> runWriteAction(action: () -> T): T {

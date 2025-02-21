@@ -93,7 +93,9 @@ data class MoveTextCommand(val range: Range, val modifier: CommandModifier, val 
     val dropNewLineInEnd = (line + linesMoved == editor.lineCount() - 1 && text.last() == '\n') ||
       (lineRange.endLine == editor.lineCount() - 1)
 
-    editor.deleteString(range)
+    injector.application.runWriteAction {
+      editor.deleteString(range)
+    }
     val putData = if (line == -1) {
       // Special case. Move text to below the line before the first line
       caret.moveToOffset(0)
@@ -113,7 +115,9 @@ data class MoveTextCommand(val range: Range, val modifier: CommandModifier, val 
 
     if (dropNewLineInEnd) {
       assert(editor.text().last() == '\n')
-      editor.deleteString(TextRange(editor.text().length - 1, editor.text().length))
+      injector.application.runWriteAction {
+        editor.deleteString(TextRange(editor.text().length - 1, editor.text().length))
+      }
     }
 
     globalMarks.forEach { shiftGlobalMark(editor, it, shift) }

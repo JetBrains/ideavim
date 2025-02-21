@@ -245,13 +245,7 @@ class KeyHandler {
       val action: Runnable = ActionRunner(editor, context, command, keyState, operatorArguments)
       val cmdAction = command.action
       val name = cmdAction.id
-      if (type.isWrite) {
-        injector.application.runWriteCommand(editor, name, action, action)
-      } else if (type.isRead) {
-        injector.application.runReadCommand(editor, name, action, action)
-      } else {
-        injector.actionExecutor.executeCommand(editor, action, name, action)
-      }
+      injector.actionExecutor.executeCommand(editor, action, name, action)
     }
   }
 
