@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.extension.exchange
 
-import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.colors.EditorColors
@@ -111,12 +110,10 @@ internal class VimExchangeExtension : VimExtension {
 
   private class VExchangeHandler : ExtensionHandler {
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
-      runWriteAction {
-        val mode = editor.mode
-        // Leave visual mode to create selection marks
-        executeNormalWithoutMapping(injector.parser.parseKeys("<Esc>"), editor.ij)
-        Operator(true).apply(editor, context, mode.selectionType ?: SelectionType.CHARACTER_WISE)
-      }
+      val mode = editor.mode
+      // Leave visual mode to create selection marks
+      executeNormalWithoutMapping(injector.parser.parseKeys("<Esc>"), editor.ij)
+      Operator(true).apply(editor, context, mode.selectionType ?: SelectionType.CHARACTER_WISE)
     }
   }
 
@@ -226,23 +223,22 @@ internal class VimExchangeExtension : VimExtension {
       val unnRegText = getRegister(editor.vim, '"')
       val startRegText = getRegister(editor.vim, '*')
       val plusRegText = getRegister(editor.vim, '+')
-      runWriteAction {
-        // TODO handle:
-        // 	" Compare using =~ because "'==' != 0" returns 0
-        // 	let indent = s:get_setting('exchange_indent', 1) !~ 0 && a:x.type ==# 'V' && a:y.type ==# 'V'
-        pasteExchange(ex1, ex2)
-        if (!expand) {
-          pasteExchange(ex2, ex1)
-        }
-        // TODO: handle: if ident
-        if (!expand) {
-          fixCursor(ex1, ex2, reverse)
-        }
-        setRegister('z', zRegText)
-        setRegister('"', unnRegText)
-        setRegister('*', startRegText)
-        setRegister('+', plusRegText)
+
+      // TODO handle:
+      // 	" Compare using =~ because "'==' != 0" returns 0
+      // 	let indent = s:get_setting('exchange_indent', 1) !~ 0 && a:x.type ==# 'V' && a:y.type ==# 'V'
+      pasteExchange(ex1, ex2)
+      if (!expand) {
+        pasteExchange(ex2, ex1)
       }
+      // TODO: handle: if ident
+      if (!expand) {
+        fixCursor(ex1, ex2, reverse)
+      }
+      setRegister('z', zRegText)
+      setRegister('"', unnRegText)
+      setRegister('*', startRegText)
+      setRegister('+', plusRegText)
     }
 
     private fun compareExchanges(x: Exchange, y: Exchange): ExchangeCompareResult {
