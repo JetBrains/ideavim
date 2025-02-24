@@ -106,12 +106,9 @@ interface VimCommandLine {
   fun clearPromptCharacter() {
     if (promptCharacterOffset == null) return
 
-    // Note: We have to set promptCharacterOffset to null first, because when we set the new text,
-    //   the listener will be called, which will try to get the actual text again. And, if this field isn't null,
-    //   it will get an incorrect result.
-    promptCharacterOffset = null
     setText(actualText)
     caret.offset = min(caret.offset, visibleText.length)
+    promptCharacterOffset = null
   }
 
   fun clearCurrentAction()
