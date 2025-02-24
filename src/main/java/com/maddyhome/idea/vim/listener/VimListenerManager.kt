@@ -102,10 +102,12 @@ import com.maddyhome.idea.vim.state.mode.inSelectMode
 import com.maddyhome.idea.vim.state.mode.selectionType
 import com.maddyhome.idea.vim.ui.ShowCmdOptionChangeListener
 import com.maddyhome.idea.vim.ui.ShowCmdWidgetUpdater
+import com.maddyhome.idea.vim.ui.widgets.search.searchWidgetOptionListener
 import com.maddyhome.idea.vim.ui.widgets.macro.MacroWidgetListener
 import com.maddyhome.idea.vim.ui.widgets.macro.macroWidgetOptionListener
 import com.maddyhome.idea.vim.ui.widgets.mode.listeners.ModeWidgetListener
 import com.maddyhome.idea.vim.ui.widgets.mode.modeWidgetOptionListener
+import com.maddyhome.idea.vim.ui.widgets.search.SearchWidgetListener
 import org.jetbrains.annotations.TestOnly
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -172,6 +174,10 @@ internal object VimListenerManager {
     injector.listenersNotifier.myEditorListeners.add(modeWidgetListener)
     injector.listenersNotifier.vimPluginListeners.add(modeWidgetListener)
 
+    val searchWidgetListener = SearchWidgetListener()
+    injector.listenersNotifier.searchListeners.add(searchWidgetListener)
+    injector.listenersNotifier.vimPluginListeners.add(searchWidgetListener)
+
     val macroWidgetListener = MacroWidgetListener()
     injector.listenersNotifier.macroRecordingListeners.add(macroWidgetListener)
     injector.listenersNotifier.vimPluginListeners.add(macroWidgetListener)
@@ -211,8 +217,10 @@ internal object VimListenerManager {
       // This code is executed after ideavimrc execution, so we trigger onGlobalOptionChanged just in case
       optionGroup.addGlobalOptionChangeListener(Options.showmode, modeWidgetOptionListener)
       optionGroup.addGlobalOptionChangeListener(Options.showmode, macroWidgetOptionListener)
+      optionGroup.addGlobalOptionChangeListener(Options.showmode, searchWidgetOptionListener)
       modeWidgetOptionListener.onGlobalOptionChanged()
       macroWidgetOptionListener.onGlobalOptionChanged()
+      searchWidgetOptionListener.onGlobalOptionChanged()
 
       // Listen for and initialise new editors
       EventFacade.getInstance()
@@ -235,6 +243,7 @@ internal object VimListenerManager {
       optionGroup.removeGlobalOptionChangeListener(Options.showcmd, ShowCmdOptionChangeListener)
       optionGroup.removeGlobalOptionChangeListener(Options.showmode, modeWidgetOptionListener)
       optionGroup.removeGlobalOptionChangeListener(Options.showmode, macroWidgetOptionListener)
+      optionGroup.removeGlobalOptionChangeListener(Options.showmode, searchWidgetOptionListener)
       optionGroup.removeEffectiveOptionValueChangeListener(Options.guicursor, GuicursorChangeListener)
     }
   }
