@@ -52,8 +52,8 @@ interface VimCommandLine {
     get() {
       val promptCharacterOffset1 = promptCharacterOffset
       return if (promptCharacterOffset1 == null) visibleText else {
-        if (promptCharacterOffset1 > visibleText.length) {
-          logger.error("promptCharacterOffset1 >= visibleText.length: $promptCharacterOffset1 >= ${visibleText.length}")
+        if (promptCharacterOffset1 + 1 > visibleText.length) {
+          logger.error("promptCharacterOffset1 > visibleText.length: ${promptCharacterOffset1 + 1} > ${visibleText.length}")
           visibleText
         } else {
           visibleText.removeRange(promptCharacterOffset1, promptCharacterOffset1 + 1)
@@ -106,9 +106,13 @@ interface VimCommandLine {
   fun clearPromptCharacter() {
     if (promptCharacterOffset == null) return
 
-    setText(actualText)
-    caret.offset = min(caret.offset, visibleText.length)
+    // Note: We have to set promptCharacterOffset to null first, because when we set the new text,
+    //   the listener will be called, which will try to get the actual text again. And, if this field isn't null,
+    //   it will get an incorrect result.
+    val myActualText = actualText
     promptCharacterOffset = null
+    setText(myActualText)
+    caret.offset = min(caret.offset, visibleText.length)
   }
 
   fun clearCurrentAction()
