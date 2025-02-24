@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.action.change
 
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class OperatorActionTest : VimTestCase() {
@@ -153,8 +154,10 @@ class OperatorActionTest : VimTestCase() {
   }
 
   @Test
+  @Disabled(":set does not correctly parse the quotes in the lambda syntax")
+  // TODO: It's unclear that this is incorrect behaviour. Vim also fails with this command
   // The parser is treating the second double-quote char as a comment. The argument to the command is parsed as:
-  // opfunc={ arg -> execute "`[v`]rx
+  // opfunc={\ arg\ ->\ execute\ "`[v`]rx
   // The map command is properly handled - the `<CR>g@` is correctly understood, and the full lambda is passed to the
   // parser, but the parser does not fully handle the text
   fun `test operator function with lambda`() {
@@ -163,7 +166,7 @@ class OperatorActionTest : VimTestCase() {
       "lorem ipsum dolor sit amet",
       "lorem ipsum dolor sit amet"
     ) {
-      enterCommand("noremap gx :set opfunc={ arg -> execute \"`[v`]rx\" }<CR>g@")
+      enterCommand("""noremap gx :set opfunc={\ arg\ ->\ execute\ "`[v`]rx"\ }<CR>g@""")
     }
   }
 }

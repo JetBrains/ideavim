@@ -42,7 +42,7 @@ class VimBlob : VimDataType() {
     TODO("Not yet implemented")
   }
 
-  override fun toString(): String {
+  override fun toOutputString(): String {
     TODO("Not yet implemented")
   }
 }

@@ -30,11 +30,18 @@ internal class JoinFunctionHandler : FunctionHandler() {
     context: ExecutionContext,
     vimContext: VimLContext,
   ): VimDataType {
-    val argument1 = argumentValues[0].evaluate(editor, context, vimContext)
-    if (argument1 !is VimList) {
+    val list = argumentValues[0].evaluate(editor, context, vimContext)
+    if (list !is VimList) {
       throw exExceptionMessage("E1211", "1") // E1211: List required for argument 1
     }
-    val argument2 = argumentValues.getOrNull(1)?.evaluate(editor, context, vimContext)?.asString() ?: " "
-    return VimString(argument1.values.joinToString(argument2) { it.toString() })
+    val separator = argumentValues.getOrNull(1)?.evaluate(editor, context, vimContext)?.asString() ?: " "
+    return VimString(list.values.joinToString(separator) {
+      // According to the docs, String is used as-is, while List and Dictionary (and presumably the other datatypes) are
+      // converted in the same way as Vim's string() function, which has the same results as toEchoString()
+      when (it) {
+        is VimString -> it.value
+        else -> it.toOutputString()
+      }
+    })
   }
 }

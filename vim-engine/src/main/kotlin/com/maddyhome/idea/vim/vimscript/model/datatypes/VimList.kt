@@ -30,12 +30,14 @@ data class VimList(val values: MutableList<VimDataType>) : VimDataType() {
     throw exExceptionMessage("E730")  // E730: Using a List as a String
   }
 
-  override fun toString(): String {
-    val result = StringBuffer("[")
-    result.append(values.joinToString(separator = ", ") { if (it is VimString) "'$it'" else it.toString() })
-    result.append("]")
-    return result.toString()
+  override fun toOutputString() = buildString {
+    append("[")
+    // TODO: Handle recursive references
+    values.joinTo(this, separator = ", ") { if (it is VimString) "'${it.value}'" else it.toOutputString() }
+    append("]")
   }
+
+  override fun toInsertableString() = values.joinToString(separator = "") { it.toOutputString() + "\n" }
 
   override fun asBoolean(): Boolean {
     throw exExceptionMessage("E745")  // E745: Using a List as a Number

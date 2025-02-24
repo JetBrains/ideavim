@@ -69,9 +69,7 @@ data class VimString(val value: String) : VimDataType() {
   override fun toVimNumber(): VimInt = VimInt(this.value)
   override fun toVimString(): VimString = this
 
-  override fun toString(): String {
-    return value
-  }
+  override fun toOutputString() = value
 
   override fun deepCopy(level: Int): VimString {
     return copy()

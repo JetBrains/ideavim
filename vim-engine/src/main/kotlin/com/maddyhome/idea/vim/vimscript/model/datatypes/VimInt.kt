@@ -20,9 +20,7 @@ data class VimInt(val value: Int) : VimDataType() {
   override fun toVimNumber() = this
   override fun toVimString() = VimString(value.toString())
 
-  override fun toString(): String {
-    return value.toString()
-  }
+  override fun toOutputString() = value.toString()
 
   override fun deepCopy(level: Int): VimInt {
     return copy()
