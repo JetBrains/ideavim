@@ -33,10 +33,9 @@ class PlaybackRegisterAction : VimActionHandler.SingleExecution() {
   ): Boolean {
     val argument = cmd.argument as? Argument.Character ?: return false
     val reg = argument.character
-    val application = injector.application
     val res = arrayOf(false)
     when {
-      reg == LAST_COMMAND_REGISTER || (reg == '@' && injector.macro.lastRegister == LAST_COMMAND_REGISTER) -> { // No write action
+      reg == LAST_COMMAND_REGISTER || (reg == '@' && injector.macro.lastRegister == LAST_COMMAND_REGISTER) -> {
         try {
           var i = 0
           while (i < cmd.count) {
@@ -55,15 +54,11 @@ class PlaybackRegisterAction : VimActionHandler.SingleExecution() {
       }
 
       reg == '@' -> {
-        application.runWriteAction {
-          res[0] = injector.macro.playbackLastRegister(editor, context, cmd.count)
-        }
+        res[0] = injector.macro.playbackLastRegister(editor, context, cmd.count)
       }
 
       else -> {
-        application.runWriteAction {
-          res[0] = injector.macro.playbackRegister(editor, context, reg, cmd.count)
-        }
+        res[0] = injector.macro.playbackRegister(editor, context, reg, cmd.count)
       }
     }
     return res[0]

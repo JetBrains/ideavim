@@ -56,6 +56,21 @@ class MacroActionTest : VimTestCase() {
   }
 
   @Test
+  fun testMacroWithIdeAction() {
+    configureByText("""One
+      |Two
+      |Three
+      |Four""".trimMargin())
+    enterCommand("map j <Action>(EditorDown)")
+    typeText(injector.parser.parseKeys("qa" + "j" + "q"))
+    typeText(injector.parser.parseKeys("@a"))
+    assertState("""One
+      |Two
+      |${c}Three
+      |Four""".trimMargin())
+  }
+
+  @Test
   fun testRecordMacroWithDigraph() {
     typeTextInFile(injector.parser.parseKeys("qa" + "i" + "<C-K>OK<Esc>" + "q"), "")
     val vimEditor = fixture.editor.vim
