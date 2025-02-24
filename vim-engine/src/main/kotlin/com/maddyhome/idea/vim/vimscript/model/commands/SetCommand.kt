@@ -310,7 +310,7 @@ private fun formatKnownOptionValue(option: Option<out VimDataType>, scope: Optio
 
     return if (value.asBoolean()) "  ${option.name}" else "no${option.name}"
   } else {
-    return "  ${option.name}=$value"
+    return "  ${option.name}=${value.toOutputString()}"
   }
 }
 

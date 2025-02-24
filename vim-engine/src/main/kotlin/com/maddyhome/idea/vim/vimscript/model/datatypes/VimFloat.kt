@@ -32,7 +32,7 @@ data class VimFloat(val value: Double) : VimDataType() {
     throw exExceptionMessage("E806") // E806: Using a Float as a String
   }
 
-  override fun toString(): String {
+  override fun toOutputString(): String {
     if (value.isNaN()) return "nan"
     val tooBigOrTooSmall = abs(value) >= 1e6 || (abs(value) < 1e-3 && value != 0.0)
     val pattern = if (tooBigOrTooSmall) "0.0#####E0" else "0.0#####"

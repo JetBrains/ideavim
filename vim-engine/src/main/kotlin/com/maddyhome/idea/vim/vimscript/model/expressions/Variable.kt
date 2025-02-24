@@ -22,6 +22,6 @@ data class Variable(val scope: Scope?, val name: CurlyBracesName) : Expression()
   }
 
   fun toString(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): String {
-    return (scope?.toString() ?: "") + name.evaluate(editor, context, vimContext)
+    return (scope?.toString() ?: "") + name.evaluate(editor, context, vimContext).value
   }
 }

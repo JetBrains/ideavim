@@ -155,11 +155,12 @@ data class LetCommand(
           val variableValue =
             injector.variableService.getNonNullVariableValue(variable.expression, editor, context, this)
           if (variableValue is VimList) {
+            // TODO: Use .toVimNumber, but fix parsing of a string that represents a float value. e.g "1.3" should == 1
             // we use Integer.parseInt(........asString()) because in case if index's type is Float, List, Dictionary etc
             // vim throws the same error as the asString() method
-            val from = Integer.parseInt(variable.from?.evaluate(editor, context, this)?.toString() ?: "0")
+            val from = Integer.parseInt(variable.from?.evaluate(editor, context, this)?.asString() ?: "0")
             val to = Integer.parseInt(
-              variable.to?.evaluate(editor, context, this)?.toString()
+              variable.to?.evaluate(editor, context, this)?.asString()
                 ?: (variableValue.values.size - 1).toString(),
             )
 

@@ -17,12 +17,12 @@ class VimFloatTest {
 
   @Test
   fun `round 6 digits`() {
-    assertEquals("0.999999", VimFloat(0.999999).toString())
+    assertEquals("0.999999", VimFloat(0.999999).toOutputString())
   }
 
   @Test
   fun `round 7 digits`() {
-    assertEquals("1.0", VimFloat(0.9999999).toString())
+    assertEquals("1.0", VimFloat(0.9999999).toOutputString())
   }
 
   @Test
@@ -30,7 +30,7 @@ class VimFloatTest {
     val oldLocale = Locale.getDefault()
     Locale.setDefault(Locale.GERMANY) // In Germany, they use a comma as a decimal separator, i.e., "3,14".
     try {
-      assertEquals("3.14", VimFloat(3.14).toString())
+      assertEquals("3.14", VimFloat(3.14).toOutputString())
     } finally {
       Locale.setDefault(oldLocale)
     }

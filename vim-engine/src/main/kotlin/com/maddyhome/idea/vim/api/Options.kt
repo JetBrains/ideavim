@@ -279,6 +279,9 @@ object Options {
       // * E81: Using <SID> not in a script context
       // * E475: Invalid argument: s:MyFunc
       // * E474: Invalid argument: opfunc=funcref('s:MyFunc')
+      // TODO: Vim evaluates (and therefore validates) function(), funcref() + lambda values when set
+      // If doesn't evaluate simple names, so it doesn't handle arbitrary expressions.
+      // However, we don't have the context to evaluate, and can't easily pass it in.
       return super.parseValue(value, token)
     }
   })

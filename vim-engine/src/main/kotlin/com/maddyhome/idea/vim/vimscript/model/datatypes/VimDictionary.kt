@@ -28,19 +28,16 @@ data class VimDictionary(val dictionary: LinkedHashMap<VimString, VimDataType>) 
     throw exExceptionMessage("E731")  // E731: Using a Dictionary as a String
   }
 
-  override fun toString(): String {
-    val result = StringBuffer("{")
-    result.append(dictionary.map { stringOfEntry(it) }.joinToString(separator = ", "))
-    result.append("}")
-    return result.toString()
-  }
-
-  private fun stringOfEntry(entry: Map.Entry<VimString, VimDataType>): String {
-    val valueString = when (entry.value) {
-      is VimString -> "'${entry.value}'"
-      else -> entry.value.toString()
-    }
-    return "'${entry.key}': $valueString"
+  override fun toOutputString() = buildString {
+    append("{")
+    append(dictionary.map { (key, value) ->
+      val valueString = when (value) {
+        is VimString -> "'${value.value}'"
+        else -> value.toOutputString()  // TODO: Handle recursive entries
+      }
+      "'${key.value}': $valueString"
+    }.joinToString(separator = ", "))
+    append("}")
   }
 
   override fun asBoolean(): Boolean {

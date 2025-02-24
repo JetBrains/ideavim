@@ -44,7 +44,7 @@ data class VimFuncref(
     throw exExceptionMessage("E729")  // E729: Using a Funcref as a String
   }
 
-  override fun toString(): String {
+  override fun toOutputString(): String {
     return if (arguments.values.isEmpty() && dictionary == null) {
       when (type) {
         Type.LAMBDA -> "function('${handler.name}')"
@@ -54,7 +54,7 @@ data class VimFuncref(
     } else {
       val result = StringBuffer("function('${handler.name}'")
       if (arguments.values.isNotEmpty()) {
-        result.append(", ").append(arguments.toString())
+        result.append(", ").append(arguments.toOutputString())
       }
       result.append(")")
       return result.toString()
