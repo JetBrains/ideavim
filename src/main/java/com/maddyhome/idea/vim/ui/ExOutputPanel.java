@@ -319,10 +319,7 @@ public class ExOutputPanel extends JPanel {
         KeyHandler.getInstance().getKeyStack().addKeys(keys);
         ExecutionContext context =
           injector.getExecutionContextManager().getEditorExecutionContext(new IjVimEditor(myEditor));
-        injector.getApplication().runWriteAction(() -> {
-          VimPlugin.getMacro().playbackKeys(new IjVimEditor(myEditor), context, 1);
-          return null;
-        });
+        VimPlugin.getMacro().playbackKeys(new IjVimEditor(myEditor), context, 1);
       }
     });
   }
