@@ -52,7 +52,7 @@ interface VimCommandLine {
     get() {
       val promptCharacterOffset1 = promptCharacterOffset
       return if (promptCharacterOffset1 == null) visibleText else {
-        if (promptCharacterOffset1 >= visibleText.length) {
+        if (promptCharacterOffset1 > visibleText.length) {
           logger.error("promptCharacterOffset1 >= visibleText.length: $promptCharacterOffset1 >= ${visibleText.length}")
           visibleText
         } else {
