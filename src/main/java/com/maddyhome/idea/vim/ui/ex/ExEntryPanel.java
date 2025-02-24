@@ -382,7 +382,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
       catch (Throwable ex) {
         // Make sure the exception doesn't leak out of the handler, because it can break the text entry field and
         // require the editor to be closed/reopened. The worst that will happen is no incsearch highlights
-        logger.warn("Error while trying to show incsearch highlights", ex);
+        logger.error("Error while trying to show incsearch highlights", ex);
       }
     }
 
@@ -397,7 +397,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
         }
       }
       catch (Exception e) {
-        logger.warn("Cannot parse command for incsearch", e);
+        logger.error("Cannot parse command for incsearch", e);
       }
 
       return null;
