@@ -27,7 +27,7 @@ data class IfStatement(val conditionToBody: List<Pair<Expression, List<Executabl
     var result: ExecutionResult = ExecutionResult.Success
     var statementsToExecute: List<Executable>? = null
     for ((condition, statements) in conditionToBody) {
-      if (condition.evaluate(editor, context, this).asBoolean()) {
+      if (condition.evaluate(editor, context, this).toVimNumber().booleanValue) {
         statementsToExecute = statements
         statementsToExecute.forEach { it.vimContext = this }
         break

@@ -124,7 +124,7 @@ class ListOptionMapperTest : VimTestCase() {
 
   @Test
   fun `test setglobal 'list' option affects IdeaVim global value only`() {
-    assertFalse(IjOptions.list.defaultValue.asBoolean())  // Vim default
+    assertFalse(IjOptions.list.defaultValue.booleanValue)  // Vim default
     assertCommandOutput("setglobal list?", "nolist")
 
     enterCommand("setglobal list")

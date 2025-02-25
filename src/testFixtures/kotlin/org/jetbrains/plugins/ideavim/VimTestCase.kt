@@ -153,17 +153,17 @@ abstract class VimTestCase {
   private fun resetAllOptions() {
     // Some options are mapped to IntelliJ settings. Make sure the IntelliJ settings match the Vim defaults
     EditorSettingsExternalizable.getInstance().apply {
-      isUseCustomSoftWrapIndent = IjOptions.breakindent.defaultValue.asBoolean()
+      isUseCustomSoftWrapIndent = IjOptions.breakindent.defaultValue.booleanValue
       isRightMarginShown = false  // Otherwise we get `colorcolumn=+0`
-      isWhitespacesShown = IjOptions.list.defaultValue.asBoolean()
-      isLineNumbersShown = Options.number.defaultValue.asBoolean()
-      lineNumeration = if (IjOptions.relativenumber.defaultValue.asBoolean()) {
+      isWhitespacesShown = IjOptions.list.defaultValue.booleanValue
+      isLineNumbersShown = Options.number.defaultValue.booleanValue
+      lineNumeration = if (IjOptions.relativenumber.defaultValue.booleanValue) {
         if (isLineNumbersShown) EditorSettings.LineNumerationType.HYBRID else EditorSettings.LineNumerationType.RELATIVE
       } else {
         EditorSettings.LineNumerationType.ABSOLUTE
       }
       softWrapFileMasks = "*"
-      isUseSoftWraps = IjOptions.wrap.defaultValue.asBoolean()
+      isUseSoftWraps = IjOptions.wrap.defaultValue.booleanValue
 
       verticalScrollJump = Options.scrolljump.defaultValue.value
       verticalScrollOffset = Options.scrolloff.defaultValue.value
@@ -188,7 +188,7 @@ abstract class VimTestCase {
   private fun setDefaultIntelliJSettings(editor: Editor) {
     // These settings don't have a global setting...
     ApplicationManager.getApplication().invokeAndWait {
-      editor.settings.isCaretRowShown = IjOptions.cursorline.defaultValue.asBoolean()
+      editor.settings.isCaretRowShown = IjOptions.cursorline.defaultValue.booleanValue
     }
   }
 

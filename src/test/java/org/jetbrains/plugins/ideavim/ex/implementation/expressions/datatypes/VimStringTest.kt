@@ -86,11 +86,11 @@ class VimStringTest {
 
   @Test
   fun `string as boolean`() {
-    assertEquals(false, VimString("oh, hi Mark").asBoolean())
+    assertEquals(false, VimString("oh, hi Mark").toVimNumber().booleanValue)
   }
 
   @Test
   fun `string as boolean2`() {
-    assertEquals(true, VimString("3oh, hi Mark").asBoolean())
+    assertEquals(true, VimString("3oh, hi Mark").toVimNumber().booleanValue)
   }
 }

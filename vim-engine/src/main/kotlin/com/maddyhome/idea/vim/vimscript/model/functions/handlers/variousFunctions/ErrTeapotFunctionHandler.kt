@@ -28,7 +28,7 @@ class ErrTeapotFunctionHandler : FunctionHandler() {
     context: ExecutionContext,
     vimContext: VimLContext,
   ): VimDataType {
-    val arg1 = argumentValues.getOrNull(0)?.evaluate(editor, context, vimContext)?.asBoolean() ?: false
+    val arg1 = argumentValues.getOrNull(0)?.evaluate(editor, context, vimContext)?.toVimNumber()?.booleanValue ?: false
     if (arg1) {
       throw exExceptionMessage("E503")
     }

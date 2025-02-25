@@ -129,7 +129,7 @@ class BreakIndentOptionMapperTest : VimTestCase() {
 
   @Test
   fun `test setglobal 'breakindent' option affects IdeaVim global value only`() {
-    assertFalse(IjOptions.breakindent.defaultValue.asBoolean()) // Vim default
+    assertFalse(IjOptions.breakindent.defaultValue.booleanValue) // Vim default
     assertCommandOutput("setglobal breakindent?", "nobreakindent")
 
     enterCommand("setglobal breakindent")

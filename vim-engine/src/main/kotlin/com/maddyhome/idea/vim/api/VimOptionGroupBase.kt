@@ -1196,7 +1196,7 @@ private class OptionStorage {
 
   // We can't use StrictMode.assert because it checks an option, which calls into VimOptionGroupBase...
   private inline fun strictModeAssert(condition: Boolean, lazyMessage: () -> String) {
-    if (globalValues[Options.ideastrictmode.name]?.value?.asBoolean() == true && !condition) {
+    if (globalValues[Options.ideastrictmode.name]?.value?.toVimNumber()?.booleanValue == true && !condition) {
       error(lazyMessage())
     }
   }

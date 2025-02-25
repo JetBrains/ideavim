@@ -17,6 +17,7 @@ import com.maddyhome.idea.vim.options.StringListOption
 import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 import org.jetbrains.annotations.TestOnly
 
 interface VimOptionGroup {
@@ -282,7 +283,7 @@ fun VimOptionGroup.unsetToggleOption(option: ToggleOption, scope: OptionAccessSc
  */
 fun VimOptionGroup.invertToggleOption(option: ToggleOption, scope: OptionAccessScope) {
   val optionValue = getOptionValue(option, scope)
-  setOptionValue(option, scope, if (optionValue.asBoolean()) VimInt.ZERO else VimInt.ONE)
+  setOptionValue(option, scope, (!optionValue.booleanValue).asVimInt())
 }
 
 /**

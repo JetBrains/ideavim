@@ -32,7 +32,7 @@ internal class SplitFunctionHandler : FunctionHandler() {
   ): VimDataType {
     val text = argumentValues[0].evaluate(editor, context, vimContext).asString()
     val delimiter = argumentValues.getOrNull(1)?.evaluate(editor, context, vimContext)?.asString() ?: "\\s\\+"
-    val keepEmpty = argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext)?.asBoolean() ?: false
+    val keepEmpty = argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext)?.toVimNumber()?.booleanValue ?: false
 
     val delimiters: List<Pair<Int, Int>> =
       injector.regexpService.getAllMatches(text, delimiter) + Pair(text.length, text.length)
