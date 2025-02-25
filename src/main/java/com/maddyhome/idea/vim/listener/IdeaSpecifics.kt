@@ -42,6 +42,7 @@ import com.maddyhome.idea.vim.newapi.initInjector
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.inNormalMode
+import com.maddyhome.idea.vim.undo.VimTimestampBasedUndoService
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.isIdeaRefactorModeKeep
 import org.jetbrains.annotations.NonNls
@@ -70,6 +71,11 @@ internal object IdeaSpecifics {
       }
 
       val isVimAction = (action as? AnActionWrapper)?.delegate is VimShortcutKeyAction
+      if (!isVimAction && injector.vimState.mode == Mode.INSERT) {
+        val undoService = injector.undo as VimTimestampBasedUndoService
+        val nanoTime = System.nanoTime()
+        editor?.vim?.forEachCaret { undoService.endInsertSequence(it, it.offset, nanoTime) }
+      }
       if (!isVimAction && injector.globalIjOptions().trackactionids) {
         if (action !is NotificationService.ActionIdNotifier.CopyActionId && action !is NotificationService.ActionIdNotifier.StopTracking) {
           val id: String? =
