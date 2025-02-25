@@ -66,7 +66,13 @@ data class VimString(val value: String) : VimDataType() {
     return value
   }
 
-  override fun toVimNumber(): VimInt = VimInt(this.value)
+  override fun toVimNumber(): VimInt {
+    // Vim will automatically convert a String to a Number when required during evaluation. The value is not parsed as
+    // strictly as the text used to create a Number expression - Vim allows trailing characters for Number, so something
+    // like `6bar` is parsed as `6`.
+    return (parseNumber(value, allowTrailingCharacters = true) ?: 0).asVimInt()
+  }
+
   override fun toVimString(): VimString = this
 
   override fun toOutputString() = value

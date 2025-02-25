@@ -39,10 +39,6 @@ data class VimList(val values: MutableList<VimDataType>) : VimDataType() {
 
   override fun toInsertableString() = values.joinToString(separator = "") { it.toOutputString() + "\n" }
 
-  override fun asBoolean(): Boolean {
-    throw exExceptionMessage("E745")  // E745: Using a List as a Number
-  }
-
   override fun deepCopy(level: Int): VimDataType {
     return if (level > 0) {
       VimList(values.map { it.deepCopy(level - 1) }.toMutableList())

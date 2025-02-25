@@ -326,7 +326,7 @@ class ModeWidgetPopup : AnAction() {
 
     private class VimScopeBooleanVariable(private var key: String) : ReadWriteProperty<ModeColors, Boolean> {
       override fun getValue(thisRef: ModeColors, property: KProperty<*>): Boolean {
-        return injector.variableService.getVimVariable(key)?.asBoolean() ?: false
+        return injector.variableService.getVimVariable(key)?.toVimNumber()?.booleanValue ?: false
       }
 
       override fun setValue(thisRef: ModeColors, property: KProperty<*>, value: Boolean) {

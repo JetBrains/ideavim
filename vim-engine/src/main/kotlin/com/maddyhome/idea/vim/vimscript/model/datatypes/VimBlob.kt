@@ -26,10 +26,6 @@ class VimBlob : VimDataType() {
     TODO("Not yet implemented")
   }
 
-  override fun asBoolean(): Boolean {
-    TODO("empty must be falsy (0z), otherwise - truthy (like 0z00 0z01 etc)")
-  }
-
   override fun deepCopy(level: Int): VimDataType {
     TODO("Not yet implemented")
   }

@@ -18,7 +18,7 @@ import java.awt.Color
 fun getModeBackground(mode: Mode?): Color {
   val isLight = !(LafManager.getInstance()?.currentUIThemeLookAndFeel?.isDark ?: false)
   val keyPostfix = if (isLight) "_light" else "_dark"
-  if (injector.variableService.getVimVariable("widget_mode_is_full_customization$keyPostfix")?.asBoolean() != true) {
+  if (injector.variableService.getVimVariable("widget_mode_is_full_customization$keyPostfix")?.toVimNumber()?.booleanValue != true) {
     val themeString = injector.variableService.getVimVariable("widget_mode_theme$keyPostfix")?.asString() ?: ""
     val theme = ModeWidgetTheme.parseString(themeString) ?: ModeWidgetTheme.getDefaultTheme()
     when (theme) {
@@ -102,7 +102,7 @@ fun getModeBackground(mode: Mode?): Color {
 fun getModeForeground(mode: Mode?): Color {
   val isLight = !(LafManager.getInstance()?.currentUIThemeLookAndFeel?.isDark ?: false)
   val keyPostfix = if (isLight) "_light" else "_dark"
-  if (injector.variableService.getVimVariable("widget_mode_is_full_customization$keyPostfix")?.asBoolean() != true) {
+  if (injector.variableService.getVimVariable("widget_mode_is_full_customization$keyPostfix")?.toVimNumber()?.booleanValue != true) {
     val themeString = injector.variableService.getVimVariable("widget_mode_theme$keyPostfix")?.asString() ?: ""
     val theme = ModeWidgetTheme.parseString(themeString) ?: ModeWidgetTheme.getDefaultTheme()
     return when (theme) {

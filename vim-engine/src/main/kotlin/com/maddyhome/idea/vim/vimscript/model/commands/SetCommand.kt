@@ -300,16 +300,17 @@ private fun showOptions(
 }
 
 private fun formatKnownOptionValue(option: Option<out VimDataType>, scope: OptionAccessScope): String {
-  val value = injector.optionGroup.getOptionValue(option, scope)
   if (option is ToggleOption) {
+    val value = injector.optionGroup.getOptionValue(option, scope)
 
     // Unset global-local toggle option
     if (option.declaredScope.isGlobalLocal() && scope is OptionAccessScope.LOCAL && value == VimInt.MINUS_ONE) {
       return "--${option.name}"
     }
 
-    return if (value.asBoolean()) "  ${option.name}" else "no${option.name}"
+    return if (value.booleanValue) "  ${option.name}" else "no${option.name}"
   } else {
+    val value = injector.optionGroup.getOptionValue(option, scope)
     return "  ${option.name}=${value.toOutputString()}"
   }
 }

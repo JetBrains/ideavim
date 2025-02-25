@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.vimscript.model.datatypes
 
+import com.maddyhome.idea.vim.ex.ExException
+
 abstract class VimDataType {
 
   abstract fun asDouble(): Double
@@ -15,10 +17,29 @@ abstract class VimDataType {
   // string value that is used in arithmetic expressions (concatenation etc.)
   abstract fun asString(): String
 
-  open fun asBoolean(): Boolean {
-    return asDouble() != 0.0
-  }
+  /**
+   * Deprecated. Returns the current object as a boolean value, throwing if there is no conversion available
+   *
+   * The original implementation of this would incorrectly convert Float to a boolean value, which is not part of Vim's
+   * conversion rules.
+   *
+   * If the caller requires a boolean value from an expression result, it is better to be explicit that the expression
+   * is expected to be a Vim Number, by calling [toVimNumber]. This function will apply the correct conversion rules
+   * (only String can convert to Number) and will throw otherwise.
+   *
+   * This function is used by external plugins.
+   */
+  @Deprecated("Use toVimNumber().booleanValue instead", ReplaceWith("toVimNumber().booleanValue"))
+  fun asBoolean() = toVimNumber().booleanValue
 
+  /**
+   * Returns this object as a Vim Number (integral number value), converting if necessary/appropriate
+   *
+   * Note that Vim will only automatically convert a String to a Number. Anything else will throw an [ExException] in
+   * the form "Using a XXX as a Number".
+   *
+   * Use this function to get a Number that can be used as a boolean value.
+   */
   abstract fun toVimNumber(): VimInt
   abstract fun toVimString(): VimString
 

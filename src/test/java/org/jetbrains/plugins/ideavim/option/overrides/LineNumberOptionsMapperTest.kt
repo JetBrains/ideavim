@@ -209,7 +209,7 @@ class LineNumberOptionsMapperTest : VimTestCase() {
 
   @Test
   fun `test set global 'number' option affects IdeaVim global value only`() {
-    assertFalse(Options.number.defaultValue.asBoolean())
+    assertFalse(Options.number.defaultValue.booleanValue)
     assertCommandOutput("setglobal number?", "nonumber")
 
     enterCommand("setglobal number")
@@ -220,7 +220,7 @@ class LineNumberOptionsMapperTest : VimTestCase() {
 
   @Test
   fun `test set global 'relativenumber' option affects IdeaVim global value only`() {
-    assertFalse(Options.number.defaultValue.asBoolean())
+    assertFalse(Options.number.defaultValue.booleanValue)
     assertCommandOutput("setglobal relativenumber?", "norelativenumber")
 
     enterCommand("setglobal relativenumber")

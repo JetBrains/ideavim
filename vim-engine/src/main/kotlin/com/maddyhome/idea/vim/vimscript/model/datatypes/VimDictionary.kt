@@ -40,10 +40,6 @@ data class VimDictionary(val dictionary: LinkedHashMap<VimString, VimDataType>) 
     append("}")
   }
 
-  override fun asBoolean(): Boolean {
-    throw exExceptionMessage("E728")  // E728: Using a Dictionary as a Number
-  }
-
   override fun deepCopy(level: Int): VimDictionary {
     return if (level > 0) {
       VimDictionary(linkedMapOf(*(dictionary.map { it.key.copy() to it.value.deepCopy(level - 1) }.toTypedArray())))

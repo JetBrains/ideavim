@@ -419,8 +419,8 @@ private class BombOptionMapper : LocalOptionValueOverride<VimInt> {
     // Do nothing if we're setting the initial default
     if (newValue is OptionValue.Default && storedValue == null) return false
 
-    val hasBom = getLocalValue(storedValue, editor).value.asBoolean()
-    if (hasBom == newValue.value.asBoolean()) return false
+    val hasBom = getLocalValue(storedValue, editor).value.booleanValue
+    if (hasBom == newValue.value.booleanValue) return false
 
     // Use IntelliJ's own actions to modify the BOM. This will change the BOM stored in the virtual file, update the
     // file contents and save it
@@ -454,7 +454,7 @@ private class BreakIndentOptionMapper(
     editor.ij.settings.isUseCustomSoftWrapIndent.asVimInt()
 
   override fun setLocalExternalValue(editor: VimEditor, value: VimInt) {
-    editor.ij.settings.isUseCustomSoftWrapIndent = value.asBoolean()
+    editor.ij.settings.isUseCustomSoftWrapIndent = value.booleanValue
   }
 }
 
@@ -581,7 +581,7 @@ private class CursorLineOptionMapper(cursorLineOption: ToggleOption) :
     editor.ij.settings.isCaretRowShown.asVimInt()
 
   override fun setLocalExternalValue(editor: VimEditor, value: VimInt) {
-    editor.ij.settings.isCaretRowShown = value.asBoolean()
+    editor.ij.settings.isCaretRowShown = value.booleanValue
   }
 }
 
@@ -789,7 +789,7 @@ private class ListOptionMapper(listOption: ToggleOption, internalOptionValueAcce
     editor.ij.settings.isWhitespacesShown.asVimInt()
 
   override fun setLocalExternalValue(editor: VimEditor, value: VimInt) {
-    editor.ij.settings.isWhitespacesShown = value.asBoolean()
+    editor.ij.settings.isWhitespacesShown = value.booleanValue
   }
 }
 
@@ -815,7 +815,7 @@ private class NumberOptionMapper(numberOption: ToggleOption, internalOptionValue
   }
 
   override fun setLocalExternalValue(editor: VimEditor, value: VimInt) {
-    if (value.asBoolean()) {
+    if (value.booleanValue) {
       if (editor.ij.settings.isLineNumbersShown) {
         if (isShowingRelativeLineNumbers(editor.ij.settings.lineNumerationType)) {
           editor.ij.settings.lineNumerationType = LineNumerationType.HYBRID
@@ -869,7 +869,7 @@ private class RelativeNumberOptionMapper(
   }
 
   override fun setLocalExternalValue(editor: VimEditor, value: VimInt) {
-    if (value.asBoolean()) {
+    if (value.booleanValue) {
       if (editor.ij.settings.isLineNumbersShown) {
         if (isShowingAbsoluteLineNumbers(editor.ij.settings.lineNumerationType)) {
           editor.ij.settings.lineNumerationType = LineNumerationType.HYBRID
@@ -1234,7 +1234,7 @@ private class WrapOptionMapper(wrapOption: ToggleOption, internalOptionValueAcce
   override fun getEffectiveExternalValue(editor: VimEditor) = getEffectiveIsUseSoftWraps(editor).asVimInt()
 
   override fun setLocalExternalValue(editor: VimEditor, value: VimInt) {
-    setIsUseSoftWraps(editor, value.asBoolean())
+    setIsUseSoftWraps(editor, value.booleanValue)
   }
 
   override fun canInitialiseOptionFrom(sourceEditor: VimEditor, targetEditor: VimEditor): Boolean {
