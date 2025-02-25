@@ -28,6 +28,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.ex.AnActionListener
 import com.intellij.openapi.actionSystem.impl.ProxyShortcutSet
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.actions.EnterAction
 import com.intellij.openapi.keymap.KeymapManager
 import com.intellij.openapi.project.DumbAwareToggleAction
 import com.intellij.openapi.util.TextRange
@@ -71,7 +72,7 @@ internal object IdeaSpecifics {
       }
 
       val isVimAction = (action as? AnActionWrapper)?.delegate is VimShortcutKeyAction
-      if (!isVimAction && injector.vimState.mode == Mode.INSERT) {
+      if (!isVimAction && injector.vimState.mode == Mode.INSERT && action !is EnterAction) {
         val undoService = injector.undo as VimTimestampBasedUndoService
         val nanoTime = System.nanoTime()
         editor?.vim?.forEachCaret { undoService.endInsertSequence(it, it.offset, nanoTime) }
