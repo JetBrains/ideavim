@@ -46,7 +46,7 @@ class WidgetState : ApplicationUsagesCollector() {
     if (injector.variableService.getVimVariable("widget_mode_is_full_customization$postfix")?.toVimNumber()?.booleanValue == true) {
       return "ADVANCED CUSTOMIZATION"
     }
-    val themeString = injector.variableService.getVimVariable("widget_mode_theme$postfix")?.asString()
+    val themeString = injector.variableService.getVimVariable("widget_mode_theme$postfix")?.toVimString()?.value
     return if (themeString?.lowercase() == "colorless") {
       "COLORLESS"
     } else {

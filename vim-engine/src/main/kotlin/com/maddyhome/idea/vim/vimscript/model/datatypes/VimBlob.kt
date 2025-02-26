@@ -14,10 +14,6 @@ class VimBlob : VimDataType() {
     TODO("Not yet implemented")
   }
 
-  override fun asString(): String {
-    TODO("Not yet implemented")
-  }
-
   override fun toVimNumber(): VimInt {
     TODO("Not yet implemented")
   }

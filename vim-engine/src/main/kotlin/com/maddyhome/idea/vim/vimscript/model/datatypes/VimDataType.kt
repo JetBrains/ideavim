@@ -14,8 +14,20 @@ abstract class VimDataType {
 
   abstract fun asDouble(): Double
 
-  // string value that is used in arithmetic expressions (concatenation etc.)
-  abstract fun asString(): String
+  /**
+   * Deprecated. Returns the current object as a string value, throwing if there is no conversion available
+   *
+   * This function is unclear on its intended usage, as there are several reasons for getting a string or textual
+   * representation of a Vim expression result.
+   *
+   * If the caller requires a String value from an expression result, it is better to be explicit and use [toVimString]
+   * and then use the accessors to get the underlying value. This will apply the correct automatic conversion from
+   * Number, and throw for other datatypes.
+   *
+   * This function is used by external plugins.
+   */
+  @Deprecated("Use toVimString().value instead")
+  fun asString(): String = toVimString().value
 
   /**
    * Deprecated. Returns the current object as a boolean value, throwing if there is no conversion available
@@ -41,6 +53,21 @@ abstract class VimDataType {
    * Use this function to get a Number that can be used as a boolean value.
    */
   abstract fun toVimNumber(): VimInt
+
+  /**
+   * Returns this object as a Vim String, converting if necessary and throwing if no conversion is allowed
+   *
+   * Use this function to get the value of a String expression, after evaluation. It will throw an [ExException] if the
+   * value is not a String and cannot be automatically converted to a String, according to Vim's rules (only Numbers
+   * can be automatically converted to String).
+   *
+   * To get the text of an arbitrary expression result (e.g. a Float, List or Dictionary), use [toOutputString] to
+   * report the textual representation to the user in output and error messages, and [toInsertableString] to get a
+   * textual representation that can be inserted into a document.
+   *
+   * @see toOutputString
+   * @see toInsertableString
+   */
   abstract fun toVimString(): VimString
 
   /**

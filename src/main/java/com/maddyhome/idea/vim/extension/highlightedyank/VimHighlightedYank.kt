@@ -214,11 +214,13 @@ internal class VimHighlightedYank : VimExtension, VimYankListener, ModeChangeLis
     }
 
     private fun extractUsersHighlightColor(): Color {
-      val value = VimPlugin.getVariableService().getGlobalVariableValue(HIGHLIGHT_COLOR_VARIABLE_NAME)
+      val value =
+        VimPlugin.getVariableService().getGlobalVariableValue(HIGHLIGHT_COLOR_VARIABLE_NAME)?.toVimString()?.value
       if (value != null) {
         return try {
-          parseRgbaColor(value.asString())
+          parseRgbaColor(value)
         } catch (e: Exception) {
+          @Suppress("DialogTitleCapitalization")
           @VimNlsSafe val message = MessageHelper.message(
             "highlightedyank.invalid.value.of.0.1",
             "g:$HIGHLIGHT_COLOR_VARIABLE_NAME",
@@ -232,12 +234,15 @@ internal class VimHighlightedYank : VimExtension, VimYankListener, ModeChangeLis
     }
 
     private fun extractUserHighlightForegroundColor(): Color? {
-      val value = VimPlugin.getVariableService().getGlobalVariableValue(HIGHLIGHT_FOREGROUND_COLOR_VARIABLE_NAME)
-        ?: return null
+      val value =
+        VimPlugin.getVariableService().getGlobalVariableValue(HIGHLIGHT_FOREGROUND_COLOR_VARIABLE_NAME)
+          ?.toVimString()?.value
+          ?: return null
 
       return try {
-        parseRgbaColor(value.asString())
+        parseRgbaColor(value)
       } catch (e: Exception) {
+        @Suppress("DialogTitleCapitalization")
         @VimNlsSafe val message = MessageHelper.message(
           "highlightedyank.invalid.value.of.0.1",
           "g:$HIGHLIGHT_FOREGROUND_COLOR_VARIABLE_NAME",
@@ -268,6 +273,7 @@ internal class VimHighlightedYank : VimExtension, VimYankListener, ModeChangeLis
         return try {
           extractFun(value)
         } catch (e: Exception) {
+          @Suppress("DialogTitleCapitalization")
           @VimNlsSafe val message = MessageHelper.message(
             "highlightedyank.invalid.value.of.0.1",
             "g:$variable",

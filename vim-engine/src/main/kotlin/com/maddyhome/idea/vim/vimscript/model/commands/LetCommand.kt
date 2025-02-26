@@ -26,7 +26,6 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimBlob
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.EnvVariableExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.OneElementSublistExpression
@@ -103,7 +102,7 @@ data class LetCommand(
       is OneElementSublistExpression -> {
         when (val containerValue = variable.expression.evaluate(editor, context, vimContext)) {
           is VimDictionary -> {
-            val dictKey = VimString(variable.index.evaluate(editor, context, this).asString())
+            val dictKey = variable.index.evaluate(editor, context, this).toVimString()
             if (operator != AssignmentOperator.ASSIGNMENT && !containerValue.dictionary.containsKey(dictKey)) {
               throw ExException("E716: Key not present in Dictionary: $dictKey")
             }
@@ -132,9 +131,7 @@ data class LetCommand(
           }
 
           is VimList -> {
-            // we use Integer.parseInt(........asString()) because in case if index's type is Float, List, Dictionary etc
-            // vim throws the same error as the asString() method
-            val index = Integer.parseInt(variable.index.evaluate(editor, context, this).asString())
+            val index = variable.index.evaluate(editor, context, this).toVimNumber().value
             if (index > containerValue.values.size - 1) {
               throw ExException("E684: list index out of range: $index")
             }
@@ -155,14 +152,9 @@ data class LetCommand(
           val variableValue =
             injector.variableService.getNonNullVariableValue(variable.expression, editor, context, this)
           if (variableValue is VimList) {
-            // TODO: Use .toVimNumber, but fix parsing of a string that represents a float value. e.g "1.3" should == 1
-            // we use Integer.parseInt(........asString()) because in case if index's type is Float, List, Dictionary etc
-            // vim throws the same error as the asString() method
-            val from = Integer.parseInt(variable.from?.evaluate(editor, context, this)?.asString() ?: "0")
-            val to = Integer.parseInt(
-              variable.to?.evaluate(editor, context, this)?.asString()
-                ?: (variableValue.values.size - 1).toString(),
-            )
+            val from = variable.from?.evaluate(editor, context, this)?.toVimNumber()?.value ?: 0
+            val to = variable.to?.evaluate(editor, context, this)?.toVimNumber()?.value
+              ?: (variableValue.values.size - 1)
 
             val expressionValue = expression.evaluate(editor, context, this)
             if (expressionValue !is VimList && expressionValue !is VimBlob) {
@@ -236,7 +228,7 @@ data class LetCommand(
             editor,
             context,
             variable.char,
-            expression.evaluate(editor, context, vimContext).asString()
+            expression.evaluate(editor, context, vimContext).toVimString().value
           )
           if (!result) {
             logger.error(

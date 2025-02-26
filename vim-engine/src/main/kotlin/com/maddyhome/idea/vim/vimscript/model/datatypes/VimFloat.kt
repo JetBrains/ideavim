@@ -20,10 +20,6 @@ data class VimFloat(val value: Double) : VimDataType() {
     return value
   }
 
-  override fun asString(): String {
-    throw exExceptionMessage("E806") // E806: Using a Float as a String
-  }
-
   override fun toVimNumber(): VimInt {
     throw exExceptionMessage("E805") // E805: Using a Float as a Number
   }

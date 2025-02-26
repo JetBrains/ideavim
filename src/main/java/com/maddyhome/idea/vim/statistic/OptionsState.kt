@@ -42,7 +42,7 @@ internal class OptionsState : ApplicationUsagesCollector() {
       OPTIONS.metric(
         IDEAJOIN with injector.optionGroup.getOptionValue(IjOptions.ideajoin, OptionAccessScope.GLOBAL(null)).booleanValue,
         IDEAMARKS with globalIjOptions.ideamarks,
-        IDEAREFACTOR with injector.optionGroup.getOptionValue(IjOptions.idearefactormode, OptionAccessScope.GLOBAL(null)).asString(),
+        IDEAREFACTOR with injector.optionGroup.getOptionValue(IjOptions.idearefactormode, OptionAccessScope.GLOBAL(null)).value,
         IDEAPUT with globalOptions.clipboard.contains(OptionConstants.clipboard_ideaput),
         IDEASTATUSICON with globalIjOptions.ideastatusicon,
         IDEAWRITE with globalIjOptions.ideawrite,

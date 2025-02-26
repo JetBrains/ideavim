@@ -23,7 +23,7 @@ class VariableParsingTests {
     val variable = VimscriptParser.parseExpression("variableName")
     assertTrue(variable is Variable)
     assertTrue(variable.scope == null)
-    assertEquals("variableName", variable.name.evaluate().asString())
+    assertEquals("variableName", variable.name.evaluate().value)
   }
 
   @Test
@@ -31,6 +31,6 @@ class VariableParsingTests {
     val variable = VimscriptParser.parseExpression("t:variableName")
     assertTrue(variable is Variable)
     assertEquals(Scope.TABPAGE_VARIABLE, variable.scope)
-    assertEquals("variableName", variable.name.evaluate().asString())
+    assertEquals("variableName", variable.name.evaluate().value)
   }
 }

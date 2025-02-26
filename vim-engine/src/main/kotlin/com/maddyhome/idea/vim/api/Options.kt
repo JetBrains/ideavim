@@ -299,7 +299,7 @@ object Options {
     override val defaultValue: VimString
       get() {
         // Default value depends on the `'shell'` option. Since it's a global option, we can pass null as the editor
-        val shell = injector.optionGroup.getOptionValue(shell, OptionAccessScope.GLOBAL(null)).asString()
+        val shell = injector.optionGroup.getOptionValue(shell, OptionAccessScope.GLOBAL(null)).value
         return VimString(
           when {
             injector.systemInfoService.isWindows && shell.contains("powershell") -> "-Command"
@@ -314,7 +314,7 @@ object Options {
     override val defaultValue: VimString
       get() {
         // Default value depends on the `'shell'` option. Since it's a global option, we can pass null as the editor
-        val shell = injector.optionGroup.getOptionValue(shell, OptionAccessScope.GLOBAL(null)).asString()
+        val shell = injector.optionGroup.getOptionValue(shell, OptionAccessScope.GLOBAL(null)).value
         return VimString(
           when {
             injector.systemInfoService.isWindows && shell == "cmd.exe" -> "("

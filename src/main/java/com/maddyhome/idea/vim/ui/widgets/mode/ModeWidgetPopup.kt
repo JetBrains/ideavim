@@ -336,7 +336,7 @@ class ModeWidgetPopup : AnAction() {
 
     private class VimScopeStringVariable(private var key: String) : ReadWriteProperty<ModeColors, String> {
       override fun getValue(thisRef: ModeColors, property: KProperty<*>): String {
-        return injector.variableService.getVimVariable(key)?.asString() ?: ""
+        return injector.variableService.getVimVariable(key)?.toVimString()?.value ?: ""
       }
 
       override fun setValue(thisRef: ModeColors, property: KProperty<*>, value: String) {
@@ -347,7 +347,7 @@ class ModeWidgetPopup : AnAction() {
     private class VimScopeThemeVariable(private var key: String) : ReadWriteProperty<ModeColors, ModeWidgetTheme> {
       override fun getValue(thisRef: ModeColors, property: KProperty<*>): ModeWidgetTheme {
         val themeString =
-          injector.variableService.getVimVariable(key)?.asString() ?: return ModeWidgetTheme.getDefaultTheme()
+          injector.variableService.getVimVariable(key)?.toVimString()?.value ?: return ModeWidgetTheme.getDefaultTheme()
         return ModeWidgetTheme.parseString(themeString) ?: ModeWidgetTheme.getDefaultTheme()
       }
 

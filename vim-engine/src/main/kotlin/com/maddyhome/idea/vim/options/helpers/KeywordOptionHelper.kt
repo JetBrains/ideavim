@@ -37,7 +37,7 @@ object KeywordOptionHelper {
 
     val specs =
       injector.optionGroup.getParsedEffectiveOptionValue(option, editor) { optionValue ->
-        valuesToValidatedAndReversedSpecs(parseValues(optionValue.asString()))!!
+        valuesToValidatedAndReversedSpecs(parseValues(optionValue.value))!!
       }
     for (spec in specs) {
       if (spec.contains(c.code)) {
