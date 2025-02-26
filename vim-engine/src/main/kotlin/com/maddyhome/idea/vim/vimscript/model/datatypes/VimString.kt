@@ -62,10 +62,6 @@ data class VimString(val value: String) : VimDataType() {
     }
   }
 
-  override fun asString(): String {
-    return value
-  }
-
   override fun toVimNumber(): VimInt {
     // Vim will automatically convert a String to a Number when required during evaluation. The value is not parsed as
     // strictly as the text used to create a Number expression - Vim allows trailing characters for Number, so something
@@ -74,7 +70,6 @@ data class VimString(val value: String) : VimDataType() {
   }
 
   override fun toVimString(): VimString = this
-
   override fun toOutputString() = value
 
   override fun deepCopy(level: Int): VimString {

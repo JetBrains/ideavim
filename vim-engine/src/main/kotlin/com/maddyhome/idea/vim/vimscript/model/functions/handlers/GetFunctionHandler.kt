@@ -44,7 +44,7 @@ internal class GetFunctionHandler : FunctionHandler() {
       }
 
       is VimDictionary -> {
-        val key = argumentValues[1].evaluate(editor, context, vimContext).asString()
+        val key = argumentValues[1].evaluate(editor, context, vimContext).toVimString().value
         container.dictionary.getOrElse(VimString(key)) {
           argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext) ?: VimInt(0)
         }

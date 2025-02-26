@@ -16,10 +16,6 @@ data class VimDictionary(val dictionary: LinkedHashMap<VimString, VimDataType>) 
     throw exExceptionMessage("E728")  // E728: Using a Dictionary as a Number
   }
 
-  override fun asString(): String {
-    throw exExceptionMessage("E731")  // E731: Using a Dictionary as a String
-  }
-
   override fun toVimNumber(): VimInt {
     throw exExceptionMessage("E728")  // E728: Using a Dictionary as a Number
   }

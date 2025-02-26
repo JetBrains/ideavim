@@ -89,7 +89,7 @@ object GuiCursorOptionHelper {
 
   private fun parseGuicursor(guicursor: VimString) = GuiCursorAttributeBuilders().also { builders ->
     // Split into entries. Each entry has a list of modes and various attributes and adds to/overrides current values
-    Options.guicursor.split(guicursor.asString()).map { convertToken(it) }
+    Options.guicursor.split(guicursor.value).map { convertToken(it) }
       .forEach { entry ->
         entry.modes.forEach {
           if (it == GuiCursorMode.ALL) {

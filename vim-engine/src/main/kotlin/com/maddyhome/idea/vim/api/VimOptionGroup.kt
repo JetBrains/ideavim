@@ -261,7 +261,7 @@ fun <T : VimDataType> VimOptionGroup.isUnsetValue(option: Option<T>, editor: Vim
  * E.g. the `fileencodings` option with value "ucs-bom,utf-8,default,latin1" will result listOf("ucs-bom", "utf-8", "default", "latin1")
  */
 fun VimOptionGroup.getStringListValues(option: StringListOption, scope: OptionAccessScope): List<String> {
-  return option.split(getOptionValue(option, scope).asString())
+  return option.split(getOptionValue(option, scope).value)
 }
 
 /**
@@ -291,7 +291,7 @@ fun VimOptionGroup.invertToggleOption(option: ToggleOption, scope: OptionAccessS
  */
 fun VimOptionGroup.hasValue(option: StringListOption, scope: OptionAccessScope, value: String): Boolean {
   val optionValue = getOptionValue(option, scope)
-  return option.split(optionValue.asString()).contains(value)
+  return option.split(optionValue.value).contains(value)
 }
 
 /**

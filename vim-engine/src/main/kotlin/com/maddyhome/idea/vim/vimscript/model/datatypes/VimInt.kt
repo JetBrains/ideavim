@@ -21,11 +21,9 @@ data class VimInt(val value: Int) : VimDataType() {
   val booleanValue = value != 0
 
   override fun asDouble() = value.toDouble()
-  override fun asString() = value.toString()
 
   override fun toVimNumber() = this
   override fun toVimString() = VimString(value.toString())
-
   override fun toOutputString() = value.toString()
 
   override fun deepCopy(level: Int): VimInt {

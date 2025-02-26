@@ -18,10 +18,6 @@ data class VimList(val values: MutableList<VimDataType>) : VimDataType() {
     throw exExceptionMessage("E745")  // E745: Using a List as a Number
   }
 
-  override fun asString(): String {
-    throw exExceptionMessage("E730")  // E730: Using a List as a String
-  }
-
   override fun toVimNumber(): VimInt {
     throw exExceptionMessage("E745")  // E745: Using a List as a Number
   }

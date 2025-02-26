@@ -34,7 +34,7 @@ internal class JoinFunctionHandler : FunctionHandler() {
     if (list !is VimList) {
       throw exExceptionMessage("E1211", "1") // E1211: List required for argument 1
     }
-    val separator = argumentValues.getOrNull(1)?.evaluate(editor, context, vimContext)?.asString() ?: " "
+    val separator = argumentValues.getOrNull(1)?.evaluate(editor, context, vimContext)?.toVimString()?.value ?: " "
     return VimString(list.values.joinToString(separator) {
       // According to the docs, String is used as-is, while List and Dictionary (and presumably the other datatypes) are
       // converted in the same way as Vim's string() function, which has the same results as toEchoString()

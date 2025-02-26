@@ -127,7 +127,7 @@ abstract class VimOptionGroupBase : VimOptionGroup {
     storage.getOptionValue(option, scope)
 
   override fun <T : VimDataType> setOptionValue(option: Option<T>, scope: OptionAccessScope, value: T) {
-    option.checkIfValueValid(value, value.asString())
+    option.checkIfValueValid(value, value.toOutputString())
     // The value is being explicitly set. [resetDefaultValue] is used to set the default value
     // Track if this option was explicitly set from ~/.ideavimrc during IdeaVim startup
     val optionValue = if (inInitVimRc) OptionValue.InitVimRc(value) else OptionValue.User(value)
@@ -139,7 +139,7 @@ abstract class VimOptionGroupBase : VimOptionGroup {
     scope: OptionAccessScope,
     value: OptionValue<T>,
   ) {
-    option.checkIfValueValid(value.value, value.value.asString())
+    option.checkIfValueValid(value.value, value.value.toOutputString())
     doSetOptionValue(option, scope, value)
   }
 

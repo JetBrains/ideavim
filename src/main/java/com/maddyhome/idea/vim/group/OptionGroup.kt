@@ -617,7 +617,7 @@ private class FileEncodingOptionMapper : LocalOptionValueOverride<VimString> {
     // TODO: When would virtual file be null?
     val virtualFile = editor.ij.virtualFile ?: return false
 
-    val charsetName = newValue.value.asString()
+    val charsetName = newValue.value.value
     if (charsetName.isBlank()) return false   // Default value is "", which is an illegal charset name
     if (!Charset.isSupported(charsetName)) {
       // This is usually reported when writing the file with `:w`

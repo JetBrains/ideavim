@@ -40,7 +40,11 @@ data class VimFuncref(
     throw exExceptionMessage("E703")  // E703: Using a Funcref as a Number
   }
 
-  override fun asString(): String {
+  override fun toVimNumber(): VimInt {
+    throw exExceptionMessage("E703")  // E703: Using a Funcref as a Number
+  }
+
+  override fun toVimString(): VimString {
     throw exExceptionMessage("E729")  // E729: Using a Funcref as a String
   }
 
@@ -59,14 +63,6 @@ data class VimFuncref(
       result.append(")")
       return result.toString()
     }
-  }
-
-  override fun toVimNumber(): VimInt {
-    throw exExceptionMessage("E703")  // E703: Using a Funcref as a Number
-  }
-
-  override fun toVimString(): VimString {
-    throw exExceptionMessage("E729")  // E729: Using a Funcref as a String
   }
 
   fun execute(
