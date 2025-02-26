@@ -160,7 +160,7 @@ dependencies {
   // Temp workaround suggested in https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-faq.html#junit5-test-framework-refers-to-junit4
   // Can be removed when IJPL-159134 is fixed
 //  testRuntimeOnly("junit:junit:4.13.2")
-  testImplementation("org.junit.vintage:junit-vintage-engine:5.10.5")
+  testImplementation("org.junit.vintage:junit-vintage-engine:5.12.0")
 //  testFixturesImplementation("org.junit.vintage:junit-vintage-engine:5.10.3")
 }
 
