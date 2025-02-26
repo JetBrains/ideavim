@@ -26,7 +26,7 @@ dependencies {
   implementation("io.ktor:ktor-client-cio:3.0.3")
   implementation("io.ktor:ktor-client-content-negotiation:3.0.3")
   implementation("io.ktor:ktor-serialization-kotlinx-json:3.0.3")
-  implementation("io.ktor:ktor-client-auth:3.0.3")
+  implementation("io.ktor:ktor-client-auth:3.1.1")
   implementation("org.eclipse.jgit:org.eclipse.jgit:6.6.0.202305301015-r")
 
   // This is needed for jgit to connect to ssh
