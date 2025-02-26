@@ -590,9 +590,9 @@ internal object VimListenerManager {
       // and dragging left or vertically upwards, the last character prior to EOL
       // remains unselected. It's not clear why this happens, but this code fixes it.
       val caret = editor.caretModel.currentCaret
-      val caretOffset = caret.offset
-      val lineStart = ijVimEditor.getLineStartForOffset(caret.offset)
-      val lineEnd = ijVimEditor.getLineEndForOffset(caret.offset)
+      val caretOffset = ApplicationManager.getApplication().runReadAction<Int> { caret.offset }
+      val lineStart = ijVimEditor.getLineStartForOffset(caretOffset)
+      val lineEnd = ijVimEditor.getLineEndForOffset(caretOffset)
       val startOffset = selectionEvent.newRange.startOffset
       val endOffset = selectionEvent.newRange.endOffset
 
