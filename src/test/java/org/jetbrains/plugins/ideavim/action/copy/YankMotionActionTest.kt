@@ -10,6 +10,7 @@ package org.jetbrains.plugins.ideavim.action.copy
 
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -192,5 +193,53 @@ class YankMotionActionTest : VimTestCase() {
       registerService.getRegister(vimEditor, context, registerService.lastRegisterChar)?.text ?: kotlin.test.fail()
 
     kotlin.test.assertEquals("hard by the torrent of a mountain pass.\n", text)
+  }
+
+  @Test
+  fun `test yank block works linewise if at start of line`() {
+    val file = """
+            Lorem Ipsum
+
+               ${c}dolor sit amet
+
+            I found it in a legendary land
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
+    """.trimIndent()
+    typeTextInFile("y}", file)
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+    val register = registerService.getRegister(vimEditor, context, registerService.lastRegisterChar)
+    val text = register?.text ?: kotlin.test.fail()
+    val type = register.type
+
+    kotlin.test.assertEquals("dolor sit amet\n", text)
+    kotlin.test.assertEquals(SelectionType.LINE_WISE, type)
+  }
+
+  @Test
+  fun `test yank block works charwise if not at start of line`() {
+    val file = """
+            Lorem Ipsum
+
+               d${c}olor sit amet
+
+            I found it in a legendary land
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
+    """.trimIndent()
+    typeTextInFile("y}", file)
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+    val register = registerService.getRegister(vimEditor, context, registerService.lastRegisterChar)
+    val text = register?.text ?: kotlin.test.fail()
+    val type = register.type
+
+    kotlin.test.assertEquals("olor sit amet\n", text)
+    kotlin.test.assertEquals(SelectionType.CHARACTER_WISE, type)
   }
 }
