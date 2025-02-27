@@ -13,12 +13,19 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.anyNonWhitespace
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
+import com.maddyhome.idea.vim.api.getText
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.normalizeColumn
+import com.maddyhome.idea.vim.api.normalizeLine
 import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.group.visual.vimLeadSelectionOffset
+import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.annotations.Contract
 import kotlin.math.min
@@ -82,7 +89,7 @@ open class YankGroupBase : VimYankGroup {
     operatorArguments: OperatorArguments,
   ): Boolean {
     val motion = argument as? Argument.Motion ?: return false
-    val motionType = motion.getMotionType()
+    var motionType = motion.getMotionType()
 
     val nativeCaretCount = editor.nativeCarets().size
     if (nativeCaretCount <= 0) return false
@@ -98,6 +105,7 @@ open class YankGroupBase : VimYankGroup {
         HashMap<VimCaret, Int>(nativeCaretCount)
       }
 
+
     for (caret in editor.nativeCarets()) {
       val motionRange = injector.motion.getMotionRange(editor, caret, context, argument, operatorArguments)
         ?: continue
@@ -106,6 +114,17 @@ open class YankGroupBase : VimYankGroup {
       ranges.add(motionRange.startOffset to motionRange.endOffset)
       startOffsets?.put(caret, motionRange.normalize().startOffset)
       caretToRange[caret] = TextRange(motionRange.startOffset, motionRange.endOffset)
+
+      if (caret.isPrimary && argument.motion is MotionActionHandler && argument.motion.motionType == MotionType.EXCLUSIVE) {
+        val start = editor.offsetToBufferPosition(motionRange.startOffset)
+        val end = editor.offsetToBufferPosition(motionRange.endOffset)
+        if (start.line != end.line
+          && !editor.anyNonWhitespace(motionRange.startOffset, -1)
+          && !editor.anyNonWhitespace(motionRange.endOffset, 1)
+        ) {
+          motionType = SelectionType.LINE_WISE
+        }
+      }
     }
 
     val range = getTextRange(ranges, motionType) ?: return false
