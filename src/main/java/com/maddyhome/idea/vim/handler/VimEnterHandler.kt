@@ -32,6 +32,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.key
 import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.IjActionExecutor
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.isPrimaryEditor
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
@@ -169,6 +170,7 @@ internal abstract class OctopusHandler(private val nextHandler: EditorActionHand
     }
 
     if (dataContext?.actionStartedFromVim == true) return true
+    if ((injector.actionExecutor as? IjActionExecutor)?.isRunningActionFromVim == true) return true
 
     return false
   }

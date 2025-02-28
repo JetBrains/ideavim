@@ -30,6 +30,7 @@ import com.intellij.openapi.editor.actionSystem.DocCommandGroupId
 import com.intellij.openapi.progress.util.ProgressIndicatorUtils
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.util.NlsContexts
+import com.intellij.openapi.util.registry.Registry
 import com.maddyhome.idea.vim.RegisterActions
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.NativeAction
@@ -65,6 +66,8 @@ internal class IjActionExecutor : VimActionExecutor {
     // [VERSION UPDATE] 2024.3+ Replace raw "ExpandCollapseToggleAction" with IdeActions.ACTION_EXPAND_COLLAPSE_TOGGLE_REGION from the platform.
     get() = "ExpandCollapseToggleAction"
 
+  var isRunningActionFromVim: Boolean = false
+
   /**
    * Execute an action
    *
@@ -79,7 +82,23 @@ internal class IjActionExecutor : VimActionExecutor {
     }
 
     val ijAction = (action as IjNativeAction).action
+    if (Registry.`is`("ideavim.old.action.execution", true)) {
+      return manualActionExecution(context, ijAction)
+    } else {
+      try {
+        isRunningActionFromVim = true
+        val res = ActionManager.getInstance().tryToExecute(ijAction, null, editor?.ij?.component, "IdeaVim", true)
+        return res.isDone
+      } finally {
+        isRunningActionFromVim = false
+      }
+    }
+  }
 
+  private fun manualActionExecution(
+    context: ExecutionContext,
+    ijAction: AnAction,
+  ): Boolean {
     /**
      * Data context that defines that some action was started from IdeaVim.
      * You can call use [runFromVimKey] key to define if intellij action was started from IdeaVim
