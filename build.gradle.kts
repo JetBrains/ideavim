@@ -213,7 +213,7 @@ tasks {
       jvmTarget = javaVersion
       // See https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
       // For the list of bundled versions
-      apiVersion = "1.9"
+      apiVersion = "2.0"
       freeCompilerArgs = listOf(
         "-Xjvm-default=all-compatibility",
 
@@ -229,7 +229,7 @@ tasks {
   compileTestKotlin {
     kotlinOptions {
       jvmTarget = javaVersion
-      apiVersion = "1.9"
+      apiVersion = "2.0"
 
       // Needed to compile the AceJump which uses kotlin beta
       //  Without these two option compilation fails
