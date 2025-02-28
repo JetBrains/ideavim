@@ -43,7 +43,7 @@ open class TestingBuildType(
       tasks = "clean test"
       buildFile = ""
       enableStacktrace = true
-      jdkHome = "/usr/lib/jvm/java-17-amazon-corretto"
+      jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
   }
 
