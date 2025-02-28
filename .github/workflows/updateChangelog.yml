@@ -22,10 +22,10 @@ jobs:
           ssh-key: ${{ secrets.PUSH_TO_PROTECTED_BRANCH_SECRET }}
       - name: Get tags
         run: git fetch --tags origin
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v2
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'adopt'
           server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
           settings-path: ${{ github.workspace }} # location for the settings.xml file

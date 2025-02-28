@@ -170,6 +170,19 @@ configurations {
   }
 }
 
+val currentJavaVersion = javaToolchains.launcherFor {}.get().metadata.languageVersion.toString()
+if (currentJavaVersion != javaVersion) {
+  // NOTE: I made this exception because the default Gradle error message is horrible, noone can understand it.
+  throw RuntimeException(
+    """
+    Incorrect java version used for building.
+    IdeaVim uses java version $javaVersion, but the current java version is $currentJavaVersion.
+    If IntelliJ IDEA is used, change the setting in "Settings | Build, Execution, Deployment | Build Tools | Gradle"
+    If build is run from the terminal, set JAVA_HOME environment variable to the correct java version.
+  """.trimIndent()
+  )
+}
+
 tasks {
   test {
     useJUnitPlatform()
