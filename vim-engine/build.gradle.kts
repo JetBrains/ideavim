@@ -91,7 +91,7 @@ tasks {
 
     compileKotlin {
         kotlinOptions {
-            apiVersion = "1.9"
+            apiVersion = "2.0"
             freeCompilerArgs = listOf("-Xjvm-default=all-compatibility")
         }
     }
