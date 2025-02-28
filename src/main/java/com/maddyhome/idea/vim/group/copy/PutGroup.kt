@@ -19,7 +19,6 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.RangeMarker
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.ide.CopyPasteManager
-import com.intellij.util.PlatformUtils
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
@@ -34,6 +33,7 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.RWLockLabel
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.ide.isClionNova
+import com.maddyhome.idea.vim.ide.isRider
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_POS
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.IjVimCopiedText
@@ -206,7 +206,7 @@ internal class PutGroup : VimPutBase() {
     endOffset: Int,
   ): Int {
     // Temp fix for VIM-2808. Should be removed after rider will fix it's issues
-    if (PlatformUtils.isRider() || isClionNova()) return endOffset
+    if (isRider() || isClionNova()) return endOffset
 
     val startLine = editor.offsetToBufferPosition(startOffset).line
     val endLine = editor.offsetToBufferPosition(endOffset - 1).line

@@ -28,6 +28,7 @@
   <depends>com.intellij.modules.platform</depends>
   <resource-bundle>messages.IdeaVimBundle</resource-bundle>
 
+  <!--  https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html#exploring-module-and-plugin-apis-->
   <!-- IDE-Specific configurations -->
   <!--suppress PluginXmlValidity -->
   <depends optional="true" config-file="ides/ideavim-withRider.xml">com.intellij.modules.rider</depends>
@@ -52,6 +53,7 @@
 
     </extensionPoint>
     <extensionPoint interface="com.maddyhome.idea.vim.ide.ClionNovaProvider" dynamic="true" name="clionNovaProvider"/>
+    <extensionPoint interface="com.maddyhome.idea.vim.ide.RiderProvider" dynamic="true" name="riderProvider"/>
     <extensionPoint interface="com.maddyhome.idea.vim.key.IdeaVimDisablerExtensionPoint" dynamic="true"
                     name="internal.disabler"/>
   </extensionPoints>

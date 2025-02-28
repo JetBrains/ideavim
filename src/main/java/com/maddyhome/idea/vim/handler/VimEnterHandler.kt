@@ -25,6 +25,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.UserDataHolder
 import com.intellij.openapi.util.removeUserData
+import com.intellij.util.PlatformUtils
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
@@ -34,6 +35,8 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.isPrimaryEditor
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
+import com.maddyhome.idea.vim.ide.isClionNova
+import com.maddyhome.idea.vim.ide.isRider
 import com.maddyhome.idea.vim.newapi.actionStartedFromVim
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.vim
@@ -358,6 +361,8 @@ internal fun isOctopusEnabled(s: KeyStroke, editor: Editor): Boolean {
   // CMD line has a different processing mechanizm: the processing actions are registered
   //   for the input field component. These keys are not dispatched via the octopus handler.
   if (editor.vim.mode is Mode.CMD_LINE) return false
+  // Turn off octopus for some IDEs. They have issues with ENTER and ESC on the octopus like VIM-3815
+  if (isRider() || PlatformUtils.isJetBrainsClient() || isClionNova()) return false
   when {
     s.keyCode == KeyEvent.VK_ENTER && s.modifiers == 0 -> return true
     s.keyCode == KeyEvent.VK_ESCAPE && s.modifiers == 0 -> return true

@@ -18,4 +18,7 @@
                          id="ideavim-rider-esc"
                          order="first, before idea.only.escape"/>
   </extensions>
+  <extensions defaultExtensionNs="IdeaVIM">
+    <riderProvider implementation="com.maddyhome.idea.vim.ide.RiderProviderImpl"/>
+  </extensions>
 </idea-plugin>
