@@ -19,7 +19,6 @@ import com.intellij.openapi.fileEditor.impl.EditorWindow
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
-import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimChangeGroupBase
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
@@ -48,7 +47,6 @@ import com.maddyhome.idea.vim.helper.getNormalizedSideScrollOffset
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.impl.state.VimStateMachineImpl
-import com.maddyhome.idea.vim.listener.AppCodeTemplates
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
@@ -62,10 +60,6 @@ import kotlin.math.min
  */
 @Service
 internal class MotionGroup : VimMotionGroupBase() {
-  override fun onAppCodeMovement(editor: VimEditor, caret: VimCaret, offset: Int, oldOffset: Int) {
-    AppCodeTemplates.onMovement(editor.ij, caret.ij, oldOffset < offset)
-  }
-
   override fun moveCaretToFirstDisplayLine(
     editor: VimEditor,
     caret: ImmutableVimCaret,

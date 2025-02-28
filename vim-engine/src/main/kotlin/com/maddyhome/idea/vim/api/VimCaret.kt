@@ -116,7 +116,6 @@ per-caret marks.
       editor.exitVisualMode()
       updatedCaret
     }
-    injector.motion.onAppCodeMovement(editor, this, offset, oldOffset)
     return updatedCaret
   }
 

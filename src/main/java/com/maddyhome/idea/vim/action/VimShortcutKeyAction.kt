@@ -44,7 +44,6 @@ import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.listener.AceJumpService
-import com.maddyhome.idea.vim.listener.AppCodeTemplates.appCodeTemplateCaptured
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.initInjector
 import com.maddyhome.idea.vim.newapi.vim
@@ -180,10 +179,6 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
 
     if (keyCode == KeyEvent.VK_TAB && editor.isTemplateActive()) {
       return ActionEnableStatus.no("The key is tab and the template is active", LogLevel.INFO)
-    }
-
-    if ((keyCode == KeyEvent.VK_TAB || keyCode == KeyEvent.VK_ENTER) && editor.appCodeTemplateCaptured()) {
-      return ActionEnableStatus.no("App code template is active", LogLevel.INFO)
     }
 
     if (editor.inInsertMode) {

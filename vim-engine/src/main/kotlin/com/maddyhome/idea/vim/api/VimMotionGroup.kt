@@ -157,5 +157,4 @@ interface VimMotionGroup {
   // TODO: These aren't caret motions. Should be moved to VimWindowGroup?
   fun moveCaretGotoNextTab(editor: VimEditor, context: ExecutionContext, rawCount: Int): Int
   fun moveCaretGotoPreviousTab(editor: VimEditor, context: ExecutionContext, rawCount: Int): Int
-  fun onAppCodeMovement(editor: VimEditor, caret: VimCaret, offset: Int, oldOffset: Int)
 }

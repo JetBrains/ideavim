@@ -33,8 +33,6 @@
   <depends optional="true" config-file="ides/ideavim-withRider.xml">com.intellij.modules.rider</depends>
   <!--suppress PluginXmlValidity -->
   <depends optional="true" config-file="ides/ideavim-withClionNova.xml">org.jetbrains.plugins.clion.radler</depends>
-  <!--suppress PluginXmlValidity -->
-  <depends optional="true" config-file="ides/ideavim-withAppCode.xml">com.intellij.modules.appcode</depends>
   <depends optional="true" config-file="ideavim-withAceJump.xml">AceJump</depends>
   <depends optional="true" config-file="features/ideavim-withTerminal.xml">org.jetbrains.plugins.terminal</depends>
 

@@ -29,7 +29,7 @@ IdeaVim is a Vim engine for JetBrains IDEs.
 
 #### Compatibility
 
-IntelliJ IDEA, PyCharm, CLion, PhpStorm, WebStorm, RubyMine, AppCode, DataGrip, GoLand, Rider, Cursive,
+IntelliJ IDEA, PyCharm, CLion, PhpStorm, WebStorm, RubyMine, DataGrip, GoLand, Rider, Cursive,
 Android Studio and other IntelliJ platform based IDEs.
 
 Setup
