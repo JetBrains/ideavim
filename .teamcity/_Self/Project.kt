@@ -5,7 +5,6 @@ import _Self.buildTypes.LongRunning
 import _Self.buildTypes.Nvim
 import _Self.buildTypes.PluginVerifier
 import _Self.buildTypes.PropertyBased
-import _Self.buildTypes.Qodana
 import _Self.buildTypes.TestingBuildType
 import _Self.subprojects.GitHub
 import _Self.subprojects.Releases
@@ -34,8 +33,6 @@ object Project : Project({
   buildType(Nvim)
   buildType(PluginVerifier)
   buildType(Compatibility)
-
-  buildType(Qodana)
 })
 
 // Common build type for all configurations
