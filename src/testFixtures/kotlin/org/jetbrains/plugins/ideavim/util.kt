@@ -88,7 +88,7 @@ fun assertDoesntChange(timeInMillis: Int = 1000, condition: () -> Boolean) {
   }
 }
 
-internal fun <T, S, V> Collection<T>.cartesianProduct(
+fun <T, S, V> Collection<T>.cartesianProduct(
   other: Iterable<S>,
   transformer: (first: T, second: S) -> V,
 ): List<V> {
@@ -97,12 +97,12 @@ internal fun <T, S, V> Collection<T>.cartesianProduct(
 
 // Cartesian product of multiple lists. Useful for making parameterized tests with all available combinations.
 // Can be used instead of @Theory from JUnit 4
-internal fun productForArguments(vararg elements: List<String>): List<Arguments> {
+fun productForArguments(vararg elements: List<String>): List<Arguments> {
   val res = product(*elements)
   return res.map { Arguments.of(*it.toArray(emptyArray())) }
 }
 
-internal fun <T> product(vararg elements: List<T>): List<List<T>> {
+fun <T> product(vararg elements: List<T>): List<List<T>> {
   val res = elements.fold(listOf<List<T>>(emptyList())) { acc, items ->
     acc.cartesianProduct(items) { accItems, item ->
       accItems + item
@@ -120,7 +120,7 @@ fun waitAndAssertMode(
   waitAndAssert(timeout) { fixture.editor.vim.mode == mode }
 }
 
-internal fun waitUntil(timeout: Int = 10_000, condition: () -> Boolean): Boolean {
+fun waitUntil(timeout: Int = 10_000, condition: () -> Boolean): Boolean {
   val timeEnd = System.currentTimeMillis() + timeout
   while (System.currentTimeMillis() < timeEnd) {
     if (condition()) {

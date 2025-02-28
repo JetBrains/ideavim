@@ -45,7 +45,7 @@ buildscript {
   }
 
   dependencies {
-    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.0")
+    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21")
     classpath("com.github.AlexPl292:mark-down-to-slack:1.1.2")
     classpath("org.eclipse.jgit:org.eclipse.jgit:6.6.0.202305301015-r")
 
@@ -66,14 +66,14 @@ buildscript {
 
 plugins {
   java
-  kotlin("jvm") version "2.0.0"
+  kotlin("jvm") version "2.0.21"
   application
   id("java-test-fixtures")
   id("org.jetbrains.intellij.platform") version "2.2.2-SNAPSHOT"
   id("org.jetbrains.changelog") version "2.2.1"
   id("org.jetbrains.kotlinx.kover") version "0.6.1"
   id("com.dorongold.task-tree") version "4.0.0"
-  id("com.google.devtools.ksp") version "2.0.0-1.0.23"
+  id("com.google.devtools.ksp") version "2.0.21-1.0.25"
 }
 
 val moduleSources by configurations.registering
