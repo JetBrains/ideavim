@@ -69,6 +69,8 @@ internal class CaretShapeEnterEditorHandler(private val nextHandler: EditorActio
 
 /**
  * This handler doesn't work in tests for ex commands
+ *
+ * About this handler: VIM-2974
  */
 internal abstract class OctopusHandler(private val nextHandler: EditorActionHandler?) : EditorActionHandler() {
 
