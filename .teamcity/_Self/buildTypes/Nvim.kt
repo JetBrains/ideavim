@@ -32,7 +32,7 @@ object Nvim : IdeaVimBuildType({
     script {
       name = "Set up NeoVim"
       scriptContent = """
-              wget https://github.com/neovim/neovim/releases/download/v0.7.2/nvim-linux64.tar.gz
+              wget https://github.com/neovim/neovim/releases/download/v0.10.4/nvim-linux64.tar.gz
               tar xzf nvim-linux64.tar.gz
               cd nvim-linux64/bin
               chmod +x nvim
@@ -42,6 +42,7 @@ object Nvim : IdeaVimBuildType({
       tasks = "clean test -Dnvim"
       buildFile = ""
       enableStacktrace = true
+      jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
   }
 

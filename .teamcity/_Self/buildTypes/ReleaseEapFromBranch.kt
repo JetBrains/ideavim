@@ -59,18 +59,22 @@ object ReleaseEapFromBranch : IdeaVimBuildType({
     gradle {
       name = "Calculate new eap version from branch"
       tasks = "scripts:calculateNewEapVersionFromBranch"
+      jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
     gradle {
       name = "Set TeamCity build number"
       tasks = "scripts:setTeamCityBuildNumber"
+      jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
     gradle {
       name = "Add release tag"
       tasks = "scripts:addReleaseTag"
+      jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
     gradle {
       name = "Publish plugin"
       tasks = "publishPlugin"
+      jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
     script {
       name = "Push changes to the repo"

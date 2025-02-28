@@ -28,6 +28,7 @@ object LongRunning : IdeaVimBuildType({
       tasks = "clean :tests:long-running-tests:testLongRunning"
       buildFile = ""
       enableStacktrace = true
+      jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
   }
 

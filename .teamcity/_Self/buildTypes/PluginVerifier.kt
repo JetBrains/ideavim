@@ -25,6 +25,7 @@ object PluginVerifier : IdeaVimBuildType({
       tasks = "clean verifyPlugin"
       buildFile = ""
       enableStacktrace = true
+      jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
   }
 

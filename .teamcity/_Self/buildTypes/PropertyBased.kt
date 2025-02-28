@@ -27,6 +27,7 @@ object PropertyBased : IdeaVimBuildType({
       tasks = "clean :tests:property-tests:testPropertyBased"
       buildFile = ""
       enableStacktrace = true
+      jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
   }
 

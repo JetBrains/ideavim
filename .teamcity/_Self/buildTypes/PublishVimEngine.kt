@@ -36,6 +36,7 @@ object PublishVimEngine : IdeaVimBuildType({
       tasks = ":vim-engine:publish"
       buildFile = ""
       enableStacktrace = true
+      jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
   }
 

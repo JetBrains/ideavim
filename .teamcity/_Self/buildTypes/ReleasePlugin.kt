@@ -93,10 +93,12 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
     gradle {
       name = "Calculate new version"
       tasks = "scripts:calculateNewVersion"
+      jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
     gradle {
       name = "Set TeamCity build number"
       tasks = "scripts:setTeamCityBuildNumber"
+      jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
 //    gradle {
 //      name = "Update change log"
@@ -109,6 +111,7 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
     gradle {
       name = "Add release tag"
       tasks = "scripts:addReleaseTag"
+      jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
     script {
       name = "Run tests"
@@ -117,6 +120,7 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
     gradle {
       name = "Publish release"
       tasks = "publishPlugin"
+      jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
 //    script {
 //      name = "Checkout master branch"
@@ -148,6 +152,7 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       name = "Run Integrations"
       tasks = "releaseActions"
       gradleParams = "--no-configuration-cache"
+      jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
 //    gradle {
 //      name = "Slack Notification"
