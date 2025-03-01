@@ -438,63 +438,6 @@ class CommentaryExtensionTest : VimJavaTestCase() {
   }
 
   @Test
-  fun `test text object deletes single line comment from leading whitespace 2`() {
-    doTest(
-      "dgc",
-      """
-        <caret>
-        
-        // Comment 1
-        final Int value = 42;
-      """.trimIndent(),
-      """
-        final Int value = 42;
-      """.trimIndent(),
-      Mode.NORMAL(),
-      JavaFileType.INSTANCE,
-    )
-  }
-
-  @Test
-  fun `test text object deletes single line comment from leading whitespace 3`() {
-    doTest(
-      "dgc",
-      """
-        final Int value1 = 42;
-        <caret>
-        
-        // Comment 1
-        final Int value2 = 42;
-      """.trimIndent(),
-      """
-        final Int value1 = 42;
-        final Int value2 = 42;
-      """.trimIndent(),
-      Mode.NORMAL(),
-      JavaFileType.INSTANCE,
-    )
-  }
-
-  @Test
-  fun `test text object deletes single line comment from trailing whitespace`() {
-    doTest(
-      "dgc",
-      """
-        
-        // Comment 1
-        <caret>
-        
-        final Int value = 42;
-      """.trimIndent(),
-      """
-        final Int value = 42;
-      """.trimIndent(),
-      Mode.NORMAL(),
-      JavaFileType.INSTANCE,
-    )
-  }
-
-  @Test
   fun `test text object deletes single line comments separated by whitespace`() {
     doTest(
       "dgc",
@@ -505,24 +448,8 @@ class CommentaryExtensionTest : VimJavaTestCase() {
         final Int value = 42;
       """.trimIndent(),
       """
-        final Int value = 42;
-      """.trimIndent(),
-      Mode.NORMAL(),
-      JavaFileType.INSTANCE,
-    )
-  }
-
-  @Test
-  fun `test text object deletes disjointed single line comments from whitespace`() {
-    doTest(
-      "dgc",
-      """
-        // Comment 1
-        <caret>
+        
         // Comment 2
-        final Int value = 42;
-      """.trimIndent(),
-      """
         final Int value = 42;
       """.trimIndent(),
       Mode.NORMAL(),
@@ -655,6 +582,10 @@ class CommentaryExtensionTest : VimJavaTestCase() {
         final Int value = 42;
       """.trimIndent(),
       """
+         
+        /* Comment 1
+         * Comment 2
+         * Comment 3 */
         final Int value = 42;
       """.trimIndent(),
       Mode.NORMAL(),
@@ -704,8 +635,7 @@ class CommentaryExtensionTest : VimJavaTestCase() {
     doTest(
       "dgc",
       """
-        <caret>
-        /**
+        /**<caret>
          * Cool summary, dude
          * @param value the value, innit
          * @param name what's your name?
@@ -763,6 +693,79 @@ class CommentaryExtensionTest : VimJavaTestCase() {
         }
       """.trimIndent(),
       """
+        
+        /* Block comment */
+        
+        /**
+         * Cool summary, dude
+         * @param value the value, innit
+         * @param name what's your name?
+         */
+        public void something(int value, String name) {
+        }
+      """.trimIndent(),
+      Mode.NORMAL(),
+      JavaFileType.INSTANCE,
+    )
+  }
+
+
+  @Test
+  fun `test text object deletes JavaDoc comment and adjoining comments separated by whitespace 2`() {
+    doTest(
+      "dgc",
+      """
+        // This should be deleted too
+        
+        /* <caret>Block comment */
+        
+        /**
+         * Cool summary, dude
+         * @param value the value, innit
+         * @param name what's your name?
+         */
+        public void something(int value, String name) {
+        }
+      """.trimIndent(),
+      """
+        // This should be deleted too
+        
+        
+        /**
+         * Cool summary, dude
+         * @param value the value, innit
+         * @param name what's your name?
+         */
+        public void something(int value, String name) {
+        }
+      """.trimIndent(),
+      Mode.NORMAL(),
+      JavaFileType.INSTANCE,
+    )
+  }
+
+  @Test
+  fun `test text object deletes JavaDoc comment and adjoining comments separated by whitespace 3`() {
+    doTest(
+      "dgc",
+      """
+        // This should be deleted too
+        
+        /* Block comment */
+        
+        /**<caret>
+         * Cool summary, dude
+         * @param value the value, innit
+         * @param name what's your name?
+         */
+        public void something(int value, String name) {
+        }
+      """.trimIndent(),
+      """
+        // This should be deleted too
+        
+        /* Block comment */
+        
         public void something(int value, String name) {
         }
       """.trimIndent(),
