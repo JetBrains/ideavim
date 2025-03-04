@@ -133,7 +133,7 @@
         implementation="com.maddyhome.idea.vim.listener.VimListenerManager$VimDocumentListener"/>
     <registryKey defaultValue="true" description="Enable IdeaVim only in editor component and project tree"
                  key="ideavim.only.in.editor.component"/>
-    <registryKey defaultValue="true" description="Old action execution mechanism" key="ideavim.old.action.execution"
+    <registryKey defaultValue="false" description="Old action execution mechanism" key="ideavim.old.action.execution"
                  restartRequired="false"/>
   </extensions>
 
