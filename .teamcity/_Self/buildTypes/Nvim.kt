@@ -18,7 +18,7 @@ object Nvim : IdeaVimBuildType({
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
     param("env.ORG_GRADLE_PROJECT_ideaVersion", NVIM_TESTS)
     param("env.ORG_GRADLE_PROJECT_instrumentPluginCode", "false")
-    param("env.ideavim.nvim.path", "./nvim-linux64/bin/nvim")
+    param("env.ideavim.nvim.path", "./nvim-linux-x86_64/bin/nvim")
   }
 
   vcs {
