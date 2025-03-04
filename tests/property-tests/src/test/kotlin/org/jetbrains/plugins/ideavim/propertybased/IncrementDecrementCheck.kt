@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.propertybased
 
 import com.intellij.ide.IdeEventQueue
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.api.injector
@@ -34,7 +35,9 @@ class IncrementDecrementTest : VimPropertyTestBase() {
           moveCaretToRandomPlace(env, editor)
           env.executeCommands(Generator.sampledFrom(IncrementDecrementActions(editor, this)))
         } finally {
-          reset(editor)
+          ApplicationManager.getApplication().invokeAndWait {
+            reset(editor)
+          }
         }
       }
     }
@@ -62,7 +65,9 @@ class IncrementDecrementTest : VimPropertyTestBase() {
 
           NeovimTesting.assertState(editor, this.testInfo)
         } finally {
-          reset(editor)
+          ApplicationManager.getApplication().invokeAndWait {
+            reset(editor)
+          }
         }
       }
     }
@@ -78,8 +83,10 @@ private class IncrementDecrementActions(private val editor: Editor, val test: Vi
     VimTestCase.typeText(listOf(action), editor, editor.project)
     NeovimTesting.typeCommand(key, test.testInfo, editor)
 
-    IdeEventQueue.getInstance().flushQueue()
-    PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+    ApplicationManager.getApplication().invokeAndWait {
+      IdeEventQueue.getInstance().flushQueue()
+      PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+    }
   }
 }
 
