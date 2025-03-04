@@ -202,7 +202,8 @@ internal class IjActionExecutor : VimActionExecutor {
   }
 
   override fun executeEsc(editor: VimEditor, context: ExecutionContext): Boolean {
-    return executeAction(editor, IdeActions.ACTION_EDITOR_ESCAPE, context)
+    executeAction(editor, IdeActions.ACTION_EDITOR_ESCAPE, context)
+    return true
   }
 
   override fun executeVimAction(
