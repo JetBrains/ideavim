@@ -49,7 +49,9 @@ abstract class VimMotionGroupBase : VimMotionGroup {
         editor.mode.isEndAllowedIgnoringOnemore,
       )
       val newPos = VimVisualPosition(line, normalisedColumn, false)
-      return editor.visualPositionToOffset(newPos).toAdjustedMotionOrError(intendedColumn)
+      val newOffset = editor.visualPositionToOffset(newPos)
+      val adjustedOffset = editor.normalizeOffset(newOffset, editor.isEndAllowed)
+      return adjustedOffset.toAdjustedMotionOrError(intendedColumn)
     }
 
     if (line < 0) {
