@@ -107,13 +107,6 @@ tasks.register("calculateNewEapVersion", JavaExec::class) {
   args = listOf("${rootProject.rootDir}")
 }
 
-tasks.register("calculateNewEapVersionFromBranch", JavaExec::class) {
-  group = "release"
-  mainClass.set("scripts.release.CalculateNewEapVersionFromBranchKt")
-  classpath = sourceSets["main"].runtimeClasspath
-  args = listOf("${rootProject.rootDir}")
-}
-
 tasks.register("calculateNewDevVersion", JavaExec::class) {
   group = "release"
   mainClass.set("scripts.release.CalculateNewDevVersionKt")
