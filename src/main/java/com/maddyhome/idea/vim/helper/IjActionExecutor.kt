@@ -88,6 +88,7 @@ internal class IjActionExecutor : VimActionExecutor {
       try {
         isRunningActionFromVim = true
         val res = ActionManager.getInstance().tryToExecute(ijAction, null, editor?.ij?.component, "IdeaVim", true)
+        res.waitFor(5_000)
         return res.isDone
       } finally {
         isRunningActionFromVim = false
