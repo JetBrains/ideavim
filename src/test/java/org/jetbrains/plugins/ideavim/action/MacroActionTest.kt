@@ -56,6 +56,7 @@ class MacroActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(reason = SkipNeovimReason.ACTION_COMMAND)
   fun testMacroWithIdeAction() {
     configureByText("""One
       |Two
