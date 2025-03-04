@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.helper.RWLockLabel
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 
@@ -92,5 +93,6 @@ interface VimVisualMotionGroup {
    *
    * If the IDE changes the selection, this function can be used to understand what the current selection type is.
    */
+  @RWLockLabel.Readonly
   fun detectSelectionType(editor: VimEditor): SelectionType
 }

@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.group.visual.VisualOperation
 import com.maddyhome.idea.vim.group.visual.vimLeadSelectionOffset
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.group.visual.vimUpdateEditorSelection
+import com.maddyhome.idea.vim.helper.RWLockLabel
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
@@ -201,6 +202,7 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
     }
   }
 
+  @RWLockLabel.Readonly
   override fun detectSelectionType(editor: VimEditor): SelectionType {
     if (editor.carets().size > 1 && seemsLikeBlockMode(editor)) {
       return SelectionType.BLOCK_WISE

@@ -19,6 +19,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.event.CaretEvent
 import com.intellij.openapi.editor.event.CaretListener
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
@@ -47,8 +48,12 @@ internal class RiderActionListener : AnActionListener {
           override fun caretPositionChanged(event: CaretEvent) {
             val eventEditor = event.editor.getTopLevelEditor()
             if (!eventEditor.isIdeaVimDisabledHere) {
-              val predictedMode =
-                IdeaSelectionControl.predictMode(eventEditor, VimListenerManager.SelectionSource.OTHER)
+              val predictedMode = injector.application.runReadAction {
+                IdeaSelectionControl.predictMode(
+                  eventEditor,
+                  VimListenerManager.SelectionSource.OTHER
+                )
+              }
               moveCaretOneCharLeftFromSelectionEnd(eventEditor, predictedMode)
             }
             eventEditor.caretModel.removeCaretListener(this)

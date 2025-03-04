@@ -14,10 +14,12 @@ import com.intellij.codeInsight.lookup.LookupManager
 import com.intellij.codeInsight.lookup.impl.LookupImpl
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.intellij.openapi.editor.Editor
+import com.intellij.util.concurrency.annotations.RequiresReadLock
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.IjOptionConstants
+import com.maddyhome.idea.vim.helper.RWLockLabel
 import com.maddyhome.idea.vim.helper.hasBlockOrUnderscoreCaret
 import com.maddyhome.idea.vim.helper.hasVisualSelection
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
@@ -83,6 +85,8 @@ internal object IdeaRefactorModeHelper {
     }
   }
 
+  @RWLockLabel.Readonly
+  @RequiresReadLock
   fun calculateCorrections(editor: Editor): List<Action> {
     val corrections = mutableListOf<Action>()
     val mode = editor.vim.mode
@@ -112,7 +116,7 @@ internal object IdeaRefactorModeHelper {
   }
 
   fun correctSelection(editor: Editor) {
-    val corrections = calculateCorrections(editor)
+    val corrections = injector.application.runReadAction { calculateCorrections(editor) }
     applyCorrections(corrections, editor)
   }
 }

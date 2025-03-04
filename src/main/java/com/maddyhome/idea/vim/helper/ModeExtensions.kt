@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.newapi.IjVimCaret
@@ -31,7 +32,8 @@ internal fun Editor.exitSelectMode(adjustCaretPosition: Boolean) {
   vimEditor.mode = vimEditor.mode.returnTo
   SelectionVimListenerSuppressor.lock().use {
     this.caretModel.allCarets.forEach {
-      it.removeSelection()
+      // NOTE: I think it should be write action, but the exception shows only an absence of the read action
+      injector.application.runReadAction { it.removeSelection() }
       it.vim.vimSelectionStartClear()
       if (adjustCaretPosition && !vimEditor.isEndAllowed) {
         val lineEnd = IjVimEditor(this).getLineEndForOffset(it.offset)
@@ -52,7 +54,8 @@ internal fun VimEditor.exitSelectMode(adjustCaretPosition: Boolean) {
   SelectionVimListenerSuppressor.lock().use {
     carets().forEach { vimCaret ->
       val caret = (vimCaret as IjVimCaret).caret
-      caret.removeSelection()
+      // NOTE: I think it should be write action, but the exception shows only an absence of the read action
+      injector.application.runReadAction { caret.removeSelection() }
       caret.vim.vimSelectionStartClear()
       if (adjustCaretPosition && !isEndAllowed) {
         val lineEnd = IjVimEditor((this as IjVimEditor).editor).getLineEndForOffset(caret.offset)

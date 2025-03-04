@@ -762,7 +762,8 @@ internal object VimListenerManager {
         logger.debug("Release mouse after dragging")
         val editor = event.editor
         SelectionVimListenerSuppressor.lock().use {
-          val predictedMode = IdeaSelectionControl.predictMode(editor, SelectionSource.MOUSE)
+          val predictedMode = injector.application
+            .runReadAction { IdeaSelectionControl.predictMode(editor, SelectionSource.MOUSE) }
           IdeaSelectionControl.controlNonVimSelectionChange(editor, SelectionSource.MOUSE)
           // TODO: This should only be for 'selection'=inclusive
           moveCaretOneCharLeftFromSelectionEnd(editor, predictedMode)
@@ -840,7 +841,9 @@ internal object VimListenerManager {
     override fun mousePressed(e: MouseEvent?) {
       val editor = (e?.component as? EditorComponentImpl)?.editor ?: return
       if (editor.isIdeaVimDisabledHere) return
-      val predictedMode = IdeaSelectionControl.predictMode(editor, SelectionSource.MOUSE)
+      val predictedMode = injector.application.runReadAction {
+        IdeaSelectionControl.predictMode(editor, SelectionSource.MOUSE)
+      }
       when (e.clickCount) {
         1 -> {
           // If you click after the line, the caret is placed by IJ after the last symbol.
