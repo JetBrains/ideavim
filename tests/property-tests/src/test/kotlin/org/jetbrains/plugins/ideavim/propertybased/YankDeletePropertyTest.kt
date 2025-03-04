@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.propertybased
 
 import com.intellij.ide.IdeEventQueue
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.api.injector
@@ -29,7 +30,9 @@ class YankDeletePropertyTest : VimPropertyTestBase() {
           moveCaretToRandomPlace(env, editor)
           env.executeCommands(Generator.sampledFrom(YankDeleteActions(editor)))
         } finally {
-          reset(editor)
+          ApplicationManager.getApplication().invokeAndWait {
+            reset(editor)
+          }
         }
       }
     }
@@ -43,8 +46,10 @@ private class YankDeleteActions(private val editor: Editor) : ImperativeCommand 
     env.logMessage("Use command: $key")
     VimTestCase.typeText(injector.parser.parseKeys(key), editor, editor.project)
 
-    IdeEventQueue.getInstance().flushQueue()
-    PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+    ApplicationManager.getApplication().invokeAndWait {
+      IdeEventQueue.getInstance().flushQueue()
+      PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+    }
   }
 }
 

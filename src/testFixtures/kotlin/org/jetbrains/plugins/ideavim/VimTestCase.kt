@@ -1062,19 +1062,21 @@ abstract class VimTestCase {
       val keyHandler = KeyHandler.getInstance()
       val dataContext = injector.executionContextManager.getEditorExecutionContext(editor.vim)
       TestInputModel.getInstance(editor).setKeyStrokes(keys.filterNotNull())
-      injector.actionExecutor.executeCommand(
-        editor.vim,
-        Runnable {
-          val inputModel = TestInputModel.getInstance(editor)
-          var key = inputModel.nextKeyStroke()
-          while (key != null) {
-            keyHandler.handleKey(editor.vim, key, dataContext, keyHandler.keyHandlerState)
-            key = inputModel.nextKeyStroke()
-          }
-        },
-        null,
-        null,
-      )
+      ApplicationManager.getApplication().invokeAndWait {
+        injector.actionExecutor.executeCommand(
+          editor.vim,
+          Runnable {
+            val inputModel = TestInputModel.getInstance(editor)
+            var key = inputModel.nextKeyStroke()
+            while (key != null) {
+              keyHandler.handleKey(editor.vim, key, dataContext, keyHandler.keyHandlerState)
+              key = inputModel.nextKeyStroke()
+            }
+          },
+          null,
+          null,
+        )
+      }
     }
 
     @JvmStatic

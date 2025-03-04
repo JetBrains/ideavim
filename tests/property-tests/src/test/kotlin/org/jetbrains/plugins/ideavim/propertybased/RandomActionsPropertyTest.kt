@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.propertybased
 
 import com.intellij.ide.IdeEventQueue
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.KeyHandler
@@ -36,12 +37,16 @@ class RandomActionsPropertyTest : VimPropertyTestBase() {
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->
         val editor = configureByText(text)
-        KeyHandler.getInstance().fullReset(editor.vim)
+        ApplicationManager.getApplication().invokeAndWait {
+          KeyHandler.getInstance().fullReset(editor.vim)
+        }
         try {
           moveCaretToRandomPlace(env, editor)
           env.executeCommands(Generator.sampledFrom(AvailableActions(editor)))
         } finally {
-          reset(editor)
+          ApplicationManager.getApplication().invokeAndWait {
+            reset(editor)
+          }
         }
       }
     }
@@ -52,12 +57,16 @@ class RandomActionsPropertyTest : VimPropertyTestBase() {
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->
         val editor = configureByText(loremText)
-        KeyHandler.getInstance().fullReset(editor.vim)
+        ApplicationManager.getApplication().invokeAndWait {
+          KeyHandler.getInstance().fullReset(editor.vim)
+        }
         try {
           moveCaretToRandomPlace(env, editor)
           env.executeCommands(Generator.sampledFrom(AvailableActions(editor)))
         } finally {
-          reset(editor)
+          ApplicationManager.getApplication().invokeAndWait {
+            reset(editor)
+          }
         }
       }
     }
@@ -68,12 +77,16 @@ class RandomActionsPropertyTest : VimPropertyTestBase() {
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->
         val editor = configureByJavaText(javaText)
-        KeyHandler.getInstance().fullReset(editor.vim)
+        ApplicationManager.getApplication().invokeAndWait {
+          KeyHandler.getInstance().fullReset(editor.vim)
+        }
         try {
           moveCaretToRandomPlace(env, editor)
           env.executeCommands(Generator.sampledFrom(AvailableActions(editor)))
         } finally {
-          reset(editor)
+          ApplicationManager.getApplication().invokeAndWait {
+            reset(editor)
+          }
         }
       }
     }
@@ -110,8 +123,10 @@ private class AvailableActions(private val editor: Editor) : ImperativeCommand {
     env.logMessage("Use command: ${injector.parser.toKeyNotation(currentKeys + usedKey)}. ${if (node?.data != null) "Action: ${node.data!!.actionId}" else ""}")
     VimTestCase.typeText(listOf(usedKey), editor, editor.project)
 
-    IdeEventQueue.getInstance().flushQueue()
-    PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+    ApplicationManager.getApplication().invokeAndWait {
+      IdeEventQueue.getInstance().flushQueue()
+      PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+    }
   }
 
   private val esc = key("<Esc>")

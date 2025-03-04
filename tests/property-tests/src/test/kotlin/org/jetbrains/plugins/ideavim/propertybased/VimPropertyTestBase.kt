@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.propertybased
 
 import com.intellij.ide.highlighter.JavaFileType
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
@@ -20,7 +21,11 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 abstract class VimPropertyTestBase : VimTestCase() {
   protected fun moveCaretToRandomPlace(env: ImperativeCommand.Environment, editor: Editor) {
     val pos = env.generateValue(Generator.integers(0, editor.document.textLength - 1), "Put caret at position %s")
-    editor.caretModel.currentCaret.vim.moveToOffset(pos)
+    ApplicationManager.getApplication().invokeAndWait {
+      ApplicationManager.getApplication().runReadAction {
+        editor.caretModel.currentCaret.vim.moveToOffset(pos)
+      }
+    }
   }
 
   protected fun reset(editor: Editor) {
