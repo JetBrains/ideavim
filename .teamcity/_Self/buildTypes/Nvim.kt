@@ -32,9 +32,9 @@ object Nvim : IdeaVimBuildType({
     script {
       name = "Set up NeoVim"
       scriptContent = """
-              wget https://github.com/neovim/neovim/releases/download/v0.10.4/nvim-linux64.tar.gz
-              tar xzf nvim-linux64.tar.gz
-              cd nvim-linux64/bin
+              wget https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz
+              tar xzf nvim-linux-x86_64.tar.gz
+              cd nvim-linux-x86_64/bin
               chmod +x nvim
               """.trimIndent()
     }
