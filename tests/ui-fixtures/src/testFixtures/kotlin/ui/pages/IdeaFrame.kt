@@ -31,7 +31,7 @@ class IdeaFrame(
 ) : CommonContainerFixture(remoteRobot, remoteComponent) {
 
   val projectViewTree
-    get() = find<JTreeFixture>(byXpath("ProjectViewTree", "//div[@class='ProjectViewTree']"), Duration.ofSeconds(30))
+    get() = find<JTreeFixture>(byXpath("MyProjectViewTree", "//div[@class='MyProjectViewTree']"), Duration.ofSeconds(30))
 
   val projectName
     get() = step("Get project name") { return@step callJs<String>("component.getProject().getName()") }
