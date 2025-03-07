@@ -106,6 +106,10 @@ open class YankGroupBase : VimYankGroup {
       assert(motionRange.size() == 1)
       startOffsets?.put(caret, motionRange.normalize().startOffset)
 
+      // Yank motion commands that are not linewise become linewise if all the following are true:
+      // 1) The range is across multiple lines
+      // 2) There is only whitespace before the start of the range
+      // 3) There is only whitespace after the end of the range
       if (argument.motion is MotionActionHandler && argument.motion.motionType == MotionType.EXCLUSIVE) {
         val start = editor.offsetToBufferPosition(motionRange.startOffset)
         val end = editor.offsetToBufferPosition(motionRange.endOffset)
