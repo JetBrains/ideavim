@@ -30,7 +30,7 @@ internal class VimState {
     }
     stringMap.keys.forEach { name ->
       notifications?.getChild(name)?.getAttributeValue("value")?.let {
-        stringMap[name] = it
+        stringMap[name] = it.decode
       }
     }
   }
@@ -46,11 +46,17 @@ internal class VimState {
     }
     stringMap.forEach { (name, value) ->
       val child = Element(name)
-      child.setAttribute("value", value)
+      child.setAttribute("value", value.encode)
       notifications.addContent(child)
     }
   }
 }
+
+private val String?.encode: String get() = this ?: NULL_VALUE
+private val String?.decode: String? get() = if (this == NULL_VALUE) null else this
+
+// Settings cannot store null values
+private const val NULL_VALUE = "__NULL_VALUE_CONST__"
 
 private val map by lazy { mutableMapOf<String, Boolean>() }
 private val stringMap by lazy { mutableMapOf<String, String?>() }
@@ -68,7 +74,8 @@ private class StateProperty(val xmlName: String) : ReadWriteProperty<VimState, B
   }
 }
 
-private class StringProperty(val propertyName: String, val defaultValue: String?) : ReadWriteProperty<VimState, String?> {
+private class StringProperty(val propertyName: String, val defaultValue: String?) :
+  ReadWriteProperty<VimState, String?> {
 
   init {
     stringMap[propertyName] = defaultValue
