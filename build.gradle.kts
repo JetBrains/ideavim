@@ -196,6 +196,11 @@ tasks {
     }
 
     systemProperty("ideavim.nvim.test", System.getProperty("nvim") ?: false)
+
+    // This removes all localization plugins from the test version of IJ.
+    // There is a bug that IJ for tests may be loaded with a different locale and some keys may be missing there,
+    //   what breaks the tests. This usually happens in EAP versions of IJ.
+    classpath -= classpath.filter { it.name.startsWith("localization-") && it.name.endsWith(".jar") }
   }
 
   compileJava {
