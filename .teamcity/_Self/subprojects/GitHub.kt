@@ -42,6 +42,7 @@ class GithubBuildType(command: String, desc: String) : IdeaVimBuildType({
       tasks = command
       buildFile = ""
       enableStacktrace = true
+      jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
   }
 
