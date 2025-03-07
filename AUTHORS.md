@@ -579,6 +579,10 @@ Contributors:
   [![icon][github]](https://github.com/oca159)
   &nbsp;
   Osvaldo
+* [![icon][mail]](mailto:nath@squareup.com)
+  [![icon][github]](https://github.com/nath)
+  &nbsp;
+  Nath Tumlin
 
 Previous contributors:
 
