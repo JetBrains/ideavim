@@ -126,10 +126,12 @@ publishing {
   }
   repositories {
     maven {
-      url = uri(uploadUrl)
-      credentials {
-        username = spaceUsername
-        password = spacePassword
+      if (uploadUrl.isNotEmpty()) {
+        url = uri(uploadUrl)
+        credentials {
+          username = spaceUsername
+          password = spacePassword
+        }
       }
     }
   }
