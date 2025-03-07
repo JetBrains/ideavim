@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
 
 class YankMotionActionTest : VimTestCase() {
   @Test
@@ -217,6 +218,40 @@ class YankMotionActionTest : VimTestCase() {
 
     kotlin.test.assertEquals("dolor sit amet\n", text)
     kotlin.test.assertEquals(SelectionType.LINE_WISE, type)
+  }
+
+  @Test
+  fun `test yank block works linewise mixing linewise and characterwise motion`() {
+    val file = """
+            Lorem Ipsum
+
+               ${c}dolor sit amet
+
+            I found it in a legendary land
+            
+            consectetur ${c}adipiscing elit
+            
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
+    """.trimIndent()
+    typeTextInFile("y}", file)
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+
+    val carets = injector.application.runReadAction {
+      vimEditor.carets().sortedBy { it.offset }
+    }
+
+    assertEquals(2, carets.size)
+
+    val firstRegister = carets.first().registerStorage.getRegister(vimEditor, context, registerService.lastRegisterChar)
+    assertEquals("dolor sit amet\n", firstRegister!!.text)
+    assertEquals(SelectionType.LINE_WISE, firstRegister.type)
+
+    val secondRegister = carets.last().registerStorage.getRegister(vimEditor, context, registerService.lastRegisterChar)
+    assertEquals("adipiscing elit\n", secondRegister!!.text)
+    assertEquals(SelectionType.CHARACTER_WISE, secondRegister.type)
   }
 
   @Test

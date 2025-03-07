@@ -30,19 +30,18 @@ open class YankGroupBase : VimYankGroup {
   private fun yankRange(
     editor: VimEditor,
     context: ExecutionContext,
-    caretToRange: Map<ImmutableVimCaret, TextRange>,
-    type: SelectionType,
+    caretToRange: Map<ImmutableVimCaret, Pair<TextRange, SelectionType>>,
     startOffsets: Map<VimCaret, Int>?,
   ): Boolean {
     startOffsets?.forEach { (caret, offset) ->
       caret.moveToOffset(offset)
     }
 
-    injector.listenersNotifier.notifyYankPerformed(caretToRange)
+    injector.listenersNotifier.notifyYankPerformed(caretToRange.mapValues { it.value.first })
 
     var result = true
     for ((caret, myRange) in caretToRange) {
-      result = caret.registerStorage.storeText(editor, context, myRange, type, false) && result
+      result = caret.registerStorage.storeText(editor, context, myRange.first, myRange.second, false) && result
     }
     return result
   }
@@ -84,12 +83,11 @@ open class YankGroupBase : VimYankGroup {
     operatorArguments: OperatorArguments,
   ): Boolean {
     val motion = argument as? Argument.Motion ?: return false
-    var motionType = motion.getMotionType()
 
     val nativeCaretCount = editor.nativeCarets().size
     if (nativeCaretCount <= 0) return false
 
-    val caretToRange = HashMap<ImmutableVimCaret, TextRange>(nativeCaretCount)
+    val caretToRange = HashMap<ImmutableVimCaret, Pair<TextRange, SelectionType>>(nativeCaretCount)
 
     // This logic is from original vim
     val startOffsets =
@@ -101,14 +99,14 @@ open class YankGroupBase : VimYankGroup {
 
 
     for (caret in editor.nativeCarets()) {
+      var motionType = motion.getMotionType()
       val motionRange = injector.motion.getMotionRange(editor, caret, context, argument, operatorArguments)
         ?: continue
 
       assert(motionRange.size() == 1)
       startOffsets?.put(caret, motionRange.normalize().startOffset)
-      caretToRange[caret] = TextRange(motionRange.startOffset, motionRange.endOffset)
 
-      if (caret.isPrimary && argument.motion is MotionActionHandler && argument.motion.motionType == MotionType.EXCLUSIVE) {
+      if (argument.motion is MotionActionHandler && argument.motion.motionType == MotionType.EXCLUSIVE) {
         val start = editor.offsetToBufferPosition(motionRange.startOffset)
         val end = editor.offsetToBufferPosition(motionRange.endOffset)
         if (start.line != end.line
@@ -118,6 +116,8 @@ open class YankGroupBase : VimYankGroup {
           motionType = SelectionType.LINE_WISE
         }
       }
+
+      caretToRange[caret] = TextRange(motionRange.startOffset, motionRange.endOffset) to motionType
     }
 
     if (caretToRange.isEmpty()) return false
@@ -126,7 +126,6 @@ open class YankGroupBase : VimYankGroup {
       editor,
       context,
       caretToRange,
-      motionType,
       startOffsets,
     )
   }
@@ -146,7 +145,7 @@ open class YankGroupBase : VimYankGroup {
    */
   override fun yankLine(editor: VimEditor, context: ExecutionContext, count: Int): Boolean {
     val caretCount = editor.nativeCarets().size
-    val caretToRange = HashMap<ImmutableVimCaret, TextRange>(caretCount)
+    val caretToRange = HashMap<ImmutableVimCaret, Pair<TextRange, SelectionType>>(caretCount)
     for (caret in editor.nativeCarets()) {
       val start = injector.motion.moveCaretToCurrentLineStart(editor, caret)
       val end =
@@ -154,10 +153,10 @@ open class YankGroupBase : VimYankGroup {
 
       if (end == -1) continue
 
-      caretToRange[caret] = TextRange(start, end)
+      caretToRange[caret] = TextRange(start, end) to SelectionType.LINE_WISE
     }
 
-    return yankRange(editor, context, caretToRange, SelectionType.LINE_WISE, null)
+    return yankRange(editor, context, caretToRange, null)
   }
 
   @Deprecated("Please use the same method, but with ExecutionContext")
@@ -182,7 +181,7 @@ open class YankGroupBase : VimYankGroup {
     moveCursor: Boolean,
   ): Boolean {
     range ?: return false
-    val caretToRange = HashMap<ImmutableVimCaret, TextRange>()
+    val caretToRange = HashMap<ImmutableVimCaret, Pair<TextRange, SelectionType>>()
 
     if (type == SelectionType.LINE_WISE) {
       for (i in 0 until range.size()) {
@@ -202,19 +201,19 @@ open class YankGroupBase : VimYankGroup {
     val startOffsets = HashMap<VimCaret, Int>(editor.nativeCarets().size)
     if (type == SelectionType.BLOCK_WISE) {
       startOffsets[editor.primaryCaret()] = range.normalize().startOffset
-      caretToRange[editor.primaryCaret()] = range
+      caretToRange[editor.primaryCaret()] = range to type
     } else {
       for ((i, caret) in editor.nativeCarets().withIndex()) {
         val textRange = TextRange(rangeStartOffsets[i], rangeEndOffsets[i])
         startOffsets[caret] = textRange.normalize().startOffset
-        caretToRange[caret] = textRange
+        caretToRange[caret] = textRange to type
       }
     }
 
     return if (moveCursor) {
-      yankRange(editor, context, caretToRange, type, startOffsets)
+      yankRange(editor, context, caretToRange, startOffsets)
     } else {
-      yankRange(editor, context, caretToRange, type, null)
+      yankRange(editor, context, caretToRange, null)
     }
   }
 }
