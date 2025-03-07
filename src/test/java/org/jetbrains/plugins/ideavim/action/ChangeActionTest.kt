@@ -1081,4 +1081,12 @@ foobaz
     typeText("<BS><BS><BS>")
     assertState("1ello world")
   }
+
+  @Test
+  fun `backspace with replace modes`() {
+    configureByText("")
+    typeText("c<C-Home><Esc>.")
+    assertState("")
+    assertPluginError(false)
+  }
 }

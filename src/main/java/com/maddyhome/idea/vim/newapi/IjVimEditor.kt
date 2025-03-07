@@ -542,7 +542,9 @@ internal class InsertTimeRecorder : ModeChangeListener {
     if (oldMode == Mode.INSERT) {
       val undo = injector.undo as? VimTimestampBasedUndoService ?: return
       val nanoTime = System.nanoTime()
-      editor.forEachCaret { undo.endInsertSequence(it, it.offset, nanoTime) }
+      injector.application.runReadAction {
+        editor.nativeCarets().forEach { undo.endInsertSequence(it, it.offset, nanoTime) }
+      }
     }
   }
 }
