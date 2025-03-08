@@ -20,6 +20,7 @@ class VimListenersNotifier {
   val modeChangeListeners: MutableCollection<ModeChangeListener> = ConcurrentLinkedDeque()
   val myEditorListeners: MutableCollection<EditorListener> = ConcurrentLinkedDeque()
   val macroRecordingListeners: MutableCollection<MacroRecordingListener> = ConcurrentLinkedDeque()
+  val searchListeners: MutableCollection<SearchListener> = ConcurrentLinkedDeque()
   val vimPluginListeners: MutableCollection<VimPluginListener> = ConcurrentLinkedDeque()
   val isReplaceCharListeners: MutableCollection<IsReplaceCharListener> = ConcurrentLinkedDeque()
   val yankListeners: MutableCollection<VimYankListener> = ConcurrentLinkedDeque()
@@ -47,6 +48,16 @@ class VimListenersNotifier {
   fun notifyEditorFocusLost(editor: VimEditor) {
     if (!injector.enabler.isEnabled()) return // we remove all the listeners when turning the plugin off, but let's do it just in case
     myEditorListeners.forEach { it.focusLost(editor) }
+  }
+
+  fun notifySearchUpdated(editor: VimEditor, offset: Int) {
+    if (!injector.enabler.isEnabled()) return // we remove all the listeners when turning the plugin off, but let's do it just in case
+    searchListeners.forEach { it.searchUpdated(editor, offset) }
+  }
+
+  fun notifySearchStopped() {
+    if (!injector.enabler.isEnabled()) return // we remove all the listeners when turning the plugin off, but let's do it just in case
+    searchListeners.forEach { it.searchStopped() }
   }
 
   fun notifyMacroRecordingStarted() {
