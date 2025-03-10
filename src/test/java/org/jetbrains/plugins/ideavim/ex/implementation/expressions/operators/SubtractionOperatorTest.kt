@@ -12,11 +12,12 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
+import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.ex.evaluate
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class SubtractionOperatorTest {
+class SubtractionOperatorTest : VimTestCase() {
 
   @Test
   fun `integer minus integer`() {
