@@ -16,9 +16,9 @@ object GreaterOrEqualsCaseSensitiveHandler : BinaryOperatorHandler() {
 
   override fun performOperation(left: VimDataType, right: VimDataType): VimDataType {
     return if (left is VimString || right is VimString) {
-      VimInt(if (left.asString() < right.asString()) 0 else 1)
+      VimInt(if (left.asString() >= right.asString()) 1 else 0)
     } else {
-      VimInt(if (left.asDouble() < right.asDouble()) 0 else 1)
+      VimInt(if (left.asDouble() >= right.asDouble()) 1 else 0)
     }
   }
 }
