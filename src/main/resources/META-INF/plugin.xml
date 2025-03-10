@@ -62,7 +62,12 @@
     <applicationConfigurable groupId="editor" instance="com.maddyhome.idea.vim.ui.VimEmulationConfigurable"/>
     <projectService serviceImplementation="com.maddyhome.idea.vim.group.LastTabService"/>
     <statusBarWidgetFactory id="IdeaVimMode" implementation="com.maddyhome.idea.vim.ui.widgets.mode.ModeWidgetFactory" order="last, before Memory"/>
-    <statusBarWidgetFactory id="IdeaVim-Icon" implementation="com.maddyhome.idea.vim.ui.StatusBarIconFactory" order="last, before IdeaVimMode"/>
+    <!-- [VERSION UPDATE: 2025.1+]
+         Rider's dotCover status indicator sets itself as "last" which pushes the IdeaVim widgets out
+         Hopefully this will be fixed in Rider 2025.1. Once this is the minimum supported version, we can remove this
+         https://youtrack.jetbrains.com/issue/DCVR-13021/dotCover-status-bar-indicator-in-Rider-incorrect-position
+    -->
+    <statusBarWidgetFactory id="IdeaVim-Icon" implementation="com.maddyhome.idea.vim.ui.StatusBarIconFactory" order="last, before IdeaVimMode, after dotCoverIndicator"/>
     <statusBarWidgetFactory id="IdeaVimShowCmd" implementation="com.maddyhome.idea.vim.ui.ShowCmdStatusBarWidgetFactory" order="first"/>
     <statusBarWidgetFactory id="IdeaVimMacro" implementation="com.maddyhome.idea.vim.ui.widgets.macro.MacroWidgetFactory" order="first, after IdeaVimShowCmd"/>
 
