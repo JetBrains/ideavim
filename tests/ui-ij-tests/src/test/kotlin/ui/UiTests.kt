@@ -291,7 +291,7 @@ class UiTests {
     waitFor {
       val generateDialog = findAll<ComponentFixture>(byXpath("//div[@class='EngravedLabel']"))
       if (generateDialog.size == 1) {
-        return@waitFor generateDialog.single().hasText("Path With Line Number")
+        return@waitFor hasText("Path With Line Number")
       }
       return@waitFor false
     }
