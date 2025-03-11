@@ -27,7 +27,6 @@ import ui.pages.dialog
 import ui.pages.editor
 import ui.pages.gutter
 import ui.pages.idea
-import ui.pages.searchEverywhere
 import ui.pages.welcomeFrame
 import ui.utils.JavaExampleSteps
 import ui.utils.StepsLogger
@@ -209,11 +208,8 @@ class UiTests {
   }
 
   private fun IdeaFrame.testTrackActionId(editor: Editor) {
-    remoteRobot.invokeActionJs("GotoAction")
-
-    val searchEverywhere = this@testTrackActionId.searchEverywhere()
-
     commonSteps.invokeAction("VimFindActionIdAction")
+
     keyboard {
       escape()
     }
@@ -238,7 +234,6 @@ class UiTests {
       """.trimMargin() == editor.text
     }
 
-    remoteRobot.invokeActionJs("GotoAction")
     waitFor { !hasText("Copy Action Id") }
 
     vimExit()
