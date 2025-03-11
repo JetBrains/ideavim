@@ -13,7 +13,6 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.DataContextWrapper
 import com.intellij.openapi.actionSystem.EmptyAction
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.actionSystem.PlatformDataKeys
@@ -68,12 +67,6 @@ internal class IjActionExecutor : VimActionExecutor {
 
   var isRunningActionFromVim: Boolean = false
 
-  /**
-   * Execute an action
-   *
-   * @param ijAction  The action to execute
-   * @param context The context to run it in
-   */
   override fun executeAction(editor: VimEditor?, action: NativeAction, context: ExecutionContext): Boolean {
     val applicationEx = ApplicationManagerEx.getApplicationEx()
     if (ProgressIndicatorUtils.isWriteActionRunningOrPending(applicationEx)) {
@@ -110,7 +103,7 @@ internal class IjActionExecutor : VimActionExecutor {
     val dataContext = SimpleDataContext.getSimpleContext(runFromVimKey, true, context.ij)
 
     val actionId = ActionManager.getInstance().getId(ijAction)
-    val event = AnActionEvent(
+    @Suppress("removal", "DEPRECATION") val event = AnActionEvent(
       null,
       dataContext,
       ActionPlaces.KEYBOARD_SHORTCUT,
@@ -118,21 +111,22 @@ internal class IjActionExecutor : VimActionExecutor {
       ActionManager.getInstance(),
       0,
     )
-    // beforeActionPerformedUpdate should be called to update the action. It fixes some rider-specific problems.
-    //   because rider use async update method. See VIM-1819.
-    // This method executes inside of lastUpdateAndCheckDumb
+    // beforeActionPerformedUpdate should be called to update the action. It fixes some rider-specific problems
+    //   because rider uses an async update method. See VIM-1819.
+    // This method executes inside lastUpdateAndCheckDumb
     // Another related issue: VIM-2604
 
     // This is a hack to fix the tests and fix VIM-3332
     // We should get rid of it in VIM-3376
     if (actionId == "RunClass" || actionId == IdeActions.ACTION_COMMENT_LINE || actionId == IdeActions.ACTION_COMMENT_BLOCK) {
+      @Suppress("removal", "OverrideOnly", "DEPRECATION")
       ijAction.beforeActionPerformedUpdate(event)
       if (!event.presentation.isEnabled) return false
     } else {
       if (!ActionUtil.lastUpdateAndCheckDumb(ijAction, event, false)) return false
     }
     if (ijAction is ActionGroup && !event.presentation.isPerformGroup) {
-      // Some ActionGroups should not be performed, but shown as a popup
+      // Some ActionGroups should not be performed but shown as a popup
       val popup = JBPopupFactory.getInstance()
         .createActionGroupPopup(event.presentation.text, ijAction, dataContext, false, null, -1)
       val component = dataContext.getData(PlatformDataKeys.CONTEXT_COMPONENT)
@@ -146,7 +140,10 @@ internal class IjActionExecutor : VimActionExecutor {
       popup.showInFocusCenter()
       return true
     } else {
-      performDumbAwareWithCallbacks(ijAction, event) { ijAction.actionPerformed(event) }
+      performDumbAwareWithCallbacks(ijAction, event) {
+        @Suppress("OverrideOnly")
+        ijAction.actionPerformed(event)
+      }
       return true
     }
   }
