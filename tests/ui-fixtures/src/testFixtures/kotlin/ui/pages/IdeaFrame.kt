@@ -20,7 +20,7 @@ import com.intellij.remoterobot.utils.waitFor
 import java.time.Duration
 
 fun RemoteRobot.idea(function: IdeaFrame.() -> Unit) {
-  find<IdeaFrame>().apply(function)
+  find<IdeaFrame>(Duration.ofSeconds(10)).apply(function)
 }
 
 @FixtureName("Idea frame")
