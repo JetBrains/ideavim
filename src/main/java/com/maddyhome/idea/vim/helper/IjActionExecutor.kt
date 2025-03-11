@@ -87,10 +87,9 @@ internal class IjActionExecutor : VimActionExecutor {
     } else {
       try {
         isRunningActionFromVim = true
-        // DataContext is build on the context component.
-        //   However, it should be null as in this case the data context is taken from the context and the
-        //   PlatformDataKeys.EDITOR is properly set.
-        val contextComponent: Component? = null
+        // The context component should be editor. This is especially important when running the `:action` commands
+        //  because at the moment of execution, the focused component is Ex Field, not editor.
+        val contextComponent = editor?.ij?.contentComponent
         val res = ActionManager.getInstance().tryToExecute(ijAction, null, contextComponent, "IdeaVim", true)
         res.waitFor(5_000)
         return res.isDone
