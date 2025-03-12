@@ -40,7 +40,7 @@ jobs:
         run: mv tests/ui-py-tests/video build/reports
       - name: Move sandbox logs
         if: always()
-        run: mv build/idea-sandbox/PC-2024.3.3/log_runIdeForUiTests idea-sandbox-log
+        run: mv build/idea-sandbox/PC-*/log_runIdeForUiTests idea-sandbox-log
       - name: Save report
         if: always()
         uses: actions/upload-artifact@v4
