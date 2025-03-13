@@ -583,6 +583,10 @@ Contributors:
   [![icon][github]](https://github.com/nath)
   &nbsp;
   Nath Tumlin
+* [![icon][mail]](mailto:ilya.usov@jetbrains.com)
+  [![icon][github]](https://github.com/Iliya-usov)
+  &nbsp;
+  Ilya Usov
 
 Previous contributors:
 
