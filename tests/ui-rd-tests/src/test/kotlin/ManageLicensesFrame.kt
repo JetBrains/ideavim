@@ -27,11 +27,11 @@ class ManageLicensesFrame(remoteRobot: RemoteRobot, remoteComponent: RemoteCompo
   fun enableFreeTier() {
     find<ComponentFixture>(
       byXpath(
-        "//div[@class='SegmentedButton' and @action='Non-commercial use (null)']",
+        "//div[@class='SegmentedButton' and @action='Start trial (null)']",
       )
     ).click()
-    checkBox("I agree with", contains = true).select()
-    button("Start Non-Commercial Use").click()
+//    checkBox("I agree with", contains = true).select()
+    button("Start Free 30-Day Trial").click()
     button("Close").click()
   }
 }
