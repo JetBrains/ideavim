@@ -17,6 +17,7 @@
             <option value="$PROJECT_DIR$/tests/ui-fixtures" />
             <option value="$PROJECT_DIR$/tests/ui-ij-tests" />
             <option value="$PROJECT_DIR$/tests/ui-py-tests" />
+            <option value="$PROJECT_DIR$/tests/ui-rd-tests" />
             <option value="$PROJECT_DIR$/vim-engine" />
           </set>
         </option>
