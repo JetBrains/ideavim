@@ -20,7 +20,7 @@ object Compatibility : IdeaVimBuildType({
       name = "Load Verifier"
       scriptContent = """
         mkdir verifier1
-        curl -f -L -o verifier1/verifier-cli-dev-all-1.jar "https://packages.jetbrains.team/files/p/ideavim/plugin-verifier/verifier-cli-dev-all-1.jar"
+        curl -f -L -o verifier1/verifier-cli-dev-all-2.jar "https://packages.jetbrains.team/files/p/ideavim/plugin-verifier/verifier-cli-dev-all-2.jar"
       """.trimIndent()
     }
     script {
@@ -33,16 +33,16 @@ object Compatibility : IdeaVimBuildType({
               # Upload verifier-cli-dev-all.jar artifact to the repo in IdeaVim space repo
               
               java --version
-              java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}org.jetbrains.IdeaVim-EasyMotion' [latest-IU] -team-city
-              java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}eu.theblob42.idea.whichkey' [latest-IU] -team-city
-              java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}IdeaVimExtension' [latest-IU] -team-city
+              java -jar verifier1/verifier-cli-dev-all-2.jar check-plugin '${'$'}org.jetbrains.IdeaVim-EasyMotion' [latest-IU] -team-city
+              java -jar verifier1/verifier-cli-dev-all-2.jar check-plugin '${'$'}eu.theblob42.idea.whichkey' [latest-IU] -team-city
+              java -jar verifier1/verifier-cli-dev-all-2.jar check-plugin '${'$'}IdeaVimExtension' [latest-IU] -team-city
               # Outdated java -jar verifier/verifier-cli-dev-all.jar check-plugin '${'$'}github.zgqq.intellij-enhance' [latest-IU] -team-city
-              # java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}com.github.copilot' [latest-IU] -team-city
-              java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}com.github.dankinsoid.multicursor' [latest-IU] -team-city
-              java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}com.joshestein.ideavim-quickscope' [latest-IU] -team-city
-              java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}com.julienphalip.ideavim.peekaboo' [latest-IU] -team-city
-              java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}com.julienphalip.ideavim.switch' [latest-IU] -team-city
-              java -jar verifier1/verifier-cli-dev-all-1.jar check-plugin '${'$'}com.julienphalip.ideavim.functiontextobj' [latest-IU] -team-city
+              # java -jar verifier1/verifier-cli-dev-all-2.jar check-plugin '${'$'}com.github.copilot' [latest-IU] -team-city
+              java -jar verifier1/verifier-cli-dev-all-2.jar check-plugin '${'$'}com.github.dankinsoid.multicursor' [latest-IU] -team-city
+              java -jar verifier1/verifier-cli-dev-all-2.jar check-plugin '${'$'}com.joshestein.ideavim-quickscope' [latest-IU] -team-city
+              java -jar verifier1/verifier-cli-dev-all-2.jar check-plugin '${'$'}com.julienphalip.ideavim.peekaboo' [latest-IU] -team-city
+              java -jar verifier1/verifier-cli-dev-all-2.jar check-plugin '${'$'}com.julienphalip.ideavim.switch' [latest-IU] -team-city
+              java -jar verifier1/verifier-cli-dev-all-2.jar check-plugin '${'$'}com.julienphalip.ideavim.functiontextobj' [latest-IU] -team-city
             """.trimIndent()
     }
   }
