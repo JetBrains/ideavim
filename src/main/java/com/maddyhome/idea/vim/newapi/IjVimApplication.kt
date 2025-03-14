@@ -13,9 +13,12 @@ import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.util.Computable
 import com.intellij.util.ExceptionUtil
+import com.intellij.util.PlatformUtils
 import com.maddyhome.idea.vim.api.VimApplicationBase
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.diagnostic.vimLogger
+import com.maddyhome.idea.vim.ide.isClionNova
+import com.maddyhome.idea.vim.ide.isRider
 import java.awt.Component
 import java.awt.Toolkit
 import java.awt.Window
@@ -74,6 +77,8 @@ internal class IjVimApplication : VimApplicationBase() {
   }
 
   override fun isOctopusEnabled(): Boolean {
+    // Turn off octopus for some IDEs. They have issues with ENTER and ESC on the octopus like VIM-3815
+    if (isRider() || PlatformUtils.isJetBrainsClient() || isClionNova()) return false
     val property = System.getProperty("octopus.handler") ?: "true"
     if (property.isBlank()) return true
     return property.toBoolean()
