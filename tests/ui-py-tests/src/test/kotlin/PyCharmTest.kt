@@ -69,7 +69,7 @@ class PyCharmTest {
   private fun RemoteRobot.startNewProject() {
     welcomeFrame {
       createNewProjectLink.click()
-      waitFor {
+      waitFor(duration = Duration.ofSeconds(30)) {
         // Waiting till the SDK will be detected by PyCharm
         findAllText("detected in the system").isNotEmpty()
       }
