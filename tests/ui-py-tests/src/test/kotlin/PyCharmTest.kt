@@ -8,6 +8,8 @@
 
 import com.automation.remarks.junit5.Video
 import com.intellij.remoterobot.RemoteRobot
+import com.intellij.remoterobot.fixtures.ComponentFixture
+import com.intellij.remoterobot.search.locators.byXpath
 import com.intellij.remoterobot.steps.CommonSteps
 import com.intellij.remoterobot.utils.keyboard
 import com.intellij.remoterobot.utils.waitFor
@@ -71,7 +73,8 @@ class PyCharmTest {
       createNewProjectLink.click()
       waitFor(duration = Duration.ofSeconds(30)) {
         // Waiting till the SDK will be detected by PyCharm
-        findAllText("detected in the system").isNotEmpty()
+        this@startNewProject.findAll<ComponentFixture>(byXpath("//div[@class='SimpleColoredComponent']"))
+          .any { it.hasText { text -> text.text.contains("detected in the system") } }
       }
       button("Create").click()
     }
