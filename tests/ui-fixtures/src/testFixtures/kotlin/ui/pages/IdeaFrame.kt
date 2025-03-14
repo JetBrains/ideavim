@@ -16,6 +16,7 @@ import com.intellij.remoterobot.fixtures.FixtureName
 import com.intellij.remoterobot.fixtures.JTreeFixture
 import com.intellij.remoterobot.search.locators.byXpath
 import com.intellij.remoterobot.stepsProcessing.step
+import com.intellij.remoterobot.utils.WaitForConditionTimeoutException
 import com.intellij.remoterobot.utils.waitFor
 import java.time.Duration
 
@@ -30,8 +31,15 @@ class IdeaFrame(
   remoteComponent: RemoteComponent,
 ) : CommonContainerFixture(remoteRobot, remoteComponent) {
 
-  val projectViewTree
-    get() = find<JTreeFixture>(byXpath("MyProjectViewTree", "//div[@class='MyProjectViewTree']"), Duration.ofSeconds(30))
+  val projectViewTree: JTreeFixture
+    get() {
+      return try {
+        find<JTreeFixture>(byXpath("MyProjectViewTree", "//div[@class='MyProjectViewTree']"), Duration.ofSeconds(30))
+      } catch (_: WaitForConditionTimeoutException) {
+        // [VERSION UPDATE] 2025.1+ Leave only MyProjectViewTree.
+        find<JTreeFixture>(byXpath("ProjectViewTree", "//div[@class='ProjectViewTree']"), Duration.ofSeconds(30))
+      }
+    }
 
   val projectName
     get() = step("Get project name") { return@step callJs<String>("component.getProject().getName()") }
