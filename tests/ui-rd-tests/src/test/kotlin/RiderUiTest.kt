@@ -11,7 +11,6 @@ import com.intellij.remoterobot.RemoteRobot
 import com.intellij.remoterobot.steps.CommonSteps
 import com.intellij.remoterobot.stepsProcessing.step
 import com.intellij.remoterobot.utils.keyboard
-import com.intellij.remoterobot.utils.waitFor
 import org.assertj.swing.core.MouseButton
 import org.junit.jupiter.api.Test
 import ui.pages.Editor
@@ -23,7 +22,6 @@ import ui.pages.idea
 import ui.pages.welcomeFrame
 import ui.utils.StepsLogger
 import ui.utils.uiTest
-import java.time.Duration
 import kotlin.test.assertEquals
 
 class RiderUiTest {
@@ -44,42 +42,35 @@ class RiderUiTest {
     idea {
       waitSmartMode()
 
-      createFile("1.txt", this@uiTest)
-      val editor = editor("1.txt") {
-        step("Write a text") {
-          injectText(
-            """
-            |One Two
-            |Three Four
-          """.trimMargin()
-          )
-        }
-      }
-      waitFor(Duration.ofMinutes(1)) { editor.findAllText("One").isNotEmpty() }
+      val editor = editor("Program.cs")
 
       testEnterWorksInNormalMode(editor)
     }
   }
 
   private fun IdeaFrame.testEnterWorksInNormalMode(editor: Editor) {
-    editor.findText("Two").click()
+    editor.findText(" for more information").click()
     keyboard {
       enter()
     }
 
     assertEquals(
       """
-      |One Two
-      |Three Four
+      |// See https://aka.ms/new-console-template for more information
+      |
+      |Console.WriteLine("Hello, World!");
     """.trimMargin(), editor.text
     )
 
-    assertEquals(8, editor.caretOffset)
+    assertEquals(64, editor.caretOffset)
   }
 
   private fun RemoteRobot.startNewProject() {
+    manageLicensesFrame {
+      enableFreeTier()
+    }
     welcomeFrame {
-      createNewProjectLink.click()
+      createNewSolutionLink.click()
       button("Create").click()
     }
   }

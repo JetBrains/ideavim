@@ -33,6 +33,14 @@ class WelcomeFrame(remoteRobot: RemoteRobot, remoteComponent: RemoteComponent) :
       ),
     )
 
+  val createNewSolutionLink
+    get() = actionLink(
+      byXpath(
+        "New Solution",
+        "//div[(@class='MainButton' and @text='New Solution') or (@accessiblename='New Solution' and @class='JButton')]",
+      ),
+    )
+
   @Suppress("unused")
   val moreActions
     get() = button(byXpath("More Action", "//div[@accessiblename='More Actions' and @class='ActionButton']"))
