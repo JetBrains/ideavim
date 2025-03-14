@@ -75,7 +75,7 @@ internal object IdeaSpecifics {
       if (!isVimAction && injector.vimState.mode == Mode.INSERT && action !is EnterAction) {
         val undoService = injector.undo as VimTimestampBasedUndoService
         val nanoTime = System.nanoTime()
-        editor?.vim?.forEachCaret { undoService.endInsertSequence(it, it.offset, nanoTime) }
+        editor?.vim?.nativeCarets()?.forEach { undoService.endInsertSequence(it, it.offset, nanoTime) }
       }
       if (!isVimAction && injector.globalIjOptions().trackactionids) {
         if (action !is NotificationService.ActionIdNotifier.CopyActionId && action !is NotificationService.ActionIdNotifier.StopTracking) {
