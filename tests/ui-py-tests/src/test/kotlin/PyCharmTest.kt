@@ -74,7 +74,7 @@ class PyCharmTest {
       waitFor(duration = Duration.ofSeconds(30)) {
         // Waiting till the SDK will be detected by PyCharm
         this@startNewProject.findAll<ComponentFixture>(byXpath("//div[@class='SimpleColoredComponent']"))
-          .any { it.hasText { text -> text.text.contains("/usr/bin/python3") } }
+          .any { it.hasText { text -> text.text.contains("/usr/local/bin/python3") } }
       }
       button("Create").click()
     }
