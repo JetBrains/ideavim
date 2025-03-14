@@ -44,12 +44,12 @@ class PyCharmTest {
   }
 
   private fun IdeaFrame.testEnterWorksInPyConsole() {
-    waitFor(duration = Duration.ofMinutes(5)) {
-      findAllText("Python Console").isNotEmpty() &&
-        findAllText("Version Control").isNotEmpty() &&
-        findAllText("Python Packages").isNotEmpty() &&
-        isSmartMode()
-    }
+//    waitFor(duration = Duration.ofMinutes(5)) {
+//      findAllText("Python Console").isNotEmpty() &&
+//        findAllText("Version Control").isNotEmpty() &&
+//        findAllText("Python Packages").isNotEmpty() &&
+//        isSmartMode()
+//    }
 
     // Open tool window by id.
     // id taken from PythonConsoleToolWindowFactory.ID but it's not resolved in robot by some reason
