@@ -16,13 +16,11 @@ internal object DoesntMatchHandler :
   BinaryOperatorWithIgnoreCaseOption(DoesntMatchIgnoreCaseHandler, DoesntMatchCaseSensitiveHandler)
 
 internal object DoesntMatchIgnoreCaseHandler : BinaryOperatorHandler() {
-  override fun performOperation(left: VimDataType, right: VimDataType): VimDataType {
-    return injector.regexpService.matches(left.asString(), right.asString(), ignoreCase = true).asVimInt()
-  }
+  override fun performOperation(left: VimDataType, right: VimDataType) =
+    injector.regexpService.matches(left.toVimString().value, right.toVimString().value, ignoreCase = true).asVimInt()
 }
 
 internal object DoesntMatchCaseSensitiveHandler : BinaryOperatorHandler() {
-  override fun performOperation(left: VimDataType, right: VimDataType): VimDataType {
-    return injector.regexpService.matches(left.asString(), right.asString(), ignoreCase = false).asVimInt()
-  }
+  override fun performOperation(left: VimDataType, right: VimDataType) =
+    injector.regexpService.matches(left.toVimString().value, right.toVimString().value, ignoreCase = false).asVimInt()
 }
