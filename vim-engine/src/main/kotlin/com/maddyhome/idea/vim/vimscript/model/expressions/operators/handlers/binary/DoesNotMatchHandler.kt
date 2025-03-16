@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 
-internal class DoesntMatchHandler(ignoreCase: Boolean? = null) :
+internal class DoesNotMatchHandler(ignoreCase: Boolean? = null) :
   BinaryOperatorWithIgnoreCaseOption(ignoreCase) {
 
   override fun performOperation(left: VimDataType, right: VimDataType, ignoreCase: Boolean) =
