@@ -8,7 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.datatypes
 
-import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import java.text.DecimalFormat
 import kotlin.math.abs
 
@@ -19,11 +19,15 @@ data class VimFloat(val value: Double) : VimDataType() {
   }
 
   override fun asString(): String {
-    throw ExException("E806: using Float as a String")
+    throw exExceptionMessage("E806") // E806: Using a Float as a String
   }
 
   override fun toVimNumber(): VimInt {
-    throw ExException("E805: Using a Float as a Number")
+    throw exExceptionMessage("E805") // E805: Using a Float as a Number
+  }
+
+  override fun toVimString(): VimString {
+    throw exExceptionMessage("E806") // E806: Using a Float as a String
   }
 
   override fun toString(): String {

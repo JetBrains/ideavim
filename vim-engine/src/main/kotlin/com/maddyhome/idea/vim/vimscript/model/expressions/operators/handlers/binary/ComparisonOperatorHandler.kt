@@ -52,8 +52,7 @@ internal abstract class ComparisonOperatorHandler() : BinaryOperatorHandler() {
       }
 
       left is VimString || right is VimString -> {
-        // TODO: Introduce toVimString
-        compare(left.asString(), right.asString())
+        compare(left.toVimString().value, right.toVimString().value)
       }
 
       left is VimInt || right is VimInt -> {

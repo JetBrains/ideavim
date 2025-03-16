@@ -8,20 +8,24 @@
 
 package com.maddyhome.idea.vim.vimscript.model.datatypes
 
-import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 
 data class VimDictionary(val dictionary: LinkedHashMap<VimString, VimDataType>) : VimDataType() {
 
   override fun asDouble(): Double {
-    throw ExException("E728: Using a Dictionary as a Number")
+    throw exExceptionMessage("E728")  // E728: Using a Dictionary as a Number
   }
 
   override fun asString(): String {
-    throw ExException("E731: Using a Dictionary as a String")
+    throw exExceptionMessage("E731")  // E731: Using a Dictionary as a String
   }
 
   override fun toVimNumber(): VimInt {
-    throw ExException("E728: Using a Dictionary as a Number")
+    throw exExceptionMessage("E728")  // E728: Using a Dictionary as a Number
+  }
+
+  override fun toVimString(): VimString {
+    throw exExceptionMessage("E731")  // E731: Using a Dictionary as a String
   }
 
   override fun toString(): String {
@@ -40,7 +44,7 @@ data class VimDictionary(val dictionary: LinkedHashMap<VimString, VimDataType>) 
   }
 
   override fun asBoolean(): Boolean {
-    throw ExException("E728: Using a Dictionary as a Number")
+    throw exExceptionMessage("E728")  // E728: Using a Dictionary as a Number
   }
 
   override fun deepCopy(level: Int): VimDictionary {
