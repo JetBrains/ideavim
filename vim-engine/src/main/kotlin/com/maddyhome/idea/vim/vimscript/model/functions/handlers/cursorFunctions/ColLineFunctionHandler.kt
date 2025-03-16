@@ -105,7 +105,7 @@ private fun variableToPosition(
   // Current caret line
   if (name[0] == '.') return editor.currentCaret().vimLine.asVimInt() to currentCol(editor)
 
-  // Visual start
+  // The opposite end of the Visual selection, i.e., the start. If there is no selection, return the current line
   if (name == "v") {
     if (!editor.inVisualMode) {
       return editor.currentCaret().vimLine.asVimInt() to currentCol(editor)
@@ -113,10 +113,10 @@ private fun variableToPosition(
 
     val vimStart = editor.currentCaret().vimSelectionStart
     val bufferPosition = editor.offsetToBufferPosition(vimStart)
-    val visualLine = (bufferPosition.line + 1).asVimInt()
-    val visualCol = (bufferPosition.column + 1).asVimInt()
+    val line = (bufferPosition.line + 1).asVimInt()
+    val col = (bufferPosition.column + 1).asVimInt()
 
-    return visualLine to visualCol
+    return line to col
   }
 
   // Mark
