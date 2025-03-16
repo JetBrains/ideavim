@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
@@ -36,11 +37,11 @@ data class VimFuncref(
   }
 
   override fun asDouble(): Double {
-    throw ExException("E703: using Funcref as a Number")
+    throw exExceptionMessage("E703")  // E703: Using a Funcref as a Number
   }
 
   override fun asString(): String {
-    throw ExException("E729: using Funcref as a String")
+    throw exExceptionMessage("E729")  // E729: Using a Funcref as a String
   }
 
   override fun toString(): String {
@@ -61,7 +62,11 @@ data class VimFuncref(
   }
 
   override fun toVimNumber(): VimInt {
-    throw ExException("E703: using Funcref as a Number")
+    throw exExceptionMessage("E703")  // E703: Using a Funcref as a Number
+  }
+
+  override fun toVimString(): VimString {
+    throw exExceptionMessage("E729")  // E729: Using a Funcref as a String
   }
 
   fun execute(
