@@ -8,7 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary
 
-import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -65,7 +65,7 @@ internal object ModulusHandler : BinaryOperatorHandler() {
 
   override fun performOperation(left: VimDataType, right: VimDataType): VimDataType {
     if (left is VimFloat || right is VimFloat) {
-      throw ExException("E804: Connot use '%' with Float")
+      throw exExceptionMessage("E804")  // E804: Cannot use '%' with Float
     } else {
       return VimInt(modulus(left.asDouble().toInt(), right.asDouble().toInt()))
     }
