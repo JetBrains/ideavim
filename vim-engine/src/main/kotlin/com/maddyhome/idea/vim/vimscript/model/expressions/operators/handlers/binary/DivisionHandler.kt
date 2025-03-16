@@ -12,8 +12,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 
-object DivisionHandler : BinaryOperatorHandler() {
-
+internal object DivisionHandler : BinaryOperatorHandler() {
   override fun performOperation(left: VimDataType, right: VimDataType): VimDataType {
     return if (left is VimFloat || right is VimFloat) {
       VimFloat(left.asDouble() / right.asDouble())

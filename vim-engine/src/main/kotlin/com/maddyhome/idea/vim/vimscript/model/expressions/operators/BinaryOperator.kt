@@ -47,7 +47,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.bin
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary.UnequalsHandler
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary.UnequalsIgnoreCaseHandler
 
-enum class BinaryOperator(val value: String, val handler: BinaryOperatorHandler) {
+enum class BinaryOperator(val value: String, internal val handler: BinaryOperatorHandler) {
   MULTIPLICATION("*", MultiplicationHandler),
   DIVISION("/", DivisionHandler),
   ADDITION("+", AdditionHandler),
