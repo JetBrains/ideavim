@@ -16,3 +16,9 @@ internal object LogicalAndHandler : BinaryOperatorHandler() {
     return VimInt(if (left.asDouble() != 0.0 && right.asDouble() != 0.0) 1 else 0)
   }
 }
+
+internal object LogicalOrHandler : BinaryOperatorHandler() {
+  override fun performOperation(left: VimDataType, right: VimDataType): VimDataType {
+    return VimInt(if (left.asDouble() != 0.0 || right.asDouble() != 0.0) 1 else 0)
+  }
+}
