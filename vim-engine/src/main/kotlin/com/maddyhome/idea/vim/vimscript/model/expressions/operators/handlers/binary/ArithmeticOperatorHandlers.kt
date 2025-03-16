@@ -11,63 +11,68 @@ package com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.bi
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
+import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 
-internal object AdditionHandler : BinaryOperatorHandler() {
+internal abstract class ArithmeticBinaryOperatorHandler() : BinaryOperatorHandler() {
   override fun performOperation(left: VimDataType, right: VimDataType): VimDataType {
     return if (left is VimFloat || right is VimFloat) {
-      VimFloat(left.asDouble() + right.asDouble())
-    } else if (left is VimList && right is VimList) {
+      val leftFloat = coerceToVimFloatValue(left)
+      val rightFloat = coerceToVimFloatValue(right)
+      VimFloat(performOperation(leftFloat, rightFloat))
+    }
+    else {
+      val leftNumber = left.toVimNumber().value
+      val rightNumber = right.toVimNumber().value
+      performOperation(leftNumber, rightNumber).asVimInt()
+    }
+  }
+
+  protected abstract fun performOperation(left: Double, right: Double): Double
+  protected abstract fun performOperation(left: Int, right: Int): Int
+}
+
+internal object AdditionHandler : ArithmeticBinaryOperatorHandler() {
+  override fun performOperation(left: VimDataType, right: VimDataType): VimDataType {
+    if (left is VimList && right is VimList) {
       val newList = ArrayList(left.values)
       newList.addAll(right.values)
-      VimList(newList)
-    } else {
-      VimInt((left.asDouble() + right.asDouble()).toInt())
+      return VimList(newList)
     }
+
+    return super.performOperation(left, right)
   }
+
+  override fun performOperation(left: Double, right: Double) = left + right
+  override fun performOperation(left: Int, right: Int) = left + right
 }
 
-internal object SubtractionHandler : BinaryOperatorHandler() {
-  override fun performOperation(left: VimDataType, right: VimDataType): VimDataType {
-    return if (left is VimFloat || right is VimFloat) {
-      VimFloat(left.asDouble() - right.asDouble())
-    } else {
-      VimInt((left.asDouble() - right.asDouble()).toInt())
-    }
-  }
+internal object SubtractionHandler : ArithmeticBinaryOperatorHandler() {
+  override fun performOperation(left: Double, right: Double) = left - right
+  override fun performOperation(left: Int, right: Int) = left - right
 }
 
-internal object MultiplicationHandler : BinaryOperatorHandler() {
-  override fun performOperation(left: VimDataType, right: VimDataType): VimDataType {
-    return if (left is VimFloat || right is VimFloat) {
-      VimFloat(left.asDouble() * right.asDouble())
-    } else {
-      VimInt((left.asDouble() * right.asDouble()).toInt())
-    }
-  }
+internal object MultiplicationHandler : ArithmeticBinaryOperatorHandler() {
+  override fun performOperation(left: Double, right: Double) = left * right
+  override fun performOperation(left: Int, right: Int) = left * right
 }
 
-internal object DivisionHandler : BinaryOperatorHandler() {
-  override fun performOperation(left: VimDataType, right: VimDataType): VimDataType {
-    return if (left is VimFloat || right is VimFloat) {
-      VimFloat(left.asDouble() / right.asDouble())
-    } else {
-      VimInt((left.asDouble() / right.asDouble()).toInt())
-    }
+internal object DivisionHandler : ArithmeticBinaryOperatorHandler() {
+  override fun performOperation(left: Double, right: Double) = left / right
+  override fun performOperation(left: Int, right: Int): Int {
+    // We get an exception when dividing an integer by 0. Doubles give NaN, which becomes 0 when converted to integer
+    return (left.toDouble() / right.toDouble()).toInt()
   }
 }
 
 internal object ModulusHandler : BinaryOperatorHandler() {
-  private fun modulus(l: Int, r: Int): Int {
-    return if (r == 0) 0 else l % r
-  }
-
   override fun performOperation(left: VimDataType, right: VimDataType): VimDataType {
     if (left is VimFloat || right is VimFloat) {
       throw exExceptionMessage("E804")  // E804: Cannot use '%' with Float
-    } else {
-      return VimInt(modulus(left.asDouble().toInt(), right.asDouble().toInt()))
     }
+
+    val leftNumber = left.toVimNumber().value
+    val rightNumber = right.toVimNumber().value
+    return (if (rightNumber == 0) 0 else leftNumber % rightNumber).asVimInt()
   }
 }
