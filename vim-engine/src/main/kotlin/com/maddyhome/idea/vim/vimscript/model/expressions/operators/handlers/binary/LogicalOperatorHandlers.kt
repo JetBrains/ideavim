@@ -12,13 +12,11 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 
 internal object LogicalAndHandler : BinaryOperatorHandler() {
-  override fun performOperation(left: VimDataType, right: VimDataType): VimDataType {
-    return VimInt(if (left.asDouble() != 0.0 && right.asDouble() != 0.0) 1 else 0)
-  }
+  override fun performOperation(left: VimDataType, right: VimDataType) =
+    if (left.asDouble() != 0.0 && right.asDouble() != 0.0) VimInt.ONE else VimInt.ZERO
 }
 
 internal object LogicalOrHandler : BinaryOperatorHandler() {
-  override fun performOperation(left: VimDataType, right: VimDataType): VimDataType {
-    return VimInt(if (left.asDouble() != 0.0 || right.asDouble() != 0.0) 1 else 0)
-  }
+  override fun performOperation(left: VimDataType, right: VimDataType) =
+    if (left.asDouble() != 0.0 || right.asDouble() != 0.0) VimInt.ONE else VimInt.ZERO
 }
