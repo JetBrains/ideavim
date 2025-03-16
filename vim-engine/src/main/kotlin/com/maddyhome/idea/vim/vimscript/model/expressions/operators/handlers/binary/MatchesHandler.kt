@@ -15,13 +15,11 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 internal object MatchesHandler : BinaryOperatorWithIgnoreCaseOption(MatchesIgnoreCaseHandler, MatchesCaseSensitiveHandler)
 
 internal object MatchesIgnoreCaseHandler : BinaryOperatorHandler() {
-  override fun performOperation(left: VimDataType, right: VimDataType): VimDataType {
-    return injector.regexpService.matches(right.asString(), left.asString(), ignoreCase = true).asVimInt()
-  }
+  override fun performOperation(left: VimDataType, right: VimDataType) =
+    injector.regexpService.matches(right.toVimString().value, left.toVimString().value, ignoreCase = true).asVimInt()
 }
 
 internal object MatchesCaseSensitiveHandler : BinaryOperatorHandler() {
-  override fun performOperation(left: VimDataType, right: VimDataType): VimDataType {
-    return injector.regexpService.matches(right.asString(), left.asString(), ignoreCase = false).asVimInt()
-  }
+  override fun performOperation(left: VimDataType, right: VimDataType) =
+    injector.regexpService.matches(right.toVimString().value, left.toVimString().value, ignoreCase = false).asVimInt()
 }
