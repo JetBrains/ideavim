@@ -28,11 +28,13 @@ internal abstract class UnaryFloatFunctionHandlerBase : FunctionHandler() {
     context: ExecutionContext,
     vimContext: VimLContext,
   ): VimDataType {
-    val argument = argumentValues[0].evaluate(editor, context, vimContext)
-    if (argument !is VimFloat && argument !is VimInt) {
-      throw exExceptionMessage("E808")  // E808: Number or Float required
+    val arg = argumentValues[0].evaluate(editor, context, vimContext)
+    val argument = when (arg) {
+      is VimFloat -> arg.value
+      is VimInt -> arg.value.toDouble()
+      else -> throw exExceptionMessage("E808")  // E808: Number or Float required
     }
-    return VimFloat(invoke(argument.asDouble()))
+    return VimFloat(invoke(argument))
   }
 
   protected abstract fun invoke(argument: Double): Double
@@ -50,10 +52,17 @@ internal abstract class BinaryFloatFunctionHandlerBase : FunctionHandler() {
   ): VimDataType {
     val arg1 = argumentValues[0].evaluate(editor, context, vimContext)
     val arg2 = argumentValues[1].evaluate(editor, context, vimContext)
-    if ((arg1 !is VimFloat && arg1 !is VimInt) || (arg2 !is VimFloat && arg2 !is VimInt)) {
-      throw exExceptionMessage("E808")  // E808: Number or Float required
+    val x = when (arg1) {
+      is VimFloat -> arg1.value
+      is VimInt -> arg1.value.toDouble()
+      else -> throw exExceptionMessage("E808")  // E808: Number or Float required
     }
-    return VimFloat(invoke(arg1.asDouble(), arg2.asDouble()))
+    val y = when (arg2) {
+      is VimFloat -> arg2.value
+      is VimInt -> arg2.value.toDouble()
+      else -> throw exExceptionMessage("E808")  // E808: Number or Float required
+    }
+    return VimFloat(invoke(x, y))
   }
 
   protected abstract fun invoke(arg1: Double, arg2: Double): Double

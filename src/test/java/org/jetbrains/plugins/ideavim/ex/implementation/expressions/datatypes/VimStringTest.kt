@@ -16,72 +16,72 @@ class VimStringTest {
 
   @Test
   fun `string as number`() {
-    assertEquals(0.0, VimString("oh, hi Mark").asDouble())
+    assertEquals(0, VimString("oh, hi Mark").toVimNumber().value)
   }
 
   @Test
   fun `string with zero as number`() {
-    assertEquals(0.0, VimString("0oh, hi Mark").asDouble())
+    assertEquals(0, VimString("0oh, hi Mark").toVimNumber().value)
   }
 
   @Test
   fun `string with minus`() {
-    assertEquals(0.0, VimString("-oh, hi Mark").asDouble())
+    assertEquals(0, VimString("-oh, hi Mark").toVimNumber().value)
   }
 
   @Test
   fun `string with minus zero`() {
-    assertEquals(0.0, VimString("-0oh, hi Mark").asDouble())
+    assertEquals(0, VimString("-0oh, hi Mark").toVimNumber().value)
   }
 
   @Test
   fun `string with float`() {
-    assertEquals(4.0, VimString("4.67oh, hi Mark").asDouble())
+    assertEquals(4, VimString("4.67oh, hi Mark").toVimNumber().value)
   }
 
   @Test
   fun `string with digit`() {
-    assertEquals(5.0, VimString("5oh, hi Mark").asDouble())
+    assertEquals(5, VimString("5oh, hi Mark").toVimNumber().value)
   }
 
   @Test
   fun `string with integer`() {
-    assertEquals(53.0, VimString("53oh, hi Mark").asDouble())
+    assertEquals(53, VimString("53oh, hi Mark").toVimNumber().value)
   }
 
   @Test
   fun `string with negative integer`() {
-    assertEquals(-1464.0, VimString("-1464 oh, hi Mark").asDouble())
+    assertEquals(-1464, VimString("-1464 oh, hi Mark").toVimNumber().value)
   }
 
   @Test
   fun `string with octal number`() {
-    assertEquals(83.0, VimString("0123 oh, hi Mark").asDouble())
+    assertEquals(83, VimString("0123 oh, hi Mark").toVimNumber().value)
   }
 
   @Test
   fun `string with negative octal number`() {
-    assertEquals(-83.0, VimString("-0123 oh, hi Mark").asDouble())
+    assertEquals(-83, VimString("-0123 oh, hi Mark").toVimNumber().value)
   }
 
   @Test
   fun `string with octal number with multiple leading zeros`() {
-    assertEquals(83.0, VimString("000123 oh, hi Mark").asDouble())
+    assertEquals(83, VimString("000123 oh, hi Mark").toVimNumber().value)
   }
 
   @Test
   fun `string with hex number`() {
-    assertEquals(17.0, VimString("0x11 oh, hi Mark").asDouble())
+    assertEquals(17, VimString("0x11 oh, hi Mark").toVimNumber().value)
   }
 
   @Test
   fun `string with negative hex number`() {
-    assertEquals(-17.0, VimString("-0x11 oh, hi Mark").asDouble())
+    assertEquals(-17, VimString("-0x11 oh, hi Mark").toVimNumber().value)
   }
 
   @Test
-  fun `string with hex number with multiple leading zeroz`() {
-    assertEquals(0.0, VimString("000x11 oh, hi Mark").asDouble())
+  fun `string with hex number with multiple leading zeroes`() {
+    assertEquals(0, VimString("000x11 oh, hi Mark").toVimNumber().value)
   }
 
   @Test

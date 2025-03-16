@@ -12,8 +12,6 @@ import com.maddyhome.idea.vim.ex.ExException
 
 abstract class VimDataType {
 
-  abstract fun asDouble(): Double
-
   /**
    * Deprecated. Returns the current object as a string value, throwing if there is no conversion available
    *
@@ -26,7 +24,7 @@ abstract class VimDataType {
    *
    * This function is used by external plugins.
    */
-  @Deprecated("Use toVimString().value instead")
+  @Deprecated("Use toVimString().value instead", ReplaceWith("toVimString().value"))
   fun asString(): String = toVimString().value
 
   /**
@@ -42,7 +40,12 @@ abstract class VimDataType {
    * This function is used by external plugins.
    */
   @Deprecated("Use toVimNumber().booleanValue instead", ReplaceWith("toVimNumber().booleanValue"))
-  fun asBoolean() = toVimNumber().booleanValue
+  fun asBoolean(): Boolean = toVimNumber().booleanValue
+
+  /**
+   * Returns this object as a Vim Float. If the object is not a Float, this function throws
+   */
+  abstract fun toVimFloat(): VimFloat
 
   /**
    * Returns this object as a Vim Number (integral number value), converting if necessary/appropriate
