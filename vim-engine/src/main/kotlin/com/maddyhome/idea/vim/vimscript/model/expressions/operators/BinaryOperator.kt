@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.bin
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary.BinaryOperatorHandler
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary.ConcatenationHandler
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary.DivisionHandler
+import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary.DoesntMatchCaseSensitiveHandler
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary.DoesntMatchHandler
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary.DoesntMatchIgnoreCaseHandler
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary.EqualsCaseSensitiveHandler
@@ -86,7 +87,7 @@ enum class BinaryOperator(val value: String, internal val handler: BinaryOperato
   MATCHES_CASE_SENSITIVE("=~#", MatchesCaseSensitiveHandler),
   DOESNT_MATCH("!~", DoesntMatchHandler),
   DOESNT_MATCH_IGNORE_CASE("!~?", DoesntMatchIgnoreCaseHandler),
-  DOESNT_MATCH_CASE_SENSITIVE("!~#", DoesntMatchIgnoreCaseHandler),
+  DOESNT_MATCH_CASE_SENSITIVE("!~#", DoesntMatchCaseSensitiveHandler),
   ;
 
   companion object {

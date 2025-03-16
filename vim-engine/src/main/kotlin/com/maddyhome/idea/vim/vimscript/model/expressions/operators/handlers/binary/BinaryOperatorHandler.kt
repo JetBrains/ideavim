@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary
 
+import com.maddyhome.idea.vim.api.globalOptions
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
@@ -29,4 +31,13 @@ internal abstract class BinaryOperatorHandler {
    */
   protected fun coerceToVimFloatValue(value: VimDataType) =
     if (value is VimFloat) value.value else value.toVimNumber().value.toDouble()
+}
+
+internal abstract class BinaryOperatorWithIgnoreCaseOption(private val ignoreCase: Boolean?) : BinaryOperatorHandler() {
+  final override fun performOperation(left: VimDataType, right: VimDataType): VimDataType {
+    val shouldIgnoreCase = ignoreCase ?: injector.globalOptions().ignorecase
+    return performOperation(left, right, shouldIgnoreCase)
+  }
+
+  abstract fun performOperation(left: VimDataType, right: VimDataType, ignoreCase: Boolean): VimDataType
 }
