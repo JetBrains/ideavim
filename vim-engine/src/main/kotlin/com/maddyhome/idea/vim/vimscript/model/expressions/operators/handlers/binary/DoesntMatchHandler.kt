@@ -12,15 +12,13 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 
-internal object DoesntMatchHandler :
-  BinaryOperatorWithIgnoreCaseOption(DoesntMatchIgnoreCaseHandler, DoesntMatchCaseSensitiveHandler)
+internal open class DoesntMatchHandlerBase(ignoreCase: Boolean? = null) :
+  BinaryOperatorWithIgnoreCaseOption(ignoreCase) {
 
-internal object DoesntMatchIgnoreCaseHandler : BinaryOperatorHandler() {
-  override fun performOperation(left: VimDataType, right: VimDataType) =
-    injector.regexpService.matches(left.toVimString().value, right.toVimString().value, ignoreCase = true).asVimInt()
+  override fun performOperation(left: VimDataType, right: VimDataType, ignoreCase: Boolean) =
+    injector.regexpService.matches(left.toVimString().value, right.toVimString().value, ignoreCase).asVimInt()
 }
 
-internal object DoesntMatchCaseSensitiveHandler : BinaryOperatorHandler() {
-  override fun performOperation(left: VimDataType, right: VimDataType) =
-    injector.regexpService.matches(left.toVimString().value, right.toVimString().value, ignoreCase = false).asVimInt()
-}
+internal object DoesntMatchHandler : DoesntMatchHandlerBase()
+internal object DoesntMatchIgnoreCaseHandler : DoesntMatchHandlerBase(ignoreCase = true)
+internal object DoesntMatchCaseSensitiveHandler : DoesntMatchHandlerBase(ignoreCase = false)

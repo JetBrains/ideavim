@@ -8,8 +8,6 @@
 
 package com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary
 
-import com.maddyhome.idea.vim.api.globalOptions
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
@@ -21,16 +19,15 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 
-internal abstract class ComparisonOperatorHandler(private val ignoreCase: Boolean?) : BinaryOperatorHandler() {
-  protected val shouldIgnoreCase: Boolean
-    get() = ignoreCase ?: injector.globalOptions().ignorecase
+internal abstract class ComparisonOperatorHandler(ignoreCase: Boolean?) :
+  BinaryOperatorWithIgnoreCaseOption(ignoreCase) {
 
-  final override fun performOperation(left: VimDataType, right: VimDataType): VimDataType {
+  final override fun performOperation(left: VimDataType, right: VimDataType, ignoreCase: Boolean): VimDataType {
     return when {
       left is VimList || right is VimList -> {
         val leftList = left as? VimList ?: throw exExceptionMessage("E691") // E691: Can only compare List with List
         val rightList = right as? VimList ?: throw exExceptionMessage("E691") // E691: Can only compare List with List
-        compare(leftList, rightList, shouldIgnoreCase)
+        compare(leftList, rightList, ignoreCase)
       }
 
       left is VimDictionary || right is VimDictionary -> {
@@ -38,7 +35,7 @@ internal abstract class ComparisonOperatorHandler(private val ignoreCase: Boolea
           ?: throw exExceptionMessage("E735") // E735: Can only compare Dictionary with Dictionary
         val rightDictionary = right as? VimDictionary
           ?: throw exExceptionMessage("E735") // E735: Can only compare Dictionary with Dictionary
-        compare(leftDictionary, rightDictionary, shouldIgnoreCase)
+        compare(leftDictionary, rightDictionary, ignoreCase)
       }
 
       left is VimFuncref || right is VimFuncref -> {
@@ -57,7 +54,7 @@ internal abstract class ComparisonOperatorHandler(private val ignoreCase: Boolea
       }
 
       left is VimString || right is VimString -> {
-        compare(left.toVimString().value, right.toVimString().value, shouldIgnoreCase)
+        compare(left.toVimString().value, right.toVimString().value, ignoreCase)
       }
 
       left is VimInt || right is VimInt -> {

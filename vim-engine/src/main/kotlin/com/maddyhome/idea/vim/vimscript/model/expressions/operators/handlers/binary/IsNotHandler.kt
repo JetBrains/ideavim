@@ -18,16 +18,14 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 
-internal object IsNotHandler : BinaryOperatorWithIgnoreCaseOption(IsNotIgnoreCaseHandler, IsNotCaseSensitiveHandler)
-
-internal object IsNotIgnoreCaseHandler : BinaryOperatorHandler() {
-  override fun performOperation(left: VimDataType, right: VimDataType): VimDataType {
+internal open class IsNotHandlerBase(ignoreCase: Boolean? = null) : BinaryOperatorWithIgnoreCaseOption(ignoreCase) {
+  override fun performOperation(left: VimDataType, right: VimDataType, ignoreCase: Boolean): VimDataType {
     return when (left) {
       // Check the value is the same with simple equals (data classes). Vim does not convert between Number and String!
       is VimFloat -> left != right
       is VimInt -> left != right
 
-      // Ignore case
+      // Can't use simple equals for case insensitive `isnot`
       is VimString -> {
         if (right is VimString) left.value.compareTo(right.value, ignoreCase = true) != 0 else false
       }
@@ -42,20 +40,6 @@ internal object IsNotIgnoreCaseHandler : BinaryOperatorHandler() {
   }
 }
 
-internal object IsNotCaseSensitiveHandler : BinaryOperatorHandler() {
-  override fun performOperation(left: VimDataType, right: VimDataType): VimDataType {
-    return when (left) {
-      // Check the value is the same with simple equals (data classes). Vim does not convert between Number and String!
-      is VimFloat -> left != right
-      is VimInt -> left != right
-      is VimString -> left != right
-
-      // Check the instance is the same with reference equals
-      is VimList -> left !== right
-      is VimDictionary -> left !== right
-      is VimFuncref -> left !== right
-      is VimBlob -> left !== right
-      else -> false
-    }.asVimInt()
-  }
-}
+internal object IsNotHandler : IsNotHandlerBase()
+internal object IsNotIgnoreCaseHandler : IsNotHandlerBase(ignoreCase = true)
+internal object IsNotCaseSensitiveHandler : IsNotHandlerBase(ignoreCase = false)
