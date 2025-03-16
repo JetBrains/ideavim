@@ -16,9 +16,7 @@ import kotlin.math.abs
 
 data class VimFloat(val value: Double) : VimDataType() {
 
-  override fun asDouble(): Double {
-    return value
-  }
+  override fun toVimFloat() = this
 
   override fun toVimNumber(): VimInt {
     throw exExceptionMessage("E805") // E805: Using a Float as a Number

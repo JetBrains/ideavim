@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.vimscript.model.datatypes
 
 class VimBlob : VimDataType() {
 
-  override fun asDouble(): Double {
+  override fun toVimFloat(): VimFloat {
     TODO("Not yet implemented")
   }
 

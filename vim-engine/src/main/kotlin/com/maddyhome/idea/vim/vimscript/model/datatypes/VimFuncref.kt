@@ -36,8 +36,8 @@ data class VimFuncref(
     var anonymousCounter: Int = 1
   }
 
-  override fun asDouble(): Double {
-    throw exExceptionMessage("E703")  // E703: Using a Funcref as a Number
+  override fun toVimFloat(): VimFloat {
+    throw exExceptionMessage("E891")  // E891: Using a Funcref as a Float
   }
 
   override fun toVimNumber(): VimInt {

@@ -20,7 +20,25 @@ data class VimInt(val value: Int) : VimDataType() {
    */
   val booleanValue = value != 0
 
-  override fun asDouble() = value.toDouble()
+  /**
+   * Returns the current object as a Vim Float, if possible (it's not)
+   *
+   * Vim will automatically convert between Number and String, but it does not convert from Number to Float (see
+   * `:help Number`). However, there doesn't appear to be a distinct error for trying to use a Number as a Float, like
+   * there is for other types (`E893: Using a List as a Float`). This seems to be because there is no way to get into
+   * this situation.
+   *
+   * It is possible to call builtin functions with Number or Float, such as `pow()`, but the documentation states that
+   * the expressions passed must evaluate to a Float or a Number, and will throw `E808: Number or Float required`, so
+   * indicates that the function handler needs to check types rather than rely on something like `toVimFloat`.
+   *
+   * Note that when an expression mixes Float and Number (e.g., in an `if` condition), Vim will convert the Number to a
+   * Float (see `:help E714` - "When mixing Number and Float the Number is converted to Float. Otherwise, there is no
+   * automatic conversion of Float"). IdeaVim handles this conversion directly when evaluating expressions.
+   */
+  override fun toVimFloat(): VimFloat {
+    error("Using a Number as a Float is not allowed")
+  }
 
   override fun toVimNumber() = this
   override fun toVimString() = VimString(value.toString())

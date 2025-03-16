@@ -14,8 +14,8 @@ data class VimList(val values: MutableList<VimDataType>) : VimDataType() {
 
   operator fun get(index: Int): VimDataType = this.values[index]
 
-  override fun asDouble(): Double {
-    throw exExceptionMessage("E745")  // E745: Using a List as a Number
+  override fun toVimFloat(): VimFloat {
+    throw exExceptionMessage("E893")  // E893: Using a List as a Float
   }
 
   override fun toVimNumber(): VimInt {
