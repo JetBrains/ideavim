@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 
-object ModulusHandler : BinaryOperatorHandler() {
+internal object ModulusHandler : BinaryOperatorHandler() {
 
   private fun modulus(l: Int, r: Int): Int {
     return if (r == 0) 0 else l % r

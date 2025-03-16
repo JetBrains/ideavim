@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.bi
 
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
-abstract class BinaryOperatorHandler {
-
+internal abstract class BinaryOperatorHandler {
   abstract fun performOperation(left: VimDataType, right: VimDataType): VimDataType
 }

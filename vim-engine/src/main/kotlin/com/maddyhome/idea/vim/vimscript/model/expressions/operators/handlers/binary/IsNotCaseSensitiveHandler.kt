@@ -11,8 +11,7 @@ package com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.bi
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 
-object IsNotCaseSensitiveHandler : BinaryOperatorHandler() {
-
+internal object IsNotCaseSensitiveHandler : BinaryOperatorHandler() {
   override fun performOperation(left: VimDataType, right: VimDataType): VimDataType {
     return VimInt(if (left != right) 1 else 0)
   }

@@ -8,5 +8,5 @@
 
 package com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary
 
-object LessOrEqualsHandler :
+internal object LessOrEqualsHandler :
   BinaryOperatorWithIgnoreCaseOption(LessOrEqualsIgnoreCaseHandler, LessOrEqualsCaseSensitiveHandler)

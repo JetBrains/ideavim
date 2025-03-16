@@ -14,7 +14,6 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 
 internal object AdditionHandler : BinaryOperatorHandler() {
-
   override fun performOperation(left: VimDataType, right: VimDataType): VimDataType {
     return if (left is VimFloat || right is VimFloat) {
       VimFloat(left.asDouble() + right.asDouble())
