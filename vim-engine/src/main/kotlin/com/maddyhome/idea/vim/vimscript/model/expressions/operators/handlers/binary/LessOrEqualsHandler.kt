@@ -8,12 +8,8 @@
 
 package com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary
 
-internal open class LessOrEqualsHandlerBase(ignoreCase: Boolean? = null) : ComparisonOperatorHandler(ignoreCase) {
+internal class LessOrEqualsHandler(ignoreCase: Boolean? = null) : ComparisonOperatorHandler(ignoreCase) {
   override fun compare(left: Double, right: Double) = left <= right
   override fun compare(left: Int, right: Int) = left <= right
   override fun compare(left: String, right: String, ignoreCase: Boolean) = left.compareTo(right, ignoreCase) <= 0
 }
-
-internal object LessOrEqualsHandler : LessOrEqualsHandlerBase()
-internal object LessOrEqualsIgnoreCaseHandler : LessOrEqualsHandlerBase(ignoreCase = true)
-internal object LessOrEqualsCaseSensitiveHandler : LessOrEqualsHandlerBase(ignoreCase = false)

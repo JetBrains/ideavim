@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 
-internal open class IsNotHandlerBase(ignoreCase: Boolean? = null) : BinaryOperatorWithIgnoreCaseOption(ignoreCase) {
+internal class IsNotHandler(ignoreCase: Boolean? = null) : BinaryOperatorWithIgnoreCaseOption(ignoreCase) {
   override fun performOperation(left: VimDataType, right: VimDataType, ignoreCase: Boolean): VimDataType {
     return when (left) {
       // Check the value is the same with simple equals (data classes). Vim does not convert between Number and String!
@@ -39,7 +39,3 @@ internal open class IsNotHandlerBase(ignoreCase: Boolean? = null) : BinaryOperat
     }.asVimInt()
   }
 }
-
-internal object IsNotHandler : IsNotHandlerBase()
-internal object IsNotIgnoreCaseHandler : IsNotHandlerBase(ignoreCase = true)
-internal object IsNotCaseSensitiveHandler : IsNotHandlerBase(ignoreCase = false)

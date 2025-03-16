@@ -12,11 +12,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 
-internal open class MatchesHandlerBase(ignoreCase: Boolean? = null) : BinaryOperatorWithIgnoreCaseOption(ignoreCase) {
+internal class MatchesHandler(ignoreCase: Boolean? = null) : BinaryOperatorWithIgnoreCaseOption(ignoreCase) {
   override fun performOperation(left: VimDataType, right: VimDataType, ignoreCase: Boolean) =
     injector.regexpService.matches(right.toVimString().value, left.toVimString().value, ignoreCase).asVimInt()
 }
-
-internal object MatchesHandler : MatchesHandlerBase()
-internal object MatchesIgnoreCaseHandler : MatchesHandlerBase(ignoreCase = true)
-internal object MatchesCaseSensitiveHandler : MatchesHandlerBase(ignoreCase = false)

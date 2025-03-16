@@ -8,14 +8,10 @@
 
 package com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary
 
-internal open class EqualsHandlerBase(ignoreCase: Boolean? = null) : ComparisonOperatorHandler(ignoreCase) {
+internal class EqualsHandler(ignoreCase: Boolean? = null) : ComparisonOperatorHandler(ignoreCase) {
   override fun compare(left: Double, right: Double) = left == right
   override fun compare(left: Int, right: Int) = left == right
   override fun compare(left: String, right: String, ignoreCase: Boolean) = left.compareTo(right, ignoreCase) == 0
 
   // TODO: Implement for List, Dictionary, Funcref, Blob
 }
-
-internal object EqualsHandler : EqualsHandlerBase()
-internal object EqualsIgnoreCaseHandler : EqualsHandlerBase(ignoreCase = true)
-internal object EqualsCaseSensitiveHandler : EqualsHandlerBase(ignoreCase = false)
