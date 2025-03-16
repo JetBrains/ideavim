@@ -32,8 +32,7 @@ class LineFunctionTest : VimTestCase() {
     // With selection - make sure to delete the '<,'> that is automatically prepended when entering Command-line mode
     // with a selection
     typeText("vj")
-    typeText(""":<C-U>echo line("v")<CR>""")  // enterCommand/assertCommandOutput cannot handle <C-U>!
-    assertExOutput("3")
+    assertCommandOutput("""<C-U>echo line("v")""", "3")
 
     // Remove selection and check again - note that exiting Command-line mode removes selection and switches back to
     // Normal. This <esc> does nothing

@@ -137,7 +137,7 @@ abstract class VimTestCase {
     VimPlugin.getSearch().resetState()
     if (VimPlugin.isNotEnabled()) VimPlugin.setEnabled(true)
     injector.globalOptions().ideastrictmode = true
-    VimTestCase.Checks.reset()
+    Checks.reset()
     clearClipboard()
 
     // Make sure the entry text field gets a bounds, or we won't be able to work out caret location
@@ -442,9 +442,9 @@ abstract class VimTestCase {
       editor,
     )
     val project = fixture.project
-    when (VimTestCase.Checks.keyHandler) {
-      VimTestCase.Checks.KeyHandlerMethod.DIRECT_TO_VIM -> typeText(keys.filterNotNull(), editor, project)
-      VimTestCase.Checks.KeyHandlerMethod.VIA_IDE -> typeTextViaIde(keys.filterNotNull(), editor)
+    when (Checks.keyHandler) {
+      Checks.KeyHandlerMethod.DIRECT_TO_VIM -> typeText(keys.filterNotNull(), editor, project)
+      Checks.KeyHandlerMethod.VIA_IDE -> typeTextViaIde(keys.filterNotNull(), editor)
     }
     return editor
   }
@@ -749,7 +749,7 @@ abstract class VimTestCase {
   }
 
   protected fun assertCaretsVisualAttributes() {
-    if (!VimTestCase.Checks.caretShape) return
+    if (!Checks.caretShape) return
     val editor = fixture.editor
     val attributes = GuiCursorOptionHelper.getAttributes(getGuiCursorMode(editor))
     val colour = editor.colorsScheme.getColor(EditorColors.CARET_COLOR)
@@ -946,8 +946,8 @@ abstract class VimTestCase {
   }
 
   // Disable or enable checks for the particular test
-  protected inline fun setupChecks(setup: VimTestCase.Checks.() -> Unit) {
-    VimTestCase.Checks.setup()
+  protected inline fun setupChecks(setup: Checks.() -> Unit) {
+    Checks.setup()
   }
 
   protected fun assertExException(expectedErrorMessage: String, action: () -> Unit) {
@@ -1082,11 +1082,24 @@ abstract class VimTestCase {
     @JvmStatic
     fun commandToKeys(command: String): List<KeyStroke> {
       val keys: MutableList<KeyStroke> = ArrayList()
-      if (!command.startsWith(":")) {
-        keys.addAll(injector.parser.parseKeys(":"))
+
+      keys.addAll(injector.parser.parseKeys(":"))
+      var startIndex = if (command.startsWith(":")) 1 else 0
+
+      // Special case support for <C-U>
+      startIndex = if (command.substring(startIndex).startsWith("<C-U>")) {
+        keys.addAll(injector.parser.parseKeys("<C-U>"))
+        startIndex + 5
       }
-      keys.addAll(injector.parser.stringToKeys(command)) // Avoids trying to parse 'command ... <args>' as a special char
-      keys.addAll(injector.parser.parseKeys("<Enter>"))
+      else {
+        startIndex
+      }
+      // We don't parse the rest of the command, to avoid parsing special keys in e.g. maps. Note that values such as
+      // `<expr>` or `<args>` would be correctly handled by parseKeys
+      keys.addAll(injector.parser.stringToKeys(command.substring(startIndex)))
+      if (keys.last().keyCode != KeyEvent.VK_ENTER) {
+        keys.addAll(injector.parser.parseKeys("<Enter>"))
+      }
       return keys
     }
 
