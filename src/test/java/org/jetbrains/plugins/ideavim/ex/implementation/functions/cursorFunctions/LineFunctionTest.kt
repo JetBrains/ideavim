@@ -45,4 +45,50 @@ class LineFunctionTest : VimTestCase() {
       "0 1 5 0 5 0"
     )
   }
+
+  @Test
+  fun `test line with selection`() {
+    doTest(
+      listOf("V2j", "q"),
+      """
+        |1
+        |${c}2
+        |3
+        |4
+        |5
+      """.trimMargin(),
+      """
+        |1
+        |2
+        |3
+        |4 - line(v)==${c}2
+        |5
+      """.trimMargin(),
+    ) {
+      enterCommand("vmap <expr> q '<Esc>a - line(v)=='.line('v').'<Esc>'")
+    }
+  }
+
+  @Test
+  fun `test line with reverse selection`() {
+    doTest(
+      listOf("V2k", "q"),
+      """
+        |1
+        |2
+        |3
+        |${c}4
+        |5
+      """.trimMargin(),
+      """
+        |1
+        |2 - line(v)==${c}4
+        |3
+        |4
+        |5
+      """.trimMargin(),
+    ) {
+      enterCommand("vmap <expr> q '<Esc>a - line(v)=='.line('v').'<Esc>'")
+    }
+  }
 }
