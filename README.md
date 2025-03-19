@@ -92,20 +92,25 @@ Here are some examples of supported vim features and commands:
 
 [IdeaVim plugins](https://github.com/JetBrains/ideavim/wiki/IdeaVim-Plugins):
 
-* vim-easymotion
+* argtextobj
+* commentary
+* easymotion
+* exchange
+* FunctionTextObj
+* highlightedyank
+* IdeaVim-Quickscope
+* matchit.vim
+* Mini.ai: Extend and create a/i textobjects (IMPORTANT: The plugin is not related with artificial intelligence)
+* multiple-cursors
 * NERDTree
-* vim-surround
-* vim-multiple-cursors
-* vim-commentary
-* argtextobj.vim
-* vim-textobj-entire
 * ReplaceWithRegister
-* vim-exchange
-* vim-highlightedyank
-* vim-paragraph-motion
+* surround
+* Switch
+* textobj-entire
+* Vim Peekaboo
 * vim-indent-object
-* match.it  
-etc
+* vim-paragraph-motion
+* Which-Key
 
 See also:
 
