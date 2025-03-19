@@ -225,7 +225,7 @@ class KeyHandler {
     val operatorArguments = OperatorArguments(command.rawCount, editorState.mode)
 
     // If we were in "operator pending" mode, reset back to normal mode.
-    // But opening command line should not reset operator pending mode (e.g. `d/foo`
+    // But opening command line should not reset operator pending mode (e.g. `d/foo`)
     if (!command.flags.contains(CommandFlags.FLAG_START_EX)) {
       editor.resetOpPending()
     }

@@ -18,6 +18,8 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMarkService
 import com.maddyhome.idea.vim.api.getText
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.normalizeColumn
+import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ExException
@@ -55,48 +57,53 @@ data class MoveTextCommand(val range: Range, val modifier: CommandModifier, val 
       throw ExException("Move command supported only for one caret at the moment")
     }
     val caret = editor.primaryCaret()
-    val caretPosition = caret.getBufferPosition()
 
     // Move is defined as:
     // :[range]m[ove] {address}
     // Move the given [range] to below the line given by {address}. Address can be a range, but only the first address
     // is used. The rest is ignored with no errors. Note that address is one-based, and 0 means move the text to below
     // the line _before_ the first line (i.e., move to above the first line).
-    val lineRange = getLineRange(editor, caret)
-    val range = lineRange.toTextRange(editor)
-    val address1 = getAddressFromArgument(editor)
+    val sourceLineRange = getLineRange(editor, caret)
+    val sourceRange = sourceLineRange.toTextRange(editor)
+    val targetAddressLine1 = getAddressFromArgument(editor)
 
     // Convert target one-based line to zero-based line. This means our special case of 0 will be represented by -1
-    val line = min(editor.fileSize().toInt(), normalizeAddress(address1 - 1, lineRange))
-    val linesMoved = lineRange.size
-    if (line < -1 || line + linesMoved >= editor.lineCount()) {
+    // We'll move the range to _after_ this target line
+    val targetLineAfterDeletion = min(editor.fileSize().toInt(), normalizeAddress(targetAddressLine1 - 1, sourceLineRange))
+    val linesMoved = sourceLineRange.size
+    if (targetLineAfterDeletion < -1 || targetLineAfterDeletion + linesMoved >= editor.lineCount()) {
       throw exExceptionMessage(Msg.e_invrange)  // E16: Invalid range
     }
 
-    val shift = line - editor.offsetToBufferPosition(range.startOffset).line + 1
+    val shift = targetLineAfterDeletion - editor.offsetToBufferPosition(sourceRange.startOffset).line + 1
 
     val localMarks = injector.markService.getAllLocalMarks(caret)
-      .filter { range.contains(it.offset(editor)) }
+      .filter { sourceRange.contains(it.offset(editor)) }
       .filter { it.key != VimMarkService.SELECTION_START_MARK && it.key != VimMarkService.SELECTION_END_MARK }
       .toSet()
     val globalMarks = injector.markService.getGlobalMarks(editor)
-      .filter { range.contains(it.offset(editor)) }
+      .filter { sourceRange.contains(it.offset(editor)) }
       .map { Pair(it, it.line) } // we save logical line because it will be cleared by Platform after text deletion
       .toSet()
     val lastSelectionInfo = caret.lastSelectionInfo
     val selectionStartOffset = lastSelectionInfo.start?.let { editor.bufferPositionToOffset(it) }
     val selectionEndOffset = lastSelectionInfo.end?.let { editor.bufferPositionToOffset(it) }
 
-    val text = editor.getText(range)
+    val text = editor.getText(sourceRange)
     val textData = PutData.TextData(null, injector.clipboardManager.dumbCopiedText(text), SelectionType.LINE_WISE)
 
-    val dropNewLineInEnd = (line + linesMoved == editor.lineCount() - 1 && text.last() == '\n') ||
-      (lineRange.endLine == editor.lineCount() - 1)
+    val dropNewLineInEnd = (targetLineAfterDeletion + linesMoved == editor.lineCount() - 1 && text.last() == '\n') ||
+      (sourceLineRange.endLine == editor.lineCount() - 1)
+
+    // The caret will be moved as part of deleting/putting the text, so remember the current column so we can reset it
+    // if the 'nostartofline' is active
+    val caretColumn = caret.getBufferPosition().column
 
     injector.application.runWriteAction {
-      editor.deleteString(range)
+      editor.deleteString(sourceRange)
     }
-    val putData = if (line == -1) {
+
+    val putData = if (targetLineAfterDeletion == -1) {
       // Special case. Move text to below the line before the first line
       caret.moveToOffset(0)
       PutData(textData, null, 1, insertTextBeforeCaret = true, rawIndent = true, caretAfterInsertedText = false)
@@ -108,7 +115,7 @@ data class MoveTextCommand(val range: Range, val modifier: CommandModifier, val 
         insertTextBeforeCaret = false,
         rawIndent = true,
         caretAfterInsertedText = false,
-        putToLine = line
+        putToLine = targetLineAfterDeletion
       )
     }
     injector.put.putTextForCaret(editor, caret, context, putData)
@@ -122,10 +129,24 @@ data class MoveTextCommand(val range: Range, val modifier: CommandModifier, val 
 
     globalMarks.forEach { shiftGlobalMark(editor, it, shift) }
     localMarks.forEach { shiftLocalMark(caret, it, shift) }
-    shiftSelectionInfo(caret, selectionStartOffset, selectionEndOffset, lastSelectionInfo, shift, range)
+    shiftSelectionInfo(caret, selectionStartOffset, selectionEndOffset, lastSelectionInfo, shift, sourceRange)
 
-    val newCaretPosition = shiftBufferPosition(caretPosition, shift)
-    caret.moveToBufferPosition(newCaretPosition)
+    // Move the caret to the end of the moved range, obeying 'startofline'. We've already moved the caret, so we can't
+    // use moveCaretToLineWithStartOfLineOption. We have to do it manually
+    val caretLine = if (targetAddressLine1 >= sourceLineRange.startLine1) {
+      targetAddressLine1 - 1
+    }
+    else {
+      targetAddressLine1 + (sourceLineRange.size) - 1
+    }
+    val caretOffset = if (!injector.options(editor).startofline) {
+      val column = editor.normalizeColumn(caretLine, caretColumn, allowEnd = false)
+      editor.bufferPositionToOffset(BufferPosition(caretLine, column))
+    }
+    else {
+      injector.motion.moveCaretToLineStartSkipLeading(editor, caretLine)
+    }
+    caret.moveToOffset(caretOffset)
 
     return ExecutionResult.Success
   }

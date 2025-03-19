@@ -37,8 +37,7 @@ class ColFunctionTest : VimTestCase() {
     // With selection - make sure to delete the '<,'> that is automatically prepended when entering Command-line mode
     // with a selection
     typeText("vll")
-    typeText(":<C-U>echo col(\"v\")<CR>") // enterCommand/assertCommandOutput cannot handle <C-U>!
-    assertExOutput("5")
+    assertCommandOutput("""<C-U>echo col("v")""", "5")
 
     // Remove selection and check again - note that exiting Command-line mode removes selection and switches back to
     // Normal. This <esc> does nothing

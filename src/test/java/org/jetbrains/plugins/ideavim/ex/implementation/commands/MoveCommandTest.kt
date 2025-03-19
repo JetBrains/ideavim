@@ -148,7 +148,7 @@ class MoveCommandTest : VimTestCase() {
     enterCommand("m 0")
     assertState(
       """
-      For example: homewor${c}k, homework, homework, homework, homework, homework, homework, homework, homework.
+      ${c}For example: homework, homework, homework, homework, homework, homework, homework, homework, homework.
       ====
       My mother taught me this trick: if you repeat something over and over again it loses its meaning.
       See, nothing.
@@ -173,8 +173,8 @@ class MoveCommandTest : VimTestCase() {
         |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
         |Morbi nec luctus tortor, id venenatis lacus.
         |Nunc sit amet tellus vel purus cursus posuere et at purus.
-        |Ut id dapibus augue.
-        |${c}Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+        |${c}Ut id dapibus augue.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
       """.trimMargin()
     )
   }
@@ -194,7 +194,7 @@ class MoveCommandTest : VimTestCase() {
     assertState(
       """
       For example: homework, homework, homework, homework, homework, homework, homework, homework, homework.
-      See, nothing.
+      ${c}See, nothing.
       ====
       My mother taught me this trick: if you repeat something over and over again it loses its meaning.
       """.trimIndent(),
@@ -216,7 +216,7 @@ class MoveCommandTest : VimTestCase() {
       """
       ====
       My mother taught me this trick: if you repeat something over and over again it loses its meaning.
-      See, not${c}hing.
+      ${c}See, nothing.
       For example: homework, homework, homework, homework, homework, homework, homework, homework, homework.
       """.trimIndent(),
     )
@@ -238,8 +238,103 @@ class MoveCommandTest : VimTestCase() {
       ====
       My mother taught me this trick: if you repeat something over and over again it loses its meaning.
       See, nothing.
-      For example: homewor${c}k, homework, homework, homework, homework, homework, homework, homework, homework.
+      ${c}For example: homework, homework, homework, homework, homework, homework, homework, homework, homework.
       """.trimIndent(),
     )
+  }
+
+  // VIM-3837
+  @Test
+  fun `test moving relative line positions caret correctly`() {
+    doTest(
+      exCommand("+2m."), // Move the line 2 lines below, to below the current line
+      """
+        |2
+        |1
+        |${c}3
+        |1
+        |2
+      """.trimMargin(),
+      """
+        |2
+        |1
+        |3
+        |${c}2
+        |1
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test moving relative line positions caret correctly 2`() {
+    doTest(
+      exCommand("+2m."), // Move the line 2 lines below, to below the current line
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet ${c}tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |${c}Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Ut id dapibus augue.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test moving lines positions caret correctly with nostartofline option`() {
+    doTest(
+      exCommand("+2m."), // Move the line 2 lines below, to below the current line
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet ${c}tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Orci varius na${c}toque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Ut id dapibus augue.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin()
+    ) {
+      enterCommand("set nostartofline")
+    }
+  }
+
+  @Test
+  fun `test moving lines positions caret correctly with nostartofline option on shorter line`() {
+    doTest(
+      exCommand("+2m."), // Move the line 2 lines below, to below the current line
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id ${c}venenatis lacus.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Ut id dapibus augue.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        |Morbi nec luctus tortor, id venenatis lacus.
+        |Ut id dapibus augue${c}.
+        |Nunc sit amet tellus vel purus cursus posuere et at purus.
+        |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin()
+    ) {
+      enterCommand("set nostartofline")
+    }
   }
 }

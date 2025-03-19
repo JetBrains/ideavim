@@ -32,8 +32,7 @@ class LineFunctionTest : VimTestCase() {
     // With selection - make sure to delete the '<,'> that is automatically prepended when entering Command-line mode
     // with a selection
     typeText("vj")
-    typeText(""":<C-U>echo line("v")<CR>""")  // enterCommand/assertCommandOutput cannot handle <C-U>!
-    assertExOutput("3")
+    assertCommandOutput("""<C-U>echo line("v")""", "3")
 
     // Remove selection and check again - note that exiting Command-line mode removes selection and switches back to
     // Normal. This <esc> does nothing
@@ -45,5 +44,51 @@ class LineFunctionTest : VimTestCase() {
       """echo line([0, 1]) line([1, 1]) line([5, 1]) line([6, 1]) line([5, 2]) line([5, 3])""",
       "0 1 5 0 5 0"
     )
+  }
+
+  @Test
+  fun `test line with selection`() {
+    doTest(
+      listOf("V2j", "q"),
+      """
+        |1
+        |${c}2
+        |3
+        |4
+        |5
+      """.trimMargin(),
+      """
+        |1
+        |2
+        |3
+        |4 - line(v)==${c}2
+        |5
+      """.trimMargin(),
+    ) {
+      enterCommand("vmap <expr> q '<Esc>a - line(v)=='.line('v').'<Esc>'")
+    }
+  }
+
+  @Test
+  fun `test line with reverse selection`() {
+    doTest(
+      listOf("V2k", "q"),
+      """
+        |1
+        |2
+        |3
+        |${c}4
+        |5
+      """.trimMargin(),
+      """
+        |1
+        |2 - line(v)==${c}4
+        |3
+        |4
+        |5
+      """.trimMargin(),
+    ) {
+      enterCommand("vmap <expr> q '<Esc>a - line(v)=='.line('v').'<Esc>'")
+    }
   }
 }
