@@ -14,15 +14,11 @@ data class VimInt(val value: Int) : VimDataType() {
 
   constructor(binaryOctalDecimalOrHexNumber: String) : this(parseNumber(binaryOctalDecimalOrHexNumber) ?: 0)
 
-  override fun asDouble(): Double {
-    return value.toDouble()
-  }
+  override fun asDouble() = value.toDouble()
+  override fun asString() = value.toString()
 
-  override fun asString(): String {
-    return value.toString()
-  }
-
-  override fun toVimNumber(): VimInt = this
+  override fun toVimNumber() = this
+  override fun toVimString() = VimString(value.toString())
 
   override fun toString(): String {
     return value.toString()

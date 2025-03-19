@@ -16,7 +16,9 @@ abstract class VimDataType {
   abstract fun asString(): String
 
   abstract fun toVimNumber(): VimInt
+  abstract fun toVimString(): VimString
 
+  // TODO: Introduce toOutputString to be more explicit for callers
   // string value that is used in echo-like commands
   override fun toString(): String {
     throw NotImplementedError("implement me :(")

@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.una
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.unary.PlusOperatorHandler
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.unary.UnaryOperatorHandler
 
-enum class UnaryOperator(val value: String, val handler: UnaryOperatorHandler) {
+enum class UnaryOperator(val value: String, internal val handler: UnaryOperatorHandler) {
   NOT("!", NotOperatorHandler),
   PLUS("+", PlusOperatorHandler),
   MINUS("-", MinusOperatorHandler),

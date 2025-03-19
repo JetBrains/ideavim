@@ -8,22 +8,26 @@
 
 package com.maddyhome.idea.vim.vimscript.model.datatypes
 
-import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 
 data class VimList(val values: MutableList<VimDataType>) : VimDataType() {
 
   operator fun get(index: Int): VimDataType = this.values[index]
 
   override fun asDouble(): Double {
-    throw ExException("E745: Using a List as a Number")
+    throw exExceptionMessage("E745")  // E745: Using a List as a Number
   }
 
   override fun asString(): String {
-    throw ExException("E730: Using a List as a String")
+    throw exExceptionMessage("E730")  // E730: Using a List as a String
   }
 
   override fun toVimNumber(): VimInt {
-    throw ExException("E745: Using a List as a Number")
+    throw exExceptionMessage("E745")  // E745: Using a List as a Number
+  }
+
+  override fun toVimString(): VimString {
+    throw exExceptionMessage("E730")  // E730: Using a List as a String
   }
 
   override fun toString(): String {
@@ -34,7 +38,7 @@ data class VimList(val values: MutableList<VimDataType>) : VimDataType() {
   }
 
   override fun asBoolean(): Boolean {
-    throw ExException("E745: Using a List as a Number")
+    throw exExceptionMessage("E745")  // E745: Using a List as a Number
   }
 
   override fun deepCopy(level: Int): VimDataType {

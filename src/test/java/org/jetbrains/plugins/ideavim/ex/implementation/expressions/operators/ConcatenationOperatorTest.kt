@@ -11,6 +11,7 @@ package org.jetbrains.plugins.ideavim.ex.implementation.expressions.operators
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
+import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.ex.evaluate
 import org.jetbrains.plugins.ideavim.productForArguments
 import org.junit.jupiter.params.ParameterizedTest
@@ -18,7 +19,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import kotlin.test.assertEquals
 
-class ConcatenationOperatorTest {
+class ConcatenationOperatorTest : VimTestCase() {
 
   companion object {
     @JvmStatic
@@ -47,7 +48,7 @@ class ConcatenationOperatorTest {
     try {
       VimscriptParser.parseExpression("3.4$sp1$operator${sp2}2")!!.evaluate()
     } catch (e: ExException) {
-      assertEquals("E806: using Float as a String", e.message)
+      assertEquals("E806: Using a Float as a String", e.message)
     }
   }
 
@@ -57,7 +58,7 @@ class ConcatenationOperatorTest {
     try {
       VimscriptParser.parseExpression("3.4$sp1$operator${sp2}2.2")!!.evaluate()
     } catch (e: ExException) {
-      assertEquals("E806: using Float as a String", e.message)
+      assertEquals("E806: Using a Float as a String", e.message)
     }
   }
 
@@ -67,7 +68,7 @@ class ConcatenationOperatorTest {
     try {
       VimscriptParser.parseExpression("'string'$sp1$operator${sp2}3.4")!!.evaluate()
     } catch (e: ExException) {
-      assertEquals("E806: using Float as a String", e.message)
+      assertEquals("E806: Using a Float as a String", e.message)
     }
   }
 
