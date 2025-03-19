@@ -509,6 +509,8 @@ or restart the IDE.
 
 https://plugins.jetbrains.com/plugin/25899-vim-switch
 
+</details>
+
 ## Archived
 
 <details>
