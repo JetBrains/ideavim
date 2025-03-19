@@ -16,10 +16,95 @@ in `~/.ideavimrc`. E.g. `set nosurround`.
 Available plugins:
 
 <details>
+<summary><h2>argtextobj</h2></summary>
+
+Original plugin: [argtextobj.vim](https://www.vim.org/scripts/script.php?script_id=2699).
+
+### About:
+This plugin provides a text-object 'a' (argument). 
+You can d(elete), c(hange), v(select)... an argument or inner argument in familiar ways.
+
+That is, such as 'daa'(delete-an-argument) 'cia'(change-inner-argument) 'via'(select-inner-argument).
+What this script does is more than just typing
+
+F,dt,
+
+because it recognizes inclusion relationship of parentheses.
+
+### Setup:
+- Add the following command to `~/.ideavimrc`: `Plug 'vim-scripts/argtextobj.vim'`
+    <details>
+      <summary>Alternative syntax</summary>
+      <code>Plugin 'vim-scripts/argtextobj.vim'</code>
+      <br/>
+      <code>Plug 'https://github.com/vim-scripts/argtextobj.vim'</code>
+      <br/>
+      <code>Plug 'argtextobj.vim'</code>
+      <br/>
+      <code>Plug 'https://www.vim.org/scripts/script.php?script_id=2699'</code>
+      <br/>
+      <code>set argtextobj</code>
+      </details>
+
+### Instructions
+
+By default, only the arguments inside parenthesis are considered. To extend the functionality
+to other types of brackets, set `g:argtextobj_pairs` variable to a comma-separated
+list of colon-separated pairs (same as VIM's `matchpairs` option), like
+`let g:argtextobj_pairs="(:),{:},<:>"`. The order of pairs matters when
+handling symbols that can also be operators: `func(x << 5, 20) >> 17`. To handle
+this syntax parenthesis, must come before angle brackets in the list.
+
+https://www.vim.org/scripts/script.php?script_id=2699
+
+</details>
+
+<details>
+<summary><h2>commentary</h2></summary>
+
+By [Daniel Leong](https://github.com/dhleong)  
+Original plugin: [commentary.vim](https://github.com/tpope/vim-commentary).
+
+### About:
+Comment stuff out. 
+Use gcc to comment out a line (takes a count), gc to comment out the target of a motion 
+(for example, gcap to comment out a paragraph), gc in visual mode to comment out the selection, 
+and gc in operator pending mode to target a comment. 
+You can also use it as a command, either with a range like :7,17Commentary, 
+or as part of a :global invocation like with :g/TODO/Commentary. 
+That's it.
+
+### Setup:
+- Add the following command to `~/.ideavimrc`: `Plug 'tpope/vim-commentary'`
+    <details>
+      <summary>Alternative syntax</summary>
+      <code>Plugin 'tpope/vim-commentary'</code>
+      <br/>
+      <code>Plug 'https://github.com/tpope/vim-commentary'</code>
+      <br/>
+      <code>Plug 'vim-commentary'</code>
+      <br/>
+      <code>Plug 'tcomment_vim'</code>
+      <br/>
+      <code>set commentary</code>
+      </details>
+
+### Instructions
+
+https://github.com/tpope/vim-commentary/blob/master/doc/commentary.txt
+
+</details>
+
+<details>
 <summary><h2>easymotion</h2></summary>
    
 Original plugin: [vim-easymotion](https://github.com/easymotion/vim-easymotion).
-   
+
+### About:
+EasyMotion provides a much simpler way to use some motions in vim. 
+It takes the \<number> out of \<number>w or \<number>f{char} by highlighting all possible choices 
+and allowing you to press one key to jump directly to the target.
+
 ### Setup:
 - Install [IdeaVim-EasyMotion](https://plugins.jetbrains.com/plugin/13360-ideavim-easymotion/)
       and [AceJump](https://plugins.jetbrains.com/plugin/7086-acejump/) plugins.
@@ -38,27 +123,6 @@ Original plugin: [vim-easymotion](https://github.com/easymotion/vim-easymotion).
 ### Instructions
    
 All commands with the mappings are supported. See the [full list of supported commands](https://github.com/AlexPl292/IdeaVim-EasyMotion#supported-commands).
-
-</details>
-
-
-<details>
-<summary><h2>sneak</h2></summary>
-
-<img src="images/sneakIcon.svg" width="80" height="80" alt="icon"/>  
-
-By [Mikhail Levchenko](https://github.com/Mishkun)  
-Original repository with the plugin: https://github.com/Mishkun/ideavim-sneak  
-Original plugin: [vim-sneak](https://github.com/justinmk/vim-sneak).
-   
-### Setup:
-- Add the following command to `~/.ideavimrc`: `Plug 'justinmk/vim-sneak'`
-   
-### Instructions
-
-* Type `s` and two chars to start sneaking in forward direction
-* Type `S` and two chars to start sneaking in backward direction
-* Type `;` or `,` to proceed with sneaking just as if you were using `f` or `t` commands
 
 </details>
 
@@ -152,32 +216,6 @@ xmap <leader>g<C-n> <Plug>AllOccurrences
 
 </details>
 
-<details>
-<summary><h2>commentary</h2></summary>
-
-By [Daniel Leong](https://github.com/dhleong)  
-Original plugin: [commentary.vim](https://github.com/tpope/vim-commentary).
-   
-### Setup:
-- Add the following command to `~/.ideavimrc`: `Plug 'tpope/vim-commentary'`
-    <details>
-      <summary>Alternative syntax</summary>
-      <code>Plugin 'tpope/vim-commentary'</code>
-      <br/>
-      <code>Plug 'https://github.com/tpope/vim-commentary'</code>
-      <br/>
-      <code>Plug 'vim-commentary'</code>
-      <br/>
-      <code>Plug 'tcomment_vim'</code>
-      <br/>
-      <code>set commentary</code>
-      </details>
-   
-### Instructions
-   
-https://github.com/tpope/vim-commentary/blob/master/doc/commentary.txt
-
-</details>
 
 <details>
 <summary><h2>ReplaceWithRegister</h2></summary>
@@ -210,38 +248,7 @@ https://github.com/vim-scripts/ReplaceWithRegister/blob/master/doc/ReplaceWithRe
 
 </details>
 
-<details>
-<summary><h2>argtextobj</h2></summary>
 
-Original plugin: [argtextobj.vim](https://www.vim.org/scripts/script.php?script_id=2699).
-   
-### Setup:
-- Add the following command to `~/.ideavimrc`: `Plug 'vim-scripts/argtextobj.vim'`
-    <details>
-      <summary>Alternative syntax</summary>
-      <code>Plugin 'vim-scripts/argtextobj.vim'</code>
-      <br/>
-      <code>Plug 'https://github.com/vim-scripts/argtextobj.vim'</code>
-      <br/>
-      <code>Plug 'argtextobj.vim'</code>
-      <br/>
-      <code>Plug 'https://www.vim.org/scripts/script.php?script_id=2699'</code>
-      <br/>
-      <code>set argtextobj</code>
-      </details>
-   
-### Instructions
-   
-By default, only the arguments inside parenthesis are considered. To extend the functionality
-      to other types of brackets, set `g:argtextobj_pairs` variable to a comma-separated
-      list of colon-separated pairs (same as VIM's `matchpairs` option), like
-      `let g:argtextobj_pairs="(:),{:},<:>"`. The order of pairs matters when
-      handling symbols that can also be operators: `func(x << 5, 20) >> 17`. To handle
-      this syntax parenthesis, must come before angle brackets in the list.
-   
-https://www.vim.org/scripts/script.php?script_id=2699
-
-</details>
    
 
 <details>
@@ -501,4 +508,30 @@ or restart the IDE.
 ### Instructions
 
 https://plugins.jetbrains.com/plugin/25899-vim-switch
+
+## Archived
+
+<details>
+<summary><h2>sneak</h2></summary>
+
+<img src="images/sneakIcon.svg" width="80" height="80" alt="icon"/>  
+
+By [Mikhail Levchenko](https://github.com/Mishkun)  
+Original repository with the plugin: https://github.com/Mishkun/ideavim-sneak  
+Original plugin: [vim-sneak](https://github.com/justinmk/vim-sneak).
+
+### About:
+Now built in to Ideavim! 
+See [this](https://github.com/JetBrains/ideavim/discussions/818) GitHub discussion for more details. 
+
+### Setup:
+- Add the following command to `~/.ideavimrc`: `Plug 'justinmk/vim-sneak'`
+
+### Instructions
+
+* Type `s` and two chars to start sneaking in forward direction
+* Type `S` and two chars to start sneaking in backward direction
+* Type `;` or `,` to proceed with sneaking just as if you were using `f` or `t` commands
+
+</details>
 
