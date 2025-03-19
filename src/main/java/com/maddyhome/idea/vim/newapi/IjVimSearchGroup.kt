@@ -127,6 +127,7 @@ open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateComponent<Ele
 
   override fun clearSearchHighlight() {
     showSearchHighlight = false
+    injector.listenersNotifier.notifySearchStopped()
     updateSearchHighlights(false)
   }
 
