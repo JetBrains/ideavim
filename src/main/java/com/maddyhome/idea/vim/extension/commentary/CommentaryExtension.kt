@@ -221,14 +221,16 @@ internal class CommentaryExtension : VimExtension {
       val endOffset = editor.vim.getLineEndOffset(logicalLine, true)
       val startElement = file.findElementAt(startOffset) ?: return false
       var next: PsiElement? = startElement
+      var hasComment = false
       while (next != null && next.textRange.startOffset <= endOffset) {
-        if (next !is PsiWhiteSpace && !isComment(next)) {
-          return false
+        when {
+          next is PsiWhiteSpace -> {} // Skip whitespace elementl
+          isComment(next) -> hasComment = true // Mark when we find a comment
+          else -> return false // Non-comment content found, exit early
         }
         next = PsiTreeUtil.nextLeaf(next, true)
       }
-
-      return true
+      return hasComment
     }
 
     private fun isComment(element: PsiElement) =
