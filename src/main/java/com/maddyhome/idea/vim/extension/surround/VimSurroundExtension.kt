@@ -11,6 +11,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
@@ -139,6 +140,10 @@ internal class VimSurroundExtension : VimExtension {
         // Leave visual mode
         editor.exitVisualMode()
         editor.ij.caretModel.moveToOffset(selectionStart)
+
+        // Reset the key handler so that the command trie is updated for the new mode (Normal)
+        // TODO: This should probably be handled by ToHandlerMapping.execute
+        KeyHandler.getInstance().reset(editor)
       }
     }
   }
