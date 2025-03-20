@@ -633,6 +633,17 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest(listOf(motion), before, after, Mode.NORMAL())
   }
 
+  // VIM-3841
+  @Test
+  fun `test return to Normal mode after surround in Visual mode`() {
+    doTest(
+      listOf("veS\"", "i"),
+      "lorem ${c}ipsum dolor sit amet",
+      "lorem ${c}\"ipsum\" dolor sit amet",
+      Mode.INSERT,
+    )
+  }
+
   companion object {
     @JvmStatic
     fun removeWhiteSpaceWithClosingBracketParams() = listOf(
