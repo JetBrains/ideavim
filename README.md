@@ -107,6 +107,7 @@ Here are some examples of supported vim features and commands:
 * Peekaboo
 * quick-scope
 * ReplaceWithRegister
+* sneak
 * surround
 * Switch
 * textobj-entire
