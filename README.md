@@ -98,18 +98,18 @@ Here are some examples of supported vim features and commands:
 * exchange
 * FunctionTextObj
 * highlightedyank
-* IdeaVim-Quickscope
+* indent-object
 * matchit.vim
 * Mini.ai: Extend and create a/i textobjects (IMPORTANT: The plugin is not related with artificial intelligence)
 * multiple-cursors
 * NERDTree
+* paragraph-motion
+* Peekaboo
+* quick-scope
 * ReplaceWithRegister
 * surround
 * Switch
 * textobj-entire
-* Vim Peekaboo
-* vim-indent-object
-* vim-paragraph-motion
 * Which-Key
 
 See also:

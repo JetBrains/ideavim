@@ -127,6 +127,213 @@ All commands with the mappings are supported. See the [full list of supported co
 </details>
 
 <details>
+<summary><h2>exchange</h2></summary>
+
+By [fan-tom](https://github.com/fan-tom)  
+Original plugin: [vim-exchange](https://github.com/tommcdo/vim-exchange).
+
+### About:
+Easy text exchange operator for Vim.
+
+### Setup:
+- Add the following command to `~/.ideavimrc`: `Plug 'tommcdo/vim-exchange'`
+    <details>
+      <summary>Alternative syntax</summary>
+      <code>Plugin 'tommcdo/vim-exchange'</code>
+      <br/>
+      <code>Plug 'https://github.com/tommcdo/vim-exchange'</code>
+      <br/>
+      <code>Plug 'vim-exchange'</code>
+      <br/>
+      <code>set exchange</code>
+      </details>
+
+### Instructions
+
+https://github.com/tommcdo/vim-exchange/blob/master/doc/exchange.txt
+
+</details>
+
+<details>
+<summary><h2>FunctionTextObj</h2></summary>
+
+By Julien Phalip
+
+### About:
+An extension for IdeaVim that adds text objects for manipulating functions/methods in your code. 
+Similar to how iw operates on words or i" operates on quoted strings, 
+this plugin provides if and af to operate on functions
+
+### Setup
+
+Add `set functiontextobj` to your `~/.ideavimrc` file, then run `:source ~/.ideavimrc`
+or restart the IDE.
+
+### Instructions
+
+https://plugins.jetbrains.com/plugin/25897-vim-functiontextobj
+</details>
+
+<details>
+<summary><h2>highlightedyank</h2></summary>
+
+By [KostkaBrukowa](https://github.com/KostkaBrukowa)  
+Original plugin: [vim-highlightedyank](https://github.com/machakann/vim-highlightedyank).
+
+### About:
+Make the yanked region apparent!
+
+### Setup:
+- Add the following command to `~/.ideavimrc`: `Plug 'machakann/vim-highlightedyank'`
+    <details>
+      <summary>Alternative syntax</summary>
+      <code>Plugin 'machakann/vim-highlightedyank'</code>
+      <br/>
+      <code>Plug 'https://github.com/machakann/vim-highlightedyank'</code>
+      <br/>
+      <code>Plug 'vim-highlightedyank'</code>
+      <br/>
+      <code>set highlightedyank</code>
+      </details>
+
+### Instructions
+
+If you want to optimize highlight duration, assign a time in milliseconds:  
+`let g:highlightedyank_highlight_duration = "1000"`  
+A negative number makes the highlight persistent.
+
+If you want to change background color of highlight you can provide the rgba of the color you want e.g.  
+`let g:highlightedyank_highlight_color = "rgba(160, 160, 160, 155)"`
+
+If you want to change text color of highlight you can provide the rgba of the color you want e.g.  
+`let g:highlightedyank_highlight_foreground_color = "rgba(0, 0, 0, 255)"`
+
+https://github.com/machakann/vim-highlightedyank/blob/master/doc/highlightedyank.txt
+
+</details>
+
+<details>
+<summary><h2>indent-object</h2></summary>
+
+By [Shrikant Sharat Kandula](https://github.com/sharat87)  
+Original plugin: [vim-indent-object](https://github.com/michaeljsmith/vim-indent-object).
+
+### About:
+Vim text objects provide a convenient way to select and operate on various types of objects. 
+These objects include regions surrounded by various types of brackets and various parts of language 
+(ie sentences, paragraphs, etc).
+
+### Setup:
+- Add the following command to `~/.ideavimrc`: `Plug 'michaeljsmith/vim-indent-object'`
+    <details>
+      <summary>Alternative syntax</summary>
+      <code>Plugin 'michaeljsmith/vim-indent-object'</code>
+      <br/>
+      <code>Plug 'https://github.com/michaeljsmith/vim-indent-object'</code>
+      <br/>
+      <code>Plug 'vim-indent-object'</code>
+      <br/>
+      <code>set textobj-indent</code>
+      </details>
+
+### Instructions
+
+https://github.com/michaeljsmith/vim-indent-object/blob/master/doc/indent-object.txt
+
+</details>
+
+<details>
+<summary><h2>matchit.vim</h2></summary>
+
+By [Martin Yzeiri](https://github.com/myzeiri)
+Original plugin: [matchit.vim](https://github.com/chrisbra/matchit).
+
+### About:
+In Vim, as in plain vi, the percent key, |%|, jumps the cursor from a brace, bracket, or paren to its match. 
+This can be configured with the 'matchpairs' option. 
+The matchit plugin extends this in several ways...
+
+### Setup:
+- Add the following command to `~/.ideavimrc`: `packadd matchit`
+    <details>
+      <summary>Alternative syntax</summary>
+      <code>Plug 'vim-matchit'</code>
+      <br/>
+      <code>Plug 'chrisbra/matchit'</code>
+      <br/>
+      <code>set matchit</code>
+      </details>
+
+### Instructions
+
+https://github.com/adelarsq/vim-matchit/blob/master/doc/matchit.txt
+
+</details>
+
+<details>
+<summary><h2>Mini.ai: Extend and create a/i textobjects (IMPORTANT: The plugin is not related with artificial intelligence)</h2></summary>
+
+### About:
+Extend and create a/i textobjects
+
+### Features:
+Provides additional text object motions for handling quotes and brackets. The following motions are included:
+
+- aq: Around any quotes.
+- iq: Inside any quotes.
+- ab: Around any parentheses, curly braces, and square brackets.
+- ib: Inside any parentheses, curly braces, and square brackets.
+
+Original plugin: [mini.ai](https://github.com/echasnovski/mini.ai).
+
+### Setup:
+- Add the following command to `~/.ideavimrc`: `set mini-ai`
+
+</details>
+
+<details>
+<summary><h2>multiple-cursors</h2></summary>
+
+Original plugin: [vim-multiple-cursors](https://github.com/terryma/vim-multiple-cursors).
+
+### Setup:
+- Add the following command to `~/.ideavimrc`: `Plug 'terryma/vim-multiple-cursors'`
+    <details>
+      <summary>Alternative syntax</summary>
+      <code>Plugin 'terryma/vim-multiple-cursors'</code>
+      <br/>
+      <code>Plug 'https://github.com/terryma/vim-multiple-cursors'</code>
+      <br/>
+      <code>Plug 'vim-multiple-cursors'</code>
+      <br/>
+      <code>set multiple-cursors</code>
+      </details>
+
+### Instructions
+
+At the moment, the default key binds for this plugin do not get mapped correctly in IdeaVim (see [VIM-2178](https://youtrack.jetbrains.com/issue/VIM-2178)). To enable the default key binds, add the following to your `.ideavimrc` file...
+
+```
+" Remap multiple-cursors shortcuts to match terryma/vim-multiple-cursors
+nmap <C-n> <Plug>NextWholeOccurrence
+xmap <C-n> <Plug>NextWholeOccurrence
+nmap g<C-n> <Plug>NextOccurrence
+xmap g<C-n> <Plug>NextOccurrence
+xmap <C-x> <Plug>SkipOccurrence
+xmap <C-p> <Plug>RemoveOccurrence
+
+" Note that the default <A-n> and g<A-n> shortcuts don't work on Mac due to dead keys.
+" <A-n> is used to enter accented text e.g. ñ
+" Feel free to pick your own mappings that are not affected. I like to use <leader>
+nmap <leader><C-n> <Plug>AllWholeOccurrences
+xmap <leader><C-n> <Plug>AllWholeOccurrences
+nmap <leader>g<C-n> <Plug>AllOccurrences
+xmap <leader>g<C-n> <Plug>AllOccurrences
+```
+
+</details>
+
+<details>
 <summary><h2>NERDTree</h2></summary>
    
 Original plugin: [NERDTree](https://github.com/preservim/nerdtree).
@@ -151,6 +358,23 @@ Original plugin: [NERDTree](https://github.com/preservim/nerdtree).
 </details>
 
 <details>
+<summary><h2>quick-scope</h2></summary>
+
+Original plugin: [quick-scope](https://github.com/unblevable/quick-scope).
+
+### About:
+An always-on highlight for a unique character in every word on a line to help you use f, F and family.
+
+### Setup:
+- Install [IdeaVim-Quickscope](https://plugins.jetbrains.com/plugin/19417-ideavim-quickscope) plugin.
+- Add the following command to `~/.ideavimrc`: `set quickscope`
+
+### Instructions
+
+https://plugins.jetbrains.com/plugin/19417-ideavim-quickscope
+
+</details>
+<details>
 <summary><h2>surround</h2></summary>
    
 Original plugin: [vim-surround](https://github.com/tpope/vim-surround).
@@ -174,47 +398,6 @@ https://github.com/tpope/vim-surround/blob/master/doc/surround.txt
 
 </details>
 
-<details>
-<summary><h2>multiple-cursors</h2></summary>
-   
-Original plugin: [vim-multiple-cursors](https://github.com/terryma/vim-multiple-cursors).
-   
-### Setup:
-- Add the following command to `~/.ideavimrc`: `Plug 'terryma/vim-multiple-cursors'`
-    <details>
-      <summary>Alternative syntax</summary>
-      <code>Plugin 'terryma/vim-multiple-cursors'</code>
-      <br/>
-      <code>Plug 'https://github.com/terryma/vim-multiple-cursors'</code>
-      <br/>
-      <code>Plug 'vim-multiple-cursors'</code>
-      <br/>
-      <code>set multiple-cursors</code>
-      </details>
-   
-### Instructions
-
-At the moment, the default key binds for this plugin do not get mapped correctly in IdeaVim (see [VIM-2178](https://youtrack.jetbrains.com/issue/VIM-2178)). To enable the default key binds, add the following to your `.ideavimrc` file...
-
-```
-" Remap multiple-cursors shortcuts to match terryma/vim-multiple-cursors
-nmap <C-n> <Plug>NextWholeOccurrence
-xmap <C-n> <Plug>NextWholeOccurrence
-nmap g<C-n> <Plug>NextOccurrence
-xmap g<C-n> <Plug>NextOccurrence
-xmap <C-x> <Plug>SkipOccurrence
-xmap <C-p> <Plug>RemoveOccurrence
-
-" Note that the default <A-n> and g<A-n> shortcuts don't work on Mac due to dead keys.
-" <A-n> is used to enter accented text e.g. ñ
-" Feel free to pick your own mappings that are not affected. I like to use <leader>
-nmap <leader><C-n> <Plug>AllWholeOccurrences
-xmap <leader><C-n> <Plug>AllWholeOccurrences
-nmap <leader>g<C-n> <Plug>AllOccurrences
-xmap <leader>g<C-n> <Plug>AllOccurrences
-```
-
-</details>
 
 
 <details>
@@ -251,30 +434,6 @@ https://github.com/vim-scripts/ReplaceWithRegister/blob/master/doc/ReplaceWithRe
 
    
 
-<details>
-<summary><h2>exchange</h2></summary>
-
-By [fan-tom](https://github.com/fan-tom)  
-Original plugin: [vim-exchange](https://github.com/tommcdo/vim-exchange).
-   
-### Setup:
-- Add the following command to `~/.ideavimrc`: `Plug 'tommcdo/vim-exchange'`
-    <details>
-      <summary>Alternative syntax</summary>
-      <code>Plugin 'tommcdo/vim-exchange'</code>
-      <br/>
-      <code>Plug 'https://github.com/tommcdo/vim-exchange'</code>
-      <br/>
-      <code>Plug 'vim-exchange'</code>
-      <br/>
-      <code>set exchange</code>
-      </details>
-   
-### Instructions
-   
-https://github.com/tommcdo/vim-exchange/blob/master/doc/exchange.txt
-
-</details>
    
 <details>
 <summary><h2>textobj-entire</h2></summary>
@@ -301,40 +460,6 @@ https://github.com/kana/vim-textobj-entire/blob/master/doc/textobj-entire.txt
 
 </details>
    
-<details>
-<summary><h2>highlightedyank</h2></summary>
-
-By [KostkaBrukowa](https://github.com/KostkaBrukowa)  
-Original plugin: [vim-highlightedyank](https://github.com/machakann/vim-highlightedyank).
-   
-### Setup:
-- Add the following command to `~/.ideavimrc`: `Plug 'machakann/vim-highlightedyank'`
-    <details>
-      <summary>Alternative syntax</summary>
-      <code>Plugin 'machakann/vim-highlightedyank'</code>
-      <br/>
-      <code>Plug 'https://github.com/machakann/vim-highlightedyank'</code>
-      <br/>
-      <code>Plug 'vim-highlightedyank'</code>
-      <br/>
-      <code>set highlightedyank</code>
-      </details>
-   
-### Instructions
-   
-If you want to optimize highlight duration, assign a time in milliseconds:  
-      `let g:highlightedyank_highlight_duration = "1000"`  
-      A negative number makes the highlight persistent.  
-   
-If you want to change background color of highlight you can provide the rgba of the color you want e.g.  
-      `let g:highlightedyank_highlight_color = "rgba(160, 160, 160, 155)"`
-
-If you want to change text color of highlight you can provide the rgba of the color you want e.g.  
-`let g:highlightedyank_highlight_foreground_color = "rgba(0, 0, 0, 255)"`
-
-https://github.com/machakann/vim-highlightedyank/blob/master/doc/highlightedyank.txt
-
-</details>
 
 <details>
 <summary><h2>vim-paragraph-motion</h2></summary>
@@ -392,61 +517,8 @@ https://github.com/michaeljsmith/vim-indent-object/blob/master/doc/indent-object
 </details>
    
    
-<details>
-<summary><h2>matchit.vim</h2></summary>
 
-By [Martin Yzeiri](https://github.com/myzeiri)
-Original plugin: [matchit.vim](https://github.com/chrisbra/matchit).
-   
-### Setup:
-- Add the following command to `~/.ideavimrc`: `packadd matchit`
-    <details>
-      <summary>Alternative syntax</summary>
-      <code>Plug 'vim-matchit'</code>
-      <br/>
-      <code>Plug 'chrisbra/matchit'</code>
-      <br/>
-      <code>set matchit</code>
-      </details>
-   
-### Instructions
-   
-https://github.com/adelarsq/vim-matchit/blob/master/doc/matchit.txt
 
-</details>
-
-<details>
-<summary><h2>IdeaVim-Quickscope</h2></summary>
-
-Original plugin: [quick-scope](https://github.com/unblevable/quick-scope).
-
-### Setup:
-- Install [IdeaVim-Quickscope](https://plugins.jetbrains.com/plugin/19417-ideavim-quickscope) plugin.
-- Add the following command to `~/.ideavimrc`: `set quickscope`
-
-### Instructions
-
-https://plugins.jetbrains.com/plugin/19417-ideavim-quickscope
-
-</details>
-
-<details>
-<summary><h2>Mini.ai: Extend and create a/i textobjects (IMPORTANT: The plugin is not related with artificial intelligence)</h2></summary>
-
-### Features: 
-Provides additional text object motions for handling quotes and brackets. The following motions are included:
-
-- aq: Around any quotes.
-- iq: Inside any quotes.
-- ab: Around any parentheses, curly braces, and square brackets.
-- ib: Inside any parentheses, curly braces, and square brackets.
-
-Original plugin: [mini.ai](https://github.com/echasnovski/mini.ai).
-
-### Setup:
-- Add the following command to `~/.ideavimrc`: `set mini-ai`
-
-</details>
 
 
 <details>
@@ -479,20 +551,6 @@ or restart the IDE.
 https://plugins.jetbrains.com/plugin/25776-vim-peekaboo
 </details>
 
-<details>
-<summary><h2>FunctionTextObj</h2></summary>
-
-By Julien Phalip  
-
-### Setup
-
-Add `set functiontextobj` to your `~/.ideavimrc` file, then run `:source ~/.ideavimrc`
-or restart the IDE.
-
-### Instructions
-
-https://plugins.jetbrains.com/plugin/25897-vim-functiontextobj
-</details>
 
 <details>
 <summary><h2>Switch</h2></summary>
