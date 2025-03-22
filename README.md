@@ -100,7 +100,7 @@ Here are some examples of supported vim features and commands:
 * highlightedyank
 * indent-object
 * matchit.vim
-* Mini.ai: Extend and create a/i textobjects (IMPORTANT: The plugin is not related with artificial intelligence)
+* Mini.ai
 * multiple-cursors
 * NERDTree
 * paragraph-motion
