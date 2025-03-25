@@ -45,11 +45,13 @@ object EngineStringHelper {
     return toPrintableCharacter(c)
   }
 
-  fun toPrintableCharacter(c: Char): String {
-    if (c.code <= 31) {
-      return "^" + (c.code + 'A'.code - 1).toChar()
-    } else if (c.code == 127) {
-      return "^" + (c.code - 'A'.code + 1).toChar()
+  fun toPrintableCharacter(c: Char): String = toPrintableCharacter(c.code)
+
+  fun toPrintableCharacter(codepoint: Int): String {
+    if (codepoint <= 31) {
+      return "^" + (codepoint + 'A'.code - 1).toChar()
+    } else if (codepoint == 127) {
+      return "^" + (codepoint - 'A'.code + 1).toChar()
       // Vim doesn't use these representations unless :set encoding=latin1. Technically, we could use them if the
       // encoding of the buffer for the mark, jump or :ascii char is. But what encoding would we use for registers?
       // Since we support Unicode, just treat everything as Unicode.
@@ -59,13 +61,13 @@ object EngineStringHelper {
 //      return "|" + (char)(c - (('A' - 1) * 2));
 //    } else if (c == 255) {
 //      return "~" + (char)(c - (('A' - 1) * 3));
-    } else if (CharacterHelper.isInvisibleControlCharacter(c) || CharacterHelper.isZeroWidthCharacter(c)) {
-      if (c.code > 0xff) {
-        return String.format("<%04x>", c.code)
+    } else if (CharacterHelper.isInvisibleControlCharacter(codepoint) || CharacterHelper.isZeroWidthCharacter(codepoint)) {
+      if (codepoint > 0xff) {
+        return String.format("<%04x>", codepoint)
       }
-      return String.format("<%02x>", c.code)
+      return String.format("<%02x>", codepoint)
     }
-    return c.toString()
+    return String(Character.toChars(codepoint))
   }
 }
 

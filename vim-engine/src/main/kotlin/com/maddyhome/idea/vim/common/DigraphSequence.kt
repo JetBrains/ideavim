@@ -64,9 +64,9 @@ class DigraphSequence : Cloneable {
         logger.debug("DIG_STATE_BACK_SPACE")
         digraphState = DIG_STATE_PENDING
         if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {
-          val ch = injector.digraphGroup.getCharacterForDigraph(digraphChar, key.keyChar)
+          val codepoint = injector.digraphGroup.getCharacterForDigraph(digraphChar, key.keyChar)
           digraphChar = 0.toChar()
-          return done(KeyStroke.getKeyStroke(ch))
+          return done(codepoint)
         }
         DigraphResult.Unhandled
       }
@@ -86,8 +86,8 @@ class DigraphSequence : Cloneable {
         logger.debug("DIG_STATE_DIG_TWO")
         digraphState = DIG_STATE_PENDING
         if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {
-          val ch = injector.digraphGroup.getCharacterForDigraph(digraphChar, key.keyChar)
-          return done(KeyStroke.getKeyStroke(ch))
+          val codepoint = injector.digraphGroup.getCharacterForDigraph(digraphChar, key.keyChar)
+          return done(codepoint)
         }
         DigraphResult.Bad
       }
@@ -138,17 +138,16 @@ class DigraphSequence : Cloneable {
 
           else -> {
             if (key.keyCode == KeyEvent.VK_TAB) {
-              val code = KeyStroke.getKeyStroke('\t')
               digraphState = DIG_STATE_PENDING
-              return done(code)
+              return done('\t'.code)
             }
-            val ks = specialKeyToKeyCode(key)
-            if (ks != null) {
-              return done(ks)
+            val codepoint = specialKeyToKeyCode(key)
+            if (codepoint != null) {
+              return done(codepoint)
             }
             logger.debug("unknown")
             digraphState = DIG_STATE_PENDING
-            done(key)
+            done(key.keyChar.code)
           }
         }
       }
@@ -173,33 +172,27 @@ class DigraphSequence : Cloneable {
           logger.debug("valid")
           codeChars[codeCnt++] = key.keyChar
           return if (codeCnt == codeMax) {
-            val digits = String(codeChars, 0, codeCnt)
-            val `val` = digits.toInt(codeType)
-            val code = KeyStroke.getKeyStroke(`val`.toChar())
             digraphState = DIG_STATE_PENDING
-            done(code)
+            val digits = String(codeChars, 0, codeCnt)
+            val codepoint = digits.toInt(codeType)
+            done(codepoint)
           } else {
             DigraphResult.HandledLiteral
           }
         } else if (codeCnt > 0) {
           logger.debug("invalid")
-          val digits = String(codeChars, 0, codeCnt)
-          val `val` = digits.toInt(codeType)
           digraphState = DIG_STATE_PENDING
-          val code = KeyStroke.getKeyStroke(`val`.toChar())
+          val digits = String(codeChars, 0, codeCnt)
+          val codepoint = digits.toInt(codeType)
           if (!injector.application.isUnitTest()) {
             // The key we received isn't part of the literal, so post it to be handled after we've handled the literal.
             // This requires swing, so we can't run it in tests.
             injector.application.postKey(key, editor)
           }
-          return done(code)
+          return done(codepoint)
         } else if (codeCnt == 0) {
           digraphState = DIG_STATE_PENDING
-          return if (specialKeyToKeyCode(key) != null) {
-            done(specialKeyToKeyCode(key))
-          } else {
-            done(key)
-          }
+          return specialKeyToKeyCode(key)?.let { done(it) } ?: done(key.keyChar.code)
         }
         DigraphResult.Bad
       }
@@ -208,22 +201,21 @@ class DigraphSequence : Cloneable {
     }
   }
 
-  private fun specialKeyToKeyCode(key: KeyStroke): KeyStroke? {
+  private fun specialKeyToKeyCode(key: KeyStroke): Int? {
+    // Handle special keys. Specifically, if it's CTRL+something, return the codepoint for `\something`. Or if it's
+    // newline, return carriage return (Vim likes to treat newline as null), and escape should be returned as escape
     if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) {
       val specialKeyCode = injector.parser.parseVimScriptString("\\" + injector.parser.toKeyNotation(key))
       if (specialKeyCode.length == 1) {
-        return if (specialKeyCode[0].code == 10) {
-          KeyStroke.getKeyStroke(0.toChar())
-        } else {
-          KeyStroke.getKeyStroke(specialKeyCode[0])
-        }
+        // TODO: If we get 10 here, we return 0. If we get 10 below, we return 13. Why the difference?
+        return if (specialKeyCode[0].code == 10) 0 else { specialKeyCode[0].code }
       } else {
         logger.error("Digraph char was recognized as multiple chars")
       }
     } else {
       return when (key.keyCode) {
-        10 -> KeyStroke.getKeyStroke(13.toChar())
-        27 -> KeyStroke.getKeyStroke(27.toChar())
+        10 -> 13
+        27 -> 27
         else -> null
       }
     }

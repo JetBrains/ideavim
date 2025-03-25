@@ -85,10 +85,24 @@ class DigraphConsumer : KeyConsumer {
             lambdaKeyState.commandBuilder.fallbackToCharacterArgument()
           }
         }
-        val stroke = res.stroke ?: return false
+        val codepoint = res.codepoint ?: return false
         keyProcessResultBuilder.addExecutionStep { lambdaKeyState, lambdaEditorState, lambdaContext ->
           lambdaKeyState.commandBuilder.addTypedKeyStroke(key)
-          keyHandler.handleKey(lambdaEditorState, stroke, lambdaContext, lambdaKeyState)
+          if (Character.isSupplementaryCodePoint(codepoint)) {
+            val charArray = Character.toChars(codepoint)
+            val highSurrogate = charArray[0]
+            val lowSurrogate = charArray[1]
+
+            val keyStrokeHigh = KeyStroke.getKeyStroke(highSurrogate)
+            keyHandler.handleKey(lambdaEditorState, keyStrokeHigh, lambdaContext, lambdaKeyState)
+
+            val keyStrokeLow = KeyStroke.getKeyStroke(lowSurrogate)
+            keyHandler.handleKey(lambdaEditorState, keyStrokeLow, lambdaContext, lambdaKeyState)
+          }
+          else {
+            val stroke = KeyStroke.getKeyStroke(codepoint.toChar())
+            keyHandler.handleKey(lambdaEditorState, stroke, lambdaContext, lambdaKeyState)
+          }
         }
         return true
       }
