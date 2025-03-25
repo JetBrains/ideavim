@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.vimscript.services
 
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import org.jetbrains.annotations.NonNls
 import java.io.File
@@ -30,25 +31,44 @@ object VimRcService {
 
   @JvmStatic
   fun findIdeaVimRc(): File? {
-    val homeDirName = System.getProperty("user.home")
     // Check whether file exists in home dir
+    val homeDirName = System.getProperty("user.home")
     if (homeDirName != null) {
       for (fileName in HOME_VIMRC_PATHS) {
         val file = File(homeDirName, fileName)
         if (file.exists()) {
+          logger.debug { "Found ideavimrc file: $file" }
           return file
         }
       }
+    }
+    else {
+      logger.info("User's home directory is not defined. Cannot locate ~/.ideavimrc or ~/_ideavimrc file.")
     }
 
     // Check in XDG config directory
     val xdgConfigHomeProperty = System.getenv("XDG_CONFIG_HOME")
     val xdgConfig = if (xdgConfigHomeProperty == null || xdgConfigHomeProperty == "") {
+      logger.debug("XDG_CONFIG_HOME is not defined. Trying to locate ~/.config/ideavim/ideavimrc file.")
       if (homeDirName != null) Paths.get(homeDirName, ".config", XDG_VIMRC_PATH).toFile() else null
     } else {
-      File(xdgConfigHomeProperty, XDG_VIMRC_PATH)
+      logger.debug { "XDG_CONFIG_HOME set to '$xdgConfigHomeProperty'. Trying to locate \$XDG_CONFIG_HOME/ideavim/ideavimrc file" }
+      val configHome = if (xdgConfigHomeProperty.startsWith("~/") || xdgConfigHomeProperty.startsWith("~\\")) {
+        val expandedConfigHome = homeDirName + xdgConfigHomeProperty.substring(1)
+        logger.debug { "Expanded \$XDG_CONFIG_HOME to '$expandedConfigHome'" }
+        expandedConfigHome
+      }
+      else {
+        xdgConfigHomeProperty
+      }
+      File(configHome, XDG_VIMRC_PATH)
     }
-    return if (xdgConfig != null && xdgConfig.exists()) xdgConfig else null
+    return xdgConfig?.let {
+      if (it.exists()) {
+        logger.debug { "Found ideavimrc file: $it" }
+        it
+      } else null
+    }
   }
 
   private fun getNewIdeaVimRcTemplate(vimrc: String) = """
