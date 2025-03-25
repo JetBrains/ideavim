@@ -77,4 +77,12 @@ class AsciiCommandTest : VimTestCase() {
     enterCommand("ascii")
     assertEquals("<⓪> 9450, Hex 24ea, Oct 22352, Digr (0", VimPlugin.getMessage())
   }
+
+  @Test
+  fun `test shows custom digraph with 32-bit Unicode codepoint`() {
+    configureByText("🔴")
+    enterCommand("digraph cr 128308")
+    enterCommand("ascii")
+    assertEquals("<🔴> 128308, Hex 1f534, Oct 372464, Digr cr", VimPlugin.getMessage())
+  }
 }

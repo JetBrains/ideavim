@@ -15,50 +15,48 @@ import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.helper.EngineStringHelper
 import org.jetbrains.annotations.TestOnly
 import java.util.*
-import javax.swing.KeyStroke
 import kotlin.math.ceil
 
 private val logger = vimLogger<VimDigraphGroup>()
 
 open class VimDigraphGroupBase() : VimDigraphGroup {
 
-  override fun getCharacterForDigraph(ch1: Char, ch2: Char): Char {
-    fun getCharacter(ch1: Char, ch2: Char, digraphs: Map<String, Char>): Char? {
+  override fun getCharacterForDigraph(ch1: Char, ch2: Char): Int {
+    fun getCodepoint(ch1: Char, ch2: Char, digraphs: Map<String, Int>): Int? {
       val chars = charArrayOf(ch1, ch2)
       var digraph = String(chars)
-      val ch = digraphs[digraph]
-      if (ch == null) {
+      return digraphs.getOrElse(digraph) {
         chars[0] = ch2
         chars[1] = ch1
         digraph = String(chars)
-        return digraphs[digraph]
+        digraphs[digraph]  // Possibly null
       }
-      return ch
     }
 
-    return getCharacter(ch1, ch2, customDigraphToCharacter)
-      ?: getCharacter(ch1, ch2, digraphToCharacter)
-      ?: ch2
+    return getCodepoint(ch1, ch2, customDigraphToCodepoint)
+      ?: getCodepoint(ch1, ch2, digraphToCodepoint)
+      ?: ch2.code
   }
 
   override fun displayAsciiInfo(editor: VimEditor) {
     val offset = editor.currentCaret().offset
     val charsSequence = editor.text()
     if (charsSequence.isEmpty() || offset >= charsSequence.length) return
-    val ch = charsSequence[offset]
 
-    val digraph = customCharacterToDigraph[ch] ?: characterToDigraph[ch]
+    val codepoint = Character.codePointAt(charsSequence, offset)
+
+    val digraph = customCodepointToDigraph[codepoint] ?: codepointToDigraph[codepoint]
     val digraphText = if (digraph == null) "" else ", Digr $digraph"
 
-    if (ch.code < 0x100) {
+    if (codepoint < 0x100) {
       injector.messages.showStatusBarMessage(
         editor,
         String.format(
           "<%s>  %d,  Hex %02x,  Oct %03o%s",
-          EngineStringHelper.toPrintableCharacter(KeyStroke.getKeyStroke(ch)),
-          ch.code,
-          ch.code,
-          ch.code,
+          EngineStringHelper.toPrintableCharacter(codepoint),
+          codepoint,
+          codepoint,
+          codepoint,
           digraphText,
         ),
       )
@@ -67,10 +65,10 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
         editor,
         String.format(
           "<%s> %d, Hex %04x, Oct %o%s",
-          EngineStringHelper.toPrintableCharacter(KeyStroke.getKeyStroke(ch)),
-          ch.code,
-          ch.code,
-          ch.code,
+          EngineStringHelper.toPrintableCharacter(codepoint),
+          codepoint,
+          codepoint,
+          codepoint,
           digraphText,
         ),
       )
@@ -81,11 +79,11 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     var i = 0
     while (i < defaultDigraphs.size) {
       if (defaultDigraphs[i] != '\u0000' && defaultDigraphs[i + 1] != '\u0000') {
-        val character: Char = defaultDigraphs[i + 2]
+        val codepoint = defaultDigraphs[i + 2].code
         val digraph = String(defaultDigraphs, i, 2)
-        digraphToCharacter[digraph] = character
-        if (!characterToDigraph.contains(character)) {
-          characterToDigraph[character] = digraph
+        digraphToCodepoint[digraph] = codepoint
+        if (!codepointToDigraph.contains(codepoint)) {
+          codepointToDigraph[codepoint] = digraph
         }
       }
       i += 3
@@ -109,7 +107,7 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
         throw exExceptionMessage("E39") // E39: Number expected
       }
 
-      addCustomDigraph(digraph.substring(0, 2), Char(codepoint))
+      addCustomDigraph(digraph.substring(0, 2), codepoint)
     }
 
     return true
@@ -122,7 +120,7 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     // and it's a quirk too far to copy.
     val columnWidth = 13
     val columnCount = width / columnWidth
-    val height = ceil(digraphToCharacter.size.toDouble() / columnCount.toDouble()).toInt()
+    val height = ceil(digraphToCodepoint.size.toDouble() / columnCount.toDouble()).toInt()
 
     if (logger.isDebug()) {
       logger.debug("width=$width")
@@ -130,7 +128,7 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
       logger.debug("height=$height")
     }
 
-    val digraphCount = (defaultDigraphs.size / 3) + customDigraphToCharacter.size
+    val digraphCount = (defaultDigraphs.size / 3) + customDigraphToCodepoint.size
     val capacity = (digraphCount * columnWidth) + (digraphCount / columnCount) + 300 // Text + newlines + headers
     val output = buildString(capacity) {
       var column = 0
@@ -140,11 +138,11 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
       // We cannot guarantee ordering with the dictionaries, so let's use the defaultDigraphs list.
       // We output in codepoint order, but there are duplicate digraphs for some codepoints and we want control of order
       for (i in 0 until defaultDigraphs.size step 3) {
-        val char = defaultDigraphs[i + 2]
+        val codepoint = defaultDigraphs[i + 2].code
 
         // Show headers if requested. Vim shows headers for some Unicode blocks, but not all. And its block boundaries
         // aren't necessarily correct
-        val block = getVimCompatibleUnicodeBlock(char)
+        val block = getVimCompatibleUnicodeBlock(codepoint)
         if (showHeaders && block != previousUnicodeBlock && digraphHeaderNames.containsKey(block)) {
           if (column != 0) {
             appendLine()
@@ -158,7 +156,7 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
           repeat(columnWidth - (columnLength % columnWidth)) { append(' ') }
         }
 
-        columnLength = appendDigraph(defaultDigraphs[i], defaultDigraphs[i + 1], char)
+        columnLength = appendDigraph(defaultDigraphs[i], defaultDigraphs[i + 1], codepoint)
         column++
 
         if (column == columnCount) {
@@ -167,7 +165,7 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
         }
       }
 
-      if (showHeaders && customDigraphToCharacter.isNotEmpty()) {
+      if (showHeaders && customDigraphToCodepoint.isNotEmpty()) {
         if (column != 0) {
           appendLine()
         }
@@ -175,7 +173,7 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
         column = 0
       }
 
-      customDigraphToCharacter.forEach { (digraph, char) ->
+      customDigraphToCodepoint.forEach { (digraph, char) ->
         if (column != 0) {
           repeat(columnWidth - (columnLength % columnWidth)) { append(' ') }
         }
@@ -194,7 +192,7 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     injector.outputPanel.output(editor, context, output)
   }
 
-  private fun StringBuilder.appendDigraph(ch1: Char, ch2: Char, char: Char): Int {
+  private fun StringBuilder.appendDigraph(ch1: Char, ch2: Char, codepoint: Int): Int {
     val start = this.length
 
     append(ch1)
@@ -202,22 +200,22 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     append(' ')
 
     // VIM highlights the printable character with HLF_8, which it also uses for special keys in `:map`
-    val printable = EngineStringHelper.toPrintableCharacter(char)
+    val printable = EngineStringHelper.toPrintableCharacter(codepoint)
     val invisibleCharAdjustment = when {
       // Vim null handling weirdness... `NU` is NULL, and represented as NL ('\u000a`), but the char should be `^@`
       ch1 == 'N' && ch2 == 'U' -> {
-        append(EngineStringHelper.toPrintableCharacter('\u0000'))
+        append(EngineStringHelper.toPrintableCharacter(0))
         0
       }
 
-      printable.length == 1 && isRightToLeft(char) -> {
+      printable.length == 1 && isRightToLeft(codepoint) -> {
         append('\u2067')  // RIGHT_TO_LEFT_ISOLATE - set RTL and isolate following content from the surrounding text
         append(printable)
         append('\u2069')  // POP_DIRECTIONAL_ISOLATE - close the isolation range and return to LTR
         2
       }
 
-      printable.length == 1 && isCombiningCharacter(char) -> {
+      printable.length == 1 && isCombiningCharacter(codepoint) -> {
         append(' ') // Give the combining character something to combine with
         append(printable)
         1
@@ -239,47 +237,47 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
 
     // Print the code: ' %3d'
     append(' ')
-    append(char.code.toString().padStart(3))
+    append(codepoint.toString().padStart(3))
 
     return length - start - invisibleCharAdjustment
   }
 
-  private fun isRightToLeft(c: Char): Boolean {
-    val directionality = Character.getDirectionality(c)
+  private fun isRightToLeft(codepoint: Int): Boolean {
+    val directionality = Character.getDirectionality(codepoint)
     return directionality == Character.DIRECTIONALITY_RIGHT_TO_LEFT
       || directionality == Character.DIRECTIONALITY_RIGHT_TO_LEFT_ARABIC
       || directionality == Character.DIRECTIONALITY_RIGHT_TO_LEFT_EMBEDDING
       || directionality == Character.DIRECTIONALITY_RIGHT_TO_LEFT_OVERRIDE
   }
 
-  private fun isCombiningCharacter(char: Char): Boolean {
-    val type = Character.getType(char).toByte()
+  private fun isCombiningCharacter(codepoint: Int): Boolean {
+    val type = Character.getType(codepoint).toByte()
     return type == Character.NON_SPACING_MARK
       || type == Character.COMBINING_SPACING_MARK
       || type == Character.ENCLOSING_MARK
       || type == Character.FORMAT
   }
 
-  private fun getVimCompatibleUnicodeBlock(char: Char): Character.UnicodeBlock {
+  private fun getVimCompatibleUnicodeBlock(codepoint: Int): Character.UnicodeBlock {
     // Vim's block boundaries don't agree with Java's. Fudge things so they match
-    val block = Character.UnicodeBlock.of(char)
+    val block = Character.UnicodeBlock.of(codepoint)
     return when {
-      block == Character.UnicodeBlock.LATIN_1_SUPPLEMENT && char.code < 0xa1 -> Character.UnicodeBlock.BASIC_LATIN
-      block == Character.UnicodeBlock.NUMBER_FORMS && char.code < 0x2160 -> Character.UnicodeBlock.LETTERLIKE_SYMBOLS
+      block == Character.UnicodeBlock.LATIN_1_SUPPLEMENT && codepoint < 0xa1 -> Character.UnicodeBlock.BASIC_LATIN
+      block == Character.UnicodeBlock.NUMBER_FORMS && codepoint < 0x2160 -> Character.UnicodeBlock.LETTERLIKE_SYMBOLS
       else -> block
     }
   }
 
-  private fun addCustomDigraph(digraph: String, char: Char) {
-    customDigraphToCharacter[digraph] = char
-    customCharacterToDigraph[char] = digraph
+  private fun addCustomDigraph(digraph: String, codepoint: Int) {
+    customDigraphToCodepoint[digraph] = codepoint
+    customCodepointToDigraph[codepoint] = digraph
   }
 
   // Surprisingly, Vim doesn't have a command line for removing custom digraphs
   @TestOnly
   fun clearCustomDigraphs() {
-    customDigraphToCharacter.clear()
-    customCharacterToDigraph.clear()
+    customDigraphToCodepoint.clear()
+    customCodepointToDigraph.clear()
   }
 
   // Based on the digraphs listed in `:help digraph-table` and `:help digraph-table-mbyte`, which unfortunately doesn't
@@ -1677,30 +1675,31 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
   )
 
   /**
-   * A map of digraph to character
+   * A map of digraph to character codepoint
    *
    * Note that this might contain duplicates for the character!
    */
-  private val digraphToCharacter: MutableMap<String, Char> = HashMap<String, Char>(defaultDigraphs.size)
+  private val digraphToCodepoint: MutableMap<String, Int> = HashMap<String, Int>(defaultDigraphs.size)
 
   /**
-   * A map of character to digraph, as a concatenated string
+   * A map of character codepoint to digraph, as a concatenated string
    *
    * Note that when a character has multiple digraphs (e.g. `!I` and `~!`), only the first is kept!
    */
-  private val characterToDigraph: MutableMap<Char, String> = TreeMap<Char, String>()
+  private val codepointToDigraph: MutableMap<Int, String> = TreeMap<Int, String>()
 
   /**
-   * A map of custom digraphs to chars
+   * A map of custom digraph to a digraph codepoint
    *
-   * This property uses [LinkedHashMap] so that iteration order matches insertion order
+   * This property uses [LinkedHashMap] so that iteration order matches insertion order. The digraph character is
+   * represented as a codepoint to handle wide Unicode characters that cannot be represented in a 16-bit [Char].
    */
-  private val customDigraphToCharacter: MutableMap<String, Char> = LinkedHashMap<String, Char>()
+  private val customDigraphToCodepoint: MutableMap<String, Int> = LinkedHashMap<String, Int>()
 
   /**
-   * A map of custom digraph characters to digraph
+   * A map of custom digraph codepoints to digraph
    */
-  private val customCharacterToDigraph: MutableMap<Char, String> = HashMap<Char, String>()
+  private val customCodepointToDigraph: MutableMap<Int, String> = HashMap<Int, String>()
 
   /**
    * A map of Unicode block to Vim digraph header name/display text

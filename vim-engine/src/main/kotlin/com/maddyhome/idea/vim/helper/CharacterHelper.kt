@@ -46,19 +46,17 @@ object CharacterHelper {
     }
   }
 
-  @JvmStatic
   fun isWhitespace(editor: VimEditor, ch: Char, isBig: Boolean): Boolean =
     charType(editor, ch, isBig) == CharacterType.WHITESPACE
 
-  @JvmStatic
-  fun isInvisibleControlCharacter(ch: Char): Boolean {
-    val type = Character.getType(ch).toByte()
+  fun isInvisibleControlCharacter(codepoint: Int): Boolean {
+    val type = Character.getType(codepoint).toByte()
     return type == Character.CONTROL || type == Character.FORMAT || type == Character.PRIVATE_USE ||
       type == Character.SURROGATE || type == Character.UNASSIGNED
   }
 
-  @JvmStatic
-  fun isZeroWidthCharacter(ch: Char): Boolean = ch == '\ufeff' || ch == '\u200b' || ch == '\u200c' || ch == '\u200d'
+  fun isZeroWidthCharacter(codepoint: Int): Boolean =
+    codepoint == 0xfeff || codepoint == 0x200b || codepoint == 0x200c || codepoint == 0x200d
 
   private fun isHalfWidthKatakanaLetter(ch: Char): Boolean = ch in '\uFF66'..'\uFF9F'
 
