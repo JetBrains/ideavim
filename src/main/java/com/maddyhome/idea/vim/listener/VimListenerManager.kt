@@ -457,7 +457,9 @@ internal object VimListenerManager {
           openingEditor == null -> LocalOptionInitialisationScenario.EDIT
           else -> LocalOptionInitialisationScenario.NEW
         }
-        EditorListeners.add(event.editor, openingEditor?.vim ?: injector.fallbackWindow, scenario)
+        SlowOperations.knownIssue("VIM-3648").use {
+          EditorListeners.add(event.editor, openingEditor?.vim ?: injector.fallbackWindow, scenario)
+        }
         firstEditorInitialised = true
       } else {
         // We've got a virtual file, so FileOpenedSyncListener will be called. Save data
