@@ -15,11 +15,13 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.EmptyAction
 import com.intellij.openapi.actionSystem.IdeActions
+import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.actionSystem.ex.ActionUtil
 import com.intellij.openapi.actionSystem.ex.ActionUtil.performDumbAwareWithCallbacks
 import com.intellij.openapi.actionSystem.impl.ProxyShortcutSet
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext
+import com.intellij.openapi.application.ApplicationInfo
 import com.intellij.openapi.application.ex.ApplicationManagerEx
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.command.UndoConfirmationPolicy
@@ -37,12 +39,15 @@ import com.maddyhome.idea.vim.api.VimActionExecutor
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import com.maddyhome.idea.vim.ide.isRider
 import com.maddyhome.idea.vim.newapi.IjNativeAction
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.runFromVimKey
 import org.jetbrains.annotations.NonNls
 import java.awt.Component
+import java.awt.event.KeyEvent
 import javax.swing.JComponent
+import javax.swing.KeyStroke
 import javax.swing.SwingUtilities
 
 @Service
@@ -75,7 +80,7 @@ internal class IjActionExecutor : VimActionExecutor {
     }
 
     val ijAction = (action as IjNativeAction).action
-    if (Registry.`is`("ideavim.old.action.execution", true)) {
+    if (executeManually(ijAction)) {
       return manualActionExecution(context, ijAction)
     } else {
       try {
@@ -90,6 +95,30 @@ internal class IjActionExecutor : VimActionExecutor {
         isRunningActionFromVim = false
       }
     }
+  }
+
+  // [VERSION UPDATE] 251+ Remove manual execution, switch to tryToExecute
+  private fun executeManually(action: AnAction): Boolean {
+    if (Registry.`is`("ideavim.old.action.execution", true)) return true
+    if (isRider()) {
+      // Special Rider logic for VIM-3826. In rider 251 everything works fine with tryToExecute
+      val lessThan251 = ApplicationInfo.getInstance().build.baselineVersion < 251
+      val keyIsEnter = action.shortcutSet.shortcuts.any {
+        (it as KeyboardShortcut).firstKeyStroke == KeyStroke.getKeyStroke(
+          KeyEvent.VK_ENTER,
+          0
+        )
+      }
+      val keyIsEsc = action.shortcutSet.shortcuts.any {
+        (it as KeyboardShortcut).firstKeyStroke == KeyStroke.getKeyStroke(
+          KeyEvent.VK_ESCAPE,
+          0
+        )
+      }
+      if (lessThan251 && !keyIsEnter && !keyIsEsc) return true
+    }
+
+    return false
   }
 
   private fun manualActionExecution(
