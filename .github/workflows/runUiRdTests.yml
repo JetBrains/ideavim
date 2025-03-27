@@ -32,6 +32,8 @@ jobs:
           retry-delay: 10s
       - name: Tests
         run: gradle :tests:ui-rd-tests:testUi
+        env:
+          RIDER_LICENSE: ${{ secrets.RIDER_LICENSE }}
       - name: Move video
         if: always()
         run: mv tests/ui-rd-tests/video build/reports

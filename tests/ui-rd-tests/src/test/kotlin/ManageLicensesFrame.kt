@@ -9,7 +9,6 @@
 import com.intellij.remoterobot.RemoteRobot
 import com.intellij.remoterobot.data.RemoteComponent
 import com.intellij.remoterobot.fixtures.CommonContainerFixture
-import com.intellij.remoterobot.fixtures.ComponentFixture
 import com.intellij.remoterobot.fixtures.DefaultXpath
 import com.intellij.remoterobot.fixtures.FixtureName
 import com.intellij.remoterobot.search.locators.byXpath
@@ -25,13 +24,8 @@ class ManageLicensesFrame(remoteRobot: RemoteRobot, remoteComponent: RemoteCompo
   CommonContainerFixture(remoteRobot, remoteComponent) {
 
   fun enableFreeTier() {
-    find<ComponentFixture>(
-      byXpath(
-        "//div[@class='SegmentedButton' and @action='Start trial (null)']",
-      )
-    ).click()
-//    checkBox("I agree with", contains = true).select()
-    button("Start Free 30-Day Trial").click()
+    radioButton("Activation code").click()
+    textFields(byXpath("//div[@class='X']")).first().text = System.getenv("RIDER_LICENSE")
     button("Close").click()
   }
 }
