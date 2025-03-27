@@ -45,7 +45,52 @@ class RiderUiTest {
       val editor = editor("Program.cs")
 
       testEnterWorksInNormalMode(editor)
+      testReformatCodeUsingMappingWithSpace(editor)
+      testEnterInInsertMode(editor)
     }
+  }
+
+  private fun IdeaFrame.testEnterInInsertMode(editor: Editor) {
+    editor.findText(" for more information").click()
+    keyboard {
+      enterText("A")
+      enter()
+    }
+    Thread.sleep(1000)
+    assertEquals(
+      """
+      |// See https://aka.ms/new-console-template for more information
+      |
+      |
+      |Console.WriteLine("Hello, World!");
+    """.trimMargin(), editor.text
+    )
+
+    keyboard {
+      escape()
+      enterText("dd")
+    }
+  }
+
+  private fun IdeaFrame.testReformatCodeUsingMappingWithSpace(editor: Editor) {
+    editor.findText(" for more information").click()
+    keyboard {
+      enterText("jj>>")
+
+      enterText(":map <Space>x <Action>(ReformatCode)")
+      enter()
+
+      enterText(" x")
+    }
+
+    Thread.sleep(1000)
+    assertEquals(
+      """
+      |// See https://aka.ms/new-console-template for more information
+      |
+      |Console.WriteLine("Hello, World!");
+    """.trimMargin(), editor.text
+    )
   }
 
   private fun IdeaFrame.testEnterWorksInNormalMode(editor: Editor) {
