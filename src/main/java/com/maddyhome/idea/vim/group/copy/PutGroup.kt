@@ -19,6 +19,7 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.RangeMarker
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.ide.CopyPasteManager
+import com.intellij.util.PlatformUtils
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
@@ -205,8 +206,9 @@ internal class PutGroup : VimPutBase() {
     startOffset: Int,
     endOffset: Int,
   ): Int {
-    // Temp fix for VIM-2808. Should be removed after rider will fix it's issues
-    if (isRider() || isClionNova()) return endOffset
+    // Temp fix for VIM-2808 for Rider and Clion. Should be removed after rider will fix it's issues
+    // Disable for client due to VIM-3857
+    if (isRider() || isClionNova() || PlatformUtils.isJetBrainsClient()) return endOffset
 
     val startLine = editor.offsetToBufferPosition(startOffset).line
     val endLine = editor.offsetToBufferPosition(endOffset - 1).line
