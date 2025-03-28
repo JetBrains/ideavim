@@ -16,5 +16,5 @@ internal class DoesNotMatchHandler(ignoreCase: Boolean? = null) :
   BinaryOperatorWithIgnoreCaseOption(ignoreCase) {
 
   override fun performOperation(left: VimDataType, right: VimDataType, ignoreCase: Boolean) =
-    injector.regexpService.matches(left.toVimString().value, right.toVimString().value, ignoreCase).asVimInt()
+    (!injector.regexpService.matches(right.toVimString().value, left.toVimString().value, ignoreCase)).asVimInt()
 }
