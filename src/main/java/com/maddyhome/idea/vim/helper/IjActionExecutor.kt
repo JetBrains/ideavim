@@ -101,26 +101,33 @@ internal class IjActionExecutor : VimActionExecutor {
   // [VERSION UPDATE] 251+ Remove manual execution, switch to tryToExecute
   private fun executeManually(action: AnAction): Boolean {
     if (Registry.`is`("ideavim.old.action.execution", true)) return true
-    if (isClionNova()) return true
+    if (isClionNova()) {
+      if (action.isEnter() || action.isEsc()) return false
+      return true
+    }
     if (isRider()) {
       // Special Rider logic for VIM-3826. In rider 251 everything works fine with tryToExecute
       val lessThan251 = ApplicationInfo.getInstance().build.baselineVersion < 251
-      val keyIsEnter = action.shortcutSet.shortcuts.any {
-        (it as? KeyboardShortcut)?.firstKeyStroke == KeyStroke.getKeyStroke(
-          KeyEvent.VK_ENTER,
-          0
-        )
-      }
-      val keyIsEsc = action.shortcutSet.shortcuts.any {
-        (it as? KeyboardShortcut)?.firstKeyStroke == KeyStroke.getKeyStroke(
-          KeyEvent.VK_ESCAPE,
-          0
-        )
-      }
+      val keyIsEnter = action.isEnter()
+      val keyIsEsc = action.isEsc()
       if (lessThan251 && !keyIsEnter && !keyIsEsc) return true
     }
 
     return false
+  }
+
+  private fun AnAction.isEsc(): Boolean = this.shortcutSet.shortcuts.any {
+    (it as? KeyboardShortcut)?.firstKeyStroke == KeyStroke.getKeyStroke(
+      KeyEvent.VK_ESCAPE,
+      0
+    )
+  }
+
+  private fun AnAction.isEnter(): Boolean = this.shortcutSet.shortcuts.any {
+    (it as? KeyboardShortcut)?.firstKeyStroke == KeyStroke.getKeyStroke(
+      KeyEvent.VK_ENTER,
+      0
+    )
   }
 
   private fun manualActionExecution(
