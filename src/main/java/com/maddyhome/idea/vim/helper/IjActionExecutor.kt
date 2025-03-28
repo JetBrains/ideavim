@@ -39,6 +39,7 @@ import com.maddyhome.idea.vim.api.VimActionExecutor
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import com.maddyhome.idea.vim.ide.isClionNova
 import com.maddyhome.idea.vim.ide.isRider
 import com.maddyhome.idea.vim.newapi.IjNativeAction
 import com.maddyhome.idea.vim.newapi.ij
@@ -100,6 +101,7 @@ internal class IjActionExecutor : VimActionExecutor {
   // [VERSION UPDATE] 251+ Remove manual execution, switch to tryToExecute
   private fun executeManually(action: AnAction): Boolean {
     if (Registry.`is`("ideavim.old.action.execution", true)) return true
+    if (isClionNova()) return true
     if (isRider()) {
       // Special Rider logic for VIM-3826. In rider 251 everything works fine with tryToExecute
       val lessThan251 = ApplicationInfo.getInstance().build.baselineVersion < 251
