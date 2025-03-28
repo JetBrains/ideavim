@@ -8,7 +8,6 @@
 
 package org.jetbrains.plugins.ideavim.extension.miniai
 
-import com.intellij.ide.highlighter.JavaFileType
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.BeforeEach
@@ -31,7 +30,6 @@ class MiniAIExtensionTest : VimTestCase() {
       "<caret>This is a \"'simple'\" test",
       "This is a \"<caret>\" test",
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -44,7 +42,6 @@ class MiniAIExtensionTest : VimTestCase() {
       "'balanced'false <caret>string'balanced'",
       "'balanced'false string'<caret>'",
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -57,7 +54,6 @@ class MiniAIExtensionTest : VimTestCase() {
       "\"balanced\"false <caret>string\"balanced\"",
       "\"balanced\"false string\"<caret>\"",
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -70,7 +66,6 @@ class MiniAIExtensionTest : VimTestCase() {
       "`balanced`false <caret>string`balanced`",
       "`balanced`false string`<caret>`",
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -87,7 +82,6 @@ class MiniAIExtensionTest : VimTestCase() {
       '""",
       "''",
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -103,7 +97,6 @@ class MiniAIExtensionTest : VimTestCase() {
       """",
       "\"\"",
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -120,7 +113,6 @@ class MiniAIExtensionTest : VimTestCase() {
       `""",
       "``",
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -142,7 +134,6 @@ class MiniAIExtensionTest : VimTestCase() {
       '<caret>'
       """,
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -161,7 +152,6 @@ print(something)
 {}
       """,
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -183,7 +173,6 @@ print(something)
     }
     """.trimIndent(),
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -196,7 +185,6 @@ print(something)
       "<caret>This is a `'simple'` test",
       "This is a `<caret>` test",
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -210,7 +198,6 @@ print(something)
       "<caret>This is a '\"simple\"' test",
       "This is a '<caret>' test",
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -222,7 +209,6 @@ print(something)
       "this 'simple<caret> \"test\"'",
       "this '<caret>'",
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -234,7 +220,6 @@ print(something)
       "this 'simple<caret> \"test\"'",
       "this '<caret>'",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -246,7 +231,6 @@ print(something)
       "this \"simple<caret> 'test'\"",
       "this \"<caret>\"",
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -258,7 +242,6 @@ print(something)
       "this \"simple<caret> 'test'\"",
       "this \"<caret>\"",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -270,7 +253,6 @@ print(something)
       "this `simple<caret> \"test\"`",
       "this `<caret>`",
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -282,7 +264,6 @@ print(something)
       "this `simple<caret> \"test\"`",
       "this `<caret>`",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -294,7 +275,6 @@ print(something)
       "this 'simple<caret> \"test\"'",
       "this <caret>",
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -306,7 +286,6 @@ print(something)
       "this 'simple<caret> \"test\"' test",
       "this <caret> test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -318,7 +297,6 @@ print(something)
       "this \"simple<caret> 'test'\"",
       "this <caret>",
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -330,7 +308,6 @@ print(something)
       "this \"simple<caret> 'test'\" test",
       "this <caret> test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -342,7 +319,6 @@ print(something)
       "this `simple<caret> \"test\"`",
       "this <caret>",
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -354,7 +330,6 @@ print(something)
       "this `simple<caret> \"test\"` test",
       "this <caret> test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -367,7 +342,6 @@ print(something)
       "this 'simple \"<caret>test\"'",
       "this 'simple <caret>'",
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -379,7 +353,6 @@ print(something)
       "this 'simple \"<caret>test\"'",
       "this 'simple '",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -392,7 +365,6 @@ print(something)
       "this 'simple \"nested `<caret>test`\"'",
       "this 'simple \"nested <caret>\"'",
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -404,7 +376,6 @@ print(something)
       "this 'simple \"nested `<caret>test`\"'",
       "this 'simple \"nested <caret>\"'",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -416,7 +387,6 @@ print(something)
       "<caret>This is a 'simple' test",
       "This is a '<caret>' test",
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -429,7 +399,6 @@ print(something)
       "<caret>This is a 'simple test",
       "<caret>This is a 'simple test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -442,7 +411,6 @@ print(something)
       "<caret>This is a \"simple\" test",
       "This is a \"<caret>\" test",
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -455,7 +423,6 @@ print(something)
       "<caret>This is a \"simple test",
       "<caret>This is a \"simple test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -468,7 +435,6 @@ print(something)
       "<caret>This is a `simple` test",
       "This is a `<caret>` test",
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -481,7 +447,6 @@ print(something)
       "<caret>This is a `simple test",
       "<caret>This is a `simple test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -494,7 +459,6 @@ print(something)
       "<caret>This is a 'simple' test",
       "This is a <caret> test",
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -507,7 +471,6 @@ print(something)
       "<caret>This is a 'simple test",
       "<caret>This is a 'simple test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -520,7 +483,6 @@ print(something)
       "<caret>This is a \"simple\" test",
       "This is a <caret> test",
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -533,7 +495,6 @@ print(something)
       "<caret>This is a \"simple test",
       "<caret>This is a \"simple test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -545,7 +506,6 @@ print(something)
       "<caret>This is a `simple` test",
       "This is a <caret> test",
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -558,7 +518,6 @@ print(something)
       "<caret>This is a `simple test",
       "<caret>This is a `simple test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -570,7 +529,6 @@ print(something)
       "<caret>This is a (simple) test",
       "This is a (<caret>) test",
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -583,7 +541,6 @@ print(something)
       "<caret>This is a (simple test",
       "<caret>This is a (simple test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -596,7 +553,6 @@ print(something)
       "<caret>This is a [simple] test",
       "This is a [<caret>] test",
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -609,7 +565,6 @@ print(something)
       "<caret>This is a [simple test",
       "<caret>This is a [simple test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -622,7 +577,6 @@ print(something)
       "<caret>This is a {simple} test",
       "This is a {<caret>} test",
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -635,7 +589,6 @@ print(something)
       "<caret>This is a {simple test",
       "<caret>This is a {simple test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -648,7 +601,6 @@ print(something)
       "<caret>This is a (simple) test",
       "This is a <caret> test",
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -661,7 +613,6 @@ print(something)
       "<caret>This is a (simple test",
       "<caret>This is a (simple test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -674,7 +625,6 @@ print(something)
       "<caret>This is a [simple] test",
       "This is a <caret> test",
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -686,7 +636,6 @@ print(something)
       "<caret>This is a [simple test",
       "<caret>This is a [simple test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -699,7 +648,6 @@ print(something)
       "<caret>This is a {simple} test",
       "This is a <caret> test",
       Mode.INSERT,
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -712,7 +660,6 @@ print(something)
       "<caret>This is a {simple test",
       "<caret>This is a {simple test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -725,7 +672,6 @@ print(something)
       "<caret>This is a 'simple' test",
       "This is a '<caret>' test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -738,7 +684,6 @@ print(something)
       "<caret>This is a 'simple test",
       "<caret>This is a 'simple test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -751,7 +696,6 @@ print(something)
       "<caret>This is a \"simple\" test",
       "This is a \"<caret>\" test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -764,7 +708,6 @@ print(something)
       "<caret>This is a \"simple test",
       "<caret>This is a \"simple test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -777,7 +720,6 @@ print(something)
       "<caret>This is a `simple` test",
       "This is a `<caret>` test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -790,7 +732,6 @@ print(something)
       "<caret>This is a `simple test",
       "<caret>This is a `simple test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -803,7 +744,6 @@ print(something)
       "<caret>This is a 'simple' test",
       "This is a <caret> test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -815,7 +755,6 @@ print(something)
       "<caret>This is a 'simple test",
       "<caret>This is a 'simple test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -828,7 +767,6 @@ print(something)
       "<caret>This is a \"simple\" test",
       "This is a <caret> test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -841,7 +779,6 @@ print(something)
       "<caret>This is a \"simple test",
       "<caret>This is a \"simple test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -854,7 +791,6 @@ print(something)
       "<caret>This is a `simple` test",
       "This is a <caret> test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -867,7 +803,6 @@ print(something)
       "<caret>This is a `simple test",
       "<caret>This is a `simple test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -880,7 +815,6 @@ print(something)
       "<caret>This is a (simple) test",
       "This is a (<caret>) test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -893,7 +827,6 @@ print(something)
       "<caret>This is a (simple test",
       "<caret>This is a (simple test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -906,7 +839,6 @@ print(something)
       "<caret>This is a [simple] test",
       "This is a [<caret>] test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -919,7 +851,6 @@ print(something)
       "<caret>This is a [simple test",
       "<caret>This is a [simple test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -932,7 +863,6 @@ print(something)
       "<caret>This is a {simple} test",
       "This is a {<caret>} test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -945,7 +875,6 @@ print(something)
       "<caret>This is a {simple test",
       "<caret>This is a {simple test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -958,7 +887,6 @@ print(something)
       "<caret>This is a (simple) test",
       "This is a <caret> test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -971,7 +899,6 @@ print(something)
       "<caret>This is a (simple test",
       "<caret>This is a (simple test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -984,7 +911,6 @@ print(something)
       "<caret>This is a [simple] test",
       "This is a <caret> test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -997,7 +923,6 @@ print(something)
       "<caret>This is a [simple test",
       "<caret>This is a [simple test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -1010,7 +935,6 @@ print(something)
       "<caret>This is a {simple} test",
       "This is a <caret> test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
@@ -1023,7 +947,6 @@ print(something)
       "<caret>This is a {simple test",
       "<caret>This is a {simple test",
       Mode.NORMAL(),
-      JavaFileType.INSTANCE,
     )
     assertSelection(null)
   }
