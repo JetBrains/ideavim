@@ -104,13 +104,13 @@ internal class IjActionExecutor : VimActionExecutor {
       // Special Rider logic for VIM-3826. In rider 251 everything works fine with tryToExecute
       val lessThan251 = ApplicationInfo.getInstance().build.baselineVersion < 251
       val keyIsEnter = action.shortcutSet.shortcuts.any {
-        (it as KeyboardShortcut).firstKeyStroke == KeyStroke.getKeyStroke(
+        (it as? KeyboardShortcut)?.firstKeyStroke == KeyStroke.getKeyStroke(
           KeyEvent.VK_ENTER,
           0
         )
       }
       val keyIsEsc = action.shortcutSet.shortcuts.any {
-        (it as KeyboardShortcut).firstKeyStroke == KeyStroke.getKeyStroke(
+        (it as? KeyboardShortcut)?.firstKeyStroke == KeyStroke.getKeyStroke(
           KeyEvent.VK_ESCAPE,
           0
         )
