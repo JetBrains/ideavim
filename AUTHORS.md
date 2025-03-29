@@ -587,6 +587,10 @@ Contributors:
   [![icon][github]](https://github.com/Iliya-usov)
   &nbsp;
   Ilya Usov
+* [![icon][mail]](mailto:peterHoburg@users.noreply.github.com)
+  [![icon][github]](https://github.com/peterHoburg)
+  &nbsp;
+  Peter Hoburg
 
 Previous contributors:
 
