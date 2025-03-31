@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.helper
 
+import com.intellij.execution.actions.StopAction
 import com.intellij.openapi.actionSystem.ActionGroup
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
@@ -89,13 +90,24 @@ internal class IjActionExecutor : VimActionExecutor {
         // The context component should be editor. This is especially important when running the `:action` commands
         //  because at the moment of execution, the focused component is Ex Field, not editor.
         val contextComponent = editor?.ij?.contentComponent
-        val res = ActionManager.getInstance().tryToExecute(ijAction, null, contextComponent, "IdeaVim", true)
+        val place = ijAction.choosePlace()
+        val res = ActionManager.getInstance().tryToExecute(ijAction, null, contextComponent, place, true)
         res.waitFor(5_000)
         return res.isDone
       } finally {
         isRunningActionFromVim = false
       }
     }
+  }
+
+  // Note: We should find a proper place for the IdeaVim actions
+  // Currently, we use "IdeaVim" except a few actions
+  private fun AnAction.choosePlace(): String {
+    // StopAction works fine if `StopAction.isPlaceGlobal` returns true
+    // Or if there is a specific data stored in the context. This data, however, is stored
+    //   only if the run window is in focus.
+    if (this is StopAction) return ActionPlaces.ACTION_SEARCH
+    return "IdeaVim"
   }
 
   // [VERSION UPDATE] 251+ Remove manual execution, switch to tryToExecute
