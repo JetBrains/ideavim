@@ -143,19 +143,12 @@ fun parseOptionLine(
     }
   }
 
-  // We now have 1 or more option operators separator by spaces
+  // We now have 1 or more option operators separator by spaces. Some of the option values might have escaped whitespace
   var error: String? = null
-  val tokenizer = StringTokenizer(argument)
+  val tokenizer = EscapedWhitespaceStringTokenizer(argument)
   val toShow = mutableListOf<Pair<String, String>>()
   while (tokenizer.hasMoreTokens()) {
-    var token = tokenizer.nextToken()
-    // See if a space has been backslashed, if not get the rest of the text
-    while (token.endsWith("\\")) {
-      token = token.take(token.length - 1) + ' '
-      if (tokenizer.hasMoreTokens()) {
-        token += tokenizer.nextToken()
-      }
-    }
+    val token = tokenizer.nextToken()
 
     val eq = token.indexOf('=')
     val colon = token.indexOf(':')
@@ -335,5 +328,15 @@ private fun removeValue(option: Option<VimDataType>, currentValue: VimDataType, 
     is StringListOption -> option.removeValue(currentValue as VimString, value as VimString)
     is NumberOption -> option.subtractValues(currentValue as VimInt, value as VimInt)
     else -> null
+  }
+}
+
+private class EscapedWhitespaceStringTokenizer(string: String) : StringTokenizer(string) {
+  override fun nextToken(): String {
+    var token = super.nextToken()
+    while (token.endsWith("\\") && hasMoreTokens()) {
+      token = token.substring(0, token.length - 1) + ' ' + super.nextToken()
+    }
+    return token
   }
 }
