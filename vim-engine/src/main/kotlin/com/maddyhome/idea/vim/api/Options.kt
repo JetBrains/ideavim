@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.options.UnsignedNumberOption
 import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper
+import com.maddyhome.idea.vim.options.helpers.LangMapOptionHelper
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
@@ -289,6 +290,55 @@ object Options {
         }
       }
     })
+
+  val langmap: StringListOption = addOption(object : StringListOption("langmap", GLOBAL, "lmap", VimString.EMPTY) {
+    override fun split(value: String): List<String> {
+      return LangMapOptionHelper.split(value)
+    }
+
+    override fun checkIfValueValid(value: VimString, token: String, isPartialValue: Boolean) {
+      LangMapOptionHelper.parse(value.value, token)
+    }
+
+    override fun parseValue(value: String, token: String): VimString {
+      // TODO: This should probably be handled when parsing the command argument
+      // Firstly, unescape any quotes or bars. These are escaped to prevent comments and starting a new command. Vim
+      // appears to handle this separately to parsing the option value.
+      val unescapedValue = value.replace("\\" + "\"", "\"").replace("\\|", "|")
+
+      // TODO: We should probably be doing this for other options too
+      // See `:help option-backslash`
+      // Whitespace (and for 'langmap' semicolon, comma, quote and bar) needs to be escaped with a backslash, but to
+      // include a backslash, you have to use two. I.e. `:set langmap=a\,` fails, because Vim sees this as `langmap=a,`.
+      // You need to use `:set langmap=a\\,` to map `a` to `,`.
+      // We see this in action with the Dvorak langmap which starts `:set langmap='q,\\,w,.e`. The first pair is `'q`,
+      // the second is `\,w` and then `.e`. We can check this with `:set langmap?`, and Vim will print
+      // `langmap='q,\,w,.e` - the double backslash has become an escape for the comma.
+      val processedValue = if (!unescapedValue.contains('\\')) unescapedValue else buildString {
+        // Note that this loop means we drop a trailing backslash, which is what appears to happen with Vim - the docs
+        // say that the number of backslashes is halved (rounded down)
+        // E.g. `:set langmap=\\\ab` is parsed as `\ab` (`:set langmap?`)
+        var inBackslash = false
+        for (c in unescapedValue) {
+          if (c == '\\') {
+            if (inBackslash) {
+              append('\\')
+              inBackslash = false
+            } else {
+              inBackslash = true
+            }
+          }
+          else {
+            append(c)
+            inBackslash = false
+          }
+        }
+
+        if (inBackslash) append('\\')
+      }
+      return super.parseValue(processedValue, token)
+    }
+  })
 
   val matchpairs: StringListOption =
     addOption(object : StringListOption("matchpairs", LOCAL_TO_BUFFER, "mps", "(:),{:},[:]") {
