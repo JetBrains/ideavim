@@ -47,6 +47,8 @@ data class VimString(val value: String) : VimDataType("string") {
     throw exExceptionMessage("E892")
   }
 
+  val isEmpty: Boolean get() = value.isEmpty()
+
   override fun toVimNumber(): VimInt {
     // Vim will automatically convert a String to a Number when required during evaluation. The value is not parsed as
     // strictly as the text used to create a Number expression - Vim allows trailing characters for Number, so something

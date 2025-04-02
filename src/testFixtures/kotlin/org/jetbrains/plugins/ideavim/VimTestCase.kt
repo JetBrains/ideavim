@@ -773,7 +773,12 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
   }
 
   fun assertPluginError(isError: Boolean) {
-    assertEquals(isError, injector.messages.isError(), injector.messages.getStatusBarMessage() ?: "<No error message>")
+    if (!isError) {
+      assertEquals(isError, injector.messages.isError(), injector.messages.getStatusBarMessage() ?: "Unknown error")
+    }
+    else {
+      assertEquals(isError, injector.messages.isError(), injector.messages.getStatusBarMessage() ?: "<No error message>")
+    }
   }
 
   fun assertPluginErrorMessage(message: String) {
