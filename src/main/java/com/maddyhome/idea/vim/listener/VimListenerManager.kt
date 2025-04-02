@@ -116,6 +116,8 @@ import com.maddyhome.idea.vim.newapi.IjVimSearchGroup
 import com.maddyhome.idea.vim.newapi.InsertTimeRecorder
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.options.helpers.LangNoRemapChangeListener
+import com.maddyhome.idea.vim.options.helpers.LangRemapChangeListener
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.inSelectMode
 import com.maddyhome.idea.vim.state.mode.selectionType
@@ -222,18 +224,22 @@ object VimListenerManager {
       }
 
       val optionGroup = VimPlugin.getOptionGroup()
+      optionGroup.addEffectiveOptionValueChangeListener(Options.guicursor, GuicursorChangeListener)
+      optionGroup.addGlobalOptionChangeListener(Options.langremap, LangRemapChangeListener)
+      optionGroup.addGlobalOptionChangeListener(Options.langnoremap, LangNoRemapChangeListener)
       optionGroup.addEffectiveOptionValueChangeListener(Options.number, NumberChangeListener)
       optionGroup.addEffectiveOptionValueChangeListener(
         IjOptions.relativenumber,
         NumberChangeListener
       )
       optionGroup.addEffectiveOptionValueChangeListener(Options.scrolloff, ScrollOptionsChangeListener)
-      optionGroup.addEffectiveOptionValueChangeListener(Options.guicursor, GuicursorChangeListener)
       optionGroup.addGlobalOptionChangeListener(Options.showcmd, ShowCmdOptionChangeListener)
-
-      // This code is executed after ideavimrc execution, so we trigger onGlobalOptionChanged just in case
       optionGroup.addGlobalOptionChangeListener(Options.showmode, modeWidgetOptionListener)
       optionGroup.addGlobalOptionChangeListener(Options.showmode, macroWidgetOptionListener)
+
+      // The listeners are registered _after_ ideavimrc has been evaluated, so trigger these listeners to ensure we're
+      // up to date
+      // TODO: Why do we register listeners after evaluating ideavimrc?
       modeWidgetOptionListener.onGlobalOptionChanged()
       macroWidgetOptionListener.onGlobalOptionChanged()
 
@@ -263,6 +269,9 @@ object VimListenerManager {
       EventFacade.getInstance().restoreTypedActionHandler()
 
       val optionGroup = VimPlugin.getOptionGroup()
+      optionGroup.removeEffectiveOptionValueChangeListener(Options.guicursor, GuicursorChangeListener)
+      optionGroup.removeGlobalOptionChangeListener(Options.langremap, LangRemapChangeListener)
+      optionGroup.removeGlobalOptionChangeListener(Options.langnoremap, LangNoRemapChangeListener)
       optionGroup.removeEffectiveOptionValueChangeListener(Options.number, NumberChangeListener)
       optionGroup.removeEffectiveOptionValueChangeListener(
         IjOptions.relativenumber,
@@ -272,7 +281,6 @@ object VimListenerManager {
       optionGroup.removeGlobalOptionChangeListener(Options.showcmd, ShowCmdOptionChangeListener)
       optionGroup.removeGlobalOptionChangeListener(Options.showmode, modeWidgetOptionListener)
       optionGroup.removeGlobalOptionChangeListener(Options.showmode, macroWidgetOptionListener)
-      optionGroup.removeEffectiveOptionValueChangeListener(Options.guicursor, GuicursorChangeListener)
 
       BufNewFileTracker.clear()
     }

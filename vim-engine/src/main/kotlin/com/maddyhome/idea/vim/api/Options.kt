@@ -151,6 +151,22 @@ object Options {
       )
     )
   )
+
+  /**
+   * This is the inverse of `'langremap'`. Only for backwards compatibility
+   */
+  val langnoremap: ToggleOption = addOption(ToggleOption("langnoremap", GLOBAL, "lnr", true))
+
+  /**
+   * On if `'langmap'` applies to the results of a mapping
+   *
+   * Vim defaults to "on", but sets to "off" in defaults.vim. Neovim defaults to "off". Off is the better default value,
+   * and Vim clearly thinks so too, but maintains the old "on" default to avoid breaking changes.
+   *
+   * Changing this value sets `'langnoremap'` and vice versa.
+   */
+  val langremap: ToggleOption = addOption(ToggleOption("langremap", GLOBAL, "lrm", false))
+
   val maxmapdepth: NumberOption = addOption(NumberOption("maxmapdepth", GLOBAL, "mmd", 20))
   val maxsearchcount: UnsignedNumberOption = addOption(
     object : UnsignedNumberOption("maxsearchcount", GLOBAL, "msc", 999) {
