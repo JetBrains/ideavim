@@ -9,9 +9,11 @@
 package com.maddyhome.idea.vim.options.helpers
 
 import com.maddyhome.idea.vim.api.Options
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.Graphemes
 import com.maddyhome.idea.vim.ex.exExceptionMessage
+import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 // `'langmap'` maps a typed char to an ASCII char
@@ -143,5 +145,31 @@ object LangMapOptionHelper {
       throw exExceptionMessage("E357", lastChar, token)  // E357: 'langmap': Matching character missing for {0}: {1}
     }
     return next
+  }
+}
+
+object LangRemapChangeListener : GlobalOptionChangeListener {
+  override fun onGlobalOptionChanged() {
+    val langremap = injector.globalOptions().langremap
+    val langnoremap = injector.globalOptions().langnoremap
+    if (langremap != !langnoremap) {
+      injector.globalOptions().langnoremap = !langremap
+    }
+  }
+}
+
+/**
+ * Update `'langremap'` when `'langnoremap'` changes
+ *
+ * The `'langnoremap'` option is just for backwards compatibility. I presume it was added during development of langmap,
+ * without realising how horrible `'nolongnoremap'` is to understand.
+ */
+object LangNoRemapChangeListener : GlobalOptionChangeListener {
+  override fun onGlobalOptionChanged() {
+    val langremap = injector.globalOptions().langremap
+    val langnoremap = injector.globalOptions().langnoremap
+    if (langremap != !langnoremap) {
+      injector.globalOptions().langremap = !langnoremap
+    }
   }
 }

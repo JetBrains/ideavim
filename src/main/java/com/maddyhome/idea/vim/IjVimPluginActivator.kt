@@ -93,7 +93,9 @@ internal class IjVimPluginActivator : VimPluginActivator {
     }
 
     // 5) Turning on should be performed after all commands registration
-    (VimPlugin.getSearch() as IjVimSearchGroup).turnOn()
+    VimPlugin.getSearch().turnOn()
+
+    // TODO: Consider moving this before evaluating ideavimrc, so we can react to users changing settings
     VimListenerManager.turnOn()
   }
 
