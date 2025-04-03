@@ -22,7 +22,7 @@ class VimApplicationStub : VimApplicationBase() {
     TODO("Not yet implemented")
   }
 
-  override fun invokeLater(action: () -> Unit, editor: VimEditor) {
+  override fun invokeLater(editor: VimEditor, action: () -> Unit) {
     TODO("Not yet implemented")
   }
 

@@ -37,149 +37,195 @@ object MappingProcessor : KeyConsumer {
     mappingCompleted: Boolean,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
-    log.trace { "Entered MappingProcessor" }
+    log.trace { "Entered MappingProcessor with key $key" }
+
     if (!allowKeyMappings) return false
 
     log.debug("Start processing key mappings.")
+
     val keyState = keyProcessResultBuilder.state
-    val mappingState = keyState.mappingState
-    val commandBuilder = keyState.commandBuilder
-    if (commandBuilder.isAwaitingCharOrDigraphArgument()
-      || commandBuilder.isBuildingMultiKeyCommand()
-      || commandBuilder.isRegisterPending
-      || isMappingDisabledForKey(key, keyState)
-    ) {
+
+    if (!isMappingApplicable(keyState.commandBuilder, key, keyState)) {
       log.debug("Mapping not applicable. Finish key processing, returning false")
       return false
     }
+
+    val mappingState = keyState.mappingState
     mappingState.stopMappingTimer()
 
     // Save the unhandled keystrokes until we either complete or abandon the sequence.
-    log.trace("Add key to mapping state")
+    log.trace { "Add key to mapping state: $key" }
     mappingState.addKey(key)
+
     val mappingMode = editor.mode.toMappingMode()
-    val mapping = injector.keyGroup.getKeyMappingLayer(mappingMode)
     log.trace { "Get keys for mapping mode. mode = $mappingMode" }
+    val mapping = injector.keyGroup.getKeyMappingLayer(mappingMode)
 
     // Returns true if any of these methods handle the key. False means that the key is unrelated to mapping and should
     // be processed as normal.
+    // TODO: This pipeline is confusing - each function has knowledge of where it is in the pipeline
+    // E.g. handleCompleteMappingSequence assumes it's not a prefix because it's called after handleUnfinishedMappingSeq
+    // Perhaps this should be simplified to `if (isUnfinishedMappingSequence) process() else if (isComplete...)`?
+    // The benefit of the existing functions is that we always fall through to handleAbandoned, which sorts everything
     val mappingProcessed =
-      handleUnfinishedMappingSequence(keyProcessResultBuilder, mapping, mappingCompleted) ||
-        handleCompleteMappingSequence(keyProcessResultBuilder, mapping, key) ||
-        handleAbandonedMappingSequence(keyProcessResultBuilder)
+      handleUnfinishedMappingSequence(editor, keyProcessResultBuilder, mapping, mappingCompleted)
+        || handleCompleteMappingSequence(keyProcessResultBuilder, mapping, key)
+        || handleAbandonedMappingSequence(keyProcessResultBuilder)
     log.debug { "Finish mapping processing. Return $mappingProcessed" }
 
     return mappingProcessed
   }
 
-  private fun isMappingDisabledForKey(key: KeyStroke, keyState: KeyHandlerState): Boolean {
-    // "0" can be mapped, but the mapping isn't applied when entering a count. Other digits are always mapped, even when
-    // entering a count.
-    // See `:help :map-modes`
-    val isMappingDisabled = key.keyChar == '0' && keyState.commandBuilder.hasCountCharacters()
-    log.debug { "Mapping disabled for key: $isMappingDisabled" }
-    return isMappingDisabled
+  private fun isMappingApplicable(commandBuilder: CommandBuilder, key: KeyStroke, keyState: KeyHandlerState): Boolean {
+    // Mapping is not applied to character/digraph arguments (e.g. `f{char}` or register names).
+    // It's also not applied partway through an existing command - e.g. `<C-W>s` does not apply any maps for `s`.
+    return !commandBuilder.isAwaitingCharOrDigraphArgument()
+      && !commandBuilder.isBuildingMultiKeyCommand()
+      && !commandBuilder.isRegisterPending
+      && !isTypingZeroInCommandCount(key, keyState)
   }
 
+  private fun isTypingZeroInCommandCount(key: KeyStroke, keyState: KeyHandlerState): Boolean {
+    // "0" can be mapped, but the mapping isn't applied when entering a count. Other digits are always mapped, even when
+    // entering a count. Note that the docs state that this is for Normal, but it also applies in Visual and Op-pending.
+    // (E.g. `:imap 0 3` -> `d20w` will still delete 20 words, not 23, but `d0w` will delete 3, `2d0w` will delete 6).
+    // Essentially, if we've got a count, don't map.
+    // See `:help :map-modes`
+    return key.keyChar == '0' && keyState.commandBuilder.hasCountCharacters()
+  }
+
+  /**
+   * Handles the next key in an ongoing key sequence, if applicable
+   *
+   * If the current key sequence, including the current key, is a prefix to other mappings, then we consider this an
+   * unfinished sequence. We wait for the next keystroke or, if `'timeout'` is set, start a timer to abandon the mapping
+   * if no other keys are pressed.
+   */
   private fun handleUnfinishedMappingSequence(
-    processBuilder: KeyProcessResult.KeyProcessResultBuilder,
+    editor: VimEditor,
+    keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
     mapping: KeyMappingLayer,
     mappingCompleted: Boolean,
   ): Boolean {
-    log.trace("processing unfinished mappings...")
+    log.trace("Processing unfinished mappings...")
+
+    // This is set when we need to replay an unhandled key sequence. That sequence was a prefix to a mapping that wasn't
+    // completed, either due to a timeout or a key that wasn't part of the mapping. The unhandled keys are passed
+    // through the key handler again, with this flag set to prevent us trying to map them again.
+    // TODO: Try to remove this, so we don't have to pass yet more state around
+    // When replaying, we should find the longest viable mapping and invoke it, then pass the remaining keys back to key
+    // handler without any flags set - they can be mapped. If there is no mapping in the previous sequence, then pass
+    // all the keys back to key handler with the allowKeyMappings flag set to false.
     if (mappingCompleted) {
-      log.trace("mapping is already completed. Returning false.")
+      log.trace("Mapping is already completed. Returning false.")
       return false
     }
 
-    // Is there at least one mapping that starts with the current sequence? This does not include complete matches,
-    // unless a sequence is also a prefix for another mapping. We eagerly evaluate the shortest mapping, so even if a
-    // mapping is a prefix, it will get evaluated when the next character is entered.
-    // Note that currentlyUnhandledKeySequence is the same as the state after commandState.getMappingKeys().add(key). It
-    // would be nice to tidy this up
-    if (!mapping.isPrefix(processBuilder.state.mappingState.keys)) {
+    // If the current sequence, with the current key, is a prefix to one or more mappings, then it's unfinished. A
+    // completed sequence is not a prefix to itself - this function will return false unless it's also a prefix for
+    // other mappings.
+    if (!mapping.isPrefix(keyProcessResultBuilder.state.mappingState.keys)) {
       log.debug("There are no mappings that start with the current sequence. Returning false.")
       return false
     }
 
-    // If the timeout option is set, set a timer that will abandon the sequence and replay the unhandled keys unmapped.
-    // Every time a key is pressed and handled, the timer is stopped. E.g. if there is a mapping for "dweri", and the
-    // user has typed "dw" wait for the timeout, and then replay "d" and "w" without any mapping (which will of course
-    // delete a word)
-    processBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, lambdaContext ->
-      processUnfinishedMappingSequence(
-        lambdaEditor,
-        lambdaContext,
-        lambdaKeyState
-      )
+    // If the 'timeout' option is set, start a timer that will abandon the sequence and replay the unhandled keys
+    // unmapped. Every time a key is pressed and handled, the timer is stopped. E.g. if there is a mapping for "dweri",
+    // and the user has typed "dw" wait for the timeout, and then replay "d" and "w" without any mapping (which will of
+    // course delete a word)
+    if (injector.options(editor).timeout) {
+      log.trace("'timeout' is set. Scheduling the mapping timer")
+
+      keyProcessResultBuilder.addExecutionStep { ks, e, c ->
+        ks.mappingState.startMappingTimer { onUnfinishedMappingSequenceTimeout(editor, ks, c) }
+      }
+    }
+    else {
+      log.trace("'timeout' is not set. Waiting for the next keystroke")
     }
     return true
   }
 
-  private fun processUnfinishedMappingSequence(
+  private fun onUnfinishedMappingSequenceTimeout(
     editor: VimEditor,
-    context: ExecutionContext,
     keyState: KeyHandlerState,
+    context: ExecutionContext,
   ) {
-    if (injector.options(editor).timeout) {
-      log.trace("timeout is set. schedule a mapping timer")
-      // XXX There is a strange issue that reports that mapping state is empty at the moment of the function call.
-      //   At the moment, I see the only one possibility this to happen - other key is handled after the timer executed,
-      //   but before invoke later is handled. This is a rare case, so I'll just add a check to isPluginMapping.
-      //   But this "unexpected behaviour" exists, and it would be better not to relay on mutable state with delays.
-      //   https://youtrack.jetbrains.com/issue/VIM-2392
-      val mappingState = keyState.mappingState
-      mappingState.startMappingTimer {
-        injector.application.invokeLater(
-          {
-            log.debug("Delayed mapping timer call")
-            val unhandledKeys = mappingState.detachKeys()
-            if (editor.isDisposed() || isPluginMapping(unhandledKeys)) {
-              log.debug("Abandon mapping timer")
-              return@invokeLater
-            }
-            log.trace("processing unhandled keys...")
-            for ((index, keyStroke) in unhandledKeys.withIndex()) {
-              // Related issue: VIM-2315
-              // If we have two mappings: for `abc` and for `ab`, after typing `ab` we should wait a bit and execute
-              //   `ab` mapping
-              // So, we rerun all keys with mappings with "mappingsCompleted" for the last char to avoid infinite loop
-              //  of waiting for `abc` mapping.
-              val lastKeyInSequence = index == unhandledKeys.lastIndex
+      injector.application.invokeLater(editor) {
+        log.debug("Delayed mapping timer call")
 
-              val keyHandler = KeyHandler.getInstance()
-              keyHandler.handleKey(
-                editor,
-                keyStroke,
-                context,
-                allowKeyMappings = true,
-                mappingCompleted = lastKeyInSequence,
-                keyState,
-              )
-            }
-          },
-          editor,
-        )
+        val unhandledKeys = keyState.mappingState.detachKeys()
+
+        // XXX There is a strange issue that reports that mapping state is empty at the moment of the function call.
+        //   At the moment, I see the only one possibility this to happen - other key is handled after the timer executed,
+        //   but before invoke later is handled. This is a rare case, so I'll just add a check to isPluginMapping.
+        //   But this "unexpected behaviour" exists, and it would be better not to relay on mutable state with delays.
+        //   https://youtrack.jetbrains.com/issue/VIM-2392
+        if (editor.isDisposed() || isPluginMapping(unhandledKeys)) {
+          log.debug("Abandon mapping timer")
+          return@invokeLater
+        }
+
+        log.trace("Replaying unhandled keys...")
+
+        // TODO: Centralise replaying unhandled keys
+        // Find the longest sequence that's a mapping and execute it. Then replay the remaining keys, allowing
+        // mapping. This will remove the need for mappingComplete.
+        for ((index, keyStroke) in unhandledKeys.withIndex()) {
+          // TODO: There is a bug if the previous longest sequence is not the last char
+          // Related issue: VIM-2315
+          // If we have two mappings: for `abc` and for `ab`, after typing `ab` we should wait a bit and execute
+          //   `ab` mapping
+          // So, we rerun all keys with mappings with "mappingsCompleted" for the last char to avoid infinite loop
+          //  of waiting for `abc` mapping.
+          val lastKeyInSequence = index == unhandledKeys.lastIndex
+
+          val keyHandler = KeyHandler.getInstance()
+          keyHandler.handleKey(
+            editor,
+            keyStroke,
+            context,
+            allowKeyMappings = true,
+            mappingCompleted = lastKeyInSequence,
+            keyState,
+          )
+        }
       }
-    }
-    log.trace("Unfinished mapping processing finished")
   }
 
+  /**
+   * Handles a complete key sequence, if applicable
+   *
+   * If the current sequence completes a mapping, then execute it. If not, do nothing.
+   *
+   * TODO: This documentation doesn't match current implementation.
+   */
   private fun handleCompleteMappingSequence(
     processBuilder: KeyProcessResult.KeyProcessResultBuilder,
     mapping: KeyMappingLayer,
     key: KeyStroke,
   ): Boolean {
     log.trace("Processing complete mapping sequence...")
+
     // The current sequence isn't a prefix, check to see if it's a completed sequence.
+    // TODO: The current sequence might be a prefix
+    // If an unfinished sequence times out, we replay with mapping enabled, and set mappingComplete for the last char,
+    // which skips the unfinished check. In this case, it is a prefix, but we try to complete it, or complete a mapping
+    // for the sequence that ends the character before.
+    // If we simplify the replay mechanism, we don't need to worry about this.
     val mappingState = processBuilder.state.mappingState
-    val currentMappingInfo = mapping.getLayer(mappingState.keys)
-    var mappingInfo = currentMappingInfo
+    val mappingInfoForCurrentSequence = mapping.getLayer(mappingState.keys)
+    var mappingInfo = mappingInfoForCurrentSequence
     if (mappingInfo == null) {
       log.trace("Haven't found any mapping info for the given sequence. Trying to apply mapping to a subsequence.")
+
       // It's an abandoned sequence, check to see if the previous sequence was a complete sequence.
       // TODO: This is incorrect behaviour
       // What about sequences that were completed N keys ago?
+      // I.e. if we have `imap ab AB` and `imap abcde ABCDE`, this will try to handle `abcd`, which isn't a map
+      // This will likely drop us into handleAbandonedMappingSequence, which will start replaying key strokes, but
+      // crucially without mapping and without invoking any earlier complete sequences, so we end up with `abcd` instead
+      // of `ABcd`.
       // This should really be handled as part of an abandoned key sequence. We should also consolidate the replay
       // of cached keys - this happens in timeout, here and also in abandoned sequences.
       // Extract most of this method into handleMappingInfo. If we have a complete sequence, call it and we're done.
@@ -194,19 +240,14 @@ object MappingProcessor : KeyConsumer {
         mappingInfo = mapping.getLayer(previouslyUnhandledKeySequence)
       }
     }
+
     if (mappingInfo == null) {
       log.trace("Cannot find any mapping info for the sequence. Return false.")
       return false
     }
-    processBuilder.addExecutionStep { b, c, d ->
-      processCompleteMappingSequence(
-        key,
-        b,
-        c,
-        d,
-        mappingInfo,
-        currentMappingInfo
-      )
+
+    processBuilder.addExecutionStep { ks, e, c ->
+      processCompleteMappingSequence(key, ks, e, c, mappingInfo, mappingInfoForCurrentSequence)
     }
     return true
   }
@@ -217,11 +258,15 @@ object MappingProcessor : KeyConsumer {
     editor: VimEditor,
     context: ExecutionContext,
     mappingInfo: MappingInfoLayer,
-    currentMappingInfo: MappingInfoLayer?,
+    mappingInfoForCurrentSequence: MappingInfoLayer?,
   ) {
     val mappingState = keyState.mappingState
     mappingState.resetMappingSequence()
+
     log.trace("Executing mapping info")
+
+    // Catch any exception, but also NotImplementedError. Don't just catch Throwable, as this will catch exceptions
+    // thrown by log.error, which can include TestLoggerAssertionError
     try {
       mappingState.startMapExecution()
       mappingInfo.execute(editor, context, keyState)
@@ -240,8 +285,8 @@ object MappingProcessor : KeyConsumer {
       injector.messages.indicateError()
       log.error(
         """
-                 Caught exception during ${mappingInfo.getPresentableString()}
-                 ${e.message}
+                Caught exception during ${mappingInfo.getPresentableString()}
+                ${e.message}
         """.trimIndent(),
         e
       )
@@ -250,15 +295,22 @@ object MappingProcessor : KeyConsumer {
     }
 
     // If we've just evaluated the previous key sequence, make sure to also handle the current key
-    if (mappingInfo !== currentMappingInfo) {
+    if (mappingInfo !== mappingInfoForCurrentSequence) {
       log.trace("Evaluating the current key")
       KeyHandler.getInstance().handleKey(editor, key, context, allowKeyMappings = true, false, keyState)
     }
-    log.trace("Success processing of mapping")
+    log.trace("Completed mapping sequence")
   }
 
+  /**
+   * Handle a key sequence that is no longer a prefix to a mapping
+   *
+   * If the user enters a key that is not part of a prefix and doesn't complete a mapping, then replay the unhandled
+   * keys so that they get processed.
+   */
   private fun handleAbandonedMappingSequence(processBuilder: KeyProcessResult.KeyProcessResultBuilder): Boolean {
     log.debug("Processing abandoned mapping sequence")
+
     // The user has terminated a mapping sequence with an unexpected key
     // E.g. if there is a mapping for "hello" and user enters command "help" the processing of "h", "e" and "l" will be
     //   prevented by this handler. Make sure the currently unhandled keys are processed as normal.
@@ -270,20 +322,13 @@ object MappingProcessor : KeyConsumer {
       return false
     }
 
-    // Okay, look at the code below. Why is the first key handled separately?
-    // Let's assume the next mappings:
-    //   - map ds j
-    //   - map I 2l
-    // If user enters `dI`, the first `d` will be caught be this handler because it's a prefix for `ds` command.
-    //  After the user enters `I`, the caught `d` should be processed without mapping, and the rest of keys
-    //  should be processed with mappings (to make I work)
     processBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, lambdaContext ->
-      processAbondonedMappingSequence(unhandledKeyStrokes, lambdaEditor, lambdaContext, lambdaKeyState)
+      processAbandonedMappingSequence(unhandledKeyStrokes, lambdaEditor, lambdaContext, lambdaKeyState)
     }
     return true
   }
 
-  private fun processAbondonedMappingSequence(
+  private fun processAbandonedMappingSequence(
     unhandledKeyStrokes: List<KeyStroke>,
     editor: VimEditor,
     context: ExecutionContext,
@@ -291,6 +336,10 @@ object MappingProcessor : KeyConsumer {
   ) {
     if (isPluginMapping(unhandledKeyStrokes)) {
       log.trace("This is a plugin mapping, process it")
+
+      // We've typed a key that causes us to abandon the sequence. If it's an (unfinished) <Plug> sequence, ignore the
+      // plugin sequence and only replay the last character?
+      // TODO: Why do we skip this <Plug> prefix? Why not push it through without mapping? Surely that's the expected behaviour
       KeyHandler.getInstance().handleKey(
         editor,
         unhandledKeyStrokes[unhandledKeyStrokes.size - 1],
@@ -301,6 +350,14 @@ object MappingProcessor : KeyConsumer {
       )
     } else {
       log.trace("Process abandoned keys.")
+
+      // Okay, look at the code below. Why is the first key handled separately?
+      // Let's assume the next mappings:
+      //   - map ds j
+      //   - map I 2l
+      // If user enters `dI`, the first `d` will be caught be this handler because it's a prefix for `ds` command.
+      //  After the user enters `I`, the caught `d` should be processed without mapping, and the rest of keys
+      //  should be processed with mappings (to make I work)
       KeyHandler.getInstance()
         .handleKey(
           editor,
@@ -324,6 +381,11 @@ object MappingProcessor : KeyConsumer {
   //   - map I <Plug>i
   //   For `IA` someAction should be executed.
   //   But if the user types `Ib`, `<Plug>i` won't be executed again. Only `b` will be passed to keyHandler.
+  // TODO: If we change how we replay keys, this logic needs to be revisited
+  // User types `I`, which is a complete sequence. Since it's a recursive mapping, `<Plug>i` is pushed through the key
+  // handler. It's an unfinished sequence. The user types `b` and we've now got an abandoned sequence. I would expect
+  // Vim to replay everything (`<Plug>ib`) with no mapping, but we seem to skip the `<Plug>` prefix completely.
+  // I still don't understand why
   private fun isPluginMapping(unhandledKeyStrokes: List<KeyStroke>): Boolean {
     return unhandledKeyStrokes.isNotEmpty() && unhandledKeyStrokes[0] == injector.parser.plugKeyStroke
   }
