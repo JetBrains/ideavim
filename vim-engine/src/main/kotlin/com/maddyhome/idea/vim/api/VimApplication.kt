@@ -12,7 +12,7 @@ import javax.swing.KeyStroke
 
 interface VimApplication {
   fun isMainThread(): Boolean
-  fun invokeLater(action: () -> Unit, editor: VimEditor)
+  fun invokeLater(editor: VimEditor, action: () -> Unit)
   fun invokeLater(action: () -> Unit)
   fun isUnitTest(): Boolean
   fun isInternal(): Boolean

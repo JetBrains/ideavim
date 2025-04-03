@@ -32,7 +32,7 @@ internal class IjVimApplication : VimApplicationBase() {
     return ApplicationManager.getApplication().isDispatchThread
   }
 
-  override fun invokeLater(action: () -> Unit, editor: VimEditor) {
+  override fun invokeLater(editor: VimEditor, action: () -> Unit) {
     ApplicationManager.getApplication()
       .invokeLater(action, ModalityState.stateForComponent((editor as IjVimEditor).editor.component))
   }
