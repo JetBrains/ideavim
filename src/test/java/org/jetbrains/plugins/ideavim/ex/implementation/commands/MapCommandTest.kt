@@ -10,6 +10,7 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 import com.intellij.idea.TestFor
 import com.intellij.testFramework.LoggedErrorProcessor
 import com.maddyhome.idea.vim.KeyHandler
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.keys
 import com.maddyhome.idea.vim.command.MappingMode
@@ -21,6 +22,7 @@ import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.exceptionMappingOwner
+import org.jetbrains.plugins.ideavim.waitAndAssert
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -105,16 +107,16 @@ class MapCommandTest : VimTestCase() {
     enterCommand("imap <C-Down> <C-O>gt")
     enterCommand("nmap ,f <Plug>Foo")
     enterCommand("nmap <Plug>Foo iHello<Esc>")
-    enterCommand("imap")
-    assertExOutput(
+
+    assertCommandOutput("imap",
       """
         |i  <C-Down>      <C-O>gt
         |i  bar           <Esc>
         |i  foo           bar
       """.trimMargin(),
     )
-    enterCommand("map")
-    assertExOutput(
+
+    assertCommandOutput("map",
       """
         |   <C-Down>      gt
         |n  <Plug>Foo     iHello<Esc>
@@ -142,11 +144,9 @@ class MapCommandTest : VimTestCase() {
     configureByText("\n")
     addTestMaps()
 
-    enterCommand("map")
-
     // Note that Vim doesn't appear to have an order. Items are kinda sorted, but also not. I.e. `m{something}` are
     // grouped together, but followed later by `g{something}`. We'll sort by {lhs}, so we're at least consistent
-    assertExOutput(
+    assertCommandOutput("map",
       """
         |   all           foo
         |n  normal        foo
@@ -163,9 +163,7 @@ class MapCommandTest : VimTestCase() {
     configureByText("\n")
     addTestMaps()
 
-    enterCommand("nmap")
-
-    assertExOutput(
+    assertCommandOutput("nmap",
       """
         |   all           foo
         |n  normal        foo
@@ -178,9 +176,7 @@ class MapCommandTest : VimTestCase() {
     configureByText("\n")
     addTestMaps()
 
-    enterCommand("vmap")
-
-    assertExOutput(
+    assertCommandOutput("vmap",
       """
         |   all           foo
         |s  select        foo
@@ -195,9 +191,7 @@ class MapCommandTest : VimTestCase() {
     configureByText("\n")
     addTestMaps()
 
-    enterCommand("smap")
-
-    assertExOutput(
+    assertCommandOutput("smap",
       """
         |   all           foo
         |s  select        foo
@@ -211,9 +205,7 @@ class MapCommandTest : VimTestCase() {
     configureByText("\n")
     addTestMaps()
 
-    enterCommand("xmap")
-
-    assertExOutput(
+    assertCommandOutput("xmap",
       """
         |   all           foo
         |x  visual        foo
@@ -227,9 +219,7 @@ class MapCommandTest : VimTestCase() {
     configureByText("\n")
     addTestMaps()
 
-    enterCommand("omap")
-
-    assertExOutput(
+    assertCommandOutput("omap",
       """
         |   all           foo
         |o  op-pending    foo
@@ -242,9 +232,7 @@ class MapCommandTest : VimTestCase() {
     configureByText("\n")
     addTestMaps()
 
-    enterCommand("map!")
-
-    assertExOutput(
+    assertCommandOutput("map!",
       """
         |c  cmdline       foo
         |i  insert        foo
@@ -267,9 +255,7 @@ class MapCommandTest : VimTestCase() {
     configureByText("\n")
     addTestMaps()
 
-    enterCommand("imap")
-
-    assertExOutput(
+    assertCommandOutput("imap",
       """
         |i  insert        foo
         |!  insert+cmdline   foo
@@ -283,9 +269,7 @@ class MapCommandTest : VimTestCase() {
     configureByText("\n")
     addTestMaps()
 
-    enterCommand("lmap")
-
-    assertExOutput(
+    assertCommandOutput("lmap",
       """
         |l  lang          foo
       """.trimMargin()
@@ -297,9 +281,7 @@ class MapCommandTest : VimTestCase() {
     configureByText("\n")
     addTestMaps()
 
-    enterCommand("cmap")
-
-    assertExOutput(
+    assertCommandOutput("cmap",
       """
         |c  cmdline       foo
         |!  insert+cmdline   foo
@@ -313,10 +295,9 @@ class MapCommandTest : VimTestCase() {
     addTestMaps() // Adds a mapping of all for NVO
 
     enterCommand("sunmap all")  // Removes Select from the NVO mapping for foo
-    enterCommand("map")
 
     // Note that the formatting is exactly how Vim shows it. Messy, isn't it?
-    assertExOutput(
+    assertCommandOutput("map",
       """
         |noxall           foo
         |n  normal        foo
@@ -334,9 +315,8 @@ class MapCommandTest : VimTestCase() {
     addTestMaps() // Adds a mapping of all for NVO
 
     enterCommand("vunmap all")  // Removes Visual+Select from the NVO mapping for foo
-    enterCommand("map")
 
-    assertExOutput(
+    assertCommandOutput("map",
       """
         |no all           foo
         |n  normal        foo
@@ -355,8 +335,7 @@ class MapCommandTest : VimTestCase() {
     enterCommand("vmap foo baz")  // Visual, Select
 
     // Just to be sure we're set up correctly
-    enterCommand("map")
-    assertExOutput(
+    assertCommandOutput("map",
       """
         |no foo           bar
         |v  foo           baz
@@ -366,8 +345,7 @@ class MapCommandTest : VimTestCase() {
     enterCommand("sunmap foo")
     enterCommand("ounmap foo")
 
-    enterCommand("map")
-    assertExOutput(
+    assertCommandOutput("map",
       """
         |n  foo           bar
         |x  foo           baz
@@ -383,8 +361,7 @@ class MapCommandTest : VimTestCase() {
     enterCommand("nmap fee bap")
     enterCommand("nmap zzz ppp")
 
-    enterCommand("map f")
-    assertExOutput(
+    assertCommandOutput("map f",
       """
         |n  fee           bap
         |   foo           bar
@@ -397,8 +374,7 @@ class MapCommandTest : VimTestCase() {
     configureByText("\n")
     enterCommand("map foo bar")
 
-    enterCommand("map     ")
-    assertExOutput(
+    assertCommandOutput("map     ",
       """
         |   foo           bar
       """.trimMargin()
@@ -410,8 +386,7 @@ class MapCommandTest : VimTestCase() {
     configureByText("\n")
     enterCommand("imap foo bar")
 
-    enterCommand("imap f    ")
-    assertExOutput(
+    assertCommandOutput("imap f    ",
       """
         |i  foo           bar
       """.trimMargin()
@@ -429,7 +404,7 @@ class MapCommandTest : VimTestCase() {
   }
 
   @Test
-  fun testddWithMapping() {
+  fun `test dd with mapping starting with d`() {
     configureByText(
       """
       Hello$c 1
@@ -460,8 +435,8 @@ class MapCommandTest : VimTestCase() {
     configureByText("\n")
     enterCommand("inoremap jj <Esc>")
     enterCommand("imap foo bar")
-    enterCommand("imap")
-    assertExOutput(
+
+    assertCommandOutput("imap",
       """
         |i  foo           bar
         |i  jj          * <Esc>
@@ -491,8 +466,7 @@ class MapCommandTest : VimTestCase() {
       """.trimIndent(),
     )
     assertOffset(1)
-    enterCommand("nmap")
-    assertExOutput("n  <Right>     * <Nop>")
+    assertCommandOutput("nmap", "n  <Right>     * <Nop>")
   }
 
   @Test
@@ -505,8 +479,8 @@ class MapCommandTest : VimTestCase() {
     enterCommand("nmap <script> ,e /e<CR>")
     enterCommand("nmap <expr> ,f '/f<CR>'")
     enterCommand("nmap <unique> ,g /g<CR>")
-    enterCommand("nmap")
-    assertExOutput(
+
+    assertCommandOutput("nmap",
       """
         |n  ,a            /a<CR>
         |n  ,b            /b<CR>
@@ -613,8 +587,8 @@ class MapCommandTest : VimTestCase() {
     typeText("i" + "#" + "<Esc>")
     assertState("#\n")
     assertMode(Mode.NORMAL())
-    enterCommand("imap")
-    assertExOutput("i  #           * X<C-H>#")
+
+    assertCommandOutput("imap", "i  #           * X<C-H>#")
   }
 
   // VIM-679 |:map|
@@ -638,8 +612,7 @@ class MapCommandTest : VimTestCase() {
       """.trimIndent(),
     )
     assertMode(Mode.NORMAL())
-    enterCommand("map")
-    assertExOutput("   <C-X>i        dd")
+    assertCommandOutput("map", "   <C-X>i        dd")
     typeText("<C-X>i")
     assertState("bar\n")
   }
@@ -752,6 +725,59 @@ class MapCommandTest : VimTestCase() {
     assertState("\n")
     typeText(",fooch")
     assertState("Bye\n")
+  }
+
+  @Test
+  fun `test map applies longest mapping`() {
+    configureByText("\n")
+    enterCommand("imap ab AB")
+    enterCommand("imap abcd ABCD")
+    typeText("i", "abcd", "<Esc>")
+    assertState("ABCD\n")
+  }
+
+  @Test
+  fun `test map falls back to previous longest mapping when abandoned`() {
+    configureByText("\n")
+    enterCommand("imap abc ABC")
+    enterCommand("imap abcd ABCD")
+    typeText("i", "abcg", "<Esc>")
+    assertState("ABCg\n")
+  }
+
+  @Test
+  fun `test map falls back to previous longest mapping when abandoned with shorter prefix`() {
+    configureByText("\n")
+    enterCommand("imap ab AB")
+    enterCommand("imap abcd ABCD")
+    typeText("i", "abcg", "<Esc>")
+    assertState("ABcg\n")
+  }
+
+  @Test
+  fun `test map falls back to previous longest mapping after timeout`() {
+    configureByText("\n")
+    enterCommand("imap ab AB")
+    enterCommand("imap abcd ABCD")
+    enterCommand("set timeoutlen=100")
+    typeText("i", "abc")
+    waitAndAssert(injector.globalOptions().timeoutlen + 100) {
+      fixture.editor.document.text == "ABc\n"
+    }
+    assertState("ABc\n")
+  }
+
+  @Test
+  fun `test map falls back to previous longest mapping after timeout with shorter prefix`() {
+    configureByText("\n")
+    enterCommand("imap ab AB")
+    enterCommand("imap abcde ABCDE")
+    enterCommand("set timeoutlen=100")
+    typeText("i", "abcd")
+    waitAndAssert(injector.globalOptions().timeoutlen + 100) {
+      fixture.editor.document.text == "ABcd\n"
+    }
+    assertState("ABcd\n")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUG)
@@ -903,7 +929,7 @@ class MapCommandTest : VimTestCase() {
 
 
   @Test
-  fun `test rhc with triangle brackets`() {
+  fun `test rhs with triangle brackets`() {
     configureByText("\n")
     enterCommand("inoremap p <p>")
     typeText("ip")
@@ -942,8 +968,8 @@ class MapCommandTest : VimTestCase() {
     enterCommand("nmap ,g :action Back<C-M>")
     enterCommand("nmap ,h :action Back<C-m>")
     enterCommand("nmap ,i :action Back<c-m>")
-    enterCommand("nmap")
-    assertExOutput(
+
+    assertCommandOutput("nmap",
       """
         |n  ,a            <Action>(Back)
         |n  ,b            <Action>(Back)
@@ -970,8 +996,8 @@ class MapCommandTest : VimTestCase() {
     enterCommand("nnoremap ,g :action Back<C-M>")
     enterCommand("nnoremap ,h :action Back<C-m>")
     enterCommand("nnoremap ,i :action Back<c-m>")
-    enterCommand("nnoremap")
-    assertExOutput(
+
+    assertCommandOutput("nnoremap",
       """
         |n  ,a            <Action>(Back)
         |n  ,b            <Action>(Back)

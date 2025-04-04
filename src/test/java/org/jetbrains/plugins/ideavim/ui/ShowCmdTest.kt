@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.ui
 
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ui.ShowCmd
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -16,7 +17,6 @@ import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.waitAndAssert
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import kotlin.test.assertEquals
@@ -87,15 +87,12 @@ class ShowCmdTest : VimTestCase() {
     assertEquals("32d", getShowCmdText())
   }
 
-  // TODO: This test fails because IdeaVim's mapping handler doesn't correctly expand unhandled keys on timeout
   @Test
-  @Disabled
   fun `test showcmd expands ambiguous mapped keys on timeout`() {
-//     `rrr` should timeout and replay `rr` which is mapped to `42`
     enterCommand("nmap rr 42")
     enterCommand("nmap rrr 55")
     typeText(injector.parser.parseKeys("12rr"))
-    waitAndAssert { "1242" == getShowCmdText() }
+    waitAndAssert(injector.globalOptions().timeoutlen + 100) { "1242" == getShowCmdText() }
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
