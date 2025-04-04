@@ -42,7 +42,7 @@ import javax.swing.KeyStroke
  */
 // TODO for future refactorings (PRs are welcome)
 // 1. avoid using handleKeyRecursionCount & shouldRecord
-// 2. maybe we can live without allowKeyMappings: Boolean & mappingCompleted: Boolean
+// 2. maybe we can live without allowKeyMappings: Boolean
 class KeyHandler {
   private val keyConsumers: List<KeyConsumer> = listOf(
     ModalInputConsumer(),
@@ -89,8 +89,8 @@ class KeyHandler {
   /**
    * Handling input keys with additional parameters
    *
-   * @param allowKeyMappings - If we allow key mappings or not
-   * @param mappingCompleted - if true, we don't check if the mapping is incomplete
+   * @param allowKeyMappings If we allow key mappings or not
+   * @param mappingCompleted No longer used
    */
   fun handleKey(
     editor: VimEditor,
@@ -100,13 +100,7 @@ class KeyHandler {
     mappingCompleted: Boolean,
     keyState: KeyHandlerState,
   ) {
-    val result = processKey(
-      key,
-      editor,
-      allowKeyMappings,
-      mappingCompleted,
-      KeyProcessResult.SynchronousKeyProcessBuilder(keyState)
-    )
+    val result = processKey(key, editor, allowKeyMappings, KeyProcessResult.SynchronousKeyProcessBuilder(keyState))
     if (result is KeyProcessResult.Executable) {
       result.execute(editor, context)
     }
@@ -119,31 +113,30 @@ class KeyHandler {
    * Alternatively, if we understand the key, we return a 'KeyProcessResult.Executable', which contains a runnable that
    * could execute the key if needed.
    */
-  fun processKey(
+  private fun processKey(
     key: KeyStroke,
     editor: VimEditor,
     allowKeyMappings: Boolean,
-    mappingCompleted: Boolean,
-    processBuilder: KeyProcessResult.KeyProcessResultBuilder,
+    keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): KeyProcessResult {
     synchronized(lock) {
       logger.trace {
         """
         ------- Key Handler -------
-        Start key processing. allowKeyMappings: $allowKeyMappings, mappingCompleted: $mappingCompleted
+        Start key processing. allowKeyMappings: $allowKeyMappings
         Key: $key
       """.trimIndent()
       }
-      logger.trace { processBuilder.state.toString() }
+      logger.trace { keyProcessResultBuilder.state.toString() }
       logger.trace { "Mode = ${editor.mode}" }
       val maxMapDepth = injector.globalOptions().maxmapdepth
       if (handleKeyRecursionCount >= maxMapDepth) {
-        processBuilder.addExecutionStep { _, lambdaEditor, _ ->
+        keyProcessResultBuilder.addExecutionStep { _, lambdaEditor, _ ->
           logger.warn("Key handling, maximum recursion of the key received. maxdepth=$maxMapDepth")
           injector.messages.showStatusBarMessage(lambdaEditor, injector.messages.message("E223"))
           injector.messages.indicateError()
         }
-        return processBuilder.build()
+        return keyProcessResultBuilder.build()
       }
 
       injector.messages.clearError()
@@ -153,25 +146,25 @@ class KeyHandler {
       handleKeyRecursionCount++
       try {
         val isProcessed = keyConsumers.any {
-          it.consumeKey(key, editor, allowKeyMappings, mappingCompleted, processBuilder)
+          it.consumeKey(key, editor, allowKeyMappings, keyProcessResultBuilder)
         }
         if (isProcessed) {
           logger.trace { "Key was successfully caught by consumer" }
-          processBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, lambdaContext ->
+          keyProcessResultBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, lambdaContext ->
             finishedCommandPreparation(lambdaEditor, lambdaContext, key, shouldRecord, lambdaKeyState)
           }
         } else {
           // Key wasn't processed by any of the consumers, so we reset our key state
-          onUnknownKey(editor, processBuilder.state)
-          updateState(processBuilder.state)
+          onUnknownKey(editor, keyProcessResultBuilder.state)
+          updateState(keyProcessResultBuilder.state)
           return KeyProcessResult.Unknown.apply {
             handleKeyRecursionCount-- // because onFinish will now be executed for unknown
           }
         }
       } finally {
-        processBuilder.onFinish = { handleKeyRecursionCount-- }
+        keyProcessResultBuilder.onFinish = { handleKeyRecursionCount-- }
       }
-      return processBuilder.build()
+      return keyProcessResultBuilder.build()
     }
   }
 

@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-class CommandCountConsumer : KeyConsumer {
+internal class CommandCountConsumer : KeyConsumer {
   private companion object {
     private val logger = vimLogger<CommandCountConsumer>()
   }
@@ -28,7 +28,6 @@ class CommandCountConsumer : KeyConsumer {
     key: KeyStroke,
     editor: VimEditor,
     allowKeyMappings: Boolean,
-    mappingCompleted: Boolean,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
     logger.trace { "Entered CommandCountConsumer" }

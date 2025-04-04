@@ -14,12 +14,11 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.key.KeyConsumer
 import javax.swing.KeyStroke
 
-class ModalInputConsumer : KeyConsumer {
+internal class ModalInputConsumer : KeyConsumer {
   override fun consumeKey(
     key: KeyStroke,
     editor: VimEditor,
     allowKeyMappings: Boolean,
-    mappingCompleted: Boolean,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
     val modalInput = injector.modalInput.getCurrentModalInput() ?: return false
