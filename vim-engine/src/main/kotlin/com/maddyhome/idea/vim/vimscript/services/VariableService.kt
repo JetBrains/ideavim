@@ -26,7 +26,7 @@ interface VariableService {
    * Stores variable.
    *
    * The `v:` scope currently is not supported.
-   * @param variable variable to store, if it's scope is null, the default scope for vimContext will be chosen
+   * @param variable variable to store, if its scope is null, the default scope for vimContext will be chosen
    * @param value variable value
    * @param editor editor
    * @param context execution context
@@ -42,23 +42,23 @@ interface VariableService {
   )
 
   /**
-   * Get global scope variable value.
+   * Stores global scope variable value.
    * @param name variable name
    * @param value variable value
    */
   fun storeGlobalVariable(name: String, value: VimDataType)
 
   /**
-   * Get global scope variable value.
+   * Gets global scope variable value.
    * @param name variable name
    */
   fun getGlobalVariableValue(name: String): VimDataType?
 
   /**
-   * Gets variable value
+   * Gets variable value.
    *
-   * The `v:` scope currently is not supported
-   * @param variable variable, if it's scope is null, the default scope for vimContext will be chosen
+   * The `v:` scope currently is not supported.
+   * @param variable variable, if its scope is null, the default scope for vimContext will be chosen
    * @param editor editor
    * @param context execution context
    * @param vimContext vim context
@@ -75,7 +75,7 @@ interface VariableService {
    * Gets variable value.
    *
    * The `v:` scope currently is not supported.
-   * @param variable variable, if it's scope is null, the default scope for vimContext will be chosen
+   * @param variable variable, if its scope is null, the default scope for vimContext will be chosen
    * @param editor editor
    * @param context execution context
    * @param vimContext vim context
@@ -90,12 +90,12 @@ interface VariableService {
   ): VimDataType
 
   /**
-   * Checks if the variable locked.
+   * Checks if the variable is locked.
    *
    * Returns false if the variable does not exist.
    *
    * See `:h lockvar`.
-   * @param variable variable, if it's scope is null, the default scope for vimContext will be chosen
+   * @param variable variable, if its scope is null, the default scope for vimContext will be chosen
    * @param editor editor
    * @param context execution context
    * @param vimContext vim context
@@ -111,7 +111,7 @@ interface VariableService {
    * Locks variable.
    *
    * See `:h lockvar`.
-   * @param variable variable, if it's scope is null, the default scope for vimContext will be chosen
+   * @param variable variable, if its scope is null, the default scope for vimContext will be chosen
    * @param depth lock depth
    * @param editor editor
    * @param context execution context
@@ -129,7 +129,7 @@ interface VariableService {
    * Unlocks variable.
    *
    * See `:h lockvar`.
-   * @param variable variable, if it's scope is null, the default scope for vimContext will be chosen
+   * @param variable variable, if its scope is null, the default scope for vimContext will be chosen
    * @param depth lock depth
    * @param editor editor
    * @param context execution context
@@ -146,7 +146,7 @@ interface VariableService {
   fun getGlobalVariables(): Map<String, VimDataType>
 
   /**
-   * Clears all global variables
+   * Clears all global variables.
    */
   @TestOnly
   fun clear()
