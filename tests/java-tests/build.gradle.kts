@@ -43,7 +43,6 @@ dependencies {
     testFramework(TestFrameworkType.Platform)
     testFramework(TestFrameworkType.JUnit5)
     bundledPlugins("com.intellij.java", "org.jetbrains.plugins.yaml")
-    instrumentationTools()
   }
 }
 

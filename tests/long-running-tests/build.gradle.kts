@@ -35,7 +35,6 @@ dependencies {
     create(ideaType, ideaVersion, false)
     testFramework(TestFrameworkType.Platform)
     testFramework(TestFrameworkType.JUnit5)
-    instrumentationTools()
   }
 }
 
