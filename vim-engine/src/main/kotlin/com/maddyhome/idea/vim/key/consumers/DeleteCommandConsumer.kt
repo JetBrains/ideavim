@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-class DeleteCommandConsumer : KeyConsumer {
+internal class DeleteCommandConsumer : KeyConsumer {
   private companion object {
     private val logger = vimLogger<DeleteCommandConsumer>()
   }
@@ -27,7 +27,6 @@ class DeleteCommandConsumer : KeyConsumer {
     key: KeyStroke,
     editor: VimEditor,
     allowKeyMappings: Boolean,
-    mappingCompleted: Boolean,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
     logger.trace { "Entered DeleteCommandConsumer" }

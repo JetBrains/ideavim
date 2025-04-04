@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.KeyProcessResult
 import com.maddyhome.idea.vim.api.VimEditor
 import javax.swing.KeyStroke
 
-interface KeyConsumer {
+internal interface KeyConsumer {
   /**
    * @return true if consumed key and could do something meaningful wit it
    */
@@ -20,7 +20,6 @@ interface KeyConsumer {
     key: KeyStroke,
     editor: VimEditor,
     allowKeyMappings: Boolean,
-    mappingCompleted: Boolean,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean
 }

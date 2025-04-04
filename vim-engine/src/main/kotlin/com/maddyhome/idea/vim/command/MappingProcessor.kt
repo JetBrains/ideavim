@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.key.isPrefix
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import javax.swing.KeyStroke
 
-object MappingProcessor : KeyConsumer {
+internal object MappingProcessor : KeyConsumer {
 
   private val log = vimLogger<MappingProcessor>()
 
@@ -34,7 +34,6 @@ object MappingProcessor : KeyConsumer {
     key: KeyStroke,
     editor: VimEditor,
     allowKeyMappings: Boolean,
-    mappingCompleted: Boolean,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
     log.trace { "Entered MappingProcessor with key $key" }

@@ -21,7 +21,7 @@ import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-class DigraphConsumer : KeyConsumer {
+internal class DigraphConsumer : KeyConsumer {
   private companion object {
     private val logger = vimLogger<DigraphConsumer>()
   }
@@ -30,7 +30,6 @@ class DigraphConsumer : KeyConsumer {
     key: KeyStroke,
     editor: VimEditor,
     allowKeyMappings: Boolean,
-    mappingCompleted: Boolean,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
     logger.trace { "Entered DigraphConsumer" }

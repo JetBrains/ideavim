@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.key.KeyConsumer
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-class CharArgumentConsumer : KeyConsumer {
+internal class CharArgumentConsumer : KeyConsumer {
   private companion object {
     private val logger = vimLogger<CharArgumentConsumer>()
   }
@@ -29,7 +29,6 @@ class CharArgumentConsumer : KeyConsumer {
     key: KeyStroke,
     editor: VimEditor,
     allowKeyMappings: Boolean,
-    mappingCompleted: Boolean,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
     logger.trace { "Entered CharArgumentConsumer" }
