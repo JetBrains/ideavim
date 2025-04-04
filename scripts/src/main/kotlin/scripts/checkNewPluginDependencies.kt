@@ -43,6 +43,7 @@ val knownPlugins = setOf(
   "com.julienphalip.ideavim.peekaboo", // https://plugins.jetbrains.com/plugin/25776-vim-peekaboo
   "com.julienphalip.ideavim.switch", // https://plugins.jetbrains.com/plugin/25899-vim-switch
   "com.julienphalip.ideavim.functiontextobj", // https://plugins.jetbrains.com/plugin/25897-vim-functiontextobj
+  "com.miksuki.HighlightCursor", // https://plugins.jetbrains.com/plugin/26743-highlightcursor
 )
 
 suspend fun main() {
