@@ -88,7 +88,12 @@ class ToKeysMappingInfo(
 
   override fun execute(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
     LOG.debug("Executing 'ToKeys' mapping info...")
-    val fromIsPrefix = KeyHandler.isPrefix(fromKeys, toKeys)
+
+    // From the Vim docs: If the {rhs} starts with the {lhs}, the first character is not mapped again.
+    // E.g. `:map ab abcd`. When typing `ab`, Vim will process `abcd`, executing `a` and inserting `bcd`.
+    // See `:help recursive_mapping`
+    val lhsIsPrefixOfRhs = KeyHandler.isPrefix(fromKeys, toKeys)
+
     val keyHandler = KeyHandler.getInstance()
     LOG.trace { "Adding new keys to keyStack as toKeys of mapping. State before adding keys: ${keyHandler.keyStack.dump()}" }
     keyHandler.keyStack.addKeys(toKeys)
@@ -96,8 +101,8 @@ class ToKeysMappingInfo(
       var first = true
       while (keyHandler.keyStack.hasStroke()) {
         val keyStroke = keyHandler.keyStack.feedStroke()
-        val recursive = isRecursive && !(first && fromIsPrefix)
-        keyHandler.handleKey(editor, keyStroke, context, recursive, false, keyState)
+        val allowKeyMappings = isRecursive && !(first && lhsIsPrefixOfRhs)
+        keyHandler.handleKey(editor, keyStroke, context, allowKeyMappings, false, keyState)
         first = false
       }
     } finally {
@@ -126,13 +131,20 @@ class ToExpressionMappingInfo(
 
   override fun execute(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
     LOG.debug("Executing 'ToExpression' mapping info...")
+
     val toKeys = injector.parser.parseKeys(toExpression.evaluate(editor, context, CommandLineVimLContext).toString())
-    val fromIsPrefix = KeyHandler.isPrefix(fromKeys, toKeys)
+
+    // TODO: Merge similar code from ToKeysMappingInfo
+    // From the Vim docs: If the {rhs} starts with the {lhs}, the first character is not mapped again.
+    // E.g. `:map ab abcd`. When typing `ab`, Vim will process `abcd`, executing `a` and inserting `bcd`.
+    // See `:help recursive_mapping`
+    val lhsIsPrefixOfRhs = KeyHandler.isPrefix(fromKeys, toKeys)
+
     var first = true
     for (keyStroke in toKeys) {
-      val recursive = isRecursive && !(first && fromIsPrefix)
+      val allowKeyMappings = isRecursive && !(first && lhsIsPrefixOfRhs)
       val keyHandler = KeyHandler.getInstance()
-      keyHandler.handleKey(editor, keyStroke, context, recursive, false, keyState)
+      keyHandler.handleKey(editor, keyStroke, context, allowKeyMappings, false, keyState)
       first = false
     }
   }
