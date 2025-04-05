@@ -9,7 +9,6 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class NormalCommandTest : VimTestCase() {
@@ -29,12 +28,12 @@ class NormalCommandTest : VimTestCase() {
   }
 
   @Test
-  fun `test range single stroke`() {
+  fun `test normal command with current line range moves caret to start of line before executing command`() {
     doTest(exCommand(".norm x"), "123<caret>456", "<caret>23456")
   }
 
   @Test
-  fun `test range multiple strokes`() {
+  fun `test normal command with multi-line range`() {
     doTest(
       exCommand("1,3norm x"),
       """
@@ -94,7 +93,7 @@ class NormalCommandTest : VimTestCase() {
   }
 
   @Test
-  fun `test from visual mode`() {
+  fun `test normal from Visual mode runs command on start of each line in range`() {
     configureByText(
       """
             <caret>123456
@@ -105,7 +104,7 @@ class NormalCommandTest : VimTestCase() {
       """.trimIndent()
     )
     typeText("Vjj")
-    enterCommand("normal x")
+    enterCommand("normal x")  // Will give `:'<,'>normal x`
     assertState(
       """
             23456
@@ -118,7 +117,7 @@ class NormalCommandTest : VimTestCase() {
   }
 
   @Test
-  fun `test execute visual mode`() {
+  fun `test normal command switches to Visual mode`() {
     configureByText(
       """
         <caret>123456
@@ -164,7 +163,6 @@ class NormalCommandTest : VimTestCase() {
     )
   }
 
-  @Disabled("Not working. NormalCommand is not correctly handling Visual and selection")
   @Test
   fun `test command executes at selection start`() {
     configureByText("hello <caret>world !")
