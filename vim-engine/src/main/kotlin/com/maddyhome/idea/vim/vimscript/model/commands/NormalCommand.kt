@@ -10,14 +10,11 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 
 import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.KeyHandler
-import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.VimMarkService
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ranges.Range
-import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
@@ -30,7 +27,6 @@ data class NormalCommand(val range: Range, val modifier: CommandModifier, val ar
     RangeFlag.RANGE_OPTIONAL,
     ArgumentFlag.ARGUMENT_OPTIONAL,
     Access.WRITABLE,
-    Flag.SAVE_VISUAL,
   )
 
   override fun processCommand(
@@ -40,34 +36,17 @@ data class NormalCommand(val range: Range, val modifier: CommandModifier, val ar
   ): ExecutionResult {
     val useMappings = modifier != CommandModifier.BANG
 
-    val rangeUsed = range.size() != 0
-    when (editor.mode) {
-      is Mode.VISUAL -> {
-        editor.exitVisualMode()
-        if (!rangeUsed) {
-          val selectionStart =
-            injector.markService.getMark(editor.primaryCaret(), VimMarkService.SELECTION_START_MARK)!!
-          editor.currentCaret().moveToBufferPosition(BufferPosition(selectionStart.line, selectionStart.col))
-        }
-      }
-
-      is Mode.CMD_LINE -> injector.commandLine.getActiveCommandLine()
-        ?.close(refocusOwningEditor = true, resetCaret = false)
-
-      Mode.INSERT, Mode.REPLACE -> editor.exitInsertMode(context)
-      is Mode.SELECT -> editor.exitSelectModeNative(false)
-      is Mode.OP_PENDING, is Mode.NORMAL -> Unit
-    }
+    val rangeSpecified = range.size() != 0
     val range = getLineRange(editor, editor.primaryCaret())
 
     for (line in range.startLine..range.endLine) {
-      if (rangeUsed) {
-        // Move caret to the first position on line
-        if (editor.lineCount() < line) {
-          break
-        }
-        val startOffset = editor.getLineStartOffset(line)
-        editor.currentCaret().moveToOffset(startOffset)
+      if (editor.lineCount() < line) {
+        break
+      }
+
+      // If a range is specified, the caret is moved to the start of each line before the command is executed
+      if (rangeSpecified) {
+        editor.currentCaret().moveToOffset(injector.motion.moveCaretToLineStart(editor, line))
       }
 
       // Perform operations
