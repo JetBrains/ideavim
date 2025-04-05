@@ -54,7 +54,7 @@ data class NormalCommand(val range: Range, val modifier: CommandModifier, val ar
       val keyHandler = KeyHandler.getInstance()
       keyHandler.reset(editor)
       for (key in keys) {
-        keyHandler.handleKey(editor, key, context, useMappings, true, keyHandler.keyHandlerState)
+        keyHandler.handleKey(editor, key, context, useMappings, false, keyHandler.keyHandlerState)
       }
 
       // Exit if state leaves as insert or cmd_line
