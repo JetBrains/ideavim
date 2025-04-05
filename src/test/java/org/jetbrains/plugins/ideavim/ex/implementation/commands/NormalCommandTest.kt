@@ -8,33 +8,35 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-/*
-class NormalCommandTest : VimTestCase() {
+import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 
+class NormalCommandTest : VimTestCase() {
   @Test
   fun `test simple execution`() {
-    doTest("normal x", "123<caret>456", "123<caret>56")
+    doTest(exCommand("normal x"), "123<caret>456", "123<caret>56")
   }
 
   @Test
   fun `test short command`() {
-    doTest("norm x", "123<caret>456", "123<caret>56")
+    doTest(exCommand("norm x"), "123<caret>456", "123<caret>56")
   }
 
   @Test
   fun `test multiple commands`() {
-    doTest("normal xiNewText", "123<caret>456", "123NewTex<caret>t56")
+    doTest(exCommand("normal xiNewText"), "123<caret>456", "123NewTex<caret>t56")
   }
 
   @Test
   fun `test range single stroke`() {
-    doTest(".norm x", "123<caret>456", "<caret>23456")
+    doTest(exCommand(".norm x"), "123<caret>456", "<caret>23456")
   }
 
   @Test
   fun `test range multiple strokes`() {
     doTest(
-      "1,3norm x",
+      exCommand("1,3norm x"),
       """
          123456
          123456
@@ -61,8 +63,8 @@ class NormalCommandTest : VimTestCase() {
             123456
       """.trimIndent()
     )
-    typeText(commandToKeys("map G dd"))
-    typeText(commandToKeys("normal G"))
+    enterCommand("map G dd")
+    enterCommand("normal G")
     assertState(
       """
       <caret>123456
@@ -80,8 +82,8 @@ class NormalCommandTest : VimTestCase() {
             123456
       """.trimIndent()
     )
-    typeText(commandToKeys("map G dd"))
-    typeText(commandToKeys("normal! G"))
+    enterCommand("map G dd")
+    enterCommand("normal! G")
     assertState(
       """
             123456
@@ -102,8 +104,8 @@ class NormalCommandTest : VimTestCase() {
             123456
       """.trimIndent()
     )
-    typeText(parseKeys("Vjj"))
-    typeText(commandToKeys("normal x"))
+    typeText("Vjj")
+    enterCommand("normal x")
     assertState(
       """
             23456
@@ -126,8 +128,8 @@ class NormalCommandTest : VimTestCase() {
         123456
       """.trimIndent()
     )
-    typeText(commandToKeys("normal Vjj"))
-    typeText(parseKeys("x"))
+    enterCommand("normal Vjj")
+    typeText("x")
     assertState(
       """
           <caret>123456
@@ -148,8 +150,8 @@ class NormalCommandTest : VimTestCase() {
       123456
       """.trimIndent()
     )
-    typeText(parseKeys("qqxq", "jVjjj"))
-    typeText(commandToKeys("norm @q"))
+    typeText("qqxq", "jVjjj")
+    enterCommand("norm @q")
     assertState(
       """
       23456
@@ -162,32 +164,26 @@ class NormalCommandTest : VimTestCase() {
     )
   }
 
+  @Disabled("Not working. NormalCommand is not correctly handling Visual and selection")
   @Test
   fun `test command executes at selection start`() {
     configureByText("hello <caret>world !")
-    typeText(parseKeys("vw"))
-    typeText(parseKeys(":<C-u>norm x<CR>"))
+    typeText("vw")
+    enterCommand("<C-u>norm x")
     assertState("hello <caret>orld !")
   }
 
   @Test
   fun `test false escape`() {
     configureByText("hello <caret>world !")
-    typeText(commandToKeys("norm i<Esc>"))
+    enterCommand("norm i<Esc>")
     assertState("hello <Esc<caret>>world !")
   }
 
   @Test
   fun `test C-R`() {
-    configureByText("myprop: \"my value\"")
-    typeText(commandToKeys("exe \"norm ^dei-\\<C-R>\\\"-\""))
-    assertState("-myprop-: \"my value\"")
-  }
-
-  private fun doTest(command: String, before: String, after: String) {
-    myFixture.configureByText("a.java", before)
-    typeText(commandToKeys(command))
-    myFixture.checkResult(after)
+    configureByText("""myprop: "my value"""")
+    enterCommand("""exe "norm ^dei-\<C-R>\"-"""")
+    assertState("""-myprop-: "my value"""")
   }
 }
-*/

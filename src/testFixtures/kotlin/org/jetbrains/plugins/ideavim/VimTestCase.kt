@@ -1087,7 +1087,7 @@ abstract class VimTestCase {
       var startIndex = if (command.startsWith(":")) 1 else 0
 
       // Special case support for <C-U>
-      startIndex = if (command.substring(startIndex).startsWith("<C-U>")) {
+      startIndex = if (command.substring(startIndex).startsWith("<C-U>", ignoreCase = true)) {
         keys.addAll(injector.parser.parseKeys("<C-U>"))
         startIndex + 5
       }
