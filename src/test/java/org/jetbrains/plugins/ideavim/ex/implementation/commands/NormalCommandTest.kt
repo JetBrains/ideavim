@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -20,6 +21,11 @@ class NormalCommandTest : VimTestCase() {
   @Test
   fun `test short command`() {
     doTest(exCommand("norm x"), "123<caret>456", "123<caret>56")
+  }
+
+  @Test
+  fun `test normal command automatically exits Insert mode`() {
+    doTest(exCommand("normal iFoo"), "123<caret>456", "123Fo<caret>o456", Mode.NORMAL())
   }
 
   @Test
@@ -54,7 +60,7 @@ class NormalCommandTest : VimTestCase() {
   }
 
   @Test
-  fun `test with mapping`() {
+  fun `test normal command with single letter mapping`() {
     configureByText(
       """
             <caret>123456
@@ -73,7 +79,28 @@ class NormalCommandTest : VimTestCase() {
   }
 
   @Test
-  fun `test with disabled mapping`() {
+  fun `test normal command with multi-letter mapping`() {
+    doTest(
+      exCommand("normal dd"),
+      """
+        |${c}Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+      """
+        |Lorem ipsum dolor sit amet,
+        |consectetur adipiscing elit
+        |Sed in orci mauris.
+        |${c}Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+    ) {
+      enterCommand("map dd G")
+    }
+  }
+
+  @Test
+  fun `test normal command with disabled mapping`() {
     configureByText(
       """
             <caret>123456
