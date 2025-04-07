@@ -591,6 +591,10 @@ Contributors:
   [![icon][github]](https://github.com/peterHoburg)
   &nbsp;
   Peter Hoburg
+* [![icon][mail]](mailto:erotourtes@gmail.com)
+  [![icon][github]](https://github.com/erotourtes)
+  &nbsp;
+  Max Siryk
 
 Previous contributors:
 
