@@ -799,22 +799,92 @@ class MapCommandTest : VimTestCase() {
     assertState("123${c}7890")
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.PLUG)
-  @Test
-  fun testIncompleteMapping() {
-    configureByText("123${c}4567890")
-    enterCommand("map <Plug>(Hi)l lll")
-    enterCommand("map I <Plug>(Hi)")
-    typeText("Ih")
-    assertState("12${c}34567890")
-  }
-
   @Test
   fun testIntersectingCommands2() {
     configureByText("123${c}4567890")
     enterCommand("map as x")
     typeText("gas")
     assertState("123${c}567890")
+  }
+
+  @Test
+  fun `test partial Plug mapping`() {
+    doTest(
+      listOf("i", "Xy"),
+      "Lorem $c ipsum dolor sit amet",
+      "Lorem Hello ipsum dolor sit amet",
+      Mode.INSERT
+    ) {
+      enterCommand("imap <Plug>xy Hello")
+      enterCommand("imap X <Plug>x")
+    }
+  }
+
+  @Test
+  fun `test abandoned Plug mapping replays all keys as text`() {
+    // The default Vim behaviour for an abandoned mapping is to replay it, character by character, even if that makes no
+    // sense for the mode or mapping, and will move the caret or delete text or whatever. This is also true for <Plug>
+    // mappings, even though `<Plug>` is a special char that can't be typed by the user. When used in Insert mode, Vim
+    // expands the special char to the string "<Plug>".
+    doTest(
+      listOf("i", "Xz"),
+      "Lorem $c ipsum dolor sit amet",
+      "Lorem <Plug>xz ipsum dolor sit amet",
+      Mode.INSERT
+    ) {
+      enterCommand("imap <Plug>xy Hello")
+      enterCommand("imap X <Plug>x")
+    }
+  }
+
+  @Test
+  fun `test partial Action mapping`() {
+    doTest(
+      listOf("i", "X(EditorToggleCase)"),
+      "Lorem ${c}ipsum dolor sit amet",
+      "Lorem IPSUM dolor sit amet",
+      Mode.INSERT
+    ) {
+      enterCommand("imap X <Action>")
+    }
+  }
+
+  @Test
+  fun `test abandoned Action mapping replays all keys as text`() {
+    // The mapping is looking for `<Action>(...)`, so we need to feed it a key that is not part of this mapping. A space
+    // char will work
+    doTest(
+      listOf("i", "X( "),
+      "Lorem $c ipsum dolor sit amet",
+      "Lorem <Action>(  ipsum dolor sit amet",
+      Mode.INSERT
+    ) {
+      enterCommand("imap X <Action>")
+    }
+  }
+
+  @Test
+  fun `test abandoned Action mapping replays all keys as text 2`() {
+    doTest(
+      listOf("i", "Xz"),
+      "Lorem $c ipsum dolor sit amet",
+      "Lorem <Action>z ipsum dolor sit amet",
+      Mode.INSERT
+    ) {
+      enterCommand("imap X <Action>")
+    }
+  }
+
+  @Test
+  fun `test timedout Action mapping replays all keys as text`() {
+    configureByText("Lorem $c ipsum dolor sit amet")
+    enterCommand("imap X <Action>")
+    enterCommand("set timeoutlen=100")
+    typeText("i", "X")
+    waitAndAssert(injector.globalOptions().timeoutlen + 100) {
+      fixture.editor.document.text == "Lorem <Action> ipsum dolor sit amet"
+    }
+    assertState("Lorem <Action> ipsum dolor sit amet")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
