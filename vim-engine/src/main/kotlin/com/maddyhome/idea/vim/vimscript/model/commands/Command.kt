@@ -81,7 +81,7 @@ sealed class Command(
     // Unless the command needs us to keep visual (e.g. :action), remove the secondary carets that are an implementation
     // detail for block selection, but leave all other carets. If any other caret has a selection, move the caret to the
     // start offset of the selection, copying Vim's behaviour (with its only caret)
-    if (Flag.SAVE_VISUAL !in argFlags.flags) {
+    if (Flag.SAVE_SELECTION !in argFlags.flags) {
       // Editor.inBlockSelection is not available, because we're not in Visual mode anymore. Check if the primary caret
       // currently has a selection and if (when we still in Visual) it was a block selection.
       injector.application.runReadAction {
@@ -240,12 +240,14 @@ sealed class Command(
 
   enum class Flag {
     /**
-     * This command should not exit visual mode.
+     * The current selection should not be reset before executing this command
      *
-     * Vim exits visual mode before command execution, but in this case :action will work incorrect.
-     *   With this flag visual mode will not be exited while command execution.
+     * Vim and IdeaVim always exit Visual mode, removing selection, and return to Normal before a command is executed.
+     * However, IdeaVim has some commands that require the current selection, especially commands like `:action` that
+     * interact with IDE functions. If this flag is specified, IdeaVim will still leave Visual and return to Normal, but
+     * the current selection is not removed. It is up to the command to handle and either remove/update the selection.
      */
-    SAVE_VISUAL,
+    SAVE_SELECTION,
   }
 
   data class CommandHandlerFlags(
