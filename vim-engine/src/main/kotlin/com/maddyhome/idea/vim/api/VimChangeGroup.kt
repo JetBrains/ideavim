@@ -336,6 +336,7 @@ interface VimChangeGroup {
   )
 
   fun type(vimEditor: VimEditor, context: ExecutionContext, key: Char)
+  fun type(vimEditor: VimEditor, context: ExecutionContext, string: String)
   fun replaceText(editor: VimEditor, caret: VimCaret, start: Int, end: Int, str: String)
 
   enum class ChangeCaseType {

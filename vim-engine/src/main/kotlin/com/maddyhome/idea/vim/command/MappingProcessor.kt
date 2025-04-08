@@ -133,23 +133,22 @@ internal object MappingProcessor : KeyConsumer {
     keyState: KeyHandlerState,
     context: ExecutionContext,
   ) {
-      injector.application.invokeLater(editor) {
-        log.debug("Callback for 'timeout'. Replaying unhandled keys")
+    injector.application.invokeLater(editor) {
+      log.debug("Callback for 'timeout'. Replaying unhandled keys")
 
-        val unhandledKeys = keyState.mappingState.detachKeys()
-
-        // XXX There is a strange issue that reports that mapping state is empty at the moment of the function call.
-        //   At the moment, I see the only one possibility this to happen - other key is handled after the timer executed,
-        //   but before invoke later is handled. This is a rare case, so I'll just add a check to isPluginMapping.
-        //   But this "unexpected behaviour" exists, and it would be better not to relay on mutable state with delays.
-        //   https://youtrack.jetbrains.com/issue/VIM-2392
-        if (editor.isDisposed() || isPluginMapping(unhandledKeys)) {
-          log.debug("Abandon mapping timer")
-          return@invokeLater
-        }
-
-        replayUnhandledKeys(unhandledKeys, editor, context, keyState)
+      // Note that there is an inherent but unlikely race condition here. If the timeout fires, it's possible that a key
+      // is handled before invokeLater is called, which could reset the keys. All we can really do is check that the
+      // unhandled keys list isn't empty at this point. If we detach before calling invokeLater, there might still be a
+      // key handled, which means we're replaying (stale) keys after a key has been handled.
+      // https://youtrack.jetbrains.com/issue/VIM-2392
+      val unhandledKeys = keyState.mappingState.detachKeys()
+      if (editor.isDisposed() || unhandledKeys.isEmpty()) {
+        log.debug("Abandon mapping timer")
+        return@invokeLater
       }
+
+      replayUnhandledKeys(unhandledKeys, editor, context, keyState)
+    }
   }
 
   /**
@@ -279,7 +278,8 @@ internal object MappingProcessor : KeyConsumer {
 
         // Replay the rest of the keys, with mapping applied, as though they were typed
         unhandledKeys.subList(subsequence.size, unhandledKeys.size).forEach {
-          KeyHandler.getInstance().handleKey(editor, it, context, allowKeyMappings = true, mappingCompleted = false, keyState)
+          KeyHandler.getInstance()
+            .handleKey(editor, it, context, allowKeyMappings = true, mappingCompleted = false, keyState)
         }
         return
       }
@@ -287,50 +287,14 @@ internal object MappingProcessor : KeyConsumer {
       subsequence.removeLast()
     }
 
-    // TODO: I don't understand the reasoning behind this code
-    // Why do we throw away a `<Plug>...` prefix sequence? Normal Vim behaviour is to replay the failed sequence, so I
-    // would expect us to do the same here. The only reason I can think of is that `<Plug>` is converted into a custom
-    // keystroke that wouldn't be processed properly, especially because the first replayed keystroke is not mapped.
-    // If this is why we skip it, maybe we should expand it to normal keystrokes (allowing mapping)?
-    // Also, if we do this for `<Plug>`, why do we not do it for `<Action>`?
-    if (isPluginMapping(unhandledKeys)) {
-      // TODO: Original comment, but we're not processing the plugin mapping?!
-      log.trace("This is a plugin mapping, process it")
+    log.trace("Replaying unhandled keys. There is no mapping in subsequence. Replaying all keys")
 
-      // If the user types a key that ends a `<Plug>...` prefix sequence, we ignore the prefix and replay just the key,
-      // with mappings enabled, as though the user typed it.
-      // Note that we have logic in the 'timeout' function to ignore `<Plug>` mappings completely there. That sequence
-      // only contains valid keystrokes, so there's nothing to replay.
-      KeyHandler.getInstance().handleKey(
-        editor,
-        unhandledKeys.last(),
-        context,
-        allowKeyMappings = true,
-        mappingCompleted = false,
-        keyState,
-      )
+    // There wasn't a complete sequence in the unhandled keys, so replay all of them. Do not allow mappings for the
+    // first key, or we'll start to build the same prefix that just failed. Subsequent keys should allow mappings, as
+    // though they were typed.
+    val keyHandler = KeyHandler.getInstance()
+    unhandledKeys.forEachIndexed { index, it ->
+      keyHandler.handleKey(editor, it, context, allowKeyMappings = index != 0, mappingCompleted = false, keyState)
     }
-    else {
-      log.trace("Replaying unhandled keys. There is no mapping in subsequence. Replaying all keys")
-
-      // There wasn't a complete sequence in the unhandled keys, so replay all of them. Do not allow mappings for the
-      // first key, or we'll start to build the same prefix that just failed. Subsequent keys should allow mappings, as
-      // though they were typed.
-      val keyHandler = KeyHandler.getInstance()
-      unhandledKeys.forEachIndexed { index, it ->
-        keyHandler.handleKey(editor, it, context, allowKeyMappings = index != 0, mappingCompleted = false, keyState)
-      }
-    }
-  }
-
-  // TODO: WHY?
-  // The <Plug>mappings are not executed if they fail to map to something.
-  //   E.g.
-  //   - map <Plug>iA someAction
-  //   - map I <Plug>i
-  //   For `IA` someAction should be executed.
-  //   But if the user types `Ib`, `<Plug>i` won't be executed again. Only `b` will be passed to keyHandler.
-  private fun isPluginMapping(unhandledKeyStrokes: List<KeyStroke>): Boolean {
-    return unhandledKeyStrokes.isNotEmpty() && unhandledKeyStrokes[0] == injector.parser.plugKeyStroke
   }
 }

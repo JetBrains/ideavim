@@ -7,7 +7,7 @@
  */
 package com.maddyhome.idea.vim.group
 
-import com.intellij.codeInsight.actions.AsyncActionExecutionService.Companion.getInstance
+import com.intellij.codeInsight.actions.AsyncActionExecutionService
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.application.ApplicationManager
@@ -15,6 +15,7 @@ import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.command.UndoConfirmationPolicy
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.actionSystem.TypedActionHandler
 import com.intellij.openapi.editor.actions.EnterAction
 import com.intellij.openapi.editor.event.EditorMouseEvent
 import com.intellij.openapi.editor.event.EditorMouseListener
@@ -33,7 +34,7 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.handler.commandContinuation
 import com.maddyhome.idea.vim.helper.inInsertMode
-import com.maddyhome.idea.vim.key.KeyHandlerKeeper.Companion.getInstance
+import com.maddyhome.idea.vim.key.KeyHandlerKeeper
 import com.maddyhome.idea.vim.listener.VimInsertListener
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.IjVimCopiedText
@@ -62,8 +63,21 @@ class ChangeGroup : VimChangeGroupBase() {
   }
 
   override fun type(vimEditor: VimEditor, context: ExecutionContext, key: Char) {
+    doType(vimEditor, context) {
+      it.execute(vimEditor.ij, key, context.ij)
+    }
+  }
+
+  override fun type(vimEditor: VimEditor, context: ExecutionContext, string: String) {
+    doType(vimEditor, context) { handler ->
+      string.forEach { char ->
+        handler.execute(vimEditor.ij, char, context.ij)
+      }
+    }
+  }
+
+  private fun doType(vimEditor: VimEditor, context: ExecutionContext, action: (TypedActionHandler) -> Unit) {
     val editor = (vimEditor as IjVimEditor).editor
-    val ijContext = context.ij
     val doc = vimEditor.editor.document
 
     val undo = injector.undo
@@ -76,8 +90,9 @@ class ChangeGroup : VimChangeGroupBase() {
     }
     CommandProcessor.getInstance().executeCommand(
       editor.project, {
-        ApplicationManager.getApplication()
-          .runWriteAction { getInstance().originalHandler.execute(editor, key, ijContext) }
+        ApplicationManager.getApplication().runWriteAction {
+          action(KeyHandlerKeeper.getInstance().originalHandler)
+        }
       }, "", doc,
       UndoConfirmationPolicy.DEFAULT, doc
     )
@@ -173,7 +188,7 @@ class ChangeGroup : VimChangeGroupBase() {
       restoreCursor(editor, caret, (caret as IjVimCaret).caret.logicalPosition.line)
     }
     if (project != null) {
-      getInstance(project)
+      AsyncActionExecutionService.getInstance(project)
         .withExecutionAfterAction(IdeActions.ACTION_EDITOR_AUTO_INDENT_LINES, actionExecution, afterAction)
     } else {
       actionExecution.invoke()

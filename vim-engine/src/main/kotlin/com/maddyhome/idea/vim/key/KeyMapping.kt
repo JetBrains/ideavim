@@ -173,7 +173,10 @@ class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, Key
     if (keysTrie.isPrefix(keys)) return true
 
     // Is this an incomplete RHS on-demand <Action>(...)?
-    return keys.first().keyCode == injector.parser.actionKeyStroke.keyCode && keys.last().keyChar != ')'
+    return keys.first().keyCode == injector.parser.actionKeyStroke.keyCode
+      && (keys.size < 2 || keys[1].keyChar == '(')
+      && (keys.size < 3 || !Character.isWhitespace(keys[2].keyChar))
+      && keys.last().keyChar != ')'
   }
 
   /**

@@ -769,12 +769,15 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     logger.debug { "processKey($key)" }
     if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {
       editor.replaceMask?.recordChangeAtCaret(editor)
-      processResultBuilder.addExecutionStep { _, lambdaEditor, lambdaContext ->
-        type(
-          lambdaEditor,
-          lambdaContext,
-          key.keyChar
-        )
+      processResultBuilder.addExecutionStep { _, e, c ->
+        type(e, c, key.keyChar)
+      }
+      return true
+    } else if (key.keyCode == injector.parser.plugKeyStroke.keyCode || key.keyCode == injector.parser.actionKeyStroke.keyCode) {
+      // <Plug> and <Action> are fake keystrokes that can never be typed. If a failed mapping is replaying it as part of
+      // Insert or Select mode, we need to replace it with the name of the key as text.
+      processResultBuilder.addExecutionStep { _, e, c ->
+        type(e, c, injector.parser.toKeyNotation(key))
       }
       return true
     }
@@ -782,7 +785,9 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     // Shift-space
     if (key.keyCode == 32 && key.modifiers and KeyEvent.SHIFT_DOWN_MASK != 0) {
       editor.replaceMask?.recordChangeAtCaret(editor)
-      processResultBuilder.addExecutionStep { _, lambdaEditor, lambdaContext -> type(lambdaEditor, lambdaContext, ' ') }
+      processResultBuilder.addExecutionStep { _, e, c ->
+        type(e, c, ' ')
+      }
       return true
     }
     return false
