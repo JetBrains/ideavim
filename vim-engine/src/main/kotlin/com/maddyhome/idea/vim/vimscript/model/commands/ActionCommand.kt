@@ -29,7 +29,7 @@ data class ActionCommand(val range: Range, val modifier: CommandModifier, val ar
     RangeFlag.RANGE_OPTIONAL,
     ArgumentFlag.ARGUMENT_OPTIONAL,
     Access.READ_ONLY,
-    Flag.SAVE_VISUAL,
+    Flag.SAVE_SELECTION,
   )
 
   override fun processCommand(
