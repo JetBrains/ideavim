@@ -810,7 +810,7 @@ internal object VimListenerManager {
             if (editor.inVisualMode) {
               editor.vim.exitVisualMode()
             } else if (editor.vim.inSelectMode) {
-              editor.exitSelectMode(false)
+              editor.vim.exitSelectMode(false)
               KeyHandler.getInstance().reset(editor.vim)
             }
           }

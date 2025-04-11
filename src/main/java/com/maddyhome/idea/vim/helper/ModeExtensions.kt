@@ -25,28 +25,6 @@ import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.inSelectMode
 
 /** [adjustCaretPosition] - if true, caret will be moved one char left if it's on the line end */
-internal fun Editor.exitSelectMode(adjustCaretPosition: Boolean) {
-  val vimEditor = this.vim
-  if (!vimEditor.inSelectMode) return
-
-  vimEditor.mode = vimEditor.mode.returnTo
-  SelectionVimListenerSuppressor.lock().use {
-    this.caretModel.allCarets.forEach {
-      // NOTE: I think it should be write action, but the exception shows only an absence of the read action
-      injector.application.runReadAction { it.removeSelection() }
-      it.vim.vimSelectionStartClear()
-      if (adjustCaretPosition && !vimEditor.isEndAllowed) {
-        val lineEnd = IjVimEditor(this).getLineEndForOffset(it.offset)
-        val lineStart = IjVimEditor(this).getLineStartForOffset(it.offset)
-        if (it.offset == lineEnd && it.offset != lineStart) {
-          it.moveToInlayAwareOffset(it.offset - 1)
-        }
-      }
-    }
-  }
-}
-
-/** [adjustCaretPosition] - if true, caret will be moved one char left if it's on the line end */
 internal fun VimEditor.exitSelectMode(adjustCaretPosition: Boolean) {
   if (!this.inSelectMode) return
 

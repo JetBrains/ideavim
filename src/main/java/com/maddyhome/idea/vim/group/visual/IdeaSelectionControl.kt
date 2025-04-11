@@ -96,7 +96,7 @@ internal object IdeaSelectionControl {
       } else {
         logger.debug("None of carets have selection. State before adjustment: ${editor.vim.mode}")
         if (editor.vim.inVisualMode) editor.vim.exitVisualMode()
-        if (editor.vim.inSelectMode) editor.exitSelectMode(false)
+        if (editor.vim.inSelectMode) editor.vim.exitSelectMode(false)
 
         if (editor.vim.inNormalMode) {
           activateMode(editor, chooseNonSelectionMode(editor))
