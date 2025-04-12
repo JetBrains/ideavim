@@ -12,7 +12,6 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.KeyProcessResult
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.CommandBuilder
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
@@ -25,6 +24,18 @@ internal class CharArgumentConsumer : KeyConsumer {
     private val logger = vimLogger<CharArgumentConsumer>()
   }
 
+  override fun isApplicable(
+    key: KeyStroke,
+    editor: VimEditor,
+    allowKeyMappings: Boolean,
+    keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
+  ): Boolean {
+    val expectingCharArgument =
+      keyProcessResultBuilder.state.commandBuilder.expectedArgumentType === Argument.Type.CHARACTER
+    logger.debug { "Expecting char argument: $expectingCharArgument" }
+    return expectingCharArgument
+  }
+
   override fun consumeKey(
     key: KeyStroke,
     editor: VimEditor,
@@ -32,17 +43,9 @@ internal class CharArgumentConsumer : KeyConsumer {
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
     logger.trace { "Entered CharArgumentConsumer" }
-    if (!isExpectingCharArgument(keyProcessResultBuilder.state.commandBuilder)) return false
-
     val chKey: Char = if (key.keyChar == KeyEvent.CHAR_UNDEFINED) 0.toChar() else key.keyChar
     handleCharArgument(key, chKey, keyProcessResultBuilder)
     return true
-  }
-
-  private fun isExpectingCharArgument(commandBuilder: CommandBuilder): Boolean {
-    val expectingCharArgument = commandBuilder.expectedArgumentType === Argument.Type.CHARACTER
-    logger.debug { "Expecting char argument: $expectingCharArgument" }
-    return expectingCharArgument
   }
 
   private fun handleCharArgument(

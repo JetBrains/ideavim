@@ -23,6 +23,15 @@ internal class SelectRegisterConsumer : KeyConsumer {
     private val logger = vimLogger<SelectRegisterConsumer>()
   }
 
+  override fun isApplicable(
+    key: KeyStroke,
+    editor: VimEditor,
+    allowKeyMappings: Boolean,
+    keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
+  ): Boolean {
+    return isSelectRegister(key, keyProcessResultBuilder.state)
+  }
+
   override fun consumeKey(
     key: KeyStroke,
     editor: VimEditor,
@@ -30,12 +39,8 @@ internal class SelectRegisterConsumer : KeyConsumer {
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
     logger.trace { "Entered SelectRegisterConsumer" }
-    val state = keyProcessResultBuilder.state
-    if (!isSelectRegister(key, state)) return false
-
-    logger.trace("Select register")
-    keyProcessResultBuilder.addExecutionStep { _, lambdaEditor, _ ->
-      state.commandBuilder.startWaitingForRegister(key)
+    keyProcessResultBuilder.addExecutionStep { ks, _, _ ->
+      ks.commandBuilder.startWaitingForRegister(key)
     }
     return true
   }

@@ -14,7 +14,26 @@ import javax.swing.KeyStroke
 
 internal interface KeyConsumer {
   /**
-   * @return true if consumed key and could do something meaningful wit it
+   * Returns true if this key consumer can attempt to process the key
+   *
+   * This is mainly a shortcut to aid debugging. Instead of stepping into each key consumer, it's possible to set a
+   * breakpoint on the call to [consumeKey] instead.
+   *
+   * This function will always be called before [consumeKey].
+   */
+  fun isApplicable(
+    key: KeyStroke,
+    editor: VimEditor,
+    allowKeyMappings: Boolean,
+    keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
+  ): Boolean
+
+  /**
+   * Attempt to process and consume the key, if applicable.
+   *
+   * This function will only be called if [isApplicable] returns `true` first.
+   *
+   * @return `true` if the key was consumed and no further [KeyConsumer] instances should be called
    */
   fun consumeKey(
     key: KeyStroke,
