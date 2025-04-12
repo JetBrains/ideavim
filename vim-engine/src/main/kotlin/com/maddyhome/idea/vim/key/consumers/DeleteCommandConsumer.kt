@@ -23,6 +23,15 @@ internal class DeleteCommandConsumer : KeyConsumer {
     private val logger = vimLogger<DeleteCommandConsumer>()
   }
 
+  override fun isApplicable(
+    key: KeyStroke,
+    editor: VimEditor,
+    allowKeyMappings: Boolean,
+    keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
+  ): Boolean {
+    return isDeleteCommandCountKey(key, keyProcessResultBuilder.state, editor.mode)
+  }
+
   override fun consumeKey(
     key: KeyStroke,
     editor: VimEditor,
@@ -30,7 +39,6 @@ internal class DeleteCommandConsumer : KeyConsumer {
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
     logger.trace { "Entered DeleteCommandConsumer" }
-    if (!isDeleteCommandCountKey(key, keyProcessResultBuilder.state, editor.mode)) return false
     keyProcessResultBuilder.state.commandBuilder.deleteCountCharacter()
     return true
   }

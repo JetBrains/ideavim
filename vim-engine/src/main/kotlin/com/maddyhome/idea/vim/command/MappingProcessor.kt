@@ -28,6 +28,23 @@ internal object MappingProcessor : KeyConsumer {
 
   private val log = vimLogger<MappingProcessor>()
 
+  override fun isApplicable(
+    key: KeyStroke,
+    editor: VimEditor,
+    allowKeyMappings: Boolean,
+    keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
+  ): Boolean {
+    if (!allowKeyMappings) {
+      log.trace("Mapping not allowed for key")
+      return false
+    }
+    if (!isMappingApplicable(keyProcessResultBuilder.state.commandBuilder, key, keyProcessResultBuilder.state)) {
+      log.trace { "Mapping not applicable for key: $key" }
+      return false
+    }
+    return true
+  }
+
   override fun consumeKey(
     key: KeyStroke,
     editor: VimEditor,
@@ -35,18 +52,7 @@ internal object MappingProcessor : KeyConsumer {
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
     log.trace { "Entered MappingProcessor with key $key" }
-
-    if (!allowKeyMappings) return false
-
-    log.debug("Start processing key mappings.")
-
     val keyState = keyProcessResultBuilder.state
-
-    if (!isMappingApplicable(keyState.commandBuilder, key, keyState)) {
-      log.debug("Mapping not applicable. Finish key processing, returning false")
-      return false
-    }
-
     val mappingState = keyState.mappingState
     mappingState.stopMappingTimer()
 

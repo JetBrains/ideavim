@@ -28,6 +28,17 @@ internal class EditorResetConsumer : KeyConsumer {
     private val logger = vimLogger<EditorResetConsumer>()
   }
 
+  override fun isApplicable(
+    key: KeyStroke,
+    editor: VimEditor,
+    allowKeyMappings: Boolean,
+    keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
+  ): Boolean {
+    val editorReset = editor.mode is Mode.NORMAL && key.isCloseKeyStroke()
+    logger.debug { "This is editor reset: $editorReset" }
+    return editorReset
+  }
+
   override fun consumeKey(
     key: KeyStroke,
     editor: VimEditor,
@@ -35,7 +46,6 @@ internal class EditorResetConsumer : KeyConsumer {
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
     logger.trace { "Entered EditorResetConsumer" }
-    if (!isEditorReset(key, editor)) return false
     keyProcessResultBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, lambdaContext ->
       handleEditorReset(
         lambdaEditor,
@@ -45,12 +55,6 @@ internal class EditorResetConsumer : KeyConsumer {
       )
     }
     return true
-  }
-
-  private fun isEditorReset(key: KeyStroke, editor: VimEditor): Boolean {
-    val editorReset = editor.mode is Mode.NORMAL && key.isCloseKeyStroke()
-    logger.debug { "This is editor reset: $editorReset" }
-    return editorReset
   }
 
   private fun handleEditorReset(

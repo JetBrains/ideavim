@@ -24,6 +24,16 @@ internal class CommandCountConsumer : KeyConsumer {
     private val logger = vimLogger<CommandCountConsumer>()
   }
 
+  override fun isApplicable(
+    key: KeyStroke,
+    editor: VimEditor,
+    allowKeyMappings: Boolean,
+    keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
+  ): Boolean {
+    val chKey: Char = if (key.keyChar == KeyEvent.CHAR_UNDEFINED) 0.toChar() else key.keyChar
+    return isCommandCountKey(chKey, keyProcessResultBuilder.state)
+  }
+
   override fun consumeKey(
     key: KeyStroke,
     editor: VimEditor,
@@ -31,9 +41,6 @@ internal class CommandCountConsumer : KeyConsumer {
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
     logger.trace { "Entered CommandCountConsumer" }
-    val chKey: Char = if (key.keyChar == KeyEvent.CHAR_UNDEFINED) 0.toChar() else key.keyChar
-    if (!isCommandCountKey(chKey, keyProcessResultBuilder.state)) return false
-
     keyProcessResultBuilder.state.commandBuilder.addCountCharacter(key)
     return true
   }

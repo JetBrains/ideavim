@@ -31,6 +31,15 @@ internal class CommandConsumer : KeyConsumer {
     private val logger = vimLogger<CommandConsumer>()
   }
 
+  override fun isApplicable(
+    key: KeyStroke,
+    editor: VimEditor,
+    allowKeyMappings: Boolean,
+    keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
+  ): Boolean {
+    return true
+  }
+
   override fun consumeKey(
     key: KeyStroke,
     editor: VimEditor,

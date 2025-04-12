@@ -23,6 +23,15 @@ internal class RegisterConsumer : KeyConsumer {
     private val logger = vimLogger<CharArgumentConsumer>()
   }
 
+  override fun isApplicable(
+    key: KeyStroke,
+    editor: VimEditor,
+    allowKeyMappings: Boolean,
+    keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
+  ): Boolean {
+    return keyProcessResultBuilder.state.commandBuilder.isRegisterPending
+  }
+
   override fun consumeKey(
     key: KeyStroke,
     editor: VimEditor,
@@ -31,12 +40,9 @@ internal class RegisterConsumer : KeyConsumer {
   ): Boolean {
     logger.trace { "Entered RegisterConsumer" }
     val commandBuilder = keyProcessResultBuilder.state.commandBuilder
-    if (!commandBuilder.isRegisterPending) return false
-
-    logger.trace("Pending mode.")
     commandBuilder.addTypedKeyStroke(key)
 
-    val chKey: Char = if (key.keyChar == KeyEvent.CHAR_UNDEFINED) 0.toChar() else key.keyChar
+    val chKey = if (key.keyChar == KeyEvent.CHAR_UNDEFINED) 0.toChar() else key.keyChar
     handleSelectRegister(chKey, keyProcessResultBuilder)
     return true
   }

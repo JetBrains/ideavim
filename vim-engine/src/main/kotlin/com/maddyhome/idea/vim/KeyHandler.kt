@@ -181,7 +181,9 @@ class KeyHandler {
       handleKeyRecursionCount++
       try {
         val isProcessed = keyConsumers.any {
-          it.consumeKey(key, editor, allowKeyMappings, keyProcessResultBuilder)
+          // These two lines are specifically formatted to allow setting a breakpoint on the consumeKey line :)
+          it.isApplicable(key, editor, allowKeyMappings, keyProcessResultBuilder)
+            && it.consumeKey(key, editor, allowKeyMappings, keyProcessResultBuilder)
         }
         if (isProcessed) {
           logger.trace { "Key was successfully caught by consumer" }

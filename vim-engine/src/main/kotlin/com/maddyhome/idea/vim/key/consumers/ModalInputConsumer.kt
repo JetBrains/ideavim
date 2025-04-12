@@ -15,6 +15,15 @@ import com.maddyhome.idea.vim.key.KeyConsumer
 import javax.swing.KeyStroke
 
 internal class ModalInputConsumer : KeyConsumer {
+  override fun isApplicable(
+    key: KeyStroke,
+    editor: VimEditor,
+    allowKeyMappings: Boolean,
+    keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder
+  ): Boolean {
+    return injector.modalInput.getCurrentModalInput() != null
+  }
+
   override fun consumeKey(
     key: KeyStroke,
     editor: VimEditor,

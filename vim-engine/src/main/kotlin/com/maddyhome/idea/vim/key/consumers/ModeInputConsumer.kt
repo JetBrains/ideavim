@@ -23,6 +23,15 @@ internal class ModeInputConsumer : KeyConsumer {
     private val logger = vimLogger<ModeInputConsumer>()
   }
 
+  override fun isApplicable(
+    key: KeyStroke,
+    editor: VimEditor,
+    allowKeyMappings: Boolean,
+    keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
+  ): Boolean {
+    return true
+  }
+
   override fun consumeKey(
     key: KeyStroke,
     editor: VimEditor,
