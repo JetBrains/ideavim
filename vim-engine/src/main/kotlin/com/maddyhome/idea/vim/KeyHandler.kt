@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.key.KeyStack
 import com.maddyhome.idea.vim.key.consumers.CharArgumentConsumer
 import com.maddyhome.idea.vim.key.consumers.CommandConsumer
 import com.maddyhome.idea.vim.key.consumers.CommandCountConsumer
-import com.maddyhome.idea.vim.key.consumers.DeleteCommandConsumer
+import com.maddyhome.idea.vim.key.consumers.DeleteCommandCountConsumer
 import com.maddyhome.idea.vim.key.consumers.DigraphConsumer
 import com.maddyhome.idea.vim.key.consumers.EditorResetConsumer
 import com.maddyhome.idea.vim.key.consumers.ModalInputConsumer
@@ -50,7 +50,7 @@ class KeyHandler {
     ModalInputConsumer(),
     MappingProcessor,
     CommandCountConsumer(),
-    DeleteCommandConsumer(),
+    DeleteCommandCountConsumer(),
     EditorResetConsumer(),
     CharArgumentConsumer(),
     RegisterConsumer(),

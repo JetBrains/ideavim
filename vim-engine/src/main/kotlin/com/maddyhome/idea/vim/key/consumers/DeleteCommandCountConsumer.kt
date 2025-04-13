@@ -18,9 +18,9 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-internal class DeleteCommandConsumer : KeyConsumer {
+internal class DeleteCommandCountConsumer : KeyConsumer {
   private companion object {
-    private val logger = vimLogger<DeleteCommandConsumer>()
+    private val logger = vimLogger<DeleteCommandCountConsumer>()
   }
 
   override fun isApplicable(
