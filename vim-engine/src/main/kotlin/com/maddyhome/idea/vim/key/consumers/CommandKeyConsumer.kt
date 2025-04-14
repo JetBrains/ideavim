@@ -48,9 +48,9 @@ import javax.swing.KeyStroke
  * TODO: This is currently handled by [EditorResetConsumer], but this doesn't do anything for non-Normal modes
  * Escape in Op-pending falls through to onUnknownKey, which might be the best implementation
  */
-internal class CommandConsumer : KeyConsumer {
+internal class CommandKeyConsumer : KeyConsumer {
   private companion object {
-    private val logger = vimLogger<CommandConsumer>()
+    private val logger = vimLogger<CommandKeyConsumer>()
   }
 
   override fun isApplicable(
