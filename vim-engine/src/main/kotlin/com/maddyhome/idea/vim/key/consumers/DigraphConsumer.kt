@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.KeyProcessResult
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.CommandBuilder
 import com.maddyhome.idea.vim.common.DigraphResult
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
@@ -21,6 +22,24 @@ import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
+/**
+ * Key consumer to process digraph sequences and convert them into character keystrokes
+ *
+ * This consumer processes all incoming keystrokes. If the [CommandBuilder] is waiting for an [Argument.Type.DIGRAPH]
+ * argument, then it will accept the `<C-K>` and `<C-V>` keystrokes to start a digraph or literal input sequence.
+ * Alternatively, the command handlers for `<C-K>` and `<C-V>` can start a digraph/literal sequence if there is no
+ * argument waiting.
+ *
+ * Keystrokes are consumed until the digraph or literal sequence completes, at which point the resulting character is
+ * converted to one or more keystrokes and passed back through the key handler.
+ *
+ * If the keystroke is unhandled, the key is not consumed and other [KeyConsumer] instances can have a go. If the
+ * [CommandBuilder] is currently waiting for an [Argument.Type.DIGRAPH], then it consume the key, and then fallback to
+ * an [Argument.Type.CHARACTER] and push the key through the key handler so all [KeyConsumer] instances can see it.
+ *
+ * The escape and cancel keys will cancel digraph/literal entry, and are consumed by literal entry. When in Command-line
+ * mode, the cancel key will also cancel Command-line.
+ */
 internal class DigraphConsumer : KeyConsumer {
   private companion object {
     private val logger = vimLogger<DigraphConsumer>()

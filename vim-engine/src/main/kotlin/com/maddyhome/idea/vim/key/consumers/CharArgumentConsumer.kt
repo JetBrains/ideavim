@@ -19,6 +19,17 @@ import com.maddyhome.idea.vim.key.KeyConsumer
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
+/**
+ * Key consumer to handle [Argument.Type.CHARACTER] arguments
+ *
+ * If the currently in-progress command is expecting a character and the given keystroke is a valid character, then it
+ * is attached as an argument to the command. If the keystroke is not a valid character, the current command is failed.
+ *
+ * This consumer does not currently handle escape or cancel keys. Either keystrokes will result in a bad command.
+ *
+ * TODO: Should this handle its own cancellation?
+ * How does fallback work with DIGRAPH arguments and cancel characters? Would that get feed back to this consumer?
+ */
 internal class CharArgumentConsumer : KeyConsumer {
   private companion object {
     private val logger = vimLogger<CharArgumentConsumer>()

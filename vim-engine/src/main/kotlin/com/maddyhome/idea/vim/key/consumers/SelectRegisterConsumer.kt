@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.key.consumers
 import com.maddyhome.idea.vim.KeyProcessResult
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.CommandBuilder
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.key.KeyConsumer
@@ -18,6 +19,12 @@ import com.maddyhome.idea.vim.state.KeyHandlerState
 import com.maddyhome.idea.vim.state.mode.Mode
 import javax.swing.KeyStroke
 
+/**
+ * Key consumer to look for the `"` keystroke to start waiting for a register name
+ *
+ * This consumer will match `"` in Normal or Visual and start the [CommandBuilder] waiting for a register name. It does
+ * not need to handle escape or cancel keys as there is no current state to reset.
+ */
 internal class SelectRegisterConsumer : KeyConsumer {
   private companion object {
     private val logger = vimLogger<SelectRegisterConsumer>()

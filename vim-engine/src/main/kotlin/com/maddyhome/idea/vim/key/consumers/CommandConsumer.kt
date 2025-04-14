@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandBuilder
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.common.argumentCaptured
 import com.maddyhome.idea.vim.diagnostic.trace
@@ -26,6 +27,27 @@ import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
 import javax.swing.KeyStroke
 
+/**
+ * Tries to consume a key that is the start of a new command, or continuation of an in-progress command
+ *
+ * This consumer will process all input. It delegates to [CommandBuilder] and if the key is processed as part of a new
+ * or ongoing command, the key is consumed. If the command maps to a complete action, it is added to the
+ * [CommandBuilder], and either waits for an argument, or is invoked when all key consumers have finished.
+ *
+ * The key consumer is responsible for updating the [CommandBuilder] if the discovered action needs to start or leave
+ * Command-line mode, although it does not change the mode directly. This is similar to supporting a "nested" command
+ * builder so that a Normal mode command can include a Command-line command, e.g. `d/foo`.
+ *
+ * Escape and cancel keys can match as completed commands, in which case the command handler will be invoked once all
+ * key consumers are done. If a command is not yet completed, the escape and cancel keys will fail to map to a known
+ * built-in key shortcut and refuse to process the key.
+ *
+ * In practice, this means we can implement escape and cancel command handlers for the happy paths, but other key
+ * consumers need to handle escape and cancel for all other scenarios. E.g., when selecting the new current register.
+ *
+ * TODO: This is currently handled by [EditorResetConsumer], but this doesn't do anything for non-Normal modes
+ * Escape in Op-pending falls through to onUnknownKey, which might be the best implementation
+ */
 internal class CommandConsumer : KeyConsumer {
   private companion object {
     private val logger = vimLogger<CommandConsumer>()
