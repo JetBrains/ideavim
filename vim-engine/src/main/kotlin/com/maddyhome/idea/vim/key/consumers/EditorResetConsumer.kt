@@ -23,6 +23,20 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
+/**
+ * Key consumer to handle escape and cancel keys in Normal mode
+ *
+ * This consumer will also pass `<Esc>` to the IDE so it can e.g. remove highlights, etc.
+ *
+ * At least some of this implementation can be moved to command handlers.
+ *
+ * This consumer handles escape and cancel keys, but only for Normal mode, and with no distinction between escape or
+ * cancel.
+ *
+ * TODO: What about Visual mode? I think this leaves a hole in escape processing for Visual
+ * E.g. `"<Esc>` will reset the key handler, but `v"<Esc>` will not. It will go through [RegisterConsumer] and error,
+ * resetting the key handler, but also beeping
+ */
 internal class EditorResetConsumer : KeyConsumer {
   private companion object {
     private val logger = vimLogger<EditorResetConsumer>()

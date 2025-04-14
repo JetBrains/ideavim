@@ -18,6 +18,11 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
+/**
+ * Key consumer to handle removing digits from a command currently being built
+ *
+ * This consumer only handles digits in NVO mode. It does not need need to handle escape or cancel keys.
+ */
 internal class DeleteCommandCountConsumer : KeyConsumer {
   private companion object {
     private val logger = vimLogger<DeleteCommandCountConsumer>()

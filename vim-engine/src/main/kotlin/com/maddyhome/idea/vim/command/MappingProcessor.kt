@@ -24,6 +24,26 @@ import com.maddyhome.idea.vim.key.MappingInfoLayer
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import javax.swing.KeyStroke
 
+/**
+ * Key consumer to apply mappings to the incoming keystroke(s) in all modes
+ *
+ * If mappings are allowed, keys are consumed and batched up until a matching map is completed or abandoned, by entering
+ * a key that is not part of a mapping's right-hand side. If the `'timeout'` option is set, and a prefix is not matched
+ * within `'timeoutlen'` milliseconds, the prefix is also abandoned.
+ *
+ * If a key sequence matches a map and doesn't have a longer sequence available, the key is consumed and the right-hand
+ * side of the map is sent through the key handler. This recursive call to the key handler may or may not apply mappings
+ * again, depending on how the mapping was declared (e.g. `nmap` vs `nnoremap`).
+ *
+ * When a prefix is abandoned, it is first checked for the next longest matching map. If found, the right-hand side is
+ * sent through the key handler (recursively or non-recursively depending on the mapping), followed by the remaining
+ * keys, with mapping enabled, as though the keys were directly typed. If not found, all the unhandled keys are
+ * replayed, with the first key handled non-recursively to avoid cycles. The remaining keys are handled recursively.
+ *
+ * Escape (`<Esc>`/`<C-[>`) and cancel keys (`<C-C>`) are handled as part of a map's left-hand side. If these keys are
+ * part of the current map sequence, they are consumed. If they don't, the map is abandoned and the keys are replayed
+ * through the handler with the first in the sequence disallowing further mapping.
+ */
 internal object MappingProcessor : KeyConsumer {
 
   private val log = vimLogger<MappingProcessor>()

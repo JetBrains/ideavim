@@ -18,6 +18,17 @@ import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.state.mode.Mode
 import javax.swing.KeyStroke
 
+/**
+ * Key consumer to handle keystrokes as text input. It should be the last key consumer
+ *
+ * This key consumer will process all keys, and will try to consume keys for Insert, Replace, Select and Command-line
+ * modes by passing to the editor or command line as though it were typed directly. However, not all keystrokes will be
+ * accepted, and some keystrokes will be unhandled. If successfully processed, the editor is partially reset before
+ * continuing.
+ *
+ * This consumer does not directly handle escape or cancel keys, but will pass them to the editor. This will not affect
+ * IdeaVim state.
+ */
 internal class ModeInputConsumer : KeyConsumer {
   private companion object {
     private val logger = vimLogger<ModeInputConsumer>()

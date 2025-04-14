@@ -18,6 +18,12 @@ import com.maddyhome.idea.vim.key.KeyConsumer
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
+/**
+ * Key consumer to capture the register specified after the `"` key in an in-progress command
+ *
+ * This consumer does not explicitly handle escape or cancel keys. If the keystroke is not a valid register name
+ * (including control characters), the entire command is marked as a bad command.
+ */
 internal class RegisterConsumer : KeyConsumer {
   private companion object {
     private val logger = vimLogger<CharArgumentConsumer>()
