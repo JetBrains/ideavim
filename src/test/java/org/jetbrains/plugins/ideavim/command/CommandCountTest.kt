@@ -1,12 +1,12 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2025 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
  * https://opensource.org/licenses/MIT.
  */
 
-package org.jetbrains.plugins.ideavim.action
+package org.jetbrains.plugins.ideavim.command
 
 import com.intellij.idea.TestFor
 import com.maddyhome.idea.vim.api.injector
