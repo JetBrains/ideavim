@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.helper.RWLockLabel
 import com.maddyhome.idea.vim.mark.Mark
 
 interface VimMarkService {
@@ -85,6 +86,7 @@ interface VimMarkService {
   fun setGlobalMark(editor: VimEditor, char: Char, offset: Int): Boolean
   fun setGlobalMark(mark: Mark): Boolean
 
+  @RWLockLabel.Readonly
   fun setVisualSelectionMarks(editor: VimEditor)
   fun getVisualSelectionMarks(caret: ImmutableVimCaret): TextRange?
 

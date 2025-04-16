@@ -82,6 +82,8 @@ per-caret marks.
   fun vimSelectionStartClear()
 
   fun setSelection(start: Int, end: Int)
+
+  @RWLockLabel.Writable
   fun removeSelection()
 
   fun moveToOffset(offset: Int): VimCaret {

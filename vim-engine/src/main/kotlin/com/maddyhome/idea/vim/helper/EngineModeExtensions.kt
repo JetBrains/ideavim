@@ -25,11 +25,15 @@ fun VimEditor.exitVisualMode() {
     if (inBlockSelection) {
       removeSecondaryCarets()
     }
-    nativeCarets().forEach(VimCaret::removeSelection)
+    injector.application.runWriteAction {
+      nativeCarets().forEach(VimCaret::removeSelection)
+    }
   }
   if (inVisualMode || inCommandLineModeWithVisual) {
     vimLastSelectionType = selectionType
-    injector.markService.setVisualSelectionMarks(this)
+    injector.application.runReadAction {
+      injector.markService.setVisualSelectionMarks(this)
+    }
     nativeCarets().forEach { it.vimSelectionStartClear() }
 
     // We usually want to return to the mode that we were in before we started Visual. Typically, this will be NORMAL,
