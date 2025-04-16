@@ -1600,6 +1600,16 @@
         "modes": "NXO"
     },
     {
+        "keys": "g?",
+        "class": "com.maddyhome.idea.vim.action.change.change.ChangeRot13MotionAction",
+        "modes": "N"
+    },
+    {
+        "keys": "g?",
+        "class": "com.maddyhome.idea.vim.action.change.change.ChangeRot13VisualAction",
+        "modes": "X"
+    },
+    {
         "keys": "gD",
         "class": "com.maddyhome.idea.vim.action.motion.search.GotoDeclarationAction",
         "modes": "NX"
