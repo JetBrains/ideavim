@@ -45,7 +45,7 @@ afterEvaluate {
 }
 
 dependencies {
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.12.1")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.12.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.12.2")
 
     // Temp workaround suggested in https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-faq.html#junit5-test-framework-refers-to-junit4
