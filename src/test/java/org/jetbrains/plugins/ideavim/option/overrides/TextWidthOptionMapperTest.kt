@@ -50,7 +50,7 @@ class TextWidthOptionMapperTest : VimTestCase() {
 
     // Copied from FileEditorManagerTestCase to allow us to split windows
     val manager =
-      FileEditorManagerImpl(fixture.project, (fixture.project as ComponentManagerEx).getCoroutineScope().childScope())
+      FileEditorManagerImpl(fixture.project, (fixture.project as ComponentManagerEx).getCoroutineScope().childScope(name = "TextWidthOptionMapperTest"))
     fixture.project.replaceService(FileEditorManager::class.java, manager, fixture.testRootDisposable)
 
     ApplicationManager.getApplication().invokeAndWait {

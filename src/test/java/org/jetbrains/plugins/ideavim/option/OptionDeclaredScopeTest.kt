@@ -61,7 +61,7 @@ class OptionDeclaredScopeTest : VimTestCase() {
     super.setUp(testInfo)
 
     // Copied from FileEditorManagerTestCase to allow us to split windows
-    fileEditorManager = FileEditorManagerImpl(fixture.project, (fixture.project as ComponentManagerEx).getCoroutineScope().childScope())
+    fileEditorManager = FileEditorManagerImpl(fixture.project, (fixture.project as ComponentManagerEx).getCoroutineScope().childScope(name = "OptionDeclaredScopeTest"))
     fixture.project.replaceService(FileEditorManager::class.java, fileEditorManager, fixture.testRootDisposable)
 
     // Create a new editor that will represent a new buffer in a separate window. It will have default values
@@ -160,7 +160,7 @@ class OptionDeclaredScopeTest : VimTestCase() {
       }
       val virtualFile = editor.virtualFile
 
-      if (editorWindow != null && virtualFile != null) {
+      if (virtualFile != null) {
         editorWindow.closeFile(virtualFile)
         editorWindow.requestFocus(true)
       }

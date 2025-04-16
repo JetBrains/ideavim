@@ -32,7 +32,7 @@ class VimListenersTest : VimTestCase() {
     super.setUp(testInfo)
 
     val manager =
-      FileEditorManagerImpl(fixture.project, (fixture.project as ComponentManagerEx).getCoroutineScope().childScope())
+      FileEditorManagerImpl(fixture.project, (fixture.project as ComponentManagerEx).getCoroutineScope().childScope(name = "VimListenersTest"))
     fixture.project.replaceService(FileEditorManager::class.java, manager, fixture.testRootDisposable)
 
     VimListenerTestObject.disposedCounter = 0

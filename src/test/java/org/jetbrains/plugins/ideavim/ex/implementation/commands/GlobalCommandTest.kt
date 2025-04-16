@@ -13,7 +13,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
-import com.maddyhome.idea.vim.history.HistoryConstants
+import com.maddyhome.idea.vim.history.VimHistory
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -240,7 +240,7 @@ class GlobalCommandTest : VimTestCase() {
   @Test
   fun `test check history`() {
     VimPlugin.getHistory().clear()
-    val initialEntries = VimPlugin.getHistory().getEntries(HistoryConstants.COMMAND, 0, 0)
+    val initialEntries = VimPlugin.getHistory().getEntries(VimHistory.Type.Command, 0, 0)
     doTest(
       "g/found/d",
       initialText,
@@ -252,7 +252,7 @@ class GlobalCommandTest : VimTestCase() {
             hard by the torrent of a mountain pass. 
       """.trimIndent(),
     )
-    val entries = VimPlugin.getHistory().getEntries(HistoryConstants.COMMAND, 0, 0)
+    val entries = VimPlugin.getHistory().getEntries(VimHistory.Type.Command, 0, 0)
     kotlin.test.assertEquals(1, entries.size - initialEntries.size)
     val element = entries.last()
     kotlin.test.assertEquals("g/found/d", element.entry)

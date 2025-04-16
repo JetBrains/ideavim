@@ -9,7 +9,6 @@
 package org.jetbrains.plugins.ideavim.action.copy
 
 import com.intellij.notification.ActionCenter
-import com.intellij.notification.EventLog
 import com.intellij.notification.Notification
 import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.VimPlugin
@@ -105,7 +104,7 @@ class IdeaPutNotificationsTest : VimTestCase() {
     }
     typeText(injector.parser.parseKeys("p"))
 
-    val notifications = EventLog.getLogModel(fixture.project).notifications
+    val notifications = ActionCenter.getNotifications(fixture.project)
     kotlin.test.assertTrue(notifications.isEmpty() || notifications.last().isExpired || OptionConstants.clipboard_ideaput !in notifications.last().content)
   }
 

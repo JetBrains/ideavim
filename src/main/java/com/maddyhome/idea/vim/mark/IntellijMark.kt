@@ -18,7 +18,7 @@ internal class IntellijMark(bookmark: LineBookmark, override val col: Int, proje
 
   private val project: WeakReference<Project?> = WeakReference(project)
 
-  override val key = BookmarksManager.getInstance(project)?.getType(bookmark)?.mnemonic!!
+  override val key = BookmarksManager.getInstance(project)?.getType(bookmark)?.mnemonic ?: ' '
   override val line: Int
     get() = getMark()?.line ?: 0
   override val filepath: String

@@ -37,7 +37,7 @@ class WrapOptionMapperTest : VimTestCase() {
 
     // Copied from FileEditorManagerTestCase to allow us to split windows
     manager =
-      FileEditorManagerImpl(fixture.project, (fixture.project as ComponentManagerEx).getCoroutineScope().childScope())
+      FileEditorManagerImpl(fixture.project, (fixture.project as ComponentManagerEx).getCoroutineScope().childScope(name = "WrapOptionMapperTest"))
     fixture.project.replaceService(FileEditorManager::class.java, manager, fixture.testRootDisposable)
 
     configureByText("\n")

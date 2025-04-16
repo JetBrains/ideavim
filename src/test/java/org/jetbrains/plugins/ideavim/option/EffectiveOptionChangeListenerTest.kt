@@ -67,7 +67,7 @@ class EffectiveOptionChangeListenerTest : VimTestCase() {
 
     // Copied from FileEditorManagerTestCase to allow us to split windows
     manager =
-      FileEditorManagerImpl(fixture.project, (fixture.project as ComponentManagerEx).getCoroutineScope().childScope())
+      FileEditorManagerImpl(fixture.project, (fixture.project as ComponentManagerEx).getCoroutineScope().childScope(name = "EffectiveOptionChangeListenerTest"))
     fixture.project.replaceService(FileEditorManager::class.java, manager, fixture.testRootDisposable)
 
     // Create a new editor that will represent a new buffer in a separate window. It will have default values
