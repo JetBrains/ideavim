@@ -69,7 +69,12 @@ plugins {
   kotlin("jvm") version "2.0.21"
   application
   id("java-test-fixtures")
+
+  // NOTE: Unignore "test block comment falls back to line comment when not available" test
+  //   After changing this version. It supposed to work on the next version of the gradle plugin
+  //   Or go report to the devs that this test still fails.
   id("org.jetbrains.intellij.platform") version "2.5.0"
+
   id("org.jetbrains.changelog") version "2.2.1"
   id("org.jetbrains.kotlinx.kover") version "0.6.1"
   id("com.dorongold.task-tree") version "4.0.1"

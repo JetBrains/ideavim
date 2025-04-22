@@ -12,7 +12,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
 open class TestingBuildType(
   private val testName: String,
-  private val branch: String,
+  private val branch: String = "<default>",
   private val version: String = testName,
   private val javaVersion: String? = null,
   private val javaPlugin: Boolean = true,

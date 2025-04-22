@@ -23,8 +23,8 @@ object Project : Project({
   vcsRoot(ReleasesVcsRoot)
 
   // Active tests
-  buildType(TestingBuildType("Latest EAP", "<default>", version = "LATEST-EAP-SNAPSHOT"))
-  buildType(TestingBuildType("2024.3.3", "<default>"))
+  buildType(TestingBuildType("Latest EAP", version = "LATEST-EAP-SNAPSHOT"))
+  buildType(TestingBuildType("2025.1"))
   buildType(TestingBuildType("Latest EAP With Xorg", "<default>", version = "LATEST-EAP-SNAPSHOT"))
 
   buildType(PropertyBased)
