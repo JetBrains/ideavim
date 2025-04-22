@@ -31,10 +31,8 @@ open class GlobalIjOptions(scope: OptionAccessScope) : OptionsPropertiesBase(sco
 
   // Temporary options to control work-in-progress behaviour
   var closenotebooks: Boolean by optionProperty(IjOptions.closenotebooks)
-  var commandOrMotionAnnotation: Boolean by optionProperty(IjOptions.commandOrMotionAnnotation)
   var oldundo: Boolean by optionProperty(IjOptions.oldundo)
   var unifyjumps: Boolean by optionProperty(IjOptions.unifyjumps)
-  var vimscriptFunctionAnnotation: Boolean by optionProperty(IjOptions.vimscriptFunctionAnnotation)
 }
 
 /**
