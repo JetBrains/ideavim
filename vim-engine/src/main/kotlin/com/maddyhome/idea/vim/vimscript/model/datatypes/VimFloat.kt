@@ -10,6 +10,8 @@ package com.maddyhome.idea.vim.vimscript.model.datatypes
 
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.util.Locale
 import kotlin.math.abs
 
 data class VimFloat(val value: Double) : VimDataType() {
@@ -32,14 +34,12 @@ data class VimFloat(val value: Double) : VimDataType() {
 
   override fun toString(): String {
     if (value.isNaN()) return "nan"
-    return if (abs(value) >= 1e6 || (abs(value) < 1e-3 && value != 0.0)) {
-      val formatter = DecimalFormat("0.0#####E0")
-      formatter.decimalFormatSymbols = formatter.decimalFormatSymbols.apply { exponentSeparator = "e" }
-      formatter.format(value)
+    val tooBigOrTooSmall = abs(value) >= 1e6 || (abs(value) < 1e-3 && value != 0.0)
+    val pattern = if (tooBigOrTooSmall) "0.0#####E0" else "0.0#####"
+    val symbols = DecimalFormatSymbols.getInstance(Locale.ROOT).apply {
+      exponentSeparator = "e"
     }
-    else {
-      DecimalFormat("0.0#####").format(value)
-    }
+    return DecimalFormat(pattern, symbols).format(value)
   }
 
   override fun deepCopy(level: Int): VimFloat {
