@@ -10,6 +10,7 @@ package org.jetbrains.plugins.ideavim.ex.implementation.expressions.datatypes
 
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
 import org.junit.jupiter.api.Test
+import java.util.Locale
 import kotlin.test.assertEquals
 
 class VimFloatTest {
@@ -22,5 +23,16 @@ class VimFloatTest {
   @Test
   fun `round 7 digits`() {
     assertEquals("1.0", VimFloat(0.9999999).toString())
+  }
+
+  @Test
+  fun `use point as decimal separator always`() {
+    val oldLocale = Locale.getDefault()
+    Locale.setDefault(Locale.GERMANY) // In Germany, they use a comma as a decimal separator, i.e., "3,14".
+    try {
+      assertEquals("3.14", VimFloat(3.14).toString())
+    } finally {
+      Locale.setDefault(oldLocale)
+    }
   }
 }
