@@ -197,6 +197,19 @@ class SubstituteCommandTest : VimTestCase() {
     VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test ampersand group`() {
+    doTest(
+      exCommand("s/a\\|b/z&/g"),
+      "${c}abcdefg",
+      "zazbcdefg",
+    )
+  }
+
+  @OptionTest(
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
+  )
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test missing group`() {
     doTest(
       exCommand("s/b/<\\7>/"),
@@ -1339,6 +1352,62 @@ class SubstituteCommandTest : VimTestCase() {
       exCommand("%s/[*/]//g"),
       "/* comment */",
       " comment ",
+    )
+  }
+
+  // VIM-3510
+  @OptionTest(
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
+  )
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test replace action U`() {
+    doTest(
+      exCommand("s/\\(foo\\)/\\U\\1bar/"),
+      "${c}a foo",
+      "a FOOBAR",
+    )
+  }
+
+  // VIM-3510
+  @OptionTest(
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
+  )
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test replace action U and E`() {
+    doTest(
+      exCommand("s/\\(foo\\)/\\U\\1\\ebar/"),
+      "${c}a foo",
+      "a FOObar",
+    )
+  }
+
+  // VIM-3510
+  @OptionTest(
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
+  )
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test replace action u`() {
+    doTest(
+      exCommand("s/\\(foo\\)/\\u\\1bar/"),
+      "${c}a foo",
+      "a Foobar",
+    )
+  }
+
+  // VIM-3510
+  @OptionTest(
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
+  )
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test replace action u and empty group`() {
+    doTest(
+      exCommand("s/a foo\\(\\)/a foo\\u\\1bar/"),
+      "${c}a foo",
+      "a fooBar",
     )
   }
 }
