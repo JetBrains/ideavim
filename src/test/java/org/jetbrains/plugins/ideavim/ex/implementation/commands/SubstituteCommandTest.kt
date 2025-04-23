@@ -197,6 +197,19 @@ class SubstituteCommandTest : VimTestCase() {
     VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test missing group`() {
+    doTest(
+      exCommand("s/b/<\\7>/"),
+      "${c}abc",
+      "a<>c",
+    )
+  }
+
+  @OptionTest(
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
+  )
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test to nl`() {
     doTest(
       exCommand("s/\\./\\r/g"),

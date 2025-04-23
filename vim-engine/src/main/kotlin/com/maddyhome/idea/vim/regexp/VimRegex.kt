@@ -389,16 +389,15 @@ class VimRegex(pattern: String) {
           '&' -> result.append(if (magic) '&' else matchResult.value)
           '~' -> result.append(if (magic) '~' else buildSubstituteString(matchResult, lastSubstituteString, "", false))
           '0' -> result.append(matchResult.value)
-          // TODO: check for illegal back references
-          '1' -> result.append(matchResult.groups.get(1)?.value)
-          '2' -> result.append(matchResult.groups.get(2)?.value)
-          '3' -> result.append(matchResult.groups.get(3)?.value)
-          '4' -> result.append(matchResult.groups.get(4)?.value)
-          '5' -> result.append(matchResult.groups.get(5)?.value)
-          '6' -> result.append(matchResult.groups.get(6)?.value)
-          '7' -> result.append(matchResult.groups.get(7)?.value)
-          '8' -> result.append(matchResult.groups.get(8)?.value)
-          '9' -> result.append(matchResult.groups.get(9)?.value)
+          '1' -> result.append(matchResult.groups.get(1)?.value ?: "")
+          '2' -> result.append(matchResult.groups.get(2)?.value ?: "")
+          '3' -> result.append(matchResult.groups.get(3)?.value ?: "")
+          '4' -> result.append(matchResult.groups.get(4)?.value ?: "")
+          '5' -> result.append(matchResult.groups.get(5)?.value ?: "")
+          '6' -> result.append(matchResult.groups.get(6)?.value ?: "")
+          '7' -> result.append(matchResult.groups.get(7)?.value ?: "")
+          '8' -> result.append(matchResult.groups.get(8)?.value ?: "")
+          '9' -> result.append(matchResult.groups.get(9)?.value ?: "")
           'u' -> caseSettings = SubstituteCase.UPPER
           'U' -> caseSettings = SubstituteCase.UPPER_PERSISTENT
           'l' -> caseSettings = SubstituteCase.LOWER
