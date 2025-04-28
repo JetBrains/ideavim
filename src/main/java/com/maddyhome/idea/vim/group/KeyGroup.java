@@ -58,7 +58,7 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
   public void registerRequiredShortcutKeys(@NotNull VimEditor editor) {
     EventFacade.getInstance()
       .registerCustomShortcutSet(VimShortcutKeyAction.getInstance(), toShortcutSet(getRequiredShortcutKeys()),
-                                 ((IjVimEditor)editor).getEditor().getComponent());
+                                 ((IjVimEditor)editor).getEditor().getContentComponent());
   }
 
   public void registerShortcutsForLookup(@NotNull LookupImpl lookup) {
@@ -69,7 +69,7 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
 
   void unregisterShortcutKeys(@NotNull VimEditor editor) {
     EventFacade.getInstance().unregisterCustomShortcutSet(VimShortcutKeyAction.getInstance(),
-                                                          ((IjVimEditor)editor).getEditor().getComponent());
+                                                          ((IjVimEditor)editor).getEditor().getContentComponent());
   }
 
   @Override
