@@ -26,6 +26,13 @@ Previous maintainers:
   &nbsp;
   Andrey Vlasovskikh
 
+Previous support members:
+
+* [![icon][mail]](mailto:lejia.chen@jetbrains.com)
+  [![icon][github-off]](#)
+  &nbsp;
+  Lejia Chen
+
 Contributors:
 
 * [![icon][mail]](mailto:yole@jetbrains.com)
