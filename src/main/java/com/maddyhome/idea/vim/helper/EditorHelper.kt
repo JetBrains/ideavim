@@ -68,6 +68,20 @@ internal fun Editor.isPrimaryEditor(): Boolean {
   return fileEditorManager.allEditors.any { fileEditor -> this == EditorUtil.getEditorEx(fileEditor) }
 }
 
+/**
+ * Checks if the editor should be treated like a terminal. I.e. switch to Insert mode automatically
+ *
+ * A "terminal" editor is an editor used for purposes other than mainstream editing, such as a terminal, console, log
+ * viewer, etc. In this instance, the editor is writable, the document is writable, but it's not backed by a real file
+ * and it's not the diff viewer. We also check that if it's an injected language fragment backed by a real file.
+ */
+internal fun Editor.isTerminalEditor(): Boolean {
+  return !isViewer
+    && document.isWritable
+    && !EditorHelper.isFileEditor(this)
+    && !EditorHelper.isDiffEditor(this)
+}
+
 // Optimized clone of com.intellij.ide.ui.laf.darcula.DarculaUIUtil.isTableCellEditor
 private fun isTableCellEditor(c: Component): Boolean {
   return (java.lang.Boolean.TRUE == (c as JComponent).getClientProperty("JComboBox.isTableCellEditor")) ||
