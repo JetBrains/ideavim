@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.helper;
 
+import com.intellij.injected.editor.VirtualFileWindow;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.ex.util.EditorUtil;
 import com.intellij.openapi.editor.impl.EditorImpl;
@@ -15,6 +16,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.registry.Registry;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileUtil;
 import com.intellij.testFramework.LightVirtualFile;
 import com.maddyhome.idea.vim.api.EngineEditorHelperKt;
 import com.maddyhome.idea.vim.api.VimEditor;
@@ -652,7 +654,21 @@ public class EditorHelper {
    */
   public static boolean isFileEditor(@NotNull Editor editor) {
     final VirtualFile virtualFile = getVirtualFile(editor);
-    return virtualFile != null && !(virtualFile instanceof LightVirtualFile);
+    if (virtualFile == null) return false;
+    if (virtualFile instanceof LightVirtualFile) {
+      var hostVirtualFile = getHostFileFromInjectedFile(virtualFile);
+      if (hostVirtualFile == null) return false;
+      return !(hostVirtualFile instanceof LightVirtualFile);
+    }
+    return true;
+  }
+
+  private static @Nullable VirtualFile getHostFileFromInjectedFile(@NotNull VirtualFile virtualFile) {
+    final var vf = VirtualFileUtil.originalFileOrSelf(virtualFile);
+    if (vf instanceof VirtualFileWindow) {
+      return ((VirtualFileWindow)vf).getDelegate();
+    }
+    return null;
   }
 
   /**

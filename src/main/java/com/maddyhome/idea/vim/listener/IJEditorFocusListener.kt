@@ -10,8 +10,6 @@ package com.maddyhome.idea.vim.listener
 
 import com.intellij.execution.impl.ConsoleViewImpl
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.EditorKind
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.LastUsedEditorInfo
 import com.maddyhome.idea.vim.VimPlugin
@@ -19,8 +17,8 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.EditorListener
-import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.inInsertMode
+import com.maddyhome.idea.vim.helper.isTerminalEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.state.mode.Mode
 
@@ -57,7 +55,7 @@ class IJEditorFocusListener : EditorListener {
     // to know that a read-only editor that is hosting a console view with a running process can be treated as writable.
 
     val ijEditor = editor.ij
-    val isCurrentEditorTerminal = isTerminal(ijEditor)
+    val isCurrentEditorTerminal = ijEditor.isTerminalEditor()
 
     KeyHandler.getInstance().lastUsedEditorInfo = LastUsedEditorInfo(currentEditorHashCode, false)
 
@@ -86,13 +84,5 @@ class IJEditorFocusListener : EditorListener {
       }
     }
     KeyHandler.getInstance().reset(editor)
-  }
-
-  // By "terminal" we refer to some editor that should switch to INSERT mode on focus
-  private fun isTerminal(ijEditor: Editor): Boolean {
-    return !ijEditor.isViewer &&
-      !EditorHelper.isFileEditor(ijEditor) &&
-      ijEditor.document.isWritable &&
-      ijEditor.editorKind != EditorKind.DIFF
   }
 }
