@@ -44,6 +44,8 @@ internal class RiderActionListener : AnActionListener {
     if (hostEditor != null) {
       editor = hostEditor
     }
+
+    // Fixes RIDER-123506
     if (action is EditorAction) {
       val key = ActionPlaces.EXECUTE_EDITOR_ACTION_ON_FRONTEND
       editor?.putUserData(key, shouldExecuteOnFrontend(action))
