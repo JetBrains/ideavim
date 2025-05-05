@@ -182,8 +182,8 @@ internal class NotificationService(private val project: Project?) {
     ).notify(project)
   }
 
-  fun notifyActionId(id: String?, candidates: List<String>? = null) {
-    ActionIdNotifier.notifyActionId(id, project, candidates)
+  fun notifyActionId(id: String?, candidates: List<String>? = null, intentionName: String?) {
+    ActionIdNotifier.notifyActionId(id, project, candidates, intentionName)
   }
 
   fun notifyKeymapIssues(issues: ArrayList<KeyMapIssue>) {
@@ -261,12 +261,15 @@ internal class NotificationService(private val project: Project?) {
   object ActionIdNotifier {
     private var notification: Notification? = null
 
-    fun notifyActionId(id: String?, project: Project?, candidates: List<String>? = null) {
+    fun notifyActionId(id: String?, project: Project?, candidates: List<String>? = null, intentionName: String? = null) {
       notification?.expire()
 
       val possibleIDs = candidates?.distinct()?.sorted()
       val content = when {
         id != null -> "Action ID: <code>$id</code><br><br>"
+        possibleIDs.isNullOrEmpty() && !intentionName.isNullOrEmpty() -> {
+          "Intention \"$intentionName\" does not have an action ID.<br><br>"
+        }
         possibleIDs.isNullOrEmpty() -> "<i>Cannot detect action ID</i><br><br>"
         possibleIDs.size == 1 -> "Possible action ID: <code>${possibleIDs[0]}</code><br><br>"
         else -> {

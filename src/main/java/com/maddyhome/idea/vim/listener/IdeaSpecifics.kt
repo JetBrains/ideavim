@@ -18,6 +18,7 @@ import com.intellij.codeInsight.template.TemplateEditingAdapter
 import com.intellij.codeInsight.template.TemplateManagerListener
 import com.intellij.codeInsight.template.impl.TemplateState
 import com.intellij.find.FindModelListener
+import com.intellij.ide.actions.ApplyIntentionAction
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
@@ -94,10 +95,14 @@ internal object IdeaSpecifics {
           } else {
             emptyList()
           }
+         val intentionName = if (action is ApplyIntentionAction) {
+            action.name
+          }
+          else null
 
           // We can still get empty ID and empty candidates. Notably, for the tool window toggle buttons on the new UI.
           // We could filter out action events with `place == ActionPlaces.TOOLWINDOW_TOOLBAR_BAR`
-          VimPlugin.getNotifications(event.dataContext.getData(CommonDataKeys.PROJECT)).notifyActionId(id, candidates)
+          VimPlugin.getNotifications(event.dataContext.getData(CommonDataKeys.PROJECT)).notifyActionId(id, candidates, intentionName)
         }
       }
 
