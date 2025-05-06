@@ -32,10 +32,6 @@ Previous support members:
   [![icon][github-off]](#)
   &nbsp;
   Lejia Chen
-* [![icon][mail]](mailto:ivan.yarkov@jetbrains.com)
-  [![icon][github]](https://github.com/MToolMakerJB)
-  &nbsp;
-  Ivan Yarkov
 
 Contributors:
 
@@ -606,6 +602,10 @@ Contributors:
   [![icon][github]](https://github.com/erotourtes)
   &nbsp;
   Max Siryk
+* [![icon][mail]](mailto:ivan.yarkov@jetbrains.com)
+  [![icon][github]](https://github.com/MToolMakerJB)
+  &nbsp;
+  Ivan Yarkov
 
 Previous contributors:
 

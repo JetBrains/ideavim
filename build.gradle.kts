@@ -31,6 +31,7 @@ import kotlinx.serialization.json.putJsonObject
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.lib.RepositoryBuilder
 import org.intellij.markdown.ast.getTextInNode
+import org.intellij.markdown.ast.impl.ListCompositeNode
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.tasks.aware.SplitModeAware
@@ -824,7 +825,9 @@ fun updateAuthors(uncheckedEmails: Set<String>) {
     org.intellij.markdown.parser.MarkdownParser(org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor())
   val tree = parser.buildMarkdownTreeFromString(authors)
 
-  val contributorsSection = tree.children[24]
+  val contributorsSection = tree.children
+    .filter { it is ListCompositeNode }
+    .single { it.getTextInNode(authors).contains("yole") }
   val existingEmails = mutableSetOf<String>()
   for (child in contributorsSection.children) {
     if (child.children.size > 1) {
