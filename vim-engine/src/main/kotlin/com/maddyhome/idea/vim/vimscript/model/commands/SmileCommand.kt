@@ -48,11 +48,13 @@ class SmileCommand(val range: Range, val modifier: CommandModifier, val argument
     private val extensionToResourceMap: Map<String, String> = mapOf(
       "kt" to KOTLIN_RESOURCE_PATH,
       "kts" to KOTLIN_RESOURCE_PATH,
-      "java" to JAVA_RESOURCE_PATH
+      "java" to JAVA_RESOURCE_PATH,
+      "py" to PYTHON_RESOURCE_PATH
     )
 
     const val DEFAULT_RESOURCE_PATH = "/ascii-art/default.txt"
     const val KOTLIN_RESOURCE_PATH = "/ascii-art/kotlin.txt"
     const val JAVA_RESOURCE_PATH = "/ascii-art/java.txt"
+    const val PYTHON_RESOURCE_PATH = "/ascii-art/python.txt"
   }
 }

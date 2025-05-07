@@ -71,6 +71,18 @@ class SmileCommandTest : VimTestCase() {
   }
 
   @Test
+  fun `test smile command with python file`() {
+    configureByText("\n")
+    configureByFileName("Test.py")
+    typeText(commandToKeys("smile"))
+
+    val output: String = ExOutputModel.getInstance(fixture.editor).text.trimEnd()
+    val expectedContent: String = loadResourceContent(SmileCommand.PYTHON_RESOURCE_PATH).trimEnd()
+
+    assertEquals(expectedContent, output)
+  }
+
+  @Test
   fun `test smile command with unknown file extension`() {
     configureByText("\n")
     configureByFileName("Test.unknown")
