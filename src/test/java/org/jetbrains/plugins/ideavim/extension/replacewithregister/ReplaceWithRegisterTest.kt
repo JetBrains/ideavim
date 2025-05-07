@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.extension.replacewithregister
 
+import com.intellij.idea.TestFor
 import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
@@ -650,4 +651,149 @@ class ReplaceWithRegisterTest : VimTestCase() {
     assertState("one two three")
     enterCommand("set clipboard&")
   }
+
+  @TestFor(issues = ["VIM-2263"])
+  @Test
+  fun `test replace with count from register a`() {
+    val before = """
+            ${c}first line
+            second line
+            third line
+            fourth line
+            fifth line
+        """.trimIndent()
+
+    configureByText(before)
+    typeText("\"ay$")
+
+    val context = injector.executionContextManager.getEditorExecutionContext(fixture.editor.vim)
+
+    injector.registerGroup.getRegister(fixture.editor.vim, context, 'a' )?.let {
+      assertEquals("first line", it.text)
+    }
+
+    injector.registerGroup.getRegister(fixture.editor.vim, context, '"' )?.let {
+      assertEquals("first line", it.text)
+    }
+
+    typeText("j")
+    typeText("y$")
+
+    injector.registerGroup.getRegister(fixture.editor.vim, context, 'a' )?.let {
+      assertEquals("first line", it.text)
+    }
+
+    injector.registerGroup.getRegister(fixture.editor.vim, context, '"' )?.let {
+      assertEquals("second line", it.text)
+    }
+
+    typeText("\"a2grr")
+
+    val expected = """
+            first line
+            ${c}first line
+            fourth line
+            fifth line
+        """.trimIndent()
+
+    assertState(expected)
+  }
+
+  @TestFor(issues = ["VIM-2263"])
+  @Test
+  fun `test replace from the register a (without count)`() {
+    val before = """
+            ${c}first line
+            second line
+            third line
+            fourth line
+            fifth line
+        """.trimIndent()
+
+    configureByText(before)
+    typeText("\"ay$")
+
+    val context = injector.executionContextManager.getEditorExecutionContext(fixture.editor.vim)
+
+    injector.registerGroup.getRegister(fixture.editor.vim, context, 'a' )?.let {
+      assertEquals("first line", it.text)
+    }
+
+    injector.registerGroup.getRegister(fixture.editor.vim, context, '"' )?.let {
+      assertEquals("first line", it.text)
+    }
+
+    typeText("j")
+    typeText("y$")
+
+    injector.registerGroup.getRegister(fixture.editor.vim, context, 'a' )?.let {
+      assertEquals("first line", it.text)
+    }
+
+    injector.registerGroup.getRegister(fixture.editor.vim, context, '"' )?.let {
+      assertEquals("second line", it.text)
+    }
+
+    typeText("\"agrr")
+
+    val expected = """
+            first line
+            ${c}first line
+            third line
+            fourth line
+            fifth line
+        """.trimIndent()
+
+    assertState(expected)
+  }
+
+  @TestFor(issues = ["VIM-2263"])
+  @Test
+  fun `test replace from the register a to the end of the line`() {
+    val before = """
+            ${c}first line
+            second line
+            third line
+            fourth line
+            fifth line
+        """.trimIndent()
+
+    configureByText(before)
+    typeText("\"ayiw")
+
+    val context = injector.executionContextManager.getEditorExecutionContext(fixture.editor.vim)
+
+    injector.registerGroup.getRegister(fixture.editor.vim, context, 'a' )?.let {
+      assertEquals("first", it.text)
+    }
+
+    injector.registerGroup.getRegister(fixture.editor.vim, context, '"' )?.let {
+      assertEquals("first", it.text)
+    }
+
+    typeText("j")
+    typeText("y$")
+    typeText("w")
+
+    injector.registerGroup.getRegister(fixture.editor.vim, context, 'a' )?.let {
+      assertEquals("first", it.text)
+    }
+
+    injector.registerGroup.getRegister(fixture.editor.vim, context, '"' )?.let {
+      assertEquals("second line", it.text)
+    }
+
+    typeText("\"agr$")
+
+    val expected = """
+            first line
+            second firs${c}t
+            third line
+            fourth line
+            fifth line
+        """.trimIndent()
+
+    assertState(expected)
+  }
+
 }
