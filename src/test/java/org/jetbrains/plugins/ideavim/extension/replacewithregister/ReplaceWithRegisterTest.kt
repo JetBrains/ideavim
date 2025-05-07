@@ -668,24 +668,20 @@ class ReplaceWithRegisterTest : VimTestCase() {
 
     val context = injector.executionContextManager.getEditorExecutionContext(fixture.editor.vim)
 
-    injector.registerGroup.getRegister(fixture.editor.vim, context, 'a' )?.let {
-      assertEquals("first line", it.text)
-    }
+    val aRegText = injector.registerGroup.getRegister(fixture.editor.vim, context, 'a' )!!.text
+    assertEquals("first line", aRegText)
 
-    injector.registerGroup.getRegister(fixture.editor.vim, context, '"' )?.let {
-      assertEquals("first line", it.text)
-    }
+    val defaultRegText = injector.registerGroup.getRegister(fixture.editor.vim, context, '"' )!!.text
+    assertEquals("first line", defaultRegText )
 
     typeText("j")
     typeText("y$")
 
-    injector.registerGroup.getRegister(fixture.editor.vim, context, 'a' )?.let {
-      assertEquals("first line", it.text)
-    }
+    val aRegTextAfter = injector.registerGroup.getRegister(fixture.editor.vim, context, 'a' )!!.text
+    assertEquals("first line", aRegTextAfter)
 
-    injector.registerGroup.getRegister(fixture.editor.vim, context, '"' )?.let {
-      assertEquals("second line", it.text)
-    }
+    val defaultRegTextAfter = injector.registerGroup.getRegister(fixture.editor.vim, context, '"' )!!.text
+    assertEquals("second line", defaultRegTextAfter )
 
     typeText("\"a2grr")
 
@@ -715,24 +711,20 @@ class ReplaceWithRegisterTest : VimTestCase() {
 
     val context = injector.executionContextManager.getEditorExecutionContext(fixture.editor.vim)
 
-    injector.registerGroup.getRegister(fixture.editor.vim, context, 'a' )?.let {
-      assertEquals("first line", it.text)
-    }
+    val aRegText = injector.registerGroup.getRegister(fixture.editor.vim, context, 'a' )!!.text
+    assertEquals("first line", aRegText)
 
-    injector.registerGroup.getRegister(fixture.editor.vim, context, '"' )?.let {
-      assertEquals("first line", it.text)
-    }
+    val defaultRegText = injector.registerGroup.getRegister(fixture.editor.vim, context, '"' )!!.text
+    assertEquals("first line", defaultRegText )
 
     typeText("j")
     typeText("y$")
 
-    injector.registerGroup.getRegister(fixture.editor.vim, context, 'a' )?.let {
-      assertEquals("first line", it.text)
-    }
+    val aRegTextAfter = injector.registerGroup.getRegister(fixture.editor.vim, context, 'a' )!!.text
+    assertEquals("first line", aRegTextAfter)
 
-    injector.registerGroup.getRegister(fixture.editor.vim, context, '"' )?.let {
-      assertEquals("second line", it.text)
-    }
+    val defaultRegTextAfter = injector.registerGroup.getRegister(fixture.editor.vim, context, '"' )!!.text
+    assertEquals("second line", defaultRegTextAfter )
 
     typeText("\"agrr")
 
@@ -763,25 +755,21 @@ class ReplaceWithRegisterTest : VimTestCase() {
 
     val context = injector.executionContextManager.getEditorExecutionContext(fixture.editor.vim)
 
-    injector.registerGroup.getRegister(fixture.editor.vim, context, 'a' )?.let {
-      assertEquals("first", it.text)
-    }
+    val aRegText = injector.registerGroup.getRegister(fixture.editor.vim, context, 'a' )!!.text
+    assertEquals("first", aRegText)
 
-    injector.registerGroup.getRegister(fixture.editor.vim, context, '"' )?.let {
-      assertEquals("first", it.text)
-    }
+    val defaultRegText = injector.registerGroup.getRegister(fixture.editor.vim, context, '"' )!!.text
+    assertEquals("first", defaultRegText )
 
     typeText("j")
     typeText("y$")
     typeText("w")
 
-    injector.registerGroup.getRegister(fixture.editor.vim, context, 'a' )?.let {
-      assertEquals("first", it.text)
-    }
+    val aRegTextAfter = injector.registerGroup.getRegister(fixture.editor.vim, context, 'a' )!!.text
+    assertEquals("first", aRegTextAfter)
 
-    injector.registerGroup.getRegister(fixture.editor.vim, context, '"' )?.let {
-      assertEquals("second line", it.text)
-    }
+    val defaultRegTextAfter = injector.registerGroup.getRegister(fixture.editor.vim, context, '"' )!!.text
+    assertEquals("second line", defaultRegTextAfter )
 
     typeText("\"agr$")
 
