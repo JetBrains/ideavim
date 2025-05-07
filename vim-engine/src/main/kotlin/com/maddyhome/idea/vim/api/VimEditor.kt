@@ -152,7 +152,7 @@ interface VimEditor {
     return bufferPositionToVisualPosition(BufferPosition(line, 0)).line
   }
 
-  fun getVirtualFile(): VirtualFile?
+  fun getVirtualFile(): VimVirtualFile?
   @RWLockLabel.Writable
   fun deleteString(range: TextRange)
 
