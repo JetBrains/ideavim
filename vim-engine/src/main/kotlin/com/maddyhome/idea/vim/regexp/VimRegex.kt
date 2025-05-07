@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.api.VimIndentConfig
 import com.maddyhome.idea.vim.api.VimScrollingModel
 import com.maddyhome.idea.vim.api.VimSelectionModel
 import com.maddyhome.idea.vim.api.VimVisualPosition
-import com.maddyhome.idea.vim.api.VirtualFile
+import com.maddyhome.idea.vim.api.VimVirtualFile
 import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.VimEditorReplaceMask
@@ -705,7 +705,7 @@ class VimRegex(pattern: String) {
       return VimVisualPosition(position.line, position.column, position.leansForward)
     }
 
-    override fun getVirtualFile(): VirtualFile? = null
+    override fun getVirtualFile(): VimVirtualFile? = null
 
     override fun deleteString(range: TextRange) {}
 

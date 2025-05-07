@@ -36,7 +36,7 @@ import com.maddyhome.idea.vim.api.VimIndentConfig
 import com.maddyhome.idea.vim.api.VimScrollingModel
 import com.maddyhome.idea.vim.api.VimSelectionModel
 import com.maddyhome.idea.vim.api.VimVisualPosition
-import com.maddyhome.idea.vim.api.VirtualFile
+import com.maddyhome.idea.vim.api.VimVirtualFile
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.IndentConfig
 import com.maddyhome.idea.vim.common.LiveRange
@@ -284,12 +284,13 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase(
     return editor.logicalPositionToOffset(logicalPosition)
   }
 
-  override fun getVirtualFile(): VirtualFile? {
+  override fun getVirtualFile(): VimVirtualFile? {
     val vf = EditorHelper.getVirtualFile(editor)
     return vf?.let {
-      object : VirtualFile {
+      object : VimVirtualFile {
         override val path: String = vf.path
         override val protocol: String = vf.fileSystem.protocol
+        override val extension: String? = vf.extension
       }
     }
   }
