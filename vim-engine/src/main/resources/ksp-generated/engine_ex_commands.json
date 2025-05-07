@@ -89,6 +89,7 @@
     "sh[ell]": "com.maddyhome.idea.vim.vimscript.model.commands.ShellCommand",
     "smap": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand",
     "smapc[lear]": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapClearCommand",
+    "smile": "com.maddyhome.idea.vim.vimscript.model.commands.SmileCommand",
     "snor[emap]": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand",
     "so[urce]": "com.maddyhome.idea.vim.vimscript.model.commands.SourceCommand",
     "sor[t]": "com.maddyhome.idea.vim.vimscript.model.commands.SortCommand",
