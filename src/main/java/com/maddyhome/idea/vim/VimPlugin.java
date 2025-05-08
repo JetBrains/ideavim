@@ -371,7 +371,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     if (isEnabled() && !ApplicationManager.getApplication().isUnitTestMode()) {
       stateUpdated = true;
       if (SystemInfo.isMac) {
-        final MacKeyRepeat keyRepeat = MacKeyRepeat.getInstance();
+        final MacKeyRepeat keyRepeat = MacKeyRepeat.Companion.getInstance();
         final Boolean enabled = keyRepeat.isEnabled();
         final Boolean isKeyRepeat = getEditor().isKeyRepeat();
         if ((enabled == null || !enabled) && (isKeyRepeat == null || isKeyRepeat)) {

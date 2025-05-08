@@ -5,71 +5,64 @@
  * license that can be found in the LICENSE.txt file or at
  * https://opensource.org/licenses/MIT.
  */
+package com.maddyhome.idea.vim.helper
 
-package com.maddyhome.idea.vim.helper;
-
-import com.google.common.io.CharStreams;
-import org.jetbrains.annotations.NonNls;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import com.google.common.io.CharStreams
+import org.jetbrains.annotations.NonNls
+import java.io.IOException
+import java.io.InputStream
+import java.io.InputStreamReader
 
 /**
  * @author vlan
  */
-public class MacKeyRepeat {
-  @VimNlsSafe public static final String FMT = "defaults %s -globalDomain ApplePressAndHoldEnabled";
-  @NotNull private static final MacKeyRepeat INSTANCE = new MacKeyRepeat();
-  @NonNls private static final String EXEC_COMMAND = "launchctl stop com.apple.SystemUIServer.agent";
-  @NonNls private static final String delete = "delete";
-  @NonNls private static final String write = "write";
-  @NonNls private static final String read = "read";
-
-  public static @NotNull MacKeyRepeat getInstance() {
-    return INSTANCE;
-  }
-
-  private static @NotNull String read(@NotNull InputStream stream) throws IOException {
-    return CharStreams.toString(new InputStreamReader(stream));
-  }
-
-  public @Nullable Boolean isEnabled() {
-    final String command = String.format(FMT, read);
-    try {
-      final Process process = Runtime.getRuntime().exec(command);
-      final String data = read(process.getInputStream()).trim();
+class MacKeyRepeat {
+  var isEnabled: Boolean?
+    get() {
+      val command: String = String.format(FMT, read)
+      return try {
+        val process = Runtime.getRuntime().exec(command)
+        val data = read(process.inputStream).trim { it <= ' ' }
+        try {
+          data.toInt() == 0
+        } catch (_: NumberFormatException) {
+          null
+        }
+      } catch (_: IOException) {
+        null
+      }
+    }
+    set(value) {
+      val command: String
+      if (value == null) {
+        command = String.format(FMT, delete)
+      } else {
+        val arg = if (value) "0" else "1"
+        command = String.format(FMT, write) + " " + arg
+      }
       try {
-        return Integer.parseInt(data) == 0;
-      }
-      catch (NumberFormatException e) {
-        return null;
+        val runtime = Runtime.getRuntime()
+        val defaults = runtime.exec(command)
+        defaults.waitFor()
+        val restartSystemUI: Process = runtime.exec(EXEC_COMMAND)
+        restartSystemUI.waitFor()
+      } catch (_: IOException) {
+      } catch (_: InterruptedException) {
       }
     }
-    catch (IOException e) {
-      return null;
-    }
-  }
 
-  public void setEnabled(@Nullable Boolean value) {
-    final String command;
-    if (value == null) {
-      command = String.format(FMT, delete);
-    }
-    else {
-      final String arg = value ? "0" : "1";
-      command = String.format(FMT, write) + " " + arg;
-    }
-    try {
-      final Runtime runtime = Runtime.getRuntime();
-      final Process defaults = runtime.exec(command);
-      defaults.waitFor();
-      final Process restartSystemUI = runtime.exec(EXEC_COMMAND);
-      restartSystemUI.waitFor();
-    }
-    catch (IOException | InterruptedException ignored) {
+  companion object {
+    @VimNlsSafe
+    const val FMT: String = "defaults %s -globalDomain ApplePressAndHoldEnabled"
+    val instance: MacKeyRepeat = MacKeyRepeat()
+    private const val EXEC_COMMAND: @NonNls String = "launchctl stop com.apple.SystemUIServer.agent"
+    private const val delete: @NonNls String = "delete"
+    private const val write: @NonNls String = "write"
+    private const val read: @NonNls String = "read"
+
+    @Throws(IOException::class)
+    private fun read(stream: InputStream): String {
+      return CharStreams.toString(InputStreamReader(stream))
     }
   }
 }
