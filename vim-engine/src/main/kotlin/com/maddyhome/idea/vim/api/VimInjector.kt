@@ -68,16 +68,6 @@ interface VimInjector {
 
   val visualMotionGroup: VimVisualMotionGroup
 
-  // [FINISHED] Class moved to vim-engine, but it's attached to Editor using IJ things
-  @Deprecated("Please use VimInjector.vimState", replaceWith = ReplaceWith("vimState"))
-  fun commandStateFor(editor: VimEditor): VimStateMachine
-  /**
-   * COMPATIBILITY-LAYER: Added new method with Any
-   * Please see: https://jb.gg/zo8n0r
-   */
-  @Deprecated("Please use VimInjector.vimState", replaceWith = ReplaceWith("vimState"))
-  fun commandStateFor(editor: Any): VimStateMachine
-
   val engineEditorHelper: EngineEditorHelper
 
   val editorGroup: VimEditorGroup

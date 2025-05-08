@@ -213,16 +213,6 @@ internal class IjVimInjector : VimInjectorBase() {
   override val redrawService: VimRedrawService
     get() = service()
 
-  @Deprecated("Please use VimInjector.vimState", replaceWith = ReplaceWith("vimState"))
-  override fun commandStateFor(editor: VimEditor): VimStateMachine {
-    return vimState
-  }
-
-  @Deprecated("Please use VimInjector.vimState", replaceWith = ReplaceWith("vimState"))
-  override fun commandStateFor(editor: Any): VimStateMachine {
-    return vimState
-  }
-
   override val engineEditorHelper: EngineEditorHelper
     get() = service<IjEditorHelper>()
   override val editorGroup: VimEditorGroup
