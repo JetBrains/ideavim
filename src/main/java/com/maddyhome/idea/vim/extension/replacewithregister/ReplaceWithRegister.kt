@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndOffset
+import com.maddyhome.idea.vim.api.getText
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
@@ -148,6 +149,22 @@ private fun doReplace(editor: Editor, context: DataContext, caret: ImmutableVimC
 
   var usedType = savedRegister.type
   var usedText = savedRegister.text
+
+  val selection = visualSelection.caretsAndSelections.values.first()
+  val startOffset: Int = selection.vimStart
+  val endOffset: Int = selection.vimEnd + 1
+
+  val isEmptySelection: Boolean = startOffset == endOffset
+
+  if (isEmptySelection) {
+    val editor: VimEditor = editor.vim
+
+    val beforeChar: String = editor.getText(startOffset - 1, startOffset)
+    val afterChar: String = editor.getText(endOffset, endOffset + 1)
+
+    usedText = beforeChar + usedText + afterChar
+  }
+
   if (usedType.isLine && usedText?.endsWith('\n') == true) {
     // Code from original plugin implementation. Correct text for linewise selected text
     usedText = usedText.dropLast(1)
