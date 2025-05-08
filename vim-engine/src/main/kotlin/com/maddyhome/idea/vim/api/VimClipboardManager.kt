@@ -20,27 +20,15 @@ import java.awt.datatransfer.Transferable
  * - **Clipboard**: This is supported by all operating systems. It functions as a storage for the common 'copy and paste' operations typically done with Ctrl-C and Ctrl-V.
  */
 interface VimClipboardManager {
-  @Deprecated("Please use com.maddyhome.idea.vim.api.VimClipboardManager#getPrimaryTextAndTransferableData")
-  fun getPrimaryTextAndTransferableData(): Pair<String, List<Any>?>?
   fun getPrimaryContent(editor: VimEditor, context: ExecutionContext): VimCopiedText?
 
-  /**
-   * Returns the string currently on the system clipboard.
-   *
-   * @return The clipboard string or null if data isn't plain text
-   */
-  @Deprecated("Please use com.maddyhome.idea.vim.api.VimClipboardManager#getClipboardTextAndTransferableData")
-  fun getClipboardTextAndTransferableData(): Pair<String, List<Any>?>?
   fun getClipboardContent(editor: VimEditor, context: ExecutionContext): VimCopiedText?
 
   fun setClipboardContent(editor: VimEditor, context: ExecutionContext, textData: VimCopiedText): Boolean
   fun setPrimaryContent(editor: VimEditor, context: ExecutionContext, textData: VimCopiedText): Boolean
 
-  @Deprecated("Please use com.maddyhome.idea.vim.api.VimClipboardManager#setClipboardText")
+  @Deprecated("Please use com.maddyhome.idea.vim.api.VimClipboardManager#setClipboardContent")
   fun setClipboardText(text: String, rawText: String = text, transferableData: List<Any>): Transferable?
-
-  @Deprecated("Please use com.maddyhome.idea.vim.api.VimClipboardManager#setPrimaryText")
-  fun setPrimaryText(text: String, rawText: String = text, transferableData: List<Any>): Transferable?
 
   fun collectCopiedText(
     editor: VimEditor,

@@ -39,26 +39,16 @@ import java.io.IOException
 
 @Service
 internal class IjClipboardManager : VimClipboardManager {
-  @Deprecated("Please use com.maddyhome.idea.vim.api.VimClipboardManager#getPrimaryTextAndTransferableData")
-  override fun getPrimaryTextAndTransferableData(): Pair<String, List<Any>?>? {
+  override fun getPrimaryContent(editor: VimEditor, context: ExecutionContext): IjVimCopiedText? {
     val clipboard = Toolkit.getDefaultToolkit()?.systemSelection ?: return null
     val contents = clipboard.getContents(null) ?: return null
-    return getTextAndTransferableData(contents)
-  }
-
-  override fun getPrimaryContent(editor: VimEditor, context: ExecutionContext): IjVimCopiedText? {
-    val (text, transferableData) = getPrimaryTextAndTransferableData() ?: return null
+    val (text, transferableData) = getTextAndTransferableData(contents) ?: return null
     return IjVimCopiedText(text, transferableData ?: emptyList())
   }
 
-  @Deprecated("Please use com.maddyhome.idea.vim.api.VimClipboardManager#getClipboardTextAndTransferableData")
-  override fun getClipboardTextAndTransferableData(): Pair<String, List<Any>?>? {
-    val contents = getContents() ?: return null
-    return getTextAndTransferableData(contents)
-  }
-
   override fun getClipboardContent(editor: VimEditor, context: ExecutionContext): VimCopiedText? {
-    val (text, transferableData) = getClipboardTextAndTransferableData() ?: return null
+    val contents = getContents() ?: return null
+    val (text, transferableData) = getTextAndTransferableData(contents) ?: return null
     return IjVimCopiedText(text, transferableData ?: emptyList())
   }
 
@@ -124,14 +114,6 @@ internal class IjClipboardManager : VimClipboardManager {
 //    require(entry is IJClipboardEntry)
 //    return setPrimaryText(entry.text, entry.rawText, entry.transferableData) != null
 //  }
-
-  @Deprecated("Please use com.maddyhome.idea.vim.api.VimClipboardManager#setPrimaryText")
-  override fun setPrimaryText(text: String, rawText: String, transferableData: List<Any>): Transferable? {
-    return handleTextSetting(text, rawText, transferableData) { content ->
-      val clipboard = Toolkit.getDefaultToolkit()?.systemSelection ?: return@handleTextSetting null
-      clipboard.setContents(content, EmptyClipboardOwner.INSTANCE)
-    }
-  }
 
   override fun collectCopiedText(
     editor: VimEditor,

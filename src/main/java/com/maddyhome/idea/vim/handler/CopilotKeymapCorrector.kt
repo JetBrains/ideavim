@@ -17,7 +17,6 @@ import com.intellij.openapi.keymap.KeymapManagerListener
 import com.intellij.openapi.keymap.ex.KeymapManagerEx
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
-import com.jetbrains.rd.util.ConcurrentHashMap
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.key
@@ -28,6 +27,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
+import org.jetbrains.annotations.NonNls
+import java.util.concurrent.ConcurrentHashMap
 
 
 // We use alarm with delay to avoid many actions in case many events are fired at the same time
@@ -67,11 +68,7 @@ internal class IdeaVimCorrectorKeymapChangedListener : KeymapManagerListener {
     check(correctorRequester.tryEmit(Unit))
   }
 
-  override fun shortcutChanged(keymap: Keymap, actionId: String) {
-    check(correctorRequester.tryEmit(Unit))
-  }
-
-  override fun shortcutChanged(keymap: Keymap, actionId: String, fromSettings: Boolean) {
+  override fun shortcutsChanged(keymap: Keymap, actionIds: @NonNls Collection<String>, fromSettings: Boolean) {
     check(correctorRequester.tryEmit(Unit))
   }
 }

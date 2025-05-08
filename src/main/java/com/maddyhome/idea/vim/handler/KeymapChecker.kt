@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
+import org.jetbrains.annotations.NonNls
 import javax.swing.KeyStroke
 
 // We use alarm with delay to avoid many notifications in case many events are fired at the same time
@@ -67,11 +68,7 @@ internal class IdeaVimKeymapChangedListener : KeymapManagerListener {
     check(keyCheckRequests.tryEmit(Unit))
   }
 
-  override fun shortcutChanged(keymap: Keymap, actionId: String) {
-    check(keyCheckRequests.tryEmit(Unit))
-  }
-
-  override fun shortcutChanged(keymap: Keymap, actionId: String, fromSettings: Boolean) {
+  override fun shortcutsChanged(keymap: Keymap, actionIds: @NonNls Collection<String>, fromSettings: Boolean) {
     check(keyCheckRequests.tryEmit(Unit))
   }
 }
