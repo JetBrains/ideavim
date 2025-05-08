@@ -22,7 +22,6 @@ import com.intellij.openapi.actionSystem.ex.ActionUtil
 import com.intellij.openapi.actionSystem.ex.ActionUtil.performDumbAwareWithCallbacks
 import com.intellij.openapi.actionSystem.impl.ProxyShortcutSet
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext
-import com.intellij.openapi.application.ApplicationInfo
 import com.intellij.openapi.application.ex.ApplicationManagerEx
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.command.UndoConfirmationPolicy
@@ -41,7 +40,6 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.ide.isClionNova
-import com.maddyhome.idea.vim.ide.isRider
 import com.maddyhome.idea.vim.newapi.IjNativeAction
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.runFromVimKey
@@ -109,19 +107,11 @@ internal class IjActionExecutor : VimActionExecutor {
     return "IdeaVim"
   }
 
-  // [VERSION UPDATE] 251+ Remove manual execution, switch to tryToExecute
   private fun executeManually(action: AnAction): Boolean {
     if (Registry.`is`("ideavim.old.action.execution", true)) return true
     if (isClionNova()) {
       if (action.isEnter() || action.isEsc()) return false
       return true
-    }
-    if (isRider()) {
-      // Special Rider logic for VIM-3826. In rider 251 everything works fine with tryToExecute
-      val lessThan251 = ApplicationInfo.getInstance().build.baselineVersion < 251
-      val keyIsEnter = action.isEnter()
-      val keyIsEsc = action.isEsc()
-      if (lessThan251 && !keyIsEnter && !keyIsEsc) return true
     }
 
     return false
