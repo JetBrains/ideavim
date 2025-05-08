@@ -9,19 +9,14 @@
 package com.maddyhome.idea.vim.helper
 
 import com.intellij.execution.actions.StopAction
-import com.intellij.openapi.actionSystem.ActionGroup
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnAction
-import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.EmptyAction
 import com.intellij.openapi.actionSystem.IdeActions
-import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.actionSystem.ex.ActionUtil
-import com.intellij.openapi.actionSystem.ex.ActionUtil.performDumbAwareWithCallbacks
 import com.intellij.openapi.actionSystem.impl.ProxyShortcutSet
-import com.intellij.openapi.actionSystem.impl.SimpleDataContext
 import com.intellij.openapi.application.ex.ApplicationManagerEx
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.command.UndoConfirmationPolicy
@@ -29,9 +24,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.actionSystem.DocCommandGroupId
 import com.intellij.openapi.progress.util.ProgressIndicatorUtils
-import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.util.NlsContexts
-import com.intellij.openapi.util.registry.Registry
 import com.maddyhome.idea.vim.RegisterActions
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.NativeAction
@@ -39,16 +32,11 @@ import com.maddyhome.idea.vim.api.VimActionExecutor
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
-import com.maddyhome.idea.vim.ide.isClionNova
 import com.maddyhome.idea.vim.newapi.IjNativeAction
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.newapi.runFromVimKey
 import org.jetbrains.annotations.NonNls
 import java.awt.Component
-import java.awt.event.KeyEvent
 import javax.swing.JComponent
-import javax.swing.KeyStroke
-import javax.swing.SwingUtilities
 
 @Service
 internal class IjActionExecutor : VimActionExecutor {
@@ -79,21 +67,17 @@ internal class IjActionExecutor : VimActionExecutor {
     }
 
     val ijAction = (action as IjNativeAction).action
-    if (executeManually(ijAction)) {
-      return manualActionExecution(context, ijAction)
-    } else {
-      try {
-        isRunningActionFromVim = true
-        // The context component should be editor. This is especially important when running the `:action` commands
-        //  because at the moment of execution, the focused component is Ex Field, not editor.
-        val contextComponent = editor?.ij?.contentComponent
-        val place = ijAction.choosePlace()
-        val res = ActionManager.getInstance().tryToExecute(ijAction, null, contextComponent, place, true)
-        res.waitFor(5_000)
-        return res.isDone
-      } finally {
-        isRunningActionFromVim = false
-      }
+    try {
+      isRunningActionFromVim = true
+      // The context component should be editor. This is especially important when running the `:action` commands
+      //  because at the moment of execution, the focused component is Ex Field, not editor.
+      val contextComponent = editor?.ij?.contentComponent
+      val place = ijAction.choosePlace()
+      val res = ActionManager.getInstance().tryToExecute(ijAction, null, contextComponent, place, true)
+      res.waitFor(5_000)
+      return res.isDone
+    } finally {
+      isRunningActionFromVim = false
     }
   }
 
@@ -105,86 +89,6 @@ internal class IjActionExecutor : VimActionExecutor {
     //   only if the run window is in focus.
     if (this is StopAction) return ActionPlaces.ACTION_SEARCH
     return "IdeaVim"
-  }
-
-  private fun executeManually(action: AnAction): Boolean {
-    if (Registry.`is`("ideavim.old.action.execution", true)) return true
-    if (isClionNova()) {
-      if (action.isEnter() || action.isEsc()) return false
-      return true
-    }
-
-    return false
-  }
-
-  private fun AnAction.isEsc(): Boolean = this.shortcutSet.shortcuts.any {
-    (it as? KeyboardShortcut)?.firstKeyStroke == KeyStroke.getKeyStroke(
-      KeyEvent.VK_ESCAPE,
-      0
-    )
-  }
-
-  private fun AnAction.isEnter(): Boolean = this.shortcutSet.shortcuts.any {
-    (it as? KeyboardShortcut)?.firstKeyStroke == KeyStroke.getKeyStroke(
-      KeyEvent.VK_ENTER,
-      0
-    )
-  }
-
-  private fun manualActionExecution(
-    context: ExecutionContext,
-    ijAction: AnAction,
-  ): Boolean {
-    /**
-     * Data context that defines that some action was started from IdeaVim.
-     * You can call use [runFromVimKey] key to define if intellij action was started from IdeaVim
-     */
-    val dataContext = SimpleDataContext.getSimpleContext(runFromVimKey, true, context.ij)
-
-    val actionId = ActionManager.getInstance().getId(ijAction)
-    @Suppress("removal", "DEPRECATION") val event = AnActionEvent(
-      null,
-      dataContext,
-      ActionPlaces.KEYBOARD_SHORTCUT,
-      ijAction.templatePresentation.clone(),
-      ActionManager.getInstance(),
-      0,
-    )
-    // beforeActionPerformedUpdate should be called to update the action. It fixes some rider-specific problems
-    //   because rider uses an async update method. See VIM-1819.
-    // This method executes inside lastUpdateAndCheckDumb
-    // Another related issue: VIM-2604
-
-    // This is a hack to fix the tests and fix VIM-3332
-    // We should get rid of it in VIM-3376
-    if (actionId == "RunClass" || actionId == IdeActions.ACTION_COMMENT_LINE || actionId == IdeActions.ACTION_COMMENT_BLOCK) {
-      @Suppress("removal", "OverrideOnly", "DEPRECATION")
-      ijAction.beforeActionPerformedUpdate(event)
-      if (!event.presentation.isEnabled) return false
-    } else {
-      if (!ActionUtil.lastUpdateAndCheckDumb(ijAction, event, false)) return false
-    }
-    if (ijAction is ActionGroup && !event.presentation.isPerformGroup) {
-      // Some ActionGroups should not be performed but shown as a popup
-      val popup = JBPopupFactory.getInstance()
-        .createActionGroupPopup(event.presentation.text, ijAction, dataContext, false, null, -1)
-      val component = dataContext.getData(PlatformDataKeys.CONTEXT_COMPONENT)
-      if (component != null) {
-        val window = SwingUtilities.getWindowAncestor(component)
-        if (window != null) {
-          popup.showInCenterOf(window)
-        }
-        return true
-      }
-      popup.showInFocusCenter()
-      return true
-    } else {
-      performDumbAwareWithCallbacks(ijAction, event) {
-        @Suppress("OverrideOnly")
-        ijAction.actionPerformed(event)
-      }
-      return true
-    }
   }
 
   /**
