@@ -606,10 +606,10 @@ Contributors:
   [![icon][github]](https://github.com/MToolMakerJB)
   &nbsp;
   Ivan Yarkov
-* [![icon][mail]](mailto:210524958+vumi19@users.noreply.github.com)
+* [![icon][mail]](mailto:mia.vucinic@jetbrains.com)
   [![icon][github]](https://github.com/vumi19)
   &nbsp;
-  vumi19
+  Mia Vucinic
 
 Previous contributors:
 
