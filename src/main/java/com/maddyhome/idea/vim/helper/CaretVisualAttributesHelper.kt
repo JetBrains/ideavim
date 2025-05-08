@@ -95,8 +95,8 @@ private fun Editor.updatePrimaryCaretVisualAttributes() {
 
   // Make sure the caret is visible as soon as it's set. It might be invisible while blinking
   // NOTE: At the moment, this causes project leak in tests
-  // IJPL-928 - this will be fixed in 2024.2
-  // [VERSION UPDATE] 2024.2 - remove if wrapping
+  // IJPL-928 - this will be fixed in 2025.2
+  // [VERSION UPDATE] 2025.2 - remove if wrapping
   if (!ApplicationManager.getApplication().isUnitTestMode) {
     (this as? EditorEx)?.setCaretVisible(true)
   }

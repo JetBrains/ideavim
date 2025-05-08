@@ -11,16 +11,17 @@ package com.maddyhome.idea.vim.customization.feature.terminal
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.key.IdeaVimDisablerExtensionPoint
 import org.jetbrains.plugins.terminal.block.util.TerminalDataContextUtils.isAlternateBufferEditor
+import org.jetbrains.plugins.terminal.block.util.TerminalDataContextUtils.isAlternateBufferModelEditor
 import org.jetbrains.plugins.terminal.block.util.TerminalDataContextUtils.isOutputEditor
+import org.jetbrains.plugins.terminal.block.util.TerminalDataContextUtils.isOutputModelEditor
 import org.jetbrains.plugins.terminal.block.util.TerminalDataContextUtils.isPromptEditor
 
 /**
  * The only implementation is defined right here.
  */
-// [VERSION UPDATE] 2025.1+ Add 2 new predicates
 internal class IdeaVimTerminalDisablerExtension : IdeaVimDisablerExtensionPoint {
   override fun isDisabledForEditor(editor: Editor): Boolean {
     return editor.isPromptEditor || editor.isOutputEditor || editor.isAlternateBufferEditor
-//      || editor.isOutputModelEditor || editor.isAlternateBufferModelEditor
+      || editor.isOutputModelEditor || editor.isAlternateBufferModelEditor
   }
 }
