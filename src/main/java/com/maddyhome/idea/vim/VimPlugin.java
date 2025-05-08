@@ -371,8 +371,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     if (isEnabled() && !ApplicationManager.getApplication().isUnitTestMode()) {
       stateUpdated = true;
       if (SystemInfo.isMac) {
-        final MacKeyRepeat keyRepeat = MacKeyRepeat.Companion.getInstance();
-        final Boolean enabled = keyRepeat.isEnabled();
+        final Boolean enabled = MacKeyRepeat.INSTANCE.isEnabled();
         final Boolean isKeyRepeat = getEditor().isKeyRepeat();
         if ((enabled == null || !enabled) && (isKeyRepeat == null || isKeyRepeat)) {
           // This system property is used in IJ ui robot to hide the startup tips
@@ -382,7 +381,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
           if (showNotification) {
             if (VimPlugin.getNotifications().enableRepeatingMode() == Messages.YES) {
               getEditor().setKeyRepeat(true);
-              keyRepeat.setEnabled(true);
+              MacKeyRepeat.INSTANCE.setEnabled(true);
             }
             else {
               getEditor().setKeyRepeat(false);

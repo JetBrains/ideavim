@@ -8,37 +8,28 @@
 package com.maddyhome.idea.vim.helper
 
 import com.google.common.io.CharStreams
-import org.jetbrains.annotations.NonNls
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 
-/**
- * @author vlan
- */
-class MacKeyRepeat {
+object MacKeyRepeat {
   var isEnabled: Boolean?
     get() {
-      val command: String = String.format(FMT, read)
       return try {
-        val process = Runtime.getRuntime().exec(command)
-        val data = read(process.inputStream).trim { it <= ' ' }
-        try {
-          data.toInt() == 0
-        } catch (_: NumberFormatException) {
-          null
-        }
+        val process = Runtime.getRuntime().exec(READ_COMMAND)
+        val data = read(process.inputStream).trim().toIntOrNull() ?: return null
+        data == 0
       } catch (_: IOException) {
         null
       }
     }
     set(value) {
-      val command: String
+      val command: Array<String>
       if (value == null) {
-        command = String.format(FMT, delete)
+        command = DELETE_COMMAND
       } else {
         val arg = if (value) "0" else "1"
-        command = String.format(FMT, write) + " " + arg
+        command = WRITE_COMMAND + arg
       }
       try {
         val runtime = Runtime.getRuntime()
@@ -51,18 +42,13 @@ class MacKeyRepeat {
       }
     }
 
-  companion object {
-    @VimNlsSafe
-    const val FMT: String = "defaults %s -globalDomain ApplePressAndHoldEnabled"
-    val instance: MacKeyRepeat = MacKeyRepeat()
-    private const val EXEC_COMMAND: @NonNls String = "launchctl stop com.apple.SystemUIServer.agent"
-    private const val delete: @NonNls String = "delete"
-    private const val write: @NonNls String = "write"
-    private const val read: @NonNls String = "read"
+  private val EXEC_COMMAND = arrayOf("launchctl", "stop", "com.apple.SystemUIServer.agent")
+  private val READ_COMMAND = arrayOf("defaults", "read", "-globalDomain", "ApplePressAndHoldEnabled")
+  private val WRITE_COMMAND = arrayOf("defaults", "write", "-globalDomain", "ApplePressAndHoldEnabled")
+  private val DELETE_COMMAND = arrayOf("defaults", "delete", "-globalDomain", "ApplePressAndHoldEnabled")
 
-    @Throws(IOException::class)
-    private fun read(stream: InputStream): String {
-      return CharStreams.toString(InputStreamReader(stream))
-    }
+  @Throws(IOException::class)
+  private fun read(stream: InputStream): String {
+    return CharStreams.toString(InputStreamReader(stream))
   }
 }
