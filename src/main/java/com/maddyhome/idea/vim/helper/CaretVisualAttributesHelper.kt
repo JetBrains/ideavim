@@ -60,7 +60,7 @@ internal fun Editor.updateCaretsVisualAttributes() {
  * Used when Vim emulation is disabled
  */
 internal fun Editor.removeCaretsVisualAttributes() {
-  caretModel.allCarets.forEach { it.visualAttributes = CaretVisualAttributes.DEFAULT }
+  caretModel.allCarets.forEach { it.visualAttributes = CaretVisualAttributes.getDefault() }
 }
 
 internal fun Editor.hasBlockOrUnderscoreCaret() = isBlockCursorOverride() ||
