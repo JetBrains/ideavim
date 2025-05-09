@@ -355,7 +355,12 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     if (unsubscribe) {
       VimListenerManager.INSTANCE.turnOff();
     }
-    injector.getCommandLine().fullReset();
+    // Use getServiceIfCreated to avoid creating the service during the dispose (this is prohibited by the platform)
+    @Nullable VimCommandLineService service =
+      ApplicationManager.getApplication().getServiceIfCreated(VimCommandLineService.class);
+    if (service != null) {
+      service.fullReset();
+    }
 
     // Unregister vim actions in command mode
     RegisterActions.unregisterActions();
