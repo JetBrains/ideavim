@@ -428,14 +428,6 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     return active;
   }
 
-  /**
-   * @deprecated Use getVisibleText()
-   */
-  @Deprecated(forRemoval = true)
-  public @NotNull String getText() {
-    return entry.getText();
-  }
-
   @Override
   public @NotNull String getVisibleText() {
     return entry.getText();

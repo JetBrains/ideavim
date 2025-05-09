@@ -645,18 +645,6 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     }
   }
 
-  @Deprecated("Please use the same method, but with ExecutionContext")
-  override fun deleteCharacter(
-    editor: VimEditor,
-    caret: VimCaret,
-    count: Int,
-    isChange: Boolean,
-    operatorArguments: OperatorArguments,
-  ): Boolean {
-    val context = injector.executionContextManager.getEditorExecutionContext(editor)
-    return deleteCharacter(editor, context, caret, count, isChange, operatorArguments)
-  }
-
   /**
    * While in INSERT or REPLACE mode the user can enter a single NORMAL mode command and then automatically
    * return to INSERT or REPLACE mode.
@@ -666,17 +654,6 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   override fun processSingleCommand(editor: VimEditor) {
     editor.mode = Mode.NORMAL(editor.mode)
     clearStrokes(editor)
-  }
-
-  @Deprecated("Please use the same method, but with ExecutionContext")
-  override fun deleteEndOfLine(
-    editor: VimEditor,
-    caret: VimCaret,
-    count: Int,
-    operatorArguments: OperatorArguments,
-  ): Boolean {
-    val context = injector.executionContextManager.getEditorExecutionContext(editor)
-    return deleteEndOfLine(editor, context, caret, count, operatorArguments)
   }
 
   /**
@@ -713,17 +690,6 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       return res
     }
     return false
-  }
-
-  @Deprecated("Please use the same method, but with ExecutionContext")
-  override fun deleteJoinLines(
-    editor: VimEditor,
-    caret: VimCaret,
-    count: Int,
-    spaces: Boolean,
-  ): Boolean {
-    val context = injector.executionContextManager.getEditorExecutionContext(editor)
-    return deleteJoinLines(editor, context, caret, count, spaces)
   }
 
   /**
@@ -812,17 +778,6 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     return res
   }
 
-  @Deprecated("Please use the same method, but with ExecutionContext")
-  override fun deleteLine(
-    editor: VimEditor,
-    caret: VimCaret,
-    count: Int,
-    operatorArguments: OperatorArguments,
-  ): Boolean {
-    val context = injector.executionContextManager.getEditorExecutionContext(editor)
-    return deleteLine(editor, context, caret, count, operatorArguments)
-  }
-
   /**
    * Deletes count lines including the current line
    *
@@ -859,18 +814,6 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       return res
     }
     return false
-  }
-
-  @Deprecated("Please use the same method, but with ExecutionContext")
-  override fun deleteJoinRange(
-    editor: VimEditor,
-    caret: VimCaret,
-    range: TextRange,
-    spaces: Boolean,
-    operatorArguments: OperatorArguments,
-  ): Boolean {
-    val context = injector.executionContextManager.getEditorExecutionContext(editor)
-    return deleteJoinRange(editor, context, caret, range, spaces, operatorArguments)
   }
 
   override fun joinViaIdeaByCount(editor: VimEditor, context: ExecutionContext, count: Int): Boolean {
@@ -971,20 +914,6 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     return Pair(range, motionType)
   }
 
-  @Deprecated("Please use the same method, but with ExecutionContext")
-  override fun deleteRange(
-    editor: VimEditor,
-    caret: VimCaret,
-    range: TextRange,
-    type: SelectionType?,
-    isChange: Boolean,
-    operatorArguments: OperatorArguments,
-    saveToRegister: Boolean,
-  ): Boolean {
-    val context = injector.executionContextManager.getEditorExecutionContext(editor)
-    return deleteRange(editor, context, caret, range, type, isChange)
-  }
-
   /**
    * Delete the range of text.
    *
@@ -1041,12 +970,6 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       processedCaret.resetLastColumn()
     }
     return res
-  }
-
-  @Deprecated("Please use the same method, but with ExecutionContext")
-  override fun changeCharacters(editor: VimEditor, caret: VimCaret, operatorArguments: OperatorArguments): Boolean {
-    val context = injector.executionContextManager.getEditorExecutionContext(editor)
-    return changeCharacters(editor, context, caret, operatorArguments)
   }
 
   private fun removeLastNewLine(editor: VimEditor, range: TextRange, type: SelectionType?): Boolean {
@@ -1107,17 +1030,6 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       editor.vimChangeActionSwitchMode = Mode.INSERT
     }
     return res
-  }
-
-  @Deprecated("Please use the same method, but with ExecutionContext")
-  override fun changeEndOfLine(
-    editor: VimEditor,
-    caret: VimCaret,
-    count: Int,
-    operatorArguments: OperatorArguments,
-  ): Boolean {
-    val context = injector.executionContextManager.getEditorExecutionContext(editor)
-    return changeEndOfLine(editor, context, caret, count, operatorArguments)
   }
 
   protected abstract fun reformatCode(editor: VimEditor, start: Int, end: Int)

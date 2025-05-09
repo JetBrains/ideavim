@@ -23,7 +23,6 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import org.jetbrains.annotations.Contract
 import kotlin.math.min
 
 open class YankGroupBase : VimYankGroup {
@@ -44,33 +43,6 @@ open class YankGroupBase : VimYankGroup {
       result = caret.registerStorage.storeText(editor, context, myRange.first, myRange.second, false) && result
     }
     return result
-  }
-
-  @Contract("_, _ -> new")
-  protected fun getTextRange(ranges: List<Pair<Int, Int>>, type: SelectionType): TextRange? {
-    if (ranges.isEmpty()) return null
-
-    val size = ranges.size
-    val starts = IntArray(size)
-    val ends = IntArray(size)
-
-    if (type == SelectionType.LINE_WISE) {
-      starts[size - 1] = ranges[size - 1].first
-      ends[size - 1] = ranges[size - 1].second
-      for (i in 0 until size - 1) {
-        val range = ranges[i]
-        starts[i] = range.first
-        ends[i] = range.second - 1
-      }
-    } else {
-      for (i in 0 until size) {
-        val range = ranges[i]
-        starts[i] = range.first
-        ends[i] = range.second
-      }
-    }
-
-    return TextRange(starts, ends)
   }
 
   /**
@@ -134,12 +106,6 @@ open class YankGroupBase : VimYankGroup {
     )
   }
 
-  @Deprecated("Please use the same method, but with ExecutionContext")
-  override fun yankLine(editor: VimEditor, count: Int): Boolean {
-    val context = injector.executionContextManager.getEditorExecutionContext(editor)
-    return yankLine(editor, context, count)
-  }
-
   /**
    * This yanks count lines of text
    *
@@ -161,12 +127,6 @@ open class YankGroupBase : VimYankGroup {
     }
 
     return yankRange(editor, context, caretToRange, null)
-  }
-
-  @Deprecated("Please use the same method, but with ExecutionContext")
-  override fun yankRange(editor: VimEditor, range: TextRange?, type: SelectionType, moveCursor: Boolean): Boolean {
-    val context = injector.executionContextManager.getEditorExecutionContext(editor)
-    return yankRange(editor, context, range, type, moveCursor)
   }
 
   /**

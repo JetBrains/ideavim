@@ -214,8 +214,14 @@ object VimExtensionFacade {
 
   /** Set the current contents of the given register */
   @JvmStatic
-  fun setRegisterForCaret(register: Char, caret: ImmutableVimCaret, keys: List<KeyStroke?>?) {
-    caret.registerStorage.setKeys(register, keys?.filterNotNull() ?: emptyList())
+  fun setRegisterForCaret(
+    editor: VimEditor,
+    context: ExecutionContext,
+    register: Char,
+    caret: ImmutableVimCaret,
+    keys: List<KeyStroke?>?,
+  ) {
+    caret.registerStorage.setKeys(editor, context, register, keys?.filterNotNull() ?: emptyList())
   }
 
   /** Set the current contents of the given register */

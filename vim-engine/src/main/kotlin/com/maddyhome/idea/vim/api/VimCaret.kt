@@ -155,11 +155,6 @@ fun VimCaret.moveToMotion(motion: Motion): VimCaret {
 interface CaretRegisterStorage {
   val caret: ImmutableVimCaret
 
-  /**
-   * Stores text to caret's recordable (named/numbered/unnamed) register
-   */
-  @Deprecated("Please use the same method, but with ExecutionContext")
-  fun storeText(editor: VimEditor, range: TextRange, type: SelectionType, isDelete: Boolean): Boolean
   fun storeText(
     editor: VimEditor,
     context: ExecutionContext,
@@ -168,19 +163,7 @@ interface CaretRegisterStorage {
     isDelete: Boolean,
   ): Boolean
 
-  /**
-   * Gets text from caret's recordable register
-   * If the register is not recordable - global text state will be returned
-   */
-  @Deprecated("Please use com.maddyhome.idea.vim.api.CaretRegisterStorage#getRegister(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext, char)")
-  fun getRegister(r: Char): Register?
   fun getRegister(editor: VimEditor, context: ExecutionContext, r: Char): Register?
-
-  @Deprecated("Please use com.maddyhome.idea.vim.api.CaretRegisterStorage#setKeys(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext, char, java.util.List<? extends javax.swing.KeyStroke>)")
-  fun setKeys(register: Char, keys: List<KeyStroke>)
   fun setKeys(editor: VimEditor, context: ExecutionContext, register: Char, keys: List<KeyStroke>)
-
-  @Deprecated("Please use com.maddyhome.idea.vim.api.CaretRegisterStorage#saveRegister(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext, char, com.maddyhome.idea.vim.register.Register)")
-  fun saveRegister(r: Char, register: Register)
   fun saveRegister(editor: VimEditor, context: ExecutionContext, r: Char, register: Register)
 }

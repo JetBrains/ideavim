@@ -276,24 +276,6 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     return true
   }
 
-  @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#storeText(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext, com.maddyhome.idea.vim.api.ImmutableVimCaret, com.maddyhome.idea.vim.common.TextRange, com.maddyhome.idea.vim.state.mode.SelectionType, boolean)")
-  override fun storeText(
-    editor: VimEditor,
-    caret: ImmutableVimCaret,
-    range: TextRange,
-    type: SelectionType,
-    isDelete: Boolean,
-  ): Boolean {
-    return storeText(
-      editor,
-      injector.executionContextManager.getEditorExecutionContext(editor),
-      caret,
-      range,
-      type,
-      isDelete
-    )
-  }
-
   /**
    * Store text into the last register.
    *
@@ -364,13 +346,6 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     return getRegister(dummyEditor, dummyContext, r)
   }
 
-  @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#storeText(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext, char, java.lang.String, com.maddyhome.idea.vim.state.mode.SelectionType)")
-  override fun storeText(register: Char, text: String, selectionType: SelectionType): Boolean {
-    val dummyEditor = injector.fallbackWindow
-    val dummyContext = injector.executionContextManager.getEditorExecutionContext(dummyEditor)
-    return storeText(dummyEditor, dummyContext, register, text, selectionType)
-  }
-
   override fun storeText(
     editor: VimEditor,
     context: ExecutionContext,
@@ -397,13 +372,6 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
       injector.searchGroup.lastSearchPattern = text // todo we should not have this field if we have the "/" register
     }
     return true
-  }
-
-  @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#storeText(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext, char, java.lang.String)")
-  override fun storeText(register: Char, text: String): Boolean {
-    val dummyEditor = injector.fallbackWindow
-    val dummyContext = injector.executionContextManager.getEditorExecutionContext(dummyEditor)
-    return storeText(dummyEditor, dummyContext, register, text)
   }
 
   override fun storeText(editor: VimEditor, context: ExecutionContext, register: Char, text: String): Boolean {
@@ -498,13 +466,6 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     ) else myRegisters[myR]
   }
 
-  @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#getRegisters(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext)")
-  override fun getRegisters(): List<Register> {
-    val dummyEditor = injector.fallbackWindow
-    val dummyContext = injector.executionContextManager.getEditorExecutionContext(dummyEditor)
-    return getRegisters(dummyEditor, dummyContext)
-  }
-
   override fun getRegisters(editor: VimEditor, context: ExecutionContext): List<Register> {
     val filteredRegisters = myRegisters.values.filterNot { CLIPBOARD_REGISTERS.contains(it.name) }.toMutableList()
     val clipboardRegisters = CLIPBOARD_REGISTERS
@@ -512,13 +473,6 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
       .mapNotNull { refreshClipboardRegister(editor, context, it) }
 
     return (filteredRegisters + clipboardRegisters).sortedWith(Register.KeySorter)
-  }
-
-  @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#saveRegister(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext, char, com.maddyhome.idea.vim.register.Register)")
-  override fun saveRegister(r: Char, register: Register) {
-    val dummyEditor = injector.fallbackWindow
-    val dummyContext = injector.executionContextManager.getEditorExecutionContext(dummyEditor)
-    saveRegister(dummyEditor, dummyContext, r, register)
   }
 
   override fun saveRegister(editor: VimEditor, context: ExecutionContext, r: Char, register: Register) {
@@ -552,13 +506,6 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     }
   }
 
-  @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#getPlaybackRegister(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext, char)")
-  override fun getPlaybackRegister(r: Char): Register? {
-    val dummyEditor = injector.fallbackWindow
-    val dummyContext = injector.executionContextManager.getEditorExecutionContext(dummyEditor)
-    return getPlaybackRegister(dummyEditor, dummyContext, r)
-  }
-
   override fun getPlaybackRegister(editor: VimEditor, context: ExecutionContext, r: Char): Register? {
     return if (PLAYBACK_REGISTERS.indexOf(r) != 0) getRegister(editor, context, r) else null
   }
@@ -576,13 +523,6 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
 
   override fun setKeys(register: Char, keys: List<KeyStroke>, type: SelectionType) {
     myRegisters[register] = Register(register, type, keys.toMutableList())
-  }
-
-  @Deprecated("Please use com.maddyhome.idea.vim.register.VimRegisterGroup#finishRecording(com.maddyhome.idea.vim.api.VimEditor, com.maddyhome.idea.vim.api.ExecutionContext)")
-  override fun finishRecording() {
-    val dummyEditor = injector.fallbackWindow
-    val dummyContext = injector.executionContextManager.getEditorExecutionContext(dummyEditor)
-    finishRecording(dummyEditor, dummyContext)
   }
 
   override fun finishRecording(editor: VimEditor, context: ExecutionContext) {

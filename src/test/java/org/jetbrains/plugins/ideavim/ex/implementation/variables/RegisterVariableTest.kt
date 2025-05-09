@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.variables
 
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -43,9 +44,9 @@ class RegisterVariableTest : VimTestCase() {
     configureByText("abcd")
     enterCommand("""vnoremap <expr> y '"' . v:register . 'y'""")
     typeText("vl\"zy")
-    val register = injector.registerGroup.getRegisters()
-      .filter { reg -> reg.name == 'z' }
-      .first()
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val register = injector.registerGroup.getRegisters(vimEditor, context).first { reg -> reg.name == 'z' }
     assertEquals("ab", register.text)
   }
 

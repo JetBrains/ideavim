@@ -21,8 +21,6 @@ import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.key.KeyMappingLayer
 import com.maddyhome.idea.vim.key.MappingInfoLayer
-import com.maddyhome.idea.vim.key.getLayer
-import com.maddyhome.idea.vim.key.isPrefix
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import javax.swing.KeyStroke
 
@@ -106,7 +104,11 @@ internal object MappingProcessor : KeyConsumer {
     // If the current sequence, with the current key, is a prefix to one or more mappings, then it's unfinished. A
     // completed sequence is not a prefix to itself - this function will return false unless it's also a prefix for
     // other mappings.
-    if (!mapping.isPrefix(keyProcessResultBuilder.state.mappingState.keys)) {
+    if (!mapping.isPrefix(
+        keyProcessResultBuilder.state.mappingState.keys as? List<KeyStroke>
+          ?: keyProcessResultBuilder.state.mappingState.keys.toList()
+      )
+    ) {
       log.debug("There are no mappings that start with the current sequence. Mapping processor will not handle further.")
       return false
     }
@@ -163,7 +165,7 @@ internal object MappingProcessor : KeyConsumer {
     log.trace("Try processing complete mapping sequence...")
 
     val mappingState = keyProcessResultBuilder.state.mappingState
-    val mappingInfo = mapping.getLayer(mappingState.keys)
+    val mappingInfo = mapping.getLayer(mappingState.keys as? List<KeyStroke> ?: mappingState.keys.toList())
     if (mappingInfo == null) {
       log.trace("Cannot find any mapping info for the sequence. Mapping processor will not handle further.")
       return false

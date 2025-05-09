@@ -39,12 +39,6 @@ open class CaretRegisterStorageBase(override var caret: ImmutableVimCaret) : Car
     }
     set(_) {}
 
-  @Deprecated("Please use the same method, but with ExecutionContext")
-  override fun storeText(editor: VimEditor, range: TextRange, type: SelectionType, isDelete: Boolean): Boolean {
-    val context = injector.executionContextManager.getEditorExecutionContext(editor)
-    return storeText(editor, context, caret, range, type, isDelete)
-  }
-
   override fun storeText(
     editor: VimEditor,
     context: ExecutionContext,
@@ -93,12 +87,6 @@ open class CaretRegisterStorageBase(override var caret: ImmutableVimCaret) : Car
       return
     }
     return super.setKeys(register, keys)
-  }
-
-  override fun saveRegister(r: Char, register: Register) {
-    val editorStub = injector.fallbackWindow
-    val contextStub = injector.executionContextManager.getEditorExecutionContext(editorStub)
-    saveRegister(editorStub, contextStub, r, register)
   }
 
   override fun saveRegister(editor: VimEditor, context: ExecutionContext, r: Char, register: Register) {

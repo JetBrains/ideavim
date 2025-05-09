@@ -168,8 +168,8 @@ internal class VimSurroundExtension : VimExtension {
         val surroundings = editor.sortedCarets()
           .map {
             val oldValue: List<KeyStroke>? = getRegisterForCaret(editor, context, REGISTER, it)
-            setRegisterForCaret(REGISTER, it, null)
-            SurroundingInfo(it, null, oldValue, false)
+            setRegisterForCaret(editor, context, REGISTER, it, null)
+            SurroundingInfo(editor, context, it, null, oldValue, false)
           }
 
         // Delete surrounding's content
@@ -258,9 +258,16 @@ internal class VimSurroundExtension : VimExtension {
     }
   }
 
-  private data class SurroundingInfo(val caret: VimCaret, var innerText: List<KeyStroke>?, val oldRegisterContent: List<KeyStroke>?, var isValidSurrounding: Boolean) {
+  private data class SurroundingInfo(
+    val editor: VimEditor,
+    val context: ExecutionContext,
+    val caret: VimCaret,
+    var innerText: List<KeyStroke>?,
+    val oldRegisterContent: List<KeyStroke>?,
+    var isValidSurrounding: Boolean,
+  ) {
     fun restoreRegister() {
-      setRegisterForCaret(REGISTER, caret, oldRegisterContent)
+      setRegisterForCaret(editor, context, REGISTER, caret, oldRegisterContent)
     }
   }
 

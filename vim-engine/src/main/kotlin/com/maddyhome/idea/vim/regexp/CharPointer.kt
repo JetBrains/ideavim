@@ -21,11 +21,6 @@ class CharPointer {
     readonly = true
   }
 
-  constructor(text: CharBuffer) {
-    seq = text
-    readonly = true
-  }
-
   constructor(text: StringBuffer) {
     seq = text
     readonly = false
@@ -37,10 +32,6 @@ class CharPointer {
     pointer = ptr.pointer + offset
   }
 
-  fun pointer(): Int {
-    return pointer
-  }
-
   @JvmOverloads
   fun set(ch: Char, offset: Int = 0): CharPointer {
     check(!readonly) { "readonly string" }
@@ -50,12 +41,6 @@ class CharPointer {
     }
     data.setCharAt(pointer + offset, ch)
     return this
-  }
-
-  fun charAtInc(): Char {
-    val res = charAt(0)
-    inc()
-    return res
   }
 
   @JvmOverloads
@@ -224,10 +209,6 @@ class CharPointer {
 
   override fun hashCode(): Int {
     return Objects.hash(seq, pointer)
-  }
-
-  fun skipWhitespaces() {
-    while (CharacterClasses.isWhite(charAt())) inc()
   }
 
   val digits: Int
