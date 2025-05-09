@@ -39,8 +39,13 @@ internal val Editor.isIdeaVimDisabledHere: Boolean
     return (ideaVimDisabledInDialog(ideaVimSupportValue) && isInDialog()) ||
       !ClientId.isCurrentlyUnderLocalId || // CWM-927
       (ideaVimDisabledForSingleLine(ideaVimSupportValue) && isSingleLine()) ||
-      IdeaVimDisablerExtensionPoint.isDisabledForEditor(this)
+      IdeaVimDisablerExtensionPoint.isDisabledForEditor(this) ||
+      isAiChat() // VIM-3786
   }
+
+private fun Editor.isAiChat(): Boolean {
+  return EditorHelper.getVirtualFile(this)?.name?.contains("AIAssistantInput") == true
+}
 
 private fun ideaVimDisabledInDialog(ideaVimSupportValue: StringListOptionValue): Boolean {
   return !ideaVimSupportValue.contains(IjOptionConstants.ideavimsupport_dialog)

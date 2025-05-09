@@ -25,11 +25,6 @@
         "modes": "I"
     },
     {
-        "keys": "<S-CR>",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertShiftEnterAction",
-        "modes": "I"
-    },
-    {
         "keys": "<Tab>",
         "class": "com.maddyhome.idea.vim.action.editor.VimEditorTab",
         "modes": "I"
