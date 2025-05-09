@@ -23,7 +23,7 @@ jobs:
       - name: Run Idea
         run: |
           mkdir -p build/reports
-          gradle --no-configuration-cache :runIdeForUiTests -PideaType=RD > build/reports/idea.log
+          gradle --no-configuration-cache :runIdeForUiTests -PideaType=RD
       - name: Wait for Idea started
         uses: jtalk/url-health-check-action@v3
         with:
