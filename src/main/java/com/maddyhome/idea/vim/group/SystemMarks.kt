@@ -44,7 +44,7 @@ internal class SystemMarks {
 
 internal fun Project.createLineBookmark(editor: Editor, line: Int, mnemonic: Char): LineBookmark? {
   val bookmarksManager = BookmarksManager.getInstance(this) ?: return null
-  val lineBookmarkProvider = LineBookmarkProvider.find(this) ?: return null
+  val lineBookmarkProvider = LineBookmarkProvider.Util.find(this) ?: return null
   val bookmark = lineBookmarkProvider.createBookmark(editor, line) as LineBookmark? ?: return null
   val type = BookmarkType.get(mnemonic)
   if (type == BookmarkType.DEFAULT) return null
