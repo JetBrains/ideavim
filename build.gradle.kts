@@ -118,7 +118,11 @@ dependencies {
   intellijPlatform {
     // Snapshots don't use installers
     // https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-dependencies-extension.html#target-versions-installers
-    val useInstaller = "EAP-SNAPSHOT" !in ideaVersion
+    var useInstaller = "EAP-SNAPSHOT" !in ideaVersion
+    if (ideaType == "RD") {
+      // Using Rider as a target IntelliJ Platform with `useInstaller = true` is currently not supported, please set `useInstaller = false` instead. See: https://github.com/JetBrains/intellij-platform-gradle-plugin/issues/1852
+      useInstaller = false
+    }
 
     // Note that it is also possible to use local("...") to compile against a locally installed IDE
     // E.g. local("/Users/{user}/Applications/IntelliJ IDEA Ultimate.app")
