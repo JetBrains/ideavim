@@ -19,6 +19,7 @@ import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.TextEditorWithPreview
 import com.intellij.openapi.fileEditor.impl.text.TextEditorProvider
 import com.intellij.openapi.util.registry.Registry
+import com.intellij.util.PlatformUtils
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -40,6 +41,12 @@ internal class UndoRedoHelper : VimTimestampBasedUndoService {
   }
 
   override fun undo(editor: VimEditor, context: ExecutionContext): Boolean {
+    if (PlatformUtils.isJetBrainsClient()) {
+      // Note: Remote Dev has special hacks for undo/redo, so we don't use the manager.
+      // The action is sent directly to the backend using the internal API.
+      return injector.actionExecutor.executeAction(editor, injector.actionExecutor.ACTION_UNDO, context)
+    }
+
     val ijContext = context.context as DataContext
     val project = PlatformDataKeys.PROJECT.getData(ijContext) ?: return false
     val textEditor = getTextEditor(editor.ij)
@@ -111,6 +118,10 @@ internal class UndoRedoHelper : VimTimestampBasedUndoService {
   }
 
   override fun redo(editor: VimEditor, context: ExecutionContext): Boolean {
+    if (PlatformUtils.isJetBrainsClient()) {
+      return injector.actionExecutor.executeAction(editor, injector.actionExecutor.ACTION_REDO, context)
+    }
+
     val ijContext = context.context as DataContext
     val project = PlatformDataKeys.PROJECT.getData(ijContext) ?: return false
     val textEditor = getTextEditor(editor.ij)

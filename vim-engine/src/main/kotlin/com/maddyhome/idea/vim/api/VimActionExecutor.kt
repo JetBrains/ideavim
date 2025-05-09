@@ -21,6 +21,8 @@ interface VimActionExecutor {
   val ACTION_EXPAND_REGION: String
   val ACTION_EXPAND_REGION_RECURSIVELY: String
   val ACTION_EXPAND_COLLAPSE_TOGGLE: String
+  val ACTION_UNDO: String
+  val ACTION_REDO: String
 
   /**
    * Execute an action
