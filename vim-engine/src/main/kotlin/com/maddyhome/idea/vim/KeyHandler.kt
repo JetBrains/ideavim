@@ -34,6 +34,8 @@ import com.maddyhome.idea.vim.key.consumers.SelectRegisterConsumer
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
+import org.jetbrains.annotations.ApiStatus
+import java.util.concurrent.ConcurrentLinkedDeque
 import javax.swing.KeyStroke
 
 /**
@@ -59,6 +61,24 @@ class KeyHandler {
   )
   private var handleKeyRecursionCount = 0
 
+  private var commandListener: ConcurrentLinkedDeque<() -> Unit> = ConcurrentLinkedDeque()
+
+  /**
+   * This is an internal API of IdeaVim. External plugins must not use it.
+   */
+  @ApiStatus.Internal
+  fun addCommandListener(listener: () -> Unit) {
+    commandListener.add(listener)
+  }
+
+  /**
+   * This is an internal API of IdeaVim. External plugins must not use it.
+   */
+  @ApiStatus.Internal
+  fun removeAllCommandListeners() {
+    commandListener.clear()
+  }
+
   // KeyHandlerState requires injector.keyGroup to be initialized and that's why we don't create it immediately and have this here
   // TODO figure out a better solution
   private val defaultKeyHandlerState by lazy { KeyHandlerState() }
@@ -83,6 +103,7 @@ class KeyHandler {
    * @param context The data context
    */
   fun handleKey(editor: VimEditor, key: KeyStroke, context: ExecutionContext, keyState: KeyHandlerState) {
+    commandListener.forEach { it() }
     handleKey(editor, key, context, allowKeyMappings = true, mappingCompleted = false, keyState)
   }
 

@@ -38,6 +38,7 @@ import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.handler.KeyMapIssue
 import com.maddyhome.idea.vim.helper.MessageHelper
+import com.maddyhome.idea.vim.icons.VimIcons
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.newapi.globalIjOptions
@@ -180,6 +181,28 @@ internal class NotificationService(private val project: Project?) {
       """You have finished the Early Access Program. Please reinstall IdeaVim to get the stable version.""",
       NotificationType.INFORMATION,
     ).notify(project)
+  }
+
+  /**
+   * Shows a notification that the user can reenable IdeaVim by clicking on the IdeaVim icon in the status bar.
+   */
+  fun showReenableNotification(project: Project) {
+    val notification = Notification(
+      IDEAVIM_NOTIFICATION_ID,
+      IDEAVIM_NOTIFICATION_TITLE,
+      "IdeaVim has been disabled. You can reenable it by clicking on the gray IdeaVim icon in the status bar.",
+      NotificationType.INFORMATION,
+    )
+    notification.icon = VimIcons.IDEAVIM_DISABLED
+
+    notification.addAction(object : DumbAwareAction("Reenable IdeaVim") {
+      override fun actionPerformed(e: AnActionEvent) {
+        VimPlugin.setEnabled(true)
+        notification.expire()
+      }
+    })
+
+    notification.notify(project)
   }
 
   fun notifyActionId(id: String?, candidates: List<String>? = null, intentionName: String?) {

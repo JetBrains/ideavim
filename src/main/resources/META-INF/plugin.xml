@@ -140,6 +140,9 @@
                  key="ideavim.only.in.editor.component"/>
     <registryKey defaultValue="false" description="Old action execution mechanism" key="ideavim.old.action.execution"
                  restartRequired="false"/>
+
+    <editorNotificationProvider
+        implementation="com.maddyhome.idea.vim.troubleshooting.AccidentalInstallDetectorEditorNotificationProvider"/>
   </extensions>
 
   <xi:include href="/META-INF/includes/ApplicationServices.xml" xpointer="xpointer(/idea-plugin/*)"/>
