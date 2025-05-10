@@ -121,6 +121,11 @@ abstract class VimPutBase : VimPut {
         if (!caret.isValid) return@forEach
         val range = selection.toVimTextRange(false).normalize()
 
+        if (selection.isEmptySelection) {
+          caret.moveToInlayAwareOffset(range.startOffset + 1)
+          return@forEach
+        }
+
         injector.application.runWriteAction {
           injector.changeGroup.deleteRange(editor, context, caret, range, selection.type, false, saveToRegister)
         }
