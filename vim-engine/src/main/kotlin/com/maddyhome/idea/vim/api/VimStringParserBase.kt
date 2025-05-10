@@ -27,26 +27,30 @@ abstract class VimStringParserBase : VimStringParser {
   override fun toPrintableString(keys: List<KeyStroke>): String {
     val builder = StringBuilder()
     for (key in keys) {
-      val keyAsChar = keyStrokeToChar(key)
-      builder.append(keyAsChar)
+      val keyAsString = keyStrokeToString(key)
+      builder.append(keyAsString)
     }
     return builder.toString()
   }
 
-  private fun keyStrokeToChar(key: KeyStroke): Char {
+  private fun keyStrokeToString(key: KeyStroke): String {
     if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {
-      return key.keyChar
+      return key.keyChar.toString()
     } else if (key.modifiers and InputEvent.CTRL_DOWN_MASK == InputEvent.CTRL_DOWN_MASK) {
-      return if (key.keyCode == 'J'.code) {
-        // 'J' is a special case, keycode 10 is \n char
-        0.toChar()
+      return if (isControlCharacterKeyCode(key.keyCode)) {
+        if (key.keyCode == 'J'.code) {
+          // 'J' is a special case, keycode 10 is \n char
+          0.toChar().toString()
+        } else {
+          (key.keyCode - 'A'.code + 1).toChar().toString()
+        }
       } else {
-        (key.keyCode - 'A'.code + 1).toChar()
+        "^" + key.keyCode.toChar()
       }
     } else if (key.keyChar == KeyEvent.CHAR_UNDEFINED && key.keyCode == KeyEvent.VK_ENTER) {
-      return '\u000D'
+      return "\u000D"
     }
-    return key.keyCode.toChar()
+    return key.keyCode.toChar().toString()
   }
 
   override fun toKeyNotation(keyStrokes: List<KeyStroke>): String {
@@ -178,7 +182,12 @@ abstract class VimStringParserBase : VimStringParser {
   private fun getMapLeader(): List<KeyStroke> {
     val mapLeader: Any? = injector.variableService.getGlobalVariableValue("mapleader")
     return if (mapLeader is VimString) {
-      stringToKeys(mapLeader.value)
+      val v: String = mapLeader.value
+      if (v[0] == '<' && v[v.length - 1] == '>') {
+        listOf(parseSpecialKey(v.substring(1, v.length - 1), 0)!!)
+      } else {
+        stringToKeys(mapLeader.value)
+      }
     } else {
       stringToKeys("\\")
     }
@@ -205,6 +214,11 @@ abstract class VimStringParserBase : VimStringParser {
 
   private fun isControlCharacter(c: Char): Boolean {
     return c < '\u0020'
+  }
+
+  private fun isControlCharacterKeyCode(code: Int): Boolean {
+    // Ctrl-(A..Z [\]^_) are ASCII control characters
+    return code >= 'A'.code && code <= '_'.code
   }
 
   @Suppress("SpellCheckingInspection")
@@ -428,18 +442,24 @@ abstract class VimStringParserBase : VimStringParser {
           }
           if (c == '>') {
             val specialKey = parseSpecialKey(specialKeyBuilder.toString(), 0)
+            var keyCode: Int? = null
             if (specialKey != null) {
-              var keyCode = specialKey.keyCode
               if (specialKey.keyCode == 0) {
                 keyCode = specialKey.keyChar.code
               } else if (specialKey.modifiers and InputEvent.CTRL_DOWN_MASK == InputEvent.CTRL_DOWN_MASK) {
-                keyCode = if (specialKey.keyCode == 'J'.code) {
-                  // 'J' is a special case, keycode 10 is \n char
-                  0
-                } else {
-                  specialKey.keyCode - 'A'.code + 1
+                if (isControlCharacterKeyCode(specialKey.keyCode)) {
+                  keyCode = if (specialKey.keyCode == 'J'.code) {
+                    // 'J' is a special case, keycode 10 is \n char
+                    0
+                  } else {
+                    specialKey.keyCode - 'A'.code + 1
+                  }
                 }
+              } else {
+                keyCode = specialKey.keyCode
               }
+            }
+            if (keyCode != null) {
               result.append(keyCode.toChar())
             } else {
               result.append("<").append(specialKeyBuilder).append(">")
