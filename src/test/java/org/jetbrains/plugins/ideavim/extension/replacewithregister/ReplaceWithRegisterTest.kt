@@ -784,4 +784,47 @@ class ReplaceWithRegisterTest : VimTestCase() {
     assertState(expected)
   }
 
+  @TestFor(issues = ["VIM-3798"])
+  @Test
+  fun `test for performing replace with register on empty text object (empty parentheses), from default register`() {
+    val before = """
+      ${c}text
+      function()
+    """.trimIndent()
+
+    configureByText(before)
+
+    typeText("yiw")
+    typeText("j")
+    typeText("grib")
+
+    val expected = """
+      text
+      function(tex${c}t)
+    """.trimIndent()
+
+    assertState(expected)
+  }
+
+  @TestFor(issues = ["VIM-3798"])
+  @Test
+  fun `test for performing replace with register on empty text object (empty quotation marks), from default register`() {
+    val before = """
+      ${c}text
+      function("")
+    """.trimIndent()
+
+    configureByText(before)
+
+    typeText("yiw")
+    typeText("j")
+    typeText("gri\"")
+
+    val expected = """
+      text
+      function("tex${c}t")
+    """.trimIndent()
+
+    assertState(expected)
+  }
 }
