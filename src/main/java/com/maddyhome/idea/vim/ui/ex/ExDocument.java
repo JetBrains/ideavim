@@ -91,13 +91,23 @@ public class ExDocument extends PlainDocument {
       return;
     }
 
-    final Object attribute =
+    // See if we have a composed text attribute, and if so, try to cast it to AttributedString
+    final Object composedTextAttribute =
       attributeSet != null ? attributeSet.getAttribute(StyleConstants.ComposedTextAttribute) : null;
-    if (attribute instanceof AttributedString as) {
-      final Map<AttributedCharacterIterator.Attribute, Object> attributes = as.getIterator().getAttributes();
-      if (!attributes.containsKey(TextAttribute.INPUT_METHOD_HIGHLIGHT) &&
-          !attributes.containsKey(TextAttribute.INPUT_METHOD_UNDERLINE)) {
-        as.addAttribute(TextAttribute.INPUT_METHOD_HIGHLIGHT, InputMethodHighlight.UNSELECTED_CONVERTED_TEXT_HIGHLIGHT);
+    if (composedTextAttribute instanceof AttributedString attributedString) {
+      // Iterate over all the characters in the attributed string (might just be `~` or `^`, or might be a longer prefix
+      // from an IME) and add an input method highlight to it if it's not already there
+      final AttributedCharacterIterator iterator = attributedString.getIterator();
+      while (iterator.current() != AttributedCharacterIterator.DONE) {
+        final Map<AttributedCharacterIterator.Attribute, Object> currentCharAttributes = iterator.getAttributes();
+        if (!currentCharAttributes.containsKey(TextAttribute.INPUT_METHOD_HIGHLIGHT) &&
+            !currentCharAttributes.containsKey(TextAttribute.INPUT_METHOD_UNDERLINE)) {
+          attributedString.addAttribute(TextAttribute.INPUT_METHOD_HIGHLIGHT,
+                                        InputMethodHighlight.UNSELECTED_CONVERTED_TEXT_HIGHLIGHT, iterator.getIndex(),
+                                        iterator.getIndex() + 1);
+        }
+
+        iterator.next();
       }
     }
   }
