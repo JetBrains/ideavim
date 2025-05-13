@@ -15,10 +15,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ranges.Range
-import com.maddyhome.idea.vim.history.HistoryConstants.COMMAND
-import com.maddyhome.idea.vim.history.HistoryConstants.EXPRESSION
-import com.maddyhome.idea.vim.history.HistoryConstants.INPUT
-import com.maddyhome.idea.vim.history.HistoryConstants.SEARCH
+import com.maddyhome.idea.vim.history.VimHistory
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -105,11 +102,12 @@ data class HistoryCommand(val range: Range, val modifier: CommandModifier, val a
 
     val p = processKey(f, l)
     val res = when (key[0]) {
-      'c' -> p(COMMAND)
-      's' -> p(SEARCH)
-      'e' -> p(EXPRESSION)
-      'i' -> p(INPUT)
-      'a' -> "${p(COMMAND)}${p(SEARCH)}${p(EXPRESSION)}${p(INPUT)}"
+      'c' -> p(VimHistory.Type.Command)
+      's' -> p(VimHistory.Type.Search)
+      'e' -> p(VimHistory.Type.Expression)
+      'i' -> p(VimHistory.Type.Input)
+      // TODO: This is missing new lines if the history has more than one entry
+      'a' -> "${p(VimHistory.Type.Command)}${p(VimHistory.Type.Search)}${p(VimHistory.Type.Expression)}${p(VimHistory.Type.Input)}"
       else -> ""
     }
 
@@ -117,7 +115,7 @@ data class HistoryCommand(val range: Range, val modifier: CommandModifier, val a
     return ExecutionResult.Success
   }
 
-  private fun processKey(start: Int, end: Int) = { key: String ->
+  private fun processKey(start: Int, end: Int) = { key: VimHistory.Type ->
     logger.debug("process $key $start,$end")
 
     injector.historyGroup.getEntries(key, start, end).joinToString("\n", prefix = "      #  $key history\n") { entry ->
