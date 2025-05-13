@@ -17,8 +17,8 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.VimCommandLine;
 import com.maddyhome.idea.vim.api.VimCommandLineCaret;
 import com.maddyhome.idea.vim.helper.UiHelper;
-import com.maddyhome.idea.vim.history.HistoryConstants;
 import com.maddyhome.idea.vim.history.HistoryEntry;
+import com.maddyhome.idea.vim.history.VimHistory;
 import com.maddyhome.idea.vim.options.helpers.GuiCursorAttributes;
 import com.maddyhome.idea.vim.options.helpers.GuiCursorMode;
 import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper;
@@ -121,14 +121,10 @@ public class ExTextField extends JTextField {
   }
 
   void setType(@NotNull String type) {
-    String hkey = switch (type.charAt(0)) {
-      case '/', '?' -> HistoryConstants.SEARCH;
-      case ':' -> HistoryConstants.COMMAND;
-      default -> null;
-    };
-
-    if (hkey != null) {
-      history = VimPlugin.getHistory().getEntries(hkey, 0, 0);
+    // TODO: What should we do with a Custom text field type?
+    final VimHistory.Type historyType = VimHistory.Type.Companion.getTypeByLabel(type);
+    if (!(historyType instanceof VimHistory.Type.Custom)) {
+      final List<@NotNull HistoryEntry> history = VimPlugin.getHistory().getEntries(historyType, 0, 0);
       histIndex = history.size();
     }
   }
@@ -140,50 +136,6 @@ public class ExTextField extends JTextField {
    */
   void saveLastEntry() {
     lastEntry = super.getText();
-  }
-
-  void selectHistory(boolean isUp, boolean filter) {
-    int dir = isUp ? -1 : 1;
-    if (histIndex + dir < 0 || histIndex + dir > history.size()) {
-      VimPlugin.indicateError();
-
-      return;
-    }
-
-    if (filter) {
-      for (int i = histIndex + dir; i >= 0 && i <= history.size(); i += dir) {
-        String txt;
-        if (i == history.size()) {
-          txt = lastEntry;
-        }
-        else {
-          HistoryEntry entry = history.get(i);
-          txt = entry.getEntry();
-        }
-
-        if (txt.startsWith(lastEntry)) {
-          updateText(txt);
-          histIndex = i;
-
-          return;
-        }
-      }
-
-      VimPlugin.indicateError();
-    }
-    else {
-      histIndex += dir;
-      String txt;
-      if (histIndex == history.size()) {
-        txt = lastEntry;
-      }
-      else {
-        HistoryEntry entry = history.get(histIndex);
-        txt = entry.getEntry();
-      }
-
-      updateText(txt);
-    }
   }
 
   void updateText(String string) {
@@ -268,24 +220,6 @@ public class ExTextField extends JTextField {
   @Override
   protected @NotNull Document createDefaultModel() {
     return new ExDocument();
-  }
-
-  /**
-   * Cancels current action, if there is one. If not, cancels entry.
-   */
-  void escape() {
-    cancel();
-  }
-
-  /**
-   * Cancels entry, including any current action.
-   */
-  void cancel() {
-    clearCurrentAction();
-    VimCommandLine commandLine = injector.getCommandLine().getActiveCommandLine();
-    if (commandLine != null) {
-      commandLine.close(true, true);
-    }
   }
 
   public void clearCurrentAction() {
@@ -527,7 +461,6 @@ public class ExTextField extends JTextField {
   private DataContext context;
   private final CommandLineCaret caret;
   String lastEntry;
-  private List<HistoryEntry> history;
   int histIndex = 0;
   int currentActionPromptCharacterOffset = -1;
 

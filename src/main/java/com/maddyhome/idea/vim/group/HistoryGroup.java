@@ -25,8 +25,6 @@ import org.jetbrains.annotations.TestOnly;
 
 import java.util.List;
 
-import static com.maddyhome.idea.vim.history.HistoryConstants.*;
-
 @State(name = "VimHistorySettings", storages = {
   @Storage(value = "$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)})
 public class HistoryGroup extends VimHistoryBase implements PersistentStateComponent<Element> {
@@ -73,7 +71,7 @@ public class HistoryGroup extends VimHistoryBase implements PersistentStateCompo
   }
 
   private void readData(@NotNull Element element, String key) {
-    HistoryBlock block = getHistories().get(key);
+    HistoryBlock block = getHistories().get(getTypeForString(key));
     if (block != null) {
       return;
     }
@@ -94,22 +92,24 @@ public class HistoryGroup extends VimHistoryBase implements PersistentStateCompo
   }
 
   private String typeToKey(VimHistory.Type type) {
-    if (type instanceof VimHistory.Type.Search) {
-      return SEARCH;
-    }
-    if (type instanceof VimHistory.Type.Command) {
-      return COMMAND;
-    }
-    if (type instanceof VimHistory.Type.Expression) {
-      return EXPRESSION;
-    }
-    if (type instanceof VimHistory.Type.Input) {
-      return INPUT;
-    }
-    if (type instanceof VimHistory.Type.Custom) {
-      return ((Type.Custom)type).getId();
-    }
-    return "unreachable";
+    return switch (type) {
+      case Type.Search ignored -> "search";
+      case Type.Command ignored -> "cmd";
+      case Type.Expression ignored -> "expr";
+      case Type.Input ignored -> "input";
+      case Type.Custom custom -> custom.getId();
+      case null, default -> "unreachable";
+    };
+  }
+
+  private VimHistory.Type getTypeForString(String key) {
+    return switch (key) {
+      case "search" -> Type.Search.INSTANCE;
+      case "cmd" -> Type.Command.INSTANCE;
+      case "expr" -> Type.Expression.INSTANCE;
+      case "input" -> Type.Input.INSTANCE;
+      default -> new VimHistory.Type.Custom(key);
+    };
   }
 
   @Nullable
