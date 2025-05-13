@@ -100,16 +100,16 @@ class ExEntryPanelService : VimCommandLineServiceBase(), VimModalInputService {
   }
 
   override fun readInputAndProcess(
-    editor: VimEditor,
+    vimEditor: VimEditor,
     context: ExecutionContext,
     prompt: String,
     finishOn: Char?,
     processing: (String) -> Unit,
   ) {
-    val currentMode = editor.mode
+    val currentMode = vimEditor.mode
 
     // Make sure the Visual selection marks are up to date before we use them.
-    injector.markService.setVisualSelectionMarks(editor)
+    injector.markService.setVisualSelectionMarks(vimEditor)
 
     // Note that we should remove selection and reset caret offset before we switch back to Normal mode and then enter
     // Command-line mode. However, some IdeaVim commands can handle multiple carets, including multiple carets with
@@ -119,14 +119,14 @@ class ExEntryPanelService : VimCommandLineServiceBase(), VimModalInputService {
     // On the plus side, it means we still show selection while editing the command line, which Vim also does
     // (Normal then Command-line is not strictly necessary, but done for completeness and autocmd)
     // Caret selection is finally handled in Command.execute
-    editor.mode = Mode.NORMAL()
-    editor.mode = Mode.CMD_LINE(currentMode)
+    vimEditor.mode = Mode.NORMAL()
+    vimEditor.mode = Mode.CMD_LINE(currentMode)
 
     val panel = ExEntryPanel.getInstance()
     panel as ExEntryPanel
     panel.finishOn = finishOn
     panel.inputProcessing = processing
-    panel.activate(editor.ij, context.ij, prompt, "")
+    panel.activate(vimEditor.ij, context.ij, prompt, "")
   }
 
   override fun createPanel(
