@@ -39,7 +39,7 @@ class ExecutableTextRangesTests : VimTestCase() {
     val scriptString = """
       set rnu
       if 1
-        -0=a " some line that parser cannot recognize (it should be ignored)
+        -0§a " some line that parser cannot recognize (it should be ignored)
         let y = 76
       endif
     """.trimIndent()
@@ -61,7 +61,7 @@ class ExecutableTextRangesTests : VimTestCase() {
       oh, hi Mark
       "        ideavim ignore end
       if 1
-        -0=a " some line that parser cannot recognize (it should be ignored)
+        -0§a " some line that parser cannot recognize (it should be ignored)
         let y = 76
       endif
     """.trimIndent()
