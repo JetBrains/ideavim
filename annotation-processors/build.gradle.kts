@@ -21,7 +21,7 @@ repositories {
 }
 
 dependencies {
-  compileOnly("com.google.devtools.ksp:symbol-processing-api:2.1.20-2.0.1")
+  compileOnly("com.google.devtools.ksp:symbol-processing-api:2.1.21-2.0.1")
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:$kotlinxSerializationVersion") {
     // kotlin stdlib is provided by IJ, so there is no need to include it into the distribution
     exclude("org.jetbrains.kotlin", "kotlin-stdlib")
