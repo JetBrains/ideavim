@@ -8,17 +8,12 @@
 
 package com.maddyhome.idea.vim.ui.ex;
 
-import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Editor;
 import com.intellij.ui.paint.PaintUtil;
 import com.intellij.util.ui.JBUI;
-import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.VimCommandLine;
 import com.maddyhome.idea.vim.api.VimCommandLineCaret;
 import com.maddyhome.idea.vim.helper.UiHelper;
-import com.maddyhome.idea.vim.history.HistoryEntry;
-import com.maddyhome.idea.vim.history.VimHistory;
 import com.maddyhome.idea.vim.options.helpers.GuiCursorAttributes;
 import com.maddyhome.idea.vim.options.helpers.GuiCursorMode;
 import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper;
@@ -39,7 +34,6 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.util.Date;
-import java.util.List;
 
 import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 import static java.lang.Math.ceil;
@@ -81,8 +75,6 @@ public class ExTextField extends JTextField {
 
   void deactivate() {
     clearCurrentAction();
-    ExEntryPanel.getInstance().setEditor(null);
-    context = null;
   }
 
   @Override
@@ -120,22 +112,13 @@ public class ExTextField extends JTextField {
     setKeymap(map);
   }
 
-  void setType(@NotNull String type) {
-    // TODO: What should we do with a Custom text field type?
-    final VimHistory.Type historyType = VimHistory.Type.Companion.getTypeByLabel(type);
-    if (!(historyType instanceof VimHistory.Type.Custom)) {
-      final List<@NotNull HistoryEntry> history = VimPlugin.getHistory().getEntries(historyType, 0, 0);
-      histIndex = history.size();
-    }
-  }
-
   /**
    * Stores the current text for use in filtering history. Required for scrolling through multiple history entries
    * <p>
    * Called whenever the text is changed, either by typing, or by special characters altering the text (e.g. Delete)
    */
   void saveLastEntry() {
-    lastEntry = super.getText();
+    ExEntryPanel.getInstance().setLastEntry(super.getText());
   }
 
   void updateText(String string) {
@@ -153,20 +136,7 @@ public class ExTextField extends JTextField {
 
   // VIM-570
   private void setFontToJField(String stringToDisplay) {
-    super.setFont(UiHelper.selectEditorFont(getEditor(), stringToDisplay));
-  }
-
-  void setEditor(@NotNull Editor editor, DataContext context) {
-    this.context = context;
-    ExEntryPanel.getInstance().setEditor(editor);
-  }
-
-  public @Nullable Editor getEditor() {
-    return ExEntryPanel.getInstance().getIjEditor();
-  }
-
-  public DataContext getContext() {
-    return context;
+    super.setFont(UiHelper.selectEditorFont(ExEntryPanel.getInstance().getIjEditor(), stringToDisplay));
   }
 
   public void handleKey(@NotNull KeyStroke stroke) {
@@ -458,10 +428,7 @@ public class ExTextField extends JTextField {
     return String.format("%s %d", caret.mode, caret.thickness);
   }
 
-  private DataContext context;
   private final CommandLineCaret caret;
-  String lastEntry;
-  int histIndex = 0;
   int currentActionPromptCharacterOffset = -1;
 
   private static final Logger logger = Logger.getInstance(ExTextField.class.getName());

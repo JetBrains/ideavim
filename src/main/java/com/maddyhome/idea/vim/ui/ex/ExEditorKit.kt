@@ -52,10 +52,9 @@ internal object ExEditorKit : DefaultEditorKit() {
             val panel = ((injector.commandLine.getActiveCommandLine() as? ExEntryPanel)
               ?: (injector.modalInput.getCurrentModalInput() as? WrappedAsModalInputExEntryPanel)?.exEntryPanel)
               ?: return
-            val entry = panel.entry
-            val editor = entry.editor
+            val editor = panel.ijEditor
             val keyHandler = KeyHandler.getInstance()
-            keyHandler.handleKey(editor!!.vim, key, entry.context.vim, keyHandler.keyHandlerState)
+            keyHandler.handleKey(editor!!.vim, key, panel.context.vim, keyHandler.keyHandlerState)
           } else {
             val event = ActionEvent(e.source, e.id, c.toString(), e.getWhen(), e.modifiers)
             super.actionPerformed(event)
