@@ -35,13 +35,13 @@ internal class ExShortcutKeyAction(private val exEntryPanel: ExEntryPanel) : Dum
   override fun actionPerformed(e: AnActionEvent) {
     val keyStroke = getKeyStroke(e)
     if (keyStroke != null) {
-      val editor = exEntryPanel.entry.editor
+      val editor = exEntryPanel.ijEditor
       val keyHandler = KeyHandler.getInstance()
 
       // About the context: we use the context of the main editor to execute actions on it.
       //   e.dataContext will refer to the ex-entry editor and commands will be executed on it,
       //   thus it should not be used. For example, `:action EditorSelectWord` will not work with this context
-      val mainEditorContext = exEntryPanel.entry.context.vim
+      val mainEditorContext = exEntryPanel.context.vim
       keyHandler.handleKey(editor!!.vim, keyStroke, mainEditorContext, keyHandler.keyHandlerState)
     }
   }
