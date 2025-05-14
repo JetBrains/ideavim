@@ -8,9 +8,14 @@
 
 package com.maddyhome.idea.vim.history
 
+import org.jetbrains.annotations.TestOnly
+
 interface VimHistory {
   fun addEntry(type: Type, text: String)
   fun getEntries(type: Type, first: Int, last: Int): List<HistoryEntry>
+
+  @TestOnly
+  fun resetHistory()
 
   sealed class Type() {
     data object Search : Type()

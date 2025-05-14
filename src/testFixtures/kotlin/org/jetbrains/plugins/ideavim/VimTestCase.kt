@@ -223,6 +223,7 @@ abstract class VimTestCase {
     VimPlugin.getSearch().resetState()
     injector.markService.resetAllMarks()
     injector.jumpService.resetJumps()
+    injector.historyGroup.resetHistory()
     VimPlugin.getChange().resetRepeat()
     VimPlugin.getKey().savedShortcutConflicts.clear()
     assertTrue(KeyHandler.getInstance().keyStack.isEmpty())
