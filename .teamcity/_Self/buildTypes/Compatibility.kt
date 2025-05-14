@@ -44,6 +44,7 @@ object Compatibility : IdeaVimBuildType({
               java -jar verifier1/verifier-cli-dev-all-2.jar check-plugin '${'$'}com.julienphalip.ideavim.switch' [latest-IU] -team-city
               java -jar verifier1/verifier-cli-dev-all-2.jar check-plugin '${'$'}com.julienphalip.ideavim.functiontextobj' [latest-IU] -team-city
               java -jar verifier1/verifier-cli-dev-all-2.jar check-plugin '${'$'}com.miksuki.HighlightCursor' [latest-IU] -team-city
+              java -jar verifier1/verifier-cli-dev-all-2.jar check-plugin '${'$'}com.ugarosa.idea.edgemotion' [latest-IU] -team-city
             """.trimIndent()
     }
   }
