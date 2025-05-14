@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 
 open class VimHistoryBase : VimHistory {
-  val histories: MutableMap<VimHistory.Type, HistoryBlock> = mutableMapOf()
+  protected val histories: MutableMap<VimHistory.Type, HistoryBlock> = mutableMapOf()
 
   override fun addEntry(type: VimHistory.Type, text: String) {
     val block = blocks(type)
@@ -27,6 +27,9 @@ open class VimHistoryBase : VimHistory {
 
     val entries = block.getEntries()
     val res = ArrayList<HistoryEntry>()
+    if (myFirst == 0 && myLast == 0) {
+      myLast = Integer.MAX_VALUE
+    }
     if (myFirst < 0) {
       myFirst = if (-myFirst > entries.size) {
         Integer.MAX_VALUE
@@ -43,7 +46,7 @@ open class VimHistoryBase : VimHistory {
         entry.number
       }
     } else if (myLast == 0) {
-      myLast = Integer.MAX_VALUE
+      myLast = myFirst
     }
 
     logger.debug { "first=$myFirst\nlast=$myLast" }
@@ -55,6 +58,10 @@ open class VimHistoryBase : VimHistory {
     }
 
     return res
+  }
+
+  override fun resetHistory() {
+    histories.clear()
   }
 
   private fun blocks(type: VimHistory.Type): HistoryBlock {
