@@ -123,6 +123,7 @@ command:
         | FILE | EXIT | E_LOWERCASE | EDIT_FILE | DUMP_LINE | DIGRAPH | DEL_MARKS | D_LOWERCASE | DEL_LINES | DELCMD
         | T_LOWERCASE | COPY | CMD_CLEAR | BUFFER_LIST | BUFFER_CLOSE | B_LOWERCASE | BUFFER | ASCII
         | ACTIONLIST | ACTION | LOCKVAR | UNLOCKVAR | PACKADD | TABMOVE
+        | ASSIGN    // `:=` print last line number
       )
       bangModifier = BANG?
     WS* ((commandArgumentWithoutBars? inline_comment NEW_LINE) | (commandArgumentWithoutBars? NEW_LINE) | (commandArgumentWithoutBars? BAR)) (NEW_LINE | BAR)*
