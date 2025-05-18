@@ -70,6 +70,23 @@ class MarkCommandTest : VimTestCase() {
   }
 
   @Test
+  fun `test k mark with no whitespace`() {
+    configureByText(
+      """Lorem ipsum dolor sit amet,
+                         |consectetur adipiscing elit
+                         |where it$c was settled on some sodden sand
+                         |Cras id tellus in ex imperdiet egestas.
+      """.trimMargin(),
+    )
+    typeText(commandToKeys("ka"))
+    val vimEditor = fixture.editor.vim
+    injector.markService.getMark(vimEditor.primaryCaret(), 'a')?.let {
+      kotlin.test.assertEquals(2, it.line)
+      kotlin.test.assertEquals(0, it.col)
+    } ?: fail("Mark is null")
+  }
+
+  @Test
   fun `test mark in range`() {
     configureByText(
       """Lorem ipsum dolor sit amet,
