@@ -279,25 +279,6 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
     val modifier = if (ctx.bangModifier == null) CommandModifier.NONE else CommandModifier.BANG
     val argument = ctx.commandArgumentWithBars()?.text ?: ""
 
-    val alphabeticPart = name.split(Regex("\\P{Alpha}"))[0]
-    if (setOf(
-        "s",
-        "su",
-        "sub",
-        "subs",
-        "subst",
-        "substi",
-        "substit",
-        "substitu",
-        "substitut",
-        "substitut",
-        "substitute"
-      ).contains(alphabeticPart)
-    ) {
-      val command = SubstituteCommand(range, name.replaceFirst(alphabeticPart, "") + argument, alphabeticPart)
-      command.rangeInScript = ctx.getTextRange()
-      return command
-    }
     val commandConstructor = getCommandByName(name).constructors
       .filter { it.parameters.size == 3 }
       .firstOrNull {
