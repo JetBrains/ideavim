@@ -32,6 +32,7 @@ import com.maddyhome.idea.vim.vimscript.model.commands.ExecuteCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.GlobalCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.GoToLineCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.LetCommand
+import com.maddyhome.idea.vim.vimscript.model.commands.MarkCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.ShiftLeftCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.ShiftRightCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.SplitCommand
@@ -273,11 +274,26 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
     return command
   }
 
+  /**
+   * Called for unmatched commands, such as aliases
+   */
   override fun visitOtherCommand(ctx: OtherCommandContext): Command {
     val range: Range = parseRange(ctx.range())
     val name = ctx.commandName().text
     val modifier = if (ctx.bangModifier == null) CommandModifier.NONE else CommandModifier.BANG
     val argument = ctx.commandArgumentWithBars()?.text ?: ""
+
+    // Special case for `:k{mark}`, with no whitespace between command and argument. The `:k` command (shorthand for
+    // `:mark`) is already recognised and handled as a command. That parser rule allows optional whitespace, so
+    // `:k{mark}` should work. However, the catch-all "other" rule is greedier and accepts a command name starting with
+    // `k` and containing alpha marks. This is the only command that starts with `k`, so we can handle it here, passing
+    // the rest of the command name as an argument. (Note that the whitespace between end of command name and what the
+    // parser thinks of as the argument isn't necessarily correct, but this is an error anyway)
+    if (name.startsWith("k")) {
+      val command = MarkCommand(range, CommandModifier.NONE, name.substring(1) + " " + argument)
+      command.rangeInScript = ctx.getTextRange()
+      return command
+    }
 
     val commandConstructor = getCommandByName(name).constructors
       .filter { it.parameters.size == 3 }
