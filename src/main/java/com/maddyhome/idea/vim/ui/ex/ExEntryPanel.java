@@ -95,7 +95,6 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     // This does not need to be unregistered, it's registered as a custom UI property on this
     EventFacade.getInstance().registerCustomShortcutSet(VimShortcutKeyAction.getInstance(), toShortcutSet(
       ((VimKeyGroupBase)injector.getKeyGroup()).getRequiredShortcutKeys()), entry);
-    new ExShortcutKeyAction(this).registerCustomShortcutSet();
 
     updateUI();
   }

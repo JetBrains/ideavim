@@ -44,7 +44,7 @@ internal object ExEditorKit : DefaultEditorKit() {
     override fun actionPerformed(e: ActionEvent) {
       val target = getTextComponent(e) as ExTextField
 
-      val key = convert(e)
+     val key = convertActionEventToKeyStroke(e)
       if (key != null) {
         val c = key.keyChar
         if (c.code > 0) {
@@ -68,17 +68,29 @@ internal object ExEditorKit : DefaultEditorKit() {
     }
   }
 
-  fun convert(event: ActionEvent): KeyStroke? {
+  fun convertActionEventToKeyStroke(event: ActionEvent): KeyStroke? {
     val cmd = event.actionCommand
     val mods = event.modifiers
     if (cmd != null && cmd.isNotEmpty()) {
-      val ch = cmd[0]
-      if (ch < ' ') {
-        if (mods and ActionEvent.CTRL_MASK != 0) {
-          return KeyStroke.getKeyStroke(KeyEvent.VK_A + ch.code - 1, mods)
-        }
-      } else {
-        return KeyStroke.getKeyStroke(Character.valueOf(ch), mods)
+      // event.actionCommand is null if KeyStroke.keyChar is KeyEvent.UNDEFINED. Which means cmd is either an actual
+      // action command (it's not, we don't have any registered) or it's the string version of the key char. In which
+      // case, it's either a typed, printable character, or it's a control character. If it's a control character, it's
+      // the actual character, e.g. `\n`, '\t` or ESC (ASCII 27) without the CTRL modifier.
+      if (cmd[0] < ' ') {
+        // If it's a control character, convert it into a KEY_PRESSED KeyStroke, i.e. based on keyCode rather than a
+        // converted key char. Get the virtual key code for the control character. Note that this might be incorrect,
+        // as there aren't virtual key codes for most control characters, only VK_BACK_SPACE, VK_TAB, VK_ENTER and
+        // VK_ESCAPE.
+        // TODO: This will cause trouble when we want to enter a control character as a literal
+        // We'll cross that bridge when we come to it...
+        // I think the correct implementation is to handle the actual KeyEvent, rather than let Swing convert the
+        // KeyStroke to an ActionEvent and then try to convert it back again
+        val keyCode = KeyEvent.getExtendedKeyCodeForChar(cmd[0].code)
+        return KeyStroke.getKeyStroke(keyCode, mods)
+      }
+      else {
+        // The command is a typed character, so treat it as a KEY_TYPED KeyStroke, based on a converted character
+        return KeyStroke.getKeyStroke(cmd[0], mods)
       }
     }
     return null
