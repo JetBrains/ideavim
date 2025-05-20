@@ -68,7 +68,7 @@
       </aliases>
     </vimExtension>
 
-    <vimExtension implementation="com.maddyhome.idea.vim.extension.replacewithregister.ReplaceWithRegister"
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.replacewithregister.ReplaceWithRegisterNewApi"
                   name="ReplaceWithRegister">
       <aliases>
         <alias name="https://github.com/vim-scripts/ReplaceWithRegister"/>

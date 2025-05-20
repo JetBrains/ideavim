@@ -111,6 +111,7 @@ repositories {
 
 dependencies {
   api(project(":vim-engine"))
+  api(project(":api"))
   ksp(project(":annotation-processors"))
   compileOnly(project(":annotation-processors"))
 

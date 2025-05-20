@@ -77,6 +77,8 @@ internal class IjVimCaret(val caret: Caret) : VimCaretBase() {
     set(value) {
       this.caret.lastSelectionInfo = value
     }
+  override val id: String
+    get() = caret.hashCode().toString()
   override val editor: VimEditor
     get() = IjVimEditor(caret.editor)
   override val offset: Int
