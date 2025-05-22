@@ -89,35 +89,13 @@ Here are some examples of supported vim features and commands:
 * Full Vim regexps for search and search/replace
 * Vim web help
 * `~/.ideavimrc` configuration file
-
-[IdeaVim plugins](https://github.com/JetBrains/ideavim/wiki/IdeaVim-Plugins):
-
-* argtextobj
-* commentary
-* easymotion
-* exchange
-* FunctionTextObj
-* highlightedyank
-* indent-object
-* matchit.vim
-* Mini.ai
-* multiple-cursors
-* NERDTree
-* paragraph-motion
-* Peekaboo
-* quick-scope
-* ReplaceWithRegister
-* sneak
-* surround
-* Switch
-* textobj-entire
-* Which-Key
+* Vim script
+* IdeaVim plugins
 
 See also:
 
 * [Top feature requests and bugs](https://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+sort+by%3A+votes)
 * [Vimscript support roadmap](vimscript-info/VIMSCRIPT_ROADMAP.md)
-* [List of supported in-build functions](vimscript-info/FUNCTIONS_INFO.MD)
 
 Files
 -----
