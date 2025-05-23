@@ -1,6 +1,7 @@
 {
     "&": "com.maddyhome.idea.vim.vimscript.model.commands.SubstituteCommand",
     "<": "com.maddyhome.idea.vim.vimscript.model.commands.ShiftLeftCommand",
+    "=": "com.maddyhome.idea.vim.vimscript.model.commands.PrintLineNumberCommand",
     ">": "com.maddyhome.idea.vim.vimscript.model.commands.ShiftRightCommand",
     "@": "com.maddyhome.idea.vim.vimscript.model.commands.RepeatCommand",
     "N[ext]": "com.maddyhome.idea.vim.vimscript.model.commands.PreviousFileCommand",
