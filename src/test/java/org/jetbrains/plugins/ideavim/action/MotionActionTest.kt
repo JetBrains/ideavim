@@ -875,15 +875,6 @@ class MotionActionTest : VimTestCase() {
     assertOffset(9)
   }
 
-  // VIM-965 |[m|
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, "File type specific")
-  @Test
-  fun testMethodMovingInNonJavaFile() {
-    configureByJsonText("{\"foo\": \"${c}bar\"}\n")
-    typeText(injector.parser.parseKeys("[m"))
-    assertState("{\"foo\": \"${c}bar\"}\n")
-  }
-
   // VIM-331 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   @Test

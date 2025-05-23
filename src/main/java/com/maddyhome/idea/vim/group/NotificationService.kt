@@ -12,7 +12,6 @@ import com.intellij.icons.AllIcons
 import com.intellij.ide.BrowserUtil
 import com.intellij.ide.actions.OpenFileAction
 import com.intellij.ide.actions.RevealFileAction
-import com.intellij.notification.ActionCenter
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationGroup
 import com.intellij.notification.NotificationGroupManager
@@ -302,7 +301,7 @@ internal class NotificationService(private val project: Project?) {
             append("</ul></p>")
           }
         }
-      } + "<small>See the ${ActionCenter.getToolwindowName()} tool window for previous IDs</small>"
+      } + "<small>See the Notifications tool window for previous IDs</small>"
 
       notification =
         Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, content, NotificationType.INFORMATION).also {

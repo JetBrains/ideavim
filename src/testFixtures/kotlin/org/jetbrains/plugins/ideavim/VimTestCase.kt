@@ -11,7 +11,6 @@ import com.intellij.application.options.CodeStyle
 import com.intellij.ide.ClipboardSynchronizer
 import com.intellij.ide.bookmark.BookmarksManager
 import com.intellij.ide.highlighter.XmlFileType
-import com.intellij.json.JsonFileType
 import com.intellij.lang.Language
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
@@ -284,8 +283,6 @@ abstract class VimTestCase {
 
   protected fun configureByText(content: String) = configureByText(PlainTextFileType.INSTANCE, content)
   protected fun configureByXmlText(content: String) = configureByText(XmlFileType.INSTANCE, content)
-  protected fun configureByJsonText(@Suppress("SameParameterValue") content: String) =
-    configureByText(JsonFileType.INSTANCE, content)
 
   protected fun configureAndGuard(content: String) {
     val ranges = extractBrackets(content)

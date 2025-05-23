@@ -138,7 +138,7 @@ dependencies {
     // AceJump is an optional dependency. We use their SessionManager class to check if it's active
     plugin("AceJump", "3.8.19")
 
-    bundledPlugins("org.jetbrains.plugins.terminal", "com.intellij.modules.json")
+    bundledPlugins("org.jetbrains.plugins.terminal")
   }
 
   moduleSources(project(":vim-engine", "sourcesJarArtifacts"))

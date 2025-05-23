@@ -80,7 +80,7 @@ class IdeaPutNotificationsTest : VimTestCase() {
     kotlin.test.assertTrue(notifications.isEmpty() || notifications.last().isExpired || OptionConstants.clipboard_ideaput !in notifications.last().content)
   }
 
-  private fun notifications(): MutableList<Notification> {
+  private fun notifications(): List<Notification> {
     return ActionCenter.getNotifications(fixture.project)
   }
 
