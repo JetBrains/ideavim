@@ -199,10 +199,6 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
         VimPlugin.getChange().tabAction = true
         return ActionEnableStatus.no("Tab action in insert mode", LogLevel.INFO)
       }
-      // Debug watch, Python console, etc.
-      if (keyStroke in NON_FILE_EDITOR_KEYS && !EditorHelper.isFileEditor(editor)) {
-        return ActionEnableStatus.no("Non file editor keys", LogLevel.INFO)
-      }
     }
 
     if (keyStroke in VIM_ONLY_EDITOR_KEYS) {
@@ -349,14 +345,6 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
         ).build()
 
     private const val ACTION_ID = "VimShortcutKeyAction"
-
-    private val NON_FILE_EDITOR_KEYS: Set<KeyStroke> = ImmutableSet.builder<KeyStroke>()
-      .addAll(getKeyStrokes(KeyEvent.VK_ENTER, 0))
-      .addAll(getKeyStrokes(KeyEvent.VK_ESCAPE, 0))
-      .addAll(getKeyStrokes(KeyEvent.VK_TAB, 0))
-      .addAll(getKeyStrokes(KeyEvent.VK_UP, 0))
-      .addAll(getKeyStrokes(KeyEvent.VK_DOWN, 0))
-      .build()
 
     private val LOG = logger<VimShortcutKeyAction>()
 

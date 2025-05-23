@@ -40,11 +40,27 @@ internal val Editor.isIdeaVimDisabledHere: Boolean
       !ClientId.isCurrentlyUnderLocalId || // CWM-927
       (ideaVimDisabledForSingleLine(ideaVimSupportValue) && isSingleLine()) ||
       IdeaVimDisablerExtensionPoint.isDisabledForEditor(this) ||
-      isAiChat() // VIM-3786
+      isNotFileEditorExceptCommit()
   }
 
-private fun Editor.isAiChat(): Boolean {
-  return EditorHelper.getVirtualFile(this)?.name?.contains("AIAssistantInput") == true
+/**
+ * Almost every non-file-based editor should not use Vim mode. These editors are debug watch, Python console, AI chats,
+ *   and other fields that are smart.
+ *
+ * We may support IdeaVim in these editors, but this will require a focused work and a lot of testing.
+ *
+ * Here are issues when non-file editors were supported:
+ * AI Chat – VIM-3786
+ * Debug evaluate console – VIM-3929
+ *
+ * However, we still support IdeaVim in a commit window because it works fine there, and removing vim from this place will
+ *   be quite a visible change for users.
+ * We detect the commit window by the name of the editor (Dummy.txt). If this causes issues, let's disable IdeaVim
+ *   in the commit window as well.
+ */
+private fun Editor.isNotFileEditorExceptCommit(): Boolean {
+  if (EditorHelper.getVirtualFile(this)?.name?.contains("Dummy.txt") == true) return false
+  return !EditorHelper.isFileEditor(this)
 }
 
 private fun ideaVimDisabledInDialog(ideaVimSupportValue: StringListOptionValue): Boolean {
