@@ -137,16 +137,15 @@ class DigraphSequence : Cloneable {
           }
 
           else -> {
+            digraphState = DIG_STATE_PENDING
             if (key.keyCode == KeyEvent.VK_TAB) {
-              digraphState = DIG_STATE_PENDING
               return done('\t'.code)
             }
-            val codepoint = specialKeyToKeyCode(key)
+            val codepoint = specialKeyToCodepoint(key)
             if (codepoint != null) {
               return done(codepoint)
             }
             logger.debug("unknown")
-            digraphState = DIG_STATE_PENDING
             done(key.keyChar.code)
           }
         }
@@ -192,7 +191,7 @@ class DigraphSequence : Cloneable {
           return done(codepoint)
         } else if (codeCnt == 0) {
           digraphState = DIG_STATE_PENDING
-          return specialKeyToKeyCode(key)?.let { done(it) } ?: done(key.keyChar.code)
+          return specialKeyToCodepoint(key)?.let { done(it) } ?: done(key.keyChar.code)
         }
         DigraphResult.Bad
       }
@@ -201,21 +200,23 @@ class DigraphSequence : Cloneable {
     }
   }
 
-  private fun specialKeyToKeyCode(key: KeyStroke): Int? {
-    // Handle special keys. Specifically, if it's CTRL+something, return the codepoint for `\something`. Or if it's
-    // newline, return carriage return (Vim likes to treat newline as null), and escape should be returned as escape
+  private fun specialKeyToCodepoint(key: KeyStroke): Int? {
+    // If the key is a control character, return the codepoint of the character. I.e. `<C-I>` would be `\t`, by parsing
+    // the Vim string "\<C-I>". Alternatively, if it's newline, return carriage return (Vim likes to consider newline as
+    // null), and escape should be returned as escape. Anything else isn't a special key
     if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) {
-      val specialKeyCode = injector.parser.parseVimScriptString("\\" + injector.parser.toKeyNotation(key))
-      if (specialKeyCode.length == 1) {
+      val char = injector.parser.parseVimScriptString("\\" + injector.parser.toKeyNotation(key))
+      if (char.length == 1) {
         // TODO: If we get 10 here, we return 0. If we get 10 below, we return 13. Why the difference?
-        return if (specialKeyCode[0].code == 10) 0 else { specialKeyCode[0].code }
+        return if (char[0].code == 10) 0 else { char[0].code }
       } else {
         logger.error("Digraph char was recognized as multiple chars")
       }
     } else {
+      // Remember that keyCode is a virtual key code, not a codepoint!
       return when (key.keyCode) {
-        10 -> 13
-        27 -> 27
+        KeyEvent.VK_ENTER -> '\r'.code
+        KeyEvent.VK_ESCAPE -> 27
         else -> null
       }
     }

@@ -77,7 +77,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
 
   private ExEntryPanel(boolean enableShortcuts) {
     label = new JLabel(" ");
-    entry = new ExTextField();
+    entry = new ExTextField(this);
 
     GridBagLayout layout = new GridBagLayout();
     GridBagConstraints gbc = new GridBagConstraints();
@@ -455,9 +455,14 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
   }
 
   /**
-   * Pass the keystroke on to the text edit for handling
+   * Pass the keystroke on to the text field for handling
+   * <p>
+   * The text field for the command line will forward a pressed or typed keystroke to the key handler, which will either
+   * consume it for mapping or a command. If it's not consumed, or if it's mapped, the keystroke is returned to the
+   * command line to complete handling. This includes typed characters as well as pressed shortcuts.
+   * </p>
    *
-   * @param stroke The keystroke
+   * @param stroke The potentially mapped keystroke
    */
   @Override
   public void handleKey(@NotNull KeyStroke stroke) {
