@@ -80,11 +80,21 @@ interface VimCommandLine {
     setText(newText)
   }
 
+  /**
+   * Called by the [KeyHandler] to finish handling the keystroke
+   *
+   * All keystrokes received by the command line are first routed through the key handler to allow for mapping and
+   * commands. If a keystroke is not consumed as part of a mapping or command, it is returned to the command line for
+   * further processing. If it is mapped to a new keystroke, the new keystroke is passed instead. Typically, commands
+   * exist for cursor movements (`<Left>` and `<Right>`) as well as for shortcuts for Vim actions (`<Up>`, `<Down>`,
+   * `<C-U>`, etc.). Typed characters are usually not mapped, and passed back to the command line component, where they
+   * are added to the text content.
+   */
   fun handleKey(key: KeyStroke)
 
   /**
    * Text to show while composing a digraph or inserting a literal or register
-   * <p>
+   *
    * The prompt character is inserted directly into the text of the text field, rather than drawn over the top of the
    * current character. When the action has been completed, the new character(s) are either inserted or overwritten,
    * depending on the insert/overwrite status of the text field. This mimics Vim's behaviour.

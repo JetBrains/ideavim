@@ -11,9 +11,11 @@ package com.maddyhome.idea.vim.ui.ex;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.ui.paint.PaintUtil;
 import com.intellij.util.ui.JBUI;
+import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.api.VimCommandLine;
 import com.maddyhome.idea.vim.api.VimCommandLineCaret;
 import com.maddyhome.idea.vim.helper.UiHelper;
+import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext;
 import com.maddyhome.idea.vim.options.helpers.GuiCursorAttributes;
 import com.maddyhome.idea.vim.options.helpers.GuiCursorMode;
 import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper;
@@ -46,9 +48,11 @@ public class ExTextField extends JTextField {
 
   public static final @NonNls String KEYMAP_NAME = "ex";
 
-  public boolean useHandleKeyFromEx = true;
+  private final ExEntryPanel myParentPanel;
 
-  ExTextField() {
+  ExTextField(ExEntryPanel parentPanel) {
+    myParentPanel = parentPanel;
+
     // We need to store this in a field, because we can't trust getCaret(), as it will return an instance of
     // ComposedTextCaret when working with dead keys or input methods
     caret = new CommandLineCaret();
@@ -103,12 +107,10 @@ public class ExTextField extends JTextField {
     final ActionMap actionMap = getActionMap();
     for (Action a : actions) {
       actionMap.put(a.getValue(Action.NAME), a);
-      //System.out.println("  " + a.getValue(Action.NAME));
     }
 
     setInputMap(WHEN_FOCUSED, new InputMap());
     Keymap map = addKeymap(KEYMAP_NAME, getKeymap());
-    map.setDefaultAction(new ExEditorKit.DefaultExKeyHandler());
     setKeymap(map);
   }
 
@@ -139,46 +141,80 @@ public class ExTextField extends JTextField {
     super.setFont(UiHelper.selectEditorFont(ExEntryPanel.getInstance().getIjEditor(), stringToDisplay));
   }
 
+  /**
+   * Finish handling the keystroke
+   * <p>
+   * When the key event is first received, the keystroke is sent to the key handler to handle commands or for mapping.
+   * The potentially mapped keystroke is then returned to the text field to complete handling. Typically, the only
+   * keystrokes passed are typed characters, along with pressed shortcuts that aren't recognised as commands (they won't
+   * be recognised by the text field either; we don't register any commands).
+   * </p>
+   * @param stroke  The potentially mapped keystroke
+   */
   public void handleKey(@NotNull KeyStroke stroke) {
     if (logger.isDebugEnabled()) logger.debug("stroke=" + stroke);
-    final char keyChar = stroke.getKeyChar();
-    char c = keyChar;
-    final int modifiers = stroke.getModifiers();
-    final int keyCode = stroke.getKeyCode();
-    if ((modifiers & KeyEvent.CTRL_DOWN_MASK) != 0) {
-      final int codePoint = keyCode - KeyEvent.VK_A + 1;
-      if (codePoint > 0) {
-        c = Character.toChars(codePoint)[0];
-      }
-    }
 
-    // Make sure the current action sees any subsequent keystrokes, and they're not processed by Swing's action system.
-    // Note that this will only handle simple characters and any control characters that are already registered against
-    // ExShortcutKeyAction - any other control characters will can be "stolen" by other IDE actions.
-    // If we need to capture ANY subsequent keystroke (e.g. for ^V<Tab>, or to stop the Swing standard <C-A> going to
-    // start of line), we should replace ExShortcutAction with a dispatcher registered with IdeEventQueue#addDispatcher.
-    // This gets called for ALL events, before the IDE starts to process key events for the action system. We can add a
-    // dispatcher that checks that the plugin is enabled, checks that the component with the focus is ExTextField,
-    // dispatch to ExEntryPanel#handleKey and if it's processed, mark the event as consumed.
-    KeyEvent event = new KeyEvent(this, keyChar != KeyEvent.CHAR_UNDEFINED
-                                        ? KeyEvent.KEY_TYPED
-                                        : (stroke.isOnKeyRelease() ? KeyEvent.KEY_RELEASED : KeyEvent.KEY_PRESSED),
-                                  (new Date()).getTime(), modifiers, keyCode, c);
+    //noinspection MagicConstant
+    KeyEvent event =
+      new KeyEvent(this, stroke.getKeyEventType(), (new Date()).getTime(), stroke.getModifiers(), stroke.getKeyCode(),
+                   stroke.getKeyChar());
 
-    useHandleKeyFromEx = false;
-    try {
-      super.processKeyEvent(event);
-    }
-    finally {
-      useHandleKeyFromEx = true;
-    }
+    // Make sure we call super directly, to avoid recursion.
+    // The superclass will convert the event to an action by way of keybindings. Since we don't have any key bindings,
+    // this will go to the default typed action handler, which will add all non-control characters to the text.
+    // (Control characters are ignored)
+    super.processKeyEvent(event);
+
+    saveLastEntry();
   }
 
   @Override
   protected void processKeyEvent(KeyEvent e) {
     if (logger.isDebugEnabled()) logger.debug("key=" + e);
-    super.processKeyEvent(e);
+
+    // The user has pressed or typed a key. The text field is first notified of a KEY_PRESSED event. If it's a simple
+    // text character, it will be translated to a KEY_TYPED event with a keyChar, and we'll be notified again. We'll
+    // forward this typed key to the key handler, which will potentially map it to another keystroke and return it to
+    // the text field via ExTextField.handleKey.
+    // If it's not a simple text character but a shortcut (i.e., a keypress with one or more modifiers), then it will be
+    // handled in the same way as a shortcut activated in the main editor. That is, the IntelliJ action system sees the
+    // KEY_PRESSED event first and dispatches it to IdeaVim's action handler, which pushes it through the key handler
+    // and invokes the action. The event is handled before this component sees it! This method is not called for
+    // registered action shortcuts. It is called for other shortcuts, and we pass those on to the super class.
+    // (We should consider passing these to the key handler too, so that "insert literal" (<C-V>) will convert them to
+    // typed keys and display them in the text field. As it happens, Vim has shortcuts for all control characters, and
+    // it's unclear if/how we should represent other modifier-based shortcuts)
+    // Note that Enter and Escape are registered as editor actions rather than action shortcuts. Therefore, we have to
+    // handle them separately, as key presses, but not as typed characters.
+    if (isAllowedPressedEvent(e) || isAllowedTypedEvent(e)) {
+      var editor = myParentPanel.getEditor();
+      var keyHandler = KeyHandler.getInstance();
+      var keyStroke = KeyStroke.getKeyStrokeForEvent(e);
+      keyHandler.handleKey(editor, keyStroke, new IjEditorExecutionContext(myParentPanel.getContext()),
+                           keyHandler.getKeyHandlerState());
+      e.consume();
+    }
+    else {
+      super.processKeyEvent(e);
+    }
   }
+
+  private boolean isAllowedTypedEvent(KeyEvent event) {
+    return event.getID() == KeyEvent.KEY_TYPED && !isKeyCharEnterOrEscape(event.getKeyChar());
+  }
+
+  private boolean isAllowedPressedEvent(KeyEvent event) {
+    return event.getID() == KeyEvent.KEY_PRESSED && isKeyCodeEnterOrEscape(event.getKeyCode());
+  }
+
+  private boolean isKeyCharEnterOrEscape(char keyChar) {
+    return keyChar == '\n' || keyChar == '\u001B';
+  }
+
+  private boolean isKeyCodeEnterOrEscape(int keyCode) {
+    return keyCode == KeyEvent.VK_ENTER || keyCode == KeyEvent.VK_ESCAPE;
+  }
+
 
   /**
    * Creates the default implementation of the model
