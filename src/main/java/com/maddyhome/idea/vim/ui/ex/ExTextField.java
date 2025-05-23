@@ -102,13 +102,6 @@ public class ExTextField extends JTextField {
 
     setBorder(null);
 
-    // Do not override getActions() method, because it is has side effect: propagates these actions to defaults.
-    final Action[] actions = ExEditorKit.INSTANCE.getActions();
-    final ActionMap actionMap = getActionMap();
-    for (Action a : actions) {
-      actionMap.put(a.getValue(Action.NAME), a);
-    }
-
     setInputMap(WHEN_FOCUSED, new InputMap());
     Keymap map = addKeymap(KEYMAP_NAME, getKeymap());
     setKeymap(map);
