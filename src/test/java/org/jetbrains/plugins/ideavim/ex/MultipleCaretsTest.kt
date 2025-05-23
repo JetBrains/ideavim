@@ -132,9 +132,18 @@ class MultipleCaretsTest : VimTestCase() {
     val editor = configureByText(before)
     val vimEditor = editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
-    ApplicationManager.getApplication().runWriteAction {
-      VimPlugin.getRegister()
-        .storeText(vimEditor, context, vimEditor.primaryCaret(), TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
+    ApplicationManager.getApplication().invokeAndWait {
+      ApplicationManager.getApplication().runWriteAction {
+        VimPlugin.getRegister()
+          .storeText(
+            vimEditor,
+            context,
+            vimEditor.primaryCaret(),
+            TextRange(16, 19),
+            SelectionType.CHARACTER_WISE,
+            false
+          )
+      }
     }
     typeText(commandToKeys("pu"))
     val after = """
@@ -170,9 +179,18 @@ class MultipleCaretsTest : VimTestCase() {
     val editor = configureByText(before)
     val vimEditor = editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
-    ApplicationManager.getApplication().runWriteAction {
-      VimPlugin.getRegister()
-        .storeText(vimEditor, context, vimEditor.primaryCaret(), TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
+    ApplicationManager.getApplication().invokeAndWait {
+      ApplicationManager.getApplication().runWriteAction {
+        VimPlugin.getRegister()
+          .storeText(
+            vimEditor,
+            context,
+            vimEditor.primaryCaret(),
+            TextRange(16, 19),
+            SelectionType.CHARACTER_WISE,
+            false
+          )
+      }
     }
     typeText(commandToKeys("pu"))
     val after = """
@@ -209,9 +227,18 @@ class MultipleCaretsTest : VimTestCase() {
     val editor = configureByText(before)
     val vimEditor = editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
-    ApplicationManager.getApplication().runWriteAction {
-      VimPlugin.getRegister()
-        .storeText(vimEditor, context, vimEditor.primaryCaret(), TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
+    ApplicationManager.getApplication().invokeAndWait {
+      ApplicationManager.getApplication().runWriteAction {
+        VimPlugin.getRegister()
+          .storeText(
+            vimEditor,
+            context,
+            vimEditor.primaryCaret(),
+            TextRange(16, 19),
+            SelectionType.CHARACTER_WISE,
+            false
+          )
+      }
     }
     typeText(commandToKeys("4pu"))
     val after = """
@@ -248,9 +275,18 @@ class MultipleCaretsTest : VimTestCase() {
     val editor = configureByText(before)
     val vimEditor = editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
-    ApplicationManager.getApplication().runWriteAction {
-      VimPlugin.getRegister()
-        .storeText(vimEditor, context, vimEditor.primaryCaret(), TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
+    ApplicationManager.getApplication().invokeAndWait {
+      ApplicationManager.getApplication().runWriteAction {
+        VimPlugin.getRegister()
+          .storeText(
+            vimEditor,
+            context,
+            vimEditor.primaryCaret(),
+            TextRange(16, 19),
+            SelectionType.CHARACTER_WISE,
+            false
+          )
+      }
     }
     typeText(commandToKeys("4pu"))
     val after = """

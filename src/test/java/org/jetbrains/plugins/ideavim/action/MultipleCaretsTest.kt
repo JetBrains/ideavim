@@ -2185,16 +2185,18 @@ rtyfg${c}hzxc"""
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     injector.registerGroup.storeText(vimEditor, context, '*', "fgh")
-    ApplicationManager.getApplication().runWriteAction {
-      VimPlugin.getRegister()
-        .storeText(
-          IjVimEditor(editor),
-          context,
-          editor.vim.primaryCaret(),
-          TextRange(16, 19),
-          SelectionType.CHARACTER_WISE,
-          false
-        )
+    ApplicationManager.getApplication().invokeAndWait {
+      ApplicationManager.getApplication().runWriteAction {
+        VimPlugin.getRegister()
+          .storeText(
+            IjVimEditor(editor),
+            context,
+            editor.vim.primaryCaret(),
+            TextRange(16, 19),
+            SelectionType.CHARACTER_WISE,
+            false
+          )
+      }
     }
     typeText(injector.parser.parseKeys("\"*P"))
     val after = "fg${c}hqfg${c}hwe asd zxc rty fg${c}hfgh vbn"
