@@ -95,7 +95,6 @@ Here are some examples of supported vim features and commands:
 See also:
 
 * [Top feature requests and bugs](https://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+sort+by%3A+votes)
-* [Vimscript support roadmap](vimscript-info/VIMSCRIPT_ROADMAP.md)
 
 Files
 -----
@@ -249,8 +248,7 @@ IdeaVim can execute custom scripts that are written with Vim Script.
 At the moment we support all language features, but not all of the built-in functions and options are supported.
 
 Additionally, you may be interested in the
-[Vim Script Discussion](https://github.com/JetBrains/ideavim/discussions/357) or
-[Vim Script Roadmap](https://github.com/JetBrains/ideavim/blob/master/vimscript-info/VIMSCRIPT_ROADMAP.md).
+[Vim Script Discussion](https://github.com/JetBrains/ideavim/discussions/357).
 
 
 ### IDE specific options
