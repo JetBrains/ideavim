@@ -183,8 +183,8 @@ abstract class VimStringParserBase : VimStringParser {
     val mapLeader: Any? = injector.variableService.getGlobalVariableValue("mapleader")
     return if (mapLeader is VimString) {
       val v: String = mapLeader.value
-      if (v[0] == '<' && v[v.length - 1] == '>') {
-        listOf(parseSpecialKey(v.substring(1, v.length - 1), 0)!!)
+      if (v.startsWith("\\<") && v[v.length - 1] == '>') {
+        listOf(parseSpecialKey(v.substring(2, v.length - 1), 0)!!)
       } else {
         stringToKeys(mapLeader.value)
       }
@@ -430,8 +430,9 @@ abstract class VimStringParserBase : VimStringParser {
           }
           if (c == '>') {
             val specialKey = parseSpecialKey(specialKeyBuilder.toString(), 0)
-            var keyCode: Int? = null
             if (specialKey != null) {
+              var keyCode = specialKey.keyCode
+              var useKeyCode = true
               if (specialKey.keyCode == 0) {
                 keyCode = specialKey.keyChar.code
               } else if (specialKey.modifiers and InputEvent.CTRL_DOWN_MASK == InputEvent.CTRL_DOWN_MASK) {
@@ -442,13 +443,14 @@ abstract class VimStringParserBase : VimStringParser {
                   } else {
                     specialKey.keyCode - 'A'.code + 1
                   }
+                } else {
+                  useKeyCode = false
+                  result.append("\\<${specialKeyBuilder}>")
                 }
-              } else {
-                keyCode = specialKey.keyCode
               }
-            }
-            if (keyCode != null) {
-              result.append(keyCode.toChar())
+              if (useKeyCode) {
+                result.append(keyCode.toChar())
+              }
             } else {
               result.append("<").append(specialKeyBuilder).append(">")
             }
