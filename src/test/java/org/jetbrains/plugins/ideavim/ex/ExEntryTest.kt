@@ -571,6 +571,37 @@ class ExEntryTest : VimTestCase() {
     assertExOffset(1)
   }
 
+  @Test
+  fun `test insert literal control characters`() {
+    typeExInput(":normal I[<C-V><Esc>A]<C-V><Esc>")
+    assertExText("normal I[" + Char(27) + "A]" + Char(27))
+
+    deactivateExEntry()
+
+    // CR should be \n but Vim treats that as a NULL char, so we insert \r
+    typeExInput(":nmap p <C-V><CR>")
+    assertExText("nmap p \r")
+
+    deactivateExEntry()
+
+    typeExInput(":nmap p <C-V><C-D>")
+    assertExText("nmap p " + Char(4))
+
+    deactivateExEntry()
+
+    typeExInput(":nmap p <C-V><C-I>")
+    assertExText("nmap p \t")
+
+    deactivateExEntry()
+
+    typeExInput(":nmap p <C-V><C-V>")
+    assertExText("nmap p " + Char(22))
+
+    // TODO: IdeaVim handles <C-C> before handling digraphs/literals
+//    typeExInput(":nmap p <C-V><C-C>")
+//    assertExText("nmap p " + Char(3))
+  }
+
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   @Test
   fun `test prompt while inserting literal character`() {

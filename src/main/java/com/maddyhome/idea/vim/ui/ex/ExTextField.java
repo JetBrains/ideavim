@@ -128,16 +128,22 @@ public class ExTextField extends JTextField {
   public void handleKey(@NotNull KeyStroke stroke) {
     if (logger.isDebugEnabled()) logger.debug("stroke=" + stroke);
 
-    //noinspection MagicConstant
-    KeyEvent event =
-      new KeyEvent(this, stroke.getKeyEventType(), (new Date()).getTime(), stroke.getModifiers(), stroke.getKeyCode(),
-                   stroke.getKeyChar());
+    // Typically, we would let the super class handle the keystroke. It would use any registered keybindings to convert
+    // it to an action handler, or use the default handler (we don't actually have any keybindings). The default action
+    // handler adds all non-control characters to the text field. We want to add all characters, so if we have an
+    // actual character, just add it. Anything else, we'll pass to the super class like before (even though it's unclear
+    // what it will do with the keystroke)
+    if (stroke.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
+      replaceSelection(String.valueOf(stroke.getKeyChar()));
+    }
+    else {
+      //noinspection MagicConstant
+      KeyEvent event = new KeyEvent(this, stroke.getKeyEventType(), (new Date()).getTime(), stroke.getModifiers(),
+                                    stroke.getKeyCode(), stroke.getKeyChar());
 
-    // Make sure we call super directly, to avoid recursion.
-    // The superclass will convert the event to an action by way of keybindings. Since we don't have any key bindings,
-    // this will go to the default typed action handler, which will add all non-control characters to the text.
-    // (Control characters are ignored)
-    super.processKeyEvent(event);
+      // Call super to avoid recursion!
+      super.processKeyEvent(event);
+    }
 
     saveLastEntry();
   }
