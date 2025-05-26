@@ -17,7 +17,7 @@ import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
 class DigraphSequence : Cloneable {
-  private var digraphState = DIG_STATE_PENDING
+  private var digraphState = DigraphState.DIG_STATE_PENDING
   private var digraphChar = 0.toChar()
   private lateinit var codeChars: CharArray
   private var codeCnt = 0
@@ -25,24 +25,24 @@ class DigraphSequence : Cloneable {
   private var codeMax = 0
 
   fun isDigraphStart(key: KeyStroke): Boolean {
-    return digraphState == DIG_STATE_PENDING && // if state has changed, then it's not a start
+    return digraphState == DigraphState.DIG_STATE_PENDING && // if state has changed, then it's not a start
       key.keyCode == KeyEvent.VK_K && key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0
   }
 
   fun isLiteralStart(key: KeyStroke): Boolean {
-    return digraphState == DIG_STATE_PENDING && // if state has changed, then it's not a start
+    return digraphState == DigraphState.DIG_STATE_PENDING && // if state has changed, then it's not a start
       (key.keyCode == KeyEvent.VK_V || key.keyCode == KeyEvent.VK_Q) && key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0
   }
 
   fun startDigraphSequence(): DigraphResult {
     logger.debug("startDigraphSequence")
-    digraphState = DIG_STATE_DIG_ONE
+    digraphState = DigraphState.DIG_STATE_DIG_ONE
     return DigraphResult.HandledDigraph
   }
 
   fun startLiteralSequence(): DigraphResult {
     logger.debug("startLiteralSequence")
-    digraphState = DIG_STATE_CODE_START
+    digraphState = DigraphState.DIG_STATE_CODE_START
     codeChars = CharArray(8)
     codeCnt = 0
     return DigraphResult.HandledLiteral
@@ -50,19 +50,19 @@ class DigraphSequence : Cloneable {
 
   fun processKey(key: KeyStroke, editor: VimEditor): DigraphResult {
     return when (digraphState) {
-      DIG_STATE_PENDING -> {
+      DigraphState.DIG_STATE_PENDING -> {
         logger.debug("DIG_STATE_PENDING")
         if (key.keyCode == KeyEvent.VK_BACK_SPACE && injector.options(editor).digraph) {
-          digraphState = DIG_STATE_BACK_SPACE
+          digraphState = DigraphState.DIG_STATE_BACK_SPACE
         } else if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {
           digraphChar = key.keyChar
         }
         DigraphResult.Unhandled
       }
 
-      DIG_STATE_BACK_SPACE -> {
+      DigraphState.DIG_STATE_BACK_SPACE -> {
         logger.debug("DIG_STATE_BACK_SPACE")
-        digraphState = DIG_STATE_PENDING
+        digraphState = DigraphState.DIG_STATE_PENDING
         if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {
           val codepoint = injector.digraphGroup.getCharacterForDigraph(digraphChar, key.keyChar)
           digraphChar = 0.toChar()
@@ -71,20 +71,20 @@ class DigraphSequence : Cloneable {
         DigraphResult.Unhandled
       }
 
-      DIG_STATE_DIG_ONE -> {
+      DigraphState.DIG_STATE_DIG_ONE -> {
         logger.debug("DIG_STATE_DIG_ONE")
         if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {
           digraphChar = key.keyChar
-          digraphState = DIG_STATE_DIG_TWO
+          digraphState = DigraphState.DIG_STATE_DIG_TWO
           return handled(digraphChar)
         }
-        digraphState = DIG_STATE_PENDING
+        digraphState = DigraphState.DIG_STATE_PENDING
         DigraphResult.Bad
       }
 
-      DIG_STATE_DIG_TWO -> {
+      DigraphState.DIG_STATE_DIG_TWO -> {
         logger.debug("DIG_STATE_DIG_TWO")
-        digraphState = DIG_STATE_PENDING
+        digraphState = DigraphState.DIG_STATE_PENDING
         if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {
           val codepoint = injector.digraphGroup.getCharacterForDigraph(digraphChar, key.keyChar)
           return done(codepoint)
@@ -92,12 +92,12 @@ class DigraphSequence : Cloneable {
         DigraphResult.Bad
       }
 
-      DIG_STATE_CODE_START -> {
+      DigraphState.DIG_STATE_CODE_START -> {
         logger.debug("DIG_STATE_CODE_START")
         when (key.keyChar) {
           'o', 'O' -> {
             codeMax = 3
-            digraphState = DIG_STATE_CODE_CHAR
+            digraphState = DigraphState.DIG_STATE_CODE_CHAR
             codeType = 8
             logger.debug("Octal")
             DigraphResult.HandledLiteral
@@ -105,7 +105,7 @@ class DigraphSequence : Cloneable {
 
           'x', 'X' -> {
             codeMax = 2
-            digraphState = DIG_STATE_CODE_CHAR
+            digraphState = DigraphState.DIG_STATE_CODE_CHAR
             codeType = 16
             logger.debug("hex2")
             DigraphResult.HandledLiteral
@@ -113,7 +113,7 @@ class DigraphSequence : Cloneable {
 
           'u' -> {
             codeMax = 4
-            digraphState = DIG_STATE_CODE_CHAR
+            digraphState = DigraphState.DIG_STATE_CODE_CHAR
             codeType = 16
             logger.debug("hex4")
             DigraphResult.HandledLiteral
@@ -121,7 +121,7 @@ class DigraphSequence : Cloneable {
 
           'U' -> {
             codeMax = 8
-            digraphState = DIG_STATE_CODE_CHAR
+            digraphState = DigraphState.DIG_STATE_CODE_CHAR
             codeType = 16
             logger.debug("hex8")
             DigraphResult.HandledLiteral
@@ -129,7 +129,7 @@ class DigraphSequence : Cloneable {
 
           '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> {
             codeMax = 3
-            digraphState = DIG_STATE_CODE_CHAR
+            digraphState = DigraphState.DIG_STATE_CODE_CHAR
             codeType = 10
             codeChars[codeCnt++] = key.keyChar
             logger.debug("decimal")
@@ -137,7 +137,7 @@ class DigraphSequence : Cloneable {
           }
 
           else -> {
-            digraphState = DIG_STATE_PENDING
+            digraphState = DigraphState.DIG_STATE_PENDING
             if (key.keyCode == KeyEvent.VK_TAB) {
               return done('\t'.code)
             }
@@ -151,7 +151,7 @@ class DigraphSequence : Cloneable {
         }
       }
 
-      DIG_STATE_CODE_CHAR -> {
+      DigraphState.DIG_STATE_CODE_CHAR -> {
         logger.debug("DIG_STATE_CODE_CHAR")
         var valid = false
         when (codeType) {
@@ -171,7 +171,7 @@ class DigraphSequence : Cloneable {
           logger.debug("valid")
           codeChars[codeCnt++] = key.keyChar
           return if (codeCnt == codeMax) {
-            digraphState = DIG_STATE_PENDING
+            digraphState = DigraphState.DIG_STATE_PENDING
             val digits = String(codeChars, 0, codeCnt)
             val codepoint = digits.toInt(codeType)
             done(codepoint)
@@ -180,7 +180,7 @@ class DigraphSequence : Cloneable {
           }
         } else if (codeCnt > 0) {
           logger.debug("invalid")
-          digraphState = DIG_STATE_PENDING
+          digraphState = DigraphState.DIG_STATE_PENDING
           val digits = String(codeChars, 0, codeCnt)
           val codepoint = digits.toInt(codeType)
           if (!injector.application.isUnitTest()) {
@@ -190,20 +190,18 @@ class DigraphSequence : Cloneable {
           }
           return done(codepoint)
         } else if (codeCnt == 0) {
-          digraphState = DIG_STATE_PENDING
+          digraphState = DigraphState.DIG_STATE_PENDING
           return specialKeyToCodepoint(key)?.let { done(it) } ?: done(key.keyChar.code)
         }
         DigraphResult.Bad
       }
-
-      else -> DigraphResult.Bad
     }
   }
 
   private fun specialKeyToCodepoint(key: KeyStroke): Int? {
     // If the key is a control character, return the codepoint of the character. I.e. `<C-I>` would be `\t`, by parsing
-    // the Vim string "\<C-I>". Alternatively, if it's newline, return carriage return (Vim likes to consider newline as
-    // null), and escape should be returned as escape. Anything else isn't a special key
+    // the Vim string "\<C-I>". Alternatively, if it's a newline, return carriage return (Vim likes to consider newline
+    // as null), and escape should be returned as escape. Anything else isn't a special key
     if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) {
       val char = injector.parser.parseVimScriptString("\\" + injector.parser.toKeyNotation(key))
       if (char.length == 1) {
@@ -224,7 +222,7 @@ class DigraphSequence : Cloneable {
   }
 
   fun reset() {
-    digraphState = DIG_STATE_PENDING
+    digraphState = DigraphState.DIG_STATE_PENDING
     codeChars = CharArray(8)
   }
 
@@ -234,6 +232,7 @@ class DigraphSequence : Cloneable {
 
     other as DigraphSequence
 
+    @Suppress("DuplicatedCode")
     if (digraphState != other.digraphState) return false
     if (digraphChar != other.digraphChar) return false
     if (codeCnt != other.codeCnt) return false
@@ -250,7 +249,7 @@ class DigraphSequence : Cloneable {
   }
 
   override fun hashCode(): Int {
-    var result = digraphState
+    var result = digraphState.value
     result = 31 * result + digraphChar.hashCode()
     result = 31 * result + if (::codeChars.isInitialized) codeChars.contentHashCode() else 0
     result = 31 * result + codeCnt
@@ -278,12 +277,15 @@ class DigraphSequence : Cloneable {
   }
 
   companion object {
-    private const val DIG_STATE_PENDING = 1
-    private const val DIG_STATE_DIG_ONE = 2
-    private const val DIG_STATE_DIG_TWO = 3
-    private const val DIG_STATE_CODE_START = 10
-    private const val DIG_STATE_CODE_CHAR = 11
-    private const val DIG_STATE_BACK_SPACE = 20
     private val logger = vimLogger<DigraphSequence>()
+  }
+
+  private enum class DigraphState(val value: Int) {
+    DIG_STATE_PENDING(1),
+    DIG_STATE_DIG_ONE(2),
+    DIG_STATE_DIG_TWO(3),
+    DIG_STATE_CODE_START(10),
+    DIG_STATE_CODE_CHAR(11),
+    DIG_STATE_BACK_SPACE(20)
   }
 }
