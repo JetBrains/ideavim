@@ -60,6 +60,12 @@ object CommandLineVimLContext : VimLContext {
   }
 }
 
+object VimPluginContext : VimLContext {
+  override fun getPreviousParentContext(): VimLContext {
+    throw RuntimeException("IT'S NOT A VIMSCRIPT")
+  }
+}
+
 // todo rename
 enum class ExecutableContext {
   COMMAND_LINE,

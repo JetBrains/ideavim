@@ -16,7 +16,6 @@ import com.intellij.vim.api.RegisterType
 import com.intellij.vim.api.ResourceGuard
 import com.intellij.vim.api.TextSelectionType
 import com.intellij.vim.api.VimPluginApi
-import com.intellij.vim.api.VimVariablesScope
 import com.intellij.vim.api.caretId
 import com.intellij.vim.api.caretInfo
 import com.intellij.vim.api.scopes.vim.VimScope
@@ -25,7 +24,6 @@ import com.intellij.vim.api.toMappingMode
 import com.intellij.vim.api.toMode
 import com.intellij.vim.api.toRegisterType
 import com.intellij.vim.api.toTextSelectionType
-import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.MutableVimEditor
 import com.maddyhome.idea.vim.api.VimCaret
@@ -47,7 +45,12 @@ import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.selectionType
+import com.maddyhome.idea.vim.vimscript.model.VimPluginContext
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
+import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
+import com.maddyhome.idea.vim.vimscript.services.VariableService
 
 class VimPluginApiImpl : VimPluginApi {
 
@@ -320,31 +323,23 @@ class VimPluginApiImpl : VimPluginApi {
     TODO("Not yet implemented")
   }
 
-  override fun getVimVariableInt(
-    vimVariablesScope: VimVariablesScope,
-    name: String,
-  ): Int? {
-    /**
-     * Variable value should probably be obtained like this:
-     * val variable = injector.variableService.getNullableVariableValue(Variable(name, Scope.VIM_VARIABLE), editor, context, vimContext)
-     *
-     * However, I don't know how to obtain vimContext, so I implemented workaround since vimContext is not required to get value
-     * of the count and count1 vim variables.
-     */
-    return if (vimVariablesScope == VimVariablesScope.VIM_SCOPE) {
-      when (name) {
-        "count" -> VimInt(KeyHandler.getInstance().keyHandlerState.commandBuilder.calculateCount0Snapshot()).toString()
-          .toIntOrNull()
-
-        "count1" -> VimInt(
-          KeyHandler.getInstance().keyHandlerState.commandBuilder.calculateCount0Snapshot().coerceAtLeast(1)
-        ).toString().toIntOrNull()
-
-        else -> null
-      }
-
-    } else {
-      null
-    }
+  override fun getVariableInt(editor: VimEditor, context: ExecutionContext, name: String): Int? {
+    val (name, scope) = parseVariableName(name)
+    val variableService: VariableService = injector.variableService
+    val variable = Variable(scope, name)
+    val variableValue: VimDataType =
+      variableService.getNullableVariableValue(variable, editor, context, VimPluginContext) ?: return null
+    val intValue: Int? = (variableValue as? VimInt)?.value
+    return intValue
   }
+
+  private fun parseVariableName(name: String): Pair<String, Scope?> {
+    if (name.contains(':').not()) {
+      return name to Scope.GLOBAL_VARIABLE
+    }
+    val prefix: String = name.substringBefore(':')
+    val variableName: String = name.substringAfter(':')
+    return variableName to Scope.getByValue(prefix)
+  }
+
 }
