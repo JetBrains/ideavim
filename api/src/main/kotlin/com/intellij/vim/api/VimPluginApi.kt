@@ -8,7 +8,6 @@
 
 package com.intellij.vim.api
 
-import com.intellij.vim.api.scopes.VimInitPluginScope
 import com.intellij.vim.api.scopes.Read
 import com.intellij.vim.api.scopes.Transaction
 import com.intellij.vim.api.scopes.VimScope
@@ -21,19 +20,19 @@ interface VimPluginApi {
   fun getCurrentRegisterName(read: Read, caretId: CaretId): Char
   fun getRegisterType(read: Read, caretId: CaretId, register: Char): RegisterType?
 
-  fun addMapping(scope: VimInitPluginScope, fromKeys: String, toKeys: String, isRecursive: Boolean, vararg mode: Mode)
+  fun addMapping(scope: VimScope, fromKeys: String, toKeys: String, isRecursive: Boolean, vararg mode: Mode)
   fun addMapping(
     fromKeys: String,
-    scope: VimInitPluginScope,
+    scope: VimScope,
     isRecursive: Boolean,
     isRepeatable: Boolean,
     action: VimScope.() -> Unit,
     vararg mode: Mode,
   )
 
-  fun removeMapping(scope: VimInitPluginScope, fromKeys: String, vararg mode: Mode)
+  fun removeMapping(scope: VimScope, fromKeys: String, vararg mode: Mode)
 
-  fun exportOperatorFunction(name: String, scope: VimInitPluginScope, function: VimScope.() -> Boolean)
+  fun exportOperatorFunction(name: String, scope: VimScope, function: VimScope.() -> Boolean)
   fun setOperatorFunction(scope: VimScope, name: String)
   fun executeNormal(scope: VimScope, command: String)
 

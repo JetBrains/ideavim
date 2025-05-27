@@ -19,7 +19,6 @@ import com.intellij.vim.api.VimPluginApi
 import com.intellij.vim.api.VimVariablesScope
 import com.intellij.vim.api.caretId
 import com.intellij.vim.api.caretInfo
-import com.intellij.vim.api.scopes.VimInitPluginScope
 import com.intellij.vim.api.scopes.Read
 import com.intellij.vim.api.scopes.Transaction
 import com.intellij.vim.api.scopes.VimScope
@@ -98,7 +97,7 @@ class VimPluginApiImpl : VimPluginApi {
   }
 
   override fun addMapping(
-    scope: VimInitPluginScope,
+    scope: VimScope,
     fromKeys: String,
     toKeys: String,
     isRecursive: Boolean,
@@ -116,7 +115,7 @@ class VimPluginApiImpl : VimPluginApi {
 
   override fun addMapping(
     fromKeys: String,
-    scope: VimInitPluginScope,
+    scope: VimScope,
     isRecursive: Boolean,
     isRepeatable: Boolean,
     action: VimScope.() -> Unit,
@@ -148,7 +147,7 @@ class VimPluginApiImpl : VimPluginApi {
   }
 
   override fun removeMapping(
-    scope: VimInitPluginScope,
+    scope: VimScope,
     fromKeys: String,
     vararg mode: Mode,
   ) {
@@ -161,7 +160,7 @@ class VimPluginApiImpl : VimPluginApi {
 
   override fun exportOperatorFunction(
     name: String,
-    scope: VimInitPluginScope,
+    scope: VimScope,
     function: VimScope.() -> Boolean,
   ) {
     val vimApi: VimPluginApi = scope.vimPluginApi

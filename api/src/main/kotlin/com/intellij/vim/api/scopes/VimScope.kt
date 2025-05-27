@@ -32,7 +32,7 @@ fun VimScope.getVimVariableInt(name: String, vimVariableScope: VimVariablesScope
   return vimPluginApi.getVimVariableInt(this, vimVariableScope, name)
 }
 
-fun VimInitPluginScope.exportOperatorFunction(name: String, function: VimScope.() -> Boolean) {
+fun VimScope.exportOperatorFunction(name: String, function: VimScope.() -> Boolean) {
   vimPluginApi.exportOperatorFunction(name, this, function)
 }
 
