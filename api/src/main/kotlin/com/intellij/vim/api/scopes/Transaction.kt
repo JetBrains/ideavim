@@ -14,7 +14,7 @@ import com.intellij.vim.api.CaretInfo
 interface Transaction : Read
 
 fun Transaction.deleteText(startOffset: Int, endOffset: Int) {
-  vimPluginApi.deleteText(this, startOffset, endOffset)
+  vimPluginApi.deleteText(editor, startOffset, endOffset)
 }
 
 fun Transaction.replaceText(
@@ -23,7 +23,7 @@ fun Transaction.replaceText(
   endOffset: Int,
   text: String,
 ) {
-  vimPluginApi.replaceText(this, caretId, startOffset, endOffset, text)
+  vimPluginApi.replaceText(editor, caretId, startOffset, endOffset, text)
 }
 
 fun Transaction.replaceTextBlockwise(
@@ -32,9 +32,9 @@ fun Transaction.replaceTextBlockwise(
   endOffset: Int,
   text: List<String>
 ) {
-  vimPluginApi.replaceTextBlockwise(this, caretId, startOffset, endOffset, text)
+  vimPluginApi.replaceTextBlockwise(editor, caretId, startOffset, endOffset, text)
 }
 
 fun Transaction.updateCaret(caretId: CaretId, info: CaretInfo) {
-  vimPluginApi.updateCaret(this, caretId, info)
+  vimPluginApi.updateCaret(editor, caretId, info)
 }

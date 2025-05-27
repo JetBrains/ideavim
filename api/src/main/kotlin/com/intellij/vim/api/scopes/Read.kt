@@ -16,53 +16,53 @@ import com.intellij.vim.api.RegisterType
 interface Read : VimScope
 
 fun Read.getCurrentRegisterName(caretId: CaretId): Char {
-  return vimPluginApi.getCurrentRegisterName(this, caretId)
+  return vimPluginApi.getCurrentRegisterName(editor, caretId)
 }
 
 fun Read.getRegisterContent(caretId: CaretId, register: Char): String? {
-  return vimPluginApi.getRegisterContent(this, caretId, register)
+  return vimPluginApi.getRegisterContent(editor, context, caretId, register)
 }
 
 fun Read.getRegisterType(caretId: CaretId, register: Char): RegisterType? {
-  return vimPluginApi.getRegisterType(this, caretId, register)
+  return vimPluginApi.getRegisterType(editor, context, caretId, register)
 }
 
 fun Read.getVisualSelectionMarks(caretId: CaretId): Pair<Int, Int>? {
-  return vimPluginApi.getVisualMarks(this, caretId)
+  return vimPluginApi.getVisualMarks(editor, caretId)
 }
 
 fun Read.getChangeMarks(caretId: CaretId): Pair<Int, Int>? {
-  return vimPluginApi.getChangeMarks(this, caretId)
+  return vimPluginApi.getChangeMarks(editor, caretId)
 }
 
 fun Read.getCaretLine(caretId: CaretId): Int? {
-  return vimPluginApi.getCaretLine(this, caretId)
+  return vimPluginApi.getCaretLine(editor, caretId)
 }
 
 fun Read.getLineStartOffset(line: Int): Int {
-  return vimPluginApi.getLineStartOffset(this, line)
+  return vimPluginApi.getLineStartOffset(editor, line)
 }
 
 fun Read.getLineEndOffset(line: Int, allowEnd: Boolean): Int {
-  return vimPluginApi.getLineEndOffset(this, line, allowEnd)
+  return vimPluginApi.getLineEndOffset(editor, line, allowEnd)
 }
 
 fun Read.getAllCaretsData(): List<CaretData> {
-  return vimPluginApi.getAllCaretsData(this)
+  return vimPluginApi.getAllCaretsData(editor)
 }
 
 fun Read.getAllCaretsDataSortedByOffset(): List<CaretData> {
-  return vimPluginApi.getAllCaretsDataSortedByOffset(this)
+  return vimPluginApi.getAllCaretsDataSortedByOffset(editor)
 }
 
 fun Read.getAllCaretIds(): List<CaretId> {
-  return vimPluginApi.getAllCaretIds(this)
+  return vimPluginApi.getAllCaretIds(editor)
 }
 
 fun Read.getAllCaretIdsSortedByOffset(): List<CaretId> {
-  return vimPluginApi.getALlCaretIdsSortedByOffset(this)
+  return vimPluginApi.getALlCaretIdsSortedByOffset(editor)
 }
 
 fun Read.getCaretInfo(caretId: CaretId): CaretInfo? {
-  return vimPluginApi.getCaretInfo(this, caretId)
+  return vimPluginApi.getCaretInfo(editor, caretId)
 }

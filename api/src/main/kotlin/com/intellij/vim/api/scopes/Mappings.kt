@@ -108,7 +108,7 @@ fun VimScope.cunmap(fromKeys: String) {
 }
 
 private fun VimScope.addMapping(fromKeys: String, toKeys: String, isRecursive: Boolean, vararg modes: Mode) {
-  vimPluginApi.addMapping(this, fromKeys, toKeys, isRecursive, *modes)
+  vimPluginApi.addMapping(fromKeys, toKeys, isRecursive, *modes)
 }
 
 private fun VimScope.addMapping(
@@ -118,9 +118,9 @@ private fun VimScope.addMapping(
   action: VimScope.() -> Unit,
   vararg modes: Mode,
 ) {
-  vimPluginApi.addMapping(fromKeys, this, isRecursive, isRepeatable, action, *modes)
+  vimPluginApi.addMapping(fromKeys, isRecursive, isRepeatable, action, *modes)
 }
 
 private fun VimScope.removeMapping(fromKeys: String, vararg modes: Mode) {
-  vimPluginApi.removeMapping(this, fromKeys, *modes)
+  vimPluginApi.removeMapping(fromKeys, *modes)
 }
