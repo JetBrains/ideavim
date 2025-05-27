@@ -8,8 +8,8 @@
 
 package com.intellij.vim.api
 
-import com.intellij.vim.api.scopes.Read
-import com.intellij.vim.api.scopes.Transaction
+import com.intellij.vim.api.scopes.read.Read
+import com.intellij.vim.api.scopes.transaction.Transaction
 
 interface ResourceGuard {
   fun <T> read(read: Read, block: Read.() -> T): T

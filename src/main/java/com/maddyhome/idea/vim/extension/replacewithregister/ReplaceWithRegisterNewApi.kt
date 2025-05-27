@@ -15,7 +15,7 @@ import com.intellij.vim.api.RegisterType
 import com.intellij.vim.api.TextSelectionType
 import com.intellij.vim.api.VimVariablesScope
 import com.intellij.vim.api.isLine
-import com.intellij.vim.api.scopes.VimScope
+import com.intellij.vim.api.scopes.vim.VimScope
 import com.intellij.vim.api.scopes.change
 import com.intellij.vim.api.scopes.forEachCaret
 import com.intellij.vim.api.scopes.forEachCaretSorted

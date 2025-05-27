@@ -6,11 +6,13 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.intellij.vim.api.scopes
+package com.intellij.vim.api.scopes.transaction
 
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.CaretInfo
 import com.intellij.vim.api.VimPluginApi
+import com.intellij.vim.api.scopes.read.Read
+import com.intellij.vim.api.scopes.read.ReadImpl
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 

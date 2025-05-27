@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.intellij.vim.api.scopes
+package com.intellij.vim.api.scopes.vim
 
 import com.intellij.vim.api.Mode
 import com.intellij.vim.api.TextSelectionType

@@ -10,8 +10,8 @@ package com.maddyhome.idea.vim.extension.thin.api
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.vim.api.ResourceGuard
-import com.intellij.vim.api.scopes.Read
-import com.intellij.vim.api.scopes.Transaction
+import com.intellij.vim.api.scopes.read.Read
+import com.intellij.vim.api.scopes.transaction.Transaction
 
 class IntelliJResourceGuard : ResourceGuard {
   override fun <T> read(read: Read, block: Read.() -> T): T = ApplicationManager.getApplication().runReadAction<T> {

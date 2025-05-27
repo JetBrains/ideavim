@@ -19,7 +19,7 @@ import com.intellij.vim.api.VimPluginApi
 import com.intellij.vim.api.VimVariablesScope
 import com.intellij.vim.api.caretId
 import com.intellij.vim.api.caretInfo
-import com.intellij.vim.api.scopes.VimScope
+import com.intellij.vim.api.scopes.vim.VimScope
 import com.intellij.vim.api.scopes.vimScope
 import com.intellij.vim.api.toMappingMode
 import com.intellij.vim.api.toMode

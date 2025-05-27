@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.intellij.vim.api.scopes
+package com.intellij.vim.api.scopes.vim
 
 import com.intellij.vim.api.Mode
 import com.intellij.vim.api.TextSelectionType
@@ -16,9 +16,9 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 
 internal class VimScopeImpl(
-   val editor: VimEditor,
-   val context: ExecutionContext,
-   val vimPluginApi: VimPluginApi,
+  val editor: VimEditor,
+  val context: ExecutionContext,
+  val vimPluginApi: VimPluginApi,
 ) : VimScope {
   override val mode: Mode
     get() = vimPluginApi.getMode(editor)

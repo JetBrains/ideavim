@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.intellij.vim.api.scopes
+package com.intellij.vim.api.scopes.read
 
 import com.intellij.vim.api.CaretData
 import com.intellij.vim.api.CaretId
