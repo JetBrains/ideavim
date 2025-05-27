@@ -18,21 +18,6 @@ import kotlin.contracts.contract
 
 
 @OptIn(ExperimentalContracts::class)
-fun vimInitPluginScope(
-  vimApi: VimPluginApi,
-  block: VimInitPluginScope.() -> Unit,
-) {
-  contract {
-    callsInPlace(block, InvocationKind.EXACTLY_ONCE)
-  }
-  val vimInitPluginScope = object : VimInitPluginScope {
-    override val vimPluginApi: VimPluginApi
-      get() = vimApi
-  }
-  return vimInitPluginScope.block()
-}
-
-@OptIn(ExperimentalContracts::class)
 fun <T> vimScope(
   vimEditor: VimEditor,
   context: ExecutionContext,
