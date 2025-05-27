@@ -11,7 +11,7 @@ package com.intellij.vim.api
 import com.intellij.vim.api.scopes.VimInitPluginScope
 import com.intellij.vim.api.scopes.Read
 import com.intellij.vim.api.scopes.Transaction
-import com.intellij.vim.api.scopes.VimPluginScope
+import com.intellij.vim.api.scopes.VimScope
 
 
 interface VimPluginApi {
@@ -27,19 +27,19 @@ interface VimPluginApi {
     scope: VimInitPluginScope,
     isRecursive: Boolean,
     isRepeatable: Boolean,
-    action: VimPluginScope.() -> Unit,
+    action: VimScope.() -> Unit,
     vararg mode: Mode,
   )
 
   fun removeMapping(scope: VimInitPluginScope, fromKeys: String, vararg mode: Mode)
 
-  fun exportOperatorFunction(name: String, scope: VimInitPluginScope, function: VimPluginScope.() -> Boolean)
-  fun setOperatorFunction(scope: VimPluginScope, name: String)
-  fun executeNormal(scope: VimPluginScope, command: String)
+  fun exportOperatorFunction(name: String, scope: VimInitPluginScope, function: VimScope.() -> Boolean)
+  fun setOperatorFunction(scope: VimScope, name: String)
+  fun executeNormal(scope: VimScope, command: String)
 
-  fun getMode(scope: VimPluginScope): Mode
-  fun getSelectionTypeForCurrentMode(scope: VimPluginScope): TextSelectionType?
-  fun exitVisualMode(scope: VimPluginScope)
+  fun getMode(scope: VimScope): Mode
+  fun getSelectionTypeForCurrentMode(scope: VimScope): TextSelectionType?
+  fun exitVisualMode(scope: VimScope)
 
   fun deleteText(transaction: Transaction, startOffset: Int, endOffset: Int)
   fun replaceText(
@@ -77,5 +77,5 @@ interface VimPluginApi {
   fun addCaret(transaction: Transaction, caretInfo: CaretInfo): CaretId
   fun removeCaret(transaction: Transaction, caretId: CaretId)
 
-  fun getVimVariableInt(scope: VimPluginScope, vimVariablesScope: VimVariablesScope, name: String): Int?
+  fun getVimVariableInt(scope: VimScope, vimVariablesScope: VimVariablesScope, name: String): Int?
 }

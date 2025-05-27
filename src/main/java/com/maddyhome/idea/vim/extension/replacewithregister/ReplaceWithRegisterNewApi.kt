@@ -16,7 +16,7 @@ import com.intellij.vim.api.TextSelectionType
 import com.intellij.vim.api.VimVariablesScope
 import com.intellij.vim.api.isLine
 import com.intellij.vim.api.scopes.VimInitPluginScope
-import com.intellij.vim.api.scopes.VimPluginScope
+import com.intellij.vim.api.scopes.VimScope
 import com.intellij.vim.api.scopes.change
 import com.intellij.vim.api.scopes.exitVisualMode
 import com.intellij.vim.api.scopes.exportOperatorFunction
@@ -83,12 +83,12 @@ class ReplaceWithRegisterNewApi : VimPluginBase {
     }
   }
 
-  private fun VimPluginScope.rewriteMotion() {
+  private fun VimScope.rewriteMotion() {
     setOperatorFunction(OPERATOR_FUNC)
     normal("g@")
   }
 
-  private fun VimPluginScope.rewriteLine() {
+  private fun VimScope.rewriteLine() {
     val caretsSelectionsMap: MutableMap<CaretId, Pair<Int, Int>> = mutableMapOf()
     forEachCaret { caretId ->
       val caretLine: Int?
@@ -115,7 +115,7 @@ class ReplaceWithRegisterNewApi : VimPluginBase {
     }
   }
 
-  private fun VimPluginScope.rewriteVisual() {
+  private fun VimScope.rewriteVisual() {
     forEachCaretSorted { caretId ->
       val selectionType: TextSelectionType = getSelectionTypeForCurrentMode() ?: TextSelectionType.CHARACTER_WISE
       val selectionRange: Pair<Int, Int> = read { getVisualSelectionMarks(caretId) } ?: return@forEachCaretSorted
@@ -124,7 +124,7 @@ class ReplaceWithRegisterNewApi : VimPluginBase {
     exitVisualMode()
   }
 
-  private fun VimPluginScope.replaceTextForCaret(
+  private fun VimScope.replaceTextForCaret(
     caretId: CaretId,
     selectionRange: Pair<Int, Int>,
     selectionType: TextSelectionType,
