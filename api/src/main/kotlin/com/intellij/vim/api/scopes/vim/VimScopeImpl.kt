@@ -11,7 +11,6 @@ package com.intellij.vim.api.scopes.vim
 import com.intellij.vim.api.Mode
 import com.intellij.vim.api.TextSelectionType
 import com.intellij.vim.api.VimPluginApi
-import com.intellij.vim.api.VimVariablesScope
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 
@@ -27,11 +26,8 @@ internal class VimScopeImpl(
     return vimPluginApi.getSelectionTypeForCurrentMode(editor)
   }
 
-  override fun getVimVariableInt(
-    name: String,
-    vimVariableScope: VimVariablesScope,
-  ): Int? {
-    return vimPluginApi.getVimVariableInt(vimVariableScope, name)
+  override fun getVariableInt(name: String): Int? {
+    return vimPluginApi.getVariableInt(editor, context, name)
   }
 
   override fun exportOperatorFunction(

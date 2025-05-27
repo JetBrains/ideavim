@@ -108,7 +108,3 @@ fun MappingMode.toMode(): Mode {
     MappingMode.CMD_LINE -> Mode.COMMAND
   }
 }
-
-enum class VimVariablesScope(val prefix: String) {
-  VIM_SCOPE(":v")
-}

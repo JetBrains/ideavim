@@ -91,5 +91,5 @@ interface VimPluginApi {
   fun addCaret(editor: VimEditor, caretInfo: CaretInfo): CaretId
   fun removeCaret(editor: VimEditor, caretId: CaretId)
 
-  fun getVimVariableInt(vimVariablesScope: VimVariablesScope, name: String): Int?
+  fun getVariableInt(editor: VimEditor, context: ExecutionContext, name: String): Int?
 }

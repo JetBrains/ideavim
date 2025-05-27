@@ -10,12 +10,11 @@ package com.intellij.vim.api.scopes.vim
 
 import com.intellij.vim.api.Mode
 import com.intellij.vim.api.TextSelectionType
-import com.intellij.vim.api.VimVariablesScope
 
 interface VimScope {
   val mode: Mode
   fun getSelectionTypeForCurrentMode(): TextSelectionType?
-  fun getVimVariableInt(name: String, vimVariableScope: VimVariablesScope): Int?
+  fun getVariableInt(name: String): Int?
   fun exportOperatorFunction(name: String, function: VimScope.() -> Boolean)
   fun setOperatorFunction(name: String)
   fun normal(command: String)
