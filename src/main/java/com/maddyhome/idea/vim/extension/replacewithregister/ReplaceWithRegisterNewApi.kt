@@ -15,7 +15,6 @@ import com.intellij.vim.api.RegisterType
 import com.intellij.vim.api.TextSelectionType
 import com.intellij.vim.api.VimVariablesScope
 import com.intellij.vim.api.isLine
-import com.intellij.vim.api.scopes.VimInitPluginScope
 import com.intellij.vim.api.scopes.VimScope
 import com.intellij.vim.api.scopes.change
 import com.intellij.vim.api.scopes.exitVisualMode
@@ -47,7 +46,7 @@ import com.maddyhome.idea.vim.extension.thin.api.VimPluginBase
 class ReplaceWithRegisterNewApi : VimPluginBase {
   override fun getName(): String = "ReplaceWithRegister"
 
-  override fun VimInitPluginScope.init() {
+  override fun VimScope.init() {
     nmap(fromKeys = RWR_OPERATOR, isRepeatable = true) {
       rewriteMotion()
     }
