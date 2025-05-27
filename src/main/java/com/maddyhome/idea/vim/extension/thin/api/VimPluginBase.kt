@@ -16,10 +16,9 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.extension.VimExtension
 
-val vimPluginApi: VimPluginApi = VimPluginApiImpl()
-
 interface VimPluginBase : VimExtension {
   override fun init() {
+    val vimPluginApi: VimPluginApi = VimPluginApiImpl()
     val dummyEditor: VimEditor = injector.fallbackWindow
     val context: ExecutionContext = injector.executionContextManager.getEditorExecutionContext(dummyEditor)
     vimScope(dummyEditor, context, vimPluginApi) {
