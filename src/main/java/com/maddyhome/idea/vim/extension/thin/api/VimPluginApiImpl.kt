@@ -19,8 +19,6 @@ import com.intellij.vim.api.VimPluginApi
 import com.intellij.vim.api.VimVariablesScope
 import com.intellij.vim.api.caretId
 import com.intellij.vim.api.caretInfo
-import com.intellij.vim.api.scopes.Read
-import com.intellij.vim.api.scopes.Transaction
 import com.intellij.vim.api.scopes.VimScope
 import com.intellij.vim.api.scopes.vimScope
 import com.intellij.vim.api.toMappingMode
@@ -60,22 +58,19 @@ class VimPluginApiImpl : VimPluginApi {
   }
 
   override fun getRegisterContent(
-    read: Read,
+    editor: VimEditor,
+    context: ExecutionContext,
     caretId: CaretId,
     register: Char,
   ): String? {
-    val editor: VimEditor = read.editor
-    val context: ExecutionContext = read.context
-
     val caret: VimCaret = editor.carets().find { it.id == caretId.id } ?: return null
     return caret.registerStorage.getRegister(editor, context, register)?.text
   }
 
   override fun getCurrentRegisterName(
-    read: Read,
+    editor: VimEditor,
     caretId: CaretId,
   ): Char {
-    val editor: VimEditor = read.editor
     val caretCount: Int = editor.carets().size
     val registerGroup = injector.registerGroup
 
@@ -85,19 +80,16 @@ class VimPluginApiImpl : VimPluginApi {
   }
 
   override fun getRegisterType(
-    read: Read,
+    editor: VimEditor,
+    context: ExecutionContext,
     caretId: CaretId,
     register: Char,
   ): RegisterType? {
-    val editor: VimEditor = read.editor
-    val context: ExecutionContext = read.context
-
     val caret: VimCaret = editor.carets().find { it.id == caretId.id } ?: return null
     return caret.registerStorage.getRegister(editor, context, register)?.type?.toRegisterType()
   }
 
   override fun addMapping(
-    scope: VimScope,
     fromKeys: String,
     toKeys: String,
     isRecursive: Boolean,
@@ -115,14 +107,12 @@ class VimPluginApiImpl : VimPluginApi {
 
   override fun addMapping(
     fromKeys: String,
-    scope: VimScope,
     isRecursive: Boolean,
     isRepeatable: Boolean,
     action: VimScope.() -> Unit,
     vararg mode: Mode,
   ) {
     val modes: Set<MappingMode> = mode.map { it.toMappingMode() }.toSet()
-    val vimApi: VimPluginApi = scope.vimPluginApi
     val extensionHandler: ExtensionHandler = object : ExtensionHandler {
       override val isRepeatable: Boolean
         get() = isRepeatable
@@ -132,7 +122,7 @@ class VimPluginApiImpl : VimPluginApi {
         context: ExecutionContext,
         operatorArguments: OperatorArguments,
       ) {
-        vimScope(editor, context, vimApi) {
+        vimScope(editor, context, vimPluginApi) {
           action()
         }
       }
@@ -147,7 +137,6 @@ class VimPluginApiImpl : VimPluginApi {
   }
 
   override fun removeMapping(
-    scope: VimScope,
     fromKeys: String,
     vararg mode: Mode,
   ) {
@@ -160,17 +149,16 @@ class VimPluginApiImpl : VimPluginApi {
 
   override fun exportOperatorFunction(
     name: String,
-    scope: VimScope,
+    vimPluginApi: VimPluginApi,
     function: VimScope.() -> Boolean,
   ) {
-    val vimApi: VimPluginApi = scope.vimPluginApi
     val operatorFunction: OperatorFunction = object : OperatorFunction {
       override fun apply(
         editor: VimEditor,
         context: ExecutionContext,
         selectionType: SelectionType?,
       ): Boolean {
-        return vimScope(editor, context, vimApi) {
+        return vimScope(editor, context, vimPluginApi) {
           function()
         }
       }
@@ -178,48 +166,42 @@ class VimPluginApiImpl : VimPluginApi {
     VimExtensionFacade.exportOperatorFunction(name, operatorFunction)
   }
 
-  override fun setOperatorFunction(scope: VimScope, name: String) {
+  override fun setOperatorFunction(name: String) {
     injector.globalOptions().operatorfunc = name
   }
 
-  override fun executeNormal(scope: VimScope, command: String) {
-    val editor: VimEditor = scope.editor
+  override fun executeNormal(editor: VimEditor, command: String) {
     executeNormalWithoutMapping(injector.parser.parseKeys("g@"), editor.ij)
   }
 
-  override fun getMode(scope: VimScope): Mode {
-    val editor: VimEditor = scope.editor
+  override fun getMode(editor: VimEditor): Mode {
     return editor.mode.toMappingMode().toMode()
   }
 
-  override fun getSelectionTypeForCurrentMode(scope: VimScope): TextSelectionType? {
-    val editor: VimEditor = scope.editor
+  override fun getSelectionTypeForCurrentMode(editor: VimEditor): TextSelectionType? {
     val typeInEditor = editor.mode.selectionType ?: return null
     return typeInEditor.toTextSelectionType()
   }
 
-  override fun exitVisualMode(scope: VimScope) {
-    val editor: VimEditor = scope.editor
+  override fun exitVisualMode(editor: VimEditor) {
     editor.exitVisualMode()
   }
 
   override fun deleteText(
-    transaction: Transaction,
+    editor: VimEditor,
     startOffset: Int,
     endOffset: Int,
   ) {
-    val editor: VimEditor = transaction.editor
     editor.deleteString(TextRange(startOffset, endOffset))
   }
 
   override fun replaceText(
-    transaction: Transaction,
+    editor: VimEditor,
     caretId: CaretId,
     startOffset: Int,
     endOffset: Int,
     text: String,
   ) {
-    val editor: VimEditor = transaction.editor
     val replaceSequenceSize = endOffset - startOffset - 1
     val caret: VimCaret = editor.carets().find { it.id == caretId.id } ?: return
     if (replaceSequenceSize == 0) {
@@ -232,13 +214,12 @@ class VimPluginApiImpl : VimPluginApi {
   }
 
   override fun replaceTextBlockwise(
-    transaction: Transaction,
+    editor: VimEditor,
     caretId: CaretId,
     startOffset: Int,
     endOffset: Int,
     text: List<String>,
   ) {
-    val editor: VimEditor = transaction.editor
     val caret: VimCaret = editor.carets().find { it.id == caretId.id } ?: return
     val firstLine = editor.offsetToBufferPosition(startOffset).line
     val lastLine = text.size + firstLine - 1
@@ -259,66 +240,56 @@ class VimPluginApiImpl : VimPluginApi {
   }
 
   override fun getChangeMarks(
-    read: Read,
+    editor: VimEditor,
     caretId: CaretId,
   ): Pair<Int, Int>? {
-    val editor: VimEditor = read.editor
     val caret: VimCaret = editor.carets().find { it.id == caretId.id } ?: return null
     val changeMarks: TextRange = injector.markService.getChangeMarks(caret) ?: return null
     return Pair(changeMarks.startOffset, changeMarks.endOffset)
   }
 
   override fun getVisualMarks(
-    read: Read,
+    editor: VimEditor,
     caretId: CaretId,
   ): Pair<Int, Int>? {
-    val editor: VimEditor = read.editor
     val caret: VimCaret = editor.carets().find { it.id == caretId.id } ?: return null
     return Pair(caret.selectionStart, caret.selectionEnd)
   }
 
-  override fun getLineStartOffset(read: Read, line: Int): Int {
-    val editor: VimEditor = read.editor
+  override fun getLineStartOffset(editor: VimEditor, line: Int): Int {
     return editor.getLineStartOffset(line)
   }
 
-  override fun getLineEndOffset(read: Read, line: Int, allowEnd: Boolean): Int {
-    val editor: VimEditor = read.editor
+  override fun getLineEndOffset(editor: VimEditor, line: Int, allowEnd: Boolean): Int {
     return editor.getLineEndOffset(line, allowEnd)
   }
 
-  override fun getAllCaretIds(read: Read): List<CaretId> {
-    val editor: VimEditor = read.editor
+  override fun getAllCaretIds(editor: VimEditor): List<CaretId> {
     return editor.carets().map { caret -> caret.caretId }
   }
 
-  override fun getALlCaretIdsSortedByOffset(read: Read): List<CaretId> {
-    val editor: VimEditor = read.editor
+  override fun getALlCaretIdsSortedByOffset(editor: VimEditor): List<CaretId> {
     return editor.sortedCarets().map { caret -> caret.caretId }
   }
 
-  override fun getCaretLine(read: Read, caretId: CaretId): Int? {
-    val editor: VimEditor = read.editor
+  override fun getCaretLine(editor: VimEditor, caretId: CaretId): Int? {
     val caret: VimCaret = editor.carets().find { it.id == caretId.id } ?: return null
     return caret.getBufferPosition().line
   }
 
-  override fun getAllCaretsData(read: Read): List<CaretData> {
-    val editor: VimEditor = read.editor
+  override fun getAllCaretsData(editor: VimEditor): List<CaretData> {
     return editor.carets().map { caret -> caret.caretId to caret.caretInfo }
   }
 
-  override fun getAllCaretsDataSortedByOffset(read: Read): List<CaretData> {
-    val editor: VimEditor = read.editor
+  override fun getAllCaretsDataSortedByOffset(editor: VimEditor): List<CaretData> {
     return editor.sortedCarets().map { caret -> caret.caretId to caret.caretInfo }
   }
 
   override fun updateCaret(
-    transaction: Transaction,
+    editor: VimEditor,
     caretId: CaretId,
     caretInfo: CaretInfo,
   ) {
-    val editor: VimEditor = transaction.editor
     val caret: VimCaret = editor.carets().find { it.id == caretId.id } ?: return
     caret.moveToOffset(caretInfo.offset)
     caretInfo.selection?.let { (start, end) ->
@@ -327,30 +298,28 @@ class VimPluginApiImpl : VimPluginApi {
   }
 
   override fun getCaretInfo(
-    read: Read,
+    editor: VimEditor,
     caretId: CaretId,
   ): CaretInfo? {
-    val editor: VimEditor = read.editor
     val caret: VimCaret = editor.carets().find { it.id == caretId.id } ?: return null
     return caret.caretInfo
   }
 
   override fun addCaret(
-    transaction: Transaction,
+    editor: VimEditor,
     caretInfo: CaretInfo,
   ): CaretId {
     TODO("Not yet implemented")
   }
 
   override fun removeCaret(
-    transaction: Transaction,
+    editor: VimEditor,
     caretId: CaretId,
   ) {
     TODO("Not yet implemented")
   }
 
   override fun getVimVariableInt(
-    scope: VimScope,
     vimVariablesScope: VimVariablesScope,
     name: String,
   ): Int? {
