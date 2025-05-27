@@ -22,28 +22,28 @@ interface VimScope {
 }
 
 val VimScope.mode: Mode
-  get() = vimPluginApi.getMode(this)
+  get() = vimPluginApi.getMode(editor)
 
 fun VimScope.getSelectionTypeForCurrentMode(): TextSelectionType? {
-  return vimPluginApi.getSelectionTypeForCurrentMode(this)
+  return vimPluginApi.getSelectionTypeForCurrentMode(editor)
 }
 
 fun VimScope.getVimVariableInt(name: String, vimVariableScope: VimVariablesScope): Int? {
-  return vimPluginApi.getVimVariableInt(this, vimVariableScope, name)
+  return vimPluginApi.getVimVariableInt(vimVariableScope, name)
 }
 
 fun VimScope.exportOperatorFunction(name: String, function: VimScope.() -> Boolean) {
-  vimPluginApi.exportOperatorFunction(name, this, function)
+  vimPluginApi.exportOperatorFunction(name, vimPluginApi, function)
 }
 
 fun VimScope.setOperatorFunction(name: String) {
-  vimPluginApi.setOperatorFunction(this, name)
+  vimPluginApi.setOperatorFunction(name)
 }
 
 fun VimScope.normal(command: String) {
-  vimPluginApi.executeNormal(this, command)
+  vimPluginApi.executeNormal(editor, command)
 }
 
 fun VimScope.exitVisualMode() {
-  vimPluginApi.exitVisualMode(this)
+  vimPluginApi.exitVisualMode(editor)
 }
