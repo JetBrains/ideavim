@@ -17,30 +17,9 @@ import com.intellij.vim.api.VimVariablesScope
 import com.intellij.vim.api.isLine
 import com.intellij.vim.api.scopes.VimScope
 import com.intellij.vim.api.scopes.change
-import com.intellij.vim.api.scopes.exitVisualMode
-import com.intellij.vim.api.scopes.exportOperatorFunction
 import com.intellij.vim.api.scopes.forEachCaret
 import com.intellij.vim.api.scopes.forEachCaretSorted
-import com.intellij.vim.api.scopes.getCaretInfo
-import com.intellij.vim.api.scopes.getCaretLine
-import com.intellij.vim.api.scopes.getChangeMarks
-import com.intellij.vim.api.scopes.getCurrentRegisterName
-import com.intellij.vim.api.scopes.getLineEndOffset
-import com.intellij.vim.api.scopes.getLineStartOffset
-import com.intellij.vim.api.scopes.getRegisterContent
-import com.intellij.vim.api.scopes.getRegisterType
-import com.intellij.vim.api.scopes.getSelectionTypeForCurrentMode
-import com.intellij.vim.api.scopes.getVimVariableInt
-import com.intellij.vim.api.scopes.getVisualSelectionMarks
-import com.intellij.vim.api.scopes.mode
-import com.intellij.vim.api.scopes.nmap
-import com.intellij.vim.api.scopes.normal
 import com.intellij.vim.api.scopes.read
-import com.intellij.vim.api.scopes.replaceText
-import com.intellij.vim.api.scopes.replaceTextBlockwise
-import com.intellij.vim.api.scopes.setOperatorFunction
-import com.intellij.vim.api.scopes.updateCaret
-import com.intellij.vim.api.scopes.vmap
 import com.maddyhome.idea.vim.extension.thin.api.VimPluginBase
 
 class ReplaceWithRegisterNewApi : VimPluginBase {

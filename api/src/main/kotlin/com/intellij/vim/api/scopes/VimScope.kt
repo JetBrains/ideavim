@@ -10,40 +10,18 @@ package com.intellij.vim.api.scopes
 
 import com.intellij.vim.api.Mode
 import com.intellij.vim.api.TextSelectionType
-import com.intellij.vim.api.VimPluginApi
 import com.intellij.vim.api.VimVariablesScope
-import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimEditor
 
 interface VimScope {
-  val editor: VimEditor
-  val context: ExecutionContext
-  val vimPluginApi: VimPluginApi
-}
-
-val VimScope.mode: Mode
-  get() = vimPluginApi.getMode(editor)
-
-fun VimScope.getSelectionTypeForCurrentMode(): TextSelectionType? {
-  return vimPluginApi.getSelectionTypeForCurrentMode(editor)
-}
-
-fun VimScope.getVimVariableInt(name: String, vimVariableScope: VimVariablesScope): Int? {
-  return vimPluginApi.getVimVariableInt(vimVariableScope, name)
-}
-
-fun VimScope.exportOperatorFunction(name: String, function: VimScope.() -> Boolean) {
-  vimPluginApi.exportOperatorFunction(name, vimPluginApi, function)
-}
-
-fun VimScope.setOperatorFunction(name: String) {
-  vimPluginApi.setOperatorFunction(name)
-}
-
-fun VimScope.normal(command: String) {
-  vimPluginApi.executeNormal(editor, command)
-}
-
-fun VimScope.exitVisualMode() {
-  vimPluginApi.exitVisualMode(editor)
+  val mode: Mode
+  fun getSelectionTypeForCurrentMode(): TextSelectionType?
+  fun getVimVariableInt(name: String, vimVariableScope: VimVariablesScope): Int?
+  fun exportOperatorFunction(name: String, function: VimScope.() -> Boolean)
+  fun setOperatorFunction(name: String)
+  fun normal(command: String)
+  fun exitVisualMode()
+  fun nmap(fromKeys: String, toKeys: String)
+  fun vmap(fromKeys: String, toKeys: String)
+  fun nmap(fromKeys: String, isRepeatable: Boolean, action: VimScope.() -> Unit)
+  fun vmap(fromKeys: String, isRepeatable: Boolean, action: VimScope.() -> Unit)
 }

@@ -27,14 +27,7 @@ fun <T> vimScope(
   contract {
     callsInPlace(block, InvocationKind.EXACTLY_ONCE)
   }
-  val vimScope = object : VimScope {
-    override val editor: VimEditor
-      get() = vimEditor
-    override val context: ExecutionContext
-      get() = context
-    override val vimPluginApi: VimPluginApi
-      get() = vimApi
-  }
+  val vimScope = VimScopeImpl(vimEditor, context, vimApi)
   return vimScope.block()
 }
 
@@ -48,18 +41,10 @@ fun <T> VimScope.read(block: Read.() -> T): T {
     "Cannot open read or transaction scope within read scope"
   }
 
-  val vimEditor: VimEditor = editor
-  val vimContext: ExecutionContext = context
-  val vimApi: VimPluginApi = vimPluginApi
-  val read = object : Read {
-    override val editor: VimEditor
-      get() = vimEditor
-    override val context: ExecutionContext
-      get() = vimContext
-    override val vimPluginApi: VimPluginApi
-      get() = vimApi
+  val readImpl = with(this as VimScopeImpl) {
+    ReadImpl(editor, context, vimPluginApi)
   }
-  return vimPluginApi.getResourceGuard().read(read, block)
+  return readImpl.executeRead(block)
 }
 
 @OptIn(ExperimentalContracts::class)
@@ -72,18 +57,11 @@ fun VimScope.change(block: Transaction.() -> Unit) {
     "Cannot open read or transaction scope within transaction scope"
   }
 
-  val vimEditor: VimEditor = editor
-  val vimContext: ExecutionContext = context
-  val vimApi: VimPluginApi = vimPluginApi
-  val transaction = object : Transaction {
-    override val editor: VimEditor
-      get() = vimEditor
-    override val context: ExecutionContext
-      get() = vimContext
-    override val vimPluginApi: VimPluginApi
-      get() = vimApi
+  val transactionImpl = with(this as VimScopeImpl) {
+    val readImpl = ReadImpl(editor, context, vimPluginApi)
+    TransactionImpl(editor, context, vimPluginApi, readImpl)
   }
-  vimPluginApi.getResourceGuard().change(transaction, block)
+  transactionImpl.executeChange(block)
 }
 
 fun VimScope.forEachCaret(block: VimScope.(CaretId) -> Unit) {
