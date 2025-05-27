@@ -13,13 +13,12 @@ import com.intellij.vim.api.CaretInfo
 import com.intellij.vim.api.Mode
 import com.intellij.vim.api.RegisterType
 import com.intellij.vim.api.TextSelectionType
-import com.intellij.vim.api.VimVariablesScope
 import com.intellij.vim.api.isLine
-import com.intellij.vim.api.scopes.vim.VimScope
 import com.intellij.vim.api.scopes.change
 import com.intellij.vim.api.scopes.forEachCaret
 import com.intellij.vim.api.scopes.forEachCaretSorted
 import com.intellij.vim.api.scopes.read
+import com.intellij.vim.api.scopes.vim.VimScope
 import com.maddyhome.idea.vim.extension.thin.api.VimPluginBase
 
 class ReplaceWithRegisterNewApi : VimPluginBase {
@@ -71,7 +70,7 @@ class ReplaceWithRegisterNewApi : VimPluginBase {
     forEachCaret { caretId ->
       val caretLine: Int?
       val lineRange: Pair<Int, Int>?
-      val count1 = getVimVariableInt("count1", VimVariablesScope.VIM_SCOPE) ?: 1
+      val count1 = getVariableInt("v:count1") ?: 1
 
       read {
         caretLine = getCaretLine(caretId)
