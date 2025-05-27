@@ -9,7 +9,7 @@
 package com.maddyhome.idea.vim.extension.thin.api
 
 import com.intellij.vim.api.VimPluginApi
-import com.intellij.vim.api.scopes.VimScope
+import com.intellij.vim.api.scopes.vim.VimScope
 import com.intellij.vim.api.scopes.vimScope
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor

@@ -8,7 +8,7 @@
 
 package com.intellij.vim.api
 
-import com.intellij.vim.api.scopes.VimScope
+import com.intellij.vim.api.scopes.vim.VimScope
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 

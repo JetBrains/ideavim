@@ -6,10 +6,11 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.intellij.vim.api.scopes
+package com.intellij.vim.api.scopes.transaction
 
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.CaretInfo
+import com.intellij.vim.api.scopes.read.Read
 
 interface Transaction : Read {
   fun deleteText(startOffset: Int, endOffset: Int)
