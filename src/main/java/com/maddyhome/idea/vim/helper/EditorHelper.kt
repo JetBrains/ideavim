@@ -40,7 +40,7 @@ internal val Editor.isIdeaVimDisabledHere: Boolean
       !ClientId.isCurrentlyUnderLocalId || // CWM-927
       (ideaVimDisabledForSingleLine(ideaVimSupportValue) && isSingleLine()) ||
       IdeaVimDisablerExtensionPoint.isDisabledForEditor(this) ||
-      isNotFileEditorExceptCommit()
+      isNotFileEditorExceptAllowed()
   }
 
 /**
@@ -57,9 +57,12 @@ internal val Editor.isIdeaVimDisabledHere: Boolean
  *   be quite a visible change for users.
  * We detect the commit window by the name of the editor (Dummy.txt). If this causes issues, let's disable IdeaVim
  *   in the commit window as well.
+ *
+ * Also, we support IdeaVim in diff viewers.
  */
-private fun Editor.isNotFileEditorExceptCommit(): Boolean {
+private fun Editor.isNotFileEditorExceptAllowed(): Boolean {
   if (EditorHelper.getVirtualFile(this)?.name?.contains("Dummy.txt") == true) return false
+  if (EditorHelper.isDiffEditor(this)) return false
   return !EditorHelper.isFileEditor(this)
 }
 
