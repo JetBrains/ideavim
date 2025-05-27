@@ -106,6 +106,7 @@ class VimPluginApiImpl : VimPluginApi {
   }
 
   override fun addMapping(
+    vimPluginApi: VimPluginApi,
     fromKeys: String,
     isRecursive: Boolean,
     isRepeatable: Boolean,

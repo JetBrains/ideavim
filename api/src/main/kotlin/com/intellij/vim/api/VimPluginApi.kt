@@ -37,6 +37,7 @@ interface VimPluginApi {
 
   fun addMapping(fromKeys: String, toKeys: String, isRecursive: Boolean, vararg mode: Mode)
   fun addMapping(
+    vimPluginApi: VimPluginApi,
     fromKeys: String,
     isRecursive: Boolean,
     isRepeatable: Boolean,

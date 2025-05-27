@@ -11,30 +11,19 @@ package com.intellij.vim.api.scopes
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.CaretInfo
 
-interface Transaction : Read
-
-fun Transaction.deleteText(startOffset: Int, endOffset: Int) {
-  vimPluginApi.deleteText(editor, startOffset, endOffset)
-}
-
-fun Transaction.replaceText(
-  caretId: CaretId,
-  startOffset: Int,
-  endOffset: Int,
-  text: String,
-) {
-  vimPluginApi.replaceText(editor, caretId, startOffset, endOffset, text)
-}
-
-fun Transaction.replaceTextBlockwise(
-  caretId: CaretId,
-  startOffset: Int,
-  endOffset: Int,
-  text: List<String>
-) {
-  vimPluginApi.replaceTextBlockwise(editor, caretId, startOffset, endOffset, text)
-}
-
-fun Transaction.updateCaret(caretId: CaretId, info: CaretInfo) {
-  vimPluginApi.updateCaret(editor, caretId, info)
+interface Transaction : Read {
+  fun deleteText(startOffset: Int, endOffset: Int)
+  fun replaceText(
+    caretId: CaretId,
+    startOffset: Int,
+    endOffset: Int,
+    text: String,
+  )
+  fun replaceTextBlockwise(
+    caretId: CaretId,
+    startOffset: Int,
+    endOffset: Int,
+    text: List<String>
+  )
+  fun updateCaret(caretId: CaretId, info: CaretInfo)
 }
