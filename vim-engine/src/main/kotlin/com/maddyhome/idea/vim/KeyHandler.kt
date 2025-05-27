@@ -255,12 +255,11 @@ class KeyHandler {
         return
       }
     }
-    if (injector.application.isMainThread()) {
-      val action: Runnable = ActionRunner(editor, context, command, keyState, operatorArguments)
-      val cmdAction = command.action
-      val name = cmdAction.id
-      injector.actionExecutor.executeCommand(editor, action, name, action)
-    }
+
+    val action: Runnable = ActionRunner(editor, context, command, keyState, operatorArguments)
+    val cmdAction = command.action
+    val name = cmdAction.id
+    injector.actionExecutor.executeCommand(editor, action, name, action)
   }
 
   /**
