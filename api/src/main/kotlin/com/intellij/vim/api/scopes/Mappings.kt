@@ -59,27 +59,27 @@ fun VimInitPluginScope.noremap(fromKeys: String, toKeys: String) {
   addMapping(fromKeys, toKeys, isRecursive = false, Mode.OP_PENDING)
 }
 
-fun VimInitPluginScope.map(fromKeys: String, isRepeatable: Boolean, action: VimPluginScope.() -> Unit) {
+fun VimInitPluginScope.map(fromKeys: String, isRepeatable: Boolean, action: VimScope.() -> Unit) {
   addMapping(fromKeys, isRecursive = true, isRepeatable, action, Mode.OP_PENDING)
 }
 
-fun VimInitPluginScope.nmap(fromKeys: String, isRepeatable: Boolean, action: VimPluginScope.() -> Unit) {
+fun VimInitPluginScope.nmap(fromKeys: String, isRepeatable: Boolean, action: VimScope.() -> Unit) {
   addMapping(fromKeys, isRecursive = true, isRepeatable, action, Mode.NORMAL)
 }
 
-fun VimInitPluginScope.vmap(fromKeys: String, isRepeatable: Boolean, action: VimPluginScope.() -> Unit) {
+fun VimInitPluginScope.vmap(fromKeys: String, isRepeatable: Boolean, action: VimScope.() -> Unit) {
   addMapping(fromKeys, isRecursive = true, isRepeatable, action, Mode.VISUAL)
 }
 
-fun VimInitPluginScope.omap(fromKeys: String, isRepeatable: Boolean, action: VimPluginScope.() -> Unit) {
+fun VimInitPluginScope.omap(fromKeys: String, isRepeatable: Boolean, action: VimScope.() -> Unit) {
   addMapping(fromKeys, isRecursive = true, isRepeatable, action, Mode.OP_PENDING)
 }
 
-fun VimInitPluginScope.imap(fromKeys: String, isRepeatable: Boolean, action: VimPluginScope.() -> Unit) {
+fun VimInitPluginScope.imap(fromKeys: String, isRepeatable: Boolean, action: VimScope.() -> Unit) {
   addMapping(fromKeys, isRecursive = true, isRepeatable, action, Mode.INSERT)
 }
 
-fun VimInitPluginScope.cmap(fromKeys: String, isRepeatable: Boolean, action: VimPluginScope.() -> Unit) {
+fun VimInitPluginScope.cmap(fromKeys: String, isRepeatable: Boolean, action: VimScope.() -> Unit) {
   addMapping(fromKeys, isRecursive = true, isRepeatable, action, Mode.COMMAND)
 }
 
@@ -115,7 +115,7 @@ private fun VimInitPluginScope.addMapping(
   fromKeys: String,
   isRecursive: Boolean,
   isRepeatable: Boolean,
-  action: VimPluginScope.() -> Unit,
+  action: VimScope.() -> Unit,
   vararg modes: Mode,
 ) {
   vimPluginApi.addMapping(fromKeys, this, isRecursive, isRepeatable, action, *modes)

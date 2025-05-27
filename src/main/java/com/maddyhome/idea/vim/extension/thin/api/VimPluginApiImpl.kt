@@ -22,8 +22,8 @@ import com.intellij.vim.api.caretInfo
 import com.intellij.vim.api.scopes.VimInitPluginScope
 import com.intellij.vim.api.scopes.Read
 import com.intellij.vim.api.scopes.Transaction
-import com.intellij.vim.api.scopes.VimPluginScope
-import com.intellij.vim.api.scopes.vimPluginScope
+import com.intellij.vim.api.scopes.VimScope
+import com.intellij.vim.api.scopes.vimScope
 import com.intellij.vim.api.toMappingMode
 import com.intellij.vim.api.toMode
 import com.intellij.vim.api.toRegisterType
@@ -119,7 +119,7 @@ class VimPluginApiImpl : VimPluginApi {
     scope: VimInitPluginScope,
     isRecursive: Boolean,
     isRepeatable: Boolean,
-    action: VimPluginScope.() -> Unit,
+    action: VimScope.() -> Unit,
     vararg mode: Mode,
   ) {
     val modes: Set<MappingMode> = mode.map { it.toMappingMode() }.toSet()
@@ -133,7 +133,7 @@ class VimPluginApiImpl : VimPluginApi {
         context: ExecutionContext,
         operatorArguments: OperatorArguments,
       ) {
-        vimPluginScope(editor, context, vimApi) {
+        vimScope(editor, context, vimApi) {
           action()
         }
       }
@@ -162,7 +162,7 @@ class VimPluginApiImpl : VimPluginApi {
   override fun exportOperatorFunction(
     name: String,
     scope: VimInitPluginScope,
-    function: VimPluginScope.() -> Boolean,
+    function: VimScope.() -> Boolean,
   ) {
     val vimApi: VimPluginApi = scope.vimPluginApi
     val operatorFunction: OperatorFunction = object : OperatorFunction {
@@ -171,7 +171,7 @@ class VimPluginApiImpl : VimPluginApi {
         context: ExecutionContext,
         selectionType: SelectionType?,
       ): Boolean {
-        return vimPluginScope(editor, context, vimApi) {
+        return vimScope(editor, context, vimApi) {
           function()
         }
       }
@@ -179,27 +179,27 @@ class VimPluginApiImpl : VimPluginApi {
     VimExtensionFacade.exportOperatorFunction(name, operatorFunction)
   }
 
-  override fun setOperatorFunction(scope: VimPluginScope, name: String) {
+  override fun setOperatorFunction(scope: VimScope, name: String) {
     injector.globalOptions().operatorfunc = name
   }
 
-  override fun executeNormal(scope: VimPluginScope, command: String) {
+  override fun executeNormal(scope: VimScope, command: String) {
     val editor: VimEditor = scope.editor
     executeNormalWithoutMapping(injector.parser.parseKeys("g@"), editor.ij)
   }
 
-  override fun getMode(scope: VimPluginScope): Mode {
+  override fun getMode(scope: VimScope): Mode {
     val editor: VimEditor = scope.editor
     return editor.mode.toMappingMode().toMode()
   }
 
-  override fun getSelectionTypeForCurrentMode(scope: VimPluginScope): TextSelectionType? {
+  override fun getSelectionTypeForCurrentMode(scope: VimScope): TextSelectionType? {
     val editor: VimEditor = scope.editor
     val typeInEditor = editor.mode.selectionType ?: return null
     return typeInEditor.toTextSelectionType()
   }
 
-  override fun exitVisualMode(scope: VimPluginScope) {
+  override fun exitVisualMode(scope: VimScope) {
     val editor: VimEditor = scope.editor
     editor.exitVisualMode()
   }
@@ -351,7 +351,7 @@ class VimPluginApiImpl : VimPluginApi {
   }
 
   override fun getVimVariableInt(
-    scope: VimPluginScope,
+    scope: VimScope,
     vimVariablesScope: VimVariablesScope,
     name: String,
   ): Int? {

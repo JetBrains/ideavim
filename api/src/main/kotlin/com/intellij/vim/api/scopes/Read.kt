@@ -13,7 +13,7 @@ import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.CaretInfo
 import com.intellij.vim.api.RegisterType
 
-interface Read : VimPluginScope
+interface Read : VimScope
 
 fun Read.getCurrentRegisterName(caretId: CaretId): Char {
   return vimPluginApi.getCurrentRegisterName(this, caretId)

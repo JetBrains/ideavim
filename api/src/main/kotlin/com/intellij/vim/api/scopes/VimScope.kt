@@ -15,35 +15,35 @@ import com.intellij.vim.api.VimVariablesScope
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 
-interface VimPluginScope {
+interface VimScope {
   val editor: VimEditor
   val context: ExecutionContext
   val vimPluginApi: VimPluginApi
 }
 
-val VimPluginScope.mode: Mode
+val VimScope.mode: Mode
   get() = vimPluginApi.getMode(this)
 
-fun VimPluginScope.getSelectionTypeForCurrentMode(): TextSelectionType? {
+fun VimScope.getSelectionTypeForCurrentMode(): TextSelectionType? {
   return vimPluginApi.getSelectionTypeForCurrentMode(this)
 }
 
-fun VimPluginScope.getVimVariableInt(name: String, vimVariableScope: VimVariablesScope): Int? {
+fun VimScope.getVimVariableInt(name: String, vimVariableScope: VimVariablesScope): Int? {
   return vimPluginApi.getVimVariableInt(this, vimVariableScope, name)
 }
 
-fun VimInitPluginScope.exportOperatorFunction(name: String, function: VimPluginScope.() -> Boolean) {
+fun VimInitPluginScope.exportOperatorFunction(name: String, function: VimScope.() -> Boolean) {
   vimPluginApi.exportOperatorFunction(name, this, function)
 }
 
-fun VimPluginScope.setOperatorFunction(name: String) {
+fun VimScope.setOperatorFunction(name: String) {
   vimPluginApi.setOperatorFunction(this, name)
 }
 
-fun VimPluginScope.normal(command: String) {
+fun VimScope.normal(command: String) {
   vimPluginApi.executeNormal(this, command)
 }
 
-fun VimPluginScope.exitVisualMode() {
+fun VimScope.exitVisualMode() {
   vimPluginApi.exitVisualMode(this)
 }

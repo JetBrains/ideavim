@@ -33,16 +33,16 @@ fun vimInitPluginScope(
 }
 
 @OptIn(ExperimentalContracts::class)
-fun <T> vimPluginScope(
+fun <T> vimScope(
   vimEditor: VimEditor,
   context: ExecutionContext,
   vimApi: VimPluginApi,
-  block: VimPluginScope.() -> T,
+  block: VimScope.() -> T,
 ): T {
   contract {
     callsInPlace(block, InvocationKind.EXACTLY_ONCE)
   }
-  val vimPluginScope = object : VimPluginScope {
+  val vimScope = object : VimScope {
     override val editor: VimEditor
       get() = vimEditor
     override val context: ExecutionContext
@@ -50,11 +50,11 @@ fun <T> vimPluginScope(
     override val vimPluginApi: VimPluginApi
       get() = vimApi
   }
-  return vimPluginScope.block()
+  return vimScope.block()
 }
 
 @OptIn(ExperimentalContracts::class)
-fun <T> VimPluginScope.read(block: Read.() -> T): T {
+fun <T> VimScope.read(block: Read.() -> T): T {
   contract {
     callsInPlace(block, InvocationKind.EXACTLY_ONCE)
   }
@@ -78,7 +78,7 @@ fun <T> VimPluginScope.read(block: Read.() -> T): T {
 }
 
 @OptIn(ExperimentalContracts::class)
-fun VimPluginScope.change(block: Transaction.() -> Unit) {
+fun VimScope.change(block: Transaction.() -> Unit) {
   contract {
     callsInPlace(block, InvocationKind.EXACTLY_ONCE)
   }
@@ -101,10 +101,10 @@ fun VimPluginScope.change(block: Transaction.() -> Unit) {
   vimPluginApi.getResourceGuard().change(transaction, block)
 }
 
-fun VimPluginScope.forEachCaret(block: VimPluginScope.(CaretId) -> Unit) {
+fun VimScope.forEachCaret(block: VimScope.(CaretId) -> Unit) {
   read { getAllCaretIds() }.forEach { caretId -> block(caretId) }
 }
 
-fun VimPluginScope.forEachCaretSorted(block: VimPluginScope.(CaretId) -> Unit) {
+fun VimScope.forEachCaretSorted(block: VimScope.(CaretId) -> Unit) {
   read { getAllCaretIdsSortedByOffset() }.forEach { caretId -> block(caretId) }
 }
