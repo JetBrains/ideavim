@@ -59,12 +59,9 @@ tasks {
     useJUnitPlatform()
 
     // Set teamcity env variable locally to run additional tests for leaks.
-    // By default, this test runs on TC only, but this test doesn't take a lot of time,
-    //   so we can turn it on for local development
-    if (environment["TEAMCITY_VERSION"] == null) {
-      println("Set env TEAMCITY_VERSION to X to enable project leak checks from the platform")
-      environment("TEAMCITY_VERSION" to "X")
-    }
+    println("Project leak checks: If you experience project leaks on TeamCity that doesn't reproduce locally")
+    println("Uncomment the following line in build.gradle to enable leak checks (see build.gradle config)")
+//      environment("TEAMCITY_VERSION" to "X")
   }
 }
 
