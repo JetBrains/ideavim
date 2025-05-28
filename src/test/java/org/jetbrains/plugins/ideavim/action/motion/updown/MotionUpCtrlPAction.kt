@@ -9,12 +9,10 @@
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class MotionUpCtrlPAction : VimTestCase() {
   @Test
-  @Disabled("This one should be fixed")
   fun `test last column empty`() {
     val keys = "o<Esc><End><C-P>"
     val before = """

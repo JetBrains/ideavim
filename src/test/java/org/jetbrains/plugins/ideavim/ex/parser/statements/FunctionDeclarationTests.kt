@@ -17,7 +17,6 @@ import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.productForArguments
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -191,7 +190,6 @@ class FunctionDeclarationTests : VimTestCase() {
 
   // https://youtrack.jetbrains.com/issue/VIM-2654
   @Test
-  @Disabled
   fun `return with omitted expression`() {
     VimscriptParser.parse(
       """

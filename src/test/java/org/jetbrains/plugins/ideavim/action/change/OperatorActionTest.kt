@@ -9,7 +9,6 @@
 package org.jetbrains.plugins.ideavim.action.change
 
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class OperatorActionTest : VimTestCase() {
@@ -154,7 +153,6 @@ class OperatorActionTest : VimTestCase() {
   }
 
   @Test
-  @Disabled(":set does not correctly parse the quotes in the lambda syntax")
   // The parser is treating the second double-quote char as a comment. The argument to the command is parsed as:
   // opfunc={ arg -> execute "`[v`]rx
   // The map command is properly handled - the `<CR>g@` is correctly understood, and the full lambda is passed to the

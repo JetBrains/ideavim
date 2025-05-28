@@ -16,7 +16,6 @@ import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import java.nio.file.Files
@@ -42,33 +41,6 @@ class ReloadVimRcTest : VimTestCase() {
     val document = editorFactory.createDocument(file)
 
     kotlin.test.assertTrue(VimRcFileState.equalTo(document))
-  }
-
-  // TODO
-  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
-  @Test
-  @Disabled
-  fun `test equalTo with whitespaces`() {
-    val s = " " // Just to see whitespaces in the following code
-    """
-      map x y
-      set myPlugin
-      map z t
-    """.trimIndent()
-    """
-      map x y
-      set myPlugin$s$s$s$s$s$s
-
-
-            map z t
-    """.trimIndent()
-
-//    val lines = convertFileToLines(origFile)
-//    VimRcFileState.saveFileState("", lines)
-//
-//    val document = editorFactory.createDocument(changedFile)
-//
-//    assertTrue(VimRcFileState.equalTo(document))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)

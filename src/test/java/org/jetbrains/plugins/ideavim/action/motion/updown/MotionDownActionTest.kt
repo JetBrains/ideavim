@@ -136,7 +136,6 @@ class MotionDownActionTest : VimTestCase() {
   }
 
   @Test
-  @Disabled
   fun `test motion down in visual block mode with dollar motion2`() {
     val keys = "i<C-O>d<ESC>"
     val before = """

@@ -12,7 +12,6 @@ package org.jetbrains.plugins.ideavim.action.change.change
 
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class ChangeMotionActionTest : VimTestCase() {
@@ -150,9 +149,7 @@ class ChangeMotionActionTest : VimTestCase() {
   }
 
   // VIM-276 |c| |F|
-  @Suppress("unused")
   @Test
-  @Disabled
   fun testChangeLinesToBackwards() {
     doTest(
       "cFc",

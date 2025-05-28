@@ -15,7 +15,6 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -85,7 +84,6 @@ class InsertNewLineAboveActionTest : VimTestCase() {
     doTest("O", before, after, Mode.INSERT)
   }
 
-  @Disabled("Action execution in tests is broken for 2024.2")
   @Test
   fun `test insert new line above with multiple carets`() {
     val before = """    I fou${c}nd it in a legendary land
