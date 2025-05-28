@@ -92,101 +92,277 @@ class DeleteJoinLinesSpacesActionTest : VimTestCase() {
 
   @Test
   fun `test undo after join lines`() {
-    configureByText("""
+    configureByText(
+      """
       First line
       ${c}Second line
       Third line
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("J")
-    assertState("""
+    assertState(
+      """
       First line
       Second line${c} Third line
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("u")
-    assertState("""
+    assertState(
+      """
       First line
       ${c}Second line
       Third line
-    """.trimIndent())
+    """.trimIndent()
+    )
   }
 
   @Test
   fun `test undo after join multiple lines`() {
-    configureByText("""
+    configureByText(
+      """
       ${c}Line 1
       Line 2
       Line 3
       Line 4
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("3J")
-    assertState("""
+    assertState(
+      """
       Line 1 Line 2$c Line 3
       Line 4
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("u")
-    assertState("""
+    assertState(
+      """
       ${c}Line 1
       Line 2
       Line 3
       Line 4
-    """.trimIndent())
+    """.trimIndent()
+    )
   }
 
   @Test
   fun `test undo after multiple sequential joins`() {
-    configureByText("""
+    configureByText(
+      """
       ${c}One
       Two
       Three
       Four
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("J")
-    assertState("""
+    assertState(
+      """
       One${c} Two
       Three
       Four
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("J")
-    assertState("""
+    assertState(
+      """
       One Two${c} Three
       Four
-    """.trimIndent())
-    
+    """.trimIndent()
+    )
+
     // Undo second join
     typeText("u")
-    assertState("""
+    assertState(
+      """
       One${c} Two
       Three
       Four
-    """.trimIndent())
-    
+    """.trimIndent()
+    )
+
     // Undo first join
     typeText("u")
-    assertState("""
+    assertState(
+      """
       ${c}One
       Two
       Three
       Four
-    """.trimIndent())
+    """.trimIndent()
+    )
   }
 
   @Test
   fun `test undo join with special whitespace handling`() {
-    configureByText("""
+    configureByText(
+      """
       ${c}foo {
           bar
       }
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("J")
-    assertState("""
+    assertState(
+      """
       foo {${c} bar
       }
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("u")
-    assertState("""
+    assertState(
+      """
       ${c}foo {
           bar
       }
-    """.trimIndent())
+    """.trimIndent()
+    )
+  }
+
+  @Test
+  fun `test undo after join lines with oldundo`() {
+    configureByText(
+      """
+      First line
+      ${c}Second line
+      Third line
+    """.trimIndent()
+    )
+    try {
+      enterCommand("set oldundo")
+      typeText("J")
+      assertState(
+        """
+      First line
+      Second line${c} Third line
+    """.trimIndent()
+      )
+      typeText("u")
+      assertState(
+        """
+      First line
+      ${c}Second line
+      Third line
+    """.trimIndent()
+      )
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
+  fun `test undo after join multiple lines with oldundo`() {
+    configureByText(
+      """
+      ${c}Line 1
+      Line 2
+      Line 3
+      Line 4
+    """.trimIndent()
+    )
+    try {
+      enterCommand("set oldundo")
+      typeText("3J")
+      assertState(
+        """
+      Line 1 Line 2$c Line 3
+      Line 4
+    """.trimIndent()
+      )
+      typeText("u")
+      assertState(
+        """
+      ${c}Line 1
+      Line 2
+      Line 3
+      Line 4
+    """.trimIndent()
+      )
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
+  fun `test undo after multiple sequential joins with oldundo`() {
+    configureByText(
+      """
+      ${c}One
+      Two
+      Three
+      Four
+    """.trimIndent()
+    )
+    try {
+      enterCommand("set oldundo")
+      typeText("J")
+      assertState(
+        """
+      One${c} Two
+      Three
+      Four
+    """.trimIndent()
+      )
+      typeText("J")
+      assertState(
+        """
+      One Two${c} Three
+      Four
+    """.trimIndent()
+      )
+
+      // Undo second join
+      typeText("u")
+      assertState(
+        """
+      One${c} Two
+      Three
+      Four
+    """.trimIndent()
+      )
+
+      // Undo first join
+      typeText("u")
+      assertState(
+        """
+      ${c}One
+      Two
+      Three
+      Four
+    """.trimIndent()
+      )
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
+  fun `test undo join with special whitespace handling with oldundo`() {
+    configureByText(
+      """
+      ${c}foo {
+          bar
+      }
+    """.trimIndent()
+    )
+    try {
+      enterCommand("set oldundo")
+      typeText("J")
+      assertState(
+        """
+      foo {${c} bar
+      }
+    """.trimIndent()
+      )
+      typeText("u")
+      assertState(
+        """
+      ${c}foo {
+          bar
+      }
+    """.trimIndent()
+      )
+    } finally {
+      enterCommand("set nooldundo")
+    }
   }
 }

@@ -69,6 +69,26 @@ class InsertDeleteInsertedTextActionTest : VimTestCase() {
   }
 
   @Test
+  fun `test undo after delete inserted text in insert mode with oldundo`() {
+    configureByText("Hello ${c}world")
+    try {
+      enterCommand("set oldundo")
+      typeText("i")
+      typeText("beautiful ")
+      assertState("Hello beautiful ${c}world")
+      assertMode(Mode.INSERT)
+      typeText("<C-U>")
+      assertState("Hello ${c}world")
+      assertMode(Mode.INSERT)
+      typeText("<Esc>")
+      typeText("u")
+      assertState("Hello ${c}world")
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
   fun `test undo preserves text before insertion point`() {
     configureByText("Start${c}End")
     typeText("i")
@@ -82,5 +102,26 @@ class InsertDeleteInsertedTextActionTest : VimTestCase() {
     assertState("Star${c}tEnd")
     typeText("u")
     assertState("Start${c}End")
+  }
+
+  @Test
+  fun `test undo preserves text before insertion point with oldundo`() {
+    configureByText("Start${c}End")
+    try {
+      enterCommand("set oldundo")
+      typeText("i")
+      typeText(" Middle ")
+      assertState("Start Middle ${c}End")
+      assertMode(Mode.INSERT)
+      typeText("<C-U>")
+      assertState("Start${c}End")
+      assertMode(Mode.INSERT)
+      typeText("<Esc>")
+      assertState("Star${c}tEnd")
+      typeText("u")
+      assertState("Start${c}End")
+    } finally {
+      enterCommand("set nooldundo")
+    }
   }
 }

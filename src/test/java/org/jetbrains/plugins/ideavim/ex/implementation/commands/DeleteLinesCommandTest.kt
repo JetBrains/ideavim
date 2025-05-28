@@ -548,4 +548,126 @@ class DeleteLinesCommandTest : VimTestCase() {
       """.trimMargin()
     )
   }
+
+  @Test
+  fun `test delete line and undo with oldundo`() {
+    configureByText(
+      """
+      |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      |Morbi nec luctus tortor, id venenatis lacus.
+      |Nunc sit amet tellus vel purus cursus posuere et at purus.
+      |Ut id dapibus${c} augue.
+      |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+      |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin()
+    )
+
+    try {
+      enterCommand("set oldundo")
+      enterCommand("d")
+      assertState(
+        """
+      |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      |Morbi nec luctus tortor, id venenatis lacus.
+      |Nunc sit amet tellus vel purus cursus posuere et at purus.
+      |${c}Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+      |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin()
+      )
+
+      typeText("u")
+      assertState(
+        """
+      |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      |Morbi nec luctus tortor, id venenatis lacus.
+      |Nunc sit amet tellus vel purus cursus posuere et at purus.
+      |Ut id dapibus${c} augue.
+      |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+      |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin()
+      )
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
+  fun `test delete multiple lines with range and undo with oldundo`() {
+    configureByText(
+      """
+      |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      |Morbi nec luctus tortor, id venenatis lacus.
+      |Nunc sit amet tellus vel ${c}purus cursus posuere et at purus.
+      |Ut id dapibus augue.
+      |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+      |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin()
+    )
+
+    try {
+      enterCommand("set oldundo")
+      enterCommand("2,4d")
+      assertState(
+        """
+      |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      |${c}Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+      |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin()
+      )
+
+      typeText("u")
+      assertState(
+        """
+      |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      |Morbi nec luctus tortor, id venenatis lacus.
+      |Nunc sit amet tellus vel ${c}purus cursus posuere et at purus.
+      |Ut id dapibus augue.
+      |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+      |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin()
+      )
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
+  fun `test delete with count and undo with oldundo`() {
+    configureByText(
+      """
+      |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      |${c}Morbi nec luctus tortor, id venenatis lacus.
+      |Nunc sit amet tellus vel purus cursus posuere et at purus.
+      |Ut id dapibus augue.
+      |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+      |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin()
+    )
+
+    try {
+      enterCommand("set oldundo")
+      enterCommand("d 3")
+      assertState(
+        """
+      |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      |${c}Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+      |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin()
+      )
+
+      typeText("u")
+      assertState(
+        """
+      |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      |${c}Morbi nec luctus tortor, id venenatis lacus.
+      |Nunc sit amet tellus vel purus cursus posuere et at purus.
+      |Ut id dapibus augue.
+      |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+      |Pellentesque orci dolor, tristique quis rutrum non, scelerisque id dui.
+      """.trimMargin()
+      )
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
 }

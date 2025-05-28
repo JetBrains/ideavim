@@ -222,11 +222,13 @@ class PutTestAfterCursorActionTest : VimTestCase() {
     configureByText("Hello ${c}world")
     typeText("yy")
     typeText("p")
-    assertState("""
+    assertState(
+      """
       Hello world
       ${c}Hello world
       
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("u")
     assertState("Hello ${c}world")
   }
@@ -260,32 +262,40 @@ class PutTestAfterCursorActionTest : VimTestCase() {
     configureByText("${c}Hello")
     typeText("yy")
     typeText("p")
-    assertState("""
+    assertState(
+      """
       Hello
       ${c}Hello
       
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("p")
-    assertState("""
+    assertState(
+      """
       Hello
       Hello
       ${c}Hello
       
-    """.trimIndent())
-    
+    """.trimIndent()
+    )
+
     // Undo second put
     typeText("u")
-    assertState("""
+    assertState(
+      """
       Hello
       ${c}Hello
       
-    """.trimIndent())
-    
+    """.trimIndent()
+    )
+
     // Undo first put
     typeText("u")
-    assertState("""
+    assertState(
+      """
       ${c}Hello
-    """.trimIndent())
+    """.trimIndent()
+    )
   }
 
   @Test
@@ -302,30 +312,198 @@ class PutTestAfterCursorActionTest : VimTestCase() {
 
   @Test
   fun `test undo put visual block after cursor`() {
-    configureByText("""
+    configureByText(
+      """
       ${c}abc
       def
       ghi
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("<C-V>jjl")  // Visual block select first 2 columns of all lines
     typeText("y")
     typeText("$")
-    assertState("""
+    assertState(
+      """
       ab${c}c
       def
       ghi
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("p")
-    assertState("""
+    assertState(
+      """
       abc${c}ab
       defde
       ghigh
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("u")
-    assertState("""
+    assertState(
+      """
       ab${c}c
       def
       ghi
-    """.trimIndent())
+    """.trimIndent()
+    )
+  }
+
+  @Test
+  fun `test undo after put after cursor with oldundo`() {
+    configureByText("Hello ${c}world")
+    try {
+      enterCommand("set oldundo")
+      typeText("yy")
+      typeText("p")
+      assertState(
+        """
+      Hello world
+      ${c}Hello world
+      
+    """.trimIndent()
+      )
+      typeText("u")
+      assertState("Hello ${c}world")
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
+  fun `test undo after put character after cursor with oldundo`() {
+    configureByText("abc${c}def")
+    try {
+      enterCommand("set oldundo")
+      typeText("yl")  // Yank 'd'
+      typeText("h")   // Move left
+      assertState("ab${c}cdef")
+      typeText("p")
+      assertState("abc${c}ddef")
+      typeText("u")
+      assertState("ab${c}cdef")
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
+  fun `test undo after put word after cursor with oldundo`() {
+    configureByText("The ${c}quick brown fox")
+    try {
+      enterCommand("set oldundo")
+      typeText("yiw")  // Yank "quick"
+      typeText("w")    // Move to "brown"
+      assertState("The quick ${c}brown fox")
+      typeText("p")
+      assertState("The quick bquic${c}krown fox")
+      typeText("u")
+      assertState("The quick ${c}brown fox")
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
+  fun `test multiple undo after sequential puts after cursor with oldundo`() {
+    configureByText("${c}Hello")
+    try {
+      enterCommand("set oldundo")
+      typeText("yy")
+      typeText("p")
+      assertState(
+        """
+      Hello
+      ${c}Hello
+      
+    """.trimIndent()
+      )
+      typeText("p")
+      assertState(
+        """
+      Hello
+      Hello
+      ${c}Hello
+      
+    """.trimIndent()
+      )
+
+      // Undo second put
+      typeText("u")
+      assertState(
+        """
+      Hello
+      ${c}Hello
+      
+    """.trimIndent()
+      )
+
+      // Undo first put
+      typeText("u")
+      assertState(
+        """
+      ${c}Hello
+    """.trimIndent()
+      )
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
+  fun `test undo put and move cursor with oldundo`() {
+    configureByText("${c}abc def")
+    try {
+      enterCommand("set oldundo")
+      typeText("yiw")  // Yank "abc"
+      typeText("w")    // Move to "def"
+      assertState("abc ${c}def")
+      typeText("gp")   // Put and move cursor after pasted text
+      assertState("abc dabc${c}ef")
+      typeText("u")
+      assertState("abc ${c}def")
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
+  fun `test undo put visual block after cursor with oldundo`() {
+    configureByText(
+      """
+      ${c}abc
+      def
+      ghi
+    """.trimIndent()
+    )
+    try {
+      enterCommand("set oldundo")
+      typeText("<C-V>jjl")  // Visual block select first 2 columns of all lines
+      typeText("y")
+      typeText("$")
+      assertState(
+        """
+      ab${c}c
+      def
+      ghi
+    """.trimIndent()
+      )
+      typeText("p")
+      assertState(
+        """
+      abc${c}ab
+      defde
+      ghigh
+    """.trimIndent()
+      )
+      typeText("u")
+      assertState(
+        """
+      ab${c}c
+      def
+      ghi
+    """.trimIndent()
+      )
+    } finally {
+      enterCommand("set nooldundo")
+    }
   }
 }

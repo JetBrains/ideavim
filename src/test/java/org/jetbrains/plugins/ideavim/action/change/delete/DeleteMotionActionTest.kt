@@ -268,47 +268,139 @@ class DeleteMotionActionTest : VimTestCase() {
   }
 
   @Test
+  fun `test undo after delete motion with word with oldundo`() {
+    configureByText("Hello ${c}world and more text")
+    try {
+      enterCommand("set oldundo")
+      typeText("dw")
+      assertState("Hello ${c}and more text")
+      typeText("u")
+      assertState("Hello ${c}world and more text")
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
   fun `test undo after delete line`() {
-    configureByText("""
+    configureByText(
+      """
       First line
       ${c}Second line
       Third line
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("dd")
-    assertState("""
+    assertState(
+      """
       First line
       ${c}Third line
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("u")
-    assertState("""
+    assertState(
+      """
       First line
       ${c}Second line
       Third line
-    """.trimIndent())
+    """.trimIndent()
+    )
+  }
+
+  @Test
+  fun `test undo after delete line with oldundo`() {
+    configureByText(
+      """
+      First line
+      ${c}Second line
+      Third line
+    """.trimIndent()
+    )
+    try {
+      enterCommand("set oldundo")
+      typeText("dd")
+      assertState(
+        """
+      First line
+      ${c}Third line
+    """.trimIndent()
+      )
+      typeText("u")
+      assertState(
+        """
+      First line
+      ${c}Second line
+      Third line
+    """.trimIndent()
+      )
+    } finally {
+      enterCommand("set nooldundo")
+    }
   }
 
   @Test
   fun `test undo after delete multiple lines`() {
-    configureByText("""
+    configureByText(
+      """
       First line
       ${c}Second line
       Third line
       Fourth line
       Fifth line
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("3dd")
-    assertState("""
+    assertState(
+      """
       First line
       ${c}Fifth line
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("u")
-    assertState("""
+    assertState(
+      """
       First line
       ${c}Second line
       Third line
       Fourth line
       Fifth line
-    """.trimIndent())
+    """.trimIndent()
+    )
+  }
+
+  @Test
+  fun `test undo after delete multiple lines with oldundo`() {
+    configureByText(
+      """
+      First line
+      ${c}Second line
+      Third line
+      Fourth line
+      Fifth line
+    """.trimIndent()
+    )
+    try {
+      enterCommand("set oldundo")
+      typeText("3dd")
+      assertState(
+        """
+      First line
+      ${c}Fifth line
+    """.trimIndent()
+      )
+      typeText("u")
+      assertState(
+        """
+      First line
+      ${c}Second line
+      Third line
+      Fourth line
+      Fifth line
+    """.trimIndent()
+      )
+    } finally {
+      enterCommand("set nooldundo")
+    }
   }
 
   @Test
@@ -318,18 +410,44 @@ class DeleteMotionActionTest : VimTestCase() {
     assertState("The ${c}jumps")
     typeText("u")
     assertState("The ${c}quick brown fox jumps")
-    
+
     // Test with $ motion
     typeText("d$")
     assertState("The$c ")
     typeText("u")
     assertState("The ${c}quick brown fox jumps")
-    
+
     // Test with 0 motion
     typeText("d0")
     assertState("${c}quick brown fox jumps")
     typeText("u")
     assertState("The ${c}quick brown fox jumps")
+  }
+
+  @Test
+  fun `test undo after delete with different motions with oldundo`() {
+    configureByText("The ${c}quick brown fox jumps")
+    try {
+      enterCommand("set oldundo")
+      typeText("d3w")
+      assertState("The ${c}jumps")
+      typeText("u")
+      assertState("The ${c}quick brown fox jumps")
+
+      // Test with $ motion
+      typeText("d$")
+      assertState("The$c ")
+      typeText("u")
+      assertState("The ${c}quick brown fox jumps")
+
+      // Test with 0 motion
+      typeText("d0")
+      assertState("${c}quick brown fox jumps")
+      typeText("u")
+      assertState("The ${c}quick brown fox jumps")
+    } finally {
+      enterCommand("set nooldundo")
+    }
   }
 
   @Test
@@ -342,31 +460,95 @@ class DeleteMotionActionTest : VimTestCase() {
   }
 
   @Test
+  fun `test undo delete with motion that includes caret movement with oldundo`() {
+    configureByText("a${c}bc(xxx)def")
+    try {
+      enterCommand("set oldundo")
+      typeText("di(")
+      assertState("abc(${c})def")
+      typeText("u")
+      assertState("a${c}bc(xxx)def")
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
   fun `test undo after delete to mark`() {
-    configureByText("""
+    configureByText(
+      """
       Line 1
       Li${c}ne 2
       Line 3
       Line 4
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("ma")  // Set mark a
     typeText("jj")
-    assertState("""
+    assertState(
+      """
       Line 1
       Line 2
       Line 3
       Li${c}ne 4
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("d'a")  // Delete to mark a
-    assertState("""
+    assertState(
+      """
       ${c}Line 1
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("u")
-    assertState("""
+    assertState(
+      """
       Line 1
       Line 2
       Line 3
       Li${c}ne 4
-    """.trimIndent())
+    """.trimIndent()
+    )
+  }
+
+  @Test
+  fun `test undo after delete to mark with oldundo`() {
+    configureByText(
+      """
+      Line 1
+      Li${c}ne 2
+      Line 3
+      Line 4
+    """.trimIndent()
+    )
+    try {
+      enterCommand("set oldundo")
+      typeText("ma")  // Set mark a
+      typeText("jj")
+      assertState(
+        """
+      Line 1
+      Line 2
+      Line 3
+      Li${c}ne 4
+    """.trimIndent()
+      )
+      typeText("d'a")  // Delete to mark a
+      assertState(
+        """
+      ${c}Line 1
+    """.trimIndent()
+      )
+      typeText("u")
+      assertState(
+        """
+      Line 1
+      Line 2
+      Line 3
+      Li${c}ne 4
+    """.trimIndent()
+      )
+    } finally {
+      enterCommand("set nooldundo")
+    }
   }
 }

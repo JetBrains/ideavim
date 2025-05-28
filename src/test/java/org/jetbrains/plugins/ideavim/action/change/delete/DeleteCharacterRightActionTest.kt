@@ -124,4 +124,20 @@ class DeleteCharacterRightActionTest : VimTestCase() {
     typeText("u")
     assertState("foo ${c}foo")
   }
+
+  @Test
+  fun `undo after deleting character with oldundo`() {
+    configureByText("foo ${c}foo")
+    try {
+      enterCommand("set oldundo")
+      typeText("xx")
+      assertState("foo ${c}o")
+      typeText("u")
+      assertState("foo ${c}oo")
+      typeText("u")
+      assertState("foo ${c}foo")
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
 }

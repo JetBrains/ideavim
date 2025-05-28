@@ -139,98 +139,263 @@ class ShiftLeftTest : VimTestCase() {
 
   @Test
   fun `test undo after shift left single line`() {
-    configureByText("""
+    configureByText(
+      """
       func main() {
           ${c}println("Hello")
       }
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("<<")
-    assertState("""
+    assertState(
+      """
       func main() {
       ${c}println("Hello")
       }
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("u")
-    assertState("""
+    assertState(
+      """
       func main() {
           ${c}println("Hello")
       }
-    """.trimIndent())
+    """.trimIndent()
+    )
   }
 
   @Test
   fun `test undo after shift left with motion`() {
-    configureByText("""
+    configureByText(
+      """
       func main() {
           ${c}line1()
           line2()
           line3()
       }
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("<2j")  // Shift left 3 lines
-    assertState("""
+    assertState(
+      """
       func main() {
       ${c}line1()
       line2()
       line3()
       }
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("u")
-    assertState("""
+    assertState(
+      """
       func main() {
           ${c}line1()
           line2()
           line3()
       }
-    """.trimIndent())
+    """.trimIndent()
+    )
   }
 
   @Test
   fun `test undo after shift left visual mode`() {
-    configureByText("""
+    configureByText(
+      """
       func main() {
           ${c}line1()
           line2()
           line3()
       }
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("Vj<")  // Visual select 2 lines and shift left
-    assertState("""
+    assertState(
+      """
       func main() {
       ${c}line1()
       line2()
           line3()
       }
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("u")
-    assertState("""
+    assertState(
+      """
       func main() {
       ${c}    line1()
           line2()
           line3()
       }
-    """.trimIndent())
+    """.trimIndent()
+    )
   }
 
   @Test
   fun `test undo shift left in insert mode`() {
-    configureByText("""
+    configureByText(
+      """
       func main() {
           ${c}println("Hello")
       }
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("i<C-D>")
-    assertState("""
+    assertState(
+      """
       func main() {
       ${c}println("Hello")
       }
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("<Esc>")
     typeText("u")
-    assertState("""
+    assertState(
+      """
       func main() {
           ${c}println("Hello")
       }
-    """.trimIndent())
+    """.trimIndent()
+    )
+  }
+
+  @Test
+  fun `test undo after shift left single line with oldundo`() {
+    configureByText(
+      """
+      func main() {
+          ${c}println("Hello")
+      }
+    """.trimIndent()
+    )
+    try {
+      enterCommand("set oldundo")
+      typeText("<<")
+      assertState(
+        """
+      func main() {
+      ${c}println("Hello")
+      }
+    """.trimIndent()
+      )
+      typeText("u")
+      assertState(
+        """
+      func main() {
+          ${c}println("Hello")
+      }
+    """.trimIndent()
+      )
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
+  fun `test undo after shift left with motion with oldundo`() {
+    configureByText(
+      """
+      func main() {
+          ${c}line1()
+          line2()
+          line3()
+      }
+    """.trimIndent()
+    )
+    try {
+      enterCommand("set oldundo")
+      typeText("<2j")  // Shift left 3 lines
+      assertState(
+        """
+      func main() {
+      ${c}line1()
+      line2()
+      line3()
+      }
+    """.trimIndent()
+      )
+      typeText("u")
+      assertState(
+        """
+      func main() {
+          ${c}line1()
+          line2()
+          line3()
+      }
+    """.trimIndent()
+      )
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
+  fun `test undo after shift left visual mode with oldundo`() {
+    configureByText(
+      """
+      func main() {
+          ${c}line1()
+          line2()
+          line3()
+      }
+    """.trimIndent()
+    )
+    try {
+      enterCommand("set oldundo")
+      typeText("Vj<")  // Visual select 2 lines and shift left
+      assertState(
+        """
+      func main() {
+      ${c}line1()
+      line2()
+          line3()
+      }
+    """.trimIndent()
+      )
+      typeText("u")
+      assertState(
+        """
+      func main() {
+      ${c}    line1()
+          line2()
+          line3()
+      }
+    """.trimIndent()
+      )
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
+  fun `test undo shift left in insert mode with oldundo`() {
+    configureByText(
+      """
+      func main() {
+          ${c}println("Hello")
+      }
+    """.trimIndent()
+    )
+    try {
+      enterCommand("set oldundo")
+      typeText("i<C-D>")
+      assertState(
+        """
+      func main() {
+      ${c}println("Hello")
+      }
+    """.trimIndent()
+      )
+      typeText("<Esc>")
+      typeText("u")
+      assertState(
+        """
+      func main() {
+          ${c}println("Hello")
+      }
+    """.trimIndent()
+      )
+    } finally {
+      enterCommand("set nooldundo")
+    }
   }
 }

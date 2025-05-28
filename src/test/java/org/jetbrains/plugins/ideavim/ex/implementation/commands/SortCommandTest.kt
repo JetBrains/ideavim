@@ -973,4 +973,158 @@ class SortCommandTest : VimTestCase() {
       """.trimMargin()
     )
   }
+
+  @Test
+  fun `test sort and undo with oldundo`() {
+    configureByText(
+      """
+      |zebra
+      |${c}apple
+      |banana
+      |cherry
+      """.trimMargin()
+    )
+
+    try {
+      enterCommand("set oldundo")
+      typeText(commandToKeys("sort"))
+      assertState(
+        """
+      |${c}apple
+      |banana
+      |cherry
+      |zebra
+      """.trimMargin()
+      )
+
+      typeText("u")
+      assertState(
+        """
+      |zebra
+      |${c}apple
+      |banana
+      |cherry
+      """.trimMargin()
+      )
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
+  fun `test sort with range and undo with oldundo`() {
+    configureByText(
+      """
+      |header
+      |zebra
+      |${c}apple
+      |banana
+      |cherry
+      |footer
+      """.trimMargin()
+    )
+
+    try {
+      enterCommand("set oldundo")
+      typeText(commandToKeys("2,5sort"))
+      assertState(
+        """
+      |header
+      |${c}apple
+      |banana
+      |cherry
+      |zebra
+      |footer
+      """.trimMargin()
+      )
+
+      typeText("u")
+      assertState(
+        """
+      |header
+      |zebra
+      |${c}apple
+      |banana
+      |cherry
+      |footer
+      """.trimMargin()
+      )
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
+  fun `test sort with options and undo with oldundo`() {
+    configureByText(
+      """
+      |${c}10
+      |2
+      |100
+      |20
+      """.trimMargin()
+    )
+
+    try {
+      enterCommand("set oldundo")
+      typeText(commandToKeys("sort n"))
+      assertState(
+        """
+      |${c}2
+      |10
+      |20
+      |100
+      """.trimMargin()
+      )
+
+      typeText("u")
+      assertState(
+        """
+      |${c}10
+      |2
+      |100
+      |20
+      """.trimMargin()
+      )
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
+  fun `test reverse sort and undo with oldundo`() {
+    configureByText(
+      """
+      |${c}apple
+      |banana
+      |cherry
+      |date
+      """.trimMargin()
+    )
+
+    try {
+      enterCommand("set oldundo")
+      typeText(commandToKeys("sort!"))
+      assertState(
+        """
+      |${c}date
+      |cherry
+      |banana
+      |apple
+      """.trimMargin()
+      )
+
+      typeText("u")
+      assertState(
+        """
+      |${c}apple
+      |banana
+      |cherry
+      |date
+      """.trimMargin()
+      )
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
 }

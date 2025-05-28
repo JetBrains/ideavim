@@ -141,12 +141,40 @@ class DeleteCharacterLeftActionTest : VimTestCase() {
   }
 
   @Test
+  fun `test undo after deleting character left with oldundo`() {
+    configureByText("foo f${c}oo")
+    try {
+      enterCommand("set oldundo")
+      typeText("X")
+      assertState("foo ${c}oo")
+      typeText("u")
+      assertState("foo f${c}oo")
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
   fun `test undo after deleting multiple characters left`() {
     configureByText("abcdef${c}ghijk")
     typeText("3X")
     assertState("abc${c}ghijk")
     typeText("u")
     assertState("abcdef${c}ghijk")
+  }
+
+  @Test
+  fun `test undo after deleting multiple characters left with oldundo`() {
+    configureByText("abcdef${c}ghijk")
+    try {
+      enterCommand("set oldundo")
+      typeText("3X")
+      assertState("abc${c}ghijk")
+      typeText("u")
+      assertState("abcdef${c}ghijk")
+    } finally {
+      enterCommand("set nooldundo")
+    }
   }
 
   @Test
@@ -160,5 +188,23 @@ class DeleteCharacterLeftActionTest : VimTestCase() {
     assertState("foo bar${c}baz")
     typeText("u")
     assertState("foo bar ${c}baz")
+  }
+
+  @Test
+  fun `test multiple undo after sequential deletes with oldundo`() {
+    configureByText("foo bar ${c}baz")
+    try {
+      enterCommand("set oldundo")
+      typeText("XXX")
+      assertState("foo b${c}baz")
+      typeText("u")
+      assertState("foo ba${c}baz")
+      typeText("u")
+      assertState("foo bar${c}baz")
+      typeText("u")
+      assertState("foo bar ${c}baz")
+    } finally {
+      enterCommand("set nooldundo")
+    }
   }
 }

@@ -130,4 +130,112 @@ class PutCommandTest : VimTestCase() {
       """.trimIndent()
     )
   }
+
+  @Test
+  fun `test put and undo with oldundo`() {
+    configureByText(
+      """
+      Line 1
+      Line ${c}2
+      Line 3
+      """.trimIndent()
+    )
+    typeText(injector.parser.parseKeys("yy"))
+    try {
+      enterCommand("set oldundo")
+      enterCommand("put")
+      assertState(
+        """
+      Line 1
+      Line 2
+      ${c}Line 2
+      Line 3
+      """.trimIndent()
+      )
+
+      typeText("u")
+      assertState(
+        """
+      Line 1
+      Line ${c}2
+      Line 3
+      """.trimIndent()
+      )
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
+  fun `test put from register and undo with oldundo`() {
+    configureByText(
+      """
+      First line
+      Second ${c}line
+      Third line
+      """.trimIndent()
+    )
+    typeText(injector.parser.parseKeys("\"ayy"))
+    try {
+      enterCommand("set oldundo")
+      enterCommand("put a")
+      assertState(
+        """
+      First line
+      Second line
+      ${c}Second line
+      Third line
+      """.trimIndent()
+      )
+
+      typeText("u")
+      assertState(
+        """
+      First line
+      Second ${c}line
+      Third line
+      """.trimIndent()
+      )
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
+  fun `test put with line number and undo with oldundo`() {
+    configureByText(
+      """
+      Line 1
+      Line ${c}2
+      Line 3
+      Line 4
+      """.trimIndent()
+    )
+    typeText(injector.parser.parseKeys("yy"))
+    try {
+      enterCommand("set oldundo")
+      enterCommand("1put")
+      assertState(
+        """
+      Line 1
+      ${c}Line 2
+      Line 2
+      Line 3
+      Line 4
+      """.trimIndent()
+      )
+
+      typeText("u")
+      assertState(
+        """
+      Line 1
+      Line ${c}2
+      Line 3
+      Line 4
+      """.trimIndent()
+      )
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
 }

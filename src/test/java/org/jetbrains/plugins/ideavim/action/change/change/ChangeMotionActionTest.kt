@@ -218,26 +218,82 @@ class ChangeMotionActionTest : VimTestCase() {
   }
 
   @Test
+  fun `test undo after change word with oldundo`() {
+    configureByText("Hello ${c}world and more")
+    try {
+      enterCommand("set oldundo")
+      typeText("cw")
+      typeText("Vim")
+      typeText("<Esc>")
+      assertState("Hello Vi${c}m and more")
+      typeText("u")
+      assertState("Hello Vim${c} and more")
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
   fun `test undo after change line`() {
-    configureByText("""
+    configureByText(
+      """
       First line
       ${c}Second line with text
       Third line
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("cc")
     typeText("Changed line")
     typeText("<Esc>")
-    assertState("""
+    assertState(
+      """
       First line
       Changed lin${c}e
       Third line
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("u")
-    assertState("""
+    assertState(
+      """
       First line
       ${c}Second line with text
       Third line
-    """.trimIndent())
+    """.trimIndent()
+    )
+  }
+
+  @Test
+  fun `test undo after change line with oldundo`() {
+    configureByText(
+      """
+      First line
+      ${c}Second line with text
+      Third line
+    """.trimIndent()
+    )
+    try {
+      enterCommand("set oldundo")
+      typeText("cc")
+      typeText("Changed line")
+      typeText("<Esc>")
+      assertState(
+        """
+      First line
+      Changed lin${c}e
+      Third line
+    """.trimIndent()
+      )
+      typeText("u")
+      assertState(
+        """
+      First line
+      Changed line${c}
+      Third line
+    """.trimIndent()
+      )
+    } finally {
+      enterCommand("set nooldundo")
+    }
   }
 
   @Test
@@ -252,6 +308,22 @@ class ChangeMotionActionTest : VimTestCase() {
   }
 
   @Test
+  fun `test undo after change to end of line with oldundo`() {
+    configureByText("Start ${c}middle end")
+    try {
+      enterCommand("set oldundo")
+      typeText("C")
+      typeText("new ending")
+      typeText("<Esc>")
+      assertState("Start new endin${c}g")
+      typeText("u")
+      assertState("Start new ending${c}")
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
   fun `test undo after change with motion`() {
     configureByText("The ${c}quick brown fox")
     typeText("c3w")
@@ -260,6 +332,22 @@ class ChangeMotionActionTest : VimTestCase() {
     assertState("The slo${c}w")
     typeText("u")
     assertState("The ${c}quick brown fox")
+  }
+
+  @Test
+  fun `test undo after change with motion with oldundo`() {
+    configureByText("The ${c}quick brown fox")
+    try {
+      enterCommand("set oldundo")
+      typeText("c3w")
+      typeText("slow")
+      typeText("<Esc>")
+      assertState("The slo${c}w")
+      typeText("u")
+      assertState("The slow${c}")
+    } finally {
+      enterCommand("set nooldundo")
+    }
   }
 
   @Test
@@ -274,26 +362,70 @@ class ChangeMotionActionTest : VimTestCase() {
   }
 
   @Test
+  fun `test undo change with motion and caret movement with oldundo`() {
+    configureByText("a${c}bc(xxx)def")
+    try {
+      enterCommand("set oldundo")
+      typeText("ci(")
+      typeText("yyy")
+      typeText("<Esc>")
+      assertState("abc(yy${c}y)def")
+      typeText("u")
+      assertState("abc(yyy${c})def")
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
   fun `test multiple undo after sequential changes`() {
     configureByText("${c}one two three")
     typeText("cw")
     typeText("ONE")
     typeText("<Esc>")
     assertState("ON${c}E two three")
-    
+
     typeText("w")
     typeText("cw")
     typeText("TWO")
     typeText("<Esc>")
     assertState("ONE TW${c}O three")
-    
+
     // Undo second change
     typeText("u")
     assertState("ONE ${c}two three")
-    
+
     // Undo first change
     typeText("u")
     assertState("${c}one two three")
+  }
+
+  @Test
+  fun `test multiple undo after sequential changes with oldundo`() {
+    configureByText("${c}one two three")
+    try {
+      enterCommand("set oldundo")
+      typeText("cw")
+      typeText("ONE")
+      typeText("<Esc>")
+      assertState("ON${c}E two three")
+
+      typeText("w")
+      typeText("cw")
+      typeText("TWO")
+      typeText("<Esc>")
+      assertState("ONE TW${c}O three")
+
+      // Undo second change
+      typeText("u")
+      assertState("ONE TWO${c} three")
+
+      // Undo first change
+      typeText("u")
+      assertState("ONE ${c} three")
+    } finally {
+      enterCommand("set nooldundo")
+    }
   }
 
   @Test
@@ -308,6 +440,22 @@ class ChangeMotionActionTest : VimTestCase() {
   }
 
   @Test
+  fun `test undo change character with oldundo`() {
+    configureByText("a${c}bcdef")
+    try {
+      enterCommand("set oldundo")
+      typeText("s")
+      typeText("X")
+      typeText("<Esc>")
+      assertState("a${c}Xcdef")
+      typeText("u")
+      assertState("aX${c}cdef")
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
   fun `test undo change multiple characters`() {
     configureByText("abc${c}defghijk")
     typeText("3s")
@@ -316,5 +464,21 @@ class ChangeMotionActionTest : VimTestCase() {
     assertState("abcXX${c}Xghijk")
     typeText("u")
     assertState("abc${c}defghijk")
+  }
+
+  @Test
+  fun `test undo change multiple characters with oldundo`() {
+    configureByText("abc${c}defghijk")
+    try {
+      enterCommand("set oldundo")
+      typeText("3s")
+      typeText("XXX")
+      typeText("<Esc>")
+      assertState("abcXX${c}Xghijk")
+      typeText("u")
+      assertState("abcXXX${c}ghijk")
+    } finally {
+      enterCommand("set nooldundo")
+    }
   }
 }

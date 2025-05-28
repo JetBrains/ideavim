@@ -345,4 +345,113 @@ class JoinLinesCommandTest : VimTestCase() {
       """.trimIndent()
     )
   }
+
+  @Test
+  fun `test join lines and undo with oldundo`() {
+    configureByText(
+      """
+      Line 1
+      Line ${c}2
+      Line 3
+      Line 4
+      """.trimIndent()
+    )
+
+    try {
+      enterCommand("set oldundo")
+      enterCommand("j")
+      assertState(
+        """
+      Line 1
+      ${c}Line 2 Line 3
+      Line 4
+      """.trimIndent()
+      )
+
+      typeText("u")
+      assertState(
+        """
+      Line 1
+      Line ${c}2
+      Line 3
+      Line 4
+      """.trimIndent()
+      )
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
+  fun `test join range and undo with oldundo`() {
+    configureByText(
+      """
+      Line 1
+      Line ${c}2
+      Line 3
+      Line 4
+      Line 5
+      """.trimIndent()
+    )
+
+    try {
+      enterCommand("set oldundo")
+      enterCommand("2,4j")
+      assertState(
+        """
+      Line 1
+      ${c}Line 2 Line 3 Line 4
+      Line 5
+      """.trimIndent()
+      )
+
+      typeText("u")
+      assertState(
+        """
+      Line 1
+      Line ${c}2
+      Line 3
+      Line 4
+      Line 5
+      """.trimIndent()
+      )
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
+  fun `test join with count and undo with oldundo`() {
+    configureByText(
+      """
+      ${c}Lorem ipsum dolor sit amet,
+      consectetur adipiscing elit
+      Sed in orci mauris.
+      Cras id tellus in ex imperdiet egestas.
+      """.trimIndent()
+    )
+
+    try {
+      enterCommand("set oldundo")
+      enterCommand("j 3")
+      assertState(
+        """
+      ${c}Lorem ipsum dolor sit amet, consectetur adipiscing elit Sed in orci mauris.
+      Cras id tellus in ex imperdiet egestas.
+      """.trimIndent()
+      )
+
+      typeText("u")
+      assertState(
+        """
+      ${c}Lorem ipsum dolor sit amet,
+      consectetur adipiscing elit
+      Sed in orci mauris.
+      Cras id tellus in ex imperdiet egestas.
+      """.trimIndent()
+      )
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
 }

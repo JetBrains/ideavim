@@ -62,10 +62,12 @@ class PutTextBeforeCursorActionTest : VimTestCase() {
     configureByText("Hello ${c}world")
     typeText("yy")
     typeText("P")
-    assertState("""
+    assertState(
+      """
       ${c}Hello world
       Hello world
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("u")
     assertState("Hello ${c}world")
   }
@@ -99,57 +101,212 @@ class PutTextBeforeCursorActionTest : VimTestCase() {
     configureByText("${c}Hello")
     typeText("yy")
     typeText("P")
-    assertState("""
+    assertState(
+      """
       ${c}Hello
       Hello
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("P")
-    assertState("""
+    assertState(
+      """
       ${c}Hello
       Hello
       Hello
-    """.trimIndent())
-    
+    """.trimIndent()
+    )
+
     // Undo second put
     typeText("u")
-    assertState("""
+    assertState(
+      """
       ${c}Hello
       Hello
-    """.trimIndent())
-    
+    """.trimIndent()
+    )
+
     // Undo first put
     typeText("u")
-    assertState("""
+    assertState(
+      """
       ${c}Hello
-    """.trimIndent())
+    """.trimIndent()
+    )
   }
 
   @Test
   fun `test undo put visual block`() {
-    configureByText("""
+    configureByText(
+      """
       ${c}abc
       def
       ghi
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("<C-V>jjl")  // Visual block select first 2 columns of all lines
     typeText("y")
     typeText("$")
-    assertState("""
+    assertState(
+      """
       ab${c}c
       def
       ghi
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("P")
-    assertState("""
+    assertState(
+      """
       ab${c}abc
       dedef
       ghghi
-    """.trimIndent())
+    """.trimIndent()
+    )
     typeText("u")
-    assertState("""
+    assertState(
+      """
       ab${c}c
       def
       ghi
-    """.trimIndent())
+    """.trimIndent()
+    )
+  }
+
+  @Test
+  fun `test undo after put before cursor with oldundo`() {
+    configureByText("Hello ${c}world")
+    try {
+      enterCommand("set oldundo")
+      typeText("yy")
+      typeText("P")
+      assertState(
+        """
+      ${c}Hello world
+      Hello world
+    """.trimIndent()
+      )
+      typeText("u")
+      assertState("Hello ${c}world")
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
+  fun `test undo after put character before cursor with oldundo`() {
+    configureByText("abc${c}def")
+    try {
+      enterCommand("set oldundo")
+      typeText("yl")  // Yank 'd'
+      typeText("h")   // Move left
+      assertState("ab${c}cdef")
+      typeText("P")
+      assertState("ab${c}dcdef")
+      typeText("u")
+      assertState("ab${c}cdef")
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
+  fun `test undo after put word before cursor with oldundo`() {
+    configureByText("The ${c}quick brown fox")
+    try {
+      enterCommand("set oldundo")
+      typeText("yiw")  // Yank "quick"
+      typeText("w")    // Move to "brown"
+      assertState("The quick ${c}brown fox")
+      typeText("P")
+      assertState("The quick quic${c}kbrown fox")
+      typeText("u")
+      assertState("The quick ${c}brown fox")
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
+  fun `test multiple undo after sequential puts with oldundo`() {
+    configureByText("${c}Hello")
+    try {
+      enterCommand("set oldundo")
+      typeText("yy")
+      typeText("P")
+      assertState(
+        """
+      ${c}Hello
+      Hello
+    """.trimIndent()
+      )
+      typeText("P")
+      assertState(
+        """
+      ${c}Hello
+      Hello
+      Hello
+    """.trimIndent()
+      )
+
+      // Undo second put
+      typeText("u")
+      assertState(
+        """
+      ${c}Hello
+      Hello
+    """.trimIndent()
+      )
+
+      // Undo first put
+      typeText("u")
+      assertState(
+        """
+      ${c}Hello
+    """.trimIndent()
+      )
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
+  fun `test undo put visual block with oldundo`() {
+    configureByText(
+      """
+      ${c}abc
+      def
+      ghi
+    """.trimIndent()
+    )
+    try {
+      enterCommand("set oldundo")
+      typeText("<C-V>jjl")  // Visual block select first 2 columns of all lines
+      typeText("y")
+      typeText("$")
+      assertState(
+        """
+      ab${c}c
+      def
+      ghi
+    """.trimIndent()
+      )
+      typeText("P")
+      assertState(
+        """
+      ab${c}abc
+      dedef
+      ghghi
+    """.trimIndent()
+      )
+      typeText("u")
+      assertState(
+        """
+      ab${c}c
+      def
+      ghi
+    """.trimIndent()
+      )
+    } finally {
+      enterCommand("set nooldundo")
+    }
   }
 }

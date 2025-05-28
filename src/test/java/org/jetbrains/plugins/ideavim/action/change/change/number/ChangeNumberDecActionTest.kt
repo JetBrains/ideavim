@@ -58,12 +58,63 @@ class ChangeNumberDecActionTest : VimTestCase() {
   }
 
   @Test
+  fun `test undo after decrement number with oldundo`() {
+    configureByText("The answer is ${c}42")
+    try {
+      enterCommand("set oldundo")
+      typeText("<C-X>")
+      assertState("The answer is 4${c}1")
+      typeText("u")
+      assertState("The answer is ${c}42")
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
+  fun `test undo after decrement number with caret move`() {
+    configureByText("The answer ${c}is 42")
+    typeText("<C-X>")
+    assertState("The answer is 4${c}1")
+    typeText("u")
+    assertState("The answer ${c}is 42")
+  }
+
+  @Test
+fun `test undo after decrement number with caret move with oldundo`() {
+    configureByText("The answer ${c}is 42")
+    try {
+      enterCommand("set oldundo")
+      typeText("<C-X>")
+      assertState("The answer is 4${c}1")
+      typeText("u")
+      assertState("The answer ${c}is 42")
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
   fun `test undo after decrement with count`() {
     configureByText("Count: ${c}20")
     typeText("5<C-X>")
     assertState("Count: 1${c}5")
     typeText("u")
     assertState("Count: ${c}20")
+  }
+
+  @Test
+  fun `test undo after decrement with count with oldundo`() {
+    configureByText("Count: ${c}20")
+    try {
+      enterCommand("set oldundo")
+      typeText("5<C-X>")
+      assertState("Count: 1${c}5")
+      typeText("u")
+      assertState("Count: ${c}20")
+    } finally {
+      enterCommand("set nooldundo")
+    }
   }
 
   @Test
@@ -76,6 +127,20 @@ class ChangeNumberDecActionTest : VimTestCase() {
   }
 
   @Test
+  fun `test undo after decrement negative number with oldundo`() {
+    configureByText("Temperature: ${c}-5 degrees")
+    try {
+      enterCommand("set oldundo")
+      typeText("<C-X>")
+      assertState("Temperature: -${c}6 degrees")
+      typeText("u")
+      assertState("Temperature: ${c}-5 degrees")
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
   fun `test multiple undo after sequential decrements`() {
     configureByText("Value: ${c}100")
     typeText("<C-X>")
@@ -84,18 +149,46 @@ class ChangeNumberDecActionTest : VimTestCase() {
     assertState("Value: 9${c}8")
     typeText("<C-X>")
     assertState("Value: 9${c}7")
-    
+
     // Undo third decrement
     typeText("u")
     assertState("Value: 9${c}8")
-    
+
     // Undo second decrement
     typeText("u")
     assertState("Value: 9${c}9")
-    
+
     // Undo first decrement
     typeText("u")
     assertState("Value: ${c}100")
+  }
+
+  @Test
+  fun `test multiple undo after sequential decrements with oldundo`() {
+    configureByText("Value: ${c}100")
+    try {
+      enterCommand("set oldundo")
+      typeText("<C-X>")
+      assertState("Value: 9${c}9")
+      typeText("<C-X>")
+      assertState("Value: 9${c}8")
+      typeText("<C-X>")
+      assertState("Value: 9${c}7")
+
+      // Undo third decrement
+      typeText("u")
+      assertState("Value: 9${c}8")
+
+      // Undo second decrement
+      typeText("u")
+      assertState("Value: 9${c}9")
+
+      // Undo first decrement
+      typeText("u")
+      assertState("Value: ${c}100")
+    } finally {
+      enterCommand("set nooldundo")
+    }
   }
 
   @Test
@@ -120,6 +213,32 @@ class ChangeNumberDecActionTest : VimTestCase() {
   }
 
   @Test
+  fun `test undo decrement with visual selection with oldundo`() {
+    configureByText("""
+      ${c}10
+      20
+      30
+    """.trimIndent())
+    try {
+      enterCommand("set oldundo")
+      typeText("Vj<C-X>")  // Visual select first two lines and decrement
+      assertState("""
+        ${c}9
+        19
+        30
+      """.trimIndent())
+      typeText("u")
+      assertState("""
+        ${c}10
+        20
+        30
+      """.trimIndent())
+    } finally {
+      enterCommand("set nooldundo")
+    }
+  }
+
+  @Test
   fun `test undo increment and decrement combination`() {
     configureByText("Number: ${c}50")
     typeText("<C-A>")
@@ -128,17 +247,45 @@ class ChangeNumberDecActionTest : VimTestCase() {
     assertState("Number: 5${c}0")
     typeText("<C-X>")
     assertState("Number: 4${c}9")
-    
+
     // Undo second decrement
     typeText("u")
     assertState("Number: 5${c}0")
-    
+
     // Undo first decrement
     typeText("u")
     assertState("Number: 5${c}1")
-    
+
     // Undo increment
     typeText("u")
     assertState("Number: ${c}50")
+  }
+
+  @Test
+  fun `test undo increment and decrement combination with oldundo`() {
+    configureByText("Number: ${c}50")
+    try {
+      enterCommand("set oldundo")
+      typeText("<C-A>")
+      assertState("Number: 5${c}1")
+      typeText("<C-X>")
+      assertState("Number: 5${c}0")
+      typeText("<C-X>")
+      assertState("Number: 4${c}9")
+
+      // Undo second decrement
+      typeText("u")
+      assertState("Number: 5${c}0")
+
+      // Undo first decrement
+      typeText("u")
+      assertState("Number: 5${c}1")
+
+      // Undo increment
+      typeText("u")
+      assertState("Number: ${c}50")
+    } finally {
+      enterCommand("set nooldundo")
+    }
   }
 }
