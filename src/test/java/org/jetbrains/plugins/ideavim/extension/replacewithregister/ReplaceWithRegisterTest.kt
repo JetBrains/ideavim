@@ -336,7 +336,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
     )
   }
 
-  @VimBehaviorDiffers(description = "Where is the new line comes from?...")
   @Test
   fun `test line replace with block`() {
     val text = """
