@@ -130,4 +130,35 @@ class DeleteCharacterLeftActionTest : VimTestCase() {
     assertVisualPosition(0, 55)
     assertVisibleLineBounds(0, 15, 94)
   }
+
+  @Test
+  fun `test undo after deleting character left`() {
+    configureByText("foo f${c}oo")
+    typeText("X")
+    assertState("foo ${c}oo")
+    typeText("u")
+    assertState("foo f${c}oo")
+  }
+
+  @Test
+  fun `test undo after deleting multiple characters left`() {
+    configureByText("abcdef${c}ghijk")
+    typeText("3X")
+    assertState("abc${c}ghijk")
+    typeText("u")
+    assertState("abcdef${c}ghijk")
+  }
+
+  @Test
+  fun `test multiple undo after sequential deletes`() {
+    configureByText("foo bar ${c}baz")
+    typeText("XXX")
+    assertState("foo b${c}baz")
+    typeText("u")
+    assertState("foo ba${c}baz")
+    typeText("u")
+    assertState("foo bar${c}baz")
+    typeText("u")
+    assertState("foo bar ${c}baz")
+  }
 }

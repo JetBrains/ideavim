@@ -208,4 +208,116 @@ class ChangeMotionActionTest : VimTestCase() {
       """.trimIndent()
     )
   }
+
+  @Test
+  fun `test undo after change word`() {
+    configureByText("Hello ${c}world and more")
+    typeText("cw")
+    typeText("Vim")
+    typeText("<Esc>")
+    assertState("Hello Vi${c}m and more")
+    typeText("u")
+    assertState("Hello ${c}world and more")
+  }
+
+  @Test
+  fun `test undo after change line`() {
+    configureByText("""
+      First line
+      ${c}Second line with text
+      Third line
+    """.trimIndent())
+    typeText("cc")
+    typeText("Changed line")
+    typeText("<Esc>")
+    assertState("""
+      First line
+      Changed lin${c}e
+      Third line
+    """.trimIndent())
+    typeText("u")
+    assertState("""
+      First line
+      ${c}Second line with text
+      Third line
+    """.trimIndent())
+  }
+
+  @Test
+  fun `test undo after change to end of line`() {
+    configureByText("Start ${c}middle end")
+    typeText("C")
+    typeText("new ending")
+    typeText("<Esc>")
+    assertState("Start new endin${c}g")
+    typeText("u")
+    assertState("Start ${c}middle end")
+  }
+
+  @Test
+  fun `test undo after change with motion`() {
+    configureByText("The ${c}quick brown fox")
+    typeText("c3w")
+    typeText("slow")
+    typeText("<Esc>")
+    assertState("The slo${c}w")
+    typeText("u")
+    assertState("The ${c}quick brown fox")
+  }
+
+  @Test
+  fun `test undo change with motion and caret movement`() {
+    configureByText("a${c}bc(xxx)def")
+    typeText("ci(")
+    typeText("yyy")
+    typeText("<Esc>")
+    assertState("abc(yy${c}y)def")
+    typeText("u")
+    assertState("a${c}bc(xxx)def")
+  }
+
+  @Test
+  fun `test multiple undo after sequential changes`() {
+    configureByText("${c}one two three")
+    typeText("cw")
+    typeText("ONE")
+    typeText("<Esc>")
+    assertState("ON${c}E two three")
+    
+    typeText("w")
+    typeText("cw")
+    typeText("TWO")
+    typeText("<Esc>")
+    assertState("ONE TW${c}O three")
+    
+    // Undo second change
+    typeText("u")
+    assertState("ONE ${c}two three")
+    
+    // Undo first change
+    typeText("u")
+    assertState("${c}one two three")
+  }
+
+  @Test
+  fun `test undo change character`() {
+    configureByText("a${c}bcdef")
+    typeText("s")
+    typeText("X")
+    typeText("<Esc>")
+    assertState("a${c}Xcdef")
+    typeText("u")
+    assertState("a${c}bcdef")
+  }
+
+  @Test
+  fun `test undo change multiple characters`() {
+    configureByText("abc${c}defghijk")
+    typeText("3s")
+    typeText("XXX")
+    typeText("<Esc>")
+    assertState("abcXX${c}Xghijk")
+    typeText("u")
+    assertState("abc${c}defghijk")
+  }
 }

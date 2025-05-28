@@ -56,4 +56,100 @@ class PutTextBeforeCursorActionTest : VimTestCase() {
     """.trimIndent()
     assertState(after)
   }
+
+  @Test
+  fun `test undo after put before cursor`() {
+    configureByText("Hello ${c}world")
+    typeText("yy")
+    typeText("P")
+    assertState("""
+      ${c}Hello world
+      Hello world
+    """.trimIndent())
+    typeText("u")
+    assertState("Hello ${c}world")
+  }
+
+  @Test
+  fun `test undo after put character before cursor`() {
+    configureByText("abc${c}def")
+    typeText("yl")  // Yank 'd'
+    typeText("h")   // Move left
+    assertState("ab${c}cdef")
+    typeText("P")
+    assertState("ab${c}dcdef")
+    typeText("u")
+    assertState("ab${c}cdef")
+  }
+
+  @Test
+  fun `test undo after put word before cursor`() {
+    configureByText("The ${c}quick brown fox")
+    typeText("yiw")  // Yank "quick"
+    typeText("w")    // Move to "brown"
+    assertState("The quick ${c}brown fox")
+    typeText("P")
+    assertState("The quick quic${c}kbrown fox")
+    typeText("u")
+    assertState("The quick ${c}brown fox")
+  }
+
+  @Test
+  fun `test multiple undo after sequential puts`() {
+    configureByText("${c}Hello")
+    typeText("yy")
+    typeText("P")
+    assertState("""
+      ${c}Hello
+      Hello
+    """.trimIndent())
+    typeText("P")
+    assertState("""
+      ${c}Hello
+      Hello
+      Hello
+    """.trimIndent())
+    
+    // Undo second put
+    typeText("u")
+    assertState("""
+      ${c}Hello
+      Hello
+    """.trimIndent())
+    
+    // Undo first put
+    typeText("u")
+    assertState("""
+      ${c}Hello
+    """.trimIndent())
+  }
+
+  @Test
+  fun `test undo put visual block`() {
+    configureByText("""
+      ${c}abc
+      def
+      ghi
+    """.trimIndent())
+    typeText("<C-V>jjl")  // Visual block select first 2 columns of all lines
+    typeText("y")
+    typeText("$")
+    assertState("""
+      ab${c}c
+      def
+      ghi
+    """.trimIndent())
+    typeText("P")
+    assertState("""
+      ab${c}abc
+      dedef
+      ghghi
+    """.trimIndent())
+    typeText("u")
+    assertState("""
+      ab${c}c
+      def
+      ghi
+    """.trimIndent())
+  }
 }

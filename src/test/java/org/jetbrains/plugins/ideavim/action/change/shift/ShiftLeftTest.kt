@@ -136,4 +136,101 @@ class ShiftLeftTest : VimTestCase() {
       """.trimIndent(),
     )
   }
+
+  @Test
+  fun `test undo after shift left single line`() {
+    configureByText("""
+      func main() {
+          ${c}println("Hello")
+      }
+    """.trimIndent())
+    typeText("<<")
+    assertState("""
+      func main() {
+      ${c}println("Hello")
+      }
+    """.trimIndent())
+    typeText("u")
+    assertState("""
+      func main() {
+          ${c}println("Hello")
+      }
+    """.trimIndent())
+  }
+
+  @Test
+  fun `test undo after shift left with motion`() {
+    configureByText("""
+      func main() {
+          ${c}line1()
+          line2()
+          line3()
+      }
+    """.trimIndent())
+    typeText("<2j")  // Shift left 3 lines
+    assertState("""
+      func main() {
+      ${c}line1()
+      line2()
+      line3()
+      }
+    """.trimIndent())
+    typeText("u")
+    assertState("""
+      func main() {
+          ${c}line1()
+          line2()
+          line3()
+      }
+    """.trimIndent())
+  }
+
+  @Test
+  fun `test undo after shift left visual mode`() {
+    configureByText("""
+      func main() {
+          ${c}line1()
+          line2()
+          line3()
+      }
+    """.trimIndent())
+    typeText("Vj<")  // Visual select 2 lines and shift left
+    assertState("""
+      func main() {
+      ${c}line1()
+      line2()
+          line3()
+      }
+    """.trimIndent())
+    typeText("u")
+    assertState("""
+      func main() {
+      ${c}    line1()
+          line2()
+          line3()
+      }
+    """.trimIndent())
+  }
+
+  @Test
+  fun `test undo shift left in insert mode`() {
+    configureByText("""
+      func main() {
+          ${c}println("Hello")
+      }
+    """.trimIndent())
+    typeText("i<C-D>")
+    assertState("""
+      func main() {
+      ${c}println("Hello")
+      }
+    """.trimIndent())
+    typeText("<Esc>")
+    typeText("u")
+    assertState("""
+      func main() {
+          ${c}println("Hello")
+      }
+    """.trimIndent())
+  }
 }

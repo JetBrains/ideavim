@@ -208,4 +208,161 @@ class ShiftRightTest : VimTestCase() {
       """.trimIndent(),
     )
   }
+
+  @Test
+  fun `test undo after shift right single line`() {
+    configureByText("""
+      func main() {
+      ${c}println("Hello")
+      }
+    """.trimIndent())
+    typeText(">>")
+    assertState("""
+      func main() {
+          ${c}println("Hello")
+      }
+    """.trimIndent())
+    typeText("u")
+    assertState("""
+      func main() {
+      ${c}println("Hello")
+      }
+    """.trimIndent())
+  }
+
+  @Test
+  fun `test undo after shift right with motion`() {
+    configureByText("""
+      func main() {
+      ${c}line1()
+      line2()
+      line3()
+      }
+    """.trimIndent())
+    typeText(">2j")  // Shift right 3 lines
+    assertState("""
+      func main() {
+          ${c}line1()
+          line2()
+          line3()
+      }
+    """.trimIndent())
+    typeText("u")
+    assertState("""
+      func main() {
+      ${c}line1()
+      line2()
+      line3()
+      }
+    """.trimIndent())
+  }
+
+  @Test
+  fun `test undo after shift right visual mode`() {
+    configureByText("""
+      func main() {
+      ${c}line1()
+      line2()
+          line3()
+      }
+    """.trimIndent())
+    typeText("Vj>")  // Visual select 2 lines and shift right
+    assertState("""
+      func main() {
+          ${c}line1()
+          line2()
+          line3()
+      }
+    """.trimIndent())
+    typeText("u")
+    assertState("""
+      func main() {
+      ${c}line1()
+      line2()
+          line3()
+      }
+    """.trimIndent())
+  }
+
+  @Test
+  fun `test multiple undo after sequential shifts right`() {
+    configureByText("${c}unindented line")
+    typeText(">>")
+    assertState("    ${c}unindented line")
+    typeText(">>")
+    assertState("        ${c}unindented line")
+    typeText(">>")
+    assertState("            ${c}unindented line")
+    
+    // Undo third shift
+    typeText("u")
+    assertState("        ${c}unindented line")
+    
+    // Undo second shift
+    typeText("u")
+    assertState("    ${c}unindented line")
+    
+    // Undo first shift
+    typeText("u")
+    assertState("${c}unindented line")
+  }
+
+  @Test
+  fun `test undo shift right in insert mode`() {
+    configureByText("""
+      func main() {
+      ${c}println("Hello")
+      }
+    """.trimIndent())
+    typeText("i<C-T>")
+    assertState("""
+      func main() {
+          ${c}println("Hello")
+      }
+    """.trimIndent())
+    typeText("<Esc>")
+    typeText("u")
+    assertState("""
+      func main() {
+      ${c}println("Hello")
+      }
+    """.trimIndent())
+  }
+
+  @Test
+  fun `test undo shift right and left combination`() {
+    configureByText("""
+      func main() {
+          ${c}println("Hello")
+      }
+    """.trimIndent())
+    typeText(">>")  // Shift right
+    assertState("""
+      func main() {
+              ${c}println("Hello")
+      }
+    """.trimIndent())
+    typeText("<<")  // Shift left
+    assertState("""
+      func main() {
+          ${c}println("Hello")
+      }
+    """.trimIndent())
+    
+    // Undo shift left
+    typeText("u")
+    assertState("""
+      func main() {
+              ${c}println("Hello")
+      }
+    """.trimIndent())
+    
+    // Undo shift right
+    typeText("u")
+    assertState("""
+      func main() {
+          ${c}println("Hello")
+      }
+    """.trimIndent())
+  }
 }

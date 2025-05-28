@@ -216,4 +216,116 @@ class PutTestAfterCursorActionTest : VimTestCase() {
       )
     }
   }
+
+  @Test
+  fun `test undo after put after cursor`() {
+    configureByText("Hello ${c}world")
+    typeText("yy")
+    typeText("p")
+    assertState("""
+      Hello world
+      ${c}Hello world
+      
+    """.trimIndent())
+    typeText("u")
+    assertState("Hello ${c}world")
+  }
+
+  @Test
+  fun `test undo after put character after cursor`() {
+    configureByText("abc${c}def")
+    typeText("yl")  // Yank 'd'
+    typeText("h")   // Move left
+    assertState("ab${c}cdef")
+    typeText("p")
+    assertState("abc${c}ddef")
+    typeText("u")
+    assertState("ab${c}cdef")
+  }
+
+  @Test
+  fun `test undo after put word after cursor`() {
+    configureByText("The ${c}quick brown fox")
+    typeText("yiw")  // Yank "quick"
+    typeText("w")    // Move to "brown"
+    assertState("The quick ${c}brown fox")
+    typeText("p")
+    assertState("The quick bquic${c}krown fox")
+    typeText("u")
+    assertState("The quick ${c}brown fox")
+  }
+
+  @Test
+  fun `test multiple undo after sequential puts after cursor`() {
+    configureByText("${c}Hello")
+    typeText("yy")
+    typeText("p")
+    assertState("""
+      Hello
+      ${c}Hello
+      
+    """.trimIndent())
+    typeText("p")
+    assertState("""
+      Hello
+      Hello
+      ${c}Hello
+      
+    """.trimIndent())
+    
+    // Undo second put
+    typeText("u")
+    assertState("""
+      Hello
+      ${c}Hello
+      
+    """.trimIndent())
+    
+    // Undo first put
+    typeText("u")
+    assertState("""
+      ${c}Hello
+    """.trimIndent())
+  }
+
+  @Test
+  fun `test undo put and move cursor`() {
+    configureByText("${c}abc def")
+    typeText("yiw")  // Yank "abc"
+    typeText("w")    // Move to "def"
+    assertState("abc ${c}def")
+    typeText("gp")   // Put and move cursor after pasted text
+    assertState("abc dabc${c}ef")
+    typeText("u")
+    assertState("abc ${c}def")
+  }
+
+  @Test
+  fun `test undo put visual block after cursor`() {
+    configureByText("""
+      ${c}abc
+      def
+      ghi
+    """.trimIndent())
+    typeText("<C-V>jjl")  // Visual block select first 2 columns of all lines
+    typeText("y")
+    typeText("$")
+    assertState("""
+      ab${c}c
+      def
+      ghi
+    """.trimIndent())
+    typeText("p")
+    assertState("""
+      abc${c}ab
+      defde
+      ghigh
+    """.trimIndent())
+    typeText("u")
+    assertState("""
+      ab${c}c
+      def
+      ghi
+    """.trimIndent())
+  }
 }

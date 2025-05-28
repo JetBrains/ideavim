@@ -52,4 +52,35 @@ class InsertDeleteInsertedTextActionTest : VimTestCase() {
       Mode.NORMAL(),
     )
   }
+
+  @Test
+  fun `test undo after delete inserted text in insert mode`() {
+    configureByText("Hello ${c}world")
+    typeText("i")
+    typeText("beautiful ")
+    assertState("Hello beautiful ${c}world")
+    assertMode(Mode.INSERT)
+    typeText("<C-U>")
+    assertState("Hello ${c}world")
+    assertMode(Mode.INSERT)
+    typeText("<Esc>")
+    typeText("u")
+    assertState("Hello ${c}world")
+  }
+
+  @Test
+  fun `test undo preserves text before insertion point`() {
+    configureByText("Start${c}End")
+    typeText("i")
+    typeText(" Middle ")
+    assertState("Start Middle ${c}End")
+    assertMode(Mode.INSERT)
+    typeText("<C-U>")
+    assertState("Start${c}End")
+    assertMode(Mode.INSERT)
+    typeText("<Esc>")
+    assertState("Star${c}tEnd")
+    typeText("u")
+    assertState("Start${c}End")
+  }
 }

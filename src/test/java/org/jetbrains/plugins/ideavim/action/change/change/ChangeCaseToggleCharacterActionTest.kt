@@ -85,4 +85,99 @@ class ChangeCaseToggleCharacterActionTest : VimTestCase() {
       this.enterCommand("set whichwrap=~")
     }
   }
+
+  @Test
+  fun `test undo after toggle case single character`() {
+    configureByText("Hello ${c}World")
+    typeText("~")
+    assertState("Hello w${c}orld")
+    typeText("u")
+    assertState("Hello ${c}World")
+  }
+
+  @Test
+  fun `test undo after toggle case multiple characters`() {
+    configureByText("${c}hello WORLD")
+    typeText("5~")
+    assertState("HELLO${c} WORLD")
+    typeText("u")
+    assertState("${c}hello WORLD")
+  }
+
+  @Test
+  fun `test multiple undo after sequential toggle case`() {
+    configureByText("${c}aBc")
+    typeText("~")
+    assertState("A${c}Bc")
+    typeText("~")
+    assertState("Ab${c}c")
+    typeText("~")
+    assertState("Ab${c}C")
+    
+    // Undo third toggle
+    typeText("u")
+    assertState("Ab${c}c")
+    
+    // Undo second toggle
+    typeText("u")
+    assertState("A${c}Bc")
+    
+    // Undo first toggle
+    typeText("u")
+    assertState("${c}aBc")
+  }
+
+  @Test
+  fun `test undo toggle case motion`() {
+    configureByText("${c}hello world")
+    typeText("g~w")
+    assertState("${c}HELLO world")
+    typeText("u")
+    assertState("${c}hello world")
+  }
+
+  @Test
+  fun `test undo uppercase motion`() {
+    configureByText("${c}hello world")
+    typeText("gUw")
+    assertState("${c}HELLO world")
+    typeText("u")
+    assertState("${c}hello world")
+  }
+
+  @Test
+  fun `test undo lowercase motion`() {
+    configureByText("${c}HELLO WORLD")
+    typeText("guw")
+    assertState("${c}hello WORLD")
+    typeText("u")
+    assertState("${c}HELLO WORLD")
+  }
+
+  @Test
+  fun `test undo toggle case line`() {
+    configureByText("${c}Hello World")
+    typeText("g~~")
+    assertState("${c}hELLO wORLD")
+    typeText("u")
+    assertState("${c}Hello World")
+  }
+
+  @Test
+  fun `test undo uppercase line`() {
+    configureByText("${c}Hello World")
+    typeText("gUU")
+    assertState("${c}HELLO WORLD")
+    typeText("u")
+    assertState("${c}Hello World")
+  }
+
+  @Test
+  fun `test undo lowercase line`() {
+    configureByText("${c}HELLO WORLD")
+    typeText("guu")
+    assertState("${c}hello world")
+    typeText("u")
+    assertState("${c}HELLO WORLD")
+  }
 }

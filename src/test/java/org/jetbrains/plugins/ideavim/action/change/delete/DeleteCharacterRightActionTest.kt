@@ -113,4 +113,15 @@ class DeleteCharacterRightActionTest : VimTestCase() {
     // type annotation
     assertVisualPosition(0, 4)
   }
+
+  @Test
+  fun `undo after deleting character`() {
+    configureByText("foo ${c}foo")
+    typeText("xx")
+    assertState("foo ${c}o")
+    typeText("u")
+    assertState("foo ${c}oo")
+    typeText("u")
+    assertState("foo ${c}foo")
+  }
 }

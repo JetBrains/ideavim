@@ -257,4 +257,116 @@ class DeleteMotionActionTest : VimTestCase() {
     typeText("dd")
     assertStatusLineCleared()
   }
+
+  @Test
+  fun `test undo after delete motion with word`() {
+    configureByText("Hello ${c}world and more text")
+    typeText("dw")
+    assertState("Hello ${c}and more text")
+    typeText("u")
+    assertState("Hello ${c}world and more text")
+  }
+
+  @Test
+  fun `test undo after delete line`() {
+    configureByText("""
+      First line
+      ${c}Second line
+      Third line
+    """.trimIndent())
+    typeText("dd")
+    assertState("""
+      First line
+      ${c}Third line
+    """.trimIndent())
+    typeText("u")
+    assertState("""
+      First line
+      ${c}Second line
+      Third line
+    """.trimIndent())
+  }
+
+  @Test
+  fun `test undo after delete multiple lines`() {
+    configureByText("""
+      First line
+      ${c}Second line
+      Third line
+      Fourth line
+      Fifth line
+    """.trimIndent())
+    typeText("3dd")
+    assertState("""
+      First line
+      ${c}Fifth line
+    """.trimIndent())
+    typeText("u")
+    assertState("""
+      First line
+      ${c}Second line
+      Third line
+      Fourth line
+      Fifth line
+    """.trimIndent())
+  }
+
+  @Test
+  fun `test undo after delete with different motions`() {
+    configureByText("The ${c}quick brown fox jumps")
+    typeText("d3w")
+    assertState("The ${c}jumps")
+    typeText("u")
+    assertState("The ${c}quick brown fox jumps")
+    
+    // Test with $ motion
+    typeText("d$")
+    assertState("The$c ")
+    typeText("u")
+    assertState("The ${c}quick brown fox jumps")
+    
+    // Test with 0 motion
+    typeText("d0")
+    assertState("${c}quick brown fox jumps")
+    typeText("u")
+    assertState("The ${c}quick brown fox jumps")
+  }
+
+  @Test
+  fun `test undo delete with motion that includes caret movement`() {
+    configureByText("a${c}bc(xxx)def")
+    typeText("di(")
+    assertState("abc(${c})def")
+    typeText("u")
+    assertState("a${c}bc(xxx)def")
+  }
+
+  @Test
+  fun `test undo after delete to mark`() {
+    configureByText("""
+      Line 1
+      Li${c}ne 2
+      Line 3
+      Line 4
+    """.trimIndent())
+    typeText("ma")  // Set mark a
+    typeText("jj")
+    assertState("""
+      Line 1
+      Line 2
+      Line 3
+      Li${c}ne 4
+    """.trimIndent())
+    typeText("d'a")  // Delete to mark a
+    assertState("""
+      ${c}Line 1
+    """.trimIndent())
+    typeText("u")
+    assertState("""
+      Line 1
+      Line 2
+      Line 3
+      Li${c}ne 4
+    """.trimIndent())
+  }
 }
