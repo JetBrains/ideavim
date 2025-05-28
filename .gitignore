@@ -33,3 +33,5 @@ vim-engine/src/main/java/com/maddyhome/idea/vim/regexp/parser/generated
 settings.xml
 
 .kotlin
+
+.claude/settings.local.json
