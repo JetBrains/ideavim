@@ -202,4 +202,104 @@ class CopyCommandTest : VimTestCase() {
     )
     assertPluginError(false)
   }
+
+  @Test
+  fun `test copy line and undo`() {
+    configureByText(
+      """
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      Nunc tincidunt viverra ligula non ${c}scelerisque.
+      Fusce sit amet mi ut purus volutpat vulputate vitae sed tortor.
+      """.trimIndent()
+    )
+
+    enterCommand("copy .")
+    assertState(
+      """
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      Nunc tincidunt viverra ligula non scelerisque.
+      ${c}Nunc tincidunt viverra ligula non scelerisque.
+      Fusce sit amet mi ut purus volutpat vulputate vitae sed tortor.
+      """.trimIndent()
+    )
+
+    typeText("u")
+    assertState(
+      """
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      Nunc tincidunt viverra ligula non ${c}scelerisque.
+      Fusce sit amet mi ut purus volutpat vulputate vitae sed tortor.
+      """.trimIndent()
+    )
+  }
+
+  @Test
+  fun `test copy range and undo`() {
+    configureByText(
+      """
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      Morbi nec luctus tortor, id venenatis lacus.
+      Nunc sit amet tellus vel ${c}purus cursus posuere et at purus.
+      Ut id dapibus augue.
+      Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+      """.trimIndent()
+    )
+
+    enterCommand("2,3copy $")
+    assertState(
+      """
+      |Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      |Morbi nec luctus tortor, id venenatis lacus.
+      |Nunc sit amet tellus vel purus cursus posuere et at purus.
+      |Ut id dapibus augue.
+      |Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+      |${c}Morbi nec luctus tortor, id venenatis lacus.
+      |Nunc sit amet tellus vel purus cursus posuere et at purus.
+      |""".trimMargin()
+    )
+
+    typeText("u")
+    assertState(
+      """
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+      Morbi nec luctus tortor, id venenatis lacus.
+      Nunc sit amet tellus vel ${c}purus cursus posuere et at purus.
+      Ut id dapibus augue.
+      Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+      """.trimIndent()
+    )
+  }
+
+  @Test
+  fun `test t command synonym and undo`() {
+    configureByText(
+      """
+      Line 1
+      Line 2
+      Line ${c}3
+      Line 4
+      """.trimIndent()
+    )
+
+    enterCommand("t-1")
+    assertState(
+      """
+      Line 1
+      Line 2
+      ${c}Line 3
+      Line 3
+      Line 4
+      """.trimIndent()
+    )
+
+    typeText("u")
+    assertState(
+      """
+      Line 1
+      Line 2
+      Line ${c}3
+      Line 4
+      """.trimIndent()
+    )
+  }
 }

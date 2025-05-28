@@ -17,6 +17,7 @@ import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.TraceOptions
 import org.jetbrains.plugins.ideavim.impl.VimOption
 import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
@@ -1408,6 +1409,141 @@ class SubstituteCommandTest : VimTestCase() {
       exCommand("s/a foo\\(\\)/a foo\\u\\1bar/"),
       "${c}a foo",
       "a fooBar",
+    )
+  }
+
+  @OptionTest(
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
+  )
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test substitute and undo`() {
+    configureByText(
+      """
+      |Hello ${c}world
+      |Hello world
+      |Hello world
+      """.trimMargin()
+    )
+
+    typeText(commandToKeys("s/world/universe/"))
+    assertState(
+      """
+      |${c}Hello universe
+      |Hello world
+      |Hello world
+      """.trimMargin()
+    )
+
+    typeText("u")
+    assertState(
+      """
+      |Hello ${c}world
+      |Hello world
+      |Hello world
+      """.trimMargin()
+    )
+  }
+
+  @OptionTest(
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
+  )
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test substitute global and undo`() {
+    configureByText(
+      """
+      |${c}Hello world world world
+      |Hello world
+      """.trimMargin()
+    )
+
+    typeText(commandToKeys("s/world/universe/g"))
+    assertState(
+      """
+      |${c}Hello universe universe universe
+      |Hello world
+      """.trimMargin()
+    )
+
+    typeText("u")
+    assertState(
+      """
+      |${c}Hello world world world
+      |Hello world
+      """.trimMargin()
+    )
+  }
+
+  @OptionTest(
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
+  )
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test substitute with range and undo`() {
+    configureByText(
+      """
+      |First line
+      |${c}Hello world
+      |Hello world
+      |Hello world
+      |Last line
+      """.trimMargin()
+    )
+
+    typeText(commandToKeys("2,4s/world/universe/"))
+    assertState(
+      """
+      |First line
+      |Hello universe
+      |Hello universe
+      |${c}Hello universe
+      |Last line
+      """.trimMargin()
+    )
+
+    typeText("u")
+    assertState(
+      """
+      |First line
+      |${c}Hello world
+      |Hello world
+      |Hello world
+      |Last line
+      """.trimMargin()
+    )
+  }
+
+  @OptionTest(
+    VimOption(TestOptionConstants.smartcase, doesntAffectTest = true),
+    VimOption(TestOptionConstants.ignorecase, doesntAffectTest = true),
+  )
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test substitute all lines and undo`() {
+    configureByText(
+      """
+      |${c}Hello world
+      |Hello world
+      |Hello world
+      """.trimMargin()
+    )
+
+    typeText(commandToKeys("%s/world/universe/"))
+    assertState(
+      """
+      |Hello universe
+      |Hello universe
+      |${c}Hello universe
+      """.trimMargin()
+    )
+
+    typeText("u")
+    assertState(
+      """
+      |${c}Hello world
+      |Hello world
+      |Hello world
+      """.trimMargin()
     )
   }
 }

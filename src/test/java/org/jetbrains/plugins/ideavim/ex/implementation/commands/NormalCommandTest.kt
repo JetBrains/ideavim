@@ -211,4 +211,117 @@ class NormalCommandTest : VimTestCase() {
     enterCommand("""exe "norm ^dei-\<C-R>\"-"""")
     assertState("""-myprop-: "my value"""")
   }
+
+  @Test
+  fun `test normal command delete and undo`() {
+    configureByText(
+      """
+      |Line 1
+      |Line ${c}2
+      |Line 3
+      """.trimMargin()
+    )
+
+    enterCommand("normal x")
+    assertState(
+      """
+      |Line 1
+      |Line 
+      |Line 3
+      """.trimMargin()
+    )
+
+    typeText("u")
+    assertState(
+      """
+      |Line 1
+      |Line ${c}2
+      |Line 3
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test normal command with range and undo`() {
+    configureByText(
+      """
+      |First ${c}line
+      |Second line
+      |Third line
+      |Fourth line
+      """.trimMargin()
+    )
+
+    enterCommand("2,3normal A!")
+    assertState(
+      """
+      |First line
+      |Second line!
+      |Third line${c}!
+      |Fourth line
+      """.trimMargin()
+    )
+
+    typeText("u")
+    assertState(
+      """
+      |First ${c}line
+      |Second line
+      |Third line
+      |Fourth line
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test normal command insert and undo`() {
+    configureByText(
+      """
+      |${c}Hello world
+      """.trimMargin()
+    )
+
+    enterCommand("normal iTest ")
+    assertState(
+      """
+      |Test${c} Hello world
+      """.trimMargin()
+    )
+
+    typeText("u")
+    assertState(
+      """
+      |${c}Hello world
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test normal command complex operation and undo`() {
+    configureByText(
+      """
+      |Line ${c}1
+      |Line 2
+      |Line 3
+      """.trimMargin()
+    )
+
+    enterCommand("normal ddp")
+    assertState(
+      """
+      |Line 2
+      |${c}Line 1
+      |Line 3
+      """.trimMargin()
+    )
+
+    typeText("u")
+    assertState(
+      """
+      |Line ${c}1
+      |Line 2
+      |Line 3
+      """.trimMargin()
+    )
+  }
 }

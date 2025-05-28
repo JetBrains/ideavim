@@ -839,4 +839,138 @@ class SortCommandTest : VimTestCase() {
     typeText(commandToKeys("sort"))
     assertState(" a\n b\n c\n whatever\n zee")
   }
+
+  @Test
+  fun `test sort and undo`() {
+    configureByText(
+      """
+      |zebra
+      |${c}apple
+      |banana
+      |cherry
+      """.trimMargin()
+    )
+
+    typeText(commandToKeys("sort"))
+    assertState(
+      """
+      |${c}apple
+      |banana
+      |cherry
+      |zebra
+      """.trimMargin()
+    )
+
+    typeText("u")
+    assertState(
+      """
+      |zebra
+      |${c}apple
+      |banana
+      |cherry
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test sort with range and undo`() {
+    configureByText(
+      """
+      |header
+      |zebra
+      |${c}apple
+      |banana
+      |cherry
+      |footer
+      """.trimMargin()
+    )
+
+    typeText(commandToKeys("2,5sort"))
+    assertState(
+      """
+      |header
+      |${c}apple
+      |banana
+      |cherry
+      |zebra
+      |footer
+      """.trimMargin()
+    )
+
+    typeText("u")
+    assertState(
+      """
+      |header
+      |zebra
+      |${c}apple
+      |banana
+      |cherry
+      |footer
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test sort with options and undo`() {
+    configureByText(
+      """
+      |${c}10
+      |2
+      |100
+      |20
+      """.trimMargin()
+    )
+
+    typeText(commandToKeys("sort n"))
+    assertState(
+      """
+      |${c}2
+      |10
+      |20
+      |100
+      """.trimMargin()
+    )
+
+    typeText("u")
+    assertState(
+      """
+      |${c}10
+      |2
+      |100
+      |20
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test reverse sort and undo`() {
+    configureByText(
+      """
+      |${c}apple
+      |banana
+      |cherry
+      |date
+      """.trimMargin()
+    )
+
+    typeText(commandToKeys("sort!"))
+    assertState(
+      """
+      |${c}date
+      |cherry
+      |banana
+      |apple
+      """.trimMargin()
+    )
+
+    typeText("u")
+    assertState(
+      """
+      |${c}apple
+      |banana
+      |cherry
+      |date
+      """.trimMargin()
+    )
+  }
 }

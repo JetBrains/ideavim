@@ -120,7 +120,8 @@ class DeleteJoinLinesSpacesActionTest : VimTestCase() {
     """.trimIndent())
     typeText("3J")
     assertState("""
-      Line 1 Line 2 Line 3$c Line 4
+      Line 1 Line 2$c Line 3
+      Line 4
     """.trimIndent())
     typeText("u")
     assertState("""

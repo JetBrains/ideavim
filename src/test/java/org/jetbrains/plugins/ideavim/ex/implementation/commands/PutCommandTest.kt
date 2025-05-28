@@ -37,4 +37,97 @@ class PutCommandTest : VimTestCase() {
     typeText(commandToKeys("put"))
     assertState("Hello World!\n" + "<caret>Hello \n")
   }
+
+  @Test
+  fun `test put and undo`() {
+    configureByText(
+      """
+      Line 1
+      Line ${c}2
+      Line 3
+      """.trimIndent()
+    )
+    typeText(injector.parser.parseKeys("yy"))
+    enterCommand("put")
+    assertState(
+      """
+      Line 1
+      Line 2
+      ${c}Line 2
+      Line 3
+      """.trimIndent()
+    )
+
+    typeText("u")
+    assertState(
+      """
+      Line 1
+      Line ${c}2
+      Line 3
+      """.trimIndent()
+    )
+  }
+
+  @Test
+  fun `test put from register and undo`() {
+    configureByText(
+      """
+      First line
+      Second ${c}line
+      Third line
+      """.trimIndent()
+    )
+    typeText(injector.parser.parseKeys("\"ayy"))
+    enterCommand("put a")
+    assertState(
+      """
+      First line
+      Second line
+      ${c}Second line
+      Third line
+      """.trimIndent()
+    )
+
+    typeText("u")
+    assertState(
+      """
+      First line
+      Second ${c}line
+      Third line
+      """.trimIndent()
+    )
+  }
+
+  @Test
+  fun `test put with line number and undo`() {
+    configureByText(
+      """
+      Line 1
+      Line ${c}2
+      Line 3
+      Line 4
+      """.trimIndent()
+    )
+    typeText(injector.parser.parseKeys("yy"))
+    enterCommand("1put")
+    assertState(
+      """
+      Line 1
+      ${c}Line 2
+      Line 2
+      Line 3
+      Line 4
+      """.trimIndent()
+    )
+
+    typeText("u")
+    assertState(
+      """
+      Line 1
+      Line ${c}2
+      Line 3
+      Line 4
+      """.trimIndent()
+    )
+  }
 }

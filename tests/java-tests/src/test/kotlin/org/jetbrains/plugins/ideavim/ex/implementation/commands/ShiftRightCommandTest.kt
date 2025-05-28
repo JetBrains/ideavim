@@ -182,4 +182,121 @@ class ShiftRightCommandTest : VimJavaTestCase() {
     """.trimMargin()
     assertState(after)
   }
+
+  @Test
+  fun `test shift right and undo`() {
+    configureByJavaText(
+      """
+      |public class Example {
+      |    public static void main(String[] args) {
+      |        ${c}System.out.println("Hello");
+      |        System.out.println("World");
+      |    }
+      |}
+      """.trimMargin()
+    )
+
+    enterCommand(">")
+    assertState(
+      """
+      |public class Example {
+      |    public static void main(String[] args) {
+      |            ${c}System.out.println("Hello");
+      |        System.out.println("World");
+      |    }
+      |}
+      """.trimMargin()
+    )
+
+    typeText("u")
+    assertState(
+      """
+      |public class Example {
+      |    public static void main(String[] args) {
+      |        ${c}System.out.println("Hello");
+      |        System.out.println("World");
+      |    }
+      |}
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test shift right with range and undo`() {
+    configureByJavaText(
+      """
+      |public class Example {
+      |    public static void main(String[] args) {
+      |        ${c}System.out.println("Hello");
+      |        System.out.println("World");
+      |        System.out.println("!");
+      |    }
+      |}
+      """.trimMargin()
+    )
+
+    enterCommand("3,5>")
+    assertState(
+      """
+      |public class Example {
+      |    public static void main(String[] args) {
+      |            System.out.println("Hello");
+      |            System.out.println("World");
+      |            ${c}System.out.println("!");
+      |    }
+      |}
+      """.trimMargin()
+    )
+
+    typeText("u")
+    assertState(
+      """
+      |public class Example {
+      |    public static void main(String[] args) {
+      |        ${c}System.out.println("Hello");
+      |        System.out.println("World");
+      |        System.out.println("!");
+      |    }
+      |}
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test shift right with count and undo`() {
+    configureByJavaText(
+      """
+      |public class Example {
+      |    public static void main(String[] args) {
+      |        ${c}System.out.println("Hello");
+      |        System.out.println("World");
+      |    }
+      |}
+      """.trimMargin()
+    )
+
+    enterCommand("> 2")
+    assertState(
+      """
+      |public class Example {
+      |    public static void main(String[] args) {
+      |            System.out.println("Hello");
+      |            ${c}System.out.println("World");
+      |    }
+      |}
+      """.trimMargin()
+    )
+
+    typeText("u")
+    assertState(
+      """
+      |public class Example {
+      |    public static void main(String[] args) {
+      |        ${c}System.out.println("Hello");
+      |        System.out.println("World");
+      |    }
+      |}
+      """.trimMargin()
+    )
+  }
 }

@@ -251,4 +251,98 @@ class JoinLinesCommandTest : VimTestCase() {
       """.trimIndent(),
     )
   }
+
+  @Test
+  fun `test join lines and undo`() {
+    configureByText(
+      """
+      Line 1
+      Line ${c}2
+      Line 3
+      Line 4
+      """.trimIndent()
+    )
+
+    enterCommand("j")
+    assertState(
+      """
+      Line 1
+      ${c}Line 2 Line 3
+      Line 4
+      """.trimIndent()
+    )
+
+    typeText("u")
+    assertState(
+      """
+      Line 1
+      Line ${c}2
+      Line 3
+      Line 4
+      """.trimIndent()
+    )
+  }
+
+  @Test
+  fun `test join range and undo`() {
+    configureByText(
+      """
+      Line 1
+      Line ${c}2
+      Line 3
+      Line 4
+      Line 5
+      """.trimIndent()
+    )
+
+    enterCommand("2,4j")
+    assertState(
+      """
+      Line 1
+      ${c}Line 2 Line 3 Line 4
+      Line 5
+      """.trimIndent()
+    )
+
+    typeText("u")
+    assertState(
+      """
+      Line 1
+      Line ${c}2
+      Line 3
+      Line 4
+      Line 5
+      """.trimIndent()
+    )
+  }
+
+  @Test
+  fun `test join with count and undo`() {
+    configureByText(
+      """
+      ${c}Lorem ipsum dolor sit amet,
+      consectetur adipiscing elit
+      Sed in orci mauris.
+      Cras id tellus in ex imperdiet egestas.
+      """.trimIndent()
+    )
+
+    enterCommand("j 3")
+    assertState(
+      """
+      ${c}Lorem ipsum dolor sit amet, consectetur adipiscing elit Sed in orci mauris.
+      Cras id tellus in ex imperdiet egestas.
+      """.trimIndent()
+    )
+
+    typeText("u")
+    assertState(
+      """
+      ${c}Lorem ipsum dolor sit amet,
+      consectetur adipiscing elit
+      Sed in orci mauris.
+      Cras id tellus in ex imperdiet egestas.
+      """.trimIndent()
+    )
+  }
 }

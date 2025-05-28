@@ -15,6 +15,42 @@ import org.junit.jupiter.api.Test
 class MoveCommandTest : VimTestCase() {
 
   @Test
+  fun `test move line up and undo`() {
+    configureByText(
+      """
+      ====
+      My mother taught me this trick: if you repeat something over and over again it loses its meaning.
+      For example: homewor${c}k, homework, homework, homework, homework, homework, homework, homework, homework.
+      See, nothing.
+      
+      """.trimIndent(),
+    )
+
+    enterCommand("m 0")
+    assertState(
+      """
+      ${c}For example: homework, homework, homework, homework, homework, homework, homework, homework, homework.
+      ====
+      My mother taught me this trick: if you repeat something over and over again it loses its meaning.
+      See, nothing.
+      
+      """.trimIndent(),
+    )
+
+    typeText("u")
+
+    assertState(
+      """
+      ====
+      My mother taught me this trick: if you repeat something over and over again it loses its meaning.
+      For example: homewor${c}k, homework, homework, homework, homework, homework, homework, homework, homework.
+      See, nothing.
+      
+      """.trimIndent(),
+    )
+  }
+
+  @Test
   fun `test selection marks after moving line up`() {
     configureByText(
       """
