@@ -69,6 +69,7 @@ dependencies {
     compileOnly(kotlin("reflect"))
 
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
+    implementation(project(":api"))
 }
 
 tasks {
