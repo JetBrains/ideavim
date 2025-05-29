@@ -6,25 +6,15 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.intellij.vim.api.scopes.transaction
+package com.intellij.vim.api.scopes
 
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.CaretInfo
-import com.intellij.vim.api.scopes.read.Read
 
+@VimPluginDsl
 interface Transaction : Read {
   fun deleteText(startOffset: Int, endOffset: Int)
-  fun replaceText(
-    caretId: CaretId,
-    startOffset: Int,
-    endOffset: Int,
-    text: String,
-  )
-  fun replaceTextBlockwise(
-    caretId: CaretId,
-    startOffset: Int,
-    endOffset: Int,
-    text: List<String>
-  )
+  fun replaceText(caretId: CaretId, startOffset: Int, endOffset: Int, text: String)
+  fun replaceTextBlockwise(caretId: CaretId, startOffset: Int, endOffset: Int, text: List<String>)
   fun updateCaret(caretId: CaretId, info: CaretInfo)
 }

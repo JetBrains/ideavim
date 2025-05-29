@@ -14,11 +14,7 @@ import com.intellij.vim.api.Mode
 import com.intellij.vim.api.RegisterType
 import com.intellij.vim.api.TextSelectionType
 import com.intellij.vim.api.isLine
-import com.intellij.vim.api.scopes.change
-import com.intellij.vim.api.scopes.forEachCaret
-import com.intellij.vim.api.scopes.forEachCaretSorted
-import com.intellij.vim.api.scopes.read
-import com.intellij.vim.api.scopes.vim.VimScope
+import com.intellij.vim.api.scopes.VimScope
 import com.maddyhome.idea.vim.extension.thin.api.VimPluginBase
 
 class ReplaceWithRegisterNewApi : VimPluginBase {
@@ -42,7 +38,7 @@ class ReplaceWithRegisterNewApi : VimPluginBase {
     exportOperatorFunction(OPERATOR_FUNC) {
       forEachCaret { caretId ->
         val selectionRange: Pair<Int, Int>? = read {
-          when (mode) {
+          when (this@forEachCaret.mode) {
             Mode.NORMAL -> getChangeMarks(caretId)
             Mode.VISUAL -> getVisualSelectionMarks(caretId)
             else -> null

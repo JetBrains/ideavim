@@ -6,13 +6,14 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.intellij.vim.api.scopes.read
+package com.intellij.vim.api.scopes
 
 import com.intellij.vim.api.CaretData
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.CaretInfo
 import com.intellij.vim.api.RegisterType
 
+@VimPluginDsl
 interface Read {
   fun getCurrentRegisterName(caretId: CaretId): Char
   fun getRegisterContent(caretId: CaretId, register: Char): String?

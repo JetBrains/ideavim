@@ -61,6 +61,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.isInjectorInitialized
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.extension.VimExtensionRegistrar
+import com.maddyhome.idea.vim.extension.thin.api.VimPluginServiceImpl
 import com.maddyhome.idea.vim.group.CommandGroup
 import com.maddyhome.idea.vim.group.EditorGroup
 import com.maddyhome.idea.vim.group.EffectiveIjOptions
@@ -83,7 +84,7 @@ import com.maddyhome.idea.vim.history.VimHistory
 import com.maddyhome.idea.vim.macro.VimMacro
 import com.maddyhome.idea.vim.put.VimPut
 import com.maddyhome.idea.vim.register.VimRegisterGroup
-import com.maddyhome.idea.vim.state.VimStateMachine
+import com.maddyhome.idea.vim.thinapi.VimPluginService
 import com.maddyhome.idea.vim.ui.VimRcFileState
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanelService
 import com.maddyhome.idea.vim.undo.VimUndoRedo
@@ -212,6 +213,8 @@ internal class IjVimInjector : VimInjectorBase() {
     get() = service()
   override val redrawService: VimRedrawService
     get() = service()
+  override val pluginService: VimPluginService
+    get() = VimPluginServiceImpl()
 
   override val engineEditorHelper: EngineEditorHelper
     get() = service<IjEditorHelper>()
