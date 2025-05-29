@@ -8,22 +8,25 @@
 
 package com.maddyhome.idea.vim.extension.thin.api
 
-import com.intellij.vim.api.VimPluginApi
-import com.intellij.vim.api.scopes.vim.VimScope
-import com.intellij.vim.api.scopes.vimScope
+import com.intellij.vim.api.scopes.VimScope
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.extension.VimExtension
+import com.maddyhome.idea.vim.thinapi.VimScopeImpl
 
 interface VimPluginBase : VimExtension {
   override fun init() {
-    val vimPluginApi: VimPluginApi = VimPluginApiImpl()
     val dummyEditor: VimEditor = injector.fallbackWindow
     val context: ExecutionContext = injector.executionContextManager.getEditorExecutionContext(dummyEditor)
-    vimScope(dummyEditor, context, vimPluginApi) {
+    vimScope(dummyEditor, context) {
       init()
     }
+  }
+
+  private fun vimScope(editor: VimEditor, context: ExecutionContext, block: VimScope.() -> Unit) {
+    val vimScope = VimScopeImpl(editor, context)
+    vimScope.block()
   }
 
   fun VimScope.init()
