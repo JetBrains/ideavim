@@ -399,8 +399,6 @@ class KeyHandler {
     @JvmStatic
     fun getInstance(): KeyHandler = instance
   }
-
-  data class MutableBoolean(var value: Boolean)
 }
 
 /**
