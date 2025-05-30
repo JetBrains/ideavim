@@ -139,24 +139,44 @@ class ChangeActionTest : VimTestCase() {
   // VIM-321 |d| |count|
   @Test
   fun testDeleteEmptyRange() {
-    doTest("d0", "${c}hello\n", "hello\n", Mode.NORMAL())
+    doTest(
+      "d0",
+      "${c}hello\n",
+      "hello\n",
+      Mode.NORMAL(),
+    )
   }
 
   // VIM-157 |~|
   @Test
   fun testToggleCharCase() {
-    doTest("~~", "${c}hello world\n", "HEllo world\n", Mode.NORMAL())
+    doTest(
+      "~~",
+      "${c}hello world\n",
+      "HEllo world\n",
+      Mode.NORMAL(),
+    )
   }
 
   // VIM-157 |~|
   @Test
   fun testToggleCharCaseLineEnd() {
-    doTest("~~", "hello wor${c}ld\n", "hello worLD\n", Mode.NORMAL())
+    doTest(
+      "~~",
+      "hello wor${c}ld\n",
+      "hello worLD\n",
+      Mode.NORMAL(),
+    )
   }
 
   @Test
   fun testToggleCaseMotion() {
-    doTest("g~w", "${c}FooBar Baz\n", "fOObAR Baz\n", Mode.NORMAL())
+    doTest(
+      "g~w",
+      "${c}FooBar Baz\n",
+      "fOObAR Baz\n",
+      Mode.NORMAL(),
+    )
   }
 
   @Test
@@ -171,7 +191,12 @@ class ChangeActionTest : VimTestCase() {
 
   @Test
   fun testChangeLowerCase() {
-    doTest("guw", "${c}FooBar Baz\n", "foobar Baz\n", Mode.NORMAL())
+    doTest(
+      "guw",
+      "${c}FooBar Baz\n",
+      "foobar Baz\n",
+      Mode.NORMAL(),
+    )
   }
 
   @Test
@@ -213,13 +238,13 @@ class ChangeActionTest : VimTestCase() {
    one
    two ${c}three
    four
-   
+
       """.trimIndent(),
       """
    one
    two hello world! three
    four
-   
+
       """.trimIndent(),
       Mode.INSERT,
     )
@@ -233,12 +258,12 @@ class ChangeActionTest : VimTestCase() {
       """
         one
         ${c}two
-        
+
       """.trimIndent(),
       """
         one
-        
-        
+
+
       """.trimIndent(),
       Mode.NORMAL(),
     )
@@ -253,12 +278,12 @@ class ChangeActionTest : VimTestCase() {
       """
    one ${c}two
    three
-   
+
       """.trimIndent(),
       """
    one 
    three
-   
+
       """.trimIndent(),
       Mode.NORMAL(),
     )
@@ -271,15 +296,15 @@ class ChangeActionTest : VimTestCase() {
       "dw",
       """
    one ${c}two
-   
+
    three
-   
+
       """.trimIndent(),
       """
    one 
-   
+
    three
-   
+
       """.trimIndent(),
       Mode.NORMAL(),
     )
@@ -290,12 +315,14 @@ class ChangeActionTest : VimTestCase() {
   fun testDeleteLastWordBeforeEOLAndWhitespace() {
     doTest(
       "dw",
-      """one ${c}two
- three
-""",
-      """one 
- three
-""",
+      """
+        one ${c}two
+         three
+      """.trimIndent(),
+      """
+        one 
+         three
+      """.trimIndent(),
       Mode.NORMAL(),
     )
     assertOffset(3)
@@ -309,7 +336,7 @@ class ChangeActionTest : VimTestCase() {
       """
    one ${c}two
    three four
-   
+
       """.trimIndent(),
       "one four\n",
       Mode.NORMAL(),
@@ -350,12 +377,12 @@ class ChangeActionTest : VimTestCase() {
       """
    foo(${c}bar
    baz
-   
+
       """.trimIndent(),
       """
    foo(
    baz
-   
+
       """.trimIndent(),
       Mode.NORMAL(),
     )
@@ -369,12 +396,12 @@ class ChangeActionTest : VimTestCase() {
       """
         fo${c}o
         bar
-        
+
       """.trimIndent(),
       """
         fo
         bar
-        
+
       """.trimIndent(),
       Mode.NORMAL(),
     )
@@ -389,7 +416,7 @@ class ChangeActionTest : VimTestCase() {
       """
    one
    two
-   
+
       """.trimIndent(),
       "two\n",
       Mode.NORMAL(),
@@ -440,14 +467,14 @@ class ChangeActionTest : VimTestCase() {
         bar
         baz
         quux
-        
+
       """.trimIndent(),
       """
         ${c}o
         r
         z
         quux
-        
+
       """.trimIndent(),
       Mode.NORMAL(),
     )
@@ -462,14 +489,14 @@ class ChangeActionTest : VimTestCase() {
         bar
         baz
         quux
-        
+
       """.trimIndent(),
       """
         ${c}o
         r
         z
         quux
-        
+
       """.trimIndent(),
       Mode.NORMAL(),
     )
@@ -514,7 +541,7 @@ quux
       "3J",
       """
         foo.
-        
+
         bar
       """.dotToSpace().trimIndent(),
       "foo bar",
@@ -539,14 +566,16 @@ quux
   fun testDeleteJoinVisualLinesSpaces() {
     doTest(
       "v2jJ",
-      """    a$c 1
-    b 2
-    c 3
-quux
-""",
-      """    a 1 b 2 c 3
-quux
-""",
+      """
+        a$c 1
+        b 2
+        c 3
+        quux
+      """.trimIndent(),
+      """
+        a 1 b 2 c 3
+        quux
+      """.trimIndent(),
       Mode.NORMAL(),
     )
   }
@@ -597,15 +626,15 @@ quux
       listOf("l", "<C-V>", "jj", "x"),
       """
         foo
-        
+
         bar
-        
+
       """.trimIndent(),
       """
         fo
-        
+
         br
-        
+
       """.trimIndent(),
       Mode.NORMAL(),
     )
@@ -621,13 +650,13 @@ quux
         foo
         x
         bar
-        
+
       """.trimIndent(),
       """
         fo
         x
         br
-        
+
       """.trimIndent(),
       Mode.NORMAL(),
     )
@@ -640,7 +669,7 @@ quux
       """
   foo
   bar
-  
+
       """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("<C-V>" + "j" + "x"))
@@ -648,7 +677,7 @@ quux
       """
   oo
   ar
-  
+
       """.trimIndent(),
     )
   }
@@ -656,20 +685,35 @@ quux
   // |r|
   @Test
   fun testReplaceOneChar() {
-    doTest("rx", "b${c}ar\n", "b${c}xr\n", Mode.NORMAL())
+    doTest(
+      "rx",
+      "b${c}ar\n",
+      "b${c}xr\n",
+      Mode.NORMAL(),
+    )
   }
 
   // |r|
   @VimBehaviorDiffers(originalVimAfter = "foXX${c}Xr\n")
   @Test
   fun testReplaceMultipleCharsWithCount() {
-    doTest("3rX", "fo${c}obar\n", "fo${c}XXXr\n", Mode.NORMAL())
+    doTest(
+      "3rX",
+      "fo${c}obar\n",
+      "fo${c}XXXr\n",
+      Mode.NORMAL(),
+    )
   }
 
   // |r|
   @Test
   fun testReplaceMultipleCharsWithCountPastEndOfLine() {
-    doTest("6rX", "fo${c}obar\n", "fo${c}obar\n", Mode.NORMAL())
+    doTest(
+      "6rX",
+      "fo${c}obar\n",
+      "fo${c}obar\n",
+      Mode.NORMAL(),
+    )
   }
 
   // |r|
@@ -681,12 +725,12 @@ quux
       """
         fo${c}obar
         foobaz
-        
+
       """.trimIndent(),
       """
         foZZZZ
         ZZZZZz
-        
+
       """.trimIndent(),
       Mode.NORMAL(),
     )
@@ -697,13 +741,15 @@ quux
   fun testReplaceOneCharWithNewline() {
     doTest(
       "r<Enter>",
-      """    fo${c}obar
-foobaz
-""",
-      """    fo
-    bar
-foobaz
-""",
+      """
+        fo${c}obar
+        foobaz
+      """.trimIndent(),
+      """
+        fo
+        bar
+        foobaz
+      """.trimIndent(),
       Mode.NORMAL(),
     )
   }
@@ -714,13 +760,15 @@ foobaz
   fun testReplaceCharWithNewlineAndCountAddsOnlySingleNewline() {
     doTest(
       "3r<Enter>",
-      """    fo${c}obar
-foobaz
-""",
-      """    fo
-    r
-foobaz
-""",
+      """
+        fo${c}obar
+        foobaz
+      """.trimIndent(),
+      """
+        fo
+        r
+        foobaz
+      """.trimIndent(),
       Mode.NORMAL(),
     )
   }
@@ -728,7 +776,12 @@ foobaz
   // |s|
   @Test
   fun testReplaceOneCharWithText() {
-    doTest("sxy<Esc>", "b${c}ar\n", "bx${c}yr\n", Mode.NORMAL())
+    doTest(
+      "sxy<Esc>",
+      "b${c}ar\n",
+      "bx${c}yr\n",
+      Mode.NORMAL(),
+    )
   }
 
   // |s|
@@ -750,12 +803,12 @@ foobaz
       """
         foo${c}bar
         biff
-        
+
       """.trimIndent(),
       """
         fooxy${c}z
         biff
-        
+
       """.trimIndent(),
       Mode.NORMAL(),
     )
@@ -764,7 +817,12 @@ foobaz
   // |R|
   @Test
   fun testReplaceMode() {
-    doTest("Rbaz<Esc>", "foo${c}bar\n", "fooba${c}z\n", Mode.NORMAL())
+    doTest(
+      "Rbaz<Esc>",
+      "foo${c}bar\n",
+      "fooba${c}z\n",
+      Mode.NORMAL(),
+    )
   }
 
   // |R| |i_<Insert>|
@@ -800,12 +858,12 @@ foobaz
       """
         ${c}foo baz
         baz quux
-        
+
       """.trimIndent(),
       """
         foo baz
         fo${c}o quux
-        
+
       """.trimIndent(),
       Mode.NORMAL(),
     )
@@ -819,16 +877,16 @@ foobaz
   $c- 1
   - 2
   - 3
-  
+
       """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("d$" + "j" + "."))
     assertState(
       """
-  
-  
+
+
   - 3
-  
+
       """.trimIndent(),
     )
   }
@@ -844,7 +902,7 @@ foobaz
   $c- 1
   - 2
   - 3
-  
+
       """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("A" + "<BS>" + "<Esc>" + "j" + "."))
@@ -853,7 +911,7 @@ foobaz
   - 
   - 
   - 3
-  
+
       """.trimIndent(),
     )
 
@@ -863,7 +921,7 @@ foobaz
   $c- 1
   - 2
   - 3
-  
+
       """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("A" + "4" + "<BS>" + "<Esc>" + "j" + "."))
@@ -872,7 +930,7 @@ foobaz
   - 1
   - 2
   - 3
-  
+
       """.trimIndent(),
     )
 
@@ -882,7 +940,7 @@ foobaz
   $c- 1
   - 2
   - 3
-  
+
       """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("A" + "<BS>" + "4" + "<Esc>" + "j" + "."))
@@ -891,7 +949,7 @@ foobaz
   - 4
   - 4
   - 3
-  
+
       """.trimIndent(),
     )
   }
@@ -1020,12 +1078,12 @@ foobaz
       """
         ${c}lorem ipsum dolor sit amet
         lorem ipsum dolor sit amet
-        
+
       """.trimIndent(),
       """
         psum dolor sit amet
         ${c}lorem ipsum dolor sit amet
-        
+
       """.trimIndent(),
       Mode.NORMAL(),
     )
@@ -1040,12 +1098,12 @@ foobaz
         gaganis ${c}gaganis gaganis
         gaganis gaganis gaganis
         gaganis gaganis gaganis
-        
+
       """.trimIndent(),
       """
         gaganis s gaganis
         gaganis ${c}gaganis gaganis
-        
+
       """.trimIndent(),
       Mode.NORMAL(),
     )
