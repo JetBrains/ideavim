@@ -88,7 +88,7 @@ class VimTypedActionHandler(origHandler: TypedActionHandler) : TypedActionHandle
         LOG.info("VimTypedAction '$charTyped': $duration ms")
       }
     } catch (e: ProcessCanceledException) {
-      // Nothing
+      throw e
     } catch (e: Throwable) {
       LOG.error(e)
     }
