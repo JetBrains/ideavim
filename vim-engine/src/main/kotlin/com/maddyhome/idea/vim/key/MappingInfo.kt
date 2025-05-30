@@ -102,7 +102,7 @@ class ToKeysMappingInfo(
       while (keyHandler.keyStack.hasStroke()) {
         val keyStroke = keyHandler.keyStack.feedStroke()
         val allowKeyMappings = isRecursive && !(first && lhsIsPrefixOfRhs)
-        keyHandler.handleKey(editor, keyStroke, context, allowKeyMappings, false, keyState)
+        keyHandler.handleKey(editor, keyStroke, context, allowKeyMappings, keyState)
         first = false
       }
     } finally {
@@ -144,7 +144,7 @@ class ToExpressionMappingInfo(
     for (keyStroke in toKeys) {
       val allowKeyMappings = isRecursive && !(first && lhsIsPrefixOfRhs)
       val keyHandler = KeyHandler.getInstance()
-      keyHandler.handleKey(editor, keyStroke, context, allowKeyMappings, false, keyState)
+      keyHandler.handleKey(editor, keyStroke, context, allowKeyMappings, keyState)
       first = false
     }
   }

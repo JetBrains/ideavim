@@ -104,15 +104,32 @@ class KeyHandler {
    */
   fun handleKey(editor: VimEditor, key: KeyStroke, context: ExecutionContext, keyState: KeyHandlerState) {
     commandListener.forEach { it() }
-    handleKey(editor, key, context, allowKeyMappings = true, mappingCompleted = false, keyState)
+    handleKey(editor, key, context, allowKeyMappings = true, keyState)
   }
 
   /**
    * Handling input keys with additional parameters
    *
    * @param allowKeyMappings If we allow key mappings or not
-   * @param mappingCompleted No longer used
    */
+  fun handleKey(
+    editor: VimEditor,
+    key: KeyStroke,
+    context: ExecutionContext,
+    allowKeyMappings: Boolean,
+    keyState: KeyHandlerState,
+  ) {
+    val result = processKey(key, editor, allowKeyMappings, KeyProcessResult.SynchronousKeyProcessBuilder(keyState))
+    if (result is KeyProcessResult.Executable) {
+      result.execute(editor, context)
+    }
+  }
+
+  @Deprecated(
+    "Use `handleKey(editor, key, context, allowKeyMappings, keyState)` instead.",
+    replaceWith = ReplaceWith("handleKey(editor, key, context, allowKeyMappings, keyState)")
+  )
+  @ApiStatus.ScheduledForRemoval
   fun handleKey(
     editor: VimEditor,
     key: KeyStroke,
@@ -121,10 +138,7 @@ class KeyHandler {
     mappingCompleted: Boolean,
     keyState: KeyHandlerState,
   ) {
-    val result = processKey(key, editor, allowKeyMappings, KeyProcessResult.SynchronousKeyProcessBuilder(keyState))
-    if (result is KeyProcessResult.Executable) {
-      result.execute(editor, context)
-    }
+    handleKey(editor, key, context, allowKeyMappings, keyState)
   }
 
   /**

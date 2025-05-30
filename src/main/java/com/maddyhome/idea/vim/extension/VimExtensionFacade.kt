@@ -146,7 +146,7 @@ object VimExtensionFacade {
   fun executeNormalWithoutMapping(keys: List<KeyStroke>, editor: Editor) {
     val context = injector.executionContextManager.getEditorExecutionContext(editor.vim)
     val keyHandler = KeyHandler.getInstance()
-    keys.forEach { keyHandler.handleKey(editor.vim, it, context, false, false, keyHandler.keyHandlerState) }
+    keys.forEach { keyHandler.handleKey(editor.vim, it, context, false, keyHandler.keyHandlerState) }
   }
 
   /** Returns a single key stroke from the user input similar to 'getchar()'. */

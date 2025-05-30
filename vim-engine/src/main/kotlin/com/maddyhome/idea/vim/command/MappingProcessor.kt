@@ -280,8 +280,7 @@ internal object MappingProcessor : KeyConsumer {
 
         // Replay the rest of the keys, with mapping applied, as though they were typed
         unhandledKeys.subList(subsequence.size, unhandledKeys.size).forEach {
-          KeyHandler.getInstance()
-            .handleKey(editor, it, context, allowKeyMappings = true, mappingCompleted = false, keyState)
+          KeyHandler.getInstance().handleKey(editor, it, context, allowKeyMappings = true, keyState)
         }
         return
       }
@@ -296,7 +295,7 @@ internal object MappingProcessor : KeyConsumer {
     // though they were typed.
     val keyHandler = KeyHandler.getInstance()
     unhandledKeys.forEachIndexed { index, it ->
-      keyHandler.handleKey(editor, it, context, allowKeyMappings = index != 0, mappingCompleted = false, keyState)
+      keyHandler.handleKey(editor, it, context, allowKeyMappings = index != 0, keyState)
     }
   }
 }
