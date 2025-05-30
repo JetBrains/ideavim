@@ -59,11 +59,8 @@ import javax.swing.KeyStroke
  *
  *
  * These keys are not passed to [com.maddyhome.idea.vim.VimTypedActionHandler] and should be handled by actions.
- *
- * This class is used in Which-Key plugin, so don't make it internal. Generally, we should provide a proper
- *   way to get ideavim keys for this plugin. See VIM-3085
  */
-class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
+internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
 
   init {
     initInjector()
