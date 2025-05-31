@@ -21,14 +21,16 @@ class ReplaceWithRegisterNewApi : VimPluginBase {
   override fun getName(): String = "ReplaceWithRegister"
 
   override fun VimScope.init() {
-    nmap(from = "gr", label = RWR_OPERATOR, isRepeatable = true) {
-      rewriteMotion()
-    }
-    nmap(from = "grr", label = RWR_LINE, isRepeatable = true) {
-      rewriteLine()
-    }
-    vmap(from =  "gr", label = RWR_VISUAL, isRepeatable = true) {
-      rewriteVisual()
+    mappings {
+      nmap(keys = "gr", label = RWR_OPERATOR, isRepeatable = true) {
+        rewriteMotion()
+      }
+      nmap(keys = "grr", label = RWR_LINE, isRepeatable = true) {
+        rewriteLine()
+      }
+      vmap(keys = "gr", label = RWR_VISUAL, isRepeatable = true) {
+        rewriteVisual()
+      }
     }
 
     exportOperatorFunction(OPERATOR_FUNC) {

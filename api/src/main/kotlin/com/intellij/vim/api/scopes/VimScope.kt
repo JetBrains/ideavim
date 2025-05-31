@@ -23,14 +23,9 @@ abstract class VimScope {
   abstract fun exportOperatorFunction(name: String, function: VimScope.() -> Boolean)
   abstract fun setOperatorFunction(name: String)
   abstract fun normal(command: String)
+
   // todo: Use mode instead
   abstract fun exitVisualMode()
-  abstract fun nmap(from: String, to: String)
-  abstract fun vmap(from: String, to: String)
-  abstract fun nmap(from: String, isRepeatable: Boolean, action: VimScope.() -> Unit)
-  abstract fun vmap(from: String, isRepeatable: Boolean, action: VimScope.() -> Unit)
-  abstract fun nmap(from: String, label: String, isRepeatable: Boolean, action: VimScope.() -> Unit)
-  abstract fun vmap(from: String, label: String, isRepeatable: Boolean, action: VimScope.() -> Unit)
 
   @OptIn(ExperimentalContracts::class)
   fun <T> read(block: Read.() -> T): T {
@@ -47,6 +42,8 @@ abstract class VimScope {
     }
     return ideChange(block)
   }
+
+  abstract fun mappings(block: MappingScope.() -> Unit)
 
   fun forEachCaret(block: VimScope.(CaretId) -> Unit) {
     read { getAllCaretIds() }.forEach { caretId -> block(caretId) }
