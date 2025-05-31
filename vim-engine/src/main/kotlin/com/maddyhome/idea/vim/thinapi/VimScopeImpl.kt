@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.thinapi
 
 import com.intellij.vim.api.Mode
 import com.intellij.vim.api.TextSelectionType
+import com.intellij.vim.api.scopes.MappingScope
 import com.intellij.vim.api.scopes.Read
 import com.intellij.vim.api.scopes.Transaction
 import com.intellij.vim.api.scopes.VimScope
@@ -18,12 +19,8 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.impl.state.toMappingMode
-import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.selectionType
@@ -96,85 +93,11 @@ open class VimScopeImpl(
     editor.exitVisualMode()
   }
 
-  override fun nmap(from: String, to: String) {
-    addMapping(from, to, isRecursive = true, MappingMode.NORMAL)
+  override fun mappings(block: MappingScope.() -> Unit) {
+    val mappingScope = MappingScopeImpl()
+    mappingScope.block()
   }
 
-  override fun nmap(from: String, isRepeatable: Boolean, action: VimScope.() -> Unit) {
-    addMapping(from, isRecursive = true, isRepeatable, action, MappingMode.NORMAL)
-  }
-
-  override fun vmap(from: String, to: String) {
-    addMapping(from, to, isRecursive = true, MappingMode.VISUAL)
-  }
-
-  override fun vmap(from: String, isRepeatable: Boolean, action: VimScope.() -> Unit) {
-    addMapping(from, isRecursive = true, isRepeatable, action, MappingMode.VISUAL)
-  }
-
-  override fun nmap(
-    from: String,
-    label: String,
-    isRepeatable: Boolean,
-    action: VimScope.() -> Unit,
-  ) {
-    addMapping(label, true, isRepeatable, action, MappingMode.NORMAL)
-    addMapping(from, label, true, MappingMode.NORMAL)
-  }
-
-  override fun vmap(
-    from: String,
-    label: String,
-    isRepeatable: Boolean,
-    action: VimScope.() -> Unit,
-  ) {
-    addMapping(label, true, isRepeatable, action, MappingMode.VISUAL)
-    addMapping(from, label, true, MappingMode.VISUAL)
-  }
-
-  private fun addMapping(
-    fromKeys: String,
-    toKeys: String,
-    isRecursive: Boolean,
-    vararg mode: MappingMode,
-  ) {
-    injector.keyGroup.putKeyMapping(
-      modes = mode.toSet(),
-      fromKeys = injector.parser.parseKeys(fromKeys),
-      toKeys = injector.parser.parseKeys(toKeys),
-      recursive = isRecursive,
-      owner = MappingOwner.IdeaVim.System
-    )
-  }
-
-  private fun addMapping(
-    fromKeys: String,
-    isRecursive: Boolean,
-    isRepeatable: Boolean,
-    action: VimScope.() -> Unit,
-    vararg mode: MappingMode,
-  ) {
-    val extensionHandler: ExtensionHandler = object : ExtensionHandler {
-      override val isRepeatable: Boolean
-        get() = isRepeatable
-
-      override fun execute(
-        editor: VimEditor,
-        context: ExecutionContext,
-        operatorArguments: OperatorArguments,
-      ) {
-        return VimScopeImpl(editor, context).action()
-      }
-    }
-
-    injector.keyGroup.putKeyMapping(
-      modes = mode.toSet(),
-      fromKeys = injector.parser.parseKeys(fromKeys),
-      owner = MappingOwner.IdeaVim.System,
-      recursive = isRecursive,
-      extensionHandler = extensionHandler
-    )
-  }
 
   override fun <T> ideRead(block: Read.() -> T): T {
     return injector.application.runReadAction {
