@@ -25,10 +25,12 @@ abstract class VimScope {
   abstract fun normal(command: String)
   // todo: Use mode instead
   abstract fun exitVisualMode()
-  abstract fun nmap(fromKeys: String, toKeys: String)
-  abstract fun vmap(fromKeys: String, toKeys: String)
-  abstract fun nmap(fromKeys: String, isRepeatable: Boolean, action: VimScope.() -> Unit)
-  abstract fun vmap(fromKeys: String, isRepeatable: Boolean, action: VimScope.() -> Unit)
+  abstract fun nmap(from: String, to: String)
+  abstract fun vmap(from: String, to: String)
+  abstract fun nmap(from: String, isRepeatable: Boolean, action: VimScope.() -> Unit)
+  abstract fun vmap(from: String, isRepeatable: Boolean, action: VimScope.() -> Unit)
+  abstract fun nmap(from: String, label: String, isRepeatable: Boolean, action: VimScope.() -> Unit)
+  abstract fun vmap(from: String, label: String, isRepeatable: Boolean, action: VimScope.() -> Unit)
 
   @OptIn(ExperimentalContracts::class)
   fun <T> read(block: Read.() -> T): T {

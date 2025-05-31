@@ -96,20 +96,40 @@ open class VimScopeImpl(
     editor.exitVisualMode()
   }
 
-  override fun nmap(fromKeys: String, toKeys: String) {
-    addMapping(fromKeys, toKeys, isRecursive = true, MappingMode.NORMAL)
+  override fun nmap(from: String, to: String) {
+    addMapping(from, to, isRecursive = true, MappingMode.NORMAL)
   }
 
-  override fun nmap(fromKeys: String, isRepeatable: Boolean, action: VimScope.() -> Unit) {
-    addMapping(fromKeys, isRecursive = true, isRepeatable, action, MappingMode.NORMAL)
+  override fun nmap(from: String, isRepeatable: Boolean, action: VimScope.() -> Unit) {
+    addMapping(from, isRecursive = true, isRepeatable, action, MappingMode.NORMAL)
   }
 
-  override fun vmap(fromKeys: String, toKeys: String) {
-    addMapping(fromKeys, toKeys, isRecursive = true, MappingMode.VISUAL)
+  override fun vmap(from: String, to: String) {
+    addMapping(from, to, isRecursive = true, MappingMode.VISUAL)
   }
 
-  override fun vmap(fromKeys: String, isRepeatable: Boolean, action: VimScope.() -> Unit) {
-    addMapping(fromKeys, isRecursive = true, isRepeatable, action, MappingMode.VISUAL)
+  override fun vmap(from: String, isRepeatable: Boolean, action: VimScope.() -> Unit) {
+    addMapping(from, isRecursive = true, isRepeatable, action, MappingMode.VISUAL)
+  }
+
+  override fun nmap(
+    from: String,
+    label: String,
+    isRepeatable: Boolean,
+    action: VimScope.() -> Unit,
+  ) {
+    addMapping(label, true, isRepeatable, action, MappingMode.NORMAL)
+    addMapping(from, label, true, MappingMode.NORMAL)
+  }
+
+  override fun vmap(
+    from: String,
+    label: String,
+    isRepeatable: Boolean,
+    action: VimScope.() -> Unit,
+  ) {
+    addMapping(label, true, isRepeatable, action, MappingMode.VISUAL)
+    addMapping(from, label, true, MappingMode.VISUAL)
   }
 
   private fun addMapping(
