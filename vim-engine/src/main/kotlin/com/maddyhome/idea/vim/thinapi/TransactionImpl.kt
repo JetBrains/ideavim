@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.thinapi
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.CaretInfo
 import com.intellij.vim.api.scopes.Transaction
+import com.intellij.vim.api.scopes.caret.CaretTransaction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.MutableVimEditor
 import com.maddyhome.idea.vim.api.VimCaret
@@ -21,7 +22,26 @@ import com.maddyhome.idea.vim.common.TextRange
 class TransactionImpl(
   private val editor: VimEditor,
   private val context: ExecutionContext,
-) : Transaction, ReadImpl(editor, context) {
+) : Transaction {
+  override fun forEachCaret(block: CaretTransaction.() -> Unit) {
+    editor.carets().forEach { caret -> CaretTransactionImpl(caret.caretId, editor, context).block() }
+  }
+
+  override fun <T> mapEachCaret(block: CaretTransaction.() -> T): List<T> {
+    return editor.carets().map { caret -> CaretTransactionImpl(caret.caretId, editor, context).block() }
+  }
+
+  override fun forEachCaretSorted(block: CaretTransaction.() -> Unit) {
+    editor.sortedCarets().forEach { caret -> CaretTransactionImpl(caret.caretId, editor, context).block() }
+  }
+
+  override fun withCaret(
+    caretId: CaretId,
+    block: CaretTransaction.() -> Unit,
+  ) {
+    TODO("Not yet implemented")
+  }
+
   override fun deleteText(startOffset: Int, endOffset: Int) {
     editor.deleteString(TextRange(startOffset, endOffset))
   }

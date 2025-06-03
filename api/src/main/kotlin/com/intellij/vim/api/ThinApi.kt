@@ -17,12 +17,18 @@ enum class RegisterType {
 val RegisterType.isLine: Boolean
   get() = this == RegisterType.LINE
 
+data class RegisterData(
+  val text: String,
+  val type: RegisterType
+)
 
 enum class TextSelectionType {
   CHARACTER_WISE,
   LINE_WISE,
   BLOCK_WISE,
 }
+
+data class Range(val start: Int, val end: Int)
 
 typealias CaretData = Pair<CaretId, CaretInfo>
 

@@ -10,56 +10,33 @@ package com.maddyhome.idea.vim.thinapi
 
 import com.intellij.vim.api.CaretData
 import com.intellij.vim.api.CaretId
-import com.intellij.vim.api.CaretInfo
-import com.intellij.vim.api.RegisterType
 import com.intellij.vim.api.scopes.Read
+import com.intellij.vim.api.scopes.caret.CaretRead
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndOffset
-import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.common.TextRange
 
 open class ReadImpl(
   private val editor: VimEditor,
   private val context: ExecutionContext,
 ) : Read, VimScopeImpl(editor, context) {
-  override fun getCurrentRegisterName(caretId: CaretId): Char {
-    val caretCount: Int = editor.carets().size
-    val registerGroup = injector.registerGroup
-
-    val lastRegisterChar: Char =
-      if (caretCount == 1) registerGroup.currentRegister else registerGroup.getCurrentRegisterForMulticaret()
-    return lastRegisterChar
+  override fun forEachCaret(block: CaretRead.() -> Unit) {
+    editor.carets().forEach { caret -> CaretReadImpl(caret.caretId, editor, context).block() }
   }
 
-  override fun getRegisterContent(caretId: CaretId, register: Char): String? {
-    val caret: VimCaret = editor.carets().find { it.id == caretId.id } ?: return null
-    return caret.registerStorage.getRegister(editor, context, register)?.text
+  override fun <T> mapEachCaret(block: CaretRead.() -> T): List<T> {
+    return editor.carets().map { caret -> CaretReadImpl(caret.caretId, editor, context).block() }
   }
 
-  override fun getRegisterType(
+  override fun forEachCaretSorted(block: CaretRead.() -> Unit) {
+    editor.sortedCarets().forEach { caret -> CaretReadImpl(caret.caretId, editor, context).block() }
+  }
+
+  override fun withCaret(
     caretId: CaretId,
-    register: Char,
-  ): RegisterType? {
-    val caret: VimCaret = editor.carets().find { it.id == caretId.id } ?: return null
-    return caret.registerStorage.getRegister(editor, context, register)?.type?.toRegisterType()
-  }
-
-  override fun getVisualSelectionMarks(caretId: CaretId): Pair<Int, Int>? {
-    val caret: VimCaret = editor.carets().find { it.id == caretId.id } ?: return null
-    return Pair(caret.selectionStart, caret.selectionEnd)
-  }
-
-  override fun getChangeMarks(caretId: CaretId): Pair<Int, Int>? {
-    val caret: VimCaret = editor.carets().find { it.id == caretId.id } ?: return null
-    val changeMarks: TextRange = injector.markService.getChangeMarks(caret) ?: return null
-    return Pair(changeMarks.startOffset, changeMarks.endOffset)
-  }
-
-  override fun getCaretLine(caretId: CaretId): Int? {
-    val caret: VimCaret = editor.carets().find { it.id == caretId.id } ?: return null
-    return caret.getBufferPosition().line
+    block: CaretRead.() -> Unit,
+  ) {
+    CaretReadImpl(caretId, editor, context).block()
   }
 
   override fun getLineStartOffset(line: Int): Int {
@@ -84,10 +61,5 @@ open class ReadImpl(
 
   override fun getAllCaretIdsSortedByOffset(): List<CaretId> {
     return editor.sortedCarets().map { caret -> caret.caretId }
-  }
-
-  override fun getCaretInfo(caretId: CaretId): CaretInfo? {
-    val caret: VimCaret = editor.carets().find { it.id == caretId.id } ?: return null
-    return caret.caretInfo
   }
 }
