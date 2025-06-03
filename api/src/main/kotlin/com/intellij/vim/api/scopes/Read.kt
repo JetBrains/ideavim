@@ -10,22 +10,22 @@ package com.intellij.vim.api.scopes
 
 import com.intellij.vim.api.CaretData
 import com.intellij.vim.api.CaretId
-import com.intellij.vim.api.CaretInfo
-import com.intellij.vim.api.RegisterType
+import com.intellij.vim.api.scopes.caret.CaretRead
 
 @VimPluginDsl
 interface Read {
-  fun getCurrentRegisterName(caretId: CaretId): Char
-  fun getRegisterContent(caretId: CaretId, register: Char): String?
-  fun getRegisterType(caretId: CaretId, register: Char): RegisterType?
-  fun getVisualSelectionMarks(caretId: CaretId): Pair<Int, Int>?
-  fun getChangeMarks(caretId: CaretId): Pair<Int, Int>?
-  fun getCaretLine(caretId: CaretId): Int?
+  fun forEachCaret(block: CaretRead.() -> Unit)
+
+  fun <T> mapEachCaret(block: CaretRead.() -> T): List<T>
+
+  fun forEachCaretSorted(block: CaretRead.() -> Unit)
+
+  fun withCaret(caretId: CaretId, block: CaretRead.() -> Unit)
+
   fun getLineStartOffset(line: Int): Int
   fun getLineEndOffset(line: Int, allowEnd: Boolean): Int
   fun getAllCaretsData(): List<CaretData>
   fun getAllCaretsDataSortedByOffset(): List<CaretData>
   fun getAllCaretIds(): List<CaretId>
   fun getAllCaretIdsSortedByOffset(): List<CaretId>
-  fun getCaretInfo(caretId: CaretId): CaretInfo?
 }

@@ -11,10 +11,14 @@ package com.maddyhome.idea.vim.extension.replacewithregister
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.CaretInfo
 import com.intellij.vim.api.Mode
+import com.intellij.vim.api.Range
+import com.intellij.vim.api.RegisterData
 import com.intellij.vim.api.RegisterType
 import com.intellij.vim.api.TextSelectionType
 import com.intellij.vim.api.isLine
+import com.intellij.vim.api.scopes.Transaction
 import com.intellij.vim.api.scopes.VimScope
+import com.intellij.vim.api.scopes.caret.CaretTransaction
 import com.maddyhome.idea.vim.extension.thin.api.VimPluginBase
 
 class ReplaceWithRegisterNewApi : VimPluginBase {
@@ -33,121 +37,111 @@ class ReplaceWithRegisterNewApi : VimPluginBase {
       }
     }
 
-    exportOperatorFunction(OPERATOR_FUNC) {
-      forEachCaret { caretId ->
-        val selectionRange: Pair<Int, Int>? = read {
-          when (this@forEachCaret.mode) {
-            Mode.NORMAL -> getChangeMarks(caretId)
-            Mode.VISUAL -> getVisualSelectionMarks(caretId)
-            else -> null
-          }
-        }
-
-        if (selectionRange == null) {
-          return@forEachCaret
-        }
-
-        val selectionType: TextSelectionType = getSelectionTypeForCurrentMode() ?: TextSelectionType.CHARACTER_WISE
-        replaceTextForCaret(caretId, selectionRange, selectionType)
-      }
-      return@exportOperatorFunction true
+    exportOperatorFunction(OPERATOR_FUNC_NAME) {
+      operatorFunction()
     }
   }
 
+  private fun VimScope.operatorFunction(): Boolean {
+    fun CaretTransaction.getSelection(): Range? {
+      return when (this@operatorFunction.mode) {
+        Mode.NORMAL -> getChangeMarks()
+        Mode.VISUAL -> getVisualSelectionMarks()
+        else -> null
+      }
+    }
+
+    val selectionType: TextSelectionType = getSelectionTypeForCurrentMode() ?: TextSelectionType.CHARACTER_WISE
+    change {
+      forEachCaret {
+        val selectionRange = getSelection() ?: return@forEachCaret
+        val registerData = prepareRegister() ?: return@forEachCaret
+        replaceTextAndUpdateCaret(caretId, selectionRange, selectionType, registerData)
+      }
+    }
+    return true
+  }
+
   private fun VimScope.rewriteMotion() {
-    setOperatorFunction(OPERATOR_FUNC)
+    setOperatorFunction(OPERATOR_FUNC_NAME)
     normal("g@")
   }
 
   private fun VimScope.rewriteLine() {
-    val caretsSelectionsMap: MutableMap<CaretId, Pair<Int, Int>> = mutableMapOf()
-    forEachCaret { caretId ->
-      val caretLine: Int?
-      val lineRange: Pair<Int, Int>?
-      val count1 = getVariableInt("v:count1") ?: 1
-
-      read {
-        caretLine = getCaretLine(caretId)
-        lineRange = caretLine?.let { line ->
-          getLineStartOffset(line) to getLineEndOffset(line + count1 - 1, true)
-        }
-      }
-
-      caretsSelectionsMap[caretId] = lineRange ?: return@forEachCaret
-      replaceTextForCaret(caretId, lineRange, TextSelectionType.LINE_WISE)
-    }
-
-    forEachCaretSorted { caretId ->
-      val (selectionStart, _) = caretsSelectionsMap.getValue(caretId)
-      change {
-        val caretInfo: CaretInfo = getCaretInfo(caretId) ?: return@change
-        updateCaret(caretId, caretInfo.copy(offset = selectionStart))
+    val count1 = getVariableInt("v:count1") ?: 1
+    change {
+      forEachCaretSorted {
+        val line = getCaretLine()
+        val lineRange = Range(getLineStartOffset(line), getLineEndOffset(line + count1 - 1, true))
+        val registerData = prepareRegister() ?: return@forEachCaretSorted
+        val selectionType = TextSelectionType.LINE_WISE
+        replaceTextAndUpdateCaret(caretId, lineRange, selectionType, registerData)
+        updateCaret(caretId, caretInfo.copy(offset = lineRange.start))
       }
     }
   }
 
   private fun VimScope.rewriteVisual() {
-    forEachCaretSorted { caretId ->
-      val selectionType: TextSelectionType = getSelectionTypeForCurrentMode() ?: TextSelectionType.CHARACTER_WISE
-      val selectionRange: Pair<Int, Int> = read { getVisualSelectionMarks(caretId) } ?: return@forEachCaretSorted
-      replaceTextForCaret(caretId, selectionRange, selectionType)
+    val selectionType: TextSelectionType = getSelectionTypeForCurrentMode() ?: TextSelectionType.CHARACTER_WISE
+    change {
+      forEachCaretSorted {
+        val selectionRange = getVisualSelectionMarks() ?: return@forEachCaretSorted
+        val registerData = prepareRegister() ?: return@forEachCaretSorted
+        replaceTextAndUpdateCaret(caretId, selectionRange, selectionType, registerData)
+      }
     }
     exitVisualMode()
   }
 
-  private fun VimScope.replaceTextForCaret(
-    caretId: CaretId,
-    selectionRange: Pair<Int, Int>,
-    selectionType: TextSelectionType,
-  ) {
-    val (startOffset, endOffset) = selectionRange
-    val lastRegisterName: Char
-    var registerText: String?
-    var registerType: RegisterType?
-
-    read {
-      lastRegisterName = getCurrentRegisterName(caretId)
-      registerText = getRegisterContent(caretId, lastRegisterName)
-      registerType = getRegisterType(caretId, lastRegisterName)
-    }
-
-    if (registerText == null || registerType == null) return
+  private fun CaretTransaction.prepareRegister(): RegisterData? {
+    val lastRegisterName: Char = getCurrentRegisterName()
+    var registerText: String = getRegisterContent(lastRegisterName) ?: return null
+    var registerType: RegisterType = getRegisterType(lastRegisterName) ?: return null
 
     if (registerType.isLine && registerText.endsWith("\n")) {
       registerText = registerText.removeSuffix("\n")
       registerType = RegisterType.CHAR
     }
 
-    change {
-      /**
-       * This logic that includes updating caret position should probably be hidden from the user and handled inside
-       * functions - this is a simplified version for the API draft.
-       */
-      var newCaretOffset: Int
-      val replaceTextBlockWise: Boolean =
-        registerType == RegisterType.BLOCK && selectionType == TextSelectionType.CHARACTER_WISE
+    return RegisterData(registerText, registerType)
+  }
 
-      if (replaceTextBlockWise) {
-        replaceTextBlockwise(caretId, startOffset, endOffset, registerText.split("\n"))
-        newCaretOffset = startOffset
-      } else {
-        replaceText(caretId, startOffset, endOffset, registerText)
-        newCaretOffset = when (selectionType) {
-          TextSelectionType.CHARACTER_WISE -> startOffset + registerText.length - 1
-          TextSelectionType.LINE_WISE -> startOffset
-          TextSelectionType.BLOCK_WISE -> startOffset
-        }
+  private fun Transaction.replaceTextAndUpdateCaret(
+    caretId: CaretId,
+    selectionRange: Range,
+    selectionType: TextSelectionType,
+    registerData: RegisterData,
+  ) {
+    val text: String = registerData.text
+    val registerType: RegisterType = registerData.type
+    val (startOffset, endOffset) = selectionRange
+    /**
+     * This logic that includes updating caret position should probably be hidden from the user and handled inside
+     * functions - this is a simplified version for the API draft.
+     */
+    var newCaretOffset: Int
+    val replaceTextBlockWise: Boolean =
+      registerType == RegisterType.BLOCK && selectionType == TextSelectionType.CHARACTER_WISE
+
+    if (replaceTextBlockWise) {
+      replaceTextBlockwise(caretId, startOffset, endOffset, text.split("\n"))
+      newCaretOffset = startOffset
+    } else {
+      replaceText(caretId, startOffset, endOffset, text)
+      newCaretOffset = when (selectionType) {
+        TextSelectionType.CHARACTER_WISE -> startOffset + text.length - 1
+        TextSelectionType.LINE_WISE -> startOffset
+        TextSelectionType.BLOCK_WISE -> startOffset
       }
-
-      val caretInfo: CaretInfo = getCaretInfo(caretId) ?: return@change
-      updateCaret(caretId, caretInfo.copy(newCaretOffset, null))
     }
+
+    updateCaret(caretId, CaretInfo(newCaretOffset, null))
   }
 
   companion object {
     private const val RWR_OPERATOR = "<Plug>ReplaceWithRegisterOperator"
     private const val RWR_LINE = "<Plug>ReplaceWithRegisterLine"
     private const val RWR_VISUAL = "<Plug>ReplaceWithRegisterVisual"
-    private const val OPERATOR_FUNC = "ReplaceWithRegisterOperatorFunc"
+    private const val OPERATOR_FUNC_NAME = "ReplaceWithRegisterOperatorFunc"
   }
 }
