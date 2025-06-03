@@ -89,6 +89,11 @@ tasks {
       dependsOn("generateTestGrammarSource")
     }
 
+    compileJava {
+      sourceCompatibility = "17"
+      targetCompatibility = "17"
+    }
+
     compileKotlin {
         kotlinOptions {
             jvmTarget = "17"
