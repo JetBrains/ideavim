@@ -8,7 +8,6 @@
 
 package com.intellij.vim.api.scopes
 
-import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.Mode
 import com.intellij.vim.api.TextSelectionType
 import kotlin.contracts.ExperimentalContracts
@@ -44,14 +43,6 @@ abstract class VimScope {
   }
 
   abstract fun mappings(block: MappingScope.() -> Unit)
-
-  fun forEachCaret(block: VimScope.(CaretId) -> Unit) {
-    read { getAllCaretIds() }.forEach { caretId -> block(caretId) }
-  }
-
-  fun forEachCaretSorted(block: VimScope.(CaretId) -> Unit) {
-    read { getAllCaretIdsSortedByOffset() }.forEach { caretId -> block(caretId) }
-  }
 
   protected abstract fun <T> ideRead(block: Read.() -> T): T
   protected abstract fun ideChange(block: Transaction.() -> Unit)
