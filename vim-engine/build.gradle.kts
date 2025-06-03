@@ -91,6 +91,7 @@ tasks {
 
     compileKotlin {
         kotlinOptions {
+            jvmTarget = "17"
             apiVersion = "1.9"
             freeCompilerArgs = listOf("-Xjvm-default=all-compatibility")
         }
