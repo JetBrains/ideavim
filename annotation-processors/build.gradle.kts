@@ -20,6 +20,19 @@ repositories {
   mavenCentral()
 }
 
+tasks {
+  compileJava {
+    sourceCompatibility = "17"
+    targetCompatibility = "17"
+  }
+
+  compileKotlin {
+    kotlinOptions {
+      jvmTarget = "17"
+    }
+  }
+}
+
 dependencies {
   compileOnly("com.google.devtools.ksp:symbol-processing-api:2.0.0-1.0.24")
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:$kotlinxSerializationVersion") {
