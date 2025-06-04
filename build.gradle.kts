@@ -161,10 +161,10 @@ dependencies {
   testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
 
   testImplementation("org.junit.jupiter:junit-jupiter-api:5.12.2")
-  testImplementation("org.junit.jupiter:junit-jupiter-engine:5.12.2")
+  testImplementation("org.junit.jupiter:junit-jupiter-engine:5.13.0")
   testImplementation("org.junit.jupiter:junit-jupiter-params:5.12.2")
   testFixturesImplementation("org.junit.jupiter:junit-jupiter-api:5.12.2")
-  testFixturesImplementation("org.junit.jupiter:junit-jupiter-engine:5.12.2")
+  testFixturesImplementation("org.junit.jupiter:junit-jupiter-engine:5.13.0")
   testFixturesImplementation("org.junit.jupiter:junit-jupiter-params:5.12.2")
 
   // Temp workaround suggested in https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-faq.html#junit5-test-framework-refers-to-junit4
