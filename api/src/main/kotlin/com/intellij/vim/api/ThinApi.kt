@@ -48,3 +48,11 @@ enum class Mode {
   INSERT,
   COMMAND
 }
+
+interface Highlighter
+
+data class Color(
+  val hexCode: String
+)
+
+class VimPluginException(message: String) : Exception(message)

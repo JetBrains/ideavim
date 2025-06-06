@@ -8,6 +8,7 @@
 
 package com.intellij.vim.api.scopes
 
+import com.intellij.vim.api.Color
 import com.intellij.vim.api.Mode
 import com.intellij.vim.api.TextSelectionType
 import kotlin.reflect.KType
@@ -39,6 +40,13 @@ interface VimScope {
   fun editor(block: EditorScope.() -> Unit)
   fun mappings(block: MappingScope.() -> Unit)
   fun listeners(block: ListenersScope.() -> Unit)
+
+  /**
+   * String in format: rgba(0,0,0,0)
+   *
+   * Throws IllegalArgumentException if string is not in correct format
+   */
+  fun parseRgbaColor(rgbaString: String): Color?
 }
 
 /**
