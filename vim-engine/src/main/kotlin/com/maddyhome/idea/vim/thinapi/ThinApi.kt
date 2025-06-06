@@ -10,12 +10,16 @@ package com.maddyhome.idea.vim.thinapi
 
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.CaretInfo
+import com.intellij.vim.api.Color
 import com.intellij.vim.api.Mode
 import com.intellij.vim.api.RegisterType
 import com.intellij.vim.api.TextSelectionType
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.state.mode.SelectionType
+import java.lang.String
+import kotlin.to
+import java.awt.Color as AwtColor
 
 fun RegisterType.toSelectionType(): SelectionType {
   return when (this) {
@@ -78,4 +82,21 @@ fun MappingMode.toMode(): Mode {
     MappingMode.INSERT -> Mode.INSERT
     MappingMode.CMD_LINE -> Mode.COMMAND
   }
+}
+
+fun Color.toAwtColor(): AwtColor {
+  val argb = hexCode.removePrefix("#").toLong(16)
+  val hasAlpha = hexCode.length > 7
+
+  val r = (argb shr 16).toInt() and 0xFF
+  val g = (argb shr 8).toInt() and 0xFF
+  val b = argb.toInt() and 0xFF
+  val a = if (hasAlpha) (argb shr 24).toInt() and 0xFF else 0xFF
+
+  return AwtColor(r, g, b, a)
+}
+
+fun AwtColor.toHexColor(): Color {
+  val hexColor = String.format("#%02x%02x%02x%02x", alpha, red, green, blue)
+  return Color(hexColor)
 }

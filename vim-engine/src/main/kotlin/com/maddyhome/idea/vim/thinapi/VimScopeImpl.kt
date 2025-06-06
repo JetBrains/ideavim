@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.thinapi
 
 
+import com.intellij.vim.api.Color
 import com.intellij.vim.api.Mode
 import com.intellij.vim.api.TextSelectionType
 import com.intellij.vim.api.scopes.EditorScope
@@ -39,6 +40,7 @@ import com.maddyhome.idea.vim.vimscript.services.VariableService
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.full.createType
+import java.awt.Color as AwtColor
 
 open class VimScopeImpl(
   private val listenerOwner: ListenerOwner,
@@ -59,7 +61,7 @@ open class VimScopeImpl(
     return typeInEditor.toTextSelectionType()
   }
 
-  override fun <T : Any> getVariable(name: String, type: KType): T {
+  override fun <T : Any> getVariable(name: String, type: KType): T? {
     val (name, scope) = parseVariableName(name)
     val variableService: VariableService = injector.variableService
     val variable = Variable(scope, name)
@@ -67,7 +69,8 @@ open class VimScopeImpl(
     val variableValue: VimDataType? =
       variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext)
     if (variableValue == null) {
-      throw IllegalArgumentException("Variable with name $name does not exist")
+      return variableValue
+//      throw IllegalArgumentException("Variable with name $name does not exist")
     }
     val value: T = parseVariableValue(variableValue, type)
     return value
@@ -79,6 +82,8 @@ open class VimScopeImpl(
       Int::class -> {
         if (vimDataType is VimInt) {
           vimDataType.value
+        } else if(vimDataType is VimString && vimDataType.value.toIntOrNull() != null) {
+          vimDataType.value.toInt()
         } else {
           throw IllegalArgumentException("Expected Int, but got ${vimDataType::class.simpleName}")
         }
@@ -192,5 +197,20 @@ open class VimScopeImpl(
   override fun listeners(block: ListenersScope.() -> Unit) {
     val listenersScope = ListenerScopeImpl(listenerOwner, mappingOwner)
     listenersScope.block()
+  }
+
+  override fun parseRgbaColor(rgbaString: String): Color? {
+    // todo: replace with regex
+    val rgba = rgbaString.removePrefix("rgba(")
+      .filter { it != '(' && it != ')' && !it.isWhitespace() }
+      .split(',')
+      .map { it.toInt() }
+
+    if (rgba.size != 4 || rgba.any { it < 0 || it > 255 }) {
+      throw IllegalArgumentException("Invalid RGBA values. Each component must be between 0 and 255")
+    }
+
+    val awtColor = AwtColor(rgba[0], rgba[1], rgba[2], rgba[3])
+    return awtColor.toHexColor()
   }
 }
