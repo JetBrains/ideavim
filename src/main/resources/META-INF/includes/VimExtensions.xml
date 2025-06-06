@@ -89,7 +89,7 @@
       </aliases>
     </vimExtension>
 
-    <vimExtension implementation="com.maddyhome.idea.vim.extension.highlightedyank.VimHighlightedYank"
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.highlightedyank.VimHighlightedYankNewApi"
                   name="highlightedyank">
       <aliases>
         <alias name="https://github.com/machakann/vim-highlightedyank"/>

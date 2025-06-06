@@ -8,16 +8,16 @@
 
 package com.maddyhome.idea.vim.extension.thin.api
 
-import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.ProjectManager
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.listener.VimListenerManager.VimLastSelectedEditorTracker
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.thinapi.VimEditorService
 
-class IjVimEditorServiceImpl: VimEditorService {
+class IjVimEditorServiceImpl : VimEditorService {
   override fun getFocusedEditor(): VimEditor? {
-    val project = ProjectManager.getInstance().openProjects.first()
-    val fileEditorManager = FileEditorManager.getInstance(project)
-    return fileEditorManager.selectedTextEditor?.vim
+    // todo: probably we should use currently focused project
+    val project = ProjectManager.getInstance().openProjects.firstOrNull() ?: ProjectManager.getInstance().defaultProject
+    return VimLastSelectedEditorTracker.getLastSelectedEditor(project)?.vim
   }
 }

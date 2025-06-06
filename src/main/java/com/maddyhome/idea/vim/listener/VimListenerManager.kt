@@ -389,8 +389,8 @@ internal object VimListenerManager {
 
     fun getLastSelectedEditor(project: Project): Editor? = selectedEditors[project]?.get()
 
-    internal fun setLastSelectedEditor(fileEditor: FileEditor?) {
-      (fileEditor as? TextEditor)?.editor?.let { editor ->
+    internal fun setLastSelectedEditor(editor: Editor?) {
+      editor?.let { editor ->
         editor.project?.let { project -> selectedEditors[project] = WeakReference(editor) }
       }
     }
@@ -415,7 +415,7 @@ internal object VimListenerManager {
       FileGroup.fileEditorManagerSelectionChangedCallback(event)
       VimPlugin.getSearch().fileEditorManagerSelectionChangedCallback(event)
       IjVimRedrawService.fileEditorManagerSelectionChangedCallback(event)
-      VimLastSelectedEditorTracker.setLastSelectedEditor(event.newEditor)
+      VimLastSelectedEditorTracker.setLastSelectedEditor((event.newEditor as TextEditor?)?.editor)
     }
   }
 
