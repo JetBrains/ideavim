@@ -610,6 +610,10 @@ Contributors:
   [![icon][github]](https://github.com/vumi19)
   &nbsp;
   Mia Vucinic
+* [![icon][mail]](mailto:canava.thomas@gmail.com)
+  [![icon][github]](https://github.com/Malandril)
+  &nbsp;
+  Thomas Canava
 
 Previous contributors:
 
