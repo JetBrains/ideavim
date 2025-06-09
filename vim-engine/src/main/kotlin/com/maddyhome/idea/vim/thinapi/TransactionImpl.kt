@@ -39,7 +39,13 @@ class TransactionImpl(
     caretId: CaretId,
     block: CaretTransaction.() -> Unit,
   ) {
-    TODO("Not yet implemented")
+    vimEditor.carets().find { it.id == caretId.id }
+      ?.let { caret -> block(CaretTransactionImpl(caret.caretId, vimEditor, context)) } ?: return
+  }
+
+  override fun insertText(caretId: CaretId, atPosition: Int, text: CharSequence) {
+    val caret: VimCaret = vimEditor.carets().find { it.id == caretId.id } ?: return
+    (vimEditor as MutableVimEditor).insertText(caret, atPosition, text)
   }
 
   override fun deleteText(startOffset: Int, endOffset: Int) {
@@ -61,6 +67,14 @@ class TransactionImpl(
       val preparedText = if (isLastCharInLine) text.plus("\n") else text
       (vimEditor as MutableVimEditor).replaceString(startOffset, endOffset, preparedText)
     }
+  }
+
+  override fun addCaret(offset: Int): CaretId {
+    TODO("Not yet implemented")
+  }
+
+  override fun removeCaret(caretId: CaretId) {
+    TODO("Not yet implemented")
   }
 
   override fun replaceTextBlockwise(
@@ -86,13 +100,5 @@ class TransactionImpl(
         (vimEditor as MutableVimEditor).insertText(caret, lineStartOffset + startDiff, lineText)
       }
     }
-  }
-
-  override fun updateCaret(caretId: CaretId, info: CaretInfo) {
-    val caret: VimCaret = vimEditor.carets().find { it.id == caretId.id } ?: return
-    caret.moveToOffset(info.offset)
-    info.selection?.let { (start, end) ->
-      caret.setSelection(start, end)
-    } ?: caret.removeSelection()
   }
 }
