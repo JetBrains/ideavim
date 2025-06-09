@@ -17,6 +17,7 @@ import com.maddyhome.idea.vim.macro.VimMacro
 import com.maddyhome.idea.vim.put.VimPut
 import com.maddyhome.idea.vim.register.VimRegisterGroup
 import com.maddyhome.idea.vim.state.VimStateMachine
+import com.maddyhome.idea.vim.thinapi.VimEditorService
 import com.maddyhome.idea.vim.thinapi.VimPluginService
 import com.maddyhome.idea.vim.undo.VimUndoRedo
 import com.maddyhome.idea.vim.vimscript.services.VariableService
@@ -143,6 +144,8 @@ interface VimInjector {
   val redrawService: VimRedrawService
 
   val pluginService: VimPluginService
+
+  val editorService: VimEditorService
 }
 
 lateinit var injector: VimInjector
