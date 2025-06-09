@@ -15,11 +15,19 @@ import com.intellij.vim.api.scopes.caret.CaretRead
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndOffset
+import com.maddyhome.idea.vim.api.getText
 
 open class ReadImpl(
   private val vimEditor: VimEditor,
   private val context: ExecutionContext,
 ) : Read, VimScopeImpl(vimEditor, context) {
+  override val size: Long
+    get() = vimEditor.fileSize()
+  override val text: CharSequence
+    get() = vimEditor.text()
+  override val lineCount: Int
+    get() = vimEditor.lineCount()
+
   override fun forEachCaret(block: CaretRead.() -> Unit) {
     vimEditor.carets().forEach { caret -> CaretReadImpl(caret.caretId, vimEditor, context).block() }
   }
@@ -45,6 +53,10 @@ open class ReadImpl(
 
   override fun getLineEndOffset(line: Int, allowEnd: Boolean): Int {
     return vimEditor.getLineEndOffset(line, allowEnd)
+  }
+
+  override fun getText(startOffset: Int, endOffset: Int): CharSequence {
+    return vimEditor.getText(startOffset, endOffset)
   }
 
   override fun getAllCaretsData(): List<CaretData> {
