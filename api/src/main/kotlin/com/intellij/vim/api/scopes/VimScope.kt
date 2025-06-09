@@ -38,6 +38,7 @@ interface VimScope {
 
   fun editor(block: EditorScope.() -> Unit)
   fun mappings(block: MappingScope.() -> Unit)
+  fun listeners(block: ListenersScope.() -> Unit)
 }
 
 /**
