@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.thinapi.VimScopeImpl
 
 interface VimPluginBase : VimExtension {
   override fun init() {
-    val vimScope = VimScopeImpl()
+    val vimScope = VimScopeImpl(listenerOwner, mappingOwner = owner)
     vimScope.init()
   }
 
