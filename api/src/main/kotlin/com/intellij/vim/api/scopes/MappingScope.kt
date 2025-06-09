@@ -12,20 +12,20 @@ interface MappingScope {
   fun nmap(from: String, to: String)
   fun vmap(from: String, to: String)
 
-  fun nmap(from: String, isRepeatable: Boolean, action: VimScope.() -> Unit)
-  fun vmap(from: String, isRepeatable: Boolean, action: VimScope.() -> Unit)
+  fun nmap(from: String, isRepeatable: Boolean = false, action: VimScope.() -> Unit)
+  fun vmap(from: String, isRepeatable: Boolean = false, action: VimScope.() -> Unit)
 
   fun nmap(
     keys: String,
     label: String,
-    isRepeatable: Boolean,
+    isRepeatable: Boolean = false,
     action: VimScope.() -> Unit,
   )
 
   fun vmap(
     keys: String,
     label: String,
-    isRepeatable: Boolean,
+    isRepeatable: Boolean = false,
     action: VimScope.() -> Unit,
   )
 }
