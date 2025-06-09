@@ -14,7 +14,6 @@ import com.intellij.vim.api.Range
 import com.intellij.vim.api.RegisterData
 import com.intellij.vim.api.RegisterType
 import com.intellij.vim.api.scopes.caret.CaretRead
-import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -24,9 +23,10 @@ import com.maddyhome.idea.vim.register.Register
 
 class CaretReadImpl(
   override val caretId: CaretId,
-  private val vimEditor: VimEditor,
-  private val context: ExecutionContext,
 ) : CaretRead {
+  private val vimEditor: VimEditor
+    get() = injector.editorService.getFocusedEditor()!!
+
   override val caretInfo: CaretInfo
     get() {
       val caret: VimCaret = vimEditor.carets().first { it.id == caretId.id }
@@ -43,6 +43,7 @@ class CaretReadImpl(
   }
 
   override fun getRegisterData(register: Char): RegisterData? {
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val caret: VimCaret = vimEditor.carets().find { it.id == caretId.id } ?: return null
     val register: Register = caret.registerStorage.getRegister(vimEditor, context, register) ?: return null
     return RegisterData(register.text, register.type.toRegisterType())

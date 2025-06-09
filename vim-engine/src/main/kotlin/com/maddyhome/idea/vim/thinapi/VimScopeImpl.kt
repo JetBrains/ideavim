@@ -37,20 +37,19 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.full.createType
 
-open class VimScopeImpl(
-  private val vimEditor: VimEditor,
-  private val context: ExecutionContext,
-) : VimScope {
+open class VimScopeImpl() : VimScope {
   override var mode: Mode
     get() {
-      return vimEditor.mode.toMappingMode().toMode()
+      return injector.vimState.mode.toMappingMode().toMode()
     }
     set(value) {
       // a lot of custom logic
     }
+  private val vimEditor: VimEditor
+    get() = injector.editorService.getFocusedEditor()!!
 
   override fun getSelectionTypeForCurrentMode(): TextSelectionType? {
-    val typeInEditor = vimEditor.mode.selectionType ?: return null
+    val typeInEditor = injector.vimState.mode.selectionType ?: return null
     return typeInEditor.toTextSelectionType()
   }
 
@@ -58,6 +57,7 @@ open class VimScopeImpl(
     val (name, scope) = parseVariableName(name)
     val variableService: VariableService = injector.variableService
     val variable = Variable(scope, name)
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val variableValue: VimDataType? =
       variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext)
     if (variableValue == null) {
@@ -154,7 +154,7 @@ open class VimScopeImpl(
         context: ExecutionContext,
         selectionType: SelectionType?,
       ): Boolean {
-        return VimScopeImpl(editor, context).function()
+        return VimScopeImpl().function()
       }
     }
     injector.pluginService.exportOperatorFunction(name, operatorFunction)
@@ -174,7 +174,7 @@ open class VimScopeImpl(
   }
 
   override fun editor(block: EditorScope.() -> Unit) {
-    val editorScope = EditorScopeImpl(vimEditor, context)
+    val editorScope = EditorScopeImpl()
     editorScope.block()
   }
 

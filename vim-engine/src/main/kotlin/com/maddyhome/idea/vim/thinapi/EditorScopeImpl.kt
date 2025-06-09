@@ -11,24 +11,19 @@ package com.maddyhome.idea.vim.thinapi
 import com.intellij.vim.api.scopes.EditorScope
 import com.intellij.vim.api.scopes.Read
 import com.intellij.vim.api.scopes.Transaction
-import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 
-class EditorScopeImpl(
-  private val vimEditor: VimEditor,
-  private val context: ExecutionContext,
-) : EditorScope() {
+class EditorScopeImpl() : EditorScope() {
   override fun <T> ideRead(block: Read.() -> T): T {
     return injector.application.runReadAction {
-      val read = ReadImpl(vimEditor, context)
+      val read = ReadImpl()
       return@runReadAction block(read)
     }
   }
 
   override fun ideChange(block: Transaction.() -> Unit) {
     return injector.application.runWriteAction {
-      val transaction = TransactionImpl(vimEditor, context)
+      val transaction = TransactionImpl()
       transaction.block()
     }
   }
