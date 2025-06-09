@@ -9,30 +9,29 @@
 package com.maddyhome.idea.vim.thinapi
 
 import com.intellij.vim.api.CaretId
-import com.intellij.vim.api.CaretInfo
 import com.intellij.vim.api.scopes.Transaction
 import com.intellij.vim.api.scopes.caret.CaretTransaction
-import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.MutableVimEditor
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndOffset
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.TextRange
 
-class TransactionImpl(
-  private val vimEditor: VimEditor,
-  private val context: ExecutionContext,
-) : Transaction {
+class TransactionImpl() : Transaction {
+  private val vimEditor: VimEditor
+    get() = injector.editorService.getFocusedEditor()!!
+
   override fun forEachCaret(block: CaretTransaction.() -> Unit) {
-    vimEditor.carets().forEach { caret -> CaretTransactionImpl(caret.caretId, vimEditor, context).block() }
+    vimEditor.carets().forEach { caret -> CaretTransactionImpl(caret.caretId).block() }
   }
 
   override fun <T> mapEachCaret(block: CaretTransaction.() -> T): List<T> {
-    return vimEditor.carets().map { caret -> CaretTransactionImpl(caret.caretId, vimEditor, context).block() }
+    return vimEditor.carets().map { caret -> CaretTransactionImpl(caret.caretId).block() }
   }
 
   override fun forEachCaretSorted(block: CaretTransaction.() -> Unit) {
-    vimEditor.sortedCarets().forEach { caret -> CaretTransactionImpl(caret.caretId, vimEditor, context).block() }
+    vimEditor.sortedCarets().forEach { caret -> CaretTransactionImpl(caret.caretId).block() }
   }
 
   override fun withCaret(
@@ -40,7 +39,7 @@ class TransactionImpl(
     block: CaretTransaction.() -> Unit,
   ) {
     vimEditor.carets().find { it.id == caretId.id }
-      ?.let { caret -> block(CaretTransactionImpl(caret.caretId, vimEditor, context)) } ?: return
+      ?.let { caret -> block(CaretTransactionImpl(caret.caretId)) } ?: return
   }
 
   override fun insertText(caretId: CaretId, atPosition: Int, text: CharSequence) {

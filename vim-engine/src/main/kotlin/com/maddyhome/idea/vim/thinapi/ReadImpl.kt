@@ -12,15 +12,16 @@ import com.intellij.vim.api.CaretData
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.scopes.Read
 import com.intellij.vim.api.scopes.caret.CaretRead
-import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.getText
+import com.maddyhome.idea.vim.api.injector
 
 open class ReadImpl(
-  private val vimEditor: VimEditor,
-  private val context: ExecutionContext,
-) : Read, VimScopeImpl(vimEditor, context) {
+) : Read, VimScopeImpl() {
+  private val vimEditor: VimEditor
+    get() = injector.editorService.getFocusedEditor()!!
+
   override val size: Long
     get() = vimEditor.fileSize()
   override val text: CharSequence
@@ -29,22 +30,22 @@ open class ReadImpl(
     get() = vimEditor.lineCount()
 
   override fun forEachCaret(block: CaretRead.() -> Unit) {
-    vimEditor.carets().forEach { caret -> CaretReadImpl(caret.caretId, vimEditor, context).block() }
+    vimEditor.carets().forEach { caret -> CaretReadImpl(caret.caretId).block() }
   }
 
   override fun <T> mapEachCaret(block: CaretRead.() -> T): List<T> {
-    return vimEditor.carets().map { caret -> CaretReadImpl(caret.caretId, vimEditor, context).block() }
+    return vimEditor.carets().map { caret -> CaretReadImpl(caret.caretId).block() }
   }
 
   override fun forEachCaretSorted(block: CaretRead.() -> Unit) {
-    vimEditor.sortedCarets().forEach { caret -> CaretReadImpl(caret.caretId, vimEditor, context).block() }
+    vimEditor.sortedCarets().forEach { caret -> CaretReadImpl(caret.caretId).block() }
   }
 
   override fun withCaret(
     caretId: CaretId,
     block: CaretRead.() -> Unit,
   ) {
-    CaretReadImpl(caretId, vimEditor, context).block()
+    CaretReadImpl(caretId).block()
   }
 
   override fun getLineStartOffset(line: Int): Int {

@@ -90,7 +90,7 @@ class MappingScopeImpl: MappingScope {
         context: ExecutionContext,
         operatorArguments: OperatorArguments,
       ) {
-        return VimScopeImpl(editor, context).action()
+        return VimScopeImpl().action()
       }
     }
 
