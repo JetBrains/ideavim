@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.impl.state.toMappingMode
+import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.selectionType
@@ -42,6 +43,8 @@ import kotlin.reflect.full.createType
 open class VimScopeImpl(
   // todo: passing ListenerOwner.IdeaVim.System is temporary
   private val listenerOwner: ListenerOwner = ListenerOwner.IdeaVim.System,
+  // todo: passing MappingOwner.IdeaVim.System is temporary
+  private val mappingOwner: MappingOwner = MappingOwner.IdeaVim.System,
 ) : VimScope {
   override var mode: Mode
     get() {
@@ -184,7 +187,7 @@ open class VimScopeImpl(
   }
 
   override fun mappings(block: MappingScope.() -> Unit) {
-    val mappingScope = MappingScopeImpl()
+    val mappingScope = MappingScopeImpl(mappingOwner)
     mappingScope.block()
   }
 
