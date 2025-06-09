@@ -24,17 +24,17 @@ import com.maddyhome.idea.vim.register.Register
 
 class CaretReadImpl(
   override val caretId: CaretId,
-  private val editor: VimEditor,
+  private val vimEditor: VimEditor,
   private val context: ExecutionContext,
 ) : CaretRead {
   override val caretInfo: CaretInfo
     get() {
-      val caret: VimCaret = editor.carets().first { it.id == caretId.id }
+      val caret: VimCaret = vimEditor.carets().first { it.id == caretId.id }
       return caret.caretInfo
     }
 
   override fun getCurrentRegisterName(): Char {
-    val caretCount: Int = editor.carets().size
+    val caretCount: Int = vimEditor.carets().size
     val registerGroup = injector.registerGroup
 
     val lastRegisterChar: Char =
@@ -43,8 +43,8 @@ class CaretReadImpl(
   }
 
   override fun getRegisterData(register: Char): RegisterData? {
-    val caret: VimCaret = editor.carets().find { it.id == caretId.id } ?: return null
-    val register: Register = caret.registerStorage.getRegister(editor, context, register) ?: return null
+    val caret: VimCaret = vimEditor.carets().find { it.id == caretId.id } ?: return null
+    val register: Register = caret.registerStorage.getRegister(vimEditor, context, register) ?: return null
     return RegisterData(register.text, register.type.toRegisterType())
   }
 
@@ -57,18 +57,18 @@ class CaretReadImpl(
   }
 
   override fun getVisualSelectionMarks(): Range? {
-    val caret: VimCaret = editor.carets().find { it.id == caretId.id } ?: return null
+    val caret: VimCaret = vimEditor.carets().find { it.id == caretId.id } ?: return null
     return Range(caret.selectionStart, caret.selectionEnd)
   }
 
   override fun getChangeMarks(): Range? {
-    val caret: VimCaret = editor.carets().find { it.id == caretId.id } ?: return null
+    val caret: VimCaret = vimEditor.carets().find { it.id == caretId.id } ?: return null
     val changeMarks: TextRange = injector.markService.getChangeMarks(caret) ?: return null
     return Range(changeMarks.startOffset, changeMarks.endOffset)
   }
 
   override fun getCaretLine(): Int {
-    val caret: VimCaret = editor.carets().find { it.id == caretId.id }!!
+    val caret: VimCaret = vimEditor.carets().find { it.id == caretId.id }!!
     return caret.getBufferPosition().line
   }
 }

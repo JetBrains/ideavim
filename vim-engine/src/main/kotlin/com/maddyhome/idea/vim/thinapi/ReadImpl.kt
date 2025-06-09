@@ -17,49 +17,49 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndOffset
 
 open class ReadImpl(
-  private val editor: VimEditor,
+  private val vimEditor: VimEditor,
   private val context: ExecutionContext,
-) : Read, VimScopeImpl(editor, context) {
+) : Read, VimScopeImpl(vimEditor, context) {
   override fun forEachCaret(block: CaretRead.() -> Unit) {
-    editor.carets().forEach { caret -> CaretReadImpl(caret.caretId, editor, context).block() }
+    vimEditor.carets().forEach { caret -> CaretReadImpl(caret.caretId, vimEditor, context).block() }
   }
 
   override fun <T> mapEachCaret(block: CaretRead.() -> T): List<T> {
-    return editor.carets().map { caret -> CaretReadImpl(caret.caretId, editor, context).block() }
+    return vimEditor.carets().map { caret -> CaretReadImpl(caret.caretId, vimEditor, context).block() }
   }
 
   override fun forEachCaretSorted(block: CaretRead.() -> Unit) {
-    editor.sortedCarets().forEach { caret -> CaretReadImpl(caret.caretId, editor, context).block() }
+    vimEditor.sortedCarets().forEach { caret -> CaretReadImpl(caret.caretId, vimEditor, context).block() }
   }
 
   override fun withCaret(
     caretId: CaretId,
     block: CaretRead.() -> Unit,
   ) {
-    CaretReadImpl(caretId, editor, context).block()
+    CaretReadImpl(caretId, vimEditor, context).block()
   }
 
   override fun getLineStartOffset(line: Int): Int {
-    return editor.getLineStartOffset(line)
+    return vimEditor.getLineStartOffset(line)
   }
 
   override fun getLineEndOffset(line: Int, allowEnd: Boolean): Int {
-    return editor.getLineEndOffset(line, allowEnd)
+    return vimEditor.getLineEndOffset(line, allowEnd)
   }
 
   override fun getAllCaretsData(): List<CaretData> {
-    return editor.carets().map { caret -> caret.caretId to caret.caretInfo }
+    return vimEditor.carets().map { caret -> caret.caretId to caret.caretInfo }
   }
 
   override fun getAllCaretsDataSortedByOffset(): List<CaretData> {
-    return editor.sortedCarets().map { caret -> caret.caretId to caret.caretInfo }
+    return vimEditor.sortedCarets().map { caret -> caret.caretId to caret.caretInfo }
   }
 
   override fun getAllCaretIds(): List<CaretId> {
-    return editor.carets().map { caret -> caret.caretId }
+    return vimEditor.carets().map { caret -> caret.caretId }
   }
 
   override fun getAllCaretIdsSortedByOffset(): List<CaretId> {
-    return editor.sortedCarets().map { caret -> caret.caretId }
+    return vimEditor.sortedCarets().map { caret -> caret.caretId }
   }
 }
