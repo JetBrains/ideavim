@@ -25,6 +25,7 @@ interface CaretTransaction {
   fun getVisualSelectionMarks(): Range?
   fun getChangeMarks(): Range?
   fun getCaretLine(): Int
+  fun updateCaret(newInfo: CaretInfo)
 
   // todo: this is temporary - remove
   fun getLineStartOffset(line: Int): Int

@@ -56,7 +56,7 @@ class ReplaceWithRegisterNewApi : VimPluginBase {
       change {
         forEachCaret {
           val selectionRange = getSelection() ?: return@forEachCaret
-          val registerData = prepareRegister() ?: return@forEachCaret
+          val registerData = prepareRegisterData() ?: return@forEachCaret
           replaceTextAndUpdateCaret(caretId, selectionRange, selectionType, registerData)
         }
       }
@@ -76,10 +76,10 @@ class ReplaceWithRegisterNewApi : VimPluginBase {
         forEachCaretSorted {
           val line = getCaretLine()
           val lineRange = Range(getLineStartOffset(line), getLineEndOffset(line + count1 - 1, true))
-          val registerData = prepareRegister() ?: return@forEachCaretSorted
+          val registerData = prepareRegisterData() ?: return@forEachCaretSorted
           val selectionType = TextSelectionType.LINE_WISE
           replaceTextAndUpdateCaret(caretId, lineRange, selectionType, registerData)
-          updateCaret(caretId, caretInfo.copy(offset = lineRange.start))
+          updateCaret(caretInfo.copy(offset = lineRange.start))
         }
       }
     }
@@ -91,7 +91,7 @@ class ReplaceWithRegisterNewApi : VimPluginBase {
       change {
         forEachCaretSorted {
           val selectionRange = getVisualSelectionMarks() ?: return@forEachCaretSorted
-          val registerData = prepareRegister() ?: return@forEachCaretSorted
+          val registerData = prepareRegisterData() ?: return@forEachCaretSorted
           replaceTextAndUpdateCaret(caretId, selectionRange, selectionType, registerData)
         }
       }
@@ -99,7 +99,7 @@ class ReplaceWithRegisterNewApi : VimPluginBase {
     exitVisualMode()
   }
 
-  private fun CaretTransaction.prepareRegister(): RegisterData? {
+  private fun CaretTransaction.prepareRegisterData(): RegisterData? {
     val lastRegisterName: Char = getCurrentRegisterName()
     var registerText: String = getRegisterContent(lastRegisterName) ?: return null
     var registerType: RegisterType = getRegisterType(lastRegisterName) ?: return null
@@ -141,7 +141,9 @@ class ReplaceWithRegisterNewApi : VimPluginBase {
       }
     }
 
-    updateCaret(caretId, CaretInfo(newCaretOffset, null))
+    withCaret(caretId) {
+      updateCaret(CaretInfo(newCaretOffset, null))
+    }
   }
 
   companion object {

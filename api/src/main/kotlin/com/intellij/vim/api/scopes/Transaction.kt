@@ -9,7 +9,6 @@
 package com.intellij.vim.api.scopes
 
 import com.intellij.vim.api.CaretId
-import com.intellij.vim.api.CaretInfo
 import com.intellij.vim.api.scopes.caret.CaretTransaction
 
 @VimPluginDsl
@@ -22,8 +21,11 @@ interface Transaction {
 
   fun withCaret(caretId: CaretId, block: CaretTransaction.() -> Unit)
 
+  fun insertText(caretId: CaretId, atPosition: Int, text: CharSequence)
   fun deleteText(startOffset: Int, endOffset: Int)
-  fun replaceText(caretId: CaretId, startOffset: Int, endOffset: Int, text: String)
   fun replaceTextBlockwise(caretId: CaretId, startOffset: Int, endOffset: Int, text: List<String>)
-  fun updateCaret(caretId: CaretId, info: CaretInfo)
+  fun replaceText(caretId: CaretId, startOffset: Int, endOffset: Int, text: String)
+
+  fun addCaret(offset: Int): CaretId
+  fun removeCaret(caretId: CaretId)
 }
