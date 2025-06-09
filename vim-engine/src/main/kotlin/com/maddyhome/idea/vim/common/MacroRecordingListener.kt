@@ -8,7 +8,7 @@
 
 package com.maddyhome.idea.vim.common
 
-interface MacroRecordingListener {
+interface MacroRecordingListener: Listener {
   fun recordingStarted()
   fun recordingFinished()
 }
