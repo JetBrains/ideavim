@@ -12,6 +12,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
+@VimPluginDsl
 abstract class EditorScope {
   @OptIn(ExperimentalContracts::class)
   fun <T> read(block: Read.() -> T): T {
