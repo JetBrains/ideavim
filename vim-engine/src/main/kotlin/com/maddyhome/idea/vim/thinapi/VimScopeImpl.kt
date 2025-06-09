@@ -12,12 +12,14 @@ package com.maddyhome.idea.vim.thinapi
 import com.intellij.vim.api.Mode
 import com.intellij.vim.api.TextSelectionType
 import com.intellij.vim.api.scopes.EditorScope
+import com.intellij.vim.api.scopes.ListenersScope
 import com.intellij.vim.api.scopes.MappingScope
 import com.intellij.vim.api.scopes.VimScope
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.key.OperatorFunction
@@ -37,7 +39,10 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.full.createType
 
-open class VimScopeImpl() : VimScope {
+open class VimScopeImpl(
+  // todo: passing ListenerOwner.IdeaVim.System is temporary
+  private val listenerOwner: ListenerOwner = ListenerOwner.IdeaVim.System,
+) : VimScope {
   override var mode: Mode
     get() {
       return injector.vimState.mode.toMappingMode().toMode()
@@ -181,5 +186,10 @@ open class VimScopeImpl() : VimScope {
   override fun mappings(block: MappingScope.() -> Unit) {
     val mappingScope = MappingScopeImpl()
     mappingScope.block()
+  }
+
+  override fun listeners(block: ListenersScope.() -> Unit) {
+    val listenersScope = ListenerScopeImpl(listenerOwner)
+    listenersScope.block()
   }
 }
