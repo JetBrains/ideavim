@@ -18,7 +18,9 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.key.MappingOwner
 
-class MappingScopeImpl: MappingScope {
+class MappingScopeImpl(
+  private val mappingOwner: MappingOwner
+): MappingScope {
   override fun nmap(from: String, to: String) {
     addMapping(from, to, isRecursive = true, MappingMode.NORMAL)
   }
@@ -70,7 +72,7 @@ class MappingScopeImpl: MappingScope {
       fromKeys = injector.parser.parseKeys(from),
       toKeys = injector.parser.parseKeys(to),
       recursive = isRecursive,
-      owner = MappingOwner.IdeaVim.System
+      owner = mappingOwner
     )
   }
 
@@ -97,7 +99,7 @@ class MappingScopeImpl: MappingScope {
     injector.keyGroup.putKeyMapping(
       modes = mode.toSet(),
       fromKeys = injector.parser.parseKeys(from),
-      owner = MappingOwner.IdeaVim.System,
+      owner = mappingOwner,
       recursive = isRecursive,
       extensionHandler = extensionHandler
     )
