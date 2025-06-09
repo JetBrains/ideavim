@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 
 class CaretTransactionImpl(
   override val caretId: CaretId,
-  private val editor: VimEditor,
+  private val vimEditor: VimEditor,
   private val context: ExecutionContext,
-) : CaretTransaction, CaretRead by CaretReadImpl(caretId, editor, context), Read by ReadImpl(editor, context) {
+) : CaretTransaction, CaretRead by CaretReadImpl(caretId, vimEditor, context), Read by ReadImpl(vimEditor, context) {
 }

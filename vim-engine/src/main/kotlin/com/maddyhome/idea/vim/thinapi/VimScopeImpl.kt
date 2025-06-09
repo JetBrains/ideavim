@@ -31,19 +31,19 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 
 open class VimScopeImpl(
-  private val editor: VimEditor,
+  private val vimEditor: VimEditor,
   private val context: ExecutionContext,
 ) : VimScope {
   override var mode: Mode
     get() {
-      return editor.mode.toMappingMode().toMode()
+      return vimEditor.mode.toMappingMode().toMode()
     }
     set(value) {
       // a lot of custom logic
     }
 
   override fun getSelectionTypeForCurrentMode(): TextSelectionType? {
-    val typeInEditor = editor.mode.selectionType ?: return null
+    val typeInEditor = vimEditor.mode.selectionType ?: return null
     return typeInEditor.toTextSelectionType()
   }
 
@@ -52,7 +52,7 @@ open class VimScopeImpl(
     val variableService: VariableService = injector.variableService
     val variable = Variable(scope, name)
     val variableValue: VimDataType =
-      variableService.getNullableVariableValue(variable, editor, context, VimPluginContext) ?: return null
+      variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext) ?: return null
     val intValue: Int? = (variableValue as? VimInt)?.value
     return intValue
   }
@@ -84,16 +84,16 @@ open class VimScopeImpl(
   }
 
   override fun normal(command: String) {
-    injector.pluginService.executeNormalWithoutMapping(command, editor)
+    injector.pluginService.executeNormalWithoutMapping(command, vimEditor)
   }
 
   // todo: Probably we don't need it
   override fun exitVisualMode() {
-    editor.exitVisualMode()
+    vimEditor.exitVisualMode()
   }
 
   override fun editor(block: EditorScope.() -> Unit) {
-    val editorScope = EditorScopeImpl(editor, context)
+    val editorScope = EditorScopeImpl(vimEditor, context)
     editorScope.block()
   }
 
