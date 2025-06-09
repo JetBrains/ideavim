@@ -19,6 +19,7 @@ import com.intellij.vim.api.isLine
 import com.intellij.vim.api.scopes.Transaction
 import com.intellij.vim.api.scopes.VimScope
 import com.intellij.vim.api.scopes.caret.CaretTransaction
+import com.intellij.vim.api.scopes.getVariable
 import com.maddyhome.idea.vim.extension.thin.api.VimPluginBase
 
 class ReplaceWithRegisterNewApi : VimPluginBase {
@@ -70,7 +71,7 @@ class ReplaceWithRegisterNewApi : VimPluginBase {
   }
 
   private fun VimScope.rewriteLine() {
-    val count1 = getVariableInt("v:count1") ?: 1
+    val count1 = getVariable<Int>("v:count1") ?: 1
     editor {
       change {
         forEachCaretSorted {
