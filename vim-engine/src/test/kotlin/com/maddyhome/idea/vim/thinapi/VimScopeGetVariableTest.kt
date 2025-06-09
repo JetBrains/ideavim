@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.thinapi
 import com.intellij.vim.api.scopes.VimScope
 import com.intellij.vim.api.scopes.getVariable
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.ExecutionContextManager
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimInjector
 import com.maddyhome.idea.vim.api.injector
@@ -36,6 +37,8 @@ class VimScopeGetVariableTest {
   private lateinit var vimEditor: VimEditor
   private lateinit var context: ExecutionContext
   private lateinit var variableService: VariableService
+  private lateinit var editorService: VimEditorService
+  private lateinit var contextManager: ExecutionContextManager
   private lateinit var vimScope: VimScope
 
   @BeforeEach
@@ -43,14 +46,21 @@ class VimScopeGetVariableTest {
     vimEditor = mock(VimEditor::class.java)
     context = mock(ExecutionContext::class.java)
     variableService = mock(VariableService::class.java)
+    editorService = mock(VimEditorService::class.java)
+    contextManager = mock(ExecutionContextManager::class.java)
 
     val mockInjector = mock(VimInjector::class.java)
 
     `when`(mockInjector.variableService).thenReturn(variableService)
+    `when`(mockInjector.editorService).thenReturn(editorService)
+    `when`(mockInjector.executionContextManager).thenReturn(contextManager)
+
+    `when`(mockInjector.executionContextManager.getEditorExecutionContext(vimEditor)).thenReturn(context)
+    `when`(mockInjector.editorService.getFocusedEditor()).thenReturn(vimEditor)
 
     injector = mockInjector
 
-    vimScope = VimScopeImpl(vimEditor, context)
+    vimScope = VimScopeImpl()
   }
 
   @AfterEach
