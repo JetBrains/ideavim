@@ -52,11 +52,13 @@ class ReplaceWithRegisterNewApi : VimPluginBase {
     }
 
     val selectionType: TextSelectionType = getSelectionTypeForCurrentMode() ?: TextSelectionType.CHARACTER_WISE
-    change {
-      forEachCaret {
-        val selectionRange = getSelection() ?: return@forEachCaret
-        val registerData = prepareRegister() ?: return@forEachCaret
-        replaceTextAndUpdateCaret(caretId, selectionRange, selectionType, registerData)
+    editor {
+      change {
+        forEachCaret {
+          val selectionRange = getSelection() ?: return@forEachCaret
+          val registerData = prepareRegister() ?: return@forEachCaret
+          replaceTextAndUpdateCaret(caretId, selectionRange, selectionType, registerData)
+        }
       }
     }
     return true
@@ -69,25 +71,29 @@ class ReplaceWithRegisterNewApi : VimPluginBase {
 
   private fun VimScope.rewriteLine() {
     val count1 = getVariableInt("v:count1") ?: 1
-    change {
-      forEachCaretSorted {
-        val line = getCaretLine()
-        val lineRange = Range(getLineStartOffset(line), getLineEndOffset(line + count1 - 1, true))
-        val registerData = prepareRegister() ?: return@forEachCaretSorted
-        val selectionType = TextSelectionType.LINE_WISE
-        replaceTextAndUpdateCaret(caretId, lineRange, selectionType, registerData)
-        updateCaret(caretId, caretInfo.copy(offset = lineRange.start))
+    editor {
+      change {
+        forEachCaretSorted {
+          val line = getCaretLine()
+          val lineRange = Range(getLineStartOffset(line), getLineEndOffset(line + count1 - 1, true))
+          val registerData = prepareRegister() ?: return@forEachCaretSorted
+          val selectionType = TextSelectionType.LINE_WISE
+          replaceTextAndUpdateCaret(caretId, lineRange, selectionType, registerData)
+          updateCaret(caretId, caretInfo.copy(offset = lineRange.start))
+        }
       }
     }
   }
 
   private fun VimScope.rewriteVisual() {
     val selectionType: TextSelectionType = getSelectionTypeForCurrentMode() ?: TextSelectionType.CHARACTER_WISE
-    change {
-      forEachCaretSorted {
-        val selectionRange = getVisualSelectionMarks() ?: return@forEachCaretSorted
-        val registerData = prepareRegister() ?: return@forEachCaretSorted
-        replaceTextAndUpdateCaret(caretId, selectionRange, selectionType, registerData)
+    editor {
+      change {
+        forEachCaretSorted {
+          val selectionRange = getVisualSelectionMarks() ?: return@forEachCaretSorted
+          val registerData = prepareRegister() ?: return@forEachCaretSorted
+          replaceTextAndUpdateCaret(caretId, selectionRange, selectionType, registerData)
+        }
       }
     }
     exitVisualMode()

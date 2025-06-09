@@ -11,9 +11,8 @@ package com.maddyhome.idea.vim.thinapi
 
 import com.intellij.vim.api.Mode
 import com.intellij.vim.api.TextSelectionType
+import com.intellij.vim.api.scopes.EditorScope
 import com.intellij.vim.api.scopes.MappingScope
-import com.intellij.vim.api.scopes.Read
-import com.intellij.vim.api.scopes.Transaction
 import com.intellij.vim.api.scopes.VimScope
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
@@ -34,7 +33,7 @@ import com.maddyhome.idea.vim.vimscript.services.VariableService
 open class VimScopeImpl(
   private val editor: VimEditor,
   private val context: ExecutionContext,
-) : VimScope() {
+) : VimScope {
   override var mode: Mode
     get() {
       return editor.mode.toMappingMode().toMode()
@@ -93,23 +92,13 @@ open class VimScopeImpl(
     editor.exitVisualMode()
   }
 
+  override fun editor(block: EditorScope.() -> Unit) {
+    val editorScope = EditorScopeImpl(editor, context)
+    editorScope.block()
+  }
+
   override fun mappings(block: MappingScope.() -> Unit) {
     val mappingScope = MappingScopeImpl()
     mappingScope.block()
-  }
-
-
-  override fun <T> ideRead(block: Read.() -> T): T {
-    return injector.application.runReadAction {
-      val read = ReadImpl(editor, context)
-      return@runReadAction block(read)
-    }
-  }
-
-  override fun ideChange(block: Transaction.() -> Unit) {
-    return injector.application.runWriteAction {
-      val transaction = TransactionImpl(editor, context)
-      transaction.block()
-    }
   }
 }
