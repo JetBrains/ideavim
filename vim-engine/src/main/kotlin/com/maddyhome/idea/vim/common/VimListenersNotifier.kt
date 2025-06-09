@@ -77,6 +77,15 @@ class VimListenersNotifier {
     yankListeners.forEach { it.yankPerformed(caretToRange) }
   }
 
+  fun unloadListeners(listenerOwner: ListenerOwner) {
+    modeChangeListeners.removeIf { it.owner == listenerOwner }
+    myEditorListeners.removeIf { it.owner == listenerOwner }
+    macroRecordingListeners.removeIf { it.owner == listenerOwner }
+    vimPluginListeners.removeIf { it.owner == listenerOwner }
+    isReplaceCharListeners.removeIf { it.owner == listenerOwner }
+    yankListeners.removeIf { it.owner == listenerOwner }
+  }
+
   fun reset() {
     modeChangeListeners.clear()
     myEditorListeners.clear()

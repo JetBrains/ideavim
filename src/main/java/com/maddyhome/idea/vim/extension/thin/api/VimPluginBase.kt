@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.extension.thin.api
 
 import com.intellij.vim.api.scopes.VimScope
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.thinapi.VimScopeImpl
 
@@ -16,6 +17,10 @@ interface VimPluginBase : VimExtension {
   override fun init() {
     val vimScope = VimScopeImpl()
     vimScope.init()
+  }
+
+  override fun dispose() {
+    injector.listenersNotifier.unloadListeners(listenerOwner)
   }
 
   fun VimScope.init()

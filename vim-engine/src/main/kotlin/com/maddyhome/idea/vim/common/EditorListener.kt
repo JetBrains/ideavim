@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.common
 
 import com.maddyhome.idea.vim.api.VimEditor
 
-interface EditorListener {
+interface EditorListener: Listener {
   fun created(editor: VimEditor) {}
   fun released(editor: VimEditor) {}
   fun focusGained(editor: VimEditor) {}
