@@ -10,13 +10,10 @@ package org.jetbrains.plugins.ideavim.thinapi
 
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.scopes.Transaction
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.thinapi.VimScopeImpl
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 
 class TransactionTest : VimTestCase() {
 
@@ -40,42 +37,6 @@ class TransactionTest : VimTestCase() {
   }
 
   @Test
-  fun `test insertTextBeforeCaret with count repeats the text`() {
-    doTest(
-      keys = "",
-      before = "Hello${c} World",
-      after = "Hello Beautiful Beautiful${c} World",
-    ) { editor ->
-      val vimEditor = editor.vim
-      val caret = vimEditor.primaryCaret()
-      val caretId = CaretId(caret.id)
-
-      val textToInsert = " Beautiful"
-
-      executeInsideTransaction {
-        insertTextBeforeCaret(caretId, 5, textToInsert, Transaction.TextOperationOptions(count = 2))
-      }
-    }
-  }
-
-  @Test
-  fun `test insertTextBeforeCaret with updateVisualMarks sets visual marks`() {
-    doTest(
-      keys = "",
-      before = "Hello${c} World",
-      after = "Hello Beautiful${c} World",
-    ) { editor ->
-      val vimEditor = editor.vim
-      val caret = vimEditor.primaryCaret()
-      val caretId = CaretId(caret.id)
-
-      executeInsideTransaction {
-        insertTextBeforeCaret(caretId, 5, " Beautiful", Transaction.TextOperationOptions(updateVisualMarks = true))
-      }
-    }
-  }
-
-  @Test
   fun `test replaceText replaces text between offsets`() {
     doTest(
       keys = "",
@@ -93,54 +54,6 @@ class TransactionTest : VimTestCase() {
   }
 
   @Test
-  fun `test replaceText with count repeats the replacement text`() {
-    doTest(
-      keys = "",
-      before = "Hello ${c}World",
-      after = "Hello UniverseUnivers${c}e",
-    ) { editor ->
-      val vimEditor = editor.vim
-      val caret = vimEditor.primaryCaret()
-      val caretId = CaretId(caret.id)
-
-      executeInsideTransaction {
-        replaceText(caretId, 6, 11, "Universe", Transaction.TextOperationOptions(count = 2))
-      }
-    }
-  }
-
-  @Test
-  fun `test replaceText with updateVisualMarks sets visual marks`() {
-    doTest(
-      keys = "",
-      before = "Hello ${c}World",
-      after = "Hello Univers${c}e",
-    ) { editor ->
-      val vimEditor = editor.vim
-      val caret = vimEditor.primaryCaret()
-      val caretId = CaretId(caret.id)
-
-      executeInsideTransaction {
-        replaceText(
-          caretId,
-          6,
-          11,
-          "Universe",
-          Transaction.TextOperationOptions(updateVisualMarks = true)
-        )
-      }
-
-      // Check that visual marks are set correctly
-      val visualMarks = injector.markService.getVisualSelectionMarks(caret)
-
-      // Visual marks should be set from position 6 to 14 (the replaced text)
-      assertNotNull(visualMarks)
-      assertEquals(6, visualMarks.startOffset)
-      assertEquals(14, visualMarks.endOffset)
-    }
-  }
-
-  @Test
   fun `test deleteText deletes text between offsets`() {
     doTest(
       keys = "",
@@ -154,31 +67,6 @@ class TransactionTest : VimTestCase() {
       executeInsideTransaction {
         deleteText(caretId, 5, 11)
       }
-    }
-  }
-
-  @Test
-  fun `test deleteText with updateVisualMarks sets change marks`() {
-    doTest(
-      keys = "",
-      before = "Hello${c} World",
-      after = "Hell${c}o",
-    ) { editor ->
-      val vimEditor = editor.vim
-      val caret = vimEditor.primaryCaret()
-      val caretId = CaretId(caret.id)
-
-      executeInsideTransaction {
-        deleteText(caretId, 5, 11, Transaction.DeleteOptions(updateVisualMarks = true))
-      }
-
-      // Check that visual marks are set correctly
-      val changeMarks = injector.markService.getChangeMarks(caret)
-
-      // Visual marks should be set at the deletion point
-      assertNotNull(changeMarks)
-      assertEquals(5, changeMarks.startOffset)
-      assertEquals(6, changeMarks.endOffset)
     }
   }
 
@@ -294,31 +182,6 @@ class TransactionTest : VimTestCase() {
   }
 
   @Test
-  fun `test insertTextBeforeCaret with count on multiline text`() {
-    doTest(
-      keys = "",
-      before = """
-        First line${c}
-        Second line
-      """.trimIndent(),
-      after = """
-        First line
-        Inserted line
-        Inserted lin${c}e
-        Second line
-      """.trimIndent(),
-    ) { editor ->
-      val vimEditor = editor.vim
-      val caret = vimEditor.primaryCaret()
-      val caretId = CaretId(caret.id)
-
-      executeInsideTransaction {
-        insertTextBeforeCaret(caretId, 10, "\nInserted line", Transaction.TextOperationOptions(count = 2))
-      }
-    }
-  }
-
-  @Test
   fun `test replaceText with empty replacement`() {
     doTest(
       keys = "",
@@ -355,31 +218,6 @@ class TransactionTest : VimTestCase() {
 
       executeInsideTransaction {
         replaceText(caretId, 6, 11, "Universe\nGalaxy", options = Transaction.TextOperationOptions())
-      }
-    }
-  }
-
-  @Test
-  fun `test replaceText with count on multiline replacement`() {
-    doTest(
-      keys = "",
-      before = """
-        Hello ${c}World
-        Next line
-      """.trimIndent(),
-      after = """
-        Hello Universe
-        GalaxyUniverse
-        Galax${c}y
-        Next line
-      """.trimIndent(),
-    ) { editor ->
-      val vimEditor = editor.vim
-      val caret = vimEditor.primaryCaret()
-      val caretId = CaretId(caret.id)
-
-      executeInsideTransaction {
-        replaceText(caretId, 6, 11, "Universe\nGalaxy", Transaction.TextOperationOptions(count = 2))
       }
     }
   }
@@ -478,7 +316,7 @@ class TransactionTest : VimTestCase() {
             offset,
             offset + 4,
             "text",
-            options = Transaction.TextOperationOptions(caretAfterText = true)
+            options = Transaction.TextOperationOptions()
           )
         }
       }
@@ -665,31 +503,6 @@ class TransactionTest : VimTestCase() {
 
       executeInsideTransaction {
         insertTextAtLine(caretId, 2, "Inserted at last line")
-      }
-    }
-  }
-
-  @Test
-  fun `test insertTextAtLine with count repeats the text`() {
-    doTest(
-      keys = "",
-      before = """
-        First line${c}
-        Second line
-        Third line
-      """.trimIndent(),
-      after = """
-        First line
-        Repeated textRepeated textSecond line
-        Third line
-      """.trimIndent(),
-    ) { editor ->
-      val vimEditor = editor.vim
-      val caret = vimEditor.primaryCaret()
-      val caretId = CaretId(caret.id)
-
-      executeInsideTransaction {
-        insertTextAtLine(caretId, 1, "Repeated text", Transaction.TextOperationOptions(count = 2))
       }
     }
   }
