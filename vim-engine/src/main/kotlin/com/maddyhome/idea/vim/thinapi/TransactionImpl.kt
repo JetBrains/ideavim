@@ -88,6 +88,7 @@ class TransactionImpl() : Transaction {
     startPosition: Int,
     text: String,
     options: Transaction.TextOperationOptions,
+    caretAfterText: Boolean,
     insertBeforeCaret: Boolean,
   ): Boolean {
     val caret: VimCaret = vimEditor.carets().find { it.id == caretId.id } ?: return false
@@ -100,10 +101,10 @@ class TransactionImpl() : Transaction {
     val putData = PutData(
       textData = textData,
       visualSelection = null,
-      count = options.count,
+      count = 1,
       insertTextBeforeCaret = insertBeforeCaret,
       rawIndent = options.rawIndent,
-      caretAfterInsertedText = options.caretAfterText,
+      caretAfterInsertedText = caretAfterText,
       putToLine = -1
     )
 
@@ -120,7 +121,7 @@ class TransactionImpl() : Transaction {
           caret,
           executionContext,
           putData,
-          options.updateVisualMarks,
+          false,
           options.modifyRegister
         )
       }
@@ -135,7 +136,7 @@ class TransactionImpl() : Transaction {
     text: String,
     options: Transaction.TextOperationOptions,
   ): Boolean {
-    return putText(caretId, position, text, options.copy(caretAfterText = true), insertBeforeCaret = true)
+    return putText(caretId, position, text, options, caretAfterText = true, insertBeforeCaret = true)
   }
 
   override fun insertTextAfterCaret(
@@ -144,7 +145,7 @@ class TransactionImpl() : Transaction {
     text: String,
     options: Transaction.TextOperationOptions,
   ): Boolean {
-    return putText(caretId, position, text, options.copy(caretAfterText = false), insertBeforeCaret = false)
+    return putText(caretId, position, text, options, caretAfterText = false, insertBeforeCaret = false)
   }
 
   override fun replaceText(
@@ -167,10 +168,10 @@ class TransactionImpl() : Transaction {
     val putData = PutData(
       textData = textData,
       visualSelection = visualSelection,
-      count = options.count,
+      count = 1,
       insertTextBeforeCaret = true, // Always insert before caret for replace
       rawIndent = options.rawIndent,
-      caretAfterInsertedText = options.caretAfterText,
+      caretAfterInsertedText = true,
       putToLine = -1
     )
 
@@ -182,7 +183,7 @@ class TransactionImpl() : Transaction {
           caret,
           executionContext,
           putData,
-          options.updateVisualMarks,
+          false,
           options.modifyRegister
         )
       }
@@ -202,9 +203,7 @@ class TransactionImpl() : Transaction {
     // Create a range for the text to delete
     val range = TextRange(startOffset, endOffset)
 
-    // Use executeCommand to wrap document modifications in a command
     injector.actionExecutor.executeCommand(vimEditor, {
-      // Use runWriteAction to ensure document modifications are properly handled
       injector.application.runWriteAction {
         injector.changeGroup.deleteRange(
           vimEditor,
@@ -215,14 +214,6 @@ class TransactionImpl() : Transaction {
           isChange = options.isChange,
           saveToRegister = options.saveToRegister
         )
-
-//        // Move caret to the end position after deletion
-//        caret.moveToOffset(startOffset)
-//
-//        // Update visual marks if needed
-//        if (options.updateVisualMarks) {
-//          injector.markService.setVisualSelectionMarks(caret, TextRange(startOffset, startOffset))
-//        }
       }
     }, "Delete Text", null)
 
@@ -238,7 +229,7 @@ class TransactionImpl() : Transaction {
     vimEditor.carets().find { it.id == caretId.id } ?: return
     val lineStartOffset = vimEditor.getLineStartOffset(line)
 
-    putText(caretId, lineStartOffset, text, options, true)
+    putText(caretId, lineStartOffset, text, options, caretAfterText = true, insertBeforeCaret = true)
   }
 
   override fun replaceTextBlockwise(
