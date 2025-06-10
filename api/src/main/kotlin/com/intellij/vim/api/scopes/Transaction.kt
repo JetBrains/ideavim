@@ -114,29 +114,21 @@ interface Transaction {
   /**
    * Options for text operations like insertion and replacement.
    *
-   * @property count Number of times to repeat the operation
-   * @property updateVisualMarks Whether to update visual marks after the operation
    * @property rawIndent Whether to use raw indentation
    * @property modifyRegister Whether to modify the register
-   * @property caretAfterText Whether to place the caret after the inserted/replaced text
    */
   data class TextOperationOptions(
-    val count: Int = 1,
-    val updateVisualMarks: Boolean = false,
     val rawIndent: Boolean = false,
     val modifyRegister: Boolean = false,
-    val caretAfterText: Boolean = true,
   )
 
   /**
    * Options for delete operations.
    *
-   * @property updateVisualMarks Whether to update visual marks after deletion
    * @property isChange Whether this deletion is part of a change operation
    * @property saveToRegister Whether to save the deleted text to a register
    */
   data class DeleteOptions(
-    val updateVisualMarks: Boolean = false,
     val isChange: Boolean = false,
     val saveToRegister: Boolean = false,
   )
