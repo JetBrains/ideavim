@@ -12,18 +12,23 @@ import com.intellij.vim.api.scopes.EditorScope
 import com.intellij.vim.api.scopes.Read
 import com.intellij.vim.api.scopes.Transaction
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.common.ListenerOwner
+import com.maddyhome.idea.vim.key.MappingOwner
 
-class EditorScopeImpl() : EditorScope() {
+class EditorScopeImpl(
+  private val listenerOwner: ListenerOwner,
+  private val mappingOwner: MappingOwner,
+) : EditorScope() {
   override fun <T> ideRead(block: Read.() -> T): T {
     return injector.application.runReadAction {
-      val read = ReadImpl()
+      val read = ReadImpl(listenerOwner, mappingOwner)
       return@runReadAction block(read)
     }
   }
 
   override fun ideChange(block: Transaction.() -> Unit) {
     return injector.application.runWriteAction {
-      val transaction = TransactionImpl()
+      val transaction = TransactionImpl(listenerOwner, mappingOwner)
       transaction.block()
     }
   }
