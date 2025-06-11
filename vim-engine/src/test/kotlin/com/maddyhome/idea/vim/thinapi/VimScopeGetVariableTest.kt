@@ -15,6 +15,8 @@ import com.maddyhome.idea.vim.api.ExecutionContextManager
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimInjector
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.common.ListenerOwner
+import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.vimscript.model.VimPluginContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
@@ -32,6 +34,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNull
 
 class VimScopeGetVariableTest {
   private lateinit var vimEditor: VimEditor
@@ -60,7 +63,10 @@ class VimScopeGetVariableTest {
 
     injector = mockInjector
 
-    vimScope = VimScopeImpl()
+    val listenerOwner = ListenerOwner.IdeaVim.System
+    val mappingOwner = MappingOwner.IdeaVim.System
+
+    vimScope = VimScopeImpl(listenerOwner, mappingOwner)
   }
 
   @AfterEach
@@ -288,11 +294,7 @@ class VimScopeGetVariableTest {
     `when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
       .thenReturn(null)
 
-    val exception = assertFailsWith<IllegalArgumentException> {
-      vimScope.getVariable<String>(variableName)
-    }
-
-    assertEquals("Variable with name nonExistentVar does not exist", exception.message)
+    assertNull(vimScope.getVariable<String>(variableName))
   }
 
   @Test

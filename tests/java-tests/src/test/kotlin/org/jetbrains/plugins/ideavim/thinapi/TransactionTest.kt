@@ -10,6 +10,8 @@ package org.jetbrains.plugins.ideavim.thinapi
 
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.scopes.Transaction
+import com.maddyhome.idea.vim.common.ListenerOwner
+import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.thinapi.VimScopeImpl
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -509,7 +511,9 @@ class TransactionTest : VimTestCase() {
 
   private fun executeInsideTransaction(block: Transaction.() -> Unit) {
     com.intellij.openapi.application.ApplicationManager.getApplication().invokeAndWait {
-      VimScopeImpl().apply {
+      val listenerOwner = ListenerOwner.IdeaVim.System
+      val mappingOwner = MappingOwner.IdeaVim.System
+      VimScopeImpl(listenerOwner, mappingOwner).apply {
         editor {
           change {
             block()
