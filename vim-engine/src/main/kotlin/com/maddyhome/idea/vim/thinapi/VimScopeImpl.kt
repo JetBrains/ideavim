@@ -41,10 +41,8 @@ import kotlin.reflect.KType
 import kotlin.reflect.full.createType
 
 open class VimScopeImpl(
-  // todo: passing ListenerOwner.IdeaVim.System is temporary
-  private val listenerOwner: ListenerOwner = ListenerOwner.IdeaVim.System,
-  // todo: passing MappingOwner.IdeaVim.System is temporary
-  private val mappingOwner: MappingOwner = MappingOwner.IdeaVim.System,
+  private val listenerOwner: ListenerOwner,
+  private val mappingOwner: MappingOwner,
 ) : VimScope {
   override var mode: Mode
     get() {
@@ -162,7 +160,7 @@ open class VimScopeImpl(
         context: ExecutionContext,
         selectionType: SelectionType?,
       ): Boolean {
-        return VimScopeImpl().function()
+        return VimScopeImpl(listenerOwner, mappingOwner).function()
       }
     }
     injector.pluginService.exportOperatorFunction(name, operatorFunction)
@@ -182,17 +180,17 @@ open class VimScopeImpl(
   }
 
   override fun editor(block: EditorScope.() -> Unit) {
-    val editorScope = EditorScopeImpl()
+    val editorScope = EditorScopeImpl(listenerOwner, mappingOwner)
     editorScope.block()
   }
 
   override fun mappings(block: MappingScope.() -> Unit) {
-    val mappingScope = MappingScopeImpl(mappingOwner)
+    val mappingScope = MappingScopeImpl(listenerOwner, mappingOwner)
     mappingScope.block()
   }
 
   override fun listeners(block: ListenersScope.() -> Unit) {
-    val listenersScope = ListenerScopeImpl(listenerOwner)
+    val listenersScope = ListenerScopeImpl(listenerOwner, mappingOwner)
     listenersScope.block()
   }
 }

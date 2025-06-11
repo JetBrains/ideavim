@@ -16,10 +16,14 @@ import com.intellij.vim.api.scopes.caret.CaretTransaction
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.common.ListenerOwner
+import com.maddyhome.idea.vim.key.MappingOwner
 
 class CaretTransactionImpl(
+  private val listenerOwner: ListenerOwner,
+  private val mappingOwner: MappingOwner,
   override val caretId: CaretId,
-) : CaretTransaction, CaretRead by CaretReadImpl(caretId), Read by ReadImpl() {
+) : CaretTransaction, CaretRead by CaretReadImpl(caretId), Read by ReadImpl(listenerOwner, mappingOwner) {
   private val vimEditor: VimEditor
     get() = injector.editorService.getFocusedEditor()!!
 

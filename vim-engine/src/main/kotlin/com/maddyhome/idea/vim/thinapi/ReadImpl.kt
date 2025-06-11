@@ -16,9 +16,13 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.getText
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.common.ListenerOwner
+import com.maddyhome.idea.vim.key.MappingOwner
 
 open class ReadImpl(
-) : Read, VimScopeImpl() {
+  listenerOwner: ListenerOwner,
+  mappingOwner: MappingOwner,
+) : Read, VimScopeImpl(listenerOwner, mappingOwner) {
   private val vimEditor: VimEditor
     get() = injector.editorService.getFocusedEditor()!!
 

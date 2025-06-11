@@ -25,9 +25,11 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.VimPluginListener
 import com.maddyhome.idea.vim.common.VimYankListener
 import com.maddyhome.idea.vim.impl.state.toMappingMode
+import com.maddyhome.idea.vim.key.MappingOwner
 
 class ListenerScopeImpl(
-  private val listenerOwner: ListenerOwner
+  private val listenerOwner: ListenerOwner,
+  private val mappingOwner: MappingOwner,
 ): ListenersScope {
   override fun onModeChange(callback: VimScope.(Mode) -> Unit) {
     val listener = object : ModeChangeListener {
@@ -35,7 +37,7 @@ class ListenerScopeImpl(
         editor: VimEditor,
         oldMode: com.maddyhome.idea.vim.state.mode.Mode,
       ) {
-        val vimScope = VimScopeImpl(listenerOwner)
+        val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
         vimScope.callback(oldMode.toMappingMode().toMode())
       }
 
@@ -52,7 +54,7 @@ class ListenerScopeImpl(
           caretToRange.map {
               (caret, range) -> CaretId(caret.id) to Range(range.startOffset, range.endOffset)
           }.toMap()
-        val vimScope = VimScopeImpl(listenerOwner)
+        val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
         vimScope.callback(caretToRangeMap)
       }
 
@@ -65,7 +67,7 @@ class ListenerScopeImpl(
   override fun onEditorCreate(callback: VimScope.() -> Unit) {
     val listener = object : EditorListener {
       override fun created(editor: VimEditor) {
-        val vimScope = VimScopeImpl(listenerOwner)
+        val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
         vimScope.callback()
       }
 
@@ -78,7 +80,7 @@ class ListenerScopeImpl(
   override fun onEditorRelease(callback: VimScope.() -> Unit) {
     val listener = object : EditorListener {
       override fun released(editor: VimEditor) {
-        val vimScope = VimScopeImpl(listenerOwner)
+        val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
         vimScope.callback()
       }
 
@@ -91,7 +93,7 @@ class ListenerScopeImpl(
   override fun onEditorFocusGain(callback: VimScope.() -> Unit) {
     val listener = object : EditorListener {
       override fun focusGained(editor: VimEditor) {
-        val vimScope = VimScopeImpl(listenerOwner)
+        val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
         vimScope.callback()
       }
 
@@ -104,7 +106,7 @@ class ListenerScopeImpl(
   override fun onEditorFocusLost(callback: VimScope.() -> Unit) {
     val listener = object : EditorListener {
       override fun focusLost(editor: VimEditor) {
-        val vimScope = VimScopeImpl(listenerOwner)
+        val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
         vimScope.callback()
       }
 
@@ -117,7 +119,7 @@ class ListenerScopeImpl(
   override fun onMacroRecordingStart(callback: VimScope.() -> Unit) {
     val listener = object : MacroRecordingListener {
       override fun recordingStarted() {
-        val vimScope = VimScopeImpl(listenerOwner)
+        val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
         vimScope.callback()
       }
 
@@ -138,7 +140,7 @@ class ListenerScopeImpl(
       }
 
       override fun recordingFinished() {
-        val vimScope = VimScopeImpl(listenerOwner)
+        val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
         vimScope.callback()
       }
 
@@ -151,7 +153,7 @@ class ListenerScopeImpl(
   override fun onPluginTurnOn(callback: VimScope.() -> Unit) {
     val listener = object : VimPluginListener {
       override fun turnedOn() {
-        val vimScope = VimScopeImpl(listenerOwner)
+        val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
         vimScope.callback()
       }
 
@@ -172,7 +174,7 @@ class ListenerScopeImpl(
       }
 
       override fun turnedOff() {
-        val vimScope = VimScopeImpl(listenerOwner)
+        val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
         vimScope.callback()
       }
 
@@ -185,7 +187,7 @@ class ListenerScopeImpl(
   override fun onReplaceCharChange(callback: VimScope.() -> Unit) {
     val listener = object : IsReplaceCharListener {
       override fun isReplaceCharChanged(editor: VimEditor) {
-        val vimScope = VimScopeImpl(listenerOwner)
+        val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
         vimScope.callback()
       }
 

@@ -15,10 +15,12 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.key.MappingOwner
 
 class MappingScopeImpl(
+  private val listenerOwner: ListenerOwner,
   private val mappingOwner: MappingOwner
 ): MappingScope {
   override fun nmap(from: String, to: String) {
@@ -92,7 +94,7 @@ class MappingScopeImpl(
         context: ExecutionContext,
         operatorArguments: OperatorArguments,
       ) {
-        return VimScopeImpl().action()
+        return VimScopeImpl(listenerOwner, mappingOwner).action()
       }
     }
 
