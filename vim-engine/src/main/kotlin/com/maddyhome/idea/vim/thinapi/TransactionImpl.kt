@@ -17,12 +17,17 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.visual.VimSelection
+import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.put.PutData
 import com.maddyhome.idea.vim.state.mode.SelectionType
 
-class TransactionImpl() : Transaction {
+class TransactionImpl(
+  private val listenerOwner: ListenerOwner,
+  private val mappingOwner: MappingOwner,
+) : Transaction {
   private val vimEditor: VimEditor
     get() = injector.editorService.getFocusedEditor()!!
 
@@ -30,15 +35,16 @@ class TransactionImpl() : Transaction {
     get() = injector.executionContextManager.getEditorExecutionContext(vimEditor)
 
   override fun forEachCaret(block: CaretTransaction.() -> Unit) {
-    vimEditor.carets().forEach { caret -> CaretTransactionImpl(caret.caretId).block() }
+    vimEditor.carets().forEach { caret -> CaretTransactionImpl(listenerOwner, mappingOwner, caret.caretId).block() }
   }
 
   override fun <T> mapEachCaret(block: CaretTransaction.() -> T): List<T> {
-    return vimEditor.carets().map { caret -> CaretTransactionImpl(caret.caretId).block() }
+    return vimEditor.carets().map { caret -> CaretTransactionImpl(listenerOwner, mappingOwner, caret.caretId).block() }
   }
 
   override fun forEachCaretSorted(block: CaretTransaction.() -> Unit) {
-    vimEditor.sortedCarets().forEach { caret -> CaretTransactionImpl(caret.caretId).block() }
+    vimEditor.sortedCarets()
+      .forEach { caret -> CaretTransactionImpl(listenerOwner, mappingOwner, caret.caretId).block() }
   }
 
   override fun withCaret(
@@ -46,7 +52,7 @@ class TransactionImpl() : Transaction {
     block: CaretTransaction.() -> Unit,
   ) {
     vimEditor.carets().find { it.id == caretId.id }
-      ?.let { caret -> block(CaretTransactionImpl(caret.caretId)) } ?: return
+      ?.let { caret -> block(CaretTransactionImpl(listenerOwner, mappingOwner, caret.caretId)) } ?: return
   }
 
   override fun insertText(caretId: CaretId, atPosition: Int, text: CharSequence) {
