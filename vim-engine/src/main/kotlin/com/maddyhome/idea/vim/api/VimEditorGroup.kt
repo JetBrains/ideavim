@@ -59,4 +59,6 @@ interface VimEditorGroup {
   // TODO find a better place for methods below. Maybe make CaretVisualAttributesHelper abstract?
   fun updateCaretsVisualAttributes(editor: VimEditor)
   fun updateCaretsVisualPosition(editor: VimEditor)
+
+  fun getFocusedEditor(): VimEditor?
 }

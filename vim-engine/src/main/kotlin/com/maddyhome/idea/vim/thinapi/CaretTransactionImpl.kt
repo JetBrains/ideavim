@@ -25,7 +25,7 @@ class CaretTransactionImpl(
   override val caretId: CaretId,
 ) : CaretTransaction, CaretRead by CaretReadImpl(caretId), Read by ReadImpl(listenerOwner, mappingOwner) {
   private val vimEditor: VimEditor
-    get() = injector.editorService.getFocusedEditor()!!
+    get() = injector.editorGroup.getFocusedEditor()!!
 
   override fun updateCaret(newInfo: CaretInfo) {
     val caret: VimCaret = vimEditor.carets().find { it.id == caretId.id } ?: return

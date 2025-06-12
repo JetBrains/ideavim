@@ -25,7 +25,7 @@ class CaretReadImpl(
   override val caretId: CaretId,
 ) : CaretRead {
   private val vimEditor: VimEditor
-    get() = injector.editorService.getFocusedEditor()!!
+    get() = injector.editorGroup.getFocusedEditor()!!
 
   override val caretInfo: CaretInfo
     get() {

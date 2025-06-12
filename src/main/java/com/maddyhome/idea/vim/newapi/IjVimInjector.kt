@@ -61,7 +61,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.isInjectorInitialized
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.extension.VimExtensionRegistrar
-import com.maddyhome.idea.vim.extension.thin.api.IjVimEditorServiceImpl
 import com.maddyhome.idea.vim.extension.thin.api.VimHighlightingServiceImpl
 import com.maddyhome.idea.vim.extension.thin.api.VimPluginServiceImpl
 import com.maddyhome.idea.vim.group.CommandGroup
@@ -86,7 +85,6 @@ import com.maddyhome.idea.vim.history.VimHistory
 import com.maddyhome.idea.vim.macro.VimMacro
 import com.maddyhome.idea.vim.put.VimPut
 import com.maddyhome.idea.vim.register.VimRegisterGroup
-import com.maddyhome.idea.vim.thinapi.VimEditorService
 import com.maddyhome.idea.vim.thinapi.VimHighlightingService
 import com.maddyhome.idea.vim.thinapi.VimPluginService
 import com.maddyhome.idea.vim.ui.VimRcFileState
@@ -219,8 +217,6 @@ internal class IjVimInjector : VimInjectorBase() {
     get() = service()
   override val pluginService: VimPluginService
     get() = VimPluginServiceImpl()
-  override val editorService: VimEditorService
-    get() = IjVimEditorServiceImpl()
   override val highlightingService: VimHighlightingService
     get() = VimHighlightingServiceImpl()
 

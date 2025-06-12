@@ -24,7 +24,7 @@ open class ReadImpl(
   mappingOwner: MappingOwner,
 ) : Read, VimScopeImpl(listenerOwner, mappingOwner) {
   private val vimEditor: VimEditor
-    get() = injector.editorService.getFocusedEditor()!!
+    get() = injector.editorGroup.getFocusedEditor()!!
 
   override val size: Long
     get() = vimEditor.fileSize()
