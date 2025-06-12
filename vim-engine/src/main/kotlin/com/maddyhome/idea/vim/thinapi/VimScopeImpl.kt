@@ -54,7 +54,7 @@ open class VimScopeImpl(
       // a lot of custom logic
     }
   private val vimEditor: VimEditor
-    get() = injector.editorService.getFocusedEditor()!!
+    get() = injector.editorGroup.getFocusedEditor()!!
 
   override fun getSelectionTypeForCurrentMode(): TextSelectionType? {
     val typeInEditor = injector.vimState.mode.selectionType ?: return null

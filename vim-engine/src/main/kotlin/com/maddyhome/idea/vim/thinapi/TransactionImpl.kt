@@ -31,7 +31,7 @@ class TransactionImpl(
   private val mappingOwner: MappingOwner,
 ) : Transaction {
   private val vimEditor: VimEditor
-    get() = injector.editorService.getFocusedEditor()!!
+    get() = injector.editorGroup.getFocusedEditor()!!
 
   private val executionContext: ExecutionContext
     get() = injector.executionContextManager.getEditorExecutionContext(vimEditor)
