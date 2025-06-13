@@ -8,12 +8,6 @@
 
 package com.intellij.vim.api
 
-enum class RegisterType {
-  LINE,
-  CHAR,
-  BLOCK,
-}
-
 val TextSelectionType.isLine: Boolean
   get() = this == TextSelectionType.LINE_WISE
 
@@ -30,7 +24,7 @@ enum class TextSelectionType {
 
 class TextInfo(
   val text: String,
-  val type: TextSelectionType
+  val type: TextSelectionType = TextSelectionType.CHARACTER_WISE
 )
 
 data class Range(val start: Int, val end: Int)

@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.thinapi
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.CaretInfo
 import com.intellij.vim.api.Color
-import com.intellij.vim.api.RegisterType
 import com.intellij.vim.api.TextSelectionType
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.state.mode.SelectionType
@@ -20,22 +19,6 @@ import kotlin.text.removePrefix
 import kotlin.text.toLong
 import kotlin.to
 import java.awt.Color as AwtColor
-
-fun RegisterType.toSelectionType(): SelectionType {
-  return when (this) {
-    RegisterType.LINE -> SelectionType.LINE_WISE
-    RegisterType.CHAR -> SelectionType.CHARACTER_WISE
-    RegisterType.BLOCK -> SelectionType.BLOCK_WISE
-  }
-}
-
-fun SelectionType.toRegisterType(): RegisterType {
-  return when (this) {
-    SelectionType.CHARACTER_WISE -> RegisterType.CHAR
-    SelectionType.LINE_WISE -> RegisterType.LINE
-    SelectionType.BLOCK_WISE -> RegisterType.BLOCK
-  }
-}
 
 fun SelectionType.toTextSelectionType(): TextSelectionType {
   return when (this) {

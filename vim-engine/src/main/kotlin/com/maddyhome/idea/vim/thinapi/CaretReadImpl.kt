@@ -12,7 +12,6 @@ import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.CaretInfo
 import com.intellij.vim.api.Range
 import com.intellij.vim.api.RegisterData
-import com.intellij.vim.api.RegisterType
 import com.intellij.vim.api.TextSelectionType
 import com.intellij.vim.api.scopes.caret.CaretRead
 import com.maddyhome.idea.vim.api.VimCaret
