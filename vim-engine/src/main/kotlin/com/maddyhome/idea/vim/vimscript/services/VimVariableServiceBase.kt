@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.api.getOrPutTabData
 import com.maddyhome.idea.vim.api.getOrPutWindowData
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.Direction
-import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.ExecutableContext
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
@@ -121,7 +121,7 @@ abstract class VimVariableServiceBase : VariableService {
       }
     }
 
-    throw ExException("Cannot extract variable name without editor, context, and vimContext")
+    throw exExceptionMessage("variable.extract.name.error")
   }
 
   override fun getNullableVariableValue(
@@ -134,7 +134,7 @@ abstract class VimVariableServiceBase : VariableService {
       ?: if (vimContext != null) {
         getDefaultVariableScope(vimContext)
       } else {
-        throw ExException("VimLContext is required to determine the default variable scope")
+        throw exExceptionMessage("variable.scope.vimcontext.required")
       }
 
     val name = if (editor != null && context != null && vimContext != null) {
@@ -146,27 +146,27 @@ abstract class VimVariableServiceBase : VariableService {
     return when (scope) {
       Scope.GLOBAL_VARIABLE -> getGlobalVariableValue(name)
       Scope.SCRIPT_VARIABLE -> {
-        if (vimContext == null) throw ExException("VimLContext is required for script variables")
+        if (vimContext == null) throw exExceptionMessage("variable.script.vimcontext.required")
         getScriptVariable(name, vimContext)
       }
       Scope.WINDOW_VARIABLE -> {
-        if (editor == null) throw ExException("Editor is required for window variables")
+        if (editor == null) throw exExceptionMessage("variable.window.editor.required")
         getWindowVariable(name, editor)
       }
       Scope.TABPAGE_VARIABLE -> {
-        if (editor == null) throw ExException("Editor is required for tabpage variables")
+        if (editor == null) throw exExceptionMessage("variable.tabpage.editor.required")
         getTabVariable(name, editor)
       }
       Scope.FUNCTION_VARIABLE -> {
-        if (vimContext == null) throw ExException("VimLContext is required for function variables")
+        if (vimContext == null) throw exExceptionMessage("variable.function.vimcontext.required")
         getFunctionVariable(name, vimContext)
       }
       Scope.LOCAL_VARIABLE -> {
-        if (vimContext == null) throw ExException("VimLContext is required for local variables")
+        if (vimContext == null) throw exExceptionMessage("variable.local.vimcontext.required")
         getLocalVariable(name, vimContext)
       }
       Scope.BUFFER_VARIABLE -> {
-        if (editor == null) throw ExException("Editor is required for buffer variables")
+        if (editor == null) throw exExceptionMessage("variable.buffer.editor.required")
         getBufferVariable(name, editor)
       }
       Scope.VIM_VARIABLE -> {
@@ -182,9 +182,9 @@ abstract class VimVariableServiceBase : VariableService {
     vimContext: VimLContext,
   ): VimDataType {
     return getNullableVariableValue(variable, editor, context, vimContext)
-      ?: throw ExException(
-        "E121: Undefined variable: " +
-          (if (variable.scope != null) variable.scope.c + ":" else "") +
+      ?: throw exExceptionMessage(
+        "E121",
+        (if (variable.scope != null) variable.scope.c + ":" else "") +
           variable.name.evaluate(editor, context, vimContext).value,
       )
   }
@@ -194,7 +194,7 @@ abstract class VimVariableServiceBase : VariableService {
   }
 
   protected open fun getScriptVariable(name: String, vimContext: VimLContext): VimDataType? {
-    val script = vimContext.getScript() ?: throw ExException("E121: Undefined variable: s:$name")
+    val script = vimContext.getScript() ?: throw exExceptionMessage("E121", "s:$name")
     return script.scriptVariables[name]
   }
 
@@ -269,20 +269,20 @@ abstract class VimVariableServiceBase : VariableService {
 
       "searchforward" -> VimInt(if (injector.searchGroup.getLastSearchDirection() == Direction.FORWARDS) 1 else 0)
       "hlsearch" -> {
-        if (editor == null) throw ExException("Editor is required for vim variables")
-        if (context == null) throw ExException("ExecutionContext is required for vim variables")
-        if (vimContext == null) throw ExException("VimLContext is required for vim variables")
+        if (editor == null) throw exExceptionMessage("variable.vim.editor.required")
+        if (context == null) throw exExceptionMessage("variable.vim.context.required")
+        if (vimContext == null) throw exExceptionMessage("variable.vim.vimcontext.required")
         HighLightVariable().evaluate(name, editor, context, vimContext)
       }
 
       "register" -> {
-        if (editor == null) throw ExException("Editor is required for vim variables")
-        if (context == null) throw ExException("ExecutionContext is required for vim variables")
-        if (vimContext == null) throw ExException("VimLContext is required for vim variables")
+        if (editor == null) throw exExceptionMessage("variable.vim.editor.required")
+        if (context == null) throw exExceptionMessage("variable.vim.context.required")
+        if (vimContext == null) throw exExceptionMessage("variable.vim.vimcontext.required")
         RegisterVariable().evaluate(name, editor, context, vimContext)
       }
 
-      else -> throw ExException("The 'v:${name}' variable is not implemented yet")
+      else -> throw exExceptionMessage("variable.vim.not.implemented", name)
     }
   }
 
@@ -291,7 +291,7 @@ abstract class VimVariableServiceBase : VariableService {
   }
 
   protected open fun storeScriptVariable(name: String, value: VimDataType, vimContext: VimLContext) {
-    val script = vimContext.getScript() ?: throw ExException("E461: Illegal variable name: s:$name")
+    val script = vimContext.getScript() ?: throw exExceptionMessage("E461", "s:$name")
     script.scriptVariables[name] = value
   }
 
@@ -312,7 +312,7 @@ abstract class VimVariableServiceBase : VariableService {
     if (node is FunctionDeclaration) {
       node.functionVariables[name] = value
     } else {
-      throw ExException("E461: Illegal variable name: a:$name")
+      throw exExceptionMessage("E461", "a:$name")
     }
   }
 
@@ -324,7 +324,7 @@ abstract class VimVariableServiceBase : VariableService {
     if (node is FunctionDeclaration) {
       node.localVariables[name] = value
     } else {
-      throw ExException("E461: Illegal variable name: l:$name")
+      throw exExceptionMessage("E461", "l:$name")
     }
   }
 
@@ -339,7 +339,7 @@ abstract class VimVariableServiceBase : VariableService {
     context: ExecutionContext,
     vimContext: VimLContext,
   ) {
-    throw ExException("The 'v:' scope is not implemented yet :(")
+    throw exExceptionMessage("variable.scope.vim.not.implemented")
   }
 
   override fun clear() {
