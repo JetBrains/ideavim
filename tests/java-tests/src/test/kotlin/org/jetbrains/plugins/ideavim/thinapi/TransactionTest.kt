@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.thinapi
 
 import com.intellij.vim.api.CaretId
+import com.intellij.vim.api.TextInfo
 import com.intellij.vim.api.scopes.Transaction
 import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.key.MappingOwner
@@ -50,7 +51,7 @@ class TransactionTest : VimTestCase() {
       val caretId = CaretId(caret.id)
 
       executeInsideTransaction {
-        replaceText(caretId, 6, 11, "Universe")
+        replaceText(caretId, 6, 11, TextInfo("Universe"))
       }
     }
   }
@@ -195,7 +196,7 @@ class TransactionTest : VimTestCase() {
       val caretId = CaretId(caret.id)
 
       executeInsideTransaction {
-        replaceText(caretId, 6, 11, "")
+        replaceText(caretId, 6, 11, TextInfo(""))
       }
     }
   }
@@ -219,7 +220,7 @@ class TransactionTest : VimTestCase() {
       val caretId = CaretId(caret.id)
 
       executeInsideTransaction {
-        replaceText(caretId, 6, 11, "Universe\nGalaxy")
+        replaceText(caretId, 6, 11, TextInfo("Universe\nGalaxy"))
       }
     }
   }
@@ -317,7 +318,7 @@ class TransactionTest : VimTestCase() {
             CaretId(caret.id),
             offset,
             offset + 4,
-            "text"
+            TextInfo("text")
           )
         }
       }
