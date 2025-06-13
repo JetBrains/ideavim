@@ -11,13 +11,13 @@ package com.maddyhome.idea.vim.thinapi
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.CaretInfo
 import com.intellij.vim.api.Color
-import com.intellij.vim.api.Mode
 import com.intellij.vim.api.RegisterType
 import com.intellij.vim.api.TextSelectionType
 import com.maddyhome.idea.vim.api.VimCaret
-import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import java.lang.String
+import kotlin.text.removePrefix
+import kotlin.text.toLong
 import kotlin.to
 import java.awt.Color as AwtColor
 
@@ -61,28 +61,6 @@ val VimCaret.caretInfo: CaretInfo
     this.offset,
     if (hasSelection()) selectionStart to selectionEnd else null
   )
-
-fun Mode.toMappingMode(): MappingMode {
-  return when (this) {
-    Mode.NORMAL -> MappingMode.NORMAL
-    Mode.VISUAL -> MappingMode.VISUAL
-    Mode.SELECT -> MappingMode.SELECT
-    Mode.OP_PENDING -> MappingMode.OP_PENDING
-    Mode.INSERT -> MappingMode.INSERT
-    Mode.COMMAND -> MappingMode.CMD_LINE
-  }
-}
-
-fun MappingMode.toMode(): Mode {
-  return when (this) {
-    MappingMode.NORMAL -> Mode.NORMAL
-    MappingMode.VISUAL -> Mode.VISUAL
-    MappingMode.SELECT -> Mode.SELECT
-    MappingMode.OP_PENDING -> Mode.OP_PENDING
-    MappingMode.INSERT -> Mode.INSERT
-    MappingMode.CMD_LINE -> Mode.COMMAND
-  }
-}
 
 fun Color.toAwtColor(): AwtColor {
   val argb = hexCode.removePrefix("#").toLong(16)

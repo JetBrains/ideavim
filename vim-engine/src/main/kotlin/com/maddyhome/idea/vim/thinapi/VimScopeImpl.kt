@@ -21,8 +21,6 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ListenerOwner
-import com.maddyhome.idea.vim.helper.exitVisualMode
-import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.state.mode.SelectionType
@@ -48,11 +46,12 @@ open class VimScopeImpl(
 ) : VimScope {
   override var mode: Mode
     get() {
-      return injector.vimState.mode.toMappingMode().toMode()
+      return injector.vimState.mode.toMode()
     }
     set(value) {
-      // a lot of custom logic
+      changeMode(value, vimEditor)
     }
+
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!
 
@@ -177,11 +176,6 @@ open class VimScopeImpl(
 
   override fun normal(command: String) {
     injector.pluginService.executeNormalWithoutMapping(command, vimEditor)
-  }
-
-  // todo: Probably we don't need it
-  override fun exitVisualMode() {
-    vimEditor.exitVisualMode()
   }
 
   override fun editor(block: EditorScope.() -> Unit) {
