@@ -63,12 +63,15 @@ interface VariableService {
    * @param context execution context
    * @param vimContext vim context
    * @throws ExException("The 'v:' scope is not implemented yet :(")
+   * @throws ExException if a required parameter is null for the specific scope
+   * @throws ExException("VimLContext is required to determine the default variable scope") if variable.scope is null and vimContext is null
+   * @throws ExException("Cannot extract variable name without editor, context, and vimContext") if the variable name cannot be extracted without the parameters
    */
   fun getNullableVariableValue(
     variable: Variable,
-    editor: VimEditor,
-    context: ExecutionContext,
-    vimContext: VimLContext,
+    editor: VimEditor?,
+    context: ExecutionContext?,
+    vimContext: VimLContext?,
   ): VimDataType?
 
   /**
