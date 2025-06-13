@@ -40,15 +40,6 @@ data class CaretInfo(
   val selection: Pair<Int, Int>?,
 )
 
-enum class Mode {
-  NORMAL,
-  VISUAL,
-  SELECT,
-  OP_PENDING,
-  INSERT,
-  COMMAND
-}
-
 interface Highlighter
 
 data class Color(

@@ -24,8 +24,8 @@ import com.maddyhome.idea.vim.common.ModeChangeListener
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.VimPluginListener
 import com.maddyhome.idea.vim.common.VimYankListener
-import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.key.MappingOwner
+import com.maddyhome.idea.vim.state.mode.Mode as EngineMode
 
 class ListenerScopeImpl(
   private val listenerOwner: ListenerOwner,
@@ -35,10 +35,10 @@ class ListenerScopeImpl(
     val listener = object : ModeChangeListener {
       override fun modeChanged(
         editor: VimEditor,
-        oldMode: com.maddyhome.idea.vim.state.mode.Mode,
+        oldMode: EngineMode,
       ) {
         val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
-        vimScope.callback(oldMode.toMappingMode().toMode())
+        vimScope.callback(oldMode.toMode())
       }
 
       override val owner: ListenerOwner

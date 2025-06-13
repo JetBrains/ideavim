@@ -34,9 +34,6 @@ interface VimScope {
   fun setOperatorFunction(name: String)
   fun normal(command: String)
 
-  // todo: Use mode instead
-  fun exitVisualMode()
-
   fun editor(block: EditorScope.() -> Unit)
   fun mappings(block: MappingScope.() -> Unit)
   fun listeners(block: ListenersScope.() -> Unit)
