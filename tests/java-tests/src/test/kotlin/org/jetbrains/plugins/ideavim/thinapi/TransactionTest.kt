@@ -33,7 +33,7 @@ class TransactionTest : VimTestCase() {
       val textToInsert = " Beautiful"
 
       executeInsideTransaction {
-        insertTextBeforeCaret(caretId, 5, textToInsert)
+        insertText(caretId, 5, textToInsert, caretAfterInsertedText = true)
       }
     }
   }
@@ -50,7 +50,7 @@ class TransactionTest : VimTestCase() {
       val caretId = CaretId(caret.id)
 
       executeInsideTransaction {
-        replaceText(caretId, 6, 11, "Universe", options = Transaction.TextOperationOptions())
+        replaceText(caretId, 6, 11, "Universe")
       }
     }
   }
@@ -90,7 +90,7 @@ class TransactionTest : VimTestCase() {
       val caretId = CaretId(caret.id)
 
       executeInsideTransaction {
-        insertTextBeforeCaret(caretId, 10, " - inserted text")
+        insertText(caretId, 10, " - inserted text")
       }
     }
   }
@@ -113,7 +113,7 @@ class TransactionTest : VimTestCase() {
       val caretId = CaretId(caret.id)
 
       executeInsideTransaction {
-        insertTextBeforeCaret(caretId, 0, "Prefix: ")
+        insertText(caretId, 0, "Prefix: ")
       }
     }
   }
@@ -136,7 +136,7 @@ class TransactionTest : VimTestCase() {
       val caretId = CaretId(caret.id)
 
       executeInsideTransaction {
-        insertTextBeforeCaret(caretId, 10, " - suffix")
+        insertText(caretId, 10, " - suffix")
       }
     }
   }
@@ -153,7 +153,7 @@ class TransactionTest : VimTestCase() {
       val caretId = CaretId(caret.id)
 
       executeInsideTransaction {
-        insertTextBeforeCaret(caretId, 5, "")
+        insertText(caretId, 5, "")
       }
     }
   }
@@ -178,7 +178,7 @@ class TransactionTest : VimTestCase() {
       val caretId = CaretId(caret.id)
 
       executeInsideTransaction {
-        insertTextBeforeCaret(caretId, 10, "\nInserted line 1\nInserted line 2")
+        insertText(caretId, 10, "\nInserted line 1\nInserted line 2")
       }
     }
   }
@@ -195,7 +195,7 @@ class TransactionTest : VimTestCase() {
       val caretId = CaretId(caret.id)
 
       executeInsideTransaction {
-        replaceText(caretId, 6, 11, "", options = Transaction.TextOperationOptions())
+        replaceText(caretId, 6, 11, "")
       }
     }
   }
@@ -219,7 +219,7 @@ class TransactionTest : VimTestCase() {
       val caretId = CaretId(caret.id)
 
       executeInsideTransaction {
-        replaceText(caretId, 6, 11, "Universe\nGalaxy", options = Transaction.TextOperationOptions())
+        replaceText(caretId, 6, 11, "Universe\nGalaxy")
       }
     }
   }
@@ -286,7 +286,7 @@ class TransactionTest : VimTestCase() {
       executeInsideTransaction {
         for (caret in carets) {
           val offset = caret.offset
-          insertTextAfterCaret(CaretId(caret.id), offset, "- modified ")
+          insertText(CaretId(caret.id), offset, " - modified")
         }
       }
     }
@@ -317,8 +317,7 @@ class TransactionTest : VimTestCase() {
             CaretId(caret.id),
             offset,
             offset + 4,
-            "text",
-            options = Transaction.TextOperationOptions()
+            "text"
           )
         }
       }
@@ -353,62 +352,6 @@ class TransactionTest : VimTestCase() {
   }
 
   @Test
-  fun `test insertTextAtLine inserts text at specified line`() {
-    doTest(
-      keys = "",
-      before = """
-        First line${c}
-        Second line
-        Third line
-      """.trimIndent(),
-      after = """
-        First line
-        Inserted textSecond line
-        Third line
-      """.trimIndent(),
-    ) { editor ->
-      val vimEditor = editor.vim
-      val caret = vimEditor.primaryCaret()
-      val caretId = CaretId(caret.id)
-
-      executeInsideTransaction {
-        insertTextAtLine(caretId, 1, "Inserted text")
-      }
-    }
-  }
-
-  @Test
-  fun `test insertTextAtLine with multiline text`() {
-    doTest(
-      keys = "",
-      before = """
-        First line${c}
-        Second line
-        Third line
-      """.trimIndent(),
-      after = """
-        First line
-        Line 1
-        Line 2Second line
-        Third line
-      """.trimIndent(),
-    ) { editor ->
-      val vimEditor = editor.vim
-      val caret = vimEditor.primaryCaret()
-      val caretId = CaretId(caret.id)
-
-      val multilineText = """
-        Line 1
-        Line 2
-      """.trimIndent()
-
-      executeInsideTransaction {
-        insertTextAtLine(caretId, 1, multilineText)
-      }
-    }
-  }
-
-  @Test
   fun `test insertTextAtLine with multiple carets`() {
     doTest(
       keys = "",
@@ -428,7 +371,7 @@ class TransactionTest : VimTestCase() {
 
       executeInsideTransaction {
         carets.forEachIndexed { index, caret ->
-          insertTextAtLine(CaretId(caret.id), index, "Inserted at line $index")
+          insertText(CaretId(caret.id), vimEditor.getLineStartOffset(caret.getLine()), "Inserted at line $index")
         }
       }
     }
@@ -454,7 +397,7 @@ class TransactionTest : VimTestCase() {
       val caretId = CaretId(caret.id)
 
       executeInsideTransaction {
-        insertTextAtLine(caretId, 1, "")
+        insertText(caretId, 1, "")
       }
     }
   }
@@ -479,32 +422,7 @@ class TransactionTest : VimTestCase() {
       val caretId = CaretId(caret.id)
 
       executeInsideTransaction {
-        insertTextAtLine(caretId, 0, "Inserted at first line")
-      }
-    }
-  }
-
-  @Test
-  fun `test insertTextAtLine at last line`() {
-    doTest(
-      keys = "",
-      before = """
-        First line${c}
-        Second line
-        Third line
-      """.trimIndent(),
-      after = """
-        First line
-        Second line
-        Inserted at last lineThird line
-      """.trimIndent(),
-    ) { editor ->
-      val vimEditor = editor.vim
-      val caret = vimEditor.primaryCaret()
-      val caretId = CaretId(caret.id)
-
-      executeInsideTransaction {
-        insertTextAtLine(caretId, 2, "Inserted at last line")
+        insertText(caretId, 0, "Inserted at first line")
       }
     }
   }
