@@ -12,7 +12,7 @@ import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.Mode
 import com.intellij.vim.api.Range
 import com.intellij.vim.api.RegisterData
-import com.intellij.vim.api.RegisterType
+import com.intellij.vim.api.TextInfo
 import com.intellij.vim.api.TextSelectionType
 import com.intellij.vim.api.isLine
 import com.intellij.vim.api.scopes.Transaction
@@ -102,11 +102,11 @@ class ReplaceWithRegisterNewApi : VimPluginBase() {
   private fun CaretTransaction.prepareRegisterData(): RegisterData? {
     val lastRegisterName: Char = getCurrentRegisterName()
     var registerText: String = getRegisterContent(lastRegisterName) ?: return null
-    var registerType: RegisterType = getRegisterType(lastRegisterName) ?: return null
+    var registerType: TextSelectionType = getRegisterType(lastRegisterName) ?: return null
 
     if (registerType.isLine && registerText.endsWith("\n")) {
       registerText = registerText.removeSuffix("\n")
-      registerType = RegisterType.CHAR
+      registerType = TextSelectionType.CHARACTER_WISE
     }
 
     return RegisterData(registerText, registerType)
@@ -119,9 +119,9 @@ class ReplaceWithRegisterNewApi : VimPluginBase() {
     registerData: RegisterData,
   ) {
     val text: String = registerData.text
-    val registerType: RegisterType = registerData.type
+    val registerType: TextSelectionType = registerData.type
     val (startOffset, endOffset) = selectionRange
-    replaceText(caretId, startOffset, endOffset, text)
+    replaceText(caretId, startOffset, endOffset, TextInfo(text, registerType), selectionType, preserveIndentation = false)
   }
 
   companion object {
