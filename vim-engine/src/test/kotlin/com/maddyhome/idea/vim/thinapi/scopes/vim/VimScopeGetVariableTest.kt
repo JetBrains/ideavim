@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.thinapi
+package com.maddyhome.idea.vim.thinapi.scopes.vim
 
 import com.intellij.vim.api.scopes.VimScope
 import com.intellij.vim.api.scopes.getVariable
@@ -15,9 +15,11 @@ import com.maddyhome.idea.vim.api.ExecutionContextManager
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimEditorGroup
 import com.maddyhome.idea.vim.api.VimInjector
+import com.maddyhome.idea.vim.api.VimStorageService
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.key.MappingOwner
+import com.maddyhome.idea.vim.thinapi.VimScopeImpl
 import com.maddyhome.idea.vim.vimscript.model.VimPluginContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
@@ -28,11 +30,12 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.services.VariableService
+import com.maddyhome.idea.vim.vimscript.services.VimVariableServiceBase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.`when`
+import org.mockito.Mockito
+import org.mockito.kotlin.spy
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
@@ -43,24 +46,27 @@ class VimScopeGetVariableTest {
   private lateinit var variableService: VariableService
   private lateinit var editorGroup: VimEditorGroup
   private lateinit var contextManager: ExecutionContextManager
+  private lateinit var storageService: VimStorageService
   private lateinit var vimScope: VimScope
 
   @BeforeEach
   fun setUp() {
-    vimEditor = mock(VimEditor::class.java)
-    context = mock(ExecutionContext::class.java)
-    variableService = mock(VariableService::class.java)
-    editorGroup = mock(VimEditorGroup::class.java)
-    contextManager = mock(ExecutionContextManager::class.java)
+    vimEditor = Mockito.mock(VimEditor::class.java)
+    context = Mockito.mock(ExecutionContext::class.java)
+    variableService = spy(object : VimVariableServiceBase() {})
+    editorGroup = Mockito.mock(VimEditorGroup::class.java)
+    contextManager = Mockito.mock(ExecutionContextManager::class.java)
+    storageService = Mockito.mock(VimStorageService::class.java)
 
-    val mockInjector = mock(VimInjector::class.java)
+    val mockInjector = Mockito.mock(VimInjector::class.java)
 
-    `when`(mockInjector.variableService).thenReturn(variableService)
-    `when`(mockInjector.editorGroup).thenReturn(editorGroup)
-    `when`(mockInjector.executionContextManager).thenReturn(contextManager)
+    Mockito.`when`(mockInjector.variableService).thenReturn(variableService)
+    Mockito.`when`(mockInjector.editorGroup).thenReturn(editorGroup)
+    Mockito.`when`(mockInjector.executionContextManager).thenReturn(contextManager)
+    Mockito.`when`(mockInjector.vimStorageService).thenReturn(storageService)
 
-    `when`(mockInjector.executionContextManager.getEditorExecutionContext(vimEditor)).thenReturn(context)
-    `when`(mockInjector.editorGroup.getFocusedEditor()).thenReturn(vimEditor)
+    Mockito.`when`(mockInjector.executionContextManager.getEditorExecutionContext(vimEditor)).thenReturn(context)
+    Mockito.`when`(mockInjector.editorGroup.getFocusedEditor()).thenReturn(vimEditor)
 
     injector = mockInjector
 
@@ -72,7 +78,7 @@ class VimScopeGetVariableTest {
 
   @AfterEach
   fun tearDown() {
-    injector = mock(VimInjector::class.java)
+    injector = Mockito.mock(VimInjector::class.java)
   }
 
   @Test
@@ -81,7 +87,7 @@ class VimScopeGetVariableTest {
     val variable = Variable(Scope.GLOBAL_VARIABLE, "intVar")
     val vimInt = VimInt(42)
 
-    `when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
+    Mockito.`when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
       .thenReturn(vimInt)
 
     val result: Int? = vimScope.getVariable<Int>(variableName)
@@ -95,7 +101,7 @@ class VimScopeGetVariableTest {
     val variable = Variable(Scope.GLOBAL_VARIABLE, "stringVar")
     val vimString = VimString("hello")
 
-    `when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
+    Mockito.`when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
       .thenReturn(vimString)
 
     val result: String? = vimScope.getVariable<String>(variableName)
@@ -109,7 +115,7 @@ class VimScopeGetVariableTest {
     val variable = Variable(Scope.GLOBAL_VARIABLE, "doubleVar")
     val vimFloat = VimFloat(3.14)
 
-    `when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
+    Mockito.`when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
       .thenReturn(vimFloat)
 
     val result: Double? = vimScope.getVariable<Double>(variableName)
@@ -123,7 +129,7 @@ class VimScopeGetVariableTest {
     val variable = Variable(Scope.GLOBAL_VARIABLE, "listVar")
     val vimList = VimList(mutableListOf(VimInt(1), VimInt(2), VimInt(3)))
 
-    `when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
+    Mockito.`when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
       .thenReturn(vimList)
 
     val result: List<Int>? = vimScope.getVariable<List<Int>>(variableName)
@@ -141,7 +147,7 @@ class VimScopeGetVariableTest {
     )
     val vimDictionary = VimDictionary(map)
 
-    `when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
+    Mockito.`when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
       .thenReturn(vimDictionary)
 
     val result: Map<String, Int>? = vimScope.getVariable<Map<String, Int>>(variableName)
@@ -159,7 +165,7 @@ class VimScopeGetVariableTest {
     val innerList2 = VimList(mutableListOf(VimInt(3), VimInt(4)))
     val vimList = VimList(mutableListOf(innerList1, innerList2))
 
-    `when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
+    Mockito.`when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
       .thenReturn(vimList)
 
     val result: List<List<Int>>? = vimScope.getVariable<List<List<Int>>>(variableName)
@@ -177,7 +183,7 @@ class VimScopeGetVariableTest {
     )
     val vimDictionary = VimDictionary(map)
 
-    `when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
+    Mockito.`when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
       .thenReturn(vimDictionary)
 
     val result: Map<String, List<Int>>? = vimScope.getVariable<Map<String, List<Int>>>(variableName)
@@ -212,7 +218,7 @@ class VimScopeGetVariableTest {
     )
     val vimDictionary = VimDictionary(map)
 
-    `when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
+    Mockito.`when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
       .thenReturn(vimDictionary)
 
     val result: Map<String, Map<String, Int>>? = vimScope.getVariable<Map<String, Map<String, Int>>>(variableName)
@@ -243,7 +249,7 @@ class VimScopeGetVariableTest {
     )
     val vimDictionary = VimDictionary(map)
 
-    `when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
+    Mockito.`when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
       .thenReturn(vimDictionary)
 
     val result: Map<String, List<List<Int>>>? = vimScope.getVariable<Map<String, List<List<Int>>>>(variableName)
@@ -274,7 +280,7 @@ class VimScopeGetVariableTest {
     )
     val vimList = VimList(mutableListOf(map1, map2))
 
-    `when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
+    Mockito.`when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
       .thenReturn(vimList)
 
     val result: List<Map<String, Int>>? = vimScope.getVariable<List<Map<String, Int>>>(variableName)
@@ -292,7 +298,7 @@ class VimScopeGetVariableTest {
     val variableName = "g:nonExistentVar"
     val variable = Variable(Scope.GLOBAL_VARIABLE, "nonExistentVar")
 
-    `when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
+    Mockito.`when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
       .thenReturn(null)
 
     assertNull(vimScope.getVariable<String>(variableName))
@@ -304,7 +310,7 @@ class VimScopeGetVariableTest {
     val variable = Variable(Scope.GLOBAL_VARIABLE, "wrongTypeVar")
     val vimString = VimString("not an int")
 
-    `when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
+    Mockito.`when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
       .thenReturn(vimString)
 
     val exception = assertFailsWith<IllegalArgumentException> {
@@ -320,7 +326,7 @@ class VimScopeGetVariableTest {
     val variable = Variable(Scope.GLOBAL_VARIABLE, "wrongTypeVar")
     val vimInt = VimInt(42)
 
-    `when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
+    Mockito.`when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
       .thenReturn(vimInt)
 
     val exception = assertFailsWith<IllegalArgumentException> {
@@ -336,7 +342,7 @@ class VimScopeGetVariableTest {
     val variable = Variable(Scope.GLOBAL_VARIABLE, "wrongTypeVar")
     val vimInt = VimInt(42)
 
-    `when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
+    Mockito.`when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
       .thenReturn(vimInt)
 
     val exception = assertFailsWith<IllegalArgumentException> {
@@ -352,7 +358,7 @@ class VimScopeGetVariableTest {
     val variable = Variable(Scope.GLOBAL_VARIABLE, "wrongTypeVar")
     val vimDictionary = VimDictionary(linkedMapOf(VimString("key") to VimInt(1)))
 
-    `when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
+    Mockito.`when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
       .thenReturn(vimDictionary)
 
     val exception = assertFailsWith<IllegalArgumentException> {
@@ -368,7 +374,7 @@ class VimScopeGetVariableTest {
     val variable = Variable(Scope.GLOBAL_VARIABLE, "wrongTypeVar")
     val vimList = VimList(mutableListOf(VimInt(1), VimInt(2)))
 
-    `when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
+    Mockito.`when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
       .thenReturn(vimList)
 
     val exception = assertFailsWith<IllegalArgumentException> {
@@ -384,7 +390,7 @@ class VimScopeGetVariableTest {
     val variable = Variable(Scope.GLOBAL_VARIABLE, "validVar")
     val vimInt = VimInt(42)
 
-    `when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
+    Mockito.`when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
       .thenReturn(vimInt)
 
     val exception = assertFailsWith<IllegalArgumentException> {
@@ -400,7 +406,7 @@ class VimScopeGetVariableTest {
     val variable = Variable(Scope.GLOBAL_VARIABLE, "emptyListVar")
     val vimList = VimList(mutableListOf())
 
-    `when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
+    Mockito.`when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
       .thenReturn(vimList)
 
     val result: List<Int>? = vimScope.getVariable<List<Int>>(variableName)
@@ -414,7 +420,7 @@ class VimScopeGetVariableTest {
     val variable = Variable(Scope.GLOBAL_VARIABLE, "emptyMapVar")
     val vimDictionary = VimDictionary(linkedMapOf())
 
-    `when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
+    Mockito.`when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
       .thenReturn(vimDictionary)
 
     val result: Map<String, Int>? = vimScope.getVariable<Map<String, Int>>(variableName)
@@ -428,7 +434,7 @@ class VimScopeGetVariableTest {
     val variable = Variable(Scope.GLOBAL_VARIABLE, "invalidName")
     val vimInt = VimInt(42)
 
-    `when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
+    Mockito.`when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
       .thenReturn(vimInt)
 
     val result: Int? = vimScope.getVariable<Int>(variableName)
@@ -442,7 +448,7 @@ class VimScopeGetVariableTest {
     val variable = Variable(Scope.BUFFER_VARIABLE, "bufferVar")
     val vimInt = VimInt(42)
 
-    `when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
+    Mockito.`when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
       .thenReturn(vimInt)
 
     val result: Int? = vimScope.getVariable<Int>(variableName)
@@ -456,7 +462,7 @@ class VimScopeGetVariableTest {
     val variable = Variable(Scope.GLOBAL_VARIABLE, "mapWithIntKey")
     val vimDictionary = VimDictionary(linkedMapOf(VimString("key") to VimInt(1)))
 
-    `when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
+    Mockito.`when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
       .thenReturn(vimDictionary)
 
     val exception = assertFailsWith<IllegalArgumentException> {
@@ -513,7 +519,7 @@ class VimScopeGetVariableTest {
       )
     )
 
-    `when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
+    Mockito.`when`(variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext))
       .thenReturn(level1Map)
 
     val result: Map<String, Map<String, List<Map<String, Int>>>>? =

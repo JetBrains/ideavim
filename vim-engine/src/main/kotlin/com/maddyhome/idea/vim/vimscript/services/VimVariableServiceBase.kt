@@ -21,7 +21,10 @@ import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.ExecutableContext
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
@@ -30,6 +33,9 @@ import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 import com.maddyhome.idea.vim.vimscript.model.variables.HighLightVariable
 import com.maddyhome.idea.vim.vimscript.model.variables.RegisterVariable
+import kotlin.reflect.KClass
+import kotlin.reflect.KType
+import kotlin.reflect.full.createType
 
 abstract class VimVariableServiceBase : VariableService {
   private var globalVariables: MutableMap<String, VimDataType> = mutableMapOf()
@@ -340,6 +346,82 @@ abstract class VimVariableServiceBase : VariableService {
     vimContext: VimLContext,
   ) {
     throw exExceptionMessage("variable.scope.vim.not.implemented")
+  }
+
+  override fun <T : Any> parseVariableValue(
+    vimDataType: VimDataType,
+    type: KType,
+  ): T {
+    val clazz: KClass<*> = type.classifier as KClass<*>
+    return when (clazz) {
+      Int::class -> {
+        if (vimDataType is VimInt) {
+          vimDataType.value
+        } else if(vimDataType is VimString && vimDataType.value.toIntOrNull() != null) {
+          vimDataType.value.toInt()
+        } else {
+          throw IllegalArgumentException("Expected Int, but got ${vimDataType::class.simpleName}")
+        }
+      }
+
+      String::class -> {
+        if (vimDataType is VimString) {
+          vimDataType.value
+        } else {
+          throw IllegalArgumentException("Expected String, but got ${vimDataType::class.simpleName}")
+        }
+      }
+
+      Double::class -> {
+        if (vimDataType is VimFloat) {
+          vimDataType.value
+        } else {
+          throw IllegalArgumentException("Expected Double, but got ${vimDataType::class.simpleName}")
+        }
+      }
+
+      List::class -> {
+        if (vimDataType is VimList) {
+          val list = mutableListOf<Any>()
+          val values = vimDataType.values
+          val listArgumentType: KType = type.arguments.firstNotNullOf { it.type }
+          for (value in values) {
+            list.add(parseVariableValue(value, listArgumentType))
+          }
+          list.toList()
+        } else {
+          throw IllegalArgumentException("Expected List, but got ${vimDataType::class.simpleName}")
+        }
+      }
+
+      Map::class -> {
+        if (vimDataType is VimDictionary) {
+          val mapArgumentTypes: List<KType> = type.arguments.mapNotNull { it.type }
+          val values: HashMap<VimString, VimDataType> = vimDataType.dictionary
+
+          // the fist argument has to be string
+          val keyArgumentType: KType = mapArgumentTypes[0]
+          if (keyArgumentType != String::class.createType()) {
+            throw IllegalArgumentException("Expected Map with String as key, but got ${vimDataType::class.simpleName}")
+          }
+
+          val valueArgumentType: KType = mapArgumentTypes[1]
+
+          val map: MutableMap<String, Any> = mutableMapOf()
+          for ((key, value) in values) {
+            val keyValue: String = parseVariableValue(key, keyArgumentType)
+            val valueValue: Any = parseVariableValue(value, valueArgumentType)
+
+            map[keyValue] = valueValue
+          }
+          map.toMap()
+        } else {
+          throw IllegalArgumentException("Expected Map, but got ${vimDataType::class.simpleName}")
+        }
+      }
+
+      else -> throw IllegalArgumentException("Unsupported type: ${clazz.simpleName}")
+    } as T
   }
 
   override fun clear() {
