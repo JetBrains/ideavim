@@ -11,6 +11,8 @@ package com.intellij.vim.api.scopes
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.Color
 import com.intellij.vim.api.Highlighter
+import com.intellij.vim.api.TextInfo
+import com.intellij.vim.api.TextSelectionType
 import com.intellij.vim.api.scopes.caret.CaretTransaction
 
 @VimPluginDsl
@@ -56,7 +58,8 @@ interface Transaction {
     caretId: CaretId,
     startOffset: Int,
     endOffset: Int,
-    text: String,
+    textInfo: TextInfo,
+    selectionType: TextSelectionType = TextSelectionType.CHARACTER_WISE,
     preserveIndentation: Boolean = true
   ): Boolean
 
