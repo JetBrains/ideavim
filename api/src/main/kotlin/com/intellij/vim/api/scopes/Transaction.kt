@@ -23,11 +23,6 @@ interface Transaction {
 
   fun withCaret(caretId: CaretId, block: CaretTransaction.() -> Unit)
 
-  fun insertText(caretId: CaretId, atPosition: Int, text: CharSequence)
-  fun deleteText(startOffset: Int, endOffset: Int)
-  fun replaceTextBlockwise(caretId: CaretId, startOffset: Int, endOffset: Int, text: List<String>)
-  fun replaceText(caretId: CaretId, startOffset: Int, endOffset: Int, text: String)
-
   /**
    * Inserts text before the caret position.
    * Caret will be placed after the inserted text.
@@ -38,44 +33,13 @@ interface Transaction {
    * @param options Optional parameters for the insertion operation
    * @return True if the operation was successful, false otherwise
    */
-  fun insertTextBeforeCaret(
+  fun insertText(
     caretId: CaretId,
     position: Int,
     text: String,
-    options: TextOperationOptions = TextOperationOptions(),
+    caretAfterInsertedText: Boolean = true,
+    preserveIndentation: Boolean = true
   ): Boolean
-
-  /**
-   * Inserts text after the caret position.
-   * Caret will be placed before the inserted text.
-   *
-   * @param caretId The ID of the caret to use for insertion
-   * @param position The position where text will be inserted
-   * @param text The text to insert
-   * @param options Optional parameters for the insertion operation
-   * @return True if the operation was successful, false otherwise
-   */
-  fun insertTextAfterCaret(
-    caretId: CaretId,
-    position: Int,
-    text: String,
-    options: TextOperationOptions = TextOperationOptions(),
-  ): Boolean
-
-  /**
-   * Inserts text at the specified line.
-   *
-   * @param caretId The ID of the caret to use for insertion
-   * @param line The line number where text will be inserted
-   * @param text The text to insert
-   * @param options Optional parameters for the insertion operation
-   */
-  fun insertTextAtLine(
-    caretId: CaretId,
-    line: Int,
-    text: String,
-    options: TextOperationOptions = TextOperationOptions(),
-  )
 
   /**
    * Replaces text between startOffset and endOffset.
@@ -93,7 +57,7 @@ interface Transaction {
     startOffset: Int,
     endOffset: Int,
     text: String,
-    options: TextOperationOptions = TextOperationOptions(),
+    preserveIndentation: Boolean = true
   ): Boolean
 
   /**
@@ -110,30 +74,7 @@ interface Transaction {
     caretId: CaretId,
     startOffset: Int,
     endOffset: Int,
-    options: DeleteOptions = DeleteOptions(),
   ): Boolean
-
-  /**
-   * Options for text operations like insertion and replacement.
-   *
-   * @property rawIndent Whether to use raw indentation
-   * @property modifyRegister Whether to modify the register
-   */
-  data class TextOperationOptions(
-    val rawIndent: Boolean = false,
-    val modifyRegister: Boolean = false,
-  )
-
-  /**
-   * Options for delete operations.
-   *
-   * @property isChange Whether this deletion is part of a change operation
-   * @property saveToRegister Whether to save the deleted text to a register
-   */
-  data class DeleteOptions(
-    val isChange: Boolean = false,
-    val saveToRegister: Boolean = false,
-  )
 
   fun addCaret(offset: Int): CaretId
   fun removeCaret(caretId: CaretId)

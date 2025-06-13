@@ -9,7 +9,6 @@
 package com.maddyhome.idea.vim.extension.replacewithregister
 
 import com.intellij.vim.api.CaretId
-import com.intellij.vim.api.CaretInfo
 import com.intellij.vim.api.Mode
 import com.intellij.vim.api.Range
 import com.intellij.vim.api.RegisterData
@@ -122,29 +121,7 @@ class ReplaceWithRegisterNewApi : VimPluginBase() {
     val text: String = registerData.text
     val registerType: RegisterType = registerData.type
     val (startOffset, endOffset) = selectionRange
-    /**
-     * This logic that includes updating caret position should probably be hidden from the user and handled inside
-     * functions - this is a simplified version for the API draft.
-     */
-    var newCaretOffset: Int
-    val replaceTextBlockWise: Boolean =
-      registerType == RegisterType.BLOCK && selectionType == TextSelectionType.CHARACTER_WISE
-
-    if (replaceTextBlockWise) {
-      replaceTextBlockwise(caretId, startOffset, endOffset, text.split("\n"))
-      newCaretOffset = startOffset
-    } else {
-      replaceText(caretId, startOffset, endOffset, text)
-      newCaretOffset = when (selectionType) {
-        TextSelectionType.CHARACTER_WISE -> startOffset + text.length - 1
-        TextSelectionType.LINE_WISE -> startOffset
-        TextSelectionType.BLOCK_WISE -> startOffset
-      }
-    }
-
-    withCaret(caretId) {
-      updateCaret(CaretInfo(newCaretOffset, null))
-    }
+    replaceText(caretId, startOffset, endOffset, text)
   }
 
   companion object {
