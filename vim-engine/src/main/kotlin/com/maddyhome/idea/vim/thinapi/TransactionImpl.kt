@@ -11,6 +11,8 @@ package com.maddyhome.idea.vim.thinapi
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.Color
 import com.intellij.vim.api.Highlighter
+import com.intellij.vim.api.TextInfo
+import com.intellij.vim.api.TextSelectionType
 import com.intellij.vim.api.scopes.Transaction
 import com.intellij.vim.api.scopes.caret.CaretTransaction
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -144,17 +146,27 @@ class TransactionImpl(
     caretId: CaretId,
     startOffset: Int,
     endOffset: Int,
-    text: String,
+    textInfo: TextInfo,
+    selectionType: TextSelectionType,
     preserveIndentation: Boolean,
   ): Boolean {
     val caret: VimCaret = vimEditor.carets().find { it.id == caretId.id } ?: return false
 
-    val copiedText = injector.clipboardManager.dumbCopiedText(text)
-    val textData = PutData.TextData(null, copiedText, SelectionType.CHARACTER_WISE)
+    val copiedText = injector.clipboardManager.dumbCopiedText(textInfo.text)
+    val textData = PutData.TextData(null, copiedText, textInfo.type.toSelectionType())
+
+    val emptySelection = startOffset == endOffset
 
     val visualSelection = PutData.VisualSelection(
-      mapOf(caret to VimSelection.create(startOffset, endOffset, SelectionType.CHARACTER_WISE, vimEditor)),
-      SelectionType.CHARACTER_WISE
+      mapOf(
+        caret to VimSelection.create(
+          startOffset,
+          if (emptySelection) endOffset else endOffset - 1,
+          selectionType.toSelectionType(),
+          vimEditor
+        )
+      ),
+      selectionType.toSelectionType()
     )
 
     val putData = PutData(
@@ -163,7 +175,7 @@ class TransactionImpl(
       count = 1,
       insertTextBeforeCaret = true, // Always insert before caret for replace
       rawIndent = preserveIndentation,
-      caretAfterInsertedText = true,
+      caretAfterInsertedText = false,
       putToLine = -1
     )
 

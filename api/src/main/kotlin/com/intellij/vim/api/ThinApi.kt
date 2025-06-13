@@ -14,12 +14,12 @@ enum class RegisterType {
   BLOCK,
 }
 
-val RegisterType.isLine: Boolean
-  get() = this == RegisterType.LINE
+val TextSelectionType.isLine: Boolean
+  get() = this == TextSelectionType.LINE_WISE
 
 data class RegisterData(
   val text: String,
-  val type: RegisterType
+  val type: TextSelectionType
 )
 
 enum class TextSelectionType {
@@ -27,6 +27,11 @@ enum class TextSelectionType {
   LINE_WISE,
   BLOCK_WISE,
 }
+
+class TextInfo(
+  val text: String,
+  val type: TextSelectionType
+)
 
 data class Range(val start: Int, val end: Int)
 

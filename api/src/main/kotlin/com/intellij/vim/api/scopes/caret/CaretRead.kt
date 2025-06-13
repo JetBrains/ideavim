@@ -12,7 +12,7 @@ import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.CaretInfo
 import com.intellij.vim.api.Range
 import com.intellij.vim.api.RegisterData
-import com.intellij.vim.api.RegisterType
+import com.intellij.vim.api.TextSelectionType
 
 interface CaretRead {
   val caretId: CaretId
@@ -21,7 +21,7 @@ interface CaretRead {
   fun getCurrentRegisterName(): Char
   fun getRegisterData(register: Char): RegisterData?
   fun getRegisterContent(register: Char): String?
-  fun getRegisterType(register: Char): RegisterType?
+  fun getRegisterType(register: Char): TextSelectionType?
   fun getVisualSelectionMarks(): Range?
   fun getChangeMarks(): Range?
   fun getCaretLine(): Int
