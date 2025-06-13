@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import org.jetbrains.annotations.ApiStatus.Internal
 import org.jetbrains.annotations.TestOnly
+import kotlin.reflect.KType
 
 /**
  * COMPATIBILITY-LAYER: Renamed from VimVariableService
@@ -147,6 +148,8 @@ interface VariableService {
   )
 
   fun getGlobalVariables(): Map<String, VimDataType>
+
+  fun <T : Any> parseVariableValue(vimDataType: VimDataType, type: KType): T
 
   /**
    * Clears all global variables.
