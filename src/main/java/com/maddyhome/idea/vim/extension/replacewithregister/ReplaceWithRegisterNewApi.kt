@@ -46,8 +46,8 @@ class ReplaceWithRegisterNewApi : VimPluginBase() {
   private fun VimScope.operatorFunction(): Boolean {
     fun CaretTransaction.getSelection(): Range? {
       return when (this@operatorFunction.mode) {
-        Mode.NORMAL -> getChangeMarks()
-        Mode.VISUAL -> getVisualSelectionMarks()
+        is Mode.NORMAL -> getChangeMarks()
+        is Mode.VISUAL -> getVisualSelectionMarks()
         else -> null
       }
     }
@@ -97,7 +97,7 @@ class ReplaceWithRegisterNewApi : VimPluginBase() {
         }
       }
     }
-    exitVisualMode()
+    mode = Mode.NORMAL()
   }
 
   private fun CaretTransaction.prepareRegisterData(): RegisterData? {
