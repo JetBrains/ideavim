@@ -327,8 +327,8 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     // 2.1) Register vim actions in command mode
     RegisterActions.registerActions();
 
-    // 2.2) Register extensions
-    VimExtensionRegistrar.registerExtensions();
+    // 2.2) Enable extensions
+    VimExtensionRegistrar.enableExtensions();
 
     // 2.3) Register functions
     VimInjectorKt.getInjector().getFunctionService().registerHandlers();
@@ -364,6 +364,9 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
 
     // Unregister vim actions in command mode
     RegisterActions.unregisterActions();
+
+    // Disable extensions
+    VimExtensionRegistrar.disableExtensions();
 
     if (onOffDisposable != null) {
       Disposer.dispose(onOffDisposable);
