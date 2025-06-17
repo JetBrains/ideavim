@@ -11,7 +11,7 @@ package com.maddyhome.idea.vim.thinapi
 
 import com.intellij.vim.api.Color
 import com.intellij.vim.api.Mode
-import com.intellij.vim.api.TextSelectionType
+import com.intellij.vim.api.TextType
 import com.intellij.vim.api.scopes.EditorScope
 import com.intellij.vim.api.scopes.ListenersScope
 import com.intellij.vim.api.scopes.MappingScope
@@ -48,7 +48,7 @@ open class VimScopeImpl(
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!
 
-  override fun getSelectionTypeForCurrentMode(): TextSelectionType? {
+  override fun getSelectionTypeForCurrentMode(): TextType? {
     val typeInEditor = injector.vimState.mode.selectionType ?: return null
     return typeInEditor.toTextSelectionType()
   }

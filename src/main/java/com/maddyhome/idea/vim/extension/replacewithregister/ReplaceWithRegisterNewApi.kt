@@ -8,14 +8,10 @@
 
 package com.maddyhome.idea.vim.extension.replacewithregister
 
-import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.Mode
 import com.intellij.vim.api.Range
-import com.intellij.vim.api.RegisterData
-import com.intellij.vim.api.TextInfo
-import com.intellij.vim.api.TextSelectionType
+import com.intellij.vim.api.TextType
 import com.intellij.vim.api.isLine
-import com.intellij.vim.api.scopes.Transaction
 import com.intellij.vim.api.scopes.VimScope
 import com.intellij.vim.api.scopes.caret.CaretTransaction
 import com.intellij.vim.api.scopes.getVariable
@@ -43,21 +39,20 @@ class ReplaceWithRegisterNewApi : VimPluginBase() {
   }
 
   private fun VimScope.operatorFunction(): Boolean {
-    fun CaretTransaction.getSelection(): Range? {
+    fun CaretTransaction.getSelection(): Array<Range>? {
       return when (this@operatorFunction.mode) {
-        is Mode.NORMAL -> getChangeMarks()
-        is Mode.VISUAL -> getVisualSelectionMarks()
+        is Mode.NORMAL -> changeMarks?.let { arrayOf(it) }
+        is Mode.VISUAL -> visualSelectionMarks
         else -> null
       }
     }
 
-    val selectionType: TextSelectionType = getSelectionTypeForCurrentMode() ?: TextSelectionType.CHARACTER_WISE
     editor {
       change {
         forEachCaret {
           val selectionRange = getSelection() ?: return@forEachCaret
           val registerData = prepareRegisterData() ?: return@forEachCaret
-          replaceTextAndUpdateCaret(caretId, selectionRange, selectionType, registerData)
+          replaceTextAndUpdateCaret(selectionRange, registerData)
         }
       }
     }
@@ -74,54 +69,68 @@ class ReplaceWithRegisterNewApi : VimPluginBase() {
     editor {
       change {
         forEachCaretSorted {
-          val line = getCaretLine()
           val lineRange = Range(getLineStartOffset(line), getLineEndOffset(line + count1 - 1, true))
           val registerData = prepareRegisterData() ?: return@forEachCaretSorted
-          val selectionType = TextSelectionType.LINE_WISE
-          replaceTextAndUpdateCaret(caretId, lineRange, selectionType, registerData)
-          updateCaret(caretInfo.copy(offset = lineRange.start))
+          replaceText(lineRange.start, lineRange.end, registerData.first)
+          updateCaret(offset = lineRange.start)
         }
       }
     }
   }
 
   private fun VimScope.rewriteVisual() {
-    val selectionType: TextSelectionType = getSelectionTypeForCurrentMode() ?: TextSelectionType.CHARACTER_WISE
     editor {
       change {
         forEachCaretSorted {
-          val selectionRange = getVisualSelectionMarks() ?: return@forEachCaretSorted
+          val selectionRange = visualSelectionMarks ?: return@forEachCaretSorted
           val registerData = prepareRegisterData() ?: return@forEachCaretSorted
-          replaceTextAndUpdateCaret(caretId, selectionRange, selectionType, registerData)
+          replaceTextAndUpdateCaret(selectionRange, registerData)
         }
       }
     }
     mode = Mode.NORMAL()
   }
 
-  private fun CaretTransaction.prepareRegisterData(): RegisterData? {
-    val lastRegisterName: Char = getCurrentRegisterName()
-    var registerText: String = getRegisterContent(lastRegisterName) ?: return null
-    var registerType: TextSelectionType = getRegisterType(lastRegisterName) ?: return null
+  private fun CaretTransaction.prepareRegisterData(): Pair<String, TextType>? {
+    val lastRegisterName: Char = lastSelectedReg
+    var registerText: String = getReg(lastRegisterName) ?: return null
+    var registerType: TextType = getRegType(lastRegisterName) ?: return null
 
     if (registerType.isLine && registerText.endsWith("\n")) {
       registerText = registerText.removeSuffix("\n")
-      registerType = TextSelectionType.CHARACTER_WISE
+      registerType = TextType.CHARACTER_WISE
     }
 
-    return RegisterData(registerText, registerType)
+    return registerText to registerType
   }
 
-  private fun Transaction.replaceTextAndUpdateCaret(
-    caretId: CaretId,
-    selectionRange: Range,
-    selectionType: TextSelectionType,
-    registerData: RegisterData,
+  private fun CaretTransaction.replaceTextAndUpdateCaret(
+    selectionRange: Array<Range>,
+    registerData: Pair<String, TextType>,
   ) {
-    val text: String = registerData.text
-    val registerType: TextSelectionType = registerData.type
-    val (startOffset, endOffset) = selectionRange
-    replaceText(caretId, startOffset, endOffset, TextInfo(text, registerType), selectionType, preserveIndentation = false)
+    val text: String = registerData.first
+    val registerType: TextType = registerData.second
+    if (registerType == TextType.BLOCK_WISE) {
+      val lines = text.lines()
+      val startOffset = selectionRange.first().start
+      val endOffset = selectionRange.last().end
+      val startLine = getLineNumber(startOffset)
+      val diff = startOffset - getLineStartOffset(startLine)
+
+      lines.forEachIndexed { index, lineText ->
+        val offset = getLineStartOffset(startLine + index) + diff
+        if (index == 0) {
+          replaceText(offset, endOffset, lineText)
+        } else {
+          insertText(offset, lineText)
+        }
+      }
+
+      updateCaret(offset = startOffset)
+    } else {
+      val range = selectionRange.first()
+      replaceText(range.start, range.end, text)
+    }
   }
 
   companion object {

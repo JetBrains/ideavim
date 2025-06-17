@@ -30,6 +30,8 @@ interface Read {
   fun getLineEndOffset(line: Int, allowEnd: Boolean): Int
   fun getText(startOffset: Int, endOffset: Int): CharSequence
 
+  fun getLineNumber(offset: Int): Int
+
   fun getAllCaretsData(): List<CaretData>
   fun getAllCaretsDataSortedByOffset(): List<CaretData>
   fun getAllCaretIds(): List<CaretId>
