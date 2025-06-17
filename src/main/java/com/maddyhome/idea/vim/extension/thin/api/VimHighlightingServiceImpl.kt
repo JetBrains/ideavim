@@ -15,16 +15,16 @@ import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.vim.api.Color
-import com.intellij.vim.api.Highlighter
+import com.intellij.vim.api.HighlighterId
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.thinapi.VimHighlightingService
 import com.maddyhome.idea.vim.thinapi.toAwtColor
 import java.awt.Font
 
-internal class IjHighlighter(
+internal class IjHighlighterId(
   internal var ijHighlighter: RangeHighlighter
-): Highlighter
+): HighlighterId
 
 
 class VimHighlightingServiceImpl : VimHighlightingService {
@@ -34,7 +34,7 @@ class VimHighlightingServiceImpl : VimHighlightingService {
     endOffset: Int,
     backgroundColor: Color?,
     foregroundColor: Color?,
-  ): Highlighter {
+  ): HighlighterId {
     val ijEditor = editor.ij
 
     val attributes = TextAttributes(
@@ -53,12 +53,12 @@ class VimHighlightingServiceImpl : VimHighlightingService {
       HighlighterTargetArea.EXACT_RANGE,
     )
 
-    val highlighter = IjHighlighter(iJHighlighter)
+    val highlighter = IjHighlighterId(iJHighlighter)
     return highlighter
   }
 
-  override fun removeHighlighter(editor: VimEditor, highlighter: Highlighter) {
+  override fun removeHighlighter(editor: VimEditor, highlighterId: HighlighterId) {
     val ijEditor = editor.ij
-    ijEditor.markupModel.removeHighlighter((highlighter as IjHighlighter).ijHighlighter)
+    ijEditor.markupModel.removeHighlighter((highlighterId as IjHighlighterId).ijHighlighter)
   }
 }

@@ -14,7 +14,7 @@ import com.intellij.util.Alarm
 import com.intellij.util.Alarm.ThreadToUse
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.Color
-import com.intellij.vim.api.Highlighter
+import com.intellij.vim.api.HighlighterId
 import com.intellij.vim.api.Mode
 import com.intellij.vim.api.Range
 import com.intellij.vim.api.scopes.VimScope
@@ -44,7 +44,7 @@ import com.maddyhome.idea.vim.thinapi.toHexColor
  * When a new text is yanked or user starts editing, the old highlighting would be deleted.
  */
 class VimHighlightedYankNewApi : VimPluginBase() {
-  private val highlighters: MutableList<Highlighter> = mutableListOf()
+  private val myHighlighterIds: MutableList<HighlighterId> = mutableListOf()
   private val alarm = Alarm(ThreadToUse.SWING_THREAD)
 
   override fun getName(): String = "highlightedyank"
@@ -82,7 +82,7 @@ class VimHighlightedYankNewApi : VimPluginBase() {
             backgroundColor = highlightColor,
             foregroundColor = foregroundColor
           )
-          highlighters.add(highlighter)
+          myHighlighterIds.add(highlighter)
         }
       }
     }
@@ -105,10 +105,10 @@ class VimHighlightedYankNewApi : VimPluginBase() {
     alarm.cancelAllRequests()
     editor {
       change {
-        removeHighlighters(highlighters)
+        removeHighlighters(myHighlighterIds)
       }
     }
-    highlighters.clear()
+    myHighlighterIds.clear()
   }
 
   private fun getDefaultHighlightTextColor(): Color {
