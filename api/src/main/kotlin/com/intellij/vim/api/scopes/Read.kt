@@ -14,21 +14,18 @@ import com.intellij.vim.api.scopes.caret.CaretRead
 
 @VimPluginDsl
 interface Read {
-  val size: Long
+  val fileSize: Long
   val text: CharSequence
   val lineCount: Int
 
   fun <T> forEachCaret(block: CaretRead.() -> T): List<T>
-  fun withCaret(caretId: CaretId, block: CaretRead.() -> Unit)
+  fun with(caretId: CaretId, block: CaretRead.() -> Unit)
 
   fun getLineStartOffset(line: Int): Int
   fun getLineEndOffset(line: Int, allowEnd: Boolean): Int
-  fun getText(startOffset: Int, endOffset: Int): CharSequence
 
   fun getLineNumber(offset: Int): Int
 
-  fun getAllCaretsData(): List<CaretData>
-  fun getAllCaretsDataSortedByOffset(): List<CaretData>
-  fun getAllCaretIds(): List<CaretId>
-  fun getAllCaretIdsSortedByOffset(): List<CaretId>
+  val caretData: List<CaretData>
+  val caretIds: List<CaretId>
 }
