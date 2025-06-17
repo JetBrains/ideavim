@@ -64,6 +64,10 @@ open class ReadImpl(
     return vimEditor.getText(startOffset, endOffset)
   }
 
+  override fun getLineNumber(offset: Int): Int {
+    return vimEditor.offsetToBufferPosition(offset).line
+  }
+
   override fun getAllCaretsData(): List<CaretData> {
     return vimEditor.carets().map { caret -> caret.caretId to caret.caretInfo }
   }

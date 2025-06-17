@@ -8,15 +8,10 @@
 
 package com.intellij.vim.api
 
-val TextSelectionType.isLine: Boolean
-  get() = this == TextSelectionType.LINE_WISE
+val TextType.isLine: Boolean
+  get() = this == TextType.LINE_WISE
 
-data class RegisterData(
-  val text: String,
-  val type: TextSelectionType
-)
-
-enum class TextSelectionType {
+enum class TextType {
   CHARACTER_WISE,
   LINE_WISE,
   BLOCK_WISE,
@@ -24,10 +19,10 @@ enum class TextSelectionType {
 
 class TextInfo(
   val text: String,
-  val type: TextSelectionType = TextSelectionType.CHARACTER_WISE
+  val type: TextType = TextType.CHARACTER_WISE
 )
 
-data class Range(val start: Int, val end: Int)
+data class Range(val start: Int, val end: Int) // todo: Maybe use IntRange instead?
 
 typealias CaretData = Pair<CaretId, CaretInfo>
 

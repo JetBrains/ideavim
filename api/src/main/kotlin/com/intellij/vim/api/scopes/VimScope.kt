@@ -10,14 +10,14 @@ package com.intellij.vim.api.scopes
 
 import com.intellij.vim.api.Color
 import com.intellij.vim.api.Mode
-import com.intellij.vim.api.TextSelectionType
+import com.intellij.vim.api.TextType
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
 @VimPluginDsl
 interface VimScope {
   var mode: Mode
-  fun getSelectionTypeForCurrentMode(): TextSelectionType?
+  fun getSelectionTypeForCurrentMode(): TextType?
 
   /**
    * Retrieves a VimScript variable and converts it to the specified Kotlin type.

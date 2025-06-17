@@ -11,8 +11,10 @@ package com.maddyhome.idea.vim.thinapi
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.CaretInfo
 import com.intellij.vim.api.Color
-import com.intellij.vim.api.TextSelectionType
+import com.intellij.vim.api.Range
+import com.intellij.vim.api.TextType
 import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import java.lang.String
 import kotlin.text.removePrefix
@@ -20,19 +22,19 @@ import kotlin.text.toLong
 import kotlin.to
 import java.awt.Color as AwtColor
 
-fun SelectionType.toTextSelectionType(): TextSelectionType {
+fun SelectionType.toTextSelectionType(): TextType {
   return when (this) {
-    SelectionType.CHARACTER_WISE -> TextSelectionType.CHARACTER_WISE
-    SelectionType.LINE_WISE -> TextSelectionType.LINE_WISE
-    SelectionType.BLOCK_WISE -> TextSelectionType.BLOCK_WISE
+    SelectionType.CHARACTER_WISE -> TextType.CHARACTER_WISE
+    SelectionType.LINE_WISE -> TextType.LINE_WISE
+    SelectionType.BLOCK_WISE -> TextType.BLOCK_WISE
   }
 }
 
-fun TextSelectionType.toSelectionType(): SelectionType {
+fun TextType.toSelectionType(): SelectionType {
   return when (this) {
-    TextSelectionType.CHARACTER_WISE -> SelectionType.CHARACTER_WISE
-    TextSelectionType.LINE_WISE -> SelectionType.LINE_WISE
-    TextSelectionType.BLOCK_WISE -> SelectionType.BLOCK_WISE
+    TextType.CHARACTER_WISE -> SelectionType.CHARACTER_WISE
+    TextType.LINE_WISE -> SelectionType.LINE_WISE
+    TextType.BLOCK_WISE -> SelectionType.BLOCK_WISE
   }
 }
 
@@ -60,4 +62,8 @@ fun Color.toAwtColor(): AwtColor {
 fun AwtColor.toHexColor(): Color {
   val hexColor = String.format("#%02x%02x%02x%02x", alpha, red, green, blue)
   return Color(hexColor)
+}
+
+fun TextRange.toRange(): Range {
+  return Range(startOffset, endOffset)
 }

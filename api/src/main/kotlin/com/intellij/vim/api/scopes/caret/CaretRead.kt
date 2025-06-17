@@ -9,20 +9,21 @@
 package com.intellij.vim.api.scopes.caret
 
 import com.intellij.vim.api.CaretId
-import com.intellij.vim.api.CaretInfo
 import com.intellij.vim.api.Range
-import com.intellij.vim.api.RegisterData
-import com.intellij.vim.api.TextSelectionType
+import com.intellij.vim.api.TextType
 
 interface CaretRead {
   val caretId: CaretId
-  val caretInfo: CaretInfo
 
-  fun getCurrentRegisterName(): Char
-  fun getRegisterData(register: Char): RegisterData?
-  fun getRegisterContent(register: Char): String?
-  fun getRegisterType(register: Char): TextSelectionType?
-  fun getVisualSelectionMarks(): Range?
-  fun getChangeMarks(): Range?
-  fun getCaretLine(): Int
+  val offset: Int
+  val selection: Array<Range>
+  val line: Int
+
+  val lastSelectedReg: Char
+
+  val visualSelectionMarks: Array<Range>?
+  val changeMarks: Range?
+
+  fun getReg(register: Char): String?
+  fun getRegType(register: Char): TextType?
 }

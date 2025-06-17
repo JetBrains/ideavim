@@ -19,9 +19,9 @@ sealed interface Mode {
 
   data class OP_PENDING(override val returnTo: Mode) : Mode
 
-  data class VISUAL(val selectionType: TextSelectionType, override val returnTo: Mode = NORMAL()) : Mode
+  data class VISUAL(val selectionType: TextType, override val returnTo: Mode = NORMAL()) : Mode
 
-  data class SELECT(val selectionType: TextSelectionType, override val returnTo: Mode = NORMAL()) : Mode
+  data class SELECT(val selectionType: TextType, override val returnTo: Mode = NORMAL()) : Mode
 
   object INSERT : Mode {
     override val returnTo: Mode = NORMAL()

@@ -8,26 +8,31 @@
 
 package com.intellij.vim.api.scopes.caret
 
-import com.intellij.vim.api.CaretId
-import com.intellij.vim.api.CaretInfo
 import com.intellij.vim.api.Range
-import com.intellij.vim.api.RegisterData
-import com.intellij.vim.api.TextSelectionType
 
-interface CaretTransaction {
-  val caretId: CaretId
-  val caretInfo: CaretInfo
+interface CaretTransaction: CaretRead {
+  fun updateCaret(offset: Int, selection: Range? = null)
 
-  fun getCurrentRegisterName(): Char
-  fun getRegisterData(register: Char): RegisterData?
-  fun getRegisterContent(register: Char): String?
-  fun getRegisterType(register: Char): TextSelectionType?
-  fun getVisualSelectionMarks(): Range?
-  fun getChangeMarks(): Range?
-  fun getCaretLine(): Int
-  fun updateCaret(newInfo: CaretInfo)
+  fun insertText(
+    position: Int,
+    text: String,
+    caretAfterInsertedText: Boolean = true
+  ): Boolean
 
-  // todo: this is temporary - remove
+
+  fun replaceText(
+    startOffset: Int,
+    endOffset: Int,
+    text: String
+  ): Boolean
+
+  fun deleteText(
+    startOffset: Int,
+    endOffset: Int,
+  ): Boolean
+
+  // temporary
   fun getLineStartOffset(line: Int): Int
   fun getLineEndOffset(line: Int, allowEnd: Boolean): Int
+  fun getLineNumber(offset: Int): Int
 }
