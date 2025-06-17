@@ -29,7 +29,7 @@ class TransactionImpl(
     return vimEditor.sortedCarets().map { caret -> CaretTransactionImpl(listenerOwner, mappingOwner, caret.caretId).block() }
   }
 
-  override fun withCaret(
+  override fun with(
     caretId: CaretId,
     block: CaretTransaction.() -> Unit,
   ) {
@@ -62,11 +62,5 @@ class TransactionImpl(
 
   override fun removeHighlighter(highlighterId: HighlighterId) {
     injector.highlightingService.removeHighlighter(vimEditor, highlighterId)
-  }
-
-  override fun removeHighlighters(highlighterIds: List<HighlighterId>) {
-    highlighterIds.forEach { highlighter ->
-      injector.highlightingService.removeHighlighter(vimEditor, highlighter)
-    }
   }
 }

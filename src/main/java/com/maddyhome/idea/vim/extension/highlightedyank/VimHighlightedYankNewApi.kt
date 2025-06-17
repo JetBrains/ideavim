@@ -105,7 +105,7 @@ class VimHighlightedYankNewApi : VimPluginBase() {
     alarm.cancelAllRequests()
     editor {
       change {
-        removeHighlighters(myHighlighterIds)
+        myHighlighterIds.forEach { highlighterId -> removeHighlighter(highlighterId) }
       }
     }
     myHighlighterIds.clear()
