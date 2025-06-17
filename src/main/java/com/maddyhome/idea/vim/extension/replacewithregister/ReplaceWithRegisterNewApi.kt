@@ -14,7 +14,6 @@ import com.intellij.vim.api.TextType
 import com.intellij.vim.api.isLine
 import com.intellij.vim.api.scopes.VimScope
 import com.intellij.vim.api.scopes.caret.CaretTransaction
-import com.intellij.vim.api.scopes.getVariable
 import com.maddyhome.idea.vim.extension.thin.api.VimPluginBase
 
 class ReplaceWithRegisterNewApi : VimPluginBase() {

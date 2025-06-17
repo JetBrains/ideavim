@@ -36,7 +36,7 @@ import java.awt.Color as AwtColor
 open class VimScopeImpl(
   private val listenerOwner: ListenerOwner,
   private val mappingOwner: MappingOwner,
-) : VimScope {
+) : VimScope() {
   override var mode: Mode
     get() {
       return injector.vimState.mode.toMode()
