@@ -35,7 +35,7 @@ data class SourceCommand(val range: Range, val modifier: CommandModifier, val ar
     context: ExecutionContext,
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
-    val path = expandUser(argument.trim())
+    val path = argument.trim().vimExpanded()
     val file = File(path)
     injector.vimscriptExecutor.executeFile(
       file,
@@ -48,13 +48,23 @@ data class SourceCommand(val range: Range, val modifier: CommandModifier, val ar
     return ExecutionResult.Success
   }
 
-  private fun expandUser(path: String): String {
-    if (path.startsWith("~")) {
+  private fun String.vimExpanded(): String {
+    var expanded = this
+    if (startsWith("~")) {
       val home = System.getProperty("user.home")
       if (home != null) {
-        return home + path.substring(1)
+        expanded = home + substring(1)
       }
     }
-    return path
+
+    val envRe = Regex("\\$[A-Za-z0-9_]+")
+    val env = System.getenv()
+    expanded = expanded.replace(envRe) { match ->
+      val name = match.value.trimStart('$')
+      val ret = env[name] ?: match.value
+      ret
+    }
+
+    return expanded
   }
 }
