@@ -25,17 +25,8 @@ class TransactionImpl(
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!
 
-  override fun forEachCaret(block: CaretTransaction.() -> Unit) {
-    vimEditor.carets().forEach { caret -> CaretTransactionImpl(listenerOwner, mappingOwner, caret.caretId).block() }
-  }
-
-  override fun <T> mapEachCaret(block: CaretTransaction.() -> T): List<T> {
-    return vimEditor.carets().map { caret -> CaretTransactionImpl(listenerOwner, mappingOwner, caret.caretId).block() }
-  }
-
-  override fun forEachCaretSorted(block: CaretTransaction.() -> Unit) {
-    vimEditor.sortedCarets()
-      .forEach { caret -> CaretTransactionImpl(listenerOwner, mappingOwner, caret.caretId).block() }
+  override fun <T> forEachCaret(block: CaretTransaction.() -> T): List<T> {
+    return vimEditor.sortedCarets().map { caret -> CaretTransactionImpl(listenerOwner, mappingOwner, caret.caretId).block() }
   }
 
   override fun withCaret(

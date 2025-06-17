@@ -15,12 +15,7 @@ import com.intellij.vim.api.scopes.caret.CaretTransaction
 
 @VimPluginDsl
 interface Transaction {
-  fun forEachCaret(block: CaretTransaction.() -> Unit)
-
-  fun <T> mapEachCaret(block: CaretTransaction.() -> T): List<T>
-
-  fun forEachCaretSorted(block: CaretTransaction.() -> Unit)
-
+  fun <T> forEachCaret(block: CaretTransaction.() -> T): List<T>
   fun withCaret(caretId: CaretId, block: CaretTransaction.() -> Unit)
 
   fun addCaret(offset: Int): CaretId

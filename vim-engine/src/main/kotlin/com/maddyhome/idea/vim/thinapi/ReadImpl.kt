@@ -33,16 +33,8 @@ open class ReadImpl(
   override val lineCount: Int
     get() = vimEditor.lineCount()
 
-  override fun forEachCaret(block: CaretRead.() -> Unit) {
-    vimEditor.carets().forEach { caret -> CaretReadImpl(caret.caretId).block() }
-  }
-
-  override fun <T> mapEachCaret(block: CaretRead.() -> T): List<T> {
-    return vimEditor.carets().map { caret -> CaretReadImpl(caret.caretId).block() }
-  }
-
-  override fun forEachCaretSorted(block: CaretRead.() -> Unit) {
-    vimEditor.sortedCarets().forEach { caret -> CaretReadImpl(caret.caretId).block() }
+  override fun <T> forEachCaret(block: CaretRead.() -> T): List<T> {
+    return vimEditor.sortedCarets().map { caret -> CaretReadImpl(caret.caretId).block() }
   }
 
   override fun withCaret(
