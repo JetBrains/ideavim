@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.thinapi
 
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.Color
-import com.intellij.vim.api.Highlighter
+import com.intellij.vim.api.HighlighterId
 import com.intellij.vim.api.scopes.Transaction
 import com.intellij.vim.api.scopes.caret.CaretTransaction
 import com.maddyhome.idea.vim.api.VimEditor
@@ -50,7 +50,7 @@ class TransactionImpl(
     endOffset: Int,
     backgroundColor: Color?,
     foregroundColor: Color?,
-  ): Highlighter {
+  ): HighlighterId {
     return injector.highlightingService.addHighlighter(
       vimEditor,
       startOffset,
@@ -60,12 +60,12 @@ class TransactionImpl(
     )
   }
 
-  override fun removeHighlighter(highlighter: Highlighter) {
-    injector.highlightingService.removeHighlighter(vimEditor, highlighter)
+  override fun removeHighlighter(highlighterId: HighlighterId) {
+    injector.highlightingService.removeHighlighter(vimEditor, highlighterId)
   }
 
-  override fun removeHighlighters(highlighters: List<Highlighter>) {
-    highlighters.forEach { highlighter ->
+  override fun removeHighlighters(highlighterIds: List<HighlighterId>) {
+    highlighterIds.forEach { highlighter ->
       injector.highlightingService.removeHighlighter(vimEditor, highlighter)
     }
   }

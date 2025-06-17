@@ -34,7 +34,7 @@ data class CaretInfo(
   val selection: Pair<Int, Int>?,
 )
 
-interface Highlighter
+interface HighlighterId
 
 data class Color(
   val hexCode: String
