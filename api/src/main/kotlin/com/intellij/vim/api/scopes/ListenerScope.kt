@@ -24,8 +24,6 @@ interface ListenersScope {
   fun onMacroRecordingStart(callback: VimScope.() -> Unit)
   fun onMacroRecordingFinish(callback: VimScope.() -> Unit)
 
-  fun onPluginTurnOn(callback: VimScope.() -> Unit)
-  fun onPluginTurnOff(callback: VimScope.() -> Unit)
-
-  fun onReplaceCharChange(callback: VimScope.() -> Unit)
+  fun onIdeaVimEnabled(callback: VimScope.() -> Unit)
+  fun onIdeaVimDisabled(callback: VimScope.() -> Unit)
 }

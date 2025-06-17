@@ -17,7 +17,6 @@ import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.EditorListener
-import com.maddyhome.idea.vim.common.IsReplaceCharListener
 import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.common.MacroRecordingListener
 import com.maddyhome.idea.vim.common.ModeChangeListener
@@ -150,7 +149,7 @@ class ListenerScopeImpl(
     injector.listenersNotifier.macroRecordingListeners.add(listener)
   }
 
-  override fun onPluginTurnOn(callback: VimScope.() -> Unit) {
+  override fun onIdeaVimEnabled(callback: VimScope.() -> Unit) {
     val listener = object : VimPluginListener {
       override fun turnedOn() {
         val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
@@ -167,7 +166,7 @@ class ListenerScopeImpl(
     injector.listenersNotifier.vimPluginListeners.add(listener)
   }
 
-  override fun onPluginTurnOff(callback: VimScope.() -> Unit) {
+  override fun onIdeaVimDisabled(callback: VimScope.() -> Unit) {
     val listener = object : VimPluginListener {
       override fun turnedOn() {
         // Not used in this listener
@@ -182,18 +181,5 @@ class ListenerScopeImpl(
         get() = listenerOwner
     }
     injector.listenersNotifier.vimPluginListeners.add(listener)
-  }
-
-  override fun onReplaceCharChange(callback: VimScope.() -> Unit) {
-    val listener = object : IsReplaceCharListener {
-      override fun isReplaceCharChanged(editor: VimEditor) {
-        val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
-        vimScope.callback()
-      }
-
-      override val owner: ListenerOwner
-        get() = listenerOwner
-    }
-    injector.listenersNotifier.isReplaceCharListeners.add(listener)
   }
 }
