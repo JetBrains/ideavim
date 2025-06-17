@@ -18,7 +18,6 @@ import com.intellij.vim.api.HighlighterId
 import com.intellij.vim.api.Mode
 import com.intellij.vim.api.Range
 import com.intellij.vim.api.scopes.VimScope
-import com.intellij.vim.api.scopes.getVariable
 import com.maddyhome.idea.vim.extension.thin.api.VimPluginBase
 import com.maddyhome.idea.vim.thinapi.toHexColor
 
