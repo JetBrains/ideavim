@@ -14,7 +14,6 @@ import com.intellij.vim.api.scopes.Read
 import com.intellij.vim.api.scopes.caret.CaretRead
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndOffset
-import com.maddyhome.idea.vim.api.getText
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.key.MappingOwner
@@ -26,7 +25,7 @@ open class ReadImpl(
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!
 
-  override val size: Long
+  override val fileSize: Long
     get() = vimEditor.fileSize()
   override val text: CharSequence
     get() = vimEditor.text()
@@ -37,7 +36,7 @@ open class ReadImpl(
     return vimEditor.sortedCarets().map { caret -> CaretReadImpl(caret.caretId).block() }
   }
 
-  override fun withCaret(
+  override fun with(
     caretId: CaretId,
     block: CaretRead.() -> Unit,
   ) {
@@ -52,27 +51,12 @@ open class ReadImpl(
     return vimEditor.getLineEndOffset(line, allowEnd)
   }
 
-  override fun getText(startOffset: Int, endOffset: Int): CharSequence {
-    return vimEditor.getText(startOffset, endOffset)
-  }
-
   override fun getLineNumber(offset: Int): Int {
     return vimEditor.offsetToBufferPosition(offset).line
   }
 
-  override fun getAllCaretsData(): List<CaretData> {
-    return vimEditor.carets().map { caret -> caret.caretId to caret.caretInfo }
-  }
-
-  override fun getAllCaretsDataSortedByOffset(): List<CaretData> {
-    return vimEditor.sortedCarets().map { caret -> caret.caretId to caret.caretInfo }
-  }
-
-  override fun getAllCaretIds(): List<CaretId> {
-    return vimEditor.carets().map { caret -> caret.caretId }
-  }
-
-  override fun getAllCaretIdsSortedByOffset(): List<CaretId> {
-    return vimEditor.sortedCarets().map { caret -> caret.caretId }
-  }
+  override val caretData: List<CaretData>
+    get() = vimEditor.sortedCarets().map { caret -> caret.caretId to caret.caretInfo }
+  override val caretIds: List<CaretId>
+    get() = vimEditor.sortedCarets().map { caret -> caret.caretId }
 }
