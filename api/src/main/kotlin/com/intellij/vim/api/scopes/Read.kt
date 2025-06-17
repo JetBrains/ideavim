@@ -18,12 +18,7 @@ interface Read {
   val text: CharSequence
   val lineCount: Int
 
-  fun forEachCaret(block: CaretRead.() -> Unit)
-
-  fun <T> mapEachCaret(block: CaretRead.() -> T): List<T>
-
-  fun forEachCaretSorted(block: CaretRead.() -> Unit)
-
+  fun <T> forEachCaret(block: CaretRead.() -> T): List<T>
   fun withCaret(caretId: CaretId, block: CaretRead.() -> Unit)
 
   fun getLineStartOffset(line: Int): Int

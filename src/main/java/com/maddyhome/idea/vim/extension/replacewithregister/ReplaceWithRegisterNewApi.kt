@@ -68,9 +68,9 @@ class ReplaceWithRegisterNewApi : VimPluginBase() {
     val count1 = getVariable<Int>("v:count1") ?: 1
     editor {
       change {
-        forEachCaretSorted {
+        forEachCaret {
           val lineRange = Range(getLineStartOffset(line), getLineEndOffset(line + count1 - 1, true))
-          val registerData = prepareRegisterData() ?: return@forEachCaretSorted
+          val registerData = prepareRegisterData() ?: return@forEachCaret
           replaceText(lineRange.start, lineRange.end, registerData.first)
           updateCaret(offset = lineRange.start)
         }
@@ -81,9 +81,9 @@ class ReplaceWithRegisterNewApi : VimPluginBase() {
   private fun VimScope.rewriteVisual() {
     editor {
       change {
-        forEachCaretSorted {
-          val selectionRange = visualSelectionMarks ?: return@forEachCaretSorted
-          val registerData = prepareRegisterData() ?: return@forEachCaretSorted
+        forEachCaret {
+          val selectionRange = visualSelectionMarks ?: return@forEachCaret
+          val registerData = prepareRegisterData() ?: return@forEachCaret
           replaceTextAndUpdateCaret(selectionRange, registerData)
         }
       }
