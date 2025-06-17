@@ -9,15 +9,20 @@
 package com.maddyhome.idea.vim.thinapi
 
 import com.intellij.vim.api.CaretId
-import com.intellij.vim.api.CaretInfo
+import com.intellij.vim.api.Range
 import com.intellij.vim.api.scopes.Read
 import com.intellij.vim.api.scopes.caret.CaretRead
 import com.intellij.vim.api.scopes.caret.CaretTransaction
+import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ListenerOwner
+import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.key.MappingOwner
+import com.maddyhome.idea.vim.put.PutData
+import com.maddyhome.idea.vim.state.mode.SelectionType
 
 class CaretTransactionImpl(
   private val listenerOwner: ListenerOwner,
@@ -27,10 +32,162 @@ class CaretTransactionImpl(
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!
 
-  override fun updateCaret(newInfo: CaretInfo) {
+  private val executionContext: ExecutionContext
+    get() = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+
+  private val vimCaret: VimCaret
+    get() = vimEditor.carets().first { it.id == caretId.id }
+
+  private fun determineSelectionType(startOffset: Int, endOffset: Int): SelectionType {
+    val endOffsetNormalized = endOffset.coerceAtMost(vimEditor.fileSize().toInt())
+    if (endOffsetNormalized == startOffset) return SelectionType.CHARACTER_WISE
+
+    val selectedText = vimEditor.text().subSequence(startOffset, endOffsetNormalized)
+
+    val startLine = vimEditor.offsetToBufferPosition(startOffset).line
+    val endLine = vimEditor.offsetToBufferPosition(endOffset).line
+
+    val lineStartOffset = vimEditor.getLineStartOffset(startLine)
+    val lineEndOffset = vimEditor.getLineEndOffset(endLine)
+
+    val isLine: Boolean = (startOffset == lineStartOffset && endOffset == lineEndOffset) &&
+      selectedText.endsWith("\n")
+
+    return if (startLine == endLine) {
+      if (isLine) {
+        SelectionType.LINE_WISE
+      } else {
+        SelectionType.CHARACTER_WISE
+      }
+    } else {
+      SelectionType.LINE_WISE
+    }
+  }
+
+  private fun putText(
+    startPosition: Int,
+    text: String,
+    caretAfterInsertedText: Boolean,
+  ): Boolean {
+    val copiedText = injector.clipboardManager.dumbCopiedText(text)
+    val textData = PutData.TextData(null, copiedText, SelectionType.CHARACTER_WISE)
+
+    val putData = PutData(
+      textData = textData,
+      visualSelection = null,
+      count = 1,
+      insertTextBeforeCaret = caretAfterInsertedText,
+      rawIndent = false,
+      caretAfterInsertedText = caretAfterInsertedText,
+      putToLine = -1
+    )
+
+    var result = false
+    injector.actionExecutor.executeCommand(vimEditor, {
+      injector.application.runWriteAction {
+        // Move caret to insertion position
+        vimCaret.moveToOffset(startPosition)
+
+        result = injector.put.putTextForCaret(
+          vimEditor,
+          vimCaret,
+          executionContext,
+          putData,
+          updateVisualMarks = false,
+          modifyRegister = false
+        )
+      }
+    }, "Insert Text", null)
+
+    return result
+  }
+
+  override fun insertText(
+    position: Int,
+    text: String,
+    caretAfterInsertedText: Boolean
+  ): Boolean {
+    return putText(position, text, caretAfterInsertedText)
+  }
+
+  override fun replaceText(
+    startOffset: Int,
+    endOffset: Int,
+    text: String
+  ): Boolean {
+    val copiedText = injector.clipboardManager.dumbCopiedText(text)
+    val textData = PutData.TextData(null, copiedText, SelectionType.CHARACTER_WISE)
+
+    val emptySelection = startOffset == endOffset
+
+    val selectionType = determineSelectionType(startOffset, endOffset)
+
+    val visualSelection = PutData.VisualSelection(
+      mapOf(
+        vimCaret to VimSelection.create(
+          startOffset,
+          if (emptySelection) endOffset else endOffset - 1,
+          selectionType,
+          vimEditor
+        )
+      ),
+      selectionType
+    )
+
+    val putData = PutData(
+      textData = textData,
+      visualSelection = visualSelection,
+      count = 1,
+      insertTextBeforeCaret = true, // Always insert before caret for replace
+      rawIndent = false,
+      caretAfterInsertedText = false,
+      putToLine = -1
+    )
+
+    var result = false
+    injector.actionExecutor.executeCommand(vimEditor, {
+      injector.application.runWriteAction {
+        result = injector.put.putTextForCaret(
+          vimEditor,
+          vimCaret,
+          executionContext,
+          putData,
+          updateVisualMarks = false,
+          modifyRegister = false
+        )
+      }
+    }, "Replace Text", null)
+
+    return result
+  }
+
+  override fun deleteText(
+    startOffset: Int,
+    endOffset: Int,
+  ): Boolean {
+    val range = TextRange(startOffset, endOffset)
+
+    injector.actionExecutor.executeCommand(vimEditor, {
+      injector.application.runWriteAction {
+        injector.changeGroup.deleteRange(
+          vimEditor,
+          executionContext,
+          vimCaret,
+          range,
+          SelectionType.CHARACTER_WISE,
+          isChange = false,
+          saveToRegister = false
+        )
+      }
+    }, "Delete Text", null)
+
+    return true
+  }
+
+  override fun updateCaret(offset: Int, selection: Range?) {
     val caret: VimCaret = vimEditor.carets().find { it.id == caretId.id } ?: return
-    caret.moveToOffset(newInfo.offset)
-    newInfo.selection?.let { (start, end) ->
+    caret.moveToOffset(offset)
+    selection?.let { (start, end) ->
       caret.setSelection(start, end)
     } ?: caret.removeSelection()
   }
