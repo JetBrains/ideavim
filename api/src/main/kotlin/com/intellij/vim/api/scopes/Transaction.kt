@@ -16,7 +16,7 @@ import com.intellij.vim.api.scopes.caret.CaretTransaction
 @VimPluginDsl
 interface Transaction {
   fun <T> forEachCaret(block: CaretTransaction.() -> T): List<T>
-  fun withCaret(caretId: CaretId, block: CaretTransaction.() -> Unit)
+  fun with(caretId: CaretId, block: CaretTransaction.() -> Unit)
 
   fun addCaret(offset: Int): CaretId
   fun removeCaret(caretId: CaretId)
@@ -24,5 +24,4 @@ interface Transaction {
   // Highlighting
   fun addHighlighter(startOffset: Int, endOffset: Int, backgroundColor: Color?, foregroundColor: Color?): HighlighterId
   fun removeHighlighter(highlighterId: HighlighterId)
-  fun removeHighlighters(highlighterIds: List<HighlighterId>)
 }
