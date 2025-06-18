@@ -46,19 +46,19 @@ open class VimScopeImpl(
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!
 
-  override fun <T : Any> getVariable(name: String, type: KType): T? {
-    val (name, scope) = parseVariableName(name)
-    val variableService: VariableService = injector.variableService
-    val variable = Variable(scope, name)
-    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
-    val variableValue: VimDataType? =
-      variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext)
-    if (variableValue == null) {
-      return variableValue
+  override fun <T : Any> getVariableInternal(name: String, type: KType): T? {
+      val (name, scope) = parseVariableName(name)
+      val variableService: VariableService = injector.variableService
+      val variable = Variable(scope, name)
+      val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+      val variableValue: VimDataType? =
+        variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext)
+      if (variableValue == null) {
+        return variableValue
 //      throw IllegalArgumentException("Variable with name $name does not exist")
-    }
-    val value: T = parseVariableValue(variableValue, type)
-    return value
+      }
+      val value: T = parseVariableValue(variableValue, type)
+      return value
   }
 
   private fun <T : Any> parseVariableValue(vimDataType: VimDataType, type: KType): T {
