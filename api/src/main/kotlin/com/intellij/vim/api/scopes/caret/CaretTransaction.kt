@@ -8,6 +8,7 @@
 
 package com.intellij.vim.api.scopes.caret
 
+import com.intellij.vim.api.Line
 import com.intellij.vim.api.Range
 
 interface CaretTransaction: CaretRead {
@@ -34,5 +35,5 @@ interface CaretTransaction: CaretRead {
   // temporary
   fun getLineStartOffset(line: Int): Int
   fun getLineEndOffset(line: Int, allowEnd: Boolean): Int
-  fun getLineNumber(offset: Int): Int
+  fun getLine(offset: Int): Line
 }

@@ -68,10 +68,10 @@ class ReplaceWithRegisterNewApi : VimPluginBase() {
     editor {
       change {
         forEachCaret {
-          val lineRange = Range(getLineStartOffset(line), getLineEndOffset(line + count1 - 1, true))
+          val endOffset = getLineEndOffset(line.number + count1 - 1, true)
           val registerData = prepareRegisterData() ?: return@forEachCaret
-          replaceText(lineRange.start, lineRange.end, registerData.first)
-          updateCaret(offset = lineRange.start)
+          replaceText(line.start, endOffset, registerData.first)
+          updateCaret(offset = line.start)
         }
       }
     }
@@ -113,11 +113,11 @@ class ReplaceWithRegisterNewApi : VimPluginBase() {
       val lines = text.lines()
       val startOffset = selectionRange.first().start
       val endOffset = selectionRange.last().end
-      val startLine = getLineNumber(startOffset)
-      val diff = startOffset - getLineStartOffset(startLine)
+      val startLine = getLine(startOffset)
+      val diff = startOffset - startLine.start
 
       lines.forEachIndexed { index, lineText ->
-        val offset = getLineStartOffset(startLine + index) + diff
+        val offset = getLineStartOffset(startLine.number + index) + diff
         if (index == 0) {
           replaceText(offset, endOffset, lineText)
         } else {
