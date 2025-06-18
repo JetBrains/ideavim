@@ -15,7 +15,7 @@ import com.intellij.vim.api.scopes.caret.CaretRead
 
 @VimPluginDsl
 interface Read {
-  val fileSize: Long
+  val textLength: Long
   val text: CharSequence
   val lineCount: Int
 

@@ -26,7 +26,7 @@ open class ReadImpl(
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!
 
-  override val fileSize: Long
+  override val textLength: Long
     get() = vimEditor.fileSize()
   override val text: CharSequence
     get() = vimEditor.text()
