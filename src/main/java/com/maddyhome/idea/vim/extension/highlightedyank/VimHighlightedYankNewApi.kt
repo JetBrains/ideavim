@@ -66,7 +66,7 @@ class VimHighlightedYankNewApi : VimPluginBase() {
     clearYankHighlighters()
   }
 
-  private fun VimScope.highlightYankRange(caretRangeMap: Map<CaretId, Range>) {
+  private fun VimScope.highlightYankRange(caretRangeMap: Map<CaretId, Range.Simple>) {
     clearYankHighlighters()
 
     val highlightColor: Color = extractColor(HIGHLIGHT_COLOR_VARIABLE) ?: getDefaultHighlightTextColor()

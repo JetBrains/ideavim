@@ -22,7 +22,23 @@ class TextInfo(
   val type: TextType = TextType.CHARACTER_WISE
 )
 
-data class Range(val start: Int, val end: Int) // todo: Maybe use IntRange instead?
+sealed interface Range {
+  data class Simple(val start: Int, val end: Int): Range
+
+  data class Block(val ranges: Array<Simple>): Range {
+    override fun equals(other: Any?): Boolean {
+      if (this === other) return true
+      if (javaClass != other?.javaClass) return false
+      other as Block
+      return ranges.contentEquals(other.ranges)
+    }
+
+    override fun hashCode(): Int {
+      return ranges.contentHashCode()
+    }
+  }
+}
+
 
 data class Line(val number: Int, val text: String, val start: Int, val end: Int)
 

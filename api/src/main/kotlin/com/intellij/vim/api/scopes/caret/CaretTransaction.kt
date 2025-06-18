@@ -12,7 +12,7 @@ import com.intellij.vim.api.Line
 import com.intellij.vim.api.Range
 
 interface CaretTransaction: CaretRead {
-  fun updateCaret(offset: Int, selection: Range? = null)
+  fun updateCaret(offset: Int, selection: Range.Simple? = null)
 
   fun insertText(
     position: Int,
