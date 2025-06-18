@@ -10,14 +10,12 @@ package com.intellij.vim.api.scopes
 
 import com.intellij.vim.api.Color
 import com.intellij.vim.api.Mode
-import com.intellij.vim.api.TextType
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
 @VimPluginDsl
 abstract class VimScope {
   abstract var mode: Mode
-  abstract fun getSelectionTypeForCurrentMode(): TextType?
 
   abstract fun <T : Any> getVariable(name: String, type: KType): T?
 
