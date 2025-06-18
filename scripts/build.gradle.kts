@@ -22,11 +22,11 @@ repositories {
 dependencies {
   compileOnly("org.jetbrains.kotlin:kotlin-stdlib:2.1.21")
 
-  implementation("io.ktor:ktor-client-core:3.1.3")
-  implementation("io.ktor:ktor-client-cio:3.1.3")
-  implementation("io.ktor:ktor-client-content-negotiation:3.1.3")
-  implementation("io.ktor:ktor-serialization-kotlinx-json:3.1.3")
-  implementation("io.ktor:ktor-client-auth:3.1.3")
+  implementation("io.ktor:ktor-client-core:3.2.0")
+  implementation("io.ktor:ktor-client-cio:3.2.0")
+  implementation("io.ktor:ktor-client-content-negotiation:3.2.0")
+  implementation("io.ktor:ktor-serialization-kotlinx-json:3.2.0")
+  implementation("io.ktor:ktor-client-auth:3.2.0")
   implementation("org.eclipse.jgit:org.eclipse.jgit:6.6.0.202305301015-r")
 
   // This is needed for jgit to connect to ssh
