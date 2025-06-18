@@ -41,7 +41,7 @@ class ReplaceWithRegisterNewApi : VimPluginBase() {
     fun CaretTransaction.getSelection(): Array<Range>? {
       return when (this@operatorFunction.mode) {
         is Mode.NORMAL -> changeMarks?.let { arrayOf(it) }
-        is Mode.VISUAL -> visualSelectionMarks
+        is Mode.VISUAL -> selection
         else -> null
       }
     }
@@ -81,7 +81,7 @@ class ReplaceWithRegisterNewApi : VimPluginBase() {
     editor {
       change {
         forEachCaret {
-          val selectionRange = visualSelectionMarks ?: return@forEachCaret
+          val selectionRange = selection
           val registerData = prepareRegisterData() ?: return@forEachCaret
           replaceTextAndUpdateCaret(selectionRange, registerData)
         }

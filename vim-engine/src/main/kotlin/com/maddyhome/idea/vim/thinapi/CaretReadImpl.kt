@@ -34,7 +34,15 @@ class CaretReadImpl(
 
   override val selection: Array<Range>
     get() {
-      return vimEditor.nativeCarets().map { Range(it.selectionStart, it.selectionEnd) }.toTypedArray()
+      val mode = injector.vimState.mode
+      val isVisualBlockMode = mode is Mode.VISUAL && mode.selectionType == SelectionType.BLOCK_WISE
+
+      return if (isVisualBlockMode) {
+        vimEditor.nativeCarets().map { Range(it.selectionStart, it.selectionEnd) }
+          .toTypedArray()
+      } else {
+        arrayOf(Range(vimCaret.selectionStart, vimCaret.selectionEnd))
+      }
     }
 
   override val line: Int
@@ -56,10 +64,11 @@ class CaretReadImpl(
       val isVisualBlockMode = mode is Mode.VISUAL && mode.selectionType == SelectionType.BLOCK_WISE
 
       return if (isVisualBlockMode) {
-        vimEditor.nativeCarets().map { Range(it.selectionStart, it.selectionEnd) }
+        vimEditor.nativeCarets().mapNotNull { injector.markService.getVisualSelectionMarks(it)?.toRange() }
           .toTypedArray()
       } else {
-        arrayOf(Range(vimCaret.selectionStart, vimCaret.selectionEnd))
+        val visualSelectionMarks = injector.markService.getVisualSelectionMarks(vimCaret) ?: return null
+        arrayOf(visualSelectionMarks.toRange())
       }
     }
 
