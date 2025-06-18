@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.thinapi
 
 import com.intellij.vim.api.Color
 import com.intellij.vim.api.Mode
-import com.intellij.vim.api.TextType
 import com.intellij.vim.api.scopes.EditorScope
 import com.intellij.vim.api.scopes.ListenersScope
 import com.intellij.vim.api.scopes.MappingScope
@@ -24,7 +23,6 @@ import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.state.mode.selectionType
 import com.maddyhome.idea.vim.vimscript.model.VimPluginContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
@@ -47,11 +45,6 @@ open class VimScopeImpl(
 
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!
-
-  override fun getSelectionTypeForCurrentMode(): TextType? {
-    val typeInEditor = injector.vimState.mode.selectionType ?: return null
-    return typeInEditor.toTextSelectionType()
-  }
 
   override fun <T : Any> getVariable(name: String, type: KType): T? {
     val (name, scope) = parseVariableName(name)
