@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.thinapi
 
 import com.intellij.vim.api.CaretId
+import com.intellij.vim.api.Line
 import com.intellij.vim.api.Range
 import com.intellij.vim.api.TextType
 import com.intellij.vim.api.scopes.caret.CaretRead
@@ -45,8 +46,14 @@ class CaretReadImpl(
       }
     }
 
-  override val line: Int
-    get() = vimCaret.getLine()
+  override val line: Line
+    get() {
+      val lineNumber = vimCaret.getLine()
+      val lineText = vimEditor.getLineText(lineNumber)
+      val lineStartOffset = vimEditor.getLineStartOffset(lineNumber)
+      val lineEndOffset = vimEditor.getLineEndOffset(lineNumber)
+      return Line(lineNumber, lineText, lineStartOffset, lineEndOffset)
+    }
 
   override val lastSelectedReg: Char
     get() {

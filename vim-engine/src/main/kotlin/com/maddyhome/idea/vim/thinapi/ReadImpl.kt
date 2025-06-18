@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.thinapi
 
 import com.intellij.vim.api.CaretData
 import com.intellij.vim.api.CaretId
+import com.intellij.vim.api.Line
 import com.intellij.vim.api.scopes.Read
 import com.intellij.vim.api.scopes.caret.CaretRead
 import com.maddyhome.idea.vim.api.VimEditor
@@ -51,8 +52,12 @@ open class ReadImpl(
     return vimEditor.getLineEndOffset(line, allowEnd)
   }
 
-  override fun getLineNumber(offset: Int): Int {
-    return vimEditor.offsetToBufferPosition(offset).line
+  override fun getLine(offset: Int): Line {
+    val lineNumber = vimEditor.offsetToBufferPosition(offset).line
+    val lineText = vimEditor.getLineText(lineNumber)
+    val lineStartOffset = vimEditor.getLineStartOffset(lineNumber)
+    val lineEndOffset = vimEditor.getLineEndOffset(lineNumber)
+    return Line(lineNumber, lineText, lineStartOffset, lineEndOffset)
   }
 
   override val caretData: List<CaretData>
