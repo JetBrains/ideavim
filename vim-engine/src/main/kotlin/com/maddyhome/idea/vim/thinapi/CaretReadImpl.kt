@@ -33,16 +33,17 @@ class CaretReadImpl(
   override val offset: Int
     get() = vimCaret.offset
 
-  override val selection: Array<Range>
+  override val selection: Range
     get() {
       val mode = injector.vimState.mode
       val isVisualBlockMode = mode is Mode.VISUAL && mode.selectionType == SelectionType.BLOCK_WISE
 
       return if (isVisualBlockMode) {
-        vimEditor.nativeCarets().map { Range(it.selectionStart, it.selectionEnd) }
+        val ranges = vimEditor.nativeCarets().map { Range.Simple(it.selectionStart, it.selectionEnd) }
           .toTypedArray()
+        Range.Block(ranges)
       } else {
-        arrayOf(Range(vimCaret.selectionStart, vimCaret.selectionEnd))
+        Range.Simple(vimCaret.selectionStart, vimCaret.selectionEnd)
       }
     }
 
@@ -65,17 +66,18 @@ class CaretReadImpl(
       return lastRegisterChar
     }
 
-  override val visualSelectionMarks: Array<Range>?
+  override val visualSelectionMarks: Range?
     get() {
       val mode = injector.vimState.mode
       val isVisualBlockMode = mode is Mode.VISUAL && mode.selectionType == SelectionType.BLOCK_WISE
 
       return if (isVisualBlockMode) {
-        vimEditor.nativeCarets().mapNotNull { injector.markService.getVisualSelectionMarks(it)?.toRange() }
+        val ranges = vimEditor.nativeCarets().mapNotNull { injector.markService.getVisualSelectionMarks(it)?.toRange() }
           .toTypedArray()
+        Range.Block(ranges)
       } else {
         val visualSelectionMarks = injector.markService.getVisualSelectionMarks(vimCaret) ?: return null
-        arrayOf(visualSelectionMarks.toRange())
+        visualSelectionMarks.toRange()
       }
     }
 

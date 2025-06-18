@@ -184,7 +184,7 @@ class CaretTransactionImpl(
     return true
   }
 
-  override fun updateCaret(offset: Int, selection: Range?) {
+  override fun updateCaret(offset: Int, selection: Range.Simple?) {
     val caret: VimCaret = vimEditor.carets().find { it.id == caretId.id } ?: return
     caret.moveToOffset(offset)
     selection?.let { (start, end) ->

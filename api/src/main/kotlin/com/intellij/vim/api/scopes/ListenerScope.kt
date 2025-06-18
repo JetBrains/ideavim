@@ -14,7 +14,7 @@ import com.intellij.vim.api.Range
 
 interface ListenersScope {
   fun onModeChange(callback: VimScope.(Mode) -> Unit)
-  fun onYank(callback: VimScope.(Map<CaretId, Range>) -> Unit)
+  fun onYank(callback: VimScope.(Map<CaretId, Range.Simple>) -> Unit)
 
   fun onEditorCreate(callback: VimScope.() -> Unit)
   fun onEditorRelease(callback: VimScope.() -> Unit)

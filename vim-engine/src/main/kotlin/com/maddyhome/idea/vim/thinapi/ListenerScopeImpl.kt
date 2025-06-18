@@ -46,12 +46,12 @@ class ListenerScopeImpl(
     injector.listenersNotifier.modeChangeListeners.add(listener)
   }
 
-  override fun onYank(callback: VimScope.(Map<CaretId, Range>) -> Unit) {
+  override fun onYank(callback: VimScope.(Map<CaretId, Range.Simple>) -> Unit) {
     val listener = object : VimYankListener {
       override fun yankPerformed(caretToRange: Map<ImmutableVimCaret, TextRange>) {
-        val caretToRangeMap: Map<CaretId, Range> =
+        val caretToRangeMap: Map<CaretId, Range.Simple> =
           caretToRange.map {
-              (caret, range) -> CaretId(caret.id) to Range(range.startOffset, range.endOffset)
+              (caret, range) -> CaretId(caret.id) to Range.Simple(range.startOffset, range.endOffset)
           }.toMap()
         val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
         vimScope.callback(caretToRangeMap)

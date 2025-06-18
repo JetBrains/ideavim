@@ -17,12 +17,12 @@ interface CaretRead {
   val caretId: CaretId
 
   val offset: Int
-  val selection: Array<Range>
+  val selection: Range
   val line: Line
 
   val lastSelectedReg: Char
 
-  val visualSelectionMarks: Array<Range>?
+  val visualSelectionMarks: Range?
   val changeMarks: Range?
 
   fun getReg(register: Char): String?

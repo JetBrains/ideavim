@@ -64,6 +64,6 @@ fun AwtColor.toHexColor(): Color {
   return Color(hexColor)
 }
 
-fun TextRange.toRange(): Range {
-  return Range(startOffset, endOffset)
+fun TextRange.toRange(): Range.Simple {
+  return Range.Simple(startOffset, endOffset)
 }

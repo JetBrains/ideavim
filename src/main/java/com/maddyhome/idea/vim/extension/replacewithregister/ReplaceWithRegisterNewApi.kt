@@ -38,9 +38,9 @@ class ReplaceWithRegisterNewApi : VimPluginBase() {
   }
 
   private fun VimScope.operatorFunction(): Boolean {
-    fun CaretTransaction.getSelection(): Array<Range>? {
+    fun CaretTransaction.getSelection(): Range? {
       return when (this@operatorFunction.mode) {
-        is Mode.NORMAL -> changeMarks?.let { arrayOf(it) }
+        is Mode.NORMAL -> changeMarks
         is Mode.VISUAL -> selection
         else -> null
       }
@@ -104,31 +104,51 @@ class ReplaceWithRegisterNewApi : VimPluginBase() {
   }
 
   private fun CaretTransaction.replaceTextAndUpdateCaret(
-    selectionRange: Array<Range>,
+    selectionRange: Range,
     registerData: Pair<String, TextType>,
   ) {
-    val text: String = registerData.first
-    val registerType: TextType = registerData.second
+    val (text, registerType) = registerData
+
     if (registerType == TextType.BLOCK_WISE) {
       val lines = text.lines()
-      val startOffset = selectionRange.first().start
-      val endOffset = selectionRange.last().end
-      val startLine = getLine(startOffset)
-      val diff = startOffset - startLine.start
 
-      lines.forEachIndexed { index, lineText ->
-        val offset = getLineStartOffset(startLine.number + index) + diff
-        if (index == 0) {
-          replaceText(offset, endOffset, lineText)
-        } else {
-          insertText(offset, lineText)
+      if (selectionRange is Range.Simple) {
+        val startOffset = selectionRange.start
+        val endOffset = selectionRange.end
+        val startLine = getLine(startOffset)
+        val diff = startOffset - startLine.start
+
+        lines.forEachIndexed { index, lineText ->
+          val offset = getLineStartOffset(startLine.number + index) + diff
+          if (index == 0) {
+            replaceText(offset, endOffset, lineText)
+          } else {
+            insertText(offset, lineText)
+          }
+        }
+
+        updateCaret(offset = startOffset)
+      } else if (selectionRange is Range.Block) {
+        val selections: Array<Range.Simple> = selectionRange.ranges
+
+        selections.zip(lines).forEach { (range, lineText) ->
+          replaceText(range.start, range.end, lineText)
         }
       }
 
-      updateCaret(offset = startOffset)
+
     } else {
-      val range = selectionRange.first()
-      replaceText(range.start, range.end, text)
+      if (selectionRange is Range.Simple) {
+        replaceText(selectionRange.start, selectionRange.end, text)
+      } else if (selectionRange is Range.Block) {
+        val selections: Array<Range.Simple> = selectionRange.ranges
+
+        selections.forEach { range ->
+          replaceText(range.start, range.end, text)
+        }
+
+        updateCaret(offset = selections.first().start)
+      }
     }
   }
 
