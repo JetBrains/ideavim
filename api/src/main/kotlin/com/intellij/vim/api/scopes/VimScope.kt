@@ -17,9 +17,12 @@ import kotlin.reflect.typeOf
 abstract class VimScope {
   abstract var mode: Mode
 
-  abstract fun <T : Any> getVariable(name: String, type: KType): T?
+  protected abstract fun <T : Any> getVariableInternal(name: String, type: KType): T?
 
-  inline fun <reified T : Any> VimScope.getVariable(name: String): T? {
+  @PublishedApi
+  internal fun <T : Any> getVariable(name: String, type: KType): T? = getVariableInternal(name, type)
+
+  inline fun <reified T : Any> getVariable(name: String): T? {
     val kType: KType = typeOf<T>()
     return getVariable(name, kType)
   }
