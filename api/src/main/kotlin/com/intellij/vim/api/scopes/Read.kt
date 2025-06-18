@@ -10,6 +10,7 @@ package com.intellij.vim.api.scopes
 
 import com.intellij.vim.api.CaretData
 import com.intellij.vim.api.CaretId
+import com.intellij.vim.api.Line
 import com.intellij.vim.api.scopes.caret.CaretRead
 
 @VimPluginDsl
@@ -24,7 +25,7 @@ interface Read {
   fun getLineStartOffset(line: Int): Int
   fun getLineEndOffset(line: Int, allowEnd: Boolean): Int
 
-  fun getLineNumber(offset: Int): Int
+  fun getLine(offset: Int): Line
 
   val caretData: List<CaretData>
   val caretIds: List<CaretId>
