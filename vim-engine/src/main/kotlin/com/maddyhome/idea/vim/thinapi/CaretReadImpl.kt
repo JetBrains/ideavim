@@ -66,7 +66,7 @@ class CaretReadImpl(
       return lastRegisterChar
     }
 
-  override val visualSelectionMarks: Range?
+  override val selectionMarks: Range?
     get() {
       val mode = injector.vimState.mode
       val isVisualBlockMode = mode is Mode.VISUAL && mode.selectionType == SelectionType.BLOCK_WISE

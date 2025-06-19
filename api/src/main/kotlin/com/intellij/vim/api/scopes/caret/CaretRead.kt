@@ -22,7 +22,7 @@ interface CaretRead {
 
   val lastSelectedReg: Char
 
-  val visualSelectionMarks: Range?
+  val selectionMarks: Range?
   val changeMarks: Range?
 
   fun getReg(register: Char): String?
