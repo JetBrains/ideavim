@@ -9,7 +9,7 @@
 package com.maddyhome.idea.vim.thinapi
 
 import com.intellij.vim.api.Color
-import com.intellij.vim.api.HighlighterId
+import com.intellij.vim.api.HighlightId
 import com.maddyhome.idea.vim.api.VimEditor
 
 interface VimHighlightingService {
@@ -19,7 +19,7 @@ interface VimHighlightingService {
     endOffset: Int,
     backgroundColor: Color?,
     foregroundColor: Color?,
-  ): HighlighterId
+  ): HighlightId
 
-  fun removeHighlighter(editor: VimEditor, highlighterId: HighlighterId)
+  fun removeHighlighter(editor: VimEditor, highlightId: HighlightId)
 }

@@ -10,7 +10,7 @@ package com.intellij.vim.api.scopes
 
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.Color
-import com.intellij.vim.api.HighlighterId
+import com.intellij.vim.api.HighlightId
 import com.intellij.vim.api.scopes.caret.CaretTransaction
 
 @VimPluginDsl
@@ -22,6 +22,6 @@ interface Transaction {
   fun removeCaret(caretId: CaretId)
 
   // Highlighting
-  fun addHighlighter(startOffset: Int, endOffset: Int, backgroundColor: Color?, foregroundColor: Color?): HighlighterId
-  fun removeHighlighter(highlighterId: HighlighterId)
+  fun addHighlight(startOffset: Int, endOffset: Int, backgroundColor: Color?, foregroundColor: Color?): HighlightId
+  fun removeHighlight(highlightId: HighlightId)
 }
