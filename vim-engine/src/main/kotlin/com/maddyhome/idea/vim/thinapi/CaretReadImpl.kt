@@ -30,6 +30,9 @@ class CaretReadImpl(
   private val vimCaret: VimCaret
     get() = vimEditor.carets().first { it.id == caretId.id }
 
+  private val registerGroup
+    get() = injector.registerGroup
+
   override val offset: Int
     get() = vimCaret.offset
 
@@ -59,12 +62,54 @@ class CaretReadImpl(
   override val lastSelectedReg: Char
     get() {
       val caretCount: Int = vimEditor.carets().size
-      val registerGroup = injector.registerGroup
-
       val lastRegisterChar: Char =
         if (caretCount == 1) registerGroup.currentRegister else registerGroup.getCurrentRegisterForMulticaret()
       return lastRegisterChar
     }
+
+  override val defaultRegister: Char
+    get() = registerGroup.defaultRegister
+
+  override val isRegisterSpecifiedExplicitly: Boolean
+    get() = registerGroup.isRegisterSpecifiedExplicitly
+
+  override fun selectRegister(register: Char): Boolean {
+    return registerGroup.selectRegister(register)
+  }
+
+  override fun resetRegisters() {
+    registerGroup.resetRegisters()
+  }
+
+  override fun isWritable(register: Char): Boolean {
+    return registerGroup.isRegisterWritable(register)
+  }
+
+  override fun isSystemClipboard(register: Char): Boolean {
+    return registerGroup.isSystemClipboard(register)
+  }
+
+  override fun isPrimaryRegisterSupported(): Boolean {
+    return registerGroup.isPrimaryRegisterSupported()
+  }
+
+  override fun startRecording(register: Char) {
+    registerGroup.startRecording(register)
+  }
+
+  override fun getPlaybackRegister(register: Char): String {
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    return registerGroup.getPlaybackRegister(vimEditor, context, register)?.text ?: ""
+  }
+
+  override fun recordText(text: String) {
+    registerGroup.recordText(text)
+  }
+
+  override fun finishRecording() {
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    registerGroup.finishRecording(vimEditor, context)
+  }
 
   override val selectionMarks: Range?
     get() {
@@ -104,5 +149,14 @@ class CaretReadImpl(
 
   override fun getRegType(register: Char): TextType? {
     return getRegisterData(register)?.type
+  }
+
+  override fun setReg(register: Char, text: String, textType: TextType): Boolean {
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    return when (textType) {
+      TextType.CHARACTER_WISE -> registerGroup.storeText(vimEditor, context, register, text, SelectionType.CHARACTER_WISE)
+      TextType.LINE_WISE -> registerGroup.storeText(vimEditor, context, register, text, SelectionType.LINE_WISE)
+      TextType.BLOCK_WISE -> registerGroup.storeText(vimEditor, context, register, text, SelectionType.BLOCK_WISE)
+    }
   }
 }
