@@ -52,7 +52,7 @@ data class CaretInfo(
   val selection: Pair<Int, Int>?,
 )
 
-interface HighlighterId
+interface HighlightId
 
 data class Color(
   val hexCode: String
