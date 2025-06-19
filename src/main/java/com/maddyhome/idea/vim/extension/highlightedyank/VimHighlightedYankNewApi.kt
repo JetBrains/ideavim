@@ -19,7 +19,6 @@ import com.intellij.vim.api.Mode
 import com.intellij.vim.api.Range
 import com.intellij.vim.api.scopes.VimScope
 import com.maddyhome.idea.vim.extension.thin.api.VimPluginBase
-import com.maddyhome.idea.vim.thinapi.toHexColor
 
 /**
  * @author KostkaBrukowa (@kostkabrukowa)
@@ -112,8 +111,9 @@ class VimHighlightedYankNewApi : VimPluginBase() {
 
   private fun getDefaultHighlightTextColor(): Color {
     return defaultHighlightTextColor
-      ?: return EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES.defaultAttributes.backgroundColor.toHexColor()
-        .also { defaultHighlightTextColor = it }
+      ?: return EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES.defaultAttributes.backgroundColor.run {
+        Color.fromRgba(red, green, blue, alpha)
+      }.also { defaultHighlightTextColor = it }
   }
 
   private fun VimScope.extractColor(colorVarName: String): Color? {
@@ -124,6 +124,20 @@ class VimHighlightedYankNewApi : VimPluginBase() {
       // todo: Throw VimException
       null
     }
+  }
+
+  private fun parseRgbaColor(rgbaString: String): Color? {
+    val rgba = rgbaString.removePrefix("rgba(")
+      .filter { it != '(' && it != ')' && !it.isWhitespace() }
+      .split(',')
+      .map { it.toInt() }
+
+    if (rgba.size != 4 || rgba.any { it < 0 || it > 255 }) {
+      throw IllegalArgumentException("Invalid RGBA values. Each component must be between 0 and 255")
+    }
+
+    val (r, g, b, a) = rgba
+    return Color.fromRgba(r, g, b, a)
   }
 
   companion object {

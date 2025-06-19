@@ -109,19 +109,4 @@ open class VimScopeImpl(
     val listenersScope = ListenerScopeImpl(listenerOwner, mappingOwner)
     listenersScope.block()
   }
-
-  override fun parseRgbaColor(rgbaString: String): Color? {
-    // todo: replace with regex
-    val rgba = rgbaString.removePrefix("rgba(")
-      .filter { it != '(' && it != ')' && !it.isWhitespace() }
-      .split(',')
-      .map { it.toInt() }
-
-    if (rgba.size != 4 || rgba.any { it < 0 || it > 255 }) {
-      throw IllegalArgumentException("Invalid RGBA values. Each component must be between 0 and 255")
-    }
-
-    val awtColor = AwtColor(rgba[0], rgba[1], rgba[2], rgba[3])
-    return awtColor.toHexColor()
-  }
 }

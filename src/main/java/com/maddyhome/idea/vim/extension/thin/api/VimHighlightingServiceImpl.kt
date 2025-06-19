@@ -19,13 +19,14 @@ import com.intellij.vim.api.HighlightId
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.thinapi.VimHighlightingService
-import com.maddyhome.idea.vim.thinapi.toAwtColor
 import java.awt.Font
+import java.awt.Color as AwtColor
 
 internal class IjHighlightId(
   internal var ijHighlighter: RangeHighlighter
 ): HighlightId
 
+private fun Color.toAwtColor(): AwtColor = AwtColor(r, g, b, a)
 
 class VimHighlightingServiceImpl : VimHighlightingService {
   override fun addHighlighter(
