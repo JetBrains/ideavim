@@ -9,27 +9,33 @@
 package com.maddyhome.idea.vim.thinapi
 
 
-import com.intellij.vim.api.Color
 import com.intellij.vim.api.Mode
+import com.intellij.vim.api.Option
+import com.intellij.vim.api.OptionType
 import com.intellij.vim.api.scopes.EditorScope
 import com.intellij.vim.api.scopes.ListenersScope
 import com.intellij.vim.api.scopes.MappingScope
 import com.intellij.vim.api.scopes.VimScope
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.invertToggleOption
 import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.OperatorFunction
+import com.maddyhome.idea.vim.options.OptionAccessScope
+import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.vimscript.model.VimPluginContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 import kotlin.reflect.KType
-import java.awt.Color as AwtColor
 
 open class VimScopeImpl(
   private val listenerOwner: ListenerOwner,
@@ -46,19 +52,22 @@ open class VimScopeImpl(
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!
 
+  private val optionGroup: VimOptionGroup
+    get() = injector.optionGroup
+
   override fun <T : Any> getVariableInternal(name: String, type: KType): T? {
-      val (name, scope) = parseVariableName(name)
-      val variableService: VariableService = injector.variableService
-      val variable = Variable(scope, name)
-      val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
-      val variableValue: VimDataType? =
-        variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext)
-      if (variableValue == null) {
-        return variableValue
+    val (name, scope) = parseVariableName(name)
+    val variableService: VariableService = injector.variableService
+    val variable = Variable(scope, name)
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val variableValue: VimDataType? =
+      variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext)
+    if (variableValue == null) {
+      return variableValue
 //      throw IllegalArgumentException("Variable with name $name does not exist")
-      }
-      val value: T = parseVariableValue(variableValue, type)
-      return value
+    }
+    val value: T = parseVariableValue(variableValue, type)
+    return value
   }
 
   private fun <T : Any> parseVariableValue(vimDataType: VimDataType, type: KType): T {
@@ -108,5 +117,102 @@ open class VimScopeImpl(
   override fun listeners(block: ListenersScope.() -> Unit) {
     val listenersScope = ListenerScopeImpl(listenerOwner, mappingOwner)
     listenersScope.block()
+  }
+
+  override fun <T : OptionType> getOptionInternal(name: String, type: KType): Option<T>? {
+    val option = optionGroup.getOption(name) ?: return null
+    return option.toApiOption()
+  }
+
+  override fun <T : OptionType> getOptionValueInternal(name: String, type: KType): T? {
+    val option = optionGroup.getOption(name) ?: return null
+
+    val optionValue = optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(vimEditor))
+    return parseOptionValue(optionValue, type)
+  }
+
+  override fun <T : OptionType> setOptionInternal(name: String, value: T, type: KType, scope: String): Boolean {
+    val option = optionGroup.getOption(name) ?: return false
+
+    val optionValue = when(type.classifier) {
+      OptionType.IntType::class -> {
+        val intValue = value as OptionType.IntType
+        VimInt(intValue.value)
+      }
+      OptionType.StringType::class -> {
+        val stringValue = value as OptionType.StringType
+        VimString(stringValue.value)
+      }
+      OptionType.BooleanType::class -> {
+        val booleanValue = value as OptionType.BooleanType
+        if (booleanValue.value) VimInt.ONE else VimInt.ZERO
+      }
+      else -> return false
+    }
+    val optionAccessScope = when (scope) {
+      "global" -> OptionAccessScope.GLOBAL(vimEditor)
+      "local" -> OptionAccessScope.LOCAL(vimEditor)
+      "effective" -> OptionAccessScope.EFFECTIVE(vimEditor)
+      else -> OptionAccessScope.EFFECTIVE(vimEditor)
+    }
+    optionGroup.setOptionValue(option, optionAccessScope, optionValue)
+    return true
+  }
+
+  override fun <T : OptionType> getAllOptions(): Set<Option<T>> {
+    val options = optionGroup.getAllOptions()
+    return options.mapNotNull { it.toApiOption<T>() }.toSet()
+  }
+
+  override fun <T : OptionType> overrideDefaultValue(
+    option: Option<T>,
+    newDefaultValue: T,
+  ): Boolean {
+    val engineOption = optionGroup.getOption(option.name) ?: return false
+
+    val vimDataType = when (newDefaultValue) {
+      is OptionType.IntType -> VimInt(newDefaultValue.value)
+      is OptionType.StringType -> VimString(newDefaultValue.value)
+      is OptionType.BooleanType -> if (newDefaultValue.value) VimInt.ONE else VimInt.ZERO
+      else -> return false
+    }
+
+    optionGroup.overrideDefaultValue(engineOption, vimDataType)
+    return true
+  }
+
+  override fun resetOptionToDefault(name: String): Boolean {
+    val option = optionGroup.getOption(name) ?: return false
+
+    optionGroup.resetToDefaultValue(option, OptionAccessScope.EFFECTIVE(vimEditor))
+    return true
+  }
+
+  override fun toggleValue(name: String) {
+    val option = optionGroup.getOption(name) ?: throw IllegalArgumentException("Option with name $name does not exist")
+
+    if (option !is ToggleOption) {
+      throw IllegalArgumentException("Option with name $name is not a boolean option")
+    }
+
+    optionGroup.invertToggleOption(option, OptionAccessScope.EFFECTIVE(vimEditor))
+  }
+
+  private fun <T : Any> parseOptionValue(vimDataType: VimDataType, type: KType): T? {
+    return try {
+      when (type.classifier) {
+        Boolean::class -> vimDataType.asBoolean() as T
+        Int::class -> vimDataType.toVimNumber().value as T
+        String::class -> vimDataType.asString() as T
+        List::class -> {
+          if (vimDataType !is VimString) return null
+          vimDataType.asString().split(",") as T
+        }
+
+        else -> null
+      }
+    } catch (e: Exception) {
+      null
+    }
   }
 }

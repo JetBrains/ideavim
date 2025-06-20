@@ -26,4 +26,12 @@ interface ListenersScope {
 
   fun onIdeaVimEnabled(callback: VimScope.() -> Unit)
   fun onIdeaVimDisabled(callback: VimScope.() -> Unit)
+
+  /**
+   * Register a callback to be invoked when a global option changes.
+   *
+   * @param optionName The name of the option to listen for changes
+   * @param callback The callback to invoke when the option changes
+   */
+  fun onGlobalOptionChange(optionName: String, callback: VimScope.() -> Unit)
 }
