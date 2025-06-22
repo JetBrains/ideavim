@@ -9,6 +9,8 @@
 package com.maddyhome.idea.vim.ui.ex;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.textarea.TextComponentEditor;
 import com.intellij.ui.paint.PaintUtil;
 import com.intellij.util.ui.JBUI;
 import com.maddyhome.idea.vim.KeyHandler;
@@ -33,13 +35,20 @@ import java.awt.event.KeyEvent;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.util.Date;
+import java.util.Objects;
 
 import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 
 /**
- * Provides a custom keymap for the text field. The keymap is the VIM Ex command keymapping
+ * A custom text field for the Ex command line.
+ * <p>
+ * Note that because this is an instance of {@link JTextComponent}, anything that looks for an IntelliJ {@link Editor}
+ * in current data context will get an instance of {@link TextComponentEditor}, which means that normal IntelliJ
+ * shortcuts and actions will work with the Ex command line, even if they're not supposed to. E.g., CMD+V will paste on
+ * Mac, but CTRL+V on Windows won't, because the Ex command line handles that shortcut. I don't see a way to fix this.
+ * </p>
  */
 public class ExTextField extends JTextField {
   private final ExEntryPanel myParentPanel;
@@ -53,6 +62,9 @@ public class ExTextField extends JTextField {
     caret.setBlinkRate(getCaret().getBlinkRate());
     setCaret(caret);
     setNormalModeCaret();
+
+    final Style defaultStyle = ((StyledDocument)getDocument()).getStyle(StyleContext.DEFAULT_STYLE);
+    StyleConstants.setForeground(defaultStyle, getForeground());
 
     addCaretListener(e -> resetCaret());
   }
@@ -112,7 +124,32 @@ public class ExTextField extends JTextField {
 
   // VIM-570
   private void setFontToJField(String stringToDisplay) {
-    super.setFont(UiHelper.selectEditorFont(ExEntryPanel.getInstance().getIjEditor(), stringToDisplay));
+    setFont(UiHelper.selectEditorFont(ExEntryPanel.getInstance().getIjEditor(), stringToDisplay));
+  }
+
+  @Override
+  public void setFont(Font f) {
+    super.setFont(f);
+    final Document document = getDocument();
+    if (document instanceof StyledDocument styledDocument) {
+      final Style defaultStyle = styledDocument.getStyle(StyleContext.DEFAULT_STYLE);
+      if (!Objects.equals(StyleConstants.getFontFamily(defaultStyle), getFont().getFamily())) {
+        StyleConstants.setFontFamily(defaultStyle, getFont().getFamily());
+      }
+      if (!Objects.equals(StyleConstants.getFontSize(defaultStyle), getFont().getSize())) {
+        StyleConstants.setFontSize(defaultStyle, getFont().getSize());
+      }
+    }
+  }
+
+  @Override
+  public void setForeground(Color fg) {
+    super.setForeground(fg);
+    final Document document = getDocument();
+    if (document instanceof StyledDocument styledDocument) {
+      final Style defaultStyle = styledDocument.getStyle(StyleContext.DEFAULT_STYLE);
+      StyleConstants.setForeground(defaultStyle, fg);
+    }
   }
 
   /**
