@@ -37,14 +37,15 @@ class DeleteNextCharAction : VimActionHandler.SingleExecution() {
       return true
     }
 
-    val newText = if (caretOffset == oldText.length) {
+    // If the caret is at the end of the text, delete previous character
+    if (caretOffset == oldText.length) {
       val preEndOffset = Graphemes.prev(oldText, oldText.length) ?: return true
-      oldText.substring(0, preEndOffset)
-    } else {
-      val nextOffset = Graphemes.next(oldText, caretOffset) ?: return true
-      oldText.substring(0, caretOffset) + oldText.substring(nextOffset)
+      commandLine.deleteText(preEndOffset, oldText.length - preEndOffset)
     }
-    commandLine.setText(newText)
+    else {
+      val nextOffset = Graphemes.next(oldText, caretOffset) ?: return true
+      commandLine.deleteText(caretOffset, nextOffset - caretOffset)
+    }
 
     return true
   }

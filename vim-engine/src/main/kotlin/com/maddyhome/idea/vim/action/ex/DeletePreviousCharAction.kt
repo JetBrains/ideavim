@@ -40,9 +40,7 @@ class DeletePreviousCharAction : VimActionHandler.SingleExecution() {
     if (caretOffset == 0) return true
 
     val prevOffset = Graphemes.prev(oldText, caretOffset) ?: 0
-    commandLine.caret.offset = prevOffset
-    val newText = oldText.substring(0, prevOffset) + oldText.substring(caretOffset)
-    commandLine.setText(newText)
+    commandLine.deleteText(prevOffset, caretOffset - prevOffset)
 
     return true
   }

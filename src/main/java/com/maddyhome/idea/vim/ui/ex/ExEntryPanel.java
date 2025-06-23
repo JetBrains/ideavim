@@ -570,6 +570,20 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
   }
 
   @Override
+  public void deleteText(int offset, int length) {
+    entry.deleteText(offset, length);
+  }
+
+  @Override
+  public void insertText(int offset, @NotNull String string) {
+    // Remember that replace mode is different to overwrite! The document handles overwrite, but we must handle replace
+    if (isReplaceMode) {
+      entry.deleteText(offset, string.length());
+    }
+    entry.insertText(offset, string);
+  }
+
+  @Override
   public void clearCurrentAction() {
     entry.clearCurrentAction();
   }
@@ -597,11 +611,6 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
 
   public @Nullable VimInputInterceptor<?> getInputInterceptor() {
     return myInputInterceptor;
-  }
-
-  @Override
-  public void insertText(int offset, @NotNull String string) {
-    VimCommandLine.super.insertText(offset, string);
   }
 
   public void setInputInterceptor(@Nullable VimInputInterceptor<?> vimInputInterceptor) {
