@@ -101,14 +101,24 @@ public class ExTextField extends JTextField {
   }
 
   /**
-   * Stores the current text for use in filtering history. Required for scrolling through multiple history entries
+   * Stores the current text as the last edited entry in the command line's history
    * <p>
-   * Called whenever the text is changed, either by typing, or by special characters altering the text (e.g. Delete)
+   * This method is called whenever the text is changed by the user, either by typing, cut/paste or delete. It remembers
+   * the current text as the last entry in the command line's history, so that we can scroll into the past, and then
+   * return to the uncommitted text we were previously editing.
+   * </p>
    */
   void saveLastEntry() {
     ExEntryPanel.getInstance().setLastEntry(super.getText());
   }
 
+  /**
+   * Update the text in the text field without saving it as the current/last entry in the command line's history
+   * <p>
+   * This is used to update the text to another entry in the command line's history, without losing the current/last
+   * entry.
+   * </p>
+   */
   void updateText(String string) {
     super.setText(string);
     setFontToJField(string);
@@ -120,6 +130,29 @@ public class ExTextField extends JTextField {
 
     saveLastEntry();
     setFontToJField(string);
+  }
+
+  public void insertText(int offset, String text) {
+    try {
+      // Note that ExDocument.insertString handles overwrite, but not replace mode!
+      getDocument().insertString(offset, text, null);
+    }
+    catch (BadLocationException e) {
+      logger.error(e);
+    }
+    saveLastEntry();
+    setFontToJField(getText());
+  }
+
+  public void deleteText(int offset, int length) {
+    try {
+      getDocument().remove(offset, Math.min(length, getDocument().getLength() - offset));
+    }
+    catch (BadLocationException e) {
+      logger.error(e);
+    }
+    saveLastEntry();
+    setFontToJField(getText());
   }
 
   // VIM-570

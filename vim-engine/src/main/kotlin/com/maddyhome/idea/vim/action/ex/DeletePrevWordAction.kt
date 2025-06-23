@@ -36,14 +36,8 @@ class DeletePrevWordAction : VimActionHandler.SingleExecution() {
     val oldText = commandLine.actualText
     val motion =
       injector.motion.findOffsetOfNextWord(oldText, commandLine.caret.offset, -1, true, editor)
-    when (motion) {
-      is Motion.AbsoluteOffset -> {
-        val newText = oldText.substring(0, motion.offset) + oldText.substring(caretOffset)
-        commandLine.caret.offset = motion.offset
-        commandLine.setText(newText)
-      }
-
-      else -> {}
+    if (motion is Motion.AbsoluteOffset) {
+      commandLine.deleteText(motion.offset, caretOffset - motion.offset)
     }
 
     return true

@@ -188,8 +188,8 @@ public class ExDocument extends DefaultStyledDocument {
         }
 
         // Note that fb.replace will remove the existing text and then add the new text. If we're replacing the whole
-        // text (e.g., ExTextField.setText) then this can reset scroll position
-        // TODO: Allow deleting text directly rather than editing text and setting the value to the field
+        // text (e.g., ExTextField.setText) then this can reset the scroll position. Note that ExTextField has methods
+        // to set, insert and delete text to avoid this situation.
         final AttributeSet a = isPrintable ? attrs : getNonPrintableAttributes(attrs);
         final String s = text.substring(start, pos);
         if (start == 0) {

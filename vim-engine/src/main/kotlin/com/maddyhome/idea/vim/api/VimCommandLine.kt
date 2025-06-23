@@ -69,16 +69,27 @@ interface VimCommandLine {
   val visibleText: String
   var promptCharacterOffset: Int?
 
+  /**
+   * Replaces the current text with the new string
+   *
+   * Note that this will reset the scroll position of the text field. If the text is being edited, it is better to use
+   * [insertText] or [deleteText].
+   */
   fun setText(string: String, updateLastEntry: Boolean = true)
-  fun insertText(offset: Int, string: String) {
-    val newText = if (isReplaceMode) {
-      val endOffset = min(offset + string.length, actualText.length)
-      StringBuilder(actualText).replace(offset, endOffset, string)
-    } else {
-      StringBuilder(actualText).insert(offset, string)
-    }.toString()
-    setText(newText)
-  }
+
+  /**
+   * Insert the new string into the text at the given offset, maintaining the text field's current scroll position
+   *
+   * This will always save the updated text as the last entry in the command line's history.
+   */
+  fun insertText(offset: Int, string: String)
+
+  /**
+   * Delete the text at the given offset, maintaining the text field's current scroll position
+   *
+   * This will always save the updated text as the last entry in the command line's history.
+   */
+  fun deleteText(offset: Int, length: Int)
 
   /**
    * Called by the [KeyHandler] to finish handling the keystroke
