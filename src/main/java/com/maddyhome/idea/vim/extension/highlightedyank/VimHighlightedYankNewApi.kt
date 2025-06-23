@@ -112,7 +112,7 @@ class VimHighlightedYankNewApi : VimPluginBase() {
   private fun getDefaultHighlightTextColor(): Color {
     return defaultHighlightTextColor
       ?: return EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES.defaultAttributes.backgroundColor.run {
-        Color.fromRgba(red, green, blue, alpha)
+        Color(red, green, blue, alpha)
       }.also { defaultHighlightTextColor = it }
   }
 
@@ -137,7 +137,7 @@ class VimHighlightedYankNewApi : VimPluginBase() {
     }
 
     val (r, g, b, a) = rgba
-    return Color.fromRgba(r, g, b, a)
+    return Color(r, g, b, a)
   }
 
   companion object {
