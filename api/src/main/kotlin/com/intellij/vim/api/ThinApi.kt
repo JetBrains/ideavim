@@ -57,28 +57,19 @@ interface HighlightId
 data class Color(
   val hexCode: String
 ) {
-  val r: Int
-    get() = hexCode.substring(1..2).toInt(16)
+  constructor(r: Int, g: Int, b: Int, a: Int = 255): this(String.format("#%02x%02x%02x%02x", r, g, b, a))
 
-  val g: Int
-    get() = hexCode.substring(3..4).toInt(16)
+  val r: Int = hexCode.substring(1..2).toInt(16)
 
-  val b: Int
-    get() = hexCode.substring(5..6).toInt(16)
+  val g: Int = hexCode.substring(3..4).toInt(16)
 
-  val a: Int
-    get() = if (hexCode.length == 9) hexCode.substring(7..8).toInt(16) else 255
+  val b: Int = hexCode.substring(5..6).toInt(16)
+
+  val a: Int = if (hexCode.length == 9) hexCode.substring(7..8).toInt(16) else 255
 
   init {
     require(hexCode.matches(Regex("^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$"))) {
       "Hex code should be in format #RRGGBB[AA]"
-    }
-  }
-
-  companion object {
-    fun fromRgba(r: Int, g: Int, b: Int, a: Int = 255): Color {
-      val hexCode = String.format("#%02x%02x%02x%02x", r, g, b, a)
-      return Color(hexCode)
     }
   }
 }
