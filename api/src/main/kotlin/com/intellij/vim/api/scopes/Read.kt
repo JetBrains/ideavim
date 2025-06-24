@@ -10,6 +10,7 @@ package com.intellij.vim.api.scopes
 
 import com.intellij.vim.api.CaretData
 import com.intellij.vim.api.CaretId
+import com.intellij.vim.api.Jump
 import com.intellij.vim.api.Line
 import com.intellij.vim.api.Mark
 import com.intellij.vim.api.scopes.caret.CaretRead
@@ -43,4 +44,26 @@ interface Read {
    * All global marks.
    */
   val globalMarks: Set<Mark>
+
+  /**
+   * Gets a jump from the jump list.
+   *
+   * @param count The number of jumps to go back (negative) or forward (positive) from the current position in the jump list.
+   * @return The jump, or null if there is no jump at the specified position
+   */
+  fun getJump(count: Int = 0): Jump?
+
+  /**
+   * Gets all jumps in the jump list.
+   *
+   * @return A list of all jumps
+   */
+  val jumps: List<Jump>
+
+  /**
+   * Index of the current position in the jump list.
+   *
+   * This is used to determine which jump will be used when navigating with Ctrl-O and Ctrl-I.
+   */
+  val currentJumpIndex: Int
 }

@@ -36,4 +36,17 @@ interface CaretTransaction: CaretRead {
   fun getLineStartOffset(line: Int): Int
   fun getLineEndOffset(line: Int, allowEnd: Boolean): Int
   fun getLine(offset: Int): Line
+
+  /**
+   * Adds a jump with the current caret's position to the jump list.
+   *
+   * @param reset Whether to reset the current position in the jump list
+   */
+  fun addJump(reset: Boolean)
+
+  /**
+   * Saves the location of the current caret to the jump list and sets the ' mark.
+   */
+  // todo: maybe not necessary
+  fun saveJumpLocation()
 }

@@ -11,6 +11,7 @@ package com.intellij.vim.api.scopes
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.Color
 import com.intellij.vim.api.HighlightId
+import com.intellij.vim.api.Jump
 import com.intellij.vim.api.scopes.caret.CaretTransaction
 
 @VimPluginDsl
@@ -70,4 +71,29 @@ interface Transaction {
    * This removes all marks, both global and local.
    */
   fun resetAllMarks()
+
+  /**
+   * Adds a specific jump to the jump list.
+   *
+   * @param jump The jump to add
+   * @param reset Whether to reset the current position in the jump list
+   */
+  fun addJump(jump: Jump, reset: Boolean)
+
+  /**
+   * Removes a jump from the jump list.
+   *
+   * @param jump The jump to remove
+   */
+  fun removeJump(jump: Jump)
+
+  /**
+   * Removes the last jump from the jump list.
+   */
+  fun dropLastJump()
+
+  /**
+   * Clears all jumps from the jump list.
+   */
+  fun clearJumps()
 }

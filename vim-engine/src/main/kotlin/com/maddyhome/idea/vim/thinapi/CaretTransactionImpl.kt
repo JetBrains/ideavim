@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.put.PutData
 import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.mark.Jump as EngineJump
 
 class CaretTransactionImpl(
   private val listenerOwner: ListenerOwner,
@@ -207,5 +208,20 @@ class CaretTransactionImpl(
     val lineStartOffset = vimEditor.getLineStartOffset(lineNumber)
     val lineEndOffset = vimEditor.getLineEndOffset(lineNumber)
     return Line(lineNumber, lineText, lineStartOffset, lineEndOffset)
+  }
+
+  override fun addJump(reset: Boolean) {
+    val virtualFile = vimEditor.getVirtualFile() ?: return
+    val path = virtualFile.path
+    val protocol = virtualFile.protocol
+    val position = vimEditor.offsetToBufferPosition(vimCaret.offset)
+    val jump = EngineJump(position.line, position.column, path, protocol)
+    injector.jumpService.addJump(vimEditor.projectId, jump, reset)
+  }
+
+  override fun saveJumpLocation() {
+    addJump(true)
+    injector.markService.setMark(vimEditor, '\'')
+    injector.jumpService.includeCurrentCommandAsNavigation(vimEditor)
   }
 }
