@@ -16,6 +16,7 @@ import com.intellij.util.ui.JBUI;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.api.VimCommandLine;
 import com.maddyhome.idea.vim.api.VimCommandLineCaret;
+import com.maddyhome.idea.vim.helper.EngineStringHelper;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext;
 import com.maddyhome.idea.vim.options.helpers.GuiCursorAttributes;
@@ -407,7 +408,7 @@ public class ExTextField extends JTextField {
         final FontMetrics fm = component.getFontMetrics(component.getFont());
         if (!hasFocus) {
           final float outlineThickness = (float)PaintUtil.alignToInt(1.0, g2d);
-          final double caretWidth = getCaretWidth(fm, r.getX(), 100);
+          final double caretWidth = getCaretWidth(fm, r.getX(), 100, false);
           final Area area = new Area(new Rectangle2D.Double(r.getX(), r.getY(), caretWidth, r.getHeight()));
           area.subtract(new Area(new Rectangle2D.Double(r.getX() + outlineThickness, r.getY() + outlineThickness,
                                                         caretWidth - (2 * outlineThickness),
@@ -416,7 +417,7 @@ public class ExTextField extends JTextField {
         }
         else {
           final double caretHeight = getCaretHeight(r.getHeight());
-          final double caretWidth = getCaretWidth(fm, r.getX(), thickness);
+          final double caretWidth = getCaretWidth(fm, r.getX(), thickness, true);
           Double rect = new Double(r.getX(), r.getY() + r.getHeight() - caretHeight, caretWidth, caretHeight);
           g2d.fill(rect);
         }
@@ -446,7 +447,7 @@ public class ExTextField extends JTextField {
         final FontMetrics fm = getComponent().getFontMetrics(getComponent().getFont());
         x = r.x;
         y = r.y;
-        width = (int)ceil(getCaretWidth(fm, r.x, 100)) + 1;
+        width = (int)ceil(getCaretWidth(fm, r.x, 100, false)) + 1;
         height = r.height;
         repaint();
       }
@@ -465,20 +466,26 @@ public class ExTextField extends JTextField {
       }
     }
 
-    private double getCaretWidth(FontMetrics fm, double dotX, int widthPercentage) {
+    private double getCaretWidth(FontMetrics fm, double dotX, int widthPercentage, boolean coerceCharacterWidth) {
       // Caret width is based on the distance to the next character. This isn't necessarily the same as the character
       // width. E.g. when using float coordinates, the width of a grid is 8.4, while the character width is only 8. This
-      // would give us a caret that is not wide enough
+      // would give us a caret that is not wide enough.
+      // We can also try to coerce to the width of the character, rather than using the View's width. This is so that
+      // non-printable characters have the same sized caret as printable characters. The only time we use full width
+      // with non-printable characters is when drawing the lost-focus caret (a box enclosing the character).
       double width;
       final Rectangle2D r = modelToView(getDot() + 1);
-      if (r != null) {
+      if (r != null && !coerceCharacterWidth) {
         width = r.getX() - dotX;
       }
       else {
         char c = ' ';
         try {
           if (getDot() < getComponent().getDocument().getLength()) {
-            c = getComponent().getText(getDot(), 1).charAt(0);
+            char documentChar = getComponent().getText(getDot(), 1).charAt(0);
+            if (EngineStringHelper.INSTANCE.isPrintableCharacter(documentChar)) {
+              c = documentChar;
+            }
           }
         }
         catch (BadLocationException e) {
