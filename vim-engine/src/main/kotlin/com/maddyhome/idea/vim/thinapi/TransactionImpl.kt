@@ -11,12 +11,15 @@ package com.maddyhome.idea.vim.thinapi
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.Color
 import com.intellij.vim.api.HighlightId
+import com.intellij.vim.api.Jump
 import com.intellij.vim.api.scopes.Transaction
 import com.intellij.vim.api.scopes.caret.CaretTransaction
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.key.MappingOwner
+import kotlin.io.path.pathString
+import com.maddyhome.idea.vim.mark.Jump as EngineJump
 
 class TransactionImpl(
   private val listenerOwner: ListenerOwner,
@@ -89,5 +92,23 @@ class TransactionImpl(
 
   override fun resetAllMarks() {
     injector.markService.resetAllMarks()
+  }
+
+  override fun addJump(jump: Jump, reset: Boolean) {
+    val engineJump = EngineJump(jump.line, jump.col, jump.filepath.javaPath.pathString, jump.filepath.protocol)
+    injector.jumpService.addJump(vimEditor.projectId, engineJump, reset)
+  }
+
+  override fun removeJump(jump: Jump) {
+    val engineJump = EngineJump(jump.line, jump.col, jump.filepath.javaPath.pathString, jump.filepath.protocol)
+    injector.jumpService.removeJump(vimEditor.projectId, engineJump)
+  }
+
+  override fun dropLastJump() {
+    injector.jumpService.dropLastJump(vimEditor.projectId)
+  }
+
+  override fun clearJumps() {
+    injector.jumpService.clearJumps(vimEditor.projectId)
   }
 }

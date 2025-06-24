@@ -16,8 +16,10 @@ import com.intellij.vim.api.Range
 import com.intellij.vim.api.TextType
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.mark.Mark as EngineMark
 import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.intellij.vim.api.Jump as ApiJump
+import com.maddyhome.idea.vim.mark.Jump as EngineJump
+import com.maddyhome.idea.vim.mark.Mark as EngineMark
 
 fun SelectionType.toTextSelectionType(): TextType {
   return when (this) {
@@ -61,5 +63,14 @@ fun EngineMark.toApiMark(): Mark {
         override val path: Array<String>
           get() = filePath.path
       }
+  }
+}
+
+fun EngineJump.toApiJump(): ApiJump {
+  return object : ApiJump {
+    override val line: Int = this@toApiJump.line
+    override val col: Int = this@toApiJump.col
+    override val filepath: Path
+      get() = TODO("Not yet implemented")
   }
 }

@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.thinapi
 
 import com.intellij.vim.api.CaretData
 import com.intellij.vim.api.CaretId
+import com.intellij.vim.api.Jump
 import com.intellij.vim.api.Line
 import com.intellij.vim.api.Mark
 import com.intellij.vim.api.scopes.Read
@@ -73,4 +74,15 @@ open class ReadImpl(
 
   override val globalMarks: Set<Mark>
     get() = injector.markService.getAllGlobalMarks().map { it.toApiMark() }.toSet()
+
+  override fun getJump(count: Int): Jump? {
+    val jump = injector.jumpService.getJump(vimEditor.projectId, count)
+    return jump?.toApiJump()
+  }
+
+  override val jumps: List<Jump>
+    get() = injector.jumpService.getJumps(vimEditor.projectId).map { it.toApiJump() }
+
+  override val currentJumpIndex: Int
+    get() = injector.jumpService.getJumpSpot(vimEditor.projectId)
 }
