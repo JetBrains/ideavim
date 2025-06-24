@@ -91,10 +91,10 @@ interface CaretRead {
 
   /**
    * Checks if a register is connected to the system clipboard.
-   * 
+   *
    * In Vim, registers '+' and '*' are connected to the system clipboard.
    * Example: Using `"+y` yanks text to the system clipboard.
-   * 
+   *
    * @param register The register to check
    * @return True if the register is connected to the system clipboard, false otherwise
    */
@@ -108,33 +108,6 @@ interface CaretRead {
    * @return True if the primary selection register is supported, false otherwise
    */
   fun isPrimaryRegisterSupported(): Boolean
-
-  /**
-   * Starts recording keystrokes into the specified register.
-   *
-   * @param register The register to record into
-   */
-  fun startRecording(register: Char)
-
-  /**
-   * Gets the recorded keystrokes from a register for playback.
-   *
-   * @param register The register to get playback from
-   * @return The recorded keystrokes as a string
-   */
-  fun getPlaybackRegister(register: Char): String
-
-  /**
-   * Records text during a macro recording.
-   *
-   * @param text The text to record
-   */
-  fun recordText(text: String)
-
-  /**
-   * Finishes the current recording of a macro.
-   */
-  fun finishRecording() 
 
   /**
    * The marks for the current visual selection.

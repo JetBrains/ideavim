@@ -95,24 +95,6 @@ class CaretReadImpl(
     return registerGroup.isPrimaryRegisterSupported()
   }
 
-  override fun startRecording(register: Char) {
-    registerGroup.startRecording(register)
-  }
-
-  override fun getPlaybackRegister(register: Char): String {
-    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
-    return registerGroup.getPlaybackRegister(vimEditor, context, register)?.text ?: ""
-  }
-
-  override fun recordText(text: String) {
-    registerGroup.recordText(text)
-  }
-
-  override fun finishRecording() {
-    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
-    registerGroup.finishRecording(vimEditor, context)
-  }
-
   override val selectionMarks: Range?
     get() {
       val mode = injector.vimState.mode
