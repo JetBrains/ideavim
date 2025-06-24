@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.thinapi
 
 import com.intellij.vim.api.CaretId
+import com.intellij.vim.api.Line
 import com.intellij.vim.api.Range
 import com.intellij.vim.api.scopes.Read
 import com.intellij.vim.api.scopes.caret.CaretRead
@@ -190,5 +191,21 @@ class CaretTransactionImpl(
     selection?.let { (start, end) ->
       caret.setSelection(start, end)
     } ?: caret.removeSelection()
+  }
+
+  override fun getLineStartOffset(line: Int): Int {
+    return vimEditor.getLineStartOffset(line)
+  }
+
+  override fun getLineEndOffset(line: Int, allowEnd: Boolean): Int {
+    return vimEditor.getLineEndOffset(line)
+  }
+
+  override fun getLine(offset: Int): Line {
+    val lineNumber = vimEditor.offsetToBufferPosition(offset).line
+    val lineText = vimEditor.getLineText(lineNumber)
+    val lineStartOffset = vimEditor.getLineStartOffset(lineNumber)
+    val lineEndOffset = vimEditor.getLineEndOffset(lineNumber)
+    return Line(lineNumber, lineText, lineStartOffset, lineEndOffset)
   }
 }

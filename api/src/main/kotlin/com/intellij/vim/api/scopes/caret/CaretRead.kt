@@ -10,6 +10,8 @@ package com.intellij.vim.api.scopes.caret
 
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.Line
+import com.intellij.vim.api.Mark
+import com.intellij.vim.api.Path
 import com.intellij.vim.api.Range
 import com.intellij.vim.api.TextType
 
@@ -184,4 +186,48 @@ interface CaretRead {
    * @return True if the register was successfully set, false otherwise
    */
   fun setReg(register: Char, text: String, textType: TextType = TextType.CHARACTER_WISE): Boolean
+
+  /**
+   * Gets a mark by its character key for the current caret.
+   *
+   * @param char The character key of the mark (a-z, 0-9, etc.)
+   * @return The mark, or null if the mark doesn't exist
+   */
+  fun getMark(char: Char): Mark?
+
+  /**
+   * Gets all local marks for the current caret.
+   * 
+   * @return A set of all local marks for the current caret
+   */
+  fun getAllLocalMarks(): Set<Mark>
+
+  /**
+   * Sets a mark at the current caret position.
+   *
+   * @param char The character key of the mark (a-z, etc.)
+   * @return True if the mark was successfully set, false otherwise
+   */
+  fun setMark(char: Char): Boolean
+
+  /**
+   * Sets a mark at the specified offset.
+   *
+   * @param char The character key of the mark (a-z, etc.)
+   * @param offset The offset to set the mark to
+   * @return True if the mark was successfully set, false otherwise
+   */
+  fun setMark(char: Char, offset: Int): Boolean
+
+  /**
+   * Removes a local mark for the current caret.
+   *
+   * @param char The character key of the mark to remove (a-z, etc.)
+   */
+  fun removeLocalMark(char: Char)
+
+  /**
+   * Resets all marks for the current caret.
+   */
+  fun resetAllMarksForCaret()
 }

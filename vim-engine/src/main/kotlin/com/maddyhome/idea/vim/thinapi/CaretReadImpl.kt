@@ -10,6 +10,8 @@ package com.maddyhome.idea.vim.thinapi
 
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.Line
+import com.intellij.vim.api.Mark
+import com.intellij.vim.api.Path
 import com.intellij.vim.api.Range
 import com.intellij.vim.api.TextType
 import com.intellij.vim.api.scopes.caret.CaretRead
@@ -154,9 +156,41 @@ class CaretReadImpl(
   override fun setReg(register: Char, text: String, textType: TextType): Boolean {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     return when (textType) {
-      TextType.CHARACTER_WISE -> registerGroup.storeText(vimEditor, context, register, text, SelectionType.CHARACTER_WISE)
+      TextType.CHARACTER_WISE -> registerGroup.storeText(
+        vimEditor,
+        context,
+        register,
+        text,
+        SelectionType.CHARACTER_WISE
+      )
+
       TextType.LINE_WISE -> registerGroup.storeText(vimEditor, context, register, text, SelectionType.LINE_WISE)
       TextType.BLOCK_WISE -> registerGroup.storeText(vimEditor, context, register, text, SelectionType.BLOCK_WISE)
     }
+  }
+
+  override fun getMark(char: Char): Mark? {
+    val mark = injector.markService.getMark(vimCaret, char)
+    return mark?.toApiMark()
+  }
+
+  override fun getAllLocalMarks(): Set<Mark> {
+    return injector.markService.getAllLocalMarks(vimCaret).map { it.toApiMark() }.toSet()
+  }
+
+  override fun setMark(char: Char): Boolean {
+    return injector.markService.setMark(vimCaret, char, vimCaret.offset)
+  }
+
+  override fun setMark(char: Char, offset: Int): Boolean {
+    return injector.markService.setMark(vimCaret, char, offset)
+  }
+
+  override fun removeLocalMark(char: Char) {
+    injector.markService.removeLocalMark(vimCaret, char)
+  }
+
+  override fun resetAllMarksForCaret() {
+    injector.markService.resetAllMarksForCaret(vimCaret)
   }
 }
