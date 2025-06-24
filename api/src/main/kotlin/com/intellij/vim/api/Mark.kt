@@ -34,8 +34,3 @@ interface Mark {
    */
   val filePath: Path
 }
-
-interface Path {
-  val protocol: String
-  val path: Array<String>
-}
