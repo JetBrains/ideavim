@@ -455,6 +455,17 @@ internal class NerdTree : VimExtension {
         tree.scrollRowToVisible(expectedRow)
       },
     )
+    registerCommand("gg", NerdAction.Code { project, _, _ ->
+      val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
+      tree.setSelectionRow(0)
+      tree.scrollRowToVisible(0)
+    })
+    registerCommand("G", NerdAction.Code { project, _, _ ->
+      val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
+      val lastRowIndex = tree.rowCount -1
+      tree.setSelectionRow(lastRowIndex)
+      tree.scrollRowToVisible(lastRowIndex)
+    })
     registerCommand(
       "NERDTreeMapJumpNextSibling",
       "<C-J>",
