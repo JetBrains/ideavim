@@ -26,7 +26,6 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
 
 import javax.swing.*;
-import javax.swing.plaf.basic.BasicTextFieldUI;
 import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.FocusEvent;
@@ -45,9 +44,6 @@ import static java.lang.Math.max;
  * Provides a custom keymap for the text field. The keymap is the VIM Ex command keymapping
  */
 public class ExTextField extends JTextField {
-
-  public static final @NonNls String KEYMAP_NAME = "ex";
-
   private final ExEntryPanel myParentPanel;
 
   ExTextField(ExEntryPanel parentPanel) {
@@ -97,14 +93,10 @@ public class ExTextField extends JTextField {
     // Override the default look and feel specific UI so we can have a completely borderless and margin-less text field.
     // (See TextFieldWithPopupHandlerUI#getDefaultMargins and derived classes). This allows us to draw the text field
     // directly next to the label
-    setUI(new BasicTextFieldUI());
+    setUI(new ExTextFieldUI(ExEditorKit.INSTANCE));
     invalidate();
 
     setBorder(null);
-
-    setInputMap(WHEN_FOCUSED, new InputMap());
-    Keymap map = addKeymap(KEYMAP_NAME, getKeymap());
-    setKeymap(map);
   }
 
   /**

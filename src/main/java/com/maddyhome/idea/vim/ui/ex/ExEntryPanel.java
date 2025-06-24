@@ -294,7 +294,6 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
 
   private void reset() {
     deactivate(false);
-    JTextField.removeKeymap(ExTextField.KEYMAP_NAME);
   }
 
   private void resetCaretOffset(@NotNull Editor editor) {
