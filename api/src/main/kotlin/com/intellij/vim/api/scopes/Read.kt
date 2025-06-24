@@ -11,6 +11,7 @@ package com.intellij.vim.api.scopes
 import com.intellij.vim.api.CaretData
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.Line
+import com.intellij.vim.api.Mark
 import com.intellij.vim.api.scopes.caret.CaretRead
 
 @VimPluginDsl
@@ -29,4 +30,19 @@ interface Read {
 
   val caretData: List<CaretData>
   val caretIds: List<CaretId>
+
+  /**
+   * Gets a global mark by its character key.
+   *
+   * @param char The character key of the mark (A-Z)
+   * @return The mark, or null if the mark doesn't exist
+   */
+  fun getGlobalMark(char: Char): Mark?
+
+  /**
+   * Gets all global marks.
+   *
+   * @return A set of all global marks
+   */
+  fun getAllGlobalMarks(): Set<Mark>
 }

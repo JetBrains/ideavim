@@ -26,7 +26,8 @@ class TransactionImpl(
     get() = injector.editorGroup.getFocusedEditor()!!
 
   override fun <T> forEachCaret(block: CaretTransaction.() -> T): List<T> {
-    return vimEditor.sortedCarets().map { caret -> CaretTransactionImpl(listenerOwner, mappingOwner, caret.caretId).block() }
+    return vimEditor.sortedCarets()
+      .map { caret -> CaretTransactionImpl(listenerOwner, mappingOwner, caret.caretId).block() }
   }
 
   override fun with(
@@ -62,5 +63,31 @@ class TransactionImpl(
 
   override fun removeHighlight(highlightId: HighlightId) {
     injector.highlightingService.removeHighlighter(vimEditor, highlightId)
+  }
+
+  override fun setMark(char: Char): Boolean {
+    return injector.markService.setMark(vimEditor, char)
+  }
+
+  override fun removeMark(char: Char) {
+    injector.markService.removeMark(vimEditor, char)
+  }
+
+  override fun setGlobalMark(char: Char): Boolean {
+    val editor = vimEditor
+    val offset = editor.currentCaret().offset
+    return injector.markService.setGlobalMark(editor, char, offset)
+  }
+
+  override fun removeGlobalMark(char: Char) {
+    injector.markService.removeGlobalMark(char)
+  }
+
+  override fun setGlobalMark(char: Char, offset: Int): Boolean {
+    return injector.markService.setGlobalMark(vimEditor, char, offset)
+  }
+
+  override fun resetAllMarks() {
+    injector.markService.resetAllMarks()
   }
 }

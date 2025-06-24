@@ -10,10 +10,13 @@ package com.maddyhome.idea.vim.thinapi
 
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.CaretInfo
+import com.intellij.vim.api.Mark
+import com.intellij.vim.api.Path
 import com.intellij.vim.api.Range
 import com.intellij.vim.api.TextType
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.mark.Mark as EngineMark
 import com.maddyhome.idea.vim.state.mode.SelectionType
 
 fun SelectionType.toTextSelectionType(): TextType {
@@ -43,4 +46,20 @@ val VimCaret.caretInfo: CaretInfo
 
 fun TextRange.toRange(): Range.Simple {
   return Range.Simple(startOffset, endOffset)
+}
+
+fun EngineMark.toApiMark(): Mark {
+  val mark = this
+  return object : Mark {
+    override val key: Char = mark.key
+    override val line: Int = mark.line
+    override val col: Int = mark.col
+    override val filePath: Path
+      get() = object : Path {
+        override val protocol: String
+          get() = filePath.protocol
+        override val path: Array<String>
+          get() = filePath.path
+      }
+  }
 }

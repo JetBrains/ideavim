@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.thinapi
 import com.intellij.vim.api.CaretData
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.Line
+import com.intellij.vim.api.Mark
 import com.intellij.vim.api.scopes.Read
 import com.intellij.vim.api.scopes.caret.CaretRead
 import com.maddyhome.idea.vim.api.VimEditor
@@ -64,4 +65,13 @@ open class ReadImpl(
     get() = vimEditor.sortedCarets().map { caret -> caret.caretId to caret.caretInfo }
   override val caretIds: List<CaretId>
     get() = vimEditor.sortedCarets().map { caret -> caret.caretId }
+
+  override fun getGlobalMark(char: Char): Mark? {
+    val mark = injector.markService.getGlobalMark(char)
+    return mark?.toApiMark()
+  }
+
+  override fun getAllGlobalMarks(): Set<Mark> {
+    return injector.markService.getAllGlobalMarks().map { it.toApiMark() }.toSet()
+  }
 }
