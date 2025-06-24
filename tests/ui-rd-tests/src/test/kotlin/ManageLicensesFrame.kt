@@ -11,6 +11,7 @@ import com.intellij.remoterobot.data.RemoteComponent
 import com.intellij.remoterobot.fixtures.CommonContainerFixture
 import com.intellij.remoterobot.fixtures.DefaultXpath
 import com.intellij.remoterobot.fixtures.FixtureName
+import com.intellij.remoterobot.fixtures.JButtonFixture
 import com.intellij.remoterobot.search.locators.byXpath
 import java.time.Duration
 
@@ -28,6 +29,6 @@ class ManageLicensesFrame(remoteRobot: RemoteRobot, remoteComponent: RemoteCompo
     /// Note: The license code is obfuscated, so we use the class `W`. But a better solution is required.
     textFields(byXpath("//div[@class='W']")).first().text = System.getenv("RIDER_LICENSE")
     button("Activate").click()
-    button("Close").click()
+    button(JButtonFixture.byText("Close"), timeout = Duration.ofSeconds(20)).click()
   }
 }
