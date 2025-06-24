@@ -9,8 +9,6 @@
 package com.intellij.vim.api.scopes
 
 import com.intellij.vim.api.Mode
-import com.intellij.vim.api.Option
-import com.intellij.vim.api.OptionType
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
@@ -36,40 +34,24 @@ abstract class VimScope {
   abstract fun mappings(block: MappingScope.() -> Unit)
   abstract fun listeners(block: ListenersScope.() -> Unit)
 
-  protected abstract fun <T : OptionType> getOptionInternal(name: String, type: KType): Option<T>?
+  protected abstract fun <T> getOptionValueInternal(name: String, type: KType): T?
 
-  protected abstract fun <T : OptionType> getOptionValueInternal(name: String, type: KType): T?
-
-  protected abstract fun <T : OptionType> setOptionInternal(name: String, value: T, type: KType, scope: String): Boolean
-
-  @PublishedApi
-  internal fun <T : OptionType> getOption(name: String, type: KType): Option<T>? = getOptionInternal(name, type)
+  protected abstract fun <T> setOptionInternal(name: String, value: T, type: KType, scope: String): Boolean
 
   @PublishedApi
   internal fun <T : Any> getOptionValue(name: String, type: KType): T? = getOptionValueInternal(name, type)
 
   @PublishedApi
-  internal fun <T : OptionType> setGlobal(name: String, value: T, type: KType): Boolean =
+  internal fun <T> setGlobal(name: String, value: T, type: KType): Boolean =
     setOptionInternal(name, value, type, "global")
 
   @PublishedApi
-  internal fun <T : OptionType> setLocal(name: String, value: T, type: KType): Boolean =
+  internal fun <T> setLocal(name: String, value: T, type: KType): Boolean =
     setOptionInternal(name, value, type, "local")
 
   @PublishedApi
-  internal fun <T : OptionType> set(name: String, value: T, type: KType): Boolean =
+  internal fun <T> set(name: String, value: T, type: KType): Boolean =
     setOptionInternal(name, value, type, "effective")
-
-  /**
-   * Gets information about an option.
-   *
-   * @param name The name of the option
-   * @return Information about the option, or null if the option doesn't exist or isn't of the specified type
-   */
-  inline fun <reified T : OptionType> getOption(name: String): Option<T>? {
-    val kType: KType = typeOf<T>()
-    return getOption(name, kType)
-  }
 
   /**
    * Gets the value of an option with the specified type.
@@ -80,7 +62,7 @@ abstract class VimScope {
    * @param name The name of the option
    * @return The value of the option, or null if the option doesn't exist or isn't of the specified type
    */
-  inline fun <reified T : Any> getOptionValue(name: String): T? {
+  inline fun <reified T> getOptionValue(name: String): T? {
     val kType: KType = typeOf<T>()
     return getOptionValue(name, kType)
   }
@@ -95,7 +77,7 @@ abstract class VimScope {
    * @param value The value to set
    * @return True if the option was set successfully, false otherwise
    */
-  inline fun <reified T : OptionType> setGlobal(name: String, value: T): Boolean {
+  inline fun <reified T> setGlobal(name: String, value: T): Boolean {
     val kType: KType = typeOf<T>()
     return setGlobal(name, value, kType)
   }
@@ -110,7 +92,7 @@ abstract class VimScope {
    * @param value The value to set
    * @return True if the option was set successfully, false otherwise
    */
-  inline fun <reified T : OptionType> setLocal(name: String, value: T): Boolean {
+  inline fun <reified T> setLocal(name: String, value: T): Boolean {
     val kType: KType = typeOf<T>()
     return setLocal(name, value, kType)
   }
@@ -125,26 +107,10 @@ abstract class VimScope {
    * @param value The value to set
    * @return True if the option was set successfully, false otherwise
    */
-  inline fun <reified T : OptionType> set(name: String, value: T): Boolean {
+  inline fun <reified T> set(name: String, value: T): Boolean {
     val kType: KType = typeOf<T>()
     return set(name, value, kType)
   }
-
-  /**
-   * Gets all available options.
-   *
-   * @return A set of all available options
-   */
-  abstract fun <T : OptionType> getAllOptions(): Set<Option<T>>
-
-  /**
-   * Overrides the default value of an option.
-   *
-   * @param option The option to override
-   * @param newDefaultValue The new default value
-   * @return True if the default value was overridden successfully, false otherwise
-   */
-  abstract fun <T : OptionType> overrideDefaultValue(option: Option<T>, newDefaultValue: T): Boolean
 
   /**
    * Resets an option to its default value.
@@ -156,15 +122,4 @@ abstract class VimScope {
    * @return True if the option was reset successfully, false otherwise
    */
   abstract fun resetOptionToDefault(name: String): Boolean
-
-  /**
-   * Toggles a boolean option's value.
-   *
-   * In Vim, this is equivalent to `:set option!` or `:set nooption` depending on the current value.
-   * Example: `:set ignorecase!` toggles the 'ignorecase' option.
-   *
-   * @param name The name of the boolean option to toggle
-   * @throws IllegalArgumentException if the option doesn't exist or is not a boolean option
-   */
-  abstract fun toggleValue(name: String)
 }
