@@ -20,7 +20,7 @@ repositories {
 }
 
 dependencies {
-  compileOnly("org.jetbrains.kotlin:kotlin-stdlib:2.1.21")
+  compileOnly("org.jetbrains.kotlin:kotlin-stdlib:2.2.0")
 
   implementation("io.ktor:ktor-client-core:3.2.0")
   implementation("io.ktor:ktor-client-cio:3.2.0")
