@@ -25,7 +25,7 @@ object LongRunning : IdeaVimBuildType({
 
   steps {
     gradle {
-      tasks = "clean :tests:long-running-tests:testLongRunning"
+      tasks = "clean :tests:long-running-tests:test"
       buildFile = ""
       enableStacktrace = true
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"

@@ -25,7 +25,7 @@ object PropertyBased : IdeaVimBuildType({
   steps {
     gradle {
       clearConditions()
-      tasks = "clean :tests:property-tests:testPropertyBased"
+      tasks = "clean :tests:property-tests:test"
       buildFile = ""
       enableStacktrace = true
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
