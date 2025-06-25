@@ -65,7 +65,7 @@ We've prepared some useful configurations for you:
 And here are useful gradle commands:
 
 * `./gradlew runIde` — start the dev version of IntelliJ IDEA with IdeaVim installed.
-* `./gradlew test` — run tests.
+* `./gradlew test -x :tests:property-tests:test -x :tests:long-running-tests:test` — run tests.
 * `./gradlew buildPlugin` — build the plugin. The result will be located in `build/distributions`. This file can be
 installed by using `Settings | Plugin | >Gear Icon< | Install Plugin from Disk...`. You can stay with your personal build
 for a few days or send it to a friend for testing.

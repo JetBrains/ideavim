@@ -47,16 +47,7 @@ tasks {
   // I didn't find a better way to exclude except disabling and defining a new task with a different name
   // Note that useJUnitTestPlatform() is required to prevent red code
   test {
-    enabled = false
     useJUnitPlatform()
-  }
-
-  // The `test` task is automatically set up with IntelliJ goodness. A custom test task needs to be configured for it
-  val testLongRunning by intellijPlatformTesting.testIde.registering {
-    task {
-      group = "verification"
-      useJUnitPlatform()
-    }
   }
 }
 

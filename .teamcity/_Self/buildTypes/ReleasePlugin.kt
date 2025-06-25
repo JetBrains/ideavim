@@ -115,7 +115,7 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
     }
     script {
       name = "Run tests"
-      scriptContent = "./gradlew test"
+      scriptContent = "./gradlew test -x :tests:property-tests:test -x :tests:long-running-tests:test"
     }
     gradle {
       name = "Publish release"
