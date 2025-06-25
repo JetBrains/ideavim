@@ -16,6 +16,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ScrollingModel;
+import com.intellij.openapi.editor.colors.EditorColors;
 import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.IJSwingUtilities;
@@ -188,6 +189,11 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     entry.setText(initText);
     entry.setFont(UiHelper.selectEditorFont(editor, initText));
     parent = editor.getContentComponent();
+
+    entry.setForeground(editor.getColorsScheme().getDefaultForeground());
+    // TODO: Introduce IdeaVim colour scheme for "SpecialKey"?
+    entry.setSpecialKeyForeground(editor.getColorsScheme().getColor(EditorColors.WHITESPACES_COLOR));
+    this.label.setForeground(entry.getForeground());
 
     this.context = context;
     setEditor(editor);
