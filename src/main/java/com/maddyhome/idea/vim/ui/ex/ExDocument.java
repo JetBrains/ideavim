@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.helper.EngineStringHelper;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.text.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.font.TextAttribute;
 import java.awt.im.InputMethodHighlight;
@@ -29,12 +30,29 @@ import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
  * Note that PlainDocument will remove CRs from text for single line text fields
  */
 public class ExDocument extends DefaultStyledDocument {
+  public static final String SpecialKeyStyleName = "SpecialKey";
   public static final String NonPrintableElementName = "non-printable";
 
   private boolean overwrite = false;
 
   public ExDocument() {
     setDocumentFilter(new ExDocumentFilter());
+    final Style specialStyle = addStyle(SpecialKeyStyleName, null);
+    final Style nonPrintableStyle = addStyle(NonPrintableElementName, specialStyle);
+    nonPrintableStyle.addAttribute(AbstractDocument.ElementNameAttribute, NonPrintableElementName);
+  }
+
+  /**
+   * Set the foreground colour for special key characters
+   * <p>
+   * Maps to Vim's `SpecialKey` highlight
+   * </p>
+   */
+  void setSpecialKeyForeground(Color fg) {
+    final Style style = getStyle(SpecialKeyStyleName);
+    if (style != null) {
+      StyleConstants.setForeground(style, fg);
+    }
   }
 
   /**
@@ -131,7 +149,7 @@ public class ExDocument extends DefaultStyledDocument {
           pos++;
         }
 
-        final AttributeSet a = isPrintable ? attr : getNonPrintableAttributes(attr);
+        final AttributeSet a = isPrintable ? attr : getNonPrintableAttributes(fb.getDocument(), attr);
         final String s = string.substring(start, pos);
         fb.insertString(offset, s, a);
         offset += s.length();
@@ -190,7 +208,7 @@ public class ExDocument extends DefaultStyledDocument {
         // Note that fb.replace will remove the existing text and then add the new text. If we're replacing the whole
         // text (e.g., ExTextField.setText) then this can reset the scroll position. Note that ExTextField has methods
         // to set, insert and delete text to avoid this situation.
-        final AttributeSet a = isPrintable ? attrs : getNonPrintableAttributes(attrs);
+        final AttributeSet a = isPrintable ? attrs : getNonPrintableAttributes(fb.getDocument(), attrs);
         final String s = text.substring(start, pos);
         if (start == 0) {
           fb.replace(offset, length, s, a);
@@ -217,13 +235,18 @@ public class ExDocument extends DefaultStyledDocument {
       return EngineStringHelper.INSTANCE.isPrintableCharacter(c);
     }
 
-    private static @NotNull SimpleAttributeSet getNonPrintableAttributes(AttributeSet attrs) {
-      final SimpleAttributeSet attributeSet = new SimpleAttributeSet();
-      if (attrs != null) {
-        attributeSet.addAttributes(attrs);
+    private static @NotNull AttributeSet getNonPrintableAttributes(Document document, AttributeSet attrs) {
+      if (document instanceof ExDocument exDocument) {
+        return exDocument.getStyle(ExDocument.NonPrintableElementName);
       }
-      attributeSet.addAttribute(AbstractDocument.ElementNameAttribute, ExDocument.NonPrintableElementName);
-      return attributeSet;
+      else {
+        final SimpleAttributeSet attributeSet = new SimpleAttributeSet();
+        if (attrs != null) {
+          attributeSet.addAttributes(attrs);
+        }
+        attributeSet.addAttribute(AbstractDocument.ElementNameAttribute, ExDocument.NonPrintableElementName);
+        return attributeSet;
+      }
     }
   }
 }
