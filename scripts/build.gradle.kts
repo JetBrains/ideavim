@@ -36,11 +36,9 @@ dependencies {
 
 val releaseType: String? by project
 
-tasks {
-  compileKotlin {
-    kotlinOptions {
-      freeCompilerArgs = listOf("-Xjvm-default=all-compatibility")
-    }
+kotlin {
+  compilerOptions {
+    freeCompilerArgs = listOf("-Xjvm-default=all-compatibility")
   }
 }
 

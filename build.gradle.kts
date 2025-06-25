@@ -35,6 +35,8 @@ import org.intellij.markdown.ast.impl.ListCompositeNode
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.tasks.aware.SplitModeAware
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.kohsuke.github.GHUser
 import java.net.HttpURLConnection
 import java.net.URL
@@ -46,7 +48,7 @@ buildscript {
   }
 
   dependencies {
-    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21")
+    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.0")
     classpath("com.github.AlexPl292:mark-down-to-slack:1.1.2")
     classpath("org.eclipse.jgit:org.eclipse.jgit:6.6.0.202305301015-r")
 
@@ -67,7 +69,7 @@ buildscript {
 
 plugins {
   java
-  kotlin("jvm") version "2.0.21"
+  kotlin("jvm") version "2.2.0"
   application
   id("java-test-fixtures")
 
@@ -79,7 +81,7 @@ plugins {
   id("org.jetbrains.changelog") version "2.2.1"
   id("org.jetbrains.kotlinx.kover") version "0.6.1"
   id("com.dorongold.task-tree") version "4.0.1"
-  id("com.google.devtools.ksp") version "2.0.21-1.0.25"
+  id("com.google.devtools.ksp") version "2.2.0-2.0.2"
 }
 
 val moduleSources by configurations.registering
@@ -220,36 +222,6 @@ tasks {
     options.encoding = "UTF-8"
   }
 
-  compileKotlin {
-    kotlinOptions {
-      jvmTarget = javaVersion
-      // See https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
-      // For the list of bundled versions
-      apiVersion = "2.0"
-      freeCompilerArgs = listOf(
-        "-Xjvm-default=all-compatibility",
-
-        // Needed to compile the AceJump which uses kotlin beta
-        //  Without these two option compilation fails
-        "-Xskip-prerelease-check",
-        "-Xallow-unstable-dependencies",
-      )
-//            allWarningsAsErrors = true
-    }
-  }
-
-  compileTestKotlin {
-    kotlinOptions {
-      jvmTarget = javaVersion
-      apiVersion = "2.0"
-
-      // Needed to compile the AceJump which uses kotlin beta
-      //  Without these two option compilation fails
-      freeCompilerArgs += listOf("-Xskip-prerelease-check", "-Xallow-unstable-dependencies")
-//            allWarningsAsErrors = true
-    }
-  }
-
   // Note that this will run the plugin installed in the IDE specified in dependencies. To run in a different IDE, use
   // a custom task (see below)
   runIde {
@@ -321,6 +293,23 @@ java {
 kotlin {
   jvmToolchain {
     languageVersion.set(JavaLanguageVersion.of(javaVersion))
+  }
+
+  compilerOptions {
+    jvmTarget.set(JvmTarget.fromTarget(javaVersion))
+
+    // See https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library
+    // For the list of bundled versions
+    apiVersion.set(KotlinVersion.KOTLIN_2_0)
+    freeCompilerArgs = listOf(
+      "-Xjvm-default=all-compatibility",
+
+      // Needed to compile the AceJump which uses kotlin beta
+      //  Without these two option compilation fails
+      "-Xskip-prerelease-check",
+      "-Xallow-unstable-dependencies",
+    )
+//            allWarningsAsErrors = true
   }
 }
 

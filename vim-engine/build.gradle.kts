@@ -10,8 +10,8 @@ plugins {
     java
     kotlin("jvm")
 //    id("org.jlleitschuh.gradle.ktlint")
-    id("com.google.devtools.ksp") version "2.0.21-1.0.25"
-    kotlin("plugin.serialization") version "2.0.21"
+    id("com.google.devtools.ksp") version "2.2.0-2.0.2"
+    kotlin("plugin.serialization") version "2.2.0"
     `maven-publish`
     antlr
 }
@@ -88,13 +88,13 @@ tasks {
     named("compileTestKotlin") {
       dependsOn("generateTestGrammarSource")
     }
+}
 
-    compileKotlin {
-        kotlinOptions {
-            apiVersion = "2.0"
-            freeCompilerArgs = listOf("-Xjvm-default=all-compatibility")
-        }
-    }
+kotlin {
+  compilerOptions {
+    apiVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_0)
+    freeCompilerArgs = listOf("-Xjvm-default=all-compatibility")
+  }
 }
 
 // --- Linting
