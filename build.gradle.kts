@@ -141,6 +141,11 @@ dependencies {
     plugin("AceJump", "3.8.19")
 
     bundledPlugins("org.jetbrains.plugins.terminal")
+
+    // VERSION UPDATE: This module is required since 2025.2
+    if (ideaVersion == "LATEST-EAP-SNAPSHOT") {
+      bundledModule("intellij.spellchecker")
+    }
   }
 
   moduleSources(project(":vim-engine", "sourcesJarArtifacts"))
