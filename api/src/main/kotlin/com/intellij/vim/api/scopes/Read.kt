@@ -40,9 +40,7 @@ interface Read {
   fun getGlobalMark(char: Char): Mark?
 
   /**
-   * Gets all global marks.
-   *
-   * @return A set of all global marks
+   * All global marks.
    */
-  fun getAllGlobalMarks(): Set<Mark>
+  val globalMarks: Set<Mark>
 }

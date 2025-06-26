@@ -169,11 +169,9 @@ interface CaretRead {
   fun getMark(char: Char): Mark?
 
   /**
-   * Gets all local marks for the current caret.
-   * 
-   * @return A set of all local marks for the current caret
+   * All local marks for the current caret.
    */
-  fun getAllLocalMarks(): Set<Mark>
+  val localMarks: Set<Mark>
 
   /**
    * Sets a mark at the current caret position.
