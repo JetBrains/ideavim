@@ -16,6 +16,6 @@ interface VimModalInputService {
     editor: VimEditor,
     context: ExecutionContext,
     label: String,
-    inputInterceptor: VimInputInterceptor<*>,
+    inputInterceptor: VimInputInterceptor,
   ): VimModalInput
 }

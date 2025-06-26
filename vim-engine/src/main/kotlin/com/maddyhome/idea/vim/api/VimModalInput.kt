@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.key.interceptors.VimInputInterceptor
 import javax.swing.KeyStroke
 
 interface VimModalInput {
-  var inputInterceptor: VimInputInterceptor<*>
+  var inputInterceptor: VimInputInterceptor
   val caret: VimCommandLineCaret
   val label: String
 
