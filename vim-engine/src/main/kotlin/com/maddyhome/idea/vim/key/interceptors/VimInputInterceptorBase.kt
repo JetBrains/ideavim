@@ -14,7 +14,7 @@ import com.maddyhome.idea.vim.api.injector
 import javax.swing.KeyStroke
 
 // TODO make it safer to utilise key.isCloseKeystroke and similar logic
-abstract class VimInputInterceptorBase<T> : VimInputInterceptor<T> {
+abstract class VimInputInterceptorBase<T> : VimInputInterceptor {
   override fun consumeKey(
     key: KeyStroke,
     editor: VimEditor,
@@ -32,4 +32,25 @@ abstract class VimInputInterceptorBase<T> : VimInputInterceptor<T> {
     val prompt = injector.modalInput.getCurrentModalInput() ?: return
     prompt.deactivate(refocusOwningEditor = true, resetCaret = true)
   }
+
+  /**
+   * Attempt to build a complete input from the given keystroke.
+   *
+   * @param key The current keystroke to process.
+   * @return The complete input of type [T] if it can be constructed, or null if more keystrokes are needed.
+   */
+  protected abstract fun buildInput(key: KeyStroke): T?
+
+  /**
+   * Execute the action associated with the complete input.
+   *
+   * @param input The complete input of type T.
+   * @param editor The active editor instance.
+   * @param context The current execution context.
+   */
+  protected abstract fun executeInput(
+    input: T,
+    editor: VimEditor,
+    context: ExecutionContext,
+  )
 }

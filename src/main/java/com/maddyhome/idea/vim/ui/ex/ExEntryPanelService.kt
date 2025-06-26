@@ -123,7 +123,6 @@ class ExEntryPanelService : VimCommandLineServiceBase(), VimModalInputService {
     vimEditor.mode = Mode.CMD_LINE(currentMode)
 
     val panel = ExEntryPanel.getOrCreateInstance()
-    panel as ExEntryPanel
     panel.finishOn = finishOn
     panel.inputProcessing = processing
     panel.activate(vimEditor.ij, context.ij, prompt, "")
@@ -154,7 +153,7 @@ class ExEntryPanelService : VimCommandLineServiceBase(), VimModalInputService {
     editor: VimEditor,
     context: ExecutionContext,
     label: String,
-    inputInterceptor: VimInputInterceptor<*>,
+    inputInterceptor: VimInputInterceptor,
   ): VimModalInput {
     val panel = ExEntryPanel.getOrCreateInstance()
     panel.inputInterceptor = inputInterceptor
@@ -164,7 +163,7 @@ class ExEntryPanelService : VimCommandLineServiceBase(), VimModalInputService {
 }
 
 internal class WrappedAsModalInputExEntryPanel(internal val exEntryPanel: ExEntryPanel) : VimModalInputBase() {
-  override var inputInterceptor: VimInputInterceptor<*>
+  override var inputInterceptor: VimInputInterceptor
     get() = exEntryPanel.inputInterceptor!!
     set(value) {
       exEntryPanel.inputInterceptor = value

@@ -584,11 +584,11 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     IdeFocusManager.findInstance().requestFocus(entry, true);
   }
 
-  public @Nullable VimInputInterceptor<?> getInputInterceptor() {
+  public @Nullable VimInputInterceptor getInputInterceptor() {
     return myInputInterceptor;
   }
 
-  public void setInputInterceptor(@Nullable VimInputInterceptor<?> vimInputInterceptor) {
+  public void setInputInterceptor(@Nullable VimInputInterceptor vimInputInterceptor) {
     myInputInterceptor = vimInputInterceptor;
   }
 
