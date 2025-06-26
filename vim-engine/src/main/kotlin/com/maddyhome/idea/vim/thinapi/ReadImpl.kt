@@ -71,7 +71,6 @@ open class ReadImpl(
     return mark?.toApiMark()
   }
 
-  override fun getAllGlobalMarks(): Set<Mark> {
-    return injector.markService.getAllGlobalMarks().map { it.toApiMark() }.toSet()
-  }
+  override val globalMarks: Set<Mark>
+    get() = injector.markService.getAllGlobalMarks().map { it.toApiMark() }.toSet()
 }

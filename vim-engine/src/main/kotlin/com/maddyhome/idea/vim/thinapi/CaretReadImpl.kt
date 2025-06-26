@@ -156,9 +156,8 @@ class CaretReadImpl(
     return mark?.toApiMark()
   }
 
-  override fun getAllLocalMarks(): Set<Mark> {
-    return injector.markService.getAllLocalMarks(vimCaret).map { it.toApiMark() }.toSet()
-  }
+  override val localMarks: Set<Mark>
+    get() = injector.markService.getAllLocalMarks(vimCaret).map { it.toApiMark() }.toSet()
 
   override fun setMark(char: Char): Boolean {
     return injector.markService.setMark(vimCaret, char, vimCaret.offset)
