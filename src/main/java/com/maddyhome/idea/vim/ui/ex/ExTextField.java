@@ -110,7 +110,7 @@ public class ExTextField extends JTextField {
    * </p>
    */
   void saveLastEntry() {
-    ExEntryPanel.getInstance().setLastEntry(super.getText());
+    myParentPanel.setLastEntry(super.getText());
   }
 
   /**
@@ -158,7 +158,7 @@ public class ExTextField extends JTextField {
 
   // VIM-570
   private void setFontToJField(String stringToDisplay) {
-    setFont(UiHelper.selectEditorFont(ExEntryPanel.getInstance().getIjEditor(), stringToDisplay));
+    setFont(UiHelper.selectEditorFont(myParentPanel.getIjEditor(), stringToDisplay));
   }
 
   @Override

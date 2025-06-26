@@ -772,7 +772,7 @@ class ExEntryTest : VimTestCase() {
   }
 
   private val exEntryPanel
-    get() = ExEntryPanel.getInstance()
+    get() = ExEntryPanel.getOrCreateInstance()
 
   private val caret
     get() = exEntryPanel.entry.caret

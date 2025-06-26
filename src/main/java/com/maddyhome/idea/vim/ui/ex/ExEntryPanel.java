@@ -63,8 +63,7 @@ import static com.maddyhome.idea.vim.group.KeyGroup.toShortcutSet;
  * This is used to enter ex commands such as searches and "colon" commands
  */
 public class ExEntryPanel extends JPanel implements VimCommandLine {
-  public static ExEntryPanel instance;
-  public static ExEntryPanel instanceWithoutShortcuts;
+  public static @Nullable ExEntryPanel instance;
 
   public boolean isReplaceMode = false;
   public Function1<String, Unit> inputProcessing = null;
@@ -76,7 +75,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
   private int histIndex = 0;
   private String lastEntry;
 
-  private ExEntryPanel(boolean enableShortcuts) {
+  private ExEntryPanel() {
     label = new JLabel(" ");
     entry = new ExTextField(this);
 
@@ -100,39 +99,18 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     updateUI();
   }
 
-  public static ExEntryPanel getInstance() {
+  public static ExEntryPanel getOrCreateInstance() {
     if (instance == null) {
-      instance = new ExEntryPanel(true);
+      instance = new ExEntryPanel();
     }
 
     return instance;
   }
 
-  // TODO: Since all shortcuts are handled by KeyHandler, I don't think this does anything useful any more
-  public static ExEntryPanel getInstanceWithoutShortcuts() {
-    if (instanceWithoutShortcuts == null) {
-      instanceWithoutShortcuts = new ExEntryPanel(false);
-    }
-
-    return instanceWithoutShortcuts;
-  }
-
-  public static boolean isInstanceWithShortcutsActive() {
-    return instance != null;
-  }
-
-  public static boolean isInstanceWithoutShortcutsActive() {
-    return instanceWithoutShortcuts != null;
-  }
-
   public static void fullReset() {
-    if (isInstanceWithShortcutsActive()) {
+    if (instance != null) {
       instance.reset();
       instance = null;
-    }
-    if (isInstanceWithoutShortcutsActive()) {
-      instanceWithoutShortcuts.reset();
-      instanceWithoutShortcuts = null;
     }
   }
 
@@ -223,15 +201,6 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
       entry.requestFocusInWindow();
     }
     active = true;
-  }
-
-  public static void deactivateAll() {
-    if (instance != null && instance.active) {
-      instance.deactivate(false);
-    }
-    if (instanceWithoutShortcuts != null && instanceWithoutShortcuts.active) {
-      instanceWithoutShortcuts.deactivate(false);
-    }
   }
 
   public void deactivate(boolean refocusOwningEditor) {
@@ -658,12 +627,10 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     @Override
     public void lookAndFeelChanged(@NotNull LafManager source) {
       if (VimPlugin.isNotEnabled()) return;
+
       // Calls updateUI on this and child components
-      if (ExEntryPanel.isInstanceWithShortcutsActive()) {
-        IJSwingUtilities.updateComponentTreeUI(ExEntryPanel.getInstance());
-      }
-      if (ExEntryPanel.isInstanceWithoutShortcutsActive()) {
-        IJSwingUtilities.updateComponentTreeUI(ExEntryPanel.getInstanceWithoutShortcuts());
+      if (instance != null) {
+        IJSwingUtilities.updateComponentTreeUI(instance);
       }
     }
   }
