@@ -27,27 +27,27 @@ class GetCmdTypeFunctionTest : VimTestCase() {
   fun `test getcmdtype() for a regular command`() {
     enterCommand("cmap <expr> z getcmdtype()")
     typeText(":fooz")
-    assertEquals("foo:", (injector.commandLine.getActiveCommandLine() as ExEntryPanel).visibleText)
+    assertEquals("foo:", (injector.commandLine.getActiveCommandLine() as ExEntryPanel).actualText)
   }
 
   @Test
   fun `test getcmdtype() for a forward search`() {
     enterCommand("cmap <expr> z getcmdtype()")
     typeText("/fooz")
-    assertEquals("foo/", (injector.commandLine.getActiveCommandLine() as ExEntryPanel).visibleText)
+    assertEquals("foo/", (injector.commandLine.getActiveCommandLine() as ExEntryPanel).actualText)
   }
 
   @Test
   fun `test getcmdtype() for a backward search`() {
     enterCommand("cmap <expr> z getcmdtype()")
     typeText("?fooz")
-    assertEquals("foo?", (injector.commandLine.getActiveCommandLine() as ExEntryPanel).visibleText)
+    assertEquals("foo?", (injector.commandLine.getActiveCommandLine() as ExEntryPanel).actualText)
   }
 
   @Test
   fun `test getcmdtype() for an expression command`() {
     enterCommand("cmap <expr> z getcmdtype()")
     typeText("i<C-r>=fooz")
-    assertEquals("foo=", (injector.commandLine.getActiveCommandLine() as ExEntryPanel).visibleText)
+    assertEquals("foo=", (injector.commandLine.getActiveCommandLine() as ExEntryPanel).actualText)
   }
 }
