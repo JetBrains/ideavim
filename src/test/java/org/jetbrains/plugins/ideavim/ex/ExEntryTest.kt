@@ -721,6 +721,22 @@ class ExEntryTest : VimTestCase() {
     assertEquals("hello world", cmdLine.visibleText)
   }
 
+  @Test
+  fun `test renders control characters`() {
+    configureByText("")
+    typeText(":normal I<C-V><Esc>A<C-V><Esc>")
+    val cmdLine = injector.commandLine.getActiveCommandLine() ?: fail()
+    assertEquals("normal I^[A^[", cmdLine.getRenderedText())
+  }
+
+  @Test
+  fun `test renders control characters as unicode number`() {
+    configureByText("")
+    typeText(":echo <C-V>x80")
+    val cmdLine = injector.commandLine.getActiveCommandLine() ?: fail()
+    assertEquals("echo <80>", cmdLine.getRenderedText())
+  }
+
   private fun typeExInput(text: String) {
     assertTrue(
       Regex("""\d*[:/?].*""").matches(text),

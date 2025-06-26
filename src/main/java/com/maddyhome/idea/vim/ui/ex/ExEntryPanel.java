@@ -49,6 +49,9 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.GlyphView;
+import javax.swing.text.Segment;
+import javax.swing.text.View;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -422,6 +425,37 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
   @Override
   public @NotNull String getVisibleText() {
     return entry.getText();
+  }
+
+  @Override
+  public @NotNull String getRenderedText() {
+    final StringBuilder stringBuilder = new StringBuilder();
+    getRenderedText(entry.getUI().getRootView(entry), stringBuilder);
+    if (stringBuilder.charAt(stringBuilder.length() - 1) == '\n') {
+      stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+    }
+    return stringBuilder.toString();
+  }
+
+  private void getRenderedText(View view, StringBuilder stringBuilder) {
+    if (view.getElement().isLeaf()) {
+      if (view instanceof GlyphView glyphView) {
+        final Segment text = glyphView.getText(glyphView.getStartOffset(), glyphView.getEndOffset());
+        stringBuilder.append(text);
+      }
+      else {
+        stringBuilder.append("<Unknown leaf view. Expected GlyphView, got: ");
+        stringBuilder.append(view.getClass().getName());
+        stringBuilder.append(">");
+      }
+    }
+    else {
+      final int viewCount = view.getViewCount();
+      for (int i = 0; i < viewCount; i++) {
+        final View child = view.getView(i);
+        getRenderedText(child, stringBuilder);
+      }
+    }
   }
 
   public @NotNull ExTextField getEntry() {
