@@ -140,7 +140,7 @@ abstract class VimTestCase {
     clearClipboard()
 
     // Make sure the entry text field gets a bounds, or we won't be able to work out caret location
-    ExEntryPanel.getInstance().entry.setBounds(0, 0, 100, 25)
+    ExEntryPanel.getOrCreateInstance().entry.setBounds(0, 0, 100, 25)
 
     NeovimTesting.setUp(testInfo)
 
@@ -214,7 +214,7 @@ abstract class VimTestCase {
     }
     VimListenerManager.VimLastSelectedEditorTracker.resetLastSelectedEditor(fixture.project)
     SelectionVimListenerSuppressor.lock().use { fixture.tearDown() }
-    ExEntryPanel.getInstance().deactivate(false)
+    ExEntryPanel.instance?.deactivate(false)
     VimPlugin.getVariableService().clear()
     VimFuncref.lambdaCounter = 0
     VimFuncref.anonymousCounter = 0

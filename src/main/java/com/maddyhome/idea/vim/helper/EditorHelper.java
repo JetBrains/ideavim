@@ -388,13 +388,8 @@ public class EditorHelper {
   }
 
   private static int getExEntryHeight() {
-    if (ExEntryPanel.getInstance().isActive()) {
-      return ExEntryPanel.getInstance().getHeight();
-    }
-    if (ExEntryPanel.getInstanceWithoutShortcuts().isActive()) {
-      return ExEntryPanel.getInstanceWithoutShortcuts().getHeight();
-    }
-    return 0;
+    var instance = ExEntryPanel.instance;
+    return instance != null && instance.isActive() ? instance.getHeight() : 0;
   }
 
   private static int getHorizontalScrollbarHeight(final @NotNull Editor editor) {
