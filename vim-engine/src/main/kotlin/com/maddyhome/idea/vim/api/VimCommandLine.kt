@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.history.HistoryEntry
 import com.maddyhome.idea.vim.history.VimHistory
+import org.jetbrains.annotations.TestOnly
 import javax.swing.KeyStroke
 import kotlin.math.min
 
@@ -68,6 +69,14 @@ interface VimCommandLine {
    */
   val visibleText: String
   var promptCharacterOffset: Int?
+
+  /**
+   * Get the text as it is rendered in the command line.
+   *
+   * This includes control characters rendered in Vim style, e.g. `<80>` or `^[`.
+   */
+  @TestOnly
+  fun getRenderedText(): String
 
   /**
    * Replaces the current text with the new string
