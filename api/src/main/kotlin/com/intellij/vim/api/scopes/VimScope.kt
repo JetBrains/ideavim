@@ -175,4 +175,49 @@ abstract class VimScope {
    */
   abstract fun getAllMatches(text: String, pattern: String): List<Pair<Int, Int>>
 
+  /**
+   * Selects the next window in the editor.
+   */
+  abstract fun selectNextWindow()
+
+  /**
+   * Selects the previous window in the editor.
+   */
+  abstract fun selectPreviousWindow()
+
+  /**
+   * Selects a window by its index.
+   *
+   * @param index The index of the window to select (1-based).
+   */
+  abstract fun selectWindow(index: Int)
+
+  /**
+   * Splits the current window vertically and optionally opens a file in the new window.
+   *
+   * @param filename The name of the file to open in the new window. If null, the new window will show the same file.
+   */
+  abstract fun splitWindowVertically(filename: String? = null)
+
+  /**
+   * Splits the current window horizontally and optionally opens a file in the new window.
+   *
+   * @param filename The name of the file to open in the new window. If null, the new window will show the same file.
+   */
+  abstract fun splitWindowHorizontally(filename: String? = null)
+
+  /**
+   * Closes all windows except the current one.
+   */
+  abstract fun closeAllExceptCurrentWindow()
+
+  /**
+   * Closes the current window.
+   */
+  abstract fun closeCurrentWindow()
+
+  /**
+   * Closes all windows in the editor.
+   */
+  abstract fun closeAllWindows()
 }

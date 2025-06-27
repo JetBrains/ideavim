@@ -225,4 +225,24 @@ interface CaretRead {
    * @return True if the scroll was successful, false otherwise
    */
   fun scrollHalfPageDown(lines: Int): Boolean
+
+  /**
+   * Selects a window in the same row as the current window.
+   * This function allows navigation between split windows in the editor.
+   *
+   * @param relativePosition The relative position of the window to select.
+   *                        Positive values select windows to the right,
+   *                        negative values select windows to the left.
+   */
+  fun selectWindowHorizontally(relativePosition: Int)
+
+  /**
+   * Selects a window in the same column as the current window.
+   * This function allows navigation between split windows in the editor.
+   *
+   * @param relativePosition The relative position of the window to select.
+   *                        Positive values select the windows below,
+   *                        negative values select the windows above.
+   */
+  fun selectWindowInVertically(relativePosition: Int)
 }

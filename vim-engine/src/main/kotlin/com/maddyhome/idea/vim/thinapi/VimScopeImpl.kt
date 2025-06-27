@@ -188,6 +188,38 @@ open class VimScopeImpl(
     return injector.regexpService.getAllMatches(text, pattern)
   }
 
+  override fun selectNextWindow() {
+    injector.window.selectNextWindow(vimContext)
+  }
+
+  override fun selectWindow(index: Int) {
+    injector.window.selectWindow(vimContext, index)
+  }
+
+  override fun selectPreviousWindow() {
+    injector.window.selectPreviousWindow(vimContext)
+  }
+
+  override fun splitWindowVertically(filename: String?) {
+    injector.window.splitWindowVertical(vimContext, filename ?: "")
+  }
+
+  override fun splitWindowHorizontally(filename: String?) {
+    injector.window.splitWindowHorizontal(vimContext, filename ?: "")
+  }
+
+  override fun closeAllExceptCurrentWindow() {
+    injector.window.closeAllExceptCurrent(vimContext)
+  }
+
+  override fun closeCurrentWindow() {
+    injector.window.closeCurrentWindow(vimContext)
+  }
+
+  override fun closeAllWindows() {
+    injector.window.closeAll(vimContext)
+  }
+
   private fun <T : Any> parseOptionValue(vimDataType: VimDataType, type: KType): T? {
     return try {
       when (type.classifier) {
