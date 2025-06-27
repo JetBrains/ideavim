@@ -48,6 +48,9 @@ open class VimScopeImpl(
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!
 
+  private val vimContext: ExecutionContext
+    get() = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+
   private val optionGroup: VimOptionGroup
     get() = injector.optionGroup
 
@@ -125,16 +128,19 @@ open class VimScopeImpl(
   override fun <T> setOptionInternal(name: String, value: T, type: KType, scope: String): Boolean {
     val option = optionGroup.getOption(name) ?: return false
 
-    val optionValue = when(type.classifier) {
+    val optionValue = when (type.classifier) {
       Int::class -> {
         VimInt(value as Int)
       }
+
       String::class -> {
         VimString(value as String)
       }
+
       Boolean::class -> {
         if (value as Boolean) VimInt.ONE else VimInt.ZERO
       }
+
       else -> return false
     }
     val optionAccessScope = when (scope) {
@@ -151,6 +157,24 @@ open class VimScopeImpl(
     val option = optionGroup.getOption(name) ?: return false
     optionGroup.resetToDefaultValue(option, OptionAccessScope.EFFECTIVE(vimEditor))
     return true
+  }
+
+  override val tabCount: Int
+    get() = injector.tabService.getTabCount(vimContext)
+
+  override val currentTabIndex: Int?
+    get() = injector.tabService.getCurrentTabIndex(vimContext)
+
+  override fun removeTabAt(indexToDelete: Int, indexToSelect: Int) {
+    injector.tabService.removeTabAt(indexToDelete, indexToSelect, vimContext)
+  }
+
+  override fun moveCurrentTabToIndex(index: Int) {
+    injector.tabService.moveCurrentTabToIndex(index, vimContext)
+  }
+
+  override fun closeAllExceptCurrentTab() {
+    injector.tabService.closeAllExceptCurrentTab(vimContext)
   }
 
   private fun <T : Any> parseOptionValue(vimDataType: VimDataType, type: KType): T? {
