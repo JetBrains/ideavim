@@ -155,4 +155,24 @@ abstract class VimScope {
    * @throws IllegalStateException if there is no tab selected
    */
   abstract fun closeAllExceptCurrentTab()
+
+  /**
+   * Checks if a pattern matches a text.
+   *
+   * @param pattern The regular expression pattern to match
+   * @param text The text to check against the pattern
+   * @param ignoreCase Whether to ignore case when matching
+   * @return True if the pattern matches the text, false otherwise
+   */
+  abstract fun matches(pattern: String, text: String?, ignoreCase: Boolean = false): Boolean
+
+  /**
+   * Finds all matches of a pattern in a text.
+   *
+   * @param text The text to search in
+   * @param pattern The regular expression pattern to search for
+   * @return A list of pairs representing the start and end offsets of each match
+   */
+  abstract fun getAllMatches(text: String, pattern: String): List<Pair<Int, Int>>
+
 }

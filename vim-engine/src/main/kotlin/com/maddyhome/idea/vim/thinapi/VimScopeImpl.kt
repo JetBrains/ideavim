@@ -177,6 +177,17 @@ open class VimScopeImpl(
     injector.tabService.closeAllExceptCurrentTab(vimContext)
   }
 
+  override fun matches(pattern: String, text: String?, ignoreCase: Boolean): Boolean {
+    return injector.regexpService.matches(pattern, text, ignoreCase)
+  }
+
+  override fun getAllMatches(
+    text: String,
+    pattern: String,
+  ): List<Pair<Int, Int>> {
+    return injector.regexpService.getAllMatches(text, pattern)
+  }
+
   private fun <T : Any> parseOptionValue(vimDataType: VimDataType, type: KType): T? {
     return try {
       when (type.classifier) {
