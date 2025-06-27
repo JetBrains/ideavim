@@ -122,4 +122,37 @@ abstract class VimScope {
    * @return True if the option was reset successfully, false otherwise
    */
   abstract fun resetOptionToDefault(name: String): Boolean
+
+  /**
+   * Gets the number of tabs in the current window.
+   */
+  abstract val tabCount: Int
+
+  /**
+   * The index of the current tab or null if there is no tab selected or no tabs are open
+   */
+  abstract val currentTabIndex: Int?
+
+  /**
+   * Removes a tab at the specified index and selects another tab.
+   *
+   * @param indexToDelete The index of the tab to delete
+   * @param indexToSelect The index of the tab to select after deletion
+   */
+  abstract fun removeTabAt(indexToDelete: Int, indexToSelect: Int)
+
+  /**
+   * Moves the current tab to the specified index.
+   *
+   * @param index The index to move the current tab to
+   * @throws IllegalStateException if there is no tab selected or no tabs are open
+   */
+  abstract fun moveCurrentTabToIndex(index: Int)
+
+  /**
+   * Closes all tabs except the current one.
+   *
+   * @throws IllegalStateException if there is no tab selected
+   */
+  abstract fun closeAllExceptCurrentTab()
 }
