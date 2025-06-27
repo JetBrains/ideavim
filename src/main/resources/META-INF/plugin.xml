@@ -143,6 +143,8 @@
 
     <editorNotificationProvider
         implementation="com.maddyhome.idea.vim.troubleshooting.AccidentalInstallDetectorEditorNotificationProvider"/>
+
+    <dependencySupport coordinate="configuration" kind="vim" displayName="IdeaVim"/>
   </extensions>
 
   <xi:include href="/META-INF/includes/ApplicationServices.xml" xpointer="xpointer(/idea-plugin/*)"/>
