@@ -174,4 +174,16 @@ class CaretReadImpl(
   override fun resetAllMarksForCaret() {
     injector.markService.resetAllMarksForCaret(vimCaret)
   }
+
+  override fun scrollFullPage(pages: Int): Boolean {
+    return injector.scroll.scrollFullPage(vimEditor, vimCaret, pages)
+  }
+
+  override fun scrollHalfPageUp(lines: Int): Boolean {
+    return injector.scroll.scrollHalfPage(vimEditor, vimCaret, lines, false)
+  }
+
+  override fun scrollHalfPageDown(lines: Int): Boolean {
+    return injector.scroll.scrollHalfPage(vimEditor, vimCaret, lines, true)
+  }
 }

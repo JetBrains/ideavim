@@ -66,4 +66,68 @@ interface Read {
    * This is used to determine which jump will be used when navigating with Ctrl-O and Ctrl-I.
    */
   val currentJumpIndex: Int
+
+  /**
+   * Scrolls the caret into view.
+   *
+   * This ensures that the caret is visible in the editor window.
+   */
+  fun scrollCaretIntoView()
+
+  /**
+   * Scrolls the editor by a specified number of lines.
+   *
+   * @param lines The number of lines to scroll. Positive values scroll down, negative values scroll up.
+   * @return True if the scroll was successful, false otherwise
+   */
+  fun scrollVertically(lines: Int): Boolean
+
+  /**
+   * Scrolls the current line to the top of the display.
+   *
+   * @param line The line number to scroll to (1-based). If 0, uses the current line.
+   * @param start Whether to position the caret at the start of the line
+   * @return True if the scroll was successful, false otherwise
+   */
+  fun scrollLineToTop(line: Int, start: Boolean): Boolean
+
+  /**
+   * Scrolls the current line to the middle of the display.
+   *
+   * @param line The line number to scroll to (1-based). If 0, uses the current line.
+   * @param start Whether to position the caret at the start of the line
+   * @return True if the scroll was successful, false otherwise
+   */
+  fun scrollLineToMiddle(line: Int, start: Boolean): Boolean
+
+  /**
+   * Scrolls the current line to the bottom of the display.
+   *
+   * @param line The line number to scroll to (1-based). If 0, uses the current line.
+   * @param start Whether to position the caret at the start of the line
+   * @return True if the scroll was successful, false otherwise
+   */
+  fun scrollLineToBottom(line: Int, start: Boolean): Boolean
+
+  /**
+   * Scrolls the editor horizontally by a specified number of columns.
+   *
+   * @param columns The number of columns to scroll. Positive values scroll right, negative values scroll left.
+   * @return True if the scroll was successful, false otherwise
+   */
+  fun scrollHorizontally(columns: Int): Boolean
+
+  /**
+   * Scrolls the editor to position the caret column at the left edge of the display.
+   *
+   * @return True if the scroll was successful, false otherwise
+   */
+  fun scrollCaretToLeftEdge(): Boolean
+
+  /**
+   * Scrolls the editor to position the caret column at the right edge of the display.
+   *
+   * @return True if the scroll was successful, false otherwise
+   */
+  fun scrollCaretToRightEdge(): Boolean
 }
