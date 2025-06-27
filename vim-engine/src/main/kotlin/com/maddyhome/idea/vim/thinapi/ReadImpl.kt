@@ -85,4 +85,36 @@ open class ReadImpl(
 
   override val currentJumpIndex: Int
     get() = injector.jumpService.getJumpSpot(vimEditor.projectId)
+
+  override fun scrollCaretIntoView() {
+    return injector.scroll.scrollCaretIntoView(vimEditor)
+  }
+
+  override fun scrollVertically(lines: Int): Boolean {
+    return injector.scroll.scrollLines(vimEditor, lines)
+  }
+
+  override fun scrollLineToTop(line: Int, start: Boolean): Boolean {
+    return injector.scroll.scrollCurrentLineToDisplayTop(vimEditor, line, start)
+  }
+
+  override fun scrollLineToMiddle(line: Int, start: Boolean): Boolean {
+    return injector.scroll.scrollCurrentLineToDisplayMiddle(vimEditor, line, start)
+  }
+
+  override fun scrollLineToBottom(line: Int, start: Boolean): Boolean {
+    return injector.scroll.scrollCurrentLineToDisplayBottom(vimEditor, line, start)
+  }
+
+  override fun scrollHorizontally(columns: Int): Boolean {
+    return injector.scroll.scrollColumns(vimEditor, columns)
+  }
+
+  override fun scrollCaretToLeftEdge(): Boolean {
+    return injector.scroll.scrollCaretColumnToDisplayLeftEdge(vimEditor)
+  }
+
+  override fun scrollCaretToRightEdge(): Boolean {
+    return injector.scroll.scrollCaretColumnToDisplayRightEdge(vimEditor)
+  }
 }

@@ -201,4 +201,28 @@ interface CaretRead {
    * Resets all marks for the current caret.
    */
   fun resetAllMarksForCaret()
+
+  /**
+   * Scrolls a full page up or down.
+   *
+   * @param pages The number of pages to scroll. Positive values scroll down, negative values scroll up.
+   * @return True if the scroll was successful, false otherwise
+   */
+  fun scrollFullPage(pages: Int): Boolean
+
+  /**
+   * Scrolls half a page up.
+   *
+   * @param lines The number of lines to scroll. If 0, uses half the window height.
+   * @return True if the scroll was successful, false otherwise
+   */
+  fun scrollHalfPageUp(lines: Int): Boolean
+
+  /**
+   * Scrolls half a page up.
+   *
+   * @param lines The number of lines to scroll. If 0, uses half the window height.
+   * @return True if the scroll was successful, false otherwise
+   */
+  fun scrollHalfPageDown(lines: Int): Boolean
 }
