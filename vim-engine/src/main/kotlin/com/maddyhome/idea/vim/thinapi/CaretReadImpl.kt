@@ -15,6 +15,7 @@ import com.intellij.vim.api.Path
 import com.intellij.vim.api.Range
 import com.intellij.vim.api.TextType
 import com.intellij.vim.api.scopes.caret.CaretRead
+import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -28,6 +29,9 @@ class CaretReadImpl(
 ) : CaretRead {
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!
+
+  private val vimContext: ExecutionContext
+    get() = injector.executionContextManager.getEditorExecutionContext(vimEditor)
 
   private val vimCaret: VimCaret
     get() = vimEditor.carets().first { it.id == caretId.id }
@@ -185,5 +189,13 @@ class CaretReadImpl(
 
   override fun scrollHalfPageDown(lines: Int): Boolean {
     return injector.scroll.scrollHalfPage(vimEditor, vimCaret, lines, true)
+  }
+
+  override fun selectWindowHorizontally(relativePosition: Int) {
+    injector.window.selectWindowInRow(vimCaret, vimContext, relativePosition, false)
+  }
+
+  override fun selectWindowInVertically(relativePosition: Int) {
+    injector.window.selectWindowInRow(vimCaret, vimContext, relativePosition, true)
   }
 }
