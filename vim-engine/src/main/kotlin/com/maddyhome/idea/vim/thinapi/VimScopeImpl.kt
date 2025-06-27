@@ -220,6 +220,15 @@ open class VimScopeImpl(
     injector.window.closeAll(vimContext)
   }
 
+  override fun execute(script: String): Boolean {
+    val result = injector.vimscriptExecutor.execute(
+      script, vimEditor, vimContext,
+      skipHistory = true,
+      indicateErrors = true
+    )
+    return result == com.maddyhome.idea.vim.vimscript.model.ExecutionResult.Success
+  }
+
   private fun <T : Any> parseOptionValue(vimDataType: VimDataType, type: KType): T? {
     return try {
       when (type.classifier) {

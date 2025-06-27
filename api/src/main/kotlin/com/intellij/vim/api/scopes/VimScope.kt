@@ -220,4 +220,13 @@ abstract class VimScope {
    * Closes all windows in the editor.
    */
   abstract fun closeAllWindows()
+
+  /**
+   * Parses and executes the given Vimscript string. It can be used to execute
+   * ex commands, such as `:set`, `:map`, etc.
+   *
+   * @param script The Vimscript string to execute
+   * @return The result of the execution, which can be Success or Error
+   */
+  abstract fun execute(script: String): Boolean
 }
