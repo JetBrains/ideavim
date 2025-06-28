@@ -13,6 +13,7 @@ import com.intellij.vim.api.Mode
 import com.intellij.vim.api.scopes.EditorScope
 import com.intellij.vim.api.scopes.ListenersScope
 import com.intellij.vim.api.scopes.MappingScope
+import com.intellij.vim.api.scopes.ModalInput
 import com.intellij.vim.api.scopes.OutputPanelScope
 import com.intellij.vim.api.scopes.VimScope
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -123,6 +124,11 @@ open class VimScopeImpl(
     val outputPanelScope = OutputPanelScopeImpl()
     outputPanelScope.block()
   }
+
+  override fun modalInput(label: String): ModalInput {
+    return ModalInputImpl(listenerOwner, mappingOwner)
+  }
+
 
   override fun <T> getOptionValueInternal(name: String, type: KType): T? {
     val option = optionGroup.getOption(name) ?: return null
