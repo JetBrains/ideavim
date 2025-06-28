@@ -33,6 +33,7 @@ abstract class VimScope {
   abstract fun editor(block: EditorScope.() -> Unit)
   abstract fun mappings(block: MappingScope.() -> Unit)
   abstract fun listeners(block: ListenersScope.() -> Unit)
+  abstract fun outputPanel(block: OutputPanelScope.() -> Unit)
 
   protected abstract fun <T> getOptionValueInternal(name: String, type: KType): T?
 

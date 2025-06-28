@@ -13,6 +13,7 @@ import com.intellij.vim.api.Mode
 import com.intellij.vim.api.scopes.EditorScope
 import com.intellij.vim.api.scopes.ListenersScope
 import com.intellij.vim.api.scopes.MappingScope
+import com.intellij.vim.api.scopes.OutputPanelScope
 import com.intellij.vim.api.scopes.VimScope
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
@@ -116,6 +117,11 @@ open class VimScopeImpl(
   override fun listeners(block: ListenersScope.() -> Unit) {
     val listenersScope = ListenerScopeImpl(listenerOwner, mappingOwner)
     listenersScope.block()
+  }
+
+  override fun outputPanel(block: OutputPanelScope.() -> Unit) {
+    val outputPanelScope = OutputPanelScopeImpl()
+    outputPanelScope.block()
   }
 
   override fun <T> getOptionValueInternal(name: String, type: KType): T? {
