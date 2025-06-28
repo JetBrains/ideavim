@@ -34,6 +34,7 @@ abstract class VimScope {
   abstract fun mappings(block: MappingScope.() -> Unit)
   abstract fun listeners(block: ListenersScope.() -> Unit)
   abstract fun outputPanel(block: OutputPanelScope.() -> Unit)
+  abstract fun modalInput(label: String): ModalInput
 
   protected abstract fun <T> getOptionValueInternal(name: String, type: KType): T?
 
