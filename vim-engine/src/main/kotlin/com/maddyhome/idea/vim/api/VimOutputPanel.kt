@@ -48,4 +48,7 @@ interface VimOutputPanel {
   fun scrollPage()
   fun scrollHalfPage()
   fun scrollLine()
+
+  fun setContent(text: String)
+  fun clearText()
 }
