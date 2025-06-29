@@ -9,6 +9,9 @@
 package com.intellij.vim.api.scopes
 
 import com.intellij.vim.api.Mode
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
@@ -30,7 +33,16 @@ abstract class VimScope {
   abstract fun setOperatorFunction(name: String)
   abstract fun normal(command: String)
 
-  abstract fun editor(block: EditorScope.() -> Unit)
+  @OptIn(ExperimentalContracts::class)
+  fun <T> editor(block: EditorScope.() -> T): T {
+    contract {
+      callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+    return this.editorScope().block()
+  }
+
+  protected abstract fun editorScope(): EditorScope
+
   abstract fun mappings(block: MappingScope.() -> Unit)
   abstract fun listeners(block: ListenersScope.() -> Unit)
   abstract fun outputPanel(block: OutputPanelScope.() -> Unit)
