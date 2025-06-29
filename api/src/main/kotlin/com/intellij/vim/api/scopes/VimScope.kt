@@ -231,4 +231,6 @@ abstract class VimScope {
    * @return The result of the execution, which can be Success or Error
    */
   abstract fun execute(script: String): Boolean
+
+  abstract fun command(command: String, block: VimScope.(String) -> Unit)
 }

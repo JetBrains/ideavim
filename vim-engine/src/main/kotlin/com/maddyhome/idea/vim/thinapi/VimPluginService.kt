@@ -9,9 +9,11 @@
 package com.maddyhome.idea.vim.thinapi
 
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.common.CommandAliasHandler
 import com.maddyhome.idea.vim.key.OperatorFunction
 
 interface VimPluginService {
   fun executeNormalWithoutMapping(command: String, editor: VimEditor)
   fun exportOperatorFunction(name: String, function: OperatorFunction)
+  fun addCommand(name: String, commandHandler: CommandAliasHandler)
 }
