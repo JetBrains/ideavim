@@ -23,6 +23,7 @@ interface Read {
 
   fun <T> forEachCaret(block: CaretRead.() -> T): List<T>
   fun with(caretId: CaretId, block: CaretRead.() -> Unit)
+  fun withPrimaryCaret(block: CaretRead.() -> Unit)
 
   fun getLineStartOffset(line: Int): Int
   fun getLineEndOffset(line: Int, allowEnd: Boolean): Int

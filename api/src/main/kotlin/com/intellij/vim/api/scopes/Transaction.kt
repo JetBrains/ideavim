@@ -12,12 +12,14 @@ import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.Color
 import com.intellij.vim.api.HighlightId
 import com.intellij.vim.api.Jump
+import com.intellij.vim.api.scopes.caret.CaretRead
 import com.intellij.vim.api.scopes.caret.CaretTransaction
 
 @VimPluginDsl
 interface Transaction {
   fun <T> forEachCaret(block: CaretTransaction.() -> T): List<T>
   fun with(caretId: CaretId, block: CaretTransaction.() -> Unit)
+  fun withPrimaryCaret(block: CaretTransaction.() -> Unit)
 
   fun addCaret(offset: Int): CaretId
   fun removeCaret(caretId: CaretId)

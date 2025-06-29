@@ -46,6 +46,10 @@ open class ReadImpl(
     CaretReadImpl(caretId).block()
   }
 
+  override fun withPrimaryCaret(block: CaretRead.() -> Unit) {
+    CaretReadImpl(vimEditor.primaryCaret().caretId).block()
+  }
+
   override fun getLineStartOffset(line: Int): Int {
     return vimEditor.getLineStartOffset(line)
   }

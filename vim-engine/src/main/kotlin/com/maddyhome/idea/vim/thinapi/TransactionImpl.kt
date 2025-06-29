@@ -13,6 +13,7 @@ import com.intellij.vim.api.Color
 import com.intellij.vim.api.HighlightId
 import com.intellij.vim.api.Jump
 import com.intellij.vim.api.scopes.Transaction
+import com.intellij.vim.api.scopes.caret.CaretRead
 import com.intellij.vim.api.scopes.caret.CaretTransaction
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -39,6 +40,10 @@ class TransactionImpl(
   ) {
     vimEditor.carets().find { it.id == caretId.id }
       ?.let { caret -> block(CaretTransactionImpl(listenerOwner, mappingOwner, caret.caretId)) } ?: return
+  }
+
+  override fun withPrimaryCaret(block: CaretTransaction.() -> Unit) {
+    block(CaretTransactionImpl(listenerOwner, mappingOwner, vimEditor.primaryCaret().caretId))
   }
 
   override fun addCaret(offset: Int): CaretId {
