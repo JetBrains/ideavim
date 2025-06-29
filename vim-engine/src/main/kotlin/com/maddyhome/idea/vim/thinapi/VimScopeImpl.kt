@@ -125,7 +125,7 @@ open class VimScopeImpl(
     outputPanelScope.block()
   }
 
-  override fun modalInput(label: String): ModalInput {
+  override fun modalInput(): ModalInput {
     return ModalInputImpl(listenerOwner, mappingOwner)
   }
 
