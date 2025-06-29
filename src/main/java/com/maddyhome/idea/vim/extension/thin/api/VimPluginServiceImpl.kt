@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.extension.thin.api
 
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.common.CommandAliasHandler
 import com.maddyhome.idea.vim.extension.VimExtensionFacade
 import com.maddyhome.idea.vim.extension.exportOperatorFunction
 import com.maddyhome.idea.vim.key.OperatorFunction
@@ -23,5 +24,9 @@ class VimPluginServiceImpl : VimPluginService {
 
   override fun exportOperatorFunction(name: String, function: OperatorFunction) {
     VimExtensionFacade.exportOperatorFunction(name, function)
+  }
+
+  override fun addCommand(name: String, commandHandler: CommandAliasHandler) {
+    VimExtensionFacade.addCommand(name, commandHandler)
   }
 }

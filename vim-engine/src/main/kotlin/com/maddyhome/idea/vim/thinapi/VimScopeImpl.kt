@@ -21,6 +21,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.common.CommandAliasHandler
 import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.OperatorFunction
@@ -239,6 +240,24 @@ open class VimScopeImpl(
       indicateErrors = true
     )
     return result == com.maddyhome.idea.vim.vimscript.model.ExecutionResult.Success
+  }
+
+  override fun command(
+    command: String,
+    block: VimScope.(String) -> Unit,
+  ) {
+    val commandHandler = object: CommandAliasHandler {
+      override fun execute(
+        command: String,
+        range: com.maddyhome.idea.vim.ex.ranges.Range,
+        editor: VimEditor,
+        context: ExecutionContext,
+      ) {
+        val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
+        vimScope.block(command)
+      }
+    }
+    injector.pluginService.addCommand(command, commandHandler)
   }
 
   private fun <T : Any> parseOptionValue(vimDataType: VimDataType, type: KType): T? {
