@@ -87,8 +87,8 @@ class ModalInputImpl(
       val vimContext = injector.executionContextManager.getEditorExecutionContext(vimEditor)
 
       val modalInput = this.modalInput
-      this.modalInput = injector.modalInput.create(vimEditor, vimContext, newLabel, this)
       modalInput.deactivate(refocusOwningEditor = false, resetCaret = false)
+      this.modalInput = injector.modalInput.create(vimEditor, vimContext, newLabel, this)
     }
 
     override fun executeInput(input: T, editor: VimEditor, context: ExecutionContext) {
