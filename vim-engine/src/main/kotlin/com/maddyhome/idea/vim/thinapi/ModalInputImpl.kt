@@ -32,6 +32,12 @@ class ModalInputImpl(
 
   private var repeatCondition: (() -> Boolean)? = null
   private var repeatCount: Int? = null
+  private var updateLabel: ((String) -> String)? = null
+
+  override fun updateLabel(block: (String) -> String): ModalInput {
+    updateLabel = block
+    return this
+  }
 
   override fun repeatUntil(condition: () -> Boolean): ModalInput {
     repeatCondition = condition
@@ -45,7 +51,7 @@ class ModalInputImpl(
 
   override fun inputString(label: String, handler: VimScope.(String) -> Unit) {
     val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
-    val interceptor = TextInputInterceptor(repeatCount, repeatCondition) {
+    val interceptor = TextInputInterceptor(repeatCount, repeatCondition, updateLabel) {
       vimScope.handler(it)
     }
     val modalInput = injector.modalInput.create(vimEditor, vimContext, label, interceptor)
@@ -54,7 +60,7 @@ class ModalInputImpl(
 
   override fun inputChar(label: String, handler: VimScope.(Char) -> Unit) {
     val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
-    val interceptor = CharInputInterceptor(repeatCount, repeatCondition) { char ->
+    val interceptor = CharInputInterceptor(repeatCount, repeatCondition, updateLabel) { char ->
       vimScope.handler(char)
     }
     val modalInput = injector.modalInput.create(vimEditor, vimContext, label, interceptor)
@@ -67,15 +73,55 @@ class ModalInputImpl(
     return true
   }
 
-  private class TextInputInterceptor(
-    private val repeatCount: Int? = null,
-    private val repeatCondition: (() -> Boolean)? = null,
-    private val handler: (String) -> Unit,
-  ) : VimInputInterceptorBase<String>() {
+  private abstract class InputInterceptorBase<T>(
+    protected val repeatCount: Int? = null,
+    protected val repeatCondition: (() -> Boolean)? = null,
+    protected var updateLabelFn: ((String) -> String)? = null,
+    protected val handler: (T) -> Unit
+  ): VimInputInterceptorBase<T>() {
     lateinit var modalInput: VimModalInput
-    private val textBuffer = StringBuilder()
+    var counter = 0
 
-    private var counter = 0
+    private fun updateLabel(newLabel: String) {
+      val vimEditor = injector.editorGroup.getFocusedEditor()!!
+      val vimContext = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+
+      val modalInput = this.modalInput
+      this.modalInput = injector.modalInput.create(vimEditor, vimContext, newLabel, this)
+      modalInput.deactivate(refocusOwningEditor = false, resetCaret = false)
+    }
+
+    override fun executeInput(input: T, editor: VimEditor, context: ExecutionContext) {
+      handler(input)
+      counter++
+
+      val hasRepeatCondition = repeatCount != null || repeatCondition != null
+      if (hasRepeatCondition && (counter == repeatCount || repeatCondition?.invoke() == true)) {
+        modalInput.deactivate(refocusOwningEditor = true, resetCaret = true)
+        return
+      }
+
+      if (!hasRepeatCondition) {
+        modalInput.deactivate(refocusOwningEditor = true, resetCaret = true)
+        return
+      }
+
+      val currentLabel = modalInput.label
+      val newLabel = updateLabelFn?.invoke(currentLabel) ?: currentLabel
+      if (currentLabel != newLabel) {
+        updateLabel(newLabel)
+      }
+    }
+  }
+
+  private class TextInputInterceptor(
+    repeatCount: Int? = null,
+    repeatCondition: (() -> Boolean)? = null,
+    updateLabelFn: ((String) -> String)? = null,
+    handler: (String) -> Unit,
+  ) : InputInterceptorBase<String>(repeatCount, repeatCondition, updateLabelFn, handler) {
+
+    private val textBuffer = StringBuilder()
 
     override fun buildInput(key: KeyStroke): String? {
       if (key.isCloseKeyStroke()) return ""
@@ -100,54 +146,26 @@ class ModalInputImpl(
 
       return null
     }
-
-    override fun executeInput(input: String, editor: VimEditor, context: ExecutionContext) {
-      handler(input)
-      counter++
-
-      val hasRepeatCondition = repeatCount != null || repeatCondition != null
-      if (hasRepeatCondition && (counter == repeatCount || repeatCondition?.invoke() == true)) {
-        modalInput.deactivate(refocusOwningEditor = true, resetCaret = true)
-      }
-
-      if (!hasRepeatCondition) {
-        modalInput.deactivate(refocusOwningEditor = true, resetCaret = true)
-      }
-    }
   }
 
   private class CharInputInterceptor(
-    private val repeatCount: Int? = null,
-    private val repeatCondition: (() -> Boolean)? = null,
-    private val handler: (Char) -> Unit
-  ) : VimInputInterceptorBase<Char>() {
-    lateinit var modalInput: VimModalInput
-
-    private var counter = 0
+    repeatCount: Int? = null,
+    repeatCondition: (() -> Boolean)? = null,
+    updateLabelFn: ((String) -> String)? = null,
+    handler: (Char) -> Unit,
+  ) : InputInterceptorBase<Char>(repeatCount, repeatCondition, updateLabelFn, handler) {
+    private var currentChar: Char? = null
 
     override fun buildInput(key: KeyStroke): Char? {
       if (key.isCloseKeyStroke()) return '\u0000'
 
       val keyChar = key.keyChar
       if (keyChar != KeyEvent.CHAR_UNDEFINED) {
+        currentChar = keyChar
         return keyChar
       }
 
       return null
-    }
-
-    override fun executeInput(input: Char, editor: VimEditor, context: ExecutionContext) {
-      handler(input)
-      counter++
-
-      val hasRepeatCondition = repeatCount != null || repeatCondition != null
-      if (hasRepeatCondition && (counter == repeatCount || repeatCondition?.invoke() == true)) {
-        modalInput.deactivate(refocusOwningEditor = true, resetCaret = true)
-      }
-
-      if (!hasRepeatCondition) {
-        modalInput.deactivate(refocusOwningEditor = true, resetCaret = true)
-      }
     }
   }
 }

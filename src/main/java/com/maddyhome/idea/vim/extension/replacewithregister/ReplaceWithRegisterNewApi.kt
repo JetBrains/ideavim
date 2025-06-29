@@ -33,10 +33,6 @@ class ReplaceWithRegisterNewApi : VimPluginBase() {
     }
 
     exportOperatorFunction(OPERATOR_FUNC_NAME) {
-
-      modalInput("Input: ").inputChar("Input: ") {
-
-      }
       operatorFunction()
     }
   }
