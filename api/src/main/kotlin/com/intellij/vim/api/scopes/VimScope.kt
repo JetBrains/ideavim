@@ -47,6 +47,7 @@ abstract class VimScope {
   abstract fun listeners(block: ListenersScope.() -> Unit)
   abstract fun outputPanel(block: OutputPanelScope.() -> Unit)
   abstract fun modalInput(): ModalInput
+  abstract fun commandLine(block: CommandLineScope.() -> Unit)
 
   protected abstract fun <T> getOptionValueInternal(name: String, type: KType): T?
 
