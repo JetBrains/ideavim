@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.thinapi
 
 
 import com.intellij.vim.api.Mode
+import com.intellij.vim.api.scopes.CommandLineScope
 import com.intellij.vim.api.scopes.EditorScope
 import com.intellij.vim.api.scopes.ListenersScope
 import com.intellij.vim.api.scopes.MappingScope
@@ -129,6 +130,10 @@ open class VimScopeImpl(
     return ModalInputImpl(listenerOwner, mappingOwner)
   }
 
+  override fun commandLine(block: CommandLineScope.() -> Unit) {
+    val commandLineScope = CommandLineScopeImpl(listenerOwner, mappingOwner)
+    commandLineScope.block()
+  }
 
   override fun <T> getOptionValueInternal(name: String, type: KType): T? {
     val option = optionGroup.getOption(name) ?: return null
