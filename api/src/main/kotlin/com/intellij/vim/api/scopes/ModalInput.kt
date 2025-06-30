@@ -18,7 +18,7 @@ package com.intellij.vim.api.scopes
 interface ModalInput {
   fun updateLabel(block: (String) -> String): ModalInput
 
-  fun repeatUntil(condition: () -> Boolean): ModalInput
+  fun repeatWhile(condition: () -> Boolean): ModalInput
 
   fun repeat(count: Int): ModalInput
 

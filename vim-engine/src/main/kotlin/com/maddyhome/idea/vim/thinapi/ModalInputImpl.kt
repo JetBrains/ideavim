@@ -30,7 +30,7 @@ class ModalInputImpl(
   private val vimContext: ExecutionContext
     get() = injector.executionContextManager.getEditorExecutionContext(vimEditor)
 
-  private var repeatCondition: (() -> Boolean)? = null
+  private var repeatWhileCondition: (() -> Boolean)? = null
   private var repeatCount: Int? = null
   private var updateLabel: ((String) -> String)? = null
 
@@ -39,8 +39,8 @@ class ModalInputImpl(
     return this
   }
 
-  override fun repeatUntil(condition: () -> Boolean): ModalInput {
-    repeatCondition = condition
+  override fun repeatWhile(condition: () -> Boolean): ModalInput {
+    repeatWhileCondition = condition
     return this
   }
 
@@ -51,7 +51,7 @@ class ModalInputImpl(
 
   override fun inputString(label: String, handler: VimScope.(String) -> Unit) {
     val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
-    val interceptor = TextInputInterceptor(repeatCount, repeatCondition, updateLabel) {
+    val interceptor = TextInputInterceptor(repeatCount, repeatWhileCondition, updateLabel) {
       vimScope.handler(it)
     }
     val modalInput = injector.modalInput.create(vimEditor, vimContext, label, interceptor)
@@ -60,7 +60,7 @@ class ModalInputImpl(
 
   override fun inputChar(label: String, handler: VimScope.(Char) -> Unit) {
     val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
-    val interceptor = CharInputInterceptor(repeatCount, repeatCondition, updateLabel) { char ->
+    val interceptor = CharInputInterceptor(repeatCount, repeatWhileCondition, updateLabel) { char ->
       vimScope.handler(char)
     }
     val modalInput = injector.modalInput.create(vimEditor, vimContext, label, interceptor)
@@ -96,7 +96,7 @@ class ModalInputImpl(
       counter++
 
       val hasRepeatCondition = repeatCount != null || repeatCondition != null
-      if (hasRepeatCondition && (counter == repeatCount || repeatCondition?.invoke() == true)) {
+      if (hasRepeatCondition && (counter == repeatCount || repeatCondition?.invoke() == false)) {
         modalInput.deactivate(refocusOwningEditor = true, resetCaret = true)
         return
       }
