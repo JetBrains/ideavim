@@ -100,7 +100,7 @@ open class VimScopeImpl(
     variableService.unlockVariable(variable, depth, vimEditor, vimContext, VimPluginContext)
   }
 
-  override fun isVariableLocked(name: String): Boolean {
+  override fun islocked(name: String): Boolean {
     val (variableName, scope) = parseVariableName(name)
     val variableService: VariableService = injector.variableService
     val variable = Variable(scope, variableName)
