@@ -326,6 +326,14 @@ open class VimScopeImpl(
     injector.vimStorageService.putDataToTab(vimEditor, storageKey, data)
   }
 
+  override fun saveFile() {
+    injector.file.saveFile(vimEditor, vimContext)
+  }
+
+  override fun closeFile() {
+    injector.file.closeFile(vimEditor, vimContext)
+  }
+
   private fun <T : Any> parseOptionValue(vimDataType: VimDataType, type: KType): T? {
     return try {
       when (type.classifier) {
