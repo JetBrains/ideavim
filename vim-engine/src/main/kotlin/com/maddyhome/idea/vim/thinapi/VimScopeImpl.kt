@@ -69,7 +69,7 @@ open class VimScopeImpl(
       return variableValue
 //      throw IllegalArgumentException("Variable with name $name does not exist")
     }
-    val value: T = parseVariableValue(variableValue, type)
+    val value: T = injector.variableService.convertToKotlinType(variableValue, type)
     return value
   }
 
@@ -106,10 +106,6 @@ open class VimScopeImpl(
     val variable = Variable(scope, variableName)
 
     return variableService.isVariableLocked(variable, vimEditor, vimContext, VimPluginContext)
-  }
-
-  private fun <T : Any> parseVariableValue(vimDataType: VimDataType, type: KType): T {
-    return injector.variableService.parseVariableValue(vimDataType, type)
   }
 
   private fun parseVariableName(name: String): Pair<String, Scope?> {

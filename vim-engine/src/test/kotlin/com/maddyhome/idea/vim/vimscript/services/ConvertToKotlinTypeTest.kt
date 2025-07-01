@@ -25,7 +25,7 @@ import kotlin.reflect.typeOf
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
-class ParseVariableValueTest {
+class ConvertToKotlinTypeTest {
 
   private lateinit var variableService: VariableService
 
@@ -50,7 +50,7 @@ class ParseVariableValueTest {
     val vimInt = VimInt(42)
     val type = typeOf<Int>()
 
-    val result: Int? = variableService.parseVariableValue(vimInt, type)
+    val result: Int? = variableService.convertToKotlinType(vimInt, type)
 
     assertEquals(42, result)
   }
@@ -60,7 +60,7 @@ class ParseVariableValueTest {
     val vimString = VimString("hello")
     val type = typeOf<String>()
 
-    val result: String? = variableService.parseVariableValue(vimString, type)
+    val result: String? = variableService.convertToKotlinType(vimString, type)
 
     assertEquals("hello", result)
   }
@@ -70,7 +70,7 @@ class ParseVariableValueTest {
     val vimFloat = VimFloat(3.14)
     val type = typeOf<Double>()
 
-    val result: Double? = variableService.parseVariableValue(vimFloat, type)
+    val result: Double? = variableService.convertToKotlinType(vimFloat, type)
 
     assertEquals(3.14, result)
   }
@@ -80,7 +80,7 @@ class ParseVariableValueTest {
     val vimList = VimList(mutableListOf(VimInt(1), VimInt(2), VimInt(3)))
     val type = typeOf<List<Int>>()
 
-    val result: List<Int>? = variableService.parseVariableValue(vimList, type)
+    val result: List<Int>? = variableService.convertToKotlinType(vimList, type)
 
     assertEquals(listOf(1, 2, 3), result)
   }
@@ -94,7 +94,7 @@ class ParseVariableValueTest {
     val vimDictionary = VimDictionary(map)
     val type = typeOf<Map<String, Int>>()
 
-    val result: Map<String, Int>? = variableService.parseVariableValue(vimDictionary, type)
+    val result: Map<String, Int>? = variableService.convertToKotlinType(vimDictionary, type)
 
     assertEquals(mapOf("one" to 1, "two" to 2), result)
   }
@@ -108,7 +108,7 @@ class ParseVariableValueTest {
     val vimList = VimList(mutableListOf(innerList1, innerList2))
     val type = typeOf<List<List<Int>>>()
 
-    val result: List<List<Int>>? = variableService.parseVariableValue(vimList, type)
+    val result: List<List<Int>>? = variableService.convertToKotlinType(vimList, type)
 
     assertEquals(listOf(listOf(1, 2), listOf(3, 4)), result)
   }
@@ -123,7 +123,7 @@ class ParseVariableValueTest {
 
     val type = typeOf<Map<String, List<Int>>>()
 
-    val result: Map<String, List<Int>>? = variableService.parseVariableValue(vimDictionary, type)
+    val result: Map<String, List<Int>>? = variableService.convertToKotlinType(vimDictionary, type)
 
     assertEquals(
       mapOf(
@@ -154,7 +154,7 @@ class ParseVariableValueTest {
     val vimDictionary = VimDictionary(map)
     val type = typeOf<Map<String, Map<String, Int>>>()
 
-    val result: Map<String, Map<String, Int>>? = variableService.parseVariableValue(vimDictionary, type)
+    val result: Map<String, Map<String, Int>>? = variableService.convertToKotlinType(vimDictionary, type)
 
     assertEquals(
       mapOf(
@@ -181,7 +181,7 @@ class ParseVariableValueTest {
     val vimDictionary = VimDictionary(map)
     val type = typeOf<Map<String, List<List<Int>>>>()
 
-    val result: Map<String, List<List<Int>>>? = variableService.parseVariableValue(vimDictionary, type)
+    val result: Map<String, List<List<Int>>>? = variableService.convertToKotlinType(vimDictionary, type)
 
     assertEquals(
       mapOf(
@@ -208,7 +208,7 @@ class ParseVariableValueTest {
     val vimList = VimList(mutableListOf(map1, map2))
     val type = typeOf<List<Map<String, Int>>>()
 
-    val result: List<Map<String, Int>>? = variableService.parseVariableValue(vimList, type)
+    val result: List<Map<String, Int>>? = variableService.convertToKotlinType(vimList, type)
 
     assertEquals(
       listOf(
@@ -224,7 +224,7 @@ class ParseVariableValueTest {
     val type = typeOf<Int>()
 
     val exception = assertFailsWith<IllegalArgumentException> {
-      variableService.parseVariableValue(vimString, type)
+      variableService.convertToKotlinType(vimString, type)
     }
 
     assertEquals("Expected Int, but got VimString", exception.message)
@@ -236,7 +236,7 @@ class ParseVariableValueTest {
     val type = typeOf<String>()
 
     val exception = assertFailsWith<IllegalArgumentException> {
-      variableService.parseVariableValue(vimInt, type)
+      variableService.convertToKotlinType(vimInt, type)
     }
 
     assertEquals("Expected String, but got VimInt", exception.message)
@@ -248,7 +248,7 @@ class ParseVariableValueTest {
     val type = typeOf<Double>()
 
     val exception = assertFailsWith<IllegalArgumentException> {
-      variableService.parseVariableValue(vimInt, type)
+      variableService.convertToKotlinType(vimInt, type)
     }
 
     assertEquals("Expected Double, but got VimInt", exception.message)
@@ -260,7 +260,7 @@ class ParseVariableValueTest {
     val type = typeOf<List<Int>>()
 
     val exception = assertFailsWith<IllegalArgumentException> {
-      variableService.parseVariableValue(vimDictionary, type)
+      variableService.convertToKotlinType(vimDictionary, type)
     }
 
     assertEquals("Expected List, but got VimDictionary", exception.message)
@@ -272,7 +272,7 @@ class ParseVariableValueTest {
     val type = typeOf<Map<String, Int>>()
 
     val exception = assertFailsWith<IllegalArgumentException> {
-      variableService.parseVariableValue(vimList, type)
+      variableService.convertToKotlinType(vimList, type)
     }
 
     assertEquals("Expected Map, but got VimList", exception.message)
@@ -284,7 +284,7 @@ class ParseVariableValueTest {
     val type = typeOf<Boolean>()
 
     val exception = assertFailsWith<IllegalArgumentException> {
-      variableService.parseVariableValue(vimInt, type)
+      variableService.convertToKotlinType(vimInt, type)
     }
 
     assertEquals("Unsupported type: Boolean", exception.message)
@@ -295,7 +295,7 @@ class ParseVariableValueTest {
     val vimList = VimList(mutableListOf())
     val type = typeOf<List<Int>>()
 
-    val result: List<Int>? = variableService.parseVariableValue(vimList, type)
+    val result: List<Int>? = variableService.convertToKotlinType(vimList, type)
 
     assertEquals(emptyList(), result)
   }
@@ -305,7 +305,7 @@ class ParseVariableValueTest {
     val vimDictionary = VimDictionary(linkedMapOf())
     val type = typeOf<Map<String, Int>>()
 
-    val result: Map<String, Int>? = variableService.parseVariableValue(vimDictionary, type)
+    val result: Map<String, Int>? = variableService.convertToKotlinType(vimDictionary, type)
 
     assertEquals(emptyMap(), result)
   }
@@ -315,7 +315,7 @@ class ParseVariableValueTest {
     val vimInt = VimInt(42)
     val type = typeOf<Int>()
 
-    val result: Int? = variableService.parseVariableValue(vimInt, type)
+    val result: Int? = variableService.convertToKotlinType(vimInt, type)
 
     assertEquals(42, result)
   }
@@ -325,7 +325,7 @@ class ParseVariableValueTest {
     val vimInt = VimInt(42)
     val type = typeOf<Int>()
 
-    val result: Int? = variableService.parseVariableValue(vimInt, type)
+    val result: Int? = variableService.convertToKotlinType(vimInt, type)
 
     assertEquals(42, result)
   }
@@ -336,7 +336,7 @@ class ParseVariableValueTest {
     val type = typeOf<Map<Int, Int>>()
 
     val exception = assertFailsWith<IllegalArgumentException> {
-      variableService.parseVariableValue(vimDictionary, type)
+      variableService.convertToKotlinType(vimDictionary, type)
     }
 
     assertEquals("Expected Map with String as key, but got VimDictionary", exception.message)
@@ -389,7 +389,7 @@ class ParseVariableValueTest {
     val type = typeOf<Map<String, Map<String, List<Map<String, Int>>>>>()
 
     val result: Map<String, Map<String, List<Map<String, Int>>>>? =
-      variableService.parseVariableValue(level1Map, type)
+      variableService.convertToKotlinType(level1Map, type)
 
     assertEquals(
       mapOf(
