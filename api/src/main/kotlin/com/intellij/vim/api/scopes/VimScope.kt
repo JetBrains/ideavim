@@ -305,4 +305,92 @@ abstract class VimScope {
   abstract fun execute(script: String): Boolean
 
   abstract fun command(command: String, block: VimScope.(String) -> Unit)
+
+  /**
+   * Gets keyed data from a Vim window.
+   *
+   * IdeaVim's editor is equivalent to Vim's window, which is an editor view on a buffer.
+   * Vim stores window scoped variables (`w:`) and local-to-window options per-window.
+   *
+   * @param key The key to retrieve data for
+   * @return The data associated with the key, or null if no data is found
+   */
+  abstract fun <T> getDataFromWindow(key: String): T?
+
+  /**
+   * Stores keyed user data in a Vim window.
+   *
+   * IdeaVim's editor is equivalent to Vim's window, which is an editor view on a buffer.
+   * Vim stores window scoped variables (`w:`) and local-to-window options per-window.
+   *
+   * @param key The key to store data for
+   * @param data The data to store
+   */
+  abstract fun <T> putDataToWindow(key: String, data: T)
+
+  /**
+   * Gets data from buffer.
+   * Vim stores there buffer scoped (`b:`) variables and local options.
+   *
+   * @param key The key to retrieve data for
+   * @return The data associated with the key, or null if no data is found
+   */
+  abstract fun <T> getDataFromBuffer(key: String): T?
+
+  /**
+   * Puts data to buffer.
+   * Vim stores there buffer scoped (`b:`) variables and local options.
+   *
+   * @param key The key to store data for
+   * @param data The data to store
+   */
+  abstract fun <T> putDataToBuffer(key: String, data: T)
+
+  /**
+   * Gets data from tab (group of windows).
+   * Vim stores there tab page scoped (`t:`) variables.
+   *
+   * @param key The key to retrieve data for
+   * @return The data associated with the key, or null if no data is found
+   */
+  abstract fun <T> getDataFromTab(key: String): T?
+
+  /**
+   * Puts data to tab (group of windows).
+   * Vim stores there tab page scoped (`t:`) variables.
+   *
+   * @param key The key to store data for
+   * @param data The data to store
+   */
+  abstract fun <T> putDataToTab(key: String, data: T)
+
+  /**
+   * Gets data from window or puts it if it doesn't exist.
+   *
+   * @param key The key to retrieve or store data for
+   * @param provider A function that provides the data if it doesn't exist
+   * @return The existing data or the newly created data
+   */
+  fun <T> getOrPutWindowData(key: String, provider: () -> T): T =
+    getDataFromWindow(key) ?: provider().also { putDataToWindow(key, it) }
+
+  /**
+   * Gets data from buffer or puts it if it doesn't exist.
+   *
+   * @param key The key to retrieve or store data for
+   * @param provider A function that provides the data if it doesn't exist
+   * @return The existing data or the newly created data
+   */
+  fun <T> getOrPutBufferData(key: String, provider: () -> T): T =
+    getDataFromBuffer(key) ?: provider().also { putDataToBuffer(key, it) }
+
+  /**
+   * Gets data from tab or puts it if it doesn't exist.
+   *
+   * @param key The key to retrieve or store data for
+   * @param provider A function that provides the data if it doesn't exist
+   * @return The existing data or the newly created data
+   */
+  fun <T> getOrPutTabData(key: String, provider: () -> T): T =
+    getDataFromTab(key) ?: provider().also { putDataToTab(key, it) }
 }
