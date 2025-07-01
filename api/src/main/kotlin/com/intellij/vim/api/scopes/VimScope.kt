@@ -86,7 +86,7 @@ abstract class VimScope {
    * @param name The name of the variable, optionally prefixed with a scope (g:, b:, etc.)
    * @return True if the variable is locked, false otherwise
    */
-  abstract fun isVariableLocked(name: String): Boolean
+  abstract fun islocked(name: String): Boolean
 
   abstract fun exportOperatorFunction(name: String, function: VimScope.() -> Boolean)
   abstract fun setOperatorFunction(name: String)
