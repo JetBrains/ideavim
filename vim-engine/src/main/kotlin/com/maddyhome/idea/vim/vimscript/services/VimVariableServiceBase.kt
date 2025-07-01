@@ -435,4 +435,60 @@ abstract class VimVariableServiceBase : VariableService {
   override fun storeVimVariable(name: String, value: VimDataType) {
     vimVariables[name] = value
   }
+
+  override fun convertToVimDataType(value: Any, type: KType): VimDataType {
+    val clazz: KClass<*> = type.classifier as KClass<*>
+    return when (clazz) {
+      Int::class -> VimInt(value as Int)
+      String::class -> VimString(value as String)
+      Boolean::class -> if (value as Boolean) VimInt.ONE else VimInt.ZERO
+      Double::class -> VimFloat(value as Double)
+
+      List::class -> {
+        val list = value as List<*>
+        val listArgumentType: KType = type.arguments.firstNotNullOf { it.type }
+        val vimValues = mutableListOf<VimDataType>()
+
+        for (item in list) {
+          if (item != null) {
+            vimValues.add(convertToVimDataType(item, listArgumentType))
+          } else {
+            throw IllegalArgumentException("List cannot contain null values")
+          }
+        }
+
+        VimList(vimValues)
+      }
+
+      Map::class -> {
+        val map = value as Map<*, *>
+        val mapArgumentTypes: List<KType> = type.arguments.mapNotNull { it.type }
+
+        // the first argument has to be string
+        val keyArgumentType: KType = mapArgumentTypes[0]
+        if (keyArgumentType != String::class.createType()) {
+          throw IllegalArgumentException("Map must have String keys for conversion to VimDictionary")
+        }
+
+        val valueArgumentType: KType = mapArgumentTypes[1]
+        val dictionary = LinkedHashMap<VimString, VimDataType>()
+
+        for ((key, mapValue) in map) {
+          if (key != null && mapValue != null) {
+            val vimKey = VimString(key as String)
+            val vimValue = convertToVimDataType(mapValue, valueArgumentType)
+            dictionary[vimKey] = vimValue
+          } else {
+            throw IllegalArgumentException("Map cannot contain null keys or values")
+          }
+        }
+
+        VimDictionary(dictionary)
+      }
+
+      else -> {
+        value as? VimDataType ?: throw IllegalArgumentException("Unsupported type: ${clazz.simpleName}")
+      }
+    }
+  }
 }
