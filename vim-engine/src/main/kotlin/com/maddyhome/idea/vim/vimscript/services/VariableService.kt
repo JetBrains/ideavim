@@ -149,7 +149,25 @@ interface VariableService {
 
   fun getGlobalVariables(): Map<String, VimDataType>
 
+  /**
+   * Converts a VimDataType to a Kotlin type.
+   *
+   * @param vimDataType The VimDataType to convert
+   * @param type The target Kotlin type
+   * @return The converted value
+   * @throws IllegalArgumentException if the conversion is not possible
+   */
   fun <T : Any> parseVariableValue(vimDataType: VimDataType, type: KType): T
+
+  /**
+   * Converts a Kotlin value to a VimDataType.
+   *
+   * @param value The Kotlin value to convert
+   * @param type The Kotlin type information
+   * @return The converted VimDataType
+   * @throws IllegalArgumentException if the conversion is not possible
+   */
+  fun convertToVimDataType(value: Any, type: KType): VimDataType
 
   /**
    * Clears all global variables.

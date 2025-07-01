@@ -29,6 +29,65 @@ abstract class VimScope {
     return getVariable(name, kType)
   }
 
+  /**
+   * Internal method to set a variable value.
+   * 
+   * @param name The name of the variable
+   * @param value The value to set
+   * @param type The Kotlin type of the value
+   */
+  protected abstract fun setVariableInternal(name: String, value: Any, type: KType)
+
+  @PublishedApi
+  internal fun setVariable(name: String, value: Any, type: KType) = setVariableInternal(name, value, type)
+
+  /**
+   * Sets a variable with the specified name and value.
+   *
+   * In Vim, this is equivalent to `let varname = value`.
+   * Example: `let g:myvar = 42` or `let b:myvar = "text"`
+   *
+   * @param name The name of the variable, optionally prefixed with a scope (g:, b:, etc.)
+   * @param value The value to set
+   */
+  inline fun <reified T : Any> setVariable(name: String, value: T) {
+    val kType: KType = typeOf<T>()
+    setVariable(name, value, kType)
+  }
+
+  /**
+   * Locks a variable to prevent changes.
+   *
+   * In Vim, this is equivalent to `:lockvar varname`.
+   * Example: `:lockvar g:myvar`
+   *
+   * @param name The name of the variable, optionally prefixed with a scope (g:, b:, etc.)
+   * @param depth The lock depth (default is 1)
+   */
+  abstract fun lockvar(name: String, depth: Int = 1)
+
+  /**
+   * Unlocks a variable to allow changes.
+   *
+   * In Vim, this is equivalent to `:unlockvar varname`.
+   * Example: `:unlockvar g:myvar`
+   *
+   * @param name The name of the variable, optionally prefixed with a scope (g:, b:, etc.)
+   * @param depth The lock depth (default is 1)
+   */
+  abstract fun unlockvar(name: String, depth: Int = 1)
+
+  /**
+   * Checks if a variable is locked.
+   *
+   * In Vim, this is similar to checking the `islocked()` function.
+   * Example: `if islocked("g:myvar")`
+   *
+   * @param name The name of the variable, optionally prefixed with a scope (g:, b:, etc.)
+   * @return True if the variable is locked, false otherwise
+   */
+  abstract fun isVariableLocked(name: String): Boolean
+
   abstract fun exportOperatorFunction(name: String, function: VimScope.() -> Boolean)
   abstract fun setOperatorFunction(name: String)
   abstract fun normal(command: String)
