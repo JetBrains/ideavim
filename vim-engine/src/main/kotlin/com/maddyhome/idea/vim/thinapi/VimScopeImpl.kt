@@ -36,6 +36,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 import kotlin.reflect.KType
+import com.maddyhome.idea.vim.api.Key
 
 open class VimScopeImpl(
   private val listenerOwner: ListenerOwner,
@@ -293,6 +294,36 @@ open class VimScopeImpl(
       }
     }
     injector.pluginService.addCommand(command, commandHandler)
+  }
+
+  override fun <T> getDataFromWindow(key: String): T? {
+    val storageKey = Key<T>(key)
+    return injector.vimStorageService.getDataFromWindow(vimEditor, storageKey)
+  }
+
+  override fun <T> putDataToWindow(key: String, data: T) {
+    val storageKey = Key<T>(key)
+    injector.vimStorageService.putDataToWindow(vimEditor, storageKey, data)
+  }
+
+  override fun <T> getDataFromBuffer(key: String): T? {
+    val storageKey = Key<T>(key)
+    return injector.vimStorageService.getDataFromBuffer(vimEditor, storageKey)
+  }
+
+  override fun <T> putDataToBuffer(key: String, data: T) {
+    val storageKey = Key<T>(key)
+    injector.vimStorageService.putDataToBuffer(vimEditor, storageKey, data)
+  }
+
+  override fun <T> getDataFromTab(key: String): T? {
+    val storageKey = Key<T>(key)
+    return injector.vimStorageService.getDataFromTab(vimEditor, storageKey)
+  }
+
+  override fun <T> putDataToTab(key: String, data: T) {
+    val storageKey = Key<T>(key)
+    injector.vimStorageService.putDataToTab(vimEditor, storageKey, data)
   }
 
   private fun <T : Any> parseOptionValue(vimDataType: VimDataType, type: KType): T? {
