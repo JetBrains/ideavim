@@ -393,4 +393,18 @@ abstract class VimScope {
    */
   fun <T> getOrPutTabData(key: String, provider: () -> T): T =
     getDataFromTab(key) ?: provider().also { putDataToTab(key, it) }
+
+  /**
+   * Saves the current file.
+   *
+   * In Vim, this is equivalent to the `:w` command.
+   */
+  abstract fun saveFile()
+
+  /**
+   * Closes the current file.
+   *
+   * In Vim, this is equivalent to the `:q` command.
+   */
+  abstract fun closeFile()
 }
