@@ -348,7 +348,7 @@ abstract class VimVariableServiceBase : VariableService {
     throw exExceptionMessage("variable.scope.vim.not.implemented")
   }
 
-  override fun <T : Any> parseVariableValue(
+  override fun <T : Any> convertToKotlinType(
     vimDataType: VimDataType,
     type: KType,
   ): T {
@@ -386,7 +386,7 @@ abstract class VimVariableServiceBase : VariableService {
           val values = vimDataType.values
           val listArgumentType: KType = type.arguments.firstNotNullOf { it.type }
           for (value in values) {
-            list.add(parseVariableValue(value, listArgumentType))
+            list.add(convertToKotlinType(value, listArgumentType))
           }
           list.toList()
         } else {
@@ -409,8 +409,8 @@ abstract class VimVariableServiceBase : VariableService {
 
           val map: MutableMap<String, Any> = mutableMapOf()
           for ((key, value) in values) {
-            val keyValue: String = parseVariableValue(key, keyArgumentType)
-            val valueValue: Any = parseVariableValue(value, valueArgumentType)
+            val keyValue: String = convertToKotlinType(key, keyArgumentType)
+            val valueValue: Any = convertToKotlinType(value, valueArgumentType)
 
             map[keyValue] = valueValue
           }

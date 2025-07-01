@@ -157,7 +157,7 @@ interface VariableService {
    * @return The converted value
    * @throws IllegalArgumentException if the conversion is not possible
    */
-  fun <T : Any> parseVariableValue(vimDataType: VimDataType, type: KType): T
+  fun <T : Any> convertToKotlinType(vimDataType: VimDataType, type: KType): T
 
   /**
    * Converts a Kotlin value to a VimDataType.
