@@ -17,7 +17,7 @@ abstract class OptionScope() {
   protected abstract fun <T> setOptionInternal(name: String, value: T, type: KType, scope: String): Boolean
 
   @PublishedApi
-  internal fun <T : Any> getOptionValue(name: String, type: KType): T? = getOptionValueInternal(name, type)
+  internal fun <T : Any> get(name: String, type: KType): T? = getOptionValueInternal(name, type)
 
   @PublishedApi
   internal fun <T> setGlobal(name: String, value: T, type: KType): Boolean =
@@ -40,9 +40,9 @@ abstract class OptionScope() {
    * @param name The name of the option
    * @return The value of the option, or null if the option doesn't exist or isn't of the specified type
    */
-  inline fun <reified T> getOptionValue(name: String): T? {
+  inline fun <reified T> get(name: String): T? {
     val kType: KType = typeOf<T>()
-    return getOptionValue(name, kType)
+    return get(name, kType)
   }
 
   /**
@@ -99,5 +99,5 @@ abstract class OptionScope() {
    * @param name The name of the option
    * @return True if the option was reset successfully, false otherwise
    */
-  abstract fun resetOptionToDefault(name: String): Boolean
+  abstract fun reset(name: String): Boolean
 }
