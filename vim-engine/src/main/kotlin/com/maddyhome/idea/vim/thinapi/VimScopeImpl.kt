@@ -15,28 +15,25 @@ import com.intellij.vim.api.scopes.EditorScope
 import com.intellij.vim.api.scopes.ListenersScope
 import com.intellij.vim.api.scopes.MappingScope
 import com.intellij.vim.api.scopes.ModalInput
+import com.intellij.vim.api.scopes.OptionScope
 import com.intellij.vim.api.scopes.OutputPanelScope
 import com.intellij.vim.api.scopes.VimScope
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.Key
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.CommandAliasHandler
 import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.OperatorFunction
-import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.vimscript.model.VimPluginContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 import kotlin.reflect.KType
-import com.maddyhome.idea.vim.api.Key
 
 open class VimScopeImpl(
   private val listenerOwner: ListenerOwner,
@@ -55,9 +52,6 @@ open class VimScopeImpl(
 
   private val vimContext: ExecutionContext
     get() = injector.executionContextManager.getEditorExecutionContext(vimEditor)
-
-  private val optionGroup: VimOptionGroup
-    get() = injector.optionGroup
 
   override fun <T : Any> getVariableInternal(name: String, type: KType): T? {
     val (name, scope) = parseVariableName(name)
@@ -167,45 +161,9 @@ open class VimScopeImpl(
     commandLineScope.block()
   }
 
-  override fun <T> getOptionValueInternal(name: String, type: KType): T? {
-    val option = optionGroup.getOption(name) ?: return null
-
-    val optionValue = optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(vimEditor))
-    return parseOptionValue(optionValue, type)
-  }
-
-  override fun <T> setOptionInternal(name: String, value: T, type: KType, scope: String): Boolean {
-    val option = optionGroup.getOption(name) ?: return false
-
-    val optionValue = when (type.classifier) {
-      Int::class -> {
-        VimInt(value as Int)
-      }
-
-      String::class -> {
-        VimString(value as String)
-      }
-
-      Boolean::class -> {
-        if (value as Boolean) VimInt.ONE else VimInt.ZERO
-      }
-
-      else -> return false
-    }
-    val optionAccessScope = when (scope) {
-      "global" -> OptionAccessScope.GLOBAL(vimEditor)
-      "local" -> OptionAccessScope.LOCAL(vimEditor)
-      "effective" -> OptionAccessScope.EFFECTIVE(vimEditor)
-      else -> OptionAccessScope.EFFECTIVE(vimEditor)
-    }
-    optionGroup.setOptionValue(option, optionAccessScope, optionValue)
-    return true
-  }
-
-  override fun resetOptionToDefault(name: String): Boolean {
-    val option = optionGroup.getOption(name) ?: return false
-    optionGroup.resetToDefaultValue(option, OptionAccessScope.EFFECTIVE(vimEditor))
-    return true
+  override fun option(block: OptionScope.() -> Unit) {
+    val optionScope = OptionScopeImpl()
+    optionScope.block()
   }
 
   override val tabCount: Int
@@ -332,23 +290,5 @@ open class VimScopeImpl(
 
   override fun closeFile() {
     injector.file.closeFile(vimEditor, vimContext)
-  }
-
-  private fun <T : Any> parseOptionValue(vimDataType: VimDataType, type: KType): T? {
-    return try {
-      when (type.classifier) {
-        Boolean::class -> vimDataType.asBoolean() as T
-        Int::class -> vimDataType.toVimNumber().value as T
-        String::class -> vimDataType.asString() as T
-        List::class -> {
-          if (vimDataType !is VimString) return null
-          vimDataType.asString().split(",") as T
-        }
-
-        else -> null
-      }
-    } catch (e: Exception) {
-      null
-    }
   }
 }
