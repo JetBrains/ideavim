@@ -59,7 +59,7 @@ class OptionScopeImpl: OptionScope() {
     return true
   }
 
-  override fun resetOptionToDefault(name: String): Boolean {
+  override fun reset(name: String): Boolean {
     val option = optionGroup.getOption(name) ?: return false
     optionGroup.resetToDefaultValue(option, OptionAccessScope.EFFECTIVE(vimEditor))
     return true
