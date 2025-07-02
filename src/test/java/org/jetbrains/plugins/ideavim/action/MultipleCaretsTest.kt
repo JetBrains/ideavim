@@ -1144,6 +1144,12 @@ $c  tw${c}o
       "O${c}NcE thIs ${c}TEXt wIlL n${c}Ot lOoK s${c}O rIdIcuLoUs\n",
     )
     assertState("O${c}nce this text will n${c}ot look s${c}o ridiculous\n")
+
+    typeTextInFile(
+      injector.parser.parseKeys("v2wgu"),
+      "O${c}NcE thIs ${c}TEXt wIlL n${c}Ot lOoK s${c}O rIdIcuLoUs\n",
+    )
+    assertState("O${c}nce this text will n${c}ot look s${c}o ridiculous\n")
   }
 
   @Test
@@ -1177,6 +1183,12 @@ $c  tw${c}o
   fun testChangeCaseUpperVisualAction() {
     typeTextInFile(
       injector.parser.parseKeys("v2wU"),
+      "O${c}NcE thIs ${c}TEXt wIlL N${c}Ot lOoK S${c}O rIdIcuLoUs\n",
+    )
+    assertState("O${c}NCE THIS TEXT WILL N${c}OT LOOK S${c}O RIDICULOUS\n")
+
+    typeTextInFile(
+      injector.parser.parseKeys("v2wgU"),
       "O${c}NcE thIs ${c}TEXt wIlL N${c}Ot lOoK S${c}O rIdIcuLoUs\n",
     )
     assertState("O${c}NCE THIS TEXT WILL N${c}OT LOOK S${c}O RIDICULOUS\n")

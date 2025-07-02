@@ -21,8 +21,12 @@ import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 
 /**
  * @author vlan
+ *
+ * Note: This implementation assumes that the 'gu' command in visual mode is equivalent to 'u'.
+ * While 'v_gu' is not explicitly documented in Vim help, we treat these commands as identical
+ * based on observed behavior, without examining Vim's source code.
  */
-@CommandOrMotion(keys = ["u"], modes = [Mode.VISUAL])
+@CommandOrMotion(keys = ["u", "gu"], modes = [Mode.VISUAL])
 class ChangeCaseLowerVisualAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 
