@@ -39,14 +39,13 @@ abstract class VimSearchHelperBase : VimSearchHelper {
 
   override fun findSection(
     editor: VimEditor,
-    caret: ImmutableVimCaret,
+    line: Int,
     type: Char,
     direction: Int,
     count: Int,
-  )
-    : Int {
+  ): Int {
     val documentText: CharSequence = editor.text()
-    var currentLine: Int = caret.getBufferPosition().line + direction
+    var currentLine: Int = line + direction
     var resultOffset = -1
     var remainingTargets = count
 
@@ -69,14 +68,25 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     return resultOffset
   }
 
-  override fun findNextCharacterOnLine(editor: VimEditor, caret: ImmutableVimCaret, count: Int, ch: Char): Int {
-    val line: Int = caret.getBufferPosition().line
+  override fun findSection(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    type: Char,
+    direction: Int,
+    count: Int,
+  ): Int {
+    val line = caret.getBufferPosition().line
+    return findSection(editor, line, type, direction, count)
+  }
+
+  override fun findNextCharacterOnLine(editor: VimEditor, offset: Int, count: Int, ch: Char): Int {
+    val line = editor.offsetToBufferPosition(offset).line
     val start = editor.getLineStartOffset(line)
     val end = editor.getLineEndOffset(line, true)
     val chars: CharSequence = editor.text()
     var found = 0
     val step = if (count >= 0) 1 else -1
-    var pos: Int = caret.offset + step
+    var pos: Int = offset + step
     while (pos in start until end && pos < chars.length) {
       if (chars[pos] == ch) {
         found++
@@ -94,11 +104,17 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     }
   }
 
-  override fun findWordNearestCursor(editor: VimEditor, caret: ImmutableVimCaret): TextRange? {
-    val chars = editor.text()
-    val stop = editor.getLineEndOffset(caret.getBufferPosition().line, true)
+  override fun findNextCharacterOnLine(editor: VimEditor, caret: ImmutableVimCaret, count: Int, ch: Char): Int {
+    val offset = caret.offset
+    return findNextCharacterOnLine(editor, offset, count, ch)
+  }
 
-    val pos = caret.offset
+  override fun findWordNearestCursor(editor: VimEditor, offset: Int): TextRange? {
+    val chars = editor.text()
+    val line = editor.offsetToBufferPosition(offset).line
+    val stop = editor.getLineEndOffset(line, true)
+
+    val pos = offset
 
     if (chars.isEmpty() || chars.length <= pos) return null
 
@@ -142,6 +158,11 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     }
 
     return TextRange(start, end)
+  }
+
+  override fun findWordNearestCursor(editor: VimEditor, caret: ImmutableVimCaret): TextRange? {
+    val offset = caret.offset
+    return findWordNearestCursor(editor, offset)
   }
 
   override fun findNextWord(
@@ -664,14 +685,14 @@ abstract class VimSearchHelperBase : VimSearchHelper {
 
   override fun findBlockQuoteInLineRange(
     editor: VimEditor,
-    caret: ImmutableVimCaret,
+    offset: Int,
     quote: Char,
     isOuter: Boolean,
   ): TextRange? {
     var leftQuote: Int
     var rightQuote: Int
 
-    val caretOffset = caret.offset
+    val caretOffset = offset
     val quoteAfterCaret: Int = editor.text().indexOfNext(quote, caretOffset, true) ?: return null
     val quoteBeforeCaret: Int? = editor.text().indexOfPrevious(quote, caretOffset, true)
     val quotesBeforeCaret: Int = editor.text().occurrencesBeforeOffset(quote, caretOffset, true)
@@ -688,6 +709,16 @@ abstract class VimSearchHelperBase : VimSearchHelper {
       rightQuote--
     }
     return TextRange(leftQuote, rightQuote + 1)
+  }
+
+  override fun findBlockQuoteInLineRange(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    quote: Char,
+    isOuter: Boolean,
+  ): TextRange? {
+    val offset = caret.offset
+    return findBlockQuoteInLineRange(editor, offset, quote, isOuter)
   }
 
   /**
@@ -788,7 +819,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
   @Contract(pure = true)
   override fun findNextSentenceStart(
     editor: VimEditor,
-    caret: ImmutableVimCaret,
+    offset: Int,
     count: Int,
     countCurrent: Boolean,
     requireAll: Boolean,
@@ -798,11 +829,57 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     count = Math.abs(count)
     val total = count
     val chars: CharSequence = editor.text()
-    val start: Int = caret.offset
+    val start: Int = offset
     val max: Int = editor.fileSize().toInt()
     var res: Int? = start
     while (count > 0 && res != null && res >= 0 && res <= max - 1) {
       res = findSentenceStart(editor, chars, res, max, dir, countCurrent)
+      if (res == 0 || res == max - 1) {
+        count--
+        break
+      }
+      count--
+    }
+    if (res == null && (!requireAll || total == 1)) {
+      res = if (dir == Direction.FORWARDS) max - 1 else 0
+    } else if (count > 0 && total > 1 && !requireAll) {
+      res = if (dir == Direction.FORWARDS) max - 1 else 0
+    } else if (count > 0 && total > 1 && requireAll) {
+      res = null
+    }
+    return res
+  }
+
+  @Contract(pure = true)
+  override fun findNextSentenceStart(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    count: Int,
+    countCurrent: Boolean,
+    requireAll: Boolean,
+  ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int? {
+    val offset = caret.offset
+    return findNextSentenceStart(editor, offset, count, countCurrent, requireAll)
+  }
+
+  @Contract(pure = true)
+  override fun findNextSentenceEnd(
+    editor: VimEditor,
+    offset: Int,
+    count: Int,
+    countCurrent: Boolean,
+    requireAll: Boolean,
+  ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int? {
+    var count = count
+    val dir = if (count > 0) Direction.FORWARDS else Direction.BACKWARDS
+    count = Math.abs(count)
+    val total = count
+    val chars: CharSequence = editor.text()
+    val start: Int = offset
+    val max: Int = editor.fileSize().toInt()
+    var res: Int? = start
+    while (count > 0 && res != null && res >= 0 && res <= max - 1) {
+      res = findSentenceEnd(editor, chars, res, max, dir, countCurrent && count == total)
       if (res == 0 || res == max - 1) {
         count--
         break
@@ -827,30 +904,8 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     countCurrent: Boolean,
     requireAll: Boolean,
   ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int? {
-    var count = count
-    val dir = if (count > 0) Direction.FORWARDS else Direction.BACKWARDS
-    count = Math.abs(count)
-    val total = count
-    val chars: CharSequence = editor.text()
-    val start: Int = caret.offset
-    val max: Int = editor.fileSize().toInt()
-    var res: Int? = start
-    while (count > 0 && res != null && res >= 0 && res <= max - 1) {
-      res = findSentenceEnd(editor, chars, res, max, dir, countCurrent && count == total)
-      if (res == 0 || res == max - 1) {
-        count--
-        break
-      }
-      count--
-    }
-    if (res == null && (!requireAll || total == 1)) {
-      res = if (dir == Direction.FORWARDS) max - 1 else 0
-    } else if (count > 0 && total > 1 && !requireAll) {
-      res = if (dir == Direction.FORWARDS) max - 1 else 0
-    } else if (count > 0 && total > 1 && requireAll) {
-      res = null
-    }
-    return res
+    val offset = caret.offset
+    return findNextSentenceEnd(editor, offset, count, countCurrent, requireAll)
   }
 
   @Contract(pure = true)
@@ -1217,17 +1272,26 @@ abstract class VimSearchHelperBase : VimSearchHelper {
   }
 
   @Contract(pure = true)
-  override fun findNextParagraph(editor: VimEditor, caret: ImmutableVimCaret, count: Int, allowBlanks: Boolean): @Range(
+  override fun findNextParagraph(editor: VimEditor, startLine: Int, count: Int, allowBlanks: Boolean): @Range(
     from = 0,
     to = Int.MAX_VALUE.toLong()
   ) Int? {
-    val line: Int = findNextParagraphLine(editor, caret.getBufferPosition().line, count, allowBlanks) ?: return null
+    val line: Int = findNextParagraphLine(editor, startLine, count, allowBlanks) ?: return null
     val lineCount: Int = editor.nativeLineCount()
     return if (line == lineCount - 1) {
       if (count > 0) editor.fileSize().toInt() - 1 else 0
     } else {
       editor.getLineStartOffset(line)
     }
+  }
+
+  @Contract(pure = true)
+  override fun findNextParagraph(editor: VimEditor, caret: ImmutableVimCaret, count: Int, allowBlanks: Boolean): @Range(
+    from = 0,
+    to = Int.MAX_VALUE.toLong()
+  ) Int? {
+    val startLine = caret.getBufferPosition().line
+    return findNextParagraph(editor, startLine, count, allowBlanks)
   }
 
   /**
@@ -1254,12 +1318,10 @@ abstract class VimSearchHelperBase : VimSearchHelper {
   @Contract(pure = true)
   override fun findParagraphRange(
     editor: VimEditor,
-    caret: ImmutableVimCaret,
+    line: Int,
     count: Int,
     isOuter: Boolean,
   ): TextRange? {
-    val line: Int = caret.getBufferPosition().line
-
     if (logger.isDebug()) {
       logger.debug("Starting paragraph range search on line $line")
     }
@@ -1278,6 +1340,17 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     val start: Int = editor.getLineStartOffset(startLine)
     val end: Int = editor.getLineStartOffset(endLine)
     return TextRange(start, end + 1)
+  }
+
+  @Contract(pure = true)
+  override fun findParagraphRange(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    count: Int,
+    isOuter: Boolean,
+  ): TextRange? {
+    val line = caret.getBufferPosition().line
+    return findParagraphRange(editor, line, count, isOuter)
   }
 
   @Contract(pure = true)

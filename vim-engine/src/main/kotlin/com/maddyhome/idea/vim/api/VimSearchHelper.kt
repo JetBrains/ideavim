@@ -28,6 +28,21 @@ interface VimSearchHelper {
     allowBlanks: Boolean,
   ): Int?
 
+  /**
+   * Find next paragraph bound offset
+   * @param editor target editor
+   * @param startLine line to start the search from
+   * @param count search for the count-th occurrence
+   * @param allowBlanks true if we consider lines with whitespaces as empty
+   * @return next paragraph off
+   */
+  fun findNextParagraph(
+    editor: VimEditor,
+    startLine: Int,
+    count: Int,
+    allowBlanks: Boolean,
+  ): Int?
+
   fun findNextSentenceStart(
     editor: VimEditor,
     caret: ImmutableVimCaret,
@@ -36,9 +51,25 @@ interface VimSearchHelper {
     requireAll: Boolean,
   ): Int?
 
+  fun findNextSentenceStart(
+    editor: VimEditor,
+    offset: Int,
+    count: Int,
+    countCurrent: Boolean,
+    requireAll: Boolean,
+  ): Int?
+
   fun findSection(
     editor: VimEditor,
     caret: ImmutableVimCaret,
+    type: Char,
+    direction: Int,
+    count: Int,
+  ): Int
+
+  fun findSection(
+    editor: VimEditor,
+    line: Int,
     type: Char,
     direction: Int,
     count: Int,
@@ -79,6 +110,14 @@ interface VimSearchHelper {
   fun findNextSentenceEnd(
     editor: VimEditor,
     caret: ImmutableVimCaret,
+    count: Int,
+    countCurrent: Boolean,
+    requireAll: Boolean,
+  ): Int?
+
+  fun findNextSentenceEnd(
+    editor: VimEditor,
+    offset: Int,
     count: Int,
     countCurrent: Boolean,
     requireAll: Boolean,
@@ -195,6 +234,13 @@ interface VimSearchHelper {
     ch: Char,
   ): Int
 
+  fun findNextCharacterOnLine(
+    editor: VimEditor,
+    offset: Int,
+    count: Int,
+    ch: Char,
+  ): Int
+
   /**
    * Find the word at or nearest to the current caret offset
    *
@@ -208,6 +254,8 @@ interface VimSearchHelper {
    * * or null, if none of the above are found
    */
   fun findWordNearestCursor(editor: VimEditor, caret: ImmutableVimCaret): TextRange?
+
+  fun findWordNearestCursor(editor: VimEditor, offset: Int): TextRange?
 
   /**
    * Find the range of the word text object at the location of the caret
@@ -242,6 +290,13 @@ interface VimSearchHelper {
     isOuter: Boolean,
   ): TextRange?
 
+  fun findParagraphRange(
+    editor: VimEditor,
+    line: Int,
+    count: Int,
+    isOuter: Boolean,
+  ): TextRange?
+
   fun findBlockTagRange(
     editor: VimEditor,
     caret: ImmutableVimCaret,
@@ -252,6 +307,13 @@ interface VimSearchHelper {
   fun findBlockQuoteInLineRange(
     editor: VimEditor,
     caret: ImmutableVimCaret,
+    quote: Char,
+    isOuter: Boolean,
+  ): TextRange?
+
+  fun findBlockQuoteInLineRange(
+    editor: VimEditor,
+    offset: Int,
     quote: Char,
     isOuter: Boolean,
   ): TextRange?
