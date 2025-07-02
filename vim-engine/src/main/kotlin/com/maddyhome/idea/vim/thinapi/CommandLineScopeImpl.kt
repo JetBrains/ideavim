@@ -51,18 +51,6 @@ class CommandLineScopeImpl(
     activeCommandLine?.caret?.offset = position
   }
 
-  override fun createCommandPrompt(initialText: String): Boolean {
-    if (activeCommandLine != null) return false
-    injector.commandLine.createCommandPrompt(vimEditor, vimContext, 0, initialText)
-    return true
-  }
-
-  override fun createSearchPrompt(label: String, initialText: String): Boolean {
-    if (activeCommandLine != null) return false
-    injector.commandLine.createSearchPrompt(vimEditor, vimContext, label, initialText)
-    return true
-  }
-
   override fun input(prompt: String, finishOn: Char?, callback: VimScope.(String) -> Unit) {
     val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
     injector.commandLine.readInputAndProcess(vimEditor, vimContext, prompt, finishOn) {
