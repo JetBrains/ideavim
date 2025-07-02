@@ -1660,6 +1660,11 @@
         "modes": "N"
     },
     {
+        "keys": "gU",
+        "class": "com.maddyhome.idea.vim.action.change.change.ChangeCaseUpperVisualAction",
+        "modes": "X"
+    },
+    {
         "keys": "g^",
         "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionFirstScreenNonSpaceAction",
         "modes": "NXO"
@@ -1768,6 +1773,11 @@
         "keys": "gu",
         "class": "com.maddyhome.idea.vim.action.change.change.ChangeCaseLowerMotionAction",
         "modes": "N"
+    },
+    {
+        "keys": "gu",
+        "class": "com.maddyhome.idea.vim.action.change.change.ChangeCaseLowerVisualAction",
+        "modes": "X"
     },
     {
         "keys": "gv",
