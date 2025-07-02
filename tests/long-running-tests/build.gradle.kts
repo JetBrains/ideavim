@@ -25,7 +25,7 @@ dependencies {
   compileOnly("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
   testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
   testImplementation(testFixtures(project(":"))) // The root project
-  testImplementation("org.junit.vintage:junit-vintage-engine:5.13.1")
+  testImplementation("org.junit.vintage:junit-vintage-engine:5.13.2")
 
   intellijPlatform {
     // Snapshots don't use installers
