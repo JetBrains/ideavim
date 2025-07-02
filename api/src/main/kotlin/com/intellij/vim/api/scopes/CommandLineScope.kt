@@ -56,23 +56,6 @@ interface CommandLineScope {
   fun setCaretPosition(position: Int)
 
   /**
-   * Creates a command prompt with the specified initial text.
-   *
-   * @param initialText The initial text to display in the command line.
-   * @return True if the command prompt was created successfully, false otherwise.
-   */
-  fun createCommandPrompt(initialText: String = ""): Boolean
-
-  /**
-   * Creates a search prompt with the specified label and initial text.
-   *
-   * @param label The label to display at the beginning of the command line (e.g., '/', '?').
-   * @param initialText The initial text to display in the command line.
-   * @return True if the search prompt was created successfully, false otherwise.
-   */
-  fun createSearchPrompt(label: String, initialText: String = ""): Boolean
-
-  /**
    * Reads input from the command line and processes it with the provided function.
    *
    * @param prompt The prompt to display at the beginning of the command line.
