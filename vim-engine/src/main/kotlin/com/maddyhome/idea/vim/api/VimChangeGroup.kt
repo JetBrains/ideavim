@@ -198,7 +198,7 @@ interface VimChangeGroup {
     caret: VimCaret,
     context: ExecutionContext?,
     type: ChangeCaseType,
-    argument: Argument,
+    argument: Argument.Motion,
     operatorArguments: OperatorArguments,
   ): Boolean
 

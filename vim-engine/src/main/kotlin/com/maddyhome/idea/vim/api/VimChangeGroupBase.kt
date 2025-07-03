@@ -1857,16 +1857,11 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     caret: VimCaret,
     context: ExecutionContext?,
     type: VimChangeGroup.ChangeCaseType,
-    argument: Argument,
+    argument: Argument.Motion,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    if (argument !is Argument.Motion) {
-      throw RuntimeException("changeCaseMotion requires a Motion argument, but got $argument")
-    }
-
     var range = injector.motion.getMotionRange(
-      editor, caret, context!!, argument,
-      operatorArguments
+      editor, caret, context!!, argument, operatorArguments
     )
     if (range == null) return false
 
