@@ -16,9 +16,9 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
-@CommandOrMotion(keys = ["ZZ"], modes = [Mode.NORMAL])
-class FileSaveCloseAction : VimActionHandler.SingleExecution() {
-  override val type: Command.Type = Command.Type.OTHER_WRITABLE
+@CommandOrMotion(keys = ["ZQ"], modes = [Mode.NORMAL])
+class FileCloseAction : VimActionHandler.SingleExecution() {
+  override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
   override fun execute(
     editor: VimEditor,
@@ -26,7 +26,6 @@ class FileSaveCloseAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    injector.file.saveFile(editor, context)
     injector.file.closeFile(editor, context)
     return true
   }

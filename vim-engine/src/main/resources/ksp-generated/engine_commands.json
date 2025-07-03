@@ -1211,7 +1211,7 @@
     },
     {
         "keys": "ZQ",
-        "class": "com.maddyhome.idea.vim.action.file.FileSaveCloseAction",
+        "class": "com.maddyhome.idea.vim.action.file.FileCloseAction",
         "modes": "N"
     },
     {
