@@ -53,15 +53,11 @@ sealed class Argument {
 
     fun getMotionType() = if (isLinewiseMotion()) SelectionType.LINE_WISE else SelectionType.CHARACTER_WISE
 
-    fun isLinewiseMotion(): Boolean {
-      return motion.let {
-        when (it) {
-          is TextObjectActionHandler -> it.visualType == TextObjectVisualType.LINE_WISE
-          is MotionActionHandler -> it.motionType == MotionType.LINE_WISE
-          is ExternalActionHandler -> it.isLinewiseMotion
-          else -> error("Command is not a motion: $motion")
-        }
-      }
+    fun isLinewiseMotion(): Boolean = when (motion) {
+      is TextObjectActionHandler -> motion.visualType == TextObjectVisualType.LINE_WISE
+      is MotionActionHandler -> motion.motionType == MotionType.LINE_WISE
+      is ExternalActionHandler -> motion.isLinewiseMotion
+      else -> error("Command is not a motion: $motion")
     }
 
     fun withArgument(argument: Argument) = Motion(motion, argument)
