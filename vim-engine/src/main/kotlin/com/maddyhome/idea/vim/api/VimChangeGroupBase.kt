@@ -1860,11 +1860,24 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     argument: Argument,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    val range = injector.motion.getMotionRange(
+    if (argument !is Argument.Motion) {
+      throw RuntimeException("changeCaseMotion requires a Motion argument, but got $argument")
+    }
+
+    var range = injector.motion.getMotionRange(
       editor, caret, context!!, argument,
       operatorArguments
     )
-    return range != null && changeCaseRange(editor, caret, range, type)
+    if (range == null) return false
+
+    // If the motion is linewise, we need to adjust range.startOffset to match the observed Vim behavior
+    if (argument.isLinewiseMotion()) {
+      val pos = editor.offsetToBufferPosition(range.startOffset)
+      // The leftmost non-whitespace character OR the current caret position, whichever is closer to the left
+      val start = editor.getLeadingCharacterOffset(pos.line).coerceAtMost(caret.offset)
+      range = TextRange(start, range.endOffset)
+    }
+    return changeCaseRange(editor, caret, range, type)
   }
 
   /**

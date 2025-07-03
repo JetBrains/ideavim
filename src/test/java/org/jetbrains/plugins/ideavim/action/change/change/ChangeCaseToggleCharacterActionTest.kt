@@ -320,4 +320,61 @@ class ChangeCaseToggleCharacterActionTest : VimTestCase() {
       enterCommand("set nooldundo")
     }
   }
+
+  @Test
+  fun `test toggle case line caret position`() {
+    configureByText("  Hello ${c}World")
+    typeText("g~~")
+    assertState("  ${c}hELLO wORLD")
+    typeText("u")
+    assertState("  Hello ${c}World")
+
+    typeText("^g~~")
+    assertState("  ${c}hELLO wORLD")
+    typeText("u")
+    assertState("  ${c}Hello World")
+
+    typeText("hg~~")
+    assertState(" $c hELLO wORLD")
+    typeText("u")
+    assertState(" $c Hello World")
+  }
+
+  @Test
+  fun `test uppercase line caret position`() {
+    configureByText("  Hello ${c}World")
+    typeText("gUU")
+    assertState("  ${c}HELLO WORLD")
+    typeText("u")
+    assertState("  Hello ${c}World")
+
+    typeText("^gUU")
+    assertState("  ${c}HELLO WORLD")
+    typeText("u")
+    assertState("  ${c}Hello World")
+
+    typeText("hgUU")
+    assertState(" $c HELLO WORLD")
+    typeText("u")
+    assertState(" $c Hello World")
+  }
+
+  @Test
+  fun `test lowercase line caret position`() {
+    configureByText("  Hello ${c}World")
+    typeText("guu")
+    assertState("  ${c}hello world")
+    typeText("u")
+    assertState("  Hello ${c}World")
+
+    typeText("^guu")
+    assertState("  ${c}hello world")
+    typeText("u")
+    assertState("  ${c}Hello World")
+
+    typeText("hguu")
+    assertState(" $c hello world")
+    typeText("u")
+    assertState(" $c Hello World")
+  }
 }
