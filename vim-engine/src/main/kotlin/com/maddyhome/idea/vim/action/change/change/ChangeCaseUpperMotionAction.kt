@@ -18,10 +18,13 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.DuplicableOperatorAction
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
 @CommandOrMotion(keys = ["gU"], modes = [Mode.NORMAL])
 class ChangeCaseUpperMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
+  private val logger = vimLogger<ChangeCaseUpperMotionAction>()
+
   override val type: Command.Type = Command.Type.CHANGE
 
   override val argumentType: Argument.Type = Argument.Type.MOTION
@@ -35,15 +38,18 @@ class ChangeCaseUpperMotionAction : ChangeEditorActionHandler.ForEachCaret(), Du
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    return argument != null &&
-      injector.changeGroup
-        .changeCaseMotion(
-          editor,
-          caret,
-          context,
-          VimChangeGroup.ChangeCaseType.UPPER,
-          argument,
-          operatorArguments,
-        )
+    if (argument == null || argument !is Argument.Motion) {
+      logger.error("Argument is null or not Argument.Motion. argument=$argument")
+      return false
+    }
+
+    return injector.changeGroup.changeCaseMotion(
+        editor,
+        caret,
+        context,
+        VimChangeGroup.ChangeCaseType.UPPER,
+        argument,
+        operatorArguments,
+      )
   }
 }
