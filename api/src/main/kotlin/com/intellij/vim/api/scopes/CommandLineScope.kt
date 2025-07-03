@@ -8,6 +8,12 @@
 
 package com.intellij.vim.api.scopes
 
+import com.intellij.vim.api.scopes.commandline.CommandLineRead
+import com.intellij.vim.api.scopes.commandline.CommandLineTransaction
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
+
 /**
  * Interface for interacting with the Vim command line.
  * 
@@ -15,45 +21,7 @@ package com.intellij.vim.api.scopes
  * This scope provides methods to create, manipulate, and interact with the command line.
  */
 @VimPluginDsl
-interface CommandLineScope {
-  /**
-   * The text currently displayed in the command line.
-   */
-  val text: String
-  
-  /**
-   * The current position of the caret in the command line.
-   */
-  val caretPosition: Int
-
-  /**
-   * True if the command line is currently active, false otherwise.
-   */
-  val isActive: Boolean
-
-  /**
-   * Sets the text content of the command line.
-   *
-   * This replaces any existing text in the command line with the provided text.
-   *
-   * @param text The new text to display in the command line.
-   */
-  fun setText(text: String)
-
-  /**
-   * Inserts text at the specified position in the command line.
-   *
-   * @param offset The position at which to insert the text.
-   * @param text The text to insert.
-   */
-  fun insertText(offset: Int, text: String)
-
-  /**
-   * Sets the caret position in the command line.
-   *
-   * @param position The new position for the caret.
-   */
-  fun setCaretPosition(position: Int)
+abstract class CommandLineScope {
 
   /**
    * Reads input from the command line and processes it with the provided function.
@@ -62,13 +30,24 @@ interface CommandLineScope {
    * @param finishOn The character that, when entered, will finish the input process. If null, only Enter will finish.
    * @param callback A function that will be called with the entered text when input is complete.
    */
-  fun input(prompt: String, finishOn: Char? = null, callback: VimScope.(String) -> Unit)
+  abstract fun input(prompt: String, finishOn: Char? = null, callback: VimScope.(String) -> Unit)
 
-  /**
-   * Closes the command line.
-   *
-   * @param refocusEditor Whether to refocus the editor after closing the command line.
-   * @return True if the command line was closed, false if it was not active.
-   */
-  fun close(refocusEditor: Boolean = true): Boolean
+  @OptIn(ExperimentalContracts::class)
+  fun <T> read(block: CommandLineRead.() -> T): T {
+    contract {
+      callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+    return this.ideRead(block)
+  }
+
+  @OptIn(ExperimentalContracts::class)
+  fun change(block: CommandLineTransaction.() -> Unit) {
+    contract {
+      callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+    return ideChange(block)
+  }
+
+  protected abstract fun <T> ideRead(block: CommandLineRead.() -> T): T
+  protected abstract fun ideChange(block: CommandLineTransaction.() -> Unit)
 }
