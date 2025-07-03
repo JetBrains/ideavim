@@ -396,12 +396,11 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     // If we are a linewise motion we need to normalize the start and stop then move the start to the beginning
     // of the line and move the end to the end of the line.
     if (argument.isLinewiseMotion()) {
-      if (caret.getBufferPosition().line != editor.lineCount() - 1) {
-        start = editor.getLineStartForOffset(start)
-        end = min((editor.getLineEndForOffset(end) + 1).toLong(), editor.fileSize()).toInt()
+      start = editor.getLineStartForOffset(start)
+      end = if (caret.getBufferPosition().line != editor.lineCount() - 1) {
+        min((editor.getLineEndForOffset(end) + 1).toLong(), editor.fileSize()).toInt()
       } else {
-        start = editor.getLineStartForOffset(start)
-        end = editor.getLineEndForOffset(end)
+        editor.getLineEndForOffset(end)
       }
     }
 
