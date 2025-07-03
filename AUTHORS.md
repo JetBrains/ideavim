@@ -614,6 +614,10 @@ Contributors:
   [![icon][github]](https://github.com/Malandril)
   &nbsp;
   Thomas Canava
+* [![icon][mail]](mailto:xinhe.wang@jetbrains.com)
+  [![icon][github]](https://github.com/wxh06)
+  &nbsp;
+  Xinhe Wang
 
 Previous contributors:
 
