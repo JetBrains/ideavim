@@ -15,6 +15,7 @@ import com.intellij.vim.api.scopes.EditorScope
 import com.intellij.vim.api.scopes.ListenersScope
 import com.intellij.vim.api.scopes.MappingScope
 import com.intellij.vim.api.scopes.ModalInput
+import com.intellij.vim.api.scopes.DigraphScope
 import com.intellij.vim.api.scopes.OptionScope
 import com.intellij.vim.api.scopes.OutputPanelScope
 import com.intellij.vim.api.scopes.VimScope
@@ -168,6 +169,11 @@ open class VimScopeImpl(
   override fun option(block: OptionScope.() -> Unit) {
     val optionScope = OptionScopeImpl()
     optionScope.block()
+  }
+
+  override fun digraph(block: DigraphScope.() -> Unit) {
+    val digraphScope = DigraphScopeImpl()
+    digraphScope.block()
   }
 
   override val tabCount: Int
