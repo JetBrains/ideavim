@@ -18,4 +18,5 @@ interface VimDigraphGroup {
   fun displayAsciiInfo(editor: VimEditor)
   fun parseCommandLine(editor: VimEditor, args: String): Boolean
   fun showDigraphs(editor: VimEditor, showHeaders: Boolean)
+  fun clearCustomDigraphs()
 }

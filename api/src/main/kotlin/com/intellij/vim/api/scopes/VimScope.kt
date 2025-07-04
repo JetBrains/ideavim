@@ -108,6 +108,7 @@ abstract class VimScope {
   abstract fun modalInput(): ModalInput
   abstract fun commandLine(block: CommandLineScope.() -> Unit)
   abstract fun option(block: OptionScope.() -> Unit)
+  abstract fun digraph(block: DigraphScope.() -> Unit)
 
   /**
    * Gets the number of tabs in the current window.
