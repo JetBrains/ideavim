@@ -319,4 +319,57 @@ abstract class VimScope {
    * In Vim, this is equivalent to the `:q` command.
    */
   abstract fun closeFile()
+
+  /**
+   * Finds the start offset of the next camelCase or snake_case word.
+   *
+   * @param chars The character sequence to search in (e.g., document text)
+   * @param startIndex The index to start searching from (inclusive). Must be within the bounds of chars: [0, chars.length)
+   * @param count Find the [count]-th occurrence. Must be greater than 1.
+   * @return The offset of the next camelCase or snake_case word start, or null if not found
+   */
+  abstract fun getNextCamelStartOffset(chars: CharSequence, startIndex: Int, count: Int = 1): Int?
+
+  /**
+   * Finds the start offset of the previous camelCase or snake_case word.
+   *
+   * @param chars The character sequence to search in (e.g., document text)
+   * @param endIndex The index to start searching backward from (exclusive). Must be within the bounds of chars: [0, chars.length]
+   * @param count Find the [count]-th occurrence. Must be greater than 1.
+   * @return The offset of the previous camelCase or snake_case word start, or null if not found
+   */
+  abstract fun getPreviousCamelStartOffset(chars: CharSequence, endIndex: Int, count: Int = 1): Int?
+
+  /**
+   * Finds the end offset of the next camelCase or snake_case word.
+   *
+   * @param chars The character sequence to search in (e.g., document text)
+   * @param startIndex The index to start searching from (inclusive). Must be within the bounds of chars: [0, chars.length)
+   * @param count Find the [count]-th occurrence. Must be greater than 1.
+   * @return The offset of the next camelCase or snake_case word end, or null if not found
+   */
+  abstract fun getNextCamelEndOffset(chars: CharSequence, startIndex: Int, count: Int = 1): Int?
+
+  /**
+   * Finds the end offset of the previous camelCase or snake_case word.
+   *
+   * @param chars The character sequence to search in (e.g., document text)
+   * @param endIndex The index to start searching backward from (exclusive). Must be within the bounds of chars: [0, chars.length]
+   * @param count Find the [count]-th occurrence. Must be greater than 1.
+   * @return The offset of the previous camelCase or snake_case word end, or null if not found
+   */
+  abstract fun getPreviousCamelEndOffset(chars: CharSequence, endIndex: Int, count: Int = 1): Int?
+
+  /**
+   * Find the next word in some text outside the editor (e.g., command line), from the given starting point
+   *
+   * Note that this function can return an out-of-bounds index when there is no next word!
+   *
+   * @param text The text to search in.
+   * @param startOffset The offset in the document to search from.
+   * @param count Search for the [count]-th occurrence. If negative, search backwards.
+   * @param isBigWord Use WORD instead of word boundaries.
+   * @return The offset of the [count]-th next word, or `0` or the offset of the end of a file if not found.
+   */
+  abstract fun getNextWordStartOffset(text: CharSequence, startOffset: Int, count: Int = 1, isBigWord: Boolean = false): Int
 }

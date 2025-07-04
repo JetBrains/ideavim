@@ -13,12 +13,15 @@ import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.Jump
 import com.intellij.vim.api.Line
 import com.intellij.vim.api.Mark
+import com.intellij.vim.api.Range
 import com.intellij.vim.api.scopes.Read
 import com.intellij.vim.api.scopes.caret.CaretRead
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ListenerOwner
+import com.maddyhome.idea.vim.helper.SearchOptions
+import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.key.MappingOwner
 
 open class ReadImpl(
@@ -121,4 +124,73 @@ open class ReadImpl(
   override fun scrollCaretToRightEdge(): Boolean {
     return injector.scroll.scrollCaretColumnToDisplayRightEdge(vimEditor)
   }
+
+  override fun getNextParagraphBoundOffset(startLine: Int, count: Int, includeWhitespaceLines: Boolean): Int? {
+    return injector.searchHelper.findNextParagraph(vimEditor, startLine, count, includeWhitespaceLines)
+  }
+
+  override fun getNextSentenceStart(startOffset: Int, count: Int, includeCurrent: Boolean, requireAll: Boolean): Int? {
+    return injector.searchHelper.findNextSentenceStart(vimEditor, startOffset, count, includeCurrent, requireAll)
+  }
+
+  override fun getNextSectionStart(startLine: Int, marker: Char, count: Int): Int {
+    return injector.searchHelper.findSection(vimEditor, startLine, marker, 1, count)
+  }
+
+  override fun getPreviousSectionStart(startLine: Int, marker: Char, count: Int): Int {
+    return injector.searchHelper.findSection(vimEditor, startLine, marker, -1, count)
+  }
+
+  override fun getNextSentenceEnd(startOffset: Int, count: Int, includeCurrent: Boolean, requireAll: Boolean): Int? {
+    return injector.searchHelper.findNextSentenceEnd(vimEditor, startOffset, count, includeCurrent, requireAll)
+  }
+
+  override fun getNextWordStartOffset(startOffset: Int, count: Int, isBigWord: Boolean): Int {
+    return injector.searchHelper.findNextWord(vimEditor, startOffset, count, isBigWord)
+  }
+
+  override fun getNextWordEndOffset(startOffset: Int, count: Int, isBigWord: Boolean, stopOnEmptyLine: Boolean): Int {
+    return injector.searchHelper.findNextWordEnd(vimEditor, startOffset, count, isBigWord, stopOnEmptyLine)
+  }
+
+  override fun getNextCharOnLineOffset(startOffset: Int, count: Int, char: Char): Int {
+    return injector.searchHelper.findNextCharacterOnLine(vimEditor, startOffset, count, char)
+  }
+
+  override fun getNearestWordOffset(startOffset: Int): Range? {
+    val textRange = injector.searchHelper.findWordNearestCursor(vimEditor, startOffset)
+    return textRange?.toRange()
+  }
+
+  override fun getParagraphRange(line: Int, count: Int, isOuter: Boolean): Range? {
+    val textRange = injector.searchHelper.findParagraphRange(vimEditor, line, count, isOuter)
+    return textRange?.toRange()
+  }
+
+  override fun getBlockQuoteInLineRange(startOffset: Int, quote: Char, isOuter: Boolean): Range? {
+    val textRange = injector.searchHelper.findBlockQuoteInLineRange(vimEditor, startOffset, quote, isOuter)
+    return textRange?.toRange()
+  }
+
+  override fun findAll(
+    pattern: String,
+    startLine: Int,
+    endLine: Int,
+    ignoreCase: Boolean,
+  ): List<Range> {
+    val textRanges = injector.searchHelper.findAll(vimEditor, pattern, startLine, endLine, ignoreCase)
+    return textRanges.map { it.toRange() }
+  }
+
+  override fun findPattern(
+    pattern: String,
+    startOffset: Int,
+    count: Int,
+    backwards: Boolean,
+  ): Range? {
+    val vimSearchOptions = if (backwards) enumSetOf(SearchOptions.BACKWARDS) else enumSetOf()
+    val textRange = injector.searchHelper.findPattern(vimEditor, pattern, startOffset, count, vimSearchOptions)
+    return textRange?.toRange()
+  }
+
 }

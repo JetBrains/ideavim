@@ -17,11 +17,6 @@ enum class TextType {
   BLOCK_WISE,
 }
 
-class TextInfo(
-  val text: String,
-  val type: TextType = TextType.CHARACTER_WISE
-)
-
 sealed interface Range {
   data class Simple(val start: Int, val end: Int): Range
 

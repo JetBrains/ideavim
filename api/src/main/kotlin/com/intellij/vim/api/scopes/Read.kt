@@ -13,6 +13,7 @@ import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.Jump
 import com.intellij.vim.api.Line
 import com.intellij.vim.api.Mark
+import com.intellij.vim.api.Range
 import com.intellij.vim.api.scopes.caret.CaretRead
 
 @VimPluginDsl
@@ -131,4 +132,147 @@ interface Read {
    * @return True if the scroll was successful, false otherwise
    */
   fun scrollCaretToRightEdge(): Boolean
+
+  /**
+   * Find the next paragraph-bound offset in the editor.
+   *
+   * @param startLine Line to start the search from.
+   * @param count Search for the [count]-th occurrence.
+   * @param includeWhitespaceLines Should be `true` if we consider lines with whitespaces as empty.
+   * @return next paragraph off
+   */
+  fun getNextParagraphBoundOffset(startLine: Int, count: Int = 1, includeWhitespaceLines: Boolean = true): Int?
+
+  /**
+   * Finds the next sentence start in the editor from the given offset, based on the specified parameters.
+   *
+   * @param count Search for the [count]-th occurrence.
+   * @param includeCurrent If `true`, includes the current sentence if at its boundary.
+   * @param requireAll If `true`, returns `null` if fewer than [count] sentences are found.
+   * @return The offset of the next sentence start, or `null` if not found or constraints cannot be met.
+   */
+  fun getNextSentenceStart(startOffset: Int, count: Int = 1, includeCurrent: Boolean, requireAll: Boolean = true): Int?
+
+  /**
+   * Find the next section in the editor.
+   *
+   * @param startLine The line to start searching from.
+   * @param marker The type of section to find.
+   * @param count Search for the [count]-th occurrence.
+   * @return The offset of the next section.
+   */
+  fun getNextSectionStart(startLine: Int, marker: Char, count: Int = 1): Int
+
+  /**
+   * Find the start of the previous section in the editor.
+   *
+   * @param startLine The line to start searching from.
+   * @param marker The type of section to find.
+   * @param count Search for the [count]-th occurrence.
+   * @return The offset of the next section.
+   */
+  fun getPreviousSectionStart(startLine: Int, marker: Char, count: Int = 1): Int
+
+  /**
+   * Find the next sentence end from the given offset.
+   *
+   * @param startOffset The offset to start searching from
+   * @param count Search for the [count]-th occurrence.
+   * @param includeCurrent Whether to count the current position as a sentence end
+   * @param requireAll Whether to require all sentence ends to be found
+   * @return The offset of the next sentence end, or null if not found
+   */
+  fun getNextSentenceEnd(startOffset: Int, count: Int = 1, includeCurrent: Boolean, requireAll: Boolean = true): Int?
+
+  /**
+   * Find the next word in the editor's document, from the given starting point
+   *
+   * Note that this function can return an out-of-bounds index when there is no next word!
+   *
+   * @param startOffset The offset in the document to search from
+   * @param count Search for the [count]-th occurrence. If negative, search backwards.
+   * @param isBigWord Use WORD instead of word boundaries.
+   * @return The offset of the [count]-th next word, or `0` or the offset of the end of a file if not found.
+   */
+  fun getNextWordStartOffset(startOffset: Int, count: Int = 1, isBigWord: Boolean): Int
+
+  /**
+   * Find the end offset of the next word in the editor's document, from the given starting point
+   *
+   * @param startOffset The offset in the document to search from
+   * @param count Return an offset to the [count] word from the starting position. Will search backwards if negative
+   * @param isBigWord Use WORD instead of word boundaries
+   * @param stopOnEmptyLine Vim considers an empty line to be a word/WORD, but `e` and `E` don't respect this for vi
+   *                        compatibility reasons. Callers other than `e` and `E` should pass `true`
+   * @return The offset of the [count] next word/WORD. Will return document bounds if not found
+   */
+  fun getNextWordEndOffset(startOffset: Int, count: Int = 1, isBigWord: Boolean, stopOnEmptyLine: Boolean = true): Int
+
+  /**
+   * Find the next character on the current line
+   *
+   * @param startOffset The offset to start searching from
+   * @param count The number of occurrences to find
+   * @param char The character to find
+   * @return The offset of the next character, or -1 if not found
+   */
+  fun getNextCharOnLineOffset(startOffset: Int, count: Int = 1, char: Char): Int
+
+  /**
+   * Find the word at or nearest to the given offset
+   *
+   * @param startOffset The offset to search from
+   * @return The range of the word, or null if not found
+   */
+  fun getNearestWordOffset(startOffset: Int): Range?
+
+  /**
+   * Returns range of a paragraph containing the given line.
+   *
+   * @param line line to start the search from
+   * @param count search for the count paragraphs forward
+   * @param isOuter true if it is an outer motion, false otherwise
+   * @return the paragraph text range
+   */
+  fun getParagraphRange(line: Int, count: Int = 1, isOuter: Boolean): Range?
+
+  /**
+   * Find a block quote in the current line
+   *
+   * @param startOffset The offset to start searching from
+   * @param quote The quote character to find
+   * @param isOuter Whether to include the quotes in the range
+   * @return The range of the block quote, or null if not found
+   */
+  fun getBlockQuoteInLineRange(startOffset: Int, quote: Char, isOuter: Boolean): Range?
+
+  /**
+   * Finds all occurrences of the given pattern within a specified line range.
+   *
+   * This function searches for all matches of a pattern within a specified range of lines
+   * in the document. It's useful for implementing commands like `:g/pattern/` or `:v/pattern/`
+   * that need to find all occurrences of a pattern.
+   *
+   * @param pattern The pattern to search for. This is a plain string, not a regex pattern.
+   * @param startLine The line number to start searching from (0-based). Must be within the range [0, lineCount-1].
+   * @param endLine The line number to end searching at (0-based), or -1 for the whole document.
+   *               If specified, must be within the range [startLine, lineCount-1].
+   * @param ignoreCase If true, performs case-insensitive search; if false, performs case-sensitive search.
+   * @return A list of Ranges representing all matches found. Empty list if no matches are found.
+   */
+  fun findAll(pattern: String, startLine: Int, endLine: Int, ignoreCase: Boolean = false): List<Range>
+
+  /**
+   * Finds text matching the given Vim-style regular expression pattern.
+   *
+   * This function implements Vim's pattern search functionality, supporting all Vim regex syntax.
+   * See `:help /pattern` in Vim for details on the pattern syntax.
+   *
+   * @param pattern The Vim-style regex pattern to search for.
+   * @param startOffset The offset to start searching from. Must be within the range [0, document.length].
+   * @param count Find the [count]-th occurrence of the pattern.
+   * @param backwards If true, search backward from the start offset; if false, search forward.
+   * @return A Range representing the matched text, or null if no match is found.
+   */
+  fun findPattern(pattern: String, startOffset: Int, count: Int = 1, backwards: Boolean = false): Range?
 }
