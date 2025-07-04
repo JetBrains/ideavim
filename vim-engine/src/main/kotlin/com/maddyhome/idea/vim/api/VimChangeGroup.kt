@@ -23,13 +23,13 @@ import javax.swing.KeyStroke
 interface VimChangeGroup {
   fun setInsertRepeat(lines: Int, column: Int, append: Boolean)
 
-  fun insertBeforeCursor(editor: VimEditor, context: ExecutionContext)
+  fun insertBeforeCaret(editor: VimEditor, context: ExecutionContext)
 
   fun insertBeforeFirstNonBlank(editor: VimEditor, context: ExecutionContext)
 
   fun insertLineStart(editor: VimEditor, context: ExecutionContext)
 
-  fun insertAfterCursor(editor: VimEditor, context: ExecutionContext)
+  fun insertAfterCaret(editor: VimEditor, context: ExecutionContext)
 
   fun insertAfterLineEnd(editor: VimEditor, context: ExecutionContext)
 

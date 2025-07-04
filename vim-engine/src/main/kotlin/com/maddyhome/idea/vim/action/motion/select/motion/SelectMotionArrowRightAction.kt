@@ -48,7 +48,7 @@ class SelectMotionArrowRightAction : MotionActionHandler.ForEachCaret() {
       editor.exitSelectModeNative(false)
       if (editor.isTemplateActive()) {
         logger.debug("Template is active. Activate insert mode")
-        injector.changeGroup.insertBeforeCursor(editor, context)
+        injector.changeGroup.insertBeforeCaret(editor, context)
         if (caret.offset in startSelection..endSelection) {
           return endSelection.toMotion()
         }

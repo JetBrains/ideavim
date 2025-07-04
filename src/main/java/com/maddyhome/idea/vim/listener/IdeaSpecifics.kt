@@ -163,7 +163,7 @@ internal object IdeaSpecifics {
       ) {
         editor?.let {
           it.vim.mode = Mode.NORMAL()
-          VimPlugin.getChange().insertBeforeCursor(it.vim, event.dataContext.vim)
+          VimPlugin.getChange().insertBeforeCaret(it.vim, event.dataContext.vim)
           KeyHandler.getInstance().reset(it.vim)
         }
       }
@@ -199,7 +199,7 @@ internal object IdeaSpecifics {
           // Enable insert mode if there is no selection in template
           // Template with selection is handled by [com.maddyhome.idea.vim.group.visual.VisualMotionGroup.controlNonVimSelectionChange]
           if (editor.vim.inNormalMode) {
-            VimPlugin.getChange().insertBeforeCursor(
+            VimPlugin.getChange().insertBeforeCaret(
               editor.vim,
               injector.executionContextManager.getEditorExecutionContext(editor.vim),
             )

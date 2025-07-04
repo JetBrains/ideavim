@@ -391,7 +391,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    * @param editor  The editor to insert into
    * @param context The data context
    */
-  override fun insertBeforeCursor(editor: VimEditor, context: ExecutionContext) {
+  override fun insertBeforeCaret(editor: VimEditor, context: ExecutionContext) {
     initInsert(editor, context, Mode.INSERT)
   }
 
@@ -407,7 +407,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    * @param editor  The editor to insert into
    * @param context The data context
    */
-  override fun insertAfterCursor(editor: VimEditor, context: ExecutionContext) {
+  override fun insertAfterCaret(editor: VimEditor, context: ExecutionContext) {
     for (caret in editor.nativeCarets()) {
       caret.moveToMotion(injector.motion.getHorizontalMotion(editor, caret, 1, true))
     }
@@ -771,7 +771,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         lambdaEditor.exitSelectModeNative(false)
         KeyHandler.getInstance().reset(lambdaEditor)
         if (isPrintableChar(key.keyChar) || activeTemplateWithLeftRightMotion(lambdaEditor, key)) {
-          injector.changeGroup.insertBeforeCursor(lambdaEditor, lambdaContext)
+          injector.changeGroup.insertBeforeCaret(lambdaEditor, lambdaContext)
         }
       }
     }
@@ -1292,7 +1292,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       if (type === SelectionType.LINE_WISE) {
         // Please don't use `getDocument().getText().isEmpty()` because it converts CharSequence into String
         if (editor.fileSize() == 0L) {
-          insertBeforeCursor(editor, context)
+          insertBeforeCaret(editor, context)
         } else if (after && !editor.endsWithNewLine()) {
           insertNewLineBelow(editor, updatedCaret, lp.column)
         } else {
@@ -1305,7 +1305,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         editor.vimChangeActionSwitchMode = Mode.INSERT
       }
     } else {
-      insertBeforeCursor(editor, context)
+      insertBeforeCaret(editor, context)
     }
     return true
   }
@@ -2038,7 +2038,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       caret.moveToInlayAwareOffset(editor.bufferPositionToOffset(BufferPosition(line, column)))
       setInsertRepeat(lines, column, append)
     }
-    insertBeforeCursor(editor, context)
+    insertBeforeCaret(editor, context)
     return true
   }
 

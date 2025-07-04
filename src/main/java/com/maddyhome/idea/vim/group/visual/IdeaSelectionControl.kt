@@ -134,7 +134,7 @@ internal object IdeaSelectionControl {
       is Mode.VISUAL -> VimPlugin.getVisualMotion().enterVisualMode(editor.vim, mode.selectionType)
       is Mode.SELECT -> VimPlugin.getVisualMotion().enterSelectMode(editor.vim, mode.selectionType)
       is Mode.INSERT -> VimPlugin.getChange()
-        .insertBeforeCursor(editor.vim, injector.executionContextManager.getEditorExecutionContext(editor.vim))
+        .insertBeforeCaret(editor.vim, injector.executionContextManager.getEditorExecutionContext(editor.vim))
 
       is Mode.NORMAL -> Unit
       else -> error("Unexpected mode: $mode")

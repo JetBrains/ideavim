@@ -29,7 +29,7 @@ class InsertBeforeCursorAction : ChangeEditorActionHandler.SingleExecution() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    injector.changeGroup.insertBeforeCursor(editor, context)
+    injector.changeGroup.insertBeforeCaret(editor, context)
     return true
   }
 }

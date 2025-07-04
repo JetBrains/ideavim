@@ -27,7 +27,7 @@ class InsertAfterCursorAction : ChangeEditorActionHandler.SingleExecution() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    injector.changeGroup.insertAfterCursor(editor, context)
+    injector.changeGroup.insertAfterCaret(editor, context)
     return true
   }
 }

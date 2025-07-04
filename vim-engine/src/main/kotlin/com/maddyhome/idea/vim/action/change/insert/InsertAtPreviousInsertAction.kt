@@ -47,5 +47,5 @@ private fun insertAtPreviousInsert(editor: VimEditor, context: ExecutionContext)
   if (motion is Motion.AbsoluteOffset) {
     caret.moveToOffset(motion.offset)
   }
-  injector.changeGroup.insertBeforeCursor(editor, context)
+  injector.changeGroup.insertBeforeCaret(editor, context)
 }
