@@ -81,7 +81,6 @@ import com.maddyhome.idea.vim.handler.keyCheckRequests
 import com.maddyhome.idea.vim.helper.CaretVisualAttributesListener
 import com.maddyhome.idea.vim.helper.GuicursorChangeListener
 import com.maddyhome.idea.vim.helper.StrictMode
-import com.maddyhome.idea.vim.helper.VimStandalonePluginUpdateChecker
 import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.forceBarCursor
@@ -487,8 +486,6 @@ internal object VimListenerManager {
           OpeningEditor(openingEditor, owningEditorWindow, isPreview, canBeReused)
         )
       }
-
-      VimStandalonePluginUpdateChecker.getInstance().pluginUsed()
     }
 
     override fun editorReleased(event: EditorFactoryEvent) {
