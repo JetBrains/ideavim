@@ -11,7 +11,6 @@ package com.intellij.vim.api.scopes.caret
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.Line
 import com.intellij.vim.api.Mark
-import com.intellij.vim.api.Path
 import com.intellij.vim.api.Range
 import com.intellij.vim.api.TextType
 
@@ -245,4 +244,131 @@ interface CaretRead {
    *                        negative values select the windows above.
    */
   fun selectWindowInVertically(relativePosition: Int)
+
+  /**
+   * Finds the offset of the next paragraph boundary.
+   *
+   * @param count Search for the [count]-th occurrence.
+   * @param includeWhitespaceLines Should be `true` if we consider lines with whitespaces as empty.
+   * @return next paragraph off
+   */
+  fun getNextParagraphBoundOffset(count: Int = 1, includeWhitespaceLines: Boolean = true): Int?
+
+  /**
+   * Finds the next sentence start in the editor from the given offset, based on the specified parameters.
+   *
+   * @param count Search for the [count]-th occurrence.
+   * @param includeCurrent If `true`, includes the current sentence if at its boundary.
+   * @param requireAll If `true`, returns `null` if fewer than [count] sentences are found.
+   * @return The offset of the next sentence start, or `null` if not found or constraints cannot be met.
+   */
+  fun getNextSentenceStart(count: Int = 1, includeCurrent: Boolean, requireAll: Boolean = true): Int?
+
+  /**
+   * Find the next section in the editor.
+   *
+   * @param marker The type of section to find.
+   * @param count Search for the [count]-th occurrence.
+   * @return The offset of the next section.
+   */
+  fun getNextSectionStart(marker: Char, count: Int = 1): Int
+
+  /**
+   * Find the start of the previous section in the editor.
+   *
+   * @param marker The type of section to find.
+   * @param count Search for the [count]-th occurrence.
+   * @return The offset of the next section.
+   */
+  fun getPreviousSectionStart(marker: Char, count: Int = 1): Int
+
+  /**
+   * Finds the end offset of the next sentence from the current caret position.
+   *
+   * @param count Search for the [count]-th occurrence.
+   * @param includeCurrent Whether to count the current position as a sentence end
+   * @param requireAll Whether to require all sentence ends to be found
+   * @return The offset of the next sentence end, or null if not found
+   */
+  fun getNextSentenceEnd(count: Int = 1, includeCurrent: Boolean, requireAll: Boolean = true): Int?
+
+  /**
+   * Finds the end offset of the next method from the current caret position.
+   *
+   * This function uses language-specific features to identify method boundaries in the code.
+   *
+   * @param count Search for the [count]-th occurrence.
+   * @return The offset of the end of the next method.
+   */
+  fun getMethodEndOffset(count: Int = 1): Int
+
+  /**
+   * Finds the start offset of the next method from the current caret position.
+   *
+   * This function uses language-specific features to identify method boundaries in the code.
+   *
+   * @param count Search for the [count]-th occurrence.
+   * @return The offset of the start of the next method.
+   */
+  fun getMethodStartOffset(count: Int = 1): Int
+
+  /**
+   * Finds the next occurrence of a specific character on the current line.
+   *
+   * @param count Search for the [count]-th occurrence.
+   * @param char The character to find.
+   * @return The offset of the found character, or -1 if not found.
+   */
+  fun getNextCharOnLineOffset(count: Int = 1, char: Char): Int
+
+  /**
+   * Finds the word at or nearest to the current caret position.
+   *
+   * @return A Range representing the found word, or null if no word is found.
+   */
+  fun getNearestWordOffset(): Range?
+
+  /**
+   * Find the range of the word text object at the location of the caret
+   */
+  fun getWordTextObjectRange(count: Int = 1, isOuter: Boolean, isBigWord: Boolean): Range
+
+  /**
+   * Find the range of the sentence text object at the location of the caret
+   */
+  fun getSentenceRange(count: Int = 1, isOuter: Boolean): Range
+
+  /**
+   * Returns range of a paragraph containing the caret
+   *
+   * @param count Search for the [count]-th occurrence.
+   * @param isOuter true if it is an outer motion, false otherwise
+   * @return the paragraph text range
+   */
+  fun getParagraphRange(count: Int = 1, isOuter: Boolean): Range?
+
+  /**
+   * Find the range of a block tag at the location of the caret
+   */
+  fun getBlockTagRange(count: Int = 1, isOuter: Boolean): Range?
+
+  /**
+   * Find a block quote in the current line at the location of the caret
+   *
+   * @param quote The quote character to find
+   * @param isOuter Whether to include the quotes in the range
+   * @return The range of the block quote, or null if not found
+   */
+  fun getBlockQuoteInLineRange(quote: Char, isOuter: Boolean): Range?
+
+  /**
+   * Finds the offset of the next misspelled word from the current caret position.
+   *
+   * This function uses the IDE's spell checker to identify misspelled words in the document.
+   * It's used to implement Vim's `]s` and `[s` commands for navigating between spelling errors.
+   *
+   * @param count Search for the [count]-th occurrence.
+   * @return The offset of the next misspelled word.
+   */
+  fun getNextMisspelledWordOffset(count: Int = 1): Int
 }

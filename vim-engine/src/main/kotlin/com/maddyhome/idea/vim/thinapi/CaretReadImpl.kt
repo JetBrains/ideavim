@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.thinapi
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.Line
 import com.intellij.vim.api.Mark
-import com.intellij.vim.api.Path
 import com.intellij.vim.api.Range
 import com.intellij.vim.api.TextType
 import com.intellij.vim.api.scopes.caret.CaretRead
@@ -105,8 +104,10 @@ class CaretReadImpl(
       val isVisualBlockMode = mode is Mode.VISUAL && mode.selectionType == SelectionType.BLOCK_WISE
 
       return if (isVisualBlockMode) {
-        val ranges = vimEditor.nativeCarets().mapNotNull { injector.markService.getVisualSelectionMarks(it)?.toRange() }
-          .toTypedArray()
+        val ranges = vimEditor.nativeCarets().mapNotNull { 
+          val marks = injector.markService.getVisualSelectionMarks(it) ?: return@mapNotNull null
+          Range.Simple(marks.startOffset, marks.endOffset)
+        }.toTypedArray()
         Range.Block(ranges)
       } else {
         val visualSelectionMarks = injector.markService.getVisualSelectionMarks(vimCaret) ?: return null
@@ -197,5 +198,71 @@ class CaretReadImpl(
 
   override fun selectWindowInVertically(relativePosition: Int) {
     injector.window.selectWindowInRow(vimCaret, vimContext, relativePosition, true)
+  }
+
+  override fun getNextParagraphBoundOffset(count: Int, includeWhitespaceLines: Boolean): Int? {
+    return injector.searchHelper.findNextParagraph(vimEditor, vimCaret, count, includeWhitespaceLines)
+  }
+
+  override fun getNextSentenceStart(count: Int, includeCurrent: Boolean, requireAll: Boolean): Int? {
+    return injector.searchHelper.findNextSentenceStart(vimEditor, vimCaret, count, includeCurrent, requireAll)
+  }
+
+  override fun getNextSectionStart(marker: Char, count: Int): Int {
+    return injector.searchHelper.findSection(vimEditor, vimCaret, marker, 1, count)
+  }
+
+  override fun getPreviousSectionStart(marker: Char, count: Int): Int {
+    return injector.searchHelper.findSection(vimEditor, vimCaret, marker, -1, count)
+  }
+
+  override fun getNextSentenceEnd(count: Int, includeCurrent: Boolean, requireAll: Boolean): Int? {
+    return injector.searchHelper.findNextSentenceEnd(vimEditor, vimCaret, count, includeCurrent, requireAll)
+  }
+
+  override fun getMethodEndOffset(count: Int): Int {
+    return injector.searchHelper.findMethodEnd(vimEditor, vimCaret, count)
+  }
+
+  override fun getMethodStartOffset(count: Int): Int {
+    return injector.searchHelper.findMethodStart(vimEditor, vimCaret, count)
+  }
+
+  override fun getNextCharOnLineOffset(count: Int, char: Char): Int {
+    return injector.searchHelper.findNextCharacterOnLine(vimEditor, vimCaret, count, char)
+  }
+
+  override fun getNearestWordOffset(): Range? {
+    val textRange = injector.searchHelper.findWordNearestCursor(vimEditor, vimCaret)
+    return textRange?.toRange()
+  }
+
+  override fun getWordTextObjectRange(count: Int, isOuter: Boolean, isBigWord: Boolean): Range {
+    val textRange = injector.searchHelper.findWordObject(vimEditor, vimCaret, count, isOuter, isBigWord)
+    return textRange.toRange()
+  }
+
+  override fun getSentenceRange(count: Int, isOuter: Boolean): Range {
+    val textRange = injector.searchHelper.findSentenceRange(vimEditor, vimCaret, count, isOuter)
+    return textRange.toRange()
+  }
+
+  override fun getParagraphRange(count: Int, isOuter: Boolean): Range? {
+    val textRange = injector.searchHelper.findParagraphRange(vimEditor, vimCaret, count, isOuter)
+    return textRange?.toRange()
+  }
+
+  override fun getBlockTagRange(count: Int, isOuter: Boolean): Range? {
+    val textRange = injector.searchHelper.findBlockTagRange(vimEditor, vimCaret, count, isOuter)
+    return textRange?.toRange()
+  }
+
+  override fun getBlockQuoteInLineRange(quote: Char, isOuter: Boolean): Range? {
+    val textRange = injector.searchHelper.findBlockQuoteInLineRange(vimEditor, vimCaret, quote, isOuter)
+    return textRange?.toRange()
+  }
+
+  override fun getNextMisspelledWordOffset(count: Int): Int {
+    return injector.searchHelper.findMisspelledWord(vimEditor, vimCaret, count)
   }
 }

@@ -21,6 +21,7 @@ import com.intellij.vim.api.scopes.VimScope
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.Key
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.CommandAliasHandler
@@ -52,6 +53,9 @@ open class VimScopeImpl(
 
   private val vimContext: ExecutionContext
     get() = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+
+  private val optionGroup: VimOptionGroup
+    get() = injector.optionGroup
 
   override fun <T : Any> getVariableInternal(name: String, type: KType): T? {
     val (name, scope) = parseVariableName(name)
@@ -290,5 +294,30 @@ open class VimScopeImpl(
 
   override fun closeFile() {
     injector.file.closeFile(vimEditor, vimContext)
+  }
+
+  override fun getNextCamelStartOffset(chars: CharSequence, startIndex: Int, count: Int): Int? {
+    return injector.searchHelper.findNextCamelStart(chars, startIndex, count)
+  }
+
+  override fun getPreviousCamelStartOffset(chars: CharSequence, endIndex: Int, count: Int): Int? {
+    return injector.searchHelper.findPreviousCamelStart(chars, endIndex, count)
+  }
+
+  override fun getNextCamelEndOffset(chars: CharSequence, startIndex: Int, count: Int): Int? {
+    return injector.searchHelper.findNextCamelEnd(chars, startIndex, count)
+  }
+
+  override fun getPreviousCamelEndOffset(chars: CharSequence, endIndex: Int, count: Int): Int? {
+    return injector.searchHelper.findPreviousCamelEnd(chars, endIndex, count)
+  }
+
+  override fun getNextWordStartOffset(
+    text: CharSequence,
+    startOffset: Int,
+    count: Int,
+    isBigWord: Boolean,
+  ): Int {
+    return injector.searchHelper.findNextWord(text, vimEditor, startOffset, count, isBigWord)
   }
 }
