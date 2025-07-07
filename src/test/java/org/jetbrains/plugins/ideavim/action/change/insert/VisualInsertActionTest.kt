@@ -17,7 +17,7 @@ import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
-class VisualBlockInsertActionTest : VimTestCase() {
+class VisualInsertActionTest : VimTestCase() {
   // VIM-1379 |CTRL-V| |j| |v_b_I|
   @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
   @Test
@@ -101,28 +101,70 @@ class VisualBlockInsertActionTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
   @Test
-  fun `test insert in non block mode`() {
-    doTest(
-      listOf("vwIHello<esc>"),
-      """
-                ${c}A Discovery
+  fun `test insert in non-block visual within single line`() {
+    val before = """
+      |  A ${c}Discovery
 
-                ${c}I found it in a legendary land
-                all rocks and ${c}lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
-      """.trimIndent(),
-      """
-                Hell${c}oA Discovery
+      |  I ${c}found it in a legendary land
+      |  all rocks and lavender and tufted grass,
+      |  where it was settled on some sodden sand
+      |  hard by the torrent of a mountain pass.
+    """.trimMargin()
+    val after = """
+      |Hell${c}o  A Discovery
 
-                Hell${c}oI found it in a legendary land
-                Hell${c}oall rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
-      """.trimIndent(),
-    )
+      |Hell${c}o  I found it in a legendary land
+      |  all rocks and lavender and tufted grass,
+      |  where it was settled on some sodden sand
+      |  hard by the torrent of a mountain pass.
+    """.trimMargin()
+    doTest(listOf($$"v$IHello<esc>"), before, after)
+    doTest(listOf("VIHello<esc>"), before, after)
+  }
+
+  @Test
+  fun `test insert in non-block visual spanning multiple lines down`() {
+    val before = """
+      |  A ${c}Discovery
+
+      |  I ${c}found it in a legendary land
+      |  all rocks and lavender and tufted grass,
+      |  where it was settled on some sodden sand
+      |  hard by the torrent of a mountain pass.
+    """.trimMargin()
+    val after = """
+      |Hell${c}o  A Discovery
+
+      |Hell${c}o  I found it in a legendary land
+      |  all rocks and lavender and tufted grass,
+      |  where it was settled on some sodden sand
+      |  hard by the torrent of a mountain pass.
+    """.trimMargin()
+    doTest(listOf("vjIHello<esc>"), before, after)
+    doTest(listOf("VjIHello<esc>"), before, after)
+  }
+
+  @Test
+  fun `test insert in non-block visual spanning multiple lines up`() {
+    val before = """
+      |  A Discovery
+
+      |  I found it in a legendary land
+      |  all rocks and lavender and tufted grass${c},
+      |  where it was settled on some sodden sand
+      |  hard ${c}by the torrent of a mountain pass.
+    """.trimMargin()
+    val after = """
+      |  A Discovery
+
+      |  I found it in a legendary landHell${c}o
+      |  all rocks and lavender and tufted grass,
+      |  whereHell${c}o it was settled on some sodden sand
+      |  hard by the torrent of a mountain pass.
+    """.trimMargin()
+    doTest(listOf("vkIHello<esc>"), before, after)
+    doTest(listOf("VkIHello<esc>"), before, after)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)

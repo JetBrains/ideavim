@@ -1106,7 +1106,7 @@
     },
     {
         "keys": "I",
-        "class": "com.maddyhome.idea.vim.action.change.insert.VisualBlockInsertAction",
+        "class": "com.maddyhome.idea.vim.action.change.insert.VisualInsertAction",
         "modes": "X"
     },
     {
