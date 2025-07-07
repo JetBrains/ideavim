@@ -39,7 +39,7 @@ object Nvim : IdeaVimBuildType({
               """.trimIndent()
     }
     gradle {
-      tasks = "clean test -Dnvim"
+      tasks = "clean test -x :tests:property-tests:test -x :tests:long-running-tests:test -Dnvim"
       buildFile = ""
       enableStacktrace = true
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
