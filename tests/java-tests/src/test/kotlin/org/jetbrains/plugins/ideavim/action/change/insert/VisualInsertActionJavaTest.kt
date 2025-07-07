@@ -17,7 +17,7 @@ import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimJavaTestCase
 import org.junit.jupiter.api.Test
 
-class VisualBlockInsertActionJavaTest : VimJavaTestCase() {
+class VisualInsertActionJavaTest : VimJavaTestCase() {
   // VIM-1110 |CTRL-V| |v_b_i| |zc|
   @TestWithoutNeovim(SkipNeovimReason.FOLDING)
   @Test
