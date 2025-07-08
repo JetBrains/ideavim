@@ -208,7 +208,7 @@ class DigraphSequence : Cloneable {
         // TODO: If we get 10 here, we return 0. If we get 10 below, we return 13. Why the difference?
         return if (char[0].code == 10) 0 else { char[0].code }
       } else {
-        logger.error("Digraph char was recognized as multiple chars")
+        logger.error("Digraph char was recognized as multiple chars: $char ($key)")
       }
     } else {
       // Remember that keyCode is a virtual key code, not a codepoint!
