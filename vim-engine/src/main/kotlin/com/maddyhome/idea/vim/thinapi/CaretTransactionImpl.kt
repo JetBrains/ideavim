@@ -38,7 +38,7 @@ class CaretTransactionImpl(
     get() = injector.executionContextManager.getEditorExecutionContext(vimEditor)
 
   private val vimCaret: VimCaret
-    get() = vimEditor.carets().first { it.id == caretId.id }
+    get() = vimEditor.carets().firstOrNull { it.id == caretId.id } ?: vimEditor.primaryCaret()
 
   private fun determineSelectionType(startOffset: Int, endOffset: Int): SelectionType {
     val endOffsetNormalized = endOffset.coerceAtMost(vimEditor.fileSize().toInt())
@@ -115,7 +115,7 @@ class CaretTransactionImpl(
   override fun replaceText(
     startOffset: Int,
     endOffset: Int,
-    text: String
+    text: String,
   ): Boolean {
     val copiedText = injector.clipboardManager.dumbCopiedText(text)
     val textData = PutData.TextData(null, copiedText, SelectionType.CHARACTER_WISE)
@@ -161,6 +161,14 @@ class CaretTransactionImpl(
     }, "Replace Text", null)
 
     return result
+  }
+
+  override fun replaceTextForRange(startOffset: Int, endOffset: Int, text: String) {
+    injector.actionExecutor.executeCommand(vimEditor, {
+      injector.application.runWriteAction {
+        injector.changeGroup.replaceText(vimEditor, vimCaret, startOffset, endOffset, text)
+      }
+    }, "Replace Text", null)
   }
 
   override fun deleteText(
