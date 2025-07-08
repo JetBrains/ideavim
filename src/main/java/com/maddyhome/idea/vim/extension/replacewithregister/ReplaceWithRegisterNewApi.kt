@@ -51,7 +51,7 @@ class ReplaceWithRegisterNewApi : VimPluginBase() {
         forEachCaret {
           val selectionRange = getSelection() ?: return@forEachCaret
           val registerData = prepareRegisterData() ?: return@forEachCaret
-          replaceTextAndUpdateCaret(selectionRange, registerData)
+          replaceTextAndUpdateCaret(this@operatorFunction, selectionRange, registerData)
         }
       }
     }
@@ -83,7 +83,7 @@ class ReplaceWithRegisterNewApi : VimPluginBase() {
         forEachCaret {
           val selectionRange = selection
           val registerData = prepareRegisterData() ?: return@forEachCaret
-          replaceTextAndUpdateCaret(selectionRange, registerData)
+          replaceTextAndUpdateCaret(this@rewriteVisual, selectionRange, registerData)
         }
       }
     }
@@ -104,6 +104,7 @@ class ReplaceWithRegisterNewApi : VimPluginBase() {
   }
 
   private fun CaretTransaction.replaceTextAndUpdateCaret(
+    vimScope: VimScope,
     selectionRange: Range,
     registerData: Pair<String, TextType>,
   ) {
@@ -141,13 +142,14 @@ class ReplaceWithRegisterNewApi : VimPluginBase() {
       if (selectionRange is Range.Simple) {
         replaceText(selectionRange.start, selectionRange.end, text)
       } else if (selectionRange is Range.Block) {
-        val selections: Array<Range.Simple> = selectionRange.ranges
+        val selections: Array<Range.Simple> = selectionRange.ranges.sortedByDescending { it.start }.toTypedArray()
 
         selections.forEach { range ->
-          replaceText(range.start, range.end, text)
+          replaceTextForRange(range.start, range.end, text)
         }
 
-        updateCaret(offset = selections.first().start)
+        vimScope.mode = Mode.NORMAL()
+        updateCaret(offset = selections.last().start)
       }
     }
   }

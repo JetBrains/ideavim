@@ -20,12 +20,17 @@ interface CaretTransaction: CaretRead {
     caretAfterInsertedText: Boolean = true
   ): Boolean
 
-
   fun replaceText(
     startOffset: Int,
     endOffset: Int,
-    text: String
+    text: String,
   ): Boolean
+
+  fun replaceTextForRange(
+    startOffset: Int,
+    endOffset: Int,
+    text: String
+  )
 
   fun deleteText(
     startOffset: Int,
