@@ -9,17 +9,26 @@
 package com.maddyhome.idea.vim.thinapi
 
 import com.intellij.vim.api.Path
+import java.nio.file.Paths
 import java.nio.file.Path as JavaPath
 
 val Path.javaPath: JavaPath
-  get() = TODO("Not yet implemented")
+  get() = Paths.get(protocol, *path)
 
-val JavaPath.vimPath: Path
+val JavaPath.vimPath: Path?
   get() {
+    val pathComponents: List<String> = iterator().asSequence().map { it.toString() }.toList()
+    val protocolRegex = Regex("^[a-zA-Z]:|^/")
+
+    val protocol: String = root?.toString()?.removeSuffix(":")
+      ?: pathComponents.firstOrNull()?.takeIf { protocolRegex.matches(it) }?.removeSuffix(":")
+      ?: return null
+
     return object : Path {
       override val protocol: String
-        get() = TODO("Not yet implemented")
+        get() = protocol
+
       override val path: Array<String>
-        get() = TODO("Not yet implemented")
+        get() = pathComponents.toTypedArray()
     }
   }
