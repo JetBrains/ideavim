@@ -28,7 +28,7 @@ class MoveCaretToLineEnd : VimActionHandler.SingleExecution() {
     operatorArguments: OperatorArguments,
   ): Boolean {
     val commandLine = injector.commandLine.getActiveCommandLine() ?: return false
-    commandLine.caret.offset = commandLine.actualText.length
+    commandLine.caret.offset = commandLine.text.length
     return true
   }
 }

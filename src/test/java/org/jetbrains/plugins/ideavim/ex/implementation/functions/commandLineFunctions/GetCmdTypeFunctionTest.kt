@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import kotlin.test.assertEquals
 
+@Suppress("SpellCheckingInspection")
 class GetCmdTypeFunctionTest : VimTestCase() {
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
@@ -27,27 +28,32 @@ class GetCmdTypeFunctionTest : VimTestCase() {
   fun `test getcmdtype() for a regular command`() {
     enterCommand("cmap <expr> z getcmdtype()")
     typeText(":fooz")
-    assertEquals("foo:", (injector.commandLine.getActiveCommandLine() as ExEntryPanel).actualText)
+    assertRenderedExText("foo:")
   }
 
   @Test
   fun `test getcmdtype() for a forward search`() {
     enterCommand("cmap <expr> z getcmdtype()")
     typeText("/fooz")
-    assertEquals("foo/", (injector.commandLine.getActiveCommandLine() as ExEntryPanel).actualText)
+    assertRenderedExText("foo/")
   }
 
   @Test
   fun `test getcmdtype() for a backward search`() {
     enterCommand("cmap <expr> z getcmdtype()")
     typeText("?fooz")
-    assertEquals("foo?", (injector.commandLine.getActiveCommandLine() as ExEntryPanel).actualText)
+    assertRenderedExText("foo?")
   }
 
   @Test
   fun `test getcmdtype() for an expression command`() {
     enterCommand("cmap <expr> z getcmdtype()")
     typeText("i<C-r>=fooz")
-    assertEquals("foo=", (injector.commandLine.getActiveCommandLine() as ExEntryPanel).actualText)
+    assertRenderedExText("foo=")
+  }
+
+  private fun assertRenderedExText(expected: String) {
+    // Get the text directly from the text field. This DOES include prompts or rendered control characters
+    assertEquals(expected, (injector.commandLine.getActiveCommandLine() as ExEntryPanel).getRenderedText())
   }
 }

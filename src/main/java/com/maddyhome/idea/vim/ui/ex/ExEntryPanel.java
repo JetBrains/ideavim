@@ -49,9 +49,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.GlyphView;
-import javax.swing.text.Segment;
-import javax.swing.text.View;
+import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -218,6 +216,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     logger.info("Deactivate ex entry panel");
     if (!active) return;
 
+    clearPromptCharacter();
     try {
       entry.getDocument().removeDocumentListener(fontListener);
       // incsearch won't change in the lifetime of this activation
@@ -312,7 +311,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
         boolean searchCommand = false;
         LineRange searchRange = null;
         char separator = labelText.charAt(0);
-        String searchText = getActualText();
+        String searchText = getText();
         if (labelText.equals(":")) {
           if (searchText.isEmpty()) return;
           final Command command = getIncsearchCommand(searchText);
@@ -423,7 +422,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
   }
 
   @Override
-  public @NotNull String getVisibleText() {
+  public @NotNull String getText() {
     return entry.getText();
   }
 
@@ -442,6 +441,12 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
       if (view instanceof GlyphView glyphView) {
         final Segment text = glyphView.getText(glyphView.getStartOffset(), glyphView.getEndOffset());
         stringBuilder.append(text);
+
+        // GlyphView doesn't render a trailing new line, but uses it to flush the characters in the preceding string
+        // Typically, we won't get a newline in the middle of a string, but we do add the prompt to the end of the doc
+        if (stringBuilder.charAt(stringBuilder.length() - 1) == '\n') {
+          stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+        }
       }
       else {
         stringBuilder.append("<Unknown leaf view. Expected GlyphView, got: ");
@@ -455,6 +460,20 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
         final View child = view.getView(i);
         getRenderedText(child, stringBuilder);
       }
+    }
+  }
+
+  @Override
+  public void setPromptCharacter(char promptCharacter) {
+    if (entry.getUI() instanceof ExTextFieldUI exTextFieldUI) {
+      exTextFieldUI.setPromptCharacter(promptCharacter);
+    }
+  }
+
+  @Override
+  public void clearPromptCharacter() {
+    if (entry.getUI() instanceof ExTextFieldUI exTextFieldUI) {
+      exTextFieldUI.clearPromptCharacter();
     }
   }
 
@@ -476,7 +495,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
   public void handleKey(@NotNull KeyStroke stroke) {
     entry.handleKey(stroke);
     if (finishOn != null && stroke.getKeyChar() == finishOn && inputProcessing != null) {
-      inputProcessing.invoke(getActualText());
+      inputProcessing.invoke(getText());
       close(true, true);
     }
   }
@@ -517,7 +536,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
 
   private void setFontForElements() {
     label.setFont(UiHelper.selectEditorFont(getIjEditor(), label.getText()));
-    entry.setFont(UiHelper.selectEditorFont(getIjEditor(), getVisibleText()));
+    entry.setFont(UiHelper.selectEditorFont(getIjEditor(), entry.getText()));
   }
 
   private void positionPanel() {
@@ -575,7 +594,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     int offset = getCaret().getOffset();
     entry.updateText(string);
     if (updateLastEntry) entry.saveLastEntry();
-    getCaret().setOffset(Math.min(offset, getVisibleText().length()));
+    getCaret().setOffset(Math.min(offset, getText().length()));
   }
 
   @Override
@@ -595,17 +614,6 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
   @Override
   public void clearCurrentAction() {
     entry.clearCurrentAction();
-  }
-
-  @Override
-  public @Nullable Integer getPromptCharacterOffset() {
-    int offset = entry.currentActionPromptCharacterOffset;
-    return offset == -1 ? null : offset;
-  }
-
-  @Override
-  public void setPromptCharacterOffset(@Nullable Integer integer) {
-    entry.currentActionPromptCharacterOffset = integer == null ? -1 : integer;
   }
 
   @Override

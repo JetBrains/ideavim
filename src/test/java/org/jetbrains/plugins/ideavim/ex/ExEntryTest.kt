@@ -35,6 +35,7 @@ import kotlin.test.fail
 // or literal, etc. should have individual test classes in the ideavim.ex.action package
 // :cmap should also be tested separately
 
+@Suppress("SpellCheckingInspection")
 class ExEntryTest : VimTestCase() {
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
@@ -493,25 +494,25 @@ class ExEntryTest : VimTestCase() {
   @Test
   fun `test prompt while inserting digraph`() {
     typeExInput(":<C-K>")
-    assertExText("?")
+    assertRenderedExText("?")
     assertExOffset(0)
 
     deactivateExEntry()
 
     typeExInput(":<C-K>O")
-    assertExText("O")
+    assertRenderedExText("O")
     assertExOffset(0)
 
     deactivateExEntry()
 
     typeExInput(":set<Home><C-K>")
-    assertExText("?set")
+    assertRenderedExText("?set")
     assertExOffset(0)
 
     deactivateExEntry()
 
     typeExInput(":set<Home><C-K>O")
-    assertExText("Oset")
+    assertRenderedExText("Oset")
     assertExOffset(0)
   }
 
@@ -527,12 +528,10 @@ class ExEntryTest : VimTestCase() {
     // this isn't true - digraph entry is stopped, but command line mode continues
     typeExInput(":<C-K>O<Esc>K")
     assertIsActive()
-    assertEquals("K", exEntryPanel.actualText)
+    assertRenderedExText("K")
 
     deactivateExEntry()
   }
-
-  // TODO: Test inserting control characters, if/when supported
 
   @Test
   fun `test insert literal character`() {
@@ -606,25 +605,25 @@ class ExEntryTest : VimTestCase() {
   @Test
   fun `test prompt while inserting literal character`() {
     typeExInput(":<C-V>")
-    assertExText("^")
+    assertRenderedExText("^")
     assertExOffset(0)
 
     deactivateExEntry()
 
     typeExInput(":<C-V>o")
-    assertExText("^")
+    assertRenderedExText("^")
     assertExOffset(0)
 
     typeText("1")
-    assertExText("^")
+    assertRenderedExText("^")
     assertExOffset(0)
 
     typeText("2")
-    assertExText("^")
+    assertRenderedExText("^")
     assertExOffset(0)
 
     typeText("3")
-    assertExText("S")
+    assertRenderedExText("S")
     assertExOffset(1)
   }
 
@@ -646,9 +645,6 @@ class ExEntryTest : VimTestCase() {
     typeExInput(":set<Home><C-R>c")
     assertExText("hello worldset")
     assertExOffset(11) // Just before 'set'
-
-    // TODO: Test caret feedback
-    // Vim shows " after hitting <C-R>
   }
 
   @Test
@@ -715,26 +711,23 @@ class ExEntryTest : VimTestCase() {
     injector.registerGroup.setKeys('w', injector.parser.parseKeys("world"))
     configureByText("")
     typeText(":hello <C-R>")
-    val cmdLine = injector.commandLine.getActiveCommandLine() ?: fail()
-    assertEquals("hello \"", cmdLine.visibleText)
+    assertRenderedExText("hello \"")
     typeText("w")
-    assertEquals("hello world", cmdLine.visibleText)
+    assertRenderedExText("hello world")
   }
 
   @Test
   fun `test renders control characters`() {
     configureByText("")
     typeText(":normal I<C-V><Esc>A<C-V><Esc>")
-    val cmdLine = injector.commandLine.getActiveCommandLine() ?: fail()
-    assertEquals("normal I^[A^[", cmdLine.getRenderedText())
+    assertRenderedExText("normal I^[A^[")
   }
 
   @Test
   fun `test renders control characters as unicode number`() {
     configureByText("")
     typeText(":echo <C-V>x80")
-    val cmdLine = injector.commandLine.getActiveCommandLine() ?: fail()
-    assertEquals("echo <80>", cmdLine.getRenderedText())
+    assertRenderedExText("echo <80>")
   }
 
   private fun typeExInput(text: String) {
@@ -770,9 +763,14 @@ class ExEntryTest : VimTestCase() {
     }
   }
 
+  private fun assertRenderedExText(expected: String) {
+    // Get the text directly from the text field. This DOES include prompts or rendered control characters
+    assertEquals(expected, exEntryPanel.getRenderedText())
+  }
+
   private fun assertExText(expected: String) {
-    // Get the text directly from the text field. This will include any "prompt" chars for e.g. digraphs
-    assertEquals(expected, exEntryPanel.entry.text)
+    // Get the text directly from the text field. This does NOT include prompts or rendered control characters
+    assertEquals(expected, exEntryPanel.text)
   }
 
   private fun assertIsActive() {
