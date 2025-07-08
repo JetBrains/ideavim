@@ -317,7 +317,14 @@ open class VimScopeImpl(
     startOffset: Int,
     count: Int,
     isBigWord: Boolean,
-  ): Int {
-    return injector.searchHelper.findNextWord(text, vimEditor, startOffset, count, isBigWord)
+  ): Int? {
+    val editorSize = vimEditor.fileSize().toInt()
+    val nextWordOffset = injector.searchHelper.findNextWord(text, vimEditor, startOffset, count, isBigWord)
+
+    return if (nextWordOffset >= editorSize) {
+      null
+    } else {
+      nextWordOffset
+    }
   }
 }

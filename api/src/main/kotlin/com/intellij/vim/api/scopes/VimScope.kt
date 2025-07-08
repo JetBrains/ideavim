@@ -363,13 +363,11 @@ abstract class VimScope {
   /**
    * Find the next word in some text outside the editor (e.g., command line), from the given starting point
    *
-   * Note that this function can return an out-of-bounds index when there is no next word!
-   *
    * @param text The text to search in.
    * @param startOffset The offset in the document to search from.
    * @param count Search for the [count]-th occurrence. If negative, search backwards.
    * @param isBigWord Use WORD instead of word boundaries.
-   * @return The offset of the [count]-th next word, or `0` or the offset of the end of a file if not found.
+   * @return The offset of the [count]-th next word, or `null` if not found.
    */
-  abstract fun getNextWordStartOffset(text: CharSequence, startOffset: Int, count: Int = 1, isBigWord: Boolean = false): Int
+  abstract fun getNextWordStartOffset(text: CharSequence, startOffset: Int, count: Int = 1, isBigWord: Boolean = false): Int?
 }

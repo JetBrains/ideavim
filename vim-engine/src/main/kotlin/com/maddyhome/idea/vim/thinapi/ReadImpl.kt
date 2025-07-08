@@ -145,8 +145,15 @@ open class ReadImpl(
     return injector.searchHelper.findNextSentenceEnd(vimEditor, startOffset, count, includeCurrent, requireAll)
   }
 
-  override fun getNextWordStartOffset(startOffset: Int, count: Int, isBigWord: Boolean): Int {
-    return injector.searchHelper.findNextWord(vimEditor, startOffset, count, isBigWord)
+  override fun getNextWordStartOffset(startOffset: Int, count: Int, isBigWord: Boolean): Int? {
+    val editorSize = vimEditor.fileSize().toInt()
+    val nextWordOffset = injector.searchHelper.findNextWord(vimEditor, startOffset, count, isBigWord)
+
+    return if (nextWordOffset >= editorSize) {
+      null
+    } else {
+      nextWordOffset
+    }
   }
 
   override fun getNextWordEndOffset(startOffset: Int, count: Int, isBigWord: Boolean, stopOnEmptyLine: Boolean): Int {

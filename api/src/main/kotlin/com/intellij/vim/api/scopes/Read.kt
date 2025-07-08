@@ -187,14 +187,12 @@ interface Read {
   /**
    * Find the next word in the editor's document, from the given starting point
    *
-   * Note that this function can return an out-of-bounds index when there is no next word!
-   *
    * @param startOffset The offset in the document to search from
    * @param count Search for the [count]-th occurrence. If negative, search backwards.
    * @param isBigWord Use WORD instead of word boundaries.
-   * @return The offset of the [count]-th next word, or `0` or the offset of the end of a file if not found.
+   * @return The offset of the [count]-th next word, or `null` if not found.
    */
-  fun getNextWordStartOffset(startOffset: Int, count: Int = 1, isBigWord: Boolean): Int
+  fun getNextWordStartOffset(startOffset: Int, count: Int = 1, isBigWord: Boolean): Int?
 
   /**
    * Find the end offset of the next word in the editor's document, from the given starting point
