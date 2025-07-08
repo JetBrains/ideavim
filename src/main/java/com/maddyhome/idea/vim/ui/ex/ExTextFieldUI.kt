@@ -10,6 +10,8 @@ package com.maddyhome.idea.vim.ui.ex
 
 import javax.swing.plaf.basic.BasicTextFieldUI
 import javax.swing.text.JTextComponent
+import javax.swing.text.Position
+import javax.swing.text.View
 
 internal class ExTextFieldUI(private val editorKit: ExEditorKit) : BasicTextFieldUI() {
   override fun getEditorKit(tc: JTextComponent?) = editorKit
@@ -40,5 +42,81 @@ internal class ExTextFieldUI(private val editorKit: ExEditorKit) : BasicTextFiel
     // keymap, it doesn't install itself into the InputMap chain).
     // (The UndoManager unexpectedly adds a couple of custom actions, but there's little we can do about that)
     component.keymap = JTextComponent.getKeymap(JTextComponent.DEFAULT_KEYMAP)
+  }
+
+  fun setPromptCharacter(promptCharacter: Char) {
+    // We only ever want one prompt view, so remove it if it's there. Alternatively, we could find the current prompt
+    // and update it
+    clearPromptCharacter()
+
+    val paragraphView = getParagraphView()
+
+    val caretOffset = component.caret.dot
+    val childViewIndex = paragraphView.getViewIndex(caretOffset, Position.Bias.Forward)
+    val childView = paragraphView.getView(childViewIndex) ?: return  // Unexpected
+
+    val promptView = ExFakePromptView(promptCharacter, childView.element, caretOffset)
+
+    when {
+      childView.startOffset == caretOffset -> {
+        // Insert before the current view
+        paragraphView.insert(childViewIndex, promptView)
+      }
+
+      childView.endOffset - 1 == caretOffset -> { // End offset is exclusive
+        // Append to the current view (insert before the next view)
+        paragraphView.insert(childViewIndex + 1, promptView)
+      }
+
+      else -> {
+        // Careful! Fragments are dangerous. Normal views match 1:1 with an element, and defer the start/end offset to
+        // it. Fragments have specified start/end offsets that don't update with changes to the document. This can lead
+        // to "stale view" exceptions, e.g. by trying to calculate the preferred span of a GlyphView after deleting
+        // text. There doesn't seem to be a good way to guard against this, especially when it can be called
+        // non-deterministically to update the flashing caret.
+        val pre = childView.createFragment(childView.startOffset, caretOffset)  // End offset is exclusive
+        val post = childView.createFragment(caretOffset, childView.endOffset)
+        paragraphView.replace(childViewIndex, 1, arrayOf(pre, promptView, post))
+      }
+    }
+
+    paragraphView.preferenceChanged(paragraphView, true, false)
+    component.repaint()
+  }
+
+  fun clearPromptCharacter() {
+    val paragraphView = getParagraphView()
+
+    for (i in 0 until paragraphView.viewCount) {
+      val childView = paragraphView.getView(i)
+      if (childView is ExFakePromptView) {
+
+        // Fragments are very helpful for inserting an additional view, but can be problematic when the document is
+        // edited, so replace consecutive fragments with a simple view
+        if (i > 0 && i < paragraphView.viewCount - 1
+          && paragraphView.getView(i - 1).element == childView.element
+          && paragraphView.getView(i + 1).element == childView.element) {
+
+          val viewFactory = childView.viewFactory
+          val elementView = viewFactory.create(childView.element)
+          paragraphView.replace(i - 1, 3, arrayOf(elementView))
+        }
+        else {
+          paragraphView.remove(i)
+        }
+
+        paragraphView.preferenceChanged(paragraphView, true, false)
+        component.repaint()
+
+        // There is (hopefully) only one PromptView and removing while iterating could be awkward
+        break
+      }
+    }
+  }
+
+  private fun getParagraphView(): View {
+    val rootView = getRootView(component)
+    val sectionView = rootView.getView(0) // Only one section (ScrollingInlineCompositeView)
+    return sectionView.getView(0)  // Only one paragraph (InlineCompositeView)
   }
 }

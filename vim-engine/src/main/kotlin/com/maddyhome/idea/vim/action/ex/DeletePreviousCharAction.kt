@@ -30,7 +30,7 @@ class DeletePreviousCharAction : VimActionHandler.SingleExecution() {
   ): Boolean {
     val commandLine = injector.commandLine.getActiveCommandLine() ?: return false
 
-    val oldText = commandLine.actualText
+    val oldText = commandLine.text
     if (oldText.isEmpty()) {
       commandLine.close(refocusOwningEditor = true, resetCaret = false)
       return true

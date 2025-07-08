@@ -74,14 +74,14 @@ class ExEntryPanelService : VimCommandLineServiceBase(), VimModalInputService {
           }
 
           key.keyCode == KeyEvent.VK_ENTER -> {
-            text = commandLine.actualText
+            text = commandLine.text
             commandLine.deactivate(refocusOwningEditor = true, resetCaret = true)
             false
           }
 
           finishOn != null && key.keyChar == finishOn -> {
             commandLine.handleKey(key)
-            text = commandLine.actualText
+            text = commandLine.text
             commandLine.deactivate(refocusOwningEditor = true, resetCaret = true)
             false
           }

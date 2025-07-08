@@ -31,7 +31,7 @@ class DeleteNextCharAction : VimActionHandler.SingleExecution() {
     val commandLine = injector.commandLine.getActiveCommandLine() ?: return false
     val caretOffset = commandLine.caret.offset
 
-    val oldText = commandLine.actualText
+    val oldText = commandLine.text
     if (oldText.isEmpty()) {
       commandLine.close(refocusOwningEditor = true, resetCaret = false)
       return true

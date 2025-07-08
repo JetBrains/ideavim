@@ -9,26 +9,19 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.KeyHandler
-import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.history.HistoryEntry
 import com.maddyhome.idea.vim.history.VimHistory
 import org.jetbrains.annotations.TestOnly
 import javax.swing.KeyStroke
-import kotlin.math.min
 
 /**
  * This interface is not supposed to have any implementation logic.
  * The reason why we have implementation details here is
  * that this class extended by [ExEntryPanel] that already extends [JPanel]
  * and can't extend a base implementation of [VimCommandLine].
- * It will also be hard to wrap [ExEntryPanel] into some other class that extends [VimCommandLine],
- * because [ExEntryPanel] has a listener that should use the [actualText] field, so it must implement [VimCommandLine]
+ * TODO: Consider creating a derived instance that has-a instance of ExEntryPanel
  */
 interface VimCommandLine {
-  companion object {
-    private val logger = vimLogger<VimCommandLine>()
-  }
-
   val inputProcessing: ((String) -> Unit)?
   val finishOn: Char?
 
@@ -46,34 +39,14 @@ interface VimCommandLine {
   fun toggleReplaceMode()
 
   /**
-   * The actual text present in the command line, excluding special characters like the `?` displayed during digraph input.
-   * This text represents the real content that is being processed or executed.
+   * The entered text. It does not include any rendered text such as `<80>` or prompts such as `^` or `?`
    */
-  val actualText: String
-    get() {
-      val promptCharacterOffset1 = promptCharacterOffset
-      return if (promptCharacterOffset1 == null) visibleText else {
-        if (promptCharacterOffset1 + 1 > visibleText.length) {
-          logger.error("promptCharacterOffset1 > visibleText.length: ${promptCharacterOffset1 + 1} > ${visibleText.length}")
-          visibleText
-        } else {
-          visibleText.removeRange(promptCharacterOffset1, promptCharacterOffset1 + 1)
-        }
-      }
-    }
-
-  /**
-   * The text content displayed in the command line, including any additional characters or symbols
-   * that might be shown to the user, such as the `?` during digraph input.
-   * This is the text that the user sees on the screen.
-   */
-  val visibleText: String
-  var promptCharacterOffset: Int?
+  val text: String
 
   /**
    * Get the text as it is rendered in the command line.
    *
-   * This includes control characters rendered in Vim style, e.g. `<80>` or `^[`.
+   * This includes control characters rendered in Vim style, e.g. `<80>` or `^[` and prompts such as `^` or `?`
    */
   @TestOnly
   fun getRenderedText(): String
@@ -121,29 +94,8 @@ interface VimCommandLine {
    *
    * @param promptCharacter The character to show as prompt
    */
-  fun setPromptCharacter(char: Char) {
-    val stringBuilder = StringBuilder(actualText)
-
-    val offset =
-      promptCharacterOffset ?: caret.offset // TODO is there a case where caret is not at the [promptCharacterOffset]?
-    promptCharacterOffset = offset
-    stringBuilder.insert(offset, char)
-    setText(stringBuilder.toString())
-
-    caret.offset = offset
-  }
-
-  fun clearPromptCharacter() {
-    if (promptCharacterOffset == null) return
-
-    // Note: We have to set promptCharacterOffset to null first, because when we set the new text,
-    //   the listener will be called, which will try to get the actual text again. And, if this field isn't null,
-    //   it will get an incorrect result.
-    val myActualText = actualText
-    promptCharacterOffset = null
-    setText(myActualText)
-    caret.offset = min(caret.offset, visibleText.length)
-  }
+  fun setPromptCharacter(promptCharacter: Char)
+  fun clearPromptCharacter()
 
   fun clearCurrentAction()
 
@@ -151,6 +103,7 @@ interface VimCommandLine {
    * TODO remove me, close is safer
    */
   fun deactivate(refocusOwningEditor: Boolean, resetCaret: Boolean)
+
   fun close(refocusOwningEditor: Boolean, resetCaret: Boolean) {
     // If 'cpoptions' contains 'x', then Escape should execute the command line. This is the default for Vi but not Vim.
     // IdeaVim does not (currently?) support 'cpoptions', so sticks with Vim's default behaviour. Escape cancels.

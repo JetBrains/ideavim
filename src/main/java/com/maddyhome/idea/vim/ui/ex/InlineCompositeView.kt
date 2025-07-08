@@ -34,6 +34,19 @@ open class InlineCompositeView(elem: Element) : CompositeView(elem) {
     return getView(viewCount - 1)
   }
 
+  override fun getViewIndexAtPosition(pos: Int): Int {
+    // We might have multiple views for the current element, and the default implementation of CompositeView returns the
+    // index of the child element at the given offset. We need to find the view that holds the given offset. This is
+    // used to e.g. calculate the position of the caret
+    for (n in 0 until viewCount) {
+      val view = getView(n)
+      if (pos >= view.startOffset && pos < view.endOffset) {  // End offset is exclusive
+        return n
+      }
+    }
+    return -1
+  }
+
   override fun childAllocation(index: Int, a: Rectangle?) {
     a?.let {
       var lastSpan = 0
