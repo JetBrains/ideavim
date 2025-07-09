@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 internal class VimProjectService(val project: Project) : Disposable {
   override fun dispose() {
     // Not sure if this is a best solution
-    ExEntryPanel.getInstance().setEditor(null)
+    ExEntryPanel.instance?.setEditor(null)
   }
 
   companion object {

@@ -74,14 +74,14 @@ class ExEntryPanelService : VimCommandLineServiceBase(), VimModalInputService {
           }
 
           key.keyCode == KeyEvent.VK_ENTER -> {
-            text = commandLine.actualText
+            text = commandLine.text
             commandLine.deactivate(refocusOwningEditor = true, resetCaret = true)
             false
           }
 
           finishOn != null && key.keyChar == finishOn -> {
             commandLine.handleKey(key)
-            text = commandLine.actualText
+            text = commandLine.text
             commandLine.deactivate(refocusOwningEditor = true, resetCaret = true)
             false
           }
@@ -100,16 +100,16 @@ class ExEntryPanelService : VimCommandLineServiceBase(), VimModalInputService {
   }
 
   override fun readInputAndProcess(
-    editor: VimEditor,
+    vimEditor: VimEditor,
     context: ExecutionContext,
     prompt: String,
     finishOn: Char?,
     processing: (String) -> Unit,
   ) {
-    val currentMode = editor.mode
+    val currentMode = vimEditor.mode
 
     // Make sure the Visual selection marks are up to date before we use them.
-    injector.markService.setVisualSelectionMarks(editor)
+    injector.markService.setVisualSelectionMarks(vimEditor)
 
     // Note that we should remove selection and reset caret offset before we switch back to Normal mode and then enter
     // Command-line mode. However, some IdeaVim commands can handle multiple carets, including multiple carets with
@@ -119,14 +119,13 @@ class ExEntryPanelService : VimCommandLineServiceBase(), VimModalInputService {
     // On the plus side, it means we still show selection while editing the command line, which Vim also does
     // (Normal then Command-line is not strictly necessary, but done for completeness and autocmd)
     // Caret selection is finally handled in Command.execute
-    editor.mode = Mode.NORMAL()
-    editor.mode = Mode.CMD_LINE(currentMode)
+    vimEditor.mode = Mode.NORMAL()
+    vimEditor.mode = Mode.CMD_LINE(currentMode)
 
-    val panel = ExEntryPanel.getInstance()
-    panel as ExEntryPanel
+    val panel = ExEntryPanel.getOrCreateInstance()
     panel.finishOn = finishOn
     panel.inputProcessing = processing
-    panel.activate(editor.ij, context.ij, prompt, "")
+    panel.activate(vimEditor.ij, context.ij, prompt, "")
   }
 
   override fun createPanel(
@@ -135,7 +134,7 @@ class ExEntryPanelService : VimCommandLineServiceBase(), VimModalInputService {
     label: String,
     initText: String,
   ): VimCommandLine {
-    val panel = ExEntryPanel.getInstance()
+    val panel = ExEntryPanel.getOrCreateInstance()
     panel.activate(editor.ij, context.ij, label, initText)
     return panel
   }
@@ -145,17 +144,18 @@ class ExEntryPanelService : VimCommandLineServiceBase(), VimModalInputService {
   }
 
   override fun getCurrentModalInput(): VimModalInput? {
-    return ExEntryPanel.getInstanceWithoutShortcuts()?.takeIf { it.isActive && it.inputInterceptor != null }
-      ?.let { WrappedAsModalInputExEntryPanel(it) }
+    val instance = ExEntryPanel.instance ?: return null
+    if (!instance.isActive || instance.inputInterceptor == null) return null
+    return WrappedAsModalInputExEntryPanel(instance)
   }
 
   override fun create(
     editor: VimEditor,
     context: ExecutionContext,
     label: String,
-    inputInterceptor: VimInputInterceptor<*>,
+    inputInterceptor: VimInputInterceptor,
   ): VimModalInput {
-    val panel = ExEntryPanel.getInstanceWithoutShortcuts()
+    val panel = ExEntryPanel.getOrCreateInstance()
     panel.inputInterceptor = inputInterceptor
     panel.activate(editor.ij, context.ij, label, "")
     return WrappedAsModalInputExEntryPanel(panel)
@@ -163,7 +163,7 @@ class ExEntryPanelService : VimCommandLineServiceBase(), VimModalInputService {
 }
 
 internal class WrappedAsModalInputExEntryPanel(internal val exEntryPanel: ExEntryPanel) : VimModalInputBase() {
-  override var inputInterceptor: VimInputInterceptor<*>
+  override var inputInterceptor: VimInputInterceptor
     get() = exEntryPanel.inputInterceptor!!
     set(value) {
       exEntryPanel.inputInterceptor = value

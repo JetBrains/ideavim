@@ -16,6 +16,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ScrollingModel;
+import com.intellij.openapi.editor.colors.EditorColors;
 import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.IJSwingUtilities;
@@ -48,6 +49,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -62,18 +64,21 @@ import static com.maddyhome.idea.vim.group.KeyGroup.toShortcutSet;
  * This is used to enter ex commands such as searches and "colon" commands
  */
 public class ExEntryPanel extends JPanel implements VimCommandLine {
-  public static ExEntryPanel instance;
-  public static ExEntryPanel instanceWithoutShortcuts;
-  public boolean isReplaceMode = false;
-  private WeakReference<Editor> weakEditor = null;
+  public static @Nullable ExEntryPanel instance;
 
-  private VimInputInterceptor myInputInterceptor = null;
+  public boolean isReplaceMode = false;
   public Function1<String, Unit> inputProcessing = null;
   public Character finishOn = null;
 
-  private ExEntryPanel(boolean enableShortcuts) {
+  private VimInputInterceptor myInputInterceptor = null;
+  private WeakReference<Editor> weakEditor = null;
+  private DataContext context = null;
+  private int histIndex = 0;
+  private String lastEntry;
+
+  private ExEntryPanel() {
     label = new JLabel(" ");
-    entry = new ExTextField();
+    entry = new ExTextField(this);
 
     GridBagLayout layout = new GridBagLayout();
     GridBagConstraints gbc = new GridBagConstraints();
@@ -91,43 +96,22 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     // This does not need to be unregistered, it's registered as a custom UI property on this
     EventFacade.getInstance().registerCustomShortcutSet(VimShortcutKeyAction.getInstance(), toShortcutSet(
       ((VimKeyGroupBase)injector.getKeyGroup()).getRequiredShortcutKeys()), entry);
-    new ExShortcutKeyAction(this).registerCustomShortcutSet();
 
     updateUI();
   }
 
-  public static ExEntryPanel getInstance() {
+  public static ExEntryPanel getOrCreateInstance() {
     if (instance == null) {
-      instance = new ExEntryPanel(true);
+      instance = new ExEntryPanel();
     }
 
     return instance;
   }
 
-  public static ExEntryPanel getInstanceWithoutShortcuts() {
-    if (instanceWithoutShortcuts == null) {
-      instanceWithoutShortcuts = new ExEntryPanel(false);
-    }
-
-    return instanceWithoutShortcuts;
-  }
-
-  public static boolean isInstanceWithShortcutsActive() {
-    return instance != null;
-  }
-
-  public static boolean isInstanceWithoutShortcutsActive() {
-    return instanceWithoutShortcuts != null;
-  }
-
   public static void fullReset() {
-    if (isInstanceWithShortcutsActive()) {
+    if (instance != null) {
       instance.reset();
       instance = null;
-    }
-    if (isInstanceWithoutShortcutsActive()) {
-      instanceWithoutShortcuts.reset();
-      instanceWithoutShortcuts = null;
     }
   }
 
@@ -152,6 +136,14 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     }
   }
 
+  public DataContext getContext() {
+    return context;
+  }
+
+  public void setContext(DataContext context) {
+    this.context = context;
+  }
+
   /**
    * @deprecated use {@link ExEntryPanel#activate(Editor, DataContext, String, String)}
    */
@@ -173,11 +165,19 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     this.label.setText(label);
     this.label.setFont(UiHelper.selectEditorFont(editor, label));
     entry.reset();
-    entry.setEditor(editor, context);
     entry.setText(initText);
     entry.setFont(UiHelper.selectEditorFont(editor, initText));
-    entry.setType(label);
     parent = editor.getContentComponent();
+
+    entry.setForeground(editor.getColorsScheme().getDefaultForeground());
+    // TODO: Introduce IdeaVim colour scheme for "SpecialKey"?
+    entry.setSpecialKeyForeground(editor.getColorsScheme().getColor(EditorColors.WHITESPACES_COLOR));
+    this.label.setForeground(entry.getForeground());
+
+    this.context = context;
+    setEditor(editor);
+
+    setHistIndex(VimPlugin.getHistory().getEntries(getHistoryType(), 0, 0).size());
 
     entry.getDocument().addDocumentListener(fontListener);
     if (isIncSearchEnabled()) {
@@ -204,15 +204,6 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     active = true;
   }
 
-  public static void deactivateAll() {
-    if (instance != null && instance.active) {
-      instance.deactivate(false);
-    }
-    if (instanceWithoutShortcuts != null && instanceWithoutShortcuts.active) {
-      instanceWithoutShortcuts.deactivate(false);
-    }
-  }
-
   public void deactivate(boolean refocusOwningEditor) {
     deactivate(refocusOwningEditor, true);
   }
@@ -225,6 +216,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     logger.info("Deactivate ex entry panel");
     if (!active) return;
 
+    clearPromptCharacter();
     try {
       entry.getDocument().removeDocumentListener(fontListener);
       // incsearch won't change in the lifetime of this activation
@@ -239,19 +231,17 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
         // search that we did for incsearch and add highlights back. The `:nohlsearch` command, even if bound to a
         // shortcut, is still processed by the ex entry panel, so deactivating will force update remove, search and add
         // of the current search results before the `NoHLSearchHandler` will remove all highlights again
-        final Editor editor = entry.getEditor();
-        if (!editor.isDisposed() && resetCaret) {
+        final Editor editor = getIjEditor();
+        if (editor != null && !editor.isDisposed() && resetCaret) {
           resetCaretOffset(editor);
         }
 
         VimPlugin.getSearch().resetIncsearchHighlights();
       }
 
-      isReplaceMode = false;
       entry.deactivate();
     }
     finally {
-
       // Make sure we hide the UI, especially if something goes wrong
       if (!ApplicationManager.getApplication().isUnitTestMode()) {
         if (refocusOwningEditor && parent != null) {
@@ -268,6 +258,10 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
       parent = null;
     }
 
+    isReplaceMode = false;
+    setEditor(null);
+    context = null;
+
     // We have this in the end, because `entry.deactivate()` communicates with active panel during deactivation
     active = false;
     finishOn = null;
@@ -277,7 +271,6 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
 
   private void reset() {
     deactivate(false);
-    JTextField.removeKeymap(ExTextField.KEYMAP_NAME);
   }
 
   private void resetCaretOffset(@NotNull Editor editor) {
@@ -308,7 +301,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     @Override
     protected void textChanged(@NotNull DocumentEvent e) {
       try {
-        final Editor editor = entry.getEditor();
+        final Editor editor = getIjEditor();
         if (editor == null) {
           return;
         }
@@ -318,7 +311,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
         boolean searchCommand = false;
         LineRange searchRange = null;
         char separator = labelText.charAt(0);
-        String searchText = getActualText();
+        String searchText = getText();
         if (labelText.equals(":")) {
           if (searchText.isEmpty()) return;
           final Command command = getIncsearchCommand(searchText);
@@ -410,7 +403,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
    * @return The ex entry label
    */
   @Override
-  public String getLabel() {
+  public @NotNull String getLabel() {
     return label.getText();
   }
 
@@ -429,8 +422,59 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
   }
 
   @Override
-  public @NotNull String getVisibleText() {
+  public @NotNull String getText() {
     return entry.getText();
+  }
+
+  @Override
+  public @NotNull String getRenderedText() {
+    final StringBuilder stringBuilder = new StringBuilder();
+    getRenderedText(entry.getUI().getRootView(entry), stringBuilder);
+    if (stringBuilder.charAt(stringBuilder.length() - 1) == '\n') {
+      stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+    }
+    return stringBuilder.toString();
+  }
+
+  private void getRenderedText(View view, StringBuilder stringBuilder) {
+    if (view.getElement().isLeaf()) {
+      if (view instanceof GlyphView glyphView) {
+        final Segment text = glyphView.getText(glyphView.getStartOffset(), glyphView.getEndOffset());
+        stringBuilder.append(text);
+
+        // GlyphView doesn't render a trailing new line, but uses it to flush the characters in the preceding string
+        // Typically, we won't get a newline in the middle of a string, but we do add the prompt to the end of the doc
+        if (stringBuilder.charAt(stringBuilder.length() - 1) == '\n') {
+          stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+        }
+      }
+      else {
+        stringBuilder.append("<Unknown leaf view. Expected GlyphView, got: ");
+        stringBuilder.append(view.getClass().getName());
+        stringBuilder.append(">");
+      }
+    }
+    else {
+      final int viewCount = view.getViewCount();
+      for (int i = 0; i < viewCount; i++) {
+        final View child = view.getView(i);
+        getRenderedText(child, stringBuilder);
+      }
+    }
+  }
+
+  @Override
+  public void setPromptCharacter(char promptCharacter) {
+    if (entry.getUI() instanceof ExTextFieldUI exTextFieldUI) {
+      exTextFieldUI.setPromptCharacter(promptCharacter);
+    }
+  }
+
+  @Override
+  public void clearPromptCharacter() {
+    if (entry.getUI() instanceof ExTextFieldUI exTextFieldUI) {
+      exTextFieldUI.clearPromptCharacter();
+    }
   }
 
   public @NotNull ExTextField getEntry() {
@@ -438,15 +482,20 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
   }
 
   /**
-   * Pass the keystroke on to the text edit for handling
+   * Pass the keystroke on to the text field for handling
+   * <p>
+   * The text field for the command line will forward a pressed or typed keystroke to the key handler, which will either
+   * consume it for mapping or a command. If it's not consumed, or if it's mapped, the keystroke is returned to the
+   * command line to complete handling. This includes typed characters as well as pressed shortcuts.
+   * </p>
    *
-   * @param stroke The keystroke
+   * @param stroke The potentially mapped keystroke
    */
   @Override
   public void handleKey(@NotNull KeyStroke stroke) {
     entry.handleKey(stroke);
     if (finishOn != null && stroke.getKeyChar() == finishOn && inputProcessing != null) {
-      inputProcessing.invoke(getActualText());
+      inputProcessing.invoke(getText());
       close(true, true);
     }
   }
@@ -487,7 +536,7 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
 
   private void setFontForElements() {
     label.setFont(UiHelper.selectEditorFont(getIjEditor(), label.getText()));
-    entry.setFont(UiHelper.selectEditorFont(getIjEditor(), getVisibleText()));
+    entry.setFont(UiHelper.selectEditorFont(getIjEditor(), entry.getText()));
   }
 
   private void positionPanel() {
@@ -545,23 +594,26 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     int offset = getCaret().getOffset();
     entry.updateText(string);
     if (updateLastEntry) entry.saveLastEntry();
-    getCaret().setOffset(Math.min(offset, getVisibleText().length()));
+    getCaret().setOffset(Math.min(offset, getText().length()));
+  }
+
+  @Override
+  public void deleteText(int offset, int length) {
+    entry.deleteText(offset, length);
+  }
+
+  @Override
+  public void insertText(int offset, @NotNull String string) {
+    // Remember that replace mode is different to overwrite! The document handles overwrite, but we must handle replace
+    if (isReplaceMode) {
+      entry.deleteText(offset, string.length());
+    }
+    entry.insertText(offset, string);
   }
 
   @Override
   public void clearCurrentAction() {
     entry.clearCurrentAction();
-  }
-
-  @Override
-  public @Nullable Integer getPromptCharacterOffset() {
-    int offset = entry.currentActionPromptCharacterOffset;
-    return offset == -1 ? null : offset;
-  }
-
-  @Override
-  public void setPromptCharacterOffset(@Nullable Integer integer) {
-    entry.currentActionPromptCharacterOffset = integer == null ? -1 : integer;
   }
 
   @Override
@@ -574,16 +626,11 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     IdeFocusManager.findInstance().requestFocus(entry, true);
   }
 
-  public @Nullable VimInputInterceptor<?> getInputInterceptor() {
+  public @Nullable VimInputInterceptor getInputInterceptor() {
     return myInputInterceptor;
   }
 
-  @Override
-  public void insertText(int offset, @NotNull String string) {
-    VimCommandLine.super.insertText(offset, string);
-  }
-
-  public void setInputInterceptor(@Nullable VimInputInterceptor<?> vimInputInterceptor) {
+  public void setInputInterceptor(@Nullable VimInputInterceptor vimInputInterceptor) {
     myInputInterceptor = vimInputInterceptor;
   }
 
@@ -599,35 +646,33 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
 
   @Override
   public int getHistIndex() {
-    return entry.histIndex;
+    return histIndex;
   }
 
   @Override
   public void setHistIndex(int i) {
-    entry.histIndex = i;
+    histIndex = i;
   }
 
   @NotNull
   @Override
   public String getLastEntry() {
-    return entry.lastEntry;
+    return lastEntry;
   }
 
   @Override
   public void setLastEntry(@NotNull String s) {
-    entry.lastEntry = s;
+    lastEntry = s;
   }
 
   public static class LafListener implements LafManagerListener {
     @Override
     public void lookAndFeelChanged(@NotNull LafManager source) {
       if (VimPlugin.isNotEnabled()) return;
+
       // Calls updateUI on this and child components
-      if (ExEntryPanel.isInstanceWithShortcutsActive()) {
-        IJSwingUtilities.updateComponentTreeUI(ExEntryPanel.getInstance());
-      }
-      if (ExEntryPanel.isInstanceWithoutShortcutsActive()) {
-        IJSwingUtilities.updateComponentTreeUI(ExEntryPanel.getInstanceWithoutShortcuts());
+      if (instance != null) {
+        IJSwingUtilities.updateComponentTreeUI(instance);
       }
     }
   }
