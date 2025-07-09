@@ -138,6 +138,13 @@ open class VimScopeImpl(
     injector.pluginService.executeNormalWithoutMapping(command, vimEditor)
   }
 
+  override fun <T> forEachEditor(block: EditorScope.() -> T): List<T> {
+    return injector.editorGroup.getEditors().map { editor ->
+      val editorScope = EditorScopeImpl(listenerOwner, mappingOwner)
+      editorScope.block()
+    }
+  }
+
   override fun editorScope(): EditorScope {
     return EditorScopeImpl(listenerOwner, mappingOwner)
   }
