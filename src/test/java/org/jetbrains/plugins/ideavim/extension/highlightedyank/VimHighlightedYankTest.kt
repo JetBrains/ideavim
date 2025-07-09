@@ -10,11 +10,9 @@ package org.jetbrains.plugins.ideavim.extension.highlightedyank
 
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.markup.RangeHighlighter
-import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.util.TextRange
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.extension.highlightedyank.DEFAULT_HIGHLIGHT_DURATION
-import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.assertHappened
@@ -22,8 +20,6 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
-import org.mockito.Mockito.`when`
-import org.mockito.kotlin.spy
 import java.awt.Color
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -34,13 +30,6 @@ class VimHighlightedYankTest : VimTestCase() {
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
     enableExtensions("highlightedyank")
-
-    configureByText(code)
-    val spyEditor = spy(fixture.editor)
-    val mockProject = ProjectManager.getInstance().defaultProject
-    `when`(spyEditor.project).thenReturn(mockProject)
-
-    VimListenerManager.VimLastSelectedEditorTracker.setLastSelectedEditor(spyEditor)
   }
 
   @AfterEach
