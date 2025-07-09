@@ -17,7 +17,7 @@ import com.intellij.vim.api.scopes.caret.CaretTransaction
 import com.maddyhome.idea.vim.extension.thin.api.VimPluginBase
 
 class ReplaceWithRegisterNewApi : VimPluginBase() {
-  override fun getName(): String = "ReplaceWithRegister"
+  override val name: String = "ReplaceWithRegister"
 
   override fun VimScope.init() {
     mappings {

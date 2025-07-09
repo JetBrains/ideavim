@@ -52,9 +52,9 @@ class MiniAI : VimExtension {
     private const val KEY_IB = "ib"
   }
 
-  override fun getName() = "mini-ai"
+  override val name = "mini-ai"
 
-  override fun init() {
+  override suspend fun init() {
     registerMappings()
   }
 
@@ -78,7 +78,7 @@ class MiniAI : VimExtension {
       // Inner brackets
       PLUG_IB to createHandler { e, c, _ -> findBracketRange(e, c, isOuter = false) }
     ).forEach { (plug, handler) ->
-      putExtensionHandlerMapping(MappingMode.XO, injector.parser.parseKeys(plug), owner, handler, false)
+      putExtensionHandlerMapping(MappingMode.XO, injector.parser.parseKeys(plug), mappingOwner, handler, false)
     }
 
     // Map user keys -> <Plug> keys
@@ -88,7 +88,7 @@ class MiniAI : VimExtension {
       KEY_AB to PLUG_AB,
       KEY_IB to PLUG_IB
     ).forEach { (key, plug) ->
-      putKeyMapping(MappingMode.XO, injector.parser.parseKeys(key), owner, injector.parser.parseKeys(plug), true)
+      putKeyMapping(MappingMode.XO, injector.parser.parseKeys(key), mappingOwner, injector.parser.parseKeys(plug), true)
     }
   }
 }

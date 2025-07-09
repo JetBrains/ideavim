@@ -21,7 +21,7 @@ interface VimExtension {
   @get:VimNlsSafe
   val name: String
 
-  val owner: MappingOwner
+  val mappingOwner: MappingOwner
     get() = MappingOwner.Plugin.Companion.get(this.name)
 
   val listenerOwner: ListenerOwner
@@ -54,10 +54,10 @@ interface VimExtension {
    * `<Plug>(ExchangeLine)` and doesn't register the default cxx mapping. However, such detection requires the mapping
    * to be defined before the plugin initialization.
   </Plug></Plug> */
-  fun init()
+  suspend fun init()
 
   fun dispose() {
-    VimPlugin.getKey().removeKeyMapping(this.owner)
+    VimPlugin.getKey().removeKeyMapping(this.mappingOwner)
     injector.listenersNotifier.unloadListeners(this.listenerOwner)
   }
 
