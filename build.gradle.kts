@@ -56,11 +56,11 @@ buildscript {
     classpath("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:7.3.0.202506031305-r")
     classpath("org.kohsuke:github-api:1.305")
 
-    classpath("io.ktor:ktor-client-core:3.2.0")
-    classpath("io.ktor:ktor-client-cio:3.2.0")
-    classpath("io.ktor:ktor-client-auth:3.2.0")
-    classpath("io.ktor:ktor-client-content-negotiation:3.2.0")
-    classpath("io.ktor:ktor-serialization-kotlinx-json:3.2.0")
+    classpath("io.ktor:ktor-client-core:3.2.1")
+    classpath("io.ktor:ktor-client-cio:3.2.1")
+    classpath("io.ktor:ktor-client-auth:3.2.1")
+    classpath("io.ktor:ktor-client-content-negotiation:3.2.1")
+    classpath("io.ktor:ktor-serialization-kotlinx-json:3.2.1")
 
     // This comes from the changelog plugin
 //        classpath("org.jetbrains:markdown:0.3.1")
