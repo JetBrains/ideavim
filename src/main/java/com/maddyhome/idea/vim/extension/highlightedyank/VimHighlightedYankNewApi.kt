@@ -45,7 +45,7 @@ class VimHighlightedYankNewApi : VimPluginBase() {
   private val myHighlightIds: MutableList<HighlightId> = mutableListOf()
   private val alarm = Alarm(ThreadToUse.SWING_THREAD)
 
-  override fun getName(): String = "highlightedyank"
+  override val name: String = "highlightedyank"
 
   override fun VimScope.init() {
     listeners {

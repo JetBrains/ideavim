@@ -54,16 +54,16 @@ import java.util.regex.Pattern
  */
 internal class Matchit : VimExtension {
 
-  override fun getName(): String = "matchit"
+  override val name: String = "matchit"
 
-  override fun init() {
-    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys("<Plug>(MatchitMotion)"), owner, MatchitHandler(false), false)
-    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys("<Plug>(MatchitMotion)"), owner, MatchitHandler(false), false)
-    putKeyMappingIfMissing(MappingMode.NXO, injector.parser.parseKeys("%"), owner, injector.parser.parseKeys("<Plug>(MatchitMotion)"), true)
+  override suspend fun init() {
+    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys("<Plug>(MatchitMotion)"), mappingOwner, MatchitHandler(false), false)
+    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys("<Plug>(MatchitMotion)"), mappingOwner, MatchitHandler(false), false)
+    putKeyMappingIfMissing(MappingMode.NXO, injector.parser.parseKeys("%"), mappingOwner, injector.parser.parseKeys("<Plug>(MatchitMotion)"), true)
 
-    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys("<Plug>(ReverseMatchitMotion)"), owner, MatchitHandler(true), false)
-    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys("<Plug>(ReverseMatchitMotion)"), owner, MatchitHandler(true), false)
-    putKeyMappingIfMissing(MappingMode.NXO, injector.parser.parseKeys("g%"), owner, injector.parser.parseKeys("<Plug>(ReverseMatchitMotion)"), true)
+    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys("<Plug>(ReverseMatchitMotion)"), mappingOwner, MatchitHandler(true), false)
+    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys("<Plug>(ReverseMatchitMotion)"), mappingOwner, MatchitHandler(true), false)
+    putKeyMappingIfMissing(MappingMode.NXO, injector.parser.parseKeys("g%"), mappingOwner, injector.parser.parseKeys("<Plug>(ReverseMatchitMotion)"), true)
   }
 
   private class MatchitAction : MotionActionHandler.ForEachCaret() {
