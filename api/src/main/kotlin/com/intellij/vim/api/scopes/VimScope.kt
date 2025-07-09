@@ -100,6 +100,8 @@ abstract class VimScope {
     return this.editorScope().block()
   }
 
+  abstract fun <T> forEachEditor(block: EditorScope.() -> T): List<T>
+
   protected abstract fun editorScope(): EditorScope
 
   abstract fun mappings(block: MappingScope.() -> Unit)
