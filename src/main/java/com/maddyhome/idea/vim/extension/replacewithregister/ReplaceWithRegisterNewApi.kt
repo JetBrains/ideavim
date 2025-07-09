@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.extension.thin.api.VimPluginBase
 class ReplaceWithRegisterNewApi : VimPluginBase() {
   override val name: String = "ReplaceWithRegister"
 
-  override fun VimScope.init() {
+  override suspend fun VimScope.init() {
     mappings {
       nmap(keys = "gr", label = RWR_OPERATOR, isRepeatable = true) {
         rewriteMotion()
