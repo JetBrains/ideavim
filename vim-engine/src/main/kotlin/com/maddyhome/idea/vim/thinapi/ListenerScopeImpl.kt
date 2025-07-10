@@ -17,6 +17,7 @@ import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.EditorListener
+import com.maddyhome.idea.vim.common.Listener
 import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.common.MacroRecordingListener
 import com.maddyhome.idea.vim.common.ModeChangeListener
@@ -27,117 +28,121 @@ import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import com.maddyhome.idea.vim.state.mode.Mode as EngineMode
 
 class ListenerScopeImpl(
   private val listenerOwner: ListenerOwner,
   private val mappingOwner: MappingOwner,
 ) : ListenersScope {
-  private val coroutineScope = CoroutineScope(Dispatchers.Unconfined)
+
+  private abstract class ListenerBase(listenerOwner: ListenerOwner): Listener {
+    final override val owner: ListenerOwner = listenerOwner
+    private val coroutineScope = CoroutineScope(Dispatchers.Unconfined)
+    private var currentJob: Job? = null
+
+    fun launch(block: suspend () -> Unit) {
+      currentJob?.cancel() // cancel a previously launched job, todo: see if correct
+      currentJob = coroutineScope.launch { block() }
+    }
+
+    final override fun onRemove() {
+      runBlocking {
+        // wait for job to finish todo: maybe not necessary
+        currentJob?.join()
+      }
+      // cancel coroutines that are launched by this listener
+      coroutineScope.cancel()
+    }
+  }
 
   override suspend fun onModeChange(callback: suspend VimScope.(Mode) -> Unit) {
-    val listener = object : ModeChangeListener {
+    val listener = object : ModeChangeListener, ListenerBase(listenerOwner) {
       override fun modeChanged(
         editor: VimEditor,
         oldMode: EngineMode,
       ) {
         val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
-        coroutineScope.launch {
+        launch {
           vimScope.callback(oldMode.toMode())
         }
       }
-
-      override val owner: ListenerOwner
-        get() = listenerOwner
     }
     injector.listenersNotifier.modeChangeListeners.add(listener)
   }
 
   override suspend fun onYank(callback: suspend VimScope.(Map<CaretId, Range.Simple>) -> Unit) {
-    val listener = object : VimYankListener {
+    val listener = object : VimYankListener, ListenerBase(listenerOwner) {
       override fun yankPerformed(caretToRange: Map<ImmutableVimCaret, TextRange>) {
         val caretToRangeMap: Map<CaretId, Range.Simple> =
           caretToRange.map { (caret, range) ->
             CaretId(caret.id) to Range.Simple(range.startOffset, range.endOffset)
           }.toMap()
         val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
-        coroutineScope.launch {
+        launch {
           vimScope.callback(caretToRangeMap)
         }
       }
-
-      override val owner: ListenerOwner
-        get() = listenerOwner
     }
     injector.listenersNotifier.yankListeners.add(listener)
   }
 
   override suspend fun onEditorCreate(callback: suspend VimScope.() -> Unit) {
-    val listener = object : EditorListener {
+    val listener = object : EditorListener, ListenerBase(listenerOwner) {
       override fun created(editor: VimEditor) {
         val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
-        coroutineScope.launch {
+        launch {
           vimScope.callback()
         }
       }
-
-      override val owner: ListenerOwner
-        get() = listenerOwner
     }
     injector.listenersNotifier.myEditorListeners.add(listener)
   }
 
   override suspend fun onEditorRelease(callback: suspend VimScope.() -> Unit) {
-    val listener = object : EditorListener {
+    val listener = object : EditorListener, ListenerBase(listenerOwner) {
       override fun released(editor: VimEditor) {
         val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
-        coroutineScope.launch {
+        launch {
           vimScope.callback()
         }
       }
-
-      override val owner: ListenerOwner
-        get() = listenerOwner
     }
     injector.listenersNotifier.myEditorListeners.add(listener)
   }
 
   override suspend fun onEditorFocusGain(callback: suspend VimScope.() -> Unit) {
-    val listener = object : EditorListener {
+    val listener = object : EditorListener, ListenerBase(listenerOwner) {
       override fun focusGained(editor: VimEditor) {
         val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
-        coroutineScope.launch {
+        launch {
           vimScope.callback()
         }
       }
-
-      override val owner: ListenerOwner
-        get() = listenerOwner
     }
     injector.listenersNotifier.myEditorListeners.add(listener)
   }
 
   override suspend fun onEditorFocusLost(callback: suspend VimScope.() -> Unit) {
-    val listener = object : EditorListener {
+    val listener = object : EditorListener, ListenerBase(listenerOwner) {
       override fun focusLost(editor: VimEditor) {
         val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
-        coroutineScope.launch {
+        launch {
           vimScope.callback()
         }
       }
-
-      override val owner: ListenerOwner
-        get() = listenerOwner
     }
     injector.listenersNotifier.myEditorListeners.add(listener)
   }
 
   override suspend fun onMacroRecordingStart(callback: suspend VimScope.() -> Unit) {
-    val listener = object : MacroRecordingListener {
+    val listener = object : MacroRecordingListener, ListenerBase(listenerOwner) {
       override fun recordingStarted() {
         val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
-        coroutineScope.launch {
+        launch {
           vimScope.callback()
         }
       }
@@ -145,37 +150,31 @@ class ListenerScopeImpl(
       override fun recordingFinished() {
         // Not used in this listener
       }
-
-      override val owner: ListenerOwner
-        get() = listenerOwner
     }
     injector.listenersNotifier.macroRecordingListeners.add(listener)
   }
 
   override suspend fun onMacroRecordingFinish(callback: suspend VimScope.() -> Unit) {
-    val listener = object : MacroRecordingListener {
+    val listener = object : MacroRecordingListener, ListenerBase(listenerOwner) {
       override fun recordingStarted() {
         // Not used in this listener
       }
 
       override fun recordingFinished() {
         val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
-        coroutineScope.launch {
+        launch {
           vimScope.callback()
         }
       }
-
-      override val owner: ListenerOwner
-        get() = listenerOwner
     }
     injector.listenersNotifier.macroRecordingListeners.add(listener)
   }
 
   override suspend fun onIdeaVimEnabled(callback: suspend VimScope.() -> Unit) {
-    val listener = object : VimPluginListener {
+    val listener = object : VimPluginListener, ListenerBase(listenerOwner) {
       override fun turnedOn() {
         val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
-        coroutineScope.launch {
+        launch {
           vimScope.callback()
         }
       }
@@ -183,38 +182,32 @@ class ListenerScopeImpl(
       override fun turnedOff() {
         // Not used in this listener
       }
-
-      override val owner: ListenerOwner
-        get() = listenerOwner
     }
     injector.listenersNotifier.vimPluginListeners.add(listener)
   }
 
   override suspend fun onIdeaVimDisabled(callback: suspend VimScope.() -> Unit) {
-    val listener = object : VimPluginListener {
+    val listener = object : VimPluginListener, ListenerBase(listenerOwner) {
       override fun turnedOn() {
         // Not used in this listener
       }
 
       override fun turnedOff() {
         val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
-        coroutineScope.launch {
+        launch {
           vimScope.callback()
         }
       }
-
-      override val owner: ListenerOwner
-        get() = listenerOwner
     }
     injector.listenersNotifier.vimPluginListeners.add(listener)
   }
 
   override suspend fun onGlobalOptionChange(optionName: String, callback: suspend VimScope.() -> Unit) {
     val option = injector.optionGroup.getOption(optionName) ?: return
-    val listener = object : GlobalOptionChangeListener {
+    val listener = object : GlobalOptionChangeListener, ListenerBase(listenerOwner) {
       override fun onGlobalOptionChanged() {
         val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
-        coroutineScope.launch {
+        launch {
           vimScope.callback()
         }
       }
