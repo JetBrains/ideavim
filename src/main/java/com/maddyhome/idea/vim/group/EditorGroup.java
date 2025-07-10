@@ -9,6 +9,9 @@
 package com.maddyhome.idea.vim.group;
 
 import com.intellij.find.EditorSearchSession;
+import com.intellij.ide.DataManager;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.client.ClientAppSession;
 import com.intellij.openapi.client.ClientKind;
 import com.intellij.openapi.client.ClientSessionsManager;
@@ -21,13 +24,11 @@ import com.intellij.openapi.editor.event.CaretListener;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.helper.CaretVisualAttributesHelperKt;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.UserDataManager;
-import com.maddyhome.idea.vim.listener.VimListenerManager;
 import com.maddyhome.idea.vim.newapi.IjVimDocument;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.options.EffectiveOptionValueChangeListener;
@@ -39,9 +40,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -272,12 +274,19 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
 
   @Override
   public @Nullable VimEditor getFocusedEditor() {
-    // todo: probably we should use currently focused project
-    Project project = Arrays.stream(ProjectManager.getInstance().getOpenProjects()).findFirst()
-      .orElseGet(ProjectManager.getInstance()::getDefaultProject);
-    Editor editor = VimListenerManager.VimLastSelectedEditorTracker.INSTANCE.getLastSelectedEditor(project);
-    if (editor == null) return null;
-    return new IjVimEditor(editor);
+    try {
+      DataContext dataContext = DataManager.getInstance().getDataContextFromFocusAsync().blockingGet(1000);
+      if (dataContext != null) {
+        Editor focusedEditor = CommonDataKeys.EDITOR.getData(dataContext);
+        if (focusedEditor != null) {
+          return new IjVimEditor(focusedEditor);
+        }
+      }
+    }
+    catch (TimeoutException | ExecutionException e) {
+      throw new RuntimeException("No focused editor found", e);
+    }
+    return null;
   }
 
   public static class NumberChangeListener implements EffectiveOptionValueChangeListener {
