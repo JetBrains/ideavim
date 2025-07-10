@@ -70,6 +70,7 @@ dependencies {
 
     testImplementation("org.mockito.kotlin:mockito-kotlin:6.0.0")
     implementation(project(":api"))
+    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.8.1")
 }
 
 tasks {
