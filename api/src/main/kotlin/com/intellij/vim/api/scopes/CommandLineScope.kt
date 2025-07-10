@@ -10,6 +10,8 @@ package com.intellij.vim.api.scopes
 
 import com.intellij.vim.api.scopes.commandline.CommandLineRead
 import com.intellij.vim.api.scopes.commandline.CommandLineTransaction
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Job
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -22,18 +24,17 @@ import kotlin.contracts.contract
  */
 @VimPluginDsl
 abstract class CommandLineScope {
-
   /**
-   * Reads input from the command line and processes it with the provided function.
+   * Reads input from the command line and processes it with the provided suspend function.
    *
    * @param prompt The prompt to display at the beginning of the command line.
    * @param finishOn The character that, when entered, will finish the input process. If null, only Enter will finish.
-   * @param callback A function that will be called with the entered text when input is complete.
+   * @param callback A suspend function that will be called with the entered text when input is complete.
    */
-  abstract fun input(prompt: String, finishOn: Char? = null, callback: VimScope.(String) -> Unit)
+  abstract suspend fun input(prompt: String, finishOn: Char? = null, callback: VimScope.(String) -> Unit)
 
   @OptIn(ExperimentalContracts::class)
-  fun <T> read(block: CommandLineRead.() -> T): T {
+  suspend fun <T> read(block: suspend CommandLineRead.() -> T): Deferred<T> {
     contract {
       callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
@@ -41,13 +42,13 @@ abstract class CommandLineScope {
   }
 
   @OptIn(ExperimentalContracts::class)
-  fun change(block: CommandLineTransaction.() -> Unit) {
+  suspend fun change(block: suspend CommandLineTransaction.() -> Unit): Job {
     contract {
       callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
     return ideChange(block)
   }
 
-  protected abstract fun <T> ideRead(block: CommandLineRead.() -> T): T
-  protected abstract fun ideChange(block: CommandLineTransaction.() -> Unit)
+  protected abstract suspend fun <T> ideRead(block: suspend CommandLineRead.() -> T): Deferred<T>
+  protected abstract suspend fun ideChange(block: suspend CommandLineTransaction.() -> Unit): Job
 }

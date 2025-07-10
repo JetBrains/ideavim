@@ -34,22 +34,22 @@ class ModalInputImpl(
   private var repeatCount: Int? = null
   private var updateLabel: ((String) -> String)? = null
 
-  override fun updateLabel(block: (String) -> String): ModalInput {
+  override suspend fun updateLabel(block: (String) -> String): ModalInput {
     updateLabel = block
     return this
   }
 
-  override fun repeatWhile(condition: () -> Boolean): ModalInput {
+  override suspend fun repeatWhile(condition: () -> Boolean): ModalInput {
     repeatWhileCondition = condition
     return this
   }
 
-  override fun repeat(count: Int): ModalInput {
+  override suspend fun repeat(count: Int): ModalInput {
     repeatCount = count
     return this
   }
 
-  override fun inputString(label: String, handler: VimScope.(String) -> Unit) {
+  override suspend fun inputString(label: String, handler: VimScope.(String) -> Unit) {
     val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
     val interceptor = TextInputInterceptor(repeatCount, repeatWhileCondition, updateLabel) {
       vimScope.handler(it)
@@ -58,7 +58,7 @@ class ModalInputImpl(
     interceptor.modalInput = modalInput
   }
 
-  override fun inputChar(label: String, handler: VimScope.(Char) -> Unit) {
+  override suspend fun inputChar(label: String, handler: VimScope.(Char) -> Unit) {
     val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
     val interceptor = CharInputInterceptor(repeatCount, repeatWhileCondition, updateLabel) { char ->
       vimScope.handler(char)
@@ -67,7 +67,7 @@ class ModalInputImpl(
     interceptor.modalInput = modalInput
   }
 
-  override fun closeCurrentInput(refocusEditor: Boolean): Boolean {
+  override suspend fun closeCurrentInput(refocusEditor: Boolean): Boolean {
     val currentInput = injector.modalInput.getCurrentModalInput() ?: return false
     currentInput.deactivate(refocusEditor, true)
     return true

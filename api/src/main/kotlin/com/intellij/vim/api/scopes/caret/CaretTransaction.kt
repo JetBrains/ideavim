@@ -12,46 +12,46 @@ import com.intellij.vim.api.Line
 import com.intellij.vim.api.Range
 
 interface CaretTransaction: CaretRead {
-  fun updateCaret(offset: Int, selection: Range.Simple? = null)
+  suspend fun updateCaret(offset: Int, selection: Range.Simple? = null)
 
-  fun insertText(
+  suspend fun insertText(
     position: Int,
     text: String,
     caretAfterInsertedText: Boolean = true
   ): Boolean
 
-  fun replaceText(
+  suspend fun replaceText(
     startOffset: Int,
     endOffset: Int,
     text: String,
   ): Boolean
 
-  fun replaceTextForRange(
+  suspend fun replaceTextForRange(
     startOffset: Int,
     endOffset: Int,
     text: String
   )
 
-  fun deleteText(
+  suspend fun deleteText(
     startOffset: Int,
     endOffset: Int,
   ): Boolean
 
   // temporary
-  fun getLineStartOffset(line: Int): Int
-  fun getLineEndOffset(line: Int, allowEnd: Boolean): Int
-  fun getLine(offset: Int): Line
+  suspend fun getLineStartOffset(line: Int): Int
+  suspend fun getLineEndOffset(line: Int, allowEnd: Boolean): Int
+  suspend fun getLine(offset: Int): Line
 
   /**
    * Adds a jump with the current caret's position to the jump list.
    *
    * @param reset Whether to reset the current position in the jump list
    */
-  fun addJump(reset: Boolean)
+  suspend fun addJump(reset: Boolean)
 
   /**
    * Saves the location of the current caret to the jump list and sets the ' mark.
    */
   // todo: maybe not necessary
-  fun saveJumpLocation()
+  suspend fun saveJumpLocation()
 }

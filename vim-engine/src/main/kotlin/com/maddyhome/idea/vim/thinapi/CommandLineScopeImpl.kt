@@ -17,35 +17,43 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.key.MappingOwner
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 class CommandLineScopeImpl(
   private val listenerOwner: ListenerOwner,
   private val mappingOwner: MappingOwner,
 ) : CommandLineScope() {
+  private val coroutineScope = CoroutineScope(Dispatchers.Unconfined )
+
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!
 
   private val vimContext: ExecutionContext
     get() = injector.executionContextManager.getEditorExecutionContext(vimEditor)
 
-  override fun input(prompt: String, finishOn: Char?, callback: VimScope.(String) -> Unit) {
+  override suspend fun input(prompt: String, finishOn: Char?, callback: VimScope.(String) -> Unit) {
     val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
     injector.commandLine.readInputAndProcess(vimEditor, vimContext, prompt, finishOn) {
       vimScope.callback(it)
     }
   }
 
-  override fun <T> ideRead(block: CommandLineRead.() -> T): T {
+  override suspend fun <T> ideRead(block: suspend CommandLineRead.() -> T): Deferred<T> {
     return injector.application.runReadAction {
       val read = CommandLineReadImpl()
-      return@runReadAction block(read)
+      return@runReadAction coroutineScope.async { block(read) }
     }
   }
 
-  override fun ideChange(block: CommandLineTransaction.() -> Unit) {
+  override suspend fun ideChange(block: suspend CommandLineTransaction.() -> Unit): Job {
     return injector.application.runWriteAction {
       val transaction = CommandLineTransactionImpl()
-      transaction.block()
+      coroutineScope.launch { transaction.block() }
     }
   }
 }

@@ -16,29 +16,29 @@ package com.intellij.vim.api.scopes
  */
 @VimPluginDsl
 interface ModalInput {
-  fun updateLabel(block: (String) -> String): ModalInput
+  suspend fun updateLabel(block: (String) -> String): ModalInput
 
-  fun repeatWhile(condition: () -> Boolean): ModalInput
+  suspend fun repeatWhile(condition: () -> Boolean): ModalInput
 
-  fun repeat(count: Int): ModalInput
+  suspend fun repeat(count: Int): ModalInput
 
   /**
    * Creates a modal input dialog with the given label and handler. Handler will be executed after the user presses ENTER.
    *
    * @param label The label to display in the dialog
-   * @param handler A function that will be called when the user enters input (after pressing ENTER)
+   * @param handler A suspend function that will be called when the user enters input (after pressing ENTER)
    * @return True if the input was processed successfully, false otherwise
    */
-  fun inputString(label: String, handler: VimScope.(String) -> Unit)
+  suspend fun inputString(label: String, handler: VimScope.(String) -> Unit)
 
   /**
    * Creates a modal input dialog with the given label and handler.
    *
    * @param label The label to display in the dialog
-   * @param handler A function that will be called when the user enters input (after pressing ENTER)
+   * @param handler A suspend function that will be called when the user enters input (after pressing ENTER)
    * @return True if the input was processed successfully, false otherwise
    */
-  fun inputChar(label: String, handler: VimScope.(Char) -> Unit)
+  suspend fun inputChar(label: String, handler: VimScope.(Char) -> Unit)
 
   /**
    * Closes the current modal input dialog, if any.
@@ -46,5 +46,5 @@ interface ModalInput {
    * @param refocusEditor Whether to refocus the editor after closing the dialog
    * @return True if a dialog was closed, false otherwise
    */
-  fun closeCurrentInput(refocusEditor: Boolean = true): Boolean
+  suspend fun closeCurrentInput(refocusEditor: Boolean = true): Boolean
 }

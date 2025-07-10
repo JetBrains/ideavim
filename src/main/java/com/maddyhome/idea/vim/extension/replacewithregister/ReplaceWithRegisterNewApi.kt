@@ -15,6 +15,7 @@ import com.intellij.vim.api.isLine
 import com.intellij.vim.api.scopes.VimScope
 import com.intellij.vim.api.scopes.caret.CaretTransaction
 import com.maddyhome.idea.vim.extension.thin.api.VimPluginBase
+import kotlinx.coroutines.Job
 
 class ReplaceWithRegisterNewApi : VimPluginBase() {
   override val name: String = "ReplaceWithRegister"
@@ -37,7 +38,7 @@ class ReplaceWithRegisterNewApi : VimPluginBase() {
     }
   }
 
-  private fun VimScope.operatorFunction(): Boolean {
+  private suspend fun VimScope.operatorFunction(): Boolean {
     fun CaretTransaction.getSelection(): Range? {
       return when (this@operatorFunction.mode) {
         is Mode.NORMAL -> changeMarks
@@ -46,8 +47,9 @@ class ReplaceWithRegisterNewApi : VimPluginBase() {
       }
     }
 
+    val job: Job
     editor {
-      change {
+      job = change {
         forEachCaret {
           val selectionRange = getSelection() ?: return@forEachCaret
           val registerData = prepareRegisterData() ?: return@forEachCaret
@@ -55,18 +57,20 @@ class ReplaceWithRegisterNewApi : VimPluginBase() {
         }
       }
     }
+    job.join()
     return true
   }
 
-  private fun VimScope.rewriteMotion() {
+  private suspend fun VimScope.rewriteMotion() {
     setOperatorFunction(OPERATOR_FUNC_NAME)
     normal("g@")
   }
 
-  private fun VimScope.rewriteLine() {
+  private suspend fun VimScope.rewriteLine() {
     val count1 = getVariable<Int>("v:count1") ?: 1
+    val job: Job
     editor {
-      change {
+      job = change {
         forEachCaret {
           val endOffset = getLineEndOffset(line.number + count1 - 1, true)
           val registerData = prepareRegisterData() ?: return@forEachCaret
@@ -75,11 +79,13 @@ class ReplaceWithRegisterNewApi : VimPluginBase() {
         }
       }
     }
+    job.join()
   }
 
-  private fun VimScope.rewriteVisual() {
+  private suspend fun VimScope.rewriteVisual() {
+    val job: Job
     editor {
-      change {
+      job = change {
         forEachCaret {
           val selectionRange = selection
           val registerData = prepareRegisterData() ?: return@forEachCaret
@@ -87,10 +93,11 @@ class ReplaceWithRegisterNewApi : VimPluginBase() {
         }
       }
     }
+    job.join()
     mode = Mode.NORMAL()
   }
 
-  private fun CaretTransaction.prepareRegisterData(): Pair<String, TextType>? {
+  private suspend fun CaretTransaction.prepareRegisterData(): Pair<String, TextType>? {
     val lastRegisterName: Char = lastSelectedReg
     var registerText: String = getReg(lastRegisterName) ?: return null
     var registerType: TextType = getRegType(lastRegisterName) ?: return null
@@ -103,7 +110,7 @@ class ReplaceWithRegisterNewApi : VimPluginBase() {
     return registerText to registerType
   }
 
-  private fun CaretTransaction.replaceTextAndUpdateCaret(
+  private suspend fun CaretTransaction.replaceTextAndUpdateCaret(
     vimScope: VimScope,
     selectionRange: Range,
     registerData: Pair<String, TextType>,
