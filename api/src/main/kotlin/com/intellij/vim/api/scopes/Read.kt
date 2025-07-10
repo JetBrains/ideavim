@@ -22,14 +22,14 @@ interface Read {
   val text: CharSequence
   val lineCount: Int
 
-  fun <T> forEachCaret(block: CaretRead.() -> T): List<T>
-  fun with(caretId: CaretId, block: CaretRead.() -> Unit)
-  fun withPrimaryCaret(block: CaretRead.() -> Unit)
+  suspend fun <T> forEachCaret(block: suspend CaretRead.() -> T): List<T>
+  suspend fun with(caretId: CaretId, block: suspend CaretRead.() -> Unit)
+  suspend fun withPrimaryCaret(block: suspend CaretRead.() -> Unit)
 
-  fun getLineStartOffset(line: Int): Int
-  fun getLineEndOffset(line: Int, allowEnd: Boolean): Int
+  suspend fun getLineStartOffset(line: Int): Int
+  suspend fun getLineEndOffset(line: Int, allowEnd: Boolean): Int
 
-  fun getLine(offset: Int): Line
+  suspend fun getLine(offset: Int): Line
 
   val caretData: List<CaretData>
   val caretIds: List<CaretId>
@@ -40,7 +40,7 @@ interface Read {
    * @param char The character key of the mark (A-Z)
    * @return The mark, or null if the mark doesn't exist
    */
-  fun getGlobalMark(char: Char): Mark?
+  suspend fun getGlobalMark(char: Char): Mark?
 
   /**
    * All global marks.
@@ -53,7 +53,7 @@ interface Read {
    * @param count The number of jumps to go back (negative) or forward (positive) from the current position in the jump list.
    * @return The jump, or null if there is no jump at the specified position
    */
-  fun getJump(count: Int = 0): Jump?
+  suspend fun getJump(count: Int = 0): Jump?
 
   /**
    * Gets all jumps in the jump list.
@@ -74,7 +74,7 @@ interface Read {
    *
    * This ensures that the caret is visible in the editor window.
    */
-  fun scrollCaretIntoView()
+  suspend fun scrollCaretIntoView()
 
   /**
    * Scrolls the editor by a specified number of lines.
@@ -82,7 +82,7 @@ interface Read {
    * @param lines The number of lines to scroll. Positive values scroll down, negative values scroll up.
    * @return True if the scroll was successful, false otherwise
    */
-  fun scrollVertically(lines: Int): Boolean
+  suspend fun scrollVertically(lines: Int): Boolean
 
   /**
    * Scrolls the current line to the top of the display.
@@ -91,7 +91,7 @@ interface Read {
    * @param start Whether to position the caret at the start of the line
    * @return True if the scroll was successful, false otherwise
    */
-  fun scrollLineToTop(line: Int, start: Boolean): Boolean
+  suspend fun scrollLineToTop(line: Int, start: Boolean): Boolean
 
   /**
    * Scrolls the current line to the middle of the display.
@@ -100,7 +100,7 @@ interface Read {
    * @param start Whether to position the caret at the start of the line
    * @return True if the scroll was successful, false otherwise
    */
-  fun scrollLineToMiddle(line: Int, start: Boolean): Boolean
+  suspend fun scrollLineToMiddle(line: Int, start: Boolean): Boolean
 
   /**
    * Scrolls the current line to the bottom of the display.
@@ -109,7 +109,7 @@ interface Read {
    * @param start Whether to position the caret at the start of the line
    * @return True if the scroll was successful, false otherwise
    */
-  fun scrollLineToBottom(line: Int, start: Boolean): Boolean
+  suspend fun scrollLineToBottom(line: Int, start: Boolean): Boolean
 
   /**
    * Scrolls the editor horizontally by a specified number of columns.
@@ -117,21 +117,21 @@ interface Read {
    * @param columns The number of columns to scroll. Positive values scroll right, negative values scroll left.
    * @return True if the scroll was successful, false otherwise
    */
-  fun scrollHorizontally(columns: Int): Boolean
+  suspend fun scrollHorizontally(columns: Int): Boolean
 
   /**
    * Scrolls the editor to position the caret column at the left edge of the display.
    *
    * @return True if the scroll was successful, false otherwise
    */
-  fun scrollCaretToLeftEdge(): Boolean
+  suspend fun scrollCaretToLeftEdge(): Boolean
 
   /**
    * Scrolls the editor to position the caret column at the right edge of the display.
    *
    * @return True if the scroll was successful, false otherwise
    */
-  fun scrollCaretToRightEdge(): Boolean
+  suspend fun scrollCaretToRightEdge(): Boolean
 
   /**
    * Find the next paragraph-bound offset in the editor.
@@ -141,7 +141,7 @@ interface Read {
    * @param includeWhitespaceLines Should be `true` if we consider lines with whitespaces as empty.
    * @return next paragraph off
    */
-  fun getNextParagraphBoundOffset(startLine: Int, count: Int = 1, includeWhitespaceLines: Boolean = true): Int?
+  suspend fun getNextParagraphBoundOffset(startLine: Int, count: Int = 1, includeWhitespaceLines: Boolean = true): Int?
 
   /**
    * Finds the next sentence start in the editor from the given offset, based on the specified parameters.
@@ -151,7 +151,7 @@ interface Read {
    * @param requireAll If `true`, returns `null` if fewer than [count] sentences are found.
    * @return The offset of the next sentence start, or `null` if not found or constraints cannot be met.
    */
-  fun getNextSentenceStart(startOffset: Int, count: Int = 1, includeCurrent: Boolean, requireAll: Boolean = true): Int?
+  suspend fun getNextSentenceStart(startOffset: Int, count: Int = 1, includeCurrent: Boolean, requireAll: Boolean = true): Int?
 
   /**
    * Find the next section in the editor.
@@ -161,7 +161,7 @@ interface Read {
    * @param count Search for the [count]-th occurrence.
    * @return The offset of the next section.
    */
-  fun getNextSectionStart(startLine: Int, marker: Char, count: Int = 1): Int
+  suspend fun getNextSectionStart(startLine: Int, marker: Char, count: Int = 1): Int
 
   /**
    * Find the start of the previous section in the editor.
@@ -171,7 +171,7 @@ interface Read {
    * @param count Search for the [count]-th occurrence.
    * @return The offset of the next section.
    */
-  fun getPreviousSectionStart(startLine: Int, marker: Char, count: Int = 1): Int
+  suspend fun getPreviousSectionStart(startLine: Int, marker: Char, count: Int = 1): Int
 
   /**
    * Find the next sentence end from the given offset.
@@ -182,7 +182,7 @@ interface Read {
    * @param requireAll Whether to require all sentence ends to be found
    * @return The offset of the next sentence end, or null if not found
    */
-  fun getNextSentenceEnd(startOffset: Int, count: Int = 1, includeCurrent: Boolean, requireAll: Boolean = true): Int?
+  suspend fun getNextSentenceEnd(startOffset: Int, count: Int = 1, includeCurrent: Boolean, requireAll: Boolean = true): Int?
 
   /**
    * Find the next word in the editor's document, from the given starting point
@@ -192,7 +192,7 @@ interface Read {
    * @param isBigWord Use WORD instead of word boundaries.
    * @return The offset of the [count]-th next word, or `null` if not found.
    */
-  fun getNextWordStartOffset(startOffset: Int, count: Int = 1, isBigWord: Boolean): Int?
+  suspend fun getNextWordStartOffset(startOffset: Int, count: Int = 1, isBigWord: Boolean): Int?
 
   /**
    * Find the end offset of the next word in the editor's document, from the given starting point
@@ -204,7 +204,7 @@ interface Read {
    *                        compatibility reasons. Callers other than `e` and `E` should pass `true`
    * @return The offset of the [count] next word/WORD. Will return document bounds if not found
    */
-  fun getNextWordEndOffset(startOffset: Int, count: Int = 1, isBigWord: Boolean, stopOnEmptyLine: Boolean = true): Int
+  suspend fun getNextWordEndOffset(startOffset: Int, count: Int = 1, isBigWord: Boolean, stopOnEmptyLine: Boolean = true): Int
 
   /**
    * Find the next character on the current line
@@ -214,7 +214,7 @@ interface Read {
    * @param char The character to find
    * @return The offset of the next character, or -1 if not found
    */
-  fun getNextCharOnLineOffset(startOffset: Int, count: Int = 1, char: Char): Int
+  suspend fun getNextCharOnLineOffset(startOffset: Int, count: Int = 1, char: Char): Int
 
   /**
    * Find the word at or nearest to the given offset
@@ -222,7 +222,7 @@ interface Read {
    * @param startOffset The offset to search from
    * @return The range of the word, or null if not found
    */
-  fun getNearestWordOffset(startOffset: Int): Range?
+  suspend fun getNearestWordOffset(startOffset: Int): Range?
 
   /**
    * Returns range of a paragraph containing the given line.
@@ -232,7 +232,7 @@ interface Read {
    * @param isOuter true if it is an outer motion, false otherwise
    * @return the paragraph text range
    */
-  fun getParagraphRange(line: Int, count: Int = 1, isOuter: Boolean): Range?
+  suspend fun getParagraphRange(line: Int, count: Int = 1, isOuter: Boolean): Range?
 
   /**
    * Find a block quote in the current line
@@ -242,12 +242,12 @@ interface Read {
    * @param isOuter Whether to include the quotes in the range
    * @return The range of the block quote, or null if not found
    */
-  fun getBlockQuoteInLineRange(startOffset: Int, quote: Char, isOuter: Boolean): Range?
+  suspend fun getBlockQuoteInLineRange(startOffset: Int, quote: Char, isOuter: Boolean): Range?
 
   /**
    * Finds all occurrences of the given pattern within a specified line range.
    *
-   * This function searches for all matches of a pattern within a specified range of lines
+   * This suspend function searches for all matches of a pattern within a specified range of lines
    * in the document. It's useful for implementing commands like `:g/pattern/` or `:v/pattern/`
    * that need to find all occurrences of a pattern.
    *
@@ -258,12 +258,12 @@ interface Read {
    * @param ignoreCase If true, performs case-insensitive search; if false, performs case-sensitive search.
    * @return A list of Ranges representing all matches found. Empty list if no matches are found.
    */
-  fun findAll(pattern: String, startLine: Int, endLine: Int, ignoreCase: Boolean = false): List<Range>
+  suspend fun findAll(pattern: String, startLine: Int, endLine: Int, ignoreCase: Boolean = false): List<Range>
 
   /**
    * Finds text matching the given Vim-style regular expression pattern.
    *
-   * This function implements Vim's pattern search functionality, supporting all Vim regex syntax.
+   * This suspend function implements Vim's pattern search functionality, supporting all Vim regex syntax.
    * See `:help /pattern` in Vim for details on the pattern syntax.
    *
    * @param pattern The Vim-style regex pattern to search for.
@@ -272,5 +272,5 @@ interface Read {
    * @param backwards If true, search backward from the start offset; if false, search forward.
    * @return A Range representing the matched text, or null if no match is found.
    */
-  fun findPattern(pattern: String, startOffset: Int, count: Int = 1, backwards: Boolean = false): Range?
+  suspend fun findPattern(pattern: String, startOffset: Int, count: Int = 1, backwards: Boolean = false): Range?
 }

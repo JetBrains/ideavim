@@ -12,23 +12,23 @@ import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
 abstract class OptionScope() {
-  protected abstract fun <T> getOptionValueInternal(name: String, type: KType): T?
+  protected abstract suspend fun <T> getOptionValueInternal(name: String, type: KType): T?
 
-  protected abstract fun <T> setOptionInternal(name: String, value: T, type: KType, scope: String): Boolean
-
-  @PublishedApi
-  internal fun <T : Any> get(name: String, type: KType): T? = getOptionValueInternal(name, type)
+  protected abstract suspend fun <T> setOptionInternal(name: String, value: T, type: KType, scope: String): Boolean
 
   @PublishedApi
-  internal fun <T> setGlobal(name: String, value: T, type: KType): Boolean =
+  internal suspend fun <T : Any> get(name: String, type: KType): T? = getOptionValueInternal(name, type)
+
+  @PublishedApi
+  internal suspend fun <T> setGlobal(name: String, value: T, type: KType): Boolean =
     setOptionInternal(name, value, type, "global")
 
   @PublishedApi
-  internal fun <T> setLocal(name: String, value: T, type: KType): Boolean =
+  internal suspend fun <T> setLocal(name: String, value: T, type: KType): Boolean =
     setOptionInternal(name, value, type, "local")
 
   @PublishedApi
-  internal fun <T> set(name: String, value: T, type: KType): Boolean =
+  internal suspend fun <T> set(name: String, value: T, type: KType): Boolean =
     setOptionInternal(name, value, type, "effective")
 
   /**
@@ -40,7 +40,7 @@ abstract class OptionScope() {
    * @param name The name of the option
    * @return The value of the option, or null if the option doesn't exist or isn't of the specified type
    */
-  inline fun <reified T> get(name: String): T? {
+  suspend inline fun <reified T> get(name: String): T? {
     val kType: KType = typeOf<T>()
     return get(name, kType)
   }
@@ -55,7 +55,7 @@ abstract class OptionScope() {
    * @param value The value to set
    * @return True if the option was set successfully, false otherwise
    */
-  inline fun <reified T> setGlobal(name: String, value: T): Boolean {
+  inline suspend fun <reified T> setGlobal(name: String, value: T): Boolean {
     val kType: KType = typeOf<T>()
     return setGlobal(name, value, kType)
   }
@@ -70,7 +70,7 @@ abstract class OptionScope() {
    * @param value The value to set
    * @return True if the option was set successfully, false otherwise
    */
-  inline fun <reified T> setLocal(name: String, value: T): Boolean {
+  suspend inline fun <reified T> setLocal(name: String, value: T): Boolean {
     val kType: KType = typeOf<T>()
     return setLocal(name, value, kType)
   }
@@ -85,7 +85,7 @@ abstract class OptionScope() {
    * @param value The value to set
    * @return True if the option was set successfully, false otherwise
    */
-  inline fun <reified T> set(name: String, value: T): Boolean {
+  suspend inline fun <reified T> set(name: String, value: T): Boolean {
     val kType: KType = typeOf<T>()
     return set(name, value, kType)
   }
@@ -99,5 +99,5 @@ abstract class OptionScope() {
    * @param name The name of the option
    * @return True if the option was reset successfully, false otherwise
    */
-  abstract fun reset(name: String): Boolean
+  abstract suspend fun reset(name: String): Boolean
 }

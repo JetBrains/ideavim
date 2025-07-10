@@ -19,12 +19,12 @@ import kotlin.reflect.typeOf
 abstract class VimScope {
   abstract var mode: Mode
 
-  protected abstract fun <T : Any> getVariableInternal(name: String, type: KType): T?
+  protected abstract suspend fun <T : Any> getVariableInternal(name: String, type: KType): T?
 
   @PublishedApi
-  internal fun <T : Any> getVariable(name: String, type: KType): T? = getVariableInternal(name, type)
+  internal suspend fun <T : Any> getVariable(name: String, type: KType): T? = getVariableInternal(name, type)
 
-  inline fun <reified T : Any> getVariable(name: String): T? {
+  suspend inline fun <reified T : Any> getVariable(name: String): T? {
     val kType: KType = typeOf<T>()
     return getVariable(name, kType)
   }
@@ -36,10 +36,10 @@ abstract class VimScope {
    * @param value The value to set
    * @param type The Kotlin type of the value
    */
-  protected abstract fun setVariableInternal(name: String, value: Any, type: KType)
+  protected abstract suspend fun setVariableInternal(name: String, value: Any, type: KType)
 
   @PublishedApi
-  internal fun setVariable(name: String, value: Any, type: KType) = setVariableInternal(name, value, type)
+  internal suspend fun setVariable(name: String, value: Any, type: KType) = setVariableInternal(name, value, type)
 
   /**
    * Sets a variable with the specified name and value.
@@ -50,7 +50,7 @@ abstract class VimScope {
    * @param name The name of the variable, optionally prefixed with a scope (g:, b:, etc.)
    * @param value The value to set
    */
-  inline fun <reified T : Any> setVariable(name: String, value: T) {
+  suspend inline fun <reified T : Any> setVariable(name: String, value: T) {
     val kType: KType = typeOf<T>()
     setVariable(name, value, kType)
   }
@@ -64,7 +64,7 @@ abstract class VimScope {
    * @param name The name of the variable, optionally prefixed with a scope (g:, b:, etc.)
    * @param depth The lock depth (default is 1)
    */
-  abstract fun lockvar(name: String, depth: Int = 1)
+  abstract suspend fun lockvar(name: String, depth: Int = 1)
 
   /**
    * Unlocks a variable to allow changes.
@@ -75,7 +75,7 @@ abstract class VimScope {
    * @param name The name of the variable, optionally prefixed with a scope (g:, b:, etc.)
    * @param depth The lock depth (default is 1)
    */
-  abstract fun unlockvar(name: String, depth: Int = 1)
+  abstract suspend fun unlockvar(name: String, depth: Int = 1)
 
   /**
    * Checks if a variable is locked.
@@ -86,31 +86,31 @@ abstract class VimScope {
    * @param name The name of the variable, optionally prefixed with a scope (g:, b:, etc.)
    * @return True if the variable is locked, false otherwise
    */
-  abstract fun islocked(name: String): Boolean
+  abstract suspend fun islocked(name: String): Boolean
 
-  abstract fun exportOperatorFunction(name: String, function: VimScope.() -> Boolean)
-  abstract fun setOperatorFunction(name: String)
-  abstract fun normal(command: String)
+  abstract suspend fun exportOperatorFunction(name: String, function: suspend VimScope.() -> Boolean)
+  abstract suspend fun setOperatorFunction(name: String)
+  abstract suspend fun normal(command: String)
 
   @OptIn(ExperimentalContracts::class)
-  fun <T> editor(block: EditorScope.() -> T): T {
+  suspend fun <T> editor(block: suspend EditorScope.() -> T): T {
     contract {
       callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
     return this.editorScope().block()
   }
 
-  abstract fun <T> forEachEditor(block: EditorScope.() -> T): List<T>
+  protected abstract suspend fun editorScope(): EditorScope
 
-  protected abstract fun editorScope(): EditorScope
+  abstract suspend fun <T> forEachEditor(block: suspend EditorScope.() -> T): List<T>
 
-  abstract fun mappings(block: MappingScope.() -> Unit)
-  abstract fun listeners(block: ListenersScope.() -> Unit)
-  abstract fun outputPanel(block: OutputPanelScope.() -> Unit)
-  abstract fun modalInput(): ModalInput
-  abstract fun commandLine(block: CommandLineScope.() -> Unit)
-  abstract fun option(block: OptionScope.() -> Unit)
-  abstract fun digraph(block: DigraphScope.() -> Unit)
+  abstract suspend fun mappings(block: suspend MappingScope.() -> Unit)
+  abstract suspend fun listeners(block: suspend ListenersScope.() -> Unit)
+  abstract suspend fun outputPanel(block: suspend OutputPanelScope.() -> Unit)
+  abstract suspend fun modalInput(): ModalInput
+  abstract suspend fun commandLine(block: suspend CommandLineScope.() -> Unit)
+  abstract suspend fun option(block: suspend OptionScope.() -> Unit)
+  abstract suspend fun digraph(block: suspend DigraphScope.() -> Unit)
 
   /**
    * Gets the number of tabs in the current window.
@@ -128,7 +128,7 @@ abstract class VimScope {
    * @param indexToDelete The index of the tab to delete
    * @param indexToSelect The index of the tab to select after deletion
    */
-  abstract fun removeTabAt(indexToDelete: Int, indexToSelect: Int)
+  abstract suspend fun removeTabAt(indexToDelete: Int, indexToSelect: Int)
 
   /**
    * Moves the current tab to the specified index.
@@ -136,14 +136,14 @@ abstract class VimScope {
    * @param index The index to move the current tab to
    * @throws IllegalStateException if there is no tab selected or no tabs are open
    */
-  abstract fun moveCurrentTabToIndex(index: Int)
+  abstract suspend fun moveCurrentTabToIndex(index: Int)
 
   /**
    * Closes all tabs except the current one.
    *
    * @throws IllegalStateException if there is no tab selected
    */
-  abstract fun closeAllExceptCurrentTab()
+  abstract suspend fun closeAllExceptCurrentTab()
 
   /**
    * Checks if a pattern matches a text.
@@ -153,7 +153,7 @@ abstract class VimScope {
    * @param ignoreCase Whether to ignore case when matching
    * @return True if the pattern matches the text, false otherwise
    */
-  abstract fun matches(pattern: String, text: String?, ignoreCase: Boolean = false): Boolean
+  abstract suspend fun matches(pattern: String, text: String?, ignoreCase: Boolean = false): Boolean
 
   /**
    * Finds all matches of a pattern in a text.
@@ -162,53 +162,53 @@ abstract class VimScope {
    * @param pattern The regular expression pattern to search for
    * @return A list of pairs representing the start and end offsets of each match
    */
-  abstract fun getAllMatches(text: String, pattern: String): List<Pair<Int, Int>>
+  abstract suspend fun getAllMatches(text: String, pattern: String): List<Pair<Int, Int>>
 
   /**
    * Selects the next window in the editor.
    */
-  abstract fun selectNextWindow()
+  abstract suspend fun selectNextWindow()
 
   /**
    * Selects the previous window in the editor.
    */
-  abstract fun selectPreviousWindow()
+  abstract suspend fun selectPreviousWindow()
 
   /**
    * Selects a window by its index.
    *
    * @param index The index of the window to select (1-based).
    */
-  abstract fun selectWindow(index: Int)
+  abstract suspend fun selectWindow(index: Int)
 
   /**
    * Splits the current window vertically and optionally opens a file in the new window.
    *
    * @param filename The name of the file to open in the new window. If null, the new window will show the same file.
    */
-  abstract fun splitWindowVertically(filename: String? = null)
+  abstract suspend fun splitWindowVertically(filename: String? = null)
 
   /**
    * Splits the current window horizontally and optionally opens a file in the new window.
    *
    * @param filename The name of the file to open in the new window. If null, the new window will show the same file.
    */
-  abstract fun splitWindowHorizontally(filename: String? = null)
+  abstract suspend fun splitWindowHorizontally(filename: String? = null)
 
   /**
    * Closes all windows except the current one.
    */
-  abstract fun closeAllExceptCurrentWindow()
+  abstract suspend fun closeAllExceptCurrentWindow()
 
   /**
    * Closes the current window.
    */
-  abstract fun closeCurrentWindow()
+  abstract suspend fun closeCurrentWindow()
 
   /**
    * Closes all windows in the editor.
    */
-  abstract fun closeAllWindows()
+  abstract suspend fun closeAllWindows()
 
   /**
    * Parses and executes the given Vimscript string. It can be used to execute
@@ -217,9 +217,9 @@ abstract class VimScope {
    * @param script The Vimscript string to execute
    * @return The result of the execution, which can be Success or Error
    */
-  abstract fun execute(script: String): Boolean
+  abstract suspend fun execute(script: String): Boolean
 
-  abstract fun command(command: String, block: VimScope.(String) -> Unit)
+  abstract suspend fun command(command: String, block: VimScope.(String) -> Unit)
 
   /**
    * Gets keyed data from a Vim window.
@@ -230,7 +230,7 @@ abstract class VimScope {
    * @param key The key to retrieve data for
    * @return The data associated with the key, or null if no data is found
    */
-  abstract fun <T> getDataFromWindow(key: String): T?
+  abstract suspend fun <T> getDataFromWindow(key: String): T?
 
   /**
    * Stores keyed user data in a Vim window.
@@ -241,7 +241,7 @@ abstract class VimScope {
    * @param key The key to store data for
    * @param data The data to store
    */
-  abstract fun <T> putDataToWindow(key: String, data: T)
+  abstract suspend fun <T> putDataToWindow(key: String, data: T)
 
   /**
    * Gets data from buffer.
@@ -250,7 +250,7 @@ abstract class VimScope {
    * @param key The key to retrieve data for
    * @return The data associated with the key, or null if no data is found
    */
-  abstract fun <T> getDataFromBuffer(key: String): T?
+  abstract suspend fun <T> getDataFromBuffer(key: String): T?
 
   /**
    * Puts data to buffer.
@@ -259,7 +259,7 @@ abstract class VimScope {
    * @param key The key to store data for
    * @param data The data to store
    */
-  abstract fun <T> putDataToBuffer(key: String, data: T)
+  abstract suspend fun <T> putDataToBuffer(key: String, data: T)
 
   /**
    * Gets data from tab (group of windows).
@@ -268,7 +268,7 @@ abstract class VimScope {
    * @param key The key to retrieve data for
    * @return The data associated with the key, or null if no data is found
    */
-  abstract fun <T> getDataFromTab(key: String): T?
+  abstract suspend fun <T> getDataFromTab(key: String): T?
 
   /**
    * Puts data to tab (group of windows).
@@ -277,7 +277,7 @@ abstract class VimScope {
    * @param key The key to store data for
    * @param data The data to store
    */
-  abstract fun <T> putDataToTab(key: String, data: T)
+  abstract suspend fun <T> putDataToTab(key: String, data: T)
 
   /**
    * Gets data from window or puts it if it doesn't exist.
@@ -286,7 +286,7 @@ abstract class VimScope {
    * @param provider A function that provides the data if it doesn't exist
    * @return The existing data or the newly created data
    */
-  fun <T> getOrPutWindowData(key: String, provider: () -> T): T =
+  suspend fun <T> getOrPutWindowData(key: String, provider: () -> T): T =
     getDataFromWindow(key) ?: provider().also { putDataToWindow(key, it) }
 
   /**
@@ -296,7 +296,7 @@ abstract class VimScope {
    * @param provider A function that provides the data if it doesn't exist
    * @return The existing data or the newly created data
    */
-  fun <T> getOrPutBufferData(key: String, provider: () -> T): T =
+  suspend fun <T> getOrPutBufferData(key: String, provider: () -> T): T =
     getDataFromBuffer(key) ?: provider().also { putDataToBuffer(key, it) }
 
   /**
@@ -306,7 +306,7 @@ abstract class VimScope {
    * @param provider A function that provides the data if it doesn't exist
    * @return The existing data or the newly created data
    */
-  fun <T> getOrPutTabData(key: String, provider: () -> T): T =
+  suspend fun <T> getOrPutTabData(key: String, provider: () -> T): T =
     getDataFromTab(key) ?: provider().also { putDataToTab(key, it) }
 
   /**
@@ -314,14 +314,14 @@ abstract class VimScope {
    *
    * In Vim, this is equivalent to the `:w` command.
    */
-  abstract fun saveFile()
+  abstract suspend fun saveFile()
 
   /**
    * Closes the current file.
    *
    * In Vim, this is equivalent to the `:q` command.
    */
-  abstract fun closeFile()
+  abstract suspend fun closeFile()
 
   /**
    * Finds the start offset of the next camelCase or snake_case word.
@@ -331,7 +331,7 @@ abstract class VimScope {
    * @param count Find the [count]-th occurrence. Must be greater than 1.
    * @return The offset of the next camelCase or snake_case word start, or null if not found
    */
-  abstract fun getNextCamelStartOffset(chars: CharSequence, startIndex: Int, count: Int = 1): Int?
+  abstract suspend fun getNextCamelStartOffset(chars: CharSequence, startIndex: Int, count: Int = 1): Int?
 
   /**
    * Finds the start offset of the previous camelCase or snake_case word.
@@ -341,7 +341,7 @@ abstract class VimScope {
    * @param count Find the [count]-th occurrence. Must be greater than 1.
    * @return The offset of the previous camelCase or snake_case word start, or null if not found
    */
-  abstract fun getPreviousCamelStartOffset(chars: CharSequence, endIndex: Int, count: Int = 1): Int?
+  abstract suspend fun getPreviousCamelStartOffset(chars: CharSequence, endIndex: Int, count: Int = 1): Int?
 
   /**
    * Finds the end offset of the next camelCase or snake_case word.
@@ -351,7 +351,7 @@ abstract class VimScope {
    * @param count Find the [count]-th occurrence. Must be greater than 1.
    * @return The offset of the next camelCase or snake_case word end, or null if not found
    */
-  abstract fun getNextCamelEndOffset(chars: CharSequence, startIndex: Int, count: Int = 1): Int?
+  abstract suspend fun getNextCamelEndOffset(chars: CharSequence, startIndex: Int, count: Int = 1): Int?
 
   /**
    * Finds the end offset of the previous camelCase or snake_case word.
@@ -361,7 +361,7 @@ abstract class VimScope {
    * @param count Find the [count]-th occurrence. Must be greater than 1.
    * @return The offset of the previous camelCase or snake_case word end, or null if not found
    */
-  abstract fun getPreviousCamelEndOffset(chars: CharSequence, endIndex: Int, count: Int = 1): Int?
+  abstract suspend fun getPreviousCamelEndOffset(chars: CharSequence, endIndex: Int, count: Int = 1): Int?
 
   /**
    * Find the next word in some text outside the editor (e.g., command line), from the given starting point
@@ -372,5 +372,5 @@ abstract class VimScope {
    * @param isBigWord Use WORD instead of word boundaries.
    * @return The offset of the [count]-th next word, or `null` if not found.
    */
-  abstract fun getNextWordStartOffset(text: CharSequence, startOffset: Int, count: Int = 1, isBigWord: Boolean = false): Int?
+  abstract suspend fun getNextWordStartOffset(text: CharSequence, startOffset: Int, count: Int = 1, isBigWord: Boolean = false): Int?
 }

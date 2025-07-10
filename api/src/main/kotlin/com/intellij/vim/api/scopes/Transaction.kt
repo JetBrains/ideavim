@@ -17,16 +17,16 @@ import com.intellij.vim.api.scopes.caret.CaretTransaction
 
 @VimPluginDsl
 interface Transaction {
-  fun <T> forEachCaret(block: CaretTransaction.() -> T): List<T>
-  fun with(caretId: CaretId, block: CaretTransaction.() -> Unit)
-  fun withPrimaryCaret(block: CaretTransaction.() -> Unit)
+  suspend fun <T> forEachCaret(block: suspend CaretTransaction.() -> T): List<T>
+  suspend fun with(caretId: CaretId, block: suspend CaretTransaction.() -> Unit)
+  suspend fun withPrimaryCaret(block: suspend CaretTransaction.() -> Unit)
 
-  fun addCaret(offset: Int): CaretId
-  fun removeCaret(caretId: CaretId)
+  suspend fun addCaret(offset: Int): CaretId
+  suspend fun removeCaret(caretId: CaretId)
 
   // Highlighting
-  fun addHighlight(startOffset: Int, endOffset: Int, backgroundColor: Color?, foregroundColor: Color?): HighlightId
-  fun removeHighlight(highlightId: HighlightId)
+  suspend fun addHighlight(startOffset: Int, endOffset: Int, backgroundColor: Color?, foregroundColor: Color?): HighlightId
+  suspend fun removeHighlight(highlightId: HighlightId)
 
   /**
    * Sets a mark at the current position for each caret in the editor.
@@ -34,14 +34,14 @@ interface Transaction {
    * @param char The character key of the mark (a-z, A-Z, etc.)
    * @return True if the mark was successfully set, false otherwise
    */
-  fun setMark(char: Char): Boolean
+  suspend fun setMark(char: Char): Boolean
 
   /**
    * Removes a mark for all carets in the editor.
    *
    * @param char The character key of the mark to remove (a-z, A-Z, etc.)
    */
-  fun removeMark(char: Char)
+  suspend fun removeMark(char: Char)
 
   /**
    * Sets a global mark at the current position.
@@ -49,14 +49,14 @@ interface Transaction {
    * @param char The character key of the mark (A-Z)
    * @return True if the mark was successfully set, false otherwise
    */
-  fun setGlobalMark(char: Char): Boolean
+  suspend fun setGlobalMark(char: Char): Boolean
 
   /**
    * Removes a global mark.
    *
    * @param char The character key of the mark to remove (A-Z)
    */
-  fun removeGlobalMark(char: Char)
+  suspend fun removeGlobalMark(char: Char)
 
   /**
    * Sets a global mark at the specified offset.
@@ -65,14 +65,14 @@ interface Transaction {
    * @param offset The offset to set the mark to
    * @return True if the mark was successfully set, false otherwise
    */
-  fun setGlobalMark(char: Char, offset: Int): Boolean
+  suspend fun setGlobalMark(char: Char, offset: Int): Boolean
 
   /**
    * Resets all marks.
    *
    * This removes all marks, both global and local.
    */
-  fun resetAllMarks()
+  suspend fun resetAllMarks()
 
   /**
    * Adds a specific jump to the jump list.
@@ -80,22 +80,22 @@ interface Transaction {
    * @param jump The jump to add
    * @param reset Whether to reset the current position in the jump list
    */
-  fun addJump(jump: Jump, reset: Boolean)
+  suspend fun addJump(jump: Jump, reset: Boolean)
 
   /**
    * Removes a jump from the jump list.
    *
    * @param jump The jump to remove
    */
-  fun removeJump(jump: Jump)
+  suspend fun removeJump(jump: Jump)
 
   /**
    * Removes the last jump from the jump list.
    */
-  fun dropLastJump()
+  suspend fun dropLastJump()
 
   /**
    * Clears all jumps from the jump list.
    */
-  fun clearJumps()
+  suspend fun clearJumps()
 }

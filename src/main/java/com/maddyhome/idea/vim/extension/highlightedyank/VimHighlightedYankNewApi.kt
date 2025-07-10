@@ -19,6 +19,7 @@ import com.intellij.vim.api.Mode
 import com.intellij.vim.api.Range
 import com.intellij.vim.api.scopes.VimScope
 import com.maddyhome.idea.vim.extension.thin.api.VimPluginBase
+import kotlinx.coroutines.runBlocking
 
 /**
  * @author KostkaBrukowa (@kostkabrukowa)
@@ -62,10 +63,12 @@ class VimHighlightedYankNewApi : VimPluginBase() {
   }
 
   override fun VimScope.unload() {
-    clearYankHighlighters()
+    runBlocking {
+      clearYankHighlighters()
+    }
   }
 
-  private fun VimScope.highlightYankRange(caretRangeMap: Map<CaretId, Range.Simple>) {
+  private suspend fun VimScope.highlightYankRange(caretRangeMap: Map<CaretId, Range.Simple>) {
     clearYankHighlighters()
 
     val highlightColor: Color = extractColor(HIGHLIGHT_COLOR_VARIABLE) ?: getDefaultHighlightTextColor()
@@ -89,7 +92,11 @@ class VimHighlightedYankNewApi : VimPluginBase() {
       val highlightDuration: Int = getVariable<Int>(HIGHLIGHT_DURATION_VARIABLE) ?: DEFAULT_DURATION
       if (highlightDuration >= 0) {
         alarm.addRequest(
-          request = { clearYankHighlighters() },
+          request = {
+            runBlocking {
+              clearYankHighlighters()
+            }
+          },
           delayMillis = highlightDuration,
           modalityState = ModalityState.any(),
         )
@@ -99,24 +106,25 @@ class VimHighlightedYankNewApi : VimPluginBase() {
     }
   }
 
-  private fun VimScope.clearYankHighlighters() {
+  private suspend fun VimScope.clearYankHighlighters() {
     alarm.cancelAllRequests()
-    forEachEditor {
+    val jobs = forEachEditor {
       change {
         myHighlightIds.forEach { highlighterId -> removeHighlight(highlighterId) }
       }
     }
+    jobs.forEach { it.join() }
     myHighlightIds.clear()
   }
 
-  private fun getDefaultHighlightTextColor(): Color {
+  private suspend fun getDefaultHighlightTextColor(): Color {
     return defaultHighlightTextColor
       ?: return EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES.defaultAttributes.backgroundColor.run {
         Color(red, green, blue, alpha)
       }.also { defaultHighlightTextColor = it }
   }
 
-  private fun VimScope.extractColor(colorVarName: String): Color? {
+  private suspend fun VimScope.extractColor(colorVarName: String): Color? {
     return try {
       val colorString = getVariable<String>(colorVarName) ?: return null
       parseRgbaColor(colorString)

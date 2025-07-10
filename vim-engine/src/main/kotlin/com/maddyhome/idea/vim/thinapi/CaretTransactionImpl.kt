@@ -66,7 +66,7 @@ class CaretTransactionImpl(
     }
   }
 
-  private fun putText(
+  private suspend fun putText(
     startPosition: Int,
     text: String,
     caretAfterInsertedText: Boolean,
@@ -104,7 +104,7 @@ class CaretTransactionImpl(
     return result
   }
 
-  override fun insertText(
+  override suspend fun insertText(
     position: Int,
     text: String,
     caretAfterInsertedText: Boolean
@@ -112,7 +112,7 @@ class CaretTransactionImpl(
     return putText(position, text, caretAfterInsertedText)
   }
 
-  override fun replaceText(
+  override suspend fun replaceText(
     startOffset: Int,
     endOffset: Int,
     text: String,
@@ -163,7 +163,7 @@ class CaretTransactionImpl(
     return result
   }
 
-  override fun replaceTextForRange(startOffset: Int, endOffset: Int, text: String) {
+  override suspend fun replaceTextForRange(startOffset: Int, endOffset: Int, text: String) {
     injector.actionExecutor.executeCommand(vimEditor, {
       injector.application.runWriteAction {
         injector.changeGroup.replaceText(vimEditor, vimCaret, startOffset, endOffset, text)
@@ -171,7 +171,7 @@ class CaretTransactionImpl(
     }, "Replace Text", null)
   }
 
-  override fun deleteText(
+  override suspend fun deleteText(
     startOffset: Int,
     endOffset: Int,
   ): Boolean {
@@ -194,7 +194,7 @@ class CaretTransactionImpl(
     return true
   }
 
-  override fun updateCaret(offset: Int, selection: Range.Simple?) {
+  override suspend fun updateCaret(offset: Int, selection: Range.Simple?) {
     val caret: VimCaret = vimEditor.carets().find { it.id == caretId.id } ?: return
     caret.moveToOffset(offset)
     selection?.let { (start, end) ->
@@ -202,15 +202,15 @@ class CaretTransactionImpl(
     } ?: caret.removeSelection()
   }
 
-  override fun getLineStartOffset(line: Int): Int {
+  override suspend fun getLineStartOffset(line: Int): Int {
     return vimEditor.getLineStartOffset(line)
   }
 
-  override fun getLineEndOffset(line: Int, allowEnd: Boolean): Int {
+  override suspend fun getLineEndOffset(line: Int, allowEnd: Boolean): Int {
     return vimEditor.getLineEndOffset(line)
   }
 
-  override fun getLine(offset: Int): Line {
+  override suspend fun getLine(offset: Int): Line {
     val lineNumber = vimEditor.offsetToBufferPosition(offset).line
     val lineText = vimEditor.getLineText(lineNumber)
     val lineStartOffset = vimEditor.getLineStartOffset(lineNumber)
@@ -218,7 +218,7 @@ class CaretTransactionImpl(
     return Line(lineNumber, lineText, lineStartOffset, lineEndOffset)
   }
 
-  override fun addJump(reset: Boolean) {
+  override suspend fun addJump(reset: Boolean) {
     val virtualFile = vimEditor.getVirtualFile() ?: return
     val path = virtualFile.path
     val protocol = virtualFile.protocol
@@ -227,7 +227,7 @@ class CaretTransactionImpl(
     injector.jumpService.addJump(vimEditor.projectId, jump, reset)
   }
 
-  override fun saveJumpLocation() {
+  override suspend fun saveJumpLocation() {
     addJump(true)
     injector.markService.setMark(vimEditor, '\'')
     injector.jumpService.includeCurrentCommandAsNavigation(vimEditor)
