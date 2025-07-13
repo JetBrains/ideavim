@@ -237,7 +237,7 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
   }
 
   private fun isShortcutConflict(keyStroke: KeyStroke): Boolean {
-    return VimPlugin.getKey().getKeymapConflicts(keyStroke).isNotEmpty()
+    return VimPlugin.getKey().getKeymapConflicts(keyStroke.vimKeyStroke).isNotEmpty()
   }
 
   /**

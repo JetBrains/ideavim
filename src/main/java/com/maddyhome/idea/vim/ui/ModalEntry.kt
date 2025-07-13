@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.isCloseKeyStroke
 import com.maddyhome.idea.vim.helper.keyStroke
+import com.maddyhome.idea.vim.helper.vimKeyStroke
 import java.awt.KeyEventDispatcher
 import java.awt.KeyboardFocusManager
 import java.awt.Toolkit
@@ -53,7 +54,7 @@ object ModalEntry {
         val stroke: KeyStroke
         if (e.id == KeyEvent.KEY_RELEASED) {
           stroke = KeyStroke.getKeyStrokeForEvent(e)
-          if (!stroke.isCloseKeyStroke() && stroke.keyCode != KeyEvent.VK_ENTER) {
+          if (!stroke.vimKeyStroke.isCloseKeyStroke() && stroke.keyCode != KeyEvent.VK_ENTER) {
             return true
           }
         } else if (e.id == KeyEvent.KEY_TYPED) {
@@ -62,7 +63,7 @@ object ModalEntry {
           return true
         }
         if (injector.registerGroup.isRecording) {
-          KeyHandler.getInstance().modalEntryKeys += stroke
+          KeyHandler.getInstance().modalEntryKeys += stroke.vimKeyStroke
         }
         if (!processor(stroke)) {
           LOG.trace("Got char from keyboard input: $stroke. Event: $e")

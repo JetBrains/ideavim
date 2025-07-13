@@ -9,6 +9,8 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.google.common.collect.Lists
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.helper.vimKeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -23,7 +25,7 @@ class SortCommandTest : VimTestCase() {
     val (content, visualSelect, sortCommand, expected) = testCase
     configureByText(content)
     if (visualSelect.isNotBlank()) {
-      val keys: MutableList<KeyStroke?> = Lists.newArrayList(KeyStroke.getKeyStroke("control V"))
+      val keys: MutableList<VimKeyStroke?> = Lists.newArrayList(KeyStroke.getKeyStroke("control V").vimKeyStroke)
       keys.addAll(injector.parser.stringToKeys(visualSelect))
       typeText(keys)
     }

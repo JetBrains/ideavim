@@ -22,7 +22,9 @@ import com.maddyhome.idea.vim.extension.ExtensionHandler;
 import com.maddyhome.idea.vim.extension.VimExtension;
 import com.maddyhome.idea.vim.group.visual.EngineVisualGroupKt;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
+import com.maddyhome.idea.vim.helper.IJVimKeyHelperKt;
 import com.maddyhome.idea.vim.helper.InlayHelperKt;
+import com.maddyhome.idea.vim.key.VimKeyStroke;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
@@ -31,6 +33,9 @@ import com.maddyhome.idea.vim.state.KeyHandlerState;
 import com.maddyhome.idea.vim.state.mode.Mode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import javax.swing.*;
+import java.util.List;
 
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping;
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping;
@@ -65,8 +70,9 @@ public class VimIndentObject implements VimExtension {
   public void init() {
     putExtensionHandlerMapping(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("<Plug>textobj-indent-ai"), getOwner(),
                                new IndentObject(true, false), false);
+
     putExtensionHandlerMapping(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("<Plug>textobj-indent-aI"), getOwner(),
-      new IndentObject(true, true), false);
+                               new IndentObject(true, true), false);
     putExtensionHandlerMapping(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("<Plug>textobj-indent-ii"), getOwner(),
       new IndentObject(false, false), false);
 

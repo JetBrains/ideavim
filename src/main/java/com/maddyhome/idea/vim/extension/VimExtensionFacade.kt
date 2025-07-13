@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.helper.keyStroke
 import com.maddyhome.idea.vim.helper.vimKeyStroke
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.OperatorFunction
+import com.maddyhome.idea.vim.key.VimKeyStroke
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.ui.ModalEntry
@@ -61,12 +62,12 @@ object VimExtensionFacade {
   @JvmStatic
   fun putExtensionHandlerMapping(
     modes: Set<MappingMode>,
-    fromKeys: List<KeyStroke>,
+    fromKeys: List<VimKeyStroke>,
     pluginOwner: MappingOwner,
     extensionHandler: ExtensionHandler,
     recursive: Boolean,
   ) {
-    VimPlugin.getKey().putKeyMapping(modes, fromKeys.map { it.vimKeyStroke }, pluginOwner, extensionHandler, recursive)
+    VimPlugin.getKey().putKeyMapping(modes, fromKeys, pluginOwner, extensionHandler, recursive)
   }
 
 
@@ -80,37 +81,37 @@ object VimExtensionFacade {
   )
   fun putExtensionHandlerMapping(
     modes: Set<MappingMode>,
-    fromKeys: List<KeyStroke>,
+    fromKeys: List<VimKeyStroke>,
     pluginOwner: MappingOwner,
     extensionHandler: VimExtensionHandler,
     recursive: Boolean,
   ) {
-    VimPlugin.getKey().putKeyMapping(modes, fromKeys.map { it.vimKeyStroke }, pluginOwner, extensionHandler, recursive)
+    VimPlugin.getKey().putKeyMapping(modes, fromKeys, pluginOwner, extensionHandler, recursive)
   }
 
   /** The 'map' command for mapping keys to other keys. */
   @JvmStatic
   fun putKeyMapping(
     modes: Set<MappingMode>,
-    fromKeys: List<KeyStroke>,
+    fromKeys: List<VimKeyStroke>,
     pluginOwner: MappingOwner,
-    toKeys: List<KeyStroke>,
+    toKeys: List<VimKeyStroke>,
     recursive: Boolean,
   ) {
-    VimPlugin.getKey().putKeyMapping(modes, fromKeys.map { it.vimKeyStroke }, pluginOwner, toKeys.map { it.vimKeyStroke }, recursive)
+    VimPlugin.getKey().putKeyMapping(modes, fromKeys, pluginOwner, toKeys, recursive)
   }
 
   /** The 'map' command for mapping keys to other keys if there is no other mapping to these keys */
   @JvmStatic
   fun putKeyMappingIfMissing(
     modes: Set<MappingMode>,
-    fromKeys: List<KeyStroke>,
+    fromKeys: List<VimKeyStroke>,
     pluginOwner: MappingOwner,
-    toKeys: List<KeyStroke>,
+    toKeys: List<VimKeyStroke>,
     recursive: Boolean,
   ) {
-    val filteredModes = modes.filterNotTo(HashSet()) { VimPlugin.getKey().hasmapto(it, toKeys.map { it.vimKeyStroke }) }
-    VimPlugin.getKey().putKeyMapping(filteredModes, fromKeys.map { it.vimKeyStroke }, pluginOwner, toKeys.map { it.vimKeyStroke }, recursive)
+    val filteredModes = modes.filterNotTo(HashSet()) { VimPlugin.getKey().hasmapto(it, toKeys) }
+    VimPlugin.getKey().putKeyMapping(filteredModes, fromKeys, pluginOwner, toKeys, recursive)
   }
 
   /**

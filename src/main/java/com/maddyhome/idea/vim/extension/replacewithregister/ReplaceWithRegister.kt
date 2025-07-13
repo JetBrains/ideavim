@@ -47,13 +47,13 @@ internal class ReplaceWithRegister : VimExtension {
   override fun getName(): String = "ReplaceWithRegister"
 
   override fun init() {
-    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys(RWR_OPERATOR).map { it.keyStroke }, owner, RwrMotion(), false)
-    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys(RWR_LINE).map { it.keyStroke }, owner, RwrLine(), false)
-    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.X, injector.parser.parseKeys(RWR_VISUAL).map { it.keyStroke }, owner, RwrVisual(), false)
+    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys(RWR_OPERATOR), owner, RwrMotion(), false)
+    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys(RWR_LINE), owner, RwrLine(), false)
+    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.X, injector.parser.parseKeys(RWR_VISUAL), owner, RwrVisual(), false)
 
-    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("gr").map { it.keyStroke }, owner, injector.parser.parseKeys(RWR_OPERATOR).map { it.keyStroke }, true)
-    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("grr").map { it.keyStroke }, owner, injector.parser.parseKeys(RWR_LINE).map { it.keyStroke }, true)
-    putKeyMappingIfMissing(MappingMode.X, injector.parser.parseKeys("gr").map { it.keyStroke }, owner, injector.parser.parseKeys(RWR_VISUAL).map { it.keyStroke }, true)
+    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("gr"), owner, injector.parser.parseKeys(RWR_OPERATOR), true)
+    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("grr"), owner, injector.parser.parseKeys(RWR_LINE), true)
+    putKeyMappingIfMissing(MappingMode.X, injector.parser.parseKeys("gr"), owner, injector.parser.parseKeys(RWR_VISUAL), true)
 
     VimExtensionFacade.exportOperatorFunction(OPERATOR_FUNC, Operator())
   }

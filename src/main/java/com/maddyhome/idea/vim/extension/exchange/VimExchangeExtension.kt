@@ -63,15 +63,15 @@ internal class VimExchangeExtension : VimExtension {
   override fun getName() = "exchange"
 
   override fun init() {
-    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys(EXCHANGE_CMD).map { it.keyStroke }, owner, ExchangeHandler(false), false)
-    putExtensionHandlerMapping(MappingMode.X, injector.parser.parseKeys(EXCHANGE_CMD).map { it.keyStroke }, owner, VExchangeHandler(), false)
-    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys(EXCHANGE_CLEAR_CMD).map { it.keyStroke }, owner, ExchangeClearHandler(), false)
-    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys(EXCHANGE_LINE_CMD).map { it.keyStroke }, owner, ExchangeHandler(true), false)
+    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys(EXCHANGE_CMD), owner, ExchangeHandler(false), false)
+    putExtensionHandlerMapping(MappingMode.X, injector.parser.parseKeys(EXCHANGE_CMD), owner, VExchangeHandler(), false)
+    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys(EXCHANGE_CLEAR_CMD), owner, ExchangeClearHandler(), false)
+    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys(EXCHANGE_LINE_CMD), owner, ExchangeHandler(true), false)
 
-    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("cx").map { it.keyStroke }, owner, injector.parser.parseKeys(EXCHANGE_CMD).map { it.keyStroke }, true)
-    putKeyMappingIfMissing(MappingMode.X, injector.parser.parseKeys("X").map { it.keyStroke }, owner, injector.parser.parseKeys(EXCHANGE_CMD).map { it.keyStroke }, true)
-    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("cxc").map { it.keyStroke }, owner, injector.parser.parseKeys(EXCHANGE_CLEAR_CMD).map { it.keyStroke }, true)
-    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("cxx").map { it.keyStroke }, owner, injector.parser.parseKeys(EXCHANGE_LINE_CMD).map { it.keyStroke }, true)
+    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("cx"), owner, injector.parser.parseKeys(EXCHANGE_CMD), true)
+    putKeyMappingIfMissing(MappingMode.X, injector.parser.parseKeys("X"), owner, injector.parser.parseKeys(EXCHANGE_CMD), true)
+    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("cxc"), owner, injector.parser.parseKeys(EXCHANGE_CLEAR_CMD), true)
+    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("cxx"), owner, injector.parser.parseKeys(EXCHANGE_LINE_CMD), true)
 
     VimExtensionFacade.exportOperatorFunction(OPERATOR_FUNC, Operator())
   }

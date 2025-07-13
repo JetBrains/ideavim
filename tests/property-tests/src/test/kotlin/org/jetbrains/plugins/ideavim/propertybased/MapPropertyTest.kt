@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.propertybased
 
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.helper.keyStroke
 import org.jetbrains.jetCheck.Generator
 import org.jetbrains.jetCheck.ImperativeCommand
 import org.jetbrains.jetCheck.PropertyChecker

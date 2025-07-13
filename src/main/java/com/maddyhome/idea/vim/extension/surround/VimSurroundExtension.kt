@@ -38,6 +38,7 @@ import com.maddyhome.idea.vim.extension.exportOperatorFunction
 import com.maddyhome.idea.vim.group.findBlockRange
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.keyStroke
+import com.maddyhome.idea.vim.helper.vimKeyStroke
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
@@ -66,19 +67,19 @@ internal class VimSurroundExtension : VimExtension {
   private val NO_MAPPINGS = "surround_no_mappings"
 
   override fun init() {
-    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>YSurround").map { it.keyStroke }, owner, YSurroundHandler(), false)
-    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>Yssurround").map { it.keyStroke }, owner, YSSurroundHandler(), false)
-    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>CSurround").map { it.keyStroke }, owner, CSurroundHandler(), false)
-    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>DSurround").map { it.keyStroke }, owner, DSurroundHandler(), false)
-    putExtensionHandlerMapping(MappingMode.XO, injector.parser.parseKeys("<Plug>VSurround").map { it.keyStroke }, owner, VSurroundHandler(), false)
+    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>YSurround"), owner, YSurroundHandler(), false)
+    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>Yssurround"), owner, YSSurroundHandler(), false)
+    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>CSurround"), owner, CSurroundHandler(), false)
+    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>DSurround"), owner, DSurroundHandler(), false)
+    putExtensionHandlerMapping(MappingMode.XO, injector.parser.parseKeys("<Plug>VSurround"), owner, VSurroundHandler(), false)
 
     val noMappings = VimPlugin.getVariableService().getGlobalVariableValue(NO_MAPPINGS)?.asBoolean() ?: false
     if (!noMappings) {
-      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("ys").map { it.keyStroke }, owner, injector.parser.parseKeys("<Plug>YSurround").map { it.keyStroke }, true)
-      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("yss").map { it.keyStroke }, owner, injector.parser.parseKeys("<Plug>Yssurround").map { it.keyStroke }, true)
-      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("cs").map { it.keyStroke }, owner, injector.parser.parseKeys("<Plug>CSurround").map { it.keyStroke }, true)
-      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("ds").map { it.keyStroke }, owner, injector.parser.parseKeys("<Plug>DSurround").map { it.keyStroke }, true)
-      putKeyMappingIfMissing(MappingMode.XO, injector.parser.parseKeys("S").map { it.keyStroke }, owner, injector.parser.parseKeys("<Plug>VSurround").map { it.keyStroke }, true)
+      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("ys"), owner, injector.parser.parseKeys("<Plug>YSurround"), true)
+      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("yss"), owner, injector.parser.parseKeys("<Plug>Yssurround"), true)
+      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("cs"), owner, injector.parser.parseKeys("<Plug>CSurround"), true)
+      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("ds"), owner, injector.parser.parseKeys("<Plug>DSurround"), true)
+      putKeyMappingIfMissing(MappingMode.XO, injector.parser.parseKeys("S"), owner, injector.parser.parseKeys("<Plug>VSurround"), true)
     }
 
     VimExtensionFacade.exportOperatorFunction(OPERATOR_FUNC, Operator())
@@ -202,7 +203,7 @@ internal class VimSurroundExtension : VimExtension {
         surroundings
           .filter { it.isValidSurrounding } // we do nothing with carets that are not inside the surrounding
           .map { surrounding ->
-            val innerValue = injector.parser.toPrintableString(surrounding.innerText?.map { it.vim }!!)
+            val innerValue = injector.parser.toPrintableString(surrounding.innerText?.map { it.vimKeyStroke }!!)
             val text = newSurround?.let {
               val trimmedValue = if (newSurround.shouldTrim) innerValue.trim() else innerValue
               it.first + trimmedValue + it.second

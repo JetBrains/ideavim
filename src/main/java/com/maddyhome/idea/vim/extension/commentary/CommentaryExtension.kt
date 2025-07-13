@@ -126,25 +126,25 @@ internal class CommentaryExtension : VimExtension {
   override fun init() {
     val plugCommentaryKeys = injector.parser.parseKeys("<Plug>Commentary")
     val plugCommentaryLineKeys = injector.parser.parseKeys("<Plug>CommentaryLine")
-    putExtensionHandlerMapping(MappingMode.NX, plugCommentaryKeys.map { it.keyStroke }, owner, CommentaryOperatorHandler(), false)
-    putExtensionHandlerMapping(MappingMode.O, plugCommentaryKeys.map { it.keyStroke }, owner, CommentaryMappingHandler(), false)
-    putKeyMappingIfMissing(MappingMode.N, plugCommentaryLineKeys.map { it.keyStroke }, owner, injector.parser.parseKeys("gc_").map { it.keyStroke }, true)
+    putExtensionHandlerMapping(MappingMode.NX, plugCommentaryKeys, owner, CommentaryOperatorHandler(), false)
+    putExtensionHandlerMapping(MappingMode.O, plugCommentaryKeys, owner, CommentaryMappingHandler(), false)
+    putKeyMappingIfMissing(MappingMode.N, plugCommentaryLineKeys, owner, injector.parser.parseKeys("gc_"), true)
 
-    putKeyMappingIfMissing(MappingMode.NXO, injector.parser.parseKeys("gc").map { it.keyStroke }, owner, plugCommentaryKeys.map { it.keyStroke }, true)
-    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("gcc").map { it.keyStroke }, owner, plugCommentaryLineKeys.map { it.keyStroke }, true)
+    putKeyMappingIfMissing(MappingMode.NXO, injector.parser.parseKeys("gc"), owner, plugCommentaryKeys, true)
+    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("gcc"), owner, plugCommentaryLineKeys, true)
     putKeyMappingIfMissing(
       MappingMode.N,
-      injector.parser.parseKeys("gcu").map { it.keyStroke },
+      injector.parser.parseKeys("gcu"),
       owner,
-      injector.parser.parseKeys("<Plug>Commentary<Plug>Commentary").map { it.keyStroke },
+      injector.parser.parseKeys("<Plug>Commentary<Plug>Commentary"),
       true,
     )
 
     // Previous versions of IdeaVim used different mappings to Vim's Commentary. Make sure everything works if someone
     // is still using the old mapping
-    putKeyMapping(MappingMode.N, injector.parser.parseKeys("<Plug>(CommentMotion)").map { it.keyStroke }, owner, plugCommentaryKeys.map { it.keyStroke }, true)
-    putKeyMapping(MappingMode.XO, injector.parser.parseKeys("<Plug>(CommentMotionV)").map { it.keyStroke }, owner, plugCommentaryKeys.map { it.keyStroke }, true)
-    putKeyMapping(MappingMode.N, injector.parser.parseKeys("<Plug>(CommentLine)").map { it.keyStroke }, owner, plugCommentaryLineKeys.map { it.keyStroke }, true)
+    putKeyMapping(MappingMode.N, injector.parser.parseKeys("<Plug>(CommentMotion)"), owner, plugCommentaryKeys, true)
+    putKeyMapping(MappingMode.XO, injector.parser.parseKeys("<Plug>(CommentMotionV)"), owner, plugCommentaryKeys, true)
+    putKeyMapping(MappingMode.N, injector.parser.parseKeys("<Plug>(CommentLine)"), owner, plugCommentaryLineKeys, true)
 
     addCommand("Commentary", CommentaryCommandAliasHandler())
 

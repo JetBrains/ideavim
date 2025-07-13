@@ -302,14 +302,14 @@ private fun VimExtension.mapToFunctionAndProvideKeys(
 ) {
   VimExtensionFacade.putExtensionHandlerMapping(
     mappingModes,
-    injector.parser.parseKeys(command(keys)).map { it.keyStroke },
+    injector.parser.parseKeys(command(keys)),
     owner,
     handler,
     false
   )
   VimExtensionFacade.putExtensionHandlerMapping(
     mappingModes,
-    injector.parser.parseKeys(commandFromOriginalPlugin(keys)).map { it.keyStroke },
+    injector.parser.parseKeys(commandFromOriginalPlugin(keys)),
     owner,
     handler,
     false
@@ -333,12 +333,12 @@ private fun VimExtension.mapToFunctionAndProvideKeys(
   val doubleFiltered = mappingModes
     .filter { it in filteredModes2 && it in filteredModes && it in filteredFromModes }
     .toSet()
-  putKeyMapping(doubleFiltered, fromKeys.map { it.keyStroke }, owner, injector.parser.parseKeys(command(keys)).map { it.keyStroke }, true)
+  putKeyMapping(doubleFiltered, fromKeys, owner, injector.parser.parseKeys(command(keys)), true)
   putKeyMapping(
     doubleFiltered,
-    fromKeys.map { it.keyStroke },
+    fromKeys,
     owner,
-    injector.parser.parseKeys(commandFromOriginalPlugin(keys)).map { it.keyStroke },
+    injector.parser.parseKeys(commandFromOriginalPlugin(keys)),
     true
   )
 }

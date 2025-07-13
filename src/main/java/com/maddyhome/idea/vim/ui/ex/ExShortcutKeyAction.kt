@@ -13,6 +13,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.project.DumbAwareAction
 import com.maddyhome.idea.vim.KeyHandler
+import com.maddyhome.idea.vim.helper.vimKeyStroke
 import com.maddyhome.idea.vim.newapi.vim
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -42,7 +43,7 @@ internal class ExShortcutKeyAction(private val exEntryPanel: ExEntryPanel) : Dum
       //   e.dataContext will refer to the ex-entry editor and commands will be executed on it,
       //   thus it should not be used. For example, `:action EditorSelectWord` will not work with this context
       val mainEditorContext = exEntryPanel.entry.context.vim
-      keyHandler.handleKey(editor!!.vim, keyStroke.vim, mainEditorContext, keyHandler.keyHandlerState)
+      keyHandler.handleKey(editor!!.vim, keyStroke.vimKeyStroke, mainEditorContext, keyHandler.keyHandlerState)
     }
   }
 
