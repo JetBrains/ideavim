@@ -11,7 +11,7 @@ package com.maddyhome.idea.vim.api.stubs
 import com.maddyhome.idea.vim.api.VimApplicationBase
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 
 class VimApplicationStub : VimApplicationBase() {
   init {
@@ -38,7 +38,7 @@ class VimApplicationStub : VimApplicationBase() {
     TODO("Not yet implemented")
   }
 
-  override fun postKey(stroke: KeyStroke, editor: VimEditor) {
+  override fun postKey(stroke: VimKeyStroke, editor: VimEditor) {
     TODO("Not yet implemented")
   }
 

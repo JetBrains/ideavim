@@ -17,24 +17,24 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import java.awt.event.KeyEvent
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 
 @CommandOrMotion(keys = ["<DEL>"], modes = [Mode.SELECT])
 class SelectDeleteAction : SelectDeleteBackspaceActionBase() {
-  override val keyStroke: KeyStroke
-    get() = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)
+  override val keyStroke: VimKeyStroke
+    get() = VimKeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)
 }
 
 @CommandOrMotion(keys = ["<BS>"], modes = [Mode.SELECT])
 class SelectBackspaceAction : SelectDeleteBackspaceActionBase() {
-  override val keyStroke: KeyStroke
-    get() = KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)
+  override val keyStroke: VimKeyStroke
+    get() = VimKeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)
 }
 
 abstract class SelectDeleteBackspaceActionBase : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 
-  abstract val keyStroke: KeyStroke
+  abstract val keyStroke: VimKeyStroke
 
   override fun execute(
     editor: VimEditor,

@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.key.KeyConsumer
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 
 internal class DigraphConsumer : KeyConsumer {
   private companion object {
@@ -27,7 +27,7 @@ internal class DigraphConsumer : KeyConsumer {
   }
 
   override fun consumeKey(
-    key: KeyStroke,
+    key: VimKeyStroke,
     editor: VimEditor,
     allowKeyMappings: Boolean,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
@@ -92,14 +92,14 @@ internal class DigraphConsumer : KeyConsumer {
             val highSurrogate = charArray[0]
             val lowSurrogate = charArray[1]
 
-            val keyStrokeHigh = KeyStroke.getKeyStroke(highSurrogate)
+            val keyStrokeHigh = VimKeyStroke.getKeyStroke(highSurrogate)
             keyHandler.handleKey(lambdaEditorState, keyStrokeHigh, lambdaContext, lambdaKeyState)
 
-            val keyStrokeLow = KeyStroke.getKeyStroke(lowSurrogate)
+            val keyStrokeLow = VimKeyStroke.getKeyStroke(lowSurrogate)
             keyHandler.handleKey(lambdaEditorState, keyStrokeLow, lambdaContext, lambdaKeyState)
           }
           else {
-            val stroke = KeyStroke.getKeyStroke(codepoint.toChar())
+            val stroke = VimKeyStroke.getKeyStroke(codepoint.toChar())
             keyHandler.handleKey(lambdaEditorState, stroke, lambdaContext, lambdaKeyState)
           }
         }

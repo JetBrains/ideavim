@@ -32,14 +32,14 @@ import com.maddyhome.idea.vim.state.mode.selectionType
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import java.awt.event.KeyEvent
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 import kotlin.math.min
 
 /**
  * @author vlan
  */
 sealed class MappingInfo(
-  val fromKeys: List<KeyStroke>,
+  val fromKeys: List<VimKeyStroke>,
   val isRecursive: Boolean,
   val owner: MappingOwner,
   val originalModes: Set<MappingMode>,
@@ -61,7 +61,7 @@ sealed class MappingInfo(
     return size - otherSize
   }
 
-  private fun compareKeys(key1: KeyStroke, key2: KeyStroke): Int {
+  private fun compareKeys(key1: VimKeyStroke, key2: VimKeyStroke): Int {
     val c1 = key1.keyChar
     val c2 = key2.keyChar
     return when {
@@ -78,8 +78,8 @@ sealed class MappingInfo(
 }
 
 class ToKeysMappingInfo(
-  val toKeys: List<KeyStroke>,
-  fromKeys: List<KeyStroke>,
+  val toKeys: List<VimKeyStroke>,
+  fromKeys: List<VimKeyStroke>,
   isRecursive: Boolean,
   owner: MappingOwner,
   originalModes: Set<MappingMode>,
@@ -121,7 +121,7 @@ class ToKeysMappingInfo(
 
 class ToExpressionMappingInfo(
   private val toExpression: Expression,
-  fromKeys: List<KeyStroke>,
+  fromKeys: List<VimKeyStroke>,
   isRecursive: Boolean,
   owner: MappingOwner,
   originalModes: Set<MappingMode>,
@@ -156,7 +156,7 @@ class ToExpressionMappingInfo(
 
 class ToHandlerMappingInfo(
   private val extensionHandler: ExtensionHandler,
-  fromKeys: List<KeyStroke>,
+  fromKeys: List<VimKeyStroke>,
   isRecursive: Boolean,
   owner: MappingOwner,
   originalModes: Set<MappingMode>,
@@ -263,7 +263,7 @@ class ToHandlerMappingInfo(
 
 class ToActionMappingInfo(
   val action: String,
-  fromKeys: List<KeyStroke>,
+  fromKeys: List<VimKeyStroke>,
   isRecursive: Boolean,
   owner: MappingOwner,
   originalModes: Set<MappingMode>,

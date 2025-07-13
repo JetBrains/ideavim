@@ -8,9 +8,9 @@
 
 package com.maddyhome.idea.vim.key
 
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 
 interface KeyMappingLayer {
-  fun isPrefix(keys: List<KeyStroke>): Boolean
-  fun getLayer(keys: List<KeyStroke>): MappingInfoLayer?
+  fun isPrefix(keys: List<VimKeyStroke>): Boolean
+  fun getLayer(keys: List<VimKeyStroke>): MappingInfoLayer?
 }

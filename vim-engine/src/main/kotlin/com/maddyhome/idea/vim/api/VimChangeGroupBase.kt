@@ -47,7 +47,7 @@ import org.jetbrains.annotations.TestOnly
 import java.awt.event.KeyEvent
 import java.math.BigInteger
 import java.util.*
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -601,7 +601,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     if (editor.mode is Mode.REPLACE) {
       editor.insertMode = true
     }
-    val enterKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)
+    val enterKeyStroke = VimKeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)
     val actions = injector.keyGroup.getActions(editor, enterKeyStroke)
     for (action in actions) {
       if (injector.actionExecutor.executeAction(editor, action, context)) {
@@ -729,7 +729,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    */
   override fun processKey(
     editor: VimEditor,
-    key: KeyStroke,
+    key: VimKeyStroke,
     processResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
     logger.debug { "processKey($key)" }
@@ -761,7 +761,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
 
   override fun processKeyInSelectMode(
     editor: VimEditor,
-    key: KeyStroke,
+    key: VimKeyStroke,
     processResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
     var res: Boolean
@@ -1098,7 +1098,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       block !== Character.UnicodeBlock.SPECIALS
   }
 
-  private fun activeTemplateWithLeftRightMotion(editor: VimEditor, keyStroke: KeyStroke): Boolean {
+  private fun activeTemplateWithLeftRightMotion(editor: VimEditor, keyStroke: VimKeyStroke): Boolean {
     return injector.templateManager.getTemplateState(editor) != null &&
       (keyStroke.keyCode == KeyEvent.VK_LEFT || keyStroke.keyCode == KeyEvent.VK_RIGHT)
   }

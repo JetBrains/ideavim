@@ -14,7 +14,7 @@ import com.maddyhome.idea.vim.common.DigraphResult.Companion.done
 import com.maddyhome.idea.vim.common.DigraphResult.Companion.handled
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import java.awt.event.KeyEvent
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 
 class DigraphSequence : Cloneable {
   private var digraphState = DIG_STATE_PENDING
@@ -24,12 +24,12 @@ class DigraphSequence : Cloneable {
   private var codeType = 0
   private var codeMax = 0
 
-  fun isDigraphStart(key: KeyStroke): Boolean {
+  fun isDigraphStart(key: VimKeyStroke): Boolean {
     return digraphState == DIG_STATE_PENDING && // if state has changed, then it's not a start
       key.keyCode == KeyEvent.VK_K && key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0
   }
 
-  fun isLiteralStart(key: KeyStroke): Boolean {
+  fun isLiteralStart(key: VimKeyStroke): Boolean {
     return digraphState == DIG_STATE_PENDING && // if state has changed, then it's not a start
       (key.keyCode == KeyEvent.VK_V || key.keyCode == KeyEvent.VK_Q) && key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0
   }
@@ -48,7 +48,7 @@ class DigraphSequence : Cloneable {
     return DigraphResult.HandledLiteral
   }
 
-  fun processKey(key: KeyStroke, editor: VimEditor): DigraphResult {
+  fun processKey(key: VimKeyStroke, editor: VimEditor): DigraphResult {
     return when (digraphState) {
       DIG_STATE_PENDING -> {
         logger.debug("DIG_STATE_PENDING")
@@ -201,7 +201,7 @@ class DigraphSequence : Cloneable {
     }
   }
 
-  private fun specialKeyToKeyCode(key: KeyStroke): Int? {
+  private fun specialKeyToKeyCode(key: VimKeyStroke): Int? {
     // Handle special keys. Specifically, if it's CTRL+something, return the codepoint for `\something`. Or if it's
     // newline, return carriage return (Vim likes to treat newline as null), and escape should be returned as escape
     if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) {

@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import org.jetbrains.annotations.NonNls
 import java.util.*
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 
 /**
  * @author vlan
@@ -159,7 +159,7 @@ data class MapCommand(val range: Range, val cmd: String, val modifier: CommandMo
 
   private class CommandArguments(
     val specialArguments: Set<SpecialArgument>,
-    val fromKeys: List<KeyStroke>,
+    val fromKeys: List<VimKeyStroke>,
     val toExpr: Expression,
     val secondArgument: String,
   )
@@ -195,7 +195,7 @@ data class MapCommand(val range: Range, val cmd: String, val modifier: CommandMo
   private fun parseCommandArguments(input: String): CommandArguments? {
     val specialArguments = HashSet<SpecialArgument>()
     val toKeysBuilder = StringBuilder()
-    var fromKeys: List<KeyStroke>? = null
+    var fromKeys: List<VimKeyStroke>? = null
 
     val preprocessedInput = processBars(input)
     preprocessedInput.split(" ").dropLastWhile { it.isEmpty() }.forEach { part ->

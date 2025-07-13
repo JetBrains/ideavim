@@ -14,17 +14,17 @@ import org.jetbrains.annotations.NonNls
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
 import java.util.*
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 
 abstract class VimStringParserBase : VimStringParser {
-  override val plugKeyStroke: KeyStroke
+  override val plugKeyStroke: VimKeyStroke
     get() = parseKeys("<Plug>")[0]
 
-  override val actionKeyStroke: KeyStroke
+  override val actionKeyStroke: VimKeyStroke
     get() = parseKeys("<Action>")[0]
 
   // todo what is the difference between this one and com.maddyhome.idea.vim.helper.EngineStringHelper#toPrintableCharacters
-  override fun toPrintableString(keys: List<KeyStroke>): String {
+  override fun toPrintableString(keys: List<VimKeyStroke>): String {
     val builder = StringBuilder()
     for (key in keys) {
       val keyAsChar = keyStrokeToChar(key)
@@ -33,7 +33,7 @@ abstract class VimStringParserBase : VimStringParser {
     return builder.toString()
   }
 
-  private fun keyStrokeToChar(key: KeyStroke): Char {
+  private fun keyStrokeToChar(key: VimKeyStroke): Char {
     if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {
       return key.keyChar
     } else if (key.modifiers and InputEvent.CTRL_DOWN_MASK == InputEvent.CTRL_DOWN_MASK) {
@@ -49,7 +49,7 @@ abstract class VimStringParserBase : VimStringParser {
     return key.keyCode.toChar()
   }
 
-  override fun toKeyNotation(keyStrokes: List<KeyStroke>): String {
+  override fun toKeyNotation(keyStrokes: List<VimKeyStroke>): String {
     if (keyStrokes.isEmpty()) {
       return "<Nop>"
     }
@@ -60,7 +60,7 @@ abstract class VimStringParserBase : VimStringParser {
     return builder.toString()
   }
 
-  override fun toKeyNotation(keyStroke: KeyStroke): String {
+  override fun toKeyNotation(keyStroke: VimKeyStroke): String {
     val c = keyStroke.keyChar
     val keyCode = keyStroke.keyCode
     val modifiers = keyStroke.modifiers
@@ -101,7 +101,7 @@ abstract class VimStringParserBase : VimStringParser {
     return if (name != null) "<$prefix$name>" else "<<$keyStroke>>"
   }
 
-  override fun parseKeys(string: String): List<KeyStroke> = buildList {
+  override fun parseKeys(string: String): List<VimKeyStroke> = buildList {
     val specialKeyBuilder = StringBuilder()
     var state = KeyParserState.INIT
 
@@ -115,12 +115,12 @@ abstract class VimStringParserBase : VimStringParser {
           }
 
           else -> {
-            val stroke: KeyStroke = if (c == '\t' || c == '\n') {
-              KeyStroke.getKeyStroke(c.code, 0)
+            val stroke: VimKeyStroke = if (c == '\t' || c == '\n') {
+              VimKeyStroke.getKeyStroke(c.code, 0)
             } else if (isControlCharacter(c)) {
-              KeyStroke.getKeyStroke(c.code + 'A'.code - 1, InputEvent.CTRL_DOWN_MASK)
+              VimKeyStroke.getKeyStroke(c.code + 'A'.code - 1, InputEvent.CTRL_DOWN_MASK)
             } else {
-              KeyStroke.getKeyStroke(c)
+              VimKeyStroke.getKeyStroke(c)
             }
             add(stroke)
           }
@@ -129,9 +129,9 @@ abstract class VimStringParserBase : VimStringParser {
         KeyParserState.ESCAPE -> {
           state = KeyParserState.INIT
           if (c != '\\') {
-            add(KeyStroke.getKeyStroke('\\'))
+            add(VimKeyStroke.getKeyStroke('\\'))
           }
-          add(KeyStroke.getKeyStroke(c))
+          add(VimKeyStroke.getKeyStroke(c))
         }
 
         KeyParserState.SPECIAL -> {
@@ -148,15 +148,15 @@ abstract class VimStringParserBase : VimStringParser {
               if (specialKey != null && specialKeyName.length > 1) {
                 add(specialKey)
               } else {
-                add(KeyStroke.getKeyStroke('<'))
+                add(VimKeyStroke.getKeyStroke('<'))
                 addAll(stringToKeys(specialKeyName))
-                add(KeyStroke.getKeyStroke('>'))
+                add(VimKeyStroke.getKeyStroke('>'))
               }
             }
           } else {
             // e.g. move '<-2<CR> - the first part does not belong to any special key
             if (c == '<') {
-              add(KeyStroke.getKeyStroke('<'))
+              add(VimKeyStroke.getKeyStroke('<'))
               addAll(stringToKeys(specialKeyBuilder.toString()))
               specialKeyBuilder.clear()
             } else {
@@ -168,14 +168,14 @@ abstract class VimStringParserBase : VimStringParser {
     }
 
     if (state == KeyParserState.ESCAPE) {
-      add(KeyStroke.getKeyStroke('\\'))
+      add(VimKeyStroke.getKeyStroke('\\'))
     } else if (state == KeyParserState.SPECIAL) {
-      add(KeyStroke.getKeyStroke('<'))
+      add(VimKeyStroke.getKeyStroke('<'))
       addAll(stringToKeys(specialKeyBuilder.toString()))
     }
   }
 
-  private fun getMapLeader(): List<KeyStroke> {
+  private fun getMapLeader(): List<VimKeyStroke> {
     val mapLeader: Any? = injector.variableService.getGlobalVariableValue("mapleader")
     return if (mapLeader is VimString) {
       stringToKeys(mapLeader.value)
@@ -184,20 +184,20 @@ abstract class VimStringParserBase : VimStringParser {
     }
   }
 
-  override fun stringToKeys(string: @NonNls String): List<KeyStroke> {
-    val res: MutableList<KeyStroke> = ArrayList()
+  override fun stringToKeys(string: @NonNls String): List<VimKeyStroke> {
+    val res: MutableList<VimKeyStroke> = ArrayList()
     for (element in string) {
       if (isControlCharacter(element) && element.code != 10) {
         if (element.code == 0) {
           // J is a special case, it's keycode is 0 because keycode 10 is reserved by \n
-          res.add(KeyStroke.getKeyStroke('J'.code, InputEvent.CTRL_DOWN_MASK))
+          res.add(VimKeyStroke.getKeyStroke('J'.code, InputEvent.CTRL_DOWN_MASK))
         } else if (element == '\t') {
-          res.add(KeyStroke.getKeyStroke('\t'))
+          res.add(VimKeyStroke.getKeyStroke('\t'))
         } else {
-          res.add(KeyStroke.getKeyStroke(element.code + 'A'.code - 1, InputEvent.CTRL_DOWN_MASK))
+          res.add(VimKeyStroke.getKeyStroke(element.code + 'A'.code - 1, InputEvent.CTRL_DOWN_MASK))
         }
       } else {
-        res.add(KeyStroke.getKeyStroke(element))
+        res.add(VimKeyStroke.getKeyStroke(element))
       }
     }
     return res
@@ -268,7 +268,7 @@ abstract class VimStringParserBase : VimStringParser {
     return if (Character.isUpperCase(s[0])) s else s[0].uppercaseChar().toString() + s.substring(1)
   }
 
-  private fun toEscapeNotation(key: KeyStroke): String? {
+  private fun toEscapeNotation(key: VimKeyStroke): String? {
     val c = key.keyChar
     if (isControlCharacter(c)) {
       return "^" + (c.code + 'A'.code - 1).toChar()
@@ -278,7 +278,7 @@ abstract class VimStringParserBase : VimStringParser {
     return null
   }
 
-  private fun isControlKeyCode(key: KeyStroke): Boolean {
+  private fun isControlKeyCode(key: VimKeyStroke): Boolean {
     return key.keyChar == KeyEvent.CHAR_UNDEFINED && key.keyCode < 0x20 && key.modifiers == 0
   }
 
@@ -470,12 +470,12 @@ abstract class VimStringParserBase : VimStringParser {
   }
 
   // See https://vimdoc.sourceforge.net/htmldoc/intro.html#key-notation
-  private fun parseSpecialKey(s: String, modifiers: Int): KeyStroke? {
+  private fun parseSpecialKey(s: String, modifiers: Int): VimKeyStroke? {
     val lower = s.lowercase(Locale.getDefault())
     val keyCode = getVimKeyName(lower)
     val typedChar = getVimTypedKeyName(lower)
     if (keyCode != null) {
-      return KeyStroke.getKeyStroke(keyCode, modifiers)
+      return VimKeyStroke.getKeyStroke(keyCode, modifiers)
     } else if (typedChar != null) {
       return getTypedOrPressedKeyStroke(typedChar, modifiers)
     } else if (lower.startsWith(CMD_PREFIX)) {
@@ -558,13 +558,13 @@ abstract class VimStringParserBase : VimStringParser {
     }
   }
 
-  private fun getTypedOrPressedKeyStroke(c: Char, modifiers: Int): KeyStroke {
+  private fun getTypedOrPressedKeyStroke(c: Char, modifiers: Int): VimKeyStroke {
     return if (modifiers == 0) {
-      KeyStroke.getKeyStroke(c)
+      VimKeyStroke.getKeyStroke(c)
     } else if (modifiers == InputEvent.SHIFT_DOWN_MASK && Character.isLetter(c)) {
-      KeyStroke.getKeyStroke(Character.toUpperCase(c))
+      VimKeyStroke.getKeyStroke(Character.toUpperCase(c))
     } else {
-      KeyStroke.getKeyStroke(Character.toUpperCase(c).code, modifiers)
+      VimKeyStroke.getKeyStroke(Character.toUpperCase(c).code, modifiers)
     }
   }
 

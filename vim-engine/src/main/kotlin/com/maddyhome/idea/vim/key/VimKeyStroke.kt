@@ -13,6 +13,9 @@ data class VimKeyStroke(val keyChar: Char, val keyCode: Int, val modifiers: Int)
     fun getKeyStroke(c: Char): VimKeyStroke {
       TODO("zeauberg")
     }
+    fun getKeyStroke(keyChar: Char, modifiers: Int): VimKeyStroke {
+      TODO("zeauberg")
+    }
 
     fun getKeyStroke(keycode: Int, modifiers: Int): VimKeyStroke {
       TODO("zeauberg")

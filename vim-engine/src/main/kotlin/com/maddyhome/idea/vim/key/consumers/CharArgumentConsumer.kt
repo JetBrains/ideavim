@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.key.KeyConsumer
 import java.awt.event.KeyEvent
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 
 internal class CharArgumentConsumer : KeyConsumer {
   private companion object {
@@ -26,7 +26,7 @@ internal class CharArgumentConsumer : KeyConsumer {
   }
 
   override fun consumeKey(
-    key: KeyStroke,
+    key: VimKeyStroke,
     editor: VimEditor,
     allowKeyMappings: Boolean,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
@@ -46,7 +46,7 @@ internal class CharArgumentConsumer : KeyConsumer {
   }
 
   private fun handleCharArgument(
-    key: KeyStroke,
+    key: VimKeyStroke,
     chKey: Char,
     processBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ) {
