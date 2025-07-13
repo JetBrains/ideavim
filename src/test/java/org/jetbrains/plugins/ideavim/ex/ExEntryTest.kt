@@ -12,6 +12,7 @@ import com.intellij.idea.TestFor
 import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.key.VimKeyStroke
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.ui.ex.ExDocument
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
@@ -650,7 +651,7 @@ class ExEntryTest : VimTestCase() {
   @Test
   fun `test insert multi-line register`() {
     // parseKeys parses <CR> in a way that Register#getText doesn't like
-    val keys = mutableListOf<KeyStroke>()
+    val keys = mutableListOf<VimKeyStroke>()
     keys.addAll(injector.parser.parseKeys("hello<CR>world"))
     VimPlugin.getRegister().setKeys('c', keys)
 
@@ -736,7 +737,7 @@ class ExEntryTest : VimTestCase() {
       "Ex command must start with '[count]:', '[count]/' or '[count]?'",
     )
 
-    val keys = mutableListOf<KeyStroke>()
+    val keys = mutableListOf<VimKeyStroke>()
     injector.parser.parseKeys(text).forEach {
       // <Left> doesn't work correctly in tests. The DefaultEditorKit.NextVisualPositionAction action is correctly
       // called, but fails to move the caret correctly because the text component has never been painted

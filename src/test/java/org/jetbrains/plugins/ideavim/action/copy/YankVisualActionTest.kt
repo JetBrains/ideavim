@@ -11,6 +11,7 @@
 package org.jetbrains.plugins.ideavim.action.copy
 
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.key.VimKeyStroke
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -307,7 +308,7 @@ class YankVisualActionTest : VimTestCase() {
     )
   }
 
-  private fun doTest(keys: List<KeyStroke>, before: String, expectedText: String, expectedType: SelectionType) {
+  private fun doTest(keys: List<VimKeyStroke>, before: String, expectedText: String, expectedType: SelectionType) {
     configureByText(before)
     typeText(keys)
 

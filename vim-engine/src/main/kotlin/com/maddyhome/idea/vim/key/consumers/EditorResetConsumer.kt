@@ -20,8 +20,8 @@ import com.maddyhome.idea.vim.helper.isCloseKeyStroke
 import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import com.maddyhome.idea.vim.state.mode.Mode
-import java.awt.event.KeyEvent
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.VK_ESCAPE
 
 internal class EditorResetConsumer : KeyConsumer {
   private companion object {
@@ -29,7 +29,7 @@ internal class EditorResetConsumer : KeyConsumer {
   }
 
   override fun consumeKey(
-    key: KeyStroke,
+    key: VimKeyStroke,
     editor: VimEditor,
     allowKeyMappings: Boolean,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
@@ -47,7 +47,7 @@ internal class EditorResetConsumer : KeyConsumer {
     return true
   }
 
-  private fun isEditorReset(key: KeyStroke, editor: VimEditor): Boolean {
+  private fun isEditorReset(key: VimKeyStroke, editor: VimEditor): Boolean {
     val editorReset = editor.mode is Mode.NORMAL && key.isCloseKeyStroke()
     logger.debug { "This is editor reset: $editorReset" }
     return editorReset
@@ -55,7 +55,7 @@ internal class EditorResetConsumer : KeyConsumer {
 
   private fun handleEditorReset(
     editor: VimEditor,
-    key: KeyStroke,
+    key: VimKeyStroke,
     keyState: KeyHandlerState,
     context: ExecutionContext,
   ) {
@@ -72,7 +72,7 @@ internal class EditorResetConsumer : KeyConsumer {
           editor.mode = mode.returnTo
         } else {
           var indicateError = true
-          if (key.keyCode == KeyEvent.VK_ESCAPE) {
+          if (key.keyCode == VK_ESCAPE) {
             val executed = arrayOf<Boolean?>(null)
             injector.actionExecutor.executeCommand(
               editor,

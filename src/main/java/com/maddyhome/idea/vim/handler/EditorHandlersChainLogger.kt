@@ -16,6 +16,7 @@ import com.intellij.openapi.keymap.ex.KeymapManagerEx
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
 import com.maddyhome.idea.vim.api.key
+import com.maddyhome.idea.vim.helper.keyStroke
 import com.maddyhome.idea.vim.newapi.initInjector
 
 /**
@@ -56,8 +57,8 @@ internal class EditorHandlersChainLogger : ProjectActivity {
 
     LOG.info("Active keymap (${keymap.name}) shortcuts for esc: $keymapShortcutsForEsc, Shortcuts for enter: $keymapShortcutsForEnter")
 
-    val actionsForEsc = keymap.getActionIds(key("<esc>")).joinToString("\n")
-    val actionsForEnter = keymap.getActionIds(key("<enter>")).joinToString("\n")
+    val actionsForEsc = keymap.getActionIds(key("<esc>").keyStroke).joinToString("\n")
+    val actionsForEnter = keymap.getActionIds(key("<enter>").keyStroke).joinToString("\n")
 
     LOG.info(
       "Also keymap (${keymap.name}) has " +

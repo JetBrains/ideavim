@@ -11,10 +11,11 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.api.VimOutputPanelBase
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.helper.keyStroke
 import com.maddyhome.idea.vim.helper.vimExOutput
+import com.maddyhome.idea.vim.key.VimKeyStroke
 import com.maddyhome.idea.vim.ui.ExOutputPanel
 import java.lang.ref.WeakReference
-import javax.swing.KeyStroke
 
 // TODO: We need a nicer way to handle output, especially wrt testing, appending + clearing
 class ExOutputModel(private val myEditor: WeakReference<Editor>) : VimOutputPanelBase() {
@@ -118,10 +119,10 @@ class ExOutputModel(private val myEditor: WeakReference<Editor>) : VimOutputPane
     panel.onBadKey()
   }
 
-  override fun close(key: KeyStroke?) {
+  override fun close(key: VimKeyStroke?) {
     val notNullEditor = editor ?: return
     val panel = ExOutputPanel.getNullablePanel(notNullEditor) ?: return
-    panel.close(key)
+    panel.close(key?.keyStroke)
   }
 
   override fun close() {

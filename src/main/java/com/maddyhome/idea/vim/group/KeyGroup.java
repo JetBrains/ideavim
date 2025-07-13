@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.action.VimShortcutKeyAction;
 import com.maddyhome.idea.vim.action.change.LazyVimCommand;
 import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.helper.IJVimKeyHelperKt;
 import com.maddyhome.idea.vim.key.*;
 import com.maddyhome.idea.vim.newapi.IjNativeAction;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
@@ -82,7 +83,7 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
 
   public void saveData(@NotNull Element element) {
     final Element conflictsElement = new Element(SHORTCUT_CONFLICTS_ELEMENT);
-    for (Map.Entry<KeyStroke, ShortcutOwnerInfo> entry : myShortcutConflicts.entrySet()) {
+    for (Map.Entry<VimKeyStroke, ShortcutOwnerInfo> entry : myShortcutConflicts.entrySet()) {
       final ShortcutOwner owner;
       ShortcutOwnerInfo myValue = entry.getValue();
       if (myValue instanceof ShortcutOwnerInfo.AllModes) {
@@ -124,7 +125,7 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
           if (text != null) {
             final KeyStroke keyStroke = KeyStroke.getKeyStroke(text);
             if (keyStroke != null) {
-              myShortcutConflicts.put(keyStroke, new ShortcutOwnerInfo.AllModes(owner));
+              myShortcutConflicts.put(IJVimKeyHelperKt.getVimKeyStroke(keyStroke), new ShortcutOwnerInfo.AllModes(owner));
             }
           }
         }
@@ -133,10 +134,10 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
   }
 
   @Override
-  public @NotNull List<NativeAction> getKeymapConflicts(@NotNull KeyStroke keyStroke) {
+  public @NotNull List<NativeAction> getKeymapConflicts(@NotNull VimKeyStroke keyStroke) {
     final KeymapManagerEx keymapManager = KeymapManagerEx.getInstanceEx();
     final Keymap keymap = keymapManager.getActiveKeymap();
-    final KeyboardShortcut shortcut = new KeyboardShortcut(keyStroke, null);
+    final KeyboardShortcut shortcut = new KeyboardShortcut(IJVimKeyHelperKt.getKeyStroke(keyStroke), null);
     final Map<String, ? extends List<KeyboardShortcut>> conflicts = keymap.getConflicts("", shortcut);
     final List<AnAction> actions = new ArrayList<>();
     for (String actionId : conflicts.keySet()) {
@@ -148,13 +149,13 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
     return actions.stream().map(IjNativeAction::new).collect(toList());
   }
 
-  public @NotNull Map<KeyStroke, ShortcutOwnerInfo> getShortcutConflicts() {
+  public @NotNull Map<VimKeyStroke, ShortcutOwnerInfo> getShortcutConflicts() {
     final Set<RequiredShortcut> requiredShortcutKeys = this.getRequiredShortcutKeys();
-    final Map<KeyStroke, ShortcutOwnerInfo> savedConflicts = getSavedShortcutConflicts();
-    final Map<KeyStroke, ShortcutOwnerInfo> results = new HashMap<>();
+    var savedConflicts = getSavedShortcutConflicts();
+    final Map<VimKeyStroke, ShortcutOwnerInfo> results = new HashMap<>();
     for (RequiredShortcut requiredShortcut : requiredShortcutKeys) {
-      KeyStroke keyStroke = requiredShortcut.getKeyStroke();
-      if (!VimShortcutKeyAction.VIM_ONLY_EDITOR_KEYS.contains(keyStroke)) {
+      VimKeyStroke keyStroke = requiredShortcut.getKeyStroke();
+      if (!VimShortcutKeyAction.VIM_ONLY_EDITOR_KEYS.contains(IJVimKeyHelperKt.getKeyStroke(keyStroke))) {
         final List<NativeAction> conflicts = getKeymapConflicts(keyStroke);
         if (!conflicts.isEmpty()) {
           ShortcutOwnerInfo owner = savedConflicts.get(keyStroke);
@@ -179,18 +180,18 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
    * @param keyStroke The shortcut to register
    */
   public void registerShortcutWithoutAction(KeyStroke keyStroke, MappingOwner owner) {
-    registerRequiredShortcut(Collections.singletonList(keyStroke), owner);
+    registerRequiredShortcut(Collections.singletonList(IJVimKeyHelperKt.getVimKeyStroke(keyStroke)), owner);
   }
 
   public void registerCommandAction(@NotNull LazyVimCommand command) {
     if (ApplicationManager.getApplication().isUnitTestMode()) {
       initIdentityChecker();
-      for (List<KeyStroke> keys : command.getKeys()) {
+      for (List<VimKeyStroke> keys : command.getKeys()) {
         checkCommand(command.getModes(), command, keys);
       }
     }
 
-    for (List<KeyStroke> keyStrokes : command.getKeys()) {
+    for (List<VimKeyStroke> keyStrokes : command.getKeys()) {
       registerRequiredShortcut(keyStrokes, MappingOwner.IdeaVim.System.INSTANCE);
 
       for (MappingMode mappingMode : command.getModes()) {
@@ -199,8 +200,8 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
     }
   }
 
-  private void registerRequiredShortcut(@NotNull List<KeyStroke> keys, MappingOwner owner) {
-    for (KeyStroke key : keys) {
+  private void registerRequiredShortcut(@NotNull List<VimKeyStroke> keys, MappingOwner owner) {
+    for (VimKeyStroke key : keys) {
       if (key.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
         if (!injector.getApplication().isOctopusEnabled() ||
             !(key.getKeyCode() == KeyEvent.VK_ESCAPE && key.getModifiers() == 0) &&
@@ -214,13 +215,13 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
   public static @NotNull ShortcutSet toShortcutSet(@NotNull Collection<RequiredShortcut> requiredShortcuts) {
     final List<Shortcut> shortcuts = new ArrayList<>();
     for (RequiredShortcut key : requiredShortcuts) {
-      shortcuts.add(new KeyboardShortcut(key.getKeyStroke(), null));
+      shortcuts.add(new KeyboardShortcut(IJVimKeyHelperKt.getKeyStroke(key.getKeyStroke()), null));
     }
     return new CustomShortcutSet(shortcuts.toArray(new Shortcut[0]));
   }
 
   private static @NotNull List<Pair<Set<MappingMode>, MappingInfo>> getKeyMappingRows(@NotNull Set<? extends MappingMode> modes,
-                                                                                      @NotNull List<? extends KeyStroke> prefix) {
+                                                                                      @NotNull List<VimKeyStroke> prefix) {
     // Some map commands set a mapping for more than one mode (e.g. `map` sets for Normal, Visual, Select and
     // Op-pending). Vim treats this as a single mapping, and when listing all maps only lists it once, with the
     // appropriate mode indicator(s) in the first column (NVO is a space char). If the lhs mapping is changed or cleared
@@ -232,8 +233,8 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
     // the same behaviour as Vim in map output. So we store the original modes with the mapping and check they're still
     // valid as we collect output
     final List<Pair<Set<MappingMode>, MappingInfo>> rows = new ArrayList<>();
-    final MultiMap<List<? extends KeyStroke>, Set<MappingMode>> multiModeMappings = MultiMap.create();
-    final List<KeyStroke> fromKeys = new ArrayList<>();
+    final MultiMap<List<? extends VimKeyStroke>, Set<MappingMode>> multiModeMappings = MultiMap.create();
+    final List<VimKeyStroke> fromKeys = new ArrayList<>();
 
     for (MappingMode mode : modes) {
       final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(mode);
@@ -260,7 +261,7 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
     return rows;
   }
 
-  private static @NotNull Set<MappingMode> getModesForMapping(@NotNull List<? extends KeyStroke> keyStrokes,
+  private static @NotNull Set<MappingMode> getModesForMapping(@NotNull List<VimKeyStroke> keyStrokes,
                                                               @NotNull Set<MappingMode> originalMappingModes) {
     final Set<MappingMode> actualModes = EnumSet.noneOf(MappingMode.class);
     for (MappingMode mode : originalMappingModes) {
@@ -302,8 +303,8 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
   }
 
   @Override
-  public @NotNull List<NativeAction> getActions(@NotNull VimEditor editor, @NotNull KeyStroke keyStroke) {
-    return getActions(((IjVimEditor)editor).getEditor().getComponent(), keyStroke).stream().map(IjNativeAction::new)
+  public @NotNull List<NativeAction> getActions(@NotNull VimEditor editor, @NotNull VimKeyStroke keyStroke) {
+    return getActions(((IjVimEditor)editor).getEditor().getComponent(), IJVimKeyHelperKt.getKeyStroke(keyStroke)).stream().map(IjNativeAction::new)
       .collect(toList());
   }
 
@@ -359,9 +360,10 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
   }
 
   @Override
-  public boolean showKeyMappings(@NotNull Set<? extends MappingMode> modes,
-                                 @NotNull List<? extends KeyStroke> prefix,
+  public boolean showKeyMappings(@NotNull Set<? extends @NotNull MappingMode> modes,
+                                 @NotNull List<@NotNull VimKeyStroke> prefix,
                                  @NotNull VimEditor editor) {
+
     List<Pair<Set<MappingMode>, MappingInfo>> rows = getKeyMappingRows(modes, prefix);
 
     final StringBuilder builder = new StringBuilder();

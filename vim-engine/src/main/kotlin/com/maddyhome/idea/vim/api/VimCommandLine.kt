@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.history.HistoryEntry
 import com.maddyhome.idea.vim.history.VimHistory
 import org.jetbrains.annotations.TestOnly
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 
 /**
  * This interface is not supposed to have any implementation logic.
@@ -83,7 +83,7 @@ interface VimCommandLine {
    * `<C-U>`, etc.). Typed characters are usually not mapped, and passed back to the command line component, where they
    * are added to the text content.
    */
-  fun handleKey(key: KeyStroke)
+  fun handleKey(key: VimKeyStroke)
 
   /**
    * Text to show while composing a digraph or inserting a literal or register

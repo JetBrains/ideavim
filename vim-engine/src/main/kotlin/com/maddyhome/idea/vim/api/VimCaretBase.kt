@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.register.Register
 import com.maddyhome.idea.vim.register.RegisterConstants
 import com.maddyhome.idea.vim.register.VimRegisterGroupBase
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 
 abstract class VimCaretBase : VimCaret
 
@@ -73,13 +73,13 @@ open class CaretRegisterStorageBase(override var caret: ImmutableVimCaret) : Car
     return super.getRegister(editor, context, r) ?: injector.registerGroup.getRegister(editor, context, r)
   }
 
-  override fun setKeys(register: Char, keys: List<KeyStroke>) {
+  override fun setKeys(register: Char, keys: List<VimKeyStroke>) {
     val editorStub = injector.fallbackWindow
     val contextStub = injector.executionContextManager.getEditorExecutionContext(editorStub)
     setKeys(editorStub, contextStub, register, keys)
   }
 
-  override fun setKeys(editor: VimEditor, context: ExecutionContext, register: Char, keys: List<KeyStroke>) {
+  override fun setKeys(editor: VimEditor, context: ExecutionContext, register: Char, keys: List<VimKeyStroke>) {
     if (caret.isPrimary) {
       injector.registerGroup.setKeys(register, keys)
     }

@@ -11,7 +11,7 @@ package com.maddyhome.idea.vim.key
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 
 /**
  * This thing is used for keeping keys from ToKeys mappings and macros.
@@ -32,7 +32,7 @@ class KeyStack {
     return stack.none { it.hasStroke() }
   }
 
-  fun feedSomeStroke(): KeyStroke? {
+  fun feedSomeStroke(): VimKeyStroke? {
     stack.forEach {
       if (it.hasStroke()) {
         return it.feed()
@@ -41,13 +41,13 @@ class KeyStack {
     return null
   }
 
-  fun feedStroke(): KeyStroke {
+  fun feedStroke(): VimKeyStroke {
     val frame = stack.first()
     val key = frame.feed()
     return key
   }
 
-  fun addKeys(keyStrokes: List<KeyStroke>) {
+  fun addKeys(keyStrokes: List<VimKeyStroke>) {
     LOG.trace { "Got new keys to key stack: $keyStrokes" }
     stack.addFirst(Frame(keyStrokes))
   }
@@ -83,14 +83,14 @@ class KeyStack {
 }
 
 private class Frame(
-  val keys: List<KeyStroke>,
+  val keys: List<VimKeyStroke>,
   var pointer: Int = 0,
 ) {
   fun hasStroke(): Boolean {
     return pointer < keys.size
   }
 
-  fun feed(): KeyStroke {
+  fun feed(): VimKeyStroke {
     val key = keys[pointer]
     pointer += 1
     return key

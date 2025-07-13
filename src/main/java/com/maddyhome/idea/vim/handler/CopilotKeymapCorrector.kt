@@ -20,6 +20,7 @@ import com.intellij.openapi.startup.ProjectActivity
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.key
+import com.maddyhome.idea.vim.helper.keyStroke
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BufferOverflow
@@ -108,7 +109,7 @@ private fun correctCopilotKeymap() {
       val keymap = KeymapManagerEx.getInstanceEx().getKeymap(name) ?: return@forEach
       val currentShortcuts = keymap.getShortcuts("copilot.disposeInlays")
       if ("[pressed ESCAPE]" !in currentShortcuts.map { it.toString() }) {
-        keymap.addShortcut("copilot.disposeInlays", KeyboardShortcut(key("<esc>"), null))
+        keymap.addShortcut("copilot.disposeInlays", KeyboardShortcut(key("<esc>").keyStroke, null))
       }
       LOG.info("Restore copilot escape shortcut in keymap ${keymap.name}")
     }

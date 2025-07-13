@@ -21,6 +21,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.TestInputModel
 import com.maddyhome.idea.vim.helper.inRepeatMode
 import com.maddyhome.idea.vim.helper.isCloseKeyStroke
+import com.maddyhome.idea.vim.helper.vimKeyStroke
 import com.maddyhome.idea.vim.key.interceptors.VimInputInterceptor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
@@ -48,7 +49,7 @@ class ExEntryPanelService : VimCommandLineServiceBase(), VimModalInputService {
       val inputModel = TestInputModel.getInstance(editor)
       var key: KeyStroke? = inputModel.nextKeyStroke()
       while (key != null &&
-        !key.isCloseKeyStroke() && key.keyCode != KeyEvent.VK_ENTER &&
+        !key.vimKeyStroke.isCloseKeyStroke() && key.keyCode != KeyEvent.VK_ENTER &&
         (finishOn == null || key.keyChar != finishOn)
       ) {
         val c = key.keyChar
@@ -68,7 +69,7 @@ class ExEntryPanelService : VimCommandLineServiceBase(), VimModalInputService {
       val commandLine = injector.commandLine.createSearchPrompt(vimEditor, context, prompt.ifEmpty { " " }, "")
       ModalEntry.activate(editor.vim) { key: KeyStroke ->
         return@activate when {
-          key.isCloseKeyStroke() -> {
+          key.vimKeyStroke.isCloseKeyStroke() -> {
             commandLine.deactivate(refocusOwningEditor = true, resetCaret = true)
             false
           }
@@ -80,14 +81,14 @@ class ExEntryPanelService : VimCommandLineServiceBase(), VimModalInputService {
           }
 
           finishOn != null && key.keyChar == finishOn -> {
-            commandLine.handleKey(key)
+            commandLine.handleKey(key.vimKeyStroke)
             text = commandLine.text
             commandLine.deactivate(refocusOwningEditor = true, resetCaret = true)
             false
           }
 
           else -> {
-            commandLine.handleKey(key)
+            commandLine.handleKey(key.vimKeyStroke)
             true
           }
         }

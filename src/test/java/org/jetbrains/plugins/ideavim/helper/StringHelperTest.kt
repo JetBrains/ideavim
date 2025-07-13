@@ -8,6 +8,7 @@
 package org.jetbrains.plugins.ideavim.helper
 
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.helper.keyStroke
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 import java.awt.event.InputEvent
@@ -117,6 +118,6 @@ class StringHelperTest : VimTestCase() {
   private fun parseKeyStroke(s: String): KeyStroke {
     val actualStrokes = injector.parser.parseKeys(s)
     assertEquals<Any>(1, actualStrokes.size, injector.parser.toKeyNotation(actualStrokes))
-    return actualStrokes[0]
+    return actualStrokes[0].keyStroke
   }
 }

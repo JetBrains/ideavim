@@ -9,21 +9,21 @@
 package com.maddyhome.idea.vim.action.change
 
 import com.maddyhome.idea.vim.extension.ExtensionHandler
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 
 object Extension {
   var lastExtensionHandler: ExtensionHandler? = null
 
-  private val keyStrokes = mutableListOf<KeyStroke>()
+  private val keyStrokes = mutableListOf<VimKeyStroke>()
   private val strings = mutableListOf<String>()
 
   private var keystrokePointer = 0
   private var stringPointer = 0
 
-  fun addKeystroke(key: KeyStroke): Boolean = keyStrokes.add(key)
+  fun addKeystroke(key: VimKeyStroke): Boolean = keyStrokes.add(key)
   fun addString(key: String): Boolean = strings.add(key)
 
-  fun consumeKeystroke(): KeyStroke? {
+  fun consumeKeystroke(): VimKeyStroke? {
     if (keystrokePointer in keyStrokes.indices) {
       keystrokePointer += 1
       return keyStrokes[keystrokePointer - 1]

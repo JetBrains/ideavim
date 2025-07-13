@@ -8,7 +8,7 @@
 
 package com.maddyhome.idea.vim.api
 
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 
 interface VimOutputPanel {
   /**
@@ -44,7 +44,7 @@ interface VimOutputPanel {
    */
   fun close()
 
-  fun handleKey(key: KeyStroke)
+  fun handleKey(key: VimKeyStroke)
   fun scrollPage()
   fun scrollHalfPage()
   fun scrollLine()

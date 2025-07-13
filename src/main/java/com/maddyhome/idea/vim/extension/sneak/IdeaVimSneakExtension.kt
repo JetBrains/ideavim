@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.helper.StrictMode
+import com.maddyhome.idea.vim.helper.keyStroke
 import com.maddyhome.idea.vim.newapi.ij
 import org.jetbrains.annotations.TestOnly
 import java.awt.Font
@@ -105,7 +106,7 @@ internal class IdeaVimSneakExtension : VimExtension {
   private class SneakMemoryHandler(private val char: String) : VimExtensionHandler {
     override fun execute(editor: Editor, context: DataContext) {
       Util.lastSDirection = null
-      VimExtensionFacade.executeNormalWithoutMapping(injector.parser.parseKeys(char), editor)
+      VimExtensionFacade.executeNormalWithoutMapping(injector.parser.parseKeys(char).map { it.keyStroke }, editor)
     }
   }
 
@@ -120,7 +121,7 @@ internal class IdeaVimSneakExtension : VimExtension {
         val jumpRange = Util.jumpTo(editor, charone, chartwo, direction.map(lastSDirection))
         jumpRange?.let { highlightHandler.highlightSneakRange(editor.ij, jumpRange) }
       } else {
-        VimExtensionFacade.executeNormalWithoutMapping(injector.parser.parseKeys(direction.symb), editor.ij)
+        VimExtensionFacade.executeNormalWithoutMapping(injector.parser.parseKeys(direction.symb).map{ it.keyStroke }, editor.ij)
       }
     }
   }

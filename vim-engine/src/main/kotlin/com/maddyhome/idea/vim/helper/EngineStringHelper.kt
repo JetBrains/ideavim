@@ -8,12 +8,12 @@
 
 package com.maddyhome.idea.vim.helper
 
-import java.awt.event.InputEvent
-import java.awt.event.KeyEvent
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.CHAR_UNDEFINED
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.CTRL_DOWN_MASK
 
 object EngineStringHelper {
-  fun toPrintableCharacters(keys: List<KeyStroke>): String {
+  fun toPrintableCharacters(keys: List<VimKeyStroke>): String {
     if (keys.isEmpty()) {
       return ""
     }
@@ -34,12 +34,12 @@ object EngineStringHelper {
    * @return A printable String of the character represented by the KeyStroke
    */
   @JvmStatic
-  fun toPrintableCharacter(key: KeyStroke): String {
+  fun toPrintableCharacter(key: VimKeyStroke): String {
     // TODO: Look at 'isprint', 'display' and 'encoding' settings
     var c = key.keyChar
-    if (c == KeyEvent.CHAR_UNDEFINED && key.modifiers == 0) {
+    if (c == CHAR_UNDEFINED && key.modifiers == 0) {
       c = key.keyCode.toChar()
-    } else if (c == KeyEvent.CHAR_UNDEFINED && key.modifiers and InputEvent.CTRL_DOWN_MASK != 0) {
+    } else if (c == CHAR_UNDEFINED && key.modifiers and CTRL_DOWN_MASK != 0) {
       c = (key.keyCode - 'A'.code + 1).toChar()
     }
     return toPrintableCharacter(c)

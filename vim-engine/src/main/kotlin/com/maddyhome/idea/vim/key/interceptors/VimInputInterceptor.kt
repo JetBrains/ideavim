@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.key.interceptors
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 
 /**
  * Modal key interceptor
@@ -18,7 +18,7 @@ import javax.swing.KeyStroke
  */
 interface VimInputInterceptor {
   fun consumeKey(
-    key: KeyStroke,
+    key: VimKeyStroke,
     editor: VimEditor,
     context: ExecutionContext,
   )

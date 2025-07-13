@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.key
 
 import com.maddyhome.idea.vim.api.VimKeyGroup
 import com.maddyhome.idea.vim.api.injector
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 
 /**
  * COMPATIBILITY-LAYER: Moved from common package to this one
@@ -63,7 +63,7 @@ data class CommandNode<T>(val actionHolder: T) : Node<T> {
 @Suppress("DEPRECATION")
 @Deprecated("Use KeyStrokeTrie and VimKeyGroup.getBuiltinCommandsTrie instead")
 open class CommandPartNode<T> internal constructor(private val trieNode: KeyStrokeTrie.TrieNode<T>) : Node<T>,
-  AbstractMap<KeyStroke, Node<T>>() {
+  AbstractMap<VimKeyStroke, Node<T>>() {
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
@@ -82,7 +82,7 @@ open class CommandPartNode<T> internal constructor(private val trieNode: KeyStro
       """.trimIndent()
   }
 
-  override val entries: Set<Map.Entry<KeyStroke, Node<T>>>
+  override val entries: Set<Map.Entry<VimKeyStroke, Node<T>>>
     get() {
       return buildMap {
         trieNode.visit { key, value ->

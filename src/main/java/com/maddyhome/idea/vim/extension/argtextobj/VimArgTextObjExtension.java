@@ -19,6 +19,7 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.extension.ExtensionHandler;
 import com.maddyhome.idea.vim.extension.VimExtension;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
+import com.maddyhome.idea.vim.helper.IJVimKeyHelperKt;
 import com.maddyhome.idea.vim.helper.InlayHelperKt;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.VimNlsSafe;

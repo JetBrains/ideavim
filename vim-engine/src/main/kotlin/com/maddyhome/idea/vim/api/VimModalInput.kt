@@ -9,14 +9,14 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.key.interceptors.VimInputInterceptor
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 
 interface VimModalInput {
   var inputInterceptor: VimInputInterceptor
   val caret: VimCommandLineCaret
   val label: String
 
-  fun handleKey(key: KeyStroke, editor: VimEditor, executionContext: ExecutionContext)
+  fun handleKey(key: VimKeyStroke, editor: VimEditor, executionContext: ExecutionContext)
 
   fun deactivate(refocusOwningEditor: Boolean, resetCaret: Boolean)
 

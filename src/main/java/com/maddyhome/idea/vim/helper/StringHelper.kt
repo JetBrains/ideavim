@@ -18,7 +18,7 @@ object StringHelper {
   @Deprecated("Use injector.parser.parseKeys(string)")
   @ApiStatus.ScheduledForRemoval
   fun parseKeys(vararg string: String): List<KeyStroke> {
-    return Arrays.stream(string).flatMap { o: String -> injector.parser.parseKeys(o).stream() }
+    return Arrays.stream(string).flatMap { o: String -> injector.parser.parseKeys(o).map { it.keyStroke }.stream() }
       .collect(Collectors.toList())
   }
 }

@@ -14,6 +14,8 @@ import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.helper.IJVimKeyHelperKt;
+import com.maddyhome.idea.vim.key.VimKeyStroke;
 import com.maddyhome.idea.vim.newapi.IjVimInjectorKt;
 import com.maddyhome.idea.vim.register.Register;
 import com.maddyhome.idea.vim.register.VimRegisterGroupBase;
@@ -70,8 +72,8 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
       else {
         logger.trace("Save register as 'keys'");
         final Element keys = new Element("keys");
-        final List<KeyStroke> list = register.getKeys();
-        for (KeyStroke stroke : list) {
+        var list = register.getKeys();
+        for (VimKeyStroke stroke : list) {
           final Element k = new Element("key");
           k.setAttribute("char", Integer.toString(stroke.getKeyChar()));
           k.setAttribute("code", Integer.toString(stroke.getKeyCode()));
@@ -139,14 +141,14 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
           logger.trace("Register has 'keys' element");
           final Element keysElement = registerElement.getChild("keys");
           final List<Element> keyElements = keysElement.getChildren("key");
-          final List<KeyStroke> strokes = new ArrayList<>();
+          final List<VimKeyStroke> strokes = new ArrayList<>();
           for (Element keyElement : keyElements) {
             final int code = Integer.parseInt(keyElement.getAttributeValue("code"));
             final int modifiers = Integer.parseInt(keyElement.getAttributeValue("mods"));
             final char c = (char)Integer.parseInt(keyElement.getAttributeValue("char"));
             //noinspection MagicConstant
             strokes.add(
-              c == KeyEvent.CHAR_UNDEFINED ? KeyStroke.getKeyStroke(code, modifiers) : KeyStroke.getKeyStroke(c));
+              c == KeyEvent.CHAR_UNDEFINED ? IJVimKeyHelperKt.getVimKeyStroke(KeyStroke.getKeyStroke(code, modifiers)) : IJVimKeyHelperKt.getVimKeyStroke(KeyStroke.getKeyStroke(c)));
           }
           register = new Register(key, type, strokes);
         }

@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.undo.VimKeyBasedUndoService
 import org.jetbrains.annotations.NonNls
 import java.util.*
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 
 /**
  * All the commands in IdeaVim should implement one of the following handlers and be registered in VimActions.xml
@@ -170,11 +170,11 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
   companion object {
     private val logger = vimLogger<EditorActionHandlerBase>()
 
-    fun parseKeysSet(keyStrings: List<String>): Set<List<KeyStroke>> =
+    fun parseKeysSet(keyStrings: List<String>): Set<List<VimKeyStroke>> =
       keyStrings.map { injector.parser.parseKeys(it) }.toSet()
 
     @JvmStatic
-    fun parseKeysSet(@NonNls vararg keyStrings: String): Set<List<KeyStroke>> = List(keyStrings.size) {
+    fun parseKeysSet(@NonNls vararg keyStrings: String): Set<List<VimKeyStroke>> = List(keyStrings.size) {
       injector.parser.parseKeys(keyStrings[it])
     }.toSet()
 

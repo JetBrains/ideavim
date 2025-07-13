@@ -44,10 +44,14 @@ import com.maddyhome.idea.vim.undo.VimTimestampBasedUndoService
 import com.maddyhome.idea.vim.vimscript.model.commands.SortOption
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.TestOnly
-import java.awt.event.KeyEvent
 import java.math.BigInteger
 import java.util.*
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.CHAR_UNDEFINED
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.SHIFT_DOWN_MASK
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.VK_ENTER
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.VK_LEFT
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.VK_RIGHT
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -601,7 +605,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     if (editor.mode is Mode.REPLACE) {
       editor.insertMode = true
     }
-    val enterKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)
+    val enterKeyStroke = VimKeyStroke.getKeyStroke(VK_ENTER, 0)
     val actions = injector.keyGroup.getActions(editor, enterKeyStroke)
     for (action in actions) {
       if (injector.actionExecutor.executeAction(editor, action, context)) {
@@ -729,11 +733,11 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    */
   override fun processKey(
     editor: VimEditor,
-    key: KeyStroke,
+    key: VimKeyStroke,
     processResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
     logger.debug { "processKey($key)" }
-    if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {
+    if (key.keyChar != CHAR_UNDEFINED) {
       editor.replaceMask?.recordChangeAtCaret(editor)
       processResultBuilder.addExecutionStep { _, e, c ->
         type(e, c, key.keyChar)
@@ -749,7 +753,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     }
 
     // Shift-space
-    if (key.keyCode == 32 && key.modifiers and KeyEvent.SHIFT_DOWN_MASK != 0) {
+    if (key.keyCode == 32 && key.modifiers and SHIFT_DOWN_MASK != 0) {
       editor.replaceMask?.recordChangeAtCaret(editor)
       processResultBuilder.addExecutionStep { _, e, c ->
         type(e, c, ' ')
@@ -761,7 +765,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
 
   override fun processKeyInSelectMode(
     editor: VimEditor,
-    key: KeyStroke,
+    key: VimKeyStroke,
     processResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
     var res: Boolean
@@ -1093,14 +1097,14 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   private fun isPrintableChar(c: Char): Boolean {
     val block = Character.UnicodeBlock.of(c)
     return !Character.isISOControl(c) &&
-      (c != KeyEvent.CHAR_UNDEFINED) &&
+      (c != CHAR_UNDEFINED) &&
       (block != null) &&
       block !== Character.UnicodeBlock.SPECIALS
   }
 
-  private fun activeTemplateWithLeftRightMotion(editor: VimEditor, keyStroke: KeyStroke): Boolean {
+  private fun activeTemplateWithLeftRightMotion(editor: VimEditor, keyStroke: VimKeyStroke): Boolean {
     return injector.templateManager.getTemplateState(editor) != null &&
-      (keyStroke.keyCode == KeyEvent.VK_LEFT || keyStroke.keyCode == KeyEvent.VK_RIGHT)
+      (keyStroke.keyCode == VK_LEFT || keyStroke.keyCode == VK_RIGHT)
   }
 
   /**

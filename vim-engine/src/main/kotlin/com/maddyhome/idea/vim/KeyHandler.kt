@@ -36,7 +36,7 @@ import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.annotations.ApiStatus
 import java.util.concurrent.ConcurrentLinkedDeque
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 
 /**
  * This handles every keystroke that the user can argType except those that are still valid hotkeys for various Idea
@@ -90,7 +90,7 @@ class KeyHandler {
     }
 
   val keyStack: KeyStack = KeyStack()
-  val modalEntryKeys: MutableList<KeyStroke> = ArrayList()
+  val modalEntryKeys: MutableList<VimKeyStroke> = ArrayList()
 
   var lastUsedEditorInfo: LastUsedEditorInfo = LastUsedEditorInfo(-1, false)
 
@@ -102,7 +102,7 @@ class KeyHandler {
    * @param key     The keystroke typed by the user
    * @param context The data context
    */
-  fun handleKey(editor: VimEditor, key: KeyStroke, context: ExecutionContext, keyState: KeyHandlerState) {
+  fun handleKey(editor: VimEditor, key: VimKeyStroke, context: ExecutionContext, keyState: KeyHandlerState) {
     commandListener.forEach { it() }
     handleKey(editor, key, context, allowKeyMappings = true, keyState)
   }
@@ -114,7 +114,7 @@ class KeyHandler {
    */
   fun handleKey(
     editor: VimEditor,
-    key: KeyStroke,
+    key: VimKeyStroke,
     context: ExecutionContext,
     allowKeyMappings: Boolean,
     keyState: KeyHandlerState,
@@ -132,7 +132,7 @@ class KeyHandler {
   @ApiStatus.ScheduledForRemoval
   fun handleKey(
     editor: VimEditor,
-    key: KeyStroke,
+    key: VimKeyStroke,
     context: ExecutionContext,
     allowKeyMappings: Boolean,
     mappingCompleted: Boolean,
@@ -149,7 +149,7 @@ class KeyHandler {
    * could execute the key if needed.
    */
   private fun processKey(
-    key: KeyStroke,
+    key: VimKeyStroke,
     editor: VimEditor,
     allowKeyMappings: Boolean,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
@@ -206,7 +206,7 @@ class KeyHandler {
   internal fun finishedCommandPreparation(
     editor: VimEditor,
     context: ExecutionContext,
-    key: KeyStroke?,
+    key: VimKeyStroke?,
     shouldRecord: Boolean,
     keyState: KeyHandlerState,
   ) {

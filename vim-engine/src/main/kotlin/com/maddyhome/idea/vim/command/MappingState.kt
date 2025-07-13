@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import java.awt.event.ActionListener
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 import javax.swing.Timer
 
 class MappingState : Cloneable {
@@ -35,16 +35,16 @@ class MappingState : Cloneable {
     --mapDepth
   }
 
-  // TODO: This should probably return List<KeyStroke> to match the keys we're using in KeyMapping
+  // TODO: This should probably return List<VimKeyStroke> to match the keys we're using in KeyMapping
   // Let's avoid creating temporary wrapper lists when we could use this list directly
-  val keys: Iterable<KeyStroke>
+  val keys: Iterable<VimKeyStroke>
     get() = keyList
 
   val hasKeys
     get() = keyList.isNotEmpty()
 
   private var timer = VimTimer(injector.globalOptions().timeoutlen)
-  private var keyList = mutableListOf<KeyStroke>()
+  private var keyList = mutableListOf<VimKeyStroke>()
 
   init {
     timer.isRepeats = false
@@ -63,11 +63,11 @@ class MappingState : Cloneable {
     timer.actionListeners.forEach { timer.removeActionListener(it) }
   }
 
-  fun addKey(key: KeyStroke) {
+  fun addKey(key: VimKeyStroke) {
     keyList.add(key)
   }
 
-  fun detachKeys(): List<KeyStroke> {
+  fun detachKeys(): List<VimKeyStroke> {
     val currentKeys = keyList
     keyList = mutableListOf()
     return currentKeys

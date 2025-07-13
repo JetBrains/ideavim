@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import com.maddyhome.idea.vim.state.mode.Mode
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 
 internal class SelectRegisterConsumer : KeyConsumer {
   private companion object {
@@ -24,7 +24,7 @@ internal class SelectRegisterConsumer : KeyConsumer {
   }
 
   override fun consumeKey(
-    key: KeyStroke,
+    key: VimKeyStroke,
     editor: VimEditor,
     allowKeyMappings: Boolean,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
@@ -40,7 +40,7 @@ internal class SelectRegisterConsumer : KeyConsumer {
     return true
   }
 
-  private fun isSelectRegister(key: KeyStroke, keyState: KeyHandlerState): Boolean {
+  private fun isSelectRegister(key: VimKeyStroke, keyState: KeyHandlerState): Boolean {
     val vimState = injector.vimState
     if (vimState.mode !is Mode.NORMAL && vimState.mode !is Mode.VISUAL) {
       return false

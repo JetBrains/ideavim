@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.state.KeyHandlerState
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 
 @CommandOrMotion(keys = ["<C-K>"], modes = [Mode.INSERT, Mode.CMD_LINE])
 class InsertCompletedDigraphAction : VimActionHandler.SingleExecution() {
@@ -58,7 +58,7 @@ class InsertCompletedDigraphAction : VimActionHandler.SingleExecution() {
   ): Boolean {
     // The converted digraph character has been captured as an argument, push it back through key handler
     val argument = cmd.argument as? Argument.Character ?: return false
-    val keyStroke = KeyStroke.getKeyStroke(argument.character)
+    val keyStroke = VimKeyStroke.getKeyStroke(argument.character)
     val keyHandler = KeyHandler.getInstance()
     keyHandler.handleKey(editor, keyStroke, context, keyHandler.keyHandlerState)
     return true

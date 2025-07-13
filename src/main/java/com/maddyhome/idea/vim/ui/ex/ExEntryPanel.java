@@ -30,8 +30,10 @@ import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.api.VimKeyGroupBase;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.helper.EngineModeExtensionsKt;
+import com.maddyhome.idea.vim.helper.IJVimKeyHelperKt;
 import com.maddyhome.idea.vim.helper.SearchHighlightsHelper;
 import com.maddyhome.idea.vim.helper.UiHelper;
+import com.maddyhome.idea.vim.key.VimKeyStroke;
 import com.maddyhome.idea.vim.key.interceptors.VimInputInterceptor;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
@@ -492,8 +494,8 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
    * @param stroke The potentially mapped keystroke
    */
   @Override
-  public void handleKey(@NotNull KeyStroke stroke) {
-    entry.handleKey(stroke);
+  public void handleKey(@NotNull VimKeyStroke stroke) {
+    entry.handleKey(IJVimKeyHelperKt.getKeyStroke(stroke));
     if (finishOn != null && stroke.getKeyChar() == finishOn && inputProcessing != null) {
       inputProcessing.invoke(getText());
       close(true, true);

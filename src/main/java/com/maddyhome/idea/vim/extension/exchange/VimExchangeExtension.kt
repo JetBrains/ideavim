@@ -36,6 +36,7 @@ import com.maddyhome.idea.vim.extension.exportOperatorFunction
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.moveToInlayAwareLogicalPosition
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
+import com.maddyhome.idea.vim.helper.keyStroke
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.mark.VimMarkConstants
@@ -98,7 +99,7 @@ internal class VimExchangeExtension : VimExtension {
 
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       injector.globalOptions().operatorfunc = OPERATOR_FUNC
-      executeNormalWithoutMapping(injector.parser.parseKeys(if (isLine) "g@_" else "g@"), editor.ij)
+      executeNormalWithoutMapping(injector.parser.parseKeys(if (isLine) "g@_" else "g@").map { it.keyStroke }, editor.ij)
     }
   }
 
@@ -112,7 +113,7 @@ internal class VimExchangeExtension : VimExtension {
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       val mode = editor.mode
       // Leave visual mode to create selection marks
-      executeNormalWithoutMapping(injector.parser.parseKeys("<Esc>"), editor.ij)
+      executeNormalWithoutMapping(injector.parser.parseKeys("<Esc>").map { it.keyStroke }, editor.ij)
       Operator(true).apply(editor, context, mode.selectionType ?: SelectionType.CHARACTER_WISE)
     }
   }
@@ -190,8 +191,8 @@ internal class VimExchangeExtension : VimExtension {
           TextRange(editor.getMarkOffset(targetExchange.start), editor.getMarkOffset(targetExchange.end) + 1),
         )
         // do this instead of direct text manipulation to set change marks
-        setRegister('z', injector.parser.stringToKeys(sourceExchange.text), sourceExchange.type)
-        executeNormalWithoutMapping(injector.parser.stringToKeys("`[${targetExchange.type.getString()}`]\"zp"), editor)
+        setRegister('z', injector.parser.stringToKeys(sourceExchange.text).map { it.keyStroke }, sourceExchange.type)
+        executeNormalWithoutMapping(injector.parser.stringToKeys("`[${targetExchange.type.getString()}`]\"zp").map { it.keyStroke }, editor)
       }
 
       fun fixCursor(ex1: Exchange, ex2: Exchange, reverse: Boolean) {
@@ -315,15 +316,15 @@ internal class VimExchangeExtension : VimExtension {
 
       val (selectionStart, selectionEnd) = getMarks(isVisual)
       if (isVisual) {
-        executeNormalWithoutMapping(injector.parser.parseKeys("gvy"), editor)
+        executeNormalWithoutMapping(injector.parser.parseKeys("gvy").map { it.keyStroke }, editor)
         // TODO: handle
         // if &selection ==# 'exclusive' && start != end
         // 			let end.column -= len(matchstr(@@, '\_.$'))
       } else {
         when (selectionType) {
-          SelectionType.LINE_WISE -> executeNormalWithoutMapping(injector.parser.stringToKeys("`[V`]y"), editor)
-          SelectionType.BLOCK_WISE -> executeNormalWithoutMapping(injector.parser.stringToKeys("""`[<C-V>`]y"""), editor)
-          SelectionType.CHARACTER_WISE -> executeNormalWithoutMapping(injector.parser.stringToKeys("`[v`]y"), editor)
+          SelectionType.LINE_WISE -> executeNormalWithoutMapping(injector.parser.stringToKeys("`[V`]y").map { it.keyStroke }, editor)
+          SelectionType.BLOCK_WISE -> executeNormalWithoutMapping(injector.parser.stringToKeys("""`[<C-V>`]y""").map { it.keyStroke }, editor)
+          SelectionType.CHARACTER_WISE -> executeNormalWithoutMapping(injector.parser.stringToKeys("`[v`]y").map { it.keyStroke }, editor)
         }
       }
 
