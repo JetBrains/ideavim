@@ -42,6 +42,7 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissin
 import com.maddyhome.idea.vim.extension.exportOperatorFunction
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.helper.PsiHelper
+import com.maddyhome.idea.vim.helper.swing
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
@@ -125,25 +126,25 @@ internal class CommentaryExtension : VimExtension {
   override fun init() {
     val plugCommentaryKeys = injector.parser.parseKeys("<Plug>Commentary")
     val plugCommentaryLineKeys = injector.parser.parseKeys("<Plug>CommentaryLine")
-    putExtensionHandlerMapping(MappingMode.NX, plugCommentaryKeys, owner, CommentaryOperatorHandler(), false)
-    putExtensionHandlerMapping(MappingMode.O, plugCommentaryKeys, owner, CommentaryMappingHandler(), false)
-    putKeyMappingIfMissing(MappingMode.N, plugCommentaryLineKeys, owner, injector.parser.parseKeys("gc_"), true)
+    putExtensionHandlerMapping(MappingMode.NX, plugCommentaryKeys.map { it.swing }, owner, CommentaryOperatorHandler(), false)
+    putExtensionHandlerMapping(MappingMode.O, plugCommentaryKeys.map { it.swing }, owner, CommentaryMappingHandler(), false)
+    putKeyMappingIfMissing(MappingMode.N, plugCommentaryLineKeys.map { it.swing }, owner, injector.parser.parseKeys("gc_").map { it.swing }, true)
 
-    putKeyMappingIfMissing(MappingMode.NXO, injector.parser.parseKeys("gc"), owner, plugCommentaryKeys, true)
-    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("gcc"), owner, plugCommentaryLineKeys, true)
+    putKeyMappingIfMissing(MappingMode.NXO, injector.parser.parseKeys("gc").map { it.swing }, owner, plugCommentaryKeys.map { it.swing }, true)
+    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("gcc").map { it.swing }, owner, plugCommentaryLineKeys.map { it.swing }, true)
     putKeyMappingIfMissing(
       MappingMode.N,
-      injector.parser.parseKeys("gcu"),
+      injector.parser.parseKeys("gcu").map { it.swing },
       owner,
-      injector.parser.parseKeys("<Plug>Commentary<Plug>Commentary"),
+      injector.parser.parseKeys("<Plug>Commentary<Plug>Commentary").map { it.swing },
       true,
     )
 
     // Previous versions of IdeaVim used different mappings to Vim's Commentary. Make sure everything works if someone
     // is still using the old mapping
-    putKeyMapping(MappingMode.N, injector.parser.parseKeys("<Plug>(CommentMotion)"), owner, plugCommentaryKeys, true)
-    putKeyMapping(MappingMode.XO, injector.parser.parseKeys("<Plug>(CommentMotionV)"), owner, plugCommentaryKeys, true)
-    putKeyMapping(MappingMode.N, injector.parser.parseKeys("<Plug>(CommentLine)"), owner, plugCommentaryLineKeys, true)
+    putKeyMapping(MappingMode.N, injector.parser.parseKeys("<Plug>(CommentMotion)").map { it.swing }, owner, plugCommentaryKeys.map { it.swing }, true)
+    putKeyMapping(MappingMode.XO, injector.parser.parseKeys("<Plug>(CommentMotionV)").map { it.swing }, owner, plugCommentaryKeys.map { it.swing }, true)
+    putKeyMapping(MappingMode.N, injector.parser.parseKeys("<Plug>(CommentLine)").map { it.swing }, owner, plugCommentaryLineKeys.map { it.swing }, true)
 
     addCommand("Commentary", CommentaryCommandAliasHandler())
 
@@ -169,7 +170,7 @@ internal class CommentaryExtension : VimExtension {
 
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       injector.globalOptions().operatorfunc = OPERATOR_FUNC
-      executeNormalWithoutMapping(injector.parser.parseKeys("g@"), editor.ij)
+      executeNormalWithoutMapping(injector.parser.parseKeys("g@").map { it.swing }, editor.ij)
     }
   }
 

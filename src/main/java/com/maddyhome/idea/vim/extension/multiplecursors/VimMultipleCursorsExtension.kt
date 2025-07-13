@@ -35,6 +35,7 @@ import com.maddyhome.idea.vim.helper.endOffsetInclusive
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.helper.swing
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.userData
 import com.maddyhome.idea.vim.newapi.IjVimEditor
@@ -75,29 +76,29 @@ internal class VimMultipleCursorsExtension : VimExtension {
   override fun getName() = "multiple-cursors"
 
   override fun init() {
-    putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys(NEXT_WHOLE_OCCURRENCE), owner, NextOccurrenceHandler(), false)
+    putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys(NEXT_WHOLE_OCCURRENCE).map { it.swing }, owner, NextOccurrenceHandler(), false)
     putExtensionHandlerMapping(
       MappingMode.NXO,
-      injector.parser.parseKeys(NEXT_OCCURRENCE),
+      injector.parser.parseKeys(NEXT_OCCURRENCE).map { it.swing },
       owner,
       NextOccurrenceHandler(whole = false),
       false,
     )
-    putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys(ALL_WHOLE_OCCURRENCES), owner, AllOccurrencesHandler(), false)
+    putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys(ALL_WHOLE_OCCURRENCES).map { it.swing }, owner, AllOccurrencesHandler(), false)
     putExtensionHandlerMapping(
       MappingMode.NXO,
-      injector.parser.parseKeys(ALL_OCCURRENCES),
+      injector.parser.parseKeys(ALL_OCCURRENCES).map { it.swing },
       owner,
       AllOccurrencesHandler(whole = false),
       false,
     )
-    putExtensionHandlerMapping(MappingMode.X, injector.parser.parseKeys(SKIP_OCCURRENCE), owner, SkipOccurrenceHandler(), false)
-    putExtensionHandlerMapping(MappingMode.X, injector.parser.parseKeys(REMOVE_OCCURRENCE), owner, RemoveOccurrenceHandler(), false)
+    putExtensionHandlerMapping(MappingMode.X, injector.parser.parseKeys(SKIP_OCCURRENCE).map { it.swing }, owner, SkipOccurrenceHandler(), false)
+    putExtensionHandlerMapping(MappingMode.X, injector.parser.parseKeys(REMOVE_OCCURRENCE).map { it.swing }, owner, RemoveOccurrenceHandler(), false)
 
-    putKeyMappingIfMissing(MappingMode.NXO, injector.parser.parseKeys("<A-n>"), owner, injector.parser.parseKeys(NEXT_WHOLE_OCCURRENCE), true)
-    putKeyMappingIfMissing(MappingMode.NXO, injector.parser.parseKeys("g<A-n>"), owner, injector.parser.parseKeys(NEXT_OCCURRENCE), true)
-    putKeyMappingIfMissing(MappingMode.X, injector.parser.parseKeys("<A-x>"), owner, injector.parser.parseKeys(SKIP_OCCURRENCE), true)
-    putKeyMappingIfMissing(MappingMode.X, injector.parser.parseKeys("<A-p>"), owner, injector.parser.parseKeys(REMOVE_OCCURRENCE), true)
+    putKeyMappingIfMissing(MappingMode.NXO, injector.parser.parseKeys("<A-n>").map { it.swing }, owner, injector.parser.parseKeys(NEXT_WHOLE_OCCURRENCE).map { it.swing }, true)
+    putKeyMappingIfMissing(MappingMode.NXO, injector.parser.parseKeys("g<A-n>").map { it.swing }, owner, injector.parser.parseKeys(NEXT_OCCURRENCE).map { it.swing }, true)
+    putKeyMappingIfMissing(MappingMode.X, injector.parser.parseKeys("<A-x>").map { it.swing }, owner, injector.parser.parseKeys(SKIP_OCCURRENCE).map { it.swing }, true)
+    putKeyMappingIfMissing(MappingMode.X, injector.parser.parseKeys("<A-p>").map { it.swing }, owner, injector.parser.parseKeys(REMOVE_OCCURRENCE).map { it.swing }, true)
   }
 
   abstract class WriteActionHandler : ExtensionHandler {

@@ -20,8 +20,11 @@ import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
+import com.maddyhome.idea.vim.helper.swing
+import com.maddyhome.idea.vim.helper.vim
 import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.key.MappingOwner
+import com.maddyhome.idea.vim.key.VimKeyStroke
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import javax.swing.KeyStroke
@@ -30,11 +33,11 @@ internal class ParagraphMotion : VimExtension {
   override fun getName(): String = "vim-paragraph-motion"
 
   override fun init() {
-    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys("<Plug>(ParagraphNextMotion)"), owner, ParagraphMotionHandler(1), false)
-    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys("<Plug>(ParagraphPrevMotion)"), owner, ParagraphMotionHandler(-1), false)
+    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys("<Plug>(ParagraphNextMotion)").map { it.swing }, owner, ParagraphMotionHandler(1), false)
+    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys("<Plug>(ParagraphPrevMotion)").map { it.swing }, owner, ParagraphMotionHandler(-1), false)
 
-    putKeyMappingIfMissingFromAndToKeys(MappingMode.NXO, injector.parser.parseKeys("}"), owner, injector.parser.parseKeys("<Plug>(ParagraphNextMotion)"), true)
-    putKeyMappingIfMissingFromAndToKeys(MappingMode.NXO, injector.parser.parseKeys("{"), owner, injector.parser.parseKeys("<Plug>(ParagraphPrevMotion)"), true)
+    putKeyMappingIfMissingFromAndToKeys(MappingMode.NXO, injector.parser.parseKeys("}").map { it.swing }, owner, injector.parser.parseKeys("<Plug>(ParagraphNextMotion)").map { it.swing }, true)
+    putKeyMappingIfMissingFromAndToKeys(MappingMode.NXO, injector.parser.parseKeys("{").map { it.swing }, owner, injector.parser.parseKeys("<Plug>(ParagraphPrevMotion)").map { it.swing }, true)
   }
 
   private class ParagraphMotionHandler(private val count: Int) : ExtensionHandler {
@@ -62,7 +65,7 @@ internal class ParagraphMotion : VimExtension {
     toKeys: List<KeyStroke>,
     recursive: Boolean,
   ) {
-    val filteredModes = modes.filterNotTo(HashSet()) { VimPlugin.getKey().getKeyMapping(it).getLayer(fromKeys) != null }
+    val filteredModes = modes.filterNotTo(HashSet()) { VimPlugin.getKey().getKeyMapping(it).getLayer(fromKeys.map { it.vim }) != null }
     putKeyMappingIfMissing(filteredModes, fromKeys, pluginOwner, toKeys, recursive)
   }
 }

@@ -26,8 +26,11 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.TestInputModel
 import com.maddyhome.idea.vim.helper.inRepeatMode
 import com.maddyhome.idea.vim.helper.noneOfEnum
+import com.maddyhome.idea.vim.helper.swing
+import com.maddyhome.idea.vim.helper.vim
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.OperatorFunction
+import com.maddyhome.idea.vim.key.VimKeyStroke
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.ui.ModalEntry
@@ -64,7 +67,7 @@ object VimExtensionFacade {
     extensionHandler: ExtensionHandler,
     recursive: Boolean,
   ) {
-    VimPlugin.getKey().putKeyMapping(modes, fromKeys, pluginOwner, extensionHandler, recursive)
+    VimPlugin.getKey().putKeyMapping(modes, fromKeys.map { it.vim }, pluginOwner, extensionHandler, recursive)
   }
 
 
@@ -83,7 +86,7 @@ object VimExtensionFacade {
     extensionHandler: VimExtensionHandler,
     recursive: Boolean,
   ) {
-    VimPlugin.getKey().putKeyMapping(modes, fromKeys, pluginOwner, extensionHandler, recursive)
+    VimPlugin.getKey().putKeyMapping(modes, fromKeys.map { it.vim }, pluginOwner, extensionHandler, recursive)
   }
 
   /** The 'map' command for mapping keys to other keys. */
@@ -95,7 +98,7 @@ object VimExtensionFacade {
     toKeys: List<KeyStroke>,
     recursive: Boolean,
   ) {
-    VimPlugin.getKey().putKeyMapping(modes, fromKeys, pluginOwner, toKeys, recursive)
+    VimPlugin.getKey().putKeyMapping(modes, fromKeys.map { it.vim }, pluginOwner, toKeys.map { it.vim }, recursive)
   }
 
   /** The 'map' command for mapping keys to other keys if there is no other mapping to these keys */
@@ -107,8 +110,8 @@ object VimExtensionFacade {
     toKeys: List<KeyStroke>,
     recursive: Boolean,
   ) {
-    val filteredModes = modes.filterNotTo(HashSet()) { VimPlugin.getKey().hasmapto(it, toKeys) }
-    VimPlugin.getKey().putKeyMapping(filteredModes, fromKeys, pluginOwner, toKeys, recursive)
+    val filteredModes = modes.filterNotTo(HashSet()) { VimPlugin.getKey().hasmapto(it, toKeys.map { it.vim }) }
+    VimPlugin.getKey().putKeyMapping(filteredModes, fromKeys.map { it.vim }, pluginOwner, toKeys.map { it.vim }, recursive)
   }
 
   /**
@@ -146,14 +149,14 @@ object VimExtensionFacade {
   fun executeNormalWithoutMapping(keys: List<KeyStroke>, editor: Editor) {
     val context = injector.executionContextManager.getEditorExecutionContext(editor.vim)
     val keyHandler = KeyHandler.getInstance()
-    keys.forEach { keyHandler.handleKey(editor.vim, it, context, false, keyHandler.keyHandlerState) }
+    keys.forEach { keyHandler.handleKey(editor.vim, it.vim, context, false, keyHandler.keyHandlerState) }
   }
 
   /** Returns a single key stroke from the user input similar to 'getchar()'. */
   @JvmStatic
   fun inputKeyStroke(editor: Editor): KeyStroke {
     if (editor.vim.inRepeatMode) {
-      val input = Extension.consumeKeystroke()
+      val input = Extension.consumeKeystroke()?.swing
       LOG.trace("inputKeyStroke: dot repeat in progress. Input: $input")
       return input ?: error("Not enough keystrokes saved: ${Extension.lastExtensionHandler}")
     }
@@ -161,9 +164,9 @@ object VimExtensionFacade {
     val key: KeyStroke? = if (ApplicationManager.getApplication().isUnitTestMode) {
       LOG.trace("Unit test mode is active")
       val mappingStack = KeyHandler.getInstance().keyStack
-      mappingStack.feedSomeStroke() ?: TestInputModel.getInstance(editor).nextKeyStroke()?.also {
+      mappingStack.feedSomeStroke()?.swing ?: TestInputModel.getInstance(editor).nextKeyStroke()?.also {
         if (injector.registerGroup.isRecording) {
-          KeyHandler.getInstance().modalEntryKeys += it
+          KeyHandler.getInstance().modalEntryKeys += it.vim
         }
       }
     } else {
@@ -177,7 +180,7 @@ object VimExtensionFacade {
       ref
     }
     val result = key ?: KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE.toChar())
-    Extension.addKeystroke(result)
+    Extension.addKeystroke(result.vim)
     return result
   }
 
@@ -192,7 +195,7 @@ object VimExtensionFacade {
   fun getRegister(editor: VimEditor, register: Char): List<KeyStroke>? {
     val reg = VimPlugin.getRegister()
       .getRegister(editor, injector.executionContextManager.getEditorExecutionContext(editor), register) ?: return null
-    return reg.keys
+    return reg.keys.map { it.swing }
   }
 
   @JvmStatic
@@ -203,13 +206,13 @@ object VimExtensionFacade {
     caret: VimCaret,
   ): List<KeyStroke>? {
     val reg = caret.registerStorage.getRegister(editor, context, register) ?: return null
-    return reg.keys
+    return reg.keys.map { it.swing }
   }
 
   /** Set the current contents of the given register */
   @JvmStatic
   fun setRegister(register: Char, keys: List<KeyStroke?>?) {
-    VimPlugin.getRegister().setKeys(register, keys?.filterNotNull() ?: emptyList())
+    VimPlugin.getRegister().setKeys(register, keys?.filterNotNull()?.map { it.vim } ?: emptyList())
   }
 
   /** Set the current contents of the given register */
@@ -221,13 +224,13 @@ object VimExtensionFacade {
     caret: ImmutableVimCaret,
     keys: List<KeyStroke?>?,
   ) {
-    caret.registerStorage.setKeys(editor, context, register, keys?.filterNotNull() ?: emptyList())
+    caret.registerStorage.setKeys(editor, context, register, keys?.filterNotNull()?.map { it.vim } ?: emptyList())
   }
 
   /** Set the current contents of the given register */
   @JvmStatic
   fun setRegister(register: Char, keys: List<KeyStroke?>?, type: SelectionType) {
-    VimPlugin.getRegister().setKeys(register, keys?.filterNotNull() ?: emptyList(), type)
+    VimPlugin.getRegister().setKeys(register, keys?.filterNotNull()?.map { it.vim } ?: emptyList(), type)
   }
 
   @JvmStatic
