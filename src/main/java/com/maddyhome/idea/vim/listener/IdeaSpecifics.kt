@@ -39,7 +39,7 @@ import com.maddyhome.idea.vim.action.VimShortcutKeyAction
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
-import com.maddyhome.idea.vim.helper.vim
+import com.maddyhome.idea.vim.helper.vimKeyStroke
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.initInjector
 import com.maddyhome.idea.vim.newapi.vim
@@ -115,7 +115,7 @@ internal object IdeaSpecifics {
           val register = VimPlugin.getRegister()
           val backSpace = KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)
           repeat(charsToRemove) {
-            register.recordKeyStroke(backSpace.vim)
+            register.recordKeyStroke(backSpace.vimKeyStroke)
           }
 
           completionPrevDocumentLength = hostEditor.document.textLength - charsToRemove
@@ -147,7 +147,7 @@ internal object IdeaSpecifics {
             )
           )
           repeat(caretShift.coerceAtLeast(0)) {
-            register.recordKeyStroke(leftArrow.vim)
+            register.recordKeyStroke(leftArrow.vimKeyStroke)
           }
         }
 

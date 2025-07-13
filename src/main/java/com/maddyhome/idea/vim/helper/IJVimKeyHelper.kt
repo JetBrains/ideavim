@@ -11,11 +11,11 @@ package com.maddyhome.idea.vim.helper
 import com.maddyhome.idea.vim.key.VimKeyStroke
 import javax.swing.KeyStroke
 
-val KeyStroke.vim: VimKeyStroke
+val KeyStroke.vimKeyStroke: VimKeyStroke
   get() {
     TODO()
   }
-val VimKeyStroke.swing: KeyStroke
+val VimKeyStroke.keyStroke: KeyStroke
   get() {
     TODO()
   }

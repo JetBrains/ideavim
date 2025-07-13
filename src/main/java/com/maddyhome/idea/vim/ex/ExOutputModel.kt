@@ -11,7 +11,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.api.VimOutputPanelBase
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.helper.swing
+import com.maddyhome.idea.vim.helper.keyStroke
 import com.maddyhome.idea.vim.helper.vimExOutput
 import com.maddyhome.idea.vim.key.VimKeyStroke
 import com.maddyhome.idea.vim.ui.ExOutputPanel
@@ -122,7 +122,7 @@ class ExOutputModel(private val myEditor: WeakReference<Editor>) : VimOutputPane
   override fun close(key: VimKeyStroke?) {
     val notNullEditor = editor ?: return
     val panel = ExOutputPanel.getNullablePanel(notNullEditor) ?: return
-    panel.close(key?.swing)
+    panel.close(key?.keyStroke)
   }
 
   override fun close() {

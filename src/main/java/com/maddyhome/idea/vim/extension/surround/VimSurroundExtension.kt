@@ -37,6 +37,7 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegisterForCaret
 import com.maddyhome.idea.vim.extension.exportOperatorFunction
 import com.maddyhome.idea.vim.group.findBlockRange
 import com.maddyhome.idea.vim.helper.exitVisualMode
+import com.maddyhome.idea.vim.helper.keyStroke
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
@@ -65,19 +66,19 @@ internal class VimSurroundExtension : VimExtension {
   private val NO_MAPPINGS = "surround_no_mappings"
 
   override fun init() {
-    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>YSurround"), owner, YSurroundHandler(), false)
-    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>Yssurround"), owner, YSSurroundHandler(), false)
-    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>CSurround"), owner, CSurroundHandler(), false)
-    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>DSurround"), owner, DSurroundHandler(), false)
-    putExtensionHandlerMapping(MappingMode.XO, injector.parser.parseKeys("<Plug>VSurround"), owner, VSurroundHandler(), false)
+    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>YSurround").map { it.keyStroke }, owner, YSurroundHandler(), false)
+    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>Yssurround").map { it.keyStroke }, owner, YSSurroundHandler(), false)
+    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>CSurround").map { it.keyStroke }, owner, CSurroundHandler(), false)
+    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>DSurround").map { it.keyStroke }, owner, DSurroundHandler(), false)
+    putExtensionHandlerMapping(MappingMode.XO, injector.parser.parseKeys("<Plug>VSurround").map { it.keyStroke }, owner, VSurroundHandler(), false)
 
     val noMappings = VimPlugin.getVariableService().getGlobalVariableValue(NO_MAPPINGS)?.asBoolean() ?: false
     if (!noMappings) {
-      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("ys"), owner, injector.parser.parseKeys("<Plug>YSurround"), true)
-      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("yss"), owner, injector.parser.parseKeys("<Plug>Yssurround"), true)
-      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("cs"), owner, injector.parser.parseKeys("<Plug>CSurround"), true)
-      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("ds"), owner, injector.parser.parseKeys("<Plug>DSurround"), true)
-      putKeyMappingIfMissing(MappingMode.XO, injector.parser.parseKeys("S"), owner, injector.parser.parseKeys("<Plug>VSurround"), true)
+      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("ys").map { it.keyStroke }, owner, injector.parser.parseKeys("<Plug>YSurround").map { it.keyStroke }, true)
+      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("yss").map { it.keyStroke }, owner, injector.parser.parseKeys("<Plug>Yssurround").map { it.keyStroke }, true)
+      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("cs").map { it.keyStroke }, owner, injector.parser.parseKeys("<Plug>CSurround").map { it.keyStroke }, true)
+      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("ds").map { it.keyStroke }, owner, injector.parser.parseKeys("<Plug>DSurround").map { it.keyStroke }, true)
+      putKeyMappingIfMissing(MappingMode.XO, injector.parser.parseKeys("S").map { it.keyStroke }, owner, injector.parser.parseKeys("<Plug>VSurround").map { it.keyStroke }, true)
     }
 
     VimExtensionFacade.exportOperatorFunction(OPERATOR_FUNC, Operator())
@@ -88,7 +89,7 @@ internal class VimSurroundExtension : VimExtension {
 
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       injector.globalOptions().operatorfunc = OPERATOR_FUNC
-      executeNormalWithoutMapping(injector.parser.parseKeys("g@"), editor.ij)
+      executeNormalWithoutMapping(injector.parser.parseKeys("g@").map { it.keyStroke }, editor.ij)
     }
   }
 
@@ -116,7 +117,7 @@ internal class VimSurroundExtension : VimExtension {
       if (editor.mode !is Mode.NORMAL) {
         editor.mode = Mode.NORMAL()
       }
-      executeNormalWithoutMapping(injector.parser.parseKeys("`["), ijEditor)
+      executeNormalWithoutMapping(injector.parser.parseKeys("`[").map { it.keyStroke }, ijEditor)
     }
 
     private fun getLastNonWhitespaceCharacterOffset(chars: CharSequence, startOffset: Int, endOffset: Int): Int? {
@@ -201,7 +202,7 @@ internal class VimSurroundExtension : VimExtension {
         surroundings
           .filter { it.isValidSurrounding } // we do nothing with carets that are not inside the surrounding
           .map { surrounding ->
-            val innerValue = injector.parser.toPrintableString(surrounding.innerText!!)
+            val innerValue = injector.parser.toPrintableString(surrounding.innerText?.map { it.vim }!!)
             val text = newSurround?.let {
               val trimmedValue = if (newSurround.shouldTrim) innerValue.trim() else innerValue
               it.first + trimmedValue + it.second
@@ -218,12 +219,12 @@ internal class VimSurroundExtension : VimExtension {
           it.restoreRegister()
         }
 
-        executeNormalWithoutMapping(injector.parser.parseKeys("`["), editor.ij)
+        executeNormalWithoutMapping(injector.parser.parseKeys("`[").map { it.keyStroke }, editor.ij)
       }
 
       private fun perform(sequence: String, editor: Editor) {
         ClipboardOptionHelper.IdeaputDisabler()
-          .use { executeNormalWithoutMapping(injector.parser.parseKeys("\"" + REGISTER + sequence), editor) }
+          .use { executeNormalWithoutMapping(injector.parser.parseKeys("\"" + REGISTER + sequence).map { it.keyStroke }, editor) }
       }
 
       private fun pick(charFrom: Char) = when (charFrom) {
@@ -295,7 +296,7 @@ internal class VimSurroundExtension : VimExtension {
       val range = getSurroundRange(editor.currentCaret()) ?: return false
       performSurround(pair, range, editor.currentCaret(), selectionType == SelectionType.LINE_WISE)
       // Jump back to start
-      executeNormalWithoutMapping(injector.parser.parseKeys("`["), ijEditor)
+      executeNormalWithoutMapping(injector.parser.parseKeys("`[").map { it.keyStroke }, ijEditor)
       return true
     }
 

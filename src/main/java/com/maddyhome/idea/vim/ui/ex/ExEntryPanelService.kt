@@ -68,7 +68,7 @@ class ExEntryPanelService : VimCommandLineServiceBase(), VimModalInputService {
       val commandLine = injector.commandLine.createSearchPrompt(vimEditor, context, prompt.ifEmpty { " " }, "")
       ModalEntry.activate(editor.vim) { key: KeyStroke ->
         return@activate when {
-          key.isCloseKeyStroke() -> {
+          key.vim.isCloseKeyStroke() -> {
             commandLine.deactivate(refocusOwningEditor = true, resetCaret = true)
             false
           }
@@ -80,14 +80,14 @@ class ExEntryPanelService : VimCommandLineServiceBase(), VimModalInputService {
           }
 
           finishOn != null && key.keyChar == finishOn -> {
-            commandLine.handleKey(key)
+            commandLine.handleKey(key.vim)
             text = commandLine.actualText
             commandLine.deactivate(refocusOwningEditor = true, resetCaret = true)
             false
           }
 
           else -> {
-            commandLine.handleKey(key)
+            commandLine.handleKey(key.vim)
             true
           }
         }

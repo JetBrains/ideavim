@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissin
 import com.maddyhome.idea.vim.extension.exportOperatorFunction
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.helper.exitVisualMode
-import com.maddyhome.idea.vim.helper.swing
+import com.maddyhome.idea.vim.helper.keyStroke
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.IjVimCopiedText
 import com.maddyhome.idea.vim.newapi.IjVimEditor
@@ -47,13 +47,13 @@ internal class ReplaceWithRegister : VimExtension {
   override fun getName(): String = "ReplaceWithRegister"
 
   override fun init() {
-    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys(RWR_OPERATOR).map { it.swing }, owner, RwrMotion(), false)
-    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys(RWR_LINE).map { it.swing }, owner, RwrLine(), false)
-    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.X, injector.parser.parseKeys(RWR_VISUAL).map { it.swing }, owner, RwrVisual(), false)
+    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys(RWR_OPERATOR).map { it.keyStroke }, owner, RwrMotion(), false)
+    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys(RWR_LINE).map { it.keyStroke }, owner, RwrLine(), false)
+    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.X, injector.parser.parseKeys(RWR_VISUAL).map { it.keyStroke }, owner, RwrVisual(), false)
 
-    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("gr").map { it.swing }, owner, injector.parser.parseKeys(RWR_OPERATOR).map { it.swing }, true)
-    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("grr").map { it.swing }, owner, injector.parser.parseKeys(RWR_LINE).map { it.swing }, true)
-    putKeyMappingIfMissing(MappingMode.X, injector.parser.parseKeys("gr").map { it.swing }, owner, injector.parser.parseKeys(RWR_VISUAL).map { it.swing }, true)
+    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("gr").map { it.keyStroke }, owner, injector.parser.parseKeys(RWR_OPERATOR).map { it.keyStroke }, true)
+    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("grr").map { it.keyStroke }, owner, injector.parser.parseKeys(RWR_LINE).map { it.keyStroke }, true)
+    putKeyMappingIfMissing(MappingMode.X, injector.parser.parseKeys("gr").map { it.keyStroke }, owner, injector.parser.parseKeys(RWR_VISUAL).map { it.keyStroke }, true)
 
     VimExtensionFacade.exportOperatorFunction(OPERATOR_FUNC, Operator())
   }
@@ -77,7 +77,7 @@ internal class ReplaceWithRegister : VimExtension {
 
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       injector.globalOptions().operatorfunc = OPERATOR_FUNC
-      executeNormalWithoutMapping(injector.parser.parseKeys("g@").map { it.swing }, editor.ij)
+      executeNormalWithoutMapping(injector.parser.parseKeys("g@").map { it.keyStroke }, editor.ij)
     }
   }
 

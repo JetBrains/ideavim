@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMa
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.helper.swing
+import com.maddyhome.idea.vim.helper.keyStroke
 import java.util.EnumSet
 
 /**
@@ -79,7 +79,7 @@ class MiniAI : VimExtension {
       // Inner brackets
       PLUG_IB to createHandler { e, c, _ -> findBracketRange(e, c, isOuter = false) }
     ).forEach { (plug, handler) ->
-      putExtensionHandlerMapping(MappingMode.XO, injector.parser.parseKeys(plug).map { it.swing }, owner, handler, false)
+      putExtensionHandlerMapping(MappingMode.XO, injector.parser.parseKeys(plug).map { it.keyStroke }, owner, handler, false)
     }
 
     // Map user keys -> <Plug> keys
@@ -89,7 +89,7 @@ class MiniAI : VimExtension {
       KEY_AB to PLUG_AB,
       KEY_IB to PLUG_IB
     ).forEach { (key, plug) ->
-      putKeyMapping(MappingMode.XO, injector.parser.parseKeys(key).map { it.swing }, owner, injector.parser.parseKeys(plug).map { it.swing }, true)
+      putKeyMapping(MappingMode.XO, injector.parser.parseKeys(key).map { it.keyStroke }, owner, injector.parser.parseKeys(plug).map { it.keyStroke }, true)
     }
   }
 }

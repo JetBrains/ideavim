@@ -30,8 +30,8 @@ import com.intellij.util.ui.UIUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.MessageHelper.message
-import com.maddyhome.idea.vim.helper.swing
-import com.maddyhome.idea.vim.helper.vim
+import com.maddyhome.idea.vim.helper.keyStroke
+import com.maddyhome.idea.vim.helper.vimKeyStroke
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo.AllModes
@@ -292,7 +292,7 @@ internal class VimEmulationConfigurable : Configurable {
         get() = VimPlugin.getKey().shortcutConflicts != currentData
 
       fun apply() {
-        VimPlugin.getKey().savedShortcutConflicts.putAll(currentData.mapKeys { it.key.vim })
+        VimPlugin.getKey().savedShortcutConflicts.putAll(currentData.mapKeys { it.key.vimKeyStroke })
       }
 
       fun reset() {
@@ -300,7 +300,7 @@ internal class VimEmulationConfigurable : Configurable {
         for ((keyStroke, value) in VimPlugin.getKey().shortcutConflicts) {
           val actions = VimPlugin.getKey().getKeymapConflicts(keyStroke)
           if (actions.isNotEmpty()) {
-            rows.add(Row(keyStroke.swing, actions[0].action as AnAction, value))
+            rows.add(Row(keyStroke.keyStroke, actions[0].action as AnAction, value))
           }
         }
         rows.sort()
@@ -341,7 +341,7 @@ internal class VimEmulationConfigurable : Configurable {
         val owner = (ownerInfo as AllModes).owner
         if (owner === ShortcutOwner.UNDEFINED) continue
         stringBuilder.append("sethandler ")
-        stringBuilder.append(injector.parser.toKeyNotation(row.keyStroke.vim))
+        stringBuilder.append(injector.parser.toKeyNotation(row.keyStroke.vimKeyStroke))
         stringBuilder.append(" ")
         stringBuilder.append("a:")
         stringBuilder.append(owner.ownerName)
