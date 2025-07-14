@@ -45,6 +45,8 @@ val knownPlugins = setOf(
   "com.julienphalip.ideavim.functiontextobj", // https://plugins.jetbrains.com/plugin/25897-vim-functiontextobj
   "com.miksuki.HighlightCursor", // https://plugins.jetbrains.com/plugin/26743-highlightcursor
   "com.ugarosa.idea.edgemotion", // https://plugins.jetbrains.com/plugin/27211-edgemotion
+
+  "cn.mumukehao.plugin",
 )
 
 suspend fun main() {
