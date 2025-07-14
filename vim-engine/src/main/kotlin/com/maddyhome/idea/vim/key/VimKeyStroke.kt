@@ -11,14 +11,18 @@ package com.maddyhome.idea.vim.key
 data class VimKeyStroke(val keyChar: Char, val keyCode: Int, val modifiers: Int) {
   companion object {
     fun getKeyStroke(c: Char): VimKeyStroke {
-      TODO("zeauberg")
+      return VimKeyStroke(c, VK_UNDEFINED, NO_MODIFIERS)
     }
     fun getKeyStroke(keyChar: Char, modifiers: Int): VimKeyStroke {
-      TODO("zeauberg")
+      return VimKeyStroke(keyChar, VK_UNDEFINED, modifiers)
     }
 
     fun getKeyStroke(keycode: Int, modifiers: Int): VimKeyStroke {
-      TODO("zeauberg")
+      return VimKeyStroke(CHAR_UNDEFINED, keycode, modifiers)
     }
   }
 }
+
+const val VK_UNDEFINED = 0x0
+const val CHAR_UNDEFINED = 0xFFFF.toChar()
+const val NO_MODIFIERS = 0x0
