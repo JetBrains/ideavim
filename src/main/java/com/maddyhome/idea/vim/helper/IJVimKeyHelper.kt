@@ -9,13 +9,18 @@
 package com.maddyhome.idea.vim.helper
 
 import com.maddyhome.idea.vim.key.VimKeyStroke
+import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
 val KeyStroke.vimKeyStroke: VimKeyStroke
   get() {
-    TODO()
+    return VimKeyStroke(keyChar,  keyCode, modifiers)
   }
 val VimKeyStroke.keyStroke: KeyStroke
   get() {
-    TODO()
+    return if (KeyEvent.VK_UNDEFINED == keyCode) {
+      KeyStroke.getKeyStroke(keyChar, modifiers)
+    } else {
+      KeyStroke.getKeyStroke(keyCode, modifiers)
+    }
   }
