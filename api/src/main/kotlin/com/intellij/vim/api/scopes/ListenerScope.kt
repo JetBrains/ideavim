@@ -13,19 +13,19 @@ import com.intellij.vim.api.Mode
 import com.intellij.vim.api.Range
 
 interface ListenersScope {
-  suspend fun onModeChange(callback: suspend VimScope.(Mode) -> Unit)
-  suspend fun onYank(callback: suspend VimScope.(Map<CaretId, Range.Simple>) -> Unit)
+  fun onModeChange(callback: suspend VimScope.(Mode) -> Unit)
+  fun onYank(callback: suspend VimScope.(Map<CaretId, Range.Simple>) -> Unit)
 
-  suspend fun onEditorCreate(callback: suspend VimScope.() -> Unit)
-  suspend fun onEditorRelease(callback: suspend VimScope.() -> Unit)
-  suspend fun onEditorFocusGain(callback: suspend VimScope.() -> Unit)
-  suspend fun onEditorFocusLost(callback: suspend VimScope.() -> Unit)
+  fun onEditorCreate(callback: suspend VimScope.() -> Unit)
+  fun onEditorRelease(callback: suspend VimScope.() -> Unit)
+  fun onEditorFocusGain(callback: suspend VimScope.() -> Unit)
+  fun onEditorFocusLost(callback: suspend VimScope.() -> Unit)
 
-  suspend fun onMacroRecordingStart(callback: suspend VimScope.() -> Unit)
-  suspend fun onMacroRecordingFinish(callback: suspend VimScope.() -> Unit)
+  fun onMacroRecordingStart(callback: suspend VimScope.() -> Unit)
+  fun onMacroRecordingFinish(callback: suspend VimScope.() -> Unit)
 
-  suspend fun onIdeaVimEnabled(callback: suspend VimScope.() -> Unit)
-  suspend fun onIdeaVimDisabled(callback: suspend VimScope.() -> Unit)
+  fun onIdeaVimEnabled(callback: suspend VimScope.() -> Unit)
+  fun onIdeaVimDisabled(callback: suspend VimScope.() -> Unit)
 
   /**
    * Register a callback to be invoked when a global option changes.
@@ -33,5 +33,5 @@ interface ListenersScope {
    * @param optionName The name of the option to listen for changes
    * @param callback The callback to invoke when the option changes
    */
-  suspend fun onGlobalOptionChange(optionName: String, callback: suspend VimScope.() -> Unit)
+  fun onGlobalOptionChange(optionName: String, callback: suspend VimScope.() -> Unit)
 }
