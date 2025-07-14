@@ -220,5 +220,37 @@ data class VimKeyStroke(val keyChar: Char, val keyCode: Int, val modifiers: Int)
     const val VK_BEGIN                    = 0xFF58
     const val VK_UNDEFINED      = 0x0
 
+    // Modifiers masks
+    const val SHIFT_DOWN_MASK: Int = 1 shl 6
+    const val CTRL_DOWN_MASK: Int = 1 shl 7
+    const val META_DOWN_MASK: Int = 1 shl 8
+    const val ALT_DOWN_MASK: Int = 1 shl 9
+    const val BUTTON1_DOWN_MASK: Int = 1 shl 10
+    const val BUTTON2_DOWN_MASK: Int = 1 shl 11
+    const val BUTTON3_DOWN_MASK: Int = 1 shl 12
+    const val ALT_GRAPH_DOWN_MASK: Int = 1 shl 13
+    val BUTTON_DOWN_MASK: IntArray = intArrayOf(
+      BUTTON1_DOWN_MASK,
+      BUTTON2_DOWN_MASK,
+      BUTTON3_DOWN_MASK,
+      1 shl 14,  //4th physical button (this is not a wheel!)
+      1 shl 15,  //(this is not a wheel!)
+      1 shl 16,
+      1 shl 17,
+      1 shl 18,
+      1 shl 19,
+      1 shl 20,
+      1 shl 21,
+      1 shl 22,
+      1 shl 23,
+      1 shl 24,
+      1 shl 25,
+      1 shl 26,
+      1 shl 27,
+      1 shl 28,
+      1 shl 29,
+      1 shl 30
+    )
+
   }
 }
