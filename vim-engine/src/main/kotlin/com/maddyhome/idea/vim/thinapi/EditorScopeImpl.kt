@@ -27,14 +27,14 @@ class EditorScopeImpl(
 ) : EditorScope() {
   private val coroutineScope = CoroutineScope(Dispatchers.Unconfined )
 
-  override suspend fun <T> ideRead(block: suspend Read.() -> T): Deferred<T> {
+  override fun <T> ideRead(block: suspend Read.() -> T): Deferred<T> {
     return injector.application.runReadAction {
       val read = ReadImpl(listenerOwner, mappingOwner)
       return@runReadAction coroutineScope.async { block(read) }
     }
   }
 
-  override suspend fun ideChange(block: suspend Transaction.() -> Unit): Job {
+  override fun ideChange(block: suspend Transaction.() -> Unit): Job {
     return injector.application.runWriteAction {
       val transaction = TransactionImpl(listenerOwner, mappingOwner)
       coroutineScope.launch { transaction.block() }

@@ -17,7 +17,7 @@ import kotlin.contracts.contract
 @VimPluginDsl
 abstract class EditorScope {
   @OptIn(ExperimentalContracts::class)
-  suspend fun <T> read(block: suspend Read.() -> T): Deferred<T> {
+  fun <T> read(block: suspend Read.() -> T): Deferred<T> {
     contract {
       callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
@@ -25,13 +25,13 @@ abstract class EditorScope {
   }
 
   @OptIn(ExperimentalContracts::class)
-  suspend fun change(block: suspend Transaction.() -> Unit): Job {
+  fun change(block: suspend Transaction.() -> Unit): Job {
     contract {
       callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
     return ideChange(block)
   }
 
-  protected abstract suspend fun <T> ideRead(block: suspend Read.() -> T): Deferred<T>
-  protected abstract suspend fun ideChange(block: suspend Transaction.() -> Unit): Job
+  protected abstract fun <T> ideRead(block: suspend Read.() -> T): Deferred<T>
+  protected abstract fun ideChange(block: suspend Transaction.() -> Unit): Job
 }

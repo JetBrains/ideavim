@@ -36,21 +36,21 @@ class CommandLineScopeImpl(
   private val vimContext: ExecutionContext
     get() = injector.executionContextManager.getEditorExecutionContext(vimEditor)
 
-  override suspend fun input(prompt: String, finishOn: Char?, callback: VimScope.(String) -> Unit) {
+  override fun input(prompt: String, finishOn: Char?, callback: VimScope.(String) -> Unit) {
     val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
     injector.commandLine.readInputAndProcess(vimEditor, vimContext, prompt, finishOn) {
       vimScope.callback(it)
     }
   }
 
-  override suspend fun <T> ideRead(block: suspend CommandLineRead.() -> T): Deferred<T> {
+  override fun <T> ideRead(block: suspend CommandLineRead.() -> T): Deferred<T> {
     return injector.application.runReadAction {
       val read = CommandLineReadImpl()
       return@runReadAction coroutineScope.async { block(read) }
     }
   }
 
-  override suspend fun ideChange(block: suspend CommandLineTransaction.() -> Unit): Job {
+  override fun ideChange(block: suspend CommandLineTransaction.() -> Unit): Job {
     return injector.application.runWriteAction {
       val transaction = CommandLineTransactionImpl()
       coroutineScope.launch { transaction.block() }
