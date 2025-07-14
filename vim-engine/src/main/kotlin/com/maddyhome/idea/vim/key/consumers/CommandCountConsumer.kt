@@ -16,8 +16,8 @@ import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import com.maddyhome.idea.vim.state.mode.Mode
-import java.awt.event.KeyEvent
 import com.maddyhome.idea.vim.key.VimKeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.CHAR_UNDEFINED
 
 internal class CommandCountConsumer : KeyConsumer {
   private companion object {
@@ -31,7 +31,7 @@ internal class CommandCountConsumer : KeyConsumer {
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
     logger.trace { "Entered CommandCountConsumer" }
-    val chKey: Char = if (key.keyChar == KeyEvent.CHAR_UNDEFINED) 0.toChar() else key.keyChar
+    val chKey: Char = if (key.keyChar == CHAR_UNDEFINED) 0.toChar() else key.keyChar
     if (!isCommandCountKey(chKey, keyProcessResultBuilder.state)) return false
 
     keyProcessResultBuilder.state.commandBuilder.addCountCharacter(key)

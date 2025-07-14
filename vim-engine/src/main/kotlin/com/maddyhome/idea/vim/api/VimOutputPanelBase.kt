@@ -8,8 +8,10 @@
 
 package com.maddyhome.idea.vim.api
 
-import java.awt.event.KeyEvent
 import com.maddyhome.idea.vim.key.VimKeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.CHAR_UNDEFINED
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.VK_ENTER
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.VK_ESCAPE
 
 abstract class VimOutputPanelBase : VimOutputPanel {
   protected abstract val atEnd: Boolean
@@ -25,10 +27,10 @@ abstract class VimOutputPanelBase : VimOutputPanel {
       'd' -> scrollHalfPage()
       'q', '\u001b' -> close()
       '\n' -> scrollLine()
-      KeyEvent.CHAR_UNDEFINED -> {
+      CHAR_UNDEFINED -> {
         when (key.keyCode) {
-          KeyEvent.VK_ENTER -> scrollLine()
-          KeyEvent.VK_ESCAPE -> close()
+          VK_ENTER -> scrollLine()
+          VK_ESCAPE -> close()
           else -> onBadKey()
         }
       }

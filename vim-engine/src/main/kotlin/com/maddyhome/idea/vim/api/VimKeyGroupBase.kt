@@ -20,9 +20,11 @@ import com.maddyhome.idea.vim.key.RequiredShortcut
 import com.maddyhome.idea.vim.key.RootNode
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import java.awt.event.KeyEvent
 import java.util.*
 import com.maddyhome.idea.vim.key.VimKeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.CHAR_UNDEFINED
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.VK_ENTER
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.VK_ESCAPE
 import kotlin.math.min
 
 abstract class VimKeyGroupBase : VimKeyGroup {
@@ -168,11 +170,11 @@ abstract class VimKeyGroupBase : VimKeyGroup {
   private fun registerKeyMapping(fromKeys: List<VimKeyStroke>, owner: MappingOwner) {
     val oldSize = requiredShortcutKeys.size
     for (key in fromKeys) {
-      if (key.keyChar == KeyEvent.CHAR_UNDEFINED) {
+      if (key.keyChar == CHAR_UNDEFINED) {
         if (
           !injector.application.isOctopusEnabled() ||
-          !(key.keyCode == KeyEvent.VK_ESCAPE && key.modifiers == 0) &&
-          !(key.keyCode == KeyEvent.VK_ENTER && key.modifiers == 0)
+          !(key.keyCode == VK_ESCAPE && key.modifiers == 0) &&
+          !(key.keyCode == VK_ENTER && key.modifiers == 0)
         ) {
           requiredShortcutKeys.add(RequiredShortcut(key, owner))
         }

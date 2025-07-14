@@ -9,8 +9,7 @@
 package com.maddyhome.idea.vim.key
 
 import com.maddyhome.idea.vim.api.injector
-import java.awt.event.KeyEvent
-import com.maddyhome.idea.vim.key.VimKeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.CHAR_UNDEFINED
 
 /**
  * A trie data structure for storing and retrieving values associated with sequences of keystrokes
@@ -83,7 +82,7 @@ class KeyStrokeTrie<T>(private val name: String) {
 
   private val root = TrieNodeImpl<T>(
     name = "",
-    key = VimKeyStroke.getKeyStroke(KeyEvent.CHAR_UNDEFINED),
+    key = VimKeyStroke.getKeyStroke(CHAR_UNDEFINED),
     parent = null,
     data = null
   )

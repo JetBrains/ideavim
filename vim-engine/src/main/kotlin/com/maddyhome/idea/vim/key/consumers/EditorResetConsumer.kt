@@ -20,8 +20,8 @@ import com.maddyhome.idea.vim.helper.isCloseKeyStroke
 import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import com.maddyhome.idea.vim.state.mode.Mode
-import java.awt.event.KeyEvent
 import com.maddyhome.idea.vim.key.VimKeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.VK_ESCAPE
 
 internal class EditorResetConsumer : KeyConsumer {
   private companion object {
@@ -72,7 +72,7 @@ internal class EditorResetConsumer : KeyConsumer {
           editor.mode = mode.returnTo
         } else {
           var indicateError = true
-          if (key.keyCode == KeyEvent.VK_ESCAPE) {
+          if (key.keyCode == VK_ESCAPE) {
             val executed = arrayOf<Boolean?>(null)
             injector.actionExecutor.executeCommand(
               editor,

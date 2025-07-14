@@ -19,8 +19,8 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.state.KeyHandlerState
-import java.awt.event.KeyEvent
 import com.maddyhome.idea.vim.key.VimKeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.CTRL_DOWN_MASK
 
 @CommandOrMotion(keys = ["<C-R>"], modes = [Mode.CMD_LINE])
 class InsertRegisterAction : VimActionHandler.SingleExecution() {
@@ -45,7 +45,7 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
 
     val argument = cmd.argument as? Argument.Character ?: return false
     val keyStroke = VimKeyStroke.getKeyStroke(argument.character)
-    val pasteContent = if ((keyStroke.modifiers and KeyEvent.CTRL_DOWN_MASK) == 0) {
+    val pasteContent = if ((keyStroke.modifiers and CTRL_DOWN_MASK) == 0) {
       injector.registerGroup.getRegister(editor, context, keyStroke.keyChar)?.text
     } else {
       throw ExException("Not yet implemented")

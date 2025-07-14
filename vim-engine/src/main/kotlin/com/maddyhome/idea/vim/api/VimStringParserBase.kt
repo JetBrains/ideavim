@@ -11,10 +11,13 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.jetbrains.annotations.Contract
 import org.jetbrains.annotations.NonNls
-import java.awt.event.InputEvent
 import java.util.*
 import com.maddyhome.idea.vim.key.VimKeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.ALT_DOWN_MASK
 import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.CHAR_UNDEFINED
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.CTRL_DOWN_MASK
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.META_DOWN_MASK
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.SHIFT_DOWN_MASK
 import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.VK_BACK_SPACE
 import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.VK_DELETE
 import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.VK_DOWN
@@ -77,7 +80,7 @@ abstract class VimStringParserBase : VimStringParser {
   private fun keyStrokeToChar(key: VimKeyStroke): Char {
     if (key.keyChar != CHAR_UNDEFINED) {
       return key.keyChar
-    } else if (key.modifiers and InputEvent.CTRL_DOWN_MASK == InputEvent.CTRL_DOWN_MASK) {
+    } else if (key.modifiers and CTRL_DOWN_MASK == CTRL_DOWN_MASK) {
       return if (key.keyCode == 'J'.code) {
         // 'J' is a special case, keycode 10 is \n char
         0.toChar()
@@ -109,16 +112,16 @@ abstract class VimStringParserBase : VimStringParser {
       return c.toString()
     }
     var prefix = ""
-    if (modifiers and InputEvent.META_DOWN_MASK != 0) {
+    if (modifiers and META_DOWN_MASK != 0) {
       prefix += "M-"
     }
-    if (modifiers and InputEvent.ALT_DOWN_MASK != 0) {
+    if (modifiers and ALT_DOWN_MASK != 0) {
       prefix += "A-"
     }
-    if (modifiers and InputEvent.CTRL_DOWN_MASK != 0) {
+    if (modifiers and CTRL_DOWN_MASK != 0) {
       prefix += "C-"
     }
-    if (modifiers and InputEvent.SHIFT_DOWN_MASK != 0) {
+    if (modifiers and SHIFT_DOWN_MASK != 0) {
       prefix += "S-"
     }
     var name = getVimKeyValue(keyCode)
@@ -159,7 +162,7 @@ abstract class VimStringParserBase : VimStringParser {
             val stroke: VimKeyStroke = if (c == '\t' || c == '\n') {
               VimKeyStroke.getKeyStroke(c.code, 0)
             } else if (isControlCharacter(c)) {
-              VimKeyStroke.getKeyStroke(c.code + 'A'.code - 1, InputEvent.CTRL_DOWN_MASK)
+              VimKeyStroke.getKeyStroke(c.code + 'A'.code - 1, CTRL_DOWN_MASK)
             } else {
               VimKeyStroke.getKeyStroke(c)
             }
@@ -231,11 +234,11 @@ abstract class VimStringParserBase : VimStringParser {
       if (isControlCharacter(element) && element.code != 10) {
         if (element.code == 0) {
           // J is a special case, it's keycode is 0 because keycode 10 is reserved by \n
-          res.add(VimKeyStroke.getKeyStroke('J'.code, InputEvent.CTRL_DOWN_MASK))
+          res.add(VimKeyStroke.getKeyStroke('J'.code, CTRL_DOWN_MASK))
         } else if (element == '\t') {
           res.add(VimKeyStroke.getKeyStroke('\t'))
         } else {
-          res.add(VimKeyStroke.getKeyStroke(element.code + 'A'.code - 1, InputEvent.CTRL_DOWN_MASK))
+          res.add(VimKeyStroke.getKeyStroke(element.code + 'A'.code - 1, CTRL_DOWN_MASK))
         }
       } else {
         res.add(VimKeyStroke.getKeyStroke(element))
@@ -461,7 +464,7 @@ abstract class VimStringParserBase : VimStringParser {
               var keyCode = specialKey.keyCode
               if (specialKey.keyCode == 0) {
                 keyCode = specialKey.keyChar.code
-              } else if (specialKey.modifiers and InputEvent.CTRL_DOWN_MASK == InputEvent.CTRL_DOWN_MASK) {
+              } else if (specialKey.modifiers and CTRL_DOWN_MASK == CTRL_DOWN_MASK) {
                 keyCode = if (specialKey.keyCode == 'J'.code) {
                   // 'J' is a special case, keycode 10 is \n char
                   0
@@ -520,16 +523,16 @@ abstract class VimStringParserBase : VimStringParser {
     } else if (typedChar != null) {
       return getTypedOrPressedKeyStroke(typedChar, modifiers)
     } else if (lower.startsWith(CMD_PREFIX)) {
-      return parseSpecialKey(s.substring(CMD_PREFIX.length), modifiers or InputEvent.META_DOWN_MASK)
+      return parseSpecialKey(s.substring(CMD_PREFIX.length), modifiers or META_DOWN_MASK)
     } else if (lower.startsWith(META_PREFIX)) {
       // Meta and alt prefixes are the same thing. See the key notation of vim
-      return parseSpecialKey(s.substring(META_PREFIX.length), modifiers or InputEvent.ALT_DOWN_MASK)
+      return parseSpecialKey(s.substring(META_PREFIX.length), modifiers or ALT_DOWN_MASK)
     } else if (lower.startsWith(ALT_PREFIX)) {
-      return parseSpecialKey(s.substring(ALT_PREFIX.length), modifiers or InputEvent.ALT_DOWN_MASK)
+      return parseSpecialKey(s.substring(ALT_PREFIX.length), modifiers or ALT_DOWN_MASK)
     } else if (lower.startsWith(CTRL_PREFIX)) {
-      return parseSpecialKey(s.substring(CTRL_PREFIX.length), modifiers or InputEvent.CTRL_DOWN_MASK)
+      return parseSpecialKey(s.substring(CTRL_PREFIX.length), modifiers or CTRL_DOWN_MASK)
     } else if (lower.startsWith(SHIFT_PREFIX)) {
-      return parseSpecialKey(s.substring(SHIFT_PREFIX.length), modifiers or InputEvent.SHIFT_DOWN_MASK)
+      return parseSpecialKey(s.substring(SHIFT_PREFIX.length), modifiers or SHIFT_DOWN_MASK)
     } else if (s.length == 1) {
       return getTypedOrPressedKeyStroke(s[0], modifiers)
     }
@@ -602,7 +605,7 @@ abstract class VimStringParserBase : VimStringParser {
   private fun getTypedOrPressedKeyStroke(c: Char, modifiers: Int): VimKeyStroke {
     return if (modifiers == 0) {
       VimKeyStroke.getKeyStroke(c)
-    } else if (modifiers == InputEvent.SHIFT_DOWN_MASK && Character.isLetter(c)) {
+    } else if (modifiers == SHIFT_DOWN_MASK && Character.isLetter(c)) {
       VimKeyStroke.getKeyStroke(Character.toUpperCase(c))
     } else {
       VimKeyStroke.getKeyStroke(Character.toUpperCase(c).code, modifiers)

@@ -16,19 +16,20 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import java.awt.event.KeyEvent
 import com.maddyhome.idea.vim.key.VimKeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.VK_BACK_SPACE
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.VK_DELETE
 
 @CommandOrMotion(keys = ["<DEL>"], modes = [Mode.SELECT])
 class SelectDeleteAction : SelectDeleteBackspaceActionBase() {
   override val keyStroke: VimKeyStroke
-    get() = VimKeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)
+    get() = VimKeyStroke.getKeyStroke(VK_DELETE, 0)
 }
 
 @CommandOrMotion(keys = ["<BS>"], modes = [Mode.SELECT])
 class SelectBackspaceAction : SelectDeleteBackspaceActionBase() {
   override val keyStroke: VimKeyStroke
-    get() = VimKeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)
+    get() = VimKeyStroke.getKeyStroke(VK_BACK_SPACE, 0)
 }
 
 abstract class SelectDeleteBackspaceActionBase : VimActionHandler.SingleExecution() {
