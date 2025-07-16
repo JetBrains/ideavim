@@ -18,11 +18,43 @@ data class VimKeyStroke(val keyChar: Char, val keyCode: Int, val modifiers: Int)
       return VimKeyStroke(c, VK_UNDEFINED, NO_MODIFIERS)
     }
     fun getKeyStroke(keyChar: Char, modifiers: Int): VimKeyStroke {
-      return VimKeyStroke(keyChar, VK_UNDEFINED, modifiers)
+      var mod = modifiers
+      if (modifiers == Constants.CTRL_DOWN_MASK) {
+        mod = mod or Constants.CTRL_MASK
+      }
+
+      if (modifiers == Constants.SHIFT_DOWN_MASK) {
+        mod = mod or Constants.SHIFT_MASK
+      }
+
+      if (modifiers == Constants.META_DOWN_MASK) {
+        mod = mod or Constants.META_MASK
+      }
+
+      if (modifiers == Constants.ALT_DOWN_MASK) {
+        mod = mod or Constants.ALT_MASK
+      }
+      return VimKeyStroke(keyChar, VK_UNDEFINED, mod)
     }
 
     fun getKeyStroke(keycode: Int, modifiers: Int): VimKeyStroke {
-      return VimKeyStroke(CHAR_UNDEFINED, keycode, modifiers)
+      var mod = modifiers
+      if (modifiers == Constants.CTRL_DOWN_MASK) {
+        mod = mod or Constants.CTRL_MASK
+      }
+
+      if (modifiers == Constants.SHIFT_DOWN_MASK) {
+        mod = mod or Constants.SHIFT_MASK
+      }
+
+      if (modifiers == Constants.META_DOWN_MASK) {
+        mod = mod or Constants.META_MASK
+      }
+
+      if (modifiers == Constants.ALT_DOWN_MASK) {
+        mod = mod or Constants.ALT_MASK
+      }
+      return VimKeyStroke(CHAR_UNDEFINED, keycode, mod)
     }
   }
 
@@ -252,5 +284,10 @@ data class VimKeyStroke(val keyChar: Char, val keyCode: Int, val modifiers: Int)
       1 shl 30
     )
 
+    const val SHIFT_MASK: Int = 1 shl 0
+    const val CTRL_MASK: Int = 1 shl 1
+    const val META_MASK: Int = 1 shl 2
+    const val ALT_MASK: Int = 1 shl 3
+    // TODO ALT_GRAPH_DOWN vs getKey...Ext
   }
 }
