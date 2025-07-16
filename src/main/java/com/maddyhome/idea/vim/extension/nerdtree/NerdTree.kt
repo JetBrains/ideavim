@@ -44,13 +44,10 @@ import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.group.KeyGroup
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.runAfterGotFocus
-import com.maddyhome.idea.vim.key.KeyStrokeTrie
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.RequiredShortcut
-import com.maddyhome.idea.vim.key.add
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 import javax.swing.SwingConstants
@@ -120,7 +117,7 @@ internal class NerdTree : VimExtension {
   override fun init() {
     LOG.info("IdeaVim: Initializing NERDTree extension. Disable this extension if you observe a strange behaviour of the project tree. E.g. moving down on 'j'")
 
-    registerCommands()
+    registerMappings()
 
     addCommand("NERDTreeFocus", IjCommandHandler("ActivateProjectToolWindow"))
     addCommand("NERDTree", IjCommandHandler("ActivateProjectToolWindow"))
@@ -208,7 +205,7 @@ internal class NerdTree : VimExtension {
       }
 
       keys.add(keyStroke)
-      actionsRoot.getData(keys)?.let { action ->
+      mappings.getAction(keys)?.let { action ->
         when (action) {
           is NerdAction.ToIj -> Util.callAction(null, action.name, e.dataContext.vim)
           is NerdAction.Code -> e.project?.let { action.action(it, e.dataContext, e) }
@@ -272,11 +269,11 @@ internal class NerdTree : VimExtension {
     }
   }
 
-  private fun registerCommands() {
+  private fun registerMappings() {
     // TODO: 22.01.2021 Should not just to the last line after the first
-    registerCommand("j", NerdAction.ToIj("Tree-selectNext"))
-    registerCommand("k", NerdAction.ToIj("Tree-selectPrevious"))
-    registerCommand(
+    mappings.register("j", NerdAction.ToIj("Tree-selectNext"))
+    mappings.register("k", NerdAction.ToIj("Tree-selectPrevious"))
+    mappings.register(
       "NERDTreeMapActivateNode",
       "o",
       NerdAction.Code { project, dataContext, _ ->
@@ -295,7 +292,7 @@ internal class NerdTree : VimExtension {
         }
       },
     )
-    registerCommand(
+    mappings.register(
       "NERDTreeMapPreview",
       "go",
       NerdAction.Code { _, dataContext, _ ->
@@ -305,7 +302,7 @@ internal class NerdTree : VimExtension {
           ?.forEach { it.navigate(false) }
       },
     )
-    registerCommand(
+    mappings.register(
       "NERDTreeMapOpenInTab",
       "t",
       NerdAction.Code { _, dataContext, _ ->
@@ -316,7 +313,7 @@ internal class NerdTree : VimExtension {
           ?.forEach { it.navigate(true) }
       },
     )
-    registerCommand(
+    mappings.register(
       "NERDTreeMapOpenInTabSilent",
       "T",
       NerdAction.Code { _, dataContext, _ ->
@@ -329,9 +326,9 @@ internal class NerdTree : VimExtension {
     )
 
     // TODO: 21.01.2021 Should option in left split
-    registerCommand("NERDTreeMapOpenVSplit", "s", NerdAction.ToIj("OpenInRightSplit"))
+    mappings.register("NERDTreeMapOpenVSplit", "s", NerdAction.ToIj("OpenInRightSplit"))
     // TODO: 21.01.2021 Should option in above split
-    registerCommand(
+    mappings.register(
       "NERDTreeMapOpenSplit",
       "i",
       NerdAction.Code { project, _, event ->
@@ -342,7 +339,7 @@ internal class NerdTree : VimExtension {
         currentWindow?.split(SwingConstants.HORIZONTAL, true, file, true)
       },
     )
-    registerCommand(
+    mappings.register(
       "NERDTreeMapPreviewVSplit",
       "gs",
       NerdAction.Code { project, context, event ->
@@ -355,7 +352,7 @@ internal class NerdTree : VimExtension {
         Util.callAction(null, "ActivateProjectToolWindow", context.vim)
       },
     )
-    registerCommand(
+    mappings.register(
       "NERDTreeMapPreviewSplit",
       "gi",
       NerdAction.Code { project, context, event ->
@@ -367,7 +364,7 @@ internal class NerdTree : VimExtension {
         Util.callAction(null, "ActivateProjectToolWindow", context.vim)
       },
     )
-    registerCommand(
+    mappings.register(
       "NERDTreeMapOpenRecursively",
       "O",
       NerdAction.Code { project, _, _ ->
@@ -378,7 +375,7 @@ internal class NerdTree : VimExtension {
         }
       },
     )
-    registerCommand(
+    mappings.register(
       "NERDTreeMapCloseChildren",
       "X",
       NerdAction.Code { project, _, _ ->
@@ -389,7 +386,7 @@ internal class NerdTree : VimExtension {
         }
       },
     )
-    registerCommand(
+    mappings.register(
       "NERDTreeMapCloseDir",
       "x",
       NerdAction.Code { project, _, _ ->
@@ -407,8 +404,8 @@ internal class NerdTree : VimExtension {
         }
       },
     )
-    registerCommand("NERDTreeMapJumpRoot", "P", NerdAction.ToIj("Tree-selectFirst"))
-    registerCommand(
+    mappings.register("NERDTreeMapJumpRoot", "P", NerdAction.ToIj("Tree-selectFirst"))
+    mappings.register(
       "NERDTreeMapJumpParent",
       "p",
       NerdAction.Code { project, _, _ ->
@@ -422,7 +419,7 @@ internal class NerdTree : VimExtension {
         }
       },
     )
-    registerCommand(
+    mappings.register(
       "NERDTreeMapJumpFirstChild",
       "K",
       NerdAction.Code { project, _, _ ->
@@ -435,7 +432,7 @@ internal class NerdTree : VimExtension {
         tree.scrollRowToVisible(row + 1)
       },
     )
-    registerCommand(
+    mappings.register(
       "NERDTreeMapJumpLastChild",
       "J",
       NerdAction.Code { project, _, _ ->
@@ -458,56 +455,56 @@ internal class NerdTree : VimExtension {
         tree.scrollRowToVisible(expectedRow)
       },
     )
-    registerCommand("gg", NerdAction.Code { project, _, _ ->
+    mappings.register("gg", NerdAction.Code { project, _, _ ->
       val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
       tree.setSelectionRow(0)
       tree.scrollRowToVisible(0)
     })
-    registerCommand("G", NerdAction.Code { project, _, _ ->
+    mappings.register("G", NerdAction.Code { project, _, _ ->
       val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
       val lastRowIndex = tree.rowCount -1
       tree.setSelectionRow(lastRowIndex)
       tree.scrollRowToVisible(lastRowIndex)
     })
-    registerCommand(
+    mappings.register(
       "NERDTreeMapJumpNextSibling",
       "<C-J>",
       NerdAction.ToIj("Tree-selectNextSibling"),
     )
-    registerCommand(
+    mappings.register(
       "NERDTreeMapJumpPrevSibling",
       "<C-K>",
       NerdAction.ToIj("Tree-selectPreviousSibling"),
     )
-    registerCommand(
+    mappings.register(
       "NERDTreeMapRefresh",
       "r",
       NerdAction.ToIj("SynchronizeCurrentFile"),
     )
-    registerCommand("NERDTreeMapToggleHidden", "I", NerdAction.ToIj("ProjectView.ShowExcludedFiles"))
-    registerCommand("NERDTreeMapNewFile", "n", NerdAction.ToIj("NewFile"))
-    registerCommand("NERDTreeMapNewDir", "N", NerdAction.ToIj("NewDir"))
-    registerCommand("NERDTreeMapDelete", "d", NerdAction.ToIj("\$Delete"))
-    registerCommand("NERDTreeMapCopy", "y", NerdAction.ToIj("\$Copy"))
-    registerCommand("NERDTreeMapPaste", "v", NerdAction.ToIj("\$Paste"))
-    registerCommand("NERDTreeMapRename", "<C-r>", NerdAction.ToIj("RenameElement"))
-    registerCommand("NERDTreeMapRefreshRoot", "R", NerdAction.ToIj("Synchronize"))
-    registerCommand("NERDTreeMapMenu", "m", NerdAction.ToIj("ShowPopupMenu"))
-    registerCommand("NERDTreeMapQuit", "q", NerdAction.ToIj("HideActiveWindow"))
-    registerCommand(
+    mappings.register("NERDTreeMapToggleHidden", "I", NerdAction.ToIj("ProjectView.ShowExcludedFiles"))
+    mappings.register("NERDTreeMapNewFile", "n", NerdAction.ToIj("NewFile"))
+    mappings.register("NERDTreeMapNewDir", "N", NerdAction.ToIj("NewDir"))
+    mappings.register("NERDTreeMapDelete", "d", NerdAction.ToIj("\$Delete"))
+    mappings.register("NERDTreeMapCopy", "y", NerdAction.ToIj("\$Copy"))
+    mappings.register("NERDTreeMapPaste", "v", NerdAction.ToIj("\$Paste"))
+    mappings.register("NERDTreeMapRename", "<C-r>", NerdAction.ToIj("RenameElement"))
+    mappings.register("NERDTreeMapRefreshRoot", "R", NerdAction.ToIj("Synchronize"))
+    mappings.register("NERDTreeMapMenu", "m", NerdAction.ToIj("ShowPopupMenu"))
+    mappings.register("NERDTreeMapQuit", "q", NerdAction.ToIj("HideActiveWindow"))
+    mappings.register(
       "NERDTreeMapToggleZoom",
       "A",
       NerdAction.ToIj("MaximizeToolWindow"),
     )
 
-    registerCommand(
+    mappings.register(
       "/",
       NerdAction.Code { project, _, _ ->
         NerdDispatcher.getInstance(project).waitForSearch = true
       },
     )
 
-    registerCommand(
+    mappings.register(
       "<ESC>",
       NerdAction.Code { project, _, _ ->
         val instance = NerdDispatcher.getInstance(project)
@@ -547,27 +544,11 @@ private fun addCommand(alias: String, handler: CommandAliasHandler) {
   VimPlugin.getCommand().setAlias(alias, CommandAlias.Call(0, -1, alias, handler))
 }
 
-private fun registerCommand(variable: String, defaultMapping: String, action: NerdAction) {
-  val variableValue = VimPlugin.getVariableService().getGlobalVariableValue(variable)
-  val mapping = if (variableValue is VimString) {
-    variableValue.value
-  } else {
-    defaultMapping
-  }
-  registerCommand(mapping, action)
-}
-
-private fun registerCommand(mapping: String, action: NerdAction) {
-  actionsRoot.add(mapping, action)
-  distinctShortcuts.addAll(injector.parser.parseKeys(mapping))
-}
-
-private val actionsRoot: KeyStrokeTrie<NerdAction> = KeyStrokeTrie<NerdAction>("NERDTree")
-private val distinctShortcuts = mutableSetOf<KeyStroke>()
+private val mappings = Mappings("NERDTree")
 
 private fun installDispatcher(project: Project) {
   val dispatcher = NerdTree.NerdDispatcher.getInstance(project)
-  val shortcuts = distinctShortcuts.map { RequiredShortcut(it, MappingOwner.Plugin.get(NerdTree.pluginName)) }
+  val shortcuts = mappings.keyStrokes.map { RequiredShortcut(it, MappingOwner.Plugin.get(NerdTree.pluginName)) }
   dispatcher.registerCustomShortcutSet(
     KeyGroup.toShortcutSet(shortcuts),
     (ProjectView.getInstance(project) as ProjectViewImpl).component,
