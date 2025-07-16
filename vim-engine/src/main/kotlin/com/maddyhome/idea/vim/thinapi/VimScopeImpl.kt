@@ -125,9 +125,13 @@ open class VimScopeImpl(
         context: ExecutionContext,
         selectionType: SelectionType?,
       ): Boolean {
-        return runBlocking {
-          VimScopeImpl(listenerOwner, mappingOwner).function()
-        }
+        var returnValue = false
+        injector.actionExecutor.executeCommand(vimEditor, {
+          runBlocking {
+            returnValue = VimScopeImpl(listenerOwner, mappingOwner).function()
+          }
+        }, "Insert Text", null)
+        return returnValue
       }
     }
     injector.pluginService.exportOperatorFunction(name, operatorFunction)
@@ -142,7 +146,7 @@ open class VimScopeImpl(
   }
 
   override suspend fun editorScope(): EditorScope {
-     return EditorScopeImpl(listenerOwner, mappingOwner)
+    return EditorScopeImpl(listenerOwner, mappingOwner)
   }
 
   override suspend fun <T> forEachEditor(block: suspend EditorScope.() -> T): List<T> {
@@ -260,7 +264,7 @@ open class VimScopeImpl(
     command: String,
     block: VimScope.(String) -> Unit,
   ) {
-    val commandHandler = object: CommandAliasHandler {
+    val commandHandler = object : CommandAliasHandler {
       override fun execute(
         command: String,
         range: com.maddyhome.idea.vim.ex.ranges.Range,

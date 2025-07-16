@@ -83,23 +83,16 @@ class CaretTransactionImpl(
       caretAfterInsertedText = caretAfterInsertedText,
       putToLine = -1
     )
+    vimCaret.moveToOffset(startPosition)
 
-    var result = false
-    injector.actionExecutor.executeCommand(vimEditor, {
-      injector.application.runWriteAction {
-        // Move caret to insertion position
-        vimCaret.moveToOffset(startPosition)
-
-        result = injector.put.putTextForCaret(
-          vimEditor,
-          vimCaret,
-          executionContext,
-          putData,
-          updateVisualMarks = false,
-          modifyRegister = false
-        )
-      }
-    }, "Insert Text", null)
+    val result: Boolean = injector.put.putTextForCaret(
+      vimEditor,
+      vimCaret,
+      executionContext,
+      putData,
+      updateVisualMarks = false,
+      modifyRegister = false
+    )
 
     return result
   }
@@ -107,7 +100,7 @@ class CaretTransactionImpl(
   override suspend fun insertText(
     position: Int,
     text: String,
-    caretAfterInsertedText: Boolean
+    caretAfterInsertedText: Boolean,
   ): Boolean {
     return putText(position, text, caretAfterInsertedText)
   }
@@ -146,29 +139,20 @@ class CaretTransactionImpl(
       putToLine = -1
     )
 
-    var result = false
-    injector.actionExecutor.executeCommand(vimEditor, {
-      injector.application.runWriteAction {
-        result = injector.put.putTextForCaret(
-          vimEditor,
-          vimCaret,
-          executionContext,
-          putData,
-          updateVisualMarks = false,
-          modifyRegister = false
-        )
-      }
-    }, "Replace Text", null)
+    val result: Boolean = injector.put.putTextForCaret(
+      vimEditor,
+      vimCaret,
+      executionContext,
+      putData,
+      updateVisualMarks = false,
+      modifyRegister = false
+    )
 
     return result
   }
 
   override suspend fun replaceTextForRange(startOffset: Int, endOffset: Int, text: String) {
-    injector.actionExecutor.executeCommand(vimEditor, {
-      injector.application.runWriteAction {
-        injector.changeGroup.replaceText(vimEditor, vimCaret, startOffset, endOffset, text)
-      }
-    }, "Replace Text", null)
+    injector.changeGroup.replaceText(vimEditor, vimCaret, startOffset, endOffset, text)
   }
 
   override suspend fun deleteText(
@@ -177,19 +161,15 @@ class CaretTransactionImpl(
   ): Boolean {
     val range = TextRange(startOffset, endOffset)
 
-    injector.actionExecutor.executeCommand(vimEditor, {
-      injector.application.runWriteAction {
-        injector.changeGroup.deleteRange(
-          vimEditor,
-          executionContext,
-          vimCaret,
-          range,
-          SelectionType.CHARACTER_WISE,
-          isChange = false,
-          saveToRegister = false
-        )
-      }
-    }, "Delete Text", null)
+    injector.changeGroup.deleteRange(
+      vimEditor,
+      executionContext,
+      vimCaret,
+      range,
+      SelectionType.CHARACTER_WISE,
+      isChange = false,
+      saveToRegister = false
+    )
 
     return true
   }
