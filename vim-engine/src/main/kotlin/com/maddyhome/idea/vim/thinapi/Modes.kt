@@ -66,7 +66,7 @@ fun Mode.toEngineMode(): EngineMode {
 fun changeMode(value: Mode, vimEditor: VimEditor?) {
   val vimState = injector.vimState
   val currentMode: EngineMode = vimState.mode
-  if (currentMode == value) return
+  if (currentMode == value.toEngineMode()) return
 
   val oldValue: EngineMode = vimState.mode
   if (oldValue == EngineMode.REPLACE) {
@@ -76,10 +76,10 @@ fun changeMode(value: Mode, vimEditor: VimEditor?) {
 
     // remove carets and selection
     SelectionVimListenerSuppressor.lock().use {
-      if (vimEditor.inBlockSelection) {
-        vimEditor.removeSecondaryCarets()
-      }
       injector.application.runWriteAction {
+        if (vimEditor.inBlockSelection) {
+          vimEditor.removeSecondaryCarets()
+        }
         vimEditor.nativeCarets().forEach(VimCaret::removeSelection)
       }
     }
@@ -90,12 +90,14 @@ fun changeMode(value: Mode, vimEditor: VimEditor?) {
       injector.application.runReadAction {
         injector.markService.setVisualSelectionMarks(vimEditor)
       }
-      vimEditor.nativeCarets().forEach { it.vimSelectionStartClear() }
+      injector.application.runWriteAction {
+        vimEditor.nativeCarets().forEach { it.vimSelectionStartClear() }
+      }
     }
   }
 
   (injector.vimState as VimStateMachineImpl).mode = value.toEngineMode()
   val editor = vimEditor ?: injector.fallbackWindow
-  // todo: we should probably remove editor from ModeChangeListener, but listener implementations use it
+
   injector.listenersNotifier.notifyModeChanged(editor, oldValue)
 }

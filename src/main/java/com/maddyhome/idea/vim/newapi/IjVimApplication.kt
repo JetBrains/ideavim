@@ -41,6 +41,10 @@ internal class IjVimApplication : VimApplicationBase() {
     ApplicationManager.getApplication().invokeLater(action)
   }
 
+  override fun invokeAndWait(action: () -> Unit) {
+    ApplicationManager.getApplication().invokeAndWait(action)
+  }
+
   override fun isUnitTest(): Boolean {
     return ApplicationManager.getApplication().isUnitTestMode
   }
