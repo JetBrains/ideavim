@@ -21,7 +21,6 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
-import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.startup.ProjectActivity
@@ -29,7 +28,6 @@ import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowId
 import com.intellij.openapi.wm.ex.ToolWindowManagerEx
 import com.intellij.openapi.wm.ex.ToolWindowManagerListener
-import com.intellij.ui.KeyStrokeAdapter
 import com.intellij.ui.TreeExpandCollapse
 import com.intellij.ui.speedSearch.SpeedSearchSupply
 import com.intellij.util.ui.tree.TreeUtil
@@ -49,7 +47,6 @@ import com.maddyhome.idea.vim.key.RequiredShortcut
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import java.awt.event.KeyEvent
-import javax.swing.KeyStroke
 import javax.swing.SwingConstants
 
 /**
@@ -191,29 +188,9 @@ internal class NerdTree : VimExtension {
   }
 
   @Service(Service.Level.PROJECT)
-  class NerdDispatcher : DumbAwareAction() {
+  class NerdDispatcher : AbstractDispatcher(mappings) {
     internal var waitForSearch = false
     internal var speedSearchListenerInstalled = false
-
-    private val keys = mutableListOf<KeyStroke>()
-
-    override fun actionPerformed(e: AnActionEvent) {
-      var keyStroke = getKeyStroke(e) ?: return
-      val keyChar = keyStroke.keyChar
-      if (keyChar != KeyEvent.CHAR_UNDEFINED) {
-        keyStroke = KeyStroke.getKeyStroke(keyChar)
-      }
-
-      keys.add(keyStroke)
-      mappings.getAction(keys)?.let { action ->
-        when (action) {
-          is NerdAction.ToIj -> Util.callAction(null, action.name, e.dataContext.vim)
-          is NerdAction.Code -> e.project?.let { action.action(it, e.dataContext, e) }
-        }
-
-        keys.clear()
-      }
-    }
 
     override fun update(e: AnActionEvent) {
       // Special processing of esc.
@@ -242,30 +219,6 @@ internal class NerdTree : VimExtension {
       }
 
       private const val ESCAPE_KEY_CODE = 27
-    }
-
-    /**
-     * getDefaultKeyStroke is needed for NEO layout keyboard VIM-987
-     * but we should cache the value because on the second call (isEnabled -> actionPerformed)
-     * the event is already consumed
-     */
-    private var keyStrokeCache: Pair<KeyEvent?, KeyStroke?> = null to null
-
-    private fun getKeyStroke(e: AnActionEvent): KeyStroke? {
-      val inputEvent = e.inputEvent
-      if (inputEvent is KeyEvent) {
-        val defaultKeyStroke = KeyStrokeAdapter.getDefaultKeyStroke(inputEvent)
-        val strokeCache = keyStrokeCache
-        if (defaultKeyStroke != null) {
-          keyStrokeCache = inputEvent to defaultKeyStroke
-          return defaultKeyStroke
-        } else if (strokeCache.first === inputEvent) {
-          keyStrokeCache = null to null
-          return strokeCache.second
-        }
-        return KeyStroke.getKeyStrokeForEvent(inputEvent)
-      }
-      return null
     }
   }
 

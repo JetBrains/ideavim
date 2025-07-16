@@ -1,0 +1,65 @@
+/*
+ * Copyright 2003-2025 The IdeaVim authors
+ *
+ * Use of this source code is governed by an MIT-style
+ * license that can be found in the LICENSE.txt file or at
+ * https://opensource.org/licenses/MIT.
+ */
+
+package com.maddyhome.idea.vim.extension.nerdtree
+
+import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.project.DumbAwareAction
+import com.intellij.ui.KeyStrokeAdapter
+import com.maddyhome.idea.vim.newapi.vim
+import java.awt.event.KeyEvent
+import javax.swing.KeyStroke
+
+/**
+ * Handles keyboard shortcuts and delegates them to appropriate actions.
+ */
+internal abstract class AbstractDispatcher(private val mappings: Mappings) : DumbAwareAction() {
+  private val keys = mutableListOf<KeyStroke>()
+
+  override fun actionPerformed(e: AnActionEvent) {
+    var keyStroke = getKeyStroke(e) ?: return
+    val keyChar = keyStroke.keyChar
+    if (keyChar != KeyEvent.CHAR_UNDEFINED) {
+      keyStroke = KeyStroke.getKeyStroke(keyChar)
+    }
+
+    keys.add(keyStroke)
+    mappings.getAction(keys)?.let { action ->
+      when (action) {
+        is NerdAction.ToIj -> NerdTree.Util.callAction(null, action.name, e.dataContext.vim)
+        is NerdAction.Code -> e.project?.let { action.action(it, e.dataContext, e) }
+      }
+
+      keys.clear()
+    }
+  }
+
+  /**
+   * getDefaultKeyStroke is needed for NEO layout keyboard VIM-987
+   * but we should cache the value because on the second call (isEnabled -> actionPerformed)
+   * the event is already consumed
+   */
+  private var keyStrokeCache: Pair<KeyEvent?, KeyStroke?> = null to null
+
+  private fun getKeyStroke(e: AnActionEvent): KeyStroke? {
+    val inputEvent = e.inputEvent
+    if (inputEvent is KeyEvent) {
+      val defaultKeyStroke = KeyStrokeAdapter.getDefaultKeyStroke(inputEvent)
+      val strokeCache = keyStrokeCache
+      if (defaultKeyStroke != null) {
+        keyStrokeCache = inputEvent to defaultKeyStroke
+        return defaultKeyStroke
+      } else if (strokeCache.first === inputEvent) {
+        keyStrokeCache = null to null
+        return strokeCache.second
+      }
+      return KeyStroke.getKeyStrokeForEvent(inputEvent)
+    }
+    return null
+  }
+}
