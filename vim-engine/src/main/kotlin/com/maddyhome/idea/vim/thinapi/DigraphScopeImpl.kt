@@ -16,16 +16,16 @@ class DigraphScopeImpl() : DigraphScope {
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!
 
-  override suspend fun getCharacter(ch1: Char, ch2: Char): Int {
+  override fun getCharacter(ch1: Char, ch2: Char): Int {
     return injector.digraphGroup.getCharacterForDigraph(ch1, ch2)
   }
 
-  override suspend fun addDigraph(ch1: Char, ch2: Char, codepoint: Int) {
+  override fun addDigraph(ch1: Char, ch2: Char, codepoint: Int) {
     val args = "$ch1$ch2 $codepoint"
     injector.digraphGroup.parseCommandLine(vimEditor, args)
   }
 
-  override suspend fun addDigraph(digraph: String, codepoint: Int) {
+  override fun addDigraph(digraph: String, codepoint: Int) {
     if (digraph.length != 2) {
       throw IllegalArgumentException("Digraph must be exactly two characters: $digraph")
     }
@@ -33,7 +33,7 @@ class DigraphScopeImpl() : DigraphScope {
     injector.digraphGroup.parseCommandLine(vimEditor, args)
   }
 
-  override suspend fun clearCustomDigraphs() {
+  override fun clearCustomDigraphs() {
     injector.digraphGroup.clearCustomDigraphs()
   }
 }

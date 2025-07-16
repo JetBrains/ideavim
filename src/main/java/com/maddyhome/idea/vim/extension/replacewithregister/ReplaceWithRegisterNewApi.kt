@@ -61,7 +61,7 @@ class ReplaceWithRegisterNewApi : VimPluginBase() {
     return true
   }
 
-  private suspend fun VimScope.rewriteMotion() {
+  private fun VimScope.rewriteMotion() {
     setOperatorFunction(OPERATOR_FUNC_NAME)
     normal("g@")
   }

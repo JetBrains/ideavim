@@ -24,14 +24,14 @@ class OptionScopeImpl: OptionScope() {
   private val optionGroup: VimOptionGroup
     get() = injector.optionGroup
 
-  override suspend fun <T> getOptionValueInternal(name: String, type: KType): T? {
+  override fun <T> getOptionValueInternal(name: String, type: KType): T? {
     val option = optionGroup.getOption(name) ?: return null
 
     val optionValue = optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(vimEditor))
     return injector.variableService.convertToKotlinType(optionValue, type)
   }
 
-  override suspend fun <T> setOptionInternal(name: String, value: T, type: KType, scope: String): Boolean {
+  override fun <T> setOptionInternal(name: String, value: T, type: KType, scope: String): Boolean {
     val option = optionGroup.getOption(name) ?: return false
 
     val optionValue = when (type.classifier) {
@@ -59,7 +59,7 @@ class OptionScopeImpl: OptionScope() {
     return true
   }
 
-  override suspend fun reset(name: String): Boolean {
+  override fun reset(name: String): Boolean {
     val option = optionGroup.getOption(name) ?: return false
     optionGroup.resetToDefaultValue(option, OptionAccessScope.EFFECTIVE(vimEditor))
     return true
