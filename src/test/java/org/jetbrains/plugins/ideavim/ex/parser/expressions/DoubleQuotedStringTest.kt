@@ -10,12 +10,13 @@ package org.jetbrains.plugins.ideavim.ex.parser.expressions
 
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.vimKeyStroke
+import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 import java.awt.event.InputEvent.CTRL_DOWN_MASK
 import javax.swing.KeyStroke.getKeyStroke
 import kotlin.test.assertEquals
 
-class DoubleQuotedStringTest {
+class DoubleQuotedStringTest : VimTestCase() {
 
   @Test
   fun `test three-digit octal number`() {
