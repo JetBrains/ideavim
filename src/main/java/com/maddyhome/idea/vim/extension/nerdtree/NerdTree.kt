@@ -17,6 +17,8 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.components.Service
+import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.project.DumbAwareAction
@@ -191,6 +193,7 @@ internal class NerdTree : VimExtension {
     }
   }
 
+  @Service(Service.Level.PROJECT)
   class NerdDispatcher : DumbAwareAction() {
     internal var waitForSearch = false
     internal var speedSearchListenerInstalled = false
@@ -238,7 +241,7 @@ internal class NerdTree : VimExtension {
 
     companion object {
       fun getInstance(project: Project): NerdDispatcher {
-        return project.getService(NerdDispatcher::class.java)
+        return project.service<NerdDispatcher>()
       }
 
       private const val ESCAPE_KEY_CODE = 27
@@ -556,9 +559,7 @@ private fun registerCommand(variable: String, defaultMapping: String, action: Ne
 
 private fun registerCommand(mapping: String, action: NerdAction) {
   actionsRoot.add(mapping, action)
-  injector.parser.parseKeys(mapping).forEach {
-    distinctShortcuts.add(it)
-  }
+  distinctShortcuts.addAll(injector.parser.parseKeys(mapping))
 }
 
 private val actionsRoot: KeyStrokeTrie<NerdAction> = KeyStrokeTrie<NerdAction>("NERDTree")
