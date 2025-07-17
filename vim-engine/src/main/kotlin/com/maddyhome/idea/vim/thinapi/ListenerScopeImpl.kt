@@ -25,7 +25,6 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.VimPluginListener
 import com.maddyhome.idea.vim.common.VimYankListener
 import com.maddyhome.idea.vim.key.MappingOwner
-import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 import kotlinx.coroutines.runBlocking
 import com.maddyhome.idea.vim.state.mode.Mode as EngineMode
 
@@ -183,19 +182,5 @@ class ListenerScopeImpl(
       }
     }
     injector.listenersNotifier.vimPluginListeners.add(listener)
-  }
-
-  override fun onGlobalOptionChange(optionName: String, callback: suspend VimScope.() -> Unit) {
-    val option = injector.optionGroup.getOption(optionName) ?: return
-    val listener = object : GlobalOptionChangeListener, ListenerBase(listenerOwner) {
-      override fun onGlobalOptionChanged() {
-        val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
-        launch {
-          vimScope.callback()
-        }
-      }
-    }
-    // todo: this listener should be added to the VimListenerNotifier
-    injector.optionGroup.addGlobalOptionChangeListener(option, listener)
   }
 }
