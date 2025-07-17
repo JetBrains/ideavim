@@ -25,14 +25,6 @@ class DigraphScopeImpl() : DigraphScope {
     injector.digraphGroup.parseCommandLine(vimEditor, args)
   }
 
-  override fun addDigraph(digraph: String, codepoint: Int) {
-    if (digraph.length != 2) {
-      throw IllegalArgumentException("Digraph must be exactly two characters: $digraph")
-    }
-    val args = "$digraph $codepoint"
-    injector.digraphGroup.parseCommandLine(vimEditor, args)
-  }
-
   override fun clearCustomDigraphs() {
     injector.digraphGroup.clearCustomDigraphs()
   }

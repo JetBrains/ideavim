@@ -37,18 +37,6 @@ interface DigraphScope {
   fun addDigraph(ch1: Char, ch2: Char, codepoint: Int)
 
   /**
-   * Adds a custom digraph using a string representation.
-   *
-   * In Vim, this is equivalent to the `:digraph` command with arguments.
-   * Example: `:digraph a: 228` adds a digraph where 'a:' produces 'ä'
-   *
-   * @param digraph A string containing exactly two characters representing the digraph
-   * @param codepoint The Unicode codepoint of the character to associate with the digraph
-   * @throws IllegalArgumentException if the digraph string does not contain exactly two characters
-   */
-  fun addDigraph(digraph: String, codepoint: Int)
-
-  /**
    * Clears all custom digraphs.
    *
    * Note: Vim does not provide a built-in command to clear custom digraphs.
