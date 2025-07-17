@@ -164,7 +164,7 @@ abstract class VimScope {
    * @param ignoreCase Whether to ignore case when matching
    * @return True if the pattern matches the text, false otherwise
    */
-  abstract fun matches(pattern: String, text: String?, ignoreCase: Boolean = false): Boolean
+  abstract fun matches(pattern: String, text: String, ignoreCase: Boolean = false): Boolean
 
   /**
    * Finds all matches of a pattern in a text.

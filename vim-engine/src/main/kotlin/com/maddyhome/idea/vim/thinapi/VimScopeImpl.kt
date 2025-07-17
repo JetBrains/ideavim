@@ -215,7 +215,7 @@ open class VimScopeImpl(
     injector.tabService.closeAllExceptCurrentTab(vimContext)
   }
 
-  override fun matches(pattern: String, text: String?, ignoreCase: Boolean): Boolean {
+  override fun matches(pattern: String, text: String, ignoreCase: Boolean): Boolean {
     return injector.regexpService.matches(pattern, text, ignoreCase)
   }
 
