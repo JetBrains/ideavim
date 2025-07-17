@@ -380,6 +380,14 @@ abstract class VimVariableServiceBase : VariableService {
         }
       }
 
+      Float::class -> {
+        if (vimDataType is VimFloat) {
+          vimDataType.value.toFloat()
+        } else {
+          throw IllegalArgumentException("Expected Float, but got ${vimDataType::class.simpleName}")
+        }
+      }
+
       List::class -> {
         if (vimDataType is VimList) {
           val list = mutableListOf<Any>()
@@ -443,6 +451,7 @@ abstract class VimVariableServiceBase : VariableService {
       String::class -> VimString(value as String)
       Boolean::class -> if (value as Boolean) VimInt.ONE else VimInt.ZERO
       Double::class -> VimFloat(value as Double)
+      Float::class -> VimFloat((value as Float).toDouble())
 
       List::class -> {
         val list = value as List<*>

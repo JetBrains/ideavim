@@ -24,6 +24,17 @@ abstract class VimScope {
   @PublishedApi
   internal fun <T : Any> getVariable(name: String, type: KType): T? = getVariableInternal(name, type)
 
+  /**
+   * Retrieves a variable of the specified type and name.
+   *
+   * @param name The name of the variable to retrieve.
+   * @return The variable of type `T` if found, otherwise `null`.
+   *
+   * Example usage:
+   * ```
+   * val value: String? = getVariable<String>("myVariable")
+   * ```
+   */
   inline fun <reified T : Any> getVariable(name: String): T? {
     val kType: KType = typeOf<T>()
     return getVariable(name, kType)
