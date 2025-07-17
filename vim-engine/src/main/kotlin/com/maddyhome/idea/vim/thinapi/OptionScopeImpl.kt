@@ -28,7 +28,38 @@ class OptionScopeImpl: OptionScope() {
     val option = optionGroup.getOption(name) ?: return null
 
     val optionValue = optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(vimEditor))
-    return injector.variableService.convertToKotlinType(optionValue, type)
+
+    val kotlinType = type.classifier ?: return null
+    val kotlinValue = when (optionValue) {
+      is VimInt -> {
+        val intValue = optionValue.value
+        when(kotlinType) {
+          Int::class -> intValue
+          Boolean::class -> intValue == VimInt.ONE.value
+
+          else -> {
+            throw IllegalArgumentException("Wrong option type. Expected boolean or integer, got $kotlinType. Option name: $name, value: $intValue.")
+          }
+        }
+      }
+
+      is VimString -> {
+        val stringValue = optionValue.value
+        when(kotlinType) {
+          String::class -> optionValue.value
+
+          else -> {
+            throw IllegalArgumentException("Wrong option type. Expected string, got $kotlinType. Option name: $name, value: $stringValue")
+          }
+        }
+      }
+
+      else -> {
+        throw IllegalArgumentException("Options can only be of types string, integer and boolean.")
+      }
+    }
+
+    return kotlinValue as T?
   }
 
   override fun <T> setOptionInternal(name: String, value: T, type: KType, scope: String): Boolean {
@@ -47,7 +78,9 @@ class OptionScopeImpl: OptionScope() {
         if (value as Boolean) VimInt.ONE else VimInt.ZERO
       }
 
-      else -> return false
+      else -> {
+        throw IllegalArgumentException("Options can only be of types string, integer and boolean")
+      }
     }
     val optionAccessScope = when (scope) {
       "global" -> OptionAccessScope.GLOBAL(vimEditor)
