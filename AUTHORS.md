@@ -618,10 +618,10 @@ Contributors:
   [![icon][github]](https://github.com/wxh06)
   &nbsp;
   Xinhe Wang
-* [![icon][mail]](mailto:50877692+zuberol@users.noreply.github.com)
+* [![icon][mail]](mailto:zuber.kuba@gmail.com)
   [![icon][github]](https://github.com/zuberol)
   &nbsp;
-  zuberol
+  Jakub Zuber
 
 Previous contributors:
 
