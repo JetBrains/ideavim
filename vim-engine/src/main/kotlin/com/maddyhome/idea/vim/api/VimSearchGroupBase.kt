@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.helper.SearchOptions
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.isCloseKeyStroke
-import com.maddyhome.idea.vim.history.HistoryConstants
+import com.maddyhome.idea.vim.history.VimHistory
 import com.maddyhome.idea.vim.key.interceptors.VimInputInterceptorBase
 import com.maddyhome.idea.vim.regexp.CharPointer
 import com.maddyhome.idea.vim.regexp.VimRegex
@@ -1282,7 +1282,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
 
     // This will remove an existing entry and add it back to the end, and is expected to do so even if the string value
     // is the same
-    injector.historyGroup.addEntry(HistoryConstants.SEARCH, pattern)
+    injector.historyGroup.addEntry(VimHistory.Type.Search, pattern)
 
   }
 

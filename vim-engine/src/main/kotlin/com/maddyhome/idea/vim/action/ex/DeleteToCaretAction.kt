@@ -28,10 +28,7 @@ class DeleteToCaretAction : VimActionHandler.SingleExecution() {
     operatorArguments: OperatorArguments,
   ): Boolean {
     val commandLine = injector.commandLine.getActiveCommandLine() ?: return false
-    val oldText = commandLine.actualText
-    val newText = oldText.substring(commandLine.caret.offset)
-    commandLine.setText(newText)
-    commandLine.caret.offset = 0
+    commandLine.deleteText(0, commandLine.caret.offset)
     return true
   }
 }

@@ -13,24 +13,11 @@ import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 
 open class VimHistoryBase : VimHistory {
-  val histories: MutableMap<VimHistory.Type, HistoryBlock> = mutableMapOf()
-
-  @Deprecated("Please use fun addEntry(type: Type, text: String)")
-  override fun addEntry(key: String, text: String) {
-    val type = getTypeForString(key)
-    addEntry(type, text)
-
-  }
+  protected val histories: MutableMap<VimHistory.Type, HistoryBlock> = mutableMapOf()
 
   override fun addEntry(type: VimHistory.Type, text: String) {
     val block = blocks(type)
     block.addEntry(text)
-  }
-
-  @Deprecated("Please use fun getEntries(type: Type, text: String)")
-  override fun getEntries(key: String, first: Int, last: Int): List<HistoryEntry> {
-    val type = getTypeForString(key)
-    return getEntries(type, first, last)
   }
 
   override fun getEntries(type: VimHistory.Type, first: Int, last: Int): List<HistoryEntry> {
@@ -40,6 +27,9 @@ open class VimHistoryBase : VimHistory {
 
     val entries = block.getEntries()
     val res = ArrayList<HistoryEntry>()
+    if (myFirst == 0 && myLast == 0) {
+      myLast = Integer.MAX_VALUE
+    }
     if (myFirst < 0) {
       myFirst = if (-myFirst > entries.size) {
         Integer.MAX_VALUE
@@ -56,7 +46,7 @@ open class VimHistoryBase : VimHistory {
         entry.number
       }
     } else if (myLast == 0) {
-      myLast = Integer.MAX_VALUE
+      myLast = myFirst
     }
 
     logger.debug { "first=$myFirst\nlast=$myLast" }
@@ -70,18 +60,12 @@ open class VimHistoryBase : VimHistory {
     return res
   }
 
-  private fun blocks(type: VimHistory.Type): HistoryBlock {
-    return histories.getOrPut(type) { HistoryBlock() }
+  override fun resetHistory() {
+    histories.clear()
   }
 
-  protected fun getTypeForString(key: String): VimHistory.Type {
-    return when (key) {
-      HistoryConstants.SEARCH -> VimHistory.Type.Search
-      HistoryConstants.COMMAND -> VimHistory.Type.Command
-      HistoryConstants.EXPRESSION -> VimHistory.Type.Expression
-      HistoryConstants.INPUT -> VimHistory.Type.Input
-      else -> VimHistory.Type.Custom(key)
-    }
+  private fun blocks(type: VimHistory.Type): HistoryBlock {
+    return histories.getOrPut(type) { HistoryBlock() }
   }
 
   companion object {

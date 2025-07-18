@@ -7,81 +7,25 @@
  */
 package com.maddyhome.idea.vim.ui.ex
 
-import com.maddyhome.idea.vim.KeyHandler
-import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.annotations.NonNls
-import java.awt.event.ActionEvent
-import java.awt.event.KeyEvent
-import javax.swing.KeyStroke
-import javax.swing.text.DefaultEditorKit
-import javax.swing.text.Document
+import javax.swing.text.AbstractDocument
+import javax.swing.text.StyledEditorKit
+import javax.swing.text.ViewFactory
 
-@Deprecated("ExCommands should be migrated to KeyHandler like commands for other modes")
-internal object ExEditorKit : DefaultEditorKit() {
-  /**
-   * Gets the MIME type of the data that this
-   * kit represents support for.
-   *
-   * @return the type
-   */
+internal object ExEditorKit : StyledEditorKit() {
   @NonNls
-  override fun getContentType(): String {
-    return "text/ideavim"
-  }
+  override fun getContentType() = "text/ideavim"
+  override fun createDefaultDocument() = ExDocument()
 
-  /**
-   * Creates an uninitialized text storage model
-   * that is appropriate for this type of editor.
-   *
-   * @return the model
-   */
-  override fun createDefaultDocument(): Document {
-    return ExDocument()
-  }
-
-  class DefaultExKeyHandler : DefaultKeyTypedAction() {
-    override fun actionPerformed(e: ActionEvent) {
-      val target = getTextComponent(e) as ExTextField
-
-      val key = convert(e)
-      if (key != null) {
-        val c = key.keyChar
-        if (c.code > 0) {
-          if (target.useHandleKeyFromEx) {
-            val panel = ((injector.commandLine.getActiveCommandLine() as? ExEntryPanel)
-              ?: (injector.modalInput.getCurrentModalInput() as? WrappedAsModalInputExEntryPanel)?.exEntryPanel)
-              ?: return
-            val entry = panel.entry
-            val editor = entry.editor
-            val keyHandler = KeyHandler.getInstance()
-            keyHandler.handleKey(editor!!.vim, key, entry.context.vim, keyHandler.keyHandlerState)
-          } else {
-            val event = ActionEvent(e.source, e.id, c.toString(), e.getWhen(), e.modifiers)
-            super.actionPerformed(event)
-          }
-          target.saveLastEntry()
-        }
-      } else {
-        super.actionPerformed(e)
-        target.saveLastEntry()
-      }
+  override fun getViewFactory() = ViewFactory { elem ->
+    // Hierarchy for a styled document is section -> paragraph -> content/non-printable
+    // For our document there will be one section, one paragraph and at least one content/non-printable
+    // (A PlainDocument just contains a single content element)
+    when (elem.name) {
+      AbstractDocument.SectionElementName -> ScrollingInlineCompositeView(elem)
+      AbstractDocument.ParagraphElementName -> InlineCompositeView(elem)
+      ExDocument.NonPrintableElementName -> ExNonPrintableFieldView(elem)
+      else -> super.viewFactory.create(elem)
     }
-  }
-
-  fun convert(event: ActionEvent): KeyStroke? {
-    val cmd = event.actionCommand
-    val mods = event.modifiers
-    if (cmd != null && cmd.isNotEmpty()) {
-      val ch = cmd[0]
-      if (ch < ' ') {
-        if (mods and ActionEvent.CTRL_MASK != 0) {
-          return KeyStroke.getKeyStroke(KeyEvent.VK_A + ch.code - 1, mods)
-        }
-      } else {
-        return KeyStroke.getKeyStroke(Character.valueOf(ch), mods)
-      }
-    }
-    return null
   }
 }

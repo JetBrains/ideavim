@@ -8,17 +8,17 @@
 
 package com.maddyhome.idea.vim.ui.ex;
 
-import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.textarea.TextComponentEditor;
 import com.intellij.ui.paint.PaintUtil;
 import com.intellij.util.ui.JBUI;
-import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.api.VimCommandLine;
 import com.maddyhome.idea.vim.api.VimCommandLineCaret;
+import com.maddyhome.idea.vim.helper.EngineStringHelper;
 import com.maddyhome.idea.vim.helper.UiHelper;
-import com.maddyhome.idea.vim.history.HistoryConstants;
-import com.maddyhome.idea.vim.history.HistoryEntry;
+import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext;
 import com.maddyhome.idea.vim.options.helpers.GuiCursorAttributes;
 import com.maddyhome.idea.vim.options.helpers.GuiCursorMode;
 import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper;
@@ -29,32 +29,34 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
 
 import javax.swing.*;
-import javax.swing.plaf.basic.BasicTextFieldUI;
 import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.util.Date;
-import java.util.List;
+import java.util.Objects;
 
 import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 
 /**
- * Provides a custom keymap for the text field. The keymap is the VIM Ex command keymapping
+ * A custom text field for the Ex command line.
+ * <p>
+ * Note that because this is an instance of {@link JTextComponent}, anything that looks for an IntelliJ {@link Editor}
+ * in current data context will get an instance of {@link TextComponentEditor}, which means that normal IntelliJ
+ * shortcuts and actions will work with the Ex command line, even if they're not supposed to. E.g., CMD+V will paste on
+ * Mac, but CTRL+V on Windows won't, because the Ex command line handles that shortcut. I don't see a way to fix this.
+ * </p>
  */
 public class ExTextField extends JTextField {
+  private final ExEntryPanel myParentPanel;
 
-  public static final @NonNls String KEYMAP_NAME = "ex";
+  ExTextField(ExEntryPanel parentPanel) {
+    myParentPanel = parentPanel;
 
-  public boolean useHandleKeyFromEx = true;
-
-  ExTextField() {
     // We need to store this in a field, because we can't trust getCaret(), as it will return an instance of
     // ComposedTextCaret when working with dead keys or input methods
     caret = new CommandLineCaret();
@@ -62,16 +64,10 @@ public class ExTextField extends JTextField {
     setCaret(caret);
     setNormalModeCaret();
 
+    final Style defaultStyle = ((StyledDocument)getDocument()).getStyle(StyleContext.DEFAULT_STYLE);
+    StyleConstants.setForeground(defaultStyle, getForeground());
+
     addCaretListener(e -> resetCaret());
-    addMouseListener(new MouseAdapter() {
-      @Override
-      public void mouseClicked(MouseEvent e) {
-        // If we're in the middle of an action (e.g. entering a register to paste, or inserting a digraph), cancel it if
-        // the mouse is clicked anywhere. Vim's behavior is to use the mouse click as an event, which can lead to
-        // something like : !%!C, which I don't believe is documented, or useful
-        super.mouseClicked(e);
-      }
-    });
   }
 
   void reset() {
@@ -81,8 +77,6 @@ public class ExTextField extends JTextField {
 
   void deactivate() {
     clearCurrentAction();
-    ExEntryPanel.getInstance().setEditor(null);
-    context = null;
   }
 
   @Override
@@ -101,92 +95,31 @@ public class ExTextField extends JTextField {
     // Override the default look and feel specific UI so we can have a completely borderless and margin-less text field.
     // (See TextFieldWithPopupHandlerUI#getDefaultMargins and derived classes). This allows us to draw the text field
     // directly next to the label
-    setUI(new BasicTextFieldUI());
+    setUI(new ExTextFieldUI(ExEditorKit.INSTANCE));
     invalidate();
 
     setBorder(null);
-
-    // Do not override getActions() method, because it is has side effect: propagates these actions to defaults.
-    final Action[] actions = ExEditorKit.INSTANCE.getActions();
-    final ActionMap actionMap = getActionMap();
-    for (Action a : actions) {
-      actionMap.put(a.getValue(Action.NAME), a);
-      //System.out.println("  " + a.getValue(Action.NAME));
-    }
-
-    setInputMap(WHEN_FOCUSED, new InputMap());
-    Keymap map = addKeymap(KEYMAP_NAME, getKeymap());
-    loadKeymap(map, ExKeyBindings.INSTANCE.getBindings(), actions);
-    map.setDefaultAction(new ExEditorKit.DefaultExKeyHandler());
-    setKeymap(map);
-  }
-
-  void setType(@NotNull String type) {
-    String hkey = switch (type.charAt(0)) {
-      case '/', '?' -> HistoryConstants.SEARCH;
-      case ':' -> HistoryConstants.COMMAND;
-      default -> null;
-    };
-
-    if (hkey != null) {
-      history = VimPlugin.getHistory().getEntries(hkey, 0, 0);
-      histIndex = history.size();
-    }
   }
 
   /**
-   * Stores the current text for use in filtering history. Required for scrolling through multiple history entries
+   * Stores the current text as the last edited entry in the command line's history
    * <p>
-   * Called whenever the text is changed, either by typing, or by special characters altering the text (e.g. Delete)
+   * This method is called whenever the text is changed by the user, either by typing, cut/paste or delete. It remembers
+   * the current text as the last entry in the command line's history, so that we can scroll into the past, and then
+   * return to the uncommitted text we were previously editing.
+   * </p>
    */
   void saveLastEntry() {
-    lastEntry = super.getText();
+    myParentPanel.setLastEntry(super.getText());
   }
 
-  void selectHistory(boolean isUp, boolean filter) {
-    int dir = isUp ? -1 : 1;
-    if (histIndex + dir < 0 || histIndex + dir > history.size()) {
-      VimPlugin.indicateError();
-
-      return;
-    }
-
-    if (filter) {
-      for (int i = histIndex + dir; i >= 0 && i <= history.size(); i += dir) {
-        String txt;
-        if (i == history.size()) {
-          txt = lastEntry;
-        }
-        else {
-          HistoryEntry entry = history.get(i);
-          txt = entry.getEntry();
-        }
-
-        if (txt.startsWith(lastEntry)) {
-          updateText(txt);
-          histIndex = i;
-
-          return;
-        }
-      }
-
-      VimPlugin.indicateError();
-    }
-    else {
-      histIndex += dir;
-      String txt;
-      if (histIndex == history.size()) {
-        txt = lastEntry;
-      }
-      else {
-        HistoryEntry entry = history.get(histIndex);
-        txt = entry.getEntry();
-      }
-
-      updateText(txt);
-    }
-  }
-
+  /**
+   * Update the text in the text field without saving it as the current/last entry in the command line's history
+   * <p>
+   * This is used to update the text to another entry in the command line's history, without losing the current/last
+   * entry.
+   * </p>
+   */
   void updateText(String string) {
     super.setText(string);
     setFontToJField(string);
@@ -200,64 +133,146 @@ public class ExTextField extends JTextField {
     setFontToJField(string);
   }
 
+  public void insertText(int offset, String text) {
+    try {
+      // Note that ExDocument.insertString handles overwrite, but not replace mode!
+      getDocument().insertString(offset, text, null);
+    }
+    catch (BadLocationException e) {
+      logger.error(e);
+    }
+    saveLastEntry();
+    setFontToJField(getText());
+  }
+
+  public void deleteText(int offset, int length) {
+    try {
+      getDocument().remove(offset, Math.min(length, getDocument().getLength() - offset));
+    }
+    catch (BadLocationException e) {
+      logger.error(e);
+    }
+    saveLastEntry();
+    setFontToJField(getText());
+  }
+
   // VIM-570
   private void setFontToJField(String stringToDisplay) {
-    super.setFont(UiHelper.selectEditorFont(getEditor(), stringToDisplay));
+    setFont(UiHelper.selectEditorFont(myParentPanel.getIjEditor(), stringToDisplay));
   }
 
-  void setEditor(@NotNull Editor editor, DataContext context) {
-    this.context = context;
-    ExEntryPanel.getInstance().setEditor(editor);
-  }
-
-  public @Nullable Editor getEditor() {
-    return ExEntryPanel.getInstance().getIjEditor();
-  }
-
-  public DataContext getContext() {
-    return context;
-  }
-
-  public void handleKey(@NotNull KeyStroke stroke) {
-    if (logger.isDebugEnabled()) logger.debug("stroke=" + stroke);
-    final char keyChar = stroke.getKeyChar();
-    char c = keyChar;
-    final int modifiers = stroke.getModifiers();
-    final int keyCode = stroke.getKeyCode();
-    if ((modifiers & KeyEvent.CTRL_DOWN_MASK) != 0) {
-      final int codePoint = keyCode - KeyEvent.VK_A + 1;
-      if (codePoint > 0) {
-        c = Character.toChars(codePoint)[0];
+  @Override
+  public void setFont(Font f) {
+    super.setFont(f);
+    final Document document = getDocument();
+    if (document instanceof StyledDocument styledDocument) {
+      final Style defaultStyle = styledDocument.getStyle(StyleContext.DEFAULT_STYLE);
+      if (!Objects.equals(StyleConstants.getFontFamily(defaultStyle), getFont().getFamily())) {
+        StyleConstants.setFontFamily(defaultStyle, getFont().getFamily());
+      }
+      if (!Objects.equals(StyleConstants.getFontSize(defaultStyle), getFont().getSize())) {
+        StyleConstants.setFontSize(defaultStyle, getFont().getSize());
       }
     }
+  }
 
-    // Make sure the current action sees any subsequent keystrokes, and they're not processed by Swing's action system.
-    // Note that this will only handle simple characters and any control characters that are already registered against
-    // ExShortcutKeyAction - any other control characters will can be "stolen" by other IDE actions.
-    // If we need to capture ANY subsequent keystroke (e.g. for ^V<Tab>, or to stop the Swing standard <C-A> going to
-    // start of line), we should replace ExShortcutAction with a dispatcher registered with IdeEventQueue#addDispatcher.
-    // This gets called for ALL events, before the IDE starts to process key events for the action system. We can add a
-    // dispatcher that checks that the plugin is enabled, checks that the component with the focus is ExTextField,
-    // dispatch to ExEntryPanel#handleKey and if it's processed, mark the event as consumed.
-    KeyEvent event = new KeyEvent(this, keyChar != KeyEvent.CHAR_UNDEFINED
-                                        ? KeyEvent.KEY_TYPED
-                                        : (stroke.isOnKeyRelease() ? KeyEvent.KEY_RELEASED : KeyEvent.KEY_PRESSED),
-                                  (new Date()).getTime(), modifiers, keyCode, c);
+  @Override
+  public void setForeground(Color fg) {
+    super.setForeground(fg);
+    final Document document = getDocument();
+    if (document instanceof StyledDocument styledDocument) {
+      final Style defaultStyle = styledDocument.getStyle(StyleContext.DEFAULT_STYLE);
+      StyleConstants.setForeground(defaultStyle, fg);
+    }
+  }
 
-    useHandleKeyFromEx = false;
-    try {
+  public void setSpecialKeyForeground(Color fg) {
+    final Document document = getDocument();
+    if (document instanceof ExDocument exDocument) {
+      exDocument.setSpecialKeyForeground(fg);
+    }
+  }
+
+  /**
+   * Finish handling the keystroke
+   * <p>
+   * When the key event is first received, the keystroke is sent to the key handler to handle commands or for mapping.
+   * The potentially mapped keystroke is then returned to the text field to complete handling. Typically, the only
+   * keystrokes passed are typed characters, along with pressed shortcuts that aren't recognised as commands (they won't
+   * be recognised by the text field either; we don't register any commands).
+   * </p>
+   * @param stroke  The potentially mapped keystroke
+   */
+  public void handleKey(@NotNull KeyStroke stroke) {
+    if (logger.isDebugEnabled()) logger.debug("stroke=" + stroke);
+
+    // Typically, we would let the super class handle the keystroke. It would use any registered keybindings to convert
+    // it to an action handler, or use the default handler (we don't actually have any keybindings). The default action
+    // handler adds all non-control characters to the text field. We want to add all characters, so if we have an
+    // actual character, just add it. Anything else, we'll pass to the super class like before (even though it's unclear
+    // what it will do with the keystroke)
+    if (stroke.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
+      replaceSelection(String.valueOf(stroke.getKeyChar()));
+    }
+    else {
+      //noinspection MagicConstant
+      KeyEvent event = new KeyEvent(this, stroke.getKeyEventType(), (new Date()).getTime(), stroke.getModifiers(),
+                                    stroke.getKeyCode(), stroke.getKeyChar());
+
+      // Call super to avoid recursion!
       super.processKeyEvent(event);
     }
-    finally {
-      useHandleKeyFromEx = true;
-    }
+
+    saveLastEntry();
   }
 
   @Override
   protected void processKeyEvent(KeyEvent e) {
     if (logger.isDebugEnabled()) logger.debug("key=" + e);
-    super.processKeyEvent(e);
+
+    // The user has pressed or typed a key. The text field is first notified of a KEY_PRESSED event. If it's a simple
+    // text character, it will be translated to a KEY_TYPED event with a keyChar, and we'll be notified again. We'll
+    // forward this typed key to the key handler, which will potentially map it to another keystroke and return it to
+    // the text field via ExTextField.handleKey.
+    // If it's not a simple text character but a shortcut (i.e., a keypress with one or more modifiers), then it will be
+    // handled in the same way as a shortcut activated in the main editor. That is, the IntelliJ action system sees the
+    // KEY_PRESSED event first and dispatches it to IdeaVim's action handler, which pushes it through the key handler
+    // and invokes the action. The event is handled before this component sees it! This method is not called for
+    // registered action shortcuts. It is called for other shortcuts, and we pass those on to the super class.
+    // (We should consider passing these to the key handler too, so that "insert literal" (<C-V>) will convert them to
+    // typed keys and display them in the text field. As it happens, Vim has shortcuts for all control characters, and
+    // it's unclear if/how we should represent other modifier-based shortcuts)
+    // Note that Enter and Escape are registered as editor actions rather than action shortcuts. Therefore, we have to
+    // handle them separately, as key presses, but not as typed characters.
+    if (isAllowedPressedEvent(e) || isAllowedTypedEvent(e)) {
+      var editor = myParentPanel.getEditor();
+      var keyHandler = KeyHandler.getInstance();
+      var keyStroke = KeyStroke.getKeyStrokeForEvent(e);
+      keyHandler.handleKey(editor, keyStroke, new IjEditorExecutionContext(myParentPanel.getContext()),
+                           keyHandler.getKeyHandlerState());
+      e.consume();
+    }
+    else {
+      super.processKeyEvent(e);
+    }
   }
+
+  private boolean isAllowedTypedEvent(KeyEvent event) {
+    return event.getID() == KeyEvent.KEY_TYPED && !isKeyCharEnterOrEscape(event.getKeyChar());
+  }
+
+  private boolean isAllowedPressedEvent(KeyEvent event) {
+    return event.getID() == KeyEvent.KEY_PRESSED && isKeyCodeEnterOrEscape(event.getKeyCode());
+  }
+
+  private boolean isKeyCharEnterOrEscape(char keyChar) {
+    return keyChar == '\n' || keyChar == '\u001B';
+  }
+
+  private boolean isKeyCodeEnterOrEscape(int keyCode) {
+    return keyCode == KeyEvent.VK_ENTER || keyCode == KeyEvent.VK_ESCAPE;
+  }
+
 
   /**
    * Creates the default implementation of the model
@@ -269,24 +284,6 @@ public class ExTextField extends JTextField {
   @Override
   protected @NotNull Document createDefaultModel() {
     return new ExDocument();
-  }
-
-  /**
-   * Cancels current action, if there is one. If not, cancels entry.
-   */
-  void escape() {
-    cancel();
-  }
-
-  /**
-   * Cancels entry, including any current action.
-   */
-  void cancel() {
-    clearCurrentAction();
-    VimCommandLine commandLine = injector.getCommandLine().getActiveCommandLine();
-    if (commandLine != null) {
-      commandLine.close(true, true);
-    }
   }
 
   public void clearCurrentAction() {
@@ -418,7 +415,7 @@ public class ExTextField extends JTextField {
         final FontMetrics fm = component.getFontMetrics(component.getFont());
         if (!hasFocus) {
           final float outlineThickness = (float)PaintUtil.alignToInt(1.0, g2d);
-          final double caretWidth = getCaretWidth(fm, r.getX(), 100);
+          final double caretWidth = getCaretWidth(fm, r.getX(), 100, false);
           final Area area = new Area(new Rectangle2D.Double(r.getX(), r.getY(), caretWidth, r.getHeight()));
           area.subtract(new Area(new Rectangle2D.Double(r.getX() + outlineThickness, r.getY() + outlineThickness,
                                                         caretWidth - (2 * outlineThickness),
@@ -427,7 +424,7 @@ public class ExTextField extends JTextField {
         }
         else {
           final double caretHeight = getCaretHeight(r.getHeight());
-          final double caretWidth = getCaretWidth(fm, r.getX(), thickness);
+          final double caretWidth = getCaretWidth(fm, r.getX(), thickness, true);
           Double rect = new Double(r.getX(), r.getY() + r.getHeight() - caretHeight, caretWidth, caretHeight);
           g2d.fill(rect);
         }
@@ -457,7 +454,7 @@ public class ExTextField extends JTextField {
         final FontMetrics fm = getComponent().getFontMetrics(getComponent().getFont());
         x = r.x;
         y = r.y;
-        width = (int)ceil(getCaretWidth(fm, r.x, 100)) + 1;
+        width = (int)ceil(getCaretWidth(fm, r.x, 100, false)) + 1;
         height = r.height;
         repaint();
       }
@@ -476,20 +473,26 @@ public class ExTextField extends JTextField {
       }
     }
 
-    private double getCaretWidth(FontMetrics fm, double dotX, int widthPercentage) {
+    private double getCaretWidth(FontMetrics fm, double dotX, int widthPercentage, boolean coerceCharacterWidth) {
       // Caret width is based on the distance to the next character. This isn't necessarily the same as the character
       // width. E.g. when using float coordinates, the width of a grid is 8.4, while the character width is only 8. This
-      // would give us a caret that is not wide enough
+      // would give us a caret that is not wide enough.
+      // We can also try to coerce to the width of the character, rather than using the View's width. This is so that
+      // non-printable characters have the same sized caret as printable characters. The only time we use full width
+      // with non-printable characters is when drawing the lost-focus caret (a box enclosing the character).
       double width;
       final Rectangle2D r = modelToView(getDot() + 1);
-      if (r != null) {
+      if (r != null && !coerceCharacterWidth) {
         width = r.getX() - dotX;
       }
       else {
         char c = ' ';
         try {
           if (getDot() < getComponent().getDocument().getLength()) {
-            c = getComponent().getText(getDot(), 1).charAt(0);
+            char documentChar = getComponent().getText(getDot(), 1).charAt(0);
+            if (EngineStringHelper.INSTANCE.isPrintableCharacter(documentChar)) {
+              c = documentChar;
+            }
           }
         }
         catch (BadLocationException e) {
@@ -525,11 +528,7 @@ public class ExTextField extends JTextField {
     return String.format("%s %d", caret.mode, caret.thickness);
   }
 
-  private DataContext context;
   private final CommandLineCaret caret;
-  String lastEntry;
-  private List<HistoryEntry> history;
-  int histIndex = 0;
   int currentActionPromptCharacterOffset = -1;
 
   private static final Logger logger = Logger.getInstance(ExTextField.class.getName());

@@ -31,7 +31,7 @@ class MoveCaretRightAction : VimActionHandler.SingleExecution() {
     val commandLine = injector.commandLine.getActiveCommandLine() ?: return false
     val caret = commandLine.caret
 
-    val nextOffset = Graphemes.next(commandLine.actualText, caret.offset) ?: return true
+    val nextOffset = Graphemes.next(commandLine.text, caret.offset) ?: return true
     caret.offset = nextOffset
 
     return true

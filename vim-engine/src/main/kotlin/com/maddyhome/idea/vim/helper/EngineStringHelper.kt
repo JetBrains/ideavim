@@ -69,6 +69,10 @@ object EngineStringHelper {
     }
     return String(Character.toChars(codepoint))
   }
+
+  fun isPrintableCharacter(c: Char) = c.code >= 32 && c.code != 127
+    && !CharacterHelper.isInvisibleControlCharacter(c.code)
+    && !CharacterHelper.isZeroWidthCharacter(c.code)
 }
 
 // https://stackoverflow.com/a/14652763/3124227

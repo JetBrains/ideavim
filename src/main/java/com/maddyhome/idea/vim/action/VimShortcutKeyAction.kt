@@ -265,7 +265,7 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
   private fun getEditor(e: AnActionEvent): Editor? {
     return e.getData(PlatformDataKeys.EDITOR)
       ?: if (e.getData(PlatformDataKeys.CONTEXT_COMPONENT) is ExTextField) {
-        ExEntryPanel.getInstance().ijEditor
+        ExEntryPanel.getOrCreateInstance().ijEditor
       } else {
         null
       }
