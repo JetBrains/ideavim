@@ -13,6 +13,9 @@ import com.intellij.ide.ui.LafManagerListener;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.wm.impl.IdeBackgroundUtil;
+import com.intellij.ui.ClientProperty;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.IJSwingUtilities;
 import com.maddyhome.idea.vim.KeyHandler;
@@ -44,7 +47,7 @@ import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 /**
  * This panel displays text in a <code>more</code> like window.
  */
-public class ExOutputPanel extends JPanel {
+public class ExOutputPanel extends JBPanel<ExOutputPanel> {
   private final @NotNull Editor myEditor;
 
   public final @NotNull JLabel myLabel = new JLabel("more");
@@ -86,6 +89,11 @@ public class ExOutputPanel extends JPanel {
     MoreKeyListener moreKeyListener = new MoreKeyListener(this);
     addKeyListener(moreKeyListener);
     myText.addKeyListener(moreKeyListener);
+
+    // Suppress the fancy frame background used in the Islands theme, which comes from a custom Graphics implementation
+    // applied to the IdeRoot, and used to paint all children, including this panel. This client property is checked by
+    // JBPanel.getComponentGraphics to give us the original Graphics, opting out of the fancy painting.
+    ClientProperty.putRecursive(this, IdeBackgroundUtil.NO_BACKGROUND, true);
 
     updateUI();
   }

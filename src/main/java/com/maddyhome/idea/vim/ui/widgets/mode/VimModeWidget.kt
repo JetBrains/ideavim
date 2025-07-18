@@ -16,6 +16,7 @@ import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.wm.CustomStatusBarWidget
 import com.intellij.openapi.wm.StatusBarWidgetFactory
 import com.intellij.openapi.wm.WindowManager
+import com.intellij.openapi.wm.impl.IdeBackgroundUtil
 import com.intellij.openapi.wm.impl.status.widget.StatusBarWidgetsManager
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.ui.components.JBLabel
@@ -24,6 +25,7 @@ import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import java.awt.Dimension
+import java.awt.Graphics
 import java.awt.Point
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -181,6 +183,14 @@ class VimModeWidget(val project: Project) : CustomStatusBarWidget, VimStatusBarW
     override fun getMaximumSize(): Dimension {
       val maximumSize = super.getMaximumSize()
       return Dimension(max(maximumSize.width, wordWidth + insets.width), maximumSize.height)
+    }
+
+    override fun getComponentGraphics(g: Graphics): Graphics {
+      // Opt out of the fancy frame background painting that is part of the Islands theme. This is implemented with a
+      // custom Graphics implementation that paints the nice background _after_ invoking any fill-like paint request
+      // (fillRect, etc.) Since we're part of the frame, we get the modified Graphics. Get the original Graphics so our
+      // background isn't overwritten.
+      return IdeBackgroundUtil.getOriginalGraphics(g)
     }
   }
 }
