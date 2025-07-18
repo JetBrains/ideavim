@@ -22,14 +22,14 @@ import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.key.KeyMappingLayer
 import com.maddyhome.idea.vim.key.MappingInfoLayer
 import com.maddyhome.idea.vim.state.KeyHandlerState
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 
 internal object MappingProcessor : KeyConsumer {
 
   private val log = vimLogger<MappingProcessor>()
 
   override fun consumeKey(
-    key: KeyStroke,
+    key: VimKeyStroke,
     editor: VimEditor,
     allowKeyMappings: Boolean,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
@@ -69,7 +69,7 @@ internal object MappingProcessor : KeyConsumer {
     return mappingProcessed
   }
 
-  private fun isMappingApplicable(commandBuilder: CommandBuilder, key: KeyStroke, keyState: KeyHandlerState): Boolean {
+  private fun isMappingApplicable(commandBuilder: CommandBuilder, key: VimKeyStroke, keyState: KeyHandlerState): Boolean {
     // Mapping is not applied to character/digraph arguments (e.g. `f{char}` or register names).
     // It's also not applied partway through an existing command - e.g. `<C-W>s` does not apply any maps for `s`.
     return !commandBuilder.isAwaitingCharOrDigraphArgument()
@@ -78,7 +78,7 @@ internal object MappingProcessor : KeyConsumer {
       && !isTypingZeroInCommandCount(key, keyState)
   }
 
-  private fun isTypingZeroInCommandCount(key: KeyStroke, keyState: KeyHandlerState): Boolean {
+  private fun isTypingZeroInCommandCount(key: VimKeyStroke, keyState: KeyHandlerState): Boolean {
     // "0" can be mapped, but the mapping isn't applied when entering a count. Other digits are always mapped, even when
     // entering a count. Note that the docs state that this is for Normal, but it also applies in Visual and Op-pending.
     // (E.g. `:imap 0 3` -> `d20w` will still delete 20 words, not 23, but `d0w` will delete 3, `2d0w` will delete 6).
@@ -105,7 +105,7 @@ internal object MappingProcessor : KeyConsumer {
     // completed sequence is not a prefix to itself - this function will return false unless it's also a prefix for
     // other mappings.
     if (!mapping.isPrefix(
-        keyProcessResultBuilder.state.mappingState.keys as? List<KeyStroke>
+        keyProcessResultBuilder.state.mappingState.keys as? List<VimKeyStroke>
           ?: keyProcessResultBuilder.state.mappingState.keys.toList()
       )
     ) {
@@ -165,7 +165,7 @@ internal object MappingProcessor : KeyConsumer {
     log.trace("Try processing complete mapping sequence...")
 
     val mappingState = keyProcessResultBuilder.state.mappingState
-    val mappingInfo = mapping.getLayer(mappingState.keys as? List<KeyStroke> ?: mappingState.keys.toList())
+    val mappingInfo = mapping.getLayer(mappingState.keys as? List<VimKeyStroke> ?: mappingState.keys.toList())
     if (mappingInfo == null) {
       log.trace("Cannot find any mapping info for the sequence. Mapping processor will not handle further.")
       return false
@@ -262,7 +262,7 @@ internal object MappingProcessor : KeyConsumer {
    * were typed.
    */
   private fun replayUnhandledKeys(
-    unhandledKeys: List<KeyStroke>,
+    unhandledKeys: List<VimKeyStroke>,
     editor: VimEditor,
     context: ExecutionContext,
     keyState: KeyHandlerState,

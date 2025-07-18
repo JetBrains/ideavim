@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 
 internal class CommandConsumer : KeyConsumer {
   private companion object {
@@ -32,7 +32,7 @@ internal class CommandConsumer : KeyConsumer {
   }
 
   override fun consumeKey(
-    key: KeyStroke,
+    key: VimKeyStroke,
     editor: VimEditor,
     allowKeyMappings: Boolean,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,

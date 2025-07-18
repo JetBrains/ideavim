@@ -9,6 +9,7 @@ package com.maddyhome.idea.vim.ui.ex
 
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.helper.vimKeyStroke
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.annotations.NonNls
 import java.awt.event.ActionEvent
@@ -55,7 +56,7 @@ internal object ExEditorKit : DefaultEditorKit() {
             val entry = panel.entry
             val editor = entry.editor
             val keyHandler = KeyHandler.getInstance()
-            keyHandler.handleKey(editor!!.vim, key, entry.context.vim, keyHandler.keyHandlerState)
+            keyHandler.handleKey(editor!!.vim, key.vimKeyStroke, entry.context.vim, keyHandler.keyHandlerState)
           } else {
             val event = ActionEvent(e.source, e.id, c.toString(), e.getWhen(), e.modifiers)
             super.actionPerformed(event)

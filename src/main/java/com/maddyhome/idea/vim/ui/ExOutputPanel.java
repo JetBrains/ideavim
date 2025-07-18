@@ -21,6 +21,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext;
 import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.api.VimOutputPanel;
 import com.maddyhome.idea.vim.diagnostic.VimLogger;
+import com.maddyhome.idea.vim.helper.IJVimKeyHelperKt;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.helper.UserDataManager;
@@ -316,7 +317,7 @@ public class ExOutputPanel extends JPanel {
           LOG.trace("Adding new keys to keyStack as part of playback. State before adding keys: " +
                     KeyHandler.getInstance().getKeyStack().dump());
         }
-        KeyHandler.getInstance().getKeyStack().addKeys(keys);
+        KeyHandler.getInstance().getKeyStack().addKeys(keys.stream().map(IJVimKeyHelperKt::getVimKeyStroke).toList());
         ExecutionContext context =
           injector.getExecutionContextManager().getEditorExecutionContext(new IjVimEditor(myEditor));
         VimPlugin.getMacro().playbackKeys(new IjVimEditor(myEditor), context, 1);
@@ -345,7 +346,7 @@ public class ExOutputPanel extends JPanel {
       KeyStroke keyStroke = (keyChar == KeyEvent.CHAR_UNDEFINED)
                             ? KeyStroke.getKeyStroke(keyCode, modifiers)
                             : KeyStroke.getKeyStroke(keyChar, modifiers);
-      currentPanel.handleKey(keyStroke);
+      currentPanel.handleKey(IJVimKeyHelperKt.getVimKeyStroke(keyStroke));
     }
   }
 

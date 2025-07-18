@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.key.KeyStrokeTrie
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 
 interface VimKeyGroup {
   @Suppress("DEPRECATION")
@@ -25,12 +25,12 @@ interface VimKeyGroup {
 
   fun getBuiltinCommandsTrie(mappingMode: MappingMode): KeyStrokeTrie<LazyVimCommand>
   fun getKeyMappingLayer(mode: MappingMode): KeyMappingLayer
-  fun getActions(editor: VimEditor, keyStroke: KeyStroke): List<NativeAction>
-  fun getKeymapConflicts(keyStroke: KeyStroke): List<NativeAction>
+  fun getActions(editor: VimEditor, keyStroke: VimKeyStroke): List<NativeAction>
+  fun getKeymapConflicts(keyStroke: VimKeyStroke): List<NativeAction>
 
   fun putKeyMapping(
     modes: Set<MappingMode>,
-    fromKeys: List<KeyStroke>,
+    fromKeys: List<VimKeyStroke>,
     owner: MappingOwner,
     extensionHandler: ExtensionHandler,
     recursive: Boolean,
@@ -38,15 +38,15 @@ interface VimKeyGroup {
 
   fun putKeyMapping(
     modes: Set<MappingMode>,
-    fromKeys: List<KeyStroke>,
+    fromKeys: List<VimKeyStroke>,
     owner: MappingOwner,
-    toKeys: List<KeyStroke>,
+    toKeys: List<VimKeyStroke>,
     recursive: Boolean,
   )
 
   fun putKeyMapping(
     modes: Set<MappingMode>,
-    fromKeys: List<KeyStroke>,
+    fromKeys: List<VimKeyStroke>,
     owner: MappingOwner,
     toExpr: Expression,
     originalString: String,
@@ -55,8 +55,8 @@ interface VimKeyGroup {
 
   fun removeKeyMapping(owner: MappingOwner)
   fun removeKeyMapping(modes: Set<MappingMode>)
-  fun removeKeyMapping(modes: Set<MappingMode>, keys: List<KeyStroke>)
-  fun showKeyMappings(modes: Set<MappingMode>, prefix: List<KeyStroke>, editor: VimEditor): Boolean
+  fun removeKeyMapping(modes: Set<MappingMode>, keys: List<VimKeyStroke>)
+  fun showKeyMappings(modes: Set<MappingMode>, prefix: List<VimKeyStroke>, editor: VimEditor): Boolean
   fun getKeyMapping(mode: MappingMode): KeyMapping
   fun updateShortcutKeysRegistration()
   fun unregisterCommandActions()
@@ -68,8 +68,8 @@ interface VimKeyGroup {
    * Note that the Vim function `hasmapto()` can accept a set of modes, and checks if any mapping _contains_ the given
    * left-hand side mapping, rather than is a direct map. (It also handles abbreviations)
    */
-  fun hasmapto(mode: MappingMode, toKeys: List<KeyStroke>): Boolean
+  fun hasmapto(mode: MappingMode, toKeys: List<VimKeyStroke>): Boolean
 
-  val shortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo>
-  val savedShortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo>
+  val shortcutConflicts: MutableMap<VimKeyStroke, ShortcutOwnerInfo>
+  val savedShortcutConflicts: MutableMap<VimKeyStroke, ShortcutOwnerInfo>
 }

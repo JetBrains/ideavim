@@ -17,8 +17,10 @@ import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.key.KeyConsumer
-import java.awt.event.KeyEvent
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.CHAR_UNDEFINED
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.VK_ENTER
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.VK_TAB
 
 internal class CharArgumentConsumer : KeyConsumer {
   private companion object {
@@ -26,7 +28,7 @@ internal class CharArgumentConsumer : KeyConsumer {
   }
 
   override fun consumeKey(
-    key: KeyStroke,
+    key: VimKeyStroke,
     editor: VimEditor,
     allowKeyMappings: Boolean,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
@@ -34,7 +36,7 @@ internal class CharArgumentConsumer : KeyConsumer {
     logger.trace { "Entered CharArgumentConsumer" }
     if (!isExpectingCharArgument(keyProcessResultBuilder.state.commandBuilder)) return false
 
-    val chKey: Char = if (key.keyChar == KeyEvent.CHAR_UNDEFINED) 0.toChar() else key.keyChar
+    val chKey: Char = if (key.keyChar == CHAR_UNDEFINED) 0.toChar() else key.keyChar
     handleCharArgument(key, chKey, keyProcessResultBuilder)
     return true
   }
@@ -46,7 +48,7 @@ internal class CharArgumentConsumer : KeyConsumer {
   }
 
   private fun handleCharArgument(
-    key: KeyStroke,
+    key: VimKeyStroke,
     chKey: Char,
     processBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ) {
@@ -56,8 +58,8 @@ internal class CharArgumentConsumer : KeyConsumer {
     // Some special keys can be handled as character arguments - let's check for them here.
     if (mutableChKey.code == 0) {
       when (key.keyCode) {
-        KeyEvent.VK_TAB -> mutableChKey = '\t'
-        KeyEvent.VK_ENTER -> mutableChKey = '\n'
+        VK_TAB -> mutableChKey = '\t'
+        VK_ENTER -> mutableChKey = '\n'
       }
     }
     val commandBuilder = processBuilder.state.commandBuilder

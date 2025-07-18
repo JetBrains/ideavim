@@ -8,10 +8,10 @@
 
 package com.maddyhome.idea.vim.api
 
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 
 abstract class VimModalInputBase : VimModalInput {
-  override fun handleKey(key: KeyStroke, editor: VimEditor, executionContext: ExecutionContext) {
+  override fun handleKey(key: VimKeyStroke, editor: VimEditor, executionContext: ExecutionContext) {
     inputInterceptor.consumeKey(key, editor, executionContext)
   }
 }

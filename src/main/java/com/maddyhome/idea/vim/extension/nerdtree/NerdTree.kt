@@ -42,6 +42,8 @@ import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.group.KeyGroup
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.runAfterGotFocus
+import com.maddyhome.idea.vim.helper.keyStroke
+import com.maddyhome.idea.vim.helper.vimKeyStroke
 import com.maddyhome.idea.vim.key.KeyStrokeTrie
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.RequiredShortcut
@@ -205,7 +207,7 @@ internal class NerdTree : VimExtension {
       }
 
       keys.add(keyStroke)
-      actionsRoot.getData(keys)?.let { action ->
+      actionsRoot.getData(keys.map { it.vimKeyStroke })?.let { action ->
         when (action) {
           is NerdAction.ToIj -> Util.callAction(null, action.name, e.dataContext.vim)
           is NerdAction.Code -> e.project?.let { action.action(it, e.dataContext, e) }
@@ -557,7 +559,7 @@ private fun registerCommand(variable: String, defaultMapping: String, action: Ne
 private fun registerCommand(mapping: String, action: NerdAction) {
   actionsRoot.add(mapping, action)
   injector.parser.parseKeys(mapping).forEach {
-    distinctShortcuts.add(it)
+    distinctShortcuts.add(it.keyStroke)
   }
 }
 
@@ -566,7 +568,7 @@ private val distinctShortcuts = mutableSetOf<KeyStroke>()
 
 private fun installDispatcher(project: Project) {
   val dispatcher = NerdTree.NerdDispatcher.getInstance(project)
-  val shortcuts = distinctShortcuts.map { RequiredShortcut(it, MappingOwner.Plugin.get(NerdTree.pluginName)) }
+  val shortcuts = distinctShortcuts.map { RequiredShortcut(it.vimKeyStroke, MappingOwner.Plugin.get(NerdTree.pluginName)) }
   dispatcher.registerCustomShortcutSet(
     KeyGroup.toShortcutSet(shortcuts),
     (ProjectView.getInstance(project) as ProjectViewImpl).component,

@@ -9,8 +9,7 @@
 package com.maddyhome.idea.vim.key
 
 import com.maddyhome.idea.vim.api.injector
-import java.awt.event.KeyEvent
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.CHAR_UNDEFINED
 
 /**
  * A trie data structure for storing and retrieving values associated with sequences of keystrokes
@@ -21,28 +20,28 @@ import javax.swing.KeyStroke
  */
 class KeyStrokeTrie<T>(private val name: String) {
   interface TrieNode<T> {
-    val key: KeyStroke
+    val key: VimKeyStroke
     val data: T?
     val parent: TrieNode<T>?
 
-    fun visit(visitor: (KeyStroke, TrieNode<T>) -> Unit)
+    fun visit(visitor: (VimKeyStroke, TrieNode<T>) -> Unit)
 
     val debugString: String
   }
 
   private class TrieNodeImpl<T>(
     val name: String,
-    override val key: KeyStroke,
+    override val key: VimKeyStroke,
     override val parent: TrieNodeImpl<T>?,
     override var data: T?,
   ) : TrieNode<T> {
 
-    val children = lazy { mutableMapOf<KeyStroke, TrieNodeImpl<T>>() }
+    val children = lazy { mutableMapOf<VimKeyStroke, TrieNodeImpl<T>>() }
 
     val depth: Int
       get() = parent?.let { it.depth + 1 } ?: 0
 
-    override fun visit(visitor: (KeyStroke, TrieNode<T>) -> Unit) {
+    override fun visit(visitor: (VimKeyStroke, TrieNode<T>) -> Unit) {
       if (!children.isInitialized()) return
       children.value.forEach { visitor(it.key, it.value) }
     }
@@ -83,12 +82,12 @@ class KeyStrokeTrie<T>(private val name: String) {
 
   private val root = TrieNodeImpl<T>(
     name = "",
-    key = KeyStroke.getKeyStroke(KeyEvent.CHAR_UNDEFINED),
+    key = VimKeyStroke.getKeyStroke(CHAR_UNDEFINED),
     parent = null,
     data = null
   )
 
-  fun add(keyStrokes: List<KeyStroke>, data: T) {
+  fun add(keyStrokes: List<VimKeyStroke>, data: T) {
     var current = root
     keyStrokes.forEachIndexed { i, stroke ->
       current = current.children.value.getOrPut(stroke) {
@@ -106,7 +105,7 @@ class KeyStrokeTrie<T>(private val name: String) {
    *
    * @return Returns null if the key sequence does not exist, or if the data at the node is empty
    */
-  fun getData(keyStrokes: List<KeyStroke>): T? {
+  fun getData(keyStrokes: List<VimKeyStroke>): T? {
     var current = root
     keyStrokes.forEach {
       if (!current.children.isInitialized()) return null
@@ -122,7 +121,7 @@ class KeyStrokeTrie<T>(private val name: String) {
    * of a matching sequence, or a matching prefix. If it's only a matching prefix, the [TrieNode.data] value will be
    * null.
    */
-  fun getTrieNode(keyStrokes: List<KeyStroke>): TrieNode<T>? {
+  fun getTrieNode(keyStrokes: List<VimKeyStroke>): TrieNode<T>? {
     var current = root
     keyStrokes.forEach {
       if (!current.children.isInitialized()) return null
@@ -136,7 +135,7 @@ class KeyStrokeTrie<T>(private val name: String) {
    *
    * Prefixes are skipped
    */
-  fun getEntries(prefix: List<KeyStroke>? = null): Sequence<TrieNode<T>> {
+  fun getEntries(prefix: List<VimKeyStroke>? = null): Sequence<TrieNode<T>> {
     suspend fun SequenceScope<TrieNode<T>>.yieldTrieNode(node: TrieNodeImpl<T>) {
       if (node.data != null) yield(node)
       if (node.children.isInitialized()) {
@@ -153,7 +152,7 @@ class KeyStrokeTrie<T>(private val name: String) {
    *
    * Will return true even if the current keys map to a node with data.
    */
-  fun isPrefix(keyStrokes: List<KeyStroke>): Boolean {
+  fun isPrefix(keyStrokes: List<VimKeyStroke>): Boolean {
     val node = getTrieNode(keyStrokes) as? TrieNodeImpl<T> ?: return false
     return node.children.isInitialized() && node.children.value.isNotEmpty()
   }
@@ -163,7 +162,7 @@ class KeyStrokeTrie<T>(private val name: String) {
    *
    * If the key sequence is also a prefix, removes the associated data, but does not modify any child sequences.
    */
-  fun remove(keys: List<KeyStroke>) {
+  fun remove(keys: List<VimKeyStroke>) {
     val path = buildList {
       var current = root
       keys.forEach { key ->

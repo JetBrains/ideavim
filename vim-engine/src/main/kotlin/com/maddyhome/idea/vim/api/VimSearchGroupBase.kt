@@ -33,7 +33,7 @@ import org.jetbrains.annotations.TestOnly
 import java.text.NumberFormat
 import java.text.ParsePosition
 import java.util.*
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 import kotlin.math.max
 import kotlin.math.min
 
@@ -890,7 +890,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     private var gotQuit = false
     private var doReplace = true
 
-    override fun buildInput(key: KeyStroke): ReplaceConfirmationChoice? {
+    override fun buildInput(key: VimKeyStroke): ReplaceConfirmationChoice? {
       if (key.isCloseKeyStroke()) return ReplaceConfirmationChoice.QUIT
       return when (key.keyChar) {
         'q' -> ReplaceConfirmationChoice.QUIT

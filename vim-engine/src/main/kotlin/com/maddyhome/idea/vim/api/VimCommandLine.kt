@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.history.HistoryEntry
 import com.maddyhome.idea.vim.history.VimHistory
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 import kotlin.math.min
 
 /**
@@ -80,7 +80,7 @@ interface VimCommandLine {
     setText(newText)
   }
 
-  fun handleKey(key: KeyStroke)
+  fun handleKey(key: VimKeyStroke)
 
   /**
    * Text to show while composing a digraph or inserting a literal or register

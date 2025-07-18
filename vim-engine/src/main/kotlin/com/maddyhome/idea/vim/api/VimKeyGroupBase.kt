@@ -20,19 +20,21 @@ import com.maddyhome.idea.vim.key.RequiredShortcut
 import com.maddyhome.idea.vim.key.RootNode
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import java.awt.event.KeyEvent
 import java.util.*
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.CHAR_UNDEFINED
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.VK_ENTER
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.VK_ESCAPE
 import kotlin.math.min
 
 abstract class VimKeyGroupBase : VimKeyGroup {
   @JvmField
-  val myShortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo> = LinkedHashMap()
+  val myShortcutConflicts: MutableMap<VimKeyStroke, ShortcutOwnerInfo> = LinkedHashMap()
   val requiredShortcutKeys: MutableSet<RequiredShortcut> = HashSet(300)
   val builtinCommands: MutableMap<MappingMode, KeyStrokeTrie<LazyVimCommand>> = EnumMap(MappingMode::class.java)
   val keyMappings: MutableMap<MappingMode, KeyMapping> = EnumMap(MappingMode::class.java)
 
-  override fun removeKeyMapping(modes: Set<MappingMode>, keys: List<KeyStroke>) {
+  override fun removeKeyMapping(modes: Set<MappingMode>, keys: List<VimKeyStroke>) {
     modes.map { getKeyMapping(it) }.forEach { it.removeKeyMapping(keys) }
   }
 
@@ -40,7 +42,7 @@ abstract class VimKeyGroupBase : VimKeyGroup {
     modes.map { getKeyMapping(it) }.forEach { it.clear() }
   }
 
-  override fun hasmapto(mode: MappingMode, toKeys: List<KeyStroke>): Boolean {
+  override fun hasmapto(mode: MappingMode, toKeys: List<VimKeyStroke>): Boolean {
     return this.getKeyMapping(mode).hasmapto(toKeys)
   }
 
@@ -72,7 +74,7 @@ abstract class VimKeyGroupBase : VimKeyGroup {
   protected fun checkCommand(
     mappingModes: Set<MappingMode>,
     action: EditorActionHandlerBase,
-    keys: List<KeyStroke>,
+    keys: List<VimKeyStroke>,
   ) {
     for (mappingMode in mappingModes) {
       checkIdentity(mappingMode, action.id, keys)
@@ -81,14 +83,14 @@ abstract class VimKeyGroupBase : VimKeyGroup {
     checkCorrectCombination(action, keys)
   }
 
-  protected fun checkCommand(mappingModes: Set<MappingMode>, command: LazyVimCommand, keys: List<KeyStroke>) {
+  protected fun checkCommand(mappingModes: Set<MappingMode>, command: LazyVimCommand, keys: List<VimKeyStroke>) {
     for (mappingMode in mappingModes) {
       checkIdentity(mappingMode, command.actionId, keys)
     }
     checkCorrectCombination(command, keys)
   }
 
-  private fun checkIdentity(mappingMode: MappingMode, actName: String, keys: List<KeyStroke>) {
+  private fun checkIdentity(mappingMode: MappingMode, actName: String, keys: List<VimKeyStroke>) {
     val keySets = identityChecker!!.getOrPut(mappingMode) { HashSet() }
     if (keys in keySets) {
       throw RuntimeException("This keymap already exists: $mappingMode keys: $keys action:$actName")
@@ -97,7 +99,7 @@ abstract class VimKeyGroupBase : VimKeyGroup {
   }
 
   @Deprecated("Initialization EditorActionHandlerBase for this method breaks the point of lazy initialization")
-  private fun checkCorrectCombination(action: EditorActionHandlerBase, keys: List<KeyStroke>) {
+  private fun checkCorrectCombination(action: EditorActionHandlerBase, keys: List<VimKeyStroke>) {
     for (entry in prefixes!!.entries) {
       val prefix = entry.key
       if (prefix.size == keys.size) continue
@@ -124,7 +126,7 @@ abstract class VimKeyGroupBase : VimKeyGroup {
     prefixes!![keys.toMutableList()] = action.id
   }
 
-  private fun checkCorrectCombination(command: LazyVimCommand, keys: List<KeyStroke>) {
+  private fun checkCorrectCombination(command: LazyVimCommand, keys: List<VimKeyStroke>) {
     for (entry in prefixes!!.entries) {
       val prefix = entry.key
       if (prefix.size == keys.size) continue
@@ -151,7 +153,7 @@ abstract class VimKeyGroupBase : VimKeyGroup {
     prefixes!![keys.toMutableList()] = command.actionId
   }
 
-  override val savedShortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo>
+  override val savedShortcutConflicts: MutableMap<VimKeyStroke, ShortcutOwnerInfo>
     get() = myShortcutConflicts
 
   protected fun initIdentityChecker() {
@@ -162,17 +164,17 @@ abstract class VimKeyGroupBase : VimKeyGroup {
   // Internal structures that used in tests to make sure shortcuts are initialized properly and,
   //  for example, we didn't make two similar shortcuts for two different actions
   //  These structures are not initialized during production
-  private var identityChecker: MutableMap<MappingMode, MutableSet<MutableList<KeyStroke>>>? = null
-  private var prefixes: MutableMap<MutableList<KeyStroke>, String>? = null
+  private var identityChecker: MutableMap<MappingMode, MutableSet<MutableList<VimKeyStroke>>>? = null
+  private var prefixes: MutableMap<MutableList<VimKeyStroke>, String>? = null
 
-  private fun registerKeyMapping(fromKeys: List<KeyStroke>, owner: MappingOwner) {
+  private fun registerKeyMapping(fromKeys: List<VimKeyStroke>, owner: MappingOwner) {
     val oldSize = requiredShortcutKeys.size
     for (key in fromKeys) {
-      if (key.keyChar == KeyEvent.CHAR_UNDEFINED) {
+      if (key.keyChar == CHAR_UNDEFINED) {
         if (
           !injector.application.isOctopusEnabled() ||
-          !(key.keyCode == KeyEvent.VK_ESCAPE && key.modifiers == 0) &&
-          !(key.keyCode == KeyEvent.VK_ENTER && key.modifiers == 0)
+          !(key.keyCode == VK_ESCAPE && key.modifiers == 0) &&
+          !(key.keyCode == VK_ENTER && key.modifiers == 0)
         ) {
           requiredShortcutKeys.add(RequiredShortcut(key, owner))
         }
@@ -198,9 +200,9 @@ abstract class VimKeyGroupBase : VimKeyGroup {
 
   override fun putKeyMapping(
     modes: Set<MappingMode>,
-    fromKeys: List<KeyStroke>,
+    fromKeys: List<VimKeyStroke>,
     owner: MappingOwner,
-    toKeys: List<KeyStroke>,
+    toKeys: List<VimKeyStroke>,
     recursive: Boolean,
   ) {
     modes.map { getKeyMapping(it) }.forEach { it.put(fromKeys, toKeys, owner, modes, recursive) }
@@ -209,7 +211,7 @@ abstract class VimKeyGroupBase : VimKeyGroup {
 
   override fun putKeyMapping(
     modes: Set<MappingMode>,
-    fromKeys: List<KeyStroke>,
+    fromKeys: List<VimKeyStroke>,
     owner: MappingOwner,
     toExpr: Expression,
     originalString: String,
@@ -221,7 +223,7 @@ abstract class VimKeyGroupBase : VimKeyGroup {
 
   override fun putKeyMapping(
     modes: Set<MappingMode>,
-    fromKeys: List<KeyStroke>,
+    fromKeys: List<VimKeyStroke>,
     owner: MappingOwner,
     extensionHandler: ExtensionHandler,
     recursive: Boolean,

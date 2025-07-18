@@ -13,8 +13,14 @@ import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.common.DigraphResult.Companion.done
 import com.maddyhome.idea.vim.common.DigraphResult.Companion.handled
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import java.awt.event.KeyEvent
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.CHAR_UNDEFINED
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.CTRL_DOWN_MASK
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.VK_BACK_SPACE
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.VK_K
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.VK_Q
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.VK_TAB
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.VK_V
 
 class DigraphSequence : Cloneable {
   private var digraphState = DIG_STATE_PENDING
@@ -24,14 +30,14 @@ class DigraphSequence : Cloneable {
   private var codeType = 0
   private var codeMax = 0
 
-  fun isDigraphStart(key: KeyStroke): Boolean {
+  fun isDigraphStart(key: VimKeyStroke): Boolean {
     return digraphState == DIG_STATE_PENDING && // if state has changed, then it's not a start
-      key.keyCode == KeyEvent.VK_K && key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0
+      key.keyCode == VK_K && key.modifiers and CTRL_DOWN_MASK != 0
   }
 
-  fun isLiteralStart(key: KeyStroke): Boolean {
+  fun isLiteralStart(key: VimKeyStroke): Boolean {
     return digraphState == DIG_STATE_PENDING && // if state has changed, then it's not a start
-      (key.keyCode == KeyEvent.VK_V || key.keyCode == KeyEvent.VK_Q) && key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0
+      (key.keyCode == VK_V || key.keyCode == VK_Q) && key.modifiers and CTRL_DOWN_MASK != 0
   }
 
   fun startDigraphSequence(): DigraphResult {
@@ -48,13 +54,13 @@ class DigraphSequence : Cloneable {
     return DigraphResult.HandledLiteral
   }
 
-  fun processKey(key: KeyStroke, editor: VimEditor): DigraphResult {
+  fun processKey(key: VimKeyStroke, editor: VimEditor): DigraphResult {
     return when (digraphState) {
       DIG_STATE_PENDING -> {
         logger.debug("DIG_STATE_PENDING")
-        if (key.keyCode == KeyEvent.VK_BACK_SPACE && injector.options(editor).digraph) {
+        if (key.keyCode == VK_BACK_SPACE && injector.options(editor).digraph) {
           digraphState = DIG_STATE_BACK_SPACE
-        } else if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {
+        } else if (key.keyChar != CHAR_UNDEFINED) {
           digraphChar = key.keyChar
         }
         DigraphResult.Unhandled
@@ -63,7 +69,7 @@ class DigraphSequence : Cloneable {
       DIG_STATE_BACK_SPACE -> {
         logger.debug("DIG_STATE_BACK_SPACE")
         digraphState = DIG_STATE_PENDING
-        if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {
+        if (key.keyChar != CHAR_UNDEFINED) {
           val codepoint = injector.digraphGroup.getCharacterForDigraph(digraphChar, key.keyChar)
           digraphChar = 0.toChar()
           return done(codepoint)
@@ -73,7 +79,7 @@ class DigraphSequence : Cloneable {
 
       DIG_STATE_DIG_ONE -> {
         logger.debug("DIG_STATE_DIG_ONE")
-        if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {
+        if (key.keyChar != CHAR_UNDEFINED) {
           digraphChar = key.keyChar
           digraphState = DIG_STATE_DIG_TWO
           return handled(digraphChar)
@@ -85,7 +91,7 @@ class DigraphSequence : Cloneable {
       DIG_STATE_DIG_TWO -> {
         logger.debug("DIG_STATE_DIG_TWO")
         digraphState = DIG_STATE_PENDING
-        if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {
+        if (key.keyChar != CHAR_UNDEFINED) {
           val codepoint = injector.digraphGroup.getCharacterForDigraph(digraphChar, key.keyChar)
           return done(codepoint)
         }
@@ -137,7 +143,7 @@ class DigraphSequence : Cloneable {
           }
 
           else -> {
-            if (key.keyCode == KeyEvent.VK_TAB) {
+            if (key.keyCode == VK_TAB) {
               digraphState = DIG_STATE_PENDING
               return done('\t'.code)
             }
@@ -201,10 +207,10 @@ class DigraphSequence : Cloneable {
     }
   }
 
-  private fun specialKeyToKeyCode(key: KeyStroke): Int? {
+  private fun specialKeyToKeyCode(key: VimKeyStroke): Int? {
     // Handle special keys. Specifically, if it's CTRL+something, return the codepoint for `\something`. Or if it's
     // newline, return carriage return (Vim likes to treat newline as null), and escape should be returned as escape
-    if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) {
+    if (key.modifiers and CTRL_DOWN_MASK != 0) {
       val specialKeyCode = injector.parser.parseVimScriptString("\\" + injector.parser.toKeyNotation(key))
       if (specialKeyCode.length == 1) {
         // TODO: If we get 10 here, we return 0. If we get 10 below, we return 13. Why the difference?
