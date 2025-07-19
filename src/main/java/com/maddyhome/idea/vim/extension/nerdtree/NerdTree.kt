@@ -21,6 +21,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
+import com.intellij.openapi.fileEditor.impl.EditorWindow
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.startup.ProjectActivity
@@ -224,17 +225,15 @@ internal class NerdTree : VimExtension {
 
   private fun registerMappings() {
     // TODO: 22.01.2021 Should not just to the last line after the first
-    mappings.register("j", NerdAction.ToIj("Tree-selectNext"))
-    mappings.register("k", NerdAction.ToIj("Tree-selectPrevious"))
+    mappings.register("j", NerdAction.ij("Tree-selectNext"))
+    mappings.register("k", NerdAction.ij("Tree-selectPrevious"))
     mappings.register(
       "NERDTreeMapActivateNode",
       "o",
-      NerdAction.Code { project, dataContext, _ ->
-        val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
-
-        val array = CommonDataKeys.NAVIGATABLE_ARRAY.getData(dataContext)?.filter { it.canNavigateToSource() }
+      NerdAction { event, tree ->
+        val array = CommonDataKeys.NAVIGATABLE_ARRAY.getData(event.dataContext)?.filter { it.canNavigateToSource() }
         if (array.isNullOrEmpty()) {
-          val row = tree.selectionRows?.getOrNull(0) ?: return@Code
+          val row = tree.selectionRows?.getOrNull(0) ?: return@NerdAction
           if (tree.isExpanded(row)) {
             tree.collapseRow(row)
           } else {
@@ -248,80 +247,70 @@ internal class NerdTree : VimExtension {
     mappings.register(
       "NERDTreeMapPreview",
       "go",
-      NerdAction.Code { _, dataContext, _ ->
-        CommonDataKeys.NAVIGATABLE_ARRAY
-          .getData(dataContext)
-          ?.filter { it.canNavigateToSource() }
+      NerdAction { event, _ ->
+        CommonDataKeys.NAVIGATABLE_ARRAY.getData(event.dataContext)?.filter { it.canNavigateToSource() }
           ?.forEach { it.navigate(false) }
       },
     )
     mappings.register(
       "NERDTreeMapOpenInTab",
       "t",
-      NerdAction.Code { _, dataContext, _ ->
+      NerdAction { event, _ ->
         // FIXME: 22.01.2021 Doesn't work correct
-        CommonDataKeys.NAVIGATABLE_ARRAY
-          .getData(dataContext)
-          ?.filter { it.canNavigateToSource() }
+        CommonDataKeys.NAVIGATABLE_ARRAY.getData(event.dataContext)?.filter { it.canNavigateToSource() }
           ?.forEach { it.navigate(true) }
       },
     )
     mappings.register(
       "NERDTreeMapOpenInTabSilent",
       "T",
-      NerdAction.Code { _, dataContext, _ ->
+      NerdAction { event, _ ->
         // FIXME: 22.01.2021 Doesn't work correct
-        CommonDataKeys.NAVIGATABLE_ARRAY
-          .getData(dataContext)
-          ?.filter { it.canNavigateToSource() }
+        CommonDataKeys.NAVIGATABLE_ARRAY.getData(event.dataContext)?.filter { it.canNavigateToSource() }
           ?.forEach { it.navigate(true) }
       },
     )
 
     // TODO: 21.01.2021 Should option in left split
-    mappings.register("NERDTreeMapOpenVSplit", "s", NerdAction.ToIj("OpenInRightSplit"))
+    mappings.register("NERDTreeMapOpenVSplit", "s", NerdAction.ij("OpenInRightSplit"))
     // TODO: 21.01.2021 Should option in above split
     mappings.register(
       "NERDTreeMapOpenSplit",
       "i",
-      NerdAction.Code { project, _, event ->
-        val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Code
-        if (file.isDirectory) return@Code
-        val splitters = FileEditorManagerEx.getInstanceEx(project).splitters
-        val currentWindow = splitters.currentWindow
+      NerdAction { event, _ ->
+        val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@NerdAction
+        if (file.isDirectory) return@NerdAction
+        val currentWindow = Util.getSplittersCurrentWindow(event)
         currentWindow?.split(SwingConstants.HORIZONTAL, true, file, true)
       },
     )
     mappings.register(
       "NERDTreeMapPreviewVSplit",
       "gs",
-      NerdAction.Code { project, context, event ->
-        val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Code
-        val splitters = FileEditorManagerEx.getInstanceEx(project).splitters
-        val currentWindow = splitters.currentWindow
+      NerdAction { event, _ ->
+        val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@NerdAction
+        val currentWindow = Util.getSplittersCurrentWindow(event)
         currentWindow?.split(SwingConstants.VERTICAL, true, file, true)
 
         // FIXME: 22.01.2021 This solution bouncing a bit
-        Util.callAction(null, "ActivateProjectToolWindow", context.vim)
+        Util.callAction(null, "ActivateProjectToolWindow", event.dataContext.vim)
       },
     )
     mappings.register(
       "NERDTreeMapPreviewSplit",
       "gi",
-      NerdAction.Code { project, context, event ->
-        val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Code
-        val splitters = FileEditorManagerEx.getInstanceEx(project).splitters
-        val currentWindow = splitters.currentWindow
+      NerdAction { event, _ ->
+        val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@NerdAction
+        val currentWindow = Util.getSplittersCurrentWindow(event)
         currentWindow?.split(SwingConstants.HORIZONTAL, true, file, true)
 
-        Util.callAction(null, "ActivateProjectToolWindow", context.vim)
+        Util.callAction(null, "ActivateProjectToolWindow", event.dataContext.vim)
       },
     )
     mappings.register(
       "NERDTreeMapOpenRecursively",
       "O",
-      NerdAction.Code { project, _, _ ->
-        val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
+      NerdAction { event, tree ->
         TreeExpandCollapse.expandAll(tree)
         tree.selectionPath?.let {
           TreeUtil.scrollToVisible(tree, it, false)
@@ -331,8 +320,7 @@ internal class NerdTree : VimExtension {
     mappings.register(
       "NERDTreeMapCloseChildren",
       "X",
-      NerdAction.Code { project, _, _ ->
-        val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
+      NerdAction { event, tree ->
         TreeExpandCollapse.collapse(tree)
         tree.selectionPath?.let {
           TreeUtil.scrollToVisible(tree, it, false)
@@ -342,13 +330,12 @@ internal class NerdTree : VimExtension {
     mappings.register(
       "NERDTreeMapCloseDir",
       "x",
-      NerdAction.Code { project, _, _ ->
-        val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
-        val currentPath = tree.selectionPath ?: return@Code
+      NerdAction { event, tree ->
+        val currentPath = tree.selectionPath ?: return@NerdAction
         if (tree.isExpanded(currentPath)) {
           tree.collapsePath(currentPath)
         } else {
-          val parentPath = currentPath.parentPath ?: return@Code
+          val parentPath = currentPath.parentPath ?: return@NerdAction
           if (parentPath.parentPath != null) {
             // The real root of the project is not shown in the project view, so we check the grandparent of the node
             tree.collapsePath(parentPath)
@@ -357,14 +344,13 @@ internal class NerdTree : VimExtension {
         }
       },
     )
-    mappings.register("NERDTreeMapJumpRoot", "P", NerdAction.ToIj("Tree-selectFirst"))
+    mappings.register("NERDTreeMapJumpRoot", "P", NerdAction.ij("Tree-selectFirst"))
     mappings.register(
       "NERDTreeMapJumpParent",
       "p",
-      NerdAction.Code { project, _, _ ->
-        val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
-        val currentPath = tree.selectionPath ?: return@Code
-        val parentPath = currentPath.parentPath ?: return@Code
+      NerdAction { event, tree ->
+        val currentPath = tree.selectionPath ?: return@NerdAction
+        val parentPath = currentPath.parentPath ?: return@NerdAction
         if (parentPath.parentPath != null) {
           // The real root of the project is not shown in the project view, so we check the grandparent of the node
           tree.selectionPath = parentPath
@@ -375,10 +361,9 @@ internal class NerdTree : VimExtension {
     mappings.register(
       "NERDTreeMapJumpFirstChild",
       "K",
-      NerdAction.Code { project, _, _ ->
-        val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
-        val currentPath = tree.selectionPath ?: return@Code
-        val parent = currentPath.parentPath ?: return@Code
+      NerdAction { event, tree ->
+        val currentPath = tree.selectionPath ?: return@NerdAction
+        val parent = currentPath.parentPath ?: return@NerdAction
         val row = tree.getRowForPath(parent)
         tree.setSelectionRow(row + 1)
 
@@ -388,9 +373,8 @@ internal class NerdTree : VimExtension {
     mappings.register(
       "NERDTreeMapJumpLastChild",
       "J",
-      NerdAction.Code { project, _, _ ->
-        val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
-        val currentPath = tree.selectionPath ?: return@Code
+      NerdAction { event, tree ->
+        val currentPath = tree.selectionPath ?: return@NerdAction
 
         val currentPathCount = currentPath.pathCount
         var row = tree.getRowForPath(currentPath)
@@ -408,13 +392,11 @@ internal class NerdTree : VimExtension {
         tree.scrollRowToVisible(expectedRow)
       },
     )
-    mappings.register("gg", NerdAction.Code { project, _, _ ->
-      val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
+    mappings.register("gg", NerdAction { _, tree ->
       tree.setSelectionRow(0)
       tree.scrollRowToVisible(0)
     })
-    mappings.register("G", NerdAction.Code { project, _, _ ->
-      val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
+    mappings.register("G", NerdAction { _, tree ->
       val lastRowIndex = tree.rowCount -1
       tree.setSelectionRow(lastRowIndex)
       tree.scrollRowToVisible(lastRowIndex)
@@ -422,45 +404,45 @@ internal class NerdTree : VimExtension {
     mappings.register(
       "NERDTreeMapJumpNextSibling",
       "<C-J>",
-      NerdAction.ToIj("Tree-selectNextSibling"),
+      NerdAction.ij("Tree-selectNextSibling"),
     )
     mappings.register(
       "NERDTreeMapJumpPrevSibling",
       "<C-K>",
-      NerdAction.ToIj("Tree-selectPreviousSibling"),
+      NerdAction.ij("Tree-selectPreviousSibling"),
     )
     mappings.register(
       "NERDTreeMapRefresh",
       "r",
-      NerdAction.ToIj("SynchronizeCurrentFile"),
+      NerdAction.ij("SynchronizeCurrentFile"),
     )
-    mappings.register("NERDTreeMapToggleHidden", "I", NerdAction.ToIj("ProjectView.ShowExcludedFiles"))
-    mappings.register("NERDTreeMapNewFile", "n", NerdAction.ToIj("NewFile"))
-    mappings.register("NERDTreeMapNewDir", "N", NerdAction.ToIj("NewDir"))
-    mappings.register("NERDTreeMapDelete", "d", NerdAction.ToIj("\$Delete"))
-    mappings.register("NERDTreeMapCopy", "y", NerdAction.ToIj("\$Copy"))
-    mappings.register("NERDTreeMapPaste", "v", NerdAction.ToIj("\$Paste"))
-    mappings.register("NERDTreeMapRename", "<C-r>", NerdAction.ToIj("RenameElement"))
-    mappings.register("NERDTreeMapRefreshRoot", "R", NerdAction.ToIj("Synchronize"))
-    mappings.register("NERDTreeMapMenu", "m", NerdAction.ToIj("ShowPopupMenu"))
-    mappings.register("NERDTreeMapQuit", "q", NerdAction.ToIj("HideActiveWindow"))
+    mappings.register("NERDTreeMapToggleHidden", "I", NerdAction.ij("ProjectView.ShowExcludedFiles"))
+    mappings.register("NERDTreeMapNewFile", "n", NerdAction.ij("NewFile"))
+    mappings.register("NERDTreeMapNewDir", "N", NerdAction.ij("NewDir"))
+    mappings.register("NERDTreeMapDelete", "d", NerdAction.ij("\$Delete"))
+    mappings.register("NERDTreeMapCopy", "y", NerdAction.ij("\$Copy"))
+    mappings.register("NERDTreeMapPaste", "v", NerdAction.ij("\$Paste"))
+    mappings.register("NERDTreeMapRename", "<C-r>", NerdAction.ij("RenameElement"))
+    mappings.register("NERDTreeMapRefreshRoot", "R", NerdAction.ij("Synchronize"))
+    mappings.register("NERDTreeMapMenu", "m", NerdAction.ij("ShowPopupMenu"))
+    mappings.register("NERDTreeMapQuit", "q", NerdAction.ij("HideActiveWindow"))
     mappings.register(
       "NERDTreeMapToggleZoom",
       "A",
-      NerdAction.ToIj("MaximizeToolWindow"),
+      NerdAction.ij("MaximizeToolWindow"),
     )
 
     mappings.register(
       "/",
-      NerdAction.Code { project, _, _ ->
-        NerdDispatcher.getInstance(project).waitForSearch = true
+      NerdAction { event, _ ->
+        NerdDispatcher.getInstance(event.project ?: return@NerdAction).waitForSearch = true
       },
     )
 
     mappings.register(
       "<ESC>",
-      NerdAction.Code { project, _, _ ->
-        val instance = NerdDispatcher.getInstance(project)
+      NerdAction { event, _ ->
+        val instance = NerdDispatcher.getInstance(event.project ?: return@NerdAction)
         if (instance.waitForSearch) {
           instance.waitForSearch = false
         }
@@ -484,6 +466,11 @@ internal class NerdTree : VimExtension {
           injector.actionExecutor.executeAction(editor, action.vim, context)
         }
       }
+    }
+
+    fun getSplittersCurrentWindow(event: AnActionEvent): EditorWindow? {
+      val splitters = FileEditorManagerEx.getInstanceEx(event.project ?: return null).splitters
+      return splitters.currentWindow
     }
   }
 

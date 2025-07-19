@@ -9,9 +9,10 @@
 package com.maddyhome.idea.vim.extension.nerdtree
 
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.ui.KeyStrokeAdapter
-import com.maddyhome.idea.vim.newapi.vim
+import com.intellij.ui.treeStructure.Tree
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
@@ -31,10 +32,9 @@ internal abstract class AbstractNerdDispatcher(private val mappings: NerdTreeMap
 
     keys.add(keyStroke)
     mappings.getAction(keys)?.let { action ->
-      when (action) {
-        is NerdAction.ToIj -> NerdTree.Util.callAction(null, action.name, e.dataContext.vim)
-        is NerdAction.Code -> e.project?.let { action.action(it, e.dataContext, e) }
-      }
+      val component = e.getData(PlatformDataKeys.CONTEXT_COMPONENT)
+      if (component is Tree) action.action(e, component)
+      else return // TODO error log
 
       keys.clear()
     }
