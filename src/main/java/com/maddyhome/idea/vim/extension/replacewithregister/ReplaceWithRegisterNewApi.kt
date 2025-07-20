@@ -150,10 +150,9 @@ class ReplaceWithRegisterNewApi : VimPluginBase() {
         replaceText(selectionRange.start, selectionRange.end, text)
       } else if (selectionRange is Range.Block) {
         val selections: Array<Range.Simple> = selectionRange.ranges.sortedByDescending { it.start }.toTypedArray()
+        val lines = List(selections.size) { text }
 
-        selections.forEach { range ->
-          replaceTextForRange(range.start, range.end, text)
-        }
+        replaceTextBlockwise(selectionRange, lines)
 
         vimScope.mode = Mode.NORMAL()
         updateCaret(offset = selections.last().start)

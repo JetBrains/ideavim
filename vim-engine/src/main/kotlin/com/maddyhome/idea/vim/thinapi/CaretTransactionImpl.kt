@@ -151,8 +151,22 @@ class CaretTransactionImpl(
     return result
   }
 
-  override suspend fun replaceTextForRange(startOffset: Int, endOffset: Int, text: String) {
-    injector.changeGroup.replaceText(vimEditor, vimCaret, startOffset, endOffset, text)
+  override suspend fun replaceTextBlockwise(range: Range.Block, text: List<String>) {
+    val selections: Array<Range.Simple> = range.ranges.sortedByDescending { it.start }.toTypedArray()
+
+    if (text.size != selections.size) {
+      throw IllegalArgumentException("Text block size must match number of selections!")
+    }
+
+    for (selection in selections.withIndex()) {
+      injector.changeGroup.replaceText(
+        vimEditor,
+        vimCaret,
+        selection.value.start,
+        selection.value.end,
+        text[selection.index]
+      )
+    }
   }
 
   override suspend fun deleteText(

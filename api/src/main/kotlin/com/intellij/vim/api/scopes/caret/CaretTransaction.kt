@@ -26,10 +26,9 @@ interface CaretTransaction: CaretRead {
     text: String,
   ): Boolean
 
-  suspend fun replaceTextForRange(
-    startOffset: Int,
-    endOffset: Int,
-    text: String
+  suspend fun replaceTextBlockwise(
+    range: Range.Block,
+    text: List<String>
   )
 
   suspend fun deleteText(
