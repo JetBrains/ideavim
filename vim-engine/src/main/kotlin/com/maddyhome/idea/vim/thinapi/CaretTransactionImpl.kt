@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.thinapi
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.Line
 import com.intellij.vim.api.Range
+import com.intellij.vim.api.VimPluginException
 import com.intellij.vim.api.scopes.Read
 import com.intellij.vim.api.scopes.caret.CaretRead
 import com.intellij.vim.api.scopes.caret.CaretTransaction
@@ -66,10 +67,11 @@ class CaretTransactionImpl(
     }
   }
 
-  private suspend fun putText(
+  private fun putText(
     startPosition: Int,
     text: String,
     caretAfterInsertedText: Boolean,
+    beforeCaret: Boolean,
   ): Boolean {
     val copiedText = injector.clipboardManager.dumbCopiedText(text)
     val textData = PutData.TextData(null, copiedText, SelectionType.CHARACTER_WISE)
@@ -78,7 +80,7 @@ class CaretTransactionImpl(
       textData = textData,
       visualSelection = null,
       count = 1,
-      insertTextBeforeCaret = caretAfterInsertedText,
+      insertTextBeforeCaret = beforeCaret,
       rawIndent = false,
       caretAfterInsertedText = caretAfterInsertedText,
       putToLine = -1
@@ -94,6 +96,22 @@ class CaretTransactionImpl(
       modifyRegister = false
     )
 
+    val newOffset = if (caretAfterInsertedText) {
+      if (beforeCaret) {
+        startPosition + text.length - 1
+      } else {
+        startPosition + text.length
+      }
+    } else {
+      if (beforeCaret) {
+        startPosition
+      } else {
+        startPosition + 1
+      }
+    }.coerceIn(0, vimEditor.fileSize().toInt() - 1)
+
+    vimCaret.moveToOffset(newOffset)
+
     return result
   }
 
@@ -101,8 +119,14 @@ class CaretTransactionImpl(
     position: Int,
     text: String,
     caretAfterInsertedText: Boolean,
+    beforeCaret: Boolean,
   ): Boolean {
-    return putText(position, text, caretAfterInsertedText)
+    val validRange = 0..<vimEditor.fileSize().toInt()
+    if (position !in validRange) {
+      throw IllegalArgumentException("Position $position is not in valid range $validRange")
+    }
+    vimCaret.moveToOffset(position)
+    return putText(position, text, caretAfterInsertedText, beforeCaret)
   }
 
   override suspend fun replaceText(
@@ -110,10 +134,22 @@ class CaretTransactionImpl(
     endOffset: Int,
     text: String,
   ): Boolean {
+    val validRange = 0..<vimEditor.fileSize().toInt()
+    if (startOffset !in validRange || endOffset - 1 !in validRange) {
+      throw IllegalArgumentException("Start offset $startOffset or end offset $endOffset is not in valid range $validRange")
+    }
+
+    if (startOffset > endOffset) {
+      throw IllegalArgumentException("Start offset $startOffset is greater than end offset $endOffset")
+    }
+
+    if (startOffset == endOffset) {
+      insertText(startOffset, text, caretAfterInsertedText = false, beforeCaret = true)
+      return true
+    }
+
     val copiedText = injector.clipboardManager.dumbCopiedText(text)
     val textData = PutData.TextData(null, copiedText, SelectionType.CHARACTER_WISE)
-
-    val emptySelection = startOffset == endOffset
 
     val selectionType = determineSelectionType(startOffset, endOffset)
 
@@ -121,7 +157,7 @@ class CaretTransactionImpl(
       mapOf(
         vimCaret to VimSelection.create(
           startOffset,
-          if (emptySelection) endOffset else endOffset - 1,
+          endOffset - 1,
           selectionType,
           vimEditor
         )
@@ -153,9 +189,19 @@ class CaretTransactionImpl(
 
   override suspend fun replaceTextBlockwise(range: Range.Block, text: List<String>) {
     val selections: Array<Range.Simple> = range.ranges.sortedByDescending { it.start }.toTypedArray()
+    val listOfText = text.reversed()
 
-    if (text.size != selections.size) {
+    if (listOfText.size != selections.size) {
       throw IllegalArgumentException("Text block size must match number of selections!")
+    }
+
+    val startOffsetValidRange = 0..<vimEditor.fileSize().toInt()
+    val endOffsetValidRange = 0..vimEditor.fileSize().toInt()
+
+    selections.forEach { selection ->
+      if (selection.start !in startOffsetValidRange || selection.end !in endOffsetValidRange) {
+        throw IllegalArgumentException("Start offset ${selection.start} or end offset ${selection.end} is not in valid range $startOffsetValidRange")
+      }
     }
 
     for (selection in selections.withIndex()) {
@@ -164,7 +210,7 @@ class CaretTransactionImpl(
         vimCaret,
         selection.value.start,
         selection.value.end,
-        text[selection.index]
+        listOfText[selection.index]
       )
     }
   }
@@ -173,6 +219,13 @@ class CaretTransactionImpl(
     startOffset: Int,
     endOffset: Int,
   ): Boolean {
+    val startOffsetValidRange = 0..<vimEditor.fileSize().toInt()
+    val endOffsetValidRange = 0..vimEditor.fileSize().toInt()
+
+    if (startOffset !in startOffsetValidRange || endOffset !in endOffsetValidRange) {
+      throw IllegalArgumentException("Start offset $startOffset or end offset $endOffset is not in valid range")
+    }
+
     val range = TextRange(startOffset, endOffset)
 
     injector.changeGroup.deleteRange(
@@ -189,11 +242,26 @@ class CaretTransactionImpl(
   }
 
   override suspend fun updateCaret(offset: Int, selection: Range.Simple?) {
-    val caret: VimCaret = vimEditor.carets().find { it.id == caretId.id } ?: return
-    caret.moveToOffset(offset)
+    val fileSize = vimEditor.fileSize().toInt()
+    val validOffsetRange = 0..<fileSize
+
+    if (offset !in validOffsetRange) {
+      throw IllegalArgumentException("Offset $offset is not in valid range $validOffsetRange")
+    }
+
+    if (selection != null) {
+      if (selection.start !in validOffsetRange || selection.end !in validOffsetRange) {
+        throw IllegalArgumentException("Selection $selection is not in valid range $validOffsetRange")
+      }
+    }
+
+    vimCaret.moveToOffset(offset)
+
     selection?.let { (start, end) ->
-      caret.setSelection(start, end)
-    } ?: caret.removeSelection()
+      if (start != end) {
+        vimCaret.setSelection(start, end)
+      }
+    } ?: vimCaret.removeSelection()
   }
 
   override suspend fun getLineStartOffset(line: Int): Int {
