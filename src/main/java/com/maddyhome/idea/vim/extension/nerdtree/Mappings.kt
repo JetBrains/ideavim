@@ -92,22 +92,16 @@ internal class Mappings(name: String) {
 
     // FIXME lazy loaded tree nodes are not expanded
     register("NERDTreeMapOpenRecursively", "O", Action.ij("FullyExpandTreeNode"))
-    register(
-      "NERDTreeMapCloseDir", "x",
-      Action { _, tree ->
-        val currentPath = tree.selectionPath ?: return@Action
-        if (tree.isExpanded(currentPath)) {
-          tree.collapsePath(currentPath)
-        } else {
-          val parentPath = currentPath.parentPath ?: return@Action
-          if (parentPath.parentPath != null) {
-            // The real root of the project is not shown in the project view, so we check the grandparent of the node
-            tree.collapsePath(parentPath)
-            TreeUtil.scrollToVisible(tree, parentPath, false)
-          }
+    // This action respects `ide.tree.collapse.recursively`. We may prompt the user to disable it
+    register("NERDTreeMapCloseDir", "x", Action { _, tree ->
+      tree.selectionPath?.parentPath?.let {
+        if (tree.getRowForPath(it) >= 0) { // skip if invisible, but we cannot use `tree.isVisible(path)` here
+          tree.selectionPath = it
+          tree.collapsePath(it)
+          tree.scrollPathToVisible(it)
         }
-      },
-    )
+      }
+    })
     register("NERDTreeMapCloseChildren", "X", Action.ij("CollapseTreeNode"))
 
     // FIXME The first row is not the root of External Libraries
