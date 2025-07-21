@@ -25,7 +25,7 @@ abstract class VimPluginBase : VimExtension {
     super.dispose()
   }
 
-  abstract suspend fun VimScope.init()
+  abstract fun VimScope.init()
 
   open fun VimScope.unload() {}
 }

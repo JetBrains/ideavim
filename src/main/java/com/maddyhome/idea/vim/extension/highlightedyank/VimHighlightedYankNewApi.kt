@@ -48,7 +48,7 @@ class VimHighlightedYankNewApi : VimPluginBase() {
 
   override val name: String = "highlightedyank"
 
-  override suspend fun VimScope.init() {
+  override fun VimScope.init() {
     listeners {
       onModeChange { oldMode ->
         if (mode == Mode.INSERT) {

@@ -20,7 +20,7 @@ import kotlinx.coroutines.Job
 class ReplaceWithRegisterNewApi : VimPluginBase() {
   override val name: String = "ReplaceWithRegister"
 
-  override suspend fun VimScope.init() {
+  override fun VimScope.init() {
     mappings {
       nmap(keys = "gr", label = RWR_OPERATOR, isRepeatable = true) {
         rewriteMotion()
