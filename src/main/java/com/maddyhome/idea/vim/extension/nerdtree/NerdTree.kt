@@ -29,9 +29,7 @@ import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowId
 import com.intellij.openapi.wm.ex.ToolWindowManagerEx
 import com.intellij.openapi.wm.ex.ToolWindowManagerListener
-import com.intellij.ui.TreeExpandCollapse
 import com.intellij.ui.speedSearch.SpeedSearchSupply
-import com.intellij.util.ui.tree.TreeUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
@@ -224,9 +222,8 @@ internal class NerdTree : VimExtension {
   }
 
   private fun registerMappings() {
-    // TODO: 22.01.2021 Should not just to the last line after the first
-    mappings.register("j", Mappings.Action.ij("Tree-selectNext"))
-    mappings.register("k", Mappings.Action.ij("Tree-selectPrevious"))
+    mappings.registerNavigationMappings()
+
     mappings.register(
       "NERDTreeMapActivateNode",
       "o",
@@ -306,110 +303,6 @@ internal class NerdTree : VimExtension {
 
         Util.callAction(null, "ActivateProjectToolWindow", event.dataContext.vim)
       },
-    )
-    mappings.register(
-      "NERDTreeMapOpenRecursively",
-      "O",
-      Mappings.Action { event, tree ->
-        TreeExpandCollapse.expandAll(tree)
-        tree.selectionPath?.let {
-          TreeUtil.scrollToVisible(tree, it, false)
-        }
-      },
-    )
-    mappings.register(
-      "NERDTreeMapCloseChildren",
-      "X",
-      Mappings.Action { event, tree ->
-        TreeExpandCollapse.collapse(tree)
-        tree.selectionPath?.let {
-          TreeUtil.scrollToVisible(tree, it, false)
-        }
-      },
-    )
-    mappings.register(
-      "NERDTreeMapCloseDir",
-      "x",
-      Mappings.Action { event, tree ->
-        val currentPath = tree.selectionPath ?: return@Action
-        if (tree.isExpanded(currentPath)) {
-          tree.collapsePath(currentPath)
-        } else {
-          val parentPath = currentPath.parentPath ?: return@Action
-          if (parentPath.parentPath != null) {
-            // The real root of the project is not shown in the project view, so we check the grandparent of the node
-            tree.collapsePath(parentPath)
-            TreeUtil.scrollToVisible(tree, parentPath, false)
-          }
-        }
-      },
-    )
-    mappings.register("NERDTreeMapJumpRoot", "P", Mappings.Action.ij("Tree-selectFirst"))
-    mappings.register(
-      "NERDTreeMapJumpParent",
-      "p",
-      Mappings.Action { event, tree ->
-        val currentPath = tree.selectionPath ?: return@Action
-        val parentPath = currentPath.parentPath ?: return@Action
-        if (parentPath.parentPath != null) {
-          // The real root of the project is not shown in the project view, so we check the grandparent of the node
-          tree.selectionPath = parentPath
-          TreeUtil.scrollToVisible(tree, parentPath, false)
-        }
-      },
-    )
-    mappings.register(
-      "NERDTreeMapJumpFirstChild",
-      "K",
-      Mappings.Action { event, tree ->
-        val currentPath = tree.selectionPath ?: return@Action
-        val parent = currentPath.parentPath ?: return@Action
-        val row = tree.getRowForPath(parent)
-        tree.setSelectionRow(row + 1)
-
-        tree.scrollRowToVisible(row + 1)
-      },
-    )
-    mappings.register(
-      "NERDTreeMapJumpLastChild",
-      "J",
-      Mappings.Action { event, tree ->
-        val currentPath = tree.selectionPath ?: return@Action
-
-        val currentPathCount = currentPath.pathCount
-        var row = tree.getRowForPath(currentPath)
-
-        var expectedRow = row
-        while (true) {
-          row++
-          val nextPath = tree.getPathForRow(row) ?: break
-          val pathCount = nextPath.pathCount
-          if (pathCount == currentPathCount) expectedRow = row
-          if (pathCount < currentPathCount) break
-        }
-        tree.setSelectionRow(expectedRow)
-
-        tree.scrollRowToVisible(expectedRow)
-      },
-    )
-    mappings.register("gg", Mappings.Action { _, tree ->
-      tree.setSelectionRow(0)
-      tree.scrollRowToVisible(0)
-    })
-    mappings.register("G", Mappings.Action { _, tree ->
-      val lastRowIndex = tree.rowCount -1
-      tree.setSelectionRow(lastRowIndex)
-      tree.scrollRowToVisible(lastRowIndex)
-    })
-    mappings.register(
-      "NERDTreeMapJumpNextSibling",
-      "<C-J>",
-      Mappings.Action.ij("Tree-selectNextSibling"),
-    )
-    mappings.register(
-      "NERDTreeMapJumpPrevSibling",
-      "<C-K>",
-      Mappings.Action.ij("Tree-selectPreviousSibling"),
     )
     mappings.register(
       "NERDTreeMapRefresh",
