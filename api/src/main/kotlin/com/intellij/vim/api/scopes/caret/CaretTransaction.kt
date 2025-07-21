@@ -39,9 +39,9 @@ interface CaretTransaction : CaretRead {
    *
    * @param position The position (offset) where the text should be inserted
    * @param text The text to insert
-   * @param caretAfterInsertedText If true (default), places the caret after the inserted text;
+   * @param caretAtEnd If true (default), places the caret after on the last character of the inserted text;
    *                              if false, places the caret at the beginning of the inserted text
-   * @param beforeCaret If true, inserts the text before the specified position;
+   * @param insertBeforeCaret If true, inserts the text before the specified position;
    *                    if false (default), inserts the text at the specified position
    * @return true if the insertion was successful, false otherwise
    * @throws IllegalArgumentException If the position is not in the valid range [0, fileSize)
@@ -49,8 +49,8 @@ interface CaretTransaction : CaretRead {
   suspend fun insertText(
     position: Int,
     text: String,
-    caretAfterInsertedText: Boolean = true,
-    beforeCaret: Boolean = false,
+    caretAtEnd: Boolean = true,
+    insertBeforeCaret: Boolean = false,
   ): Boolean
 
   /**
@@ -107,9 +107,10 @@ interface CaretTransaction : CaretRead {
     endOffset: Int,
   ): Boolean
 
-  // temporary
   suspend fun getLineStartOffset(line: Int): Int
+
   suspend fun getLineEndOffset(line: Int, allowEnd: Boolean): Int
+
   suspend fun getLine(offset: Int): Line
 
   /**

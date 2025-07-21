@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.thinapi
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.Line
 import com.intellij.vim.api.Range
-import com.intellij.vim.api.VimPluginException
 import com.intellij.vim.api.scopes.Read
 import com.intellij.vim.api.scopes.caret.CaretRead
 import com.intellij.vim.api.scopes.caret.CaretTransaction
@@ -118,15 +117,15 @@ class CaretTransactionImpl(
   override suspend fun insertText(
     position: Int,
     text: String,
-    caretAfterInsertedText: Boolean,
-    beforeCaret: Boolean,
+    caretAtEnd: Boolean,
+    insertBeforeCaret: Boolean,
   ): Boolean {
     val validRange = 0..<vimEditor.fileSize().toInt()
     if (position !in validRange) {
       throw IllegalArgumentException("Position $position is not in valid range $validRange")
     }
     vimCaret.moveToOffset(position)
-    return putText(position, text, caretAfterInsertedText, beforeCaret)
+    return putText(position, text, caretAtEnd, insertBeforeCaret)
   }
 
   override suspend fun replaceText(
@@ -144,7 +143,7 @@ class CaretTransactionImpl(
     }
 
     if (startOffset == endOffset) {
-      insertText(startOffset, text, caretAfterInsertedText = false, beforeCaret = true)
+      insertText(startOffset, text, caretAtEnd = false, insertBeforeCaret = true)
       return true
     }
 

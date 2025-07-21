@@ -217,7 +217,7 @@ class CaretTransactionTest : VimTestCase() {
       vimScope.editor {
         change {
           withPrimaryCaret {
-            insertText(4, "NEW", caretAfterInsertedText = true, beforeCaret = true)
+            insertText(4, "NEW", caretAtEnd = true, insertBeforeCaret = true)
           }
         }
       }
@@ -235,7 +235,7 @@ class CaretTransactionTest : VimTestCase() {
       vimScope.editor {
         change {
           withPrimaryCaret {
-            insertText(4, "NEW", caretAfterInsertedText = false, beforeCaret = true)
+            insertText(4, "NEW", caretAtEnd = false, insertBeforeCaret = true)
           }
         }
       }
@@ -253,7 +253,7 @@ class CaretTransactionTest : VimTestCase() {
       vimScope.editor {
         change {
           withPrimaryCaret {
-            insertText(4, "NEW", caretAfterInsertedText = true, beforeCaret = false)
+            insertText(4, "NEW", caretAtEnd = true, insertBeforeCaret = false)
           }
         }
       }
@@ -271,7 +271,7 @@ class CaretTransactionTest : VimTestCase() {
       vimScope.editor {
         change {
           withPrimaryCaret {
-            insertText(4, "NEW", caretAfterInsertedText = false, beforeCaret = false)
+            insertText(4, "NEW", caretAtEnd = false, insertBeforeCaret = false)
           }
         }
       }
@@ -289,7 +289,7 @@ class CaretTransactionTest : VimTestCase() {
       vimScope.editor {
         change {
           withPrimaryCaret {
-            insertText(0, "START: ", beforeCaret = true)
+            insertText(0, "START: ", insertBeforeCaret = true)
           }
         }
       }
@@ -345,7 +345,7 @@ class CaretTransactionTest : VimTestCase() {
       vimScope.editor {
         change {
           withPrimaryCaret {
-            insertText(4, "line1\nline2\nline3", beforeCaret = true)
+            insertText(4, "line1\nline2\nline3", insertBeforeCaret = true)
           }
         }
       }
