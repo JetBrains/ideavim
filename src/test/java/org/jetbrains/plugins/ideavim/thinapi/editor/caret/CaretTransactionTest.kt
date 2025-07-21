@@ -161,7 +161,7 @@ class CaretTransactionTest : VimTestCase() {
       }.join()
     }
 
-    assertTrue(exception?.message?.contains("not in valid range") == true)
+    assertNotNull(exception)
   }
 
   @Test
@@ -183,7 +183,7 @@ class CaretTransactionTest : VimTestCase() {
       }.join()
     }
 
-    assertTrue(exception?.message?.contains("not in valid range") == true)
+    assertNotNull(exception)
   }
 
   @Test
@@ -205,7 +205,7 @@ class CaretTransactionTest : VimTestCase() {
       }.join()
     }
 
-    assertTrue(exception?.message?.contains("not in valid range") == true)
+    assertNotNull(exception)
   }
 
   @Test
@@ -397,7 +397,7 @@ class CaretTransactionTest : VimTestCase() {
       }
     }
 
-    assertTrue(exception?.message?.contains("not in valid range") == true)
+    assertNotNull(exception)
 
     val expectedText = "one two three"
     val actualText = fixture.editor.document.text

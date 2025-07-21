@@ -40,6 +40,12 @@ class CaretTransactionImpl(
   private val vimCaret: VimCaret
     get() = vimEditor.carets().firstOrNull { it.id == caretId.id } ?: vimEditor.primaryCaret()
 
+  private fun assertOffsetInRange(offset: Int, range: IntRange) {
+    require(offset in range) {
+      "Offset $this is not within the valid range ${range.start}..${range.endInclusive}."
+    }
+  }
+
   private fun determineSelectionType(startOffset: Int, endOffset: Int): SelectionType {
     val endOffsetNormalized = endOffset.coerceAtMost(vimEditor.fileSize().toInt())
     if (endOffsetNormalized == startOffset) return SelectionType.CHARACTER_WISE
@@ -66,9 +72,9 @@ class CaretTransactionImpl(
     }
   }
 
-  private fun putText(
-    startPosition: Int,
+  private fun putTextInternal(
     text: String,
+    visualSelection: PutData.VisualSelection?,
     caretAfterInsertedText: Boolean,
     beforeCaret: Boolean,
   ): Boolean {
@@ -77,14 +83,13 @@ class CaretTransactionImpl(
 
     val putData = PutData(
       textData = textData,
-      visualSelection = null,
+      visualSelection = visualSelection,
       count = 1,
       insertTextBeforeCaret = beforeCaret,
       rawIndent = false,
       caretAfterInsertedText = caretAfterInsertedText,
       putToLine = -1
     )
-    vimCaret.moveToOffset(startPosition)
 
     val result: Boolean = injector.put.putTextForCaret(
       vimEditor,
@@ -94,23 +99,6 @@ class CaretTransactionImpl(
       updateVisualMarks = false,
       modifyRegister = false
     )
-
-    val newOffset = if (caretAfterInsertedText) {
-      if (beforeCaret) {
-        startPosition + text.length - 1
-      } else {
-        startPosition + text.length
-      }
-    } else {
-      if (beforeCaret) {
-        startPosition
-      } else {
-        startPosition + 1
-      }
-    }.coerceIn(0, vimEditor.fileSize().toInt() - 1)
-
-    vimCaret.moveToOffset(newOffset)
-
     return result
   }
 
@@ -121,11 +109,29 @@ class CaretTransactionImpl(
     insertBeforeCaret: Boolean,
   ): Boolean {
     val validRange = 0..vimEditor.fileSize().toInt()
-    if (position !in validRange) {
-      throw IllegalArgumentException("Position $position is not in valid range $validRange")
-    }
+    assertOffsetInRange(position, validRange)
+
     vimCaret.moveToOffset(position)
-    return putText(position, text, caretAtEnd, insertBeforeCaret)
+
+    val returnValue = putTextInternal(text, null, caretAtEnd, insertBeforeCaret)
+
+    val newOffset = if (caretAtEnd) {
+      if (insertBeforeCaret) {
+        position + text.length - 1
+      } else {
+        position + text.length
+      }
+    } else {
+      if (insertBeforeCaret) {
+        position
+      } else {
+        position + 1
+      }
+    }.coerceIn(0, vimEditor.fileSize().toInt() - 1)
+
+    vimCaret.moveToOffset(newOffset)
+
+    return returnValue
   }
 
   override suspend fun replaceText(
@@ -141,21 +147,17 @@ class CaretTransactionImpl(
     val startOffsetValidRange = 0..<vimEditor.fileSize().toInt()
     val endOffsetValidRange = 0..vimEditor.fileSize().toInt()
 
-    if (startOffset !in startOffsetValidRange || endOffset - 1 !in endOffsetValidRange) {
-      throw IllegalArgumentException("Start offset $startOffset or end offset $endOffset is not in valid range")
-    }
+    assertOffsetInRange(startOffset, startOffsetValidRange)
+    assertOffsetInRange(endOffset, endOffsetValidRange)
 
     if (startOffset > endOffset) {
-      throw IllegalArgumentException("Start offset $startOffset is greater than end offset $endOffset")
+      throw IllegalArgumentException("Start offset must be less than or equal to end offset!")
     }
 
     if (startOffset == endOffset) {
       insertText(startOffset, text, caretAtEnd = false, insertBeforeCaret = true)
       return true
     }
-
-    val copiedText = injector.clipboardManager.dumbCopiedText(text)
-    val textData = PutData.TextData(null, copiedText, SelectionType.CHARACTER_WISE)
 
     val selectionType = determineSelectionType(startOffset, endOffset)
 
@@ -171,26 +173,7 @@ class CaretTransactionImpl(
       selectionType
     )
 
-    val putData = PutData(
-      textData = textData,
-      visualSelection = visualSelection,
-      count = 1,
-      insertTextBeforeCaret = true, // Always insert before caret for replace
-      rawIndent = false,
-      caretAfterInsertedText = false,
-      putToLine = -1
-    )
-
-    val result: Boolean = injector.put.putTextForCaret(
-      vimEditor,
-      vimCaret,
-      executionContext,
-      putData,
-      updateVisualMarks = false,
-      modifyRegister = false
-    )
-
-    return result
+    return putTextInternal(text, visualSelection, caretAfterInsertedText = false, beforeCaret = true)
   }
 
   override suspend fun replaceTextBlockwise(range: Range.Block, text: List<String>) {
@@ -205,9 +188,8 @@ class CaretTransactionImpl(
     val endOffsetValidRange = 0..vimEditor.fileSize().toInt()
 
     selections.forEach { selection ->
-      if (selection.start !in startOffsetValidRange || selection.end !in endOffsetValidRange) {
-        throw IllegalArgumentException("Start offset ${selection.start} or end offset ${selection.end} is not in valid range $startOffsetValidRange")
-      }
+      assertOffsetInRange(selection.start, startOffsetValidRange)
+      assertOffsetInRange(selection.end, endOffsetValidRange)
     }
 
     for (selection in selections.withIndex()) {
@@ -228,9 +210,8 @@ class CaretTransactionImpl(
     val startOffsetValidRange = 0..<vimEditor.fileSize().toInt()
     val endOffsetValidRange = 0..vimEditor.fileSize().toInt()
 
-    if (startOffset !in startOffsetValidRange || endOffset !in endOffsetValidRange) {
-      throw IllegalArgumentException("Start offset $startOffset or end offset $endOffset is not in valid range")
-    }
+    assertOffsetInRange(startOffset, startOffsetValidRange)
+    assertOffsetInRange(endOffset, endOffsetValidRange)
 
     val range = TextRange(startOffset, endOffset)
 
@@ -248,17 +229,12 @@ class CaretTransactionImpl(
   }
 
   override suspend fun updateCaret(offset: Int, selection: Range.Simple?) {
-    val fileSize = vimEditor.fileSize().toInt()
-    val validOffsetRange = 0..<fileSize
-
-    if (offset !in validOffsetRange) {
-      throw IllegalArgumentException("Offset $offset is not in valid range $validOffsetRange")
-    }
+    val validOffsetRange = 0..<vimEditor.fileSize().toInt()
+    assertOffsetInRange(offset, validOffsetRange)
 
     if (selection != null) {
-      if (selection.start !in validOffsetRange || selection.end !in validOffsetRange) {
-        throw IllegalArgumentException("Selection $selection is not in valid range $validOffsetRange")
-      }
+      assertOffsetInRange(selection.start, validOffsetRange)
+      assertOffsetInRange(selection.end, validOffsetRange)
     }
 
     vimCaret.moveToOffset(offset)
