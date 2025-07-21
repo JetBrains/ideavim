@@ -29,62 +29,11 @@ internal object VimExtensionRegistrar : VimExtensionRegistrator {
 
   private val delayedExtensionEnabling = mutableListOf<ExtensionBeanClass>()
 
-  private fun ExtensionBeanClass.getToggleOption(): ToggleOption {
-    val name = name ?: instance.name
-    return ToggleOption(name, OptionDeclaredScope.GLOBAL, getAbbrev(name), false)
-  }
-
-  private fun ToggleOption.isEnabled(): Boolean {
-    return injector.optionGroup.getOptionValue(this, OptionAccessScope.GLOBAL(null)).asBoolean()
-  }
-
-  private fun enableExtension(extensionBean: ExtensionBeanClass, name: String) {
-    initExtension(extensionBean, name)
-    PluginState.Util.enabledExtensions.add(name)
-  }
-
-  private fun disableExtension(extensionBean: ExtensionBeanClass, name: String) {
-    extensionBean.instance.dispose()
-    PluginState.Util.enabledExtensions.remove(name)
-  }
-
-  /**
-   * Calls dispose method on all currently enabled extensions.
-   */
   @JvmStatic
-  fun disableExtensions() {
-    VimExtension.EP_NAME.extensions.filter { extensionBean ->
-      extensionBean.getToggleOption().isEnabled()
-    }.forEach { disableExtension(it, it.name ?: it.instance.name) }
-  }
+  fun registerExtensions() {
+    if (extensionRegistered) return
+    extensionRegistered = true
 
-  /**
-   * Registers all extensions if they haven't been registered yet, or enables previously enabled extensions.
-   * This is called when the plugin is turned on.
-   */
-  @JvmStatic
-  fun enableExtensions() {
-    if (!extensionRegistered) {
-      registerExtensions()
-      extensionRegistered = true
-      return
-    }
-    // call init method for all extensions that were enabled before
-    initializeEnabledExtensions()
-  }
-
-  /**
-   * Enables all extensions that have their toggle option enabled.
-   * Calls the init() method on each enabled extension.
-   */
-  @JvmStatic
-  private fun initializeEnabledExtensions() {
-    VimExtension.EP_NAME.extensions.filter { extensionBean ->
-      extensionBean.getToggleOption().isEnabled()
-    }.forEach { enableExtension(it, it.name ?: it.instance.name) }
-  }
-
-  private fun registerExtensions() {
     VimExtension.EP_NAME.extensions.forEach(this::registerExtension)
 
     VimExtension.EP_NAME.point.addExtensionPointListener(
@@ -114,13 +63,14 @@ internal object VimExtensionRegistrar : VimExtensionRegistrator {
 
     registeredExtensions.add(name)
     registerAliases(extensionBean)
-    val option = extensionBean.getToggleOption()
+    val option = ToggleOption(name, OptionDeclaredScope.GLOBAL, getAbbrev(name), false)
     VimPlugin.getOptionGroup().addOption(option)
     VimPlugin.getOptionGroup().addGlobalOptionChangeListener(option) {
-      if (option.isEnabled()) {
-        enableExtension(extensionBean, name)
+      if (injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(null)).asBoolean()) {
+        initExtension(extensionBean, name)
+        PluginState.Util.enabledExtensions.add(name)
       } else {
-        disableExtension(extensionBean, name)
+        extensionBean.instance.dispose()
       }
     }
   }
@@ -159,7 +109,7 @@ internal object VimExtensionRegistrar : VimExtensionRegistrator {
     if (name !in registeredExtensions) return
     registeredExtensions.remove(name)
     removeAliases(extension)
-    disableExtension(extension, name)
+    extension.instance.dispose()
     VimPlugin.getOptionGroup().removeOption(name)
     MappingOwner.Plugin.Companion.remove(name)
     ListenerOwner.Plugin.Companion.remove(name)
