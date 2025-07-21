@@ -120,7 +120,7 @@ class CaretTransactionImpl(
     caretAtEnd: Boolean,
     insertBeforeCaret: Boolean,
   ): Boolean {
-    val validRange = 0..<vimEditor.fileSize().toInt()
+    val validRange = 0..vimEditor.fileSize().toInt()
     if (position !in validRange) {
       throw IllegalArgumentException("Position $position is not in valid range $validRange")
     }
@@ -133,9 +133,16 @@ class CaretTransactionImpl(
     endOffset: Int,
     text: String,
   ): Boolean {
-    val validRange = 0..<vimEditor.fileSize().toInt()
-    if (startOffset !in validRange || endOffset - 1 !in validRange) {
-      throw IllegalArgumentException("Start offset $startOffset or end offset $endOffset is not in valid range $validRange")
+    if (vimEditor.text().isEmpty()) {
+      insertText(startOffset, text, caretAtEnd = true)
+      return true
+    }
+
+    val startOffsetValidRange = 0..<vimEditor.fileSize().toInt()
+    val endOffsetValidRange = 0..vimEditor.fileSize().toInt()
+
+    if (startOffset !in startOffsetValidRange || endOffset - 1 !in endOffsetValidRange) {
+      throw IllegalArgumentException("Start offset $startOffset or end offset $endOffset is not in valid range")
     }
 
     if (startOffset > endOffset) {

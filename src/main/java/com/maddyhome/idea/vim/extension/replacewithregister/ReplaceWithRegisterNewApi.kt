@@ -131,7 +131,7 @@ class ReplaceWithRegisterNewApi : VimPluginBase() {
           if (index == 0) {
             replaceText(offset, endOffset, lineText)
           } else {
-            insertText(offset, lineText)
+            insertText(offset, lineText, insertBeforeCaret = true)
           }
         }
 
