@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.extension.nerdtree
 
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.options.advanced.AdvancedSettings
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.ui.tree.TreeUtil
 import com.maddyhome.idea.vim.VimPlugin
@@ -18,6 +19,7 @@ import com.maddyhome.idea.vim.key.add
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import javax.swing.KeyStroke
+import javax.swing.tree.TreeNode
 
 /**
  * Maps key sequences to NERDTree actions using KeyStrokeTrie for efficient lookup.
@@ -102,7 +104,26 @@ internal class Mappings(name: String) {
         }
       }
     })
-    register("NERDTreeMapCloseChildren", "X", Action.ij("CollapseTreeNode"))
+    register(
+      "NERDTreeMapCloseChildren",
+      "X",
+      Action { _, tree ->
+        val path = tree.selectionPath ?: return@Action
+
+        // FIXME We should avoid relying on `ide.tree.collapse.recursively` since it closes visible paths only
+        val recursive = AdvancedSettings.getBoolean("ide.tree.collapse.recursively")
+        try {
+          AdvancedSettings.setBoolean("ide.tree.collapse.recursively", true)
+          // Note that we cannot use `tree.collapsePaths` here since it does not respect `ide.tree.collapse.recursively`
+          TreeUtil.listChildren(path.lastPathComponent as TreeNode).filterNot(TreeNode::isLeaf)
+            .map(path::pathByAddingChild).forEach(tree::collapsePath)
+        } finally {
+          AdvancedSettings.setBoolean("ide.tree.collapse.recursively", recursive)
+        }
+
+        tree.scrollPathToVisible(path)
+      },
+    )
 
     // FIXME The first row is not the root of External Libraries
     register("NERDTreeMapJumpRoot", "P", Action.ij("Tree-selectFirst"))
