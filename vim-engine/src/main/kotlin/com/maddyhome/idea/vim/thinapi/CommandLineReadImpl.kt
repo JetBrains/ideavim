@@ -17,7 +17,7 @@ class CommandLineReadImpl: CommandLineRead {
     get() = injector.commandLine.getActiveCommandLine()
 
   override val text: String
-    get() = activeCommandLine?.actualText ?: ""
+    get() = activeCommandLine?.text ?: ""
 
   override val caretPosition: Int
     get() = activeCommandLine?.caret?.offset ?: 0

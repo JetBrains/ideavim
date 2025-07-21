@@ -101,6 +101,16 @@ class ModalInputTest : MockTestCase() {
     )
   }
 
+  fun consumeByInterceptor(chars: String, interceptor: VimInputInterceptor) {
+    injector.parser.parseKeys(chars).forEach { c ->
+      interceptor.consumeKey(c, vimEditor, executionContext)
+    }
+  }
+
+  fun consumeByInterceptor(char: Char, interceptor: VimInputInterceptor) {
+    consumeByInterceptor(char.toString(), interceptor)
+  }
+
   @Test
   fun `test updateLabel with inputChar`() {
     val label = "Enter character:"
@@ -122,7 +132,7 @@ class ModalInputTest : MockTestCase() {
         receivedChar = char
       }
 
-    val interceptorCaptor = argumentCaptor<VimInputInterceptor<*>>()
+    val interceptorCaptor = argumentCaptor<VimInputInterceptor>()
     val editorCaptor = argumentCaptor<VimEditor>()
 
     verify(modalInputService).create(
@@ -134,14 +144,12 @@ class ModalInputTest : MockTestCase() {
 
     assertEqualsEditor(vimEditor, editorCaptor.firstValue)
 
-    val interceptor = interceptorCaptor.firstValue as VimInputInterceptor<Char>
-    val testChar = 'a'
-    interceptor.executeInput(testChar, vimEditor, executionContext)
-    interceptor.executeInput(testChar, vimEditor, executionContext)
+    val testChars = "aa"
+    consumeByInterceptor(chars = testChars, interceptor = interceptorCaptor.firstValue)
 
     assertEquals(2, handlerCalledCount)
     assertEquals("Enter character: - Updated", currentLabel)
-    assertEquals(testChar, receivedChar)
+    assertEquals(testChars.last(), receivedChar)
   }
 
   @Test
@@ -161,7 +169,7 @@ class ModalInputTest : MockTestCase() {
         receivedChar = char
       }
 
-    val interceptorCaptor = argumentCaptor<VimInputInterceptor<*>>()
+    val interceptorCaptor = argumentCaptor<VimInputInterceptor>()
     val editorCaptor = argumentCaptor<VimEditor>()
 
     verify(modalInputService).create(
@@ -173,9 +181,8 @@ class ModalInputTest : MockTestCase() {
 
     assertEqualsEditor(vimEditor, editorCaptor.firstValue)
 
-    val interceptor = interceptorCaptor.firstValue as VimInputInterceptor<Char>
     val testChar = 'a'
-    interceptor.executeInput(testChar, vimEditor, executionContext)
+    consumeByInterceptor(char = testChar, interceptor = interceptorCaptor.firstValue)
 
     assertEquals(1, handlerCalledCount)
     assertEquals(testChar, receivedChar)
@@ -196,7 +203,7 @@ class ModalInputTest : MockTestCase() {
         receivedChar = char
       }
 
-    val interceptorCaptor = argumentCaptor<VimInputInterceptor<*>>()
+    val interceptorCaptor = argumentCaptor<VimInputInterceptor>()
     val editorCaptor = argumentCaptor<VimEditor>()
 
     verify(modalInputService).create(
@@ -208,14 +215,11 @@ class ModalInputTest : MockTestCase() {
 
     assertEqualsEditor(vimEditor, editorCaptor.firstValue)
 
-    val interceptor = interceptorCaptor.firstValue as VimInputInterceptor<Char>
-    val testChar = 'a'
-    interceptor.executeInput(testChar, vimEditor, executionContext)
-    interceptor.executeInput(testChar, vimEditor, executionContext)
-    interceptor.executeInput(testChar, vimEditor, executionContext)
+    val testChars = "aaa"
+    consumeByInterceptor(chars = testChars, interceptor = interceptorCaptor.firstValue)
 
     assertEquals(3, handlerCalledCount)
-    assertEquals(testChar, receivedChar)
+    assertEquals(testChars.last(), receivedChar)
   }
 
   @Test
@@ -232,7 +236,7 @@ class ModalInputTest : MockTestCase() {
         receivedString = string
       }
 
-    val interceptorCaptor = argumentCaptor<VimInputInterceptor<*>>()
+    val interceptorCaptor = argumentCaptor<VimInputInterceptor>()
     val editorCaptor = argumentCaptor<VimEditor>()
 
     verify(modalInputService).create(
@@ -244,12 +248,11 @@ class ModalInputTest : MockTestCase() {
 
     assertEqualsEditor(vimEditor, editorCaptor.firstValue)
 
-    val interceptor = interceptorCaptor.firstValue as VimInputInterceptor<String>
-    val testString = "test"
-    interceptor.executeInput(testString, vimEditor, executionContext)
+    val testWord = "test"
+    consumeByInterceptor(chars = "$testWord<CR>", interceptor = interceptorCaptor.firstValue)
 
     assertEquals(1, handlerCalledCount)
-    assertEquals(testString, receivedString)
+    assertEquals(testWord, receivedString)
   }
 
   @Test
@@ -266,7 +269,7 @@ class ModalInputTest : MockTestCase() {
         receivedChar = char
       }
 
-    val interceptorCaptor = argumentCaptor<VimInputInterceptor<*>>()
+    val interceptorCaptor = argumentCaptor<VimInputInterceptor>()
     val editorCaptor = argumentCaptor<VimEditor>()
 
     verify(modalInputService).create(
@@ -278,9 +281,8 @@ class ModalInputTest : MockTestCase() {
 
     assertEqualsEditor(vimEditor, editorCaptor.firstValue)
 
-    val interceptor = interceptorCaptor.firstValue as VimInputInterceptor<Char>
     val testChar = 'a'
-    interceptor.executeInput(testChar, vimEditor, executionContext)
+    consumeByInterceptor(char = testChar, interceptor = interceptorCaptor.firstValue)
 
     assertEquals(1, handlerCalledCount)
     assertEquals(testChar, receivedChar)
