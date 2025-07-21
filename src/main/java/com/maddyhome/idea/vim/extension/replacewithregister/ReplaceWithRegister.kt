@@ -43,16 +43,16 @@ import org.jetbrains.annotations.NonNls
 
 internal class ReplaceWithRegister : VimExtension {
 
-  override val name: String = "ReplaceWithRegister"
+  override fun getName(): String = "ReplaceWithRegister"
 
-  override suspend fun init() {
-    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys(RWR_OPERATOR), mappingOwner, RwrMotion(), false)
-    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys(RWR_LINE), mappingOwner, RwrLine(), false)
-    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.X, injector.parser.parseKeys(RWR_VISUAL), mappingOwner, RwrVisual(), false)
+  override fun init() {
+    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys(RWR_OPERATOR), owner, RwrMotion(), false)
+    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys(RWR_LINE), owner, RwrLine(), false)
+    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.X, injector.parser.parseKeys(RWR_VISUAL), owner, RwrVisual(), false)
 
-    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("gr"), mappingOwner, injector.parser.parseKeys(RWR_OPERATOR), true)
-    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("grr"), mappingOwner, injector.parser.parseKeys(RWR_LINE), true)
-    putKeyMappingIfMissing(MappingMode.X, injector.parser.parseKeys("gr"), mappingOwner, injector.parser.parseKeys(RWR_VISUAL), true)
+    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("gr"), owner, injector.parser.parseKeys(RWR_OPERATOR), true)
+    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("grr"), owner, injector.parser.parseKeys(RWR_LINE), true)
+    putKeyMappingIfMissing(MappingMode.X, injector.parser.parseKeys("gr"), owner, injector.parser.parseKeys(RWR_VISUAL), true)
 
     VimExtensionFacade.exportOperatorFunction(OPERATOR_FUNC, Operator())
   }

@@ -143,12 +143,12 @@ class OpMappingTest : VimTestCase() {
 
     Disposer.dispose(disposable)
     disposable = Disposer.newDisposable()
-    assertEmpty(getKeyMappingByOwner(extension.instance.mappingOwner))
+    assertEmpty(getKeyMappingByOwner(extension.instance.owner))
     typeText("Q")
     assertState("I$c found it in a legendary land")
 
     VimExtension.EP_NAME.point.registerExtension(extension, disposable)
-    assertEmpty(getKeyMappingByOwner(extension.instance.mappingOwner))
+    assertEmpty(getKeyMappingByOwner(extension.instance.owner))
     enableExtensions("TestExtension")
     typeText("Q")
     assertState("I ${c}found it in a legendary land")
@@ -363,63 +363,63 @@ private class TestExtension : VimExtension {
   var initialized = false
   var disposed = false
 
-  override val name: String = "TestExtension"
+  override fun getName(): String = "TestExtension"
 
-  override suspend fun init() {
+  override fun init() {
     initialized = true
     putExtensionHandlerMapping(
       MappingMode.O,
       injector.parser.parseKeys("<Plug>TestExtensionEmulateInclusive"),
-      mappingOwner,
+      owner,
       MoveEmulateInclusive(),
       false,
     )
     putExtensionHandlerMapping(
       MappingMode.O,
       injector.parser.parseKeys("<Plug>TestExtensionBackwardsCharacter"),
-      mappingOwner,
+      owner,
       MoveBackwards(),
       false,
     )
     putExtensionHandlerMapping(
       MappingMode.O,
       injector.parser.parseKeys("<Plug>TestExtensionCharacter"),
-      mappingOwner,
+      owner,
       Move(),
       false
     )
     putExtensionHandlerMapping(
       MappingMode.O,
       injector.parser.parseKeys("<Plug>TestExtensionLinewise"),
-      mappingOwner,
+      owner,
       MoveLinewise(),
       false
     )
     putExtensionHandlerMapping(
       MappingMode.N,
       injector.parser.parseKeys("<Plug>TestMotion"),
-      mappingOwner,
+      owner,
       MoveLinewiseInNormal(),
       false
     )
     putExtensionHandlerMapping(
       MappingMode.N,
       injector.parser.parseKeys("<Plug>TestMissing"),
-      mappingOwner,
+      owner,
       MoveLinewiseInNormal(),
       false
     )
     putExtensionHandlerMapping(
       MappingMode.NO,
       injector.parser.parseKeys("<Plug>TestDelayed"),
-      mappingOwner,
+      owner,
       DelayedAction(),
       false
     )
     putExtensionHandlerMapping(
       MappingMode.NO,
       injector.parser.parseKeys("<Plug>TestIncorrectDelayed"),
-      mappingOwner,
+      owner,
       DelayedIncorrectAction(),
       false
     )
@@ -427,49 +427,49 @@ private class TestExtension : VimExtension {
     putKeyMapping(
       MappingMode.O,
       injector.parser.parseKeys("U"),
-      mappingOwner,
+      owner,
       injector.parser.parseKeys("<Plug>TestExtensionEmulateInclusive"),
       true
     )
     putKeyMapping(
       MappingMode.O,
       injector.parser.parseKeys("P"),
-      mappingOwner,
+      owner,
       injector.parser.parseKeys("<Plug>TestExtensionBackwardsCharacter"),
       true
     )
     putKeyMapping(
       MappingMode.O,
       injector.parser.parseKeys("I"),
-      mappingOwner,
+      owner,
       injector.parser.parseKeys("<Plug>TestExtensionCharacter"),
       true
     )
     putKeyMapping(
       MappingMode.O,
       injector.parser.parseKeys("O"),
-      mappingOwner,
+      owner,
       injector.parser.parseKeys("<Plug>TestExtensionLinewise"),
       true
     )
     putKeyMapping(
       MappingMode.N,
       injector.parser.parseKeys("Q"),
-      mappingOwner,
+      owner,
       injector.parser.parseKeys("<Plug>TestMotion"),
       true
     )
     putKeyMapping(
       MappingMode.NO,
       injector.parser.parseKeys("R"),
-      mappingOwner,
+      owner,
       injector.parser.parseKeys("<Plug>TestDelayed"),
       true
     )
     putKeyMapping(
       MappingMode.NO,
       injector.parser.parseKeys("E"),
-      mappingOwner,
+      owner,
       injector.parser.parseKeys("<Plug>TestIncorrectDelayed"),
       true
     )
@@ -477,14 +477,14 @@ private class TestExtension : VimExtension {
     putKeyMappingIfMissing(
       MappingMode.N,
       injector.parser.parseKeys("Z"),
-      mappingOwner,
+      owner,
       injector.parser.parseKeys("<Plug>TestMissing"),
       true
     )
     putKeyMappingIfMissing(
       MappingMode.I,
       injector.parser.parseKeys("L"),
-      mappingOwner,
+      owner,
       injector.parser.parseKeys("<Plug>TestMissing"),
       true
     )

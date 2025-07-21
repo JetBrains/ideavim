@@ -59,25 +59,25 @@ import javax.swing.KeyStroke
  */
 internal class VimSurroundExtension : VimExtension {
 
-  override val name = "surround"
+  override fun getName() = "surround"
 
   @NonNls
   private val NO_MAPPINGS = "surround_no_mappings"
 
-  override suspend fun init() {
-    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>YSurround"), mappingOwner, YSurroundHandler(), false)
-    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>Yssurround"), mappingOwner, YSSurroundHandler(), false)
-    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>CSurround"), mappingOwner, CSurroundHandler(), false)
-    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>DSurround"), mappingOwner, DSurroundHandler(), false)
-    putExtensionHandlerMapping(MappingMode.XO, injector.parser.parseKeys("<Plug>VSurround"), mappingOwner, VSurroundHandler(), false)
+  override fun init() {
+    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>YSurround"), owner, YSurroundHandler(), false)
+    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>Yssurround"), owner, YSSurroundHandler(), false)
+    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>CSurround"), owner, CSurroundHandler(), false)
+    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>DSurround"), owner, DSurroundHandler(), false)
+    putExtensionHandlerMapping(MappingMode.XO, injector.parser.parseKeys("<Plug>VSurround"), owner, VSurroundHandler(), false)
 
     val noMappings = VimPlugin.getVariableService().getGlobalVariableValue(NO_MAPPINGS)?.asBoolean() ?: false
     if (!noMappings) {
-      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("ys"), mappingOwner, injector.parser.parseKeys("<Plug>YSurround"), true)
-      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("yss"), mappingOwner, injector.parser.parseKeys("<Plug>Yssurround"), true)
-      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("cs"), mappingOwner, injector.parser.parseKeys("<Plug>CSurround"), true)
-      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("ds"), mappingOwner, injector.parser.parseKeys("<Plug>DSurround"), true)
-      putKeyMappingIfMissing(MappingMode.XO, injector.parser.parseKeys("S"), mappingOwner, injector.parser.parseKeys("<Plug>VSurround"), true)
+      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("ys"), owner, injector.parser.parseKeys("<Plug>YSurround"), true)
+      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("yss"), owner, injector.parser.parseKeys("<Plug>Yssurround"), true)
+      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("cs"), owner, injector.parser.parseKeys("<Plug>CSurround"), true)
+      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("ds"), owner, injector.parser.parseKeys("<Plug>DSurround"), true)
+      putKeyMappingIfMissing(MappingMode.XO, injector.parser.parseKeys("S"), owner, injector.parser.parseKeys("<Plug>VSurround"), true)
     }
 
     VimExtensionFacade.exportOperatorFunction(OPERATOR_FUNC, Operator())

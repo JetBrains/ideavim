@@ -113,9 +113,9 @@ import javax.swing.SwingConstants
  * ?........Toggle the display of the quick help.......................|NERDTree-?|
  */
 internal class NerdTree : VimExtension {
-  override val name: String = pluginName
+  override fun getName(): String = pluginName
 
-  override suspend fun init() {
+  override fun init() {
     LOG.info("IdeaVim: Initializing NERDTree extension. Disable this extension if you observe a strange behaviour of the project tree. E.g. moving down on 'j'")
 
     registerCommands()

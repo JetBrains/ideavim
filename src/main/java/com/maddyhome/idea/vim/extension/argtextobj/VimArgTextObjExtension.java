@@ -29,8 +29,6 @@ import com.maddyhome.idea.vim.newapi.IjVimEditor;
 import com.maddyhome.idea.vim.state.KeyHandlerState;
 import com.maddyhome.idea.vim.state.mode.Mode;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
-import kotlin.Unit;
-import kotlin.coroutines.Continuation;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,15 +50,14 @@ public class VimArgTextObjExtension implements VimExtension {
     return "argtextobj";
   }
 
-  // passing Continuation object to make it suspend
   @Override
-  public @Nullable Object init(@NotNull Continuation<? super Unit> continuation) {
-    putExtensionHandlerMapping(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("<Plug>InnerArgument"), getMappingOwner(), new VimArgTextObjExtension.ArgumentHandler(true), false);
-    putExtensionHandlerMapping(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("<Plug>OuterArgument"), getMappingOwner(), new VimArgTextObjExtension.ArgumentHandler(false), false);
+  public void init() {
 
-    putKeyMappingIfMissing(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("ia"), getMappingOwner(), VimInjectorKt.getInjector().getParser().parseKeys("<Plug>InnerArgument"), true);
-    putKeyMappingIfMissing(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("aa"), getMappingOwner(), VimInjectorKt.getInjector().getParser().parseKeys("<Plug>OuterArgument"), true);
-    return null;
+    putExtensionHandlerMapping(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("<Plug>InnerArgument"), getOwner(), new VimArgTextObjExtension.ArgumentHandler(true), false);
+    putExtensionHandlerMapping(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("<Plug>OuterArgument"), getOwner(), new VimArgTextObjExtension.ArgumentHandler(false), false);
+
+    putKeyMappingIfMissing(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("ia"), getOwner(), VimInjectorKt.getInjector().getParser().parseKeys("<Plug>InnerArgument"), true);
+    putKeyMappingIfMissing(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("aa"), getOwner(), VimInjectorKt.getInjector().getParser().parseKeys("<Plug>OuterArgument"), true);
   }
 
   /**

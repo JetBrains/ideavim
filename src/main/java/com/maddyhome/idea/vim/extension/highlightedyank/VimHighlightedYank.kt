@@ -90,9 +90,9 @@ internal class VimHighlightedYank : VimExtension, VimYankListener, ModeChangeLis
   private val highlightHandler = HighlightHandler()
   private var initialised = false
 
-  override val name = "highlightedyank"
+  override fun getName() = "highlightedyank"
 
-  override suspend fun init() {
+  override fun init() {
     // Note that these listeners will still be registered when IdeaVim is disabled. However, they'll never get called
     injector.listenersNotifier.modeChangeListeners.add(this)
     injector.listenersNotifier.yankListeners.add(this)

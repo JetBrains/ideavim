@@ -13,13 +13,13 @@ import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.thinapi.VimScopeImpl
 
 abstract class VimPluginBase : VimExtension {
-  final override suspend fun init() {
-    val vimScope = VimScopeImpl(listenerOwner, mappingOwner = mappingOwner)
+  override fun init() {
+    val vimScope = VimScopeImpl(listenerOwner, mappingOwner = owner)
     vimScope.init()
   }
 
   final override fun dispose() {
-    val vimScope = VimScopeImpl(listenerOwner, mappingOwner = mappingOwner)
+    val vimScope = VimScopeImpl(listenerOwner, mappingOwner = owner)
     vimScope.unload()
 
     super.dispose()

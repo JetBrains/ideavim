@@ -56,9 +56,9 @@ internal class IdeaVimSneakExtension : VimExtension {
     }
   }
 
-  override val name: String = "sneak"
+  override fun getName(): String = "sneak"
 
-  override suspend fun init() {
+  override fun init() {
     val _highlightHandler = HighlightHandler()
     highlightHandler = _highlightHandler
     mapToFunctionAndProvideKeys("s", SneakHandler(_highlightHandler, Direction.FORWARD), MappingMode.NXO)
@@ -302,14 +302,14 @@ private fun VimExtension.mapToFunctionAndProvideKeys(
   VimExtensionFacade.putExtensionHandlerMapping(
     mappingModes,
     injector.parser.parseKeys(command(keys)),
-    mappingOwner,
+    owner,
     handler,
     false
   )
   VimExtensionFacade.putExtensionHandlerMapping(
     mappingModes,
     injector.parser.parseKeys(commandFromOriginalPlugin(keys)),
-    mappingOwner,
+    owner,
     handler,
     false
   )
@@ -332,11 +332,11 @@ private fun VimExtension.mapToFunctionAndProvideKeys(
   val doubleFiltered = mappingModes
     .filter { it in filteredModes2 && it in filteredModes && it in filteredFromModes }
     .toSet()
-  putKeyMapping(doubleFiltered, fromKeys, mappingOwner, injector.parser.parseKeys(command(keys)), true)
+  putKeyMapping(doubleFiltered, fromKeys, owner, injector.parser.parseKeys(command(keys)), true)
   putKeyMapping(
     doubleFiltered,
     fromKeys,
-    mappingOwner,
+    owner,
     injector.parser.parseKeys(commandFromOriginalPlugin(keys)),
     true
   )

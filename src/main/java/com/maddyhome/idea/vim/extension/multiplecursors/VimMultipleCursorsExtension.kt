@@ -72,32 +72,32 @@ private var Editor.vimMultipleCursorsLastSelection: TextRange? by userData()
  * */
 internal class VimMultipleCursorsExtension : VimExtension {
 
-  override val name = "multiple-cursors"
+  override fun getName() = "multiple-cursors"
 
-  override suspend fun init() {
-    putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys(NEXT_WHOLE_OCCURRENCE), mappingOwner, NextOccurrenceHandler(), false)
+  override fun init() {
+    putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys(NEXT_WHOLE_OCCURRENCE), owner, NextOccurrenceHandler(), false)
     putExtensionHandlerMapping(
       MappingMode.NXO,
       injector.parser.parseKeys(NEXT_OCCURRENCE),
-      mappingOwner,
+      owner,
       NextOccurrenceHandler(whole = false),
       false,
     )
-    putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys(ALL_WHOLE_OCCURRENCES), mappingOwner, AllOccurrencesHandler(), false)
+    putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys(ALL_WHOLE_OCCURRENCES), owner, AllOccurrencesHandler(), false)
     putExtensionHandlerMapping(
       MappingMode.NXO,
       injector.parser.parseKeys(ALL_OCCURRENCES),
-      mappingOwner,
+      owner,
       AllOccurrencesHandler(whole = false),
       false,
     )
-    putExtensionHandlerMapping(MappingMode.X, injector.parser.parseKeys(SKIP_OCCURRENCE), mappingOwner, SkipOccurrenceHandler(), false)
-    putExtensionHandlerMapping(MappingMode.X, injector.parser.parseKeys(REMOVE_OCCURRENCE), mappingOwner, RemoveOccurrenceHandler(), false)
+    putExtensionHandlerMapping(MappingMode.X, injector.parser.parseKeys(SKIP_OCCURRENCE), owner, SkipOccurrenceHandler(), false)
+    putExtensionHandlerMapping(MappingMode.X, injector.parser.parseKeys(REMOVE_OCCURRENCE), owner, RemoveOccurrenceHandler(), false)
 
-    putKeyMappingIfMissing(MappingMode.NXO, injector.parser.parseKeys("<A-n>"), mappingOwner, injector.parser.parseKeys(NEXT_WHOLE_OCCURRENCE), true)
-    putKeyMappingIfMissing(MappingMode.NXO, injector.parser.parseKeys("g<A-n>"), mappingOwner, injector.parser.parseKeys(NEXT_OCCURRENCE), true)
-    putKeyMappingIfMissing(MappingMode.X, injector.parser.parseKeys("<A-x>"), mappingOwner, injector.parser.parseKeys(SKIP_OCCURRENCE), true)
-    putKeyMappingIfMissing(MappingMode.X, injector.parser.parseKeys("<A-p>"), mappingOwner, injector.parser.parseKeys(REMOVE_OCCURRENCE), true)
+    putKeyMappingIfMissing(MappingMode.NXO, injector.parser.parseKeys("<A-n>"), owner, injector.parser.parseKeys(NEXT_WHOLE_OCCURRENCE), true)
+    putKeyMappingIfMissing(MappingMode.NXO, injector.parser.parseKeys("g<A-n>"), owner, injector.parser.parseKeys(NEXT_OCCURRENCE), true)
+    putKeyMappingIfMissing(MappingMode.X, injector.parser.parseKeys("<A-x>"), owner, injector.parser.parseKeys(SKIP_OCCURRENCE), true)
+    putKeyMappingIfMissing(MappingMode.X, injector.parser.parseKeys("<A-p>"), owner, injector.parser.parseKeys(REMOVE_OCCURRENCE), true)
   }
 
   abstract class WriteActionHandler : ExtensionHandler {

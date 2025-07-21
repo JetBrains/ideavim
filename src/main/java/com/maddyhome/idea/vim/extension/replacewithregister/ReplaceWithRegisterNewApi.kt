@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.extension.thin.api.VimPluginBase
 import kotlinx.coroutines.Job
 
 class ReplaceWithRegisterNewApi : VimPluginBase() {
-  override val name: String = "ReplaceWithRegister"
+  override fun getName(): String = "ReplaceWithRegister"
 
   override fun VimScope.init() {
     mappings {

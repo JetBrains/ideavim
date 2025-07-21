@@ -20,7 +20,6 @@ import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.options.OptionDeclaredScope
 import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.statistic.PluginState
-import kotlinx.coroutines.runBlocking
 
 internal object VimExtensionRegistrar : VimExtensionRegistrator {
   internal val registeredExtensions: MutableSet<String> = HashSet()
@@ -134,9 +133,7 @@ internal object VimExtensionRegistrar : VimExtensionRegistrator {
     if (injector.vimscriptExecutor.executingVimscript) {
       delayedExtensionEnabling += extensionBean
     } else {
-      runBlocking {
-        extensionBean.instance.init()
-      }
+      extensionBean.instance.init()
       logger.info("IdeaVim extension '$name' initialized")
     }
   }
@@ -150,9 +147,7 @@ internal object VimExtensionRegistrar : VimExtensionRegistrator {
   @JvmStatic
   fun enableDelayedExtensions() {
     delayedExtensionEnabling.forEach {
-      runBlocking {
-        it.instance.init()
-      }
+      it.instance.init()
       logger.info("IdeaVim extension '${it.name}' initialized")
     }
     delayedExtensionEnabling.clear()
