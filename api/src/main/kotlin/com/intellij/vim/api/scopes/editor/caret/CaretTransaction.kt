@@ -107,12 +107,6 @@ interface CaretTransaction : CaretRead {
     endOffset: Int,
   ): Boolean
 
-  suspend fun getLineStartOffset(line: Int): Int
-
-  suspend fun getLineEndOffset(line: Int, allowEnd: Boolean): Int
-
-  suspend fun getLine(offset: Int): Line
-
   /**
    * Adds a jump with the current caret's position to the jump list.
    *
