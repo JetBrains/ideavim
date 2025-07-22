@@ -78,12 +78,9 @@ class VimListenersNotifier {
   }
 
   /**
-   * Removes listeners with a given listener owner and calls onRemove method on each removed listener.
+   * Removes listeners with a given listener owner.
    */
   private fun <T : Listener> unloadListeners(listenerOwner: ListenerOwner, listenerCollection: MutableCollection<T>) {
-    listenerCollection
-      .filter { listener -> listener.owner == listenerOwner }
-      .forEach { listener -> listener.onRemove() }
     listenerCollection.removeIf { it.owner == listenerOwner }
   }
 

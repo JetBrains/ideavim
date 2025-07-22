@@ -11,11 +11,4 @@ package com.maddyhome.idea.vim.common
 interface Listener {
   val owner: ListenerOwner
     get() = ListenerOwner.IdeaVim.System
-
-  /**
-   * Called when listener is removed.
-   */
-  fun onRemove() {
-    // empty
-  }
 }
