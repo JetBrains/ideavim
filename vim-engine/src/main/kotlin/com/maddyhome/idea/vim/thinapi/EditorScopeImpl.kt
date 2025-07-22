@@ -8,9 +8,9 @@
 
 package com.maddyhome.idea.vim.thinapi
 
-import com.intellij.vim.api.scopes.EditorScope
-import com.intellij.vim.api.scopes.Read
-import com.intellij.vim.api.scopes.Transaction
+import com.intellij.vim.api.scopes.editor.EditorScope
+import com.intellij.vim.api.scopes.editor.Read
+import com.intellij.vim.api.scopes.editor.Transaction
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.key.MappingOwner

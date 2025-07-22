@@ -68,7 +68,7 @@
       </aliases>
     </vimExtension>
 
-    <vimExtension implementation="com.maddyhome.idea.vim.extension.replacewithregister.ReplaceWithRegisterNewApi"
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.replacewithregister.ReplaceWithRegister"
                   name="ReplaceWithRegister">
       <aliases>
         <alias name="https://github.com/vim-scripts/ReplaceWithRegister"/>
@@ -89,7 +89,7 @@
       </aliases>
     </vimExtension>
 
-    <vimExtension implementation="com.maddyhome.idea.vim.extension.highlightedyank.VimHighlightedYankNewApi"
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.highlightedyank.VimHighlightedYank"
                   name="highlightedyank">
       <aliases>
         <alias name="https://github.com/machakann/vim-highlightedyank"/>

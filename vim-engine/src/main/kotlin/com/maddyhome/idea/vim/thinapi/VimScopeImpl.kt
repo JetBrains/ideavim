@@ -11,9 +11,9 @@ package com.maddyhome.idea.vim.thinapi
 
 import com.intellij.vim.api.Mode
 import com.intellij.vim.api.Path
-import com.intellij.vim.api.scopes.CommandLineScope
+import com.intellij.vim.api.scopes.commandline.CommandLineScope
 import com.intellij.vim.api.scopes.DigraphScope
-import com.intellij.vim.api.scopes.EditorScope
+import com.intellij.vim.api.scopes.editor.EditorScope
 import com.intellij.vim.api.scopes.ListenersScope
 import com.intellij.vim.api.scopes.MappingScope
 import com.intellij.vim.api.scopes.ModalInput

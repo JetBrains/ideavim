@@ -14,8 +14,8 @@ import com.intellij.vim.api.Jump
 import com.intellij.vim.api.Line
 import com.intellij.vim.api.Mark
 import com.intellij.vim.api.Range
-import com.intellij.vim.api.scopes.Read
-import com.intellij.vim.api.scopes.caret.CaretRead
+import com.intellij.vim.api.scopes.editor.Read
+import com.intellij.vim.api.scopes.editor.caret.CaretRead
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.injector

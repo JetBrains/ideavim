@@ -12,8 +12,8 @@ import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.Color
 import com.intellij.vim.api.HighlightId
 import com.intellij.vim.api.Jump
-import com.intellij.vim.api.scopes.Transaction
-import com.intellij.vim.api.scopes.caret.CaretTransaction
+import com.intellij.vim.api.scopes.editor.Transaction
+import com.intellij.vim.api.scopes.editor.caret.CaretTransaction
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ListenerOwner

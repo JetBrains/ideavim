@@ -224,7 +224,7 @@ class ReadTest : MockTestCase() {
 
     vimScope.editor {
       read {
-        getNextWordEndOffset(startOffset, count, isBigWord, stopOnEmptyLine)
+        getNextWordEndOffset(startOffset, count, isBigWord)
       }
     }
 

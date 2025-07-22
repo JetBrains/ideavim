@@ -6,8 +6,11 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.intellij.vim.api.scopes
+package com.intellij.vim.api.scopes.editor
 
+import com.intellij.vim.api.scopes.editor.Read
+import com.intellij.vim.api.scopes.editor.Transaction
+import com.intellij.vim.api.scopes.VimPluginDsl
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlin.contracts.ExperimentalContracts
@@ -24,7 +27,7 @@ abstract class EditorScope {
    *
    * This function provides access to read-only operations through the [Read] interface.
    * It runs the provided block under a read lock to ensure thread safety when accessing editor state.
-   * The operation is executed asynchronously and returns a [Deferred] that can be awaited for the result.
+   * The operation is executed asynchronously and returns a [kotlinx.coroutines.Deferred] that can be awaited for the result.
    *
    * Example usage:
    * ```
@@ -36,7 +39,7 @@ abstract class EditorScope {
    * ```
    *
    * @param block A suspending lambda with [Read] receiver that contains the read operations to perform
-   * @return A [Deferred] that completes with the result of the block execution
+   * @return A [kotlinx.coroutines.Deferred] that completes with the result of the block execution
    */
   @OptIn(ExperimentalContracts::class)
   fun <T> read(block: suspend Read.() -> T): Deferred<T> {
@@ -51,7 +54,7 @@ abstract class EditorScope {
    *
    * This function provides access to write operations through the [Transaction] interface.
    * It runs the provided block under a write lock to ensure thread safety when modifying editor state.
-   * The operation is executed asynchronously and returns a [Job] that can be joined to wait for completion.
+   * The operation is executed asynchronously and returns a [kotlinx.coroutines.Job] that can be joined to wait for completion.
    *
    * Example usage:
    * ```
@@ -59,7 +62,7 @@ abstract class EditorScope {
    *   val job = change {
    *     // Modify editor content
    *     replaceText(startOffset, endOffset, newText)
-   *     
+   *
    *     // Add highlights
    *     val highlightId = addHighlight(startOffset, endOffset, backgroundColor, foregroundColor)
    *   }
@@ -68,7 +71,7 @@ abstract class EditorScope {
    * ```
    *
    * @param block A suspending lambda with [Transaction] receiver that contains the write operations to perform
-   * @return A [Job] that completes when all write operations are finished
+   * @return A [kotlinx.coroutines.Job] that completes when all write operations are finished
    */
   @OptIn(ExperimentalContracts::class)
   fun change(block: suspend Transaction.() -> Unit): Job {

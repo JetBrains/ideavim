@@ -6,10 +6,10 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.intellij.vim.api.scopes
+package com.intellij.vim.api.scopes.commandline
 
-import com.intellij.vim.api.scopes.commandline.CommandLineRead
-import com.intellij.vim.api.scopes.commandline.CommandLineTransaction
+import com.intellij.vim.api.scopes.VimPluginDsl
+import com.intellij.vim.api.scopes.VimScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlin.contracts.ExperimentalContracts

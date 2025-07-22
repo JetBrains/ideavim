@@ -8,7 +8,7 @@
 
 package com.maddyhome.idea.vim.thinapi
 
-import com.intellij.vim.api.scopes.CommandLineScope
+import com.intellij.vim.api.scopes.commandline.CommandLineScope
 import com.intellij.vim.api.scopes.VimScope
 import com.intellij.vim.api.scopes.commandline.CommandLineRead
 import com.intellij.vim.api.scopes.commandline.CommandLineTransaction

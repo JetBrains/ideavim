@@ -11,9 +11,9 @@ package com.maddyhome.idea.vim.thinapi
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.Line
 import com.intellij.vim.api.Range
-import com.intellij.vim.api.scopes.Read
-import com.intellij.vim.api.scopes.caret.CaretRead
-import com.intellij.vim.api.scopes.caret.CaretTransaction
+import com.intellij.vim.api.scopes.editor.Read
+import com.intellij.vim.api.scopes.editor.caret.CaretRead
+import com.intellij.vim.api.scopes.editor.caret.CaretTransaction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor

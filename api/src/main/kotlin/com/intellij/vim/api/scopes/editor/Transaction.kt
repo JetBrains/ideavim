@@ -6,14 +6,14 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.intellij.vim.api.scopes
+package com.intellij.vim.api.scopes.editor
 
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.Color
 import com.intellij.vim.api.HighlightId
 import com.intellij.vim.api.Jump
-import com.intellij.vim.api.scopes.caret.CaretRead
-import com.intellij.vim.api.scopes.caret.CaretTransaction
+import com.intellij.vim.api.scopes.VimPluginDsl
+import com.intellij.vim.api.scopes.editor.caret.CaretTransaction
 
 /**
  * Scope for editor functions that should be executed under write lock.

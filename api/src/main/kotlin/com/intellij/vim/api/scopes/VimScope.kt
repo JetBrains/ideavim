@@ -10,6 +10,8 @@ package com.intellij.vim.api.scopes
 
 import com.intellij.vim.api.Mode
 import com.intellij.vim.api.Path
+import com.intellij.vim.api.scopes.commandline.CommandLineScope
+import com.intellij.vim.api.scopes.editor.EditorScope
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract

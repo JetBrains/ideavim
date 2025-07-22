@@ -13,7 +13,7 @@ import com.intellij.vim.api.Line
 import com.intellij.vim.api.Mark
 import com.intellij.vim.api.Range
 import com.intellij.vim.api.TextType
-import com.intellij.vim.api.scopes.caret.CaretRead
+import com.intellij.vim.api.scopes.editor.caret.CaretRead
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
