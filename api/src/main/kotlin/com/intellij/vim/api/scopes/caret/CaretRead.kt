@@ -13,10 +13,12 @@ import com.intellij.vim.api.Line
 import com.intellij.vim.api.Mark
 import com.intellij.vim.api.Range
 import com.intellij.vim.api.TextType
+import com.intellij.vim.api.scopes.VimPluginDsl
 
 /**
- * Interface for read operations on a caret in Vim.
+ * Scope for caret operations that should be executed under the read lock.
  */
+@VimPluginDsl
 interface CaretRead {
   /**
    * The unique identifier for this caret.
@@ -212,7 +214,7 @@ interface CaretRead {
   /**
    * Scrolls half a page up.
    *
-   * @param lines The number of lines to scroll. If 0, uses half the window height.
+   * @param lines The number of lines to scroll.
    * @return True if the scroll was successful, false otherwise
    */
   suspend fun scrollHalfPageUp(lines: Int): Boolean
@@ -220,14 +222,13 @@ interface CaretRead {
   /**
    * Scrolls half a page up.
    *
-   * @param lines The number of lines to scroll. If 0, uses half the window height.
+   * @param lines The number of lines to scroll.
    * @return True if the scroll was successful, false otherwise
    */
   suspend fun scrollHalfPageDown(lines: Int): Boolean
 
   /**
    * Selects a window in the same row as the current window.
-   * This suspend function allows navigation between split windows in the editor.
    *
    * @param relativePosition The relative position of the window to select.
    *                        Positive values select windows to the right,
@@ -237,7 +238,6 @@ interface CaretRead {
 
   /**
    * Selects a window in the same column as the current window.
-   * This suspend function allows navigation between split windows in the editor.
    *
    * @param relativePosition The relative position of the window to select.
    *                        Positive values select the windows below,
@@ -295,8 +295,6 @@ interface CaretRead {
   /**
    * Finds the end offset of the next method from the current caret position.
    *
-   * This suspend function uses language-specific features to identify method boundaries in the code.
-   *
    * @param count Search for the [count]-th occurrence.
    * @return The offset of the end of the next method.
    */
@@ -304,8 +302,6 @@ interface CaretRead {
 
   /**
    * Finds the start offset of the next method from the current caret position.
-   *
-   * This suspend function uses language-specific features to identify method boundaries in the code.
    *
    * @param count Search for the [count]-th occurrence.
    * @return The offset of the start of the next method.
@@ -363,9 +359,6 @@ interface CaretRead {
 
   /**
    * Finds the offset of the next misspelled word from the current caret position.
-   *
-   * This suspend function uses the IDE's spell checker to identify misspelled words in the document.
-   * It's used to implement Vim's `]s` and `[s` commands for navigating between spelling errors.
    *
    * @param count Search for the [count]-th occurrence.
    * @return The offset of the next misspelled word.

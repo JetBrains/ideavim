@@ -9,8 +9,9 @@
 package com.intellij.vim.api.scopes
 
 /**
- * Provides access to Vim's digraph functionality.
+ * Scope for functions that provide working with digraphs.
  */
+@VimPluginDsl
 interface DigraphScope {
   /**
    * Gets the character for a digraph.
@@ -34,7 +35,7 @@ interface DigraphScope {
    * @param ch2 The second character of the digraph
    * @param codepoint The Unicode codepoint of the character to associate with the digraph
    */
-  fun addDigraph(ch1: Char, ch2: Char, codepoint: Int)
+  fun add(ch1: Char, ch2: Char, codepoint: Int)
 
   /**
    * Clears all custom digraphs.

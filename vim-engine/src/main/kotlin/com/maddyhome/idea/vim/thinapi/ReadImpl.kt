@@ -156,8 +156,8 @@ open class ReadImpl(
     }
   }
 
-  override suspend fun getNextWordEndOffset(startOffset: Int, count: Int, isBigWord: Boolean, stopOnEmptyLine: Boolean): Int {
-    return injector.searchHelper.findNextWordEnd(vimEditor, startOffset, count, isBigWord, stopOnEmptyLine)
+  override suspend fun getNextWordEndOffset(startOffset: Int, count: Int, isBigWord: Boolean): Int {
+    return injector.searchHelper.findNextWordEnd(vimEditor, startOffset, count, isBigWord, true)
   }
 
   override suspend fun getNextCharOnLineOffset(startOffset: Int, count: Int, char: Char): Int {

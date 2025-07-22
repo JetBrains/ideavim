@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.thinapi
 
 
 import com.intellij.vim.api.Mode
+import com.intellij.vim.api.Path
 import com.intellij.vim.api.scopes.CommandLineScope
 import com.intellij.vim.api.scopes.DigraphScope
 import com.intellij.vim.api.scopes.EditorScope
@@ -37,6 +38,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 import kotlinx.coroutines.runBlocking
+import kotlin.io.path.pathString
 import kotlin.reflect.KType
 
 open class VimScopeImpl(
@@ -238,12 +240,12 @@ open class VimScopeImpl(
     injector.window.selectPreviousWindow(vimContext)
   }
 
-  override fun splitWindowVertically(filename: String?) {
-    injector.window.splitWindowVertical(vimContext, filename ?: "")
+  override fun splitWindowVertically(filePath: Path?) {
+    injector.window.splitWindowVertical(vimContext, filePath?.javaPath?.pathString ?: "")
   }
 
-  override fun splitWindowHorizontally(filename: String?) {
-    injector.window.splitWindowHorizontal(vimContext, filename ?: "")
+  override fun splitWindowHorizontally(filePath: Path?) {
+    injector.window.splitWindowHorizontal(vimContext, filePath?.javaPath?.pathString ?: "")
   }
 
   override fun closeAllExceptCurrentWindow() {

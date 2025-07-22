@@ -16,22 +16,126 @@ import com.intellij.vim.api.Mark
 import com.intellij.vim.api.Range
 import com.intellij.vim.api.scopes.caret.CaretRead
 
+/**
+ * Scope for editor functions that should be executed under read lock.
+ */
 @VimPluginDsl
 interface Read {
+  /**
+   * The total length of the text in the editor.
+   */
   val textLength: Long
+
+  /**
+   * The entire text content of the editor.
+   */
   val text: CharSequence
+
+  /**
+   * The total number of lines in the editor.
+   */
   val lineCount: Int
 
+  /**
+   * Executes the provided block for each caret in the editor and returns a list of results.
+   *
+   * This function allows you to perform operations on all carets in the editor in a single call.
+   * The block is executed with each caret as the receiver, and the results are collected into a list.
+   *
+   * Example usage:
+   * ```kotlin
+   * editor {
+   *   val caretOffsets = forEachCaret {
+   *     offset // Get the offset of each caret
+   *   }
+   *   // caretOffsets is a List<Int> containing the offset of each caret
+   * }
+   * ```
+   *
+   * @param block The block to execute for each caret
+   * @return A list containing the results of executing the block for each caret
+   */
   suspend fun <T> forEachCaret(block: suspend CaretRead.() -> T): List<T>
+
+  /**
+   * Executes the provided block with a specific caret as the receiver.
+   *
+   * This function allows you to perform operations on a specific caret identified by its ID.
+   *
+   * Example usage:
+   * ```kotlin
+   * editor {
+   *   with(caretId) {
+   *     // Perform operations on the specific caret
+   *     val caretOffset = offset
+   *     val caretLine = line
+   *   }
+   * }
+   * ```
+   *
+   * @param caretId The ID of the caret to use
+   * @param block The block to execute with the specified caret as the receiver
+   */
   suspend fun with(caretId: CaretId, block: suspend CaretRead.() -> Unit)
+
+  /**
+   * Executes the provided block with the primary caret as the receiver.
+   *
+   * This function allows you to perform operations on the primary caret in the editor.
+   *
+   * Example usage:
+   * ```kotlin
+   * editor {
+   *   withPrimaryCaret {
+   *     // Perform operations on the primary caret
+   *     val primaryCaretOffset = offset
+   *     val primaryCaretLine = line
+   *   }
+   * }
+   * ```
+   *
+   * @param block The block to execute with the primary caret as the receiver
+   */
   suspend fun withPrimaryCaret(block: suspend CaretRead.() -> Unit)
 
+  /**
+   * Gets the start offset of the specified line.
+   *
+   * @param line The line number (0-based)
+   * @return The offset of the first character in the line
+   */
   suspend fun getLineStartOffset(line: Int): Int
+
+  /**
+   * Gets the end offset of the specified line.
+   *
+   * @param line The line number (0-based)
+   * @param allowEnd Whether to allow the end of the document as a valid result
+   * @return The offset after the last character in the line
+   */
   suspend fun getLineEndOffset(line: Int, allowEnd: Boolean): Int
 
+  /**
+   * Gets information about the line containing the specified offset.
+   *
+   * @param offset The offset in the document
+   * @return A Line object containing information about the line
+   */
   suspend fun getLine(offset: Int): Line
 
+  /**
+   * A list of data for all carets in the editor.
+   *
+   * Each element in the list is a CaretData object containing information about a caret,
+   * such as its position, selection, and other properties.
+   */
   val caretData: List<CaretData>
+
+  /**
+   * A list of IDs for all carets in the editor.
+   *
+   * These IDs can be used with the `with` function to perform operations on specific carets.
+   */
   val caretIds: List<CaretId>
 
   /**
@@ -200,11 +304,9 @@ interface Read {
    * @param startOffset The offset in the document to search from
    * @param count Return an offset to the [count] word from the starting position. Will search backwards if negative
    * @param isBigWord Use WORD instead of word boundaries
-   * @param stopOnEmptyLine Vim considers an empty line to be a word/WORD, but `e` and `E` don't respect this for vi
-   *                        compatibility reasons. Callers other than `e` and `E` should pass `true`
    * @return The offset of the [count] next word/WORD. Will return document bounds if not found
    */
-  suspend fun getNextWordEndOffset(startOffset: Int, count: Int = 1, isBigWord: Boolean, stopOnEmptyLine: Boolean = true): Int
+  suspend fun getNextWordEndOffset(startOffset: Int, count: Int = 1, isBigWord: Boolean): Int
 
   /**
    * Find the next character on the current line
@@ -247,11 +349,7 @@ interface Read {
   /**
    * Finds all occurrences of the given pattern within a specified line range.
    *
-   * This suspend function searches for all matches of a pattern within a specified range of lines
-   * in the document. It's useful for implementing commands like `:g/pattern/` or `:v/pattern/`
-   * that need to find all occurrences of a pattern.
-   *
-   * @param pattern The pattern to search for. This is a plain string, not a regex pattern.
+   * @param pattern The Vim-style regex pattern to search for.
    * @param startLine The line number to start searching from (0-based). Must be within the range [0, lineCount-1].
    * @param endLine The line number to end searching at (0-based), or -1 for the whole document.
    *               If specified, must be within the range [startLine, lineCount-1].
@@ -262,9 +360,6 @@ interface Read {
 
   /**
    * Finds text matching the given Vim-style regular expression pattern.
-   *
-   * This suspend function implements Vim's pattern search functionality, supporting all Vim regex syntax.
-   * See `:help /pattern` in Vim for details on the pattern syntax.
    *
    * @param pattern The Vim-style regex pattern to search for.
    * @param startOffset The offset to start searching from. Must be within the range [0, document.length].

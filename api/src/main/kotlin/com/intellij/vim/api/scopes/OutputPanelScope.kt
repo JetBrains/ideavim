@@ -9,11 +9,9 @@
 package com.intellij.vim.api.scopes
 
 /**
- * Interface for interacting with the Vim output panel.
- * 
- * The output panel is used to display text output from Vim commands and operations.
- * This scope provides methods to manipulate the content and appearance of the output panel.
+ * Scope that provides functions for interacting with the Vim output panel.
  */
+@VimPluginDsl
 interface OutputPanelScope {
   /**
    * The text displayed in the output panel.

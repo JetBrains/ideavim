@@ -14,8 +14,30 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
+/**
+ * Scope that provides access to editor functions.
+ */
 @VimPluginDsl
 abstract class EditorScope {
+  /**
+   * Executes a read-only operation on the editor.
+   *
+   * This function provides access to read-only operations through the [Read] interface.
+   * It runs the provided block under a read lock to ensure thread safety when accessing editor state.
+   * The operation is executed asynchronously and returns a [Deferred] that can be awaited for the result.
+   *
+   * Example usage:
+   * ```
+   * editor {
+   *   val text = read {
+   *     text // Access the editor's text content
+   *   }.await()
+   * }
+   * ```
+   *
+   * @param block A suspending lambda with [Read] receiver that contains the read operations to perform
+   * @return A [Deferred] that completes with the result of the block execution
+   */
   @OptIn(ExperimentalContracts::class)
   fun <T> read(block: suspend Read.() -> T): Deferred<T> {
     contract {
@@ -24,6 +46,30 @@ abstract class EditorScope {
     return this.ideRead(block)
   }
 
+  /**
+   * Executes a write operation that modifies the editor's state.
+   *
+   * This function provides access to write operations through the [Transaction] interface.
+   * It runs the provided block under a write lock to ensure thread safety when modifying editor state.
+   * The operation is executed asynchronously and returns a [Job] that can be joined to wait for completion.
+   *
+   * Example usage:
+   * ```
+   * editor {
+   *   val job = change {
+   *     // Modify editor content
+   *     replaceText(startOffset, endOffset, newText)
+   *     
+   *     // Add highlights
+   *     val highlightId = addHighlight(startOffset, endOffset, backgroundColor, foregroundColor)
+   *   }
+   *   job.join() // Wait for the changes to complete
+   * }
+   * ```
+   *
+   * @param block A suspending lambda with [Transaction] receiver that contains the write operations to perform
+   * @return A [Job] that completes when all write operations are finished
+   */
   @OptIn(ExperimentalContracts::class)
   fun change(block: suspend Transaction.() -> Unit): Job {
     contract {

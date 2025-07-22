@@ -20,7 +20,7 @@ class DigraphScopeImpl() : DigraphScope {
     return injector.digraphGroup.getCharacterForDigraph(ch1, ch2)
   }
 
-  override fun addDigraph(ch1: Char, ch2: Char, codepoint: Int) {
+  override fun add(ch1: Char, ch2: Char, codepoint: Int) {
     val args = "$ch1$ch2 $codepoint"
     injector.digraphGroup.parseCommandLine(vimEditor, args)
   }

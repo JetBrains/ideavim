@@ -8,6 +8,12 @@
 
 package com.intellij.vim.api.scopes.commandline
 
+import com.intellij.vim.api.scopes.VimPluginDsl
+
+/**
+ * Scope for command line functions that should be executed under read lock.
+ */
+@VimPluginDsl
 interface CommandLineRead {
   /**
    * The text currently displayed in the command line.

@@ -89,7 +89,7 @@ class DigraphScopeTest : MockTestCase() {
     val codepoint = 228
 
     vimScope.digraph {
-      addDigraph(ch1, ch2, codepoint)
+      add(ch1, ch2, codepoint)
     }
 
     val editorCaptor = argumentCaptor<VimEditor>()

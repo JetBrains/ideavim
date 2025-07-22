@@ -8,9 +8,14 @@
 
 package com.intellij.vim.api.scopes
 
+/**
+ * Scope that provides access to mappings.
+ */
+@VimPluginDsl
 interface MappingScope {
   /**
    * Maps a key sequence in normal mode.
+   *
    * @param from The key sequence to map from
    * @param to The key sequence to map to
    */
@@ -18,12 +23,14 @@ interface MappingScope {
 
   /**
    * Removes a key sequence mapping in normal mode.
+   *
    * @param keys The key sequence to unmap
    */
   fun nunmap(keys: String)
 
   /**
    * Maps a key sequence in visual mode.
+   *
    * @param from The key sequence to map from
    * @param to The key sequence to map to
    */
@@ -31,12 +38,14 @@ interface MappingScope {
 
   /**
    * Removes a key sequence mapping in visual mode.
+   *
    * @param keys The key sequence to unmap
    */
   fun vunmap(keys: String)
 
   /**
    * Maps a key sequence in normal mode to an action.
+   *
    * @param from The key sequence to map from
    * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
@@ -45,6 +54,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in visual mode to an action.
+   *
    * @param from The key sequence to map from
    * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
@@ -53,6 +63,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in normal mode to an action with a label.
+   *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
    * @param isRepeatable Whether the mapping is repeatable with the dot command
@@ -67,6 +78,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in visual mode to an action with a label.
+   *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
    * @param isRepeatable Whether the mapping is repeatable with the dot command
@@ -81,6 +93,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in all modes.
+   *
    * @param from The key sequence to map from
    * @param to The key sequence to map to
    */
@@ -88,12 +101,14 @@ interface MappingScope {
 
   /**
    * Removes a key sequence mapping in all modes.
+   *
    * @param keys The key sequence to unmap
    */
   fun unmap(keys: String)
 
   /**
    * Maps a key sequence in all modes to an action.
+   *
    * @param from The key sequence to map from
    * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
@@ -102,6 +117,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in all modes to an action with a label.
+   *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
    * @param isRepeatable Whether the mapping is repeatable with the dot command
@@ -116,6 +132,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in visual exclusive mode.
+   *
    * @param from The key sequence to map from
    * @param to The key sequence to map to
    */
@@ -123,12 +140,14 @@ interface MappingScope {
 
   /**
    * Removes a key sequence mapping in visual exclusive mode.
+   *
    * @param keys The key sequence to unmap
    */
   fun xunmap(keys: String)
 
   /**
    * Maps a key sequence in visual exclusive mode to an action.
+   *
    * @param from The key sequence to map from
    * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
@@ -137,6 +156,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in visual exclusive mode to an action with a label.
+   *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
    * @param isRepeatable Whether the mapping is repeatable with the dot command
@@ -151,6 +171,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in select mode.
+   *
    * @param from The key sequence to map from
    * @param to The key sequence to map to
    */
@@ -158,12 +179,14 @@ interface MappingScope {
 
   /**
    * Removes a key sequence mapping in select mode.
+   *
    * @param keys The key sequence to unmap
    */
   fun sunmap(keys: String)
 
   /**
    * Maps a key sequence in select mode to an action.
+   *
    * @param from The key sequence to map from
    * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
@@ -172,6 +195,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in select mode to an action with a label.
+   *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
    * @param isRepeatable Whether the mapping is repeatable with the dot command
@@ -186,6 +210,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in operator pending mode.
+   *
    * @param from The key sequence to map from
    * @param to The key sequence to map to
    */
@@ -193,12 +218,14 @@ interface MappingScope {
 
   /**
    * Removes a key sequence mapping in operator pending mode.
+   *
    * @param keys The key sequence to unmap
    */
   fun ounmap(keys: String)
 
   /**
    * Maps a key sequence in operator pending mode to an action.
+   *
    * @param from The key sequence to map from
    * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
@@ -207,6 +234,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in operator pending mode to an action with a label.
+   *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
    * @param isRepeatable Whether the mapping is repeatable with the dot command
@@ -221,6 +249,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in insert mode.
+   *
    * @param from The key sequence to map from
    * @param to The key sequence to map to
    */
@@ -228,12 +257,14 @@ interface MappingScope {
 
   /**
    * Removes a key sequence mapping in insert mode.
+   *
    * @param keys The key sequence to unmap
    */
   fun iunmap(keys: String)
 
   /**
    * Maps a key sequence in insert mode to an action.
+   *
    * @param from The key sequence to map from
    * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
@@ -242,6 +273,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in insert mode to an action with a label.
+   *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
    * @param isRepeatable Whether the mapping is repeatable with the dot command
@@ -256,6 +288,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in command line mode.
+   *
    * @param from The key sequence to map from
    * @param to The key sequence to map to
    */
@@ -263,12 +296,14 @@ interface MappingScope {
 
   /**
    * Removes a key sequence mapping in command line mode.
+   *
    * @param keys The key sequence to unmap
    */
   fun cunmap(keys: String)
 
   /**
    * Maps a key sequence in command line mode to an action.
+   *
    * @param from The key sequence to map from
    * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
@@ -277,6 +312,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in command line mode to an action with a label.
+   *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
    * @param isRepeatable Whether the mapping is repeatable with the dot command
@@ -291,6 +327,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in normal mode non-recursively.
+   *
    * @param from The key sequence to map from
    * @param to The key sequence to map to
    */
@@ -298,6 +335,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in normal mode to an action non-recursively.
+   *
    * @param from The key sequence to map from
    * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
@@ -306,6 +344,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in normal mode to an action with a label non-recursively.
+   *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
    * @param isRepeatable Whether the mapping is repeatable with the dot command
@@ -320,6 +359,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in visual mode non-recursively.
+   *
    * @param from The key sequence to map from
    * @param to The key sequence to map to
    */
@@ -327,6 +367,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in visual mode to an action non-recursively.
+   *
    * @param from The key sequence to map from
    * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
@@ -335,6 +376,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in visual mode to an action with a label non-recursively.
+   *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
    * @param isRepeatable Whether the mapping is repeatable with the dot command
@@ -349,6 +391,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in all modes non-recursively.
+   *
    * @param from The key sequence to map from
    * @param to The key sequence to map to
    */
@@ -356,6 +399,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in all modes to an action non-recursively.
+   *
    * @param from The key sequence to map from
    * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
@@ -364,6 +408,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in all modes to an action with a label non-recursively.
+   *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
    * @param isRepeatable Whether the mapping is repeatable with the dot command
@@ -378,6 +423,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in visual exclusive mode non-recursively.
+   *
    * @param from The key sequence to map from
    * @param to The key sequence to map to
    */
@@ -385,6 +431,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in visual exclusive mode to an action non-recursively.
+   *
    * @param from The key sequence to map from
    * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
@@ -393,6 +440,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in visual exclusive mode to an action with a label non-recursively.
+   *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
    * @param isRepeatable Whether the mapping is repeatable with the dot command
@@ -407,6 +455,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in select mode non-recursively.
+   *
    * @param from The key sequence to map from
    * @param to The key sequence to map to
    */
@@ -414,6 +463,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in select mode to an action non-recursively.
+   *
    * @param from The key sequence to map from
    * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
@@ -422,6 +472,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in select mode to an action with a label non-recursively.
+   *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
    * @param isRepeatable Whether the mapping is repeatable with the dot command
@@ -436,6 +487,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in operator pending mode non-recursively.
+   *
    * @param from The key sequence to map from
    * @param to The key sequence to map to
    */
@@ -443,6 +495,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in operator pending mode to an action non-recursively.
+   *
    * @param from The key sequence to map from
    * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
@@ -451,6 +504,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in operator pending mode to an action with a label non-recursively.
+   *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
    * @param isRepeatable Whether the mapping is repeatable with the dot command
@@ -465,6 +519,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in insert mode non-recursively.
+   *
    * @param from The key sequence to map from
    * @param to The key sequence to map to
    */
@@ -472,6 +527,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in insert mode to an action non-recursively.
+   *
    * @param from The key sequence to map from
    * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
@@ -480,6 +536,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in insert mode to an action with a label non-recursively.
+   *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
    * @param isRepeatable Whether the mapping is repeatable with the dot command
@@ -494,6 +551,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in command line mode non-recursively.
+   *
    * @param from The key sequence to map from
    * @param to The key sequence to map to
    */
@@ -501,6 +559,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in command line mode to an action non-recursively.
+   *
    * @param from The key sequence to map from
    * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
@@ -509,6 +568,7 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in command line mode to an action with a label non-recursively.
+   *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
    * @param isRepeatable Whether the mapping is repeatable with the dot command

@@ -34,7 +34,6 @@ sealed interface Range {
   }
 }
 
-
 data class Line(val number: Int, val text: String, val start: Int, val end: Int)
 
 typealias CaretData = Pair<CaretId, CaretInfo>
@@ -68,5 +67,3 @@ data class Color(
     }
   }
 }
-
-class VimPluginException(message: String) : Exception(message)

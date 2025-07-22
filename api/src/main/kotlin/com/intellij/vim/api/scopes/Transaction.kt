@@ -15,17 +15,107 @@ import com.intellij.vim.api.Jump
 import com.intellij.vim.api.scopes.caret.CaretRead
 import com.intellij.vim.api.scopes.caret.CaretTransaction
 
+/**
+ * Scope for editor functions that should be executed under write lock.
+ */
 @VimPluginDsl
 interface Transaction {
+  /**
+   * Executes the provided block for each caret in the editor and returns a list of results.
+   *
+   * Example usage:
+   * ```kotlin
+   * editor {
+   *   change {
+   *     forEachCaret {
+   *       // Perform operations on each caret
+   *     }
+   *   }
+   * }
+   * ```
+   *
+   * @param block The block to execute for each caret
+   * @return A list containing the results of executing the block for each caret
+   */
   suspend fun <T> forEachCaret(block: suspend CaretTransaction.() -> T): List<T>
+
+  /**
+   * Executes the provided block with a specific caret as the receiver.
+   *
+   * This function allows you to perform write operations on a specific caret identified by its ID.
+   *
+   * Example usage:
+   * ```kotlin
+   * editor {
+   *   change {
+   *     val caretId = caretIds.first() // Get the ID of the first caret
+   *     with(caretId) {
+   *       // Perform operations on the specific caret
+   *       deleteText(offset, offset + 5)
+   *       updateCaret(newOffset)
+   *     }
+   *   }
+   * }
+   * ```
+   *
+   * @param caretId The ID of the caret to use
+   * @param block The block to execute with the specified caret as the receiver
+   */
   suspend fun with(caretId: CaretId, block: suspend CaretTransaction.() -> Unit)
+
+  /**
+   * Executes the provided block with the primary caret as the receiver.
+   *
+   * This function allows you to perform write operations on the primary caret in the editor.
+   *
+   * Example usage:
+   * ```kotlin
+   * editor {
+   *   change {
+   *     withPrimaryCaret {
+   *       // Perform operations on the primary caret
+   *       deleteText(offset, offset + 5)
+   *       updateCaret(newOffset)
+   *     }
+   *   }
+   * }
+   * ```
+   *
+   * @param block The block to execute with the primary caret as the receiver
+   */
   suspend fun withPrimaryCaret(block: suspend CaretTransaction.() -> Unit)
 
+  /**
+   * Adds a new caret at the specified offset in the editor.
+   *
+   * @param offset The offset at which to add the caret
+   * @return The ID of the newly created caret
+   */
   suspend fun addCaret(offset: Int): CaretId
+
+  /**
+   * Removes a caret from the editor.
+   *
+   * @param caretId The ID of the caret to remove
+   */
   suspend fun removeCaret(caretId: CaretId)
 
-  // Highlighting
+  /**
+   * Adds a highlight to the editor.
+   *
+   * @param startOffset The start offset of the highlight
+   * @param endOffset The end offset of the highlight
+   * @param backgroundColor The background color of the highlight, or null for no background color
+   * @param foregroundColor The foreground color of the highlight, or null for no foreground color
+   * @return The ID of the newly created highlight
+   */
   suspend fun addHighlight(startOffset: Int, endOffset: Int, backgroundColor: Color?, foregroundColor: Color?): HighlightId
+
+  /**
+   * Removes a highlight from the editor.
+   *
+   * @param highlightId The ID of the highlight to remove
+   */
   suspend fun removeHighlight(highlightId: HighlightId)
 
   /**

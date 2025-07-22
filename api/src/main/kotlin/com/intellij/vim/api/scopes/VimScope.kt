@@ -9,14 +9,37 @@
 package com.intellij.vim.api.scopes
 
 import com.intellij.vim.api.Mode
+import com.intellij.vim.api.Path
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
+/**
+ * Scope that provides vim functions and is an entry point for the other scopes.
+ */
 @VimPluginDsl
 abstract class VimScope {
+  /**
+   * Represents the current mode in Vim.
+   *
+   * The `mode` variable allows both reading the current mode and setting a new one.
+   *
+   * Example usage:
+   *
+   * **Getting the Current Mode**
+   * ```kotlin
+   * val currentMode = mode
+   * println("Current Vim Mode: $currentMode")
+   * ```
+   *
+   * **Setting the Mode**
+   * ```kotlin
+   * mode = Mode.INSERT
+   * println("Switched to Insert Mode")
+   * ```
+   */
   abstract var mode: Mode
 
   protected abstract fun <T : Any> getVariableInternal(name: String, type: KType): T?
@@ -27,26 +50,19 @@ abstract class VimScope {
   /**
    * Retrieves a variable of the specified type and name.
    *
-   * @param name The name of the variable to retrieve.
-   * @return The variable of type `T` if found, otherwise `null`.
-   *
    * Example usage:
    * ```
    * val value: String? = getVariable<String>("myVariable")
    * ```
+   *
+   * @param name The name of the variable to retrieve.
+   * @return The variable of type `T` if found, otherwise `null`.
    */
   inline fun <reified T : Any> getVariable(name: String): T? {
     val kType: KType = typeOf<T>()
     return getVariable(name, kType)
   }
 
-  /**
-   * Internal method to set a variable value.
-   * 
-   * @param name The name of the variable
-   * @param value The value to set
-   * @param type The Kotlin type of the value
-   */
   protected abstract fun setVariableInternal(name: String, value: Any, type: KType)
 
   @PublishedApi
@@ -56,7 +72,11 @@ abstract class VimScope {
    * Sets a variable with the specified name and value.
    *
    * In Vim, this is equivalent to `let varname = value`.
-   * Example: `let g:myvar = 42` or `let b:myvar = "text"`
+   *
+   * Example usage:
+   * ```
+   * setVariable<Int>("g:my_var", 42)
+   * ```
    *
    * @param name The name of the variable, optionally prefixed with a scope (g:, b:, etc.)
    * @param value The value to set
@@ -70,7 +90,6 @@ abstract class VimScope {
    * Locks a variable to prevent changes.
    *
    * In Vim, this is equivalent to `:lockvar varname`.
-   * Example: `:lockvar g:myvar`
    *
    * @param name The name of the variable, optionally prefixed with a scope (g:, b:, etc.)
    * @param depth The lock depth (default is 1)
@@ -81,7 +100,6 @@ abstract class VimScope {
    * Unlocks a variable to allow changes.
    *
    * In Vim, this is equivalent to `:unlockvar varname`.
-   * Example: `:unlockvar g:myvar`
    *
    * @param name The name of the variable, optionally prefixed with a scope (g:, b:, etc.)
    * @param depth The lock depth (default is 1)
@@ -92,17 +110,71 @@ abstract class VimScope {
    * Checks if a variable is locked.
    *
    * In Vim, this is similar to checking the `islocked()` function.
-   * Example: `if islocked("g:myvar")`
    *
    * @param name The name of the variable, optionally prefixed with a scope (g:, b:, etc.)
    * @return True if the variable is locked, false otherwise
    */
   abstract fun islocked(name: String): Boolean
 
+  /**
+   * Exports a function that can be used as an operator function in Vim.
+   *
+   * In Vim, operator functions are used with the `g@` operator to create custom operators.
+   *
+   * Example usage:
+   * ```kotlin
+   * exportOperatorFunction("MyOperator") {
+   *     editor {
+   *         // Perform operations on the selected text
+   *         true // Return success
+   *     }
+   * }
+   * ```
+   *
+   * @param name The name to register the function under
+   * @param function The function to execute when the operator is invoked
+   */
   abstract fun exportOperatorFunction(name: String, function: suspend VimScope.() -> Boolean)
+
+  /**
+   * Sets the current operator function to use with the `g@` operator.
+   *
+   * In Vim, this is equivalent to setting the 'operatorfunc' option.
+   *
+   * @param name The name of the previously exported operator function
+   */
   abstract fun setOperatorFunction(name: String)
+
+  /**
+   * Executes normal mode commands as if they were typed.
+   *
+   * In Vim, this is equivalent to the `:normal` command.
+   *
+   * Example usage:
+   * ```kotlin
+   * normal("gg")  // Go to the first line
+   * normal("dw")  // Delete word
+   * ```
+   *
+   * @param command The normal mode command string to execute
+   */
   abstract fun normal(command: String)
 
+  /**
+   * Executes a block of code in the context of the currently focused editor.
+   *
+   * Example usage:
+   * ```kotlin
+   * editor {
+   *     read {
+   *       // executed under read lock
+   *     }
+   * }
+   * ```
+   *
+   * @param block The code block to execute within editor scope
+   * @return The result of the block execution
+   */
   @OptIn(ExperimentalContracts::class)
   fun <T> editor(block: EditorScope.() -> T): T {
     contract {
@@ -111,16 +183,140 @@ abstract class VimScope {
     return this.editorScope().block()
   }
 
+  /**
+   * Internal method that provides access to the editor scope.
+   *
+   * @return An EditorScope instance for the current editor
+   */
   protected abstract fun editorScope(): EditorScope
 
+  /**
+   * Executes a block of code for each editor.
+   *
+   * This function allows performing operations on all available editors.
+   *
+   * Example usage:
+   * ```kotlin
+   * forEachEditor {
+   *     // Perform some operation on each editor
+   * }
+   * ```
+   *
+   * @param block The code block to execute for each editor
+   * @return A list containing the results of executing the block on each editor
+   */
   abstract fun <T> forEachEditor(block: EditorScope.() -> T): List<T>
 
+  /**
+   * Provides access to key mapping functionality.
+   *
+   * Example usage:
+   * ```kotlin
+   * mappings {
+   *    nmap("jk", "<Esc>")
+   * }
+   * ```
+   *
+   * @param block The code block to execute within the mapping scope
+   */
   abstract fun mappings(block: MappingScope.() -> Unit)
+
+  /**
+   * Provides access to event listener functionality.
+   *
+   * Example usage:
+   * ```kotlin
+   * listeners {
+   *     // Register a listener for mode changes
+   *     onModeChange { oldMode ->
+   *         println("Mode changed from $oldMode")
+   *     }
+   * }
+   * ```
+   *
+   * @param block The code block to execute within the listeners scope
+   */
   abstract fun listeners(block: ListenersScope.() -> Unit)
+
+  /**
+   * Provides access to Vim's output panel functionality.
+   *
+   * Example usage:
+   * ```kotlin
+   * outputPanel {
+   *     // Print a message to the output panel
+   *     setText("Hello from IdeaVim plugin!")
+   * }
+   * ```
+   *
+   * @param block The code block to execute within the output panel scope
+   */
   abstract fun outputPanel(block: OutputPanelScope.() -> Unit)
+
+  /**
+   * Provides access to modal input functionality.
+   *
+   * Example usage:
+   * ```kotlin
+   * modalInput()
+   *  .inputChar(label) { char ->
+   *    // get char that user entered
+   *  }
+   * ```
+   *
+   * @return A ModalInput instance that can be used to request user input
+   */
   abstract fun modalInput(): ModalInput
+
+  /**
+   * Provides access to Vim's command line functionality.
+   *
+   * Example usage:
+   * ```kotlin
+   * commandLine {
+   *    // get current command line text
+   *    read {
+   *      // executed under read lock
+   *      text
+   *    }
+   * }
+   * ```
+   *
+   * @param block The code block to execute with command line scope
+   */
   abstract fun commandLine(block: CommandLineScope.() -> Unit)
+
+  /**
+   * Provides access to Vim's options functionality.
+   *
+   * Example usage:
+   * ```kotlin
+   * option {
+   *     // Get option value
+   *     get<Boolean>("number")
+   *
+   *     // Set option value
+   *     set<Boolean>("number", true)
+   * }
+   * ```
+   *
+   * @param block The code block to execute within the option scope
+   */
   abstract fun option(block: OptionScope.() -> Unit)
+
+  /**
+   * Provides access to Vim's digraph functionality.
+   *
+   * Example usage:
+   * ```kotlin
+   * digraph {
+   *     // Add a new digraph
+   *     add("a:", 'ä')
+   * }
+   * ```
+   *
+   * @param block The code block to execute within the digraph scope
+   */
   abstract fun digraph(block: DigraphScope.() -> Unit)
 
   /**
@@ -195,16 +391,16 @@ abstract class VimScope {
   /**
    * Splits the current window vertically and optionally opens a file in the new window.
    *
-   * @param filename The name of the file to open in the new window. If null, the new window will show the same file.
+   * @param filePath Path of the file to open in the new window. If null, the new window will show the same file.
    */
-  abstract fun splitWindowVertically(filename: String? = null)
+  abstract fun splitWindowVertically(filePath: Path? = null)
 
   /**
    * Splits the current window horizontally and optionally opens a file in the new window.
    *
-   * @param filename The name of the file to open in the new window. If null, the new window will show the same file.
+   * @param filePath Path of the file to open in the new window. If null, the new window will show the same file.
    */
-  abstract fun splitWindowHorizontally(filename: String? = null)
+  abstract fun splitWindowHorizontally(filePath: Path? = null)
 
   /**
    * Closes all windows except the current one.
@@ -222,21 +418,31 @@ abstract class VimScope {
   abstract fun closeAllWindows()
 
   /**
-   * Parses and executes the given Vimscript string. It can be used to execute
-   * ex commands, such as `:set`, `:map`, etc.
+   * Parses and executes the given Vimscript string.
    *
    * @param script The Vimscript string to execute
    * @return The result of the execution, which can be Success or Error
    */
   abstract fun execute(script: String): Boolean
 
+  /**
+   * Registers a new Vim command.
+   *
+   * Example usage:
+   * ```
+   * command("MyCommand") { cmd ->
+   *     println("Command executed: $cmd")
+   * }
+   * ```
+   *
+   * @param command The name of the command to register, as entered by the user.
+   * @param block The logic to execute when the command is invoked. Receives the command name
+   *              entered by the user as a parameter.
+   */
   abstract fun command(command: String, block: VimScope.(String) -> Unit)
 
   /**
    * Gets keyed data from a Vim window.
-   *
-   * IdeaVim's editor is equivalent to Vim's window, which is an editor view on a buffer.
-   * Vim stores window scoped variables (`w:`) and local-to-window options per-window.
    *
    * @param key The key to retrieve data for
    * @return The data associated with the key, or null if no data is found
@@ -246,9 +452,6 @@ abstract class VimScope {
   /**
    * Stores keyed user data in a Vim window.
    *
-   * IdeaVim's editor is equivalent to Vim's window, which is an editor view on a buffer.
-   * Vim stores window scoped variables (`w:`) and local-to-window options per-window.
-   *
    * @param key The key to store data for
    * @param data The data to store
    */
@@ -256,7 +459,6 @@ abstract class VimScope {
 
   /**
    * Gets data from buffer.
-   * Vim stores there buffer scoped (`b:`) variables and local options.
    *
    * @param key The key to retrieve data for
    * @return The data associated with the key, or null if no data is found
@@ -265,7 +467,6 @@ abstract class VimScope {
 
   /**
    * Puts data to buffer.
-   * Vim stores there buffer scoped (`b:`) variables and local options.
    *
    * @param key The key to store data for
    * @param data The data to store
@@ -274,7 +475,6 @@ abstract class VimScope {
 
   /**
    * Gets data from tab (group of windows).
-   * Vim stores there tab page scoped (`t:`) variables.
    *
    * @param key The key to retrieve data for
    * @return The data associated with the key, or null if no data is found
@@ -283,7 +483,6 @@ abstract class VimScope {
 
   /**
    * Puts data to tab (group of windows).
-   * Vim stores there tab page scoped (`t:`) variables.
    *
    * @param key The key to store data for
    * @param data The data to store
@@ -322,60 +521,56 @@ abstract class VimScope {
 
   /**
    * Saves the current file.
-   *
-   * In Vim, this is equivalent to the `:w` command.
    */
   abstract fun saveFile()
 
   /**
    * Closes the current file.
-   *
-   * In Vim, this is equivalent to the `:q` command.
    */
   abstract fun closeFile()
 
   /**
-   * Finds the start offset of the next camelCase or snake_case word.
+   * Finds the start offset of the next word in camel case or snake case text.
    *
    * @param chars The character sequence to search in (e.g., document text)
    * @param startIndex The index to start searching from (inclusive). Must be within the bounds of chars: [0, chars.length)
    * @param count Find the [count]-th occurrence. Must be greater than 1.
-   * @return The offset of the next camelCase or snake_case word start, or null if not found
+   * @return The offset of the next word start, or null if not found
    */
   abstract fun getNextCamelStartOffset(chars: CharSequence, startIndex: Int, count: Int = 1): Int?
 
   /**
-   * Finds the start offset of the previous camelCase or snake_case word.
+   * Finds the start offset of the previous word in camel case or snake case text.
    *
    * @param chars The character sequence to search in (e.g., document text)
    * @param endIndex The index to start searching backward from (exclusive). Must be within the bounds of chars: [0, chars.length]
    * @param count Find the [count]-th occurrence. Must be greater than 1.
-   * @return The offset of the previous camelCase or snake_case word start, or null if not found
+   * @return The offset of the previous word start, or null if not found
    */
   abstract fun getPreviousCamelStartOffset(chars: CharSequence, endIndex: Int, count: Int = 1): Int?
 
   /**
-   * Finds the end offset of the next camelCase or snake_case word.
+   * Finds the end offset of the next word in camel case or snake case text.
    *
    * @param chars The character sequence to search in (e.g., document text)
    * @param startIndex The index to start searching from (inclusive). Must be within the bounds of chars: [0, chars.length)
    * @param count Find the [count]-th occurrence. Must be greater than 1.
-   * @return The offset of the next camelCase or snake_case word end, or null if not found
+   * @return The offset of the next word end, or null if not found
    */
   abstract fun getNextCamelEndOffset(chars: CharSequence, startIndex: Int, count: Int = 1): Int?
 
   /**
-   * Finds the end offset of the previous camelCase or snake_case word.
+   * Finds the end offset of the previous word in camel case or snake case text.
    *
    * @param chars The character sequence to search in (e.g., document text)
    * @param endIndex The index to start searching backward from (exclusive). Must be within the bounds of chars: [0, chars.length]
    * @param count Find the [count]-th occurrence. Must be greater than 1.
-   * @return The offset of the previous camelCase or snake_case word end, or null if not found
+   * @return The offset of the previous word end, or null if not found
    */
   abstract fun getPreviousCamelEndOffset(chars: CharSequence, endIndex: Int, count: Int = 1): Int?
 
   /**
-   * Find the next word in some text outside the editor (e.g., command line), from the given starting point
+   * Find the next word in some text, from the given starting point.
    *
    * @param text The text to search in.
    * @param startOffset The offset in the document to search from.

@@ -17,10 +17,7 @@ import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
 /**
- * Interface for interacting with the Vim command line.
- * 
- * The command line is used for entering Ex commands, search patterns, and other input.
- * This scope provides methods to create, manipulate, and interact with the command line.
+ * Scope for interacting with the Vim command line.
  */
 @VimPluginDsl
 abstract class CommandLineScope {
@@ -33,6 +30,21 @@ abstract class CommandLineScope {
    */
   abstract fun input(prompt: String, finishOn: Char? = null, callback: VimScope.(String) -> Unit)
 
+  /**
+   * Executes operations on the command line that require a read lock.
+   *
+   * Example usage:
+   * ```kotlin
+   * commandLine {
+   *  read {
+   *    text
+   *  }
+   * }
+   * ```
+   *
+   * @param block A suspend function with CommandLineRead receiver that contains the read operations to perform.
+   * @return A Deferred that will complete with the result of the block execution.
+   */
   @OptIn(ExperimentalContracts::class)
   fun <T> read(block: suspend CommandLineRead.() -> T): Deferred<T> {
     contract {
@@ -41,6 +53,22 @@ abstract class CommandLineScope {
     return this.ideRead(block)
   }
 
+  /**
+   * Executes operations that require write lock on the command line.
+   *
+   * Example usage:
+   * ```kotlin
+   * // Set command line text
+   * commandLineScope {
+   *  change {
+   *    setText("Hello")
+   *   }
+   * }
+   * ```
+   *
+   * @param block A suspend function with CommandLineTransaction receiver that contains the write operations to perform.
+   * @return A Job that represents the ongoing execution of the block.
+   */
   @OptIn(ExperimentalContracts::class)
   fun change(block: suspend CommandLineTransaction.() -> Unit): Job {
     contract {
