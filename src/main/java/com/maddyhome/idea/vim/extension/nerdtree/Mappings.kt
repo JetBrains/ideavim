@@ -30,6 +30,7 @@ import javax.swing.tree.TreeNode
 internal class Mappings(name: String) {
   private val trie = KeyStrokeTrie<Action>(name)
   val getAction = trie::getData
+  val isPrefix = trie::isPrefix
 
   private val _keyStrokes = mutableSetOf<KeyStroke>()
   val keyStrokes: Set<KeyStroke> get() = _keyStrokes

@@ -29,9 +29,10 @@ internal abstract class AbstractDispatcher(private val mappings: Mappings) : Dum
     if (keyChar != KeyEvent.CHAR_UNDEFINED) {
       keyStroke = KeyStroke.getKeyStroke(keyChar)
     }
-
     keys.add(keyStroke)
-    mappings.getAction(keys)?.let { action ->
+
+    val action = mappings.getAction(keys)
+    if (action != null) {
       val component = e.getData(PlatformDataKeys.CONTEXT_COMPONENT)
       if (component is Tree) {
         action.action(e, component)
@@ -40,6 +41,10 @@ internal abstract class AbstractDispatcher(private val mappings: Mappings) : Dum
       }
 
       keys.clear()
+    } else if (!mappings.isPrefix(keys)) { // invalid
+      LOG.info("Unrecognised key sequence: $keys")
+      keys.clear()
+      // TODO notify the user
     }
   }
 
