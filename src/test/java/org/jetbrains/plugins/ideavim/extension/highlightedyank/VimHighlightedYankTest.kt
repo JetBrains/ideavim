@@ -16,7 +16,6 @@ import com.maddyhome.idea.vim.extension.highlightedyank.DEFAULT_HIGHLIGHT_DURATI
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.assertHappened
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
@@ -25,16 +24,10 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class VimHighlightedYankTest : VimTestCase() {
-
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
     enableExtensions("highlightedyank")
-  }
-
-  @AfterEach
-  override fun tearDown(testInfo: TestInfo) {
-    super.tearDown(testInfo)
   }
 
   @Test
