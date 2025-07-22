@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.thinapi
+package com.maddyhome.idea.vim.thinapi.editor.caret
 
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.Line
@@ -21,6 +21,9 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.register.Register
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.thinapi.toApiMark
+import com.maddyhome.idea.vim.thinapi.toRange
+import com.maddyhome.idea.vim.thinapi.toTextSelectionType
 
 
 class CaretReadImpl(

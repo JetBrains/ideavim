@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.thinapi
+package com.maddyhome.idea.vim.thinapi.commandline
 
 import com.intellij.vim.api.scopes.commandline.CommandLineTransaction
 import com.maddyhome.idea.vim.api.VimCommandLine

@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.thinapi
+package com.maddyhome.idea.vim.thinapi.editor.caret
 
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.Line
@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.put.PutData
 import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.thinapi.editor.ReadImpl
 import com.maddyhome.idea.vim.mark.Jump as EngineJump
 
 class CaretTransactionImpl(

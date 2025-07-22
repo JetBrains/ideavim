@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.thinapi
+package com.maddyhome.idea.vim.thinapi.editor
 
 import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.Color
@@ -18,6 +18,9 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.key.MappingOwner
+import com.maddyhome.idea.vim.thinapi.editor.caret.CaretTransactionImpl
+import com.maddyhome.idea.vim.thinapi.caretId
+import com.maddyhome.idea.vim.thinapi.javaPath
 import kotlin.io.path.pathString
 import com.maddyhome.idea.vim.mark.Jump as EngineJump
 

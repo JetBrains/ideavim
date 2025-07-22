@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.thinapi
+package com.maddyhome.idea.vim.thinapi.editor
 
 import com.intellij.vim.api.scopes.editor.EditorScope
 import com.intellij.vim.api.scopes.editor.Read

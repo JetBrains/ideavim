@@ -32,6 +32,8 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.thinapi.commandline.CommandLineScopeImpl
+import com.maddyhome.idea.vim.thinapi.editor.EditorScopeImpl
 import com.maddyhome.idea.vim.vimscript.model.VimPluginContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope

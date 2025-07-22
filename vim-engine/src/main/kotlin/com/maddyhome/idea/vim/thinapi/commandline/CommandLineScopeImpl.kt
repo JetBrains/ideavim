@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.thinapi
+package com.maddyhome.idea.vim.thinapi.commandline
 
 import com.intellij.vim.api.scopes.commandline.CommandLineScope
 import com.intellij.vim.api.scopes.VimScope
@@ -17,6 +17,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.key.MappingOwner
+import com.maddyhome.idea.vim.thinapi.VimScopeImpl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers

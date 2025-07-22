@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.thinapi
+package com.maddyhome.idea.vim.thinapi.editor
 
 import com.intellij.vim.api.CaretData
 import com.intellij.vim.api.CaretId
@@ -23,6 +23,13 @@ import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.helper.SearchOptions
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.key.MappingOwner
+import com.maddyhome.idea.vim.thinapi.editor.caret.CaretReadImpl
+import com.maddyhome.idea.vim.thinapi.VimScopeImpl
+import com.maddyhome.idea.vim.thinapi.caretId
+import com.maddyhome.idea.vim.thinapi.caretInfo
+import com.maddyhome.idea.vim.thinapi.toApiJump
+import com.maddyhome.idea.vim.thinapi.toApiMark
+import com.maddyhome.idea.vim.thinapi.toRange
 
 open class ReadImpl(
   listenerOwner: ListenerOwner,
