@@ -89,36 +89,6 @@ abstract class VimScope {
   }
 
   /**
-   * Locks a variable to prevent changes.
-   *
-   * In Vim, this is equivalent to `:lockvar varname`.
-   *
-   * @param name The name of the variable, optionally prefixed with a scope (g:, b:, etc.)
-   * @param depth The lock depth (default is 1)
-   */
-  abstract fun lockvar(name: String, depth: Int = 1)
-
-  /**
-   * Unlocks a variable to allow changes.
-   *
-   * In Vim, this is equivalent to `:unlockvar varname`.
-   *
-   * @param name The name of the variable, optionally prefixed with a scope (g:, b:, etc.)
-   * @param depth The lock depth (default is 1)
-   */
-  abstract fun unlockvar(name: String, depth: Int = 1)
-
-  /**
-   * Checks if a variable is locked.
-   *
-   * In Vim, this is similar to checking the `islocked()` function.
-   *
-   * @param name The name of the variable, optionally prefixed with a scope (g:, b:, etc.)
-   * @return True if the variable is locked, false otherwise
-   */
-  abstract fun islocked(name: String): Boolean
-
-  /**
    * Exports a function that can be used as an operator function in Vim.
    *
    * In Vim, operator functions are used with the `g@` operator to create custom operators.

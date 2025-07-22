@@ -96,30 +96,6 @@ open class VimScopeImpl(
     variableService.storeVariable(variable, vimValue, vimEditor, context, VimPluginContext)
   }
 
-  override fun lockvar(name: String, depth: Int) {
-    val (variableName, scope) = parseVariableName(name)
-    val variableService: VariableService = injector.variableService
-    val variable = Variable(scope, variableName)
-
-    variableService.lockVariable(variable, depth, vimEditor, vimContext, VimPluginContext)
-  }
-
-  override fun unlockvar(name: String, depth: Int) {
-    val (variableName, scope) = parseVariableName(name)
-    val variableService: VariableService = injector.variableService
-    val variable = Variable(scope, variableName)
-
-    variableService.unlockVariable(variable, depth, vimEditor, vimContext, VimPluginContext)
-  }
-
-  override fun islocked(name: String): Boolean {
-    val (variableName, scope) = parseVariableName(name)
-    val variableService: VariableService = injector.variableService
-    val variable = Variable(scope, variableName)
-
-    return variableService.isVariableLocked(variable, vimEditor, vimContext, VimPluginContext)
-  }
-
   private fun parseVariableName(name: String): Pair<String, Scope?> {
     if (name.contains(':').not()) {
       return name to Scope.GLOBAL_VARIABLE
