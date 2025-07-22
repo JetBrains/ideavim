@@ -13,17 +13,17 @@ package com.intellij.vim.api
  */
 enum class TextType {
   /**
-   * Character-wise selection mode, where text is selected character by character.
+   * Character-wise selection, where text is selected character by character.
    */
   CHARACTER_WISE,
 
   /**
-   * Line-wise selection mode, where text is selected line by line.
+   * Line-wise selection, where text is selected line by line.
    */
   LINE_WISE,
 
   /**
-   * Block-wise selection mode, where text is selected in a rectangular block.
+   * Block-wise selection, where text is selected in a rectangular block.
    */
   BLOCK_WISE,
 }
