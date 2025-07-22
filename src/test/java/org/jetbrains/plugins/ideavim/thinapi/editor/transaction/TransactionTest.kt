@@ -64,6 +64,11 @@ class TransactionTest : MockTestCase() {
   @AfterEach
   override fun tearDown(testInfo: TestInfo) {
     super.tearDown(testInfo)
+    // reset mocks
+    Mockito.reset(mockMarkService)
+    Mockito.reset(mockJumpService)
+    Mockito.reset(mockInjector)
+
     injector = realInjector
   }
 

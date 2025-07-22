@@ -91,6 +91,15 @@ class ModalInputTest : MockTestCase() {
   @AfterEach
   override fun tearDown(testInfo: TestInfo) {
     super.tearDown(testInfo)
+    // reset mocks
+    Mockito.reset(modalInputService)
+    Mockito.reset(modalInput)
+    Mockito.reset(commandLineCaret)
+    Mockito.reset(executionContext)
+    Mockito.reset(editorGroup)
+    Mockito.reset(executionContextManager)
+    Mockito.reset(mockInjector)
+
     injector = realInjector
   }
 

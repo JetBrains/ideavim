@@ -61,6 +61,10 @@ class ReadTest : MockTestCase() {
   @AfterEach
   override fun tearDown(testInfo: TestInfo) {
     super.tearDown(testInfo)
+    // reset mocks
+    Mockito.reset(mockSearchHelper)
+    Mockito.reset(mockInjector)
+
     injector = realInjector
   }
 

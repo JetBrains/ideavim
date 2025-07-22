@@ -24,7 +24,6 @@ import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.assertNotNull
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class CaretTransactionTest : VimTestCase() {
   private lateinit var vimScope: VimScope

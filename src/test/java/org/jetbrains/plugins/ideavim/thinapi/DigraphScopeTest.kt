@@ -60,6 +60,10 @@ class DigraphScopeTest : MockTestCase() {
   @AfterEach
   override fun tearDown(testInfo: TestInfo) {
     super.tearDown(testInfo)
+    // reset mocks
+    Mockito.reset(digraphGroup)
+    Mockito.reset(mockInjector)
+
     injector = realInjector
   }
 
