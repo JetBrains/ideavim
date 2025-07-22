@@ -8,7 +8,17 @@
 
 package com.intellij.vim.api
 
+/**
+ * Represents a path.
+ */
 interface Path {
+  /**
+   * The protocol part of the path.
+   */
   val protocol: String
+
+  /**
+   * The segments of the path as an array of strings.
+   */
   val path: Array<String>
 }
