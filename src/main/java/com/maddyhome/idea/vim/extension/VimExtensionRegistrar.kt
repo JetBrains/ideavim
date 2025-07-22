@@ -14,8 +14,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimExtensionRegistrator
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.setToggleOption
-import com.maddyhome.idea.vim.common.ListenerOwner
-import com.maddyhome.idea.vim.key.MappingOwner
+import com.maddyhome.idea.vim.key.MappingOwner.Plugin.Companion.remove
 import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.options.OptionDeclaredScope
 import com.maddyhome.idea.vim.options.ToggleOption
@@ -111,8 +110,7 @@ internal object VimExtensionRegistrar : VimExtensionRegistrator {
     removeAliases(extension)
     extension.instance.dispose()
     VimPlugin.getOptionGroup().removeOption(name)
-    MappingOwner.Plugin.Companion.remove(name)
-    ListenerOwner.Plugin.Companion.remove(name)
+    remove(name)
     logger.info("IdeaVim extension '$name' disposed")
   }
 
