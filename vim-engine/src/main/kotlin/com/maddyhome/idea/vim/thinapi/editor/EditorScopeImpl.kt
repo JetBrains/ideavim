@@ -9,7 +9,7 @@
 package com.maddyhome.idea.vim.thinapi.editor
 
 import com.intellij.vim.api.scopes.editor.EditorScope
-import com.intellij.vim.api.scopes.editor.Read
+import com.intellij.vim.api.scopes.editor.ReadScope
 import com.intellij.vim.api.scopes.editor.Transaction
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ListenerOwner
@@ -27,10 +27,10 @@ class EditorScopeImpl(
 ) : EditorScope() {
   private val coroutineScope = CoroutineScope(Dispatchers.Unconfined )
 
-  override fun <T> ideRead(block: suspend Read.() -> T): Deferred<T> {
+  override fun <T> ideRead(block: suspend ReadScope.() -> T): Deferred<T> {
     return injector.application.runReadAction {
-      val read = ReadImpl(listenerOwner, mappingOwner)
-      return@runReadAction coroutineScope.async { block(read) }
+      val readScope = ReadScopeImpl(listenerOwner, mappingOwner)
+      return@runReadAction coroutineScope.async { block(readScope) }
     }
   }
 

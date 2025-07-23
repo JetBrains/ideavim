@@ -12,6 +12,7 @@ import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.Color
 import com.intellij.vim.api.HighlightId
 import com.intellij.vim.api.Jump
+import com.intellij.vim.api.scopes.editor.Read
 import com.intellij.vim.api.scopes.editor.Transaction
 import com.intellij.vim.api.scopes.editor.caret.CaretTransaction
 import com.maddyhome.idea.vim.api.VimEditor
@@ -27,7 +28,7 @@ import com.maddyhome.idea.vim.mark.Jump as EngineJump
 class TransactionImpl(
   private val listenerOwner: ListenerOwner,
   private val mappingOwner: MappingOwner,
-) : Transaction {
+) : Transaction, Read by ReadImpl(listenerOwner, mappingOwner) {
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!
 

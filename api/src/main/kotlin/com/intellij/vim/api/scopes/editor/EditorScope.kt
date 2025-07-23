@@ -42,7 +42,7 @@ abstract class EditorScope {
    * @return A [kotlinx.coroutines.Deferred] that completes with the result of the block execution
    */
   @OptIn(ExperimentalContracts::class)
-  fun <T> read(block: suspend Read.() -> T): Deferred<T> {
+  fun <T> read(block: suspend ReadScope.() -> T): Deferred<T> {
     contract {
       callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
@@ -81,6 +81,6 @@ abstract class EditorScope {
     return ideChange(block)
   }
 
-  protected abstract fun <T> ideRead(block: suspend Read.() -> T): Deferred<T>
+  protected abstract fun <T> ideRead(block: suspend ReadScope.() -> T): Deferred<T>
   protected abstract fun ideChange(block: suspend Transaction.() -> Unit): Job
 }

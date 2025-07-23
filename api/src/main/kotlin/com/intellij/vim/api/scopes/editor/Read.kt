@@ -15,7 +15,6 @@ import com.intellij.vim.api.Line
 import com.intellij.vim.api.Mark
 import com.intellij.vim.api.Range
 import com.intellij.vim.api.scopes.VimPluginDsl
-import com.intellij.vim.api.scopes.editor.caret.CaretRead
 
 /**
  * Scope for editor functions that should be executed under read lock.
@@ -36,68 +35,6 @@ interface Read {
    * The total number of lines in the editor.
    */
   val lineCount: Int
-
-  /**
-   * Executes the provided block for each caret in the editor and returns a list of results.
-   *
-   * This function allows you to perform operations on all carets in the editor in a single call.
-   * The block is executed with each caret as the receiver, and the results are collected into a list.
-   *
-   * Example usage:
-   * ```kotlin
-   * editor {
-   *   val caretOffsets = forEachCaret {
-   *     offset // Get the offset of each caret
-   *   }
-   *   // caretOffsets is a List<Int> containing the offset of each caret
-   * }
-   * ```
-   *
-   * @param block The block to execute for each caret
-   * @return A list containing the results of executing the block for each caret
-   */
-  suspend fun <T> forEachCaret(block: suspend CaretRead.() -> T): List<T>
-
-  /**
-   * Executes the provided block with a specific caret as the receiver.
-   *
-   * This function allows you to perform operations on a specific caret identified by its ID.
-   *
-   * Example usage:
-   * ```kotlin
-   * editor {
-   *   with(caretId) {
-   *     // Perform operations on the specific caret
-   *     val caretOffset = offset
-   *     val caretLine = line
-   *   }
-   * }
-   * ```
-   *
-   * @param caretId The ID of the caret to use
-   * @param block The block to execute with the specified caret as the receiver
-   */
-  suspend fun with(caretId: CaretId, block: suspend CaretRead.() -> Unit)
-
-  /**
-   * Executes the provided block with the primary caret as the receiver.
-   *
-   * This function allows you to perform operations on the primary caret in the editor.
-   *
-   * Example usage:
-   * ```kotlin
-   * editor {
-   *   withPrimaryCaret {
-   *     // Perform operations on the primary caret
-   *     val primaryCaretOffset = offset
-   *     val primaryCaretLine = line
-   *   }
-   * }
-   * ```
-   *
-   * @param block The block to execute with the primary caret as the receiver
-   */
-  suspend fun withPrimaryCaret(block: suspend CaretRead.() -> Unit)
 
   /**
    * Gets the start offset of the specified line.

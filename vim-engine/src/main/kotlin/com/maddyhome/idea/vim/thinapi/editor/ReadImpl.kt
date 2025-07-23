@@ -15,7 +15,6 @@ import com.intellij.vim.api.Line
 import com.intellij.vim.api.Mark
 import com.intellij.vim.api.Range
 import com.intellij.vim.api.scopes.editor.Read
-import com.intellij.vim.api.scopes.editor.caret.CaretRead
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.injector
@@ -23,7 +22,6 @@ import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.helper.SearchOptions
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.key.MappingOwner
-import com.maddyhome.idea.vim.thinapi.editor.caret.CaretReadImpl
 import com.maddyhome.idea.vim.thinapi.VimScopeImpl
 import com.maddyhome.idea.vim.thinapi.caretId
 import com.maddyhome.idea.vim.thinapi.caretInfo
@@ -44,21 +42,6 @@ open class ReadImpl(
     get() = vimEditor.text()
   override val lineCount: Int
     get() = vimEditor.lineCount()
-
-  override suspend fun <T> forEachCaret(block: suspend CaretRead.() -> T): List<T> {
-    return vimEditor.sortedCarets().map { caret -> CaretReadImpl(caret.caretId).block() }
-  }
-
-  override suspend fun with(
-    caretId: CaretId,
-    block: suspend CaretRead.() -> Unit,
-  ) {
-    CaretReadImpl(caretId).block()
-  }
-
-  override suspend fun withPrimaryCaret(block: suspend CaretRead.() -> Unit) {
-    CaretReadImpl(vimEditor.primaryCaret().caretId).block()
-  }
 
   override suspend fun getLineStartOffset(line: Int): Int {
     return vimEditor.getLineStartOffset(line)
