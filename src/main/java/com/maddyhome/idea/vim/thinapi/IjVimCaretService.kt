@@ -6,14 +6,13 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.extension.thin.api
+package com.maddyhome.idea.vim.thinapi
 
 import com.intellij.openapi.components.Service
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.thinapi.VimCaretService
 
 @Service
 class IjVimCaretService : VimCaretService {

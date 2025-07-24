@@ -62,9 +62,9 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.isInjectorInitialized
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.extension.VimExtensionRegistrar
-import com.maddyhome.idea.vim.extension.thin.api.IjVimCaretService
-import com.maddyhome.idea.vim.extension.thin.api.VimHighlightingServiceImpl
-import com.maddyhome.idea.vim.extension.thin.api.VimPluginServiceImpl
+import com.maddyhome.idea.vim.thinapi.IjVimCaretService
+import com.maddyhome.idea.vim.thinapi.VimHighlightingServiceImpl
+import com.maddyhome.idea.vim.thinapi.VimPluginServiceImpl
 import com.maddyhome.idea.vim.group.CommandGroup
 import com.maddyhome.idea.vim.group.EditorGroup
 import com.maddyhome.idea.vim.group.EffectiveIjOptions

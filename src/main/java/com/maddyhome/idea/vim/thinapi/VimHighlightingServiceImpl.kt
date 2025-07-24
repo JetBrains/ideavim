@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.extension.thin.api
+package com.maddyhome.idea.vim.thinapi
 
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.markup.EffectType
@@ -18,7 +18,6 @@ import com.intellij.vim.api.Color
 import com.intellij.vim.api.HighlightId
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.thinapi.VimHighlightingService
 import java.awt.Font
 import java.awt.Color as AwtColor
 
