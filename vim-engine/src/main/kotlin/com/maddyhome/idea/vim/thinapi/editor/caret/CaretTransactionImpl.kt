@@ -109,12 +109,16 @@ class CaretTransactionImpl(
     caretAtEnd: Boolean,
     insertBeforeCaret: Boolean,
   ): Boolean {
-    val validRange = 0..vimEditor.fileSize().toInt()
+    val fileLength = vimEditor.text().length
+    val validRange = 0..fileLength
     assertOffsetInRange(position, validRange)
 
     vimCaret.moveToOffset(position)
 
     val returnValue = putTextInternal(text, null, caretAtEnd, insertBeforeCaret)
+
+    val newFileLength = vimEditor.text().length
+    val endBoundary = if (newFileLength > 0) newFileLength - 1 else 0
 
     val newOffset = if (caretAtEnd) {
       if (insertBeforeCaret) {
@@ -128,7 +132,7 @@ class CaretTransactionImpl(
       } else {
         position + 1
       }
-    }.coerceIn(0, vimEditor.fileSize().toInt() - 1)
+    }.coerceIn(0, endBoundary)
 
     vimCaret.moveToOffset(newOffset)
 
