@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.extension.thin.api
+package com.maddyhome.idea.vim.thinapi
 
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -15,7 +15,6 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade
 import com.maddyhome.idea.vim.extension.exportOperatorFunction
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.thinapi.VimPluginService
 
 class VimPluginServiceImpl : VimPluginService {
   override fun executeNormalWithoutMapping(command: String, editor: VimEditor) {
