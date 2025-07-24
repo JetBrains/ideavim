@@ -12,23 +12,50 @@ import com.intellij.vim.api.Path
 import java.nio.file.Paths
 import java.nio.file.Path as JavaPath
 
+private const val PATH_DELIMITER = "/"
+private const val PROTOCOL_DELIMITER = "://"
+
 val Path.javaPath: JavaPath
-  get() = Paths.get(protocol, *path)
+  get() {
+    val uri = "$protocol$PROTOCOL_DELIMITER${getFilePath()}"
+    return Paths.get(uri)
+  }
 
 val JavaPath.vimPath: Path?
   get() {
     val pathComponents: List<String> = iterator().asSequence().map { it.toString() }.toList()
-    val protocolRegex = Regex("^[a-zA-Z]:|^/")
-
-    val protocol: String = root?.toString()?.removeSuffix(":")
-      ?: pathComponents.firstOrNull()?.takeIf { protocolRegex.matches(it) }?.removeSuffix(":")
-      ?: return null
+    // Protocol is the first component:
+    // e.g., temp:///src/aaa.txt => protocol = "temp:", path = ("src", "aaa.txt")
+    val protocolRegex = Regex("^([a-zA-Z]+):")
+    val protocolString = pathComponents.firstOrNull() ?: return null
+    val protocol = protocolRegex.find(protocolString)?.groupValues[1] ?: return null
+    // drop protocol from list
+    val components = pathComponents.drop(1)
 
     return object : Path {
-      override val protocol: String
-        get() = protocol
-
-      override val path: Array<String>
-        get() = pathComponents.toTypedArray()
+      override val protocol: String = protocol
+      override val path: Array<String> = components.toTypedArray()
     }
   }
+
+
+/**
+ * Function that will create [Path] from protocol and file path passed as function parameters.
+ */
+internal fun Path.Companion.createApiPath(protocol: String, filePath: String): Path {
+  val pathComponents: Array<String> = filePath
+    .split(PATH_DELIMITER)
+    .toTypedArray()
+
+  return object : Path {
+    override val protocol: String = protocol
+    override val path: Array<String> = pathComponents
+  }
+}
+
+/**
+ * Function that returns a string that represents filePath without a protocol.
+ */
+internal fun Path.getFilePath(): String {
+  return path.joinToString(PATH_DELIMITER)
+}

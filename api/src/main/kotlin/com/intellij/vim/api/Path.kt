@@ -21,4 +21,6 @@ interface Path {
    * The segments of the path as an array of strings.
    */
   val path: Array<String>
+
+  companion object
 }

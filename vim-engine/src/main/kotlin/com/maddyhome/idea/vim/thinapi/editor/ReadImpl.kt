@@ -13,9 +13,11 @@ import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.Jump
 import com.intellij.vim.api.Line
 import com.intellij.vim.api.Mark
+import com.intellij.vim.api.Path
 import com.intellij.vim.api.Range
 import com.intellij.vim.api.scopes.editor.Read
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimVirtualFile
 import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ListenerOwner
@@ -25,6 +27,7 @@ import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.thinapi.VimScopeImpl
 import com.maddyhome.idea.vim.thinapi.caretId
 import com.maddyhome.idea.vim.thinapi.caretInfo
+import com.maddyhome.idea.vim.thinapi.createApiPath
 import com.maddyhome.idea.vim.thinapi.toApiJump
 import com.maddyhome.idea.vim.thinapi.toApiMark
 import com.maddyhome.idea.vim.thinapi.toRange
@@ -42,6 +45,14 @@ open class ReadImpl(
     get() = vimEditor.text()
   override val lineCount: Int
     get() = vimEditor.lineCount()
+  override val filePath: Path
+    get() {
+      val virtualFile: VimVirtualFile =
+        vimEditor.getVirtualFile() ?: throw IllegalStateException("Virtual file is null")
+      val filePath: String = virtualFile.path
+      val protocol: String = virtualFile.protocol
+      return Path.createApiPath(protocol, filePath)
+    }
 
   override suspend fun getLineStartOffset(line: Int): Int {
     return vimEditor.getLineStartOffset(line)
@@ -119,7 +130,12 @@ open class ReadImpl(
     return injector.searchHelper.findNextParagraph(vimEditor, startLine, count, includeWhitespaceLines)
   }
 
-  override suspend fun getNextSentenceStart(startOffset: Int, count: Int, includeCurrent: Boolean, requireAll: Boolean): Int? {
+  override suspend fun getNextSentenceStart(
+    startOffset: Int,
+    count: Int,
+    includeCurrent: Boolean,
+    requireAll: Boolean,
+  ): Int? {
     return injector.searchHelper.findNextSentenceStart(vimEditor, startOffset, count, includeCurrent, requireAll)
   }
 
@@ -131,7 +147,12 @@ open class ReadImpl(
     return injector.searchHelper.findSection(vimEditor, startLine, marker, -1, count)
   }
 
-  override suspend fun getNextSentenceEnd(startOffset: Int, count: Int, includeCurrent: Boolean, requireAll: Boolean): Int? {
+  override suspend fun getNextSentenceEnd(
+    startOffset: Int,
+    count: Int,
+    includeCurrent: Boolean,
+    requireAll: Boolean,
+  ): Int? {
     return injector.searchHelper.findNextSentenceEnd(vimEditor, startOffset, count, includeCurrent, requireAll)
   }
 

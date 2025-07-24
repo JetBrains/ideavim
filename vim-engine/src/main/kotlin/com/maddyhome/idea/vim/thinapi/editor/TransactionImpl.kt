@@ -21,8 +21,7 @@ import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.thinapi.editor.caret.CaretTransactionImpl
 import com.maddyhome.idea.vim.thinapi.caretId
-import com.maddyhome.idea.vim.thinapi.javaPath
-import kotlin.io.path.pathString
+import com.maddyhome.idea.vim.thinapi.getFilePath
 import com.maddyhome.idea.vim.mark.Jump as EngineJump
 
 class TransactionImpl(
@@ -103,12 +102,16 @@ class TransactionImpl(
   }
 
   override suspend fun addJump(jump: Jump, reset: Boolean) {
-    val engineJump = EngineJump(jump.line, jump.col, jump.filepath.javaPath.pathString, jump.filepath.protocol)
+    val protocol = jump.filepath.protocol
+    val filePath = jump.filepath.getFilePath()
+    val engineJump = EngineJump(jump.line, jump.col, filePath, protocol)
     injector.jumpService.addJump(vimEditor.projectId, engineJump, reset)
   }
 
   override suspend fun removeJump(jump: Jump) {
-    val engineJump = EngineJump(jump.line, jump.col, jump.filepath.javaPath.pathString, jump.filepath.protocol)
+    val protocol = jump.filepath.protocol
+    val filePath = jump.filepath.getFilePath()
+    val engineJump = EngineJump(jump.line, jump.col, filePath, protocol)
     injector.jumpService.removeJump(vimEditor.projectId, engineJump)
   }
 

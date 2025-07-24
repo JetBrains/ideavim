@@ -51,26 +51,18 @@ fun TextRange.toRange(): Range.Simple {
 }
 
 fun EngineMark.toApiMark(): Mark {
-  val mark = this
-  return object : Mark {
-    override val key: Char = mark.key
-    override val line: Int = mark.line
-    override val col: Int = mark.col
-    override val filePath: Path
-      get() = object : Path {
-        override val protocol: String
-          get() = filePath.protocol
-        override val path: Array<String>
-          get() = filePath.path
-      }
-  }
+  return Mark(
+    key,
+    line,
+    col,
+    Path.createApiPath(protocol, filepath)
+  )
 }
 
 fun EngineJump.toApiJump(): ApiJump {
-  return object : ApiJump {
-    override val line: Int = this@toApiJump.line
-    override val col: Int = this@toApiJump.col
-    override val filepath: Path
-      get() = TODO("Not yet implemented")
-  }
+  return ApiJump(
+    line,
+    col,
+    Path.createApiPath(protocol, filepath)
+  )
 }

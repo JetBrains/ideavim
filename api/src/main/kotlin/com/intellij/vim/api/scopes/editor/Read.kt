@@ -13,6 +13,7 @@ import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.Jump
 import com.intellij.vim.api.Line
 import com.intellij.vim.api.Mark
+import com.intellij.vim.api.Path
 import com.intellij.vim.api.Range
 import com.intellij.vim.api.scopes.VimPluginDsl
 
@@ -35,6 +36,11 @@ interface Read {
    * The total number of lines in the editor.
    */
   val lineCount: Int
+
+  /**
+   * File path of the editor.
+   */
+  val filePath: Path
 
   /**
    * Gets the start offset of the specified line.

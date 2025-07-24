@@ -13,19 +13,19 @@ import org.jetbrains.annotations.Range
 /**
  * Represents a Vim jump location.
  */
-interface Jump {
+data class Jump(
   /**
    * The 0-based line number of the jump.
    */
-  val line: @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int
+  val line: @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int,
 
   /**
    * The 0-based column number of the jump.
    */
-  val col: @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int
+  val col: @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int,
 
   /**
    * The file path where the jump is located.
    */
   val filepath: Path
-}
+)

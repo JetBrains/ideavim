@@ -170,7 +170,7 @@ interface Transaction: Read {
    * @param jump The jump to add
    * @param reset Whether to reset the current position in the jump list
    */
-  suspend fun addJump(jump: Jump, reset: Boolean)
+  suspend fun addJump(jump: Jump, reset: Boolean = false)
 
   /**
    * Removes a jump from the jump list.
