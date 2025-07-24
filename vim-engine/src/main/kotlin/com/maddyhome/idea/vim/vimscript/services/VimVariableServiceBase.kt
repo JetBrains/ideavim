@@ -127,7 +127,7 @@ abstract class VimVariableServiceBase : VariableService {
       }
     }
 
-    throw exExceptionMessage("variable.extract.name.error")
+    throw exExceptionMessage("variable.name.extract.error")
   }
 
   override fun getNullableVariableValue(

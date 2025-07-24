@@ -43,7 +43,7 @@ class CaretTransactionImpl(
 
   private fun assertOffsetInRange(offset: Int, range: IntRange) {
     require(offset in range) {
-      "Offset $this is not within the valid range ${range.start}..${range.endInclusive}."
+      "Offset $offset is not within the valid range ${range.start}..${range.endInclusive}."
     }
   }
 
