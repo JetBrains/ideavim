@@ -540,15 +540,4 @@ abstract class VimScope {
    * @return The offset of the previous word end, or null if not found
    */
   abstract fun getPreviousCamelEndOffset(chars: CharSequence, endIndex: Int, count: Int = 1): Int?
-
-  /**
-   * Find the next word in some text, from the given starting point.
-   *
-   * @param text The text to search in.
-   * @param startOffset The offset in the document to search from.
-   * @param count Search for the [count]-th occurrence. If negative, search backwards.
-   * @param isBigWord Use WORD instead of word boundaries.
-   * @return The offset of the [count]-th next word, or `null` if not found.
-   */
-  abstract fun getNextWordStartOffset(text: CharSequence, startOffset: Int, count: Int = 1, isBigWord: Boolean = false): Int?
 }

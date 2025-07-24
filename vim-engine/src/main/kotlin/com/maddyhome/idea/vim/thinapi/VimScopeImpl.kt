@@ -314,20 +314,4 @@ open class VimScopeImpl(
   override fun getPreviousCamelEndOffset(chars: CharSequence, endIndex: Int, count: Int): Int? {
     return injector.searchHelper.findPreviousCamelEnd(chars, endIndex, count)
   }
-
-  override fun getNextWordStartOffset(
-    text: CharSequence,
-    startOffset: Int,
-    count: Int,
-    isBigWord: Boolean,
-  ): Int? {
-    val editorSize = vimEditor.fileSize().toInt()
-    val nextWordOffset = injector.searchHelper.findNextWord(text, vimEditor, startOffset, count, isBigWord)
-
-    return if (nextWordOffset >= editorSize) {
-      null
-    } else {
-      nextWordOffset
-    }
-  }
 }
