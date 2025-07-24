@@ -27,7 +27,7 @@ internal class IjHighlightId(
 
 private fun Color.toAwtColor(): AwtColor = AwtColor(r, g, b, a)
 
-class VimHighlightingServiceImpl : VimHighlightingService {
+class IjVimHighlightingService : VimHighlightingService {
   override fun addHighlighter(
     editor: VimEditor,
     startOffset: Int,
