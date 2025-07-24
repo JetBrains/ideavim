@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.extension.exportOperatorFunction
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.ij
 
-class VimPluginServiceImpl : VimPluginService {
+class IjVimPluginService : VimPluginService {
   override fun executeNormalWithoutMapping(command: String, editor: VimEditor) {
     VimExtensionFacade.executeNormalWithoutMapping(injector.parser.parseKeys(command), editor.ij)
   }
