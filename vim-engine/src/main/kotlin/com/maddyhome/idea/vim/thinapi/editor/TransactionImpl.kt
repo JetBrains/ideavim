@@ -48,12 +48,21 @@ class TransactionImpl(
     block(CaretTransactionImpl(listenerOwner, mappingOwner, vimEditor.primaryCaret().caretId))
   }
 
-  override suspend fun addCaret(offset: Int): CaretId {
-    TODO("Not yet implemented")
+  override suspend fun addCaret(offset: Int): CaretId? {
+    val fileLength = vimEditor.text().length
+    val validRange = 0 until fileLength
+    if (offset !in validRange) {
+      throw IllegalArgumentException("Offset $offset is not in valid range $validRange")
+    }
+
+    return vimEditor.addCaret(offset)?.caretId
   }
 
   override suspend fun removeCaret(caretId: CaretId) {
-    TODO("Not yet implemented")
+    val caret = vimEditor.carets().find { it.id == caretId.id }
+      ?: throw IllegalArgumentException("Caret with id $caretId not found")
+
+    vimEditor.removeCaret(caret)
   }
 
   override suspend fun addHighlight(

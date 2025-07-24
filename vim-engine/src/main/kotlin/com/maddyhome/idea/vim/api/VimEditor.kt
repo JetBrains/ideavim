@@ -166,6 +166,7 @@ interface VimEditor {
   fun getScrollingModel(): VimScrollingModel
 
   fun removeCaret(caret: VimCaret)
+  fun addCaret(offset: Int): VimCaret?
   fun removeSecondaryCarets()
   fun vimSetSystemBlockSelectionSilently(start: BufferPosition, end: BufferPosition)
 
