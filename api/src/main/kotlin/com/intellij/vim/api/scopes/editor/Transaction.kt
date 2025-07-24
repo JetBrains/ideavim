@@ -89,14 +89,16 @@ interface Transaction: Read {
    * Adds a new caret at the specified offset in the editor.
    *
    * @param offset The offset at which to add the caret
-   * @return The ID of the newly created caret
+   * @return The ID of the newly created caret if successful, null otherwise
+   * @throws IllegalArgumentException if offset is not in valid range `[0, fileLength - 1]`
    */
-  suspend fun addCaret(offset: Int): CaretId
+  suspend fun addCaret(offset: Int): CaretId?
 
   /**
    * Removes a caret from the editor.
    *
    * @param caretId The ID of the caret to remove
+   * @throws IllegalArgumentException if caret with [caretId] is not found
    */
   suspend fun removeCaret(caretId: CaretId)
 
