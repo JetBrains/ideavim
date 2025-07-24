@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.thinapi.VimPluginService
 
 class VimPluginServiceImpl : VimPluginService {
   override fun executeNormalWithoutMapping(command: String, editor: VimEditor) {
-    VimExtensionFacade.executeNormalWithoutMapping(injector.parser.parseKeys("g@"), editor.ij)
+    VimExtensionFacade.executeNormalWithoutMapping(injector.parser.parseKeys(command), editor.ij)
   }
 
   override fun exportOperatorFunction(name: String, function: OperatorFunction) {
