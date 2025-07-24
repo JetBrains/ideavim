@@ -336,6 +336,42 @@ class CaretTransactionTest : VimTestCase() {
   }
 
   @Test
+  fun `test insert when empty file`() {
+    val text = "${c}"
+    configureByText(text)
+
+    executeAction {
+      vimScope.editor {
+        change {
+          withPrimaryCaret {
+            insertText(0, "TEXT")
+          }
+        }
+      }
+    }
+
+    assertState("TEX${c}T")
+  }
+
+  @Test
+  fun `test insert empty text into empty file`() {
+    val text = "${c}"
+    configureByText(text)
+
+    executeAction {
+      vimScope.editor {
+        change {
+          withPrimaryCaret {
+            insertText(0, "")
+          }
+        }
+      }
+    }
+
+    assertState("${c}")
+  }
+
+  @Test
   fun `test insertion of multi-line text`() {
     val text = "one ${c}two three"
     configureByText(text)
