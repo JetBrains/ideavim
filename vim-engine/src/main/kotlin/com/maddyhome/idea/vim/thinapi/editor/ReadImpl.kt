@@ -136,7 +136,7 @@ open class ReadImpl(
   }
 
   override suspend fun getNextWordStartOffset(startOffset: Int, count: Int, isBigWord: Boolean): Int? {
-    val editorSize = vimEditor.fileSize().toInt()
+    val editorSize = vimEditor.text().length
     val nextWordOffset = injector.searchHelper.findNextWord(vimEditor, startOffset, count, isBigWord)
 
     return if (nextWordOffset >= editorSize) {
