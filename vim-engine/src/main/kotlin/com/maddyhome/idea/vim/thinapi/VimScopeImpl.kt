@@ -23,7 +23,6 @@ import com.intellij.vim.api.scopes.VimScope
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.Key
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.CommandAliasHandler
@@ -61,9 +60,6 @@ open class VimScopeImpl(
   private val vimContext: ExecutionContext
     get() = injector.executionContextManager.getEditorExecutionContext(vimEditor)
 
-  private val optionGroup: VimOptionGroup
-    get() = injector.optionGroup
-
   override fun <T : Any> getVariableInternal(name: String, type: KType): T? {
     val (name, scope) = parseVariableName(name)
     val variableService: VariableService = injector.variableService
@@ -71,9 +67,9 @@ open class VimScopeImpl(
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val variableValue: VimDataType? =
       variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext)
+    // variable does not exist
     if (variableValue == null) {
       return variableValue
-//      throw IllegalArgumentException("Variable with name $name does not exist")
     }
     val value: T = injector.variableService.convertToKotlinType(variableValue, type)
     return value
