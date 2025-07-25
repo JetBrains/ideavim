@@ -19,7 +19,6 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
-import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.fileEditor.impl.EditorWindow
 import com.intellij.openapi.project.Project
@@ -36,6 +35,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.CommandAlias
 import com.maddyhome.idea.vim.common.CommandAliasHandler
+import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.group.KeyGroup
@@ -369,7 +369,7 @@ internal class NerdTree : VimExtension {
 
   companion object {
     const val pluginName = "NERDTree"
-    private val LOG = logger<NerdTree>()
+    private val LOG = vimLogger<NerdTree>()
   }
 }
 
