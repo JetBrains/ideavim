@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.IjActionExecutor
 import com.maddyhome.idea.vim.helper.inNormalMode
+import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.helper.isPrimaryEditor
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.newapi.actionStartedFromVim
@@ -52,7 +53,7 @@ internal val commandContinuation = Key.create<EditorActionHandler>("commandConti
  */
 internal class CaretShapeEnterEditorHandler(private val nextHandler: EditorActionHandler) : EditorActionHandler() {
   override fun doExecute(editor: Editor, caret: Caret?, dataContext: DataContext?) {
-    if (VimPlugin.isEnabled() && enableOctopus) {
+    if (VimPlugin.isEnabled() && !editor.isIdeaVimDisabledHere && enableOctopus) {
       invokeLater {
         editor.updateCaretsVisualAttributes()
       }
@@ -128,6 +129,7 @@ internal abstract class OctopusHandler(private val nextHandler: EditorActionHand
 
   private fun isThisHandlerEnabled(editor: Editor, caret: Caret?, dataContext: DataContext?): Boolean {
     if (VimPlugin.isNotEnabled()) return false
+    if (editor.isIdeaVimDisabledHere) return false
     if (!isHandlerEnabled(editor, dataContext)) return false
     if (isNotActualKeyPress(dataContext)) return false
     if (!enableOctopus) return false
