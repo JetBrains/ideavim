@@ -17,9 +17,10 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.components.Service
+import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
-import com.intellij.openapi.project.DumbAwareAction
+import com.intellij.openapi.fileEditor.impl.EditorWindow
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.startup.ProjectActivity
@@ -27,30 +28,24 @@ import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowId
 import com.intellij.openapi.wm.ex.ToolWindowManagerEx
 import com.intellij.openapi.wm.ex.ToolWindowManagerListener
-import com.intellij.ui.KeyStrokeAdapter
-import com.intellij.ui.TreeExpandCollapse
 import com.intellij.ui.speedSearch.SpeedSearchSupply
-import com.intellij.util.ui.tree.TreeUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.CommandAlias
 import com.maddyhome.idea.vim.common.CommandAliasHandler
+import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.group.KeyGroup
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.runAfterGotFocus
-import com.maddyhome.idea.vim.key.KeyStrokeTrie
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.RequiredShortcut
-import com.maddyhome.idea.vim.key.add
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import java.awt.event.KeyEvent
-import javax.swing.KeyStroke
 import javax.swing.SwingConstants
 
 /**
@@ -118,7 +113,7 @@ internal class NerdTree : VimExtension {
   override fun init() {
     LOG.info("IdeaVim: Initializing NERDTree extension. Disable this extension if you observe a strange behaviour of the project tree. E.g. moving down on 'j'")
 
-    registerCommands()
+    registerMappings()
 
     addCommand("NERDTreeFocus", IjCommandHandler("ActivateProjectToolWindow"))
     addCommand("NERDTree", IjCommandHandler("ActivateProjectToolWindow"))
@@ -191,29 +186,10 @@ internal class NerdTree : VimExtension {
     }
   }
 
-  class NerdDispatcher : DumbAwareAction() {
+  @Service(Service.Level.PROJECT)
+  class NerdDispatcher : AbstractDispatcher(mappings) {
     internal var waitForSearch = false
     internal var speedSearchListenerInstalled = false
-
-    private val keys = mutableListOf<KeyStroke>()
-
-    override fun actionPerformed(e: AnActionEvent) {
-      var keyStroke = getKeyStroke(e) ?: return
-      val keyChar = keyStroke.keyChar
-      if (keyChar != KeyEvent.CHAR_UNDEFINED) {
-        keyStroke = KeyStroke.getKeyStroke(keyChar)
-      }
-
-      keys.add(keyStroke)
-      actionsRoot.getData(keys)?.let { action ->
-        when (action) {
-          is NerdAction.ToIj -> Util.callAction(null, action.name, e.dataContext.vim)
-          is NerdAction.Code -> e.project?.let { action.action(it, e.dataContext, e) }
-        }
-
-        keys.clear()
-      }
-    }
 
     override fun update(e: AnActionEvent) {
       // Special processing of esc.
@@ -238,50 +214,23 @@ internal class NerdTree : VimExtension {
 
     companion object {
       fun getInstance(project: Project): NerdDispatcher {
-        return project.getService(NerdDispatcher::class.java)
+        return project.service<NerdDispatcher>()
       }
 
       private const val ESCAPE_KEY_CODE = 27
     }
-
-    /**
-     * getDefaultKeyStroke is needed for NEO layout keyboard VIM-987
-     * but we should cache the value because on the second call (isEnabled -> actionPerformed)
-     * the event is already consumed
-     */
-    private var keyStrokeCache: Pair<KeyEvent?, KeyStroke?> = null to null
-
-    private fun getKeyStroke(e: AnActionEvent): KeyStroke? {
-      val inputEvent = e.inputEvent
-      if (inputEvent is KeyEvent) {
-        val defaultKeyStroke = KeyStrokeAdapter.getDefaultKeyStroke(inputEvent)
-        val strokeCache = keyStrokeCache
-        if (defaultKeyStroke != null) {
-          keyStrokeCache = inputEvent to defaultKeyStroke
-          return defaultKeyStroke
-        } else if (strokeCache.first === inputEvent) {
-          keyStrokeCache = null to null
-          return strokeCache.second
-        }
-        return KeyStroke.getKeyStrokeForEvent(inputEvent)
-      }
-      return null
-    }
   }
 
-  private fun registerCommands() {
-    // TODO: 22.01.2021 Should not just to the last line after the first
-    registerCommand("j", NerdAction.ToIj("Tree-selectNext"))
-    registerCommand("k", NerdAction.ToIj("Tree-selectPrevious"))
-    registerCommand(
+  private fun registerMappings() {
+    mappings.registerNavigationMappings()
+
+    mappings.register(
       "NERDTreeMapActivateNode",
       "o",
-      NerdAction.Code { project, dataContext, _ ->
-        val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
-
-        val array = CommonDataKeys.NAVIGATABLE_ARRAY.getData(dataContext)?.filter { it.canNavigateToSource() }
+      Mappings.Action { event, tree ->
+        val array = CommonDataKeys.NAVIGATABLE_ARRAY.getData(event.dataContext)?.filter { it.canNavigateToSource() }
         if (array.isNullOrEmpty()) {
-          val row = tree.selectionRows?.getOrNull(0) ?: return@Code
+          val row = tree.selectionRows?.getOrNull(0) ?: return@Action
           if (tree.isExpanded(row)) {
             tree.collapseRow(row)
           } else {
@@ -292,222 +241,101 @@ internal class NerdTree : VimExtension {
         }
       },
     )
-    registerCommand(
+    mappings.register(
       "NERDTreeMapPreview",
       "go",
-      NerdAction.Code { _, dataContext, _ ->
-        CommonDataKeys.NAVIGATABLE_ARRAY
-          .getData(dataContext)
-          ?.filter { it.canNavigateToSource() }
+      Mappings.Action { event, _ ->
+        CommonDataKeys.NAVIGATABLE_ARRAY.getData(event.dataContext)?.filter { it.canNavigateToSource() }
           ?.forEach { it.navigate(false) }
       },
     )
-    registerCommand(
+    mappings.register(
       "NERDTreeMapOpenInTab",
       "t",
-      NerdAction.Code { _, dataContext, _ ->
+      Mappings.Action { event, _ ->
         // FIXME: 22.01.2021 Doesn't work correct
-        CommonDataKeys.NAVIGATABLE_ARRAY
-          .getData(dataContext)
-          ?.filter { it.canNavigateToSource() }
+        CommonDataKeys.NAVIGATABLE_ARRAY.getData(event.dataContext)?.filter { it.canNavigateToSource() }
           ?.forEach { it.navigate(true) }
       },
     )
-    registerCommand(
+    mappings.register(
       "NERDTreeMapOpenInTabSilent",
       "T",
-      NerdAction.Code { _, dataContext, _ ->
+      Mappings.Action { event, _ ->
         // FIXME: 22.01.2021 Doesn't work correct
-        CommonDataKeys.NAVIGATABLE_ARRAY
-          .getData(dataContext)
-          ?.filter { it.canNavigateToSource() }
+        CommonDataKeys.NAVIGATABLE_ARRAY.getData(event.dataContext)?.filter { it.canNavigateToSource() }
           ?.forEach { it.navigate(true) }
       },
     )
 
     // TODO: 21.01.2021 Should option in left split
-    registerCommand("NERDTreeMapOpenVSplit", "s", NerdAction.ToIj("OpenInRightSplit"))
+    mappings.register("NERDTreeMapOpenVSplit", "s", Mappings.Action.ij("OpenInRightSplit"))
     // TODO: 21.01.2021 Should option in above split
-    registerCommand(
+    mappings.register(
       "NERDTreeMapOpenSplit",
       "i",
-      NerdAction.Code { project, _, event ->
-        val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Code
-        if (file.isDirectory) return@Code
-        val splitters = FileEditorManagerEx.getInstanceEx(project).splitters
-        val currentWindow = splitters.currentWindow
+      Mappings.Action { event, _ ->
+        val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Action
+        if (file.isDirectory) return@Action
+        val currentWindow = Util.getSplittersCurrentWindow(event)
         currentWindow?.split(SwingConstants.HORIZONTAL, true, file, true)
       },
     )
-    registerCommand(
+    mappings.register(
       "NERDTreeMapPreviewVSplit",
       "gs",
-      NerdAction.Code { project, context, event ->
-        val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Code
-        val splitters = FileEditorManagerEx.getInstanceEx(project).splitters
-        val currentWindow = splitters.currentWindow
+      Mappings.Action { event, _ ->
+        val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Action
+        val currentWindow = Util.getSplittersCurrentWindow(event)
         currentWindow?.split(SwingConstants.VERTICAL, true, file, true)
 
         // FIXME: 22.01.2021 This solution bouncing a bit
-        Util.callAction(null, "ActivateProjectToolWindow", context.vim)
+        Util.callAction(null, "ActivateProjectToolWindow", event.dataContext.vim)
       },
     )
-    registerCommand(
+    mappings.register(
       "NERDTreeMapPreviewSplit",
       "gi",
-      NerdAction.Code { project, context, event ->
-        val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Code
-        val splitters = FileEditorManagerEx.getInstanceEx(project).splitters
-        val currentWindow = splitters.currentWindow
+      Mappings.Action { event, _ ->
+        val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Action
+        val currentWindow = Util.getSplittersCurrentWindow(event)
         currentWindow?.split(SwingConstants.HORIZONTAL, true, file, true)
 
-        Util.callAction(null, "ActivateProjectToolWindow", context.vim)
+        Util.callAction(null, "ActivateProjectToolWindow", event.dataContext.vim)
       },
     )
-    registerCommand(
-      "NERDTreeMapOpenRecursively",
-      "O",
-      NerdAction.Code { project, _, _ ->
-        val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
-        TreeExpandCollapse.expandAll(tree)
-        tree.selectionPath?.let {
-          TreeUtil.scrollToVisible(tree, it, false)
-        }
-      },
-    )
-    registerCommand(
-      "NERDTreeMapCloseChildren",
-      "X",
-      NerdAction.Code { project, _, _ ->
-        val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
-        TreeExpandCollapse.collapse(tree)
-        tree.selectionPath?.let {
-          TreeUtil.scrollToVisible(tree, it, false)
-        }
-      },
-    )
-    registerCommand(
-      "NERDTreeMapCloseDir",
-      "x",
-      NerdAction.Code { project, _, _ ->
-        val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
-        val currentPath = tree.selectionPath ?: return@Code
-        if (tree.isExpanded(currentPath)) {
-          tree.collapsePath(currentPath)
-        } else {
-          val parentPath = currentPath.parentPath ?: return@Code
-          if (parentPath.parentPath != null) {
-            // The real root of the project is not shown in the project view, so we check the grandparent of the node
-            tree.collapsePath(parentPath)
-            TreeUtil.scrollToVisible(tree, parentPath, false)
-          }
-        }
-      },
-    )
-    registerCommand("NERDTreeMapJumpRoot", "P", NerdAction.ToIj("Tree-selectFirst"))
-    registerCommand(
-      "NERDTreeMapJumpParent",
-      "p",
-      NerdAction.Code { project, _, _ ->
-        val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
-        val currentPath = tree.selectionPath ?: return@Code
-        val parentPath = currentPath.parentPath ?: return@Code
-        if (parentPath.parentPath != null) {
-          // The real root of the project is not shown in the project view, so we check the grandparent of the node
-          tree.selectionPath = parentPath
-          TreeUtil.scrollToVisible(tree, parentPath, false)
-        }
-      },
-    )
-    registerCommand(
-      "NERDTreeMapJumpFirstChild",
-      "K",
-      NerdAction.Code { project, _, _ ->
-        val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
-        val currentPath = tree.selectionPath ?: return@Code
-        val parent = currentPath.parentPath ?: return@Code
-        val row = tree.getRowForPath(parent)
-        tree.setSelectionRow(row + 1)
-
-        tree.scrollRowToVisible(row + 1)
-      },
-    )
-    registerCommand(
-      "NERDTreeMapJumpLastChild",
-      "J",
-      NerdAction.Code { project, _, _ ->
-        val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
-        val currentPath = tree.selectionPath ?: return@Code
-
-        val currentPathCount = currentPath.pathCount
-        var row = tree.getRowForPath(currentPath)
-
-        var expectedRow = row
-        while (true) {
-          row++
-          val nextPath = tree.getPathForRow(row) ?: break
-          val pathCount = nextPath.pathCount
-          if (pathCount == currentPathCount) expectedRow = row
-          if (pathCount < currentPathCount) break
-        }
-        tree.setSelectionRow(expectedRow)
-
-        tree.scrollRowToVisible(expectedRow)
-      },
-    )
-    registerCommand("gg", NerdAction.Code { project, _, _ ->
-      val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
-      tree.setSelectionRow(0)
-      tree.scrollRowToVisible(0)
-    })
-    registerCommand("G", NerdAction.Code { project, _, _ ->
-      val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
-      val lastRowIndex = tree.rowCount -1
-      tree.setSelectionRow(lastRowIndex)
-      tree.scrollRowToVisible(lastRowIndex)
-    })
-    registerCommand(
-      "NERDTreeMapJumpNextSibling",
-      "<C-J>",
-      NerdAction.ToIj("Tree-selectNextSibling"),
-    )
-    registerCommand(
-      "NERDTreeMapJumpPrevSibling",
-      "<C-K>",
-      NerdAction.ToIj("Tree-selectPreviousSibling"),
-    )
-    registerCommand(
+    mappings.register(
       "NERDTreeMapRefresh",
       "r",
-      NerdAction.ToIj("SynchronizeCurrentFile"),
+      Mappings.Action.ij("SynchronizeCurrentFile"),
     )
-    registerCommand("NERDTreeMapToggleHidden", "I", NerdAction.ToIj("ProjectView.ShowExcludedFiles"))
-    registerCommand("NERDTreeMapNewFile", "n", NerdAction.ToIj("NewFile"))
-    registerCommand("NERDTreeMapNewDir", "N", NerdAction.ToIj("NewDir"))
-    registerCommand("NERDTreeMapDelete", "d", NerdAction.ToIj("\$Delete"))
-    registerCommand("NERDTreeMapCopy", "y", NerdAction.ToIj("\$Copy"))
-    registerCommand("NERDTreeMapPaste", "v", NerdAction.ToIj("\$Paste"))
-    registerCommand("NERDTreeMapRename", "<C-r>", NerdAction.ToIj("RenameElement"))
-    registerCommand("NERDTreeMapRefreshRoot", "R", NerdAction.ToIj("Synchronize"))
-    registerCommand("NERDTreeMapMenu", "m", NerdAction.ToIj("ShowPopupMenu"))
-    registerCommand("NERDTreeMapQuit", "q", NerdAction.ToIj("HideActiveWindow"))
-    registerCommand(
+    mappings.register("NERDTreeMapToggleHidden", "I", Mappings.Action.ij("ProjectView.ShowExcludedFiles"))
+    mappings.register("NERDTreeMapNewFile", "n", Mappings.Action.ij("NewFile"))
+    mappings.register("NERDTreeMapNewDir", "N", Mappings.Action.ij("NewDir"))
+    mappings.register("NERDTreeMapDelete", "d", Mappings.Action.ij("\$Delete"))
+    mappings.register("NERDTreeMapCopy", "y", Mappings.Action.ij("\$Copy"))
+    mappings.register("NERDTreeMapPaste", "v", Mappings.Action.ij("\$Paste"))
+    mappings.register("NERDTreeMapRename", "<C-r>", Mappings.Action.ij("RenameElement"))
+    mappings.register("NERDTreeMapRefreshRoot", "R", Mappings.Action.ij("Synchronize"))
+    mappings.register("NERDTreeMapMenu", "m", Mappings.Action.ij("ShowPopupMenu"))
+    mappings.register("NERDTreeMapQuit", "q", Mappings.Action.ij("HideActiveWindow"))
+    mappings.register(
       "NERDTreeMapToggleZoom",
       "A",
-      NerdAction.ToIj("MaximizeToolWindow"),
+      Mappings.Action.ij("MaximizeToolWindow"),
     )
 
-    registerCommand(
+    mappings.register(
       "/",
-      NerdAction.Code { project, _, _ ->
-        NerdDispatcher.getInstance(project).waitForSearch = true
+      Mappings.Action { event, _ ->
+        NerdDispatcher.getInstance(event.project ?: return@Action).waitForSearch = true
       },
     )
 
-    registerCommand(
+    mappings.register(
       "<ESC>",
-      NerdAction.Code { project, _, _ ->
-        val instance = NerdDispatcher.getInstance(project)
+      Mappings.Action { event, _ ->
+        val instance = NerdDispatcher.getInstance(event.project ?: return@Action)
         if (instance.waitForSearch) {
           instance.waitForSearch = false
         }
@@ -532,11 +360,16 @@ internal class NerdTree : VimExtension {
         }
       }
     }
+
+    fun getSplittersCurrentWindow(event: AnActionEvent): EditorWindow? {
+      val splitters = FileEditorManagerEx.getInstanceEx(event.project ?: return null).splitters
+      return splitters.currentWindow
+    }
   }
 
   companion object {
     const val pluginName = "NERDTree"
-    private val LOG = logger<NerdTree>()
+    private val LOG = vimLogger<NerdTree>()
   }
 }
 
@@ -544,29 +377,11 @@ private fun addCommand(alias: String, handler: CommandAliasHandler) {
   VimPlugin.getCommand().setAlias(alias, CommandAlias.Call(0, -1, alias, handler))
 }
 
-private fun registerCommand(variable: String, defaultMapping: String, action: NerdAction) {
-  val variableValue = VimPlugin.getVariableService().getGlobalVariableValue(variable)
-  val mapping = if (variableValue is VimString) {
-    variableValue.value
-  } else {
-    defaultMapping
-  }
-  registerCommand(mapping, action)
-}
-
-private fun registerCommand(mapping: String, action: NerdAction) {
-  actionsRoot.add(mapping, action)
-  injector.parser.parseKeys(mapping).forEach {
-    distinctShortcuts.add(it)
-  }
-}
-
-private val actionsRoot: KeyStrokeTrie<NerdAction> = KeyStrokeTrie<NerdAction>("NERDTree")
-private val distinctShortcuts = mutableSetOf<KeyStroke>()
+private val mappings = Mappings("NERDTree")
 
 private fun installDispatcher(project: Project) {
   val dispatcher = NerdTree.NerdDispatcher.getInstance(project)
-  val shortcuts = distinctShortcuts.map { RequiredShortcut(it, MappingOwner.Plugin.get(NerdTree.pluginName)) }
+  val shortcuts = mappings.keyStrokes.map { RequiredShortcut(it, MappingOwner.Plugin.get(NerdTree.pluginName)) }
   dispatcher.registerCustomShortcutSet(
     KeyGroup.toShortcutSet(shortcuts),
     (ProjectView.getInstance(project) as ProjectViewImpl).component,

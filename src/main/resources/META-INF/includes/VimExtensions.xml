@@ -146,7 +146,6 @@
 
   <!--  IdeaVim extensions-->
   <extensions defaultExtensionNs="com.intellij">
-    <projectService serviceImplementation="com.maddyhome.idea.vim.extension.nerdtree.NerdTree$NerdDispatcher"/>
     <postStartupActivity implementation="com.maddyhome.idea.vim.extension.nerdtree.NerdTree$NerdStartupActivity"/>
   </extensions>
   <projectListeners>
