@@ -14,6 +14,7 @@ interface VimApplication {
   fun isMainThread(): Boolean
   fun invokeLater(editor: VimEditor, action: () -> Unit)
   fun invokeLater(action: () -> Unit)
+  fun invokeAndWait(action: () -> Unit)
   fun isUnitTest(): Boolean
   fun isInternal(): Boolean
   fun postKey(stroke: KeyStroke, editor: VimEditor)

@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import org.jetbrains.annotations.ApiStatus.Internal
 import org.jetbrains.annotations.TestOnly
+import kotlin.reflect.KType
 
 /**
  * COMPATIBILITY-LAYER: Renamed from VimVariableService
@@ -63,12 +64,15 @@ interface VariableService {
    * @param context execution context
    * @param vimContext vim context
    * @throws ExException("The 'v:' scope is not implemented yet :(")
+   * @throws ExException if a required parameter is null for the specific scope
+   * @throws ExException("VimLContext is required to determine the default variable scope") if variable.scope is null and vimContext is null
+   * @throws ExException("Cannot extract variable name without editor, context, and vimContext") if the variable name cannot be extracted without the parameters
    */
   fun getNullableVariableValue(
     variable: Variable,
-    editor: VimEditor,
-    context: ExecutionContext,
-    vimContext: VimLContext,
+    editor: VimEditor?,
+    context: ExecutionContext?,
+    vimContext: VimLContext?,
   ): VimDataType?
 
   /**
@@ -144,6 +148,26 @@ interface VariableService {
   )
 
   fun getGlobalVariables(): Map<String, VimDataType>
+
+  /**
+   * Converts a VimDataType to a Kotlin type.
+   *
+   * @param vimDataType The VimDataType to convert
+   * @param type The target Kotlin type
+   * @return The converted value
+   * @throws IllegalArgumentException if the conversion is not possible
+   */
+  fun <T : Any> convertToKotlinType(vimDataType: VimDataType, type: KType): T
+
+  /**
+   * Converts a Kotlin value to a VimDataType.
+   *
+   * @param value The Kotlin value to convert
+   * @param type The Kotlin type information
+   * @return The converted VimDataType
+   * @throws IllegalArgumentException if the conversion is not possible
+   */
+  fun convertToVimDataType(value: Any, type: KType): VimDataType
 
   /**
    * Clears all global variables.

@@ -10,6 +10,6 @@ package com.maddyhome.idea.vim.common
 
 import com.maddyhome.idea.vim.api.VimEditor
 
-interface IsReplaceCharListener {
+interface IsReplaceCharListener: Listener {
   fun isReplaceCharChanged(editor: VimEditor)
 }

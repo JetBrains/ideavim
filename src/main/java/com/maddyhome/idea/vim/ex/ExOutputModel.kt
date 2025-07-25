@@ -67,6 +67,14 @@ class ExOutputModel(private val myEditor: WeakReference<Editor>) : VimOutputPane
     panel.scrollLine()
   }
 
+  override fun setContent(text: String) {
+    this.text = text
+  }
+
+  override fun clearText() {
+    text = ""
+  }
+
   override var text: String = ""
     get() = if (!ApplicationManager.getApplication().isUnitTestMode) {
       editor?.let { ExOutputPanel.getInstance(it).text } ?: ""
