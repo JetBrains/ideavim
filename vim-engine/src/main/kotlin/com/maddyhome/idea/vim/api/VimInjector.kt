@@ -152,6 +152,8 @@ interface VimInjector {
   val pluginService: VimPluginService
 
   val highlightingService: VimHighlightingService
+
+  val kotlinScriptService: KotlinScriptService
 }
 
 lateinit var injector: VimInjector

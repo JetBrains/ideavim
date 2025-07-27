@@ -118,6 +118,13 @@ dependencies {
   compileOnly("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
   compileOnly("org.jetbrains:annotations:26.0.2")
 
+  val kotlinScriptVersion = "2.2.0"
+  implementation("org.jetbrains.kotlin:kotlin-scripting-common:$kotlinScriptVersion")
+  implementation("org.jetbrains.kotlin:kotlin-scripting-jvm-host:$kotlinScriptVersion")
+  implementation("org.jetbrains.kotlin:kotlin-scripting-jvm:$kotlinScriptVersion")
+  // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-scripting-compiler-embeddable
+//  implementation("org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:$kotlinScriptVersion")
+
   intellijPlatform {
     // Snapshots don't use installers
     // https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-dependencies-extension.html#target-versions-installers
@@ -232,6 +239,8 @@ tasks {
   // a custom task (see below)
   runIde {
     systemProperty("octopus.handler", System.getProperty("octopus.handler") ?: true)
+    // todo: ugly - ask if there is better way
+    systemProperty("idea.home.path", "/Users/username/.gradle/caches/8.13/transforms/somehash/transformed/ideaIC-2025.1-aarch64")
   }
 
   // Uncomment to run the plugin in a custom IDE, rather than the IDE specified as a compile target in dependencies

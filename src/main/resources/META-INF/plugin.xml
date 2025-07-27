@@ -146,7 +146,8 @@
     <editorNotificationProvider
         implementation="com.maddyhome.idea.vim.troubleshooting.AccidentalInstallDetectorEditorNotificationProvider"/>
 
-    <dependencySupport coordinate="configuration" kind="vim" displayName="IdeaVim"/>
+    <toolWindow id="IdeaVim config" anchor="right" secondary="true" icon="AllIcons.Nodes.Console"
+                factoryClass="com.maddyhome.idea.vim.ui.toolwindow.ScriptToolWindowFactory"/>
   </extensions>
 
   <xi:include href="/META-INF/includes/ApplicationServices.xml" xpointer="xpointer(/idea-plugin/*)"/>

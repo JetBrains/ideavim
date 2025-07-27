@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.api.VimInjector
 import com.maddyhome.idea.vim.api.VimInjectorBase
 import com.maddyhome.idea.vim.api.VimJumpService
 import com.maddyhome.idea.vim.api.VimKeyGroup
+import com.maddyhome.idea.vim.api.KotlinScriptService
 import com.maddyhome.idea.vim.api.VimLookupManager
 import com.maddyhome.idea.vim.api.VimMarkService
 import com.maddyhome.idea.vim.api.VimMessages
@@ -86,6 +87,7 @@ import com.maddyhome.idea.vim.helper.IjVimStringParser
 import com.maddyhome.idea.vim.helper.UndoRedoHelper
 import com.maddyhome.idea.vim.history.VimHistory
 import com.maddyhome.idea.vim.macro.VimMacro
+import com.maddyhome.idea.vim.newapi.script.IjKotlinScriptService
 import com.maddyhome.idea.vim.put.VimPut
 import com.maddyhome.idea.vim.register.VimRegisterGroup
 import com.maddyhome.idea.vim.thinapi.IjExtensionLoader
@@ -227,6 +229,8 @@ internal class IjVimInjector : VimInjectorBase() {
     get() = IjVimPluginService()
   override val highlightingService: VimHighlightingService
     get() = IjVimHighlightingService()
+  override val kotlinScriptService: KotlinScriptService
+    get() = service<IjKotlinScriptService>()
 
   override val engineEditorHelper: EngineEditorHelper
     get() = service<IjEditorHelper>()

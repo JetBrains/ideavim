@@ -43,8 +43,8 @@ import kotlin.io.path.pathString
 import kotlin.reflect.KType
 
 open class VimScopeImpl(
-  private val listenerOwner: ListenerOwner,
-  private val mappingOwner: MappingOwner,
+  val listenerOwner: ListenerOwner,
+  val mappingOwner: MappingOwner,
 ) : VimScope() {
   override var mode: Mode
     get() {
