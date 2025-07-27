@@ -39,7 +39,7 @@ abstract class VimInputInterceptorBase<T> : VimInputInterceptor {
    * @param key The current keystroke to process.
    * @return The complete input of type [T] if it can be constructed, or null if more keystrokes are needed.
    */
-  protected abstract fun buildInput(key: KeyStroke): T?
+  protected abstract fun buildInput(key: VimKeyStroke): T?
 
   /**
    * Execute the action associated with the complete input.

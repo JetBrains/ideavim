@@ -17,6 +17,7 @@ import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.api.VimCommandLine;
 import com.maddyhome.idea.vim.api.VimCommandLineCaret;
 import com.maddyhome.idea.vim.helper.EngineStringHelper;
+import com.maddyhome.idea.vim.helper.IJVimKeyHelperKt;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext;
 import com.maddyhome.idea.vim.options.helpers.GuiCursorAttributes;
@@ -248,7 +249,7 @@ public class ExTextField extends JTextField {
       var editor = myParentPanel.getEditor();
       var keyHandler = KeyHandler.getInstance();
       var keyStroke = KeyStroke.getKeyStrokeForEvent(e);
-      keyHandler.handleKey(editor, keyStroke, new IjEditorExecutionContext(myParentPanel.getContext()),
+      keyHandler.handleKey(editor, IJVimKeyHelperKt.getVimKeyStroke(keyStroke), new IjEditorExecutionContext(myParentPanel.getContext()),
                            keyHandler.getKeyHandlerState());
       e.consume();
     }
