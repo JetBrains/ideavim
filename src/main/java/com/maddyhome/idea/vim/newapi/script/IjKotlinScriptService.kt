@@ -61,7 +61,6 @@ class IjKotlinScriptService() : KotlinScriptService {
             onCompilationError(results)
           }
         )
-
       }
     } catch (e: Exception) {
       println("Error during script execution: ${e.message}")
@@ -74,7 +73,7 @@ class IjKotlinScriptService() : KotlinScriptService {
     onFailure: (List<ScriptDiagnostic>, String) -> Unit,
   ) {
     val context: VimScope = scriptContext ?: createScriptContext().also { scriptContext = it }
-    val evaluationConfiguration = createEvaluationConfiguration()
+    val evaluationConfiguration = createEvaluationConfiguration(context)
     runBlocking {
       val evaluationResult: ResultWithDiagnostics<EvaluationResult>
       val output = redirectOutput {

@@ -87,8 +87,8 @@ fun createScriptContext(): VimScope {
   return vimScopeImpl
 }
 
-internal fun createEvaluationConfiguration(): ScriptEvaluationConfiguration {
+internal fun createEvaluationConfiguration(context: VimScope): ScriptEvaluationConfiguration {
   return ScriptEvaluationConfiguration {
-    implicitReceivers(createScriptContext())
+    implicitReceivers(context)
   }
 }
