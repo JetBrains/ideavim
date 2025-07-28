@@ -13,8 +13,8 @@ import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.common.DigraphResult.Companion.done
 import com.maddyhome.idea.vim.common.DigraphResult.Companion.handled
 import com.maddyhome.idea.vim.diagnostic.vimLogger
+import com.maddyhome.idea.vim.key.VimKeyStroke
 import java.awt.event.KeyEvent
-import javax.swing.KeyStroke
 
 class DigraphSequence : Cloneable {
   private var digraphState = DigraphState.DIG_STATE_PENDING
@@ -24,12 +24,12 @@ class DigraphSequence : Cloneable {
   private var codeType = 0
   private var codeMax = 0
 
-  fun isDigraphStart(key: KeyStroke): Boolean {
+  fun isDigraphStart(key: VimKeyStroke): Boolean {
     return digraphState == DigraphState.DIG_STATE_PENDING && // if state has changed, then it's not a start
       key.keyCode == KeyEvent.VK_K && key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0
   }
 
-  fun isLiteralStart(key: KeyStroke): Boolean {
+  fun isLiteralStart(key: VimKeyStroke): Boolean {
     return digraphState == DigraphState.DIG_STATE_PENDING && // if state has changed, then it's not a start
       (key.keyCode == KeyEvent.VK_V || key.keyCode == KeyEvent.VK_Q) && key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0
   }
@@ -48,7 +48,7 @@ class DigraphSequence : Cloneable {
     return DigraphResult.HandledLiteral
   }
 
-  fun processKey(key: KeyStroke, editor: VimEditor): DigraphResult {
+  fun processKey(key: VimKeyStroke, editor: VimEditor): DigraphResult {
     return when (digraphState) {
       DigraphState.DIG_STATE_PENDING -> {
         logger.debug("DIG_STATE_PENDING")
@@ -198,7 +198,7 @@ class DigraphSequence : Cloneable {
     }
   }
 
-  private fun specialKeyToCodepoint(key: KeyStroke): Int? {
+  private fun specialKeyToCodepoint(key: VimKeyStroke): Int? {
     // If the key is a control character, return the codepoint of the character. I.e. `<C-I>` would be `\t`, by parsing
     // the Vim string "\<C-I>". Alternatively, if it's a newline, return carriage return (Vim likes to consider newline
     // as null), and escape should be returned as escape. Anything else isn't a special key

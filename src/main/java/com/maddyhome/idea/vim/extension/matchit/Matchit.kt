@@ -41,6 +41,7 @@ import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.PsiHelper
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.helper.keyStroke
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim

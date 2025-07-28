@@ -25,21 +25,20 @@ import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.group.visual.VimSelection.Companion.create
 import com.maddyhome.idea.vim.handler.ExternalActionHandler
 import com.maddyhome.idea.vim.helper.VimNlsSafe
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.CHAR_UNDEFINED
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType.CHARACTER_WISE
 import com.maddyhome.idea.vim.state.mode.selectionType
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import java.awt.event.KeyEvent
-import javax.swing.KeyStroke
 import kotlin.math.min
 
 /**
  * @author vlan
  */
 sealed class MappingInfo(
-  val fromKeys: List<KeyStroke>,
+  val fromKeys: List<VimKeyStroke>,
   val isRecursive: Boolean,
   val owner: MappingOwner,
   val originalModes: Set<MappingMode>,
@@ -61,25 +60,25 @@ sealed class MappingInfo(
     return size - otherSize
   }
 
-  private fun compareKeys(key1: KeyStroke, key2: KeyStroke): Int {
+  private fun compareKeys(key1: VimKeyStroke, key2: VimKeyStroke): Int {
     val c1 = key1.keyChar
     val c2 = key2.keyChar
     return when {
-      c1 == KeyEvent.CHAR_UNDEFINED && c2 == KeyEvent.CHAR_UNDEFINED -> {
+      c1 == CHAR_UNDEFINED && c2 == CHAR_UNDEFINED -> {
         val keyCodeDiff = key1.keyCode - key2.keyCode
         if (keyCodeDiff != 0) keyCodeDiff else key1.modifiers - key2.modifiers
       }
 
-      c1 == KeyEvent.CHAR_UNDEFINED -> -1
-      c2 == KeyEvent.CHAR_UNDEFINED -> 1
+      c1 == CHAR_UNDEFINED -> -1
+      c2 == CHAR_UNDEFINED -> 1
       else -> c1 - c2
     }
   }
 }
 
 class ToKeysMappingInfo(
-  val toKeys: List<KeyStroke>,
-  fromKeys: List<KeyStroke>,
+  val toKeys: List<VimKeyStroke>,
+  fromKeys: List<VimKeyStroke>,
   isRecursive: Boolean,
   owner: MappingOwner,
   originalModes: Set<MappingMode>,
@@ -121,7 +120,7 @@ class ToKeysMappingInfo(
 
 class ToExpressionMappingInfo(
   private val toExpression: Expression,
-  fromKeys: List<KeyStroke>,
+  fromKeys: List<VimKeyStroke>,
   isRecursive: Boolean,
   owner: MappingOwner,
   originalModes: Set<MappingMode>,
@@ -156,7 +155,7 @@ class ToExpressionMappingInfo(
 
 class ToHandlerMappingInfo(
   private val extensionHandler: ExtensionHandler,
-  fromKeys: List<KeyStroke>,
+  fromKeys: List<VimKeyStroke>,
   isRecursive: Boolean,
   owner: MappingOwner,
   originalModes: Set<MappingMode>,
@@ -263,7 +262,7 @@ class ToHandlerMappingInfo(
 
 class ToActionMappingInfo(
   val action: String,
-  fromKeys: List<KeyStroke>,
+  fromKeys: List<VimKeyStroke>,
   isRecursive: Boolean,
   owner: MappingOwner,
   originalModes: Set<MappingMode>,

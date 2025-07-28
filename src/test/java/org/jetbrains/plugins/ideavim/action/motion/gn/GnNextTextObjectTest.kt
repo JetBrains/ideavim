@@ -13,6 +13,7 @@ package org.jetbrains.plugins.ideavim.action.motion.gn
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.Direction
+import com.maddyhome.idea.vim.key.VimKeyStroke
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -83,7 +84,7 @@ class GnNextTextObjectTest : VimTestCase() {
     )
   }
 
-  private fun doTestWithSearch(keys: List<KeyStroke>, before: String, after: String) {
+  private fun doTestWithSearch(keys: List<VimKeyStroke>, before: String, after: String) {
     configureByText(before)
     VimPlugin.getSearch().setLastSearchState("test", "", Direction.FORWARDS)
     typeText(keys)

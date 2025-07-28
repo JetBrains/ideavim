@@ -12,13 +12,13 @@ import com.maddyhome.idea.vim.common.VimCopiedText
 import com.maddyhome.idea.vim.helper.EngineStringHelper
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.annotations.NonNls
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 
 // TODO should we prefer keys over text, as they are more informative?
 // TODO e.g.  could be both <Esc> and <C-[> after trying to restore original keys
 data class Register(
   val name: Char,
-  val keys: List<KeyStroke>,
+  val keys: List<VimKeyStroke>,
   val type: SelectionType,
   val copiedText: VimCopiedText,
 ) {
@@ -27,7 +27,7 @@ data class Register(
     EngineStringHelper.toPrintableCharacters(keys) // should be the same as [text], but we can't render control notation properly
 
 
-  constructor(name: Char, type: SelectionType, keys: List<KeyStroke>) : this(
+  constructor(name: Char, type: SelectionType, keys: List<VimKeyStroke>) : this(
     name,
     keys,
     type,

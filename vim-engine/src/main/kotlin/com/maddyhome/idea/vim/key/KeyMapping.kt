@@ -14,12 +14,12 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.key.KeyStrokeTrie.TrieNode
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import org.jetbrains.annotations.TestOnly
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 
 data class KeyMappingEntry(private val node: TrieNode<MappingInfo>) {
   val mappingInfo = node.data!!
 
-  fun collectPath(path: MutableList<KeyStroke>): List<KeyStroke> {
+  fun collectPath(path: MutableList<VimKeyStroke>): List<VimKeyStroke> {
     path.clear()
     var current: TrieNode<MappingInfo>? = node
     while (current != null && current.parent != null) {
@@ -39,13 +39,13 @@ data class KeyMappingEntry(private val node: TrieNode<MappingInfo>) {
  *
  * @author vlan
  */
-class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, KeyMappingLayer {
+class KeyMapping(private val mode: MappingMode) : Iterable<List<VimKeyStroke>>, KeyMappingLayer {
   private val keysTrie = KeyStrokeTrie<MappingInfo>(mode.name)
 
   /**
    * Returns mapping info for the given key sequence, if any
    */
-  operator fun get(keys: List<KeyStroke>): MappingInfo? {
+  operator fun get(keys: List<VimKeyStroke>): MappingInfo? {
     keysTrie.getData(keys)?.let { return it }
 
     // Mapping a keystroke to an IDE action is a recursive mapping. The lhs is the keys, and the rhs is the
@@ -59,13 +59,13 @@ class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, Key
   }
 
   // TODO: Do we need this as well as get()?
-  override fun getLayer(keys: List<KeyStroke>): MappingInfoLayer? = get(keys)
+  override fun getLayer(keys: List<VimKeyStroke>): MappingInfoLayer? = get(keys)
 
-  @Deprecated("Use get(List<KeyStroke>) to maintain the same lookup key type and avoid unnecessary wrapping")
-  operator fun get(keys: Iterable<KeyStroke>): MappingInfo? =
-    get(keys as? List<KeyStroke> ?: keys.toList())
+  @Deprecated("Use get(List<VimKeyStroke>) to maintain the same lookup key type and avoid unnecessary wrapping")
+  operator fun get(keys: Iterable<VimKeyStroke>): MappingInfo? =
+    get(keys as? List<VimKeyStroke> ?: keys.toList())
 
-  private fun getActionNameFromActionMapping(keys: List<KeyStroke>): String? {
+  private fun getActionNameFromActionMapping(keys: List<VimKeyStroke>): String? {
     if (keys.size > 3
       && keys[0].keyCode == injector.parser.actionKeyStroke.keyCode
       && keys[1].keyChar == '(' && keys.last().keyChar == ')'
@@ -84,7 +84,7 @@ class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, Key
     "Use getAll to return a sequence that does not allocate a list of for all entries and a list for the keystrokes of each entry",
     ReplaceWith("getAll()")
   )
-  override fun iterator(): Iterator<List<KeyStroke>> =
+  override fun iterator(): Iterator<List<VimKeyStroke>> =
     keysTrie.getEntries().map { KeyMappingEntry(it).getPath() }.iterator()
 
   /**
@@ -92,7 +92,7 @@ class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, Key
    *
    * Does not return any prefixes.
    */
-  fun getAll(prefix: List<KeyStroke>): Sequence<KeyMappingEntry> =
+  fun getAll(prefix: List<VimKeyStroke>): Sequence<KeyMappingEntry> =
     keysTrie.getEntries(prefix).map { KeyMappingEntry(it) }
 
   /**
@@ -102,7 +102,7 @@ class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, Key
     keysTrie.getEntries().filter { it.data?.owner == owner }.map { KeyMappingEntry(it) }
 
   fun put(
-    fromKeys: List<KeyStroke>,
+    fromKeys: List<VimKeyStroke>,
     owner: MappingOwner,
     originalModes: Set<MappingMode>,
     extensionHandler: ExtensionHandler,
@@ -112,8 +112,8 @@ class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, Key
   }
 
   fun put(
-    fromKeys: List<KeyStroke>,
-    toKeys: List<KeyStroke>,
+    fromKeys: List<VimKeyStroke>,
+    toKeys: List<VimKeyStroke>,
     owner: MappingOwner,
     originalModes: Set<MappingMode>,
     recursive: Boolean,
@@ -122,7 +122,7 @@ class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, Key
   }
 
   fun put(
-    fromKeys: List<KeyStroke>,
+    fromKeys: List<VimKeyStroke>,
     toExpression: Expression,
     owner: MappingOwner,
     originalModes: Set<MappingMode>,
@@ -132,7 +132,7 @@ class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, Key
     add(fromKeys, ToExpressionMappingInfo(toExpression, fromKeys, recursive, owner, originalModes, originalString))
   }
 
-  private fun add(keys: List<KeyStroke>, mappingInfo: MappingInfo) {
+  private fun add(keys: List<VimKeyStroke>, mappingInfo: MappingInfo) {
     keysTrie.add(keys, mappingInfo)
   }
 
@@ -141,7 +141,7 @@ class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, Key
    *
    * If the key sequence is also a prefix, all child sequences are not modified
    */
-  fun removeKeyMapping(keys: List<KeyStroke>) {
+  fun removeKeyMapping(keys: List<VimKeyStroke>) {
     keysTrie.remove(keys)
   }
 
@@ -151,7 +151,7 @@ class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, Key
   fun removeKeyMappingsByOwner(owner: MappingOwner) {
     // Make a copy of the sequence, so we can modify it without exceptions
     val toRemove = getAllByOwner(owner).toList()
-    val keys = mutableListOf<KeyStroke>()
+    val keys = mutableListOf<VimKeyStroke>()
     toRemove.forEach { keysTrie.remove(it.collectPath(keys)) }
   }
 
@@ -168,7 +168,7 @@ class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, Key
    * Used while handling unfinished mapping sequences. Note that a list of keystrokes that is both a key sequence and a
    * prefix is treated as a prefix.
    */
-  override fun isPrefix(keys: List<KeyStroke>): Boolean {
+  override fun isPrefix(keys: List<VimKeyStroke>): Boolean {
     if (keys.isEmpty()) return false
     if (keysTrie.isPrefix(keys)) return true
 
@@ -182,14 +182,14 @@ class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, Key
   /**
    * Returns true if there exists a mapping to keys that match the given key sequence
    */
-  fun hasmapto(toKeys: List<KeyStroke>) =
+  fun hasmapto(toKeys: List<VimKeyStroke>) =
     keysTrie.getEntries().any { (it.data as? ToKeysMappingInfo)?.toKeys == toKeys }
 
 
   // Currently used externally by peekaboo plugin
   @Deprecated("Use different approach")
   @TestOnly
-  fun getMapTo(toKeys: List<KeyStroke?>): List<Pair<List<KeyStroke>, MappingInfo>> {
+  fun getMapTo(toKeys: List<VimKeyStroke?>): List<Pair<List<VimKeyStroke>, MappingInfo>> {
     return keysTrie.getEntries().filter { node ->
       if (node.data == null) return@filter false
       val mappingInfo = node.data

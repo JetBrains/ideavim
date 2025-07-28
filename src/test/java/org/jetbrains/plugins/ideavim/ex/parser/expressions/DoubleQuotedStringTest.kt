@@ -9,12 +9,14 @@
 package org.jetbrains.plugins.ideavim.ex.parser.expressions
 
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.helper.vimKeyStroke
+import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 import java.awt.event.InputEvent.CTRL_DOWN_MASK
 import javax.swing.KeyStroke.getKeyStroke
 import kotlin.test.assertEquals
 
-class DoubleQuotedStringTest {
+class DoubleQuotedStringTest : VimTestCase() {
 
   @Test
   fun `test three-digit octal number`() {
@@ -167,36 +169,36 @@ class DoubleQuotedStringTest {
 
   @Test
   fun `test 1-31 keycodes`() {
-    assertEquals(listOf(getKeyStroke(65, CTRL_DOWN_MASK)), injector.parser.stringToKeys(1.toChar().toString()))
-    assertEquals(listOf(getKeyStroke(66, CTRL_DOWN_MASK)), injector.parser.stringToKeys(2.toChar().toString()))
-    assertEquals(listOf(getKeyStroke(67, CTRL_DOWN_MASK)), injector.parser.stringToKeys(3.toChar().toString()))
-    assertEquals(listOf(getKeyStroke(68, CTRL_DOWN_MASK)), injector.parser.stringToKeys(4.toChar().toString()))
-    assertEquals(listOf(getKeyStroke(69, CTRL_DOWN_MASK)), injector.parser.stringToKeys(5.toChar().toString()))
-    assertEquals(listOf(getKeyStroke(70, CTRL_DOWN_MASK)), injector.parser.stringToKeys(6.toChar().toString()))
-    assertEquals(listOf(getKeyStroke(71, CTRL_DOWN_MASK)), injector.parser.stringToKeys(7.toChar().toString()))
-    assertEquals(listOf(getKeyStroke(72, CTRL_DOWN_MASK)), injector.parser.stringToKeys(8.toChar().toString()))
-    assertEquals(listOf(getKeyStroke('\t')), injector.parser.stringToKeys(9.toChar().toString()))
-    assertEquals(listOf(getKeyStroke(74, CTRL_DOWN_MASK)), injector.parser.stringToKeys(0.toChar().toString()))
-    assertEquals(listOf(getKeyStroke(75, CTRL_DOWN_MASK)), injector.parser.stringToKeys(11.toChar().toString()))
-    assertEquals(listOf(getKeyStroke(76, CTRL_DOWN_MASK)), injector.parser.stringToKeys(12.toChar().toString()))
-    assertEquals(listOf(getKeyStroke(77, CTRL_DOWN_MASK)), injector.parser.stringToKeys(13.toChar().toString()))
-    assertEquals(listOf(getKeyStroke(78, CTRL_DOWN_MASK)), injector.parser.stringToKeys(14.toChar().toString()))
-    assertEquals(listOf(getKeyStroke(79, CTRL_DOWN_MASK)), injector.parser.stringToKeys(15.toChar().toString()))
-    assertEquals(listOf(getKeyStroke(80, CTRL_DOWN_MASK)), injector.parser.stringToKeys(16.toChar().toString()))
-    assertEquals(listOf(getKeyStroke(81, CTRL_DOWN_MASK)), injector.parser.stringToKeys(17.toChar().toString()))
-    assertEquals(listOf(getKeyStroke(82, CTRL_DOWN_MASK)), injector.parser.stringToKeys(18.toChar().toString()))
-    assertEquals(listOf(getKeyStroke(83, CTRL_DOWN_MASK)), injector.parser.stringToKeys(19.toChar().toString()))
-    assertEquals(listOf(getKeyStroke(84, CTRL_DOWN_MASK)), injector.parser.stringToKeys(20.toChar().toString()))
-    assertEquals(listOf(getKeyStroke(85, CTRL_DOWN_MASK)), injector.parser.stringToKeys(21.toChar().toString()))
-    assertEquals(listOf(getKeyStroke(86, CTRL_DOWN_MASK)), injector.parser.stringToKeys(22.toChar().toString()))
-    assertEquals(listOf(getKeyStroke(87, CTRL_DOWN_MASK)), injector.parser.stringToKeys(23.toChar().toString()))
-    assertEquals(listOf(getKeyStroke(88, CTRL_DOWN_MASK)), injector.parser.stringToKeys(24.toChar().toString()))
-    assertEquals(listOf(getKeyStroke(89, CTRL_DOWN_MASK)), injector.parser.stringToKeys(25.toChar().toString()))
-    assertEquals(listOf(getKeyStroke(90, CTRL_DOWN_MASK)), injector.parser.stringToKeys(26.toChar().toString()))
-    assertEquals(listOf(getKeyStroke(91, CTRL_DOWN_MASK)), injector.parser.stringToKeys(27.toChar().toString()))
-    assertEquals(listOf(getKeyStroke(92, CTRL_DOWN_MASK)), injector.parser.stringToKeys(28.toChar().toString()))
-    assertEquals(listOf(getKeyStroke(93, CTRL_DOWN_MASK)), injector.parser.stringToKeys(29.toChar().toString()))
-    assertEquals(listOf(getKeyStroke(94, CTRL_DOWN_MASK)), injector.parser.stringToKeys(30.toChar().toString()))
-    assertEquals(listOf(getKeyStroke(95, CTRL_DOWN_MASK)), injector.parser.stringToKeys(31.toChar().toString()))
+    assertEquals(listOf(getKeyStroke(65, CTRL_DOWN_MASK).vimKeyStroke), injector.parser.stringToKeys(1.toChar().toString()))
+    assertEquals(listOf(getKeyStroke(66, CTRL_DOWN_MASK).vimKeyStroke), injector.parser.stringToKeys(2.toChar().toString()))
+    assertEquals(listOf(getKeyStroke(67, CTRL_DOWN_MASK).vimKeyStroke), injector.parser.stringToKeys(3.toChar().toString()))
+    assertEquals(listOf(getKeyStroke(68, CTRL_DOWN_MASK).vimKeyStroke), injector.parser.stringToKeys(4.toChar().toString()))
+    assertEquals(listOf(getKeyStroke(69, CTRL_DOWN_MASK).vimKeyStroke), injector.parser.stringToKeys(5.toChar().toString()))
+    assertEquals(listOf(getKeyStroke(70, CTRL_DOWN_MASK).vimKeyStroke), injector.parser.stringToKeys(6.toChar().toString()))
+    assertEquals(listOf(getKeyStroke(71, CTRL_DOWN_MASK).vimKeyStroke), injector.parser.stringToKeys(7.toChar().toString()))
+    assertEquals(listOf(getKeyStroke(72, CTRL_DOWN_MASK).vimKeyStroke), injector.parser.stringToKeys(8.toChar().toString()))
+    assertEquals(listOf(getKeyStroke('\t').vimKeyStroke), injector.parser.stringToKeys(9.toChar().toString()))
+    assertEquals(listOf(getKeyStroke(74, CTRL_DOWN_MASK).vimKeyStroke), injector.parser.stringToKeys(0.toChar().toString()))
+    assertEquals(listOf(getKeyStroke(75, CTRL_DOWN_MASK).vimKeyStroke), injector.parser.stringToKeys(11.toChar().toString()))
+    assertEquals(listOf(getKeyStroke(76, CTRL_DOWN_MASK).vimKeyStroke), injector.parser.stringToKeys(12.toChar().toString()))
+    assertEquals(listOf(getKeyStroke(77, CTRL_DOWN_MASK).vimKeyStroke), injector.parser.stringToKeys(13.toChar().toString()))
+    assertEquals(listOf(getKeyStroke(78, CTRL_DOWN_MASK).vimKeyStroke), injector.parser.stringToKeys(14.toChar().toString()))
+    assertEquals(listOf(getKeyStroke(79, CTRL_DOWN_MASK).vimKeyStroke), injector.parser.stringToKeys(15.toChar().toString()))
+    assertEquals(listOf(getKeyStroke(80, CTRL_DOWN_MASK).vimKeyStroke), injector.parser.stringToKeys(16.toChar().toString()))
+    assertEquals(listOf(getKeyStroke(81, CTRL_DOWN_MASK).vimKeyStroke), injector.parser.stringToKeys(17.toChar().toString()))
+    assertEquals(listOf(getKeyStroke(82, CTRL_DOWN_MASK).vimKeyStroke), injector.parser.stringToKeys(18.toChar().toString()))
+    assertEquals(listOf(getKeyStroke(83, CTRL_DOWN_MASK).vimKeyStroke), injector.parser.stringToKeys(19.toChar().toString()))
+    assertEquals(listOf(getKeyStroke(84, CTRL_DOWN_MASK).vimKeyStroke), injector.parser.stringToKeys(20.toChar().toString()))
+    assertEquals(listOf(getKeyStroke(85, CTRL_DOWN_MASK).vimKeyStroke), injector.parser.stringToKeys(21.toChar().toString()))
+    assertEquals(listOf(getKeyStroke(86, CTRL_DOWN_MASK).vimKeyStroke), injector.parser.stringToKeys(22.toChar().toString()))
+    assertEquals(listOf(getKeyStroke(87, CTRL_DOWN_MASK).vimKeyStroke), injector.parser.stringToKeys(23.toChar().toString()))
+    assertEquals(listOf(getKeyStroke(88, CTRL_DOWN_MASK).vimKeyStroke), injector.parser.stringToKeys(24.toChar().toString()))
+    assertEquals(listOf(getKeyStroke(89, CTRL_DOWN_MASK).vimKeyStroke), injector.parser.stringToKeys(25.toChar().toString()))
+    assertEquals(listOf(getKeyStroke(90, CTRL_DOWN_MASK).vimKeyStroke), injector.parser.stringToKeys(26.toChar().toString()))
+    assertEquals(listOf(getKeyStroke(91, CTRL_DOWN_MASK).vimKeyStroke), injector.parser.stringToKeys(27.toChar().toString()))
+    assertEquals(listOf(getKeyStroke(92, CTRL_DOWN_MASK).vimKeyStroke), injector.parser.stringToKeys(28.toChar().toString()))
+    assertEquals(listOf(getKeyStroke(93, CTRL_DOWN_MASK).vimKeyStroke), injector.parser.stringToKeys(29.toChar().toString()))
+    assertEquals(listOf(getKeyStroke(94, CTRL_DOWN_MASK).vimKeyStroke), injector.parser.stringToKeys(30.toChar().toString()))
+    assertEquals(listOf(getKeyStroke(95, CTRL_DOWN_MASK).vimKeyStroke), injector.parser.stringToKeys(31.toChar().toString()))
   }
 }

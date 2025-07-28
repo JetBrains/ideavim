@@ -11,12 +11,12 @@ package com.maddyhome.idea.vim.key.interceptors
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
 
 // TODO make it safer to utilise key.isCloseKeystroke and similar logic
 abstract class VimInputInterceptorBase<T> : VimInputInterceptor {
   override fun consumeKey(
-    key: KeyStroke,
+    key: VimKeyStroke,
     editor: VimEditor,
     context: ExecutionContext,
   ) {
@@ -39,7 +39,7 @@ abstract class VimInputInterceptorBase<T> : VimInputInterceptor {
    * @param key The current keystroke to process.
    * @return The complete input of type [T] if it can be constructed, or null if more keystrokes are needed.
    */
-  protected abstract fun buildInput(key: KeyStroke): T?
+  protected abstract fun buildInput(key: VimKeyStroke): T?
 
   /**
    * Execute the action associated with the complete input.

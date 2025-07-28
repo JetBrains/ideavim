@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMa
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.helper.keyStroke
 import java.util.EnumSet
 
 /**

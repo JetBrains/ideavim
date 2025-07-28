@@ -15,8 +15,8 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.key.KeyConsumer
-import java.awt.event.KeyEvent
-import javax.swing.KeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke
+import com.maddyhome.idea.vim.key.VimKeyStroke.Constants.CHAR_UNDEFINED
 
 internal class RegisterConsumer : KeyConsumer {
   private companion object {
@@ -24,7 +24,7 @@ internal class RegisterConsumer : KeyConsumer {
   }
 
   override fun consumeKey(
-    key: KeyStroke,
+    key: VimKeyStroke,
     editor: VimEditor,
     allowKeyMappings: Boolean,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
@@ -36,7 +36,7 @@ internal class RegisterConsumer : KeyConsumer {
     logger.trace("Pending mode.")
     commandBuilder.addTypedKeyStroke(key)
 
-    val chKey: Char = if (key.keyChar == KeyEvent.CHAR_UNDEFINED) 0.toChar() else key.keyChar
+    val chKey: Char = if (key.keyChar == CHAR_UNDEFINED) 0.toChar() else key.keyChar
     handleSelectRegister(chKey, keyProcessResultBuilder)
     return true
   }
