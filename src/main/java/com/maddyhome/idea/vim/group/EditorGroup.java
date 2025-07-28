@@ -284,7 +284,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
       }
     }
     catch (TimeoutException | ExecutionException e) {
-      throw new RuntimeException("No focused editor found", e);
+      return null;
     }
     return null;
   }
