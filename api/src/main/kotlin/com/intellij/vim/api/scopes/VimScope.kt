@@ -506,7 +506,7 @@ abstract class VimScope {
    *
    * @param chars The character sequence to search in (e.g., document text)
    * @param startIndex The index to start searching from (inclusive). Must be within the bounds of chars: [0, chars.length)
-   * @param count Find the [count]-th occurrence. Must be greater than 1.
+   * @param count Find the [count]-th occurrence. Must be greater than 0.
    * @return The offset of the next word start, or null if not found
    */
   abstract fun getNextCamelStartOffset(chars: CharSequence, startIndex: Int, count: Int = 1): Int?
@@ -516,7 +516,7 @@ abstract class VimScope {
    *
    * @param chars The character sequence to search in (e.g., document text)
    * @param endIndex The index to start searching backward from (exclusive). Must be within the bounds of chars: [0, chars.length]
-   * @param count Find the [count]-th occurrence. Must be greater than 1.
+   * @param count Find the [count]-th occurrence. Must be greater than 0.
    * @return The offset of the previous word start, or null if not found
    */
   abstract fun getPreviousCamelStartOffset(chars: CharSequence, endIndex: Int, count: Int = 1): Int?
@@ -526,7 +526,7 @@ abstract class VimScope {
    *
    * @param chars The character sequence to search in (e.g., document text)
    * @param startIndex The index to start searching from (inclusive). Must be within the bounds of chars: [0, chars.length)
-   * @param count Find the [count]-th occurrence. Must be greater than 1.
+   * @param count Find the [count]-th occurrence. Must be greater than 0.
    * @return The offset of the next word end, or null if not found
    */
   abstract fun getNextCamelEndOffset(chars: CharSequence, startIndex: Int, count: Int = 1): Int?
@@ -536,7 +536,7 @@ abstract class VimScope {
    *
    * @param chars The character sequence to search in (e.g., document text)
    * @param endIndex The index to start searching backward from (exclusive). Must be within the bounds of chars: [0, chars.length]
-   * @param count Find the [count]-th occurrence. Must be greater than 1.
+   * @param count Find the [count]-th occurrence. Must be greater than 0.
    * @return The offset of the previous word end, or null if not found
    */
   abstract fun getPreviousCamelEndOffset(chars: CharSequence, endIndex: Int, count: Int = 1): Int?
