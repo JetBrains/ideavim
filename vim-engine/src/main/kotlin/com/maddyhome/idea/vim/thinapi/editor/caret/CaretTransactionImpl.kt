@@ -145,6 +145,13 @@ class CaretTransactionImpl(
     text: String,
   ): Boolean {
     if (vimEditor.text().isEmpty()) {
+      val fileSize = vimEditor.fileSize().toInt()
+      if (startOffset != 0 || endOffset != 0) {
+        throw IllegalArgumentException(
+          "Invalid offsets for an empty editor: startOffset=$startOffset, endOffset=$endOffset, fileSize=$fileSize."
+        )
+      }
+
       insertText(startOffset, text, caretAtEnd = true)
       return true
     }
@@ -234,12 +241,15 @@ class CaretTransactionImpl(
   }
 
   override suspend fun updateCaret(offset: Int, selection: Range.Simple?) {
-    val validOffsetRange = 0..<vimEditor.fileSize().toInt()
-    assertOffsetInRange(offset, validOffsetRange)
+    val textLength = vimEditor.text().length
+    val startOffsetValidRange = 0..<textLength
+    val endOffsetValidRange = 0..textLength
+
+    assertOffsetInRange(offset, startOffsetValidRange)
 
     if (selection != null) {
-      assertOffsetInRange(selection.start, validOffsetRange)
-      assertOffsetInRange(selection.end, validOffsetRange)
+      assertOffsetInRange(selection.start, startOffsetValidRange)
+      assertOffsetInRange(selection.end, endOffsetValidRange)
     }
 
     vimCaret.moveToOffset(offset)

@@ -531,6 +531,42 @@ class CaretTransactionTest : VimTestCase() {
   }
 
   @Test
+  fun `test replacement of one character at the beginning of the file`() {
+    val text = "${c}o"
+    configureByText(text)
+
+    executeAction {
+      vimScope.editor {
+        change {
+          withPrimaryCaret {
+            replaceText(0, 1, "one")
+          }
+        }
+      }
+    }
+
+    assertState("on${c}e")
+  }
+
+  @Test
+  fun `test replacement when empty editor`() {
+    val text = "${c}"
+    configureByText(text)
+
+    executeAction {
+      vimScope.editor {
+        change {
+          withPrimaryCaret {
+            replaceText(0, 0, "one")
+          }
+        }
+      }
+    }
+
+    assertState("on${c}e")
+  }
+
+  @Test
   fun `test replacement of empty range`() {
     val text = "one ${c}two three"
     configureByText(text)
