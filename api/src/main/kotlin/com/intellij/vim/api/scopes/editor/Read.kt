@@ -240,7 +240,7 @@ interface Read {
    * @param isBigWord Use WORD instead of word boundaries.
    * @return The offset of the [count]-th next word, or `null` if not found.
    */
-  suspend fun getNextWordStartOffset(startOffset: Int, count: Int = 1, isBigWord: Boolean): Int?
+  suspend fun getNextWordStartOffset(startOffset: Int, count: Int = 1, isBigWord: Boolean = false): Int?
 
   /**
    * Find the end offset of the next word in the editor's document, from the given starting point
@@ -250,7 +250,7 @@ interface Read {
    * @param isBigWord Use WORD instead of word boundaries
    * @return The offset of the [count] next word/WORD. Will return document bounds if not found
    */
-  suspend fun getNextWordEndOffset(startOffset: Int, count: Int = 1, isBigWord: Boolean): Int
+  suspend fun getNextWordEndOffset(startOffset: Int, count: Int = 1, isBigWord: Boolean = false): Int
 
   /**
    * Find the next character on the current line
