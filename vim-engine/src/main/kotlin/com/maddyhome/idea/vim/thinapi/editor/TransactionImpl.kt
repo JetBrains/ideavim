@@ -36,16 +36,15 @@ class TransactionImpl(
       .map { caret -> CaretTransactionImpl(listenerOwner, mappingOwner, caret.caretId).block() }
   }
 
-  override suspend fun with(
+  override suspend fun <T> with(
     caretId: CaretId,
-    block: suspend CaretTransaction.() -> Unit,
-  ) {
-    vimEditor.carets().find { it.id == caretId.id }
-      ?.let { caret -> block(CaretTransactionImpl(listenerOwner, mappingOwner, caret.caretId)) } ?: return
+    block: suspend CaretTransaction.() -> T,
+  ): T {
+    return CaretTransactionImpl(listenerOwner, mappingOwner, caretId).block()
   }
 
-  override suspend fun withPrimaryCaret(block: suspend CaretTransaction.() -> Unit) {
-    block(CaretTransactionImpl(listenerOwner, mappingOwner, vimEditor.primaryCaret().caretId))
+  override suspend fun <T> withPrimaryCaret(block: suspend CaretTransaction.() -> T): T {
+    return CaretTransactionImpl(listenerOwner, mappingOwner, vimEditor.primaryCaret().caretId).block()
   }
 
   override suspend fun addCaret(offset: Int): CaretId? {

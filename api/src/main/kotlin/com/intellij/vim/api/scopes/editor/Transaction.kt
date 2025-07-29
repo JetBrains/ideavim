@@ -61,7 +61,7 @@ interface Transaction: Read {
    * @param caretId The ID of the caret to use
    * @param block The block to execute with the specified caret as the receiver
    */
-  suspend fun with(caretId: CaretId, block: suspend CaretTransaction.() -> Unit)
+  suspend fun <T> with(caretId: CaretId, block: suspend CaretTransaction.() -> T): T
 
   /**
    * Executes the provided block with the primary caret as the receiver.
@@ -83,7 +83,7 @@ interface Transaction: Read {
    *
    * @param block The block to execute with the primary caret as the receiver
    */
-  suspend fun withPrimaryCaret(block: suspend CaretTransaction.() -> Unit)
+  suspend fun <T> withPrimaryCaret(block: suspend CaretTransaction.() -> T): T
 
   /**
    * Adds a new caret at the specified offset in the editor.

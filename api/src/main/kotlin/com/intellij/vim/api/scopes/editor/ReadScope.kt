@@ -57,7 +57,7 @@ interface ReadScope: Read {
    * @param caretId The ID of the caret to use
    * @param block The block to execute with the specified caret as the receiver
    */
-  suspend fun with(caretId: CaretId, block: suspend CaretRead.() -> Unit)
+  suspend fun <T> with(caretId: CaretId, block: suspend CaretRead.() -> T): T
 
   /**
    * Executes the provided block with the primary caret as the receiver.
@@ -77,5 +77,5 @@ interface ReadScope: Read {
    *
    * @param block The block to execute with the primary caret as the receiver
    */
-  suspend fun withPrimaryCaret(block: suspend CaretRead.() -> Unit)
+  suspend fun <T> withPrimaryCaret(block: suspend CaretRead.() -> T): T
 }

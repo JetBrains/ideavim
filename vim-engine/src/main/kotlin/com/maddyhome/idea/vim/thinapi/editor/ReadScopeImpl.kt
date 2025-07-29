@@ -30,14 +30,14 @@ class ReadScopeImpl(
     return vimEditor.sortedCarets().map { caret -> CaretReadImpl(caret.caretId).block() }
   }
 
-  override suspend fun with(
+  override suspend fun <T> with(
     caretId: CaretId,
-    block: suspend CaretRead.() -> Unit,
-  ) {
-    CaretReadImpl(caretId).block()
+    block: suspend CaretRead.() -> T,
+  ): T {
+    return CaretReadImpl(caretId).block()
   }
 
-  override suspend fun withPrimaryCaret(block: suspend CaretRead.() -> Unit) {
-    CaretReadImpl(vimEditor.primaryCaret().caretId).block()
+  override suspend fun <T> withPrimaryCaret(block: suspend CaretRead.() -> T): T {
+    return CaretReadImpl(vimEditor.primaryCaret().caretId).block()
   }
 }
