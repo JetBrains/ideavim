@@ -29,21 +29,21 @@ class OutputPanelScopeImpl : OutputPanelScope {
   override val label: String
     get() = outputPanel.label
 
-  override suspend fun setText(text: String) {
+  override fun setText(text: String) {
     outputPanel.setContent(text)
     outputPanel.show() // has to be called to update the text
   }
 
-  override suspend fun appendText(text: String, startNewLine: Boolean) {
+  override fun appendText(text: String, startNewLine: Boolean) {
     outputPanel.addText(text, startNewLine)
     outputPanel.show() // has to be called to update the text
   }
 
-  override suspend fun setLabel(label: String) {
+  override fun setLabel(label: String) {
     outputPanel.label = label
   }
 
-  override suspend fun clearText() {
+  override fun clearText() {
     outputPanel.clearText()
     outputPanel.show() // has to be called to update the text
   }
