@@ -21,6 +21,7 @@ import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.openapi.wm.ToolWindowId
 import com.intellij.openapi.wm.ex.ToolWindowManagerEx
+import com.intellij.ui.treeStructure.Tree
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.common.CommandAliasHandler
@@ -33,6 +34,7 @@ import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.RequiredShortcut
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
+import java.awt.KeyboardFocusManager
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import javax.swing.SwingConstants
 import kotlin.concurrent.read
@@ -111,6 +113,23 @@ internal class NerdTree : VimExtension {
       VimExtensionFacade.addCommand("NERDTreeClose", CloseHandler())
       VimExtensionFacade.addCommand("NERDTreeFind", IjCommandHandler("SelectInProjectView"))
       VimExtensionFacade.addCommand("NERDTreeRefreshRoot", IjCommandHandler("Synchronize"))
+
+      // NERDTree Everywhere
+      KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener("focusOwner") {
+        val newFocusOwner = it.newValue
+        val oldFocusOwner = it.oldValue
+        val dispatcher = service<NerdTreeEverywhere.Dispatcher>()
+        if (newFocusOwner is Tree) {
+          val shortcuts =
+            NerdTreeEverywhere.mappings.keyStrokes.map { RequiredShortcut(it, MappingOwner.Plugin.get(PLUGIN_NAME)) }
+          // It's okay to have `register` called multiple times, as its internal implementation prevents duplicate registrations
+          dispatcher.registerCustomShortcutSet(KeyGroup.toShortcutSet(shortcuts), newFocusOwner)
+        }
+        // Note that we do not have to unregister the shortcut in fact
+        if (oldFocusOwner is Tree) {
+          dispatcher.unregisterCustomShortcutSet(oldFocusOwner)
+        }
+      }
     }
     ProjectManager.getInstance().openProjects.forEach(::installDispatcher)
   }
