@@ -78,7 +78,7 @@ plugins {
   //   Or go report to the devs that this test still fails.
   id("org.jetbrains.intellij.platform") version "2.6.0"
 
-  id("org.jetbrains.changelog") version "2.2.1"
+  id("org.jetbrains.changelog") version "2.3.0"
   id("org.jetbrains.kotlinx.kover") version "0.6.1"
   id("com.dorongold.task-tree") version "4.0.1"
   id("com.google.devtools.ksp") version "2.2.0-2.0.2"
