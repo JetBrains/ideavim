@@ -1,0 +1,7 @@
+[
+    {
+        "extensionName": "ReplaceWithRegister",
+        "functionName": "init",
+        "className": "com.maddyhome.idea.vim.extension.replacewithregister.ReplaceWithRegisterNewApiKt"
+    }
+]
