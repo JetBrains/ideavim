@@ -7,6 +7,7 @@
     "IdeaPlug": "com.maddyhome.idea.vim.vimscript.model.commands.IdeaPlug",
     "N[ext]": "com.maddyhome.idea.vim.vimscript.model.commands.PreviousFileCommand",
     "P[rint]": "com.maddyhome.idea.vim.vimscript.model.commands.PrintCommand",
+    "PlugEnable": "com.maddyhome.idea.vim.vimscript.model.commands.PlugEnable",
     "Plug[in]": "com.maddyhome.idea.vim.vimscript.model.commands.PlugCommand",
     "action": "com.maddyhome.idea.vim.vimscript.model.commands.ActionCommand",
     "argu[ment]": "com.maddyhome.idea.vim.vimscript.model.commands.SelectFileCommand",
