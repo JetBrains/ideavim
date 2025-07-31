@@ -31,12 +31,15 @@ class ExCommandProcessor(private val environment: SymbolProcessorEnvironment): S
   private val json = Json { prettyPrint = true }
 
   override fun process(resolver: Resolver): List<KSAnnotated> {
+    val exCommandsFile = environment.options["ex_commands_file"]
+    if (exCommandsFile == null) return emptyList()
+
     resolver.getAllFiles().forEach { it.accept(visitor, Unit) }
 
     val generatedDirPath = Path(environment.options["generated_directory"]!!)
     Files.createDirectories(generatedDirPath)
 
-    val filePath = generatedDirPath.resolve(environment.options["ex_commands_file"]!!)
+    val filePath = generatedDirPath.resolve(exCommandsFile)
     val sortedCommandToClass = commandToClass.toList().sortedWith(compareBy({ it.first }, { it.second })).toMap()
     val fileContent = json.encodeToString(sortedCommandToClass)
     filePath.writeText(fileContent)

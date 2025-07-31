@@ -31,12 +31,15 @@ class VimscriptFunctionProcessor(private val environment: SymbolProcessorEnviron
   private val json = Json { prettyPrint = true }
 
   override fun process(resolver: Resolver): List<KSAnnotated> {
+    val vimscriptFunctionsFile = environment.options["vimscript_functions_file"]
+    if (vimscriptFunctionsFile == null) return emptyList()
+
     resolver.getAllFiles().forEach { it.accept(visitor, Unit) }
 
     val generatedDirPath = Path(environment.options["generated_directory"]!!)
     Files.createDirectories(generatedDirPath)
 
-    val filePath = generatedDirPath.resolve(environment.options["vimscript_functions_file"]!!)
+    val filePath = generatedDirPath.resolve(vimscriptFunctionsFile)
     val sortedNameToClass = nameToClass.toList().sortedWith(compareBy({ it.first }, { it.second })).toMap()
     val fileContent = json.encodeToString(sortedNameToClass)
     filePath.writeText(fileContent)
