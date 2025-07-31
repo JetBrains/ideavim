@@ -234,6 +234,11 @@ abstract class VimTestCase {
     // Important to reset in tearDown as well as setUp, so we reset modified test options
     resetAllOptions()
 
+    // disable all enabled extensions
+    injector.extensionLoader.getEnabledExtensions().forEach {
+      injector.extensionLoader.disableExtension(it.extensionName)
+    }
+
     // Tear down neovim
     NeovimTesting.tearDown(testInfo)
   }
@@ -244,6 +249,14 @@ abstract class VimTestCase {
 
       // Global value of a global option. We can pass null
       injector.optionGroup.setToggleOption(option, OptionAccessScope.GLOBAL(null))
+    }
+  }
+
+  protected fun enableExtensionsNewApi(vararg extensionNames: String) {
+    for (name in extensionNames) {
+      injector.jsonExtensionProvider.getExtension(name = name)?.let { extension ->
+        injector.extensionLoader.enableExtension(extension)
+      }
     }
   }
 
@@ -1088,8 +1101,7 @@ abstract class VimTestCase {
       startIndex = if (command.substring(startIndex).startsWith("<C-U>", ignoreCase = true)) {
         keys.addAll(injector.parser.parseKeys("<C-U>"))
         startIndex + 5
-      }
-      else {
+      } else {
         startIndex
       }
       // We don't parse the rest of the command, to avoid parsing special keys in e.g. maps. Note that values such as
