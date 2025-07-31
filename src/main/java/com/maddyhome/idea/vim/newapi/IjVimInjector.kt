@@ -60,6 +60,9 @@ import com.maddyhome.idea.vim.api.VimscriptParser
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.isInjectorInitialized
 import com.maddyhome.idea.vim.diagnostic.VimLogger
+import com.maddyhome.idea.vim.extension.JsonExtensionProvider
+import com.maddyhome.idea.vim.extension.ExtensionLoader
+import com.maddyhome.idea.vim.thinapi.IjJsonExtensionProvider
 import com.maddyhome.idea.vim.extension.VimExtensionRegistrar
 import com.maddyhome.idea.vim.thinapi.IjVimHighlightingService
 import com.maddyhome.idea.vim.thinapi.IjVimPluginService
@@ -85,6 +88,7 @@ import com.maddyhome.idea.vim.history.VimHistory
 import com.maddyhome.idea.vim.macro.VimMacro
 import com.maddyhome.idea.vim.put.VimPut
 import com.maddyhome.idea.vim.register.VimRegisterGroup
+import com.maddyhome.idea.vim.thinapi.IjExtensionLoader
 import com.maddyhome.idea.vim.thinapi.VimHighlightingService
 import com.maddyhome.idea.vim.thinapi.VimPluginService
 import com.maddyhome.idea.vim.ui.VimRcFileState
@@ -121,6 +125,10 @@ internal class IjVimInjector : VimInjectorBase() {
     get() = service<HistoryGroup>()
   override val extensionRegistrator: VimExtensionRegistrator
     get() = VimExtensionRegistrar
+  override val jsonExtensionProvider: JsonExtensionProvider
+    get() = service<IjJsonExtensionProvider>()
+  override val extensionLoader: ExtensionLoader
+    get() = service<IjExtensionLoader>()
   override val tabService: TabService
     get() = service()
   override val regexpService: VimRegexpService

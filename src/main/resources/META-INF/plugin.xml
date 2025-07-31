@@ -40,6 +40,8 @@
   <applicationListeners>
     <listener class="com.maddyhome.idea.vim.PyNotebooksCloseWorkaround"
               topic="com.intellij.openapi.project.ProjectManagerListener"/>
+    <listener class="com.maddyhome.idea.vim.thinapi.IjPluginListener"
+              topic="com.intellij.ide.plugins.DynamicPluginListener"/>
   </applicationListeners>
 
   <projectListeners>

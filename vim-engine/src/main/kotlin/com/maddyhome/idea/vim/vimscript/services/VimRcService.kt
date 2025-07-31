@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
+import com.maddyhome.idea.vim.vimscript.model.commands.IdeaPlug
 import org.jetbrains.annotations.NonNls
 import java.io.File
 import java.io.IOException
@@ -154,6 +155,10 @@ object VimRcService {
     val ideaVimRc = findIdeaVimRc()
     if (ideaVimRc != null) {
       logger.info("Execute ideavimrc file: " + ideaVimRc.absolutePath)
+
+      // clear all previously enabled extensions
+      IdeaPlug.Companion.EnabledExtensions.clearExtensions()
+
       injector.vimscriptExecutor.executeFile(ideaVimRc, editor, fileIsIdeaVimRcConfig = true)
     } else {
       logger.info("ideavimrc file isn't found")

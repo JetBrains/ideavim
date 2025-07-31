@@ -37,6 +37,7 @@ import com.maddyhome.idea.vim.helper.MacKeyRepeat;
 import com.maddyhome.idea.vim.listener.VimListenerManager;
 import com.maddyhome.idea.vim.newapi.IjVimInjectorKt;
 import com.maddyhome.idea.vim.newapi.IjVimSearchGroup;
+import com.maddyhome.idea.vim.thinapi.IjPluginExtensionsScanner;
 import com.maddyhome.idea.vim.ui.StatusBarIconFactory;
 import com.maddyhome.idea.vim.vimscript.services.VariableService;
 import com.maddyhome.idea.vim.yank.YankGroupBase;
@@ -329,6 +330,12 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
 
     // 2.2) Register extensions
     VimExtensionRegistrar.registerExtensions();
+
+    // 2.2.1) Register extensions with new API
+    VimInjectorKt.getInjector().getJsonExtensionProvider().init();
+    VimInjectorKt.getInjector()
+      .getJsonExtensionProvider()
+      .addExtensions(IjPluginExtensionsScanner.Companion.instance().scanAllPlugins());
 
     // 2.3) Register functions
     VimInjectorKt.getInjector().getFunctionService().registerHandlers();
