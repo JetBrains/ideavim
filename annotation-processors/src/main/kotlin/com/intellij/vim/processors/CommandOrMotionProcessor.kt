@@ -31,12 +31,15 @@ class CommandOrMotionProcessor(private val environment: SymbolProcessorEnvironme
   private val json = Json { prettyPrint = true }
 
   override fun process(resolver: Resolver): List<KSAnnotated> {
+    val commandsFile = environment.options["commands_file"]
+    if (commandsFile == null) return emptyList()
+
     resolver.getAllFiles().forEach { it.accept(visitor, Unit) }
 
     val generatedDirPath = Path(environment.options["generated_directory"]!!)
     Files.createDirectories(generatedDirPath)
 
-    val filePath = generatedDirPath.resolve(environment.options["commands_file"]!!)
+    val filePath = generatedDirPath.resolve(commandsFile)
     val sortedCommands = commands.sortedWith(compareBy({ it.keys }, { it.`class` }))
     val fileContent = json.encodeToString(sortedCommands)
     filePath.writeText(fileContent)

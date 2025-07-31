@@ -27,4 +27,5 @@ dependencies {
     exclude("org.jetbrains.kotlin", "kotlin-stdlib")
     exclude("org.jetbrains.kotlin", "kotlin-stdlib-common")
   }
+  api(project(":api"))
 }
