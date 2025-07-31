@@ -254,7 +254,7 @@ abstract class VimTestCase {
 
   protected fun enableExtensionsNewApi(vararg extensionNames: String) {
     for (name in extensionNames) {
-      injector.jsonExtensionProvider.getExtension(name = name)?.let { extension ->
+      injector.jsonExtensionProvider.getBundledExtensions().find { it.extensionName == name }?.let { extension ->
         injector.extensionLoader.enableExtension(extension)
       }
     }

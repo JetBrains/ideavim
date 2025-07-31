@@ -58,7 +58,7 @@ class IjJsonExtensionProvider : JsonExtensionProvider {
    * @return List of [ExtensionBean] objects deserialized from the JSON file
    */
   @OptIn(ExperimentalSerializationApi::class)
-  private fun readExtensionsFromJson(): List<ExtensionBean> {
+  private fun readExtensionsFromJsonConfigFile(): List<ExtensionBean> {
     return runCatching {
       getConfigFile().inputStream().use { inputStream ->
         Json.decodeFromStream<List<ExtensionBean>>(inputStream)
@@ -74,7 +74,7 @@ class IjJsonExtensionProvider : JsonExtensionProvider {
    *
    * @param extensions List of [ExtensionBean] objects to be serialized and written to the JSON file
    */
-  private fun writeExtensionsToJson(extensions: List<ExtensionBean>) {
+  private fun writeExtensionsToJsonConfigFile(extensions: List<ExtensionBean>) {
     val encodedExtensions = json.encodeToString(extensions)
     val filePath = getConfigFile().toPath()
     filePath.writeText(encodedExtensions)
@@ -87,7 +87,7 @@ class IjJsonExtensionProvider : JsonExtensionProvider {
    * @return The [ExtensionBean] with the specified name, or null if not found
    */
   override fun getExtension(name: String): ExtensionBean? = withReadLock {
-    return@withReadLock readExtensionsFromJson().find { it.extensionName == name }
+    return@withReadLock readExtensionsFromJsonConfigFile().find { it.extensionName == name }
   }
 
   /**
@@ -96,7 +96,20 @@ class IjJsonExtensionProvider : JsonExtensionProvider {
    * @return A list of all [ExtensionBean] objects
    */
   override fun getAllExtensions(): List<ExtensionBean> = withReadLock {
-    return@withReadLock readExtensionsFromJson()
+    return@withReadLock readExtensionsFromJsonConfigFile()
+  }
+
+  @OptIn(ExperimentalSerializationApi::class)
+  override fun getBundledExtensions(): List<ExtensionBean> {
+    val bundledExtensionsFile = "ksp-generated/$EXTENSION_LIST_FILE_NAME"
+    val resourceStream: InputStream? =
+      this.javaClass.classLoader.getResourceAsStream(bundledExtensionsFile)
+    if (resourceStream == null) {
+      logger.error("Failed to fetch extensions from $bundledExtensionsFile")
+      return emptyList()
+    }
+    val bundledExtensions: List<KspExtensionBean> = Json.decodeFromStream(resourceStream)
+    return bundledExtensions.map { it.toExtensionBean(IDEAVIM_ID) }
   }
 
   /**
@@ -106,7 +119,7 @@ class IjJsonExtensionProvider : JsonExtensionProvider {
    * @return A list of [ExtensionBean] objects associated with the specified plugin
    */
   override fun getExtensionsForPlugin(pluginId: String): List<ExtensionBean> = withReadLock {
-    return@withReadLock readExtensionsFromJson().filter { it.pluginId == pluginId }
+    return@withReadLock readExtensionsFromJsonConfigFile().filter { it.pluginId == pluginId }
   }
 
   /**
@@ -116,9 +129,9 @@ class IjJsonExtensionProvider : JsonExtensionProvider {
    * @param extension The [ExtensionBean] to add
    */
   override fun addExtension(extension: ExtensionBean) = withReadWriteLock {
-    val allExtensions: Set<ExtensionBean> = readExtensionsFromJson().toSet()
+    val allExtensions: Set<ExtensionBean> = readExtensionsFromJsonConfigFile().toSet()
     val newExtensions = allExtensions + extension
-    writeExtensionsToJson(newExtensions.toList())
+    writeExtensionsToJsonConfigFile(newExtensions.toList())
   }
 
   /**
@@ -128,9 +141,9 @@ class IjJsonExtensionProvider : JsonExtensionProvider {
    * @param extensions Collection of [ExtensionBean] objects to add
    */
   override fun addExtensions(extensions: Collection<ExtensionBean>) = withReadWriteLock {
-    val allExtensions: Set<ExtensionBean> = readExtensionsFromJson().toSet()
+    val allExtensions: Set<ExtensionBean> = readExtensionsFromJsonConfigFile().toSet()
     val newExtensions = allExtensions + extensions
-    writeExtensionsToJson(newExtensions.toList())
+    writeExtensionsToJsonConfigFile(newExtensions.toList())
   }
 
   /**
@@ -140,9 +153,9 @@ class IjJsonExtensionProvider : JsonExtensionProvider {
    */
   @OptIn(ExperimentalSerializationApi::class)
   override fun removeExtensionForPlugin(pluginId: String) = withReadWriteLock {
-    val allExtensions: MutableList<ExtensionBean> = readExtensionsFromJson().toMutableList()
+    val allExtensions: MutableList<ExtensionBean> = readExtensionsFromJsonConfigFile().toMutableList()
     allExtensions.removeIf { it.pluginId == pluginId }
-    writeExtensionsToJson(allExtensions)
+    writeExtensionsToJsonConfigFile(allExtensions)
   }
 
   /**
