@@ -4,6 +4,7 @@
     "=": "com.maddyhome.idea.vim.vimscript.model.commands.PrintLineNumberCommand",
     ">": "com.maddyhome.idea.vim.vimscript.model.commands.ShiftRightCommand",
     "@": "com.maddyhome.idea.vim.vimscript.model.commands.RepeatCommand",
+    "IdeaPlug": "com.maddyhome.idea.vim.vimscript.model.commands.IdeaPlug",
     "N[ext]": "com.maddyhome.idea.vim.vimscript.model.commands.PreviousFileCommand",
     "P[rint]": "com.maddyhome.idea.vim.vimscript.model.commands.PrintCommand",
     "Plug[in]": "com.maddyhome.idea.vim.vimscript.model.commands.PlugCommand",
