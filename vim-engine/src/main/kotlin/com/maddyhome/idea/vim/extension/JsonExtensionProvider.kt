@@ -28,6 +28,13 @@ interface JsonExtensionProvider {
   fun getAllExtensions(): List<ExtensionBean>
 
   /**
+   * Retrieves all bundled extensions.
+   *
+   * @return A list of all [ExtensionBean] objects
+   */
+  fun getBundledExtensions(): List<ExtensionBean>
+
+  /**
    * Retrieves all extensions bundled within a specific IDE plugin.
    *
    * @param pluginId The ID of the plugin to filter extensions by
