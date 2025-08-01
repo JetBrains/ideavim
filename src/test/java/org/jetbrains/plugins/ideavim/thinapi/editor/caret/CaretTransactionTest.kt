@@ -8,8 +8,8 @@
 
 package org.jetbrains.plugins.ideavim.thinapi.editor.caret
 
-import com.intellij.vim.api.models.Range
 import com.intellij.vim.api.VimApi
+import com.intellij.vim.api.models.Range
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.key.MappingOwner
@@ -157,7 +157,7 @@ class CaretTransactionTest : VimTestCase() {
             }
           }
         }
-      }.join()
+      }
     }
 
     assertNotNull(exception)
@@ -179,7 +179,7 @@ class CaretTransactionTest : VimTestCase() {
             }
           }
         }
-      }.join()
+      }
     }
 
     assertNotNull(exception)
@@ -201,7 +201,7 @@ class CaretTransactionTest : VimTestCase() {
             }
           }
         }
-      }.join()
+      }
     }
 
     assertNotNull(exception)
@@ -618,7 +618,7 @@ class CaretTransactionTest : VimTestCase() {
             }
           }
         }
-      }.join()
+      }
     }
 
     assertNotNull(exception)
@@ -641,7 +641,7 @@ class CaretTransactionTest : VimTestCase() {
             }
           }
         }
-      }.join()
+      }
     }
 
     assertNotNull(exception)
@@ -665,7 +665,7 @@ class CaretTransactionTest : VimTestCase() {
             }
           }
         }
-      }.join()
+      }
     }
 
     assertNotNull(exception)
@@ -688,7 +688,7 @@ class CaretTransactionTest : VimTestCase() {
             }
           }
         }
-      }.join()
+      }
     }
 
     assertNotNull(exception)
@@ -757,7 +757,7 @@ class CaretTransactionTest : VimTestCase() {
             }
           }
         }
-      }.join()
+      }
     }
 
     assertNotNull(exception)
@@ -827,7 +827,7 @@ class CaretTransactionTest : VimTestCase() {
             }
           }
         }
-      }.join()
+      }
     }
 
     assertNotNull(exception)
@@ -945,7 +945,7 @@ class CaretTransactionTest : VimTestCase() {
             }
           }
         }
-      }.join()
+      }
     }
 
     assertNotNull(exception)
@@ -967,7 +967,7 @@ class CaretTransactionTest : VimTestCase() {
             }
           }
         }
-      }.join()
+      }
     }
 
     assertNotNull(exception)
@@ -990,7 +990,7 @@ class CaretTransactionTest : VimTestCase() {
             }
           }
         }
-      }.join()
+      }
     }
 
     assertNotNull(exception)

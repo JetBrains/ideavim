@@ -8,10 +8,8 @@
 
 package com.intellij.vim.api.scopes.commandline
 
-import com.intellij.vim.api.scopes.VimApiDsl
 import com.intellij.vim.api.VimApi
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Job
+import com.intellij.vim.api.scopes.VimApiDsl
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -42,11 +40,11 @@ abstract class CommandLineScope {
    * }
    * ```
    *
-   * @param block A suspend function with CommandLineRead receiver that contains the read operations to perform.
+   * @param block A function with CommandLineRead receiver that contains the read operations to perform.
    * @return A Deferred that will complete with the result of the block execution.
    */
   @OptIn(ExperimentalContracts::class)
-  fun <T> read(block: suspend CommandLineRead.() -> T): Deferred<T> {
+  fun <T> read(block: CommandLineRead.() -> T): T {
     contract {
       callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
@@ -66,17 +64,17 @@ abstract class CommandLineScope {
    * }
    * ```
    *
-   * @param block A suspend function with CommandLineTransaction receiver that contains the write operations to perform.
+   * @param block A function with CommandLineTransaction receiver that contains the write operations to perform.
    * @return A Job that represents the ongoing execution of the block.
    */
   @OptIn(ExperimentalContracts::class)
-  fun change(block: suspend CommandLineTransaction.() -> Unit): Job {
+  fun change(block: CommandLineTransaction.() -> Unit) {
     contract {
       callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
     return ideChange(block)
   }
 
-  protected abstract fun <T> ideRead(block: suspend CommandLineRead.() -> T): Deferred<T>
-  protected abstract fun ideChange(block: suspend CommandLineTransaction.() -> Unit): Job
+  protected abstract fun <T> ideRead(block: CommandLineRead.() -> T): T
+  protected abstract fun ideChange(block: CommandLineTransaction.() -> Unit)
 }

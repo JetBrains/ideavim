@@ -12,6 +12,7 @@ import com.intellij.vim.api.VimApi
 import java.lang.invoke.MethodHandle
 import java.lang.invoke.MethodHandles
 import java.lang.invoke.MethodType
+import kotlin.jvm.java
 
 /**
  * Represents a lazily initialized instance of a static extension function.

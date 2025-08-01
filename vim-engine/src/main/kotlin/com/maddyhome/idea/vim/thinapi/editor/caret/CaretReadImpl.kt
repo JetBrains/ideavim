@@ -81,23 +81,23 @@ class CaretReadImpl(
   override val isRegisterSpecifiedExplicitly: Boolean
     get() = registerGroup.isRegisterSpecifiedExplicitly
 
-  override suspend fun selectRegister(register: Char): Boolean {
+  override fun selectRegister(register: Char): Boolean {
     return registerGroup.selectRegister(register)
   }
 
-  override suspend fun resetRegisters() {
+  override fun resetRegisters() {
     registerGroup.resetRegisters()
   }
 
-  override suspend fun isWritable(register: Char): Boolean {
+  override fun isWritable(register: Char): Boolean {
     return registerGroup.isRegisterWritable(register)
   }
 
-  override suspend fun isSystemClipboard(register: Char): Boolean {
+  override fun isSystemClipboard(register: Char): Boolean {
     return registerGroup.isSystemClipboard(register)
   }
 
-  override suspend fun isPrimaryRegisterSupported(): Boolean {
+  override fun isPrimaryRegisterSupported(): Boolean {
     return registerGroup.isPrimaryRegisterSupported()
   }
 
@@ -135,15 +135,15 @@ class CaretReadImpl(
     return RegisterData(register.text, register.type.toTextSelectionType())
   }
 
-  override suspend fun getReg(register: Char): String? {
+  override fun getReg(register: Char): String? {
     return getRegisterData(register)?.text
   }
 
-  override suspend fun getRegType(register: Char): TextType? {
+  override fun getRegType(register: Char): TextType? {
     return getRegisterData(register)?.type
   }
 
-  override suspend fun setReg(register: Char, text: String, textType: TextType): Boolean {
+  override fun setReg(register: Char, text: String, textType: TextType): Boolean {
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     return when (textType) {
       TextType.CHARACTER_WISE -> registerGroup.storeText(
@@ -159,7 +159,7 @@ class CaretReadImpl(
     }
   }
 
-  override suspend fun getMark(char: Char): Mark? {
+  override fun getMark(char: Char): Mark? {
     val mark = injector.markService.getMark(vimCaret, char)
     return mark?.toApiMark()
   }
@@ -167,105 +167,105 @@ class CaretReadImpl(
   override val localMarks: Set<Mark>
     get() = injector.markService.getAllLocalMarks(vimCaret).map { it.toApiMark() }.toSet()
 
-  override suspend fun setMark(char: Char): Boolean {
+  override fun setMark(char: Char): Boolean {
     return injector.markService.setMark(vimCaret, char, vimCaret.offset)
   }
 
-  override suspend fun setMark(char: Char, offset: Int): Boolean {
+  override fun setMark(char: Char, offset: Int): Boolean {
     return injector.markService.setMark(vimCaret, char, offset)
   }
 
-  override suspend fun removeLocalMark(char: Char) {
+  override fun removeLocalMark(char: Char) {
     injector.markService.removeLocalMark(vimCaret, char)
   }
 
-  override suspend fun resetAllMarksForCaret() {
+  override fun resetAllMarksForCaret() {
     injector.markService.resetAllMarksForCaret(vimCaret)
   }
 
-  override suspend fun scrollFullPage(pages: Int): Boolean {
+  override fun scrollFullPage(pages: Int): Boolean {
     return injector.scroll.scrollFullPage(vimEditor, vimCaret, pages)
   }
 
-  override suspend fun scrollHalfPageUp(lines: Int): Boolean {
+  override fun scrollHalfPageUp(lines: Int): Boolean {
     return injector.scroll.scrollHalfPage(vimEditor, vimCaret, lines, false)
   }
 
-  override suspend fun scrollHalfPageDown(lines: Int): Boolean {
+  override fun scrollHalfPageDown(lines: Int): Boolean {
     return injector.scroll.scrollHalfPage(vimEditor, vimCaret, lines, true)
   }
 
-  override suspend fun selectWindowHorizontally(relativePosition: Int) {
+  override fun selectWindowHorizontally(relativePosition: Int) {
     injector.window.selectWindowInRow(vimCaret, vimContext, relativePosition, false)
   }
 
-  override suspend fun selectWindowInVertically(relativePosition: Int) {
+  override fun selectWindowInVertically(relativePosition: Int) {
     injector.window.selectWindowInRow(vimCaret, vimContext, relativePosition, true)
   }
 
-  override suspend fun getNextParagraphBoundOffset(count: Int, includeWhitespaceLines: Boolean): Int? {
+  override fun getNextParagraphBoundOffset(count: Int, includeWhitespaceLines: Boolean): Int? {
     return injector.searchHelper.findNextParagraph(vimEditor, vimCaret, count, includeWhitespaceLines)
   }
 
-  override suspend fun getNextSentenceStart(count: Int, includeCurrent: Boolean, requireAll: Boolean): Int? {
+  override fun getNextSentenceStart(count: Int, includeCurrent: Boolean, requireAll: Boolean): Int? {
     return injector.searchHelper.findNextSentenceStart(vimEditor, vimCaret, count, includeCurrent, requireAll)
   }
 
-  override suspend fun getNextSectionStart(marker: Char, count: Int): Int {
+  override fun getNextSectionStart(marker: Char, count: Int): Int {
     return injector.searchHelper.findSection(vimEditor, vimCaret, marker, 1, count)
   }
 
-  override suspend fun getPreviousSectionStart(marker: Char, count: Int): Int {
+  override fun getPreviousSectionStart(marker: Char, count: Int): Int {
     return injector.searchHelper.findSection(vimEditor, vimCaret, marker, -1, count)
   }
 
-  override suspend fun getNextSentenceEnd(count: Int, includeCurrent: Boolean, requireAll: Boolean): Int? {
+  override fun getNextSentenceEnd(count: Int, includeCurrent: Boolean, requireAll: Boolean): Int? {
     return injector.searchHelper.findNextSentenceEnd(vimEditor, vimCaret, count, includeCurrent, requireAll)
   }
 
-  override suspend fun getMethodEndOffset(count: Int): Int {
+  override fun getMethodEndOffset(count: Int): Int {
     return injector.searchHelper.findMethodEnd(vimEditor, vimCaret, count)
   }
 
-  override suspend fun getMethodStartOffset(count: Int): Int {
+  override fun getMethodStartOffset(count: Int): Int {
     return injector.searchHelper.findMethodStart(vimEditor, vimCaret, count)
   }
 
-  override suspend fun getNextCharOnLineOffset(count: Int, char: Char): Int {
+  override fun getNextCharOnLineOffset(count: Int, char: Char): Int {
     return injector.searchHelper.findNextCharacterOnLine(vimEditor, vimCaret, count, char)
   }
 
-  override suspend fun getNearestWordOffset(): Range? {
+  override fun getNearestWordOffset(): Range? {
     val textRange = injector.searchHelper.findWordNearestCursor(vimEditor, vimCaret)
     return textRange?.toRange()
   }
 
-  override suspend fun getWordTextObjectRange(count: Int, isOuter: Boolean, isBigWord: Boolean): Range {
+  override fun getWordTextObjectRange(count: Int, isOuter: Boolean, isBigWord: Boolean): Range {
     val textRange = injector.searchHelper.findWordObject(vimEditor, vimCaret, count, isOuter, isBigWord)
     return textRange.toRange()
   }
 
-  override suspend fun getSentenceRange(count: Int, isOuter: Boolean): Range {
+  override fun getSentenceRange(count: Int, isOuter: Boolean): Range {
     val textRange = injector.searchHelper.findSentenceRange(vimEditor, vimCaret, count, isOuter)
     return textRange.toRange()
   }
 
-  override suspend fun getParagraphRange(count: Int, isOuter: Boolean): Range? {
+  override fun getParagraphRange(count: Int, isOuter: Boolean): Range? {
     val textRange = injector.searchHelper.findParagraphRange(vimEditor, vimCaret, count, isOuter)
     return textRange?.toRange()
   }
 
-  override suspend fun getBlockTagRange(count: Int, isOuter: Boolean): Range? {
+  override fun getBlockTagRange(count: Int, isOuter: Boolean): Range? {
     val textRange = injector.searchHelper.findBlockTagRange(vimEditor, vimCaret, count, isOuter)
     return textRange?.toRange()
   }
 
-  override suspend fun getBlockQuoteInLineRange(quote: Char, isOuter: Boolean): Range? {
+  override fun getBlockQuoteInLineRange(quote: Char, isOuter: Boolean): Range? {
     val textRange = injector.searchHelper.findBlockQuoteInLineRange(vimEditor, vimCaret, quote, isOuter)
     return textRange?.toRange()
   }
 
-  override suspend fun getNextMisspelledWordOffset(count: Int): Int {
+  override fun getNextMisspelledWordOffset(count: Int): Int {
     return injector.searchHelper.findMisspelledWord(vimEditor, vimCaret, count)
   }
 }

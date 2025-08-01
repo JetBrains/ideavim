@@ -9,7 +9,6 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.api.stubs.ExecutionContextManagerStub
-import com.maddyhome.idea.vim.api.stubs.VimApplicationStub
 import com.maddyhome.idea.vim.api.stubs.VimEnablerStub
 import com.maddyhome.idea.vim.api.stubs.VimMessagesStub
 import com.maddyhome.idea.vim.api.stubs.VimProcessGroupStub
@@ -42,7 +41,6 @@ abstract class VimInjectorBase : VimInjector {
   override val registerGroupIfCreated: VimRegisterGroup? by lazy { registerGroupStub }
   override val messages: VimMessages by lazy { VimMessagesStub() }
   override val processGroup: VimProcessGroup by lazy { VimProcessGroupStub() }
-  override val application: VimApplication by lazy { VimApplicationStub() }
   override val executionContextManager: ExecutionContextManager by lazy { ExecutionContextManagerStub() }
   override val enabler: VimEnabler by lazy { VimEnablerStub() }
   override val yank: VimYankGroup by lazy { YankGroupBase() }

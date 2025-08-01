@@ -33,7 +33,7 @@ interface CaretTransaction : CaretRead, Read {
    *                                 or if the selection range is invalid (start or end out of range,
    *                                 or start > end)
    */
-  suspend fun updateCaret(offset: Int, selection: Range.Simple? = null)
+  fun updateCaret(offset: Int, selection: Range.Simple? = null)
 
   /**
    * Inserts text at the specified position in the document.
@@ -48,7 +48,7 @@ interface CaretTransaction : CaretRead, Read {
    * @return true if the insertion was successful, false otherwise
    * @throws IllegalArgumentException If the position is not in the valid range [0, fileSize)
    */
-  suspend fun insertText(
+  fun insertText(
     position: Int,
     text: String,
     caretAtEnd: Boolean = true,
@@ -67,7 +67,7 @@ interface CaretTransaction : CaretRead, Read {
    * @throws IllegalArgumentException If the offsets are not in the valid range [0, fileSize),
    *                                 or if startOffset > endOffset
    */
-  suspend fun replaceText(
+  fun replaceText(
     startOffset: Int,
     endOffset: Int,
     text: String,
@@ -85,7 +85,7 @@ interface CaretTransaction : CaretRead, Read {
    * @throws IllegalArgumentException If the size of the text list doesn't match the number of ranges in the block,
    *                                 or if any range in the block is invalid
    */
-  suspend fun replaceTextBlockwise(
+  fun replaceTextBlockwise(
     range: Range.Block,
     text: List<String>,
   )
@@ -102,7 +102,7 @@ interface CaretTransaction : CaretRead, Read {
    * @return true if the deletion was successful, false otherwise
    * @throws Exception If endOffset is beyond the file size
    */
-  suspend fun deleteText(
+  fun deleteText(
     startOffset: Int,
     endOffset: Int,
   ): Boolean
@@ -112,10 +112,10 @@ interface CaretTransaction : CaretRead, Read {
    *
    * @param reset Whether to reset the current position in the jump list
    */
-  suspend fun addJump(reset: Boolean)
+  fun addJump(reset: Boolean)
 
   /**
    * Saves the location of the current caret to the jump list and sets the ' mark.
    */
-  suspend fun saveJumpLocation()
+  fun saveJumpLocation()
 }

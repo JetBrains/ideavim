@@ -26,23 +26,23 @@ class TransactionImpl : Transaction, Read by ReadImpl() {
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!
 
-  override suspend fun <T> forEachCaret(block: suspend CaretTransaction.() -> T): List<T> {
+  override fun <T> forEachCaret(block: CaretTransaction.() -> T): List<T> {
     return vimEditor.sortedCarets()
       .map { caret -> CaretTransactionImpl(caret.caretId).block() }
   }
 
-  override suspend fun <T> with(
+  override fun <T> with(
     caretId: CaretId,
-    block: suspend CaretTransaction.() -> T,
+    block: CaretTransaction.() -> T,
   ): T {
     return CaretTransactionImpl(caretId).block()
   }
 
-  override suspend fun <T> withPrimaryCaret(block: suspend CaretTransaction.() -> T): T {
+  override fun <T> withPrimaryCaret(block: CaretTransaction.() -> T): T {
     return CaretTransactionImpl(vimEditor.primaryCaret().caretId).block()
   }
 
-  override suspend fun addCaret(offset: Int): CaretId? {
+  override fun addCaret(offset: Int): CaretId? {
     val fileLength = vimEditor.text().length
     val validRange = 0 until fileLength
     if (offset !in validRange) {
@@ -52,14 +52,14 @@ class TransactionImpl : Transaction, Read by ReadImpl() {
     return vimEditor.addCaret(offset)?.caretId
   }
 
-  override suspend fun removeCaret(caretId: CaretId) {
+  override fun removeCaret(caretId: CaretId) {
     val caret = vimEditor.carets().find { it.id == caretId.id }
       ?: throw IllegalArgumentException("Caret with id $caretId not found")
 
     vimEditor.removeCaret(caret)
   }
 
-  override suspend fun addHighlight(
+  override fun addHighlight(
     startOffset: Int,
     endOffset: Int,
     backgroundColor: Color?,
@@ -74,55 +74,55 @@ class TransactionImpl : Transaction, Read by ReadImpl() {
     )
   }
 
-  override suspend fun removeHighlight(highlightId: HighlightId) {
+  override fun removeHighlight(highlightId: HighlightId) {
     injector.highlightingService.removeHighlighter(vimEditor, highlightId)
   }
 
-  override suspend fun setMark(char: Char): Boolean {
+  override fun setMark(char: Char): Boolean {
     return injector.markService.setMark(vimEditor, char)
   }
 
-  override suspend fun removeMark(char: Char) {
+  override fun removeMark(char: Char) {
     injector.markService.removeMark(vimEditor, char)
   }
 
-  override suspend fun setGlobalMark(char: Char): Boolean {
+  override fun setGlobalMark(char: Char): Boolean {
     val editor = vimEditor
     val offset = editor.currentCaret().offset
     return injector.markService.setGlobalMark(editor, char, offset)
   }
 
-  override suspend fun removeGlobalMark(char: Char) {
+  override fun removeGlobalMark(char: Char) {
     injector.markService.removeGlobalMark(char)
   }
 
-  override suspend fun setGlobalMark(char: Char, offset: Int): Boolean {
+  override fun setGlobalMark(char: Char, offset: Int): Boolean {
     return injector.markService.setGlobalMark(vimEditor, char, offset)
   }
 
-  override suspend fun resetAllMarks() {
+  override fun resetAllMarks() {
     injector.markService.resetAllMarks()
   }
 
-  override suspend fun addJump(jump: Jump, reset: Boolean) {
+  override fun addJump(jump: Jump, reset: Boolean) {
     val protocol = jump.filepath.protocol
     val filePath = jump.filepath.getFilePath()
     val engineJump = EngineJump(jump.line, jump.col, filePath, protocol)
     injector.jumpService.addJump(vimEditor.projectId, engineJump, reset)
   }
 
-  override suspend fun removeJump(jump: Jump) {
+  override fun removeJump(jump: Jump) {
     val protocol = jump.filepath.protocol
     val filePath = jump.filepath.getFilePath()
     val engineJump = EngineJump(jump.line, jump.col, filePath, protocol)
     injector.jumpService.removeJump(vimEditor.projectId, engineJump)
   }
 
-  override suspend fun dropLastJump() {
+  override fun dropLastJump() {
     injector.jumpService.dropLastJump(vimEditor.projectId)
   }
 
-  override suspend fun clearJumps() {
+  override fun clearJumps() {
     injector.jumpService.clearJumps(vimEditor.projectId)
   }
 }

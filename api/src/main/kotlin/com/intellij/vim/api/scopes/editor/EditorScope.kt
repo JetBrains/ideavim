@@ -9,8 +9,6 @@
 package com.intellij.vim.api.scopes.editor
 
 import com.intellij.vim.api.scopes.VimApiDsl
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Job
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -40,7 +38,7 @@ abstract class EditorScope {
    * @return A [kotlinx.coroutines.Deferred] that completes with the result of the block execution
    */
   @OptIn(ExperimentalContracts::class)
-  fun <T> read(block: suspend ReadScope.() -> T): Deferred<T> {
+  fun <T> read(block: ReadScope.() -> T): T {
     contract {
       callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
@@ -72,13 +70,13 @@ abstract class EditorScope {
    * @return A [kotlinx.coroutines.Job] that completes when all write operations are finished
    */
   @OptIn(ExperimentalContracts::class)
-  fun change(block: suspend Transaction.() -> Unit): Job {
+  fun change(block: Transaction.() -> Unit) {
     contract {
       callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
     return ideChange(block)
   }
 
-  protected abstract fun <T> ideRead(block: suspend ReadScope.() -> T): Deferred<T>
-  protected abstract fun ideChange(block: suspend Transaction.() -> Unit): Job
+  protected abstract fun <T> ideRead(block: ReadScope.() -> T): T
+  protected abstract fun ideChange(block: Transaction.() -> Unit)
 }

@@ -18,19 +18,11 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.thinapi.VimApiImpl
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 
 class CommandLineScopeImpl(
   private val listenerOwner: ListenerOwner,
   private val mappingOwner: MappingOwner,
 ) : CommandLineScope() {
-  private val coroutineScope = CoroutineScope(Dispatchers.Unconfined )
-
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!
 
@@ -44,17 +36,17 @@ class CommandLineScopeImpl(
     }
   }
 
-  override fun <T> ideRead(block: suspend CommandLineRead.() -> T): Deferred<T> {
+  override fun <T> ideRead(block: CommandLineRead.() -> T): T {
     return injector.application.runReadAction {
       val read = CommandLineReadImpl()
-      return@runReadAction coroutineScope.async { block(read) }
+      block(read)
     }
   }
 
-  override fun ideChange(block: suspend CommandLineTransaction.() -> Unit): Job {
+  override fun ideChange(block: CommandLineTransaction.() -> Unit) {
     return injector.application.runWriteAction {
       val transaction = CommandLineTransactionImpl()
-      coroutineScope.launch { transaction.block() }
+      transaction.block()
     }
   }
 }

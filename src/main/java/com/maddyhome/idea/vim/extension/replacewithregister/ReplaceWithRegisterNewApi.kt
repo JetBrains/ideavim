@@ -37,7 +37,7 @@ fun VimApi.init() {
   }
 }
 
-private suspend fun VimApi.operatorFunction(): Boolean {
+private fun VimApi.operatorFunction(): Boolean {
   fun CaretTransaction.getSelection(): Range? {
     return when {
       this@operatorFunction.mode == Mode.NORMAL -> changeMarks
@@ -51,19 +51,19 @@ private suspend fun VimApi.operatorFunction(): Boolean {
       forEachCaret {
         val selectionRange = getSelection() ?: return@forEachCaret
         val registerData = prepareRegisterData() ?: return@forEachCaret
-        replaceTextAndUpdateCaret(this@operatorFunction, selectionRange, registerData)
+        replaceTextAndUpdateCaret(selectionRange, registerData)
       }
     }
   }
   return true
 }
 
-private suspend fun VimApi.rewriteMotion() {
+private fun VimApi.rewriteMotion() {
   setOperatorFunction(OPERATOR_FUNC_NAME)
   normal("g@")
 }
 
-private suspend fun VimApi.rewriteLine() {
+private fun VimApi.rewriteLine() {
   val count1 = getVariable<Int>("v:count1") ?: 1
   editor {
     change {
@@ -78,20 +78,20 @@ private suspend fun VimApi.rewriteLine() {
   }
 }
 
-private suspend fun VimApi.rewriteVisual() {
+private fun VimApi.rewriteVisual() {
   editor {
     change {
       forEachCaret {
         val selectionRange = selection
         val registerData = prepareRegisterData() ?: return@forEachCaret
-        replaceTextAndUpdateCaret(this@rewriteVisual, selectionRange, registerData)
+        replaceTextAndUpdateCaret(selectionRange, registerData)
       }
     }
   }
 //  mode = Mode.NORMAL // TODO
 }
 
-private suspend fun CaretTransaction.prepareRegisterData(): Pair<String, TextType>? {
+private fun CaretTransaction.prepareRegisterData(): Pair<String, TextType>? {
   val lastRegisterName: Char = lastSelectedReg
   var registerText: String = getReg(lastRegisterName) ?: return null
   var registerType: TextType = getRegType(lastRegisterName) ?: return null
@@ -104,8 +104,7 @@ private suspend fun CaretTransaction.prepareRegisterData(): Pair<String, TextTyp
   return registerText to registerType
 }
 
-private suspend fun CaretTransaction.replaceTextAndUpdateCaret(
-  vimApi: VimApi,
+private fun CaretTransaction.replaceTextAndUpdateCaret(
   selectionRange: Range,
   registerData: Pair<String, TextType>,
 ) {

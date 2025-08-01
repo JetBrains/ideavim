@@ -36,7 +36,7 @@ interface ReadScope : Read {
    * @param block The block to execute for each caret
    * @return A list containing the results of executing the block for each caret
    */
-  suspend fun <T> forEachCaret(block: suspend CaretRead.() -> T): List<T>
+  fun <T> forEachCaret(block: CaretRead.() -> T): List<T>
 
   /**
    * Executes the provided block with a specific caret as the receiver.
@@ -57,7 +57,7 @@ interface ReadScope : Read {
    * @param caretId The ID of the caret to use
    * @param block The block to execute with the specified caret as the receiver
    */
-  suspend fun <T> with(caretId: CaretId, block: suspend CaretRead.() -> T): T
+  fun <T> with(caretId: CaretId, block: CaretRead.() -> T): T
 
   /**
    * Executes the provided block with the primary caret as the receiver.
@@ -77,5 +77,5 @@ interface ReadScope : Read {
    *
    * @param block The block to execute with the primary caret as the receiver
    */
-  suspend fun <T> withPrimaryCaret(block: suspend CaretRead.() -> T): T
+  fun <T> withPrimaryCaret(block: CaretRead.() -> T): T
 }

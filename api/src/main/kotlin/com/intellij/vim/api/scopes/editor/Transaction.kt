@@ -37,7 +37,7 @@ interface Transaction : Read {
    * @param block The block to execute for each caret
    * @return A list containing the results of executing the block for each caret
    */
-  suspend fun <T> forEachCaret(block: suspend CaretTransaction.() -> T): List<T>
+  fun <T> forEachCaret(block: CaretTransaction.() -> T): List<T>
 
   /**
    * Executes the provided block with a specific caret as the receiver.
@@ -61,7 +61,7 @@ interface Transaction : Read {
    * @param caretId The ID of the caret to use
    * @param block The block to execute with the specified caret as the receiver
    */
-  suspend fun <T> with(caretId: CaretId, block: suspend CaretTransaction.() -> T): T
+  fun <T> with(caretId: CaretId, block: CaretTransaction.() -> T): T
 
   /**
    * Executes the provided block with the primary caret as the receiver.
@@ -83,7 +83,7 @@ interface Transaction : Read {
    *
    * @param block The block to execute with the primary caret as the receiver
    */
-  suspend fun <T> withPrimaryCaret(block: suspend CaretTransaction.() -> T): T
+  fun <T> withPrimaryCaret(block: CaretTransaction.() -> T): T
 
   /**
    * Adds a new caret at the specified offset in the editor.
@@ -92,7 +92,7 @@ interface Transaction : Read {
    * @return The ID of the newly created caret if successful, null otherwise
    * @throws IllegalArgumentException if offset is not in valid range `[0, fileLength - 1]`
    */
-  suspend fun addCaret(offset: Int): CaretId?
+  fun addCaret(offset: Int): CaretId?
 
   /**
    * Removes a caret from the editor.
@@ -100,7 +100,7 @@ interface Transaction : Read {
    * @param caretId The ID of the caret to remove
    * @throws IllegalArgumentException if caret with [caretId] is not found
    */
-  suspend fun removeCaret(caretId: CaretId)
+  fun removeCaret(caretId: CaretId)
 
   /**
    * Adds a highlight to the editor.
@@ -111,7 +111,7 @@ interface Transaction : Read {
    * @param foregroundColor The foreground color of the highlight, or null for no foreground color
    * @return The ID of the newly created highlight
    */
-  suspend fun addHighlight(
+  fun addHighlight(
     startOffset: Int,
     endOffset: Int,
     backgroundColor: Color?,
@@ -123,7 +123,7 @@ interface Transaction : Read {
    *
    * @param highlightId The ID of the highlight to remove
    */
-  suspend fun removeHighlight(highlightId: HighlightId)
+  fun removeHighlight(highlightId: HighlightId)
 
   /**
    * Sets a mark at the current position for each caret in the editor.
@@ -131,14 +131,14 @@ interface Transaction : Read {
    * @param char The character key of the mark (a-z, A-Z, etc.)
    * @return True if the mark was successfully set, false otherwise
    */
-  suspend fun setMark(char: Char): Boolean
+  fun setMark(char: Char): Boolean
 
   /**
    * Removes a mark for all carets in the editor.
    *
    * @param char The character key of the mark to remove (a-z, A-Z, etc.)
    */
-  suspend fun removeMark(char: Char)
+  fun removeMark(char: Char)
 
   /**
    * Sets a global mark at the current position.
@@ -146,14 +146,14 @@ interface Transaction : Read {
    * @param char The character key of the mark (A-Z)
    * @return True if the mark was successfully set, false otherwise
    */
-  suspend fun setGlobalMark(char: Char): Boolean
+  fun setGlobalMark(char: Char): Boolean
 
   /**
    * Removes a global mark.
    *
    * @param char The character key of the mark to remove (A-Z)
    */
-  suspend fun removeGlobalMark(char: Char)
+  fun removeGlobalMark(char: Char)
 
   /**
    * Sets a global mark at the specified offset.
@@ -162,14 +162,14 @@ interface Transaction : Read {
    * @param offset The offset to set the mark to
    * @return True if the mark was successfully set, false otherwise
    */
-  suspend fun setGlobalMark(char: Char, offset: Int): Boolean
+  fun setGlobalMark(char: Char, offset: Int): Boolean
 
   /**
    * Resets all marks.
    *
    * This removes all marks, both global and local.
    */
-  suspend fun resetAllMarks()
+  fun resetAllMarks()
 
   /**
    * Adds a specific jump to the jump list.
@@ -177,22 +177,22 @@ interface Transaction : Read {
    * @param jump The jump to add
    * @param reset Whether to reset the current position in the jump list
    */
-  suspend fun addJump(jump: Jump, reset: Boolean = false)
+  fun addJump(jump: Jump, reset: Boolean = false)
 
   /**
    * Removes a jump from the jump list.
    *
    * @param jump The jump to remove
    */
-  suspend fun removeJump(jump: Jump)
+  fun removeJump(jump: Jump)
 
   /**
    * Removes the last jump from the jump list.
    */
-  suspend fun dropLastJump()
+  fun dropLastJump()
 
   /**
    * Clears all jumps from the jump list.
    */
-  suspend fun clearJumps()
+  fun clearJumps()
 }

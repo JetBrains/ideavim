@@ -48,15 +48,15 @@ open class ReadImpl : Read {
       return Path.createApiPath(protocol, filePath)
     }
 
-  override suspend fun getLineStartOffset(line: Int): Int {
+  override fun getLineStartOffset(line: Int): Int {
     return vimEditor.getLineStartOffset(line)
   }
 
-  override suspend fun getLineEndOffset(line: Int, allowEnd: Boolean): Int {
+  override fun getLineEndOffset(line: Int, allowEnd: Boolean): Int {
     return vimEditor.getLineEndOffset(line, allowEnd)
   }
 
-  override suspend fun getLine(offset: Int): Line {
+  override fun getLine(offset: Int): Line {
     val lineNumber = vimEditor.offsetToBufferPosition(offset).line
     val lineText = vimEditor.getLineText(lineNumber)
     val lineStartOffset = vimEditor.getLineStartOffset(lineNumber)
@@ -69,7 +69,7 @@ open class ReadImpl : Read {
   override val caretIds: List<CaretId>
     get() = vimEditor.sortedCarets().map { caret -> caret.caretId }
 
-  override suspend fun getGlobalMark(char: Char): Mark? {
+  override fun getGlobalMark(char: Char): Mark? {
     val mark = injector.markService.getGlobalMark(char)
     return mark?.toApiMark()
   }
@@ -77,7 +77,7 @@ open class ReadImpl : Read {
   override val globalMarks: Set<Mark>
     get() = injector.markService.getAllGlobalMarks().map { it.toApiMark() }.toSet()
 
-  override suspend fun getJump(count: Int): Jump? {
+  override fun getJump(count: Int): Jump? {
     val jump = injector.jumpService.getJump(vimEditor.projectId, count)
     return jump?.toApiJump()
   }
@@ -88,43 +88,43 @@ open class ReadImpl : Read {
   override val currentJumpIndex: Int
     get() = injector.jumpService.getJumpSpot(vimEditor.projectId)
 
-  override suspend fun scrollCaretIntoView() {
+  override fun scrollCaretIntoView() {
     return injector.scroll.scrollCaretIntoView(vimEditor)
   }
 
-  override suspend fun scrollVertically(lines: Int): Boolean {
+  override fun scrollVertically(lines: Int): Boolean {
     return injector.scroll.scrollLines(vimEditor, lines)
   }
 
-  override suspend fun scrollLineToTop(line: Int, start: Boolean): Boolean {
+  override fun scrollLineToTop(line: Int, start: Boolean): Boolean {
     return injector.scroll.scrollCurrentLineToDisplayTop(vimEditor, line, start)
   }
 
-  override suspend fun scrollLineToMiddle(line: Int, start: Boolean): Boolean {
+  override fun scrollLineToMiddle(line: Int, start: Boolean): Boolean {
     return injector.scroll.scrollCurrentLineToDisplayMiddle(vimEditor, line, start)
   }
 
-  override suspend fun scrollLineToBottom(line: Int, start: Boolean): Boolean {
+  override fun scrollLineToBottom(line: Int, start: Boolean): Boolean {
     return injector.scroll.scrollCurrentLineToDisplayBottom(vimEditor, line, start)
   }
 
-  override suspend fun scrollHorizontally(columns: Int): Boolean {
+  override fun scrollHorizontally(columns: Int): Boolean {
     return injector.scroll.scrollColumns(vimEditor, columns)
   }
 
-  override suspend fun scrollCaretToLeftEdge(): Boolean {
+  override fun scrollCaretToLeftEdge(): Boolean {
     return injector.scroll.scrollCaretColumnToDisplayLeftEdge(vimEditor)
   }
 
-  override suspend fun scrollCaretToRightEdge(): Boolean {
+  override fun scrollCaretToRightEdge(): Boolean {
     return injector.scroll.scrollCaretColumnToDisplayRightEdge(vimEditor)
   }
 
-  override suspend fun getNextParagraphBoundOffset(startLine: Int, count: Int, includeWhitespaceLines: Boolean): Int? {
+  override fun getNextParagraphBoundOffset(startLine: Int, count: Int, includeWhitespaceLines: Boolean): Int? {
     return injector.searchHelper.findNextParagraph(vimEditor, startLine, count, includeWhitespaceLines)
   }
 
-  override suspend fun getNextSentenceStart(
+  override fun getNextSentenceStart(
     startOffset: Int,
     count: Int,
     includeCurrent: Boolean,
@@ -133,15 +133,15 @@ open class ReadImpl : Read {
     return injector.searchHelper.findNextSentenceStart(vimEditor, startOffset, count, includeCurrent, requireAll)
   }
 
-  override suspend fun getNextSectionStart(startLine: Int, marker: Char, count: Int): Int {
+  override fun getNextSectionStart(startLine: Int, marker: Char, count: Int): Int {
     return injector.searchHelper.findSection(vimEditor, startLine, marker, 1, count)
   }
 
-  override suspend fun getPreviousSectionStart(startLine: Int, marker: Char, count: Int): Int {
+  override fun getPreviousSectionStart(startLine: Int, marker: Char, count: Int): Int {
     return injector.searchHelper.findSection(vimEditor, startLine, marker, -1, count)
   }
 
-  override suspend fun getNextSentenceEnd(
+  override fun getNextSentenceEnd(
     startOffset: Int,
     count: Int,
     includeCurrent: Boolean,
@@ -150,7 +150,7 @@ open class ReadImpl : Read {
     return injector.searchHelper.findNextSentenceEnd(vimEditor, startOffset, count, includeCurrent, requireAll)
   }
 
-  override suspend fun getNextWordStartOffset(startOffset: Int, count: Int, isBigWord: Boolean): Int? {
+  override fun getNextWordStartOffset(startOffset: Int, count: Int, isBigWord: Boolean): Int? {
     val editorSize = vimEditor.text().length
     val nextWordOffset = injector.searchHelper.findNextWord(vimEditor, startOffset, count, isBigWord)
 
@@ -161,30 +161,30 @@ open class ReadImpl : Read {
     }
   }
 
-  override suspend fun getNextWordEndOffset(startOffset: Int, count: Int, isBigWord: Boolean): Int {
+  override fun getNextWordEndOffset(startOffset: Int, count: Int, isBigWord: Boolean): Int {
     return injector.searchHelper.findNextWordEnd(vimEditor, startOffset, count, isBigWord, true)
   }
 
-  override suspend fun getNextCharOnLineOffset(startOffset: Int, count: Int, char: Char): Int {
+  override fun getNextCharOnLineOffset(startOffset: Int, count: Int, char: Char): Int {
     return injector.searchHelper.findNextCharacterOnLine(vimEditor, startOffset, count, char)
   }
 
-  override suspend fun getNearestWordOffset(startOffset: Int): Range? {
+  override fun getNearestWordOffset(startOffset: Int): Range? {
     val textRange = injector.searchHelper.findWordNearestCursor(vimEditor, startOffset)
     return textRange?.toRange()
   }
 
-  override suspend fun getParagraphRange(line: Int, count: Int, isOuter: Boolean): Range? {
+  override fun getParagraphRange(line: Int, count: Int, isOuter: Boolean): Range? {
     val textRange = injector.searchHelper.findParagraphRange(vimEditor, line, count, isOuter)
     return textRange?.toRange()
   }
 
-  override suspend fun getBlockQuoteInLineRange(startOffset: Int, quote: Char, isOuter: Boolean): Range? {
+  override fun getBlockQuoteInLineRange(startOffset: Int, quote: Char, isOuter: Boolean): Range? {
     val textRange = injector.searchHelper.findBlockQuoteInLineRange(vimEditor, startOffset, quote, isOuter)
     return textRange?.toRange()
   }
 
-  override suspend fun findAll(
+  override fun findAll(
     pattern: String,
     startLine: Int,
     endLine: Int,
@@ -194,7 +194,7 @@ open class ReadImpl : Read {
     return textRanges.map { it.toRange() }
   }
 
-  override suspend fun findPattern(
+  override fun findPattern(
     pattern: String,
     startOffset: Int,
     count: Int,

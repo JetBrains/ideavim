@@ -21,18 +21,18 @@ class ReadScopeImpl : ReadScope, Read by ReadImpl() {
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!
 
-  override suspend fun <T> forEachCaret(block: suspend CaretRead.() -> T): List<T> {
+  override fun <T> forEachCaret(block: CaretRead.() -> T): List<T> {
     return vimEditor.sortedCarets().map { caret -> CaretReadImpl(caret.caretId).block() }
   }
 
-  override suspend fun <T> with(
+  override fun <T> with(
     caretId: CaretId,
-    block: suspend CaretRead.() -> T,
+    block: CaretRead.() -> T,
   ): T {
     return CaretReadImpl(caretId).block()
   }
 
-  override suspend fun <T> withPrimaryCaret(block: suspend CaretRead.() -> T): T {
+  override fun <T> withPrimaryCaret(block: CaretRead.() -> T): T {
     return CaretReadImpl(vimEditor.primaryCaret().caretId).block()
   }
 }
