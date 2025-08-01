@@ -9,6 +9,8 @@
 package org.jetbrains.plugins.ideavim.thinapi.vimscope
 
 import com.intellij.vim.api.scopes.VimScope
+import com.intellij.vim.api.scopes.getVariable
+import com.intellij.vim.api.scopes.setVariable
 import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.thinapi.VimScopeImpl

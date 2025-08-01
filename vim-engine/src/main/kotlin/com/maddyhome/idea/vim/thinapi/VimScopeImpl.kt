@@ -45,7 +45,7 @@ import kotlin.reflect.KType
 class VimScopeImpl(
   private val listenerOwner: ListenerOwner,
   private val mappingOwner: MappingOwner,
-) : VimScope() {
+) : VimScope {
   override var mode: Mode
     get() {
       return injector.vimState.mode.toMode()
@@ -60,7 +60,7 @@ class VimScopeImpl(
   private val vimContext: ExecutionContext
     get() = injector.executionContextManager.getEditorExecutionContext(vimEditor)
 
-  override fun <T : Any> getVariableInternal(name: String, type: KType): T? {
+  override fun <T : Any> getVariable(name: String, type: KType): T? {
     val (name, scope) = parseVariableName(name)
     val variableService: VariableService = injector.variableService
     val variable = Variable(scope, name)
@@ -75,7 +75,7 @@ class VimScopeImpl(
     return value
   }
 
-  override fun setVariableInternal(name: String, value: Any, type: KType) {
+  override fun setVariable(name: String, value: Any, type: KType) {
     val (variableName, scope) = parseVariableName(name)
     val variableService: VariableService = injector.variableService
     val variable = Variable(scope, variableName)
@@ -128,8 +128,8 @@ class VimScopeImpl(
     injector.pluginService.executeNormalWithoutMapping(command, vimEditor)
   }
 
-  override fun editorScope(): EditorScope {
-    return EditorScopeImpl()
+  override fun <T> editor(block: EditorScope.() -> T): T {
+    return EditorScopeImpl().block()
   }
 
   override fun <T> forEachEditor(block: EditorScope.() -> T): List<T> {
