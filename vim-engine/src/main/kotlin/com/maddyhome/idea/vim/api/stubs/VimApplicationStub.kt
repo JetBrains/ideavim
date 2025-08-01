@@ -30,6 +30,10 @@ class VimApplicationStub : VimApplicationBase() {
     TODO("Not yet implemented")
   }
 
+  override fun invokeAndWait(action: () -> Unit) {
+    TODO("Not yet implemented")
+  }
+
   override fun isUnitTest(): Boolean {
     TODO("Not yet implemented")
   }

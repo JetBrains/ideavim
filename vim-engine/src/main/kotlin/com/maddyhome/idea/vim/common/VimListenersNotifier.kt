@@ -77,6 +77,24 @@ class VimListenersNotifier {
     yankListeners.forEach { it.yankPerformed(caretToRange) }
   }
 
+  /**
+   * Removes listeners with a given listener owner.
+   */
+  private fun <T : Listener> unloadListeners(listenerOwner: ListenerOwner, listenerCollection: MutableCollection<T>) {
+    listenerCollection.removeIf { it.owner == listenerOwner }
+  }
+
+  fun unloadListeners(listenerOwner: ListenerOwner) {
+    arrayOf(
+      modeChangeListeners,
+      myEditorListeners,
+      macroRecordingListeners,
+      vimPluginListeners,
+      isReplaceCharListeners,
+      yankListeners
+    ).forEach { unloadListeners(listenerOwner, it) }
+  }
+
   fun reset() {
     modeChangeListeners.clear()
     myEditorListeners.clear()

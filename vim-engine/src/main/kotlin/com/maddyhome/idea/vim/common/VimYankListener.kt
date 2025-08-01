@@ -10,6 +10,6 @@ package com.maddyhome.idea.vim.common
 
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 
-interface VimYankListener {
+interface VimYankListener: Listener {
   fun yankPerformed(caretToRange: Map<ImmutableVimCaret, TextRange>)
 }

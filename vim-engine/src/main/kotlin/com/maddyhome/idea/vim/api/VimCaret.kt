@@ -36,6 +36,7 @@ import javax.swing.KeyStroke
  *       to be consistent with VimEditor
  */
 interface ImmutableVimCaret {
+  val id: String
   val editor: VimEditor
   val offset: Int
   val isValid: Boolean

@@ -9,6 +9,9 @@
 package com.maddyhome.idea.vim.group;
 
 import com.intellij.find.EditorSearchSession;
+import com.intellij.ide.DataManager;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.client.ClientAppSession;
 import com.intellij.openapi.client.ClientKind;
 import com.intellij.openapi.client.ClientSessionsManager;
@@ -39,6 +42,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -265,6 +270,23 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
   public void updateCaretsVisualPosition(@NotNull VimEditor editor) {
     Editor ijEditor = ((IjVimEditor)editor).getEditor();
     CaretVisualAttributesHelperKt.updateCaretsVisualAttributes(ijEditor);
+  }
+
+  @Override
+  public @Nullable VimEditor getFocusedEditor() {
+    try {
+      DataContext dataContext = DataManager.getInstance().getDataContextFromFocusAsync().blockingGet(1000);
+      if (dataContext != null) {
+        Editor focusedEditor = CommonDataKeys.EDITOR.getData(dataContext);
+        if (focusedEditor != null) {
+          return new IjVimEditor(focusedEditor);
+        }
+      }
+    }
+    catch (TimeoutException | ExecutionException e) {
+      return null;
+    }
+    return null;
   }
 
   public static class NumberChangeListener implements EffectiveOptionValueChangeListener {

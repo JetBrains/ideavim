@@ -329,6 +329,12 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase(
     editor.caretModel.removeCaret((caret as IjVimCaret).caret)
   }
 
+  override fun addCaret(offset: Int): VimCaret? {
+    return editor.caretModel.addCaret(
+      editor.offsetToVisualPosition(offset)
+    )?.vim
+  }
+
   override fun removeSecondaryCarets() {
     editor.caretModel.removeSecondaryCarets()
   }

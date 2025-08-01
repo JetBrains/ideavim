@@ -70,7 +70,7 @@ enum class MappingMode {
     val ALL: EnumSet<MappingMode> = EnumSet.allOf(MappingMode::class.java)
 
     // This method is used only for single modes, not groups of them (V is not supported)
-    internal fun parseModeChar(char: Char): MappingMode {
+    fun parseModeChar(char: Char): MappingMode {
       return when (char.uppercaseChar()) {
         'N' -> NORMAL
         'X' -> VISUAL

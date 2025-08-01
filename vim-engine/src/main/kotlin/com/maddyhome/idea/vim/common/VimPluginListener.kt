@@ -8,7 +8,7 @@
 
 package com.maddyhome.idea.vim.common
 
-interface VimPluginListener {
+interface VimPluginListener: Listener {
   fun turnedOn()
   fun turnedOff()
 }

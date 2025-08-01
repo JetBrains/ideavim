@@ -707,6 +707,8 @@ class VimRegex(pattern: String) {
     override fun removeCaret(caret: VimCaret) {
     }
 
+    override fun addCaret(offset: Int): VimCaret? = null
+
     override fun removeSecondaryCarets() {
     }
 

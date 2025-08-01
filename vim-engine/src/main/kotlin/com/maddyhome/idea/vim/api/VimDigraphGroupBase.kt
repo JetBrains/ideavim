@@ -275,7 +275,7 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
 
   // Surprisingly, Vim doesn't have a command line for removing custom digraphs
   @TestOnly
-  fun clearCustomDigraphs() {
+  override fun clearCustomDigraphs() {
     customDigraphToCodepoint.clear()
     customCodepointToDigraph.clear()
   }

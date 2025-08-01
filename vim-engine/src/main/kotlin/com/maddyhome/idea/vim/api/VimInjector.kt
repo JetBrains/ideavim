@@ -17,6 +17,8 @@ import com.maddyhome.idea.vim.macro.VimMacro
 import com.maddyhome.idea.vim.put.VimPut
 import com.maddyhome.idea.vim.register.VimRegisterGroup
 import com.maddyhome.idea.vim.state.VimStateMachine
+import com.maddyhome.idea.vim.thinapi.VimHighlightingService
+import com.maddyhome.idea.vim.thinapi.VimPluginService
 import com.maddyhome.idea.vim.undo.VimUndoRedo
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 import com.maddyhome.idea.vim.yank.VimYankGroup
@@ -140,6 +142,10 @@ interface VimInjector {
   val listenersNotifier: VimListenersNotifier
 
   val redrawService: VimRedrawService
+
+  val pluginService: VimPluginService
+
+  val highlightingService: VimHighlightingService
 }
 
 lateinit var injector: VimInjector
