@@ -199,7 +199,12 @@ interface Read {
    * @param requireAll If `true`, returns `null` if fewer than [count] sentences are found.
    * @return The offset of the next sentence start, or `null` if not found or constraints cannot be met.
    */
-  suspend fun getNextSentenceStart(startOffset: Int, count: Int = 1, includeCurrent: Boolean, requireAll: Boolean = true): Int?
+  suspend fun getNextSentenceStart(
+    startOffset: Int,
+    count: Int = 1,
+    includeCurrent: Boolean,
+    requireAll: Boolean = true,
+  ): Int?
 
   /**
    * Find the next section in the editor.
@@ -230,7 +235,12 @@ interface Read {
    * @param requireAll Whether to require all sentence ends to be found
    * @return The offset of the next sentence end, or null if not found
    */
-  suspend fun getNextSentenceEnd(startOffset: Int, count: Int = 1, includeCurrent: Boolean, requireAll: Boolean = true): Int?
+  suspend fun getNextSentenceEnd(
+    startOffset: Int,
+    count: Int = 1,
+    includeCurrent: Boolean,
+    requireAll: Boolean = true,
+  ): Int?
 
   /**
    * Find the next word in the editor's document, from the given starting point

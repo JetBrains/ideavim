@@ -32,5 +32,5 @@ data class Mark(
   /**
    * The file path where the mark is located.
    */
-  val filePath: Path
+  val filePath: Path,
 )

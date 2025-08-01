@@ -27,5 +27,5 @@ data class Jump(
   /**
    * The file path where the jump is located.
    */
-  val filepath: Path
+  val filepath: Path,
 )

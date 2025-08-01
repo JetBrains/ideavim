@@ -19,7 +19,7 @@ import com.intellij.vim.api.scopes.editor.caret.CaretTransaction
  * Scope for editor functions that should be executed under write lock.
  */
 @VimApiDsl
-interface Transaction: Read {
+interface Transaction : Read {
   /**
    * Executes the provided block for each caret in the editor and returns a list of results.
    *
@@ -111,7 +111,12 @@ interface Transaction: Read {
    * @param foregroundColor The foreground color of the highlight, or null for no foreground color
    * @return The ID of the newly created highlight
    */
-  suspend fun addHighlight(startOffset: Int, endOffset: Int, backgroundColor: Color?, foregroundColor: Color?): HighlightId
+  suspend fun addHighlight(
+    startOffset: Int,
+    endOffset: Int,
+    backgroundColor: Color?,
+    foregroundColor: Color?,
+  ): HighlightId
 
   /**
    * Removes a highlight from the editor.

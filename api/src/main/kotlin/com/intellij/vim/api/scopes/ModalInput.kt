@@ -10,10 +10,10 @@ package com.intellij.vim.api.scopes
 
 /**
  * Scope for working with modal input in IdeaVim.
- * 
+ *
  * This scope provides methods for creating and managing modal input dialogs,
  * which can be used to get user input in a Vim-like way.
- * 
+ *
  * The ModalInput interface supports:
  * - Single character input with [inputChar]
  * - String input with [inputString]
@@ -25,20 +25,20 @@ package com.intellij.vim.api.scopes
 interface ModalInput {
   /**
    * Updates the label of the modal input dialog during input processing.
-   * 
+   *
    * This method allows you to dynamically modify the label shown to the user based on the current state.
    *
    * Example usage:
    * ```kotlin
    * modalInput()
-   *   .updateLabel { currentLabel -> 
-   *     "$currentLabel - Updated" 
+   *   .updateLabel { currentLabel ->
+   *     "$currentLabel - Updated"
    *   }
    *   .inputChar("Enter character:") { char ->
    *     // Process the character
    *   }
    * ```
-   * 
+   *
    * @param block A function that takes the current label and returns a new label
    * @return This ModalInput instance for method chaining
    */
@@ -46,16 +46,16 @@ interface ModalInput {
 
   /**
    * Repeats the input operation as long as the specified condition is true.
-   * 
+   *
    * This method allows you to collect multiple inputs from the user until a certain condition is met.
    * The condition is evaluated before each input operation.
-   * 
+   *
    * Example usage:
    * ```kotlin
    * var inputCount = 0
    *
    * modalInput()
-   *   .repeatWhile { 
+   *   .repeatWhile {
    *     inputCount < 3  // Continue until we've received 3 inputs
    *   }
    *   .inputChar("Enter character:") { char ->
@@ -63,7 +63,7 @@ interface ModalInput {
    *     // Process the character
    *   }
    * ```
-   * 
+   *
    * @param condition A function that returns true if the input operation should be repeated
    * @return This ModalInput instance for method chaining
    */
@@ -71,9 +71,9 @@ interface ModalInput {
 
   /**
    * Repeats the input operation a specified number of times.
-   * 
+   *
    * This method allows you to collect a fixed number of inputs from the user.
-   * 
+   *
    * Example usage:
    * ```kotlin
    * modalInput()
@@ -83,7 +83,7 @@ interface ModalInput {
    *     // This handler will be called 3 times
    *   }
    * ```
-   * 
+   *
    * @param count The number of times to repeat the input operation
    * @return This ModalInput instance for method chaining
    */
@@ -91,10 +91,10 @@ interface ModalInput {
 
   /**
    * Creates a modal input dialog for collecting a string from the user.
-   * 
+   *
    * This method displays a dialog with the specified label and waits for the user to enter text.
    * The handler is executed after the user presses ENTER, receiving the entered string as a parameter.
-   * 
+   *
    * Example usage:
    * ```kotlin
    * modalInput()
@@ -103,7 +103,7 @@ interface ModalInput {
    *     println("User entered: $enteredString")
    *   }
    * ```
-   * 
+   *
    * This can be combined with other methods:
    *
    * ```kotlin
@@ -121,11 +121,11 @@ interface ModalInput {
 
   /**
    * Creates a modal input dialog for collecting a single character from the user.
-   * 
+   *
    * This method displays a dialog with the specified label and waits for the user to press a key.
    * The handler is executed immediately after the user presses any key, receiving the entered character as a parameter.
    * Unlike [inputString], this method doesn't require the user to press ENTER.
-   * 
+   *
    * Example usage:
    * ```kotlin
    * vimScope.modalInput()
@@ -138,7 +138,7 @@ interface ModalInput {
    *     }
    *   }
    * ```
-   * 
+   *
    * This can be combined with other methods:
    *
    * ```kotlin

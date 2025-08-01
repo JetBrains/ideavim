@@ -14,7 +14,7 @@ package com.intellij.vim.api
  * @property hexCode The string representation of the color in hex format (#RRGGBB or #RRGGBBAA).
  */
 data class Color(
-  val hexCode: String
+  val hexCode: String,
 ) {
   /**
    * Creates a color from individual RGB(A) components.
@@ -24,7 +24,7 @@ data class Color(
    * @param b Blue component (0-255).
    * @param a Alpha component (0-255), defaults to 255 (fully opaque).
    */
-  constructor(r: Int, g: Int, b: Int, a: Int = 255): this(String.format("#%02x%02x%02x%02x", r, g, b, a))
+  constructor(r: Int, g: Int, b: Int, a: Int = 255) : this(String.format("#%02x%02x%02x%02x", r, g, b, a))
 
   /**
    * The red component of the color (0-255).

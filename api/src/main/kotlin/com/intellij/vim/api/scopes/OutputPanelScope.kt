@@ -20,7 +20,7 @@ interface OutputPanelScope {
 
   /**
    * The label text displayed at the bottom of the output panel.
-   * 
+   *
    * This is used for status information like "-- MORE --" to indicate
    * that there is more content to scroll through.
    */
@@ -28,16 +28,16 @@ interface OutputPanelScope {
 
   /**
    * Sets the text content of the output panel.
-   * 
+   *
    * This replaces any existing text in the panel with the provided text.
-   * 
+   *
    * @param text The new text to display in the output panel.
    */
   fun setText(text: String)
 
   /**
    * Appends text to the existing content of the output panel.
-   * 
+   *
    * @param text The text to append to the current content.
    * @param startNewLine Whether to start the appended text on a new line.
    *                     If true and there is an existing text, a newline character
@@ -48,7 +48,7 @@ interface OutputPanelScope {
 
   /**
    * Sets the label text at the bottom of the output panel.
-   * 
+   *
    * @param label The new label text to display.
    */
   fun setLabel(label: String)

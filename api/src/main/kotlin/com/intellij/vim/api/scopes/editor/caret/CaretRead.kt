@@ -42,7 +42,7 @@ interface CaretRead {
 
   /**
    * The last register that was selected for operations.
-   * 
+   *
    * Example: After using `"ay` to yank into register 'a', this would return 'a'.
    * In VimScript, variable `v:register` contains this value.
    */
@@ -50,21 +50,21 @@ interface CaretRead {
 
   /**
    * The default register used when no register is explicitly specified.
-   * 
+   *
    * In Vim, this is typically the unnamed register (").
    */
   val defaultRegister: Char
 
   /**
    * Indicates whether the current register was explicitly specified by the user.
-   * 
+   *
    * Example: After `"ay`, this would be true; after just `y`, this would be false.
    */
   val isRegisterSpecifiedExplicitly: Boolean
 
   /**
    * Selects a register for subsequent operations.
-   * 
+   *
    * Example: In Vim, pressing `"a` before an operation selects register 'a'.
    *
    * @param register The register to select
@@ -79,7 +79,7 @@ interface CaretRead {
 
   /**
    * Checks if a register is writable.
-   * 
+   *
    * Some registers in Vim are read-only. Examples of read-only registers:
    *  - ':' (last executed command)
    *  - '.' (last inserted text)
@@ -103,16 +103,16 @@ interface CaretRead {
 
   /**
    * Checks if the primary selection register is supported.
-   * 
+   *
    * Example: On Linux, using `"*y` yanks text to the primary selection.
-   * 
+   *
    * @return True if the primary selection register is supported, false otherwise
    */
   suspend fun isPrimaryRegisterSupported(): Boolean
 
   /**
    * The marks for the current visual selection.
-   * 
+   *
    * In Vim, these are the '< and '> marks.
    * Example: After making a visual selection and then pressing ESC, `'<` and `'>` mark the beginning and end.
    * In VimScript `getpos("'<")` and `getpos("'>")` are used to get these marks.
@@ -121,7 +121,7 @@ interface CaretRead {
 
   /**
    * The marks for the last change.
-   * 
+   *
    * In Vim, these are the '[ and '] marks.
    * Example: After a change operation like `cw`, these marks indicate the changed region.
    * In VimScript, `getpos("'[")` and `getpos("']")` are used to get these marks.
@@ -130,10 +130,10 @@ interface CaretRead {
 
   /**
    * Gets the text content of a register.
-   * 
+   *
    * Example: In Vim, `:echo @a` shows the content of register 'a'.
    * In VimScript `getreg('a')` is used to get the content of register 'a'.
-   * 
+   *
    * @param register The register to get text from
    * @return The text content of the register, or null if the register is empty or doesn't exist
    */
@@ -141,9 +141,9 @@ interface CaretRead {
 
   /**
    * Gets the type of text stored in a register (character-wise, line-wise, or block-wise).
-   * 
+   *
    * In VimScript, `getregtype('a')` is used to get the type of register 'a'.
-   * 
+   *
    * @param register The register to get the type from
    * @return The type of text in the register, or null if the register is empty or doesn't exist
    */
@@ -151,9 +151,9 @@ interface CaretRead {
 
   /**
    * Sets the text content and type of a register.
-   * 
+   *
    * In VimScript, `setreg('a', 'text', 'c')` is used to set register 'a' to "text" with character-wise type.
-   * 
+   *
    * @param register The register to set
    * @param text The text to store in the register
    * @param textType The type of text (character-wise, line-wise, or block-wise)
