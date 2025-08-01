@@ -19,6 +19,7 @@ import com.intellij.openapi.editor.ScrollPositionCalculator
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.intellij.openapi.editor.impl.softwrap.SoftWrapAppliancePlaces
+import com.intellij.openapi.editor.textarea.TextComponentEditor
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.impl.LoadTextUtil
 import com.intellij.openapi.fileEditor.impl.text.TextEditorImpl
@@ -490,6 +491,14 @@ private class ColorColumnOptionValueProvider(private val colorColumnOption: Stri
     // If isRightMarginShown is disabled, then we don't show any visual guides, including the right margin
     if (!editor.ij.settings.isRightMarginShown) {
       return VimString.EMPTY
+    }
+
+    // The fallback editor always has an uninitialised value for softMargins, rather than falling back to the global
+    // default. If the global value has been set, the empty value looks like it's been set and we treat it as External.
+    // By returning the global value, we treat it as Default, so we don't reset the value when initialising a new
+    // window/editor's options
+    if (editor.ij is TextComponentEditor) {
+      return getGlobalExternalValue(editor)
     }
 
     val softMargins = editor.ij.settings.softMargins
