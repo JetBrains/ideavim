@@ -14,8 +14,8 @@ import com.intellij.openapi.editor.markup.HighlighterLayer
 import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.editor.markup.TextAttributes
-import com.intellij.vim.api.Color
-import com.intellij.vim.api.HighlightId
+import com.intellij.vim.api.models.Color
+import com.intellij.vim.api.models.HighlightId
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import java.awt.Font

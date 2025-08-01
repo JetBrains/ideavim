@@ -8,10 +8,10 @@
 
 package com.intellij.vim.api.scopes.editor
 
-import com.intellij.vim.api.CaretId
-import com.intellij.vim.api.Color
-import com.intellij.vim.api.HighlightId
-import com.intellij.vim.api.Jump
+import com.intellij.vim.api.models.CaretId
+import com.intellij.vim.api.models.Color
+import com.intellij.vim.api.models.HighlightId
+import com.intellij.vim.api.models.Jump
 import com.intellij.vim.api.scopes.VimApiDsl
 import com.intellij.vim.api.scopes.editor.caret.CaretTransaction
 

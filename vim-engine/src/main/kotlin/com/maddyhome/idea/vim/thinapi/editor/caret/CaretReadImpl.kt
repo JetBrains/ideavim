@@ -8,11 +8,11 @@
 
 package com.maddyhome.idea.vim.thinapi.editor.caret
 
-import com.intellij.vim.api.CaretId
-import com.intellij.vim.api.Line
-import com.intellij.vim.api.Mark
-import com.intellij.vim.api.Range
-import com.intellij.vim.api.TextType
+import com.intellij.vim.api.models.CaretId
+import com.intellij.vim.api.models.Line
+import com.intellij.vim.api.models.Mark
+import com.intellij.vim.api.models.Range
+import com.intellij.vim.api.models.TextType
 import com.intellij.vim.api.scopes.editor.caret.CaretRead
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret

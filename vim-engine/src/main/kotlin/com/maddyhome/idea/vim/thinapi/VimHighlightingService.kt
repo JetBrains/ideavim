@@ -8,8 +8,8 @@
 
 package com.maddyhome.idea.vim.thinapi
 
-import com.intellij.vim.api.Color
-import com.intellij.vim.api.HighlightId
+import com.intellij.vim.api.models.Color
+import com.intellij.vim.api.models.HighlightId
 import com.maddyhome.idea.vim.api.VimEditor
 
 interface VimHighlightingService {

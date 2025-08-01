@@ -8,11 +8,11 @@
 
 package org.jetbrains.plugins.ideavim.thinapi
 
-import com.intellij.vim.api.scopes.VimScope
+import com.intellij.vim.api.VimApi
 import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.key.MappingOwner
-import com.maddyhome.idea.vim.thinapi.VimScopeImpl
+import com.maddyhome.idea.vim.thinapi.VimApiImpl
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -24,7 +24,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class OptionScopeTest : VimTestCase() {
-  private lateinit var vimScope: VimScope
+  private lateinit var myVimApi: VimApi
 
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
@@ -32,14 +32,14 @@ class OptionScopeTest : VimTestCase() {
 
     val listenerOwner = ListenerOwner.Plugin.get("test")
     val mappingOwner = MappingOwner.Plugin.get("test")
-    vimScope = VimScopeImpl(listenerOwner, mappingOwner)
+    myVimApi = VimApiImpl(listenerOwner, mappingOwner)
 
     configureByText("\n")
   }
 
   @Test
   fun `test get option with integer value`() {
-    vimScope.option {
+    myVimApi.option {
       set<Int>("history", 40)
       val result = get<Int>("history")
       assertEquals(40, result)
@@ -48,7 +48,7 @@ class OptionScopeTest : VimTestCase() {
 
   @Test
   fun `test get option with string value`() {
-    vimScope.option {
+    myVimApi.option {
       set<String>("selection", "inclusive")
       val result = get<String>("selection")
       assertEquals("inclusive", result)
@@ -57,7 +57,7 @@ class OptionScopeTest : VimTestCase() {
 
   @Test
   fun `test get option with toggle value`() {
-    vimScope.option {
+    myVimApi.option {
       set<Boolean>("ignorecase", true)
       val result = get<Boolean>("ignorecase")
       assertTrue(result == true)
@@ -66,7 +66,7 @@ class OptionScopeTest : VimTestCase() {
 
   @Test
   fun `test get non-existent option`() {
-    vimScope.option {
+    myVimApi.option {
       val result = get<Int>("nonexistentoption")
       assertNull(result)
     }
@@ -74,7 +74,7 @@ class OptionScopeTest : VimTestCase() {
 
   @Test
   fun `test set global option`() {
-    vimScope.option {
+    myVimApi.option {
       val result = setGlobal<Int>("history", 80)
       assertTrue(result)
 
@@ -85,7 +85,7 @@ class OptionScopeTest : VimTestCase() {
 
   @Test
   fun `test set local option`() {
-    vimScope.option {
+    myVimApi.option {
       val result = setLocal<Int>("history", 20)
       assertTrue(result)
 
@@ -96,7 +96,7 @@ class OptionScopeTest : VimTestCase() {
 
   @Test
   fun `test set effective option`() {
-    vimScope.option {
+    myVimApi.option {
       val result = set<Int>("history", 40)
       assertTrue(result)
 
@@ -107,7 +107,7 @@ class OptionScopeTest : VimTestCase() {
 
   @Test
   fun `test set non-existent option`() {
-    vimScope.option {
+    myVimApi.option {
       val result = set<Int>("nonexistentoption", 42)
       assertFalse(result)
     }
@@ -115,7 +115,7 @@ class OptionScopeTest : VimTestCase() {
 
   @Test
   fun `test reset option`() {
-    vimScope.option {
+    myVimApi.option {
       set<Int>("history", 100)
       assertEquals(100, get<Int>("history"))
 
@@ -129,7 +129,7 @@ class OptionScopeTest : VimTestCase() {
 
   @Test
   fun `test reset non-existent option`() {
-    vimScope.option {
+    myVimApi.option {
       val result = reset("nonexistentoption")
       assertFalse(result)
     }
@@ -137,7 +137,7 @@ class OptionScopeTest : VimTestCase() {
 
   @Test
   fun `test set option with wrong type`() {
-    vimScope.option {
+    myVimApi.option {
       assertThrows<ExException> {
         set<Int>("selection", 42)
       }
@@ -146,7 +146,7 @@ class OptionScopeTest : VimTestCase() {
 
   @Test
   fun `test set toggle option with true value`() {
-    vimScope.option {
+    myVimApi.option {
       val result = set<Boolean>("ignorecase", true)
       assertTrue(result)
 
@@ -157,7 +157,7 @@ class OptionScopeTest : VimTestCase() {
 
   @Test
   fun `test set toggle option with false value`() {
-    vimScope.option {
+    myVimApi.option {
       val result = set<Boolean>("ignorecase", false)
       assertTrue(result)
 
@@ -168,7 +168,7 @@ class OptionScopeTest : VimTestCase() {
 
   @Test
   fun `test set and get multiple options`() {
-    vimScope.option {
+    myVimApi.option {
       set<Int>("history", 40)
       set<Int>("ignorecase", 1)
       set<String>("selection", "inclusive")
@@ -181,7 +181,7 @@ class OptionScopeTest : VimTestCase() {
 
   @Test
   fun `test global vs local option settings`() {
-    vimScope.option {
+    myVimApi.option {
       setGlobal<Int>("history", 100)
 
       setLocal<Int>("history", 20)
@@ -192,7 +192,7 @@ class OptionScopeTest : VimTestCase() {
 
   @Test
   fun `test get integer option as string returns null`() {
-    vimScope.option {
+    myVimApi.option {
       set<Int>("history", 42)
 
       assertThrows<IllegalArgumentException> {
@@ -203,7 +203,7 @@ class OptionScopeTest : VimTestCase() {
 
   @Test
   fun `test get string option as integer returns null`() {
-    vimScope.option {
+    myVimApi.option {
       set<String>("selection", "inclusive")
 
       assertThrows<IllegalArgumentException> {
@@ -214,7 +214,7 @@ class OptionScopeTest : VimTestCase() {
 
   @Test
   fun `test set integer option with string value throws exception`() {
-    vimScope.option {
+    myVimApi.option {
       assertThrows<ExException> {
         set<String>("history", "not-a-number")
       }
@@ -223,7 +223,7 @@ class OptionScopeTest : VimTestCase() {
 
   @Test
   fun `test set boolean option with string value throws exception`() {
-    vimScope.option {
+    myVimApi.option {
       assertThrows<ExException> {
         set<String>("ignorecase", "not-a-boolean")
       }

@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.intellij.vim.api
+package com.intellij.vim.api.models
 
 
 /**

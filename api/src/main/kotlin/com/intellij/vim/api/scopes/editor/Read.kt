@@ -8,13 +8,13 @@
 
 package com.intellij.vim.api.scopes.editor
 
-import com.intellij.vim.api.CaretData
-import com.intellij.vim.api.CaretId
-import com.intellij.vim.api.Jump
-import com.intellij.vim.api.Line
-import com.intellij.vim.api.Mark
-import com.intellij.vim.api.Path
-import com.intellij.vim.api.Range
+import com.intellij.vim.api.models.CaretData
+import com.intellij.vim.api.models.CaretId
+import com.intellij.vim.api.models.Jump
+import com.intellij.vim.api.models.Line
+import com.intellij.vim.api.models.Mark
+import com.intellij.vim.api.models.Path
+import com.intellij.vim.api.models.Range
 import com.intellij.vim.api.scopes.VimApiDsl
 
 /**

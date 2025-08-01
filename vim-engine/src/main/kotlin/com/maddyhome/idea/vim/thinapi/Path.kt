@@ -8,7 +8,7 @@
 
 package com.maddyhome.idea.vim.thinapi
 
-import com.intellij.vim.api.Path
+import com.intellij.vim.api.models.Path
 import java.nio.file.Paths
 import java.nio.file.Path as JavaPath
 

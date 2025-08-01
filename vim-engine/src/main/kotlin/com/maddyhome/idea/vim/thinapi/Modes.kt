@@ -8,7 +8,7 @@
 
 package com.maddyhome.idea.vim.thinapi
 
-import com.intellij.vim.api.Mode
+import com.intellij.vim.api.models.Mode
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector

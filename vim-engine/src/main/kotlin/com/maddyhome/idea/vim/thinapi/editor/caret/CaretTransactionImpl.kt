@@ -8,9 +8,9 @@
 
 package com.maddyhome.idea.vim.thinapi.editor.caret
 
-import com.intellij.vim.api.CaretId
-import com.intellij.vim.api.Line
-import com.intellij.vim.api.Range
+import com.intellij.vim.api.models.CaretId
+import com.intellij.vim.api.models.Line
+import com.intellij.vim.api.models.Range
 import com.intellij.vim.api.scopes.editor.Read
 import com.intellij.vim.api.scopes.editor.caret.CaretRead
 import com.intellij.vim.api.scopes.editor.caret.CaretTransaction

@@ -8,7 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.thinapi
 
-import com.intellij.vim.api.scopes.VimScope
+import com.intellij.vim.api.VimApi
 import com.maddyhome.idea.vim.api.VimDigraphGroup
 import com.maddyhome.idea.vim.api.VimDigraphGroupBase
 import com.maddyhome.idea.vim.api.VimEditor
@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.thinapi.VimScopeImpl
+import com.maddyhome.idea.vim.thinapi.VimApiImpl
 import org.jetbrains.plugins.ideavim.mock.MockTestCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -31,7 +31,7 @@ import org.mockito.kotlin.verify
 import kotlin.test.assertTrue
 
 class DigraphScopeTest : MockTestCase() {
-  private lateinit var vimScope: VimScope
+  private lateinit var myVimApi: VimApi
   private lateinit var digraphGroup: VimDigraphGroup
   private lateinit var vimEditor: VimEditor
   private lateinit var mockInjector: VimInjector
@@ -44,7 +44,7 @@ class DigraphScopeTest : MockTestCase() {
 
     val listenerOwner = ListenerOwner.Plugin.get("test")
     val mappingOwner = MappingOwner.Plugin.get("test")
-    vimScope = VimScopeImpl(listenerOwner, mappingOwner)
+    myVimApi = VimApiImpl(listenerOwner, mappingOwner)
 
     mockInjector = spy(injector)
 
@@ -79,7 +79,7 @@ class DigraphScopeTest : MockTestCase() {
     val ch1 = 'a'
     val ch2 = 'b'
 
-    vimScope.digraph {
+    myVimApi.digraph {
       getCharacter(ch1, ch2)
     }
 
@@ -92,7 +92,7 @@ class DigraphScopeTest : MockTestCase() {
     val ch2 = 'b'
     val codepoint = 228
 
-    vimScope.digraph {
+    myVimApi.digraph {
       add(ch1, ch2, codepoint)
     }
 
@@ -103,7 +103,7 @@ class DigraphScopeTest : MockTestCase() {
 
   @Test
   fun `test clearCustomDigraphs`() {
-    vimScope.digraph {
+    myVimApi.digraph {
       clearCustomDigraphs()
     }
 

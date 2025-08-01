@@ -8,12 +8,12 @@
 
 package org.jetbrains.plugins.ideavim.thinapi.vimscope
 
-import com.intellij.vim.api.Mode
-import com.intellij.vim.api.scopes.VimScope
+import com.intellij.vim.api.VimApi
+import com.intellij.vim.api.models.Mode
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.key.MappingOwner
-import com.maddyhome.idea.vim.thinapi.VimScopeImpl
+import com.maddyhome.idea.vim.thinapi.VimApiImpl
 import com.maddyhome.idea.vim.thinapi.toEngineMode
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.BeforeEach
@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 
 class ModeTest : VimTestCase() {
-  private lateinit var vimScope: VimScope
+  private lateinit var myVimApi: VimApi
 
   fun execute(block: () -> Unit) {
     injector.application.invokeAndWait {
@@ -35,7 +35,7 @@ class ModeTest : VimTestCase() {
 
     val listenerOwner = ListenerOwner.Plugin.get("test")
     val mappingOwner = MappingOwner.Plugin.get("test")
-    vimScope = VimScopeImpl(listenerOwner, mappingOwner)
+    myVimApi = VimApiImpl(listenerOwner, mappingOwner)
 
     configureByText("\n")
   }
@@ -54,7 +54,7 @@ class ModeTest : VimTestCase() {
   fun `test set normal mode`() {
     val normalMode = Mode.NORMAL()
     execute {
-      vimScope.mode = normalMode
+      vimApi.mode = normalMode
     }
 
     verifyCurrentMode(normalMode)
@@ -64,7 +64,7 @@ class ModeTest : VimTestCase() {
   fun `test set insert mode`() {
     val insertMode = Mode.INSERT
     execute {
-      vimScope.mode = insertMode
+      vimApi.mode = insertMode
     }
 
     verifyCurrentMode(insertMode)
@@ -74,7 +74,7 @@ class ModeTest : VimTestCase() {
   fun `test set replace mode`() {
     val replaceMode = Mode.REPLACE
     execute {
-      vimScope.mode = replaceMode
+      vimApi.mode = replaceMode
     }
 
     verifyCurrentMode(replaceMode)
@@ -84,7 +84,7 @@ class ModeTest : VimTestCase() {
   fun `test set visual character mode`() {
     val visualMode = Mode.VISUAL(TextType.CHARACTER_WISE)
     execute {
-      vimScope.mode = visualMode
+      vimApi.mode = visualMode
     }
 
     verifyCurrentMode(visualMode)
@@ -94,7 +94,7 @@ class ModeTest : VimTestCase() {
   fun `test set visual line mode`() {
     val visualMode = Mode.VISUAL(TextType.LINE_WISE)
     execute {
-      vimScope.mode = visualMode
+      vimApi.mode = visualMode
     }
 
     verifyCurrentMode(visualMode)
@@ -104,7 +104,7 @@ class ModeTest : VimTestCase() {
   fun `test set visual block mode`() {
     val visualMode = Mode.VISUAL(TextType.BLOCK_WISE)
     execute {
-      vimScope.mode = visualMode
+      vimApi.mode = visualMode
     }
 
     verifyCurrentMode(visualMode)
@@ -114,7 +114,7 @@ class ModeTest : VimTestCase() {
   fun `test set select character mode`() {
     val selectMode = Mode.SELECT(TextType.CHARACTER_WISE)
     execute {
-      vimScope.mode = selectMode
+      vimApi.mode = selectMode
     }
 
     verifyCurrentMode(selectMode)
@@ -124,7 +124,7 @@ class ModeTest : VimTestCase() {
   fun `test set select line mode`() {
     val selectMode = Mode.SELECT(TextType.LINE_WISE)
     execute {
-      vimScope.mode = selectMode
+      vimApi.mode = selectMode
     }
 
     verifyCurrentMode(selectMode)
@@ -134,7 +134,7 @@ class ModeTest : VimTestCase() {
   fun `test set select block mode`() {
     val selectMode = Mode.SELECT(TextType.BLOCK_WISE)
     execute {
-      vimScope.mode = selectMode
+      vimApi.mode = selectMode
     }
 
     verifyCurrentMode(selectMode)
@@ -144,7 +144,7 @@ class ModeTest : VimTestCase() {
   fun `test set command line mode`() {
     val cmdLineMode = Mode.CMD_LINE(Mode.NORMAL())
     execute {
-      vimScope.mode = cmdLineMode
+      vimApi.mode = cmdLineMode
     }
 
     verifyCurrentMode(cmdLineMode)
@@ -154,7 +154,7 @@ class ModeTest : VimTestCase() {
   fun `test set operator pending mode`() {
     val opPendingMode = Mode.OP_PENDING(Mode.NORMAL())
     execute {
-      vimScope.mode = opPendingMode
+      vimApi.mode = opPendingMode
     }
 
     verifyCurrentMode(opPendingMode)
@@ -164,14 +164,14 @@ class ModeTest : VimTestCase() {
   fun `test transition from normal to insert mode`() {
     val normalMode = Mode.NORMAL()
     execute {
-      vimScope.mode = normalMode
+      vimApi.mode = normalMode
     }
 
     verifyCurrentMode(normalMode)
 
     val insertMode = Mode.INSERT
     execute {
-      vimScope.mode = insertMode
+      vimApi.mode = insertMode
     }
 
     verifyCurrentMode(insertMode)
@@ -181,13 +181,13 @@ class ModeTest : VimTestCase() {
   fun `test transition from insert to normal mode`() {
     val insertMode = Mode.INSERT
     execute {
-      vimScope.mode = insertMode
+      vimApi.mode = insertMode
     }
     verifyCurrentMode(insertMode)
 
     val normalMode = Mode.NORMAL()
     execute {
-      vimScope.mode = normalMode
+      vimApi.mode = normalMode
     }
     verifyCurrentMode(normalMode)
   }
@@ -196,13 +196,13 @@ class ModeTest : VimTestCase() {
   fun `test transition from visual character to normal mode`() {
     val visualMode = Mode.VISUAL(TextType.CHARACTER_WISE)
     execute {
-      vimScope.mode = visualMode
+      vimApi.mode = visualMode
     }
     verifyCurrentMode(visualMode)
 
     val normalMode = Mode.NORMAL()
     execute {
-      vimScope.mode = normalMode
+      vimApi.mode = normalMode
     }
     verifyCurrentMode(normalMode)
   }
@@ -211,13 +211,13 @@ class ModeTest : VimTestCase() {
   fun `test transition from visual line to normal mode`() {
     val visualMode = Mode.VISUAL(TextType.LINE_WISE)
     execute {
-      vimScope.mode = visualMode
+      vimApi.mode = visualMode
     }
     verifyCurrentMode(visualMode)
 
     val normalMode = Mode.NORMAL()
     execute {
-      vimScope.mode = normalMode
+      vimApi.mode = normalMode
     }
     verifyCurrentMode(normalMode)
   }
@@ -226,13 +226,13 @@ class ModeTest : VimTestCase() {
   fun `test transition from visual block to normal mode`() {
     val visualMode = Mode.VISUAL(TextType.BLOCK_WISE)
     execute {
-      vimScope.mode = visualMode
+      vimApi.mode = visualMode
     }
     verifyCurrentMode(visualMode)
 
     val normalMode = Mode.NORMAL()
     execute {
-      vimScope.mode = normalMode
+      vimApi.mode = normalMode
     }
     verifyCurrentMode(normalMode)
   }
@@ -241,13 +241,13 @@ class ModeTest : VimTestCase() {
   fun `test transition from select character to normal mode`() {
     val selectMode = Mode.SELECT(TextType.CHARACTER_WISE)
     execute {
-      vimScope.mode = selectMode
+      vimApi.mode = selectMode
     }
     verifyCurrentMode(selectMode)
 
     val normalMode = Mode.NORMAL()
     execute {
-      vimScope.mode = normalMode
+      vimApi.mode = normalMode
     }
     verifyCurrentMode(normalMode)
   }
@@ -256,13 +256,13 @@ class ModeTest : VimTestCase() {
   fun `test transition between visual character and visual line modes`() {
     val visualCharMode = Mode.VISUAL(TextType.CHARACTER_WISE)
     execute {
-      vimScope.mode = visualCharMode
+      vimApi.mode = visualCharMode
     }
     verifyCurrentMode(visualCharMode)
 
     val visualLineMode = Mode.VISUAL(TextType.LINE_WISE)
     execute {
-      vimScope.mode = visualLineMode
+      vimApi.mode = visualLineMode
     }
     verifyCurrentMode(visualLineMode)
   }
@@ -271,13 +271,13 @@ class ModeTest : VimTestCase() {
   fun `test transition between visual line and visual block modes`() {
     val visualLineMode = Mode.VISUAL(TextType.LINE_WISE)
     execute {
-      vimScope.mode = visualLineMode
+      vimApi.mode = visualLineMode
     }
     verifyCurrentMode(visualLineMode)
 
     val visualBlockMode = Mode.VISUAL(TextType.BLOCK_WISE)
     execute {
-      vimScope.mode = visualBlockMode
+      vimApi.mode = visualBlockMode
     }
     verifyCurrentMode(visualBlockMode)
   }
@@ -286,13 +286,13 @@ class ModeTest : VimTestCase() {
   fun `test transition between visual block and visual character modes`() {
     val visualBlockMode = Mode.VISUAL(TextType.BLOCK_WISE)
     execute {
-      vimScope.mode = visualBlockMode
+      vimApi.mode = visualBlockMode
     }
     verifyCurrentMode(visualBlockMode)
 
     val visualCharMode = Mode.VISUAL(TextType.CHARACTER_WISE)
     execute {
-      vimScope.mode = visualCharMode
+      vimApi.mode = visualCharMode
     }
     verifyCurrentMode(visualCharMode)
   }
@@ -301,13 +301,13 @@ class ModeTest : VimTestCase() {
   fun `test transition from visual to select mode`() {
     val visualMode = Mode.VISUAL(TextType.CHARACTER_WISE)
     execute {
-      vimScope.mode = visualMode
+      vimApi.mode = visualMode
     }
     verifyCurrentMode(visualMode)
 
     val selectMode = Mode.SELECT(TextType.CHARACTER_WISE)
     execute {
-      vimScope.mode = selectMode
+      vimApi.mode = selectMode
     }
     verifyCurrentMode(selectMode)
   }
@@ -316,13 +316,13 @@ class ModeTest : VimTestCase() {
   fun `test transition from select to visual mode`() {
     val selectMode = Mode.SELECT(TextType.CHARACTER_WISE)
     execute {
-      vimScope.mode = selectMode
+      vimApi.mode = selectMode
     }
     verifyCurrentMode(selectMode)
 
     val visualMode = Mode.VISUAL(TextType.CHARACTER_WISE)
     execute {
-      vimScope.mode = visualMode
+      vimApi.mode = visualMode
     }
     verifyCurrentMode(visualMode)
   }
@@ -331,13 +331,13 @@ class ModeTest : VimTestCase() {
   fun `test transition from command line to normal mode`() {
     val cmdLineMode = Mode.CMD_LINE(Mode.NORMAL())
     execute {
-      vimScope.mode = cmdLineMode
+      vimApi.mode = cmdLineMode
     }
     verifyCurrentMode(cmdLineMode)
 
     val normalMode = Mode.NORMAL()
     execute {
-      vimScope.mode = normalMode
+      vimApi.mode = normalMode
     }
     verifyCurrentMode(normalMode)
   }
@@ -346,13 +346,13 @@ class ModeTest : VimTestCase() {
   fun `test transition from operator pending to normal mode`() {
     val opPendingMode = Mode.OP_PENDING(Mode.NORMAL())
     execute {
-      vimScope.mode = opPendingMode
+      vimApi.mode = opPendingMode
     }
     verifyCurrentMode(opPendingMode)
 
     val normalMode = Mode.NORMAL()
     execute {
-      vimScope.mode = normalMode
+      vimApi.mode = normalMode
     }
     verifyCurrentMode(normalMode)
   }
@@ -361,13 +361,13 @@ class ModeTest : VimTestCase() {
   fun `test transition from replace to normal mode`() {
     val replaceMode = Mode.REPLACE
     execute {
-      vimScope.mode = replaceMode
+      vimApi.mode = replaceMode
     }
     verifyCurrentMode(replaceMode)
 
     val normalMode = Mode.NORMAL()
     execute {
-      vimScope.mode = normalMode
+      vimApi.mode = normalMode
     }
     verifyCurrentMode(normalMode)
   }
@@ -376,13 +376,13 @@ class ModeTest : VimTestCase() {
   fun `test transition from normal to replace mode`() {
     val normalMode = Mode.NORMAL()
     execute {
-      vimScope.mode = normalMode
+      vimApi.mode = normalMode
     }
     verifyCurrentMode(normalMode)
 
     val replaceMode = Mode.REPLACE
     execute {
-      vimScope.mode = replaceMode
+      vimApi.mode = replaceMode
     }
     verifyCurrentMode(replaceMode)
   }
@@ -391,13 +391,13 @@ class ModeTest : VimTestCase() {
   fun `test transition from insert to replace mode`() {
     val insertMode = Mode.INSERT
     execute {
-      vimScope.mode = insertMode
+      vimApi.mode = insertMode
     }
     verifyCurrentMode(insertMode)
 
     val replaceMode = Mode.REPLACE
     execute {
-      vimScope.mode = replaceMode
+      vimApi.mode = replaceMode
     }
     verifyCurrentMode(replaceMode)
   }
@@ -406,13 +406,13 @@ class ModeTest : VimTestCase() {
   fun `test transition from replace to insert mode`() {
     val replaceMode = Mode.REPLACE
     execute {
-      vimScope.mode = replaceMode
+      vimApi.mode = replaceMode
     }
     verifyCurrentMode(replaceMode)
 
     val insertMode = Mode.INSERT
     execute {
-      vimScope.mode = insertMode
+      vimApi.mode = insertMode
     }
     verifyCurrentMode(insertMode)
   }
@@ -421,13 +421,13 @@ class ModeTest : VimTestCase() {
   fun `test transition from normal to command line mode`() {
     val normalMode = Mode.NORMAL()
     execute {
-      vimScope.mode = normalMode
+      vimApi.mode = normalMode
     }
     verifyCurrentMode(normalMode)
 
     val cmdLineMode = Mode.CMD_LINE(Mode.NORMAL())
     execute {
-      vimScope.mode = cmdLineMode
+      vimApi.mode = cmdLineMode
     }
     verifyCurrentMode(cmdLineMode)
   }
@@ -436,13 +436,13 @@ class ModeTest : VimTestCase() {
   fun `test transition from normal to operator pending mode`() {
     val normalMode = Mode.NORMAL()
     execute {
-      vimScope.mode = normalMode
+      vimApi.mode = normalMode
     }
     verifyCurrentMode(normalMode)
 
     val opPendingMode = Mode.OP_PENDING(Mode.NORMAL())
     execute {
-      vimScope.mode = opPendingMode
+      vimApi.mode = opPendingMode
     }
     verifyCurrentMode(opPendingMode)
   }
@@ -451,13 +451,13 @@ class ModeTest : VimTestCase() {
   fun `test transition from normal to visual character mode`() {
     val normalMode = Mode.NORMAL()
     execute {
-      vimScope.mode = normalMode
+      vimApi.mode = normalMode
     }
     verifyCurrentMode(normalMode)
 
     val visualMode = Mode.VISUAL(TextType.CHARACTER_WISE)
     execute {
-      vimScope.mode = visualMode
+      vimApi.mode = visualMode
     }
     verifyCurrentMode(visualMode)
   }
@@ -466,13 +466,13 @@ class ModeTest : VimTestCase() {
   fun `test transition from normal to visual line mode`() {
     val normalMode = Mode.NORMAL()
     execute {
-      vimScope.mode = normalMode
+      vimApi.mode = normalMode
     }
     verifyCurrentMode(normalMode)
 
     val visualMode = Mode.VISUAL(TextType.LINE_WISE)
     execute {
-      vimScope.mode = visualMode
+      vimApi.mode = visualMode
     }
     verifyCurrentMode(visualMode)
   }
@@ -481,13 +481,13 @@ class ModeTest : VimTestCase() {
   fun `test transition from normal to visual block mode`() {
     val normalMode = Mode.NORMAL()
     execute {
-      vimScope.mode = normalMode
+      vimApi.mode = normalMode
     }
     verifyCurrentMode(normalMode)
 
     val visualMode = Mode.VISUAL(TextType.BLOCK_WISE)
     execute {
-      vimScope.mode = visualMode
+      vimApi.mode = visualMode
     }
     verifyCurrentMode(visualMode)
   }
@@ -496,13 +496,13 @@ class ModeTest : VimTestCase() {
   fun `test transition from normal to select character mode`() {
     val normalMode = Mode.NORMAL()
     execute {
-      vimScope.mode = normalMode
+      vimApi.mode = normalMode
     }
     verifyCurrentMode(normalMode)
 
     val selectMode = Mode.SELECT(TextType.CHARACTER_WISE)
     execute {
-      vimScope.mode = selectMode
+      vimApi.mode = selectMode
     }
     verifyCurrentMode(selectMode)
   }
@@ -511,13 +511,13 @@ class ModeTest : VimTestCase() {
   fun `test transition from normal to select line mode`() {
     val normalMode = Mode.NORMAL()
     execute {
-      vimScope.mode = normalMode
+      vimApi.mode = normalMode
     }
     verifyCurrentMode(normalMode)
 
     val selectMode = Mode.SELECT(TextType.LINE_WISE)
     execute {
-      vimScope.mode = selectMode
+      vimApi.mode = selectMode
     }
     verifyCurrentMode(selectMode)
   }
@@ -526,13 +526,13 @@ class ModeTest : VimTestCase() {
   fun `test transition from normal to select block mode`() {
     val normalMode = Mode.NORMAL()
     execute {
-      vimScope.mode = normalMode
+      vimApi.mode = normalMode
     }
     verifyCurrentMode(normalMode)
 
     val selectMode = Mode.SELECT(TextType.BLOCK_WISE)
     execute {
-      vimScope.mode = selectMode
+      vimApi.mode = selectMode
     }
     verifyCurrentMode(selectMode)
   }

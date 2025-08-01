@@ -1,8 +1,8 @@
 # API Reference
 
-## VimScope
+## VimApi
 
-The `VimScope` class is the main entry point for interacting with the Vim editor. It provides access to various functionalities like variable management, window operations, and text manipulation.
+The `VimApi` class is the main entry point for interacting with the Vim editor. It provides access to various functionalities like variable management, window operations, and text manipulation.
 
 ### Properties
 
@@ -23,11 +23,11 @@ The `VimScope` class is the main entry point for interacting with the Vim editor
 
 #### Operator Functions
 
-| Method | Description | Return Value |
-|--------|-------------|--------------|
-| `exportOperatorFunction(name: String, function: suspend VimScope.() -> Boolean)` | Exports a function as an operator function. | None |
-| `setOperatorFunction(name: String)` | Sets the operator function to use. | None |
-| `normal(command: String)` | Executes a normal mode command. | None |
+| Method                                                                         | Description | Return Value |
+|--------------------------------------------------------------------------------|-------------|--------------|
+| `exportOperatorFunction(name: String, function: suspend VimApi.() -> Boolean)` | Exports a function as an operator function. | None |
+| `setOperatorFunction(name: String)`                                            | Sets the operator function to use. | None |
+| `normal(command: String)`                                                      | Executes a normal mode command. | None |
 
 #### Editor Operations
 
@@ -78,10 +78,10 @@ The `VimScope` class is the main entry point for interacting with the Vim editor
 
 #### Script Execution
 
-| Method | Description | Return Value |
-|--------|-------------|--------------|
-| `execute(script: String): Boolean` | Parses and executes the given Vimscript string. It can be used to execute ex commands, such as `:set`, `:map`, etc. | The result of the execution, which can be Success or Error. |
-| `command(command: String, block: VimScope.(String) -> Unit)` | Defines a new command. | None |
+| Method                                                     | Description | Return Value |
+|------------------------------------------------------------|-------------|--------------|
+| `execute(script: String): Boolean`                         | Parses and executes the given Vimscript string. It can be used to execute ex commands, such as `:set`, `:map`, etc. | The result of the execution, which can be Success or Error. |
+| `command(command: String, block: VimApi.(String) -> Unit)` | Defines a new command. | None |
 
 #### Data Storage
 
@@ -388,14 +388,14 @@ The `ModalInput` interface provides methods for creating and managing modal inpu
 
 ### Methods
 
-| Method | Description | Return Value |
-|--------|-------------|--------------|
-| `updateLabel(block: (String) -> String): ModalInput` | Updates the label of the modal input dialog using the provided function. | The ModalInput instance for method chaining. |
-| `repeatWhile(condition: () -> Boolean): ModalInput` | Repeats the modal input dialog while the provided condition is true. | The ModalInput instance for method chaining. |
-| `repeat(count: Int): ModalInput` | Repeats the modal input dialog the specified number of times. | The ModalInput instance for method chaining. |
-| `inputString(label: String, handler: VimScope.(String) -> Unit)` | Creates a modal input dialog with the given label and handler. The handler will be executed after the user presses ENTER. | None |
-| `inputChar(label: String, handler: VimScope.(Char) -> Unit)` | Creates a modal input dialog with the given label and handler. The handler will be executed after the user enters a character. | None |
-| `closeCurrentInput(refocusEditor: Boolean = true): Boolean` | Closes the current modal input dialog, if any. If refocusEditor is true, the editor will be refocused after closing the dialog. | True if a dialog was closed, false otherwise. |
+| Method                                                         | Description | Return Value |
+|----------------------------------------------------------------|-------------|--------------|
+| `updateLabel(block: (String) -> String): ModalInput`           | Updates the label of the modal input dialog using the provided function. | The ModalInput instance for method chaining. |
+| `repeatWhile(condition: () -> Boolean): ModalInput`            | Repeats the modal input dialog while the provided condition is true. | The ModalInput instance for method chaining. |
+| `repeat(count: Int): ModalInput`                               | Repeats the modal input dialog the specified number of times. | The ModalInput instance for method chaining. |
+| `inputString(label: String, handler: VimApi.(String) -> Unit)` | Creates a modal input dialog with the given label and handler. The handler will be executed after the user presses ENTER. | None |
+| `inputChar(label: String, handler: VimApi.(Char) -> Unit)`     | Creates a modal input dialog with the given label and handler. The handler will be executed after the user enters a character. | None |
+| `closeCurrentInput(refocusEditor: Boolean = true): Boolean`    | Closes the current modal input dialog, if any. If refocusEditor is true, the editor will be refocused after closing the dialog. | True if a dialog was closed, false otherwise. |
 
 ## ListenerScope
 
@@ -405,33 +405,33 @@ The `ListenerScope` interface provides methods for registering callbacks for var
 
 #### Mode and Action Listeners
 
-| Method | Description | Return Value |
-|--------|-------------|--------------|
-| `onModeChange(callback: suspend VimScope.(Mode) -> Unit)` | Registers a callback that is invoked when the editor mode changes (e.g., from Normal to Insert). | None |
-| `onYank(callback: suspend VimScope.(Map<CaretId, Range.Simple>) -> Unit)` | Registers a callback that is invoked when text is yanked. The callback receives a map of caret IDs to yanked text ranges. | None |
+| Method                                                                  | Description | Return Value |
+|-------------------------------------------------------------------------|-------------|--------------|
+| `onModeChange(callback: suspend VimApi.(Mode) -> Unit)`                 | Registers a callback that is invoked when the editor mode changes (e.g., from Normal to Insert). | None |
+| `onYank(callback: suspend VimApi.(Map<CaretId, Range.Simple>) -> Unit)` | Registers a callback that is invoked when text is yanked. The callback receives a map of caret IDs to yanked text ranges. | None |
 
 #### Editor Lifecycle Listeners
 
-| Method | Description | Return Value |
-|--------|-------------|--------------|
-| `onEditorCreate(callback: suspend VimScope.() -> Unit)` | Registers a callback that is invoked when a new editor is created. | None |
-| `onEditorRelease(callback: suspend VimScope.() -> Unit)` | Registers a callback that is invoked when an editor is released (closed). | None |
-| `onEditorFocusGain(callback: suspend VimScope.() -> Unit)` | Registers a callback that is invoked when an editor gains focus. | None |
-| `onEditorFocusLost(callback: suspend VimScope.() -> Unit)` | Registers a callback that is invoked when an editor loses focus. | None |
+| Method                                                   | Description | Return Value |
+|----------------------------------------------------------|-------------|--------------|
+| `onEditorCreate(callback: suspend VimApi.() -> Unit)`    | Registers a callback that is invoked when a new editor is created. | None |
+| `onEditorRelease(callback: suspend VimApi.() -> Unit)`   | Registers a callback that is invoked when an editor is released (closed). | None |
+| `onEditorFocusGain(callback: suspend VimApi.() -> Unit)` | Registers a callback that is invoked when an editor gains focus. | None |
+| `onEditorFocusLost(callback: suspend VimApi.() -> Unit)` | Registers a callback that is invoked when an editor loses focus. | None |
 
 #### Macro Recording Listeners
 
-| Method | Description | Return Value |
-|--------|-------------|--------------|
-| `onMacroRecordingStart(callback: suspend VimScope.() -> Unit)` | Registers a callback that is invoked when macro recording starts. | None |
-| `onMacroRecordingFinish(callback: suspend VimScope.() -> Unit)` | Registers a callback that is invoked when macro recording finishes. | None |
+| Method                                                        | Description | Return Value |
+|---------------------------------------------------------------|-------------|--------------|
+| `onMacroRecordingStart(callback: suspend VimApi.() -> Unit)`  | Registers a callback that is invoked when macro recording starts. | None |
+| `onMacroRecordingFinish(callback: suspend VimApi.() -> Unit)` | Registers a callback that is invoked when macro recording finishes. | None |
 
 #### Plugin State Listeners
 
-| Method | Description | Return Value |
-|--------|-------------|--------------|
-| `onIdeaVimEnabled(callback: suspend VimScope.() -> Unit)` | Registers a callback that is invoked when IdeaVim is enabled. | None |
-| `onIdeaVimDisabled(callback: suspend VimScope.() -> Unit)` | Registers a callback that is invoked when IdeaVim is disabled. | None |
+| Method                                                   | Description | Return Value |
+|----------------------------------------------------------|-------------|--------------|
+| `onIdeaVimEnabled(callback: suspend VimApi.() -> Unit)`  | Registers a callback that is invoked when IdeaVim is enabled. | None |
+| `onIdeaVimDisabled(callback: suspend VimApi.() -> Unit)` | Registers a callback that is invoked when IdeaVim is disabled. | None |
 
 ## DigraphScope
 
@@ -451,11 +451,11 @@ The `CommandLineScope` class provides methods for interacting with the Vim comma
 
 ### Methods
 
-| Method | Description | Return Value |
-|--------|-------------|--------------|
-| `input(prompt: String, finishOn: Char? = null, callback: VimScope.(String) -> Unit)` | Reads input from the command line and processes it with the provided function. | None |
-| `read<T>(block: suspend CommandLineRead.() -> T): Deferred<T>` | Executes a block of code in the context of read operations on the command line. This allows for reading the command line state without modifying it. | A Deferred result of the block execution. |
-| `change(block: suspend CommandLineTransaction.() -> Unit): Job` | Executes a block of code in the context of transaction operations on the command line. This allows for modifying the command line state. | A Job representing the asynchronous operation. |
+| Method                                                                             | Description | Return Value |
+|------------------------------------------------------------------------------------|-------------|--------------|
+| `input(prompt: String, finishOn: Char? = null, callback: VimApi.(String) -> Unit)` | Reads input from the command line and processes it with the provided function. | None |
+| `read<T>(block: suspend CommandLineRead.() -> T): Deferred<T>`                     | Executes a block of code in the context of read operations on the command line. This allows for reading the command line state without modifying it. | A Deferred result of the block execution. |
+| `change(block: suspend CommandLineTransaction.() -> Unit): Job`                    | Executes a block of code in the context of transaction operations on the command line. This allows for modifying the command line state. | A Job representing the asynchronous operation. |
 
 ## CommandLineRead
 

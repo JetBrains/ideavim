@@ -8,7 +8,7 @@
 
 package com.intellij.vim.api.scopes.editor.caret
 
-import com.intellij.vim.api.Range
+import com.intellij.vim.api.models.Range
 import com.intellij.vim.api.scopes.VimApiDsl
 import com.intellij.vim.api.scopes.editor.Read
 

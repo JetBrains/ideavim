@@ -38,18 +38,18 @@ class IjExtensionLoader : ExtensionLoader {
   private val enabledExtensions: MutableMap<String, ExtensionBean> = mutableMapOf()
 
   /**
-   * Creates a VimScope for the specified extension.
+   * Creates a VimApi for the specified extension.
    *
-   * The VimScope provides extension-specific context for mappings and listeners,
+   * The VimApi provides extension-specific context for mappings and listeners,
    * allowing the extension to register its functionality in an isolated manner.
    *
    * @param name The name of the extension for which to create a scope.
-   * @return A [VimScopeImpl] instance configured for the specified extension.
+   * @return A [VimApiImpl] instance configured for the specified extension.
    */
-  private fun createVimScope(name: String): VimScopeImpl{
+  private fun createVimApi(name: String): VimApiImpl {
     val mappingOwner = MappingOwner.Plugin.Companion.get(name)
     val listenerOwner = ListenerOwner.Plugin.Companion.get(name)
-    return VimScopeImpl(listenerOwner, mappingOwner)
+    return VimApiImpl(listenerOwner, mappingOwner)
   }
 
   /**
@@ -76,7 +76,7 @@ class IjExtensionLoader : ExtensionLoader {
     enabledExtensions[name] = extension
 
     // call init method
-    extension.toLazyExtension()?.instance?.invoke(createVimScope(name))
+    extension.toLazyExtension()?.instance?.invoke(createVimApi(name))
   }
 
   /**

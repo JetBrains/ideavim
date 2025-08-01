@@ -8,13 +8,13 @@
 
 package org.jetbrains.plugins.ideavim.thinapi.editor.caret
 
-import com.intellij.vim.api.Range
-import com.intellij.vim.api.scopes.VimScope
+import com.intellij.vim.api.models.Range
+import com.intellij.vim.api.VimApi
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.thinapi.VimScopeImpl
+import com.maddyhome.idea.vim.thinapi.VimApiImpl
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -26,7 +26,7 @@ import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
 
 class CaretTransactionTest : VimTestCase() {
-  private lateinit var vimScope: VimScope
+  private lateinit var myVimApi: VimApi
 
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
@@ -34,7 +34,7 @@ class CaretTransactionTest : VimTestCase() {
 
     val listenerOwner = ListenerOwner.Plugin.get("test")
     val mappingOwner = MappingOwner.Plugin.get("test")
-    vimScope = VimScopeImpl(listenerOwner, mappingOwner)
+    myVimApi = VimApiImpl(listenerOwner, mappingOwner)
 
     configureByText("\n")
   }
@@ -55,7 +55,7 @@ class CaretTransactionTest : VimTestCase() {
     configureByText(text)
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             deleteText(4, 8)
@@ -73,7 +73,7 @@ class CaretTransactionTest : VimTestCase() {
     configureByText(text)
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             updateCaret(8)
@@ -91,7 +91,7 @@ class CaretTransactionTest : VimTestCase() {
     configureByText(text)
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             updateCaret(7, Range.Simple(4, 7))
@@ -109,7 +109,7 @@ class CaretTransactionTest : VimTestCase() {
     configureByText(text)
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             updateCaret(0)
@@ -129,7 +129,7 @@ class CaretTransactionTest : VimTestCase() {
     val fileSize = fixture.editor.document.textLength
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             updateCaret(fileSize - 1)
@@ -149,7 +149,7 @@ class CaretTransactionTest : VimTestCase() {
     var exception: IllegalArgumentException? = null
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             exception = assertThrows<IllegalArgumentException> {
@@ -171,7 +171,7 @@ class CaretTransactionTest : VimTestCase() {
     var exception: IllegalArgumentException? = null
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             exception = assertThrows<IllegalArgumentException> {
@@ -193,7 +193,7 @@ class CaretTransactionTest : VimTestCase() {
     var exception: IllegalArgumentException? = null
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             exception = assertThrows<IllegalArgumentException> {
@@ -213,7 +213,7 @@ class CaretTransactionTest : VimTestCase() {
     configureByText(text)
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             insertText(4, "NEW", caretAtEnd = true, insertBeforeCaret = true)
@@ -231,7 +231,7 @@ class CaretTransactionTest : VimTestCase() {
     configureByText(text)
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             insertText(4, "NEW", caretAtEnd = false, insertBeforeCaret = true)
@@ -249,7 +249,7 @@ class CaretTransactionTest : VimTestCase() {
     configureByText(text)
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             insertText(4, "NEW", caretAtEnd = true, insertBeforeCaret = false)
@@ -267,7 +267,7 @@ class CaretTransactionTest : VimTestCase() {
     configureByText(text)
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             insertText(4, "NEW", caretAtEnd = false, insertBeforeCaret = false)
@@ -285,7 +285,7 @@ class CaretTransactionTest : VimTestCase() {
     configureByText(text)
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             insertText(0, "START: ", insertBeforeCaret = true)
@@ -305,7 +305,7 @@ class CaretTransactionTest : VimTestCase() {
     val fileSize = fixture.editor.document.textLength
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             insertText(fileSize - 1, " END")
@@ -323,7 +323,7 @@ class CaretTransactionTest : VimTestCase() {
     configureByText(text)
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             insertText(4, "")
@@ -341,7 +341,7 @@ class CaretTransactionTest : VimTestCase() {
     configureByText(text)
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             insertText(0, "TEXT")
@@ -359,7 +359,7 @@ class CaretTransactionTest : VimTestCase() {
     configureByText(text)
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             insertText(0, "")
@@ -377,7 +377,7 @@ class CaretTransactionTest : VimTestCase() {
     configureByText(text)
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             insertText(4, "line1\nline2\nline3", insertBeforeCaret = true)
@@ -397,7 +397,7 @@ class CaretTransactionTest : VimTestCase() {
     var exception: IllegalArgumentException? = null
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           exception = assertThrows<IllegalArgumentException> {
             withPrimaryCaret {
@@ -421,7 +421,7 @@ class CaretTransactionTest : VimTestCase() {
     var exception: IllegalArgumentException? = null
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           exception = assertThrows<IllegalArgumentException> {
             withPrimaryCaret {
@@ -446,7 +446,7 @@ class CaretTransactionTest : VimTestCase() {
     configureByText(text)
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             replaceText(4, 7, "REPLACED")
@@ -464,7 +464,7 @@ class CaretTransactionTest : VimTestCase() {
     configureByText(text)
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             replaceText(0, 3, "START")
@@ -482,7 +482,7 @@ class CaretTransactionTest : VimTestCase() {
     configureByText(text)
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             replaceText(8, 13, "END")
@@ -500,7 +500,7 @@ class CaretTransactionTest : VimTestCase() {
     configureByText(text)
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             replaceText(4, 8, "")
@@ -518,7 +518,7 @@ class CaretTransactionTest : VimTestCase() {
     configureByText(text)
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             replaceText(4, 5, "INSERTED")
@@ -536,7 +536,7 @@ class CaretTransactionTest : VimTestCase() {
     configureByText(text)
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             replaceText(0, 1, "one")
@@ -554,7 +554,7 @@ class CaretTransactionTest : VimTestCase() {
     configureByText(text)
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             replaceText(0, 0, "one")
@@ -572,7 +572,7 @@ class CaretTransactionTest : VimTestCase() {
     configureByText(text)
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             replaceText(4, 4, "INSERTED")
@@ -590,7 +590,7 @@ class CaretTransactionTest : VimTestCase() {
     configureByText(text)
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             replaceText(4, 7, "line1\nline2\nline3")
@@ -610,7 +610,7 @@ class CaretTransactionTest : VimTestCase() {
     var exception: Exception? = null
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           exception = assertThrows<IllegalArgumentException> {
             withPrimaryCaret {
@@ -633,7 +633,7 @@ class CaretTransactionTest : VimTestCase() {
     var exception: Exception? = null
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           exception = assertThrows<IllegalArgumentException> {
             withPrimaryCaret {
@@ -657,7 +657,7 @@ class CaretTransactionTest : VimTestCase() {
     var exception: IllegalArgumentException? = null
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           exception = assertThrows<IllegalArgumentException> {
             withPrimaryCaret {
@@ -680,7 +680,7 @@ class CaretTransactionTest : VimTestCase() {
     var exception: Exception? = null
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           exception = assertThrows<IllegalArgumentException> {
             withPrimaryCaret {
@@ -705,7 +705,7 @@ class CaretTransactionTest : VimTestCase() {
     configureByText(text)
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             val range = Range.Block(
@@ -743,7 +743,7 @@ class CaretTransactionTest : VimTestCase() {
     var exception: IllegalArgumentException? = null
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             val range = Range.Block(
@@ -774,7 +774,7 @@ class CaretTransactionTest : VimTestCase() {
     configureByText(text)
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             val range = Range.Block(
@@ -813,7 +813,7 @@ class CaretTransactionTest : VimTestCase() {
     var exception: Exception? = null
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           exception = assertThrows<IllegalArgumentException> {
             withPrimaryCaret {
@@ -840,7 +840,7 @@ class CaretTransactionTest : VimTestCase() {
     configureByText(text)
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             deleteText(4, 7)
@@ -858,7 +858,7 @@ class CaretTransactionTest : VimTestCase() {
     configureByText(text)
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             deleteText(0, 4)
@@ -876,7 +876,7 @@ class CaretTransactionTest : VimTestCase() {
     configureByText(text)
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             deleteText(8, 13)
@@ -897,7 +897,7 @@ class CaretTransactionTest : VimTestCase() {
     configureByText(text)
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             deleteText(4, 4)
@@ -917,7 +917,7 @@ class CaretTransactionTest : VimTestCase() {
     val fileSize = fixture.editor.document.textLength
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             deleteText(0, fileSize)
@@ -937,7 +937,7 @@ class CaretTransactionTest : VimTestCase() {
     var exception: Exception? = null
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           exception = assertThrows<IllegalArgumentException> {
             withPrimaryCaret {
@@ -959,7 +959,7 @@ class CaretTransactionTest : VimTestCase() {
     var exception: Exception? = null
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           exception = assertThrows<IllegalArgumentException> {
             withPrimaryCaret {
@@ -982,7 +982,7 @@ class CaretTransactionTest : VimTestCase() {
     var exception: Exception? = null
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           exception = assertThrows<IllegalArgumentException> {
             withPrimaryCaret {
@@ -1002,7 +1002,7 @@ class CaretTransactionTest : VimTestCase() {
     configureByText(text)
 
     executeAction {
-      vimScope.editor {
+      myVimApi.editor {
         change {
           withPrimaryCaret {
             deleteText(7, 4)

@@ -9,15 +9,15 @@
 package com.maddyhome.idea.vim.thinapi
 
 
-import com.intellij.vim.api.Mode
-import com.intellij.vim.api.Path
+import com.intellij.vim.api.VimApi
+import com.intellij.vim.api.models.Mode
+import com.intellij.vim.api.models.Path
 import com.intellij.vim.api.scopes.DigraphScope
 import com.intellij.vim.api.scopes.ListenersScope
 import com.intellij.vim.api.scopes.MappingScope
 import com.intellij.vim.api.scopes.ModalInput
 import com.intellij.vim.api.scopes.OptionScope
 import com.intellij.vim.api.scopes.OutputPanelScope
-import com.intellij.vim.api.scopes.VimScope
 import com.intellij.vim.api.scopes.commandline.CommandLineScope
 import com.intellij.vim.api.scopes.editor.EditorScope
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -42,10 +42,10 @@ import kotlinx.coroutines.runBlocking
 import kotlin.io.path.pathString
 import kotlin.reflect.KType
 
-class VimScopeImpl(
+class VimApiImpl(
   private val listenerOwner: ListenerOwner,
   private val mappingOwner: MappingOwner,
-) : VimScope {
+) : VimApi {
   // Note: Setting a new mode is a complicated operation. Currently, it updates the selection under the write lock,
   //   but we don't require to run this under the write lock. Also, esc in insert mode may produce more inserts
   //   when the insert was started with the number: `3iabc<esc>`
@@ -106,7 +106,7 @@ class VimScopeImpl(
     return variableName to Scope.getByValue(prefix)
   }
 
-  override fun exportOperatorFunction(name: String, function: suspend VimScope.() -> Boolean) {
+  override fun exportOperatorFunction(name: String, function: suspend VimApi.() -> Boolean) {
     val operatorFunction: OperatorFunction = object : OperatorFunction {
       override fun apply(
         editor: VimEditor,
@@ -116,7 +116,7 @@ class VimScopeImpl(
         var returnValue = false
         injector.actionExecutor.executeCommand(vimEditor, {
           runBlocking {
-            returnValue = VimScopeImpl(listenerOwner, mappingOwner).function()
+            returnValue = VimApiImpl(listenerOwner, mappingOwner).function()
           }
         }, "Insert Text", null)
         return returnValue
@@ -250,7 +250,7 @@ class VimScopeImpl(
 
   override fun command(
     command: String,
-    block: VimScope.(String) -> Unit,
+    block: VimApi.(String) -> Unit,
   ) {
     val commandHandler = object : CommandAliasHandler {
       override fun execute(
@@ -259,8 +259,8 @@ class VimScopeImpl(
         editor: VimEditor,
         context: ExecutionContext,
       ) {
-        val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
-        vimScope.block(command)
+        val vimApi = VimApiImpl(listenerOwner, mappingOwner)
+        vimApi.block(command)
       }
     }
     injector.pluginService.addCommand(command, commandHandler)

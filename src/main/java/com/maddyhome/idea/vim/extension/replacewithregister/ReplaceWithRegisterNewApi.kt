@@ -8,18 +8,18 @@
 
 package com.maddyhome.idea.vim.extension.replacewithregister
 
-import com.intellij.vim.api.Mode
-import com.intellij.vim.api.Range
-import com.intellij.vim.api.TextType
+import com.intellij.vim.api.VimApi
 import com.intellij.vim.api.VimPlugin
-import com.intellij.vim.api.scopes.VimScope
+import com.intellij.vim.api.getVariable
+import com.intellij.vim.api.models.Mode
+import com.intellij.vim.api.models.Range
+import com.intellij.vim.api.models.TextType
 import com.intellij.vim.api.scopes.editor.caret.CaretTransaction
-import kotlinx.coroutines.Job
 
 private const val PLUGIN_NAME: String = "ReplaceWithRegister"
 
 @VimPlugin(name = PLUGIN_NAME)
-fun VimScope.init() {
+fun VimApi.init() {
   mappings {
     nmap(keys = "gr", label = RWR_OPERATOR, isRepeatable = true) {
       rewriteMotion()
@@ -37,18 +37,17 @@ fun VimScope.init() {
   }
 }
 
-private suspend fun VimScope.operatorFunction(): Boolean {
+private suspend fun VimApi.operatorFunction(): Boolean {
   fun CaretTransaction.getSelection(): Range? {
-    return when (this@operatorFunction.mode) {
-      is Mode.NORMAL -> changeMarks
-      is Mode.VISUAL -> selection
+    return when {
+      this@operatorFunction.mode == Mode.NORMAL -> changeMarks
+      this@operatorFunction.mode.isVisual -> selection
       else -> null
     }
   }
 
-  val job: Job
   editor {
-    job = change {
+    change {
       forEachCaret {
         val selectionRange = getSelection() ?: return@forEachCaret
         val registerData = prepareRegisterData() ?: return@forEachCaret
@@ -56,20 +55,18 @@ private suspend fun VimScope.operatorFunction(): Boolean {
       }
     }
   }
-  job.join()
   return true
 }
 
-private suspend fun VimScope.rewriteMotion() {
+private suspend fun VimApi.rewriteMotion() {
   setOperatorFunction(OPERATOR_FUNC_NAME)
   normal("g@")
 }
 
-private suspend fun VimScope.rewriteLine() {
+private suspend fun VimApi.rewriteLine() {
   val count1 = getVariable<Int>("v:count1") ?: 1
-  val job: Job
   editor {
-    job = change {
+    change {
       forEachCaret {
         val endOffset = getLineEndOffset(line.number + count1 - 1, true)
         val lineStartOffset = line.start
@@ -79,13 +76,11 @@ private suspend fun VimScope.rewriteLine() {
       }
     }
   }
-  job.join()
 }
 
-private suspend fun VimScope.rewriteVisual() {
-  val job: Job
+private suspend fun VimApi.rewriteVisual() {
   editor {
-    job = change {
+    change {
       forEachCaret {
         val selectionRange = selection
         val registerData = prepareRegisterData() ?: return@forEachCaret
@@ -93,8 +88,7 @@ private suspend fun VimScope.rewriteVisual() {
       }
     }
   }
-  job.join()
-  mode = Mode.NORMAL()
+//  mode = Mode.NORMAL // TODO
 }
 
 private suspend fun CaretTransaction.prepareRegisterData(): Pair<String, TextType>? {
@@ -111,7 +105,7 @@ private suspend fun CaretTransaction.prepareRegisterData(): Pair<String, TextTyp
 }
 
 private suspend fun CaretTransaction.replaceTextAndUpdateCaret(
-  vimScope: VimScope,
+  vimApi: VimApi,
   selectionRange: Range,
   registerData: Pair<String, TextType>,
 ) {
@@ -157,7 +151,7 @@ private suspend fun CaretTransaction.replaceTextAndUpdateCaret(
 
       replaceTextBlockwise(selectionRange, lines)
 
-      vimScope.mode = Mode.NORMAL()
+//      vimApi.mode = Mode.NORMAL // TODO
       updateCaret(offset = selections.last().start)
     }
   }

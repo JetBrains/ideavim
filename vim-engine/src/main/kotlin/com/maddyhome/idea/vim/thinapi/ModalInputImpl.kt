@@ -8,8 +8,8 @@
 
 package com.maddyhome.idea.vim.thinapi
 
+import com.intellij.vim.api.VimApi
 import com.intellij.vim.api.scopes.ModalInput
-import com.intellij.vim.api.scopes.VimScope
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimModalInput
@@ -49,19 +49,19 @@ class ModalInputImpl(
     return this
   }
 
-  override fun inputString(label: String, handler: VimScope.(String) -> Unit) {
-    val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
+  override fun inputString(label: String, handler: VimApi.(String) -> Unit) {
+    val vimApi = VimApiImpl(listenerOwner, mappingOwner)
     val interceptor = TextInputInterceptor(repeatCount, repeatWhileCondition, updateLabel) {
-      vimScope.handler(it)
+      vimApi.handler(it)
     }
     val modalInput = injector.modalInput.create(vimEditor, vimContext, label, interceptor)
     interceptor.modalInput = modalInput
   }
 
-  override fun inputChar(label: String, handler: VimScope.(Char) -> Unit) {
-    val vimScope = VimScopeImpl(listenerOwner, mappingOwner)
+  override fun inputChar(label: String, handler: VimApi.(Char) -> Unit) {
+    val vimApi = VimApiImpl(listenerOwner, mappingOwner)
     val interceptor = CharInputInterceptor(repeatCount, repeatWhileCondition, updateLabel) { char ->
-      vimScope.handler(char)
+      vimApi.handler(char)
     }
     val modalInput = injector.modalInput.create(vimEditor, vimContext, label, interceptor)
     interceptor.modalInput = modalInput

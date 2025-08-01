@@ -8,6 +8,8 @@
 
 package com.intellij.vim.api.scopes
 
+import com.intellij.vim.api.VimApi
+
 /**
  * Scope for working with modal input in IdeaVim.
  *
@@ -107,7 +109,7 @@ interface ModalInput {
    * This can be combined with other methods:
    *
    * ```kotlin
-   * vimScope.modalInput()
+   * vimApi.modalInput()
    *   .repeat(2)  // Get two strings from the user
    *   .inputString("Enter value:") { value ->
    *     // Process each string as it's entered
@@ -117,7 +119,7 @@ interface ModalInput {
    * @param label The label to display in the dialog
    * @param handler A function that will be called when the user enters input and presses ENTER
    */
-  fun inputString(label: String, handler: VimScope.(String) -> Unit)
+  fun inputString(label: String, handler: VimApi.(String) -> Unit)
 
   /**
    * Creates a modal input dialog for collecting a single character from the user.
@@ -128,7 +130,7 @@ interface ModalInput {
    *
    * Example usage:
    * ```kotlin
-   * vimScope.modalInput()
+   * vimApi.modalInput()
    *   .inputChar("Press a key:") { char ->
    *     // Process the entered character
    *     when(char) {
@@ -142,7 +144,7 @@ interface ModalInput {
    * This can be combined with other methods:
    *
    * ```kotlin
-   * vimScope.modalInput()
+   * vimApi.modalInput()
    *   .repeatWhile { /* condition */ }
    *   .inputChar("Enter character:") { char ->
    *     // Process each character as it's entered
@@ -152,7 +154,7 @@ interface ModalInput {
    * @param label The label to display in the dialog
    * @param handler A function that will be called when the user enters a character
    */
-  fun inputChar(label: String, handler: VimScope.(Char) -> Unit)
+  fun inputChar(label: String, handler: VimApi.(Char) -> Unit)
 
   /**
    * Closes the current modal input dialog, if one is active.

@@ -8,9 +8,10 @@
 
 package com.intellij.vim.api.scopes
 
-import com.intellij.vim.api.CaretId
-import com.intellij.vim.api.Mode
-import com.intellij.vim.api.Range
+import com.intellij.vim.api.models.CaretId
+import com.intellij.vim.api.models.Mode
+import com.intellij.vim.api.models.Range
+import com.intellij.vim.api.VimApi
 
 /**
  * Scope that provides access to various listeners.
@@ -35,7 +36,7 @@ interface ListenersScope {
    *
    * @param callback The function to execute when the mode changes
    */
-  fun onModeChange(callback: suspend VimScope.(Mode) -> Unit)
+  fun onModeChange(callback: suspend VimApi.(Mode) -> Unit)
 
   /**
    * Registers a callback that is invoked when text is yanked.
@@ -56,7 +57,7 @@ interface ListenersScope {
    *
    * @param callback The function to execute when text is yanked
    */
-  fun onYank(callback: suspend VimScope.(Map<CaretId, Range.Simple>) -> Unit)
+  fun onYank(callback: suspend VimApi.(Map<CaretId, Range.Simple>) -> Unit)
 
   /**
    * Registers a callback that is invoked when a new editor is created.
@@ -72,7 +73,7 @@ interface ListenersScope {
    *
    * @param callback The function to execute when an editor is created
    */
-  fun onEditorCreate(callback: suspend VimScope.() -> Unit)
+  fun onEditorCreate(callback: suspend VimApi.() -> Unit)
 
   /**
    * Registers a callback that is invoked when an editor is released.
@@ -88,7 +89,7 @@ interface ListenersScope {
    *
    * @param callback The function to execute when an editor is released
    */
-  fun onEditorRelease(callback: suspend VimScope.() -> Unit)
+  fun onEditorRelease(callback: suspend VimApi.() -> Unit)
 
   /**
    * Registers a callback that is invoked when an editor gains focus.
@@ -104,7 +105,7 @@ interface ListenersScope {
    *
    * @param callback The function to execute when an editor gains focus
    */
-  fun onEditorFocusGain(callback: suspend VimScope.() -> Unit)
+  fun onEditorFocusGain(callback: suspend VimApi.() -> Unit)
 
   /**
    * Registers a callback that is invoked when an editor loses focus.
@@ -120,7 +121,7 @@ interface ListenersScope {
    *
    * @param callback The function to execute when an editor loses focus
    */
-  fun onEditorFocusLost(callback: suspend VimScope.() -> Unit)
+  fun onEditorFocusLost(callback: suspend VimApi.() -> Unit)
 
   /**
    * Registers a callback that is invoked when macro recording starts.
@@ -136,7 +137,7 @@ interface ListenersScope {
    *
    * @param callback The function to execute when macro recording starts
    */
-  fun onMacroRecordingStart(callback: suspend VimScope.() -> Unit)
+  fun onMacroRecordingStart(callback: suspend VimApi.() -> Unit)
 
   /**
    * Registers a callback that is invoked when macro recording finishes.
@@ -152,7 +153,7 @@ interface ListenersScope {
    *
    * @param callback The function to execute when macro recording finishes
    */
-  fun onMacroRecordingFinish(callback: suspend VimScope.() -> Unit)
+  fun onMacroRecordingFinish(callback: suspend VimApi.() -> Unit)
 
   /**
    * Registers a callback that is invoked when IdeaVim is enabled.
@@ -168,7 +169,7 @@ interface ListenersScope {
    *
    * @param callback The function to execute when IdeaVim is enabled
    */
-  fun onIdeaVimEnabled(callback: suspend VimScope.() -> Unit)
+  fun onIdeaVimEnabled(callback: suspend VimApi.() -> Unit)
 
   /**
    * Registers a callback that is invoked when IdeaVim is disabled.
@@ -184,5 +185,5 @@ interface ListenersScope {
    *
    * @param callback The function to execute when IdeaVim is disabled
    */
-  fun onIdeaVimDisabled(callback: suspend VimScope.() -> Unit)
+  fun onIdeaVimDisabled(callback: suspend VimApi.() -> Unit)
 }

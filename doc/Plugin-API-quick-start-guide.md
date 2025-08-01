@@ -15,7 +15,7 @@ The entry point for an IdeaVim plugin is a function annotated with `@VimPlugin`:
 
 ```kotlin
 @VimPlugin(name = "MyFirstPlugin")
-fun VimScope.init() {
+fun VimApi.init() {
     // Plugin initialization code goes here
 }
 ```
@@ -28,7 +28,7 @@ Let's add a simple mapping that displays a message in the output panel:
 
 ```kotlin
 @VimPlugin(name = "MyFirstPlugin")
-fun VimScope.init() {
+fun VimApi.init() {
     mappings {
         nmap(keys = "<leader>h", label = "HelloWorld") {
             outputPanel {
@@ -141,7 +141,7 @@ Here's a simple plugin that adds a mapping to uppercase the selected text:
 
 ```kotlin
 @VimPlugin(name = "ToUppercase")
-fun VimScope.init() {
+fun VimApi.init() {
     mappings {
         vmap(keys = "<leader>ll", label = "ToUpperCase") {
             editor {

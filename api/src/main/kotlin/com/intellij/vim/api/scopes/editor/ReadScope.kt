@@ -8,7 +8,7 @@
 
 package com.intellij.vim.api.scopes.editor
 
-import com.intellij.vim.api.CaretId
+import com.intellij.vim.api.models.CaretId
 import com.intellij.vim.api.scopes.VimApiDsl
 import com.intellij.vim.api.scopes.editor.caret.CaretRead
 

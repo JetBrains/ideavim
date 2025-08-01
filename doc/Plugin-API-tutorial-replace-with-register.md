@@ -48,12 +48,12 @@ First, create a Kotlin file for your plugin:
 
 ```kotlin
 @VimPlugin(name = "ReplaceWithRegister")
-fun VimScope.init() {
+fun VimApi.init() {
   // We'll add mappings and functionality here
 }
 ```
 
-The `init` function has a responsibility to set up our plugin within the `VimScope`.
+The `init` function has a responsibility to set up our plugin within the `VimApi`.
 
 ### Step 2: Define Mappings
 
@@ -67,7 +67,7 @@ Add this code to the `init` function:
 
 ```kotlin
 @VimPlugin(name = "ReplaceWithRegister", shortPath = "username/ReplaceWithRegister")
-fun VimScope.init() {
+fun VimApi.init() {
     mappings {
         nmap(keys = "gr", label = "ReplaceWithRegisterOperator", isRepeatable = true) {
             rewriteMotion()
@@ -102,12 +102,12 @@ Let's break down what's happening:
 Now, let's implement the functions we referenced in our mappings:
 
 ```kotlin
-private fun VimScope.rewriteMotion() {
+private fun VimApi.rewriteMotion() {
     setOperatorFunction("ReplaceWithRegisterOperatorFunc")
     normal("g@")
 }
 
-private suspend fun VimScope.rewriteLine() {
+private suspend fun VimApi.rewriteLine() {
     val count1 = getVariable<Int>("v:count1") ?: 1
     val job: Job
     editor {
@@ -124,7 +124,7 @@ private suspend fun VimScope.rewriteLine() {
     job.join()
 }
 
-private suspend fun VimScope.rewriteVisual() {
+private suspend fun VimApi.rewriteVisual() {
     val job: Job
     editor {
         job = change {
@@ -139,7 +139,7 @@ private suspend fun VimScope.rewriteVisual() {
     mode = Mode.NORMAL()
 }
 
-private suspend fun VimScope.operatorFunction(): Boolean {
+private suspend fun VimApi.operatorFunction(): Boolean {
     fun CaretTransaction.getSelection(): Range? {
         return when (this@operatorFunction.mode) {
             is Mode.NORMAL -> changeMarks
@@ -194,7 +194,7 @@ private suspend fun CaretTransaction.prepareRegisterData(): Pair<String, TextTyp
 }
 
 private suspend fun CaretTransaction.replaceTextAndUpdateCaret(
-    vimScope: VimScope,
+    vimApi: VimApi,
     selectionRange: Range,
     registerData: Pair<String, TextType>,
 ) {
@@ -240,7 +240,7 @@ private suspend fun CaretTransaction.replaceTextAndUpdateCaret(
 
             replaceTextBlockwise(selectionRange, lines)
 
-            vimScope.mode = Mode.NORMAL()
+            vimApi.mode = Mode.NORMAL()
             updateCaret(offset = selections.last().start)
         }
     }

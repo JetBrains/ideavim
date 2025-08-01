@@ -8,16 +8,16 @@
 
 package com.maddyhome.idea.vim.thinapi
 
-import com.intellij.vim.api.CaretId
-import com.intellij.vim.api.CaretInfo
-import com.intellij.vim.api.Mark
-import com.intellij.vim.api.Path
-import com.intellij.vim.api.Range
-import com.intellij.vim.api.TextType
+import com.intellij.vim.api.models.CaretId
+import com.intellij.vim.api.models.CaretInfo
+import com.intellij.vim.api.models.Mark
+import com.intellij.vim.api.models.Path
+import com.intellij.vim.api.models.Range
+import com.intellij.vim.api.models.TextType
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.intellij.vim.api.Jump as ApiJump
+import com.intellij.vim.api.models.Jump as ApiJump
 import com.maddyhome.idea.vim.mark.Jump as EngineJump
 import com.maddyhome.idea.vim.mark.Mark as EngineMark
 

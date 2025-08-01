@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.intellij.vim.api
+package com.intellij.vim.api.models
 
 /**
  * Represents a range of text in the editor.

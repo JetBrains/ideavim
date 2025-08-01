@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.intellij.vim.api
+package com.intellij.vim.api.models
 
 /**
  * Represents the type of text selection in Vim.

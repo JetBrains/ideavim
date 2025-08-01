@@ -8,11 +8,11 @@
 
 package org.jetbrains.plugins.ideavim.thinapi.vimscope
 
-import com.intellij.vim.api.scopes.VimScope
+import com.intellij.vim.api.VimApi
 import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.regexp.VimRegexException
-import com.maddyhome.idea.vim.thinapi.VimScopeImpl
+import com.maddyhome.idea.vim.thinapi.VimApiImpl
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -23,7 +23,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class TextSearch : VimTestCase() {
-  private lateinit var vimScope: VimScope
+  private lateinit var myVimApi: VimApi
 
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
@@ -31,7 +31,7 @@ class TextSearch : VimTestCase() {
 
     val listenerOwner = ListenerOwner.Plugin.get("test")
     val mappingOwner = MappingOwner.Plugin.get("test")
-    vimScope = VimScopeImpl(listenerOwner, mappingOwner)
+    myVimApi = VimApiImpl(listenerOwner, mappingOwner)
 
     configureByText("\n")
   }
@@ -42,35 +42,35 @@ class TextSearch : VimTestCase() {
 
   @Test
   fun `test matches with simple pattern`() {
-    assertTrue(vimScope.matches("test", "This is a test string", false))
-    assertFalse(vimScope.matches("missing", "This is a test string", false))
+    assertTrue(myVimApi.matches("test", "This is a test string", false))
+    assertFalse(myVimApi.matches("missing", "This is a test string", false))
   }
 
   @Test
   fun `test matches with case sensitivity`() {
-    assertFalse(vimScope.matches("TEST", "This is a test string", false))
-    assertTrue(vimScope.matches("TEST", "This is a TEST string", false))
-    assertTrue(vimScope.matches("TEST", "This is a test string", true))
+    assertFalse(myVimApi.matches("TEST", "This is a test string", false))
+    assertTrue(myVimApi.matches("TEST", "This is a TEST string", false))
+    assertTrue(myVimApi.matches("TEST", "This is a test string", true))
   }
 
   @Test
   fun `test matches with regex pattern`() {
-    assertTrue(vimScope.matches("t..t", "This is a test string", false))
-    assertTrue(vimScope.matches("\\w\\+", "word", false))
-    assertFalse(vimScope.matches("^test$", "This is a test", false))
-    assertTrue(vimScope.matches("^test$", "test", false))
+    assertTrue(myVimApi.matches("t..t", "This is a test string", false))
+    assertTrue(myVimApi.matches("\\w\\+", "word", false))
+    assertFalse(myVimApi.matches("^test$", "This is a test", false))
+    assertTrue(myVimApi.matches("^test$", "test", false))
   }
 
   @Test
   fun `test matches with empty text`() {
-    assertFalse(vimScope.matches("pattern", "", false))
+    assertFalse(myVimApi.matches("pattern", "", false))
   }
 
   @Test
   fun `test matches with empty pattern`() {
     // invalid pattern - ""
     val exception = assertThrows<VimRegexException> {
-      vimScope.matches("", "", false)
+      myVimApi.matches("", "", false)
     }
     assert(exception.message.contains("E383"))
   }
@@ -78,7 +78,7 @@ class TextSearch : VimTestCase() {
   @Test
   fun `test getAllMatches with simple pattern`() {
     val text = "one two one three one four"
-    val matches = vimScope.getAllMatches(text, "one")
+    val matches = myVimApi.getAllMatches(text, "one")
 
     val expectedBoundaries = mapOf(
       0 to 3, 8 to 11, 18 to 21
@@ -95,7 +95,7 @@ class TextSearch : VimTestCase() {
   fun `test getAllMatches with regex pattern`() {
     val text = "one 123 two 456 three 789"
 
-    val matches = vimScope.getAllMatches(text, "\\d\\+")
+    val matches = myVimApi.getAllMatches(text, "\\d\\+")
 
     val expectedBoundaries = mapOf(
       4 to 7, 12 to 15, 22 to 25
@@ -111,14 +111,14 @@ class TextSearch : VimTestCase() {
   @Test
   fun `test getAllMatches with no matches`() {
     val text = "one two three"
-    val matches = vimScope.getAllMatches(text, "four")
+    val matches = myVimApi.getAllMatches(text, "four")
 
     assert(matches.isEmpty())
   }
 
   @Test
   fun `test getAllMatches with empty text`() {
-    val matches = vimScope.getAllMatches("", "pattern")
+    val matches = myVimApi.getAllMatches("", "pattern")
     assert(matches.isEmpty())
   }
 
@@ -127,14 +127,14 @@ class TextSearch : VimTestCase() {
     val text = "some text"
 
     assertThrows<VimRegexException> {
-      vimScope.getAllMatches(text, "")
+      myVimApi.getAllMatches(text, "")
     }
   }
 
   @Test
   fun `test getAllMatches with overlapping patterns`() {
     val text = "abababa"
-    val matches = vimScope.getAllMatches(text, "aba")
+    val matches = myVimApi.getAllMatches(text, "aba")
 
     val expectedBoundaries = mapOf(
       0 to 3, 4 to 7
@@ -149,10 +149,10 @@ class TextSearch : VimTestCase() {
 
   @Test
   fun `test getNextCamelStartOffset in camelCase text`() {
-    val result = vimScope.getNextCamelStartOffset(camelCaseText, 1)
+    val result = myVimApi.getNextCamelStartOffset(camelCaseText, 1)
     assertNotNull(result)
 
-    val result2 = vimScope.getNextCamelStartOffset(camelCaseText, result + 1)
+    val result2 = myVimApi.getNextCamelStartOffset(camelCaseText, result + 1)
     result2?.let {
       assert(it > result) { "Expected second boundary to be after first boundary" }
     }
@@ -160,68 +160,68 @@ class TextSearch : VimTestCase() {
 
   @Test
   fun `test getNextCamelStartOffset with count parameter`() {
-    val result = vimScope.getNextCamelStartOffset(camelCaseText, 0, 3)
+    val result = myVimApi.getNextCamelStartOffset(camelCaseText, 0, 3)
     assert(result == 6)
   }
 
   @Test
   fun `test getNextCamelStartOffset in snake_case text`() {
-    val result = vimScope.getNextCamelStartOffset(snakeCaseText, 0, 2)
+    val result = myVimApi.getNextCamelStartOffset(snakeCaseText, 0, 2)
     assert(result == 5)
   }
 
   @Test
   fun `test getNextCamelStartOffset at end of text`() {
-    val result = vimScope.getNextCamelStartOffset(camelCaseText, camelCaseText.length - 1)
+    val result = myVimApi.getNextCamelStartOffset(camelCaseText, camelCaseText.length - 1)
     assert(result == null)
   }
 
   @Test
   fun `test getNextCamelStartOffset in empty text`() {
-    val result = vimScope.getNextCamelStartOffset(emptyText, 0)
+    val result = myVimApi.getNextCamelStartOffset(emptyText, 0)
     assert(result == null)
   }
 
   @Test
   fun `test getPreviousCamelStartOffset in camelCase text`() {
-    val result = vimScope.getPreviousCamelStartOffset(camelCaseText, 10)
+    val result = myVimApi.getPreviousCamelStartOffset(camelCaseText, 10)
     assert(result == 6)
 
-    val result2 = vimScope.getPreviousCamelStartOffset(camelCaseText, 6)
+    val result2 = myVimApi.getPreviousCamelStartOffset(camelCaseText, 6)
     assert(result2 == 4)
   }
 
   @Test
   fun `test getPreviousCamelStartOffset with count parameter`() {
-    val result = vimScope.getPreviousCamelStartOffset(camelCaseText, 10, 3)
+    val result = myVimApi.getPreviousCamelStartOffset(camelCaseText, 10, 3)
     assert(result == 0)
   }
 
   @Test
   fun `test getPreviousCamelStartOffset in snake_case text`() {
-    val result = vimScope.getPreviousCamelStartOffset(snakeCaseText, 10)
+    val result = myVimApi.getPreviousCamelStartOffset(snakeCaseText, 10)
     assert(result == 8)
   }
 
   @Test
   fun `test getPreviousCamelStartOffset at start of text`() {
-    val result = vimScope.getPreviousCamelStartOffset(camelCaseText, 0)
+    val result = myVimApi.getPreviousCamelStartOffset(camelCaseText, 0)
     assert(result == null)
   }
 
   @Test
   fun `test getNextCamelEndOffset in camelCase text`() {
-    val result = vimScope.getNextCamelEndOffset(camelCaseText, 0)
+    val result = myVimApi.getNextCamelEndOffset(camelCaseText, 0)
     assert(result == 3)
 
-    val result2 = vimScope.getNextCamelEndOffset(camelCaseText, 4)
+    val result2 = myVimApi.getNextCamelEndOffset(camelCaseText, 4)
     assert(result2 == 5)
   }
 
   @Test
   fun `test getNextCamelEndOffset with count parameter`() {
     for (count in 1..3) {
-      val result = vimScope.getNextCamelEndOffset(camelCaseText, 0, count)
+      val result = myVimApi.getNextCamelEndOffset(camelCaseText, 0, count)
 
       assertNotNull(result) { "Expected to find a camel case boundary with count=$count" }
 
@@ -231,7 +231,7 @@ class TextSearch : VimTestCase() {
 
   @Test
   fun `test getNextCamelEndOffset in snake_case text`() {
-    val result = vimScope.getNextCamelEndOffset(snakeCaseText, 0)
+    val result = myVimApi.getNextCamelEndOffset(snakeCaseText, 0)
     assertNotNull(result) { "Expected to find a camel/snake case boundary" }
 
     assert(result > 0 && result < snakeCaseText.length) { "Boundary should be within text bounds" }
@@ -239,22 +239,22 @@ class TextSearch : VimTestCase() {
 
   @Test
   fun `test getPreviousCamelEndOffset in camelCase text`() {
-    val result = vimScope.getPreviousCamelEndOffset(camelCaseText, 10)
+    val result = myVimApi.getPreviousCamelEndOffset(camelCaseText, 10)
     assert(result == 5)
 
-    val result2 = vimScope.getPreviousCamelEndOffset(camelCaseText, 5)
+    val result2 = myVimApi.getPreviousCamelEndOffset(camelCaseText, 5)
     assert(result2 == 3)
   }
 
   @Test
   fun `test getPreviousCamelEndOffset with count parameter`() {
-    val result = vimScope.getPreviousCamelEndOffset(camelCaseText, 15, 3)
+    val result = myVimApi.getPreviousCamelEndOffset(camelCaseText, 15, 3)
     assert(result == 5)
   }
 
   @Test
   fun `test getPreviousCamelEndOffset in snake_case text`() {
-    val result = vimScope.getPreviousCamelEndOffset(snakeCaseText, 10)
+    val result = myVimApi.getPreviousCamelEndOffset(snakeCaseText, 10)
     assert(result == 6)
   }
 }

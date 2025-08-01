@@ -8,7 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.thinapi
 
-import com.intellij.vim.api.scopes.VimScope
+import com.intellij.vim.api.VimApi
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ExecutionContextManager
 import com.maddyhome.idea.vim.api.VimCommandLineCaret
@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.interceptors.VimInputInterceptor
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.thinapi.VimScopeImpl
+import com.maddyhome.idea.vim.thinapi.VimApiImpl
 import org.jetbrains.plugins.ideavim.mock.MockTestCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -41,7 +41,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class ModalInputTest : MockTestCase() {
-  private lateinit var vimScope: VimScope
+  private lateinit var myVimApi: VimApi
   private lateinit var modalInputService: VimModalInputService
   private lateinit var modalInput: VimModalInput
   private lateinit var vimEditor: VimEditor
@@ -59,7 +59,7 @@ class ModalInputTest : MockTestCase() {
 
     val listenerOwner = ListenerOwner.Plugin.get("test")
     val mappingOwner = MappingOwner.Plugin.get("test")
-    vimScope = VimScopeImpl(listenerOwner, mappingOwner)
+    myVimApi = VimApiImpl(listenerOwner, mappingOwner)
 
     mockInjector = spy(injector)
 
@@ -130,7 +130,7 @@ class ModalInputTest : MockTestCase() {
 
     Mockito.`when`(modalInput.label).thenReturn(label)
 
-    vimScope.modalInput()
+    myVimApi.modalInput()
       .repeat(2)
       .updateLabel { newLabel ->
         currentLabel = "$newLabel - Updated"
@@ -169,7 +169,7 @@ class ModalInputTest : MockTestCase() {
 
     Mockito.`when`(modalInput.label).thenReturn(label)
 
-    vimScope.modalInput()
+    myVimApi.modalInput()
       .repeatWhile {
         handlerCalledCount < 1
       }
@@ -205,7 +205,7 @@ class ModalInputTest : MockTestCase() {
 
     Mockito.`when`(modalInput.label).thenReturn(label)
 
-    vimScope.modalInput()
+    myVimApi.modalInput()
       .repeat(3)
       .inputChar(label) { char ->
         handlerCalledCount++
@@ -239,7 +239,7 @@ class ModalInputTest : MockTestCase() {
 
     Mockito.`when`(modalInput.label).thenReturn(label)
 
-    vimScope.modalInput()
+    myVimApi.modalInput()
       .inputString(label) { string ->
         handlerCalledCount++
         receivedString = string
@@ -272,7 +272,7 @@ class ModalInputTest : MockTestCase() {
 
     Mockito.`when`(modalInput.label).thenReturn(label)
 
-    vimScope.modalInput()
+    myVimApi.modalInput()
       .inputChar(label) { char ->
         handlerCalledCount++
         receivedChar = char
@@ -301,7 +301,7 @@ class ModalInputTest : MockTestCase() {
   fun `test closeCurrentInput with existing input`() {
     Mockito.`when`(modalInputService.getCurrentModalInput()).thenReturn(modalInput)
 
-    val result = vimScope.modalInput().closeCurrentInput()
+    val result = myVimApi.modalInput().closeCurrentInput()
 
     verify(modalInput).deactivate(eq(true), eq(true))
 
@@ -312,7 +312,7 @@ class ModalInputTest : MockTestCase() {
   fun `test closeCurrentInput with no existing input`() {
     Mockito.`when`(modalInputService.getCurrentModalInput()).thenReturn(null)
 
-    val result = vimScope.modalInput().closeCurrentInput()
+    val result = myVimApi.modalInput().closeCurrentInput()
 
     assertFalse(result)
   }
@@ -321,7 +321,7 @@ class ModalInputTest : MockTestCase() {
   fun `test closeCurrentInput with refocusEditor false`() {
     Mockito.`when`(modalInputService.getCurrentModalInput()).thenReturn(modalInput)
 
-    vimScope.modalInput().closeCurrentInput(refocusEditor = false)
+    myVimApi.modalInput().closeCurrentInput(refocusEditor = false)
 
     verify(modalInput).deactivate(eq(false), eq(true))
   }

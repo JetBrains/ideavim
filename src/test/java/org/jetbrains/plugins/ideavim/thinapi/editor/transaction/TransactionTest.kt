@@ -8,7 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.thinapi.editor.transaction
 
-import com.intellij.vim.api.scopes.VimScope
+import com.intellij.vim.api.VimApi
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimInjector
 import com.maddyhome.idea.vim.api.VimJumpService
@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.thinapi.VimScopeImpl
+import com.maddyhome.idea.vim.thinapi.VimApiImpl
 import org.jetbrains.plugins.ideavim.mock.MockTestCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -31,7 +31,7 @@ import org.mockito.kotlin.verify
 import kotlin.test.assertTrue
 
 class TransactionTest : MockTestCase() {
-  private lateinit var vimScope: VimScope
+  private lateinit var myVimApi: VimApi
   private lateinit var mockMarkService: VimMarkService
   private lateinit var mockJumpService: VimJumpService
   private lateinit var vimEditor: VimEditor
@@ -45,7 +45,7 @@ class TransactionTest : MockTestCase() {
 
     val listenerOwner = ListenerOwner.Plugin.get("test")
     val mappingOwner = MappingOwner.Plugin.get("test")
-    vimScope = VimScopeImpl(listenerOwner, mappingOwner)
+    myVimApi = VimApiImpl(listenerOwner, mappingOwner)
 
     mockInjector = spy(injector)
 
@@ -83,7 +83,7 @@ class TransactionTest : MockTestCase() {
   fun `test setMark calls setMark`() {
     val char = 'a'
 
-    vimScope.editor {
+    myVimApi.editor {
       change {
         setMark(char)
       }
@@ -102,7 +102,7 @@ class TransactionTest : MockTestCase() {
   fun `test removeMark calls removeMark`() {
     val char = 'b'
 
-    vimScope.editor {
+    myVimApi.editor {
       change {
         removeMark(char)
       }
@@ -122,7 +122,7 @@ class TransactionTest : MockTestCase() {
     val char = 'A'
     val offset = 0
 
-    vimScope.editor {
+    myVimApi.editor {
       change {
         setGlobalMark(char)
       }
@@ -142,7 +142,7 @@ class TransactionTest : MockTestCase() {
   fun `test removeGlobalMark calls removeGlobalMark`() {
     val char = 'B'
 
-    vimScope.editor {
+    myVimApi.editor {
       change {
         removeGlobalMark(char)
       }
@@ -156,7 +156,7 @@ class TransactionTest : MockTestCase() {
     val char = 'C'
     val offset = 10
 
-    vimScope.editor {
+    myVimApi.editor {
       change {
         setGlobalMark(char, offset)
       }
@@ -174,7 +174,7 @@ class TransactionTest : MockTestCase() {
 
   @Test
   fun `test resetAllMarks calls resetAllMarks`() {
-    vimScope.editor {
+    myVimApi.editor {
       change {
         resetAllMarks()
       }
@@ -185,7 +185,7 @@ class TransactionTest : MockTestCase() {
 
   @Test
   fun `test dropLastJump calls dropLastJump`() {
-    vimScope.editor {
+    myVimApi.editor {
       change {
         dropLastJump()
       }
@@ -196,7 +196,7 @@ class TransactionTest : MockTestCase() {
 
   @Test
   fun `test clearJumps calls clearJumps`() {
-    vimScope.editor {
+    myVimApi.editor {
       change {
         clearJumps()
       }

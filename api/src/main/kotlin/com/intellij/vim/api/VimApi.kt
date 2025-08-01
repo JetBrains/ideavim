@@ -6,20 +6,27 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.intellij.vim.api.scopes
+package com.intellij.vim.api
 
-import com.intellij.vim.api.Mode
-import com.intellij.vim.api.Path
+import com.intellij.vim.api.models.Mode
+import com.intellij.vim.api.models.Path
+import com.intellij.vim.api.scopes.DigraphScope
+import com.intellij.vim.api.scopes.ListenersScope
+import com.intellij.vim.api.scopes.MappingScope
+import com.intellij.vim.api.scopes.ModalInput
+import com.intellij.vim.api.scopes.OptionScope
+import com.intellij.vim.api.scopes.OutputPanelScope
+import com.intellij.vim.api.scopes.VimApiDsl
 import com.intellij.vim.api.scopes.commandline.CommandLineScope
 import com.intellij.vim.api.scopes.editor.EditorScope
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
 /**
- * Scope that provides vim functions and is an entry point for the other scopes.
+ * Entry point of the Vim API
  */
 @VimApiDsl
-interface VimScope {
+interface VimApi {
   /**
    * Represents the current mode in Vim.
    *
@@ -65,7 +72,7 @@ interface VimScope {
    * @param name The name to register the function under
    * @param function The function to execute when the operator is invoked
    */
-  fun exportOperatorFunction(name: String, function: suspend VimScope.() -> Boolean)
+  fun exportOperatorFunction(name: String, function: suspend VimApi.() -> Boolean)
 
   /**
    * Sets the current operator function to use with the `g@` operator.
@@ -357,7 +364,7 @@ interface VimScope {
    * @param block The logic to execute when the command is invoked. Receives the command name
    *              entered by the user as a parameter.
    */
-  fun command(command: String, block: VimScope.(String) -> Unit)
+  fun command(command: String, block: VimApi.(String) -> Unit)
 
   /**
    * Gets keyed data from a Vim window.
@@ -501,7 +508,7 @@ interface VimScope {
  * @param name The name of the variable, optionally prefixed with a scope (g:, b:, etc.)
  * @param value The value to set
  */
-inline fun <reified T : Any> VimScope.setVariable(name: String, value: T) {
+inline fun <reified T : Any> VimApi.setVariable(name: String, value: T) {
   val kType: KType = typeOf<T>()
   setVariable(name, value, kType)
 }
@@ -517,7 +524,7 @@ inline fun <reified T : Any> VimScope.setVariable(name: String, value: T) {
  * @param name The name of the variable to retrieve.
  * @return The variable of type `T` if found, otherwise `null`.
  */
-inline fun <reified T : Any> VimScope.getVariable(name: String): T? {
+inline fun <reified T : Any> VimApi.getVariable(name: String): T? {
   val kType: KType = typeOf<T>()
   return getVariable(name, kType)
 }

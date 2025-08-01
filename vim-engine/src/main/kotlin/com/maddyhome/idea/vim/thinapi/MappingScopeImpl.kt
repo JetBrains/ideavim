@@ -9,7 +9,7 @@
 package com.maddyhome.idea.vim.thinapi
 
 import com.intellij.vim.api.scopes.MappingScope
-import com.intellij.vim.api.scopes.VimScope
+import com.intellij.vim.api.VimApi
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -33,14 +33,14 @@ class MappingScopeImpl(
     addMapping(from, to, isRecursive = true, MappingMode.VISUAL)
   }
 
-  override fun nmap(from: String, isRepeatable: Boolean, action: suspend VimScope.() -> Unit) {
+  override fun nmap(from: String, isRepeatable: Boolean, action: suspend VimApi.() -> Unit) {
     addMapping(from, isRecursive = true, isRepeatable, action, MappingMode.NORMAL)
   }
 
   override fun vmap(
     from: String,
     isRepeatable: Boolean,
-    action: suspend VimScope.() -> Unit,
+    action: suspend VimApi.() -> Unit,
   ) {
     addMapping(from, isRecursive = true, isRepeatable, action, MappingMode.VISUAL)
   }
@@ -49,7 +49,7 @@ class MappingScopeImpl(
     keys: String,
     label: String,
     isRepeatable: Boolean,
-    action: suspend VimScope.() -> Unit,
+    action: suspend VimApi.() -> Unit,
   ) {
     addMapping(label, true, isRepeatable, action, MappingMode.NORMAL)
     addMapping(keys, label, true, MappingMode.NORMAL)
@@ -59,7 +59,7 @@ class MappingScopeImpl(
     keys: String,
     label: String,
     isRepeatable: Boolean,
-    action: suspend VimScope.() -> Unit,
+    action: suspend VimApi.() -> Unit,
   ) {
     addMapping(label, true, isRepeatable, action, MappingMode.VISUAL)
     addMapping(keys, label, true, MappingMode.VISUAL)
@@ -69,7 +69,7 @@ class MappingScopeImpl(
     addMapping(from, to, isRecursive = true, *MappingMode.ALL.toTypedArray())
   }
 
-  override fun map(from: String, isRepeatable: Boolean, action: suspend VimScope.() -> Unit) {
+  override fun map(from: String, isRepeatable: Boolean, action: suspend VimApi.() -> Unit) {
     addMapping(from, isRecursive = true, isRepeatable, action, *MappingMode.ALL.toTypedArray())
   }
 
@@ -77,7 +77,7 @@ class MappingScopeImpl(
     keys: String,
     label: String,
     isRepeatable: Boolean,
-    action: suspend VimScope.() -> Unit,
+    action: suspend VimApi.() -> Unit,
   ) {
     addMapping(label, true, isRepeatable, action, *MappingMode.ALL.toTypedArray())
     addMapping(keys, label, true, *MappingMode.ALL.toTypedArray())
@@ -87,7 +87,7 @@ class MappingScopeImpl(
     addMapping(from, to, isRecursive = true, MappingMode.VISUAL)
   }
 
-  override fun xmap(from: String, isRepeatable: Boolean, action: suspend VimScope.() -> Unit) {
+  override fun xmap(from: String, isRepeatable: Boolean, action: suspend VimApi.() -> Unit) {
     addMapping(from, isRecursive = true, isRepeatable, action, MappingMode.VISUAL)
   }
 
@@ -95,7 +95,7 @@ class MappingScopeImpl(
     keys: String,
     label: String,
     isRepeatable: Boolean,
-    action: suspend VimScope.() -> Unit,
+    action: suspend VimApi.() -> Unit,
   ) {
     addMapping(label, true, isRepeatable, action, MappingMode.VISUAL)
     addMapping(keys, label, true, MappingMode.VISUAL)
@@ -105,7 +105,7 @@ class MappingScopeImpl(
     addMapping(from, to, isRecursive = true, MappingMode.SELECT)
   }
 
-  override fun smap(from: String, isRepeatable: Boolean, action: suspend VimScope.() -> Unit) {
+  override fun smap(from: String, isRepeatable: Boolean, action: suspend VimApi.() -> Unit) {
     addMapping(from, isRecursive = true, isRepeatable, action, MappingMode.SELECT)
   }
 
@@ -113,7 +113,7 @@ class MappingScopeImpl(
     keys: String,
     label: String,
     isRepeatable: Boolean,
-    action: suspend VimScope.() -> Unit,
+    action: suspend VimApi.() -> Unit,
   ) {
     addMapping(label, true, isRepeatable, action, MappingMode.SELECT)
     addMapping(keys, label, true, MappingMode.SELECT)
@@ -123,7 +123,7 @@ class MappingScopeImpl(
     addMapping(from, to, isRecursive = true, MappingMode.OP_PENDING)
   }
 
-  override fun omap(from: String, isRepeatable: Boolean, action: suspend VimScope.() -> Unit) {
+  override fun omap(from: String, isRepeatable: Boolean, action: suspend VimApi.() -> Unit) {
     addMapping(from, isRecursive = true, isRepeatable, action, MappingMode.OP_PENDING)
   }
 
@@ -131,7 +131,7 @@ class MappingScopeImpl(
     keys: String,
     label: String,
     isRepeatable: Boolean,
-    action: suspend VimScope.() -> Unit,
+    action: suspend VimApi.() -> Unit,
   ) {
     addMapping(label, true, isRepeatable, action, MappingMode.OP_PENDING)
     addMapping(keys, label, true, MappingMode.OP_PENDING)
@@ -141,7 +141,7 @@ class MappingScopeImpl(
     addMapping(from, to, isRecursive = true, MappingMode.INSERT)
   }
 
-  override fun imap(from: String, isRepeatable: Boolean, action: suspend VimScope.() -> Unit) {
+  override fun imap(from: String, isRepeatable: Boolean, action: suspend VimApi.() -> Unit) {
     addMapping(from, isRecursive = true, isRepeatable, action, MappingMode.INSERT)
   }
 
@@ -149,7 +149,7 @@ class MappingScopeImpl(
     keys: String,
     label: String,
     isRepeatable: Boolean,
-    action: suspend VimScope.() -> Unit,
+    action: suspend VimApi.() -> Unit,
   ) {
     addMapping(label, true, isRepeatable, action, MappingMode.INSERT)
     addMapping(keys, label, true, MappingMode.INSERT)
@@ -159,7 +159,7 @@ class MappingScopeImpl(
     addMapping(from, to, isRecursive = true, MappingMode.CMD_LINE)
   }
 
-  override fun cmap(from: String, isRepeatable: Boolean, action: suspend VimScope.() -> Unit) {
+  override fun cmap(from: String, isRepeatable: Boolean, action: suspend VimApi.() -> Unit) {
     addMapping(from, isRecursive = true, isRepeatable, action, MappingMode.CMD_LINE)
   }
 
@@ -167,7 +167,7 @@ class MappingScopeImpl(
     keys: String,
     label: String,
     isRepeatable: Boolean,
-    action: suspend VimScope.() -> Unit,
+    action: suspend VimApi.() -> Unit,
   ) {
     addMapping(label, true, isRepeatable, action, MappingMode.CMD_LINE)
     addMapping(keys, label, true, MappingMode.CMD_LINE)
@@ -177,7 +177,7 @@ class MappingScopeImpl(
     addMapping(from, to, isRecursive = false, MappingMode.NORMAL)
   }
 
-  override fun nnoremap(from: String, isRepeatable: Boolean, action: suspend VimScope.() -> Unit) {
+  override fun nnoremap(from: String, isRepeatable: Boolean, action: suspend VimApi.() -> Unit) {
     addMapping(from, isRecursive = false, isRepeatable, action, MappingMode.NORMAL)
   }
 
@@ -185,7 +185,7 @@ class MappingScopeImpl(
     keys: String,
     label: String,
     isRepeatable: Boolean,
-    action: suspend VimScope.() -> Unit,
+    action: suspend VimApi.() -> Unit,
   ) {
     addMapping(label, false, isRepeatable, action, MappingMode.NORMAL)
     addMapping(keys, label, false, MappingMode.NORMAL)
@@ -195,7 +195,7 @@ class MappingScopeImpl(
     addMapping(from, to, isRecursive = false, MappingMode.VISUAL)
   }
 
-  override fun vnoremap(from: String, isRepeatable: Boolean, action: suspend VimScope.() -> Unit) {
+  override fun vnoremap(from: String, isRepeatable: Boolean, action: suspend VimApi.() -> Unit) {
     addMapping(from, isRecursive = false, isRepeatable, action, MappingMode.VISUAL)
   }
 
@@ -203,7 +203,7 @@ class MappingScopeImpl(
     keys: String,
     label: String,
     isRepeatable: Boolean,
-    action: suspend VimScope.() -> Unit,
+    action: suspend VimApi.() -> Unit,
   ) {
     addMapping(label, false, isRepeatable, action, MappingMode.VISUAL)
     addMapping(keys, label, false, MappingMode.VISUAL)
@@ -213,7 +213,7 @@ class MappingScopeImpl(
     addMapping(from, to, isRecursive = false, *MappingMode.ALL.toTypedArray())
   }
 
-  override fun noremap(from: String, isRepeatable: Boolean, action: suspend VimScope.() -> Unit) {
+  override fun noremap(from: String, isRepeatable: Boolean, action: suspend VimApi.() -> Unit) {
     addMapping(from, isRecursive = false, isRepeatable, action, *MappingMode.ALL.toTypedArray())
   }
 
@@ -221,7 +221,7 @@ class MappingScopeImpl(
     keys: String,
     label: String,
     isRepeatable: Boolean,
-    action: suspend VimScope.() -> Unit,
+    action: suspend VimApi.() -> Unit,
   ) {
     addMapping(label, false, isRepeatable, action, *MappingMode.ALL.toTypedArray())
     addMapping(keys, label, false, *MappingMode.ALL.toTypedArray())
@@ -231,7 +231,7 @@ class MappingScopeImpl(
     addMapping(from, to, isRecursive = false, MappingMode.VISUAL)
   }
 
-  override fun xnoremap(from: String, isRepeatable: Boolean, action: suspend VimScope.() -> Unit) {
+  override fun xnoremap(from: String, isRepeatable: Boolean, action: suspend VimApi.() -> Unit) {
     addMapping(from, isRecursive = false, isRepeatable, action, MappingMode.VISUAL)
   }
 
@@ -239,7 +239,7 @@ class MappingScopeImpl(
     keys: String,
     label: String,
     isRepeatable: Boolean,
-    action: suspend VimScope.() -> Unit,
+    action: suspend VimApi.() -> Unit,
   ) {
     addMapping(label, false, isRepeatable, action, MappingMode.VISUAL)
     addMapping(keys, label, false, MappingMode.VISUAL)
@@ -249,7 +249,7 @@ class MappingScopeImpl(
     addMapping(from, to, isRecursive = false, MappingMode.SELECT)
   }
 
-  override fun snoremap(from: String, isRepeatable: Boolean, action: suspend VimScope.() -> Unit) {
+  override fun snoremap(from: String, isRepeatable: Boolean, action: suspend VimApi.() -> Unit) {
     addMapping(from, isRecursive = false, isRepeatable, action, MappingMode.SELECT)
   }
 
@@ -257,7 +257,7 @@ class MappingScopeImpl(
     keys: String,
     label: String,
     isRepeatable: Boolean,
-    action: suspend VimScope.() -> Unit,
+    action: suspend VimApi.() -> Unit,
   ) {
     addMapping(label, false, isRepeatable, action, MappingMode.SELECT)
     addMapping(keys, label, false, MappingMode.SELECT)
@@ -267,7 +267,7 @@ class MappingScopeImpl(
     addMapping(from, to, isRecursive = false, MappingMode.OP_PENDING)
   }
 
-  override fun onoremap(from: String, isRepeatable: Boolean, action: suspend VimScope.() -> Unit) {
+  override fun onoremap(from: String, isRepeatable: Boolean, action: suspend VimApi.() -> Unit) {
     addMapping(from, isRecursive = false, isRepeatable, action, MappingMode.OP_PENDING)
   }
 
@@ -275,7 +275,7 @@ class MappingScopeImpl(
     keys: String,
     label: String,
     isRepeatable: Boolean,
-    action: suspend VimScope.() -> Unit,
+    action: suspend VimApi.() -> Unit,
   ) {
     addMapping(label, false, isRepeatable, action, MappingMode.OP_PENDING)
     addMapping(keys, label, false, MappingMode.OP_PENDING)
@@ -285,7 +285,7 @@ class MappingScopeImpl(
     addMapping(from, to, isRecursive = false, MappingMode.INSERT)
   }
 
-  override fun inoremap(from: String, isRepeatable: Boolean, action: suspend VimScope.() -> Unit) {
+  override fun inoremap(from: String, isRepeatable: Boolean, action: suspend VimApi.() -> Unit) {
     addMapping(from, isRecursive = false, isRepeatable, action, MappingMode.INSERT)
   }
 
@@ -293,7 +293,7 @@ class MappingScopeImpl(
     keys: String,
     label: String,
     isRepeatable: Boolean,
-    action: suspend VimScope.() -> Unit,
+    action: suspend VimApi.() -> Unit,
   ) {
     addMapping(label, false, isRepeatable, action, MappingMode.INSERT)
     addMapping(keys, label, false, MappingMode.INSERT)
@@ -303,7 +303,7 @@ class MappingScopeImpl(
     addMapping(from, to, isRecursive = false, MappingMode.CMD_LINE)
   }
 
-  override fun cnoremap(from: String, isRepeatable: Boolean, action: suspend VimScope.() -> Unit) {
+  override fun cnoremap(from: String, isRepeatable: Boolean, action: suspend VimApi.() -> Unit) {
     addMapping(from, isRecursive = false, isRepeatable, action, MappingMode.CMD_LINE)
   }
 
@@ -311,7 +311,7 @@ class MappingScopeImpl(
     keys: String,
     label: String,
     isRepeatable: Boolean,
-    action: suspend VimScope.() -> Unit,
+    action: suspend VimApi.() -> Unit,
   ) {
     addMapping(label, false, isRepeatable, action, MappingMode.CMD_LINE)
     addMapping(keys, label, false, MappingMode.CMD_LINE)
@@ -375,7 +375,7 @@ class MappingScopeImpl(
     from: String,
     isRecursive: Boolean,
     isRepeatable: Boolean,
-    action: suspend VimScope.() -> Unit,
+    action: suspend VimApi.() -> Unit,
     vararg mode: MappingMode,
   ) {
     val extensionHandler: ExtensionHandler = object : ExtensionHandler {
@@ -387,7 +387,7 @@ class MappingScopeImpl(
         context: ExecutionContext,
         operatorArguments: OperatorArguments,
       ) {
-        runBlocking {  VimScopeImpl(listenerOwner, mappingOwner).action() }
+        runBlocking {  VimApiImpl(listenerOwner, mappingOwner).action() }
       }
     }
 
