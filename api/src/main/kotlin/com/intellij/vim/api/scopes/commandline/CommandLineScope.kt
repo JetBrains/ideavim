@@ -72,7 +72,7 @@ abstract class CommandLineScope {
     contract {
       callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
-    return ideChange(block)
+    ideChange(block)
   }
 
   protected abstract fun <T> ideRead(block: CommandLineRead.() -> T): T
