@@ -23,8 +23,6 @@ interface VimScope {
   /**
    * Represents the current mode in Vim.
    *
-   * The `mode` variable allows both reading the current mode and setting a new one.
-   *
    * Example usage:
    *
    * **Getting the Current Mode**
@@ -32,14 +30,8 @@ interface VimScope {
    * val currentMode = mode
    * println("Current Vim Mode: $currentMode")
    * ```
-   *
-   * **Setting the Mode**
-   * ```kotlin
-   * mode = Mode.INSERT
-   * println("Switched to Insert Mode")
-   * ```
    */
-  var mode: Mode
+  val mode: Mode
 
   /**
    * Retrieves a variable of the specified type and name.
