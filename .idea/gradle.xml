@@ -9,6 +9,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/annotation-processors" />
+            <option value="$PROJECT_DIR$/api" />
             <option value="$PROJECT_DIR$/scripts" />
             <option value="$PROJECT_DIR$/tests" />
             <option value="$PROJECT_DIR$/tests/java-tests" />
