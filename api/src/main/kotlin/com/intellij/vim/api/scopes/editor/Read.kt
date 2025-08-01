@@ -15,12 +15,12 @@ import com.intellij.vim.api.Line
 import com.intellij.vim.api.Mark
 import com.intellij.vim.api.Path
 import com.intellij.vim.api.Range
-import com.intellij.vim.api.scopes.VimPluginDsl
+import com.intellij.vim.api.scopes.VimApiDsl
 
 /**
  * Scope for editor functions that should be executed under read lock.
  */
-@VimPluginDsl
+@VimApiDsl
 interface Read {
   /**
    * The total length of the text in the editor.

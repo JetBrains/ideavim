@@ -14,7 +14,7 @@ import kotlin.reflect.typeOf
 /**
  * Scope that provides functions for working with options.
  */
-@VimPluginDsl
+@VimApiDsl
 abstract class OptionScope() {
   protected abstract fun <T> getOptionValueInternal(name: String, type: KType): T?
 

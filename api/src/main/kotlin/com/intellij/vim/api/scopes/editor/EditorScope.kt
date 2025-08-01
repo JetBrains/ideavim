@@ -8,9 +8,7 @@
 
 package com.intellij.vim.api.scopes.editor
 
-import com.intellij.vim.api.scopes.editor.Read
-import com.intellij.vim.api.scopes.editor.Transaction
-import com.intellij.vim.api.scopes.VimPluginDsl
+import com.intellij.vim.api.scopes.VimApiDsl
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlin.contracts.ExperimentalContracts
@@ -20,7 +18,7 @@ import kotlin.contracts.contract
 /**
  * Scope that provides access to editor functions.
  */
-@VimPluginDsl
+@VimApiDsl
 abstract class EditorScope {
   /**
    * Executes a read-only operation on the editor.

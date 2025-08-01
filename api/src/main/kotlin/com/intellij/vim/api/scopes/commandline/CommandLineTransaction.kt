@@ -8,12 +8,12 @@
 
 package com.intellij.vim.api.scopes.commandline
 
-import com.intellij.vim.api.scopes.VimPluginDsl
+import com.intellij.vim.api.scopes.VimApiDsl
 
 /**
  * Scope for command line functions that should be executed under write lock.
  */
-@VimPluginDsl
+@VimApiDsl
 interface CommandLineTransaction {
   /**
    * Sets the text content of the command line. It replaces any existing text in the command line with the provided text.

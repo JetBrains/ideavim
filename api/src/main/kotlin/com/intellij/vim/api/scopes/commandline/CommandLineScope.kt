@@ -8,7 +8,7 @@
 
 package com.intellij.vim.api.scopes.commandline
 
-import com.intellij.vim.api.scopes.VimPluginDsl
+import com.intellij.vim.api.scopes.VimApiDsl
 import com.intellij.vim.api.scopes.VimScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
@@ -19,7 +19,7 @@ import kotlin.contracts.contract
 /**
  * Scope for interacting with the Vim command line.
  */
-@VimPluginDsl
+@VimApiDsl
 abstract class CommandLineScope {
   /**
    * Reads input from the command line and processes it with the provided function.

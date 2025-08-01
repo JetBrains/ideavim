@@ -11,7 +11,7 @@ package com.intellij.vim.api.scopes
 /**
  * Scope that provides access to mappings.
  */
-@VimPluginDsl
+@VimApiDsl
 interface MappingScope {
   /**
    * Maps a key sequence in normal mode.

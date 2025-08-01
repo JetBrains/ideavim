@@ -15,7 +15,7 @@ import com.intellij.vim.api.Range
 /**
  * Scope that provides access to various listeners.
  */
-@VimPluginDsl
+@VimApiDsl
 interface ListenersScope {
   /**
    * Registers a callback that is invoked when the editor mode changes.

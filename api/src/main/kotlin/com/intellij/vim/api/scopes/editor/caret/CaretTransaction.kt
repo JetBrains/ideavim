@@ -8,15 +8,14 @@
 
 package com.intellij.vim.api.scopes.editor.caret
 
-import com.intellij.vim.api.Line
 import com.intellij.vim.api.Range
-import com.intellij.vim.api.scopes.VimPluginDsl
+import com.intellij.vim.api.scopes.VimApiDsl
 import com.intellij.vim.api.scopes.editor.Read
 
 /**
  * Scope for caret operations that should be executed under the write lock.
  */
-@VimPluginDsl
+@VimApiDsl
 interface CaretTransaction : CaretRead, Read {
   /**
    * Updates the caret position and optionally sets a selection.

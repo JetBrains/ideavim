@@ -10,4 +10,4 @@ package com.intellij.vim.api.scopes
 
 @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE)
 @DslMarker
-annotation class VimPluginDsl
+internal annotation class VimApiDsl

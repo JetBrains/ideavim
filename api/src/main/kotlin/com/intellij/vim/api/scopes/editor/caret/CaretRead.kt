@@ -13,12 +13,12 @@ import com.intellij.vim.api.Line
 import com.intellij.vim.api.Mark
 import com.intellij.vim.api.Range
 import com.intellij.vim.api.TextType
-import com.intellij.vim.api.scopes.VimPluginDsl
+import com.intellij.vim.api.scopes.VimApiDsl
 
 /**
  * Scope for caret operations that should be executed under the read lock.
  */
-@VimPluginDsl
+@VimApiDsl
 interface CaretRead {
   /**
    * The unique identifier for this caret.

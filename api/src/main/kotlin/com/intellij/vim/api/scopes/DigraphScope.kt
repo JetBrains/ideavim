@@ -11,7 +11,7 @@ package com.intellij.vim.api.scopes
 /**
  * Scope for functions that provide working with digraphs.
  */
-@VimPluginDsl
+@VimApiDsl
 interface DigraphScope {
   /**
    * Gets the character for a digraph.

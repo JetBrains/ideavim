@@ -9,13 +9,13 @@
 package com.intellij.vim.api.scopes.editor
 
 import com.intellij.vim.api.CaretId
-import com.intellij.vim.api.scopes.VimPluginDsl
+import com.intellij.vim.api.scopes.VimApiDsl
 import com.intellij.vim.api.scopes.editor.caret.CaretRead
 
 /**
  * Interface that provides functions that open CaretRead scope.
  */
-@VimPluginDsl
+@VimApiDsl
 interface ReadScope: Read {
   /**
    * Executes the provided block for each caret in the editor and returns a list of results.

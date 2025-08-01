@@ -12,13 +12,13 @@ import com.intellij.vim.api.CaretId
 import com.intellij.vim.api.Color
 import com.intellij.vim.api.HighlightId
 import com.intellij.vim.api.Jump
-import com.intellij.vim.api.scopes.VimPluginDsl
+import com.intellij.vim.api.scopes.VimApiDsl
 import com.intellij.vim.api.scopes.editor.caret.CaretTransaction
 
 /**
  * Scope for editor functions that should be executed under write lock.
  */
-@VimPluginDsl
+@VimApiDsl
 interface Transaction: Read {
   /**
    * Executes the provided block for each caret in the editor and returns a list of results.

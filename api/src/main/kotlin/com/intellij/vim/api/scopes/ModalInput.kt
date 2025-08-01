@@ -21,7 +21,7 @@ package com.intellij.vim.api.scopes
  * - Updating the input prompt with [updateLabel]
  * - Closing the current input dialog with [closeCurrentInput]
  */
-@VimPluginDsl
+@VimApiDsl
 interface ModalInput {
   /**
    * Updates the label of the modal input dialog during input processing.

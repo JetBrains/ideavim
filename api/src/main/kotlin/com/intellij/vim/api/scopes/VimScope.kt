@@ -21,7 +21,7 @@ import kotlin.reflect.typeOf
 /**
  * Scope that provides vim functions and is an entry point for the other scopes.
  */
-@VimPluginDsl
+@VimApiDsl
 abstract class VimScope {
   /**
    * Represents the current mode in Vim.

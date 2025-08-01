@@ -11,7 +11,7 @@ package com.intellij.vim.api.scopes
 /**
  * Scope that provides functions for interacting with the Vim output panel.
  */
-@VimPluginDsl
+@VimApiDsl
 interface OutputPanelScope {
   /**
    * The text displayed in the output panel.
