@@ -12,8 +12,6 @@ import com.intellij.vim.api.scopes.editor.EditorScope
 import com.intellij.vim.api.scopes.editor.ReadScope
 import com.intellij.vim.api.scopes.editor.Transaction
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.common.ListenerOwner
-import com.maddyhome.idea.vim.key.MappingOwner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -21,22 +19,19 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
-class EditorScopeImpl(
-  private val listenerOwner: ListenerOwner,
-  private val mappingOwner: MappingOwner,
-) : EditorScope() {
+class EditorScopeImpl : EditorScope() {
   private val coroutineScope = CoroutineScope(Dispatchers.Unconfined )
 
   override fun <T> ideRead(block: suspend ReadScope.() -> T): Deferred<T> {
     return injector.application.runReadAction {
-      val readScope = ReadScopeImpl(listenerOwner, mappingOwner)
+      val readScope = ReadScopeImpl()
       return@runReadAction coroutineScope.async { block(readScope) }
     }
   }
 
   override fun ideChange(block: suspend Transaction.() -> Unit): Job {
     return injector.application.runWriteAction {
-      val transaction = TransactionImpl(listenerOwner, mappingOwner)
+      val transaction = TransactionImpl()
       coroutineScope.launch { transaction.block() }
     }
   }

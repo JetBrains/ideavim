@@ -20,11 +20,8 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimVirtualFile
 import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.helper.SearchOptions
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.key.MappingOwner
-import com.maddyhome.idea.vim.thinapi.VimScopeImpl
 import com.maddyhome.idea.vim.thinapi.caretId
 import com.maddyhome.idea.vim.thinapi.caretInfo
 import com.maddyhome.idea.vim.thinapi.createApiPath
@@ -32,10 +29,7 @@ import com.maddyhome.idea.vim.thinapi.toApiJump
 import com.maddyhome.idea.vim.thinapi.toApiMark
 import com.maddyhome.idea.vim.thinapi.toRange
 
-open class ReadImpl(
-  listenerOwner: ListenerOwner,
-  mappingOwner: MappingOwner,
-) : Read, VimScopeImpl(listenerOwner, mappingOwner) {
+open class ReadImpl : Read {
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!
 

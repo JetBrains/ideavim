@@ -14,15 +14,10 @@ import com.intellij.vim.api.scopes.editor.ReadScope
 import com.intellij.vim.api.scopes.editor.caret.CaretRead
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.common.ListenerOwner
-import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.thinapi.caretId
 import com.maddyhome.idea.vim.thinapi.editor.caret.CaretReadImpl
 
-class ReadScopeImpl(
-  listenerOwner: ListenerOwner,
-  mappingOwner: MappingOwner,
-) : ReadScope, Read by ReadImpl(listenerOwner, mappingOwner) {
+class ReadScopeImpl : ReadScope, Read by ReadImpl() {
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!
 

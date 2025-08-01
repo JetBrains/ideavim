@@ -17,34 +17,29 @@ import com.intellij.vim.api.scopes.editor.Transaction
 import com.intellij.vim.api.scopes.editor.caret.CaretTransaction
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.common.ListenerOwner
-import com.maddyhome.idea.vim.key.MappingOwner
-import com.maddyhome.idea.vim.thinapi.editor.caret.CaretTransactionImpl
 import com.maddyhome.idea.vim.thinapi.caretId
+import com.maddyhome.idea.vim.thinapi.editor.caret.CaretTransactionImpl
 import com.maddyhome.idea.vim.thinapi.getFilePath
 import com.maddyhome.idea.vim.mark.Jump as EngineJump
 
-class TransactionImpl(
-  private val listenerOwner: ListenerOwner,
-  private val mappingOwner: MappingOwner,
-) : Transaction, Read by ReadImpl(listenerOwner, mappingOwner) {
+class TransactionImpl : Transaction, Read by ReadImpl() {
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!
 
   override suspend fun <T> forEachCaret(block: suspend CaretTransaction.() -> T): List<T> {
     return vimEditor.sortedCarets()
-      .map { caret -> CaretTransactionImpl(listenerOwner, mappingOwner, caret.caretId).block() }
+      .map { caret -> CaretTransactionImpl(caret.caretId).block() }
   }
 
   override suspend fun <T> with(
     caretId: CaretId,
     block: suspend CaretTransaction.() -> T,
   ): T {
-    return CaretTransactionImpl(listenerOwner, mappingOwner, caretId).block()
+    return CaretTransactionImpl(caretId).block()
   }
 
   override suspend fun <T> withPrimaryCaret(block: suspend CaretTransaction.() -> T): T {
-    return CaretTransactionImpl(listenerOwner, mappingOwner, vimEditor.primaryCaret().caretId).block()
+    return CaretTransactionImpl(vimEditor.primaryCaret().caretId).block()
   }
 
   override suspend fun addCaret(offset: Int): CaretId? {

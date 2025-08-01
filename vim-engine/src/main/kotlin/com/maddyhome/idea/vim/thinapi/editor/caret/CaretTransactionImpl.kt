@@ -18,20 +18,16 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.visual.VimSelection
-import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.put.PutData
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.thinapi.editor.ReadImpl
 import com.maddyhome.idea.vim.mark.Jump as EngineJump
 
 class CaretTransactionImpl(
-  private val listenerOwner: ListenerOwner,
-  private val mappingOwner: MappingOwner,
   override val caretId: CaretId,
-) : CaretTransaction, CaretRead by CaretReadImpl(caretId), Read by ReadImpl(listenerOwner, mappingOwner) {
+) : CaretTransaction, CaretRead by CaretReadImpl(caretId), Read by ReadImpl() {
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!
 

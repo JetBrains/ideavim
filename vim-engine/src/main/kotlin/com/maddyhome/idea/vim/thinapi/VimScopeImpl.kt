@@ -11,15 +11,15 @@ package com.maddyhome.idea.vim.thinapi
 
 import com.intellij.vim.api.Mode
 import com.intellij.vim.api.Path
-import com.intellij.vim.api.scopes.commandline.CommandLineScope
 import com.intellij.vim.api.scopes.DigraphScope
-import com.intellij.vim.api.scopes.editor.EditorScope
 import com.intellij.vim.api.scopes.ListenersScope
 import com.intellij.vim.api.scopes.MappingScope
 import com.intellij.vim.api.scopes.ModalInput
 import com.intellij.vim.api.scopes.OptionScope
 import com.intellij.vim.api.scopes.OutputPanelScope
 import com.intellij.vim.api.scopes.VimScope
+import com.intellij.vim.api.scopes.commandline.CommandLineScope
+import com.intellij.vim.api.scopes.editor.EditorScope
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.Key
 import com.maddyhome.idea.vim.api.VimEditor
@@ -42,7 +42,7 @@ import kotlinx.coroutines.runBlocking
 import kotlin.io.path.pathString
 import kotlin.reflect.KType
 
-open class VimScopeImpl(
+class VimScopeImpl(
   private val listenerOwner: ListenerOwner,
   private val mappingOwner: MappingOwner,
 ) : VimScope() {
@@ -129,12 +129,12 @@ open class VimScopeImpl(
   }
 
   override fun editorScope(): EditorScope {
-    return EditorScopeImpl(listenerOwner, mappingOwner)
+    return EditorScopeImpl()
   }
 
   override fun <T> forEachEditor(block: EditorScope.() -> T): List<T> {
     return injector.editorGroup.getEditors().map { editor ->
-      val editorScope = EditorScopeImpl(listenerOwner, mappingOwner)
+      val editorScope = EditorScopeImpl()
       editorScope.block()
     }
   }
