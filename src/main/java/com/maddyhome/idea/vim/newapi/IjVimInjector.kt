@@ -59,13 +59,11 @@ import com.maddyhome.idea.vim.api.VimscriptFunctionService
 import com.maddyhome.idea.vim.api.VimscriptParser
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.isInjectorInitialized
+import com.maddyhome.idea.vim.common.VimListenersNotifier
 import com.maddyhome.idea.vim.diagnostic.VimLogger
-import com.maddyhome.idea.vim.extension.JsonExtensionProvider
 import com.maddyhome.idea.vim.extension.ExtensionLoader
-import com.maddyhome.idea.vim.thinapi.IjJsonExtensionProvider
+import com.maddyhome.idea.vim.extension.JsonExtensionProvider
 import com.maddyhome.idea.vim.extension.VimExtensionRegistrar
-import com.maddyhome.idea.vim.thinapi.IjVimHighlightingService
-import com.maddyhome.idea.vim.thinapi.IjVimPluginService
 import com.maddyhome.idea.vim.group.CommandGroup
 import com.maddyhome.idea.vim.group.EditorGroup
 import com.maddyhome.idea.vim.group.EffectiveIjOptions
@@ -88,7 +86,11 @@ import com.maddyhome.idea.vim.history.VimHistory
 import com.maddyhome.idea.vim.macro.VimMacro
 import com.maddyhome.idea.vim.put.VimPut
 import com.maddyhome.idea.vim.register.VimRegisterGroup
+import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.thinapi.IjExtensionLoader
+import com.maddyhome.idea.vim.thinapi.IjJsonExtensionProvider
+import com.maddyhome.idea.vim.thinapi.IjVimHighlightingService
+import com.maddyhome.idea.vim.thinapi.IjVimPluginService
 import com.maddyhome.idea.vim.thinapi.VimHighlightingService
 import com.maddyhome.idea.vim.thinapi.VimPluginService
 import com.maddyhome.idea.vim.ui.VimRcFileState
