@@ -141,7 +141,7 @@ dependencies {
     // AceJump is an optional dependency. We use their SessionManager class to check if it's active
     plugin("AceJump", "3.8.19")
 
-    bundledPlugins("org.jetbrains.plugins.terminal")
+    bundledPlugins("org.jetbrains.plugins.terminal", "org.jetbrains.kotlin")
 
     // VERSION UPDATE: This module is required since 2025.2
     if (ideaVersion == "LATEST-EAP-SNAPSHOT") {

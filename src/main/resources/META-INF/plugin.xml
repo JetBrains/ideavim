@@ -26,6 +26,7 @@
 
   <!-- Mark the plugin as compatible with RubyMine and other products based on the IntelliJ platform (including CWM) -->
   <depends>com.intellij.modules.platform</depends>
+  <depends>org.jetbrains.kotlin</depends>
   <resource-bundle>messages.IdeaVimBundle</resource-bundle>
 
   <!--  https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html#exploring-module-and-plugin-apis-->
@@ -147,6 +148,10 @@
         implementation="com.maddyhome.idea.vim.troubleshooting.AccidentalInstallDetectorEditorNotificationProvider"/>
 
     <dependencySupport coordinate="configuration" kind="vim" displayName="IdeaVim"/>
+  </extensions>
+
+  <extensions defaultExtensionNs="org.jetbrains.kotlin">
+    <supportsKotlinPluginMode supportsK2="true"/>
   </extensions>
 
   <xi:include href="/META-INF/includes/ApplicationServices.xml" xpointer="xpointer(/idea-plugin/*)"/>
