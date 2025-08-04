@@ -148,10 +148,13 @@
         implementation="com.maddyhome.idea.vim.troubleshooting.AccidentalInstallDetectorEditorNotificationProvider"/>
 
     <dependencySupport coordinate="configuration" kind="vim" displayName="IdeaVim"/>
+
+    <resolveScopeProvider implementation="com.maddyhome.idea.vim.scripting.ide.IdeaVimResolveScopeProvider"/>
   </extensions>
 
   <extensions defaultExtensionNs="org.jetbrains.kotlin">
     <supportsKotlinPluginMode supportsK2="true"/>
+    <scriptDefinitionsSource implementation="com.maddyhome.idea.vim.scripting.ide.IdeaVimScriptDefinitionSource"/>
   </extensions>
 
   <xi:include href="/META-INF/includes/ApplicationServices.xml" xpointer="xpointer(/idea-plugin/*)"/>
