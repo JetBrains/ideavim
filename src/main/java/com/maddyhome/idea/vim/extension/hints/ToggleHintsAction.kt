@@ -9,24 +9,16 @@
 package com.maddyhome.idea.vim.extension.hints
 
 import com.intellij.openapi.actionSystem.ToggleOptionAction
-import com.intellij.openapi.actionSystem.impl.ActionButton
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.wm.WindowManager
 import com.intellij.openapi.wm.impl.IdeGlassPaneImpl
-import com.intellij.openapi.wm.impl.ToolbarComboButton
-import com.intellij.openapi.wm.impl.status.TextPanel
-import com.intellij.ui.InplaceButton
 import com.intellij.ui.JBColor
-import com.intellij.ui.SimpleColoredComponent
-import com.intellij.ui.components.labels.LinkLabel
 import com.intellij.ui.treeStructure.Tree
 import java.awt.Color
 import java.awt.Component
 import java.awt.Container
-import javax.swing.AbstractButton
 import javax.swing.JLabel
 import javax.swing.JPanel
-import javax.swing.JTextArea
-import javax.swing.JTextField
 import javax.swing.SwingUtilities
 
 class ToggleHintsAction : ToggleOptionAction(object : Option {
@@ -63,25 +55,23 @@ class ToggleHintsAction : ToggleOptionAction(object : Option {
   }
 })
 
-private fun Component.isClickable(): Boolean = when (this) {
-  is AbstractButton, is ActionButton, is InplaceButton, is ToolbarComboButton, // buttons
-  is JTextField, is JTextArea, // text inputs
-  is LinkLabel<*>, // clickable links
-  is TextPanel, is SimpleColoredComponent, // in IDE status bar
-    -> isEnabled // exclude disabled components
-  else -> false
-}
+private fun Component.isClickable(): Boolean = (accessibleContext?.accessibleAction?.accessibleActionCount ?: 0) > 0
 
 private fun Component.createCover(glassPane: Component) = JPanel().apply {
   background = JBColor(Color(0, 0, 0, 0), Color(0, 0, 0, 0))
   bounds = SwingUtilities.convertRectangle(this@createCover.parent, this@createCover.bounds, glassPane)
   border = javax.swing.border.LineBorder(JBColor.GREEN, 2)
+  if (ApplicationManager.getApplication().isInternal) {
+    val accessibleName = this@createCover.accessibleContext?.accessibleName
+    if (accessibleName != null) {
+      add(JLabel().apply {
+        text = accessibleName
+        foreground = JBColor.RED
+      })
+    }
+  }
   if (this@createCover is Tree) {
     border = javax.swing.border.LineBorder(JBColor.RED, 2)
-    add(JLabel().apply {
-      text = "TREE"
-      foreground = JBColor.RED
-    })
   }
   isVisible = true
 }
