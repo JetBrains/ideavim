@@ -186,7 +186,7 @@ public class ExTextField extends JTextField {
     }
   }
 
-  public void setSpecialKeyForeground(Color fg) {
+  public void setSpecialKeyForeground(@NotNull Color fg) {
     final Document document = getDocument();
     if (document instanceof ExDocument exDocument) {
       exDocument.setSpecialKeyForeground(fg);

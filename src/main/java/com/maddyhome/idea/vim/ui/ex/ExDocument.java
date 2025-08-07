@@ -48,7 +48,7 @@ public class ExDocument extends DefaultStyledDocument {
    * Maps to Vim's `SpecialKey` highlight
    * </p>
    */
-  void setSpecialKeyForeground(Color fg) {
+  void setSpecialKeyForeground(@NotNull Color fg) {
     final Style style = getStyle(SpecialKeyStyleName);
     if (style != null) {
       StyleConstants.setForeground(style, fg);
