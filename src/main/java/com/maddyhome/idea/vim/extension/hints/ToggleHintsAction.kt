@@ -8,8 +8,9 @@
 
 package com.maddyhome.idea.vim.extension.hints
 
-import com.intellij.openapi.actionSystem.ToggleOptionAction
+import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.project.DumbAwareToggleAction
 import com.intellij.openapi.wm.WindowManager
 import com.intellij.openapi.wm.impl.IdeGlassPaneImpl
 import com.intellij.ui.JBColor
@@ -24,7 +25,7 @@ import javax.swing.SwingUtilities
 /**
  * Toggle hints action
  */
-class ToggleHintsAction : ToggleOptionAction(object : Option {
+class ToggleHintsAction : DumbAwareToggleAction() {
   /** Whether the hints are enabled */
   private var enabled = false
 
@@ -39,12 +40,16 @@ class ToggleHintsAction : ToggleOptionAction(object : Option {
   /**
    * @return current enablement state
    */
-  override fun isSelected(): Boolean = enabled
+  override fun isSelected(e: AnActionEvent): Boolean = enabled
+
+  override fun setSelected(e: AnActionEvent, selected: Boolean) {
+    setSelected(selected)
+  }
 
   /**
    * @param selected new enablement state
    */
-  override fun setSelected(selected: Boolean) {
+  private fun setSelected(selected: Boolean) {
     this.enabled = selected
 
     val frame = WindowManager.getInstance().findVisibleFrame()!!
@@ -70,7 +75,7 @@ class ToggleHintsAction : ToggleOptionAction(object : Option {
     rootComponent.createCovers(glassPane).forEach(cover::add)
     cover.size = glassPane.size
   }
-})
+}
 
 /**
  * Check if the component is clickable
