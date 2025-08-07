@@ -169,9 +169,11 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
     entry.setFont(UiHelper.selectEditorFont(editor, initText));
     parent = editor.getContentComponent();
 
-    entry.setForeground(editor.getColorsScheme().getDefaultForeground());
+    final Color foregroundColour = editor.getColorsScheme().getDefaultForeground();
+    entry.setForeground(foregroundColour);
     // TODO: Introduce IdeaVim colour scheme for "SpecialKey"?
-    entry.setSpecialKeyForeground(editor.getColorsScheme().getColor(EditorColors.WHITESPACES_COLOR));
+    final Color whitespaceColour = editor.getColorsScheme().getColor(EditorColors.WHITESPACES_COLOR);
+    entry.setSpecialKeyForeground(whitespaceColour != null ? whitespaceColour : foregroundColour);
     this.label.setForeground(entry.getForeground());
 
     this.context = context;
