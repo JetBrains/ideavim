@@ -8,8 +8,9 @@
 
 package com.maddyhome.idea.vim.extension.hints
 
-import com.intellij.openapi.actionSystem.ToggleOptionAction
+import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.project.DumbAwareToggleAction
 import com.intellij.openapi.wm.WindowManager
 import com.intellij.openapi.wm.impl.IdeGlassPaneImpl
 import com.intellij.ui.JBColor
@@ -21,7 +22,7 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
 
-class ToggleHintsAction : ToggleOptionAction(object : Option {
+class ToggleHintsAction : DumbAwareToggleAction() {
   private var enabled = false
 
   /** The mask layer container for placing all hints */
@@ -30,22 +31,31 @@ class ToggleHintsAction : ToggleOptionAction(object : Option {
     background = JBColor(0x1F000000, 0x1F000000)
   }
 
-  override fun isSelected(): Boolean = enabled
+  override fun isSelected(e: AnActionEvent): Boolean = enabled
 
-  override fun setSelected(selected: Boolean) {
-    if (selected) { // enable
-      val frame = WindowManager.getInstance().findVisibleFrame() ?: return
-      val rootPane = frame.rootPane
-      val glassPane = frame.glassPane as IdeGlassPaneImpl
+  override fun setSelected(e: AnActionEvent, selected: Boolean) = if (selected) {
+    enable()
+  } else {
+    disable()
+  }
 
-      updateCovers(rootPane, glassPane)
-      if (cover !in glassPane.components) glassPane.add(cover)
-      glassPane.isVisible = true
-      cover.isVisible = true
-    } else { // disable
-      cover.isVisible = false
-    }
-    this.enabled = selected
+  private fun enable() {
+    val frame = WindowManager.getInstance().findVisibleFrame() ?: return
+    val rootPane = frame.rootPane
+    val glassPane = frame.glassPane as IdeGlassPaneImpl
+
+    updateCovers(rootPane, glassPane)
+    if (cover !in glassPane.components) glassPane.add(cover)
+    glassPane.isVisible = true
+    cover.isVisible = true
+
+    enabled = true
+  }
+
+  private fun disable() {
+    cover.isVisible = false
+
+    enabled = false
   }
 
   private fun updateCovers(rootComponent: Component, glassPane: Component) {
@@ -53,7 +63,7 @@ class ToggleHintsAction : ToggleOptionAction(object : Option {
     rootComponent.createCovers(glassPane).forEach(cover::add)
     cover.size = glassPane.size
   }
-})
+}
 
 private fun Component.isClickable(): Boolean = (accessibleContext?.accessibleAction?.accessibleActionCount ?: 0) > 0
 
