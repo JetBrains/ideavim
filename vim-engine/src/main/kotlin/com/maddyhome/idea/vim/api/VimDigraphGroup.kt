@@ -9,7 +9,8 @@ package com.maddyhome.idea.vim.api
 
 interface VimDigraphGroup {
   /**
-   * Returns the codepoint of a character matching the given digraph characters, or `null` if no matching digraph exists
+   * Returns the codepoint of a character matching the given digraph characters, or
+   *   the codepoint of the second char, if no matching digraph exists
    *
    * Note that a [Char] can only handle 16-bit Unicode characters. To support wide characters (e.g. 128388 maps to 🔴),
    * this function retuns a codepoint.

@@ -12,7 +12,7 @@ import com.intellij.vim.api.scopes.DigraphScope
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 
-class DigraphScopeImpl() : DigraphScope {
+class DigraphScopeImpl : DigraphScope {
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!
 
@@ -23,9 +23,5 @@ class DigraphScopeImpl() : DigraphScope {
   override fun add(ch1: Char, ch2: Char, codepoint: Int) {
     val args = "$ch1$ch2 $codepoint"
     injector.digraphGroup.parseCommandLine(vimEditor, args)
-  }
-
-  override fun clearCustomDigraphs() {
-    injector.digraphGroup.clearCustomDigraphs()
   }
 }

@@ -36,11 +36,4 @@ interface DigraphScope {
    * @param codepoint The Unicode codepoint of the character to associate with the digraph
    */
   fun add(ch1: Char, ch2: Char, codepoint: Int)
-
-  /**
-   * Clears all custom digraphs.
-   *
-   * Note: Vim does not provide a built-in command to clear custom digraphs.
-   */
-  fun clearCustomDigraphs()
 }
