@@ -49,19 +49,17 @@ interface MappingScope {
    * Maps a key sequence in normal mode to an action.
    *
    * @param from The key sequence to map from
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
-  fun nmap(from: String, isRepeatable: Boolean = false, action: suspend VimApi.() -> Unit)
+  fun nmap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
    * Maps a key sequence in visual mode to an action.
    *
    * @param from The key sequence to map from
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
-  fun vmap(from: String, isRepeatable: Boolean = false, action: suspend VimApi.() -> Unit)
+  fun vmap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
    * Maps a key sequence in normal mode to an action with a label.
@@ -73,13 +71,11 @@ interface MappingScope {
    *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
   fun nmap(
     keys: String,
     label: String,
-    isRepeatable: Boolean = false,
     action: suspend VimApi.() -> Unit,
   )
 
@@ -93,13 +89,11 @@ interface MappingScope {
    *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
   fun vmap(
     keys: String,
     label: String,
-    isRepeatable: Boolean = false,
     action: suspend VimApi.() -> Unit,
   )
 
@@ -122,10 +116,9 @@ interface MappingScope {
    * Maps a key sequence in all modes to an action.
    *
    * @param from The key sequence to map from
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
-  fun map(from: String, isRepeatable: Boolean = false, action: suspend VimApi.() -> Unit)
+  fun map(from: String, action: suspend VimApi.() -> Unit)
 
   /**
    * Maps a key sequence in all modes to an action with a label.
@@ -137,13 +130,11 @@ interface MappingScope {
    *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
   fun map(
     keys: String,
     label: String,
-    isRepeatable: Boolean = false,
     action: suspend VimApi.() -> Unit,
   )
 
@@ -166,10 +157,9 @@ interface MappingScope {
    * Maps a key sequence in visual exclusive mode to an action.
    *
    * @param from The key sequence to map from
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
-  fun xmap(from: String, isRepeatable: Boolean = false, action: suspend VimApi.() -> Unit)
+  fun xmap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
    * Maps a key sequence in visual exclusive mode to an action with a label.
@@ -181,13 +171,11 @@ interface MappingScope {
    *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
   fun xmap(
     keys: String,
     label: String,
-    isRepeatable: Boolean = false,
     action: suspend VimApi.() -> Unit,
   )
 
@@ -210,10 +198,9 @@ interface MappingScope {
    * Maps a key sequence in select mode to an action.
    *
    * @param from The key sequence to map from
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
-  fun smap(from: String, isRepeatable: Boolean = false, action: suspend VimApi.() -> Unit)
+  fun smap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
    * Maps a key sequence in select mode to an action with a label.
@@ -225,13 +212,11 @@ interface MappingScope {
    *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
   fun smap(
     keys: String,
     label: String,
-    isRepeatable: Boolean = false,
     action: suspend VimApi.() -> Unit,
   )
 
@@ -254,10 +239,9 @@ interface MappingScope {
    * Maps a key sequence in operator pending mode to an action.
    *
    * @param from The key sequence to map from
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
-  fun omap(from: String, isRepeatable: Boolean = false, action: suspend VimApi.() -> Unit)
+  fun omap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
    * Maps a key sequence in operator pending mode to an action with a label.
@@ -269,13 +253,11 @@ interface MappingScope {
    *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
   fun omap(
     keys: String,
     label: String,
-    isRepeatable: Boolean = false,
     action: suspend VimApi.() -> Unit,
   )
 
@@ -298,10 +280,9 @@ interface MappingScope {
    * Maps a key sequence in insert mode to an action.
    *
    * @param from The key sequence to map from
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
-  fun imap(from: String, isRepeatable: Boolean = false, action: suspend VimApi.() -> Unit)
+  fun imap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
    * Maps a key sequence in insert mode to an action with a label.
@@ -313,13 +294,11 @@ interface MappingScope {
    *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
   fun imap(
     keys: String,
     label: String,
-    isRepeatable: Boolean = false,
     action: suspend VimApi.() -> Unit,
   )
 
@@ -342,10 +321,9 @@ interface MappingScope {
    * Maps a key sequence in command line mode to an action.
    *
    * @param from The key sequence to map from
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
-  fun cmap(from: String, isRepeatable: Boolean = false, action: suspend VimApi.() -> Unit)
+  fun cmap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
    * Maps a key sequence in command line mode to an action with a label.
@@ -357,13 +335,11 @@ interface MappingScope {
    *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
   fun cmap(
     keys: String,
     label: String,
-    isRepeatable: Boolean = false,
     action: suspend VimApi.() -> Unit,
   )
 
@@ -379,10 +355,9 @@ interface MappingScope {
    * Maps a key sequence in normal mode to an action non-recursively.
    *
    * @param from The key sequence to map from
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
-  fun nnoremap(from: String, isRepeatable: Boolean = false, action: suspend VimApi.() -> Unit)
+  fun nnoremap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
    * Maps a key sequence in normal mode to an action with a label non-recursively.
@@ -394,13 +369,11 @@ interface MappingScope {
    *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
   fun nnoremap(
     keys: String,
     label: String,
-    isRepeatable: Boolean = false,
     action: suspend VimApi.() -> Unit,
   )
 
@@ -416,10 +389,9 @@ interface MappingScope {
    * Maps a key sequence in visual mode to an action non-recursively.
    *
    * @param from The key sequence to map from
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
-  fun vnoremap(from: String, isRepeatable: Boolean = false, action: suspend VimApi.() -> Unit)
+  fun vnoremap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
    * Maps a key sequence in visual mode to an action with a label non-recursively.
@@ -431,13 +403,11 @@ interface MappingScope {
    *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
   fun vnoremap(
     keys: String,
     label: String,
-    isRepeatable: Boolean = false,
     action: suspend VimApi.() -> Unit,
   )
 
@@ -453,10 +423,9 @@ interface MappingScope {
    * Maps a key sequence in all modes to an action non-recursively.
    *
    * @param from The key sequence to map from
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
-  fun noremap(from: String, isRepeatable: Boolean = false, action: suspend VimApi.() -> Unit)
+  fun noremap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
    * Maps a key sequence in all modes to an action with a label non-recursively.
@@ -468,13 +437,11 @@ interface MappingScope {
    *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
   fun noremap(
     keys: String,
     label: String,
-    isRepeatable: Boolean = false,
     action: suspend VimApi.() -> Unit,
   )
 
@@ -490,10 +457,9 @@ interface MappingScope {
    * Maps a key sequence in visual exclusive mode to an action non-recursively.
    *
    * @param from The key sequence to map from
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
-  fun xnoremap(from: String, isRepeatable: Boolean = false, action: suspend VimApi.() -> Unit)
+  fun xnoremap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
    * Maps a key sequence in visual exclusive mode to an action with a label non-recursively.
@@ -505,13 +471,11 @@ interface MappingScope {
    *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
   fun xnoremap(
     keys: String,
     label: String,
-    isRepeatable: Boolean = false,
     action: suspend VimApi.() -> Unit,
   )
 
@@ -527,10 +491,9 @@ interface MappingScope {
    * Maps a key sequence in select mode to an action non-recursively.
    *
    * @param from The key sequence to map from
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
-  fun snoremap(from: String, isRepeatable: Boolean = false, action: suspend VimApi.() -> Unit)
+  fun snoremap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
    * Maps a key sequence in select mode to an action with a label non-recursively.
@@ -542,13 +505,11 @@ interface MappingScope {
    *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
   fun snoremap(
     keys: String,
     label: String,
-    isRepeatable: Boolean = false,
     action: suspend VimApi.() -> Unit,
   )
 
@@ -564,10 +525,9 @@ interface MappingScope {
    * Maps a key sequence in operator pending mode to an action non-recursively.
    *
    * @param from The key sequence to map from
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
-  fun onoremap(from: String, isRepeatable: Boolean = false, action: suspend VimApi.() -> Unit)
+  fun onoremap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
    * Maps a key sequence in operator pending mode to an action with a label non-recursively.
@@ -579,13 +539,11 @@ interface MappingScope {
    *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
   fun onoremap(
     keys: String,
     label: String,
-    isRepeatable: Boolean = false,
     action: suspend VimApi.() -> Unit,
   )
 
@@ -601,10 +559,9 @@ interface MappingScope {
    * Maps a key sequence in insert mode to an action non-recursively.
    *
    * @param from The key sequence to map from
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
-  fun inoremap(from: String, isRepeatable: Boolean = false, action: suspend VimApi.() -> Unit)
+  fun inoremap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
    * Maps a key sequence in insert mode to an action with a label non-recursively.
@@ -616,13 +573,11 @@ interface MappingScope {
    *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
   fun inoremap(
     keys: String,
     label: String,
-    isRepeatable: Boolean = false,
     action: suspend VimApi.() -> Unit,
   )
 
@@ -638,10 +593,9 @@ interface MappingScope {
    * Maps a key sequence in command line mode to an action non-recursively.
    *
    * @param from The key sequence to map from
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
-  fun cnoremap(from: String, isRepeatable: Boolean = false, action: suspend VimApi.() -> Unit)
+  fun cnoremap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
    * Maps a key sequence in command line mode to an action with a label non-recursively.
@@ -653,13 +607,11 @@ interface MappingScope {
    *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
-   * @param isRepeatable Whether the mapping is repeatable with the dot command
    * @param action The action to execute when the key sequence is pressed
    */
   fun cnoremap(
     keys: String,
     label: String,
-    isRepeatable: Boolean = false,
     action: suspend VimApi.() -> Unit,
   )
 }
