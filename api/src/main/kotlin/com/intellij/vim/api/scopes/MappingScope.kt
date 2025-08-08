@@ -66,6 +66,11 @@ interface MappingScope {
   /**
    * Maps a key sequence in normal mode to an action with a label.
    *
+   * [label] is needed to provide an intermediate mapping from the [keys] to [action].
+   * Two mappings will be created: from [keys] to [label] and from [label] to [action].
+   * In this way, the user will be able to rewrite the default mapping to the plugin by
+   * providing a custom mapping to [label].
+   *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
    * @param isRepeatable Whether the mapping is repeatable with the dot command
@@ -80,6 +85,11 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in visual mode to an action with a label.
+   *
+   * [label] is needed to provide an intermediate mapping from the [keys] to [action].
+   * Two mappings will be created: from [keys] to [label] and from [label] to [action].
+   * In this way, the user will be able to rewrite the default mapping to the plugin by
+   * providing a custom mapping to [label].
    *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
@@ -120,6 +130,11 @@ interface MappingScope {
   /**
    * Maps a key sequence in all modes to an action with a label.
    *
+   * [label] is needed to provide an intermediate mapping from the [keys] to [action].
+   * Two mappings will be created: from [keys] to [label] and from [label] to [action].
+   * In this way, the user will be able to rewrite the default mapping to the plugin by
+   * providing a custom mapping to [label].
+   *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
    * @param isRepeatable Whether the mapping is repeatable with the dot command
@@ -158,6 +173,11 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in visual exclusive mode to an action with a label.
+   *
+   * [label] is needed to provide an intermediate mapping from the [keys] to [action].
+   * Two mappings will be created: from [keys] to [label] and from [label] to [action].
+   * In this way, the user will be able to rewrite the default mapping to the plugin by
+   * providing a custom mapping to [label].
    *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
@@ -198,6 +218,11 @@ interface MappingScope {
   /**
    * Maps a key sequence in select mode to an action with a label.
    *
+   * [label] is needed to provide an intermediate mapping from the [keys] to [action].
+   * Two mappings will be created: from [keys] to [label] and from [label] to [action].
+   * In this way, the user will be able to rewrite the default mapping to the plugin by
+   * providing a custom mapping to [label].
+   *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
    * @param isRepeatable Whether the mapping is repeatable with the dot command
@@ -236,6 +261,11 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in operator pending mode to an action with a label.
+   *
+   * [label] is needed to provide an intermediate mapping from the [keys] to [action].
+   * Two mappings will be created: from [keys] to [label] and from [label] to [action].
+   * In this way, the user will be able to rewrite the default mapping to the plugin by
+   * providing a custom mapping to [label].
    *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
@@ -276,6 +306,11 @@ interface MappingScope {
   /**
    * Maps a key sequence in insert mode to an action with a label.
    *
+   * [label] is needed to provide an intermediate mapping from the [keys] to [action].
+   * Two mappings will be created: from [keys] to [label] and from [label] to [action].
+   * In this way, the user will be able to rewrite the default mapping to the plugin by
+   * providing a custom mapping to [label].
+   *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
    * @param isRepeatable Whether the mapping is repeatable with the dot command
@@ -315,6 +350,11 @@ interface MappingScope {
   /**
    * Maps a key sequence in command line mode to an action with a label.
    *
+   * [label] is needed to provide an intermediate mapping from the [keys] to [action].
+   * Two mappings will be created: from [keys] to [label] and from [label] to [action].
+   * In this way, the user will be able to rewrite the default mapping to the plugin by
+   * providing a custom mapping to [label].
+   *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
    * @param isRepeatable Whether the mapping is repeatable with the dot command
@@ -346,6 +386,11 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in normal mode to an action with a label non-recursively.
+   *
+   * [label] is needed to provide an intermediate mapping from the [keys] to [action].
+   * Two mappings will be created: from [keys] to [label] and from [label] to [action].
+   * In this way, the user will be able to rewrite the default mapping to the plugin by
+   * providing a custom mapping to [label].
    *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
@@ -379,6 +424,11 @@ interface MappingScope {
   /**
    * Maps a key sequence in visual mode to an action with a label non-recursively.
    *
+   * [label] is needed to provide an intermediate mapping from the [keys] to [action].
+   * Two mappings will be created: from [keys] to [label] and from [label] to [action].
+   * In this way, the user will be able to rewrite the default mapping to the plugin by
+   * providing a custom mapping to [label].
+   *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
    * @param isRepeatable Whether the mapping is repeatable with the dot command
@@ -410,6 +460,11 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in all modes to an action with a label non-recursively.
+   *
+   * [label] is needed to provide an intermediate mapping from the [keys] to [action].
+   * Two mappings will be created: from [keys] to [label] and from [label] to [action].
+   * In this way, the user will be able to rewrite the default mapping to the plugin by
+   * providing a custom mapping to [label].
    *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
@@ -443,6 +498,11 @@ interface MappingScope {
   /**
    * Maps a key sequence in visual exclusive mode to an action with a label non-recursively.
    *
+   * [label] is needed to provide an intermediate mapping from the [keys] to [action].
+   * Two mappings will be created: from [keys] to [label] and from [label] to [action].
+   * In this way, the user will be able to rewrite the default mapping to the plugin by
+   * providing a custom mapping to [label].
+   *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
    * @param isRepeatable Whether the mapping is repeatable with the dot command
@@ -474,6 +534,11 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in select mode to an action with a label non-recursively.
+   *
+   * [label] is needed to provide an intermediate mapping from the [keys] to [action].
+   * Two mappings will be created: from [keys] to [label] and from [label] to [action].
+   * In this way, the user will be able to rewrite the default mapping to the plugin by
+   * providing a custom mapping to [label].
    *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
@@ -507,6 +572,11 @@ interface MappingScope {
   /**
    * Maps a key sequence in operator pending mode to an action with a label non-recursively.
    *
+   * [label] is needed to provide an intermediate mapping from the [keys] to [action].
+   * Two mappings will be created: from [keys] to [label] and from [label] to [action].
+   * In this way, the user will be able to rewrite the default mapping to the plugin by
+   * providing a custom mapping to [label].
+   *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
    * @param isRepeatable Whether the mapping is repeatable with the dot command
@@ -539,6 +609,11 @@ interface MappingScope {
   /**
    * Maps a key sequence in insert mode to an action with a label non-recursively.
    *
+   * [label] is needed to provide an intermediate mapping from the [keys] to [action].
+   * Two mappings will be created: from [keys] to [label] and from [label] to [action].
+   * In this way, the user will be able to rewrite the default mapping to the plugin by
+   * providing a custom mapping to [label].
+   *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
    * @param isRepeatable Whether the mapping is repeatable with the dot command
@@ -570,6 +645,11 @@ interface MappingScope {
 
   /**
    * Maps a key sequence in command line mode to an action with a label non-recursively.
+   *
+   * [label] is needed to provide an intermediate mapping from the [keys] to [action].
+   * Two mappings will be created: from [keys] to [label] and from [label] to [action].
+   * In this way, the user will be able to rewrite the default mapping to the plugin by
+   * providing a custom mapping to [label].
    *
    * @param keys The key sequence to map from
    * @param label A label for the mapping
