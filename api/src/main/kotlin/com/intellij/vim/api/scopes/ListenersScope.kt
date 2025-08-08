@@ -8,10 +8,10 @@
 
 package com.intellij.vim.api.scopes
 
+import com.intellij.vim.api.VimApi
 import com.intellij.vim.api.models.CaretId
 import com.intellij.vim.api.models.Mode
 import com.intellij.vim.api.models.Range
-import com.intellij.vim.api.VimApi
 
 /**
  * Scope that provides access to various listeners.

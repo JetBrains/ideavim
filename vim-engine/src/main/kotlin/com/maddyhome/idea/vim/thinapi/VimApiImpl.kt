@@ -13,7 +13,6 @@ import com.intellij.vim.api.VimApi
 import com.intellij.vim.api.models.Mode
 import com.intellij.vim.api.models.Path
 import com.intellij.vim.api.scopes.DigraphScope
-import com.intellij.vim.api.scopes.ListenersScope
 import com.intellij.vim.api.scopes.MappingScope
 import com.intellij.vim.api.scopes.ModalInput
 import com.intellij.vim.api.scopes.OptionScope
@@ -148,10 +147,10 @@ class VimApiImpl(
     mappingScope.block()
   }
 
-  override fun listeners(block: ListenersScope.() -> Unit) {
-    val listenersScope = ListenerScopeImpl(listenerOwner, mappingOwner)
-    listenersScope.block()
-  }
+//  override fun listeners(block: ListenersScope.() -> Unit) {
+//    val listenersScope = ListenerScopeImpl(listenerOwner, mappingOwner)
+//    listenersScope.block()
+//  }
 
   override fun outputPanel(block: OutputPanelScope.() -> Unit) {
     val outputPanelScope = OutputPanelScopeImpl()

@@ -11,7 +11,6 @@ package com.intellij.vim.api
 import com.intellij.vim.api.models.Mode
 import com.intellij.vim.api.models.Path
 import com.intellij.vim.api.scopes.DigraphScope
-import com.intellij.vim.api.scopes.ListenersScope
 import com.intellij.vim.api.scopes.MappingScope
 import com.intellij.vim.api.scopes.ModalInput
 import com.intellij.vim.api.scopes.OptionScope
@@ -151,22 +150,22 @@ interface VimApi {
    */
   fun mappings(block: MappingScope.() -> Unit)
 
-  /**
-   * Provides access to event listener functionality.
-   *
-   * Example usage:
-   * ```kotlin
-   * listeners {
-   *     // Register a listener for mode changes
-   *     onModeChange { oldMode ->
-   *         println("Mode changed from $oldMode")
-   *     }
-   * }
-   * ```
-   *
-   * @param block The code block to execute within the listeners scope
-   */
-  fun listeners(block: ListenersScope.() -> Unit)
+//  /**
+//   * Provides access to event listener functionality.
+//   *
+//   * Example usage:
+//   * ```kotlin
+//   * listeners {
+//   *     // Register a listener for mode changes
+//   *     onModeChange { oldMode ->
+//   *         println("Mode changed from $oldMode")
+//   *     }
+//   * }
+//   * ```
+//   *
+//   * @param block The code block to execute within the listeners scope
+//   */
+//  fun listeners(block: ListenersScope.() -> Unit)
 
   /**
    * Provides access to Vim's output panel functionality.
