@@ -46,20 +46,20 @@ class MappingScopeImpl(
 
   override fun nmap(
     keys: String,
-    label: String,
+    actionName: String,
     action: suspend VimApi.() -> Unit,
   ) {
-    addMapping(label, true, action, MappingMode.NORMAL)
-    addMapping(keys, label, true, MappingMode.NORMAL)
+    addMapping(actionName, true, action, MappingMode.NORMAL)
+    addMapping(keys, actionName, true, MappingMode.NORMAL)
   }
 
   override fun vmap(
     keys: String,
-    label: String,
+    actionName: String,
     action: suspend VimApi.() -> Unit,
   ) {
-    addMapping(label, true, action, MappingMode.VISUAL)
-    addMapping(keys, label, true, MappingMode.VISUAL)
+    addMapping(actionName, true, action, MappingMode.VISUAL)
+    addMapping(keys, actionName, true, MappingMode.VISUAL)
   }
 
   override fun map(from: String, to: String) {
@@ -72,11 +72,11 @@ class MappingScopeImpl(
 
   override fun map(
     keys: String,
-    label: String,
+    actionName: String,
     action: suspend VimApi.() -> Unit,
   ) {
-    addMapping(label, true, action, *MappingMode.ALL.toTypedArray())
-    addMapping(keys, label, true, *MappingMode.ALL.toTypedArray())
+    addMapping(actionName, true, action, *MappingMode.ALL.toTypedArray())
+    addMapping(keys, actionName, true, *MappingMode.ALL.toTypedArray())
   }
 
   override fun xmap(from: String, to: String) {
@@ -89,11 +89,11 @@ class MappingScopeImpl(
 
   override fun xmap(
     keys: String,
-    label: String,
+    actionName: String,
     action: suspend VimApi.() -> Unit,
   ) {
-    addMapping(label, true, action, MappingMode.VISUAL)
-    addMapping(keys, label, true, MappingMode.VISUAL)
+    addMapping(actionName, true, action, MappingMode.VISUAL)
+    addMapping(keys, actionName, true, MappingMode.VISUAL)
   }
 
   override fun smap(from: String, to: String) {
@@ -106,11 +106,11 @@ class MappingScopeImpl(
 
   override fun smap(
     keys: String,
-    label: String,
+    actionName: String,
     action: suspend VimApi.() -> Unit,
   ) {
-    addMapping(label, true, action, MappingMode.SELECT)
-    addMapping(keys, label, true, MappingMode.SELECT)
+    addMapping(actionName, true, action, MappingMode.SELECT)
+    addMapping(keys, actionName, true, MappingMode.SELECT)
   }
 
   override fun omap(from: String, to: String) {
@@ -123,11 +123,11 @@ class MappingScopeImpl(
 
   override fun omap(
     keys: String,
-    label: String,
+    actionName: String,
     action: suspend VimApi.() -> Unit,
   ) {
-    addMapping(label, true, action, MappingMode.OP_PENDING)
-    addMapping(keys, label, true, MappingMode.OP_PENDING)
+    addMapping(actionName, true, action, MappingMode.OP_PENDING)
+    addMapping(keys, actionName, true, MappingMode.OP_PENDING)
   }
 
   override fun imap(from: String, to: String) {
@@ -140,11 +140,11 @@ class MappingScopeImpl(
 
   override fun imap(
     keys: String,
-    label: String,
+    actionName: String,
     action: suspend VimApi.() -> Unit,
   ) {
-    addMapping(label, true, action, MappingMode.INSERT)
-    addMapping(keys, label, true, MappingMode.INSERT)
+    addMapping(actionName, true, action, MappingMode.INSERT)
+    addMapping(keys, actionName, true, MappingMode.INSERT)
   }
 
   override fun cmap(from: String, to: String) {
@@ -157,11 +157,11 @@ class MappingScopeImpl(
 
   override fun cmap(
     keys: String,
-    label: String,
+    actionName: String,
     action: suspend VimApi.() -> Unit,
   ) {
-    addMapping(label, true, action, MappingMode.CMD_LINE)
-    addMapping(keys, label, true, MappingMode.CMD_LINE)
+    addMapping(actionName, true, action, MappingMode.CMD_LINE)
+    addMapping(keys, actionName, true, MappingMode.CMD_LINE)
   }
 
   override fun nnoremap(from: String, to: String) {
@@ -174,11 +174,11 @@ class MappingScopeImpl(
 
   override fun nnoremap(
     keys: String,
-    label: String,
+    actionName: String,
     action: suspend VimApi.() -> Unit,
   ) {
-    addMapping(label, false, action, MappingMode.NORMAL)
-    addMapping(keys, label, false, MappingMode.NORMAL)
+    addMapping(actionName, false, action, MappingMode.NORMAL)
+    addMapping(keys, actionName, false, MappingMode.NORMAL)
   }
 
   override fun vnoremap(from: String, to: String) {
@@ -191,11 +191,11 @@ class MappingScopeImpl(
 
   override fun vnoremap(
     keys: String,
-    label: String,
+    actionName: String,
     action: suspend VimApi.() -> Unit,
   ) {
-    addMapping(label, false, action, MappingMode.VISUAL)
-    addMapping(keys, label, false, MappingMode.VISUAL)
+    addMapping(actionName, false, action, MappingMode.VISUAL)
+    addMapping(keys, actionName, false, MappingMode.VISUAL)
   }
 
   override fun noremap(from: String, to: String) {
@@ -208,11 +208,11 @@ class MappingScopeImpl(
 
   override fun noremap(
     keys: String,
-    label: String,
+    actionName: String,
     action: suspend VimApi.() -> Unit,
   ) {
-    addMapping(label, false, action, *MappingMode.ALL.toTypedArray())
-    addMapping(keys, label, false, *MappingMode.ALL.toTypedArray())
+    addMapping(actionName, false, action, *MappingMode.ALL.toTypedArray())
+    addMapping(keys, actionName, false, *MappingMode.ALL.toTypedArray())
   }
 
   override fun xnoremap(from: String, to: String) {
@@ -225,11 +225,11 @@ class MappingScopeImpl(
 
   override fun xnoremap(
     keys: String,
-    label: String,
+    actionName: String,
     action: suspend VimApi.() -> Unit,
   ) {
-    addMapping(label, false, action, MappingMode.VISUAL)
-    addMapping(keys, label, false, MappingMode.VISUAL)
+    addMapping(actionName, false, action, MappingMode.VISUAL)
+    addMapping(keys, actionName, false, MappingMode.VISUAL)
   }
 
   override fun snoremap(from: String, to: String) {
@@ -242,11 +242,11 @@ class MappingScopeImpl(
 
   override fun snoremap(
     keys: String,
-    label: String,
+    actionName: String,
     action: suspend VimApi.() -> Unit,
   ) {
-    addMapping(label, false, action, MappingMode.SELECT)
-    addMapping(keys, label, false, MappingMode.SELECT)
+    addMapping(actionName, false, action, MappingMode.SELECT)
+    addMapping(keys, actionName, false, MappingMode.SELECT)
   }
 
   override fun onoremap(from: String, to: String) {
@@ -259,11 +259,11 @@ class MappingScopeImpl(
 
   override fun onoremap(
     keys: String,
-    label: String,
+    actionName: String,
     action: suspend VimApi.() -> Unit,
   ) {
-    addMapping(label, false, action, MappingMode.OP_PENDING)
-    addMapping(keys, label, false, MappingMode.OP_PENDING)
+    addMapping(actionName, false, action, MappingMode.OP_PENDING)
+    addMapping(keys, actionName, false, MappingMode.OP_PENDING)
   }
 
   override fun inoremap(from: String, to: String) {
@@ -276,11 +276,11 @@ class MappingScopeImpl(
 
   override fun inoremap(
     keys: String,
-    label: String,
+    actionName: String,
     action: suspend VimApi.() -> Unit,
   ) {
-    addMapping(label, false, action, MappingMode.INSERT)
-    addMapping(keys, label, false, MappingMode.INSERT)
+    addMapping(actionName, false, action, MappingMode.INSERT)
+    addMapping(keys, actionName, false, MappingMode.INSERT)
   }
 
   override fun cnoremap(from: String, to: String) {
@@ -293,11 +293,11 @@ class MappingScopeImpl(
 
   override fun cnoremap(
     keys: String,
-    label: String,
+    actionName: String,
     action: suspend VimApi.() -> Unit,
   ) {
-    addMapping(label, false, action, MappingMode.CMD_LINE)
-    addMapping(keys, label, false, MappingMode.CMD_LINE)
+    addMapping(actionName, false, action, MappingMode.CMD_LINE)
+    addMapping(keys, actionName, false, MappingMode.CMD_LINE)
   }
 
   override fun nunmap(keys: String) {
@@ -369,6 +369,7 @@ class MappingScopeImpl(
         context: ExecutionContext,
         operatorArguments: OperatorArguments,
       ) {
+        // XXX: It's not OK to call runBlocking, but let's keep it to have an API.
         runBlocking { VimApiImpl(listenerOwner, mappingOwner).action() }
       }
     }
