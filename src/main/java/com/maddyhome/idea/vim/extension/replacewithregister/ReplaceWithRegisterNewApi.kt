@@ -21,13 +21,13 @@ private const val PLUGIN_NAME: String = "ReplaceWithRegister"
 @VimPlugin(name = PLUGIN_NAME)
 fun VimApi.init() {
   mappings {
-    nmap(keys = "gr", label = RWR_OPERATOR, isRepeatable = true) {
+    nmap(keys = "gr", actionName = RWR_OPERATOR) {
       rewriteMotion()
     }
-    nmap(keys = "grr", label = RWR_LINE, isRepeatable = true) {
+    nmap(keys = "grr", actionName = RWR_LINE) {
       rewriteLine()
     }
-    vmap(keys = "gr", label = RWR_VISUAL, isRepeatable = true) {
+    vmap(keys = "gr", actionName = RWR_VISUAL) {
       rewriteVisual()
     }
   }

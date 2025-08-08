@@ -100,13 +100,4 @@ class DigraphScopeTest : MockTestCase() {
     verify(injector.digraphGroup).parseCommandLine(editorCaptor.capture(), eq("$ch1$ch2 $codepoint"))
     assertEqualsEditor(vimEditor, editorCaptor.firstValue)
   }
-
-  @Test
-  fun `test clearCustomDigraphs`() {
-    myVimApi.digraph {
-      clearCustomDigraphs()
-    }
-
-    verify(injector.digraphGroup).clearCustomDigraphs()
-  }
 }
