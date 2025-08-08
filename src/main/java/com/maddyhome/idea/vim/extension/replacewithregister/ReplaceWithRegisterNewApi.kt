@@ -51,7 +51,7 @@ private fun VimApi.operatorFunction(): Boolean {
       forEachCaret {
         val selectionRange = getSelection() ?: return@forEachCaret
         val registerData = prepareRegisterData() ?: return@forEachCaret
-        replaceTextAndUpdateCaret(selectionRange, registerData)
+        replaceTextAndUpdateCaret(this@operatorFunction, selectionRange, registerData)
       }
     }
   }
@@ -84,11 +84,11 @@ private fun VimApi.rewriteVisual() {
       forEachCaret {
         val selectionRange = selection
         val registerData = prepareRegisterData() ?: return@forEachCaret
-        replaceTextAndUpdateCaret(selectionRange, registerData)
+        replaceTextAndUpdateCaret(this@rewriteVisual, selectionRange, registerData)
       }
     }
   }
-//  mode = Mode.NORMAL // TODO
+  mode = Mode.NORMAL
 }
 
 private fun CaretTransaction.prepareRegisterData(): Pair<String, TextType>? {
@@ -105,6 +105,7 @@ private fun CaretTransaction.prepareRegisterData(): Pair<String, TextType>? {
 }
 
 private fun CaretTransaction.replaceTextAndUpdateCaret(
+  vimApi: VimApi,
   selectionRange: Range,
   registerData: Pair<String, TextType>,
 ) {
@@ -150,7 +151,7 @@ private fun CaretTransaction.replaceTextAndUpdateCaret(
 
       replaceTextBlockwise(selectionRange, lines)
 
-//      vimApi.mode = Mode.NORMAL // TODO
+      vimApi.mode = Mode.NORMAL
       updateCaret(offset = selections.last().start)
     }
   }

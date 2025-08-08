@@ -50,14 +50,13 @@ class VimApiImpl(
   //   but we don't require to run this under the write lock. Also, esc in insert mode may produce more inserts
   //   when the insert was started with the number: `3iabc<esc>`
   // It'll be necessary to review how the set of mode should be presented in the API.
-  // Uncomment `ModeTest` if the set will get back.
-  override val mode: Mode
+  override var mode: Mode
     get() {
       return injector.vimState.mode.toMode()
     }
-//    set(value) {
-//      changeMode(value, vimEditor)
-//    }
+    set(value) {
+      changeMode(value, vimEditor)
+    }
 
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!

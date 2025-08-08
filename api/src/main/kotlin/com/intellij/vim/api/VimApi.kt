@@ -19,6 +19,7 @@ import com.intellij.vim.api.scopes.OutputPanelScope
 import com.intellij.vim.api.scopes.VimApiDsl
 import com.intellij.vim.api.scopes.commandline.CommandLineScope
 import com.intellij.vim.api.scopes.editor.EditorScope
+import org.jetbrains.annotations.ApiStatus
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
@@ -37,8 +38,12 @@ interface VimApi {
    * val currentMode = mode
    * println("Current Vim Mode: $currentMode")
    * ```
+   *
+   * The set of mode is currently an experimental operation as the contracts of it are getting polished.
+   *   We suggest currently not using it.
    */
-  val mode: Mode
+  @set:ApiStatus.Experimental
+  var mode: Mode
 
   /**
    * Retrieves a variable of the specified type and name.

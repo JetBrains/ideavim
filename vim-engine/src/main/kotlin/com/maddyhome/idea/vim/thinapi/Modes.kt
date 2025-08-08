@@ -142,8 +142,6 @@ fun Mode.toEngineMode(): EngineMode {
   }
 }
 
-// Note: Set of mode is temporally disabled.
-@Suppress("unused")
 fun changeMode(value: Mode, vimEditor: VimEditor?) {
   val vimState = injector.vimState
   val currentMode: EngineMode = vimState.mode
