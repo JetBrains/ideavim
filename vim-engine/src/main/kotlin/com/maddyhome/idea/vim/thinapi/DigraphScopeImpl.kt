@@ -12,7 +12,7 @@ import com.intellij.vim.api.scopes.DigraphScope
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 
-class DigraphScopeImpl : DigraphScope {
+object DigraphScopeImpl : DigraphScope {
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!
 

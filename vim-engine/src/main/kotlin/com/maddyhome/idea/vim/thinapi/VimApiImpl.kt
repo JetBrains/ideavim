@@ -173,8 +173,7 @@ class VimApiImpl(
   }
 
   override fun digraph(block: DigraphScope.() -> Unit) {
-    val digraphScope = DigraphScopeImpl()
-    digraphScope.block()
+    DigraphScopeImpl.block()
   }
 
   override val tabCount: Int
