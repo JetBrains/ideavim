@@ -84,30 +84,34 @@ class ToggleHintsAction : DumbAwareToggleAction() {
  */
 private fun Component.isClickable(): Boolean = (accessibleContext?.accessibleAction?.accessibleActionCount ?: 0) > 0
 
-private fun Component.createCover(glassPane: Component) = JPanel().apply {
-  // transparent background
-  background = JBColor(Color(0, 0, 0, 0), Color(0, 0, 0, 0))
-  // same bounds (location and size) as the original component
-  bounds = SwingUtilities.convertRectangle(this@createCover.parent, this@createCover.bounds, glassPane)
-  // green border
-  border = javax.swing.border.LineBorder(JBColor.GREEN, 2)
-  if (ApplicationManager.getApplication().isInternal) {
-    val accessibleName = this@createCover.accessibleContext?.accessibleName
-    if (accessibleName != null) {
-      // add a label
-      add(JLabel().apply {
-        text = accessibleName
-        foreground = JBColor.RED
-      })
+private class Hint(val component: Component, glassPane: Component) : JPanel() {
+  val label: String?
+    get() = component.accessibleContext?.accessibleName
+
+  init {
+    // transparent background
+    background = JBColor(Color(0, 0, 0, 0), Color(0, 0, 0, 0))
+    // same bounds (location and size) as the original component
+    bounds = SwingUtilities.convertRectangle(component.parent, component.bounds, glassPane)
+    // green border
+    border = javax.swing.border.LineBorder(JBColor.GREEN, 2)
+    if (ApplicationManager.getApplication().isInternal) {
+      if (label != null) {
+        // add a label
+        add(JLabel().apply {
+          text = this@Hint.label
+          foreground = JBColor.RED
+        })
+      }
     }
+    // tree structure
+    if (component is Tree) {
+      // red border
+      border = javax.swing.border.LineBorder(JBColor.RED, 2)
+    }
+    // visible
+    isVisible = true
   }
-  // tree structure
-  if (this@createCover is Tree) {
-    // red border
-    border = javax.swing.border.LineBorder(JBColor.RED, 2)
-  }
-  // visible
-  isVisible = true
 }
 
 /**
@@ -116,10 +120,10 @@ private fun Component.createCover(glassPane: Component) = JPanel().apply {
  * @param this the ancestor of components to be highlighted
  * @return list of cover panels
  */
-private fun Component.createCovers(glassPane: Component): List<JPanel> = if (isVisible) {
-  val hints = mutableListOf<JPanel>()
+private fun Component.createCovers(glassPane: Component): List<Hint> = if (isVisible) {
+  val hints = mutableListOf<Hint>()
   // recursively create covers for children
   if (this is Container) hints += components.flatMap { it.createCovers(glassPane) }
-  if (this.isClickable() || this is Tree) hints.add(this.createCover(glassPane))
+  if (this.isClickable() || this is Tree) hints.add(Hint(this, glassPane))
   hints
 } else emptyList()
