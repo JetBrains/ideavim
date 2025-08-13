@@ -194,39 +194,6 @@ class ExEntryTest : VimExTestCase() {
   }
 
   @Test
-  fun `test backspace deletes character in front of caret`() {
-    typeExInput(":set incsearch<BS>")
-    assertExText("set incsearc")
-
-    typeText("<C-H>")
-    assertExText("set incsear")
-  }
-
-  @Test
-  fun `test backspace character in front of caret cancels entry`() {
-    typeExInput(":<BS>")
-    assertIsDeactivated()
-
-    deactivateExEntry()
-
-    typeExInput(":set<BS><BS><BS><BS>")
-    assertIsDeactivated()
-
-    deactivateExEntry()
-
-    typeExInput(":<C-H>")
-    assertIsDeactivated()
-
-    deactivateExEntry()
-
-    // Don't deactivate if there is still text to the right of the caret
-    typeExInput(":set<C-B>")
-    assertExOffset(0)
-    typeText("<BS>")
-    assertIsActive()
-  }
-
-  @Test
   fun `test delete word before caret`() {
     typeExInput(":set incsearch<C-W>")
     assertExText("set ")
@@ -726,28 +693,17 @@ class ExEntryTest : VimExTestCase() {
     }
   }
 
-  private fun deactivateExEntry() {
-    // We don't need to reset text, that's handled by #active
-    if (exEntryPanel.isActive) {
-      typeText("<C-C>")
-    }
-  }
-
   private fun assertRenderedExText(expected: String) {
     // Get the text directly from the text field. This DOES include prompts or rendered control characters
     assertEquals(expected, exEntryPanel.getRenderedText())
   }
 
   private fun assertIsActive() {
-    assertTrue(exEntryPanel.isActive)
+    assertExIsActive()
   }
 
   private fun assertIsDeactivated() {
-    assertFalse(exEntryPanel.isActive)
-  }
-
-  private fun assertExOffset(expected: Int) {
-    assertEquals(expected, caret.dot)
+    assertExIsDeactivated()
   }
 
   private val exEntryPanel
