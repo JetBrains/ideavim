@@ -34,8 +34,8 @@ import javax.swing.KeyStroke
  * cancel.
  *
  * TODO: What about Visual mode? I think this leaves a hole in escape processing for Visual
- * E.g. `"<Esc>` will reset the key handler, but `v"<Esc>` will not. It will go through [RegisterConsumer] and error,
- * resetting the key handler, but also beeping
+ * E.g. `"<Esc>` will reset the key handler, but `v"<Esc>` will not. It will go through [SelectRegisterConsumer] and
+ * error, resetting the key handler, but also beeping
  */
 internal class EditorResetConsumer : KeyConsumer {
   private companion object {
