@@ -18,16 +18,13 @@ import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
-import org.junit.jupiter.api.BeforeEach
+import org.jetbrains.plugins.ideavim.action.ex.VimExTestCase
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInfo
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
-import kotlin.test.fail
 
 // TODO: Split this class
 // This class should handle simple ex entry features, such as starting ex entry, accepting/cancelling, cursor shape etc.
@@ -36,13 +33,7 @@ import kotlin.test.fail
 // :cmap should also be tested separately
 
 @Suppress("SpellCheckingInspection")
-class ExEntryTest : VimTestCase() {
-  @BeforeEach
-  override fun setUp(testInfo: TestInfo) {
-    super.setUp(testInfo)
-    configureByText("\n")
-  }
-
+class ExEntryTest : VimExTestCase() {
   @Test
   fun `test initial text set to empty string`() {
     typeExInput(":")
@@ -233,27 +224,6 @@ class ExEntryTest : VimTestCase() {
     assertExOffset(0)
     typeText("<BS>")
     assertIsActive()
-  }
-
-  @Test
-  fun `test delete deletes character under caret`() {
-    typeExInput(":set<Left>")
-    typeText("<Del>")
-    assertExText("se")
-  }
-
-  @Test
-  fun `test delete at end of string deletes character to left of caret`() {
-    typeExInput(":set")
-    typeText("<Del>")
-    assertExText("se")
-  }
-
-  @Test
-  fun `test delete with no text cancels entry`() {
-    typeExInput(":set")
-    typeText("<Del><Del><Del><Del>")
-    assertIsDeactivated()
   }
 
   @Test
@@ -766,11 +736,6 @@ class ExEntryTest : VimTestCase() {
   private fun assertRenderedExText(expected: String) {
     // Get the text directly from the text field. This DOES include prompts or rendered control characters
     assertEquals(expected, exEntryPanel.getRenderedText())
-  }
-
-  private fun assertExText(expected: String) {
-    // Get the text directly from the text field. This does NOT include prompts or rendered control characters
-    assertEquals(expected, exEntryPanel.text)
   }
 
   private fun assertIsActive() {
