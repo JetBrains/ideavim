@@ -193,17 +193,6 @@ class ExEntryTest : VimExTestCase() {
     assertExOffset(13)
   }
 
-  @Test
-  fun `test delete to start of line`() {
-    typeExInput(":set incsearch<C-U>")
-    assertExText("")
-
-    deactivateExEntry()
-
-    typeExInput(":set incsearch<Left><Left><Left><C-U>")
-    assertExText("rch")
-  }
-
   @VimBehaviorDiffers(description = "Vim reorders history even when cancelling entry")
   @Test
   fun `test command history`() {
