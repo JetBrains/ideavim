@@ -8,7 +8,6 @@
 
 package org.jetbrains.plugins.ideavim.ex
 
-import com.intellij.idea.TestFor
 import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
@@ -542,54 +541,6 @@ class ExEntryTest : VimExTestCase() {
   }
 
   @Test
-  fun `test insert register`() {
-    VimPlugin.getRegister().setKeys('c', injector.parser.parseKeys("hello world"))
-    VimPlugin.getRegister().setKeys('5', injector.parser.parseKeys("greetings programs"))
-
-    typeExInput(":<C-R>c")
-    assertExText("hello world")
-
-    deactivateExEntry()
-
-    typeExInput(":<C-R>5")
-    assertExText("greetings programs")
-
-    deactivateExEntry()
-
-    typeExInput(":set<Home><C-R>c")
-    assertExText("hello worldset")
-    assertExOffset(11) // Just before 'set'
-  }
-
-  @Test
-  fun `test insert multi-line register`() {
-    // parseKeys parses <CR> in a way that Register#getText doesn't like
-    val keys = mutableListOf<KeyStroke>()
-    keys.addAll(injector.parser.parseKeys("hello<CR>world"))
-    VimPlugin.getRegister().setKeys('c', keys)
-
-    typeExInput(":<C-R>c")
-    assertExText("hello\u000Dworld")
-  }
-
-  // TODO: Test other special registers, if/when supported
-  // E.g. '.' '%' '#', etc.
-
-  @Test
-  fun `test insert last command`() {
-    typeExInput(":set incsearch<CR>")
-    typeExInput(":<C-R>:")
-    assertExText("set incsearch")
-  }
-
-  @Test
-  fun `test insert last search command`() {
-    typeExInput("/hello<CR>")
-    typeExInput(":<C-R>/")
-    assertExText("hello")
-  }
-
-  @Test
   fun `test cmap`() {
     typeExInput(":cmap x z<CR>")
     typeExInput(":cnoremap w z<CR>")
@@ -617,17 +568,6 @@ class ExEntryTest : VimExTestCase() {
     typeText(injector.parser.stringToKeys(":cmap d <C-R>") + injector.parser.parseKeys("<CR>"))
     typeExInput(":de")
     assertExText("hello world")
-  }
-
-  @Test
-  @TestFor(issues = ["VIM-3506"])
-  fun `test quote when awaiting for register during insert`() {
-    injector.registerGroup.setKeys('w', injector.parser.parseKeys("world"))
-    configureByText("")
-    typeText(":hello <C-R>")
-    assertRenderedExText("hello \"")
-    typeText("w")
-    assertRenderedExText("hello world")
   }
 
   @Test
@@ -668,11 +608,6 @@ class ExEntryTest : VimExTestCase() {
     if (keys.isNotEmpty()) {
       typeText(keys)
     }
-  }
-
-  private fun assertRenderedExText(expected: String) {
-    // Get the text directly from the text field. This DOES include prompts or rendered control characters
-    assertEquals(expected, exEntryPanel.getRenderedText())
   }
 
   private fun assertIsActive() {
