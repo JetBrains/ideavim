@@ -62,6 +62,7 @@ internal class StartSelectRegisterConsumer : KeyConsumer {
     // command such as `vi"`
     return key.keyChar == '"'
       && !keyState.commandBuilder.isRegisterPending
+      && !keyState.commandBuilder.isAwaitingArgument
       && !keyState.commandBuilder.isBuildingMultiKeyCommand()
   }
 }
