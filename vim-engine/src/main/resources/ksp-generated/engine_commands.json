@@ -501,7 +501,7 @@
     },
     {
         "keys": "<C-W>",
-        "class": "com.maddyhome.idea.vim.action.ex.DeletePrevWordAction",
+        "class": "com.maddyhome.idea.vim.action.ex.DeletePreviousWordAction",
         "modes": "C"
     },
     {

@@ -194,18 +194,6 @@ class ExEntryTest : VimExTestCase() {
   }
 
   @Test
-  fun `test delete word before caret`() {
-    typeExInput(":set incsearch<C-W>")
-    assertExText("set ")
-
-    deactivateExEntry()
-
-    typeExInput(":set incsearch<Left><Left><Left>")
-    typeText("<C-W>")
-    assertExText("set rch")
-  }
-
-  @Test
   fun `test delete to start of line`() {
     typeExInput(":set incsearch<C-U>")
     assertExText("")
