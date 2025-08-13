@@ -10,25 +10,12 @@ package com.maddyhome.idea.vim.action.ex
 
 import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
-import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.api.VimCommandLine
 import com.maddyhome.idea.vim.common.Graphemes
-import com.maddyhome.idea.vim.handler.VimActionHandler
 
 @CommandOrMotion(keys = ["<DEL>"], modes = [Mode.CMD_LINE])
-class DeleteNextCharAction : VimActionHandler.SingleExecution() {
-  override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
-
-  override fun execute(
-    editor: VimEditor,
-    context: ExecutionContext,
-    cmd: Command,
-    operatorArguments: OperatorArguments,
-  ): Boolean {
-    val commandLine = injector.commandLine.getActiveCommandLine() ?: return false
+class DeleteNextCharAction : CommandLineActionHandler() {
+  override fun execute(commandLine: VimCommandLine): Boolean {
     val caretOffset = commandLine.caret.offset
 
     val oldText = commandLine.text
@@ -37,7 +24,7 @@ class DeleteNextCharAction : VimActionHandler.SingleExecution() {
       return true
     }
 
-    // If the caret is at the end of the text, delete previous character
+    // If the caret is at the end of the text, delete the previous character
     if (caretOffset == oldText.length) {
       val preEndOffset = Graphemes.prev(oldText, oldText.length) ?: return true
       commandLine.deleteText(preEndOffset, oldText.length - preEndOffset)
