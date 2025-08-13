@@ -30,7 +30,7 @@ import com.maddyhome.idea.vim.key.consumers.EditorResetConsumer
 import com.maddyhome.idea.vim.key.consumers.ModalInputConsumer
 import com.maddyhome.idea.vim.key.consumers.ModeInputConsumer
 import com.maddyhome.idea.vim.key.consumers.RegisterConsumer
-import com.maddyhome.idea.vim.key.consumers.SelectRegisterConsumer
+import com.maddyhome.idea.vim.key.consumers.StartSelectRegisterConsumer
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
@@ -56,7 +56,7 @@ class KeyHandler {
     RegisterConsumer(),
     DigraphConsumer(),
     CommandKeyConsumer(),
-    SelectRegisterConsumer(),
+    StartSelectRegisterConsumer(),
     ModeInputConsumer()
   )
   private var handleKeyRecursionCount = 0
