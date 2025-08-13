@@ -10,30 +10,15 @@ package com.maddyhome.idea.vim.action.ex
 
 import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
-import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.api.VimCommandLine
 import com.maddyhome.idea.vim.common.Graphemes
-import com.maddyhome.idea.vim.handler.VimActionHandler
 
 @CommandOrMotion(keys = ["<Right>"], modes = [Mode.CMD_LINE])
-class MoveCaretRightAction : VimActionHandler.SingleExecution() {
-  override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
-
-  override fun execute(
-    editor: VimEditor,
-    context: ExecutionContext,
-    cmd: Command,
-    operatorArguments: OperatorArguments,
-  ): Boolean {
-    val commandLine = injector.commandLine.getActiveCommandLine() ?: return false
+class MoveCaretRightAction : CommandLineActionHandler() {
+  override fun execute(commandLine: VimCommandLine): Boolean {
     val caret = commandLine.caret
-
     val nextOffset = Graphemes.next(commandLine.text, caret.offset) ?: return true
     caret.offset = nextOffset
-
     return true
   }
 }
