@@ -47,17 +47,18 @@ import javax.swing.KeyStroke
 // 2. maybe we can live without allowKeyMappings: Boolean
 class KeyHandler {
   private val keyConsumers: List<KeyConsumer> = listOf(
-    ModalInputConsumer(),
-    MappingProcessor,
+    ModalInputConsumer(), // Must be first
+    MappingProcessor,     // Must be as early in pipeline as possible
     CommandCountConsumer(),
     DeleteCommandCountConsumer(),
     EditorResetConsumer(),
-    CharArgumentConsumer(),
-    StartSelectRegisterConsumer(),
+    StartSelectRegisterConsumer(),  // Must be before command consumer, so " isn't treated as a command char
     SelectRegisterConsumer(),
-    DigraphConsumer(),
-    CommandKeyConsumer(),
-    ModeInputConsumer()
+    DigraphConsumer(),    // Must be before command key consumer so {char}<BS>{char} works.
+                          // Would be a problem if a command prefix requires a DIGRAPH arg (no such command exists)
+    CommandKeyConsumer(), // Must be before argument consumers, to handle c_CTRL-R prefix
+    CharArgumentConsumer(),
+    ModeInputConsumer()   // Must be last to accept the keystroke as typed input
   )
   private var handleKeyRecursionCount = 0
 
