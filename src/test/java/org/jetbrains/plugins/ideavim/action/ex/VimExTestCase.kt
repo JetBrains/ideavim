@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInfo
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 open class VimExTestCase : VimTestCase() {
   @BeforeEach
@@ -31,8 +32,23 @@ open class VimExTestCase : VimTestCase() {
     assertEquals(expected, exEntryPanel.text)
   }
 
+  protected fun assertExOffset(expected: Int) {
+    assertEquals(expected, exEntryPanel.entry.caret.dot)
+  }
+
+  protected fun assertExIsActive() {
+    assertTrue(exEntryPanel.isActive)
+  }
+
   protected fun assertExIsDeactivated() {
     assertFalse(exEntryPanel.isActive)
+  }
+
+  protected fun deactivateExEntry() {
+    // We don't need to reset text, that's handled by #active
+    if (exEntryPanel.isActive) {
+      typeText("<C-C>")
+    }
   }
 
   private val exEntryPanel
