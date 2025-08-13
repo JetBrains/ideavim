@@ -25,9 +25,9 @@ import javax.swing.KeyStroke
  * This consumer will match `"` in Normal or Visual and start the [CommandBuilder] waiting for a register name. It does
  * not need to handle escape or cancel keys as there is no current state to reset.
  */
-internal class SelectRegisterConsumer : KeyConsumer {
+internal class StartSelectRegisterConsumer : KeyConsumer {
   private companion object {
-    private val logger = vimLogger<SelectRegisterConsumer>()
+    private val logger = vimLogger<StartSelectRegisterConsumer>()
   }
 
   override fun isApplicable(
@@ -45,7 +45,7 @@ internal class SelectRegisterConsumer : KeyConsumer {
     allowKeyMappings: Boolean,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
-    logger.trace { "Entered SelectRegisterConsumer" }
+    logger.trace { "Entered StartSelectRegisterConsumer" }
     keyProcessResultBuilder.addExecutionStep { ks, _, _ ->
       ks.commandBuilder.startWaitingForRegister(key)
     }
