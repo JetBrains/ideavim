@@ -57,6 +57,11 @@ internal class StartSelectRegisterConsumer : KeyConsumer {
     if (vimState.mode !is Mode.NORMAL && vimState.mode !is Mode.VISUAL) {
       return false
     }
-    return keyState.commandBuilder.isRegisterPending || key.keyChar == '"'
+
+    // Accept a `"` char, but not when we're already waiting for a register, and not when we're building a multi-key
+    // command such as `vi"`
+    return key.keyChar == '"'
+      && !keyState.commandBuilder.isRegisterPending
+      && !keyState.commandBuilder.isBuildingMultiKeyCommand()
   }
 }

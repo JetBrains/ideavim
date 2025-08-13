@@ -53,10 +53,10 @@ class KeyHandler {
     DeleteCommandCountConsumer(),
     EditorResetConsumer(),
     CharArgumentConsumer(),
+    StartSelectRegisterConsumer(),
     SelectRegisterConsumer(),
     DigraphConsumer(),
     CommandKeyConsumer(),
-    StartSelectRegisterConsumer(),
     ModeInputConsumer()
   )
   private var handleKeyRecursionCount = 0
