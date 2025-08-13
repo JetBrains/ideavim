@@ -12,7 +12,6 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.KeyProcessResult
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.key.KeyConsumer
 import java.awt.event.KeyEvent
@@ -24,9 +23,9 @@ import javax.swing.KeyStroke
  * This consumer does not explicitly handle escape or cancel keys. If the keystroke is not a valid register name
  * (including control characters), the entire command is marked as a bad command.
  */
-internal class RegisterConsumer : KeyConsumer {
+internal class SelectRegisterConsumer : KeyConsumer {
   private companion object {
-    private val logger = vimLogger<CharArgumentConsumer>()
+    private val logger = vimLogger<SelectRegisterConsumer>()
   }
 
   override fun isApplicable(
@@ -44,7 +43,8 @@ internal class RegisterConsumer : KeyConsumer {
     allowKeyMappings: Boolean,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
-    logger.trace { "Entered RegisterConsumer" }
+    logger.trace("Entered SelectRegisterConsumer")
+
     val commandBuilder = keyProcessResultBuilder.state.commandBuilder
     commandBuilder.addTypedKeyStroke(key)
 
