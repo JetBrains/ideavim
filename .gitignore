@@ -3,6 +3,7 @@
 /.intellijPlatform/
 
 /.idea/
+!/.idea/dictionaries/project.xml
 !/.idea/scopes
 !/.idea/copyright
 !/.idea/icon.png
