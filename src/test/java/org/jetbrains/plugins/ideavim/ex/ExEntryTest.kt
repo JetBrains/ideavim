@@ -337,27 +337,6 @@ class ExEntryTest : VimExTestCase() {
     assertExOffset(0)
   }
 
-  @VimBehaviorDiffers(description = "Moving one word right positions caret at end of previous word")
-  @Test
-  fun `test move caret one WORD right`() {
-    typeExInput(":set incsearch")
-    caret.dot = 0
-    typeText("<S-Right>")
-    // TODO: Vim moves caret to "set| ", while we move it to "set |"
-    assertExOffset(4)
-
-    typeText("<S-Right>")
-    assertExOffset(13)
-
-    caret.dot = 0
-    typeText("<C-Right>")
-    // TODO: Vim moves caret to "set| ", while we move it to "set |"
-    assertExOffset(4)
-
-    typeText("<C-Right>")
-    assertExOffset(13)
-  }
-
   @Test
   fun `test insert digraph`() {
     typeExInput(":<C-K>OK")

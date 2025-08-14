@@ -431,7 +431,7 @@
     },
     {
         "keys": "<C-Right>",
-        "class": "com.maddyhome.idea.vim.action.ex.MoveToNextWordAction",
+        "class": "com.maddyhome.idea.vim.action.ex.MoveCaretToNextBigWordAction",
         "modes": "C"
     },
     {
@@ -921,7 +921,7 @@
     },
     {
         "keys": "<S-Right>",
-        "class": "com.maddyhome.idea.vim.action.ex.MoveToNextWordAction",
+        "class": "com.maddyhome.idea.vim.action.ex.MoveCaretToNextBigWordAction",
         "modes": "C"
     },
     {
