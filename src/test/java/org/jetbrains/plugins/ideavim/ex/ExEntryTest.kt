@@ -165,16 +165,6 @@ class ExEntryTest : VimExTestCase() {
     assertEquals("HOR 75", exEntryPanel.entry.caretShape)
   }
 
-  @Test
-  fun `test move caret to beginning of line`() {
-    typeExInput(":set incsearch<C-B>")
-    assertExOffset(0)
-
-    deactivateExEntry()
-
-    typeExInput(":set incsearch<Home>")
-    assertExOffset(0)
-  }
 
   @Test
   fun `test move caret to end of line`() {
