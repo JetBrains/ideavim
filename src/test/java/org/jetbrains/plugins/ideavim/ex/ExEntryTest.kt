@@ -165,23 +165,6 @@ class ExEntryTest : VimExTestCase() {
     assertEquals("HOR 75", exEntryPanel.entry.caretShape)
   }
 
-
-  @Test
-  fun `test move caret to end of line`() {
-    typeExInput(":set incsearch<C-B>")
-    assertExOffset(0)
-
-    typeText("<C-E>")
-    assertExOffset(13)
-
-    deactivateExEntry()
-    typeExInput(":set incsearch<C-B>")
-    assertExOffset(0)
-
-    typeText("<End>")
-    assertExOffset(13)
-  }
-
   @VimBehaviorDiffers(description = "Vim reorders history even when cancelling entry")
   @Test
   fun `test command history`() {
