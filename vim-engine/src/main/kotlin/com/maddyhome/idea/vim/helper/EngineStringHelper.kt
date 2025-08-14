@@ -40,7 +40,13 @@ object EngineStringHelper {
     if (c == KeyEvent.CHAR_UNDEFINED && key.modifiers == 0) {
       c = key.keyCode.toChar()
     } else if (c == KeyEvent.CHAR_UNDEFINED && key.modifiers and InputEvent.CTRL_DOWN_MASK != 0) {
-      c = (key.keyCode - 'A'.code + 1).toChar()
+      val code = key.keyCode
+      if (code >= 'A'.code && code <= '_'.code) {
+        // Ctrl-(A..Z [\]^_) are ASCII control characters
+        c = (code - 'A'.code + 1).toChar()
+      } else {
+        return "^" + code.toChar()
+      }
     }
     return toPrintableCharacter(c)
   }
