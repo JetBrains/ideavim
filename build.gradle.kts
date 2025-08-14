@@ -38,8 +38,6 @@ import org.jetbrains.intellij.platform.gradle.tasks.aware.SplitModeAware
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.kohsuke.github.GHUser
-import java.net.HttpURLConnection
-import java.net.URL
 
 buildscript {
   repositories {
@@ -130,7 +128,7 @@ dependencies {
     // Note that it is also possible to use local("...") to compile against a locally installed IDE
     // E.g. local("/Users/{user}/Applications/IntelliJ IDEA Ultimate.app")
     // Or something like: intellijIdeaUltimate(ideaVersion)
-    create(ideaType, ideaVersion, useInstaller)
+    create(ideaType, ideaVersion) { this.useInstaller = useInstaller }
 
     pluginVerifier()
     zipSigner()
@@ -363,7 +361,7 @@ intellijPlatform {
     password.set(providers.environmentVariable("PRIVATE_KEY_PASSWORD"))
   }
 
-  verifyPlugin {
+  pluginVerification {
     teamCityOutputFormat = true
     ides {
       recommended()
@@ -409,7 +407,7 @@ koverMerged {
 
 // --- Slack notification
 
-tasks.register("slackNotification") {
+tasks.register<Task>("slackNotification") {
   doLast {
     if (version.toString().last() != '0') return@doLast
     if (slackUrl.isBlank()) {
@@ -437,20 +435,25 @@ tasks.register("slackNotification") {
         """.trimIndent()
 
     println("Parsed data: $slackDown")
-    val post = URL(slackUrl)
-    with(post.openConnection() as HttpURLConnection) {
-      requestMethod = "POST"
-      doOutput = true
-      setRequestProperty("Content-Type", "application/json")
 
-      outputStream.write(message.toByteArray())
+    runBlocking {
+      val client = HttpClient(CIO)
+      try {
+        val response = client.post(slackUrl) {
+          contentType(ContentType.Application.Json)
+          setBody(message)
+        }
 
-      val postRc = responseCode
-      println("Response code: $postRc")
-      if (postRc == 200) {
-        println(inputStream.bufferedReader().use { it.readText() })
-      } else {
-        println(errorStream.bufferedReader().use { it.readText() })
+        val responseCode = response.status.value
+        println("Response code: $responseCode")
+
+        val responseBody = response.body<String>()
+        println(responseBody)
+      } catch (e: Exception) {
+        println("Error sending Slack notification: ${e.message}")
+        throw e
+      } finally {
+        client.close()
       }
     }
   }
@@ -465,7 +468,7 @@ tasks.register("slackNotification") {
 // }
 
 // --- Update authors
-tasks.register("updateAuthors") {
+tasks.register<Task>("updateAuthors") {
   doLast {
     val uncheckedEmails = setOf(
       "aleksei.plate@jetbrains.com",
@@ -481,7 +484,7 @@ tasks.register("updateAuthors") {
 
 val prId: String by project
 
-tasks.register("updateMergedPr") {
+tasks.register<Task>("updateMergedPr") {
   doLast {
     val x = changelog.getUnreleased()
     println("x")
@@ -494,13 +497,13 @@ tasks.register("updateMergedPr") {
   }
 }
 
-tasks.register("updateChangelog") {
+tasks.register<Task>("updateChangelog") {
   doLast {
     updateChangelog()
   }
 }
 
-tasks.register("updateYoutrackOnCommit") {
+tasks.register<Task>("updateYoutrackOnCommit") {
   doLast {
     updateYoutrackOnCommit()
   }
@@ -511,12 +514,13 @@ val fixVersionsFieldId = "123-285"
 val fixVersionsFieldType = "VersionProjectCustomField"
 val fixVersionsElementType = "VersionBundleElement"
 
-tasks.register("releaseActions") {
+tasks.register<Task>("releaseActions") {
   group = "other"
   doLast {
     if (releaseType == "patch") return@doLast
 
-    val tickets = getYoutrackTicketsByQuery("%23%7BReady+To+Release%7D%20and%20tag:%20%7BIdeaVim%20Released%20In%20EAP%7D%20")
+    val tickets =
+      getYoutrackTicketsByQuery("%23%7BReady+To+Release%7D%20and%20tag:%20%7BIdeaVim%20Released%20In%20EAP%7D%20")
     if (tickets.isNotEmpty()) {
       println("Updating statuses for tickets: $tickets")
       setYoutrackStatus(tickets, "Fixed")
@@ -534,7 +538,7 @@ tasks.register("releaseActions") {
   }
 }
 
-tasks.register("integrationsTest") {
+tasks.register<Task>("integrationsTest") {
   group = "other"
   doLast {
     val testTicketId = "VIM-2784"
@@ -583,7 +587,7 @@ fun guard(check: Boolean, ifWrong: () -> String) {
   }
 }
 
-tasks.register("testUpdateChangelog") {
+tasks.register<Task>("testUpdateChangelog") {
   group = "verification"
   description = "This is a task to manually assert the correctness of the update tasks"
   doLast {

@@ -43,7 +43,7 @@ dependencies {
       useInstaller = false
     }
 
-    create(ideaType, ideaVersion, useInstaller)
+    create(ideaType, ideaVersion) { this.useInstaller = useInstaller }
     testFramework(TestFrameworkType.Platform)
     testFramework(TestFrameworkType.JUnit5)
     bundledPlugins("com.intellij.java", "org.jetbrains.plugins.yaml")
