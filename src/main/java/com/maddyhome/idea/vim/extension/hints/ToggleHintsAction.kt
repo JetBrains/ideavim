@@ -11,19 +11,18 @@ package com.maddyhome.idea.vim.extension.hints
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.DumbAwareToggleAction
-import com.intellij.openapi.ui.DialogWrapper
+import com.intellij.openapi.ui.popup.JBPopupFactory
+import com.intellij.openapi.ui.popup.JBPopupListener
+import com.intellij.openapi.ui.popup.LightweightWindowEvent
+import com.intellij.openapi.ui.popup.PopupStep
+import com.intellij.openapi.ui.popup.util.BaseListPopupStep
 import com.intellij.openapi.wm.WindowManager
 import com.intellij.openapi.wm.impl.IdeGlassPaneImpl
 import com.intellij.ui.JBColor
-import com.intellij.ui.components.JBList
-import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.treeStructure.Tree
-import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
 import java.awt.Container
-import java.awt.Dimension
-import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
@@ -56,14 +55,20 @@ class ToggleHintsAction : DumbAwareToggleAction() {
     if (cover !in glassPane.components) glassPane.add(cover)
     glassPane.isVisible = true
     cover.isVisible = true
-    val dialog = MySelectDialog()
-    if (dialog.showAndGet()) {
-      val selectedOption = dialog.getSelected()
-      println("Selected: $selectedOption")
-      selectedOption?.component?.accessibleContext?.accessibleAction?.doAccessibleAction(0)
-    } else {
-      println("Cancelled")
-    }
+    val popup =
+      JBPopupFactory.getInstance().createListPopup(object : BaseListPopupStep<Hint>("Type to Filter", hints) {
+        override fun isSpeedSearchEnabled(): Boolean = true
+        override fun onChosen(selectedValue: Hint?, finalChoice: Boolean): PopupStep<*>? {
+          selectedValue?.component?.accessibleContext?.accessibleAction?.doAccessibleAction(0)
+          return FINAL_CHOICE
+        }
+      })
+    popup.addListener(object : JBPopupListener {
+      override fun onClosed(event: LightweightWindowEvent) {
+        disable()
+      }
+    })
+    popup.showInCenterOf(rootPane)
 
     enabled = true
   }
@@ -79,28 +84,6 @@ class ToggleHintsAction : DumbAwareToggleAction() {
     hints = rootComponent.createCovers(glassPane)
     hints.map(Hint::cover).forEach(cover::add)
     cover.size = glassPane.size
-  }
-
-  private inner class MySelectDialog : DialogWrapper(true) {
-
-    private var list = JBList(*hints.toTypedArray())
-
-    init {
-      title = "Select Component to Click"
-      init()
-    }
-
-    override fun createCenterPanel(): JComponent {
-      val panel = JPanel(BorderLayout())
-
-      val scrollPane = JBScrollPane(list)
-      scrollPane.preferredSize = Dimension(300, 150)
-
-      panel.add(scrollPane, BorderLayout.CENTER)
-      return panel
-    }
-
-    fun getSelected(): Hint? = list.selectedValue
   }
 }
 
