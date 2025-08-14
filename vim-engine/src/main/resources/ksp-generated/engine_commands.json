@@ -376,7 +376,7 @@
     },
     {
         "keys": "<C-P>",
-        "class": "com.maddyhome.idea.vim.action.ex.HistoryUpAction",
+        "class": "com.maddyhome.idea.vim.action.ex.SelectOlderHistoryAction",
         "modes": "C"
     },
     {
@@ -846,7 +846,7 @@
     },
     {
         "keys": "<PageUp>",
-        "class": "com.maddyhome.idea.vim.action.ex.HistoryUpAction",
+        "class": "com.maddyhome.idea.vim.action.ex.SelectOlderHistoryAction",
         "modes": "C"
     },
     {
@@ -931,7 +931,7 @@
     },
     {
         "keys": "<S-Up>",
-        "class": "com.maddyhome.idea.vim.action.ex.HistoryUpAction",
+        "class": "com.maddyhome.idea.vim.action.ex.SelectOlderHistoryAction",
         "modes": "C"
     },
     {

@@ -12,7 +12,7 @@ import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.VimCommandLine
 
 @CommandOrMotion(keys = ["<S-Up>", "<C-P>", "<PageUp>"], modes = [Mode.CMD_LINE])
-class HistoryUpAction : CommandLineActionHandler() {
+class SelectOlderHistoryAction : CommandLineActionHandler() {
   override fun execute(commandLine: VimCommandLine): Boolean {
     commandLine.selectHistory(isUp = true, filter = false)
     return true
