@@ -12,8 +12,6 @@ import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.ui.ex.ExDocument
-import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
@@ -31,7 +29,6 @@ import kotlin.test.assertTrue
 // or literal, etc. should have individual test classes in the ideavim.ex.action package
 // :cmap should also be tested separately
 
-@Suppress("SpellCheckingInspection")
 class ExEntryTest : VimExTestCase() {
   @Test
   fun `test initial text set to empty string`() {
@@ -304,23 +301,6 @@ class ExEntryTest : VimExTestCase() {
     assertExText("so cool")
   }
 
-  @Test
-  fun `test toggle insert replace`() {
-    val exDocument = exEntryPanel.entry.document as ExDocument
-    assertFalse(exDocument.isOverwrite)
-    typeExInput(":set<C-B>digraph")
-    assertExText("digraphset")
-
-    deactivateExEntry()
-
-    typeExInput(":set<C-B><Insert>digraph")
-    assertTrue(exDocument.isOverwrite)
-    assertExText("digraph")
-
-    typeText("<Insert><C-B>set ")
-    assertFalse(exDocument.isOverwrite)
-    assertExText("set digraph")
-  }
 
   @Test
   fun `test insert digraph`() {
@@ -554,10 +534,4 @@ class ExEntryTest : VimExTestCase() {
   private fun assertIsDeactivated() {
     assertExIsDeactivated()
   }
-
-  private val exEntryPanel
-    get() = ExEntryPanel.getOrCreateInstance()
-
-  private val caret
-    get() = exEntryPanel.entry.caret
 }

@@ -56,6 +56,6 @@ open class VimExTestCase : VimTestCase() {
     }
   }
 
-  private val exEntryPanel
+  protected val exEntryPanel: ExEntryPanel
     get() = ExEntryPanel.getOrCreateInstance()
 }
