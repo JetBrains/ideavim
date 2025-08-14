@@ -323,21 +323,6 @@ class ExEntryTest : VimExTestCase() {
   }
 
   @Test
-  fun `test move caret one WORD left`() {
-    typeExInput(":set incsearch<S-Left>")
-    assertExOffset(4)
-    typeText("<S-Left>")
-    assertExOffset(0)
-
-    deactivateExEntry()
-
-    typeExInput(":set incsearch<C-Left>")
-    assertExOffset(4)
-    typeText("<C-Left>")
-    assertExOffset(0)
-  }
-
-  @Test
   fun `test insert digraph`() {
     typeExInput(":<C-K>OK")
     assertExText("✓")

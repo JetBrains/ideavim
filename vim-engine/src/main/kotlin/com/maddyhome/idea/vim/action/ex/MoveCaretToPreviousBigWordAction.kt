@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.handler.Motion
 
 @CommandOrMotion(keys = ["<C-Left>", "<S-Left>"], modes = [Mode.CMD_LINE])
-class MoveToPreviousWordAction : CommandLineActionHandler() {
+class MoveCaretToPreviousBigWordAction : CommandLineActionHandler() {
   override fun execute(commandLine: VimCommandLine): Boolean {
     val text = commandLine.text
     // TODO: Should this be WORD or word?
