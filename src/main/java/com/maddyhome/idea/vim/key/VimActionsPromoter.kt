@@ -74,6 +74,13 @@ internal class VimActionsPromoter : ActionPromoter {
           ordered.add(vimAction)
         }
 
+        // Unless we're in some kind of editable mode, don't allow ExpandLiveTemplateByTabAction. We don't want to
+        // invoke an action that will edit text while we're in e.g., Normal. This isn't a hard and fast rule - we don't
+        // remove InsertInlineCompletionAction or Next Edit Suggestions. These are ok because there are visible prompts,
+        // so modifying text in Normal is expected.
+        if (it is ExpandLiveTemplateByTabAction && mode != Mode.INSERT && mode != Mode.REPLACE && mode !is Mode.SELECT) {
+          return@forEach
+        }
         ordered.add(it)
       }
 
