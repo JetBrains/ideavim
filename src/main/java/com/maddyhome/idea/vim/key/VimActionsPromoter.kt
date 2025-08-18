@@ -67,9 +67,7 @@ internal class VimActionsPromoter : ActionPromoter {
           return@forEach
         }
 
-        // Add VimShortcutKeyAction just before TabAction.
-        // TODO: We shouldn't add VimShortcutKeyAction for Tab in Insert mode
-        // The action has a check for this and disables itself. This means we can't remap i_Tab
+        // Add VimShortcutKeyAction just before TabAction, and after all of the contextual actions
         if (it is TabAction) {
           ordered.add(vimAction)
         }

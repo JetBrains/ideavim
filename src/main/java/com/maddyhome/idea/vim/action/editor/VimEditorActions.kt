@@ -9,8 +9,10 @@
 package com.maddyhome.idea.vim.action.editor
 
 import com.intellij.openapi.actionSystem.IdeActions
+import com.intellij.openapi.editor.actions.TabAction
 import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
+import com.maddyhome.idea.vim.action.VimShortcutKeyAction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -20,6 +22,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.IdeActionHandler
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.key.VimActionsPromoter
 import com.maddyhome.idea.vim.undo.VimKeyBasedUndoService
 import com.maddyhome.idea.vim.undo.VimTimestampBasedUndoService
 import java.util.*
@@ -52,6 +55,27 @@ internal class VimEditorDown : IdeActionHandler(IdeActions.ACTION_EDITOR_MOVE_CA
   }
 }
 
+/**
+ * Invoke the IDE's "EditorTab" action
+ *
+ * Insert mode handler for `<Tab>` and `<C-I>`. This will invoke the IDE's "EditorTab" action, which will insert the
+ * tab or the appropriate number of spaces.
+ *
+ * Note that `Tab` has special handling in [VimActionsPromoter]. Typically, the promoter makes sure that
+ * [VimShortcutKeyAction] is the first action to be evaluated and potentially invoked. However, when the list of
+ * possible actions for the shortcut includes [TabAction], the promoter will actually demote [VimShortcutKeyAction] so
+ * that it is invoked almost last, second only to [TabAction]. This means the user has the chance to invoke context
+ * specific IDE `Tab` actions without the Vim commands interfering, e.g., accepting LLM output, Next Edit Suggestions,
+ * expanding Live Templates, etc.
+ *
+ * In Normal mode, the Vim handler for `Tab` will not insert a tab but move around the jump list. In Insert mode (below)
+ * it invokes "EditorTab" and inserts the text. In both cases, [VimShortcutKeyAction] handles the shortcut and the
+ * default [TabAction] is not involved. The benefit of this is that we can now map `<Tab>` in both Normal and Insert
+ * modes.
+ *
+ * Also, by inserting `Tab` with our action, we will correctly update the scroll position to keep the caret visible,
+ * applying `'scrolloff'` and `'sidescrolloff'`.
+ */
 @CommandOrMotion(keys = ["<Tab>", "<C-I>"], modes = [Mode.INSERT])
 internal class VimEditorTab : IdeActionHandler(IdeActions.ACTION_EDITOR_TAB) {
   override val type: Command.Type = Command.Type.INSERT

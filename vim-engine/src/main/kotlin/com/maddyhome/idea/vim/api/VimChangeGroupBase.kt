@@ -69,9 +69,6 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   @JvmField
   protected var oldOffset: Int = -1
 
-  // Workaround for VIM-1546. Another solution is highly appreciated.
-  var tabAction: Boolean = false
-
   @JvmField
   protected var vimDocumentListener: ChangesListener? = null
 
@@ -350,10 +347,9 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       }
 
       // Ignore multi-character indents as they should be inserted automatically while repeating <Enter> actions
-      if (!tabAction && newFragmentLength > 1 && newFragment.trim { it <= ' ' }.isEmpty()) {
+      if (newFragmentLength > 1 && newFragment.trim { it <= ' ' }.isEmpty()) {
         return
       }
-      tabAction = false
       strokes.addAll(getAdjustCaretActions(change))
       if (oldFragmentLength > 0) {
         val editorDelete = injector.nativeActionManager.deleteAction

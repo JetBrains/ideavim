@@ -1230,4 +1230,39 @@ class MapCommandTest : VimTestCase() {
       enterCommand("imap b test    ")
     }
   }
+
+  @Test
+  fun `test map Tab in Normal mode`() {
+    doTest(
+      listOf("<Tab>"),
+      "",
+      "hello",
+    ) {
+      enterCommand("nmap <Tab> ihello<Esc>")
+    }
+  }
+
+  @TestFor(issues = ["VIM-2331"])
+  @Test
+  fun `test map Tab in Insert mode`() {
+    doTest(
+      listOf("i", "<Tab>", "<Esc>"),
+      "",
+      "hello",
+    ) {
+      enterCommand("imap <Tab> hello")
+    }
+  }
+
+  @TestFor(issues = ["https://github.com/JetBrains/ideavim/discussions/938"])
+  @Test
+  fun `test map Shift+Tab`() {
+    doTest(
+      listOf("i", "<S-Tab>", "<Esc>"),
+      "",
+      "hello",
+    ) {
+      enterCommand("imap <S-Tab> hello")
+    }
+  }
 }
