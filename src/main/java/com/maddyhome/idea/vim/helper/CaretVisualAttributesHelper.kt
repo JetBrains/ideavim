@@ -90,7 +90,7 @@ private fun Editor.updatePrimaryCaretVisualAttributes() {
   if (VimPlugin.isNotEnabled()) thisLogger().error("The caret attributes should not be updated if the IdeaVim is disabled")
   if (isIdeaVimDisabledHere) return
   ApplicationManager.getApplication().invokeAndWait {
-    caretModel.primaryCaret.visualAttributes = AttributesCache.getCaretVisualAttributes(this)
+    caretModel.primaryCaret.visualAttributes = getVisualAttributesForCaret(caretModel.primaryCaret)
   }
 
   // Make sure the caret is visible as soon as it's set. It might be invisible while blinking
@@ -105,12 +105,34 @@ private fun Editor.updatePrimaryCaretVisualAttributes() {
 private fun Editor.updateSecondaryCaretsVisualAttributes() {
   if (VimPlugin.isNotEnabled()) thisLogger().error("The caret attributes should not be updated if the IdeaVim is disabled")
   if (isIdeaVimDisabledHere) return
-  // IntelliJ simulates visual block with multiple carets with selections. Do our best to hide them
-  val attributes = if (this.vim.inBlockSelection) HIDDEN else AttributesCache.getCaretVisualAttributes(this)
   this.caretModel.allCarets.forEach {
     if (it != this.caretModel.primaryCaret) {
+      // IntelliJ simulates visual block with multiple carets with selections. Do our best to hide them
+      val attributes = if (this.vim.inBlockSelection) HIDDEN else getVisualAttributesForCaret(it)
       it.visualAttributes = attributes
     }
+  }
+}
+
+/**
+ * Get the visual attributes for a caret
+ *
+ * The cached per-mode caret attributes don't set a colour and use `null` to represent the default caret colour. If some
+ * other code (such as Next Edit Suggestions) changes the caret colour, return attributes using the current colour.
+ */
+private fun getVisualAttributesForCaret(caret: Caret): CaretVisualAttributes {
+  val currentAttributes = caret.visualAttributes
+  val newAttributes = AttributesCache.getCaretVisualAttributes(caret.editor)
+  return if (newAttributes.color == null && caret.visualAttributes.color != newAttributes.color) {
+    CaretVisualAttributes(
+      currentAttributes.color,
+      newAttributes.weight,
+      newAttributes.shape,
+      newAttributes.thickness,
+    )
+  }
+  else {
+    newAttributes
   }
 }
 
