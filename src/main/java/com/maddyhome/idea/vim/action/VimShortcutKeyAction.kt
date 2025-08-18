@@ -35,11 +35,9 @@ import com.maddyhome.idea.vim.handler.enableOctopus
 import com.maddyhome.idea.vim.handler.isOctopusEnabled
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.HandlerInjector
-import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.helper.isPrimaryEditor
-import com.maddyhome.idea.vim.helper.isTemplateActive
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
@@ -172,29 +170,6 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
         ActionEnableStatus.yes("Is enabled for Esc", LogLevel.INFO)
       } else {
         ActionEnableStatus.no("Is disabled for Esc", LogLevel.INFO)
-      }
-    }
-
-    if (keyCode == KeyEvent.VK_TAB && editor.isTemplateActive()) {
-      return ActionEnableStatus.no("The key is tab and the template is active", LogLevel.INFO)
-    }
-
-    if (editor.inInsertMode) {
-      if (keyCode == KeyEvent.VK_TAB) {
-        // TODO: This stops VimEditorTab seeing <Tab> in insert mode and correctly scrolling the view
-        // There are multiple actions registered for VK_TAB. The important items, in order, are this, the Live
-        // Templates action and TabAction. Returning false in insert mode means that the Live Template action gets to
-        // execute, and this allows Emmet to work (VIM-674). But it also means that the VimEditorTab handle is never
-        // called, so we can't scroll the caret into view correctly.
-        // If we do return true, VimEditorTab handles the Vim side of things and then invokes
-        // IdeActions.ACTION_EDITOR_TAB, which inserts the tab. It also bypasses the Live Template action, and Emmet
-        // no longer works.
-        // This flag is used when recording text entry/keystrokes for repeated insertion. Because we return false and
-        // don't execute the VimEditorTab handler, we don't record tab as an action. Instead, we see an incoming text
-        // change of multiple whitespace characters, which is normally ignored because it's auto-indent content from
-        // hitting <Enter>. When this flag is set, we record the whitespace as the output of the <Tab>
-        VimPlugin.getChange().tabAction = true
-        return ActionEnableStatus.no("Tab action in insert mode", LogLevel.INFO)
       }
     }
 
