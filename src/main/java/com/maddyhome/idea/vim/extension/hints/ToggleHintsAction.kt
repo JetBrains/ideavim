@@ -9,7 +9,6 @@
 package com.maddyhome.idea.vim.extension.hints
 
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.DumbAwareToggleAction
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.ui.popup.JBPopupListener
@@ -19,6 +18,7 @@ import com.intellij.openapi.ui.popup.util.BaseListPopupStep
 import com.intellij.openapi.wm.WindowManager
 import com.intellij.openapi.wm.impl.IdeGlassPaneImpl
 import com.intellij.ui.JBColor
+import com.intellij.ui.components.JBList
 import com.intellij.ui.treeStructure.Tree
 import java.awt.Color
 import java.awt.Component
@@ -36,8 +36,11 @@ class ToggleHintsAction : DumbAwareToggleAction() {
   /** The mask layer container for placing all hints */
   private val cover = JPanel().apply {
     layout = null // no layout manager (absolute positioning)
-    background = JBColor(0x1F000000, 0x1F000000)
+    isOpaque = false
+    isVisible = false
   }
+
+  private val highlight = HighlightComponent()
 
   private var hints: List<Hint> = emptyList()
 
@@ -55,6 +58,7 @@ class ToggleHintsAction : DumbAwareToggleAction() {
     val glassPane = frame.glassPane as IdeGlassPaneImpl
 
     updateCovers(rootPane, glassPane)
+    if (highlight !in glassPane.components) glassPane.add(highlight)
     if (cover !in glassPane.components) glassPane.add(cover)
     glassPane.isVisible = true
     cover.isVisible = true
@@ -71,6 +75,10 @@ class ToggleHintsAction : DumbAwareToggleAction() {
         disable()
       }
     })
+    popup.addListSelectionListener {
+      val current = ((it.source as JBList<*>).selectedValue as? Hint)
+      highlight.setTarget(current)
+    }
     popup.showInCenterOf(rootPane)
 
     enabled = true
@@ -78,6 +86,7 @@ class ToggleHintsAction : DumbAwareToggleAction() {
 
   private fun disable() {
     cover.isVisible = false
+    highlight.setTarget(null)
 
     enabled = false
   }
@@ -102,22 +111,36 @@ private class Hint(val component: Accessible, loc: Point) {
   val cover = JPanel().apply {
     background = JBColor(Color(0, 0, 0, 0), Color(0, 0, 0, 0))
     bounds = this@Hint.bounds
-    border = javax.swing.border.LineBorder(JBColor.GREEN, 2)
-    if (ApplicationManager.getApplication().isInternal) {
-      if (label != null) {
-        add(JLabel().apply {
-          text = this@Hint.label
-          foreground = JBColor.RED
-        })
-      }
+    border = javax.swing.border.LineBorder(JBColor.BLUE, 1)
+    if (label != null) {
+      add(JLabel().apply {
+        text = this@Hint.label
+        foreground = JBColor.RED
+      })
     }
     if (component is Tree) {
-      border = javax.swing.border.LineBorder(JBColor.RED, 2)
+      border = javax.swing.border.LineBorder(JBColor.RED, 1)
     }
     isVisible = true
   }
 
   override fun toString(): String = label ?: "<not labelled>"
+}
+
+private class HighlightComponent : JPanel() {
+  init {
+    background = JBColor(Color(0, 255, 0, 50), Color(0, 255, 0, 50))
+    border = javax.swing.border.LineBorder(JBColor.GREEN, 1)
+  }
+
+  fun setTarget(target: Hint?) {
+    if (target != null) {
+      bounds = target.bounds
+      isVisible = true
+    } else {
+      isVisible = false
+    }
+  }
 }
 
 /**
