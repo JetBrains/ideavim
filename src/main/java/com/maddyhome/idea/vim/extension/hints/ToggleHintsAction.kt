@@ -19,10 +19,12 @@ import com.intellij.openapi.ui.popup.util.BaseListPopupStep
 import com.intellij.openapi.wm.WindowManager
 import com.intellij.openapi.wm.impl.IdeGlassPaneImpl
 import com.intellij.ui.JBColor
+import com.intellij.ui.components.JBList
 import com.intellij.ui.treeStructure.Tree
 import java.awt.Color
 import java.awt.Component
 import java.awt.Point
+import java.awt.Rectangle
 import javax.accessibility.Accessible
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -41,8 +43,11 @@ class ToggleHintsAction : DumbAwareToggleAction() {
     // no layout manager (absolute positioning)
     layout = null
     // semi-transparent background
-    background = JBColor(0x1F000000, 0x1F000000)
+    background = JBColor(Color(0, 0, 0, 0), Color(0, 0, 0, 0))
+    isVisible = false
   }
+
+  private val highlight = HighlightComponent()
 
   private var hints: List<Hint> = emptyList()
 
@@ -67,9 +72,12 @@ class ToggleHintsAction : DumbAwareToggleAction() {
       val glassPane = frame.glassPane as IdeGlassPaneImpl
 
       updateCovers(rootPane, glassPane)
+      if (highlight !in glassPane.components) glassPane.add(highlight)
       if (cover !in glassPane.components) glassPane.add(cover)
       glassPane.isVisible = true
-      cover.isVisible = true
+      if (ApplicationManager.getApplication().isInternal) {
+        cover.isVisible = true
+      }
       val popup =
         JBPopupFactory.getInstance().createListPopup(object : BaseListPopupStep<Hint>("Type to Filter", hints) {
           override fun isSpeedSearchEnabled(): Boolean = true
@@ -83,9 +91,14 @@ class ToggleHintsAction : DumbAwareToggleAction() {
           setSelected(false)
         }
       })
+      popup.addListSelectionListener {
+        val current = ((it.source as JBList<*>).selectedValue as? Hint)
+        highlight.setTarget(current)
+      }
       popup.showInCenterOf(rootPane)
     } else { // disable
       cover.isVisible = false
+      highlight.setTarget(null)
     }
   }
 
@@ -123,26 +136,40 @@ private class Hint(val component: Accessible, loc: Point) {
     // same bounds (location and size) as the original component
     bounds = this@Hint.bounds
     // green border
-    border = javax.swing.border.LineBorder(JBColor.GREEN, 2)
-    if (ApplicationManager.getApplication().isInternal) {
-      if (label != null) {
-        // add a label
-        add(JLabel().apply {
-          text = this@Hint.label
-          foreground = JBColor.RED
-        })
-      }
+    border = javax.swing.border.LineBorder(JBColor.BLUE, 1)
+    if (label != null) {
+      // add a label
+      add(JLabel().apply {
+        text = this@Hint.label
+        foreground = JBColor.RED
+      })
     }
     // tree structure
     if (component is Tree) {
       // red border
-      border = javax.swing.border.LineBorder(JBColor.RED, 2)
+      border = javax.swing.border.LineBorder(JBColor.RED, 1)
     }
     // visible
     isVisible = true
   }
 
   override fun toString(): String = label ?: "<not labelled>"
+}
+
+private class HighlightComponent : JPanel() {
+  init {
+    background = JBColor(Color(0, 255, 0, 50), Color(0, 255, 0, 50))
+    border = javax.swing.border.LineBorder(JBColor.GREEN, 1)
+  }
+
+  fun setTarget(target: Hint?) {
+    if (target != null) {
+      bounds = target.bounds
+      isVisible = true
+    } else {
+      isVisible = false
+    }
+  }
 }
 
 /**
