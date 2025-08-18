@@ -22,9 +22,11 @@ import com.intellij.ui.JBColor
 import com.intellij.ui.treeStructure.Tree
 import java.awt.Color
 import java.awt.Component
-import java.awt.Container
+import java.awt.Point
+import javax.accessibility.Accessible
 import javax.swing.JLabel
 import javax.swing.JPanel
+import javax.swing.JRootPane
 import javax.swing.SwingUtilities
 
 /**
@@ -59,11 +61,11 @@ class ToggleHintsAction : DumbAwareToggleAction() {
   private fun setSelected(selected: Boolean) {
     this.enabled = selected
 
-    val frame = WindowManager.getInstance().findVisibleFrame()!!
-    val rootPane = frame.rootPane
-    val glassPane = frame.glassPane as IdeGlassPaneImpl
-
     if (selected) { // enable
+      val frame = WindowManager.getInstance().findVisibleFrame()!!
+      val rootPane = frame.rootPane
+      val glassPane = frame.glassPane as IdeGlassPaneImpl
+
       updateCovers(rootPane, glassPane)
       if (cover !in glassPane.components) glassPane.add(cover)
       glassPane.isVisible = true
@@ -93,9 +95,10 @@ class ToggleHintsAction : DumbAwareToggleAction() {
    * @param rootComponent root component
    * @param glassPane glass pane for positioning
    */
-  private fun updateCovers(rootComponent: Component, glassPane: Component) {
+  private fun updateCovers(rootComponent: JRootPane, glassPane: Component) {
     cover.removeAll() // clear existing covers
-    hints = rootComponent.createCovers(glassPane)
+    hints =
+      rootComponent.createCovers(SwingUtilities.convertPoint(rootComponent.parent, rootComponent.location, glassPane))
     hints.map(Hint::cover).forEach(cover::add)
     cover.size = glassPane.size
   }
@@ -106,17 +109,19 @@ class ToggleHintsAction : DumbAwareToggleAction() {
  *
  * @return whether the component is clickable
  */
-private fun Component.isClickable(): Boolean = (accessibleContext?.accessibleAction?.accessibleActionCount ?: 0) > 0
+private fun Accessible.isClickable(): Boolean = (accessibleContext.accessibleAction?.accessibleActionCount ?: 0) > 0
 
-private class Hint(val component: Component, glassPane: Component) {
+private class Hint(val component: Accessible, loc: Point) {
   val label: String?
     get() = component.accessibleContext?.accessibleName
+
+  val bounds: Rectangle = Rectangle(loc, component.accessibleContext.accessibleComponent.size)
 
   val cover = JPanel().apply {
     // transparent background
     background = JBColor(Color(0, 0, 0, 0), Color(0, 0, 0, 0))
     // same bounds (location and size) as the original component
-    bounds = SwingUtilities.convertRectangle(component.parent, component.bounds, glassPane)
+    bounds = this@Hint.bounds
     // green border
     border = javax.swing.border.LineBorder(JBColor.GREEN, 2)
     if (ApplicationManager.getApplication().isInternal) {
@@ -146,10 +151,17 @@ private class Hint(val component: Component, glassPane: Component) {
  * @param this the ancestor of components to be highlighted
  * @return list of cover panels
  */
-private fun Component.createCovers(glassPane: Component): List<Hint> = if (isVisible) {
+private fun Accessible.createCovers(loc: Point): List<Hint> = if (accessibleContext.accessibleComponent.isShowing) {
   val hints = mutableListOf<Hint>()
+  val location = loc + accessibleContext.accessibleComponent.location
   // recursively create covers for children
-  if (this is Container) hints += components.flatMap { it.createCovers(glassPane) }
-  if (this.isClickable() || this is Tree) hints.add(Hint(this, glassPane))
+  hints.addAll((0..<accessibleContext.accessibleChildrenCount).flatMap {
+    accessibleContext.getAccessibleChild(it).createCovers(location)
+  })
+  if (this.isClickable() || this is Tree) {
+    hints.add(Hint(this, location))
+  }
   hints
 } else emptyList()
+
+private operator fun Point.plus(other: Point) = Point(x + other.x, y + other.y)
