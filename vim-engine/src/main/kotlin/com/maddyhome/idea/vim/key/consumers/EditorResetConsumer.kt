@@ -89,5 +89,17 @@ internal class EditorResetConsumer : KeyConsumer {
       }
     }
     KeyHandler.getInstance().reset(keyState, editor.mode)
+
+    // Make sure the caret attributes are up to date. If we've just changed the mode, then they will be. But if someone
+    // has changed the caret while we weren't expecting, then this will at least sync the caret when hitting Escape.
+    // This is a small workaround for an issue in the initial implementation of Next Edit Suggestions. It changes the
+    // caret colour when it has a suggestion, capturing the original caret attributes when it does so. When it resets,
+    // it restores the cached attributes. Unfortunately, we might easily have changed mode between times. I've seen it
+    // happen where NES manages to capture the Op-pending heavy underscore caret attributes, and it's very confusing
+    // when they're restored (LLM-19241).
+    // Ideally, NES would modify the current caret attributes' colour, rather than recreate and/or cache. If this
+    // doesn't get fixed by NES, we could reset caret attributes after every command, which should reduce how long the
+    // incorrect caret is shown.
+    injector.editorGroup.updateCaretsVisualAttributes(editor)
   }
 }
