@@ -961,7 +961,7 @@
     },
     {
         "keys": "<Up>",
-        "class": "com.maddyhome.idea.vim.action.ex.HistoryUpFilterAction",
+        "class": "com.maddyhome.idea.vim.action.ex.SelectOlderHistoryFilteredAction",
         "modes": "C"
     },
     {
