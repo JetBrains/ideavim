@@ -346,7 +346,7 @@
     },
     {
         "keys": "<C-N>",
-        "class": "com.maddyhome.idea.vim.action.ex.HistoryDownAction",
+        "class": "com.maddyhome.idea.vim.action.ex.SelectNewerHistoryAction",
         "modes": "C"
     },
     {
@@ -831,7 +831,7 @@
     },
     {
         "keys": "<PageDown>",
-        "class": "com.maddyhome.idea.vim.action.ex.HistoryDownAction",
+        "class": "com.maddyhome.idea.vim.action.ex.SelectNewerHistoryAction",
         "modes": "C"
     },
     {
@@ -886,7 +886,7 @@
     },
     {
         "keys": "<S-Down>",
-        "class": "com.maddyhome.idea.vim.action.ex.HistoryDownAction",
+        "class": "com.maddyhome.idea.vim.action.ex.SelectNewerHistoryAction",
         "modes": "C"
     },
     {
