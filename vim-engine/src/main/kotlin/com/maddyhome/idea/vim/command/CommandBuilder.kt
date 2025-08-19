@@ -56,7 +56,7 @@ class CommandBuilder private constructor(
   val isEmpty
     get() = commandState == CurrentCommandState.NEW_COMMAND
       && selectedRegister == null
-      && counts.size == 1
+      && counts.size == 1 && counts[0] == 0
       && action == null
       && argument == null
       && fallbackArgumentType == null
