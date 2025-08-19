@@ -11,6 +11,7 @@
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
 import com.intellij.codeInsight.daemon.impl.HintRenderer
+import com.intellij.idea.TestFor
 import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.state.mode.Mode
@@ -377,6 +378,42 @@ class MotionDownActionTest : VimTestCase() {
     }
     typeText(keys)
     assertState(after)
+  }
+
+  @TestFor(issues = ["VIM-4007"])
+  @Test
+  fun `test with inlays - move down from visual column of inlay instead of visual column of character`() {
+    doTest(
+      listOf("j"),
+      """
+        |A Discovery
+        |${c}
+        |I found it in a legendary land
+        |all rocks and lavender and tufted grass,
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.
+      """.trimMargin(),
+      """
+        |A Discovery
+        |
+        |${c}I found it in a legendary land
+        |all rocks and lavender and tufted grass,
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.
+      """.trimMargin()
+    ) {
+      // When an inlay is inserted at an offset, a visual column is inserted for it before the offset. When IdeaVim
+      // moves the caret, it tries to keep the caret on text characters, so skips the visual column of the inlay.
+      // (Normal IntelliJ editor will move the caret to either side of the inlay - so the logical position stays the
+      // same, but the visual position changes).
+      // However, if IdeaVim doesn't move the caret, or if the inlay is added after the caret was last moved, it might
+      // be positioned on the wrong visual column for the offset. VIM-4007 shows this scenario by opening a file on
+      // a blank line, then IntelliJ adds an inlay for LLM code generation. Because the caret was on the wrong visual
+      // column, the calculation to move to up to the same column resulted in a negative number.
+      // This puts the caret on the wrong visual column (the inlay, not the text character).
+      addInlay(12, true, 10)
+      assertVisualPosition(1, 0)
+    }
   }
 
   @Test

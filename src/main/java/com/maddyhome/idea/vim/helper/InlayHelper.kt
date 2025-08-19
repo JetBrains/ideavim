@@ -71,12 +71,29 @@ private fun getVisualPositionForTextAtOffset(editor: Editor, offset: Int): Visua
 }
 
 internal val Caret.inlayAwareVisualColumn: Int
-  get() = this.visualPosition.column - this.amountOfInlaysBeforeCaret
+  get() {
+    // When an inlay is inserted at an offset, it is placed in a new visual column before the offset. When transforming
+    // an offset to a visual position, both the visual column of the text and the visual column of the inlay are valid.
+    // IdeaVim tries hard to always keep the caret on a text character rather than an inlay, so if we subtract the
+    // number of inlays before the caret from the current visual column, we get a "simplified" visual column. (i.e.,
+    // includes visual columns for folds, but excludes inlays).
+    // However, we can't assume that the caret has been positioned on the correct visual column. Perhaps the inlay has
+    // been added since the last time IdeaVim moved or corrected the caret. In which case, we should re-calculate the
+    // preferred visual column and then subtract.
+    // One scenario where this can happen is when opening a file with the caret on an empty line and the IDE adding an
+    // inlay as a hint for LLM completion. Because the caret hasn't been repositioned, we get a negative visual column.
+    // Make sure that doesn't happen.
+    val textVisualColumn = getVisualPositionForTextAtOffset(this.editor, this.offset).column
+    return (textVisualColumn - this.amountOfInlaysBeforeCaret).coerceAtLeast(0)
+  }
 
 internal val Caret.amountOfInlaysBeforeCaret: Int
   get() {
-    val curLineStartOffset: Int = this.editor.document.getLineStartOffset(logicalPosition.line)
-    return this.editor.inlayModel.getInlineElementsInRange(curLineStartOffset, this.offset).size
+    // An inlay associated with an offset is placed in a visual column before the offset, regardless of if it's related
+    // to preceding text or following text. When transforming an offset to a visual position, both the visual column of
+    // the text and the visual column of the inlay are valid.
+    val lineStartOffset: Int = this.editor.document.getLineStartOffset(logicalPosition.line)
+    return this.editor.inlayModel.getInlineElementsInRange(lineStartOffset, this.offset).size
   }
 
 internal fun Editor.amountOfInlaysBeforeVisualPosition(pos: VisualPosition): Int {
