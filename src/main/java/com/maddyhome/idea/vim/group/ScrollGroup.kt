@@ -15,7 +15,6 @@ import com.maddyhome.idea.vim.api.VimScrollGroup
 import com.maddyhome.idea.vim.api.getVisualLineCount
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.normalizeLine
-import com.maddyhome.idea.vim.api.normalizeVisualColumn
 import com.maddyhome.idea.vim.api.normalizeVisualLine
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.api.visualLineToBufferLine
@@ -203,10 +202,10 @@ internal class ScrollGroup : VimScrollGroup {
     val caretVisualPosition = ijEditor.caretModel.visualPosition
     if (columns > 0) {
       // TODO: Don't add columns to visual position. This includes inlays and folds
-      var visualColumn = editor.normalizeVisualColumn(
+      var visualColumn = EditorHelper.normalizeVisualColumn(
+        ijEditor,
         caretVisualPosition.line,
-        EditorHelper.getVisualColumnAtLeftOfDisplay(ijEditor, caretVisualPosition.line) +
-          columns,
+        EditorHelper.getVisualColumnAtLeftOfDisplay(ijEditor, caretVisualPosition.line) + columns,
         false,
       )
 
@@ -245,8 +244,12 @@ internal class ScrollGroup : VimScrollGroup {
     val caretVisualPosition = ijEditor.caretModel.visualPosition
     val scrollOffset = getNormalizedSideScrollOffset(ijEditor)
     // TODO: Should the offset be applied to visual columns? This includes inline inlays and folds
-    val column =
-      editor.normalizeVisualColumn(caretVisualPosition.line, caretVisualPosition.column + scrollOffset, false)
+    val column = EditorHelper.normalizeVisualColumn(
+      ijEditor,
+      caretVisualPosition.line,
+      caretVisualPosition.column + scrollOffset,
+      false
+    )
     EditorHelper.scrollColumnToRightOfScreen(ijEditor, caretVisualPosition.line, column)
     return true
   }

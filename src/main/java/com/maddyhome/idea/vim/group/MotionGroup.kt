@@ -27,7 +27,6 @@ import com.maddyhome.idea.vim.api.getLeadingCharacterOffset
 import com.maddyhome.idea.vim.api.getVisualLineCount
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.lineLength
-import com.maddyhome.idea.vim.api.normalizeVisualColumn
 import com.maddyhome.idea.vim.api.normalizeVisualLine
 import com.maddyhome.idea.vim.api.visualLineToBufferLine
 import com.maddyhome.idea.vim.command.Argument
@@ -293,7 +292,7 @@ internal class MotionGroup : VimMotionGroupBase() {
       if (newVisualLine == caretVisualLine && newColumn != caretColumn) {
         col = newColumn
       }
-      newColumn = vimEditor.normalizeVisualColumn(newVisualLine, newColumn, editor.vim.isEndAllowed)
+      newColumn = EditorHelper.normalizeVisualColumn(editor, newVisualLine, newColumn, editor.vim.isEndAllowed)
       if (newVisualLine != caretVisualLine || newColumn != oldColumn) {
         val offset = editor.visualPositionToOffset(VisualPosition(newVisualLine, newColumn))
         vimEditor.primaryCaret().moveToOffset(offset)
