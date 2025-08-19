@@ -351,6 +351,9 @@
       </aliases>
     </vimExtension>
 
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.nerdtree.NerdTreeEverywhere"
+                  name="NERDTreeEverywhere"/>
+
     <vimExtension implementation="com.maddyhome.idea.vim.extension.paragraphmotion.ParagraphMotion"
                   name="vim-paragraph-motion">
       <aliases>
