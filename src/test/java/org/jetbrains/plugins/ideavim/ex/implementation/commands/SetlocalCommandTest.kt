@@ -509,6 +509,7 @@ class SetlocalCommandTest : VimTestCase() {
       |  keymodel=continueselect,stopselect
       |  lookupkeys=<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>
       |  matchpairs=(:),{:},[:]
+      |noNERDTreeEverywhere
       |noReplaceWithRegister
       |  selection=inclusive
       |  shell=/dummy/path/to/bash
@@ -593,6 +594,7 @@ class SetlocalCommandTest : VimTestCase() {
       |  more
       |nomultiple-cursors
       |noNERDTree
+      |noNERDTreeEverywhere
       |  nrformats=hex
       |nonumber
       |  operatorfunc=
