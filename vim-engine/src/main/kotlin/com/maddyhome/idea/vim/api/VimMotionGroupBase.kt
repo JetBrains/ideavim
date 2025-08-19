@@ -43,7 +43,8 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     val line = editor.normalizeVisualLine(pos.line + count)
 
     if (intendedColumn == LAST_COLUMN) {
-      val normalisedColumn = editor.normalizeVisualColumn(
+      val normalisedColumn = injector.engineEditorHelper.normalizeVisualColumn(
+        editor,
         line,
         intendedColumn,
         editor.mode.isEndAllowedIgnoringOnemore,

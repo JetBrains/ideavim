@@ -71,4 +71,10 @@ internal class IjEditorHelper : EngineEditorHelperBase() {
       }
     }
   }
+
+  override fun getVisualLineLength(editor: VimEditor, visualLine: Int) =
+    EditorHelper.getVisualLineLength(editor.ij, visualLine)
+
+  override fun normalizeVisualColumn(editor: VimEditor, visualLine: Int, col: Int, allowEnd: Boolean) =
+    EditorHelper.normalizeVisualColumn(editor.ij, visualLine, col, allowEnd)
 }

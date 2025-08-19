@@ -298,7 +298,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         for (i in 0 until repeatLines) {
           if (repeatAppend &&
             (repeatColumn < VimMotionGroupBase.LAST_COLUMN) &&
-            (editor.getVisualLineLength(visualLine + i) < repeatColumn)
+            (injector.engineEditorHelper.getVisualLineLength(editor, visualLine + i) < repeatColumn)
           ) {
             val pad = injector.engineEditorHelper.pad(editor, bufferLine + i, repeatColumn)
             if (pad.isNotEmpty()) {
@@ -310,7 +310,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
           if (repeatColumn >= VimMotionGroupBase.LAST_COLUMN) {
             caret.moveToOffset(injector.motion.moveCaretToLineEnd(editor, bufferLine + i, true))
             repeatInsertText(editor, context, updatedCount)
-          } else if (editor.getVisualLineLength(visualLine + i) >= repeatColumn) {
+          } else if (injector.engineEditorHelper.getVisualLineLength(editor, visualLine + i) >= repeatColumn) {
             val visualPosition = VimVisualPosition(visualLine + i, repeatColumn, false)
             val inlaysCount = injector.engineEditorHelper.amountOfInlaysBeforeVisualPosition(editor, visualPosition)
             caret.moveToVisualPosition(VimVisualPosition(visualLine + i, repeatColumn + inlaysCount, false))

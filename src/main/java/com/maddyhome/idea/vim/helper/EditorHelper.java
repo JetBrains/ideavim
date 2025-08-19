@@ -102,6 +102,14 @@ public class EditorHelper {
     return EngineEditorHelperKt.normalizeVisualLine(new IjVimEditor(editor), line);
   }
 
+  public static int getVisualLineLength(final @NotNull Editor editor, int visualLine) {
+    return EditorUtil.getLastVisualLineColumnNumber(editor, visualLine);
+  }
+
+  public static int normalizeVisualColumn(final @NotNull Editor editor, int visualLine, int col, boolean allowEnd) {
+    return max(0, min(col, getVisualLineLength(editor, visualLine) - (allowEnd ? 0 : 1)));
+  }
+
   /**
    * Best efforts to ensure that scroll offset doesn't overlap itself.
    * <p>
@@ -614,7 +622,7 @@ public class EditorHelper {
 
   private static VisualPosition getNextNonInlayVisualPosition(@NotNull Editor editor, VisualPosition position) {
     final InlayModel inlayModel = editor.getInlayModel();
-    final int lineLength = EngineEditorHelperKt.getVisualLineLength(new IjVimEditor(editor), position.line);
+    final int lineLength = getVisualLineLength(editor, position.line);
     position = new VisualPosition(position.line, position.column + 1);
     while (position.column < lineLength && inlayModel.hasInlineElementAt(position)) {
       position = new VisualPosition(position.line, position.column + 1);

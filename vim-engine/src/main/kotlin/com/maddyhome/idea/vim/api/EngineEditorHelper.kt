@@ -39,6 +39,9 @@ interface EngineEditorHelper {
   fun pad(editor: VimEditor, line: Int, to: Int): String
   fun inlayAwareOffsetToVisualPosition(editor: VimEditor, offset: Int): VimVisualPosition
   fun createRangeMarker(editor: VimEditor, startOffset: Int, endOffset: Int): VimRangeMarker
+
+  fun getVisualLineLength(editor: VimEditor, visualLine: Int): Int
+  fun normalizeVisualColumn(editor: VimEditor, visualLine: Int, col: Int, allowEnd: Boolean): Int
 }
 
 fun VimEditor.endsWithNewLine(): Boolean {
@@ -64,10 +67,6 @@ fun VimEditor.getLeadingCharacterOffset(line: Int, col: Int = 0): Int {
   return pos
 }
 
-fun VimEditor.normalizeVisualColumn(visualLine: Int, col: Int, allowEnd: Boolean): Int {
-  return (this.getVisualLineLength(visualLine) - if (allowEnd) 0 else 1).coerceIn(0..col)
-}
-
 /**
  * Ensures that the supplied column number for the given buffer line is within the range 0 (incl) and the
  * number of columns in the line (excl).
@@ -79,21 +78,6 @@ fun VimEditor.normalizeVisualColumn(visualLine: Int, col: Int, allowEnd: Boolean
  */
 fun VimEditor.normalizeColumn(line: Int, col: Int, allowEnd: Boolean): Int {
   return (lineLength(line) - if (allowEnd) 0 else 1).coerceIn(0..col)
-}
-
-/**
- * Gets the number of characters on the buffer line equivalent to the specified visual line.
- *
- * This will be different from the number of visual characters if there are "real" tabs in the line.
- *
- * @param visualLine   The visual line within the file
- * @return The number of characters in the specified line
- */
-// TODO: [visual] try to get rid of this. It's probably not doing what you think it's doing
-// This gets the length of the visual line's buffer line, not the length of the visual line. With soft wraps, these can
-// be very different values.
-fun VimEditor.getVisualLineLength(visualLine: Int): Int {
-  return lineLength(visualLineToBufferLine(visualLine))
 }
 
 /**
