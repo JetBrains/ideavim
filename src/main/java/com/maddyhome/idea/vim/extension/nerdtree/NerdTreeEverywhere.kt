@@ -18,6 +18,7 @@ import com.maddyhome.idea.vim.key.RequiredShortcut
 import java.awt.KeyboardFocusManager
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
+import java.beans.PropertyChangeListener
 import javax.swing.KeyStroke
 
 /**
@@ -34,21 +35,23 @@ internal class NerdTreeEverywhere : VimExtension {
 
   override fun getName() = PLUGIN_NAME
 
-  override fun init() {
-    KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener("focusOwner") {
-      val newFocusOwner = it.newValue
-      val oldFocusOwner = it.oldValue
-      val dispatcher = service<Dispatcher>()
-      if (newFocusOwner is Tree) {
-        val shortcuts = mappings.keyStrokes.map { RequiredShortcut(it, MappingOwner.Plugin.get(PLUGIN_NAME)) }
-        // It's okay to have `register` called multiple times, as its internal implementation prevents duplicate registrations
-        dispatcher.registerCustomShortcutSet(KeyGroup.toShortcutSet(shortcuts), newFocusOwner)
-      }
-      // Note that we do not have to unregister the shortcut in fact
-      if (oldFocusOwner is Tree) {
-        dispatcher.unregisterCustomShortcutSet(oldFocusOwner)
-      }
+  val focusListener = PropertyChangeListener { evt ->
+    val newFocusOwner = evt.newValue
+    val oldFocusOwner = evt.oldValue
+    val dispatcher = service<Dispatcher>()
+    if (newFocusOwner is Tree) {
+      val shortcuts = mappings.keyStrokes.map { RequiredShortcut(it, MappingOwner.Plugin.get(PLUGIN_NAME)) }
+      // It's okay to have `register` called multiple times, as its internal implementation prevents duplicate registrations
+      dispatcher.registerCustomShortcutSet(KeyGroup.toShortcutSet(shortcuts), newFocusOwner)
     }
+    // Unregistration of the shortcut is required to make the plugin disposable
+    if (oldFocusOwner is Tree) {
+      dispatcher.unregisterCustomShortcutSet(oldFocusOwner)
+    }
+  }
+
+  override fun init() {
+    KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener("focusOwner", focusListener)
   }
 
   @Service
@@ -63,6 +66,11 @@ internal class NerdTreeEverywhere : VimExtension {
         listener.actionPerformed(ActionEvent(tree, ActionEvent.ACTION_PERFORMED, null))
       })
     }
+  }
+
+  override fun dispose() {
+    KeyboardFocusManager.getCurrentKeyboardFocusManager().removePropertyChangeListener("focusOwner", focusListener)
+    super.dispose()
   }
 }
 
