@@ -26,7 +26,16 @@ internal abstract class AbstractDispatcher(private val mappings: Mappings) : Dum
   private val keys = mutableListOf<KeyStroke>()
 
   override fun update(e: AnActionEvent) {
-    e.presentation.isEnabled = e.getData(PlatformDataKeys.SPEED_SEARCH_TEXT) == null // SpeedSearch is inactive
+    e.presentation.isEnabled = true
+    // If <ESC> is pressed, clear the keys; skip only if there are no keys
+    if ((e.inputEvent as? KeyEvent)?.keyCode == KeyEvent.VK_ESCAPE) {
+      e.presentation.isEnabled = keys.isNotEmpty()
+      keys.clear()
+    }
+    // Skip if SpeedSearch is active
+    if (e.getData(PlatformDataKeys.SPEED_SEARCH_TEXT) != null) {
+      e.presentation.isEnabled = false
+    }
   }
 
   override fun getActionUpdateThread() = ActionUpdateThread.BGT
