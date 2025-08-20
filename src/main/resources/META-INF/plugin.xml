@@ -6,7 +6,7 @@
   ~ https://opensource.org/licenses/MIT.
   -->
 
-<idea-plugin url="https://plugins.jetbrains.com/plugin/164" xmlns:xi="http://www.w3.org/2001/XInclude">
+<idea-plugin url="https://plugins.jetbrains.com/plugin/164">
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
   <description><![CDATA[
@@ -42,11 +42,40 @@
               topic="com.intellij.openapi.project.ProjectManagerListener"/>
     <listener class="com.maddyhome.idea.vim.thinapi.IjPluginListener"
               topic="com.intellij.ide.plugins.DynamicPluginListener"/>
+    <listener class="com.maddyhome.idea.vim.ui.ex.ExEntryPanel$LafListener"
+              topic="com.intellij.ide.ui.LafManagerListener"/>
+    <listener class="com.maddyhome.idea.vim.ui.ExOutputPanel$LafListener"
+              topic="com.intellij.ide.ui.LafManagerListener"/>
+    <listener class="com.maddyhome.idea.vim.extension.highlightedyank.HighlightColorResetter"
+              topic="com.intellij.ide.ui.LafManagerListener"/>
+    <listener class="com.maddyhome.idea.vim.handler.IdeaVimKeymapChangedListener"
+              topic="com.intellij.openapi.keymap.KeymapManagerListener"/>
+    <listener class="com.maddyhome.idea.vim.handler.IdeaVimCorrectorKeymapChangedListener"
+              topic="com.intellij.openapi.keymap.KeymapManagerListener"/>
   </applicationListeners>
 
   <projectListeners>
     <listener class="com.maddyhome.idea.vim.group.JumpsListener"
               topic="com.intellij.openapi.fileEditor.impl.IdeDocumentHistoryImpl$RecentPlacesListener"/>
+    <listener class="com.maddyhome.idea.vim.extension.nerdtree.NerdTree$ProjectViewListener"
+              topic="com.intellij.openapi.wm.ex.ToolWindowManagerListener"/>
+    <listener class="com.maddyhome.idea.vim.listener.VimListenerManager$VimFileEditorManagerListener"
+              topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
+
+    <listener class="com.maddyhome.idea.vim.listener.IdeaSpecifics$VimActionListener"
+              topic="com.intellij.openapi.actionSystem.ex.AnActionListener"/>
+
+    <listener class="com.maddyhome.idea.vim.listener.IdeaSpecifics$VimTemplateManagerListener"
+              topic="com.intellij.codeInsight.template.TemplateManagerListener"/>
+
+    <listener class="com.maddyhome.idea.vim.group.VimMarkServiceImpl$VimBookmarksListener"
+              topic="com.intellij.ide.bookmark.BookmarksListener"/>
+
+    <listener class="com.maddyhome.idea.vim.listener.IdeaSpecifics$VimFindModelListener"
+              topic="com.intellij.find.FindModelListener"/>
+
+    <listener class="com.maddyhome.idea.vim.listener.IdeaSpecifics$LookupTopicListener"
+              topic="com.intellij.codeInsight.lookup.LookupManagerListener"/>
   </projectListeners>
 
   <extensionPoints>
@@ -147,11 +176,55 @@
         implementation="com.maddyhome.idea.vim.troubleshooting.AccidentalInstallDetectorEditorNotificationProvider"/>
 
     <dependencySupport coordinate="configuration" kind="vim" displayName="IdeaVim"/>
-  </extensions>
 
-  <xi:include href="/META-INF/includes/ApplicationServices.xml" xpointer="xpointer(/idea-plugin/*)"/>
-  <xi:include href="/META-INF/includes/VimExtensions.xml" xpointer="xpointer(/idea-plugin/*)"/>
-  <xi:include href="/META-INF/includes/VimListeners.xml" xpointer="xpointer(/idea-plugin/*)"/>
+    <postStartupActivity implementation="com.maddyhome.idea.vim.extension.nerdtree.NerdTree$NerdStartupActivity"/>
+
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.ScrollGroup"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimScrollGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.ChangeGroup"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimChangeGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.VimMarkServiceImpl"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimMarkService"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.VimJumpServiceImpl"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimJumpService"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.RegisterGroup"
+                        serviceInterface="com.maddyhome.idea.vim.register.VimRegisterGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.FileGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.newapi.IjVimSearchGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.ProcessGroup"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimProcessGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.ui.ex.ExEntryPanelService"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimCommandLineService"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.ui.ex.IjOutputPanelService"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimOutputPanelService"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.api.VimDigraphGroupBase"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimDigraphGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.HistoryGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.KeyGroup"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimKeyGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.WindowGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.TabServiceImpl"
+                        serviceInterface="com.maddyhome.idea.vim.group.TabService"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.EditorGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.visual.VisualMotionGroup"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimVisualMotionGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.yank.YankGroupBase"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.vimscript.services.IjVariableService"
+                        serviceInterface="com.maddyhome.idea.vim.vimscript.services.VariableService"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.IjStatisticsService"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimStatistics"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.vimscript.services.FunctionStorage"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimscriptFunctionService"/>
+
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.OptionGroup"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimOptionGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.IjVimStorageService"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimStorageService"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.IjVimSystemInfoService"
+                        serviceInterface="com.maddyhome.idea.vim.api.SystemInfoService"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.IjVimRedrawService"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimRedrawService"/>
+  </extensions>
 
   <actions resource-bundle="messages.IdeaVimBundle">
     <action id="VimPluginToggle" class="com.maddyhome.idea.vim.action.VimPluginToggleAction">
@@ -176,4 +249,128 @@
 
     <action id="VimFindActionIdAction" class="com.maddyhome.idea.vim.listener.FindActionIdAction"/>
   </actions>
+
+  <extensions defaultExtensionNs="IdeaVIM">
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.surround.VimSurroundExtension" name="surround">
+      <aliases>
+        <alias name="https://github.com/tpope/vim-surround"/>
+        <alias name="tpope/vim-surround"/>
+        <alias name="vim-surround"/>
+        <alias name="https://www.vim.org/scripts/script.php?script_id=1697"/>
+      </aliases>
+    </vimExtension>
+
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.multiplecursors.VimMultipleCursorsExtension"
+                  name="multiple-cursors">
+      <aliases>
+        <alias name="https://github.com/terryma/vim-multiple-cursors"/>
+        <alias name="terryma/vim-multiple-cursors"/>
+        <alias name="vim-multiple-cursors"/>
+      </aliases>
+    </vimExtension>
+
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.commentary.CommentaryExtension" name="commentary">
+      <aliases>
+        <alias name="https://github.com/tpope/vim-commentary"/>
+        <alias name="tpope/vim-commentary"/>
+        <alias name="vim-commentary"/>
+        <alias name="https://www.vim.org/scripts/script.php?script_id=3695"/>
+        <alias name="https://github.com/tomtom/tcomment_vim"/>
+        <alias name="tomtom/tcomment_vim"/>
+        <alias name="tcomment_vim"/>
+        <alias name="https://www.vim.org/scripts/script.php?script_id=1173"/>
+      </aliases>
+    </vimExtension>
+
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.textobjentire.VimTextObjEntireExtension"
+                  name="textobj-entire">
+      <aliases>
+        <alias name="https://github.com/kana/vim-textobj-entire"/>
+        <alias name="kana/vim-textobj-entire"/>
+        <alias name="vim-textobj-entire"/>
+        <alias name="https://www.vim.org/scripts/script.php?script_id=2610"/>
+      </aliases>
+    </vimExtension>
+
+
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.miniai.MiniAI"
+                  name="mini-ai">
+      <aliases>
+        <alias name="https://github.com/echasnovski/mini.ai"/>
+        <alias name="echasnovski/mini.ai"/>
+      </aliases>
+    </vimExtension>
+
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.argtextobj.VimArgTextObjExtension"
+                  name="argtextobj">
+      <aliases>
+        <alias name="https://github.com/vim-scripts/argtextobj.vim"/>
+        <alias name="vim-scripts/argtextobj.vim"/>
+        <alias name="argtextobj.vim"/>
+        <alias name="https://www.vim.org/scripts/script.php?script_id=2699"/>
+      </aliases>
+    </vimExtension>
+
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.exchange.VimExchangeExtension" name="exchange">
+      <aliases>
+        <alias name="https://github.com/tommcdo/vim-exchange"/>
+        <alias name="tommcdo/vim-exchange"/>
+        <alias name="vim-exchange"/>
+      </aliases>
+    </vimExtension>
+
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.highlightedyank.VimHighlightedYank"
+                  name="highlightedyank">
+      <aliases>
+        <alias name="https://github.com/machakann/vim-highlightedyank"/>
+        <alias name="machakann/vim-highlightedyank"/>
+        <alias name="vim-highlightedyank"/>
+      </aliases>
+    </vimExtension>
+
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.nerdtree.NerdTree" name="NERDTree">
+      <aliases>
+        <alias name="https://github.com/preservim/nerdtree"/>
+        <alias name="preservim/nerdtree"/>
+        <alias name="https://github.com/scrooloose/nerdtree"/>
+        <alias name="scrooloose/nerdtree"/>
+        <alias name="nerdtree"/>
+      </aliases>
+    </vimExtension>
+
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.paragraphmotion.ParagraphMotion"
+                  name="vim-paragraph-motion">
+      <aliases>
+        <alias name="https://github.com/dbakker/vim-paragraph-motion"/>
+        <alias name="dbakker/vim-paragraph-motion"/>
+        <alias name="vim-paragraph-motion"/>
+        <alias name="https://github.com/vim-scripts/Improved-paragraph-motion"/>
+        <alias name="vim-scripts/Improved-paragraph-motion"/>
+        <alias name="Improved-paragraph-motion"/>
+      </aliases>
+    </vimExtension>
+
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.textobjindent.VimIndentObject" name="textobj-indent">
+      <aliases>
+        <alias name="https://github.com/michaeljsmith/vim-indent-object"/>
+        <alias name="michaeljsmith/vim-indent-object"/>
+        <alias name="vim-indent-object"/>
+      </aliases>
+    </vimExtension>
+
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.matchit.Matchit" name="matchit">
+      <aliases>
+        <alias name="vim-matchit"/>
+        <alias name="chrisbra/matchit"/>
+      </aliases>
+    </vimExtension>
+
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.sneak.IdeaVimSneakExtension" name="sneak">
+      <aliases>
+        <alias name="https://github.com/justinmk/vim-sneak"/>
+        <alias name="justinmk/vim-sneak"/>
+        <alias name="vim-sneak"/>
+      </aliases>
+    </vimExtension>
+  </extensions>
 </idea-plugin>
