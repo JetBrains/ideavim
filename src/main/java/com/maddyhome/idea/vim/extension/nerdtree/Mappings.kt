@@ -8,12 +8,18 @@
 
 package com.maddyhome.idea.vim.extension.nerdtree
 
+import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.options.advanced.AdvancedSettings
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.ui.tree.TreeUtil
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.helper.MessageHelper
+import com.maddyhome.idea.vim.helper.runAfterGotFocus
 import com.maddyhome.idea.vim.key.KeyStrokeTrie
 import com.maddyhome.idea.vim.key.add
 import com.maddyhome.idea.vim.newapi.vim
@@ -55,8 +61,20 @@ internal class Mappings(name: String) {
    */
   class Action(val action: (AnActionEvent, Tree) -> Unit) {
     companion object {
-      private fun executeAction(event: AnActionEvent, id: String) =
-        NerdTree.Util.callAction(null, id, event.dataContext.vim)
+      fun callAction(editor: VimEditor?, name: String, context: ExecutionContext) {
+        val action = ActionManager.getInstance().getAction(name) ?: run {
+          VimPlugin.showMessage(MessageHelper.message("action.not.found.0", name))
+          return
+        }
+        val application = ApplicationManager.getApplication()
+        if (application.isUnitTestMode) {
+          injector.actionExecutor.executeAction(editor, action.vim, context)
+        } else {
+          runAfterGotFocus {
+            injector.actionExecutor.executeAction(editor, action.vim, context)
+          }
+        }
+      }
 
       /**
        * Creates an [Action] that executes an IntelliJ action identified by its ID.
@@ -64,7 +82,7 @@ internal class Mappings(name: String) {
        * @param id A string representing the ID of the action to execute.
        * @return An [Action] that runs the specified action when triggered.
        */
-      fun ij(id: String): Action = Action { event, _ -> executeAction(event, id) }
+      fun ij(id: String) = Action { event, _ -> callAction(null, id, event.dataContext.vim) }
     }
   }
 
