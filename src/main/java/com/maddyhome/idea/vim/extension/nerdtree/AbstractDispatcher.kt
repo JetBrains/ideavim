@@ -13,6 +13,7 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.ui.KeyStrokeAdapter
 import com.intellij.ui.treeStructure.Tree
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -42,9 +43,9 @@ internal abstract class AbstractDispatcher(private val mappings: Mappings) : Dum
 
       keys.clear()
     } else if (!mappings.isPrefix(keys)) { // invalid
-      LOG.info("Unrecognised key sequence: $keys")
+      LOG.info("Unrecognized key sequence: $keys")
       keys.clear()
-      // TODO notify the user
+      injector.messages.indicateError()
     }
   }
 
