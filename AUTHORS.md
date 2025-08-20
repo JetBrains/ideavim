@@ -622,6 +622,10 @@ Contributors:
   [![icon][github]](https://github.com/zuberol)
   &nbsp;
   Jakub Zuber
+* [![icon][mail]](mailto:nmh9097@gmail.com)
+  [![icon][github]](https://github.com/NaMinhyeok)
+  &nbsp;
+  Na Minhyeok
 
 Previous contributors:
 
