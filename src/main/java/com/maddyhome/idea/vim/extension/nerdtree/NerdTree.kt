@@ -33,7 +33,10 @@ import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.RequiredShortcut
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
+import java.util.concurrent.locks.ReentrantReadWriteLock
 import javax.swing.SwingConstants
+import kotlin.concurrent.read
+import kotlin.concurrent.write
 
 /**
  * Features and issues:
@@ -99,20 +102,33 @@ internal class NerdTree : VimExtension {
 
   override fun init() {
     LOG.info("IdeaVim: Initializing NERDTree extension. Disable this extension if you observe a strange behaviour of the project tree. E.g. moving down on 'j'")
+    lock.write {
+      enabled = true
 
-    registerMappings()
-
-    VimExtensionFacade.addCommand("NERDTreeFocus", IjCommandHandler("ActivateProjectToolWindow"))
-    VimExtensionFacade.addCommand("NERDTree", IjCommandHandler("ActivateProjectToolWindow"))
-    VimExtensionFacade.addCommand("NERDTreeToggle", ToggleHandler())
-    VimExtensionFacade.addCommand("NERDTreeClose", CloseHandler())
-    VimExtensionFacade.addCommand("NERDTreeFind", IjCommandHandler("SelectInProjectView"))
-    VimExtensionFacade.addCommand("NERDTreeRefreshRoot", IjCommandHandler("Synchronize"))
-
-    synchronized(monitor) {
-      commandsRegistered = true
-      ProjectManager.getInstance().openProjects.forEach { project -> installDispatcher(project) }
+      VimExtensionFacade.addCommand("NERDTreeFocus", IjCommandHandler("ActivateProjectToolWindow"))
+      VimExtensionFacade.addCommand("NERDTree", IjCommandHandler("ActivateProjectToolWindow"))
+      VimExtensionFacade.addCommand("NERDTreeToggle", ToggleHandler())
+      VimExtensionFacade.addCommand("NERDTreeClose", CloseHandler())
+      VimExtensionFacade.addCommand("NERDTreeFind", IjCommandHandler("SelectInProjectView"))
+      VimExtensionFacade.addCommand("NERDTreeRefreshRoot", IjCommandHandler("Synchronize"))
     }
+    ProjectManager.getInstance().openProjects.forEach(::installDispatcher)
+  }
+
+  override fun dispose() {
+    lock.write {
+      enabled = false
+      // TODO remove ex-commands
+      ProjectManager.getInstance().openProjects.forEach { project ->
+        val component = (ProjectView.getInstance(project) as ProjectViewImpl).component
+        if (component != null) {
+          NerdDispatcher.getInstance(project).unregisterCustomShortcutSet(component)
+        } else {
+          LOG.error("$project: project view component is null")
+        }
+      }
+    }
+    super.dispose()
   }
 
   class IjCommandHandler(private val actionId: String) : CommandAliasHandler {
@@ -143,18 +159,18 @@ internal class NerdTree : VimExtension {
     }
   }
 
-  // TODO I'm not sure is this activity runs at all? Should we use [RunOnceUtil] instead?
   class NerdStartupActivity : ProjectActivity {
     override suspend fun execute(project: Project) {
-      synchronized(monitor) {
-        if (!commandsRegistered) return
-        installDispatcher(project)
-      }
+      installDispatcher(project)
     }
   }
 
   @Service(Service.Level.PROJECT)
   class NerdDispatcher : AbstractDispatcher(mappings) {
+    init {
+      registerMappings()
+    }
+
     companion object {
       fun getInstance(project: Project): NerdDispatcher {
         return project.service<NerdDispatcher>()
@@ -280,14 +296,17 @@ private fun getSplittersCurrentWindow(event: AnActionEvent): EditorWindow? {
 
 private val mappings = Mappings("NERDTree")
 
-private val monitor = Any()
-private var commandsRegistered = false
+private val lock = ReentrantReadWriteLock()
+private var enabled = false
 
 private fun installDispatcher(project: Project) {
-  val dispatcher = NerdTree.NerdDispatcher.getInstance(project)
-  val shortcuts = mappings.keyStrokes.map { RequiredShortcut(it, MappingOwner.Plugin.get(NerdTree.PLUGIN_NAME)) }
-  dispatcher.registerCustomShortcutSet(
-    KeyGroup.toShortcutSet(shortcuts),
-    (ProjectView.getInstance(project) as ProjectViewImpl).component,
-  )
+  lock.read {
+    if (!enabled) return
+    val dispatcher = NerdTree.NerdDispatcher.getInstance(project)
+    val shortcuts = mappings.keyStrokes.map { RequiredShortcut(it, MappingOwner.Plugin.get(NerdTree.PLUGIN_NAME)) }
+    dispatcher.registerCustomShortcutSet(
+      KeyGroup.toShortcutSet(shortcuts),
+      (ProjectView.getInstance(project) as ProjectViewImpl).component,
+    )
+  }
 }
