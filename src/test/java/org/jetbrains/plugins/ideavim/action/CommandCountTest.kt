@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.action
 
+import com.intellij.idea.TestFor
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -57,5 +58,15 @@ class CommandCountTest : VimTestCase() {
     configureByText("${c}12345678901234567890123456789012345678901234567890")
     typeText(injector.parser.parseKeys("2\"a2\"b2\"b2d2l")) // Delete 32 characters
     assertState("345678901234567890")
+  }
+
+  @TestFor(issues = ["VIM-3960"])
+  @Test
+  fun `test count not accepted in multicharacter text object`() {
+    doTest(
+      "di3w",
+      "Lorem ipsum do${c}lor sit amet",
+      "Lorem ipsum dolor ${c}sit amet"
+    )
   }
 }
