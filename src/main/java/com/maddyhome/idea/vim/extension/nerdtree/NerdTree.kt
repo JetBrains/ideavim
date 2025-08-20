@@ -9,7 +9,6 @@
 package com.maddyhome.idea.vim.extension.nerdtree
 
 import com.intellij.ide.projectView.ProjectView
-import com.intellij.ide.projectView.impl.AbstractProjectViewPane
 import com.intellij.ide.projectView.impl.ProjectViewImpl
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionUpdateThread
@@ -24,11 +23,8 @@ import com.intellij.openapi.fileEditor.impl.EditorWindow
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.startup.ProjectActivity
-import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowId
 import com.intellij.openapi.wm.ex.ToolWindowManagerEx
-import com.intellij.openapi.wm.ex.ToolWindowManagerListener
-import com.intellij.ui.speedSearch.SpeedSearchSupply
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
@@ -45,7 +41,6 @@ import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.RequiredShortcut
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
-import java.awt.event.KeyEvent
 import javax.swing.SwingConstants
 
 /**
@@ -156,26 +151,6 @@ internal class NerdTree : VimExtension {
     }
   }
 
-  class ProjectViewListener(private val project: Project) : ToolWindowManagerListener {
-    override fun toolWindowShown(toolWindow: ToolWindow) {
-      if (ToolWindowId.PROJECT_VIEW != toolWindow.id) return
-
-      val dispatcher = NerdDispatcher.getInstance(project)
-      if (dispatcher.speedSearchListenerInstalled) return
-
-      // I specify nullability explicitly as we've got a lot of exceptions saying this property is null
-      val currentProjectViewPane: AbstractProjectViewPane? = ProjectView.getInstance(project).currentProjectViewPane
-      val tree = currentProjectViewPane?.tree ?: return
-      val supply = SpeedSearchSupply.getSupply(tree, true) ?: return
-
-      // NB: Here might be some issues with concurrency, but it's not really bad, I think
-      dispatcher.speedSearchListenerInstalled = true
-      supply.addChangeListener {
-        dispatcher.waitForSearch = false
-      }
-    }
-  }
-
   // TODO I'm not sure is this activity runs at all? Should we use [RunOnceUtil] instead?
   class NerdStartupActivity : ProjectActivity {
     override suspend fun execute(project: Project) {
@@ -188,20 +163,7 @@ internal class NerdTree : VimExtension {
 
   @Service(Service.Level.PROJECT)
   class NerdDispatcher : AbstractDispatcher(mappings) {
-    internal var waitForSearch = false
-    internal var speedSearchListenerInstalled = false
-
     override fun update(e: AnActionEvent) {
-      // Special processing of esc.
-      if ((e.inputEvent as? KeyEvent)?.keyCode == ESCAPE_KEY_CODE) {
-        e.presentation.isEnabled = waitForSearch
-        return
-      }
-
-      if (waitForSearch) {
-        e.presentation.isEnabled = false
-        return
-      }
       e.presentation.isEnabled = !speedSearchIsHere(e)
     }
 
@@ -209,15 +171,13 @@ internal class NerdTree : VimExtension {
 
     private fun speedSearchIsHere(e: AnActionEvent): Boolean {
       val searchText = e.getData(PlatformDataKeys.SPEED_SEARCH_TEXT)
-      return !searchText.isNullOrEmpty()
+      return searchText != null
     }
 
     companion object {
       fun getInstance(project: Project): NerdDispatcher {
         return project.service<NerdDispatcher>()
       }
-
-      private const val ESCAPE_KEY_CODE = 27
     }
   }
 
@@ -325,22 +285,7 @@ internal class NerdTree : VimExtension {
       Mappings.Action.ij("MaximizeToolWindow"),
     )
 
-    mappings.register(
-      "/",
-      Mappings.Action { event, _ ->
-        NerdDispatcher.getInstance(event.project ?: return@Action).waitForSearch = true
-      },
-    )
-
-    mappings.register(
-      "<ESC>",
-      Mappings.Action { event, _ ->
-        val instance = NerdDispatcher.getInstance(event.project ?: return@Action)
-        if (instance.waitForSearch) {
-          instance.waitForSearch = false
-        }
-      },
-    )
+    mappings.register("/", Mappings.Action.ij("SpeedSearch"))
   }
 
   object Util {
