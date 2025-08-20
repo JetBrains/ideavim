@@ -78,8 +78,8 @@ for a few days or send it to a friend for testing.
  - Read the javadoc for the `@VimBehaviorDiffers` annotation in the source code and fix the corresponding functionality.
  - Implement one of the requested [#vim plugin](https://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved%20tag:%20%7Bvim%20plugin%7D%20sort%20by:%20votes%20)s.
 
-> :small_orange_diamond: Selected an issue to work on? Leave a comment in a YouTrack ticket or create a draft PR
-> to indicate that you've started working on it so that you might get additional guidance and feedback from the maintainers.
+> :small_orange_diamond: You may leave a comment in the YouTrack ticket or open a draft PR if you’d like early feedback
+> or want to let maintainers know you’ve started working on an issue. Otherwise, simply open a PR.
 
 ## Where to start in the codebase
 
