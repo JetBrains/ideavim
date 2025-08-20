@@ -10,10 +10,8 @@ package com.maddyhome.idea.vim.extension.nerdtree
 
 import com.intellij.ide.projectView.ProjectView
 import com.intellij.ide.projectView.impl.ProjectViewImpl
-import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
@@ -23,18 +21,14 @@ import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.openapi.wm.ToolWindowId
 import com.intellij.openapi.wm.ex.ToolWindowManagerEx
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.common.CommandAlias
 import com.maddyhome.idea.vim.common.CommandAliasHandler
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.extension.VimExtension
+import com.maddyhome.idea.vim.extension.VimExtensionFacade
 import com.maddyhome.idea.vim.group.KeyGroup
-import com.maddyhome.idea.vim.helper.MessageHelper
-import com.maddyhome.idea.vim.helper.runAfterGotFocus
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.RequiredShortcut
 import com.maddyhome.idea.vim.newapi.ij
@@ -101,29 +95,29 @@ import javax.swing.SwingConstants
  * ?........Toggle the display of the quick help.......................|NERDTree-?|
  */
 internal class NerdTree : VimExtension {
-  override fun getName(): String = pluginName
+  override fun getName(): String = PLUGIN_NAME
 
   override fun init() {
     LOG.info("IdeaVim: Initializing NERDTree extension. Disable this extension if you observe a strange behaviour of the project tree. E.g. moving down on 'j'")
 
     registerMappings()
 
-    addCommand("NERDTreeFocus", IjCommandHandler("ActivateProjectToolWindow"))
-    addCommand("NERDTree", IjCommandHandler("ActivateProjectToolWindow"))
-    addCommand("NERDTreeToggle", ToggleHandler())
-    addCommand("NERDTreeClose", CloseHandler())
-    addCommand("NERDTreeFind", IjCommandHandler("SelectInProjectView"))
-    addCommand("NERDTreeRefreshRoot", IjCommandHandler("Synchronize"))
+    VimExtensionFacade.addCommand("NERDTreeFocus", IjCommandHandler("ActivateProjectToolWindow"))
+    VimExtensionFacade.addCommand("NERDTree", IjCommandHandler("ActivateProjectToolWindow"))
+    VimExtensionFacade.addCommand("NERDTreeToggle", ToggleHandler())
+    VimExtensionFacade.addCommand("NERDTreeClose", CloseHandler())
+    VimExtensionFacade.addCommand("NERDTreeFind", IjCommandHandler("SelectInProjectView"))
+    VimExtensionFacade.addCommand("NERDTreeRefreshRoot", IjCommandHandler("Synchronize"))
 
-    synchronized(Util.monitor) {
-      Util.commandsRegistered = true
+    synchronized(monitor) {
+      commandsRegistered = true
       ProjectManager.getInstance().openProjects.forEach { project -> installDispatcher(project) }
     }
   }
 
   class IjCommandHandler(private val actionId: String) : CommandAliasHandler {
     override fun execute(command: String, range: Range, editor: VimEditor, context: ExecutionContext) {
-      Util.callAction(editor, actionId, context)
+      Mappings.Action.callAction(editor, actionId, context)
     }
   }
 
@@ -134,7 +128,7 @@ internal class NerdTree : VimExtension {
       if (toolWindow.isVisible) {
         toolWindow.hide()
       } else {
-        Util.callAction(editor, "ActivateProjectToolWindow", context)
+        Mappings.Action.callAction(editor, "ActivateProjectToolWindow", context)
       }
     }
   }
@@ -152,8 +146,8 @@ internal class NerdTree : VimExtension {
   // TODO I'm not sure is this activity runs at all? Should we use [RunOnceUtil] instead?
   class NerdStartupActivity : ProjectActivity {
     override suspend fun execute(project: Project) {
-      synchronized(Util.monitor) {
-        if (!Util.commandsRegistered) return
+      synchronized(monitor) {
+        if (!commandsRegistered) return
         installDispatcher(project)
       }
     }
@@ -168,150 +162,130 @@ internal class NerdTree : VimExtension {
     }
   }
 
-  private fun registerMappings() {
-    mappings.registerNavigationMappings()
-
-    mappings.register(
-      "NERDTreeMapActivateNode",
-      "o",
-      Mappings.Action { event, tree ->
-        val array = CommonDataKeys.NAVIGATABLE_ARRAY.getData(event.dataContext)?.filter { it.canNavigateToSource() }
-        if (array.isNullOrEmpty()) {
-          val row = tree.selectionRows?.getOrNull(0) ?: return@Action
-          if (tree.isExpanded(row)) {
-            tree.collapseRow(row)
-          } else {
-            tree.expandRow(row)
-          }
-        } else {
-          array.forEach { it.navigate(true) }
-        }
-      },
-    )
-    mappings.register(
-      "NERDTreeMapPreview",
-      "go",
-      Mappings.Action { event, _ ->
-        CommonDataKeys.NAVIGATABLE_ARRAY.getData(event.dataContext)?.filter { it.canNavigateToSource() }
-          ?.forEach { it.navigate(false) }
-      },
-    )
-    mappings.register(
-      "NERDTreeMapOpenInTab",
-      "t",
-      Mappings.Action { event, _ ->
-        // FIXME: 22.01.2021 Doesn't work correct
-        CommonDataKeys.NAVIGATABLE_ARRAY.getData(event.dataContext)?.filter { it.canNavigateToSource() }
-          ?.forEach { it.navigate(true) }
-      },
-    )
-    mappings.register(
-      "NERDTreeMapOpenInTabSilent",
-      "T",
-      Mappings.Action { event, _ ->
-        // FIXME: 22.01.2021 Doesn't work correct
-        CommonDataKeys.NAVIGATABLE_ARRAY.getData(event.dataContext)?.filter { it.canNavigateToSource() }
-          ?.forEach { it.navigate(true) }
-      },
-    )
-
-    // TODO: 21.01.2021 Should option in left split
-    mappings.register("NERDTreeMapOpenVSplit", "s", Mappings.Action.ij("OpenInRightSplit"))
-    // TODO: 21.01.2021 Should option in above split
-    mappings.register(
-      "NERDTreeMapOpenSplit",
-      "i",
-      Mappings.Action { event, _ ->
-        val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Action
-        if (file.isDirectory) return@Action
-        val currentWindow = Util.getSplittersCurrentWindow(event)
-        currentWindow?.split(SwingConstants.HORIZONTAL, true, file, true)
-      },
-    )
-    mappings.register(
-      "NERDTreeMapPreviewVSplit",
-      "gs",
-      Mappings.Action { event, _ ->
-        val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Action
-        val currentWindow = Util.getSplittersCurrentWindow(event)
-        currentWindow?.split(SwingConstants.VERTICAL, true, file, true)
-
-        // FIXME: 22.01.2021 This solution bouncing a bit
-        Util.callAction(null, "ActivateProjectToolWindow", event.dataContext.vim)
-      },
-    )
-    mappings.register(
-      "NERDTreeMapPreviewSplit",
-      "gi",
-      Mappings.Action { event, _ ->
-        val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Action
-        val currentWindow = Util.getSplittersCurrentWindow(event)
-        currentWindow?.split(SwingConstants.HORIZONTAL, true, file, true)
-
-        Util.callAction(null, "ActivateProjectToolWindow", event.dataContext.vim)
-      },
-    )
-    mappings.register(
-      "NERDTreeMapRefresh",
-      "r",
-      Mappings.Action.ij("SynchronizeCurrentFile"),
-    )
-    mappings.register("NERDTreeMapToggleHidden", "I", Mappings.Action.ij("ProjectView.ShowExcludedFiles"))
-    mappings.register("NERDTreeMapNewFile", "n", Mappings.Action.ij("NewFile"))
-    mappings.register("NERDTreeMapNewDir", "N", Mappings.Action.ij("NewDir"))
-    mappings.register("NERDTreeMapDelete", "d", Mappings.Action.ij("\$Delete"))
-    mappings.register("NERDTreeMapCopy", "y", Mappings.Action.ij("\$Copy"))
-    mappings.register("NERDTreeMapPaste", "v", Mappings.Action.ij("\$Paste"))
-    mappings.register("NERDTreeMapRename", "<C-r>", Mappings.Action.ij("RenameElement"))
-    mappings.register("NERDTreeMapRefreshRoot", "R", Mappings.Action.ij("Synchronize"))
-    mappings.register("NERDTreeMapMenu", "m", Mappings.Action.ij("ShowPopupMenu"))
-    mappings.register("NERDTreeMapQuit", "q", Mappings.Action.ij("HideActiveWindow"))
-    mappings.register(
-      "NERDTreeMapToggleZoom",
-      "A",
-      Mappings.Action.ij("MaximizeToolWindow"),
-    )
-  }
-
-  object Util {
-    internal val monitor = Any()
-    internal var commandsRegistered = false
-    fun callAction(editor: VimEditor?, name: String, context: ExecutionContext) {
-      val action = ActionManager.getInstance().getAction(name) ?: run {
-        VimPlugin.showMessage(MessageHelper.message("action.not.found.0", name))
-        return
-      }
-      val application = ApplicationManager.getApplication()
-      if (application.isUnitTestMode) {
-        injector.actionExecutor.executeAction(editor, action.vim, context)
-      } else {
-        runAfterGotFocus {
-          injector.actionExecutor.executeAction(editor, action.vim, context)
-        }
-      }
-    }
-
-    fun getSplittersCurrentWindow(event: AnActionEvent): EditorWindow? {
-      val splitters = FileEditorManagerEx.getInstanceEx(event.project ?: return null).splitters
-      return splitters.currentWindow
-    }
-  }
-
   companion object {
-    const val pluginName = "NERDTree"
+    const val PLUGIN_NAME = "NERDTree"
     private val LOG = vimLogger<NerdTree>()
   }
 }
 
-private fun addCommand(alias: String, handler: CommandAliasHandler) {
-  VimPlugin.getCommand().setAlias(alias, CommandAlias.Call(0, -1, alias, handler))
+private fun registerMappings() {
+  mappings.registerNavigationMappings()
+
+  mappings.register(
+    "NERDTreeMapActivateNode",
+    "o",
+    Mappings.Action { event, tree ->
+      val array = CommonDataKeys.NAVIGATABLE_ARRAY.getData(event.dataContext)?.filter { it.canNavigateToSource() }
+      if (array.isNullOrEmpty()) {
+        val row = tree.selectionRows?.getOrNull(0) ?: return@Action
+        if (tree.isExpanded(row)) {
+          tree.collapseRow(row)
+        } else {
+          tree.expandRow(row)
+        }
+      } else {
+        array.forEach { it.navigate(true) }
+      }
+    },
+  )
+  mappings.register(
+    "NERDTreeMapPreview",
+    "go",
+    Mappings.Action { event, _ ->
+      CommonDataKeys.NAVIGATABLE_ARRAY.getData(event.dataContext)?.filter { it.canNavigateToSource() }
+        ?.forEach { it.navigate(false) }
+    },
+  )
+  mappings.register(
+    "NERDTreeMapOpenInTab",
+    "t",
+    Mappings.Action { event, _ ->
+      // FIXME: 22.01.2021 Doesn't work correct
+      CommonDataKeys.NAVIGATABLE_ARRAY.getData(event.dataContext)?.filter { it.canNavigateToSource() }
+        ?.forEach { it.navigate(true) }
+    },
+  )
+  mappings.register(
+    "NERDTreeMapOpenInTabSilent",
+    "T",
+    Mappings.Action { event, _ ->
+      // FIXME: 22.01.2021 Doesn't work correct
+      CommonDataKeys.NAVIGATABLE_ARRAY.getData(event.dataContext)?.filter { it.canNavigateToSource() }
+        ?.forEach { it.navigate(true) }
+    },
+  )
+
+  // TODO: 21.01.2021 Should option in left split
+  mappings.register("NERDTreeMapOpenVSplit", "s", Mappings.Action.ij("OpenInRightSplit"))
+  // TODO: 21.01.2021 Should option in above split
+  mappings.register(
+    "NERDTreeMapOpenSplit",
+    "i",
+    Mappings.Action { event, _ ->
+      val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Action
+      if (file.isDirectory) return@Action
+      val currentWindow = getSplittersCurrentWindow(event)
+      currentWindow?.split(SwingConstants.HORIZONTAL, true, file, true)
+    },
+  )
+  mappings.register(
+    "NERDTreeMapPreviewVSplit",
+    "gs",
+    Mappings.Action { event, _ ->
+      val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Action
+      val currentWindow = getSplittersCurrentWindow(event)
+      currentWindow?.split(SwingConstants.VERTICAL, true, file, true)
+
+      // FIXME: 22.01.2021 This solution bouncing a bit
+      Mappings.Action.callAction(null, "ActivateProjectToolWindow", event.dataContext.vim)
+    },
+  )
+  mappings.register(
+    "NERDTreeMapPreviewSplit",
+    "gi",
+    Mappings.Action { event, _ ->
+      val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Action
+      val currentWindow = getSplittersCurrentWindow(event)
+      currentWindow?.split(SwingConstants.HORIZONTAL, true, file, true)
+
+      Mappings.Action.callAction(null, "ActivateProjectToolWindow", event.dataContext.vim)
+    },
+  )
+  mappings.register(
+    "NERDTreeMapRefresh",
+    "r",
+    Mappings.Action.ij("SynchronizeCurrentFile"),
+  )
+  mappings.register("NERDTreeMapToggleHidden", "I", Mappings.Action.ij("ProjectView.ShowExcludedFiles"))
+  mappings.register("NERDTreeMapNewFile", "n", Mappings.Action.ij("NewFile"))
+  mappings.register("NERDTreeMapNewDir", "N", Mappings.Action.ij("NewDir"))
+  mappings.register("NERDTreeMapDelete", "d", Mappings.Action.ij("\$Delete"))
+  mappings.register("NERDTreeMapCopy", "y", Mappings.Action.ij("\$Copy"))
+  mappings.register("NERDTreeMapPaste", "v", Mappings.Action.ij("\$Paste"))
+  mappings.register("NERDTreeMapRename", "<C-r>", Mappings.Action.ij("RenameElement"))
+  mappings.register("NERDTreeMapRefreshRoot", "R", Mappings.Action.ij("Synchronize"))
+  mappings.register("NERDTreeMapMenu", "m", Mappings.Action.ij("ShowPopupMenu"))
+  mappings.register("NERDTreeMapQuit", "q", Mappings.Action.ij("HideActiveWindow"))
+  mappings.register(
+    "NERDTreeMapToggleZoom",
+    "A",
+    Mappings.Action.ij("MaximizeToolWindow"),
+  )
+}
+
+private fun getSplittersCurrentWindow(event: AnActionEvent): EditorWindow? {
+  val splitters = FileEditorManagerEx.getInstanceEx(event.project ?: return null).splitters
+  return splitters.currentWindow
 }
 
 private val mappings = Mappings("NERDTree")
 
+private val monitor = Any()
+private var commandsRegistered = false
+
 private fun installDispatcher(project: Project) {
   val dispatcher = NerdTree.NerdDispatcher.getInstance(project)
-  val shortcuts = mappings.keyStrokes.map { RequiredShortcut(it, MappingOwner.Plugin.get(NerdTree.pluginName)) }
+  val shortcuts = mappings.keyStrokes.map { RequiredShortcut(it, MappingOwner.Plugin.get(NerdTree.PLUGIN_NAME)) }
   dispatcher.registerCustomShortcutSet(
     KeyGroup.toShortcutSet(shortcuts),
     (ProjectView.getInstance(project) as ProjectViewImpl).component,
