@@ -141,10 +141,11 @@ class CommandBuilder private constructor(
 
   val isExpectingCount: Boolean
     get() {
-      return commandState == CurrentCommandState.NEW_COMMAND &&
-        !isRegisterPending &&
-        expectedArgumentType != Argument.Type.CHARACTER &&
-        expectedArgumentType != Argument.Type.DIGRAPH
+      return commandState == CurrentCommandState.NEW_COMMAND
+        && !isRegisterPending
+        && expectedArgumentType != Argument.Type.CHARACTER
+        && expectedArgumentType != Argument.Type.DIGRAPH
+        && commandKeyStrokes.isEmpty()
     }
 
   /**
