@@ -24,7 +24,7 @@ class HistoryCommandTest : VimTestCase() {
   }
 
   @Test
-  fun `test history lists empty cmd history by default`() {
+  fun `test history lists current cmd history by default`() {
     assertCommandOutput("history",
       """
         |      #  cmd history
@@ -55,7 +55,7 @@ class HistoryCommandTest : VimTestCase() {
   }
 
   @Test
-  fun `test his lists empty cmd history by default`() {
+  fun `test his lists current cmd history by default`() {
     assertCommandOutput("his",
       """
         |      #  cmd history
