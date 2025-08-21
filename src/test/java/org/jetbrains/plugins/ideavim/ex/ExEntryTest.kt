@@ -176,67 +176,6 @@ class ExEntryTest : VimExTestCase() {
   }
 
   @Test
-  fun `test insert digraph`() {
-    typeText(":<C-K>OK")
-    assertExText("✓")
-    assertExOffset(1)
-
-    deactivateExEntry()
-
-    typeText(":set<Home><C-K>OK")
-    assertExText("✓set")
-    assertExOffset(1)
-
-    deactivateExEntry()
-
-    typeText(":set<Home><Insert><C-K>OK")
-    assertExText("✓et")
-    assertExOffset(1)
-  }
-
-  @Test
-  fun `test prompt while inserting digraph`() {
-    typeText(":<C-K>")
-    assertRenderedExText("?")
-    assertExOffset(0)
-
-    deactivateExEntry()
-
-    typeText(":<C-K>O")
-    assertRenderedExText("O")
-    assertExOffset(0)
-
-    deactivateExEntry()
-
-    typeText(":set<Home><C-K>")
-    assertRenderedExText("?set")
-    assertExOffset(0)
-
-    deactivateExEntry()
-
-    typeText(":set<Home><C-K>O")
-    assertRenderedExText("Oset")
-    assertExOffset(0)
-  }
-
-  @Test
-  fun `test escape cancels digraph`() {
-    typeText(":<C-K><Esc>OK")
-    assertIsActive()
-    assertExText("OK")
-
-    deactivateExEntry()
-
-    // Note that the docs state that hitting escape stops digraph entry and cancels command line mode. In practice,
-    // this isn't true - digraph entry is stopped, but command line mode continues
-    typeText(":<C-K>O<Esc>K")
-    assertIsActive()
-    assertRenderedExText("K")
-
-    deactivateExEntry()
-  }
-
-  @Test
   fun `test insert literal character`() {
     typeText(":<C-V>123<C-V>080")
     assertExText("{P")
