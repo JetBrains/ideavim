@@ -42,6 +42,14 @@ abstract class VimScriptExecutorBase : VimscriptExecutor {
       val myScript = injector.vimscriptParser.parse(script)
       myScript.units.forEach { it.vimContext = vimContext ?: myScript }
 
+      // Record the command in the history before executing it
+      if (!skipHistory) {
+        injector.historyGroup.addEntry(VimHistory.Type.Command, script)
+        if (myScript.units.size == 1 && myScript.units[0] is Command && myScript.units[0] !is RepeatCommand) {
+          injector.registerGroup.storeTextSpecial(LAST_COMMAND_REGISTER, script)
+        }
+      }
+
       for (unit in myScript.units) {
         try {
           val result = unit.execute(editor, context)
@@ -75,12 +83,6 @@ abstract class VimScriptExecutorBase : VimscriptExecutor {
         }
       }
 
-      if (!skipHistory) {
-        injector.historyGroup.addEntry(VimHistory.Type.Command, script)
-        if (myScript.units.size == 1 && myScript.units[0] is Command && myScript.units[0] !is RepeatCommand) {
-          injector.registerGroup.storeTextSpecial(LAST_COMMAND_REGISTER, script)
-        }
-      }
       return finalResult
     } finally {
       injector.vimscriptExecutor.executingVimscript = false
