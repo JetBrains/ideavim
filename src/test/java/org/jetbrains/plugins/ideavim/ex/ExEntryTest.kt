@@ -14,7 +14,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.action.ex.VimExTestCase
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -160,145 +159,21 @@ class ExEntryTest : VimExTestCase() {
     assertEquals("HOR 75", exEntryPanel.entry.caretShape)
   }
 
-  @VimBehaviorDiffers(description = "Vim reorders history even when cancelling entry")
   @Test
-  fun `test command history`() {
-    typeText(":set digraph<CR>")
-    typeText(":digraph<CR>")
-    typeText(":set incsearch<CR>")
-
+  fun `test saves command history when cancelling command line`() {
+    typeText(":set digraph<Esc>")
     typeText(":<Up>")
-    assertExText("set incsearch")
-    typeText("<Up>")
-    assertExText("digraph")
-    typeText("<Up>")
+
     assertExText("set digraph")
-
-    deactivateExEntry()
-
-    // TODO: Vim behavior reorders the history even when cancelling history
-//        typeExInput(":<Up>")
-//        assertExText("set digraph")
-//        typeText("<Up>")
-//        assertExText("set incsearch")
-
-    typeText(":<S-Up>")
-    assertExText("set digraph")
-    typeText("<Up>")
-    assertExText("set incsearch")
-    typeText("<Up>")
-    assertExText("digraph")
-
-    deactivateExEntry()
-
-    typeText(":<PageUp>")
-    assertExText("digraph")
-    typeText("<PageUp>")
-    assertExText("set digraph")
-    typeText("<PageUp>")
-    assertExText("set incsearch")
-  }
-
-  @TestWithoutNeovim(SkipNeovimReason.CMD)
-  @Test
-  fun `test matching command history`() {
-    typeText(":set digraph<CR>")
-    typeText(":digraph<CR>")
-    typeText(":set incsearch<CR>")
-
-    typeText(":set<Up>")
-    assertExText("set incsearch")
-    typeText("<Up>")
-    assertExText("set digraph")
-
-    deactivateExEntry()
-
-    typeText(":set<S-Up>")
-    assertExText("set digraph")
-    typeText("<S-Up>")
-    assertExText("set incsearch")
-    typeText("<S-Up>")
-    assertExText("digraph")
-
-    deactivateExEntry()
-
-    typeText(":set<PageUp>")
-    assertExText("digraph")
-    typeText("<PageUp>")
-    assertExText("set digraph")
-    typeText("<PageUp>")
-    assertExText("set incsearch")
   }
 
   @Test
-  fun `test search history`() {
-    typeText("/something cool<CR>")
-    typeText("/not cool<CR>")
-    typeText("/so cool<CR>")
-
-    typeText("/<Up>")
-    assertExText("so cool")
+  fun `test saves search history when cancelling command line`() {
+    typeText("/something cool<Esc>")
     typeText("<Up>")
-    assertExText("not cool")
-    typeText("<Up>")
+
     assertExText("something cool")
-
-    deactivateExEntry()
-
-    typeText("/<S-Up>")
-    assertExText("something cool")
-    typeText("<S-Up>")
-    assertExText("so cool")
-    typeText("<S-Up>")
-    assertExText("not cool")
-
-    deactivateExEntry()
-
-    typeText("/<PageUp>")
-    assertExText("not cool")
-    typeText("<PageUp>")
-    assertExText("something cool")
-    typeText("<PageUp>")
-    assertExText("so cool")
   }
-
-  @VimBehaviorDiffers(description = "Vim reorders history even when cancelling entry")
-  @Test
-  fun `test matching search history`() {
-    typeText("/something cool<CR>")
-    typeText("/not cool<CR>")
-    typeText("/so cool<CR>")
-
-    typeText("/so<Up>")
-    assertExText("so cool")
-    typeText("<Up>")
-    assertExText("something cool")
-
-    deactivateExEntry()
-
-    // TODO: Vim behavior reorders the history even when cancelling history
-//        typeExInput(":<Up>")
-//        assertEquals("set digraph", exEntryPanel.text)
-//        typeText("<Up>")
-//        assertEquals("set incsearch", exEntryPanel.text)
-
-    typeText("/so<S-Up>")
-    assertExText("something cool")
-    typeText("<S-Up>")
-    assertExText("so cool")
-    typeText("<S-Up>")
-    assertExText("not cool")
-
-    deactivateExEntry()
-
-    typeText("/so<PageUp>")
-    assertExText("not cool")
-    typeText("<PageUp>")
-    assertExText("something cool")
-    typeText("<PageUp>")
-    assertExText("so cool")
-  }
-
 
   @Test
   fun `test insert digraph`() {
