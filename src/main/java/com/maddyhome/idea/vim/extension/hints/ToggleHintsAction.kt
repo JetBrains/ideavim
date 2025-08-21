@@ -95,6 +95,7 @@ class ToggleHintsAction : DumbAwareToggleAction() {
     cover.removeAll() // clear existing covers
     hints =
       rootComponent.createCovers(SwingUtilities.convertPoint(rootComponent.parent, rootComponent.location, glassPane))
+    hints.zip(alphabet.permutations(2)).forEach { (hint, permutation) -> hint.hint = permutation.joinToString("") }
     hints.map(Hint::cover).forEach(cover::add)
     cover.size = glassPane.size
   }
@@ -108,23 +109,25 @@ private class Hint(val component: Accessible, loc: Point) {
 
   val bounds: Rectangle = Rectangle(loc, component.accessibleContext.accessibleComponent.size)
 
-  val cover = JPanel().apply {
-    background = JBColor(Color(0, 0, 0, 0), Color(0, 0, 0, 0))
-    bounds = this@Hint.bounds
-    border = javax.swing.border.LineBorder(JBColor.BLUE, 1)
-    if (label != null) {
+  lateinit var hint: String
+
+  val cover: JPanel by lazy {
+    JPanel().apply {
+      background = JBColor(Color(0, 0, 0, 0), Color(0, 0, 0, 0))
+      bounds = this@Hint.bounds
+      border = javax.swing.border.LineBorder(JBColor.BLUE, 1)
       add(JLabel().apply {
-        text = this@Hint.label
+        text = hint
         foreground = JBColor.RED
       })
+      if (component is Tree) {
+        border = javax.swing.border.LineBorder(JBColor.RED, 1)
+      }
+      isVisible = true
     }
-    if (component is Tree) {
-      border = javax.swing.border.LineBorder(JBColor.RED, 1)
-    }
-    isVisible = true
   }
 
-  override fun toString(): String = label ?: "<not labelled>"
+  override fun toString(): String = hint
 }
 
 private class HighlightComponent : JPanel() {
@@ -163,3 +166,17 @@ private fun Accessible.createCovers(loc: Point): List<Hint> = if (accessibleCont
 } else emptyList()
 
 private operator fun Point.plus(other: Point) = Point(x + other.x, y + other.y)
+
+private fun <T> Collection<T>.permutations(length: Int): Iterable<List<T>> = sequence {
+  if (length == 0) {
+    yield(emptyList())
+    return@sequence
+  }
+  for (element in this@permutations) {
+    (this@permutations - element).permutations(length - 1).forEach { subPermutation ->
+      yield(listOf(element) + subPermutation)
+    }
+  }
+}.asIterable()
+
+private val alphabet = "ASDFGHJKL".toList()
