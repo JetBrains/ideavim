@@ -731,7 +731,7 @@
     },
     {
         "keys": "<Down>",
-        "class": "com.maddyhome.idea.vim.action.ex.HistoryDownFilterAction",
+        "class": "com.maddyhome.idea.vim.action.ex.SelectNewerHistoryFilteredAction",
         "modes": "C"
     },
     {
