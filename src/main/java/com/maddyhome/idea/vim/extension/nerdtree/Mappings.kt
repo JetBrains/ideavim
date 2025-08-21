@@ -144,8 +144,16 @@ internal class Mappings(name: String) {
       },
     )
 
-    // FIXME The first row is not the root of External Libraries
-    register("NERDTreeMapJumpRoot", "P", Action.ij("Tree-selectFirst"))
+    register("NERDTreeMapJumpRoot", "P", Action { _, tree ->
+      // Note that we should not consider the root simply the first row
+      // It cannot be guaranteed that the tree has a single visible root
+      var path = tree.selectionPath ?: return@Action
+      while (path.parentPath != null && tree.getRowForPath(path.parentPath) >= 0) {
+        path = path.parentPath
+      }
+      tree.selectionPath = path
+      tree.scrollPathToVisible(path)
+    })
     register("NERDTreeMapJumpParent", "p", Action.ij("Tree-selectParentNoCollapse"))
     register(
       "NERDTreeMapJumpFirstChild",
@@ -153,8 +161,7 @@ internal class Mappings(name: String) {
       Action { _, tree ->
         var path = tree.selectionPath ?: return@Action
         while (true) {
-          val previous = TreeUtil.previousVisibleSibling(tree, path)
-          if (previous == null) break
+          val previous = TreeUtil.previousVisibleSibling(tree, path) ?: break
           path = previous
         }
         tree.selectionPath = path
