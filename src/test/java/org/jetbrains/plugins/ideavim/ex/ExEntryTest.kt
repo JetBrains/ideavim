@@ -18,12 +18,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-// TODO: Split this class
-// This class should handle simple ex entry features, such as starting ex entry, accepting/cancelling, cursor shape etc.
-// Individual actions such as c_CTRL-B or c_CTRL-E (beginning/end of line), c_CTRL-R (insert register), insert digraph
-// or literal, etc. should have individual test classes in the ideavim.ex.action package
-// :cmap should also be tested separately
-
 class ExEntryTest : VimExTestCase() {
   @Test
   fun `test initial text set to empty string`() {
