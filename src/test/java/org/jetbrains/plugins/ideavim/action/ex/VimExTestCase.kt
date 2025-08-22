@@ -29,7 +29,13 @@ open class VimExTestCase : VimTestCase() {
 
   protected fun assertExText(expected: String) {
     // Get the text directly from the text field. This does NOT include prompts or rendered control characters
-    assertEquals(expected, exEntryPanel.text)
+    if (expected.contains(c)) {
+      val actual = exEntryPanel.text.substring(0, exEntryPanel.caret.offset) + c + exEntryPanel.text.substring(exEntryPanel.caret.offset)
+      assertEquals(expected, actual)
+    }
+    else {
+      assertEquals(expected, exEntryPanel.text)
+    }
   }
 
   protected fun assertRenderedExText(expected: String) {
