@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl.controlNonVimSelectionChange
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl.predictMode
-import com.maddyhome.idea.vim.helper.RWLockLabel
+import com.maddyhome.idea.vim.helper.VimLockLabel
 import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.hasVisualSelection
@@ -118,7 +118,7 @@ internal object IdeaSelectionControl {
    * This method is created to improve user experience. It allows avoiding delay in some operations
    *   (because [controlNonVimSelectionChange] is not executed immediately)
    */
-  @RWLockLabel.Readonly
+  @VimLockLabel.RequiresReadLock
   @RequiresReadLock
   fun predictMode(editor: Editor, selectionSource: VimListenerManager.SelectionSource): Mode {
     if (editor.selectionModel.hasSelection(true)) {
@@ -153,7 +153,7 @@ internal object IdeaSelectionControl {
     return Mode.NORMAL()
   }
 
-  @RWLockLabel.Readonly
+  @VimLockLabel.RequiresReadLock
   @RequiresReadLock
   private fun chooseSelectionMode(
     editor: Editor,

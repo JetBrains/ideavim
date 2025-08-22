@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.ExecutionContext;
 import com.maddyhome.idea.vim.api.VimCaret;
 import com.maddyhome.idea.vim.helper.MessageHelper;
-import com.maddyhome.idea.vim.helper.RWLockLabel;
+import com.maddyhome.idea.vim.helper.VimLockLabel;
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
 import org.jetbrains.annotations.NotNull;
@@ -103,7 +103,7 @@ public class WindowGroup extends WindowGroupBase {
   }
 
   @Override
-  @RWLockLabel.Readonly
+  @VimLockLabel.RequiresReadLock
   @RequiresReadLock
   public void selectWindowInRow(@NotNull VimCaret caret,
                                 @NotNull ExecutionContext context,

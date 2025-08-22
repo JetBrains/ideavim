@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.IjOptionConstants
-import com.maddyhome.idea.vim.helper.RWLockLabel
+import com.maddyhome.idea.vim.helper.VimLockLabel
 import com.maddyhome.idea.vim.helper.hasBlockOrUnderscoreCaret
 import com.maddyhome.idea.vim.helper.hasVisualSelection
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
@@ -85,7 +85,7 @@ internal object IdeaRefactorModeHelper {
     }
   }
 
-  @RWLockLabel.Readonly
+  @VimLockLabel.RequiresReadLock
   @RequiresReadLock
   fun calculateCorrections(editor: Editor): List<Action> {
     val corrections = mutableListOf<Action>()

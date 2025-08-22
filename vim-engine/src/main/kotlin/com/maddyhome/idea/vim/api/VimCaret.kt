@@ -14,7 +14,7 @@ import com.maddyhome.idea.vim.group.visual.VisualChange
 import com.maddyhome.idea.vim.group.visual.vimMoveBlockSelectionToOffset
 import com.maddyhome.idea.vim.group.visual.vimMoveSelectionToCaret
 import com.maddyhome.idea.vim.handler.Motion
-import com.maddyhome.idea.vim.helper.RWLockLabel
+import com.maddyhome.idea.vim.helper.VimLockLabel
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.register.Register
@@ -42,10 +42,10 @@ interface ImmutableVimCaret {
   val isValid: Boolean
   val isPrimary: Boolean
 
-  @RWLockLabel.Readonly
+  @VimLockLabel.RequiresReadLock
   val selectionStart: Int
 
-  @RWLockLabel.Readonly
+  @VimLockLabel.RequiresReadLock
   val selectionEnd: Int
   val vimSelectionStart: Int
 
@@ -84,7 +84,7 @@ per-caret marks.
 
   fun setSelection(start: Int, end: Int)
 
-  @RWLockLabel.Writable
+  @VimLockLabel.RequiresWriteLock
   fun removeSelection()
 
   fun moveToOffset(offset: Int): VimCaret {

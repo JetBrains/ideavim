@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.isLineEmpty
-import com.maddyhome.idea.vim.helper.RWLockLabel
+import com.maddyhome.idea.vim.helper.VimLockLabel
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.inBlockSelection
@@ -143,7 +143,7 @@ fun VimCaret.vimUpdateEditorSelection() {
 /**
  * This works almost like [Caret.getLeadSelectionOffset] in IJ, but vim-specific
  */
-@RWLockLabel.Readonly
+@VimLockLabel.RequiresReadLock
 val ImmutableVimCaret.vimLeadSelectionOffset: Int
   get() {
     val caretOffset = offset

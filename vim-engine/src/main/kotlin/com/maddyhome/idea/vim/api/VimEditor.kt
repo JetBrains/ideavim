@@ -11,7 +11,7 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.VimEditorReplaceMask
-import com.maddyhome.idea.vim.helper.RWLockLabel
+import com.maddyhome.idea.vim.helper.VimLockLabel
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 
@@ -153,7 +153,7 @@ interface VimEditor {
   }
 
   fun getVirtualFile(): VimVirtualFile?
-  @RWLockLabel.Writable
+  @VimLockLabel.RequiresWriteLock
   fun deleteString(range: TextRange)
 
   fun getLineText(line: Int): String {
@@ -244,9 +244,9 @@ interface VimEditor {
 
 interface MutableVimEditor : VimEditor {
   fun addLine(atPosition: Int): Int?
-  @RWLockLabel.Writable
+  @VimLockLabel.RequiresWriteLock
   fun insertText(caret: VimCaret, atPosition: Int, text: CharSequence)
-  @RWLockLabel.Writable
+  @VimLockLabel.RequiresWriteLock
   fun replaceString(start: Int, end: Int, newString: String)
 }
 

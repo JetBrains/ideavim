@@ -9,7 +9,7 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.helper.RWLockLabel
+import com.maddyhome.idea.vim.helper.VimLockLabel
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import kotlin.math.max
@@ -76,7 +76,7 @@ data class SelectionInfo(var start: BufferPosition?, var end: BufferPosition?, v
   }
 
   companion object {
-    @RWLockLabel.Readonly
+    @VimLockLabel.RequiresReadLock
     fun collectCurrentSelectionInfo(caret: VimCaret): SelectionInfo? {
       val editor = caret.editor
       val mode = editor.mode
