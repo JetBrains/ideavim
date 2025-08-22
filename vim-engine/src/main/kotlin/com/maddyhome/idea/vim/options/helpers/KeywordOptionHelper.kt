@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.OptionAccessScope
+import com.maddyhome.idea.vim.options.StringListOption
 import java.util.regex.Pattern
 
 object KeywordOptionHelper {
@@ -26,13 +27,16 @@ object KeywordOptionHelper {
     return values == null || specs == null
   }
 
-  fun isKeyword(editor: VimEditor, c: Char): Boolean {
+  fun isFilename(editor: VimEditor, c: Char): Boolean  = isMatchingChar(editor, c, Options.isfname)
+  fun isKeyword(editor: VimEditor, c: Char) = isMatchingChar(editor, c, Options.iskeyword)
+
+  private fun isMatchingChar(editor: VimEditor, c: Char, option: StringListOption): Boolean {
     if (c.code >= '\u0100'.code) {
       return true
     }
 
     val specs =
-      injector.optionGroup.getParsedEffectiveOptionValue(Options.iskeyword, editor) { optionValue ->
+      injector.optionGroup.getParsedEffectiveOptionValue(option, editor) { optionValue ->
         valuesToValidatedAndReversedSpecs(parseValues(optionValue.asString()))!!
       }
     for (spec in specs) {
