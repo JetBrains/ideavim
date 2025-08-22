@@ -57,7 +57,9 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
       mode is Mode.NORMAL -> Mode.SELECT(selectionType, mode.returnTo)
       else -> Mode.SELECT(selectionType, mode)
     }
-    editor.forEachCaret { it.vimSelectionStart = it.vimLeadSelectionOffset }
+    injector.application.runReadAction {
+      editor.forEachCaret { it.vimSelectionStart = it.vimLeadSelectionOffset }
+    }
     return true
   }
 
