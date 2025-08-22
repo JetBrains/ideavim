@@ -21,8 +21,7 @@ class DeletePreviousWordAction : CommandLineActionHandler() {
     if (caretOffset == 0) return true
 
     val oldText = commandLine.text
-    // TODO: Should this be WORD or word?
-    val motion = injector.motion.findOffsetOfNextWord(oldText, commandLine.caret.offset, -1, true, commandLine.editor)
+    val motion = injector.motion.findOffsetOfNextWord(oldText, commandLine.caret.offset, count = -1, bigWord = false, commandLine.editor)
     if (motion is Motion.AbsoluteOffset) {
       commandLine.deleteText(motion.offset, caretOffset - motion.offset)
     }
