@@ -208,15 +208,25 @@ class CommandBuilder private constructor(
   fun addAction(action: EditorActionHandlerBase) {
     logger.trace { "addAction is executed. action = $action" }
 
-    if (this.action == null) {
-      this.action = action
-    } else {
-      StrictMode.assert(argument == null, "Command builder already has an action and a fully populated argument")
-      argument = when (action) {
-        is MotionActionHandler -> Argument.Motion(action, null)
-        is TextObjectActionHandler -> Argument.Motion(action)
-        is ExternalActionHandler -> Argument.Motion(action)
-        else -> throw RuntimeException("Unexpected action type: $action")
+    // If the current action is waiting for something that's not an action, but we've got an action, we should replace
+    // the current action. This is to handle the case when we have an action that is a prefix to other actions,
+    // specifically `c_CTRL-R {register}`, `i_CTRL-R {register}` and `c_CTRL-R_CTRL-W` et al.
+    when {
+      this.action == null -> {
+        this.action = action
+      }
+      this.action != null && expectedArgumentType != null && expectedArgumentType != Argument.Type.MOTION -> {
+        StrictMode.assert(argument == null, "Changing motion argument action is not expected or supported")
+        this.action = action
+      }
+      else -> {
+        StrictMode.assert(argument == null, "Command builder already has an action and a fully populated argument")
+        argument = when (action) {
+          is MotionActionHandler -> Argument.Motion(action, null)
+          is TextObjectActionHandler -> Argument.Motion(action)
+          is ExternalActionHandler -> Argument.Motion(action)
+          else -> throw RuntimeException("Unexpected action type: $action")
+        }
       }
     }
 
@@ -280,8 +290,21 @@ class CommandBuilder private constructor(
       return true
     }
 
-    logger.trace { "Found command for ${injector.parser.toPrintableString(commandKeyStrokes)} - ${node.debugString}" }
-    commandKeyStrokes.clear()
+    // This check is purely for c_CTRL-R and i_CTRL-R, although it looks more generic.
+    // `c_CTRL-R {register}` and `i_CTRL-R {register}` are actions that expect a CHARACTER argument. However, there are
+    // additional actions that have <C-R> as a prefix, e.g. c_CTRL-R_CTRL-W or i_CTRL-R_CTRL-R {register}.
+    // If the current action is also a prefix, we do not clear the current keystrokes, so we maintain the state in the
+    // keystroke trie. When handling the next keystroke, the CommandKeyConsumer will try to handle the keystroke before
+    // the CharArgumentConsumer. If there's a matched command, we'll use it, abandoning the prefix's action. If there
+    // isn't a match, the keystroke will fall through to the CharArgumentConsumer and either complete the prefix action
+    // or abandon the command with a normal Vim error beep.
+    if (node.hasChildren) {
+      logger.trace { "Found partially complete key sequence for ${injector.parser.toPrintableString(commandKeyStrokes)} - ${node.debugString} with command ${command.instance}" }
+    }
+    else {
+      logger.trace { "Found command ${command.instance} for ${injector.parser.toPrintableString(commandKeyStrokes)} - ${node.debugString}" }
+      commandKeyStrokes.clear()
+    }
     processor(command.instance)
     return true
   }
@@ -317,7 +340,7 @@ class CommandBuilder private constructor(
     //   Similarly, nmap <C-W>a <C-W>s should not try to map the second <C-W> in <C-W><C-W>
     // Note that we might still be at RootNode if we're handling a prefix, because we might be buffering keys until we
     // get a match. This means we'll still process the rest of the keys of the prefix.
-    val isMultikey = commandKeyStrokes.isNotEmpty()
+    val isMultikey = commandKeyStrokes.isNotEmpty() && keyStrokeTrie.isPrefix(commandKeyStrokes)
     logger.debug { "Building multikey command: $commandKeyStrokes" }
     return isMultikey
   }

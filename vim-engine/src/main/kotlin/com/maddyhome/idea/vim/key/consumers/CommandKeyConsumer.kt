@@ -76,6 +76,7 @@ internal class CommandKeyConsumer : KeyConsumer {
     val commandBuilder = keyProcessResultBuilder.state.commandBuilder
     return commandBuilder.expectedArgumentType == null || commandBuilder.expectedArgumentType == Argument.Type.MOTION
       || commandBuilder.expectedArgumentType == Argument.Type.DIGRAPH
+      || commandBuilder.isBuildingMultiKeyCommand()
   }
 
   override fun consumeKey(
@@ -114,7 +115,8 @@ internal class CommandKeyConsumer : KeyConsumer {
 
     val commandBuilder = keyState.commandBuilder
     val expectedArgumentType = commandBuilder.expectedArgumentType
-    if (!checkArgumentCompatibility(expectedArgumentType, action)) {
+
+    if (!checkActionArgumentCompatibility(expectedArgumentType, action)) {
       logger.trace("Return from command node handling")
       processBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, _ ->
         KeyHandler.getInstance().setBadCommand(lambdaEditor, lambdaKeyState)
@@ -122,7 +124,15 @@ internal class CommandKeyConsumer : KeyConsumer {
       return
     }
 
+    // Note that CommandBuilder.addAction will handle the scenario where the current action is a prefix to another
+    // action, and we've just matched one of the "child" actions. Specifically, `c_CTRL-R {register}` and
+    // `i_CTRL-R {register}` might be the current action, and we've just matched something like `<C-R><C-R>` aka
+    // `c_CTRL-R_CTRL-R {register}` and `i_CTRL-R_CTRL-R {register}`.
+    logger.trace { "Adding action ${action.id} to command builder." }
     commandBuilder.addAction(action)
+
+    // Does the new action require an argument? This works even if we've just replaced the current action from
+    // `c_CTRL-R {register}` to `c_CTRL-R_CTRL-R {register}` (or Insert mode equivalents).
     if (commandBuilder.isAwaitingArgument) {
       processBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, lambdaContext ->
         logger.trace("Set waiting for the argument")
@@ -165,7 +175,7 @@ internal class CommandKeyConsumer : KeyConsumer {
     action.onStartWaitingForArgument(editor, context, keyState)
   }
 
-  private fun checkArgumentCompatibility(
+  private fun checkActionArgumentCompatibility(
     expectedArgumentType: Argument.Type?,
     action: EditorActionHandlerBase,
   ): Boolean {
