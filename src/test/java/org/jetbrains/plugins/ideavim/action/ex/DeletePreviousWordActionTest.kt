@@ -10,6 +10,7 @@ package org.jetbrains.plugins.ideavim.action.ex
 
 import org.junit.jupiter.api.Test
 
+@Suppress("SpellCheckingInspection")
 class DeletePreviousWordActionTest : VimExTestCase() {
   @Test
   fun `test delete word before caret`() {
@@ -23,5 +24,30 @@ class DeletePreviousWordActionTest : VimExTestCase() {
     assertExText("set rch")
   }
 
-  // TODO: Verify this is word and not WORD
+  @Test
+  fun `test delete up to previous word boundary`() {
+    typeText(":set keymodel=continueselect,stopselect<C-W>")
+    assertExText("set keymodel=continueselect,")
+  }
+
+  @Test
+  fun `test delete up to previous word boundary 2`() {
+    typeText(":set keymodel=continueselect,<C-W>")
+    assertExText("set keymodel=continueselect")
+  }
+
+  @Test
+  fun `test delete up to previous word boundary 3`() {
+    typeText(":set keymodel=continueselect<C-W>")
+    assertExText("set keymodel=")
+  }
+
+  @Test
+  fun `test delete word honours iskeyword option`() {
+    // This is the same as in help files (mostly. We seem to have problems with ^|)
+//    enterCommand("set iskeyword=!-~,^*,^|,^\",192-255")
+    enterCommand("set iskeyword=!-~,^*,^\",192-255")
+    typeText(":set keymodel=continueselect,stopselect<C-W>")
+    assertExText("set ")
+  }
 }
