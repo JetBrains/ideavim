@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.api.setVisualSelectionMarks
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import com.maddyhome.idea.vim.helper.RWLockLabel
+import com.maddyhome.idea.vim.helper.VimLockLabel
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_POS
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.state.mode.Mode
@@ -40,7 +40,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 abstract class VimPutBase : VimPut {
-  @RWLockLabel.SelfSynchronized
+  @VimLockLabel.SelfSynchronized
   override fun putText(
     editor: VimEditor,
     context: ExecutionContext,
@@ -91,7 +91,7 @@ abstract class VimPutBase : VimPut {
     injector.markService.setVisualSelectionMarks(caret, rangeForMarks)
   }
 
-  @RWLockLabel.SelfSynchronized
+  @VimLockLabel.SelfSynchronized
   private fun deleteSelectedText(
     editor: VimEditor,
     context: ExecutionContext,
@@ -112,7 +112,7 @@ abstract class VimPutBase : VimPut {
     return caret.moveToInlayAwareOffset(range.startOffset)
   }
 
-  @RWLockLabel.SelfSynchronized
+  @VimLockLabel.SelfSynchronized
   private fun deleteSelectedText(editor: VimEditor, context: ExecutionContext, data: PutData, saveToRegister: Boolean) {
     if (data.visualSelection == null) return
 
@@ -393,7 +393,7 @@ abstract class VimPutBase : VimPut {
     }
   }
 
-  @RWLockLabel.SelfSynchronized
+  @VimLockLabel.SelfSynchronized
   protected fun prepareDocumentAndGetStartOffsets(
     vimEditor: VimEditor,
     vimCaret: VimCaret,
@@ -495,7 +495,7 @@ abstract class VimPutBase : VimPut {
     }
   }
 
-  @RWLockLabel.SelfSynchronized
+  @VimLockLabel.SelfSynchronized
   private fun putForCaret(
     editor: VimEditor,
     caret: VimCaret,
@@ -530,7 +530,7 @@ abstract class VimPutBase : VimPut {
     return updated
   }
 
-  @RWLockLabel.SelfSynchronized
+  @VimLockLabel.SelfSynchronized
   override fun putTextForCaret(
     editor: VimEditor,
     caret: VimCaret,
@@ -558,7 +558,7 @@ abstract class VimPutBase : VimPut {
     return true
   }
 
-  @RWLockLabel.SelfSynchronized
+  @VimLockLabel.SelfSynchronized
   override fun putTextAndSetCaretPosition(
     editor: VimEditor,
     context: ExecutionContext,

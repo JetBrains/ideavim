@@ -11,7 +11,7 @@ package com.maddyhome.idea.vim.put
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.helper.RWLockLabel
+import com.maddyhome.idea.vim.helper.VimLockLabel
 import com.maddyhome.idea.vim.state.mode.SelectionType
 
 interface VimPut {
@@ -19,7 +19,7 @@ interface VimPut {
 
   fun notifyAboutIdeaPut(editor: VimEditor?)
 
-  @RWLockLabel.SelfSynchronized
+  @VimLockLabel.SelfSynchronized
   fun putTextAndSetCaretPosition(
     editor: VimEditor,
     context: ExecutionContext,
@@ -28,7 +28,7 @@ interface VimPut {
     additionalData: Map<String, Any>,
   )
 
-  @RWLockLabel.SelfSynchronized
+  @VimLockLabel.SelfSynchronized
   fun putText(
     editor: VimEditor,
     context: ExecutionContext,
@@ -37,7 +37,7 @@ interface VimPut {
     modifyRegister: Boolean = true,
   ): Boolean
 
-  @RWLockLabel.SelfSynchronized
+  @VimLockLabel.SelfSynchronized
   fun putTextForCaret(
     editor: VimEditor,
     caret: VimCaret,
@@ -47,7 +47,7 @@ interface VimPut {
     modifyRegister: Boolean = true,
   ): Boolean
 
-  @RWLockLabel.SelfSynchronized
+  @VimLockLabel.SelfSynchronized
   fun putTextViaIde(
     pasteProvider: VimPasteProvider,
     vimEditor: VimEditor,

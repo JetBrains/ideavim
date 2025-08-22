@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.helper.RWLockLabel
+import com.maddyhome.idea.vim.helper.VimLockLabel
 import com.maddyhome.idea.vim.put.PutData
 import com.maddyhome.idea.vim.register.Register
 import com.maddyhome.idea.vim.state.mode.SelectionType
@@ -67,7 +67,7 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
  * @param key     The register name
  * @return true if able to insert the register contents, false if not
  */
-@RWLockLabel.SelfSynchronized
+@VimLockLabel.SelfSynchronized
 private fun insertRegister(editor: VimEditor, context: ExecutionContext, key: Char): Boolean {
   val register: Register? = injector.registerGroup.getRegister(editor, context, key)
   if (register != null) {

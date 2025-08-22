@@ -31,7 +31,7 @@ import com.maddyhome.idea.vim.api.setChangeMarks
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.RWLockLabel
+import com.maddyhome.idea.vim.helper.VimLockLabel
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.ide.isClionNova
 import com.maddyhome.idea.vim.ide.isRider
@@ -75,7 +75,7 @@ internal class PutGroup : VimPutBase() {
     return null
   }
 
-  @RWLockLabel.SelfSynchronized
+  @VimLockLabel.SelfSynchronized
   override fun putTextViaIde(
     pasteProvider: VimPasteProvider,
     vimEditor: VimEditor,
