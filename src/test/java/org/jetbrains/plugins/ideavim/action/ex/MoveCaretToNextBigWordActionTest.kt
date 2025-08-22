@@ -8,36 +8,76 @@
 
 package org.jetbrains.plugins.ideavim.action.ex
 
-import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.junit.jupiter.api.Test
 
 class MoveCaretToNextBigWordActionTest : VimExTestCase() {
-  @VimBehaviorDiffers(description = "Moving one word right positions caret at end of previous word")
   @Test
-  fun `test Shift-Right move caret one WORD right`() {
+  fun `test Shift-Right moves caret to end of current WORD`() {
     typeText(":set incsearch<C-B>")
-    assertExOffset(0)
+    assertExText("${c}set incsearch")
 
     typeText("<S-Right>")
-    // TODO: Vim moves caret to "set| ", while we move it to "set |"
-    assertExOffset(4)
-
-    typeText("<S-Right>")
-    assertExOffset(13)
+    assertExText("set$c incsearch")
   }
 
   @Test
-  fun `test CTRL-Right moves caret one WORD right`() {
+  fun `test Shift-Right moves caret to end of command line`() {
     typeText(":set incsearch<C-B>")
-    assertExOffset(0)
+    assertExText("${c}set incsearch")
 
-    typeText("<C-Right>")
-    // TODO: Vim moves caret to "set| ", while we move it to "set |"
-    assertExOffset(4)
-
-    typeText("<C-Right>")
-    assertExOffset(13)
+    typeText("<S-Right><S-Right>")
+    assertExText("set incsearch$c")
   }
 
-  // TODO: Add tests to confirm if Vim uses word or WORD
+  @Test
+  fun `test multiple Shift-Right moves caret to next whitespace`() {
+    typeText(":set     incsearch<C-B>")
+    assertExText("${c}set     incsearch")
+
+    // Command-line doesn't really use WORD, it just moves to the next whitespace character.
+    // First moves to whitespace after `set`, then next whitespace, then third whitespace
+    typeText("<S-Right><S-Right><S-Right>")
+    assertExText("set  $c   incsearch")
+  }
+
+  @Test
+  fun `test Shift-Right at end of text does nothing`() {
+    typeText(":set incsearch<S-Right>")
+    assertExText("set incsearch$c")
+  }
+
+  @Test
+  fun `test Ctrl-Right moves caret to end of current WORD`() {
+    typeText(":set incsearch<C-B>")
+    assertExText("${c}set incsearch")
+
+    typeText("<C-Right>")
+    assertExText("set$c incsearch")
+  }
+
+  @Test
+  fun `test Ctrl-Right moves caret to end of command line`() {
+    typeText(":set incsearch<C-B>")
+    assertExText("${c}set incsearch")
+
+    typeText("<C-Right><C-Right>")
+    assertExText("set incsearch$c")
+  }
+
+  @Test
+  fun `test multiple Ctrl-Right moves caret to next whitespace`() {
+    typeText(":set     incsearch<C-B>")
+    assertExText("${c}set     incsearch")
+
+    // Command-line doesn't really use WORD, it just moves to the next whitespace character.
+    // First moves to whitespace after `set`, then next whitespace, then third whitespace
+    typeText("<C-Right><C-Right><C-Right>")
+    assertExText("set  $c   incsearch")
+  }
+
+  @Test
+  fun `test Ctrl-Right at end of text does nothing`() {
+    typeText(":set incsearch<C-Right>")
+    assertExText("set incsearch$c")
+  }
 }
