@@ -12,6 +12,7 @@ import com.intellij.codeInsight.template.impl.editorActions.ExpandLiveTemplateBy
 import com.intellij.openapi.actionSystem.ActionPromoter
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionWrapper
+import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler
 import com.intellij.openapi.editor.actions.TabAction
@@ -19,7 +20,6 @@ import com.maddyhome.idea.vim.action.VimShortcutKeyAction
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
-import org.jetbrains.plugins.terminal.block.util.TerminalDataContextUtils.editor
 
 /**
  * Provides ordering and prioritisation for actions mapped to Vim shortcuts
@@ -55,7 +55,7 @@ internal class VimActionsPromoter : ActionPromoter {
 
     val tabIndex = actions.indexOfFirst { it is TabAction }
     if (tabIndex != -1) {
-      val editor = context.editor ?: return null
+      val editor = CommonDataKeys.EDITOR.getData(context) ?: return null
       if (editor.isIdeaVimDisabledHere) return null
       val mode = editor.vim.mode
       val vimAction = actions[vimIndex]
