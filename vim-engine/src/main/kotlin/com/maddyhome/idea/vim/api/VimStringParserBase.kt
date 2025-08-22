@@ -236,6 +236,18 @@ abstract class VimStringParserBase : VimStringParser {
       KeyEvent.VK_F10 -> "f10"
       KeyEvent.VK_F11 -> "f11"
       KeyEvent.VK_F12 -> "f12"
+      KeyEvent.VK_F13 -> "f13"
+      KeyEvent.VK_F14 -> "f14"
+      KeyEvent.VK_F15 -> "f15"
+      KeyEvent.VK_F16 -> "f16"
+      KeyEvent.VK_F17 -> "f17"
+      KeyEvent.VK_F18 -> "f18"
+      KeyEvent.VK_F19 -> "f19"
+      KeyEvent.VK_F20 -> "f20"
+      KeyEvent.VK_F21 -> "f21"
+      KeyEvent.VK_F22 -> "f22"
+      KeyEvent.VK_F23 -> "f23"
+      KeyEvent.VK_F24 -> "f24"
       VK_PLUG -> "plug"
       VK_ACTION -> "action"
       KeyEvent.VK_NUMPAD0 -> "k0"
@@ -524,6 +536,18 @@ abstract class VimStringParserBase : VimStringParser {
       "f10" -> KeyEvent.VK_F10
       "f11" -> KeyEvent.VK_F11
       "f12" -> KeyEvent.VK_F12
+      "f13" -> KeyEvent.VK_F13
+      "f14" -> KeyEvent.VK_F14
+      "f15" -> KeyEvent.VK_F15
+      "f16" -> KeyEvent.VK_F16
+      "f17" -> KeyEvent.VK_F17
+      "f18" -> KeyEvent.VK_F18
+      "f19" -> KeyEvent.VK_F19
+      "f20" -> KeyEvent.VK_F20
+      "f21" -> KeyEvent.VK_F21
+      "f22" -> KeyEvent.VK_F22
+      "f23" -> KeyEvent.VK_F23
+      "f24" -> KeyEvent.VK_F24
       "plug" -> VK_PLUG
       "action" -> VK_ACTION
       "k0" -> KeyEvent.VK_NUMPAD0
