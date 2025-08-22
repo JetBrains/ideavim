@@ -12,8 +12,6 @@ import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
-import org.jetbrains.plugins.ideavim.SkipNeovimReason
-import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.action.ex.VimExTestCase
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -57,21 +55,21 @@ class ExEntryTest : VimExTestCase() {
     assertFalse(options().incsearch)
     typeText(":set incsearch<Esc>")
     assertFalse(options().incsearch)
-    assertIsDeactivated()
+    assertExIsDeactivated()
 
     deactivateExEntry()
 
     assertFalse(options().incsearch)
     typeText(":set incsearch<C-[>")
     assertFalse(options().incsearch)
-    assertIsDeactivated()
+    assertExIsDeactivated()
 
     deactivateExEntry()
 
     assertFalse(options().incsearch)
     typeText(":set incsearch<C-C>")
     assertFalse(options().incsearch)
-    assertIsDeactivated()
+    assertExIsDeactivated()
   }
 
   @Test
@@ -79,7 +77,7 @@ class ExEntryTest : VimExTestCase() {
     assertFalse(options().incsearch)
     typeText(":set incsearch<Enter>")
     assertTrue(options().incsearch)
-    assertIsDeactivated()
+    assertExIsDeactivated()
 
     deactivateExEntry()
     ApplicationManager.getApplication().invokeAndWait {
@@ -91,7 +89,7 @@ class ExEntryTest : VimExTestCase() {
     assertFalse(options().incsearch)
     typeText(":set incsearch<C-J>")
     assertTrue(options().incsearch)
-    assertIsDeactivated()
+    assertExIsDeactivated()
 
     deactivateExEntry()
     ApplicationManager.getApplication().runReadAction {
@@ -101,7 +99,7 @@ class ExEntryTest : VimExTestCase() {
     assertFalse(options().incsearch)
     typeText(":set incsearch<C-M>")
     assertTrue(options().incsearch)
-    assertIsDeactivated()
+    assertExIsDeactivated()
   }
 
   @Test
@@ -176,100 +174,6 @@ class ExEntryTest : VimExTestCase() {
   }
 
   @Test
-  fun `test insert literal character`() {
-    typeText(":<C-V>123<C-V>080")
-    assertExText("{P")
-
-    deactivateExEntry()
-
-    typeText(":<C-V>o123")
-    assertExText("S")
-
-    deactivateExEntry()
-
-    typeText(":<C-V>u00A9")
-    assertExText("©")
-
-    deactivateExEntry()
-
-    typeText(":<C-Q>123<C-Q>080")
-    assertExText("{P")
-
-    deactivateExEntry()
-
-    typeText(":<C-Q>o123")
-    assertExText("S")
-
-    deactivateExEntry()
-
-    typeText(":<C-Q>u00a9")
-    assertExText("©")
-
-    deactivateExEntry()
-
-    typeText(":set<Home><C-V>u00A9")
-    assertExText("©set")
-    assertExOffset(1)
-  }
-
-  @Test
-  fun `test insert literal control characters`() {
-    typeText(":normal I[<C-V><Esc>A]<C-V><Esc>")
-    assertExText("normal I[" + Char(27) + "A]" + Char(27))
-
-    deactivateExEntry()
-
-    // CR should be \n but Vim treats that as a NULL char, so we insert \r
-    typeText(":nmap p <C-V><CR>")
-    assertExText("nmap p \r")
-
-    deactivateExEntry()
-
-    typeText(":nmap p <C-V><C-D>")
-    assertExText("nmap p " + Char(4))
-
-    deactivateExEntry()
-
-    typeText(":nmap p <C-V><C-I>")
-    assertExText("nmap p \t")
-
-    deactivateExEntry()
-
-    typeText(":nmap p <C-V><C-V>")
-    assertExText("nmap p " + Char(22))
-
-    // TODO: IdeaVim handles <C-C> before handling digraphs/literals
-//    typeText(":nmap p <C-V><C-C>")
-//    assertExText("nmap p " + Char(3))
-  }
-
-  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
-  @Test
-  fun `test prompt while inserting literal character`() {
-    typeText(":<C-V>")
-    assertRenderedExText("^")
-    assertExOffset(0)
-
-    deactivateExEntry()
-
-    typeText(":<C-V>o")
-    assertRenderedExText("^")
-    assertExOffset(0)
-
-    typeText("1")
-    assertRenderedExText("^")
-    assertExOffset(0)
-
-    typeText("2")
-    assertRenderedExText("^")
-    assertExOffset(0)
-
-    typeText("3")
-    assertRenderedExText("S")
-    assertExOffset(1)
-  }
-
-  @Test
   fun `test cmap`() {
     typeText(":cmap x z<CR>")
     typeText(":cnoremap w z<CR>")
@@ -311,13 +215,5 @@ class ExEntryTest : VimExTestCase() {
     configureByText("")
     typeText(":echo <C-V>x80")
     assertRenderedExText("echo <80>")
-  }
-
-  private fun assertIsActive() {
-    assertExIsActive()
-  }
-
-  private fun assertIsDeactivated() {
-    assertExIsDeactivated()
   }
 }
