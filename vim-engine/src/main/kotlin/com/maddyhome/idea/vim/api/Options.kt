@@ -106,11 +106,7 @@ object Options {
   val digraph: ToggleOption = addOption(ToggleOption("digraph", GLOBAL, "dg", false))
   val gdefault: ToggleOption = addOption(ToggleOption("gdefault", GLOBAL, "gd", false))
   val history: UnsignedNumberOption = addOption(UnsignedNumberOption("history", GLOBAL, "hi", 50))
-
-  @JvmField
   val hlsearch: ToggleOption = addOption(ToggleOption("hlsearch", GLOBAL, "hls", false))
-
-  @JvmField
   val ignorecase: ToggleOption = addOption(ToggleOption("ignorecase", GLOBAL, "ic", false))
   val incsearch: ToggleOption = addOption(ToggleOption("incsearch", GLOBAL, "is", false))
   val keymodel: StringListOption = addOption(
@@ -134,8 +130,6 @@ object Options {
   val nrformats: StringListOption = addOption(
     StringListOption("nrformats", LOCAL_TO_BUFFER, "nf", "hex", setOf("octal", "hex", "alpha"))
   )
-
-  // TODO add listener/interface for number option in to vim-engine
   val number: ToggleOption = addOption(ToggleOption("number", LOCAL_TO_WINDOW, "nu", false))
   val scroll: NumberOption = addOption(NumberOption("scroll", LOCAL_TO_WINDOW, "scr", 0))
   val scrolloff: NumberOption = addOption(NumberOption("scrolloff", GLOBAL_OR_LOCAL_TO_WINDOW, "so", 0))
@@ -181,8 +175,6 @@ object Options {
   val sidescrolloff: NumberOption = addOption(
     NumberOption("sidescrolloff", GLOBAL_OR_LOCAL_TO_WINDOW, "siso", 0)
   )
-
-  @JvmField
   val smartcase: ToggleOption = addOption(ToggleOption("smartcase", GLOBAL, "scs", false))
   val startofline: ToggleOption = addOption(ToggleOption("startofline", GLOBAL, "sol", true))
   val timeout: ToggleOption = addOption(ToggleOption("timeout", GLOBAL, "to", true))
@@ -248,7 +240,6 @@ object Options {
         return result ?: split(defaultValue.value)
       }
     })
-
 
   val matchpairs: StringListOption =
     addOption(object : StringListOption("matchpairs", LOCAL_TO_BUFFER, "mps", "(:),{:},[:]") {
