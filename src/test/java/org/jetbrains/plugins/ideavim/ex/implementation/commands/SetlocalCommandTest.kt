@@ -34,6 +34,7 @@ class SetlocalCommandTest : VimTestCase() {
   }
 
   private fun setOsSpecificOptionsToSafeValues() {
+    enterCommand("set isfname=@,48-57,/,\\,.,-,_,+,,,#,$,%,{,},[,],:,@-@,!,~,=")
     enterCommand("setlocal shell=/dummy/path/to/bash")
     enterCommand("setlocal shellcmdflag=-x")
     enterCommand("setlocal shellxescape=@")
@@ -505,6 +506,7 @@ class SetlocalCommandTest : VimTestCase() {
       |--ideacopypreprocess
       |  ideastatusicon=enabled
       |  ideavimsupport=dialog
+      |  isfname=@,48-57,/,\,.,-,_,+,,,#,$,%,{,},[,],:,@-@,!,~,=
       |  iskeyword=@,48-57,_
       |  keymodel=continueselect,stopselect
       |  lookupkeys=<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>
@@ -583,6 +585,7 @@ class SetlocalCommandTest : VimTestCase() {
       |  ideawrite=all
       |noignorecase
       |noincsearch
+      |  isfname=@,48-57,/,\,.,-,_,+,,,#,$,%,{,},[,],:,@-@,!,~,=
       |  iskeyword=@,48-57,_
       |  keymodel=continueselect,stopselect
       |nolist

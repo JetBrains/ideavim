@@ -32,6 +32,7 @@ class SetCommandTest : VimTestCase() {
   }
 
   private fun setOsSpecificOptionsToSafeValues() {
+    enterCommand("set isfname=@,48-57,/,\\,.,-,_,+,,,#,$,%,{,},[,],:,@-@,!,~,=")
     enterCommand("set shell=/dummy/path/to/bash")
     enterCommand("set shellcmdflag=-x")
     enterCommand("set shellxescape=@")
@@ -206,6 +207,7 @@ class SetCommandTest : VimTestCase() {
         |  idearefactormode=select
         |  ideastatusicon=enabled
         |  ideavimsupport=dialog
+        |  isfname=@,48-57,/,\,.,-,_,+,,,#,$,%,{,},[,],:,@-@,!,~,=
         |  iskeyword=@,48-57,_
         |  keymodel=continueselect,stopselect
         |  lookupkeys=<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>
@@ -283,6 +285,7 @@ class SetCommandTest : VimTestCase() {
       |  ideawrite=all
       |noignorecase
       |noincsearch
+      |  isfname=@,48-57,/,\,.,-,_,+,,,#,$,%,{,},[,],:,@-@,!,~,=
       |  iskeyword=@,48-57,_
       |  keymodel=continueselect,stopselect
       |nolist

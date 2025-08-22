@@ -33,6 +33,7 @@ class SetglobalCommandTest : VimTestCase() {
   }
 
   private fun setOsSpecificOptionsToSafeValues() {
+    enterCommand("set isfname=@,48-57,/,\\,.,-,_,+,,,#,$,%,{,},[,],:,@-@,!,~,=")
     enterCommand("setglobal fileformat=unix")
     enterCommand("setglobal shell=/dummy/path/to/bash")
     enterCommand("setglobal shellcmdflag=-x")
@@ -454,6 +455,7 @@ class SetglobalCommandTest : VimTestCase() {
       |  idearefactormode=select
       |  ideastatusicon=enabled
       |  ideavimsupport=dialog
+      |  isfname=@,48-57,/,\,.,-,_,+,,,#,$,%,{,},[,],:,@-@,!,~,=
       |  iskeyword=@,48-57,_
       |  keymodel=continueselect,stopselect
       |  lookupkeys=<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>
@@ -533,6 +535,7 @@ class SetglobalCommandTest : VimTestCase() {
       |  ideawrite=all
       |noignorecase
       |noincsearch
+      |  isfname=@,48-57,/,\,.,-,_,+,,,#,$,%,{,},[,],:,@-@,!,~,=
       |  iskeyword=@,48-57,_
       |  keymodel=continueselect,stopselect
       |nolist

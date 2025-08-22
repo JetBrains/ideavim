@@ -16,6 +16,7 @@ guicursor
 hlsearch
 ignorecase
 incsearch
+isfname
 iskeyword
 keymodel
 lookupKeys
