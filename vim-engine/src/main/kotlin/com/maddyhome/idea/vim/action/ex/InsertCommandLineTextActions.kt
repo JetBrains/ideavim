@@ -14,6 +14,7 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCommandLine
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getText
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.state.KeyHandlerState
@@ -59,7 +60,7 @@ open class InsertCommandLineTextActionBase(private val insertLiterally: Boolean)
     }
   }
 
-  protected fun insertText(commandLine: VimCommandLine, offset: Int, text: String) {
+  protected open fun insertText(commandLine: VimCommandLine, offset: Int, text: String) {
     commandLine.insertText(offset, text)
   }
 
@@ -136,4 +137,36 @@ class InsertCurrentLineAction : InsertCommandLineTextActionBase(insertLiterally 
 class InsertCurrentLineLiterallyAction : InsertCommandLineTextActionBase(insertLiterally = true) {
   override fun getText(commandLine: VimCommandLine) =
     commandLine.editor.getLineText(commandLine.editor.primaryCaret().getBufferPosition().line)
+}
+
+/**
+ * Insert the word under or following the caret into the command line.
+ *
+ * A word cannot contain control characters, so it can only be inserted literally, as plain text. Any matching prefix in
+ * the command line is maintained, and the remaining text is inserted after the prefix. The prefix must be a valid word.
+ */
+@CommandOrMotion(keys = ["<C-R><C-W>"], modes = [Mode.CMD_LINE])
+class InsertWordUnderCaretAction : InsertCommandLineTextActionBase(insertLiterally = false) {
+  override fun getText(commandLine: VimCommandLine): String? {
+    val editor = commandLine.editor
+    val wordRange = injector.searchHelper.findWordNearestCursor(editor, editor.primaryCaret())
+    if (wordRange == null) {
+      // E348: No string under cursor
+      injector.messages.showStatusBarMessage(editor, injector.messages.message("E348"))
+      return null
+    }
+    return editor.getText(wordRange)
+  }
+
+  override fun insertText(commandLine: VimCommandLine, offset: Int, text: String) {
+    val editor = commandLine.editor
+    val offset = injector.searchHelper.findNextWord(commandLine.text, editor, commandLine.caret.offset, -1, bigWord = false)
+    val prefix = commandLine.text.substring(offset, commandLine.caret.offset)
+    if (text.startsWith(prefix, ignoreCase = true)) {
+      commandLine.insertText(commandLine.caret.offset, text.substring(prefix.length))
+    }
+    else {
+      commandLine.insertText(commandLine.caret.offset, text)
+    }
+  }
 }

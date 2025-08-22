@@ -411,6 +411,8 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     bigWord: Boolean,
     allowMoveFromWordStart: Boolean = true,
   ): Int {
+    if (chars.isEmpty()) return 0
+
     var pos = start
     val startingCharType = charType(editor, chars[pos.coerceAtMost(chars.length - 1)], bigWord)
 
