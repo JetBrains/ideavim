@@ -10,17 +10,15 @@ package org.jetbrains.plugins.ideavim.thinapi
 
 import com.intellij.vim.api.VimApi
 import com.maddyhome.idea.vim.common.ListenerOwner
-import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.thinapi.VimApiImpl
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class OptionScopeTest : VimTestCase() {
@@ -67,17 +65,15 @@ class OptionScopeTest : VimTestCase() {
   @Test
   fun `test get non-existent option`() {
     myVimApi.option {
-      val result = get<Int>("nonexistentoption")
-      assertNull(result)
+      val exception = assertThrows<IllegalArgumentException> { get<Int>("nonexistentoption") }
+      assertTrue(exception.message!!.contains("not found"))
     }
   }
 
   @Test
   fun `test set global option`() {
     myVimApi.option {
-      val result = setGlobal<Int>("history", 80)
-      assertTrue(result)
-
+      assertDoesNotThrow { setGlobal<Int>("history", 80) }
       val value = get<Int>("history")
       assertEquals(80, value)
     }
@@ -86,8 +82,7 @@ class OptionScopeTest : VimTestCase() {
   @Test
   fun `test set local option`() {
     myVimApi.option {
-      val result = setLocal<Int>("history", 20)
-      assertTrue(result)
+      assertDoesNotThrow { setLocal<Int>("history", 20) }
 
       val value = get<Int>("history")
       assertEquals(20, value)
@@ -97,8 +92,7 @@ class OptionScopeTest : VimTestCase() {
   @Test
   fun `test set effective option`() {
     myVimApi.option {
-      val result = set<Int>("history", 40)
-      assertTrue(result)
+      assertDoesNotThrow { set<Int>("history", 40) }
 
       val value = get<Int>("history")
       assertEquals(40, value)
@@ -108,8 +102,7 @@ class OptionScopeTest : VimTestCase() {
   @Test
   fun `test set non-existent option`() {
     myVimApi.option {
-      val result = set<Int>("nonexistentoption", 42)
-      assertFalse(result)
+      assertThrows<IllegalArgumentException> { set<Int>("nonexistentoption", 42) }
     }
   }
 
@@ -119,8 +112,7 @@ class OptionScopeTest : VimTestCase() {
       set<Int>("history", 100)
       assertEquals(100, get<Int>("history"))
 
-      val result = reset("history")
-      assertTrue(result)
+      assertDoesNotThrow { reset("history") }
 
       val value = get<Int>("history")
       assertEquals(50, value)
@@ -130,25 +122,24 @@ class OptionScopeTest : VimTestCase() {
   @Test
   fun `test reset non-existent option`() {
     myVimApi.option {
-      val result = reset("nonexistentoption")
-      assertFalse(result)
+      assertThrows<IllegalArgumentException> { reset("nonexistentoption") }
     }
   }
 
   @Test
   fun `test set option with wrong type`() {
     myVimApi.option {
-      assertThrows<ExException> {
+      val exception = assertThrows<IllegalArgumentException> {
         set<Int>("selection", 42)
       }
+      assertTrue(exception.message!!.contains("E474"))
     }
   }
 
   @Test
   fun `test set toggle option with true value`() {
     myVimApi.option {
-      val result = set<Boolean>("ignorecase", true)
-      assertTrue(result)
+      assertDoesNotThrow { set<Boolean>("ignorecase", true) }
 
       val value = get<Boolean>("ignorecase")
       assertTrue(value == true)
@@ -158,8 +149,7 @@ class OptionScopeTest : VimTestCase() {
   @Test
   fun `test set toggle option with false value`() {
     myVimApi.option {
-      val result = set<Boolean>("ignorecase", false)
-      assertTrue(result)
+      assertDoesNotThrow { set<Boolean>("ignorecase", false) }
 
       val value = get<Boolean>("ignorecase")
       assertTrue(value == false)
@@ -215,18 +205,20 @@ class OptionScopeTest : VimTestCase() {
   @Test
   fun `test set integer option with string value throws exception`() {
     myVimApi.option {
-      assertThrows<ExException> {
+      val exception = assertThrows<IllegalArgumentException> {
         set<String>("history", "not-a-number")
       }
+      assertTrue(exception.message!!.contains("E521"), exception.message)
     }
   }
 
   @Test
   fun `test set boolean option with string value throws exception`() {
     myVimApi.option {
-      assertThrows<ExException> {
+      val exception = assertThrows<IllegalArgumentException> {
         set<String>("ignorecase", "not-a-boolean")
       }
+      assertTrue(exception.message!!.contains("E474"))
     }
   }
 }

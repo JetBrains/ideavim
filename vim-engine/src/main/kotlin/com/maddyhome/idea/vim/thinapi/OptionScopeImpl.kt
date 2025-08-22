@@ -12,6 +12,7 @@ import com.intellij.vim.api.scopes.OptionScope
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
@@ -24,12 +25,12 @@ class OptionScopeImpl: OptionScope() {
   private val optionGroup: VimOptionGroup
     get() = injector.optionGroup
 
-  override fun <T> getOptionValueInternal(name: String, type: KType): T? {
-    val option = optionGroup.getOption(name) ?: return null
+  override fun <T> getOptionValueInternal(name: String, type: KType): T {
+    val option = optionGroup.getOption(name) ?: throw IllegalArgumentException("Option $name not found")
 
     val optionValue = optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(vimEditor))
 
-    val kotlinType = type.classifier ?: return null
+    val kotlinType = type.classifier ?: throw IllegalArgumentException("Option type is undefined")
     val kotlinValue = when (optionValue) {
       is VimInt -> {
         val intValue = optionValue.value
@@ -59,28 +60,17 @@ class OptionScopeImpl: OptionScope() {
       }
     }
 
-    return kotlinValue as T?
+    return kotlinValue as T
   }
 
-  override fun <T> setOptionInternal(name: String, value: T, type: KType, scope: String): Boolean {
-    val option = optionGroup.getOption(name) ?: return false
+  override fun <T> setOptionInternal(name: String, value: T, type: KType, scope: String) {
+    val option = optionGroup.getOption(name) ?: throw IllegalArgumentException("Option $name not found")
 
     val optionValue = when (type.classifier) {
-      Int::class -> {
-        VimInt(value as Int)
-      }
-
-      String::class -> {
-        VimString(value as String)
-      }
-
-      Boolean::class -> {
-        if (value as Boolean) VimInt.ONE else VimInt.ZERO
-      }
-
-      else -> {
-        throw IllegalArgumentException("Options can only be of types string, integer and boolean")
-      }
+      Int::class -> VimInt(value as Int)
+      String::class -> VimString(value as String)
+      Boolean::class -> if (value as Boolean) VimInt.ONE else VimInt.ZERO
+      else -> throw IllegalArgumentException("Options can only be of types string, integer and boolean")
     }
     val optionAccessScope = when (scope) {
       "global" -> OptionAccessScope.GLOBAL(vimEditor)
@@ -88,13 +78,16 @@ class OptionScopeImpl: OptionScope() {
       "effective" -> OptionAccessScope.EFFECTIVE(vimEditor)
       else -> OptionAccessScope.EFFECTIVE(vimEditor)
     }
-    optionGroup.setOptionValue(option, optionAccessScope, optionValue)
-    return true
+    try {
+      optionGroup.setOptionValue(option, optionAccessScope, optionValue)
+    } catch (e: ExException) {
+      // Note: [ExException] is thrown when the value doesn't pass the validation
+      throw IllegalArgumentException("Failed to set option $name to $value. ${e.message}")
+    }
   }
 
-  override fun reset(name: String): Boolean {
-    val option = optionGroup.getOption(name) ?: return false
+  override fun reset(name: String) {
+    val option = optionGroup.getOption(name) ?: throw IllegalArgumentException("Option $name not found")
     optionGroup.resetToDefaultValue(option, OptionAccessScope.EFFECTIVE(vimEditor))
-    return true
   }
 }

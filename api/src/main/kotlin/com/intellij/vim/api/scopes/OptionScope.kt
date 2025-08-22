@@ -18,21 +18,21 @@ import kotlin.reflect.typeOf
 abstract class OptionScope() {
   protected abstract fun <T> getOptionValueInternal(name: String, type: KType): T?
 
-  protected abstract fun <T> setOptionInternal(name: String, value: T, type: KType, scope: String): Boolean
+  protected abstract fun <T> setOptionInternal(name: String, value: T, type: KType, scope: String)
 
   @PublishedApi
   internal fun <T : Any> get(name: String, type: KType): T? = getOptionValueInternal(name, type)
 
   @PublishedApi
-  internal fun <T> setGlobal(name: String, value: T, type: KType): Boolean =
+  internal fun <T> setGlobal(name: String, value: T, type: KType) =
     setOptionInternal(name, value, type, "global")
 
   @PublishedApi
-  internal fun <T> setLocal(name: String, value: T, type: KType): Boolean =
+  internal fun <T> setLocal(name: String, value: T, type: KType) =
     setOptionInternal(name, value, type, "local")
 
   @PublishedApi
-  internal fun <T> set(name: String, value: T, type: KType): Boolean =
+  internal fun <T> set(name: String, value: T, type: KType) =
     setOptionInternal(name, value, type, "effective")
 
   /**
@@ -42,7 +42,8 @@ abstract class OptionScope() {
    * Example: `&ignorecase` returns the value of the 'ignorecase' option.
    *
    * @param name The name of the option
-   * @return The value of the option, or null if the option doesn't exist or isn't of the specified type
+   * @return The value of the option
+   * @throws IllegalArgumentException if the type is wrong or the option doesn't exist
    */
   inline fun <reified T> get(name: String): T? {
     val kType: KType = typeOf<T>()
@@ -57,9 +58,10 @@ abstract class OptionScope() {
    *
    * @param name The name of the option
    * @param value The value to set
-   * @return True if the option was set successfully, false otherwise
+   *
+   * @throws IllegalArgumentException if the option doesn't exist or the type is wrong
    */
-  inline fun <reified T> setGlobal(name: String, value: T): Boolean {
+  inline fun <reified T> setGlobal(name: String, value: T) {
     val kType: KType = typeOf<T>()
     return setGlobal(name, value, kType)
   }
@@ -72,9 +74,10 @@ abstract class OptionScope() {
    *
    * @param name The name of the option
    * @param value The value to set
-   * @return True if the option was set successfully, false otherwise
+   *
+   * @throws IllegalArgumentException if the option doesn't exist or the type is wrong
    */
-  inline fun <reified T> setLocal(name: String, value: T): Boolean {
+  inline fun <reified T> setLocal(name: String, value: T) {
     val kType: KType = typeOf<T>()
     return setLocal(name, value, kType)
   }
@@ -87,9 +90,10 @@ abstract class OptionScope() {
    *
    * @param name The name of the option
    * @param value The value to set
-   * @return True if the option was set successfully, false otherwise
+   *
+   * @throws IllegalArgumentException if the option doesn't exist or the type is wrong
    */
-  inline fun <reified T> set(name: String, value: T): Boolean {
+  inline fun <reified T> set(name: String, value: T) {
     val kType: KType = typeOf<T>()
     return set(name, value, kType)
   }
@@ -101,7 +105,8 @@ abstract class OptionScope() {
    * Example: `:set ignorecase&` resets the 'ignorecase' option to its default value.
    *
    * @param name The name of the option
-   * @return True if the option was reset successfully, false otherwise
+   *
+   * @throws IllegalArgumentException if the option doesn't exist
    */
-  abstract fun reset(name: String): Boolean
+  abstract fun reset(name: String)
 }
