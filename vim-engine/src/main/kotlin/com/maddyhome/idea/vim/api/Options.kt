@@ -109,6 +109,18 @@ object Options {
   val hlsearch: ToggleOption = addOption(ToggleOption("hlsearch", GLOBAL, "hls", false))
   val ignorecase: ToggleOption = addOption(ToggleOption("ignorecase", GLOBAL, "ic", false))
   val incsearch: ToggleOption = addOption(ToggleOption("incsearch", GLOBAL, "is", false))
+  val isfname: StringListOption = addOption(
+    StringListOption(
+      "isfname",
+      GLOBAL,
+      "isf",
+      if (injector.systemInfoService.isWindows) {
+        "@,48-57,/,\\,.,-,_,+,,,#,$,%,{,},[,],:,@-@,!,~,="
+      } else {
+        "@,48-57,/,.,-,_,+,,,#,$,%,~,="
+      }
+    )
+  )
   val keymodel: StringListOption = addOption(
     StringListOption(
       "keymodel",
