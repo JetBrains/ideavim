@@ -24,6 +24,7 @@ class KeyStrokeTrie<T>(private val name: String) {
     val key: KeyStroke
     val data: T?
     val parent: TrieNode<T>?
+    val hasChildren: Boolean
 
     fun visit(visitor: (KeyStroke, TrieNode<T>) -> Unit)
 
@@ -37,7 +38,12 @@ class KeyStrokeTrie<T>(private val name: String) {
     override var data: T?,
   ) : TrieNode<T> {
 
+    // Only initialised when we're adding children. If we don't add children, it will be uninitialised.
+    // Avoid unnecessary access, to avoid allocating empty maps for leaf nodes.
     val children = lazy { mutableMapOf<KeyStroke, TrieNodeImpl<T>>() }
+
+    override val hasChildren
+      get() = children.isInitialized() && children.value.isNotEmpty()
 
     val depth: Int
       get() = parent?.let { it.depth + 1 } ?: 0
