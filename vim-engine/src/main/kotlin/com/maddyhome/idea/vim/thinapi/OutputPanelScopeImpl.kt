@@ -14,7 +14,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimOutputPanel
 import com.maddyhome.idea.vim.api.injector
 
-class OutputPanelScopeImpl : OutputPanelScope {
+object OutputPanelScopeImpl : OutputPanelScope {
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!
 

@@ -153,7 +153,7 @@ class VimApiImpl(
 //  }
 
   override fun outputPanel(block: OutputPanelScope.() -> Unit) {
-    val outputPanelScope = OutputPanelScopeImpl()
+    val outputPanelScope = OutputPanelScopeImpl
     outputPanelScope.block()
   }
 
