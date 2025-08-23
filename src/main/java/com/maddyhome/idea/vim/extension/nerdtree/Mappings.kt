@@ -159,5 +159,7 @@ internal class Mappings(name: String) {
     )
     register("NERDTreeMapJumpNextSibling", "<C-J>", Action.ij("Tree-selectNextSibling"))
     register("NERDTreeMapJumpPrevSibling", "<C-K>", Action.ij("Tree-selectPreviousSibling"))
+
+    register("/", Action.ij("SpeedSearch"))
   }
 }
