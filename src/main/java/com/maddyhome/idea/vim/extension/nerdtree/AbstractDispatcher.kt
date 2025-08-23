@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.extension.nerdtree
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.project.DumbAwareAction
@@ -23,6 +24,12 @@ import javax.swing.KeyStroke
  */
 internal abstract class AbstractDispatcher(private val mappings: Mappings) : DumbAwareAction() {
   private val keys = mutableListOf<KeyStroke>()
+
+  override fun update(e: AnActionEvent) {
+    e.presentation.isEnabled = e.getData(PlatformDataKeys.SPEED_SEARCH_TEXT) == null // SpeedSearch is inactive
+  }
+
+  override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
   override fun actionPerformed(e: AnActionEvent) {
     var keyStroke = getKeyStroke(e) ?: return
