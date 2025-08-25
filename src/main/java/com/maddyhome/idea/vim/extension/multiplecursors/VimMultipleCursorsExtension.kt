@@ -234,7 +234,7 @@ internal class VimMultipleCursorsExtension : VimExtension {
       val text = if (editor.inVisualMode) {
         primaryCaret.selectedText ?: return
       } else {
-        val range = injector.searchHelper.findWordNearestCursor(editor.vim, primaryCaret.vim) ?: return
+        val range = injector.searchHelper.findWordAtOrFollowingCursor(editor.vim, primaryCaret.vim, isBigWord = false) ?: return
         if (range.startOffset > primaryCaret.offset) return
         IjVimEditor(editor).getText(range)
       }
@@ -300,7 +300,7 @@ internal class VimMultipleCursorsExtension : VimExtension {
 
   private fun selectWordUnderCaret(editor: Editor, caret: Caret): TextRange? {
     // TODO: I think vim-multiple-cursors uses a text object rather than the star operator
-    val range = injector.searchHelper.findWordNearestCursor(editor.vim, caret.vim) ?: return null
+    val range = injector.searchHelper.findWordAtOrFollowingCursor(editor.vim, caret.vim, isBigWord = false) ?: return null
     if (range.startOffset > caret.offset) return null
 
     enterVisualMode(editor.vim)
