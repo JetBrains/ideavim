@@ -276,6 +276,22 @@ interface VimSearchHelper {
   fun findWordAtOrFollowingCursor(editor: VimEditor, offset: Int, isBigWord: Boolean): TextRange?
 
   /**
+   * Find the filename at or following the given caret's offset
+   *
+   * This function uses the `'isfname'` option to check for valid file name characters. It will find the filename under
+   * the caret, or the first filename after the caret on the current line. It will return null if no filename is found.
+   */
+  fun findFilenameAtOrFollowingCursor(editor: VimEditor, caret: ImmutableVimCaret): TextRange?
+
+  /**
+   * Find the filename at or following the given offset
+   *
+   * This function uses the `'isfname'` option to check for valid file name characters. It will find the filename under
+   * the caret, or the first filename after the caret on the current line. It will return null if no filename is found.
+   */
+  fun findFilenameAtOrFollowingCursor(editor: VimEditor, offset: Int): TextRange?
+
+  /**
    * Find the range of the word text object at the location of the caret
    */
   fun findWordObject(
