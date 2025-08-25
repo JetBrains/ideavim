@@ -273,12 +273,15 @@ interface Read {
   fun getNextCharOnLineOffset(startOffset: Int, count: Int = 1, char: Char): Int
 
   /**
-   * Find the word at or nearest to the given offset
+   * Find the word or WORD at or following the given offset
+   *
+   * Note that if there is no current or following word, the next WORD will be returned. If a WORD is requested, this is
+   * obviously a no-op.
    *
    * @param startOffset The offset to search from
    * @return The range of the word, or null if not found
    */
-  fun getNearestWordOffset(startOffset: Int): Range?
+  fun getWordAtOrFollowingOffset(startOffset: Int, isBigWord: Boolean): Range?
 
   /**
    * Returns range of a paragraph containing the given line.

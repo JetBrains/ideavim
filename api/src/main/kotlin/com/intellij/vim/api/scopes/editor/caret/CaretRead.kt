@@ -318,11 +318,15 @@ interface CaretRead {
   fun getNextCharOnLineOffset(count: Int = 1, char: Char): Int
 
   /**
-   * Finds the word at or nearest to the current caret position.
+   * Finds the word at or following the current caret position.
    *
+   * Note that if no word/WORD is found at or following the caret on the current line, the WORD at or following is
+   * always returned.
+   *
+   * @param isBigWord Search for word or WORD.
    * @return A Range representing the found word, or null if no word is found.
    */
-  fun getNearestWordOffset(): Range?
+  fun getCurrentOrFollowingWord(isBigWord: Boolean): Range?
 
   /**
    * Find the range of the word text object at the location of the caret
