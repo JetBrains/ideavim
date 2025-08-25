@@ -139,17 +139,11 @@ class InsertCurrentLineLiterallyAction : InsertCommandLineTextActionBase(insertL
     commandLine.editor.getLineText(commandLine.editor.primaryCaret().getBufferPosition().line)
 }
 
-/**
- * Insert the word under or following the caret into the command line.
- *
- * A word cannot contain control characters, so it can only be inserted literally, as plain text. Any matching prefix in
- * the command line is maintained, and the remaining text is inserted after the prefix. The prefix must be a valid word.
- */
-@CommandOrMotion(keys = ["<C-R><C-W>", "<C-R><C-R><C-W>", "<C-R><C-O><C-W>"], modes = [Mode.CMD_LINE])
-class InsertWordUnderCaretAction : InsertCommandLineTextActionBase(insertLiterally = false) {
+open class InsertWordUnderCaretActionBase(private val isBigWord: Boolean, insertLiterally: Boolean)
+  : InsertCommandLineTextActionBase(insertLiterally) {
   override fun getText(commandLine: VimCommandLine): String? {
     val editor = commandLine.editor
-    val wordRange = injector.searchHelper.findWordNearestCursor(editor, editor.primaryCaret())
+    val wordRange = injector.searchHelper.findWordAtOrFollowingCursor(editor, editor.primaryCaret(), isBigWord)
     if (wordRange == null) {
       // E348: No string under cursor
       injector.messages.showStatusBarMessage(editor, injector.messages.message("E348"))
@@ -157,9 +151,21 @@ class InsertWordUnderCaretAction : InsertCommandLineTextActionBase(insertLiteral
     }
     return editor.getText(wordRange)
   }
+}
 
+/**
+ * Insert the word under or following the caret into the command line.
+ *
+ * A word cannot contain control characters, so it can only be inserted literally, as plain text. Any matching prefix in
+ * the command line is maintained, and the remaining text is inserted after the prefix. The prefix must be a valid word.
+ */
+@CommandOrMotion(keys = ["<C-R><C-W>", "<C-R><C-R><C-W>", "<C-R><C-O><C-W>"], modes = [Mode.CMD_LINE])
+class InsertWordUnderCaretAction : InsertWordUnderCaretActionBase(isBigWord = false, insertLiterally = true) {
   override fun insertText(commandLine: VimCommandLine, offset: Int, text: String) {
     val editor = commandLine.editor
+
+    // Get the word under the caret on the command line, so we can avoid duplicating a prefix.
+    // To match Vim behaviour, we get word, not WORD
     val offset = injector.searchHelper.findNextWord(commandLine.text, editor, commandLine.caret.offset, -1, bigWord = false)
     val prefix = commandLine.text.substring(offset, commandLine.caret.offset)
     if (text.startsWith(prefix, ignoreCase = true)) {
@@ -170,3 +176,6 @@ class InsertWordUnderCaretAction : InsertCommandLineTextActionBase(insertLiteral
     }
   }
 }
+
+@CommandOrMotion(keys = ["<C-R><C-A>"], modes = [Mode.CMD_LINE])
+class InsertBigWordUnderCaretAction : InsertWordUnderCaretActionBase(isBigWord = true, insertLiterally = false)

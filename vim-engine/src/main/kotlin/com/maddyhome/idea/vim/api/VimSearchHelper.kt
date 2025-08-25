@@ -242,20 +242,38 @@ interface VimSearchHelper {
   ): Int
 
   /**
-   * Find the word at or nearest to the current caret offset
+   * Find the word or WORD at or following the current caret offset
    *
    * Note that this is not a word text object!
    *
-   * This function is used to get the word to search for using the `*`/`#` and `g*`/`g#` operators. It will return:
-   * * the range of the keyword under the cursor
-   * * or the first keyword after the cursor on the current line,
-   * * or the non-blank word under the cursor,
-   * * or the first non-blank word after the cursor on the current line
+   * This function is used to get the word to search for using the `*`/`#` and `g*`/`g#` operators, as well as for
+   * `c_CTRL-R_CTRL-W` and `c_CTRL-R_CTRL-A`. It will return:
+   * * the range of the word under the cursor, as defined by `'iskeyword'`,
+   * * or the first word after the cursor on the current line,
+   * * or the non-blank WORD under the cursor,
+   * * or the first non-blank WORD after the cursor on the current line
    * * or null, if none of the above are found
+   *
+   * In other words, this finds the current or following word/WORD, or the current/following non-blank WORD.
    */
-  fun findWordNearestCursor(editor: VimEditor, caret: ImmutableVimCaret): TextRange?
+  fun findWordAtOrFollowingCursor(editor: VimEditor, caret: ImmutableVimCaret, isBigWord: Boolean): TextRange?
 
-  fun findWordNearestCursor(editor: VimEditor, offset: Int): TextRange?
+  /**
+   * Find the word or WORD at or following the current caret offset
+   *
+   * Note that this is not a word text object!
+   *
+   * This function is used to get the word to search for using the `*`/`#` and `g*`/`g#` operators, as well as for
+   * `c_CTRL-R_CTRL-W` and `c_CTRL-R_CTRL-A`. It will return:
+   * * the range of the word under the cursor, as defined by `'iskeyword'`,
+   * * or the first word after the cursor on the current line,
+   * * or the non-blank WORD under the cursor,
+   * * or the first non-blank WORD after the cursor on the current line
+   * * or null, if none of the above are found
+   *
+   * In other words, this finds the current or following word/WORD, or the current/following non-blank WORD.
+   */
+  fun findWordAtOrFollowingCursor(editor: VimEditor, offset: Int, isBigWord: Boolean): TextRange?
 
   /**
    * Find the range of the word text object at the location of the caret

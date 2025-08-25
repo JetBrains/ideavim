@@ -235,8 +235,8 @@ class CaretReadImpl(
     return injector.searchHelper.findNextCharacterOnLine(vimEditor, vimCaret, count, char)
   }
 
-  override fun getNearestWordOffset(): Range? {
-    val textRange = injector.searchHelper.findWordNearestCursor(vimEditor, vimCaret)
+  override fun getCurrentOrFollowingWord(isBigWord: Boolean): Range? {
+    val textRange = injector.searchHelper.findWordAtOrFollowingCursor(vimEditor, vimCaret, isBigWord)
     return textRange?.toRange()
   }
 

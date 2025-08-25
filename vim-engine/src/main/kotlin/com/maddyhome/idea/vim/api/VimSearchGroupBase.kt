@@ -237,7 +237,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
 
   // TODO I think that this method (and the method above) should be part of the global command
   fun parseGlobalCommand(argument: String): GlobalCommandArguments? {
-    var cmd = CharPointer(StringBuffer(argument))
+    val cmd = CharPointer(StringBuffer(argument))
 
     val pat: CharPointer
     val delimiter: Char
@@ -426,7 +426,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     whole: Boolean,
     dir: Direction,
   ): Int {
-    val range = injector.searchHelper.findWordNearestCursor(editor, caret) ?: return -1
+    val range = injector.searchHelper.findWordAtOrFollowingCursor(editor, caret, isBigWord = false) ?: return -1
 
     val start = range.startOffset
     val end = range.endOffset
@@ -591,7 +591,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     val pattern = substituteCommandParse.pattern
     val substituteString = substituteCommandParse.substituteString
     val line1 = substituteCommandParse.range.startLine
-    var line2 = substituteCommandParse.range.endLine
+    val line2 = substituteCommandParse.range.endLine
 
     val options = enumSetOf<VimRegexOptions>()
     if (injector.globalOptions().smartcase) options.add(VimRegexOptions.SMART_CASE)
