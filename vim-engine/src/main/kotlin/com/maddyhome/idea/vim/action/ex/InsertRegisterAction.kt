@@ -16,15 +16,13 @@ import com.maddyhome.idea.vim.api.VimCommandLine
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
 @CommandOrMotion(keys = ["<C-R>"], modes = [Mode.CMD_LINE])
 class InsertRegisterAction : CommandLineActionHandler() {
-  override val argumentType: Argument.Type = Argument.Type.CHARACTER
-  override val type: Command.Type = Command.Type.OTHER_WRITABLE
+  override val argumentType = Argument.Type.CHARACTER
 
   override fun onStartWaitingForArgument(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
     val cmdLine = injector.commandLine.getActiveCommandLine() ?: return
