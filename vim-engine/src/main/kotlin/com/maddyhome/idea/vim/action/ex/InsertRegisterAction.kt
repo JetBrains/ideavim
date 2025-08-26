@@ -41,15 +41,23 @@ class InsertRegisterAction : CommandLineActionHandler() {
     if (!(injector.registerGroup.isValid(registerName))) return false
 
     val register = injector.registerGroup.getRegister(editor, context, registerName) ?: return false
-    register.keys.forEach { key ->
-      val keyHandler = KeyHandler.getInstance()
-      if (shouldHandleLiterally(key)) {
-        // Reuse existing mechanisms to insert a control character literally by passing <C-V> first
-        injector.parser.parseKeys("<C-V>").forEach {
-          keyHandler.handleKey(editor, it, context, keyHandler.keyHandlerState)
+
+    // If we have any non-text characters, replay them through the key handler. If it's all just plain text, insert it
+    // as text. Since we're not allowed to do mapping, replaying text keystrokes should be the same as inserting text.
+    if (register.keys.any { it.keyChar == KeyEvent.CHAR_UNDEFINED }) {
+      register.keys.forEach { key ->
+        val keyHandler = KeyHandler.getInstance()
+        if (shouldHandleLiterally(key)) {
+          // Reuse existing mechanisms to insert a control character literally by passing <C-V> first
+          injector.parser.parseKeys("<C-V>").forEach {
+            keyHandler.handleKey(editor, it, context, keyHandler.keyHandlerState)
+          }
         }
+        keyHandler.handleKey(editor, key, context, allowKeyMappings = false, keyHandler.keyHandlerState)
       }
-      keyHandler.handleKey(editor, key, context, allowKeyMappings = false, keyHandler.keyHandlerState)
+    }
+    else {
+      commandLine.insertText(commandLine.caret.offset, register.text)
     }
     return true
   }
