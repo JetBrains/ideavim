@@ -10,13 +10,13 @@ package com.maddyhome.idea.vim.action.ex
 
 import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
+import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCommandLine
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -37,21 +37,36 @@ class InsertRegisterAction : CommandLineActionHandler() {
     context: ExecutionContext,
     argument: Argument?
   ): Boolean {
-    val caretOffset = commandLine.caret.offset
+    val registerName = (argument as? Argument.Character)?.character ?: return false
+    if (!(injector.registerGroup.isValid(registerName))) return false
 
-    val argument = argument as? Argument.Character ?: return false
-    val keyStroke = KeyStroke.getKeyStroke(argument.character)
-    val pasteContent = if ((keyStroke.modifiers and KeyEvent.CTRL_DOWN_MASK) == 0) {
-      injector.registerGroup.getRegister(editor, context, keyStroke.keyChar)?.text
-    } else {
-      throw ExException("Not yet implemented")
-    } ?: return false
-    commandLine.insertText(caretOffset, pasteContent)
-    commandLine.caret.offset = caretOffset + pasteContent.length
+    val register = injector.registerGroup.getRegister(editor, context, registerName) ?: return false
+    register.keys.forEach { key ->
+      val keyHandler = KeyHandler.getInstance()
+      if (shouldHandleLiterally(key)) {
+        // Reuse existing mechanisms to insert a control character literally by passing <C-V> first
+        injector.parser.parseKeys("<C-V>").forEach {
+          keyHandler.handleKey(editor, it, context, keyHandler.keyHandlerState)
+        }
+      }
+      keyHandler.handleKey(editor, key, context, allowKeyMappings = false, keyHandler.keyHandlerState)
+    }
     return true
   }
 
+  private fun shouldHandleLiterally(key: KeyStroke): Boolean {
+    // <C-C>, <Esc> and <CR> are inserted literally. This includes their synonyms
+    if (key.keyCode == KeyEvent.VK_ENTER || key.keyCode == KeyEvent.VK_ESCAPE) return true
+    if (key.keyChar == KeyEvent.CHAR_UNDEFINED && key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) {
+      return key.keyCode == KeyEvent.VK_C
+        || key.keyCode == KeyEvent.VK_J
+        || key.keyCode == KeyEvent.VK_M
+        || key.keyCode == KeyEvent.VK_OPEN_BRACKET
+    }
+    return false
+  }
+
   override fun execute(commandLine: VimCommandLine): Boolean {
-    TODO("Not yet implemented")
+    error("Should not be called. Use execute(commandLine, editor, context, argument: Argument?)")
   }
 }
