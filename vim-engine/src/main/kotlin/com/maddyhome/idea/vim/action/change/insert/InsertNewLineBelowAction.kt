@@ -107,6 +107,14 @@ private fun insertNewLineAbove(editor: VimEditor, context: ExecutionContext) {
  */
 private fun insertNewLineBelow(editor: VimEditor, context: ExecutionContext) {
   if (editor.isOneLineMode()) return
+  
+  // Prevent entering insert mode in read-only files before moving the caret
+  if (!editor.isWritable()) {
+    injector.messages.showStatusBarMessage(editor, "Cannot make changes, file is read-only")
+    injector.messages.indicateError()
+    return
+  }
+  
   for (caret in editor.nativeCarets()) {
     caret.moveToOffset(injector.motion.moveCaretToCurrentLineEnd(editor, caret))
   }
