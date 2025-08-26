@@ -20,8 +20,7 @@ import com.maddyhome.idea.vim.state.KeyHandlerState
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-@CommandOrMotion(keys = ["<C-R>"], modes = [Mode.CMD_LINE])
-class InsertRegisterAction : CommandLineActionHandler() {
+open class InsertRegisterActionBase : CommandLineActionHandler() {
   override val argumentType = Argument.Type.CHARACTER
 
   override fun onStartWaitingForArgument(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
@@ -60,7 +59,7 @@ class InsertRegisterAction : CommandLineActionHandler() {
     return true
   }
 
-  private fun shouldHandleLiterally(key: KeyStroke): Boolean {
+  protected open fun shouldHandleLiterally(key: KeyStroke): Boolean {
     // <C-C>, <Esc> and <CR> are inserted literally. This includes their synonyms
     if (key.keyCode == KeyEvent.VK_ENTER || key.keyCode == KeyEvent.VK_ESCAPE) return true
     if (key.keyChar == KeyEvent.CHAR_UNDEFINED && key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) {
@@ -74,5 +73,20 @@ class InsertRegisterAction : CommandLineActionHandler() {
 
   override fun execute(commandLine: VimCommandLine): Boolean {
     error("Should not be called. Use execute(commandLine, editor, context, argument: Argument?)")
+  }
+}
+
+@CommandOrMotion(keys = ["<C-R>"], modes = [Mode.CMD_LINE])
+class InsertRegisterAction : InsertRegisterActionBase()
+
+@CommandOrMotion(keys = ["<C-R><C-R>", "<C-R><C-O>"], modes = [Mode.CMD_LINE])
+class InsertRegisterLiterallyAction : InsertRegisterActionBase() {
+  override fun shouldHandleLiterally(key: KeyStroke): Boolean {
+    // Don't escape <C-V>
+    if (key.keyCode == KeyEvent.VK_V && key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) {
+      return false
+    }
+    if (key.keyCode == KeyEvent.VK_TAB) return true
+    return key.keyChar == KeyEvent.CHAR_UNDEFINED || super.shouldHandleLiterally(key)
   }
 }
