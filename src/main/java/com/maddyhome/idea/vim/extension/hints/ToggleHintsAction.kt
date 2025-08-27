@@ -24,6 +24,7 @@ import java.awt.Color
 import java.awt.Component
 import java.awt.Point
 import java.awt.Rectangle
+import java.util.*
 import javax.accessibility.Accessible
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -43,6 +44,7 @@ class ToggleHintsAction : DumbAwareToggleAction() {
   private val highlight = HighlightComponent()
 
   private var hints: List<Hint> = emptyList()
+  private var cache: Map<Accessible, String> = WeakHashMap()
 
   override fun isSelected(e: AnActionEvent): Boolean = enabled
 
@@ -95,8 +97,12 @@ class ToggleHintsAction : DumbAwareToggleAction() {
     cover.removeAll() // clear existing covers
     hints =
       rootComponent.createCovers(SwingUtilities.convertPoint(rootComponent.parent, rootComponent.location, glassPane))
-    hints.zip(alphabet.permutations(2)).forEach { (hint, permutation) -> hint.hint = permutation.joinToString("") }
+    val hintIterator = alphabet.permutations(2).map { it.joinToString("") }.iterator()
+    hints.forEach { hint ->
+      hint.hint = cache[hint.component] ?: hintIterator.firstOrNull { it !in cache.values }!!
+    }
     hints.map(Hint::cover).forEach(cover::add)
+    cache = hints.associateBy({ it.component }, { it.hint })
     cover.size = glassPane.size
   }
 }
@@ -167,7 +173,7 @@ private fun Accessible.createCovers(loc: Point): List<Hint> = if (accessibleCont
 
 private operator fun Point.plus(other: Point) = Point(x + other.x, y + other.y)
 
-private fun <T> Collection<T>.permutations(length: Int): Iterable<List<T>> = sequence {
+private fun <T> Collection<T>.permutations(length: Int): Sequence<List<T>> = sequence {
   if (length == 0) {
     yield(emptyList())
     return@sequence
@@ -177,6 +183,14 @@ private fun <T> Collection<T>.permutations(length: Int): Iterable<List<T>> = seq
       yield(listOf(element) + subPermutation)
     }
   }
-}.asIterable()
+}
 
 private val alphabet = "ASDFGHJKL".toList()
+
+private fun <T> Iterator<T>.firstOrNull(predicate: (T) -> Boolean): T? {
+  while (hasNext()) {
+    val next = next()
+    if (predicate(next)) return next
+  }
+  return null
+}
