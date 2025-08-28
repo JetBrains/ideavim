@@ -145,7 +145,7 @@ class InsertCurrentLineLiterallyAction : InsertCommandLineTextActionBase(insertL
  * A word cannot contain control characters, so it can only be inserted literally, as plain text. Any matching prefix in
  * the command line is maintained, and the remaining text is inserted after the prefix. The prefix must be a valid word.
  */
-@CommandOrMotion(keys = ["<C-R><C-W>"], modes = [Mode.CMD_LINE])
+@CommandOrMotion(keys = ["<C-R><C-W>", "<C-R><C-R><C-W>", "<C-R><C-O><C-W>"], modes = [Mode.CMD_LINE])
 class InsertWordUnderCaretAction : InsertCommandLineTextActionBase(insertLiterally = false) {
   override fun getText(commandLine: VimCommandLine): String? {
     val editor = commandLine.editor
