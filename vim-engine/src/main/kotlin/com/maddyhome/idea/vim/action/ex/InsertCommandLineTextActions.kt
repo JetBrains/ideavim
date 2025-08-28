@@ -20,8 +20,7 @@ import com.maddyhome.idea.vim.state.KeyHandlerState
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-open class InsertRegisterActionBase : CommandLineActionHandler() {
-  override val argumentType = Argument.Type.CHARACTER
+open class InsertCommandLineTextActionBase : CommandLineActionHandler() {
 
   override fun onStartWaitingForArgument(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
     val cmdLine = injector.commandLine.getActiveCommandLine() ?: return
@@ -34,29 +33,34 @@ open class InsertRegisterActionBase : CommandLineActionHandler() {
     context: ExecutionContext,
     argument: Argument?
   ): Boolean {
-    val registerName = (argument as? Argument.Character)?.character ?: return false
-    if (!(injector.registerGroup.isValid(registerName))) return false
-
-    val register = injector.registerGroup.getRegister(editor, context, registerName) ?: return false
-
-    // If we have any non-text characters, replay them through the key handler. If it's all just plain text, insert it
-    // as text. Since we're not allowed to do mapping, replaying text keystrokes should be the same as inserting text.
-    if (register.keys.any { it.keyChar == KeyEvent.CHAR_UNDEFINED }) {
-      register.keys.forEach { key ->
-        val keyHandler = KeyHandler.getInstance()
-        if (shouldHandleLiterally(key)) {
-          // Reuse existing mechanisms to insert a control character literally by passing <C-V> first
-          injector.parser.parseKeys("<C-V>").forEach {
-            keyHandler.handleKey(editor, it, context, keyHandler.keyHandlerState)
-          }
-        }
-        keyHandler.handleKey(editor, key, context, allowKeyMappings = false, keyHandler.keyHandlerState)
-      }
+    val text = getText(commandLine) ?: return false
+    if (text.any { it.code < 32 }) {
+      val keys = injector.parser.parseKeys(text)
+      replayKeys(commandLine.editor, context, keys)
     }
     else {
-      commandLine.insertText(commandLine.caret.offset, register.text)
+      insertText(commandLine, commandLine.caret.offset, text)
     }
     return true
+  }
+
+  protected open fun getText(commandLine: VimCommandLine): String? = null
+
+  protected fun replayKeys(editor: VimEditor, context: ExecutionContext, keys: List<KeyStroke>) {
+    keys.forEach { key ->
+      val keyHandler = KeyHandler.getInstance()
+      if (shouldHandleLiterally(key)) {
+        // Reuse existing mechanisms to insert a control character literally by passing <C-V> first
+        injector.parser.parseKeys("<C-V>").forEach {
+          keyHandler.handleKey(editor, it, context, keyHandler.keyHandlerState)
+        }
+      }
+      keyHandler.handleKey(editor, key, context, allowKeyMappings = false, keyHandler.keyHandlerState)
+    }
+  }
+
+  protected fun insertText(commandLine: VimCommandLine, offset: Int, text: String) {
+    commandLine.insertText(offset, text)
   }
 
   protected open fun shouldHandleLiterally(key: KeyStroke): Boolean {
@@ -76,6 +80,32 @@ open class InsertRegisterActionBase : CommandLineActionHandler() {
   }
 }
 
+open class InsertRegisterActionBase : InsertCommandLineTextActionBase() {
+  override val argumentType = Argument.Type.CHARACTER
+
+  override fun execute(
+    commandLine: VimCommandLine,
+    editor: VimEditor,
+    context: ExecutionContext,
+    argument: Argument?
+  ): Boolean {
+    val registerName = (argument as? Argument.Character)?.character ?: return false
+    if (!(injector.registerGroup.isValid(registerName))) return false
+
+    val register = injector.registerGroup.getRegister(editor, context, registerName) ?: return false
+
+    // If we have any non-text characters, replay them through the key handler. If it's all just plain text, insert it
+    // as text. Since we're not allowed to do mapping, replaying text keystrokes should be the same as inserting text.
+    if (register.keys.any { it.keyChar == KeyEvent.CHAR_UNDEFINED }) {
+      replayKeys(editor, context, register.keys)
+    }
+    else {
+      insertText(commandLine, commandLine.caret.offset, register.text)
+    }
+    return true
+  }
+}
+
 @CommandOrMotion(keys = ["<C-R>"], modes = [Mode.CMD_LINE])
 class InsertRegisterAction : InsertRegisterActionBase()
 
@@ -89,4 +119,10 @@ class InsertRegisterLiterallyAction : InsertRegisterActionBase() {
     if (key.keyCode == KeyEvent.VK_TAB) return true
     return key.keyChar == KeyEvent.CHAR_UNDEFINED || super.shouldHandleLiterally(key)
   }
+}
+
+@CommandOrMotion(keys = ["<C-R><C-L>"], modes = [Mode.CMD_LINE])
+class InsertCurrentLineAction : InsertCommandLineTextActionBase() {
+  override fun getText(commandLine: VimCommandLine) =
+    commandLine.editor.getLineText(commandLine.editor.primaryCaret().getBufferPosition().line)
 }
