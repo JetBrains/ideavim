@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.state.KeyHandlerState
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-open class InsertCommandLineTextActionBase : CommandLineActionHandler() {
+open class InsertCommandLineTextActionBase(private val insertLiterally: Boolean) : CommandLineActionHandler() {
 
   override fun onStartWaitingForArgument(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
     val cmdLine = injector.commandLine.getActiveCommandLine() ?: return
@@ -49,7 +49,7 @@ open class InsertCommandLineTextActionBase : CommandLineActionHandler() {
   protected fun replayKeys(editor: VimEditor, context: ExecutionContext, keys: List<KeyStroke>) {
     keys.forEach { key ->
       val keyHandler = KeyHandler.getInstance()
-      if (shouldHandleLiterally(key)) {
+      if (shouldInsertLiterally(key)) {
         // Reuse existing mechanisms to insert a control character literally by passing <C-V> first
         injector.parser.parseKeys("<C-V>").forEach {
           keyHandler.handleKey(editor, it, context, keyHandler.keyHandlerState)
@@ -63,9 +63,23 @@ open class InsertCommandLineTextActionBase : CommandLineActionHandler() {
     commandLine.insertText(offset, text)
   }
 
-  protected open fun shouldHandleLiterally(key: KeyStroke): Boolean {
+  protected open fun shouldInsertLiterally(key: KeyStroke): Boolean {
+    if (insertLiterally) {
+      // Don't escape <C-V>
+      if (key.keyCode == KeyEvent.VK_V && key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) {
+        return false
+      }
+
+      // Insert Tab and any non-character keystroke literal characters
+      if (key.keyCode == KeyEvent.VK_TAB || key.keyChar == KeyEvent.CHAR_UNDEFINED) {
+        return true
+      }
+    }
+
     // <C-C>, <Esc> and <CR> are inserted literally. This includes their synonyms
-    if (key.keyCode == KeyEvent.VK_ENTER || key.keyCode == KeyEvent.VK_ESCAPE) return true
+    if (key.keyCode == KeyEvent.VK_ENTER || key.keyCode == KeyEvent.VK_ESCAPE) {
+      return true
+    }
     if (key.keyChar == KeyEvent.CHAR_UNDEFINED && key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) {
       return key.keyCode == KeyEvent.VK_C
         || key.keyCode == KeyEvent.VK_J
@@ -80,7 +94,7 @@ open class InsertCommandLineTextActionBase : CommandLineActionHandler() {
   }
 }
 
-open class InsertRegisterActionBase : InsertCommandLineTextActionBase() {
+open class InsertRegisterActionBase(insertLiterally: Boolean) : InsertCommandLineTextActionBase(insertLiterally) {
   override val argumentType = Argument.Type.CHARACTER
 
   override fun execute(
@@ -107,22 +121,19 @@ open class InsertRegisterActionBase : InsertCommandLineTextActionBase() {
 }
 
 @CommandOrMotion(keys = ["<C-R>"], modes = [Mode.CMD_LINE])
-class InsertRegisterAction : InsertRegisterActionBase()
+class InsertRegisterAction : InsertRegisterActionBase(insertLiterally = false)
 
 @CommandOrMotion(keys = ["<C-R><C-R>", "<C-R><C-O>"], modes = [Mode.CMD_LINE])
-class InsertRegisterLiterallyAction : InsertRegisterActionBase() {
-  override fun shouldHandleLiterally(key: KeyStroke): Boolean {
-    // Don't escape <C-V>
-    if (key.keyCode == KeyEvent.VK_V && key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) {
-      return false
-    }
-    if (key.keyCode == KeyEvent.VK_TAB) return true
-    return key.keyChar == KeyEvent.CHAR_UNDEFINED || super.shouldHandleLiterally(key)
-  }
-}
+class InsertRegisterLiterallyAction : InsertRegisterActionBase(insertLiterally = true)
 
 @CommandOrMotion(keys = ["<C-R><C-L>"], modes = [Mode.CMD_LINE])
-class InsertCurrentLineAction : InsertCommandLineTextActionBase() {
+class InsertCurrentLineAction : InsertCommandLineTextActionBase(insertLiterally = false) {
+  override fun getText(commandLine: VimCommandLine) =
+    commandLine.editor.getLineText(commandLine.editor.primaryCaret().getBufferPosition().line)
+}
+
+@CommandOrMotion(keys = ["<C-R><C-R><C-L>", "<C-R><C-O><C-L>"], modes = [Mode.CMD_LINE])
+class InsertCurrentLineLiterallyAction : InsertCommandLineTextActionBase(insertLiterally = true) {
   override fun getText(commandLine: VimCommandLine) =
     commandLine.editor.getLineText(commandLine.editor.primaryCaret().getBufferPosition().line)
 }
