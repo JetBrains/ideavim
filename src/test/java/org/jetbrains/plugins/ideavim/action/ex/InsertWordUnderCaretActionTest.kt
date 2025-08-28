@@ -14,6 +14,33 @@ import org.junit.jupiter.api.Test
 @Suppress("SpellCheckingInspection")
 class InsertWordUnderCaretActionTest : VimExTestCase() {
   @Test
+  fun `test render quote prompt after c_CTRL-R`() {
+    configureByText("lorem ipsum")
+    typeText(":set <C-R>")
+    assertRenderedExText("set \"")
+    typeText("<C-W>")
+    assertRenderedExText("set lorem")
+  }
+
+  @Test
+  fun `test render quote prompt after c_CTRL-R_CTRL-R`() {
+    configureByText("lorem ipsum")
+    typeText(":set <C-R><C-R>")
+    assertRenderedExText("set \"")
+    typeText("<C-W>")
+    assertRenderedExText("set lorem")
+  }
+
+  @Test
+  fun `test render quote prompt after c_CTRL-R_CTRL-O`() {
+    configureByText("lorem ipsum")
+    typeText(":set <C-R><C-O>")
+    assertRenderedExText("set \"")
+    typeText("<C-W>")
+    assertRenderedExText("set lorem")
+  }
+
+  @Test
   fun `test insert word under caret`() {
     configureByText("""
       |  Lorem ipsum, dolor, sit amet,
@@ -22,6 +49,34 @@ class InsertWordUnderCaretActionTest : VimExTestCase() {
       |  Cras id tellus in ex imperdiet egestas.
     """.trimMargin())
     typeText(":<C-R><C-W>")
+    assertExText("adipiscing")
+  }
+
+  @Test
+  fun `test insert word under caret literally with c_CTRL-R_CTRL-R`() {
+    // How do you insert a word "literally"? It can't contain control characters/shortcuts, and we don't apply maps
+    // while replaying/inserting, so a word can only ever be literal text, right?
+    configureByText("""
+      |  Lorem ipsum, dolor, sit amet,
+      |  consectetur adip${c}iscing elit
+      |  Sed in orci mauris.
+      |  Cras id tellus in ex imperdiet egestas.
+    """.trimMargin())
+    typeText(":<C-R><C-R><C-W>")
+    assertExText("adipiscing")
+  }
+
+  @Test
+  fun `test insert word under caret literally with c_CTRL-R_CTRL-O`() {
+    // How do you insert a word "literally"? It can't contain control characters/shortcuts, and we don't apply maps
+    // while replaying/inserting, so a word can only ever be literal text, right?
+    configureByText("""
+      |  Lorem ipsum, dolor, sit amet,
+      |  consectetur adip${c}iscing elit
+      |  Sed in orci mauris.
+      |  Cras id tellus in ex imperdiet egestas.
+    """.trimMargin())
+    typeText(":<C-R><C-O><C-W>")
     assertExText("adipiscing")
   }
 

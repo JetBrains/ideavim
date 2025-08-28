@@ -445,6 +445,11 @@
         "modes": "C"
     },
     {
+        "keys": "<C-R><C-O><C-W>",
+        "class": "com.maddyhome.idea.vim.action.ex.InsertWordUnderCaretAction",
+        "modes": "C"
+    },
+    {
         "keys": "<C-R><C-R>",
         "class": "com.maddyhome.idea.vim.action.ex.InsertRegisterLiterallyAction",
         "modes": "C"
@@ -452,6 +457,11 @@
     {
         "keys": "<C-R><C-R><C-L>",
         "class": "com.maddyhome.idea.vim.action.ex.InsertCurrentLineLiterallyAction",
+        "modes": "C"
+    },
+    {
+        "keys": "<C-R><C-R><C-W>",
+        "class": "com.maddyhome.idea.vim.action.ex.InsertWordUnderCaretAction",
         "modes": "C"
     },
     {
