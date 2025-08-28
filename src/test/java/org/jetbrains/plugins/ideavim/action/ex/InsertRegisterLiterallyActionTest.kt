@@ -121,7 +121,7 @@ class InsertRegisterLiterallyActionTest : VimExTestCase() {
   }
 
   @Test
-  fun `test insert register replays special characters as though typed - enter digraph`() {
+  fun `test insert register literally does not replay special characters as though typed - enter digraph`() {
     // Don't use enterCommand, it (deliberately) doesn't parse special keys!
     typeText(":let @a=\"hello<C-V><C-K>OK world\"<CR>")
     typeText(":<C-R><C-R>a")
