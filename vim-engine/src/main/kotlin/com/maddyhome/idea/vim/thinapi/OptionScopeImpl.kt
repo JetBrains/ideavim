@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import kotlin.reflect.KType
 
-class OptionScopeImpl: OptionScope {
+object OptionScopeImpl: OptionScope {
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!
 

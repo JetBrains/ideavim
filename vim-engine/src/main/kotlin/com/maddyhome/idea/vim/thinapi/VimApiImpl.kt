@@ -167,8 +167,7 @@ class VimApiImpl(
   }
 
   override fun <T> option(block: OptionScope.() -> T): T {
-    val optionScope = OptionScopeImpl()
-    return optionScope.block()
+    return OptionScopeImpl.block()
   }
 
   override fun digraph(block: DigraphScope.() -> Unit) {
