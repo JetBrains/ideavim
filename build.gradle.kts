@@ -331,8 +331,32 @@ intellijPlatform {
     name = "IdeaVim"
     changeNotes.set(
       """
-        We’ve launched a program to reward quality contributions with a one-year All Products Pack subscription. Learn more at: <a href="https://github.com/JetBrains/ideavim/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a> .
+        We've launched a program to reward quality contributions with a one-year All Products Pack subscription. Learn more at: <a href="https://github.com/JetBrains/ideavim/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a> .
         <br/>
+        <br/>
+        <h3>Features:</h3>
+        <ul>
+        <li>Added support for f13-f24 function keys <a href="https://youtrack.jetbrains.com/issue/VIM-4004">VIM-4004</a></li>
+        <li>Added support for G and gg motions in NERDTree <a href="https://youtrack.jetbrains.com/issue/VIM-3791">VIM-3791</a></li>
+        </ul>
+        <h3>Fixes:</h3>
+        <ul>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-3266">VIM-3266</a> Set FileSaveCloseAction to OTHER_SELF_SYNCHRONIZED</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-3044">VIM-3044</a> Correct the behavior of I in (linewise) Visual mode</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2375">VIM-2375</a> Do not save file with ZQ</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2413">VIM-2413</a> Correct the range of line-wise case change commands</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2142">VIM-2142</a> Support gU and gu in VISUAL mode</li>
+        <li>Fixed count accepted as valid in text object</li>
+        <li>Fixed calculation of visual column with inlays</li>
+        <li>Fixed initialising non-default colorcolumn option</li>
+        <li>Fixed command line missing due to empty colour</li>
+        <li>Do not expand Live Templates in Normal mode</li>
+        </ul>
+        <h3>Changes:</h3>
+        <ul>
+        <li>Improved compatibility with Next Edit Suggestions</li>
+        <li>Enhanced SpeedSearch functionality in NERDTree</li>
+        </ul>
         <br/>
         <a href="https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20Fix%20versions:%20${version.get()}">Changelog</a>
         """.trimIndent()

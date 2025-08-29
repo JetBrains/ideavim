@@ -27,11 +27,8 @@ usual beta standards.
 =================
 
 ### Features:
-* Added comprehensive Plugin API for writing IdeaVim extensions
 * Added support for f13-f24 function keys [VIM-4004](https://youtrack.jetbrains.com/issue/VIM-4004)
-* Extended NERDTree support to Tree components other than Project
 * Added support for G and gg motions in NERDTree [VIM-3791](https://youtrack.jetbrains.com/issue/VIM-3791)
-* Added PlugEnable and PlugDisable commands for managing extensions
 
 ### Fixes:
 * [VIM-3266](https://youtrack.jetbrains.com/issue/VIM-3266) Set FileSaveCloseAction to OTHER_SELF_SYNCHRONIZED
@@ -48,8 +45,6 @@ usual beta standards.
 ### Changes:
 * Improved compatibility with Next Edit Suggestions
 * Enhanced SpeedSearch functionality in NERDTree
-* Reset caret shape on Escape key
-* Order IDE actions for Tab before Vim actions
 
 ### Merged PRs:
 * [1287](https://github.com/JetBrains/ideavim/pull/1287) by [app/jetbrains-junie](https://github.com/app/jetbrains-junie): Update JetBrains Junie Workflow
