@@ -221,4 +221,349 @@ class OptionScopeTest : VimTestCase() {
       assertTrue(exception.message!!.contains("E474"))
     }
   }
+
+  @Test
+  fun `test get option with null type throws exception`() {
+    myVimApi.option {
+      assertThrows<IllegalArgumentException> {
+        get<Nothing?>("history")
+      }
+    }
+  }
+
+  @Test
+  fun `test set string list option with values`() {
+    myVimApi.option {
+      set<String>("virtualedit", "all,block")
+      val result = get<String>("virtualedit")
+      assertEquals("all,block", result)
+    }
+  }
+
+  @Test
+  fun `test set string list option with empty value`() {
+    myVimApi.option {
+      set<String>("virtualedit", "")
+      val result = get<String>("virtualedit")
+      assertEquals("", result)
+    }
+  }
+
+  @Test
+  fun `test set string list option with single value`() {
+    myVimApi.option {
+      set<String>("virtualedit", "all")
+      val result = get<String>("virtualedit")
+      assertEquals("all", result)
+    }
+  }
+
+  @Test
+  fun `test set string list option with invalid value throws exception`() {
+    myVimApi.option {
+      val exception = assertThrows<IllegalArgumentException> {
+        set<String>("virtualedit", "invalidvalue")
+      }
+      assertTrue(exception.message!!.contains("E474"))
+    }
+  }
+
+  @Test
+  fun `test set string list option with duplicate values`() {
+    myVimApi.option {
+      set<String>("virtualedit", "all,all,block,block")
+      val result = get<String>("virtualedit")
+      assertEquals("all,all,block,block", result)
+    }
+  }
+
+  @Test
+  fun `test set string list option with spaces between values`() {
+    myVimApi.option {
+      val exception = assertThrows<IllegalArgumentException> {
+        set<String>("virtualedit", "all, block")
+      }
+      assertTrue(exception.message!!.contains("E474"))
+    }
+  }
+
+  @Test
+  fun `test reset string list option to default`() {
+    myVimApi.option {
+      set<String>("virtualedit", "all,block")
+      assertEquals("all,block", get<String>("virtualedit"))
+      
+      reset("virtualedit")
+      assertEquals("", get<String>("virtualedit"))
+    }
+  }
+
+  @Test
+  fun `test set option with empty name throws exception`() {
+    myVimApi.option {
+      assertThrows<IllegalArgumentException> {
+        set<Int>("", 42)
+      }
+    }
+  }
+
+  @Test
+  fun `test get option with empty name throws exception`() {
+    myVimApi.option {
+      assertThrows<IllegalArgumentException> {
+        get<Int>("")
+      }
+    }
+  }
+
+  @Test
+  fun `test reset option with empty name throws exception`() {
+    myVimApi.option {
+      assertThrows<IllegalArgumentException> {
+        reset("")
+      }
+    }
+  }
+
+  @Test
+  fun `test set integer option with negative value`() {
+    myVimApi.option {
+      set<Int>("scroll", -10)
+      val result = get<Int>("scroll")
+      assertEquals(-10, result)
+    }
+  }
+
+  @Test
+  fun `test set integer option with zero value`() {
+    myVimApi.option {
+      set<Int>("history", 0)
+      val result = get<Int>("history")
+      assertEquals(0, result)
+    }
+  }
+
+  @Test
+  fun `test set integer option with maximum value`() {
+    myVimApi.option {
+      set<Int>("history", Int.MAX_VALUE)
+      val result = get<Int>("history")
+      assertEquals(Int.MAX_VALUE, result)
+    }
+  }
+
+  @Test
+  fun `test set integer option out of bounds throws exception`() {
+    myVimApi.option {
+      val exception = assertThrows<IllegalArgumentException> {
+        set<Int>("history", -1)
+      }
+      assertTrue(exception.message!!.contains("E487"))
+    }
+  }
+
+  @Test
+  fun `test set scroll jump with invalid negative value throws exception`() {
+    myVimApi.option {
+      val exception = assertThrows<IllegalArgumentException> {
+        set<Int>("scrolljump", -101)
+      }
+      assertTrue(exception.message!!.contains("E49"))
+    }
+  }
+
+  @Test
+  fun `test get boolean option as integer returns 0 or 1`() {
+    myVimApi.option {
+      set<Boolean>("ignorecase", false)
+      assertEquals(0, get<Int>("ignorecase"))
+      
+      set<Boolean>("ignorecase", true)
+      assertEquals(1, get<Int>("ignorecase"))
+    }
+  }
+
+  @Test
+  fun `test set integer option with boolean type for toggle option`() {
+    myVimApi.option {
+      set<Int>("ignorecase", 0)
+      assertEquals(false, get<Boolean>("ignorecase"))
+      
+      set<Int>("ignorecase", 1)
+      assertEquals(true, get<Boolean>("ignorecase"))
+    }
+  }
+
+  @Test
+  fun `test set string option with empty value`() {
+    myVimApi.option {
+      set<String>("selection", "")
+      val result = get<String>("selection")
+      assertEquals("", result)
+    }
+  }
+
+  @Test
+  fun `test global option persists across editors`() {
+    myVimApi.option {
+      setGlobal<Int>("history", 123)
+      assertEquals(123, get<Int>("history"))
+    }
+  }
+
+  @Test
+  fun `test local option overrides global option`() {
+    myVimApi.option {
+      setGlobal<Int>("scroll", 10)
+      setLocal<Int>("scroll", 20)
+      
+      assertEquals(20, get<Int>("scroll"))
+    }
+  }
+
+  @Test
+  fun `test reset local option falls back to global`() {
+    myVimApi.option {
+      setGlobal<Int>("scroll", 10)
+      setLocal<Int>("scroll", 20)
+      assertEquals(20, get<Int>("scroll"))
+      
+      reset("scroll")
+      assertEquals(0, get<Int>("scroll"))
+    }
+  }
+
+  @Test
+  fun `test set multiple string list values`() {
+    myVimApi.option {
+      set<String>("whichwrap", "b,s,h,l")
+      val result = get<String>("whichwrap")
+      assertEquals("b,s,h,l", result)
+    }
+  }
+
+  @Test
+  fun `test set string list with invalid item throws exception`() {
+    myVimApi.option {
+      val exception = assertThrows<IllegalArgumentException> {
+        set<String>("whichwrap", "b,invalid,s")
+      }
+      assertTrue(exception.message!!.contains("E474"))
+    }
+  }
+
+  @Test
+  fun `test matchpairs option with valid pairs`() {
+    myVimApi.option {
+      set<String>("matchpairs", "(:),{:},[:]")
+      val result = get<String>("matchpairs")
+      assertEquals("(:),{:},[:]", result)
+    }
+  }
+
+  @Test
+  fun `test matchpairs option with invalid format throws exception`() {
+    myVimApi.option {
+      val exception = assertThrows<IllegalArgumentException> {
+        set<String>("matchpairs", "(:),abc,[:]")
+      }
+      assertTrue(exception.message!!.contains("E474"))
+    }
+  }
+
+  @Test
+  fun `test set option with very long string value throws exception`() {
+    myVimApi.option {
+      val longValue = "a".repeat(1000)
+      val exception = assertThrows<IllegalArgumentException> {
+        set<String>("selection", longValue)
+      }
+      assertTrue(exception.message!!.contains("E474"))
+    }
+  }
+
+  @Test
+  fun `test concurrent option modifications`() {
+    myVimApi.option {
+      set<Int>("history", 10)
+      setGlobal<Int>("history", 20)
+      setLocal<Int>("history", 30)
+      
+      assertEquals(30, get<Int>("history"))
+    }
+  }
+
+  @Test
+  fun `test option name case sensitivity`() {
+    myVimApi.option {
+      assertThrows<IllegalArgumentException> {
+        get<Int>("HISTORY")
+      }
+    }
+  }
+
+  @Test
+  fun `test set boolean option with integer value other than 0 or 1`() {
+    myVimApi.option {
+      set<Int>("ignorecase", 2)
+      assertEquals(false, get<Boolean>("ignorecase"))
+      
+      set<Int>("ignorecase", -1)
+      assertEquals(false, get<Boolean>("ignorecase"))
+      
+      set<Int>("ignorecase", 100)
+      assertEquals(false, get<Boolean>("ignorecase"))
+      
+      set<Int>("ignorecase", 1)
+      assertEquals(true, get<Boolean>("ignorecase"))
+      
+      set<Int>("ignorecase", 0)
+      assertEquals(false, get<Boolean>("ignorecase"))
+    }
+  }
+
+  @Test
+  fun `test set list option with trailing comma`() {
+    myVimApi.option {
+      val exception = assertThrows<IllegalArgumentException> {
+        set<String>("virtualedit", "all,block,")
+      }
+      assertTrue(exception.message!!.contains("E474"))
+    }
+  }
+
+  @Test
+  fun `test set list option with leading comma`() {
+    myVimApi.option {
+      val exception = assertThrows<IllegalArgumentException> {
+        set<String>("virtualedit", ",all,block")
+      }
+      assertTrue(exception.message!!.contains("E474"))
+    }
+  }
+
+  @Test
+  fun `test get option using abbreviation`() {
+    myVimApi.option {
+      set<Int>("hi", 75)
+      assertEquals(75, get<Int>("history"))
+    }
+  }
+
+  @Test
+  fun `test set option using abbreviation`() {
+    myVimApi.option {
+      set<Boolean>("ic", true)
+      assertEquals(true, get<Boolean>("ignorecase"))
+    }
+  }
+
+  @Test
+  fun `test reset option using abbreviation`() {
+    myVimApi.option {
+      set<Int>("hi", 100)
+      reset("hi")
+      assertEquals(50, get<Int>("history"))
+    }
+  }
 }
