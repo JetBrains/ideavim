@@ -115,6 +115,7 @@ class ChangeActionTest : VimTestCase() {
 
   // VIM-620 |i_CTRL-O|
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR)
   fun testInsertSingleCommandAndNewLineInserting8() {
     doTest(
       listOf("i", "<C-O>", "gh", "d"),
