@@ -25,6 +25,7 @@ object Project : Project({
   // Active tests
   buildType(TestingBuildType("Latest EAP", version = "LATEST-EAP-SNAPSHOT"))
   buildType(TestingBuildType("2025.1"))
+  buildType(TestingBuildType("2025.2"))
   buildType(TestingBuildType("Latest EAP With Xorg", "<default>", version = "LATEST-EAP-SNAPSHOT"))
 
   buildType(PropertyBased)
