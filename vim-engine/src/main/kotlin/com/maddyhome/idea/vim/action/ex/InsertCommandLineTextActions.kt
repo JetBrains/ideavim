@@ -168,7 +168,7 @@ class InsertWordUnderCaretAction : InsertWordUnderCaretActionBase(isBigWord = fa
     // To match Vim behaviour, we get word, not WORD
     val offset = injector.searchHelper.findNextWord(commandLine.text, editor, commandLine.caret.offset, -1, bigWord = false)
     val prefix = commandLine.text.substring(offset, commandLine.caret.offset)
-    if (text.startsWith(prefix, ignoreCase = true)) {
+    if (prefix.isNotEmpty() && text.startsWith(prefix, ignoreCase = true)) {
       commandLine.insertText(commandLine.caret.offset, text.substring(prefix.length))
     }
     else {
@@ -179,3 +179,6 @@ class InsertWordUnderCaretAction : InsertWordUnderCaretActionBase(isBigWord = fa
 
 @CommandOrMotion(keys = ["<C-R><C-A>"], modes = [Mode.CMD_LINE])
 class InsertBigWordUnderCaretAction : InsertWordUnderCaretActionBase(isBigWord = true, insertLiterally = false)
+
+@CommandOrMotion(keys = ["<C-R><C-R><C-A>", "<C-R><C-O><C-A>"], modes = [Mode.CMD_LINE])
+class InsertBigWordUnderCaretLiterallyAction : InsertWordUnderCaretActionBase(isBigWord = true, insertLiterally = true)
