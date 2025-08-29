@@ -458,6 +458,7 @@ class SetglobalCommandTest : VimTestCase() {
       |  keymodel=continueselect,stopselect
       |  lookupkeys=<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>
       |  matchpairs=(:),{:},[:]
+      |noReplaceWithRegister
       |  selection=inclusive
       |  shell=/dummy/path/to/bash
       |novim-paragraph-motion
@@ -546,6 +547,7 @@ class SetglobalCommandTest : VimTestCase() {
       |nonumber
       |  operatorfunc=
       |norelativenumber
+      |noReplaceWithRegister
       |  scroll=0
       |  scrolljump=1
       |  scrolloff=0
