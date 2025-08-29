@@ -189,10 +189,8 @@ fun OptionScope.toggle(name: String) {
  * @param values The values to append (duplicates will be ignored)
  */
 fun OptionScope.append(name: String, vararg values: String) {
-  val current = get<String>(name)
-  val currentList = if (current.isEmpty()) emptyList() else current.split(",")
-  val currentSet = currentList.toSet()
-  val valuesToAdd = values.filterNot { it in currentSet }
+  val currentList = get<String>(name).split()
+  val valuesToAdd = values.filterNot { it in currentList }
   val newList = currentList + valuesToAdd
   set(name, newList.joinToString(","))
 }
@@ -215,10 +213,8 @@ fun OptionScope.append(name: String, vararg values: String) {
  * @param values The values to prepend (duplicates will be ignored)
  */
 fun OptionScope.prepend(name: String, vararg values: String) {
-  val current = get<String>(name)
-  val currentList = if (current.isEmpty()) emptyList() else current.split(",")
-  val currentSet = currentList.toSet()
-  val valuesToAdd = values.filterNot { it in currentSet }
+  val currentList = get<String>(name).split()
+  val valuesToAdd = values.filterNot { it in currentList }
   val newList = valuesToAdd + currentList
   set(name, newList.joinToString(","))
 }
@@ -239,9 +235,7 @@ fun OptionScope.prepend(name: String, vararg values: String) {
  * @param values The values to remove
  */
 fun OptionScope.remove(name: String, vararg values: String) {
-  val current = get<String>(name)
-  val currentList = if (current.isEmpty()) emptyList() else current.split(",")
-  val valuesToRemove = values.toSet()
-  val newList = currentList.filterNot { it in valuesToRemove }
+  val currentList = get<String>(name).split()
+  val newList = currentList.filterNot { it in values }
   set(name, newList.joinToString(","))
 }
