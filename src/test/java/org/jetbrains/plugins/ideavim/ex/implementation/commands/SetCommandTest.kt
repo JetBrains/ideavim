@@ -297,7 +297,7 @@ class SetCommandTest : VimTestCase() {
       |nonumber
       |  operatorfunc=
       |norelativenumber
-      noReplaceWithRegister
+      |noReplaceWithRegister
       |  scroll=0
       |  scrolljump=1
       |  scrolloff=0
