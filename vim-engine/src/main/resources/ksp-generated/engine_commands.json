@@ -455,6 +455,11 @@
         "modes": "C"
     },
     {
+        "keys": "<C-R><C-O><C-F>",
+        "class": "com.maddyhome.idea.vim.action.ex.InsertFilenameUnderCaretAction",
+        "modes": "C"
+    },
+    {
         "keys": "<C-R><C-O><C-L>",
         "class": "com.maddyhome.idea.vim.action.ex.InsertCurrentLineLiterallyAction",
         "modes": "C"
@@ -472,6 +477,11 @@
     {
         "keys": "<C-R><C-R><C-A>",
         "class": "com.maddyhome.idea.vim.action.ex.InsertBigWordUnderCaretLiterallyAction",
+        "modes": "C"
+    },
+    {
+        "keys": "<C-R><C-R><C-F>",
+        "class": "com.maddyhome.idea.vim.action.ex.InsertFilenameUnderCaretAction",
         "modes": "C"
     },
     {
