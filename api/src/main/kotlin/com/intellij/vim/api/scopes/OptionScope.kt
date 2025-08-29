@@ -15,88 +15,52 @@ import kotlin.reflect.typeOf
  * Scope that provides functions for working with options.
  */
 @VimApiDsl
-abstract class OptionScope() {
-  protected abstract fun <T> getOptionValueInternal(name: String, type: KType): T?
-
-  protected abstract fun <T> setOptionInternal(name: String, value: T, type: KType, scope: String)
-
-  @PublishedApi
-  internal fun <T : Any> get(name: String, type: KType): T? = getOptionValueInternal(name, type)
-
-  @PublishedApi
-  internal fun <T> setGlobal(name: String, value: T, type: KType) =
-    setOptionInternal(name, value, type, "global")
-
-  @PublishedApi
-  internal fun <T> setLocal(name: String, value: T, type: KType) =
-    setOptionInternal(name, value, type, "local")
-
-  @PublishedApi
-  internal fun <T> set(name: String, value: T, type: KType) =
-    setOptionInternal(name, value, type, "effective")
-
+interface OptionScope {
   /**
    * Gets the value of an option with the specified type.
+   * 
+   * **Note:** Prefer using the extension function `get<T>(name)` instead of calling this directly,
+   * as it provides better type safety and cleaner syntax through reified type parameters.
    *
-   * In Vim, options can be accessed with the `&` prefix.
-   * Example: `&ignorecase` returns the value of the 'ignorecase' option.
+   * Example of preferred usage:
+   * ```kotlin
+   * myVimApi.option {
+   *   val ignoreCase = get<Boolean>("ignorecase")
+   *   val history = get<Int>("history")
+   *   val clipboard = get<String>("clipboard")
+   * }
+   * ```
    *
    * @param name The name of the option
+   * @param type The KType of the option value
    * @return The value of the option
    * @throws IllegalArgumentException if the type is wrong or the option doesn't exist
    */
-  inline fun <reified T> get(name: String): T? {
-    val kType: KType = typeOf<T>()
-    return get(name, kType)
-  }
+  fun <T> getOptionValue(name: String, type: KType): T?
 
   /**
-   * Sets the global value of an option with the specified type.
+   * Sets an option value with the specified scope.
+   * 
+   * **Note:** Prefer using the extension functions `set<T>(name, value)`, `setGlobal<T>(name, value)`, 
+   * or `setLocal<T>(name, value)` instead of calling this directly, as they provide better type safety 
+   * and cleaner syntax through reified type parameters.
    *
-   * In Vim, this is equivalent to `:setglobal option=value`.
-   * Example: `:setglobal ignorecase` or `let &g:ignorecase = 1`
+   * Example of preferred usage:
+   * ```kotlin
+   * myVimApi.option {
+   *   set("ignorecase", true)        // Effective scope
+   *   setGlobal("number", 42)         // Global scope
+   *   setLocal("tabstop", 4)          // Local scope
+   * }
+   * ```
    *
    * @param name The name of the option
    * @param value The value to set
-   *
+   * @param type The KType of the option value
+   * @param scope The scope to set the option in ("global", "local", or "effective")
    * @throws IllegalArgumentException if the option doesn't exist or the type is wrong
    */
-  inline fun <reified T> setGlobal(name: String, value: T) {
-    val kType: KType = typeOf<T>()
-    return setGlobal(name, value, kType)
-  }
-
-  /**
-   * Sets the local value of an option with the specified type.
-   *
-   * In Vim, this is equivalent to `:setlocal option=value`.
-   * Example: `:setlocal ignorecase` or `let &l:ignorecase = 1`
-   *
-   * @param name The name of the option
-   * @param value The value to set
-   *
-   * @throws IllegalArgumentException if the option doesn't exist or the type is wrong
-   */
-  inline fun <reified T> setLocal(name: String, value: T) {
-    val kType: KType = typeOf<T>()
-    return setLocal(name, value, kType)
-  }
-
-  /**
-   * Sets the effective value of an option with the specified type.
-   *
-   * In Vim, this is equivalent to `:set option=value`.
-   * Example: `:set ignorecase` or `let &ignorecase = 1`
-   *
-   * @param name The name of the option
-   * @param value The value to set
-   *
-   * @throws IllegalArgumentException if the option doesn't exist or the type is wrong
-   */
-  inline fun <reified T> set(name: String, value: T) {
-    val kType: KType = typeOf<T>()
-    return set(name, value, kType)
-  }
+  fun <T> setOption(name: String, value: T, type: KType, scope: String)
 
   /**
    * Resets an option to its default value.
@@ -108,7 +72,7 @@ abstract class OptionScope() {
    *
    * @throws IllegalArgumentException if the option doesn't exist
    */
-  abstract fun reset(name: String)
+  fun reset(name: String)
 
   /**
    * Extension function to split a comma-separated option value into a list.
@@ -125,6 +89,69 @@ abstract class OptionScope() {
    * ```
    */
   fun String.split(): List<String> = split(",")
+}
+
+/**
+ * Gets the value of an option with the specified type.
+ *
+ * In Vim, options can be accessed with the `&` prefix.
+ * Example: `&ignorecase` returns the value of the 'ignorecase' option.
+ *
+ * @param name The name of the option
+ * @return The value of the option
+ * @throws IllegalArgumentException if the type is wrong or the option doesn't exist
+ */
+inline fun <reified T> OptionScope.get(name: String): T? {
+  val kType: KType = typeOf<T>()
+  return getOptionValue(name, kType)
+}
+
+/**
+ * Sets the global value of an option with the specified type.
+ *
+ * In Vim, this is equivalent to `:setglobal option=value`.
+ * Example: `:setglobal ignorecase` or `let &g:ignorecase = 1`
+ *
+ * @param name The name of the option
+ * @param value The value to set
+ *
+ * @throws IllegalArgumentException if the option doesn't exist or the type is wrong
+ */
+inline fun <reified T> OptionScope.setGlobal(name: String, value: T) {
+  val kType: KType = typeOf<T>()
+  setOption(name, value, kType, "global")
+}
+
+/**
+ * Sets the local value of an option with the specified type.
+ *
+ * In Vim, this is equivalent to `:setlocal option=value`.
+ * Example: `:setlocal ignorecase` or `let &l:ignorecase = 1`
+ *
+ * @param name The name of the option
+ * @param value The value to set
+ *
+ * @throws IllegalArgumentException if the option doesn't exist or the type is wrong
+ */
+inline fun <reified T> OptionScope.setLocal(name: String, value: T) {
+  val kType: KType = typeOf<T>()
+  setOption(name, value, kType, "local")
+}
+
+/**
+ * Sets the effective value of an option with the specified type.
+ *
+ * In Vim, this is equivalent to `:set option=value`.
+ * Example: `:set ignorecase` or `let &ignorecase = 1`
+ *
+ * @param name The name of the option
+ * @param value The value to set
+ *
+ * @throws IllegalArgumentException if the option doesn't exist or the type is wrong
+ */
+inline fun <reified T> OptionScope.set(name: String, value: T) {
+  val kType: KType = typeOf<T>()
+  setOption(name, value, kType, "effective")
 }
 
 /**

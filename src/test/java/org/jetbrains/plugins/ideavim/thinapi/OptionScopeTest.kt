@@ -10,8 +10,12 @@ package org.jetbrains.plugins.ideavim.thinapi
 
 import com.intellij.vim.api.VimApi
 import com.intellij.vim.api.scopes.append
+import com.intellij.vim.api.scopes.get
 import com.intellij.vim.api.scopes.prepend
 import com.intellij.vim.api.scopes.remove
+import com.intellij.vim.api.scopes.set
+import com.intellij.vim.api.scopes.setGlobal
+import com.intellij.vim.api.scopes.setLocal
 import com.intellij.vim.api.scopes.toggle
 import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.key.MappingOwner

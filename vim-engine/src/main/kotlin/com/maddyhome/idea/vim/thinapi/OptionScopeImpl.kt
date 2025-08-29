@@ -18,14 +18,14 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import kotlin.reflect.KType
 
-class OptionScopeImpl: OptionScope() {
+class OptionScopeImpl: OptionScope {
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!
 
   private val optionGroup: VimOptionGroup
     get() = injector.optionGroup
 
-  override fun <T> getOptionValueInternal(name: String, type: KType): T {
+  override fun <T> getOptionValue(name: String, type: KType): T {
     val option = optionGroup.getOption(name) ?: throw IllegalArgumentException("Option $name not found")
 
     val optionValue = optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(vimEditor))
@@ -63,7 +63,7 @@ class OptionScopeImpl: OptionScope() {
     return kotlinValue as T
   }
 
-  override fun <T> setOptionInternal(name: String, value: T, type: KType, scope: String) {
+  override fun <T> setOption(name: String, value: T, type: KType, scope: String) {
     val option = optionGroup.getOption(name) ?: throw IllegalArgumentException("Option $name not found")
 
     val optionValue = when (type.classifier) {
