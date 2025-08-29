@@ -28,7 +28,7 @@ object StringHelper {
    */
   @JvmStatic
   fun getCharAtIndex(str: String, index: Int): Char? {
-    if (index < 0 || index > str.length) {
+    if (index < 0 || index >= str.length) {
       return null
     }
     return str[index]
