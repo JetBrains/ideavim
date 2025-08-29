@@ -13,7 +13,13 @@ import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.VimCommandLine
 import com.maddyhome.idea.vim.api.injector
 
-@CommandOrMotion(keys = ["<C-R><C-F>"], modes = [Mode.CMD_LINE])
+/**
+ * Insert the filename at or following the caret to the command line.
+ *
+ * This implementation is used for both inserting normally, and inserting literally. A filename can't (or at least
+ * shouldn't) contain control characters, so it can only be inserted literally, as plain text.
+ */
+@CommandOrMotion(keys = ["<C-R><C-F>", "<C-R><C-R><C-F>", "<C-R><C-O><C-F>"], modes = [Mode.CMD_LINE])
 class InsertFilenameUnderCaretAction : CommandLineActionHandler() {
   override fun execute(commandLine: VimCommandLine): Boolean {
     val editor = commandLine.editor
