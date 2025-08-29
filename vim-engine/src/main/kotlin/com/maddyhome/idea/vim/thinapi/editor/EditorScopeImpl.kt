@@ -22,9 +22,11 @@ class EditorScopeImpl : EditorScope() {
   }
 
   override fun ideChange(block: Transaction.() -> Unit) {
-    return injector.application.runWriteAction {
-      val transaction = TransactionImpl()
-      transaction.block()
+    injector.application.invokeAndWait {
+      injector.application.runWriteAction {
+        val transaction = TransactionImpl()
+        transaction.block()
+      }
     }
   }
 }
