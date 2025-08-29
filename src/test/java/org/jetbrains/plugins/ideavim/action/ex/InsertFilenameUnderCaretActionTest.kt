@@ -20,6 +20,48 @@ class InsertFilenameUnderCaretActionTest : VimExTestCase() {
   }
 
   @Test
+  fun `test render quote prompt after c_CTRL-R`() {
+    configureByText("""
+      |Lorem ipsum dolor sit amet
+      |consectetur /Users/${c}JasonIsaacs/Documents/hello.txt adipiscing elit
+      |sed in orci mauris.
+    """.trimMargin())
+    setUnixOption()
+    typeText(":set <C-R>")
+    assertRenderedExText("set \"")
+    typeText("<C-A>")
+    assertRenderedExText("set /Users/JasonIsaacs/Documents/hello.txt")
+  }
+
+  @Test
+  fun `test render quote prompt after c_CTRL-R_CTRL-R`() {
+    configureByText("""
+      |Lorem ipsum dolor sit amet
+      |consectetur /Users/${c}JasonIsaacs/Documents/hello.txt adipiscing elit
+      |sed in orci mauris.
+    """.trimMargin())
+    setUnixOption()
+    typeText(":set <C-R><C-R>")
+    assertRenderedExText("set \"")
+    typeText("<C-F>")
+    assertRenderedExText("set /Users/JasonIsaacs/Documents/hello.txt")
+  }
+
+  @Test
+  fun `test render quote prompt after c_CTRL-R_CTRL-O`() {
+    configureByText("""
+      |Lorem ipsum dolor sit amet
+      |consectetur /Users/${c}JasonIsaacs/Documents/hello.txt adipiscing elit
+      |sed in orci mauris.
+    """.trimMargin())
+    setUnixOption()
+    typeText(":set <C-R><C-O>")
+    assertRenderedExText("set \"")
+    typeText("<C-F>")
+    assertRenderedExText("set /Users/JasonIsaacs/Documents/hello.txt")
+  }
+
+  @Test
   fun `test insert filename under caret`() {
     configureByText("""
       |Lorem ipsum dolor sit amet
@@ -28,6 +70,30 @@ class InsertFilenameUnderCaretActionTest : VimExTestCase() {
     """.trimMargin())
     setUnixOption()
     typeText(":edit <C-R><C-F>")
+    assertExText("edit /Users/JasonIsaacs/Documents/hello.txt")
+  }
+
+  @Test
+  fun `test insert filename under caret literally with c_CTRL-R_CTRL-R`() {
+    configureByText("""
+      |Lorem ipsum dolor sit amet
+      |consectetur /Users/${c}JasonIsaacs/Documents/hello.txt adipiscing elit
+      |sed in orci mauris.
+    """.trimMargin())
+    setUnixOption()
+    typeText(":edit <C-R><C-R><C-F>")
+    assertExText("edit /Users/JasonIsaacs/Documents/hello.txt")
+  }
+
+  @Test
+  fun `test insert filename under caret literally with c_CTRL-R_CTRL-O`() {
+    configureByText("""
+      |Lorem ipsum dolor sit amet
+      |consectetur /Users/${c}JasonIsaacs/Documents/hello.txt adipiscing elit
+      |sed in orci mauris.
+    """.trimMargin())
+    setUnixOption()
+    typeText(":edit <C-R><C-O><C-F>")
     assertExText("edit /Users/JasonIsaacs/Documents/hello.txt")
   }
 
