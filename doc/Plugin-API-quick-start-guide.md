@@ -1,5 +1,16 @@
 # Quick Start Guide for IdeaVim Plugin Development
 
+> **⚠️ EXPERIMENTAL API WARNING**
+> 
+> The Plugin API is currently in an **experimental stage** and is not yet recommended for production use.
+> 
+> - The API is subject to breaking changes without notice
+> - Features may be added, modified, or removed in future releases
+> - Documentation may not fully reflect the current implementation
+> - Use at your own risk for experimental purposes only
+> 
+> We welcome feedback and bug reports to help improve the API, but please be aware that stability is not guaranteed at this time.
+
 This guide will help you get started with developing plugins for IdeaVim.
 We'll cover the essential concepts and show you how to create a simple plugin.
 

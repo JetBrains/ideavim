@@ -1,5 +1,16 @@
 # API Reference
 
+> **⚠️ EXPERIMENTAL API WARNING**
+> 
+> The Plugin API is currently in an **experimental stage** and is not yet recommended for production use.
+> 
+> - The API is subject to breaking changes without notice
+> - Features may be added, modified, or removed in future releases
+> - Documentation may not fully reflect the current implementation
+> - Use at your own risk for experimental purposes only
+> 
+> We welcome feedback and bug reports to help improve the API, but please be aware that stability is not guaranteed at this time.
+
 ## VimApi
 
 The `VimApi` class is the main entry point for interacting with the Vim editor. It provides access to various functionalities like variable management, window operations, and text manipulation.

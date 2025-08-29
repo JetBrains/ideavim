@@ -1,5 +1,16 @@
 # Tutorial: Creating an IdeaVim Plugin with the New API
 
+> **⚠️ EXPERIMENTAL API WARNING**
+> 
+> The Plugin API is currently in an **experimental stage** and is not yet recommended for production use.
+> 
+> - The API is subject to breaking changes without notice
+> - Features may be added, modified, or removed in future releases
+> - Documentation may not fully reflect the current implementation
+> - Use at your own risk for experimental purposes only
+> 
+> We welcome feedback and bug reports to help improve the API, but please be aware that stability is not guaranteed at this time.
+
 This tutorial will guide you through the process of creating a plugin for IdeaVim using the new API. We'll implement a "Replace with Register" plugin that allows you to replace text with the contents of a register.
 
 ## Table of Contents
