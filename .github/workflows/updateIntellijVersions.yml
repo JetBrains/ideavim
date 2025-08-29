@@ -1,0 +1,47 @@
+name: Update IntelliJ Version Configurations
+
+on:
+  schedule:
+    # Run three times a year: August 15, April 30, December 1
+    # Times are in UTC
+    - cron: '0 10 15 8 *'   # August 15 at 10:00 UTC
+    - cron: '0 10 30 4 *'   # April 30 at 10:00 UTC  
+    - cron: '0 10 1 12 *'   # December 1 at 10:00 UTC
+  workflow_dispatch:  # Allow manual trigger for testing
+
+jobs:
+  update-intellij-versions:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      
+      - name: Run Claude Code
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          
+          prompt: |
+            Look at the file `.teamcity/_Self/Project.kt` and check what IntelliJ versions are currently being tested (look for TestingBuildType configurations).
+            
+            Based on the current date and existing versions, determine if a new IntelliJ version should be added. 
+            IntelliJ releases new versions approximately 3 times per year:
+            - Spring release (x.1) - around March/April
+            - Summer release (x.2) - around July/August  
+            - Fall release (x.3) - around November/December
+            
+            If a new version should be added:
+            1. Add the new TestingBuildType configuration in chronological order
+            2. Create a pull request with your changes
+            
+            The configuration file is located at: `.teamcity/_Self/Project.kt`
+            Look for the section with comment `// Active tests`
+            
+            Only add a new version if it doesn't already exist and if it makes sense based on the release schedule.
