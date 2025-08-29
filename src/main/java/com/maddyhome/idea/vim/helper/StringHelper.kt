@@ -21,4 +21,16 @@ object StringHelper {
     return Arrays.stream(string).flatMap { o: String -> injector.parser.parseKeys(o).stream() }
       .collect(Collectors.toList())
   }
+
+  /**
+   * Returns the character at the specified index in the string.
+   * Test method for GitHub integration.
+   */
+  @JvmStatic
+  fun getCharAtIndex(str: String, index: Int): Char? {
+    if (index < 0 || index > str.length) {
+      return null
+    }
+    return str[index]
+  }
 }
