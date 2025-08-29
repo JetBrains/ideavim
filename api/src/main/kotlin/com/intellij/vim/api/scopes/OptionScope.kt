@@ -143,3 +143,78 @@ fun OptionScope.toggle(name: String) {
   val current = get<Boolean>(name) ?: false
   set(name, !current)
 }
+
+/**
+ * Appends values to a comma-separated list option.
+ * This is equivalent to Vim's += operator for string options.
+ * Duplicate values are not added.
+ *
+ * Example:
+ * ```kotlin
+ * myVimApi.option {
+ *   append("virtualedit", "block")  // "" → "block"
+ *   append("virtualedit", "onemore")  // "block" → "block,onemore"
+ *   append("virtualedit", "block")  // "block,onemore" → "block,onemore" (no change)
+ * }
+ * ```
+ *
+ * @param name The name of the list option
+ * @param values The values to append (duplicates will be ignored)
+ */
+fun OptionScope.append(name: String, vararg values: String) {
+  val current = get<String>(name) ?: ""
+  val currentList = if (current.isEmpty()) emptyList() else current.split(",")
+  val currentSet = currentList.toSet()
+  val valuesToAdd = values.filterNot { it in currentSet }
+  val newList = currentList + valuesToAdd
+  set(name, newList.joinToString(","))
+}
+
+/**
+ * Prepends values to a comma-separated list option.
+ * This is equivalent to Vim's ^= operator for string options.
+ * Duplicate values are not added.
+ *
+ * Example:
+ * ```kotlin
+ * myVimApi.option {
+ *   prepend("virtualedit", "block")  // "all" → "block,all"
+ *   prepend("virtualedit", "onemore")  // "block,all" → "onemore,block,all"
+ *   prepend("virtualedit", "all")  // "onemore,block,all" → "onemore,block,all" (no change)
+ * }
+ * ```
+ *
+ * @param name The name of the list option
+ * @param values The values to prepend (duplicates will be ignored)
+ */
+fun OptionScope.prepend(name: String, vararg values: String) {
+  val current = get<String>(name) ?: ""
+  val currentList = if (current.isEmpty()) emptyList() else current.split(",")
+  val currentSet = currentList.toSet()
+  val valuesToAdd = values.filterNot { it in currentSet }
+  val newList = valuesToAdd + currentList
+  set(name, newList.joinToString(","))
+}
+
+/**
+ * Removes values from a comma-separated list option.
+ * This is equivalent to Vim's -= operator for string options.
+ *
+ * Example:
+ * ```kotlin
+ * myVimApi.option {
+ *   remove("virtualedit", "block")  // "block,all" → "all"
+ *   remove("virtualedit", "all")  // "all" → ""
+ * }
+ * ```
+ *
+ * @param name The name of the list option
+ * @param values The values to remove
+ */
+fun OptionScope.remove(name: String, vararg values: String) {
+  val current = get<String>(name) ?: ""
+  val currentList = if (current.isEmpty()) emptyList() else current.split(",")
+  val valuesToRemove = values.toSet()
+  val newList = currentList.filterNot { it in valuesToRemove }
+  set(name, newList.joinToString(","))
+}

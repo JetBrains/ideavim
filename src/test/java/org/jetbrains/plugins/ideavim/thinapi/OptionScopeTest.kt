@@ -9,6 +9,9 @@
 package org.jetbrains.plugins.ideavim.thinapi
 
 import com.intellij.vim.api.VimApi
+import com.intellij.vim.api.scopes.append
+import com.intellij.vim.api.scopes.prepend
+import com.intellij.vim.api.scopes.remove
 import com.intellij.vim.api.scopes.toggle
 import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.key.MappingOwner
@@ -678,6 +681,236 @@ class OptionScopeTest : VimTestCase() {
       assertThrows<IllegalArgumentException> {
         toggle("nonexistentoption")
       }
+    }
+  }
+
+  // append() tests
+  @Test
+  fun `test append to empty option`() {
+    myVimApi.option {
+      set<String>("virtualedit", "")
+      append("virtualedit", "block")
+      assertEquals("block", get<String>("virtualedit"))
+    }
+  }
+
+  @Test
+  fun `test append to non-empty option`() {
+    myVimApi.option {
+      set<String>("virtualedit", "all")
+      append("virtualedit", "block")
+      assertEquals("all,block", get<String>("virtualedit"))
+    }
+  }
+
+  @Test
+  fun `test append multiple values`() {
+    myVimApi.option {
+      set<String>("virtualedit", "all")
+      append("virtualedit", "block", "onemore")
+      assertEquals("all,block,onemore", get<String>("virtualedit"))
+    }
+  }
+
+  @Test
+  fun `test append to option with multiple existing values`() {
+    myVimApi.option {
+      set<String>("virtualedit", "block,insert")
+      append("virtualedit", "onemore")
+      assertEquals("block,insert,onemore", get<String>("virtualedit"))
+    }
+  }
+
+  @Test
+  fun `test append empty values does nothing`() {
+    myVimApi.option {
+      set<String>("virtualedit", "all")
+      append("virtualedit")
+      assertEquals("all", get<String>("virtualedit"))
+    }
+  }
+
+  @Test
+  fun `test append duplicate value is ignored`() {
+    myVimApi.option {
+      set<String>("virtualedit", "block,all")
+      append("virtualedit", "block")
+      assertEquals("block,all", get<String>("virtualedit"))
+    }
+  }
+
+  @Test
+  fun `test append multiple values with some duplicates`() {
+    myVimApi.option {
+      set<String>("virtualedit", "block,all")
+      append("virtualedit", "block", "onemore", "all", "insert")
+      assertEquals("block,all,onemore,insert", get<String>("virtualedit"))
+    }
+  }
+
+  // prepend() tests
+  @Test
+  fun `test prepend to empty option`() {
+    myVimApi.option {
+      set<String>("virtualedit", "")
+      prepend("virtualedit", "block")
+      assertEquals("block", get<String>("virtualedit"))
+    }
+  }
+
+  @Test
+  fun `test prepend to non-empty option`() {
+    myVimApi.option {
+      set<String>("virtualedit", "all")
+      prepend("virtualedit", "block")
+      assertEquals("block,all", get<String>("virtualedit"))
+    }
+  }
+
+  @Test
+  fun `test prepend multiple values`() {
+    myVimApi.option {
+      set<String>("virtualedit", "all")
+      prepend("virtualedit", "block", "onemore")
+      assertEquals("block,onemore,all", get<String>("virtualedit"))
+    }
+  }
+
+  @Test
+  fun `test prepend to option with multiple existing values`() {
+    myVimApi.option {
+      set<String>("virtualedit", "block,insert")
+      prepend("virtualedit", "onemore")
+      assertEquals("onemore,block,insert", get<String>("virtualedit"))
+    }
+  }
+
+  @Test
+  fun `test prepend empty values does nothing`() {
+    myVimApi.option {
+      set<String>("virtualedit", "all")
+      prepend("virtualedit")
+      assertEquals("all", get<String>("virtualedit"))
+    }
+  }
+
+  @Test
+  fun `test prepend duplicate value is ignored`() {
+    myVimApi.option {
+      set<String>("virtualedit", "block,all")
+      prepend("virtualedit", "all")
+      assertEquals("block,all", get<String>("virtualedit"))
+    }
+  }
+
+  @Test
+  fun `test prepend multiple values with some duplicates`() {
+    myVimApi.option {
+      set<String>("virtualedit", "block,all")
+      prepend("virtualedit", "onemore", "block", "insert", "all")
+      assertEquals("onemore,insert,block,all", get<String>("virtualedit"))
+    }
+  }
+
+  // remove() tests
+  @Test
+  fun `test remove from single value option`() {
+    myVimApi.option {
+      set<String>("virtualedit", "block")
+      remove("virtualedit", "block")
+      assertEquals("", get<String>("virtualedit"))
+    }
+  }
+
+  @Test
+  fun `test remove from multiple values option`() {
+    myVimApi.option {
+      set<String>("virtualedit", "block,all,onemore")
+      remove("virtualedit", "all")
+      assertEquals("block,onemore", get<String>("virtualedit"))
+    }
+  }
+
+  @Test
+  fun `test remove multiple values`() {
+    myVimApi.option {
+      set<String>("virtualedit", "block,all,onemore,insert")
+      remove("virtualedit", "all", "insert")
+      assertEquals("block,onemore", get<String>("virtualedit"))
+    }
+  }
+
+  @Test
+  fun `test remove non-existent value does nothing`() {
+    myVimApi.option {
+      set<String>("virtualedit", "block,all")
+      remove("virtualedit", "onemore")
+      assertEquals("block,all", get<String>("virtualedit"))
+    }
+  }
+
+  @Test
+  fun `test remove from empty option does nothing`() {
+    myVimApi.option {
+      set<String>("virtualedit", "")
+      remove("virtualedit", "block")
+      assertEquals("", get<String>("virtualedit"))
+    }
+  }
+
+  @Test
+  fun `test remove all values results in empty string`() {
+    myVimApi.option {
+      set<String>("virtualedit", "block,all")
+      remove("virtualedit", "block", "all")
+      assertEquals("", get<String>("virtualedit"))
+    }
+  }
+
+  @Test
+  fun `test remove empty values does nothing`() {
+    myVimApi.option {
+      set<String>("virtualedit", "all")
+      remove("virtualedit")
+      assertEquals("all", get<String>("virtualedit"))
+    }
+  }
+
+  // Combined operations tests
+  @Test
+  fun `test append then remove`() {
+    myVimApi.option {
+      set<String>("virtualedit", "all")
+      append("virtualedit", "block", "onemore")
+      assertEquals("all,block,onemore", get<String>("virtualedit"))
+      remove("virtualedit", "block")
+      assertEquals("all,onemore", get<String>("virtualedit"))
+    }
+  }
+
+  @Test
+  fun `test prepend then append`() {
+    myVimApi.option {
+      set<String>("virtualedit", "all")
+      prepend("virtualedit", "block")
+      assertEquals("block,all", get<String>("virtualedit"))
+      append("virtualedit", "onemore")
+      assertEquals("block,all,onemore", get<String>("virtualedit"))
+    }
+  }
+
+  @Test
+  fun `test complex combination of operations`() {
+    myVimApi.option {
+      set<String>("virtualedit", "")
+      append("virtualedit", "all")
+      assertEquals("all", get<String>("virtualedit"))
+      prepend("virtualedit", "block")
+      assertEquals("block,all", get<String>("virtualedit"))
+      append("virtualedit", "onemore", "insert")
+      assertEquals("block,all,onemore,insert", get<String>("virtualedit"))
+      remove("virtualedit", "all", "insert")
+      assertEquals("block,onemore", get<String>("virtualedit"))
     }
   }
 }
