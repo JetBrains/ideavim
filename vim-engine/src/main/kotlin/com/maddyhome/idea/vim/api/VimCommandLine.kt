@@ -44,6 +44,16 @@ interface VimCommandLine {
   val text: String
 
   /**
+   * @deprecated Use `text` instead
+   *
+   * It's now used in the com.github.dankinsoid.multicursor plugin
+   */
+  @Suppress("unused")
+  @Deprecated("Use `text` instead", ReplaceWith("text"))
+  val actualText: String
+    get() = text
+
+  /**
    * Get the text as it is rendered in the command line.
    *
    * This includes control characters rendered in Vim style, e.g. `<80>` or `^[` and prompts such as `^` or `?`
