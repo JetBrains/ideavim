@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.thinapi
 
 import com.intellij.vim.api.VimApi
+import com.intellij.vim.api.scopes.toggle
 import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.thinapi.VimApiImpl
@@ -625,6 +626,58 @@ class OptionScopeTest : VimTestCase() {
       set<String>("virtualedit", currentValues.joinToString(","))
       
       assertEquals("block,insert", get<String>("virtualedit"))
+    }
+  }
+
+  @Test
+  fun `test toggle boolean option from false to true`() {
+    myVimApi.option {
+      set<Boolean>("ignorecase", false)
+      toggle("ignorecase")
+      assertEquals(true, get<Boolean>("ignorecase"))
+    }
+  }
+
+  @Test
+  fun `test toggle boolean option from true to false`() {
+    myVimApi.option {
+      set<Boolean>("ignorecase", true)
+      toggle("ignorecase")
+      assertEquals(false, get<Boolean>("ignorecase"))
+    }
+  }
+
+  @Test
+  fun `test toggle multiple times`() {
+    myVimApi.option {
+      set<Boolean>("ignorecase", false)
+      
+      toggle("ignorecase")
+      assertEquals(true, get<Boolean>("ignorecase"))
+      
+      toggle("ignorecase")
+      assertEquals(false, get<Boolean>("ignorecase"))
+      
+      toggle("ignorecase")
+      assertEquals(true, get<Boolean>("ignorecase"))
+    }
+  }
+
+  @Test
+  fun `test toggle with abbreviation`() {
+    myVimApi.option {
+      set<Boolean>("ic", false)
+      toggle("ic")
+      assertEquals(true, get<Boolean>("ignorecase"))
+    }
+  }
+
+  @Test
+  fun `test toggle non-existent option throws exception`() {
+    myVimApi.option {
+      assertThrows<IllegalArgumentException> {
+        toggle("nonexistentoption")
+      }
     }
   }
 }

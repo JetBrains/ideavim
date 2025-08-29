@@ -126,3 +126,20 @@ abstract class OptionScope() {
    */
   fun String.split(): List<String> = split(",")
 }
+
+/**
+ * Toggles a boolean option value.
+ *
+ * Example:
+ * ```kotlin
+ * myVimApi.option {
+ *   toggle("ignorecase")  // true → false, false → true
+ * }
+ * ```
+ *
+ * @param name The name of the boolean option to toggle
+ */
+fun OptionScope.toggle(name: String) {
+  val current = get<Boolean>(name) ?: false
+  set(name, !current)
+}
