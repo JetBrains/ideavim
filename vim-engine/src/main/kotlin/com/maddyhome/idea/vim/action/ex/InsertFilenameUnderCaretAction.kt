@@ -24,7 +24,8 @@ class InsertFilenameUnderCaretAction : CommandLineActionHandler() {
   override fun execute(commandLine: VimCommandLine): Boolean {
     val editor = commandLine.editor
 
-    val range = injector.searchHelper.findFilenameAtOrFollowingCursor(editor, editor.primaryCaret())
+    val offset = injector.searchGroup.getCurrentIncsearchResultRange(editor)?.endOffset ?: editor.primaryCaret().offset
+    val range = injector.searchHelper.findFilenameAtOrFollowingCursor(editor, offset)
     if (range == null) {
       // E446: No file name under cursor
       injector.messages.showStatusBarMessage(commandLine.editor, injector.messages.message("E446"))

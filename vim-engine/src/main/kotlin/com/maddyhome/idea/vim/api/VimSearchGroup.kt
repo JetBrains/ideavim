@@ -206,4 +206,6 @@ interface VimSearchGroup {
    * Returns true if any text is selected in the visible editors, false otherwise.
    */
   fun isSomeTextHighlighted(): Boolean
+
+  fun getCurrentIncsearchResultRange(editor: VimEditor): TextRange?
 }

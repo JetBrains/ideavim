@@ -282,4 +282,65 @@ class InsertBigWordUnderCaretActionTest : VimExTestCase() {
     typeText(":adip<C-R><C-A>")
     assertExText("adip--adipiscing")
   }
+
+  @Test
+  fun `test inserts WORD under offset of end of incsearch range`() {
+    configureByText(
+      """
+      |  Lorem ipsum, dolor, sit amet,
+      |  consectetur adip${c}iscing elit
+      |  Sed in orci mauris.
+      |
+      |  Cras id tellus in ex imperdiet egestas.
+    """.trimMargin()
+    )
+    enterCommand("set incsearch")
+    typeText("/orci ma<C-R><C-A>")
+    assertExText("orci mamauris.")
+  }
+
+  @Test
+  fun `test inserts WORD literally under offset of end of incsearch range`() {
+    configureByText(
+      """
+      |  Lorem ipsum, dolor, sit amet,
+      |  consectetur adip${c}iscing elit
+      |  Sed in orci mauris.
+      |
+      |  Cras id tellus in ex imperdiet egestas.
+    """.trimMargin()
+    )
+    enterCommand("set incsearch")
+    typeText("/orci ma<C-R><C-R><C-A>")
+    assertExText("orci mamauris.")
+  }
+
+  @Test
+  fun `test inserts WORD following offset of end of incsearch range when incsearch is at end of word`() {
+    configureByText(
+      """
+      |  Lorem ipsum, dolor, sit amet,
+      |  consectetur adip${c}iscing elit
+      |  Sed in orci mauris.
+      |
+      |  Cras id tellus in ex imperdiet egestas.
+    """.trimMargin()
+    )
+    enterCommand("set incsearch")
+    typeText("/in orci<C-R><C-A>")
+    assertExText("in orcimauris.")
+  }
+
+  @Test
+  fun `test inserts punctuation following offset of end of incsearch range when incsearch is at end of word`() {
+    configureByText(
+      """|
+      |${c}  fun something() {
+      |  }
+      """.trimMargin()
+    )
+    enterCommand("set incsearch")
+    typeText("/something<C-R><C-A>")
+    assertExText("somethingsomething()")
+  }
 }

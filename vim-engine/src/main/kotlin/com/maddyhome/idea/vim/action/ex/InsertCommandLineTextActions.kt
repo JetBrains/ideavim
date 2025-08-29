@@ -45,6 +45,9 @@ open class InsertCommandLineTextActionBase(private val insertLiterally: Boolean)
     return true
   }
 
+  protected fun getStartOffset(editor: VimEditor) =
+    injector.searchGroup.getCurrentIncsearchResultRange(editor)?.endOffset ?: editor.primaryCaret().offset
+
   protected open fun getText(commandLine: VimCommandLine): String? = null
 
   protected fun replayKeys(editor: VimEditor, context: ExecutionContext, keys: List<KeyStroke>) {
@@ -129,21 +132,27 @@ class InsertRegisterLiterallyAction : InsertRegisterActionBase(insertLiterally =
 
 @CommandOrMotion(keys = ["<C-R><C-L>"], modes = [Mode.CMD_LINE])
 class InsertCurrentLineAction : InsertCommandLineTextActionBase(insertLiterally = false) {
-  override fun getText(commandLine: VimCommandLine) =
-    commandLine.editor.getLineText(commandLine.editor.primaryCaret().getBufferPosition().line)
+  override fun getText(commandLine: VimCommandLine): String {
+    val offset = getStartOffset(commandLine.editor)
+    val line = commandLine.editor.offsetToBufferPosition(offset).line
+    return commandLine.editor.getLineText(line)
+  }
 }
 
 @CommandOrMotion(keys = ["<C-R><C-R><C-L>", "<C-R><C-O><C-L>"], modes = [Mode.CMD_LINE])
 class InsertCurrentLineLiterallyAction : InsertCommandLineTextActionBase(insertLiterally = true) {
-  override fun getText(commandLine: VimCommandLine) =
-    commandLine.editor.getLineText(commandLine.editor.primaryCaret().getBufferPosition().line)
+  override fun getText(commandLine: VimCommandLine): String {
+    val offset = getStartOffset(commandLine.editor)
+    val line = commandLine.editor.offsetToBufferPosition(offset).line
+    return commandLine.editor.getLineText(line)
+  }
 }
 
 open class InsertWordUnderCaretActionBase(private val isBigWord: Boolean, insertLiterally: Boolean)
   : InsertCommandLineTextActionBase(insertLiterally) {
   override fun getText(commandLine: VimCommandLine): String? {
     val editor = commandLine.editor
-    val wordRange = injector.searchHelper.findWordAtOrFollowingCursor(editor, editor.primaryCaret(), isBigWord)
+    val wordRange = injector.searchHelper.findWordAtOrFollowingCursor(editor, getStartOffset(editor), isBigWord)
     if (wordRange == null) {
       // E348: No string under cursor
       injector.messages.showStatusBarMessage(editor, injector.messages.message("E348"))
