@@ -27,12 +27,12 @@ import org.junit.jupiter.api.TestInfo
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class ReplaceWithRegisterTest : VimTestCase() {
+class ReplaceWithRegisterNewTest : VimTestCase() {
 
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
-    enableExtensions("ReplaceWithRegister")
+    enableExtensionsNewApi("ReplaceWithRegisterNew")
   }
 
   @Test
@@ -252,7 +252,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     configureByText(text)
     VimPlugin.getRegister().setKeys('k', injector.parser.parseKeys("one"))
     typeText(injector.parser.parseKeys("\"kgrr"))
-    assertState("${c}one\n")
+    assertState("${c}one")
   }
 
   // --------------------------------------- grr --------------------------
@@ -355,7 +355,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
             one
             one two three
             one two three
-            
       """.trimIndent(),
     )
   }
@@ -426,7 +425,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
             I found it in a legendary land
             where it was settled on some sodden sand
             where it was settled on some sodden sand
-            
       """.trimIndent(),
     )
   }

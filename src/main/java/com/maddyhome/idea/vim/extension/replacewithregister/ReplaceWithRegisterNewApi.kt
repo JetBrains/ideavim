@@ -16,7 +16,7 @@ import com.intellij.vim.api.models.Range
 import com.intellij.vim.api.models.TextType
 import com.intellij.vim.api.scopes.editor.caret.CaretTransaction
 
-private const val PLUGIN_NAME: String = "ReplaceWithRegister"
+private const val PLUGIN_NAME: String = "ReplaceWithRegisterNew"
 
 @VimPlugin(name = PLUGIN_NAME)
 fun VimApi.init() {

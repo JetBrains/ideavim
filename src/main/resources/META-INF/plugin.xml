@@ -311,6 +311,19 @@
       </aliases>
     </vimExtension>
 
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.replacewithregister.ReplaceWithRegister"
+                  name="ReplaceWithRegister">
+      <aliases>
+        <alias name="https://github.com/vim-scripts/ReplaceWithRegister"/>
+        <alias name="vim-scripts/ReplaceWithRegister"/>
+        <alias name="ReplaceWithRegister"/>
+        <alias name="https://github.com/inkarkat/vim-ReplaceWithRegister"/>
+        <alias name="inkarkat/vim-ReplaceWithRegister"/>
+        <alias name="vim-ReplaceWithRegister"/>
+        <alias name="https://www.vim.org/scripts/script.php?script_id=2703"/>
+      </aliases>
+    </vimExtension>
+
     <vimExtension implementation="com.maddyhome.idea.vim.extension.exchange.VimExchangeExtension" name="exchange">
       <aliases>
         <alias name="https://github.com/tommcdo/vim-exchange"/>
