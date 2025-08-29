@@ -223,18 +223,26 @@ interface VimApi {
    *
    * Example usage:
    * ```kotlin
+   * // Get option value
+   * val history = option { get<Int>("history") }
+   * 
+   * // Set option value and return result
+   * val wasSet = option { 
+   *     set("number", true)
+   *     true
+   * }
+   * 
+   * // Multiple operations
    * option {
-   *     // Get option value
-   *     get<Boolean>("number")
-   *
-   *     // Set option value
-   *     set<Boolean>("number", true)
+   *     set("ignorecase", true)
+   *     append("virtualedit", "block")
    * }
    * ```
    *
    * @param block The code block to execute within the option scope
+   * @return The result of the block execution
    */
-  fun option(block: OptionScope.() -> Unit)
+  fun <T> option(block: OptionScope.() -> T): T
 
   /**
    * Provides access to Vim's digraph functionality.

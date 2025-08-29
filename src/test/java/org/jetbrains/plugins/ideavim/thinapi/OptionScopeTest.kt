@@ -53,6 +53,17 @@ class OptionScopeTest : VimTestCase() {
   }
 
   @Test
+  fun `test option function returns value`() {
+    val history = myVimApi.option { get<Int>("history") }
+    assertEquals(50, history) // Default value
+
+    myVimApi.option { set<Int>("history", 100) }
+    
+    val newHistory = myVimApi.option { get<Int>("history") }
+    assertEquals(100, newHistory)
+  }
+
+  @Test
   fun `test get option with string value`() {
     myVimApi.option {
       set<String>("selection", "inclusive")
