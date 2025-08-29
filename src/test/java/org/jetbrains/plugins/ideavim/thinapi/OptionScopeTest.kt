@@ -566,4 +566,65 @@ class OptionScopeTest : VimTestCase() {
       assertEquals(50, get<Int>("history"))
     }
   }
+
+  @Test
+  fun `test split with multiple values`() {
+    myVimApi.option {
+      set<String>("virtualedit", "block,all,insert")
+      val values = get<String>("virtualedit")?.split()
+      assertEquals(listOf("block", "all", "insert"), values)
+    }
+  }
+
+  @Test
+  fun `test split with single value`() {
+    myVimApi.option {
+      set<String>("virtualedit", "all")
+      val values = get<String>("virtualedit")?.split()
+      assertEquals(listOf("all"), values)
+    }
+  }
+
+  @Test
+  fun `test split with empty string`() {
+    myVimApi.option {
+      set<String>("virtualedit", "")
+      val values = get<String>("virtualedit")?.split()
+      assertEquals(listOf(""), values)  // Note: empty string splits to [""], not []
+    }
+  }
+
+  @Test
+  fun `test split with whichwrap option`() {
+    myVimApi.option {
+      set<String>("whichwrap", "b,s,h,l,<,>,[,]")
+      val values = get<String>("whichwrap")?.split()
+      assertEquals(listOf("b", "s", "h", "l", "<", ">", "[", "]"), values)
+    }
+  }
+
+  @Test
+  fun `test split integration with option manipulation`() {
+    myVimApi.option {
+      // Start with some values
+      set<String>("virtualedit", "block,all")
+      
+      // Get current values as list
+      val currentValues = get<String>("virtualedit")?.split()?.toMutableList() ?: mutableListOf()
+      
+      // Add a new value if not present
+      if (!currentValues.contains("insert")) {
+        currentValues.add("insert")
+        set<String>("virtualedit", currentValues.joinToString(","))
+      }
+      
+      assertEquals("block,all,insert", get<String>("virtualedit"))
+      
+      // Remove a value
+      currentValues.remove("all")
+      set<String>("virtualedit", currentValues.joinToString(","))
+      
+      assertEquals("block,insert", get<String>("virtualedit"))
+    }
+  }
 }

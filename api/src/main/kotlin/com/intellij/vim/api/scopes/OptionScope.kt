@@ -109,4 +109,20 @@ abstract class OptionScope() {
    * @throws IllegalArgumentException if the option doesn't exist
    */
   abstract fun reset(name: String)
+
+  /**
+   * Extension function to split a comma-separated option value into a list.
+   * This is useful for processing list options like virtualedit, whichwrap, etc.
+   *
+   * Example:
+   * ```kotlin
+   * myVimApi.option {
+   *   val values = get<String>("virtualedit")?.split() ?: emptyList()
+   *   // "block,all" → ["block", "all"]
+   *   // "" → [""]
+   *   // "all" → ["all"]
+   * }
+   * ```
+   */
+  fun String.split(): List<String> = split(",")
 }
