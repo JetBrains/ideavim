@@ -23,12 +23,62 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-## End of changelog file maintenance
+[To Be Released]
+=================
 
-Since version 2.9.0, the changelog can be found on YouTrack
+### Features:
+* Added comprehensive Plugin API for writing IdeaVim extensions
+* Added support for f13-f24 function keys [VIM-4004](https://youtrack.jetbrains.com/issue/VIM-4004)
+* Extended NERDTree support to Tree components other than Project
+* Added support for G and gg motions in NERDTree [VIM-3791](https://youtrack.jetbrains.com/issue/VIM-3791)
+* Added PlugEnable and PlugDisable commands for managing extensions
 
-* [To Be Released](https://youtrack.jetbrains.com/issues/VIM?q=%23%7BReady%20To%20Release%7D%20)
-* [Version Fixes](https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20sort%20by:%20%7BFix%20versions%7D%20asc)
+### Fixes:
+* [VIM-3266](https://youtrack.jetbrains.com/issue/VIM-3266) Set FileSaveCloseAction to OTHER_SELF_SYNCHRONIZED
+* [VIM-3044](https://youtrack.jetbrains.com/issue/VIM-3044) Correct the behavior of I in (linewise) Visual mode
+* [VIM-2375](https://youtrack.jetbrains.com/issue/VIM-2375) Do not save file with ZQ
+* [VIM-2413](https://youtrack.jetbrains.com/issue/VIM-2413) Correct the range of line-wise case change commands
+* [VIM-2142](https://youtrack.jetbrains.com/issue/VIM-2142) Support gU and gu in VISUAL mode
+* Fixed count accepted as valid in text object
+* Fixed calculation of visual column with inlays
+* Fixed initialising non-default colorcolumn option
+* Fixed command line missing due to empty colour
+* Do not expand Live Templates in Normal mode
+
+### Changes:
+* Improved compatibility with Next Edit Suggestions
+* Enhanced SpeedSearch functionality in NERDTree
+* Reset caret shape on Escape key
+* Order IDE actions for Tab before Vim actions
+
+### Merged PRs:
+* [1287](https://github.com/JetBrains/ideavim/pull/1287) by [app/jetbrains-junie](https://github.com/app/jetbrains-junie): Update JetBrains Junie Workflow
+* [1286](https://github.com/JetBrains/ideavim/pull/1286) by [app/jetbrains-junie](https://github.com/app/jetbrains-junie): Initialize JetBrains Junie 🚀
+* [1284](https://github.com/JetBrains/ideavim/pull/1284) by [AlexPl292](https://github.com/AlexPl292): Add Claude Code GitHub Workflow
+* [1280](https://github.com/JetBrains/ideavim/pull/1280) by [wxh06](https://github.com/wxh06): Improve SpeedSearch and disposal of NERDTree
+* [1279](https://github.com/JetBrains/ideavim/pull/1279) by [citizenmatt](https://github.com/citizenmatt): Fix count accepted as valid in text object
+* [1276](https://github.com/JetBrains/ideavim/pull/1276) by [wxh06](https://github.com/wxh06): Indicate error when an unrecognized key sequence is entered in NERDTree
+* [1275](https://github.com/JetBrains/ideavim/pull/1275) by [citizenmatt](https://github.com/citizenmatt): Fix a couple of bugs calculating inlay offsets
+* [1274](https://github.com/JetBrains/ideavim/pull/1274) by [wxh06](https://github.com/wxh06): Extend NERDTree support to Tree components other than Project
+* [1272](https://github.com/JetBrains/ideavim/pull/1272) by [citizenmatt](https://github.com/citizenmatt): Improve compatibility with Next Edit Suggestions
+* [1271](https://github.com/JetBrains/ideavim/pull/1271) by [NaMinhyeok](https://github.com/NaMinhyeok): Fix Gradle build deprecation warnings and improve type safety
+* [1269](https://github.com/JetBrains/ideavim/pull/1269) by [citizenmatt](https://github.com/citizenmatt): Fix command line missing due to empty colour
+* [1262](https://github.com/JetBrains/ideavim/pull/1262) by [citizenmatt](https://github.com/citizenmatt): Fix initialising non-default colorcolumn option
+* [1261](https://github.com/JetBrains/ideavim/pull/1261) by [vumi19](https://github.com/vumi19): Plugin Registration
+* [1260](https://github.com/JetBrains/ideavim/pull/1260) by [vumi19](https://github.com/vumi19): Docs for the new Plugin API
+* [1253](https://github.com/JetBrains/ideavim/pull/1253) by [citizenmatt](https://github.com/citizenmatt): Handle `:k{mark}` without separating whitespace
+* [1246](https://github.com/JetBrains/ideavim/pull/1246) by [vumi19](https://github.com/vumi19): API for writing plugins
+* [1245](https://github.com/JetBrains/ideavim/pull/1245) by [wxh06](https://github.com/wxh06): Refactor NERDTree implementation
+* [1244](https://github.com/JetBrains/ideavim/pull/1244) by [citizenmatt](https://github.com/citizenmatt): Fix issues with new islands theme
+* [1230](https://github.com/JetBrains/ideavim/pull/1230) by [citizenmatt](https://github.com/citizenmatt): Refactor command line to support control characters
+* [1229](https://github.com/JetBrains/ideavim/pull/1229) by [wxh06](https://github.com/wxh06): Fix(VIM-3266): Set `FileSaveCloseAction` to `OTHER_SELF_SYNCHRONIZED`
+* [1228](https://github.com/JetBrains/ideavim/pull/1228) by [wxh06](https://github.com/wxh06): Fix(VIM-3044): correct the behavior of `I` in (linewise) Visual mode
+* [1227](https://github.com/JetBrains/ideavim/pull/1227) by [wxh06](https://github.com/wxh06): Fix(VIM-2375): do not save file with `ZQ`
+* [1226](https://github.com/JetBrains/ideavim/pull/1226) by [wxh06](https://github.com/wxh06): Fix(VIM-2413): correct the range of line-wise case change commands
+* [1224](https://github.com/JetBrains/ideavim/pull/1224) by [wxh06](https://github.com/wxh06): Fix(VIM-2142): support `gU` and `gu` in VISUAL mode
+* [1223](https://github.com/JetBrains/ideavim/pull/1223) by [zuberol](https://github.com/zuberol): Feat(VIM-3791): support for "G" and "gg" motions inside the NERDtree
+
+**Changelog was not maintained for versions 2.10.0 through 2.27.0**
 
 ## 2.9.0, 2024-02-20
 
