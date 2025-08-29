@@ -45,7 +45,7 @@ The `VimApi` class is the main entry point for interacting with the Vim editor. 
 | `outputPanel(block: OutputPanelScope.() -> Unit)` | Executes a block of code in the output panel scope. | None |
 | `modalInput(): ModalInput` | Gets the modal input scope. | The modal input scope. |
 | `commandLine(block: CommandLineScope.() -> Unit)` | Executes a block of code in the command line scope. | None |
-| `option(block: OptionScope.() -> Unit)` | Executes a block of code in the option scope. | None |
+| `option<T>(block: OptionScope.() -> T): T` | Executes a block of code in the option scope. | The result of the block execution. |
 | `digraph(block: DigraphScope.() -> Unit)` | Executes a block of code in the digraph scope. | None |
 
 #### Tab Management
@@ -350,17 +350,87 @@ The `CaretTransaction` interface extends `CaretRead` and provides methods for mo
 
 ## OptionScope
 
-The `OptionScope` class provides methods for getting and setting Vim options. It supports different scopes for options (global, local, and effective) and allows for type-safe access to option values.
+The `OptionScope` interface provides comprehensive methods for managing Vim options. It supports different scopes for options (global, local, and effective) and allows for type-safe access to option values. The `option` function returns a value, making it easy to retrieve option values directly.
 
-### Methods
+### Core Methods
 
-| Method | Description | Return Value |
-|--------|-------------|--------------|
-| `get<T>(name: String): T?` | Gets the value of an option with the specified type. In Vim, options can be accessed with the `&` prefix. Example: `&ignorecase` returns the value of the 'ignorecase' option. | The value of the option, or null if the option doesn't exist or isn't of the specified type. |
-| `setGlobal<T>(name: String, value: T): Boolean` | Sets the global value of an option with the specified type. In Vim, this is equivalent to `:setglobal option=value`. Example: `:setglobal ignorecase` or `let &g:ignorecase = 1` | True if the option was set successfully, false otherwise. |
-| `setLocal<T>(name: String, value: T): Boolean` | Sets the local value of an option with the specified type. In Vim, this is equivalent to `:setlocal option=value`. Example: `:setlocal ignorecase` or `let &l:ignorecase = 1` | True if the option was set successfully, false otherwise. |
-| `set<T>(name: String, value: T): Boolean` | Sets the effective value of an option with the specified type. In Vim, this is equivalent to `:set option=value`. Example: `:set ignorecase` or `let &ignorecase = 1` | True if the option was set successfully, false otherwise. |
-| `reset(name: String): Boolean` | Resets an option to its default value. In Vim, this is equivalent to `:set option&`. Example: `:set ignorecase&` resets the 'ignorecase' option to its default value. | True if the option was reset successfully, false otherwise. |
+| Method                                 | Description                                                                                                                                                                      | Return Value                                                                                           |
+|----------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
+| `get<T>(name: String): T`              | Gets the value of an option with the specified type. In Vim, options can be accessed with the `&` prefix. Example: `&ignorecase` returns the value of the 'ignorecase' option.   | The value of the option. Throws IllegalArgumentException if the option doesn't exist or type is wrong. |
+| `set<T>(name: String, value: T)`       | Sets the effective value of an option with the specified type. In Vim, this is equivalent to `:set option=value`. Example: `:set ignorecase` or `let &ignorecase = 1`            | None                                                                                                   |
+| `setGlobal<T>(name: String, value: T)` | Sets the global value of an option with the specified type. In Vim, this is equivalent to `:setglobal option=value`. Example: `:setglobal ignorecase` or `let &g:ignorecase = 1` | None                                                                                                   |
+| `setLocal<T>(name: String, value: T)`  | Sets the local value of an option with the specified type. In Vim, this is equivalent to `:setlocal option=value`. Example: `:setlocal ignorecase` or `let &l:ignorecase = 1`    | None                                                                                                   |
+| `reset(name: String)`                  | Resets an option to its default value. In Vim, this is equivalent to `:set option&`. Example: `:set ignorecase&` resets the 'ignorecase' option to its default value.            | None                                                                                                   |
+
+### List Option Methods
+
+These extension functions provide convenient ways to manipulate comma-separated list options (like `virtualedit`, `whichwrap`, etc.):
+
+| Method                                         | Description                                                 | Vim Equivalent       |
+|------------------------------------------------|-------------------------------------------------------------|----------------------|
+| `append(name: String, vararg values: String)`  | Appends values to a list option. Duplicates are not added.  | `:set option+=value` |
+| `prepend(name: String, vararg values: String)` | Prepends values to a list option. Duplicates are not added. | `:set option^=value` |
+| `remove(name: String, vararg values: String)`  | Removes values from a list option.                          | `:set option-=value` |
+
+### Utility Methods
+
+| Method                         | Description                                                             | Return Value    |
+|--------------------------------|-------------------------------------------------------------------------|-----------------|
+| `toggle(name: String)`         | Toggles a boolean option value.                                         | None            |
+| `String.split(): List<String>` | Extension function to split a comma-separated option value into a list. | List of strings |
+
+### Usage Examples
+
+```kotlin
+// Getting option values
+val history = myVimApi.option { get<Int>("history") }
+val ignoreCase = myVimApi.option { get<Boolean>("ignorecase") }
+
+// Setting options
+myVimApi.option {
+    set("number", true)          // Line numbers
+    setGlobal("history", 100)    // Command history
+    setLocal("tabstop", 4)       // Tab width for current buffer
+}
+
+// Working with list options
+myVimApi.option {
+    // Add values to a list option
+    append("virtualedit", "block", "onemore")
+    
+    // Remove values from a list option
+    remove("virtualedit", "block")
+    
+    // Prepend values to a list option
+    prepend("whichwrap", "b", "s")
+}
+
+// Toggle boolean options
+myVimApi.option {
+    toggle("ignorecase")  // true → false or false → true
+}
+
+// Reset to default value
+myVimApi.option {
+    reset("tabstop")  // Reset to default value
+}
+
+// Process list options
+myVimApi.option {
+    val virtualEditModes = get<String>("virtualedit").split()
+    // "block,all" → ["block", "all"]
+}
+
+// Complex operations with return value
+val isIgnoreCaseEnabled = myVimApi.option {
+    val current = get<Boolean>("ignorecase")
+    if (!current) {
+        set("ignorecase", true)
+        set("smartcase", true)
+    }
+    current
+}
+```
 
 ## OutputPanelScope
 
