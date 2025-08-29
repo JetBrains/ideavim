@@ -225,4 +225,60 @@ class InsertFilenameUnderCaretActionTest : VimExTestCase() {
     typeText(":edit /Users<C-R><C-F>")
     assertExText("edit /Users/Users/JasonIsaacs/Documents/hello.txt")
   }
+
+  @Test
+  fun `test inserts filename at offset of end of incsearch range`() {
+    configureByText(
+      """
+      |Lorem ip${c}sum dolor sit amet
+      |consectetur /Users/JasonIsaacs/Documents/hello.txt adipiscing elit
+      |sed in orci mauris.
+    """.trimMargin()
+    )
+    enterCommand("set incsearch")
+    typeText("/tur \\/U<C-R><C-F>")
+    assertExText("tur \\/U/Users/JasonIsaacs/Documents/hello.txt")
+  }
+
+  @Test
+  fun `test inserts filename literally at offset of end of incsearch range`() {
+    configureByText(
+      """
+      |Lorem ip${c}sum dolor sit amet
+      |consectetur /Users/JasonIsaacs/Documents/hello.txt adipiscing elit
+      |sed in orci mauris.
+    """.trimMargin()
+    )
+    enterCommand("set incsearch")
+    typeText("/tur \\/U<C-R><C-R><C-F>")
+    assertExText("tur \\/U/Users/JasonIsaacs/Documents/hello.txt")
+  }
+
+  @Test
+  fun `test inserts filename following offset of end of incsearch range`() {
+    configureByText(
+      """
+      |Lorem ip${c}sum dolor sit amet
+      |consectetur /Users/JasonIsaacs/Documents/hello.txt adipiscing elit
+      |sed in orci mauris.
+    """.trimMargin()
+    )
+    enterCommand("set incsearch")
+    typeText("/tur<C-R><C-F>")
+    assertExText("tur/Users/JasonIsaacs/Documents/hello.txt")
+  }
+
+  @Test
+  fun `test inserts filename following offset of end of incsearch range across multiple lines`() {
+    configureByText(
+      """
+      |Lorem ip${c}sum dolor sit amet
+      |consectetur /Users/JasonIsaacs/Documents/hello.txt adipiscing elit
+      |sed in orci mauris.
+    """.trimMargin()
+    )
+    enterCommand("set incsearch")
+    typeText("/amet\\n.*tur<C-R><C-F>")
+    assertExText("amet\\n.*tur/Users/JasonIsaacs/Documents/hello.txt")
+  }
 }

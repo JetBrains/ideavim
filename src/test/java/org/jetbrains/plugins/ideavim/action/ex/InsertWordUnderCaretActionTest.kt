@@ -269,4 +269,59 @@ class InsertWordUnderCaretActionTest : VimExTestCase() {
     typeText(":xadip<C-R><C-W>")
     assertExText("xadipadipiscing")
   }
+
+  @Test
+  fun `test inserts word under offset of end of incsearch range`() {
+    configureByText("""
+      |  Lorem ipsum, dolor, sit amet,
+      |  consectetur adip${c}iscing elit
+      |  Sed in orci mauris.
+      |
+      |  Cras id tellus in ex imperdiet egestas.
+    """.trimMargin())
+    enterCommand("set incsearch")
+    typeText("/orci ma<C-R><C-W>")
+    assertExText("orci mauris")
+  }
+
+  @Test
+  fun `test inserts word literally under offset of end of incsearch range`() {
+    configureByText("""
+      |  Lorem ipsum, dolor, sit amet,
+      |  consectetur adip${c}iscing elit
+      |  Sed in orci mauris.
+      |
+      |  Cras id tellus in ex imperdiet egestas.
+    """.trimMargin())
+    enterCommand("set incsearch")
+    typeText("/orci ma<C-R><C-R><C-W>")
+    assertExText("orci mauris")
+  }
+
+  @Test
+  fun `test inserts word following offset of end of incsearch range when incsearch is at end of word`() {
+    configureByText("""
+      |  Lorem ipsum, dolor, sit amet,
+      |  consectetur adip${c}iscing elit
+      |  Sed in orci mauris.
+      |
+      |  Cras id tellus in ex imperdiet egestas.
+    """.trimMargin())
+    enterCommand("set incsearch")
+    typeText("/in orci<C-R><C-W>")
+    assertExText("in orcimauris")
+  }
+
+  @VimBehaviorDiffers("()")
+  @Test
+  fun `test inserts punctuation following offset of end of incsearch range when incsearch is at end of word`() {
+    configureByText("""|
+      |${c}  fun something() {
+      |  }
+      """.trimMargin()
+    )
+    enterCommand("set incsearch")
+    typeText("/something<C-R><C-W>")
+    assertExText("something(")
+  }
 }

@@ -150,4 +150,32 @@ class InsertCurrentLineLiterallyActionTest : VimExTestCase() {
     typeText(":<C-R><C-R><C-L>")
     assertRenderedExText("hello^L world")
   }
+
+  @Test
+  fun `test inserts current line literally at offset of end of incsearch range`() {
+    configureByText("""
+      |  Lorem ipsum, dolor, sit amet,
+      |  consectetur adip${c}iscing elit
+      |  Sed in orci mauris.
+      |
+      |  Cras id tellus in ex imperdiet egestas.
+    """.trimMargin())
+    enterCommand("set incsearch")
+    typeText("/orci ma<C-R><C-R><C-L>")
+    assertExText("orci ma  Sed in orci mauris.")
+  }
+
+  @Test
+  fun `test inserts current line literally at offset of end of incsearch range across multiple lines`() {
+    configureByText("""
+      |  Lorem ipsum, dolor, sit amet,
+      |  consectetur adip${c}iscing elit
+      |  Sed in orci mauris.
+      |
+      |  Cras id tellus in ex imperdiet egestas.
+    """.trimMargin())
+    enterCommand("set incsearch")
+    typeText("/elit\\n.*ma<C-R><C-O><C-L>")
+    assertExText("elit\\n.*ma  Sed in orci mauris.")
+  }
 }
