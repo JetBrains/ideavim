@@ -36,7 +36,7 @@ interface OptionScope {
    * @return The value of the option
    * @throws IllegalArgumentException if the type is wrong or the option doesn't exist
    */
-  fun <T> getOptionValue(name: String, type: KType): T?
+  fun <T> getOptionValue(name: String, type: KType): T
 
   /**
    * Sets an option value with the specified scope.
@@ -101,7 +101,7 @@ interface OptionScope {
  * @return The value of the option
  * @throws IllegalArgumentException if the type is wrong or the option doesn't exist
  */
-inline fun <reified T> OptionScope.get(name: String): T? {
+inline fun <reified T> OptionScope.get(name: String): T {
   val kType: KType = typeOf<T>()
   return getOptionValue(name, kType)
 }
@@ -167,7 +167,7 @@ inline fun <reified T> OptionScope.set(name: String, value: T) {
  * @param name The name of the boolean option to toggle
  */
 fun OptionScope.toggle(name: String) {
-  val current = get<Boolean>(name) ?: false
+  val current = get<Boolean>(name)
   set(name, !current)
 }
 
@@ -189,7 +189,7 @@ fun OptionScope.toggle(name: String) {
  * @param values The values to append (duplicates will be ignored)
  */
 fun OptionScope.append(name: String, vararg values: String) {
-  val current = get<String>(name) ?: ""
+  val current = get<String>(name)
   val currentList = if (current.isEmpty()) emptyList() else current.split(",")
   val currentSet = currentList.toSet()
   val valuesToAdd = values.filterNot { it in currentSet }
@@ -215,7 +215,7 @@ fun OptionScope.append(name: String, vararg values: String) {
  * @param values The values to prepend (duplicates will be ignored)
  */
 fun OptionScope.prepend(name: String, vararg values: String) {
-  val current = get<String>(name) ?: ""
+  val current = get<String>(name)
   val currentList = if (current.isEmpty()) emptyList() else current.split(",")
   val currentSet = currentList.toSet()
   val valuesToAdd = values.filterNot { it in currentSet }
@@ -239,7 +239,7 @@ fun OptionScope.prepend(name: String, vararg values: String) {
  * @param values The values to remove
  */
 fun OptionScope.remove(name: String, vararg values: String) {
-  val current = get<String>(name) ?: ""
+  val current = get<String>(name)
   val currentList = if (current.isEmpty()) emptyList() else current.split(",")
   val valuesToRemove = values.toSet()
   val newList = currentList.filterNot { it in valuesToRemove }
