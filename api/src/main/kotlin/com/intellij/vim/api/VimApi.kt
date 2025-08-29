@@ -24,7 +24,10 @@ import kotlin.reflect.typeOf
 
 /**
  * Entry point of the Vim API
+ *
+ * The API is currently in experimental status and not suggested to be used.
  */
+@ApiStatus.Experimental
 @VimApiDsl
 interface VimApi {
   /**
