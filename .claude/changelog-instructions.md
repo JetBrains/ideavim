@@ -91,6 +91,7 @@ git log --oneline <previous-tag>..<new-tag>
   - Use web search to find the most relevant official sources
 - **Include references**: Add [VIM-XXXX] for YouTrack tickets, (#XXX) for PRs
 - **Group logically**: Features, Fixes, Changes, Merged PRs
+- **No duplication**: Each change appears in exactly ONE subsection - don't repeat items across categories
 - **Use consistent tense**: Past tense for completed work
 
 ## Examples of Good Entries
@@ -123,10 +124,15 @@ Always put the ticket link FIRST, then the description:
 
 ### For Features:
 - Without ticket: Just the description
-- With ticket: Description followed by pipe and ticket link:
-```
-* Feature description | [VIM-XXXX](https://youtrack.jetbrains.com/issue/VIM-XXXX)
-```
+- With ticket: Can use either format:
+  - Description with pipe: `* Feature description | [VIM-XXXX](https://youtrack.jetbrains.com/issue/VIM-XXXX)`
+  - Link first (like fixes): `* [VIM-XXXX](https://youtrack.jetbrains.com/issue/VIM-XXXX) Feature description`
+
+### Avoid Duplication:
+- **Each change should appear in only ONE subsection**
+- If a feature is listed in Features, don't repeat it in Fixes
+- If a bug fix is in Fixes, don't list it again elsewhere
+- Choose the most appropriate category for each change
 
 ## Process
 
