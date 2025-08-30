@@ -626,6 +626,10 @@ Contributors:
   [![icon][github]](https://github.com/NaMinhyeok)
   &nbsp;
   Na Minhyeok
+* [![icon][mail]](mailto:201638009+jetbrains-junie[bot]@users.noreply.github.com)
+  [![icon][github]](https://github.com/apps/jetbrains-junie)
+  &nbsp;
+  jetbrains-junie[bot]
 
 Previous contributors:
 
