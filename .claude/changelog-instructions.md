@@ -68,11 +68,18 @@ git log --oneline <previous-tag>..<new-tag>
 - Test-only changes
 - **API module changes** (while in experimental status) - Do not log changes to the `api` module as it's currently experimental
   - Note: This exclusion should be removed once the API status is no longer experimental
+- **Internal code changes** - Do not log coding changes that users cannot see or experience
+  - Refactoring, code cleanup, internal architecture changes
+  - Performance optimizations (unless they fix a noticeable user issue)
+  - Remember: The changelog is for users, not developers
 
 ## Writing Style
 
 - **Be concise**: One line per change when possible
 - **User-focused**: Describe what changed from user's perspective
+  - Write for end users, not developers
+  - Focus on visible behavior changes, new commands, fixed issues users experience
+  - Avoid technical implementation details
 - **Include references**: Add [VIM-XXXX] for YouTrack tickets, (#XXX) for PRs
 - **Group logically**: Features, Fixes, Changes, Merged PRs
 - **Use consistent tense**: Past tense for completed work
