@@ -55,6 +55,12 @@ gh pr list --state merged --limit 100 --json number,title,author,mergedAt
 git log --oneline <previous-tag>..<new-tag>
 ```
 
+**Important**: Don't just read commit messages - examine the actual changes:
+- Use `git show <commit-hash>` to see the full commit content
+- Look at modified test files to find specific examples of fixed commands
+- Check the actual code changes to understand what was really fixed or added
+- Tests often contain the best examples for changelog entries (e.g., exact commands that now work)
+
 ### 4. What to Include
 - **Features**: New functionality with [VIM-XXXX] ticket numbers if available
 - **Bug Fixes**: Fixed issues with [VIM-XXXX] ticket references
