@@ -145,6 +145,7 @@ Always put the ticket link FIRST, then the description:
 - **Include PRs from external contributors** even if they're internal changes or refactoring
 - **List significant community contributions** regardless of whether they're user-visible
 - **Format**: PR number, author, and brief description
+- **Use PR title as-is**: Take the description directly from the PR title, don't regenerate or rewrite it
 - **Purpose**: Acknowledge community contributions and provide PR tracking
 - The "user-visible only" rule does NOT apply to this section
 
