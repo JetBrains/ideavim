@@ -23,12 +23,32 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-## End of changelog file maintenance
+## [To Be Released]
 
-Since version 2.9.0, the changelog can be found on YouTrack
+**Changelog was not maintained for versions 2.10.0 through 2.27.0**
 
-* [To Be Released](https://youtrack.jetbrains.com/issues/VIM?q=%23%7BReady%20To%20Release%7D%20)
-* [Version Fixes](https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20sort%20by:%20%7BFix%20versions%7D%20asc)
+### Features:
+* Extended NERDTree support to Tree components beyond just Project view
+* Added support for ActivateNode in NERDTree Everywhere 
+* Support for disabling extended NERDTree without requiring IDE restart
+* [VIM-4004](https://youtrack.jetbrains.com/issue/VIM-4004) Added support for f13-f24 function keys
+
+### Fixes:
+* [VIM-3981](https://youtrack.jetbrains.com/issue/VIM-3981) Fixed `:set noNERDTree` command to work correctly
+* Fixed count validation in text object operations
+* Fixed calculation of visual column position with inlay hints
+* Fixed normalising visual column calculations
+* Improved Tab key handling in Normal mode - Live Templates no longer expand inappropriately
+* Fixed caret shape reset on Escape key
+* Clear NERDTree's KeyStroke buffer after pressing Escape
+* Fixed colorcolumn option initialization for non-default values
+
+### Merged PRs:
+* [1280](https://github.com/JetBrains/ideavim/pull/1280) by [wxh06](https://github.com/wxh06): Improve SpeedSearch and disposal of NERDTree
+* [1279](https://github.com/JetBrains/ideavim/pull/1279) by [citizenmatt](https://github.com/citizenmatt): Fix count accepted as valid in text object
+* [1276](https://github.com/JetBrains/ideavim/pull/1276) by [wxh06](https://github.com/wxh06): Indicate error when an unrecognized key sequence is entered in NERDTree
+* [1275](https://github.com/JetBrains/ideavim/pull/1275) by [citizenmatt](https://github.com/citizenmatt): Fix a couple of bugs calculating inlay offsets
+* [1274](https://github.com/JetBrains/ideavim/pull/1274) by [wxh06](https://github.com/wxh06): Extend NERDTree support to Tree components other than Project
 
 ## 2.9.0, 2024-02-20
 

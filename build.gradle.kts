@@ -331,10 +331,30 @@ intellijPlatform {
     name = "IdeaVim"
     changeNotes.set(
       """
-        We’ve launched a program to reward quality contributions with a one-year All Products Pack subscription. Learn more at: <a href="https://github.com/JetBrains/ideavim/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a> .
-        <br/>
-        <br/>
-        <a href="https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20Fix%20versions:%20${version.get()}">Changelog</a>
+        <b>Features:</b><br>
+        • Extended NERDTree support to Tree components beyond just Project view<br>
+        • Added support for ActivateNode in NERDTree Everywhere<br>
+        • Support for disabling extended NERDTree without requiring IDE restart<br>
+        • <a href="https://youtrack.jetbrains.com/issue/VIM-4004">VIM-4004</a> Added support for f13-f24 function keys<br>
+        <br>
+        <b>Fixes:</b><br>
+        • <a href="https://youtrack.jetbrains.com/issue/VIM-3981">VIM-3981</a> Fixed <code>:set noNERDTree</code> command to work correctly<br>
+        • Fixed count validation in text object operations<br>
+        • Fixed calculation of visual column position with inlay hints<br>
+        • Fixed normalising visual column calculations<br>
+        • Improved Tab key handling in Normal mode - Live Templates no longer expand inappropriately<br>
+        • Fixed caret shape reset on Escape key<br>
+        • Clear NERDTree's KeyStroke buffer after pressing Escape<br>
+        • Fixed colorcolumn option initialization for non-default values<br>
+        <br>
+        <b>Merged PRs:</b><br>
+        • <a href="https://github.com/JetBrains/ideavim/pull/1280">1280</a> by <a href="https://github.com/wxh06">wxh06</a>: Improve SpeedSearch and disposal of NERDTree<br>
+        • <a href="https://github.com/JetBrains/ideavim/pull/1279">1279</a> by <a href="https://github.com/citizenmatt">citizenmatt</a>: Fix count accepted as valid in text object<br>
+        • <a href="https://github.com/JetBrains/ideavim/pull/1276">1276</a> by <a href="https://github.com/wxh06">wxh06</a>: Indicate error when an unrecognized key sequence is entered in NERDTree<br>
+        • <a href="https://github.com/JetBrains/ideavim/pull/1275">1275</a> by <a href="https://github.com/citizenmatt">citizenmatt</a>: Fix a couple of bugs calculating inlay offsets<br>
+        • <a href="https://github.com/JetBrains/ideavim/pull/1274">1274</a> by <a href="https://github.com/wxh06">wxh06</a>: Extend NERDTree support to Tree components other than Project<br>
+        <br>
+        We've launched a program to reward quality contributions with a one-year All Products Pack subscription. Learn more at: <a href="https://github.com/JetBrains/ideavim/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a> .
         """.trimIndent()
     )
 
