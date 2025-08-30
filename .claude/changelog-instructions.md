@@ -80,6 +80,10 @@ git log --oneline <previous-tag>..<new-tag>
   - Write for end users, not developers
   - Focus on visible behavior changes, new commands, fixed issues users experience
   - Avoid technical implementation details
+- **Include examples** when helpful:
+  - For fixes: Show the command/operation that now works correctly
+  - For features: Demonstrate the new commands or functionality
+  - Example: "Fixed `ci"` command in empty strings" or "Added support for `gn` text object"
 - **Include references**: Add [VIM-XXXX] for YouTrack tickets, (#XXX) for PRs
 - **Group logically**: Features, Fixes, Changes, Merged PRs
 - **Use consistent tense**: Past tense for completed work
@@ -88,13 +92,15 @@ git log --oneline <previous-tag>..<new-tag>
 
 ```
 ### Features:
-* Added support for `gn` text object
-* Implemented `:tabmove` command
+* Added support for `gn` text object - select next match with `gn`, change with `cgn`
+* Implemented `:tabmove` command - use `:tabmove +1` or `:tabmove -1` to reorder tabs
+* Support for `z=` to show spelling suggestions
 
 ### Fixes:
 * [VIM-3456](https://youtrack.jetbrains.com/issue/VIM-3456) Fixed cursor position after undo in visual mode
-* [VIM-3458](https://youtrack.jetbrains.com/issue/VIM-3458) Resolved issue with `ci"` in empty strings
-* [VIM-3260](https://youtrack.jetbrains.com/issue/VIM-3260) Processing the offsets at the file end
+* [VIM-3458](https://youtrack.jetbrains.com/issue/VIM-3458) Fixed `ci"` command now works correctly in empty strings
+* [VIM-3260](https://youtrack.jetbrains.com/issue/VIM-3260) Fixed `G` command at file end with count
+* [VIM-3180](https://youtrack.jetbrains.com/issue/VIM-3180) Fixed `vib` and `viB` selection in nested blocks
 
 ### Merged PRs:
 * [805](https://github.com/JetBrains/ideavim/pull/805) by [chylex](https://github.com/chylex): VIM-3238 Fix recording a macro that replays another macro
