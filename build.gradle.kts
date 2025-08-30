@@ -331,8 +331,29 @@ intellijPlatform {
     name = "IdeaVim"
     changeNotes.set(
       """
-        We’ve launched a program to reward quality contributions with a one-year All Products Pack subscription. Learn more at: <a href="https://github.com/JetBrains/ideavim/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a> .
+        We've launched a program to reward quality contributions with a one-year All Products Pack subscription. Learn more at: <a href="https://github.com/JetBrains/ideavim/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a> .
         <br/>
+        <br/>
+        <b>Features:</b><br/>
+        * Extended NERDTree support to all Tree components beyond just Project view<br/>
+        * Added support for G and gg motions inside NERDTree<br/>
+        * Added support for f13-f24 function keys<br/>
+        * Improved integration with <a href="https://blog.jetbrains.com/ai/2025/08/introducing-next-edit-suggestions-in-jetbrains-ai-assistant/">Next Edit Suggestions</a> feature<br/>
+        <br/>
+        <b>Fixes:</b><br/>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4004">VIM-4004</a> Added support for f13-f24 function keys<br/>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-3981">VIM-3981</a> Fixed :set noNERDTree command to work properly<br/>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-3791">VIM-3791</a> Added support for G and gg motions inside NERDTree<br/>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-3266">VIM-3266</a> Fixed file save and close action synchronization<br/>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-3044">VIM-3044</a> Fixed behavior of I command in linewise Visual mode<br/>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-2375">VIM-2375</a> Fixed ZQ command to not save file before quitting<br/>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-2413">VIM-2413</a> Fixed range of line-wise case change commands<br/>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-2142">VIM-2142</a> Added support for gU and gu commands in Visual mode<br/>
+        * Fixed command line display issues with empty color configuration<br/>
+        * Fixed initializing non-default colorcolumn option<br/>
+        * Fixed count validation in text objects<br/>
+        * Fixed issues with new islands theme compatibility<br/>
+        * Fixed inlay offset calculations<br/>
         <br/>
         <a href="https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20Fix%20versions:%20${version.get()}">Changelog</a>
         """.trimIndent()

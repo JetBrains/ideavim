@@ -23,12 +23,38 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-## End of changelog file maintenance
+# [To Be Released]
 
-Since version 2.9.0, the changelog can be found on YouTrack
+### Features:
+* Extended NERDTree support to all Tree components beyond just Project view
+* Added support for `G` and `gg` motions inside NERDTree
+* Added support for f13-f24 function keys
+* Improved integration with [Next Edit Suggestions](https://blog.jetbrains.com/ai/2025/08/introducing-next-edit-suggestions-in-jetbrains-ai-assistant/) feature
 
-* [To Be Released](https://youtrack.jetbrains.com/issues/VIM?q=%23%7BReady%20To%20Release%7D%20)
-* [Version Fixes](https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20sort%20by:%20%7BFix%20versions%7D%20asc)
+### Fixes:
+* [VIM-4004](https://youtrack.jetbrains.com/issue/VIM-4004) Added support for f13-f24 function keys
+* [VIM-3981](https://youtrack.jetbrains.com/issue/VIM-3981) Fixed `:set noNERDTree` command to work properly
+* [VIM-3791](https://youtrack.jetbrains.com/issue/VIM-3791) Added support for `G` and `gg` motions inside NERDTree
+* [VIM-3266](https://youtrack.jetbrains.com/issue/VIM-3266) Fixed file save and close action synchronization
+* [VIM-3044](https://youtrack.jetbrains.com/issue/VIM-3044) Fixed behavior of `I` command in linewise Visual mode
+* [VIM-2375](https://youtrack.jetbrains.com/issue/VIM-2375) Fixed `ZQ` command to not save file before quitting
+* [VIM-2413](https://youtrack.jetbrains.com/issue/VIM-2413) Fixed range of line-wise case change commands
+* [VIM-2142](https://youtrack.jetbrains.com/issue/VIM-2142) Added support for `gU` and `gu` commands in Visual mode
+* Fixed command line display issues with empty color configuration
+* Fixed initializing non-default `colorcolumn` option
+* Fixed count validation in text objects
+* Fixed issues with new islands theme compatibility
+* Fixed inlay offset calculations
+
+### Merged PRs:
+* [1280](https://github.com/JetBrains/ideavim/pull/1280) by [wxh06](https://github.com/wxh06): Improve SpeedSearch and disposal of NERDTree
+* [1279](https://github.com/JetBrains/ideavim/pull/1279) by [citizenmatt](https://github.com/citizenmatt): Fix count accepted as valid in text object
+* [1276](https://github.com/JetBrains/ideavim/pull/1276) by [wxh06](https://github.com/wxh06): Indicate error when an unrecognized key sequence is entered in NERDTree
+* [1275](https://github.com/JetBrains/ideavim/pull/1275) by [citizenmatt](https://github.com/citizenmatt): Fix a couple of bugs calculating inlay offsets
+* [1274](https://github.com/JetBrains/ideavim/pull/1274) by [wxh06](https://github.com/wxh06): Extend NERDTree support to Tree components other than Project
+* [1272](https://github.com/JetBrains/ideavim/pull/1272) by [citizenmatt](https://github.com/citizenmatt): Improve compatibility with Next Edit Suggestions
+
+**Changelog was not maintained for versions 2.10.0 through 2.27.0**
 
 ## 2.9.0, 2024-02-20
 
