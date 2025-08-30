@@ -27,7 +27,6 @@ usual beta standards.
 
 ### Features:
 * Added support for Tab key in Normal mode to accept [Next Edit Suggestions](https://blog.jetbrains.com/ai/2025/08/introducing-next-edit-suggestions-in-jetbrains-ai-assistant/) | [VIM-4010](https://youtrack.jetbrains.com/issue/VIM-4010)
-* Extended NERDTree support to Tree components other than Project - enable with `:set NERDTreeEverywhere` | [VIM-3253](https://youtrack.jetbrains.com/issue/VIM-3253)
 
 ### Fixes:
 * [VIM-3960](https://youtrack.jetbrains.com/issue/VIM-3960) Fixed invalid count being accepted in text objects (e.g., `di3w` now properly fails)
@@ -49,7 +48,6 @@ usual beta standards.
 * [1279](https://github.com/JetBrains/ideavim/pull/1279) by [citizenmatt](https://github.com/citizenmatt): Fix count accepted as valid in text object
 * [1276](https://github.com/JetBrains/ideavim/pull/1276) by [wxh06](https://github.com/wxh06): Indicate error when an unrecognized key sequence is entered in NERDTree
 * [1275](https://github.com/JetBrains/ideavim/pull/1275) by [citizenmatt](https://github.com/citizenmatt): Fix a couple of bugs calculating inlay offsets
-* [1274](https://github.com/JetBrains/ideavim/pull/1274) by [wxh06](https://github.com/wxh06): Extend NERDTree support to Tree components other than Project
 * [1272](https://github.com/JetBrains/ideavim/pull/1272) by [citizenmatt](https://github.com/citizenmatt): Improve compatibility with Next Edit Suggestions
 * [1271](https://github.com/JetBrains/ideavim/pull/1271) by [NaMinhyeok](https://github.com/NaMinhyeok): Fix Gradle build deprecation warnings and improve type safety
 * [1269](https://github.com/JetBrains/ideavim/pull/1269) by [citizenmatt](https://github.com/citizenmatt): Fix command line missing due to empty colour

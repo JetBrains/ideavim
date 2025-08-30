@@ -336,7 +336,6 @@ intellijPlatform {
         <br/>
         <b>Features:</b><br/>
         • Added support for Tab key in Normal mode to accept <a href="https://blog.jetbrains.com/ai/2025/08/introducing-next-edit-suggestions-in-jetbrains-ai-assistant/">Next Edit Suggestions</a><br/>
-        • Extended NERDTree support to Tree components other than Project - enable with <code>:set NERDTreeEverywhere</code><br/>
         <br/>
         <b>Fixes:</b><br/>
         • Fixed invalid count being accepted in text objects (e.g., <code>di3w</code> now properly fails)<br/>
