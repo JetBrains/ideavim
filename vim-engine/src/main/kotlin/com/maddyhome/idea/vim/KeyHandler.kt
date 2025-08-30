@@ -18,6 +18,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
+import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.key.KeyStack
@@ -260,14 +261,12 @@ class KeyHandler {
 
     // Save off the command we are about to execute
     editorState.executingCommand = command
-    val type = command.type
-    if (type.isWrite) {
-      if (!editor.isWritable()) {
+    // If it is a command that modifies the file content but the file is read-only, we should not execute it
+    if (command.action is ChangeEditorActionHandler && !editor.isWritable()){
         injector.messages.indicateError()
         reset(keyState, editorState.mode)
         logger.warn("File is not writable")
         return
-      }
     }
 
     val action: Runnable = ActionRunner(editor, context, command, keyState, operatorArguments)
