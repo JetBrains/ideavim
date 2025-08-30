@@ -331,10 +331,24 @@ intellijPlatform {
     name = "IdeaVim"
     changeNotes.set(
       """
-        We’ve launched a program to reward quality contributions with a one-year All Products Pack subscription. Learn more at: <a href="https://github.com/JetBrains/ideavim/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a> .
+        We've launched a program to reward quality contributions with a one-year All Products Pack subscription. Learn more at: <a href="https://github.com/JetBrains/ideavim/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a> .
         <br/>
         <br/>
-        <a href="https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20Fix%20versions:%20${version.get()}">Changelog</a>
+        <b>Features:</b><br/>
+        • Added support for Tab key in Normal mode to accept <a href="https://blog.jetbrains.com/ai/2025/08/introducing-next-edit-suggestions-in-jetbrains-ai-assistant/">Next Edit Suggestions</a><br/>
+        • Extended NERDTree support to Tree components other than Project - enable with <code>:set NERDTreeEverywhere</code><br/>
+        <br/>
+        <b>Fixes:</b><br/>
+        • Fixed invalid count being accepted in text objects (e.g., <code>di3w</code> now properly fails)<br/>
+        • Fixed cursor position calculation with inlay hints<br/>
+        • Fixed cursor placement at end of line with inlay hints after <code>$</code> command<br/>
+        • Fixed command line missing due to empty colour<br/>
+        • Fixed visual guides display with non-default colorcolumn settings<br/>
+        • Fixed <code>:set noNERDTree</code> command<br/>
+        • Fixed Tab key mapping in Insert mode<br/>
+        • Fixed caret color being overwritten<br/>
+        <br/>
+        <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">Full Changelog</a>
         """.trimIndent()
     )
 
