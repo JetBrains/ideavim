@@ -84,6 +84,11 @@ git log --oneline <previous-tag>..<new-tag>
   - For fixes: Show the command/operation that now works correctly
   - For features: Demonstrate the new commands or functionality
   - Example: "Fixed `ci"` command in empty strings" or "Added support for `gn` text object"
+- **Add helpful links** for context:
+  - When mentioning IntelliJ features, search for official JetBrains documentation or blog posts
+  - When referencing Vim commands, link to Vim documentation if helpful
+  - Example: "Added support for [Next Edit Suggestion](https://blog.jetbrains.com/ai/2025/08/introducing-next-edit-suggestions-in-jetbrains-ai-assistant/)"
+  - Use web search to find the most relevant official sources
 - **Include references**: Add [VIM-XXXX] for YouTrack tickets, (#XXX) for PRs
 - **Group logically**: Features, Fixes, Changes, Merged PRs
 - **Use consistent tense**: Past tense for completed work
@@ -95,6 +100,8 @@ git log --oneline <previous-tag>..<new-tag>
 * Added support for `gn` text object - select next match with `gn`, change with `cgn`
 * Implemented `:tabmove` command - use `:tabmove +1` or `:tabmove -1` to reorder tabs
 * Support for `z=` to show spelling suggestions
+* Added integration with [Next Edit Suggestion](https://blog.jetbrains.com/ai/2025/08/introducing-next-edit-suggestions-in-jetbrains-ai-assistant/) feature
+* Support for [multiple cursors](https://www.jetbrains.com/help/idea/multicursor.html) in visual mode
 
 ### Fixes:
 * [VIM-3456](https://youtrack.jetbrains.com/issue/VIM-3456) Fixed cursor position after undo in visual mode
