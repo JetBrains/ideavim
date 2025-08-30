@@ -84,8 +84,10 @@ git log --oneline <previous-tag>..<new-tag>
   - For fixes: Show the command/operation that now works correctly
   - For features: Demonstrate the new commands or functionality
   - Good example: "Fixed `ci"` command in empty strings" or "Added support for `gn` text object"
-  - Bad example: "Fixed count validation in text objects" - too vague, unclear what was broken
-  - Better: "Fixed `3daw` deleting wrong number of words" or specific command that failed
+  - Bad examples (too vague, unclear what was broken):
+    - "Fixed count validation in text objects"
+    - "Fixed inlay offset calculations"
+  - Better: Specify the actual case - "Fixed `3daw` deleting wrong number of words" or "Fixed cursor position with inlay hints in `f` motion"
   - **If you can't determine the specific case from tests/code, omit the entry rather than leave it unclear**
 - **Add helpful links** for context:
   - When mentioning IntelliJ features, search for official JetBrains documentation or blog posts
