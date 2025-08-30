@@ -144,7 +144,10 @@ Always put the ticket link FIRST, then the description:
    - Format it as HTML (use `<br>` for line breaks, `<b>` for headers)
    - **IMPORTANT**: Keep any existing information about the reward program in changeNotes
    - This appears in the plugin description on JetBrains Marketplace
-8. Create a PR only if there are changes to document
+8. Create a PR only if there are changes to document:
+   - Title format: "Update changelog: <super short summary>"
+   - Example: "Update changelog: Add gn text object, fix visual mode issues"
+   - Body: Brief summary of what was added
 
 ## Important Notes
 

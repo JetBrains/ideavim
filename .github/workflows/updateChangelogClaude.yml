@@ -35,7 +35,8 @@ jobs:
             Please follow the detailed changelog maintenance instructions in `.claude/changelog-instructions.md`.
             
             If you find changes that need documenting, update CHANGES.md and create a pull request with:
-            - Title: "Update changelog"
+            - Title: "Update changelog: <super short summary>"
+              Example: "Update changelog: Add gn text object, fix visual mode issues"
             - Body: Brief summary of what was added
           
           # Allow Claude to use git, GitHub CLI, and web access for checking releases and tickets
