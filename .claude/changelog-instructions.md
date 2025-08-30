@@ -160,15 +160,47 @@ Always put the ticket link FIRST, then the description:
 4. Review commits and PRs since last entry
 5. Group changes by release or under [To Be Released]
 6. Update CHANGES.md maintaining existing format
-7. Update the `changeNotes` section in `build.gradle.kts`:
-   - Copy the content from the `[To Be Released]` section of CHANGES.md
-   - Format it as HTML (use `<br>` for line breaks, `<b>` for headers)
-   - **IMPORTANT**: Keep any existing information about the reward program in changeNotes
-   - This appears in the plugin description on JetBrains Marketplace
+7. Update the `changeNotes` section in `build.gradle.kts` (see detailed instructions below)
 8. Create a PR only if there are changes to document:
    - Title format: "Update changelog: <super short summary>"
    - Example: "Update changelog: Add gn text object, fix visual mode issues"
    - Body: Brief summary of what was added
+
+## Updating changeNotes in build.gradle.kts
+
+The `changeNotes` section in `build.gradle.kts` displays on the JetBrains Marketplace plugin page. Follow these rules:
+
+### Content Requirements
+- **Match CHANGES.md exactly**: Use the same content from the `[To Be Released]` section
+- **Don't create a shorter version**: Include all entries as they appear in CHANGES.md
+- **Keep the same level of detail**: Don't summarize or condense
+
+### HTML Formatting
+Convert Markdown to HTML format:
+- Headers: `### Features:` → `<b>Features:</b>`
+- Line breaks: Use `<br>` between items
+- Links: Convert markdown links to HTML `<a href="">` tags
+- Bullet points: Use `•` or keep `*` with proper spacing
+- Code blocks: Use `<code>` tags for commands like `<code>gn</code>`
+
+### Special Notes
+- **IMPORTANT**: Keep any existing information about the reward program in changeNotes
+- This content appears in the plugin description on JetBrains Marketplace
+
+### Example Conversion
+Markdown in CHANGES.md:
+```
+### Features:
+* Added support for `gn` text object
+* [VIM-3456](https://youtrack.jetbrains.com/issue/VIM-3456) Fixed cursor position
+```
+
+HTML in changeNotes:
+```html
+<b>Features:</b><br>
+• Added support for <code>gn</code> text object<br>
+• <a href="https://youtrack.jetbrains.com/issue/VIM-3456">VIM-3456</a> Fixed cursor position<br>
+```
 
 ## Important Notes
 
