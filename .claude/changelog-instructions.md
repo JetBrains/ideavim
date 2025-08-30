@@ -83,7 +83,10 @@ git log --oneline <previous-tag>..<new-tag>
 - **Include examples** when helpful:
   - For fixes: Show the command/operation that now works correctly
   - For features: Demonstrate the new commands or functionality
-  - Example: "Fixed `ci"` command in empty strings" or "Added support for `gn` text object"
+  - Good example: "Fixed `ci"` command in empty strings" or "Added support for `gn` text object"
+  - Bad example: "Fixed count validation in text objects" - too vague, unclear what was broken
+  - Better: "Fixed `3daw` deleting wrong number of words" or specific command that failed
+  - **If you can't determine the specific case from tests/code, omit the entry rather than leave it unclear**
 - **Add helpful links** for context:
   - When mentioning IntelliJ features, search for official JetBrains documentation or blog posts
   - When referencing Vim commands, link to Vim documentation if helpful
