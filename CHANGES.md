@@ -23,12 +23,31 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-## End of changelog file maintenance
+[To Be Released]
+-----------------
 
-Since version 2.9.0, the changelog can be found on YouTrack
+### Features:
+* Added support for Tab key with [Next Edit Suggestions](https://blog.jetbrains.com/ai/2025/08/introducing-next-edit-suggestions-in-jetbrains-ai-assistant/) in Normal mode
+* Extended NERDTree support to all Tree components with `:set NERDTreeEverywhere`
+* Improved NERDTree SpeedSearch - initiates right after `/` is pressed
 
-* [To Be Released](https://youtrack.jetbrains.com/issues/VIM?q=%23%7BReady%20To%20Release%7D%20)
-* [Version Fixes](https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20sort%20by:%20%7BFix%20versions%7D%20asc)
+### Fixes:
+* [VIM-3981](https://youtrack.jetbrains.com/issue/VIM-3981) Fixed `:set noNERDTree` command now works correctly
+* Fixed count accepted as valid in text object operations
+* Fixed inlay offset calculations for better cursor positioning
+* Fixed command line missing due to empty color configuration
+* Improved NERDTree key sequence handling - clears buffer after `<ESC>`
+* Fixed NERDTree-P behavior to correctly jump to root node
+
+### Merged PRs:
+* [1280](https://github.com/JetBrains/ideavim/pull/1280) by [wxh06](https://github.com/wxh06): Improve SpeedSearch and disposal of NERDTree
+* [1279](https://github.com/JetBrains/ideavim/pull/1279) by [citizenmatt](https://github.com/citizenmatt): Fix count accepted as valid in text object
+* [1276](https://github.com/JetBrains/ideavim/pull/1276) by [wxh06](https://github.com/wxh06): Indicate error when an unrecognized key sequence is entered in NERDTree
+* [1275](https://github.com/JetBrains/ideavim/pull/1275) by [citizenmatt](https://github.com/citizenmatt): Fix a couple of bugs calculating inlay offsets
+* [1274](https://github.com/JetBrains/ideavim/pull/1274) by [wxh06](https://github.com/wxh06): Extend NERDTree support to Tree components other than Project
+* [1272](https://github.com/JetBrains/ideavim/pull/1272) by [citizenmatt](https://github.com/citizenmatt): Improve compatibility with Next Edit Suggestions
+
+**Changelog was not maintained for versions 2.10.0 through 2.27.0**
 
 ## 2.9.0, 2024-02-20
 

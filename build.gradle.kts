@@ -331,10 +331,20 @@ intellijPlatform {
     name = "IdeaVim"
     changeNotes.set(
       """
-        We’ve launched a program to reward quality contributions with a one-year All Products Pack subscription. Learn more at: <a href="https://github.com/JetBrains/ideavim/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a> .
-        <br/>
-        <br/>
-        <a href="https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20Fix%20versions:%20${version.get()}">Changelog</a>
+        <b>Features:</b><br>
+        • Added support for Tab key with <a href="https://blog.jetbrains.com/ai/2025/08/introducing-next-edit-suggestions-in-jetbrains-ai-assistant/">Next Edit Suggestions</a> in Normal mode<br>
+        • Extended NERDTree support to all Tree components with <code>:set NERDTreeEverywhere</code><br>
+        • Improved NERDTree SpeedSearch - initiates right after <code>/</code> is pressed<br>
+        <br>
+        <b>Fixes:</b><br>
+        • <a href="https://youtrack.jetbrains.com/issue/VIM-3981">VIM-3981</a> Fixed <code>:set noNERDTree</code> command now works correctly<br>
+        • Fixed count accepted as valid in text object operations<br>
+        • Fixed inlay offset calculations for better cursor positioning<br>
+        • Fixed command line missing due to empty color configuration<br>
+        • Improved NERDTree key sequence handling - clears buffer after <code>&lt;ESC&gt;</code><br>
+        • Fixed NERDTree-P behavior to correctly jump to root node<br>
+        <br>
+        We've launched a program to reward quality contributions with a one-year All Products Pack subscription. Learn more at: <a href="https://github.com/JetBrains/ideavim/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a> .
         """.trimIndent()
     )
 
