@@ -23,12 +23,29 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-## End of changelog file maintenance
+## [To Be Released]
 
-Since version 2.9.0, the changelog can be found on YouTrack
+**Changelog was not maintained for versions 2.10.0 through 2.27.0**
 
-* [To Be Released](https://youtrack.jetbrains.com/issues/VIM?q=%23%7BReady%20To%20Release%7D%20)
-* [Version Fixes](https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20sort%20by:%20%7BFix%20versions%7D%20asc)
+### Features:
+* Added support for `Tab` in Normal mode to review and accept [Next Edit Suggestions](https://blog.jetbrains.com/ai/2025/08/introducing-next-edit-suggestions-in-jetbrains-ai-assistant/) | [VIM-4010](https://youtrack.jetbrains.com/issue/VIM-4010)
+* Added support for `Tab` remapping in Insert mode | [VIM-2331](https://youtrack.jetbrains.com/issue/VIM-2331)
+* Extended NERDTree support to Tree components other than Project with `:set NERDTreeEverywhere` | [VIM-3253](https://youtrack.jetbrains.com/issue/VIM-3253)
+
+### Fixes:
+* [VIM-3981](https://youtrack.jetbrains.com/issue/VIM-3981) Fixed `:set noNERDTree` command to properly disable NERDTree
+* [VIM-3960](https://youtrack.jetbrains.com/issue/VIM-3960) Fixed invalid count in text objects - commands like `di3w` now correctly fail and only execute `w`
+* [VIM-4007](https://youtrack.jetbrains.com/issue/VIM-4007) Fixed cursor position when inlay hints are present on empty lines
+* [VIM-3997](https://youtrack.jetbrains.com/issue/VIM-3997) Fixed `$` command followed by up/down movement on lines with inlay hints
+* [VIM-3455](https://youtrack.jetbrains.com/issue/VIM-3455) Fixed caret color being overwritten and reset to editor default
+
+### Merged PRs:
+* [1280](https://github.com/JetBrains/ideavim/pull/1280) by [wxh06](https://github.com/wxh06): Improve SpeedSearch and disposal of NERDTree
+* [1279](https://github.com/JetBrains/ideavim/pull/1279) by [citizenmatt](https://github.com/citizenmatt): Fix count accepted as valid in text object
+* [1276](https://github.com/JetBrains/ideavim/pull/1276) by [wxh06](https://github.com/wxh06): Indicate error when an unrecognized key sequence is entered in NERDTree
+* [1275](https://github.com/JetBrains/ideavim/pull/1275) by [citizenmatt](https://github.com/citizenmatt): Fix a couple of bugs calculating inlay offsets
+* [1274](https://github.com/JetBrains/ideavim/pull/1274) by [wxh06](https://github.com/wxh06): Extend NERDTree support to Tree components other than Project
+* [1272](https://github.com/JetBrains/ideavim/pull/1272) by [citizenmatt](https://github.com/citizenmatt): Improve compatibility with Next Edit Suggestions
 
 ## 2.9.0, 2024-02-20
 
