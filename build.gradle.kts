@@ -331,8 +331,20 @@ intellijPlatform {
     name = "IdeaVim"
     changeNotes.set(
       """
-        We’ve launched a program to reward quality contributions with a one-year All Products Pack subscription. Learn more at: <a href="https://github.com/JetBrains/ideavim/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a> .
+        We've launched a program to reward quality contributions with a one-year All Products Pack subscription. Learn more at: <a href="https://github.com/JetBrains/ideavim/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a> .
         <br/>
+        <br/>
+        <b>Features:</b><br/>
+        * Extended NERDTree support to Tree components other than Project<br/>
+        * Added ActivateNode support in NERDTree Everywhere<br/>
+        * Support for disabling extended NERDTree without restarting<br/>
+        <br/>
+        <b>Fixes:</b><br/>
+        * Fixed count accepted as valid in text object<br/>
+        * Fixed bugs calculating inlay offsets<br/>
+        * Fixed initialising non-default colorcolumn option<br/>
+        * Fixed command line missing due to empty colour<br/>
+        * Improved compatibility with Next Edit Suggestions<br/>
         <br/>
         <a href="https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20Fix%20versions:%20${version.get()}">Changelog</a>
         """.trimIndent()

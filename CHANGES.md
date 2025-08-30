@@ -23,12 +23,34 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-## End of changelog file maintenance
+## [To Be Released]
 
-Since version 2.9.0, the changelog can be found on YouTrack
+### Features:
+* Extended NERDTree support to Tree components other than Project
+* Added ActivateNode support in NERDTree Everywhere
+* Support for disabling extended NERDTree without restarting
 
-* [To Be Released](https://youtrack.jetbrains.com/issues/VIM?q=%23%7BReady%20To%20Release%7D%20)
-* [Version Fixes](https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20sort%20by:%20%7BFix%20versions%7D%20asc)
+### Fixes:
+* Fixed count accepted as valid in text object
+* Fixed bugs calculating inlay offsets  
+* Fixed initialising non-default colorcolumn option
+* Fixed command line missing due to empty colour
+* Improved compatibility with Next Edit Suggestions
+
+### Merged PRs:
+* [1280](https://github.com/JetBrains/ideavim/pull/1280) by [wxh06](https://github.com/wxh06): Improve SpeedSearch and disposal of NERDTree
+* [1279](https://github.com/JetBrains/ideavim/pull/1279) by [citizenmatt](https://github.com/citizenmatt): Fix count accepted as valid in text object  
+* [1276](https://github.com/JetBrains/ideavim/pull/1276) by [wxh06](https://github.com/wxh06): Indicate error when an unrecognized key sequence is entered in NERDTree
+* [1275](https://github.com/JetBrains/ideavim/pull/1275) by [citizenmatt](https://github.com/citizenmatt): Fix a couple of bugs calculating inlay offsets
+* [1274](https://github.com/JetBrains/ideavim/pull/1274) by [wxh06](https://github.com/wxh06): Extend NERDTree support to Tree components other than Project
+* [1272](https://github.com/JetBrains/ideavim/pull/1272) by [citizenmatt](https://github.com/citizenmatt): Improve compatibility with Next Edit Suggestions
+* [1271](https://github.com/JetBrains/ideavim/pull/1271) by [NaMinhyeok](https://github.com/NaMinhyeok): Fix Gradle build deprecation warnings and improve type safety
+* [1269](https://github.com/JetBrains/ideavim/pull/1269) by [citizenmatt](https://github.com/citizenmatt): Fix command line missing due to empty colour
+* [1262](https://github.com/JetBrains/ideavim/pull/1262) by [citizenmatt](https://github.com/citizenmatt): Fix initialising non-default colorcolumn option
+* [1261](https://github.com/JetBrains/ideavim/pull/1261) by [vumi19](https://github.com/vumi19): Plugin Registration
+* [1260](https://github.com/JetBrains/ideavim/pull/1260) by [vumi19](https://github.com/vumi19): Docs for the new Plugin API
+
+**Changelog was not maintained for versions 2.10.0 through 2.27.0**
 
 ## 2.9.0, 2024-02-20
 
