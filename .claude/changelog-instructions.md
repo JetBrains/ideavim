@@ -59,6 +59,7 @@ git log --oneline <previous-tag>..<new-tag>
 - **Breaking Changes**: Any backwards-incompatible changes
 - **Deprecations**: Features marked for future removal
 - **Merged PRs**: Reference significant PRs like "Implement vim-surround (#123)"
+  - Note: PRs have their own inclusion rules - see "Merged PRs Special Rules" section below
 
 ### 5. What to Exclude
 - Dependabot PRs (author: dependabot[bot])
@@ -138,6 +139,14 @@ Always put the ticket link FIRST, then the description:
 - If a feature is listed in Features, don't repeat it in Fixes
 - If a bug fix is in Fixes, don't list it again elsewhere
 - Choose the most appropriate category for each change
+
+### Merged PRs Special Rules:
+- **Different criteria than other sections**: The exclusion rules for Features/Fixes don't apply here
+- **Include PRs from external contributors** even if they're internal changes or refactoring
+- **List significant community contributions** regardless of whether they're user-visible
+- **Format**: PR number, author, and brief description
+- **Purpose**: Acknowledge community contributions and provide PR tracking
+- The "user-visible only" rule does NOT apply to this section
 
 ## Process
 
