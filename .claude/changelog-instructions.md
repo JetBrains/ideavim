@@ -33,6 +33,8 @@
 
 ### 1. Check Current State
 - Read CHANGES.md to find the last documented version
+- **Important**: Only read the top portion of CHANGES.md (it's a large file)
+- Focus on the `[To Be Released]` section and recent versions
 - Note the date of the last entry
 
 ### 2. Find Releases
@@ -151,7 +153,7 @@ Always put the ticket link FIRST, then the description:
 
 ## Process
 
-1. Read the current CHANGES.md
+1. Read the current CHANGES.md (only the top portion - focus on `[To Be Released]` and recent versions)
 2. Check previous changelog PRs from GitHub:
    - Review the last few changelog update PRs (use `gh pr list --search "Update changelog" --state all --limit 5`)
    - Look for any comments or instructions about what NOT to log this time
