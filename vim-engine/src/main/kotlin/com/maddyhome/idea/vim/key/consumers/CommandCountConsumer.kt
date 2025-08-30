@@ -19,9 +19,24 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
+/**
+ * Key consumer to handle digits typed while building a command
+ *
+ * This consumer only handles digits in NVO mode. It does not need need to handle escape or cancel keys.
+ */
 internal class CommandCountConsumer : KeyConsumer {
   private companion object {
     private val logger = vimLogger<CommandCountConsumer>()
+  }
+
+  override fun isApplicable(
+    key: KeyStroke,
+    editor: VimEditor,
+    allowKeyMappings: Boolean,
+    keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
+  ): Boolean {
+    val chKey: Char = if (key.keyChar == KeyEvent.CHAR_UNDEFINED) 0.toChar() else key.keyChar
+    return isCommandCountKey(chKey, keyProcessResultBuilder.state)
   }
 
   override fun consumeKey(
@@ -31,9 +46,6 @@ internal class CommandCountConsumer : KeyConsumer {
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
     logger.trace { "Entered CommandCountConsumer" }
-    val chKey: Char = if (key.keyChar == KeyEvent.CHAR_UNDEFINED) 0.toChar() else key.keyChar
-    if (!isCommandCountKey(chKey, keyProcessResultBuilder.state)) return false
-
     keyProcessResultBuilder.state.commandBuilder.addCountCharacter(key)
     return true
   }

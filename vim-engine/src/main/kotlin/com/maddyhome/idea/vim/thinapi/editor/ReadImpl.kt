@@ -169,8 +169,8 @@ open class ReadImpl : Read {
     return injector.searchHelper.findNextCharacterOnLine(vimEditor, startOffset, count, char)
   }
 
-  override fun getNearestWordOffset(startOffset: Int): Range? {
-    val textRange = injector.searchHelper.findWordNearestCursor(vimEditor, startOffset)
+  override fun getWordAtOrFollowingOffset(startOffset: Int, isBigWord: Boolean): Range? {
+    val textRange = injector.searchHelper.findWordAtOrFollowingCursor(vimEditor, startOffset, isBigWord)
     return textRange?.toRange()
   }
 

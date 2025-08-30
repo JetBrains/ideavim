@@ -12,7 +12,6 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.KeyProcessResult
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.CommandBuilder
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
@@ -20,9 +19,32 @@ import com.maddyhome.idea.vim.key.KeyConsumer
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
+/**
+ * Key consumer to handle [Argument.Type.CHARACTER] arguments
+ *
+ * If the currently in-progress command is expecting a character and the given keystroke is a valid character, then it
+ * is attached as an argument to the command. If the keystroke is not a valid character, the current command is failed.
+ *
+ * This consumer does not currently handle escape or cancel keys. Either keystrokes will result in a bad command.
+ *
+ * TODO: Should this handle its own cancellation?
+ * How does fallback work with DIGRAPH arguments and cancel characters? Would that get feed back to this consumer?
+ */
 internal class CharArgumentConsumer : KeyConsumer {
   private companion object {
     private val logger = vimLogger<CharArgumentConsumer>()
+  }
+
+  override fun isApplicable(
+    key: KeyStroke,
+    editor: VimEditor,
+    allowKeyMappings: Boolean,
+    keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
+  ): Boolean {
+    val expectingCharArgument =
+      keyProcessResultBuilder.state.commandBuilder.expectedArgumentType === Argument.Type.CHARACTER
+    logger.debug { "Expecting char argument: $expectingCharArgument" }
+    return expectingCharArgument
   }
 
   override fun consumeKey(
@@ -32,17 +54,9 @@ internal class CharArgumentConsumer : KeyConsumer {
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
     logger.trace { "Entered CharArgumentConsumer" }
-    if (!isExpectingCharArgument(keyProcessResultBuilder.state.commandBuilder)) return false
-
     val chKey: Char = if (key.keyChar == KeyEvent.CHAR_UNDEFINED) 0.toChar() else key.keyChar
     handleCharArgument(key, chKey, keyProcessResultBuilder)
     return true
-  }
-
-  private fun isExpectingCharArgument(commandBuilder: CommandBuilder): Boolean {
-    val expectingCharArgument = commandBuilder.expectedArgumentType === Argument.Type.CHARACTER
-    logger.debug { "Expecting char argument: $expectingCharArgument" }
-    return expectingCharArgument
   }
 
   private fun handleCharArgument(

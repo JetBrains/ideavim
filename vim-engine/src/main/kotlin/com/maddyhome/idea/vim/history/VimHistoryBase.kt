@@ -16,17 +16,16 @@ open class VimHistoryBase : VimHistory {
   protected val histories: MutableMap<VimHistory.Type, HistoryBlock> = mutableMapOf()
 
   override fun addEntry(type: VimHistory.Type, text: String) {
-    val block = blocks(type)
+    val block = getEntriesBlockByType(type)
     block.addEntry(text)
   }
 
   override fun getEntries(type: VimHistory.Type, first: Int, last: Int): List<HistoryEntry> {
     var myFirst = first
     var myLast = last
-    val block = blocks(type)
+    val block = getEntriesBlockByType(type)
 
     val entries = block.getEntries()
-    val res = ArrayList<HistoryEntry>()
     if (myFirst == 0 && myLast == 0) {
       myLast = Integer.MAX_VALUE
     }
@@ -51,6 +50,7 @@ open class VimHistoryBase : VimHistory {
 
     logger.debug { "first=$myFirst\nlast=$myLast" }
 
+    val res = mutableListOf<HistoryEntry>()
     for (entry in entries) {
       if (entry.number in myFirst..myLast) {
         res.add(entry)
@@ -64,7 +64,7 @@ open class VimHistoryBase : VimHistory {
     histories.clear()
   }
 
-  private fun blocks(type: VimHistory.Type): HistoryBlock {
+  private fun getEntriesBlockByType(type: VimHistory.Type): HistoryBlock {
     return histories.getOrPut(type) { HistoryBlock() }
   }
 

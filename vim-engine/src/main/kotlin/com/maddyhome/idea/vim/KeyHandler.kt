@@ -22,15 +22,15 @@ import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.key.KeyStack
 import com.maddyhome.idea.vim.key.consumers.CharArgumentConsumer
-import com.maddyhome.idea.vim.key.consumers.CommandConsumer
+import com.maddyhome.idea.vim.key.consumers.CommandKeyConsumer
 import com.maddyhome.idea.vim.key.consumers.CommandCountConsumer
-import com.maddyhome.idea.vim.key.consumers.DeleteCommandConsumer
+import com.maddyhome.idea.vim.key.consumers.DeleteCommandCountConsumer
 import com.maddyhome.idea.vim.key.consumers.DigraphConsumer
 import com.maddyhome.idea.vim.key.consumers.EditorResetConsumer
 import com.maddyhome.idea.vim.key.consumers.ModalInputConsumer
 import com.maddyhome.idea.vim.key.consumers.ModeInputConsumer
-import com.maddyhome.idea.vim.key.consumers.RegisterConsumer
 import com.maddyhome.idea.vim.key.consumers.SelectRegisterConsumer
+import com.maddyhome.idea.vim.key.consumers.StartSelectRegisterConsumer
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
@@ -47,17 +47,18 @@ import javax.swing.KeyStroke
 // 2. maybe we can live without allowKeyMappings: Boolean
 class KeyHandler {
   private val keyConsumers: List<KeyConsumer> = listOf(
-    ModalInputConsumer(),
-    MappingProcessor,
+    ModalInputConsumer(), // Must be first
+    MappingProcessor,     // Must be as early in pipeline as possible
     CommandCountConsumer(),
-    DeleteCommandConsumer(),
+    DeleteCommandCountConsumer(),
     EditorResetConsumer(),
-    CharArgumentConsumer(),
-    RegisterConsumer(),
-    DigraphConsumer(),
-    CommandConsumer(),
+    StartSelectRegisterConsumer(),  // Must be before command consumer, so " isn't treated as a command char
     SelectRegisterConsumer(),
-    ModeInputConsumer()
+    DigraphConsumer(),    // Must be before command key consumer so {char}<BS>{char} works.
+                          // Would be a problem if a command prefix requires a DIGRAPH arg (no such command exists)
+    CommandKeyConsumer(), // Must be before argument consumers, to handle c_CTRL-R prefix
+    CharArgumentConsumer(),
+    ModeInputConsumer()   // Must be last to accept the keystroke as typed input
   )
   private var handleKeyRecursionCount = 0
 
@@ -181,7 +182,9 @@ class KeyHandler {
       handleKeyRecursionCount++
       try {
         val isProcessed = keyConsumers.any {
-          it.consumeKey(key, editor, allowKeyMappings, keyProcessResultBuilder)
+          // These two lines are specifically formatted to allow setting a breakpoint on the consumeKey line :)
+          it.isApplicable(key, editor, allowKeyMappings, keyProcessResultBuilder)
+            && it.consumeKey(key, editor, allowKeyMappings, keyProcessResultBuilder)
         }
         if (isProcessed) {
           logger.trace { "Key was successfully caught by consumer" }

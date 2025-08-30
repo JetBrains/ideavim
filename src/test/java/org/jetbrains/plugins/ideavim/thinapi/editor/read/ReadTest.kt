@@ -268,17 +268,18 @@ class ReadTest : MockTestCase() {
   }
 
   @Test
-  fun `test getNearestWordOffset calls findWordNearestCursor`() {
+  fun `test getWordAtOrFollowingOffset calls findWordAtOrFollowingCursor`() {
     val startOffset = 12
+    val isBigWord = true
 
     myVimApi.editor {
       read {
-        getNearestWordOffset(startOffset)
+        getWordAtOrFollowingOffset(startOffset, isBigWord)
       }
     }
 
     val editorCaptor = argumentCaptor<VimEditor>()
-    verify(injector.searchHelper).findWordNearestCursor(editorCaptor.capture(), eq(startOffset))
+    verify(injector.searchHelper).findWordAtOrFollowingCursor(editorCaptor.capture(), eq(startOffset), eq(isBigWord))
 
     assertEqualsEditor(vimEditor, editorCaptor.firstValue)
   }

@@ -12,7 +12,6 @@ import com.maddyhome.idea.vim.ex.ExOutputModel
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 
@@ -25,8 +24,13 @@ class HistoryCommandTest : VimTestCase() {
   }
 
   @Test
-  fun `test history lists empty cmd history by default`() {
-    assertCommandOutput("history", "      #  cmd history")
+  fun `test history lists current cmd history by default`() {
+    assertCommandOutput("history",
+      """
+        |      #  cmd history
+        |>     1  history
+      """.trimMargin()
+    )
   }
 
   @Test
@@ -46,12 +50,17 @@ class HistoryCommandTest : VimTestCase() {
         |      8  echo 8
         |      9  echo 9
         |     10  echo 10
+        |>    11  history cmd
       """.trimMargin())
   }
 
   @Test
-  fun `test his lists empty cmd history by default`() {
-    assertCommandOutput("his", "      #  cmd history")
+  fun `test his lists current cmd history by default`() {
+    assertCommandOutput("his",
+      """
+        |      #  cmd history
+        |>     1  his
+      """.trimMargin())
   }
 
   @Test
@@ -85,8 +94,47 @@ class HistoryCommandTest : VimTestCase() {
     assertPluginErrorMessageContains("E488: Trailing characters: sdf")
   }
 
-  // TODO: Add current item indicator `>`
-  // As far as I can tell, this is always the last entry (but not the last entry displayed!)
+  @Test
+  fun `test history adds indicator to current entry`() {
+    repeat(5) { i -> enterSearch("foo${i + 1}") }
+    repeat(5) { i -> enterCommand("echo ${i + 1}") }
+    ExOutputModel.getInstance(fixture.editor).clear()
+    assertCommandOutput("history all",
+      """
+        |      #  cmd history
+        |      1  echo 1
+        |      2  echo 2
+        |      3  echo 3
+        |      4  echo 4
+        |      5  echo 5
+        |>     6  history all
+        |      #  search history
+        |      1  foo1
+        |      2  foo2
+        |      3  foo3
+        |      4  foo4
+        |>     5  foo5
+        |      #  expr history
+        |      #  input history
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test history does not show indicator if not including current entry`() {
+    repeat(10) { i -> enterCommand("echo ${i + 1}") }
+    ExOutputModel.getInstance(fixture.editor).clear()
+    assertCommandOutput("history : 1,5",
+      """
+        |      #  cmd history
+        |      1  echo 1
+        |      2  echo 2
+        |      3  echo 3
+        |      4  echo 4
+        |      5  echo 5
+      """.trimMargin()
+    )
+  }
 
   @Test
   fun `test history with no name and first number lists single entry from command history`() {
@@ -115,7 +163,12 @@ class HistoryCommandTest : VimTestCase() {
 
   @Test
   fun `test history with colon lists empty cmd history`() {
-    assertCommandOutput("history :", "      #  cmd history")
+    assertCommandOutput("history :",
+      """
+        |      #  cmd history
+        |>     1  history :
+      """.trimMargin()
+    )
   }
 
   @Test
@@ -156,27 +209,36 @@ class HistoryCommandTest : VimTestCase() {
 
   @Test
   fun `test history cmd lists empty command history`() {
-    assertCommandOutput("history cmd", "      #  cmd history")
+    assertCommandOutput("history cmd",
+      """
+        |      #  cmd history
+        |>     1  history cmd
+      """.trimMargin()
+    )
   }
 
-  // TODO: Record command before it's run
-  @Disabled
   @Test
   fun `test history cmd lists current cmd in history`() {
     assertCommandOutput("history cmd",
       """
         |      #  cmd history
-        |      1  history cmd
+        |>     1  history cmd
       """.trimMargin())
   }
 
   @Test
   fun `test abbreviated history cmd lists cmd history`() {
-    assertCommandOutput("history c", "      #  cmd history")
+    assertCommandOutput("history c",
+      """
+        |      #  cmd history
+        |>     1  history c
+      """.trimMargin()
+    )
     assertCommandOutput("history cm",
       """
         |      #  cmd history
         |      1  history c
+        |>     2  history cm
       """.trimMargin()
     )
     assertCommandOutput("history cmd",
@@ -184,6 +246,7 @@ class HistoryCommandTest : VimTestCase() {
         |      #  cmd history
         |      1  history c
         |      2  history cm
+        |>     3  history cmd
       """.trimMargin()
     )
   }
@@ -268,7 +331,7 @@ class HistoryCommandTest : VimTestCase() {
     assertCommandOutput("history cmd -1",
       """
         |      #  cmd history
-        |     10  echo 10
+        |>    11  history cmd -1
       """.trimMargin())
   }
 
@@ -279,10 +342,10 @@ class HistoryCommandTest : VimTestCase() {
     assertCommandOutput("history cmd -4,-1",
       """
         |      #  cmd history
-        |      7  echo 7
         |      8  echo 8
         |      9  echo 9
         |     10  echo 10
+        |>    11  history cmd -4,-1
       """.trimMargin())
   }
 
@@ -305,6 +368,7 @@ class HistoryCommandTest : VimTestCase() {
         |      6  echo 6
         |      7  echo 7
         |      8  echo 8
+        |      9  echo 9
       """.trimMargin())
   }
 
@@ -315,7 +379,6 @@ class HistoryCommandTest : VimTestCase() {
     assertCommandOutput("history cmd -8,8",
       """
         |      #  cmd history
-        |      3  echo 3
         |      4  echo 4
         |      5  echo 5
         |      6  echo 6
@@ -389,7 +452,7 @@ class HistoryCommandTest : VimTestCase() {
         |      7  foo7
         |      8  foo8
         |      9  foo9
-        |     10  foo10
+        |>    10  foo10
       """.trimMargin())
   }
 
@@ -462,6 +525,7 @@ class HistoryCommandTest : VimTestCase() {
     assertCommandOutput("history all",
       """
         |      #  cmd history
+        |>     1  history all
         |      #  search history
         |      #  expr history
         |      #  input history
@@ -482,12 +546,13 @@ class HistoryCommandTest : VimTestCase() {
         |      3  echo 3
         |      4  echo 4
         |      5  echo 5
+        |>     6  history all
         |      #  search history
         |      1  foo1
         |      2  foo2
         |      3  foo3
         |      4  foo4
-        |      5  foo5
+        |>     5  foo5
         |      #  expr history
         |      #  input history
       """.trimMargin()

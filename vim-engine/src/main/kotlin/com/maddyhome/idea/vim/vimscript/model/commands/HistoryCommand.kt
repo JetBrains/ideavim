@@ -122,10 +122,11 @@ data class HistoryCommand(val range: Range, val modifier: CommandModifier, val a
 
   private fun StringBuilder.outputHistory(name: String, type: VimHistory.Type, start: Int, end: Int) {
     append("      #  $name history")
-    injector.historyGroup.getEntries(type, start, end).forEach {
-      val num = it.number.toString().padStart(7)
+    injector.historyGroup.getEntries(type, start, end).forEachIndexed { index, it ->
+      val indicator = if (it.current) ">" else " "
+      val num = it.number.toString().padStart(6)
       appendLine()
-      append("$num  ${it.entry}")
+      append("$indicator$num  ${it.entry}")
     }
   }
 

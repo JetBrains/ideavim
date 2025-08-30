@@ -25,11 +25,13 @@ import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.common.Direction.Companion.fromInt
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.addSubstitutionConfirmationHighlight
 import com.maddyhome.idea.vim.helper.highlightSearchResults
 import com.maddyhome.idea.vim.helper.shouldIgnoreCase
 import com.maddyhome.idea.vim.helper.updateSearchHighlights
+import com.maddyhome.idea.vim.helper.vimIncsearchCurrentMatchOffset
 import com.maddyhome.idea.vim.helper.vimLastHighlighters
 import com.maddyhome.idea.vim.options.GlobalOptionChangeListener
 import org.jdom.Element
@@ -119,6 +121,14 @@ open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateComponent<Ele
       }
     }
     return false
+  }
+
+  override fun getCurrentIncsearchResultRange(editor: VimEditor): TextRange? {
+    val ijEditor = editor.ij
+    val incsearchHighlighters = ijEditor.vimLastHighlighters ?: return null
+    val currentOffset = ijEditor.vimIncsearchCurrentMatchOffset ?: return null
+    val currentHighlighter = incsearchHighlighters.find { it.startOffset == currentOffset }
+    return currentHighlighter?.textRange?.vim
   }
 
   override fun setShouldShowSearchHighlights() {

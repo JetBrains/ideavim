@@ -306,7 +306,7 @@
     },
     {
         "keys": "<C-Left>",
-        "class": "com.maddyhome.idea.vim.action.ex.MoveToPreviousWordAction",
+        "class": "com.maddyhome.idea.vim.action.ex.MoveCaretToPreviousBigWordAction",
         "modes": "C"
     },
     {
@@ -346,7 +346,7 @@
     },
     {
         "keys": "<C-N>",
-        "class": "com.maddyhome.idea.vim.action.ex.HistoryDownAction",
+        "class": "com.maddyhome.idea.vim.action.ex.SelectNewerHistoryAction",
         "modes": "C"
     },
     {
@@ -376,7 +376,7 @@
     },
     {
         "keys": "<C-P>",
-        "class": "com.maddyhome.idea.vim.action.ex.HistoryUpAction",
+        "class": "com.maddyhome.idea.vim.action.ex.SelectOlderHistoryAction",
         "modes": "C"
     },
     {
@@ -430,8 +430,78 @@
         "modes": "C"
     },
     {
+        "keys": "<C-R><C-A>",
+        "class": "com.maddyhome.idea.vim.action.ex.InsertBigWordUnderCaretAction",
+        "modes": "C"
+    },
+    {
+        "keys": "<C-R><C-F>",
+        "class": "com.maddyhome.idea.vim.action.ex.InsertFilenameUnderCaretAction",
+        "modes": "C"
+    },
+    {
+        "keys": "<C-R><C-L>",
+        "class": "com.maddyhome.idea.vim.action.ex.InsertCurrentLineAction",
+        "modes": "C"
+    },
+    {
+        "keys": "<C-R><C-O>",
+        "class": "com.maddyhome.idea.vim.action.ex.InsertRegisterLiterallyAction",
+        "modes": "C"
+    },
+    {
+        "keys": "<C-R><C-O><C-A>",
+        "class": "com.maddyhome.idea.vim.action.ex.InsertBigWordUnderCaretLiterallyAction",
+        "modes": "C"
+    },
+    {
+        "keys": "<C-R><C-O><C-F>",
+        "class": "com.maddyhome.idea.vim.action.ex.InsertFilenameUnderCaretAction",
+        "modes": "C"
+    },
+    {
+        "keys": "<C-R><C-O><C-L>",
+        "class": "com.maddyhome.idea.vim.action.ex.InsertCurrentLineLiterallyAction",
+        "modes": "C"
+    },
+    {
+        "keys": "<C-R><C-O><C-W>",
+        "class": "com.maddyhome.idea.vim.action.ex.InsertWordUnderCaretAction",
+        "modes": "C"
+    },
+    {
+        "keys": "<C-R><C-R>",
+        "class": "com.maddyhome.idea.vim.action.ex.InsertRegisterLiterallyAction",
+        "modes": "C"
+    },
+    {
+        "keys": "<C-R><C-R><C-A>",
+        "class": "com.maddyhome.idea.vim.action.ex.InsertBigWordUnderCaretLiterallyAction",
+        "modes": "C"
+    },
+    {
+        "keys": "<C-R><C-R><C-F>",
+        "class": "com.maddyhome.idea.vim.action.ex.InsertFilenameUnderCaretAction",
+        "modes": "C"
+    },
+    {
+        "keys": "<C-R><C-R><C-L>",
+        "class": "com.maddyhome.idea.vim.action.ex.InsertCurrentLineLiterallyAction",
+        "modes": "C"
+    },
+    {
+        "keys": "<C-R><C-R><C-W>",
+        "class": "com.maddyhome.idea.vim.action.ex.InsertWordUnderCaretAction",
+        "modes": "C"
+    },
+    {
+        "keys": "<C-R><C-W>",
+        "class": "com.maddyhome.idea.vim.action.ex.InsertWordUnderCaretAction",
+        "modes": "C"
+    },
+    {
         "keys": "<C-Right>",
-        "class": "com.maddyhome.idea.vim.action.ex.MoveToNextWordAction",
+        "class": "com.maddyhome.idea.vim.action.ex.MoveCaretToNextBigWordAction",
         "modes": "C"
     },
     {
@@ -501,7 +571,7 @@
     },
     {
         "keys": "<C-W>",
-        "class": "com.maddyhome.idea.vim.action.ex.DeletePrevWordAction",
+        "class": "com.maddyhome.idea.vim.action.ex.DeletePreviousWordAction",
         "modes": "C"
     },
     {
@@ -731,7 +801,7 @@
     },
     {
         "keys": "<Down>",
-        "class": "com.maddyhome.idea.vim.action.ex.HistoryDownFilterAction",
+        "class": "com.maddyhome.idea.vim.action.ex.SelectNewerHistoryFilteredAction",
         "modes": "C"
     },
     {
@@ -831,7 +901,7 @@
     },
     {
         "keys": "<PageDown>",
-        "class": "com.maddyhome.idea.vim.action.ex.HistoryDownAction",
+        "class": "com.maddyhome.idea.vim.action.ex.SelectNewerHistoryAction",
         "modes": "C"
     },
     {
@@ -846,7 +916,7 @@
     },
     {
         "keys": "<PageUp>",
-        "class": "com.maddyhome.idea.vim.action.ex.HistoryUpAction",
+        "class": "com.maddyhome.idea.vim.action.ex.SelectOlderHistoryAction",
         "modes": "C"
     },
     {
@@ -886,7 +956,7 @@
     },
     {
         "keys": "<S-Down>",
-        "class": "com.maddyhome.idea.vim.action.ex.HistoryDownAction",
+        "class": "com.maddyhome.idea.vim.action.ex.SelectNewerHistoryAction",
         "modes": "C"
     },
     {
@@ -911,7 +981,7 @@
     },
     {
         "keys": "<S-Left>",
-        "class": "com.maddyhome.idea.vim.action.ex.MoveToPreviousWordAction",
+        "class": "com.maddyhome.idea.vim.action.ex.MoveCaretToPreviousBigWordAction",
         "modes": "C"
     },
     {
@@ -921,7 +991,7 @@
     },
     {
         "keys": "<S-Right>",
-        "class": "com.maddyhome.idea.vim.action.ex.MoveToNextWordAction",
+        "class": "com.maddyhome.idea.vim.action.ex.MoveCaretToNextBigWordAction",
         "modes": "C"
     },
     {
@@ -931,7 +1001,7 @@
     },
     {
         "keys": "<S-Up>",
-        "class": "com.maddyhome.idea.vim.action.ex.HistoryUpAction",
+        "class": "com.maddyhome.idea.vim.action.ex.SelectOlderHistoryAction",
         "modes": "C"
     },
     {
@@ -961,7 +1031,7 @@
     },
     {
         "keys": "<Up>",
-        "class": "com.maddyhome.idea.vim.action.ex.HistoryUpFilterAction",
+        "class": "com.maddyhome.idea.vim.action.ex.SelectOlderHistoryFilteredAction",
         "modes": "C"
     },
     {

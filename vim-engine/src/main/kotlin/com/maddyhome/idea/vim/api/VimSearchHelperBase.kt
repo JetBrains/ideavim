@@ -17,6 +17,7 @@ import com.maddyhome.idea.vim.helper.CharacterHelper.isWhitespace
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.helper.SearchOptions
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper
 import com.maddyhome.idea.vim.regexp.VimRegex
 import com.maddyhome.idea.vim.regexp.VimRegexException
 import com.maddyhome.idea.vim.regexp.VimRegexOptions
@@ -109,7 +110,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     return findNextCharacterOnLine(editor, offset, count, ch)
   }
 
-  override fun findWordNearestCursor(editor: VimEditor, offset: Int): TextRange? {
+  override fun findWordAtOrFollowingCursor(editor: VimEditor, offset: Int, isBigWord: Boolean): TextRange? {
     val chars = editor.text()
     val line = editor.offsetToBufferPosition(offset).line
     val stop = editor.getLineEndOffset(line, true)
@@ -125,15 +126,15 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     )
     for (i in 0..1) {
       start = pos
-      val type = charType(editor, chars[start], false)
+      val type = charType(editor, chars[start], isBigWord)
       if (type == types[i]) {
         // Search back for start of word
-        while (start > 0 && charType(editor, chars[start - 1], false) == types[i]) {
+        while (start > 0 && charType(editor, chars[start - 1], isBigWord) == types[i]) {
           start--
         }
       } else {
         // Search forward for start of word
-        while (start < stop && charType(editor, chars[start], false) != types[i]) {
+        while (start < stop && charType(editor, chars[start], isBigWord) != types[i]) {
           start++
         }
       }
@@ -150,19 +151,66 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     // Special case 1 character words because 'findNextWordEnd' returns one to many chars
     val end = if (start < stop &&
       (start >= chars.length - 1 ||
-        charType(editor, chars[start + 1], false) != CharacterHelper.CharacterType.KEYWORD)
+        charType(editor, chars[start + 1], isBigWord) != CharacterHelper.CharacterType.KEYWORD)
     ) {
       start + 1
     } else {
-      injector.searchHelper.findNextWordEnd(editor, start, 1, false, false) + 1
+      injector.searchHelper.findNextWordEnd(editor, start, 1, isBigWord, false) + 1
     }
 
     return TextRange(start, end)
   }
 
-  override fun findWordNearestCursor(editor: VimEditor, caret: ImmutableVimCaret): TextRange? {
+  override fun findWordAtOrFollowingCursor(editor: VimEditor, caret: ImmutableVimCaret, isBigWord: Boolean): TextRange? {
     val offset = caret.offset
-    return findWordNearestCursor(editor, offset)
+    return findWordAtOrFollowingCursor(editor, offset, isBigWord)
+  }
+
+  override fun findFilenameAtOrFollowingCursor(editor: VimEditor, caret: ImmutableVimCaret): TextRange? {
+    return findFilenameAtOrFollowingCursor(editor, caret.offset)
+  }
+  override fun findFilenameAtOrFollowingCursor(editor: VimEditor, offset: Int): TextRange? {
+    val text = editor.text()
+    if (text.isEmpty()) return null
+
+    val start = if (!KeywordOptionHelper.isFilename(editor, text[offset])) {
+      moveForwardsToStartOfFilename(editor, text, offset)
+    } else {
+      moveBackwardsToStartOfFilename(editor, text, offset)
+    }
+    if (start == -1) return null
+
+    val end = moveForwardsToEndOfFilename(editor, text, start)
+    if (end == -1) return null
+
+    return TextRange(start, end)
+  }
+
+  private fun moveForwardsToStartOfFilename(editor: VimEditor, text: CharSequence, start: Int): Int {
+    var offset = start
+    while (offset < text.length && !KeywordOptionHelper.isFilename(editor, text[offset])) {
+      if (text[offset] == '\n') return -1
+      offset++
+    }
+    if (offset == text.length) return -1
+    return offset
+  }
+
+  private fun moveBackwardsToStartOfFilename(editor: VimEditor, text: CharSequence, start: Int): Int {
+    var offset = start
+    while (offset > 0 && KeywordOptionHelper.isFilename(editor, text[offset - 1])) {
+      if (text[offset - 1] == '\n') return -1
+      offset--
+    }
+    return offset
+  }
+
+  private fun moveForwardsToEndOfFilename(editor: VimEditor, text: CharSequence, start: Int): Int {
+    var offset = start
+    while (offset < text.length && text[offset] != '\n' && KeywordOptionHelper.isFilename(editor, text[offset])) {
+      offset++
+    }
+    return offset - 1
   }
 
   override fun findNextWord(
@@ -411,6 +459,8 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     bigWord: Boolean,
     allowMoveFromWordStart: Boolean = true,
   ): Int {
+    if (chars.isEmpty()) return 0
+
     var pos = start
     val startingCharType = charType(editor, chars[pos.coerceAtMost(chars.length - 1)], bigWord)
 

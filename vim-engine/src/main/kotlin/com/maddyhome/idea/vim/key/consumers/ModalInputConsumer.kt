@@ -14,7 +14,21 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.key.KeyConsumer
 import javax.swing.KeyStroke
 
+/**
+ * Key consumer for modal input such as the confirmation prompt for the `:substitute` command
+ *
+ * The escape keys `<Esc>`/`<C-[>` and the cancel `<C-C>` keys are handled as part of modal input.
+ */
 internal class ModalInputConsumer : KeyConsumer {
+  override fun isApplicable(
+    key: KeyStroke,
+    editor: VimEditor,
+    allowKeyMappings: Boolean,
+    keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder
+  ): Boolean {
+    return injector.modalInput.getCurrentModalInput() != null
+  }
+
   override fun consumeKey(
     key: KeyStroke,
     editor: VimEditor,

@@ -10,32 +10,18 @@ package com.maddyhome.idea.vim.action.ex
 
 import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
-import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimCommandLine
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
-import com.maddyhome.idea.vim.handler.VimActionHandler
 
 @CommandOrMotion(keys = ["<C-W>"], modes = [Mode.CMD_LINE])
-class DeletePrevWordAction : VimActionHandler.SingleExecution() {
-  override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
-
-  override fun execute(
-    editor: VimEditor,
-    context: ExecutionContext,
-    cmd: Command,
-    operatorArguments: OperatorArguments,
-  ): Boolean {
-    val commandLine = injector.commandLine.getActiveCommandLine() ?: return false
-
+class DeletePreviousWordAction : CommandLineActionHandler() {
+  override fun execute(commandLine: VimCommandLine): Boolean {
     val caretOffset = commandLine.caret.offset
     if (caretOffset == 0) return true
 
     val oldText = commandLine.text
-    val motion =
-      injector.motion.findOffsetOfNextWord(oldText, commandLine.caret.offset, -1, true, editor)
+    val motion = injector.motion.findOffsetOfNextWord(oldText, commandLine.caret.offset, count = -1, bigWord = false, commandLine.editor)
     if (motion is Motion.AbsoluteOffset) {
       commandLine.deleteText(motion.offset, caretOffset - motion.offset)
     }

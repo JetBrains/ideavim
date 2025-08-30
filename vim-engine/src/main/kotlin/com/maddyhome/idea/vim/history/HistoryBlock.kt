@@ -12,11 +12,18 @@ import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 
 class HistoryBlock {
-  private val entries: MutableList<HistoryEntry> = ArrayList()
+  private val entries = mutableListOf<HistoryEntry>()
 
   private var counter = 0
 
   fun addEntry(text: String) {
+    // If we have a last entry, it's no longer the current one
+    if (entries.isNotEmpty()) {
+      val last = entries.removeLast()
+      entries.add(HistoryEntry(last.number, last.entry, current = false))
+    }
+
+    // If this entry already exists, remove it so we can add it as the newest entry
     for (i in entries.indices) {
       val entry = entries[i]
       if (text == entry.entry) {
@@ -24,7 +31,11 @@ class HistoryBlock {
         break
       }
     }
-    entries.add(HistoryEntry(++counter, text))
+
+    // Add the new entry as the current one
+    entries.add(HistoryEntry(++counter, text, current = true))
+
+    // If we're over the maximum number of entries, remove the oldest one
     if (entries.size > maxLength()) {
       entries.removeAt(0)
     }
