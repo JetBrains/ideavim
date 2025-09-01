@@ -50,6 +50,7 @@ sealed class Argument {
     constructor(motion: MotionActionHandler, argument: Argument?) : this(motion as EditorActionHandlerBase, argument)
     constructor(motion: TextObjectActionHandler) : this(motion as EditorActionHandlerBase)
     constructor(motion: ExternalActionHandler) : this(motion as EditorActionHandlerBase)
+    constructor(motion: EditorActionHandlerBase) : this(motion, null)
 
     fun getMotionType() = if (isLinewiseMotion()) SelectionType.LINE_WISE else SelectionType.CHARACTER_WISE
 
@@ -57,7 +58,7 @@ sealed class Argument {
       is TextObjectActionHandler -> motion.visualType == TextObjectVisualType.LINE_WISE
       is MotionActionHandler -> motion.motionType == MotionType.LINE_WISE
       is ExternalActionHandler -> motion.isLinewiseMotion
-      else -> error("Command is not a motion: $motion")
+      else -> false  // Default to character-wise for other actions
     }
 
     fun withArgument(argument: Argument) = Motion(motion, argument)
