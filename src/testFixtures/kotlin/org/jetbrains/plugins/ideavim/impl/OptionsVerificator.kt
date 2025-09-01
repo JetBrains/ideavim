@@ -298,7 +298,7 @@ private class VimOptionsInvocator : TestTemplateInvocationContextProvider {
         } else {
           when (option) {
             is ToggleOption -> vimOption.limitedValues.map { option to if (it == "true") VimInt.ONE else VimInt.ZERO }
-            is NumberOption -> vimOption.limitedValues.map { option to VimInt(it) }
+            is NumberOption -> vimOption.limitedValues.map { option to VimInt.parseNumber(it) }
             is StringOption, is StringListOption -> {
               vimOption.limitedValues.map { limitedValue -> option to VimString(limitedValue) }
             }

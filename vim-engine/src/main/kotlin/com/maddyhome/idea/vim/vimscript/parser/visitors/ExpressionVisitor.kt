@@ -80,7 +80,7 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
   }
 
   override fun visitIntExpression(ctx: IntExpressionContext): Expression {
-    val result = SimpleExpression(VimInt(ctx.text))
+    val result = SimpleExpression(VimInt.parseNumber(ctx.text) ?: VimInt.ZERO)
     result.originalString = ctx.text
     return result
   }
