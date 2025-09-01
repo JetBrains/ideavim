@@ -63,4 +63,31 @@ class InsertExitModeActionTest : VimTestCase() {
     assertState("12${c}3")
 
   }
+
+  @Test
+  fun `test exit insert mode in read-only file`() {
+    // Test that ESC works in read-only files without hanging
+    configureByText("test ${c}content")
+    fixture.editor.document.setReadOnly(true)
+
+    // This should complete without hanging or errors
+    typeText("i<Esc>")
+
+    // Reset read-only status
+    fixture.editor.document.setReadOnly(false)
+  }
+
+  @Test
+  fun `test exit insert mode with repeat count in read-only file`() {
+    // Test that ESC works with repeat counts in read-only files
+    configureByText("${c}hello")
+    fixture.editor.document.setReadOnly(true)
+
+    // 3i should repeat the insert 3 times when ESC is pressed
+    // In read-only files, this should exit cleanly without hanging
+    typeText("3i<Esc>")
+
+    // Reset read-only status
+    fixture.editor.document.setReadOnly(false)
+  }
 }
