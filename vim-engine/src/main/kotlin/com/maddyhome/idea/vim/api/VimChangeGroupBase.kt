@@ -448,20 +448,23 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    * @param mode    The mode - indicate insert or replace
    */
   override fun initInsert(editor: VimEditor, context: ExecutionContext, mode: Mode) {
-    // Prevent entering insert mode in read-only files
-    if (!editor.isWritable()) {
-      injector.messages.showStatusBarMessage(editor, "Cannot make changes, file is read-only")
-      injector.messages.indicateError()
-      return
-    }
-    
     val state = injector.vimState
-    for (caret in editor.nativeCarets()) {
-      caret.vimInsertStart = editor.createLiveMarker(caret.offset, caret.offset)
-      injector.markService.setMark(caret, MARK_CHANGE_START, caret.offset)
-    }
     val cmd = state.executingCommand
+    
+    // Handle repeat case first
     if (cmd != null && state.isDotRepeatInProgress) {
+      // For repeat operations, we need to check writability before processing
+      if (!editor.isWritable()) {
+        injector.messages.showStatusBarMessage(editor, "Cannot make changes, file is read-only")
+        injector.messages.indicateError()
+        return
+      }
+      
+      for (caret in editor.nativeCarets()) {
+        caret.vimInsertStart = editor.createLiveMarker(caret.offset, caret.offset)
+        injector.markService.setMark(caret, MARK_CHANGE_START, caret.offset)
+      }
+      
       editor.mode = mode
       if (mode == Mode.REPLACE) {
         editor.insertMode = false
@@ -473,6 +476,18 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       }
       editor.mode = Mode.NORMAL()
     } else {
+      // For new insert operations, check writability before entering insert mode
+      if (!editor.isWritable()) {
+        injector.messages.showStatusBarMessage(editor, "Cannot make changes, file is read-only")
+        injector.messages.indicateError()
+        return
+      }
+      
+      for (caret in editor.nativeCarets()) {
+        caret.vimInsertStart = editor.createLiveMarker(caret.offset, caret.offset)
+        injector.markService.setMark(caret, MARK_CHANGE_START, caret.offset)
+      }
+      
       lastInsert = cmd
       strokes.clear()
       repeatCharsCount = 0
