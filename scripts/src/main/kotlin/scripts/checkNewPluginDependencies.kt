@@ -47,6 +47,10 @@ val knownPlugins = setOf(
   "com.ugarosa.idea.edgemotion", // https://plugins.jetbrains.com/plugin/27211-edgemotion
 
   "cn.mumukehao.plugin",
+
+  "com.magidc.ideavim.anyObject",
+  "dev.ghostflyby.ideavim.toggleIME",
+  "com.magidc.ideavim.dial",
 )
 
 suspend fun main() {

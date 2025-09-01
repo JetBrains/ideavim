@@ -46,6 +46,9 @@ object Compatibility : IdeaVimBuildType({
               java -jar verifier1/verifier-cli-dev-all-2.jar check-plugin '${'$'}com.miksuki.HighlightCursor' [latest-IU] -team-city
               java -jar verifier1/verifier-cli-dev-all-2.jar check-plugin '${'$'}com.ugarosa.idea.edgemotion' [latest-IU] -team-city
               java -jar verifier1/verifier-cli-dev-all-2.jar check-plugin '${'$'}cn.mumukehao.plugin' [latest-IU] -team-city
+              java -jar verifier1/verifier-cli-dev-all-2.jar check-plugin '${'$'}com.magidc.ideavim.dial' [latest-IU] -team-city
+              java -jar verifier1/verifier-cli-dev-all-2.jar check-plugin '${'$'}dev.ghostflyby.ideavim.toggleIME' [latest-IU] -team-city
+              java -jar verifier1/verifier-cli-dev-all-2.jar check-plugin '${'$'}com.magidc.ideavim.anyObject' [latest-IU] -team-city
             """.trimIndent()
     }
   }
