@@ -103,7 +103,8 @@ internal class IjVariableService : VimVariableServiceBase(), PersistentStateComp
         }
 
         "int" -> {
-          vimVariables[variableElement.getAttributeValue("key")] = VimInt(variableElement.getAttributeValue("value"))
+          vimVariables[variableElement.getAttributeValue("key")] =
+            VimInt.parseNumber(variableElement.getAttributeValue("value")) ?: VimInt.ZERO
         }
       }
     }

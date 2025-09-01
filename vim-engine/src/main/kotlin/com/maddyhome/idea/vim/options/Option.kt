@@ -13,7 +13,6 @@ import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.datatypes.parseNumber
 import java.util.*
 
 /**
@@ -24,7 +23,7 @@ import java.util.*
  *
  * A note on variance: derived classes will also use a derived type of [VimDataType], which means that e.g.
  * `StringOption` would derive from `Option<VimString>`, which is not assignable to `Option<VimDataType>`. This can work
- * if we make the type covariant (e.g. `Option<out T : VimDataType>`) however the type is not covariant - it's not
+ * if we make the type covariant (e.g. `Option<out T : VimDataType>`) however, the type is not covariant - it's not
  * solely a producer ([checkIfValueValid] is a consumer, for example), so we must keep [T] as invariant. Furthermore,
  * if we make it covariant, then we also lose some type safety, with something like
  * `setValue(numberOption, VimString("foo"))` not treated as an error.
@@ -35,7 +34,7 @@ import java.util.*
  * @param declaredScope The declared scope of the option - global, global-local, local-to-buffer, local-to-window
  * @param abbrev  An abbreviated name for the option, recognised by `:set`
  * @param defaultValue  The default value of the option, if not set by the user
- * @param unsetValue    The value of the local part of a global-local option, if the local part has not been set
+ * @param unsetValue    The value of the local part of a global-local option if the local part has not been set
  * @param isLocalNoGlobal Most local options are initialised by copying the global value from the opening window. If
  *                        this value is true, this value is not copied and the local option is set to default.
  *                        See `:help local-noglobal`
@@ -258,8 +257,11 @@ open class NumberOption(
     if (value !is VimInt) throw exExceptionMessage("E521", token)
   }
 
-  override fun parseValue(value: String, token: String): VimInt =
-    VimInt(parseNumber(value) ?: throw exExceptionMessage("E521", token)).also { checkIfValueValid(it, token) }
+  override fun parseValue(value: String, token: String): VimInt {
+    val number = VimInt.parseNumber(value) ?: throw exExceptionMessage("E521", token)
+    checkIfValueValid(number, token)
+    return number
+  }
 
   fun addValues(value1: VimInt, value2: VimInt): VimInt = VimInt(value1.value + value2.value)
   fun multiplyValues(value1: VimInt, value2: VimInt): VimInt = VimInt(value1.value * value2.value)
@@ -271,7 +273,7 @@ open class NumberOption(
  *
  * If an unsigned number option is global-local, then its [unsetValue] is inherited from [NumberOption] and will be
  * `-1`. While this value is invalid, it is used as a sentinel value to know that the local value is not set. Consumers
- * of the options API will not use the raw local value, but will get the effective value (if unset, the global value is
+ * of the options API will not use the raw local value but will get the effective value (if unset, the global value is
  * used). Only the `:setlocal {option}?` command needs the raw local value, but uses it for output purposes only.
  *
  * @constructor Creates a new [UnsignedNumberOption] instance
@@ -307,7 +309,7 @@ open class UnsignedNumberOption(
  *
  * Boolean options are represented as a number, using the [VimInt] datatype. A value of zero is treated as false, and
  * any other value is treated as true. If a boolean option is global-local, the [unsetValue] is set to the `-1` sentinel
- * value. Vim does not document this anywhere, however it can be observed using `:echo &l:autoread` which will output
+ * value. Vim does not document this anywhere; however, it can be observed using `:echo &l:autoread` which will output
  * the unset value of the local boolean option `'autoread'` as `-1`.
  *
  * @constructor Creates a new [UnsignedNumberOption] instance
