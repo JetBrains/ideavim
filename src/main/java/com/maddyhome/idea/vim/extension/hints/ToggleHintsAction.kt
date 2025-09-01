@@ -13,12 +13,9 @@ import com.intellij.openapi.project.DumbAwareToggleAction
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.ui.popup.JBPopupListener
 import com.intellij.openapi.ui.popup.LightweightWindowEvent
-import com.intellij.openapi.ui.popup.PopupStep
-import com.intellij.openapi.ui.popup.util.BaseListPopupStep
 import com.intellij.openapi.wm.WindowManager
 import com.intellij.openapi.wm.impl.IdeGlassPaneImpl
 import com.intellij.ui.JBColor
-import com.intellij.ui.components.JBList
 import com.intellij.ui.treeStructure.Tree
 import java.awt.Color
 import javax.swing.JLabel
@@ -61,24 +58,15 @@ class ToggleHintsAction : DumbAwareToggleAction() {
     if (cover !in glassPane.components) glassPane.add(cover)
     glassPane.isVisible = true
     cover.isVisible = true
-    val popup =
-      JBPopupFactory.getInstance().createListPopup(object : BaseListPopupStep<HintTarget>("Type to Filter", targets) {
-        override fun getTextFor(value: HintTarget) = value.hint
-        override fun isSpeedSearchEnabled(): Boolean = true
-        override fun onChosen(selectedValue: HintTarget?, finalChoice: Boolean): PopupStep<*>? {
-          selectedValue?.component?.accessibleContext?.accessibleAction?.doAccessibleAction(0)
-          return FINAL_CHOICE
-        }
-      })
+    val select = JPanel()
+    val popup = JBPopupFactory.getInstance().createComponentPopupBuilder(select, select).createPopup()
+    popup.setRequestFocus(true)
+    HintDispatcher(targets, select, popup)
     popup.addListener(object : JBPopupListener {
       override fun onClosed(event: LightweightWindowEvent) {
         disable()
       }
     })
-    popup.addListSelectionListener {
-      val current = ((it.source as JBList<*>).selectedValue as? HintTarget)
-      highlight.setTarget(current)
-    }
     popup.showInCenterOf(rootPane)
 
     enabled = true
@@ -86,7 +74,6 @@ class ToggleHintsAction : DumbAwareToggleAction() {
 
   private fun disable() {
     cover.isVisible = false
-    highlight.setTarget(null)
 
     enabled = false
   }
