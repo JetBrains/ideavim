@@ -57,8 +57,6 @@
   <projectListeners>
     <listener class="com.maddyhome.idea.vim.group.JumpsListener"
               topic="com.intellij.openapi.fileEditor.impl.IdeDocumentHistoryImpl$RecentPlacesListener"/>
-    <listener class="com.maddyhome.idea.vim.extension.nerdtree.NerdTree$ProjectViewListener"
-              topic="com.intellij.openapi.wm.ex.ToolWindowManagerListener"/>
     <listener class="com.maddyhome.idea.vim.listener.VimListenerManager$VimFileEditorManagerListener"
               topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
 
