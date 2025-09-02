@@ -187,7 +187,7 @@ private object VimActionsPopup {
     actionGroup.add(ShortcutConflictsSettings)
     actionGroup.add(
       HelpLink(
-        MessageHelper.message("action.plugins"),
+        "Plugin ↗",
         "https://jb.gg/ideavim-plugins",
         null,
       ),
@@ -204,7 +204,7 @@ private object VimActionsPopup {
     actionGroup.add(JoinEap)
     actionGroup.add(
       HelpLink(
-        MessageHelper.message("action.about.eap.text"),
+        "About EAP ↗",
         "https://github.com/JetBrains/ideavim#get-early-access",
         null,
       ),
