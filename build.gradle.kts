@@ -145,6 +145,12 @@ dependencies {
     if (ideaVersion == "LATEST-EAP-SNAPSHOT") {
       bundledModule("intellij.spellchecker")
     }
+    if (ideaVersion.startsWith("2025.2")) {
+      bundledModule("intellij.spellchecker")
+    }
+    if (ideaVersion.startsWith("2025.3")) {
+      bundledModule("intellij.spellchecker")
+    }
   }
 
   moduleSources(project(":vim-engine", "sourcesJarArtifacts"))
