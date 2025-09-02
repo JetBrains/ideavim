@@ -20,7 +20,9 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.impl.LaterInvocator
+import com.intellij.openapi.components.service
 import com.intellij.openapi.fileTypes.PlainTextLanguage
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.DumbAwareAction
@@ -92,12 +94,7 @@ internal class StatusBarIconFactory : StatusBarWidgetFactory/*, LightEditCompati
   override fun isConfigurable(): Boolean = true
 
   private fun updateAll() {
-    val projectManager = ProjectManager.getInstanceIfCreated() ?: return
-    for (project in projectManager.openProjects) {
-      val statusBarWidgetsManager = project.getService(StatusBarWidgetsManager::class.java) ?: continue
-      statusBarWidgetsManager.updateWidget(this)
-    }
-
+    ApplicationManager.getApplication().service<StatusBarWidgetsManager>().updateWidget(this)
     Util.updateIcon()
   }
 
