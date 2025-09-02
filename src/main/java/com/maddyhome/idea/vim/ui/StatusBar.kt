@@ -213,6 +213,13 @@ private object VimActionsPopup {
     actionGroup.addSeparator("Learn")
 
     actionGroup.add(TutorAction())
+    actionGroup.add(
+      HelpLink(
+        "IdeaVim Docs ↗",
+        "https://github.com/JetBrains/ideavim?tab=readme-ov-file#summary-of-supported-vim-features",
+        null,
+      ),
+    )
 
     actionGroup.addSeparator(MessageHelper.message("action.contacts.help.text"))
     actionGroup.add(
