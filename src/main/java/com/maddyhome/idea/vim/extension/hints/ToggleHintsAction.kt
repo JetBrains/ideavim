@@ -17,6 +17,8 @@ import com.intellij.openapi.wm.WindowManager
 import com.intellij.openapi.wm.impl.IdeGlassPaneImpl
 import com.intellij.ui.JBColor
 import com.intellij.ui.treeStructure.Tree
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.extension.ShortcutDispatcher
 import java.awt.Color
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -61,12 +63,18 @@ class ToggleHintsAction : DumbAwareToggleAction() {
     val select = JPanel()
     val popup = JBPopupFactory.getInstance().createComponentPopupBuilder(select, select).createPopup()
     popup.setRequestFocus(true)
-    HintDispatcher(targets, select, popup)
     popup.addListener(object : JBPopupListener {
       override fun onClosed(event: LightweightWindowEvent) {
         disable()
       }
     })
+    ShortcutDispatcher("hints", targets.associateBy { it.hint.lowercase() }, { (component) ->
+      popup.closeOk(null)
+      component.accessibleContext?.accessibleAction?.doAccessibleAction(0)
+    }, {
+      popup.cancel()
+      injector.messages.indicateError()
+    }, {}).register(select, popup)
     popup.showInCenterOf(rootPane)
 
     enabled = true
