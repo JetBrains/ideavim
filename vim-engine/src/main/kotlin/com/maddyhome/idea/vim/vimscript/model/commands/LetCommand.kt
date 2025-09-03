@@ -23,9 +23,13 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimBlob
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.EnvVariableExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.OneElementSublistExpression
@@ -133,7 +137,10 @@ data class LetCommand(
           }
 
           is VimBlob -> TODO()
-          else -> throw exExceptionMessage("E689")
+          else -> {
+            val text = variable.originalString + operator.value + expression.originalString
+            throw exExceptionMessage("E689", getTypeName(containerValue), text)
+          }
         }
       }
 
@@ -238,6 +245,19 @@ data class LetCommand(
       else -> throw exExceptionMessage("E121", variable.originalString)
     }
     return ExecutionResult.Success
+  }
+
+  private fun getTypeName(dataType: VimDataType): String {
+    return when (dataType) {
+      is VimBlob -> "blob"
+      is VimDictionary -> "dict"
+      is VimFloat -> "float"
+      is VimFuncref -> "funcref"
+      is VimInt -> "number"
+      is VimList -> "list"
+      is VimString -> "string"
+      else -> "unknown"
+    }
   }
 
   private fun isInsideFunction(vimLContext: VimLContext): Boolean {
