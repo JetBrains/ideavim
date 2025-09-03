@@ -11,37 +11,6 @@ package com.maddyhome.idea.vim.vimscript.model.datatypes
 import com.maddyhome.idea.vim.ex.ExException
 
 abstract class VimDataType {
-
-  /**
-   * Deprecated. Returns the current object as a string value, throwing if there is no conversion available
-   *
-   * This function is unclear on its intended usage, as there are several reasons for getting a string or textual
-   * representation of a Vim expression result.
-   *
-   * If the caller requires a String value from an expression result, it is better to be explicit and use [toVimString]
-   * and then use the accessors to get the underlying value. This will apply the correct automatic conversion from
-   * Number, and throw for other datatypes.
-   *
-   * This function is used by external plugins.
-   */
-  @Deprecated("Use toVimString().value instead", ReplaceWith("toVimString().value"))
-  fun asString(): String = toVimString().value
-
-  /**
-   * Deprecated. Returns the current object as a boolean value, throwing if there is no conversion available
-   *
-   * The original implementation of this would incorrectly convert Float to a boolean value, which is not part of Vim's
-   * conversion rules.
-   *
-   * If the caller requires a boolean value from an expression result, it is better to be explicit that the expression
-   * is expected to be a Vim Number, by calling [toVimNumber]. This function will apply the correct conversion rules
-   * (only String can convert to Number) and will throw otherwise.
-   *
-   * This function is used by external plugins.
-   */
-  @Deprecated("Use toVimNumber().booleanValue instead", ReplaceWith("toVimNumber().booleanValue"))
-  fun asBoolean(): Boolean = toVimNumber().booleanValue
-
   /**
    * Returns this object as a Vim Float. If the object is not a Float, this function throws
    */
@@ -93,6 +62,45 @@ abstract class VimDataType {
    */
   open fun toInsertableString() = toOutputString()
 
+  abstract fun deepCopy(level: Int = 100): VimDataType
+
+  var lockOwner: Any? = null
+  var isLocked: Boolean = false
+    protected set
+
+  abstract fun lockVar(depth: Int)
+  abstract fun unlockVar(depth: Int)
+
+  /**
+   * Deprecated. Returns the current object as a string value, throwing if there is no conversion available
+   *
+   * This function is unclear on its intended usage, as there are several reasons for getting a string or textual
+   * representation of a Vim expression result.
+   *
+   * If the caller requires a String value from an expression result, it is better to be explicit and use [toVimString]
+   * and then use the accessors to get the underlying value. This will apply the correct automatic conversion from
+   * Number, and throw for other datatypes.
+   *
+   * This function is used by external plugins.
+   */
+  @Deprecated("Use toVimString().value instead", ReplaceWith("toVimString().value"))
+  fun asString(): String = toVimString().value
+
+  /**
+   * Deprecated. Returns the current object as a boolean value, throwing if there is no conversion available
+   *
+   * The original implementation of this would incorrectly convert Float to a boolean value, which is not part of Vim's
+   * conversion rules.
+   *
+   * If the caller requires a boolean value from an expression result, it is better to be explicit that the expression
+   * is expected to be a Vim Number, by calling [toVimNumber]. This function will apply the correct conversion rules
+   * (only String can convert to Number) and will throw otherwise.
+   *
+   * This function is used by external plugins.
+   */
+  @Deprecated("Use toVimNumber().booleanValue instead", ReplaceWith("toVimNumber().booleanValue"))
+  fun asBoolean(): Boolean = toVimNumber().booleanValue
+
   /**
    * Provides a diagnostic string representation of an object, useful while debugging
    *
@@ -103,13 +111,4 @@ abstract class VimDataType {
   @Suppress("POTENTIALLY_NON_REPORTED_ANNOTATION")
   @Deprecated("Use toOutputString instead", ReplaceWith("toOutputString()"))
   final override fun toString() = "${this.javaClass.simpleName}(${toOutputString()})"
-
-  abstract fun deepCopy(level: Int = 100): VimDataType
-
-  var lockOwner: Any? = null
-  var isLocked: Boolean = false
-    protected set
-
-  abstract fun lockVar(depth: Int)
-  abstract fun unlockVar(depth: Int)
 }
