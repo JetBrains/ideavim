@@ -144,7 +144,7 @@ class KeyStrokeTrie<T>(private val name: String) {
       }
     }
 
-    val node = prefix?.let { getTrieNode(it) as TrieNodeImpl<T> } ?: root
+    val node = prefix?.let { (getTrieNode(it) ?: return emptySequence()) as TrieNodeImpl<T> } ?: root
     return sequence { yieldTrieNode(node) }
   }
 
