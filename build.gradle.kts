@@ -338,6 +338,8 @@ intellijPlatform {
         • Added support for <code>Tab</code> in Normal mode to review and accept <a href="https://blog.jetbrains.com/ai/2025/08/introducing-next-edit-suggestions-in-jetbrains-ai-assistant/">Next Edit Suggestions</a> | <a href="https://youtrack.jetbrains.com/issue/VIM-4010">VIM-4010</a><br>
         • Added support for <code>Tab</code> remapping in Insert mode | <a href="https://youtrack.jetbrains.com/issue/VIM-2331">VIM-2331</a><br>
         • Extended NERDTree support to Tree components other than Project with <code>:set NERDTreeEverywhere</code> | <a href="https://youtrack.jetbrains.com/issue/VIM-3253">VIM-3253</a><br>
+        • Added link to <a href="https://jb.gg/ideavim">IdeaVim documentation</a> in status bar menu<br>
+        • Added external link indicators (↗) to status bar menu links<br>
         <br>
         <b>Fixes:</b><br>
         • <a href="https://youtrack.jetbrains.com/issue/VIM-3981">VIM-3981</a> Fixed <code>:set noNERDTree</code> command to properly disable NERDTree<br>

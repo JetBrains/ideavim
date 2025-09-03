@@ -31,6 +31,8 @@ usual beta standards.
 * Added support for `Tab` in Normal mode to review and accept [Next Edit Suggestions](https://blog.jetbrains.com/ai/2025/08/introducing-next-edit-suggestions-in-jetbrains-ai-assistant/) | [VIM-4010](https://youtrack.jetbrains.com/issue/VIM-4010)
 * Added support for `Tab` remapping in Insert mode | [VIM-2331](https://youtrack.jetbrains.com/issue/VIM-2331)
 * Extended NERDTree support to Tree components other than Project with `:set NERDTreeEverywhere` | [VIM-3253](https://youtrack.jetbrains.com/issue/VIM-3253)
+* Added link to [IdeaVim documentation](https://jb.gg/ideavim) in status bar menu
+* Added external link indicators (↗) to status bar menu links
 
 ### Fixes:
 * [VIM-3981](https://youtrack.jetbrains.com/issue/VIM-3981) Fixed `:set noNERDTree` command to properly disable NERDTree
