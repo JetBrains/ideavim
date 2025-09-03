@@ -17,6 +17,7 @@ import com.intellij.openapi.wm.WindowManager
 import com.intellij.openapi.wm.impl.IdeGlassPaneImpl
 import com.intellij.ui.JBColor
 import com.intellij.ui.treeStructure.Tree
+import com.intellij.util.Alarm
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.extension.ShortcutDispatcher
 import java.awt.Color
@@ -33,6 +34,7 @@ class ToggleHintsAction : DumbAwareToggleAction() {
     isVisible = false
   }
 
+  private val alarm = Alarm(Alarm.ThreadToUse.SWING_THREAD)
   private val highlight = HighlightComponent()
 
   private val generator = HintGenerator.Permutation(alphabet)
@@ -68,9 +70,13 @@ class ToggleHintsAction : DumbAwareToggleAction() {
         disable()
       }
     })
-    ShortcutDispatcher("hints", targets.associateBy { it.hint.lowercase() }, { (component) ->
+    ShortcutDispatcher("hints", targets.associateBy { it.hint.lowercase() }, { target ->
       popup.closeOk(null)
-      component.accessibleContext?.accessibleAction?.doAccessibleAction(0)
+      alarm.cancelAllRequests()
+      target.component.accessibleContext?.accessibleAction?.doAccessibleAction(0)?.also {
+        highlight.setTarget(target)
+        alarm.addRequest({ highlight.setTarget(null) }, highlightDuration)
+      }
     }, {
       popup.cancel()
       injector.messages.indicateError()
@@ -116,5 +122,7 @@ private class HighlightComponent : JPanel() {
     }
   }
 }
+
+private const val highlightDuration = 500
 
 private val alphabet = "ASDFGHJKL".toList()
