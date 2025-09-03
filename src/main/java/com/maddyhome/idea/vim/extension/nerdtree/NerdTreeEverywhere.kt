@@ -12,9 +12,6 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.ui.treeStructure.Tree
 import com.maddyhome.idea.vim.extension.VimExtension
-import com.maddyhome.idea.vim.group.KeyGroup
-import com.maddyhome.idea.vim.key.MappingOwner
-import com.maddyhome.idea.vim.key.RequiredShortcut
 import java.awt.KeyboardFocusManager
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
@@ -40,9 +37,8 @@ internal class NerdTreeEverywhere : VimExtension {
     val oldFocusOwner = evt.oldValue
     val dispatcher = service<Dispatcher>()
     if (newFocusOwner is Tree) {
-      val shortcuts = mappings.keyStrokes.map { RequiredShortcut(it, MappingOwner.Plugin.get(PLUGIN_NAME)) }
       // It's okay to have `register` called multiple times, as its internal implementation prevents duplicate registrations
-      dispatcher.registerCustomShortcutSet(KeyGroup.toShortcutSet(shortcuts), newFocusOwner)
+      dispatcher.register(newFocusOwner)
     }
     // Unregistration of the shortcut is required to make the plugin disposable
     if (oldFocusOwner is Tree) {
@@ -55,16 +51,15 @@ internal class NerdTreeEverywhere : VimExtension {
   }
 
   @Service
-  class Dispatcher : AbstractDispatcher(mappings) {
+  class Dispatcher : AbstractDispatcher(PLUGIN_NAME, navigationMappings.toMutableMap().apply {
+    register("NERDTreeMapActivateNode", "o", NerdTreeAction { _, tree ->
+      // TODO a more reliable way of invocation (such as double-clicking?)
+      val listener = tree.getActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0))
+      listener.actionPerformed(ActionEvent(tree, ActionEvent.ACTION_PERFORMED, null))
+    })
+  }) {
     init {
       templatePresentation.isEnabledInModalContext = true
-
-      mappings.registerNavigationMappings()
-      mappings.register("NERDTreeMapActivateNode", "o", Mappings.Action { _, tree ->
-        // TODO a more reliable way of invocation (such as double-clicking?)
-        val listener = tree.getActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0))
-        listener.actionPerformed(ActionEvent(tree, ActionEvent.ACTION_PERFORMED, null))
-      })
     }
   }
 
@@ -73,5 +68,3 @@ internal class NerdTreeEverywhere : VimExtension {
     super.dispose()
   }
 }
-
-private val mappings = Mappings(NerdTreeEverywhere.PLUGIN_NAME)
