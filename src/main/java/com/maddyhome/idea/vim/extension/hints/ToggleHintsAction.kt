@@ -80,7 +80,12 @@ class ToggleHintsAction : DumbAwareToggleAction() {
     }, {
       popup.cancel()
       injector.messages.indicateError()
-    }, {}).register(select, popup)
+    }, { entries ->
+      cover.isVisible = false
+      cover.removeAll()
+      entries.map { it.data!! }.map(HintTarget::createCover).forEach(cover::add)
+      cover.isVisible = true
+    }).register(select, popup)
     popup.showInCenterOf(rootPane)
 
     enabled = true
