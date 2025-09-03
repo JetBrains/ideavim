@@ -113,12 +113,7 @@ class KeyStrokeTrie<T>(private val name: String) {
    * @return Returns null if the key sequence does not exist, or if the data at the node is empty
    */
   fun getData(keyStrokes: List<KeyStroke>): T? {
-    var current = root
-    keyStrokes.forEach {
-      if (!current.children.isInitialized()) return null
-      current = current.children.value[it] ?: return null
-    }
-    return current.data
+    return getTrieNode(keyStrokes)?.data
   }
 
   /**
