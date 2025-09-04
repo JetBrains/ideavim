@@ -9,6 +9,8 @@ on:
 jobs:
   update-changelog:
     runs-on: ubuntu-latest
+    if: github.repository == 'JetBrains/ideavim'
+
     permissions:
       contents: write
       pull-requests: write
