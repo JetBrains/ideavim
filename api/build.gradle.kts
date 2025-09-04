@@ -20,7 +20,7 @@ dependencies {
   testImplementation(platform("org.junit:junit-bom:5.10.0"))
   testImplementation("org.junit.jupiter:junit-jupiter")
   compileOnly("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
-  compileOnly("org.jetbrains:annotations:26.0.2")
+  compileOnly("org.jetbrains:annotations:26.0.2-1")
   compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.8.1")
 }
 

@@ -114,7 +114,7 @@ dependencies {
   compileOnly(project(":annotation-processors"))
 
   compileOnly("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
-  compileOnly("org.jetbrains:annotations:26.0.2")
+  compileOnly("org.jetbrains:annotations:26.0.2-1")
 
   intellijPlatform {
     // Snapshots don't use installers
