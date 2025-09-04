@@ -16,7 +16,6 @@ import com.intellij.openapi.ui.popup.LightweightWindowEvent
 import com.intellij.openapi.wm.WindowManager
 import com.intellij.openapi.wm.impl.IdeGlassPaneImpl
 import com.intellij.ui.JBColor
-import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.Alarm
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.extension.ShortcutDispatcher
@@ -99,22 +98,19 @@ class ToggleHintsAction : DumbAwareToggleAction() {
 }
 
 private fun HintTarget.createCover() = JPanel().apply {
-  background = JBColor(Color(0, 0, 0, 0), Color(0, 0, 0, 0))
+  isOpaque = false
   bounds = this@createCover.bounds
-  border = javax.swing.border.LineBorder(JBColor.BLUE, 1)
   add(JLabel().apply {
     text = hint
-    foreground = JBColor.RED
+    isOpaque = true
+    background = JBColor.YELLOW.let { Color(it.red, it.green, it.blue, 200) }
+    foreground = JBColor.foreground()
   })
-  if (component is Tree) {
-    border = javax.swing.border.LineBorder(JBColor.RED, 1)
-  }
-  isVisible = true
 }
 
 private class HighlightComponent : JPanel() {
   init {
-    background = JBColor(Color(0, 255, 0, 50), Color(0, 255, 0, 50))
+    background = JBColor.GREEN.let { Color(it.red, it.green, it.blue, 100) }
     border = javax.swing.border.LineBorder(JBColor.GREEN, 1)
   }
 
