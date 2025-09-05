@@ -35,8 +35,8 @@ import com.maddyhome.idea.vim.api.VimFoldRegion
 import com.maddyhome.idea.vim.api.VimIndentConfig
 import com.maddyhome.idea.vim.api.VimScrollingModel
 import com.maddyhome.idea.vim.api.VimSelectionModel
-import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.api.VimVirtualFile
+import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.IndentConfig
 import com.maddyhome.idea.vim.common.LiveRange
@@ -49,7 +49,6 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.exitInsertMode
 import com.maddyhome.idea.vim.helper.exitSelectMode
-import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.inExMode
 import com.maddyhome.idea.vim.helper.isTemplateActive
@@ -101,7 +100,7 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase(
   override val indentConfig: VimIndentConfig
     get() = IndentConfig.create(editor)
 
-  override fun fileSize(): Long = editor.fileSize.toLong()
+  override fun fileSize(): Long = editor.document.textLength.toLong()
 
   override fun text(): CharSequence {
     return editor.document.charsSequence
@@ -353,7 +352,7 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase(
       if (lineCount() != 0) {
         StrictMode.fail("Incorrect line: $line, out of ${lineCount()}")
       }
-      editor.fileSize
+      editor.document.textLength
     } else {
       editor.document.getLineStartOffset(line)
     }

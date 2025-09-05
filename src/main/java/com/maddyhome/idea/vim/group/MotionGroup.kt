@@ -40,7 +40,6 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.exitVisualMode
-import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.getNormalizedScrollOffset
 import com.maddyhome.idea.vim.helper.getNormalizedSideScrollOffset
 import com.maddyhome.idea.vim.helper.isEndAllowed
@@ -212,7 +211,7 @@ internal class MotionGroup : VimMotionGroupBase() {
           end = (motion as AbsoluteOffset).offset
 
           // If inclusive, add the last character to the range
-          if (action.motionType === MotionType.INCLUSIVE && end < editor.fileSize) {
+          if (action.motionType === MotionType.INCLUSIVE && end < editor.vim.fileSize()) {
             if (start > end) {
               start++
             } else {

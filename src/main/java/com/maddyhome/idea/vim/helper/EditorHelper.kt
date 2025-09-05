@@ -25,10 +25,6 @@ import java.awt.Component
 import javax.swing.JComponent
 import javax.swing.JTable
 
-@Deprecated("Use fileSize from VimEditor")
-val Editor.fileSize: Int
-  get() = document.textLength
-
 /**
  * There is a problem with one-line editors. At the moment of the editor creation, this property is always set to false.
  *   So, we should enable IdeaVim for such editors and disable it on the first interaction

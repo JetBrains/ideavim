@@ -33,7 +33,6 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMa
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegister
 import com.maddyhome.idea.vim.extension.exportOperatorFunction
-import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.moveToInlayAwareLogicalPosition
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.key.OperatorFunction
@@ -138,7 +137,7 @@ internal class VimExchangeExtension : VimExtension {
         val endAdj = if (!(isVisualLine) && (hlArea == HighlighterTargetArea.EXACT_RANGE || isVisual)) 1 else 0
         return ijEditor.markupModel.addRangeHighlighter(
           ijEditor.getMarkOffset(ex.start),
-          (ijEditor.getMarkOffset(ex.end) + endAdj).coerceAtMost(ijEditor.fileSize),
+          (ijEditor.getMarkOffset(ex.end) + endAdj).coerceAtMost(editor.fileSize().toInt()),
           HighlighterLayer.SELECTION - 1,
           attributes,
           hlArea,
