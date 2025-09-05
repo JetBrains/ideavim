@@ -15,8 +15,7 @@ import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
-import kotlin.text.iterator
+import com.maddyhome.idea.vim.vimscript.model.functions.BinaryFunctionHandler
 
 /**
  * Implementation of Vim's escape() function.
@@ -25,10 +24,7 @@ import kotlin.text.iterator
  * Example: escape('c:\program files\vim', ' \') returns 'c:\\program\ files\\vim'
  */
 @VimscriptFunction(name = "escape")
-internal class EscapeFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments = 2
-  override val maximumNumberOfArguments = 2
-
+internal class EscapeFunctionHandler : BinaryFunctionHandler() {
   override fun doFunction(
     argumentValues: List<Expression>,
     editor: VimEditor,

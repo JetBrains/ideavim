@@ -15,12 +15,9 @@ import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.BinaryFunctionHandler
 
-internal abstract class BinaryBitwiseFunctionHandlerBase : FunctionHandler() {
-  override val minimumNumberOfArguments = 2
-  override val maximumNumberOfArguments = 2
-
+internal abstract class BinaryBitwiseFunctionHandlerBase : BinaryFunctionHandler() {
   override fun doFunction(
     argumentValues: List<Expression>,
     editor: VimEditor,

@@ -24,10 +24,7 @@ import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
 @VimscriptFunction(name = "function")
-internal class FunctionFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments: Int = 1
-  override val maximumNumberOfArguments: Int = 3
-
+internal class FunctionFunctionHandler : FunctionHandler(minArity = 1, maxArity = 3) {
   override fun doFunction(
     argumentValues: List<Expression>,
     editor: VimEditor,
@@ -79,10 +76,7 @@ internal class FunctionFunctionHandler : FunctionHandler() {
 }
 
 @VimscriptFunction(name = "funcref")
-internal class FuncrefFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments: Int = 1
-  override val maximumNumberOfArguments: Int = 3
-
+internal class FuncrefFunctionHandler : FunctionHandler(minArity = 1, maxArity = 3) {
   override fun doFunction(
     argumentValues: List<Expression>,
     editor: VimEditor,

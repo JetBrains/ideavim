@@ -29,14 +29,18 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 
-data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionHandler() {
+data class DefinedFunctionHandler(val function: FunctionDeclaration) :
+  FunctionHandler(function.args.size, getMaxArity(function)) {
   private val logger = vimLogger<DefinedFunctionHandler>()
   override val scope: Scope? = function.scope
-  override val minimumNumberOfArguments: Int = function.args.size
-  override val maximumNumberOfArguments: Int? get() = if (function.hasOptionalArguments) null else function.args.size + function.defaultArgs.size
 
   init {
     name = function.name
+  }
+
+  companion object {
+    fun getMaxArity(function: FunctionDeclaration) =
+      if (function.hasOptionalArguments) null else function.args.size + function.defaultArgs.size
   }
 
   override fun doFunction(

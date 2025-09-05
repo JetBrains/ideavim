@@ -20,10 +20,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
 @VimscriptFunction(name = "join")
-internal class JoinFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments: Int = 1
-  override val maximumNumberOfArguments: Int = 2
-
+internal class JoinFunctionHandler : FunctionHandler(minArity = 1, maxArity = 2) {
   override fun doFunction(
     argumentValues: List<Expression>,
     editor: VimEditor,

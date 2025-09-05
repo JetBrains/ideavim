@@ -16,13 +16,10 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.BinaryFunctionHandler
 
 @VimscriptFunction(name = "repeat")
-internal class RepeatFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments = 2
-  override val maximumNumberOfArguments = 2
-
+internal class RepeatFunctionHandler : BinaryFunctionHandler() {
   override fun doFunction(
     argumentValues: List<Expression>,
     editor: VimEditor,

@@ -23,13 +23,11 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.UnaryFunctionHandler
 
 // TODO: 03.08.2021 Support second parameter
 @VimscriptFunction(name = "line")
-internal class LineFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments = 1
-  override val maximumNumberOfArguments = 2
-
+internal class LineFunctionHandler : FunctionHandler(minArity = 1, maxArity = 2) {
   override fun doFunction(
     argumentValues: List<Expression>,
     editor: VimEditor,
@@ -42,10 +40,7 @@ internal class LineFunctionHandler : FunctionHandler() {
 }
 
 @VimscriptFunction(name = "col")
-internal class ColFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments = 1
-  override val maximumNumberOfArguments = 1
-
+internal class ColFunctionHandler : UnaryFunctionHandler() {
   override fun doFunction(
     argumentValues: List<Expression>,
     editor: VimEditor,

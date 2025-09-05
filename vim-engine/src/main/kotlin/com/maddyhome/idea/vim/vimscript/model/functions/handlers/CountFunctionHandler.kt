@@ -22,10 +22,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
 @VimscriptFunction(name = "count")
-internal class CountFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments = 2
-  override val maximumNumberOfArguments = 4
-
+internal class CountFunctionHandler : FunctionHandler(minArity = 2, maxArity = 4) {
   override fun doFunction(
     argumentValues: List<Expression>,
     editor: VimEditor,
