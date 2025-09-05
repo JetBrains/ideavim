@@ -370,6 +370,28 @@ class MapCommandTest : VimTestCase() {
   }
 
   @Test
+  fun `test map reports when no mappings match prefix`() {
+    configureByText("\n")
+    assertCommandOutput("map foo", "No mapping found")
+  }
+
+  @Test
+  fun `test map outputs mappings that are a prefix to arg and that have arg as a prefix`() {
+    configureByText("\n")
+    // Vim matches mappings that are a prefix to arg (e.g. mapping "f" matches arg "foo"),
+    // and it matches mappings that have arg as a prefix (e.g., mapping "food" matches arg "foo").
+    // I find this surprising
+    enterCommand("map f bar")
+    enterCommand("map food baz")
+    assertCommandOutput("map foo",
+      """
+        |   f             bar
+        |   food          baz
+      """.trimMargin()
+    )
+  }
+
+  @Test
   fun `test map with only trailing spaces treated as no arguments`() {
     configureByText("\n")
     enterCommand("map foo bar")
