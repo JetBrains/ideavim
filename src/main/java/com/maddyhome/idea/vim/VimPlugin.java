@@ -332,10 +332,10 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     VimExtensionRegistrar.registerExtensions();
 
     // 2.2.1) Register extensions with new API
-    VimInjectorKt.getInjector().getJsonExtensionProvider().init();
-    VimInjectorKt.getInjector()
-      .getJsonExtensionProvider()
-      .addExtensions(IjPluginExtensionsScanner.Companion.instance().scanAllPlugins());
+    //VimInjectorKt.getInjector().getJsonExtensionProvider().init();
+    //VimInjectorKt.getInjector()
+    //  .getJsonExtensionProvider()
+    //  .addExtensions(IjPluginExtensionsScanner.Companion.instance().scanAllPlugins());
 
     // 2.3) Register functions
     VimInjectorKt.getInjector().getFunctionService().registerHandlers();
