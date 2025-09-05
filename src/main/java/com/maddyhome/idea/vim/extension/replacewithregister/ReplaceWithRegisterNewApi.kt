@@ -37,7 +37,7 @@ fun VimApi.init() {
   }
 }
 
-private fun VimApi.operatorFunction(): Boolean {
+internal fun VimApi.operatorFunction(): Boolean {
   fun CaretTransaction.getSelection(): Range? {
     return when {
       this@operatorFunction.mode == Mode.NORMAL -> changeMarks
@@ -58,12 +58,12 @@ private fun VimApi.operatorFunction(): Boolean {
   return true
 }
 
-private fun VimApi.rewriteMotion() {
+internal fun VimApi.rewriteMotion() {
   setOperatorFunction(OPERATOR_FUNC_NAME)
   normal("g@")
 }
 
-private fun VimApi.rewriteLine() {
+internal fun VimApi.rewriteLine() {
   val count1 = getVariable<Int>("v:count1") ?: 1
   editor {
     change {
@@ -78,7 +78,7 @@ private fun VimApi.rewriteLine() {
   }
 }
 
-private fun VimApi.rewriteVisual() {
+internal fun VimApi.rewriteVisual() {
   editor {
     change {
       forEachCaret {
@@ -157,7 +157,7 @@ private fun CaretTransaction.replaceTextAndUpdateCaret(
   }
 }
 
-private const val RWR_OPERATOR = "<Plug>ReplaceWithRegisterOperator"
-private const val RWR_LINE = "<Plug>ReplaceWithRegisterLine"
-private const val RWR_VISUAL = "<Plug>ReplaceWithRegisterVisual"
-private const val OPERATOR_FUNC_NAME = "ReplaceWithRegisterOperatorFunc"
+internal const val RWR_OPERATOR = "<Plug>ReplaceWithRegisterOperator"
+internal const val RWR_LINE = "<Plug>ReplaceWithRegisterLine"
+internal const val RWR_VISUAL = "<Plug>ReplaceWithRegisterVisual"
+internal const val OPERATOR_FUNC_NAME = "ReplaceWithRegisterOperatorFunc"
