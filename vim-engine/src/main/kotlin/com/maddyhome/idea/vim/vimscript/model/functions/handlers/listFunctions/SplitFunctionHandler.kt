@@ -20,10 +20,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
 @VimscriptFunction(name = "split")
-internal class SplitFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments: Int = 1
-  override val maximumNumberOfArguments: Int = 3
-
+internal class SplitFunctionHandler : FunctionHandler(minArity = 1, maxArity = 3) {
   override fun doFunction(
     argumentValues: List<Expression>,
     editor: VimEditor,

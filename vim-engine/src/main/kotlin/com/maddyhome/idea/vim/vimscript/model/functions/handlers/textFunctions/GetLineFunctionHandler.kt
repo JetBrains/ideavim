@@ -21,10 +21,7 @@ import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.functions.handlers.cursorFunctions.variableToPosition
 
 @VimscriptFunction(name = "getline")
-internal class GetLineFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments = 1
-  override val maximumNumberOfArguments = 2
-
+internal class GetLineFunctionHandler : FunctionHandler(minArity = 1, maxArity = 2) {
   override fun doFunction(
     argumentValues: List<Expression>,
     editor: VimEditor,

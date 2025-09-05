@@ -19,13 +19,10 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.OptionExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.UnaryFunctionHandler
 
 @VimscriptFunction(name = "exists")
-internal class ExistsFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments = 1
-  override val maximumNumberOfArguments = 1
-
+internal class ExistsFunctionHandler : UnaryFunctionHandler() {
   override fun doFunction(
     argumentValues: List<Expression>,
     editor: VimEditor,

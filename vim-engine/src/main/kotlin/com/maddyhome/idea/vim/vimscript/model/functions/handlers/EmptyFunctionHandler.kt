@@ -22,13 +22,10 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.UnaryFunctionHandler
 
 @VimscriptFunction(name = "empty")
-internal class EmptyFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments: Int = 1
-  override val maximumNumberOfArguments: Int = 1
-
+internal class EmptyFunctionHandler : UnaryFunctionHandler() {
   override fun doFunction(
     argumentValues: List<Expression>,
     editor: VimEditor,

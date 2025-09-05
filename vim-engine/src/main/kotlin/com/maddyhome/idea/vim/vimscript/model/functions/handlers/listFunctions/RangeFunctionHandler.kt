@@ -20,10 +20,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
 @VimscriptFunction(name = "range")
-internal class RangeFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments = 1
-  override val maximumNumberOfArguments = 3
-
+internal class RangeFunctionHandler : FunctionHandler(minArity = 1, maxArity = 3) {
   override fun doFunction(
     argumentValues: List<Expression>,
     editor: VimEditor,

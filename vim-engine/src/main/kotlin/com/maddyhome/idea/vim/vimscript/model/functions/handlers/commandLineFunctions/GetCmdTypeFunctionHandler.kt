@@ -35,9 +35,6 @@ Not yet implemented:
  */
 @VimscriptFunction(name = "getcmdtype")
 internal class GetCmdTypeFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments = 0
-  override val maximumNumberOfArguments = 0
-
   override fun doFunction(
     argumentValues: List<Expression>,
     editor: VimEditor,
@@ -50,5 +47,4 @@ internal class GetCmdTypeFunctionHandler : FunctionHandler() {
       else -> VimString("")
     }
   }
-
 }

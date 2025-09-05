@@ -18,10 +18,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
 @VimscriptFunction(name = "nr2char")
-internal class Nr2charFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments = 1
-  override val maximumNumberOfArguments = 2
-
+internal class Nr2charFunctionHandler : FunctionHandler(minArity = 1, maxArity = 2) {
   override fun doFunction(
     argumentValues: List<Expression>,
     editor: VimEditor,

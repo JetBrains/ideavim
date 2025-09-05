@@ -17,11 +17,17 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 
-abstract class FunctionHandler {
+/**
+ * Base class for all function handlers
+ *
+ * Pass in the minimum and maximum number of arguments for the function. If [maxArity] is null, then the function has
+ * optional arguments.
+ */
+abstract class FunctionHandler(protected val minArity: Int = 0, protected val maxArity: Int? = null) {
+  constructor(arity: Int) : this(arity, arity)
+
   lateinit var name: String
   open val scope: Scope? = null
-  abstract val minimumNumberOfArguments: Int?
-  abstract val maximumNumberOfArguments: Int?
   var range: Range? = null
 
   protected abstract fun doFunction(
@@ -44,11 +50,17 @@ abstract class FunctionHandler {
   }
 
   private fun checkFunctionCall(arguments: List<Expression>) {
-    if (minimumNumberOfArguments != null && arguments.size < minimumNumberOfArguments!!) {
+    if (arguments.size < minArity) {
       throw exExceptionMessage("E119", name)
     }
-    if (maximumNumberOfArguments != null && arguments.size > maximumNumberOfArguments!!) {
+
+    // If the function has optional arguments, then maxArity will be null
+    if (maxArity != null && arguments.size > maxArity) {
       throw exExceptionMessage("E118", name)
     }
   }
 }
+
+abstract class UnaryFunctionHandler : FunctionHandler(arity = 1)
+abstract class BinaryFunctionHandler : FunctionHandler(arity = 2)
+abstract class VariadicFunctionHandler(minArity: Int) : FunctionHandler(minArity, null)

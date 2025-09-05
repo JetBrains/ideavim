@@ -20,10 +20,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
 @VimscriptFunction(name = "submatch")
-internal class SubmatchFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments = 1
-  override val maximumNumberOfArguments = 2
-
+internal class SubmatchFunctionHandler : FunctionHandler(minArity = 1, maxArity = 2) {
   var latestMatch: String = ""
 
   override fun doFunction(

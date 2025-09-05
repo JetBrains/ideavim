@@ -25,10 +25,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
 @VimscriptFunction(name = "get")
-internal class GetFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments: Int = 2
-  override val maximumNumberOfArguments: Int = 3
-
+internal class GetFunctionHandler : FunctionHandler(minArity = 2, maxArity = 3) {
   override fun doFunction(
     argumentValues: List<Expression>,
     editor: VimEditor,

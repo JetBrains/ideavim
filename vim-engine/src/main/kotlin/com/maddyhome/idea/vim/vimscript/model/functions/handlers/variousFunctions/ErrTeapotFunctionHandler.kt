@@ -18,10 +18,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
 @VimscriptFunction(name = "err_teapot")
-class ErrTeapotFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments = 0
-  override val maximumNumberOfArguments: Int? = 1
-
+class ErrTeapotFunctionHandler : FunctionHandler(minArity = 0, maxArity = 1) {
   override fun doFunction(
     argumentValues: List<Expression>,
     editor: VimEditor,

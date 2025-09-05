@@ -20,9 +20,6 @@ import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
 @VimscriptFunction(name = "pumvisible")
 internal class PopupMenuVisibleFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments = 0
-  override val maximumNumberOfArguments = 0
-
   override fun doFunction(
     argumentValues: List<Expression>,
     editor: VimEditor,

@@ -18,10 +18,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
 @VimscriptFunction(name = "trim")
-internal class TrimFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments = 1
-  override val maximumNumberOfArguments = 3
-
+internal class TrimFunctionHandler : FunctionHandler(minArity = 1, maxArity = 3) {
   override fun doFunction(
     argumentValues: List<Expression>,
     editor: VimEditor,

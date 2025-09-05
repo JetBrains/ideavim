@@ -16,12 +16,10 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.BinaryFunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.UnaryFunctionHandler
 
-internal abstract class UnaryFloatFunctionHandlerBase : FunctionHandler() {
-  override val minimumNumberOfArguments = 1
-  override val maximumNumberOfArguments = 1
-
+internal abstract class UnaryFloatFunctionHandlerBase : UnaryFunctionHandler() {
   override fun doFunction(
     argumentValues: List<Expression>,
     editor: VimEditor,
@@ -40,10 +38,7 @@ internal abstract class UnaryFloatFunctionHandlerBase : FunctionHandler() {
   protected abstract fun invoke(argument: Double): Double
 }
 
-internal abstract class BinaryFloatFunctionHandlerBase : FunctionHandler() {
-  override val minimumNumberOfArguments = 2
-  override val maximumNumberOfArguments = 2
-
+internal abstract class BinaryFloatFunctionHandlerBase : BinaryFunctionHandler() {
   override fun doFunction(
     argumentValues: List<Expression>,
     editor: VimEditor,

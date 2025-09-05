@@ -21,10 +21,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
 @VimscriptFunction(name = "has")
-internal class HasFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments = 1
-  override val maximumNumberOfArguments = 2
-
+internal class HasFunctionHandler : FunctionHandler(minArity = 1, maxArity = 2) {
   private val supportedFeatures = Features.discover()
 
   override fun doFunction(
