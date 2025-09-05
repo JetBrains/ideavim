@@ -21,9 +21,7 @@ import com.maddyhome.idea.vim.state.mode.Mode as VimMode
 
 @CommandOrMotion(keys = ["<C-[>", "<C-C>", "<Esc>"], modes = [Mode.INSERT])
 class InsertExitModeAction : VimActionHandler.SingleExecution() {
-  // Note that hitting Escape can insert text when exiting insert mode after visual block mode.
-  // We use OTHER_SELF_SYNCHRONIZED to handle write locks manually, ensuring ESC always works
-  // even in read-only files by providing a fallback path that doesn't require write access.
+  // Note: ESC should not require write access itself; any write is gated in processEscape.
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
   override fun execute(
@@ -32,21 +30,7 @@ class InsertExitModeAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    // Handle write locks manually since we use OTHER_SELF_SYNCHRONIZED
-    // Most of the time we don't need write access, only for repeat insert operations
-    try {
-      editor.exitInsertMode(context)
-    } catch (e: Exception) {
-      // If something fails, still try to exit insert mode without write operations
-      // This ensures ESC always works even in read-only files
-      val markGroup = injector.markService
-      markGroup.setMark(editor, VimMarkService.INSERT_EXIT_MARK)
-      markGroup.setMark(editor, MARK_CHANGE_END)
-      if (editor.mode is VimMode.REPLACE) {
-        editor.insertMode = true
-      }
-      editor.mode = VimMode.NORMAL()
-    }
+    editor.exitInsertMode(context)
     return true
   }
 }
