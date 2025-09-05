@@ -27,11 +27,12 @@ class InsertExitModeActionTest : VimTestCase() {
 
   @ParameterizedTest
   @ValueSource(strings = ["i", "a", "o", "O"])
-  fun `test cannot enter insert mode in read-only file`(insertCommand: String) {
+  fun `test read-only file allows insert entry but blocks changes`(insertCommand: String) {
     configureByText("12${c}3")
     fixture.editor.document.setReadOnly(true)
 
-    typeText(insertCommand)
+    // Enter insert-like commands, then immediately escape; no text should change and ESC should work
+    typeText("$insertCommand<Esc>")
 
     assertMode(Mode.NORMAL())
     assertState("12${c}3")
@@ -86,6 +87,8 @@ class InsertExitModeActionTest : VimTestCase() {
     // 3i should repeat the insert 3 times when ESC is pressed
     // In read-only files, this should exit cleanly without hanging
     typeText("3i<Esc>")
+    assertMode(Mode.NORMAL())
+    assertState("${c}hello")
 
     // Reset read-only status
     fixture.editor.document.setReadOnly(false)
