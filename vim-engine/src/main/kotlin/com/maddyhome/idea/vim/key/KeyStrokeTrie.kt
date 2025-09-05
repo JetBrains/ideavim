@@ -133,11 +133,16 @@ class KeyStrokeTrie<T>(private val name: String) {
   }
 
   /**
-   * Returns a sequence of nodes that contain data
+   * Returns a sequence of nodes that contain data, optionally filtered by a given prefix
    *
-   * Prefixes are skipped
+   * If [prefix] is supplied and [includePrefixNodes] is false, only nodes that are descendants of the prefix, and that have
+   * data, are returned. E.g., given a prefix of `fo`, only nodes such as `food` or `fool` will be returned (as long as
+   * they have data).
+   *
+   * When [prefix] is supplied and [includePrefixNodes] is true, any nodes with data found within the prefix are also
+   * returned. E.g., given a prefix of `foo`, nodes such as `f`, `fo`, `foo`, `food` and `fool` will be returned.
    */
-  fun getEntries(prefix: List<KeyStroke>? = null): Sequence<TrieNode<T>> {
+  fun getEntries(prefix: List<KeyStroke>? = null, includePrefixNodes: Boolean = false): Sequence<TrieNode<T>> {
     suspend fun SequenceScope<TrieNode<T>>.yieldTrieNode(node: TrieNodeImpl<T>) {
       if (node.data != null) yield(node)
       if (node.children.isInitialized()) {
@@ -145,8 +150,18 @@ class KeyStrokeTrie<T>(private val name: String) {
       }
     }
 
-    val node = prefix?.let { (getTrieNode(it) ?: return emptySequence()) as TrieNodeImpl<T> } ?: root
-    return sequence { yieldTrieNode(node) }
+    return sequence {
+      var node = root
+      prefix?.forEach {
+        if (node.children.isInitialized()) {
+          node = node.children.value[it] ?: return@forEach
+          if (node.data != null && includePrefixNodes) {
+            yield(node)
+          }
+        }
+      }
+      yieldTrieNode(node)
+    }
   }
 
   /**

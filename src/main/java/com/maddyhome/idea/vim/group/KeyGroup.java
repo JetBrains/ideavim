@@ -238,7 +238,10 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
     for (MappingMode mode : modes) {
       final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(mode);
 
-      final Iterator<KeyMappingEntry> iterator = mapping.getAll(prefix).iterator();
+      // Vim includes mappings for each key in the prefix, where appropriate. That is, it doesn't just all mappings that
+      // are descendants of the prefix, but includes the mappings for each key in the prefix as well.
+      // E.g. `foo` will include mappings for `f` and `fo`, as well as any mappings that are descendants of `foo`.
+      final Iterator<KeyMappingEntry> iterator = mapping.getAll(prefix, true).iterator();
       while (iterator.hasNext()) {
         final KeyMappingEntry entry = iterator.next();
         final MappingInfo mappingInfo = entry.getMappingInfo();
@@ -375,6 +378,10 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
       builder.append(" ");  // Should be `@` if it's a buffer-local mapping
       builder.append(mappingInfo.getPresentableString());
       builder.append("\n");
+    }
+
+    if (builder.isEmpty()) {
+      builder.append("No mapping found");
     }
 
     VimOutputPanel outputPanel = injector.getOutputPanel()
