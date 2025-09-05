@@ -12,12 +12,8 @@ import com.maddyhome.idea.vim.ex.exExceptionMessage
 
 data class VimDictionary(val dictionary: LinkedHashMap<VimString, VimDataType>) : VimDataType() {
 
-  override fun asDouble(): Double {
-    throw exExceptionMessage("E728")  // E728: Using a Dictionary as a Number
-  }
-
-  override fun asString(): String {
-    throw exExceptionMessage("E731")  // E731: Using a Dictionary as a String
+  override fun toVimFloat(): VimFloat {
+    throw exExceptionMessage("E894")  // E894: Using a Dictionary as a Float
   }
 
   override fun toVimNumber(): VimInt {
@@ -28,23 +24,16 @@ data class VimDictionary(val dictionary: LinkedHashMap<VimString, VimDataType>) 
     throw exExceptionMessage("E731")  // E731: Using a Dictionary as a String
   }
 
-  override fun toString(): String {
-    val result = StringBuffer("{")
-    result.append(dictionary.map { stringOfEntry(it) }.joinToString(separator = ", "))
-    result.append("}")
-    return result.toString()
-  }
-
-  private fun stringOfEntry(entry: Map.Entry<VimString, VimDataType>): String {
-    val valueString = when (entry.value) {
-      is VimString -> "'${entry.value}'"
-      else -> entry.value.toString()
-    }
-    return "'${entry.key}': $valueString"
-  }
-
-  override fun asBoolean(): Boolean {
-    throw exExceptionMessage("E728")  // E728: Using a Dictionary as a Number
+  override fun toOutputString() = buildString {
+    append("{")
+    append(dictionary.map { (key, value) ->
+      val valueString = when (value) {
+        is VimString -> "'${value.value}'"
+        else -> value.toOutputString()  // TODO: Handle recursive entries
+      }
+      "'${key.value}': $valueString"
+    }.joinToString(separator = ", "))
+    append("}")
   }
 
   override fun deepCopy(level: Int): VimDictionary {

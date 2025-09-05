@@ -49,13 +49,13 @@ class NumberParsingTests : VimTestCase() {
   }
 
   @Test
-  fun `decimal number with leading zero`() {
+  fun `leading zero not treated as octal if decimal number`() {
     assertEquals(VimInt(19), VimscriptParser.parseExpression("019")!!.evaluate())
   }
 
   @Test
-  fun `decimal number with multiple leading zeros`() {
-    assertEquals(VimInt(19), VimscriptParser.parseExpression("00019")!!.evaluate())
+  fun `multiple leading zeroes not treated as octal if decimal number`() {
+    assertEquals(VimInt(18), VimscriptParser.parseExpression("00018")!!.evaluate())
   }
 
   @Test

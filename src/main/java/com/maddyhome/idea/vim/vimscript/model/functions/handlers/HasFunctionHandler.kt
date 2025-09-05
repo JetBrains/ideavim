@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.statistic.VimscriptState
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
@@ -33,15 +33,11 @@ internal class HasFunctionHandler : FunctionHandler() {
     context: ExecutionContext,
     vimContext: VimLContext,
   ): VimDataType {
-    val feature = argumentValues[0].evaluate(editor, context, vimContext).asString()
+    val feature = argumentValues[0].evaluate(editor, context, vimContext).toVimString().value
     if (feature == "ide") {
       VimscriptState.Util.isIDESpecificConfigurationUsed = true
     }
-    return if (supportedFeatures.contains(feature)) {
-      VimInt.ONE
-    } else {
-      VimInt.ZERO
-    }
+    return supportedFeatures.contains(feature).asVimInt()
   }
 
   private object Features {

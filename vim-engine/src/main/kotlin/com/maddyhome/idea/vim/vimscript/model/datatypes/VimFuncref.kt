@@ -36,15 +36,19 @@ data class VimFuncref(
     var anonymousCounter: Int = 1
   }
 
-  override fun asDouble(): Double {
+  override fun toVimFloat(): VimFloat {
+    throw exExceptionMessage("E891")  // E891: Using a Funcref as a Float
+  }
+
+  override fun toVimNumber(): VimInt {
     throw exExceptionMessage("E703")  // E703: Using a Funcref as a Number
   }
 
-  override fun asString(): String {
+  override fun toVimString(): VimString {
     throw exExceptionMessage("E729")  // E729: Using a Funcref as a String
   }
 
-  override fun toString(): String {
+  override fun toOutputString(): String {
     return if (arguments.values.isEmpty() && dictionary == null) {
       when (type) {
         Type.LAMBDA -> "function('${handler.name}')"
@@ -54,19 +58,11 @@ data class VimFuncref(
     } else {
       val result = StringBuffer("function('${handler.name}'")
       if (arguments.values.isNotEmpty()) {
-        result.append(", ").append(arguments.toString())
+        result.append(", ").append(arguments.toOutputString())
       }
       result.append(")")
       return result.toString()
     }
-  }
-
-  override fun toVimNumber(): VimInt {
-    throw exExceptionMessage("E703")  // E703: Using a Funcref as a Number
-  }
-
-  override fun toVimString(): VimString {
-    throw exExceptionMessage("E729")  // E729: Using a Funcref as a String
   }
 
   fun execute(

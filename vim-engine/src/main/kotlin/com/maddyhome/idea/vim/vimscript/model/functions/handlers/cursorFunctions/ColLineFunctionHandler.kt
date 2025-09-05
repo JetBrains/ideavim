@@ -88,7 +88,7 @@ private fun variableToPosition(
     var column = indexAsNumber(variable, 1) ?: return null
     val lineLength = editor.lineLength(line.value - 1)
 
-    if (variable[1].asString() == "$") {
+    if (variable[1].toVimString().value == "$") {
       column = (lineLength + 1).asVimInt()
     }
 
@@ -99,7 +99,7 @@ private fun variableToPosition(
     return line to column
   }
 
-  val name = variable.asString()
+  val name = variable.toVimString().value
   if (name.isEmpty()) return null
 
   // Current caret line

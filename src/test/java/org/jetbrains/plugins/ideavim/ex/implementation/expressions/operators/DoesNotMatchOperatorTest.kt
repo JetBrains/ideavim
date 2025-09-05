@@ -20,60 +20,60 @@ import kotlin.test.assertTrue
 class DoesNotMatchOperatorTest : VimTestCase() {
   @Test
   fun `test does not match operator returns false when pattern matches string`() {
-    assertFalse(evaluate("'lorem ipsum' !~ 'l*sum'").asBoolean())
+    assertFalse(evaluate("'lorem ipsum' !~ 'l*sum'").toVimNumber().booleanValue)
   }
 
   @Test
   fun `test does not match operator returns true when pattern does not match string`() {
-    assertTrue(evaluate("'lorem ipsum' !~ 'l*foo'").asBoolean())
+    assertTrue(evaluate("'lorem ipsum' !~ 'l*foo'").toVimNumber().booleanValue)
   }
 
   @Test
   fun `test does not match operator returns false when pattern matches case`() {
-    assertFalse(evaluate("'Lorem Ipsum' !~ 'L*I'").asBoolean())
+    assertFalse(evaluate("'Lorem Ipsum' !~ 'L*I'").toVimNumber().booleanValue)
   }
 
   @Test
   fun `test does not match operator returns true when pattern does not match case`() {
-    assertTrue(evaluate("'Lorem Ipsum' !~ 'l*i'").asBoolean())
+    assertTrue(evaluate("'Lorem Ipsum' !~ 'l*i'").toVimNumber().booleanValue)
   }
 
   @Test
   fun `test does not match operator with 'noignorecase' returns false with different case pattern`() {
     injector.globalOptions().ignorecase = true // Default is false
-    assertFalse(evaluate("'Lorem Ipsum' !~ 'l*i'").asBoolean())
+    assertFalse(evaluate("'Lorem Ipsum' !~ 'l*i'").toVimNumber().booleanValue)
   }
 
   // Case-sensitive operator
   @Test
   fun `test case-sensitive does not match operator returns false when pattern matches string`() {
-    assertFalse(evaluate("'lorem ipsum' !~# 'l*sum'").asBoolean())
+    assertFalse(evaluate("'lorem ipsum' !~# 'l*sum'").toVimNumber().booleanValue)
   }
 
   @Test
   fun `test case-sensitive does not match operator returns true when pattern does not match string`() {
-    assertTrue(evaluate("'lorem ipsum' !~# 'l*foo'").asBoolean())
+    assertTrue(evaluate("'lorem ipsum' !~# 'l*foo'").toVimNumber().booleanValue)
   }
 
   @Test
   fun `test case-sensitive does not match operator returns true when pattern does not match string case`() {
-    assertTrue(evaluate("'lorem ipsum' !~# 'L*Sum'").asBoolean())
+    assertTrue(evaluate("'lorem ipsum' !~# 'L*Sum'").toVimNumber().booleanValue)
   }
 
   // Case-insensitive operator
   @Test
   fun `test case-insensitive does not match operator returns false when pattern matches string`() {
-    assertFalse(evaluate("'lorem ipsum' !~? 'l*sum'").asBoolean())
+    assertFalse(evaluate("'lorem ipsum' !~? 'l*sum'").toVimNumber().booleanValue)
   }
 
   @Test
   fun `test case-insensitive does not match operator returns true when pattern does not match string`() {
-    assertTrue(evaluate("'lorem ipsum' !~? 'l*foo'").asBoolean())
+    assertTrue(evaluate("'lorem ipsum' !~? 'l*foo'").toVimNumber().booleanValue)
   }
 
   @Test
   fun `test case-insensitive does not match operator returns false when pattern does not match string case`() {
-    assertFalse(evaluate("'lorem ipsum' !~? 'L*Sum'").asBoolean())
+    assertFalse(evaluate("'lorem ipsum' !~? 'L*Sum'").toVimNumber().booleanValue)
   }
 
   private fun evaluate(expression: String) = VimscriptParser.parseExpression(expression)!!.evaluate()

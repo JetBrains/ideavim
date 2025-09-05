@@ -11,10 +11,8 @@ package com.maddyhome.idea.vim.vimscript.model.functions.handlers.bitwiseFunctio
 import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
@@ -31,10 +29,6 @@ internal class InvertFunctionHandler : FunctionHandler() {
     vimContext: VimLContext,
   ): VimDataType {
     val arg1 = argumentValues[0].evaluate(editor, context, vimContext)
-    if (arg1 is VimFloat) {
-      throw exExceptionMessage("E805")  // E805: Using a Float as a Number
-    }
-
-    return VimInt(arg1.asDouble().toInt().inv())
+    return VimInt(arg1.toVimNumber().value.inv())
   }
 }

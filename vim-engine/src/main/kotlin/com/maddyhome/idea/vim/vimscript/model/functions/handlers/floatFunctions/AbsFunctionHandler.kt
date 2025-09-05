@@ -34,7 +34,7 @@ internal class AbsFunctionHandler : FunctionHandler() {
     return if (argument is VimFloat) {
       VimFloat(abs(argument.value))
     } else {
-      VimInt(abs(argument.asDouble().toInt()))
+      VimInt(abs(argument.toVimNumber().value))
     }
   }
 }

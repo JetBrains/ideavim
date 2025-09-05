@@ -20,6 +20,6 @@ class ExpressionTest : VimTestCase() {
   fun `test multiline register content`() {
     configureByText("${c}Oh\nHi\nMark\n")
     typeText(injector.parser.parseKeys("VGy"))
-    kotlin.test.assertEquals("Oh\nHi\nMark\n", Register('"').evaluate().toString())
+    kotlin.test.assertEquals("Oh\nHi\nMark\n", Register('"').evaluate().toOutputString())
   }
 }

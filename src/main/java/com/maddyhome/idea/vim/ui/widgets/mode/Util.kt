@@ -18,8 +18,8 @@ import java.awt.Color
 fun getModeBackground(mode: Mode?): Color {
   val isLight = !(LafManager.getInstance()?.currentUIThemeLookAndFeel?.isDark ?: false)
   val keyPostfix = if (isLight) "_light" else "_dark"
-  if (injector.variableService.getVimVariable("widget_mode_is_full_customization$keyPostfix")?.asBoolean() != true) {
-    val themeString = injector.variableService.getVimVariable("widget_mode_theme$keyPostfix")?.asString() ?: ""
+  if (injector.variableService.getVimVariable("widget_mode_is_full_customization$keyPostfix")?.toVimNumber()?.booleanValue != true) {
+    val themeString = injector.variableService.getVimVariable("widget_mode_theme$keyPostfix")?.toVimString()?.value ?: ""
     val theme = ModeWidgetTheme.parseString(themeString) ?: ModeWidgetTheme.getDefaultTheme()
     when (theme) {
       ModeWidgetTheme.TERM -> {
@@ -78,7 +78,7 @@ fun getModeBackground(mode: Mode?): Color {
       }
 
       is Mode.OP_PENDING, null -> null
-    }?.asString()
+    }?.toVimString()?.value
     val defaultColor = UIUtil.getPanelBackground()
     val color = when (colorString) {
       "v:status_bar_bg" -> UIUtil.getPanelBackground()
@@ -102,8 +102,8 @@ fun getModeBackground(mode: Mode?): Color {
 fun getModeForeground(mode: Mode?): Color {
   val isLight = !(LafManager.getInstance()?.currentUIThemeLookAndFeel?.isDark ?: false)
   val keyPostfix = if (isLight) "_light" else "_dark"
-  if (injector.variableService.getVimVariable("widget_mode_is_full_customization$keyPostfix")?.asBoolean() != true) {
-    val themeString = injector.variableService.getVimVariable("widget_mode_theme$keyPostfix")?.asString() ?: ""
+  if (injector.variableService.getVimVariable("widget_mode_is_full_customization$keyPostfix")?.toVimNumber()?.booleanValue != true) {
+    val themeString = injector.variableService.getVimVariable("widget_mode_theme$keyPostfix")?.toVimString()?.value ?: ""
     val theme = ModeWidgetTheme.parseString(themeString) ?: ModeWidgetTheme.getDefaultTheme()
     return when (theme) {
       ModeWidgetTheme.TERM -> if (isLight) Color.WHITE else Color.BLACK
@@ -141,7 +141,7 @@ fun getModeForeground(mode: Mode?): Color {
       }
 
       is Mode.OP_PENDING, null -> null
-    }?.asString()
+    }?.toVimString()?.value
     val defaultColor = UIUtil.getLabelForeground()
     val color = when (colorString) {
       "v:status_bar_bg" -> UIUtil.getPanelBackground()

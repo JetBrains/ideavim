@@ -37,14 +37,14 @@ internal class GetFunctionHandler : FunctionHandler() {
     val container = argumentValues[0].evaluate(editor, context, vimContext)
     return when (container) {
       is VimList -> {
-        val idx = argumentValues[1].evaluate(editor, context, vimContext).asDouble().toInt()
+        val idx = argumentValues[1].evaluate(editor, context, vimContext).toVimNumber().value
         container.values.getOrElse(idx) {
-          argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext) ?: VimInt(-1)
+          argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext) ?: VimInt(0)
         }
       }
 
       is VimDictionary -> {
-        val key = argumentValues[1].evaluate(editor, context, vimContext).asString()
+        val key = argumentValues[1].evaluate(editor, context, vimContext).toVimString().value
         container.dictionary.getOrElse(VimString(key)) {
           argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext) ?: VimInt(0)
         }

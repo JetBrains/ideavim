@@ -270,7 +270,7 @@ object VimExtensionFacade {
 fun VimExtensionFacade.exportOperatorFunction(name: String, function: OperatorFunction) {
   exportScriptFunction(null, name, listOf("type"), emptyList(), false, noneOfEnum()) { editor, context, args ->
 
-    val type = args["type"]?.asString()
+    val type = args["type"]?.toVimString()?.value
     val selectionType = when (type) {
       "line" -> SelectionType.LINE_WISE
       "block" -> SelectionType.BLOCK_WISE

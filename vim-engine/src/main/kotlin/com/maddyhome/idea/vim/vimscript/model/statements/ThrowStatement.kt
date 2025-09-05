@@ -22,6 +22,6 @@ data class ThrowStatement(val expression: Expression) : Executable {
   override lateinit var rangeInScript: TextRange
 
   override fun execute(editor: VimEditor, context: ExecutionContext): ExecutionResult {
-    throw ExException(expression.evaluate(editor, context, this).toString())
+    throw ExException(expression.evaluate(editor, context, this).toOutputString())
   }
 }

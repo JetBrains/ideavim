@@ -33,7 +33,7 @@ data class EchoCommand(val range: Range, val args: List<Expression>) :
     operatorArguments: OperatorArguments,
   ): ExecutionResult.Success {
     val text = args.joinToString(separator = " ", postfix = "\n") {
-      it.evaluate(editor, context, this).toString()
+      it.evaluate(editor, context, this).toOutputString()
     }
     injector.outputPanel.output(editor, context, text)
     return ExecutionResult.Success

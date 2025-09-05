@@ -132,14 +132,13 @@ class ToExpressionMappingInfo(
   override fun execute(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
     LOG.debug("Executing 'ToExpression' mapping info...")
 
-    val toKeys = injector.parser.parseKeys(toExpression.evaluate(editor, context, CommandLineVimLContext).toString())
+    val toKeys = injector.parser.parseKeys(toExpression.evaluate(editor, context, CommandLineVimLContext).toOutputString())
 
     // TODO: Merge similar code from ToKeysMappingInfo
     // From the Vim docs: If the {rhs} starts with the {lhs}, the first character is not mapped again.
     // E.g. `:map ab abcd`. When typing `ab`, Vim will process `abcd`, executing `a` and inserting `bcd`.
     // See `:help recursive_mapping`
     val lhsIsPrefixOfRhs = KeyHandler.isPrefix(fromKeys, toKeys)
-
     var first = true
     for (keyStroke in toKeys) {
       val allowKeyMappings = isRecursive && !(first && lhsIsPrefixOfRhs)

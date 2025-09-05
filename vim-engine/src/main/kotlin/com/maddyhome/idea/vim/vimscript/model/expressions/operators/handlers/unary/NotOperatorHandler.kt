@@ -13,6 +13,6 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 
 internal object NotOperatorHandler : UnaryOperatorHandler() {
   override fun performOperation(value: VimDataType): VimDataType {
-    return (!value.asBoolean()).asVimInt()
+    return (!value.toVimNumber().booleanValue).asVimInt()
   }
 }

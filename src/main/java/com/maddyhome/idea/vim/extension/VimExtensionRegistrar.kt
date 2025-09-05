@@ -65,7 +65,7 @@ internal object VimExtensionRegistrar : VimExtensionRegistrator {
     val option = ToggleOption(name, OptionDeclaredScope.GLOBAL, getAbbrev(name), false)
     VimPlugin.getOptionGroup().addOption(option)
     VimPlugin.getOptionGroup().addGlobalOptionChangeListener(option) {
-      if (injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(null)).asBoolean()) {
+      if (injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(null)).booleanValue) {
         initExtension(extensionBean, name)
         PluginState.Util.enabledExtensions.add(name)
       } else {

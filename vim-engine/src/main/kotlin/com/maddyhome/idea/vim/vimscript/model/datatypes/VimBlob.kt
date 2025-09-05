@@ -10,11 +10,7 @@ package com.maddyhome.idea.vim.vimscript.model.datatypes
 
 class VimBlob : VimDataType() {
 
-  override fun asDouble(): Double {
-    TODO("Not yet implemented")
-  }
-
-  override fun asString(): String {
+  override fun toVimFloat(): VimFloat {
     TODO("Not yet implemented")
   }
 
@@ -24,10 +20,6 @@ class VimBlob : VimDataType() {
 
   override fun toVimString(): VimString {
     TODO("Not yet implemented")
-  }
-
-  override fun asBoolean(): Boolean {
-    TODO("empty must be falsy (0z), otherwise - truthy (like 0z00 0z01 etc)")
   }
 
   override fun deepCopy(level: Int): VimDataType {
@@ -42,7 +34,7 @@ class VimBlob : VimDataType() {
     TODO("Not yet implemented")
   }
 
-  override fun toString(): String {
+  override fun toOutputString(): String {
     TODO("Not yet implemented")
   }
 }

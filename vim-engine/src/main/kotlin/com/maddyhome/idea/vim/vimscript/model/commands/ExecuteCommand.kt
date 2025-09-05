@@ -32,7 +32,7 @@ data class ExecuteCommand(val range: Range, val expressions: List<Expression>) :
     context: ExecutionContext,
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
-    val command = expressions.joinToString(separator = " ") { it.evaluate(editor, context, this).asString() }
+    val command = expressions.joinToString(separator = " ") { it.evaluate(editor, context, this).toVimString().value }
     return injector.vimscriptExecutor.execute(
       command,
       editor,

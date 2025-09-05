@@ -14,12 +14,8 @@ data class VimList(val values: MutableList<VimDataType>) : VimDataType() {
 
   operator fun get(index: Int): VimDataType = this.values[index]
 
-  override fun asDouble(): Double {
-    throw exExceptionMessage("E745")  // E745: Using a List as a Number
-  }
-
-  override fun asString(): String {
-    throw exExceptionMessage("E730")  // E730: Using a List as a String
+  override fun toVimFloat(): VimFloat {
+    throw exExceptionMessage("E893")  // E893: Using a List as a Float
   }
 
   override fun toVimNumber(): VimInt {
@@ -30,16 +26,14 @@ data class VimList(val values: MutableList<VimDataType>) : VimDataType() {
     throw exExceptionMessage("E730")  // E730: Using a List as a String
   }
 
-  override fun toString(): String {
-    val result = StringBuffer("[")
-    result.append(values.joinToString(separator = ", ") { if (it is VimString) "'$it'" else it.toString() })
-    result.append("]")
-    return result.toString()
+  override fun toOutputString() = buildString {
+    append("[")
+    // TODO: Handle recursive references
+    values.joinTo(this, separator = ", ") { if (it is VimString) "'${it.value}'" else it.toOutputString() }
+    append("]")
   }
 
-  override fun asBoolean(): Boolean {
-    throw exExceptionMessage("E745")  // E745: Using a List as a Number
-  }
+  override fun toInsertableString() = values.joinToString(separator = "") { it.toOutputString() + "\n" }
 
   override fun deepCopy(level: Int): VimDataType {
     return if (level > 0) {

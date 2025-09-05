@@ -45,8 +45,8 @@ class CursorLineOptionMapperTest : VimTestCase() {
 
   @Test
   fun `test 'cursorline' defaults to current intellij setting`() {
-    assertEquals(IjOptions.cursorline.defaultValue.asBoolean(), fixture.editor.settings.isCaretRowShown)
-    assertEquals(IjOptions.cursorline.defaultValue.asBoolean(), optionsIj().cursorline)
+    assertEquals(IjOptions.cursorline.defaultValue.booleanValue, fixture.editor.settings.isCaretRowShown)
+    assertEquals(IjOptions.cursorline.defaultValue.booleanValue, optionsIj().cursorline)
   }
 
   @Test
@@ -128,7 +128,7 @@ class CursorLineOptionMapperTest : VimTestCase() {
 
   @Test
   fun `test setglobal 'cursorline' option affects IdeaVim global value only`() {
-    assertFalse(IjOptions.cursorline.defaultValue.asBoolean())
+    assertFalse(IjOptions.cursorline.defaultValue.booleanValue)
     assertCommandOutput("setglobal cursorline?", "nocursorline")
 
     enterCommand("setglobal cursorline")
@@ -158,9 +158,9 @@ class CursorLineOptionMapperTest : VimTestCase() {
 
   @Test
   fun `test setglobal does not modify effective value`() {
-    assertEquals(IjOptions.cursorline.defaultValue.asBoolean(), fixture.editor.settings.isCaretRowShown)
+    assertEquals(IjOptions.cursorline.defaultValue.booleanValue, fixture.editor.settings.isCaretRowShown)
     enterCommand("setglobal nocursorline")
-    assertEquals(IjOptions.cursorline.defaultValue.asBoolean(), fixture.editor.settings.isCaretRowShown)
+    assertEquals(IjOptions.cursorline.defaultValue.booleanValue, fixture.editor.settings.isCaretRowShown)
   }
 
   @Test

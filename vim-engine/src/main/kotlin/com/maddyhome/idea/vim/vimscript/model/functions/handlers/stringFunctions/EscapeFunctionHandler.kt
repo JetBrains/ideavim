@@ -36,8 +36,8 @@ internal class EscapeFunctionHandler : FunctionHandler() {
     vimContext: VimLContext,
   ): VimDataType {
     // Get the input string and characters to escape
-    val string = argumentValues[0].evaluate(editor, context, vimContext).asString()
-    val charsToEscape = argumentValues[1].evaluate(editor, context, vimContext).asString()
+    val string = argumentValues[0].evaluate(editor, context, vimContext).toVimString().value
+    val charsToEscape = argumentValues[1].evaluate(editor, context, vimContext).toVimString().value.toSet()
 
     // Process each character in the input string
     val result = StringBuilder()

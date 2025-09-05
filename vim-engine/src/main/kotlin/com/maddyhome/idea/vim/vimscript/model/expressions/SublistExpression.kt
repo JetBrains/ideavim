@@ -10,10 +10,11 @@ package com.maddyhome.idea.vim.vimscript.model.expressions
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
@@ -22,15 +23,16 @@ data class SublistExpression(val from: Expression?, val to: Expression?, val exp
   override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
     val expressionValue = expression.evaluate(editor, context, vimContext)
     val arraySize = when (expressionValue) {
-      is VimDictionary -> throw ExException("E719: Cannot slice a Dictionary")
+      is VimDictionary -> throw exExceptionMessage("E719")  // E719: Cannot slice a Dictionary
+      is VimFuncref -> throw exExceptionMessage("E695") // E695: Cannot index a Funcref
       is VimList -> expressionValue.values.size
-      else -> expressionValue.asString().length
+      else -> expressionValue.toVimString().value.length
     }
-    var fromInt = Integer.parseInt(from?.evaluate(editor, context, vimContext)?.asString() ?: "0")
+    var fromInt = from?.evaluate(editor, context, vimContext)?.toVimNumber()?.value ?: 0
     if (fromInt < 0) {
       fromInt += arraySize
     }
-    var toInt = Integer.parseInt(to?.evaluate(editor, context, vimContext)?.asString() ?: (arraySize - 1).toString())
+    var toInt = to?.evaluate(editor, context, vimContext)?.toVimNumber()?.value ?: (arraySize - 1)
     if (toInt < 0) {
       toInt += arraySize
     }
@@ -38,7 +40,7 @@ data class SublistExpression(val from: Expression?, val to: Expression?, val exp
       if (fromInt > arraySize) {
         VimList(mutableListOf())
       } else if (fromInt == toInt) {
-        expressionValue.values[fromInt]
+        expressionValue.values[fromInt] // TODO: This is incorrect, it should be a List
       } else if (fromInt <= toInt) {
         VimList(expressionValue.values.subList(fromInt, toInt + 1))
       } else {
@@ -46,15 +48,16 @@ data class SublistExpression(val from: Expression?, val to: Expression?, val exp
       }
     } else {
       if (fromInt > arraySize) {
-        VimString("")
+        VimString.EMPTY
       } else if (fromInt <= toInt) {
-        if (toInt > expressionValue.asString().length - 1) {
-          VimString(expressionValue.asString().substring(fromInt))
+        val string = expressionValue.toVimString().value
+        if (toInt > string.length - 1) {
+          VimString(string.substring(fromInt))
         } else {
-          VimString(expressionValue.asString().substring(fromInt, toInt + 1))
+          VimString(string.substring(fromInt, toInt + 1))
         }
       } else {
-        VimString("")
+        VimString.EMPTY
       }
     }
   }

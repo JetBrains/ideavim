@@ -27,7 +27,7 @@ class FunctionCallExpressionTests {
   fun `function call with no arguments`() {
     val ex = VimscriptParser.parseExpression("doSomething()")
     assertTrue(ex is FunctionCallExpression)
-    assertEquals("doSomething", ex.functionName.evaluate().asString())
+    assertEquals("doSomething", ex.functionName.evaluate().value)
     assertNull(ex.scope)
     assertEquals(0, ex.arguments.size)
   }
@@ -36,7 +36,7 @@ class FunctionCallExpressionTests {
   fun `scoped function call`() {
     val ex = VimscriptParser.parseExpression("s:doSomething()")
     assertTrue(ex is FunctionCallExpression)
-    assertEquals("doSomething", ex.functionName.evaluate().asString())
+    assertEquals("doSomething", ex.functionName.evaluate().value)
     assertNotNull(ex.scope)
     assertEquals(Scope.SCRIPT_VARIABLE, ex.scope)
     assertEquals(0, ex.arguments.size)
@@ -46,7 +46,7 @@ class FunctionCallExpressionTests {
   fun `function call with simple arguments`() {
     val ex = VimscriptParser.parseExpression("f(0, 'string')")
     assertTrue(ex is FunctionCallExpression)
-    assertEquals("f", ex.functionName.evaluate().asString())
+    assertEquals("f", ex.functionName.evaluate().value)
     assertNull(ex.scope)
     assertNotNull(ex.arguments)
     assertEquals(2, ex.arguments.size)
@@ -58,7 +58,7 @@ class FunctionCallExpressionTests {
   fun `scope as a function call argument`() {
     val ex = VimscriptParser.parseExpression("f(s:, 'string')")
     assertTrue(ex is FunctionCallExpression)
-    assertEquals("f", ex.functionName.evaluate().asString())
+    assertEquals("f", ex.functionName.evaluate().value)
     assertNull(ex.scope)
     assertNotNull(ex.arguments)
     assertEquals(2, ex.arguments.size)

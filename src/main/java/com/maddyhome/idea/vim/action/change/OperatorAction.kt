@@ -63,21 +63,21 @@ private fun doOperatorAction(
           handler = value.handler
         }
       } catch (_: ExException) {
-        // Get the argument for function('...') or funcref('...') for the error message
+        // Get the argument for function(...) or funcref(...) for the error message
         val functionName = if (expression is FunctionCallExpression && expression.arguments.isNotEmpty()) {
-          expression.arguments[0].evaluate(editor, context, scriptContext).toString()
+          expression.arguments[0].evaluate(editor, context, scriptContext).toOutputString()
         } else {
           func
         }
 
-        VimPlugin.showMessage("E117: Unknown function: $functionName")
+        VimPlugin.showMessage(MessageHelper.message("E117", functionName))
         return false
       }
     }
   }
 
   if (handler == null) {
-    VimPlugin.showMessage("E117: Unknown function: $func")
+    VimPlugin.showMessage(MessageHelper.message("E117", func))
     return false
   }
 

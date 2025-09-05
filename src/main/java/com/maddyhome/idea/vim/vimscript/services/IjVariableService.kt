@@ -46,7 +46,7 @@ internal class IjVariableService : VimVariableServiceBase(), PersistentStateComp
     if (scope == Scope.GLOBAL_VARIABLE) {
       val scopeForGlobalEnvironment = variable.scope?.toString() ?: ""
       VimScriptGlobalEnvironment.getInstance()
-        .variables[scopeForGlobalEnvironment + variable.name.evaluate(editor, context, vimContext)] = value.simplify()
+        .variables[scopeForGlobalEnvironment + variable.name.evaluate(editor, context, vimContext).value] = value.simplify()
     }
   }
 
@@ -103,7 +103,8 @@ internal class IjVariableService : VimVariableServiceBase(), PersistentStateComp
         }
 
         "int" -> {
-          vimVariables[variableElement.getAttributeValue("key")] = VimInt(variableElement.getAttributeValue("value"))
+          vimVariables[variableElement.getAttributeValue("key")] =
+            VimInt.parseNumber(variableElement.getAttributeValue("value")) ?: VimInt.ZERO
         }
       }
     }

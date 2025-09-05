@@ -11,7 +11,7 @@ package com.maddyhome.idea.vim.vimscript.model.expressions
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
@@ -28,18 +28,13 @@ data class FunctionCallExpression(
     this(scope, CurlyBracesName(listOf(SimpleExpression(functionName))), arguments)
 
   override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
+    val scopePrefix = scope?.toString() ?: ""
+    val name = functionName.evaluate(editor, context, vimContext).value
     injector.statisticsService.setIfFunctionCallUsed(true)
-    val handler = injector.functionService.getFunctionHandlerOrNull(
-      scope,
-      functionName.evaluate(editor, context, vimContext).value,
-      vimContext
-    )
+    val handler = injector.functionService.getFunctionHandlerOrNull(scope, name, vimContext)
     if (handler != null) {
       if (handler is DefinedFunctionHandler && handler.function.flags.contains(FunctionFlag.DICT)) {
-        throw ExException(
-          "E725: Calling dict function without Dictionary: " +
-            (scope?.toString() ?: "") + functionName.evaluate(editor, context, vimContext),
-        )
+        throw exExceptionMessage("E725", scopePrefix + name) // E725: Calling dict function without Dictionary: {0}
       }
       return handler.executeFunction(this.arguments, editor, context, vimContext)
     }
@@ -47,17 +42,8 @@ data class FunctionCallExpression(
     val funcref =
       injector.variableService.getNullableVariableValue(Variable(scope, functionName), editor, context, vimContext)
     if (funcref is VimFuncref) {
-      val name = (if (scope != null) scope.c + ":" else "") + functionName
-      return funcref.execute(name, arguments, editor, context, vimContext)
+      return funcref.execute(scopePrefix + name, arguments, editor, context, vimContext)
     }
-    throw ExException(
-      "E117: Unknown function: ${if (scope != null) scope.c + ":" else ""}${
-        functionName.evaluate(
-          editor,
-          context,
-          vimContext
-        )
-      }"
-    )
+    throw exExceptionMessage("E117", scopePrefix + name)  // E117: Unknown function: {0}
   }
 }

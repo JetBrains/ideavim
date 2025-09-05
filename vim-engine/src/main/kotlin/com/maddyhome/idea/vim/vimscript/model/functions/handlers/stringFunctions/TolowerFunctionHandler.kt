@@ -29,7 +29,7 @@ internal class TolowerFunctionHandler : FunctionHandler() {
     context: ExecutionContext,
     vimContext: VimLContext,
   ): VimDataType {
-    val argumentString = argumentValues[0].evaluate(editor, context, vimContext).asString()
+    val argumentString = argumentValues[0].evaluate(editor, context, vimContext).toVimString().value
     return VimString(argumentString.lowercase(Locale.getDefault()))
   }
 }

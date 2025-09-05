@@ -142,7 +142,7 @@ class LetCommandTest : VimTestCase() {
       assertEquals(12, globalValue.value)
       assertEquals(12, localValue.value)
       assertTrue(
-        injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)).asBoolean()
+        injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)).booleanValue
       )
     } finally {
       injector.optionGroup.removeOption(option.name)
@@ -163,7 +163,7 @@ class LetCommandTest : VimTestCase() {
       assertEquals(0, globalValue.value)
       assertEquals(12, localValue.value)
       assertTrue(
-        injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)).asBoolean()
+        injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)).booleanValue
       )
     } finally {
       injector.optionGroup.removeOption(option.name)
@@ -184,7 +184,7 @@ class LetCommandTest : VimTestCase() {
       assertEquals(12, globalValue.value)
       assertEquals(0, localValue.value)
       assertFalse(
-        injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)).asBoolean()
+        injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)).booleanValue
       )
     } finally {
       injector.optionGroup.removeOption(option.name)
