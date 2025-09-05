@@ -45,9 +45,13 @@ abstract class VimDataType {
   /**
    * Returns a textual representation of the object, suitable for use in output messages
    *
-   * Will return a textual representation of an object that isn't a String, such as a List, Dictionary or Funcref.
+   * Formats the object so that it can be used when outputting the value of an object in `:echo` or `:throw`, `join()`,
+   * when option values are formatted and other user-facing output and error messages.
    *
-   * Used by `:echo` and `:throw`, `join()`, formatting option values, as well as user facing error messages.
+   * String is used as is, with no quotation marks. Number and Float are converted to string values. A List is shown in
+   * square brackets, like `[1, 2, 3]` and a Dictionary is shown in curly braces, like `{key1: 2, key2: 4}`. Funcref
+   * depends on the kind of function reference, for example, a built-in function shows the name, such as `abs`, while a
+   * user-defined function will be formatted such as `function('s:Func')`, amongst others.
    */
   abstract fun toOutputString(): String
 
