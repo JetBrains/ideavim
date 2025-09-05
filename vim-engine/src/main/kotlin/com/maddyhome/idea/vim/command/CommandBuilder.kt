@@ -216,7 +216,7 @@ class CommandBuilder private constructor(
         is MotionActionHandler -> Argument.Motion(action, null)
         is TextObjectActionHandler -> Argument.Motion(action)
         is ExternalActionHandler -> Argument.Motion(action)
-        else -> throw RuntimeException("Unexpected action type: $action")
+        else -> Argument.Motion(action)
       }
     }
 
