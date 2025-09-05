@@ -34,14 +34,11 @@ internal class JoinFunctionHandler : FunctionHandler() {
     if (list !is VimList) {
       throw exExceptionMessage("E1211", "1") // E1211: List required for argument 1
     }
+
+    // Note that the docs state that the values are formatted with Vim's `string()` function, except for String itself.
+    // The `string()` function is essentially the same as `toOutputString`, but it adds single quotes to String. We're
+    // safe to use `toOutputString` here.
     val separator = argumentValues.getOrNull(1)?.evaluate(editor, context, vimContext)?.toVimString()?.value ?: " "
-    return VimString(list.values.joinToString(separator) {
-      // According to the docs, String is used as-is, while List and Dictionary (and presumably the other datatypes) are
-      // converted in the same way as Vim's string() function, which has the same results as toEchoString()
-      when (it) {
-        is VimString -> it.value
-        else -> it.toOutputString()
-      }
-    })
+    return VimString(list.values.joinToString(separator) { it.toOutputString() })
   }
 }
