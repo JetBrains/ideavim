@@ -16,7 +16,7 @@ import com.intellij.vim.api.scopes.editor.caret.CaretRead
  * Interface that provides functions that open CaretRead scope.
  */
 @VimApiDsl
-interface ReadScope : Read {
+interface ReadScope : EditorAccessor {
   /**
    * Executes the provided block for each caret in the editor and returns a list of results.
    *

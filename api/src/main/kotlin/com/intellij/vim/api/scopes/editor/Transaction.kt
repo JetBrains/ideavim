@@ -19,7 +19,7 @@ import com.intellij.vim.api.scopes.editor.caret.CaretTransaction
  * Scope for editor functions that should be executed under write lock.
  */
 @VimApiDsl
-interface Transaction : Read {
+interface Transaction : EditorAccessor {
   /**
    * Executes the provided block for each caret in the editor and returns a list of results.
    *

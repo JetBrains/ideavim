@@ -21,7 +21,7 @@ abstract class EditorScope {
   /**
    * Executes a read-only operation on the editor.
    *
-   * This function provides access to read-only operations through the [Read] interface.
+   * This function provides access to read-only operations through the [EditorAccessor] interface.
    * It runs the provided block under a read lock to ensure thread safety when accessing editor state.
    * The operation is executed asynchronously and returns a [kotlinx.coroutines.Deferred] that can be awaited for the result.
    *
@@ -34,7 +34,7 @@ abstract class EditorScope {
    * }
    * ```
    *
-   * @param block A suspending lambda with [Read] receiver that contains the read operations to perform
+   * @param block A suspending lambda with [EditorAccessor] receiver that contains the read operations to perform
    * @return A [kotlinx.coroutines.Deferred] that completes with the result of the block execution
    */
   @OptIn(ExperimentalContracts::class)

@@ -9,7 +9,7 @@
 package com.maddyhome.idea.vim.thinapi.editor
 
 import com.intellij.vim.api.models.CaretId
-import com.intellij.vim.api.scopes.editor.Read
+import com.intellij.vim.api.scopes.editor.EditorAccessor
 import com.intellij.vim.api.scopes.editor.ReadScope
 import com.intellij.vim.api.scopes.editor.caret.CaretRead
 import com.maddyhome.idea.vim.api.VimEditor
@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.thinapi.caretId
 import com.maddyhome.idea.vim.thinapi.editor.caret.CaretReadImpl
 
-class ReadScopeImpl : ReadScope, Read by ReadImpl() {
+class ReadScopeImpl : ReadScope, EditorAccessor by EditorAccessorImpl() {
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!
 

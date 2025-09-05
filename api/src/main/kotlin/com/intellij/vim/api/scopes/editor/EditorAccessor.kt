@@ -18,10 +18,10 @@ import com.intellij.vim.api.models.Range
 import com.intellij.vim.api.scopes.VimApiDsl
 
 /**
- * Scope for editor functions that should be executed under read lock.
+ * Interface giving functions to access the editor state. Does not imply read or write locks.
  */
 @VimApiDsl
-interface Read {
+interface EditorAccessor {
   /**
    * The total length of the text in the editor.
    */

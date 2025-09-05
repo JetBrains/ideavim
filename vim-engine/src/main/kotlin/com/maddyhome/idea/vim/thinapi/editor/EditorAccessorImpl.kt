@@ -15,7 +15,7 @@ import com.intellij.vim.api.models.Line
 import com.intellij.vim.api.models.Mark
 import com.intellij.vim.api.models.Path
 import com.intellij.vim.api.models.Range
-import com.intellij.vim.api.scopes.editor.Read
+import com.intellij.vim.api.scopes.editor.EditorAccessor
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimVirtualFile
 import com.maddyhome.idea.vim.api.getLineEndOffset
@@ -29,7 +29,7 @@ import com.maddyhome.idea.vim.thinapi.toApiJump
 import com.maddyhome.idea.vim.thinapi.toApiMark
 import com.maddyhome.idea.vim.thinapi.toRange
 
-open class ReadImpl : Read {
+open class EditorAccessorImpl : EditorAccessor {
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!
 

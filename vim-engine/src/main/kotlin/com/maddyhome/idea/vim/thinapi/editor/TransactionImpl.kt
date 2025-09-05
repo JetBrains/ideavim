@@ -12,7 +12,7 @@ import com.intellij.vim.api.models.CaretId
 import com.intellij.vim.api.models.Color
 import com.intellij.vim.api.models.HighlightId
 import com.intellij.vim.api.models.Jump
-import com.intellij.vim.api.scopes.editor.Read
+import com.intellij.vim.api.scopes.editor.EditorAccessor
 import com.intellij.vim.api.scopes.editor.Transaction
 import com.intellij.vim.api.scopes.editor.caret.CaretTransaction
 import com.maddyhome.idea.vim.api.VimEditor
@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.thinapi.editor.caret.CaretTransactionImpl
 import com.maddyhome.idea.vim.thinapi.getFilePath
 import com.maddyhome.idea.vim.mark.Jump as EngineJump
 
-class TransactionImpl : Transaction, Read by ReadImpl() {
+class TransactionImpl : Transaction, EditorAccessor by EditorAccessorImpl() {
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!
 

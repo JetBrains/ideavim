@@ -10,13 +10,13 @@ package com.intellij.vim.api.scopes.editor.caret
 
 import com.intellij.vim.api.models.Range
 import com.intellij.vim.api.scopes.VimApiDsl
-import com.intellij.vim.api.scopes.editor.Read
+import com.intellij.vim.api.scopes.editor.EditorAccessor
 
 /**
  * Scope for caret operations that should be executed under the write lock.
  */
 @VimApiDsl
-interface CaretTransaction : CaretRead, Read {
+interface CaretTransaction : CaretRead, EditorAccessor {
   /**
    * Updates the caret position and optionally sets a selection.
    *
