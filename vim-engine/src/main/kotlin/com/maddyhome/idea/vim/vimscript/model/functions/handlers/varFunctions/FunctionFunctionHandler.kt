@@ -18,20 +18,19 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandlerBase
 
 @VimscriptFunction(name = "function")
-internal class FunctionFunctionHandler : FunctionHandler(minArity = 1, maxArity = 3) {
+internal class FunctionFunctionHandler : FunctionHandlerBase<VimFuncref>(minArity = 1, maxArity = 3) {
   override fun doFunction(
-    argumentValues: List<Expression>,
+    arguments: Arguments,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
   ): VimFuncref {
-    val arg1 = argumentValues[0].evaluate(editor, context, vimContext)
+    val arg1 = arguments[0]
     if (arg1 !is VimString) {
       throw exExceptionMessage("E129")
     }
@@ -42,8 +41,8 @@ internal class FunctionFunctionHandler : FunctionHandler(minArity = 1, maxArity 
 
     var arglist: VimList? = null
     var dictionary: VimDictionary? = null
-    val arg2 = argumentValues.getOrNull(1)?.evaluate(editor, context, vimContext)
-    val arg3 = argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext)
+    val arg2 = arguments.getOrNull(1)
+    val arg3 = arguments.getOrNull(2)
 
     if (arg2 is VimDictionary && arg3 is VimDictionary) {
       throw exExceptionMessage("E923")
@@ -76,14 +75,14 @@ internal class FunctionFunctionHandler : FunctionHandler(minArity = 1, maxArity 
 }
 
 @VimscriptFunction(name = "funcref")
-internal class FuncrefFunctionHandler : FunctionHandler(minArity = 1, maxArity = 3) {
+internal class FuncrefFunctionHandler : FunctionHandlerBase<VimFuncref>(minArity = 1, maxArity = 3) {
   override fun doFunction(
-    argumentValues: List<Expression>,
+    arguments: Arguments,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
   ): VimFuncref {
-    val arg1 = argumentValues[0].evaluate(editor, context, vimContext)
+    val arg1 = arguments[0]
     if (arg1 !is VimString) {
       throw exExceptionMessage("E129")
     }
@@ -94,8 +93,8 @@ internal class FuncrefFunctionHandler : FunctionHandler(minArity = 1, maxArity =
 
     var arglist: VimList? = null
     var dictionary: VimDictionary? = null
-    val arg2 = argumentValues.getOrNull(1)?.evaluate(editor, context, vimContext)
-    val arg3 = argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext)
+    val arg2 = arguments.getOrNull(1)
+    val arg3 = arguments.getOrNull(2)
 
     if (arg2 is VimDictionary && arg3 is VimDictionary) {
       throw exExceptionMessage("E923")

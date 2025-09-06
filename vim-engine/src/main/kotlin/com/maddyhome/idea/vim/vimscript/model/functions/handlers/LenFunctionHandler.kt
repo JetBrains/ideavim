@@ -14,25 +14,23 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimBlob
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.UnaryFunctionHandler
 
 @VimscriptFunction(name = "len")
-internal class LenFunctionHandler : UnaryFunctionHandler() {
+internal class LenFunctionHandler : UnaryFunctionHandler<VimInt>() {
   override fun doFunction(
-    argumentValues: List<Expression>,
+    arguments: Arguments,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
-  ): VimDataType {
-    val argument = argumentValues[0].evaluate(editor, context, vimContext)
+  ): VimInt {
+    val argument = arguments[0]
     return when (argument) {
-      is VimInt -> VimInt(argument.value.toString().length)
+      is VimInt -> VimInt(argument.toVimString().value.length)
       is VimString -> VimInt(argument.value.length)
       is VimList -> VimInt(argument.values.size)
       is VimDictionary -> VimInt(argument.dictionary.entries.size)

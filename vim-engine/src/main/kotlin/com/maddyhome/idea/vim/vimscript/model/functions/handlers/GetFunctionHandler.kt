@@ -20,32 +20,26 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandlerBase
 
 @VimscriptFunction(name = "get")
-internal class GetFunctionHandler : FunctionHandler(minArity = 2, maxArity = 3) {
+internal class GetFunctionHandler : FunctionHandlerBase<VimDataType>(minArity = 2, maxArity = 3) {
   override fun doFunction(
-    argumentValues: List<Expression>,
+    arguments: Arguments,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
   ): VimDataType {
-    val container = argumentValues[0].evaluate(editor, context, vimContext)
+    val container = arguments[0]
     return when (container) {
       is VimList -> {
-        val idx = argumentValues[1].evaluate(editor, context, vimContext).toVimNumber().value
-        container.values.getOrElse(idx) {
-          argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext) ?: VimInt(0)
-        }
+        val idx = arguments.getNumber(1).value
+        container.values.getOrElse(idx) { arguments.getOrNull(2) ?: VimInt.ZERO }
       }
 
       is VimDictionary -> {
-        val key = argumentValues[1].evaluate(editor, context, vimContext).toVimString().value
-        container.dictionary.getOrElse(VimString(key)) {
-          argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext) ?: VimInt(0)
-        }
+        val key = arguments.getString(1)
+        container.dictionary.getOrElse(key) { arguments.getOrNull(2) ?: VimInt.ZERO }
       }
 
       is VimBlob, is VimFuncref -> throw ExException("Blobs and Funcref are not supported as an argument for get(). If you need it, request support in YouTrack")

@@ -15,19 +15,18 @@ import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.BinaryFunctionHandler
 
 @VimscriptFunction(name = "repeat")
-internal class RepeatFunctionHandler : BinaryFunctionHandler() {
+internal class RepeatFunctionHandler : BinaryFunctionHandler<VimDataType>() {
   override fun doFunction(
-    argumentValues: List<Expression>,
+    arguments: Arguments,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
   ): VimDataType {
-    val expr = argumentValues[0].evaluate(editor, context, vimContext)
-    val count = argumentValues[1].evaluate(editor, context, vimContext).toVimNumber().value.coerceAtLeast(0)
+    val expr = arguments[0]
+    val count = arguments.getNumber(1).value.coerceAtLeast(0)
 
     return when (expr) {
       is VimList -> {

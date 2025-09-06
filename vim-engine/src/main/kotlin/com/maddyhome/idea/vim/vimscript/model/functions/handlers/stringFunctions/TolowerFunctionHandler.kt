@@ -12,21 +12,12 @@ import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.UnaryFunctionHandler
 import java.util.*
 
 @VimscriptFunction(name = "tolower")
-internal class TolowerFunctionHandler : UnaryFunctionHandler() {
-  override fun doFunction(
-    argumentValues: List<Expression>,
-    editor: VimEditor,
-    context: ExecutionContext,
-    vimContext: VimLContext,
-  ): VimDataType {
-    val argumentString = argumentValues[0].evaluate(editor, context, vimContext).toVimString().value
-    return VimString(argumentString.lowercase(Locale.getDefault()))
-  }
+internal class TolowerFunctionHandler : UnaryFunctionHandler<VimString>() {
+  override fun doFunction(arguments: Arguments, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext) =
+    VimString(arguments.getString(0).value.lowercase(Locale.getDefault()))
 }

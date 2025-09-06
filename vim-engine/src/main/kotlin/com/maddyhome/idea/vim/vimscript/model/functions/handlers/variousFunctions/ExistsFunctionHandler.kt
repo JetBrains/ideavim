@@ -14,23 +14,22 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.OptionExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 import com.maddyhome.idea.vim.vimscript.model.functions.UnaryFunctionHandler
 
 @VimscriptFunction(name = "exists")
-internal class ExistsFunctionHandler : UnaryFunctionHandler() {
+internal class ExistsFunctionHandler : UnaryFunctionHandler<VimInt>() {
   override fun doFunction(
-    argumentValues: List<Expression>,
+    arguments: Arguments,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
-  ): VimDataType {
-    val expressionValue = argumentValues[0].evaluate(editor, context, vimContext)
-    val parsedExpression = injector.vimscriptParser.parseExpression(expressionValue.toVimString().value)
+  ): VimInt {
+    val expressionValue = arguments.getString(0)
+    val parsedExpression = injector.vimscriptParser.parseExpression(expressionValue.value)
     val result = when (parsedExpression) {
       is OptionExpression -> {
         injector.optionGroup.getOption(parsedExpression.optionName) != null

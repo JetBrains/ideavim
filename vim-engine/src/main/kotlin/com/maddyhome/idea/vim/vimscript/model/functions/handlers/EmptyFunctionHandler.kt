@@ -13,7 +13,6 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimBlob
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
@@ -21,18 +20,17 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.UnaryFunctionHandler
 
 @VimscriptFunction(name = "empty")
-internal class EmptyFunctionHandler : UnaryFunctionHandler() {
+internal class EmptyFunctionHandler : UnaryFunctionHandler<VimInt>() {
   override fun doFunction(
-    argumentValues: List<Expression>,
+    arguments: Arguments,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
-  ): VimDataType {
-    val argument = argumentValues[0].evaluate(editor, context, vimContext)
+  ): VimInt {
+    val argument = arguments[0]
     // TODO: 03.08.2021
     // - |v:false|, |v:none| and |v:null| are empty, |v:true| is not.
     val isEmpty = when (argument) {

@@ -18,21 +18,20 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandlerBase
 
 @VimscriptFunction(name = "count")
-internal class CountFunctionHandler : FunctionHandler(minArity = 2, maxArity = 4) {
+internal class CountFunctionHandler : FunctionHandlerBase<VimInt>(minArity = 2, maxArity = 4) {
   override fun doFunction(
-    argumentValues: List<Expression>,
+    arguments: Arguments,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
-  ): VimDataType {
-    val comp = argumentValues[0].evaluate(editor, context, vimContext)
-    val expr = argumentValues[1].evaluate(editor, context, vimContext)
-    val ic = argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext)?.toVimNumber()?.value != 0
-    val start = argumentValues.getOrNull(3)?.evaluate(editor, context, vimContext)?.toVimNumber()?.value ?: 0
+  ): VimInt {
+    val comp = arguments[0]
+    val expr = arguments[1]
+    val ic = arguments.getNumberOrNull(2)?.booleanValue ?: false
+    val start = arguments.getNumberOrNull(3)?.value ?: 0
 
     return when (comp) {
       is VimString -> {

@@ -13,23 +13,18 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandlerBase
 
 @VimscriptFunction(name = "deepcopy")
-internal class DeepCopyFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments = 1
-  override val maximumNumberOfArguments = 2
-
+internal class DeepCopyFunctionHandler : FunctionHandlerBase<VimDataType>(minArity = 1, maxArity = 2) {
   override fun doFunction(
-    argumentValues: List<Expression>,
+    arguments: Arguments,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
   ): VimDataType {
-    val expr = argumentValues[0].evaluate(editor, context, vimContext)
-    val noRef = argumentValues.getOrNull(1)?.evaluate(editor, context, vimContext) ?: VimInt.ZERO
-    return expr.deepCopy(useReferences = !noRef.toVimNumber().booleanValue)
+    val expr = arguments[0]
+    val noRef = arguments.getNumberOrNull(1)?.booleanValue ?: false
+    return expr.deepCopy(useReferences = !noRef)
   }
 }
