@@ -12,22 +12,20 @@ import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.UnaryFunctionHandler
 
 @VimscriptFunction(name = "isinf")
-internal class IsInfFunctionHandler : UnaryFunctionHandler() {
+internal class IsInfFunctionHandler : UnaryFunctionHandler<VimInt>() {
   override fun doFunction(
-    argumentValues: List<Expression>,
+    arguments: Arguments,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
-  ): VimDataType {
-    val argument = argumentValues[0].evaluate(editor, context, vimContext)
+  ): VimInt {
+    val argument = arguments[0]
     if (argument !is VimFloat) {
       return false.asVimInt()
     }
@@ -40,14 +38,14 @@ internal class IsInfFunctionHandler : UnaryFunctionHandler() {
 }
 
 @VimscriptFunction("isnan")
-internal class IsNanFunctionHandler : UnaryFunctionHandler() {
+internal class IsNanFunctionHandler : UnaryFunctionHandler<VimInt>() {
   override fun doFunction(
-    argumentValues: List<Expression>,
+    arguments: Arguments,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
-  ): VimDataType {
-    val argument = argumentValues[0].evaluate(editor, context, vimContext)
+  ): VimInt {
+    val argument = arguments[0]
     if (argument !is VimFloat) {
       return false.asVimInt()
     }

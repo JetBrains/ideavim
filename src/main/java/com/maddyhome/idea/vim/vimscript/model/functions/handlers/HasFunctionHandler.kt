@@ -15,22 +15,16 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.statistic.VimscriptState
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandlerBase
 
 @VimscriptFunction(name = "has")
-internal class HasFunctionHandler : FunctionHandler(minArity = 1, maxArity = 2) {
+internal class HasFunctionHandler : FunctionHandlerBase<VimInt>(minArity = 1, maxArity = 2) {
   private val supportedFeatures = Features.discover()
 
-  override fun doFunction(
-    argumentValues: List<Expression>,
-    editor: VimEditor,
-    context: ExecutionContext,
-    vimContext: VimLContext,
-  ): VimDataType {
-    val feature = argumentValues[0].evaluate(editor, context, vimContext).toVimString().value
+  override fun doFunction(arguments: Arguments, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimInt {
+    val feature = arguments.getString(0).value
     if (feature == "ide") {
       VimscriptState.Util.isIDESpecificConfigurationUsed = true
     }

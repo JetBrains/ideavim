@@ -13,22 +13,20 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.UnaryFunctionHandler
 
 @VimscriptFunction(name = "min")
-internal class MinFunctionHandler : UnaryFunctionHandler() {
+internal class MinFunctionHandler : UnaryFunctionHandler<VimInt>() {
   override fun doFunction(
-    argumentValues: List<Expression>,
+    arguments: Arguments,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
-  ): VimDataType {
-    val expr = argumentValues[0].evaluate(editor, context, vimContext)
+  ): VimInt {
+    val expr = arguments[0]
 
     val values = when (expr) {
       is VimList -> expr.values
@@ -38,7 +36,7 @@ internal class MinFunctionHandler : UnaryFunctionHandler() {
 
     // Empty list/dict returns 0
     if (values.isEmpty()) {
-      return VimInt(0)
+      return VimInt.ZERO
     }
 
     return try {

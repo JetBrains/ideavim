@@ -13,21 +13,19 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandlerBase
 
 @VimscriptFunction(name = "join")
-internal class JoinFunctionHandler : FunctionHandler(minArity = 1, maxArity = 2) {
+internal class JoinFunctionHandler : FunctionHandlerBase<VimString>(minArity = 1, maxArity = 2) {
   override fun doFunction(
-    argumentValues: List<Expression>,
+    arguments: Arguments,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
-  ): VimDataType {
-    val list = argumentValues[0].evaluate(editor, context, vimContext)
+  ): VimString {
+    val list = arguments[0]
     if (list !is VimList) {
       throw exExceptionMessage("E1211", "1")
     }
@@ -35,7 +33,7 @@ internal class JoinFunctionHandler : FunctionHandler(minArity = 1, maxArity = 2)
     // Note that the docs state that the values are formatted with Vim's `string()` function, except for String itself.
     // The `string()` function is essentially the same as `toOutputString`, but it adds single quotes to String. We're
     // safe to use `toOutputString` here.
-    val separator = argumentValues.getOrNull(1)?.evaluate(editor, context, vimContext)?.toVimString()?.value ?: " "
+    val separator = arguments.getOrNull(1)?.toVimString()?.value ?: " "
     return VimString(list.values.joinToString(separator) { it.toOutputString() })
   }
 }

@@ -12,20 +12,18 @@ import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.UnaryFunctionHandler
 
 @VimscriptFunction(name = "string")
-internal class StringFunctionHandler : UnaryFunctionHandler() {
+internal class StringFunctionHandler : UnaryFunctionHandler<VimString>() {
   override fun doFunction(
-    argumentValues: List<Expression>,
+    arguments: Arguments,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
-  ): VimDataType {
-    val value = argumentValues[0].evaluate(editor, context, vimContext)
+  ): VimString {
+    val value = arguments[0]
     if (value is VimString) {
       return VimString("'" + value.value.replace("'", "''") + "'")
     }

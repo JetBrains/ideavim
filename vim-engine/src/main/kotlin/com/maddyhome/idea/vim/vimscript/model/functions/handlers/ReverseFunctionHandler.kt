@@ -16,18 +16,17 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.UnaryFunctionHandler
 
 @VimscriptFunction(name = "reverse")
-internal class ReverseFunctionHandler : UnaryFunctionHandler() {
+internal class ReverseFunctionHandler : UnaryFunctionHandler<VimDataType>() {
   override fun doFunction(
-    argumentValues: List<Expression>,
+    arguments: Arguments,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
   ): VimDataType {
-    val obj = argumentValues[0].evaluate(editor, context, vimContext)
+    val obj = arguments[0]
 
     return when (obj) {
       is VimList -> {

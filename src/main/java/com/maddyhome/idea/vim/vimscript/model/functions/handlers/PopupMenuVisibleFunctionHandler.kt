@@ -13,22 +13,12 @@ import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
+import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandlerBase
 
 @VimscriptFunction(name = "pumvisible")
-internal class PopupMenuVisibleFunctionHandler : FunctionHandler() {
-  override fun doFunction(
-    argumentValues: List<Expression>,
-    editor: VimEditor,
-    context: ExecutionContext,
-    vimContext: VimLContext,
-  ): VimDataType {
-    return if (CompletionService.getCompletionService().currentCompletion == null)
-      VimInt.ZERO
-    else
-      VimInt.ONE
-  }
+internal class PopupMenuVisibleFunctionHandler : FunctionHandlerBase<VimInt>() {
+  override fun doFunction(arguments: Arguments, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext) =
+    (CompletionService.getCompletionService().currentCompletion == null).asVimInt()
 }

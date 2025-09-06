@@ -12,26 +12,24 @@ import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandlerBase
 
 @VimscriptFunction(name = "trim")
-internal class TrimFunctionHandler : FunctionHandler(minArity = 1, maxArity = 3) {
+internal class TrimFunctionHandler : FunctionHandlerBase<VimString>(minArity = 1, maxArity = 3) {
   override fun doFunction(
-    argumentValues: List<Expression>,
+    arguments: Arguments,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
-  ): VimDataType {
-    val string = argumentValues[0].evaluate(editor, context, vimContext).toVimString().value
+  ): VimString {
+    val string = arguments.getString(0).value
 
     // Optional mask parameter (characters to trim, default is whitespace)
-    val mask = argumentValues.getOrNull(1)?.evaluate(editor, context, vimContext)?.toVimString()?.value
+    val mask = arguments.getStringOrNull(1)?.value
 
     // Optional direction parameter: 0 = both sides (default), 1 = start only, 2 = end only
-    val direction = argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext)?.toVimNumber()?.value ?: 0
+    val direction = arguments.getNumberOrNull(2)?.value ?: 0
 
     val result = if (mask == null || mask.isEmpty()) {
       // Default: trim all characters up to 0x20 (including tab, space, NL, CR) plus non-breaking space 0xa0

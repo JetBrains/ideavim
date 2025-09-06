@@ -14,23 +14,21 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandlerBase
 
 @VimscriptFunction(name = "submatch")
-internal class SubmatchFunctionHandler : FunctionHandler(minArity = 1, maxArity = 2) {
+internal class SubmatchFunctionHandler : FunctionHandlerBase<VimString>(minArity = 1, maxArity = 2) {
   var latestMatch: String = ""
 
   override fun doFunction(
-    argumentValues: List<Expression>,
+    arguments: Arguments,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
-  ): VimDataType {
-    val firstArgValue = argumentValues[0].evaluate(editor, context, vimContext).toVimNumber()
-    if (firstArgValue.value != 0 || argumentValues.size > 1) {
+  ): VimString {
+    val firstArgValue = arguments.getNumber(0)
+    if (firstArgValue.value != 0 || arguments.size > 1) {
       throw ExException("Sorry, only `submatch(0)` is supported :(")
     }
     return VimString(latestMatch)

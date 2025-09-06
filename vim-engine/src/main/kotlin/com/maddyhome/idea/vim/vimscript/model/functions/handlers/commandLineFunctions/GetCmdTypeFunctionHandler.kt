@@ -14,10 +14,8 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandlerBase
 
 /*
 Return the current command-line type. Possible return values are:
@@ -34,17 +32,17 @@ Not yet implemented:
     -	:insert or :append command
  */
 @VimscriptFunction(name = "getcmdtype")
-internal class GetCmdTypeFunctionHandler : FunctionHandler() {
+internal class GetCmdTypeFunctionHandler : FunctionHandlerBase<VimString>() {
   override fun doFunction(
-    argumentValues: List<Expression>,
+    arguments: Arguments,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
-  ): VimDataType {
+  ): VimString {
     val mode = editor.mode
     return when (mode) {
       is Mode.CMD_LINE -> VimString(injector.commandLine.getActiveCommandLine()?.getLabel() ?: "")
-      else -> VimString("")
+      else -> VimString.EMPTY
     }
   }
 }

@@ -19,8 +19,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref.Type
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.UnaryFunctionHandler
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -203,16 +202,13 @@ class VimFuncrefTest : VimDataTypeTest() {
   }
 
   // We'll never call this
-  object FakeHandler: FunctionHandler() {
+  object FakeHandler: UnaryFunctionHandler<VimDataType>() {
     init {
       name = "Fake"
     }
 
-    override val minimumNumberOfArguments = 1
-    override val maximumNumberOfArguments = 2
-
     override fun doFunction(
-      argumentValues: List<Expression>,
+      arguments: Arguments,
       editor: VimEditor,
       context: ExecutionContext,
       vimContext: VimLContext,

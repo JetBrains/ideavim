@@ -12,9 +12,7 @@ import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.BinaryFunctionHandler
 
 /**
@@ -24,16 +22,16 @@ import com.maddyhome.idea.vim.vimscript.model.functions.BinaryFunctionHandler
  * Example: escape('c:\program files\vim', ' \') returns 'c:\\program\ files\\vim'
  */
 @VimscriptFunction(name = "escape")
-internal class EscapeFunctionHandler : BinaryFunctionHandler() {
+internal class EscapeFunctionHandler : BinaryFunctionHandler<VimString>() {
   override fun doFunction(
-    argumentValues: List<Expression>,
+    arguments: Arguments,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
-  ): VimDataType {
+  ): VimString {
     // Get the input string and characters to escape
-    val string = argumentValues[0].evaluate(editor, context, vimContext).toVimString().value
-    val charsToEscape = argumentValues[1].evaluate(editor, context, vimContext).toVimString().value.toSet()
+    val string = arguments.getString(0).value
+    val charsToEscape = arguments.getString(1).value.toSet()
 
     // Process each character in the input string
     val result = StringBuilder()
