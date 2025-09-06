@@ -337,10 +337,26 @@ intellijPlatform {
     name = "IdeaVim"
     changeNotes.set(
       """
-        We’ve launched a program to reward quality contributions with a one-year All Products Pack subscription. Learn more at: <a href="https://github.com/JetBrains/ideavim/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a> .
+        We've launched a program to reward quality contributions with a one-year All Products Pack subscription. Learn more at: <a href="https://github.com/JetBrains/ideavim/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a> .
         <br/>
         <br/>
-        <a href="https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20Fix%20versions:%20${version.get()}">Changelog</a>
+        <b>Features:</b><br>
+        • Added support for <code>Tab</code> in Normal mode to review and accept <a href="https://blog.jetbrains.com/ai/2025/08/introducing-next-edit-suggestions-in-jetbrains-ai-assistant/">Next Edit Suggestions</a> | <a href="https://youtrack.jetbrains.com/issue/VIM-4010">VIM-4010</a><br>
+        • Added support for <code>Tab</code> remapping in Insert mode | <a href="https://youtrack.jetbrains.com/issue/VIM-2331">VIM-2331</a><br>
+        • Extended NERDTree support to Tree components other than Project with <code>:set NERDTreeEverywhere</code> | <a href="https://youtrack.jetbrains.com/issue/VIM-3253">VIM-3253</a><br>
+        • Added "Follow links" feature - press <code>Alt+F</code> to show clickable hints for UI components (Vimium-like)<br>
+        • Added <code>c_CTRL-R</code> commands to insert text into command line - <code>&lt;C-R&gt;&lt;C-W&gt;</code> for word, <code>&lt;C-R&gt;&lt;C-A&gt;</code> for WORD, <code>&lt;C-R&gt;&lt;C-L&gt;</code> for line, <code>&lt;C-R&gt;&lt;C-F&gt;</code> for filename | <a href="https://youtrack.jetbrains.com/issue/VIM-2511">VIM-2511</a><br>
+        • Added <code>'isfname'</code> option to define filename characters for <code>&lt;C-R&gt;&lt;C-F&gt;</code> command | <a href="https://youtrack.jetbrains.com/issue/VIM-4018">VIM-4018</a><br>
+        • Added link to <a href="https://jb.gg/ideavim">IdeaVim documentation</a> in status bar menu<br>
+        • Added external link indicators (↗) to status bar menu links<br>
+        <br>
+        <b>Fixes:</b><br>
+        • <a href="https://youtrack.jetbrains.com/issue/VIM-3981">VIM-3981</a> Fixed <code>:set noNERDTree</code> command to properly disable NERDTree<br>
+        • <a href="https://youtrack.jetbrains.com/issue/VIM-3960">VIM-3960</a> Fixed invalid count in text objects - commands like <code>di3w</code> now correctly fail and only execute <code>w</code><br>
+        • <a href="https://youtrack.jetbrains.com/issue/VIM-4007">VIM-4007</a> Fixed cursor position when inlay hints are present on empty lines<br>
+        • <a href="https://youtrack.jetbrains.com/issue/VIM-3997">VIM-3997</a> Fixed <code>$</code> command followed by up/down movement on lines with inlay hints<br>
+        • <a href="https://youtrack.jetbrains.com/issue/VIM-3455">VIM-3455</a> Fixed caret color being overwritten and reset to editor default<br>
+        • <a href="https://youtrack.jetbrains.com/issue/VIM-4028">VIM-4028</a> Fixed plugin registration error preventing proper startup<br>
         """.trimIndent()
     )
 
