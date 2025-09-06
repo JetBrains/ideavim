@@ -31,6 +31,9 @@ usual beta standards.
 * Added support for `Tab` in Normal mode to review and accept [Next Edit Suggestions](https://blog.jetbrains.com/ai/2025/08/introducing-next-edit-suggestions-in-jetbrains-ai-assistant/) | [VIM-4010](https://youtrack.jetbrains.com/issue/VIM-4010)
 * Added support for `Tab` remapping in Insert mode | [VIM-2331](https://youtrack.jetbrains.com/issue/VIM-2331)
 * Extended NERDTree support to Tree components other than Project with `:set NERDTreeEverywhere` | [VIM-3253](https://youtrack.jetbrains.com/issue/VIM-3253)
+* Added "Follow links" feature - press `Alt+F` to show clickable hints for UI components (Vimium-like)
+* Added `c_CTRL-R` commands to insert text into command line - `<C-R><C-W>` for word, `<C-R><C-A>` for WORD, `<C-R><C-L>` for line, `<C-R><C-F>` for filename | [VIM-2511](https://youtrack.jetbrains.com/issue/VIM-2511)
+* Added `'isfname'` option to define filename characters for `<C-R><C-F>` command | [VIM-4018](https://youtrack.jetbrains.com/issue/VIM-4018)
 * Added link to [IdeaVim documentation](https://jb.gg/ideavim) in status bar menu
 * Added external link indicators (↗) to status bar menu links
 
@@ -40,8 +43,11 @@ usual beta standards.
 * [VIM-4007](https://youtrack.jetbrains.com/issue/VIM-4007) Fixed cursor position when inlay hints are present on empty lines
 * [VIM-3997](https://youtrack.jetbrains.com/issue/VIM-3997) Fixed `$` command followed by up/down movement on lines with inlay hints
 * [VIM-3455](https://youtrack.jetbrains.com/issue/VIM-3455) Fixed caret color being overwritten and reset to editor default
+* [VIM-4028](https://youtrack.jetbrains.com/issue/VIM-4028) Fixed plugin registration error preventing proper startup
 
 ### Merged PRs:
+* [1297](https://github.com/JetBrains/ideavim/pull/1297) by [wxh06](https://github.com/wxh06): [Full IDE Integration] "Follow links" MVP
+* [1295](https://github.com/JetBrains/ideavim/pull/1295) by [citizenmatt](https://github.com/citizenmatt): Implement c_CTRL-R commands
 * [1280](https://github.com/JetBrains/ideavim/pull/1280) by [wxh06](https://github.com/wxh06): Improve SpeedSearch and disposal of NERDTree
 * [1279](https://github.com/JetBrains/ideavim/pull/1279) by [citizenmatt](https://github.com/citizenmatt): Fix count accepted as valid in text object
 * [1276](https://github.com/JetBrains/ideavim/pull/1276) by [wxh06](https://github.com/wxh06): Indicate error when an unrecognized key sequence is entered in NERDTree
