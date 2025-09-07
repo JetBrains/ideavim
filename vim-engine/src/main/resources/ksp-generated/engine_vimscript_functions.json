@@ -1,6 +1,7 @@
 {
     "abs": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.AbsFunctionHandler",
     "acos": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.AcosFunctionHandler",
+    "add": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.listFunctions.AddFunctionHandler",
     "and": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.bitwiseFunctions.AndFunctionHandler",
     "asin": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.AsinFunctionHandler",
     "atan": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.AtanFunctionHandler",

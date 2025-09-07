@@ -181,6 +181,8 @@ toupper
 
 delfunction
 endfunction
+lockvar
+unlockvar
 
 consectetur
 adipiscing
