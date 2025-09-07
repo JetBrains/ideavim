@@ -23,12 +23,29 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-## End of changelog file maintenance
+## [To Be Released]
 
-Since version 2.9.0, the changelog can be found on YouTrack
+### Features:
+* Added hints system for component navigation - use hint shortcuts to focus and interact with UI components
+* Command line enhancements: CTRL-R support for inserting registers, words, lines, and filenames
+* [VIM-2511](https://youtrack.jetbrains.com/issue/VIM-2511) Added CTRL-R CTRL-R for literal register insertion in command line
+* Enhanced status bar with external link indicators
 
-* [To Be Released](https://youtrack.jetbrains.com/issues/VIM?q=%23%7BReady%20To%20Release%7D%20)
-* [Version Fixes](https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20sort%20by:%20%7BFix%20versions%7D%20asc)
+### Fixes:
+* [VIM-4028](https://youtrack.jetbrains.com/issue/VIM-4028) Fixed plugin registration error that was causing startup issues
+* [VIM-3650](https://youtrack.jetbrains.com/issue/VIM-3650) Fixed write action issues with register insertion
+* Fixed hint filtering to show only relevant shortcuts when typing
+* Fixed hint color contrast for better visibility
+* Fixed casting error in KeyStrokeTrie.getEntries
+
+### Merged PRs:
+* [1303](https://github.com/JetBrains/ideavim/pull/1303) by [NaMinhyeok](https://github.com/NaMinhyeok): Prevent daily failure alerts from forks for Update Changelog workflow
+* [1299](https://github.com/JetBrains/ideavim/pull/1299) by [wxh06](https://github.com/wxh06): Fix casting error in `KeyStrokeTrie.getEntries`
+* [1298](https://github.com/JetBrains/ideavim/pull/1298) by [wxh06](https://github.com/wxh06): Remove unused NerdTree `ProjectViewListener` from plugin.xml
+* [1297](https://github.com/JetBrains/ideavim/pull/1297) by [wxh06](https://github.com/wxh06): [Full IDE Integration] "Follow links" MVP
+* [1295](https://github.com/JetBrains/ideavim/pull/1295) by [citizenmatt](https://github.com/citizenmatt): Implement c_CTRL-R commands
+
+**Changelog was not maintained for versions 2.10.0 through 2.27.0**
 
 ## 2.9.0, 2024-02-20
 

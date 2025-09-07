@@ -337,10 +337,27 @@ intellijPlatform {
     name = "IdeaVim"
     changeNotes.set(
       """
-        We’ve launched a program to reward quality contributions with a one-year All Products Pack subscription. Learn more at: <a href="https://github.com/JetBrains/ideavim/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a> .
-        <br/>
-        <br/>
-        <a href="https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20Fix%20versions:%20${version.get()}">Changelog</a>
+        <b>Features:</b><br>
+        • Added hints system for component navigation - use hint shortcuts to focus and interact with UI components<br>
+        • Command line enhancements: CTRL-R support for inserting registers, words, lines, and filenames<br>
+        • <a href="https://youtrack.jetbrains.com/issue/VIM-2511">VIM-2511</a> Added CTRL-R CTRL-R for literal register insertion in command line<br>
+        • Enhanced status bar with external link indicators<br>
+        <br>
+        <b>Fixes:</b><br>
+        • <a href="https://youtrack.jetbrains.com/issue/VIM-4028">VIM-4028</a> Fixed plugin registration error that was causing startup issues<br>
+        • <a href="https://youtrack.jetbrains.com/issue/VIM-3650">VIM-3650</a> Fixed write action issues with register insertion<br>
+        • Fixed hint filtering to show only relevant shortcuts when typing<br>
+        • Fixed hint color contrast for better visibility<br>
+        • Fixed casting error in KeyStrokeTrie.getEntries<br>
+        <br>
+        <b>Merged PRs:</b><br>
+        • <a href="https://github.com/JetBrains/ideavim/pull/1303">1303</a> by <a href="https://github.com/NaMinhyeok">NaMinhyeok</a>: Prevent daily failure alerts from forks for Update Changelog workflow<br>
+        • <a href="https://github.com/JetBrains/ideavim/pull/1299">1299</a> by <a href="https://github.com/wxh06">wxh06</a>: Fix casting error in <code>KeyStrokeTrie.getEntries</code><br>
+        • <a href="https://github.com/JetBrains/ideavim/pull/1298">1298</a> by <a href="https://github.com/wxh06">wxh06</a>: Remove unused NerdTree <code>ProjectViewListener</code> from plugin.xml<br>
+        • <a href="https://github.com/JetBrains/ideavim/pull/1297">1297</a> by <a href="https://github.com/wxh06">wxh06</a>: [Full IDE Integration] "Follow links" MVP<br>
+        • <a href="https://github.com/JetBrains/ideavim/pull/1295">1295</a> by <a href="https://github.com/citizenmatt">citizenmatt</a>: Implement c_CTRL-R commands<br>
+        <br>
+        We've launched a program to reward quality contributions with a one-year All Products Pack subscription. Learn more at: <a href="https://github.com/JetBrains/ideavim/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a> .
         """.trimIndent()
     )
 
