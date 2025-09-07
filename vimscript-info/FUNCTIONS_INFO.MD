@@ -92,7 +92,7 @@ See `:help list-functions`.
 | ✅      | `len()`        | number of items in a List                                     |
 | ✅      | `empty()`      | check if List is empty                                        |
 |        | `insert()`     | insert an item somewhere in a List                            |
-|        | `add()`        | append an item to a List                                      |
+| ✅      | `add()`        | append an item to a List                                      |
 |        | `extend()`     | append a List to a List                                       |
 |        | `extendnew()`  | make a new List and append items                              |
 |        | `remove()`     | remove one or more items from a List                          |
