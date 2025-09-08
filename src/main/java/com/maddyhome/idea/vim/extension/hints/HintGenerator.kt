@@ -32,14 +32,25 @@ internal sealed class HintGenerator {
       require(alphabet.size > 1) { "Alphabet must contain at least two characters" }
     }
 
-    override fun generate(targets: List<HintTarget>) {
-      val length = generateSequence(1) { it * alphabet.size }.takeWhile { it < targets.size + previousHints.size }.count()
+    override fun generate(targets: List<HintTarget>) = generate(targets, true)
+
+    /**
+     * @param preserve Whether to preserve the previous hints if possible
+     */
+    private fun generate(targets: List<HintTarget>, preserve: Boolean) {
+      val length = generateSequence(1) { it * alphabet.size }.takeWhile {
+        it < targets.size + if (preserve) previousHints.size else 0
+      }.count()
       val hintIterator = alphabet.permutations(length).map { it.joinToString("") }.iterator()
       targets.forEach { target ->
-        target.hint = previousHints[target.component] ?: hintIterator.firstOrNull {
-          // Check if the hint is not already used by previous targets
-          !previousHints.values.any { hint -> hint.startsWith(it) || it.startsWith(hint) }
-        }!!
+        target.hint = if (preserve) {
+          previousHints[target.component] ?: hintIterator.firstOrNull {
+            // Check if the hint is not already used by previous targets
+            !previousHints.values.any { hint -> hint.startsWith(it) || it.startsWith(hint) }
+          } ?: return generate(targets, false) // do not preserve previous hints if failed
+        } else {
+          hintIterator.next()
+        }
       }
     }
   }
