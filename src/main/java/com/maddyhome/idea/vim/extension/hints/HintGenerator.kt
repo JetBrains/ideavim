@@ -83,6 +83,8 @@ private fun collectTargets(
     }
   }
 
+  // Skip the children of the Tree, otherwise it will easily lead to performance problems
+  if (component is Tree) return
   // recursively collect children
   for (i in 0..<accessibleChildrenCount) {
     collectTargets(targets, getAccessibleChild(i), location, depth + 1)
