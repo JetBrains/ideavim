@@ -130,7 +130,7 @@ See `:help dict-functions`.
 |--------|---------------|-----------------------------------------------|
 | ✅      | `get()`       | get an entry without an error for a wrong key |
 | ✅      | `len()`       | number of entries in a Dictionary             |
-|        | `has_key()`   | check whether a key appears in a Dictionary   |
+| ✅      | `has_key()`   | check whether a key appears in a Dictionary   |
 | ✅      | `empty()`     | check if Dictionary is empty                  |
 |        | `remove()`    | remove an entry from a Dictionary             |
 |        | `extend()`    | add entries from one Dictionary to another    |
