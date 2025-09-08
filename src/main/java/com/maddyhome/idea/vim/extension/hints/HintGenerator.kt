@@ -69,20 +69,23 @@ private fun collectTargets(
   location: Point,
   depth: Int = 0,
 ): Unit = with(component.accessibleContext) {
-  if (accessibleComponent != null && accessibleComponent.isShowing) {
-    val location = location + accessibleComponent.location
-    if (component.isClickable() || component is Tree) {
+  val accessible = accessibleComponent ?: return
+  val location = location + (accessible.location ?: return)
+
+  accessible.size?.let { size ->
+    if (accessible.isShowing && (component.isClickable() || component is Tree)) {
       targets[component].let {
         // For some reason, the same component may appear multiple times in the accessible tree.
         if (it == null || it.depth > depth) {
-          targets[component] = HintTarget(component, location, depth)
+          targets[component] = HintTarget(component, location, size, depth)
         }
       }
     }
-    // recursively collect children
-    for (i in 0..<accessibleChildrenCount) {
-      collectTargets(targets, getAccessibleChild(i), location, depth + 1)
-    }
+  }
+
+  // recursively collect children
+  for (i in 0..<accessibleChildrenCount) {
+    collectTargets(targets, getAccessibleChild(i), location, depth + 1)
   }
 }
 
