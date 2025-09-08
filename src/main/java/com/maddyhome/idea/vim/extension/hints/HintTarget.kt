@@ -8,12 +8,13 @@
 
 package com.maddyhome.idea.vim.extension.hints
 
+import java.awt.Dimension
 import java.awt.Point
 import java.awt.Rectangle
 import javax.accessibility.Accessible
 
-internal data class HintTarget(val component: Accessible, val location: Point, val depth: Int) {
+internal data class HintTarget(val component: Accessible, val location: Point, val size: Dimension, val depth: Int) {
   var hint: String = ""
 
-  val bounds: Rectangle get() = Rectangle(location, component.accessibleContext.accessibleComponent.size)
+  val bounds: Rectangle get() = Rectangle(location, size)
 }
