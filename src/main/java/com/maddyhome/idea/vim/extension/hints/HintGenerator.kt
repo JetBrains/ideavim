@@ -90,7 +90,7 @@ private fun <T> Collection<T>.permutations(length: Int): Sequence<List<T>> = seq
     return@sequence
   }
   for (element in this@permutations) {
-    (this@permutations - element).permutations(length - 1).forEach { subPermutation ->
+    this@permutations.permutations(length - 1).forEach { subPermutation ->
       yield(listOf(element) + subPermutation)
     }
   }
