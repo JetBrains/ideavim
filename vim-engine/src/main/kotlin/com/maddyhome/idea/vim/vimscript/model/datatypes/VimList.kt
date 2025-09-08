@@ -22,6 +22,9 @@ import kotlin.text.appendLine
  * thrown.
  */
 class VimList(val values: MutableList<VimDataType>) : VimDataType("list") {
+
+  val size: Int
+    get() = values.size
   operator fun get(index: Int): VimDataType = this.values[index]
 
   override fun toVimFloat(): VimFloat {
