@@ -8,6 +8,9 @@
 
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.helper.EngineMessageHelper
+import org.jetbrains.annotations.PropertyKey
+
 interface VimMessages {
   fun showStatusBarMessage(editor: VimEditor?, message: String?)
   fun getStatusBarMessage(): String?
@@ -15,7 +18,14 @@ interface VimMessages {
   fun indicateError()
   fun clearError()
   fun isError(): Boolean
-  fun message(key: String, vararg params: Any): String
+
+  /**
+   * Fetch a message from the engine's resource bundle.
+   *
+   * Note that this will _only_ return messages from the engine's resource bundle. It will not return messages from
+   * the host's resource bundle. Hosts should use an alternative method to fetch messages from their own resources.
+   */
+  fun message(@PropertyKey(resourceBundle = EngineMessageHelper.BUNDLE) key: String, vararg params: Any): String
 
   fun updateStatusBar(editor: VimEditor)
 }

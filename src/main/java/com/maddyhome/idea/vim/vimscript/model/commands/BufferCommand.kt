@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.MessageHelper
+import com.maddyhome.idea.vim.helper.EngineMessageHelper
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
@@ -46,7 +46,7 @@ internal data class BufferCommand(val range: Range, val modifier: CommandModifie
         val bufNum = buffer.toInt() - 1
 
         if (!VimPlugin.getFile().selectFile(bufNum, context)) {
-          VimPlugin.showMessage(MessageHelper.message("buffer.0.does.not.exist", bufNum))
+          VimPlugin.showMessage(EngineMessageHelper.message("buffer.0.does.not.exist", bufNum))
           result = false
         }
       } else if (buffer == "#") {
@@ -56,13 +56,13 @@ internal data class BufferCommand(val range: Range, val modifier: CommandModifie
 
         when (editors.size) {
           0 -> {
-            VimPlugin.showMessage(MessageHelper.message("no.matching.buffer.for.0", buffer))
+            VimPlugin.showMessage(EngineMessageHelper.message("no.matching.buffer.for.0", buffer))
             result = false
           }
 
           1 -> {
             if (EditorHelper.hasUnsavedChanges(editor.ij) && !overrideModified) {
-              VimPlugin.showMessage(MessageHelper.message("no.write.since.last.change.add.to.override"))
+              VimPlugin.showMessage(EngineMessageHelper.message("no.write.since.last.change.add.to.override"))
               result = false
             } else {
               VimPlugin.getFile().openFile(EditorHelper.getVirtualFile(editors[0].ij)!!.name, context)
@@ -70,7 +70,7 @@ internal data class BufferCommand(val range: Range, val modifier: CommandModifie
           }
 
           else -> {
-            VimPlugin.showMessage(MessageHelper.message("more.than.one.match.for.0", buffer))
+            VimPlugin.showMessage(EngineMessageHelper.message("more.than.one.match.for.0", buffer))
             result = false
           }
         }
