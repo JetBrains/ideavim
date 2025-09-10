@@ -13,7 +13,6 @@ import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.LineRange
-import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.helper.SearchOptions
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.exitVisualMode
@@ -204,7 +203,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
       val errorMessage = when (which) {
         /*RE_SEARCH*/ 0 -> {
           pattern = lastSearchPattern
-          injector.messages.message(Msg.e_nopresub)
+          injector.messages.message("e_nopresub")
         }
 
         /*RE_SUBST*/ 1 -> {
@@ -228,7 +227,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
       /*RE_SEARCH*/ 0 -> PatternType.SEARCH
       /*RE_SUBST*/ 1 -> PatternType.SUBSTITUTE
       /*RE_BOTH*/ 2 -> PatternType.BOTH
-      else -> throw ExException(injector.messages.message(Msg.e_invcmd))
+      else -> throw ExException(injector.messages.message("e_invcmd"))
     }
     setLastUsedPattern(pattern, patSave, isNewPattern)
 
@@ -256,7 +255,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     } else if (cmd.charAt() == '\\') {
       cmd.inc()
       if ("/?&".indexOf(cmd.charAt()) == -1) {
-        messages.showStatusBarMessage(null, messages.message(Msg.e_backslash))
+        messages.showStatusBarMessage(null, messages.message("e_backslash"))
         return null
       }
       whichPat = if (cmd.charAt() == '&') 1 /* RE_SUBST */ else 0 /* RE_SEARCH */

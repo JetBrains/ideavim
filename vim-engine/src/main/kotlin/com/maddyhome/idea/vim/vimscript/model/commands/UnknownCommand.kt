@@ -16,7 +16,6 @@ import com.maddyhome.idea.vim.common.GoalCommand
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.InvalidCommandException
 import com.maddyhome.idea.vim.ex.ranges.Range
-import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.commands.UnknownCommand.Constants.MAX_RECURSION
 
@@ -52,7 +51,7 @@ data class UnknownCommand(val range: Range, val name: String, val modifier: Comm
         when (commandAlias) {
           is GoalCommand.Ex -> {
             if (commandAlias.command.isEmpty()) {
-              val message = injector.messages.message(Msg.NOT_EX_CMD, name)
+              val message = injector.messages.message("notexcmd", name)
               throw InvalidCommandException(message, null)
             }
             val parsedCommand = injector.vimscriptParser.parseCommand(commandAlias.command)

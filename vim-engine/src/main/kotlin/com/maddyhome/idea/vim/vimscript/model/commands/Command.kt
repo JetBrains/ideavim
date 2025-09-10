@@ -20,7 +20,6 @@ import com.maddyhome.idea.vim.ex.MissingRangeException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.ex.ranges.Range
-import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.state.mode.inNormalMode
 import com.maddyhome.idea.vim.state.mode.isBlock
@@ -145,7 +144,7 @@ sealed class Command(
 
     if (RangeFlag.RANGE_REQUIRED == argFlags.rangeFlag && commandRange.size() == 0) {
       // This will never be hit. The flag is used by `:[range]` and this only parses if there's an actual range
-      injector.messages.showStatusBarMessage(editor, injector.messages.message(Msg.e_rangereq))
+      injector.messages.showStatusBarMessage(editor, injector.messages.message("e_rangereq"))
       throw MissingRangeException()
     }
 
@@ -328,7 +327,7 @@ sealed class Command(
     // The simplest way to parse a range is to parse it as a command (it will default to GoToLineCommand) and ask for
     // its line range. We should perhaps improve this in the future
     return injector.vimscriptParser.parseCommand(getNextArgumentToken())?.getLineRange(editor)?.startLine1
-      ?: throw exExceptionMessage(Msg.e_invrange) // E16: Invalid range
+      ?: throw exExceptionMessage("e_invrange") // E16: Invalid range
   }
 
   protected fun getLine(editor: VimEditor): Int = getLine(editor, editor.currentCaret())

@@ -20,7 +20,6 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.Range
-import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionAccessScope
@@ -146,14 +145,13 @@ fun parseOptionLine(
 
   // We now have 1 or more option operators separator by spaces
   var error: String? = null
-  var token = ""
   val tokenizer = StringTokenizer(argument)
   val toShow = mutableListOf<Pair<String, String>>()
   while (tokenizer.hasMoreTokens()) {
-    token = tokenizer.nextToken()
-    // See if a space has been backslashed, if no get the rest of the text
+    var token = tokenizer.nextToken()
+    // See if a space has been backslashed, if not get the rest of the text
     while (token.endsWith("\\")) {
-      token = token.substring(0, token.length - 1) + ' '
+      token = token.take(token.length - 1) + ' '
       if (tokenizer.hasMoreTokens()) {
         token += tokenizer.nextToken()
       }
@@ -178,7 +176,7 @@ fun parseOptionLine(
           // different.
           val option: Option<out VimDataType>? = optionGroup.getOption(token)
           when (option) {
-            null -> error = Msg.unkopt
+            null -> error = injector.messages.message("unkopt", token)
             is ToggleOption -> optionGroup.setToggleOption(option, scope)
             else -> toShow.add(Pair(option.name, option.abbrev))
           }
@@ -208,7 +206,7 @@ fun parseOptionLine(
         optionGroup.setOptionValue(option, scope, newValue)
       } else {
         // We're either missing the equals sign, the colon, or the option name itself
-        error = Msg.unkopt
+        error = injector.messages.message("unkopt", token)
       }
     }
     if (error != null) {
@@ -222,7 +220,7 @@ fun parseOptionLine(
   }
 
   if (error != null) {
-    throw ExException(injector.messages.message(error, token))
+    throw ExException(error)
   }
 }
 
