@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.extension.hints
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.project.DumbAwareToggleAction
@@ -34,6 +35,8 @@ class ToggleHintsAction : DumbAwareToggleAction() {
   private val highlight = HighlightComponent()
 
   private val generator = HintGenerator.Permutation(alphabet)
+
+  override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
 
   override fun isSelected(e: AnActionEvent): Boolean = cover != null
 
