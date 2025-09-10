@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ranges.Range
-import com.maddyhome.idea.vim.helper.MessageHelper
+import com.maddyhome.idea.vim.helper.EngineMessageHelper
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import java.util.*
 
@@ -50,7 +50,7 @@ internal data class ActionListCommand(val range: Range, val modifier: CommandMod
       .joinToString(lineSeparator)
 
     val outputPanel = injector.outputPanel.getOrCreate(editor, context)
-    outputPanel.addText(MessageHelper.message("ex.show.all.actions.0.1", lineSeparator, actions))
+    outputPanel.addText(EngineMessageHelper.message("ex.show.all.actions.0.1", lineSeparator, actions))
     outputPanel.show()
     return ExecutionResult.Success
   }

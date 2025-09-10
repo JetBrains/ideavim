@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.ex.ranges.toTextRange
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.MessageHelper
+import com.maddyhome.idea.vim.helper.EngineMessageHelper
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
@@ -47,7 +47,7 @@ internal data class CmdFilterCommand(val range: Range, val modifier: CommandModi
           !inBackslash && c == '!' -> {
             val last = lastCommand
             if (last.isNullOrEmpty()) {
-              VimPlugin.showMessage(MessageHelper.message("e_noprev"))
+              VimPlugin.showMessage(EngineMessageHelper.message("e_noprev"))
               return ExecutionResult.Error
             }
             append(last)
@@ -60,7 +60,7 @@ internal data class CmdFilterCommand(val range: Range, val modifier: CommandModi
               // name modifiers. (I also don't know what the :p:h means)
               // (Vim) E499: Empty file name for '%' or '#', only works with ":p:h"
               // (IdeaVim) E499: Empty file name for '%'
-              VimPlugin.showMessage(MessageHelper.message("E499"))
+              VimPlugin.showMessage(EngineMessageHelper.message("E499"))
               return ExecutionResult.Error
             }
             append(virtualFile.path)

@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext;
 import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.api.VimOutputPanel;
 import com.maddyhome.idea.vim.diagnostic.VimLogger;
-import com.maddyhome.idea.vim.helper.MessageHelper;
+import com.maddyhome.idea.vim.helper.EngineMessageHelper;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.helper.UserDataManager;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
@@ -247,7 +247,7 @@ public class ExOutputPanel extends JBPanel<ExOutputPanel> {
   }
 
   public void onBadKey() {
-    myLabel.setText(MessageHelper.message("more.ret.line.space.page.d.half.page.q.quit"));
+    myLabel.setText(EngineMessageHelper.message("more.ret.line.space.page.d.half.page.q.quit"));
     myLabel.setFont(UiHelper.selectEditorFont(myEditor, myLabel.getText()));
   }
 
@@ -257,10 +257,10 @@ public class ExOutputPanel extends JBPanel<ExOutputPanel> {
     myScrollPane.getHorizontalScrollBar().setValue(0);
     if (val + more >=
         myScrollPane.getVerticalScrollBar().getMaximum() - myScrollPane.getVerticalScrollBar().getVisibleAmount()) {
-      myLabel.setText(MessageHelper.message("hit.enter.or.type.command.to.continue"));
+      myLabel.setText(EngineMessageHelper.message("hit.enter.or.type.command.to.continue"));
     }
     else {
-      myLabel.setText(MessageHelper.message("ex.output.panel.more"));
+      myLabel.setText(EngineMessageHelper.message("ex.output.panel.more"));
     }
     myLabel.setFont(UiHelper.selectEditorFont(myEditor, myLabel.getText()));
   }

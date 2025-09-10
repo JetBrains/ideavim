@@ -27,7 +27,7 @@ import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
-import com.maddyhome.idea.vim.helper.MessageHelper
+import com.maddyhome.idea.vim.helper.EngineMessageHelper
 import com.maddyhome.idea.vim.helper.inRepeatMode
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.state.mode.SelectionType
@@ -45,7 +45,7 @@ private fun doOperatorAction(
 ): Boolean {
   val func = injector.globalOptions().operatorfunc
   if (func.isEmpty()) {
-    VimPlugin.showMessage(MessageHelper.message("E774"))
+    VimPlugin.showMessage(EngineMessageHelper.message("E774"))
     return false
   }
 
@@ -70,14 +70,14 @@ private fun doOperatorAction(
           func
         }
 
-        VimPlugin.showMessage(MessageHelper.message("E117", functionName))
+        VimPlugin.showMessage(EngineMessageHelper.message("E117", functionName))
         return false
       }
     }
   }
 
   if (handler == null) {
-    VimPlugin.showMessage(MessageHelper.message("E117", func))
+    VimPlugin.showMessage(EngineMessageHelper.message("E117", func))
     return false
   }
 
