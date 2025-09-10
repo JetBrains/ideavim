@@ -20,6 +20,7 @@ import com.intellij.ui.JBColor
 import com.intellij.util.Alarm
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.extension.ShortcutDispatcher
+import com.maddyhome.idea.vim.newapi.globalIjOptions
 import java.awt.Color
 import javax.swing.JComponent
 import javax.swing.JLabel
@@ -42,6 +43,7 @@ class ToggleHintsAction : DumbAwareToggleAction() {
 
   override fun setSelected(e: AnActionEvent, selected: Boolean) {
     val rootPane = SwingUtilities.getRootPane(e.getData(PlatformDataKeys.CONTEXT_COMPONENT)) ?: return
+    if (!injector.globalIjOptions().vimHints) return
     val glassPane = rootPane.glassPane as IdeGlassPaneImpl
     if (selected) {
       enable(rootPane, glassPane)

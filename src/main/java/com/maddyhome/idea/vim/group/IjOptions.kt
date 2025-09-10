@@ -143,6 +143,7 @@ object IjOptions {
     addOption(ToggleOption("closenotebooks", GLOBAL, "closenotebooks", true, isHidden = true))
   val oldundo: ToggleOption = addOption(ToggleOption("oldundo", GLOBAL, "oldundo", false, isHidden = true))
   val unifyjumps: ToggleOption = addOption(ToggleOption("unifyjumps", GLOBAL, "unifyjumps", true, isHidden = true))
+  val vimHints: ToggleOption = addOption(ToggleOption("vimhints", GLOBAL, "vimhints", false, isHidden = true))
 
   // This needs to be Option<out VimDataType> so that it can work with derived option types, such as NumberOption, which
   // derives from Option<VimInt>
