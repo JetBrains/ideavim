@@ -14,7 +14,6 @@ import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.CharacterHelper
 import com.maddyhome.idea.vim.helper.CharacterHelper.charType
 import com.maddyhome.idea.vim.helper.CharacterHelper.isWhitespace
-import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.helper.SearchOptions
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper
@@ -306,10 +305,10 @@ abstract class VimSearchHelperBase : VimSearchHelper {
         injector.messages.showStatusBarMessage(editor, injector.messages.message("E486", pattern))
       } else if (dir === Direction.FORWARDS) {
         // E385: Search hit BOTTOM without match for: {0}
-        injector.messages.showStatusBarMessage(editor, injector.messages.message(Msg.E385, pattern))
+        injector.messages.showStatusBarMessage(editor, injector.messages.message("E385", pattern))
       } else {
         // E385: Search hit TOP without match for: {0}
-        injector.messages.showStatusBarMessage(editor, injector.messages.message(Msg.E384, pattern))
+        injector.messages.showStatusBarMessage(editor, injector.messages.message("E384", pattern))
       }
       return null
     }
@@ -330,10 +329,10 @@ abstract class VimSearchHelperBase : VimSearchHelper {
         if (searchOptions.contains(SearchOptions.SHOW_MESSAGES)) {
           if (dir === Direction.FORWARDS) {
             // E385: Search hit BOTTOM without match for: {0}
-            injector.messages.showStatusBarMessage(editor, injector.messages.message(Msg.E385, pattern))
+            injector.messages.showStatusBarMessage(editor, injector.messages.message("E385", pattern))
           } else {
             // E385: Search hit TOP without match for: {0}
-            injector.messages.showStatusBarMessage(editor, injector.messages.message(Msg.E384, pattern))
+            injector.messages.showStatusBarMessage(editor, injector.messages.message("E384", pattern))
           }
         }
         return null
