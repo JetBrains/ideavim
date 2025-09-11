@@ -47,7 +47,7 @@ internal data class CmdFilterCommand(val range: Range, val modifier: CommandModi
           !inBackslash && c == '!' -> {
             val last = lastCommand
             if (last.isNullOrEmpty()) {
-              VimPlugin.showMessage(EngineMessageHelper.message("e_noprev"))
+              VimPlugin.showMessage(EngineMessageHelper.message("E34"))
               return ExecutionResult.Error
             }
             append(last)

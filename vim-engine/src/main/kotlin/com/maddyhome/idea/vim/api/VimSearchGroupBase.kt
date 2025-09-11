@@ -203,12 +203,12 @@ abstract class VimSearchGroupBase : VimSearchGroup {
       val errorMessage = when (which) {
         /*RE_SEARCH*/ 0 -> {
           pattern = lastSearchPattern
-          injector.messages.message("e_nopresub")
+          injector.messages.message("E33")
         }
 
         /*RE_SUBST*/ 1 -> {
           pattern = lastSubstitutePattern
-          injector.messages.message("e_noprevre")
+          injector.messages.message("E35")
         }
 
         else -> null
@@ -255,7 +255,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     } else if (cmd.charAt() == '\\') {
       cmd.inc()
       if ("/?&".indexOf(cmd.charAt()) == -1) {
-        messages.showStatusBarMessage(null, messages.message("e_backslash"))
+        messages.showStatusBarMessage(null, messages.message("E10"))
         return null
       }
       whichPat = if (cmd.charAt() == '&') 1 /* RE_SUBST */ else 0 /* RE_SEARCH */
