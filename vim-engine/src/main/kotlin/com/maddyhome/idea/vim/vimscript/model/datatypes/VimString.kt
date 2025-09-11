@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.ex.exExceptionMessage
 data class VimString(val value: String) : VimDataType() {
 
   override fun toVimFloat(): VimFloat {
-    throw exExceptionMessage("E892")  // E892: Using a String as a Float
+    throw exExceptionMessage("E892")
   }
 
   override fun toVimNumber(): VimInt {

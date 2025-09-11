@@ -23,8 +23,8 @@ data class SublistExpression(val from: Expression?, val to: Expression?, val exp
   override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
     val expressionValue = expression.evaluate(editor, context, vimContext)
     val arraySize = when (expressionValue) {
-      is VimDictionary -> throw exExceptionMessage("E719")  // E719: Cannot slice a Dictionary
-      is VimFuncref -> throw exExceptionMessage("E695") // E695: Cannot index a Funcref
+      is VimDictionary -> throw exExceptionMessage("E719")
+      is VimFuncref -> throw exExceptionMessage("E695")
       is VimList -> expressionValue.values.size
       else -> expressionValue.toVimString().value.length
     }

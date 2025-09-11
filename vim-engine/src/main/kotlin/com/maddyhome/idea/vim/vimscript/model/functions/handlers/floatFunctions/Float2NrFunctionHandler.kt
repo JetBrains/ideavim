@@ -34,7 +34,7 @@ internal class Float2NrFunctionHandler : FunctionHandler() {
     return when (argument) {
       is VimFloat -> VimInt(argument.value.toInt())
       is VimInt -> VimInt(argument.value)
-      else -> throw exExceptionMessage("E808")  // E808: Number or Float required
+      else -> throw exExceptionMessage("E808")
     }
   }
 }

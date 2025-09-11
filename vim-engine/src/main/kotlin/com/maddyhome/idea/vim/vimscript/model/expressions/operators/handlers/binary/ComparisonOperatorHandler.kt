@@ -25,16 +25,16 @@ internal abstract class ComparisonOperatorHandler(ignoreCase: Boolean?) :
   final override fun performOperation(left: VimDataType, right: VimDataType, ignoreCase: Boolean): VimDataType {
     return when {
       left is VimList || right is VimList -> {
-        val leftList = left as? VimList ?: throw exExceptionMessage("E691") // E691: Can only compare List with List
-        val rightList = right as? VimList ?: throw exExceptionMessage("E691") // E691: Can only compare List with List
+        val leftList = left as? VimList ?: throw exExceptionMessage("E691")
+        val rightList = right as? VimList ?: throw exExceptionMessage("E691")
         compare(leftList, rightList, ignoreCase)
       }
 
       left is VimDictionary || right is VimDictionary -> {
         val leftDictionary = left as? VimDictionary
-          ?: throw exExceptionMessage("E735") // E735: Can only compare Dictionary with Dictionary
+          ?: throw exExceptionMessage("E735")
         val rightDictionary = right as? VimDictionary
-          ?: throw exExceptionMessage("E735") // E735: Can only compare Dictionary with Dictionary
+          ?: throw exExceptionMessage("E735")
         compare(leftDictionary, rightDictionary, ignoreCase)
       }
 
@@ -69,9 +69,9 @@ internal abstract class ComparisonOperatorHandler(ignoreCase: Boolean?) :
   protected abstract fun compare(left: Int, right: Int): Boolean
   protected abstract fun compare(left: String, right: String, ignoreCase: Boolean): Boolean
   protected open fun compare(left: VimList, right: VimList, ignoreCase: Boolean): Boolean =
-    throw exExceptionMessage("E692")  // E692: Invalid operation for List
+    throw exExceptionMessage("E692")
   protected open fun compare(left: VimDictionary, right: VimDictionary, ignoreCase: Boolean): Boolean =
-    throw exExceptionMessage("E736")  // E736: Invalid operation for Dictionary
+    throw exExceptionMessage("E736")
   protected open fun compare(left: VimFuncref, right: VimFuncref): Boolean =
-    throw exExceptionMessage("E694")  // E694: Invalid operation for Funcrefs
+    throw exExceptionMessage("E694")
 }

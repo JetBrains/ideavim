@@ -13,15 +13,15 @@ import com.maddyhome.idea.vim.ex.exExceptionMessage
 data class VimDictionary(val dictionary: LinkedHashMap<VimString, VimDataType>) : VimDataType() {
 
   override fun toVimFloat(): VimFloat {
-    throw exExceptionMessage("E894")  // E894: Using a Dictionary as a Float
+    throw exExceptionMessage("E894")
   }
 
   override fun toVimNumber(): VimInt {
-    throw exExceptionMessage("E728")  // E728: Using a Dictionary as a Number
+    throw exExceptionMessage("E728")
   }
 
   override fun toVimString(): VimString {
-    throw exExceptionMessage("E731")  // E731: Using a Dictionary as a String
+    throw exExceptionMessage("E731")
   }
 
   override fun toOutputString() = buildString {

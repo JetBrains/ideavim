@@ -32,7 +32,7 @@ internal class JoinFunctionHandler : FunctionHandler() {
   ): VimDataType {
     val list = argumentValues[0].evaluate(editor, context, vimContext)
     if (list !is VimList) {
-      throw exExceptionMessage("E1211", "1") // E1211: List required for argument 1
+      throw exExceptionMessage("E1211", "1")
     }
 
     // Note that the docs state that the values are formatted with Vim's `string()` function, except for String itself.

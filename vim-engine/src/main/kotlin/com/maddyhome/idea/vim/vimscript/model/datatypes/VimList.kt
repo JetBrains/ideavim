@@ -15,15 +15,15 @@ data class VimList(val values: MutableList<VimDataType>) : VimDataType() {
   operator fun get(index: Int): VimDataType = this.values[index]
 
   override fun toVimFloat(): VimFloat {
-    throw exExceptionMessage("E893")  // E893: Using a List as a Float
+    throw exExceptionMessage("E893")
   }
 
   override fun toVimNumber(): VimInt {
-    throw exExceptionMessage("E745")  // E745: Using a List as a Number
+    throw exExceptionMessage("E745")
   }
 
   override fun toVimString(): VimString {
-    throw exExceptionMessage("E730")  // E730: Using a List as a String
+    throw exExceptionMessage("E730")
   }
 
   override fun toOutputString() = buildString {

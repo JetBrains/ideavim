@@ -37,15 +37,15 @@ data class VimFuncref(
   }
 
   override fun toVimFloat(): VimFloat {
-    throw exExceptionMessage("E891")  // E891: Using a Funcref as a Float
+    throw exExceptionMessage("E891")
   }
 
   override fun toVimNumber(): VimInt {
-    throw exExceptionMessage("E703")  // E703: Using a Funcref as a Number
+    throw exExceptionMessage("E703")
   }
 
   override fun toVimString(): VimString {
-    throw exExceptionMessage("E729")  // E729: Using a Funcref as a String
+    throw exExceptionMessage("E729")
   }
 
   override fun toOutputString(): String {

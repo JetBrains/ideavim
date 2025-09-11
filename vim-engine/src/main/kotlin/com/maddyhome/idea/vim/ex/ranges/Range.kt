@@ -81,7 +81,7 @@ class Range {
     // Now process each range component, moving the cursor if appropriate
     val addresses = this.addresses.ifEmpty {
       Address.createRangeAddresses(defaultRange, 0, false)?.toList()
-        ?: throw exExceptionMessage("E16") // E16: Invalid range
+        ?: throw exExceptionMessage("E16")
     }
     for (address in addresses) {
       startLine1 = endLine1
@@ -93,7 +93,7 @@ class Range {
 
     // Offsets might give us a negative start/end line, which Vim treats as an error. A value of 0 is still acceptable.
     if (startLine1 < 0 || endLine1 < 0) {
-      throw exExceptionMessage("E16") // E16: Invalid range
+      throw exExceptionMessage("E16")
     }
 
     // If only one address is given, make the start and end the same
