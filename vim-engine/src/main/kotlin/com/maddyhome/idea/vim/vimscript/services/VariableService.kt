@@ -70,9 +70,9 @@ interface VariableService {
    */
   fun getNullableVariableValue(
     variable: Variable,
-    editor: VimEditor?,
-    context: ExecutionContext?,
-    vimContext: VimLContext?,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext,
   ): VimDataType?
 
   /**
