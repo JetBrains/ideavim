@@ -165,6 +165,17 @@ class KeyStrokeTrie<T>(private val name: String) {
   }
 
   /**
+   * Returns a sequence of nodes that contain data, starting at the given prefix
+   *
+   * This overload is only kept for compatibility with external extensions. Adding a new default parameter is a breaking
+   * change. Functions with default parameters generate a hidden static function with all parameters, which assigns the
+   * default parameter value to any unspecified parameters before calling the original function. Adding a new default
+   * parameter changes this generated function and will therefore break existing callers.
+   */
+  fun getEntries(prefix: List<KeyStroke>? = null): Sequence<TrieNode<T>> =
+    getEntries(prefix, includePrefixNodes = false)
+
+  /**
    * Returns true if the given keys are a prefix to a longer sequence of keys
    *
    * Will return true even if the current keys map to a node with data.
