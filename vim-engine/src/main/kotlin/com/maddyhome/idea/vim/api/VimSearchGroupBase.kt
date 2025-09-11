@@ -652,7 +652,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
       caret.moveToOffset(matchRange.startOffset)
       val highlight = addSubstitutionConfirmationHighlight(editor, matchRange.startOffset, matchRange.endOffset)
       injector.modalInput.create(
-        editor, context, injector.messages.message("replace.with.0", lineToNextSubstitute.second.second),
+        editor, context, injector.messages.message("command.substitute.replace.with.prompt", lineToNextSubstitute.second.second),
         SubstituteWithAskInputInterceptor(
           editor, caret, nextSubstitute, highlight, line, 0, parent, pattern, regex,
           oldLastSubstituteString, line2, hasExpression, substituteString, options,

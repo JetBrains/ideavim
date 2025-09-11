@@ -39,7 +39,7 @@ data class HistoryCommand(val range: Range, val modifier: CommandModifier, val a
     }
 
     if (injector.options(editor).history == 0) {
-      injector.messages.showStatusBarMessage(editor, injector.messages.message("message.history.option.is.zero"))
+      injector.messages.showStatusBarMessage(editor, injector.messages.message("command.history.option.is.zero"))
       return ExecutionResult.Success
     }
 

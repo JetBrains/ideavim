@@ -125,12 +125,12 @@ data class GlobalCommand(val range: Range, val modifier: CommandModifier, val ar
         if (invert) {
           messages.showStatusBarMessage(
             null,
-            messages.message("global.command.not.found.v", globalCommandArguments.pattern.toString())
+            messages.message("command.global.pattern.found.in.every.line", globalCommandArguments.pattern.toString())
           )
         } else {
           messages.showStatusBarMessage(
             null,
-            messages.message("global.command.not.found.g", globalCommandArguments.pattern.toString())
+            messages.message("command.global.pattern.not.found", globalCommandArguments.pattern.toString())
           )
         }
       } else {
