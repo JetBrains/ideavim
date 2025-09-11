@@ -71,7 +71,7 @@ data class MoveTextCommand(val range: Range, val modifier: CommandModifier, val 
     val targetLineAfterDeletion = min(editor.fileSize().toInt(), normalizeAddress(targetAddressLine1 - 1, sourceLineRange))
     val linesMoved = sourceLineRange.size
     if (targetLineAfterDeletion < -1 || targetLineAfterDeletion + linesMoved >= editor.lineCount()) {
-      throw exExceptionMessage("E16")  // E16: Invalid range
+      throw exExceptionMessage("E16")
     }
 
     val shift = targetLineAfterDeletion - editor.offsetToBufferPosition(sourceRange.startOffset).line + 1

@@ -35,7 +35,7 @@ data class HistoryCommand(val range: Range, val modifier: CommandModifier, val a
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
     if (modifier == CommandModifier.BANG) {
-      throw exExceptionMessage("E477")  // E477: No ! allowed
+      throw exExceptionMessage("E477")
     }
 
     if (injector.options(editor).history == 0) {
@@ -63,7 +63,7 @@ data class HistoryCommand(val range: Range, val modifier: CommandModifier, val a
     else {
       val trailing = match?.groups?.get("trailing")?.value ?: ""
       if (trailing.isNotBlank()) {
-        throw exExceptionMessage("E488", trailing.trim())  // E488: Trailing characters: $trailing
+        throw exExceptionMessage("E488", trailing.trim())
       }
 
       first = match?.groups?.get("first")?.value?.toIntOrNull() ?: 0
@@ -109,7 +109,7 @@ data class HistoryCommand(val range: Range, val modifier: CommandModifier, val a
       ?: parseTypePrefix(arg, EXPRESSION)
       ?: parseTypePrefix(arg, INPUT)
       ?: parseTypePrefix(arg, ALL)
-      ?: throw exExceptionMessage("E488", arg)  // E488: Trailing characters: $arg
+      ?: throw exExceptionMessage("E488", arg)
   }
 
   private fun parseTypePrefix(arg: String, type: String): Pair<String, Int>? {

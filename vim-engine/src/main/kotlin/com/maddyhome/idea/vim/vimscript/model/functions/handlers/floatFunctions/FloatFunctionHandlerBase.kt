@@ -32,7 +32,7 @@ internal abstract class UnaryFloatFunctionHandlerBase : FunctionHandler() {
     val argument = when (arg) {
       is VimFloat -> arg.value
       is VimInt -> arg.value.toDouble()
-      else -> throw exExceptionMessage("E808")  // E808: Number or Float required
+      else -> throw exExceptionMessage("E808")
     }
     return VimFloat(invoke(argument))
   }
@@ -55,12 +55,12 @@ internal abstract class BinaryFloatFunctionHandlerBase : FunctionHandler() {
     val x = when (arg1) {
       is VimFloat -> arg1.value
       is VimInt -> arg1.value.toDouble()
-      else -> throw exExceptionMessage("E808")  // E808: Number or Float required
+      else -> throw exExceptionMessage("E808")
     }
     val y = when (arg2) {
       is VimFloat -> arg2.value
       is VimInt -> arg2.value.toDouble()
-      else -> throw exExceptionMessage("E808")  // E808: Number or Float required
+      else -> throw exExceptionMessage("E808")
     }
     return VimFloat(invoke(x, y))
   }

@@ -35,7 +35,7 @@ data class SelectFileCommand(val range: Range, val modifier: CommandModifier, va
     val count = getCountFromArgument() ?: getCountFromRange(editor, editor.currentCaret())
     if (count <= 0) {
       // Should never get this. The default address for RANGE_IS_COUNT is 1. But it ensures (count - 1) below is safe
-      throw exExceptionMessage("E939")  // E939: Positive count required
+      throw exExceptionMessage("E939")
     }
 
     val res = injector.file.selectFile(count - 1, context)

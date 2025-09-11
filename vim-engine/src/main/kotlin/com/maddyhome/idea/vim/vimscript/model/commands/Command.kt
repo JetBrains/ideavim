@@ -139,7 +139,7 @@ sealed class Command(
   private fun checkRanges(editor: VimEditor) {
     if (RangeFlag.RANGE_FORBIDDEN == argFlags.rangeFlag && commandRange.size() != 0) {
       // Some commands (e.g. `:file`) throw "E474: Invalid argument" instead, while e.g. `:3ascii` throws E481
-      throw exExceptionMessage("E481")  // E481: No range allowed
+      throw exExceptionMessage("E481")
     }
 
     if (RangeFlag.RANGE_REQUIRED == argFlags.rangeFlag && commandRange.size() == 0) {
@@ -163,11 +163,11 @@ sealed class Command(
 
   private fun checkArgument() {
     if (ArgumentFlag.ARGUMENT_FORBIDDEN == argFlags.argumentFlag && commandArgument.isNotBlank()) {
-      throw exExceptionMessage("E488", commandArgument) // E488: Trailing characters: {0}
+      throw exExceptionMessage("E488", commandArgument)
     }
 
     if (ArgumentFlag.ARGUMENT_REQUIRED == argFlags.argumentFlag && commandArgument.isBlank()) {
-      throw exExceptionMessage("E471")  // E471: Argument required
+      throw exExceptionMessage("E471")
     }
   }
 
@@ -305,7 +305,7 @@ sealed class Command(
     val argument = getNextArgumentToken()
     return if (argument.isNotEmpty() && !argument[0].isDigit()) {
       if (!injector.registerGroup.isValid(argument[0]) || !injector.registerGroup.isRegisterWritable(argument[0])) {
-        throw exExceptionMessage("E488", argument)  // E488: Trailing characters: {0}
+        throw exExceptionMessage("E488", argument)
       }
       setNextArgumentTokenOffset(1) // Skip the register
       argument[0]
@@ -327,7 +327,7 @@ sealed class Command(
     // The simplest way to parse a range is to parse it as a command (it will default to GoToLineCommand) and ask for
     // its line range. We should perhaps improve this in the future
     return injector.vimscriptParser.parseCommand(getNextArgumentToken())?.getLineRange(editor)?.startLine1
-      ?: throw exExceptionMessage("E16") // E16: Invalid range
+      ?: throw exExceptionMessage("E16")
   }
 
   protected fun getLine(editor: VimEditor): Int = getLine(editor, editor.currentCaret())
