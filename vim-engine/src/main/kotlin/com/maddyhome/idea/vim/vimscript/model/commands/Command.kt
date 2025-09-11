@@ -327,7 +327,7 @@ sealed class Command(
     // The simplest way to parse a range is to parse it as a command (it will default to GoToLineCommand) and ask for
     // its line range. We should perhaps improve this in the future
     return injector.vimscriptParser.parseCommand(getNextArgumentToken())?.getLineRange(editor)?.startLine1
-      ?: throw exExceptionMessage("e_invrange") // E16: Invalid range
+      ?: throw exExceptionMessage("E16") // E16: Invalid range
   }
 
   protected fun getLine(editor: VimEditor): Int = getLine(editor, editor.currentCaret())
