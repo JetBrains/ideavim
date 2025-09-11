@@ -71,7 +71,7 @@ class FileGroup : VimFileBase() {
         return true
       }
     } else {
-      VimPlugin.showMessage(message("unable.to.find.0", filename))
+      VimPlugin.showMessage(message("message.open.file.not.found", filename))
 
       return false
     }

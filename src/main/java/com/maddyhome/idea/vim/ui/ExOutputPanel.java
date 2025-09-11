@@ -247,7 +247,7 @@ public class ExOutputPanel extends JBPanel<ExOutputPanel> {
   }
 
   public void onBadKey() {
-    myLabel.setText(EngineMessageHelper.message("more.ret.line.space.page.d.half.page.q.quit"));
+    myLabel.setText(EngineMessageHelper.message("message.ex.output.more.prompt.full"));
     myLabel.setFont(UiHelper.selectEditorFont(myEditor, myLabel.getText()));
   }
 
@@ -257,10 +257,10 @@ public class ExOutputPanel extends JBPanel<ExOutputPanel> {
     myScrollPane.getHorizontalScrollBar().setValue(0);
     if (val + more >=
         myScrollPane.getVerticalScrollBar().getMaximum() - myScrollPane.getVerticalScrollBar().getVisibleAmount()) {
-      myLabel.setText(EngineMessageHelper.message("hit.enter.or.type.command.to.continue"));
+      myLabel.setText(EngineMessageHelper.message("message.ex.output.end.prompt"));
     }
     else {
-      myLabel.setText(EngineMessageHelper.message("ex.output.panel.more"));
+      myLabel.setText(EngineMessageHelper.message("message.ex.output.more.prompt"));
     }
     myLabel.setFont(UiHelper.selectEditorFont(myEditor, myLabel.getText()));
   }
