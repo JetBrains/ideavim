@@ -195,7 +195,7 @@ data class MoveTextCommand(val range: Range, val modifier: CommandModifier, val 
     if (address0 >= lineRange.endLine) {
       return address0 - lineRange.size
     } else if (address0 >= lineRange.startLine) {
-      throw InvalidRangeException(injector.messages.message("e_backrange")) // Backwards range given
+      throw InvalidRangeException(injector.messages.message("E493"))
     }
 
     return address0
