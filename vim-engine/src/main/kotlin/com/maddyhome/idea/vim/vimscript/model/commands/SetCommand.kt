@@ -157,7 +157,9 @@ fun parseOptionLine(
       }
     }
 
-    val isKeyValueOperation = token.indexOf('=') != -1 || token.indexOf(':') != -1
+    val eq = token.indexOf('=')
+    val colon = token.indexOf(':')
+    val isKeyValueOperation = eq != -1 || colon != -1
     if (!isKeyValueOperation) {
       when {
         token.endsWith("?") -> toShow.add(Pair(token.dropLast(1), token))
@@ -176,7 +178,7 @@ fun parseOptionLine(
           // different.
           val option: Option<out VimDataType>? = optionGroup.getOption(token)
           when (option) {
-            null -> error = injector.messages.message("unkopt", token)
+            null -> error = injector.messages.message("E518", token)
             is ToggleOption -> optionGroup.setToggleOption(option, scope)
             else -> toShow.add(Pair(option.name, option.abbrev))
           }
@@ -184,30 +186,23 @@ fun parseOptionLine(
       }
     } else {
       // This must be one of =, :, +=, -=, or ^=
-      val eq = token.indexOf('=')
-      val colon = token.indexOf(':')
-      if (eq > 0 || colon > 0) {
-        // Could be option:value, option=value, option+=value, option-=value or option^=value
-        val idx = if (eq > 0) eq else colon
-        val op = if (eq > 0) token[eq - 1] else Char(0)
-        val end = if (eq > 0 && op in "+-^") idx - 1 else idx
+      // Could be option:value, option=value, option+=value, option-=value or option^=value
+      val idx = if (eq > 0) eq else colon
+      val op = if (eq > 0) token[eq - 1] else Char(0)
+      val end = if (eq > 0 && op in "+-^") idx - 1 else idx
 
-        // Get option name and value after operator
-        val optionName = token.take(end)
-        val option = getValidOption(optionName)
-        val existingValue = optionGroup.getOptionValue(option, scope)
-        val value = option.parseValue(token.substring(idx + 1), token)
-        val newValue = when (op) {
-          '+' -> appendValue(option, existingValue, value)
-          '^' -> prependValue(option, existingValue, value)
-          '-' -> removeValue(option, existingValue, value)
-          else -> value
-        } ?: throw exExceptionMessage("E474", token)
-        optionGroup.setOptionValue(option, scope, newValue)
-      } else {
-        // We're either missing the equals sign, the colon, or the option name itself
-        error = injector.messages.message("unkopt", token)
-      }
+      // Get option name and value after operator
+      val optionName = token.take(end)
+      val option = getValidOption(optionName)
+      val existingValue = optionGroup.getOptionValue(option, scope)
+      val value = option.parseValue(token.substring(idx + 1), token)
+      val newValue = when (op) {
+        '+' -> appendValue(option, existingValue, value)
+        '^' -> prependValue(option, existingValue, value)
+        '-' -> removeValue(option, existingValue, value)
+        else -> value
+      } ?: throw exExceptionMessage("E474", token)
+      optionGroup.setOptionValue(option, scope, newValue)
     }
     if (error != null) {
       break
