@@ -227,7 +227,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
       /*RE_SEARCH*/ 0 -> PatternType.SEARCH
       /*RE_SUBST*/ 1 -> PatternType.SUBSTITUTE
       /*RE_BOTH*/ 2 -> PatternType.BOTH
-      else -> throw ExException(injector.messages.message("e_invcmd"))
+      else -> error("Unexpected patternSave value: $patternSave")
     }
     setLastUsedPattern(pattern, patSave, isNewPattern)
 
@@ -1175,7 +1175,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
         trailingOptionsEndIndex++
       }
       if (count <= 0 && doError) {
-        injector.messages.showStatusBarMessage(null, "Zero count")
+        injector.messages.showStatusBarMessage(null, injector.messages.message("command.substitute.zero.count"))
         return null
       }
       line1 = line2
@@ -1185,14 +1185,14 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     // check for trailing command or garbage
     if (trailingOptionsEndIndex < exarg.length && exarg[trailingOptionsEndIndex] != '"') {
       // if not end-of-line or comment
-      injector.messages.showStatusBarMessage(null, "Trailing characters")
+      injector.messages.showStatusBarMessage(null, injector.messages.message("command.substitute.trailing.characters"))
       return null
     }
 
     // check for trailing command or garbage
     if (trailingOptionsEndIndex < exarg.length && exarg[trailingOptionsEndIndex] != '"') {
       // if not end-of-line or comment
-      injector.messages.showStatusBarMessage(null, "Trailing characters")
+      injector.messages.showStatusBarMessage(null, injector.messages.message("command.substitute.trailing.characters"))
       return null
     }
 

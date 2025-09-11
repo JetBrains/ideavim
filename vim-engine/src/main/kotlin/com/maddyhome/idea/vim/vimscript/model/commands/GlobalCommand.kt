@@ -120,7 +120,7 @@ data class GlobalCommand(val range: Range, val modifier: CommandModifier, val ar
       }
 
       if (gotInt) {
-        messages.showStatusBarMessage(null, messages.message("e_interr"))
+        messages.showStatusBarMessage(null, messages.message("command.global.interrupted"))
       } else if (marks.isEmpty()) {
         if (invert) {
           messages.showStatusBarMessage(
