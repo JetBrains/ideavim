@@ -46,7 +46,7 @@ internal data class BufferCommand(val range: Range, val modifier: CommandModifie
         val bufNum = buffer.toInt() - 1
 
         if (!VimPlugin.getFile().selectFile(bufNum, context)) {
-          VimPlugin.showMessage(EngineMessageHelper.message("buffer.0.does.not.exist", bufNum))
+          VimPlugin.showMessage(EngineMessageHelper.message("E86", bufNum))
           result = false
         }
       } else if (buffer == "#") {
@@ -56,13 +56,13 @@ internal data class BufferCommand(val range: Range, val modifier: CommandModifie
 
         when (editors.size) {
           0 -> {
-            VimPlugin.showMessage(EngineMessageHelper.message("no.matching.buffer.for.0", buffer))
+            VimPlugin.showMessage(EngineMessageHelper.message("E94", buffer))
             result = false
           }
 
           1 -> {
             if (EditorHelper.hasUnsavedChanges(editor.ij) && !overrideModified) {
-              VimPlugin.showMessage(EngineMessageHelper.message("no.write.since.last.change.add.to.override"))
+              VimPlugin.showMessage(EngineMessageHelper.message("E37"))
               result = false
             } else {
               VimPlugin.getFile().openFile(EditorHelper.getVirtualFile(editors[0].ij)!!.name, context)
@@ -70,7 +70,7 @@ internal data class BufferCommand(val range: Range, val modifier: CommandModifie
           }
 
           else -> {
-            VimPlugin.showMessage(EngineMessageHelper.message("more.than.one.match.for.0", buffer))
+            VimPlugin.showMessage(EngineMessageHelper.message("E93", buffer))
             result = false
           }
         }

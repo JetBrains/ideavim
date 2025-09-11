@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.GoalCommand
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.InvalidCommandException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.commands.UnknownCommand.Constants.MAX_RECURSION
@@ -51,11 +52,11 @@ data class UnknownCommand(val range: Range, val name: String, val modifier: Comm
         when (commandAlias) {
           is GoalCommand.Ex -> {
             if (commandAlias.command.isEmpty()) {
-              val message = injector.messages.message("notexcmd", name)
+              val message = injector.messages.message("E492", name)
               throw InvalidCommandException(message, null)
             }
             val parsedCommand = injector.vimscriptParser.parseCommand(commandAlias.command)
-              ?: throw ExException("E492: Not an editor command: ${commandAlias.command}")
+              ?: throw exExceptionMessage("E492", commandAlias.command)
             return if (parsedCommand is UnknownCommand) {
               processPossiblyAliasCommand(commandAlias.command, editor, context, aliasCountdown - 1)
             } else {
@@ -73,13 +74,13 @@ data class UnknownCommand(val range: Range, val name: String, val modifier: Comm
       } else {
         injector.messages.showStatusBarMessage(
           editor,
-          injector.messages.message("recursion.detected.maximum.alias.depth.reached")
+          injector.messages.message("E169")
         )
         injector.messages.indicateError()
         return ExecutionResult.Error
       }
     } else {
-      throw ExException("E492: Not an editor command: $name")
+      throw exExceptionMessage("E492")
     }
   }
 }
