@@ -36,7 +36,6 @@ import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.newapi.ij
 import org.jetbrains.annotations.TestOnly
 import java.awt.Font
-import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.Timer
 
@@ -82,20 +81,12 @@ internal class IdeaVimSneakExtension : VimExtension {
     private val direction: Direction,
   ) : ExtensionHandler {
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
-      val charone = getChar(editor) ?: return
-      val chartwo = getChar(editor) ?: return
+      val charone = injector.keyGroup.getChar(editor) ?: return
+      val chartwo = injector.keyGroup.getChar(editor) ?: return
       val range = Util.jumpTo(editor, charone, chartwo, direction)
       range?.let { highlightHandler.highlightSneakRange(editor.ij, range) }
       Util.lastSymbols = "${charone}${chartwo}"
       Util.lastSDirection = direction
-    }
-
-    private fun getChar(editor: VimEditor): Char? {
-      val key = VimExtensionFacade.inputKeyStroke(editor.ij)
-      return when {
-        key.keyChar == KeyEvent.CHAR_UNDEFINED || key.keyCode == KeyEvent.VK_ESCAPE -> null
-        else -> key.keyChar
-      }
     }
   }
 
