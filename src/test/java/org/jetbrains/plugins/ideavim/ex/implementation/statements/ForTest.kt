@@ -149,7 +149,7 @@ class ForTest : VimTestCase() {
       ),
     )
     assertPluginError(true)
-    assertPluginErrorMessageContains("E714: List required")
+    assertPluginErrorMessage("E714: List required")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
@@ -169,7 +169,7 @@ class ForTest : VimTestCase() {
       ),
     )
     assertPluginError(true)
-    assertPluginErrorMessageContains("E714: List required")
+    assertPluginErrorMessage("E714: List required")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
@@ -189,7 +189,7 @@ class ForTest : VimTestCase() {
       ),
     )
     assertPluginError(true)
-    assertPluginErrorMessageContains("E688: More targets than List items")
+    assertPluginErrorMessage("E688: More targets than List items")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
@@ -209,7 +209,7 @@ class ForTest : VimTestCase() {
       ),
     )
     assertPluginError(true)
-    assertPluginErrorMessageContains("E684: Less targets than List items")
+    assertPluginErrorMessage("E684: Less targets than List items")
   }
 
   // todo in 1.9: test for with different default scopes

@@ -46,7 +46,7 @@ class TryCatchTest : VimTestCase() {
       ),
     )
     assertPluginError(true)
-    assertPluginErrorMessageContains("my exception")
+    assertPluginErrorMessage("my exception")
   }
 
   @Test
@@ -78,7 +78,7 @@ class TryCatchTest : VimTestCase() {
       ),
     )
     assertPluginError(true)
-    assertPluginErrorMessageContains("E121: Undefined variable: undefinedVariable")
+    assertPluginErrorMessage("E121: Undefined variable: undefinedVariable")
   }
 
   @Test
@@ -114,7 +114,7 @@ class TryCatchTest : VimTestCase() {
       ),
     )
     assertPluginError(true)
-    assertPluginErrorMessageContains("my exception")
+    assertPluginErrorMessage("my exception")
   }
 
   @Test
@@ -154,7 +154,7 @@ class TryCatchTest : VimTestCase() {
       ),
     )
     assertPluginError(true)
-    assertPluginErrorMessageContains("my exception")
+    assertPluginErrorMessage("my exception")
     assertExOutput("finally block")
   }
 

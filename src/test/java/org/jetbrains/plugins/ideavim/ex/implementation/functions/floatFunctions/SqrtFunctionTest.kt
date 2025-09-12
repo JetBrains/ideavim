@@ -39,27 +39,27 @@ class SqrtFunctionTest : VimTestCase() {
   fun `test sqrt with string causes errors`() {
     enterCommand("echo sqrt('1.0')")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test sqrt with invalid string causes errors`() {
     enterCommand("echo sqrt('cheese')")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test sqrt with list causes errors`() {
     enterCommand("echo sqrt([1.0])")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test sqrt with dictionary causes errors`() {
     enterCommand("echo sqrt({1: 1.0})")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 }

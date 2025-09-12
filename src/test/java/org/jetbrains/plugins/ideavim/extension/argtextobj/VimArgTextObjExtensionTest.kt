@@ -466,7 +466,7 @@ ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>
       Mode.NORMAL(),
     )
     assertPluginError(true)
-    assertPluginErrorMessageContains("expecting ':', but got '(' instead")
+    assertPluginErrorMessage("argtextobj: Invalid value of g:argtextobj_pairs -- expecting ':', but got '(' instead")
     setArgTextObjPairsVariable("[:](:)")
     doTest(
       Lists.newArrayList("daa"),
@@ -475,7 +475,7 @@ ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>
       Mode.NORMAL(),
     )
     assertPluginError(true)
-    assertPluginErrorMessageContains("expecting ',', but got '(' instead")
+    assertPluginErrorMessage("argtextobj: Invalid value of g:argtextobj_pairs -- expecting ',', but got '(' instead")
     setArgTextObjPairsVariable("=:=")
     doTest(
       Lists.newArrayList("daa"),
@@ -484,7 +484,7 @@ ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>
       Mode.NORMAL(),
     )
     assertPluginError(true)
-    assertPluginErrorMessageContains("open and close brackets must be different")
+    assertPluginErrorMessage("argtextobj: Invalid value of g:argtextobj_pairs -- open and close brackets must be different")
     setArgTextObjPairsVariable("[:],(:")
     doTest(
       Lists.newArrayList("daa"),
@@ -493,7 +493,7 @@ ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>
       Mode.NORMAL(),
     )
     assertPluginError(true)
-    assertPluginErrorMessageContains("list of pairs is incomplete")
+    assertPluginErrorMessage("argtextobj: Invalid value of g:argtextobj_pairs -- list of pairs is incomplete")
     setArgTextObjPairsVariable("")
     doTest(
       Lists.newArrayList("daa"),
@@ -502,7 +502,7 @@ ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>
       Mode.NORMAL(),
     )
     assertPluginError(true)
-    assertPluginErrorMessageContains("list of pairs is incomplete")
+    assertPluginErrorMessage("argtextobj: Invalid value of g:argtextobj_pairs -- list of pairs is incomplete")
     setArgTextObjPairsVariable("[:],(:)")
     doTest(
       Lists.newArrayList("daa"),

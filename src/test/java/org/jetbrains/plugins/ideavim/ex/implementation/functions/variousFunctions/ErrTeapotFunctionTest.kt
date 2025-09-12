@@ -24,48 +24,48 @@ class ErrTeapotFunctionTest : VimTestCase() {
   fun `test err_teapot`() {
     enterCommand("echo err_teapot()")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E418: I am a teapot")
+    assertPluginErrorMessage("E418: I am a teapot")
   }
 
   @Test
   fun `test err_teapot with boolean false argument`() {
     enterCommand("echo err_teapot(0)")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E418: I am a teapot")
+    assertPluginErrorMessage("E418: I am a teapot")
   }
 
   @Test
   fun `test err_teapot with boolean true argument`() {
     enterCommand("echo err_teapot(1)")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E503: Coffee is currently not available")
+    assertPluginErrorMessage("E503: Coffee is currently not available")
   }
 
   @Test
   fun `test err_teapot with false string argument`() {
     enterCommand("echo err_teapot(\"0\")")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E418: I am a teapot")
+    assertPluginErrorMessage("E418: I am a teapot")
   }
 
   @Test
   fun `test err_teapot with true string argument`() {
     enterCommand("echo err_teapot(\"1\")")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E503: Coffee is currently not available")
+    assertPluginErrorMessage("E503: Coffee is currently not available")
   }
 
   @Test
   fun `test err_teapot with list argument`() {
     enterCommand("echo err_teapot([0])")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E745: Using a List as a Number")
+    assertPluginErrorMessage("E745: Using a List as a Number")
   }
 
   @Test
   fun `test err_teapot with dictionary argument`() {
     enterCommand("echo err_teapot({1: 0})")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E728: Using a Dictionary as a Number")
+    assertPluginErrorMessage("E728: Using a Dictionary as a Number")
   }
 }

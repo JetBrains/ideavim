@@ -862,7 +862,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     // todo throw multiple exceptions at once
     if (exceptions.isNotEmpty()) {
       injector.messages.indicateError()
-      injector.messages.showStatusBarMessage(null, exceptions[0].toString())
+      injector.messages.showStatusBarMessage(null, exceptions[0].message)
     }
   }
 

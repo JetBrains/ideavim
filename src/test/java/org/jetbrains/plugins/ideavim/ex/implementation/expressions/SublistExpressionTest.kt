@@ -38,14 +38,14 @@ class SublistExpressionTest : VimTestCase() {
   fun `test negative index with list`() {
     configureByText("\n")
     typeText(commandToKeys("echo [1, 2][-1]"))
-    assertPluginErrorMessageContains("E684: list index out of range: -1")
+    assertPluginErrorMessage("E684: list index out of range: -1")
   }
 
   @Test
   fun `test index greater than size with list`() {
     configureByText("\n")
     typeText(commandToKeys("echo [1, 2][1000]"))
-    assertPluginErrorMessageContains("E684: list index out of range: 1000")
+    assertPluginErrorMessage("E684: list index out of range: 1000")
   }
 
   @Test

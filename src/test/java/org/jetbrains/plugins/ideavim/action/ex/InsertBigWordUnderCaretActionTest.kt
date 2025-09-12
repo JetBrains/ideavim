@@ -186,7 +186,7 @@ class InsertBigWordUnderCaretActionTest : VimExTestCase() {
     """.trimMargin().dotToSpace())
     typeText(":<C-R><C-A>")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E348: No string under cursor")
+    assertPluginErrorMessage("E348: No string under cursor")
   }
 
   @Test
@@ -200,7 +200,7 @@ class InsertBigWordUnderCaretActionTest : VimExTestCase() {
     """.trimMargin().dotToSpace())
     typeText(":<C-R><C-A>")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E348: No string under cursor")
+    assertPluginErrorMessage("E348: No string under cursor")
   }
 
   @Test

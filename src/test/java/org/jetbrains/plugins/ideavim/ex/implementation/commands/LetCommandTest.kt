@@ -85,7 +85,7 @@ class LetCommandTest : VimTestCase() {
     enterCommand("let s = [1, 1]")
     enterCommand("let s[2] = 2")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E684: list index out of range: 2")
+    assertPluginErrorMessage("E684: list index out of range: 2")
   }
 
   @Test
@@ -101,7 +101,7 @@ class LetCommandTest : VimTestCase() {
     enterCommand("let s = [1, 2, 3]")
     enterCommand("let s[0:1] = [5, 4, 3, 2, 1]")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E710: List value has more items than targets")
+    assertPluginErrorMessage("E710: List value has more items than targets")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
@@ -110,7 +110,7 @@ class LetCommandTest : VimTestCase() {
     enterCommand("let s = [1, 2, 3]")
     enterCommand("let s[0:1] = [5]")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E711: List value does not have enough items")
+    assertPluginErrorMessage("E711: List value does not have enough items")
   }
 
   @Test
@@ -350,7 +350,7 @@ class LetCommandTest : VimTestCase() {
   fun `test define script variable with command line context`() {
     enterCommand("let s:my_var = 'oh, hi Mark'")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E461: Illegal variable name: s:my_var")
+    assertPluginErrorMessage("E461: Illegal variable name: s:my_var")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
@@ -358,7 +358,7 @@ class LetCommandTest : VimTestCase() {
   fun `test define local variable with command line context`() {
     enterCommand("let l:my_var = 'oh, hi Mark'")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E461: Illegal variable name: l:my_var")
+    assertPluginErrorMessage("E461: Illegal variable name: l:my_var")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
@@ -366,6 +366,6 @@ class LetCommandTest : VimTestCase() {
   fun `test define function variable with command line context`() {
     enterCommand("let a:my_var = 'oh, hi Mark'")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E461: Illegal variable name: a:my_var")
+    assertPluginErrorMessage("E461: Illegal variable name: a:my_var")
   }
 }

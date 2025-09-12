@@ -35,55 +35,55 @@ class Atan2FunctionTest : VimTestCase() {
   fun `test atan2 with string causes errors`() {
     enterCommand("echo atan2('1.0', 1.0)")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test atan2 with string causes errors 2`() {
     enterCommand("echo atan2(1.0, '1.0')")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test atan2 with invalid string causes errors`() {
     enterCommand("echo atan2('cheese', 1.0)")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
   @Test
 
   fun `test atan2 with invalid string causes errors 2`() {
     enterCommand("echo atan2(1.0, 'cheese')")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test atan2 with list causes errors`() {
     enterCommand("echo atan2([1.0], 1.0)")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test atan2 with list causes errors 2`() {
     enterCommand("echo atan2(1.0, [1.0])")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test atan2 with dictionary causes errors`() {
     enterCommand("echo atan2({1: 1.0}, 1.0)")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test atan2 with dictionary causes errors 2`() {
     enterCommand("echo atan2(1.0, {1: 1.0})")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 }

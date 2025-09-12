@@ -39,27 +39,27 @@ class Log10FunctionTest : VimTestCase() {
   fun `test log10 with string causes errors`() {
     enterCommand("echo log10('1.0')")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test log10 with invalid string causes errors`() {
     enterCommand("echo log10('cheese')")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test log10 with list causes errors`() {
     enterCommand("echo log10([1.0])")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test log10 with dictionary causes errors`() {
     enterCommand("echo log10({1: 1.0})")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 }
