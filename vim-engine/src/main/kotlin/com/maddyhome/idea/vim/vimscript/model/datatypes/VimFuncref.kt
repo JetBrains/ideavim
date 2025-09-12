@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.vimscript.model.datatypes
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
@@ -74,7 +73,7 @@ data class VimFuncref(
   ): VimDataType {
     if (handler is DefinedFunctionHandler && handler.function.flags.contains(FunctionFlag.DICT)) {
       if (dictionary == null) {
-        throw ExException("E725: Calling dict function without Dictionary: $name")
+        throw exExceptionMessage("E725", name)
       } else {
         injector.variableService.storeVariable(
           Variable(Scope.LOCAL_VARIABLE, "self"),
@@ -88,13 +87,13 @@ data class VimFuncref(
 
     val allArguments = listOf(this.arguments.values.map { SimpleExpression(it) }, args).flatten()
     if (handler is DefinedFunctionHandler && handler.function.isDeleted) {
-      throw ExException("E933: Function was deleted: ${handler.name}")
+      throw exExceptionMessage("E933", handler.name)
     }
     val handler = when (type) {
       Type.LAMBDA, Type.FUNCREF -> this.handler
       Type.FUNCTION -> {
         injector.functionService.getFunctionHandlerOrNull(handler.scope, handler.name, vimContext)
-          ?: throw ExException("E117: Unknown function: ${handler.name}")
+          ?: throw exExceptionMessage("E117", handler.name)
       }
     }
     return handler.executeFunction(allArguments, editor, context, vimContext)

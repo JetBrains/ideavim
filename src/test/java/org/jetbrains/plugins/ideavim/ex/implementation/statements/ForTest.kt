@@ -209,7 +209,7 @@ class ForTest : VimTestCase() {
       ),
     )
     assertPluginError(true)
-    assertPluginErrorMessage("E684: Less targets than List items")
+    assertPluginErrorMessage("E687: Less targets than List items")
   }
 
   // todo in 1.9: test for with different default scopes

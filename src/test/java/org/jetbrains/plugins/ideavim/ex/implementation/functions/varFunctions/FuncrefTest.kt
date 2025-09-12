@@ -99,7 +99,7 @@ class FuncrefTest : VimTestCase() {
     )
     typeText(commandToKeys("let Ff = funcref('Abs', [], 40)"))
     assertPluginError(true)
-    assertPluginErrorMessage("E922: expected a dict")
+    assertPluginErrorMessage("E922: Expected a dict")
 
     typeText(commandToKeys("delfunction! Abs"))
   }

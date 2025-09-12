@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.FinishException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.Address
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
@@ -109,8 +110,8 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
       }
       // todo in release 1.9. we should return value AND throw exception
       when (result) {
-        is ExecutionResult.Break -> exceptionsCaught.add(ExException("E587: :break without :while or :for: break"))
-        is ExecutionResult.Continue -> exceptionsCaught.add(ExException("E586: :continue without :while or :for: continue"))
+        is ExecutionResult.Break -> exceptionsCaught.add(exExceptionMessage("E587"))
+        is ExecutionResult.Continue -> exceptionsCaught.add(exExceptionMessage("E586"))
         is ExecutionResult.Error -> exceptionsCaught.add(ExException("unknown error occurred")) // todo
         is ExecutionResult.Return -> returnValue = result.value
         is ExecutionResult.Success -> {}
@@ -122,8 +123,8 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
         try {
           result = statement.execute(editor, context)
           when (result) {
-            is ExecutionResult.Break -> exceptionsCaught.add(ExException("E587: :break without :while or :for: break"))
-            is ExecutionResult.Continue -> exceptionsCaught.add(ExException("E586: :continue without :while or :for: continue"))
+            is ExecutionResult.Break -> exceptionsCaught.add(exExceptionMessage("E587"))
+            is ExecutionResult.Continue -> exceptionsCaught.add(exExceptionMessage("E586"))
             is ExecutionResult.Error -> exceptionsCaught.add(ExException("unknown error occurred")) // todo
             is ExecutionResult.Return -> {
               returnValue = result.value

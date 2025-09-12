@@ -222,7 +222,7 @@ data class MapCommand(val range: Range, val cmd: String, val modifier: CommandMo
     return fromKeys?.let {
       val toExpr = if (specialArguments.contains(EXPR)) {
         injector.vimscriptParser.parseExpression(toKeysBuilder.toString().trim())
-          ?: throw ExException("E15: Invalid expression: ${toKeysBuilder.toString().trim()}")
+          ?: throw exExceptionMessage("E15", toKeysBuilder.toString().trim())
       } else {
         SimpleExpression(toKeysBuilder.toString().trimStart())
       }

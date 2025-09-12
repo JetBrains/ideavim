@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.helper.SearchOptions
 import com.maddyhome.idea.vim.helper.enumSetOf
@@ -1026,7 +1027,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
   ): String {
     val expression = injector.vimscriptParser.parseExpression(exprString)
     return if (expression == null) {
-      exceptions.add(ExException("E15: Invalid expression: $exprString"))
+      exceptions.add(exExceptionMessage("E15", exprString))
       ""
     } else {
       try {

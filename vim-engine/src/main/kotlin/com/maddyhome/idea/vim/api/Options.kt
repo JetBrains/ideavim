@@ -290,7 +290,7 @@ object Options {
     override fun checkIfValueValid(value: VimDataType, token: String) {
       super.checkIfValueValid(value, token)
       if ((value as VimInt).value < -100) {
-        throw ExException("E49: Invalid scroll size: $token")
+        throw exExceptionMessage("E49", token)
       }
     }
   })

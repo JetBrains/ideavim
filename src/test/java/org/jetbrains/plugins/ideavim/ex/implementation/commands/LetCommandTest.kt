@@ -85,7 +85,7 @@ class LetCommandTest : VimTestCase() {
     enterCommand("let s = [1, 1]")
     enterCommand("let s[2] = 2")
     assertPluginError(true)
-    assertPluginErrorMessage("E684: list index out of range: 2")
+    assertPluginErrorMessage("E684: List index out of range: 2")
   }
 
   @Test
