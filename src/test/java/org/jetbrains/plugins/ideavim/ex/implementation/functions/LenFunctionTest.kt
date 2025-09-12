@@ -33,6 +33,6 @@ class LenFunctionTest : VimTestCase() {
   @Test
   fun `test len with float causes errors`() {
     enterCommand("echo len(4.2)")
-    assertPluginErrorMessageContains("E701: Invalid type for len()")
+    assertPluginErrorMessage("E701: Invalid type for len()")
   }
 }

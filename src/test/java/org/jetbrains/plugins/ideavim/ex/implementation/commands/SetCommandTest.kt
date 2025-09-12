@@ -43,7 +43,7 @@ class SetCommandTest : VimTestCase() {
   fun `test unknown option`() {
     enterCommand("set unknownOption")
     assertPluginError(true)
-    assertPluginErrorMessageContains("Unknown option: unknownOption")
+    assertPluginErrorMessage("E518: Unknown option: unknownOption")
   }
 
   @Test
@@ -92,24 +92,24 @@ class SetCommandTest : VimTestCase() {
   fun `test toggle option exceptions`() {
     enterCommand("set number+=10")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: number+=10")
+    assertPluginErrorMessage("E474: Invalid argument: number+=10")
     enterCommand("set number+=test")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: number+=test")
+    assertPluginErrorMessage("E474: Invalid argument: number+=test")
 
     enterCommand("set number^=10")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: number^=10")
+    assertPluginErrorMessage("E474: Invalid argument: number^=10")
     enterCommand("set number^=test")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: number^=test")
+    assertPluginErrorMessage("E474: Invalid argument: number^=test")
 
     enterCommand("set number-=10")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: number-=10")
+    assertPluginErrorMessage("E474: Invalid argument: number-=10")
     enterCommand("set number-=test")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: number-=test")
+    assertPluginErrorMessage("E474: Invalid argument: number-=test")
   }
 
   @Test
@@ -118,19 +118,19 @@ class SetCommandTest : VimTestCase() {
     assertPluginError(false)
     enterCommand("set scrolloff+=test")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E521: Number required after =: scrolloff+=test")
+    assertPluginErrorMessage("E521: Number required after =: scrolloff+=test")
 
     enterCommand("set scrolloff^=10")
     assertPluginError(false)
     enterCommand("set scrolloff^=test")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E521: Number required after =: scrolloff^=test")
+    assertPluginErrorMessage("E521: Number required after =: scrolloff^=test")
 
     enterCommand("set scrolloff-=10")
     assertPluginError(false)
     enterCommand("set scrolloff-=test")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E521: Number required after =: scrolloff-=test")
+    assertPluginErrorMessage("E521: Number required after =: scrolloff-=test")
   }
 
   @Test

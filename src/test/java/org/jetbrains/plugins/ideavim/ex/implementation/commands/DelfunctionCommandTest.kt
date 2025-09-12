@@ -32,7 +32,7 @@ class DelfunctionCommandTest : VimTestCase() {
     assertPluginError(false)
     typeText(commandToKeys("echo F1()"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E117: Unknown function: F1")
+    assertPluginErrorMessage("E117: Unknown function: F1")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
@@ -52,7 +52,7 @@ class DelfunctionCommandTest : VimTestCase() {
     assertPluginError(false)
     typeText(commandToKeys("echo F1()"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E117: Unknown function: F1")
+    assertPluginErrorMessage("E117: Unknown function: F1")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
@@ -61,7 +61,7 @@ class DelfunctionCommandTest : VimTestCase() {
     configureByText("\n")
     typeText(commandToKeys("delfunction F1"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E130: Unknown function: F1")
+    assertPluginErrorMessage("E130: Unknown function: F1")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
@@ -70,7 +70,7 @@ class DelfunctionCommandTest : VimTestCase() {
     configureByText("\n")
     typeText(commandToKeys("delfunction s:F1"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E81: Using <SID> not in a script context")
+    assertPluginErrorMessage("E81: Using <SID> not in a script context")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)

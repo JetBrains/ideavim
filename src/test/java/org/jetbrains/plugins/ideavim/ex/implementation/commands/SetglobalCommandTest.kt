@@ -52,7 +52,7 @@ class SetglobalCommandTest : VimTestCase() {
   fun `test set unknown option`() {
     enterCommand("setglobal unknownOption")
     assertPluginError(true)
-    assertPluginErrorMessageContains("Unknown option: unknownOption")
+    assertPluginErrorMessage("E518: Unknown option: unknownOption")
   }
 
   @Test
@@ -78,35 +78,35 @@ class SetglobalCommandTest : VimTestCase() {
   fun `test exceptions from incorrectly setting toggle option`() {
     enterCommand("setglobal number=test")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: number=test")
+    assertPluginErrorMessage("E474: Invalid argument: number=test")
 
     enterCommand("setglobal number=0")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: number=0")
+    assertPluginErrorMessage("E474: Invalid argument: number=0")
 
     enterCommand("setglobal number+=10")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: number+=10")
+    assertPluginErrorMessage("E474: Invalid argument: number+=10")
 
     enterCommand("setglobal number+=test")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: number+=test")
+    assertPluginErrorMessage("E474: Invalid argument: number+=test")
 
     enterCommand("setglobal number^=10")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: number^=10")
+    assertPluginErrorMessage("E474: Invalid argument: number^=10")
 
     enterCommand("setglobal number^=test")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: number^=test")
+    assertPluginErrorMessage("E474: Invalid argument: number^=test")
 
     enterCommand("setglobal number-=10")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: number-=10")
+    assertPluginErrorMessage("E474: Invalid argument: number-=10")
 
     enterCommand("setglobal number-=test")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: number-=test")
+    assertPluginErrorMessage("E474: Invalid argument: number-=test")
   }
 
   @Test
@@ -209,19 +209,19 @@ class SetglobalCommandTest : VimTestCase() {
   fun `test exceptions from incorrectly setting number option`() {
     enterCommand("setglobal scroll=test")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E521: Number required after =: scroll=test")
+    assertPluginErrorMessage("E521: Number required after =: scroll=test")
 
     enterCommand("setglobal scroll+=test")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E521: Number required after =: scroll+=test")
+    assertPluginErrorMessage("E521: Number required after =: scroll+=test")
 
     enterCommand("setglobal scroll-=test")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E521: Number required after =: scroll-=test")
+    assertPluginErrorMessage("E521: Number required after =: scroll-=test")
 
     enterCommand("setglobal scroll^=test")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E521: Number required after =: scroll^=test")
+    assertPluginErrorMessage("E521: Number required after =: scroll^=test")
   }
 
   @Test
@@ -321,19 +321,19 @@ class SetglobalCommandTest : VimTestCase() {
   fun `test exceptions from incorrectly setting string option`() {
     enterCommand("setglobal nrformats=unknown")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: nrformats=unknown")
+    assertPluginErrorMessage("E474: Invalid argument: nrformats=unknown")
 
     enterCommand("setglobal nrformats+=10")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: nrformats+=10")
+    assertPluginErrorMessage("E474: Invalid argument: nrformats+=10")
 
     enterCommand("setglobal nrformats-=10")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: nrformats-=10")
+    assertPluginErrorMessage("E474: Invalid argument: nrformats-=10")
 
     enterCommand("setglobal nrformats^=10")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: nrformats^=10")
+    assertPluginErrorMessage("E474: Invalid argument: nrformats^=10")
   }
 
   @Test

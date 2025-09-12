@@ -40,27 +40,27 @@ class CeilFunctionTest : VimTestCase() {
   fun `test ceil with string causes errors`() {
     enterCommand("echo ceil('1.0')")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test ceil with invalid string causes errors`() {
     enterCommand("echo ceil('cheese')")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test ceil with list causes errors`() {
     enterCommand("echo ceil([1.0])")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test ceil with dictionary causes errors`() {
     enterCommand("echo ceil({1: 1.0})")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 }
