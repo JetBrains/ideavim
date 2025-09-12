@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.mark.VimMarkConstants
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
@@ -42,7 +42,7 @@ data class DeleteMarksCommand(val range: Range, val modifier: CommandModifier, v
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
     val processedArg = if (modifier == CommandModifier.BANG) {
-      if (argument.isNotEmpty()) throw ExException("E474: Invalid argument")
+      if (argument.isNotEmpty()) throw exExceptionMessage("E474")
       VimMarkConstants.DEL_FILE_MARKS
     } else {
       argument.replace(VIML_COMMENT, "")

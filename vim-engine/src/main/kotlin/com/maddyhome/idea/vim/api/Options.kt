@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.api
 
-import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.indexOfOrNull
@@ -241,7 +240,7 @@ object Options {
       override fun checkIfValueValid(value: VimDataType, token: String) {
         super.checkIfValueValid(value, token)
         if (KeywordOptionHelper.isValueInvalid((value as VimString).value)) {
-          throw exExceptionMessage("E474", token)
+          throw exExceptionMessage("E474.arg", token)
         }
       }
 
@@ -259,7 +258,7 @@ object Options {
         super.checkIfValueValid(value, token)
         for (v in split((value as VimString).value)) {
           if (!v.matches(Regex(".:."))) {
-            throw exExceptionMessage("E474", token)
+            throw exExceptionMessage("E474.arg", token)
           }
         }
       }

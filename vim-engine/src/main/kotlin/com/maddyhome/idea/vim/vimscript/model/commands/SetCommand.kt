@@ -201,7 +201,7 @@ fun parseOptionLine(
         '^' -> prependValue(option, existingValue, value)
         '-' -> removeValue(option, existingValue, value)
         else -> value
-      } ?: throw exExceptionMessage("E474", token)
+      } ?: throw exExceptionMessage("E474.arg", token)
       optionGroup.setOptionValue(option, scope, newValue)
     }
     if (error != null) {
@@ -223,7 +223,7 @@ private fun getValidOption(optionName: String, token: String = optionName) =
   injector.optionGroup.getOption(optionName) ?: throw exExceptionMessage("E518", token)
 
 private fun getValidToggleOption(optionName: String, token: String) =
-  getValidOption(optionName, token) as? ToggleOption ?: throw exExceptionMessage("E474", token)
+  getValidOption(optionName, token) as? ToggleOption ?: throw exExceptionMessage("E474.arg", token)
 
 private fun showOptions(
   editor: VimEditor,

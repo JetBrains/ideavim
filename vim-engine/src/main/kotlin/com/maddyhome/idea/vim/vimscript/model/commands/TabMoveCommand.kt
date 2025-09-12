@@ -14,6 +14,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
@@ -49,13 +50,13 @@ data class TabMoveCommand(val range: Range, val modifier: CommandModifier, val a
       index = if (argument.startsWith("+")) {
         val number = Integer.parseInt(argument.substring(1))
         if (number == 0) {
-          throw ExException("E474: Invalid argument")
+          throw exExceptionMessage("E474")
         }
         currentIndex + number
       } else if (argument.startsWith("-")) {
         val number = Integer.parseInt(argument.substring(1))
         if (number == 0) {
-          throw ExException("E474: Invalid argument")
+          throw exExceptionMessage("E474")
         }
         currentIndex - number
       } else if (argument == "$" || argument.isBlank()) {
@@ -68,11 +69,11 @@ data class TabMoveCommand(val range: Range, val modifier: CommandModifier, val a
         number
       }
     } catch (_: NumberFormatException) {
-      throw ExException("E474: Invalid argument")
+      throw exExceptionMessage("E474")
     }
 
     if (index < 0 || index >= tabCount) {
-      throw ExException("E474: Invalid argument")
+      throw exExceptionMessage("E474")
     }
     tabService.moveCurrentTabToIndex(index, context)
     return ExecutionResult.Success
