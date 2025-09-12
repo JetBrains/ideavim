@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary
 
-import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
@@ -61,7 +60,7 @@ internal abstract class ComparisonOperatorHandler(ignoreCase: Boolean?) :
         compare(left.toVimNumber().value, right.toVimNumber().value)
       }
 
-      else -> throw ExException("E474: Invalid argument")
+      else -> throw exExceptionMessage("E474")
     }.asVimInt()
   }
 

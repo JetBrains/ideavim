@@ -49,7 +49,7 @@ object IjOptions {
         // that, but we do automatically add "+0" because IntelliJ always displays the right margin
         split(value.value).forEach {
           if (!it.matches(Regex("[+-]?[0-9]+"))) {
-            throw exExceptionMessage("E474", token)
+            throw exExceptionMessage("E474.arg", token)
           }
         }
       }

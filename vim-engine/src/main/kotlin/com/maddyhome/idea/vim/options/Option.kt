@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.options
 
-import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -110,7 +109,7 @@ open class StringOption(
 
   override fun checkIfValueValid(value: VimDataType, token: String) {
     if (value !is VimString) {
-      throw exExceptionMessage("E474", token)
+      throw exExceptionMessage("E474.arg", token)
     }
 
     if (value.value.isEmpty()) {
@@ -118,7 +117,7 @@ open class StringOption(
     }
 
     if (boundedValues != null && !boundedValues.contains(value.value)) {
-      throw exExceptionMessage("E474", token)
+      throw exExceptionMessage("E474.arg", token)
     }
   }
 
@@ -165,7 +164,7 @@ open class StringListOption(
 
   override fun checkIfValueValid(value: VimDataType, token: String) {
     if (value !is VimString) {
-      throw exExceptionMessage("E474", token)
+      throw exExceptionMessage("E474.arg", token)
     }
 
     if (value.value.isEmpty()) {
@@ -173,7 +172,7 @@ open class StringListOption(
     }
 
     if (boundedValues != null && split(value.value).any { !boundedValues.contains(it) }) {
-      throw exExceptionMessage("E474", token)
+      throw exExceptionMessage("E474.arg", token)
     }
   }
 
@@ -355,8 +354,8 @@ class ToggleOption(
   )
 
   override fun checkIfValueValid(value: VimDataType, token: String) {
-    if (value !is VimInt) throw exExceptionMessage("E474", token)
+    if (value !is VimInt) throw exExceptionMessage("E474.arg", token)
   }
 
-  override fun parseValue(value: String, token: String): Nothing = throw exExceptionMessage("E474", token)
+  override fun parseValue(value: String, token: String): Nothing = throw exExceptionMessage("E474.arg", token)
 }
