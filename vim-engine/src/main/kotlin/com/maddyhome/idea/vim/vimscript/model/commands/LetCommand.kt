@@ -70,24 +70,16 @@ data class LetCommand(
         if ((variable.scope == Scope.SCRIPT_VARIABLE && vimContext.getFirstParentContext() !is Script) ||
           (!isInsideFunction(vimContext) && (variable.scope == Scope.FUNCTION_VARIABLE || variable.scope == Scope.LOCAL_VARIABLE))
         ) {
-          throw ExException("E461: Illegal variable name: ${variable.toString(editor, context, vimContext)}")
+          throw exExceptionMessage("E461", variable.toString(editor, context, vimContext))
         }
 
         if (isReadOnlyVariable(variable, editor, context)) {
-          throw ExException(
-            "E46: Cannot change read-only variable \"${
-              variable.toString(
-                editor,
-                context,
-                vimContext
-              )
-            }\""
-          )
+          throw exExceptionMessage("E46", variable.toString(editor, context, vimContext))
         }
 
         val leftValue = injector.variableService.getNullableVariableValue(variable, editor, context, vimContext)
         if (leftValue?.isLocked == true && (leftValue.lockOwner as? Variable)?.name == variable.name) {
-          throw ExException("E741: Value is locked: ${variable.toString(editor, context, vimContext)}")
+          throw exExceptionMessage("E741", variable.toString(editor, context, vimContext))
         }
         val rightValue = expression.evaluate(editor, context, vimContext)
         injector.variableService.storeVariable(
@@ -104,19 +96,17 @@ data class LetCommand(
           is VimDictionary -> {
             val dictKey = variable.index.evaluate(editor, context, this).toVimString()
             if (operator != AssignmentOperator.ASSIGNMENT && !containerValue.dictionary.containsKey(dictKey)) {
-              throw ExException("E716: Key not present in Dictionary: $dictKey")
+              throw exExceptionMessage("E716", dictKey)
             }
             val expressionValue = expression.evaluate(editor, context, this)
             var valueToStore = if (dictKey in containerValue.dictionary) {
               if (containerValue.dictionary[dictKey]!!.isLocked) {
-                // todo better exception message
-                throw ExException("E741: Value is locked: ${variable.originalString}")
+                throw exExceptionMessage("E741", variable.originalString)
               }
               operator.getNewValue(containerValue.dictionary[dictKey]!!, expressionValue)
             } else {
               if (containerValue.isLocked) {
-                // todo better exception message
-                throw ExException("E741: Value is locked: ${variable.originalString}")
+                throw exExceptionMessage("E741", variable.originalString)
               }
               expressionValue
             }
@@ -133,17 +123,17 @@ data class LetCommand(
           is VimList -> {
             val index = variable.index.evaluate(editor, context, this).toVimNumber().value
             if (index > containerValue.values.size - 1) {
-              throw ExException("E684: list index out of range: $index")
+              throw exExceptionMessage("E684", index)
             }
             if (containerValue.values[index].isLocked) {
-              throw ExException("E741: Value is locked: ${variable.originalString}")
+              throw exExceptionMessage("E741", variable.originalString)
             }
             containerValue.values[index] =
               operator.getNewValue(containerValue.values[index], expression.evaluate(editor, context, vimContext))
           }
 
           is VimBlob -> TODO()
-          else -> throw ExException("E689: Can only index a List, Dictionary or Blob")
+          else -> throw exExceptionMessage("E689")
         }
       }
 
@@ -158,12 +148,12 @@ data class LetCommand(
 
             val expressionValue = expression.evaluate(editor, context, this)
             if (expressionValue !is VimList && expressionValue !is VimBlob) {
-              throw ExException("E709: [:] requires a List or Blob value")
+              throw exExceptionMessage("E709")
             } else if (expressionValue is VimList) {
               if (expressionValue.values.size < to - from + 1) {
-                throw ExException("E711: List value does not have enough items")
+                throw exExceptionMessage("E711")
               } else if (variable.to != null && expressionValue.values.size > to - from + 1) {
-                throw ExException("E710: List value has more items than targets")
+                throw exExceptionMessage("E710")
               }
               val newListSize = expressionValue.values.size - (to - from + 1) + variableValue.values.size
               var i = from
@@ -239,13 +229,13 @@ data class LetCommand(
             )
           }
         } else if (RegisterConstants.VALID_REGISTERS.contains(variable.char)) {
-          throw ExException("E354: Invalid register name: '${variable.char}'")
+          throw exExceptionMessage("E354", variable.char)
         } else {
-          throw ExException("E18: Unexpected characters in :let")
+          throw exExceptionMessage("E18")
         }
       }
 
-      else -> throw ExException("E121: Undefined variable")
+      else -> throw exExceptionMessage("E121", variable.originalString)
     }
     return ExecutionResult.Success
   }

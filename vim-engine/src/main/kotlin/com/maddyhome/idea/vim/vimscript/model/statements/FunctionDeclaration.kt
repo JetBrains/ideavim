@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
@@ -47,7 +47,7 @@ data class FunctionDeclaration(
     val forbiddenArgumentNames = setOf("firstline", "lastline")
     val forbiddenArgument = args.firstOrNull { forbiddenArgumentNames.contains(it) }
     if (forbiddenArgument != null) {
-      throw ExException("E125: Illegal argument: $forbiddenArgument")
+      throw exExceptionMessage("E125", forbiddenArgument)
     }
 
     body.forEach { it.vimContext = this }

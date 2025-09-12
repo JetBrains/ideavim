@@ -1328,7 +1328,7 @@ class SubstituteCommandTest : VimTestCase() {
     )
     enterCommand("%s/\\d\\+/\\=*&(")
     assertPluginError(true)
-    assertPluginErrorMessage("E15: Invalid expression: *&(")
+    assertPluginErrorMessage("E15: Invalid expression: \"*&(\"")
     assertState(
       """
       val str = "first"

@@ -299,7 +299,7 @@ open class UnsignedNumberOption(
   override fun checkIfValueValid(value: VimDataType, token: String) {
     super.checkIfValueValid(value, token)
     if ((value as VimInt).value < 0) {
-      throw ExException("E487: Argument must be positive: $token")
+      throw exExceptionMessage("E487", token)
     }
   }
 }

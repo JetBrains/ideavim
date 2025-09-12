@@ -11,7 +11,7 @@ package com.maddyhome.idea.vim.vimscript.model.statements
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
@@ -41,14 +41,14 @@ data class AnonymousFunctionDeclaration(
   override fun execute(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     val container = sublist.expression.evaluate(editor, context, vimContext)
     if (container !is VimDictionary) {
-      throw ExException("E1203: Dot can only be used on a dictionary")
+      throw exExceptionMessage("E1203")
     }
     val index = ((sublist.index as SimpleExpression).data as VimString)
     if (container.dictionary.containsKey(index)) {
       if (container.dictionary[index] is VimFuncref && !replaceExisting) {
-        throw ExException("E717: Dictionary entry already exists")
+        throw exExceptionMessage("E717")
       } else if (container.dictionary[index] !is VimFuncref) {
-        throw ExException("E718: Funcref required")
+        throw exExceptionMessage("E718")
       }
     }
     val declaration = FunctionDeclaration(

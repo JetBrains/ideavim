@@ -71,7 +71,7 @@ class FunctionTest : VimTestCase() {
     configureByText("\n")
     typeText(commandToKeys("let Ff = function('abs', [], 40)"))
     assertPluginError(true)
-    assertPluginErrorMessage("E922: expected a dict")
+    assertPluginErrorMessage("E922: Expected a dict")
   }
 
   @Test

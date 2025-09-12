@@ -328,7 +328,7 @@ class MapCommandJavaTest : VimJavaTestCase() {
     configureByJavaText(text)
     typeText(commandToKeys("nnoremap <expr> t ^f8a"))
     typeText(injector.parser.parseKeys("t"))
-    assertPluginErrorMessage("E15: Invalid expression: ^f8a")
+    assertPluginErrorMessage("E15: Invalid expression: \"^f8a\"")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
