@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim.action.change
 import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.KeyHandler
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -27,7 +26,6 @@ import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
-import com.maddyhome.idea.vim.helper.EngineMessageHelper
 import com.maddyhome.idea.vim.helper.inRepeatMode
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.state.mode.SelectionType
@@ -45,7 +43,7 @@ private fun doOperatorAction(
 ): Boolean {
   val func = injector.globalOptions().operatorfunc
   if (func.isEmpty()) {
-    VimPlugin.showMessage(EngineMessageHelper.message("E774"))
+    injector.messages.showStatusBarMessage(editor, injector.messages.message("E774"))
     return false
   }
 
@@ -70,14 +68,14 @@ private fun doOperatorAction(
           func
         }
 
-        VimPlugin.showMessage(EngineMessageHelper.message("E117", functionName))
+        injector.messages.showStatusBarMessage(editor, injector.messages.message("E117", functionName))
         return false
       }
     }
   }
 
   if (handler == null) {
-    VimPlugin.showMessage(EngineMessageHelper.message("E117", func))
+    injector.messages.showStatusBarMessage(editor, injector.messages.message("E117", func))
     return false
   }
 
