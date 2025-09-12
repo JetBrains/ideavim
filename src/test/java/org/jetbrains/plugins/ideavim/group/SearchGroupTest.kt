@@ -104,7 +104,7 @@ class SearchGroupTest : VimTestCase() {
     )
     enterSearch("(found)")
     assertOffset(0) // Caret doesn't move
-    assertPluginErrorMessageContains("Pattern not found: (found)")
+    assertPluginErrorMessage("E486: Pattern not found: (found)")
   }
 
   // VIM-528
@@ -203,7 +203,7 @@ class SearchGroupTest : VimTestCase() {
       """.trimIndent()
     )
     assertPluginError(false)
-    assertPluginErrorMessageContains("search hit BOTTOM, continuing at TOP")
+    assertPluginErrorMessage("search hit BOTTOM, continuing at TOP")
   }
 
   @Test
@@ -224,7 +224,7 @@ class SearchGroupTest : VimTestCase() {
       enterCommand("set nowrapscan")
     }
     assertPluginError(false)
-    assertPluginErrorMessageContains("E385: Search hit BOTTOM without match for: one")
+    assertPluginErrorMessage("E385: Search hit BOTTOM without match for: one")
   }
 
   @Test
@@ -243,7 +243,7 @@ class SearchGroupTest : VimTestCase() {
       """.trimIndent()
     )
     assertPluginError(false)
-    assertPluginErrorMessageContains("E486: Pattern not found: banana")
+    assertPluginErrorMessage("E486: Pattern not found: banana")
   }
 
   @Test
@@ -262,7 +262,7 @@ class SearchGroupTest : VimTestCase() {
       """.trimIndent()
     )
     assertPluginError(false)
-    assertPluginErrorMessageContains("search hit TOP, continuing at BOTTOM")
+    assertPluginErrorMessage("search hit TOP, continuing at BOTTOM")
   }
 
   @Test
@@ -283,7 +283,7 @@ class SearchGroupTest : VimTestCase() {
       enterCommand("set nowrapscan")
     }
     assertPluginError(false)
-    assertPluginErrorMessageContains("E384: Search hit TOP without match for: three")
+    assertPluginErrorMessage("E384: Search hit TOP without match for: three")
   }
 
   @Test
@@ -302,7 +302,7 @@ class SearchGroupTest : VimTestCase() {
       """.trimIndent()
     )
     assertPluginError(false)
-    assertPluginErrorMessageContains("E486: Pattern not found: banana")
+    assertPluginErrorMessage("E486: Pattern not found: banana")
   }
 
   @Test
@@ -610,7 +610,7 @@ class SearchGroupTest : VimTestCase() {
     enterCommand("set nowrapscan")
     typeText("10", "/", searchCommand("one"))
     assertPluginError(false)
-    assertPluginErrorMessageContains("E385: Search hit BOTTOM without match for: one")
+    assertPluginErrorMessage("E385: Search hit BOTTOM without match for: one")
     assertPosition(2, 0)
   }
 
@@ -674,7 +674,7 @@ class SearchGroupTest : VimTestCase() {
     enterCommand("set nowrapscan")
     typeText("12", "?one<CR>")
     assertPluginError(false)
-    assertPluginErrorMessageContains("E384: Search hit TOP without match for: one")
+    assertPluginErrorMessage("E384: Search hit TOP without match for: one")
     assertPosition(8, 0)
   }
 

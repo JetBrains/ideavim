@@ -171,10 +171,11 @@ public class WindowGroup extends WindowGroupBase {
     final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
 
     VirtualFile virtualFile = null;
-    if (filename.length() > 0) {
+    if (!filename.isEmpty()) {
       virtualFile = VimPlugin.getFile().findFile(filename, project);
       if (virtualFile == null) {
-        VimPlugin.showMessage(MessageHelper.message("could.not.find.file.0", filename));
+        // Vim doesn't have this error message. It will create a split with a new file, if there's not one to load
+        VimPlugin.showMessage(MessageHelper.message("error.split.window.could.not.find.file.0", filename));
         return;
       }
     }

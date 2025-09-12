@@ -183,7 +183,7 @@ private class LastLineAddress(offset: Int, move: Boolean) : Address(offset, move
 class MarkAddress(private val mark: Char, offset: Int, move: Boolean) : Address(offset, move) {
   override fun calculateLine1(editor: VimEditor, caret: ImmutableVimCaret): Int {
     val mark = injector.markService.getMark(caret, mark)
-      ?: throw exExceptionMessage("E20") // E20: Mark not set
+      ?: throw exExceptionMessage("E20")
     return mark.line + 1
   }
 
@@ -270,9 +270,9 @@ private class SearchAddress(pattern: String, offset: Int, move: Boolean) : Addre
 
       if (searchOffset == -1) {
         if (injector.options(editor).wrapscan) {
-          throw exExceptionMessage("E486", pattern) // E486: Pattern not found: $pattern
+          throw exExceptionMessage("E486", pattern)
         } else {
-          throw exExceptionMessage("E385", pattern) // E385: Search hit BOTTOM without match for: $pattern
+          throw exExceptionMessage("E385", pattern)
         }
       }
       line0 = editor.offsetToBufferPosition(searchOffset).line

@@ -59,28 +59,28 @@ class DigraphsCommandTest : VimTestCase() {
   fun `test add custom digraph with single character reports error`() {
     enterCommand("digraph a")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E1214: Digraph must be just two characters: a")
+    assertPluginErrorMessage("E1214: Digraph must be just two characters: a")
   }
 
   @Test
   fun `test add custom digraph with too many characters reports error about missing codepoint`() {
     enterCommand("digraph aaaaa")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E39: Number expected")
+    assertPluginErrorMessage("E39: Number expected")
   }
 
   @Test
   fun `test add custom digraph without codepoint reports error`() {
     enterCommand("digraph aa")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E39: Number expected")
+    assertPluginErrorMessage("E39: Number expected")
   }
 
   @Test
   fun `test add custom digraph with invalid codepoint reports error`() {
     enterCommand("digraph aa nvnvn")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E39: Number expected")
+    assertPluginErrorMessage("E39: Number expected")
   }
 
   @Test
@@ -95,7 +95,7 @@ class DigraphsCommandTest : VimTestCase() {
     assertEquals('⓪', injector.digraphGroup.getCharacterForDigraph('(', '0').toChar())
     assertEquals('①', injector.digraphGroup.getCharacterForDigraph('(', '1').toChar())
     assertPluginError(true)
-    assertPluginErrorMessageContains("E39: Number expected")
+    assertPluginErrorMessage("E39: Number expected")
   }
 
   @Test

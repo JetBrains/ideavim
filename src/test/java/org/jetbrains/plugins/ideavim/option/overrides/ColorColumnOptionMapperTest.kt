@@ -77,14 +77,14 @@ class ColorColumnOptionMapperTest : VimTestCase() {
   fun `test 'colorcolumn' reports invalid argument with space separated values`() {
     enterCommand("set colorcolumn=10, 20")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: colorcolumn=10,")
+    assertPluginErrorMessage("E474: Invalid argument: colorcolumn=10,")
   }
 
   @Test
   fun `test 'colorcolumn' reports invalid argument with non-numeric values`() {
     enterCommand("set colorcolumn=10,aa,20")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: colorcolumn=10,aa,20")
+    assertPluginErrorMessage("E474: Invalid argument: colorcolumn=10,aa,20")
   }
 
   @Test

@@ -42,6 +42,6 @@ class HasFunctionTest : VimTestCase() {
   fun `test has for list as an argument`() {
     enterCommand("echo has([])")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E730: Using a List as a String")
+    assertPluginErrorMessage("E730: Using a List as a String")
   }
 }

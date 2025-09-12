@@ -46,7 +46,7 @@ class CallCommand(val range: Range, val functionCall: Expression) :
         val function = injector.functionService.getFunctionHandlerOrNull(functionCall.scope, name, vimContext)
         if (function != null) {
           if (function is DefinedFunctionHandler && function.function.flags.contains(FunctionFlag.DICT)) {
-            throw exExceptionMessage("E725", scopePrefix + name)  // E725: Calling dict function without Dictionary: {0}
+            throw exExceptionMessage("E725", scopePrefix + name)
           }
           function.range = range
           function.executeFunction(functionCall.arguments, editor, context, this)
@@ -65,7 +65,7 @@ class CallCommand(val range: Range, val functionCall: Expression) :
           return ExecutionResult.Success
         }
 
-        throw exExceptionMessage("E117", scopePrefix + name)  // E117: Unknown function: {0}
+        throw exExceptionMessage("E117", scopePrefix + name)
       }
 
       is FuncrefCallExpression -> {
@@ -75,7 +75,7 @@ class CallCommand(val range: Range, val functionCall: Expression) :
 
       else -> {
         // todo add more exceptions
-        throw exExceptionMessage("E129") // E129: Function name required
+        throw exExceptionMessage("E129")
       }
     }
   }

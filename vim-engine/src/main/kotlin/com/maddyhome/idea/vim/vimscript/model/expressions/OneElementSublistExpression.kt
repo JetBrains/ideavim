@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.vimscript.model.expressions
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
@@ -27,14 +27,14 @@ data class OneElementSublistExpression(val index: Expression, val expression: Ex
       is VimDictionary -> {
         val key = index.evaluate(editor, context, vimContext).toVimString()
         return expressionValue.dictionary[key]
-          ?: throw ExException("E716: Key not present in Dictionary: \"${key.toOutputString()}\"")
+          ?: throw exExceptionMessage("E716", key.toOutputString())
       }
 
       else -> {
         val indexValue = index.evaluate(editor, context, vimContext).toVimNumber().value
         // TODO: Support negative index to retrieve item from end
         if (expressionValue is VimList && (indexValue >= expressionValue.values.size || indexValue < 0)) {
-          throw ExException("E684: list index out of range: $indexValue")
+          throw exExceptionMessage("E684", indexValue)
         }
         if (indexValue < 0) {
           return VimString.EMPTY

@@ -34,6 +34,6 @@ class JoinFunctionTest : VimTestCase() {
   fun `test join with wrong first argument type`() {
     typeText(commandToKeys("echo join('Vim is awesome')"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E1211: List required for argument 1")
+    assertPluginErrorMessage("E1211: List required for argument 1")
   }
 }

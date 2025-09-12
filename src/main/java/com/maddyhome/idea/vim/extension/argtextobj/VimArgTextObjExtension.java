@@ -204,7 +204,7 @@ public class VimArgTextObjExtension implements VimExtension {
             bracketPairs = BracketPairs.fromBracketPairList(bracketPairsVar);
           } catch (BracketPairs.ParseException parseException) {
             @VimNlsSafe String message =
-              MessageHelper.message("argtextobj.invalid.value.of.g.argtextobj.pairs.0", parseException.getMessage());
+              MessageHelper.message("argtextobj.error.invalid.value.of.g.argtextobj.pairs.0", parseException.getMessage());
             VimPlugin.showMessage(message);
             VimPlugin.indicateError();
             return null;

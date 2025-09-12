@@ -382,7 +382,7 @@ class GotoLineCommandTest : VimTestCase() {
       """.trimMargin(),
     )
     assertPluginError(true)
-    assertPluginErrorMessageContains("E486: Pattern not found: banana")
+    assertPluginErrorMessage("E486: Pattern not found: banana")
   }
 
   @Test
@@ -409,7 +409,7 @@ class GotoLineCommandTest : VimTestCase() {
       enterCommand("set nowrapscan")
     }
     assertPluginError(true)
-    assertPluginErrorMessageContains("E385: Search hit BOTTOM without match for: ipsum")
+    assertPluginErrorMessage("E385: Search hit BOTTOM without match for: ipsum")
   }
 
   @Test
@@ -550,7 +550,7 @@ class GotoLineCommandTest : VimTestCase() {
       """.trimMargin(),
     )
     assertPluginError(true)
-    assertPluginErrorMessageContains("E16: Invalid range")
+    assertPluginErrorMessage("E16: Invalid range")
   }
 
   @Test
@@ -598,7 +598,7 @@ class GotoLineCommandTest : VimTestCase() {
       """.trimMargin(),
     )
     assertPluginError(true)
-    assertPluginErrorMessageContains("E16: Invalid range")
+    assertPluginErrorMessage("E16: Invalid range")
   }
 
   @Test
@@ -669,7 +669,7 @@ class GotoLineCommandTest : VimTestCase() {
       """.trimMargin(),
     )
     assertPluginError(true)
-    assertPluginErrorMessageContains("E20: Mark not set")
+    assertPluginErrorMessage("E20: Mark not set")
   }
 
   @Test

@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
@@ -36,7 +36,7 @@ data class FileCommand(val range: Range, val modifier: CommandModifier, val argu
     // Note that `:file` doesn't really support a range or count. But `:0file` is support to remove the current file
     // name. We don't support either of these features, but by accepting a range/count, we can report the right error
     if (isRangeSpecified()) {
-      throw ExException("E474: Invalid argument")
+      throw exExceptionMessage("E474")
     }
 
     injector.file.displayFileInfo(editor, true)

@@ -61,7 +61,7 @@ class BoundedStringListOptionTest : VimTestCase() {
   fun `test set list with invalid value`() {
     enterCommand("set $optionName=Blue")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: $optionName")
+    assertPluginErrorMessage("E474: Invalid argument: $optionName=Blue")
     assertEquals(defaultValue, getOptionValue())
   }
 
@@ -77,7 +77,7 @@ class BoundedStringListOptionTest : VimTestCase() {
   fun `test append invalid item`() {
     enterCommand("set $optionName+=Blue")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: $optionName")
+    assertPluginErrorMessage("E474: Invalid argument: $optionName+=Blue")
     assertEquals("Monday,Tuesday", getOptionValue())
   }
 
@@ -93,7 +93,7 @@ class BoundedStringListOptionTest : VimTestCase() {
   fun `test append list with invalid item`() {
     enterCommand("set $optionName+=Wednesday,Blue")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: $optionName")
+    assertPluginErrorMessage("E474: Invalid argument: $optionName+=Wednesday,Blue")
     assertEquals("Monday,Tuesday", getOptionValue())
   }
 
@@ -109,7 +109,7 @@ class BoundedStringListOptionTest : VimTestCase() {
   fun `test prepend invalid item`() {
     enterCommand("set $optionName^=Blue")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: $optionName")
+    assertPluginErrorMessage("E474: Invalid argument: $optionName^=Blue")
     assertEquals("Monday,Tuesday", getOptionValue())
   }
 
@@ -125,7 +125,7 @@ class BoundedStringListOptionTest : VimTestCase() {
   fun `test prepend list with invalid item`() {
     enterCommand("set $optionName^=Wednesday,Blue")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: $optionName")
+    assertPluginErrorMessage("E474: Invalid argument: $optionName^=Wednesday,Blue")
     assertEquals("Monday,Tuesday", getOptionValue())
   }
 

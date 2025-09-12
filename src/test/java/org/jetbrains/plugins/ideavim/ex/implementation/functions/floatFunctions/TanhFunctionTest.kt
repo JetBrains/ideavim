@@ -35,27 +35,27 @@ class TanhFunctionTest : VimTestCase() {
   fun `test tanh with string causes errors`() {
     enterCommand("echo tanh('1.0')")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test tanh with invalid string causes errors`() {
     enterCommand("echo tanh('cheese')")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test tanh with list causes errors`() {
     enterCommand("echo tanh([1.0])")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test tanh with dictionary causes errors`() {
     enterCommand("echo tanh({1: 1.0})")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 }

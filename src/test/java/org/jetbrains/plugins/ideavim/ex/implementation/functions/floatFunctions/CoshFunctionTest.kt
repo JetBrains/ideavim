@@ -37,27 +37,27 @@ class CoshFunctionTest : VimTestCase() {
   fun `test cosh with string causes errors`() {
     enterCommand("echo cosh('1.0')")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test cosh with invalid string causes errors`() {
     enterCommand("echo cosh('cheese')")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test cosh with list causes errors`() {
     enterCommand("echo cosh([1.0])")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test cosh with dictionary causes errors`() {
     enterCommand("echo cosh({1: 1.0})")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 }

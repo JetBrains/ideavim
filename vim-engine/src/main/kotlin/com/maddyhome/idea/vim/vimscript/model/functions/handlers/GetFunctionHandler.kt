@@ -12,6 +12,7 @@ import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimBlob
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
@@ -51,7 +52,7 @@ internal class GetFunctionHandler : FunctionHandler() {
       }
 
       is VimBlob, is VimFuncref -> throw ExException("Blobs and Funcref are not supported as an argument for get(). If you need it, request support in YouTrack")
-      else -> throw ExException("E896: Argument of get() must be a List, Dictionary or Blob")
+      else -> throw exExceptionMessage("E896", "get()")
     }
   }
 }

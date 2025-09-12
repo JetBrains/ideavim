@@ -37,7 +37,7 @@ class FunctionDeclarationTest : VimTestCase() {
     configureByText("\n")
     typeText(commandToKeys("echo GetHiString('Mark')"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E117: Unknown function: GetHiString")
+    assertPluginErrorMessage("E117: Unknown function: GetHiString")
   }
 
   @Test
@@ -81,7 +81,7 @@ class FunctionDeclarationTest : VimTestCase() {
     )
     typeText(commandToKeys("echo F2()"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E117: Unknown function: F2")
+    assertPluginErrorMessage("E117: Unknown function: F2")
 
     typeText(commandToKeys("delf! F1"))
     typeText(commandToKeys("delf! F2"))
@@ -108,7 +108,7 @@ class FunctionDeclarationTest : VimTestCase() {
       ),
     )
     assertPluginError(true)
-    assertPluginErrorMessageContains("E122: Function F1 already exists, add ! to replace it")
+    assertPluginErrorMessage("E122: Function F1 already exists, add ! to replace it")
 
     typeText(commandToKeys("echo F1()"))
     assertExOutput("10")
@@ -182,7 +182,7 @@ class FunctionDeclarationTest : VimTestCase() {
     )
     typeText(commandToKeys("echo F1()"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E121: Undefined variable: x")
+    assertPluginErrorMessage("E121: Undefined variable: x")
     assertExOutput("0")
 
     typeText(commandToKeys("delf! F1"))
@@ -265,7 +265,7 @@ class FunctionDeclarationTest : VimTestCase() {
     )
     typeText(commandToKeys("echo F1()"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E121: Undefined variable: x")
+    assertPluginErrorMessage("E121: Undefined variable: x")
 
     injector.outputPanel.getCurrentOutputPanel()?.close()
     typeText(commandToKeys("echo F2()"))
@@ -275,7 +275,7 @@ class FunctionDeclarationTest : VimTestCase() {
     injector.outputPanel.getCurrentOutputPanel()?.close()
     typeText(commandToKeys("echo F1()"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E121: Undefined variable: x")
+    assertPluginErrorMessage("E121: Undefined variable: x")
 
     typeText(commandToKeys("delf! F1"))
     typeText(commandToKeys("delf! F2"))
@@ -296,7 +296,7 @@ class FunctionDeclarationTest : VimTestCase() {
     )
     typeText(commandToKeys("echo F1()"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E121: Undefined variable: unknownVar")
+    assertPluginErrorMessage("E121: Undefined variable: unknownVar")
 
     injector.outputPanel.getCurrentOutputPanel()?.close()
     typeText(commandToKeys("echo x"))
@@ -321,11 +321,11 @@ class FunctionDeclarationTest : VimTestCase() {
     )
     typeText(commandToKeys("echo F1()"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E121: Undefined variable: unknownVar")
+    assertPluginErrorMessage("E121: Undefined variable: unknownVar")
 
     typeText(commandToKeys("echo x"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E121: Undefined variable: x")
+    assertPluginErrorMessage("E121: Undefined variable: x")
 
     typeText(commandToKeys("delf! F1"))
   }
@@ -414,7 +414,7 @@ class FunctionDeclarationTest : VimTestCase() {
       ),
     )
     assertPluginError(true)
-    assertPluginErrorMessageContains("E125: Illegal argument: firstline")
+    assertPluginErrorMessage("E125: Illegal argument: firstline")
 
     typeText(
       commandToKeys(
@@ -426,7 +426,7 @@ class FunctionDeclarationTest : VimTestCase() {
       ),
     )
     assertPluginError(true)
-    assertPluginErrorMessageContains("E125: Illegal argument: lastline")
+    assertPluginErrorMessage("E125: Illegal argument: lastline")
 
     typeText(commandToKeys("delf! F1"))
     typeText(commandToKeys("delf! F2"))
@@ -739,7 +739,7 @@ class FunctionDeclarationTest : VimTestCase() {
       ),
     )
     assertPluginError(true)
-    assertPluginErrorMessageContains("E81: Using <SID> not in a script context")
+    assertPluginErrorMessage("E81: Using <SID> not in a script context")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
@@ -750,7 +750,7 @@ class FunctionDeclarationTest : VimTestCase() {
       commandToKeys("echo s:F1()"),
     )
     assertPluginError(true)
-    assertPluginErrorMessageContains("E120: Using <SID> not in a script context: s:F1")
+    assertPluginErrorMessage("E120: Using <SID> not in a script context: s:F1")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
@@ -759,7 +759,7 @@ class FunctionDeclarationTest : VimTestCase() {
     configureByText("\n")
     typeText(commandToKeys("echo g:abs(-10)"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E117: Unknown function: g:abs")
+    assertPluginErrorMessage("E117: Unknown function: g:abs")
   }
 
   @Test

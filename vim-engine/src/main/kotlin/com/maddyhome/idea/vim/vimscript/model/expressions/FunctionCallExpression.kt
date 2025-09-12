@@ -34,7 +34,7 @@ data class FunctionCallExpression(
     val handler = injector.functionService.getFunctionHandlerOrNull(scope, name, vimContext)
     if (handler != null) {
       if (handler is DefinedFunctionHandler && handler.function.flags.contains(FunctionFlag.DICT)) {
-        throw exExceptionMessage("E725", scopePrefix + name) // E725: Calling dict function without Dictionary: {0}
+        throw exExceptionMessage("E725", scopePrefix + name)
       }
       return handler.executeFunction(this.arguments, editor, context, vimContext)
     }
@@ -44,6 +44,6 @@ data class FunctionCallExpression(
     if (funcref is VimFuncref) {
       return funcref.execute(scopePrefix + name, arguments, editor, context, vimContext)
     }
-    throw exExceptionMessage("E117", scopePrefix + name)  // E117: Unknown function: {0}
+    throw exExceptionMessage("E117", scopePrefix + name)
   }
 }

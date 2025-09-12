@@ -9,7 +9,7 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
@@ -30,7 +30,7 @@ abstract class VimScriptFunctionServiceBase : VimscriptFunctionService {
 
   override fun deleteFunction(name: String, scope: Scope?, vimContext: VimLContext) {
     if (name[0].isLowerCase() && scope != Scope.SCRIPT_VARIABLE) {
-      throw ExException("E128: Function name must start with a capital or \"s:\": $name")
+      throw exExceptionMessage("E128", name)
     }
 
     if (scope != null) {
@@ -41,24 +41,24 @@ abstract class VimScriptFunctionServiceBase : VimscriptFunctionService {
             globalFunctions.remove(name)
             return
           } else {
-            throw ExException("E130: Unknown function: ${scope.c}:$name")
+            throw exExceptionMessage("E130", scope.toString() + name)
           }
         }
 
         Scope.SCRIPT_VARIABLE -> {
           if (vimContext.getFirstParentContext() !is Script) {
-            throw ExException("E81: Using <SID> not in a script context")
+            throw exExceptionMessage("E81")
           }
 
           if (getScriptFunction(name, vimContext) != null) {
             deleteScriptFunction(name, vimContext)
             return
           } else {
-            throw ExException("E130: Unknown function: ${scope.c}:$name")
+            throw exExceptionMessage("E130", scope.toString() + name)
           }
         }
 
-        else -> throw ExException("E130: Unknown function: ${scope.c}:$name")
+        else -> throw exExceptionMessage("E130", scope.toString() + name)
       }
     }
 
@@ -73,7 +73,7 @@ abstract class VimScriptFunctionServiceBase : VimscriptFunctionService {
       deleteScriptFunction(name, vimContext)
       return
     }
-    throw ExException("E130: Unknown function: $name")
+    throw exExceptionMessage("E130", name)
   }
 
   override fun storeFunction(declaration: FunctionDeclaration) {
@@ -81,7 +81,7 @@ abstract class VimScriptFunctionServiceBase : VimscriptFunctionService {
     when (scope) {
       Scope.GLOBAL_VARIABLE -> {
         if (globalFunctions.containsKey(declaration.name) && !declaration.replaceExisting) {
-          throw ExException("E122: Function ${declaration.name} already exists, add ! to replace it")
+          throw exExceptionMessage("E122", declaration.name)
         } else {
           globalFunctions[declaration.name] = declaration
         }
@@ -89,23 +89,23 @@ abstract class VimScriptFunctionServiceBase : VimscriptFunctionService {
 
       Scope.SCRIPT_VARIABLE -> {
         if (declaration.getFirstParentContext() !is Script) {
-          throw ExException("E81: Using <SID> not in a script context")
+          throw exExceptionMessage("E81")
         }
 
         if (getScriptFunction(declaration.name, declaration) != null && !declaration.replaceExisting) {
-          throw ExException("E122: Function ${declaration.name} already exists, add ! to replace it")
+          throw exExceptionMessage("E122", declaration.name)
         } else {
           storeScriptFunction(declaration)
         }
       }
 
-      else -> throw ExException("E884: Function name cannot contain a colon: ${scope.c}:${declaration.name}")
+      else -> throw exExceptionMessage("E884", scope.toString() + declaration.name)
     }
   }
 
   override fun getFunctionHandler(scope: Scope?, name: String, vimContext: VimLContext): FunctionHandler {
     return getFunctionHandlerOrNull(scope, name, vimContext)
-      ?: throw ExException("E117: Unknown function: ${scope?.toString() ?: ""}$name")
+      ?: throw exExceptionMessage("E117", "${scope?.toString() ?: ""}$name")
   }
 
   override fun getFunctionHandlerOrNull(scope: Scope?, name: String, vimContext: VimLContext): FunctionHandler? {
@@ -145,17 +145,17 @@ abstract class VimScriptFunctionServiceBase : VimscriptFunctionService {
   }
 
   private fun storeScriptFunction(functionDeclaration: FunctionDeclaration) {
-    val script = functionDeclaration.getScript() ?: throw ExException("E81: Using <SID> not in a script context")
+    val script = functionDeclaration.getScript() ?: throw exExceptionMessage("E81")
     script.scriptFunctions[functionDeclaration.name] = functionDeclaration
   }
 
   private fun getScriptFunction(name: String, vimContext: VimLContext): FunctionDeclaration? {
-    val script = vimContext.getScript() ?: throw ExException("E120: Using <SID> not in a script context: s:$name")
+    val script = vimContext.getScript() ?: throw exExceptionMessage("E120", name)
     return script.scriptFunctions[name]
   }
 
   private fun deleteScriptFunction(name: String, vimContext: VimLContext) {
-    val script = vimContext.getScript() ?: throw ExException("E81: Using <SID> not in a script context")
+    val script = vimContext.getScript() ?: throw exExceptionMessage("E81")
     if (script.scriptFunctions[name] != null) {
       script.scriptFunctions[name]!!.isDeleted = true
     }

@@ -12,7 +12,7 @@ import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
@@ -36,12 +36,12 @@ internal class FunctionFunctionHandler : FunctionHandler() {
   ): VimFuncref {
     val arg1 = argumentValues[0].evaluate(editor, context, vimContext)
     if (arg1 !is VimString) {
-      throw ExException("E129: Function name required")
+      throw exExceptionMessage("E129")
     }
     val scopeAndName = arg1.value.extractScopeAndName()
     val function =
       injector.functionService.getFunctionHandlerOrNull(scopeAndName.first, scopeAndName.second, vimContext)
-        ?: throw ExException("E700: Unknown function: ${if (scopeAndName.first != null) scopeAndName.first!!.c + ":" else ""}${scopeAndName.second}")
+        ?: throw exExceptionMessage("E700", (scopeAndName.first?.toString() ?: "") + scopeAndName.second)
 
     var arglist: VimList? = null
     var dictionary: VimDictionary? = null
@@ -49,19 +49,19 @@ internal class FunctionFunctionHandler : FunctionHandler() {
     val arg3 = argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext)
 
     if (arg2 is VimDictionary && arg3 is VimDictionary) {
-      throw ExException("E923: Second argument of function() must be a list or a dict")
+      throw exExceptionMessage("E923")
     }
 
     if (arg2 != null) {
       when (arg2) {
         is VimList -> arglist = arg2
         is VimDictionary -> dictionary = arg2
-        else -> throw ExException("E923: Second argument of function() must be a list or a dict")
+        else -> throw exExceptionMessage("E923")
       }
     }
 
     if (arg3 != null && arg3 !is VimDictionary) {
-      throw ExException("E922: expected a dict")
+      throw exExceptionMessage("E922")
     }
     val funcref = VimFuncref(function, arglist ?: VimList(mutableListOf()), dictionary, VimFuncref.Type.FUNCTION)
     if (dictionary != null) {
@@ -84,11 +84,11 @@ internal class FuncrefFunctionHandler : FunctionHandler() {
   ): VimFuncref {
     val arg1 = argumentValues[0].evaluate(editor, context, vimContext)
     if (arg1 !is VimString) {
-      throw ExException("E129: Function name required")
+      throw exExceptionMessage("E129")
     }
     val scopeAndName = arg1.value.extractScopeAndName()
     val function = injector.functionService.getUserDefinedFunction(scopeAndName.first, scopeAndName.second, vimContext)
-      ?: throw ExException("E700: Unknown function: ${scopeAndName.first?.toString() ?: ""}${scopeAndName.second}")
+      ?: throw exExceptionMessage("E700", (scopeAndName.first?.toString() ?: "") + scopeAndName.second)
     val handler = DefinedFunctionHandler(function)
 
     var arglist: VimList? = null
@@ -97,19 +97,19 @@ internal class FuncrefFunctionHandler : FunctionHandler() {
     val arg3 = argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext)
 
     if (arg2 is VimDictionary && arg3 is VimDictionary) {
-      throw ExException("E923: Second argument of function() must be a list or a dict")
+      throw exExceptionMessage("E923")
     }
 
     if (arg2 != null) {
       when (arg2) {
         is VimList -> arglist = arg2
         is VimDictionary -> dictionary = arg2
-        else -> throw ExException("E923: Second argument of function() must be a list or a dict")
+        else -> throw exExceptionMessage("E923")
       }
     }
 
     if (arg3 != null && arg3 !is VimDictionary) {
-      throw ExException("E922: expected a dict")
+      throw exExceptionMessage("E922")
     }
     return VimFuncref(handler, arglist ?: VimList(mutableListOf()), dictionary, VimFuncref.Type.FUNCREF)
   }

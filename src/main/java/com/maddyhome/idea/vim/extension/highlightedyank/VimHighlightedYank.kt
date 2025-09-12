@@ -222,7 +222,7 @@ internal class VimHighlightedYank : VimExtension, VimYankListener, ModeChangeLis
         } catch (e: Exception) {
           @Suppress("DialogTitleCapitalization")
           @VimNlsSafe val message = MessageHelper.message(
-            "highlightedyank.invalid.value.of.0.1",
+            "highlightedyank.error.invalid.value.of.0.1",
             "g:$HIGHLIGHT_COLOR_VARIABLE_NAME",
             e.message ?: "",
           )
@@ -244,7 +244,7 @@ internal class VimHighlightedYank : VimExtension, VimYankListener, ModeChangeLis
       } catch (e: Exception) {
         @Suppress("DialogTitleCapitalization")
         @VimNlsSafe val message = MessageHelper.message(
-          "highlightedyank.invalid.value.of.0.1",
+          "highlightedyank.error.invalid.value.of.0.1",
           "g:$HIGHLIGHT_FOREGROUND_COLOR_VARIABLE_NAME",
           e.message ?: "",
         )
@@ -275,7 +275,7 @@ internal class VimHighlightedYank : VimExtension, VimYankListener, ModeChangeLis
         } catch (e: Exception) {
           @Suppress("DialogTitleCapitalization")
           @VimNlsSafe val message = MessageHelper.message(
-            "highlightedyank.invalid.value.of.0.1",
+            "highlightedyank.error.invalid.value.of.0.1",
             "g:$variable",
             e.message ?: "",
           )

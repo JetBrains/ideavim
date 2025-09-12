@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.CommandAliasHandler
 import com.maddyhome.idea.vim.common.ListenerOwner
-import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.state.mode.SelectionType
@@ -85,7 +85,7 @@ class VimApiImpl(
 
     val isLocked = variableService.isVariableLocked(variable, vimEditor, vimContext, VimPluginContext)
     if (isLocked) {
-      throw ExException("E741: Value is locked: $name")
+      throw exExceptionMessage("E741", name)
     }
 
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)

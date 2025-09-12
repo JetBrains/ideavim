@@ -95,16 +95,16 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     while (tokenizer.hasMoreTokens()) {
       val digraph = tokenizer.nextToken()
       if (digraph.length == 1) {
-        throw exExceptionMessage("E1214", digraph)  // E1214: Digraph must be just two characters: {0}
+        throw exExceptionMessage("E1214", digraph)
       }
 
       if (!(tokenizer.hasMoreTokens())) {
-        throw exExceptionMessage("E39") // E39: Number expected
+        throw exExceptionMessage("E39")
       }
 
       val codepoint = tokenizer.nextToken().toIntOrNull()
       if (codepoint == null) {
-        throw exExceptionMessage("E39") // E39: Number expected
+        throw exExceptionMessage("E39")
       }
 
       addCustomDigraph(digraph.substring(0, 2), codepoint)

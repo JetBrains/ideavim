@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.VimLockLabel
 import com.maddyhome.idea.vim.put.PutData
@@ -42,7 +43,7 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
           if (input.isNotEmpty()) {
             val expression =
               injector.vimscriptParser.parseExpression(input)?.evaluate(editor, context, Script(listOf()))
-                ?: throw ExException("E15: Invalid expression: $input")
+                ?: throw exExceptionMessage("E15", input)
             val textToStore = expression.toInsertableString()
             injector.registerGroup.storeTextSpecial('=', textToStore)
           }

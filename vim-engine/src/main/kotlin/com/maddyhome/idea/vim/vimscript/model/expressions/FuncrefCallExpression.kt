@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.vimscript.model.expressions
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
@@ -30,7 +30,7 @@ data class FuncrefCallExpression(val expression: Expression, val args: List<Expr
       return value.execute(value.handler.name, args, editor, context, vimContext)
     } else {
       // todo more exceptions
-      throw ExException("E15: Invalid expression")
+      throw exExceptionMessage("E15", expression.originalString)
     }
   }
 

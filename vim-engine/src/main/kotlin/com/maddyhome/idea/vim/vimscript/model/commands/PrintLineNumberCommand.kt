@@ -35,7 +35,7 @@ data class PrintLineNumberCommand(val range: Range, val modifier: CommandModifie
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
     if (argument.isNotEmpty() && argument[0] !in "l#p") {
-      throw exExceptionMessage("E488", argument)  // E488: Trailing characters: $argument
+      throw exExceptionMessage("E488", argument)
     }
 
     val line1 = range.getLineRange(editor, editor.currentCaret()).endLine1

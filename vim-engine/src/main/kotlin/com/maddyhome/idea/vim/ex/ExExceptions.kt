@@ -8,6 +8,8 @@
 package com.maddyhome.idea.vim.ex
 
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.helper.EngineMessageHelper
+import org.jetbrains.annotations.PropertyKey
 
 class InvalidCommandException(message: String, cmd: String?) : ExException(message + if (cmd != null) " | $cmd" else "")
 
@@ -19,5 +21,5 @@ class NoArgumentAllowedException : ExException()
 
 class FinishException : ExException()
 
-fun exExceptionMessage(code: String, vararg params: Any): ExException =
+fun exExceptionMessage(@PropertyKey(resourceBundle = EngineMessageHelper.BUNDLE) code: String, vararg params: Any): ExException =
   ExException(injector.messages.message(code, *params)).apply { this.code = code }

@@ -29,7 +29,7 @@ import com.intellij.util.containers.ContainerUtil
 import com.intellij.util.ui.UIUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.helper.MessageHelper.message
+import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo.AllModes
@@ -54,7 +54,7 @@ import javax.swing.table.TableColumn
 internal class VimEmulationConfigurable : Configurable {
   private val settingsPanel: VimSettingsPanel by lazy { VimSettingsPanel() }
 
-  override fun getDisplayName(): String = message("configurable.name.vim.emulation")
+  override fun getDisplayName(): String = MessageHelper.message("configurable.name.vim.emulation")
 
   override fun getHelpTopic(): String? {
     return null
@@ -103,7 +103,7 @@ internal class VimEmulationConfigurable : Configurable {
       val scrollPane = decorator.createPanel()
       scrollPane.border = LineBorder(JBColor.border())
       val conflictsPanel = JPanel(BorderLayout())
-      val title = message("border.title.shortcut.conflicts.for.active.keymap")
+      val title = MessageHelper.message("configurable.border.title.shortcut.conflicts.for.active.keymap")
       conflictsPanel.border = IdeBorderFactory.createTitledBorder(title, false)
       conflictsPanel.add(scrollPane)
       add(conflictsPanel, BorderLayout.CENTER)
@@ -130,14 +130,14 @@ internal class VimEmulationConfigurable : Configurable {
       }
       if (firstPerMode == null) {
         val label = HyperlinkLabel()
-        label.setHtmlText(message("configurable.keyhandler.link"))
+        label.setHtmlText(MessageHelper.message("configurable.sethandler.hint.text"))
         label.setHyperlinkTarget("https://jb.gg/vim-sethandler")
         label.foreground = UIUtil.getInactiveTextColor()
         add(label, BorderLayout.SOUTH)
       } else {
         val helpLine = JBLabel()
-        helpLine.text = message(
-          "configurable.noneditablehandler.helper.text.with.example",
+        helpLine.text = MessageHelper.message(
+          "configurable.non.editable.handler.hint.text",
           (firstPerMode.owner as PerMode).toNotation(),
           KeymapUtil.getShortcutText(KeyboardShortcut(firstPerMode.keyStroke, null)),
         )

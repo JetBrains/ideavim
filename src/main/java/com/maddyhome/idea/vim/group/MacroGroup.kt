@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.KeyHandler.Companion.getInstance
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.helper.MessageHelper.message
+import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.macro.VimMacroBase
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 
@@ -49,10 +49,10 @@ internal class MacroGroup : VimMacroBase() {
     val isInternalMacro = potemkinProgress != null
 
     val myPotemkinProgress = potemkinProgress ?: PotemkinProgress(
-      message("progress.title.macro.execution"),
+      MessageHelper.message("macro.progress.title"),
       project,
       null,
-      message("stop"),
+      MessageHelper.message("macro.progress.stop"),
     )
 
     if (potemkinProgress == null) potemkinProgress = myPotemkinProgress

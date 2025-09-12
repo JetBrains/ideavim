@@ -16,7 +16,7 @@ class OperatorActionTest : VimTestCase() {
   @Test
   fun `test operator action throws error if operatorfunc is empty`() {
     doTest("g@w", "lorem ipsum", "lorem ipsum")
-    assertPluginErrorMessageContains("E774: 'operatorfunc' is empty")
+    assertPluginErrorMessage("E774: 'operatorfunc' is empty")
   }
 
   @Test
@@ -24,7 +24,7 @@ class OperatorActionTest : VimTestCase() {
     doTest("g@w", "lorem ipsum", "lorem ipsum") {
       enterCommand("set operatorfunc=Foo")
     }
-    assertPluginErrorMessageContains("E117: Unknown function: Foo")
+    assertPluginErrorMessage("E117: Unknown function: Foo")
   }
 
   @Test
@@ -121,7 +121,7 @@ class OperatorActionTest : VimTestCase() {
     ) {
       enterCommand("noremap gx :set opfunc=function('Foo')<CR>g@")
     }
-    assertPluginErrorMessageContains("E117: Unknown function: Foo")
+    assertPluginErrorMessage("E117: Unknown function: Foo")
   }
 
   @Test
@@ -150,7 +150,7 @@ class OperatorActionTest : VimTestCase() {
     ) {
       enterCommand("noremap gx :set opfunc=funcref('Foo')<CR>g@")
     }
-    assertPluginErrorMessageContains("E117: Unknown function: Foo")
+    assertPluginErrorMessage("E117: Unknown function: Foo")
   }
 
   @Test

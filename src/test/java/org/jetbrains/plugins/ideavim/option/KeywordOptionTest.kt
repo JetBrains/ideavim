@@ -90,7 +90,7 @@ class KeywordOptionTest : VimTestCase() {
   fun testRangeInWhichLeftValueIsHigherThanRightValueIsInvalid() {
     setKeyword("b-a")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: iskeyword=b-a")
+    assertPluginErrorMessage("E474: Invalid argument: iskeyword=b-a")
     assertTrue("b-a" !in values)
   }
 
@@ -98,7 +98,7 @@ class KeywordOptionTest : VimTestCase() {
   fun testTwoAdjacentLettersAreInvalid() {
     setKeyword("ab")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: iskeyword=ab")
+    assertPluginErrorMessage("E474: Invalid argument: iskeyword=ab")
     assertTrue("ab" !in values)
   }
 

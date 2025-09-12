@@ -16,7 +16,6 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ranges.Range
-import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import java.util.*
 
@@ -34,7 +33,6 @@ internal data class ActionListCommand(val range: Range, val modifier: CommandMod
     context: ExecutionContext,
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
-    val lineSeparator = "\n"
     val searchPattern = argument.trim().lowercase(Locale.getDefault()).split("*")
     val actionManager = ActionManager.getInstance()
 
@@ -47,10 +45,16 @@ internal data class ActionListCommand(val range: Range, val modifier: CommandMod
         if (shortcuts.isBlank()) actionName else "${actionName.padEnd(50)} $shortcuts"
       }
       .filter { line -> searchPattern.all { it in line.lowercase(Locale.getDefault()) } }
-      .joinToString(lineSeparator)
+
+    val text = buildString {
+      appendLine(injector.messages.message("command.action.list.header"))
+      actions.forEach {
+        appendLine(it)
+      }
+    }
 
     val outputPanel = injector.outputPanel.getOrCreate(editor, context)
-    outputPanel.addText(MessageHelper.message("ex.show.all.actions.0.1", lineSeparator, actions))
+    outputPanel.addText(text)
     outputPanel.show()
     return ExecutionResult.Success
   }

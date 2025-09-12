@@ -45,7 +45,7 @@ class AndFunctionTest : VimTestCase() {
     enterCommand("echo and([1, 2, 3], [2, 3, 4])")
     assertNoExOutput()
     assertPluginError(true)
-    assertPluginErrorMessageContains("E745: Using a List as a Number")
+    assertPluginErrorMessage("E745: Using a List as a Number")
   }
 
   @Test
@@ -53,7 +53,7 @@ class AndFunctionTest : VimTestCase() {
     enterCommand("echo and({1: 2, 3: 4}, {3: 4, 5: 6})")
     assertNoExOutput()
     assertPluginError(true)
-    assertPluginErrorMessageContains("E728: Using a Dictionary as a Number")
+    assertPluginErrorMessage("E728: Using a Dictionary as a Number")
   }
 
   @Test
@@ -61,6 +61,6 @@ class AndFunctionTest : VimTestCase() {
     enterCommand("echo and(1.5, 2.5)")
     assertNoExOutput()
     assertPluginError(true)
-    assertPluginErrorMessageContains("E805: Using a Float as a Number")
+    assertPluginErrorMessage("E805: Using a Float as a Number")
   }
 }

@@ -50,6 +50,7 @@ import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.VimOptionGroupBase
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.helper.vimDisabled
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
@@ -621,7 +622,7 @@ private class FileEncodingOptionMapper : LocalOptionValueOverride<VimString> {
     if (charsetName.isBlank()) return false   // Default value is "", which is an illegal charset name
     if (!Charset.isSupported(charsetName)) {
       // This is usually reported when writing the file with `:w`
-      throw ExException("E213: Cannot convert")
+      throw exExceptionMessage("E213")
     }
 
     val bytes: ByteArray?

@@ -247,7 +247,7 @@ class MapCommandTest : VimTestCase() {
     enterCommand("vmap!")
 
     assertPluginError(true)
-    assertPluginErrorMessageContains("E477: No ! allowed")
+    assertPluginErrorMessage("E477: No ! allowed")
   }
 
   @Test
@@ -1016,7 +1016,7 @@ class MapCommandTest : VimTestCase() {
 
     typeText("t")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E121: Undefined variable: s:var")
+    assertPluginErrorMessage("E121: Undefined variable: s:var")
   }
 
 

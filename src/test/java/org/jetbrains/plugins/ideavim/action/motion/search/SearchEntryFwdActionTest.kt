@@ -19,7 +19,7 @@ class SearchEntryFwdActionTest : VimTestCase() {
   fun `test search clears status line`() {
     configureByText("lorem ipsum")
     enterSearch("dolor")  // Shows "pattern not found message"
-    assertPluginErrorMessageContains("Pattern not found: dolor")
+    assertPluginErrorMessage("E486: Pattern not found: dolor")
     typeText("/")  // No <CR>
     assertStatusLineCleared()
   }

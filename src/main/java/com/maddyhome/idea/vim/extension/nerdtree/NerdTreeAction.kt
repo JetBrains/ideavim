@@ -27,7 +27,7 @@ class NerdTreeAction(val action: (AnActionEvent, Tree) -> Unit) {
   companion object {
     fun callAction(editor: VimEditor?, name: String, context: ExecutionContext) {
       val action = ActionManager.getInstance().getAction(name) ?: run {
-        VimPlugin.showMessage(MessageHelper.message("action.not.found.0", name))
+        VimPlugin.showMessage(MessageHelper.message("nerdtree.error.action.not.found", name))
         return
       }
       val application = ApplicationManager.getApplication()

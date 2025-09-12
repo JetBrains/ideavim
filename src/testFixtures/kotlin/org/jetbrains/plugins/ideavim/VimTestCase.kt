@@ -747,8 +747,8 @@ abstract class VimTestCase {
     assertEquals(isError, injector.messages.isError())
   }
 
-  fun assertPluginErrorMessageContains(message: String) {
-    assertContains(VimPlugin.getMessage(), message)
+  fun assertPluginErrorMessage(message: String) {
+    assertEquals(message, VimPlugin.getMessage())
   }
 
   fun assertStatusLineMessageContains(message: String) {

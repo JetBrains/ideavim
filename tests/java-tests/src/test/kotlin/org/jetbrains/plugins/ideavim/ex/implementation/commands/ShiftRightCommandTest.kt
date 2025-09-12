@@ -161,7 +161,7 @@ class ShiftRightCommandTest : VimJavaTestCase() {
       """.trimMargin()
     )
     assertPluginError(true)
-    assertPluginErrorMessageContains("E488: Trailing characters: ,4")
+    assertPluginErrorMessage("E488: Trailing characters: ,4")
   }
 
   @Test

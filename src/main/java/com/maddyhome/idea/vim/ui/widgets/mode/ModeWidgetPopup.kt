@@ -70,8 +70,8 @@ class ModeWidgetPopup : AnAction() {
         val tabbedPane = JBTabbedPane()
         val lightThemeSettings = createPanel(getWidgetThemeColors(true))
         val darkThemeSettings = createPanel(getWidgetThemeColors(false))
-        tabbedPane.addTab(MessageHelper.getMessage("widget.mode.popup.tab.light"), lightThemeSettings.addScrollPane())
-        tabbedPane.addTab(MessageHelper.getMessage("widget.mode.popup.tab.dark"), darkThemeSettings.addScrollPane())
+        tabbedPane.addTab(MessageHelper.message("widget.mode.popup.tab.light"), lightThemeSettings.addScrollPane())
+        tabbedPane.addTab(MessageHelper.message("widget.mode.popup.tab.dark"), darkThemeSettings.addScrollPane())
         tabbedPane.preferredSize = Dimension(300, 300)
         for (i in 0 until tabbedPane.tabCount) {
           val label = JLabel(tabbedPane.getTitleAt(i), JLabel.CENTER)
@@ -84,7 +84,7 @@ class ModeWidgetPopup : AnAction() {
         val popupContent = ContentFactory.getInstance().createContent(mainPanel, "", false).component
         val popup = JBPopupFactory.getInstance()
           .createComponentPopupBuilder(popupContent, popupContent)
-          .setTitle(MessageHelper.getMessage("widget.mode.popup.title"))
+          .setTitle(MessageHelper.message("widget.mode.popup.title"))
           .setResizable(true)
           .setMovable(true)
           .setRequestFocus(true)
@@ -149,11 +149,11 @@ class ModeWidgetPopup : AnAction() {
         lateinit var advancedSettings: Cell<JBCheckBox>
         row {
           advancedSettings =
-            checkBox(MessageHelper.getMessage("widget.mode.popup.field.advanced.settings")).bindSelected(modeColors::isFullCustomization)
+            checkBox(MessageHelper.message("widget.mode.popup.field.advanced.settings")).bindSelected(modeColors::isFullCustomization)
         }
         group {
           row {
-            label(MessageHelper.getMessage("widget.mode.popup.field.theme"))
+            label(MessageHelper.message("widget.mode.popup.field.theme"))
             comboBox(ModeWidgetTheme.entries).bindItem(modeColors::theme.toNullableProperty())
           }
           row {
@@ -163,118 +163,118 @@ class ModeWidgetPopup : AnAction() {
             )
           }
         }.topGap(TopGap.NONE).visibleIf(!advancedSettings.selected)
-        group(MessageHelper.getMessage("widget.mode.popup.group.title.full.customization")) {
-          row { text(MessageHelper.getMessage("widget.mode.popup.color.instruction")) }
+        group(MessageHelper.message("widget.mode.popup.group.title.full.customization")) {
+          row { text(MessageHelper.message("widget.mode.popup.color.instruction")) }
 
-          group(MessageHelper.getMessage("widget.mode.popup.group.normal.title")) {
+          group(MessageHelper.message("widget.mode.popup.group.normal.title")) {
             row {
-              label(MessageHelper.getMessage("widget.mode.popup.field.background"))
+              label(MessageHelper.message("widget.mode.popup.field.background"))
               textField().bindText(modeColors::normalBg)
             }.layout(RowLayout.PARENT_GRID)
             row {
-              label(MessageHelper.getMessage("widget.mode.popup.field.foreground"))
+              label(MessageHelper.message("widget.mode.popup.field.foreground"))
               textField().bindText(modeColors::normalFg)
             }.layout(RowLayout.PARENT_GRID)
           }
 
-          group(MessageHelper.getMessage("widget.mode.popup.group.insert.title")) {
+          group(MessageHelper.message("widget.mode.popup.group.insert.title")) {
             row {
-              label(MessageHelper.getMessage("widget.mode.popup.field.background"))
+              label(MessageHelper.message("widget.mode.popup.field.background"))
               textField().bindText(modeColors::insertBg)
             }.layout(RowLayout.PARENT_GRID)
             row {
-              label(MessageHelper.getMessage("widget.mode.popup.field.foreground"))
+              label(MessageHelper.message("widget.mode.popup.field.foreground"))
               textField().bindText(modeColors::insertFg)
             }.layout(RowLayout.PARENT_GRID)
           }
 
-          group(MessageHelper.getMessage("widget.mode.popup.group.replace.title")) {
+          group(MessageHelper.message("widget.mode.popup.group.replace.title")) {
             row {
-              label(MessageHelper.getMessage("widget.mode.popup.field.background"))
+              label(MessageHelper.message("widget.mode.popup.field.background"))
               textField().bindText(modeColors::replaceBg)
             }.layout(RowLayout.PARENT_GRID)
             row {
-              label(MessageHelper.getMessage("widget.mode.popup.field.foreground"))
+              label(MessageHelper.message("widget.mode.popup.field.foreground"))
               textField().bindText(modeColors::replaceFg)
             }.layout(RowLayout.PARENT_GRID)
           }
 
-          group(MessageHelper.getMessage("widget.mode.popup.group.command.title")) {
+          group(MessageHelper.message("widget.mode.popup.group.command.title")) {
             row {
-              label(MessageHelper.getMessage("widget.mode.popup.field.background"))
+              label(MessageHelper.message("widget.mode.popup.field.background"))
               textField().bindText(modeColors::commandBg)
             }.layout(RowLayout.PARENT_GRID)
             row {
-              label(MessageHelper.getMessage("widget.mode.popup.field.foreground"))
+              label(MessageHelper.message("widget.mode.popup.field.foreground"))
               textField().bindText(modeColors::commandFg)
             }.layout(RowLayout.PARENT_GRID)
           }
 
-          group(MessageHelper.getMessage("widget.mode.popup.group.visual.title")) {
+          group(MessageHelper.message("widget.mode.popup.group.visual.title")) {
             row {
-              label(MessageHelper.getMessage("widget.mode.popup.field.background"))
+              label(MessageHelper.message("widget.mode.popup.field.background"))
               textField().bindText(modeColors::visualBg)
             }.layout(RowLayout.PARENT_GRID)
             row {
-              label(MessageHelper.getMessage("widget.mode.popup.field.foreground"))
+              label(MessageHelper.message("widget.mode.popup.field.foreground"))
               textField().bindText(modeColors::visualFg)
             }.layout(RowLayout.PARENT_GRID)
 
-            collapsibleGroup(MessageHelper.getMessage("widget.mode.popup.group.visual.subgroup.line.title")) {
-              row { text(MessageHelper.getMessage("widget.mode.popup.group.visual.subgroup.instruction")) }
+            collapsibleGroup(MessageHelper.message("widget.mode.popup.group.visual.subgroup.line.title")) {
+              row { text(MessageHelper.message("widget.mode.popup.group.visual.subgroup.instruction")) }
               row {
-                label(MessageHelper.getMessage("widget.mode.popup.field.background"))
+                label(MessageHelper.message("widget.mode.popup.field.background"))
                 textField().bindText(modeColors::visualLineBg)
               }.layout(RowLayout.PARENT_GRID)
               row {
-                label(MessageHelper.getMessage("widget.mode.popup.field.foreground"))
+                label(MessageHelper.message("widget.mode.popup.field.foreground"))
                 textField().bindText(modeColors::visualLineFg)
               }.layout(RowLayout.PARENT_GRID)
             }
 
-            collapsibleGroup(MessageHelper.getMessage("widget.mode.popup.group.visual.subgroup.block.title")) {
-              row { text(MessageHelper.getMessage("widget.mode.popup.group.visual.subgroup.instruction")) }
+            collapsibleGroup(MessageHelper.message("widget.mode.popup.group.visual.subgroup.block.title")) {
+              row { text(MessageHelper.message("widget.mode.popup.group.visual.subgroup.instruction")) }
               row {
-                label(MessageHelper.getMessage("widget.mode.popup.field.background"))
+                label(MessageHelper.message("widget.mode.popup.field.background"))
                 textField().bindText(modeColors::visualBlockBg)
               }.layout(RowLayout.PARENT_GRID)
               row {
-                label(MessageHelper.getMessage("widget.mode.popup.field.foreground"))
+                label(MessageHelper.message("widget.mode.popup.field.foreground"))
                 textField().bindText(modeColors::visualBlockFg)
               }.layout(RowLayout.PARENT_GRID)
             }
           }
 
-          group(MessageHelper.getMessage("widget.mode.popup.group.select.title")) {
+          group(MessageHelper.message("widget.mode.popup.group.select.title")) {
             row {
-              label(MessageHelper.getMessage("widget.mode.popup.field.background"))
+              label(MessageHelper.message("widget.mode.popup.field.background"))
               textField().bindText(modeColors::selectBg)
             }.layout(RowLayout.PARENT_GRID)
             row {
-              label(MessageHelper.getMessage("widget.mode.popup.field.foreground"))
+              label(MessageHelper.message("widget.mode.popup.field.foreground"))
               textField().bindText(modeColors::selectFg)
             }.layout(RowLayout.PARENT_GRID)
 
-            collapsibleGroup(MessageHelper.getMessage("widget.mode.popup.group.select.subgroup.line.title")) {
-              row { text(MessageHelper.getMessage("widget.mode.popup.group.select.subgroup.instruction")) }
+            collapsibleGroup(MessageHelper.message("widget.mode.popup.group.select.subgroup.line.title")) {
+              row { text(MessageHelper.message("widget.mode.popup.group.select.subgroup.instruction")) }
               row {
-                label(MessageHelper.getMessage("widget.mode.popup.field.background"))
+                label(MessageHelper.message("widget.mode.popup.field.background"))
                 textField().bindText(modeColors::selectLineBg)
               }.layout(RowLayout.PARENT_GRID)
               row {
-                label(MessageHelper.getMessage("widget.mode.popup.field.foreground"))
+                label(MessageHelper.message("widget.mode.popup.field.foreground"))
                 textField().bindText(modeColors::selectLineFg)
               }.layout(RowLayout.PARENT_GRID)
             }
 
-            collapsibleGroup(MessageHelper.getMessage("widget.mode.popup.group.select.subgroup.block.title")) {
-              row { text(MessageHelper.getMessage("widget.mode.popup.group.select.subgroup.instruction")) }
+            collapsibleGroup(MessageHelper.message("widget.mode.popup.group.select.subgroup.block.title")) {
+              row { text(MessageHelper.message("widget.mode.popup.group.select.subgroup.instruction")) }
               row {
-                label(MessageHelper.getMessage("widget.mode.popup.field.background"))
+                label(MessageHelper.message("widget.mode.popup.field.background"))
                 textField().bindText(modeColors::selectBlockBg)
               }.layout(RowLayout.PARENT_GRID)
               row {
-                label(MessageHelper.getMessage("widget.mode.popup.field.foreground"))
+                label(MessageHelper.message("widget.mode.popup.field.foreground"))
                 textField().bindText(modeColors::selectBlockFg)
               }.layout(RowLayout.PARENT_GRID)
             }

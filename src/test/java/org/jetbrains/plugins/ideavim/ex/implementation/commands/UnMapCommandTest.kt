@@ -113,6 +113,6 @@ class UnMapCommandTest : VimTestCase() {
     enterCommand("vunmap! foo")
 
     assertPluginError(true)
-    assertPluginErrorMessageContains("E477: No ! allowed")
+    assertPluginErrorMessage("E477: No ! allowed")
   }
 }

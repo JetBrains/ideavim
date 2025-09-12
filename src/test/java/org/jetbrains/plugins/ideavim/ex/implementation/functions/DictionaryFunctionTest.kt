@@ -71,7 +71,7 @@ class DictionaryFunctionTest : VimTestCase() {
     )
     typeText(commandToKeys("call Print()"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E725: Calling dict function without Dictionary: Print")
+    assertPluginErrorMessage("E725: Calling dict function without Dictionary: Print")
 
     typeText(commandToKeys("delfunction! Print"))
   }
@@ -198,7 +198,7 @@ class DictionaryFunctionTest : VimTestCase() {
     typeText(commandToKeys("let dict = {'name': 'dict', 'print': function('Print')}"))
     typeText(commandToKeys("call dict.print()"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E46: Cannot change read-only variable \"self\"")
+    assertPluginErrorMessage("E46: Cannot change read-only variable \"self\"")
 
     typeText(commandToKeys("delfunction! Print"))
   }

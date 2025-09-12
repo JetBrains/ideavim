@@ -80,7 +80,7 @@ class FunctionCallTest : VimTestCase() {
       ),
     )
     assertPluginError(true)
-    assertPluginErrorMessageContains("E46: Cannot change read-only variable \"a:number\"")
+    assertPluginErrorMessage("E46: Cannot change read-only variable \"a:number\"")
 
     typeText(commandToKeys("delfunction! ThrowException"))
   }

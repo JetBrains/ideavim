@@ -17,6 +17,7 @@ import com.maddyhome.idea.vim.api.getOrPutTabData
 import com.maddyhome.idea.vim.api.getOrPutWindowData
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.Direction
+import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.ExecutableContext
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
@@ -27,7 +28,6 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
-import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
@@ -117,67 +117,24 @@ abstract class VimVariableServiceBase : VariableService {
     }
   }
 
-  private fun extractVariableName(variable: Variable): String {
-    val parts = variable.name.parts
-    if (parts.size == 1 && parts[0] is SimpleExpression) {
-      val simpleExpression = parts[0] as SimpleExpression
-      val data = simpleExpression.data
-      if (data is VimString) {
-        return data.value
-      }
-    }
-
-    throw exExceptionMessage("variable.name.extract.error")
-  }
-
+  @Throws(ExException::class)
   override fun getNullableVariableValue(
     variable: Variable,
-    editor: VimEditor?,
-    context: ExecutionContext?,
-    vimContext: VimLContext?,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext,
   ): VimDataType? {
-    val scope = variable.scope
-      ?: if (vimContext != null) {
-        getDefaultVariableScope(vimContext)
-      } else {
-        throw exExceptionMessage("variable.scope.vimcontext.required")
-      }
-
-    val name = if (editor != null && context != null && vimContext != null) {
-      variable.name.evaluate(editor, context, vimContext).value
-    } else {
-      extractVariableName(variable)
-    }
-
+    val scope = variable.scope ?: getDefaultVariableScope(vimContext)
+    val name = variable.name.evaluate(editor, context, vimContext).value
     return when (scope) {
       Scope.GLOBAL_VARIABLE -> getGlobalVariableValue(name)
-      Scope.SCRIPT_VARIABLE -> {
-        if (vimContext == null) throw exExceptionMessage("variable.script.vimcontext.required")
-        getScriptVariable(name, vimContext)
-      }
-      Scope.WINDOW_VARIABLE -> {
-        if (editor == null) throw exExceptionMessage("variable.window.editor.required")
-        getWindowVariable(name, editor)
-      }
-      Scope.TABPAGE_VARIABLE -> {
-        if (editor == null) throw exExceptionMessage("variable.tabpage.editor.required")
-        getTabVariable(name, editor)
-      }
-      Scope.FUNCTION_VARIABLE -> {
-        if (vimContext == null) throw exExceptionMessage("variable.function.vimcontext.required")
-        getFunctionVariable(name, vimContext)
-      }
-      Scope.LOCAL_VARIABLE -> {
-        if (vimContext == null) throw exExceptionMessage("variable.local.vimcontext.required")
-        getLocalVariable(name, vimContext)
-      }
-      Scope.BUFFER_VARIABLE -> {
-        if (editor == null) throw exExceptionMessage("variable.buffer.editor.required")
-        getBufferVariable(name, editor)
-      }
-      Scope.VIM_VARIABLE -> {
-        getVimVariable(name, editor, context, vimContext)
-      }
+      Scope.SCRIPT_VARIABLE -> getScriptVariable(name, vimContext)
+      Scope.WINDOW_VARIABLE -> getWindowVariable(name, editor)
+      Scope.TABPAGE_VARIABLE -> getTabVariable(name, editor)
+      Scope.FUNCTION_VARIABLE -> getFunctionVariable(name, vimContext)
+      Scope.LOCAL_VARIABLE -> getLocalVariable(name, vimContext)
+      Scope.BUFFER_VARIABLE -> getBufferVariable(name, editor)
+      Scope.VIM_VARIABLE -> getVimVariable(name, editor, context, vimContext)
     }
   }
 
@@ -261,9 +218,9 @@ abstract class VimVariableServiceBase : VariableService {
   @Suppress("SpellCheckingInspection")
   protected open fun getVimVariable(
     name: String,
-    editor: VimEditor?,
-    context: ExecutionContext?,
-    vimContext: VimLContext?,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext,
   ): VimDataType? {
     // Note that the v:count variables might be incorrect in scenarios other than mappings, when there is a command in
     // progress. However, I've only seen it used inside mappings, so don't know
@@ -274,21 +231,10 @@ abstract class VimVariableServiceBase : VariableService {
       )
 
       "searchforward" -> VimInt(if (injector.searchGroup.getLastSearchDirection() == Direction.FORWARDS) 1 else 0)
-      "hlsearch" -> {
-        if (editor == null) throw exExceptionMessage("variable.vim.editor.required")
-        if (context == null) throw exExceptionMessage("variable.vim.context.required")
-        if (vimContext == null) throw exExceptionMessage("variable.vim.vimcontext.required")
-        HighLightVariable().evaluate(name, editor, context, vimContext)
-      }
+      "hlsearch" -> HighLightVariable().evaluate(name, editor, context, vimContext)
+      "register" -> RegisterVariable().evaluate(name, editor, context, vimContext)
 
-      "register" -> {
-        if (editor == null) throw exExceptionMessage("variable.vim.editor.required")
-        if (context == null) throw exExceptionMessage("variable.vim.context.required")
-        if (vimContext == null) throw exExceptionMessage("variable.vim.vimcontext.required")
-        RegisterVariable().evaluate(name, editor, context, vimContext)
-      }
-
-      else -> throw exExceptionMessage("variable.vim.not.implemented", name)
+      else -> throw ExException("The 'v:${name}' variable is not implemented yet")
     }
   }
 
@@ -345,7 +291,7 @@ abstract class VimVariableServiceBase : VariableService {
     context: ExecutionContext,
     vimContext: VimLContext,
   ) {
-    throw exExceptionMessage("variable.scope.vim.not.implemented")
+    throw ExException("The 'v' scope is not implemented yet :(")
   }
 
   override fun <T : Any> convertToKotlinType(

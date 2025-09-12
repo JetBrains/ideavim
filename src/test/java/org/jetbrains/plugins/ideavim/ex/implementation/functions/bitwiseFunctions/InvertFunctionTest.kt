@@ -30,7 +30,7 @@ class InvertFunctionTest : VimTestCase() {
     enterCommand("echo invert([1, 2, 3])")
     assertNoExOutput()
     assertPluginError(true)
-    assertPluginErrorMessageContains("E745: Using a List as a Number")
+    assertPluginErrorMessage("E745: Using a List as a Number")
   }
 
   @Test
@@ -38,7 +38,7 @@ class InvertFunctionTest : VimTestCase() {
     enterCommand("echo invert({1: 2, 3: 4})")
     assertNoExOutput()
     assertPluginError(true)
-    assertPluginErrorMessageContains("E728: Using a Dictionary as a Number")
+    assertPluginErrorMessage("E728: Using a Dictionary as a Number")
   }
 
   @Test
@@ -46,6 +46,6 @@ class InvertFunctionTest : VimTestCase() {
     enterCommand("echo invert(1.5)")
     assertNoExOutput()
     assertPluginError(true)
-    assertPluginErrorMessageContains("E805: Using a Float as a Number")
+    assertPluginErrorMessage("E805: Using a Float as a Number")
   }
 }

@@ -23,7 +23,7 @@ class LockVarCommandTest : VimTestCase() {
     typeText(commandToKeys("lockvar x"))
     typeText(commandToKeys("let x = 15"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E741: Value is locked: x")
+    assertPluginErrorMessage("E741: Value is locked: x")
   }
 
   @Test
@@ -46,7 +46,7 @@ class LockVarCommandTest : VimTestCase() {
     typeText(commandToKeys("lockvar x"))
     typeText(commandToKeys("let x = 15"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E741: Value is locked: x")
+    assertPluginErrorMessage("E741: Value is locked: x")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
@@ -57,7 +57,7 @@ class LockVarCommandTest : VimTestCase() {
     typeText(commandToKeys("lockvar x"))
     typeText(commandToKeys("let x += [2]"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E741: Value is locked: x")
+    assertPluginErrorMessage("E741: Value is locked: x")
   }
 
   @Test
@@ -82,7 +82,7 @@ class LockVarCommandTest : VimTestCase() {
     typeText(commandToKeys("lockvar x"))
     typeText(commandToKeys("let x[0] = 15"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E741: Value is locked")
+    assertPluginErrorMessage("E741: Value is locked: x[0]")
     typeText(commandToKeys("echo x"))
     assertExOutput("[1, 2]")
   }
@@ -95,7 +95,7 @@ class LockVarCommandTest : VimTestCase() {
     typeText(commandToKeys("lockvar x"))
     typeText(commandToKeys("let x.two = 2"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E741: Value is locked")
+    assertPluginErrorMessage("E741: Value is locked: x.two")
     typeText(commandToKeys("echo x"))
     assertExOutput("{'one': 1}")
   }
@@ -112,7 +112,7 @@ class LockVarCommandTest : VimTestCase() {
     assertExOutput("{'one': 42}")
     typeText(commandToKeys("let x.two = 2"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E741: Value is locked")
+    assertPluginErrorMessage("E741: Value is locked: x.two")
     typeText(commandToKeys("echo x"))
     assertExOutput("{'one': 42}")
   }
@@ -125,7 +125,7 @@ class LockVarCommandTest : VimTestCase() {
     typeText(commandToKeys("lockvar x"))
     typeText(commandToKeys("let x['two'] = 2"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E741: Value is locked")
+    assertPluginErrorMessage("E741: Value is locked: x['two']")
     typeText(commandToKeys("echo x"))
     assertExOutput("{'one': 1}")
   }
@@ -148,7 +148,7 @@ class LockVarCommandTest : VimTestCase() {
     typeText(commandToKeys("lockvar 3 x"))
     typeText(commandToKeys("let x.list[0] = 42"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E741: Value is locked")
+    assertPluginErrorMessage("E741: Value is locked: x.list[0]")
     typeText(commandToKeys("echo x"))
     assertExOutput("{'list': [1]}")
   }

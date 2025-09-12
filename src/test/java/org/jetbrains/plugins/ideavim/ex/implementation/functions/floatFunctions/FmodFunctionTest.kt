@@ -45,41 +45,41 @@ class FmodFunctionTest : VimTestCase() {
   fun `test fmod with string value causes errors`() {
     enterCommand("echo fmod('42', 7)")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test fmod with string value causes errors 2`() {
     enterCommand("echo fmod(42, '7')")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test fmod with list value causes errors`() {
     enterCommand("echo fmod([1, 2], 7)")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test fmod with list value causes errors 2`() {
     enterCommand("echo fmod(42, [1, 2])")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test fmod with dictionary value causes errors`() {
     enterCommand("echo fmod({1: 2}, 7)")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test fmod with dictionary value causes errors 2`() {
     enterCommand("echo fmod(42, {1: 2})")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 }

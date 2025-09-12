@@ -68,7 +68,7 @@ internal object DivisionHandler : ArithmeticBinaryOperatorHandler() {
 internal object ModulusHandler : BinaryOperatorHandler() {
   override fun performOperation(left: VimDataType, right: VimDataType): VimDataType {
     if (left is VimFloat || right is VimFloat) {
-      throw exExceptionMessage("E804")  // E804: Cannot use '%' with Float
+      throw exExceptionMessage("E804")
     }
 
     val leftNumber = left.toVimNumber().value

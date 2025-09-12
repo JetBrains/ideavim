@@ -44,55 +44,55 @@ class PowFunctionTest : VimTestCase() {
   fun `test pow with string causes errors`() {
     enterCommand("echo pow('1.0', 2)")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test pow with string causes errors 2`() {
     enterCommand("echo pow(1.0, '2')")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test pow with invalid string causes errors`() {
     enterCommand("echo pow('cheese', 2)")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test pow with invalid string causes errors 2`() {
     enterCommand("echo pow(2, 'cheese')")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test pow with list causes errors`() {
     enterCommand("echo pow([1.0], 2)")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test pow with list causes errors 2`() {
     enterCommand("echo pow(2, [1.0])")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test pow with dictionary causes errors`() {
     enterCommand("echo pow({1: 1.0}, 2)")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test pow with dictionary causes errors 2`() {
     enterCommand("echo pow(2, {1: 1.0})")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 }

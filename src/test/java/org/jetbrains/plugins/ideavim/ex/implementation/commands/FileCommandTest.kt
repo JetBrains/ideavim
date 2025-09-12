@@ -35,7 +35,7 @@ class FileCommandTest : VimTestCase() {
     configureByText("lorem ipsum")
     enterCommand("3file")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument")
+    assertPluginErrorMessage("E474: Invalid argument")
   }
 
   @Test
@@ -44,6 +44,6 @@ class FileCommandTest : VimTestCase() {
     // Technically, this would rename the current file to "3"
     enterCommand("file 3")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E488: Trailing characters: 3")
+    assertPluginErrorMessage("E488: Trailing characters: 3")
   }
 }

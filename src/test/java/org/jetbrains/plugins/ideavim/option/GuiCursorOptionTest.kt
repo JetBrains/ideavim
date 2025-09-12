@@ -95,7 +95,7 @@ class GuiCursorOptionTest : VimTestCase() {
   fun `test ignores set with missing colon`() {
     enterCommand("set guicursor=whatever")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E545: Missing colon: whatever")
+    assertPluginErrorMessage("E545: Missing colon: whatever")
     assertHasDefaultValue()
   }
 
@@ -103,7 +103,7 @@ class GuiCursorOptionTest : VimTestCase() {
   fun `test ignores set with invalid mode`() {
     enterCommand("set guicursor=foo:block-Cursor")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E546: Illegal mode: foo:block-Cursor")
+    assertPluginErrorMessage("E546: Illegal mode: foo:block-Cursor")
     assertHasDefaultValue()
   }
 
@@ -111,7 +111,7 @@ class GuiCursorOptionTest : VimTestCase() {
   fun `test ignores set with invalid mode 2`() {
     enterCommand("set guicursor=n-foo:block-Cursor")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E546: Illegal mode: n-foo:block-Cursor")
+    assertPluginErrorMessage("E546: Illegal mode: n-foo:block-Cursor")
     assertHasDefaultValue()
   }
 
@@ -119,7 +119,7 @@ class GuiCursorOptionTest : VimTestCase() {
   fun `test ignores set with zero thickness`() {
     enterCommand("set guicursor=n:ver0-Cursor")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E549: Illegal percentage: n:ver0-Cursor")
+    assertPluginErrorMessage("E549: Illegal percentage: n:ver0-Cursor")
     assertHasDefaultValue()
   }
 
@@ -127,7 +127,7 @@ class GuiCursorOptionTest : VimTestCase() {
   fun `test ignores set with invalid vertical cursor details`() {
     enterCommand("set guicursor=n:ver-Cursor")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E548: Digit expected: n:ver-Cursor")
+    assertPluginErrorMessage("E548: Digit expected: n:ver-Cursor")
     assertHasDefaultValue()
   }
 

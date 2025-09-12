@@ -321,7 +321,7 @@ internal class NotificationService(private val project: Project?) {
     }
 
     class CopyActionId(val id: String?, val project: Project?) :
-      DumbAwareAction(MessageHelper.message("action.copy.action.id.text")) {
+      DumbAwareAction(MessageHelper.message("action.CopyActionId.text")) {
       override fun actionPerformed(e: AnActionEvent) {
         CopyPasteManager.getInstance().setContents(StringSelection(id ?: ""))
         if (id != null) {

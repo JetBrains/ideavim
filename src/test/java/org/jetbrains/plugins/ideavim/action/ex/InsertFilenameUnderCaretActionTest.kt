@@ -185,7 +185,7 @@ class InsertFilenameUnderCaretActionTest : VimExTestCase() {
     setUnixOption()
     typeText(":edit <C-R><C-F>")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E446: No file name under cursor")
+    assertPluginErrorMessage("E446: No file name under cursor")
   }
 
   @Test
@@ -198,7 +198,7 @@ class InsertFilenameUnderCaretActionTest : VimExTestCase() {
     setUnixOption()
     typeText(":edit <C-R><C-F>")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E446: No file name under cursor")
+    assertPluginErrorMessage("E446: No file name under cursor")
   }
 
   @Test
@@ -211,7 +211,7 @@ class InsertFilenameUnderCaretActionTest : VimExTestCase() {
     setUnixOption()
     typeText(":edit <C-R><C-F>")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E446: No file name under cursor")
+    assertPluginErrorMessage("E446: No file name under cursor")
   }
 
   @Test

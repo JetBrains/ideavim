@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
@@ -37,13 +38,10 @@ data class TabCloseCommand(val range: Range, val modifier: CommandModifier, val 
 
     val argument = argument
     val index = getTabIndexToClose(argument, current, tabCount - 1)
+      ?: throw exExceptionMessage("E475", argument)
 
-    if (index != null) {
-      val select = if (index == current) index + 1 else current
-      injector.tabService.removeTabAt(index, select, context)
-    } else {
-      injector.messages.showStatusBarMessage(editor, injector.messages.message("error.invalid.command.argument"))
-    }
+    val select = if (index == current) index + 1 else current
+    injector.tabService.removeTabAt(index, select, context)
 
     return ExecutionResult.Success
   }

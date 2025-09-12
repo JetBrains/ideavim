@@ -21,7 +21,7 @@ class FuncrefTest : VimTestCase() {
     configureByText("\n")
     typeText(commandToKeys("let Ff = funcref('abs')"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E700: Unknown function: abs")
+    assertPluginErrorMessage("E700: Unknown function: abs")
   }
 
   @Test
@@ -52,7 +52,7 @@ class FuncrefTest : VimTestCase() {
     configureByText("\n")
     typeText(commandToKeys("let Ff = funcref('Unknown')"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E700: Unknown function: Unknown")
+    assertPluginErrorMessage("E700: Unknown function: Unknown")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
@@ -61,7 +61,7 @@ class FuncrefTest : VimTestCase() {
     configureByText("\n")
     typeText(commandToKeys("let Ff = funcref(32)"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E129: Function name required")
+    assertPluginErrorMessage("E129: Function name required")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
@@ -79,7 +79,7 @@ class FuncrefTest : VimTestCase() {
     )
     typeText(commandToKeys("let Ff = funcref('Abs', 10)"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E923: Second argument of function() must be a list or a dict")
+    assertPluginErrorMessage("E923: Second argument of function() must be a list or a dict")
 
     typeText(commandToKeys("delfunction! Abs"))
   }
@@ -99,7 +99,7 @@ class FuncrefTest : VimTestCase() {
     )
     typeText(commandToKeys("let Ff = funcref('Abs', [], 40)"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E922: expected a dict")
+    assertPluginErrorMessage("E922: Expected a dict")
 
     typeText(commandToKeys("delfunction! Abs"))
   }
@@ -152,6 +152,6 @@ class FuncrefTest : VimTestCase() {
     typeText(commandToKeys("delfunction! SayHi"))
     typeText(commandToKeys("call Ff()"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E933: Function was deleted: SayHi")
+    assertPluginErrorMessage("E933: Function was deleted: SayHi")
   }
 }
