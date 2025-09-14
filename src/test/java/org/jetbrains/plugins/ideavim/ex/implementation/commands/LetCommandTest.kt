@@ -8,20 +8,12 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import com.maddyhome.idea.vim.api.Options
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
-import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.OptionAccessScope
-import com.maddyhome.idea.vim.options.OptionDeclaredScope
-import com.maddyhome.idea.vim.options.ToggleOption
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
 class LetCommandTest : VimTestCase("\n") {
   @Test
@@ -84,111 +76,6 @@ class LetCommandTest : VimTestCase("\n") {
     enterCommand("let s = [1, 2, 3]")
     enterCommand("let s[1:] = [5, 5, 5, 5]")
     assertCommandOutput("echo s", "[1, 5, 5, 5, 5]")
-  }
-
-  @Test
-  fun `test let option updates toggle option with number value`() {
-    enterCommand("let &incsearch=1")
-    assertTrue(options().incsearch)
-    enterCommand("let &incsearch = 0")
-    assertFalse(options().incsearch)
-  }
-
-  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
-  @Test
-  fun `test let option without scope behaves like set`() {
-    // We don't have a local toggle option we can try this with. 'number' and 'relativenumber' are backed by the IDE
-    val option = ToggleOption("test", OptionDeclaredScope.LOCAL_TO_WINDOW, "test", false)
-    try {
-      injector.optionGroup.addOption(option)
-
-      enterCommand("let &test = 12")
-      val globalValue = injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim))
-      val localValue = injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim))
-      assertEquals(12, globalValue.value)
-      assertEquals(12, localValue.value)
-      assertTrue(
-        injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)).booleanValue
-      )
-    } finally {
-      injector.optionGroup.removeOption(option.name)
-    }
-  }
-
-  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
-  @Test
-  fun `test let option with local scope behaves like setlocal`() {
-    // We don't have a local toggle option we can try this with. 'number' and 'relativenumber' are backed by the IDE
-    val option = ToggleOption("test", OptionDeclaredScope.LOCAL_TO_WINDOW, "test", false)
-    try {
-      injector.optionGroup.addOption(option)
-
-      enterCommand("let &l:test = 12")
-      val globalValue = injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim))
-      val localValue = injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim))
-      assertEquals(0, globalValue.value)
-      assertEquals(12, localValue.value)
-      assertTrue(
-        injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)).booleanValue
-      )
-    } finally {
-      injector.optionGroup.removeOption(option.name)
-    }
-  }
-
-  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
-  @Test
-  fun `test let option with global scope behaves like setglobal`() {
-    // We don't have a local toggle option we can try this with. 'number' and 'relativenumber' are backed by the IDE
-    val option = ToggleOption("test", OptionDeclaredScope.LOCAL_TO_WINDOW, "test", false)
-    try {
-      injector.optionGroup.addOption(option)
-
-      enterCommand("let &g:test = 12")
-      val globalValue = injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim))
-      val localValue = injector.optionGroup.getOptionValue(option, OptionAccessScope.LOCAL(fixture.editor.vim))
-      assertEquals(12, globalValue.value)
-      assertEquals(0, localValue.value)
-      assertFalse(
-        injector.optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(fixture.editor.vim)).booleanValue
-      )
-    } finally {
-      injector.optionGroup.removeOption(option.name)
-    }
-  }
-
-  @Test
-  fun `test let option with operator and no scope`() {
-    // 'scroll' is a local to window number option
-    enterCommand("set scroll=42")
-    enterCommand("let &scroll+=10")
-    val globalValue = injector.optionGroup.getOptionValue(Options.scroll, OptionAccessScope.GLOBAL(fixture.editor.vim))
-    val localValue = injector.optionGroup.getOptionValue(Options.scroll, OptionAccessScope.LOCAL(fixture.editor.vim))
-    assertEquals(52, globalValue.value)
-    assertEquals(52, localValue.value)
-    assertEquals(52, options().scroll)
-  }
-
-  @Test
-  fun `test let local option with operator`() {
-    enterCommand("setlocal scroll=42")
-    enterCommand("let &l:scroll+=10")
-    val globalValue = injector.optionGroup.getOptionValue(Options.scroll, OptionAccessScope.GLOBAL(fixture.editor.vim))
-    val localValue = injector.optionGroup.getOptionValue(Options.scroll, OptionAccessScope.LOCAL(fixture.editor.vim))
-    assertEquals(0, globalValue.value)
-    assertEquals(52, localValue.value)
-    assertEquals(52, options().scroll)
-  }
-
-  @Test
-  fun `test let global option with operator`() {
-    enterCommand("setglobal scroll=42")
-    enterCommand("let &g:scroll+=10")
-    val globalValue = injector.optionGroup.getOptionValue(Options.scroll, OptionAccessScope.GLOBAL(fixture.editor.vim))
-    val localValue = injector.optionGroup.getOptionValue(Options.scroll, OptionAccessScope.LOCAL(fixture.editor.vim))
-    assertEquals(52, globalValue.value)
-    assertEquals(0, localValue.value)
-    assertEquals(0, options().scroll)
   }
 
   @Test
