@@ -2,6 +2,7 @@ ideavim
 ideavimrc
 maddyhome
 
+lockvar
 setglobal
 setlocal
 vglobal

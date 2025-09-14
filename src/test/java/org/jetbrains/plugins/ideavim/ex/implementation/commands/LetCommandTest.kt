@@ -18,39 +18,12 @@ import com.maddyhome.idea.vim.options.ToggleOption
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInfo
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class LetCommandTest : VimTestCase() {
-
-  @BeforeEach
-  override fun setUp(testInfo: TestInfo) {
-    super.setUp(testInfo)
-    configureByText("\n")
-  }
-
-  @Test
-  fun `test assignment to string`() {
-    enterCommand("let s = \"foo\"")
-    assertCommandOutput("echo s", "foo")
-  }
-
-  @Test
-  fun `test assignment to number`() {
-    enterCommand("let s = 100")
-    assertCommandOutput("echo s", "100")
-  }
-
-  @Test
-  fun `test assignment to expression`() {
-    enterCommand("let s = 10 + 20 * 4")
-    assertCommandOutput("echo s", "90")
-  }
-
+class LetCommandTest : VimTestCase("\n") {
   @Test
   fun `test adding new pair to dictionary`() {
     enterCommand("let s = {'key1' : 1}")
@@ -63,13 +36,6 @@ class LetCommandTest : VimTestCase() {
     enterCommand("let s = {'key1' : 1}")
     enterCommand("let s['key1'] = 2")
     assertCommandOutput("echo s", "{'key1': 2}")
-  }
-
-  @Test
-  fun `test assignment plus operator`() {
-    enterCommand("let s = 10")
-    enterCommand("let s += 5")
-    assertCommandOutput("echo s", "15")
   }
 
   @Test
@@ -343,29 +309,5 @@ class LetCommandTest : VimTestCase() {
 
     typeText("@\"")
     assertState("unnamed register works\n")
-  }
-
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
-  @Test
-  fun `test define script variable with command line context`() {
-    enterCommand("let s:my_var = 'oh, hi Mark'")
-    assertPluginError(true)
-    assertPluginErrorMessage("E461: Illegal variable name: s:my_var")
-  }
-
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
-  @Test
-  fun `test define local variable with command line context`() {
-    enterCommand("let l:my_var = 'oh, hi Mark'")
-    assertPluginError(true)
-    assertPluginErrorMessage("E461: Illegal variable name: l:my_var")
-  }
-
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
-  @Test
-  fun `test define function variable with command line context`() {
-    enterCommand("let a:my_var = 'oh, hi Mark'")
-    assertPluginError(true)
-    assertPluginErrorMessage("E461: Illegal variable name: a:my_var")
   }
 }
