@@ -113,7 +113,7 @@ import kotlin.test.assertTrue
  * The tests are started on non-EDT thread without any locks.
  */
 @ApiStatus.Internal
-abstract class VimTestCase {
+abstract class VimTestCase(private val defaultEditorText: String? = null) {
   protected lateinit var fixture: CodeInsightTestFixture
 
   lateinit var testInfo: TestInfo
@@ -148,6 +148,10 @@ abstract class VimTestCase {
     injector.messages.clearStatusBarMessage()
 
     this.testInfo = testInfo
+
+    if (defaultEditorText != null) {
+      configureByText(defaultEditorText)
+    }
   }
 
   private fun resetAllOptions() {
