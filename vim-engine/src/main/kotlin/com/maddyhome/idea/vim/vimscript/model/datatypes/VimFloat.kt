@@ -28,6 +28,7 @@ data class VimFloat(val value: Double) : VimDataType() {
 
   override fun toOutputString(): String {
     if (value.isNaN()) return "nan"
+    if (value.isInfinite()) return if (value > 0) "inf" else "-inf"
     val tooBigOrTooSmall = abs(value) >= 1e6 || (abs(value) < 1e-3 && value != 0.0)
     val pattern = if (tooBigOrTooSmall) "0.0#####E0" else "0.0#####"
     val symbols = DecimalFormatSymbols.getInstance(Locale.ROOT).apply {

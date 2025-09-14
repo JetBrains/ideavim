@@ -36,6 +36,7 @@
     "sinh": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.SinhFunctionHandler",
     "split": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.listFunctions.SplitFunctionHandler",
     "sqrt": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.SqrtFunctionHandler",
+    "string": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.StringFunctionHandler",
     "submatch": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.stringFunctions.SubmatchFunctionHandler",
     "tan": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.TanFunctionHandler",
     "tanh": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.TanhFunctionHandler",
