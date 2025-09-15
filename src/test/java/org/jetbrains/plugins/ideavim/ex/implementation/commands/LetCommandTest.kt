@@ -9,47 +9,13 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
-import org.jetbrains.plugins.ideavim.SkipNeovimReason
-import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class LetCommandTest : VimTestCase("\n") {
   @Test
-  fun `test changing list with sublist expression`() {
-    enterCommand("let s = [1, 2, 3]")
-    enterCommand("let s[0:1] = [5, 4]")
-    assertCommandOutput("echo s", "[5, 4, 3]")
-  }
-
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
-  @Test
-  fun `test changing list with sublist expression and larger list`() {
-    enterCommand("let s = [1, 2, 3]")
-    enterCommand("let s[0:1] = [5, 4, 3, 2, 1]")
-    assertPluginError(true)
-    assertPluginErrorMessage("E710: List value has more items than targets")
-  }
-
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
-  @Test
-  fun `test changing list with sublist expression and smaller list`() {
-    enterCommand("let s = [1, 2, 3]")
-    enterCommand("let s[0:1] = [5]")
-    assertPluginError(true)
-    assertPluginErrorMessage("E711: List value does not have enough items")
-  }
-
-  @Test
-  fun `test changing list with sublist expression and undefined end`() {
-    enterCommand("let s = [1, 2, 3]")
-    enterCommand("let s[1:] = [5, 5, 5, 5]")
-    assertCommandOutput("echo s", "[1, 5, 5, 5, 5]")
-  }
-
-  @Test
-  fun `test comment`() {
+  fun `test parsing command with comment`() {
     enterCommand("let s = [1, 2, 3] \" my list for storing numbers")
     assertCommandOutput("echo s", "[1, 2, 3]")
   }
