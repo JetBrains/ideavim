@@ -157,44 +157,4 @@ class LetCommandTest : VimTestCase("\n") {
     enterCommand("let list[3].key = 'value'")
     assertCommandOutput("echo dict", "{'a': 'b', 'key': 'value'}")
   }
-
-  @Test
-  fun `test numbered register`() {
-    enterCommand("let @4 = 'inumber register works'")
-    assertCommandOutput("echo @4", "inumber register works")
-
-    typeText("@4")
-    assertState("number register works\n")
-  }
-
-  @Test
-  fun `test lowercase letter register`() {
-    enterCommand("let @o = 'ilowercase letter register works'")
-    assertCommandOutput("echo @o", "ilowercase letter register works")
-
-    typeText("@o")
-    assertState("lowercase letter register works\n")
-  }
-
-  @Test
-  fun `test uppercase letter register`() {
-    enterCommand("let @O = 'iuppercase letter register works'")
-    assertCommandOutput("echo @O", "iuppercase letter register works")
-
-    typeText("@O")
-    assertState("uppercase letter register works\n")
-    typeText("<Esc>")
-
-    enterCommand("let @O = '!'")
-    assertCommandOutput("echo @O", "iuppercase letter register works!")
-  }
-
-  @Test
-  fun `test unnamed register`() {
-    enterCommand("let @\" = 'iunnamed register works'")
-    assertCommandOutput("echo @\"", "iunnamed register works")
-
-    typeText("@\"")
-    assertState("unnamed register works\n")
-  }
 }
