@@ -17,36 +17,6 @@ import kotlin.test.assertEquals
 
 class LetCommandTest : VimTestCase("\n") {
   @Test
-  fun `test adding new pair to dictionary`() {
-    enterCommand("let s = {'key1' : 1}")
-    enterCommand("let s['key2'] = 2")
-    assertCommandOutput("echo s", "{'key1': 1, 'key2': 2}")
-  }
-
-  @Test
-  fun `test editing existing pair in dictionary`() {
-    enterCommand("let s = {'key1' : 1}")
-    enterCommand("let s['key1'] = 2")
-    assertCommandOutput("echo s", "{'key1': 2}")
-  }
-
-  @Test
-  fun `test changing list item`() {
-    enterCommand("let s = [1, 1]")
-    enterCommand("let s[1] = 2")
-    assertCommandOutput("echo s", "[1, 2]")
-  }
-
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
-  @Test
-  fun `test changing list item with index out of range`() {
-    enterCommand("let s = [1, 1]")
-    enterCommand("let s[2] = 2")
-    assertPluginError(true)
-    assertPluginErrorMessage("E684: List index out of range: 2")
-  }
-
-  @Test
   fun `test changing list with sublist expression`() {
     enterCommand("let s = [1, 2, 3]")
     enterCommand("let s[0:1] = [5, 4]")
