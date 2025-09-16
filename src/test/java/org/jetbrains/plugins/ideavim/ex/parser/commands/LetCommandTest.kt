@@ -25,8 +25,7 @@ class LetCommandTest {
     assertEquals(1, script.units.size)
     val command = script.units.first()
     assertTrue(command is LetCommand)
-    command as LetCommand
-    assertEquals(Register('+'), command.variable)
+    assertEquals(Register('+'), command.lvalue)
     assertEquals(AssignmentOperator.ASSIGNMENT, command.operator)
     assertEquals(SimpleExpression(5), command.expression)
   }
@@ -37,8 +36,7 @@ class LetCommandTest {
     assertEquals(1, script.units.size)
     val command = script.units.first()
     assertTrue(command is LetCommand)
-    command as LetCommand
-    assertEquals(Register('-'), command.variable)
+    assertEquals(Register('-'), command.lvalue)
     assertEquals(AssignmentOperator.SUBTRACTION, command.operator)
     assertEquals(SimpleExpression(42), command.expression)
   }
