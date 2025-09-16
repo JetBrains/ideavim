@@ -46,7 +46,7 @@ data class TernaryExpression(val condition: Expression, val then: Expression, va
  * See `:help truthy`
  */
 private fun isTruthy(value: VimDataType) = when (value) {
-  is VimInt -> value.value != 0
+  is VimInt -> value.booleanValue
   is VimFloat -> value.value != 0.0
   is VimString -> value.value.isNotEmpty() && value.value != "0"
   is VimList -> value.values.isNotEmpty()

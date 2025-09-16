@@ -27,7 +27,7 @@ data class WhileLoop(val condition: Expression, val body: List<Executable>) : Ex
     var result: ExecutionResult = ExecutionResult.Success
     body.forEach { it.vimContext = this }
 
-    while (condition.evaluate(editor, context, this).asBoolean()) {
+    while (condition.evaluate(editor, context, this).toVimNumber().booleanValue) {
       for (statement in body) {
         if (result is ExecutionResult.Success) {
           result = statement.execute(editor, context)

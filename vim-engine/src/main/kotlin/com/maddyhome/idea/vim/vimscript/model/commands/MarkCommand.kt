@@ -14,7 +14,6 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ranges.Range
-import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -40,7 +39,7 @@ data class MarkCommand(val range: Range, val modifier: CommandModifier, val argu
     val result = if (mark.isLetter() || mark in "'`") {
       injector.markService.setMark(editor.primaryCaret(), mark, offset)
     } else {
-      injector.messages.showStatusBarMessage(editor, injector.messages.message(Msg.E191))
+      injector.messages.showStatusBarMessage(editor, injector.messages.message("E191"))
       false
     }
     return if (result) ExecutionResult.Success else ExecutionResult.Error

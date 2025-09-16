@@ -154,7 +154,6 @@ open class InsertWordUnderCaretActionBase(private val isBigWord: Boolean, insert
     val editor = commandLine.editor
     val wordRange = injector.searchHelper.findWordAtOrFollowingCursor(editor, getStartOffset(editor), isBigWord)
     if (wordRange == null) {
-      // E348: No string under cursor
       injector.messages.showStatusBarMessage(editor, injector.messages.message("E348"))
       return null
     }

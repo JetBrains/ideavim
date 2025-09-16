@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
@@ -39,45 +39,44 @@ class CallCommand(val range: Range, val functionCall: Expression) :
     context: ExecutionContext,
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
-    if (functionCall is FunctionCallExpression) {
-      val function = injector.functionService.getFunctionHandlerOrNull(
-        functionCall.scope,
-        functionCall.functionName.evaluate(editor, context, vimContext).value,
-        vimContext,
-      )
-      if (function != null) {
-        if (function is DefinedFunctionHandler && function.function.flags.contains(FunctionFlag.DICT)) {
-          throw ExException(
-            "E725: Calling dict function without Dictionary: " +
-              (functionCall.scope?.toString() ?: "") + functionCall.functionName.evaluate(editor, context, vimContext),
-          )
+    when (functionCall) {
+      is FunctionCallExpression -> {
+        val scopePrefix = functionCall.scope?.toString() ?: ""
+        val name = functionCall.functionName.evaluate(editor, context, vimContext).value
+        val function = injector.functionService.getFunctionHandlerOrNull(functionCall.scope, name, vimContext)
+        if (function != null) {
+          if (function is DefinedFunctionHandler && function.function.flags.contains(FunctionFlag.DICT)) {
+            throw exExceptionMessage("E725", scopePrefix + name)
+          }
+          function.range = range
+          function.executeFunction(functionCall.arguments, editor, context, this)
+          return ExecutionResult.Success
         }
-        function.range = range
-        function.executeFunction(functionCall.arguments, editor, context, this)
+
+        val funcref = injector.variableService.getNullableVariableValue(
+          Variable(functionCall.scope, functionCall.functionName),
+          editor,
+          context,
+          vimContext
+        )
+        if (funcref is VimFuncref) {
+          funcref.handler.range = range
+          funcref.execute(scopePrefix + name, functionCall.arguments, editor, context, vimContext)
+          return ExecutionResult.Success
+        }
+
+        throw exExceptionMessage("E117", scopePrefix + name)
+      }
+
+      is FuncrefCallExpression -> {
+        functionCall.evaluateWithRange(range, editor, context, vimContext)
         return ExecutionResult.Success
       }
 
-      val name =
-        (functionCall.scope?.toString() ?: "") + functionCall.functionName.evaluate(editor, context, vimContext)
-      val funcref = injector.variableService.getNullableVariableValue(
-        Variable(functionCall.scope, functionCall.functionName),
-        editor,
-        context,
-        vimContext
-      )
-      if (funcref is VimFuncref) {
-        funcref.handler.range = range
-        funcref.execute(name, functionCall.arguments, editor, context, vimContext)
-        return ExecutionResult.Success
+      else -> {
+        // todo add more exceptions
+        throw exExceptionMessage("E129")
       }
-
-      throw ExException("E117: Unknown function: $name")
-    } else if (functionCall is FuncrefCallExpression) {
-      functionCall.evaluateWithRange(range, editor, context, vimContext)
-      return ExecutionResult.Success
-    } else {
-      // todo add more exceptions
-      throw ExException("E129: Function name required")
     }
   }
 }

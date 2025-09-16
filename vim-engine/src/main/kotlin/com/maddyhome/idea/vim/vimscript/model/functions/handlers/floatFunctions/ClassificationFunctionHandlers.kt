@@ -31,13 +31,13 @@ internal class IsInfFunctionHandler : FunctionHandler() {
     vimContext: VimLContext,
   ): VimDataType {
     val argument = argumentValues[0].evaluate(editor, context, vimContext)
-    if (argument !is VimInt && argument !is VimFloat) {
+    if (argument !is VimFloat) {
       return false.asVimInt()
     }
-    return when (argument.asDouble()) {
-      Double.POSITIVE_INFINITY -> VimInt.Companion.ONE
-      Double.NEGATIVE_INFINITY -> VimInt.Companion.MINUS_ONE
-      else -> VimInt.Companion.ZERO
+    return when (argument.toVimFloat().value) {
+      Double.POSITIVE_INFINITY -> VimInt.ONE
+      Double.NEGATIVE_INFINITY -> VimInt.MINUS_ONE
+      else -> VimInt.ZERO
     }
   }
 }
@@ -54,9 +54,9 @@ internal class IsNanFunctionHandler : FunctionHandler() {
     vimContext: VimLContext,
   ): VimDataType {
     val argument = argumentValues[0].evaluate(editor, context, vimContext)
-    if (argument !is VimInt && argument !is VimFloat) {
+    if (argument !is VimFloat) {
       return false.asVimInt()
     }
-    return argument.asDouble().isNaN().asVimInt()
+    return argument.toVimFloat().value.isNaN().asVimInt()
   }
 }

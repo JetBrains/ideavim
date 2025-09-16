@@ -67,7 +67,7 @@ class TabmoveTest : MockTestCase() {
     injector.vimscriptExecutor.execute("tabmove 7", editorStub, contextStub, skipHistory = false)
 
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument")
+    assertPluginErrorMessage("E474: Invalid argument")
     verify(tabService, never()).moveCurrentTabToIndex(any(), any())
   }
 
@@ -99,7 +99,7 @@ class TabmoveTest : MockTestCase() {
     injector.vimscriptExecutor.execute("tabmove +10", editorStub, contextStub, skipHistory = false)
 
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument")
+    assertPluginErrorMessage("E474: Invalid argument")
     verify(tabService, never()).moveCurrentTabToIndex(any(), any())
   }
 
@@ -111,7 +111,7 @@ class TabmoveTest : MockTestCase() {
     injector.vimscriptExecutor.execute("tabmove -10", editorStub, contextStub, skipHistory = false)
 
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument")
+    assertPluginErrorMessage("E474: Invalid argument")
     verify(tabService, never()).moveCurrentTabToIndex(any(), any())
   }
 
@@ -123,7 +123,7 @@ class TabmoveTest : MockTestCase() {
     injector.vimscriptExecutor.execute("tabmove +0", editorStub, contextStub, skipHistory = false)
 
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument")
+    assertPluginErrorMessage("E474: Invalid argument")
     verify(tabService, never()).moveCurrentTabToIndex(any(), any())
   }
 
@@ -135,7 +135,7 @@ class TabmoveTest : MockTestCase() {
     injector.vimscriptExecutor.execute("tabmove +0", editorStub, contextStub, skipHistory = false)
 
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument")
+    assertPluginErrorMessage("E474: Invalid argument")
     verify(tabService, never()).moveCurrentTabToIndex(any(), any())
   }
 

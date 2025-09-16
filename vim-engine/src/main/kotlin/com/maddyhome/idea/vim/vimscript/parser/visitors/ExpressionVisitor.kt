@@ -80,7 +80,7 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
   }
 
   override fun visitIntExpression(ctx: IntExpressionContext): Expression {
-    val result = SimpleExpression(VimInt(ctx.text))
+    val result = SimpleExpression(VimInt.parseNumber(ctx.text) ?: VimInt.ZERO)
     result.originalString = ctx.text
     return result
   }
@@ -117,40 +117,67 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
   }
 
   override fun visitBinExpression2(ctx: VimscriptParser.BinExpression2Context): Expression {
-    val left = visit(ctx.expr(0))
-    val right = visit(ctx.expr(1))
+    val leftExpression = visit(ctx.expr(0))
+    val rightExpression = visit(ctx.expr(1))
+    val rightText: String = ctx.expr(1).text
     val operatorString = ctx.binaryOperator2().text
+
     val result =
-      if (operatorString == "." && !containsSpaces(ctx) && evaluationResultCouldBeADictionary(left) && matchesLiteralDictionaryKey(
-          ctx.expr(1).text
-        )
-      ) {
-        val index = SimpleExpression(ctx.expr(1).text)
-        OneElementSublistExpression(index, left)
-      } else if (operatorString == "-" && left is OneElementSublistExpression && !containsSpaces(ctx) && matchesLiteralDictionaryKey(
-          ctx.expr(1).text,
-        )
-      ) {
-        val postfix = "-" + ctx.expr(1).text
-        val newIndex = SimpleExpression((left.index as SimpleExpression).data.asString() + postfix)
-        OneElementSublistExpression(newIndex, left.expression)
-      } else if (operatorString == "." && !containsSpaces(ctx) && evaluationResultCouldBeADictionary(left) && right is OneElementSublistExpression && matchesLiteralDictionaryKey(
-          right.expression.originalString
-        )
-      ) {
-        OneElementSublistExpression(
-          right.index,
-          OneElementSublistExpression(SimpleExpression(right.expression.originalString), left)
-        )
-      } else if (operatorString == "." && !containsSpaces(ctx) && right is FunctionCallExpression && evaluationResultCouldBeADictionary(
-          left
-        )
-      ) {
-        val index = right.functionName
-        FuncrefCallExpression(OneElementSublistExpression(index, left), right.arguments)
-      } else {
-        val operator = BinaryOperator.getByValue(operatorString) ?: throw RuntimeException()
-        BinExpression(left, right, operator)
+      when {
+        operatorString == "."
+          && !containsSpaces(ctx)
+          && evaluationResultCouldBeADictionary(leftExpression)
+          && matchesLiteralDictionaryKey(rightText) -> {
+
+          // Expr-entry: mydict.key
+          val index = SimpleExpression(rightText)
+          OneElementSublistExpression(index, leftExpression)
+        }
+
+        operatorString == "-"
+          && leftExpression is OneElementSublistExpression
+          && !containsSpaces(ctx)
+          && matchesLiteralDictionaryKey(rightText) -> {
+
+          // Parse dict.left-right as a key called `left-right`
+          // `dict.left` is first parsed as the left expression (sublist), and `right` is the right expression (simple)
+          // E.g. `let dict = {'first-key': 42, 'second-key' : {'third-key': 'oh, hi Mark'}} | echo dict.first-key`
+          // TODO: Vim does not handle this case. E716: Key not present in Dictionary: "first"
+          val postfix = "-$rightText"
+          val newIndex = SimpleExpression((leftExpression.index as SimpleExpression).data.toVimString().value + postfix)
+          OneElementSublistExpression(newIndex, leftExpression.expression)
+        }
+
+        operatorString == "."
+          && !containsSpaces(ctx)
+          && evaluationResultCouldBeADictionary(leftExpression)
+          && rightExpression is OneElementSublistExpression && matchesLiteralDictionaryKey(rightExpression.expression.originalString) -> {
+
+          // Accessing a value in a Dictionary that's an element of a Dictionary, accessed by name. Recursive
+          // leftExpression is a possible Dictionary: `mydict` or `{...}`
+          // rightExpression is an index
+          // leftExpression.rightExpression.rightIndex or leftExpression.rightExpression[leftIndex]
+          OneElementSublistExpression(
+            rightExpression.index,
+            OneElementSublistExpression(SimpleExpression(rightExpression.expression.originalString), leftExpression)
+          )
+        }
+
+        operatorString == "."
+          && !containsSpaces(ctx)
+          && rightExpression is FunctionCallExpression
+          && evaluationResultCouldBeADictionary(leftExpression) -> {
+
+          // Dictionary-function: mydict.len()
+          val index = rightExpression.functionName
+          FuncrefCallExpression(OneElementSublistExpression(index, leftExpression), rightExpression.arguments)
+        }
+
+        else -> {
+          // `.` as string concatenation, `-` as subtraction
+          val operator = BinaryOperator.getByValue(operatorString) ?: throw RuntimeException()
+          BinExpression(leftExpression, rightExpression, operator)
+        }
       }
     result.originalString = ctx.text
     return result

@@ -174,7 +174,7 @@ private object VimActionsPopup {
         false,
         ActionPlaces.POPUP,
       )
-    popup.setAdText(MessageHelper.message("popup.advertisement.version", VimPlugin.getVersion()), SwingConstants.CENTER)
+    popup.setAdText(MessageHelper.message("widget.vim.actions.popup.advertisement.version", VimPlugin.getVersion()), SwingConstants.CENTER)
 
     return popup
   }
@@ -201,7 +201,7 @@ private object VimActionsPopup {
         AllIcons.Actions.IntentionBulb,
       ),
     )
-    actionGroup.addSeparator(MessageHelper.message("action.eap.choice.active.text"))
+    actionGroup.addSeparator(MessageHelper.message("widget.vim.actions.popup.eap.choice.active.text"))
 
     actionGroup.add(JoinEap)
     actionGroup.add(
@@ -223,24 +223,24 @@ private object VimActionsPopup {
       ),
     )
 
-    actionGroup.addSeparator(MessageHelper.message("action.contacts.help.text"))
+    actionGroup.addSeparator(MessageHelper.message("widget.vim.actions.popup.contacts.help.text"))
     actionGroup.add(
       HelpLink(
-        MessageHelper.message("action.contact.on.twitter.text"),
+        MessageHelper.message("widget.vim.actions.popup.contact.on.twitter.text"),
         "https://twitter.com/ideavim",
         VimIcons.TWITTER,
       ),
     )
     actionGroup.add(
       HelpLink(
-        MessageHelper.message("action.create.issue.text"),
+        MessageHelper.message("widget.vim.actions.popup.create.issue.text"),
         "https://youtrack.jetbrains.com/newIssue?project=VIM&description=%0A%0A-----------%0AYou%20can%20improve%20the%20issue%20description%20by%20providing%3A%0A1)%20Your%20%60~%2F.ideavimrc%60%20configuration%20if%20you%20use%20it.%0A2)%20The%20%5Blog%5D(https%3A%2F%2Fintellij-support.jetbrains.com%2Fhc%2Fen-us%2Farticles%2F207241085-Locating-IDE-log-files)%20from%20your%20IDE.%0A%0AVersion:%20${VimPlugin.getVersion()}&c=Affected%20versions%20${VimPlugin.getVersion()}",
         VimIcons.YOUTRACK,
       ),
     )
     actionGroup.add(
       HelpLink(
-        MessageHelper.message("action.contribute.on.github.text"),
+        MessageHelper.message("widget.vim.actions.popup.contribute.on.github.text"),
         "https://github.com/JetBrains/ideavim",
         AllIcons.Vcs.Vendors.Github,
       ),
@@ -277,7 +277,7 @@ private class HelpLink(
 }
 
 private object ShortcutConflictsSettings :
-  DumbAwareAction(MessageHelper.message("action.settings.text"))/*, LightEditCompatible*/ {
+  DumbAwareAction(MessageHelper.message("widget.vim.actions.popup.settings.text"))/*, LightEditCompatible*/ {
   override fun actionPerformed(e: AnActionEvent) {
     ShowSettingsUtil.getInstance().showSettingsDialog(e.project, VimEmulationConfigurable::class.java)
   }
@@ -301,9 +301,9 @@ internal object JoinEap : DumbAwareAction()/*, LightEditCompatible*/ {
   override fun update(e: AnActionEvent) {
     if (eapActive()) {
       e.presentation.icon = LafIconLookup.getIcon("checkmark")
-      e.presentation.text = MessageHelper.message("action.finish.eap.text")
+      e.presentation.text = MessageHelper.message("widget.vim.actions.popup.finish.eap.text")
     } else {
-      e.presentation.text = MessageHelper.message("action.subscribe.to.eap.text")
+      e.presentation.text = MessageHelper.message("widget.vim.actions.popup.subscribe.to.eap.text")
     }
   }
 

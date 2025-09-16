@@ -69,21 +69,21 @@ class HistoryCommandTest : VimTestCase() {
     enterCommand("history")
     assertNoExOutput()
     assertPluginError(false)
-    assertPluginErrorMessageContains("'history' option is zero")
+    assertPluginErrorMessage("'history' option is zero")
   }
 
   @Test
   fun `test history with bang reports error`() {
     enterCommand("history!")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E477: No ! allowed")
+    assertPluginErrorMessage("E477: No ! allowed")
   }
 
   @Test
   fun `test history with unknown symbol raises error`() {
     enterCommand("history !")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E488: Trailing characters: !")
+    assertPluginErrorMessage("E488: Trailing characters: !")
   }
 
   @VimBehaviorDiffers(description = "Vim does not eat the 'a' for the 'all' command")
@@ -91,7 +91,7 @@ class HistoryCommandTest : VimTestCase() {
   fun `test history with unknown name reports error`() {
     enterCommand("history asdf")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E488: Trailing characters: sdf")
+    assertPluginErrorMessage("E488: Trailing characters: sdf")
   }
 
   @Test
@@ -392,14 +392,14 @@ class HistoryCommandTest : VimTestCase() {
   fun `test history cmd with one number and trailing characters reports error`() {
     enterCommand("history cmd 3, foo")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E488: Trailing characters: , foo")
+    assertPluginErrorMessage("E488: Trailing characters: , foo")
   }
 
   @Test
   fun `test history cmd with two numbers and trailing characters reports error`() {
     enterCommand("history cmd 3, 6, foo")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E488: Trailing characters: , foo")
+    assertPluginErrorMessage("E488: Trailing characters: , foo")
   }
 
   @VimBehaviorDiffers(description = "Vim reports 'cmdfoo' as the trailing characters")
@@ -407,14 +407,14 @@ class HistoryCommandTest : VimTestCase() {
   fun `test history cmd with trailing characters reports error`() {
     enterCommand("history cmdfoo")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E488: Trailing characters: foo")
+    assertPluginErrorMessage("E488: Trailing characters: foo")
   }
 
   @Test
   fun `test history cmd with trailing characters reports error 2`() {
     enterCommand("history cmd foo")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E488: Trailing characters: foo")
+    assertPluginErrorMessage("E488: Trailing characters: foo")
   }
 
   @Test

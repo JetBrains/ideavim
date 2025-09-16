@@ -210,7 +210,7 @@ internal class VimMultipleCursorsExtension : VimExtension {
         if (nextOffset != -1) {
           caretModel.allCarets.forEach {
             if (it.selectionStart == nextOffset) {
-              VimPlugin.showMessage(MessageHelper.message("message.no.more.matches"))
+              VimPlugin.showMessage(MessageHelper.message("multiple-cursors.message.no.more.matches"))
               return
             }
           }
@@ -219,7 +219,7 @@ internal class VimMultipleCursorsExtension : VimExtension {
           editor.updateCaretsVisualAttributes()
           editor.vimMultipleCursorsLastSelection = selectText(caret, pattern, nextOffset)
         } else {
-          VimPlugin.showMessage(MessageHelper.message("message.no.more.matches"))
+          VimPlugin.showMessage(MessageHelper.message("multiple-cursors.message.no.more.matches"))
         }
       }
     }
@@ -269,7 +269,7 @@ internal class VimMultipleCursorsExtension : VimExtension {
       if (nextOffset != -1) {
         editor.caretModel.allCarets.forEach {
           if (it.selectionStart == nextOffset) {
-            VimPlugin.showMessage(MessageHelper.message("message.no.more.matches"))
+            VimPlugin.showMessage(MessageHelper.message("multiple-cursors.message.no.more.matches"))
             return
           }
         }

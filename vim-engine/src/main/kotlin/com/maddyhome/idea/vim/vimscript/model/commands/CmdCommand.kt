@@ -100,7 +100,7 @@ data class CmdCommand(val range: Range, val modifier: CommandModifier, val argum
       // in the actual alias being created, and we don't want to parse that one.
       val trimmedInput = argument.takeWhile { it != ' ' }
       val pattern = Regex("(?>-nargs=((|[-])\\d+|[?]|[+]|[*]))").find(trimmedInput) ?: run {
-        injector.messages.showStatusBarMessage(editor, injector.messages.message("e176.invalid.number.of.arguments"))
+        injector.messages.showStatusBarMessage(editor, injector.messages.message("E176"))
         return false
       }
       val nargForTrim = pattern.groupValues[0]
@@ -127,7 +127,7 @@ data class CmdCommand(val range: Range, val modifier: CommandModifier, val argum
             // that regex would accept that is not valid.
             injector.messages.showStatusBarMessage(
               editor,
-              injector.messages.message("e176.invalid.number.of.arguments")
+              injector.messages.message("E176")
             )
             return false
           }
@@ -136,7 +136,7 @@ data class CmdCommand(val range: Range, val modifier: CommandModifier, val argum
         // Not sure why this isn't documented, but if you try to create a command in vim
         // with an explicit number of arguments greater than 1 it returns this error.
         if (argNum > 1 || argNum < 0) {
-          injector.messages.showStatusBarMessage(editor, injector.messages.message("e176.invalid.number.of.arguments"))
+          injector.messages.showStatusBarMessage(editor, injector.messages.message("E176"))
           return false
         }
         minNumberOfArgs = argNum
@@ -160,7 +160,7 @@ data class CmdCommand(val range: Range, val modifier: CommandModifier, val argum
     if (!alias[0].isUpperCase()) {
       injector.messages.showStatusBarMessage(
         editor,
-        injector.messages.message("e183.user.defined.commands.must.start.with.an.uppercase.letter")
+        injector.messages.message("E183")
       )
       return false
     }
@@ -168,7 +168,7 @@ data class CmdCommand(val range: Range, val modifier: CommandModifier, val argum
     if (alias in BLACKLISTED_ALIASES) {
       injector.messages.showStatusBarMessage(
         editor,
-        injector.messages.message("e841.reserved.name.cannot.be.used.for.user.defined.command")
+        injector.messages.message("E841")
       )
       return false
     }
@@ -182,7 +182,7 @@ data class CmdCommand(val range: Range, val modifier: CommandModifier, val argum
     if (!overrideAlias && injector.commandGroup.hasAlias(alias)) {
       injector.messages.showStatusBarMessage(
         editor,
-        injector.messages.message("e174.command.already.exists.add.to.replace.it")
+        injector.messages.message("E174")
       )
       return false
     }

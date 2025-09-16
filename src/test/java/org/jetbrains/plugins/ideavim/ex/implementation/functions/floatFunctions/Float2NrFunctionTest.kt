@@ -42,27 +42,27 @@ class Float2NrFunctionTest : VimTestCase() {
   fun `test float2nr with string causes errors`() {
     enterCommand("echo float2nr('1.0')")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test float2nr with invalid string causes errors`() {
     enterCommand("echo float2nr('cheese')")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test float2nr with list causes errors`() {
     enterCommand("echo float2nr([1.0])")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test float2nr with dictionary causes errors`() {
     enterCommand("echo float2nr({1: 1.0})")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 }

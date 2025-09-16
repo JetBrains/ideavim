@@ -38,12 +38,8 @@ data class ActionCommand(val range: Range, val modifier: CommandModifier, val ar
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
     val actionName = argument.trim()
-    val action = injector.actionExecutor.getAction(actionName) ?: throw ExException(
-      injector.messages.message(
-        "action.not.found.0",
-        actionName
-      )
-    )
+    val action = injector.actionExecutor.getAction(actionName)
+      ?: throw ExException(injector.messages.message("command.action.not.found", actionName))
     if (injector.application.isUnitTest()) {
       executeAction(editor, action, context)
     } else {

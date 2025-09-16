@@ -24,7 +24,6 @@ import com.maddyhome.idea.vim.api.ExecutionContext;
 import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.api.VimOutputPanel;
 import com.maddyhome.idea.vim.diagnostic.VimLogger;
-import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.helper.UserDataManager;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
@@ -86,7 +85,7 @@ public class ExOutputPanel extends JBPanel<ExOutputPanel> {
     };
 
     // Setup some listeners to handle keystrokes
-    MoreKeyListener moreKeyListener = new MoreKeyListener(this);
+    MoreKeyListener moreKeyListener = new MoreKeyListener();
     addKeyListener(moreKeyListener);
     myText.addKeyListener(moreKeyListener);
 
@@ -247,7 +246,7 @@ public class ExOutputPanel extends JBPanel<ExOutputPanel> {
   }
 
   public void onBadKey() {
-    myLabel.setText(MessageHelper.message("more.ret.line.space.page.d.half.page.q.quit"));
+    myLabel.setText(injector.getMessages().message("message.ex.output.more.prompt.full"));
     myLabel.setFont(UiHelper.selectEditorFont(myEditor, myLabel.getText()));
   }
 
@@ -257,10 +256,10 @@ public class ExOutputPanel extends JBPanel<ExOutputPanel> {
     myScrollPane.getHorizontalScrollBar().setValue(0);
     if (val + more >=
         myScrollPane.getVerticalScrollBar().getMaximum() - myScrollPane.getVerticalScrollBar().getVisibleAmount()) {
-      myLabel.setText(MessageHelper.message("hit.enter.or.type.command.to.continue"));
+      myLabel.setText(injector.getMessages().message("message.ex.output.end.prompt"));
     }
     else {
-      myLabel.setText(MessageHelper.message("ex.output.panel.more"));
+      myLabel.setText(injector.getMessages().message("message.ex.output.more.prompt"));
     }
     myLabel.setFont(UiHelper.selectEditorFont(myEditor, myLabel.getText()));
   }
@@ -333,12 +332,6 @@ public class ExOutputPanel extends JBPanel<ExOutputPanel> {
   }
 
   private static class MoreKeyListener extends KeyAdapter {
-    private final ExOutputPanel myExOutputPanel;
-
-    public MoreKeyListener(ExOutputPanel panel) {
-      this.myExOutputPanel = panel;
-    }
-
     /**
      * Invoked when a key has been pressed.
      */

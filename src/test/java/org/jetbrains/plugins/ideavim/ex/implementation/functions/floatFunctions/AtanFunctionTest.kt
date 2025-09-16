@@ -35,27 +35,27 @@ class AtanFunctionTest : VimTestCase() {
   fun `test atan with string causes errors`() {
     enterCommand("echo atan('1.0')")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test atan with invalid string causes errors`() {
     enterCommand("echo atan('cheese')")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test atan with list causes errors`() {
     enterCommand("echo atan([1.0])")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test atan with dictionary causes errors`() {
     enterCommand("echo atan({1: 1.0})")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 }

@@ -52,7 +52,7 @@ class SetlocalCommandTest : VimTestCase() {
   fun `test set unknown option`() {
     enterCommand("setlocal unknownOption")
     assertPluginError(true)
-    assertPluginErrorMessageContains("Unknown option: unknownOption")
+    assertPluginErrorMessage("E518: Unknown option: unknownOption")
   }
 
   @Test
@@ -74,35 +74,35 @@ class SetlocalCommandTest : VimTestCase() {
   fun `test exceptions from incorrectly setting toggle option`() {
     enterCommand("setlocal number=test")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: number=test")
+    assertPluginErrorMessage("E474: Invalid argument: number=test")
 
     enterCommand("setlocal number=0")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: number=0")
+    assertPluginErrorMessage("E474: Invalid argument: number=0")
 
     enterCommand("setlocal number+=10")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: number+=10")
+    assertPluginErrorMessage("E474: Invalid argument: number+=10")
 
     enterCommand("setlocal number+=test")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: number+=test")
+    assertPluginErrorMessage("E474: Invalid argument: number+=test")
 
     enterCommand("setlocal number^=10")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: number^=10")
+    assertPluginErrorMessage("E474: Invalid argument: number^=10")
 
     enterCommand("setlocal number^=test")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: number^=test")
+    assertPluginErrorMessage("E474: Invalid argument: number^=test")
 
     enterCommand("setlocal number-=10")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: number-=10")
+    assertPluginErrorMessage("E474: Invalid argument: number-=10")
 
     enterCommand("setlocal number-=test")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: number-=test")
+    assertPluginErrorMessage("E474: Invalid argument: number-=test")
   }
 
   @Test
@@ -216,19 +216,19 @@ class SetlocalCommandTest : VimTestCase() {
   fun `test exceptions from incorrectly setting number option`() {
     enterCommand("setlocal scroll=test")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E521: Number required after =: scroll=test")
+    assertPluginErrorMessage("E521: Number required after =: scroll=test")
 
     enterCommand("setlocal scroll+=test")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E521: Number required after =: scroll+=test")
+    assertPluginErrorMessage("E521: Number required after =: scroll+=test")
 
     enterCommand("setlocal scroll-=test")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E521: Number required after =: scroll-=test")
+    assertPluginErrorMessage("E521: Number required after =: scroll-=test")
 
     enterCommand("setlocal scroll^=test")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E521: Number required after =: scroll^=test")
+    assertPluginErrorMessage("E521: Number required after =: scroll^=test")
   }
 
   @Test
@@ -342,19 +342,19 @@ class SetlocalCommandTest : VimTestCase() {
   fun `test exceptions from incorrectly setting string option`() {
     enterCommand("setlocal nrformats=unknown")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: nrformats=unknown")
+    assertPluginErrorMessage("E474: Invalid argument: nrformats=unknown")
 
     enterCommand("setlocal nrformats+=10")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: nrformats+=10")
+    assertPluginErrorMessage("E474: Invalid argument: nrformats+=10")
 
     enterCommand("setlocal nrformats-=10")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: nrformats-=10")
+    assertPluginErrorMessage("E474: Invalid argument: nrformats-=10")
 
     enterCommand("setlocal nrformats^=10")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E474: Invalid argument: nrformats^=10")
+    assertPluginErrorMessage("E474: Invalid argument: nrformats^=10")
   }
 
   @Test

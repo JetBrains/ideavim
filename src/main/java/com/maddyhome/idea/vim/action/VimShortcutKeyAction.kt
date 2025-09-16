@@ -261,7 +261,7 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
       return keyStroke !in parsedLookupKeys
     }
 
-    private fun parseLookupKeys(value: VimString) = IjOptions.lookupkeys.split(value.asString())
+    private fun parseLookupKeys(keys: VimString) = IjOptions.lookupkeys.split(keys.value)
       .map { injector.parser.parseKeys(it) }
       .filter { it.isNotEmpty() }
       .map { it.first() }

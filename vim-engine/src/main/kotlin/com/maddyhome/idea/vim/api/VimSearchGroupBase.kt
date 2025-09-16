@@ -12,8 +12,8 @@ import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.LineRange
-import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.helper.SearchOptions
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.exitVisualMode
@@ -204,12 +204,12 @@ abstract class VimSearchGroupBase : VimSearchGroup {
       val errorMessage = when (which) {
         /*RE_SEARCH*/ 0 -> {
           pattern = lastSearchPattern
-          injector.messages.message(Msg.e_nopresub)
+          injector.messages.message("E33")
         }
 
         /*RE_SUBST*/ 1 -> {
           pattern = lastSubstitutePattern
-          injector.messages.message("e_noprevre")
+          injector.messages.message("E35")
         }
 
         else -> null
@@ -228,7 +228,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
       /*RE_SEARCH*/ 0 -> PatternType.SEARCH
       /*RE_SUBST*/ 1 -> PatternType.SUBSTITUTE
       /*RE_BOTH*/ 2 -> PatternType.BOTH
-      else -> throw ExException(injector.messages.message(Msg.e_invcmd))
+      else -> error("Unexpected patternSave value: $patternSave")
     }
     setLastUsedPattern(pattern, patSave, isNewPattern)
 
@@ -256,7 +256,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     } else if (cmd.charAt() == '\\') {
       cmd.inc()
       if ("/?&".indexOf(cmd.charAt()) == -1) {
-        messages.showStatusBarMessage(null, messages.message(Msg.e_backslash))
+        messages.showStatusBarMessage(null, messages.message("E10"))
         return null
       }
       whichPat = if (cmd.charAt() == '&') 1 /* RE_SUBST */ else 0 /* RE_SEARCH */
@@ -653,7 +653,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
       caret.moveToOffset(matchRange.startOffset)
       val highlight = addSubstitutionConfirmationHighlight(editor, matchRange.startOffset, matchRange.endOffset)
       injector.modalInput.create(
-        editor, context, injector.messages.message("replace.with.0", lineToNextSubstitute.second.second),
+        editor, context, injector.messages.message("command.substitute.replace.with.prompt", lineToNextSubstitute.second.second),
         SubstituteWithAskInputInterceptor(
           editor, caret, nextSubstitute, highlight, line, 0, parent, pattern, regex,
           oldLastSubstituteString, line2, hasExpression, substituteString, options,
@@ -863,7 +863,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     // todo throw multiple exceptions at once
     if (exceptions.isNotEmpty()) {
       injector.messages.indicateError()
-      injector.messages.showStatusBarMessage(null, exceptions[0].toString())
+      injector.messages.showStatusBarMessage(null, exceptions[0].message)
     }
   }
 
@@ -1027,7 +1027,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
   ): String {
     val expression = injector.vimscriptParser.parseExpression(exprString)
     return if (expression == null) {
-      exceptions.add(ExException("E15: Invalid expression: $exprString"))
+      exceptions.add(exExceptionMessage("E15", exprString))
       ""
     } else {
       try {
@@ -1176,7 +1176,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
         trailingOptionsEndIndex++
       }
       if (count <= 0 && doError) {
-        injector.messages.showStatusBarMessage(null, "Zero count")
+        injector.messages.showStatusBarMessage(null, injector.messages.message("command.substitute.zero.count"))
         return null
       }
       line1 = line2
@@ -1186,14 +1186,14 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     // check for trailing command or garbage
     if (trailingOptionsEndIndex < exarg.length && exarg[trailingOptionsEndIndex] != '"') {
       // if not end-of-line or comment
-      injector.messages.showStatusBarMessage(null, "Trailing characters")
+      injector.messages.showStatusBarMessage(null, injector.messages.message("command.substitute.trailing.characters"))
       return null
     }
 
     // check for trailing command or garbage
     if (trailingOptionsEndIndex < exarg.length && exarg[trailingOptionsEndIndex] != '"') {
       // if not end-of-line or comment
-      injector.messages.showStatusBarMessage(null, "Trailing characters")
+      injector.messages.showStatusBarMessage(null, injector.messages.message("command.substitute.trailing.characters"))
       return null
     }
 

@@ -32,14 +32,25 @@ internal sealed class HintGenerator {
       require(alphabet.size > 1) { "Alphabet must contain at least two characters" }
     }
 
-    override fun generate(targets: List<HintTarget>) {
-      val length = generateSequence(1) { it * alphabet.size }.takeWhile { it < targets.size + previousHints.size }.count()
+    override fun generate(targets: List<HintTarget>) = generate(targets, true)
+
+    /**
+     * @param preserve Whether to preserve the previous hints if possible
+     */
+    private fun generate(targets: List<HintTarget>, preserve: Boolean) {
+      val length = generateSequence(1) { it * alphabet.size }.takeWhile {
+        it < targets.size + if (preserve) previousHints.size else 0
+      }.count()
       val hintIterator = alphabet.permutations(length).map { it.joinToString("") }.iterator()
       targets.forEach { target ->
-        target.hint = previousHints[target.component] ?: hintIterator.firstOrNull {
-          // Check if the hint is not already used by previous targets
-          !previousHints.values.any { hint -> hint.startsWith(it) || it.startsWith(hint) }
-        }!!
+        target.hint = if (preserve) {
+          previousHints[target.component] ?: hintIterator.firstOrNull {
+            // Check if the hint is not already used by previous targets
+            !previousHints.values.any { hint -> hint.startsWith(it) || it.startsWith(hint) }
+          } ?: return generate(targets, false) // do not preserve previous hints if failed
+        } else {
+          hintIterator.next()
+        }
       }
     }
   }
@@ -58,20 +69,25 @@ private fun collectTargets(
   location: Point,
   depth: Int = 0,
 ): Unit = with(component.accessibleContext) {
-  if (accessibleComponent != null && accessibleComponent.isShowing) {
-    val location = location + accessibleComponent.location
-    if (component.isClickable() || component is Tree) {
+  val accessible = accessibleComponent ?: return
+  val location = location + (accessible.location ?: return)
+
+  accessible.size?.let { size ->
+    if (accessible.isShowing && (component.isClickable() || component is Tree)) {
       targets[component].let {
         // For some reason, the same component may appear multiple times in the accessible tree.
         if (it == null || it.depth > depth) {
-          targets[component] = HintTarget(component, location, depth)
+          targets[component] = HintTarget(component, location, size, depth)
         }
       }
     }
-    // recursively collect children
-    for (i in 0..<accessibleChildrenCount) {
-      collectTargets(targets, getAccessibleChild(i), location, depth + 1)
-    }
+  }
+
+  // Skip the children of the Tree, otherwise it will easily lead to performance problems
+  if (component is Tree) return
+  // recursively collect children
+  for (i in 0..<accessibleChildrenCount) {
+    collectTargets(targets, getAccessibleChild(i), location, depth + 1)
   }
 }
 
@@ -90,7 +106,7 @@ private fun <T> Collection<T>.permutations(length: Int): Sequence<List<T>> = seq
     return@sequence
   }
   for (element in this@permutations) {
-    (this@permutations - element).permutations(length - 1).forEach { subPermutation ->
+    this@permutations.permutations(length - 1).forEach { subPermutation ->
       yield(listOf(element) + subPermutation)
     }
   }

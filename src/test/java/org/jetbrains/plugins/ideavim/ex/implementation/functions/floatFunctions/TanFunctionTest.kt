@@ -36,27 +36,27 @@ class TanFunctionTest : VimTestCase() {
   fun `test tan with string causes errors`() {
     enterCommand("echo tan('1.0')")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test tan with invalid string causes errors`() {
     enterCommand("echo tan('cheese')")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test tan with list causes errors`() {
     enterCommand("echo tan([1.0])")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test tan with dictionary causes errors`() {
     enterCommand("echo tan({1: 1.0})")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 }

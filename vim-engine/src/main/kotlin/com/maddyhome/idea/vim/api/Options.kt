@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.api
 
-import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.indexOfOrNull
@@ -241,7 +240,7 @@ object Options {
       override fun checkIfValueValid(value: VimDataType, token: String) {
         super.checkIfValueValid(value, token)
         if (KeywordOptionHelper.isValueInvalid((value as VimString).value)) {
-          throw exExceptionMessage("E474", token)
+          throw exExceptionMessage("E474.arg", token)
         }
       }
 
@@ -259,7 +258,7 @@ object Options {
         super.checkIfValueValid(value, token)
         for (v in split((value as VimString).value)) {
           if (!v.matches(Regex(".:."))) {
-            throw exExceptionMessage("E474", token)
+            throw exExceptionMessage("E474.arg", token)
           }
         }
       }
@@ -279,6 +278,9 @@ object Options {
       // * E81: Using <SID> not in a script context
       // * E475: Invalid argument: s:MyFunc
       // * E474: Invalid argument: opfunc=funcref('s:MyFunc')
+      // TODO: Vim evaluates (and therefore validates) function(), funcref() + lambda values when set
+      // If doesn't evaluate simple names, so it doesn't handle arbitrary expressions.
+      // However, we don't have the context to evaluate, and can't easily pass it in.
       return super.parseValue(value, token)
     }
   })
@@ -287,7 +289,7 @@ object Options {
     override fun checkIfValueValid(value: VimDataType, token: String) {
       super.checkIfValueValid(value, token)
       if ((value as VimInt).value < -100) {
-        throw ExException("E49: Invalid scroll size: $token")
+        throw exExceptionMessage("E49", token)
       }
     }
   })
@@ -296,7 +298,7 @@ object Options {
     override val defaultValue: VimString
       get() {
         // Default value depends on the `'shell'` option. Since it's a global option, we can pass null as the editor
-        val shell = injector.optionGroup.getOptionValue(shell, OptionAccessScope.GLOBAL(null)).asString()
+        val shell = injector.optionGroup.getOptionValue(shell, OptionAccessScope.GLOBAL(null)).value
         return VimString(
           when {
             injector.systemInfoService.isWindows && shell.contains("powershell") -> "-Command"
@@ -311,7 +313,7 @@ object Options {
     override val defaultValue: VimString
       get() {
         // Default value depends on the `'shell'` option. Since it's a global option, we can pass null as the editor
-        val shell = injector.optionGroup.getOptionValue(shell, OptionAccessScope.GLOBAL(null)).asString()
+        val shell = injector.optionGroup.getOptionValue(shell, OptionAccessScope.GLOBAL(null)).value
         return VimString(
           when {
             injector.systemInfoService.isWindows && shell == "cmd.exe" -> "("

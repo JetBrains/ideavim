@@ -10,37 +10,41 @@ package com.maddyhome.idea.vim.vimscript.model.expressions
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
+// expression[index]
+// expression.index (entry in a dictionary)
 data class OneElementSublistExpression(val index: Expression, val expression: Expression) : Expression() {
 
   override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
     val expressionValue = expression.evaluate(editor, context, vimContext)
-    if (expressionValue is VimDictionary) {
-      return expressionValue.dictionary[VimString(index.evaluate(editor, context, vimContext).asString())]
-        ?: throw ExException(
-          "E716: Key not present in Dictionary: \"${
-            index.evaluate(editor, context, vimContext).asString()
-          }\"",
-        )
-    } else {
-      val indexValue = Integer.parseInt(index.evaluate(editor, context, vimContext).asString())
-      if (expressionValue is VimList && (indexValue >= expressionValue.values.size || indexValue < 0)) {
-        throw ExException("E684: list index out of range: $indexValue")
+    when (expressionValue) {
+      is VimDictionary -> {
+        val key = index.evaluate(editor, context, vimContext).toVimString()
+        return expressionValue.dictionary[key]
+          ?: throw exExceptionMessage("E716", key.toOutputString())
       }
-      if (indexValue < 0) {
-        return VimString("")
+
+      else -> {
+        val indexValue = index.evaluate(editor, context, vimContext).toVimNumber().value
+        // TODO: Support negative index to retrieve item from end
+        if (expressionValue is VimList && (indexValue >= expressionValue.values.size || indexValue < 0)) {
+          throw exExceptionMessage("E684", indexValue)
+        }
+        if (indexValue < 0) {
+          return VimString.EMPTY
+        }
+        return SublistExpression(
+          SimpleExpression(indexValue),
+          SimpleExpression(indexValue),
+          SimpleExpression(expressionValue)
+        ).evaluate(editor, context, vimContext)
       }
-      return SublistExpression(
-        SimpleExpression(indexValue),
-        SimpleExpression(indexValue),
-        SimpleExpression(expressionValue)
-      ).evaluate(editor, context, vimContext)
     }
   }
 }

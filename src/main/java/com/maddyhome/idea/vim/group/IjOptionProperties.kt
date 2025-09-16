@@ -33,6 +33,7 @@ open class GlobalIjOptions(scope: OptionAccessScope) : OptionsPropertiesBase(sco
   var closenotebooks: Boolean by optionProperty(IjOptions.closenotebooks)
   var oldundo: Boolean by optionProperty(IjOptions.oldundo)
   var unifyjumps: Boolean by optionProperty(IjOptions.unifyjumps)
+  var vimHints: Boolean by optionProperty(IjOptions.vimHints)
 }
 
 /**

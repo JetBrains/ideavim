@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.vimscript.model.functions
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
@@ -45,10 +45,10 @@ abstract class FunctionHandler {
 
   private fun checkFunctionCall(arguments: List<Expression>) {
     if (minimumNumberOfArguments != null && arguments.size < minimumNumberOfArguments!!) {
-      throw ExException("E119: Not enough arguments for function: $name")
+      throw exExceptionMessage("E119", name)
     }
     if (maximumNumberOfArguments != null && arguments.size > maximumNumberOfArguments!!) {
-      throw ExException("E118: Too many arguments for function: $name")
+      throw exExceptionMessage("E118", name)
     }
   }
 }

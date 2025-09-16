@@ -14,7 +14,6 @@ import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 
 data class DictionaryExpression(val dictionary: LinkedHashMap<Expression, Expression>) : Expression() {
@@ -28,7 +27,7 @@ data class DictionaryExpression(val dictionary: LinkedHashMap<Expression, Expres
         newFuncref = evaluatedVal.copy()
         newFuncref.dictionary = dict
       }
-      dict.dictionary[VimString(key.evaluate(editor, context, vimContext).asString())] = newFuncref
+      dict.dictionary[key.evaluate(editor, context, vimContext).toVimString()] = newFuncref
     }
     return dict
   }

@@ -35,27 +35,27 @@ class SinhFunctionTest : VimTestCase() {
   fun `test sinh with string causes errors`() {
     enterCommand("echo sinh('1.0')")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test sinh with invalid string causes errors`() {
     enterCommand("echo sinh('cheese')")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test sinh with list causes errors`() {
     enterCommand("echo sinh([1.0])")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test sinh with dictionary causes errors`() {
     enterCommand("echo sinh({1: 1.0})")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 }
