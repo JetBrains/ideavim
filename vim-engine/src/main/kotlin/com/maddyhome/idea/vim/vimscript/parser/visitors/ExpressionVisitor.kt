@@ -45,7 +45,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.LambdaFunctionCallExpr
 import com.maddyhome.idea.vim.vimscript.model.expressions.ListExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.OneElementSublistExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.OptionExpression
-import com.maddyhome.idea.vim.vimscript.model.expressions.Register
+import com.maddyhome.idea.vim.vimscript.model.expressions.RegisterExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.ScopeExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
@@ -372,7 +372,8 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
   }
 
   override fun visitRegisterExpression(ctx: RegisterExpressionContext): Expression {
-    val result = Register(ctx.text.replaceFirst("@", "")[0])
+    // The grammar ensures that we have two characters, `@{register}` so this is safe
+    val result = RegisterExpression(ctx.text[1])
     result.originalString = ctx.text
     return result
   }

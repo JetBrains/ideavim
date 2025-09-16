@@ -9,7 +9,7 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.expressions
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.vimscript.model.expressions.Register
+import com.maddyhome.idea.vim.vimscript.model.expressions.RegisterExpression
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.ex.evaluate
 import org.junit.jupiter.api.Test
@@ -20,6 +20,6 @@ class ExpressionTest : VimTestCase() {
   fun `test multiline register content`() {
     configureByText("${c}Oh\nHi\nMark\n")
     typeText(injector.parser.parseKeys("VGy"))
-    kotlin.test.assertEquals("Oh\nHi\nMark\n", Register('"').evaluate().toOutputString())
+    kotlin.test.assertEquals("Oh\nHi\nMark\n", RegisterExpression('"').evaluate().toOutputString())
   }
 }
