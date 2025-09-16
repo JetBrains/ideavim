@@ -33,7 +33,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.EnvVariableExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.LValueExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.OneElementSublistExpression
-import com.maddyhome.idea.vim.vimscript.model.expressions.Register
+import com.maddyhome.idea.vim.vimscript.model.expressions.RegisterExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.SublistExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
@@ -201,7 +201,7 @@ data class LetCommand(
 
       is EnvVariableExpression -> TODO()
 
-      is Register -> {
+      is RegisterExpression -> {
         if (RegisterConstants.WRITABLE_REGISTERS.contains(lvalue.char)) {
           val result = injector.registerGroup.storeText(
             editor,

@@ -10,7 +10,7 @@ package org.jetbrains.plugins.ideavim.ex.parser.commands
 
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.vimscript.model.commands.LetCommand
-import com.maddyhome.idea.vim.vimscript.model.expressions.Register
+import com.maddyhome.idea.vim.vimscript.model.expressions.RegisterExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.AssignmentOperator
 import org.junit.jupiter.api.Test
@@ -25,7 +25,7 @@ class LetCommandTest {
     assertEquals(1, script.units.size)
     val command = script.units.first()
     assertTrue(command is LetCommand)
-    assertEquals(Register('+'), command.lvalue)
+    assertEquals(RegisterExpression('+'), command.lvalue)
     assertEquals(AssignmentOperator.ASSIGNMENT, command.operator)
     assertEquals(SimpleExpression(5), command.expression)
   }
@@ -36,7 +36,7 @@ class LetCommandTest {
     assertEquals(1, script.units.size)
     val command = script.units.first()
     assertTrue(command is LetCommand)
-    assertEquals(Register('-'), command.lvalue)
+    assertEquals(RegisterExpression('-'), command.lvalue)
     assertEquals(AssignmentOperator.SUBTRACTION, command.operator)
     assertEquals(SimpleExpression(42), command.expression)
   }
