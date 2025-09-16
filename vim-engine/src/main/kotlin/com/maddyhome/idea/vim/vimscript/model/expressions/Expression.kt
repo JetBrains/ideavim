@@ -23,5 +23,14 @@ abstract class Expression {
  * An expression that can act as an lvalue, and be assigned a new value
  */
 abstract class LValueExpression : Expression() {
+  /**
+   * Returns true if this expression is strongly typed
+   *
+   * Register expressions are strongly typed, as registers are always strings. Options are strongly typed too, either
+   * String or Number. Variables, indexed expressions and sublists are not strongly typed, as any value can be assigned
+   * to them.
+   */
+  abstract fun isStronglyTyped(): Boolean
+
   abstract fun assign(value: VimDataType, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext)
 }
