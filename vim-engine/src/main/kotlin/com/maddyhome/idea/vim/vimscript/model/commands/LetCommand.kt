@@ -17,7 +17,6 @@ import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.Range
-import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.register.RegisterConstants
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.Script
@@ -32,8 +31,8 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.EnvVariableExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
+import com.maddyhome.idea.vim.vimscript.model.expressions.LValueExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.OneElementSublistExpression
-import com.maddyhome.idea.vim.vimscript.model.expressions.OptionExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Register
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.SublistExpression
@@ -69,6 +68,15 @@ data class LetCommand(
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
     if (!isSyntaxSupported) return ExecutionResult.Error
+
+    if (lvalue is LValueExpression) {
+      val currentValue = lvalue.evaluate(editor, context, vimContext)
+      val rhs = expression.evaluate(editor, context, vimContext)
+      val newValue = operator.getNewValue(currentValue, rhs)
+      lvalue.assign(newValue, editor, context, this)
+      return ExecutionResult.Success
+    }
+
     when (lvalue) {
       is Variable -> {
         if ((lvalue.scope == Scope.SCRIPT_VARIABLE && vimContext.getFirstParentContext() !is Script) ||
@@ -185,35 +193,6 @@ data class LetCommand(
           } else {
             throw ExException("wrong variable type")
           }
-        }
-      }
-
-      is OptionExpression -> {
-        val optionValue = lvalue.evaluate(editor, context, vimContext)
-        if (operator == AssignmentOperator.ASSIGNMENT || operator == AssignmentOperator.CONCATENATION ||
-          operator == AssignmentOperator.ADDITION || operator == AssignmentOperator.SUBTRACTION
-        ) {
-          val option = injector.optionGroup.getOption(lvalue.optionName)
-            ?: throw exExceptionMessage("E518", lvalue.originalString)
-          val newValue = operator.getNewValue(optionValue, expression.evaluate(editor, context, this))
-          when (lvalue.scope) {
-            Scope.GLOBAL_VARIABLE -> injector.optionGroup.setOptionValue(
-              option,
-              OptionAccessScope.GLOBAL(editor),
-              newValue
-            )
-
-            Scope.LOCAL_VARIABLE -> injector.optionGroup.setOptionValue(
-              option,
-              OptionAccessScope.LOCAL(editor),
-              newValue
-            )
-
-            null -> injector.optionGroup.setOptionValue(option, OptionAccessScope.EFFECTIVE(editor), newValue)
-            else -> throw ExException("Invalid option scope")
-          }
-        } else {
-          TODO()
         }
       }
 
