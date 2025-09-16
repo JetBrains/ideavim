@@ -450,12 +450,12 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
 
   private fun assertLet(init: String, action: String, result: String) {
     val letCommand = injector.vimscriptParser.parseLetCommand(init) as? LetCommand
-    val variable = letCommand?.variable?.originalString
+    val lvalue = letCommand?.lvalue?.originalString
     enterCommand(init)
     enterCommand(action)
     if (result.startsWith("E")) {
       if (!injector.messages.isError()) {
-        enterCommand("echo string($variable)")
+        enterCommand("echo string($lvalue)")
         val actual = injector.outputPanel.getCurrentOutputPanel()?.text
         assertEquals(
           true,
@@ -470,7 +470,7 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
       assertPluginErrorMessage(result)
     } else {
       assertPluginError(false)
-      assertCommandOutput("echo string($variable)", result)
+      assertCommandOutput("echo string($lvalue)", result)
     }
   }
 }

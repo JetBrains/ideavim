@@ -49,7 +49,7 @@ import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 @ExCommand(command = "let")
 data class LetCommand(
   val range: Range,
-  val variable: Expression,
+  val lvalue: Expression,
   val operator: AssignmentOperator,
   val expression: Expression,
   val isSyntaxSupported: Boolean,
@@ -69,25 +69,25 @@ data class LetCommand(
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
     if (!isSyntaxSupported) return ExecutionResult.Error
-    when (variable) {
+    when (lvalue) {
       is Variable -> {
-        if ((variable.scope == Scope.SCRIPT_VARIABLE && vimContext.getFirstParentContext() !is Script) ||
-          (!isInsideFunction(vimContext) && (variable.scope == Scope.FUNCTION_VARIABLE || variable.scope == Scope.LOCAL_VARIABLE))
+        if ((lvalue.scope == Scope.SCRIPT_VARIABLE && vimContext.getFirstParentContext() !is Script) ||
+          (!isInsideFunction(vimContext) && (lvalue.scope == Scope.FUNCTION_VARIABLE || lvalue.scope == Scope.LOCAL_VARIABLE))
         ) {
-          throw exExceptionMessage("E461", variable.toString(editor, context, vimContext))
+          throw exExceptionMessage("E461", lvalue.toString(editor, context, vimContext))
         }
 
-        if (isReadOnlyVariable(variable, editor, context)) {
-          throw exExceptionMessage("E46", variable.toString(editor, context, vimContext))
+        if (isReadOnlyVariable(lvalue, editor, context)) {
+          throw exExceptionMessage("E46", lvalue.toString(editor, context, vimContext))
         }
 
-        val leftValue = injector.variableService.getNullableVariableValue(variable, editor, context, vimContext)
-        if (leftValue?.isLocked == true && (leftValue.lockOwner as? Variable)?.name == variable.name) {
-          throw exExceptionMessage("E741", variable.toString(editor, context, vimContext))
+        val leftValue = injector.variableService.getNullableVariableValue(lvalue, editor, context, vimContext)
+        if (leftValue?.isLocked == true && (leftValue.lockOwner as? Variable)?.name == lvalue.name) {
+          throw exExceptionMessage("E741", lvalue.toString(editor, context, vimContext))
         }
         val rightValue = expression.evaluate(editor, context, vimContext)
         injector.variableService.storeVariable(
-          variable,
+          lvalue,
           operator.getNewValue(leftValue, rightValue),
           editor,
           context,
@@ -96,21 +96,21 @@ data class LetCommand(
       }
 
       is OneElementSublistExpression -> {
-        when (val containerValue = variable.expression.evaluate(editor, context, vimContext)) {
+        when (val containerValue = lvalue.expression.evaluate(editor, context, vimContext)) {
           is VimDictionary -> {
-            val dictKey = variable.index.evaluate(editor, context, this).toVimString()
+            val dictKey = lvalue.index.evaluate(editor, context, this).toVimString()
             if (operator != AssignmentOperator.ASSIGNMENT && !containerValue.dictionary.containsKey(dictKey)) {
               throw exExceptionMessage("E716", dictKey)
             }
             val expressionValue = expression.evaluate(editor, context, this)
             var valueToStore = if (dictKey in containerValue.dictionary) {
               if (containerValue.dictionary[dictKey]!!.isLocked) {
-                throw exExceptionMessage("E741", variable.originalString)
+                throw exExceptionMessage("E741", lvalue.originalString)
               }
               operator.getNewValue(containerValue.dictionary[dictKey]!!, expressionValue)
             } else {
               if (containerValue.isLocked) {
-                throw exExceptionMessage("E741", variable.originalString)
+                throw exExceptionMessage("E741", lvalue.originalString)
               }
               expressionValue
             }
@@ -125,12 +125,12 @@ data class LetCommand(
           }
 
           is VimList -> {
-            val index = variable.index.evaluate(editor, context, this).toVimNumber().value
+            val index = lvalue.index.evaluate(editor, context, this).toVimNumber().value
             if (index > containerValue.values.size - 1) {
               throw exExceptionMessage("E684", index)
             }
             if (containerValue.values[index].isLocked) {
-              throw exExceptionMessage("E741", variable.originalString)
+              throw exExceptionMessage("E741", lvalue.originalString)
             }
             containerValue.values[index] =
               operator.getNewValue(containerValue.values[index], expression.evaluate(editor, context, vimContext))
@@ -138,19 +138,19 @@ data class LetCommand(
 
           is VimBlob -> TODO()
           else -> {
-            val text = variable.originalString + operator.value + expression.originalString
+            val text = lvalue.originalString + operator.value + expression.originalString
             throw exExceptionMessage("E689", getTypeName(containerValue), text)
           }
         }
       }
 
       is SublistExpression -> {
-        if (variable.expression is Variable) {
+        if (lvalue.expression is Variable) {
           val variableValue =
-            injector.variableService.getNonNullVariableValue(variable.expression, editor, context, this)
+            injector.variableService.getNonNullVariableValue(lvalue.expression, editor, context, this)
           if (variableValue is VimList) {
-            val from = variable.from?.evaluate(editor, context, this)?.toVimNumber()?.value ?: 0
-            val to = variable.to?.evaluate(editor, context, this)?.toVimNumber()?.value
+            val from = lvalue.from?.evaluate(editor, context, this)?.toVimNumber()?.value ?: 0
+            val to = lvalue.to?.evaluate(editor, context, this)?.toVimNumber()?.value
               ?: (variableValue.values.size - 1)
 
             val expressionValue = expression.evaluate(editor, context, this)
@@ -159,7 +159,7 @@ data class LetCommand(
             } else if (expressionValue is VimList) {
               if (expressionValue.values.size < to - from + 1) {
                 throw exExceptionMessage("E711")
-              } else if (variable.to != null && expressionValue.values.size > to - from + 1) {
+              } else if (lvalue.to != null && expressionValue.values.size > to - from + 1) {
                 throw exExceptionMessage("E710")
               }
               val newListSize = expressionValue.values.size - (to - from + 1) + variableValue.values.size
@@ -189,14 +189,14 @@ data class LetCommand(
       }
 
       is OptionExpression -> {
-        val optionValue = variable.evaluate(editor, context, vimContext)
+        val optionValue = lvalue.evaluate(editor, context, vimContext)
         if (operator == AssignmentOperator.ASSIGNMENT || operator == AssignmentOperator.CONCATENATION ||
           operator == AssignmentOperator.ADDITION || operator == AssignmentOperator.SUBTRACTION
         ) {
-          val option = injector.optionGroup.getOption(variable.optionName)
-            ?: throw exExceptionMessage("E518", variable.originalString)
+          val option = injector.optionGroup.getOption(lvalue.optionName)
+            ?: throw exExceptionMessage("E518", lvalue.originalString)
           val newValue = operator.getNewValue(optionValue, expression.evaluate(editor, context, this))
-          when (variable.scope) {
+          when (lvalue.scope) {
             Scope.GLOBAL_VARIABLE -> injector.optionGroup.setOptionValue(
               option,
               OptionAccessScope.GLOBAL(editor),
@@ -220,29 +220,29 @@ data class LetCommand(
       is EnvVariableExpression -> TODO()
 
       is Register -> {
-        if (RegisterConstants.WRITABLE_REGISTERS.contains(variable.char)) {
+        if (RegisterConstants.WRITABLE_REGISTERS.contains(lvalue.char)) {
           val result = injector.registerGroup.storeText(
             editor,
             context,
-            variable.char,
+            lvalue.char,
             expression.evaluate(editor, context, vimContext).toVimString().value
           )
           if (!result) {
             logger.error(
               """
-              Error during `let ${variable.originalString} ${operator.value} ${expression.originalString}` command execution.
+              Error during `let ${lvalue.originalString} ${operator.value} ${expression.originalString}` command execution.
               Could not set register value
               """.trimIndent(),
             )
           }
-        } else if (RegisterConstants.VALID_REGISTERS.contains(variable.char)) {
-          throw exExceptionMessage("E354", variable.char)
+        } else if (RegisterConstants.VALID_REGISTERS.contains(lvalue.char)) {
+          throw exExceptionMessage("E354", lvalue.char)
         } else {
           throw exExceptionMessage("E18")
         }
       }
 
-      else -> throw exExceptionMessage("E121", variable.originalString)
+      else -> throw exExceptionMessage("E121", lvalue.originalString)
     }
     return ExecutionResult.Success
   }
