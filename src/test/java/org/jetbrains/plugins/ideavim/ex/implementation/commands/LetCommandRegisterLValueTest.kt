@@ -93,40 +93,34 @@ class LetCommandRegisterLValueTest : VimTestCase("\n") {
   // simple assignment operator can convert Number to String, Vim doesn't appear to do that for compound assignments.
   // We test `+=` (in case it works like concatenation - it doesn't) and `-=`. The other compound operators are assumed
   // to behave the same way.
-  @VimBehaviorDiffers("E734: Wrong argument type for +=")
   @Test
   fun `test arithmetic compound assignment operator to register requires Number lvalue`() {
     enterCommand("let @a='hello'")
     enterCommand("let @a+=' world'")
-    // This result is unexpected (and wrong)
-    assertCommandOutput("echo string(@a)", "' world'")
+    assertPluginError(true)
+    assertPluginErrorMessage("E734: Wrong variable type for +=")
   }
 
-  @VimBehaviorDiffers("E734: Wrong argument type for -=")
   @Test
   fun `test arithmetic compound assignment operator to register requires Number lvalue 2`() {
     enterCommand("let @a='hello'")
     enterCommand("let @a-=' world'")
-    // This result is completely wrong too
-    assertCommandOutput("echo string(@a)", "' world'")
+    assertPluginError(true)
+    assertPluginErrorMessage("E734: Wrong variable type for -=")
   }
 
-  @VimBehaviorDiffers("'hello world'")
   @Test
   fun `test string concatenation compound assignment operator to register`() {
     enterCommand("let @a='hello'")
     enterCommand("let @a.=' world'")
-//    assertCommandOutput("echo string(@a)", "'hello world'")
-    assertCommandOutput("echo string(@a)", "' world'")
+    assertCommandOutput("echo string(@a)", "'hello world'")
   }
 
-  @VimBehaviorDiffers("'hello12'")
   @Test
   fun `test string concatenation compound assignment operator converts Number rvalue to String`() {
     enterCommand("let @a='hello'")
     enterCommand("let @a.=12")
-    assertPluginError(false)  // TODO: Remove
-    assertCommandOutput("echo string(@a)", "'12'")
+    assertCommandOutput("echo string(@a)", "'hello12'")
   }
 
   @VimBehaviorDiffers("'hello1.23'")

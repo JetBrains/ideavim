@@ -201,29 +201,6 @@ data class LetCommand(
 
       is EnvVariableExpression -> TODO()
 
-      is RegisterExpression -> {
-        if (RegisterConstants.WRITABLE_REGISTERS.contains(lvalue.char)) {
-          val result = injector.registerGroup.storeText(
-            editor,
-            context,
-            lvalue.char,
-            expression.evaluate(editor, context, vimContext).toVimString().value
-          )
-          if (!result) {
-            logger.error(
-              """
-              Error during `let ${lvalue.originalString} ${operator.value} ${expression.originalString}` command execution.
-              Could not set register value
-              """.trimIndent(),
-            )
-          }
-        } else if (RegisterConstants.VALID_REGISTERS.contains(lvalue.char)) {
-          throw exExceptionMessage("E354", lvalue.char)
-        } else {
-          throw exExceptionMessage("E18")
-        }
-      }
-
       else -> throw exExceptionMessage("E121", lvalue.originalString)
     }
     return ExecutionResult.Success
