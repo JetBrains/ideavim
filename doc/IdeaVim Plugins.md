@@ -16,6 +16,25 @@ in `~/.ideavimrc`. E.g. `set nosurround`.
 Available plugins:
 
 <details>
+<summary><h2>anyobject: Useful text objects like functions, arguments, classes, loops, list items, block comments, and more.</h2></summary>
+
+### Summary:
+An extension for IdeaVim plugin that adds useful text objects to improve your productivity on JetBrains IDEs.
+
+Text objects allow a more efficient way of communicating edition or selection actions in the editor. Instead of thinking in terms of characters, words, lines, or paragraphs, use more advance text constructs like quoted text, text between brackets, items in a collection, or programming language constructs like arguments, classes, functions, loops, or comments.
+
+By Ricardo Rodriguez
+
+### Setup
+
+Add `set anyobject` to your `~/.ideavimrc` file, then run `:source ~/.ideavimrc`
+or restart the IDE.
+
+### Instructions
+
+[https://plugins.jetbrains.com/plugin/28333-vim-anyobject](https://plugins.jetbrains.com/plugin/28333-vim-anyobject)
+</details>
+<details>
 <summary><h2>argtextobj: Provides a text-object 'a' argument</h2></summary>
 
 Original plugin: [argtextobj.vim](https://www.vim.org/scripts/script.php?script_id=2699).
@@ -94,6 +113,28 @@ That's it.
 https://github.com/tpope/vim-commentary/blob/master/doc/commentary.txt
 
 </details>
+
+<details>
+<summary><h2>dial: Advanced text increment and decrement functionality.</h2></summary>
+
+### Summary:
+IdeaVim extension with advanced text increment and decrement functionality. It enhances the standard increment/decrement functionality found in Vim editors by adding support for complex text patterns beyond simple numbers.
+
+Cycle through related values from various text elements, including numbers, dates, boolean values, operators, and programming language-specific keywords.
+
+By Ricardo Rodriguez
+
+### Setup
+
+Add `set dial` to your `~/.ideavimrc` file, then run `:source ~/.ideavimrc`
+or restart the IDE.
+
+### Instructions
+
+[https://plugins.jetbrains.com/plugin/28237-vim-dial](https://plugins.jetbrains.com/plugin/28237-vim-dial
+)
+</details>
+
 
 <details>
 <summary><h2>easymotion: Simplifies some motions</h2></summary>
@@ -419,7 +460,7 @@ https://plugins.jetbrains.com/plugin/25776-vim-peekaboo
 Original plugin: [quick-scope](https://github.com/unblevable/quick-scope).
 
 ### Summary:
-An always-on highlight for a unique character in every word on a line to help you use f, F and family.
+An always-on highlight for a unique character in every word on a line to help you use f, F, and family.
 
 This plugin should help you get to any word on a line in two or three keystrokes with Vim's built-in f<char> 
 (which moves your cursor to <char>).
@@ -501,7 +542,7 @@ Original plugin: [vim-surround](https://github.com/tpope/vim-surround).
    
 ### Summary:
 Surround.vim is all about "surroundings": parentheses, brackets, quotes, XML tags, and more. 
-The plugin provides mappings to easily delete, change and add such surroundings in pairs.
+The plugin provides mappings to easily delete, change, and add such surroundings in pairs.
 
 ### Setup:
 - Add the following command to `~/.ideavimrc`: `Plug 'tpope/vim-surround'`
