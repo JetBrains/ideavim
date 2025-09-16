@@ -18,3 +18,10 @@ abstract class Expression {
   lateinit var originalString: String
   abstract fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType
 }
+
+/**
+ * An expression that can act as an lvalue, and be assigned a new value
+ */
+abstract class LValueExpression : Expression() {
+  abstract fun assign(value: VimDataType, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext)
+}
