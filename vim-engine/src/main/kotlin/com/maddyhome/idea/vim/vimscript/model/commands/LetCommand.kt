@@ -71,6 +71,9 @@ data class LetCommand(
 
     if (lvalue is LValueExpression) {
       val currentValue = lvalue.evaluate(editor, context, vimContext)
+      if (lvalue.isStronglyTyped() && !operator.isApplicableToType(currentValue)) {
+        throw exExceptionMessage("E734", operator.value)
+      }
       val rhs = expression.evaluate(editor, context, vimContext)
       val newValue = operator.getNewValue(currentValue, rhs)
       lvalue.assign(newValue, editor, context, this)

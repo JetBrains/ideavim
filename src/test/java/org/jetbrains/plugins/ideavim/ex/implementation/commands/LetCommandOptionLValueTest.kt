@@ -21,7 +21,6 @@ import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import kotlin.test.assertEquals
@@ -50,42 +49,36 @@ class LetCommandOptionLValueTest : VimTestCase("\n") {
     assertFalse(options().incsearch)
   }
 
-  @VimBehaviorDiffers("E805: Using a Float as a Number")
   @Test
   fun `test let assigning Float to Number option reports error`() {
     val option = NumberOption(OPTION_NAME, OptionDeclaredScope.GLOBAL, OPTION_NAME, 42)
     injector.optionGroup.addOption(option)
     enterCommand("let &test=1.23")
     assertPluginError(true)
-    assertPluginErrorMessage("E521: Number required after =: 1.23")
+    assertPluginErrorMessage("E805: Using a Float as a Number")
   }
 
-  @VimBehaviorDiffers("E745: Using a List as a Number")
   @Test
   fun `test let assigning List to Number option reports error`() {
     val option = NumberOption(OPTION_NAME, OptionDeclaredScope.GLOBAL, OPTION_NAME, 42)
     injector.optionGroup.addOption(option)
     enterCommand("let &test=[1,2,3]")
     assertPluginError(true)
-    assertPluginErrorMessage("E521: Number required after =: [1, 2, 3]")
+    assertPluginErrorMessage("E745: Using a List as a Number")
   }
 
-  @VimBehaviorDiffers("E728: Using a Dictionary as a Number")
   @Test
   fun `test let assigning Dictionary to Number option reports error`() {
     val option = NumberOption(OPTION_NAME, OptionDeclaredScope.GLOBAL, OPTION_NAME, 42)
     injector.optionGroup.addOption(option)
     enterCommand("let &test={'key1' : 1, 'key2' : 2}")
     assertPluginError(true)
-    assertPluginErrorMessage("E521: Number required after =: {'key1': 1, 'key2': 2}")
+    assertPluginErrorMessage("E728: Using a Dictionary as a Number")
   }
 
-  @Disabled
-  @VimBehaviorDiffers("Vim converts from String to Number")
   @Test
   fun `test let assigning String to Number option converts to Number`() {
     enterCommand("let &incsearch='1'")
-    assertPluginError(false)
     assertTrue(options().incsearch)
     enterCommand("let &incsearch='0'")
     assertFalse(options().incsearch)
@@ -93,13 +86,13 @@ class LetCommandOptionLValueTest : VimTestCase("\n") {
     assertTrue(options().incsearch)
   }
 
-  @VimBehaviorDiffers(description = "E521: Number required: &incsearch='foo'")
+  @VimBehaviorDiffers("E521: Number required: &incsearch='foo'")
   @Test
   fun `test let toggle option with invalid string value reports error`() {
     // Looks like Vim checks a String value that evaluates to 0. If it's not actually 0, throw an error
     enterCommand("let &incsearch='foo'")
     assertPluginError(true)
-    assertPluginErrorMessage("E474: Invalid argument: foo")
+    assertPluginErrorMessage("E521: Number required after =: 'foo'")
   }
 
   @Test
@@ -111,7 +104,6 @@ class LetCommandOptionLValueTest : VimTestCase("\n") {
     assertEquals("whatever", value)
   }
 
-  @Disabled
   @Test
   fun `test let assigning String option with Number value`() {
     val option = StringOption(OPTION_NAME, OptionDeclaredScope.GLOBAL, OPTION_NAME, "something")
@@ -122,35 +114,31 @@ class LetCommandOptionLValueTest : VimTestCase("\n") {
     assertEquals("12", value)
   }
 
-  @Disabled
   @Test
   fun `test let assigning String option with Float value`() {
     val option = StringOption(OPTION_NAME, OptionDeclaredScope.GLOBAL, OPTION_NAME, "something")
     injector.optionGroup.addOption(option)
     enterCommand("let &test=1.23")
-    assertPluginError(false)
     val value = injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(fixture.editor.vim)).value
     assertEquals("1.23", value)
   }
 
-  @VimBehaviorDiffers("E730: Using a List as a String")
   @Test
   fun `test let assigning String option with List value raises error`() {
     val option = StringOption(OPTION_NAME, OptionDeclaredScope.GLOBAL, OPTION_NAME, "something")
     injector.optionGroup.addOption(option)
     enterCommand("let &test=[1,2,3]")
     assertPluginError(true)
-    assertPluginErrorMessage("E474: Invalid argument: [1, 2, 3]")
+    assertPluginErrorMessage("E730: Using a List as a String")
   }
 
-  @VimBehaviorDiffers("E731: Using a Dictionary as a String")
   @Test
   fun `test let assigning String option with Dictionary value raises error`() {
     val option = StringOption(OPTION_NAME, OptionDeclaredScope.GLOBAL, OPTION_NAME, "something")
     injector.optionGroup.addOption(option)
     enterCommand("let &test={'key1' : 1, 'key2' : 2}")
     assertPluginError(true)
-    assertPluginErrorMessage("E474: Invalid argument: {'key1': 1, 'key2': 2}")
+    assertPluginErrorMessage("E731: Using a Dictionary as a String")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
@@ -259,7 +247,6 @@ class LetCommandOptionLValueTest : VimTestCase("\n") {
     assertEquals("something good", value)
   }
 
-  @VimBehaviorDiffers("E734: Wrong argument type for +=")
   @Test
   fun `test let String option with arithmetic compound assignment operator raises error for Number rvalue`() {
     val option = StringOption(OPTION_NAME, OptionDeclaredScope.GLOBAL, OPTION_NAME, "something")
@@ -267,10 +254,9 @@ class LetCommandOptionLValueTest : VimTestCase("\n") {
     enterCommand("let &test='10'")
     enterCommand("let &test += 1")
     assertPluginError(true)
-    assertPluginErrorMessage("E474: Invalid argument: 11")
+    assertPluginErrorMessage("E734: Wrong variable type for +=")
   }
 
-  @VimBehaviorDiffers("E734: Wrong argument type for +=")
   @Test
   fun `test let String option with arithmetic compound assignment operator raises error for String rvalue`() {
     val option = StringOption(OPTION_NAME, OptionDeclaredScope.GLOBAL, OPTION_NAME, "something")
@@ -278,7 +264,7 @@ class LetCommandOptionLValueTest : VimTestCase("\n") {
     enterCommand("let &test='10'")
     enterCommand("let &test += '1'")
     assertPluginError(true)
-    assertPluginErrorMessage("E474: Invalid argument: 11")
+    assertPluginErrorMessage("E734: Wrong variable type for +=")
   }
 
   @Test
@@ -290,14 +276,13 @@ class LetCommandOptionLValueTest : VimTestCase("\n") {
     assertEquals(43, value)
   }
 
-  @VimBehaviorDiffers("E734: Wrong argument type for .=")
   @Test
   fun `test let Number option with string concatenation compound assignment operator raises error`() {
     val option = NumberOption(OPTION_NAME, OptionDeclaredScope.GLOBAL, OPTION_NAME, 42)
     injector.optionGroup.addOption(option)
     enterCommand("let &test.='1'")
     assertPluginError(true)
-    assertPluginErrorMessage("E521: Number required after =: 421")
+    assertPluginErrorMessage("E734: Wrong variable type for .=")
   }
 
   companion object {
