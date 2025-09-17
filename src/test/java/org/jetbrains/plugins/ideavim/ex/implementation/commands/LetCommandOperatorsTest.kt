@@ -309,7 +309,7 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
     fun moduloOperator() = buildList {
       withInitialValue("let s=15") {
         case("let s%=12", "3")
-        case("let s%=20.5", "E804: Cannot use '%' with Float")    // TODO: E734: Wrong variable type for %=
+        case("let s%=20.5", "E734: Wrong variable type for %=")
         case("let s%='13'", "2")    // RValue String is converted to Number
         case("let s%='foo'", "0")
         case("let s%=[1,2,3]", "E734: Wrong variable type for %=")
@@ -317,18 +317,17 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
       }
 
       withInitialValue("let s=105.5") {
-        // TODO: All of these should be "E734: Wrong variable type for %="
-        case("let s%=10", "E804: Cannot use '%' with Float")
-        case("let s%=20.5", "E804: Cannot use '%' with Float")
-        case("let s%='10.5'", "E804: Cannot use '%' with Float")
-        case("let s%='foo'", "E804: Cannot use '%' with Float")
+        case("let s%=10", "E734: Wrong variable type for %=")
+        case("let s%=20.5", "E734: Wrong variable type for %=")
+        case("let s%='10.5'", "E734: Wrong variable type for %=")
+        case("let s%='foo'", "E734: Wrong variable type for %=")
         case("let s%=[1,2,3]", "E734: Wrong variable type for %=")
         case("let s%={'key1': 1, 'key2': 2}", "E734: Wrong variable type for %=")
       }
 
       withInitialValue("let s='31.5'") {
         case("let s%=13", "5")          // LValue String is converted to Number
-        case("let s%=20.5", "E804: Cannot use '%' with Float") // TODO: E734: Wrong variable type for %=
+        case("let s%=20.5", "E734: Wrong variable type for %=")
         case("let s%='13.5'", "5")      // Strings are converted to Number, result is Number
         case("let s%='0'", "0")
         case("let s%=[1,2,3]", "E734: Wrong variable type for %=")
@@ -337,7 +336,7 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
 
       withInitialValue("let s='foo'") {
         case("let s%=10", "0")      // LValue String is converted to Number
-        case("let s%=20.5", "E804: Cannot use '%' with Float")  // TODO: E734: Wrong variable type for %=
+        case("let s%=20.5", "E734: Wrong variable type for %=")
         case("let s%='20.5'", "0")  // Strings are converted to Number
         case("let s%='0'", "0")     // Strings are converted to Number
         case("let s%=[1,2,3]", "E734: Wrong variable type for %=")
