@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.ex.evaluate
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
 
 class AdditionOperatorTest : VimTestCase() {
@@ -52,20 +53,18 @@ class AdditionOperatorTest : VimTestCase() {
 
   @Test
   fun `number plus list`() {
-    try {
+    val exception = assertThrows<ExException> {
       VimscriptParser.parseExpression("2 + [1, 2]")!!.evaluate()
-    } catch (e: ExException) {
-      assertEquals("E745: Using a List as a Number", e.message)
     }
+    assertEquals("E745: Using a List as a Number", exception.message)
   }
 
   @Test
   fun `string plus list`() {
-    try {
+    val exception = assertThrows<ExException> {
       VimscriptParser.parseExpression("'string' + [1, 2]")!!.evaluate()
-    } catch (e: ExException) {
-      assertEquals("E745: Using a List as a Number", e.message)
     }
+    assertEquals("E745: Using a List as a Number", exception.message)
   }
 
   @Test
@@ -78,46 +77,41 @@ class AdditionOperatorTest : VimTestCase() {
 
   @Test
   fun `dict plus integer`() {
-    try {
+    val exception = assertThrows<ExException> {
       VimscriptParser.parseExpression("{'key' : 21} + 1")!!.evaluate()
-    } catch (e: ExException) {
-      assertEquals("E728: Using a Dictionary as a Number", e.message)
     }
+    assertEquals("E728: Using a Dictionary as a Number", exception.message)
   }
 
   @Test
   fun `dict plus float`() {
-    try {
+    val exception = assertThrows<ExException> {
       VimscriptParser.parseExpression("{'key' : 21} + 1.4")!!.evaluate()
-    } catch (e: ExException) {
-      assertEquals("E728: Using a Dictionary as a Number", e.message)
     }
+    assertEquals("E728: Using a Dictionary as a Number", exception.message)
   }
 
   @Test
   fun `dict plus string`() {
-    try {
+    val exception = assertThrows<ExException> {
       VimscriptParser.parseExpression("{'key' : 21} + 'string'")!!.evaluate()
-    } catch (e: ExException) {
-      assertEquals("E728: Using a Dictionary as a Number", e.message)
     }
+    assertEquals("E728: Using a Dictionary as a Number", exception.message)
   }
 
   @Test
   fun `dict plus list`() {
-    try {
+    val exception = assertThrows<ExException> {
       VimscriptParser.parseExpression("{'key' : 21} + [1]")!!.evaluate()
-    } catch (e: ExException) {
-      assertEquals("E728: Using a Dictionary as a Number", e.message)
     }
+    assertEquals("E728: Using a Dictionary as a Number", exception.message)
   }
 
   @Test
   fun `dict plus dict`() {
-    try {
+    val exception = assertThrows<ExException> {
       VimscriptParser.parseExpression("{'key' : 21} + {'key2': 33}")!!.evaluate()
-    } catch (e: ExException) {
-      assertEquals("E728: Using a Dictionary as a Number", e.message)
     }
+    assertEquals("E728: Using a Dictionary as a Number", exception.message)
   }
 }

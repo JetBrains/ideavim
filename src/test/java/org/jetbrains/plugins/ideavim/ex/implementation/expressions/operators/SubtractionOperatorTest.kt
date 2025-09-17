@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.ex.evaluate
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
 
 class SubtractionOperatorTest : VimTestCase() {
@@ -51,73 +52,65 @@ class SubtractionOperatorTest : VimTestCase() {
 
   @Test
   fun `number minus list`() {
-    try {
+    val exception = assertThrows<ExException> {
       VimscriptParser.parseExpression("2 - [1, 2]")!!.evaluate()
-    } catch (e: ExException) {
-      assertEquals("E745: Using a List as a Number", e.message)
     }
+    assertEquals("E745: Using a List as a Number", exception.message)
   }
 
   @Test
   fun `string minus list`() {
-    try {
+    val exception = assertThrows<ExException> {
       VimscriptParser.parseExpression("'string' - [1, 2]")!!.evaluate()
-    } catch (e: ExException) {
-      assertEquals("E745: Using a List as a Number", e.message)
     }
+    assertEquals("E745: Using a List as a Number", exception.message)
   }
 
   @Test
   fun `list minus list`() {
-    try {
+    val exception = assertThrows<ExException> {
       VimscriptParser.parseExpression("[3] - [1, 2]")!!.evaluate()
-    } catch (e: ExException) {
-      assertEquals("E745: Using a List as a Number", e.message)
     }
+    assertEquals("E745: Using a List as a Number", exception.message)
   }
 
   @Test
   fun `dict minus integer`() {
-    try {
+    val exception = assertThrows<ExException> {
       VimscriptParser.parseExpression("{'key' : 21} - 1")!!.evaluate()
-    } catch (e: ExException) {
-      assertEquals("E728: Using a Dictionary as a Number", e.message)
     }
+    assertEquals("E728: Using a Dictionary as a Number", exception.message)
   }
 
   @Test
   fun `dict minus float`() {
-    try {
+    val exception = assertThrows<ExException> {
       VimscriptParser.parseExpression("{'key' : 21} - 1.4")!!.evaluate()
-    } catch (e: ExException) {
-      assertEquals("E728: Using a Dictionary as a Number", e.message)
     }
+    assertEquals("E728: Using a Dictionary as a Number", exception.message)
   }
 
   @Test
   fun `dict minus string`() {
-    try {
+    val exception = assertThrows<ExException> {
       VimscriptParser.parseExpression("{'key' : 21} - 'string'")!!.evaluate()
-    } catch (e: ExException) {
-      assertEquals("E728: Using a Dictionary as a Number", e.message)
     }
+    assertEquals("E728: Using a Dictionary as a Number", exception.message)
   }
 
   @Test
   fun `dict minus list`() {
-    try {
+    val exception = assertThrows<ExException> {
       VimscriptParser.parseExpression("{'key' : 21} - [1]")!!.evaluate()
-    } catch (e: ExException) {
-      assertEquals("E728: Using a Dictionary as a Number", e.message)
     }
+    assertEquals("E728: Using a Dictionary as a Number", exception.message)
   }
 
   @Test
   fun `dict minus dict`() {
-    try {
+    val exception = assertThrows<ExException> {
       VimscriptParser.parseExpression("{'key' : 21} - {'key2': 33}")!!.evaluate()
-    } catch (e: ExException) {
-      assertEquals("E728: Using a Dictionary as a Number", e.message)
     }
+    assertEquals("E728: Using a Dictionary as a Number", exception.message)
   }
 }
