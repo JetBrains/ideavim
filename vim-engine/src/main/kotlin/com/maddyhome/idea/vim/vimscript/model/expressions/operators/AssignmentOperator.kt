@@ -107,6 +107,13 @@ enum class AssignmentOperator(val value: String) {
         validateArithmeticOperatorValues(lvalue, rvalue, isLValueStronglyTyped)
       }
 
+      MODULUS -> {
+        if (lvalue is VimFloat || rvalue is VimFloat) {
+          throw exExceptionMessage("E734", value)
+        }
+        validateArithmeticOperatorValues(lvalue, rvalue, isLValueStronglyTyped)
+      }
+
       else -> validateArithmeticOperatorValues(lvalue, rvalue, isLValueStronglyTyped)
     }
   }
