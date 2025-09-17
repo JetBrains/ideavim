@@ -60,13 +60,10 @@ class LetCommandRegisterLValueTest : VimTestCase("\n") {
     assertCommandOutput("echo string(@a)", "'123'")
   }
 
-  @VimBehaviorDiffers("Vim converts Float to String")
   @Test
   fun `test assign Float to register is converted to String`() {
     enterCommand("let @a = 12.34")
-    assertPluginError(true)
-    assertPluginErrorMessage("E806: Using a Float as a String")
-//    assertCommandOutput("echo string(@a)", "'12.34'")
+    assertCommandOutput("echo string(@a)", "'12.34'")
   }
 
   @Test

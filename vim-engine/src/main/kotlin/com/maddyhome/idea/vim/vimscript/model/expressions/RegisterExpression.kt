@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.register.RegisterConstants
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 data class RegisterExpression(val char: Char) : LValueExpression() {
@@ -46,6 +47,7 @@ data class RegisterExpression(val char: Char) : LValueExpression() {
     if (!RegisterConstants.WRITABLE_REGISTERS.contains(char)) {
       throw exExceptionMessage("E354", char)
     }
-    injector.registerGroup.storeText(editor, context, char, value.toVimString().value)
+    val newValue = if (value is VimFloat) value.toOutputString() else value.toVimString().value
+    injector.registerGroup.storeText(editor, context, char, newValue)
   }
 }
