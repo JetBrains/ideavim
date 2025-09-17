@@ -20,13 +20,13 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.expressions.OneElementSublistExpression
+import com.maddyhome.idea.vim.vimscript.model.expressions.IndexedExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.parser.DeletionInfo
 
 data class AnonymousFunctionDeclaration(
-  val sublist: OneElementSublistExpression,
+  val sublist: IndexedExpression,
   val args: List<String>,
   val defaultArgs: List<Pair<String, Expression>>,
   val body: List<Executable>,
