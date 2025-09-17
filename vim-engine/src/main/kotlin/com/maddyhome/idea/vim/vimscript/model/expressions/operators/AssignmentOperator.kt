@@ -86,18 +86,18 @@ enum class AssignmentOperator(val value: String) {
       }
 
       CONCATENATION, CONCATENATION2 -> {
-        if (isLValueStronglyTyped && lvalue !is VimString) {
-          // Concatenation is only allowed for String lvalues. We'll try to convert to a String unless it's a strongly
-          // typed lvalue such as a register or option
+        if (lvalue !is VimString && (isLValueStronglyTyped || lvalue !is VimInt)) {
+          // Concatenation only makes sense for String lvalues. If the lvalue is strongly typed, such as option or
+          // register, Vim doesn't allow any conversion. If untyped, we can convert from Number.
+          // The binary concatenation operator does allow coercing lhs Float to String, but that does not apply here.
+          // (e.g. `echo string(1.5 .. '2')` => `'1.52'`, but `let s=1.5 | let s.='2'` => E734)
           throw exExceptionMessage("E734", value)
         }
-        if (lvalue is VimFloat || (rvalue is VimFloat && !isLValueStronglyTyped)) {
-          // The concatenation compound assignment operator does not allow converting from Float to String, even though
-          // this is allowed for the binary concatenation operator.
-          // * `let s=1.5 | let s.='2'` should fail, even though `echo string(1.5 .. '2')` works ('1.52')
-          // * `let s='foo' | let s.=20.5` should fail, even though `echo string('foo' .. 20.5)` works ('foo25')
-          // However, it is allowed if the lvalue is strongly typed, such as a register or option.
-          // * `let &titlestring='hello' | let &titlestring.=20.5` should succeed! => 'hello20.5'
+        if (rvalue !is VimString && rvalue !is VimInt && (!isLValueStronglyTyped || rvalue !is VimFloat)) {
+          // Vim doesn't allow Float as the lvalue for concatenation compound assignment. Similarly, it doesn't allow
+          // Float for the rvalue. EXCEPT with a strongly typed lvalue. Go figure.
+          // * `let s='foo' | let s.=20.5` => E734
+          // * `let &titlestring='hello' | let &titlestring.=20.5` => 'hello20.5'
           throw exExceptionMessage("E734", value)
         }
       }

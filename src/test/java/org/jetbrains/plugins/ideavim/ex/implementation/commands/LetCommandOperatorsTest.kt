@@ -373,8 +373,8 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
         case("let s $operator 20.5", "E734: Wrong variable type for $operator")
         case("let s $operator '20'", "'10020'")    // LValue Number is converted to String
         case("let s $operator 'foo'", "'100foo'")  // LValue Number is converted to String
-        case("let s $operator [1,2,3]", "E730: Using a List as a String")  // TODO: E734: Wrong variable type for .=
-        case("let s $operator {'key1': 1, 'key2': 2}", "E731: Using a Dictionary as a String") // TODO: E734: Wrong variable type for .=
+        case("let s $operator [1,2,3]", "E734: Wrong variable type for $operator")
+        case("let s $operator {'key1': 1, 'key2': 2}", "E734: Wrong variable type for $operator")
       }
 
       withInitialValue("let s=105.5") {
@@ -391,8 +391,8 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
         case("let s $operator 20.5", "E734: Wrong variable type for $operator")
         case("let s $operator '20.5'", "'30.520.5'")
         case("let s $operator '0'", "'30.50'")
-        case("let s $operator [1,2,3]", "E730: Using a List as a String") // TODO: E734: Wrong variable type for .=
-        case("let s $operator {'key1': 1, 'key2': 2}", "E731: Using a Dictionary as a String") // TODO: E734: Wrong variable type for .=
+        case("let s $operator [1,2,3]", "E734: Wrong variable type for $operator")
+        case("let s $operator {'key1': 1, 'key2': 2}", "E734: Wrong variable type for $operator")
       }
 
       withInitialValue("let s='foo'") {
@@ -400,28 +400,26 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
         case("let s $operator 20.5", "E734: Wrong variable type for $operator")
         case("let s $operator '20.5'", "'foo20.5'")
         case("let s $operator '0'", "'foo0'")
-        case("let s $operator [1,2,3]", "E730: Using a List as a String")  // TODO: E734: Wrong variable type for .=
-        case("let s $operator {'key1': 1, 'key2': 2}", "E731: Using a Dictionary as a String") // TODO: E734: Wrong variable type for .=
+        case("let s $operator [1,2,3]", "E734: Wrong variable type for $operator")
+        case("let s $operator {'key1': 1, 'key2': 2}", "E734: Wrong variable type for $operator")
       }
 
       withInitialValue("let s=[1,2,3]") {
-        // TODO: All of these should be "E734: Wrong variable type for .="
-        case("let s $operator 10", "E730: Using a List as a String")
+        case("let s $operator 10", "E734: Wrong variable type for $operator")
         case("let s $operator 10.5", "E734: Wrong variable type for $operator")
-        case("let s $operator '10.5'", "E730: Using a List as a String")
-        case("let s $operator 'foo'", "E730: Using a List as a String")
-        case("let s $operator [1,2,3]", "E730: Using a List as a String")
-        case("let s $operator {'key1': 1, 'key2': 2}", "E730: Using a List as a String")
+        case("let s $operator '10.5'", "E734: Wrong variable type for $operator")
+        case("let s $operator 'foo'", "E734: Wrong variable type for $operator")
+        case("let s $operator [1,2,3]", "E734: Wrong variable type for $operator")
+        case("let s $operator {'key1': 1, 'key2': 2}", "E734: Wrong variable type for $operator")
       }
 
       withInitialValue("let s={'key1': 1, 'key2': 2}") {
-        // TODO: All of these should be "E734: Wrong variable type for .="
-        case("let s $operator 10", "E731: Using a Dictionary as a String")
+        case("let s $operator 10", "E734: Wrong variable type for $operator")
         case("let s $operator 10.5", "E734: Wrong variable type for $operator")
-        case("let s $operator '10.5'", "E731: Using a Dictionary as a String")
-        case("let s $operator 'foo'", "E731: Using a Dictionary as a String")
-        case("let s $operator [1,2,3]", "E731: Using a Dictionary as a String")
-        case("let s $operator {'key1': 1, 'key2': 2}", "E731: Using a Dictionary as a String")
+        case("let s $operator '10.5'", "E734: Wrong variable type for $operator")
+        case("let s $operator 'foo'", "E734: Wrong variable type for $operator")
+        case("let s $operator [1,2,3]", "E734: Wrong variable type for $operator")
+        case("let s $operator {'key1': 1, 'key2': 2}", "E734: Wrong variable type for $operator")
       }
     }
 
