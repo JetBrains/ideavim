@@ -29,6 +29,7 @@ enum class AssignmentOperator(val value: String) {
   DIVISION("/="),
   MODULUS("%="),
   CONCATENATION(".="),
+  CONCATENATION2("..="),
   ;
 
   companion object {
@@ -73,7 +74,7 @@ enum class AssignmentOperator(val value: String) {
       MULTIPLICATION -> MultiplicationHandler.performOperation(lvalue!!, rvalue)
       DIVISION -> DivisionHandler.performOperation(lvalue!!, rvalue)
       MODULUS -> ModulusHandler.performOperation(lvalue!!, rvalue)
-      CONCATENATION -> ConcatenationHandler.performOperation(lvalue!!, rvalue)
+      CONCATENATION, CONCATENATION2 -> ConcatenationHandler.performOperation(lvalue!!, rvalue)
     }
   }
 
@@ -84,7 +85,7 @@ enum class AssignmentOperator(val value: String) {
         return
       }
 
-      CONCATENATION -> {
+      CONCATENATION, CONCATENATION2 -> {
         if (isLValueStronglyTyped && lvalue !is VimString) {
           // Concatenation is only allowed for String lvalues. We'll try to convert to a String unless it's a strongly
           // typed lvalue such as a register or option
