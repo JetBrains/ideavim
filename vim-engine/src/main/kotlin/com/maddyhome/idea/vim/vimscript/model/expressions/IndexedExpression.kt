@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 // expression[index]
 // expression.index (entry in a dictionary)
-data class OneElementSublistExpression(val index: Expression, val expression: Expression) : Expression() {
+data class IndexedExpression(val index: Expression, val expression: Expression) : Expression() {
 
   override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
     val expressionValue = expression.evaluate(editor, context, vimContext)

@@ -11,7 +11,7 @@ package org.jetbrains.plugins.ideavim.ex.parser.expressions
 import com.maddyhome.idea.vim.vimscript.model.expressions.BinExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.CurlyBracesName
 import com.maddyhome.idea.vim.vimscript.model.expressions.FuncrefCallExpression
-import com.maddyhome.idea.vim.vimscript.model.expressions.OneElementSublistExpression
+import com.maddyhome.idea.vim.vimscript.model.expressions.IndexedExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.BinaryOperator
@@ -27,7 +27,7 @@ class FuncrefCallTests {
     val funcrefCall = VimscriptParser.parseExpression("dict.len()")
     assertTrue(funcrefCall is FuncrefCallExpression)
     assertEquals(
-      OneElementSublistExpression(CurlyBracesName(listOf(SimpleExpression("len"))), Variable(null, "dict")),
+      IndexedExpression(CurlyBracesName(listOf(SimpleExpression("len"))), Variable(null, "dict")),
       funcrefCall.expression,
     )
     assertEquals(0, funcrefCall.args.size)
@@ -38,9 +38,9 @@ class FuncrefCallTests {
     val funcrefCall = VimscriptParser.parseExpression("dict.innerDict.len()")
     assertTrue(funcrefCall is FuncrefCallExpression)
     assertEquals(
-      OneElementSublistExpression(
+      IndexedExpression(
         CurlyBracesName(listOf(SimpleExpression("len"))),
-        OneElementSublistExpression(SimpleExpression("innerDict"), Variable(null, "dict")),
+        IndexedExpression(SimpleExpression("innerDict"), Variable(null, "dict")),
       ),
       funcrefCall.expression,
     )
@@ -52,7 +52,7 @@ class FuncrefCallTests {
     val funcrefCall = VimscriptParser.parseExpression("dict.len(a, 5 + 10)")
     assertTrue(funcrefCall is FuncrefCallExpression)
     assertEquals(
-      OneElementSublistExpression(CurlyBracesName(listOf(SimpleExpression("len"))), Variable(null, "dict")),
+      IndexedExpression(CurlyBracesName(listOf(SimpleExpression("len"))), Variable(null, "dict")),
       funcrefCall.expression,
     )
     assertEquals(2, funcrefCall.args.size)

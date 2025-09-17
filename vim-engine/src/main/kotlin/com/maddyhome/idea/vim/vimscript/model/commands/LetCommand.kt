@@ -31,7 +31,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.EnvVariableExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.LValueExpression
-import com.maddyhome.idea.vim.vimscript.model.expressions.OneElementSublistExpression
+import com.maddyhome.idea.vim.vimscript.model.expressions.IndexedExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.SublistExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
@@ -101,7 +101,7 @@ data class LetCommand(
         )
       }
 
-      is OneElementSublistExpression -> {
+      is IndexedExpression -> {
         when (val containerValue = lvalue.expression.evaluate(editor, context, vimContext)) {
           is VimDictionary -> {
             val dictKey = lvalue.index.evaluate(editor, context, this).toVimString()

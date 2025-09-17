@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.parser.generated.VimscriptBaseVisitor
 import com.maddyhome.idea.vim.parser.generated.VimscriptParser
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.expressions.OneElementSublistExpression
+import com.maddyhome.idea.vim.vimscript.model.expressions.IndexedExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
@@ -114,13 +114,13 @@ object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
         hasOptionalArguments
       )
     } else {
-      var sublistExpression = OneElementSublistExpression(
+      var sublistExpression = IndexedExpression(
         SimpleExpression(ctx.literalDictionaryKey(1).text),
         Variable(functionScope, ctx.literalDictionaryKey(0).text)
       )
       for (i in 2 until ctx.literalDictionaryKey().size) {
         sublistExpression =
-          OneElementSublistExpression(SimpleExpression(ctx.literalDictionaryKey(i).text), sublistExpression)
+          IndexedExpression(SimpleExpression(ctx.literalDictionaryKey(i).text), sublistExpression)
       }
       AnonymousFunctionDeclaration(
         sublistExpression,
