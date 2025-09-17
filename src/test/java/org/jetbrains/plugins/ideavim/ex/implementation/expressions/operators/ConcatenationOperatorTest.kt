@@ -14,6 +14,7 @@ import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.ex.evaluate
 import org.jetbrains.plugins.ideavim.productForArguments
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -45,31 +46,28 @@ class ConcatenationOperatorTest : VimTestCase() {
   @ParameterizedTest
   @MethodSource("operatorSpacesSpaces")
   fun `integer and float`(operator: String, sp1: String, sp2: String) {
-    try {
+    val exception = assertThrows<ExException> {
       VimscriptParser.parseExpression("3.4$sp1$operator${sp2}2")!!.evaluate()
-    } catch (e: ExException) {
-      assertEquals("E806: Using a Float as a String", e.message)
     }
+    assertEquals("E806: Using a Float as a String", exception.message)
   }
 
   @ParameterizedTest
   @MethodSource("operatorSpacesSpaces")
   fun `float and float`(operator: String, sp1: String, sp2: String) {
-    try {
+    val exception = assertThrows<ExException> {
       VimscriptParser.parseExpression("3.4$sp1$operator${sp2}2.2")!!.evaluate()
-    } catch (e: ExException) {
-      assertEquals("E806: Using a Float as a String", e.message)
     }
+    assertEquals("E806: Using a Float as a String", exception.message)
   }
 
   @ParameterizedTest
   @MethodSource("operatorSpacesSpaces")
   fun `string and float`(operator: String, sp1: String, sp2: String) {
-    try {
+    val exception = assertThrows<ExException> {
       VimscriptParser.parseExpression("'string'$sp1$operator${sp2}3.4")!!.evaluate()
-    } catch (e: ExException) {
-      assertEquals("E806: Using a Float as a String", e.message)
     }
+    assertEquals("E806: Using a Float as a String", exception.message)
   }
 
   @ParameterizedTest
@@ -92,84 +90,76 @@ class ConcatenationOperatorTest : VimTestCase() {
 
   @ParameterizedTest
   @MethodSource("operatorSpacesSpaces")
-  fun `String and list`(operator: String, sp1: String, sp2: String) {
-    try {
+  fun `integer and list`(operator: String, sp1: String, sp2: String) {
+    val exception = assertThrows<ExException> {
       VimscriptParser.parseExpression("2$sp1$operator$sp2[1, 2]")!!.evaluate()
-    } catch (e: ExException) {
-      assertEquals("E730: Using a List as a String", e.message)
     }
+    assertEquals("E730: Using a List as a String", exception.message)
   }
 
   @ParameterizedTest
   @MethodSource("operatorSpacesSpaces")
   fun `string and list`(operator: String, sp1: String, sp2: String) {
-    try {
+    val exception = assertThrows<ExException> {
       VimscriptParser.parseExpression("'string'$sp1$operator$sp2[1, 2]")!!.evaluate()
-    } catch (e: ExException) {
-      assertEquals("E730: Using a List as a String", e.message)
     }
+    assertEquals("E730: Using a List as a String", exception.message)
   }
 
   @ParameterizedTest
   @MethodSource("operatorSpacesSpaces")
   fun `list and list`(operator: String, sp1: String, sp2: String) {
-    try {
+    val exception = assertThrows<ExException> {
       VimscriptParser.parseExpression("[3]$sp1$operator$sp2[1, 2]")!!.evaluate()
-    } catch (e: ExException) {
-      assertEquals("E730: Using a List as a String", e.message)
     }
+    assertEquals("E730: Using a List as a String", exception.message)
   }
 
   @ParameterizedTest
   @MethodSource("operatorSpacesSpaces")
   fun `dict and integer`(operator: String, sp1: String, sp2: String) {
-    try {
+    val exception = assertThrows<ExException> {
       if (sp1 == "" && sp2 == "") { // it is not a concatenation, so let's skip this case
         throw ExException("E731: Using a Dictionary as a String")
       }
       VimscriptParser.parseExpression("{'key' : 21}$sp1$operator${sp2}1")!!.evaluate()
-    } catch (e: ExException) {
-      assertEquals("E731: Using a Dictionary as a String", e.message)
     }
+    assertEquals("E731: Using a Dictionary as a String", exception.message)
   }
 
   @ParameterizedTest
   @MethodSource("operatorSpacesSpaces")
   fun `dict and float`(operator: String, sp1: String, sp2: String) {
-    try {
+    val exception = assertThrows<ExException> {
       VimscriptParser.parseExpression("{'key' : 21}$sp1$operator${sp2}1.4")!!.evaluate()
-    } catch (e: ExException) {
-      assertEquals("E731: Using a Dictionary as a String", e.message)
     }
+    assertEquals("E731: Using a Dictionary as a String", exception.message)
   }
 
   @ParameterizedTest
   @MethodSource("operatorSpacesSpaces")
   fun `dict and string`(operator: String, sp1: String, sp2: String) {
-    try {
+    val exception = assertThrows<ExException> {
       VimscriptParser.parseExpression("{'key' : 21}$sp1$operator$sp2'string'")!!.evaluate()
-    } catch (e: ExException) {
-      assertEquals("E731: Using a Dictionary as a String", e.message)
     }
+    assertEquals("E731: Using a Dictionary as a String", exception.message)
   }
 
   @ParameterizedTest
   @MethodSource("operatorSpacesSpaces")
   fun `dict and list`(operator: String, sp1: String, sp2: String) {
-    try {
+    val exception = assertThrows<ExException> {
       VimscriptParser.parseExpression("{'key' : 21}$sp1$operator$sp2[1]")!!.evaluate()
-    } catch (e: ExException) {
-      assertEquals("E731: Using a Dictionary as a String", e.message)
     }
+    assertEquals("E731: Using a Dictionary as a String", exception.message)
   }
 
   @ParameterizedTest
   @MethodSource("operatorSpacesSpaces")
   fun `dict and dict`(operator: String, sp1: String, sp2: String) {
-    try {
+    val exception = assertThrows<ExException> {
       VimscriptParser.parseExpression("{'key' : 21}$sp1$operator$sp2{'key2': 33}")!!.evaluate()
-    } catch (e: ExException) {
-      assertEquals("E731: Using a Dictionary as a String", e.message)
     }
+    assertEquals("E731: Using a Dictionary as a String", exception.message)
   }
 }
