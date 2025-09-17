@@ -17,7 +17,6 @@ import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.Range
-import com.maddyhome.idea.vim.register.RegisterConstants
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
@@ -33,7 +32,6 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.EnvVariableExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.LValueExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.OneElementSublistExpression
-import com.maddyhome.idea.vim.vimscript.model.expressions.RegisterExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.SublistExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
@@ -71,11 +69,8 @@ data class LetCommand(
 
     if (lvalue is LValueExpression) {
       val currentValue = lvalue.evaluate(editor, context, vimContext)
-      if (lvalue.isStronglyTyped() && !operator.isApplicableToType(currentValue)) {
-        throw exExceptionMessage("E734", operator.value)
-      }
       val rhs = expression.evaluate(editor, context, vimContext)
-      val newValue = operator.getNewValue(currentValue, rhs)
+      val newValue = operator.getNewValue(currentValue, rhs, lvalue.isStronglyTyped())
       lvalue.assign(newValue, editor, context, this)
       return ExecutionResult.Success
     }
@@ -99,7 +94,7 @@ data class LetCommand(
         val rightValue = expression.evaluate(editor, context, vimContext)
         injector.variableService.storeVariable(
           lvalue,
-          operator.getNewValue(leftValue, rightValue),
+          operator.getNewValue(leftValue, rightValue, false),
           editor,
           context,
           this
@@ -118,7 +113,7 @@ data class LetCommand(
               if (containerValue.dictionary[dictKey]!!.isLocked) {
                 throw exExceptionMessage("E741", lvalue.originalString)
               }
-              operator.getNewValue(containerValue.dictionary[dictKey]!!, expressionValue)
+              operator.getNewValue(containerValue.dictionary[dictKey]!!, expressionValue, false)
             } else {
               if (containerValue.isLocked) {
                 throw exExceptionMessage("E741", lvalue.originalString)
@@ -144,7 +139,7 @@ data class LetCommand(
               throw exExceptionMessage("E741", lvalue.originalString)
             }
             containerValue.values[index] =
-              operator.getNewValue(containerValue.values[index], expression.evaluate(editor, context, vimContext))
+              operator.getNewValue(containerValue.values[index], expression.evaluate(editor, context, vimContext), false)
           }
 
           is VimBlob -> TODO()

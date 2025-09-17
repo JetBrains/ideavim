@@ -8,7 +8,6 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -120,12 +119,10 @@ class LetCommandRegisterLValueTest : VimTestCase("\n") {
     assertCommandOutput("echo string(@a)", "'hello12'")
   }
 
-  @VimBehaviorDiffers("'hello1.23'")
   @Test
   fun `test string concatenation compound assignment operator converts Float rvalue to String`() {
     enterCommand("let @a='hello'")
-    enterCommand("let @a.=1.23'")
-    assertPluginError(true) // TODO: Wrong!
-    assertCommandOutput("echo string(@a)", "'hello'")
+    enterCommand("let @a.=1.23")
+    assertCommandOutput("echo string(@a)", "'hello1.23'")
   }
 }

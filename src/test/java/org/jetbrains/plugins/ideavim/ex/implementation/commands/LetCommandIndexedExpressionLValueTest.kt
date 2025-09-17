@@ -66,14 +66,13 @@ class LetCommandIndexedExpressionLValueTest : VimTestCase("\n") {
     assertCommandOutput("echo string(s)", "[1, '12']")
   }
 
-  @VimBehaviorDiffers("E734: Wrong variable type for .=")
   @Test
   fun `test string concatenation compound assignment operator cannot convert Float to String`() {
     // The operator tries to convert Float to String but cannot
     enterCommand("let s = [1, 1.5]")
     enterCommand("let s[1] .= '2'")
     assertPluginError(true)
-    assertPluginErrorMessage("E806: Using a Float as a String")
+    assertPluginErrorMessage("E734: Wrong variable type for .=")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
@@ -182,14 +181,13 @@ class LetCommandIndexedExpressionLValueTest : VimTestCase("\n") {
     assertCommandOutput("echo string(s)", "{'key1': '12'}")
   }
 
-  @VimBehaviorDiffers("E734: Wrong variable type for .=")
   @Test
   fun `test string concatenation compound assignment operator on Dictionary item cannot convert Float to String`() {
     // The operator tries to convert Float to String, but cannot
     enterCommand("let s = {'key1': 1, 'key2': 1.5}")
     enterCommand("let s['key2'] .= '2'")
     assertPluginError(true)
-    assertPluginErrorMessage("E806: Using a Float as a String")
+    assertPluginErrorMessage("E734: Wrong variable type for .=")
   }
 
   @VimBehaviorDiffers("{'1': 2, 'key1': 1}", description = "Order of items is undefined")
