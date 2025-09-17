@@ -70,9 +70,8 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
     assertLet(init, action, result)
   }
 
-  // TODO: Add tests for double dot concatenation operator ..=
   @ParameterizedTest(name = "{0} | {1} → {2}")
-  @MethodSource("concatenationOperator")
+  @MethodSource("concatenationOperator", "concatenation2Operator")
   fun `test concatenation compound assignment operator`(init: String, action: String, result: String) {
     assertLet(init, action, result)
   }
@@ -365,61 +364,65 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
     }
 
     @JvmStatic
-    fun concatenationOperator() = buildList {
+    fun concatenationOperator() = getConcatenationOperatorCases(".=")
+    @JvmStatic
+    fun concatenation2Operator() = getConcatenationOperatorCases("..=")
+
+    private fun getConcatenationOperatorCases(operator: String) = buildList {
       withInitialValue("let s=100") {
-        case("let s.=10", "'10010'")      // Operator converts to String
-        case("let s.=20.5", "E734: Wrong variable type for .=")
-        case("let s.='20'", "'10020'")    // LValue Number is converted to String
-        case("let s.='foo'", "'100foo'")  // LValue Number is converted to String
-        case("let s.=[1,2,3]", "E730: Using a List as a String")  // TODO: E734: Wrong variable type for .=
-        case("let s.={'key1': 1, 'key2': 2}", "E731: Using a Dictionary as a String") // TODO: E734: Wrong variable type for .=
+        case("let s $operator 10", "'10010'")      // Operator converts to String
+        case("let s $operator 20.5", "E734: Wrong variable type for $operator")
+        case("let s $operator '20'", "'10020'")    // LValue Number is converted to String
+        case("let s $operator 'foo'", "'100foo'")  // LValue Number is converted to String
+        case("let s $operator [1,2,3]", "E730: Using a List as a String")  // TODO: E734: Wrong variable type for .=
+        case("let s $operator {'key1': 1, 'key2': 2}", "E731: Using a Dictionary as a String") // TODO: E734: Wrong variable type for .=
       }
 
       withInitialValue("let s=105.5") {
-        case("let s.=10", "E734: Wrong variable type for .=")
-        case("let s.=20.5", "E734: Wrong variable type for .=")
-        case("let s.='10.5'", "E734: Wrong variable type for .=")
-        case("let s.='foo'", "E734: Wrong variable type for .=")
-        case("let s.=[1,2,3]", "E734: Wrong variable type for .=")
-        case("let s.={'key1': 1, 'key2': 2}", "E734: Wrong variable type for .=")
+        case("let s $operator 10", "E734: Wrong variable type for $operator")
+        case("let s $operator 20.5", "E734: Wrong variable type for $operator")
+        case("let s $operator '10.5'", "E734: Wrong variable type for $operator")
+        case("let s $operator 'foo'", "E734: Wrong variable type for $operator")
+        case("let s $operator [1,2,3]", "E734: Wrong variable type for $operator")
+        case("let s $operator {'key1': 1, 'key2': 2}", "E734: Wrong variable type for $operator")
       }
 
       withInitialValue("let s='30.5'") {
-        case("let s.=10", "'30.510'")   // RValue Number is converted to String
-        case("let s.=20.5", "E734: Wrong variable type for .=")
-        case("let s.='20.5'", "'30.520.5'")
-        case("let s.='0'", "'30.50'")
-        case("let s.=[1,2,3]", "E730: Using a List as a String") // TODO: E734: Wrong variable type for .=
-        case("let s.={'key1': 1, 'key2': 2}", "E731: Using a Dictionary as a String") // TODO: E734: Wrong variable type for .=
+        case("let s $operator 10", "'30.510'")   // RValue Number is converted to String
+        case("let s $operator 20.5", "E734: Wrong variable type for $operator")
+        case("let s $operator '20.5'", "'30.520.5'")
+        case("let s $operator '0'", "'30.50'")
+        case("let s $operator [1,2,3]", "E730: Using a List as a String") // TODO: E734: Wrong variable type for .=
+        case("let s $operator {'key1': 1, 'key2': 2}", "E731: Using a Dictionary as a String") // TODO: E734: Wrong variable type for .=
       }
 
       withInitialValue("let s='foo'") {
-        case("let s.=10", "'foo10'")  // LValue String is converted to Number
-        case("let s.=20.5", "E734: Wrong variable type for .=")
-        case("let s.='20.5'", "'foo20.5'")
-        case("let s.='0'", "'foo0'")
-        case("let s.=[1,2,3]", "E730: Using a List as a String")  // TODO: E734: Wrong variable type for .=
-        case("let s.={'key1': 1, 'key2': 2}", "E731: Using a Dictionary as a String") // TODO: E734: Wrong variable type for .=
+        case("let s $operator 10", "'foo10'")  // LValue String is converted to Number
+        case("let s $operator 20.5", "E734: Wrong variable type for $operator")
+        case("let s $operator '20.5'", "'foo20.5'")
+        case("let s $operator '0'", "'foo0'")
+        case("let s $operator [1,2,3]", "E730: Using a List as a String")  // TODO: E734: Wrong variable type for .=
+        case("let s $operator {'key1': 1, 'key2': 2}", "E731: Using a Dictionary as a String") // TODO: E734: Wrong variable type for .=
       }
 
       withInitialValue("let s=[1,2,3]") {
         // TODO: All of these should be "E734: Wrong variable type for .="
-        case("let s.=10", "E730: Using a List as a String")
-        case("let s.=10.5", "E734: Wrong variable type for .=")
-        case("let s.='10.5'", "E730: Using a List as a String")
-        case("let s.='foo'", "E730: Using a List as a String")
-        case("let s.=[1,2,3]", "E730: Using a List as a String")
-        case("let s.={'key1': 1, 'key2': 2}", "E730: Using a List as a String")
+        case("let s $operator 10", "E730: Using a List as a String")
+        case("let s $operator 10.5", "E734: Wrong variable type for $operator")
+        case("let s $operator '10.5'", "E730: Using a List as a String")
+        case("let s $operator 'foo'", "E730: Using a List as a String")
+        case("let s $operator [1,2,3]", "E730: Using a List as a String")
+        case("let s $operator {'key1': 1, 'key2': 2}", "E730: Using a List as a String")
       }
 
       withInitialValue("let s={'key1': 1, 'key2': 2}") {
         // TODO: All of these should be "E734: Wrong variable type for .="
-        case("let s.=10", "E731: Using a Dictionary as a String")
-        case("let s.=10.5", "E734: Wrong variable type for .=")
-        case("let s.='10.5'", "E731: Using a Dictionary as a String")
-        case("let s.='foo'", "E731: Using a Dictionary as a String")
-        case("let s.=[1,2,3]", "E731: Using a Dictionary as a String")
-        case("let s.={'key1': 1, 'key2': 2}", "E731: Using a Dictionary as a String")
+        case("let s $operator 10", "E731: Using a Dictionary as a String")
+        case("let s $operator 10.5", "E734: Wrong variable type for $operator")
+        case("let s $operator '10.5'", "E731: Using a Dictionary as a String")
+        case("let s $operator 'foo'", "E731: Using a Dictionary as a String")
+        case("let s $operator [1,2,3]", "E731: Using a Dictionary as a String")
+        case("let s $operator {'key1': 1, 'key2': 2}", "E731: Using a Dictionary as a String")
       }
     }
 

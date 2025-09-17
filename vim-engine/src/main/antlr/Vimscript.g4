@@ -164,7 +164,7 @@ letCommands:
 ;
 
 assignmentOperator:
-    ASSIGN | plusAssign | minusAssign | startAssign | divAssign | modAssign | dotAssign;
+    ASSIGN | plusAssign | minusAssign | startAssign | divAssign | modAssign | dotAssign | dotDotAssign;
 plusAssign:
     PLUS ASSIGN;
 minusAssign:
@@ -177,6 +177,8 @@ modAssign:
     MOD ASSIGN;
 dotAssign:
     DOT ASSIGN;
+dotDotAssign:
+    DOT DOT ASSIGN;
 
 shortRange:
     ((QUESTION (~QUESTION)* QUESTION?) | (DIV (~DIV)* DIV?));
