@@ -9,9 +9,14 @@
 package com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary
 
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 internal object ConcatenationHandler : BinaryOperatorHandler() {
-  override fun performOperation(left: VimDataType, right: VimDataType) =
-    VimString(left.toVimString().value + right.toVimString().value)
+  override fun performOperation(left: VimDataType, right: VimDataType): VimString {
+    // Concatenation allows converting Float to String
+    val l = if (left is VimFloat) left.toOutputString() else left.toVimString().value
+    val r = if (right is VimFloat) right.toOutputString() else right.toVimString().value
+    return VimString(l + r)
+  }
 }

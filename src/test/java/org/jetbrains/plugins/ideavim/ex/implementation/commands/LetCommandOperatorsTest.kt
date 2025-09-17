@@ -85,8 +85,8 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
         case("let s+=20.5", "30.5")  // LValue Number is converted to Float
         case("let s+='20'", "30")    // RValue String is converted to Number
         case("let s+='foo'", "10")   // RValue String is converted to Number (0)
-        case("let s+=[1,2,3]", "E745: Using a List as a Number")  // TODO: E734: Wrong variable type for +=
-        case("let s+={'key1': 1, 'key2': 2}", "E728: Using a Dictionary as a Number") // TODO: E734: Wrong variable type for +=
+        case("let s+=[1,2,3]", "E734: Wrong variable type for +=")
+        case("let s+={'key1': 1, 'key2': 2}", "E734: Wrong variable type for +=")
       }
 
       withInitialValue("let s=10.5") {
@@ -94,8 +94,8 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
         case("let s+=20.5", "31.0")
         case("let s+='10.5'", "20.5")  // String converts to Number, not Float, but result is Float
         case("let s+='foo'", "10.5")   // RValue String is converted to Number (0)
-        case("let s+=[1,2,3]", "E745: Using a List as a Number") // TODO: E734: Wrong variable type for +=
-        case("let s+={'key1': 1, 'key2': 2}", "E728: Using a Dictionary as a Number") // TODO: E734: Wrong variable type for +=
+        case("let s+=[1,2,3]", "E734: Wrong variable type for +=")
+        case("let s+={'key1': 1, 'key2': 2}", "E734: Wrong variable type for +=")
       }
 
       withInitialValue("let s='10.5'") {
@@ -103,8 +103,8 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
         case("let s+=20.5", "30.5")  // String is converted to Number, operation converted to Float
         case("let s+='20.5'", "30")  // Strings are converted to Number
         case("let s+='0'", "10")     // Strings are converted to Number
-        case("let s+=[1,2,3]", "E745: Using a List as a Number") // TODO: E734: Wrong variable type for +=
-        case("let s+={'key1': 1, 'key2': 2}", "E728: Using a Dictionary as a Number") // TODO: E734: Wrong variable type for +=
+        case("let s+=[1,2,3]", "E734: Wrong variable type for +=")
+        case("let s+={'key1': 1, 'key2': 2}", "E734: Wrong variable type for +=")
       }
 
       withInitialValue("let s='foo'") {
@@ -112,28 +112,26 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
         case("let s+=20.5", "20.5")  // String is converted to Number, operation converted to Float
         case("let s+='20.5'", "20")  // Strings are converted to Number
         case("let s+='0'", "0")      // Strings are converted to Number
-        case("let s+=[1,2,3]", "E745: Using a List as a Number") // TODO: E734: Wrong variable type for +=
-        case("let s+={'key1': 1, 'key2': 2}", "E728: Using a Dictionary as a Number") // TODO: E734: Wrong variable type for +=
+        case("let s+=[1,2,3]", "E734: Wrong variable type for +=")
+        case("let s+={'key1': 1, 'key2': 2}", "E734: Wrong variable type for +=")
       }
 
       withInitialValue("let s=[1,2,3]") {
-        // TODO: All of these should be "E734: Wrong variable type for +="
-        case("let s+=10", "E745: Using a List as a Number")
-        case("let s+=10.5", "E745: Using a List as a Number")
-        case("let s+='10.5'", "E745: Using a List as a Number")
-        case("let s+='foo'", "E745: Using a List as a Number")
+        case("let s+=10", "E734: Wrong variable type for +=")
+        case("let s+=10.5", "E734: Wrong variable type for +=")
+        case("let s+='10.5'", "E734: Wrong variable type for +=")
+        case("let s+='foo'", "E734: Wrong variable type for +=")
         case("let s+=[1,2,3]", "[1, 2, 3, 1, 2, 3]") // Needs further test to ensure modifies in-place
-        case("let s+={'key1': 1, 'key2': 2}", "E745: Using a List as a Number")
+        case("let s+={'key1': 1, 'key2': 2}", "E734: Wrong variable type for +=")
       }
 
       withInitialValue("let s={'key1': 1, 'key2': 2}") {
-        // TODO: All of these should be "E734: Wrong variable type for +="
-        case("let s+=10", "E728: Using a Dictionary as a Number")
-        case("let s+=10.5", "E728: Using a Dictionary as a Number")
-        case("let s+='10.5'", "E728: Using a Dictionary as a Number")
-        case("let s+='foo'", "E728: Using a Dictionary as a Number")
-        case("let s+=[1,2,3]", "E728: Using a Dictionary as a Number")
-        case("let s+={'key1': 1, 'key2': 2}", "E728: Using a Dictionary as a Number")
+        case("let s+=10", "E734: Wrong variable type for +=")
+        case("let s+=10.5", "E734: Wrong variable type for +=")
+        case("let s+='10.5'", "E734: Wrong variable type for +=")
+        case("let s+='foo'", "E734: Wrong variable type for +=")
+        case("let s+=[1,2,3]", "E734: Wrong variable type for +=")
+        case("let s+={'key1': 1, 'key2': 2}", "E734: Wrong variable type for +=")
       }
     }
 
@@ -144,8 +142,8 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
         case("let s-=20.5", "9.5")  // LValue Number is converted to Float
         case("let s-='20'", "10")   // RValue String is converted to Number
         case("let s-='foo'", "30")  // RValue String is converted to Number (0)
-        case("let s-=[1,2,3]", "E745: Using a List as a Number")  // TODO: E734: Wrong variable type for +=
-        case("let s-={'key1': 1, 'key2': 2}", "E728: Using a Dictionary as a Number") // TODO: E734: Wrong variable type for +=
+        case("let s-=[1,2,3]", "E734: Wrong variable type for -=")
+        case("let s-={'key1': 1, 'key2': 2}", "E734: Wrong variable type for -=")
       }
 
       withInitialValue("let s=30.5") {
@@ -153,8 +151,8 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
         case("let s-=20.5", "10.0")
         case("let s-='10.5'", "20.5")  // String converts to Number, not Float, but result is Float
         case("let s-='foo'", "30.5")   // RValue String is converted to Number (0)
-        case("let s-=[1,2,3]", "E745: Using a List as a Number") // TODO: E734: Wrong variable type for +=
-        case("let s-={'key1': 1, 'key2': 2}", "E728: Using a Dictionary as a Number") // TODO: E734: Wrong variable type for +=
+        case("let s-=[1,2,3]", "E734: Wrong variable type for -=")
+        case("let s-={'key1': 1, 'key2': 2}", "E734: Wrong variable type for -=")
       }
 
       withInitialValue("let s='30.5'") {
@@ -162,8 +160,8 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
         case("let s-=20.5", "9.5")  // String is converted to Number, operation converted to Float
         case("let s-='20.5'", "10") // Strings are converted to Number
         case("let s-='0'", "30")    // Strings are converted to Number
-        case("let s-=[1,2,3]", "E745: Using a List as a Number") // TODO: E734: Wrong variable type for -=
-        case("let s-={'key1': 1, 'key2': 2}", "E728: Using a Dictionary as a Number") // TODO: E734: Wrong variable type for -=
+        case("let s-=[1,2,3]", "E734: Wrong variable type for -=")
+        case("let s-={'key1': 1, 'key2': 2}", "E734: Wrong variable type for -=")
       }
 
       withInitialValue("let s='foo'") {
@@ -171,28 +169,26 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
         case("let s-=20.5", "-20.5")  // String is converted to Number, operation converted to Float
         case("let s-='20.5'", "-20")  // Strings are converted to Number
         case("let s-='0'", "0")       // Strings are converted to Number
-        case("let s-=[1,2,3]", "E745: Using a List as a Number") // TODO: E734: Wrong variable type for -=
-        case("let s-={'key1': 1, 'key2': 2}", "E728: Using a Dictionary as a Number") // TODO: E734: Wrong variable type for -=
+        case("let s-=[1,2,3]", "E734: Wrong variable type for -=")
+        case("let s-={'key1': 1, 'key2': 2}", "E734: Wrong variable type for -=")
       }
 
       withInitialValue("let s=[1,2,3]") {
-        // TODO: All of these should be "E734: Wrong variable type for -="
-        case("let s-=10", "E745: Using a List as a Number")
-        case("let s-=10.5", "E745: Using a List as a Number")
-        case("let s-='10.5'", "E745: Using a List as a Number")
-        case("let s-='foo'", "E745: Using a List as a Number")
-        case("let s-=[1,2,3]", "E745: Using a List as a Number")
-        case("let s-={'key1': 1, 'key2': 2}", "E745: Using a List as a Number")
+        case("let s-=10", "E734: Wrong variable type for -=")
+        case("let s-=10.5", "E734: Wrong variable type for -=")
+        case("let s-='10.5'", "E734: Wrong variable type for -=")
+        case("let s-='foo'", "E734: Wrong variable type for -=")
+        case("let s-=[1,2,3]", "E734: Wrong variable type for -=")
+        case("let s-={'key1': 1, 'key2': 2}", "E734: Wrong variable type for -=")
       }
 
       withInitialValue("let s={'key1': 1, 'key2': 2}") {
-        // TODO: All of these should be "E734: Wrong variable type for -="
-        case("let s-=10", "E728: Using a Dictionary as a Number")
-        case("let s-=10.5", "E728: Using a Dictionary as a Number")
-        case("let s-='10.5'", "E728: Using a Dictionary as a Number")
-        case("let s-='foo'", "E728: Using a Dictionary as a Number")
-        case("let s-=[1,2,3]", "E728: Using a Dictionary as a Number")
-        case("let s-={'key1': 1, 'key2': 2}", "E728: Using a Dictionary as a Number")
+        case("let s-=10", "E734: Wrong variable type for -=")
+        case("let s-=10.5", "E734: Wrong variable type for -=")
+        case("let s-='10.5'", "E734: Wrong variable type for -=")
+        case("let s-='foo'", "E734: Wrong variable type for -=")
+        case("let s-=[1,2,3]", "E734: Wrong variable type for -=")
+        case("let s-={'key1': 1, 'key2': 2}", "E734: Wrong variable type for -=")
       }
     }
 
@@ -203,8 +199,8 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
         case("let s*=20.55", "205.5") // LValue Number is converted to Float
         case("let s*='20'", "200")    // RValue String is converted to Number
         case("let s*='foo'", "0")     // RValue String is converted to Number (0)
-        case("let s*=[1,2,3]", "E745: Using a List as a Number")  // TODO: E734: Wrong variable type for *=
-        case("let s*={'key1': 1, 'key2': 2}", "E728: Using a Dictionary as a Number") // TODO: E734: Wrong variable type for *=
+        case("let s*=[1,2,3]", "E734: Wrong variable type for *=")
+        case("let s*={'key1': 1, 'key2': 2}", "E734: Wrong variable type for *=")
       }
 
       withInitialValue("let s=10.55") {
@@ -212,8 +208,8 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
         case("let s*=20.5", "216.275")
         case("let s*='10.5'", "105.5")  // String converts to Number, not Float, but result is Float
         case("let s*='foo'", "0.0")     // RValue String is converted to Number (0)
-        case("let s*=[1,2,3]", "E745: Using a List as a Number") // TODO: E734: Wrong variable type for *=
-        case("let s*={'key1': 1, 'key2': 2}", "E728: Using a Dictionary as a Number") // TODO: E734: Wrong variable type for *=
+        case("let s*=[1,2,3]", "E734: Wrong variable type for *=")
+        case("let s*={'key1': 1, 'key2': 2}", "E734: Wrong variable type for *=")
       }
 
       withInitialValue("let s='30.5'") {
@@ -221,8 +217,8 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
         case("let s*=20.5", "615.0")  // String is converted to Number, operation converted to Float
         case("let s*='20.5'", "600")  // Strings are converted to Number
         case("let s*='0'", "0")       // Strings are converted to Number
-        case("let s*=[1,2,3]", "E745: Using a List as a Number") // TODO: E734: Wrong variable type for *=
-        case("let s*={'key1': 1, 'key2': 2}", "E728: Using a Dictionary as a Number") // TODO: E734: Wrong variable type for *=
+        case("let s*=[1,2,3]", "E734: Wrong variable type for *=")
+        case("let s*={'key1': 1, 'key2': 2}", "E734: Wrong variable type for *=")
       }
 
       withInitialValue("let s='foo'") {
@@ -230,28 +226,26 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
         case("let s*=20.5", "0.0")  // String is converted to Number, operation converted to Float
         case("let s*='20.5'", "0")  // Strings are converted to Number
         case("let s*='0'", "0")     // Strings are converted to Number
-        case("let s*=[1,2,3]", "E745: Using a List as a Number") // TODO: E734: Wrong variable type for *=
-        case("let s*={'key1': 1, 'key2': 2}", "E728: Using a Dictionary as a Number") // TODO: E734: Wrong variable type for *=
+        case("let s*=[1,2,3]", "E734: Wrong variable type for *=")
+        case("let s*={'key1': 1, 'key2': 2}", "E734: Wrong variable type for *=")
       }
 
       withInitialValue("let s=[1,2,3]") {
-        // TODO: All of these should be "E734: Wrong variable type for *="
-        case("let s*=10", "E745: Using a List as a Number")
-        case("let s*=10.5", "E745: Using a List as a Number")
-        case("let s*='10.5'", "E745: Using a List as a Number")
-        case("let s*='foo'", "E745: Using a List as a Number")
-        case("let s*=[1,2,3]", "E745: Using a List as a Number")
-        case("let s*={'key1': 1, 'key2': 2}", "E745: Using a List as a Number")
+        case("let s*=10", "E734: Wrong variable type for *=")
+        case("let s*=10.5", "E734: Wrong variable type for *=")
+        case("let s*='10.5'", "E734: Wrong variable type for *=")
+        case("let s*='foo'", "E734: Wrong variable type for *=")
+        case("let s*=[1,2,3]", "E734: Wrong variable type for *=")
+        case("let s*={'key1': 1, 'key2': 2}", "E734: Wrong variable type for *=")
       }
 
       withInitialValue("let s={'key1': 1, 'key2': 2}") {
-        // TODO: All of these should be "E734: Wrong variable type for *="
-        case("let s*=10", "E728: Using a Dictionary as a Number")
-        case("let s*=10.5", "E728: Using a Dictionary as a Number")
-        case("let s*='10.5'", "E728: Using a Dictionary as a Number")
-        case("let s*='foo'", "E728: Using a Dictionary as a Number")
-        case("let s*=[1,2,3]", "E728: Using a Dictionary as a Number")
-        case("let s*={'key1': 1, 'key2': 2}", "E728: Using a Dictionary as a Number")
+        case("let s*=10", "E734: Wrong variable type for *=")
+        case("let s*=10.5", "E734: Wrong variable type for *=")
+        case("let s*='10.5'", "E734: Wrong variable type for *=")
+        case("let s*='foo'", "E734: Wrong variable type for *=")
+        case("let s*=[1,2,3]", "E734: Wrong variable type for *=")
+        case("let s*={'key1': 1, 'key2': 2}", "E734: Wrong variable type for *=")
       }
     }
 
@@ -262,8 +256,8 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
         case("let s/=20.5", "4.878049") // LValue Number is converted to Float
         case("let s/='20'", "5")        // RValue String is converted to Number
         case("let s/='foo'", "${Int.MAX_VALUE}")  // Divide by 0! Avoided by converting to Float, resulting in Int.MaxValue
-        case("let s/=[1,2,3]", "E745: Using a List as a Number")  // TODO: E734: Wrong variable type for /=
-        case("let s/={'key1': 1, 'key2': 2}", "E728: Using a Dictionary as a Number") // TODO: E734: Wrong variable type for /=
+        case("let s/=[1,2,3]", "E734: Wrong variable type for /=")
+        case("let s/={'key1': 1, 'key2': 2}", "E734: Wrong variable type for /=")
       }
 
       withInitialValue("let s=105.5") {
@@ -271,8 +265,8 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
         case("let s/=20.5", "5.146341")
         case("let s/='10.5'", "10.55")  // String converts to Number, not Float, but result is Float
         case("let s/='foo'", "inf")     // RValue String is converted to Number (divide by 0!)
-        case("let s/=[1,2,3]", "E745: Using a List as a Number") // TODO: E734: Wrong variable type for /=
-        case("let s/={'key1': 1, 'key2': 2}", "E728: Using a Dictionary as a Number") // TODO: E734: Wrong variable type for /=
+        case("let s/=[1,2,3]", "E734: Wrong variable type for /=")
+        case("let s/={'key1': 1, 'key2': 2}", "E734: Wrong variable type for /=")
       }
 
       withInitialValue("let s='30.5'") {
@@ -280,8 +274,8 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
         case("let s/=20.5", "1.463415") // String is converted to Number, operation converted to Float
         case("let s/='20.5'", "1")      // Strings are converted to Number, result is Number
         case("let s/='0'", "${Int.MAX_VALUE}")  // Divide by 0! Avoided by converting to Float, resulting in Int.MaxValue
-        case("let s/=[1,2,3]", "E745: Using a List as a Number") // TODO: E734: Wrong variable type for /=
-        case("let s/={'key1': 1, 'key2': 2}", "E728: Using a Dictionary as a Number") // TODO: E734: Wrong variable type for /=
+        case("let s/=[1,2,3]", "E734: Wrong variable type for /=")
+        case("let s/={'key1': 1, 'key2': 2}", "E734: Wrong variable type for /=")
       }
 
       withInitialValue("let s='foo'") {
@@ -289,28 +283,26 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
         case("let s/=20.5", "0.0")  // String is converted to Number, operation converted to Float
         case("let s/='20.5'", "0")  // Strings are converted to Number
         case("let s/='0'", "0")     // Strings are converted to Number
-        case("let s/=[1,2,3]", "E745: Using a List as a Number") // TODO: E734: Wrong variable type for /=
-        case("let s/={'key1': 1, 'key2': 2}", "E728: Using a Dictionary as a Number") // TODO: E734: Wrong variable type for /=
+        case("let s/=[1,2,3]", "E734: Wrong variable type for /=")
+        case("let s/={'key1': 1, 'key2': 2}", "E734: Wrong variable type for /=")
       }
 
       withInitialValue("let s=[1,2,3]") {
-        // TODO: All of these should be "E734: Wrong variable type for /="
-        case("let s/=10", "E745: Using a List as a Number")
-        case("let s/=10.5", "E745: Using a List as a Number")
-        case("let s/='10.5'", "E745: Using a List as a Number")
-        case("let s/='foo'", "E745: Using a List as a Number")
-        case("let s/=[1,2,3]", "E745: Using a List as a Number")
-        case("let s/={'key1': 1, 'key2': 2}", "E745: Using a List as a Number")
+        case("let s/=10", "E734: Wrong variable type for /=")
+        case("let s/=10.5", "E734: Wrong variable type for /=")
+        case("let s/='10.5'", "E734: Wrong variable type for /=")
+        case("let s/='foo'", "E734: Wrong variable type for /=")
+        case("let s/=[1,2,3]", "E734: Wrong variable type for /=")
+        case("let s/={'key1': 1, 'key2': 2}", "E734: Wrong variable type for /=")
       }
 
       withInitialValue("let s={'key1': 1, 'key2': 2}") {
-        // TODO: All of these should be "E734: Wrong variable type for /="
-        case("let s/=10", "E728: Using a Dictionary as a Number")
-        case("let s/=10.5", "E728: Using a Dictionary as a Number")
-        case("let s/='10.5'", "E728: Using a Dictionary as a Number")
-        case("let s/='foo'", "E728: Using a Dictionary as a Number")
-        case("let s/=[1,2,3]", "E728: Using a Dictionary as a Number")
-        case("let s/={'key1': 1, 'key2': 2}", "E728: Using a Dictionary as a Number")
+        case("let s/=10", "E734: Wrong variable type for /=")
+        case("let s/=10.5", "E734: Wrong variable type for /=")
+        case("let s/='10.5'", "E734: Wrong variable type for /=")
+        case("let s/='foo'", "E734: Wrong variable type for /=")
+        case("let s/=[1,2,3]", "E734: Wrong variable type for /=")
+        case("let s/={'key1': 1, 'key2': 2}", "E734: Wrong variable type for /=")
       }
     }
 
@@ -321,8 +313,8 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
         case("let s%=20.5", "E804: Cannot use '%' with Float")    // TODO: E734: Wrong variable type for %=
         case("let s%='13'", "2")    // RValue String is converted to Number
         case("let s%='foo'", "0")
-        case("let s%=[1,2,3]", "E745: Using a List as a Number")  // TODO: E734: Wrong variable type for %=
-        case("let s%={'key1': 1, 'key2': 2}", "E728: Using a Dictionary as a Number") // TODO: E734: Wrong variable type for %=
+        case("let s%=[1,2,3]", "E734: Wrong variable type for %=")
+        case("let s%={'key1': 1, 'key2': 2}", "E734: Wrong variable type for %=")
       }
 
       withInitialValue("let s=105.5") {
@@ -331,8 +323,8 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
         case("let s%=20.5", "E804: Cannot use '%' with Float")
         case("let s%='10.5'", "E804: Cannot use '%' with Float")
         case("let s%='foo'", "E804: Cannot use '%' with Float")
-        case("let s%=[1,2,3]", "E804: Cannot use '%' with Float")
-        case("let s%={'key1': 1, 'key2': 2}", "E804: Cannot use '%' with Float")
+        case("let s%=[1,2,3]", "E734: Wrong variable type for %=")
+        case("let s%={'key1': 1, 'key2': 2}", "E734: Wrong variable type for %=")
       }
 
       withInitialValue("let s='31.5'") {
@@ -340,8 +332,8 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
         case("let s%=20.5", "E804: Cannot use '%' with Float") // TODO: E734: Wrong variable type for %=
         case("let s%='13.5'", "5")      // Strings are converted to Number, result is Number
         case("let s%='0'", "0")
-        case("let s%=[1,2,3]", "E745: Using a List as a Number") // TODO: E734: Wrong variable type for /=
-        case("let s%={'key1': 1, 'key2': 2}", "E728: Using a Dictionary as a Number") // TODO: E734: Wrong variable type for /=
+        case("let s%=[1,2,3]", "E734: Wrong variable type for %=")
+        case("let s%={'key1': 1, 'key2': 2}", "E734: Wrong variable type for %=")
       }
 
       withInitialValue("let s='foo'") {
@@ -349,28 +341,26 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
         case("let s%=20.5", "E804: Cannot use '%' with Float")  // TODO: E734: Wrong variable type for %=
         case("let s%='20.5'", "0")  // Strings are converted to Number
         case("let s%='0'", "0")     // Strings are converted to Number
-        case("let s%=[1,2,3]", "E745: Using a List as a Number") // TODO: E734: Wrong variable type for /=
-        case("let s%={'key1': 1, 'key2': 2}", "E728: Using a Dictionary as a Number") // TODO: E734: Wrong variable type for /=
+        case("let s%=[1,2,3]", "E734: Wrong variable type for %=")
+        case("let s%={'key1': 1, 'key2': 2}", "E734: Wrong variable type for %=")
       }
 
       withInitialValue("let s=[1,2,3]") {
-        // TODO: All of these should be "E734: Wrong variable type for /="
-        case("let s%=10", "E745: Using a List as a Number")
-        case("let s%=10.5", "E804: Cannot use '%' with Float")
-        case("let s%='10.5'", "E745: Using a List as a Number")
-        case("let s%='foo'", "E745: Using a List as a Number")
-        case("let s%=[1,2,3]", "E745: Using a List as a Number")
-        case("let s%={'key1': 1, 'key2': 2}", "E745: Using a List as a Number")
+        case("let s%=10", "E734: Wrong variable type for %=")
+        case("let s%=10.5", "E734: Wrong variable type for %=")
+        case("let s%='10.5'", "E734: Wrong variable type for %=")
+        case("let s%='foo'", "E734: Wrong variable type for %=")
+        case("let s%=[1,2,3]", "E734: Wrong variable type for %=")
+        case("let s%={'key1': 1, 'key2': 2}", "E734: Wrong variable type for %=")
       }
 
       withInitialValue("let s={'key1': 1, 'key2': 2}") {
-        // TODO: All of these should be "E734: Wrong variable type for /="
-        case("let s%=10", "E728: Using a Dictionary as a Number")
-        case("let s%=10.5", "E804: Cannot use '%' with Float")
-        case("let s%='10.5'", "E728: Using a Dictionary as a Number")
-        case("let s%='foo'", "E728: Using a Dictionary as a Number")
-        case("let s%=[1,2,3]", "E728: Using a Dictionary as a Number")
-        case("let s%={'key1': 1, 'key2': 2}", "E728: Using a Dictionary as a Number")
+        case("let s%=10", "E734: Wrong variable type for %=")
+        case("let s%=10.5", "E734: Wrong variable type for %=")
+        case("let s%='10.5'", "E734: Wrong variable type for %=")
+        case("let s%='foo'", "E734: Wrong variable type for %=")
+        case("let s%=[1,2,3]", "E734: Wrong variable type for %=")
+        case("let s%={'key1': 1, 'key2': 2}", "E734: Wrong variable type for %=")
       }
     }
 
@@ -378,7 +368,7 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
     fun concatenationOperator() = buildList {
       withInitialValue("let s=100") {
         case("let s.=10", "'10010'")      // Operator converts to String
-        case("let s.=20.5", "E806: Using a Float as a String")    // TODO: E734: Wrong variable type for .=
+        case("let s.=20.5", "E734: Wrong variable type for .=")
         case("let s.='20'", "'10020'")    // LValue Number is converted to String
         case("let s.='foo'", "'100foo'")  // LValue Number is converted to String
         case("let s.=[1,2,3]", "E730: Using a List as a String")  // TODO: E734: Wrong variable type for .=
@@ -386,17 +376,17 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
       }
 
       withInitialValue("let s=105.5") {
-        case("let s.=10", "E806: Using a Float as a String")      // TODO: E734: Wrong variable type for .=
-        case("let s.=20.5", "E806: Using a Float as a String")    // TODO: E734: Wrong variable type for .=
-        case("let s.='10.5'", "E806: Using a Float as a String")  // TODO: E734: Wrong variable type for .=
-        case("let s.='foo'", "E806: Using a Float as a String")   // TODO: E734: Wrong variable type for .=
-        case("let s.=[1,2,3]", "E806: Using a Float as a String") // TODO: E734: Wrong variable type for .=
-        case("let s.={'key1': 1, 'key2': 2}", "E806: Using a Float as a String") // TODO: E734: Wrong variable type for .=
+        case("let s.=10", "E734: Wrong variable type for .=")
+        case("let s.=20.5", "E734: Wrong variable type for .=")
+        case("let s.='10.5'", "E734: Wrong variable type for .=")
+        case("let s.='foo'", "E734: Wrong variable type for .=")
+        case("let s.=[1,2,3]", "E734: Wrong variable type for .=")
+        case("let s.={'key1': 1, 'key2': 2}", "E734: Wrong variable type for .=")
       }
 
       withInitialValue("let s='30.5'") {
         case("let s.=10", "'30.510'")   // RValue Number is converted to String
-        case("let s.=20.5", "E806: Using a Float as a String")  // TODO: E734: Wrong variable type for .=
+        case("let s.=20.5", "E734: Wrong variable type for .=")
         case("let s.='20.5'", "'30.520.5'")
         case("let s.='0'", "'30.50'")
         case("let s.=[1,2,3]", "E730: Using a List as a String") // TODO: E734: Wrong variable type for .=
@@ -405,7 +395,7 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
 
       withInitialValue("let s='foo'") {
         case("let s.=10", "'foo10'")  // LValue String is converted to Number
-        case("let s.=20.5", "E806: Using a Float as a String")    // TODO: E734: Wrong variable type for .=
+        case("let s.=20.5", "E734: Wrong variable type for .=")
         case("let s.='20.5'", "'foo20.5'")
         case("let s.='0'", "'foo0'")
         case("let s.=[1,2,3]", "E730: Using a List as a String")  // TODO: E734: Wrong variable type for .=
@@ -415,7 +405,7 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
       withInitialValue("let s=[1,2,3]") {
         // TODO: All of these should be "E734: Wrong variable type for .="
         case("let s.=10", "E730: Using a List as a String")
-        case("let s.=10.5", "E730: Using a List as a String")
+        case("let s.=10.5", "E734: Wrong variable type for .=")
         case("let s.='10.5'", "E730: Using a List as a String")
         case("let s.='foo'", "E730: Using a List as a String")
         case("let s.=[1,2,3]", "E730: Using a List as a String")
@@ -425,7 +415,7 @@ class LetCommandOperatorsTest : VimTestCase("\n") {
       withInitialValue("let s={'key1': 1, 'key2': 2}") {
         // TODO: All of these should be "E734: Wrong variable type for .="
         case("let s.=10", "E731: Using a Dictionary as a String")
-        case("let s.=10.5", "E731: Using a Dictionary as a String")
+        case("let s.=10.5", "E734: Wrong variable type for .=")
         case("let s.='10.5'", "E731: Using a Dictionary as a String")
         case("let s.='foo'", "E731: Using a Dictionary as a String")
         case("let s.=[1,2,3]", "E731: Using a Dictionary as a String")

@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.expressions.operators
 
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -36,47 +37,90 @@ enum class AssignmentOperator(val value: String) {
     }
   }
 
-  fun getNewValue(left: VimDataType?, right: VimDataType): VimDataType {
+  /**
+   * Calculate the new value for the lvalue after the operator is applied
+   *
+   * It is up to the operator to convert the values to the correct or compatible types. Typically, this means that
+   * String and Number can be converted in both directions. Vim also allows operators to coerce to Float if one side is
+   * Float (this conversion isn't allowed elsewhere, e.g., indexes must be Number, but can be converted from String).
+   * The operator may throw exceptions if the conversion is not possible.
+   *
+   * However, if the lvalue is strongly typed, such as an option or register, then the operator is stricter. For
+   * example, a register is a strongly typed String lvalue, so arithmetic operators don't make sense, even though Number
+   * and String can be converted. A Number option is strongly typed, and so concatenation is not allowed, even though
+   * the concatenation operator allows converting Number and Float to String.
+   *
+   * @param lvalue The left-hand side of the operator
+   * @param rvalue The right-hand side of the operator
+   * @param isLValueStronglyTyped Is the lvalue a strongly typed expression (e.g., option or register)?
+   * @return The new value for the lvalue after the operator is applied
+   */
+  fun getNewValue(lvalue: VimDataType?, rvalue: VimDataType, isLValueStronglyTyped: Boolean): VimDataType {
+    validateValues(lvalue, rvalue, isLValueStronglyTyped)
     return when (this) {
-      ASSIGNMENT -> right
+      ASSIGNMENT -> rvalue
       ADDITION -> {
-        // in this case we should update the existing list instead of creating a new one
-        if (left is VimList && right is VimList) {
-          left.values.addAll(right.values)
-          left
+        // AdditionHandler will create a new list, but compound assignment means we modify the existing list
+        if (lvalue is VimList && rvalue is VimList) {
+          lvalue.values.addAll(rvalue.values)
+          lvalue
         } else {
-          AdditionHandler.performOperation(left!!, right)
+          AdditionHandler.performOperation(lvalue!!, rvalue)
         }
       }
 
-      SUBTRACTION -> SubtractionHandler.performOperation(left!!, right)
-      MULTIPLICATION -> MultiplicationHandler.performOperation(left!!, right)
-      DIVISION -> DivisionHandler.performOperation(left!!, right)
-      MODULUS -> ModulusHandler.performOperation(left!!, right)
-      CONCATENATION -> ConcatenationHandler.performOperation(left!!, right)
+      SUBTRACTION -> SubtractionHandler.performOperation(lvalue!!, rvalue)
+      MULTIPLICATION -> MultiplicationHandler.performOperation(lvalue!!, rvalue)
+      DIVISION -> DivisionHandler.performOperation(lvalue!!, rvalue)
+      MODULUS -> ModulusHandler.performOperation(lvalue!!, rvalue)
+      CONCATENATION -> ConcatenationHandler.performOperation(lvalue!!, rvalue)
     }
   }
 
-  /**
-   * Given a strongly typed lvalue, is the operator valid for that type?
-   *
-   * If the lvalue of a compound operator is strongly typed, then only certain operators make sense for that type. For
-   * example, a register is a strongly typed String lvalue, so arithmetic operators don't make sense. Same for a String
-   * option. Likewise, a Number option can only use arithmetic operators. An untyped lvalue, such as a variable, indexed
-   * expression, or sublist, doesn't have any restrictions on what operators make sense, and the operator will attempt
-   * to convert between String, Number, and Float as necessary. The resulting value is assigned to the lvalue, and it
-   * takes the type of the result.
-   *
-   * Note that an arithmetic operator can convert String to Number and coerce Number to Float if one side is Float.
-   * The resulting Number or Float is assigned to an untyped lvalue. An arithmetic operator that coerces to Float for
-   * a typed lvalue will fail when trying to assign the result (e.g. `E806: Using a Float as a Number`).
-   *
-   * The simple assignment operator does not operate on an lvalue, so doesn't care what type it is. It doesn't
-   * transform, but can still fail when trying to assign a value of a different type to a strongly typed lvalue.
-   */
-  fun isApplicableToType(value: VimDataType) = when (this) {
-    ASSIGNMENT -> true  // The operator doesn't care about the lvalue type, but the lvalue might
-    CONCATENATION -> value is VimString
-    else -> value is VimInt || value is VimFloat
+  private fun validateValues(lvalue: VimDataType?, rvalue: VimDataType, isLValueStronglyTyped: Boolean) {
+    when (this) {
+      ASSIGNMENT -> {
+        // The operator makes no transformations that need to be validated. The assignment might still fail.
+        return
+      }
+
+      CONCATENATION -> {
+        if (isLValueStronglyTyped && lvalue !is VimString) {
+          // Concatenation is only allowed for String lvalues. We'll try to convert to a String unless it's a strongly
+          // typed lvalue such as a register or option
+          throw exExceptionMessage("E734", value)
+        }
+        if (lvalue is VimFloat || (rvalue is VimFloat && !isLValueStronglyTyped)) {
+          // The concatenation compound assignment operator does not allow converting from Float to String, even though
+          // this is allowed for the binary concatenation operator.
+          // * `let s=1.5 | let s.='2'` should fail, even though `echo string(1.5 .. '2')` works ('1.52')
+          // * `let s='foo' | let s.=20.5` should fail, even though `echo string('foo' .. 20.5)` works ('foo25')
+          // However, it is allowed if the lvalue is strongly typed, such as a register or option.
+          // * `let &titlestring='hello' | let &titlestring.=20.5` should succeed! => 'hello20.5'
+          throw exExceptionMessage("E734", value)
+        }
+      }
+
+      ADDITION -> {
+        if (lvalue is VimList && rvalue is VimList) return
+        validateArithmeticOperatorValues(lvalue, rvalue, isLValueStronglyTyped)
+      }
+
+      else -> validateArithmeticOperatorValues(lvalue, rvalue, isLValueStronglyTyped)
+    }
+  }
+
+  private fun validateArithmeticOperatorValues(lvalue: VimDataType?, rvalue: VimDataType, isLValueStronglyTyped: Boolean) {
+    // Arithmetic operator. If the lvalue is strongly typed, such as an option or register, then the lvalue must be
+    // Number or Float. If it's not strongly typed, the String is also allowed. But nothing else is.
+    if ((isLValueStronglyTyped && lvalue !is VimInt && lvalue !is VimFloat)
+      || (!isLValueStronglyTyped && lvalue !is VimInt && lvalue !is VimFloat && lvalue !is VimString)){
+      throw exExceptionMessage("E734", value)
+    }
+
+    // This would be caught when trying to convert to Number or Float, but that reports a different error code
+    if (rvalue !is VimInt && rvalue !is VimFloat && rvalue !is VimString) {
+      throw exExceptionMessage("E734", value)
+    }
   }
 }

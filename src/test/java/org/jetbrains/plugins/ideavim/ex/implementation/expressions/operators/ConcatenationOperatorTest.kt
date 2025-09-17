@@ -11,6 +11,7 @@ package org.jetbrains.plugins.ideavim.ex.implementation.expressions.operators
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.ex.evaluate
 import org.jetbrains.plugins.ideavim.productForArguments
@@ -46,28 +47,31 @@ class ConcatenationOperatorTest : VimTestCase() {
   @ParameterizedTest
   @MethodSource("operatorSpacesSpaces")
   fun `integer and float`(operator: String, sp1: String, sp2: String) {
-    val exception = assertThrows<ExException> {
-      VimscriptParser.parseExpression("3.4$sp1$operator${sp2}2")!!.evaluate()
-    }
-    assertEquals("E806: Using a Float as a String", exception.message)
+    assertEquals(VimString("3.42"), VimscriptParser.parseExpression("3.4$sp1$operator${sp2}2")!!.evaluate())
   }
 
+  @VimBehaviorDiffers(
+    originalVimAfter = "3.422",
+    description = "Vim seems to change how it parses the rest of the expression after the concatenation operator. " +
+      "It's like it sees the concatenation operator and then anything after that is a Number and concatenation," +
+      "not Float. I don't know how we fix this. It happens with both single and double dot operators"
+  )
   @ParameterizedTest
   @MethodSource("operatorSpacesSpaces")
   fun `float and float`(operator: String, sp1: String, sp2: String) {
-    val exception = assertThrows<ExException> {
-      VimscriptParser.parseExpression("3.4$sp1$operator${sp2}2.2")!!.evaluate()
-    }
-    assertEquals("E806: Using a Float as a String", exception.message)
+    assertEquals(VimString("3.42.2"), VimscriptParser.parseExpression("3.4$sp1$operator${sp2}2.2")!!.evaluate())
   }
 
+  @VimBehaviorDiffers(
+    originalVimAfter = "'string34'",
+    description = "Vim seems to change how it parses the rest of the expression after the concatenation operator. " +
+      "It's like it sees the concatenation operator and then anything after that is a Number and concatenation," +
+      "not Float. I don't know how we fix this. It happens with both single and double dot operators"
+  )
   @ParameterizedTest
   @MethodSource("operatorSpacesSpaces")
   fun `string and float`(operator: String, sp1: String, sp2: String) {
-    val exception = assertThrows<ExException> {
-      VimscriptParser.parseExpression("'string'$sp1$operator${sp2}3.4")!!.evaluate()
-    }
-    assertEquals("E806: Using a Float as a String", exception.message)
+    assertEquals(VimString("string3.4"), VimscriptParser.parseExpression("'string'$sp1$operator${sp2}3.4")!!.evaluate())
   }
 
   @ParameterizedTest
