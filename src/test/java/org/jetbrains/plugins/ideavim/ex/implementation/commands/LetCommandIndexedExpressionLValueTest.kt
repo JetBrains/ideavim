@@ -196,17 +196,11 @@ class LetCommandIndexedExpressionLValueTest : VimTestCase("\n") {
     assertCommandOutput("echo string(s)", "{'key1': 1, '1': 2}")
   }
 
-  @VimBehaviorDiffers(
-    "{'1.5': 2, 'key1': 1}",
-    description = "Vim converts Float to String, which isn't a normal conversion"
-  )
   @Test
   fun `test assigning to Dictionary item converts Float index to String key`() {
     enterCommand("let s = {'key1' : 1}")
     enterCommand("let s[1.5] = 2")
-    assertPluginError(true)
-    assertPluginErrorMessage("E806: Using a Float as a String")
-//    assertCommandOutput("echo string(s)", "{'key1': 1, '1.5': 2}")
+    assertCommandOutput("echo string(s)", "{'key1': 1, '1.5': 2}")
   }
 
   @Test
