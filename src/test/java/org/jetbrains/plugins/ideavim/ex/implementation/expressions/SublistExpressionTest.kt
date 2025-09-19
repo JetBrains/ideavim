@@ -34,11 +34,11 @@ class SublistExpressionTest : VimTestCase() {
     assertExOutput("")
   }
 
+  // TODO: This (and above) are indexed expressions, not sublist expressions
   @Test
   fun `test negative index with list`() {
     configureByText("\n")
-    typeText(commandToKeys("echo [1, 2][-1]"))
-    assertPluginErrorMessage("E684: List index out of range: -1")
+    assertCommandOutput("echo [1, 2][-1]", "2")
   }
 
   @Test
