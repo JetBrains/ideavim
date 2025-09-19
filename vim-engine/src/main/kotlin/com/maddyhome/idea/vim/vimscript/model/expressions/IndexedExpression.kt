@@ -83,7 +83,8 @@ data class IndexedExpression(val index: Expression, val expression: Expression) 
     vimContext: VimLContext,
     assignmentTextForErrors: String,
   ) {
-    val key = index.evaluate(editor, context, vimContext).toVimString()
+    val k = index.evaluate(editor, context, vimContext)
+    val key = if (k is VimFloat) VimString(k.toOutputString()) else k.toVimString()
     if (key in dict.dictionary) {
       if (dict.dictionary[key]?.isLocked == true) {
         // Cannot modify this item
