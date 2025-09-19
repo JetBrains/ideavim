@@ -84,14 +84,13 @@ class LetCommandIndexedExpressionLValueTest : VimTestCase("\n") {
     assertPluginErrorMessage("E684: List index out of range: 2")
   }
 
-  @VimBehaviorDiffers("E741: Value is locked: s[1] = 2")
   @Test
   fun `test assigning to locked List variable with default lock depth`() {
     enterCommand("let s = [1, 1]")
     enterCommand("lockvar s")
     enterCommand("let s[1] = 2")
     assertPluginError(true)
-    assertPluginErrorMessage("E741: Value is locked: s[1]")
+    assertPluginErrorMessage("E741: Value is locked: s[1] = 2")
   }
 
   @Test
@@ -112,14 +111,13 @@ class LetCommandIndexedExpressionLValueTest : VimTestCase("\n") {
     assertCommandOutput("echo string(s)", "[1, 2]")
   }
 
-  @VimBehaviorDiffers("E741: Value is locked: s[1] = 2")
   @Test
   fun `test assigning to locked List variable with lock depth 2 does not allow modification`() {
     enterCommand("let s = [1, 1]")
     enterCommand("lockvar 2 s")
     enterCommand("let s[1] = 2")
     assertPluginError(true)
-    assertPluginErrorMessage("E741: Value is locked: s[1]")
+    assertPluginErrorMessage("E741: Value is locked: s[1] = 2")
   }
 
   @Test
@@ -225,18 +223,16 @@ class LetCommandIndexedExpressionLValueTest : VimTestCase("\n") {
     enterCommand("let s = 'abc'")
     enterCommand("let s[1] = 'd'")
     assertPluginError(true)
-    // TODO: Ideally, the error message should be the exact text typed, but we don't have that in the implementation
-    assertPluginErrorMessage("E689: Index not allowed after a string: s[1]='d'")
+    assertPluginErrorMessage("E689: Index not allowed after a string: s[1] = 'd'")
   }
 
-  @VimBehaviorDiffers("E741: Value is locked: s['key1'] = 2")
   @Test
   fun `test assigning to locked Dictionary variable with default lock depth`() {
     enterCommand("let s = {'key1' : 1}")
     enterCommand("lockvar s")
     enterCommand("let s['key1'] = 2")
     assertPluginError(true)
-    assertPluginErrorMessage("E741: Value is locked: s['key1']")
+    assertPluginErrorMessage("E741: Value is locked: s['key1'] = 2")
   }
 
   @Test
@@ -257,7 +253,6 @@ class LetCommandIndexedExpressionLValueTest : VimTestCase("\n") {
     assertCommandOutput("echo string(s)", "{'key1': 2}")
   }
 
-  @VimBehaviorDiffers("E741: Value is locked: s['key2'] = 2")
   @Test
   fun `test assigning to locked Dictionary variable with lock depth 1 does not allow addition`() {
     // Lock depth 0 means we can't change the variable or add/remove items
@@ -265,10 +260,9 @@ class LetCommandIndexedExpressionLValueTest : VimTestCase("\n") {
     enterCommand("lockvar 1 s")
     enterCommand("let s['key2'] = 2")
     assertPluginError(true)
-    assertPluginErrorMessage("E741: Value is locked: s['key2']")
+    assertPluginErrorMessage("E741: Value is locked: s['key2'] = 2")
   }
 
-  @VimBehaviorDiffers("E741: Value is locked: s['key1'] = 2")
   @Test
   fun `test assigning to locked Dictionary variable with lock depth 2 does not allow addition`() {
     // Lock depth 0 means we can't change the variable or add/remove items
@@ -276,6 +270,6 @@ class LetCommandIndexedExpressionLValueTest : VimTestCase("\n") {
     enterCommand("lockvar 2 s")
     enterCommand("let s['key1'] = 2")
     assertPluginError(true)
-    assertPluginErrorMessage("E741: Value is locked: s['key1']")
+    assertPluginErrorMessage("E741: Value is locked: s['key1'] = 2")
   }
 }

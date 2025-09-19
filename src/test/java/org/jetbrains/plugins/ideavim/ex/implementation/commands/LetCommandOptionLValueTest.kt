@@ -92,7 +92,7 @@ class LetCommandOptionLValueTest : VimTestCase("\n") {
     // Looks like Vim checks a String value that evaluates to 0. If it's not actually 0, throw an error
     enterCommand("let &incsearch='foo'")
     assertPluginError(true)
-    assertPluginErrorMessage("E521: Number required after =: 'foo'")
+    assertPluginErrorMessage("E521: Number required after =: &incsearch='foo'")
   }
 
   @Test
