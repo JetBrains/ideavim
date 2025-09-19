@@ -131,8 +131,7 @@ or restart the IDE.
 
 ### Instructions
 
-[https://plugins.jetbrains.com/plugin/28237-vim-dial](https://plugins.jetbrains.com/plugin/28237-vim-dial
-)
+[https://plugins.jetbrains.com/plugin/28237-vim-dial](https://plugins.jetbrains.com/plugin/28237-vim-dial)
 </details>
 
 
