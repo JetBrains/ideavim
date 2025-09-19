@@ -44,6 +44,7 @@ data class OptionExpression(val scope: Scope?, val optionName: String) : LValueE
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
+    assignmentTextForErrors: String,
   ) {
     val option = injector.optionGroup.getOption(optionName)
       ?: throw exExceptionMessage("E518", originalString)
@@ -57,7 +58,7 @@ data class OptionExpression(val scope: Scope?, val optionName: String) : LValueE
         if (number.value == 0 && !value.value.startsWith('0')) {
           // TODO: This should be E521: Number required: &{option}='{value}'
           // Instead, we have E521: Number required after =: '{value}'
-          throw exExceptionMessage("E521", "'${value.value}'")
+          throw exExceptionMessage("E521", assignmentTextForErrors)
         }
         number
       }

@@ -13,7 +13,6 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.Range
@@ -21,22 +20,14 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimBlob
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.EnvVariableExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.LValueExpression
-import com.maddyhome.idea.vim.vimscript.model.expressions.IndexedExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.SublistExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.AssignmentOperator
-import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 
@@ -50,11 +41,8 @@ data class LetCommand(
   val operator: AssignmentOperator,
   val expression: Expression,
   val isSyntaxSupported: Boolean,
+  val assignmentTextForErrors: String
 ) : Command.SingleExecution(range, CommandModifier.NONE) {
-
-  private companion object {
-    private val logger = vimLogger<LetCommand>()
-  }
 
   override val argFlags: CommandHandlerFlags =
     flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
@@ -68,10 +56,11 @@ data class LetCommand(
     if (!isSyntaxSupported) return ExecutionResult.Error
 
     if (lvalue is LValueExpression) {
-      val currentValue = lvalue.evaluate(editor, context, vimContext)
+      val currentValue =
+        if (operator != AssignmentOperator.ASSIGNMENT) lvalue.evaluate(editor, context, vimContext) else null
       val rhs = expression.evaluate(editor, context, vimContext)
       val newValue = operator.getNewValue(currentValue, rhs, lvalue.isStronglyTyped())
-      lvalue.assign(newValue, editor, context, this)
+      lvalue.assign(newValue, editor, context, this, assignmentTextForErrors)
       return ExecutionResult.Success
     }
 
@@ -99,55 +88,6 @@ data class LetCommand(
           context,
           this
         )
-      }
-
-      is IndexedExpression -> {
-        when (val containerValue = lvalue.expression.evaluate(editor, context, vimContext)) {
-          is VimDictionary -> {
-            val dictKey = lvalue.index.evaluate(editor, context, this).toVimString()
-            if (operator != AssignmentOperator.ASSIGNMENT && !containerValue.dictionary.containsKey(dictKey)) {
-              throw exExceptionMessage("E716", dictKey)
-            }
-            val expressionValue = expression.evaluate(editor, context, this)
-            var valueToStore = if (dictKey in containerValue.dictionary) {
-              if (containerValue.dictionary[dictKey]!!.isLocked) {
-                throw exExceptionMessage("E741", lvalue.originalString)
-              }
-              operator.getNewValue(containerValue.dictionary[dictKey]!!, expressionValue, false)
-            } else {
-              if (containerValue.isLocked) {
-                throw exExceptionMessage("E741", lvalue.originalString)
-              }
-              expressionValue
-            }
-            if (valueToStore is VimFuncref && !valueToStore.isSelfFixed &&
-              valueToStore.handler is DefinedFunctionHandler &&
-              valueToStore.handler.function.flags.contains(FunctionFlag.DICT)
-            ) {
-              valueToStore = valueToStore.copy()
-              valueToStore.dictionary = containerValue
-            }
-            containerValue.dictionary[dictKey] = valueToStore
-          }
-
-          is VimList -> {
-            val index = lvalue.index.evaluate(editor, context, this).toVimNumber().value
-            if (index > containerValue.values.size - 1) {
-              throw exExceptionMessage("E684", index)
-            }
-            if (containerValue.values[index].isLocked) {
-              throw exExceptionMessage("E741", lvalue.originalString)
-            }
-            containerValue.values[index] =
-              operator.getNewValue(containerValue.values[index], expression.evaluate(editor, context, vimContext), false)
-          }
-
-          is VimBlob -> TODO()
-          else -> {
-            val text = lvalue.originalString + operator.value + expression.originalString
-            throw exExceptionMessage("E689", getTypeName(containerValue), text)
-          }
-        }
       }
 
       is SublistExpression -> {
@@ -199,19 +139,6 @@ data class LetCommand(
       else -> throw exExceptionMessage("E121", lvalue.originalString)
     }
     return ExecutionResult.Success
-  }
-
-  private fun getTypeName(dataType: VimDataType): String {
-    return when (dataType) {
-      is VimBlob -> "blob"
-      is VimDictionary -> "dict"
-      is VimFloat -> "float"
-      is VimFuncref -> "funcref"
-      is VimInt -> "number"
-      is VimList -> "list"
-      is VimString -> "string"
-      else -> "unknown"
-    }
   }
 
   private fun isInsideFunction(vimLContext: VimLContext): Boolean {

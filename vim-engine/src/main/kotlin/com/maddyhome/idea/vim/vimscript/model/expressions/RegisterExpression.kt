@@ -43,6 +43,7 @@ data class RegisterExpression(val char: Char) : LValueExpression() {
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
+    assignmentTextForErrors: String,
   ) {
     if (!RegisterConstants.WRITABLE_REGISTERS.contains(char)) {
       throw exExceptionMessage("E354", char)

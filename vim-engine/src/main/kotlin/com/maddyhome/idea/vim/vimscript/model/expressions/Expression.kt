@@ -32,5 +32,24 @@ abstract class LValueExpression : Expression() {
    */
   abstract fun isStronglyTyped(): Boolean
 
-  abstract fun assign(value: VimDataType, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext)
+  /**
+   * Assign a new value to this expression
+   *
+   * When assigning a new value to this expression, the caller must pass the text of the assignment operation, to be
+   * used in error messages. If this isn't passed we only have the expression itself, not the operation, which is what
+   * Vim displays.
+   *
+   * @param value The new value to assign
+   * @param editor The editor used during assignment (e.g., saving to buffer or window local options)
+   * @param context The execution context used during assignment (e.g., to get access to host functionality)
+   * @param vimContext The Vimscript context to use during assignment (e.g., to get default variable scope)
+   * @param assignmentTextForErrors The text of the assignment operation, to be used in error messages.
+   */
+  abstract fun assign(
+    value: VimDataType,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext,
+    assignmentTextForErrors: String,
+  )
 }

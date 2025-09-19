@@ -51,11 +51,9 @@ data class LambdaExpression(val args: List<String>, val expr: Expression) : Expr
           Range(),
           Variable(Scope.LOCAL_VARIABLE, argument),
           AssignmentOperator.ASSIGNMENT,
-          Variable(
-            Scope.FUNCTION_VARIABLE,
-            argument,
-          ),
+          Variable(Scope.FUNCTION_VARIABLE, argument),
           true,
+          "$argument = a:$argument"
         ),
       )
     }

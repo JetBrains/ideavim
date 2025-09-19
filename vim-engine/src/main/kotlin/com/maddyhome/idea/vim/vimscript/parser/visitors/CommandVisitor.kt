@@ -115,13 +115,27 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
     val variable: Expression = expressionVisitor.visit(ctx.expr(0))
     val operator = getByValue(ctx.assignmentOperator().text)
     val expression: Expression = expressionVisitor.visit(ctx.expr(1))
-    val command = LetCommand(range, variable, operator, expression, true)
+    val assignmentTextForErrors = buildString {
+      ctx.children
+        .dropWhile { it != ctx.expr(0) }
+        .takeWhile { it != ctx.expr(1) }
+        .forEach { append(it.text) }
+      append(ctx.expr(1).text)
+    }
+    val command = LetCommand(range, variable, operator, expression, true, assignmentTextForErrors)
     command.rangeInScript = ctx.getTextRange()
     return command
   }
 
   override fun visitLet2Command(ctx: VimscriptParser.Let2CommandContext): Command {
-    val command = LetCommand(Range(), SimpleExpression(0), AssignmentOperator.ASSIGNMENT, SimpleExpression(0), false)
+    val command = LetCommand(
+      Range(),
+      SimpleExpression(0),
+      AssignmentOperator.ASSIGNMENT,
+      SimpleExpression(0),
+      false,
+      ctx.text
+    )
     command.rangeInScript = ctx.getTextRange()
     return command
   }
@@ -263,13 +277,15 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
   }
 
   override fun visitLetCommand(ctx: VimscriptParser.LetCommandContext): Command {
-    val command = injector.vimscriptParser.parseLetCommand(ctx.text) ?: LetCommand(
-      Range(),
-      SimpleExpression(0),
-      AssignmentOperator.ASSIGNMENT,
-      SimpleExpression(0),
-      false
-    )
+    val command = injector.vimscriptParser.parseLetCommand(ctx.text)
+      ?: LetCommand(
+        Range(),
+        SimpleExpression(0),
+        AssignmentOperator.ASSIGNMENT,
+        SimpleExpression(0),
+        false,
+        ctx.text,
+      )
     command.rangeInScript = ctx.getTextRange()
     return command
   }

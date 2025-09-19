@@ -92,7 +92,7 @@ class CommandParserTest : VimTestCase() {
     )
     val script2 = VimscriptParser.parse(
       """
-     let s:patBR = substitute(match_words.',',s:notslash.'\zs[,:]*,[,:]*', ',', 'g')
+     let s:patBR = substitute(match_words.',', s:notslash.'\zs[,:]*,[,:]*', ',', 'g')
       """.trimIndent(),
     )
     assertEquals(1, script1.units.size)
@@ -110,7 +110,7 @@ class CommandParserTest : VimTestCase() {
     )
     val script2 = VimscriptParser.parse(
       """
-     let s:patBR = substitute(match_words.',',s:notslash.'\zs[,:]*,[,:]*', ',', 'g')
+     let s:patBR = substitute(match_words.',', s:notslash.'\zs[,:]*,[,:]*', ',', 'g')
       """.trimIndent(),
     )
     assertEquals(1, script1.units.size)
