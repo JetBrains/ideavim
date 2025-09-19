@@ -122,15 +122,15 @@ data class IndexedExpression(val index: Expression, val expression: Expression) 
     vimContext: VimLContext,
     assignmentTextForErrors: String
   ) {
-    // TODO: Negative index, float index, string index, blah blah blah
     val index = index.evaluate(editor, context, vimContext).toVimNumber().value
-    if (index > list.values.size - 1) {
+    val idx = if (index < 0) index + list.values.size else index
+    if (idx < 0 || idx >= list.values.size) {
       throw exExceptionMessage("E684", index)
     }
-    if (list.values[index].isLocked) {
+    if (list.values[idx].isLocked) {
       throw exExceptionMessage("E741", assignmentTextForErrors)
     }
-    list.values[index] = value
+    list.values[idx] = value
   }
 
   private fun getTypeName(dataType: VimDataType): String {

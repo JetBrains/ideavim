@@ -30,7 +30,34 @@ class LetCommandIndexedExpressionLValueTest : VimTestCase("\n") {
     assertCommandOutput("echo string(t)", "[1, 2]")
   }
 
-  // TODO: Negative indexes, inc. out of range test
+  @Test
+  fun `test assigning to List with negative index`() {
+    enterCommand("let s = [1, 2, 3, 4]")
+    enterCommand("let s[-1] = 9")
+    assertCommandOutput("echo string(s)", "[1, 2, 3, 9]")
+  }
+
+  @Test
+  fun `test assigning to List with String index`() {
+    enterCommand("let s = [1, 2, 3, 4]")
+    enterCommand("let s['-1'] = 9")
+    assertCommandOutput("echo string(s)", "[1, 2, 3, 9]")
+  }
+
+  @Test
+  fun `test assigning to List with non-numeric String index`() {
+    enterCommand("let s = [1, 2, 3, 4]")
+    enterCommand("let s['foo'] = 9")
+    assertCommandOutput("echo string(s)", "[9, 2, 3, 4]")
+  }
+
+  @Test
+  fun `test assigning to List with Float index raises error`() {
+    enterCommand("let s = [1, 2, 3, 4]")
+    enterCommand("let s[1.5] = 9")
+    assertPluginError(true)
+    assertPluginErrorMessage("E805: Using a Float as a Number")
+  }
 
   // Compound assignment operators will try to convert the operands to Number, calculate the result and write back a
   // Number. The operator will coerce to Float if one side is a Float.
@@ -85,12 +112,30 @@ class LetCommandIndexedExpressionLValueTest : VimTestCase("\n") {
   }
 
   @Test
+  fun `test assigning to out of range List item with String index raises error`() {
+    enterCommand("let s = [1, 1]")
+    enterCommand("let s['2'] = 2")
+    assertPluginError(true)
+    assertPluginErrorMessage("E684: List index out of range: 2")
+  }
+
+
+  @Test
   fun `test assigning to locked List variable with default lock depth`() {
     enterCommand("let s = [1, 1]")
     enterCommand("lockvar s")
     enterCommand("let s[1] = 2")
     assertPluginError(true)
     assertPluginErrorMessage("E741: Value is locked: s[1] = 2")
+  }
+
+  @Test
+  fun `test assigning to locked List variable with negative index`() {
+    enterCommand("let s = [1, 1]")
+    enterCommand("lockvar s")
+    enterCommand("let s[-1] = 2")
+    assertPluginError(true)
+    assertPluginErrorMessage("E741: Value is locked: s[-1] = 2")
   }
 
   @Test
