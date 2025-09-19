@@ -29,29 +29,32 @@ data class IndexedExpression(val index: Expression, val expression: Expression) 
 
   override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
     val expressionValue = expression.evaluate(editor, context, vimContext)
+    val indexValue = index.evaluate(editor, context, vimContext)
     when (expressionValue) {
       is VimDictionary -> {
-        val key = index.evaluate(editor, context, vimContext).toVimString()
+        val key = if (indexValue is VimFloat) VimString(indexValue.toOutputString()) else indexValue.toVimString()
         return expressionValue.dictionary[key]
-          ?: throw exExceptionMessage("E716", key.toOutputString())
+          ?: throw exExceptionMessage("E716", indexValue.toOutputString())
+      }
+
+      is VimList -> {
+        val idx = indexValue.toVimNumber().value
+        val i = if (idx < 0) (idx + expressionValue.values.size) else idx
+        if (i < 0 || i >= expressionValue.values.size) {
+          throw exExceptionMessage("E684", idx)
+        }
+        return expressionValue.values[i]
       }
 
       else -> {
-        val indexValue = index.evaluate(editor, context, vimContext).toVimNumber().value
-        // TODO: Support negative index to retrieve item from end
-        if (expressionValue is VimList && (indexValue >= expressionValue.values.size || indexValue < 0)) {
-          throw exExceptionMessage("E684", indexValue)
-        }
-        if (indexValue < 0) {
+        // Try to convert to String
+        val idx = index.evaluate(editor, context, vimContext).toVimNumber().value
+        val text =
+          if (expressionValue is VimFloat) expressionValue.toOutputString() else expressionValue.toVimString().value
+        if (idx < 0 || idx > text.length) {
           return VimString.EMPTY
         }
-
-        // TODO: This looks wrong. Surely we should just return the indexed item?
-        return SublistExpression(
-          SimpleExpression(indexValue),
-          SimpleExpression(indexValue),
-          SimpleExpression(expressionValue)
-        ).evaluate(editor, context, vimContext)
+        return VimString(text[idx].toString())
       }
     }
   }
@@ -116,6 +119,7 @@ data class IndexedExpression(val index: Expression, val expression: Expression) 
     vimContext: VimLContext,
     assignmentTextForErrors: String
   ) {
+    // TODO: Negative index, float index, string index, blah blah blah
     val index = index.evaluate(editor, context, vimContext).toVimNumber().value
     if (index > list.values.size - 1) {
       throw exExceptionMessage("E684", index)
