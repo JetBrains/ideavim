@@ -8,8 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.datatypes
 
-class VimBlob : VimDataType() {
-
+class VimBlob : VimDataType("blob") {
   override fun toVimFloat(): VimFloat {
     TODO("Not yet implemented")
   }

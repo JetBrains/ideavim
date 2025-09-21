@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.vimscript.model.datatypes
 
 import com.maddyhome.idea.vim.ex.ExException
 
-abstract class VimDataType {
+abstract class VimDataType(val typeName: String) {
   /**
    * Returns this object as a Vim Float. If the object is not a Float, this function throws
    */

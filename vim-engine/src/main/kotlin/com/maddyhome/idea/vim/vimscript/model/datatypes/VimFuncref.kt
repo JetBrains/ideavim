@@ -26,8 +26,7 @@ data class VimFuncref(
   val arguments: VimList,
   var dictionary: VimDictionary?,
   val type: Type,
-) : VimDataType() {
-
+) : VimDataType("funcref") {
   var isSelfFixed: Boolean = false
 
   companion object {
