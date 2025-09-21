@@ -14,8 +14,7 @@ import java.text.DecimalFormatSymbols
 import java.util.Locale
 import kotlin.math.abs
 
-data class VimFloat(val value: Double) : VimDataType() {
-
+data class VimFloat(val value: Double) : VimDataType("float") {
   override fun toVimFloat() = this
 
   override fun toVimNumber(): VimInt {

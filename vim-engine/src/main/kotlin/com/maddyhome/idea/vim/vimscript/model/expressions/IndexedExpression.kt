@@ -17,7 +17,6 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
@@ -76,7 +75,7 @@ data class IndexedExpression(val index: Expression, val expression: Expression) 
       is VimList -> assignToListItem(containerValue, value, editor, context, vimContext, assignmentTextForErrors)
       is VimBlob -> TODO()
       else -> {
-        throw exExceptionMessage("E689", getTypeName(containerValue), assignmentTextForErrors)
+        throw exExceptionMessage("E689", containerValue.typeName, assignmentTextForErrors)
       }
     }
   }
@@ -131,18 +130,5 @@ data class IndexedExpression(val index: Expression, val expression: Expression) 
       throw exExceptionMessage("E741", assignmentTextForErrors)
     }
     list.values[idx] = value
-  }
-
-  private fun getTypeName(dataType: VimDataType): String {
-    return when (dataType) {
-      is VimBlob -> "blob"
-      is VimDictionary -> "dict"
-      is VimFloat -> "float"
-      is VimFuncref -> "funcref"
-      is VimInt -> "number"
-      is VimList -> "list"
-      is VimString -> "string"
-      else -> "unknown"
-    }
   }
 }

@@ -10,8 +10,7 @@ package com.maddyhome.idea.vim.vimscript.model.datatypes
 
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 
-data class VimList(val values: MutableList<VimDataType>) : VimDataType() {
-
+data class VimList(val values: MutableList<VimDataType>) : VimDataType("list") {
   operator fun get(index: Int): VimDataType = this.values[index]
 
   override fun toVimFloat(): VimFloat {

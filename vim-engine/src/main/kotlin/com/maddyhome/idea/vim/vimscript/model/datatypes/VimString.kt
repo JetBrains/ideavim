@@ -10,8 +10,7 @@ package com.maddyhome.idea.vim.vimscript.model.datatypes
 
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 
-data class VimString(val value: String) : VimDataType() {
-
+data class VimString(val value: String) : VimDataType("string") {
   override fun toVimFloat(): VimFloat {
     throw exExceptionMessage("E892")
   }

@@ -8,7 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.datatypes
 
-data class VimInt(val value: Int) : VimDataType() {
+data class VimInt(val value: Int) : VimDataType("number") {
   /**
    * Gets the value of the Number as a boolean, where zero is false and non-zero is true
    *

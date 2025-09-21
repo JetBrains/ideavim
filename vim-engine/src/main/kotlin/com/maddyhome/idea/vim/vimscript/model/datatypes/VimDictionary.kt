@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.vimscript.model.datatypes
 
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 
-data class VimDictionary(val dictionary: LinkedHashMap<VimString, VimDataType>) : VimDataType() {
+data class VimDictionary(val dictionary: LinkedHashMap<VimString, VimDataType>) : VimDataType("dict") {
 
   override fun toVimFloat(): VimFloat {
     throw exExceptionMessage("E894")
