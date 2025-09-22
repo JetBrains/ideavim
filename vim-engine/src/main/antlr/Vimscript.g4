@@ -225,7 +225,7 @@ commandName:
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 expr:
-                        expr L_BRACKET expr R_BRACKET                                           #IndexedExpression
+                        expr L_BRACKET WS* expr WS* R_BRACKET                                   #IndexedExpression
                     |   WS* BANG WS* expr                                                       #UnaryExpression
                     |   expr L_BRACKET WS* from = expr? WS* COLON WS* to = expr? WS* R_BRACKET  #SublistExpression
                     |   expr WS* binaryOperator1 WS* expr                                       #BinExpression1

@@ -30,10 +30,14 @@ data class IndexedExpression(val index: Expression, val expression: Expression) 
   override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
     val expressionValue = expression.evaluate(editor, context, vimContext)
     val indexValue = index.evaluate(editor, context, vimContext)
+
+    // Vim seems to validate the index by converting it to a string, allowing for Float, but it will use Number to
+    // index. This gets us the same error messages as Vim
+    val stringIndex = if (indexValue is VimFloat) VimString(indexValue.toOutputString()) else indexValue.toVimString()
+
     when (expressionValue) {
       is VimDictionary -> {
-        val key = if (indexValue is VimFloat) VimString(indexValue.toOutputString()) else indexValue.toVimString()
-        return expressionValue.dictionary[key]
+        return expressionValue.dictionary[stringIndex]
           ?: throw exExceptionMessage("E716", indexValue.toOutputString())
       }
 
@@ -47,10 +51,9 @@ data class IndexedExpression(val index: Expression, val expression: Expression) 
       }
 
       else -> {
-        // Try to convert to String
+        // Try to convert the expression to String, then index it
+        val text = expressionValue.toVimString().value
         val idx = index.evaluate(editor, context, vimContext).toVimNumber().value
-        val text =
-          if (expressionValue is VimFloat) expressionValue.toOutputString() else expressionValue.toVimString().value
         if (idx < 0 || idx > text.length) {
           return VimString.EMPTY
         }
