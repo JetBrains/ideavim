@@ -10,9 +10,7 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class LetCommandSublistExpressionLValueTest : VimTestCase("\n") {
@@ -59,16 +57,12 @@ class LetCommandSublistExpressionLValueTest : VimTestCase("\n") {
     assertCommandOutput("echo string(s)", "[9, 8, 7]")
   }
 
-  // TODO: Fix this
-  @Disabled
   @Test
   fun `test assign to sublist expression with negative start index`() {
     enterCommand("let s = [1, 2, 3]")
-    enterCommand("let s[-3:2] = [9, 4, 7]")
+    enterCommand("let s[-3:2] = [9, 8, 7]")
     assertCommandOutput("echo string(s)", "[9, 8, 7]")
   }
-
-  // TODO: More negative indexes
 
   @Test
   fun `test assign to sublist expression converts String indexes to Number`() {
@@ -85,7 +79,6 @@ class LetCommandSublistExpressionLValueTest : VimTestCase("\n") {
     assertPluginErrorMessage("E805: Using a Float as a Number")
   }
 
-  @Disabled("Unhandled OutOfBoundsException")
   @Test
   fun `test assign to sublist expression with out of range start index raises error`() {
     enterCommand("let s = [1, 2, 3]")
@@ -94,7 +87,6 @@ class LetCommandSublistExpressionLValueTest : VimTestCase("\n") {
     assertPluginErrorMessage("E684: List index out of range: 3")
   }
 
-  @Disabled("Unhandled OutOfBoundsException")
   @Test
   fun `test assign to sublist expression with out of range end index extends List`() {
     enterCommand("let s = [1, 2, 3]")
@@ -108,6 +100,22 @@ class LetCommandSublistExpressionLValueTest : VimTestCase("\n") {
     enterCommand("let s = [1, 2, 3]")
     enterCommand("let s[1:] = [5, 5, 5, 5]")
     assertCommandOutput("echo s", "[1, 5, 5, 5, 5]")
+  }
+
+  @Test
+  fun `test assign to sublist expression with invalid negative start index treated as 0`() {
+    enterCommand("let s = [1, 2, 3]")
+    enterCommand("let s[-10:-2] = [5, 6]")  // Treated as [-3:-2] aka [0:-2]
+    assertPluginError(false)
+    assertCommandOutput("echo string(s)", "[5, 6, 3]")
+  }
+
+  @Test
+  fun `test assign to sublist expression with invalid negative end index`() {
+    enterCommand("let s = [1, 2, 3]")
+    enterCommand("let s[-10:-8] = [5, 6]")
+    assertPluginError(true)
+    assertPluginErrorMessage("E684: List index out of range: -8")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
@@ -144,83 +152,104 @@ class LetCommandSublistExpressionLValueTest : VimTestCase("\n") {
     assertPluginErrorMessage("E709: [:] requires a List or Blob value")
   }
 
-  @VimBehaviorDiffers("E719: Cannot slice a Dictionary")
   @Test
   fun `test assign to sublist indexed expression on a Dictionary variable raises error`() {
     enterCommand("let s = {'key1' : 1, 'key2' : 2}")
     enterCommand("let s[1:2] = 'xy'")
     assertPluginError(true)
-    assertPluginErrorMessage("wrong variable type")
+    assertPluginErrorMessage("E719: Cannot slice a Dictionary")
   }
 
-  @VimBehaviorDiffers("E689: Index not allowed after a string: s[1:2] = 'xy'")
   @Test
   fun `test assign to sublist indexed expression on a String variable raises error`() {
     enterCommand("let s = 'abcde'")
     enterCommand("let s[1:2] = 'xy'")
     assertPluginError(true)
-    assertPluginErrorMessage("wrong variable type")
+    assertPluginErrorMessage("E689: Index not allowed after a string: s[1:2] = 'xy'")
   }
 
-  @VimBehaviorDiffers("E689: Index not allowed after a number: s[1:2] = 'xy'")
   @Test
   fun `test assign to sublist indexed expression on a Number variable raises error`() {
     enterCommand("let s = 12")
     enterCommand("let s[1:2] = 'xy'")
     assertPluginError(true)
-    assertPluginErrorMessage("wrong variable type")
+    assertPluginErrorMessage("E689: Index not allowed after a number: s[1:2] = 'xy'")
   }
 
   // Compound assignment operators apply to each element in the sublist. We test addition + subtraction and assume the
   // other operators work as expected. We've already tested converting between datatypes in LetCommandOperatorsTest.
-  @VimBehaviorDiffers("[6, 8.2, 10.4]")
   @Test
   fun `test arithmetic compound assignment operator applies to each element in sublist expression`() {
-    enterCommand("let s = [1, '2.5', 3]")
+    enterCommand("let s = [1, '2.5', 3.4]")
     enterCommand("let s[0:2] += [5, 6.2, '7']")
-//    assertCommandOutput("echo string(s)", "[6, 8.2, 10.4]")
-    assertCommandOutput("echo string(s)", "[5, 6.2, '7']")
+    assertPluginError(false)
+    assertCommandOutput("echo string(s)", "[6, 8.2, 10.4]")
   }
 
-  @VimBehaviorDiffers("[-9, -10.4, -3.6]")
   @Test
   fun `test arithmetic compound assignment operator applies to each element in sublist expression 2`() {
     enterCommand("let s = [1, '2.5', 3.4]")
     enterCommand("let s[0:2] -= [5, 6.2, '7']")
-    assertCommandOutput("echo string(s)", "[5, 6.2, '7']")
-//    assertCommandOutput("echo string(s)", "[-9, -10.4, -3.6]")
+    assertPluginError(false)
+    assertCommandOutput("echo string(s)", "[-4, -4.2, -3.6]")
   }
 
   // Test concatenation compound assignment operator also applies to each element in sublist expression. It converts the
   // items to string and concatenates.
-  @VimBehaviorDiffers("[15, 2.56, 37]")
   @Test
   fun `test string concatenation compound assignment operator applies to each element in sublist expression`() {
     enterCommand("let s = [1, '2.5', 3]")
-    enterCommand("let s[0:1] .= [5, 6, '7']")
-    assertCommandOutput("echo string(s)", "[1, '2.5', 3]")
-//    assertCommandOutput("echo string(s)", "['15', '2.56', '37']")
+    enterCommand("let s[0:2] .= [5, 6, '7']")
+    assertPluginError(false)
+    assertCommandOutput("echo string(s)", "['15', '2.56', '37']")
   }
 
-  @VimBehaviorDiffers("E734: Wrong variable type for .=")
   @Test
   fun `test string concatenation compound assignment operator cannot convert Float lvalue`() {
     enterCommand("let s = [1.2]")
     enterCommand("let s[0:0] .= ['x']")
-//    assertPluginError(true)
-//    assertPluginErrorMessage("E734: Wrong variable type for .=")
-    assertPluginError(false)
-    assertCommandOutput("echo string(s)", "['x']")
+    assertPluginError(true)
+    assertPluginErrorMessage("E734: Wrong variable type for .=")
   }
 
-  @VimBehaviorDiffers("E734: Wrong variable type for .=")
   @Test
   fun `test string concatenation compound assignment operator cannot convert Float rvalue`() {
     enterCommand("let s = ['x']")
     enterCommand("let s[0:0] .= [1.2]")
-//    assertPluginError(true)
-//    assertPluginErrorMessage("E734: Wrong variable type for .=")
+    assertPluginError(true)
+    assertPluginErrorMessage("E734: Wrong variable type for .=")
+  }
+
+  @Test
+  fun `test compound assignment reports error with too few items in new list`() {
+    enterCommand("let s = [1, 2, 3, 4]")
+    enterCommand("let s[1:3] += [7, 6]")
+    assertPluginError(true)
+    assertPluginErrorMessage("E711: List value does not have enough items")
+  }
+
+  @Test
+  fun `test compound assignment reports error with too many items in new list`() {
+    enterCommand("let s = [1, 2, 3, 4]")
+    enterCommand("let s[1:3] += [7, 6, 5, 4, 3, 2, 1]")
+    assertPluginError(true)
+    assertPluginErrorMessage("E710: List value has more items than targets")
+  }
+
+  @Test
+  fun `test compound assignment modifies original list up to error`() {
+    enterCommand("let s = [1, 2, 3, 4]")
+    enterCommand("let s[1:3] += [7, 6]") // Not enough items
+    assertPluginError(true)
+    assertPluginErrorMessage("E711: List value does not have enough items")
+    assertCommandOutput("echo string(s)", "[1, 9, 9, 4]")
+  }
+
+  @Test
+  fun `test compound assignment with nested lists raises error`() {
+    enterCommand("let s = [[1,2,3], [4,5,6], [7,8,9]]")
+    enterCommand("let s[0:1] += [[9,9,9], [9,9,9]]")
     assertPluginError(false)
-    assertCommandOutput("echo string(s)", "[1.2]")
+    assertCommandOutput("echo string(s)", "[[1, 2, 3, 9, 9, 9], [4, 5, 6, 9, 9, 9], [7, 8, 9]]")
   }
 }
