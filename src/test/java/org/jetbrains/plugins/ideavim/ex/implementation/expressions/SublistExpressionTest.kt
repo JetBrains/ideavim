@@ -11,89 +11,67 @@ package org.jetbrains.plugins.ideavim.ex.implementation.expressions
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
-class SublistExpressionTest : VimTestCase() {
+class SublistExpressionTest : VimTestCase("\n") {
 
   @Test
-  fun `test strung sublist`() {
-    configureByText("\n")
-    typeText(commandToKeys("echo 'abc'[0:1]"))
-    assertExOutput("ab")
+  fun `test string sublist`() {
+    assertCommandOutput("echo 'abc'[0:1]", "ab")
   }
 
   @Test
-  fun `test negative index with sting`() {
-    configureByText("\n")
-    typeText(commandToKeys("echo 'abc'[-1]"))
-    assertExOutput("")
+  fun `test negative index with string`() {
+    assertCommandOutput("echo 'abc'[-1]", "")
   }
 
   @Test
   fun `test index greater than size with string`() {
-    configureByText("\n")
-    typeText(commandToKeys("echo 'abc'[1000]"))
-    assertExOutput("")
+    assertCommandOutput("echo 'abc'[1000]", "")
   }
 
   // TODO: This (and above) are indexed expressions, not sublist expressions
   @Test
   fun `test negative index with list`() {
-    configureByText("\n")
     assertCommandOutput("echo [1, 2][-1]", "2")
   }
 
   @Test
   fun `test index greater than size with list`() {
-    configureByText("\n")
-    typeText(commandToKeys("echo [1, 2][1000]"))
+    enterCommand("echo [1, 2][1000]")
     assertPluginErrorMessage("E684: List index out of range: 1000")
   }
 
   @Test
   fun `test list with correct index`() {
-    configureByText("\n")
-    typeText(commandToKeys("echo [1, 2][1]"))
-    assertExOutput("2")
+    assertCommandOutput("echo [1, 2][1]", "2")
   }
 
   @Test
   fun `test negative first index`() {
-    configureByText("\n")
-    typeText(commandToKeys("echo 'abc'[-1:]"))
-    assertExOutput("c")
+    assertCommandOutput("echo 'abc'[-1:]", "c")
   }
 
   @Test
   fun `test negative last index`() {
-    configureByText("\n")
-    typeText(commandToKeys("echo 'abc'[0:-2]"))
-    assertExOutput("ab")
+    assertCommandOutput("echo 'abc'[0:-2]", "ab")
   }
 
   @Test
   fun `test negative last index2`() {
-    configureByText("\n")
-    typeText(commandToKeys("echo 'abc'[0:-1]"))
-    assertExOutput("abc")
+    assertCommandOutput("echo 'abc'[0:-1]", "abc")
   }
 
   @Test
   fun `test last index bigger sting size`() {
-    configureByText("\n")
-    typeText(commandToKeys("echo 'abc'[1:10000]"))
-    assertExOutput("bc")
+    assertCommandOutput("echo 'abc'[1:10000]", "bc")
   }
 
   @Test
   fun `test both indexes bigger sting size`() {
-    configureByText("\n")
-    typeText(commandToKeys("echo 'abc'[100:10000]"))
-    assertExOutput("")
+    assertCommandOutput("echo 'abc'[100:10000]", "")
   }
 
   @Test
   fun `test first index is bigger than second`() {
-    configureByText("\n")
-    typeText(commandToKeys("echo 'abc'[100:10]"))
-    assertExOutput("")
+    assertCommandOutput("echo 'abc'[100:10]", "")
   }
 }
