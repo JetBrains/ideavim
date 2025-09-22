@@ -19,7 +19,6 @@ import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimBlob
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.expressions.EnvVariableExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
@@ -59,8 +58,16 @@ data class LetCommand(
       val currentValue =
         if (operator != AssignmentOperator.ASSIGNMENT) lvalue.evaluate(editor, context, vimContext) else null
       val rhs = expression.evaluate(editor, context, vimContext)
-      val newValue = operator.getNewValue(currentValue, rhs, lvalue.isStronglyTyped())
-      lvalue.assign(newValue, editor, context, this, assignmentTextForErrors)
+      if (lvalue is SublistExpression && operator != AssignmentOperator.ASSIGNMENT && currentValue is VimList && rhs is VimList) {
+        // Compound assigment operators modifies each item in a sublist expression, in-place, even if an error is
+        // encountered. So we get a new sublist with all the changes up to the first error, assign it, then throw
+        val result = getNewSublistValue(currentValue, rhs, lvalue.isStronglyTyped())
+        lvalue.assign(result.first, editor, context, this, assignmentTextForErrors)
+        result.second?.let { throw it }
+      } else {
+        val newValue = operator.getNewValue(currentValue, rhs, lvalue.isStronglyTyped())
+        lvalue.assign(newValue, editor, context, this, assignmentTextForErrors)
+      }
       return ExecutionResult.Success
     }
 
@@ -90,55 +97,42 @@ data class LetCommand(
         )
       }
 
-      is SublistExpression -> {
-        if (lvalue.expression is Variable) {
-          val variableValue =
-            injector.variableService.getNonNullVariableValue(lvalue.expression, editor, context, this)
-          if (variableValue is VimList) {
-            val from = lvalue.from?.evaluate(editor, context, this)?.toVimNumber()?.value ?: 0
-            val to = lvalue.to?.evaluate(editor, context, this)?.toVimNumber()?.value
-              ?: (variableValue.values.size - 1)
-
-            val expressionValue = expression.evaluate(editor, context, this)
-            if (expressionValue !is VimList && expressionValue !is VimBlob) {
-              throw exExceptionMessage("E709")
-            } else if (expressionValue is VimList) {
-              if (expressionValue.values.size < to - from + 1) {
-                throw exExceptionMessage("E711")
-              } else if (lvalue.to != null && expressionValue.values.size > to - from + 1) {
-                throw exExceptionMessage("E710")
-              }
-              val newListSize = expressionValue.values.size - (to - from + 1) + variableValue.values.size
-              var i = from
-              if (newListSize > variableValue.values.size) {
-                while (i < variableValue.values.size) {
-                  variableValue.values[i] = expressionValue.values[i - from]
-                  i += 1
-                }
-                while (i < newListSize) {
-                  variableValue.values.add(expressionValue.values[i - from])
-                  i += 1
-                }
-              } else {
-                while (i <= to) {
-                  variableValue.values[i] = expressionValue.values[i - from]
-                  i += 1
-                }
-              }
-            } else if (expressionValue is VimBlob) {
-              TODO()
-            }
-          } else {
-            throw ExException("wrong variable type")
-          }
-        }
-      }
-
       is EnvVariableExpression -> TODO()
 
       else -> throw exExceptionMessage("E121", lvalue.originalString)
     }
     return ExecutionResult.Success
+  }
+
+  /**
+   * Get a new sublist value after applying a compound assignment operator to each item
+   *
+   * Compound assignments and lists are invalid. But compound assignment and sublist expressions will apply the operator
+   * to each item in the sublist. Vim modifies the original list in-place, even if an error is encountered.
+   *
+   * Potentially modifying part of a list in-place is tricky with our default implementation, so we create an
+   * intermediary result (sub)list that we can assign to the sublist expression. If any errors occur, we capture them so
+   * they can be replayed once the partial result has been assigned.
+   *
+   * Note that we modify [sublist], because we know it's just been evaluated and won't be reused.
+   */
+  private fun getNewSublistValue(
+    sublist: VimList,
+    rhs: VimList,
+    isLValueStronglyTyped: Boolean,
+  ): Pair<VimList, ExException?> {
+    var error: ExException? = null
+    for (i in 0 until sublist.values.size) {
+      if (i >= rhs.values.size) {
+        error = exExceptionMessage("E711")
+        break
+      }
+      sublist.values[i] = operator.getNewValue(sublist.values[i], rhs.values[i], isLValueStronglyTyped)
+    }
+    if (rhs.values.size > sublist.values.size) {
+      error = exExceptionMessage("E710")
+    }
+    return Pair(sublist, error)
   }
 
   private fun isInsideFunction(vimLContext: VimLContext): Boolean {
