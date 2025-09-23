@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
-import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
+import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 import org.jdom.Element
 
 @State(
@@ -34,7 +34,7 @@ import org.jdom.Element
 )
 internal class IjVariableService : VimVariableServiceBase(), PersistentStateComponent<Element?> {
   override fun storeVariable(
-    variable: Variable,
+    variable: VariableExpression,
     value: VimDataType,
     editor: VimEditor,
     context: ExecutionContext,

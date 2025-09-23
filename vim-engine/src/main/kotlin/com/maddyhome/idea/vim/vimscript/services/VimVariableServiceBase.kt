@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
-import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
+import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 import com.maddyhome.idea.vim.vimscript.model.variables.HighLightVariable
@@ -61,7 +61,7 @@ abstract class VimVariableServiceBase : VariableService {
   }
 
   override fun isVariableLocked(
-    variable: Variable,
+    variable: VariableExpression,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
@@ -70,7 +70,7 @@ abstract class VimVariableServiceBase : VariableService {
   }
 
   override fun lockVariable(
-    variable: Variable,
+    variable: VariableExpression,
     depth: Int,
     editor: VimEditor,
     context: ExecutionContext,
@@ -82,7 +82,7 @@ abstract class VimVariableServiceBase : VariableService {
   }
 
   override fun unlockVariable(
-    variable: Variable,
+    variable: VariableExpression,
     depth: Int,
     editor: VimEditor,
     context: ExecutionContext,
@@ -97,7 +97,7 @@ abstract class VimVariableServiceBase : VariableService {
   }
 
   override fun storeVariable(
-    variable: Variable,
+    variable: VariableExpression,
     value: VimDataType,
     editor: VimEditor,
     context: ExecutionContext,
@@ -119,7 +119,7 @@ abstract class VimVariableServiceBase : VariableService {
 
   @Throws(ExException::class)
   override fun getNullableVariableValue(
-    variable: Variable,
+    variable: VariableExpression,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
@@ -139,7 +139,7 @@ abstract class VimVariableServiceBase : VariableService {
   }
 
   override fun getNonNullVariableValue(
-    variable: Variable,
+    variable: VariableExpression,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,

@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.vimscript.model.commands.LetCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.NormalCommand
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
-import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
+import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -310,10 +310,10 @@ class CommandParserTest : VimTestCase() {
     assertEquals(2, script.units.size)
     assertTrue(script.units[0] is LetCommand)
     val let1 = script.units[0] as LetCommand
-    assertEquals(Variable(Scope.GLOBAL_VARIABLE, "auto_save"), let1.lvalue)
+    assertEquals(VariableExpression(Scope.GLOBAL_VARIABLE, "auto_save"), let1.lvalue)
     assertEquals(SimpleExpression(2), let1.expression)
     val let2 = script.units[1] as LetCommand
-    assertEquals(Variable(Scope.GLOBAL_VARIABLE, "y"), let2.lvalue)
+    assertEquals(VariableExpression(Scope.GLOBAL_VARIABLE, "y"), let2.lvalue)
     assertEquals(SimpleExpression(10), let2.expression)
   }
 

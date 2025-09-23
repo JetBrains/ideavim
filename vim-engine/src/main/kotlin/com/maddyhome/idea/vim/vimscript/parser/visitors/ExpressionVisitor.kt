@@ -52,7 +52,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.SublistExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.TernaryExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.UnaryExpression
-import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
+import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.BinaryOperator
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.UnaryOperator
 import org.antlr.v4.runtime.ParserRuleContext
@@ -378,9 +378,9 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
     return result
   }
 
-  override fun visitVariable(ctx: VariableContext): Variable {
+  override fun visitVariable(ctx: VariableContext): VariableExpression {
     val scope = if (ctx.variableScope() == null) null else Scope.getByValue(ctx.variableScope().text)
-    val result = Variable(scope, visitCurlyBracesName(ctx.variableName().curlyBracesName()))
+    val result = VariableExpression(scope, visitCurlyBracesName(ctx.variableName().curlyBracesName()))
     result.originalString = ctx.text
     return result
   }

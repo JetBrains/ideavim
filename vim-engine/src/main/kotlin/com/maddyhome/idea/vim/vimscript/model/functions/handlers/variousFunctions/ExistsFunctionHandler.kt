@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.OptionExpression
-import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
+import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
 @VimscriptFunction(name = "exists")
@@ -39,7 +39,7 @@ internal class ExistsFunctionHandler : FunctionHandler() {
         injector.optionGroup.getOption(parsedExpression.optionName) != null
       }
 
-      is Variable -> {
+      is VariableExpression -> {
         injector.variableService.getNullableVariableValue(parsedExpression, editor, context, vimContext) != null
       }
 

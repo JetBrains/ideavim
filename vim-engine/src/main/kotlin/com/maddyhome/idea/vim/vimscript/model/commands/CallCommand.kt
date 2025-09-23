@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.FuncrefCallExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.FunctionCallExpression
-import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
+import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 
@@ -54,7 +54,7 @@ class CallCommand(val range: Range, val functionCall: Expression) :
         }
 
         val funcref = injector.variableService.getNullableVariableValue(
-          Variable(functionCall.scope, functionCall.functionName),
+          VariableExpression(functionCall.scope, functionCall.functionName),
           editor,
           context,
           vimContext
