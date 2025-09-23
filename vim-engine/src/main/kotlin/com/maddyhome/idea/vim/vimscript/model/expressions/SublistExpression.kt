@@ -24,42 +24,35 @@ data class SublistExpression(val from: Expression?, val to: Expression?, val exp
 
   override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
     val expressionValue = expression.evaluate(editor, context, vimContext)
+    val fromValue = from?.evaluate(editor, context, vimContext)?.toVimNumber()?.value ?: 0
+    val toValue = to?.evaluate(editor, context, vimContext)?.toVimNumber()?.value ?: -1
+
     val arraySize = when (expressionValue) {
       is VimDictionary -> throw exExceptionMessage("E719")
       is VimFuncref -> throw exExceptionMessage("E695")
       is VimList -> expressionValue.values.size
       else -> expressionValue.toVimString().value.length
     }
-    var fromInt = from?.evaluate(editor, context, vimContext)?.toVimNumber()?.value ?: 0
-    if (fromInt < 0) {
-      fromInt += arraySize
-    }
-    var toInt = to?.evaluate(editor, context, vimContext)?.toVimNumber()?.value ?: (arraySize - 1)
-    if (toInt < 0) {
-      toInt += arraySize
-    }
-    return if (expressionValue is VimList) {
-      if (fromInt > arraySize) {
-        VimList(mutableListOf())
-      } else if (fromInt == toInt) {
-        expressionValue.values[fromInt] // TODO: This is incorrect, it should be a List
-      } else if (fromInt <= toInt) {
-        VimList(expressionValue.values.subList(fromInt, toInt + 1))
-      } else {
-        VimList(mutableListOf())
-      }
-    } else {
-      if (fromInt > arraySize) {
-        VimString.EMPTY
-      } else if (fromInt <= toInt) {
-        val string = expressionValue.toVimString().value
-        if (toInt > string.length - 1) {
-          VimString(string.substring(fromInt))
-        } else {
-          VimString(string.substring(fromInt, toInt + 1))
+
+    val start = if (fromValue < 0) fromValue + arraySize else fromValue
+    val end = (if (toValue < 0) toValue + arraySize else toValue).coerceAtMost(arraySize - 1)
+
+    return when (expressionValue) {
+      is VimList -> {
+        val result = mutableListOf<VimDataType>()
+        if (start >= 0 && end < arraySize) {
+          for (i in start..end) {
+            result.add(expressionValue.values[i])
+          }
         }
-      } else {
-        VimString.EMPTY
+        VimList(result)
+      }
+
+      else -> {
+        when {
+          start < 0 || end < 0 || end < start -> VimString.EMPTY
+          else -> VimString(expressionValue.toVimString().value.substring(start, end + 1))
+        }
       }
     }
   }
@@ -87,18 +80,16 @@ data class SublistExpression(val from: Expression?, val to: Expression?, val exp
 
         if (start >= listValue.values.size) {
           throw exExceptionMessage("E684", from)
-        }
-        else if (end < 0) {
+        } else if (end < 0) {
           throw exExceptionMessage("E684", to)
         }
 
         if (newList.values.size < end - start + 1) {
-          // I.e. the _new_ list value does not have enough items
+          // I.e., the _new_ list value does not have enough items
           throw exExceptionMessage("E711")
-        }
-        else if (newList.values.size > end - start + 1 && end < listValue.values.size - 1) {
-          // Remember that the if the new list "overflows" the sublist range, we'll add new items to the original list
-          // I.e. the _new_ list has more items than the target sublist range
+        } else if (newList.values.size > end - start + 1 && end < listValue.values.size - 1) {
+          // Remember that if the new list "overflows" the sublist range, we'll add new items to the original list
+          // I.e., the _new_ list has more items than the target sublist range
           throw exExceptionMessage("E710")
         }
 
@@ -106,15 +97,13 @@ data class SublistExpression(val from: Expression?, val to: Expression?, val exp
           val item = newList.values[i]
           if (i + start < listValue.values.size) {
             listValue.values[i + start] = item
-          }
-          else {
+          } else {
             listValue.values.add(item)
           }
         }
       }
-      is VimBlob -> {
-        TODO()
-      }
+
+      is VimBlob -> TODO()
       is VimDictionary -> throw exExceptionMessage("E719")
       else -> throw exExceptionMessage("E689", listValue.typeName, assignmentTextForErrors)
     }
