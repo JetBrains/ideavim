@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.LValueExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.SublistExpression
-import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
+import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.AssignmentOperator
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
@@ -72,7 +72,7 @@ data class LetCommand(
     }
 
     when (lvalue) {
-      is Variable -> {
+      is VariableExpression -> {
         if ((lvalue.scope == Scope.SCRIPT_VARIABLE && vimContext.getFirstParentContext() !is Script) ||
           (!isInsideFunction(vimContext) && (lvalue.scope == Scope.FUNCTION_VARIABLE || lvalue.scope == Scope.LOCAL_VARIABLE))
         ) {
@@ -84,7 +84,7 @@ data class LetCommand(
         }
 
         val leftValue = injector.variableService.getNullableVariableValue(lvalue, editor, context, vimContext)
-        if (leftValue?.isLocked == true && (leftValue.lockOwner as? Variable)?.name == lvalue.name) {
+        if (leftValue?.isLocked == true && (leftValue.lockOwner as? VariableExpression)?.name == lvalue.name) {
           throw exExceptionMessage("E741", lvalue.toString(editor, context, vimContext))
         }
         val rightValue = expression.evaluate(editor, context, vimContext)
@@ -147,7 +147,7 @@ data class LetCommand(
     return isInsideFunction
   }
 
-  private fun isReadOnlyVariable(variable: Variable, editor: VimEditor, context: ExecutionContext): Boolean {
+  private fun isReadOnlyVariable(variable: VariableExpression, editor: VimEditor, context: ExecutionContext): Boolean {
     if (variable.scope == Scope.FUNCTION_VARIABLE) return true
     if (variable.scope == null && variable.name.evaluate(
         editor,

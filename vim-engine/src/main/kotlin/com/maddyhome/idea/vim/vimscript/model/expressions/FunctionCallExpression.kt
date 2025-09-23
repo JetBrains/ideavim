@@ -40,7 +40,7 @@ data class FunctionCallExpression(
     }
 
     val funcref =
-      injector.variableService.getNullableVariableValue(Variable(scope, functionName), editor, context, vimContext)
+      injector.variableService.getNullableVariableValue(VariableExpression(scope, functionName), editor, context, vimContext)
     if (funcref is VimFuncref) {
       return funcref.execute(scopePrefix + name, arguments, editor, context, vimContext)
     }

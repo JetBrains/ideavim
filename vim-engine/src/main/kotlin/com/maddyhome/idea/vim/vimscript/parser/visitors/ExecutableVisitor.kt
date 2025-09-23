@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.IndexedExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
-import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
+import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 import com.maddyhome.idea.vim.vimscript.model.statements.AnonymousFunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.CatchBlock
 import com.maddyhome.idea.vim.vimscript.model.statements.FinallyBlock
@@ -79,7 +79,7 @@ object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
     val iterable = ExpressionVisitor.visit(ctx.expr())
     val body = ctx.blockMember().mapNotNull { visitBlockMember(it) }
     val loop = if (ctx.argumentsDeclaration() == null) {
-      val variable = Variable(Scope.getByValue(ctx.variableScope()?.text ?: ""), ctx.variableName().text)
+      val variable = VariableExpression(Scope.getByValue(ctx.variableScope()?.text ?: ""), ctx.variableName().text)
       ForLoop(variable, iterable, body)
     } else {
       val variables = ctx.argumentsDeclaration().variableName().map { it.text }
@@ -116,7 +116,7 @@ object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
     } else {
       var sublistExpression = IndexedExpression(
         SimpleExpression(ctx.literalDictionaryKey(1).text),
-        Variable(functionScope, ctx.literalDictionaryKey(0).text)
+        VariableExpression(functionScope, ctx.literalDictionaryKey(0).text)
       )
       for (i in 2 until ctx.literalDictionaryKey().size) {
         sublistExpression =

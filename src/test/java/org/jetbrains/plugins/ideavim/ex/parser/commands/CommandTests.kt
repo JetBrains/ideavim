@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.BinExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
-import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
+import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.ex.evaluate
@@ -53,7 +53,7 @@ class CommandTests : VimTestCase() {
   fun `let command`() {
     val c = VimscriptParser.parseCommand("let g:catSound='Meow'")
     assertTrue(c is LetCommand)
-    assertEquals(Variable(Scope.GLOBAL_VARIABLE, "catSound"), c.lvalue)
+    assertEquals(VariableExpression(Scope.GLOBAL_VARIABLE, "catSound"), c.lvalue)
     assertEquals(SimpleExpression("Meow"), c.expression)
   }
 

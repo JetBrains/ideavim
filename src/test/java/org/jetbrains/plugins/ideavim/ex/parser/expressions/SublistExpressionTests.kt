@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.SublistExpression
-import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
+import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import org.jetbrains.plugins.ideavim.ex.evaluate
 import org.jetbrains.plugins.ideavim.productForArguments
@@ -66,8 +66,8 @@ class SublistExpressionTests {
   fun `sublist with only end specified`(sp1: String, sp2: String, sp3: String) {
     val ex = VimscriptParser.parseExpression("var[$sp1:${sp2}32$sp3]")
     assertTrue(ex is SublistExpression)
-    assertTrue(ex.expression is Variable)
-    assertEquals("var", (ex.expression as Variable).name.evaluate().value)
+    assertTrue(ex.expression is VariableExpression)
+    assertEquals("var", (ex.expression as VariableExpression).name.evaluate().value)
     assertNull(ex.from)
     assertEquals(VimInt(32), ex.to!!.evaluate())
   }

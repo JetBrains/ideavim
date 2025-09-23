@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.BinExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.LambdaExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.LambdaFunctionCallExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
-import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
+import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.BinaryOperator
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import org.jetbrains.plugins.ideavim.productForArguments
@@ -52,7 +52,7 @@ class LambdaTests {
       VimscriptParser.parseExpression("{${sp1}a$sp2,${sp3}b$sp4->${sp5}a+b$sp6}") as LambdaExpression
     assertEquals(listOf("a", "b"), lambdaExpression.args)
     assertEquals(
-      BinExpression(Variable(null, "a"), Variable(null, "b"), BinaryOperator.ADDITION),
+      BinExpression(VariableExpression(null, "a"), VariableExpression(null, "b"), BinaryOperator.ADDITION),
       lambdaExpression.expr
     )
   }
@@ -71,7 +71,7 @@ class LambdaTests {
     val functionCall =
       VimscriptParser.parseExpression("{->'error'}(${sp1}a$sp2,${sp3}b$sp4)") as LambdaFunctionCallExpression
     assertEquals(2, functionCall.arguments.size)
-    assertEquals(listOf(Variable(null, "a"), Variable(null, "b")), functionCall.arguments)
+    assertEquals(listOf(VariableExpression(null, "a"), VariableExpression(null, "b")), functionCall.arguments)
     assertEquals(0, functionCall.lambda.args.size)
     assertEquals(SimpleExpression("error"), functionCall.lambda.expr)
   }

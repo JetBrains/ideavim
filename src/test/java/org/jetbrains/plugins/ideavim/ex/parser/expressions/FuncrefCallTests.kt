@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.CurlyBracesName
 import com.maddyhome.idea.vim.vimscript.model.expressions.FuncrefCallExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.IndexedExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
-import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
+import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.BinaryOperator
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import org.junit.jupiter.api.Test
@@ -27,7 +27,7 @@ class FuncrefCallTests {
     val funcrefCall = VimscriptParser.parseExpression("dict.len()")
     assertTrue(funcrefCall is FuncrefCallExpression)
     assertEquals(
-      IndexedExpression(CurlyBracesName(listOf(SimpleExpression("len"))), Variable(null, "dict")),
+      IndexedExpression(CurlyBracesName(listOf(SimpleExpression("len"))), VariableExpression(null, "dict")),
       funcrefCall.expression,
     )
     assertEquals(0, funcrefCall.args.size)
@@ -40,7 +40,7 @@ class FuncrefCallTests {
     assertEquals(
       IndexedExpression(
         CurlyBracesName(listOf(SimpleExpression("len"))),
-        IndexedExpression(SimpleExpression("innerDict"), Variable(null, "dict")),
+        IndexedExpression(SimpleExpression("innerDict"), VariableExpression(null, "dict")),
       ),
       funcrefCall.expression,
     )
@@ -52,11 +52,11 @@ class FuncrefCallTests {
     val funcrefCall = VimscriptParser.parseExpression("dict.len(a, 5 + 10)")
     assertTrue(funcrefCall is FuncrefCallExpression)
     assertEquals(
-      IndexedExpression(CurlyBracesName(listOf(SimpleExpression("len"))), Variable(null, "dict")),
+      IndexedExpression(CurlyBracesName(listOf(SimpleExpression("len"))), VariableExpression(null, "dict")),
       funcrefCall.expression,
     )
     assertEquals(2, funcrefCall.args.size)
-    assertEquals(Variable(null, "a"), funcrefCall.args[0])
+    assertEquals(VariableExpression(null, "a"), funcrefCall.args[0])
     assertEquals(BinExpression(SimpleExpression(5), SimpleExpression(10), BinaryOperator.ADDITION), funcrefCall.args[1])
   }
 }

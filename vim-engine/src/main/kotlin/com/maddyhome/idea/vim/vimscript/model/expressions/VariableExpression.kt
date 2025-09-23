@@ -14,7 +14,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
-data class Variable(val scope: Scope?, val name: CurlyBracesName) : Expression() {
+data class VariableExpression(val scope: Scope?, val name: CurlyBracesName) : Expression() {
   constructor(scope: Scope?, name: String) : this(scope, CurlyBracesName(listOf(SimpleExpression(name))))
 
   override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {

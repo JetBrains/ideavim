@@ -21,11 +21,11 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
+import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 import com.maddyhome.idea.vim.vimscript.parser.DeletionInfo
 
 // todo refactor us senpai :(
-data class ForLoop(val variable: Variable, val iterable: Expression, val body: List<Executable>) : Executable {
+data class ForLoop(val variable: VariableExpression, val iterable: Expression, val body: List<Executable>) : Executable {
   override lateinit var vimContext: VimLContext
   override lateinit var rangeInScript: TextRange
 
@@ -144,7 +144,7 @@ data class ForLoopWithList(val variables: List<String>, val iterable: Expression
     }
 
     for (item in list.values.withIndex()) {
-      injector.variableService.storeVariable(Variable(null, variables[item.index]), item.value, editor, context, this)
+      injector.variableService.storeVariable(VariableExpression(null, variables[item.index]), item.value, editor, context, this)
     }
   }
 

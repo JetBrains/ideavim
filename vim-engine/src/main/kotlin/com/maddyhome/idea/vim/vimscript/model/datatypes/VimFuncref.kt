@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
-import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
+import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
@@ -75,7 +75,7 @@ data class VimFuncref(
         throw exExceptionMessage("E725", name)
       } else {
         injector.variableService.storeVariable(
-          Variable(Scope.LOCAL_VARIABLE, "self"),
+          VariableExpression(Scope.LOCAL_VARIABLE, "self"),
           dictionary!!,
           editor,
           context,
