@@ -11,24 +11,16 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
-import com.maddyhome.idea.vim.vimscript.model.Script
-import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
-import com.maddyhome.idea.vim.vimscript.model.expressions.EnvVariableExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.LValueExpression
-import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.SublistExpression
-import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.AssignmentOperator
-import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
-import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 
 /**
  * see "h :let"
@@ -71,37 +63,9 @@ data class LetCommand(
       return ExecutionResult.Success
     }
 
-    when (lvalue) {
-      is VariableExpression -> {
-        if ((lvalue.scope == Scope.SCRIPT_VARIABLE && vimContext.getFirstParentContext() !is Script) ||
-          (!isInsideFunction(vimContext) && (lvalue.scope == Scope.FUNCTION_VARIABLE || lvalue.scope == Scope.LOCAL_VARIABLE))
-        ) {
-          throw exExceptionMessage("E461", lvalue.toString(editor, context, vimContext))
-        }
+    // TODO: EnvVariableExpression
 
-        if (isReadOnlyVariable(lvalue, editor, context)) {
-          throw exExceptionMessage("E46", lvalue.toString(editor, context, vimContext))
-        }
-
-        val leftValue = injector.variableService.getNullableVariableValue(lvalue, editor, context, vimContext)
-        if (leftValue?.isLocked == true && (leftValue.lockOwner as? VariableExpression)?.name == lvalue.name) {
-          throw exExceptionMessage("E741", lvalue.toString(editor, context, vimContext))
-        }
-        val rightValue = expression.evaluate(editor, context, vimContext)
-        injector.variableService.storeVariable(
-          lvalue,
-          operator.getNewValue(leftValue, rightValue, false),
-          editor,
-          context,
-          this
-        )
-      }
-
-      is EnvVariableExpression -> TODO()
-
-      else -> throw exExceptionMessage("E121", lvalue.originalString)
-    }
-    return ExecutionResult.Success
+    throw exExceptionMessage("E121", lvalue.originalString)
   }
 
   /**
@@ -133,39 +97,5 @@ data class LetCommand(
       error = exExceptionMessage("E710")
     }
     return Pair(sublist, error)
-  }
-
-  private fun isInsideFunction(vimLContext: VimLContext): Boolean {
-    var isInsideFunction = false
-    var node = vimLContext
-    while (!node.isFirstParentContext()) {
-      if (node is FunctionDeclaration) {
-        isInsideFunction = true
-      }
-      node = node.getPreviousParentContext()
-    }
-    return isInsideFunction
-  }
-
-  private fun isReadOnlyVariable(variable: VariableExpression, editor: VimEditor, context: ExecutionContext): Boolean {
-    if (variable.scope == Scope.FUNCTION_VARIABLE) return true
-    if (variable.scope == null && variable.name.evaluate(
-        editor,
-        context,
-        vimContext
-      ).value == "self" && isInsideDictionaryFunction()
-    ) return true
-    return false
-  }
-
-  private fun isInsideDictionaryFunction(): Boolean {
-    var node: VimLContext = this
-    while (!node.isFirstParentContext()) {
-      if (node is FunctionDeclaration && node.flags.contains(FunctionFlag.DICT)) {
-        return true
-      }
-      node = node.getPreviousParentContext()
-    }
-    return false
   }
 }
