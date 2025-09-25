@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.extension.hints
 
 import com.intellij.openapi.editor.impl.EditorComponentImpl
+import com.intellij.openapi.wm.impl.status.TextPanel
 import com.intellij.ui.treeStructure.Tree
 import java.awt.Component
 import java.awt.Point
@@ -74,7 +75,7 @@ private fun collectTargets(
   val location = location + (accessible.location ?: return)
 
   accessible.size?.let { size ->
-    if (accessible.isShowing && (component.isClickable() || component is Tree)) {
+    if (accessible.isShowing && (component.isClickable() || component is Tree || component is TextPanel)) {
       targets[component].let {
         // For some reason, the same component may appear multiple times in the accessible tree.
         if (it == null || it.depth > depth) {
