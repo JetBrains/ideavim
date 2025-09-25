@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.extension.hints
 
+import com.intellij.openapi.editor.impl.EditorComponentImpl
 import com.intellij.ui.treeStructure.Tree
 import java.awt.Component
 import java.awt.Point
@@ -77,7 +78,12 @@ private fun collectTargets(
       targets[component].let {
         // For some reason, the same component may appear multiple times in the accessible tree.
         if (it == null || it.depth > depth) {
-          targets[component] = HintTarget(component, location, size, depth)
+          targets[component] = HintTarget(component, location, size, depth).apply {
+            action = when (component) {
+              is Tree, is EditorComponentImpl -> ({ component.requestFocusInWindow() })
+              else -> HintTarget::clickCenter
+            }
+          }
         }
       }
     }
