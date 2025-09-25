@@ -11,17 +11,22 @@ package com.maddyhome.idea.vim.extension.hints
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.PlatformDataKeys
+import com.intellij.openapi.editor.impl.EditorComponentImpl
 import com.intellij.openapi.project.DumbAwareToggleAction
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.ui.popup.JBPopupListener
 import com.intellij.openapi.ui.popup.LightweightWindowEvent
 import com.intellij.openapi.wm.impl.IdeGlassPaneImpl
 import com.intellij.ui.JBColor
+import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.Alarm
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.extension.ShortcutDispatcher
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import java.awt.Color
+import java.awt.Point
+import java.awt.Robot
+import java.awt.event.InputEvent
 import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -78,12 +83,19 @@ class ToggleHintsAction : DumbAwareToggleAction() {
     ShortcutDispatcher("hints", targets.associateBy { it.hint.lowercase() }, { target ->
       popup.closeOk(null)
       alarm.cancelAllRequests()
-      target.component.accessibleContext?.apply {
-        if (accessibleAction?.doAccessibleAction(0) == null && !accessibleComponent.isFocusTraversable) return@apply
-        accessibleComponent.requestFocus()
-        highlight.setTarget(target)
-        alarm.addRequest({ highlight.setTarget(null) }, highlightDuration)
+      if (target.component is Tree || target.component is EditorComponentImpl) {
+        target.component.requestFocusInWindow()
+      } else {
+        // Click the center of the target component
+        val robot = Robot()
+        val location = Point(target.bounds.location)
+        SwingUtilities.convertPointToScreen(location, glassPane)
+        robot.mouseMove(location.x + target.bounds.width / 2, location.y + target.bounds.height / 2)
+        robot.mousePress(InputEvent.BUTTON1_DOWN_MASK)
+        robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK)
       }
+      highlight.setTarget(target)
+      alarm.addRequest({ highlight.setTarget(null) }, highlightDuration)
     }, {
       popup.cancel()
       injector.messages.indicateError()
