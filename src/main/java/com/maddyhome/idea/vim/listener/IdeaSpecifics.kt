@@ -199,10 +199,10 @@ internal object IdeaSpecifics {
           // Enable insert mode if there is no selection in template
           // Template with selection is handled by [com.maddyhome.idea.vim.group.visual.VisualMotionGroup.controlNonVimSelectionChange]
           if (editor.vim.inNormalMode) {
-            VimPlugin.getChange().insertBeforeCaret(
-              editor.vim,
-              injector.executionContextManager.getEditorExecutionContext(editor.vim),
-            )
+            injector.application.runReadAction {
+              val context = injector.executionContextManager.getEditorExecutionContext(editor.vim)
+              VimPlugin.getChange().insertBeforeCaret(editor.vim, context)
+            }
             KeyHandler.getInstance().reset(editor.vim)
           }
         }
