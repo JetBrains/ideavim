@@ -179,13 +179,16 @@ lShift: LESS+;
 rShift: GREATER+;
 
 letCommands:
-    (WS | COLON)* range? (WS | COLON)* LET WS+ expr WS*
-        assignmentOperator
-        WS* expr WS* ((inline_comment NEW_LINE) | (NEW_LINE | BAR)+)
+    (WS | COLON)* range? (WS | COLON)* LET WS+ (unpack = unpackLValue | lvalue = expr) WS* assignmentOperator WS* rvalue = expr
+        WS* ((inline_comment NEW_LINE) | (NEW_LINE | BAR)+)
     #Let1Command|
 
     (WS | COLON)* range? (WS | COLON)* LET WS+ commandArgument = ~(NEW_LINE)* NEW_LINE+
     #Let2Command
+;
+
+unpackLValue:
+    L_BRACKET WS* (lvalues += expr WS* (COMMA WS* lvalues += expr WS*)*)+ (SEMI WS* rest = expr)? WS* R_BRACKET
 ;
 
 assignmentOperator:
@@ -683,8 +686,8 @@ CMD:                    'com' | 'comm' | 'comma' | 'comman' | 'command';
 CMD_CLEAR:              'comc' | 'comcl' | 'comcle' | 'comclea' | 'comclear';
 COPY:                   'co' | 'cop' | 'copy';
 DELCOMMAND:             'delc' | 'delco' | 'delcom' | 'delcomm' | 'delcomma' | 'delcomman' | 'delcommand';
-DELFUNCTION:            'delf' | 'delfu' | 'delfun' | 'delfunc'| 'delfunct' | 'delfuncti' | 'delfunctio' | 'delfunction';
 DELETE:                 'de' | 'del' | 'dele' | 'delet' | 'delete';
+DELFUNCTION:            'delf' | 'delfu' | 'delfun' | 'delfunc'| 'delfunct' | 'delfuncti' | 'delfunctio' | 'delfunction';
 DELMARKS:               'delm' | 'delma' | 'delmar' | 'delmark' | 'delmarks';
 DIGRAPHS:               'dig' | 'digr' | 'digra' | 'digrap' | 'digraph' | 'digraphs';
 DUMPLINE:               'dump' | 'dumpl' | 'dumpli' | 'dumplin' | 'dumpline';
@@ -719,8 +722,6 @@ PUT:                    'pu' | 'put';
 QUIT:                   'qu' | 'qui' | 'quit' | 'clo' | 'clos' | 'close' | 'hid' | 'hide';
 REDO:                   'red' | 'redo';
 REGISTERS:              'di' | 'dis' | 'disp' | 'displ' | 'displa' | 'display' | 'reg' | 'regi' | 'regis' | 'regist' | 'registe' | 'register' | 'registers';
-SYMBOL:                 'sym' | 'symb' | 'symbo' | 'symbol';
-VGLOBAL:                'vg' | 'vgl' | 'vglo' | 'vglob' | 'vgloba' | 'vglobal';
 SELECT_FILE:            'argu' | 'argum' | 'argume' | 'argumen' | 'argument';
 SELECT_FIRST_FILE:      'fir' | 'firs' | 'first';
 SELECT_LAST_FILE:       'la' | 'las' | 'last';
@@ -730,10 +731,10 @@ SETLOCAL:               'setl' | 'setlo' | 'setloc' | 'setloca' | 'setlocal';
 SETHANDLER:             'sethandler';
 SHELL:                  'sh' | 'she' | 'shel' | 'shell';
 SORT:                   'sor' | 'sort';
-SPLIT:                  'sp' | 'spl' | 'spli' | 'split';
-VSPLIT:                 'vs' | 'vsp' | 'vspl' | 'vspli' | 'vsplit';
 SOURCE:                 'so' | 'sou' | 'sour' | 'sourc' | 'source';
+SPLIT:                  'sp' | 'spl' | 'spli' | 'split';
 SUBSTITUTE:             'su' | 'sub' | 'subs' | 'subst' | 'substi' | 'substit' | 'substitu' | 'substitut' | 'substitute';
+SYMBOL:                 'sym' | 'symb' | 'symbo' | 'symbol';
 TABCLOSE:               'tabc' | 'tabcl' | 'tabclo' | 'tabclos' | 'tabclose';
 TABMOVE:                'tabm' | 'tabmo' | 'tabmov' | 'tabmove';
 TABNEXT:                'tabn' | 'tabne' | 'tabnex' | 'tabnext';
@@ -741,8 +742,10 @@ TABONLY:                'tabo' | 'tabon' | 'tabonl' | 'tabonly';
 TABPREVIOUS:            'tabp' | 'tabpr' | 'tabpre' | 'tabprev' | 'tabprevi' | 'tabprevio' | 'tabpreviou' | 'tabprevious' | 'tabN' | 'tabNe' | 'tabNex' | 'tabNext';
 UNDO:                   'un' | 'und' | 'undo';
 UNLOCKVAR:              'unlo' | 'unloc' | 'unlock' | 'unlockv' | 'unlockva' | 'unlockvar';
-WRITE_ALL:              'wa' | 'wal' | 'wall';
+VGLOBAL:                'vg' | 'vgl' | 'vglo' | 'vglob' | 'vgloba' | 'vglobal';
+VSPLIT:                 'vs' | 'vsp' | 'vspl' | 'vspli' | 'vsplit';
 WRITE:                  'wr' | 'wri' | 'writ' | 'write';
+WRITE_ALL:              'wa' | 'wal' | 'wall';
 WRITE_NEXT:             'wn' | 'wne' | 'wnex' | 'wnext';
 WRITE_PREVIOUS:         'wN' | 'wNe' | 'wNex' | 'wNext' | 'wp' | 'wpr' | 'wpre' | 'wprev' | 'wprevi' | 'wprevio' | 'wpreviou' | 'wprevious';
 WRITE_QUIT:             'wq' | 'exi' | 'exit' | 'xi' | 'xit';
