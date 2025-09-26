@@ -97,8 +97,8 @@ internal object IdeaRefactorModeHelper {
       val selectionType = VimPlugin.getVisualMotion().detectSelectionType(editor.vim)
       if (mode.selectionType != selectionType) {
         val newMode = when (mode) {
-          is Mode.SELECT -> mode.copy(selectionType)
-          is Mode.VISUAL -> mode.copy(selectionType)
+          is Mode.SELECT -> mode.copy(selectionType = selectionType)
+          is Mode.VISUAL -> mode.copy(selectionType = selectionType)
           else -> error("IdeaVim should be either in visual or select modes")
         }
         corrections.add(Action.SetMode(newMode))
@@ -116,7 +116,9 @@ internal object IdeaRefactorModeHelper {
   }
 
   fun correctSelection(editor: Editor) {
-    val corrections = injector.application.runReadAction { calculateCorrections(editor) }
-    applyCorrections(corrections, editor)
+    injector.application.runReadAction {
+      val corrections = calculateCorrections(editor)
+      applyCorrections(corrections, editor)
+    }
   }
 }
