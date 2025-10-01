@@ -69,7 +69,7 @@ dependencies {
 
     compileOnly(kotlin("reflect"))
 
-    testImplementation("org.mockito.kotlin:mockito-kotlin:6.0.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:6.1.0")
     implementation(project(":api"))
     compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.10.2")
 }
