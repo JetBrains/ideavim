@@ -170,7 +170,7 @@ dependencies {
   testFixturesImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
 
   // https://mvnrepository.com/artifact/org.mockito.kotlin/mockito-kotlin
-  testImplementation("org.mockito.kotlin:mockito-kotlin:6.0.0")
+  testImplementation("org.mockito.kotlin:mockito-kotlin:6.1.0")
 
   testImplementation("org.junit.jupiter:junit-jupiter-api:5.13.4")
   testImplementation("org.junit.jupiter:junit-jupiter-engine:5.13.4")
