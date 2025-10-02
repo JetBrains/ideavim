@@ -11,6 +11,7 @@ package org.jetbrains.plugins.ideavim.option
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ComponentManagerEx
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.impl.EditorWindow
@@ -469,10 +470,12 @@ class OptionDeclaredScopeTest : VimTestCase() {
 
       assertOptionValues(otherBufferWindow, local = _changed_, effective = _changed_, global = unchanged)
 
-      val file = otherBufferWindow.virtualFile
+      val file = otherBufferWindow.document.let { FileDocumentManager.getInstance().getFile(it) }
       ApplicationManager.getApplication().invokeAndWait {
         closeWindow(otherBufferWindow)
-        fixture.openFileInEditor(file)
+        if (file != null) {
+          fixture.openFileInEditor(file)
+        }
       }
       val newBufferWindow = fixture.editor
 
@@ -492,10 +495,12 @@ class OptionDeclaredScopeTest : VimTestCase() {
 
       assertOptionValues(otherBufferWindow, local = _changed_, effective = _changed_, global = unchanged)
 
-      val file = otherBufferWindow.virtualFile
+      val file = otherBufferWindow.document.let { FileDocumentManager.getInstance().getFile(it) }
       ApplicationManager.getApplication().invokeAndWait {
         closeWindow(otherBufferWindow)
-        fixture.openFileInEditor(file)
+        if (file != null) {
+          fixture.openFileInEditor(file)
+        }
       }
       val newBufferWindow = fixture.editor
 

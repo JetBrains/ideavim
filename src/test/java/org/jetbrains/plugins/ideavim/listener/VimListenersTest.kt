@@ -10,6 +10,7 @@ package org.jetbrains.plugins.ideavim.listener
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ComponentManagerEx
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.fileEditor.impl.FileEditorManagerImpl
@@ -68,7 +69,10 @@ class VimListenersTest : VimTestCase() {
 
     val fileManager = FileEditorManagerEx.getInstanceEx(fixture.project)
     ApplicationManager.getApplication().invokeAndWait {
-      fileManager.closeFile(fixture.editor.virtualFile)
+      val file = fixture.editor.document.let { FileDocumentManager.getInstance().getFile(it) }
+      if (file != null) {
+        fileManager.closeFile(file)
+      }
     }
 
     assertEquals(1, VimListenerTestObject.disposedCounter)
@@ -84,7 +88,10 @@ class VimListenersTest : VimTestCase() {
 
       val fileManager = FileEditorManagerEx.getInstanceEx(fixture.project)
       ApplicationManager.getApplication().invokeAndWait {
-        fileManager.closeFile(fixture.editor.virtualFile)
+        val file = fixture.editor.document.let { FileDocumentManager.getInstance().getFile(it) }
+        if (file != null) {
+          fileManager.closeFile(file)
+        }
       }
 
       assertEquals(1, VimListenerTestObject.disposedCounter)
