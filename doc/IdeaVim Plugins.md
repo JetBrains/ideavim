@@ -27,7 +27,8 @@ By Ricardo Rodriguez
 
 ### Setup
 
-Add `set anyobject` to your `~/.ideavimrc` file, then run `:source ~/.ideavimrc`
+- Install [Vim AnyObject](https://plugins.jetbrains.com/plugin/28333-vim-anyobject)
+- Add `set anyobject` to your `~/.ideavimrc` file, then run `:source ~/.ideavimrc`
 or restart the IDE.
 
 ### Instructions
@@ -126,7 +127,8 @@ By Ricardo Rodriguez
 
 ### Setup
 
-Add `set dial` to your `~/.ideavimrc` file, then run `:source ~/.ideavimrc`
+- Install [Vim Dial](https://plugins.jetbrains.com/plugin/28237-vim-dial)
+- Add `set dial` to your `~/.ideavimrc` file, then run `:source ~/.ideavimrc`
 or restart the IDE.
 
 ### Instructions
