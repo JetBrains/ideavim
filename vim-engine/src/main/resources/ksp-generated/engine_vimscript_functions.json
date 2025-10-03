@@ -6,6 +6,7 @@
     "atan": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.AtanFunctionHandler",
     "atan2": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.Atan2FunctionHandler",
     "ceil": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.CeilFunctionHandler",
+    "char2nr": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.stringFunctions.Char2nrFunctionHandler",
     "col": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.cursorFunctions.ColFunctionHandler",
     "cos": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.CosFunctionHandler",
     "cosh": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.CoshFunctionHandler",
@@ -30,8 +31,11 @@
     "line": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.cursorFunctions.LineFunctionHandler",
     "log": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.LogFunctionHandler",
     "log10": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.Log10FunctionHandler",
+    "nr2char": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.stringFunctions.Nr2charFunctionHandler",
     "or": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.bitwiseFunctions.OrFunctionHandler",
     "pow": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.PowFunctionHandler",
+    "repeat": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.stringFunctions.RepeatFunctionHandler",
+    "reverse": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.listFunctions.ReverseFunctionHandler",
     "round": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.RoundFunctionHandler",
     "sin": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.SinFunctionHandler",
     "sinh": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.SinhFunctionHandler",
@@ -43,6 +47,7 @@
     "tanh": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.TanhFunctionHandler",
     "tolower": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.stringFunctions.TolowerFunctionHandler",
     "toupper": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.stringFunctions.ToupperFunctionHandler",
+    "trim": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.stringFunctions.TrimFunctionHandler",
     "trunc": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.TruncFunctionHandler",
     "xor": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.bitwiseFunctions.XorFunctionHandler"
 }
