@@ -140,7 +140,7 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
     clearClipboard()
 
     // Make sure the entry text field gets a bounds, or we won't be able to work out caret location
-    ExEntryPanel.getOrCreateInstance().entry.setBounds(0, 0, 100, 25)
+    ExEntryPanel.getOrCreatePanelInstance().entry.setBounds(0, 0, 100, 25)
 
     NeovimTesting.setUp(testInfo)
 

@@ -574,7 +574,7 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
   companion object {
     var instance: ExEntryPanel? = null
 
-    fun getOrCreateInstance(): ExEntryPanel {
+    fun getOrCreatePanelInstance(): ExEntryPanel {
       return instance ?: let {
         val exEntryPanel = ExEntryPanel()
         instance = exEntryPanel
