@@ -87,7 +87,7 @@ class ExOutputModel(private val myEditor: WeakReference<Editor>) : VimOutputPane
       // never pass null to ExOutputPanel, but we do store it for tests, so we know if we're active or not
       val newValue = value.removeSuffix("\n")
       if (!ApplicationManager.getApplication().isUnitTestMode) {
-        editor?.let { ExOutputPanel.getInstance(it).setText(newValue) }
+        editor?.let { ExOutputPanel.getInstance(it).text = newValue }
       } else {
         field = newValue
         isActiveInTestMode = newValue.isNotEmpty()
@@ -117,7 +117,7 @@ class ExOutputModel(private val myEditor: WeakReference<Editor>) : VimOutputPane
     get() {
       val notNullEditor = editor ?: return false
       val panel = ExOutputPanel.getNullablePanel(notNullEditor) ?: return false
-      return panel.isAtEnd()
+      return panel.isAtEnd
     }
 
   override fun onBadKey() {
