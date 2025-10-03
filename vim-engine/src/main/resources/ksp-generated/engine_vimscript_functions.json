@@ -21,6 +21,7 @@
     "function": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.varFunctions.FunctionFunctionHandler",
     "get": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.GetFunctionHandler",
     "getcmdtype": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.commandLineFunctions.GetCmdTypeFunctionHandler",
+    "getline": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.cursorFunctions.GetlineFunctionHandler",
     "invert": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.bitwiseFunctions.InvertFunctionHandler",
     "isinf": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.IsInfFunctionHandler",
     "isnan": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.IsNanFunctionHandler",

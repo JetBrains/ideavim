@@ -72,7 +72,7 @@ private fun currentCol(editor: VimEditor): VimInt {
 
 // Analog of var2fpos function
 // Translate variable to position
-private fun variableToPosition(
+internal fun variableToPosition(
   editor: VimEditor,
   variable: VimDataType,
   dollarForLine: Boolean,
