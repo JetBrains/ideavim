@@ -422,21 +422,34 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
 
     setBorder(ExPanelBorder())
 
-    setFontForElements()
+    // Swing uses a bad pattern of calling updateUI() from the constructor. At this moment, `entry` and myLabel is null.
+    @Suppress("SENSELESS_COMPARISON")
+    if (entry != null && myLabel != null) {
+      setFontForElements()
 
-    // Label background is automatically picked up
-    myLabel.setForeground(entry.getForeground())
+      // Label background is automatically picked up
+      myLabel.setForeground(entry.getForeground())
 
-    // Make sure the panel is positioned correctly if we're changing font size
-    positionPanel()
+      // Make sure the panel is positioned correctly if we're changing font size
+      positionPanel()
+    }
   }
 
-  // Entry can be null if getForeground is called during base class initialisation
   override fun getForeground(): Color? {
+    @Suppress("SENSELESS_COMPARISON")
+    if (entry == null) {
+      // Swing uses a bad pattern of calling getForeground() from the constructor. At this moment, `entry` is null.
+      return super.getForeground()
+    }
     return entry.getForeground()
   }
 
   override fun getBackground(): Color? {
+    @Suppress("SENSELESS_COMPARISON")
+    if (entry == null) {
+      // Swing uses a bad pattern of calling getBackground() from the constructor. At this moment, `entry` is null.
+      return super.getBackground()
+    }
     return entry.getBackground()
   }
 

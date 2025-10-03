@@ -96,13 +96,17 @@ class ExOutputPanel private constructor(private val myEditor: Editor) : JBPanel<
 
     setBorder(ExPanelBorder())
 
-    setFontForElements()
-    myText.setBorder(null)
-    myScrollPane.setBorder(null)
-    myLabel.setForeground(myText.getForeground())
+    // Swing uses a bad pattern of calling updateUI() from the constructor. At this moment, all these variables are null
+    @Suppress("SENSELESS_COMPARISON")
+    if (myText != null && myLabel != null && myScrollPane != null) {
+      setFontForElements()
+      myText.setBorder(null)
+      myScrollPane.setBorder(null)
+      myLabel.setForeground(myText.getForeground())
 
-    // Make sure the panel is positioned correctly in case we're changing font size
-    positionPanel()
+      // Make sure the panel is positioned correctly in case we're changing font size
+      positionPanel()
+    }
   }
 
   var text: String?
@@ -122,10 +126,20 @@ class ExOutputPanel private constructor(private val myEditor: Editor) : JBPanel<
     }
 
   override fun getForeground(): Color? {
+    @Suppress("SENSELESS_COMPARISON")
+    if (myText == null) {
+      // Swing uses a bad pattern of calling getForeground() from the constructor. At this moment, `myText` is null.
+      return super.getForeground()
+    }
     return myText.getForeground()
   }
 
   override fun getBackground(): Color? {
+    @Suppress("SENSELESS_COMPARISON")
+    if (myText == null) {
+      // Swing uses a bad pattern of calling getBackground() from the constructor. At this moment, `myText` is null.
+      return super.getBackground()
+    }
     return myText.getBackground()
   }
 
