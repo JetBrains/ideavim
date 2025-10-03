@@ -410,9 +410,11 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
    */
   override fun handleKey(key: KeyStroke) {
     entry.handleKey(key)
-    if (finishOn != null && key.keyChar == finishOn && inputProcessing != null) {
-      inputProcessing!!.invoke(text)
+    val myInputProcessor = inputProcessing
+    if (finishOn != null && key.keyChar == finishOn && myInputProcessor != null) {
+      val myText = text
       close(refocusOwningEditor = true, resetCaret = true)
+      myInputProcessor.invoke(myText)
     }
   }
 
