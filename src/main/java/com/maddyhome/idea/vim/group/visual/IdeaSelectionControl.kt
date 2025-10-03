@@ -91,7 +91,18 @@ internal object IdeaSelectionControl {
 
         editor.vim.mode = Mode.NORMAL()
 
-        val mode = injector.application.runReadAction { chooseSelectionMode(editor, selectionSource, true) }
+        var mode = injector.application.runReadAction { chooseSelectionMode(editor, selectionSource, true) }
+        if (initialMode != null) {
+          var initialModeReturnTo = initialMode
+          while (initialModeReturnTo?.returnTo != null && initialModeReturnTo.returnTo !is Mode.NORMAL) {
+            initialModeReturnTo = initialModeReturnTo.returnTo
+          }
+          if (mode is Mode.VISUAL) {
+            mode = mode.copy(returnTo = initialModeReturnTo)
+          } else if (mode is Mode.SELECT) {
+            mode = mode.copy(returnTo = initialModeReturnTo)
+          }
+        }
         activateMode(editor, mode)
       } else {
         logger.debug("None of carets have selection. State before adjustment: ${editor.vim.mode}")
@@ -131,7 +142,7 @@ internal object IdeaSelectionControl {
 
   private fun activateMode(editor: Editor, mode: Mode) {
     when (mode) {
-      is Mode.VISUAL -> VimPlugin.getVisualMotion().enterVisualMode(editor.vim, mode.selectionType)
+      is Mode.VISUAL -> VimPlugin.getVisualMotion().enterVisualMode(editor.vim, mode.selectionType, mode.returnTo)
       is Mode.SELECT -> VimPlugin.getVisualMotion().enterSelectMode(editor.vim, mode.selectionType)
       is Mode.INSERT -> VimPlugin.getChange()
         .insertBeforeCaret(editor.vim, injector.executionContextManager.getEditorExecutionContext(editor.vim))
