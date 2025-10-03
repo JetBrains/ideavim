@@ -5,151 +5,93 @@
  * license that can be found in the LICENSE.txt file or at
  * https://opensource.org/licenses/MIT.
  */
+package com.maddyhome.idea.vim.ui.ex
 
-package com.maddyhome.idea.vim.ui.ex;
-
-import com.intellij.ide.ui.LafManager;
-import com.intellij.ide.ui.LafManagerListener;
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.ScrollingModel;
-import com.intellij.openapi.editor.colors.EditorColors;
-import com.intellij.openapi.wm.IdeFocusManager;
-import com.intellij.ui.DocumentAdapter;
-import com.intellij.util.IJSwingUtilities;
-import com.maddyhome.idea.vim.EventFacade;
-import com.maddyhome.idea.vim.KeyHandler;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.VimShortcutKeyAction;
-import com.maddyhome.idea.vim.api.VimCommandLine;
-import com.maddyhome.idea.vim.api.VimCommandLineCaret;
-import com.maddyhome.idea.vim.api.VimEditor;
-import com.maddyhome.idea.vim.api.VimKeyGroupBase;
-import com.maddyhome.idea.vim.ex.ranges.LineRange;
-import com.maddyhome.idea.vim.helper.EngineModeExtensionsKt;
-import com.maddyhome.idea.vim.helper.SearchHighlightsHelper;
-import com.maddyhome.idea.vim.helper.UiHelper;
-import com.maddyhome.idea.vim.key.interceptors.VimInputInterceptor;
-import com.maddyhome.idea.vim.newapi.IjVimCaret;
-import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.ui.ExPanelBorder;
-import com.maddyhome.idea.vim.vimscript.model.commands.Command;
-import com.maddyhome.idea.vim.vimscript.model.commands.GlobalCommand;
-import com.maddyhome.idea.vim.vimscript.model.commands.SubstituteCommand;
-import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser;
-import kotlin.Unit;
-import kotlin.jvm.functions.Function1;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.*;
-import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.lang.ref.WeakReference;
-
-import static com.maddyhome.idea.vim.api.VimInjectorKt.globalOptions;
-import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
-import static com.maddyhome.idea.vim.group.KeyGroup.toShortcutSet;
+import com.intellij.ide.ui.LafManager
+import com.intellij.ide.ui.LafManagerListener
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.colors.EditorColors
+import com.intellij.openapi.wm.IdeFocusManager
+import com.intellij.ui.DocumentAdapter
+import com.intellij.util.IJSwingUtilities
+import com.maddyhome.idea.vim.EventFacade
+import com.maddyhome.idea.vim.KeyHandler.Companion.getInstance
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.VimShortcutKeyAction
+import com.maddyhome.idea.vim.api.VimCommandLine
+import com.maddyhome.idea.vim.api.VimCommandLineCaret
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimKeyGroupBase
+import com.maddyhome.idea.vim.api.globalOptions
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.ex.ranges.LineRange
+import com.maddyhome.idea.vim.group.KeyGroup
+import com.maddyhome.idea.vim.helper.exitVisualMode
+import com.maddyhome.idea.vim.helper.requestFocus
+import com.maddyhome.idea.vim.helper.selectEditorFont
+import com.maddyhome.idea.vim.helper.updateIncsearchHighlights
+import com.maddyhome.idea.vim.key.interceptors.VimInputInterceptor
+import com.maddyhome.idea.vim.newapi.IjVimCaret
+import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.ui.ExPanelBorder
+import com.maddyhome.idea.vim.vimscript.model.commands.Command
+import com.maddyhome.idea.vim.vimscript.model.commands.GlobalCommand
+import com.maddyhome.idea.vim.vimscript.model.commands.SubstituteCommand
+import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
+import org.jetbrains.annotations.Contract
+import java.awt.Color
+import java.awt.GridBagConstraints
+import java.awt.GridBagLayout
+import java.awt.LayoutManager
+import java.awt.event.ComponentAdapter
+import java.awt.event.ComponentEvent
+import java.awt.event.ComponentListener
+import java.lang.ref.WeakReference
+import javax.swing.JComponent
+import javax.swing.JLabel
+import javax.swing.JPanel
+import javax.swing.JScrollPane
+import javax.swing.KeyStroke
+import javax.swing.SwingUtilities
+import javax.swing.event.DocumentEvent
+import javax.swing.event.DocumentListener
+import javax.swing.text.GlyphView
+import javax.swing.text.View
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * This is used to enter ex commands such as searches and "colon" commands
  */
-public class ExEntryPanel extends JPanel implements VimCommandLine {
-  public static @Nullable ExEntryPanel instance;
+class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
+  override var isReplaceMode: Boolean = false
+  override var inputProcessing: ((String) -> Unit)? = null
+  override var finishOn: Char? = null
 
-  public boolean isReplaceMode = false;
-  public Function1<String, Unit> inputProcessing = null;
-  public Character finishOn = null;
+  var inputInterceptor: VimInputInterceptor? = null
+  private var weakEditor: WeakReference<Editor?>? = null
+  var context: DataContext? = null
+  override var histIndex: Int = 0
+  override var lastEntry: String? = null
 
-  private VimInputInterceptor myInputInterceptor = null;
-  private WeakReference<Editor> weakEditor = null;
-  private DataContext context = null;
-  private int histIndex = 0;
-  private String lastEntry;
+  val ijEditor: Editor?
+    get() = if (weakEditor != null) weakEditor!!.get() else null
 
-  private ExEntryPanel() {
-    label = new JLabel(" ");
-    entry = new ExTextField(this);
-
-    GridBagLayout layout = new GridBagLayout();
-    GridBagConstraints gbc = new GridBagConstraints();
-
-    setLayout(layout);
-    gbc.gridx = 0;
-    layout.setConstraints(this.label, gbc);
-    add(this.label);
-    gbc.gridx = 1;
-    gbc.weightx = 1.0;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    layout.setConstraints(entry, gbc);
-    add(entry);
-
-    // This does not need to be unregistered, it's registered as a custom UI property on this
-    EventFacade.getInstance().registerCustomShortcutSet(VimShortcutKeyAction.getInstance(), toShortcutSet(
-      ((VimKeyGroupBase)injector.getKeyGroup()).getRequiredShortcutKeys()), entry);
-
-    updateUI();
-  }
-
-  public static ExEntryPanel getOrCreateInstance() {
-    if (instance == null) {
-      instance = new ExEntryPanel();
+  override val editor: VimEditor
+    get() {
+      val editor = this.ijEditor ?: throw RuntimeException("Editor was disposed for active command line")
+      return IjVimEditor(editor)
     }
 
-    return instance;
-  }
-
-  public static void fullReset() {
-    if (instance != null) {
-      instance.reset();
-      instance = null;
+  fun setEditor(editor: Editor?) {
+    weakEditor = if (editor == null) {
+      null
+    } else {
+      WeakReference<Editor?>(editor)
     }
-  }
-
-  public @Nullable Editor getIjEditor() {
-    return weakEditor != null ? weakEditor.get() : null;
-  }
-
-  public @NotNull VimEditor getEditor() {
-    Editor editor = getIjEditor();
-    if (editor == null) {
-      throw new RuntimeException("Editor was disposed for active command line");
-    }
-    return new IjVimEditor(editor);
-  }
-
-  public void setEditor(@Nullable Editor editor) {
-    if (editor == null) {
-      weakEditor = null;
-    }
-    else {
-      weakEditor = new WeakReference<>(editor);
-    }
-  }
-
-  public DataContext getContext() {
-    return context;
-  }
-
-  public void setContext(DataContext context) {
-    this.context = context;
-  }
-
-  /**
-   * @deprecated use {@link ExEntryPanel#activate(Editor, DataContext, String, String)}
-   */
-  @Deprecated(forRemoval = true)
-  public void activate(@NotNull Editor editor, DataContext context, @NotNull String label, String initText, int count) {
-    activate(editor, context, label, initText);
   }
 
   /**
@@ -160,70 +102,69 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
    * @param label    The label for the ex entry (i.e. :, /, or ?)
    * @param initText The initial text for the entry
    */
-  public void activate(@NotNull Editor editor, DataContext context, @NotNull String label, String initText) {
-    logger.info("Activate ex entry panel");
-    this.label.setText(label);
-    this.label.setFont(UiHelper.selectEditorFont(editor, label));
-    entry.reset();
-    entry.setText(initText);
-    entry.setFont(UiHelper.selectEditorFont(editor, initText));
-    parent = editor.getContentComponent();
+  fun activate(editor: Editor, context: DataContext?, label: String, initText: String) {
+    logger.info("Activate ex entry panel")
+    this.myLabel.setText(label)
+    this.myLabel.setFont(selectEditorFont(editor, label))
+    entry.reset()
+    entry.setText(initText)
+    entry.setFont(selectEditorFont(editor, initText))
+    parent = editor.contentComponent
 
-    final Color foregroundColour = editor.getColorsScheme().getDefaultForeground();
-    entry.setForeground(foregroundColour);
+    val foregroundColour = editor.colorsScheme.defaultForeground
+    entry.setForeground(foregroundColour)
     // TODO: Introduce IdeaVim colour scheme for "SpecialKey"?
-    final Color whitespaceColour = editor.getColorsScheme().getColor(EditorColors.WHITESPACES_COLOR);
-    entry.setSpecialKeyForeground(whitespaceColour != null ? whitespaceColour : foregroundColour);
-    this.label.setForeground(entry.getForeground());
+    val whitespaceColour = editor.colorsScheme.getColor(EditorColors.WHITESPACES_COLOR)
+    entry.setSpecialKeyForeground(whitespaceColour ?: foregroundColour)
+    this.myLabel.setForeground(entry.getForeground())
 
-    this.context = context;
-    setEditor(editor);
+    this.context = context
+    setEditor(editor)
 
-    setHistIndex(VimPlugin.getHistory().getEntries(getHistoryType(), 0, 0).size());
+    histIndex = VimPlugin.getHistory().getEntries(historyType, 0, 0).size
 
-    entry.getDocument().addDocumentListener(fontListener);
-    if (isIncSearchEnabled()) {
-      entry.getDocument().addDocumentListener(incSearchDocumentListener);
-      caretOffset = editor.getCaretModel().getOffset();
-      verticalOffset = editor.getScrollingModel().getVerticalScrollOffset();
-      horizontalOffset = editor.getScrollingModel().getHorizontalScrollOffset();
+    entry.document.addDocumentListener(fontListener)
+    if (this.isIncSearchEnabled) {
+      entry.document.addDocumentListener(incSearchDocumentListener)
+      caretOffset = editor.caretModel.offset
+      verticalOffset = editor.scrollingModel.verticalScrollOffset
+      horizontalOffset = editor.scrollingModel.horizontalScrollOffset
     }
 
-    if (!ApplicationManager.getApplication().isUnitTestMode()) {
-      JRootPane root = SwingUtilities.getRootPane(parent);
-      if (root == null) return;
-      oldGlass = (JComponent)root.getGlassPane();
-      oldLayout = oldGlass.getLayout();
-      wasOpaque = oldGlass.isOpaque();
-      oldGlass.setLayout(null);
-      oldGlass.setOpaque(false);
-      oldGlass.add(this);
-      oldGlass.addComponentListener(resizePanelListener);
-      positionPanel();
-      oldGlass.setVisible(true);
-      entry.requestFocusInWindow();
+    if (!ApplicationManager.getApplication().isUnitTestMode) {
+      val root = SwingUtilities.getRootPane(parent) ?: return
+      val glassPane = root.getGlassPane() as JComponent
+      oldGlass = glassPane
+      oldLayout = glassPane.layout
+      wasOpaque = glassPane.isOpaque
+      glassPane.setLayout(null)
+      glassPane.setOpaque(false)
+      glassPane.add(this)
+      glassPane.addComponentListener(resizePanelListener)
+      positionPanel()
+      glassPane.isVisible = true
+      entry.requestFocusInWindow()
     }
-    active = true;
+    this.isActive = true
   }
 
-  public void deactivate(boolean refocusOwningEditor) {
-    deactivate(refocusOwningEditor, true);
+  fun deactivate(refocusOwningEditor: Boolean) {
+    deactivate(refocusOwningEditor, true)
   }
 
   /**
    * Turns off the ex entry field and optionally puts the focus back to the original component
    */
-  @Override
-  public void deactivate(boolean refocusOwningEditor, boolean resetCaret) {
-    logger.info("Deactivate ex entry panel");
-    if (!active) return;
+  override fun deactivate(refocusOwningEditor: Boolean, resetCaret: Boolean) {
+    logger.info("Deactivate ex entry panel")
+    if (!this.isActive) return
 
-    clearPromptCharacter();
+    clearPromptCharacter()
     try {
-      entry.getDocument().removeDocumentListener(fontListener);
+      entry.document.removeDocumentListener(fontListener)
       // incsearch won't change in the lifetime of this activation
-      if (isIncSearchEnabled()) {
-        entry.getDocument().removeDocumentListener(incSearchDocumentListener);
+      if (this.isIncSearchEnabled) {
+        entry.document.removeDocumentListener(incSearchDocumentListener)
 
         // TODO: Reduce the amount of unnecessary work here
         // If incsearch and hlsearch are enabled, and if this is a search panel, we'll have all of the results correctly
@@ -233,111 +174,103 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
         // search that we did for incsearch and add highlights back. The `:nohlsearch` command, even if bound to a
         // shortcut, is still processed by the ex entry panel, so deactivating will force update remove, search and add
         // of the current search results before the `NoHLSearchHandler` will remove all highlights again
-        final Editor editor = getIjEditor();
-        if (editor != null && !editor.isDisposed() && resetCaret) {
-          resetCaretOffset(editor);
+        val editor = this.ijEditor
+        if (editor != null && !editor.isDisposed && resetCaret) {
+          resetCaretOffset(editor)
         }
 
-        VimPlugin.getSearch().resetIncsearchHighlights();
+        VimPlugin.getSearch().resetIncsearchHighlights()
       }
 
-      entry.deactivate();
-    }
-    finally {
+      entry.deactivate()
+    } finally {
       // Make sure we hide the UI, especially if something goes wrong
-      if (!ApplicationManager.getApplication().isUnitTestMode()) {
+      if (!ApplicationManager.getApplication().isUnitTestMode) {
         if (refocusOwningEditor && parent != null) {
-          UiHelper.requestFocus(parent);
+          requestFocus(parent!!)
         }
 
-        oldGlass.removeComponentListener(resizePanelListener);
-        oldGlass.setVisible(false);
-        oldGlass.remove(this);
-        oldGlass.setOpaque(wasOpaque);
-        oldGlass.setLayout(oldLayout);
+        oldGlass!!.removeComponentListener(resizePanelListener)
+        oldGlass!!.isVisible = false
+        oldGlass!!.remove(this)
+        oldGlass!!.setOpaque(wasOpaque)
+        oldGlass!!.setLayout(oldLayout)
       }
 
-      parent = null;
+      parent = null
     }
 
-    isReplaceMode = false;
-    setEditor(null);
-    context = null;
+    isReplaceMode = false
+    setEditor(null)
+    context = null
 
     // We have this in the end, because `entry.deactivate()` communicates with active panel during deactivation
-    active = false;
-    finishOn = null;
-    myInputInterceptor = null;
-    inputProcessing = null;
+    this.isActive = false
+    finishOn = null
+    this.inputInterceptor = null
+    inputProcessing = null
   }
 
-  private void reset() {
-    deactivate(false);
+  private fun reset() {
+    deactivate(false)
   }
 
-  private void resetCaretOffset(@NotNull Editor editor) {
+  private fun resetCaretOffset(editor: Editor) {
     // Reset the original caret, with original scroll offsets
-    final Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
-    if (primaryCaret.getOffset() != caretOffset) {
-      new IjVimCaret(primaryCaret).moveToOffset(caretOffset);
+    val primaryCaret = editor.caretModel.primaryCaret
+    if (primaryCaret.offset != caretOffset) {
+      IjVimCaret(primaryCaret).moveToOffset(caretOffset)
     }
-    final ScrollingModel scrollingModel = editor.getScrollingModel();
-    if (scrollingModel.getHorizontalScrollOffset() != horizontalOffset ||
-        scrollingModel.getVerticalScrollOffset() != verticalOffset) {
-      scrollingModel.scroll(horizontalOffset, verticalOffset);
+    val scrollingModel = editor.scrollingModel
+    if (scrollingModel.horizontalScrollOffset != horizontalOffset ||
+      scrollingModel.verticalScrollOffset != verticalOffset
+    ) {
+      scrollingModel.scroll(horizontalOffset, verticalOffset)
     }
   }
 
-  private final @NotNull DocumentListener fontListener = new DocumentAdapter() {
-    @Override
-    protected void textChanged(@NotNull DocumentEvent e) {
-      String text = entry.getText();
-      Font newFont = UiHelper.selectEditorFont(getIjEditor(), text);
-      if (newFont != entry.getFont()) {
-        entry.setFont(newFont);
+  private val fontListener: DocumentListener = object : DocumentAdapter() {
+    override fun textChanged(e: DocumentEvent) {
+      val text = entry.getText()
+      val newFont = selectEditorFont(ijEditor, text)
+      if (newFont !== entry.getFont()) {
+        entry.setFont(newFont)
       }
     }
-  };
+  }
 
-  private final @NotNull DocumentListener incSearchDocumentListener = new DocumentAdapter() {
-    @Override
-    protected void textChanged(@NotNull DocumentEvent e) {
+  private val incSearchDocumentListener: DocumentListener = object : DocumentAdapter() {
+    override fun textChanged(e: DocumentEvent) {
       try {
-        final Editor editor = getIjEditor();
-        if (editor == null) {
-          return;
-        }
+        val editor: Editor = ijEditor ?: return
 
-        final String labelText = label.getText(); // Either '/', '?' or ':'boolean searchCommand = false;
+        val labelText: String = myLabel.text // Either '/', '?' or ':'boolean searchCommand = false;
 
-        boolean searchCommand = false;
-        LineRange searchRange = null;
-        char separator = labelText.charAt(0);
-        String searchText = getText();
-        if (labelText.equals(":")) {
-          if (searchText.isEmpty()) return;
-          final Command command = getIncsearchCommand(searchText);
-          if (command == null) {
-            return;
-          }
-          searchCommand = true;
-          searchText = "";
-          final String argument = command.getCommandArgument();
-          if (argument.length() > 1) {  // E.g. skip '/' in `:%s/`. `%` is range, `s` is command, `/` is argument
-            separator = argument.charAt(0);
-            searchText = argument.substring(1);
+        var searchCommand = false
+        var searchRange: LineRange? = null
+        var separator = labelText[0]
+        var searchText = text
+        if (labelText == ":") {
+          if (searchText.isEmpty()) return
+          val command = getIncsearchCommand(searchText) ?: return
+          searchCommand = true
+          searchText = ""
+          val argument = command.commandArgument
+          if (argument.length > 1) {  // E.g. skip '/' in `:%s/`. `%` is range, `s` is command, `/` is argument
+            separator = argument[0]
+            searchText = argument.substring(1)
           }
           if (!searchText.isEmpty()) {
-            searchRange = command.getLineRangeSafe(new IjVimEditor(editor));
+            searchRange = command.getLineRangeSafe(IjVimEditor(editor))
           }
           if (searchText.isEmpty() || searchRange == null) {
             // Reset back to the original search highlights after deleting a search from a substitution command.Or if
             // there is no search range (because the user entered an invalid range, e.g. mark not set).
             // E.g. Highlight `whatever`, type `:%s/foo` + highlight `foo`, delete back to `:%s/` and reset highlights
             // back to `whatever`
-            VimPlugin.getSearch().resetIncsearchHighlights();
-            resetCaretOffset(editor);
-            return;
+            VimPlugin.getSearch().resetIncsearchHighlights()
+            resetCaretOffset(editor)
+            return
           }
         }
 
@@ -345,18 +278,22 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
         // count components - selecting register(s), operator and motions. E.g. `2"a3"b4"c5d6/` will return 720.
         // If we're showing highlights for an Ex command like `:s`, the command builder will be empty, but we'll still
         // get a valid value.
-        int count1 = Math.max(1, KeyHandler.getInstance().getKeyHandlerState().getEditorCommandBuilder()
-          .calculateCount0Snapshot());
+        val count1 = max(
+          1, getInstance().keyHandlerState.editorCommandBuilder
+            .calculateCount0Snapshot()
+        )
 
-        if (labelText.equals("/") || labelText.equals("?") || searchCommand) {
-          final boolean forwards = !labelText.equals("?");  // :s, :g, :v are treated as forwards
-          int patternEnd = injector.getSearchGroup().findEndOfPattern(searchText, separator, 0);
-          final String pattern = searchText.substring(0, patternEnd);
+        if (labelText == "/" || labelText == "?" || searchCommand) {
+          val forwards = labelText != "?" // :s, :g, :v are treated as forwards
+          val patternEnd: Int = injector.searchGroup.findEndOfPattern(searchText, separator, 0)
+          val pattern = searchText.take(patternEnd)
 
-          VimPlugin.getEditor().closeEditorSearchSession(editor);
-          final int matchOffset =
-            SearchHighlightsHelper.updateIncsearchHighlights(editor, pattern, count1, forwards, caretOffset,
-                                                             searchRange);
+          VimPlugin.getEditor().closeEditorSearchSession(editor)
+          val matchOffset =
+            updateIncsearchHighlights(
+              editor, pattern, count1, forwards, caretOffset,
+              searchRange
+            )
           if (matchOffset != -1) {
             // Moving the caret will update the Visual selection, which is only valid while performing a search. We want
             // to remove the Visual selection when the incsearch is for a command, as this is always unrelated to the
@@ -365,317 +302,281 @@ public class ExEntryPanel extends JPanel implements VimCommandLine {
             // `:<C-U>%s/foo` should remove the selection first.
             // We're actually in Command-line with Visual pending. Exiting Visual replaces this with just Command-line
             if (searchCommand) {
-              EngineModeExtensionsKt.exitVisualMode(new IjVimEditor(editor));
+              IjVimEditor(editor).exitVisualMode()
             }
-            new IjVimCaret(editor.getCaretModel().getPrimaryCaret()).moveToOffset(matchOffset);
-          }
-          else {
-            resetCaretOffset(editor);
+            IjVimCaret(editor.caretModel.primaryCaret).moveToOffset(matchOffset)
+          } else {
+            resetCaretOffset(editor)
           }
         }
-      }
-      catch (Throwable ex) {
+      } catch (ex: Throwable) {
         // Make sure the exception doesn't leak out of the handler, because it can break the text entry field and
         // require the editor to be closed/reopened. The worst that will happen is no incsearch highlights
-        logger.error("Error while trying to show incsearch highlights", ex);
+        logger.error("Error while trying to show incsearch highlights", ex)
       }
     }
 
     @Contract("null -> null")
-    private @Nullable Command getIncsearchCommand(@Nullable String commandText) {
-      if (commandText == null) return null;
+    private fun getIncsearchCommand(commandText: String?): Command? {
+      if (commandText == null) return null
       try {
-        final Command exCommand = VimscriptParser.INSTANCE.parseCommand(commandText);
+        val exCommand = VimscriptParser.parseCommand(commandText)
         // TODO: Add smagic and snomagic here if/when the commands are supported
-        if (exCommand instanceof SubstituteCommand || exCommand instanceof GlobalCommand) {
-          return exCommand;
+        if (exCommand is SubstituteCommand || exCommand is GlobalCommand) {
+          return exCommand
         }
-      }
-      catch (Exception e) {
-        logger.error("Cannot parse command for incsearch", e);
+      } catch (e: Exception) {
+        logger.error("Cannot parse command for incsearch", e)
       }
 
-      return null;
+      return null
     }
-  };
+  }
 
   /**
    * Gets the label for the ex entry. This should be one of ":", "/", or "?"
    *
    * @return The ex entry label
    */
-  @Override
-  public @NotNull String getLabel() {
-    return label.getText();
+  override fun getLabel(): String {
+    return myLabel.text
   }
 
-  @Override
-  public void toggleReplaceMode() {
-    entry.toggleInsertReplace();
+  override fun toggleReplaceMode() {
+    entry.toggleInsertReplace()
   }
+
+  override val text: String
+    get() = entry.getText()
+
+  override fun getRenderedText(): String {
+    val stringBuilder = StringBuilder()
+    getRenderedText(entry.getUI().getRootView(entry), stringBuilder)
+    if (stringBuilder.get(stringBuilder.length - 1) == '\n') {
+      stringBuilder.deleteCharAt(stringBuilder.length - 1)
+    }
+    return stringBuilder.toString()
+  }
+
+  private fun getRenderedText(view: View, stringBuilder: StringBuilder) {
+    if (view.element.isLeaf) {
+      if (view is GlyphView) {
+        val text = view.getText(view.getStartOffset(), view.getEndOffset())
+        stringBuilder.append(text)
+
+        // GlyphView doesn't render a trailing new line, but uses it to flush the characters in the preceding string
+        // Typically, we won't get a newline in the middle of a string, but we do add the prompt to the end of the doc
+        if (stringBuilder.get(stringBuilder.length - 1) == '\n') {
+          stringBuilder.deleteCharAt(stringBuilder.length - 1)
+        }
+      } else {
+        stringBuilder.append("<Unknown leaf view. Expected GlyphView, got: ")
+        stringBuilder.append(view.javaClass.getName())
+        stringBuilder.append(">")
+      }
+    } else {
+      val viewCount = view.viewCount
+      for (i in 0..<viewCount) {
+        val child = view.getView(i)
+        getRenderedText(child, stringBuilder)
+      }
+    }
+  }
+
+  override fun setPromptCharacter(promptCharacter: Char) {
+    val entryUi = entry.getUI()
+    if (entryUi is ExTextFieldUI) {
+      entryUi.setPromptCharacter(promptCharacter)
+    }
+  }
+
+  override fun clearPromptCharacter() {
+    val exTextFieldUI = entry.getUI()
+    if (exTextFieldUI is ExTextFieldUI) {
+      exTextFieldUI.clearPromptCharacter()
+    }
+  }
+
+  /**
+   * Pass the keystroke on to the text field for handling
+   *
+   *
+   * The text field for the command line will forward a pressed or typed keystroke to the key handler, which will either
+   * consume it for mapping or a command. If it's not consumed, or if it's mapped, the keystroke is returned to the
+   * command line to complete handling. This includes typed characters as well as pressed shortcuts.
+   *
+   *
+   * @param key The potentially mapped keystroke
+   */
+  override fun handleKey(key: KeyStroke) {
+    entry.handleKey(key)
+    if (finishOn != null && key.keyChar == finishOn && inputProcessing != null) {
+      inputProcessing!!.invoke(text)
+      close(refocusOwningEditor = true, resetCaret = true)
+    }
+  }
+
+  // Called automatically when the LAF is changed and the component is visible, and manually by the LAF listener handler
+  override fun updateUI() {
+    super.updateUI()
+
+    setBorder(ExPanelBorder())
+
+    setFontForElements()
+
+    // Label background is automatically picked up
+    myLabel.setForeground(entry.getForeground())
+
+    // Make sure the panel is positioned correctly if we're changing font size
+    positionPanel()
+  }
+
+  // Entry can be null if getForeground is called during base class initialisation
+  override fun getForeground(): Color? {
+    return entry.getForeground()
+  }
+
+  override fun getBackground(): Color? {
+    return entry.getBackground()
+  }
+
+  private fun setFontForElements() {
+    myLabel.setFont(selectEditorFont(this.ijEditor, myLabel.text))
+    entry.setFont(selectEditorFont(this.ijEditor, entry.getText()))
+  }
+
+  private fun positionPanel() {
+    if (parent == null) return
+
+    val scroll = SwingUtilities.getAncestorOfClass(JScrollPane::class.java, parent)
+    val height = getPreferredSize().getHeight().toInt()
+    if (scroll != null) {
+      val bounds = scroll.bounds
+      bounds.translate(0, scroll.getHeight() - height)
+      bounds.height = height
+      val pos = SwingUtilities.convertPoint(scroll.getParent(), bounds.location, oldGlass)
+      bounds.location = pos
+      setBounds(bounds)
+      repaint()
+    }
+  }
+
+  private val isIncSearchEnabled: Boolean
+    get() = injector.globalOptions().incsearch
 
   /**
    * Checks if the ex entry panel is currently active
    *
    * @return true if active, false if not
    */
-  public boolean isActive() {
-    return active;
-  }
-
-  @Override
-  public @NotNull String getText() {
-    return entry.getText();
-  }
-
-  @Override
-  public @NotNull String getRenderedText() {
-    final StringBuilder stringBuilder = new StringBuilder();
-    getRenderedText(entry.getUI().getRootView(entry), stringBuilder);
-    if (stringBuilder.charAt(stringBuilder.length() - 1) == '\n') {
-      stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-    }
-    return stringBuilder.toString();
-  }
-
-  private void getRenderedText(View view, StringBuilder stringBuilder) {
-    if (view.getElement().isLeaf()) {
-      if (view instanceof GlyphView glyphView) {
-        final Segment text = glyphView.getText(glyphView.getStartOffset(), glyphView.getEndOffset());
-        stringBuilder.append(text);
-
-        // GlyphView doesn't render a trailing new line, but uses it to flush the characters in the preceding string
-        // Typically, we won't get a newline in the middle of a string, but we do add the prompt to the end of the doc
-        if (stringBuilder.charAt(stringBuilder.length() - 1) == '\n') {
-          stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-        }
-      }
-      else {
-        stringBuilder.append("<Unknown leaf view. Expected GlyphView, got: ");
-        stringBuilder.append(view.getClass().getName());
-        stringBuilder.append(">");
-      }
-    }
-    else {
-      final int viewCount = view.getViewCount();
-      for (int i = 0; i < viewCount; i++) {
-        final View child = view.getView(i);
-        getRenderedText(child, stringBuilder);
-      }
-    }
-  }
-
-  @Override
-  public void setPromptCharacter(char promptCharacter) {
-    if (entry.getUI() instanceof ExTextFieldUI exTextFieldUI) {
-      exTextFieldUI.setPromptCharacter(promptCharacter);
-    }
-  }
-
-  @Override
-  public void clearPromptCharacter() {
-    if (entry.getUI() instanceof ExTextFieldUI exTextFieldUI) {
-      exTextFieldUI.clearPromptCharacter();
-    }
-  }
-
-  public @NotNull ExTextField getEntry() {
-    return entry;
-  }
-
-  /**
-   * Pass the keystroke on to the text field for handling
-   * <p>
-   * The text field for the command line will forward a pressed or typed keystroke to the key handler, which will either
-   * consume it for mapping or a command. If it's not consumed, or if it's mapped, the keystroke is returned to the
-   * command line to complete handling. This includes typed characters as well as pressed shortcuts.
-   * </p>
-   *
-   * @param stroke The potentially mapped keystroke
-   */
-  @Override
-  public void handleKey(@NotNull KeyStroke stroke) {
-    entry.handleKey(stroke);
-    if (finishOn != null && stroke.getKeyChar() == finishOn && inputProcessing != null) {
-      inputProcessing.invoke(getText());
-      close(true, true);
-    }
-  }
-
-  // Called automatically when the LAF is changed and the component is visible, and manually by the LAF listener handler
-  @Override
-  public void updateUI() {
-    super.updateUI();
-
-    setBorder(new ExPanelBorder());
-
-    // Can be null when called from base constructor
-    //noinspection ConstantConditions
-    if (entry != null && label != null) {
-
-      setFontForElements();
-
-      // Label background is automatically picked up
-      label.setForeground(entry.getForeground());
-
-      // Make sure the panel is positioned correctly if we're changing font size
-      positionPanel();
-    }
-  }
-
-  // Entry can be null if getForeground is called during base class initialisation
-  @SuppressWarnings("ConstantConditions")
-  @Override
-  public Color getForeground() {
-    return entry != null ? entry.getForeground() : super.getForeground();
-  }
-
-  @SuppressWarnings("ConstantConditions")
-  @Override
-  public Color getBackground() {
-    return entry != null ? entry.getBackground() : super.getBackground();
-  }
-
-  private void setFontForElements() {
-    label.setFont(UiHelper.selectEditorFont(getIjEditor(), label.getText()));
-    entry.setFont(UiHelper.selectEditorFont(getIjEditor(), entry.getText()));
-  }
-
-  private void positionPanel() {
-    if (parent == null) return;
-
-    Container scroll = SwingUtilities.getAncestorOfClass(JScrollPane.class, parent);
-    int height = (int)getPreferredSize().getHeight();
-    if (scroll != null) {
-      Rectangle bounds = scroll.getBounds();
-      bounds.translate(0, scroll.getHeight() - height);
-      bounds.height = height;
-      Point pos = SwingUtilities.convertPoint(scroll.getParent(), bounds.getLocation(), oldGlass);
-      bounds.setLocation(pos);
-      setBounds(bounds);
-      repaint();
-    }
-  }
-
-  private boolean isIncSearchEnabled() {
-    return globalOptions(injector).getIncsearch();
-  }
-
-  private boolean active;
+  var isActive: Boolean = false
+    private set
 
   // UI stuff
-  private @Nullable JComponent parent;
-  private final @NotNull JLabel label;
-  private final @NotNull ExTextField entry;
-  private JComponent oldGlass;
-  private LayoutManager oldLayout;
-  private boolean wasOpaque;
+  private var parent: JComponent? = null
+  private val myLabel: JLabel = JLabel(" ")
+  val entry: ExTextField = ExTextField(this)
+  private var oldGlass: JComponent? = null
+  private var oldLayout: LayoutManager? = null
+  private var wasOpaque = false
 
   // incsearch stuff
-  private int verticalOffset;
-  private int horizontalOffset;
-  private int caretOffset;
+  private var verticalOffset = 0
+  private var horizontalOffset = 0
+  private var caretOffset = 0
 
-  private final @NotNull ComponentListener resizePanelListener = new ComponentAdapter() {
-    @Override
-    public void componentResized(ComponentEvent e) {
-      positionPanel();
+  private val resizePanelListener: ComponentListener = object : ComponentAdapter() {
+    override fun componentResized(e: ComponentEvent?) {
+      positionPanel()
     }
-  };
-
-  private static final Logger logger = Logger.getInstance(ExEntryPanel.class.getName());
-
-  @Override
-  public @NotNull VimCommandLineCaret getCaret() {
-    return (VimCommandLineCaret)entry.getCaret();
   }
 
-  @Override
-  public void setText(@NotNull String string, boolean updateLastEntry) {
+  init {
+
+    val layout = GridBagLayout()
+    val gbc = GridBagConstraints()
+
+    setLayout(layout)
+    gbc.gridx = 0
+    layout.setConstraints(this.myLabel, gbc)
+    add(this.myLabel)
+    gbc.gridx = 1
+    gbc.weightx = 1.0
+    gbc.fill = GridBagConstraints.HORIZONTAL
+    layout.setConstraints(entry, gbc)
+    add(entry)
+
+    // This does not need to be unregistered, it's registered as a custom UI property on this
+    EventFacade.getInstance().registerCustomShortcutSet(
+      VimShortcutKeyAction.instance, KeyGroup.toShortcutSet(
+        (injector.keyGroup as VimKeyGroupBase).requiredShortcutKeys
+      ), entry
+    )
+
+    updateUI()
+  }
+
+  override val caret: VimCommandLineCaret
+    get() = entry.caret as VimCommandLineCaret
+
+  override fun setText(string: String, updateLastEntry: Boolean) {
     // It's a feature of Swing that caret is moved when we set new text. However, our API is Swing independent and we do not expect this
-    int offset = getCaret().getOffset();
-    entry.updateText(string);
-    if (updateLastEntry) entry.saveLastEntry();
-    getCaret().setOffset(Math.min(offset, getText().length()));
+    val offset = caret.offset
+    entry.updateText(string)
+    if (updateLastEntry) entry.saveLastEntry()
+    caret.offset = min(offset, text.length)
   }
 
-  @Override
-  public void deleteText(int offset, int length) {
-    entry.deleteText(offset, length);
+  override fun deleteText(offset: Int, length: Int) {
+    entry.deleteText(offset, length)
   }
 
-  @Override
-  public void insertText(int offset, @NotNull String string) {
+  override fun insertText(offset: Int, string: String) {
     // Remember that replace mode is different to overwrite! The document handles overwrite, but we must handle replace
     if (isReplaceMode) {
-      entry.deleteText(offset, string.length());
+      entry.deleteText(offset, string.length)
     }
-    entry.insertText(offset, string);
+    entry.insertText(offset, string)
   }
 
-  @Override
-  public void clearCurrentAction() {
-    entry.clearCurrentAction();
+  override fun clearCurrentAction() {
+    entry.clearCurrentAction()
   }
 
-  @Override
-  public boolean isReplaceMode() {
-    return isReplaceMode;
+  override fun focus() {
+    IdeFocusManager.findInstance().requestFocus(entry, true)
   }
 
-  @Override
-  public void focus() {
-    IdeFocusManager.findInstance().requestFocus(entry, true);
-  }
-
-  public @Nullable VimInputInterceptor getInputInterceptor() {
-    return myInputInterceptor;
-  }
-
-  public void setInputInterceptor(@Nullable VimInputInterceptor vimInputInterceptor) {
-    myInputInterceptor = vimInputInterceptor;
-  }
-
-  @Override
-  public @Nullable Function1<String, Unit> getInputProcessing() {
-    return inputProcessing;
-  }
-
-  @Override
-  public @Nullable Character getFinishOn() {
-    return finishOn;
-  }
-
-  @Override
-  public int getHistIndex() {
-    return histIndex;
-  }
-
-  @Override
-  public void setHistIndex(int i) {
-    histIndex = i;
-  }
-
-  @NotNull
-  @Override
-  public String getLastEntry() {
-    return lastEntry;
-  }
-
-  @Override
-  public void setLastEntry(@NotNull String s) {
-    lastEntry = s;
-  }
-
-  public static class LafListener implements LafManagerListener {
-    @Override
-    public void lookAndFeelChanged(@NotNull LafManager source) {
-      if (VimPlugin.isNotEnabled()) return;
+  class LafListener : LafManagerListener {
+    override fun lookAndFeelChanged(source: LafManager) {
+      if (VimPlugin.isNotEnabled()) return
 
       // Calls updateUI on this and child components
       if (instance != null) {
-        IJSwingUtilities.updateComponentTreeUI(instance);
+        IJSwingUtilities.updateComponentTreeUI(instance)
       }
     }
+  }
+
+  companion object {
+    var instance: ExEntryPanel? = null
+
+    fun getOrCreateInstance(): ExEntryPanel {
+      return instance ?: let {
+        val exEntryPanel = ExEntryPanel()
+        instance = exEntryPanel
+        exEntryPanel
+      }
+    }
+
+    fun fullReset() {
+      val myInstance = instance
+      if (myInstance != null) {
+        myInstance.reset()
+        instance = null
+      }
+    }
+
+    private val logger = Logger.getInstance(ExEntryPanel::class.java.getName())
   }
 }

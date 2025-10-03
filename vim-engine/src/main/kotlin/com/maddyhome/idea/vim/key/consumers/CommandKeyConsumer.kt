@@ -146,7 +146,7 @@ internal class CommandKeyConsumer : KeyConsumer {
       if (action.flags.contains(CommandFlags.FLAG_END_EX)) {
         logger.trace("Processing ex_string")
         val commandLine = injector.commandLine.getActiveCommandLine()!!
-        val label = commandLine.label
+        val label = commandLine.getLabel()
         val text = commandLine.text
         val processing = commandLine.inputProcessing
         commandLine.close(refocusOwningEditor = true, resetCaret = true)

@@ -169,7 +169,7 @@ internal class WrappedAsModalInputExEntryPanel(internal val exEntryPanel: ExEntr
       exEntryPanel.inputInterceptor = value
     }
   override val caret: VimCommandLineCaret = exEntryPanel.caret
-  override val label: String = exEntryPanel.label
+  override val label: String = exEntryPanel.getLabel()
 
   override fun deactivate(refocusOwningEditor: Boolean, resetCaret: Boolean) {
     exEntryPanel.deactivate(refocusOwningEditor, resetCaret)
