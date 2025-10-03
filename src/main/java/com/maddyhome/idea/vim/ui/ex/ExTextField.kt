@@ -5,230 +5,214 @@
  * license that can be found in the LICENSE.txt file or at
  * https://opensource.org/licenses/MIT.
  */
+package com.maddyhome.idea.vim.ui.ex
 
-package com.maddyhome.idea.vim.ui.ex;
-
-import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.textarea.TextComponentEditor;
-import com.intellij.ui.paint.PaintUtil;
-import com.intellij.util.ui.JBUI;
-import com.maddyhome.idea.vim.KeyHandler;
-import com.maddyhome.idea.vim.api.VimCommandLine;
-import com.maddyhome.idea.vim.api.VimCommandLineCaret;
-import com.maddyhome.idea.vim.helper.EngineStringHelper;
-import com.maddyhome.idea.vim.helper.UiHelper;
-import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext;
-import com.maddyhome.idea.vim.options.helpers.GuiCursorAttributes;
-import com.maddyhome.idea.vim.options.helpers.GuiCursorMode;
-import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper;
-import com.maddyhome.idea.vim.options.helpers.GuiCursorType;
-import org.jetbrains.annotations.NonNls;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.TestOnly;
-
-import javax.swing.*;
-import javax.swing.text.*;
-import java.awt.*;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyEvent;
-import java.awt.geom.Area;
-import java.awt.geom.Rectangle2D;
-import java.util.Date;
-import java.util.Objects;
-
-import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
-import static java.lang.Math.ceil;
-import static java.lang.Math.max;
+import com.intellij.openapi.diagnostic.Logger
+import com.intellij.ui.paint.PaintUtil
+import com.intellij.util.ui.JBUI
+import com.maddyhome.idea.vim.KeyHandler.Companion.getInstance
+import com.maddyhome.idea.vim.api.VimCommandLine
+import com.maddyhome.idea.vim.api.VimCommandLineCaret
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.helper.EngineStringHelper.isPrintableCharacter
+import com.maddyhome.idea.vim.helper.selectEditorFont
+import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
+import com.maddyhome.idea.vim.options.helpers.GuiCursorAttributes
+import com.maddyhome.idea.vim.options.helpers.GuiCursorMode
+import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper.getAttributes
+import com.maddyhome.idea.vim.options.helpers.GuiCursorType
+import org.jetbrains.annotations.NonNls
+import org.jetbrains.annotations.TestOnly
+import java.awt.Color
+import java.awt.Font
+import java.awt.FontMetrics
+import java.awt.Graphics
+import java.awt.Graphics2D
+import java.awt.Insets
+import java.awt.Rectangle
+import java.awt.event.FocusEvent
+import java.awt.event.KeyEvent
+import java.awt.geom.Area
+import java.awt.geom.Rectangle2D
+import java.util.*
+import javax.swing.JTextField
+import javax.swing.KeyStroke
+import javax.swing.event.CaretEvent
+import javax.swing.text.BadLocationException
+import javax.swing.text.DefaultCaret
+import javax.swing.text.Document
+import javax.swing.text.JTextComponent
+import javax.swing.text.StyleConstants
+import javax.swing.text.StyleContext
+import javax.swing.text.StyledDocument
+import kotlin.math.ceil
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * A custom text field for the Ex command line.
- * <p>
- * Note that because this is an instance of {@link JTextComponent}, anything that looks for an IntelliJ {@link Editor}
- * in current data context will get an instance of {@link TextComponentEditor}, which means that normal IntelliJ
+ *
+ *
+ * Note that because this is an instance of [JTextComponent], anything that looks for an IntelliJ [com.intellij.openapi.editor.Editor]
+ * in current data context will get an instance of [com.intellij.openapi.editor.textarea.TextComponentEditor], which means that normal IntelliJ
  * shortcuts and actions will work with the Ex command line, even if they're not supposed to. E.g., CMD+V will paste on
  * Mac, but CTRL+V on Windows won't, because the Ex command line handles that shortcut. I don't see a way to fix this.
- * </p>
+ *
  */
-public class ExTextField extends JTextField {
-  private final ExEntryPanel myParentPanel;
-
-  ExTextField(ExEntryPanel parentPanel) {
-    myParentPanel = parentPanel;
-
-    // We need to store this in a field, because we can't trust getCaret(), as it will return an instance of
-    // ComposedTextCaret when working with dead keys or input methods
-    caret = new CommandLineCaret();
-    caret.setBlinkRate(getCaret().getBlinkRate());
-    setCaret(caret);
-    setNormalModeCaret();
-
-    final Style defaultStyle = ((StyledDocument)getDocument()).getStyle(StyleContext.DEFAULT_STYLE);
-    StyleConstants.setForeground(defaultStyle, getForeground());
-
-    addCaretListener(e -> resetCaret());
+class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) : JTextField() {
+  fun reset() {
+    clearCurrentAction()
+    setInsertMode()
   }
 
-  void reset() {
-    clearCurrentAction();
-    setInsertMode();
+  fun deactivate() {
+    clearCurrentAction()
   }
 
-  void deactivate() {
-    clearCurrentAction();
+  override fun getMargin(): Insets {
+    return JBUI.emptyInsets()
   }
 
-  @Override
-  public Insets getMargin() {
-    return JBUI.emptyInsets();
-  }
-
-  @Override
-  public Insets getInsets() {
-    return JBUI.emptyInsets();
+  override fun getInsets(): Insets {
+    return JBUI.emptyInsets()
   }
 
   // Called when the LAF is changed, but only if the control is visible
-  @Override
-  public void updateUI() {
+  override fun updateUI() {
     // Override the default look and feel specific UI so we can have a completely borderless and margin-less text field.
     // (See TextFieldWithPopupHandlerUI#getDefaultMargins and derived classes). This allows us to draw the text field
     // directly next to the label
-    setUI(new ExTextFieldUI(ExEditorKit.INSTANCE));
-    invalidate();
+    setUI(ExTextFieldUI(ExEditorKit))
+    invalidate()
 
-    setBorder(null);
+    setBorder(null)
   }
 
   /**
    * Stores the current text as the last edited entry in the command line's history
-   * <p>
+   *
+   *
    * This method is called whenever the text is changed by the user, either by typing, cut/paste or delete. It remembers
-   * the current text as the last entry in the command line's history, so that we can scroll into the past, and then
+   * the current text as the last entry in the command line's history, so that we can scroll into the past and then
    * return to the uncommitted text we were previously editing.
-   * </p>
+   *
    */
-  void saveLastEntry() {
-    myParentPanel.setLastEntry(super.getText());
+  fun saveLastEntry() {
+    myParentPanel.lastEntry = super.getText()
   }
 
   /**
    * Update the text in the text field without saving it as the current/last entry in the command line's history
-   * <p>
+   *
+   *
    * This is used to update the text to another entry in the command line's history, without losing the current/last
    * entry.
-   * </p>
+   *
    */
-  void updateText(String string) {
-    super.setText(string);
-    setFontToJField(string);
+  fun updateText(string: String) {
+    super.setText(string)
+    setFontToJField(string)
   }
 
-  @Override
-  public void setText(String string) {
-    super.setText(string);
+  override fun setText(string: String) {
+    super.setText(string)
 
-    saveLastEntry();
-    setFontToJField(string);
+    saveLastEntry()
+    setFontToJField(string)
   }
 
-  public void insertText(int offset, String text) {
+  fun insertText(offset: Int, text: String?) {
     try {
-      // Note that ExDocument.insertString handles overwrite, but not replace mode!
-      getDocument().insertString(offset, text, null);
+      // Note that ExDocument.insertString handles overwriting, but not replace mode!
+      document.insertString(offset, text, null)
+    } catch (e: BadLocationException) {
+      logger.error(e)
     }
-    catch (BadLocationException e) {
-      logger.error(e);
-    }
-    saveLastEntry();
-    setFontToJField(getText());
+    saveLastEntry()
+    setFontToJField(getText())
   }
 
-  public void deleteText(int offset, int length) {
+  fun deleteText(offset: Int, length: Int) {
     try {
-      getDocument().remove(offset, Math.min(length, getDocument().getLength() - offset));
+      document.remove(offset, min(length, document.length - offset))
+    } catch (e: BadLocationException) {
+      logger.error(e)
     }
-    catch (BadLocationException e) {
-      logger.error(e);
-    }
-    saveLastEntry();
-    setFontToJField(getText());
+    saveLastEntry()
+    setFontToJField(getText())
   }
 
   // VIM-570
-  private void setFontToJField(String stringToDisplay) {
-    setFont(UiHelper.selectEditorFont(myParentPanel.getIjEditor(), stringToDisplay));
+  private fun setFontToJField(stringToDisplay: String) {
+    setFont(selectEditorFont(myParentPanel.ijEditor, stringToDisplay))
   }
 
-  @Override
-  public void setFont(Font f) {
-    super.setFont(f);
-    final Document document = getDocument();
-    if (document instanceof StyledDocument styledDocument) {
-      final Style defaultStyle = styledDocument.getStyle(StyleContext.DEFAULT_STYLE);
-      if (!Objects.equals(StyleConstants.getFontFamily(defaultStyle), getFont().getFamily())) {
-        StyleConstants.setFontFamily(defaultStyle, getFont().getFamily());
+  override fun setFont(f: Font?) {
+    super.setFont(f)
+    val document = getDocument()
+    if (document is StyledDocument) {
+      val defaultStyle = document.getStyle(StyleContext.DEFAULT_STYLE)
+      if (StyleConstants.getFontFamily(defaultStyle) != getFont().family) {
+        StyleConstants.setFontFamily(defaultStyle, getFont().family)
       }
-      if (!Objects.equals(StyleConstants.getFontSize(defaultStyle), getFont().getSize())) {
-        StyleConstants.setFontSize(defaultStyle, getFont().getSize());
+      if (StyleConstants.getFontSize(defaultStyle) != getFont().getSize()) {
+        StyleConstants.setFontSize(defaultStyle, getFont().getSize())
       }
     }
   }
 
-  @Override
-  public void setForeground(Color fg) {
-    super.setForeground(fg);
-    final Document document = getDocument();
-    if (document instanceof StyledDocument styledDocument) {
-      final Style defaultStyle = styledDocument.getStyle(StyleContext.DEFAULT_STYLE);
-      StyleConstants.setForeground(defaultStyle, fg);
+  override fun setForeground(fg: Color?) {
+    super.setForeground(fg)
+    val document = getDocument()
+    if (document is StyledDocument) {
+      val defaultStyle = document.getStyle(StyleContext.DEFAULT_STYLE)
+      StyleConstants.setForeground(defaultStyle, fg)
     }
   }
 
-  public void setSpecialKeyForeground(@NotNull Color fg) {
-    final Document document = getDocument();
-    if (document instanceof ExDocument exDocument) {
-      exDocument.setSpecialKeyForeground(fg);
+  fun setSpecialKeyForeground(fg: Color) {
+    val document = getDocument()
+    if (document is ExDocument) {
+      document.setSpecialKeyForeground(fg)
     }
   }
 
   /**
    * Finish handling the keystroke
-   * <p>
+   *
+   *
    * When the key event is first received, the keystroke is sent to the key handler to handle commands or for mapping.
    * The potentially mapped keystroke is then returned to the text field to complete handling. Typically, the only
    * keystrokes passed are typed characters, along with pressed shortcuts that aren't recognised as commands (they won't
    * be recognised by the text field either; we don't register any commands).
-   * </p>
+   *
    * @param stroke  The potentially mapped keystroke
    */
-  public void handleKey(@NotNull KeyStroke stroke) {
-    if (logger.isDebugEnabled()) logger.debug("stroke=" + stroke);
+  fun handleKey(stroke: KeyStroke) {
+    if (logger.isDebugEnabled) logger.debug("stroke=$stroke")
 
     // Typically, we would let the super class handle the keystroke. It would use any registered keybindings to convert
     // it to an action handler, or use the default handler (we don't actually have any keybindings). The default action
     // handler adds all non-control characters to the text field. We want to add all characters, so if we have an
     // actual character, just add it. Anything else, we'll pass to the super class like before (even though it's unclear
     // what it will do with the keystroke)
-    if (stroke.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
-      replaceSelection(String.valueOf(stroke.getKeyChar()));
-    }
-    else {
-      //noinspection MagicConstant
-      KeyEvent event = new KeyEvent(this, stroke.getKeyEventType(), (new Date()).getTime(), stroke.getModifiers(),
-                                    stroke.getKeyCode(), stroke.getKeyChar());
+    if (stroke.keyChar != KeyEvent.CHAR_UNDEFINED) {
+      replaceSelection(stroke.keyChar.toString())
+    } else {
+      val event = KeyEvent(
+        this, stroke.keyEventType, (Date()).time, stroke.modifiers,
+        stroke.keyCode, stroke.keyChar
+      )
 
       // Call super to avoid recursion!
-      super.processKeyEvent(event);
+      super.processKeyEvent(event)
     }
 
-    saveLastEntry();
+    saveLastEntry()
   }
 
-  @Override
-  protected void processKeyEvent(KeyEvent e) {
-    if (logger.isDebugEnabled()) logger.debug("key=" + e);
+  override fun processKeyEvent(e: KeyEvent) {
+    if (logger.isDebugEnabled) logger.debug("key=$e")
 
     // The user has pressed or typed a key. The text field is first notified of a KEY_PRESSED event. If it's a simple
     // text character, it will be translated to a KEY_TYPED event with a keyChar, and we'll be notified again. We'll
@@ -245,82 +229,81 @@ public class ExTextField extends JTextField {
     // Note that Enter and Escape are registered as editor actions rather than action shortcuts. Therefore, we have to
     // handle them separately, as key presses, but not as typed characters.
     if (isAllowedPressedEvent(e) || isAllowedTypedEvent(e)) {
-      var editor = myParentPanel.getEditor();
-      var keyHandler = KeyHandler.getInstance();
-      var keyStroke = KeyStroke.getKeyStrokeForEvent(e);
-      keyHandler.handleKey(editor, keyStroke, new IjEditorExecutionContext(myParentPanel.getContext()),
-                           keyHandler.getKeyHandlerState());
-      e.consume();
+      val editor = myParentPanel.editor
+      val keyHandler = getInstance()
+      val keyStroke = KeyStroke.getKeyStrokeForEvent(e)
+      keyHandler.handleKey(
+        editor, keyStroke, IjEditorExecutionContext(myParentPanel.context!!),
+        keyHandler.keyHandlerState
+      )
+      e.consume()
+    } else {
+      super.processKeyEvent(e)
     }
-    else {
-      super.processKeyEvent(e);
-    }
   }
 
-  private boolean isAllowedTypedEvent(KeyEvent event) {
-    return event.getID() == KeyEvent.KEY_TYPED && !isKeyCharEnterOrEscape(event.getKeyChar());
+  private fun isAllowedTypedEvent(event: KeyEvent): Boolean {
+    return event.getID() == KeyEvent.KEY_TYPED && !isKeyCharEnterOrEscape(event.getKeyChar())
   }
 
-  private boolean isAllowedPressedEvent(KeyEvent event) {
-    return event.getID() == KeyEvent.KEY_PRESSED && isKeyCodeEnterOrEscape(event.getKeyCode());
+  private fun isAllowedPressedEvent(event: KeyEvent): Boolean {
+    return event.getID() == KeyEvent.KEY_PRESSED && isKeyCodeEnterOrEscape(event.getKeyCode())
   }
 
-  private boolean isKeyCharEnterOrEscape(char keyChar) {
-    return keyChar == '\n' || keyChar == '\u001B';
+  private fun isKeyCharEnterOrEscape(keyChar: Char): Boolean {
+    return keyChar == '\n' || keyChar == '\u001B'
   }
 
-  private boolean isKeyCodeEnterOrEscape(int keyCode) {
-    return keyCode == KeyEvent.VK_ENTER || keyCode == KeyEvent.VK_ESCAPE;
+  private fun isKeyCodeEnterOrEscape(keyCode: Int): Boolean {
+    return keyCode == KeyEvent.VK_ENTER || keyCode == KeyEvent.VK_ESCAPE
   }
 
 
   /**
    * Creates the default implementation of the model
    * to be used at construction if one isn't explicitly
-   * given.  An instance of <code>PlainDocument</code> is returned.
+   * given.  An instance of `PlainDocument` is returned.
    *
    * @return the default model implementation
    */
-  @Override
-  protected @NotNull Document createDefaultModel() {
-    return new ExDocument();
+  override fun createDefaultModel(): Document {
+    return ExDocument()
   }
 
-  public void clearCurrentAction() {
-    VimCommandLine commandLine = injector.getCommandLine().getActiveCommandLine();
-    if (commandLine != null) commandLine.clearPromptCharacter();
+  fun clearCurrentAction() {
+    val commandLine: VimCommandLine? = injector.commandLine.getActiveCommandLine()
+    commandLine?.clearPromptCharacter()
   }
 
-  private void setInsertMode() {
-    ExDocument doc = (ExDocument)getDocument();
-    if (doc.isOverwrite()) {
-      doc.toggleInsertReplace();
+  private fun setInsertMode() {
+    val doc = document as ExDocument
+    if (doc.isOverwrite) {
+      doc.toggleInsertReplace()
     }
-    resetCaret();
+    resetCaret()
   }
 
-  void toggleInsertReplace() {
-    ExDocument doc = (ExDocument)getDocument();
-    doc.toggleInsertReplace();
+  fun toggleInsertReplace() {
+    val doc = document as ExDocument
+    doc.toggleInsertReplace()
 
     // Hide/show the caret so its new shape is immediately visible
-    caret.setVisible(false);
-    resetCaret();
-    caret.setVisible(true);
+    caret.setVisible(false)
+    resetCaret()
+    caret.setVisible(true)
   }
 
-  private void resetCaret() {
-    if (getCaretPosition() == super.getText().length() ||
-        currentActionPromptCharacterOffset == super.getText().length() - 1) {
-      setNormalModeCaret();
-    }
-    else {
-      ExDocument doc = (ExDocument)getDocument();
-      if (doc.isOverwrite()) {
-        setReplaceModeCaret();
-      }
-      else {
-        setInsertModeCaret();
+  private fun resetCaret() {
+    if (caretPosition == super.getText().length ||
+      currentActionPromptCharacterOffset == super.getText().length - 1
+    ) {
+      setNormalModeCaret()
+    } else {
+      val doc = document as ExDocument
+      if (doc.isOverwrite) {
+        setReplaceModeCaret()
+      } else {
+        setInsertModeCaret()
       }
     }
   }
@@ -330,206 +313,217 @@ public class ExTextField extends JTextField {
   // 'ci' command-line insert is ver25
   // 'cr' command-line replace is hor20
   // see :help 'guicursor'
-  private void setNormalModeCaret() {
-    caret.setAttributes(GuiCursorOptionHelper.INSTANCE.getAttributes(GuiCursorMode.CMD_LINE));
+  private fun setNormalModeCaret() {
+    caret.setAttributes(getAttributes(GuiCursorMode.CMD_LINE))
   }
 
-  private void setInsertModeCaret() {
-    caret.setAttributes(GuiCursorOptionHelper.INSTANCE.getAttributes(GuiCursorMode.CMD_LINE_INSERT));
+  private fun setInsertModeCaret() {
+    caret.setAttributes(getAttributes(GuiCursorMode.CMD_LINE_INSERT))
   }
 
-  private void setReplaceModeCaret() {
-    caret.setAttributes(GuiCursorOptionHelper.INSTANCE.getAttributes(GuiCursorMode.CMD_LINE_REPLACE));
+  private fun setReplaceModeCaret() {
+    caret.setAttributes(getAttributes(GuiCursorMode.CMD_LINE_REPLACE))
   }
 
-  private static class CommandLineCaret extends DefaultCaret implements VimCommandLineCaret {
+  private class CommandLineCaret : DefaultCaret(), VimCommandLineCaret {
+    var mode: GuiCursorType? = null
+    var thickness = 100
+    private var lastBlinkRate = 0
+    private var hasFocus = false
 
-    private GuiCursorType mode;
-    private int thickness = 100;
-    private int lastBlinkRate = 0;
-    private boolean hasFocus;
-
-    public void setAttributes(GuiCursorAttributes attributes) {
-
+    fun setAttributes(attributes: GuiCursorAttributes) {
       // Note: do not call anything that causes a layout in this method! E.g. setVisible. This method is used as a
       // callback whenever the caret moves, and causing a layout at this point can cause issues such as an infinite
       // loop in the layout algorithm with multi-width characters such as emoji or non-Latin characters (I don't know
       // why the layout algorithm gets stuck, but we can easily avoid it)
       // See VIM-2562
 
-      mode = attributes.getType();
-      thickness = mode == GuiCursorType.BLOCK ? 100 : attributes.getThickness();
+      mode = attributes.type
+      thickness = if (mode == GuiCursorType.BLOCK) 100 else attributes.thickness
     }
 
-    @Override
-    public void focusGained(FocusEvent e) {
+    override fun focusGained(e: FocusEvent?) {
       if (lastBlinkRate != 0) {
-        setBlinkRate(lastBlinkRate);
-        lastBlinkRate = 0;
+        setBlinkRate(lastBlinkRate)
+        lastBlinkRate = 0
       }
-      super.focusGained(e);
-      repaint();
-      hasFocus = true;
+      super.focusGained(e)
+      repaint()
+      hasFocus = true
     }
 
-    @Override
-    public void focusLost(FocusEvent e) {
+    override fun focusLost(e: FocusEvent?) {
       // We don't call super.focusLost, which would hide the caret
-      hasFocus = false;
-      lastBlinkRate = getBlinkRate();
-      setBlinkRate(0);
+      hasFocus = false
+      lastBlinkRate = getBlinkRate()
+      setBlinkRate(0)
       // Make sure the box caret is visible. If we're flashing, this might be false
-      setVisible(true);
-      repaint();
+      setVisible(true)
+      repaint()
     }
 
-    @Override
-    public void paint(Graphics g) {
-      if (!isVisible()) return;
+    override fun paint(g: Graphics) {
+      if (!isVisible) return
 
       // Take a copy of the graphics, so we can mess around with it without having to reset after
-      final Graphics2D g2d = (Graphics2D)g.create();
+      val g2d = g.create() as Graphics2D
       try {
-        final JTextComponent component = getComponent();
+        val component = getComponent()
 
-        g2d.setColor(component.getBackground());
-        g2d.setXORMode(component.getCaretColor());
+        g2d.color = component.getBackground()
+        g2d.setXORMode(component.caretColor)
 
-        final Rectangle2D r = modelToView(getDot());
-        if (r == null) {
-          return;
-        }
+        val r = modelToView(getDot()) ?: return
 
         // Make sure our clip region is still up to date. It might get out of sync due to the IDE scale changing.
         // (Note that the DefaultCaret class makes this check)
         if (width > 0 && height > 0 && !contains(r)) {
-          Rectangle clip = g2d.getClipBounds();
+          val clip = g2d.clipBounds
           if (clip != null && !clip.contains(this)) {
-            repaint();
+            repaint()
           }
-          damage(r.getBounds());
+          damage(r.getBounds())
         }
 
         // Make sure not to use the saved bounds! There is no guarantee that damage() has been called first, especially
         // when the caret has not yet been moved or changed
-        final FontMetrics fm = component.getFontMetrics(component.getFont());
+        val fm = component.getFontMetrics(component.getFont())
         if (!hasFocus) {
-          final float outlineThickness = (float)PaintUtil.alignToInt(1.0, g2d);
-          final double caretWidth = getCaretWidth(fm, r.getX(), 100, false);
-          final Area area = new Area(new Rectangle2D.Double(r.getX(), r.getY(), caretWidth, r.getHeight()));
-          area.subtract(new Area(new Rectangle2D.Double(r.getX() + outlineThickness, r.getY() + outlineThickness,
-                                                        caretWidth - (2 * outlineThickness),
-                                                        r.getHeight() - (2 * outlineThickness))));
-          g2d.fill(area);
+          val outlineThickness = PaintUtil.alignToInt(1.0, g2d).toFloat()
+          val caretWidth = getCaretWidth(fm, r.x, 100, false)
+          val area = Area(Double(r.x, r.y, caretWidth, r.height))
+          area.subtract(
+            Area(
+              Double(
+                r.x + outlineThickness, r.y + outlineThickness,
+                caretWidth - (2 * outlineThickness),
+                r.height - (2 * outlineThickness)
+              )
+            )
+          )
+          g2d.fill(area)
+        } else {
+          val caretHeight = getCaretHeight(r.height)
+          val caretWidth = getCaretWidth(fm, r.x, thickness, true)
+          val rect = Double(r.x, r.y + r.height - caretHeight, caretWidth, caretHeight)
+          g2d.fill(rect)
         }
-        else {
-          final double caretHeight = getCaretHeight(r.getHeight());
-          final double caretWidth = getCaretWidth(fm, r.getX(), thickness, true);
-          Double rect = new Double(r.getX(), r.getY() + r.getHeight() - caretHeight, caretWidth, caretHeight);
-          g2d.fill(rect);
-        }
-      }
-      finally {
-        g2d.dispose();
+      } finally {
+        g2d.dispose()
       }
     }
 
     /**
      * Updates the bounds of the caret and repaints those bounds.
-     * <p>
+     *
+     *
      * This method is not guaranteed to be called before paint(). The bounds are for use by repaint().
      *
      * @param r The current location of the caret, usually provided by MapToView. The x and y appear to be the upper
-     *          left of the character position. The height appears to be correct, but the width is not the character
-     *          width. We also get an int Rectangle, which might not match the float Rectangle we use to draw the caret
+     * left of the character position. The height appears to be correct, but the width is not the character
+     * width. We also get an int Rectangle, which might not match the float Rectangle we use to draw the caret
      */
-    @Override
-    protected synchronized void damage(Rectangle r) {
+    @Synchronized
+    override fun damage(r: Rectangle?) {
       if (r != null) {
-
         // Always set the bounds to the full character grid, so that we are sure we will always erase any old caret.
         // Note that we get an int Rectangle, while we draw with a float Rectangle. The x value is fine as it will
         // round down when converting. The width is rounded up, but should also include any fraction part from x, so we
         // add one.
-        final FontMetrics fm = getComponent().getFontMetrics(getComponent().getFont());
-        x = r.x;
-        y = r.y;
-        width = (int)ceil(getCaretWidth(fm, r.x, 100, false)) + 1;
-        height = r.height;
-        repaint();
+
+        val fm = getComponent().getFontMetrics(getComponent().getFont())
+        x = r.x
+        y = r.y
+        width = ceil(getCaretWidth(fm, r.x.toDouble(), 100, false)).toInt() + 1
+        height = r.height
+        repaint()
       }
     }
 
-    private @Nullable Rectangle2D modelToView(int dot) {
-      if (dot > getComponent().getDocument().getLength()) {
-        return null;
+    fun modelToView(dot: Int): Rectangle2D? {
+      if (dot > getComponent().document.length) {
+        return null
       }
 
-      try {
-        return getComponent().getUI().modelToView2D(getComponent(), dot, getDotBias());
-      }
-      catch (BadLocationException e) {
-        return null;
+      return try {
+        getComponent().getUI().modelToView2D(getComponent(), dot, getDotBias())
+      } catch (_: BadLocationException) {
+        null
       }
     }
 
-    private double getCaretWidth(FontMetrics fm, double dotX, int widthPercentage, boolean coerceCharacterWidth) {
+    /**
+     * RemoveRedundantQualifierName – Kotlin's Double conflicts with double from Rectangle2D
+     */
+    @Suppress("RemoveRedundantQualifierName")
+    fun getCaretWidth(fm: FontMetrics, dotX: kotlin.Double, widthPercentage: Int, coerceCharacterWidth: Boolean): kotlin.Double {
       // Caret width is based on the distance to the next character. This isn't necessarily the same as the character
       // width. E.g. when using float coordinates, the width of a grid is 8.4, while the character width is only 8. This
       // would give us a caret that is not wide enough.
       // We can also try to coerce to the width of the character, rather than using the View's width. This is so that
       // non-printable characters have the same sized caret as printable characters. The only time we use full width
       // with non-printable characters is when drawing the lost-focus caret (a box enclosing the character).
-      double width;
-      final Rectangle2D r = modelToView(getDot() + 1);
+      val width: kotlin.Double
+      val r = modelToView(getDot() + 1)
       if (r != null && !coerceCharacterWidth) {
-        width = r.getX() - dotX;
-      }
-      else {
-        char c = ' ';
+        width = r.x - dotX
+      } else {
+        var c = ' '
         try {
-          if (getDot() < getComponent().getDocument().getLength()) {
-            char documentChar = getComponent().getText(getDot(), 1).charAt(0);
-            if (EngineStringHelper.INSTANCE.isPrintableCharacter(documentChar)) {
-              c = documentChar;
+          if (getDot() < getComponent().document.length) {
+            val documentChar = getComponent().getText(getDot(), 1)[0]
+            if (isPrintableCharacter(documentChar)) {
+              c = documentChar
             }
           }
-        }
-        catch (BadLocationException e) {
+        } catch (_: BadLocationException) {
           // Ignore
         }
-        width = fm.charWidth(c);
+        width = fm.charWidth(c).toDouble()
       }
 
-      return mode == GuiCursorType.VER ? max(1.0, width * widthPercentage / 100) : width;
+      return if (mode == GuiCursorType.VER) max(1.0, width * widthPercentage / 100) else width
     }
 
-    private double getCaretHeight(double fullHeight) {
+    @Suppress("RemoveRedundantQualifierName")
+    fun getCaretHeight(fullHeight: kotlin.Double): kotlin.Double {
       if (mode == GuiCursorType.HOR) {
-        return max(1.0, fullHeight * thickness / 100.0);
+        return max(1.0, fullHeight * thickness / 100.0)
       }
-      return fullHeight;
+      return fullHeight
     }
 
-    @Override
-    public int getOffset() {
-      return getDot();
-    }
-
-    @Override
-    public void setOffset(int i) {
-      setDot(i);
-    }
+    override var offset: Int
+      get() = getDot()
+      set(i) {
+        setDot(i)
+      }
   }
 
-  @TestOnly
-  public @NonNls String getCaretShape() {
-    CommandLineCaret caret = (CommandLineCaret)getCaret();
-    return String.format("%s %d", caret.mode, caret.thickness);
+  @get:TestOnly
+  val caretShape: @NonNls String
+    get() {
+      val caret = caret
+      return String.format("%s %d", caret.mode, caret.thickness)
+    }
+
+  // We need to store this in a field because we can't trust getCaret(), as it will return an instance of
+  // ComposedTextCaret when working with dead keys or input methods
+  private val caret: CommandLineCaret = CommandLineCaret()
+  var currentActionPromptCharacterOffset: Int = -1
+
+  init {
+    caret.setBlinkRate(caret.blinkRate)
+    setCaret(caret)
+    setNormalModeCaret()
+
+    val defaultStyle = (document as StyledDocument).getStyle(StyleContext.DEFAULT_STYLE)
+    StyleConstants.setForeground(defaultStyle, getForeground())
+
+    addCaretListener { _: CaretEvent? -> resetCaret() }
   }
 
-  private final CommandLineCaret caret;
-  int currentActionPromptCharacterOffset = -1;
-
-  private static final Logger logger = Logger.getInstance(ExTextField.class.getName());
+  companion object {
+    private val logger = Logger.getInstance(ExTextField::class.java.getName())
+  }
 }
