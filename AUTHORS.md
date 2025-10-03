@@ -630,6 +630,14 @@ Contributors:
   [![icon][github]](https://github.com/apps/jetbrains-junie)
   &nbsp;
   jetbrains-junie[bot]
+* [![icon][mail]](mailto:4416693+magidc@users.noreply.github.com)
+  [![icon][github]](https://github.com/magidc)
+  &nbsp;
+  magidc
+* [![icon][mail]](mailto:ricardo.rodcas@gmail.com)
+  [![icon][github]](https://github.com/magidc)
+  &nbsp;
+  magidc
 
 Previous contributors:
 
