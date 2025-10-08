@@ -157,7 +157,7 @@ dependencies {
 
   // --------- Test dependencies ----------
 
-  testApi("com.squareup.okhttp3:okhttp:5.0.0")
+  testApi("com.squareup.okhttp3:okhttp:5.2.0")
 
   // https://mvnrepository.com/artifact/com.ensarsarajcic.neovim.java/neovim-api
   testImplementation("com.ensarsarajcic.neovim.java:neovim-api:0.2.3")
