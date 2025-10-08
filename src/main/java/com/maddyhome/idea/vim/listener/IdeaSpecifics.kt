@@ -29,6 +29,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.ex.AnActionListener
 import com.intellij.openapi.actionSystem.impl.ProxyShortcutSet
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.RangeMarker
 import com.intellij.openapi.editor.actions.EnterAction
 import com.intellij.openapi.keymap.KeymapManager
 import com.intellij.openapi.project.DumbAwareToggleAction
@@ -38,6 +39,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.NotificationService
+import com.maddyhome.idea.vim.group.RegisterGroup
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.initInjector
@@ -61,8 +63,7 @@ internal object IdeaSpecifics {
     private val surrounderAction =
       "com.intellij.codeInsight.generation.surroundWith.SurroundWithHandler\$InvokeSurrounderAction"
     private var editor: Editor? = null
-    private var completionPrevDocumentLength: Int? = null
-    private var completionPrevDocumentOffset: Int? = null
+    private var completionData: CompletionData? = null
 
     override fun beforeActionPerformed(action: AnAction, event: AnActionEvent) {
       if (VimPlugin.isNotEnabled()) return
@@ -108,17 +109,36 @@ internal object IdeaSpecifics {
 
       if (hostEditor != null && action is ChooseItemAction && injector.registerGroup.isRecording) {
         val lookup = LookupManager.getActiveLookup(hostEditor)
-        if (lookup != null) {
-          val charsToRemove = hostEditor.caretModel.primaryCaret.offset - lookup.lookupStart
+        val lookupItem = lookup?.currentItem
+        if (lookup is LookupImpl && lookupItem != null) {
+          val caretOffset = hostEditor.caretModel.primaryCaret.offset
+          val completionPrefixLength = lookup.itemMatcher(lookupItem).prefix.length + lookup.additionalPrefix.length
+          val completionStartOffset = caretOffset - completionPrefixLength
+          val documentLength = hostEditor.document.textLength
+          val charsToRemove = caretOffset - completionStartOffset
 
           val register = VimPlugin.getRegister()
-          val backSpace = KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)
-          repeat(charsToRemove) {
-            register.recordKeyStroke(backSpace)
+
+          if (charsToRemove > 0) {
+            val backSpaceKey = KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)
+            repeat(charsToRemove) {
+              register.recordKeyStroke(backSpaceKey)
+            }
           }
 
-          completionPrevDocumentLength = hostEditor.document.textLength - charsToRemove
-          completionPrevDocumentOffset = lookup.lookupStart
+          val completionStartMarker = hostEditor.document.createRangeMarker(
+            completionStartOffset,
+            completionStartOffset
+          ).apply {
+            isGreedyToLeft = true
+          }
+
+          completionData = CompletionData(
+            completionStartMarker,
+            completionStartOffset,
+            caretOffset,
+            documentLength - charsToRemove
+          )
         }
       }
     }
@@ -128,30 +148,7 @@ internal object IdeaSpecifics {
 
       val editor = editor
       if (editor != null && action is ChooseItemAction && injector.registerGroup.isRecording) {
-        val prevDocumentLength = completionPrevDocumentLength
-        val prevDocumentOffset = completionPrevDocumentOffset
-
-        if (prevDocumentLength != null && prevDocumentOffset != null) {
-          val register = VimPlugin.getRegister()
-          val addedTextLength = editor.document.textLength - prevDocumentLength
-          val caretShift = addedTextLength - (editor.caretModel.primaryCaret.offset - prevDocumentOffset)
-          val leftArrow = KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0)
-
-          register.recordText(
-            editor.document.getText(
-              TextRange(
-                prevDocumentOffset,
-                prevDocumentOffset + addedTextLength
-              )
-            )
-          )
-          repeat(caretShift.coerceAtLeast(0)) {
-            register.recordKeyStroke(leftArrow)
-          }
-        }
-
-        this.completionPrevDocumentLength = null
-        this.completionPrevDocumentOffset = null
+        completionData?.recordCompletion(editor, VimPlugin.getRegister())
       }
 
       //region Enter insert mode after surround with if
@@ -170,6 +167,46 @@ internal object IdeaSpecifics {
       //endregion
 
       this.editor = null
+
+      this.completionData?.dispose()
+      this.completionData = null
+    }
+
+    private data class CompletionData(
+      val completionStartMarker: RangeMarker,
+      val originalStartOffset: Int,
+      val originalCaretOffset: Int,
+      val originalDocumentLength: Int
+    ) {
+      fun recordCompletion(editor: Editor, register: RegisterGroup) {
+        if (!completionStartMarker.isValid) {
+          return
+        }
+
+        val completionStartOffset = completionStartMarker.startOffset
+        val caretOffset = editor.caretModel.primaryCaret.offset
+        val completedCharCount = editor.document.textLength - originalDocumentLength - (completionStartOffset - originalStartOffset)
+        val completionEndOffset = completionStartOffset + completedCharCount
+
+        val completedText = editor.document.getText(TextRange(
+          completionStartOffset,
+          completionEndOffset
+        ))
+
+        register.recordText(completedText)
+
+        val caretShift = completedCharCount - (caretOffset - completionStartOffset)
+        if (caretShift > 0) {
+          val leftArrowKey = KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0)
+          repeat(caretShift) {
+            register.recordKeyStroke(leftArrowKey)
+          }
+        }
+      }
+
+      fun dispose() {
+        completionStartMarker.dispose()
+      }
     }
   }
 
