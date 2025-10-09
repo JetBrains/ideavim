@@ -163,7 +163,11 @@ Not critical, but could be addressed in future cleanup.
 - **IntelliJ Platform**: Follow IntelliJ platform conventions and APIs
 - **Property tests**: Can be flaky - verify if test failures relate to your changes
 - **Action syntax**: Use `<Action>` in mappings, not `:action`
-- **Architecture**: Refer to CONTRIBUTING.md for architecture guidelines
+- **Architecture & Guidelines**: Refer to [CONTRIBUTING.md](../CONTRIBUTING.md) for:
+  - Architecture overview and where to find specific code
+  - Testing guidelines and corner cases to consider
+  - Common patterns and conventions
+  - Information about awards for quality contributions
 
 ## Commands Reference
 
