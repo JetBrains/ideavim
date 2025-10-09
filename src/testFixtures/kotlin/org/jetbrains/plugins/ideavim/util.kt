@@ -10,6 +10,7 @@ package org.jetbrains.plugins.ideavim
 
 import com.intellij.ide.IdeEventQueue
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.editor.Editor
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.util.containers.toArray
 import com.maddyhome.idea.vim.api.injector
@@ -17,6 +18,8 @@ import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.junit.jupiter.params.provider.Arguments
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 import kotlin.test.fail
 
 /**
@@ -56,17 +59,9 @@ annotation class VimBehaviorDiffers(
   val shouldBeFixed: Boolean = true,
 )
 
-inline fun waitAndAssert(timeInMillis: Int = 1000, crossinline condition: () -> Boolean) {
-  ApplicationManager.getApplication().invokeAndWait {
-    val end = System.currentTimeMillis() + timeInMillis
-    while (end > System.currentTimeMillis()) {
-      Thread.sleep(10)
-      IdeEventQueue.getInstance().flushQueue()
-      if (condition()) return@invokeAndWait
-    }
-    fail()
-  }
-}
+// The selection is updated after 'visualdelay' milliseconds. Add an adjustment when we wait for it to be completed.
+// Since we wait for it on the main thread (to avoid reading in-progress state), we can get away with a short adjustment
+private const val visualDelayAdjustment = 200
 
 fun assertHappened(timeInMillis: Int = 1000, precision: Int, condition: () -> Boolean) {
   assertDoesntChange(timeInMillis - precision) { !condition() }
@@ -111,15 +106,58 @@ fun <T> product(vararg elements: List<T>): List<List<T>> {
   return res
 }
 
+private inline fun invokeAndWaitUntil(timeout: Int = 1_000, crossinline condition: () -> Boolean): Boolean {
+  // Run the check on the main thread to serialise access for our condition
+  var result = false
+  ApplicationManager.getApplication().invokeAndWait {
+    val end = System.currentTimeMillis() + timeout
+    while (end > System.currentTimeMillis()) {
+      if (condition()) {
+        result = true
+        return@invokeAndWait
+      }
+      Thread.sleep(10)
+      IdeEventQueue.getInstance().flushQueue()
+    }
+  }
+  return result
+}
+
+fun waitAndAssert(timeInMillis: Int = 1000, condition: () -> Boolean) {
+  assertTrue(invokeAndWaitUntil(timeInMillis, condition), "Condition not met within timeout")
+}
+
 fun waitAndAssertMode(
   fixture: CodeInsightTestFixture,
   mode: Mode,
   timeInMillis: Int? = null,
 ) {
-  val timeout = timeInMillis ?: (injector.globalIjOptions().visualdelay + 1000)
-  waitAndAssert(timeout) { fixture.editor.vim.mode == mode }
+  val timeout = timeInMillis ?: (injector.globalIjOptions().visualdelay + visualDelayAdjustment)
+  val currentMode = fixture.editor.vim.mode
+  waitAndAssert(timeout) {
+    if (fixture.editor.vim.mode == currentMode && fixture.editor.vim.mode != mode) return@waitAndAssert false
+    assertEquals(mode, fixture.editor.vim.mode)
+    return@waitAndAssert true
+  }
 }
 
+fun assertModeDoesNotChange(editor: Editor, expectedMode: Mode, timeInMillis: Int? = null) {
+  val timeout = timeInMillis ?: (injector.globalIjOptions().visualdelay + visualDelayAdjustment)
+  val currentMode = editor.vim.mode
+  assertEquals(expectedMode, currentMode, "Initial mode is not as expected")
+  invokeAndWaitUntil(timeout) { editor.vim.mode != currentMode }
+  assertEquals(currentMode, editor.vim.mode, "Mode should not change")
+}
+
+// Note that the selection might not update, but we wait long enough to give it chance to change
+fun waitUntilSelectionUpdated(editor: Editor) {
+  val timeout = injector.globalIjOptions().visualdelay + visualDelayAdjustment
+  val currentMode = editor.vim.mode
+  invokeAndWaitUntil(timeout) { editor.vim.mode != currentMode }
+}
+
+// This waits on the current thread, which in tests isn't the main thread. If we're waiting on a callback on the main
+// thread, we might see in-progress changes rather than the final state.
 fun waitUntil(timeout: Int = 10_000, condition: () -> Boolean): Boolean {
   val timeEnd = System.currentTimeMillis() + timeout
   while (System.currentTimeMillis() < timeEnd) {

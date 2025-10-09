@@ -20,7 +20,6 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.helper.VimLockLabel
-import com.maddyhome.idea.vim.helper.hasBlockOrUnderscoreCaret
 import com.maddyhome.idea.vim.helper.hasVisualSelection
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.newapi.ijOptions
@@ -87,12 +86,16 @@ internal object IdeaRefactorModeHelper {
 
   @VimLockLabel.RequiresReadLock
   @RequiresReadLock
-  fun calculateCorrections(editor: Editor): List<Action> {
+  fun calculateCorrectionsToSyncEditorToMode(editor: Editor): List<Action> {
     val corrections = mutableListOf<Action>()
     val mode = editor.vim.mode
+
+    // If the current Vim mode doesn't have a selection, remove the editor's selection
     if (!mode.hasVisualSelection && editor.selectionModel.hasSelection()) {
       corrections.add(Action.RemoveSelection)
     }
+
+    // If the current mode does have a selection, make sure it matches the selection type of the editor
     if (mode.hasVisualSelection && editor.selectionModel.hasSelection()) {
       val selectionType = VimPlugin.getVisualMotion().detectSelectionType(editor.vim)
       if (mode.selectionType != selectionType) {
@@ -105,19 +108,27 @@ internal object IdeaRefactorModeHelper {
       }
     }
 
-    if (editor.hasBlockOrUnderscoreCaret()) {
+    // IntelliJ places the caret on the exclusive end of the current variable. I.e. *after* the end of the variable.
+    // This makes sense when selecting the current variable, and when the editor is using a bar caret - the selection is
+    // naturally exclusive (and IdeaVim treats Select mode as having exclusive selection).
+    // But we don't have a selection, so it's weird to be placed at the end of a selection that no longer exists. Move
+    // the caret to the start of the (missing) selection instead.
+    if (editor.vim.isIdeaRefactorModeKeep) {
       TemplateManagerImpl.getTemplateState(editor)?.currentVariableRange?.let { segmentRange ->
-        if (!segmentRange.isEmpty && segmentRange.endOffset == editor.caretModel.offset && editor.caretModel.offset != 0) {
-          corrections.add(Action.MoveToOffset(editor.caretModel.offset - 1))
+        if (!segmentRange.isEmpty && segmentRange.startOffset != editor.caretModel.offset) {
+          corrections.add(Action.MoveToOffset(segmentRange.startOffset))
         }
       }
     }
     return corrections
   }
 
-  fun correctSelection(editor: Editor) {
+  /**
+   * Correct the editor's selection to match the current Vim mode
+   */
+  fun correctEditorSelection(editor: Editor) {
     injector.application.runReadAction {
-      val corrections = calculateCorrections(editor)
+      val corrections = calculateCorrectionsToSyncEditorToMode(editor)
       applyCorrections(corrections, editor)
     }
   }

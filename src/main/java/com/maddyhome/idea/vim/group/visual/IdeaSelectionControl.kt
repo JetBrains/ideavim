@@ -81,8 +81,12 @@ internal object IdeaSelectionControl {
           return@singleTask
         }
 
+        // The editor changed the selection, but we want to keep the current Vim mode. This is the case if we're editing
+        // a template and either 'idearefactormode' is set to `keep`, or the current Vim mode already has a selection.
+        // (i.e., if the user explicitly enters Visual or Select and then moves to the next template variable, don't
+        // switch to Select or Visual - keep the current Vim selection mode)
         if (dontChangeMode(editor)) {
-          IdeaRefactorModeHelper.correctSelection(editor)
+          IdeaRefactorModeHelper.correctEditorSelection(editor)
           logger.trace { "Selection corrected for refactoring" }
           return@singleTask
         }
@@ -146,8 +150,13 @@ internal object IdeaSelectionControl {
   }
 
   private fun chooseNonSelectionMode(editor: Editor): Mode {
-    val templateActive = editor.isTemplateActive()
-    if (templateActive && editor.vim.mode.inNormalMode || editor.inInsertMode) {
+    // If we're in an active template and the editor has just removed a selection without adding a new one, we're in a
+    // variable with nothing to select. When 'idearefactormode' is "select", enter Insert mode. Otherwise, stay in
+    // Normal.
+    // Note that when 'idearefactormode' is "visual", we enter Normal mode for an empty variable. While it might seem
+    // natural to want to insert text here, we could also paste a register, dot-repeat an insertion or other Normal
+    // commands. Normal is Visual without the selection.
+    if ((editor.isTemplateActive() && editor.vim.mode.inNormalMode && editor.vim.isIdeaRefactorModeSelect) || editor.inInsertMode) {
       return Mode.INSERT
     }
     return Mode.NORMAL()
