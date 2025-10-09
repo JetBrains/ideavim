@@ -43,6 +43,7 @@ import java.nio.file.Path;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 import static java.lang.Math.ceil;
@@ -247,17 +248,17 @@ public class ExTextField extends JTextField {
     Path projectBasePath = Path.of(project.getBasePath());
     Path inputPath = projectBasePath.resolve(input);
     String inputPathString = inputPath.toString();
-    try {
-      // Would it be useful to ignore file path case?
-      List<Path> files =
-        Files.list(inputPath.getParent()).filter(p -> p.toString().startsWith(inputPathString)).sorted().toList();
+    // Would it be useful to ignore file path case?
 
-      if (files.isEmpty()) return false;
+    try (Stream<Path> fileStream = Files.list(inputPath.getParent())) {
+      List<Path> filePaths = fileStream.filter(p -> p.toString().startsWith(inputPathString)).sorted().toList();
+      if (filePaths.isEmpty()) return false;
 
-      Path suggestion = (files.size() == 1 || !files.contains(inputPath)) ? files.getFirst() : inputPath;
+      Path suggestion = (filePaths.size() == 1 || !filePaths.contains(inputPath)) ? filePaths.getFirst() : inputPath;
 
       // If a suggested file is descendant of project base path, use relative path. Else, use absolute path.
-      Path effectivePath = projectBasePath.compareTo(suggestion) > 0 ? suggestion : projectBasePath.relativize(suggestion);
+      Path effectivePath =
+        projectBasePath.compareTo(suggestion) > 0 ? suggestion : projectBasePath.relativize(suggestion);
       updateText(String.format("%s %s", command, effectivePath));
       return true;
     }
