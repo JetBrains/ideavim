@@ -2,8 +2,8 @@ name: Codebase Maintenance with Claude
 
 on:
   schedule:
-    # Run every week on Monday at 6 AM UTC
-    - cron: '0 6 * * 1'
+    # Run every day at 6 AM UTC
+    - cron: '0 6 * * *'
   workflow_dispatch:  # Allow manual trigger
 
 jobs:
