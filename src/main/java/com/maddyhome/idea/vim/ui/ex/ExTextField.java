@@ -244,7 +244,7 @@ public class ExTextField extends JTextField {
 
     String input = parts[1];
     Project project = ((ExEntryPanel)getParent()).getContext().getData(DataKey.create("project"));
-    if (null == project) return false;
+    if (null == project || null == project.getBasePath()) return false;
     Path projectBasePath = Path.of(project.getBasePath());
     Path inputPath = projectBasePath.resolve(input);
     String inputPathString = inputPath.toString();
