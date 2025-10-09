@@ -58,10 +58,9 @@ data class SortCommand(val range: Range, val modifier: CommandModifier, val argu
     // If we don't have a range, we either have "sort", a selection, or a block
     if (range.size == 1) {
       // If we have a selection.
-      val selectionModel = editor.getSelectionModel()
-      return if (selectionModel.hasSelection()) {
-        val start = selectionModel.selectionStart
-        val end = selectionModel.selectionEnd
+      return if (caret.hasSelection()) {
+        val start = caret.selectionStart
+        val end = caret.selectionEnd
 
         val startLine = editor.offsetToBufferPosition(start).line
         val endLine = editor.offsetToBufferPosition(end).line
