@@ -50,7 +50,6 @@ import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.initInjector
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
-import com.maddyhome.idea.vim.state.mode.inNormalMode
 import com.maddyhome.idea.vim.undo.VimTimestampBasedUndoService
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.isIdeaRefactorModeKeep
@@ -290,23 +289,6 @@ internal object IdeaSpecifics {
           }
         }
       })
-
-      // TODO: I think this is redundant. currentVariableChanged will be called next
-      if (state.editor.vim.isIdeaRefactorModeKeep) {
-        IdeaRefactorModeHelper.correctEditorSelection(editor)
-      } else {
-        if (!editor.selectionModel.hasSelection()) {
-          // Enable insert mode if there is no selection in template
-          // Template with selection is handled by [com.maddyhome.idea.vim.group.visual.VisualMotionGroup.controlNonVimSelectionChange]
-          if (editor.vim.inNormalMode) {
-            injector.application.runReadAction {
-              val context = injector.executionContextManager.getEditorExecutionContext(editor.vim)
-              VimPlugin.getChange().insertBeforeCaret(editor.vim, context)
-            }
-            KeyHandler.getInstance().reset(editor.vim)
-          }
-        }
-      }
     }
   }
   //endregion
