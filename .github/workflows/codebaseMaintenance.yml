@@ -38,10 +38,9 @@ jobs:
 
             ## Creating Pull Requests
 
-            Always create a pull request to document your inspection:
+            **Only create a pull request if you made changes to the codebase.**
 
-            ### If Changes Were Made:
-            Create a PR with:
+            If you made changes, create a PR with:
             - **Title**: "Maintenance: <area> - <brief description>"
               - Example: "Maintenance: VimMotionHandler - Fix null safety issues"
             - **Body** including:
@@ -50,15 +49,7 @@ jobs:
               - Changes you made
               - Why the changes improve the code
 
-            ### If No Changes Needed:
-            Still create a PR to document the inspection with:
-            - **Title**: "Maintenance: <area> - Inspection complete, no issues found"
-              - Example: "Maintenance: ChangeLineAction - Code quality verified"
-            - **Body** including:
-              - What area you inspected
-              - What you checked for
-              - Why no changes were needed
-              - Any observations or potential future improvements
+            If no changes are needed, do not create a pull request.
 
           # Allow Claude to use necessary tools for code inspection and maintenance
           claude_args: '--allowed-tools "Read,Edit,Write,Glob,Grep,Bash(git:*),Bash(gh:*),Bash(./gradlew:*),Bash(find:*),Bash(shuf:*)"'
