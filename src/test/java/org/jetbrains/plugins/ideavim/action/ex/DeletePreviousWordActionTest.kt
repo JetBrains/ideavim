@@ -50,4 +50,10 @@ class DeletePreviousWordActionTest : VimExTestCase() {
     typeText(":set keymodel=continueselect,stopselect<C-W>")
     assertExText("set ")
   }
+
+  @Test
+  fun `test delete at beginning does nothing`() {
+    typeText(":<C-W>")
+    assertExText("")
+  }
 }
