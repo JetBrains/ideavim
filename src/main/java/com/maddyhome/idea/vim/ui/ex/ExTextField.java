@@ -8,9 +8,11 @@
 
 package com.maddyhome.idea.vim.ui.ex;
 
+import com.intellij.openapi.actionSystem.DataKey;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.textarea.TextComponentEditor;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.paint.PaintUtil;
 import com.intellij.util.ui.JBUI;
 import com.maddyhome.idea.vim.KeyHandler;
@@ -35,7 +37,11 @@ import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
@@ -215,15 +221,50 @@ public class ExTextField extends JTextField {
       replaceSelection(String.valueOf(stroke.getKeyChar()));
     }
     else {
-      //noinspection MagicConstant
-      KeyEvent event = new KeyEvent(this, stroke.getKeyEventType(), (new Date()).getTime(), stroke.getModifiers(),
-                                    stroke.getKeyCode(), stroke.getKeyChar());
+      if (stroke.getKeyCode() != KeyEvent.VK_TAB || !executeTabCompletionIfPossible()) {
+        //noinspection MagicConstant
+        KeyEvent event = new KeyEvent(this, stroke.getKeyEventType(), (new Date()).getTime(), stroke.getModifiers(),
+                                      stroke.getKeyCode(), stroke.getKeyChar());
 
-      // Call super to avoid recursion!
-      super.processKeyEvent(event);
+        // Call super to avoid recursion!
+        super.processKeyEvent(event);
+      }
     }
 
     saveLastEntry();
+  }
+
+  private boolean executeTabCompletionIfPossible() {
+    String[] parts = getText().split(" ", 2);
+    if (parts.length < 2) return false;
+    String command = parts[0];
+    // If more commands require TAB action handling, a more sophisticated check and delegation is needed
+    if (!command.equals("e") && !command.equals("w")) return false;
+
+    String input = parts[1];
+    Project project = ((ExEntryPanel)getParent()).getContext().getData(DataKey.create("project"));
+    if (null == project) return false;
+    Path projectBasePath = Path.of(project.getBasePath());
+    Path inputPath = projectBasePath.resolve(input);
+    String inputPathString = inputPath.toString();
+    try {
+      // Would it be useful to ignore file path case?
+      List<Path> files =
+        Files.list(inputPath.getParent()).filter(p -> p.toString().startsWith(inputPathString)).sorted().toList();
+
+      if (files.isEmpty()) return false;
+
+      Path suggestion = (files.size() == 1 || !files.contains(inputPath)) ? files.getFirst() : inputPath;
+
+      // If a suggested file is descendant of project base path, use relative path. Else, use absolute path.
+      Path effectivePath = projectBasePath.compareTo(suggestion) > 0 ? suggestion : projectBasePath.relativize(suggestion);
+      updateText(String.format("%s %s", command, effectivePath));
+      return true;
+    }
+    catch (IOException e) {
+      logger.error(e);
+      return false;
+    }
   }
 
   @Override
