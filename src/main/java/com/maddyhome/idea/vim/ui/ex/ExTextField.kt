@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2025 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -7,7 +7,9 @@
  */
 package com.maddyhome.idea.vim.ui.ex
 
+import com.intellij.openapi.actionSystem.DataKey
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.project.Project
 import com.intellij.ui.paint.PaintUtil
 import com.intellij.util.ui.JBUI
 import com.maddyhome.idea.vim.KeyHandler.Companion.getInstance
@@ -21,6 +23,7 @@ import com.maddyhome.idea.vim.options.helpers.GuiCursorAttributes
 import com.maddyhome.idea.vim.options.helpers.GuiCursorMode
 import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper.getAttributes
 import com.maddyhome.idea.vim.options.helpers.GuiCursorType
+import kotlinx.io.IOException
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.TestOnly
 import java.awt.Color
@@ -34,6 +37,8 @@ import java.awt.event.FocusEvent
 import java.awt.event.KeyEvent
 import java.awt.geom.Area
 import java.awt.geom.Rectangle2D
+import java.nio.file.Files
+import java.nio.file.Path
 import java.util.*
 import javax.swing.JTextField
 import javax.swing.KeyStroke
@@ -45,6 +50,8 @@ import javax.swing.text.JTextComponent
 import javax.swing.text.StyleConstants
 import javax.swing.text.StyleContext
 import javax.swing.text.StyledDocument
+import kotlin.io.path.exists
+import kotlin.io.path.isDirectory
 import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
@@ -199,13 +206,15 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
     if (stroke.keyChar != KeyEvent.CHAR_UNDEFINED) {
       replaceSelection(stroke.keyChar.toString())
     } else {
-      val event = KeyEvent(
-        this, stroke.keyEventType, (Date()).time, stroke.modifiers,
-        stroke.keyCode, stroke.keyChar
-      )
+      if (stroke.keyCode != KeyEvent.VK_TAB || !executeTabCompletionIfPossible()) {
+        val event = KeyEvent(
+          this, stroke.keyEventType, (Date()).time, stroke.modifiers,
+          stroke.keyCode, stroke.keyChar
+        )
 
-      // Call super to avoid recursion!
-      super.processKeyEvent(event)
+        // Call super to avoid recursion!
+        super.processKeyEvent(event)
+      }
     }
 
     saveLastEntry()
@@ -241,6 +250,53 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
       super.processKeyEvent(e)
     }
   }
+
+  private fun executeTabCompletionIfPossible(): Boolean {
+    val parts = getText().split(" ", limit = 2)
+    if (parts.size < 2) return false
+    val command = parts[0]
+    // If more commands require TAB action handling, a more sophisticated check and delegation is needed
+    if (!supportedTabCompletionCommands.contains(command)) return false
+
+    val input = parts[1]
+    val project = (parent as ExEntryPanel).context?.getData<Project>(DataKey.create("project"))
+    val projectBasePath = project?.basePath?.let { Path.of(it) } ?: return false
+    val inputPath = projectBasePath.resolve(input)
+    val inputPathString = inputPath.toString()
+
+    // Would it be useful to ignore file path case?
+    try {
+      val filePaths = (
+        if (inputPath.exists()) {
+          if (inputPath.isDirectory())
+            Files.list(inputPath)
+          else
+            Files.list(inputPath.parent)
+        } else if (inputPath.isAbsolute || inputPath.exists()) Files.list(inputPath.parent)
+          .filter { it.toString().startsWith(inputPathString) }
+        else Files.list(projectBasePath)
+          .filter { it.toString().startsWith(inputPathString) }
+        ).sorted().toList()
+
+      if (filePaths.isEmpty()) return false
+
+      val suggestion =
+        if (filePaths.contains(inputPath))
+          filePaths[(filePaths.indexOf(inputPath) + 1) % filePaths.size]
+        else
+          filePaths.first()
+
+      // If a suggested file is descendant of project base path, use relative path. Else, use absolute path.
+      val isDir = suggestion.isDirectory()
+      val effectivePath = if (projectBasePath > suggestion) suggestion else projectBasePath.relativize(suggestion)
+      updateText(String.format("%s %s%s", command, effectivePath, if (isDir) "/" else ""))
+      return true
+    } catch (e: IOException) {
+      logger.error(e)
+      return false
+    }
+  }
+
 
   private fun isAllowedTypedEvent(event: KeyEvent): Boolean {
     return event.getID() == KeyEvent.KEY_TYPED && !isKeyCharEnterOrEscape(event.getKeyChar())
@@ -525,5 +581,6 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
 
   companion object {
     private val logger = Logger.getInstance(ExTextField::class.java.getName())
+    private val supportedTabCompletionCommands = setOf("e", "edit", "w", "write")
   }
 }
