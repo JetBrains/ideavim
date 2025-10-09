@@ -29,7 +29,6 @@ import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormalWithoutMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.getRegisterForCaret
-import com.maddyhome.idea.vim.extension.VimExtensionFacade.inputKeyStroke
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.inputString
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
@@ -46,7 +45,6 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.selectionType
 import org.jetbrains.annotations.NonNls
-import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
 /**
@@ -71,7 +69,7 @@ internal class VimSurroundExtension : VimExtension {
     putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>DSurround"), owner, DSurroundHandler(), false)
     putExtensionHandlerMapping(MappingMode.XO, injector.parser.parseKeys("<Plug>VSurround"), owner, VSurroundHandler(), false)
 
-    val noMappings = VimPlugin.getVariableService().getGlobalVariableValue(NO_MAPPINGS)?.asBoolean() ?: false
+    val noMappings = VimPlugin.getVariableService().getGlobalVariableValue(NO_MAPPINGS)?.toVimNumber()?.booleanValue ?: false
     if (!noMappings) {
       putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("ys"), owner, injector.parser.parseKeys("<Plug>YSurround"), true)
       putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("yss"), owner, injector.parser.parseKeys("<Plug>Yssurround"), true)
@@ -97,8 +95,7 @@ internal class VimSurroundExtension : VimExtension {
 
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       val ijEditor = editor.ij
-      val c = getChar(ijEditor)
-      if (c.code == 0) return
+      val c = injector.keyGroup.getChar(editor) ?: return
       val pair = getOrInputPair(c, ijEditor, context.ij) ?: return
 
       editor.forEachCaret {
@@ -152,11 +149,9 @@ internal class VimSurroundExtension : VimExtension {
     override val isRepeatable = true
 
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
-      val charFrom = getChar(editor.ij)
-      if (charFrom.code == 0) return
+      val charFrom = injector.keyGroup.getChar(editor) ?: return
 
-      val charTo = getChar(editor.ij)
-      if (charTo.code == 0) return
+      val charTo = injector.keyGroup.getChar(editor) ?: return
 
       val newSurround = getOrInputPair(charTo, editor.ij, context.ij) ?: return
       runWriteAction { change(editor, context, charFrom, newSurround) }
@@ -276,9 +271,8 @@ internal class VimSurroundExtension : VimExtension {
 
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       // Deleting surround is just changing the surrounding to "nothing"
-      val charFrom = getChar(editor.ij)
+      val charFrom = injector.keyGroup.getChar(editor) ?: return
       LOG.debug("DSurroundHandler: charFrom = $charFrom")
-      if (charFrom.code == 0) return
 
       runWriteAction { CSurroundHandler.change(editor, context, charFrom, null) }
     }
@@ -287,8 +281,7 @@ internal class VimSurroundExtension : VimExtension {
   private class Operator : OperatorFunction {
     override fun apply(editor: VimEditor, context: ExecutionContext, selectionType: SelectionType?): Boolean {
       val ijEditor = editor.ij
-      val c = getChar(ijEditor)
-      if (c.code == 0) return true
+      val c = injector.keyGroup.getChar(editor) ?: return true
 
       val pair = getOrInputPair(c, ijEditor, context.ij) ?: return false
       // XXX: Will it work with line-wise or block-wise selections?
@@ -386,17 +379,6 @@ private fun getOrInputPair(c: Char, editor: Editor, context: DataContext): Surro
   else -> getSurroundPair(c)
 }
 
-private fun getChar(editor: Editor): Char {
-  val key = inputKeyStroke(editor)
-  val keyChar = key.keyChar
-  val res = if (keyChar == KeyEvent.CHAR_UNDEFINED || keyChar.code == KeyEvent.VK_ESCAPE) {
-    0.toChar()
-  } else {
-    keyChar
-  }
-  LOG.trace("getChar: $res")
-  return res
-}
 
 private fun performSurround(pair: SurroundPair, range: TextRange, caret: VimCaret, tagsOnNewLines: Boolean = false) {
   runWriteAction {

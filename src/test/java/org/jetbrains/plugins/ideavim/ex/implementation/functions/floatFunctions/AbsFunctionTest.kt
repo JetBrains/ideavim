@@ -45,13 +45,13 @@ class AbsFunctionTest : VimTestCase() {
   fun `test abs with list causes error`() {
     enterCommand("""echo abs([-5.456])""")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E745: Using a List as a Number")
+    assertPluginErrorMessage("E745: Using a List as a Number")
   }
 
   @Test
   fun `test abs with dictionary causes error`() {
     enterCommand("""echo abs({1: -5.456})""")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E728: Using a Dictionary as a Number")
+    assertPluginErrorMessage("E728: Using a Dictionary as a Number")
   }
 }

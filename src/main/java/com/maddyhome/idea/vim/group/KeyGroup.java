@@ -16,6 +16,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.keymap.ex.KeymapManagerEx;
@@ -26,6 +27,7 @@ import com.maddyhome.idea.vim.action.VimShortcutKeyAction;
 import com.maddyhome.idea.vim.action.change.LazyVimCommand;
 import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.extension.VimExtensionFacade;
 import com.maddyhome.idea.vim.key.*;
 import com.maddyhome.idea.vim.newapi.IjNativeAction;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
@@ -109,7 +111,7 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
   public void readData(@NotNull Element element) {
     final Element conflictsElement = element.getChild(SHORTCUT_CONFLICTS_ELEMENT);
     if (conflictsElement != null) {
-      final java.util.List<Element> conflictElements = conflictsElement.getChildren(SHORTCUT_CONFLICT_ELEMENT);
+      final List<Element> conflictElements = conflictsElement.getChildren(SHORTCUT_CONFLICT_ELEMENT);
       for (Element conflictElement : conflictElements) {
         final String ownerValue = conflictElement.getAttributeValue(OWNER_ATTRIBUTE);
         ShortcutOwner owner = ShortcutOwner.UNDEFINED;
@@ -238,7 +240,10 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
     for (MappingMode mode : modes) {
       final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(mode);
 
-      final Iterator<KeyMappingEntry> iterator = mapping.getAll(prefix).iterator();
+      // Vim includes mappings for each key in the prefix, where appropriate. That is, it doesn't just all mappings that
+      // are descendants of the prefix, but includes the mappings for each key in the prefix as well.
+      // E.g. `foo` will include mappings for `f` and `fo`, as well as any mappings that are descendants of `foo`.
+      final Iterator<KeyMappingEntry> iterator = mapping.getAll(prefix, true).iterator();
       while (iterator.hasNext()) {
         final KeyMappingEntry entry = iterator.next();
         final MappingInfo mappingInfo = entry.getMappingInfo();
@@ -377,10 +382,27 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
       builder.append("\n");
     }
 
+    if (builder.isEmpty()) {
+      builder.append("No mapping found");
+    }
+
     VimOutputPanel outputPanel = injector.getOutputPanel()
       .getOrCreate(editor, injector.getExecutionContextManager().getEditorExecutionContext(editor));
     outputPanel.addText(builder.toString(), true);
     outputPanel.show();
     return true;
+  }
+
+  @Override
+  public @Nullable Character getChar(@NotNull VimEditor editor) {
+    Editor ijEditor = ((IjVimEditor)editor).getEditor();
+    KeyStroke stroke = VimExtensionFacade.inputKeyStroke(ijEditor);
+    char keyChar = stroke.getKeyChar();
+    if (keyChar == KeyEvent.CHAR_UNDEFINED) {
+      return null;
+    }
+    else {
+      return keyChar;
+    }
   }
 }

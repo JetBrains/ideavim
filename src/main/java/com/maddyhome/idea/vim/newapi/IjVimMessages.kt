@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMessagesBase
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.helper.MessageHelper
+import com.maddyhome.idea.vim.helper.EngineMessageHelper
 import com.maddyhome.idea.vim.ui.ShowCmd
 import java.awt.Toolkit
 
@@ -99,7 +99,7 @@ internal class IjVimMessages : VimMessagesBase() {
 
   override fun isError(): Boolean = error
 
-  override fun message(key: String, vararg params: Any): String = MessageHelper.message(key, *params)
+  override fun message(key: String, vararg params: Any): String = EngineMessageHelper.message(key, *params)
 
   override fun updateStatusBar(editor: VimEditor) {
     ShowCmd.update()

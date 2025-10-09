@@ -39,7 +39,7 @@ data class MapClearCommand(val range: Range, val cmd: String, val modifier: Comm
     val bang = modifier == CommandModifier.BANG
     val commandInfo = COMMAND_INFOS.find { cmd.startsWith(it.prefix) && it.bang == bang }
     if (commandInfo == null) {
-      if (modifier == CommandModifier.BANG) throw exExceptionMessage("E477")  // E477: No ! allowed
+      if (modifier == CommandModifier.BANG) throw exExceptionMessage("E477")
       return false
     }
 

@@ -54,11 +54,11 @@ buildscript {
     classpath("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:7.3.0.202506031305-r")
     classpath("org.kohsuke:github-api:1.305")
 
-    classpath("io.ktor:ktor-client-core:3.2.3")
-    classpath("io.ktor:ktor-client-cio:3.2.3")
-    classpath("io.ktor:ktor-client-auth:3.2.3")
-    classpath("io.ktor:ktor-client-content-negotiation:3.2.3")
-    classpath("io.ktor:ktor-serialization-kotlinx-json:3.2.3")
+    classpath("io.ktor:ktor-client-core:3.3.0")
+    classpath("io.ktor:ktor-client-cio:3.3.0")
+    classpath("io.ktor:ktor-client-auth:3.3.0")
+    classpath("io.ktor:ktor-client-content-negotiation:3.3.0")
+    classpath("io.ktor:ktor-serialization-kotlinx-json:3.3.0")
 
     // This comes from the changelog plugin
 //        classpath("org.jetbrains:markdown:0.3.1")
@@ -74,7 +74,7 @@ plugins {
   // NOTE: Unignore "test block comment falls back to line comment when not available" test
   //   After changing this version. It supposed to work on the next version of the gradle plugin
   //   Or go report to the devs that this test still fails.
-  id("org.jetbrains.intellij.platform") version "2.8.0"
+  id("org.jetbrains.intellij.platform") version "2.9.0"
 
   id("org.jetbrains.changelog") version "2.4.0"
   id("org.jetbrains.kotlinx.kover") version "0.6.1"
@@ -170,19 +170,19 @@ dependencies {
   testFixturesImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
 
   // https://mvnrepository.com/artifact/org.mockito.kotlin/mockito-kotlin
-  testImplementation("org.mockito.kotlin:mockito-kotlin:6.0.0")
+  testImplementation("org.mockito.kotlin:mockito-kotlin:6.1.0")
 
-  testImplementation("org.junit.jupiter:junit-jupiter-api:5.13.4")
-  testImplementation("org.junit.jupiter:junit-jupiter-engine:5.13.4")
-  testImplementation("org.junit.jupiter:junit-jupiter-params:5.13.4")
-  testFixturesImplementation("org.junit.jupiter:junit-jupiter-api:5.13.4")
-  testFixturesImplementation("org.junit.jupiter:junit-jupiter-engine:5.13.4")
-  testFixturesImplementation("org.junit.jupiter:junit-jupiter-params:5.13.4")
+  testImplementation("org.junit.jupiter:junit-jupiter-api:6.0.0")
+  testImplementation("org.junit.jupiter:junit-jupiter-engine:6.0.0")
+  testImplementation("org.junit.jupiter:junit-jupiter-params:6.0.0")
+  testFixturesImplementation("org.junit.jupiter:junit-jupiter-api:6.0.0")
+  testFixturesImplementation("org.junit.jupiter:junit-jupiter-engine:6.0.0")
+  testFixturesImplementation("org.junit.jupiter:junit-jupiter-params:6.0.0")
 
   // Temp workaround suggested in https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-faq.html#junit5-test-framework-refers-to-junit4
   // Can be removed when IJPL-159134 is fixed
 //  testRuntimeOnly("junit:junit:4.13.2")
-  testImplementation("org.junit.vintage:junit-vintage-engine:5.13.4")
+  testImplementation("org.junit.vintage:junit-vintage-engine:6.0.0")
 //  testFixturesImplementation("org.junit.vintage:junit-vintage-engine:5.10.3")
 }
 

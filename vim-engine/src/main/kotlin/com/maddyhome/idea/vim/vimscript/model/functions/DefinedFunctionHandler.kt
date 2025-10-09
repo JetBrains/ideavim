@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.FinishException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.Address
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
@@ -24,7 +25,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
-import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
+import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 
@@ -57,7 +58,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
 
     if (function.flags.contains(FunctionFlag.RANGE)) {
       val line = (injector.variableService.getNonNullVariableValue(
-        Variable(Scope.FUNCTION_VARIABLE, "firstline"),
+        VariableExpression(Scope.FUNCTION_VARIABLE, "firstline"),
         editor,
         context,
         function
@@ -65,13 +66,13 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
       returnValue = executeBodyForLine(line, isRangeGiven, exceptionsCaught, editor, context)
     } else {
       val firstLine = (injector.variableService.getNonNullVariableValue(
-        Variable(Scope.FUNCTION_VARIABLE, "firstline"),
+        VariableExpression(Scope.FUNCTION_VARIABLE, "firstline"),
         editor,
         context,
         function
       ) as VimInt).value
       val lastLine = (injector.variableService.getNonNullVariableValue(
-        Variable(Scope.FUNCTION_VARIABLE, "lastline"),
+        VariableExpression(Scope.FUNCTION_VARIABLE, "lastline"),
         editor,
         context,
         function
@@ -109,8 +110,8 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
       }
       // todo in release 1.9. we should return value AND throw exception
       when (result) {
-        is ExecutionResult.Break -> exceptionsCaught.add(ExException("E587: :break without :while or :for: break"))
-        is ExecutionResult.Continue -> exceptionsCaught.add(ExException("E586: :continue without :while or :for: continue"))
+        is ExecutionResult.Break -> exceptionsCaught.add(exExceptionMessage("E587"))
+        is ExecutionResult.Continue -> exceptionsCaught.add(exExceptionMessage("E586"))
         is ExecutionResult.Error -> exceptionsCaught.add(ExException("unknown error occurred")) // todo
         is ExecutionResult.Return -> returnValue = result.value
         is ExecutionResult.Success -> {}
@@ -122,8 +123,8 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
         try {
           result = statement.execute(editor, context)
           when (result) {
-            is ExecutionResult.Break -> exceptionsCaught.add(ExException("E587: :break without :while or :for: break"))
-            is ExecutionResult.Continue -> exceptionsCaught.add(ExException("E586: :continue without :while or :for: continue"))
+            is ExecutionResult.Break -> exceptionsCaught.add(exExceptionMessage("E587"))
+            is ExecutionResult.Continue -> exceptionsCaught.add(exExceptionMessage("E586"))
             is ExecutionResult.Error -> exceptionsCaught.add(ExException("unknown error occurred")) // todo
             is ExecutionResult.Return -> {
               returnValue = result.value
@@ -154,7 +155,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
     // non-optional function arguments
     for ((index, name) in function.args.withIndex()) {
       injector.variableService.storeVariable(
-        Variable(Scope.FUNCTION_VARIABLE, name),
+        VariableExpression(Scope.FUNCTION_VARIABLE, name),
         argumentValues[index].evaluate(editor, context, functionCallContext),
         editor,
         context,
@@ -166,7 +167,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
       val expressionToStore =
         if (index + function.args.size < argumentValues.size) argumentValues[index + function.args.size] else function.defaultArgs[index].second
       injector.variableService.storeVariable(
-        Variable(Scope.FUNCTION_VARIABLE, function.defaultArgs[index].first),
+        VariableExpression(Scope.FUNCTION_VARIABLE, function.defaultArgs[index].first),
         expressionToStore.evaluate(editor, context, functionCallContext),
         editor,
         context,
@@ -184,7 +185,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
         VimList(mutableListOf())
       }
       injector.variableService.storeVariable(
-        Variable(Scope.FUNCTION_VARIABLE, "000"),
+        VariableExpression(Scope.FUNCTION_VARIABLE, "000"),
         remainingArgs,
         editor,
         context,
@@ -193,14 +194,14 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
     }
     val lineRange = range!!.getLineRange(editor, editor.currentCaret())
     injector.variableService.storeVariable(
-      Variable(Scope.FUNCTION_VARIABLE, "firstline"),
+      VariableExpression(Scope.FUNCTION_VARIABLE, "firstline"),
       VimInt(lineRange.startLine + 1),
       editor,
       context,
       function,
     )
     injector.variableService.storeVariable(
-      Variable(Scope.FUNCTION_VARIABLE, "lastline"),
+      VariableExpression(Scope.FUNCTION_VARIABLE, "lastline"),
       VimInt(lineRange.endLine + 1),
       editor,
       context,

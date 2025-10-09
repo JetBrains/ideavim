@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
@@ -21,11 +21,11 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
+import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 import com.maddyhome.idea.vim.vimscript.parser.DeletionInfo
 
 // todo refactor us senpai :(
-data class ForLoop(val variable: Variable, val iterable: Expression, val body: List<Executable>) : Executable {
+data class ForLoop(val variable: VariableExpression, val iterable: Expression, val body: List<Executable>) : Executable {
   override lateinit var vimContext: VimLContext
   override lateinit var rangeInScript: TextRange
 
@@ -81,7 +81,7 @@ data class ForLoop(val variable: Variable, val iterable: Expression, val body: L
     } else if (iterableValue is VimBlob) {
       TODO("Not yet implemented")
     } else {
-      throw ExException("E1098: String, List or Blob required")
+      throw exExceptionMessage("E1098")
     }
     return result
   }
@@ -126,25 +126,25 @@ data class ForLoopWithList(val variables: List<String>, val iterable: Expression
         iterableValue = iterable.evaluate(editor, context, this) as VimList
       }
     } else {
-      throw ExException("E714: List required")
+      throw exExceptionMessage("E714")
     }
     return result
   }
 
   private fun storeListVariables(list: VimDataType, editor: VimEditor, context: ExecutionContext) {
     if (list !is VimList) {
-      throw ExException("E714: List required")
+      throw exExceptionMessage("E714")
     }
 
     if (list.values.size < variables.size) {
-      throw ExException("E688: More targets than List items")
+      throw exExceptionMessage("E688")
     }
     if (list.values.size > variables.size) {
-      throw ExException("E684: Less targets than List items")
+      throw exExceptionMessage("E687")
     }
 
     for (item in list.values.withIndex()) {
-      injector.variableService.storeVariable(Variable(null, variables[item.index]), item.value, editor, context, this)
+      injector.variableService.storeVariable(VariableExpression(null, variables[item.index]), item.value, editor, context, this)
     }
   }
 

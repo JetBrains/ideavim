@@ -24,7 +24,7 @@ internal object ExEditorKit : StyledEditorKit() {
     when (elem.name) {
       AbstractDocument.SectionElementName -> ScrollingInlineCompositeView(elem)
       AbstractDocument.ParagraphElementName -> InlineCompositeView(elem)
-      ExDocument.NonPrintableElementName -> ExNonPrintableFieldView(elem)
+      ExDocument.NON_PRINTABLE_ELEMENT_NAME -> ExNonPrintableFieldView(elem)
       else -> super.viewFactory.create(elem)
     }
   }

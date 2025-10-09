@@ -63,5 +63,5 @@ open class VimExTestCase : VimTestCase() {
   }
 
   protected val exEntryPanel: ExEntryPanel
-    get() = ExEntryPanel.getOrCreateInstance()
+    get() = ExEntryPanel.getOrCreatePanelInstance()
 }

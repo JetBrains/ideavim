@@ -28,7 +28,6 @@ import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.ex.ranges.toTextRange
-import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.mark.VimMark
 import com.maddyhome.idea.vim.put.PutData
@@ -72,7 +71,7 @@ data class MoveTextCommand(val range: Range, val modifier: CommandModifier, val 
     val targetLineAfterDeletion = min(editor.fileSize().toInt(), normalizeAddress(targetAddressLine1 - 1, sourceLineRange))
     val linesMoved = sourceLineRange.size
     if (targetLineAfterDeletion < -1 || targetLineAfterDeletion + linesMoved >= editor.lineCount()) {
-      throw exExceptionMessage(Msg.e_invrange)  // E16: Invalid range
+      throw exExceptionMessage("E16")
     }
 
     val shift = targetLineAfterDeletion - editor.offsetToBufferPosition(sourceRange.startOffset).line + 1
@@ -196,7 +195,7 @@ data class MoveTextCommand(val range: Range, val modifier: CommandModifier, val 
     if (address0 >= lineRange.endLine) {
       return address0 - lineRange.size
     } else if (address0 >= lineRange.startLine) {
-      throw InvalidRangeException(injector.messages.message(Msg.e_backrange)) // Backwards range given
+      throw InvalidRangeException(injector.messages.message("E493"))
     }
 
     return address0

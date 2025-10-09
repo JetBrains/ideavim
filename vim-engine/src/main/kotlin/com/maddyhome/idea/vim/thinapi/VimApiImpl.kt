@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.CommandAliasHandler
 import com.maddyhome.idea.vim.common.ListenerOwner
-import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.state.mode.SelectionType
@@ -35,7 +35,7 @@ import com.maddyhome.idea.vim.thinapi.editor.EditorScopeImpl
 import com.maddyhome.idea.vim.vimscript.model.VimPluginContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
-import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
+import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 import kotlinx.coroutines.runBlocking
 import kotlin.io.path.pathString
@@ -66,7 +66,7 @@ class VimApiImpl(
   override fun <T : Any> getVariable(name: String, type: KType): T? {
     val (name, scope) = parseVariableName(name)
     val variableService: VariableService = injector.variableService
-    val variable = Variable(scope, name)
+    val variable = VariableExpression(scope, name)
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     val variableValue: VimDataType? =
       variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext)
@@ -81,11 +81,11 @@ class VimApiImpl(
   override fun setVariable(name: String, value: Any, type: KType) {
     val (variableName, scope) = parseVariableName(name)
     val variableService: VariableService = injector.variableService
-    val variable = Variable(scope, variableName)
+    val variable = VariableExpression(scope, variableName)
 
     val isLocked = variableService.isVariableLocked(variable, vimEditor, vimContext, VimPluginContext)
     if (isLocked) {
-      throw ExException("E741: Value is locked: $name")
+      throw exExceptionMessage("E741", name)
     }
 
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)

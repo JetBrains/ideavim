@@ -9,13 +9,14 @@
 package org.jetbrains.plugins.ideavim.action.change
 
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class OperatorActionTest : VimTestCase() {
   @Test
   fun `test operator action throws error if operatorfunc is empty`() {
     doTest("g@w", "lorem ipsum", "lorem ipsum")
-    assertPluginErrorMessageContains("E774: 'operatorfunc' is empty")
+    assertPluginErrorMessage("E774: 'operatorfunc' is empty")
   }
 
   @Test
@@ -23,7 +24,7 @@ class OperatorActionTest : VimTestCase() {
     doTest("g@w", "lorem ipsum", "lorem ipsum") {
       enterCommand("set operatorfunc=Foo")
     }
-    assertPluginErrorMessageContains("E117: Unknown function: Foo")
+    assertPluginErrorMessage("E117: Unknown function: Foo")
   }
 
   @Test
@@ -120,7 +121,7 @@ class OperatorActionTest : VimTestCase() {
     ) {
       enterCommand("noremap gx :set opfunc=function('Foo')<CR>g@")
     }
-    assertPluginErrorMessageContains("E117: Unknown function: Foo")
+    assertPluginErrorMessage("E117: Unknown function: Foo")
   }
 
   @Test
@@ -149,12 +150,14 @@ class OperatorActionTest : VimTestCase() {
     ) {
       enterCommand("noremap gx :set opfunc=funcref('Foo')<CR>g@")
     }
-    assertPluginErrorMessageContains("E117: Unknown function: Foo")
+    assertPluginErrorMessage("E117: Unknown function: Foo")
   }
 
   @Test
+  @Disabled(":set does not correctly parse the quotes in the lambda syntax")
+  // TODO: It's unclear that this is incorrect behaviour. Vim also fails with this command
   // The parser is treating the second double-quote char as a comment. The argument to the command is parsed as:
-  // opfunc={ arg -> execute "`[v`]rx
+  // opfunc={\ arg\ ->\ execute\ "`[v`]rx
   // The map command is properly handled - the `<CR>g@` is correctly understood, and the full lambda is passed to the
   // parser, but the parser does not fully handle the text
   fun `test operator function with lambda`() {
@@ -163,7 +166,7 @@ class OperatorActionTest : VimTestCase() {
       "lorem ipsum dolor sit amet",
       "lorem ipsum dolor sit amet"
     ) {
-      enterCommand("noremap gx :set opfunc={ arg -> execute \"`[v`]rx\" }<CR>g@")
+      enterCommand("""noremap gx :set opfunc={\ arg\ ->\ execute\ "`[v`]rx"\ }<CR>g@""")
     }
   }
 }

@@ -122,7 +122,7 @@ class ExEntryPanelService : VimCommandLineServiceBase(), VimModalInputService {
     vimEditor.mode = Mode.NORMAL()
     vimEditor.mode = Mode.CMD_LINE(currentMode)
 
-    val panel = ExEntryPanel.getOrCreateInstance()
+    val panel = ExEntryPanel.getOrCreatePanelInstance()
     panel.finishOn = finishOn
     panel.inputProcessing = processing
     panel.activate(vimEditor.ij, context.ij, prompt, "")
@@ -134,7 +134,7 @@ class ExEntryPanelService : VimCommandLineServiceBase(), VimModalInputService {
     label: String,
     initText: String,
   ): VimCommandLine {
-    val panel = ExEntryPanel.getOrCreateInstance()
+    val panel = ExEntryPanel.getOrCreatePanelInstance()
     panel.activate(editor.ij, context.ij, label, initText)
     return panel
   }
@@ -155,7 +155,7 @@ class ExEntryPanelService : VimCommandLineServiceBase(), VimModalInputService {
     label: String,
     inputInterceptor: VimInputInterceptor,
   ): VimModalInput {
-    val panel = ExEntryPanel.getOrCreateInstance()
+    val panel = ExEntryPanel.getOrCreatePanelInstance()
     panel.inputInterceptor = inputInterceptor
     panel.activate(editor.ij, context.ij, label, "")
     return WrappedAsModalInputExEntryPanel(panel)
@@ -169,7 +169,7 @@ internal class WrappedAsModalInputExEntryPanel(internal val exEntryPanel: ExEntr
       exEntryPanel.inputInterceptor = value
     }
   override val caret: VimCommandLineCaret = exEntryPanel.caret
-  override val label: String = exEntryPanel.label
+  override val label: String = exEntryPanel.getLabel()
 
   override fun deactivate(refocusOwningEditor: Boolean, resetCaret: Boolean) {
     exEntryPanel.deactivate(refocusOwningEditor, resetCaret)

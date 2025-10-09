@@ -121,7 +121,7 @@ class LambdaTest : VimTestCase() {
       ),
     )
     assertPluginError(true)
-    assertPluginErrorMessageContains("E119: Not enough arguments for function: <lambda>0")
+    assertPluginErrorMessage("E119: Not enough arguments for function: <lambda>0")
   }
 
   @Test

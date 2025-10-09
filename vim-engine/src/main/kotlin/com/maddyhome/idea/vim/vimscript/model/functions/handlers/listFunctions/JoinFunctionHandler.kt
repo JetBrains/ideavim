@@ -30,11 +30,15 @@ internal class JoinFunctionHandler : FunctionHandler() {
     context: ExecutionContext,
     vimContext: VimLContext,
   ): VimDataType {
-    val argument1 = argumentValues[0].evaluate(editor, context, vimContext)
-    if (argument1 !is VimList) {
-      throw exExceptionMessage("E1211", "1") // E1211: List required for argument 1
+    val list = argumentValues[0].evaluate(editor, context, vimContext)
+    if (list !is VimList) {
+      throw exExceptionMessage("E1211", "1")
     }
-    val argument2 = argumentValues.getOrNull(1)?.evaluate(editor, context, vimContext)?.asString() ?: " "
-    return VimString(argument1.values.joinToString(argument2) { it.toString() })
+
+    // Note that the docs state that the values are formatted with Vim's `string()` function, except for String itself.
+    // The `string()` function is essentially the same as `toOutputString`, but it adds single quotes to String. We're
+    // safe to use `toOutputString` here.
+    val separator = argumentValues.getOrNull(1)?.evaluate(editor, context, vimContext)?.toVimString()?.value ?: " "
+    return VimString(list.values.joinToString(separator) { it.toOutputString() })
   }
 }

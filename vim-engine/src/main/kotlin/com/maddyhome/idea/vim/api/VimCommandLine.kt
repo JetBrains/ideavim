@@ -28,13 +28,13 @@ interface VimCommandLine {
   val editor: VimEditor
   val caret: VimCommandLineCaret
 
-  val label: String
+  fun getLabel(): String
   val isReplaceMode: Boolean
 
   var histIndex: Int
-  var lastEntry: String
+  var lastEntry: String?
   val historyType: VimHistory.Type
-    get() = VimHistory.Type.getTypeByLabel(label)
+    get() = VimHistory.Type.getTypeByLabel(getLabel())
 
   fun toggleReplaceMode()
 
@@ -138,7 +138,7 @@ interface VimCommandLine {
     if (filter) {
       var i: Int = histIndex + dir
       while (i >= 0 && i <= history.size) {
-        var txt: String
+        var txt: String?
         if (i == history.size) {
           txt = lastEntry
         } else {
@@ -146,7 +146,8 @@ interface VimCommandLine {
           txt = entry.entry
         }
 
-        if (txt.startsWith(lastEntry)) {
+        val myLastEntry = lastEntry
+        if (txt != null && myLastEntry != null && txt.startsWith(myLastEntry)) {
           setText(txt, updateLastEntry = false)
           caret.offset = txt.length
           histIndex = i
@@ -159,7 +160,7 @@ interface VimCommandLine {
       injector.messages.indicateError()
     } else {
       histIndex += dir
-      val txt: String
+      val txt: String?
       if (histIndex == history.size) {
         txt = lastEntry
       } else {
@@ -167,8 +168,10 @@ interface VimCommandLine {
         txt = entry.entry
       }
 
-      setText(txt, updateLastEntry = false)
-      caret.offset = txt.length
+      if (txt != null) {
+        setText(txt, updateLastEntry = false)
+        caret.offset = txt.length
+      }
     }
   }
 }

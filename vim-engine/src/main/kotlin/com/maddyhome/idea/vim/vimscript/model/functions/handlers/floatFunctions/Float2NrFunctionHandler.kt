@@ -31,9 +31,10 @@ internal class Float2NrFunctionHandler : FunctionHandler() {
     vimContext: VimLContext,
   ): VimDataType {
     val argument = argumentValues[0].evaluate(editor, context, vimContext)
-    if (argument !is VimFloat && argument !is VimInt) {
-      throw exExceptionMessage("E808")  // E808: Number or Float required
+    return when (argument) {
+      is VimFloat -> VimInt(argument.value.toInt())
+      is VimInt -> VimInt(argument.value)
+      else -> throw exExceptionMessage("E808")
     }
-    return VimInt(argument.asDouble().toInt())
   }
 }

@@ -46,7 +46,7 @@ class PrintLineNumberTest : VimTestCase() {
     configureByLines(10, "Lorem ipsum dolor sit amet")
     enterCommand("=foo")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E488: Trailing characters: foo")
+    assertPluginErrorMessage("E488: Trailing characters: foo")
   }
 
   @Test

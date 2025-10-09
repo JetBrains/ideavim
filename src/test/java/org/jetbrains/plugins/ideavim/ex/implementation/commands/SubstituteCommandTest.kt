@@ -17,7 +17,6 @@ import org.jetbrains.plugins.ideavim.impl.OptionTest
 import org.jetbrains.plugins.ideavim.impl.TraceOptions
 import org.jetbrains.plugins.ideavim.impl.VimOption
 import org.junit.jupiter.api.Disabled
-import org.junit.jupiter.api.Test
 
 /**
  * @author Alex Plate
@@ -1018,7 +1017,7 @@ class SubstituteCommandTest : VimTestCase() {
     // Help :&& - "Note that :s and :& don't keep the flags"
     // Change the first I, ignoring case. `:s &` *does not keep flags* (:s/P/z/& would)
     doTest(listOf(exCommand("s/I/z/i"), exCommand("s &")), before, after)
-    assertPluginErrorMessageContains("Pattern not found: I")
+    assertPluginErrorMessage("E486: Pattern not found: I")
   }
 
   @OptionTest(
@@ -1298,7 +1297,7 @@ class SubstituteCommandTest : VimTestCase() {
     )
     enterCommand("%s/\\d\\+/\\=printf('0x%04x', submatch(0))")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E117: Unknown function: printf")
+    assertPluginErrorMessage("E117: Unknown function: printf")
     assertState(
       """
       val str = "first"
@@ -1329,7 +1328,7 @@ class SubstituteCommandTest : VimTestCase() {
     )
     enterCommand("%s/\\d\\+/\\=*&(")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E15: Invalid expression: *&(")
+    assertPluginErrorMessage("E15: Invalid expression: \"*&(\"")
     assertState(
       """
       val str = "first"

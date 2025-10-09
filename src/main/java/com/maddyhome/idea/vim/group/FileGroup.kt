@@ -34,7 +34,6 @@ import com.maddyhome.idea.vim.api.VimFileBase
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.LastTabService.Companion.getInstance
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.MessageHelper.message
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.execute
@@ -71,7 +70,7 @@ class FileGroup : VimFileBase() {
         return true
       }
     } else {
-      VimPlugin.showMessage(message("unable.to.find.0", filename))
+      injector.messages.showStatusBarMessage(null, injector.messages.message("message.open.file.not.found", filename))
 
       return false
     }

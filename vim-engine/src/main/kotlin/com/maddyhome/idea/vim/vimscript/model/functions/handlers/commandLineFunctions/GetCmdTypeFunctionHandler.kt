@@ -46,7 +46,7 @@ internal class GetCmdTypeFunctionHandler : FunctionHandler() {
   ): VimDataType {
     val mode = editor.mode
     return when (mode) {
-      is Mode.CMD_LINE -> VimString(injector.commandLine.getActiveCommandLine()?.label ?: "")
+      is Mode.CMD_LINE -> VimString(injector.commandLine.getActiveCommandLine()?.getLabel() ?: "")
       else -> VimString("")
     }
   }

@@ -8,65 +8,71 @@
 
 package com.maddyhome.idea.vim.extension.hints
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.project.DumbAwareToggleAction
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.ui.popup.JBPopupListener
 import com.intellij.openapi.ui.popup.LightweightWindowEvent
-import com.intellij.openapi.wm.WindowManager
 import com.intellij.openapi.wm.impl.IdeGlassPaneImpl
 import com.intellij.ui.JBColor
 import com.intellij.util.Alarm
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.extension.ShortcutDispatcher
+import com.maddyhome.idea.vim.newapi.globalIjOptions
 import java.awt.Color
+import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JPanel
+import javax.swing.JRootPane
+import javax.swing.SwingUtilities
 
 class ToggleHintsAction : DumbAwareToggleAction() {
-  private var enabled = false
-
   /** The mask layer container for placing all hints */
-  private val cover = JPanel().apply {
-    layout = null // no layout manager (absolute positioning)
-    isOpaque = false
-    isVisible = false
-  }
+  private var cover: JComponent? = null
 
   private val alarm = Alarm(Alarm.ThreadToUse.SWING_THREAD)
   private val highlight = HighlightComponent()
 
   private val generator = HintGenerator.Permutation(alphabet)
 
-  override fun isSelected(e: AnActionEvent): Boolean = enabled
+  override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
 
-  override fun setSelected(e: AnActionEvent, selected: Boolean) = if (selected) {
-    enable()
-  } else {
-    disable()
+  override fun isSelected(e: AnActionEvent): Boolean = cover != null
+
+  override fun setSelected(e: AnActionEvent, selected: Boolean) {
+    val rootPane = SwingUtilities.getRootPane(e.getData(PlatformDataKeys.CONTEXT_COMPONENT)) ?: return
+    if (!injector.globalIjOptions().vimHints) return
+    val glassPane = rootPane.glassPane as IdeGlassPaneImpl
+    if (selected) {
+      enable(rootPane, glassPane)
+    } else {
+      disable(glassPane)
+    }
   }
 
-  private fun enable() {
-    val frame = WindowManager.getInstance().findVisibleFrame() ?: return
-    val rootPane = frame.rootPane
-    val glassPane = frame.glassPane as IdeGlassPaneImpl
-
+  private fun enable(rootPane: JRootPane, glassPane: IdeGlassPaneImpl) {
     val targets = generator.generate(rootPane, glassPane)
 
-    cover.removeAll() // clear existing covers
-    targets.map(HintTarget::createCover).forEach(cover::add)
-    cover.size = glassPane.size
+    val cover = JPanel().apply {
+      cover = this
+      layout = null // no layout manager (absolute positioning)
+      isOpaque = false
+      targets.map(HintTarget::createCover).forEach(::add)
+      size = glassPane.size
+    }
 
     if (highlight !in glassPane.components) glassPane.add(highlight)
     if (cover !in glassPane.components) glassPane.add(cover)
     glassPane.isVisible = true
-    cover.isVisible = true
+
     val select = JPanel()
     val popup = JBPopupFactory.getInstance().createComponentPopupBuilder(select, select).createPopup()
     popup.setRequestFocus(true)
     popup.addListener(object : JBPopupListener {
       override fun onClosed(event: LightweightWindowEvent) {
-        disable()
+        disable(glassPane)
       }
     })
     ShortcutDispatcher("hints", targets.associateBy { it.hint.lowercase() }, { target ->
@@ -82,20 +88,19 @@ class ToggleHintsAction : DumbAwareToggleAction() {
       popup.cancel()
       injector.messages.indicateError()
     }, { entries ->
-      cover.isVisible = false
       cover.removeAll()
       entries.map { it.data!! }.map(HintTarget::createCover).forEach(cover::add)
-      cover.isVisible = true
+      cover.revalidate()
+      cover.repaint()
     }).register(select, popup)
     popup.showInCenterOf(rootPane)
-
-    enabled = true
   }
 
-  private fun disable() {
-    cover.isVisible = false
-
-    enabled = false
+  private fun disable(glassPane: IdeGlassPaneImpl) {
+    cover?.let(glassPane::remove)
+    glassPane.revalidate()
+    glassPane.repaint()
+    cover = null
   }
 }
 

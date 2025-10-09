@@ -72,4 +72,6 @@ interface VimKeyGroup {
 
   val shortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo>
   val savedShortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo>
+
+  fun getChar(editor: VimEditor): Char?
 }

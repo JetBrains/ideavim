@@ -396,7 +396,7 @@ public class EditorHelper {
   }
 
   private static int getExEntryHeight() {
-    var instance = ExEntryPanel.instance;
+    var instance = ExEntryPanel.Companion.getInstance();
     return instance != null && instance.isActive() ? instance.getHeight() : 0;
   }
 

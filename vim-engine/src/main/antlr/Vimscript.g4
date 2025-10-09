@@ -164,7 +164,7 @@ letCommands:
 ;
 
 assignmentOperator:
-    ASSIGN | plusAssign | minusAssign | startAssign | divAssign | modAssign | dotAssign;
+    ASSIGN | plusAssign | minusAssign | startAssign | divAssign | modAssign | dotAssign | dotDotAssign;
 plusAssign:
     PLUS ASSIGN;
 minusAssign:
@@ -177,6 +177,8 @@ modAssign:
     MOD ASSIGN;
 dotAssign:
     DOT ASSIGN;
+dotDotAssign:
+    DOT DOT ASSIGN;
 
 shortRange:
     ((QUESTION (~QUESTION)* QUESTION?) | (DIV (~DIV)* DIV?));
@@ -223,34 +225,34 @@ commandName:
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 expr:
-                        expr L_BRACKET expr R_BRACKET                                                                   #OneElementSublistExpression
-                    |   WS* BANG WS* expr                                                                        #UnaryExpression
-                    |   expr L_BRACKET WS* from = expr? WS* COLON WS* to = expr? WS* R_BRACKET                          #SublistExpression
-                    |   expr WS* binaryOperator1 WS* expr                                                               #BinExpression1
-                    |   expr WS* binaryOperator2 WS* expr                                                               #BinExpression2
-                    |   expr WS* binaryOperator3 WS* expr                                                               #BinExpression3
-                    |   expr WS* binaryOperator4 WS* expr                                                               #BinExpression4
-                    |   expr WS* binaryOperator5 WS* expr                                                               #BinExpression5
-                    |   WS* unaryOperator = (PLUS | MINUS) WS* expr                                                     #UnaryExpression
-                    |   expr WS* ARROW WS* functionCall                                                                 #FunctionAsMethodCall1
-                    |   expr WS* ARROW WS* lambda L_PAREN WS* functionArguments WS* R_PAREN                             #FunctionAsMethodCall2
-                    |   functionCall                                                                                    #FunctionCallExpression
-                    |   lambda L_PAREN WS* functionArguments WS* R_PAREN                                                #LambdaFunctionCallExpression
-                    |   lambda                                                                                          #LambdaExpression
-                    |	unsignedInt                                                                                     #IntExpression
-                    |   unsignedFloat                                                                                   #FloatExpression
-                    |   string                                                                                          #StringExpression
-                    |   blob                                                                                            #BlobExpression
-                    |   variable                                                                                        #VariableExpression
-                    |   option                                                                                          #OptionExpression
-                    |   envVariable                                                                                     #EnvVariableExpression
-                    |   register                                                                                        #RegisterExpression
-                    |   list                                                                                            #ListExpression
-                    |   dictionary                                                                                      #DictionaryExpression
-                    |   literalDictionary                                                                               #LiteralDictionaryExpression
-                    |   L_PAREN WS* expr WS* R_PAREN                                                                    #WrappedExpression
-                    |   expr WS* QUESTION QUESTION WS* expr                                                             #FalsyExpression
-                    |   expr WS* QUESTION WS* expr WS* COLON WS* expr                                                   #TernaryExpression
+                        expr L_BRACKET WS* expr WS* R_BRACKET                                   #IndexedExpression
+                    |   WS* BANG WS* expr                                                       #UnaryExpression
+                    |   expr L_BRACKET WS* from = expr? WS* COLON WS* to = expr? WS* R_BRACKET  #SublistExpression
+                    |   expr WS* binaryOperator1 WS* expr                                       #BinExpression1
+                    |   expr WS* binaryOperator2 WS* expr                                       #BinExpression2
+                    |   expr WS* binaryOperator3 WS* expr                                       #BinExpression3
+                    |   expr WS* binaryOperator4 WS* expr                                       #BinExpression4
+                    |   expr WS* binaryOperator5 WS* expr                                       #BinExpression5
+                    |   WS* unaryOperator = (PLUS | MINUS) WS* expr                             #UnaryExpression
+                    |   expr WS* ARROW WS* functionCall                                         #FunctionAsMethodCall1
+                    |   expr WS* ARROW WS* lambda L_PAREN WS* functionArguments WS* R_PAREN     #FunctionAsMethodCall2
+                    |   functionCall                                                            #FunctionCallExpression
+                    |   lambda L_PAREN WS* functionArguments WS* R_PAREN                        #LambdaFunctionCallExpression
+                    |   lambda                                                                  #LambdaExpression
+                    |   unsignedInt                                                             #IntExpression
+                    |   unsignedFloat                                                           #FloatExpression
+                    |   string                                                                  #StringExpression
+                    |   blob                                                                    #BlobExpression
+                    |   variable                                                                #VariableExpression
+                    |   option                                                                  #OptionExpression
+                    |   envVariable                                                             #EnvVariableExpression
+                    |   register                                                                #RegisterExpression
+                    |   list                                                                    #ListExpression
+                    |   dictionary                                                              #DictionaryExpression
+                    |   literalDictionary                                                       #LiteralDictionaryExpression
+                    |   L_PAREN WS* expr WS* R_PAREN                                            #WrappedExpression
+                    |   expr WS* QUESTION QUESTION WS* expr                                     #FalsyExpression
+                    |   expr WS* QUESTION WS* expr WS* COLON WS* expr                           #TernaryExpression
 ;
 
 binaryOperator1:        STAR | DIV | MOD;

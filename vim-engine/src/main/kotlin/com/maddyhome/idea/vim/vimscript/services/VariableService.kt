@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
-import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
+import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 import org.jetbrains.annotations.ApiStatus.Internal
 import org.jetbrains.annotations.TestOnly
 import kotlin.reflect.KType
@@ -35,7 +35,7 @@ interface VariableService {
    * @throws ExException("The 'v:' scope is not implemented yet :(")
    */
   fun storeVariable(
-    variable: Variable,
+    variable: VariableExpression,
     value: VimDataType,
     editor: VimEditor,
     context: ExecutionContext,
@@ -69,10 +69,10 @@ interface VariableService {
    * @throws ExException("Cannot extract variable name without editor, context, and vimContext") if the variable name cannot be extracted without the parameters
    */
   fun getNullableVariableValue(
-    variable: Variable,
-    editor: VimEditor?,
-    context: ExecutionContext?,
-    vimContext: VimLContext?,
+    variable: VariableExpression,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext,
   ): VimDataType?
 
   /**
@@ -87,7 +87,7 @@ interface VariableService {
    * @throws ExException("E121: Undefined variable: ${scope}:${name}")
    */
   fun getNonNullVariableValue(
-    variable: Variable,
+    variable: VariableExpression,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
@@ -105,7 +105,7 @@ interface VariableService {
    * @param vimContext vim context
    */
   fun isVariableLocked(
-    variable: Variable,
+    variable: VariableExpression,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
@@ -122,7 +122,7 @@ interface VariableService {
    * @param vimContext vim context
    */
   fun lockVariable(
-    variable: Variable,
+    variable: VariableExpression,
     depth: Int,
     editor: VimEditor,
     context: ExecutionContext,
@@ -140,7 +140,7 @@ interface VariableService {
    * @param vimContext vim context
    */
   fun unlockVariable(
-    variable: Variable,
+    variable: VariableExpression,
     depth: Int,
     editor: VimEditor,
     context: ExecutionContext,

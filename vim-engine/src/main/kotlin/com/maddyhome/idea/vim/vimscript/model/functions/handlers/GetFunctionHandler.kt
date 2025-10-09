@@ -12,6 +12,7 @@ import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimBlob
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
@@ -37,21 +38,21 @@ internal class GetFunctionHandler : FunctionHandler() {
     val container = argumentValues[0].evaluate(editor, context, vimContext)
     return when (container) {
       is VimList -> {
-        val idx = argumentValues[1].evaluate(editor, context, vimContext).asDouble().toInt()
+        val idx = argumentValues[1].evaluate(editor, context, vimContext).toVimNumber().value
         container.values.getOrElse(idx) {
-          argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext) ?: VimInt(-1)
+          argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext) ?: VimInt(0)
         }
       }
 
       is VimDictionary -> {
-        val key = argumentValues[1].evaluate(editor, context, vimContext).asString()
+        val key = argumentValues[1].evaluate(editor, context, vimContext).toVimString().value
         container.dictionary.getOrElse(VimString(key)) {
           argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext) ?: VimInt(0)
         }
       }
 
       is VimBlob, is VimFuncref -> throw ExException("Blobs and Funcref are not supported as an argument for get(). If you need it, request support in YouTrack")
-      else -> throw ExException("E896: Argument of get() must be a List, Dictionary or Blob")
+      else -> throw exExceptionMessage("E896", "get()")
     }
   }
 }

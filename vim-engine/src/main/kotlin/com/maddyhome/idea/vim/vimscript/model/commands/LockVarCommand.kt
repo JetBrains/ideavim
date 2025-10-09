@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
-import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
+import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 
 /**
  * see :h lockvar
@@ -69,7 +69,7 @@ class UnlockVarCommand(val range: Range, val modifier: CommandModifier, val argu
   }
 }
 
-private fun parseVariableAndDepth(modifier: CommandModifier, argument: String): Pair<Variable, Int> {
+private fun parseVariableAndDepth(modifier: CommandModifier, argument: String): Pair<VariableExpression, Int> {
   val variable: String
   var depth = if (modifier == CommandModifier.BANG) 100 else 2
   val args = argument.trim().split(" ")
@@ -85,11 +85,11 @@ private fun parseVariableAndDepth(modifier: CommandModifier, argument: String): 
   return Pair(parseVariable(variable), depth)
 }
 
-private fun parseVariable(variable: String): Variable {
+private fun parseVariable(variable: String): VariableExpression {
   val splittedString = variable.split(":")
   return when (splittedString.size) {
-    1 -> Variable(null, splittedString[0])
-    2 -> Variable(Scope.getByValue(splittedString[0]), splittedString[1])
+    1 -> VariableExpression(null, splittedString[0])
+    2 -> VariableExpression(Scope.getByValue(splittedString[0]), splittedString[1])
     else -> throw ExException("Unknown error during lockvar command execution")
   }
 }

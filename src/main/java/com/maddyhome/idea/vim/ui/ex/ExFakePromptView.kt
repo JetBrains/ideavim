@@ -33,7 +33,7 @@ class ExFakePromptView(private val prompt: Char, elem: Element, private val offs
   override fun getAttributes(): AttributeSet {
     val attributes = SimpleAttributeSet()
     attributes.resolveParent = super.getAttributes()
-    val specialKeyStyle = (element.document as ExDocument).getStyle(ExDocument.SpecialKeyStyleName)
+    val specialKeyStyle = (element.document as ExDocument).getStyle(ExDocument.SPECIAL_KEY_STYLE_NAME)
     attributes.addAttributes(specialKeyStyle)
     return attributes
   }

@@ -328,7 +328,7 @@ class MapCommandJavaTest : VimJavaTestCase() {
     configureByJavaText(text)
     typeText(commandToKeys("nnoremap <expr> t ^f8a"))
     typeText(injector.parser.parseKeys("t"))
-    assertPluginErrorMessageContains("E15: Invalid expression: ^f8a")
+    assertPluginErrorMessage("E15: Invalid expression: \"^f8a\"")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
@@ -361,7 +361,7 @@ class MapCommandJavaTest : VimJavaTestCase() {
     assertIs<ExException>(exception.cause!!.cause) // Exception is wrapped into LOG.error twice
 
     assertPluginError(true)
-    assertPluginErrorMessageContains("E121: Undefined variable: s:mapping")
+    assertPluginErrorMessage("E121: Undefined variable: s:mapping")
     editor.caretModel.allCarets.forEach { Disposer.dispose(it) }
   }
 
@@ -412,7 +412,7 @@ class MapCommandJavaTest : VimJavaTestCase() {
     assertIs<ExException>(exception.cause)
 
     assertPluginError(true)
-    assertPluginErrorMessageContains("E117: Unknown function: unknownFunction")
+    assertPluginErrorMessage("E117: Unknown function: unknownFunction")
     assertState(text)
   }
 

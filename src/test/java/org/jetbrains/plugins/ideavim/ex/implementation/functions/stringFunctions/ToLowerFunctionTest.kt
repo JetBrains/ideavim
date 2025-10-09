@@ -35,7 +35,7 @@ class ToLowerFunctionTest : VimTestCase() {
     enterCommand("echo tolower([1, 2, 3])")
     assertNoExOutput()
     assertPluginError(true)
-    assertPluginErrorMessageContains("E730: Using a List as a String")
+    assertPluginErrorMessage("E730: Using a List as a String")
   }
 
   @Test
@@ -43,6 +43,6 @@ class ToLowerFunctionTest : VimTestCase() {
     enterCommand("echo tolower({1: 2, 3: 4})")
     assertNoExOutput()
     assertPluginError(true)
-    assertPluginErrorMessageContains("E731: Using a Dictionary as a String")
+    assertPluginErrorMessage("E731: Using a Dictionary as a String")
   }
 }

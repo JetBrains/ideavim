@@ -43,7 +43,7 @@ class FunctionTest : VimTestCase() {
     configureByText("\n")
     typeText(commandToKeys("let Ff = function('unknown')"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E700: Unknown function: unknown")
+    assertPluginErrorMessage("E700: Unknown function: unknown")
   }
 
   // todo in release 1.9 (good example of multiple exceptions at once)
@@ -53,7 +53,7 @@ class FunctionTest : VimTestCase() {
     configureByText("\n")
     typeText(commandToKeys("let Ff = function(32)"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E129: Function name required")
+    assertPluginErrorMessage("E129: Function name required")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
@@ -62,7 +62,7 @@ class FunctionTest : VimTestCase() {
     configureByText("\n")
     typeText(commandToKeys("let Ff = function('abs', 10)"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E923: Second argument of function() must be a list or a dict")
+    assertPluginErrorMessage("E923: Second argument of function() must be a list or a dict")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
@@ -71,7 +71,7 @@ class FunctionTest : VimTestCase() {
     configureByText("\n")
     typeText(commandToKeys("let Ff = function('abs', [], 40)"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E922: expected a dict")
+    assertPluginErrorMessage("E922: Expected a dict")
   }
 
   @Test
@@ -122,6 +122,6 @@ class FunctionTest : VimTestCase() {
     typeText(commandToKeys("delfunction! SayHi"))
     typeText(commandToKeys("call Ff()"))
     assertPluginError(true)
-    assertPluginErrorMessageContains("E933: Function was deleted: SayHi")
+    assertPluginErrorMessage("E933: Function was deleted: SayHi")
   }
 }

@@ -40,27 +40,27 @@ class FloorFunctionTest : VimTestCase() {
   fun `test floor with string causes errors`() {
     enterCommand("echo floor('1.0')")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test floor with invalid string causes errors`() {
     enterCommand("echo floor('cheese')")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test floor with list causes errors`() {
     enterCommand("echo floor([1.0])")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test floor with dictionary causes errors`() {
     enterCommand("echo floor({1: 1.0})")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 }

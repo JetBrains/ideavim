@@ -32,7 +32,7 @@ abstract class OptionsPropertiesBase(private val scope: OptionAccessScope) {
   private inner class ToggleOptionProperty(private val option: ToggleOption) :
     ReadWriteProperty<OptionsPropertiesBase, Boolean> {
 
-    override fun getValue(thisRef: OptionsPropertiesBase, property: KProperty<*>) = getOptionValue(option).asBoolean()
+    override fun getValue(thisRef: OptionsPropertiesBase, property: KProperty<*>) = getOptionValue(option).booleanValue
     override fun setValue(thisRef: OptionsPropertiesBase, property: KProperty<*>, value: Boolean) =
       setOptionValue(option, value.asVimInt())
   }

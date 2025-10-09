@@ -17,10 +17,10 @@ import com.maddyhome.idea.vim.parser.generated.VimscriptParser.EnvVariableExpres
 import com.maddyhome.idea.vim.parser.generated.VimscriptParser.FalsyExpressionContext
 import com.maddyhome.idea.vim.parser.generated.VimscriptParser.FloatExpressionContext
 import com.maddyhome.idea.vim.parser.generated.VimscriptParser.FunctionCallExpressionContext
+import com.maddyhome.idea.vim.parser.generated.VimscriptParser.IndexedExpressionContext
 import com.maddyhome.idea.vim.parser.generated.VimscriptParser.IntExpressionContext
 import com.maddyhome.idea.vim.parser.generated.VimscriptParser.ListExpressionContext
 import com.maddyhome.idea.vim.parser.generated.VimscriptParser.LiteralDictionaryExpressionContext
-import com.maddyhome.idea.vim.parser.generated.VimscriptParser.OneElementSublistExpressionContext
 import com.maddyhome.idea.vim.parser.generated.VimscriptParser.OptionExpressionContext
 import com.maddyhome.idea.vim.parser.generated.VimscriptParser.RegisterExpressionContext
 import com.maddyhome.idea.vim.parser.generated.VimscriptParser.StringExpressionContext
@@ -43,16 +43,16 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.FunctionCallExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.LambdaExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.LambdaFunctionCallExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.ListExpression
-import com.maddyhome.idea.vim.vimscript.model.expressions.OneElementSublistExpression
+import com.maddyhome.idea.vim.vimscript.model.expressions.IndexedExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.OptionExpression
-import com.maddyhome.idea.vim.vimscript.model.expressions.Register
+import com.maddyhome.idea.vim.vimscript.model.expressions.RegisterExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.ScopeExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.SublistExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.TernaryExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.UnaryExpression
-import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
+import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.BinaryOperator
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.UnaryOperator
 import org.antlr.v4.runtime.ParserRuleContext
@@ -80,7 +80,7 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
   }
 
   override fun visitIntExpression(ctx: IntExpressionContext): Expression {
-    val result = SimpleExpression(VimInt(ctx.text))
+    val result = SimpleExpression(VimInt.parseNumber(ctx.text) ?: VimInt.ZERO)
     result.originalString = ctx.text
     return result
   }
@@ -117,40 +117,67 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
   }
 
   override fun visitBinExpression2(ctx: VimscriptParser.BinExpression2Context): Expression {
-    val left = visit(ctx.expr(0))
-    val right = visit(ctx.expr(1))
+    val leftExpression = visit(ctx.expr(0))
+    val rightExpression = visit(ctx.expr(1))
+    val rightText: String = ctx.expr(1).text
     val operatorString = ctx.binaryOperator2().text
+
     val result =
-      if (operatorString == "." && !containsSpaces(ctx) && evaluationResultCouldBeADictionary(left) && matchesLiteralDictionaryKey(
-          ctx.expr(1).text
-        )
-      ) {
-        val index = SimpleExpression(ctx.expr(1).text)
-        OneElementSublistExpression(index, left)
-      } else if (operatorString == "-" && left is OneElementSublistExpression && !containsSpaces(ctx) && matchesLiteralDictionaryKey(
-          ctx.expr(1).text,
-        )
-      ) {
-        val postfix = "-" + ctx.expr(1).text
-        val newIndex = SimpleExpression((left.index as SimpleExpression).data.asString() + postfix)
-        OneElementSublistExpression(newIndex, left.expression)
-      } else if (operatorString == "." && !containsSpaces(ctx) && evaluationResultCouldBeADictionary(left) && right is OneElementSublistExpression && matchesLiteralDictionaryKey(
-          right.expression.originalString
-        )
-      ) {
-        OneElementSublistExpression(
-          right.index,
-          OneElementSublistExpression(SimpleExpression(right.expression.originalString), left)
-        )
-      } else if (operatorString == "." && !containsSpaces(ctx) && right is FunctionCallExpression && evaluationResultCouldBeADictionary(
-          left
-        )
-      ) {
-        val index = right.functionName
-        FuncrefCallExpression(OneElementSublistExpression(index, left), right.arguments)
-      } else {
-        val operator = BinaryOperator.getByValue(operatorString) ?: throw RuntimeException()
-        BinExpression(left, right, operator)
+      when {
+        operatorString == "."
+          && !containsSpaces(ctx)
+          && evaluationResultCouldBeADictionary(leftExpression)
+          && matchesLiteralDictionaryKey(rightText) -> {
+
+          // Expr-entry: mydict.key
+          val index = SimpleExpression(rightText)
+          IndexedExpression(index, leftExpression)
+        }
+
+        operatorString == "-"
+          && leftExpression is IndexedExpression
+          && !containsSpaces(ctx)
+          && matchesLiteralDictionaryKey(rightText) -> {
+
+          // Parse dict.left-right as a key called `left-right`
+          // `dict.left` is first parsed as the left expression (sublist), and `right` is the right expression (simple)
+          // E.g. `let dict = {'first-key': 42, 'second-key' : {'third-key': 'oh, hi Mark'}} | echo dict.first-key`
+          // TODO: Vim does not handle this case. E716: Key not present in Dictionary: "first"
+          val postfix = "-$rightText"
+          val newIndex = SimpleExpression((leftExpression.index as SimpleExpression).data.toVimString().value + postfix)
+          IndexedExpression(newIndex, leftExpression.expression)
+        }
+
+        operatorString == "."
+          && !containsSpaces(ctx)
+          && evaluationResultCouldBeADictionary(leftExpression)
+          && rightExpression is IndexedExpression && matchesLiteralDictionaryKey(rightExpression.expression.originalString) -> {
+
+          // Accessing a value in a Dictionary that's an element of a Dictionary, accessed by name. Recursive
+          // leftExpression is a possible Dictionary: `mydict` or `{...}`
+          // rightExpression is an index
+          // leftExpression.rightExpression.rightIndex or leftExpression.rightExpression[leftIndex]
+          IndexedExpression(
+            rightExpression.index,
+            IndexedExpression(SimpleExpression(rightExpression.expression.originalString), leftExpression)
+          )
+        }
+
+        operatorString == "."
+          && !containsSpaces(ctx)
+          && rightExpression is FunctionCallExpression
+          && evaluationResultCouldBeADictionary(leftExpression) -> {
+
+          // Dictionary-function: mydict.len()
+          val index = rightExpression.functionName
+          FuncrefCallExpression(IndexedExpression(index, leftExpression), rightExpression.arguments)
+        }
+
+        else -> {
+          // `.` as string concatenation, `-` as subtraction
+          val operator = BinaryOperator.getByValue(operatorString) ?: throw RuntimeException()
+          BinExpression(leftExpression, rightExpression, operator)
+        }
       }
     result.originalString = ctx.text
     return result
@@ -330,10 +357,10 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
     return result
   }
 
-  override fun visitOneElementSublistExpression(ctx: OneElementSublistExpressionContext): Expression {
+  override fun visitIndexedExpression(ctx: IndexedExpressionContext): Expression {
     val ex = visit(ctx.expr(0))
     val fromTo = visit(ctx.expr(1))
-    val result = OneElementSublistExpression(fromTo, ex)
+    val result = IndexedExpression(fromTo, ex)
     result.originalString = ctx.text
     return result
   }
@@ -345,14 +372,15 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
   }
 
   override fun visitRegisterExpression(ctx: RegisterExpressionContext): Expression {
-    val result = Register(ctx.text.replaceFirst("@", "")[0])
+    // The grammar ensures that we have two characters, `@{register}` so this is safe
+    val result = RegisterExpression(ctx.text[1])
     result.originalString = ctx.text
     return result
   }
 
-  override fun visitVariable(ctx: VariableContext): Variable {
+  override fun visitVariable(ctx: VariableContext): VariableExpression {
     val scope = if (ctx.variableScope() == null) null else Scope.getByValue(ctx.variableScope().text)
-    val result = Variable(scope, visitCurlyBracesName(ctx.variableName().curlyBracesName()))
+    val result = VariableExpression(scope, visitCurlyBracesName(ctx.variableName().curlyBracesName()))
     result.originalString = ctx.text
     return result
   }

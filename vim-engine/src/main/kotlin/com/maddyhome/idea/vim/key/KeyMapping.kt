@@ -88,12 +88,13 @@ class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, Key
     keysTrie.getEntries().map { KeyMappingEntry(it).getPath() }.iterator()
 
   /**
-   * Returns a sequence of all valid key sequences
+   * Returns a sequence of all valid key sequences for the given prefix, optionally including mappings for the prefixes
    *
-   * Does not return any prefixes.
+   * If [prefix] is an empty list, returns all valid key sequences. If [includePrefixMappings] is true, also returns
+   * mapping sequences for each key in the prefix. Otherwise, skips the sequences for the prefixes.
    */
-  fun getAll(prefix: List<KeyStroke>): Sequence<KeyMappingEntry> =
-    keysTrie.getEntries(prefix).map { KeyMappingEntry(it) }
+  fun getAll(prefix: List<KeyStroke>, includePrefixMappings: Boolean = true): Sequence<KeyMappingEntry> =
+    keysTrie.getEntries(prefix, includePrefixNodes = includePrefixMappings).map { KeyMappingEntry(it) }
 
   /**
    * Return a sequence of all valid key sequences belonging to the given owner

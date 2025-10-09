@@ -20,7 +20,6 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.Range
-import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionAccessScope
@@ -146,20 +145,21 @@ fun parseOptionLine(
 
   // We now have 1 or more option operators separator by spaces
   var error: String? = null
-  var token = ""
   val tokenizer = StringTokenizer(argument)
   val toShow = mutableListOf<Pair<String, String>>()
   while (tokenizer.hasMoreTokens()) {
-    token = tokenizer.nextToken()
-    // See if a space has been backslashed, if no get the rest of the text
+    var token = tokenizer.nextToken()
+    // See if a space has been backslashed, if not get the rest of the text
     while (token.endsWith("\\")) {
-      token = token.substring(0, token.length - 1) + ' '
+      token = token.take(token.length - 1) + ' '
       if (tokenizer.hasMoreTokens()) {
         token += tokenizer.nextToken()
       }
     }
 
-    val isKeyValueOperation = token.indexOf('=') != -1 || token.indexOf(':') != -1
+    val eq = token.indexOf('=')
+    val colon = token.indexOf(':')
+    val isKeyValueOperation = eq != -1 || colon != -1
     if (!isKeyValueOperation) {
       when {
         token.endsWith("?") -> toShow.add(Pair(token.dropLast(1), token))
@@ -178,7 +178,7 @@ fun parseOptionLine(
           // different.
           val option: Option<out VimDataType>? = optionGroup.getOption(token)
           when (option) {
-            null -> error = Msg.unkopt
+            null -> error = injector.messages.message("E518", token)
             is ToggleOption -> optionGroup.setToggleOption(option, scope)
             else -> toShow.add(Pair(option.name, option.abbrev))
           }
@@ -186,30 +186,23 @@ fun parseOptionLine(
       }
     } else {
       // This must be one of =, :, +=, -=, or ^=
-      val eq = token.indexOf('=')
-      val colon = token.indexOf(':')
-      if (eq > 0 || colon > 0) {
-        // Could be option:value, option=value, option+=value, option-=value or option^=value
-        val idx = if (eq > 0) eq else colon
-        val op = if (eq > 0) token[eq - 1] else Char(0)
-        val end = if (eq > 0 && op in "+-^") idx - 1 else idx
+      // Could be option:value, option=value, option+=value, option-=value or option^=value
+      val idx = if (eq > 0) eq else colon
+      val op = if (eq > 0) token[eq - 1] else Char(0)
+      val end = if (eq > 0 && op in "+-^") idx - 1 else idx
 
-        // Get option name and value after operator
-        val optionName = token.take(end)
-        val option = getValidOption(optionName)
-        val existingValue = optionGroup.getOptionValue(option, scope)
-        val value = option.parseValue(token.substring(idx + 1), token)
-        val newValue = when (op) {
-          '+' -> appendValue(option, existingValue, value)
-          '^' -> prependValue(option, existingValue, value)
-          '-' -> removeValue(option, existingValue, value)
-          else -> value
-        } ?: throw exExceptionMessage("E474", token)
-        optionGroup.setOptionValue(option, scope, newValue)
-      } else {
-        // We're either missing the equals sign, the colon, or the option name itself
-        error = Msg.unkopt
-      }
+      // Get option name and value after operator
+      val optionName = token.take(end)
+      val option = getValidOption(optionName)
+      val existingValue = optionGroup.getOptionValue(option, scope)
+      val value = option.parseValue(token.substring(idx + 1), token)
+      val newValue = when (op) {
+        '+' -> appendValue(option, existingValue, value)
+        '^' -> prependValue(option, existingValue, value)
+        '-' -> removeValue(option, existingValue, value)
+        else -> value
+      } ?: throw exExceptionMessage("E474.arg", token)
+      optionGroup.setOptionValue(option, scope, newValue)
     }
     if (error != null) {
       break
@@ -222,7 +215,7 @@ fun parseOptionLine(
   }
 
   if (error != null) {
-    throw ExException(injector.messages.message(error, token))
+    throw ExException(error)
   }
 }
 
@@ -230,7 +223,7 @@ private fun getValidOption(optionName: String, token: String = optionName) =
   injector.optionGroup.getOption(optionName) ?: throw exExceptionMessage("E518", token)
 
 private fun getValidToggleOption(optionName: String, token: String) =
-  getValidOption(optionName, token) as? ToggleOption ?: throw exExceptionMessage("E474", token)
+  getValidOption(optionName, token) as? ToggleOption ?: throw exExceptionMessage("E474.arg", token)
 
 private fun showOptions(
   editor: VimEditor,
@@ -300,17 +293,18 @@ private fun showOptions(
 }
 
 private fun formatKnownOptionValue(option: Option<out VimDataType>, scope: OptionAccessScope): String {
-  val value = injector.optionGroup.getOptionValue(option, scope)
   if (option is ToggleOption) {
+    val value = injector.optionGroup.getOptionValue(option, scope)
 
     // Unset global-local toggle option
     if (option.declaredScope.isGlobalLocal() && scope is OptionAccessScope.LOCAL && value == VimInt.MINUS_ONE) {
       return "--${option.name}"
     }
 
-    return if (value.asBoolean()) "  ${option.name}" else "no${option.name}"
+    return if (value.booleanValue) "  ${option.name}" else "no${option.name}"
   } else {
-    return "  ${option.name}=$value"
+    val value = injector.optionGroup.getOptionValue(option, scope)
+    return "  ${option.name}=${value.toOutputString()}"
   }
 }
 

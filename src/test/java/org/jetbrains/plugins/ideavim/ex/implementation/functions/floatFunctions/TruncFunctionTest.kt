@@ -40,27 +40,27 @@ class TruncFunctionTest : VimTestCase() {
   fun `test trunc with string causes errors`() {
     enterCommand("echo trunc('1.0')")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test trunc with invalid string causes errors`() {
     enterCommand("echo trunc('cheese')")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test trunc with list causes errors`() {
     enterCommand("echo trunc([1.0])")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 
   @Test
   fun `test trunc with dictionary causes errors`() {
     enterCommand("echo trunc({1: 1.0})")
     assertPluginError(true)
-    assertPluginErrorMessageContains("E808: Number or Float required")
+    assertPluginErrorMessage("E808: Number or Float required")
   }
 }

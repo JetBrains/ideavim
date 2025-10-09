@@ -86,6 +86,6 @@ class MapClearCommandTest : VimTestCase() {
     enterCommand("cmapclear!")
 
     assertPluginError(true)
-    assertPluginErrorMessageContains("E477: No ! allowed")
+    assertPluginErrorMessage("E477: No ! allowed")
   }
 }

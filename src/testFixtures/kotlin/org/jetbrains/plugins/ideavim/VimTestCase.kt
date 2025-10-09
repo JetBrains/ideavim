@@ -113,7 +113,7 @@ import kotlin.test.assertTrue
  * The tests are started on non-EDT thread without any locks.
  */
 @ApiStatus.Internal
-abstract class VimTestCase {
+abstract class VimTestCase(private val defaultEditorText: String? = null) {
   protected lateinit var fixture: CodeInsightTestFixture
 
   lateinit var testInfo: TestInfo
@@ -140,7 +140,7 @@ abstract class VimTestCase {
     clearClipboard()
 
     // Make sure the entry text field gets a bounds, or we won't be able to work out caret location
-    ExEntryPanel.getOrCreateInstance().entry.setBounds(0, 0, 100, 25)
+    ExEntryPanel.getOrCreatePanelInstance().entry.setBounds(0, 0, 100, 25)
 
     NeovimTesting.setUp(testInfo)
 
@@ -148,22 +148,26 @@ abstract class VimTestCase {
     injector.messages.clearStatusBarMessage()
 
     this.testInfo = testInfo
+
+    if (defaultEditorText != null) {
+      configureByText(defaultEditorText)
+    }
   }
 
   private fun resetAllOptions() {
     // Some options are mapped to IntelliJ settings. Make sure the IntelliJ settings match the Vim defaults
     EditorSettingsExternalizable.getInstance().apply {
-      isUseCustomSoftWrapIndent = IjOptions.breakindent.defaultValue.asBoolean()
+      isUseCustomSoftWrapIndent = IjOptions.breakindent.defaultValue.booleanValue
       isRightMarginShown = false  // Otherwise we get `colorcolumn=+0`
-      isWhitespacesShown = IjOptions.list.defaultValue.asBoolean()
-      isLineNumbersShown = Options.number.defaultValue.asBoolean()
-      lineNumeration = if (IjOptions.relativenumber.defaultValue.asBoolean()) {
+      isWhitespacesShown = IjOptions.list.defaultValue.booleanValue
+      isLineNumbersShown = Options.number.defaultValue.booleanValue
+      lineNumeration = if (IjOptions.relativenumber.defaultValue.booleanValue) {
         if (isLineNumbersShown) EditorSettings.LineNumerationType.HYBRID else EditorSettings.LineNumerationType.RELATIVE
       } else {
         EditorSettings.LineNumerationType.ABSOLUTE
       }
       softWrapFileMasks = "*"
-      isUseSoftWraps = IjOptions.wrap.defaultValue.asBoolean()
+      isUseSoftWraps = IjOptions.wrap.defaultValue.booleanValue
 
       verticalScrollJump = Options.scrolljump.defaultValue.value
       verticalScrollOffset = Options.scrolloff.defaultValue.value
@@ -188,7 +192,7 @@ abstract class VimTestCase {
   private fun setDefaultIntelliJSettings(editor: Editor) {
     // These settings don't have a global setting...
     ApplicationManager.getApplication().invokeAndWait {
-      editor.settings.isCaretRowShown = IjOptions.cursorline.defaultValue.asBoolean()
+      editor.settings.isCaretRowShown = IjOptions.cursorline.defaultValue.booleanValue
     }
   }
 
@@ -744,11 +748,11 @@ abstract class VimTestCase {
   }
 
   fun assertPluginError(isError: Boolean) {
-    assertEquals(isError, injector.messages.isError())
+    assertEquals(isError, injector.messages.isError(), injector.messages.getStatusBarMessage() ?: "<No error message>")
   }
 
-  fun assertPluginErrorMessageContains(message: String) {
-    assertContains(VimPlugin.getMessage(), message)
+  fun assertPluginErrorMessage(message: String) {
+    assertEquals(message, VimPlugin.getMessage())
   }
 
   fun assertStatusLineMessageContains(message: String) {

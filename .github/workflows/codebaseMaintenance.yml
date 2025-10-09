@@ -1,0 +1,55 @@
+name: Codebase Maintenance with Claude
+
+on:
+  schedule:
+    # Run every day at 6 AM UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  maintain-codebase:
+    runs-on: ubuntu-latest
+    if: github.repository == 'JetBrains/ideavim'
+
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+      issues: read
+      actions: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Need history for context
+
+      - name: Run Claude Code for Codebase Maintenance
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+
+          prompt: |
+            ## Task: Perform Codebase Maintenance
+
+            Your goal is to inspect a random part of the IdeaVim codebase and perform maintenance checks.
+
+            Please follow the detailed maintenance instructions in `.claude/maintenance-instructions.md`.
+
+            ## Creating Pull Requests
+
+            **Only create a pull request if you made changes to the codebase.**
+
+            If you made changes, create a PR with:
+            - **Title**: "Maintenance: <area> - <brief description>"
+              - Example: "Maintenance: VimMotionHandler - Fix null safety issues"
+            - **Body** including:
+              - What area you inspected
+              - Issues you found
+              - Changes you made
+              - Why the changes improve the code
+
+            If no changes are needed, do not create a pull request.
+
+          # Allow Claude to use necessary tools for code inspection and maintenance
+          claude_args: '--allowed-tools "Read,Edit,Write,Glob,Grep,Bash(git:*),Bash(gh:*),Bash(./gradlew:*),Bash(find:*),Bash(shuf:*)"'

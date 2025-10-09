@@ -2,6 +2,7 @@ ideavim
 ideavimrc
 maddyhome
 
+lockvar
 setglobal
 setlocal
 vglobal
@@ -24,6 +25,7 @@ mapleader
 matchpairs
 maxmapdepth
 nrformats
+operatorfunc
 relativenumber
 scrolljump
 scrolloff

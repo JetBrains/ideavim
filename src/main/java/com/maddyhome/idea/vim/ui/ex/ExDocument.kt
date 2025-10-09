@@ -5,80 +5,75 @@
  * license that can be found in the LICENSE.txt file or at
  * https://opensource.org/licenses/MIT.
  */
+package com.maddyhome.idea.vim.ui.ex
 
-package com.maddyhome.idea.vim.ui.ex;
-
-import com.intellij.openapi.editor.textarea.TextComponentEditor;
-import com.intellij.openapi.util.SystemInfo;
-import com.maddyhome.idea.vim.api.VimCommandLine;
-import com.maddyhome.idea.vim.helper.EngineStringHelper;
-import org.jetbrains.annotations.NotNull;
-
-import javax.swing.text.*;
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.font.TextAttribute;
-import java.awt.im.InputMethodHighlight;
-import java.text.AttributedCharacterIterator;
-import java.text.AttributedString;
-import java.util.Map;
-
-import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
+import com.intellij.openapi.util.SystemInfo
+import com.maddyhome.idea.vim.api.VimCommandLine
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.helper.EngineStringHelper
+import java.awt.Color
+import java.awt.font.TextAttribute
+import java.awt.im.InputMethodHighlight
+import java.text.AttributedCharacterIterator
+import java.text.AttributedString
+import javax.swing.text.AbstractDocument
+import javax.swing.text.AttributeSet
+import javax.swing.text.BadLocationException
+import javax.swing.text.DefaultStyledDocument
+import javax.swing.text.Document
+import javax.swing.text.DocumentFilter
+import javax.swing.text.SimpleAttributeSet
+import javax.swing.text.StyleConstants
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * This document provides insert/overwrite mode
  * Note that PlainDocument will remove CRs from text for single line text fields
  */
-public class ExDocument extends DefaultStyledDocument {
-  public static final String SpecialKeyStyleName = "SpecialKey";
-  public static final String NonPrintableElementName = "non-printable";
+class ExDocument : DefaultStyledDocument() {
+  /**
+   * Checks if this document is in insert or overwrite mode
+   *
+   * @return true if overwrite, false if insert mode
+   */
+  var isOverwrite: Boolean = false
+    private set
 
-  private boolean overwrite = false;
-
-  public ExDocument() {
-    setDocumentFilter(new ExDocumentFilter());
-    final Style specialStyle = addStyle(SpecialKeyStyleName, null);
-    final Style nonPrintableStyle = addStyle(NonPrintableElementName, specialStyle);
-    nonPrintableStyle.addAttribute(AbstractDocument.ElementNameAttribute, NonPrintableElementName);
+  init {
+    documentFilter = ExDocumentFilter()
+    val specialStyle = addStyle(SPECIAL_KEY_STYLE_NAME, null)
+    val nonPrintableStyle = addStyle(NON_PRINTABLE_ELEMENT_NAME, specialStyle)
+    nonPrintableStyle.addAttribute(ElementNameAttribute, NON_PRINTABLE_ELEMENT_NAME)
   }
 
   /**
    * Set the foreground colour for special key characters
-   * <p>
+   *
    * Maps to Vim's `SpecialKey` highlight
-   * </p>
    */
-  void setSpecialKeyForeground(@NotNull Color fg) {
-    final Style style = getStyle(SpecialKeyStyleName);
+  fun setSpecialKeyForeground(fg: Color) {
+    val style = getStyle(SPECIAL_KEY_STYLE_NAME)
     if (style != null) {
-      StyleConstants.setForeground(style, fg);
+      StyleConstants.setForeground(style, fg)
     }
   }
 
   /**
    * Toggles the insert/overwrite state
    */
-  void toggleInsertReplace() {
-    VimCommandLine commandLine = injector.getCommandLine().getActiveCommandLine();
+  fun toggleInsertReplace() {
+    val commandLine: VimCommandLine? = injector.commandLine.getActiveCommandLine()
     if (commandLine != null) {
-      ((ExEntryPanel)commandLine).isReplaceMode = !((ExEntryPanel)commandLine).isReplaceMode;
+      (commandLine as ExEntryPanel).isReplaceMode = !commandLine.isReplaceMode
     }
-    overwrite = !overwrite;
+    this.isOverwrite = !this.isOverwrite
   }
 
-  /**
-   * Checks if this document is in insert or overwrite mode
-   *
-   * @return true if overwrite, false if insert mode
-   */
-  public boolean isOverwrite() {
-    return overwrite;
-  }
-
-  @Override
-  public void insertString(int offs, @NotNull String str, AttributeSet a) throws BadLocationException {
-    addInputMethodAttributes(a);
-    super.insertString(offs, str, a);
+  @Throws(BadLocationException::class)
+  override fun insertString(offs: Int, str: String, a: AttributeSet?) {
+    addInputMethodAttributes(a)
+    super.insertString(offs, str, a)
   }
 
   // Mac apps will show a highlight for text being composed as part of an input method or dead keys (e.g. <A-N> N will
@@ -88,165 +83,176 @@ public class ExDocument extends DefaultStyledDocument {
   // working with incremental search, and the IntelliJ editor also shows it on Mac, so we'll add it to the ex entry
   // field. Note that Windows doesn't show dead key highlights at all, not even for the IntelliJ editor. I don't know
   // what Linux does
-  private void addInputMethodAttributes(AttributeSet attributeSet) {
+  private fun addInputMethodAttributes(attributeSet: AttributeSet?) {
     if (!SystemInfo.isMac) {
-      return;
+      return
     }
 
     // See if we have a composed text attribute, and if so, try to cast it to AttributedString
-    final Object composedTextAttribute =
-      attributeSet != null ? attributeSet.getAttribute(StyleConstants.ComposedTextAttribute) : null;
-    if (composedTextAttribute instanceof AttributedString attributedString) {
+    val composedTextAttribute = attributeSet?.getAttribute(StyleConstants.ComposedTextAttribute)
+    if (composedTextAttribute is AttributedString) {
       // Iterate over all the characters in the attributed string (might just be `~` or `^`, or might be a longer prefix
       // from an IME) and add an input method highlight to it if it's not already there
-      final AttributedCharacterIterator iterator = attributedString.getIterator();
+      val iterator = composedTextAttribute.iterator
       while (iterator.current() != AttributedCharacterIterator.DONE) {
-        final Map<AttributedCharacterIterator.Attribute, Object> currentCharAttributes = iterator.getAttributes();
+        val currentCharAttributes = iterator.attributes
         if (!currentCharAttributes.containsKey(TextAttribute.INPUT_METHOD_HIGHLIGHT) &&
-            !currentCharAttributes.containsKey(TextAttribute.INPUT_METHOD_UNDERLINE)) {
-          attributedString.addAttribute(TextAttribute.INPUT_METHOD_HIGHLIGHT,
-                                        InputMethodHighlight.UNSELECTED_CONVERTED_TEXT_HIGHLIGHT, iterator.getIndex(),
-                                        iterator.getIndex() + 1);
+          !currentCharAttributes.containsKey(TextAttribute.INPUT_METHOD_UNDERLINE)
+        ) {
+          composedTextAttribute.addAttribute(
+            TextAttribute.INPUT_METHOD_HIGHLIGHT,
+            InputMethodHighlight.UNSELECTED_CONVERTED_TEXT_HIGHLIGHT, iterator.index,
+            iterator.index + 1
+          )
         }
 
-        iterator.next();
+        iterator.next()
       }
     }
   }
 
   /**
    * A document filter to apply special attributes to non-printable characters
-   * <p>
+   *
+   *
    * Filters document changes to insert non-printable characters as separate changes with special attributes. This
    * allows us identifying document elements containing non-printable characters and create a different view for them,
    * rendering them appropriately.
-   * </p>
+   *
    */
-  private static class ExDocumentFilter extends DocumentFilter {
+  private class ExDocumentFilter : DocumentFilter() {
     /**
      * Invoked before inserting a region of text in the specified Document.
-     * <p>
-     * This is called by {@link AbstractDocument#insertString}, which has few callers in our usage. Most changes to the
-     * text happen by replacing either the entire text or the selection, via {@link AbstractDocument#replace} (and
-     * therefore also @{link DocumentFilter#replace}). Some things will still call {@link AbstractDocument#insertString}
+     *
+     *
+     * This is called by [AbstractDocument.insertString], which has few callers in our usage. Most changes to the
+     * text happen by replacing either the entire text or the selection, via [AbstractDocument.replace] (and
+     * therefore also @{link DocumentFilter#replace}). Some things will still call [AbstractDocument.insertString]
      * such as IntelliJ's own paste action, which operates on the Ex text field component because it gets a
-     * {@link TextComponentEditor} instance from the current data context.
-     * </p>
+     * [com.intellij.openapi.editor.textarea.TextComponentEditor] instance from the current data context.
+     *
      */
-    @Override
-    public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr)
-      throws BadLocationException {
-      final int originalOffset = offset;
+    @Throws(BadLocationException::class)
+    override fun insertString(fb: FilterBypass, offset: Int, string: String, attr: AttributeSet?) {
+      var offset = offset
+      var string = string
+      val originalOffset = offset
 
-      string = filterNewLines(fb.getDocument(), string);
+      string = filterNewLines(fb.document, string)
 
-      int start = 0;
-      int pos = 0;
-      while (pos < string.length()) {
-        //noinspection DuplicatedCode
-        final boolean isPrintable = isPrintableCharacter(string.charAt(pos));
-        while (pos < string.length() && isPrintableCharacter(string.charAt(pos)) == isPrintable) {
-          pos++;
+      var start = 0
+      var pos = 0
+      while (pos < string.length) {
+        val isPrintable: Boolean = isPrintableCharacter(string[pos])
+        while (pos < string.length && isPrintableCharacter(string[pos]) == isPrintable) {
+          pos++
         }
 
-        final AttributeSet a = isPrintable ? attr : getNonPrintableAttributes(fb.getDocument(), attr);
-        final String s = string.substring(start, pos);
-        fb.insertString(offset, s, a);
-        offset += s.length();
+        val a = if (isPrintable) attr else getNonPrintableAttributes(fb.document, attr)
+        val s = string.substring(start, pos)
+        fb.insertString(offset, s, a)
+        offset += s.length
 
-        start = pos;
+        start = pos
       }
 
-      if (fb.getDocument() instanceof ExDocument exDocument && exDocument.isOverwrite()) {
-        int rest = originalOffset + string.length();
-        if (rest < exDocument.getLength()) {
-          int len = Math.min(string.length(), exDocument.getLength() - rest);
-          fb.remove(rest, len);
+      val exDocument = fb.document
+      if (exDocument is ExDocument && exDocument.isOverwrite) {
+        val rest = originalOffset + string.length
+        if (rest < exDocument.length) {
+          val len = min(string.length, exDocument.length - rest)
+          fb.remove(rest, len)
         }
       }
     }
 
     /**
      * Invoked before replacing a region of text in the specified Document.
-     * <p>
-     * This method is called for most changes to the document. When handing a {@link KeyEvent#KEY_TYPED} event, the
-     * document is modified with a call to {@link JTextComponent#replaceSelection}, which calls
-     * {@link AbstractDocument#replace}, passing the last offset and a length of 0. If client code calls
-     * {@link JTextComponent#setText}, this will call {@link AbstractDocument#replace} with an offset of 0 and the full
+     *
+     *
+     * This method is called for most changes to the document. When handing a [java.awt.event.KeyEvent.KEY_TYPED] event, the
+     * document is modified with a call to [javax.swing.text.JTextComponent.replaceSelection], which calls
+     * [AbstractDocument.replace], passing the last offset and a length of 0. If client code calls
+     * [javax.swing.text.JTextComponent.setText], this will call [AbstractDocument.replace] with an offset of 0 and the full
      * text length.
-     * </p>
+     *
      */
-    @Override
-    public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
-      throws BadLocationException {
-
+    @Throws(BadLocationException::class)
+    override fun replace(fb: FilterBypass, offset: Int, length: Int, text: String, attrs: AttributeSet?) {
+      var offset = offset
+      var length = length
+      var text = text
       if (text.isEmpty()) {
-        fb.replace(offset, length, text, attrs);
-        return;
+        fb.replace(offset, length, text, attrs)
+        return
       }
 
-      text = filterNewLines(fb.getDocument(), text);
+      text = filterNewLines(fb.document, text)
 
-      if (fb.getDocument() instanceof ExDocument exDocument && exDocument.isOverwrite()) {
-        if (offset + text.length() > exDocument.getLength()) {
-          length = exDocument.getLength() - offset;
-        }
-        else {
-          length = Math.max(length, text.length());
+      val exDocument = fb.document
+      if (exDocument is ExDocument && exDocument.isOverwrite) {
+        length = if (offset + text.length > exDocument.length) {
+          exDocument.length - offset
+        } else {
+          max(length, text.length)
         }
       }
 
-      int start = 0;
-      int pos = 0;
-      while (pos < text.length()) {
-        //noinspection DuplicatedCode
-        final boolean isPrintable = isPrintableCharacter(text.charAt(pos));
-        while (pos < text.length() && isPrintableCharacter(text.charAt(pos)) == isPrintable) {
-          pos++;
+      var start = 0
+      var pos = 0
+      while (pos < text.length) {
+        val isPrintable: Boolean = isPrintableCharacter(text[pos])
+        while (pos < text.length && isPrintableCharacter(text[pos]) == isPrintable) {
+          pos++
         }
 
         // Note that fb.replace will remove the existing text and then add the new text. If we're replacing the whole
-        // text (e.g., ExTextField.setText) then this can reset the scroll position. Note that ExTextField has methods
+        // text (e.g., ExTextField.setText), then this can reset the scroll position. Note that ExTextField has methods
         // to set, insert and delete text to avoid this situation.
-        final AttributeSet a = isPrintable ? attrs : getNonPrintableAttributes(fb.getDocument(), attrs);
-        final String s = text.substring(start, pos);
+        val a = if (isPrintable) attrs else getNonPrintableAttributes(fb.document, attrs)
+        val s = text.substring(start, pos)
         if (start == 0) {
-          fb.replace(offset, length, s, a);
+          fb.replace(offset, length, s, a)
+        } else {
+          fb.insertString(offset, s, a)
         }
-        else {
-          fb.insertString(offset, s, a);
-        }
-        offset += s.length();
+        offset += s.length
 
-        start = pos;
+        start = pos
       }
     }
 
-    private String filterNewLines(Document document, String string) {
+    fun filterNewLines(document: Document, string: String): String {
       // A text field shouldn't have new lines
-      Object filterNewlines = document.getProperty("filterNewlines");
-      if ((filterNewlines instanceof Boolean) && filterNewlines.equals(Boolean.TRUE)) {
-        return string.replaceAll("\n", " ");
+      val filterNewlines = document.getProperty("filterNewlines")
+      if (filterNewlines is Boolean && filterNewlines) {
+        return string.replace("\n".toRegex(), " ")
       }
-      return string;
+      return string
     }
 
-    private static boolean isPrintableCharacter(char c) {
-      return EngineStringHelper.INSTANCE.isPrintableCharacter(c);
-    }
-
-    private static @NotNull AttributeSet getNonPrintableAttributes(Document document, AttributeSet attrs) {
-      if (document instanceof ExDocument exDocument) {
-        return exDocument.getStyle(ExDocument.NonPrintableElementName);
+    companion object {
+      private fun isPrintableCharacter(c: Char): Boolean {
+        return EngineStringHelper.isPrintableCharacter(c)
       }
-      else {
-        final SimpleAttributeSet attributeSet = new SimpleAttributeSet();
-        if (attrs != null) {
-          attributeSet.addAttributes(attrs);
+
+      private fun getNonPrintableAttributes(document: Document?, attrs: AttributeSet?): AttributeSet {
+        if (document is ExDocument) {
+          return document.getStyle(NON_PRINTABLE_ELEMENT_NAME)
+        } else {
+          val attributeSet = SimpleAttributeSet()
+          if (attrs != null) {
+            attributeSet.addAttributes(attrs)
+          }
+          attributeSet.addAttribute(ElementNameAttribute, NON_PRINTABLE_ELEMENT_NAME)
+          return attributeSet
         }
-        attributeSet.addAttribute(AbstractDocument.ElementNameAttribute, ExDocument.NonPrintableElementName);
-        return attributeSet;
       }
     }
+  }
+
+  companion object {
+    const val SPECIAL_KEY_STYLE_NAME: String = "SpecialKey"
+    const val NON_PRINTABLE_ELEMENT_NAME: String = "non-printable"
   }
 }

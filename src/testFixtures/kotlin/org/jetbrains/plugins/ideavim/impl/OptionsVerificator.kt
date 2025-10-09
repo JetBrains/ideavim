@@ -123,8 +123,8 @@ private class OptionsVerificator : BeforeTestExecutionCallback, AfterTestExecuti
   }
 
   override fun afterTestExecution(context: ExtensionContext) {
-    injector = getStore(context).get("OriginalInjector", VimInjector::class.java)
-    val collector = getStore(context).get("TraceCollector", OptionsTraceCollector::class.java)
+    injector = getStore(context).get("OriginalInjector", VimInjector::class.java)!!
+    val collector = getStore(context).get("TraceCollector", OptionsTraceCollector::class.java)!!
     val usedOptions = collector.requestedKeys
       .mapNotNull { injector.optionGroup.getOption(it)?.name }
       .toSet()
@@ -258,7 +258,7 @@ internal class OptionsTracer(
 }
 
 private class VimOptionsInvocator : TestTemplateInvocationContextProvider {
-  override fun supportsTestTemplate(context: ExtensionContext?): Boolean {
+  override fun supportsTestTemplate(context: ExtensionContext): Boolean {
     return true
   }
 
@@ -298,7 +298,7 @@ private class VimOptionsInvocator : TestTemplateInvocationContextProvider {
         } else {
           when (option) {
             is ToggleOption -> vimOption.limitedValues.map { option to if (it == "true") VimInt.ONE else VimInt.ZERO }
-            is NumberOption -> vimOption.limitedValues.map { option to VimInt(it) }
+            is NumberOption -> vimOption.limitedValues.map { option to VimInt.parseNumber(it) }
             is StringOption, is StringListOption -> {
               vimOption.limitedValues.map { limitedValue -> option to VimString(limitedValue) }
             }
@@ -410,7 +410,8 @@ class VimOptionsInvocationContext(private val options: List<Pair<Option<out VimD
 
 class OptionsSetup(private val options: List<Pair<Option<out VimDataType>, VimDataType?>>) :
   BeforeTestExecutionCallback {
-  override fun beforeTestExecution(context: ExtensionContext?) {
+
+  override fun beforeTestExecution(context: ExtensionContext) {
     options.forEach { (key, value) ->
       if (value != null) {
         // We must explicitly make an unchecked cast to remove the out annotation so that we can set the value, or the

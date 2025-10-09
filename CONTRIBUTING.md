@@ -130,8 +130,13 @@ Sed in orci mauris.
 Cras id tellus in ex imperdiet egestas.
 ```
 
-3. Don't forget to test your functionality with line start, line end, file start, file end, empty line, multiple
-carets, dollar motion, etc.
+3. Don't forget to test your functionality with various corner cases:
+   - **Position-based**: line start, line end, file start, file end, empty line, single character line
+   - **Content-based**: whitespace-only lines, lines with trailing spaces, mixed tabs and spaces, Unicode characters, multi-byte characters (e.g., emoji, CJK)
+   - **Selection-based**: multiple carets, visual mode (character/line/block), empty selection
+   - **Motion-based**: dollar motion, count with motion (e.g., `3w`, `5j`), zero-width motions
+   - **Buffer state**: empty file, single line file, very long lines, read-only files
+   - **Boundaries**: word boundaries with punctuation, sentence/paragraph boundaries, matching brackets at extremes
    
 ##### Neovim
 IdeaVim has an integration with neovim in tests. Tests that are performed with `doTest` also executed in

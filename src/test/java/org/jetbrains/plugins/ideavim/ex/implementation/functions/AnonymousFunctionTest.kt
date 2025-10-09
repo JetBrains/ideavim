@@ -101,7 +101,7 @@ class AnonymousFunctionTest : VimTestCase() {
       ),
     )
     assertPluginError(true)
-    assertPluginErrorMessageContains("E1203: Dot can only be used on a dictionary")
+    assertPluginErrorMessage("E1203: Dot can only be used on a dictionary")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
@@ -123,7 +123,7 @@ class AnonymousFunctionTest : VimTestCase() {
       ),
     )
     assertPluginError(true)
-    assertPluginErrorMessageContains("E717: Dictionary entry already exists")
+    assertPluginErrorMessage("E717: Dictionary entry already exists")
   }
 
   @Test
@@ -166,6 +166,6 @@ class AnonymousFunctionTest : VimTestCase() {
       ),
     )
     assertPluginError(true)
-    assertPluginErrorMessageContains("E718: Funcref required")
+    assertPluginErrorMessage("E718: Funcref required")
   }
 }

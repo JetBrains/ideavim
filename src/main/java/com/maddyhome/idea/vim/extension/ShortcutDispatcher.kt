@@ -64,7 +64,13 @@ internal open class ShortcutDispatcher<T>(
   protected val keyStrokes: MutableList<KeyStroke> = mutableListOf()
 
   final override fun actionPerformed(e: AnActionEvent) {
-    val keyStroke = getKeyStroke(e) ?: return
+    var keyStroke = getKeyStroke(e) ?: return
+    // Omit the modifier (shift) from keyStroke
+    keyStroke.keyChar.let {
+      if (it != KeyEvent.CHAR_UNDEFINED) {
+        keyStroke = KeyStroke.getKeyStroke(it)
+      }
+    }
     keyStrokes.add(keyStroke)
     listener.onKey(e, keyStrokes, trie.getEntries(keyStrokes))
 

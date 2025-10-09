@@ -34,7 +34,7 @@ data class DelCmdCommand(val range: Range, val modifier: CommandModifier, val ar
     if (!injector.commandGroup.hasAlias(argument)) {
       injector.messages.showStatusBarMessage(
         editor,
-        injector.messages.message("e184.no.such.user.defined.command.0", argument)
+        injector.messages.message("E184", argument)
       )
       return ExecutionResult.Error
     }

@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
-import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
+import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 import org.jdom.Element
 
 @State(
@@ -34,7 +34,7 @@ import org.jdom.Element
 )
 internal class IjVariableService : VimVariableServiceBase(), PersistentStateComponent<Element?> {
   override fun storeVariable(
-    variable: Variable,
+    variable: VariableExpression,
     value: VimDataType,
     editor: VimEditor,
     context: ExecutionContext,
@@ -46,7 +46,7 @@ internal class IjVariableService : VimVariableServiceBase(), PersistentStateComp
     if (scope == Scope.GLOBAL_VARIABLE) {
       val scopeForGlobalEnvironment = variable.scope?.toString() ?: ""
       VimScriptGlobalEnvironment.getInstance()
-        .variables[scopeForGlobalEnvironment + variable.name.evaluate(editor, context, vimContext)] = value.simplify()
+        .variables[scopeForGlobalEnvironment + variable.name.evaluate(editor, context, vimContext).value] = value.simplify()
     }
   }
 
@@ -103,7 +103,8 @@ internal class IjVariableService : VimVariableServiceBase(), PersistentStateComp
         }
 
         "int" -> {
-          vimVariables[variableElement.getAttributeValue("key")] = VimInt(variableElement.getAttributeValue("value"))
+          vimVariables[variableElement.getAttributeValue("key")] =
+            VimInt.parseNumber(variableElement.getAttributeValue("value")) ?: VimInt.ZERO
         }
       }
     }

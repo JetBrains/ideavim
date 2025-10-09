@@ -42,7 +42,7 @@ class GetFunctionTest : VimTestCase() {
 
   @Test
   fun `test get by nonexistent index in list`() {
-    assertCommandOutput("echo get(['one', 'two', 'three'], 10)", "-1")
+    assertCommandOutput("echo get(['one', 'two', 'three'], 10)", "0")
   }
 
   @Test

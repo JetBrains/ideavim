@@ -14,26 +14,20 @@ import java.text.DecimalFormatSymbols
 import java.util.Locale
 import kotlin.math.abs
 
-data class VimFloat(val value: Double) : VimDataType() {
-
-  override fun asDouble(): Double {
-    return value
-  }
-
-  override fun asString(): String {
-    throw exExceptionMessage("E806") // E806: Using a Float as a String
-  }
+data class VimFloat(val value: Double) : VimDataType("float") {
+  override fun toVimFloat() = this
 
   override fun toVimNumber(): VimInt {
-    throw exExceptionMessage("E805") // E805: Using a Float as a Number
+    throw exExceptionMessage("E805")
   }
 
   override fun toVimString(): VimString {
-    throw exExceptionMessage("E806") // E806: Using a Float as a String
+    throw exExceptionMessage("E806")
   }
 
-  override fun toString(): String {
+  override fun toOutputString(): String {
     if (value.isNaN()) return "nan"
+    if (value.isInfinite()) return if (value > 0) "inf" else "-inf"
     val tooBigOrTooSmall = abs(value) >= 1e6 || (abs(value) < 1e-3 && value != 0.0)
     val pattern = if (tooBigOrTooSmall) "0.0#####E0" else "0.0#####"
     val symbols = DecimalFormatSymbols.getInstance(Locale.ROOT).apply {
