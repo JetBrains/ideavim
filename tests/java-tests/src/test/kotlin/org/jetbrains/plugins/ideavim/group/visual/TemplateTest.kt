@@ -785,7 +785,7 @@ class TemplateTest : VimJavaTestCase() {
       """
         |class Hello {
         |  public static void main() {
-        |    int m${c}yNewVar = 5;
+        |    int my${c}NewVar = 5;
         |  }
         |}
       """.trimMargin()
