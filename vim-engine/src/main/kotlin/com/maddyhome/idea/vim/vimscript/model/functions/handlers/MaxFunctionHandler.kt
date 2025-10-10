@@ -36,7 +36,7 @@ internal class MaxFunctionHandler : FunctionHandler() {
     val values = when (expr) {
       is VimList -> expr.values
       is VimDictionary -> expr.dictionary.values.toList()
-      else -> throw exExceptionMessage("E712") // E712: Argument of max() must be a List or Dictionary
+      else -> throw exExceptionMessage("E712", "max()")
     }
 
     // Empty list/dict returns 0
@@ -47,8 +47,8 @@ internal class MaxFunctionHandler : FunctionHandler() {
     return try {
       val maxValue = values.maxOf { it.toVimNumber().value }
       VimInt(maxValue)
-    } catch (e: Exception) {
-      throw exExceptionMessage("E712") // E712: Argument of max() must be a List or Dictionary
+    } catch (_: Exception) {
+      throw exExceptionMessage("E712", "max()")
     }
   }
 }
