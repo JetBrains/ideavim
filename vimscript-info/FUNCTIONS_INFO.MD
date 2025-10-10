@@ -62,7 +62,7 @@ See `:help string-functions`.
 | ☑️     | `submatch()`        | get a specific match in ":s" and substitute()                    |
 |        | `strpart()`         | get part of a string using byte index                            |
 |        | `strcharpart()`     | get part of a string using char index                            |
-|        | `slice()`           | take a slice of a string, using char index in Vim9 script        |
+| ✅      | `slice()`           | take a slice of a string, using char index in Vim9 script        |
 |        | `strgetchar()`      | get character from a string using char index                     |
 |        | `expand()`          | expand special keywords                                          |
 |        | `expandcmd()`       | expand a command like done for `:edit`                           |
@@ -103,7 +103,7 @@ See `:help list-functions`.
 |        | `mapnew()`     | make a new List with changed items                            |
 |        | `foreach()`    | apply function to List items                                  |
 |        | `reduce()`     | reduce a List to a value                                      |
-|        | `slice()`      | take a slice of a List                                        |
+| ✅      | `slice()`      | take a slice of a List                                        |
 |        | `sort()`       | sort a List                                                   |
 | ✅      | `reverse()`    | reverse the order of items in a List                          |
 |        | `uniq()`       | remove copies of repeated adjacent items                      |
