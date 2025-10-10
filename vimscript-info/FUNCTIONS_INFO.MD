@@ -120,7 +120,7 @@ See `:help list-functions`.
 | ✅      | `repeat()`     | repeat a List multiple times                                  |
 |        | `flatten()`    | flatten a List                                                |
 |        | `flattennew()` | flatten a copy of a List                                      |
-|        | `items()`      | get List of List index-value pairs                            |
+| ✅      | `items()`      | get List of List index-value pairs                            |
 
 ## Dictionary manipulation
 
@@ -141,7 +141,7 @@ See `:help dict-functions`.
 |        | `foreach()`   | apply function to Dictionary items            |
 | ✅      | `keys()`      | get List of Dictionary keys                   |
 | ✅      | `values()`    | get List of Dictionary values                 |
-|        | `items()`     | get List of Dictionary key-value pairs        |
+| ✅      | `items()`     | get List of Dictionary key-value pairs        |
 | ✅      | `copy()`      | make a shallow copy of a Dictionary           |
 | ✅      | `deepcopy()`  | make a full copy of a Dictionary              |
 | ✅      | `string()`    | String representation of a Dictionary         |
