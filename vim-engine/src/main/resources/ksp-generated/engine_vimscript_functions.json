@@ -20,6 +20,7 @@
     "exists": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.variousFunctions.ExistsFunctionHandler",
     "exp": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.ExpFunctionHandler",
     "extend": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.ExtendFunctionHandler",
+    "extendnew": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.ExtendNewFunctionHandler",
     "float2nr": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.Float2NrFunctionHandler",
     "floor": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.FloorFunctionHandler",
     "fmod": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.FmodFunctionHandler",

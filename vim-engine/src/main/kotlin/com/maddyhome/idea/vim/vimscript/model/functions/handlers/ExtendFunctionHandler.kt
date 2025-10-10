@@ -19,7 +19,13 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandlerBase
 
 @VimscriptFunction(name = "extend")
-internal class ExtendFunctionHandler : FunctionHandlerBase<VimDataType>(minArity = 2, maxArity = 3) {
+internal class ExtendFunctionHandler : ExtendFunctionHandlerBase(makeCopy = false)
+
+@VimscriptFunction(name = "extendnew")
+internal class ExtendNewFunctionHandler : ExtendFunctionHandlerBase(makeCopy = true)
+
+internal abstract class ExtendFunctionHandlerBase(private val makeCopy: Boolean) :
+  FunctionHandlerBase<VimDataType>(minArity = 2, maxArity = 3) {
   override fun doFunction(
     arguments: Arguments,
     editor: VimEditor,
@@ -30,12 +36,13 @@ internal class ExtendFunctionHandler : FunctionHandlerBase<VimDataType>(minArity
     val argument2 = arguments[1]
 
     if (argument1 is VimList && argument2 is VimList) {
-      if (argument1.isLocked) {
-        throw exExceptionMessage("E741", "extend() argument")
+      val list = if (makeCopy) VimList(argument1.values.toMutableList()) else argument1
+      if (list.isLocked) {
+        throw exExceptionMessage("E741", "$name() argument")
       }
-      val index = arguments.getNumberOrNull(2)?.value ?: argument1.size
-      argument1.values.addAll(index, argument2.values)
-      return argument1
+      val index = arguments.getNumberOrNull(2)?.value ?: list.size
+      list.values.addAll(index, argument2.values)
+      return list
     }
 
     if (argument1 is VimDictionary && argument2 is VimDictionary) {
@@ -44,32 +51,34 @@ internal class ExtendFunctionHandler : FunctionHandlerBase<VimDataType>(minArity
         throw exExceptionMessage("E475", argument3)
       }
 
-      if (argument1.isLocked) {
-        throw exExceptionMessage("E741", "extend() argument")
+      val dict = if (makeCopy) VimDictionary(LinkedHashMap(argument1.dictionary)) else argument1
+
+      if (dict.isLocked) {
+        throw exExceptionMessage("E741", "$name() argument")
       }
 
       argument2.dictionary.forEach { (key, value) ->
-        if (argument1.dictionary.containsKey(key)) {
-          if (argument1.dictionary[key]?.isLocked == true) {
-            throw exExceptionMessage("E741", "extend() argument")
+        if (dict.dictionary.containsKey(key)) {
+          if (dict.dictionary[key]?.isLocked == true) {
+            throw exExceptionMessage("E741", "$name() argument")
           }
 
           when (argument3) {
-            "force" -> argument1.dictionary[key] = value
+            "force" -> dict.dictionary[key] = value
             "keep" -> { /* Do nothing. Keep the value in argument1 */
             }
 
             "error" -> throw exExceptionMessage("E737", key.toOutputString())
           }
         } else {
-          argument1.dictionary[key] = value
+          dict.dictionary[key] = value
         }
       }
 
       // TODO: Should return 0 on error. However, IdeaVim does not support this and can only throw errors
-      return argument1
+      return dict
     }
 
-    throw exExceptionMessage("E712", "extend()")
+    throw exExceptionMessage("E712", "$name()")
   }
 }
