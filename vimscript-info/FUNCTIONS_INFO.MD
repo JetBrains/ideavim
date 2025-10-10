@@ -140,7 +140,7 @@ See `:help dict-functions`.
 |        | `mapnew()`    | make a new Dictionary with changed items      |
 |        | `foreach()`   | apply function to Dictionary items            |
 | ✅      | `keys()`      | get List of Dictionary keys                   |
-|        | `values()`    | get List of Dictionary values                 |
+| ✅      | `values()`    | get List of Dictionary values                 |
 |        | `items()`     | get List of Dictionary key-value pairs        |
 | ✅      | `copy()`      | make a shallow copy of a Dictionary           |
 | ✅      | `deepcopy()`  | make a full copy of a Dictionary              |
