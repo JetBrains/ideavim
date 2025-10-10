@@ -31,4 +31,41 @@ class DeleteNextCharActionTest : VimExTestCase() {
     typeText("<Del><Del><Del><Del>")
     assertExIsDeactivated()
   }
+
+  @Test
+  fun `test delete deletes emoji as single grapheme`() {
+    typeText(":echo 👍<Left>")
+    typeText("<Del>")
+    assertExText("echo ")
+  }
+
+  @Test
+  fun `test delete deletes emoji with skin tone modifier as single grapheme`() {
+    typeText(":echo 👍🏽<Left><Left>")
+    typeText("<Del>")
+    assertExText("echo ")
+  }
+
+  @Test
+  fun `test delete deletes flag emoji as single grapheme`() {
+    typeText(":echo 🇺🇸<Left><Left>")
+    typeText("<Del>")
+    assertExText("echo ")
+  }
+
+  @Test
+  fun `test delete deletes emoji zwj sequence as single grapheme`() {
+    // Family emoji (man-woman-boy) uses ZWJ (Zero Width Joiner)
+    typeText(":echo 👨‍👩‍👦<Left><Left>")
+    typeText("<Del>")
+    assertExText("echo ")
+  }
+
+  @Test
+  fun `test delete deletes combining character with base as single grapheme`() {
+    // e with combining acute accent (é)
+    typeText(":echo e\u0301<Left><Left>")
+    typeText("<Del>")
+    assertExText("echo ")
+  }
 }

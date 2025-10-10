@@ -44,4 +44,36 @@ class DeletePreviousCharActionTest : VimExTestCase() {
     typeText("<BS>")
     assertExIsActive()
   }
+
+  @Test
+  fun `test backspace deletes emoji as single grapheme`() {
+    typeText(":echo 👍<BS>")
+    assertExText("echo ")
+  }
+
+  @Test
+  fun `test backspace deletes emoji with skin tone modifier as single grapheme`() {
+    typeText(":echo 👍🏽<BS>")
+    assertExText("echo ")
+  }
+
+  @Test
+  fun `test backspace deletes flag emoji as single grapheme`() {
+    typeText(":echo 🇺🇸<BS>")
+    assertExText("echo ")
+  }
+
+  @Test
+  fun `test backspace deletes emoji zwj sequence as single grapheme`() {
+    // Family emoji (man-woman-boy) uses ZWJ (Zero Width Joiner)
+    typeText(":echo 👨‍👩‍👦<BS>")
+    assertExText("echo ")
+  }
+
+  @Test
+  fun `test backspace deletes combining character with base as single grapheme`() {
+    // e with combining acute accent (é)
+    typeText(":echo e\u0301<BS>")
+    assertExText("echo ")
+  }
 }
