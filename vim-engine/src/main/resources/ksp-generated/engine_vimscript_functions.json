@@ -33,6 +33,7 @@
     "invert": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.bitwiseFunctions.InvertFunctionHandler",
     "isinf": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.IsInfFunctionHandler",
     "isnan": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.IsNanFunctionHandler",
+    "items": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.ItemsFunctionHandler",
     "join": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.listFunctions.JoinFunctionHandler",
     "keys": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.dictionaryFunctions.KeysFunctionHandler",
     "len": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.LenFunctionHandler",
