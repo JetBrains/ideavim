@@ -36,7 +36,7 @@ internal class MinFunctionHandler : FunctionHandler() {
     val values = when (expr) {
       is VimList -> expr.values
       is VimDictionary -> expr.dictionary.values.toList()
-      else -> throw exExceptionMessage("E712") // E712: Argument of min() must be a List or Dictionary
+      else -> throw exExceptionMessage("E712", "min()")
     }
 
     // Empty list/dict returns 0
@@ -47,8 +47,8 @@ internal class MinFunctionHandler : FunctionHandler() {
     return try {
       val minValue = values.minOf { it.toVimNumber().value }
       VimInt(minValue)
-    } catch (e: Exception) {
-      throw exExceptionMessage("E712") // E712: Argument of min() must be a List or Dictionary
+    } catch (_: Exception) {
+      throw exExceptionMessage("E712", "min()")
     }
   }
 }
