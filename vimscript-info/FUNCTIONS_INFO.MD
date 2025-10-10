@@ -93,7 +93,7 @@ See `:help list-functions`.
 | ✅      | `empty()`      | check if List is empty                                        |
 | ✅      | `insert()`     | insert an item somewhere in a List                            |
 | ✅      | `add()`        | append an item to a List                                      |
-|        | `extend()`     | append a List to a List                                       |
+| ✅      | `extend()`     | append a List to a List                                       |
 |        | `extendnew()`  | make a new List and append items                              |
 | ✅      | `remove()`     | remove one or more items from a List                          |
 | ✅      | `copy()`       | make a shallow copy of a List                                 |
@@ -133,7 +133,7 @@ See `:help dict-functions`.
 | ✅      | `has_key()`   | check whether a key appears in a Dictionary   |
 | ✅      | `empty()`     | check if Dictionary is empty                  |
 | ✅      | `remove()`    | remove an entry from a Dictionary             |
-|        | `extend()`    | add entries from one Dictionary to another    |
+| ✅      | `extend()`    | add entries from one Dictionary to another    |
 |        | `extendnew()` | make a new Dictionary and append items        |
 |        | `filter()`    | remove selected entries from a Dictionary     |
 |        | `map()`       | change each Dictionary entry                  |
