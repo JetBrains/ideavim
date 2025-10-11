@@ -103,4 +103,22 @@ class PrintLineNumberTest : VimTestCase() {
     enterCommand("2=p#")
     assertStatusLineMessageContains("2 \t\t\tconsectetur adipiscing elit")
   }
+
+  @Test
+  fun `test out of bounds range is clamped to last line`() {
+    configureByLines(10, "Lorem ipsum dolor sit amet")
+    enterCommand("\$+100=")
+    assertStatusLineMessageContains("10")
+  }
+
+  @Test
+  fun `test out of bounds range with flags is clamped to last line`() {
+    configureByText("""
+      |Lorem ipsum dolor sit amet
+      |consectetur adipiscing elit
+      |Maecenas efficitur nec odio vel malesuada
+    """.trimMargin())
+    enterCommand("\$+100=p")
+    assertStatusLineMessageContains("3 Maecenas efficitur nec odio vel malesuada")
+  }
 }
