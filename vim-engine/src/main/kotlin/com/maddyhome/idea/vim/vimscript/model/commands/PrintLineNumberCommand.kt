@@ -38,7 +38,7 @@ data class PrintLineNumberCommand(val range: Range, val modifier: CommandModifie
       throw exExceptionMessage("E488", argument)
     }
 
-    val line1 = range.getLineRange(editor, editor.currentCaret()).endLine1
+    val line1 = range.getLineRange(editor, editor.currentCaret()).endLine1.coerceAtMost(editor.lineCount())
 
     // `l` means output the line like `:list` - show unprintable chars, and include `^` and `$`
     // `#` means output the line with the line number
