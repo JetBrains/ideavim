@@ -18,7 +18,13 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandlerBase
 
 @VimscriptFunction(name = "flatten")
-class FlattenFunctionHandler : FunctionHandlerBase<VimList>(minArity = 1, maxArity = 2) {
+internal class FlattenFunctionHandler : FlattenFunctionHandlerBase(makeCopy = false)
+
+@VimscriptFunction(name = "flattennew")
+internal class FlattenNewFunctionHandler : FlattenFunctionHandlerBase(makeCopy = true)
+
+internal abstract class FlattenFunctionHandlerBase(private val makeCopy: Boolean)
+  : FunctionHandlerBase<VimList>(minArity = 1, maxArity = 2) {
   override fun doFunction(
     arguments: Arguments,
     editor: VimEditor,
@@ -27,7 +33,7 @@ class FlattenFunctionHandler : FunctionHandlerBase<VimList>(minArity = 1, maxAri
   ): VimList {
     val argument = arguments[0]
     if (argument !is VimList) {
-      throw exExceptionMessage("E686", "flatten()")
+      throw exExceptionMessage("E686", "$name()")
     }
 
     val maxDepth = arguments.getNumberOrNull(1)?.value ?: Int.MAX_VALUE
@@ -36,27 +42,33 @@ class FlattenFunctionHandler : FunctionHandlerBase<VimList>(minArity = 1, maxAri
     }
 
     if (argument.isLocked) {
-      throw exExceptionMessage("E741", "flatten() argument")
+      throw exExceptionMessage("E741", "$name() argument")
     }
 
-    if (maxDepth > 0) {
-      flatten(argument.values, 0, maxDepth)
-    }
+    val list = if (makeCopy) VimList(argument.values.toMutableList()) else argument
+    flatten(argument.values, list.values, 0, maxDepth)
 
-    return argument
+    return list
   }
 
-  private fun flatten(originalList: MutableList<VimDataType>, index: Int, depth: Int) {
+  private fun flatten(
+    originalList: MutableList<VimDataType>,
+    targetList: MutableList<VimDataType>,
+    index: Int,
+    depth: Int,
+  ) {
     if (depth == 0) return
     var index = index
-    while (index < originalList.size) {
-      val value = originalList[index]
+    while (index < targetList.size) {
+      val value = targetList[index]
       if (value is VimList) {
-        originalList.removeAt(index)
+        targetList.removeAt(index)
         // Note that value might be the original list! We have to be careful adding to the original list while also
-        // iterating over it.
-        originalList.addAll(index, value.values)
-        flatten(originalList, index, depth - 1)
+        // iterating over it, and if we're not modifying the original list, make sure to flatten the already modified
+        // copy!
+        val nestedList = if (value.values === originalList) targetList else value.values
+        targetList.addAll(index, nestedList)
+        flatten(originalList, targetList, index, depth - 1)
         index += value.values.size
       }
       else {
