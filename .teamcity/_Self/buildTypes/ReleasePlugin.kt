@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2025 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -100,14 +100,6 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       tasks = "scripts:setTeamCityBuildNumber"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
-//    gradle {
-//      name = "Update change log"
-//      tasks = "scripts:changelogUpdateUnreleased"
-//    }
-//    gradle {
-//      name = "Commit preparation changes"
-//      tasks = "scripts:commitChanges"
-//    }
     gradle {
       name = "Add release tag"
       tasks = "scripts:addReleaseTag"
@@ -122,21 +114,6 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       tasks = "publishPlugin"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
-//    script {
-//      name = "Checkout master branch"
-//      scriptContent = """
-//        echo Checkout master
-//        git checkout master
-//      """.trimIndent()
-//    }
-//    gradle {
-//      name = "Update change log in master"
-//      tasks = "scripts:changelogUpdateUnreleased"
-//    }
-//    gradle {
-//      name = "Commit preparation changes in master"
-//      tasks = "scripts:commitChanges"
-//    }
     script {
       name = "Push changes to the repo"
       scriptContent = """
@@ -154,10 +131,6 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       gradleParams = "--no-configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
-//    gradle {
-//      name = "Slack Notification"
-//      tasks = "slackNotification"
-//    }
   }
 
   features {
