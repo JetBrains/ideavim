@@ -171,6 +171,7 @@ tmapclear
 isnot
 
 extendnew
+flattennew
 funcref
 getcmdtype
 getline

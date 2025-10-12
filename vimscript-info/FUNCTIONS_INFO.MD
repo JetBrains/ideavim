@@ -119,7 +119,7 @@ See `:help list-functions`.
 | ✅      | `count()`      | count number of times a value appears in a List               |
 | ✅      | `repeat()`     | repeat a List multiple times                                  |
 | ✅      | `flatten()`    | flatten a List                                                |
-|        | `flattennew()` | flatten a copy of a List                                      |
+| ✅      | `flattennew()` | flatten a copy of a List                                      |
 | ✅      | `items()`      | get List of List index-value pairs                            |
 
 ## Dictionary manipulation
