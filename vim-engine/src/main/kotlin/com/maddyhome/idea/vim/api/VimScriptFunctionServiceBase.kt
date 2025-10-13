@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.api
 
-import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.Script
@@ -21,8 +20,6 @@ import com.maddyhome.idea.vim.vimscript.model.functions.VimscriptFunctionProvide
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 
 abstract class VimScriptFunctionServiceBase : VimscriptFunctionService {
-  private val logger = vimLogger<VimScriptFunctionServiceBase>()
-
   protected abstract val functionProviders: List<VimscriptFunctionProvider>
 
   private val globalFunctions: MutableMap<String, FunctionDeclaration> = mutableMapOf()
@@ -167,10 +164,10 @@ abstract class VimScriptFunctionServiceBase : VimscriptFunctionService {
   }
 
   override fun registerHandlers() {
-    functionProviders.forEach { provider -> provider.getFunctions().forEach { addHandler(it) } }
-  }
-
-  override fun addHandler(handler: LazyVimscriptFunction) {
-    builtInFunctions[handler.name] = handler
+    functionProviders.forEach { provider ->
+      provider.getFunctions().forEach {
+        builtInFunctions[it.name] = it
+      }
+    }
   }
 }
