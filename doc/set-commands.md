@@ -180,12 +180,6 @@ Unless otherwise stated, these options do not have abbreviations.
         value is off. The equivalent processing for paste is controlled by the
         "ideaput" value to the 'clipboard' option.
 
-'ideaglobalmode'        boolean (default off)
-                        global
-        This option will cause IdeaVim to share a single mode across all open
-        windows. In other words, entering Insert mode in one window will
-        enable Insert mode in all windows.
-
 'ideajoin'              boolean (default off)
                         global or local to buffer
         When enabled, join commands will be handled by the IDE's "smart join"

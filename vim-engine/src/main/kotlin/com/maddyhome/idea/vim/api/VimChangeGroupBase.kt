@@ -442,9 +442,11 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    */
   override fun initInsert(editor: VimEditor, context: ExecutionContext, mode: Mode) {
     val state = injector.vimState
-    for (caret in editor.nativeCarets()) {
-      caret.vimInsertStart = editor.createLiveMarker(caret.offset, caret.offset)
-      injector.markService.setMark(caret, MARK_CHANGE_START, caret.offset)
+    injector.application.runReadAction {
+      for (caret in editor.nativeCarets()) {
+        caret.vimInsertStart = editor.createLiveMarker(caret.offset, caret.offset)
+        injector.markService.setMark(caret, MARK_CHANGE_START, caret.offset)
+      }
     }
     val cmd = state.executingCommand
     if (cmd != null && state.isDotRepeatInProgress) {
@@ -470,7 +472,9 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       val myChangeListener = VimChangesListener()
       vimDocumentListener = myChangeListener
       vimDocument!!.addChangeListener(myChangeListener)
-      oldOffset = editor.currentCaret().offset
+      injector.application.runReadAction {
+        oldOffset = editor.currentCaret().offset
+      }
       editor.insertMode = mode == Mode.INSERT
       editor.mode = mode
     }
