@@ -11,9 +11,10 @@ package com.maddyhome.idea.vim.vimscript.model.functions.handlers
 import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimBlob
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.functions.UnaryFunctionHandler
@@ -26,22 +27,24 @@ internal class ReverseFunctionHandler : UnaryFunctionHandler<VimDataType>() {
     context: ExecutionContext,
     vimContext: VimLContext,
   ): VimDataType {
-    val obj = arguments[0]
-
-    return when (obj) {
+    val argument = arguments[0]
+    return when (argument) {
       is VimList -> {
-        // Reverse the list in place and return it
-        obj.values.reverse()
-        obj
+        if (argument.isLocked) {
+          throw exExceptionMessage("E741", "reverse() argument")
+        }
+        argument.also { it.values.reverse() }
       }
+
       is VimString -> {
-        // For String, create a new reversed String
-        VimString(obj.value.reversed())
+        if (argument.isLocked) {
+          throw exExceptionMessage("E741", "reverse() argument")
+        }
+        VimString(argument.value.reversed())
       }
-      else -> {
-        // Return 0 for unsupported types (Tuple and Blob not implemented yet)
-        VimInt(0)
-      }
+
+      is VimBlob -> TODO()
+      else -> throw exExceptionMessage("E1252", 1)
     }
   }
 }
