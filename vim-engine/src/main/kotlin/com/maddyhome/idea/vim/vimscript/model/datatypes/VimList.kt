@@ -10,6 +10,16 @@ package com.maddyhome.idea.vim.vimscript.model.datatypes
 
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 
+/**
+ * Represents a Vim List
+ *
+ * This type does NOT have value semantics. It is not correct to compare two instances of this type for structural
+ * equality. This is required so that recursive data structures don't cause problems with equality or hash codes.
+ *
+ * It cannot be converted to a Number, Float, or String. When output, any recursively used elements are replaced with a
+ * placeholder. When inserted into a document as text, the value must be less than 100 levels deep, or an exception is
+ * thrown.
+ */
 data class VimList(val values: MutableList<VimDataType>) : VimDataType("list") {
   operator fun get(index: Int): VimDataType = this.values[index]
 
