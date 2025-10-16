@@ -11,6 +11,7 @@ package org.jetbrains.plugins.ideavim.ex.implementation.expressions.datatypes
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 
 class VimStringTest {
 
@@ -92,5 +93,17 @@ class VimStringTest {
   @Test
   fun `string as boolean2`() {
     assertEquals(true, VimString("3oh, hi Mark").toVimNumber().booleanValue)
+  }
+
+  @Test
+  fun `test string has value semantics`() {
+    assertEquals(VimString("foo"), VimString("foo"))
+    assertEquals(VimString("foo").hashCode(), VimString("foo").hashCode())
+
+    assertNotEquals(VimString("foo"), VimString("bar"))
+    assertNotEquals(VimString("foo").hashCode(), VimString("bar").hashCode())
+
+    assertNotEquals(VimString("foo"), VimString("FOO"))
+    assertNotEquals(VimString("foo").hashCode(), VimString("FOO").hashCode())
   }
 }

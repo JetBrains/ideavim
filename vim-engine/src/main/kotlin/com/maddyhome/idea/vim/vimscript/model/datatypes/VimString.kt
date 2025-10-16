@@ -10,6 +10,21 @@ package com.maddyhome.idea.vim.vimscript.model.datatypes
 
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 
+/**
+ * Represents a Vim String
+ *
+ * This type has value semantics, i.e., two instances of [VimString] are considered equal if they have the same
+ * underlying string value, based on Kotlin structural equality.
+ *
+ * Because I can never remember Kotlin's equality rules, especially with strings: this is a data class, so gets
+ * generated `equals` and `hashCode` methods based on the string [value] property. The `equals` method uses Kotlin's
+ * `Intrinsics.areEqual` method which will call `String.equals` if the objects are of the same type. This returns true
+ * if the two strings are of the same length and have the same characters at the same positions. It is therefore
+ * case-sensitive.
+ *
+ * A String can be automatically converted to a Number, but not a Float. The string value is parsed as a decimal, hex,
+ * octal, or binary integer, and trailing characters are ignored. If the value can't be parsed, it is treated as zero.
+ */
 data class VimString(val value: String) : VimDataType("string") {
   override fun toVimFloat(): VimFloat {
     throw exExceptionMessage("E892")
