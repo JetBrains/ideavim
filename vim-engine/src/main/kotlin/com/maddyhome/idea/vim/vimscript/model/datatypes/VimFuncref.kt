@@ -75,22 +75,39 @@ class VimFuncref(
     throw exExceptionMessage("E729")
   }
 
-  override fun toOutputString(): String {
-    return if (arguments.values.isEmpty() && dictionary == null) {
-      when (type) {
-        Type.LAMBDA -> "function('${handler.name}')"
-        Type.FUNCREF -> "function('${handler.name}')"
-        Type.FUNCTION -> handler.name
+  override fun toOutputString() = buildString {
+    val visited = mutableSetOf<VimDataType>()
+    buildOutputString(this, visited)
+  }
+
+  override fun buildOutputString(builder: StringBuilder, visited: MutableSet<VimDataType>) {
+    builder.run {
+      if (arguments.values.isEmpty() && dictionary == null) {
+        append(
+          when (type) {
+            Type.LAMBDA -> "function('${handler.name}')"
+            Type.FUNCREF -> "function('${handler.name}')"
+            Type.FUNCTION -> handler.name
+          }
+        )
+      } else {
+        builder.run {
+          append("function('${handler.name}'")
+          if (arguments.values.isNotEmpty()) {
+            append(", ")
+            arguments.buildOutputString(this, mutableSetOf())
+          }
+          if (dictionary != null) {
+            append(", ")
+            dictionary!!.buildOutputString(this, mutableSetOf())
+          }
+          append(")")
+        }
       }
-    } else {
-      val result = StringBuffer("function('${handler.name}'")
-      if (arguments.values.isNotEmpty()) {
-        result.append(", ").append(arguments.toOutputString())
-      }
-      result.append(")")
-      result.toString()
     }
   }
+
+  override fun toInsertableString(): String = throw exExceptionMessage("E729")
 
   fun execute(
     name: String,

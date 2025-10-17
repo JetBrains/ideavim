@@ -11,7 +11,6 @@ package org.jetbrains.plugins.ideavim.ex.implementation.expressions.datatypes
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
@@ -77,15 +76,13 @@ class VimDictionaryTest : VimDataTypeTest() {
     assertEquals("{'key1': 1, 'key2': {'key1': 1, 'key2': 'value'}}", dictionary.toOutputString())
   }
 
-  @Disabled("Not yet implemented")
   @Test
   fun `test output string for recursive Dictionary`() {
     val dictionary = toVimDictionary("key1" to 1, "key2" to 2, "key3" to 3)
-    dictionary.dictionary[VimString("key3")] = dictionary
+    dictionary.dictionary[VimString("key2")] = dictionary
     assertEquals("{'key1': 1, 'key2': {...}, 'key3': 3}", dictionary.toOutputString())
   }
 
-  @Disabled("Not yet implemented")
   @Test
   fun `test output string for repeated recursive Dictionary`() {
     val dictionary = toVimDictionary("key1" to 1, "key2" to 2, "key3" to 3)
@@ -94,34 +91,29 @@ class VimDictionaryTest : VimDataTypeTest() {
     assertEquals("{'key1': {...}, 'key2': 2, 'key3': {...}}", dictionary.toOutputString())
   }
 
-  @Disabled("Not yet implemented")
   @Test
   fun `test output string for indirectly recursive Dictionary`() {
     val innerDictionary = toVimDictionary("foo" to 1, "d" to 3, "bar" to 2)
     val dictionary = toVimDictionary("key1" to 1, "key2" to 2, "key3" to 3)
-    (dictionary.dictionary[VimString("key2")] as VimDictionary).dictionary[VimString("d")] = innerDictionary
+    dictionary.dictionary[VimString("key2")] = innerDictionary
+    innerDictionary.dictionary[VimString("d")] = innerDictionary
     assertEquals("{'key1': 1, 'key2': {'foo': 1, 'd': {...}, 'bar': 2}, 'key3': 3}", dictionary.toOutputString())
   }
 
-  @Disabled("Not yet implemented")
   @Test
   fun `test output string for repeated List value in Dictionary`() {
     val dictionary = toVimDictionary("key1" to toVimList(1, 2, 3), "key2" to 2, "key3" to toVimList(1, 2, 3))
-    dictionary.dictionary[VimString("key1")] = dictionary
-    dictionary.dictionary[VimString("key3")] = dictionary
     assertEquals("{'key1': [1, 2, 3], 'key2': 2, 'key3': [1, 2, 3]}", dictionary.toOutputString())
   }
 
-  @Disabled("Not yet implemented")
   @Test
   fun `test output string for Dictionary with indirectly nested lists`() {
     val innerList = toVimList(9, 8, 7)
     val dictionary = toVimDictionary(
       "key1" to toVimList(1, innerList, 3),
-      "key2" to 2, "key3" to toVimList(1, innerList, 3)
+      "key2" to 2,
+      "key3" to toVimList(1, innerList, 3)
     )
-    dictionary.dictionary[VimString("key1")] = dictionary
-    dictionary.dictionary[VimString("key3")] = dictionary
     assertEquals("{'key1': [1, [9, 8, 7], 3], 'key2': 2, 'key3': [1, [...], 3]}", dictionary.toOutputString())
   }
 
@@ -129,6 +121,16 @@ class VimDictionaryTest : VimDataTypeTest() {
   fun `test insertable string for simple Dictionary`() {
     val dictionary = toVimDictionary("key1" to 1, "key2" to "value", "key3" to 3.14, "key4" to listOf(1, 2, 3))
     assertEquals("{'key1': 1, 'key2': 'value', 'key3': 3.14, 'key4': [1, 2, 3]}", dictionary.toOutputString())
+  }
+
+  @Test
+  fun `test insertable string for recursive Dictionary throws exception`() {
+    val dictionary = toVimDictionary("key1" to 1, "key2" to 2, "key3" to 3)
+    dictionary.dictionary[VimString("key2")] = dictionary
+    val exception = assertThrows<ExException> {
+      dictionary.toInsertableString()
+    }
+    assertEquals("E724: Variable nested too deep for displaying", exception.message)
   }
 
   // TODO: DeepCopy tests, when we implement Vim's deepcopy()
