@@ -8,7 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.expressions.operators
 
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.intellij.testFramework.assertInstanceOf
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -69,10 +69,8 @@ class FalsyOperatorTest : VimTestCase() {
 
   @Test
   fun `test non-empty List treated as truthy`() {
-    assertEquals(
-      VimList(mutableListOf(VimInt(1), VimInt(2), VimInt(3))),
-      VimscriptParser.parseExpression("[1, 2, 3] ?? 'list is empty'")!!.evaluate(),
-    )
+    val expression = VimscriptParser.parseExpression("[1, 2, 3] ?? 'list is empty'")!!.evaluate()
+    assertInstanceOf<VimList>(expression)
   }
 
   @Test
@@ -82,8 +80,7 @@ class FalsyOperatorTest : VimTestCase() {
 
   @Test
   fun `test non-empty Dictionary treated as truthy`() {
-    val dictionary = LinkedHashMap<VimString, VimDataType>()
-    dictionary.put(VimString("1"), VimInt(1))
-    assertEquals(VimDictionary(dictionary), VimscriptParser.parseExpression("{'1': 1} ?? 'dict is empty'")!!.evaluate())
+    val expression = VimscriptParser.parseExpression("{'1': 1} ?? 'dict is empty'")!!.evaluate()
+    assertInstanceOf<VimDictionary>(expression)
   }
 }

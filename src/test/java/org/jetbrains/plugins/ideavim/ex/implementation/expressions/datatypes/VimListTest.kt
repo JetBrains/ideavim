@@ -26,7 +26,6 @@ class VimListTest : VimDataTypeTest() {
     assertEquals(VimInt(1), list[0])
   }
 
-  @Disabled("Not yet implemented")
   @Test
   fun `test VimList does not have value semantics`() {
     val list1 = toVimList(1, 2, 3)
