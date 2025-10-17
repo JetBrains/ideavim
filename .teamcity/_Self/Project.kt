@@ -17,7 +17,8 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.Project
 object Project : Project({
   description = "Vim engine for JetBrains IDEs"
 
-  subProjects(Releases, GitHub)
+  subProject(Releases)
+  subProject(GitHub)
 
   // VCS roots
   vcsRoot(GitHubPullRequest)
