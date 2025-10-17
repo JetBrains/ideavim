@@ -44,7 +44,7 @@ import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
  * Use [execute] to invoke the function. This will resolve the function handler if necessary and ensure a dictionary
  * function has the dictionary scope it requires. Do not invoke the function handler directly!
  */
-data class VimFuncref(
+class VimFuncref(
   val handler: FunctionHandler,
   val arguments: VimList,
   var dictionary: VimDictionary?,
@@ -128,7 +128,8 @@ data class VimFuncref(
   }
 
   override fun deepCopy(level: Int): VimFuncref {
-    return copy()
+    // TODO: Confirm semantics
+    return VimFuncref(handler, arguments.deepCopy(0), dictionary?.deepCopy(0), type)
   }
 
   override fun lockVar(depth: Int) {

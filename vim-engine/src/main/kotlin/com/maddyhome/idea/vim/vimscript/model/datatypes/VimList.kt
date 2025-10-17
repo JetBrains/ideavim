@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.ex.exExceptionMessage
  * placeholder. When inserted into a document as text, the value must be less than 100 levels deep, or an exception is
  * thrown.
  */
-data class VimList(val values: MutableList<VimDataType>) : VimDataType("list") {
+class VimList(val values: MutableList<VimDataType>) : VimDataType("list") {
   operator fun get(index: Int): VimDataType = this.values[index]
 
   override fun toVimFloat(): VimFloat {
@@ -44,7 +44,7 @@ data class VimList(val values: MutableList<VimDataType>) : VimDataType("list") {
 
   override fun toInsertableString() = values.joinToString(separator = "") { it.toOutputString() + "\n" }
 
-  override fun deepCopy(level: Int): VimDataType {
+  override fun deepCopy(level: Int): VimList {
     return if (level > 0) {
       VimList(values.map { it.deepCopy(level - 1) }.toMutableList())
     } else {
