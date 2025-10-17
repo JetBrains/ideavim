@@ -56,6 +56,15 @@ abstract class VimDataType(val typeName: String) {
   abstract fun toOutputString(): String
 
   /**
+   * Implementation of [toOutputString] for recursive lists and dictionaries
+   *
+   * DO NOT USE!
+   */
+  internal open fun buildOutputString(builder: StringBuilder, visited: MutableSet<VimDataType>) {
+    builder.append(toOutputString())
+  }
+
+  /**
    * Returns a textual representation of the object, suitable for inserting into the editor's text
    *
    * Used when evaluating the expression register (e.g. `i_CTRL-R_=` and `c_CTRL-R_=`), or when using an expression with
@@ -65,6 +74,16 @@ abstract class VimDataType(val typeName: String) {
    * E.g. [VimList] will treat items as separate lines (even in a command prompt!)
    */
   open fun toInsertableString() = toOutputString()
+
+  /**
+   * Implementation of [toInsertableString] for recursive lists and dictionaries
+   *
+   * DO NOT USE!
+   */
+  internal open fun buildInsertableString(builder: StringBuilder, depth: Int): Boolean {
+    builder.append(toInsertableString())
+    return true
+  }
 
   abstract fun deepCopy(level: Int = 100): VimDataType
 

@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref.Type
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
-import org.junit.jupiter.api.Disabled
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
@@ -60,7 +60,6 @@ class VimFuncrefTest : VimDataTypeTest() {
     assertEquals("E729: Using a Funcref as a String", exception.message)
   }
 
-  // TODO: Lots of output string tests
   @Test
   fun `test output string for funcref`() {
     val funcref = getVimFuncref(type = Type.FUNCREF)
@@ -86,7 +85,6 @@ class VimFuncrefTest : VimDataTypeTest() {
     assertEquals("function('Fake', [1, 2, 3])", funcref.toOutputString())
   }
 
-  @Disabled("Not yet implemented")
   @Test
   fun `test output string for partial dictionary function`() {
     val dictionary = toVimDictionary("key1" to 12, "key2" to "something", "key3" to toVimList(1, 2, 3))
@@ -94,7 +92,6 @@ class VimFuncrefTest : VimDataTypeTest() {
     assertEquals("function('Fake', {'key1': 12, 'key2': 'something', 'key3': [1, 2, 3]})", funcref.toOutputString())
   }
 
-  @Disabled("Not yet implemented")
   @Test
   fun `test output string for partial dictionary function with arguments`() {
     val arguments = toVimList(1, 2, 3)
@@ -103,7 +100,6 @@ class VimFuncrefTest : VimDataTypeTest() {
     assertEquals("function('Fake', [1, 2, 3], {'key1': 12, 'key2': 'something', 'key3': [1, 2, 3]})", funcref.toOutputString())
   }
 
-  @Disabled("Not yet implemented")
   @Test
   fun `test output string for partial function with recursive arguments list`() {
     val arguments = toVimList(1, 2, 3)
@@ -112,7 +108,6 @@ class VimFuncrefTest : VimDataTypeTest() {
     assertEquals("function('Fake', [1, [...], 3])", funcref.toOutputString())
   }
 
-  @Disabled("Not yet implemented")
   @Test
   fun `test output string for partial function with recursive inner arguments list`() {
     val innerList = toVimList(1, 2, 3)
@@ -122,7 +117,6 @@ class VimFuncrefTest : VimDataTypeTest() {
     assertEquals("function('Fake', [9, [1, [...], 3], 7])", funcref.toOutputString())
   }
 
-  @Disabled("Not yet implemented")
   @Test
   fun `test output string for partial function with list used in arguments and dictionary`() {
     val list = toVimList(1, 2, 3)
@@ -131,16 +125,18 @@ class VimFuncrefTest : VimDataTypeTest() {
     assertEquals("function('Fake', [1, 2, 3], {'foo': [1, 2, 3]})", funcref.toOutputString())
   }
 
-  @Disabled("Not yet implemented")
+  @VimBehaviorDiffers(
+    originalVimAfter = "function('Fake', [1, 2, 3], {'foo': [1, 2, 3], 'bar': [1, 2, 3]})",
+    description = "The dictionary parameter displays differently to the same dictionary as a top level variable"
+  )
   @Test
   fun `test output string for partial function with repeated list used in dictionary`() {
     val list = toVimList(1, 2, 3)
     val dictionary = toVimDictionary("foo" to list, "bar" to list)
     val funcref = getVimFuncref(arguments = list, dictionary = dictionary)
-    assertEquals("function('Fake', [1, 2, 3], {'foo': [1, 2, 3], 'bar': [1, 2, 3]})", funcref.toOutputString())
+    assertEquals("function('Fake', [1, 2, 3], {'foo': [1, 2, 3], 'bar': [...]})", funcref.toOutputString())
   }
 
-  @Disabled("Not yet implemented")
   @Test
   fun `test throws when trying to create insertable string`() {
     val funcref = getVimFuncref()
