@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.ex.exExceptionMessage
  * placeholder. When inserted into a document as text, the value must be less than 100 levels deep, or an exception is
  * thrown.
  */
-data class VimDictionary(val dictionary: LinkedHashMap<VimString, VimDataType>) : VimDataType("dict") {
+class VimDictionary(val dictionary: LinkedHashMap<VimString, VimDataType>) : VimDataType("dict") {
   override fun toVimFloat(): VimFloat {
     throw exExceptionMessage("E894")
   }

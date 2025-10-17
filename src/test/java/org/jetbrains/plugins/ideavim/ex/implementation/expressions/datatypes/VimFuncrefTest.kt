@@ -17,7 +17,6 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref.Type
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 import org.junit.jupiter.api.Disabled
@@ -27,7 +26,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
 class VimFuncrefTest : VimDataTypeTest() {
-  @Disabled("Not yet implemented")
   @Test
   fun `test does not have value semantics`() {
     val funcref1 = getVimFuncref()

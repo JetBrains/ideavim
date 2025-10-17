@@ -18,7 +18,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
 class VimDictionaryTest : VimDataTypeTest() {
-  @Disabled("Not yet implemented")
   @Test
   fun `test VimDictionary does not have value semantics`() {
     val dictionary1 = toVimDictionary("key1" to 1, "key2" to 2)

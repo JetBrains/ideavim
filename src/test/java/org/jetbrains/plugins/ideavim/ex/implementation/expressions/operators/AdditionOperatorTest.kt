@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.ex.evaluate
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertInstanceOf
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
 
@@ -69,10 +70,11 @@ class AdditionOperatorTest : VimTestCase() {
 
   @Test
   fun `list plus list`() {
-    assertEquals(
-      VimList(mutableListOf(VimInt(3), VimInt(1), VimInt(2))),
-      VimscriptParser.parseExpression("[3] + [1, 2]")!!.evaluate(),
-    )
+    val expression = VimscriptParser.parseExpression("[3] + [1, 2]")!!.evaluate()
+    assertInstanceOf<VimList>(expression)
+    assertEquals(VimInt(3), expression[0])
+    assertEquals(VimInt(1), expression[1])
+    assertEquals(VimInt(2), expression[2])
   }
 
   @Test
