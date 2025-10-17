@@ -5,6 +5,7 @@ import _Self.buildTypes.LongRunning
 import _Self.buildTypes.Nvim
 import _Self.buildTypes.PluginVerifier
 import _Self.buildTypes.PropertyBased
+import _Self.buildTypes.RandomOrderTests
 import _Self.buildTypes.TestingBuildType
 import _Self.subprojects.GitHub
 import _Self.subprojects.Releases
@@ -30,6 +31,7 @@ object Project : Project({
 
   buildType(PropertyBased)
   buildType(LongRunning)
+  buildType(RandomOrderTests)
 
   buildType(Nvim)
   buildType(PluginVerifier)
