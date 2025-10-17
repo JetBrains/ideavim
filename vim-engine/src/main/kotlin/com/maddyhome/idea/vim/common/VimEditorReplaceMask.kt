@@ -17,8 +17,10 @@ class VimEditorReplaceMask {
   fun recordChangeAtCaret(editor: VimEditor) {
     for (caret in editor.carets()) {
       val offset = caret.offset
-      val marker = editor.createLiveMarker(offset, offset)
-      changedChars[marker] = editor.charAt(offset)
+      if (offset < editor.fileSize()) {
+        val marker = editor.createLiveMarker(offset, offset)
+        changedChars[marker] = editor.charAt(offset)
+      }
     }
   }
 
