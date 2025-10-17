@@ -13,7 +13,6 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
@@ -86,7 +85,6 @@ class VimListTest : VimDataTypeTest() {
     assertEquals("[1, 'two', 3.14, {'foo': 'bar', 'baz': 123}]", list.toOutputString())
   }
 
-  @Disabled("Not yet implemented")
   @Test
   fun `test output string for recursive List`() {
     val list = toVimList(1, 2, 3)
@@ -94,7 +92,6 @@ class VimListTest : VimDataTypeTest() {
     assertEquals("[1, [...], 3]", list.toOutputString())
   }
 
-  @Disabled("Not yet implemented")
   @Test
   fun `test output string for repeated references to current List`() {
     val list = toVimList(1, 2, 3, 4, 5, 6, 7)
@@ -104,7 +101,6 @@ class VimListTest : VimDataTypeTest() {
     assertEquals("[1, [...], 3, [...], 5, [...], 7]", list.toOutputString())
   }
 
-  @Disabled("Not yet implemented")
   @Test
   fun `test output string for indirectly recursive List`() {
     val list = toVimList(1, toVimList(4, toVimList(7, 8, 9), 6), 3)
@@ -112,7 +108,6 @@ class VimListTest : VimDataTypeTest() {
     assertEquals("[1, [4, [7, [...], 9], 6], 3]", list.toOutputString())
   }
 
-  @Disabled("Not yet implemented")
   @Test
   fun `test output string when List used inside Dictionary`() {
     val dictionary = toVimDictionary("foo" to 42)
@@ -121,7 +116,6 @@ class VimListTest : VimDataTypeTest() {
     assertEquals("[1, {'foo': [...]}, 3]", list.toOutputString())
   }
 
-  @Disabled("Not yet implemented")
   @Test
   fun `test output string for recursive use of inner sublist`() {
     val innerList = toVimList(9, 8, 7)
@@ -142,7 +136,6 @@ class VimListTest : VimDataTypeTest() {
     assertEquals("1\n[2, 3]\n4\n", list.toInsertableString())
   }
 
-  @Disabled("Not yet implemented")
   @Test
   fun `test insertable string expands recursive subitem only for 100 levels`() {
     val list = toVimList(1, 2, 3)
@@ -156,7 +149,6 @@ class VimListTest : VimDataTypeTest() {
     assertEquals(expected, list.toInsertableString())
   }
 
-  @Disabled("Not yet implemented")
   @Test
   fun `test insertable string expands indirectly recursive subitem only for 100 levels`() {
     val list = toVimList(1, 2, 3)

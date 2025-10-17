@@ -34,15 +34,58 @@ class VimDictionary(val dictionary: LinkedHashMap<VimString, VimDataType>) : Vim
   }
 
   override fun toOutputString() = buildString {
-    append("{")
-    append(dictionary.map { (key, value) ->
-      val valueString = when (value) {
-        is VimString -> "'${value.value}'"
-        else -> value.toOutputString()  // TODO: Handle recursive entries
+    buildOutputString(this, mutableSetOf())
+  }
+
+  override fun buildOutputString(builder: StringBuilder, visited: MutableSet<VimDataType>) {
+    if (visited.contains(this@VimDictionary)) {
+      builder.append("{...}")
+    }
+    else {
+      visited.add(this)
+      builder.run {
+        append("{")
+        var count = 0
+        dictionary.forEach { (key, value) ->
+          if (count > 0) append(", ")
+          if (value is VimString) {
+            append("'${key.value}': '${value.value}'")
+          } else {
+            append("'${key.value}': ")
+            value.buildOutputString(this, visited)
+          }
+          count++
+        }
+        append("}")
       }
-      "'${key.value}': $valueString"
-    }.joinToString(separator = ", "))
-    append("}")
+    }
+  }
+
+  override fun toInsertableString() = buildString {
+    buildInsertableString(this, 1)
+  }
+
+  override fun buildInsertableString(builder: StringBuilder, depth: Int): Boolean {
+    if (depth == 100) {
+      throw exExceptionMessage("E724")
+    }
+    builder.run {
+      append("{")
+      var count = 0
+      dictionary.forEach { (key, value) ->
+        if (count > 0) append(", ")
+        append("'").append(key.value).append("'")
+        if (value is VimString) {
+          append("'").append(value.value).append("'")
+        }
+        else {
+          value.buildInsertableString(this, depth + 1)
+        }
+        count++
+      }
+      append("}")
+    }
+    return true
   }
 
   override fun deepCopy(level: Int): VimDictionary {

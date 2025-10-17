@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.vimscript.model.datatypes
 
 import com.maddyhome.idea.vim.ex.exExceptionMessage
+import kotlin.text.appendLine
 
 /**
  * Represents a Vim List
@@ -36,13 +37,73 @@ class VimList(val values: MutableList<VimDataType>) : VimDataType("list") {
   }
 
   override fun toOutputString() = buildString {
-    append("[")
-    // TODO: Handle recursive references
-    values.joinTo(this, separator = ", ") { if (it is VimString) "'${it.value}'" else it.toOutputString() }
-    append("]")
+    buildOutputString(this, mutableSetOf())
   }
 
-  override fun toInsertableString() = values.joinToString(separator = "") { it.toOutputString() + "\n" }
+  override fun buildOutputString(builder: StringBuilder, visited: MutableSet<VimDataType>) {
+    if (visited.contains(this)) {
+      builder.append("[...]")
+      return
+    }
+    visited.add(this)
+    builder.run {
+      append("[")
+      values.forEachIndexed { index, value ->
+        if (index > 0) append(", ")
+        if (value is VimString) {
+          append("'").append(value.value).append("'")
+        }
+        else {
+          value.buildOutputString(builder, visited)
+        }
+      }
+      append("]")
+    }
+  }
+
+  override fun toInsertableString() = buildString {
+    values.forEach {
+      if (it is VimString) {
+        append("'").append(it.value).append("'")
+      }
+      else {
+        it.buildInsertableString(this, 1)
+      }
+      appendLine()
+    }
+  }
+
+  override fun buildInsertableString(builder: StringBuilder, depth: Int): Boolean {
+    builder.run {
+      return when (depth) {
+        100 -> {
+          append("[{E724}]")  // E724: Variable nested too deep for displaying
+          false
+        }
+
+        else -> {
+          append("[")
+          var result = true
+          var count = 0
+          while (count < values.size) {
+            val value = values[count]
+            if (count > 0) append(", ")
+            if (value is VimString) {
+              append("'").append(value.value).append("'")
+            } else {
+              if (!value.buildInsertableString(builder, depth + 1)) {
+                result = false
+                break
+              }
+            }
+            count++
+          }
+          append("]")
+          result
+        }
+      }
+    }
+  }
 
   override fun deepCopy(level: Int): VimList {
     return if (level > 0) {
