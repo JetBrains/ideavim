@@ -11,7 +11,7 @@ package com.maddyhome.idea.vim.extension.hints
 import com.intellij.ui.treeStructure.Tree
 import java.awt.Component
 import java.awt.Point
-import java.util.*
+import java.util.WeakHashMap
 import javax.accessibility.Accessible
 import javax.swing.SwingUtilities
 
@@ -44,9 +44,9 @@ internal sealed class HintGenerator {
       val hintIterator = alphabet.permutations(length).map { it.joinToString("") }.iterator()
       targets.forEach { target ->
         target.hint = if (preserve) {
-          previousHints[target.component] ?: hintIterator.firstOrNull {
+          previousHints[target.component] ?: hintIterator.firstOrNull { candidateHint ->
             // Check if the hint is not already used by previous targets
-            !previousHints.values.any { hint -> hint.startsWith(it) || it.startsWith(hint) }
+            !previousHints.values.any { existingHint -> existingHint.startsWith(candidateHint) || candidateHint.startsWith(existingHint) }
           } ?: return generate(targets, false) // do not preserve previous hints if failed
         } else {
           hintIterator.next()

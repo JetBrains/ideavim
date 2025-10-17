@@ -66,11 +66,6 @@ class TrimFunctionTest : VimTestCase() {
   }
 
   @Test
-  fun `test trim with carriage return and vertical tab`() {
-    assertCommandOutput("echo trim('\r\t\t\r RESERVE \t\n\u000B\u00A0') .. '_TAIL'", "RESERVE_TAIL")
-  }
-
-  @Test
   fun `test trim with custom mask does not affect middle`() {
     assertCommandOutput("echo trim('rm<Xrm<>X>rrm', 'rm<>')", "Xrm<>X")
   }

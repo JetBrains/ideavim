@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.functions.listFunctions
 
 import com.maddyhome.idea.vim.api.injector
+import kotlin.test.assertTrue
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -59,17 +60,18 @@ class RangeFunctionTest : VimTestCase() {
   @Test
   fun `test range with zero stride throws error`() {
     enterCommand("echo range(1, 5, 0)")
-    kotlin.test.assertTrue(injector.messages.isError())
+    assertTrue(injector.messages.isError())
   }
 
   @Test
   fun `test range with start past end throws error`() {
     enterCommand("echo range(2, 0)")
-    kotlin.test.assertTrue(injector.messages.isError())
+    assertTrue(injector.messages.isError())
   }
 
   @Test
   fun `test range negative with start past end throws error`() {
     enterCommand("echo range(-2, 0, -1)")
+    assertTrue(injector.messages.isError())
   }
 }

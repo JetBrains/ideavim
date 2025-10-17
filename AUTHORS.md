@@ -638,6 +638,14 @@ Contributors:
   [![icon][github]](https://github.com/magidc)
   &nbsp;
   magidc
+* [![icon][mail]](mailto:41898282+claude[bot]@users.noreply.github.com)
+  [![icon][github]](https://github.com/apps/github-actions)
+  &nbsp;
+  github-actions[bot]
+* [![icon][mail]](mailto:41898282+claude[bot]@users.noreply.github.com)
+  [![icon][github]](https://github.com/apps/github-actions)
+  &nbsp;
+  github-actions[bot]
 
 Previous contributors:
 

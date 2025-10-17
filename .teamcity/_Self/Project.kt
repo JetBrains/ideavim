@@ -5,6 +5,7 @@ import _Self.buildTypes.LongRunning
 import _Self.buildTypes.Nvim
 import _Self.buildTypes.PluginVerifier
 import _Self.buildTypes.PropertyBased
+import _Self.buildTypes.RandomOrderTests
 import _Self.buildTypes.TestingBuildType
 import _Self.subprojects.GitHub
 import _Self.subprojects.Releases
@@ -16,7 +17,8 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.Project
 object Project : Project({
   description = "Vim engine for JetBrains IDEs"
 
-  subProjects(Releases, GitHub)
+  subProject(Releases)
+  subProject(GitHub)
 
   // VCS roots
   vcsRoot(GitHubPullRequest)
@@ -30,6 +32,7 @@ object Project : Project({
 
   buildType(PropertyBased)
   buildType(LongRunning)
+  buildType(RandomOrderTests)
 
   buildType(Nvim)
   buildType(PluginVerifier)

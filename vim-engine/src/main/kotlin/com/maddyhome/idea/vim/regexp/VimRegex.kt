@@ -20,9 +20,8 @@ import com.maddyhome.idea.vim.api.VimEditorBase
 import com.maddyhome.idea.vim.api.VimFoldRegion
 import com.maddyhome.idea.vim.api.VimIndentConfig
 import com.maddyhome.idea.vim.api.VimScrollingModel
-import com.maddyhome.idea.vim.api.VimSelectionModel
-import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.api.VimVirtualFile
+import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.VimEditorReplaceMask
@@ -695,10 +694,6 @@ class VimRegex(pattern: String) {
     override fun getVirtualFile(): VimVirtualFile? = null
 
     override fun deleteString(range: TextRange) {}
-
-    override fun getSelectionModel(): VimSelectionModel {
-      TODO("Not yet implemented")
-    }
 
     override fun getScrollingModel(): VimScrollingModel {
       TODO("Not yet implemented")

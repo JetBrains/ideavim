@@ -33,6 +33,7 @@ find . -type d -name "*.kt" -not -path "*/build/*" | shuf -n 1 | xargs dirname
 - **Import organization**: Remove unused imports, prefer explicit imports over wildcards (wildcard imports are generally not welcome)
 - **Code structure**: Proper indentation, spacing, line breaks
 - **Documentation**: KDoc comments where needed (public APIs, complex logic)
+- **Copyright years**: Do NOT update copyright years unless you're making substantive changes to the file. It's perfectly fine for copyright to show an older year. Don't mention copyright year updates in commit messages or change summaries
 
 ### Code Quality Issues
 - **Null safety**: Proper use of nullable types, safe calls, Elvis operator
