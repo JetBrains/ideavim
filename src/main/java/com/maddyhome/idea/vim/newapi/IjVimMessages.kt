@@ -63,7 +63,8 @@ internal class IjVimMessages : VimMessagesBase() {
   // scrolling, entering Command-line mode and probably lots more. We should manually clear the status bar when these
   // things happen.
   override fun clearStatusBarMessage() {
-    if (message.isNullOrEmpty()) return
+    val currentMessage = message
+    if (currentMessage.isNullOrEmpty()) return
 
     // Don't clear the status bar message if we've only just set it
     if (!allowClearStatusBarMessage) return
@@ -71,7 +72,7 @@ internal class IjVimMessages : VimMessagesBase() {
     ProjectManager.getInstance().openProjects.forEach { project ->
       WindowManager.getInstance().getStatusBar(project)?.let { statusBar ->
         // Only clear the status bar if it's showing our last message
-        if (statusBar.info?.contains(message.toString()) == true) {
+        if (statusBar.info?.contains(currentMessage) == true) {
           statusBar.info = ""
         }
       }
