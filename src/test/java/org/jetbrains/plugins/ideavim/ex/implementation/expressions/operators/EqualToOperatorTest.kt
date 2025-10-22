@@ -378,6 +378,85 @@ class EqualToOperatorTest : VimTestCase("\n") {
     assertCommandOutput("echo {'key1':b, 'key2':2} == {'key1':[1,a], 'key2':2}", "1")
   }
 
+  @Test
+  fun `test equal to with Funcref and non-Funcref values`() {
+    // Surprisingly not an error
+    assertCommandOutput("echo function('abs') == 'abs'", "0")
+    assertPluginError(false)
+  }
 
-  // TODO: Funcref tests
+  @Test
+  fun `test equal to with simple Funcref`() {
+    assertCommandOutput("echo function('abs') == function('abs')", "1")
+    assertCommandOutput("echo function('abs') == function('max')", "0")
+  }
+
+  @Test
+  fun `test equal to with same Funcref references`() {
+    enterCommand("let a = function('abs')")
+    enterCommand("let b = a")
+    assertCommandOutput("echo a == b", "1")
+  }
+
+  @Test
+  fun `test equal to with Funcref with arguments`() {
+    assertCommandOutput("echo function('abs', [1]) == function('abs', [1])", "1")
+    assertCommandOutput("echo function('abs', [-1]) == function('abs')", "0")
+    assertCommandOutput("echo function('abs', [-1]) == function('abs', [1])", "0")
+    assertCommandOutput("echo function('abs', [1]) == function('abs')", "0")
+    assertCommandOutput("echo function('abs') == function('abs', [1])", "0")
+  }
+
+  @Test
+  fun `test equal to with Funcref with recursive arguments`() {
+    enterCommand("let a = [1, 2, 3]")
+    enterCommand("let a[1] = a")
+    assertCommandOutput("echo function('abs', a) == function('abs', a)", "1")
+  }
+
+  @Test
+  fun `test equal to with Funcref with dictionary`() {
+    assertCommandOutput("echo function('abs', {'a':1, 'b':2}) == function('abs', {'a':1, 'b':2})", "1")
+    assertCommandOutput("echo function('abs', {'a':1, 'b':2}) == function('abs', {'a':1, 'b':3})", "0")
+    assertCommandOutput("echo function('abs', {'a':1, 'b':2}) == function('abs')", "0")
+    assertCommandOutput("echo function('abs') == function('abs', {'a':1, 'b':3})", "0")
+  }
+
+  @Test
+  fun `test equal to with Funcref with recursive dictionary`() {
+    enterCommand("let a = {'a':1, 'b':2}")
+    enterCommand("let a['b'] = a")
+    assertCommandOutput("echo function('abs', a) == function('abs', a)", "1")
+  }
+
+  @Test
+  fun `test equal to with Funcref and arguments and dictionary`() {
+    assertCommandOutput("echo function('abs', [1], {'a':1}) == function('abs', [1], {'a':1})", "1")
+    assertCommandOutput("echo function('abs', [1]) == function('abs', [1], {'a':1})", "0")
+    assertCommandOutput("echo function('abs', [1], {'a':1}) == function('abs', [1])", "0")
+  }
+
+  @Test
+  fun `test equal to case sensitive with Funcref and arguments`() {
+    assertCommandOutput("echo function('abs', ['abc']) ==# function('abs', ['abc'])", "1")
+    assertCommandOutput("echo function('abs', ['ABC']) ==# function('abs', ['abc'])", "0")
+  }
+
+  @Test
+  fun `test equal to case insensitive with Funcref and arguments`() {
+    assertCommandOutput("echo function('abs', ['abc']) ==? function('abs', ['abc'])", "1")
+    assertCommandOutput("echo function('abs', ['ABC']) ==? function('abs', ['abc'])", "1")
+  }
+
+  @Test
+  fun `test equal to case sensitive with Funcref and dictionary`() {
+    assertCommandOutput("echo function('abs', {'key1':'abc'}) ==# function('abs', {'key1':'abc'})", "1")
+    assertCommandOutput("echo function('abs', {'key1':'ABC'}) ==# function('abs', {'key1':'abc'})", "0")
+  }
+
+  @Test
+  fun `test equal to case insensitive with Funcref and dictionary`() {
+    assertCommandOutput("echo function('abs', {'key1':'abc'}) ==? function('abs', {'key1':'abc'})", "1")
+    assertCommandOutput("echo function('abs', {'key1':'ABC'}) ==? function('abs', {'key1':'abc'})", "1")
+  }
 }
