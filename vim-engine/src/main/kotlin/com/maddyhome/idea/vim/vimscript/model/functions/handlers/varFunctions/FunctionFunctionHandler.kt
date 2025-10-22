@@ -66,6 +66,10 @@ internal class FunctionFunctionHandler : FunctionHandler() {
       }
       dictionary = arg3
     }
+    // TODO: All of this logic needs a rewrite
+    if (dictionary == null) {
+      dictionary = arg3
+    }
     val funcref = VimFuncref(function, arglist ?: VimList(mutableListOf()), dictionary, VimFuncref.Type.FUNCTION)
     if (dictionary != null) {
       funcref.isSelfFixed = true
