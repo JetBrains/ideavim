@@ -43,7 +43,7 @@ internal abstract class ComparisonOperatorHandler(ignoreCase: Boolean?) :
       // There doesn't appear to be validation on Funcref comparisons, but Vim returns false if the types don't match
       val leftFuncref = left as? VimFuncref
       val rightFuncref = right as? VimFuncref
-      if (leftFuncref != null && rightFuncref != null) compare(leftFuncref, rightFuncref) else false
+      if (leftFuncref != null && rightFuncref != null) compare(leftFuncref, rightFuncref, ignoreCase, depth) else false
     }
 
     // TODO: Handle Blob. Presumably both sides must be Blob
@@ -88,6 +88,6 @@ internal abstract class ComparisonOperatorHandler(ignoreCase: Boolean?) :
     throw exExceptionMessage("E692")
   protected open fun compare(left: VimDictionary, right: VimDictionary, ignoreCase: Boolean, depth: Int): Boolean =
     throw exExceptionMessage("E736")
-  protected open fun compare(left: VimFuncref, right: VimFuncref): Boolean =
+  protected open fun compare(left: VimFuncref, right: VimFuncref, ignoreCase: Boolean, depth: Int): Boolean =
     throw exExceptionMessage("E694")
 }

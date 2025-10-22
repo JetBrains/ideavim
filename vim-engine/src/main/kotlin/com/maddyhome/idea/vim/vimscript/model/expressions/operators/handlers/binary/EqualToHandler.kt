@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary
 
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 
 internal class EqualToHandler(ignoreCase: Boolean? = null) : ComparisonOperatorHandler(ignoreCase) {
@@ -46,5 +47,23 @@ internal class EqualToHandler(ignoreCase: Boolean? = null) : ComparisonOperatorH
     }
   }
 
-  // TODO: Implement for Funcref, Blob
+  override fun compare(left: VimFuncref, right: VimFuncref, ignoreCase: Boolean, depth: Int): Boolean {
+    if (left === right) return true
+    if (left.handler.name != right.handler.name) return false
+    if (!doCompare(left.arguments, right.arguments, ignoreCase, depth + 1)) return false
+    val leftDictionary = left.dictionary
+    val rightDictionary = right.dictionary
+    when {
+      leftDictionary == null && rightDictionary != null -> return false
+      leftDictionary != null && rightDictionary == null -> return false
+      leftDictionary != null && rightDictionary != null -> {
+        if (!doCompare(leftDictionary, rightDictionary, ignoreCase, depth + 1)) {
+          return false
+        }
+      }
+    }
+    return true
+  }
+
+  // TODO: Implement for Blob
 }
