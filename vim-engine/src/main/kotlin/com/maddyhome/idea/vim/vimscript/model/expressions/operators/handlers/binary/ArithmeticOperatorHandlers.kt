@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary
 
+import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
@@ -30,6 +31,23 @@ internal abstract class ArithmeticBinaryOperatorHandler() : BinaryOperatorHandle
 
   protected abstract fun performOperation(left: Double, right: Double): Double
   protected abstract fun performOperation(left: Int, right: Int): Int
+
+  /**
+   * Coerce a Vim value to a Float
+   *
+   * Typically, Vim only automatically converts between String and Number. That is, you can call `abs("-2")` and Vim
+   * will convert the String argument to Number. However, when evaluating a binary operator, both sides of the operator
+   * need to be the same type, e.g., List and List, Dictionary and Dictionary. Vim will still automatically convert
+   * between String and Number, but for operators, it will also convert from Number to Float.
+   *
+   * For arithmetic operator purposes, a String can be converted to a Number and then converted to a Float. This means
+   * it will be a float representation of an integer, so `"1.5"` becomes `1.5`.
+   *
+   * This function will try to convert the given value to Number and return the double value of the integer value. If
+   * the value isn't Number or String, an [ExException] is thrown.
+   */
+  protected open fun coerceToVimFloatValue(value: VimDataType) =
+    if (value is VimFloat) value.value else value.toVimNumber().value.toDouble()
 }
 
 internal object AdditionHandler : ArithmeticBinaryOperatorHandler() {
