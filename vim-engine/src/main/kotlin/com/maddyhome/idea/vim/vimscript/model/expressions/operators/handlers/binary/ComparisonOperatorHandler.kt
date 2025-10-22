@@ -30,13 +30,13 @@ internal abstract class ComparisonOperatorHandler(ignoreCase: Boolean?) :
     left is VimList || right is VimList -> {
       val leftList = left as? VimList ?: throw exExceptionMessage("E691")
       val rightList = right as? VimList ?: throw exExceptionMessage("E691")
-      compare(leftList, rightList, ignoreCase, depth + 1)
+      compare(leftList, rightList, ignoreCase, depth)
     }
 
     left is VimDictionary || right is VimDictionary -> {
       val leftDictionary = left as? VimDictionary ?: throw exExceptionMessage("E735")
       val rightDictionary = right as? VimDictionary ?: throw exExceptionMessage("E735")
-      compare(leftDictionary, rightDictionary, ignoreCase)
+      compare(leftDictionary, rightDictionary, ignoreCase, depth)
     }
 
     left is VimFuncref || right is VimFuncref -> {
@@ -86,7 +86,7 @@ internal abstract class ComparisonOperatorHandler(ignoreCase: Boolean?) :
   protected abstract fun compare(left: String, right: String, ignoreCase: Boolean): Boolean
   protected open fun compare(left: VimList, right: VimList, ignoreCase: Boolean, depth: Int): Boolean =
     throw exExceptionMessage("E692")
-  protected open fun compare(left: VimDictionary, right: VimDictionary, ignoreCase: Boolean): Boolean =
+  protected open fun compare(left: VimDictionary, right: VimDictionary, ignoreCase: Boolean, depth: Int): Boolean =
     throw exExceptionMessage("E736")
   protected open fun compare(left: VimFuncref, right: VimFuncref): Boolean =
     throw exExceptionMessage("E694")

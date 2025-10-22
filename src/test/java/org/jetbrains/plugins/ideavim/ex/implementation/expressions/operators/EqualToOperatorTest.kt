@@ -203,8 +203,6 @@ class EqualToOperatorTest : VimTestCase("\n") {
     assertCommandOutput("echo a == b", "1")
   }
 
-  // TODO: Lists of Dictionary + case sensitivity
-
   @Test
   fun `test equal to with Dictionary and non-Dictionary values`() {
     enterCommand("echo {'key1':1} == 'abc'")
@@ -219,6 +217,167 @@ class EqualToOperatorTest : VimTestCase("\n") {
     assertPluginErrorMessage("E735: Can only compare Dictionary with Dictionary")
   }
 
-  // TODO: Loads more Dictionary tests
+  @Test
+  fun `test equal to with simple Dictionary`() {
+    assertCommandOutput("echo {'key1':1, 'key2':2} == {'key1':1, 'key2':2}", "1")
+    assertCommandOutput("echo {'key1':1, 'key2':2} == {'key1':1, 'key2':3}", "0")
+  }
+
+  @Test
+  fun `test equal to returns false for Dictionary with different values`() {
+    assertCommandOutput("echo {'key1':1} == {'key1':2}", "0")
+  }
+
+  @Test
+  fun `test equal to returns false for Dictionary with same key but different case`() {
+    assertCommandOutput("echo {'key1':1} == {'KEY1':1}", "0")
+  }
+
+  @Test
+  fun `test equal to with same Dictionary reference`() {
+    enterCommand("let a = {'key1':1, 'key2':2}")
+    enterCommand("let b = a")
+    assertCommandOutput("echo a == b", "1")
+  }
+
+  @Test
+  fun `test equal to with empty Dictionaries`() {
+    assertCommandOutput("echo {} == {}", "1")
+  }
+
+  @Test
+  fun `test equal to with Dictionary with keys in different order`() {
+    assertCommandOutput("echo {'key1':1, 'key2':2} == {'key2':2, 'key1':1}", "1")
+  }
+
+  @Test
+  fun `test equal to with Dictionary does not coerce values`() {
+    assertCommandOutput("echo {'key1':1} == {'key1':1.0}", "0")
+  }
+
+  @Test
+  fun `test equal to with Dictionary does not coerce values 2`() {
+    assertCommandOutput("echo {'key1':1} == {'key1':'1'}", "0")
+  }
+
+  @Test
+  fun `test equal to with Dictionary with String value depends on 'ignorecase'`() {
+    enterCommand("set noignorecase")
+    assertCommandOutput("echo {'key1':'abc', 'key2':'DEF'} == {'key1':'abc', 'key2':'DEF'}", "1")
+    assertCommandOutput("echo {'key1':'abc', 'key2':'DEF'} == {'key1':'ABC', 'key2':'def'}", "0")
+    assertCommandOutput("echo {'key1':'foo', 'key2':'bar'} == {'key1':'ABC', 'key2':'def'}", "0")
+    enterCommand("set ignorecase")
+    assertCommandOutput("echo {'key1':'abc', 'key2':'DEF'} == {'key1':'ABC', 'key2':'def'}", "1")
+  }
+
+  @Test
+  fun `test equal to case sensitive with Dictionary with String value`() {
+    assertCommandOutput("echo {'key1':'abc', 'key2':'DEF'} ==# {'key1':'abc', 'key2':'DEF'}", "1")
+    assertCommandOutput("echo {'key1':'abc', 'key2':'DEF'} ==# {'key1':'ABC', 'key2':'def'}", "0")
+    assertCommandOutput("echo {'key1':'foo', 'key2':'bar'} ==# {'key1':'ABC', 'key2':'def'}", "0")
+  }
+
+  @Test
+  fun `test equal to case insensitive with Dictionary with String value`() {
+    assertCommandOutput("echo {'key1':'abc', 'key2':'DEF'} ==? {'key1':'abc', 'key2':'DEF'}", "1")
+    assertCommandOutput("echo {'key1':'abc', 'key2':'DEF'} ==? {'key1':'ABC', 'key2':'def'}", "1")
+    assertCommandOutput("echo {'key1':'foo', 'key2':'bar'} ==? {'key1':'ABC', 'key2':'def'}", "0")
+  }
+
+  @Test
+  fun `test equal to with nested Dictionary`() {
+    assertCommandOutput("echo {'key1':1, 'key2':{'subkey1':1, 'subkey2':2}, 'key3':3} == {'key1':1, 'key2':{'subkey1':1, 'subkey2':2}, 'key3':3}", "1")
+    assertCommandOutput("echo {'key1':1, 'key2':{'subkey1':1, 'subkey2':2}, 'key3':3} == {'key1':1, 'key2':{'subkey1':1, 'subkey2':3}, 'key3':3}", "0")
+  }
+
+  @Test
+  fun `test equal to with nested Dictionary reference`() {
+    enterCommand("let a = {'subkey1':1, 'subkey2':2}")
+    enterCommand("let b = {'subkey1':1, 'subkey2':2}")
+    assertCommandOutput("echo {'key1':1, 'key2':a} == {'key1':1, 'key2':a}", "1")
+    assertCommandOutput("echo {'key1':1, 'key2':a} == {'key1':1, 'key2':b}", "1")
+  }
+
+  @Test
+  fun `test equal to with mismatched nested Dictionary`() {
+    assertCommandOutput("echo {'key1':1, 'key2':{'subkey1':1, 'subkey2':2}, 'key3':3} == {'key1':1, 'key2':'foo', 'key3':3}", "0")
+  }
+
+  @Test
+  fun `test equal to with nested Dictionary of String values depends on 'ignorecase'`() {
+    enterCommand("set noignorecase")
+    assertCommandOutput("echo {'key1':1, 'key2':{'subkey1':'abc', 'subkey2':'DEF'}, 'key3':3} == {'key1':1, 'key2':{'subkey1':'abc', 'subkey2':'DEF'}, 'key3':3}", "1")
+    assertCommandOutput("echo {'key1':1, 'key2':{'subkey1':'abc', 'subkey2':'DEF'}, 'key3':3} == {'key1':1, 'key2':{'subkey1':'ABC', 'subkey2':'def'}, 'key3':3}", "0")
+    assertCommandOutput("echo {'key1':1, 'key2':{'subkey1':'foo', 'subkey2':'bar'}, 'key3':3} == {'key1':1, 'key2':{'subkey1':'ABC', 'subkey2':'def'}, 'key3':3}", "0")
+    enterCommand("set ignorecase")
+    assertCommandOutput("echo {'key1':1, 'key2':{'subkey1':'abc', 'subkey2':'DEF'}, 'key3':3} == {'key1':1, 'key2':{'subkey1':'ABC', 'subkey2':'def'}, 'key3':3}", "1")
+  }
+
+  @Test
+  fun `test equal to case sensitive with nested Dictionary`() {
+    assertCommandOutput("echo {'key1':1, 'key2':{'subkey1':'abc', 'subkey2':'DEF'}, 'key3':3} ==# {'key1':1, 'key2':{'subkey1':'abc', 'subkey2':'DEF'}, 'key3':3}", "1")
+    assertCommandOutput("echo {'key1':1, 'key2':{'subkey1':'abc', 'subkey2':'DEF'}, 'key3':3} ==# {'key1':1, 'key2':{'subkey1':'ABC', 'subkey2':'def'}, 'key3':3}", "0")
+    assertCommandOutput("echo {'key1':1, 'key2':{'subkey1':'foo', 'subkey2':'bar'}, 'key3':3} ==# {'key1':1, 'key2':{'subkey1':'ABC', 'subkey2':'def'}, 'key3':3}", "0")
+  }
+
+  @Test
+  fun `test equal to case insensitive with nested Dictionary`() {
+    assertCommandOutput("echo {'key1':1, 'key2':{'subkey1':'abc', 'subkey2':'DEF'}, 'key3':3} ==? {'key1':1, 'key2':{'subkey1':'abc', 'subkey2':'DEF'}, 'key3':3}", "1")
+    assertCommandOutput("echo {'key1':1, 'key2':{'subkey1':'abc', 'subkey2':'DEF'}, 'key3':3} ==? {'key1':1, 'key2':{'subkey1':'ABC', 'subkey2':'def'}, 'key3':3}", "1")
+    assertCommandOutput("echo {'key1':1, 'key2':{'subkey1':'foo', 'subkey2':'bar'}, 'key3':3} ==? {'key1':1, 'key2':{'subkey1':'ABC', 'subkey2':'def'}, 'key3':3}", "0")
+  }
+
+  @Test
+  fun `test equal to with same reference to recursive Dictionary`() {
+    // Short-circuits with reference check
+    enterCommand("let a = {'key1':1, 'key2':2, 'key3':3}")
+    enterCommand("let a['key2'] = a")
+    assertCommandOutput("echo a == a", "1")
+  }
+
+  @Test
+  fun `test equal to with recursive Dictionary`() {
+    enterCommand("let a = {'key1':1, 'key2':2, 'key3':3}")
+    enterCommand("let a['key2'] = a")
+    enterCommand("let b = {'key1':1, 'key2':2, 'key3':3}")
+    enterCommand("let b['key2'] = b")
+    assertCommandOutput("echo a == b", "1")
+  }
+
+  @Test
+  fun `test equal to with Dictionary containing a List`() {
+    assertCommandOutput("echo {'key1':[1, 2, 3], 'key2':2} == {'key1':[1, 2, 3], 'key2':2}", "1")
+    assertCommandOutput("echo {'key1':[1, 2, 3], 'key2':2} == {'key1':[1, 9, 3], 'key2':2}", "0")
+  }
+
+  @Test
+  fun `test equal to with List containing a Dictionary`() {
+    assertCommandOutput("echo [1, {'key1':1, 'key2':2}] == [1, {'key1':1, 'key2':2}]", "1")
+    assertCommandOutput("echo [1, {'key1':1, 'key2':2}] == [1, {'key1':9, 'key2':2}]", "0")
+  }
+
+  @Test
+  fun `test equal to with List containing recursive Dictionary`() {
+    enterCommand("let a = {'key1':1, 'key2':2}")
+    enterCommand("let a['key2'] = a")
+    assertCommandOutput("echo [1, a] == [1, a]", "1")
+  }
+
+  @Test
+  fun `test equal to with Dictionary containing recursive List`() {
+    enterCommand("let a = [1, 2, 3]")
+    enterCommand("let a[1] = a")
+    assertCommandOutput("echo {'key1':a, 'key2':2} == {'key1':a, 'key2':2}", "1")
+  }
+
+  @Test
+  fun `test equal to with Dictionary containing List containing recursive Dictionary`() {
+    enterCommand("let a = {'key1':1, 'key2':2}")
+    enterCommand("let a['key2'] = a")
+    enterCommand("let b = [1, a]")
+    assertCommandOutput("echo {'key1':b, 'key2':2} == {'key1':[1,a], 'key2':2}", "1")
+  }
+
+
   // TODO: Funcref tests
 }
