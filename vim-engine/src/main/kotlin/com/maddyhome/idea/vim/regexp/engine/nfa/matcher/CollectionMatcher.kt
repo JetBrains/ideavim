@@ -32,27 +32,44 @@ internal class CollectionMatcher(
   override fun matches(
     editor: VimEditor,
     index: Int,
-    groups:
-    VimMatchGroupCollection,
+    groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>,
   ): MatcherResult {
     if (index >= editor.text().length) return MatcherResult.Failure
 
-    if (!includesEOL && editor.text()[index] == '\n') return MatcherResult.Failure
-    if (includesEOL && editor.text()[index] == '\n') return MatcherResult.Success(1)
+    val currentChar = editor.text()[index]
 
-    val char = editor.text()[index]
-    val result = if (isCaseInsensitive && !forceNoIgnoreCase) (chars.map { it.lowercaseChar() }
-      .contains(char.lowercaseChar()) || ranges.any {
-      it.inRange(
-        char,
-        true
-      )
-    } || charClasses.any { it(char.lowercaseChar()) || it(char.uppercaseChar()) }) == !isNegated
-    else (chars.contains(char) || ranges.any { it.inRange(char) } || charClasses.any { it(char) }) == !isNegated
-    return if (result) MatcherResult.Success(1)
-    else MatcherResult.Failure
+    // Handle end-of-line character
+    if (currentChar == '\n') {
+      return if (includesEOL) MatcherResult.Success(1) else MatcherResult.Failure
+    }
+
+    // Check if character matches the collection
+    val matchesCollection = if (isCaseInsensitive && !forceNoIgnoreCase) {
+      matchesCharCaseInsensitive(currentChar)
+    } else {
+      matchesCharCaseSensitive(currentChar)
+    }
+
+    // Apply negation if needed
+    val result = matchesCollection == !isNegated
+    return if (result) MatcherResult.Success(1) else MatcherResult.Failure
+  }
+
+  private fun matchesCharCaseSensitive(char: Char): Boolean {
+    return chars.contains(char) ||
+           ranges.any { it.inRange(char) } ||
+           charClasses.any { it(char) }
+  }
+
+  private fun matchesCharCaseInsensitive(char: Char): Boolean {
+    val lowerChar = char.lowercaseChar()
+    val upperChar = char.uppercaseChar()
+
+    return chars.any { it.equals(lowerChar, ignoreCase = true) } ||
+           ranges.any { it.inRange(char, isCaseInsensitive = true) } ||
+           charClasses.any { it(lowerChar) || it(upperChar) }
   }
 
   override fun isEpsilon(): Boolean {
