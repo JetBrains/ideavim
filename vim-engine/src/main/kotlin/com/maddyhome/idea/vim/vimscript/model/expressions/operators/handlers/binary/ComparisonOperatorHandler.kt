@@ -22,7 +22,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 internal abstract class ComparisonOperatorHandler(ignoreCase: Boolean?) :
   BinaryOperatorWithIgnoreCaseOption(ignoreCase) {
 
-  final override fun performOperation(left: VimDataType, right: VimDataType, ignoreCase: Boolean): VimDataType =
+  override fun performOperation(left: VimDataType, right: VimDataType, ignoreCase: Boolean): VimDataType =
     doCompare(left, right, ignoreCase, depth = 0).asVimInt()
 
   // Note that order is important here!
