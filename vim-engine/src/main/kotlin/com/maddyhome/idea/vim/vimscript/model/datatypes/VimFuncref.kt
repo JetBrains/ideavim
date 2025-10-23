@@ -109,6 +109,23 @@ class VimFuncref(
 
   override fun toInsertableString(): String = throw exExceptionMessage("E729")
 
+  override fun valueEquals(other: VimDataType, ignoreCase: Boolean, depth: Int): Boolean {
+    if (this === other) return true
+    if (other !is VimFuncref) return false
+    if (handler.name != other.handler.name) return false
+    if (!arguments.valueEquals(other.arguments, ignoreCase, depth)) return false
+    val thisDictionary = this.dictionary
+    val otherDictionary = other.dictionary
+    when {
+      thisDictionary == null && otherDictionary != null -> return false
+      thisDictionary != null && otherDictionary == null -> return false
+      thisDictionary != null && otherDictionary != null -> {
+        if (!thisDictionary.valueEquals(otherDictionary, ignoreCase, depth + 1)) return false
+      }
+    }
+    return true
+  }
+
   fun execute(
     name: String,
     args: List<Expression>,

@@ -105,6 +105,24 @@ class VimList(val values: MutableList<VimDataType>) : VimDataType("list") {
     }
   }
 
+  override fun valueEquals(other: VimDataType, ignoreCase: Boolean, depth: Int): Boolean {
+    // If the recursive structure is deep enough, treat it as equal.
+    // The value is fairly arbitrary but based on Vim's behaviour. Vim will also reduce the limit for every comparison
+    // once we're deep enough, so the tail of a list will both reduce the limit and short-circuit any further
+    // comparisons, including potentially expensive nested comparisons.
+    // So it should be possible to create a data structure that is 1001 levels deep (the first comparison is level 0)
+    // but has different values in the tail of the list, and Vim would still treat it as equal.
+    if (depth > 1000) return true
+
+    if (this === other) return true
+    if (other !is VimList) return false
+    if (values.size != other.values.size) return false
+    for (i in values.indices) {
+      if (!values[i].valueEquals(other.values[i], ignoreCase, depth + 1)) return false
+    }
+    return true
+  }
+
   override fun deepCopy(level: Int): VimList {
     return if (level > 0) {
       VimList(values.map { it.deepCopy(level - 1) }.toMutableList())

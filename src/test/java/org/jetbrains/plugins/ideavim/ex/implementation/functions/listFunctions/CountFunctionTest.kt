@@ -9,17 +9,9 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.functions.listFunctions
 
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInfo
 
-class CountFunctionTest : VimTestCase() {
-  @BeforeEach
-  override fun setUp(testInfo: TestInfo) {
-    super.setUp(testInfo)
-    configureByText("\n")
-  }
-
+class CountFunctionTest : VimTestCase("\n") {
   @Test
   fun `test count in list`() {
     assertCommandOutput("echo count([1, 2, 3, 2, 1], 2)", "2")
@@ -28,6 +20,17 @@ class CountFunctionTest : VimTestCase() {
   @Test
   fun `test count in list with no matches`() {
     assertCommandOutput("echo count([1, 2, 3], 5)", "0")
+  }
+
+  @Test
+  fun `test count list occurrences in list`() {
+    assertCommandOutput("echo count([[1,2,3], [1,2,3], [4,5,6]], [1,2,3])", "2")
+  }
+
+  @Test
+  fun `test count list reference occurrences in list`() {
+    enterCommand("let l = [1, 2, 3]")
+    assertCommandOutput("echo count([l, [1,2,3], [4,5,6]], l)", "2")
   }
 
   @Test
@@ -46,12 +49,17 @@ class CountFunctionTest : VimTestCase() {
   }
 
   @Test
-  fun `test count with start index`() {
+  fun `test count dictionary occurrences in dictionary`() {
+    assertCommandOutput("echo count({1: 'a', 2: {'key1': 'value'}, 3: 'a'}, {'key1': 'value'})", "1")
+  }
+
+  @Test
+  fun `test count list with start index`() {
     assertCommandOutput("echo count([1, 2, 3, 2, 1], 2, 0, 2)", "1")
   }
 
   @Test
-  fun `test count with ignore case`() {
+  fun `test count list with ignore case`() {
     assertCommandOutput("echo count(['A', 'a', 'B'], 'a', 1)", "2")
   }
 

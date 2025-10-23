@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
 @VimscriptFunction(name = "string")
-internal class StringFunctionHandler() : FunctionHandler() {
+internal class StringFunctionHandler : FunctionHandler() {
   override val minimumNumberOfArguments = 1
   override val maximumNumberOfArguments = 1
 
