@@ -40,6 +40,11 @@ data class VimString(val value: String) : VimDataType("string") {
   override fun toVimString() = this
   override fun toOutputString() = value
 
+  override fun valueEquals(other: VimDataType, ignoreCase: Boolean, depth: Int): Boolean {
+    if (other !is VimString) return false
+    return this.value.equals(other.value, ignoreCase = ignoreCase)
+  }
+
   override fun deepCopy(level: Int): VimString {
     return copy()
   }

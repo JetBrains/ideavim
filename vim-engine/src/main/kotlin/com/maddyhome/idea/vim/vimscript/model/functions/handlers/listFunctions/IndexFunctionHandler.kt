@@ -15,7 +15,6 @@ import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
@@ -36,7 +35,7 @@ internal class IndexFunctionHandler : FunctionHandler() {
     val ic = argumentValues.getOrNull(3)?.evaluate(editor, context, vimContext)?.toVimNumber()?.value != 0
 
     if (obj !is VimList) {
-      return VimInt(-1)
+      return VimInt.MINUS_ONE
     }
 
     val startIndex = if (start < 0) {
@@ -47,26 +46,11 @@ internal class IndexFunctionHandler : FunctionHandler() {
 
     for (i in startIndex until obj.values.size) {
       val item = obj.values[i]
-      if (compareValues(item, expr, ic)) {
+      if (item.valueEquals(expr, ic)) {
         return VimInt(i)
       }
     }
 
-    return VimInt(-1)
-  }
-
-  private fun compareValues(item: VimDataType, expr: VimDataType, ignoreCase: Boolean): Boolean {
-    return if (ignoreCase && item is VimString && expr is VimString) {
-      item.value.equals(expr.value, ignoreCase = true)
-    } else {
-      // Direct comparison - no automatic conversion
-      // String "4" is different from Number 4
-      when {
-        item is VimInt && expr is VimInt -> item.value == expr.value
-        item is VimString && expr is VimString -> item.value == expr.value
-        item.javaClass == expr.javaClass -> item == expr
-        else -> false
-      }
-    }
+    return VimInt.MINUS_ONE
   }
 }

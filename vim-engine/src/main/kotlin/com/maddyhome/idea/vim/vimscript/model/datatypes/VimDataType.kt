@@ -85,6 +85,17 @@ abstract class VimDataType(val typeName: String) {
     return true
   }
 
+  /**
+   * Returns true if this object is equal to another object, based on value semantics
+   *
+   * Not all Vim types can be represented as data classes, with value semantics. For example, a list or dictionary can
+   * be a recursive data structure, and that would cause problems with implementation of [equals] and [hashCode].
+   *
+   * This function can be used to compare the values of two objects are correct. It does no type coercion, unlike Vim's
+   * `==` operator.
+   */
+  open fun valueEquals(other: VimDataType, ignoreCase: Boolean, depth: Int = 0) = this == other
+
   abstract fun deepCopy(level: Int = 100): VimDataType
 
   var lockOwner: Any? = null
