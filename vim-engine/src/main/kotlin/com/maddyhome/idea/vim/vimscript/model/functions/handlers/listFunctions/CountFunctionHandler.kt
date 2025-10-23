@@ -17,6 +17,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
@@ -62,37 +63,18 @@ internal class CountFunctionHandler : FunctionHandler() {
         }
         VimInt(count)
       }
+
       is VimList -> {
         val items = if (start > 0 && start < comp.values.size) {
           comp.values.subList(start, comp.values.size)
         } else {
           comp.values
         }
-        val count = items.count { item ->
-          compareValues(item, expr, ic)
-        }
-        VimInt(count)
+        items.count { item -> item.valueEquals(expr, ic) }.asVimInt()
       }
-      is VimDictionary -> {
-        val count = comp.dictionary.values.count { item ->
-          compareValues(item, expr, ic)
-        }
-        VimInt(count)
-      }
-      else -> VimInt(0)
-    }
-  }
 
-  private fun compareValues(item: VimDataType, expr: VimDataType, ignoreCase: Boolean): Boolean {
-    return if (ignoreCase && item is VimString && expr is VimString) {
-      item.value.equals(expr.value, ignoreCase = true)
-    } else {
-      // Direct comparison - no automatic conversion
-      when {
-        item is VimInt && expr is VimInt -> item.value == expr.value
-        item is VimString && expr is VimString -> item.value == expr.value
-        else -> false
-      }
+      is VimDictionary -> comp.dictionary.values.count { item -> item.valueEquals(expr, ic) }.asVimInt()
+      else -> VimInt.ZERO
     }
   }
 }

@@ -9,17 +9,9 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.functions.listFunctions
 
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInfo
 
-class IndexFunctionTest : VimTestCase() {
-  @BeforeEach
-  override fun setUp(testInfo: TestInfo) {
-    super.setUp(testInfo)
-    configureByText("\n")
-  }
-
+class IndexFunctionTest : VimTestCase("\n") {
   @Test
   fun `test index finds element`() {
     assertCommandOutput("echo index([1, 2, 3, 2], 2)", "1")
@@ -38,6 +30,11 @@ class IndexFunctionTest : VimTestCase() {
   @Test
   fun `test index with negative start`() {
     assertCommandOutput("echo index([1, 2, 3, 4, 5], 4, -3)", "3")
+  }
+
+  @Test
+  fun `test index with finding list within list`() {
+    assertCommandOutput("echo index([1, 2, [3, 4, 5], 6], [3,4,5])", "2")
   }
 
   @Test

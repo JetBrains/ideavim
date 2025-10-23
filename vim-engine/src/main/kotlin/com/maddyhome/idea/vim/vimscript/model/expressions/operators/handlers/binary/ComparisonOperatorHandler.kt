@@ -22,47 +22,46 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 internal abstract class ComparisonOperatorHandler(ignoreCase: Boolean?) :
   BinaryOperatorWithIgnoreCaseOption(ignoreCase) {
 
-  override fun performOperation(left: VimDataType, right: VimDataType, ignoreCase: Boolean): VimDataType =
-    doCompare(left, right, ignoreCase, depth = 0).asVimInt()
+  override fun performOperation(left: VimDataType, right: VimDataType, ignoreCase: Boolean): VimDataType {
+    // Note that order is important here!
+    return when {
+      left is VimList || right is VimList -> {
+        val leftList = left as? VimList ?: throw exExceptionMessage("E691")
+        val rightList = right as? VimList ?: throw exExceptionMessage("E691")
+        compare(leftList, rightList, ignoreCase)
+      }
 
-  // Note that order is important here!
-  protected fun doCompare(left: VimDataType, right: VimDataType, ignoreCase: Boolean, depth: Int) = when {
-    left is VimList || right is VimList -> {
-      val leftList = left as? VimList ?: throw exExceptionMessage("E691")
-      val rightList = right as? VimList ?: throw exExceptionMessage("E691")
-      compare(leftList, rightList, ignoreCase, depth)
-    }
+      left is VimDictionary || right is VimDictionary -> {
+        val leftDictionary = left as? VimDictionary ?: throw exExceptionMessage("E735")
+        val rightDictionary = right as? VimDictionary ?: throw exExceptionMessage("E735")
+        compare(leftDictionary, rightDictionary, ignoreCase)
+      }
 
-    left is VimDictionary || right is VimDictionary -> {
-      val leftDictionary = left as? VimDictionary ?: throw exExceptionMessage("E735")
-      val rightDictionary = right as? VimDictionary ?: throw exExceptionMessage("E735")
-      compare(leftDictionary, rightDictionary, ignoreCase, depth)
-    }
+      left is VimFuncref || right is VimFuncref -> {
+        // There doesn't appear to be validation on Funcref comparisons, but Vim returns false if the types don't match
+        val leftFuncref = left as? VimFuncref
+        val rightFuncref = right as? VimFuncref
+        if (leftFuncref != null && rightFuncref != null) compare(leftFuncref, rightFuncref, ignoreCase) else false
+      }
 
-    left is VimFuncref || right is VimFuncref -> {
-      // There doesn't appear to be validation on Funcref comparisons, but Vim returns false if the types don't match
-      val leftFuncref = left as? VimFuncref
-      val rightFuncref = right as? VimFuncref
-      if (leftFuncref != null && rightFuncref != null) compare(leftFuncref, rightFuncref, ignoreCase, depth) else false
-    }
+      // TODO: Handle Blob. Presumably both sides must be Blob
 
-    // TODO: Handle Blob. Presumably both sides must be Blob
+      left is VimFloat || right is VimFloat -> {
+        val leftFloat = coerceToVimFloatValue(left)
+        val rightFloat = coerceToVimFloatValue(right)
+        compare(leftFloat, rightFloat)
+      }
 
-    left is VimFloat || right is VimFloat -> {
-      val leftFloat = coerceToVimFloatValue(left)
-      val rightFloat = coerceToVimFloatValue(right)
-      compare(leftFloat, rightFloat)
-    }
+      left is VimString || right is VimString -> {
+        compare(left.toVimString().value, right.toVimString().value, ignoreCase)
+      }
 
-    left is VimString || right is VimString -> {
-      compare(left.toVimString().value, right.toVimString().value, ignoreCase)
-    }
+      left is VimInt || right is VimInt -> {
+        compare(left.toVimNumber().value, right.toVimNumber().value)
+      }
 
-    left is VimInt || right is VimInt -> {
-      compare(left.toVimNumber().value, right.toVimNumber().value)
-    }
-
-    else -> throw exExceptionMessage("E474")
+      else -> throw exExceptionMessage("E474")
+    }.asVimInt()
   }
 
   /**
@@ -84,10 +83,10 @@ internal abstract class ComparisonOperatorHandler(ignoreCase: Boolean?) :
   protected abstract fun compare(left: Double, right: Double): Boolean
   protected abstract fun compare(left: Int, right: Int): Boolean
   protected abstract fun compare(left: String, right: String, ignoreCase: Boolean): Boolean
-  protected open fun compare(left: VimList, right: VimList, ignoreCase: Boolean, depth: Int): Boolean =
+  protected open fun compare(left: VimList, right: VimList, ignoreCase: Boolean): Boolean =
     throw exExceptionMessage("E692")
-  protected open fun compare(left: VimDictionary, right: VimDictionary, ignoreCase: Boolean, depth: Int): Boolean =
+  protected open fun compare(left: VimDictionary, right: VimDictionary, ignoreCase: Boolean): Boolean =
     throw exExceptionMessage("E736")
-  protected open fun compare(left: VimFuncref, right: VimFuncref, ignoreCase: Boolean, depth: Int): Boolean =
+  protected open fun compare(left: VimFuncref, right: VimFuncref, ignoreCase: Boolean): Boolean =
     throw exExceptionMessage("E694")
 }
