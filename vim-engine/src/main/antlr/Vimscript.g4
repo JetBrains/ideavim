@@ -733,6 +733,14 @@ SINGLE_QUOTE:           '\'';
 ESCAPED_SINGLE_QUOTE:   '\'\'';
 ESCAPED_DOUBLE_QUOTE:   '\\"';
 
+// Alphabetic relational operators - defined before identifiers to avoid being tokenized as identifiers
+IS:                     'is';
+IS_IC:                  'is?';
+IS_CS:                  'is#';
+IS_NOT:                 'isnot';
+IS_NOT_IC:              'isnot?';
+IS_NOT_CS:              'isnot#';
+
 // Identifiers
 IDENTIFIER_LOWERCASE:   [a-z]+;
 IDENTIFIER_ANY_CASE:    [a-zA-Z]+;
@@ -801,12 +809,6 @@ MATCHES_CS:             '=~#';
 NOT_MATCHES:            '!~';
 NOT_MATCHES_IC:         '!~?';
 NOT_MATCHES_CS:         '!~#';
-IS:                     'is';
-IS_IC:                  'is?';
-IS_CS:                  'is#';
-IS_NOT:                 'isnot';
-IS_NOT_IC:              'isnot?';
-IS_NOT_CS:              'isnot#';
 
 
 // Assignment operators
