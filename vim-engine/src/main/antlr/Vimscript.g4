@@ -346,6 +346,7 @@ anyCaseNameWithDigitsAndUnderscores:
                         lowercaseAlphabeticChar
                     |   uppercaseAlphabeticChar
                     |   keyword
+                    |   operator
                     |   IDENTIFIER_LOWERCASE
                     |   IDENTIFIER_ANY_CASE
                     |   anyCaseNameWithDigitsAndUnderscores (anyCaseNameWithDigitsAndUnderscores | DIGIT | INT | UNDERSCORE)+
@@ -441,6 +442,9 @@ keyword:                FUNCTION
                     |   AUTOCMD
                     |   AUGROUP
                     |   existingCommands
+;
+operator:               IS
+                    |   IS_NOT
 ;
 existingCommands:       RETURN
                     |   LET

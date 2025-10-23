@@ -101,4 +101,10 @@ class IsOperatorTest : VimTestCase("\n") {
     enterCommand("let B = function('abs', {'key1':1})")
     assertCommandOutput("echo A is B", "0")
   }
+
+  @Test
+  fun `tset pathological variable names`() {
+    enterCommand("let is = 12")
+    assertCommandOutput("echo is is is", "1")
+  }
 }
