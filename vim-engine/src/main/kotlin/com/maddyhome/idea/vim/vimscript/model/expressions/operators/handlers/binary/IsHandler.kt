@@ -18,22 +18,42 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 
-internal class IsHandler(ignoreCase: Boolean? = null) : BinaryOperatorWithIgnoreCaseOption(ignoreCase) {
+internal open class IsHandler(ignoreCase: Boolean? = null) : BinaryOperatorWithIgnoreCaseOption(ignoreCase) {
   override fun performOperation(left: VimDataType, right: VimDataType, ignoreCase: Boolean): VimDataType {
     return when (left) {
       // Check the value is the same with simple equals. Vim does not convert between Number and String!
       is VimFloat -> left == right
       is VimInt -> left == right
 
-      // Can't do simple equals for case insensitive `is`
+      // Can't do simple equals for case-insensitive `is`
       is VimString -> if (right is VimString) left.value.compareTo(right.value, ignoreCase) == 0 else false
 
       // Check the instance is the same with reference equals
       is VimList -> left === right
       is VimDictionary -> left === right
-      is VimFuncref -> left === right
+      is VimFuncref -> {
+        // A simple "function" reference (as opposed to a "funcref" reference) is the same, as long as it's not partial
+        // TODO: The name check might not be enough once we properly support script-local functions
+        if (left.type == VimFuncref.Type.FUNCTION
+          && right is VimFuncref && right.type == VimFuncref.Type.FUNCTION
+          && left.arguments.values.isEmpty() && right.arguments.values.isEmpty()
+          && left.dictionary == null && right.dictionary == null
+          && left.handler.name === right.handler.name) {
+          true
+        }
+        else {
+          left === right
+        }
+      }
       is VimBlob -> left === right
       else -> false
     }.asVimInt()
+  }
+}
+
+internal class IsNotHandler(ignoreCase: Boolean? = null) : IsHandler(ignoreCase) {
+  override fun performOperation(left: VimDataType, right: VimDataType, ignoreCase: Boolean): VimDataType {
+    val result = super.performOperation(left, right, ignoreCase) as VimInt
+    return (!result.booleanValue).asVimInt()
   }
 }
