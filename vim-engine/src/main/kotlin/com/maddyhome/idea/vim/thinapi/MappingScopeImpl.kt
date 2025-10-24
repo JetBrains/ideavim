@@ -25,24 +25,7 @@ class MappingScopeImpl(
   private val mappingOwner: MappingOwner,
 ) : MappingScope {
 
-  override fun nmap(from: String, to: String) {
-    addMapping(from, to, isRecursive = true, MappingMode.NORMAL)
-  }
-
-  override fun vmap(from: String, to: String) {
-    addMapping(from, to, isRecursive = true, MappingMode.VISUAL)
-  }
-
-  override fun nmap(from: String, action: suspend VimApi.() -> Unit) {
-    addMapping(from, isRecursive = true, action, MappingMode.NORMAL)
-  }
-
-  override fun vmap(
-    from: String,
-    action: suspend VimApi.() -> Unit,
-  ) {
-    addMapping(from, isRecursive = true, action, MappingMode.VISUAL)
-  }
+  // ===== All modes (map/noremap/unmap) =====
 
   override fun map(from: String, to: String) {
     addMapping(from, to, isRecursive = true, *MappingMode.ALL.toTypedArray())
@@ -50,62 +33,6 @@ class MappingScopeImpl(
 
   override fun map(from: String, action: suspend VimApi.() -> Unit) {
     addMapping(from, isRecursive = true, action, *MappingMode.ALL.toTypedArray())
-  }
-
-  override fun xmap(from: String, to: String) {
-    addMapping(from, to, isRecursive = true, MappingMode.VISUAL)
-  }
-
-  override fun xmap(from: String, action: suspend VimApi.() -> Unit) {
-    addMapping(from, isRecursive = true, action, MappingMode.VISUAL)
-  }
-
-  override fun smap(from: String, to: String) {
-    addMapping(from, to, isRecursive = true, MappingMode.SELECT)
-  }
-
-  override fun smap(from: String, action: suspend VimApi.() -> Unit) {
-    addMapping(from, isRecursive = true, action, MappingMode.SELECT)
-  }
-
-  override fun omap(from: String, to: String) {
-    addMapping(from, to, isRecursive = true, MappingMode.OP_PENDING)
-  }
-
-  override fun omap(from: String, action: suspend VimApi.() -> Unit) {
-    addMapping(from, isRecursive = true, action, MappingMode.OP_PENDING)
-  }
-
-  override fun imap(from: String, to: String) {
-    addMapping(from, to, isRecursive = true, MappingMode.INSERT)
-  }
-
-  override fun imap(from: String, action: suspend VimApi.() -> Unit) {
-    addMapping(from, isRecursive = true, action, MappingMode.INSERT)
-  }
-
-  override fun cmap(from: String, to: String) {
-    addMapping(from, to, isRecursive = true, MappingMode.CMD_LINE)
-  }
-
-  override fun cmap(from: String, action: suspend VimApi.() -> Unit) {
-    addMapping(from, isRecursive = true, action, MappingMode.CMD_LINE)
-  }
-
-  override fun nnoremap(from: String, to: String) {
-    addMapping(from, to, isRecursive = false, MappingMode.NORMAL)
-  }
-
-  override fun nnoremap(from: String, action: suspend VimApi.() -> Unit) {
-    addMapping(from, isRecursive = false, action, MappingMode.NORMAL)
-  }
-
-  override fun vnoremap(from: String, to: String) {
-    addMapping(from, to, isRecursive = false, MappingMode.VISUAL)
-  }
-
-  override fun vnoremap(from: String, action: suspend VimApi.() -> Unit) {
-    addMapping(from, isRecursive = false, action, MappingMode.VISUAL)
   }
 
   override fun noremap(from: String, to: String) {
@@ -116,12 +43,87 @@ class MappingScopeImpl(
     addMapping(from, isRecursive = false, action, *MappingMode.ALL.toTypedArray())
   }
 
+  override fun unmap(keys: String) {
+    removeMapping(keys, *MappingMode.ALL.toTypedArray())
+  }
+
+  // ===== Normal mode (nmap/nnoremap/nunmap) =====
+
+  override fun nmap(from: String, to: String) {
+    addMapping(from, to, isRecursive = true, MappingMode.NORMAL)
+  }
+
+  override fun nmap(from: String, action: suspend VimApi.() -> Unit) {
+    addMapping(from, isRecursive = true, action, MappingMode.NORMAL)
+  }
+
+  override fun nnoremap(from: String, to: String) {
+    addMapping(from, to, isRecursive = false, MappingMode.NORMAL)
+  }
+
+  override fun nnoremap(from: String, action: suspend VimApi.() -> Unit) {
+    addMapping(from, isRecursive = false, action, MappingMode.NORMAL)
+  }
+
+  override fun nunmap(keys: String) {
+    removeMapping(keys, MappingMode.NORMAL)
+  }
+
+  // ===== Visual mode (vmap/vnoremap/vunmap) =====
+
+  override fun vmap(from: String, to: String) {
+    addMapping(from, to, isRecursive = true, MappingMode.VISUAL)
+  }
+
+  override fun vmap(
+    from: String,
+    action: suspend VimApi.() -> Unit,
+  ) {
+    addMapping(from, isRecursive = true, action, MappingMode.VISUAL)
+  }
+
+  override fun vnoremap(from: String, to: String) {
+    addMapping(from, to, isRecursive = false, MappingMode.VISUAL)
+  }
+
+  override fun vnoremap(from: String, action: suspend VimApi.() -> Unit) {
+    addMapping(from, isRecursive = false, action, MappingMode.VISUAL)
+  }
+
+  override fun vunmap(keys: String) {
+    removeMapping(keys, MappingMode.VISUAL)
+  }
+
+  // ===== Visual exclusive mode (xmap/xnoremap/xunmap) =====
+
+  override fun xmap(from: String, to: String) {
+    addMapping(from, to, isRecursive = true, MappingMode.VISUAL)
+  }
+
+  override fun xmap(from: String, action: suspend VimApi.() -> Unit) {
+    addMapping(from, isRecursive = true, action, MappingMode.VISUAL)
+  }
+
   override fun xnoremap(from: String, to: String) {
     addMapping(from, to, isRecursive = false, MappingMode.VISUAL)
   }
 
   override fun xnoremap(from: String, action: suspend VimApi.() -> Unit) {
     addMapping(from, isRecursive = false, action, MappingMode.VISUAL)
+  }
+
+  override fun xunmap(keys: String) {
+    removeMapping(keys, MappingMode.VISUAL)
+  }
+
+  // ===== Select mode (smap/snoremap/sunmap) =====
+
+  override fun smap(from: String, to: String) {
+    addMapping(from, to, isRecursive = true, MappingMode.SELECT)
+  }
+
+  override fun smap(from: String, action: suspend VimApi.() -> Unit) {
+    addMapping(from, isRecursive = true, action, MappingMode.SELECT)
   }
 
   override fun snoremap(from: String, to: String) {
@@ -132,12 +134,40 @@ class MappingScopeImpl(
     addMapping(from, isRecursive = false, action, MappingMode.SELECT)
   }
 
+  override fun sunmap(keys: String) {
+    removeMapping(keys, MappingMode.SELECT)
+  }
+
+  // ===== Operator pending mode (omap/onoremap/ounmap) =====
+
+  override fun omap(from: String, to: String) {
+    addMapping(from, to, isRecursive = true, MappingMode.OP_PENDING)
+  }
+
+  override fun omap(from: String, action: suspend VimApi.() -> Unit) {
+    addMapping(from, isRecursive = true, action, MappingMode.OP_PENDING)
+  }
+
   override fun onoremap(from: String, to: String) {
     addMapping(from, to, isRecursive = false, MappingMode.OP_PENDING)
   }
 
   override fun onoremap(from: String, action: suspend VimApi.() -> Unit) {
     addMapping(from, isRecursive = false, action, MappingMode.OP_PENDING)
+  }
+
+  override fun ounmap(keys: String) {
+    removeMapping(keys, MappingMode.OP_PENDING)
+  }
+
+  // ===== Insert mode (imap/inoremap/iunmap) =====
+
+  override fun imap(from: String, to: String) {
+    addMapping(from, to, isRecursive = true, MappingMode.INSERT)
+  }
+
+  override fun imap(from: String, action: suspend VimApi.() -> Unit) {
+    addMapping(from, isRecursive = true, action, MappingMode.INSERT)
   }
 
   override fun inoremap(from: String, to: String) {
@@ -148,6 +178,20 @@ class MappingScopeImpl(
     addMapping(from, isRecursive = false, action, MappingMode.INSERT)
   }
 
+  override fun iunmap(keys: String) {
+    removeMapping(keys, MappingMode.INSERT)
+  }
+
+  // ===== Command line mode (cmap/cnoremap/cunmap) =====
+
+  override fun cmap(from: String, to: String) {
+    addMapping(from, to, isRecursive = true, MappingMode.CMD_LINE)
+  }
+
+  override fun cmap(from: String, action: suspend VimApi.() -> Unit) {
+    addMapping(from, isRecursive = true, action, MappingMode.CMD_LINE)
+  }
+
   override fun cnoremap(from: String, to: String) {
     addMapping(from, to, isRecursive = false, MappingMode.CMD_LINE)
   }
@@ -156,37 +200,11 @@ class MappingScopeImpl(
     addMapping(from, isRecursive = false, action, MappingMode.CMD_LINE)
   }
 
-  override fun nunmap(keys: String) {
-    removeMapping(keys, MappingMode.NORMAL)
-  }
-
-  override fun vunmap(keys: String) {
-    removeMapping(keys, MappingMode.VISUAL)
-  }
-
-  override fun unmap(keys: String) {
-    removeMapping(keys, *MappingMode.ALL.toTypedArray())
-  }
-
-  override fun xunmap(keys: String) {
-    removeMapping(keys, MappingMode.VISUAL)
-  }
-
-  override fun sunmap(keys: String) {
-    removeMapping(keys, MappingMode.SELECT)
-  }
-
-  override fun ounmap(keys: String) {
-    removeMapping(keys, MappingMode.OP_PENDING)
-  }
-
-  override fun iunmap(keys: String) {
-    removeMapping(keys, MappingMode.INSERT)
-  }
-
   override fun cunmap(keys: String) {
     removeMapping(keys, MappingMode.CMD_LINE)
   }
+
+  // ===== Private helper methods =====
 
   private fun removeMapping(keys: String, vararg mode: MappingMode) {
     injector.keyGroup.removeKeyMapping(
