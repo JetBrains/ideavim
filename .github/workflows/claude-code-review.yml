@@ -18,11 +18,16 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Fetch PR
+        run: |
+          gh pr checkout ${{ inputs.pr_number }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+
       - name: Run Claude Code Review
         id: claude-review
         uses: anthropics/claude-code-action@v1
         with:
-          use_oidc: ${{ !(github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork) }}
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |
             REPO: ${{ github.repository }}
