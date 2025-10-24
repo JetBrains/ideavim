@@ -183,8 +183,14 @@ abstract class VimStringParserBase : VimStringParser {
     val mapLeader: Any? = injector.variableService.getGlobalVariableValue("mapleader")
     return if (mapLeader is VimString) {
       val v: String = mapLeader.value
-      if (v.startsWith("\\<") && v[v.length - 1] == '>') {
-        listOf(parseSpecialKey(v.substring(2, v.length - 1), 0)!!)
+      // Minimum length is 4 for the shortest special key format: \<X> (e.g., "\<a>")
+      if (v.startsWith("\\<") && v.length >= 4 && v[v.length - 1] == '>') {
+        val specialKey = parseSpecialKey(v.substring(2, v.length - 1), 0)
+        if (specialKey != null) {
+          listOf(specialKey)
+        } else {
+          stringToKeys(mapLeader.value)
+        }
       } else {
         stringToKeys(mapLeader.value)
       }
