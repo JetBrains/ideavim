@@ -10,7 +10,6 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-      issues: read
       id-token: write
     
     steps:
@@ -23,6 +22,7 @@ jobs:
         id: claude-review
         uses: anthropics/claude-code-action@v1
         with:
+          use_oidc: ${{ !(github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork) }}
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |
             REPO: ${{ github.repository }}
