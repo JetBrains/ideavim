@@ -34,7 +34,6 @@ import com.maddyhome.idea.vim.api.VimEditorBase
 import com.maddyhome.idea.vim.api.VimFoldRegion
 import com.maddyhome.idea.vim.api.VimIndentConfig
 import com.maddyhome.idea.vim.api.VimScrollingModel
-import com.maddyhome.idea.vim.api.VimSelectionModel
 import com.maddyhome.idea.vim.api.VimVirtualFile
 import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.api.injector
@@ -296,18 +295,6 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase(
 
   override fun deleteString(range: TextRange) {
     editor.document.deleteString(range.startOffset, range.endOffset)
-  }
-
-  override fun getSelectionModel(): VimSelectionModel {
-    return object : VimSelectionModel {
-      private val sm = editor.selectionModel
-      override val selectionStart = sm.selectionStart
-      override val selectionEnd = sm.selectionEnd
-
-      override fun hasSelection(): Boolean {
-        return sm.hasSelection()
-      }
-    }
   }
 
   override fun getScrollingModel(): VimScrollingModel {

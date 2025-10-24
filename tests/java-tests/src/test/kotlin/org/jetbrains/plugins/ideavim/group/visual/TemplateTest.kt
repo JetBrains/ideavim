@@ -12,584 +12,1330 @@ package org.jetbrains.plugins.ideavim.group.visual
 
 import com.intellij.codeInsight.lookup.Lookup
 import com.intellij.codeInsight.lookup.LookupManager
+import com.intellij.codeInsight.template.Template
 import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.intellij.ide.DataManager
 import com.intellij.injected.editor.EditorWindow
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiElement
 import com.intellij.refactoring.rename.inplace.VariableInplaceRenameHandler
 import com.intellij.testFramework.PlatformTestUtil
 import com.intellij.testFramework.fixtures.CodeInsightTestUtil.doInlineRename
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.group.IjOptionConstants
-import com.maddyhome.idea.vim.helper.inInsertMode
-import com.maddyhome.idea.vim.helper.inVisualMode
-import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.state.mode.inNormalMode
-import com.maddyhome.idea.vim.state.mode.inSelectMode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
-import org.jetbrains.plugins.ideavim.TestIjOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimJavaTestCase
-import org.jetbrains.plugins.ideavim.assertDoesntChange
-import org.jetbrains.plugins.ideavim.impl.OptionTest
-import org.jetbrains.plugins.ideavim.impl.TraceOptions
-import org.jetbrains.plugins.ideavim.impl.VimOption
+import org.jetbrains.plugins.ideavim.assertModeDoesNotChange
 import org.jetbrains.plugins.ideavim.waitAndAssertMode
+import org.jetbrains.plugins.ideavim.waitUntilSelectionUpdated
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
+import org.junit.jupiter.api.assertNotNull
+import kotlin.test.fail
 
-/**
- * @author Alex Plate
- */
-@TraceOptions(TestIjOptionConstants.idearefactormode)
+@TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
 class TemplateTest : VimJavaTestCase() {
-
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
     TemplateManagerImpl.setTemplateTesting(fixture.testRootDisposable)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
-  @OptionTest(VimOption(TestIjOptionConstants.idearefactormode, doesntAffectTest = true))
-  fun `test simple rename`() {
+  @Test
+  fun `test accept lookup in inline rename`() {
     configureByJavaText(
       """
-            class Hello {
-                public static void main() {
-                    int my${c}Var = 5;
-                }
-            }
-      """.trimIndent(),
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
     )
+    enterCommand("set idearefactormode=keep")
+    startRenaming(VariableInplaceRenameHandler())
+    val lookupValue = fixture.lookupElementStrings?.get(0) ?: fail()
     ApplicationManager.getApplication().invokeAndWait {
-      doInlineRename(VariableInplaceRenameHandler(), "myNewVar", fixture)
+      fixture.finishLookup(Lookup.NORMAL_SELECT_CHAR)
     }
+    assertState(Mode.NORMAL())
     assertState(
       """
-            class Hello {
-                public static void main() {
-                    int my${c}NewVar = 5;
-                }
-            }
-      """.trimIndent(),
+        |class Hello {
+        |  public static void main() {
+        |    int ${lookupValue} = 5;
+        |  }
+        |}
+      """.trimMargin()
     )
   }
 
-  @OptionTest(VimOption(TestIjOptionConstants.idearefactormode, doesntAffectTest = true))
-  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
-  fun `test type rename`() {
+  @Test
+  fun `test typing with inline rename`() {
     configureByJavaText(
       """
-            class Hello {
-                public static void main() {
-                    int my${c}Var = 5;
-                }
-            }
-      """.trimIndent(),
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    startRenaming(VariableInplaceRenameHandler())
+    waitAndAssertMode(fixture, Mode.SELECT(SelectionType.CHARACTER_WISE))
+    assertState(Mode.SELECT(SelectionType.CHARACTER_WISE))
+    assertState(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int ${s}my${c}Var${se} = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+
+    typeText("myNewVar", "<CR>")
+
+    assertState(Mode.NORMAL())
+    assertState(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int myNewVa${c}r = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    assertTemplateFinished()
+  }
+
+  @Test
+  fun `test typing at start of inline rename`() {
+    configureByJavaText(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
     )
     startRenaming(VariableInplaceRenameHandler())
     waitAndAssertMode(fixture, Mode.SELECT(SelectionType.CHARACTER_WISE))
     assertState(Mode.SELECT(SelectionType.CHARACTER_WISE))
 
-    typeText(injector.parser.parseKeys("myNewVar" + "<CR>"))
+    ApplicationManager.getApplication().invokeAndWait {
+      LookupManager.hideActiveLookup(fixture.project)
+    }
 
+    // <Left> will move the caret to the start of the selection, removing it as well
+    typeText("<Left>")
+    assertState(Mode.INSERT)
+    typeText("pre" + "<CR>")
+
+    // Accepting the rename switches to Normal mode, moving the caret back one character
+    assertState(Mode.NORMAL())
+    assertState(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int pr${c}emyVar = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    assertTemplateFinished()
+  }
+
+
+  @Test
+  fun `test motion left at start of rename symbol removes Select mode without cancelling rename`() {
+    configureByJavaText(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int ${c}myVar = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    startRenaming(VariableInplaceRenameHandler())
+    waitAndAssertMode(fixture, Mode.SELECT(SelectionType.CHARACTER_WISE))
+    assertState(Mode.SELECT(SelectionType.CHARACTER_WISE))
+    assertState(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int ${s}${c}myVar${se} = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+
+    ApplicationManager.getApplication().invokeAndWait {
+      LookupManager.hideActiveLookup(fixture.project)
+    }
+
+    typeText("<Left>")
+
+    // <Left> will move the caret to the start of the selection, removing it as well. We're still renaming.
     assertState(Mode.INSERT)
     assertState(
       """
-            class Hello {
-                public static void main() {
-                    int myNewVar${c} = 5;
-                }
-            }
-      """.trimIndent(),
+        |class Hello {
+        |  public static void main() {
+        |    int ${c}myVar = 5;
+        |  }
+        |}
+      """.trimMargin()
     )
+    assertTemplateActive()
   }
 
-  @OptionTest(VimOption(TestIjOptionConstants.idearefactormode, doesntAffectTest = true))
-  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
-  fun `test selectmode without template`() {
+  @Test
+  fun `test motion right while renaming removes Select mode without cancelling rename`() {
     configureByJavaText(
       """
-            class Hello {
-                public static void main() {
-                    int my${c}Var = 5;
-                }
-            }
-      """.trimIndent(),
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    startRenaming(VariableInplaceRenameHandler())
+    waitAndAssertMode(fixture, Mode.SELECT(SelectionType.CHARACTER_WISE))
+    assertState(Mode.SELECT(SelectionType.CHARACTER_WISE))
+
+    ApplicationManager.getApplication().invokeAndWait {
+      LookupManager.hideActiveLookup(fixture.project)
+    }
+
+    typeText("<Right>")
+
+    // <Right> will move the caret to the end of the selection, removing it as well. We're still renaming.
+    assertState(Mode.INSERT)
+    assertState(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int myVar${c} = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    assertTemplateActive()
+  }
+
+  @Test
+  fun `test motion right at end of rename symbol removes Select mode without cancelling rename`() {
+    configureByJavaText(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int myVa${c}r = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    startRenaming(VariableInplaceRenameHandler())
+    waitAndAssertMode(fixture, Mode.SELECT(SelectionType.CHARACTER_WISE))
+    assertState(Mode.SELECT(SelectionType.CHARACTER_WISE))
+    assertState(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int ${s}myVa${c}r${se} = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+
+    ApplicationManager.getApplication().invokeAndWait {
+      LookupManager.hideActiveLookup(fixture.project)
+    }
+
+    typeText("<Right>")
+
+    // <Right> will move the caret to the end of the selection, removing it as well. We're still renaming.
+    assertState(Mode.INSERT)
+    assertState(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int myVar${c} = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    assertTemplateActive()
+  }
+
+  @Test
+  fun `test Escape in Select mode removes selection without cancelling rename`() {
+    configureByJavaText(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    startRenaming(VariableInplaceRenameHandler())
+    waitAndAssertMode(fixture, Mode.SELECT(SelectionType.CHARACTER_WISE))
+    assertState(Mode.SELECT(SelectionType.CHARACTER_WISE))
+    assertState(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int ${s}my${c}Var${se} = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+
+    typeText("<ESC>")
+
+    // <Escape> will remove the selection, switching us from Select to Normal. We're still renaming.
+    assertState(Mode.NORMAL())
+    assertState(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    assertTemplateActive()
+  }
+
+  @Test
+  fun `test Escape after typing in Select mode switches to Normal mode without cancelling rename`() {
+    configureByJavaText(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    startRenaming(VariableInplaceRenameHandler())
+    waitAndAssertMode(fixture, Mode.SELECT(SelectionType.CHARACTER_WISE))
+    assertState(Mode.SELECT(SelectionType.CHARACTER_WISE))
+    assertState(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int ${s}my${c}Var${se} = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+
+    typeText("Hello", "<ESC>")
+
+    assertState(Mode.NORMAL())
+    assertState(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int Hell${c}o = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    assertTemplateActive()
+  }
+
+  @Test
+  fun `test inline rename with keep option remains in Normal mode when starting rename`() {
+    configureByJavaText(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    enterCommand("set idearefactormode=keep")
+    startRenaming(VariableInplaceRenameHandler())
+    assertModeDoesNotChange(fixture.editor, Mode.NORMAL())
+    assertState(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    assertTemplateActive()
+  }
+
+  @Test
+  fun `test inline rename with keep option remains in Insert mode when starting rename`() {
+    configureByJavaText(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    enterCommand("set idearefactormode=keep")
+    typeText("i")
+    startRenaming(VariableInplaceRenameHandler())
+    assertModeDoesNotChange(fixture.editor, Mode.INSERT)
+    assertState(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    assertTemplateActive()
+  }
+
+  @Test
+  fun `test inline rename with keep option remains in Visual mode when starting`() {
+    configureByJavaText(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    typeText("vll")
+    startRenaming(VariableInplaceRenameHandler())
+    assertModeDoesNotChange(fixture.editor, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertState(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int my${s}Va${c}r${se} = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    assertTemplateActive()
+  }
+
+  @Test
+  fun `test inline rename with select option enters Select mode from Normal`() {
+    configureByJavaText(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    enterCommand("set idearefactormode=select")
+    startRenaming(VariableInplaceRenameHandler())
+    waitAndAssertMode(fixture, Mode.SELECT(SelectionType.CHARACTER_WISE))
+    assertState(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int ${s}my${c}Var${se} = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    assertTemplateActive()
+  }
+
+  @Test
+  fun `test inline rename with select option enters Select mode from Insert`() {
+    configureByJavaText(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    enterCommand("set idearefactormode=select")
+    typeText("i")
+    startRenaming(VariableInplaceRenameHandler())
+    waitAndAssertMode(fixture, Mode.SELECT(SelectionType.CHARACTER_WISE))
+    assertState(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int ${s}my${c}Var${se} = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    assertTemplateActive()
+  }
+
+  @Test
+  fun `test inline rename with select option remains in Visual mode when starting from Visual`() {
+    configureByJavaText(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    enterCommand("set idearefactormode=select")
+    typeText("vll")
+    startRenaming(VariableInplaceRenameHandler())
+    assertModeDoesNotChange(fixture.editor, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertState(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int my${s}Va${c}r${se} = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    assertTemplateActive()
+  }
+
+  @Test
+  fun `test inline rename with select option remains in Select mode when starting from Select`() {
+    configureByJavaText(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    enterCommand("set idearefactormode=select")
+    typeText("vll<C-G>")
+    startRenaming(VariableInplaceRenameHandler())
+    assertModeDoesNotChange(fixture.editor, Mode.SELECT(SelectionType.CHARACTER_WISE))
+    assertState(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int my${s}Var${c}${se} = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    assertTemplateActive()
+  }
+
+  @Test
+  fun `test inline rename with visual option enters Visual mode from Normal`() {
+    configureByJavaText(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
     )
     enterCommand("set idearefactormode=visual")
     startRenaming(VariableInplaceRenameHandler())
     waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertState(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int ${s}my${c}Var${se} = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    assertTemplateActive()
+  }
+
+  @Test
+  fun `test inline rename with visual option enters Visual mode from Insert`() {
+    configureByJavaText(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    enterCommand("set idearefactormode=visual")
+    typeText("i")
+    startRenaming(VariableInplaceRenameHandler())
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertState(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int ${s}my${c}Var${se} = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    assertTemplateActive()
+  }
+
+  @Test
+  fun `test inline rename with visual option remains in Visual mode when starting from Visual`() {
+    configureByJavaText(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    enterCommand("set idearefactormode=visual")
+    typeText("vll")
+    startRenaming(VariableInplaceRenameHandler())
+    assertModeDoesNotChange(fixture.editor, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertState(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int my${s}Va${c}r${se} = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    assertTemplateActive()
+  }
+
+  @Test
+  fun `test inline rename with visual option remains in Select mode when starting from Select`() {
+    configureByJavaText(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    enterCommand("set idearefactormode=visual")
+    typeText(injector.parser.parseKeys("vll<C-G>"))
+    startRenaming(VariableInplaceRenameHandler())
+    assertModeDoesNotChange(fixture.editor, Mode.SELECT(SelectionType.CHARACTER_WISE))
+    assertState(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int my${s}Var${c}${se} = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    assertTemplateActive()
+  }
+
+  @Test
+  fun `test inline rename with keep option ends in Normal mode`() {
+    configureByJavaText(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    enterCommand("set idearefactormode=keep")
+    ApplicationManager.getApplication().invokeAndWait {
+      doInlineRename(VariableInplaceRenameHandler(), "myNewVar", fixture)
+    }
+
+    // Rename doesn't change the caret position
+    assertState(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}NewVar = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    assertState(Mode.NORMAL())
+    assertTemplateFinished()
+  }
+
+  @Test
+  fun `test inline rename with keep option ends in Insert mode from Insert mode`() {
+    configureByJavaText(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    enterCommand("set idearefactormode=keep")
+    startRenaming(VariableInplaceRenameHandler())
+    waitAndAssertMode(fixture, Mode.NORMAL())
+    typeText("viw", "c", "myNewVar", "<CR>")
+
+    assertState(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int myNewVar${c} = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    assertState(Mode.INSERT)
+    assertTemplateFinished()
+  }
+
+  @Test
+  fun `test inline rename with keep option ends in Normal mode from Normal mode`() {
+    configureByJavaText(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    enterCommand("set idearefactormode=keep")
+    startRenaming(VariableInplaceRenameHandler())
+    waitAndAssertMode(fixture, Mode.NORMAL())
+    typeText("viw", "c", "myNewVar", "<Esc>", "<CR>")
+
+    assertState(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int myNewVa${c}r = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    assertState(Mode.NORMAL())
+    assertTemplateFinished()
+  }
+
+  @Test
+  fun `test inline rename with keep option ends in Visual mode from Visual mode`() {
+    configureByJavaText(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    enterCommand("set idearefactormode=keep")
+    startRenaming(VariableInplaceRenameHandler())
+    waitAndAssertMode(fixture, Mode.NORMAL())
+    typeText("viw", "c", "myNewVar", "<Esc>", "viw", "<CR>")
+
+    assertState(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int myNewVa${c}r = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
     assertState(Mode.VISUAL(SelectionType.CHARACTER_WISE))
-    // Disable template
-    typeText(injector.parser.parseKeys("<CR>"))
+    assertTemplateFinished()
   }
 
-  @OptionTest(VimOption(TestIjOptionConstants.idearefactormode, doesntAffectTest = true))
-  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
-  fun `test prepend`() {
+  @Test
+  fun `test inline rename with select option ends in Normal mode`() {
     configureByJavaText(
       """
-            class Hello {
-                public static void main() {
-                    int my${c}Var = 5;
-                }
-            }
-      """.trimIndent(),
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
     )
-    startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(fixture, Mode.SELECT(SelectionType.CHARACTER_WISE))
-    assertState(Mode.SELECT(SelectionType.CHARACTER_WISE))
-
     ApplicationManager.getApplication().invokeAndWait {
-      LookupManager.hideActiveLookup(fixture.project)
+      doInlineRename(VariableInplaceRenameHandler(), "myNewVar", fixture)
     }
-    typeText(injector.parser.parseKeys("<Left>"))
-    assertState(Mode.INSERT)
-    typeText(injector.parser.parseKeys("pre" + "<CR>"))
 
-    assertState(Mode.INSERT)
+    // Rename doesn't change the caret position, but changing from Select to Normal mode does
     assertState(
       """
-            class Hello {
-                public static void main() {
-                    int pre${c}myVar = 5;
-                }
-            }
-      """.trimIndent(),
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}NewVar = 5;
+        |  }
+        |}
+      """.trimMargin()
     )
-  }
-
-  @OptionTest(VimOption(TestIjOptionConstants.idearefactormode, doesntAffectTest = true))
-  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
-  fun `test motion right`() {
-    configureByJavaText(
-      """
-            class Hello {
-                public static void main() {
-                    int my${c}Var = 5;
-                }
-            }
-      """.trimIndent(),
-    )
-    startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(fixture, Mode.SELECT(SelectionType.CHARACTER_WISE))
-    assertState(Mode.SELECT(SelectionType.CHARACTER_WISE))
-
-    ApplicationManager.getApplication().invokeAndWait {
-      LookupManager.hideActiveLookup(fixture.project)
-    }
-    typeText(injector.parser.parseKeys("<Right>"))
-    assertState(Mode.INSERT)
-    assertState(
-      """
-            class Hello {
-                public static void main() {
-                    int myVar${c} = 5;
-                }
-            }
-      """.trimIndent(),
-    )
-  }
-
-  @OptionTest(VimOption(TestIjOptionConstants.idearefactormode, doesntAffectTest = true))
-  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
-  fun `test motion left on age`() {
-    configureByJavaText(
-      """
-            class Hello {
-                public static void main() {
-                    int ${c}myVar = 5;
-                }
-            }
-      """.trimIndent(),
-    )
-    startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(fixture, Mode.SELECT(SelectionType.CHARACTER_WISE))
-    assertState(Mode.SELECT(SelectionType.CHARACTER_WISE))
-
-    ApplicationManager.getApplication().invokeAndWait {
-      LookupManager.hideActiveLookup(fixture.project)
-    }
-    typeText(injector.parser.parseKeys("<Left>"))
-    assertState(Mode.INSERT)
-    assertState(
-      """
-            class Hello {
-                public static void main() {
-                    int ${c}myVar = 5;
-                }
-            }
-      """.trimIndent(),
-    )
-  }
-
-  @OptionTest(VimOption(TestIjOptionConstants.idearefactormode, doesntAffectTest = true))
-  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
-  fun `test motion right on age`() {
-    configureByJavaText(
-      """
-            class Hello {
-                public static void main() {
-                    int myVa${c}r = 5;
-                }
-            }
-      """.trimIndent(),
-    )
-    startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(fixture, Mode.SELECT(SelectionType.CHARACTER_WISE))
-    assertState(Mode.SELECT(SelectionType.CHARACTER_WISE))
-
-    ApplicationManager.getApplication().invokeAndWait {
-      LookupManager.hideActiveLookup(fixture.project)
-    }
-    typeText(injector.parser.parseKeys("<Right>"))
-    assertState(Mode.INSERT)
-    assertState(
-      """
-            class Hello {
-                public static void main() {
-                    int myVar${c} = 5;
-                }
-            }
-      """.trimIndent(),
-    )
-  }
-
-  @OptionTest(VimOption(TestIjOptionConstants.idearefactormode, doesntAffectTest = true))
-  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
-  fun `test escape`() {
-    configureByJavaText(
-      """
-            class Hello {
-                public static void main() {
-                    int my${c}Var = 5;
-                }
-            }
-      """.trimIndent(),
-    )
-    startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(fixture, Mode.SELECT(SelectionType.CHARACTER_WISE))
-    assertState(Mode.SELECT(SelectionType.CHARACTER_WISE))
-
-    typeText(injector.parser.parseKeys("<ESC>"))
-
     assertState(Mode.NORMAL())
-    assertState(
-      """
-            class Hello {
-                public static void main() {
-                    int my${c}Var = 5;
-                }
-            }
-      """.trimIndent(),
-    )
+    assertTemplateFinished()
   }
 
-  @OptionTest(VimOption(TestIjOptionConstants.idearefactormode, doesntAffectTest = true))
-  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
-  fun `test escape after typing`() {
+  @Test
+  fun `test inline rename with select option ends in Normal mode from Insert mode`() {
     configureByJavaText(
       """
-            class Hello {
-                public static void main() {
-                    int my${c}Var = 5;
-                }
-            }
-      """.trimIndent(),
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
     )
     startRenaming(VariableInplaceRenameHandler())
     waitAndAssertMode(fixture, Mode.SELECT(SelectionType.CHARACTER_WISE))
-    assertState(Mode.SELECT(SelectionType.CHARACTER_WISE))
+    typeText("myNewVar", "<CR>")  // Typing first char switches to Insert
 
-    typeText(injector.parser.parseKeys("Hello" + "<ESC>"))
-
+    // Insert ends after the symbol, then switching to Normal moves back a char
+    assertState(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int myNewVa${c}r = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
     assertState(Mode.NORMAL())
+    assertTemplateFinished()
+  }
+
+  @Test
+  fun `test inline rename with select option ends in Normal mode from Normal mode`() {
+    configureByJavaText(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    startRenaming(VariableInplaceRenameHandler())
+    waitAndAssertMode(fixture, Mode.SELECT(SelectionType.CHARACTER_WISE))
+    typeText("myNewVar", "<Esc>", "<CR>")
+
     assertState(
       """
-            class Hello {
-                public static void main() {
-                    int Hell${c}o = 5;
-                }
-            }
-      """.trimIndent(),
+        |class Hello {
+        |  public static void main() {
+        |    int myNewVa${c}r = 5;
+        |  }
+        |}
+      """.trimMargin()
     )
+    assertState(Mode.NORMAL())
+    assertTemplateFinished()
   }
 
-  @OptionTest(
-    VimOption(TestIjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_keep]),
-  )
-  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
-  fun `test template in normal mode`() {
+  @Test
+  fun `test inline rename with select option ends in Normal mode from Visual mode`() {
     configureByJavaText(
       """
-            class Hello {
-                public static void main() {
-                    int my${c}Var = 5;
-                }
-            }
-      """.trimIndent(),
-    )
-    startRenaming(VariableInplaceRenameHandler())
-    assertDoesntChange { fixture.editor.vim.inNormalMode }
-  }
-
-  @OptionTest(
-    VimOption(TestIjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_keep]),
-  )
-  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
-  fun `test save mode for insert mode`() {
-    configureByJavaText(
-      """
-            class Hello {
-                public static void main() {
-                    int my${c}Var = 5;
-                }
-            }
-      """.trimIndent(),
-    )
-    typeText(injector.parser.parseKeys("i"))
-    startRenaming(VariableInplaceRenameHandler())
-    assertDoesntChange { fixture.editor.inInsertMode }
-  }
-
-  @OptionTest(
-    VimOption(TestIjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_keep]),
-  )
-  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
-  fun `test save mode for visual mode`() {
-    configureByJavaText(
-      """
-            class Hello {
-                public static void main() {
-                    int my${c}Var = 5;
-                }
-            }
-      """.trimIndent(),
-    )
-    typeText(injector.parser.parseKeys("vll"))
-    startRenaming(VariableInplaceRenameHandler())
-    assertDoesntChange { fixture.editor.inVisualMode }
-  }
-
-  @OptionTest(
-    VimOption(TestIjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_select]),
-  )
-  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
-  fun `test template to select in normal mode`() {
-    configureByJavaText(
-      """
-            class Hello {
-                public static void main() {
-                    int my${c}Var = 5;
-                }
-            }
-      """.trimIndent(),
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
     )
     startRenaming(VariableInplaceRenameHandler())
     waitAndAssertMode(fixture, Mode.SELECT(SelectionType.CHARACTER_WISE))
+    typeText("myNewVar", "<Esc>", "viw", "<CR>")
+
+    assertState(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int myNewVa${c}r = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    assertState(Mode.NORMAL())
+    assertTemplateFinished()
   }
 
-  @OptionTest(
-    VimOption(TestIjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_select]),
-  )
-  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
-  fun `test template to select in insert mode`() {
+  @Test
+  fun `test inline rename with visual option ends in Normal mode`() {
     configureByJavaText(
       """
-            class Hello {
-                public static void main() {
-                    int my${c}Var = 5;
-                }
-            }
-      """.trimIndent(),
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
     )
-    typeText(injector.parser.parseKeys("i"))
-    startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(fixture, Mode.SELECT(SelectionType.CHARACTER_WISE))
+    enterCommand("set idearefactormode=visual")
+    ApplicationManager.getApplication().invokeAndWait {
+      doInlineRename(VariableInplaceRenameHandler(), "myNewVar", fixture)
+    }
+
+    assertState(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}NewVar = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    assertState(Mode.NORMAL())
+    assertTemplateFinished()
   }
 
-  @OptionTest(
-    VimOption(TestIjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_select]),
-  )
-  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
-  fun `test template to select in visual mode`() {
+  @Test
+  fun `test inline rename with visual option ends in Normal mode from Insert mode`() {
     configureByJavaText(
       """
-            class Hello {
-                public static void main() {
-                    int my${c}Var = 5;
-                }
-            }
-      """.trimIndent(),
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
     )
-    typeText(injector.parser.parseKeys("vll"))
-    startRenaming(VariableInplaceRenameHandler())
-    assertDoesntChange { fixture.editor.inVisualMode }
-  }
-
-  @OptionTest(
-    VimOption(TestIjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_select]),
-  )
-  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
-  fun `test template to select in select mode`() {
-    configureByJavaText(
-      """
-            class Hello {
-                public static void main() {
-                    int my${c}Var = 5;
-                }
-            }
-      """.trimIndent(),
-    )
-    typeText(injector.parser.parseKeys("vll<C-G>"))
-    startRenaming(VariableInplaceRenameHandler())
-    assertDoesntChange { fixture.editor.vim.inSelectMode }
-  }
-
-  @OptionTest(
-    VimOption(TestIjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_visual]),
-  )
-  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
-  fun `test template to visual in normal mode`() {
-    configureByJavaText(
-      """
-            class Hello {
-                public static void main() {
-                    int my${c}Var = 5;
-                }
-            }
-      """.trimIndent(),
-    )
+    enterCommand("set idearefactormode=visual")
     startRenaming(VariableInplaceRenameHandler())
     waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    typeText("c", "myNewVar", "<CR>") // Visual -> Change -> Type -> Accept
+
+    assertState(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int myNewVar${c} = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    assertState(Mode.NORMAL())
+    assertTemplateFinished()
   }
 
-  @OptionTest(
-    VimOption(TestIjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_visual]),
-  )
-  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
-  fun `test template to visual in insert mode`() {
+  @Test
+  fun `test inline rename with visual option ends in Normal mode from Normal mode`() {
     configureByJavaText(
       """
-            class Hello {
-                public static void main() {
-                    int my${c}Var = 5;
-                }
-            }
-      """.trimIndent(),
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
     )
-    typeText(injector.parser.parseKeys("i"))
+    enterCommand("set idearefactormode=visual")
     startRenaming(VariableInplaceRenameHandler())
     waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    typeText("c", "myNewVar", "<Esc>", "<CR>")  // Visual -> Change -> Type -> Normal -> Accept
+
+    // Switching from Insert to Normal moves the caret back one char
+    assertState(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    int myNewVa${c}r = 5;
+        |  }
+        |}
+      """.trimMargin()
+    )
+    assertState(Mode.NORMAL())
+    assertTemplateFinished()
   }
 
-  @OptionTest(
-    VimOption(TestIjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_visual]),
-  )
-  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
-  fun `test template to visual in visual mode`() {
+  @Test
+  fun `test inline rename with visual option ends in Normal mode from Visual mode`() {
     configureByJavaText(
       """
-            class Hello {
-                public static void main() {
-                    int my${c}Var = 5;
-                }
-            }
-      """.trimIndent(),
+        |class Hello {
+        |  public static void main() {
+        |    int my${c}Var = 5;
+        |  }
+        |}
+      """.trimMargin()
     )
-    typeText(injector.parser.parseKeys("vll"))
+    enterCommand("set idearefactormode=visual")
     startRenaming(VariableInplaceRenameHandler())
-    assertDoesntChange { fixture.editor.inVisualMode }
-  }
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    typeText("c", "myNewVar", "<Esc>", "viw", "<CR>")
 
-  @OptionTest(
-    VimOption(TestIjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_visual]),
-  )
-  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
-  fun `test template to visual in select mode`() {
-    configureByJavaText(
+    assertState(
       """
-            class Hello {
-                public static void main() {
-                    int my${c}Var = 5;
-                }
-            }
-      """.trimIndent(),
+        |class Hello {
+        |  public static void main() {
+        |    int myNewVa${c}r = 5;
+        |  }
+        |}
+      """.trimMargin()
     )
-    typeText(injector.parser.parseKeys("vll<C-G>"))
-    startRenaming(VariableInplaceRenameHandler())
-    assertDoesntChange { fixture.editor.vim.inSelectMode }
+    assertState(Mode.NORMAL())
+    assertTemplateFinished()
   }
 
-  @OptionTest(
-    VimOption(TestIjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_keep]),
-  )
-  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
-  fun `test template with multiple times`() {
-    configureByJavaText(c)
+  // 'idearefactormode'=select
+  @Test
+  fun `test template with select option enters Select mode for each variable and ends in Insert mode`() {
+    configureByJavaText("")
+
     val manager = TemplateManager.getInstance(fixture.project)
-    val template = manager.createTemplate("vn", "user", "\$V1$ var = \$V2$;")
-    template.addVariable("V1", "", "\"123\"", true)
+    val template = manager.createTemplate("vn", "user", $$"$V1$ $V2$ = $V3$;")
+    template.addVariable("V1", "", "\"var\"", true)
+    template.addVariable("V2", "", "\"foo\"", true)
+    template.addVariable("V3", "", "\"239\"", true)
+
+    startTemplate(manager, template)
+
+    assertMode(Mode.SELECT(SelectionType.CHARACTER_WISE))
+    assertState("${s}var${c}${se} foo = 239;")
+
+    moveToNextVariable()
+    assertMode(Mode.SELECT(SelectionType.CHARACTER_WISE))
+    assertState("var ${s}foo${c}${se} = 239;")
+
+    typeText("<Esc>")
+    assertMode(Mode.NORMAL())
+
+    moveToNextVariable()
+    assertMode(Mode.SELECT(SelectionType.CHARACTER_WISE))
+    assertState("var foo = ${s}239${c}${se};")
+
+    moveToNextVariable()
+    assertMode(Mode.INSERT)
+    assertState("var foo = 239;${c}")
+    assertTemplateFinished()
+  }
+
+  @Test
+  fun `test template with select option enters Insert mode for variable with no default text to select`() {
+    configureByJavaText("")
+
+    val manager = TemplateManager.getInstance(fixture.project)
+    val template = manager.createTemplate("vn", "user", $$"var $V1$ = $V2$;")
+    template.addVariable("V1", "", "\"foo\"", true)
+    template.addVariable("V2", "", "\"\"", true)
+
+    startTemplate(manager, template)
+
+    assertMode(Mode.SELECT(SelectionType.CHARACTER_WISE))
+    assertState("var ${s}foo${c}${se} = ;")
+
+    moveToNextVariable()
+    assertMode(Mode.INSERT)
+    assertState("var foo = ${c};")
+
+    assertTemplateActive()
+  }
+
+  @Test
+  fun `test template with select option enters Insert mode when no selection change when moving`() {
+    configureByJavaText("")
+
+    val manager = TemplateManager.getInstance(fixture.project)
+    val template = manager.createTemplate("vn", "user", $$"var $V1$ = $V2$;")
+    template.addVariable("V1", "", "\"foo\"", true)
+    template.addVariable("V2", "", "\"\"", true)
+
+    startTemplate(manager, template)
+
+    assertMode(Mode.SELECT(SelectionType.CHARACTER_WISE))
+    assertState("var ${s}foo${c}${se} = ;")
+
+    // Leave Select mode and tab to an empty next variable. No change in selection
+    typeText("<Esc>")
+    assertMode(Mode.NORMAL())
+    moveToNextVariable()
+
+    assertMode(Mode.INSERT)
+    assertState("var foo = ${c};")
+
+    assertTemplateActive()
+  }
+
+  @Test
+  fun `test template with select option ends in Insert mode when no selection change when moving to end`() {
+    configureByJavaText("")
+
+    val manager = TemplateManager.getInstance(fixture.project)
+    val template = manager.createTemplate("vn", "user", $$"var $V1$ = $V2$;")
+    template.addVariable("V1", "", "\"foo\"", true)
     template.addVariable("V2", "", "\"239\"", true)
 
-    ApplicationManager.getApplication().invokeAndWait {
-      ApplicationManager.getApplication().runWriteAction {
-        manager.startTemplate(fixture.editor, template)
-      }
-      PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
-    }
+    startTemplate(manager, template)
+    moveToNextVariable()  // V1 -> V2
+    typeText("<Esc>") // Select -> Normal
+    moveToNextVariable()  // V2 -> End
 
-    assertMode(Mode.NORMAL())
-    assertOffset(2)
-    typeText(injector.parser.parseKeys("<CR>"))
-    assertMode(Mode.NORMAL())
-    assertOffset(12)
-    typeText(injector.parser.parseKeys("<CR>"))
-    kotlin.test.assertNull(TemplateManagerImpl.getTemplateState(fixture.editor))
+    assertMode(Mode.INSERT)
+    assertState("var foo = 239;${c}")
+    assertTemplateFinished()
   }
 
-  @OptionTest(
-    VimOption(TestIjOptionConstants.idearefactormode, limitedValues = [IjOptionConstants.idearefactormode_keep]),
-  )
-  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
-  fun `test template with lookup`() {
-    configureByJavaText(
-      """
-            class Hello {
-                public static void main() {
-                    int my${c}Var = 5;
-                }
-            }
-      """.trimIndent(),
-    )
-    startRenaming(VariableInplaceRenameHandler())
-    val lookupValue = fixture.lookupElementStrings?.get(0) ?: kotlin.test.fail()
-    ApplicationManager.getApplication().invokeAndWait {
-      fixture.finishLookup(Lookup.NORMAL_SELECT_CHAR)
-    }
-    assertState(
-      """
-            class Hello {
-                public static void main() {
-                    int $lookupValue = 5;
-                }
-            }
-      """.trimIndent(),
-    )
+  // 'idearefactormode'=visual
+  @Test
+  fun `test template with visual option enters Visual mode for each variable and ends in Normal mode`() {
+    configureByJavaText("")
+    enterCommand("set idearefactormode=visual")
+
+    val manager = TemplateManager.getInstance(fixture.project)
+    val template = manager.createTemplate("vn", "user", $$"$V1$ $V2$ = $V3$;")
+    template.addVariable("V1", "", "\"var\"", true)
+    template.addVariable("V2", "", "\"foo\"", true)
+    template.addVariable("V3", "", "\"239\"", true)
+
+    startTemplate(manager, template)
+
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertState("${s}va${c}r${se} foo = 239;")
+
+    moveToNextVariable()
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertState("var ${s}fo${c}o${se} = 239;")
+
+    typeText("<Esc>")
+    assertMode(Mode.NORMAL())
+
+    moveToNextVariable()
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertState("var foo = ${s}23${c}9${se};")
+
+    moveToNextVariable()
+    assertMode(Mode.NORMAL())
+    assertState("var foo = 239;${c}")
+    assertTemplateFinished()
   }
 
-  private fun startRenaming(handler: VariableInplaceRenameHandler): Editor {
+  @Test
+  fun `test template with visual option enters Normal mode for variable with no default text to select`() {
+    configureByJavaText("")
+    enterCommand("set idearefactormode=visual")
+
+    val manager = TemplateManager.getInstance(fixture.project)
+    val template = manager.createTemplate("vn", "user", $$"var $V1$ = $V2$;")
+    template.addVariable("V1", "", "\"foo\"", true)
+    template.addVariable("V2", "", "\"\"", true)
+
+    startTemplate(manager, template)
+
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertState("var ${s}fo${c}o${se} = ;")
+
+    moveToNextVariable()
+    assertMode(Mode.NORMAL())
+    assertState("var foo = ${c};")
+
+    assertTemplateActive()
+  }
+
+  @Test
+  fun `test template with visual option enters Normal mode when no selection change when moving`() {
+    configureByJavaText("")
+    enterCommand("set idearefactormode=visual")
+
+    val manager = TemplateManager.getInstance(fixture.project)
+    val template = manager.createTemplate("vn", "user", $$"var $V1$ = $V2$;")
+    template.addVariable("V1", "", "\"foo\"", true)
+    template.addVariable("V2", "", "\"\"", true)
+
+    startTemplate(manager, template)
+
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertState("var ${s}fo${c}o${se} = ;")
+
+    // Leave Visual mode and tab to an empty next variable. No change in selection
+    typeText("<Esc>")
+    assertMode(Mode.NORMAL())
+    moveToNextVariable()
+
+    assertMode(Mode.NORMAL())
+    assertState("var foo = ${c};")
+
+    assertTemplateActive()
+  }
+
+  @Test
+  fun `test template with visual option ends in Normal mode when no selection change when moving to end`() {
+    configureByJavaText("")
+    enterCommand("set idearefactormode=visual")
+
+    val manager = TemplateManager.getInstance(fixture.project)
+    val template = manager.createTemplate("vn", "user", $$"var $V1$ = $V2$;")
+    template.addVariable("V1", "", "\"foo\"", true)
+    template.addVariable("V2", "", "\"239\"", true)
+
+    startTemplate(manager, template)
+    moveToNextVariable()  // V1 -> V2
+    typeText("<Esc>") // Visual -> Normal
+    moveToNextVariable()  // V2 -> End
+
+    assertMode(Mode.NORMAL())
+    assertState("var foo = 239;${c}")
+    assertTemplateFinished()
+  }
+
+  @Test
+  fun `test template with visual option positions caret at inclusive end of selection`() {
+    configureByJavaText("")
+    enterCommand("set idearefactormode=visual")
+    // Ensure 'selection' doesn't contain "exclusive" (this is the default)
+    enterCommand("set selection=")
+
+    val manager = TemplateManager.getInstance(fixture.project)
+    val template = manager.createTemplate("vn", "user", $$"var $V1$ = $V2$;")
+    template.addVariable("V1", "", "\"hello\"", true)
+    template.addVariable("V2", "", "\"world\"", true)
+
+    startTemplate(manager, template)
+
+    // In Visual mode with inclusive selection, caret should be on the last character, not after it
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertState("var ${s}hell${c}o${se} = world;")
+
+    moveToNextVariable()
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertState("var hello = ${s}worl${c}d${se};")
+
+    assertTemplateActive()
+  }
+
+  // 'idearefactormode'=keep
+  @Test
+  fun `test template with keep option keeps current mode for each variable and end`() {
+    configureByJavaText("")
+    enterCommand("set idearefactormode=keep")
+
+    val manager = TemplateManager.getInstance(fixture.project)
+    val template = manager.createTemplate("vn", "user", $$"$V1$ $V2$ = $V3$;")
+    template.addVariable("V1", "", "\"var\"", true)
+    template.addVariable("V2", "", "\"foo\"", true)
+    template.addVariable("V3", "", "\"239\"", true)
+
+    startTemplate(manager, template)
+
+    assertMode(Mode.NORMAL())
+    assertState("${c}var foo = 239;")
+
+    moveToNextVariable()
+    assertMode(Mode.NORMAL())
+    assertState("var ${c}foo = 239;")
+
+    typeText("i")
+    assertMode(Mode.INSERT)
+
+    moveToNextVariable()
+    assertMode(Mode.INSERT)
+    assertState("var foo = ${c}239;")
+
+    typeText("<Esc>")
+    assertMode(Mode.NORMAL())
+
+    // When hitting Escape from Insert, we move back a character. This puts us outside the editing segment
+    // TODO: Should we prevent this? How?
+    // VimChangeGroupBase.repeatInsert. We'd need to use VimTemplateManager and add the current variable range
+    assertState("var foo =${c} 239;")
+    typeText("l")
+
+    moveToNextVariable()
+    assertMode(Mode.NORMAL())
+    assertState("var foo = 239;${c}")
+    assertTemplateFinished()
+  }
+
+  @Test
+  fun `test template with keep option keeps current mode for variable with no default text to select`() {
+    configureByJavaText("")
+    enterCommand("set idearefactormode=keep")
+
+    val manager = TemplateManager.getInstance(fixture.project)
+    val template = manager.createTemplate("vn", "user", $$"var $V1$ = $V2$;")
+    template.addVariable("V1", "", "\"foo\"", true)
+    template.addVariable("V2", "", "\"\"", true)
+
+    startTemplate(manager, template)
+
+    assertMode(Mode.NORMAL())
+    assertState("var ${c}foo = ;")
+
+    moveToNextVariable()
+    assertMode(Mode.NORMAL())
+    assertState("var foo = ${c};")
+
+    assertTemplateActive()
+  }
+
+  @Test
+  fun `test template with keep option keeps current mode when no selection change when moving`() {
+    configureByJavaText("")
+    enterCommand("set idearefactormode=keep")
+
+    val manager = TemplateManager.getInstance(fixture.project)
+    val template = manager.createTemplate("vn", "user", $$"var $V1$ = $V2$;")
+    template.addVariable("V1", "", "\"foo\"", true)
+    template.addVariable("V2", "", "\"\"", true)
+
+    startTemplate(manager, template)
+
+    assertMode(Mode.NORMAL())
+    assertState("var ${c}foo = ;")
+
+    typeText("i")
+    assertMode(Mode.INSERT)
+    moveToNextVariable()
+
+    assertMode(Mode.INSERT)
+    assertState("var foo = ${c};")
+
+    assertTemplateActive()
+  }
+
+  @Test
+  fun `test template with keep option ends in current mode when no selection change when moving to end`() {
+    configureByJavaText("")
+    enterCommand("set idearefactormode=keep")
+
+    val manager = TemplateManager.getInstance(fixture.project)
+    val template = manager.createTemplate("vn", "user", $$"var $V1$ = $V2$;")
+    template.addVariable("V1", "", "\"foo\"", true)
+    template.addVariable("V2", "", "\"239\"", true)
+
+    startTemplate(manager, template)
+    moveToNextVariable()  // V1 -> V2
+    typeText("v") // Normal -> Visual
+    moveToNextVariable()  // V2 -> End
+
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertState("var foo = 239;${c}")
+    assertTemplateFinished()
+  }
+
+  private fun startRenaming(handler: VariableInplaceRenameHandler) {
     val editor = if (fixture.editor is EditorWindow) (fixture.editor as EditorWindow).delegate else fixture.editor
 
-    var elementToRename: PsiElement? = null
     ApplicationManager.getApplication().invokeAndWait {
+      var elementToRename: PsiElement? = null
       ApplicationManager.getApplication().runReadAction {
         elementToRename = fixture.elementAtCaret
       }
@@ -597,8 +1343,30 @@ class TemplateTest : VimJavaTestCase() {
         handler.doRename(elementToRename!!, editor, dataContext)
       }
     }
-    return editor
   }
+
+  private fun startTemplate(manager: TemplateManager, template: Template) {
+    ApplicationManager.getApplication().invokeAndWait {
+      ApplicationManager.getApplication().runWriteAction {
+        manager.startTemplate(fixture.editor, template)
+      }
+      PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
+    }
+
+    // The selection (and Vim mode) is not guaranteed to be updated. We've just waited long enough for it to be change
+    waitUntilSelectionUpdated(fixture.editor)
+  }
+
+  private fun moveToNextVariable() {
+    typeText("<CR>")
+    waitUntilSelectionUpdated(fixture.editor)
+  }
+
+  private fun assertTemplateActive() =
+    assertNotNull(TemplateManagerImpl.getTemplateState(fixture.editor))
+
+  private fun assertTemplateFinished() =
+    assertNull(TemplateManagerImpl.getTemplateState(fixture.editor))
 
   private val dataContext
     get() = DataManager.getInstance().getDataContext(fixture.editor.component)

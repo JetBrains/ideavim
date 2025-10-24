@@ -23,6 +23,7 @@ internal class StartOfLineMatcher : Matcher {
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>,
   ): MatcherResult {
+    if (index < 0 || index > editor.text().length) return MatcherResult.Failure
     return if (index == 0 || editor.text()[index - 1] == '\n') MatcherResult.Success(0)
     else MatcherResult.Failure
   }

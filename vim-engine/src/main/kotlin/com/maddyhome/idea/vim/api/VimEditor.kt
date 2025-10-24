@@ -162,7 +162,6 @@ interface VimEditor {
     return getText(start, end)
   }
 
-  fun getSelectionModel(): VimSelectionModel
   fun getScrollingModel(): VimScrollingModel
 
   fun removeCaret(caret: VimCaret)

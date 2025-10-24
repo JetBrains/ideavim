@@ -52,8 +52,8 @@ data class IndexedExpression(val index: Expression, val expression: Expression) 
       else -> {
         // Try to convert the expression to String, then index it
         val text = expressionValue.toVimString().value
-        val idx = index.evaluate(editor, context, vimContext).toVimNumber().value
-        if (idx < 0 || idx > text.length) {
+        val idx = indexValue.toVimNumber().value
+        if (idx < 0 || idx >= text.length) {
           return VimString.EMPTY
         }
         return VimString(text[idx].toString())
@@ -121,10 +121,10 @@ data class IndexedExpression(val index: Expression, val expression: Expression) 
     vimContext: VimLContext,
     assignmentTextForErrors: String
   ) {
-    val index = index.evaluate(editor, context, vimContext).toVimNumber().value
-    val idx = if (index < 0) index + list.values.size else index
+    val indexNum = index.evaluate(editor, context, vimContext).toVimNumber().value
+    val idx = if (indexNum < 0) indexNum + list.values.size else indexNum
     if (idx < 0 || idx >= list.values.size) {
-      throw exExceptionMessage("E684", index)
+      throw exExceptionMessage("E684", indexNum)
     }
     if (list.values[idx].isLocked) {
       throw exExceptionMessage("E741", assignmentTextForErrors)

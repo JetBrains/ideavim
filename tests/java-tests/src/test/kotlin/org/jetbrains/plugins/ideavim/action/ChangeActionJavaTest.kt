@@ -139,19 +139,25 @@ and some text after""",
     ApplicationManager.getApplication().invokeAndWait {
       ApplicationManager.getApplication().runWriteAction {
         CodeFoldingManager.getInstance(fixture.project).updateFoldRegions(fixture.editor)
-        assertEquals(FoldingUtil.findFoldRegionStartingAtLine(fixture.editor, 0)!!.isExpanded, true)
+        val foldRegion = FoldingUtil.findFoldRegionStartingAtLine(fixture.editor, 0)
+          ?: error("Expected fold region at line 0 for Javadoc comment")
+        assertEquals(foldRegion.isExpanded, true)
       }
     }
     typeText(injector.parser.parseKeys("za"))
     ApplicationManager.getApplication().invokeAndWait {
       ApplicationManager.getApplication().runWriteAction {
-        assertEquals(FoldingUtil.findFoldRegionStartingAtLine(fixture.editor, 0)!!.isExpanded, false)
+        val foldRegion = FoldingUtil.findFoldRegionStartingAtLine(fixture.editor, 0)
+          ?: error("Expected fold region at line 0 for Javadoc comment")
+        assertEquals(foldRegion.isExpanded, false)
       }
     }
     typeText(injector.parser.parseKeys("za"))
     ApplicationManager.getApplication().invokeAndWait {
       ApplicationManager.getApplication().runWriteAction {
-        assertEquals(FoldingUtil.findFoldRegionStartingAtLine(fixture.editor, 0)!!.isExpanded, true)
+        val foldRegion = FoldingUtil.findFoldRegionStartingAtLine(fixture.editor, 0)
+          ?: error("Expected fold region at line 0 for Javadoc comment")
+        assertEquals(foldRegion.isExpanded, true)
       }
     }
   }
@@ -174,7 +180,9 @@ and some text after""",
     ApplicationManager.getApplication().invokeAndWait {
       fixture.editor.foldingModel.runBatchFoldingOperation {
         CodeFoldingManager.getInstance(fixture.project).updateFoldRegions(fixture.editor)
-        FoldingUtil.findFoldRegionStartingAtLine(fixture.editor, 0)!!.isExpanded = false
+        val foldRegion = FoldingUtil.findFoldRegionStartingAtLine(fixture.editor, 0)
+          ?: error("Expected fold region at line 0 for Javadoc comment")
+        foldRegion.isExpanded = false
       }
     }
 

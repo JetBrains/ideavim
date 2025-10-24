@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.endOffsetInclusive
 import com.maddyhome.idea.vim.helper.enumSetOf
-import java.util.*
+import java.util.EnumSet
 
 @CommandOrMotion(keys = ["!"], modes = [Mode.VISUAL])
 class FilterVisualLinesAction : VimActionHandler.SingleExecution(), FilterCommand {
