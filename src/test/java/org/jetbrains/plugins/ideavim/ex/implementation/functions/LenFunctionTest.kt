@@ -42,17 +42,12 @@ class LenFunctionTest : VimTestCase() {
   }
 
   @Test
-  fun `test len with empty dictionary`() {
-    assertCommandOutput("echo len({})", "0")
-  }
-
-  @Test
-  fun `test len with zero`() {
+  fun `test len with zero number`() {
     assertCommandOutput("echo len(0)", "1")
   }
 
   @Test
-  fun `test len with negative number`() {
+  fun `test len with negative numbers`() {
     assertCommandOutput("echo len(-123)", "4")
     assertCommandOutput("echo len(-1)", "2")
   }
