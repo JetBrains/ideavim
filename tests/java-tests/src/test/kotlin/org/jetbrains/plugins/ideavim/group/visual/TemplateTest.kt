@@ -1196,6 +1196,31 @@ class TemplateTest : VimJavaTestCase() {
     assertTemplateFinished()
   }
 
+  @Test
+  fun `test template with visual option positions caret at inclusive end of selection`() {
+    configureByJavaText("")
+    enterCommand("set idearefactormode=visual")
+    // Ensure 'selection' doesn't contain "exclusive" (this is the default)
+    enterCommand("set selection=")
+
+    val manager = TemplateManager.getInstance(fixture.project)
+    val template = manager.createTemplate("vn", "user", $$"var $V1$ = $V2$;")
+    template.addVariable("V1", "", "\"hello\"", true)
+    template.addVariable("V2", "", "\"world\"", true)
+
+    startTemplate(manager, template)
+
+    // In Visual mode with inclusive selection, caret should be on the last character, not after it
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertState("var ${s}hell${c}o${se} = world;")
+
+    moveToNextVariable()
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    assertState("var hello = ${s}worl${c}d${se};")
+
+    assertTemplateActive()
+  }
+
   // 'idearefactormode'=keep
   @Test
   fun `test template with keep option keeps current mode for each variable and end`() {
