@@ -262,7 +262,7 @@ class CaretTransactionImpl(
   }
 
   override fun getLineEndOffset(line: Int, allowEnd: Boolean): Int {
-    return vimEditor.getLineEndOffset(line)
+    return vimEditor.getLineEndOffset(line, allowEnd)
   }
 
   override fun getLine(offset: Int): Line {
