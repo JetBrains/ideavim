@@ -41,11 +41,12 @@ Let's add a simple mapping that displays a message in the output panel:
 @VimPlugin(name = "MyFirstPlugin")
 fun VimApi.init() {
     mappings {
-        nmap(keys = "<leader>h", label = "HelloWorld") {
+        nnoremap("<Plug>HelloWorld") {
             outputPanel {
                 setText("Hello from my first IdeaVim plugin!")
             }
         }
+        nmap("<leader>h", "<Plug>HelloWorld")
     }
 }
 ```
@@ -59,19 +60,22 @@ You can define mappings for different Vim modes:
 ```kotlin
 mappings {
     // Normal mode mapping
-    nmap(keys = "<leader>x", label = "MyNormalAction") {
+    nnoremap("<Plug>MyNormalAction") {
         // Action implementation
     }
-    
+    nmap("<leader>x", "<Plug>MyNormalAction")
+
     // Visual mode mapping
-    vmap(keys = "<leader>y", label = "MyVisualAction") {
+    vnoremap("<Plug>MyVisualAction") {
         // Action implementation
     }
-    
+    vmap("<leader>y", "<Plug>MyVisualAction")
+
     // Insert mode mapping
-    imap(keys = "<C-d>", label = "MyInsertAction") {
+    inoremap("<Plug>MyInsertAction") {
         // Action implementation
     }
+    imap("<C-d>", "<Plug>MyInsertAction")
 }
 ```
 
@@ -154,9 +158,9 @@ Here's a simple plugin that adds a mapping to uppercase the selected text:
 @VimPlugin(name = "ToUppercase")
 fun VimApi.init() {
     mappings {
-        vmap(keys = "<leader>ll", label = "ToUpperCase") {
+        vnoremap("<Plug>ToUpperCase") {
             editor {
-                val job = change {
+                change {
                     forEachCaret {
                         // Get the current selection
                         val selectionStart = (selection as Range.Simple).start
@@ -171,7 +175,7 @@ fun VimApi.init() {
                 }
             }
         }
+        vmap("<leader>ll", "<Plug>ToUpperCase")
     }
-
 }
 ```
