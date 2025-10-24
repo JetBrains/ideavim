@@ -51,6 +51,20 @@ interface MappingScope {
    */
   fun unmap(keys: String)
 
+  /**
+   * Checks if any mapping exists that maps to [to] in normal, visual, select, and operator-pending modes.
+   *
+   * Returns true if there's a mapping whose right-hand side is [to].
+   *
+   * Example:
+   * ```kotlin
+   * nmap("gr", "<Plug>MyAction")
+   * hasmapto("<Plug>MyAction")  // Returns true - "gr" maps TO "<Plug>MyAction"
+   * hasmapto("gr")               // Returns false - nothing maps TO "gr"
+   * ```
+   */
+  fun hasmapto(to: String): Boolean
+
   // ===== Normal mode (nmap/nnoremap/nunmap) =====
 
   /**
@@ -86,6 +100,20 @@ interface MappingScope {
    * ```
    */
   fun nunmap(keys: String)
+
+  /**
+   * Checks if any mapping exists that maps to [to] in normal mode.
+   *
+   * Returns true if there's a mapping whose right-hand side is [to].
+   *
+   * Example:
+   * ```kotlin
+   * nmap("gr", "<Plug>MyAction")
+   * nhasmapto("<Plug>MyAction")  // Returns true - "gr" maps TO "<Plug>MyAction"
+   * nhasmapto("gr")               // Returns false - nothing maps TO "gr"
+   * ```
+   */
+  fun nhasmapto(to: String): Boolean
 
   // ===== Visual mode (vmap/vnoremap/vunmap) =====
 
@@ -123,6 +151,20 @@ interface MappingScope {
    */
   fun vunmap(keys: String)
 
+  /**
+   * Checks if any mapping exists that maps to [to] in visual mode.
+   *
+   * Returns true if there's a mapping whose right-hand side is [to].
+   *
+   * Example:
+   * ```kotlin
+   * vmap("gr", "<Plug>MyAction")
+   * vhasmapto("<Plug>MyAction")  // Returns true - "gr" maps TO "<Plug>MyAction"
+   * vhasmapto("gr")               // Returns false - nothing maps TO "gr"
+   * ```
+   */
+  fun vhasmapto(to: String): Boolean
+
   // ===== Visual exclusive mode (xmap/xnoremap/xunmap) =====
 
   /**
@@ -158,6 +200,20 @@ interface MappingScope {
    * ```
    */
   fun xunmap(keys: String)
+
+  /**
+   * Checks if any mapping exists that maps to [to] in visual exclusive mode.
+   *
+   * Returns true if there's a mapping whose right-hand side is [to].
+   *
+   * Example:
+   * ```kotlin
+   * xmap("gr", "<Plug>MyAction")
+   * xhasmapto("<Plug>MyAction")  // Returns true - "gr" maps TO "<Plug>MyAction"
+   * xhasmapto("gr")               // Returns false - nothing maps TO "gr"
+   * ```
+   */
+  fun xhasmapto(to: String): Boolean
 
   // ===== Select mode (smap/snoremap/sunmap) =====
 
@@ -195,6 +251,20 @@ interface MappingScope {
    */
   fun sunmap(keys: String)
 
+  /**
+   * Checks if any mapping exists that maps to [to] in select mode.
+   *
+   * Returns true if there's a mapping whose right-hand side is [to].
+   *
+   * Example:
+   * ```kotlin
+   * smap("gr", "<Plug>MyAction")
+   * shasmapto("<Plug>MyAction")  // Returns true - "gr" maps TO "<Plug>MyAction"
+   * shasmapto("gr")               // Returns false - nothing maps TO "gr"
+   * ```
+   */
+  fun shasmapto(to: String): Boolean
+
   // ===== Operator pending mode (omap/onoremap/ounmap) =====
 
   /**
@@ -231,6 +301,20 @@ interface MappingScope {
    */
   fun ounmap(keys: String)
 
+  /**
+   * Checks if any mapping exists that maps to [to] in operator pending mode.
+   *
+   * Returns true if there's a mapping whose right-hand side is [to].
+   *
+   * Example:
+   * ```kotlin
+   * omap("gr", "<Plug>MyAction")
+   * ohasmapto("<Plug>MyAction")  // Returns true - "gr" maps TO "<Plug>MyAction"
+   * ohasmapto("gr")               // Returns false - nothing maps TO "gr"
+   * ```
+   */
+  fun ohasmapto(to: String): Boolean
+
   // ===== Insert mode (imap/inoremap/iunmap) =====
 
   /**
@@ -266,6 +350,20 @@ interface MappingScope {
    * ```
    */
   fun iunmap(keys: String)
+
+  /**
+   * Checks if any mapping exists that maps to [to] in insert mode.
+   *
+   * Returns true if there's a mapping whose right-hand side is [to].
+   *
+   * Example:
+   * ```kotlin
+   * imap("jk", "<Plug>MyAction")
+   * ihasmapto("<Plug>MyAction")  // Returns true - "jk" maps TO "<Plug>MyAction"
+   * ihasmapto("jk")               // Returns false - nothing maps TO "jk"
+   * ```
+   */
+  fun ihasmapto(to: String): Boolean
 
   // ===== Command line mode (cmap/cnoremap/cunmap) =====
 
@@ -305,4 +403,18 @@ interface MappingScope {
    * ```
    */
   fun cunmap(keys: String)
+
+  /**
+   * Checks if any mapping exists that maps to [to] in command line mode.
+   *
+   * Returns true if there's a mapping whose right-hand side is [to].
+   *
+   * Example:
+   * ```kotlin
+   * cmap("<C-a>", "<Plug>MyAction")
+   * chasmapto("<Plug>MyAction")  // Returns true - "<C-a>" maps TO "<Plug>MyAction"
+   * chasmapto("<C-a>")            // Returns false - nothing maps TO "<C-a>"
+   * ```
+   */
+  fun chasmapto(to: String): Boolean
 }

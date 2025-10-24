@@ -47,6 +47,13 @@ class MappingScopeImpl(
     removeMapping(keys, *MappingMode.NVO.toTypedArray())
   }
 
+  override fun hasmapto(to: String): Boolean {
+    val toKeys = injector.parser.parseKeys(to)
+    return MappingMode.NVO.any { mode ->
+      injector.keyGroup.hasmapto(mode, toKeys)
+    }
+  }
+
   // ===== Normal mode (nmap/nnoremap/nunmap) =====
 
   override fun nmap(from: String, to: String) {
@@ -67,6 +74,10 @@ class MappingScopeImpl(
 
   override fun nunmap(keys: String) {
     removeMapping(keys, MappingMode.NORMAL)
+  }
+
+  override fun nhasmapto(to: String): Boolean {
+    return injector.keyGroup.hasmapto(MappingMode.NORMAL, injector.parser.parseKeys(to))
   }
 
   // ===== Visual mode (vmap/vnoremap/vunmap) =====
@@ -94,6 +105,10 @@ class MappingScopeImpl(
     removeMapping(keys, MappingMode.VISUAL)
   }
 
+  override fun vhasmapto(to: String): Boolean {
+    return injector.keyGroup.hasmapto(MappingMode.VISUAL, injector.parser.parseKeys(to))
+  }
+
   // ===== Visual exclusive mode (xmap/xnoremap/xunmap) =====
 
   override fun xmap(from: String, to: String) {
@@ -114,6 +129,10 @@ class MappingScopeImpl(
 
   override fun xunmap(keys: String) {
     removeMapping(keys, MappingMode.VISUAL)
+  }
+
+  override fun xhasmapto(to: String): Boolean {
+    return injector.keyGroup.hasmapto(MappingMode.VISUAL, injector.parser.parseKeys(to))
   }
 
   // ===== Select mode (smap/snoremap/sunmap) =====
@@ -138,6 +157,10 @@ class MappingScopeImpl(
     removeMapping(keys, MappingMode.SELECT)
   }
 
+  override fun shasmapto(to: String): Boolean {
+    return injector.keyGroup.hasmapto(MappingMode.SELECT, injector.parser.parseKeys(to))
+  }
+
   // ===== Operator pending mode (omap/onoremap/ounmap) =====
 
   override fun omap(from: String, to: String) {
@@ -158,6 +181,10 @@ class MappingScopeImpl(
 
   override fun ounmap(keys: String) {
     removeMapping(keys, MappingMode.OP_PENDING)
+  }
+
+  override fun ohasmapto(to: String): Boolean {
+    return injector.keyGroup.hasmapto(MappingMode.OP_PENDING, injector.parser.parseKeys(to))
   }
 
   // ===== Insert mode (imap/inoremap/iunmap) =====
@@ -182,6 +209,10 @@ class MappingScopeImpl(
     removeMapping(keys, MappingMode.INSERT)
   }
 
+  override fun ihasmapto(to: String): Boolean {
+    return injector.keyGroup.hasmapto(MappingMode.INSERT, injector.parser.parseKeys(to))
+  }
+
   // ===== Command line mode (cmap/cnoremap/cunmap) =====
 
   override fun cmap(from: String, to: String) {
@@ -202,6 +233,10 @@ class MappingScopeImpl(
 
   override fun cunmap(keys: String) {
     removeMapping(keys, MappingMode.CMD_LINE)
+  }
+
+  override fun chasmapto(to: String): Boolean {
+    return injector.keyGroup.hasmapto(MappingMode.CMD_LINE, injector.parser.parseKeys(to))
   }
 
   // ===== Private helper methods =====
