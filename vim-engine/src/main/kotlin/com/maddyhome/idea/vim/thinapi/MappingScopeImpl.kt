@@ -25,26 +25,26 @@ class MappingScopeImpl(
   private val mappingOwner: MappingOwner,
 ) : MappingScope {
 
-  // ===== All modes (map/noremap/unmap) =====
+  // ===== Normal, Visual, Select, and Operator-pending modes (map/noremap/unmap) =====
 
   override fun map(from: String, to: String) {
-    addMapping(from, to, isRecursive = true, *MappingMode.ALL.toTypedArray())
+    addMapping(from, to, isRecursive = true, *MappingMode.NVO.toTypedArray())
   }
 
   override fun map(from: String, action: suspend VimApi.() -> Unit) {
-    addMapping(from, isRecursive = true, action, *MappingMode.ALL.toTypedArray())
+    addMapping(from, isRecursive = true, action, *MappingMode.NVO.toTypedArray())
   }
 
   override fun noremap(from: String, to: String) {
-    addMapping(from, to, isRecursive = false, *MappingMode.ALL.toTypedArray())
+    addMapping(from, to, isRecursive = false, *MappingMode.NVO.toTypedArray())
   }
 
   override fun noremap(from: String, action: suspend VimApi.() -> Unit) {
-    addMapping(from, isRecursive = false, action, *MappingMode.ALL.toTypedArray())
+    addMapping(from, isRecursive = false, action, *MappingMode.NVO.toTypedArray())
   }
 
   override fun unmap(keys: String) {
-    removeMapping(keys, *MappingMode.ALL.toTypedArray())
+    removeMapping(keys, *MappingMode.NVO.toTypedArray())
   }
 
   // ===== Normal mode (nmap/nnoremap/nunmap) =====

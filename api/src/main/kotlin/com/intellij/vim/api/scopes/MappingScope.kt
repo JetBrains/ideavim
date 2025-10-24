@@ -15,30 +15,30 @@ import com.intellij.vim.api.VimApi
  */
 @VimApiDsl
 interface MappingScope {
-  // ===== All modes (map/noremap/unmap) =====
+  // ===== Normal, Visual, Select, and Operator-pending modes (map/noremap/unmap) =====
 
   /**
-   * Maps a [from] key sequence to [to] in all modes.
+   * Maps a [from] key sequence to [to] in normal, visual, select, and operator-pending modes.
    */
   fun map(from: String, to: String)
 
   /**
-   * Maps a [from] key sequence to an [action] in all modes.
+   * Maps a [from] key sequence to an [action] in normal, visual, select, and operator-pending modes.
    */
   fun map(from: String, action: suspend VimApi.() -> Unit)
 
   /**
-   * Maps a [from] key sequence to [to] in all modes non-recursively.
+   * Maps a [from] key sequence to [to] in normal, visual, select, and operator-pending modes non-recursively.
    */
   fun noremap(from: String, to: String)
 
   /**
-   * Maps a [from] key sequence to an [action] in all modes non-recursively.
+   * Maps a [from] key sequence to an [action] in normal, visual, select, and operator-pending modes non-recursively.
    */
   fun noremap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
-   * Removes a [keys] mapping in all modes.
+   * Removes a [keys] mapping in normal, visual, select, and operator-pending modes.
    *
    * The [keys] must fully match the 'from' keys of the original mapping.
    *
