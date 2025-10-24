@@ -64,34 +64,6 @@ interface MappingScope {
   fun vmap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
-   * Maps [keys] to an [action] with an [actionName] in normal mode.
-   *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
-   */
-  fun nmap(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
-
-  /**
-   * Maps [keys] to an [action] with an [actionName] in visual mode.
-   *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
-   */
-  fun vmap(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
-
-  /**
    * Maps a [from] key sequence to [to] in all modes.
    */
   fun map(from: String, to: String)
@@ -114,20 +86,6 @@ interface MappingScope {
    * Maps a [from] key sequence to an [action] in all modes.
    */
   fun map(from: String, action: suspend VimApi.() -> Unit)
-
-  /**
-   * Maps [keys] to an [action] with an [actionName] in all modes.
-   *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
-   */
-  fun map(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
 
   /**
    * Maps a [from] key sequence to [to] in visual exclusive mode.
@@ -154,20 +112,6 @@ interface MappingScope {
   fun xmap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
-   * Maps [keys] to an [action] with an [actionName] in visual exclusive mode.
-   *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
-   */
-  fun xmap(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
-
-  /**
    * Maps a [from] key sequence to [to] in select mode.
    */
   fun smap(from: String, to: String)
@@ -190,20 +134,6 @@ interface MappingScope {
    * Maps a [from] key sequence to an [action] in select mode.
    */
   fun smap(from: String, action: suspend VimApi.() -> Unit)
-
-  /**
-   * Maps [keys] to an [action] with an [actionName] in select mode.
-   *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
-   */
-  fun smap(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
 
   /**
    * Maps a [from] key sequence to [to] in operator pending mode.
@@ -230,20 +160,6 @@ interface MappingScope {
   fun omap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
-   * Maps [keys] to an [action] with an [actionName] in operator pending mode.
-   *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
-   */
-  fun omap(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
-
-  /**
    * Maps a [from] key sequence to [to] in insert mode.
    */
   fun imap(from: String, to: String)
@@ -266,20 +182,6 @@ interface MappingScope {
    * Maps a [from] key sequence to an [action] in insert mode.
    */
   fun imap(from: String, action: suspend VimApi.() -> Unit)
-
-  /**
-   * Maps [keys] to an [action] with an [actionName] in insert mode.
-   *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
-   */
-  fun imap(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
 
   /**
    * Maps a [from] key sequence to [to] in command line mode.
@@ -306,20 +208,6 @@ interface MappingScope {
   fun cmap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
-   * Maps [keys] to an [action] with an [actionName] in command line mode.
-   *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
-   */
-  fun cmap(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
-
-  /**
    * Maps a [from] key sequence to [to] in normal mode non-recursively.
    */
   fun nnoremap(from: String, to: String)
@@ -328,20 +216,6 @@ interface MappingScope {
    * Maps a [from] key sequence to an [action] in normal mode non-recursively.
    */
   fun nnoremap(from: String, action: suspend VimApi.() -> Unit)
-
-  /**
-   * Maps [keys] to an [action] with an [actionName] in normal mode non-recursively.
-   *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
-   */
-  fun nnoremap(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
 
   /**
    * Maps a [from] key sequence to [to] in visual mode non-recursively.
@@ -354,20 +228,6 @@ interface MappingScope {
   fun vnoremap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
-   * Maps [keys] to an [action] with an [actionName] in visual mode non-recursively.
-   *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
-   */
-  fun vnoremap(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
-
-  /**
    * Maps a [from] key sequence to [to] in all modes non-recursively.
    */
   fun noremap(from: String, to: String)
@@ -376,20 +236,6 @@ interface MappingScope {
    * Maps a [from] key sequence to an [action] in all modes non-recursively.
    */
   fun noremap(from: String, action: suspend VimApi.() -> Unit)
-
-  /**
-   * Maps [keys] to an [action] with an [actionName] in all modes non-recursively.
-   *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
-   */
-  fun noremap(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
 
   /**
    * Maps a [from] key sequence to [to] in visual exclusive mode non-recursively.
@@ -402,20 +248,6 @@ interface MappingScope {
   fun xnoremap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
-   * Maps [keys] to an [action] with an [actionName] in visual exclusive mode non-recursively.
-   *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
-   */
-  fun xnoremap(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
-
-  /**
    * Maps a [from] key sequence to [to] in select mode non-recursively.
    */
   fun snoremap(from: String, to: String)
@@ -424,20 +256,6 @@ interface MappingScope {
    * Maps a [from] key sequence to an [action] in select mode non-recursively.
    */
   fun snoremap(from: String, action: suspend VimApi.() -> Unit)
-
-  /**
-   * Maps [keys] to an [action] with an [actionName] in select mode non-recursively.
-   *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
-   */
-  fun snoremap(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
 
   /**
    * Maps a [from] key sequence to [to] in operator pending mode non-recursively.
@@ -450,20 +268,6 @@ interface MappingScope {
   fun onoremap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
-   * Maps [keys] to an [action] with an [actionName] in operator pending mode non-recursively.
-   *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
-   */
-  fun onoremap(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
-
-  /**
    * Maps a [from] key sequence to [to] in insert mode non-recursively.
    */
   fun inoremap(from: String, to: String)
@@ -472,20 +276,6 @@ interface MappingScope {
    * Maps a [from] key sequence to an [action] in insert mode non-recursively.
    */
   fun inoremap(from: String, action: suspend VimApi.() -> Unit)
-
-  /**
-   * Maps [keys] to an [action] with an [actionName] in insert mode non-recursively.
-   *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
-   */
-  fun inoremap(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
 
   /**
    * Maps a [from] key sequence to [to] in command line mode non-recursively.
@@ -499,18 +289,4 @@ interface MappingScope {
    * @param action The action to execute when the key sequence is pressed
    */
   fun cnoremap(from: String, action: suspend VimApi.() -> Unit)
-
-  /**
-   * Maps [keys] to an [action] with an [actionName] in command line mode non-recursively.
-   *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
-   */
-  fun cnoremap(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
 }
