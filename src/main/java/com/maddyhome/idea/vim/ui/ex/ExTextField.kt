@@ -183,6 +183,8 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
       document.setSpecialKeyForeground(fg)
     }
   }
+  private var completionModePrefix: String = ""
+  private var completionModeEnabled: Boolean = false
 
   /**
    * Finish handling the keystroke
@@ -205,8 +207,11 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
     // what it will do with the keystroke)
     if (stroke.keyChar != KeyEvent.CHAR_UNDEFINED) {
       replaceSelection(stroke.keyChar.toString())
-    } else {
+      completionModeEnabled = false
+    }
+    else {
       if (stroke.keyCode != KeyEvent.VK_TAB || !executeTabCompletionIfPossible()) {
+        completionModeEnabled = false
         val event = KeyEvent(
           this, stroke.keyEventType, (Date()).time, stroke.modifiers,
           stroke.keyCode, stroke.keyChar
@@ -247,6 +252,7 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
       )
       e.consume()
     } else {
+      completionModeEnabled = false
       super.processKeyEvent(e)
     }
   }
@@ -263,20 +269,19 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
     val projectBasePath = project?.basePath?.let { Path.of(it) } ?: return false
     val inputPath = projectBasePath.resolve(input)
     val inputPathString = inputPath.toString()
+    val searchPrefix = if (completionModeEnabled) completionModePrefix else inputPathString
 
     // Would it be useful to ignore file path case?
     try {
       val filePaths = (
         if (inputPath.exists()) {
-          if (inputPath.isDirectory())
+          if (inputPath.isDirectory() && !completionModeEnabled)
             Files.list(inputPath)
           else
             Files.list(inputPath.parent)
         } else if (inputPath.isAbsolute || inputPath.exists()) Files.list(inputPath.parent)
-          .filter { it.toString().startsWith(inputPathString) }
         else Files.list(projectBasePath)
-          .filter { it.toString().startsWith(inputPathString) }
-        ).sorted().toList()
+        ).filter { it.toString().startsWith(searchPrefix) }.sorted().toList()
 
       if (filePaths.isEmpty()) return false
 
@@ -290,6 +295,10 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
       val isDir = suggestion.isDirectory()
       val effectivePath = if (projectBasePath > suggestion) suggestion else projectBasePath.relativize(suggestion)
       updateText(String.format("%s %s%s", command, effectivePath, if (isDir) "/" else ""))
+      if(!completionModeEnabled) {
+        completionModeEnabled = true
+        completionModePrefix = inputPathString
+      }
       return true
     } catch (e: IOException) {
       logger.error(e)
