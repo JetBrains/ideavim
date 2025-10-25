@@ -43,27 +43,12 @@ internal class FunctionFunctionHandler : FunctionHandler() {
       injector.functionService.getFunctionHandlerOrNull(scopeAndName.first, scopeAndName.second, vimContext)
         ?: throw exExceptionMessage("E700", (scopeAndName.first?.toString() ?: "") + scopeAndName.second)
 
-    var arglist: VimList? = null
-    var dictionary: VimDictionary? = null
     val arg2 = argumentValues.getOrNull(1)?.evaluate(editor, context, vimContext)
     val arg3 = argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext)
 
-    if (arg2 is VimDictionary && arg3 is VimDictionary) {
-      throw exExceptionMessage("E923")
-    }
+    val (arglist, dictionary) = parseArglistAndDictionary(arg2, arg3)
 
-    if (arg2 != null) {
-      when (arg2) {
-        is VimList -> arglist = arg2
-        is VimDictionary -> dictionary = arg2
-        else -> throw exExceptionMessage("E923")
-      }
-    }
-
-    if (arg3 != null && arg3 !is VimDictionary) {
-      throw exExceptionMessage("E922")
-    }
-    val funcref = VimFuncref(function, arglist ?: VimList(mutableListOf()), dictionary, VimFuncref.Type.FUNCTION)
+    val funcref = VimFuncref(function, arglist, dictionary, VimFuncref.Type.FUNCTION)
     if (dictionary != null) {
       funcref.isSelfFixed = true
     }
@@ -91,28 +76,51 @@ internal class FuncrefFunctionHandler : FunctionHandler() {
       ?: throw exExceptionMessage("E700", (scopeAndName.first?.toString() ?: "") + scopeAndName.second)
     val handler = DefinedFunctionHandler(function)
 
-    var arglist: VimList? = null
-    var dictionary: VimDictionary? = null
     val arg2 = argumentValues.getOrNull(1)?.evaluate(editor, context, vimContext)
     val arg3 = argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext)
 
-    if (arg2 is VimDictionary && arg3 is VimDictionary) {
-      throw exExceptionMessage("E923")
-    }
+    val (arglist, dictionary) = parseArglistAndDictionary(arg2, arg3)
 
-    if (arg2 != null) {
-      when (arg2) {
-        is VimList -> arglist = arg2
-        is VimDictionary -> dictionary = arg2
-        else -> throw exExceptionMessage("E923")
-      }
-    }
+    return VimFuncref(handler, arglist, dictionary, VimFuncref.Type.FUNCREF)
+  }
+}
 
-    if (arg3 != null && arg3 !is VimDictionary) {
+/**
+ * Parses and validates the arglist and dictionary arguments for function() and funcref().
+ *
+ * @param arg2 The second argument, which can be a VimList (arglist) or VimDictionary (dictionary)
+ * @param arg3 The third argument, which must be a VimDictionary if present
+ * @return A pair of (arglist, dictionary) where arglist defaults to empty list if not provided
+ * @throws ExException E923 if arg2 is not a list or dict, or if both arg2 and arg3 are dicts
+ * @throws ExException E922 if arg3 is not a dict
+ */
+private fun parseArglistAndDictionary(arg2: Any?, arg3: Any?): Pair<VimList, VimDictionary?> {
+  // Check if both arg2 and arg3 are dictionaries (not allowed)
+  if (arg2 is VimDictionary && arg3 is VimDictionary) {
+    throw exExceptionMessage("E923")
+  }
+
+  var arglist: VimList? = null
+  var dictionary: VimDictionary? = null
+
+  // Parse arg2: can be either a list (arglist) or a dictionary
+  if (arg2 != null) {
+    when (arg2) {
+      is VimList -> arglist = arg2
+      is VimDictionary -> dictionary = arg2
+      else -> throw exExceptionMessage("E923")
+    }
+  }
+
+  // Parse arg3: must be a dictionary if present
+  if (arg3 != null) {
+    if (arg3 !is VimDictionary) {
       throw exExceptionMessage("E922")
     }
-    return VimFuncref(handler, arglist ?: VimList(mutableListOf()), dictionary, VimFuncref.Type.FUNCREF)
+    dictionary = arg3
   }
+
+  return Pair(arglist ?: VimList(mutableListOf()), dictionary)
 }
 
 private fun String.extractScopeAndName(): Pair<Scope?, String> {
