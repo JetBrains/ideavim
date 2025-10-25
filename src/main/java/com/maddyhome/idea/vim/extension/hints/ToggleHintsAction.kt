@@ -78,9 +78,7 @@ class ToggleHintsAction : DumbAwareToggleAction() {
     ShortcutDispatcher("hints", targets.associateBy { it.hint.lowercase() }, { target ->
       popup.closeOk(null)
       alarm.cancelAllRequests()
-      target.component.accessibleContext?.apply {
-        if (accessibleAction?.doAccessibleAction(0) == null && !accessibleComponent.isFocusTraversable) return@apply
-        accessibleComponent.requestFocus()
+      if (target.action()) {
         highlight.setTarget(target)
         alarm.addRequest({ highlight.setTarget(null) }, highlightDuration)
       }

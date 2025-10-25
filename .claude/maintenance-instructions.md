@@ -68,6 +68,12 @@ find . -type d -name "*.kt" -not -path "*/build/*" | shuf -n 1 | xargs dirname
 - **Test quality**: Do tests cover edge cases?
 - **Test naming**: Clear, descriptive test names
 - **Flaky tests**: Any potentially unstable tests?
+- **Regression tests for bug fixes**: When fixing a bug, always write a test that:
+  - Would fail with the old (buggy) implementation
+  - Passes with the fixed implementation
+  - Clearly documents what bug it's testing (include comments explaining the issue)
+  - Tests the specific boundary condition or edge case that exposed the bug
+  - This ensures the bug doesn't resurface in future refactorings
 
 ## 3. Investigation Strategy
 

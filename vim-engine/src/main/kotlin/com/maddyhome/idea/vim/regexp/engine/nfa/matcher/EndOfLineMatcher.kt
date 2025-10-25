@@ -23,7 +23,9 @@ internal class EndOfLineMatcher : Matcher {
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>,
   ): MatcherResult {
-    return if (index == editor.text().length || editor.text()[index] == '\n') MatcherResult.Success(0)
+    val length = editor.text().length
+    if (index > length) return MatcherResult.Failure
+    return if (index == length || editor.text()[index] == '\n') MatcherResult.Success(0)
     else MatcherResult.Failure
   }
 

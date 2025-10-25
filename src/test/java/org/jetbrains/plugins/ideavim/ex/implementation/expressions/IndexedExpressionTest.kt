@@ -145,6 +145,15 @@ class IndexedExpressionTest : VimTestCase("\n") {
   }
 
   @Test
+  fun `test indexed String expression at exactly length boundary returns empty String`() {
+    // This test validates the off-by-one fix in IndexedExpression.kt line 56
+    // With old code (idx > text.length), accessing index == length would cause IndexOutOfBoundsException
+    // With new code (idx >= text.length), it correctly returns empty string
+    assertCommandOutput("echo string('hello'[5])", "''")
+    assertPluginError(false)
+  }
+
+  @Test
   fun `test indexed String expression with negative index returns empty String`() {
     // Surprisingly not the same as List
     assertCommandOutput("echo string('hello'[-2])", "''")
