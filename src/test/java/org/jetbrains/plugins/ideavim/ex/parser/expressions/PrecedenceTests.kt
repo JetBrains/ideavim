@@ -210,8 +210,6 @@ class Expr10Tests : ExpressionPrecedenceTest() {
     assertExpressionPrecedence(expression = "!foo(12)", expected = "!(foo(12))")
   }
 
-  @Disabled("Incorrectly parsed as a function call with trailing syntax. " +
-    "In an echo command, this would be two expressions - the function call and a wrapped expression")
   @Test
   fun `test function call is left associative`() {
     assertExpressionPrecedence(expression = "foo(12)(34)", expected = "(foo(12))(34)")

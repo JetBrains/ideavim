@@ -233,7 +233,7 @@ expr:
                     // expr10
                         expr L_BRACKET WS* expr WS* R_BRACKET                                   #IndexedExpression
                     |   expr L_BRACKET WS* from = expr? WS* COLON WS* to = expr? WS* R_BRACKET  #SublistExpression
-                    // TODO: expr10(expr1, ...)
+                    |   expr WS* L_PAREN WS* functionArguments WS* R_PAREN                      #FunctionCallExpression
                     |   expr WS* ARROW WS* functionCall                                         #FunctionAsMethodCall1
                     |   expr WS* ARROW WS* lambda L_PAREN WS* functionArguments WS* R_PAREN     #FunctionAsMethodCall2
                     // TODO: expr10.name
