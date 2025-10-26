@@ -226,14 +226,13 @@ commandName:
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 expr:
                         expr L_BRACKET WS* expr WS* R_BRACKET                                   #IndexedExpression
-                    |   WS* BANG WS* expr                                                       #UnaryExpression
                     |   expr L_BRACKET WS* from = expr? WS* COLON WS* to = expr? WS* R_BRACKET  #SublistExpression
+                    |   unaryOperator = (BANG | PLUS | MINUS) WS* expr                          #UnaryExpression
                     |   expr WS* binaryOperator1 WS* expr                                       #BinExpression1
                     |   expr WS* binaryOperator2 WS* expr                                       #BinExpression2
                     |   expr WS* binaryOperator3 WS* expr                                       #BinExpression3
                     |   expr WS* binaryOperator4 WS* expr                                       #BinExpression4
                     |   expr WS* binaryOperator5 WS* expr                                       #BinExpression5
-                    |   WS* unaryOperator = (PLUS | MINUS) WS* expr                             #UnaryExpression
                     |   expr WS* ARROW WS* functionCall                                         #FunctionAsMethodCall1
                     |   expr WS* ARROW WS* lambda L_PAREN WS* functionArguments WS* R_PAREN     #FunctionAsMethodCall2
                     |   functionCall                                                            #FunctionCallExpression
