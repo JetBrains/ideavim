@@ -356,7 +356,6 @@ class Expr2Tests : ExpressionPrecedenceTest() {
 
 class Expr1Tests : ExpressionPrecedenceTest() {
   // expr2 ? expr1 : expr1
-  @Disabled("Ternary operator is current left associative")
   @Test
   fun `test ternary is right associative`() {
     // echo 1 == 1 ? 1 : 1 == 2 ? 2 : 3
@@ -365,7 +364,6 @@ class Expr1Tests : ExpressionPrecedenceTest() {
     assertExpressionPrecedence(expression = "1 == 1 ? 1 : 1 == 2 ? 2 : 3", expected = "(1 == 1) ? 1 : ((1 == 2) ? 2 : 3)")
   }
 
-  @Disabled("Falsy operator is current left associative")
   @Test
   fun `test falsy operator is right associative`() {
     // I don't know how to write an actual Vim expression that would demonstrate this, but falsy is right associative
