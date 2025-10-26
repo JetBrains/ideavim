@@ -218,7 +218,6 @@ class Expr10Tests : ExpressionPrecedenceTest() {
   }
 
   // expr10->name(expr1, ...)
-  @Disabled("Incorrect precedence: the unary operator is applied to the expression for the method call")
   @Test
   fun `test method call has higher precedence than unary not`() {
     // A method call is rewritten as a function call with the object as the first argument
@@ -241,6 +240,16 @@ class Expr9Tests : ExpressionPrecedenceTest() {
     // echo !(0 * 24) => 1
     // Therefore `echo !0 * 24` is equivalent to `echo (!0) * 24``
     assertExpressionPrecedence(expression = "!foo * bar", expected = "(!foo) * bar")
+  }
+
+  @Test
+  fun `test unary minus applies to numeric constant not expression`() {
+    assertExpressionPrecedence(expression = "-4->abs()", "abs(-4)")
+  }
+
+  @Test
+  fun `test unary minus applies to expression if not numeric constant`() {
+    assertExpressionPrecedence(expression = "-a->abs()", "-(abs(a))")
   }
 }
 
