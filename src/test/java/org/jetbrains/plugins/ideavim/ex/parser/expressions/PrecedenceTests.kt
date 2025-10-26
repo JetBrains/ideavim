@@ -177,7 +177,6 @@ class Expr10Tests : ExpressionPrecedenceTest() {
   }
 
   // expr10[expr1 : expr1]
-  @Disabled("Incorrect precedence: the unary operator is applied to the expression for the sublist, not the sublist itself")
   @Test
   fun `test sublist expression has higher precedence than unary not`() {
     // Unary not is expr9
