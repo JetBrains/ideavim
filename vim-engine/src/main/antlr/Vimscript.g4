@@ -224,32 +224,53 @@ commandName:
 //  Expressions related rules
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// These are in precedence order, from most significant to least. It reflects the precedence list in the Vim docs
+// (see `:help expression-syntax`) albeit without the nested grammar rules.
+// Note that expr10 has higher precedence than expr11 because Vim defines expr10 rules in terms of expr11 or expr10 with
+// trailing syntax. If we put expr11 higher, it will match the leading syntax and then fail to match the trailing syntax
 expr:
+                    // expr10
                         expr L_BRACKET WS* expr WS* R_BRACKET                                   #IndexedExpression
                     |   expr L_BRACKET WS* from = expr? WS* COLON WS* to = expr? WS* R_BRACKET  #SublistExpression
-                    |   unaryOperator = (BANG | PLUS | MINUS) WS* expr                          #UnaryExpression
-                    |   expr WS* binaryOperator1 WS* expr                                       #BinExpression1
-                    |   expr WS* binaryOperator2 WS* expr                                       #BinExpression2
-                    |   expr WS* binaryOperator3 WS* expr                                       #BinExpression3
-                    |   expr WS* binaryOperator4 WS* expr                                       #BinExpression4
-                    |   expr WS* binaryOperator5 WS* expr                                       #BinExpression5
+                    // TODO: expr10(expr1, ...)
                     |   expr WS* ARROW WS* functionCall                                         #FunctionAsMethodCall1
                     |   expr WS* ARROW WS* lambda L_PAREN WS* functionArguments WS* R_PAREN     #FunctionAsMethodCall2
-                    |   functionCall                                                            #FunctionCallExpression
-                    |   lambda L_PAREN WS* functionArguments WS* R_PAREN                        #LambdaFunctionCallExpression
-                    |   lambda                                                                  #LambdaExpression
-                    |   unsignedInt                                                             #IntExpression
-                    |   unsignedFloat                                                           #FloatExpression
+                    // TODO: expr10.name
+                    // expr11
+                    // Vim applies unary PLUS or MINUS to a numeric constant with higher precedence than to any other
+                    // expression/part expression
+                    |   unaryOperator = (PLUS | MINUS)? WS* unsignedInt                         #IntExpression
+                    |   unaryOperator = (PLUS | MINUS)? WS* unsignedFloat                       #FloatExpression
                     |   string                                                                  #StringExpression
                     |   blob                                                                    #BlobExpression
-                    |   variable                                                                #VariableExpression
-                    |   option                                                                  #OptionExpression
-                    |   envVariable                                                             #EnvVariableExpression
-                    |   register                                                                #RegisterExpression
                     |   list                                                                    #ListExpression
                     |   dictionary                                                              #DictionaryExpression
                     |   literalDictionary                                                       #LiteralDictionaryExpression
+                    |   option                                                                  #OptionExpression
                     |   L_PAREN WS* expr WS* R_PAREN                                            #WrappedExpression
+                    // Make sure functionCall is before variable so foo() isn't treated as a funcref variable invocation
+                    |   functionCall                                                            #FunctionCallExpression
+                    |   variable                                                                #VariableExpression
+                    |   envVariable                                                             #EnvVariableExpression
+                    |   register                                                                #RegisterExpression
+                    |   lambda L_PAREN WS* functionArguments WS* R_PAREN                        #LambdaFunctionCallExpression
+                    |   lambda                                                                  #LambdaExpression
+                    // expr9
+                    |   unaryOperator = (BANG | PLUS | MINUS) WS* expr                          #UnaryExpression
+                    // expr8 is Vim9 typecast
+                    // expr7: * / %
+                    |   expr WS* binaryOperator1 WS* expr                                       #BinExpression1
+                    // expr6: + - . ..
+                    |   expr WS* binaryOperator2 WS* expr                                       #BinExpression2
+                    // expr5: left/right shift (not yet implemented)
+                    // expr4: equality/is/comparisons
+                    |   expr WS* binaryOperator3 WS* expr                                       #BinExpression3
+                    // expr3: logical AND
+                    |   expr WS* binaryOperator4 WS* expr                                       #BinExpression4
+                    // expr2: logical OR
+                    |   expr WS* binaryOperator5 WS* expr                                       #BinExpression5
+                    // expr1: ternary/falsy
                     |   <assoc=right> expr WS* QUESTION QUESTION WS* expr                       #FalsyExpression
                     |   <assoc=right> expr WS* QUESTION WS* expr WS* COLON WS* expr             #TernaryExpression
 ;

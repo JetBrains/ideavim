@@ -80,8 +80,13 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
   }
 
   override fun visitIntExpression(ctx: IntExpressionContext): Expression {
-    val result = SimpleExpression(VimInt.parseNumber(ctx.text) ?: VimInt.ZERO)
-    result.originalString = ctx.text
+    val result = SimpleExpression(VimInt.parseNumber(ctx.unsignedInt().text) ?: VimInt.ZERO)
+    result.originalString = ctx.unsignedInt().text
+    if (ctx.unaryOperator != null) {
+      val unary = UnaryExpression(UnaryOperator.getByValue(ctx.unaryOperator.text), result)
+      unary.originalString = ctx.text
+      return unary
+    }
     return result
   }
 
@@ -242,7 +247,12 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
 
   override fun visitFloatExpression(ctx: FloatExpressionContext): Expression {
     val result = SimpleExpression(ctx.unsignedFloat().text.toDouble())
-    result.originalString = ctx.text
+    result.originalString = ctx.unsignedFloat().text
+    if (ctx.unaryOperator != null) {
+      val unary = UnaryExpression(UnaryOperator.getByValue(ctx.unaryOperator.text), result)
+      unary.originalString = ctx.text
+      return unary
+    }
     return result
   }
 
