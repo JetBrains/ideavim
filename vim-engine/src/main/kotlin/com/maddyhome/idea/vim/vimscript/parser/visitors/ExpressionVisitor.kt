@@ -307,7 +307,19 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
   }
 
   override fun visitFunctionCallExpression(ctx: FunctionCallExpressionContext): Expression {
-    val result = visitFunctionCall(ctx.functionCall())
+    // This can be either a function call through an expression that resolves to a funcref (i.e. `expr10(expr1, ...)`)
+    // or a function call through a name (i.e. `name(expr1, ...)` or `n{am}e(expr1, ...)` - see `expr11`).
+    // When it's through a (curly braces) name, the context will have a functionCall(), otherwise, we'll have an expr()
+    // As a reminder, a method call (`expr10->name(expr1, ...)`) is converted into a function call though a name:
+    // `expr10.name(expr1, ...)`.
+    val expr = ctx.expr()
+    val arguments = ctx.functionArguments()
+    val result = if (expr != null && arguments != null) {
+      FuncrefCallExpression(visit(expr), visitFunctionArgs(arguments))
+    }
+    else {
+      visitFunctionCall(ctx.functionCall())
+    }
     result.originalString = ctx.text
     return result
   }
