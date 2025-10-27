@@ -154,8 +154,10 @@ tasks.register("updateMergedPr", JavaExec::class) {
   group = "other"
   mainClass.set("scripts.UpdateMergedPrKt")
   classpath = sourceSets["main"].runtimeClasspath
-  val prId = project.findProperty("prId") as String? ?: error("prId property not provided")
-  args = listOf(prId, rootProject.rootDir.toString())
+  doFirst {
+    val prId = project.findProperty("prId") as String? ?: error("prId property not provided")
+    args = listOf(prId, rootProject.rootDir.toString())
+  }
 }
 
 tasks.register("updateChangelog", JavaExec::class) {
@@ -163,4 +165,11 @@ tasks.register("updateChangelog", JavaExec::class) {
   mainClass.set("scripts.UpdateChangelogKt")
   classpath = sourceSets["main"].runtimeClasspath
   args = listOf(rootProject.rootDir.toString())
+}
+
+tasks.register("releaseActions", JavaExec::class) {
+  group = "other"
+  mainClass.set("scripts.ReleaseActionsKt")
+  classpath = sourceSets["main"].runtimeClasspath
+  args = listOf(project.version.toString(), releaseType ?: "")
 }

@@ -11,7 +11,7 @@ package scripts
 import kotlinx.coroutines.runBlocking
 import java.io.File
 
-fun main(args: Array<String>) {
+fun main(args: Array<String>) = runBlocking {
   val projectDir = if (args.isNotEmpty()) File(args[0]) else File(".")
   
   println("Start updating youtrack")
@@ -21,9 +21,7 @@ fun main(args: Array<String>) {
   val newTickets = newFixes.map { it.id }
   println("Set new status for $newTickets")
   
-  runBlocking {
-    setYoutrackStatus(newTickets, "Ready To Release")
-  }
+  setYoutrackStatus(newTickets, "Ready To Release")
 }
 
 

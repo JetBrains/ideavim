@@ -418,30 +418,6 @@ val fixVersionsFieldId = "123-285"
 val fixVersionsFieldType = "VersionProjectCustomField"
 val fixVersionsElementType = "VersionBundleElement"
 
-tasks.register<Task>("releaseActions") {
-  group = "other"
-  doLast {
-    if (releaseType == "patch") return@doLast
-
-    val tickets =
-      getYoutrackTicketsByQuery("%23%7BReady+To+Release%7D%20and%20tag:%20%7BIdeaVim%20Released%20In%20EAP%7D%20")
-    if (tickets.isNotEmpty()) {
-      println("Updating statuses for tickets: $tickets")
-      setYoutrackStatus(tickets, "Fixed")
-      println("Checking if version $version exists...")
-      val versionId = getVersionIdByName(version.toString())
-      if (versionId == null) {
-        addReleaseToYoutrack(version.toString())
-      } else {
-        println("Version $version already exists in YouTrack. Version id: $versionId")
-      }
-      setYoutrackFixVersion(tickets, version.toString())
-    } else {
-      println("No tickets to update statuses")
-    }
-  }
-}
-
 tasks.register<Task>("integrationsTest") {
   group = "other"
   doLast {
