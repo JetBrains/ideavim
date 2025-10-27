@@ -33,9 +33,26 @@ abstract class VimscriptParserBase : com.maddyhome.idea.vim.api.VimscriptParser 
   }
 
   private val logger = vimLogger<VimscriptParser>()
-  override val linesWithErrors: MutableList<Int> = mutableListOf()
-  private var tries = 0
-  private var deletionInfo: DeletionInfo = DeletionInfo()
+
+  // Thread-local state to support concurrent parsing
+  private val threadLocalState = ThreadLocal.withInitial { ParserState() }
+
+  override val linesWithErrors: MutableList<Int>
+    get() = threadLocalState.get().linesWithErrors
+
+  private var tries: Int
+    get() = threadLocalState.get().tries
+    set(value) { threadLocalState.get().tries = value }
+
+  private var deletionInfo: DeletionInfo
+    get() = threadLocalState.get().deletionInfo
+    set(value) { threadLocalState.get().deletionInfo = value }
+
+  private class ParserState {
+    val linesWithErrors: MutableList<Int> = mutableListOf()
+    var tries: Int = 0
+    var deletionInfo: DeletionInfo = DeletionInfo()
+  }
   protected open val commandProviders: List<ExCommandProvider> = listOf(EngineExCommandProvider)
   override val exCommands: ExCommandTree by lazy {
     val commandTree = ExCommandTree()
