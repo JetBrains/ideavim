@@ -118,3 +118,10 @@ tasks.register("setTeamCityBuildNumber", JavaExec::class) {
   classpath = sourceSets["main"].runtimeClasspath
   args = listOf(project.version.toString(), rootProject.rootDir.toString(), releaseType ?: "")
 }
+
+tasks.register("updateYoutrackOnCommit", JavaExec::class) {
+  group = "other"
+  mainClass.set("scripts.UpdateYoutrackOnCommitKt")
+  classpath = sourceSets["main"].runtimeClasspath
+  args = listOf(rootProject.rootDir.toString())
+}

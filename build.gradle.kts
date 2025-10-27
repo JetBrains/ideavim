@@ -509,12 +509,6 @@ tasks.register<Task>("updateChangelog") {
   }
 }
 
-tasks.register<Task>("updateYoutrackOnCommit") {
-  doLast {
-    updateYoutrackOnCommit()
-  }
-}
-
 val vimProjectId = "22-43"
 val fixVersionsFieldId = "123-285"
 val fixVersionsFieldType = "VersionProjectCustomField"
@@ -644,16 +638,6 @@ fun deleteVersionById(id: String) {
   runBlocking {
     client.delete("https://youtrack.jetbrains.com/api/admin/projects/$vimProjectId/customFields/$fixVersionsFieldId/bundle/values/$id")
   }
-}
-
-fun updateYoutrackOnCommit() {
-  println("Start updating youtrack")
-  println(projectDir)
-
-  val newFixes = changes()
-  val newTickets = newFixes.map { it.id }
-  println("Set new status for $newTickets")
-  setYoutrackStatus(newTickets, "Ready To Release")
 }
 
 fun getYoutrackTicketsByQuery(query: String): Set<String> {
@@ -873,7 +857,6 @@ fun List<Author>.toMdString(): String {
 }
 
 data class Author(val name: String, val url: String, val mail: String)
-data class Change(val id: String, val text: String)
 
 fun updateMergedPr(number: Int) {
   val token = System.getenv("GITHUB_OAUTH")
@@ -973,6 +956,8 @@ val sections = listOf(
   "### Fixes:",
   "### Merged PRs:",
 )
+
+data class Change(val id: String, val text: String)
 
 fun changes(): List<Change> {
   val repository = RepositoryBuilder().setGitDir(File("$projectDir/.git")).build()
