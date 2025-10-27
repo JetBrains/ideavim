@@ -8,7 +8,6 @@
 
 package scripts
 
-import org.intellij.markdown.ast.getTextInNode
 import java.io.File
 
 fun main(args: Array<String>) {
@@ -47,72 +46,3 @@ fun updateMergedPr(number: Int, projectDir: File) {
 
   changesFile.writeText(changesBuilder.toString())
 }
-
-fun setupSection(
-  changes: String,
-  authorsBuilder: StringBuilder,
-  sectionName: String,
-): Int {
-  val parser =
-    org.intellij.markdown.parser.MarkdownParser(org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor())
-  val tree = parser.buildMarkdownTreeFromString(changes)
-
-  var idx = -1
-  for (index in tree.children.indices) {
-    if (tree.children[index].getTextInNode(changes).startsWith("## ")) {
-      idx = index
-      break
-    }
-  }
-
-  val hasToBeReleased = tree.children[idx].getTextInNode(changes).contains("To Be Released")
-  return if (hasToBeReleased) {
-    var mrgIdx = -1
-    for (index in (idx + 1) until tree.children.lastIndex) {
-      val textInNode = tree.children[index].getTextInNode(changes)
-      val foundIndex = textInNode.startsWith(sectionName)
-      if (foundIndex) {
-        var filledPr = index + 2
-        while (tree.children[filledPr].getTextInNode(changes).startsWith("*")) {
-          filledPr++
-        }
-        mrgIdx = tree.children[filledPr].startOffset + 1
-        break
-      } else {
-        val currentSectionIndex = sections.indexOf(sectionName)
-        val insertHere = textInNode.startsWith("## ") ||
-                textInNode.startsWith("### ") &&
-                sections.indexOfFirst { textInNode.startsWith(it) }
-                  .let { if (it < 0) false else it > currentSectionIndex }
-        if (insertHere) {
-          val section = """
-                        $sectionName
-                        
-                        
-                    """.trimIndent()
-          authorsBuilder.insert(tree.children[index].startOffset, section)
-          mrgIdx = tree.children[index].startOffset + (section.length - 1)
-          break
-        }
-      }
-    }
-    mrgIdx
-  } else {
-    val section = """
-            ## To Be Released
-            
-            $sectionName
-            
-            
-        """.trimIndent()
-    authorsBuilder.insert(tree.children[idx].startOffset, section)
-    tree.children[idx].startOffset + (section.length - 1)
-  }
-}
-
-val sections = listOf(
-  "### Features:",
-  "### Changes:",
-  "### Fixes:",
-  "### Merged PRs:",
-)

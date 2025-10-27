@@ -27,8 +27,6 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
-import org.eclipse.jgit.api.Git
-import org.eclipse.jgit.lib.RepositoryBuilder
 import org.intellij.markdown.ast.getTextInNode
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.tasks.aware.SplitModeAware
@@ -415,12 +413,6 @@ koverMerged {
 //    }
 // }
 
-tasks.register<Task>("updateChangelog") {
-  doLast {
-    updateChangelog()
-  }
-}
-
 val vimProjectId = "22-43"
 val fixVersionsFieldId = "123-285"
 val fixVersionsFieldType = "VersionProjectCustomField"
@@ -653,31 +645,7 @@ fun getYoutrackStatus(ticket: String): String {
   }
 }
 
-fun updateChangelog() {
-  println("Start update authors")
-  println(projectDir)
-  val newFixes = changes()
 
-  // Update changes file
-  val changesFile = File("$projectDir/CHANGES.md")
-  val changes = changesFile.readText()
-
-  val changesBuilder = StringBuilder(changes)
-  val insertOffset = setupSection(changes, changesBuilder, "### Fixes:")
-
-  if (insertOffset < 50) error("Incorrect offset: $insertOffset")
-
-  val firstPartOfChanges = changes.take(insertOffset)
-  val actualFixes = newFixes
-    .filterNot { it.id in firstPartOfChanges }
-  val newUpdates = actualFixes
-    .joinToString("") { "* [${it.id}](https://youtrack.jetbrains.com/issue/${it.id}) ${it.text}\n" }
-
-  changesBuilder.insert(insertOffset, newUpdates)
-  if (actualFixes.isNotEmpty()) {
-    changesFile.writeText(changesBuilder.toString())
-  }
-}
 
 
 
@@ -753,39 +721,7 @@ val sections = listOf(
   "### Merged PRs:",
 )
 
-data class Change(val id: String, val text: String)
 
-fun changes(): List<Change> {
-  val repository = RepositoryBuilder().setGitDir(File("$projectDir/.git")).build()
-  val git = Git(repository)
-  val lastSuccessfulCommit = System.getenv("SUCCESS_COMMIT")!!
-  val messages = git.log().call()
-    .takeWhile {
-      !it.id.name.equals(lastSuccessfulCommit, ignoreCase = true)
-    }
-    .map { it.shortMessage }
-
-  // Collect fixes
-  val newFixes = mutableListOf<Change>()
-  println("Last successful commit: $lastSuccessfulCommit")
-  println("Amount of commits: ${messages.size}")
-  println("Start changes processing")
-  for (message in messages) {
-    println("Processing '$message'...")
-    val lowercaseMessage = message.lowercase()
-    val regex = "^fix\\((vim-\\d+)\\):".toRegex()
-    val findResult = regex.find(lowercaseMessage)
-    if (findResult != null) {
-      println("Message matches")
-      val value = findResult.groups[1]!!.value.uppercase()
-      val shortMessage = message.drop(findResult.range.last + 1).trim()
-      newFixes += Change(value, shortMessage)
-    } else {
-      println("Message doesn't match")
-    }
-  }
-  return newFixes
-}
 
 fun httpClient(): HttpClient {
   return HttpClient(CIO) {
