@@ -36,6 +36,10 @@ dependencies {
   
   // For SlackNotification
   implementation("com.github.AlexPl292:mark-down-to-slack:1.1.2")
+  
+  // For updateAuthors
+  implementation("org.kohsuke:github-api:1.305")
+  implementation("org.jetbrains:markdown:0.7.3")
 }
 
 val releaseType: String? by project
@@ -137,4 +141,11 @@ tasks.register("slackNotification", JavaExec::class) {
   val slackUrl = project.findProperty("slackUrl") as String? ?: ""
   val changesFile = rootProject.file("CHANGES.md").toString()
   args = listOf(project.version.toString(), slackUrl, changesFile)
+}
+
+tasks.register("updateAuthors", JavaExec::class) {
+  group = "other"
+  mainClass.set("scripts.UpdateAuthorsKt")
+  classpath = sourceSets["main"].runtimeClasspath
+  args = listOf(rootProject.rootDir.toString())
 }
