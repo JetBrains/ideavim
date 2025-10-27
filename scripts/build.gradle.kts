@@ -17,6 +17,7 @@ plugins {
 
 repositories {
   mavenCentral()
+  maven { url = uri("https://jitpack.io") }
 }
 
 dependencies {
@@ -32,6 +33,9 @@ dependencies {
   // This is needed for jgit to connect to ssh
   implementation("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:7.3.0.202506031305-r")
   implementation("com.vdurmont:semver4j:3.1.0")
+  
+  // For SlackNotification
+  implementation("com.github.AlexPl292:mark-down-to-slack:1.1.2")
 }
 
 val releaseType: String? by project
@@ -124,4 +128,13 @@ tasks.register("updateYoutrackOnCommit", JavaExec::class) {
   mainClass.set("scripts.UpdateYoutrackOnCommitKt")
   classpath = sourceSets["main"].runtimeClasspath
   args = listOf(rootProject.rootDir.toString())
+}
+
+tasks.register("slackNotification", JavaExec::class) {
+  group = "other"
+  mainClass.set("scripts.SlackNotificationKt")
+  classpath = sourceSets["main"].runtimeClasspath
+  val slackUrl = project.findProperty("slackUrl") as String? ?: ""
+  val changesFile = rootProject.file("CHANGES.md").toString()
+  args = listOf(project.version.toString(), slackUrl, changesFile)
 }

@@ -6,7 +6,6 @@
  * https://opensource.org/licenses/MIT.
  */
 
-import dev.feedforward.markdownto.DownParser
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
@@ -32,7 +31,6 @@ import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.lib.RepositoryBuilder
 import org.intellij.markdown.ast.getTextInNode
 import org.intellij.markdown.ast.impl.ListCompositeNode
-import org.jetbrains.changelog.Changelog
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.tasks.aware.SplitModeAware
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -409,60 +407,6 @@ changelog {
 
 koverMerged {
   enable()
-}
-
-// --- Slack notification
-
-tasks.register<Task>("slackNotification") {
-  doLast {
-    if (version.toString().last() != '0') return@doLast
-    if (slackUrl.isBlank()) {
-      println("Slack Url is not defined")
-      return@doLast
-    }
-
-    val changeLog = changelog.renderItem(changelog.getLatest(), Changelog.OutputType.PLAIN_TEXT)
-    val slackDown = DownParser(changeLog, true).toSlack().toString()
-
-    //language=JSON
-    val message = """
-            {
-                "text": "New version of IdeaVim",
-                "blocks": [
-                    {
-                        "type": "section",
-                        "text": {
-                            "type": "mrkdwn",
-                            "text": "IdeaVim $version has been released\n$slackDown"
-                        }
-                    }
-                ]
-            }
-        """.trimIndent()
-
-    println("Parsed data: $slackDown")
-
-    runBlocking {
-      val client = HttpClient(CIO)
-      try {
-        val response = client.post(slackUrl) {
-          contentType(ContentType.Application.Json)
-          setBody(message)
-        }
-
-        val responseCode = response.status.value
-        println("Response code: $responseCode")
-
-        val responseBody = response.body<String>()
-        println(responseBody)
-      } catch (e: Exception) {
-        println("Error sending Slack notification: ${e.message}")
-        throw e
-      } finally {
-        client.close()
-      }
-    }
-  }
 }
 
 // Uncomment to enable FUS testing mode
