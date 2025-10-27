@@ -173,3 +173,9 @@ tasks.register("releaseActions", JavaExec::class) {
   classpath = sourceSets["main"].runtimeClasspath
   args = listOf(project.version.toString(), releaseType ?: "")
 }
+
+tasks.register("integrationsTest", JavaExec::class) {
+  group = "verification"
+  mainClass.set("scripts.IntegrationsTestKt")
+  classpath = sourceSets["main"].runtimeClasspath
+}

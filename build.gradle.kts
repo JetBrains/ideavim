@@ -418,56 +418,6 @@ val fixVersionsFieldId = "123-285"
 val fixVersionsFieldType = "VersionProjectCustomField"
 val fixVersionsElementType = "VersionBundleElement"
 
-tasks.register<Task>("integrationsTest") {
-  group = "other"
-  doLast {
-    val testTicketId = "VIM-2784"
-
-    // YouTrack set to Ready To Release on Fix commit
-    setYoutrackStatus(listOf(testTicketId), "Ready To Release")
-    if ("Ready To Release" != getYoutrackStatus(testTicketId)) {
-      error("Ticket status was not updated")
-    }
-    setYoutrackStatus(listOf(testTicketId), "Open")
-
-    // Check YouTrack requests
-    val prevStatus = getYoutrackStatus(testTicketId)
-    setYoutrackStatus(listOf(testTicketId), "Ready To Release")
-    val tickets = getYoutrackTicketsByQuery("%23%7BReady+To+Release%7D")
-    if (testTicketId !in tickets) {
-      error("Test ticket is not found in request")
-    }
-    setYoutrackStatus(listOf(testTicketId), prevStatus)
-
-    // Check adding and removing release
-    val existingVersionId = getVersionIdByName("TEST_VERSION")
-    if (existingVersionId != null) {
-      deleteVersionById(existingVersionId)
-    }
-    val versionId = addReleaseToYoutrack("TEST_VERSION")
-    guard(getVersionIdByName("TEST_VERSION") != null) { "Test version isn't created" }
-    setYoutrackStatus(listOf(testTicketId), "Fixed")
-    setYoutrackFixVersion(listOf(testTicketId), "TEST_VERSION")
-    deleteVersionById(versionId)
-    setYoutrackStatus(listOf(testTicketId), "Open")
-    guard(getVersionIdByName("TEST_VERSION") == null) { "Test version isn't deleted" }
-
-    // TODO: Update to call the script version
-    // updateMergedPr(525)
-    // TODO: test Ticket parsing
-    // TODO: test Update CHANGES
-    // TODO: test Update AUTHORS
-    // TODO: test Slack notification
-    // TODO: Add a comment on EAP release
-  }
-}
-
-fun guard(check: Boolean, ifWrong: () -> String) {
-  if (!check) {
-    error(ifWrong())
-  }
-}
-
 tasks.register<Task>("testUpdateChangelog") {
   group = "verification"
   description = "This is a task to manually assert the correctness of the update tasks"
