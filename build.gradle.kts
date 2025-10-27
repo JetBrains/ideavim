@@ -415,21 +415,6 @@ koverMerged {
 //    }
 // }
 
-val prId: String by project
-
-tasks.register<Task>("updateMergedPr") {
-  doLast {
-    val x = changelog.getUnreleased()
-    println("x")
-//    if (project.hasProperty("prId")) {
-//      println("Got pr id: $prId")
-//      updateMergedPr(prId.toInt())
-//    } else {
-//      error("Cannot get prId")
-//    }
-  }
-}
-
 tasks.register<Task>("updateChangelog") {
   doLast {
     updateChangelog()
@@ -499,7 +484,8 @@ tasks.register<Task>("integrationsTest") {
     setYoutrackStatus(listOf(testTicketId), "Open")
     guard(getVersionIdByName("TEST_VERSION") == null) { "Test version isn't deleted" }
 
-    updateMergedPr(525)
+    // TODO: Update to call the script version
+    // updateMergedPr(525)
     // TODO: test Ticket parsing
     // TODO: test Update CHANGES
     // TODO: test Update AUTHORS
@@ -695,36 +681,9 @@ fun updateChangelog() {
 
 
 
-fun updateMergedPr(number: Int) {
-  val token = System.getenv("GITHUB_OAUTH")
-  println("Token size: ${token.length}")
-  val gitHub = org.kohsuke.github.GitHubBuilder().withOAuthToken(token).build()
-  println("Connecting to the repo...")
-  val repository = gitHub.getRepository("JetBrains/ideavim")
-  println("Getting pull requests...")
-  val pullRequest = repository.getPullRequest(number)
-  if (pullRequest.user.login == "dependabot[bot]") return
 
-  val changesFile = File("$projectDir/CHANGES.md")
-  val changes = changesFile.readText()
 
-  val changesBuilder = StringBuilder(changes)
-  val insertOffset = setupSection(changes, changesBuilder, "### Merged PRs:")
-
-  if (insertOffset < 50) error("Incorrect offset: $insertOffset")
-  if (pullRequest.user.login == "dependabot[bot]") return
-
-  val prNumber = pullRequest.number
-  val userName = pullRequest.user.name ?: pullRequest.user.login
-  val login = pullRequest.user.login
-  val title = pullRequest.title
-  val section =
-    "* [$prNumber](https://github.com/JetBrains/ideavim/pull/$prNumber) by [$userName](https://github.com/$login): $title\n"
-  changesBuilder.insert(insertOffset, section)
-
-  changesFile.writeText(changesBuilder.toString())
-}
-
+// Shared utility functions (also used in scripts project)
 fun setupSection(
   changes: String,
   authorsBuilder: StringBuilder,

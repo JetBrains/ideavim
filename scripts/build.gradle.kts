@@ -149,3 +149,11 @@ tasks.register("updateAuthors", JavaExec::class) {
   classpath = sourceSets["main"].runtimeClasspath
   args = listOf(rootProject.rootDir.toString())
 }
+
+tasks.register("updateMergedPr", JavaExec::class) {
+  group = "other"
+  mainClass.set("scripts.UpdateMergedPrKt")
+  classpath = sourceSets["main"].runtimeClasspath
+  val prId = project.findProperty("prId") as String? ?: error("prId property not provided")
+  args = listOf(prId, rootProject.rootDir.toString())
+}
