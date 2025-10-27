@@ -811,6 +811,10 @@ fun updateAuthors(uncheckedEmails: Set<String>) {
       println("Email '$email' is from dependabot. Skip it")
       continue
     }
+    if ("github-actions[bot]@users.noreply.github.com" in email || "41898282+github-actions[bot]@users.noreply.github.com" in email) {
+      println("Email '$email' is from github-actions. Skip it")
+      continue
+    }
     if ("tcuser" in email) {
       println("Email '$email' is from teamcity. Skip it")
       continue
