@@ -178,4 +178,5 @@ tasks.register("integrationsTest", JavaExec::class) {
   group = "verification"
   mainClass.set("scripts.IntegrationsTestKt")
   classpath = sourceSets["main"].runtimeClasspath
+  args = listOf(rootProject.rootDir.toString())
 }

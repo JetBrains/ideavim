@@ -11,10 +11,11 @@ package scripts
 import kotlinx.coroutines.runBlocking
 
 fun main(args: Array<String>) {
-  runIntegrationsTest()
+  val rootDir = if (args.isNotEmpty()) java.io.File(args[0]) else java.io.File(".").canonicalFile
+  runIntegrationsTest(rootDir)
 }
 
-fun runIntegrationsTest() = runBlocking {
+fun runIntegrationsTest(projectDir: java.io.File = java.io.File(".").canonicalFile) = runBlocking {
   val testTicketId = "VIM-2784"
 
   // YouTrack set to Ready To Release on Fix commit
@@ -47,7 +48,6 @@ fun runIntegrationsTest() = runBlocking {
   guard(getVersionIdByName("TEST_VERSION") == null) { "Test version isn't deleted" }
 
   // Test updateMergedPr
-  val projectDir = java.io.File(".").canonicalFile
   updateMergedPr(525, projectDir)
   
   // TODO: test Ticket parsing
