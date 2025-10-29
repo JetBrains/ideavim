@@ -260,24 +260,24 @@ expr:
                     |   unaryOperator = (BANG | PLUS | MINUS) WS* expr                          #UnaryExpression
                     // expr8 is Vim9 typecast
                     // expr7: * / %
-                    |   expr WS* binaryOperator1 WS* expr                                       #BinExpression1
+                    |   expr WS* multiplicativeOperator WS* expr                                #MultiplicativeExpression
                     // expr6: + - . ..
-                    |   expr WS* binaryOperator2 WS* expr                                       #BinExpression2
+                    |   expr WS* additiveOperator WS* expr                                      #AdditiveExpression
                     // expr5: left/right shift (not yet implemented)
                     // expr4: equality/is/comparisons
-                    |   expr WS* binaryOperator3 WS* expr                                       #BinExpression3
+                    |   expr WS* comparisonOperator WS* expr                                    #ComparisonExpression
                     // expr3: logical AND
-                    |   expr WS* binaryOperator4 WS* expr                                       #BinExpression4
+                    |   expr WS* logicalAndOperator WS* expr                                    #LogicalAndExpression
                     // expr2: logical OR
-                    |   expr WS* binaryOperator5 WS* expr                                       #BinExpression5
+                    |   expr WS* logicalOrOperator WS* expr                                     #LogicalOrExpression
                     // expr1: ternary/falsy
                     |   <assoc=right> expr WS* QUESTION QUESTION WS* expr                       #FalsyExpression
                     |   <assoc=right> expr WS* QUESTION WS* expr WS* COLON WS* expr             #TernaryExpression
 ;
 
-binaryOperator1:        STAR | DIV | MOD;
-binaryOperator2:        PLUS | MINUS | DOT | (DOT DOT);
-binaryOperator3:        LESS | LESS_IC | LESS_CS
+multiplicativeOperator: STAR | DIV | MOD;
+additiveOperator:       PLUS | MINUS | DOT | (DOT DOT);
+comparisonOperator:     LESS | LESS_IC | LESS_CS
                     |   GREATER | GREATER_IC | GREATER_CS
                     |   LESS_OR_EQUALS | LESS_OR_EQUALS_IC | LESS_OR_EQUALS_CS
                     |   GREATER_OR_EQUALS | GREATER_OR_EQUALS_IC | GREATER_OR_EQUALS_CS
@@ -288,8 +288,8 @@ binaryOperator3:        LESS | LESS_IC | LESS_CS
                     |   IS | IS_IC | IS_CS
                     |   IS_NOT | IS_NOT_IC | IS_NOT_CS
 ;
-binaryOperator4:        AMPERSAND AMPERSAND;
-binaryOperator5:        LOGICAL_OR;
+logicalAndOperator:     AMPERSAND AMPERSAND;
+logicalOrOperator:      BAR BAR;
 
 register:               AT (DIGIT | lowercaseAlphabeticChar | uppercaseAlphabeticChar | MINUS | COLON | DOT | MOD | NUM | ASSIGN | STAR | PLUS | TILDE | UNDERSCORE | DIV | AT | QUOTE);
 // todo argumentDeclaration but without default values
@@ -804,9 +804,6 @@ STAR:                   '*';
 DIV:                    '/';
 MOD:                    '%';
 DOT:                    '.';
-
-// Logical operators
-LOGICAL_OR:             '||';
 
 // Relation operators
 LESS:                   '<';

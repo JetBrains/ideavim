@@ -11,7 +11,9 @@ package com.maddyhome.idea.vim.vimscript.parser.visitors
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.parser.generated.VimscriptBaseVisitor
 import com.maddyhome.idea.vim.parser.generated.VimscriptParser
+import com.maddyhome.idea.vim.parser.generated.VimscriptParser.AdditiveExpressionContext
 import com.maddyhome.idea.vim.parser.generated.VimscriptParser.BlobExpressionContext
+import com.maddyhome.idea.vim.parser.generated.VimscriptParser.ComparisonExpressionContext
 import com.maddyhome.idea.vim.parser.generated.VimscriptParser.DictionaryExpressionContext
 import com.maddyhome.idea.vim.parser.generated.VimscriptParser.EnvVariableExpressionContext
 import com.maddyhome.idea.vim.parser.generated.VimscriptParser.FalsyExpressionContext
@@ -21,6 +23,9 @@ import com.maddyhome.idea.vim.parser.generated.VimscriptParser.IndexedExpression
 import com.maddyhome.idea.vim.parser.generated.VimscriptParser.IntExpressionContext
 import com.maddyhome.idea.vim.parser.generated.VimscriptParser.ListExpressionContext
 import com.maddyhome.idea.vim.parser.generated.VimscriptParser.LiteralDictionaryExpressionContext
+import com.maddyhome.idea.vim.parser.generated.VimscriptParser.LogicalAndExpressionContext
+import com.maddyhome.idea.vim.parser.generated.VimscriptParser.LogicalOrExpressionContext
+import com.maddyhome.idea.vim.parser.generated.VimscriptParser.MultiplicativeExpressionContext
 import com.maddyhome.idea.vim.parser.generated.VimscriptParser.OptionExpressionContext
 import com.maddyhome.idea.vim.parser.generated.VimscriptParser.RegisterExpressionContext
 import com.maddyhome.idea.vim.parser.generated.VimscriptParser.StringExpressionContext
@@ -111,21 +116,21 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
     return result
   }
 
-  override fun visitBinExpression1(ctx: VimscriptParser.BinExpression1Context): Expression {
+  override fun visitMultiplicativeExpression(ctx: MultiplicativeExpressionContext): Expression {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
-    val operatorString = ctx.binaryOperator1().text
+    val operatorString = ctx.multiplicativeOperator().text
     val operator = BinaryOperator.getByValue(operatorString) ?: throw RuntimeException()
     val result = BinExpression(left, right, operator)
     result.originalString = ctx.text
     return result
   }
 
-  override fun visitBinExpression2(ctx: VimscriptParser.BinExpression2Context): Expression {
+  override fun visitAdditiveExpression(ctx: AdditiveExpressionContext): Expression {
     val leftExpression = visit(ctx.expr(0))
     val rightExpression = visit(ctx.expr(1))
     val rightText: String = ctx.expr(1).text
-    val operatorString = ctx.binaryOperator2().text
+    val operatorString = ctx.additiveOperator().text
 
     val result =
       when {
@@ -207,30 +212,30 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
     }
   }
 
-  override fun visitBinExpression3(ctx: VimscriptParser.BinExpression3Context): Expression {
+  override fun visitComparisonExpression(ctx: ComparisonExpressionContext): Expression {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
-    val operatorString = ctx.binaryOperator3().text
+    val operatorString = ctx.comparisonOperator().text
     val operator = BinaryOperator.getByValue(operatorString) ?: throw RuntimeException()
     val result = BinExpression(left, right, operator)
     result.originalString = ctx.text
     return result
   }
 
-  override fun visitBinExpression4(ctx: VimscriptParser.BinExpression4Context): Expression {
+  override fun visitLogicalAndExpression(ctx: LogicalAndExpressionContext): Expression {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
-    val operatorString = ctx.binaryOperator4().text
+    val operatorString = ctx.logicalAndOperator().text
     val operator = BinaryOperator.getByValue(operatorString) ?: throw RuntimeException()
     val result = BinExpression(left, right, operator)
     result.originalString = ctx.text
     return result
   }
 
-  override fun visitBinExpression5(ctx: VimscriptParser.BinExpression5Context): Expression {
+  override fun visitLogicalOrExpression(ctx: LogicalOrExpressionContext): Expression {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
-    val operatorString = ctx.binaryOperator5().text
+    val operatorString = ctx.logicalOrOperator().text
     val operator = BinaryOperator.getByValue(operatorString) ?: throw RuntimeException()
     val result = BinExpression(left, right, operator)
     result.originalString = ctx.text
