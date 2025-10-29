@@ -23,7 +23,7 @@ buildscript {
     classpath("org.eclipse.jgit:org.eclipse.jgit:6.6.0.202305301015-r")
 
     // This is needed for jgit to connect to ssh
-    classpath("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:7.3.0.202506031305-r")
+    classpath("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:7.4.0.202509020913-r")
     classpath("org.kohsuke:github-api:1.305")
 
     classpath("io.ktor:ktor-client-core:3.3.1")
