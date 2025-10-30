@@ -21,4 +21,11 @@ class DeleteToCaretActionTest : VimExTestCase() {
     typeText(":set incsearch<Left><Left><Left><C-U>")
     assertExText("rch")
   }
+
+  @Test
+  fun `test delete at beginning does nothing`() {
+    typeText(":<C-U>")
+    assertExText("")
+    assertExIsActive()
+  }
 }
