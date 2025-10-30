@@ -263,7 +263,8 @@ expr:
                     |   expr WS* multiplicativeOperator WS* expr                                #MultiplicativeExpression
                     // expr6: + - . ..
                     |   expr WS* additiveOperator WS* expr                                      #AdditiveExpression
-                    // expr5: left/right shift (not yet implemented)
+                    // expr5: left/right bitwise shift
+                    |   expr WS* bitwiseShiftOperator WS* expr                                  #BitwiseShiftExpression
                     // expr4: equality/is/comparisons
                     |   expr WS* comparisonOperator WS* expr                                    #ComparisonExpression
                     // expr3: logical AND
@@ -288,6 +289,7 @@ comparisonOperator:     LESS | LESS_IC | LESS_CS
                     |   IS | IS_IC | IS_CS
                     |   IS_NOT | IS_NOT_IC | IS_NOT_CS
 ;
+bitwiseShiftOperator:   LESS LESS | GREATER GREATER;
 logicalAndOperator:     AMPERSAND AMPERSAND;
 logicalOrOperator:      BAR BAR;
 

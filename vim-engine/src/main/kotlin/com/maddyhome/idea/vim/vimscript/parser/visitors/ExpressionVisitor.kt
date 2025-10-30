@@ -212,6 +212,16 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
     }
   }
 
+  override fun visitBitwiseShiftExpression(ctx: VimscriptParser.BitwiseShiftExpressionContext): Expression {
+    val left = visit(ctx.expr(0))
+    val right = visit(ctx.expr(1))
+    val operatorString = ctx.bitwiseShiftOperator().text
+    val operator = BinaryOperator.getByValue(operatorString) ?: throw RuntimeException()
+    val result = BinExpression(left, right, operator)
+    result.originalString = ctx.text
+    return result
+  }
+
   override fun visitComparisonExpression(ctx: ComparisonExpressionContext): Expression {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))

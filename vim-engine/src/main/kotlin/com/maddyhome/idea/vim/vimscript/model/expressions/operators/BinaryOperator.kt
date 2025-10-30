@@ -10,6 +10,8 @@ package com.maddyhome.idea.vim.vimscript.model.expressions.operators
 
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary.AdditionHandler
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary.BinaryOperatorHandler
+import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary.BitwiseLeftShiftHandler
+import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary.BitwiseRightShiftHandler
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary.ConcatenationHandler
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary.DivisionHandler
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary.DoesNotMatchHandler
@@ -35,6 +37,8 @@ enum class BinaryOperator(val value: String, internal val handler: BinaryOperato
   SUBTRACTION("-", SubtractionHandler),
   CONCATENATION(".", ConcatenationHandler),
   CONCATENATION2("..", ConcatenationHandler),
+  BITWISE_LEFT_SHIFT("<<", BitwiseLeftShiftHandler),
+  BITWISE_RIGHT_SHIFT(">>", BitwiseRightShiftHandler),
   LESS_THAN("<", LessThanHandler()),
   LESS_THAN_IGNORE_CASE("<?", LessThanHandler(ignoreCase = true)),
   LESS_THAN_CASE_SENSITIVE("<#", LessThanHandler(ignoreCase = false)),
