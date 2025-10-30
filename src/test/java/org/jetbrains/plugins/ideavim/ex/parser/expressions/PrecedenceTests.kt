@@ -8,7 +8,6 @@
 
 package org.jetbrains.plugins.ideavim.ex.parser.expressions
 
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.BinExpression
@@ -41,11 +40,6 @@ import kotlin.test.assertEquals
 open class ExpressionPrecedenceTest : VimTestCase("\n") {
   protected fun parseExpression(expression: String): Expression {
     return VimscriptParser.parseExpression(expression)!!
-  }
-
-  protected fun <T : VimDataType> evaluateExpression(expression: String): T {
-    @Suppress("UNCHECKED_CAST")
-    return parseExpression(expression).evaluate() as T
   }
 
   protected fun assertExpressionPrecedence(expression: String, expected: String) {
@@ -158,7 +152,7 @@ open class ExpressionPrecedenceTest : VimTestCase("\n") {
 class Expr11Tests : ExpressionPrecedenceTest() {
   @Test
   fun `test nested expression has precedence over indexed expression`() {
-    val result = evaluateExpression<VimInt>("([1, 2, 3] + [4, 5, 6])[4]")
+    val result = parseExpression("([1, 2, 3] + [4, 5, 6])[4]").evaluate() as VimInt
     assertEquals(VimInt(5), result)
   }
 }
@@ -265,16 +259,15 @@ class Expr7Tests : ExpressionPrecedenceTest() {
     assertExpressionPrecedence(expression = "1 * 2 * 3", expected = "(1 * 2) * 3")
   }
 
-  // Division and modulo are the same precedence, and covered by the same rule
+  // Division and modulo are the same precedence and covered by the same rule
 }
 
 class Expr6Tests : ExpressionPrecedenceTest() {
-  // TODO: Support left and right shift, i.e. expr5
   // expr7 + expr7
   @Test
-  fun `test addition has higher precedence than equality`() {
-    assertExpressionPrecedence(expression = "2 + 3 == 5", expected = "(2 + 3) == 5")
-    assertExpressionPrecedence(expression = "5 == 2 + 3", expected = "5 == (2 + 3)")
+  fun `test addition has higher precedence than bitwise shift`() {
+    assertExpressionPrecedence(expression = "2 + 3 << 5", expected = "(2 + 3) << 5")
+    assertExpressionPrecedence(expression = "5 << 2 + 3", expected = "5 << (2 + 3)")
   }
 
   @Test
@@ -295,7 +288,19 @@ class Expr6Tests : ExpressionPrecedenceTest() {
   }
 }
 
-// TODO: Expr5 (left/right shift)
+class Expr5Tests : ExpressionPrecedenceTest() {
+  // expr6 << expr6
+  @Test
+  fun `test bitwise shift has higher precedence than comparison`() {
+    assertExpressionPrecedence(expression = "2 << 3 == 16", expected = "(2 << 3) == 16")
+    assertExpressionPrecedence(expression = "16 == 2 << 3", expected = "16 == (2 << 3)")
+  }
+
+  @Test
+  fun `test bitwise shift is left associative`() {
+    assertExpressionPrecedence(expression = "2 << 3 << 4", expected = "(2 << 3) << 4")
+  }
+}
 
 class Expr4Tests : ExpressionPrecedenceTest() {
   // expr5 == expr5
