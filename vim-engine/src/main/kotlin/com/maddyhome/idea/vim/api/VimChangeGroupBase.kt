@@ -410,7 +410,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       injector.messages.indicateError()
       return
     }
-    
+
     for (caret in editor.nativeCarets()) {
       caret.moveToMotion(injector.motion.getHorizontalMotion(editor, caret, 1, true))
     }
@@ -454,7 +454,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       injector.messages.indicateError()
       return
     }
-    
+
     val state = injector.vimState
     injector.application.runReadAction {
       for (caret in editor.nativeCarets()) {
