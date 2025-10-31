@@ -25,12 +25,12 @@ internal class BackreferenceMatcher(private val groupNumber: Int) : Matcher {
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>,
   ): MatcherResult {
-    if (groups.get(groupNumber) == null) {
+    val capturedGroup = groups.get(groupNumber) ?: run {
       // TODO: throw illegal backreference error
       return MatcherResult.Failure
     }
-    val capturedString = if (isCaseInsensitive) groups.get(groupNumber)!!.value.lowercase()
-    else groups.get(groupNumber)!!.value
+    val capturedString = if (isCaseInsensitive) capturedGroup.value.lowercase()
+    else capturedGroup.value
 
     if (editor.text().length - index < capturedString.length) return MatcherResult.Failure
 

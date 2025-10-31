@@ -19,8 +19,7 @@ internal class CharacterMatcher(val char: Char) : Matcher {
   override fun matches(
     editor: VimEditor,
     index: Int,
-    groups:
-    VimMatchGroupCollection,
+    groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>,
   ): MatcherResult {
