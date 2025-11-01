@@ -107,6 +107,7 @@ private fun insertNewLineAbove(editor: VimEditor, context: ExecutionContext) {
  */
 private fun insertNewLineBelow(editor: VimEditor, context: ExecutionContext) {
   if (editor.isOneLineMode()) return
+
   for (caret in editor.nativeCarets()) {
     caret.moveToOffset(injector.motion.moveCaretToCurrentLineEnd(editor, caret))
   }
