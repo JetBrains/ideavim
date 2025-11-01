@@ -32,27 +32,40 @@ internal class CollectionMatcher(
   override fun matches(
     editor: VimEditor,
     index: Int,
-    groups:
-    VimMatchGroupCollection,
+    groups: VimMatchGroupCollection,
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>,
   ): MatcherResult {
     if (index >= editor.text().length) return MatcherResult.Failure
 
-    if (!includesEOL && editor.text()[index] == '\n') return MatcherResult.Failure
-    if (includesEOL && editor.text()[index] == '\n') return MatcherResult.Success(1)
-
     val char = editor.text()[index]
-    val result = if (isCaseInsensitive && !forceNoIgnoreCase) (chars.map { it.lowercaseChar() }
-      .contains(char.lowercaseChar()) || ranges.any {
-      it.inRange(
-        char,
-        true
-      )
-    } || charClasses.any { it(char.lowercaseChar()) || it(char.uppercaseChar()) }) == !isNegated
-    else (chars.contains(char) || ranges.any { it.inRange(char) } || charClasses.any { it(char) }) == !isNegated
-    return if (result) MatcherResult.Success(1)
-    else MatcherResult.Failure
+
+    // Handle newline matching
+    if (char == '\n') {
+      return if (includesEOL) MatcherResult.Success(1) else MatcherResult.Failure
+    }
+
+    // Check if char matches the collection
+    val matchesCollection = if (isCaseInsensitive && !forceNoIgnoreCase) {
+      val lowerChar = char.lowercaseChar()
+      val upperChar = char.uppercaseChar()
+
+      val inChars = chars.any { it.lowercaseChar() == lowerChar }
+      val inRanges = ranges.any { it.inRange(char, isCaseInsensitive = true) }
+      val inCharClasses = charClasses.any { it(lowerChar) || it(upperChar) }
+
+      inChars || inRanges || inCharClasses
+    } else {
+      val inChars = chars.contains(char)
+      val inRanges = ranges.any { it.inRange(char) }
+      val inCharClasses = charClasses.any { it(char) }
+
+      inChars || inRanges || inCharClasses
+    }
+
+    // Apply negation if needed
+    val result = matchesCollection == !isNegated
+    return if (result) MatcherResult.Success(1) else MatcherResult.Failure
   }
 
   override fun isEpsilon(): Boolean {
