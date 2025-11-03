@@ -13,7 +13,6 @@ import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.helper.noneOfEnum
 import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
-import org.jetbrains.annotations.Contract
 import java.util.*
 
 /**
@@ -39,26 +38,11 @@ class VimStateMachineImpl : VimStateMachine {
   override val executingCommandFlags: EnumSet<CommandFlags>
     get() = executingCommand?.flags ?: noneOfEnum()
 
-
   override fun reset() {
     mode = Mode.NORMAL()
     isDotRepeatInProgress = false
     isReplaceCharacter = false
     executingCommand = null
-  }
-
-  companion object {
-    @Contract(pure = true)
-    fun modeToMappingMode(mode: Mode): MappingMode {
-      return when (mode) {
-        is Mode.NORMAL -> MappingMode.NORMAL
-        Mode.INSERT, Mode.REPLACE -> MappingMode.INSERT
-        is Mode.VISUAL -> MappingMode.VISUAL
-        is Mode.SELECT -> MappingMode.SELECT
-        is Mode.CMD_LINE -> MappingMode.CMD_LINE
-        is Mode.OP_PENDING -> MappingMode.OP_PENDING
-      }
-    }
   }
 }
 
