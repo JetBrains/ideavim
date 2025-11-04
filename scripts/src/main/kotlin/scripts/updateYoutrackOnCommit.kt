@@ -8,11 +8,20 @@
 
 package scripts
 
-suspend fun main() {
-  println("Start updating youtrack")
+import kotlinx.coroutines.runBlocking
+import java.io.File
 
-//  val newFixes = changes()
-//  val newTickets = newFixes.map { it.id }
-//  println("Set new status for $newTickets")
-//  setYoutrackStatus(newTickets, "Ready To Release")
+fun main(args: Array<String>) = runBlocking {
+  val projectDir = if (args.isNotEmpty()) File(args[0]) else File(".")
+  
+  println("Start updating youtrack")
+  println("Project directory: $projectDir")
+
+  val newFixes = changes(projectDir)
+  val newTickets = newFixes.map { it.id }
+  println("Set new status for $newTickets")
+  
+  setYoutrackStatus(newTickets, "Ready To Release")
 }
+
+

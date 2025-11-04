@@ -17,21 +17,29 @@ plugins {
 
 repositories {
   mavenCentral()
+  maven { url = uri("https://jitpack.io") }
 }
 
 dependencies {
-  compileOnly("org.jetbrains.kotlin:kotlin-stdlib:2.2.20")
+  compileOnly("org.jetbrains.kotlin:kotlin-stdlib:2.2.21")
 
-  implementation("io.ktor:ktor-client-core:3.3.0")
-  implementation("io.ktor:ktor-client-cio:3.3.0")
-  implementation("io.ktor:ktor-client-content-negotiation:3.3.0")
-  implementation("io.ktor:ktor-serialization-kotlinx-json:3.3.0")
-  implementation("io.ktor:ktor-client-auth:3.3.0")
+  implementation("io.ktor:ktor-client-core:3.3.1")
+  implementation("io.ktor:ktor-client-cio:3.3.1")
+  implementation("io.ktor:ktor-client-content-negotiation:3.3.1")
+  implementation("io.ktor:ktor-serialization-kotlinx-json:3.3.1")
+  implementation("io.ktor:ktor-client-auth:3.3.1")
   implementation("org.eclipse.jgit:org.eclipse.jgit:6.6.0.202305301015-r")
 
   // This is needed for jgit to connect to ssh
-  implementation("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:7.3.0.202506031305-r")
+  implementation("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:7.4.0.202509020913-r")
   implementation("com.vdurmont:semver4j:3.1.0")
+  
+  // For SlackNotification
+  implementation("com.github.AlexPl292:mark-down-to-slack:1.1.2")
+  
+  // For updateAuthors
+  implementation("org.kohsuke:github-api:1.305")
+  implementation("org.jetbrains:markdown:0.7.3")
 }
 
 val releaseType: String? by project
@@ -117,4 +125,58 @@ tasks.register("setTeamCityBuildNumber", JavaExec::class) {
   mainClass.set("scripts.release.SetTeamCityBuildNumberKt")
   classpath = sourceSets["main"].runtimeClasspath
   args = listOf(project.version.toString(), rootProject.rootDir.toString(), releaseType ?: "")
+}
+
+tasks.register("updateYoutrackOnCommit", JavaExec::class) {
+  group = "other"
+  mainClass.set("scripts.UpdateYoutrackOnCommitKt")
+  classpath = sourceSets["main"].runtimeClasspath
+  args = listOf(rootProject.rootDir.toString())
+}
+
+tasks.register("slackNotification", JavaExec::class) {
+  group = "other"
+  mainClass.set("scripts.SlackNotificationKt")
+  classpath = sourceSets["main"].runtimeClasspath
+  val slackUrl = project.findProperty("slackUrl") as String? ?: ""
+  val changesFile = rootProject.file("CHANGES.md").toString()
+  args = listOf(project.version.toString(), slackUrl, changesFile)
+}
+
+tasks.register("updateAuthors", JavaExec::class) {
+  group = "other"
+  mainClass.set("scripts.UpdateAuthorsKt")
+  classpath = sourceSets["main"].runtimeClasspath
+  args = listOf(rootProject.rootDir.toString())
+}
+
+tasks.register("updateMergedPr", JavaExec::class) {
+  group = "other"
+  mainClass.set("scripts.UpdateMergedPrKt")
+  classpath = sourceSets["main"].runtimeClasspath
+  doFirst {
+    val prId = project.findProperty("prId") as String? ?: error("prId property not provided")
+    args = listOf(prId, rootProject.rootDir.toString())
+  }
+}
+
+tasks.register("updateChangelog", JavaExec::class) {
+  group = "other"
+  mainClass.set("scripts.UpdateChangelogKt")
+  classpath = sourceSets["main"].runtimeClasspath
+  args = listOf(rootProject.rootDir.toString())
+}
+
+tasks.register("releaseActions", JavaExec::class) {
+  group = "other"
+  mainClass.set("scripts.ReleaseActionsKt")
+  classpath = sourceSets["main"].runtimeClasspath
+  args = listOf(project.version.toString(), releaseType ?: "")
+}
+
+tasks.register("integrationsTest", JavaExec::class) {
+  group = "verification"
+  mainClass.set("scripts.IntegrationsTestKt")
+  classpath = sourceSets["main"].runtimeClasspath
+  args = listOf(rootProject.rootDir.toString())
 }

@@ -51,6 +51,8 @@ val knownPlugins = setOf(
   "com.magidc.ideavim.anyObject",
   "dev.ghostflyby.ideavim.toggleIME",
   "com.magidc.ideavim.dial",
+
+  "com.yelog.ideavim.cmdfloat", // https://plugins.jetbrains.com/plugin/28732-vim-cmdfloat
 )
 
 suspend fun main() {
