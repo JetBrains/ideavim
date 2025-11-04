@@ -25,6 +25,11 @@
         "modes": "I"
     },
     {
+        "keys": "<Leader>hw",
+        "class": "com.maddyhome.idea.vim.action.HelloWorldAction",
+        "modes": "N"
+    },
+    {
         "keys": "<Tab>",
         "class": "com.maddyhome.idea.vim.action.editor.VimEditorTab",
         "modes": "I"
