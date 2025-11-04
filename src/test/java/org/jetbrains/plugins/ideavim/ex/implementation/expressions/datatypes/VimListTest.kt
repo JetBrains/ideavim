@@ -17,6 +17,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
+import kotlin.test.assertNotSame
+import kotlin.test.assertSame
 
 class VimListTest : VimDataTypeTest() {
   @Test
@@ -162,6 +164,16 @@ class VimListTest : VimDataTypeTest() {
       
     """.trimIndent()
     assertEquals(expected, list.toInsertableString())
+  }
+
+  @Test
+  fun `test copy returns new instance with same value`() {
+    val item = VimInt(42)
+    val value = VimList(mutableListOf(item))
+    val copy = value.copy()
+    assertNotSame(value, copy)
+    assertNotSame(value.values, copy.values)
+    assertSame(value.values[0], copy.values[0])
   }
 
   // TODO: DeepCopy tests, when we implement Vim's deepcopy()

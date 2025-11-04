@@ -161,6 +161,8 @@ class VimFuncref(
     return handler.executeFunction(allArguments, editor, context, vimContext)
   }
 
+  override fun copy() = VimFuncref(handler, arguments.copy(), dictionary?.copy(), type)
+
   override fun deepCopy(level: Int): VimFuncref {
     // TODO: Confirm semantics
     return VimFuncref(handler, arguments.deepCopy(0), dictionary?.deepCopy(0), type)

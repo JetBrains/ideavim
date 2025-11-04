@@ -123,6 +123,8 @@ class VimList(val values: MutableList<VimDataType>) : VimDataType("list") {
     return true
   }
 
+  override fun copy() = VimList(values.toMutableList())
+
   override fun deepCopy(level: Int): VimList {
     return if (level > 0) {
       VimList(values.map { it.deepCopy(level - 1) }.toMutableList())
