@@ -10,6 +10,7 @@ package org.jetbrains.plugins.ideavim
 import com.intellij.application.options.CodeStyle
 import com.intellij.ide.ClipboardSynchronizer
 import com.intellij.ide.bookmark.BookmarksManager
+import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.ide.highlighter.XmlFileType
 import com.intellij.lang.Language
 import com.intellij.openapi.actionSystem.ActionManager
@@ -301,6 +302,7 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
 
   protected fun configureByText(content: String) = configureByText(PlainTextFileType.INSTANCE, content)
   protected fun configureByXmlText(content: String) = configureByText(XmlFileType.INSTANCE, content)
+  protected fun configureByJavaText(content: String) = configureByText(JavaFileType.INSTANCE, content)
 
   protected fun configureAndGuard(content: String) {
     val ranges = extractBrackets(content)

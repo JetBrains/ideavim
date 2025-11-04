@@ -8,8 +8,17 @@
 
 package org.jetbrains.plugins.ideavim
 
-import com.intellij.ide.highlighter.JavaFileType
-
-abstract class VimJavaTestCase : VimTestCase() {
-  protected fun configureByJavaText(content: String) = configureByText(JavaFileType.INSTANCE, content)
-}
+/**
+ * Base test case for tests that require Java file type support.
+ *
+ * This class extends [VimTestCase] and is specifically designed for tests that need to work with
+ * Java source files, where language-specific features like auto-indentation, code folding, or
+ * syntax-aware operations are required.
+ *
+ * Tests can use the inherited [configureByJavaText] method from [VimTestCase] to set up Java files.
+ * This class serves as a semantic marker and provides a convenient base for Java-specific test setup
+ * if needed in the future.
+ *
+ * @see VimTestCase
+ */
+abstract class VimJavaTestCase : VimTestCase()
