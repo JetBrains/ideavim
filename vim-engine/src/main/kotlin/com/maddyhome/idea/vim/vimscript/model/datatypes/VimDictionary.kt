@@ -105,6 +105,8 @@ class VimDictionary(val dictionary: LinkedHashMap<VimString, VimDataType>) : Vim
     }
   }
 
+  override fun copy() = VimDictionary(LinkedHashMap(dictionary))
+
   override fun deepCopy(level: Int): VimDictionary {
     return if (level > 0) {
       VimDictionary(linkedMapOf(*(dictionary.map { it.key.copy() to it.value.deepCopy(level - 1) }.toTypedArray())))

@@ -16,6 +16,7 @@ import org.junit.jupiter.api.assertThrows
 import java.util.Locale
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
+import kotlin.test.assertNotSame
 
 class VimFloatTest : VimTestCase() {
 
@@ -67,5 +68,13 @@ class VimFloatTest : VimTestCase() {
   fun `test has value semantics`() {
     assertEquals(VimFloat(1.23), VimFloat(1.23))
     assertNotEquals(VimFloat(1.23), VimFloat(53.22))
+  }
+
+  @Test
+  fun `test copy returns new instance with same value`() {
+    val value = VimFloat(1.23)
+    val copy = value.copy()
+    assertNotSame(value, copy)
+    assertEquals(value.value, copy.value)
   }
 }

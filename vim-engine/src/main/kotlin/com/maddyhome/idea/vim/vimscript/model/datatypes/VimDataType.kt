@@ -96,6 +96,18 @@ abstract class VimDataType(val typeName: String) {
    */
   open fun valueEquals(other: VimDataType, ignoreCase: Boolean, depth: Int = 0) = this == other
 
+  /**
+   * Create a shallow copy of this object
+   *
+   * Creates a new object with the same value as this one. The new object will be a new instance, but the values will
+   * be the same. For example, a [VimFloat] will have the same value, but will be a new [VimFloat] instance. When
+   * copying a more complex object like [VimList] or [VimDictionary], a new list or dictionary instance is created,
+   * but the existing list or dictionary items are reused.
+   *
+   * Use [deepCopy] to create a completely new instance.
+   */
+  abstract fun copy(): VimDataType
+
   abstract fun deepCopy(level: Int = 100): VimDataType
 
   var lockOwner: Any? = null

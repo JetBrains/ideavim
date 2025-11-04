@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
+import kotlin.test.assertNotSame
 
 class VimStringTest {
 
@@ -105,5 +106,14 @@ class VimStringTest {
 
     assertNotEquals(VimString("foo"), VimString("FOO"))
     assertNotEquals(VimString("foo").hashCode(), VimString("FOO").hashCode())
+  }
+
+  @Test
+  fun `test copy returns new instance with same value`() {
+    // We get a new instance of the VimString, but it's fine to have the same instance of the String
+    val value = VimString("hello world")
+    val copy = value.copy()
+    assertNotSame(value, copy)
+    assertEquals(value.value, copy.value)
   }
 }

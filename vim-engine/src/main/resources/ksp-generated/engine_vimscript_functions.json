@@ -8,6 +8,7 @@
     "ceil": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.CeilFunctionHandler",
     "char2nr": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.stringFunctions.Char2nrFunctionHandler",
     "col": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.cursorFunctions.ColFunctionHandler",
+    "copy": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.CopyFunctionHandler",
     "cos": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.CosFunctionHandler",
     "cosh": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.CoshFunctionHandler",
     "count": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.listFunctions.CountFunctionHandler",
