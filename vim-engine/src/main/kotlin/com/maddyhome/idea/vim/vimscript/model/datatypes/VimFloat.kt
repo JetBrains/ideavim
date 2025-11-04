@@ -44,6 +44,7 @@ data class VimFloat(val value: Double) : VimDataType("float") {
     return DecimalFormat(pattern, symbols).format(value)
   }
 
+  override fun copy() = VimFloat(value)
   override fun deepCopy(level: Int) = copy()
 
   override fun lockVar(depth: Int) {

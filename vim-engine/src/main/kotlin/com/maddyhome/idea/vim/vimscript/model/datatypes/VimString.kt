@@ -45,9 +45,8 @@ data class VimString(val value: String) : VimDataType("string") {
     return this.value.equals(other.value, ignoreCase = ignoreCase)
   }
 
-  override fun deepCopy(level: Int): VimString {
-    return copy()
-  }
+  override fun copy() = VimString(value)
+  override fun deepCopy(level: Int) = copy()
 
   override fun lockVar(depth: Int) {
     this.isLocked = true

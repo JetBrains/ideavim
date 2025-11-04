@@ -13,6 +13,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
+import kotlin.test.assertNotSame
 import kotlin.test.assertTrue
 
 class VimIntTest : VimTestCase() {
@@ -51,5 +52,13 @@ class VimIntTest : VimTestCase() {
     assertTrue(VimInt(123) >= 123)
     assertTrue(VimInt(100) < 123)
     assertTrue(VimInt(123) <= 123)
+  }
+
+  @Test
+  fun `test copy returns new instance with same value`() {
+    val value = VimInt(42)
+    val copy = value.copy()
+    assertNotSame(value, copy)
+    assertEquals(value.value, copy.value)
   }
 }

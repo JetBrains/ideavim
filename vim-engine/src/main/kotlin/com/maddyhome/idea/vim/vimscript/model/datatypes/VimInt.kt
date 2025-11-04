@@ -60,9 +60,8 @@ data class VimInt(val value: Int) : VimDataType("number") {
   override fun toVimString() = VimString(value.toString())
   override fun toOutputString() = value.toString()
 
-  override fun deepCopy(level: Int): VimInt {
-    return copy()
-  }
+  override fun copy() = VimInt(value)
+  override fun deepCopy(level: Int) = copy()
 
   override fun lockVar(depth: Int) {
     this.isLocked = true

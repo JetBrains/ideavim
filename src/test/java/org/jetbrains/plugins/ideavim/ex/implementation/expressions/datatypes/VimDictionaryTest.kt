@@ -10,11 +10,14 @@ package org.jetbrains.plugins.ideavim.ex.implementation.expressions.datatypes
 
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
+import kotlin.test.assertNotSame
+import kotlin.test.assertSame
 
 class VimDictionaryTest : VimDataTypeTest() {
   @Test
@@ -131,6 +134,17 @@ class VimDictionaryTest : VimDataTypeTest() {
       dictionary.toInsertableString()
     }
     assertEquals("E724: Variable nested too deep for displaying", exception.message)
+  }
+
+  @Test
+  fun `test copy returns new instance with same value`() {
+    val key = VimString("key")
+    val value = VimInt(42)
+    val dictionary = VimDictionary(linkedMapOf(key to value))
+    val copy = dictionary.copy()
+    assertNotSame(dictionary, copy)
+    assertNotSame(dictionary.dictionary, copy.dictionary)
+    assertSame(dictionary.dictionary[key], copy.dictionary[key])
   }
 
   // TODO: DeepCopy tests, when we implement Vim's deepcopy()
