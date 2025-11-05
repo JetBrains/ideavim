@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.expressions.datatypes
 
+import com.intellij.platform.testFramework.assertion.collectionAssertion.CollectionAssertions.assertEqualsOrdered
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -176,5 +177,67 @@ class VimListTest : VimDataTypeTest() {
     assertSame(value.values[0], copy.values[0])
   }
 
-  // TODO: DeepCopy tests, when we implement Vim's deepcopy()
+  @Test
+  fun `test deepCopy returns new instance with new instance of value items`() {
+    val value = toVimList(42) // let value=[42]
+    val copy = value.deepCopy(useReferences = true)
+    assertNotSame(value, copy)
+    assertNotSame(value.values, copy.values)
+    assertNotSame(value.values[0], copy.values[0])
+  }
+
+  @Test
+  fun `test deepCopy returns new instance with new instance of reference items`() {
+    val item = toVimList(42)
+    val value = toVimList(item) // let value=[[42]]
+    val copy = value.deepCopy(useReferences = true)
+    assertNotSame(value, copy)
+    assertNotSame(value.values, copy.values)
+    assertNotSame(value.values[0], copy.values[0])
+    (value.values[0] as VimList).values[0] = VimInt(99)
+    assertEquals(42, ((copy.values[0] as VimList).values[0] as VimInt).value)
+  }
+
+  @Test
+  fun `test deepCopy replaces same instances with copied value`() {
+    val item = toVimList(1, 2, 3)
+    val value = toVimList(item, item, item, toVimList(1, 2, 3)) // let value=[item, item, item, [1, 2, 3]]
+    val copy = value.deepCopy(useReferences = true)
+
+    assertNotSame(value.values[0], copy.values[0])
+    assertEqualsOrdered(toVimList(1, 2, 3).values, (copy.values[0] as VimList).values)
+    assertNotSame(value.values[1], copy.values[1])
+    assertEqualsOrdered(toVimList(1, 2, 3).values, (copy.values[1] as VimList).values)
+    assertNotSame(value.values[2], copy.values[3])
+    assertEqualsOrdered(toVimList(1, 2, 3).values, (copy.values[2] as VimList).values)
+    assertNotSame(value.values[3], copy.values[3])
+    assertEqualsOrdered(toVimList(1, 2, 3).values, (copy.values[3] as VimList).values)
+
+    // `copy[0] is copy[1] is copy[2] is not copy[3]`
+    assertSame(copy.values[0], copy.values[1])
+    assertSame(copy.values[1], copy.values[2])
+    assertNotSame(copy.values[2], copy.values[3])
+  }
+
+  @Test
+  fun `test deepCopy copies recursive List safely when sharing references`() {
+    val value = VimList(mutableListOf())
+    value.values.add(value)
+    val copy = value.deepCopy(useReferences = true)
+    assertNotSame(value, copy)
+    assertSame(copy, copy.values[0])
+    assertSame(copy, (copy.values[0] as VimList).values[0])
+    assertSame(copy, ((copy.values[0] as VimList).values[0] as VimList).values[0])
+    // Etc...
+  }
+
+  @Test
+  fun `test deepCopy reports error with recursive List when not sharing references`() {
+    val value = VimList(mutableListOf())
+    value.values.add(value)
+    val exception = assertThrows<ExException> {
+      value.deepCopy(useReferences = false)
+    }
+    assertEquals("E698: Variable nested too deep for making a copy", exception.message)
+  }
 }

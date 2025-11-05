@@ -107,12 +107,23 @@ class VimDictionary(val dictionary: LinkedHashMap<VimString, VimDataType>) : Vim
 
   override fun copy() = VimDictionary(LinkedHashMap(dictionary))
 
-  override fun deepCopy(level: Int): VimDictionary {
-    return if (level > 0) {
-      VimDictionary(linkedMapOf(*(dictionary.map { it.key.copy() to it.value.deepCopy(level - 1) }.toTypedArray())))
-    } else {
-      this
+  override fun deepCopy(useReferences: Boolean): VimDictionary {
+    val depth = 0
+    val copiedReferences = if (useReferences) mutableMapOf<VimDataType, VimDataType>() else null
+    return this.deepCopy(depth, copiedReferences)
+  }
+
+  override fun deepCopy(depth: Int, copiedReferences: MutableMap<VimDataType, VimDataType>?): VimDictionary {
+    if (depth >= 100) {
+      throw exExceptionMessage("E698")
     }
+    copiedReferences?.get(this)?.let { return it as VimDictionary }
+    val newDictionary = VimDictionary(LinkedHashMap<VimString, VimDataType>(this.dictionary.size))
+    copiedReferences?.put(this, newDictionary)
+    dictionary.forEach {
+      newDictionary.dictionary[it.key] = it.value.deepCopy(depth + 1, copiedReferences)
+    }
+    return newDictionary
   }
 
   override fun lockVar(depth: Int) {

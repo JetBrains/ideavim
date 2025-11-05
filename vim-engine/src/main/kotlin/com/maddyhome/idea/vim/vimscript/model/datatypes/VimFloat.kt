@@ -45,7 +45,6 @@ data class VimFloat(val value: Double) : VimDataType("float") {
   }
 
   override fun copy() = VimFloat(value)
-  override fun deepCopy(level: Int) = copy()
 
   override fun lockVar(depth: Int) {
     this.isLocked = true

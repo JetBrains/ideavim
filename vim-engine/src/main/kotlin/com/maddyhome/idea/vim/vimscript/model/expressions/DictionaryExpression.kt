@@ -24,7 +24,8 @@ data class DictionaryExpression(val dictionary: LinkedHashMap<Expression, Expres
       val evaluatedVal = value.evaluate(editor, context, vimContext)
       var newFuncref = evaluatedVal
       if (evaluatedVal is VimFuncref && evaluatedVal.handler is DefinedFunctionHandler && !evaluatedVal.isSelfFixed) {
-        newFuncref = evaluatedVal.deepCopy(0)
+        // TODO: Not sure I like this...
+        newFuncref = evaluatedVal.deepCopy(useReferences = true) as VimFuncref
         newFuncref.dictionary = dict
       }
       dict.dictionary[key.evaluate(editor, context, vimContext).toVimString()] = newFuncref
