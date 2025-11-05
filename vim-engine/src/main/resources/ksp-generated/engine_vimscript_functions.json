@@ -12,6 +12,7 @@
     "cos": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.CosFunctionHandler",
     "cosh": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.CoshFunctionHandler",
     "count": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.listFunctions.CountFunctionHandler",
+    "deepcopy": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.DeepCopyFunctionHandler",
     "empty": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.EmptyFunctionHandler",
     "err_teapot": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.variousFunctions.ErrTeapotFunctionHandler",
     "escape": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.stringFunctions.EscapeFunctionHandler",

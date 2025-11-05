@@ -169,6 +169,25 @@ class VimFuncrefTest : VimDataTypeTest() {
     assertSame(funcref.dictionary?.dictionary[key], copy.dictionary?.dictionary[key])
   }
 
+  @Test
+  fun `test deepCopy returns new instance with same value`() {
+    val item = VimInt(42)
+    val key = VimString("key")
+    val value = VimInt(42)
+    val dictionary = VimDictionary(linkedMapOf(key to value))
+    val funcref = VimFuncref(FakeHandler, VimList(mutableListOf(item)), dictionary, Type.FUNCTION)
+    val copy = funcref.deepCopy(useReferences = true) as VimFuncref
+    assertNotSame(funcref, copy)
+
+    assertNotSame(funcref.arguments, copy.arguments)
+    assertNotSame(funcref.arguments.values, copy.arguments.values)
+    assertSame(funcref.arguments.values[0], copy.arguments.values[0])
+
+    assertNotSame(funcref.dictionary, copy.dictionary)
+    assertNotSame(funcref.dictionary?.dictionary, copy.dictionary?.dictionary)
+    assertSame(funcref.dictionary?.dictionary[key], copy.dictionary?.dictionary[key])
+  }
+
   // TODO: DeepCopy tests, when we implement Vim's deepcopy()
 
   // Note that function execution is not tested here. It is better tested as part of function calls and dictionary
