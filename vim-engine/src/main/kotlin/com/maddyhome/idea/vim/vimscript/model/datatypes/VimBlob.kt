@@ -21,10 +21,6 @@ class VimBlob : VimDataType("blob") {
     TODO("Not yet implemented")
   }
 
-  override fun deepCopy(level: Int): VimDataType {
-    TODO("Not yet implemented")
-  }
-
   override fun lockVar(depth: Int) {
     TODO("Not yet implemented")
   }

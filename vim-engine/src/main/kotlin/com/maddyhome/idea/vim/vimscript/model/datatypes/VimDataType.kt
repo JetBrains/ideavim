@@ -108,7 +108,32 @@ abstract class VimDataType(val typeName: String) {
    */
   abstract fun copy(): VimDataType
 
-  abstract fun deepCopy(level: Int = 100): VimDataType
+  /**
+   * Create a deep copy of this object
+   *
+   * For value types, such as [VimFloat] and [VimInt], this will return a new instance with the same value. For
+   * [VimList] and [VimDictionary], this will create a new instance of the List or Dictionary, and then recursively
+   * create copies of each of the items (the Dictionary's keys are not copies). Note that [VimFuncref] is always a
+   * shallow copy.
+   *
+   * If [useReferences] is true, then any reference we've previously copied will reuse that copied instance. If false,
+   * all instances will be new.
+   *
+   * The implementation will only recurse 100 levels before reporting an error.
+   * ("E698: Variable nested too deep for making a copy")
+   */
+  open fun deepCopy(useReferences: Boolean): VimDataType {
+    // Strictly speaking, we should create a map here if useReferences is true, but that's an unnecessary overhead for
+    // everything other than List and Dictionary, so we'll let the implementations decide
+    return deepCopy(0, null)
+  }
+
+  /**
+   * Implementation of [deepCopy] for recursive lists and dictionaries
+   *
+   * DO NOT USE!
+   */
+  internal open fun deepCopy(depth: Int, copiedReferences: MutableMap<VimDataType, VimDataType>?) = copy()
 
   var lockOwner: Any? = null
   var isLocked: Boolean = false

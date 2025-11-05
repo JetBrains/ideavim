@@ -116,4 +116,13 @@ class VimStringTest {
     assertNotSame(value, copy)
     assertEquals(value.value, copy.value)
   }
+
+  @Test
+  fun `test deepCopy returns new instance with same value`() {
+    // We get a new instance of the VimString, but it's fine to have the same instance of the String
+    val value = VimString("hello world")
+    val copy = value.deepCopy(useReferences = true) as VimString
+    assertNotSame(value, copy)
+    assertEquals(value.value, copy.value)
+  }
 }

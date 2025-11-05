@@ -8,12 +8,17 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.expressions.datatypes
 
+import com.intellij.platform.testFramework.assertion.collectionAssertion.CollectionAssertions.assertEqualsOrdered
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertInstanceOf
 import org.junit.jupiter.api.assertThrows
+import kotlin.collections.mutableMapOf
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNotSame
@@ -138,14 +143,77 @@ class VimDictionaryTest : VimDataTypeTest() {
 
   @Test
   fun `test copy returns new instance with same value`() {
-    val key = VimString("key")
-    val value = VimInt(42)
-    val dictionary = VimDictionary(linkedMapOf(key to value))
+    val dictionary = toVimDictionary("key" to 42)
     val copy = dictionary.copy()
     assertNotSame(dictionary, copy)
     assertNotSame(dictionary.dictionary, copy.dictionary)
-    assertSame(dictionary.dictionary[key], copy.dictionary[key])
+    assertSame(dictionary.dictionary[VimString("key")], copy.dictionary[VimString("key")])
   }
 
-  // TODO: DeepCopy tests, when we implement Vim's deepcopy()
+  @Test
+  fun `test deepCopy returns new instance with new instance of value items`() {
+    val dictionary = toVimDictionary("key" to 42) // let dictionary={'key':42}
+    val copy = dictionary.deepCopy(useReferences = true)
+    assertNotSame(dictionary, copy)
+    assertNotSame(dictionary.dictionary, copy.dictionary)
+    assertNotSame(dictionary.dictionary[VimString("key")], copy.dictionary[VimString("key")])
+    assertEquals(VimInt(42), copy.dictionary[VimString("key")])
+  }
+
+  @Test
+  fun `test deepCopy returns new instance with new instance of reference item`() {
+    val list = toVimList(1, 2, 3)
+    val value = toVimDictionary("key" to list)  // let dictionary={'key':[1,2,3]}
+    val copy = value.deepCopy(useReferences = true)
+    assertNotSame(value, copy)
+    assertNotSame(value.dictionary, copy.dictionary)
+    assertNotSame(value.dictionary[VimString("key")], copy.dictionary[VimString("key")])
+    val newList = assertInstanceOf<VimList>(copy.dictionary[VimString("key")])
+    assertEqualsOrdered(toVimList(1, 2, 3).values, newList.values)
+    (value.dictionary[VimString("key")] as VimList).values[0] = VimInt(10)
+    assertEquals(VimInt(10), (value.dictionary[VimString("key")] as VimList).values[0])
+    assertEquals(VimInt(1), (copy.dictionary[VimString("key")] as VimList).values[0])
+  }
+
+  @Test
+  fun `test deepCopy replaces same instances with copied value`() {
+    val item = toVimDictionary("a" to 1, "b" to 2, "c" to 3)
+    val value = toVimDictionary("k1" to item, "k2" to item, "k3" to item, "k4" to toVimDictionary("a" to 1, "b" to 2, "c" to 3))
+    val copy = value.deepCopy(useReferences = true)
+
+    assertNotSame(item, copy.dictionary[VimString("k1")])
+    assertEquals(VimInt(1), (copy.dictionary[VimString("k1")] as VimDictionary).dictionary[VimString("a")])
+    assertNotSame(item, copy.dictionary[VimString("k2")])
+    assertEquals(VimInt(1), (copy.dictionary[VimString("k2")] as VimDictionary).dictionary[VimString("a")])
+    assertNotSame(item, copy.dictionary[VimString("k3")])
+    assertEquals(VimInt(1), (copy.dictionary[VimString("k3")] as VimDictionary).dictionary[VimString("a")])
+    assertNotSame(value.dictionary[VimString("k4")], copy.dictionary[VimString("k4")])
+    assertEquals(VimInt(1), (copy.dictionary[VimString("k4")] as VimDictionary).dictionary[VimString("a")])
+
+    // `copy['k1'] is copy['k2'] is copy['k3'] is not copy['k4']`
+    assertSame(copy.dictionary[VimString("k1")], copy.dictionary[VimString("k2")])
+    assertSame(copy.dictionary[VimString("k2")], copy.dictionary[VimString("k3")])
+    assertNotSame(copy.dictionary[VimString("k3")], copy.dictionary[VimString("k4")])
+  }
+
+  @Test
+  fun `test deepCopy copies recursive Dictionary safely when sharing references`() {
+    val value = VimDictionary(linkedMapOf())
+    value.dictionary[VimString("k1")] = value
+    val copy = value.deepCopy(useReferences = true)
+    assertNotSame(value, copy)
+    assertSame(copy, copy.dictionary[VimString("k1")])
+    assertSame(copy, (copy.dictionary[VimString("k1")] as VimDictionary).dictionary[VimString("k1")])
+    // Etc...
+  }
+
+  @Test
+  fun `test deepCopy reports error with recursive Dictionary when not sharing references`() {
+    val value = VimDictionary(linkedMapOf())
+    value.dictionary[VimString("k1")] = value
+    val exception = assertThrows<ExException> {
+      value.deepCopy(useReferences = false)
+    }
+    assertEquals("E698: Variable nested too deep for making a copy", exception.message)
+  }
 }

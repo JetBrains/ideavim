@@ -125,12 +125,27 @@ class VimList(val values: MutableList<VimDataType>) : VimDataType("list") {
 
   override fun copy() = VimList(values.toMutableList())
 
-  override fun deepCopy(level: Int): VimList {
-    return if (level > 0) {
-      VimList(values.map { it.deepCopy(level - 1) }.toMutableList())
-    } else {
-      this
+  override fun deepCopy(useReferences: Boolean): VimList {
+    val depth = 0
+    val copiedReferences = if (useReferences) mutableMapOf<VimDataType, VimDataType>() else null
+    return this.deepCopy(depth, copiedReferences)
+  }
+
+  override fun deepCopy(depth: Int, copiedReferences: MutableMap<VimDataType, VimDataType>?): VimList {
+    // TODO: In Vim, I only see the check for nesting, not that referencing a higher level makes it fail
+    // Nesting is possible up to 100 levels.  When there is an item
+    // that refers back to a higher level making a deep copy with
+    // {noref} set to 1 will fail.
+    if (depth >= 100) {
+      throw exExceptionMessage("E698")
     }
+    copiedReferences?.get(this)?.let { return it as VimList }
+    val newList = VimList(ArrayList(this.values.size))
+    copiedReferences?.put(this, newList)
+    values.forEach {
+      newList.values.add(it.deepCopy(depth + 1, copiedReferences))
+    }
+    return newList
   }
 
   override fun lockVar(depth: Int) {

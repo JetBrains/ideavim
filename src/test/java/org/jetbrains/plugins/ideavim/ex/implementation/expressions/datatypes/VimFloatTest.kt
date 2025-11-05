@@ -77,4 +77,12 @@ class VimFloatTest : VimTestCase() {
     assertNotSame(value, copy)
     assertEquals(value.value, copy.value)
   }
+
+  @Test
+  fun `test deepCopy returns new instance with same value`() {
+    val value = VimFloat(1.23)
+    val copy = value.deepCopy(useReferences = true) as VimFloat
+    assertNotSame(value, copy)
+    assertEquals(value.value, copy.value)
+  }
 }
