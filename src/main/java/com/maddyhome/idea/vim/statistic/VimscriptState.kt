@@ -16,6 +16,7 @@ import com.intellij.internal.statistic.service.fus.collectors.ApplicationUsagesC
 import com.maddyhome.idea.vim.newapi.initInjector
 import com.maddyhome.idea.vim.statistic.PluginState.Util.extensionNames
 import com.maddyhome.idea.vim.vimscript.services.VimRcService
+import java.util.concurrent.ConcurrentHashMap
 
 internal class VimscriptState : ApplicationUsagesCollector() {
 
@@ -44,14 +45,20 @@ internal class VimscriptState : ApplicationUsagesCollector() {
   }
 
   object Util {
-    val sourcedFiles = HashSet<String>()
-    val extensionsEnabledWithPlug = HashSet<String>()
+    val sourcedFiles = ConcurrentHashMap.newKeySet<String>()
+    val extensionsEnabledWithPlug = ConcurrentHashMap.newKeySet<String>()
 
+    @Volatile
     var isIDESpecificConfigurationUsed = false
+    @Volatile
     var isLoopUsed = false
+    @Volatile
     var isIfUsed = false
+    @Volatile
     var isMapExprUsed = false
+    @Volatile
     var isFunctionDeclarationUsed = false
+    @Volatile
     var isFunctionCallUsed = false
   }
 
