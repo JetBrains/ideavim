@@ -172,6 +172,7 @@ isnot
 
 funcref
 getcmdtype
+getline
 getreg
 getregtype
 isinf

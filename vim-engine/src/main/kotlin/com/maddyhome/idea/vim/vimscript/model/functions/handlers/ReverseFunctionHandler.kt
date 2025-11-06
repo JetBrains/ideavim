@@ -6,22 +6,21 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.vimscript.model.functions.handlers.listFunctions
+package com.maddyhome.idea.vim.vimscript.model.functions.handlers
 
 import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
-@VimscriptFunction(name = "min")
-internal class MinFunctionHandler : FunctionHandler() {
+@VimscriptFunction(name = "reverse")
+internal class ReverseFunctionHandler : FunctionHandler() {
   override val minimumNumberOfArguments = 1
   override val maximumNumberOfArguments = 1
 
@@ -31,24 +30,22 @@ internal class MinFunctionHandler : FunctionHandler() {
     context: ExecutionContext,
     vimContext: VimLContext,
   ): VimDataType {
-    val expr = argumentValues[0].evaluate(editor, context, vimContext)
+    val obj = argumentValues[0].evaluate(editor, context, vimContext)
 
-    val values = when (expr) {
-      is VimList -> expr.values
-      is VimDictionary -> expr.dictionary.values.toList()
-      else -> throw exExceptionMessage("E712") // E712: Argument of min() must be a List or Dictionary
-    }
-
-    // Empty list/dict returns 0
-    if (values.isEmpty()) {
-      return VimInt(0)
-    }
-
-    return try {
-      val minValue = values.minOf { it.toVimNumber().value }
-      VimInt(minValue)
-    } catch (e: Exception) {
-      throw exExceptionMessage("E712") // E712: Argument of min() must be a List or Dictionary
+    return when (obj) {
+      is VimList -> {
+        // Reverse the list in place and return it
+        obj.values.reverse()
+        obj
+      }
+      is VimString -> {
+        // For String, create a new reversed String
+        VimString(obj.value.reversed())
+      }
+      else -> {
+        // Return 0 for unsupported types (Tuple and Blob not implemented yet)
+        VimInt(0)
+      }
     }
   }
 }

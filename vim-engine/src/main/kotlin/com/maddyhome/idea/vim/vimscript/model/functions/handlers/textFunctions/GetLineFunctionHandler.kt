@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.vimscript.model.functions.handlers.cursorFunctions
+package com.maddyhome.idea.vim.vimscript.model.functions.handlers.textFunctions
 
 import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -18,9 +18,10 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.handlers.cursorFunctions.variableToPosition
 
 @VimscriptFunction(name = "getline")
-internal class GetlineFunctionHandler : FunctionHandler() {
+internal class GetLineFunctionHandler : FunctionHandler() {
   override val minimumNumberOfArguments = 1
   override val maximumNumberOfArguments = 2
 
@@ -51,7 +52,7 @@ internal class GetlineFunctionHandler : FunctionHandler() {
 
     if (argumentValues.size == 1) {
       // Single line. Return empty string if out of range
-      if (startLine1 < 1 || startLine1 > lineCount) return VimString.EMPTY
+      if (startLine1 !in 1..lineCount) return VimString.EMPTY
       val text = editor.getLineText(startLine1 - 1)
       return VimString(text)
     }

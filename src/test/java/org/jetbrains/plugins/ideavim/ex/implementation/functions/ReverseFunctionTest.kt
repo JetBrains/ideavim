@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package org.jetbrains.plugins.ideavim.ex.implementation.functions.listFunctions
+package org.jetbrains.plugins.ideavim.ex.implementation.functions
 
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.BeforeEach
