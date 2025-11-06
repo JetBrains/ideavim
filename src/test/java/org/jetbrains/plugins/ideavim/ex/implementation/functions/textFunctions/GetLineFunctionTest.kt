@@ -6,12 +6,12 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package org.jetbrains.plugins.ideavim.ex.implementation.functions.cursorFunctions
+package org.jetbrains.plugins.ideavim.ex.implementation.functions.textFunctions
 
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
-class GetlineFunctionTest : VimTestCase() {
+class GetLineFunctionTest : VimTestCase() {
   @Test
   fun `test getline numeric strings and method`() {
     configureByText(
