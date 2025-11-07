@@ -34,6 +34,9 @@ data class VimFuncref(
     var anonymousCounter: Int = 1
   }
 
+  val isPartial: Boolean
+    get() = arguments.values.isNotEmpty() || dictionary != null
+
   override fun toVimFloat(): VimFloat {
     throw exExceptionMessage("E891")
   }
@@ -111,8 +114,30 @@ data class VimFuncref(
   }
 
   enum class Type {
-    LAMBDA,
+    /**
+     * An early bound function, referenced directly
+     *
+     * The function reference is early bound, with the funcref storing a direct reference to the function. If the
+     * function is redefined, the funcref will still call the original function.
+     *
+     * The function reference can be a partial, either with arguments or bound to a dictionary or both.
+     */
     FUNCREF,
+
+    /**
+     * A late bound function, referenced by name
+     *
+     * The function reference is late bound, with the function looked up by name at evaluation time. This means the
+     * function reference will still work even if the function has been redefined.
+     *
+     * The function reference can be a partial, either with arguments or bound to a dictionary or both.
+     */
     FUNCTION,
+
+    /**
+     * An early bound reference to a lambda expression
+     */
+    LAMBDA,
+
   }
 }
