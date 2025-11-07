@@ -6,6 +6,8 @@ on:
 
 jobs:
   claude-review:
+    # Run only for PRs originating from the same repository (not from forks)
+    if: ${{ github.event.pull_request.head.repo.full_name == 'JetBrains/ideavim' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
