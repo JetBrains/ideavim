@@ -112,8 +112,8 @@ internal class IdeaVimSneakExtension : VimExtension {
       val chartwo = injector.keyGroup.getChar(editor) ?: return
       val range = Util.jumpTo(editor, charone, chartwo, direction)
       range?.let { highlightHandler.highlightSneakRange(editor.ij, range) }
-      // TODO: we should read from `g:sneak#label = 1` variable
-      val useLabel = true
+      val useLabel = injector.variableService.getGlobalVariableValue("sneak#label")?.toVimNumber()?.booleanValue
+        ?: false
       if (useLabel) {
         val visibleMatchingPositions = LabelUtil.findVisibleMatchingPositions(editor, charone, chartwo, direction)
         if (visibleMatchingPositions.isNotEmpty()) {
