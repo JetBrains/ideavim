@@ -330,7 +330,7 @@ variableName:           curlyBracesName;
 variableScope:          anyScope;
 
 curlyBracesName:        element+;
-element:                anyCaseNameWithDigitsAndUnderscores | unsignedInt | L_CURLY WS* expr WS* R_CURLY;
+element:                anyCaseNameWithDigitsAndUnderscores | unsignedInt | NUM | L_CURLY WS* expr WS* R_CURLY;
 
 option:                 AMPERSAND (optionScope COLON)? optionName;
 optionName:             anyCaseNameWithDigitsAndUnderscores;
