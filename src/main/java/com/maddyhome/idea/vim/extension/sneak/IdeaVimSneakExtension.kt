@@ -10,14 +10,19 @@ package com.maddyhome.idea.vim.extension.sneak
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.EditorCustomElementRenderer
+import com.intellij.openapi.editor.Inlay
+import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.ScrollType
 import com.intellij.openapi.editor.colors.EditorColors
+import com.intellij.openapi.editor.colors.EditorFontType
 import com.intellij.openapi.editor.markup.EffectType
 import com.intellij.openapi.editor.markup.HighlighterLayer
 import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.util.Disposer
+import com.intellij.ui.JBColor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.VimProjectService
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -36,11 +41,33 @@ import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.newapi.ij
 import org.jetbrains.annotations.TestOnly
 import java.awt.Font
+import java.awt.Graphics
+import java.awt.Point
+import java.awt.Rectangle
 import java.util.*
 import javax.swing.Timer
 
 
 private const val DEFAULT_HIGHLIGHT_DURATION_SNEAK = 300
+
+fun Editor.getVisibleRangeOffset(): TextRange {
+  val scrollingModel = scrollingModel
+  val visibleArea = scrollingModel.visibleArea
+  val startLog = xyToLogicalPosition(Point(0, visibleArea.y))
+  val lastLog = xyToLogicalPosition(Point(0, visibleArea.y + visibleArea.height))
+  val startOff = logicalPositionToOffset(startLog)
+  val endOff = logicalPositionToOffset(LogicalPosition(lastLog.line + 1, lastLog.column))
+  return TextRange(startOff, endOff)
+}
+
+fun Editor.offsetToXYCompat(
+  offset: Int,
+  leanForward: Boolean = false,
+  beforeSoftWrap: Boolean = false,
+): Point {
+  val visualPosition = offsetToVisualPosition(offset, leanForward, beforeSoftWrap)
+  return visualPositionToXY(visualPosition)
+}
 
 // By [Mikhail Levchenko](https://github.com/Mishkun)
 // Original repository with the plugin: https://github.com/Mishkun/ideavim-sneak
@@ -85,6 +112,26 @@ internal class IdeaVimSneakExtension : VimExtension {
       val chartwo = injector.keyGroup.getChar(editor) ?: return
       val range = Util.jumpTo(editor, charone, chartwo, direction)
       range?.let { highlightHandler.highlightSneakRange(editor.ij, range) }
+      // TODO: we should read from `g:sneak#label = 1` variable
+      val useLabel = true
+      if (useLabel) {
+        val visibleMatchingPositions = LabelUtil.findVisibleMatchingPositions(editor, charone, chartwo, direction)
+        if (visibleMatchingPositions.isNotEmpty()) {
+          LabelUtil.addLabelsToMatches(editor, visibleMatchingPositions)
+
+          // wait for user's input
+          // TODO: if the input is a VIM action (e.g. h,j,k,l,i,o,a) the action should be executed
+          val selectedChar = injector.keyGroup.getChar(editor) ?: return
+          val selectedPosition = LabelUtil.findPositionForHint(selectedChar.toString())
+          LabelUtil.clear()
+
+          if (selectedPosition != null) {
+            Util.jumpToPosition(editor, selectedPosition)?.let {
+              highlightHandler.highlightSneakRange(editor.ij, it)
+            }
+          }
+        }
+      }
       Util.lastSymbols = "${charone}${chartwo}"
       Util.lastSDirection = direction
     }
@@ -124,11 +171,55 @@ internal class IdeaVimSneakExtension : VimExtension {
       val position = caret.offset
       val chars = editor.text()
       val foundPosition = sneakDirection.findBiChar(editor, chars, position, charone, chartwo)
-      if (foundPosition != null) {
-        editor.primaryCaret().moveToOffset(foundPosition)
+      return jumpToPosition(editor, foundPosition)
+    }
+
+    fun jumpToPosition(editor: VimEditor, position: Int?): TextRange? {
+      if (position != null) {
+        editor.primaryCaret().moveToOffset(position)
       }
       editor.ij.scrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)
-      return foundPosition?.let { TextRange(foundPosition, foundPosition + 2) }
+      return position?.let { TextRange(position, position + 2) }
+    }
+  }
+
+  private object LabelUtil {
+    // TODO: the labeling should follow the original vim sneak behavior
+    val labels = listOf("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z")
+    val labelInlays: MutableList<Inlay<*>> = mutableListOf()
+    private val hintToPositionMap: MutableMap<String, Int> = mutableMapOf()
+
+    fun findVisibleMatchingPositions(
+      editor: VimEditor,
+      charone: Char,
+      chartwo: Char,
+      sneakDirection: Direction,
+    ): List<Int> {
+      val caret = editor.primaryCaret()
+      val position = caret.offset
+      return sneakDirection.findAllVisibleBiChars(editor, editor.text(), position, charone, chartwo)
+    }
+
+    fun findPositionForHint(hint: String): Int? {
+      return hintToPositionMap[hint]
+    }
+
+    fun addLabelsToMatches(editor: VimEditor, positions: List<Int>) {
+      clear()
+
+      positions.zip(labels).forEach { (position, label) ->
+        val inlay = editor.ij.inlayModel.addInlineElement(position, false, LabelRenderer(label))
+        hintToPositionMap[label] = position
+        if (inlay != null) {
+          labelInlays.add(inlay)
+        }
+      }
+    }
+
+    fun clear() {
+      labelInlays.forEach { it.dispose() }
+      labelInlays.clear()
+      hintToPositionMap.clear()
     }
   }
 
@@ -139,7 +230,7 @@ internal class IdeaVimSneakExtension : VimExtension {
         charSequence: CharSequence,
         position: Int,
         charone: Char,
-        chartwo: Char
+        chartwo: Char,
       ): Int? {
         for (i in (position + offset) until charSequence.length - 1) {
           if (matches(editor, charSequence, i, charone, chartwo)) {
@@ -148,6 +239,23 @@ internal class IdeaVimSneakExtension : VimExtension {
         }
         return null
       }
+
+      override fun findAllVisibleBiChars(
+        editor: VimEditor,
+        charSequence: CharSequence,
+        position: Int,
+        charone: Char,
+        chartwo: Char,
+      ): List<Int> {
+        val visibleRange = editor.ij.getVisibleRangeOffset()
+        val result = mutableListOf<Int>()
+        for (i in (position + offset) until visibleRange.endOffset - 1) {
+          if (matches(editor, charSequence, i, charone, chartwo)) {
+            result.add(i)
+          }
+        }
+        return result
+      }
     },
     BACKWARD(-1) {
       override fun findBiChar(
@@ -155,7 +263,7 @@ internal class IdeaVimSneakExtension : VimExtension {
         charSequence: CharSequence,
         position: Int,
         charone: Char,
-        chartwo: Char
+        chartwo: Char,
       ): Int? {
         for (i in (position + offset) downTo 0) {
           if (matches(editor, charSequence, i, charone, chartwo)) {
@@ -163,6 +271,23 @@ internal class IdeaVimSneakExtension : VimExtension {
           }
         }
         return null
+      }
+
+      override fun findAllVisibleBiChars(
+        editor: VimEditor,
+        charSequence: CharSequence,
+        position: Int,
+        charone: Char,
+        chartwo: Char,
+      ): List<Int> {
+        val visibleRange = editor.ij.getVisibleRangeOffset()
+        val result = mutableListOf<Int>()
+        for (i in (position + offset) downTo visibleRange.startOffset) {
+          if (matches(editor, charSequence, i, charone, chartwo)) {
+            result.add(i)
+          }
+        }
+        return result
       }
 
     };
@@ -174,6 +299,14 @@ internal class IdeaVimSneakExtension : VimExtension {
       charone: Char,
       chartwo: Char,
     ): Int?
+
+    abstract fun findAllVisibleBiChars(
+      editor: VimEditor,
+      charSequence: CharSequence,
+      position: Int,
+      charone: Char,
+      chartwo: Char,
+    ): List<Int>
 
     fun matches(
       editor: VimEditor,
@@ -280,6 +413,33 @@ internal class IdeaVimSneakExtension : VimExtension {
       EffectType.SEARCH_MATCH,
       Font.PLAIN
     )
+  }
+
+  // TODO: instead of rendering next to the match, we should render on top of it like when we use the EasyMotion plugin
+  private class LabelRenderer(
+    private val label: String,
+  ) : EditorCustomElementRenderer {
+    private object T {
+      fun boldFont(inlay: Inlay<*>): Font = inlay.editor.colorsScheme.getFont(EditorFontType.PLAIN).deriveFont(Font.BOLD)
+    }
+
+    override fun calcWidthInPixels(inlay: Inlay<*>): Int {
+      return inlay.editor.contentComponent.getFontMetrics(
+          T.boldFont(inlay)
+      ).stringWidth(label) + 4
+    }
+
+    override fun paint(inlay: Inlay<*>, g: Graphics, r: Rectangle, textAttributes: TextAttributes) {
+      val font = T.boldFont(inlay)
+      g.font = font
+      val fontMetrics = inlay.editor.contentComponent.getFontMetrics(font)
+      val width = fontMetrics.stringWidth(label) + 4
+
+      g.color = JBColor.YELLOW
+      g.fillRect(r.x, r.y, width, r.height)
+      g.color = JBColor.BLACK
+      g.drawString(label, r.x + 2, r.y + fontMetrics.ascent)
+    }
   }
 }
 
