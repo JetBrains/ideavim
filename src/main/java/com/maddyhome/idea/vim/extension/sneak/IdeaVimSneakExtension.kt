@@ -122,7 +122,7 @@ internal class IdeaVimSneakExtension : VimExtension {
           // wait for user's input
           // TODO: if the input is a VIM action (e.g. h,j,k,l,i,o,a) the action should be executed
           val selectedChar = injector.keyGroup.getChar(editor) ?: return
-          val selectedPosition = LabelUtil.findPositionForHint(selectedChar.toString())
+          val selectedPosition = LabelUtil.findPositionForHint(selectedChar)
           LabelUtil.clear()
 
           if (selectedPosition != null) {
@@ -185,9 +185,9 @@ internal class IdeaVimSneakExtension : VimExtension {
 
   private object LabelUtil {
     // TODO: the labeling should follow the original vim sneak behavior
-    val labels = listOf("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z")
+    val labels = ";sftunq/SFGHLTUNRMQZ?0".toList()
     val labelInlays: MutableList<Inlay<*>> = mutableListOf()
-    private val hintToPositionMap: MutableMap<String, Int> = mutableMapOf()
+    private val hintToPositionMap: MutableMap<Char, Int> = mutableMapOf()
 
     fun findVisibleMatchingPositions(
       editor: VimEditor,
@@ -200,7 +200,7 @@ internal class IdeaVimSneakExtension : VimExtension {
       return sneakDirection.findAllVisibleBiChars(editor, editor.text(), position, charone, chartwo)
     }
 
-    fun findPositionForHint(hint: String): Int? {
+    fun findPositionForHint(hint: Char): Int? {
       return hintToPositionMap[hint]
     }
 
@@ -208,7 +208,7 @@ internal class IdeaVimSneakExtension : VimExtension {
       clear()
 
       positions.zip(labels).forEach { (position, label) ->
-        val inlay = editor.ij.inlayModel.addInlineElement(position, false, LabelRenderer(label))
+        val inlay = editor.ij.inlayModel.addInlineElement(position, false, LabelRenderer(label.toString()))
         hintToPositionMap[label] = position
         if (inlay != null) {
           labelInlays.add(inlay)
