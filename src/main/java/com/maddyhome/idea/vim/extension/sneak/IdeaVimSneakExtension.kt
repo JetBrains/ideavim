@@ -120,7 +120,6 @@ internal class IdeaVimSneakExtension : VimExtension {
           LabelUtil.addLabelsToMatches(editor, visibleMatchingPositions)
 
           // wait for user's input
-          // TODO: if the input is a VIM action (e.g. h,j,k,l,i,o,a) the action should be executed
           val selectedChar = injector.keyGroup.getChar(editor) ?: return
           val selectedPosition = LabelUtil.findPositionForHint(selectedChar)
           LabelUtil.clear()
@@ -129,6 +128,11 @@ internal class IdeaVimSneakExtension : VimExtension {
             Util.jumpToPosition(editor, selectedPosition)?.let {
               highlightHandler.highlightSneakRange(editor.ij, it)
             }
+          } else {
+            VimExtensionFacade.executeNormalWithoutMapping(
+              injector.parser.parseKeys(selectedChar.toString()),
+              editor.ij,
+            )
           }
         }
       }
