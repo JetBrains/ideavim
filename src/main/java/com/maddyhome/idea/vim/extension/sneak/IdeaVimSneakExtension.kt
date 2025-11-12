@@ -115,26 +115,8 @@ internal class IdeaVimSneakExtension : VimExtension {
       val useLabel = injector.variableService.getGlobalVariableValue("sneak#label")?.toVimNumber()?.booleanValue
         ?: false
       if (useLabel) {
-        val visibleMatchingPositions = LabelUtil.findVisibleMatchingPositions(editor, charone, chartwo, direction)
-        if (visibleMatchingPositions.isNotEmpty()) {
-          LabelUtil.addLabelsToMatches(editor, visibleMatchingPositions)
-
-          // wait for user's input
-          val selectedChar = injector.keyGroup.getChar(editor) ?: return
-          val selectedPosition = LabelUtil.findPositionForHint(selectedChar)
-          LabelUtil.clear()
-
-          if (selectedPosition != null) {
-            Util.jumpToPosition(editor, selectedPosition)?.let {
-              highlightHandler.highlightSneakRange(editor.ij, it)
-            }
-          } else {
-            VimExtensionFacade.executeNormalWithoutMapping(
-              injector.parser.parseKeys(selectedChar.toString()),
-              editor.ij,
-            )
-          }
-        }
+        LabelUtil.jumpTo(editor, charone, chartwo, direction)
+          ?.let { highlightHandler.highlightSneakRange(editor.ij, it) }
       }
       Util.lastSymbols = "${charone}${chartwo}"
       Util.lastSDirection = direction
@@ -188,12 +170,41 @@ internal class IdeaVimSneakExtension : VimExtension {
   }
 
   private object LabelUtil {
-    // TODO: the labeling should follow the original vim sneak behavior
     val labels = ";sftunq/SFGHLTUNRMQZ?0".toList()
     val labelInlays: MutableList<Inlay<*>> = mutableListOf()
     private val hintToPositionMap: MutableMap<Char, Int> = mutableMapOf()
 
-    fun findVisibleMatchingPositions(
+    fun jumpTo(editor: VimEditor, charone: Char, chartwo: Char, sneakDirection: Direction): TextRange? {
+      try {
+        val visibleMatchingPositions = findVisibleMatchingPositions(editor, charone, chartwo, sneakDirection)
+        if (visibleMatchingPositions.isEmpty()) {
+          return null
+        }
+
+        addLabelsToMatches(editor, visibleMatchingPositions)
+
+        // wait for user's input
+        // for the CR issue (chartwo == '\n'), if I add a breakpoint the code on the next line, I can select a char to jump to
+        // if I don't, it doesn't wait for a char
+        val selectedChar = injector.keyGroup.getChar(editor) ?: return null
+        val selectedPosition = hintToPositionMap[selectedChar]
+        clear()
+
+        if (selectedPosition == null) {
+          VimExtensionFacade.executeNormalWithoutMapping(
+            injector.parser.parseKeys(selectedChar.toString()),
+            editor.ij,
+          )
+          return null
+        }
+
+        return Util.jumpToPosition(editor, selectedPosition)
+      } finally {
+        clear()
+      }
+    }
+
+    private fun findVisibleMatchingPositions(
       editor: VimEditor,
       charone: Char,
       chartwo: Char,
@@ -204,13 +215,7 @@ internal class IdeaVimSneakExtension : VimExtension {
       return sneakDirection.findAllVisibleBiChars(editor, editor.text(), position, charone, chartwo)
     }
 
-    fun findPositionForHint(hint: Char): Int? {
-      return hintToPositionMap[hint]
-    }
-
-    fun addLabelsToMatches(editor: VimEditor, positions: List<Int>) {
-      clear()
-
+    private fun addLabelsToMatches(editor: VimEditor, positions: List<Int>) {
       positions.zip(labels).forEach { (position, label) ->
         val inlay = editor.ij.inlayModel.addInlineElement(position, false, LabelRenderer(label.toString()))
         hintToPositionMap[label] = position
@@ -220,7 +225,7 @@ internal class IdeaVimSneakExtension : VimExtension {
       }
     }
 
-    fun clear() {
+    private fun clear() {
       labelInlays.forEach { it.dispose() }
       labelInlays.clear()
       hintToPositionMap.clear()
