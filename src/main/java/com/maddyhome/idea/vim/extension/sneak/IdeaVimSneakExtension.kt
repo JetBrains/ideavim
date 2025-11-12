@@ -184,9 +184,14 @@ internal class IdeaVimSneakExtension : VimExtension {
         addLabelsToMatches(editor, visibleMatchingPositions)
 
         // wait for user's input
-        // for the CR issue (chartwo == '\n'), if I add a breakpoint the code on the next line, I can select a char to jump to
-        // if I don't, it doesn't wait for a char
-        val selectedChar = injector.keyGroup.getChar(editor) ?: return null
+        val selectedChar = run {
+          val selectedChar = injector.keyGroup.getChar(editor)
+          // if the 2nd char is \n, we need to wait for the user's input again
+          if (selectedChar == null && chartwo == '\n') {
+            return@run injector.keyGroup.getChar(editor)
+          }
+          selectedChar
+        }
         val selectedPosition = hintToPositionMap[selectedChar]
         clear()
 
