@@ -59,4 +59,40 @@ class IndexFunctionTest : VimTestCase() {
   fun `test index first occurrence`() {
     assertCommandOutput("echo index([1, 2, 1, 2], 1)", "0")
   }
+
+  @Test
+  fun `test index with start beyond list size`() {
+    assertCommandOutput("echo index([1, 2, 3], 2, 10)", "-1")
+  }
+
+  @Test
+  fun `test index with start at list size`() {
+    assertCommandOutput("echo index([1, 2, 3], 2, 3)", "-1")
+  }
+
+  @Test
+  fun `test index with negative start beyond list size`() {
+    assertCommandOutput("echo index([1, 2, 3], 2, -100)", "1")
+  }
+
+  @Test
+  fun `test index with nested list`() {
+    assertCommandOutput("echo index([[1, 2], [3, 4], [1, 2]], [1, 2])", "0")
+  }
+
+  @Test
+  fun `test index with float`() {
+    assertCommandOutput("echo index([1.5, 2.5, 3.5], 2.5)", "1")
+  }
+
+  @Test
+  fun `test index float vs int different`() {
+    assertCommandOutput("echo index([1.0, 2, 3], 1)", "-1")
+  }
+
+  @Test
+  fun `test index ignoreCase only affects strings`() {
+    // ignoreCase parameter should not affect non-string comparisons
+    assertCommandOutput("echo index([1, 2, 3], 2, 0, 1)", "1")
+  }
 }

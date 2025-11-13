@@ -57,7 +57,7 @@ internal class IndexFunctionHandler : FunctionHandler() {
 
   private fun compareValues(item: VimDataType, expr: VimDataType, ignoreCase: Boolean): Boolean {
     return if (ignoreCase && item is VimString && expr is VimString) {
-      item.value.equals(expr.toVimString().value, ignoreCase = true)
+      item.value.equals(expr.value, ignoreCase = true)
     } else {
       // Direct comparison - no automatic conversion
       // String "4" is different from Number 4
