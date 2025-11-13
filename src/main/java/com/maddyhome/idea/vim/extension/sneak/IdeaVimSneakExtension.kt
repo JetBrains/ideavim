@@ -488,6 +488,8 @@ private fun VimExtension.mapToFunctionAndProvideKeys(
   )
 }
 
+// Derived from vim-flash (https://github.com/yelog/vim-flash)
+// Original code licensed under Apache License 2.0
 fun Editor.getVisibleRangeOffset(): TextRange {
   val scrollingModel = scrollingModel
   val visibleArea = scrollingModel.visibleArea
