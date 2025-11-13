@@ -14,6 +14,14 @@ import java.text.DecimalFormatSymbols
 import java.util.Locale
 import kotlin.math.abs
 
+/**
+ * Represents a Vim Float
+ *
+ * This type has value semantics. I.e., two instances of [VimFloat] are considered equal if they have the same
+ * underlying value.
+ *
+ * A Vim Float cannot be converted to a Number or String.
+ */
 data class VimFloat(val value: Double) : VimDataType("float") {
   override fun toVimFloat() = this
 
@@ -36,9 +44,7 @@ data class VimFloat(val value: Double) : VimDataType("float") {
     return DecimalFormat(pattern, symbols).format(value)
   }
 
-  override fun deepCopy(level: Int): VimFloat {
-    return copy()
-  }
+  override fun copy() = VimFloat(value)
 
   override fun lockVar(depth: Int) {
     this.isLocked = true

@@ -56,6 +56,15 @@ abstract class VimDataType(val typeName: String) {
   abstract fun toOutputString(): String
 
   /**
+   * Implementation of [toOutputString] for recursive lists and dictionaries
+   *
+   * DO NOT USE!
+   */
+  internal open fun buildOutputString(builder: StringBuilder, visited: MutableSet<VimDataType>) {
+    builder.append(toOutputString())
+  }
+
+  /**
    * Returns a textual representation of the object, suitable for inserting into the editor's text
    *
    * Used when evaluating the expression register (e.g. `i_CTRL-R_=` and `c_CTRL-R_=`), or when using an expression with
@@ -66,7 +75,65 @@ abstract class VimDataType(val typeName: String) {
    */
   open fun toInsertableString() = toOutputString()
 
-  abstract fun deepCopy(level: Int = 100): VimDataType
+  /**
+   * Implementation of [toInsertableString] for recursive lists and dictionaries
+   *
+   * DO NOT USE!
+   */
+  internal open fun buildInsertableString(builder: StringBuilder, depth: Int): Boolean {
+    builder.append(toInsertableString())
+    return true
+  }
+
+  /**
+   * Returns true if this object is equal to another object, based on value semantics
+   *
+   * Not all Vim types can be represented as data classes, with value semantics. For example, a list or dictionary can
+   * be a recursive data structure, and that would cause problems with implementation of [equals] and [hashCode].
+   *
+   * This function can be used to compare the values of two objects are correct. It does no type coercion, unlike Vim's
+   * `==` operator.
+   */
+  open fun valueEquals(other: VimDataType, ignoreCase: Boolean, depth: Int = 0) = this == other
+
+  /**
+   * Create a shallow copy of this object
+   *
+   * Creates a new object with the same value as this one. The new object will be a new instance, but the values will
+   * be the same. For example, a [VimFloat] will have the same value, but will be a new [VimFloat] instance. When
+   * copying a more complex object like [VimList] or [VimDictionary], a new list or dictionary instance is created,
+   * but the existing list or dictionary items are reused.
+   *
+   * Use [deepCopy] to create a completely new instance.
+   */
+  abstract fun copy(): VimDataType
+
+  /**
+   * Create a deep copy of this object
+   *
+   * For value types, such as [VimFloat] and [VimInt], this will return a new instance with the same value. For
+   * [VimList] and [VimDictionary], this will create a new instance of the List or Dictionary, and then recursively
+   * create copies of each of the items (the Dictionary's keys are not copies). Note that [VimFuncref] is always a
+   * shallow copy.
+   *
+   * If [useReferences] is true, then any reference we've previously copied will reuse that copied instance. If false,
+   * all instances will be new.
+   *
+   * The implementation will only recurse 100 levels before reporting an error.
+   * ("E698: Variable nested too deep for making a copy")
+   */
+  open fun deepCopy(useReferences: Boolean): VimDataType {
+    // Strictly speaking, we should create a map here if useReferences is true, but that's an unnecessary overhead for
+    // everything other than List and Dictionary, so we'll let the implementations decide
+    return deepCopy(0, null)
+  }
+
+  /**
+   * Implementation of [deepCopy] for recursive lists and dictionaries
+   *
+   * DO NOT USE!
+   */
+  internal open fun deepCopy(depth: Int, copiedReferences: MutableMap<VimDataType, VimDataType>?) = copy()
 
   var lockOwner: Any? = null
   var isLocked: Boolean = false

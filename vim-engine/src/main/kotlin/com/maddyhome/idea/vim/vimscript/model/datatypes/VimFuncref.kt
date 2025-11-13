@@ -21,18 +21,47 @@ import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 
-data class VimFuncref(
+/**
+ * Represents a Vim Funcref, or reference to the function
+ *
+ * This type does NOT have value semantics. It is not correct to compare two instances of this type for structural
+ * equality. This is required so that recursive data structures don't cause problems with equality or hash codes.
+ *
+ * It cannot be converted to a Number, Float, or String. When output, any recursively used elements are replaced with a
+ * placeholder. When attempting to insert into text, an exception is thrown: "E729: Using a Funcref as a String".
+ *
+ * A Funcref can be early bound, late bound or a lambda, and can be partially applied.
+ *
+ * When created with Vim's `function()` function, it is late bound. The Funcref is created with a function handler for
+ * validation purposes, but the handler is resolved at execution time, allowing for redefinition of the function. When
+ * created with `funcref()`, it is early bound, and the handler given at creation time is used at execution time.
+ *
+ * A lambda is a Funcref that represents a lambda literal expression.
+ *
+ * If the Funcref is created with arguments and/or a dictionary, it is partially applied, and these values are used
+ * when the function is invoked.
+ *
+ * Use [execute] to invoke the function. This will resolve the function handler if necessary and ensure a dictionary
+ * function has the dictionary scope it requires. Do not invoke the function handler directly!
+ */
+class VimFuncref(
   val handler: FunctionHandler,
   val arguments: VimList,
   var dictionary: VimDictionary?,
   val type: Type,
 ) : VimDataType("funcref") {
+  // TODO: Consider removing. It is set when the funcref is a partial and used to avoid overwriting the dictionary when invoked
+  // It might be better to have a nullable dictionary for partial application, and pass the dictionary context when
+  // invoking the function
   var isSelfFixed: Boolean = false
 
   companion object {
     var lambdaCounter: Int = 1
     var anonymousCounter: Int = 1
   }
+
+  val isPartial: Boolean
+    get() = arguments.values.isNotEmpty() || dictionary != null
 
   override fun toVimFloat(): VimFloat {
     throw exExceptionMessage("E891")
@@ -46,21 +75,55 @@ data class VimFuncref(
     throw exExceptionMessage("E729")
   }
 
-  override fun toOutputString(): String {
-    return if (arguments.values.isEmpty() && dictionary == null) {
-      when (type) {
-        Type.LAMBDA -> "function('${handler.name}')"
-        Type.FUNCREF -> "function('${handler.name}')"
-        Type.FUNCTION -> handler.name
+  override fun toOutputString() = buildString {
+    val visited = mutableSetOf<VimDataType>()
+    buildOutputString(this, visited)
+  }
+
+  override fun buildOutputString(builder: StringBuilder, visited: MutableSet<VimDataType>) {
+    builder.run {
+      if (arguments.values.isEmpty() && dictionary == null) {
+        append(
+          when (type) {
+            Type.LAMBDA -> "function('${handler.name}')"
+            Type.FUNCREF -> "function('${handler.name}')"
+            Type.FUNCTION -> handler.name
+          }
+        )
+      } else {
+        builder.run {
+          append("function('${handler.name}'")
+          if (arguments.values.isNotEmpty()) {
+            append(", ")
+            arguments.buildOutputString(this, mutableSetOf())
+          }
+          if (dictionary != null) {
+            append(", ")
+            dictionary!!.buildOutputString(this, mutableSetOf())
+          }
+          append(")")
+        }
       }
-    } else {
-      val result = StringBuffer("function('${handler.name}'")
-      if (arguments.values.isNotEmpty()) {
-        result.append(", ").append(arguments.toOutputString())
-      }
-      result.append(")")
-      return result.toString()
     }
+  }
+
+  override fun toInsertableString(): String = throw exExceptionMessage("E729")
+
+  override fun valueEquals(other: VimDataType, ignoreCase: Boolean, depth: Int): Boolean {
+    if (this === other) return true
+    if (other !is VimFuncref) return false
+    if (handler.name != other.handler.name) return false
+    if (!arguments.valueEquals(other.arguments, ignoreCase, depth)) return false
+    val thisDictionary = this.dictionary
+    val otherDictionary = other.dictionary
+    when {
+      thisDictionary == null && otherDictionary != null -> return false
+      thisDictionary != null && otherDictionary == null -> return false
+      thisDictionary != null && otherDictionary != null -> {
+        if (!thisDictionary.valueEquals(otherDictionary, ignoreCase, depth + 1)) return false
+      }
+    }
+    return true
   }
 
   fun execute(
@@ -98,9 +161,7 @@ data class VimFuncref(
     return handler.executeFunction(allArguments, editor, context, vimContext)
   }
 
-  override fun deepCopy(level: Int): VimFuncref {
-    return copy()
-  }
+  override fun copy() = VimFuncref(handler, arguments.copy(), dictionary?.copy(), type)
 
   override fun lockVar(depth: Int) {
     this.isLocked = true
@@ -111,8 +172,30 @@ data class VimFuncref(
   }
 
   enum class Type {
-    LAMBDA,
+    /**
+     * An early bound function, referenced directly
+     *
+     * The function reference is early bound, with the funcref storing a direct reference to the function. If the
+     * function is redefined, the funcref will still call the original function.
+     *
+     * The function reference can be a partial, either with arguments or bound to a dictionary or both.
+     */
     FUNCREF,
+
+    /**
+     * A late bound function, referenced by name
+     *
+     * The function reference is late bound, with the function looked up by name at evaluation time. This means the
+     * function reference will still work even if the function has been redefined.
+     *
+     * The function reference can be a partial, either with arguments or bound to a dictionary or both.
+     */
     FUNCTION,
+
+    /**
+     * An early bound reference to a lambda expression
+     */
+    LAMBDA,
+
   }
 }

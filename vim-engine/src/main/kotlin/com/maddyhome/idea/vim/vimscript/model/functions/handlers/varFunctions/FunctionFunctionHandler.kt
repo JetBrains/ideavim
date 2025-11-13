@@ -63,6 +63,10 @@ internal class FunctionFunctionHandler : FunctionHandler() {
     if (arg3 != null && arg3 !is VimDictionary) {
       throw exExceptionMessage("E922")
     }
+    // TODO: All of this logic needs a rewrite
+    if (dictionary == null) {
+      dictionary = arg3
+    }
     val funcref = VimFuncref(function, arglist ?: VimList(mutableListOf()), dictionary, VimFuncref.Type.FUNCTION)
     if (dictionary != null) {
       funcref.isSelfFixed = true

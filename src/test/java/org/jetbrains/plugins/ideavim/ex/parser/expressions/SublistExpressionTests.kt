@@ -14,8 +14,10 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.SublistExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
+import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.ex.evaluate
 import org.jetbrains.plugins.ideavim.productForArguments
+import org.junit.jupiter.api.assertInstanceOf
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -23,7 +25,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class SublistExpressionTests {
+class SublistExpressionTests : VimTestCase() {
 
   companion object {
     @JvmStatic
@@ -77,10 +79,14 @@ class SublistExpressionTests {
   fun `sublist with range specified`(sp1: String, sp2: String, sp3: String, sp4: String) {
     val ex = VimscriptParser.parseExpression("[1, 2, 3, 4, 5, 6][${sp1}1$sp2:${sp3}4$sp4]")
     assertTrue(ex is SublistExpression)
-    assertEquals(
-      VimList(mutableListOf(VimInt(1), VimInt(2), VimInt(3), VimInt(4), VimInt(5), VimInt(6))),
-      ex.expression.evaluate(),
-    )
+    val expression = ex.expression.evaluate()
+    assertInstanceOf<VimList>(expression)
+    assertEquals(VimInt(1), expression[0])
+    assertEquals(VimInt(2), expression[1])
+    assertEquals(VimInt(3), expression[2])
+    assertEquals(VimInt(4), expression[3])
+    assertEquals(VimInt(5), expression[4])
+    assertEquals(VimInt(6), expression[5])
     assertEquals(VimInt(1), ex.from!!.evaluate())
     assertEquals(VimInt(4), ex.to!!.evaluate())
   }
@@ -97,10 +103,14 @@ class SublistExpressionTests {
   ) {
     val ex = VimscriptParser.parseExpression("[1, 2, 3, 4, 5, 6][${sp1}1$sp2+${sp3}5$sp4:$sp5'asd'$sp6]")
     assertTrue(ex is SublistExpression)
-    assertEquals(
-      VimList(mutableListOf(VimInt(1), VimInt(2), VimInt(3), VimInt(4), VimInt(5), VimInt(6))),
-      ex.expression.evaluate(),
-    )
+    val expression = ex.expression.evaluate()
+    assertInstanceOf<VimList>(expression)
+    assertEquals(VimInt(1), expression[0])
+    assertEquals(VimInt(2), expression[1])
+    assertEquals(VimInt(3), expression[2])
+    assertEquals(VimInt(4), expression[3])
+    assertEquals(VimInt(5), expression[4])
+    assertEquals(VimInt(6), expression[5])
     assertEquals(VimInt(6), ex.from!!.evaluate())
     assertEquals(VimString("asd"), ex.to!!.evaluate())
   }

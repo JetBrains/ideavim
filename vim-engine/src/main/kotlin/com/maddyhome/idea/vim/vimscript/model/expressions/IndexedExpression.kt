@@ -107,7 +107,7 @@ data class IndexedExpression(val index: Expression, val expression: Expression) 
       && value.handler is DefinedFunctionHandler
       && value.handler.function.flags.contains(FunctionFlag.DICT)
     ) {
-      newValue = value.copy()
+      newValue = value.deepCopy(useReferences = true) as VimFuncref
       newValue.dictionary = dict
     }
     dict.dictionary[key] = newValue
