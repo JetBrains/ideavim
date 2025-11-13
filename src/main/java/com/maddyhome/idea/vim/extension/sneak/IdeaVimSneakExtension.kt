@@ -50,25 +50,6 @@ import javax.swing.Timer
 
 private const val DEFAULT_HIGHLIGHT_DURATION_SNEAK = 300
 
-fun Editor.getVisibleRangeOffset(): TextRange {
-  val scrollingModel = scrollingModel
-  val visibleArea = scrollingModel.visibleArea
-  val startLog = xyToLogicalPosition(Point(0, visibleArea.y))
-  val lastLog = xyToLogicalPosition(Point(0, visibleArea.y + visibleArea.height))
-  val startOff = logicalPositionToOffset(startLog)
-  val endOff = logicalPositionToOffset(LogicalPosition(lastLog.line + 1, lastLog.column))
-  return TextRange(startOff, endOff)
-}
-
-fun Editor.offsetToXYCompat(
-  offset: Int,
-  leanForward: Boolean = false,
-  beforeSoftWrap: Boolean = false,
-): Point {
-  val visualPosition = offsetToVisualPosition(offset, leanForward, beforeSoftWrap)
-  return visualPositionToXY(visualPosition)
-}
-
 // By [Mikhail Levchenko](https://github.com/Mishkun)
 // Original repository with the plugin: https://github.com/Mishkun/ideavim-sneak
 internal class IdeaVimSneakExtension : VimExtension {
@@ -505,6 +486,16 @@ private fun VimExtension.mapToFunctionAndProvideKeys(
     injector.parser.parseKeys(commandFromOriginalPlugin(keys)),
     true
   )
+}
+
+fun Editor.getVisibleRangeOffset(): TextRange {
+  val scrollingModel = scrollingModel
+  val visibleArea = scrollingModel.visibleArea
+  val startLog = xyToLogicalPosition(Point(0, visibleArea.y))
+  val lastLog = xyToLogicalPosition(Point(0, visibleArea.y + visibleArea.height))
+  val startOff = logicalPositionToOffset(startLog)
+  val endOff = logicalPositionToOffset(LogicalPosition(lastLog.line + 1, lastLog.column))
+  return TextRange(startOff, endOff)
 }
 
 private fun command(keys: String) = "<Plug>(sneak-$keys)"
