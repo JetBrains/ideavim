@@ -8,7 +8,6 @@
 
 package org.jetbrains.plugins.ideavim.propertybased
 
-import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
@@ -40,6 +39,4 @@ abstract class VimPropertyTestBase : VimTestCase() {
     VimPlugin.getSearch().resetState()
     VimPlugin.getChange().reset()
   }
-
-  protected fun configureByJavaText(content: String) = configureByText(JavaFileType.INSTANCE, content)
 }
