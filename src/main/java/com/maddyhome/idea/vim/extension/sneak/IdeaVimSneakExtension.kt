@@ -88,13 +88,16 @@ internal class IdeaVimSneakExtension : VimExtension {
     private val highlightHandler: HighlightHandler,
     private val direction: Direction,
   ) : ExtensionHandler {
+    private val useLabel = injector.variableService
+      .getGlobalVariableValue("sneak#label")
+      ?.toVimNumber()?.booleanValue
+      ?: false
+
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
       val charone = injector.keyGroup.getChar(editor) ?: return
       val chartwo = injector.keyGroup.getChar(editor) ?: return
       val range = Util.jumpTo(editor, charone, chartwo, direction)
       range?.let { highlightHandler.highlightSneakRange(editor.ij, range) }
-      val useLabel = injector.variableService.getGlobalVariableValue("sneak#label")?.toVimNumber()?.booleanValue
-        ?: false
       if (useLabel) {
         LabelUtil.jumpTo(editor, charone, chartwo, direction)
           ?.let { highlightHandler.highlightSneakRange(editor.ij, it) }
@@ -151,8 +154,8 @@ internal class IdeaVimSneakExtension : VimExtension {
   }
 
   private object LabelUtil {
-    val labels = ";sftunq/SFGHLTUNRMQZ?0".toList()
-    val labelInlays: MutableList<Inlay<*>> = mutableListOf()
+    private val labels = ";sftunq/SFGHLTUNRMQZ?0".toList()
+    private val labelInlays: MutableList<Inlay<*>> = mutableListOf()
     private val hintToPositionMap: MutableMap<Char, Int> = mutableMapOf()
 
     fun jumpTo(editor: VimEditor, charone: Char, chartwo: Char, sneakDirection: Direction): TextRange? {
@@ -410,22 +413,18 @@ internal class IdeaVimSneakExtension : VimExtension {
     )
   }
 
-  // TODO: instead of rendering next to the match, we should render on top of it like when we use the EasyMotion plugin
   private class LabelRenderer(
     private val label: String,
   ) : EditorCustomElementRenderer {
-    private object T {
-      fun boldFont(inlay: Inlay<*>): Font = inlay.editor.colorsScheme.getFont(EditorFontType.PLAIN).deriveFont(Font.BOLD)
-    }
+    private fun boldFont(inlay: Inlay<*>): Font = inlay.editor.colorsScheme.getFont(EditorFontType.PLAIN).deriveFont(Font.BOLD)
 
     override fun calcWidthInPixels(inlay: Inlay<*>): Int {
-      return inlay.editor.contentComponent.getFontMetrics(
-          T.boldFont(inlay)
-      ).stringWidth(label) + 4
+      val font = boldFont(inlay)
+      return inlay.editor.contentComponent.getFontMetrics(font).stringWidth(label) + 4
     }
 
     override fun paint(inlay: Inlay<*>, g: Graphics, r: Rectangle, textAttributes: TextAttributes) {
-      val font = T.boldFont(inlay)
+      val font = boldFont(inlay)
       g.font = font
       val fontMetrics = inlay.editor.contentComponent.getFontMetrics(font)
       val width = fontMetrics.stringWidth(label) + 4
