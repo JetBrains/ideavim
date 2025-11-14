@@ -168,6 +168,8 @@ lmapclear
 cmapclear
 tmapclear
 
+isnot
+
 funcref
 getcmdtype
 getreg

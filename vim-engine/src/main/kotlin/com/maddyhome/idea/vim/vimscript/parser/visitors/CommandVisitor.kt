@@ -112,17 +112,28 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
 
   override fun visitLet1Command(ctx: VimscriptParser.Let1CommandContext): Command {
     val range: Range = parseRange(ctx.range())
-    val variable: Expression = expressionVisitor.visit(ctx.expr(0))
+    val lvalue: Expression? = ctx.lvalue?.let { expressionVisitor.visit(it) }
+    val unpackLValues = ctx.unpack?.lvalues?.map { expressionVisitor.visit(it)!! }
+    val unpackRest: Expression? = ctx.unpack?.rest?.let { expressionVisitor.visit(it) }
     val operator = getByValue(ctx.assignmentOperator().text)
-    val expression: Expression = expressionVisitor.visit(ctx.expr(1))
+    val expression: Expression = expressionVisitor.visit(ctx.rvalue)
     val assignmentTextForErrors = buildString {
       ctx.children
-        .dropWhile { it != ctx.expr(0) }
-        .takeWhile { it != ctx.expr(1) }
+        .dropWhile { it != ctx.unpack && it != ctx.lvalue }
+        .takeWhile { it != ctx.rvalue }
         .forEach { append(it.text) }
-      append(ctx.expr(1).text)
+      append(ctx.rvalue.text)
     }
-    val command = LetCommand(range, variable, operator, expression, true, assignmentTextForErrors)
+    val command = LetCommand(
+      range,
+      lvalue,
+      unpackLValues,
+      unpackRest,
+      operator,
+      expression,
+      isSyntaxSupported = true,
+      assignmentTextForErrors
+    )
     command.rangeInScript = ctx.getTextRange()
     return command
   }
