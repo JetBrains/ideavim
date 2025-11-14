@@ -16,16 +16,17 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.BinaryOperator
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
+import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertInstanceOf
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
-class FuncrefCallTests {
+class FuncrefCallTests : VimTestCase() {
 
   @Test
   fun `test dictionary funcref call`() {
     val funcrefCall = VimscriptParser.parseExpression("dict.len()")
-    assertTrue(funcrefCall is FuncrefCallExpression)
+    assertInstanceOf<FuncrefCallExpression>(funcrefCall)
     assertEquals(
       IndexedExpression(CurlyBracesName(listOf(SimpleExpression("len"))), VariableExpression(null, "dict")),
       funcrefCall.expression,
@@ -36,7 +37,7 @@ class FuncrefCallTests {
   @Test
   fun `test inner dictionary funcref call`() {
     val funcrefCall = VimscriptParser.parseExpression("dict.innerDict.len()")
-    assertTrue(funcrefCall is FuncrefCallExpression)
+    assertInstanceOf<FuncrefCallExpression>(funcrefCall)
     assertEquals(
       IndexedExpression(
         CurlyBracesName(listOf(SimpleExpression("len"))),
@@ -50,7 +51,7 @@ class FuncrefCallTests {
   @Test
   fun `test dictionary funcref call with args`() {
     val funcrefCall = VimscriptParser.parseExpression("dict.len(a, 5 + 10)")
-    assertTrue(funcrefCall is FuncrefCallExpression)
+    assertInstanceOf<FuncrefCallExpression>(funcrefCall)
     assertEquals(
       IndexedExpression(CurlyBracesName(listOf(SimpleExpression("len"))), VariableExpression(null, "dict")),
       funcrefCall.expression,

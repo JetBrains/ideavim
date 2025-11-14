@@ -14,19 +14,20 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.FunctionCallExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.ScopeExpression
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
+import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.ex.evaluate
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertInstanceOf
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
-class FunctionCallExpressionTests {
+class FunctionCallExpressionTests : VimTestCase() {
 
   @Test
   fun `function call with no arguments`() {
     val ex = VimscriptParser.parseExpression("doSomething()")
-    assertTrue(ex is FunctionCallExpression)
+    assertInstanceOf<FunctionCallExpression>(ex)
     assertEquals("doSomething", ex.functionName.evaluate().value)
     assertNull(ex.scope)
     assertEquals(0, ex.arguments.size)
@@ -35,7 +36,7 @@ class FunctionCallExpressionTests {
   @Test
   fun `scoped function call`() {
     val ex = VimscriptParser.parseExpression("s:doSomething()")
-    assertTrue(ex is FunctionCallExpression)
+    assertInstanceOf<FunctionCallExpression>(ex)
     assertEquals("doSomething", ex.functionName.evaluate().value)
     assertNotNull(ex.scope)
     assertEquals(Scope.SCRIPT_VARIABLE, ex.scope)
@@ -45,7 +46,7 @@ class FunctionCallExpressionTests {
   @Test
   fun `function call with simple arguments`() {
     val ex = VimscriptParser.parseExpression("f(0, 'string')")
-    assertTrue(ex is FunctionCallExpression)
+    assertInstanceOf<FunctionCallExpression>(ex)
     assertEquals("f", ex.functionName.evaluate().value)
     assertNull(ex.scope)
     assertNotNull(ex.arguments)
@@ -57,7 +58,7 @@ class FunctionCallExpressionTests {
   @Test
   fun `scope as a function call argument`() {
     val ex = VimscriptParser.parseExpression("f(s:, 'string')")
-    assertTrue(ex is FunctionCallExpression)
+    assertInstanceOf<FunctionCallExpression>(ex)
     assertEquals("f", ex.functionName.evaluate().value)
     assertNull(ex.scope)
     assertNotNull(ex.arguments)

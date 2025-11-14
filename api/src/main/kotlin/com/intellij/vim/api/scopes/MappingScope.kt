@@ -15,92 +15,33 @@ import com.intellij.vim.api.VimApi
  */
 @VimApiDsl
 interface MappingScope {
-  /**
-   * Maps a [from] key sequence to [to] in normal mode.
-   */
-  fun nmap(from: String, to: String)
+  // ===== Normal, Visual, Select, and Operator-pending modes (map/noremap/unmap) =====
 
   /**
-   * Removes a [keys] mapping in normal mode.
-   * 
-   * The [keys] must fully match the 'from' keys of the original mapping.
-   * 
-   * Example:
-   * ```kotlin
-   * nmap("abc", "def")      // Create mapping
-   * nunmap("a")             // × Does not unmap anything
-   * nunmap("abc")           // ✓ Properly unmaps the mapping
-   * ```
-   */
-  fun nunmap(keys: String)
-
-  /**
-   * Maps a [from] key sequence to [to] in visual mode.
-   */
-  fun vmap(from: String, to: String)
-
-  /**
-   * Removes a [keys] mapping in visual mode.
-   * 
-   * The [keys] must fully match the 'from' keys of the original mapping.
-   * 
-   * Example:
-   * ```kotlin
-   * vmap("abc", "def")      // Create mapping
-   * vunmap("a")             // × Does not unmap anything
-   * vunmap("abc")           // ✓ Properly unmaps the mapping
-   * ```
-   */
-  fun vunmap(keys: String)
-
-  /**
-   * Maps a [from] key sequence to an [action] in normal mode.
-   */
-  fun nmap(from: String, action: suspend VimApi.() -> Unit)
-
-  /**
-   * Maps a [from] key sequence to an [action] in visual mode.
-   */
-  fun vmap(from: String, action: suspend VimApi.() -> Unit)
-
-  /**
-   * Maps [keys] to an [action] with an [actionName] in normal mode.
-   *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
-   */
-  fun nmap(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
-
-  /**
-   * Maps [keys] to an [action] with an [actionName] in visual mode.
-   *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
-   */
-  fun vmap(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
-
-  /**
-   * Maps a [from] key sequence to [to] in all modes.
+   * Maps a [from] key sequence to [to] in normal, visual, select, and operator-pending modes.
    */
   fun map(from: String, to: String)
 
   /**
-   * Removes a [keys] mapping in all modes.
-   * 
+   * Maps a [from] key sequence to an [action] in normal, visual, select, and operator-pending modes.
+   */
+  fun map(from: String, action: suspend VimApi.() -> Unit)
+
+  /**
+   * Maps a [from] key sequence to [to] in normal, visual, select, and operator-pending modes non-recursively.
+   */
+  fun noremap(from: String, to: String)
+
+  /**
+   * Maps a [from] key sequence to an [action] in normal, visual, select, and operator-pending modes non-recursively.
+   */
+  fun noremap(from: String, action: suspend VimApi.() -> Unit)
+
+  /**
+   * Removes a [keys] mapping in normal, visual, select, and operator-pending modes.
+   *
    * The [keys] must fully match the 'from' keys of the original mapping.
-   * 
+   *
    * Example:
    * ```kotlin
    * map("abc", "def")       // Create mapping
@@ -111,213 +52,30 @@ interface MappingScope {
   fun unmap(keys: String)
 
   /**
-   * Maps a [from] key sequence to an [action] in all modes.
-   */
-  fun map(from: String, action: suspend VimApi.() -> Unit)
-
-  /**
-   * Maps [keys] to an [action] with an [actionName] in all modes.
+   * Checks if any mapping exists that maps to [to] in normal, visual, select, and operator-pending modes.
    *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
-   */
-  fun map(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
-
-  /**
-   * Maps a [from] key sequence to [to] in visual exclusive mode.
-   */
-  fun xmap(from: String, to: String)
-
-  /**
-   * Removes a [keys] mapping in visual exclusive mode.
-   * 
-   * The [keys] must fully match the 'from' keys of the original mapping.
-   * 
+   * Returns true if there's a mapping whose right-hand side is [to].
+   *
    * Example:
    * ```kotlin
-   * xmap("abc", "def")      // Create mapping
-   * xunmap("a")             // × Does not unmap anything
-   * xunmap("abc")           // ✓ Properly unmaps the mapping
+   * nmap("gr", "<Plug>MyAction")
+   * hasmapto("<Plug>MyAction")  // Returns true - "gr" maps TO "<Plug>MyAction"
+   * hasmapto("gr")               // Returns false - nothing maps TO "gr"
    * ```
    */
-  fun xunmap(keys: String)
+  fun hasmapto(to: String): Boolean
+
+  // ===== Normal mode (nmap/nnoremap/nunmap) =====
 
   /**
-   * Maps a [from] key sequence to an [action] in visual exclusive mode.
+   * Maps a [from] key sequence to [to] in normal mode.
    */
-  fun xmap(from: String, action: suspend VimApi.() -> Unit)
+  fun nmap(from: String, to: String)
 
   /**
-   * Maps [keys] to an [action] with an [actionName] in visual exclusive mode.
-   *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
+   * Maps a [from] key sequence to an [action] in normal mode.
    */
-  fun xmap(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
-
-  /**
-   * Maps a [from] key sequence to [to] in select mode.
-   */
-  fun smap(from: String, to: String)
-
-  /**
-   * Removes a [keys] mapping in select mode.
-   * 
-   * The [keys] must fully match the 'from' keys of the original mapping.
-   * 
-   * Example:
-   * ```kotlin
-   * smap("abc", "def")      // Create mapping
-   * sunmap("a")             // × Does not unmap anything
-   * sunmap("abc")           // ✓ Properly unmaps the mapping
-   * ```
-   */
-  fun sunmap(keys: String)
-
-  /**
-   * Maps a [from] key sequence to an [action] in select mode.
-   */
-  fun smap(from: String, action: suspend VimApi.() -> Unit)
-
-  /**
-   * Maps [keys] to an [action] with an [actionName] in select mode.
-   *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
-   */
-  fun smap(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
-
-  /**
-   * Maps a [from] key sequence to [to] in operator pending mode.
-   */
-  fun omap(from: String, to: String)
-
-  /**
-   * Removes a [keys] mapping in operator pending mode.
-   * 
-   * The [keys] must fully match the 'from' keys of the original mapping.
-   * 
-   * Example:
-   * ```kotlin
-   * omap("abc", "def")      // Create mapping
-   * ounmap("a")             // × Does not unmap anything
-   * ounmap("abc")           // ✓ Properly unmaps the mapping
-   * ```
-   */
-  fun ounmap(keys: String)
-
-  /**
-   * Maps a [from] key sequence to an [action] in operator pending mode.
-   */
-  fun omap(from: String, action: suspend VimApi.() -> Unit)
-
-  /**
-   * Maps [keys] to an [action] with an [actionName] in operator pending mode.
-   *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
-   */
-  fun omap(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
-
-  /**
-   * Maps a [from] key sequence to [to] in insert mode.
-   */
-  fun imap(from: String, to: String)
-
-  /**
-   * Removes a [keys] mapping in insert mode.
-   * 
-   * The [keys] must fully match the 'from' keys of the original mapping.
-   * 
-   * Example:
-   * ```kotlin
-   * imap("abc", "def")      // Create mapping
-   * iunmap("a")             // × Does not unmap anything
-   * iunmap("abc")           // ✓ Properly unmaps the mapping
-   * ```
-   */
-  fun iunmap(keys: String)
-
-  /**
-   * Maps a [from] key sequence to an [action] in insert mode.
-   */
-  fun imap(from: String, action: suspend VimApi.() -> Unit)
-
-  /**
-   * Maps [keys] to an [action] with an [actionName] in insert mode.
-   *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
-   */
-  fun imap(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
-
-  /**
-   * Maps a [from] key sequence to [to] in command line mode.
-   */
-  fun cmap(from: String, to: String)
-
-  /**
-   * Removes a [keys] mapping in command line mode.
-   * 
-   * The [keys] must fully match the 'from' keys of the original mapping.
-   * 
-   * Example:
-   * ```kotlin
-   * cmap("abc", "def")      // Create mapping
-   * cunmap("a")             // × Does not unmap anything
-   * cunmap("abc")           // ✓ Properly unmaps the mapping
-   * ```
-   */
-  fun cunmap(keys: String)
-
-  /**
-   * Maps a [from] key sequence to an [action] in command line mode.
-   */
-  fun cmap(from: String, action: suspend VimApi.() -> Unit)
-
-  /**
-   * Maps [keys] to an [action] with an [actionName] in command line mode.
-   *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
-   */
-  fun cmap(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
+  fun nmap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
    * Maps a [from] key sequence to [to] in normal mode non-recursively.
@@ -330,18 +88,44 @@ interface MappingScope {
   fun nnoremap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
-   * Maps [keys] to an [action] with an [actionName] in normal mode non-recursively.
+   * Removes a [keys] mapping in normal mode.
    *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
+   * The [keys] must fully match the 'from' keys of the original mapping.
+   *
+   * Example:
+   * ```kotlin
+   * nmap("abc", "def")      // Create mapping
+   * nunmap("a")             // × Does not unmap anything
+   * nunmap("abc")           // ✓ Properly unmaps the mapping
+   * ```
    */
-  fun nnoremap(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
+  fun nunmap(keys: String)
+
+  /**
+   * Checks if any mapping exists that maps to [to] in normal mode.
+   *
+   * Returns true if there's a mapping whose right-hand side is [to].
+   *
+   * Example:
+   * ```kotlin
+   * nmap("gr", "<Plug>MyAction")
+   * nhasmapto("<Plug>MyAction")  // Returns true - "gr" maps TO "<Plug>MyAction"
+   * nhasmapto("gr")               // Returns false - nothing maps TO "gr"
+   * ```
+   */
+  fun nhasmapto(to: String): Boolean
+
+  // ===== Visual mode (vmap/vnoremap/vunmap) =====
+
+  /**
+   * Maps a [from] key sequence to [to] in visual mode.
+   */
+  fun vmap(from: String, to: String)
+
+  /**
+   * Maps a [from] key sequence to an [action] in visual mode.
+   */
+  fun vmap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
    * Maps a [from] key sequence to [to] in visual mode non-recursively.
@@ -354,42 +138,44 @@ interface MappingScope {
   fun vnoremap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
-   * Maps [keys] to an [action] with an [actionName] in visual mode non-recursively.
+   * Removes a [keys] mapping in visual mode.
    *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
-   */
-  fun vnoremap(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
-
-  /**
-   * Maps a [from] key sequence to [to] in all modes non-recursively.
-   */
-  fun noremap(from: String, to: String)
-
-  /**
-   * Maps a [from] key sequence to an [action] in all modes non-recursively.
-   */
-  fun noremap(from: String, action: suspend VimApi.() -> Unit)
-
-  /**
-   * Maps [keys] to an [action] with an [actionName] in all modes non-recursively.
+   * The [keys] must fully match the 'from' keys of the original mapping.
    *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
+   * Example:
+   * ```kotlin
+   * vmap("abc", "def")      // Create mapping
+   * vunmap("a")             // × Does not unmap anything
+   * vunmap("abc")           // ✓ Properly unmaps the mapping
+   * ```
    */
-  fun noremap(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
+  fun vunmap(keys: String)
+
+  /**
+   * Checks if any mapping exists that maps to [to] in visual mode.
+   *
+   * Returns true if there's a mapping whose right-hand side is [to].
+   *
+   * Example:
+   * ```kotlin
+   * vmap("gr", "<Plug>MyAction")
+   * vhasmapto("<Plug>MyAction")  // Returns true - "gr" maps TO "<Plug>MyAction"
+   * vhasmapto("gr")               // Returns false - nothing maps TO "gr"
+   * ```
+   */
+  fun vhasmapto(to: String): Boolean
+
+  // ===== Visual exclusive mode (xmap/xnoremap/xunmap) =====
+
+  /**
+   * Maps a [from] key sequence to [to] in visual exclusive mode.
+   */
+  fun xmap(from: String, to: String)
+
+  /**
+   * Maps a [from] key sequence to an [action] in visual exclusive mode.
+   */
+  fun xmap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
    * Maps a [from] key sequence to [to] in visual exclusive mode non-recursively.
@@ -402,18 +188,44 @@ interface MappingScope {
   fun xnoremap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
-   * Maps [keys] to an [action] with an [actionName] in visual exclusive mode non-recursively.
+   * Removes a [keys] mapping in visual exclusive mode.
    *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
+   * The [keys] must fully match the 'from' keys of the original mapping.
+   *
+   * Example:
+   * ```kotlin
+   * xmap("abc", "def")      // Create mapping
+   * xunmap("a")             // × Does not unmap anything
+   * xunmap("abc")           // ✓ Properly unmaps the mapping
+   * ```
    */
-  fun xnoremap(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
+  fun xunmap(keys: String)
+
+  /**
+   * Checks if any mapping exists that maps to [to] in visual exclusive mode.
+   *
+   * Returns true if there's a mapping whose right-hand side is [to].
+   *
+   * Example:
+   * ```kotlin
+   * xmap("gr", "<Plug>MyAction")
+   * xhasmapto("<Plug>MyAction")  // Returns true - "gr" maps TO "<Plug>MyAction"
+   * xhasmapto("gr")               // Returns false - nothing maps TO "gr"
+   * ```
+   */
+  fun xhasmapto(to: String): Boolean
+
+  // ===== Select mode (smap/snoremap/sunmap) =====
+
+  /**
+   * Maps a [from] key sequence to [to] in select mode.
+   */
+  fun smap(from: String, to: String)
+
+  /**
+   * Maps a [from] key sequence to an [action] in select mode.
+   */
+  fun smap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
    * Maps a [from] key sequence to [to] in select mode non-recursively.
@@ -426,18 +238,44 @@ interface MappingScope {
   fun snoremap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
-   * Maps [keys] to an [action] with an [actionName] in select mode non-recursively.
+   * Removes a [keys] mapping in select mode.
    *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
+   * The [keys] must fully match the 'from' keys of the original mapping.
+   *
+   * Example:
+   * ```kotlin
+   * smap("abc", "def")      // Create mapping
+   * sunmap("a")             // × Does not unmap anything
+   * sunmap("abc")           // ✓ Properly unmaps the mapping
+   * ```
    */
-  fun snoremap(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
+  fun sunmap(keys: String)
+
+  /**
+   * Checks if any mapping exists that maps to [to] in select mode.
+   *
+   * Returns true if there's a mapping whose right-hand side is [to].
+   *
+   * Example:
+   * ```kotlin
+   * smap("gr", "<Plug>MyAction")
+   * shasmapto("<Plug>MyAction")  // Returns true - "gr" maps TO "<Plug>MyAction"
+   * shasmapto("gr")               // Returns false - nothing maps TO "gr"
+   * ```
+   */
+  fun shasmapto(to: String): Boolean
+
+  // ===== Operator pending mode (omap/onoremap/ounmap) =====
+
+  /**
+   * Maps a [from] key sequence to [to] in operator pending mode.
+   */
+  fun omap(from: String, to: String)
+
+  /**
+   * Maps a [from] key sequence to an [action] in operator pending mode.
+   */
+  fun omap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
    * Maps a [from] key sequence to [to] in operator pending mode non-recursively.
@@ -450,18 +288,44 @@ interface MappingScope {
   fun onoremap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
-   * Maps [keys] to an [action] with an [actionName] in operator pending mode non-recursively.
+   * Removes a [keys] mapping in operator pending mode.
    *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
+   * The [keys] must fully match the 'from' keys of the original mapping.
+   *
+   * Example:
+   * ```kotlin
+   * omap("abc", "def")      // Create mapping
+   * ounmap("a")             // × Does not unmap anything
+   * ounmap("abc")           // ✓ Properly unmaps the mapping
+   * ```
    */
-  fun onoremap(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
+  fun ounmap(keys: String)
+
+  /**
+   * Checks if any mapping exists that maps to [to] in operator pending mode.
+   *
+   * Returns true if there's a mapping whose right-hand side is [to].
+   *
+   * Example:
+   * ```kotlin
+   * omap("gr", "<Plug>MyAction")
+   * ohasmapto("<Plug>MyAction")  // Returns true - "gr" maps TO "<Plug>MyAction"
+   * ohasmapto("gr")               // Returns false - nothing maps TO "gr"
+   * ```
+   */
+  fun ohasmapto(to: String): Boolean
+
+  // ===== Insert mode (imap/inoremap/iunmap) =====
+
+  /**
+   * Maps a [from] key sequence to [to] in insert mode.
+   */
+  fun imap(from: String, to: String)
+
+  /**
+   * Maps a [from] key sequence to an [action] in insert mode.
+   */
+  fun imap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
    * Maps a [from] key sequence to [to] in insert mode non-recursively.
@@ -474,18 +338,44 @@ interface MappingScope {
   fun inoremap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
-   * Maps [keys] to an [action] with an [actionName] in insert mode non-recursively.
+   * Removes a [keys] mapping in insert mode.
    *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
+   * The [keys] must fully match the 'from' keys of the original mapping.
+   *
+   * Example:
+   * ```kotlin
+   * imap("abc", "def")      // Create mapping
+   * iunmap("a")             // × Does not unmap anything
+   * iunmap("abc")           // ✓ Properly unmaps the mapping
+   * ```
    */
-  fun inoremap(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
+  fun iunmap(keys: String)
+
+  /**
+   * Checks if any mapping exists that maps to [to] in insert mode.
+   *
+   * Returns true if there's a mapping whose right-hand side is [to].
+   *
+   * Example:
+   * ```kotlin
+   * imap("jk", "<Plug>MyAction")
+   * ihasmapto("<Plug>MyAction")  // Returns true - "jk" maps TO "<Plug>MyAction"
+   * ihasmapto("jk")               // Returns false - nothing maps TO "jk"
+   * ```
+   */
+  fun ihasmapto(to: String): Boolean
+
+  // ===== Command line mode (cmap/cnoremap/cunmap) =====
+
+  /**
+   * Maps a [from] key sequence to [to] in command line mode.
+   */
+  fun cmap(from: String, to: String)
+
+  /**
+   * Maps a [from] key sequence to an [action] in command line mode.
+   */
+  fun cmap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
    * Maps a [from] key sequence to [to] in command line mode non-recursively.
@@ -501,16 +391,30 @@ interface MappingScope {
   fun cnoremap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
-   * Maps [keys] to an [action] with an [actionName] in command line mode non-recursively.
+   * Removes a [keys] mapping in command line mode.
    *
-   * [actionName] is needed to provide an intermediate mapping from the [keys] to [action].
-   * Two mappings will be created: from [keys] to [actionName] and from [actionName] to [action].
-   * In this way, the user will be able to rewrite the default mapping to the plugin by
-   * providing a custom mapping to [actionName].
+   * The [keys] must fully match the 'from' keys of the original mapping.
+   *
+   * Example:
+   * ```kotlin
+   * cmap("abc", "def")      // Create mapping
+   * cunmap("a")             // × Does not unmap anything
+   * cunmap("abc")           // ✓ Properly unmaps the mapping
+   * ```
    */
-  fun cnoremap(
-    keys: String,
-    actionName: String,
-    action: suspend VimApi.() -> Unit,
-  )
+  fun cunmap(keys: String)
+
+  /**
+   * Checks if any mapping exists that maps to [to] in command line mode.
+   *
+   * Returns true if there's a mapping whose right-hand side is [to].
+   *
+   * Example:
+   * ```kotlin
+   * cmap("<C-a>", "<Plug>MyAction")
+   * chasmapto("<Plug>MyAction")  // Returns true - "<C-a>" maps TO "<Plug>MyAction"
+   * chasmapto("<C-a>")            // Returns false - nothing maps TO "<C-a>"
+   * ```
+   */
+  fun chasmapto(to: String): Boolean
 }

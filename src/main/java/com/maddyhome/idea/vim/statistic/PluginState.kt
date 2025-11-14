@@ -17,6 +17,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.statistic.PluginState.Util.enabledExtensions
 import com.maddyhome.idea.vim.statistic.PluginState.Util.extensionNames
 import com.maddyhome.idea.vim.ui.JoinEap
+import java.util.concurrent.ConcurrentHashMap
 
 internal class PluginState : ApplicationUsagesCollector() {
 
@@ -48,7 +49,7 @@ internal class PluginState : ApplicationUsagesCollector() {
       "textobj-indent",
       "mini-ai"
     )
-    internal val enabledExtensions = HashSet<String>()
+    internal val enabledExtensions = ConcurrentHashMap.newKeySet<String>()
   }
 }
 

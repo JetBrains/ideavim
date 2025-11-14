@@ -37,7 +37,7 @@ jobs:
           echo "LAST_COMMIT=$(git rev-list -n 1 tags/workflow-close-youtrack)" >> $GITHUB_ENV
 
       - name: Update YouTrack
-        run: ./gradlew --no-configuration-cache updateYoutrackOnCommit
+        run: ./gradlew --no-configuration-cache :scripts:updateYoutrackOnCommit
         env:
           SUCCESS_COMMIT: ${{ env.LAST_COMMIT }}
           YOUTRACK_TOKEN: ${{ secrets.YOUTRACK_TOKEN }}
