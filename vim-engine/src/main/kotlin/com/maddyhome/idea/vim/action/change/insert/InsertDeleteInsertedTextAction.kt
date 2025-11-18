@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import java.util.*
+import java.util.EnumSet
 
 @CommandOrMotion(keys = ["<C-U>"], modes = [Mode.INSERT])
 class InsertDeleteInsertedTextAction : ChangeEditorActionHandler.ForEachCaret() {
@@ -54,16 +54,19 @@ private fun insertDeleteInsertedText(editor: VimEditor, context: ExecutionContex
   if (offset == deleteTo) {
     deleteTo = injector.motion.moveCaretToCurrentLineStartSkipLeading(editor, caret)
   }
-  if (deleteTo != -1) {
-    injector.changeGroup.deleteRange(
-      editor,
-      context,
-      caret,
-      TextRange(deleteTo, offset),
-      SelectionType.CHARACTER_WISE,
-      false,
-    )
+
+  // If there's nothing to delete (deleteTo == offset), skip deletion
+  if (deleteTo == offset) {
     return true
   }
-  return false
+
+  injector.changeGroup.deleteRange(
+    editor,
+    context,
+    caret,
+    TextRange(deleteTo, offset),
+    SelectionType.CHARACTER_WISE,
+    false,
+  )
+  return true
 }

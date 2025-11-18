@@ -124,4 +124,50 @@ class InsertDeleteInsertedTextActionTest : VimTestCase() {
       enterCommand("set nooldundo")
     }
   }
+
+  @Test
+  fun `test C-U at start of insert on empty line`() {
+    configureByText("${c}")
+    typeText("i")
+    assertState("${c}")
+    assertMode(Mode.INSERT)
+    typeText("<C-U>")
+    assertState("${c}")
+    assertMode(Mode.INSERT)
+  }
+
+  @Test
+  fun `test C-U at start of insert on line with only whitespace`() {
+    configureByText("    ${c}")
+    typeText("i")
+    assertState("    ${c}")
+    assertMode(Mode.INSERT)
+    typeText("<C-U>")
+    assertState("    ${c}")
+    assertMode(Mode.INSERT)
+  }
+
+  @Test
+  fun `test C-U with text inserted after existing content`() {
+    configureByText("    text${c}")
+    typeText("A")
+    typeText(" more")
+    assertState("    text more${c}")
+    assertMode(Mode.INSERT)
+    typeText("<C-U>")
+    assertState("    text${c}")
+    assertMode(Mode.INSERT)
+  }
+
+  @Test
+  fun `test C-U in middle of line after inserting text`() {
+    configureByText("prefix${c}suffix")
+    typeText("i")
+    typeText("inserted")
+    assertState("prefixinserted${c}suffix")
+    assertMode(Mode.INSERT)
+    typeText("<C-U>")
+    assertState("prefix${c}suffix")
+    assertMode(Mode.INSERT)
+  }
 }
