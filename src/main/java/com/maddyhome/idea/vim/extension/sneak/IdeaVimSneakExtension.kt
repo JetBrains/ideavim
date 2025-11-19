@@ -176,16 +176,17 @@ internal class IdeaVimSneakExtension : VimExtension {
           }
           selectedChar
         }
-        val selectedPosition = hintToPositionMap[selectedChar]
-        clear()
 
-        if (selectedPosition == null) {
+        // ignore ' ' (space) and non-existing chars
+        if (selectedChar == ' ' || !hintToPositionMap.containsKey(selectedChar)) {
           VimExtensionFacade.executeNormalWithoutMapping(
             injector.parser.parseKeys(selectedChar.toString()),
             editor.ij,
           )
           return null
         }
+        val selectedPosition = hintToPositionMap[selectedChar]
+        clear()
 
         return Util.jumpToPosition(editor, selectedPosition)
       } finally {
@@ -205,9 +206,15 @@ internal class IdeaVimSneakExtension : VimExtension {
     }
 
     private fun addLabelsToMatches(editor: VimEditor, positions: List<Int>) {
-      positions.zip(labels).forEach { (position, label) ->
-        val inlay = editor.ij.inlayModel.addInlineElement(position, false, LabelRenderer(label.toString()))
+      positions.forEachIndexed { index, position ->
+        val label = if (index >= labels.size) {
+          ' '
+        } else {
+          labels[index]
+        }
         hintToPositionMap[label] = position
+
+        val inlay = editor.ij.inlayModel.addInlineElement(position, false, LabelRenderer(label.toString()))
         if (inlay != null) {
           labelInlays.add(inlay)
         }
