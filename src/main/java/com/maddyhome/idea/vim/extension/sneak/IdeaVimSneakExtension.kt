@@ -88,17 +88,20 @@ internal class IdeaVimSneakExtension : VimExtension {
     private val highlightHandler: HighlightHandler,
     private val direction: Direction,
   ) : ExtensionHandler {
-    private val useLabel = injector.variableService
-      .getGlobalVariableValue("sneak#label")
-      ?.toVimNumber()?.booleanValue
-      ?: false
+    private var useLabel: Boolean? = null
 
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
+      if (useLabel == null) {
+        useLabel = injector.variableService
+          .getGlobalVariableValue("sneak#label")
+          ?.toVimNumber()?.booleanValue
+          ?: false
+      }
       val charone = injector.keyGroup.getChar(editor) ?: return
       val chartwo = injector.keyGroup.getChar(editor) ?: return
       val range = Util.jumpTo(editor, charone, chartwo, direction)
       range?.let { highlightHandler.highlightSneakRange(editor.ij, range) }
-      if (useLabel) {
+      if (useLabel == true) {
         LabelUtil.jumpTo(editor, charone, chartwo, direction)
           ?.let { highlightHandler.highlightSneakRange(editor.ij, it) }
       }
