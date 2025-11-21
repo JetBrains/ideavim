@@ -28,6 +28,10 @@ internal class IjVimLogger(private val logger: Logger) : VimLogger {
     logger.warn(message)
   }
 
+  override fun warn(message: String, e: Throwable) {
+    logger.warn(message, e)
+  }
+
   override fun error(message: String) {
     logger.error(message)
   }
