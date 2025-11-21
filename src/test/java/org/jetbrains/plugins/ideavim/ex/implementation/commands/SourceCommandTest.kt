@@ -177,4 +177,22 @@ class SourceCommandTest : VimTestCase() {
       subDir.delete()
     }
   }
+
+  @Test
+  fun `test source non-existent file shows error message`() {
+    configureByText("")
+
+    val nonExistentFile = File(tempDir, "non_existent_file.vim")
+    // Make sure the file does NOT exist
+    if (nonExistentFile.exists()) {
+      nonExistentFile.delete()
+    }
+
+    // Execute source command for non-existent file
+    enterCommand("source ${nonExistentFile.absolutePath}")
+
+    // Verify that error was indicated (no exception thrown, graceful handling)
+    // The command should complete without crashing
+    assertPluginError(true)
+  }
 }
