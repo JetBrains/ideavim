@@ -221,25 +221,24 @@ class SetCommandTest : VimTestCase() {
     } else {
       """
         |--- Options ---
-        |noargtextobj          ideawrite=all       scrolljump=1      notextobj-indent
-        |nobomb              noignorecase          scrolloff=0         textwidth=0
-        |nobreakindent       noincsearch           selectmode=         timeout
-        |  colorcolumn=      nolist                shellcmdflag=-x     timeoutlen=1000
-        |nocommentary        nomatchit             shellxescape=@    notrackactionids
-        |nocursorline          maxmapdepth=20      shellxquote={       undolevels=1000
-        |nodigraph           nomini-ai             showcmd             virtualedit=
-        |noexchange            more                showmode          novisualbell
-        |  fileformat=unix   nomultiple-cursors    sidescroll=0        visualdelay=100
-        |nogdefault          noNERDTree            sidescrolloff=0     whichwrap=b,s
-        |nohighlightedyank     nrformats=hex     nosmartcase           wrap
-        |  history=50        nonumber            nosneak               wrapscan
-        |nohlsearch            operatorfunc=       startofline
+        |noargtextobj          ideamarks           scroll=0          notextobj-entire
+        |nobomb                ideawrite=all       scrolljump=1      notextobj-indent
+        |nobreakindent       noignorecase          scrolloff=0         textwidth=0
+        |  colorcolumn=      noincsearch           selectmode=         timeout
+        |nocommentary        nolist                shellcmdflag=-x     timeoutlen=1000
+        |nocursorline        nomatchit             shellxescape=@    notrackactionids
+        |nodigraph             maxmapdepth=20      shellxquote={       undolevels=1000
+        |noexchange          nomini-ai             showcmd             virtualedit=
+        |  fileformat=unix     more                showmode          novisualbell
+        |nogdefault          nomultiple-cursors    sidescroll=0        visualdelay=100
+        |nohighlightedyank   noNERDTree            sidescrolloff=0     whichwrap=b,s
+        |  history=50          nrformats=hex     nosmartcase           wrap
+        |nohlsearch          nonumber            nosneak               wrapscan
+        |  ide=IntelliJ IDEA   operatorfunc=       startofline
         |noideajoin          norelativenumber    nosurround
-        |  ideamarks           scroll=0          notextobj-entire
         |  clipboard=ideaput,autoselect
         |  fileencoding=utf-8
         |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
-        |  ide=IntelliJ IDEA
         |noideacopypreprocess
         |  idearefactormode=select
         |  ideastatusicon=enabled

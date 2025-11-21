@@ -525,25 +525,24 @@ class SetlocalCommandTest : VimTestCase() {
     } else {
       """
       |--- Local option values ---
-      |noargtextobj          idearefactormode=   scroll=0          notextobj-entire
-      |nobomb                ideawrite=all       scrolljump=1      notextobj-indent
-      |nobreakindent       noignorecase          scrolloff=-1        textwidth=0
-      |  colorcolumn=      noincsearch           selectmode=         timeout
-      |nocommentary        nolist                shellcmdflag=-x     timeoutlen=1000
-      |nocursorline        nomatchit             shellxescape=@    notrackactionids
-      |nodigraph             maxmapdepth=20      shellxquote={       virtualedit=
-      |noexchange          nomini-ai             showcmd           novisualbell
-      |  fileformat=unix     more                showmode            visualdelay=100
-      |nogdefault          nomultiple-cursors    sidescroll=0        whichwrap=b,s
-      |nohighlightedyank   noNERDTree            sidescrolloff=-1    wrap
-      |  history=50          nrformats=hex     nosmartcase           wrapscan
-      |nohlsearch          nonumber            nosneak
+      |noargtextobj          ideamarks         norelativenumber    nosurround
+      |nobomb                idearefactormode=   scroll=0          notextobj-entire
+      |nobreakindent         ideawrite=all       scrolljump=1      notextobj-indent
+      |  colorcolumn=      noignorecase          scrolloff=-1        textwidth=0
+      |nocommentary        noincsearch           selectmode=         timeout
+      |nocursorline        nolist                shellcmdflag=-x     timeoutlen=1000
+      |nodigraph           nomatchit             shellxescape=@    notrackactionids
+      |noexchange            maxmapdepth=20      shellxquote={       virtualedit=
+      |  fileformat=unix   nomini-ai             showcmd           novisualbell
+      |nogdefault            more                showmode            visualdelay=100
+      |nohighlightedyank   nomultiple-cursors    sidescroll=0        whichwrap=b,s
+      |  history=50        noNERDTree            sidescrolloff=-1    wrap
+      |nohlsearch            nrformats=hex     nosmartcase           wrapscan
+      |  ide=IntelliJ IDEA nonumber            nosneak
       |--ideajoin            operatorfunc=       startofline
-      |  ideamarks         norelativenumber    nosurround
       |  clipboard=ideaput,autoselect
       |  fileencoding=utf-8
       |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
-      |  ide=IntelliJ IDEA
       |--ideacopypreprocess
       |  ideastatusicon=enabled
       |  ideavimsupport=dialog
