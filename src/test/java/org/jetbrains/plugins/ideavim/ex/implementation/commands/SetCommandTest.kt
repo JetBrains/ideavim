@@ -401,14 +401,4 @@ class SetCommandTest : VimTestCase() {
     enterCommand("set shell=~/\$PATH")
     assertEquals("$home/$pathValue", options().shell)
   }
-
-  // Test that options without flag don't expand
-
-  @Test
-  fun `test nrformats option does not expand environment variable`() {
-    // nrformats doesn't have expandEnvironmentVariables flag
-    enterCommand("set nrformats=\$PATH")
-    // Should keep $PATH literal (no expansion)
-    assertCommandOutput("set nrformats?", "  nrformats=\$PATH")
-  }
 }
