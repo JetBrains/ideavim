@@ -60,8 +60,11 @@ internal class FunctionFunctionHandler : FunctionHandler() {
       }
     }
 
-    if (arg3 != null && arg3 !is VimDictionary) {
-      throw exExceptionMessage("E922")
+    if (arg3 != null) {
+      if (arg3 !is VimDictionary) {
+        throw exExceptionMessage("E922")
+      }
+      dictionary = arg3
     }
     val funcref = VimFuncref(function, arglist ?: VimList(mutableListOf()), dictionary, VimFuncref.Type.FUNCTION)
     if (dictionary != null) {
@@ -108,8 +111,11 @@ internal class FuncrefFunctionHandler : FunctionHandler() {
       }
     }
 
-    if (arg3 != null && arg3 !is VimDictionary) {
-      throw exExceptionMessage("E922")
+    if (arg3 != null) {
+      if (arg3 !is VimDictionary) {
+        throw exExceptionMessage("E922")
+      }
+      dictionary = arg3
     }
     return VimFuncref(handler, arglist ?: VimList(mutableListOf()), dictionary, VimFuncref.Type.FUNCREF)
   }
