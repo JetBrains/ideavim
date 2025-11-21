@@ -8,7 +8,9 @@ Essential commands:
 - `./gradlew runIde` - Start dev IntelliJ with IdeaVim
 - `./gradlew test -x :tests:property-tests:test -x :tests:long-running-tests:test` - Run standard tests
 
-See CONTRIBUTING.md for architecture details and complete command list.
+Avoid running all tests, this takes too long. It's preferred to run specific test.
+
+See CONTRIBUTING.md for architecture details and a complete command list.
 
 ## IdeaVim-Specific Notes
 
