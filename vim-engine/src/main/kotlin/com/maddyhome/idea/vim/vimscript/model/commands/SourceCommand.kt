@@ -35,7 +35,7 @@ data class SourceCommand(val range: Range, val modifier: CommandModifier, val ar
     context: ExecutionContext,
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
-    val path = expandUser(argument.trim())
+    val path = injector.pathExpansion.expandPath(argument.trim())
     val file = File(path)
     injector.vimscriptExecutor.executeFile(
       file,
@@ -46,15 +46,5 @@ data class SourceCommand(val range: Range, val modifier: CommandModifier, val ar
 
     injector.statisticsService.addSourcedFile(path)
     return ExecutionResult.Success
-  }
-
-  private fun expandUser(path: String): String {
-    if (path.startsWith("~")) {
-      val home = System.getProperty("user.home")
-      if (home != null) {
-        return home + path.substring(1)
-      }
-    }
-    return path
   }
 }
