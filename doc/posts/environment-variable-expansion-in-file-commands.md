@@ -18,19 +18,38 @@ When these flags are set, Vim automatically expands:
 - Wildcards: `*`, `?`
 - Special chars: `%` (current file), `#` (alternate file)
 
-## Non-Existent Variables: Documentation vs Reality
+## Two Different Expansion Behaviors
 
-Testing revealed an interesting discrepancy:
+Vim has **two different behaviors** for environment variable expansion:
 
-**Documentation (`:help expand-env`)**: "If the environment variable does not exist, the '$' and the name are not modified"
+### 1. File Commands (`:source`, `:split`, etc.)
 
-**Actual Behavior**: Non-existent variables expand to **empty string**
+Non-existent variables expand to **empty string**:
 
 ```vim
 :source $NONEXISTENT/file.vim  → :source /file.vim
 ```
 
-Verified in both Vim 9.1 and Nvim 0.11.4.
+### 2. Option Settings (`:set` command)
+
+The `:help expand-env` documentation describes expansion for the `:set` command. Only **39 specific options** support expansion, controlled by the `P_EXPAND` flag (`0x10`) defined in `src/option.h`.
+
+Options with `P_EXPAND` include: `shell`, `path`, `backupdir`, `makeprg`, `grepprg`, `runtimepath`, and others.
+
+Non-existent variables are **left as-is**:
+
+```vim
+:set shell=$NONEXISTENT  → shell=$NONEXISTENT  (kept literally)
+:set shell=$HOME/bash    → shell=/Users/you/bash  (expanded)
+```
+
+**Note**: Setting options via `:let` does **not** perform expansion:
+
+```vim
+:let &shell = "$HOME/bash"  → shell=$HOME/bash  (literal string, not expanded)
+```
+
+This distinction was verified in both Vim 9.1 and Nvim 0.11.4.
 
 ## Vim Commands with File Argument Expansion
 

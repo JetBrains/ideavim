@@ -25,13 +25,21 @@ class VimPathExpansionImpl : VimPathExpansion {
   }
 
   override fun expandPath(path: String): String {
-    var expanded = path
+    return doExpand(path, expandToEmptyIfNotFound = true)
+  }
+
+  override fun expandForOption(value: String): String {
+    return doExpand(value, expandToEmptyIfNotFound = false)
+  }
+
+  private fun doExpand(input: String, expandToEmptyIfNotFound: Boolean): String {
+    var expanded = input
 
     // First, expand tilde (~) if at the start
     expanded = expandTilde(expanded)
 
     // Then, expand environment variables
-    expanded = expandEnvironmentVariables(expanded)
+    expanded = expandEnvironmentVariables(expanded, expandToEmptyIfNotFound)
 
     return expanded
   }
@@ -69,9 +77,12 @@ class VimPathExpansionImpl : VimPathExpansion {
    * Expands environment variables in the string.
    * Supports both $VAR and ${VAR} syntax.
    * Escaped variables \$VAR are converted to literal $VAR.
-   * Non-existent variables expand to empty string.
+   *
+   * @param text The text to expand
+   * @param expandToEmptyIfNotFound If true, non-existent variables → empty string (path/expression mode).
+   *                                 If false, non-existent variables → left as-is (option mode).
    */
-  private fun expandEnvironmentVariables(text: String): String {
+  private fun expandEnvironmentVariables(text: String, expandToEmptyIfNotFound: Boolean): String {
     return ENV_VAR_REGEX.replace(text) { matchResult ->
       val escaped = matchResult.groupValues[1] // Backslash before $, if any
       val varName =
@@ -81,8 +92,13 @@ class VimPathExpansionImpl : VimPathExpansion {
         // Escaped $ - remove backslash and keep literal $VAR
         matchResult.value.substring(1) // Remove the backslash
       } else {
-        // Not escaped - expand to value or empty string if doesn't exist
-        System.getenv(varName) ?: ""
+        // Not escaped - expand based on mode
+        val value = System.getenv(varName)
+        if (value != null) {
+          value
+        } else {
+          if (expandToEmptyIfNotFound) "" else matchResult.value
+        }
       }
     }
   }

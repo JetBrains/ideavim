@@ -371,4 +371,44 @@ class SetCommandTest : VimTestCase() {
     assertCommandOutput("set virtualedit?", "  virtualedit=block")
     assertCommandOutput("setlocal virtualedit?", "  virtualedit=")
   }
+
+  // Environment variable expansion tests
+
+  @Test
+  fun `test shell option expands existing environment variable`() {
+    val pathValue = System.getenv("PATH")
+    enterCommand("set shell=\$PATH")
+    assertEquals(pathValue, options().shell)
+  }
+
+  @Test
+  fun `test shell option keeps non-existent variable as-is`() {
+    enterCommand("set shell=\$NONEXISTENT_VAR_12345")
+    assertEquals("\$NONEXISTENT_VAR_12345", options().shell)
+  }
+
+  @Test
+  fun `test shell option expands tilde`() {
+    val home = System.getProperty("user.home")
+    enterCommand("set shell=~/bin/bash")
+    assertEquals("$home/bin/bash", options().shell)
+  }
+
+  @Test
+  fun `test shell option expands mixed tilde and env var`() {
+    val home = System.getProperty("user.home")
+    val pathValue = System.getenv("PATH")
+    enterCommand("set shell=~/\$PATH")
+    assertEquals("$home/$pathValue", options().shell)
+  }
+
+  // Test that options without flag don't expand
+
+  @Test
+  fun `test nrformats option does not expand environment variable`() {
+    // nrformats doesn't have expandEnvironmentVariables flag
+    enterCommand("set nrformats=\$PATH")
+    // Should keep $PATH literal (no expansion)
+    assertCommandOutput("set nrformats?", "  nrformats=\$PATH")
+  }
 }

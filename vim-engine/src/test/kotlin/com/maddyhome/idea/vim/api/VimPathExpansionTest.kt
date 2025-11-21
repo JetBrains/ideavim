@@ -152,4 +152,32 @@ class VimPathExpansionTest {
     assertEquals("${'$'}123", pathExpansion.expandPath("${'$'}123"))
     assertEquals("${'$'}@test", pathExpansion.expandPath("${'$'}@test"))
   }
+
+  // Tests for expandForOption (option expansion mode)
+
+  @Test
+  fun `test option expansion - non-existent variable left as-is`() {
+    val value = "/usr/${'$'}NONEXISTENT_VAR_12345/test"
+    assertEquals(value, pathExpansion.expandForOption(value))
+  }
+
+  @Test
+  fun `test option expansion - existing variable expanded`() {
+    val pathValue = System.getenv("PATH")
+    val expanded = pathExpansion.expandForOption("/usr/${'$'}PATH/test")
+    assertEquals("/usr/$pathValue/test", expanded)
+  }
+
+  @Test
+  fun `test option expansion - mixed existing and non-existent`() {
+    val homeValue = System.getenv("HOME") ?: System.getProperty("user.home")
+    val expanded = pathExpansion.expandForOption("/usr/${'$'}INCLUDE,${'$'}HOME/include")
+    assertEquals("/usr/${'$'}INCLUDE,$homeValue/include", expanded)
+  }
+
+  @Test
+  fun `test option expansion - tilde expansion still works`() {
+    val expanded = pathExpansion.expandForOption("~/${'$'}NONEXISTENT/test")
+    assertEquals("$home/${'$'}NONEXISTENT/test", expanded)
+  }
 }

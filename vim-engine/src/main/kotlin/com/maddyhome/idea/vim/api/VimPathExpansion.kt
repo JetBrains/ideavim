@@ -37,4 +37,26 @@ interface VimPathExpansion {
    * @return The expanded string
    */
   fun expandPath(path: String): String
+
+  /**
+   * Expands environment variables for use in option values (`:set` command context).
+   *
+   * Behavior for non-existent variables: **left unchanged** (literal `$VAR`)
+   *
+   * Examples:
+   * - `:set shell=/usr/$INCLUDE,$HOME` → expands `$HOME`, keeps `$INCLUDE` as-is
+   * - `:set shell=$NONEXISTENT.new` → keeps `$NONEXISTENT` literally
+   *
+   * This matches `:help expand-env` behavior where non-existent variables are not modified.
+   * Only used for options marked with the flag (equivalent to Vim's P_EXPAND behavior).
+   *
+   * Supports:
+   * - Tilde expansion: `~` and `~/` expand to user's home directory
+   * - Environment variables: `$VAR` and `${VAR}` expand to their values or stay as-is
+   * - Escaped dollar signs: `\$VAR` becomes literal `$VAR`
+   *
+   * @param value The option value string to expand
+   * @return The expanded string
+   */
+  fun expandForOption(value: String): String
 }

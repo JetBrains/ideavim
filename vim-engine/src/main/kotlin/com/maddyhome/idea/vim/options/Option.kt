@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.options
 
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -80,6 +81,8 @@ abstract class Option<T : VimDataType>(
  * @param unsetValue The unset value of the option if the [declaredScope] is [OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER]
  * or [OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW]. The default value is an empty string.
  * @param boundedValues The collection of bounded values for the option.
+ * @param expandEnvironmentVariables Whether to expand environment variables and tilde in values (equivalent to Vim's P_EXPAND flag).
+ *                                    Should be true for path-related options, external programs, etc. See `:help :set_env`.
  */
 open class StringOption(
   name: String,
@@ -89,6 +92,7 @@ open class StringOption(
   unsetValue: VimString = VimString.EMPTY,
   val boundedValues: Collection<String>? = null,
   isLocalNoGlobal: Boolean = false,
+  val expandEnvironmentVariables: Boolean = false,
 ) : Option<VimString>(name, declaredScope, abbrev, defaultValue, unsetValue, isLocalNoGlobal = isLocalNoGlobal) {
 
   constructor(
@@ -98,13 +102,15 @@ open class StringOption(
     defaultValue: String,
     boundedValues: Collection<String>? = null,
     isLocalNoGlobal: Boolean = false,
+    expandEnvironmentVariables: Boolean = false,
   ) : this(
     name,
     declaredScope,
     abbrev,
     VimString(defaultValue),
     boundedValues = boundedValues,
-    isLocalNoGlobal = isLocalNoGlobal
+    isLocalNoGlobal = isLocalNoGlobal,
+    expandEnvironmentVariables = expandEnvironmentVariables,
   )
 
   override fun checkIfValueValid(value: VimDataType, token: String) {
@@ -121,8 +127,16 @@ open class StringOption(
     }
   }
 
-  override fun parseValue(value: String, token: String): VimString =
-    VimString(value).also { checkIfValueValid(it, token) }
+  override fun parseValue(value: String, token: String): VimString {
+    // Expand environment variables and tilde according to :help expand-env
+    // Only expand for options with expandEnvironmentVariables flag (equivalent to Vim's P_EXPAND)
+    val expandedValue = if (this.expandEnvironmentVariables) {
+      injector.pathExpansion.expandForOption(value)
+    } else {
+      value
+    }
+    return VimString(expandedValue).also { checkIfValueValid(it, token) }
+  }
 
   fun appendValue(currentValue: VimString, value: VimString): VimString =
     VimString(currentValue.value + value.value)
@@ -145,6 +159,9 @@ open class StringOption(
  * Some Vim options are a sequence of character flags, such as `'guioptions'`. These are not comma separated, and are
  * not supported by [StringListOption]. Verify the behaviour of modifying sublists if/when flags are required.
  * See `:help set-args` and `:help add-option-flags`.
+ *
+ * @param expandEnvironmentVariables Whether to expand environment variables and tilde in values (equivalent to Vim's P_EXPAND flag).
+ *                                    Should be true for path-related options like 'path', 'cdpath', 'tags', etc. See `:help :set_env`.
  */
 open class StringListOption(
   name: String,
@@ -152,6 +169,7 @@ open class StringListOption(
   abbrev: String,
   defaultValue: VimString,
   val boundedValues: Collection<String>? = null,
+  val expandEnvironmentVariables: Boolean = false,
 ) : Option<VimString>(name, declaredScope, abbrev, defaultValue, VimString.EMPTY) {
 
   constructor(
@@ -160,7 +178,8 @@ open class StringListOption(
     abbrev: String,
     defaultValue: String,
     boundedValues: Collection<String>? = null,
-  ) : this(name, declaredScope, abbrev, VimString(defaultValue), boundedValues)
+    expandEnvironmentVariables: Boolean = false,
+  ) : this(name, declaredScope, abbrev, VimString(defaultValue), boundedValues, expandEnvironmentVariables)
 
   override fun checkIfValueValid(value: VimDataType, token: String) {
     if (value !is VimString) {
@@ -176,8 +195,16 @@ open class StringListOption(
     }
   }
 
-  override fun parseValue(value: String, token: String): VimString =
-    VimString(value).also { checkIfValueValid(it, token) }
+  override fun parseValue(value: String, token: String): VimString {
+    // Expand environment variables and tilde according to :help expand-env
+    // Only expand for options with expandEnvironmentVariables flag (equivalent to Vim's P_EXPAND)
+    val expandedValue = if (this.expandEnvironmentVariables) {
+      injector.pathExpansion.expandForOption(value)
+    } else {
+      value
+    }
+    return VimString(expandedValue).also { checkIfValueValid(it, token) }
+  }
 
   fun appendValue(currentValue: VimString, value: VimString): VimString {
     val valuesToAppend = split(value.value)
