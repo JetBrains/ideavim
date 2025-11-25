@@ -12,7 +12,7 @@ import com.intellij.vim.api.scopes.commandline.CommandLineRead
 import com.maddyhome.idea.vim.api.VimCommandLine
 import com.maddyhome.idea.vim.api.injector
 
-class CommandLineReadImpl: CommandLineRead {
+class CommandLineReadImpl : CommandLineRead {
   private val activeCommandLine: VimCommandLine?
     get() = injector.commandLine.getActiveCommandLine()
 
