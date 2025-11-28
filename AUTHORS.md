@@ -626,10 +626,6 @@ Contributors:
   [![icon][github]](https://github.com/NaMinhyeok)
   &nbsp;
   Na Minhyeok
-* [![icon][mail]](mailto:201638009+jetbrains-junie[bot]@users.noreply.github.com)
-  [![icon][github]](https://github.com/apps/jetbrains-junie)
-  &nbsp;
-  jetbrains-junie[bot]
 * [![icon][mail]](mailto:4416693+magidc@users.noreply.github.com)
   [![icon][github]](https://github.com/magidc)
   &nbsp;
@@ -642,14 +638,6 @@ Contributors:
   [![icon][github]](https://github.com/azjf)
   &nbsp;
   azjf
-* [![icon][mail]](mailto:41898282+claude[bot]@users.noreply.github.com)
-  [![icon][github]](https://github.com/apps/github-actions)
-  &nbsp;
-  github-actions[bot]
-* [![icon][mail]](mailto:41898282+claude[bot]@users.noreply.github.com)
-  [![icon][github]](https://github.com/apps/github-actions)
-  &nbsp;
-  github-actions[bot]
 
 Previous contributors:
 
