@@ -94,7 +94,13 @@ fun updateAuthors(projectDir: File, uncheckedEmails: Set<String>) {
     }
   }
 
-  val newAuthors = users.filterNot { it.mail in existingEmails }
+  // Also extract existing GitHub URLs to prevent duplicates from different emails
+  val existingGitHubUrls = Regex("""\[!\[icon]\[github]]\((https://github\.com/[^)]+)\)""")
+    .findAll(authors)
+    .map { it.groupValues[1] }
+    .toSet()
+
+  val newAuthors = users.filterNot { it.mail in existingEmails || it.url in existingGitHubUrls }
   if (newAuthors.isEmpty()) return
 
   val authorNames = newAuthors.joinToString(", ") { it.name }
