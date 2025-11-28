@@ -54,7 +54,7 @@ interface MappingScope {
   /**
    * Checks if any mapping exists that maps to [to] in normal, visual, select, and operator-pending modes.
    *
-   * Returns true if there's a mapping whose right-hand side is [to].
+   * Returns true if there's a mapping whose right-hand side is [to] in any of the mentioned modes.
    *
    * Example:
    * ```kotlin
@@ -115,30 +115,30 @@ interface MappingScope {
    */
   fun nhasmapto(to: String): Boolean
 
-  // ===== Visual mode (vmap/vnoremap/vunmap) =====
+  // ===== Visual and select modes (vmap/vnoremap/vunmap) =====
 
   /**
-   * Maps a [from] key sequence to [to] in visual mode.
+   * Maps a [from] key sequence to [to] in visual and select modes.
    */
   fun vmap(from: String, to: String)
 
   /**
-   * Maps a [from] key sequence to an [action] in visual mode.
+   * Maps a [from] key sequence to an [action] in visual and select modes.
    */
   fun vmap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
-   * Maps a [from] key sequence to [to] in visual mode non-recursively.
+   * Maps a [from] key sequence to [to] in visual and select modes non-recursively.
    */
   fun vnoremap(from: String, to: String)
 
   /**
-   * Maps a [from] key sequence to an [action] in visual mode non-recursively.
+   * Maps a [from] key sequence to an [action] in visual and select modes non-recursively.
    */
   fun vnoremap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
-   * Removes a [keys] mapping in visual mode.
+   * Removes a [keys] mapping in visual and select modes.
    *
    * The [keys] must fully match the 'from' keys of the original mapping.
    *
@@ -152,9 +152,9 @@ interface MappingScope {
   fun vunmap(keys: String)
 
   /**
-   * Checks if any mapping exists that maps to [to] in visual mode.
+   * Checks if any mapping exists that maps to [to] in visual and select modes.
    *
-   * Returns true if there's a mapping whose right-hand side is [to].
+   * Returns true if there's a mapping whose right-hand side is [to] in any of the mentioned modes.
    *
    * Example:
    * ```kotlin
@@ -165,30 +165,30 @@ interface MappingScope {
    */
   fun vhasmapto(to: String): Boolean
 
-  // ===== Visual exclusive mode (xmap/xnoremap/xunmap) =====
+  // ===== Visual mode (xmap/xnoremap/xunmap) =====
 
   /**
-   * Maps a [from] key sequence to [to] in visual exclusive mode.
+   * Maps a [from] key sequence to [to] in visual mode.
    */
   fun xmap(from: String, to: String)
 
   /**
-   * Maps a [from] key sequence to an [action] in visual exclusive mode.
+   * Maps a [from] key sequence to an [action] in visual mode.
    */
   fun xmap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
-   * Maps a [from] key sequence to [to] in visual exclusive mode non-recursively.
+   * Maps a [from] key sequence to [to] in visual mode non-recursively.
    */
   fun xnoremap(from: String, to: String)
 
   /**
-   * Maps a [from] key sequence to an [action] in visual exclusive mode non-recursively.
+   * Maps a [from] key sequence to an [action] in visual mode non-recursively.
    */
   fun xnoremap(from: String, action: suspend VimApi.() -> Unit)
 
   /**
-   * Removes a [keys] mapping in visual exclusive mode.
+   * Removes a [keys] mapping in visual mode.
    *
    * The [keys] must fully match the 'from' keys of the original mapping.
    *
@@ -202,7 +202,7 @@ interface MappingScope {
   fun xunmap(keys: String)
 
   /**
-   * Checks if any mapping exists that maps to [to] in visual exclusive mode.
+   * Checks if any mapping exists that maps to [to] in visual mode.
    *
    * Returns true if there's a mapping whose right-hand side is [to].
    *
