@@ -209,9 +209,7 @@ tasks {
   runIde {
     systemProperty("octopus.handler", System.getProperty("octopus.handler") ?: true)
   }
-   val runIntellij by intellijPlatformTesting.runIde.registering {
-        localPath.set(file("/opt/jetbrains/intellij"))
-    }
+
   // Uncomment to run the plugin in a custom IDE, rather than the IDE specified as a compile target in dependencies
   // Note that the version must be greater than the plugin's target version, for obvious reasons
   // You can also set splitMode and splitModeTarget here to test split mode in a custom IDE
