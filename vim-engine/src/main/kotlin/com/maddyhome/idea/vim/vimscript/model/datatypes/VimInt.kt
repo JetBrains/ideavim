@@ -8,6 +8,22 @@
 
 package com.maddyhome.idea.vim.vimscript.model.datatypes
 
+/**
+ * Represents a Vim Number, which is also used to represent a boolean value
+ *
+ * This type has value semantics. I.e., two instances of [VimInt] are considered equal if they have the same
+ * underlying value.
+ *
+ * A Vim Number can be converted to a String. It can be converted to a Float as part of an expression, but not as part
+ * of function calls. As such, [VimInt] does not provide automatic conversion to a Float. Expression operators should
+ * handle this themselves when required. See [toVimFloat] for more details.
+ *
+ * Note that Vim typically uses a 64-bit Number, but IdeaVim uses a 32-bit Number. Changing this will cause API
+ * compatibility issues with external plugins and will cause friction in use in Kotlin, as we typically require Int
+ * values (scroll offsets, option values, etc.), leading to a lot of `toInt()` everywhere. See `:help +num64`
+ *
+ * (It should also be called VimNumber)
+ */
 data class VimInt(val value: Int) : VimDataType("number") {
   /**
    * Gets the value of the Number as a boolean, where zero is false and non-zero is true
@@ -44,9 +60,7 @@ data class VimInt(val value: Int) : VimDataType("number") {
   override fun toVimString() = VimString(value.toString())
   override fun toOutputString() = value.toString()
 
-  override fun deepCopy(level: Int): VimInt {
-    return copy()
-  }
+  override fun copy() = VimInt(value)
 
   override fun lockVar(depth: Int) {
     this.isLocked = true
@@ -104,7 +118,7 @@ data class VimInt(val value: Int) : VimDataType("number") {
         index++
       }
 
-      // TODO: Using asVimInt will use a constant for
+      // TODO: Using asVimInt will use a constant for 0 and 1, which can break lockvar
 //      return (if (negative) -value else value).asVimInt()
       return if (negative) VimInt(-value) else VimInt(value)
     }

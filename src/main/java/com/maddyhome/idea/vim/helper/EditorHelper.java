@@ -636,7 +636,7 @@ public class EditorHelper {
     }
     final InlayModel inlayModel = editor.getInlayModel();
     position = new VisualPosition(position.line, position.column - 1);
-    while (position.column >= 0 && inlayModel.hasInlineElementAt(position)) {
+    while (position.column > 0 && inlayModel.hasInlineElementAt(position)) {
       position = new VisualPosition(position.line, position.column - 1);
     }
     return position;

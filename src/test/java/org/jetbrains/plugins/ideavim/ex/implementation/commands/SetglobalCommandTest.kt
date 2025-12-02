@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
+import com.intellij.openapi.application.ApplicationInfo
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.OptionDeclaredScope
@@ -430,8 +431,10 @@ class SetglobalCommandTest : VimTestCase() {
   @Test
   fun `test show all global option values`() {
     setOsSpecificOptionsToSafeValues()
-    assertCommandOutput(
-      "setglobal all", """
+    val version = ApplicationInfo.getInstance().build.baselineVersion
+    // VERSION UPDATE 2025.3+
+    val expected = if (version <= 252) {
+      """
       |--- Global option values ---
       |noargtextobj          ideamarks           scroll=0          notextobj-entire
       |nobomb                ideawrite=all       scrolljump=1      notextobj-indent
@@ -467,7 +470,44 @@ class SetglobalCommandTest : VimTestCase() {
       |novim-paragraph-motion
       |  viminfo='100,<50,s10,h
       """.trimMargin()
-    )
+    } else {
+      """
+      |--- Global option values ---
+      |noargtextobj        noideajoin          norelativenumber    nosurround
+      |nobomb                ideamarks           scroll=0          notextobj-entire
+      |nobreakindent         ideawrite=all       scrolljump=1      notextobj-indent
+      |  colorcolumn=      noignorecase          scrolloff=0         textwidth=0
+      |nocommentary        noincsearch           selectmode=         timeout
+      |nocursorline        nolist                shellcmdflag=-x     timeoutlen=1000
+      |nodigraph           nomatchit             shellxescape=@    notrackactionids
+      |noexchange            maxmapdepth=20      shellxquote={       undolevels=1000
+      |  fileencoding=     nomini-ai             showcmd             virtualedit=
+      |  fileformat=unix     more                showmode          novisualbell
+      |nogdefault          nomultiple-cursors    sidescroll=0        visualdelay=100
+      |nohighlightedyank   noNERDTree            sidescrolloff=0     whichwrap=b,s
+      |  history=50          nrformats=hex     nosmartcase           wrap
+      |nohlsearch          nonumber            nosneak               wrapscan
+      |  ide=IntelliJ IDEA   operatorfunc=       startofline
+      |  clipboard=ideaput,autoselect
+      |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
+      |noideacopypreprocess
+      |  idearefactormode=select
+      |  ideastatusicon=enabled
+      |  ideavimsupport=dialog
+      |  isfname=@,48-57,/,\,.,-,_,+,,,#,$,%,{,},[,],:,@-@,!,~,=
+      |  iskeyword=@,48-57,_
+      |  keymodel=continueselect,stopselect
+      |  lookupkeys=<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>
+      |  matchpairs=(:),{:},[:]
+      |noNERDTreeEverywhere
+      |noReplaceWithRegister
+      |  selection=inclusive
+      |  shell=/dummy/path/to/bash
+      |novim-paragraph-motion
+      |  viminfo='100,<50,s10,h
+      """.trimMargin()
+    }
+    assertCommandOutput("setglobal all", expected)
   }
 
   @Test
@@ -506,8 +546,10 @@ class SetglobalCommandTest : VimTestCase() {
   @Test
   fun `test show all global option values in single column`() {
     setOsSpecificOptionsToSafeValues()
-    assertCommandOutput(
-      "setglobal! all", """
+    val version = ApplicationInfo.getInstance().build.baselineVersion
+    // VERSION UPDATE 2025.3+
+    val expected = if (version <= 252) {
+      """
       |--- Global option values ---
       |noargtextobj
       |nobomb
@@ -586,7 +628,88 @@ class SetglobalCommandTest : VimTestCase() {
       |  wrap
       |  wrapscan
       """.trimMargin()
-    )
+    } else {
+      """
+      |--- Global option values ---
+      |noargtextobj
+      |nobomb
+      |nobreakindent
+      |  clipboard=ideaput,autoselect
+      |  colorcolumn=
+      |nocommentary
+      |nocursorline
+      |nodigraph
+      |noexchange
+      |  fileencoding=
+      |  fileformat=unix
+      |nogdefault
+      |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
+      |nohighlightedyank
+      |  history=50
+      |nohlsearch
+      |  ide=IntelliJ IDEA
+      |noideacopypreprocess
+      |noideajoin
+      |  ideamarks
+      |  idearefactormode=select
+      |  ideastatusicon=enabled
+      |  ideavimsupport=dialog
+      |  ideawrite=all
+      |noignorecase
+      |noincsearch
+      |  isfname=@,48-57,/,\,.,-,_,+,,,#,$,%,{,},[,],:,@-@,!,~,=
+      |  iskeyword=@,48-57,_
+      |  keymodel=continueselect,stopselect
+      |nolist
+      |  lookupkeys=<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>
+      |nomatchit
+      |  matchpairs=(:),{:},[:]
+      |  maxmapdepth=20
+      |nomini-ai
+      |  more
+      |nomultiple-cursors
+      |noNERDTree
+      |noNERDTreeEverywhere
+      |  nrformats=hex
+      |nonumber
+      |  operatorfunc=
+      |norelativenumber
+      |noReplaceWithRegister
+      |  scroll=0
+      |  scrolljump=1
+      |  scrolloff=0
+      |  selection=inclusive
+      |  selectmode=
+      |  shell=/dummy/path/to/bash
+      |  shellcmdflag=-x
+      |  shellxescape=@
+      |  shellxquote={
+      |  showcmd
+      |  showmode
+      |  sidescroll=0
+      |  sidescrolloff=0
+      |nosmartcase
+      |nosneak
+      |  startofline
+      |nosurround
+      |notextobj-entire
+      |notextobj-indent
+      |  textwidth=0
+      |  timeout
+      |  timeoutlen=1000
+      |notrackactionids
+      |  undolevels=1000
+      |novim-paragraph-motion
+      |  viminfo='100,<50,s10,h
+      |  virtualedit=
+      |novisualbell
+      |  visualdelay=100
+      |  whichwrap=b,s
+      |  wrap
+      |  wrapscan
+      """.trimMargin()
+    }
+    assertCommandOutput("setglobal! all", expected)
   }
 
   @Test

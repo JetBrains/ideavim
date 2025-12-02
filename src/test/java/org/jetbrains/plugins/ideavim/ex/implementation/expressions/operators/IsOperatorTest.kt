@@ -103,7 +103,7 @@ class IsOperatorTest : VimTestCase("\n") {
   }
 
   @Test
-  fun `tset pathological variable names`() {
+  fun `test pathological variable names`() {
     enterCommand("let is = 12")
     assertCommandOutput("echo is is is", "1")
   }

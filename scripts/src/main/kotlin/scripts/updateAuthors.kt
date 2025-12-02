@@ -57,12 +57,8 @@ fun updateAuthors(projectDir: File, uncheckedEmails: Set<String>) {
       println("Email '$email' is in unchecked emails. Skip it")
       continue
     }
-    if ("dependabot[bot]@users.noreply.github.com" in email) {
-      println("Email '$email' is from dependabot. Skip it")
-      continue
-    }
-    if ("github-actions[bot]@users.noreply.github.com" in email || "41898282+github-actions[bot]@users.noreply.github.com" in email) {
-      println("Email '$email' is from github-actions. Skip it")
+    if ("[bot]@users.noreply.github.com" in email) {
+      println("Email '$email' is from a bot. Skip it")
       continue
     }
     if ("tcuser" in email) {
@@ -98,7 +94,13 @@ fun updateAuthors(projectDir: File, uncheckedEmails: Set<String>) {
     }
   }
 
-  val newAuthors = users.filterNot { it.mail in existingEmails }
+  // Also extract existing GitHub URLs to prevent duplicates from different emails
+  val existingGitHubUrls = Regex("""\[!\[icon]\[github]]\((https://github\.com/[^)]+)\)""")
+    .findAll(authors)
+    .map { it.groupValues[1] }
+    .toSet()
+
+  val newAuthors = users.filterNot { it.mail in existingEmails || it.url in existingGitHubUrls }
   if (newAuthors.isEmpty()) return
 
   val authorNames = newAuthors.joinToString(", ") { it.name }
