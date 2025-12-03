@@ -27,13 +27,15 @@ internal class ActionTracker : CounterUsagesCollector() {
   override fun getGroup(): EventLogGroup = GROUP
 }
 
-private val GROUP = EventLogGroup("vim.actions", 1)
+private val GROUP = EventLogGroup("vim.actions", 1, "FUS", description = "Group: Information about action id tracker")
 private val TRACKED_ACTIONS = GROUP.registerEvent(
   "tracked",
   EventFields.StringValidatedByCustomRule("action_id", ActionRuleValidator::class.java),
+  "The action id was detected during the action tracking process",
 )
 private val COPIED_ACTIONS = GROUP.registerEvent(
   "copied",
   EventFields.StringValidatedByCustomRule("action_id", ActionRuleValidator::class.java),
+  "The action id was copied during the action tracking process",
 )
 

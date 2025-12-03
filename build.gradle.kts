@@ -113,16 +113,7 @@ dependencies {
 
     bundledPlugins("org.jetbrains.plugins.terminal")
 
-    // VERSION UPDATE: This module is required since 2025.2
-    if (ideaVersion == "LATEST-EAP-SNAPSHOT") {
-      bundledModule("intellij.spellchecker")
-    }
-    if (ideaVersion.startsWith("2025.2")) {
-      bundledModule("intellij.spellchecker")
-    }
-    if (ideaVersion.startsWith("2025.3")) {
-      bundledModule("intellij.spellchecker")
-    }
+    bundledModule("intellij.spellchecker")
   }
 
   moduleSources(project(":vim-engine", "sourcesJarArtifacts"))
