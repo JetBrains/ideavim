@@ -33,7 +33,7 @@ class FlipTest : VimTestCase() {
     val after = """
         Lorem ipsum
         The: o${c}lleh world
-      """.trimIndent().trimIndent()
+      """.trimIndent()
     assertState(after)
   }
 
@@ -50,7 +50,78 @@ class FlipTest : VimTestCase() {
       sql:
         init:
           mode: re${c}ven
-      """.trimIndent().trimIndent()
+      """.trimIndent()
     assertState(after)
   }
+
+  @Test
+  fun `should do nothing on empty document`() {
+    val before = c
+    configureByText(before)
+    enterCommand("flip")
+    val after = c
+    assertState(after)
+  }
+
+  @Test
+  fun `should do nothing when cursor not on a word - whitespace`() {
+    val before = """The${c}  hello world""".trimIndent()
+    configureByText(before)
+    enterCommand("flip")
+    val after = """The${c}  hello world""".trimIndent()
+    assertState(after)
+  }
+
+  @Test
+  fun `should do nothing when cursor not on a word - punctuation`() {
+    val before = """The:${c} hello world""".trimIndent()
+    configureByText(before)
+    enterCommand("flip")
+    val after = """The:${c} hello world""".trimIndent()
+    assertState(after)
+  }
+
+  @Test
+  fun `should do nothing on line with only whitespace`() {
+    val before = """
+      Lorem ipsum
+      
+      ${c}    
+      Dolor sit amet
+    """.trimIndent()
+    configureByText(before)
+    enterCommand("flip")
+    val after = """
+      Lorem ipsum
+      
+      ${c}    
+      Dolor sit amet
+    """.trimIndent()
+    assertState(after)
+  }
+
+  @Test
+  fun `should do nothing when cursor after last character on line`() {
+    val before = """hello world${c}""".trimIndent()
+    configureByText(before)
+    enterCommand("flip")
+    val after = """hello world${c}""".trimIndent()
+    assertState(after)
+  }
+
+  @Test
+  fun `should flip multiple cursors`() {
+    val before = """
+      Lorem i${c}psum
+      Dolor sit a${c}met
+    """.trimIndent()
+    configureByText(before)
+    enterCommand("flip")
+    val after = """
+      Lorem m${c}uspi
+      Dolor sit t${c}ema
+    """.trimIndent()
+    assertState(after)
+  }
+
 }

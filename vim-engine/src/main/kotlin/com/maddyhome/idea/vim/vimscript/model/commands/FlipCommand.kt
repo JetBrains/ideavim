@@ -30,9 +30,10 @@ data class FlipCommand(val range: Range, val modifier: CommandModifier, val argu
     context: ExecutionContext,
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
-    val caret = editor.carets().get(0)!!
-    val range = injector.searchHelper.findWordObject(editor, caret, 1, isOuter = false, isBig = false)
-    flipText(editor, range)
+    editor.carets().forEach {
+      val range = injector.searchHelper.findWordObject(editor, it, 1, isOuter = false, isBig = false)
+      flipText(editor, range)
+    }
     return ExecutionResult.Success
   }
 
