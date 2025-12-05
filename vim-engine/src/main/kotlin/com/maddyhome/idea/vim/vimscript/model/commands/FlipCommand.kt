@@ -11,12 +11,8 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.MutableVimEditor
-import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.VimMarkService
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.api.normalizeOffset
-import com.maddyhome.idea.vim.api.setChangeMarks
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.Range
@@ -44,9 +40,7 @@ data class FlipCommand(val range: Range, val modifier: CommandModifier, val argu
     editor: VimEditor,
     range: TextRange,
   ): Boolean {
-    val starts = range.startOffsets
-    val ends = range.endOffsets
-    flip(editor, starts[0], ends[0])
+    flip(editor, range.startOffset, range.endOffset)
     return true
   }
 
@@ -55,12 +49,8 @@ data class FlipCommand(val range: Range, val modifier: CommandModifier, val argu
     start: Int,
     end: Int,
   ) {
-    val text = buildString {
-      for (i in start until end) {
-        append(editor.text()[i])
-      }
-    }
-    replaceText(editor, start, end, StringBuilder(text).reverse().toString())
+    val selectedText = editor.text().subSequence(start, end)
+    replaceText(editor, start, end, StringBuilder(selectedText).reverse().toString())
   }
 
   private fun replaceText(editor: VimEditor, start: Int, end: Int, str: String) {
