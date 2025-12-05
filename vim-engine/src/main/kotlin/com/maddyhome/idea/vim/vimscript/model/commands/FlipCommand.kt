@@ -35,7 +35,7 @@ data class FlipCommand(val range: Range, val modifier: CommandModifier, val argu
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
     val caret = editor.carets().get(0)!!
-    val range = injector.searchHelper.findWordObject(editor, caret, 1, isOuter = true, isBig = true)
+    val range = injector.searchHelper.findWordObject(editor, caret, 1, isOuter = false, isBig = false)
     flipText(editor, range)
     return ExecutionResult.Success
   }
@@ -46,9 +46,7 @@ data class FlipCommand(val range: Range, val modifier: CommandModifier, val argu
   ): Boolean {
     val starts = range.startOffsets
     val ends = range.endOffsets
-    for (i in ends.indices.reversed()) {
-      flip(editor, starts[i], ends[i])
-    }
+    flip(editor, starts[0], ends[0])
     return true
   }
 
@@ -62,7 +60,7 @@ data class FlipCommand(val range: Range, val modifier: CommandModifier, val argu
         append(editor.text()[i])
       }
     }
-    replaceText(editor, start - 1, end - 1, StringBuilder(text).reverse().toString())
+    replaceText(editor, start, end, StringBuilder(text).reverse().toString())
   }
 
   private fun replaceText(editor: VimEditor, start: Int, end: Int, str: String) {

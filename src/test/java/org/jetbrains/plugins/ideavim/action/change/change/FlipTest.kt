@@ -8,7 +8,6 @@
 
 package org.jetbrains.plugins.ideavim.action.change.change
 
-import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -20,6 +19,38 @@ class FlipTest : VimTestCase() {
     configureByText(before)
     enterCommand("flip")
     val after = """The o${c}lleh world""".trimIndent()
+    assertState(after)
+  }
+
+  @Test
+  fun `should flip on multiline`() {
+    val before = """
+        Lorem ipsum
+        The: h${c}ello world
+      """.trimIndent()
+    configureByText(before)
+    enterCommand("flip")
+    val after = """
+        Lorem ipsum
+        The: o${c}lleh world
+      """.trimIndent().trimIndent()
+    assertState(after)
+  }
+
+  @Test
+  fun `should flip on yml`() {
+    val before = """
+      sql:
+        init:
+          mode: ne${c}ver
+      """.trimIndent()
+    configureByText(before)
+    enterCommand("flip")
+    val after = """
+      sql:
+        init:
+          mode: re${c}ven
+      """.trimIndent().trimIndent()
     assertState(after)
   }
 }
