@@ -65,7 +65,7 @@ private fun moveCaretToNextWordEnd(
     return Motion.Error
   }
 
-  // If we are doing this move as part of a change command (e.q. cw), we need to count the current end of
+  // If we are doing this move as part of a change command (e.g. cw), we need to count the current end of
   // word if the cursor happens to be on the end of a word already. If this is a normal move, we don't count
   // the current word.
   val pos = injector.searchHelper.findNextWordEnd(editor, caret.offset, count, bigWord, stopAtEmptyLine)
