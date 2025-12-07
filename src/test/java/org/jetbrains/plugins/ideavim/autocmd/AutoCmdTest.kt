@@ -87,12 +87,12 @@ class AutoCmdTest : VimTestCase() {
 
   @Test
   fun `should execute multiple handlers for same event`() {
-    enterCommand("autocmd InsertEnter * echo first")
-    enterCommand("autocmd InsertEnter * echo second")
+    enterCommand("autocmd InsertEnter * echo 1")
+    enterCommand("autocmd InsertEnter * echo 2")
 
     typeText(injector.parser.parseKeys("i"))
 
-    assertExOutput("first\nsecond")
+    assertExOutput("1\n2")
   }
 
   @Test

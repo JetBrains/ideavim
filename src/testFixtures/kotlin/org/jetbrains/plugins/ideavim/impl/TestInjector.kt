@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.impl
 
+import com.maddyhome.idea.vim.api.AutoCmdService
 import com.maddyhome.idea.vim.api.VimInjector
 import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.group.IjVimOptionGroup
@@ -32,6 +33,9 @@ class TestInjector(val injector: VimInjector) : VimInjector by injector {
 
   override val vimState
     get() = injector.vimState
+
+  override val autoCmd: AutoCmdService
+    get() = injector.autoCmd
 
   override val optionGroup: VimOptionGroup
     get() {
