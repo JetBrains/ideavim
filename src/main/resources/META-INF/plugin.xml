@@ -222,6 +222,9 @@
                         serviceInterface="com.maddyhome.idea.vim.api.SystemInfoService"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.IjVimRedrawService"
                         serviceInterface="com.maddyhome.idea.vim.api.VimRedrawService"/>
+
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.autocmd.AutoCmdImpl"
+                        serviceInterface="com.maddyhome.idea.vim.api.AutoCmdService"/>
   </extensions>
 
   <actions resource-bundle="messages.IdeaVimBundle">

@@ -117,7 +117,7 @@ command:
         | ASSIGN    // `:=` print last line number
         | B_LOWERCASE | BUFFER| BUFFER_CLOSE | BUFFER_LIST
         | CLASS | CLEARJUMPS | CMD_CLEAR | COPY
-        | D_LOWERCASE | DELETE | DELCOMMAND | DELMARKS | DIGRAPHS | DUMPLINE
+        | D_LOWERCASE | DELETE | DELCOMMAND | DELMARKS | DIGRAPHS | DUMPLINE | AUTOCMD
         | E_LOWERCASE | EDIT_FILE | EXIT
         | F_LOWERCASE | FILE | FIND
         | GOTO
@@ -574,6 +574,7 @@ existingCommands:       ACTION
                     |   WRITE_PREVIOUS
                     |   WRITE_QUIT
                     |   YANK
+                    |   AUTOCMD
 ;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
