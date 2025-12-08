@@ -12,4 +12,5 @@ enum class AutoCmdEvent {
   InsertEnter,
   InsertLeave,
   BuffEnter,
+  BuffLeave,
 }

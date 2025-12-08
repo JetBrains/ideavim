@@ -495,6 +495,7 @@ internal object VimListenerManager {
       EditorListeners.remove(event.editor)
       injector.listenersNotifier.notifyEditorReleased(vimEditor)
       injector.markService.editorReleased(vimEditor)
+      injector.autoCmd.handleEvent(AutoCmdEvent.BuffLeave)
 
       // This ticket will have a different stack trace, but it's the same problem. Originally, we tracked the last
       // editor closing based on file selection (closing an editor would select the next editor - so a null selection

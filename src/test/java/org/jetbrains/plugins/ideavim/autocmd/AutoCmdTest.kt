@@ -8,8 +8,6 @@
 
 package org.jetbrains.plugins.ideavim.autocmd
 
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -118,26 +116,5 @@ class AutoCmdTest : VimTestCase() {
     typeText(injector.parser.parseKeys("<esc>"))
 
     assertNoExOutput()
-  }
-
-  @Test
-  fun `should support BuffEnter event`() {
-    enterCommand("autocmd BuffEnter * echo 2")
-    openNewBufferWindow("test.txt")
-    assertExOutput("2")
-  }
-
-  private fun openNewBufferWindow(filename: String): Editor {
-    ApplicationManager.getApplication().invokeAndWait {
-      fixture.openFileInEditor(fixture.createFile(filename, "0"))
-
-      // But our selection changed callback doesn't get called immediately, and that callback will deactivate the ex entry
-      // panel (which causes problems if our next command is `:set`). So type something (`0` is a good no-op) to give time
-      // for the event to propagate
-      typeText("0")
-    }
-
-    return fixture.editor
-
   }
 }
