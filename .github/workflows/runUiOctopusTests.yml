@@ -37,7 +37,7 @@ jobs:
         run: mv tests/ui-ij-tests/video build/reports
       - name: Move sandbox logs
         if: always()
-        run: mv build/idea-sandbox/IC-*/log_runIdeForUiTests idea-sandbox-log
+        run: mv build/idea-sandbox/IU-*/log_runIdeForUiTests idea-sandbox-log
       - name: Save report
         if: always()
         uses: actions/upload-artifact@v4
