@@ -43,6 +43,7 @@ dependencies {
 }
 
 val releaseType: String? by project
+val youtrackToken: String by project
 
 kotlin {
   compilerOptions {
@@ -104,6 +105,7 @@ tasks.register("eapReleaseActions", JavaExec::class) {
   mainClass.set("scripts.releaseEap.EapReleaseActionsKt")
   classpath = sourceSets["main"].runtimeClasspath
   args = listOf(project.version.toString(), rootProject.rootDir.toString(), releaseType ?: "")
+  environment("YOUTRACK_TOKEN", youtrackToken)
 }
 
 tasks.register("calculateNewEapVersion", JavaExec::class) {
@@ -132,6 +134,7 @@ tasks.register("updateYoutrackOnCommit", JavaExec::class) {
   mainClass.set("scripts.UpdateYoutrackOnCommitKt")
   classpath = sourceSets["main"].runtimeClasspath
   args = listOf(rootProject.rootDir.toString())
+  environment("YOUTRACK_TOKEN", youtrackToken)
 }
 
 tasks.register("slackNotification", JavaExec::class) {
@@ -165,6 +168,7 @@ tasks.register("updateChangelog", JavaExec::class) {
   mainClass.set("scripts.UpdateChangelogKt")
   classpath = sourceSets["main"].runtimeClasspath
   args = listOf(rootProject.rootDir.toString())
+  environment("YOUTRACK_TOKEN", youtrackToken)
 }
 
 tasks.register("releaseActions", JavaExec::class) {
@@ -172,6 +176,7 @@ tasks.register("releaseActions", JavaExec::class) {
   mainClass.set("scripts.ReleaseActionsKt")
   classpath = sourceSets["main"].runtimeClasspath
   args = listOf(project.version.toString(), releaseType ?: "")
+  environment("YOUTRACK_TOKEN", youtrackToken)
 }
 
 tasks.register("integrationsTest", JavaExec::class) {
@@ -179,4 +184,5 @@ tasks.register("integrationsTest", JavaExec::class) {
   mainClass.set("scripts.IntegrationsTestKt")
   classpath = sourceSets["main"].runtimeClasspath
   args = listOf(rootProject.rootDir.toString())
+  environment("YOUTRACK_TOKEN", youtrackToken)
 }
