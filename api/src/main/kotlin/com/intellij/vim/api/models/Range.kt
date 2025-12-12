@@ -22,21 +22,12 @@ sealed interface Range {
   data class Simple(val start: Int, val end: Int) : Range
 
   /**
-   * Represents a block (rectangular) selection consisting of multiple simple ranges.
-   * Each simple range typically represents a line segment in the block selection.
+   * Represents a block (rectangular) selection defined by two corner offsets.
+   * The block spans from [start] to [end], where the actual rectangular region
+   * is determined by the line/column positions of these offsets.
    *
-   * @property ranges An array of simple ranges that make up the block selection.
+   * @property start The starting offset of the block selection.
+   * @property end The ending offset of the block selection.
    */
-  data class Block(val ranges: Array<Simple>) : Range {
-    override fun equals(other: Any?): Boolean {
-      if (this === other) return true
-      if (javaClass != other?.javaClass) return false
-      other as Block
-      return ranges.contentEquals(other.ranges)
-    }
-
-    override fun hashCode(): Int {
-      return ranges.contentHashCode()
-    }
-  }
+  data class Block(val start: Int, val end: Int) : Range
 }

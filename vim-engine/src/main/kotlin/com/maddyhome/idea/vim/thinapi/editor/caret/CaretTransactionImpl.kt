@@ -14,13 +14,16 @@ import com.intellij.vim.api.models.Range
 import com.intellij.vim.api.scopes.editor.EditorAccessor
 import com.intellij.vim.api.scopes.editor.caret.CaretRead
 import com.intellij.vim.api.scopes.editor.caret.CaretTransaction
+import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.visual.VimSelection
+import com.maddyhome.idea.vim.group.visual.blockToNativeSelection
 import com.maddyhome.idea.vim.put.PutData
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.thinapi.editor.EditorAccessorImpl
 import com.maddyhome.idea.vim.mark.Jump as EngineJump
@@ -184,12 +187,23 @@ class CaretTransactionImpl(
     return putTextInternal(text, visualSelection, caretAfterInsertedText = false, beforeCaret = true)
   }
 
+  private fun blockToLineRanges(start: Int, end: Int): List<Range.Simple> {
+    val (startPos, endPos) = blockToNativeSelection(vimEditor, start, end, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    val lineRange = if (startPos.line > endPos.line) endPos.line..startPos.line else startPos.line..endPos.line
+    return lineRange.map { line ->
+      val lineStart = vimEditor.bufferPositionToOffset(BufferPosition(line, startPos.column))
+      val lineEnd = vimEditor.bufferPositionToOffset(BufferPosition(line, endPos.column))
+      Range.Simple(lineStart, lineEnd)
+    }
+  }
+
   override fun replaceTextBlockwise(range: Range.Block, text: List<String>) {
-    val selections: Array<Range.Simple> = range.ranges.sortedByDescending { it.start }.toTypedArray()
+    val lineRanges = blockToLineRanges(range.start, range.end)
+    val selections = lineRanges.sortedByDescending { it.start }
     val listOfText = text.reversed()
 
     if (listOfText.size != selections.size) {
-      throw IllegalArgumentException("Text block size must match number of selections!")
+      throw IllegalArgumentException("Text block size must match number of lines in the block!")
     }
 
     val startOffsetValidRange = 0..<vimEditor.fileSize().toInt()
@@ -209,6 +223,11 @@ class CaretTransactionImpl(
         listOfText[selection.index]
       )
     }
+  }
+
+  override fun replaceTextBlockwise(range: Range.Block, text: String) {
+    val lineRanges = blockToLineRanges(range.start, range.end)
+    replaceTextBlockwise(range, List(lineRanges.size) { text })
   }
 
   override fun deleteText(

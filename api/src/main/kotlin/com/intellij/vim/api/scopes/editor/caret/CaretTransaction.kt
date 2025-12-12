@@ -76,18 +76,33 @@ interface CaretTransaction : CaretRead, EditorAccessor {
   /**
    * Replaces text in multiple ranges (blocks) with new text.
    *
-   * This function performs a blockwise replacement, replacing each range in the block
+   * This function performs a blockwise replacement, replacing each line in the block
    * with the corresponding string from the text list. The number of replacement strings
-   * must match the number of ranges in the block.
+   * must match the number of lines in the block.
    *
-   * @param range A block of ranges to be replaced
-   * @param text A list of strings to replace each range in the block
-   * @throws IllegalArgumentException If the size of the text list doesn't match the number of ranges in the block,
+   * @param range A block range defined by start and end offsets
+   * @param text A list of strings to replace each line in the block
+   * @throws IllegalArgumentException If the size of the text list doesn't match the number of lines in the block,
    *                                 or if any range in the block is invalid
    */
   fun replaceTextBlockwise(
     range: Range.Block,
     text: List<String>,
+  )
+
+  /**
+   * Replaces text in multiple ranges (blocks) with a single text.
+   *
+   * This function performs a blockwise replacement, replacing each line in the block
+   * with the same text string.
+   *
+   * @param range A block range defined by start and end offsets
+   * @param text The text to replace each line in the block with
+   * @throws IllegalArgumentException If any range in the block is invalid
+   */
+  fun replaceTextBlockwise(
+    range: Range.Block,
+    text: String,
   )
 
   /**
