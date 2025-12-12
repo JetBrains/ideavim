@@ -1090,10 +1090,10 @@ class CaretTransactionTest : VimTestCase() {
     assertNotNull(selectionRange)
     assertTrue(selectionRange is Range.Block, "Expected Range.Block but got ${selectionRange?.javaClass?.simpleName}")
     val block = selectionRange as Range.Block
-    // Block is defined by two corner offsets
+    // Block is defined by min selectionStart and max selectionEnd across all carets
     assertEquals(0, block.start)
-    // End should be on line 1 (offset 14 + column 2 = 16)
-    assertEquals(16, block.end)
+    // End is exclusive: line 1 offset 14 + column 3 (exclusive) = 17
+    assertEquals(17, block.end)
   }
 
   @Test
@@ -1152,9 +1152,128 @@ class CaretTransactionTest : VimTestCase() {
     assertNotNull(selectionRange)
     assertTrue(selectionRange is Range.Block)
     val block = selectionRange as Range.Block
-    // Selection goes from current position upward, so start > end or they're normalized
-    assertTrue(block.start >= 0)
-    assertTrue(block.end >= 0)
+    // Ranges are normalized: start <= end regardless of selection direction
+    assertTrue(block.start <= block.end, "Expected normalized range with start (${block.start}) <= end (${block.end})")
+  }
+
+  // ==================== Normalized Range Tests ====================
+
+  @Test
+  fun `test selection right to left in character visual mode is normalized`() {
+    val text = """
+            one two ${c}three
+            four five six
+        """.trimIndent()
+    configureByText(text)
+
+    // Enter visual mode and select leftward (right-to-left)
+    typeText("v3h")
+
+    var selectionRange: Range? = null
+    executeAction {
+      myVimApi.editor {
+        change {
+          withPrimaryCaret {
+            selectionRange = selection
+          }
+        }
+      }
+    }
+
+    assertNotNull(selectionRange)
+    assertTrue(selectionRange is Range.Simple)
+    val simple = selectionRange as Range.Simple
+    // Ranges are normalized: start <= end regardless of selection direction
+    assertTrue(simple.start <= simple.end, "Expected normalized range with start (${simple.start}) <= end (${simple.end})")
+  }
+
+  @Test
+  fun `test selection bottom to top in line visual mode is normalized`() {
+    val text = """
+            one two three
+            four five six
+            seven ${c}eight nine
+        """.trimIndent()
+    configureByText(text)
+
+    // Enter line visual mode and select upward
+    typeText("Vk")
+
+    var selectionRange: Range? = null
+    executeAction {
+      myVimApi.editor {
+        change {
+          withPrimaryCaret {
+            selectionRange = selection
+          }
+        }
+      }
+    }
+
+    assertNotNull(selectionRange)
+    assertTrue(selectionRange is Range.Simple)
+    val simple = selectionRange as Range.Simple
+    // Ranges are normalized: start <= end regardless of selection direction
+    assertTrue(simple.start <= simple.end, "Expected normalized range with start (${simple.start}) <= end (${simple.end})")
+  }
+
+  @Test
+  fun `test block selection going left is normalized`() {
+    val text = """
+            one two ${c}three
+            four five six
+        """.trimIndent()
+    configureByText(text)
+
+    // Enter block visual mode and select leftward
+    typeText("<C-V>3h")
+
+    var selectionRange: Range? = null
+    executeAction {
+      myVimApi.editor {
+        change {
+          withPrimaryCaret {
+            selectionRange = selection
+          }
+        }
+      }
+    }
+
+    assertNotNull(selectionRange)
+    assertTrue(selectionRange is Range.Block)
+    val block = selectionRange as Range.Block
+    // Ranges are normalized: start <= end regardless of selection direction
+    assertTrue(block.start <= block.end, "Expected normalized range with start (${block.start}) <= end (${block.end})")
+  }
+
+  @Test
+  fun `test block selection going up is normalized`() {
+    val text = """
+            one two three
+            four five six
+            seven ${c}eight nine
+        """.trimIndent()
+    configureByText(text)
+
+    // Enter block visual mode and select upward
+    typeText("<C-V>k")
+
+    var selectionRange: Range? = null
+    executeAction {
+      myVimApi.editor {
+        change {
+          withPrimaryCaret {
+            selectionRange = selection
+          }
+        }
+      }
+    }
+
+    assertNotNull(selectionRange)
+    assertTrue(selectionRange is Range.Block)
+    val block = selectionRange as Range.Block
+    // Ranges are normalized: start <= end regardless of selection direction
+    assertTrue(block.start <= block.end, "Expected normalized range with start (${block.start}) <= end (${block.end})")
   }
 
   // ==================== Selection Marks Tests ====================

@@ -11,12 +11,17 @@ package com.intellij.vim.api.models
 /**
  * Represents a range of text in the editor.
  * Can be either a simple linear range or a block (rectangular) range.
+ *
+ * Ranges are **normalized**: [start] is always less than or equal to [end],
+ * regardless of the selection direction. The [end] offset is exclusive.
+ *
+ * @see <a href="https://youtrack.jetbrains.com/issue/VIM-XXXX">ADR: Normalized Selection Ranges</a>
  */
 sealed interface Range {
   /**
    * Represents a simple linear range of text from start to end offset.
    *
-   * @property start The starting offset of the range.
+   * @property start The starting offset of the range (inclusive).
    * @property end The ending offset of the range (exclusive).
    */
   data class Simple(val start: Int, val end: Int) : Range

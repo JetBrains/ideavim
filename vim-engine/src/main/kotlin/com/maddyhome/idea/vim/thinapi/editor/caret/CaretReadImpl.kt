@@ -50,8 +50,11 @@ class CaretReadImpl(
       val isVisualBlockMode = mode is Mode.VISUAL && mode.selectionType == SelectionType.BLOCK_WISE
 
       return if (isVisualBlockMode) {
-        val primaryCaret = vimEditor.primaryCaret()
-        Range.Block(primaryCaret.vimSelectionStart, primaryCaret.offset)
+        // For block selection, gather all carets' selections and use min start / max end
+        val allCarets = vimEditor.nativeCarets()
+        val start = allCarets.minOf { it.selectionStart }
+        val end = allCarets.maxOf { it.selectionEnd }
+        Range.Block(start, end)
       } else {
         Range.Simple(vimCaret.selectionStart, vimCaret.selectionEnd)
       }
