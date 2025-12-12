@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.FuncrefCallExpression
-import com.maddyhome.idea.vim.vimscript.model.expressions.FunctionCallExpression
+import com.maddyhome.idea.vim.vimscript.model.expressions.NamedFunctionCallExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
@@ -40,7 +40,7 @@ class CallCommand(val range: Range, val functionCall: Expression) :
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
     when (functionCall) {
-      is FunctionCallExpression -> {
+      is NamedFunctionCallExpression -> {
         val scopePrefix = functionCall.scope?.toString() ?: ""
         val name = functionCall.functionName.evaluate(editor, context, vimContext).value
         val function = injector.functionService.getFunctionHandlerOrNull(functionCall.scope, name, vimContext)

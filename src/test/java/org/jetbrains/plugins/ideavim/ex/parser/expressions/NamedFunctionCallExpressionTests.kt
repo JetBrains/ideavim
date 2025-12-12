@@ -10,7 +10,7 @@ package org.jetbrains.plugins.ideavim.ex.parser.expressions
 
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.expressions.FunctionCallExpression
+import com.maddyhome.idea.vim.vimscript.model.expressions.NamedFunctionCallExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.ScopeExpression
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
@@ -22,12 +22,12 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-class FunctionCallExpressionTests : VimTestCase() {
+class NamedFunctionCallExpressionTests : VimTestCase() {
 
   @Test
   fun `function call with no arguments`() {
     val ex = VimscriptParser.parseExpression("doSomething()")
-    assertInstanceOf<FunctionCallExpression>(ex)
+    assertInstanceOf<NamedFunctionCallExpression>(ex)
     assertEquals("doSomething", ex.functionName.evaluate().value)
     assertNull(ex.scope)
     assertEquals(0, ex.arguments.size)
@@ -36,7 +36,7 @@ class FunctionCallExpressionTests : VimTestCase() {
   @Test
   fun `scoped function call`() {
     val ex = VimscriptParser.parseExpression("s:doSomething()")
-    assertInstanceOf<FunctionCallExpression>(ex)
+    assertInstanceOf<NamedFunctionCallExpression>(ex)
     assertEquals("doSomething", ex.functionName.evaluate().value)
     assertNotNull(ex.scope)
     assertEquals(Scope.SCRIPT_VARIABLE, ex.scope)
@@ -46,7 +46,7 @@ class FunctionCallExpressionTests : VimTestCase() {
   @Test
   fun `function call with simple arguments`() {
     val ex = VimscriptParser.parseExpression("f(0, 'string')")
-    assertInstanceOf<FunctionCallExpression>(ex)
+    assertInstanceOf<NamedFunctionCallExpression>(ex)
     assertEquals("f", ex.functionName.evaluate().value)
     assertNull(ex.scope)
     assertNotNull(ex.arguments)
@@ -58,7 +58,7 @@ class FunctionCallExpressionTests : VimTestCase() {
   @Test
   fun `scope as a function call argument`() {
     val ex = VimscriptParser.parseExpression("f(s:, 'string')")
-    assertInstanceOf<FunctionCallExpression>(ex)
+    assertInstanceOf<NamedFunctionCallExpression>(ex)
     assertEquals("f", ex.functionName.evaluate().value)
     assertNull(ex.scope)
     assertNotNull(ex.arguments)

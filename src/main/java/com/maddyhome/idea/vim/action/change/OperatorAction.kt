@@ -31,7 +31,7 @@ import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
-import com.maddyhome.idea.vim.vimscript.model.expressions.FunctionCallExpression
+import com.maddyhome.idea.vim.vimscript.model.expressions.NamedFunctionCallExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 
 // todo make it multicaret
@@ -62,7 +62,7 @@ private fun doOperatorAction(
         }
       } catch (_: ExException) {
         // Get the argument for function(...) or funcref(...) for the error message
-        val functionName = if (expression is FunctionCallExpression && expression.arguments.isNotEmpty()) {
+        val functionName = if (expression is NamedFunctionCallExpression && expression.arguments.isNotEmpty()) {
           expression.arguments[0].evaluate(editor, context, scriptContext).toOutputString()
         } else {
           func

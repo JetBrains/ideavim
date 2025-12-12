@@ -9,7 +9,7 @@
 package org.jetbrains.plugins.ideavim.ex.parser.statements
 
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.expressions.FunctionCallExpression
+import com.maddyhome.idea.vim.vimscript.model.expressions.NamedFunctionCallExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.ListExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.statements.loops.ForLoop
@@ -52,7 +52,7 @@ class ForLoopTests : VimTestCase() {
     val f = script.units[0] as ForLoop
     assertEquals(null, f.variable.scope)
     assertEquals(VimString("key"), f.variable.name.evaluate())
-    assertTrue(f.iterable is FunctionCallExpression)
+    assertTrue(f.iterable is NamedFunctionCallExpression)
     assertEquals(1, f.body.size)
   }
 

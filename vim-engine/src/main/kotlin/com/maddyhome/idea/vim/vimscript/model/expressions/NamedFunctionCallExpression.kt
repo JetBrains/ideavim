@@ -18,14 +18,18 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 
-data class FunctionCallExpression(
+/**
+ * Represents a simple function call expression, in the form `MyFunc(args)`
+ *
+ * The function name can be a literal function name, or a variable that should resolve to a Funcref. If the function is
+ * a dictionary function, the method will fail, because the function should be called as part of an [IndexedExpression],
+ * via [FuncrefCallExpression].
+ */
+data class NamedFunctionCallExpression(
   val scope: Scope?,
   val functionName: CurlyBracesName,
   val arguments: MutableList<Expression>,
-) :
-  Expression() {
-  constructor(scope: Scope?, functionName: String, arguments: MutableList<Expression>) :
-    this(scope, CurlyBracesName(listOf(SimpleExpression(functionName))), arguments)
+) : Expression() {
 
   override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
     val scopePrefix = scope?.toString() ?: ""
