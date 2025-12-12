@@ -196,6 +196,7 @@ This is just terrible. [You know what to do](https://github.com/JetBrains/ideavi
 
 * [Continuous integration builds](https://ideavim.teamcity.com/)
 * [Bug tracker](https://youtrack.jetbrains.com/issues/VIM)
+* [Architecture Decision Records](https://youtrack.jetbrains.com/issues/VIM?q=Type:%20%7BArchitecture%20Decision%20Record%7D%20)
 * [IntelliJ Platform community space](https://platform.jetbrains.com/)
 * [Chat on gitter](https://gitter.im/JetBrains/ideavim)
 * [IdeaVim Channel](https://jb.gg/bi6zp7) on [JetBrains Server](https://discord.gg/jetbrains)
