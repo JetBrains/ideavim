@@ -87,24 +87,6 @@ class CaretTransactionTest : VimTestCase() {
   }
 
   @Test
-  fun `test update caret with selection`() {
-    val text = "one ${c}two three"
-    configureByText(text)
-
-    executeAction {
-      myVimApi.editor {
-        change {
-          withPrimaryCaret {
-            updateCaret(7, Range.Simple(4, 7))
-          }
-        }
-      }
-    }
-
-    assertState("one ${s}two${c}${se} three")
-  }
-
-  @Test
   fun `test update caret to beginning of file`() {
     val text = "one ${c}two three"
     configureByText(text)
@@ -177,28 +159,6 @@ class CaretTransactionTest : VimTestCase() {
           withPrimaryCaret {
             exception = assertThrows<IllegalArgumentException> {
               updateCaret(-1)
-            }
-          }
-        }
-      }
-    }
-
-    assertNotNull(exception)
-  }
-
-  @Test
-  fun `test update caret with selection out of range`() {
-    val text = "one ${c}two three"
-    configureByText(text)
-
-    var exception: IllegalArgumentException? = null
-
-    executeAction {
-      myVimApi.editor {
-        change {
-          withPrimaryCaret {
-            exception = assertThrows<IllegalArgumentException> {
-              updateCaret(offset = 0, selection = Range.Simple(100, 101))
             }
           }
         }

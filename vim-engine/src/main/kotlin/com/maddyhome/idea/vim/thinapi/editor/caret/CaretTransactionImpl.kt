@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.group.visual.blockToNativeSelection
 import com.maddyhome.idea.vim.put.PutData
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.state.mode.isEndAllowedIgnoringOnemore
 import com.maddyhome.idea.vim.thinapi.editor.EditorAccessorImpl
 import com.maddyhome.idea.vim.mark.Jump as EngineJump
 
@@ -255,25 +256,13 @@ class CaretTransactionImpl(
     return true
   }
 
-  override fun updateCaret(offset: Int, selection: Range.Simple?) {
+  override fun updateCaret(offset: Int) {
     val textLength = vimEditor.text().length
-    val startOffsetValidRange = 0..<textLength
-    val endOffsetValidRange = 0..textLength
-
-    assertOffsetInRange(offset, startOffsetValidRange)
-
-    if (selection != null) {
-      assertOffsetInRange(selection.start, startOffsetValidRange)
-      assertOffsetInRange(selection.end, endOffsetValidRange)
-    }
+    val allowsCaretAfterEnd = vimEditor.mode.isEndAllowedIgnoringOnemore
+    val validRange = if (allowsCaretAfterEnd) 0..textLength else 0..<textLength
+    assertOffsetInRange(offset, validRange)
 
     vimCaret.moveToOffset(offset)
-
-    selection?.let { (start, end) ->
-      if (start != end) {
-        vimCaret.setSelection(start, end)
-      }
-    } ?: vimCaret.removeSelection()
   }
 
   override fun getLineStartOffset(line: Int): Int {
