@@ -16,6 +16,12 @@ import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 
+/**
+ * Represents a function call through an expression that resolves to a Funcref, e.g. `foo[12]()`, `(expr)()` or `dict.foo()`
+ *
+ * The expression will not be a [VariableExpression]. This is handled by [NamedFunctionCallExpression], which can handle
+ * a (Funcref) variable name, a simple name or a curly braces name.
+ */
 data class FuncrefCallExpression(val expression: Expression, val args: List<Expression>) : Expression() {
 
   fun evaluateWithRange(
