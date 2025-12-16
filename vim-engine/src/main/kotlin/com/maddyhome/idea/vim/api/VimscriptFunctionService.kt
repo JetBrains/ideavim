@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
+import org.jetbrains.annotations.TestOnly
 
 interface VimscriptFunctionService {
   fun deleteFunction(name: String, scope: Scope? = null, vimContext: VimLContext)
@@ -21,4 +22,7 @@ interface VimscriptFunctionService {
   fun getUserDefinedFunction(scope: Scope?, name: String, vimContext: VimLContext): FunctionDeclaration?
   fun getBuiltInFunction(name: String): FunctionHandler?
   fun registerHandlers()
+
+  @TestOnly
+  fun resetUserDefinedFunctions()
 }

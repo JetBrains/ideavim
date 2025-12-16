@@ -155,7 +155,7 @@ class VimFuncrefTest : VimDataTypeTest() {
     val key = VimString("key")
     val value = VimInt(42)
     val dictionary = VimDictionary(linkedMapOf(key to value))
-    val funcref = VimFuncref(FakeHandler, VimList(mutableListOf(item)), dictionary, Type.FUNCTION)
+    val funcref = VimFuncref(FakeHandler, VimList(mutableListOf(item)), dictionary, Type.FUNCTION, isImplicitPartial = false)
     val copy = funcref.copy()
     assertNotSame(funcref, copy)
 
@@ -174,7 +174,7 @@ class VimFuncrefTest : VimDataTypeTest() {
     val key = VimString("key")
     val value = VimInt(42)
     val dictionary = VimDictionary(linkedMapOf(key to value))
-    val funcref = VimFuncref(FakeHandler, VimList(mutableListOf(item)), dictionary, Type.FUNCTION)
+    val funcref = VimFuncref(FakeHandler, VimList(mutableListOf(item)), dictionary, Type.FUNCTION, isImplicitPartial = false)
     val copy = funcref.deepCopy(useReferences = true) as VimFuncref
     assertNotSame(funcref, copy)
 
@@ -187,8 +187,6 @@ class VimFuncrefTest : VimDataTypeTest() {
     assertSame(funcref.dictionary?.dictionary[key], copy.dictionary?.dictionary[key])
   }
 
-  // TODO: DeepCopy tests, when we implement Vim's deepcopy()
-
   // Note that function execution is not tested here. It is better tested as part of function calls and dictionary
   // function calls, especially wrt partial and dictionary functions.
   // See FunctionCallTest and DictionaryFunctionCallTest
@@ -198,7 +196,7 @@ class VimFuncrefTest : VimDataTypeTest() {
     dictionary: VimDictionary? = null,
     type: Type = Type.FUNCREF,
   ): VimFuncref {
-    return VimFuncref(FakeHandler, arguments ?: VimList(mutableListOf()), dictionary, type)
+    return VimFuncref(FakeHandler, arguments ?: VimList(mutableListOf()), dictionary, type, isImplicitPartial = false)
   }
 
   // We'll never call this

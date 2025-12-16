@@ -39,22 +39,27 @@ import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
  * A lambda is a Funcref that represents a lambda literal expression.
  *
  * If the Funcref is created with arguments and/or a dictionary, it is partially applied, and these values are used
- * when the function is invoked.
+ * when the function is invoked. Note that a Funcref can be "implicitly" partial. This is not described in the Vim docs,
+ * but applies to dictionary functions. A dictionary entry might be a Funcref, but when accessed with e.g. `dict.func`,
+ * the returned value is evaluated to be an (implicitly) partial Funcref, with the owning dictionary passed to the new
+ * Funcref. If this Funcref is called, the partially applied dictionary is used as `self`. If the Funcref is assigned to
+ * a new dictionary, it keeps the implicitly partially applied dictionary but will create a new implicit partial when
+ * the entry is evaluated. If the user creates a partially applied Funcref with a dictionary, this stored value always
+ * takes precedence.
  *
- * Use [execute] to invoke the function. This will resolve the function handler if necessary and ensure a dictionary
- * function has the dictionary scope it requires. Do not invoke the function handler directly!
+ * @param handler The function handler to use when executing the function
+ * @param arguments The arguments to use when executing the function
+ * @param dictionary The dictionary to use when executing the function
+ * @param type The type of the Funcref
+ * @param isImplicitPartial True when the Funcref is partially applied when evaluating lookup on a dictionary function
  */
 class VimFuncref(
   val handler: FunctionHandler,
   val arguments: VimList,
-  var dictionary: VimDictionary?,
+  val dictionary: VimDictionary?,
   val type: Type,
+  val isImplicitPartial: Boolean
 ) : VimDataType("funcref") {
-  // TODO: Consider removing. It is set when the funcref is a partial and used to avoid overwriting the dictionary when invoked
-  // It might be better to have a nullable dictionary for partial application, and pass the dictionary context when
-  // invoking the function
-  var isSelfFixed: Boolean = false
-
   companion object {
     var lambdaCounter: Int = 1
     var anonymousCounter: Int = 1
@@ -82,27 +87,22 @@ class VimFuncref(
 
   override fun buildOutputString(builder: StringBuilder, visited: MutableSet<VimDataType>) {
     builder.run {
-      if (arguments.values.isEmpty() && dictionary == null) {
-        append(
-          when (type) {
-            Type.LAMBDA -> "function('${handler.name}')"
-            Type.FUNCREF -> "function('${handler.name}')"
-            Type.FUNCTION -> handler.name
-          }
-        )
+      // When outputting a Function, we output only the name if it's the only item being output. If it's part of a List
+      // or Dictionary, we use the `function('...')` format
+      if (type == Type.FUNCTION && arguments.values.isEmpty() && dictionary == null && visited.isEmpty()) {
+        append(handler.name)
       } else {
-        builder.run {
-          append("function('${handler.name}'")
-          if (arguments.values.isNotEmpty()) {
-            append(", ")
-            arguments.buildOutputString(this, mutableSetOf())
-          }
-          if (dictionary != null) {
-            append(", ")
-            dictionary!!.buildOutputString(this, mutableSetOf())
-          }
-          append(")")
+        visited.add(this@VimFuncref)
+        append("function('${handler.name}'")
+        if (arguments.values.isNotEmpty()) {
+          append(", ")
+          arguments.buildOutputString(this, visited.toMutableSet())
         }
+        if (dictionary != null) {
+          append(", ")
+          dictionary.buildOutputString(this, visited.toMutableSet())
+        }
+        append(")")
       }
     }
   }
@@ -126,6 +126,14 @@ class VimFuncref(
     return true
   }
 
+  /**
+   * Execute the function with the given arguments
+   *
+   * If the Funcref is partially applied, the given arguments are concatenated to the existing arguments. If the
+   * function handler is a dictionary function, the Funcref must be a partially applied Funcref with a dictionary, or
+   * this method will throw E725. Note that accessing a dictionary entry (e.g. `dict.func`) that is a function will
+   * evaluate it to a partially applied Funcref.
+   */
   fun execute(
     name: String,
     args: List<Expression>,
@@ -139,7 +147,7 @@ class VimFuncref(
       } else {
         injector.variableService.storeVariable(
           VariableExpression(Scope.LOCAL_VARIABLE, "self"),
-          dictionary!!,
+          dictionary,
           editor,
           context,
           handler.function,
@@ -161,7 +169,7 @@ class VimFuncref(
     return handler.executeFunction(allArguments, editor, context, vimContext)
   }
 
-  override fun copy() = VimFuncref(handler, arguments.copy(), dictionary?.copy(), type)
+  override fun copy() = VimFuncref(handler, arguments.copy(), dictionary?.copy(), type, isImplicitPartial)
 
   override fun lockVar(depth: Int) {
     this.isLocked = true
