@@ -9,9 +9,12 @@
 package com.maddyhome.idea.vim.vimscript.model.commands
 
 import com.intellij.vim.annotations.ExCommand
+import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.normalizeColumn
+import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.ex.ranges.toTextRange
@@ -36,7 +39,8 @@ data class CopyTextCommand(val range: Range, val modifier: CommandModifier, val 
   ): ExecutionResult {
     val carets = editor.sortedCarets()
     for (caret in carets) {
-      val range = getLineRange(editor, caret).toTextRange(editor)
+      val sourceLineRange = getLineRange(editor, caret)
+      val range = sourceLineRange.toTextRange(editor)
       val copiedText = injector.clipboardManager.collectCopiedText(editor, context, range)
 
       // Copy is defined as:
@@ -46,10 +50,12 @@ data class CopyTextCommand(val range: Range, val modifier: CommandModifier, val 
       // the line _before_ the first line (i.e., copy to above the first line).
       val address1 = getAddressFromArgument(editor)
 
+      // Remember the current column to respect the 'startofline' option
+      val caretColumn = caret.getBufferPosition().column
+
       val textData = PutData.TextData(null, copiedText, SelectionType.LINE_WISE)
       var mutableCaret = caret
       val putData = if (address1 == 0) {
-        // TODO: This should maintain current column location
         mutableCaret = mutableCaret.moveToOffset(0)
         PutData(
           textData,
@@ -71,6 +77,25 @@ data class CopyTextCommand(val range: Range, val modifier: CommandModifier, val 
         )
       }
       injector.put.putTextForCaret(editor, mutableCaret, context, putData)
+
+      // Move the caret to the last line of the copied text, obeying 'startofline'
+      // The copied text is placed after the target line (address1 for line after that address, or 0 for start of file)
+      // The caret should be on the last line of the copied range
+      val targetLine = if (address1 == 0) {
+        sourceLineRange.size - 1
+      } else {
+        address1 + sourceLineRange.size - 1
+      }
+
+      val caretOffset = if (!injector.options(editor).startofline) {
+        // Maintain the original column position if 'nostartofline' is set
+        val column = editor.normalizeColumn(targetLine, caretColumn, allowEnd = false)
+        editor.bufferPositionToOffset(BufferPosition(targetLine, column))
+      } else {
+        // Move to the first non-whitespace character on the line
+        injector.motion.moveCaretToLineStartSkipLeading(editor, targetLine)
+      }
+      mutableCaret.moveToOffset(caretOffset)
     }
     return ExecutionResult.Success
   }
