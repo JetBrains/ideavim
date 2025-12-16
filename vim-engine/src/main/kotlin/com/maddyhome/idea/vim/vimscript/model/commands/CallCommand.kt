@@ -48,8 +48,7 @@ class CallCommand(val range: Range, val functionCall: Expression) :
           if (function is DefinedFunctionHandler && function.function.flags.contains(FunctionFlag.DICT)) {
             throw exExceptionMessage("E725", scopePrefix + name)
           }
-          function.range = range
-          function.executeFunction(functionCall.arguments, editor, context, this)
+          function.executeFunction(functionCall.arguments, range, editor, context, this)
           return ExecutionResult.Success
         }
 
@@ -60,8 +59,7 @@ class CallCommand(val range: Range, val functionCall: Expression) :
           vimContext
         )
         if (funcref is VimFuncref) {
-          funcref.handler.range = range
-          funcref.execute(scopePrefix + name, functionCall.arguments, editor, context, vimContext)
+          funcref.execute(scopePrefix + name, functionCall.arguments, range, editor, context, vimContext)
           return ExecutionResult.Success
         }
 

@@ -90,7 +90,7 @@ private fun doOperatorAction(
   KeyHandler.getInstance().reset(editor)
 
   val arguments = listOf(SimpleExpression(arg))
-  handler.executeFunction(arguments, editor, context, scriptContext)
+  handler.executeFunction(arguments, range = null, editor, context, scriptContext)
 
   VimRepeater.repeatHandler = saveRepeatHandler
   return true

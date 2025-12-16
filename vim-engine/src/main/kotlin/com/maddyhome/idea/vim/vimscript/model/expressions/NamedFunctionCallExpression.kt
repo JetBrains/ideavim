@@ -40,13 +40,13 @@ data class NamedFunctionCallExpression(
       if (handler is DefinedFunctionHandler && handler.function.flags.contains(FunctionFlag.DICT)) {
         throw exExceptionMessage("E725", scopePrefix + name)
       }
-      return handler.executeFunction(this.arguments, editor, context, vimContext)
+      return handler.executeFunction(this.arguments, range = null, editor, context, vimContext)
     }
 
     val funcref =
       injector.variableService.getNullableVariableValue(VariableExpression(scope, functionName), editor, context, vimContext)
     if (funcref is VimFuncref) {
-      return funcref.execute(scopePrefix + name, arguments, editor, context, vimContext)
+      return funcref.execute(scopePrefix + name, arguments, range = null, editor, context, vimContext)
     }
     throw exExceptionMessage("E117", scopePrefix + name)
   }
