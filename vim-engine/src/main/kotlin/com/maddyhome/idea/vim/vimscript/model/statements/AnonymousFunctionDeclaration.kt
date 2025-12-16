@@ -62,9 +62,13 @@ data class AnonymousFunctionDeclaration(
       hasOptionalArguments
     )
     declaration.vimContext = this.vimContext
-    container.dictionary[index] =
-      VimFuncref(DefinedFunctionHandler(declaration), VimList(mutableListOf()), container, VimFuncref.Type.FUNCREF)
-    container.dictionary[index]
+    container.dictionary[index] = VimFuncref(
+      DefinedFunctionHandler(declaration),
+      VimList(mutableListOf()),
+      container,
+      VimFuncref.Type.FUNCREF,
+      isImplicitPartial = false
+    )
     return ExecutionResult.Success
   }
 

@@ -170,4 +170,16 @@ abstract class VimScriptFunctionServiceBase : VimscriptFunctionService {
       }
     }
   }
+
+  override fun resetUserDefinedFunctions() {
+    // Remove all global user-defined functions
+    val iterator = globalFunctions.iterator()
+    while (iterator.hasNext()) {
+      val (_, function) = iterator.next()
+      function.isDeleted = true
+      iterator.remove()
+    }
+
+    // TODO: How to remove scoped functions?
+  }
 }

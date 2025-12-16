@@ -36,7 +36,7 @@ data class LambdaExpression(val args: List<String>, val expr: Expression) : Expr
       true
     )
     function.vimContext = vimContext
-    return VimFuncref(DefinedFunctionHandler(function), VimList(mutableListOf()), null, VimFuncref.Type.LAMBDA)
+    return VimFuncref(DefinedFunctionHandler(function), VimList(mutableListOf()), null, VimFuncref.Type.LAMBDA, isImplicitPartial = false)
   }
 
   private fun getFunctionName(): String {

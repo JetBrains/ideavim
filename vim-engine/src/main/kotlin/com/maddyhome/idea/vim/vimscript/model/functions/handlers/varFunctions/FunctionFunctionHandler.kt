@@ -66,11 +66,13 @@ internal class FunctionFunctionHandler : FunctionHandlerBase<VimFuncref>(minArit
     if (dictionary == null) {
       dictionary = arg3
     }
-    val funcref = VimFuncref(function, arglist ?: VimList(mutableListOf()), dictionary, VimFuncref.Type.FUNCTION)
-    if (dictionary != null) {
-      funcref.isSelfFixed = true
-    }
-    return funcref
+    return VimFuncref(
+      function,
+      arglist ?: VimList(mutableListOf()),
+      dictionary,
+      VimFuncref.Type.FUNCTION,
+      isImplicitPartial = false
+    )
   }
 }
 
@@ -114,7 +116,13 @@ internal class FuncrefFunctionHandler : FunctionHandlerBase<VimFuncref>(minArity
       }
       dictionary = arg3
     }
-    return VimFuncref(handler, arglist ?: VimList(mutableListOf()), dictionary, VimFuncref.Type.FUNCREF)
+    return VimFuncref(
+      handler,
+      arglist ?: VimList(mutableListOf()),
+      dictionary,
+      VimFuncref.Type.FUNCREF,
+      isImplicitPartial = false
+    )
   }
 }
 
