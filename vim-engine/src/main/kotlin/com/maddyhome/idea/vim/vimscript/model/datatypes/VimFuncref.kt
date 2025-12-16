@@ -133,6 +133,15 @@ class VimFuncref(
    * function handler is a dictionary function, the Funcref must be a partially applied Funcref with a dictionary, or
    * this method will throw E725. Note that accessing a dictionary entry (e.g. `dict.func`) that is a function will
    * evaluate it to a partially applied Funcref.
+   *
+   * @param name The name of the function about to be executed. This is used for output purposes, so might not match
+   *             the name of the Funcref's handler
+   * @param args The arguments to pass to the function. If the function is a partial function, any existing arguments
+   *             will be prepended to these arguments.
+   * @param editor The editor to use for executing the function
+   * @param context The execution context to use for executing the function
+   * @param vimContext The VimL context to use for executing the function
+   * @return The result of executing the function
    */
   fun execute(
     name: String,
