@@ -24,10 +24,18 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 interface FunctionHandler {
   val name: String
   val scope: Scope?
-  var range: Range?
 
+  /**
+   * Execute the function with the given arguments
+   *
+   * The function can be called with a range. If not provided, the current line will be used. If the range is given, the
+   * caret is moved to the start of the first line in the range before the function is invoked. If the function handles
+   * range (see `:help :func-range`), then it is only called once. Otherwise it is called for each line in the range,
+   * with the caret moved to the start of the next line before each call.
+   */
   fun executeFunction(
     arguments: List<Expression>,
+    range: Range?,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
@@ -44,10 +52,10 @@ abstract class FunctionHandlerBase<T : VimDataType>(protected val minArity: Int 
   : FunctionHandler {
   override lateinit var name: String
   override val scope: Scope? = null
-  override var range: Range? = null
 
   override fun executeFunction(
     arguments: List<Expression>,
+    range: Range?,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
@@ -56,13 +64,12 @@ abstract class FunctionHandlerBase<T : VimDataType>(protected val minArity: Int 
 
     // It's fairly trivial to confirm that Vim eagerly evaluates all function arguments from left to right
     val values = arguments.map { it.evaluate(editor, context, vimContext) }
-    val result = doFunction(Arguments(values, editor, context), editor, context, vimContext)
-    range = null
-    return result
+    return doFunction(Arguments(values, editor, context), range, editor, context, vimContext)
   }
 
   protected abstract fun doFunction(
     arguments: Arguments,
+    range: Range?,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
@@ -130,6 +137,30 @@ abstract class FunctionHandlerBase<T : VimDataType>(protected val minArity: Int 
 abstract class BuiltinFunctionHandler<T : VimDataType>(minArity: Int = 0, maxArity: Int? = null)
   : FunctionHandlerBase<T>(minArity, maxArity) {
   constructor(arity: Int) : this(arity, arity)
+
+  override fun doFunction(
+    arguments: Arguments,
+    range: Range?,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext
+  ): T {
+    // TODO: Builtin functions don't handle range. Are there any that should?
+    // Vim moves the caret to the start of the first line in the range before the function is invoked. If the function
+    // handles range, it is only called once. Otherwise, Vim moves the caret to the start of each line in the range and
+    // calls the function multiple times. It does this with builtin functions too, as demonstrated by:
+    // `'<,'>call add(l, 12)`
+    // This will fill the List `l` with items for each line in the range, and leave the caret at the end of the range.
+    // IdeaVim does not currently support this.
+    return doFunction(arguments, editor, context, vimContext)
+  }
+
+  protected abstract fun doFunction(
+    arguments: Arguments,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext
+  ): T
 }
 
 abstract class UnaryFunctionHandler<T : VimDataType> : BuiltinFunctionHandler<T>(arity = 1)

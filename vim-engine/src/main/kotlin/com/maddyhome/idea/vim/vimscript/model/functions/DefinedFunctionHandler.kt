@@ -44,6 +44,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) :
 
   override fun doFunction(
     arguments: Arguments,
+    range: Range?,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
@@ -52,12 +53,14 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) :
     val exceptionsCaught = mutableListOf<ExException>()
     val isRangeGiven = (range?.size() ?: 0) > 0
 
-    if (!isRangeGiven) {
-      range = Range().apply {
-        addAddresses(Address.createRangeAddresses(".", 0, false)!!)
-      }
+    val range = if (range == null || !isRangeGiven) {
+      Range().apply { addAddresses(Address.createRangeAddresses(".", 0, false)!!) }
     }
-    initializeFunctionVariables(arguments, editor, context, vimContext)
+    else {
+      range
+    }
+
+    initializeFunctionVariables(arguments, range, editor, context, vimContext)
 
     if (function.flags.contains(FunctionFlag.RANGE)) {
       val line = arguments.getVariable("firstline", function).toVimNumber().value
@@ -136,6 +139,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) :
 
   private fun initializeFunctionVariables(
     arguments: Arguments,
+    range: Range,
     editor: VimEditor,
     context: ExecutionContext,
     functionCallContext: VimLContext,
@@ -166,7 +170,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) :
       }
       arguments.setVariable("000", remainingArgs, editor, context, function)
     }
-    val lineRange = range!!.getLineRange(editor, editor.currentCaret())
+    val lineRange = range.getLineRange(editor, editor.currentCaret())
     arguments.setVariable("firstline", VimInt(lineRange.startLine1), editor, context, function)
     arguments.setVariable("lastline", VimInt(lineRange.endLine1), editor, context, function)
   }

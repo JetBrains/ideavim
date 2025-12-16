@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.exExceptionMessage
+import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
@@ -138,6 +139,7 @@ class VimFuncref(
    *             the name of the Funcref's handler
    * @param args The arguments to pass to the function. If the function is a partial function, any existing arguments
    *             will be prepended to these arguments.
+   * @param range The range to run the function over. If not provided, the current line is used
    * @param editor The editor to use for executing the function
    * @param context The execution context to use for executing the function
    * @param vimContext The VimL context to use for executing the function
@@ -146,6 +148,7 @@ class VimFuncref(
   fun execute(
     name: String,
     args: List<Expression>,
+    range: Range?,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
@@ -175,7 +178,7 @@ class VimFuncref(
           ?: throw exExceptionMessage("E117", handler.name)
       }
     }
-    return handler.executeFunction(allArguments, editor, context, vimContext)
+    return handler.executeFunction(allArguments, range, editor, context, vimContext)
   }
 
   override fun copy() = VimFuncref(handler, arguments.copy(), dictionary?.copy(), type, isImplicitPartial)
