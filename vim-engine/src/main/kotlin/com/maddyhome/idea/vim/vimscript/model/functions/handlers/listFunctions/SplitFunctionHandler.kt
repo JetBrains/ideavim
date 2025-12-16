@@ -15,10 +15,10 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandlerBase
+import com.maddyhome.idea.vim.vimscript.model.functions.BuiltinFunctionHandler
 
 @VimscriptFunction(name = "split")
-internal class SplitFunctionHandler : FunctionHandlerBase<VimList>(minArity = 1, maxArity = 3) {
+internal class SplitFunctionHandler : BuiltinFunctionHandler<VimList>(minArity = 1, maxArity = 3) {
   override fun doFunction(
     arguments: Arguments,
     editor: VimEditor,

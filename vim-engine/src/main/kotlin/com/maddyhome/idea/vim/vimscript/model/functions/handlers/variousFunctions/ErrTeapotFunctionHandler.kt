@@ -14,10 +14,10 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandlerBase
+import com.maddyhome.idea.vim.vimscript.model.functions.BuiltinFunctionHandler
 
 @VimscriptFunction(name = "err_teapot")
-class ErrTeapotFunctionHandler : FunctionHandlerBase<VimDataType>(minArity = 0, maxArity = 1) {
+class ErrTeapotFunctionHandler : BuiltinFunctionHandler<VimDataType>(minArity = 0, maxArity = 1) {
   override fun doFunction(
     arguments: Arguments,
     editor: VimEditor,

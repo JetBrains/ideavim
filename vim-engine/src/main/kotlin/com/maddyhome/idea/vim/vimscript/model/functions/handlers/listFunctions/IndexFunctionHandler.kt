@@ -12,13 +12,12 @@ import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandlerBase
+import com.maddyhome.idea.vim.vimscript.model.functions.BuiltinFunctionHandler
 
 @VimscriptFunction(name = "index")
-internal class IndexFunctionHandler : FunctionHandlerBase<VimInt>(minArity = 2, maxArity = 4) {
+internal class IndexFunctionHandler : BuiltinFunctionHandler<VimInt>(minArity = 2, maxArity = 4) {
   override fun doFunction(
     arguments: Arguments,
     editor: VimEditor,

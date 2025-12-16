@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandlerBase
+import com.maddyhome.idea.vim.vimscript.model.functions.BuiltinFunctionHandler
 
 @VimscriptFunction(name = "flatten")
 internal class FlattenFunctionHandler : FlattenFunctionHandlerBase(makeCopy = false)
@@ -24,7 +24,7 @@ internal class FlattenFunctionHandler : FlattenFunctionHandlerBase(makeCopy = fa
 internal class FlattenNewFunctionHandler : FlattenFunctionHandlerBase(makeCopy = true)
 
 internal abstract class FlattenFunctionHandlerBase(private val makeCopy: Boolean)
-  : FunctionHandlerBase<VimList>(minArity = 1, maxArity = 2) {
+  : BuiltinFunctionHandler<VimList>(minArity = 1, maxArity = 2) {
   override fun doFunction(
     arguments: Arguments,
     editor: VimEditor,

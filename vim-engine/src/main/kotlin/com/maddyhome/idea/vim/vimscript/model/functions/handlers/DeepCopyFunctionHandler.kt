@@ -13,10 +13,10 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandlerBase
+import com.maddyhome.idea.vim.vimscript.model.functions.BuiltinFunctionHandler
 
 @VimscriptFunction(name = "deepcopy")
-internal class DeepCopyFunctionHandler : FunctionHandlerBase<VimDataType>(minArity = 1, maxArity = 2) {
+internal class DeepCopyFunctionHandler : BuiltinFunctionHandler<VimDataType>(minArity = 1, maxArity = 2) {
   override fun doFunction(
     arguments: Arguments,
     editor: VimEditor,

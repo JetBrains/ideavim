@@ -21,12 +21,12 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandlerBase
+import com.maddyhome.idea.vim.vimscript.model.functions.BuiltinFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.functions.UnaryFunctionHandler
 
 // TODO: 03.08.2021 Support second parameter
 @VimscriptFunction(name = "line")
-internal class LineFunctionHandler : FunctionHandlerBase<VimInt>(minArity = 1, maxArity = 2) {
+internal class LineFunctionHandler : BuiltinFunctionHandler<VimInt>(minArity = 1, maxArity = 2) {
   override fun doFunction(
     arguments: Arguments,
     editor: VimEditor,

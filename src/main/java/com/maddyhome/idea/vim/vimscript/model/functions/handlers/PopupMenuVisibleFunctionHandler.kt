@@ -15,10 +15,10 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandlerBase
+import com.maddyhome.idea.vim.vimscript.model.functions.BuiltinFunctionHandler
 
 @VimscriptFunction(name = "pumvisible")
-internal class PopupMenuVisibleFunctionHandler : FunctionHandlerBase<VimInt>() {
+internal class PopupMenuVisibleFunctionHandler : BuiltinFunctionHandler<VimInt>() {
   override fun doFunction(arguments: Arguments, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext) =
     (CompletionService.getCompletionService().currentCompletion == null).asVimInt()
 }
