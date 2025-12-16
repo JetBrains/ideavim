@@ -17,10 +17,10 @@ import com.maddyhome.idea.vim.statistic.VimscriptState
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandlerBase
+import com.maddyhome.idea.vim.vimscript.model.functions.BuiltinFunctionHandler
 
 @VimscriptFunction(name = "has")
-internal class HasFunctionHandler : FunctionHandlerBase<VimInt>(minArity = 1, maxArity = 2) {
+internal class HasFunctionHandler : BuiltinFunctionHandler<VimInt>(minArity = 1, maxArity = 2) {
   private val supportedFeatures = Features.discover()
 
   override fun doFunction(arguments: Arguments, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimInt {

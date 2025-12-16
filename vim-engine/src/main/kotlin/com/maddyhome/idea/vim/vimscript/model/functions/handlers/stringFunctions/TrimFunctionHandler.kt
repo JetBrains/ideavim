@@ -13,10 +13,10 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandlerBase
+import com.maddyhome.idea.vim.vimscript.model.functions.BuiltinFunctionHandler
 
 @VimscriptFunction(name = "trim")
-internal class TrimFunctionHandler : FunctionHandlerBase<VimString>(minArity = 1, maxArity = 3) {
+internal class TrimFunctionHandler : BuiltinFunctionHandler<VimString>(minArity = 1, maxArity = 3) {
   override fun doFunction(
     arguments: Arguments,
     editor: VimEditor,

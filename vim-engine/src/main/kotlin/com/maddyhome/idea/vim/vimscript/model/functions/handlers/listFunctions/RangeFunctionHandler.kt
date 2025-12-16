@@ -16,10 +16,10 @@ import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandlerBase
+import com.maddyhome.idea.vim.vimscript.model.functions.BuiltinFunctionHandler
 
 @VimscriptFunction(name = "range")
-internal class RangeFunctionHandler : FunctionHandlerBase<VimList>(minArity = 1, maxArity = 3) {
+internal class RangeFunctionHandler : BuiltinFunctionHandler<VimList>(minArity = 1, maxArity = 3) {
   override fun doFunction(
     arguments: Arguments,
     editor: VimEditor,

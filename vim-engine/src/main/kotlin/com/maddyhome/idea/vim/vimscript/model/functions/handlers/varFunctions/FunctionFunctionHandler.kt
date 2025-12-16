@@ -19,11 +19,11 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
+import com.maddyhome.idea.vim.vimscript.model.functions.BuiltinFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandlerBase
 
 @VimscriptFunction(name = "function")
-internal class FunctionFunctionHandler : FunctionHandlerBase<VimFuncref>(minArity = 1, maxArity = 3) {
+internal class FunctionFunctionHandler : BuiltinFunctionHandler<VimFuncref>(minArity = 1, maxArity = 3) {
   override fun doFunction(
     arguments: Arguments,
     editor: VimEditor,
@@ -77,7 +77,7 @@ internal class FunctionFunctionHandler : FunctionHandlerBase<VimFuncref>(minArit
 }
 
 @VimscriptFunction(name = "funcref")
-internal class FuncrefFunctionHandler : FunctionHandlerBase<VimFuncref>(minArity = 1, maxArity = 3) {
+internal class FuncrefFunctionHandler : BuiltinFunctionHandler<VimFuncref>(minArity = 1, maxArity = 3) {
   override fun doFunction(
     arguments: Arguments,
     editor: VimEditor,

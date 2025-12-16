@@ -15,10 +15,10 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandlerBase
+import com.maddyhome.idea.vim.vimscript.model.functions.BuiltinFunctionHandler
 
 @VimscriptFunction(name = "submatch")
-internal class SubmatchFunctionHandler : FunctionHandlerBase<VimString>(minArity = 1, maxArity = 2) {
+internal class SubmatchFunctionHandler : BuiltinFunctionHandler<VimString>(minArity = 1, maxArity = 2) {
   var latestMatch: String = ""
 
   override fun doFunction(

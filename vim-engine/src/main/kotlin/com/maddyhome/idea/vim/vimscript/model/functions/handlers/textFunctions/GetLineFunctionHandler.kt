@@ -16,11 +16,11 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandlerBase
+import com.maddyhome.idea.vim.vimscript.model.functions.BuiltinFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.functions.handlers.cursorFunctions.variableToPosition
 
 @VimscriptFunction(name = "getline")
-internal class GetLineFunctionHandler : FunctionHandlerBase<VimDataType>(minArity = 1, maxArity = 2) {
+internal class GetLineFunctionHandler : BuiltinFunctionHandler<VimDataType>(minArity = 1, maxArity = 2) {
   override fun doFunction(
     arguments: Arguments,
     editor: VimEditor,

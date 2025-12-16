@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandlerBase
+import com.maddyhome.idea.vim.vimscript.model.functions.BuiltinFunctionHandler
 
 /*
 Return the current command-line type. Possible return values are:
@@ -32,7 +32,7 @@ Not yet implemented:
     -	:insert or :append command
  */
 @VimscriptFunction(name = "getcmdtype")
-internal class GetCmdTypeFunctionHandler : FunctionHandlerBase<VimString>() {
+internal class GetCmdTypeFunctionHandler : BuiltinFunctionHandler<VimString>() {
   override fun doFunction(
     arguments: Arguments,
     editor: VimEditor,

@@ -42,8 +42,6 @@ interface FunctionHandler {
  */
 abstract class FunctionHandlerBase<T : VimDataType>(protected val minArity: Int = 0, protected val maxArity: Int? = null)
   : FunctionHandler {
-  constructor(arity: Int) : this(arity, arity)
-
   override lateinit var name: String
   override val scope: Scope? = null
   override var range: Range? = null
@@ -129,6 +127,11 @@ abstract class FunctionHandlerBase<T : VimDataType>(protected val minArity: Int 
   }
 }
 
-abstract class UnaryFunctionHandler<T : VimDataType> : FunctionHandlerBase<T>(arity = 1)
-abstract class BinaryFunctionHandler<T : VimDataType> : FunctionHandlerBase<T>(arity = 2)
-abstract class VariadicFunctionHandler<T : VimDataType>(minArity: Int) : FunctionHandlerBase<T>(minArity, null)
+abstract class BuiltinFunctionHandler<T : VimDataType>(minArity: Int = 0, maxArity: Int? = null)
+  : FunctionHandlerBase<T>(minArity, maxArity) {
+  constructor(arity: Int) : this(arity, arity)
+}
+
+abstract class UnaryFunctionHandler<T : VimDataType> : BuiltinFunctionHandler<T>(arity = 1)
+abstract class BinaryFunctionHandler<T : VimDataType> : BuiltinFunctionHandler<T>(arity = 2)
+abstract class VariadicFunctionHandler<T : VimDataType>(minArity: Int) : BuiltinFunctionHandler<T>(minArity, null)
