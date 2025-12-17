@@ -8,10 +8,12 @@
 
 package com.maddyhome.idea.vim.vimscript.model.functions
 
+import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.exExceptionMessage
+import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
@@ -62,18 +64,39 @@ abstract class FunctionHandlerBase<T : VimDataType>(protected val minArity: Int 
   ): T {
     checkFunctionCall(arguments)
 
-    // It's fairly trivial to confirm that Vim eagerly evaluates all function arguments from left to right
-    val values = arguments.map { it.evaluate(editor, context, vimContext) }
-    return doFunction(Arguments(values, editor, context), range, editor, context, vimContext)
-  }
+    // If we're given a range, it is up to the function how we handle it. If the function handles it, move to the start
+    // of the range and let it get on with things. If the function does not handle it, we move to the start of each line
+    // in the range and then call the function repeatedly.
+    // The arguments are re-evaluated for each line. This is easily demonstrated with e.g. `add({list}, getline('.'))`.
+    // Note that builtin functions do not handle range, so are called multiple times. User-defined functions have to
+    // opt in to range handling. See `:help :func-range`.
+    val hasRange = range != null && range.size() > 0
+    if (hasRange) {
+      val lineRange = range.getLineRange(editor, editor.currentCaret())
+      if (lineRange.startLine1 > editor.lineCount() || lineRange.endLine1 > editor.lineCount()) {
+        throw exExceptionMessage("E16")
+      }
 
-  protected abstract fun doFunction(
-    arguments: Arguments,
-    range: Range?,
-    editor: VimEditor,
-    context: ExecutionContext,
-    vimContext: VimLContext,
-  ): T
+      // Regardless of how handles the range, we always pass it to the handler. User-defined functions always have
+      // `a:firstline` and `a:lastline` set.
+      if (handlesRange) {
+        editor.currentCaret().moveToBufferPosition(BufferPosition(lineRange.startLine, 0))
+        return doFunction(arguments, lineRange, editor, context, vimContext)
+      }
+      else {
+        var lastRetval: T? = null
+        for (line in lineRange.startLine..lineRange.endLine) {
+          editor.currentCaret().moveToBufferPosition(BufferPosition(line, 0))
+          lastRetval = doFunction(arguments, lineRange, editor, context, vimContext)
+        }
+        return lastRetval ?: throw exExceptionMessage("E16")
+      }
+    }
+    else {
+      // No range. Don't move the caret and just call the function.
+      return doFunction(arguments, null, editor, context, vimContext)
+    }
+  }
 
   private fun checkFunctionCall(arguments: List<Expression>) {
     if (arguments.size < minArity) {
@@ -85,6 +108,27 @@ abstract class FunctionHandlerBase<T : VimDataType>(protected val minArity: Int 
       throw exExceptionMessage("E118", name)
     }
   }
+
+  protected abstract val handlesRange: Boolean
+
+  private fun doFunction(
+    arguments: List<Expression>,
+    lineRange: LineRange?,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext,
+  ): T {
+    val values = arguments.map { it.evaluate(editor, context, vimContext) }
+    return doFunction(Arguments(values, editor, context), lineRange, editor, context, vimContext)
+  }
+
+  protected abstract fun doFunction(
+    arguments: Arguments,
+    range: LineRange?,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext,
+  ): T
 
   protected class Arguments(
     private val arguments: List<VimDataType>,
@@ -138,20 +182,17 @@ abstract class BuiltinFunctionHandler<T : VimDataType>(minArity: Int = 0, maxAri
   : FunctionHandlerBase<T>(minArity, maxArity) {
   constructor(arity: Int) : this(arity, arity)
 
+  // Builtin functions do not handle range. They are called multiple times, once for each line in the range, after the
+  // caret is moved.
+  override val handlesRange: Boolean = false
+
   override fun doFunction(
     arguments: Arguments,
-    range: Range?,
+    range: LineRange?,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext
   ): T {
-    // TODO: Builtin functions don't handle range. Are there any that should?
-    // Vim moves the caret to the start of the first line in the range before the function is invoked. If the function
-    // handles range, it is only called once. Otherwise, Vim moves the caret to the start of each line in the range and
-    // calls the function multiple times. It does this with builtin functions too, as demonstrated by:
-    // `'<,'>call add(l, 12)`
-    // This will fill the List `l` with items for each line in the range, and leave the caret at the end of the range.
-    // IdeaVim does not currently support this.
     return doFunction(arguments, editor, context, vimContext)
   }
 
