@@ -32,7 +32,9 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 import com.maddyhome.idea.vim.vimscript.model.variables.HighLightVariable
+import com.maddyhome.idea.vim.vimscript.model.variables.KeyVariable
 import com.maddyhome.idea.vim.vimscript.model.variables.RegisterVariable
+import com.maddyhome.idea.vim.vimscript.model.variables.ValueVariable
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.full.createType
@@ -230,9 +232,11 @@ abstract class VimVariableServiceBase : VariableService {
         KeyHandler.getInstance().keyHandlerState.commandBuilder.calculateCount0Snapshot().coerceAtLeast(1)
       )
 
-      "searchforward" -> VimInt(if (injector.searchGroup.getLastSearchDirection() == Direction.FORWARDS) 1 else 0)
+      "key" -> KeyVariable.evaluate(name, editor, context, vimContext)
       "hlsearch" -> HighLightVariable().evaluate(name, editor, context, vimContext)
       "register" -> RegisterVariable().evaluate(name, editor, context, vimContext)
+      "searchforward" -> VimInt(if (injector.searchGroup.getLastSearchDirection() == Direction.FORWARDS) 1 else 0)
+      "val" -> ValueVariable.evaluate(name, editor, context, vimContext)
 
       else -> throw ExException("The 'v:${name}' variable is not implemented yet")
     }
