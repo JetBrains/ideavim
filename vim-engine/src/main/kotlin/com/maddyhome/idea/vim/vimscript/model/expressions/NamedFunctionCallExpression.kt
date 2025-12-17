@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.exExceptionMessage
+import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
@@ -31,7 +32,12 @@ data class NamedFunctionCallExpression(
   val arguments: MutableList<Expression>,
 ) : Expression() {
 
-  override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
+  fun evaluateWithRange(
+    range: Range?,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext,
+  ): VimDataType {
     val scopePrefix = scope?.toString() ?: ""
     val name = functionName.evaluate(editor, context, vimContext).value
     injector.statisticsService.setIfFunctionCallUsed(true)
@@ -40,14 +46,18 @@ data class NamedFunctionCallExpression(
       if (handler is DefinedFunctionHandler && handler.function.flags.contains(FunctionFlag.DICT)) {
         throw exExceptionMessage("E725", scopePrefix + name)
       }
-      return handler.executeFunction(this.arguments, range = null, editor, context, vimContext)
+      return handler.executeFunction(arguments, range, editor, context, vimContext)
     }
 
     val funcref =
       injector.variableService.getNullableVariableValue(VariableExpression(scope, functionName), editor, context, vimContext)
     if (funcref is VimFuncref) {
-      return funcref.execute(scopePrefix + name, arguments, range = null, editor, context, vimContext)
+      return funcref.execute(scopePrefix + name, arguments, range, editor, context, vimContext)
     }
+
     throw exExceptionMessage("E117", scopePrefix + name)
   }
+
+  override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext) =
+    evaluateWithRange(null, editor, context, vimContext)
 }
