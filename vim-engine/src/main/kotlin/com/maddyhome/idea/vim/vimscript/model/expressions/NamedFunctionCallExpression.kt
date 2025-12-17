@@ -52,7 +52,7 @@ data class NamedFunctionCallExpression(
     val funcref =
       injector.variableService.getNullableVariableValue(VariableExpression(scope, functionName), editor, context, vimContext)
     if (funcref is VimFuncref) {
-      return funcref.execute(scopePrefix + name, arguments, range, editor, context, vimContext)
+      return funcref.execute(arguments, range, editor, context, vimContext)
     }
 
     throw exExceptionMessage("E117", scopePrefix + name)

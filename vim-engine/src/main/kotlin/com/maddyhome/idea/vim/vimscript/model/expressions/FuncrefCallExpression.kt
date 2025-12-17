@@ -32,7 +32,7 @@ data class FuncrefCallExpression(val expression: Expression, val args: List<Expr
   ): VimDataType {
     val value = expression.evaluate(editor, context, vimContext)
     if (value is VimFuncref) {
-      return value.execute(value.handler.name, args, range, editor, context, vimContext)
+      return value.execute(args, range, editor, context, vimContext)
     } else {
       // todo more exceptions
       throw exExceptionMessage("E15", expression.originalString)
