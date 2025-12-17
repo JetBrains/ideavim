@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.vimscript.model.functions
 
-import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -16,8 +15,7 @@ import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.FinishException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
-import com.maddyhome.idea.vim.ex.ranges.Address
-import com.maddyhome.idea.vim.ex.ranges.Range
+import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
@@ -42,36 +40,29 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) :
       if (function.hasOptionalArguments) null else function.args.size + function.defaultArgs.size
   }
 
+  override val handlesRange: Boolean
+    get() = function.flags.contains(FunctionFlag.RANGE)
+
   override fun doFunction(
     arguments: Arguments,
-    range: Range?,
+    range: LineRange?,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
   ): VimDataType {
-    var returnValue: VimDataType? = null
     val exceptionsCaught = mutableListOf<ExException>()
-    val isRangeGiven = (range?.size() ?: 0) > 0
+    val isRangeGiven = (range?.size ?: 0) > 0
 
-    val range = if (range == null || !isRangeGiven) {
-      Range().apply { addAddresses(Address.createRangeAddresses(".", 0, false)!!) }
+    val lineRange = if (range == null || !isRangeGiven) {
+      LineRange(editor.currentCaret().getLine(), editor.currentCaret().getLine())
     }
     else {
       range
     }
 
-    initializeFunctionVariables(arguments, range, editor, context, vimContext)
+    initializeFunctionVariables(arguments, lineRange, editor, context, vimContext)
 
-    if (function.flags.contains(FunctionFlag.RANGE)) {
-      val line = arguments.getVariable("firstline", function).toVimNumber().value
-      returnValue = executeBodyForLine(line, isRangeGiven, exceptionsCaught, editor, context)
-    } else {
-      val firstLine = arguments.getVariable("firstline", function).toVimNumber().value
-      val lastLine = arguments.getVariable("lastline", function).toVimNumber().value
-      for (line in firstLine..lastLine) {
-        returnValue = executeBodyForLine(line, isRangeGiven, exceptionsCaught, editor, context)
-      }
-    }
+    val returnValue = executeFunctionBody(exceptionsCaught, editor, context)
 
     if (exceptionsCaught.isNotEmpty()) {
       injector.messages.indicateError()
@@ -80,17 +71,12 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) :
     return returnValue ?: VimInt.ZERO
   }
 
-  private fun executeBodyForLine(
-    line: Int,
-    isRangeGiven: Boolean,
+  private fun executeFunctionBody(
     exceptionsCaught: MutableList<ExException>,
     editor: VimEditor,
     context: ExecutionContext,
   ): VimDataType? {
     var returnValue: VimDataType? = null
-    if (isRangeGiven) {
-      editor.currentCaret().moveToBufferPosition(BufferPosition(line - 1, 0))
-    }
     var result: ExecutionResult = ExecutionResult.Success
     if (function.flags.contains(FunctionFlag.ABORT)) {
       for (statement in function.body) {
@@ -139,7 +125,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) :
 
   private fun initializeFunctionVariables(
     arguments: Arguments,
-    range: Range,
+    range: LineRange,
     editor: VimEditor,
     context: ExecutionContext,
     functionCallContext: VimLContext,
@@ -170,8 +156,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) :
       }
       arguments.setVariable("000", remainingArgs, editor, context, function)
     }
-    val lineRange = range.getLineRange(editor, editor.currentCaret())
-    arguments.setVariable("firstline", VimInt(lineRange.startLine1), editor, context, function)
-    arguments.setVariable("lastline", VimInt(lineRange.endLine1), editor, context, function)
+    arguments.setVariable("firstline", VimInt(range.startLine1), editor, context, function)
+    arguments.setVariable("lastline", VimInt(range.endLine1), editor, context, function)
   }
 }
