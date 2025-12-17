@@ -18,6 +18,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
+import com.maddyhome.idea.vim.vimscript.model.expressions.format
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
@@ -135,8 +136,6 @@ class VimFuncref(
    * this method will throw E725. Note that accessing a dictionary entry (e.g. `dict.func`) that is a function will
    * evaluate it to a partially applied Funcref.
    *
-   * @param name The name of the function about to be executed. This is used for output purposes, so might not match
-   *             the name of the Funcref's handler
    * @param args The arguments to pass to the function. If the function is a partial function, any existing arguments
    *             will be prepended to these arguments.
    * @param range The range to run the function over. If not provided, the current line is used
@@ -146,7 +145,6 @@ class VimFuncref(
    * @return The result of executing the function
    */
   fun execute(
-    name: String,
     args: List<Expression>,
     range: Range?,
     editor: VimEditor,
@@ -155,7 +153,7 @@ class VimFuncref(
   ): VimDataType {
     if (handler is DefinedFunctionHandler && handler.function.flags.contains(FunctionFlag.DICT)) {
       if (dictionary == null) {
-        throw exExceptionMessage("E725", name)
+        throw exExceptionMessage("E725", handler.scope.format(handler.name))
       } else {
         injector.variableService.storeVariable(
           VariableExpression(Scope.LOCAL_VARIABLE, "self"),
@@ -169,13 +167,13 @@ class VimFuncref(
 
     val allArguments = listOf(this.arguments.values.map { SimpleExpression(it) }, args).flatten()
     if (handler is DefinedFunctionHandler && handler.function.isDeleted) {
-      throw exExceptionMessage("E933", handler.name)
+      throw exExceptionMessage("E933", handler.scope.format(handler.name))
     }
     val handler = when (type) {
       Type.LAMBDA, Type.FUNCREF -> this.handler
       Type.FUNCTION -> {
         injector.functionService.getFunctionHandlerOrNull(handler.scope, handler.name, vimContext)
-          ?: throw exExceptionMessage("E117", handler.name)
+          ?: throw exExceptionMessage("E117", handler.scope.format(handler.name))
       }
     }
     return handler.executeFunction(allArguments, range, editor, context, vimContext)

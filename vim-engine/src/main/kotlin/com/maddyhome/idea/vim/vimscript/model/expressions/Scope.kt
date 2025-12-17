@@ -20,13 +20,22 @@ enum class Scope(val c: String) {
   VIM_VARIABLE("v"),
   ;
 
+
   companion object {
-    fun getByValue(s: String): Scope? {
-      return entries.firstOrNull { it.c == s }
+    fun getByValue(s: String) = entries.firstOrNull { it.c == s }
+
+    fun split(scopedName: String): Pair<Scope?, String> {
+      val colonIndex = scopedName.indexOf(":")
+      if (colonIndex == -1) {
+        return Pair(null, scopedName)
+      }
+      val scopeString = scopedName.substring(0, colonIndex)
+      val nameString = scopedName.substring(colonIndex + 1)
+      return Pair(getByValue(scopeString), nameString)
     }
   }
 
-  override fun toString(): String {
-    return "$c:"
-  }
+  override fun toString() = "$c:"
 }
+
+fun Scope?.format(name: String) = if (this != null) this.toString() + name else name
