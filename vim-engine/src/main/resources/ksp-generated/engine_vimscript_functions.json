@@ -26,6 +26,7 @@
     "float2nr": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.Float2NrFunctionHandler",
     "floor": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.FloorFunctionHandler",
     "fmod": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.FmodFunctionHandler",
+    "foreach": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.ForEachFunctionHandler",
     "funcref": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.varFunctions.FuncrefFunctionHandler",
     "function": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.varFunctions.FunctionFunctionHandler",
     "get": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.GetFunctionHandler",

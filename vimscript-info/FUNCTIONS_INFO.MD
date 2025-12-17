@@ -101,7 +101,7 @@ See `:help list-functions`.
 |        | `filter()`     | remove selected items from a List                             |
 |        | `map()`        | change each List item                                         |
 |        | `mapnew()`     | make a new List with changed items                            |
-|        | `foreach()`    | apply function to List items                                  |
+| ✅      | `foreach()`    | apply function to List items                                  |
 |        | `reduce()`     | reduce a List to a value                                      |
 | ✅      | `slice()`      | take a slice of a List                                        |
 |        | `sort()`       | sort a List                                                   |
@@ -138,7 +138,7 @@ See `:help dict-functions`.
 |        | `filter()`    | remove selected entries from a Dictionary     |
 |        | `map()`       | change each Dictionary entry                  |
 |        | `mapnew()`    | make a new Dictionary with changed items      |
-|        | `foreach()`   | apply function to Dictionary items            |
+| ✅      | `foreach()`   | apply function to Dictionary items            |
 | ✅      | `keys()`      | get List of Dictionary keys                   |
 | ✅      | `values()`    | get List of Dictionary values                 |
 | ✅      | `items()`     | get List of Dictionary key-value pairs        |
