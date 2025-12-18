@@ -47,6 +47,8 @@
     "line": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.cursorFunctions.LineFunctionHandler",
     "log": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.LogFunctionHandler",
     "log10": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.Log10FunctionHandler",
+    "map": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.MapFunctionHandler",
+    "mapnew": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.MapNewFunctionHandler",
     "max": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.MaxFunctionHandler",
     "min": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.MinFunctionHandler",
     "nr2char": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.stringFunctions.Nr2charFunctionHandler",

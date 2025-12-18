@@ -99,8 +99,8 @@ See `:help list-functions`.
 | ✅      | `copy()`       | make a shallow copy of a List                                 |
 | ✅      | `deepcopy()`   | make a full copy of a List                                    |
 |        | `filter()`     | remove selected items from a List                             |
-|        | `map()`        | change each List item                                         |
-|        | `mapnew()`     | make a new List with changed items                            |
+| ✅      | `map()`        | change each List item                                         |
+| ✅      | `mapnew()`     | make a new List with changed items                            |
 | ✅      | `foreach()`    | apply function to List items                                  |
 |        | `reduce()`     | reduce a List to a value                                      |
 | ✅      | `slice()`      | take a slice of a List                                        |
@@ -136,8 +136,8 @@ See `:help dict-functions`.
 | ✅      | `extend()`    | add entries from one Dictionary to another    |
 | ✅      | `extendnew()` | make a new Dictionary and append items        |
 |        | `filter()`    | remove selected entries from a Dictionary     |
-|        | `map()`       | change each Dictionary entry                  |
-|        | `mapnew()`    | make a new Dictionary with changed items      |
+| ✅      | `map()`       | change each Dictionary entry                  |
+| ✅      | `mapnew()`    | make a new Dictionary with changed items      |
 | ✅      | `foreach()`   | apply function to Dictionary items            |
 | ✅      | `keys()`      | get List of Dictionary keys                   |
 | ✅      | `values()`    | get List of Dictionary values                 |
