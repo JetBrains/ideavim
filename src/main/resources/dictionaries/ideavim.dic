@@ -177,6 +177,7 @@ getcmdtype
 getline
 getreg
 getregtype
+indexof
 isinf
 tolower
 toupper

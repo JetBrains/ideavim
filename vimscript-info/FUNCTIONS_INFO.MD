@@ -113,7 +113,7 @@ See `:help list-functions`.
 | ✅      | `string()`     | String representation of a List                               |
 | ✅      | `call()`       | call a function with List as arguments                        |
 | ✅      | `index()`      | index of a value in a List or Blob                            |
-|        | `indexof()`    | index in a List or Blob where an expression evaluates to true |
+| ✅      | `indexof()`    | index in a List or Blob where an expression evaluates to true |
 | ✅      | `max()`        | maximum value in a List                                       |
 | ✅      | `min()`        | minimum value in a List                                       |
 | ✅      | `count()`      | count number of times a value appears in a List               |
