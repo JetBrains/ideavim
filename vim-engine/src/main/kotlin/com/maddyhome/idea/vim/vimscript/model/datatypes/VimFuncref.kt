@@ -60,7 +60,7 @@ class VimFuncref(
   val arguments: VimList,
   val dictionary: VimDictionary?,
   val type: Type,
-  val isImplicitPartial: Boolean
+  val isImplicitPartial: Boolean = false
 ) : VimDataType("funcref") {
   companion object {
     var lambdaCounter: Int = 1
@@ -69,6 +69,11 @@ class VimFuncref(
 
   val isPartial: Boolean
     get() = arguments.values.isNotEmpty() || dictionary != null
+
+  /**
+   * Partially apply the given to Dictionary to the Funcref
+   */
+  fun apply(dictionary: VimDictionary) = VimFuncref(handler, arguments, dictionary, type, isImplicitPartial)
 
   override fun toVimFloat(): VimFloat {
     throw exExceptionMessage("E891")

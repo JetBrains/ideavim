@@ -111,7 +111,7 @@ See `:help list-functions`.
 | ✅      | `join()`       | join List items into a String                                 |
 | ✅      | `range()`      | return a List with a sequence of numbers                      |
 | ✅      | `string()`     | String representation of a List                               |
-|        | `call()`       | call a function with List as arguments                        |
+| ✅      | `call()`       | call a function with List as arguments                        |
 | ✅      | `index()`      | index of a value in a List or Blob                            |
 |        | `indexof()`    | index in a List or Blob where an expression evaluates to true |
 | ✅      | `max()`        | maximum value in a List                                       |
