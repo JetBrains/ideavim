@@ -35,6 +35,7 @@
     "getline": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.textFunctions.GetLineFunctionHandler",
     "has_key": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.dictionaryFunctions.HasKeyFunctionHandler",
     "index": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.listFunctions.IndexFunctionHandler",
+    "indexof": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.listFunctions.IndexOfFunctionHandler",
     "insert": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.listFunctions.InsertFunctionHandler",
     "invert": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.bitwiseFunctions.InvertFunctionHandler",
     "isinf": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.IsInfFunctionHandler",
