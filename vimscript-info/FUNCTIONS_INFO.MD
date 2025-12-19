@@ -102,7 +102,7 @@ See `:help list-functions`.
 | ✅      | `map()`        | change each List item                                         |
 | ✅      | `mapnew()`     | make a new List with changed items                            |
 | ✅      | `foreach()`    | apply function to List items                                  |
-|        | `reduce()`     | reduce a List to a value                                      |
+| ✅      | `reduce()`     | reduce a List to a value                                      |
 | ✅      | `slice()`      | take a slice of a List                                        |
 |        | `sort()`       | sort a List                                                   |
 | ✅      | `reverse()`    | reverse the order of items in a List                          |
