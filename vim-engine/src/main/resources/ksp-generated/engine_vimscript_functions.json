@@ -55,6 +55,7 @@
     "or": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.bitwiseFunctions.OrFunctionHandler",
     "pow": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.PowFunctionHandler",
     "range": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.listFunctions.RangeFunctionHandler",
+    "reduce": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.ReduceFunctionHandler",
     "remove": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.RemoveFunctionHandler",
     "repeat": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.RepeatFunctionHandler",
     "reverse": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.ReverseFunctionHandler",
