@@ -30,17 +30,93 @@ import com.maddyhome.idea.vim.vimscript.model.variables.ValueVariable
 
 @VimscriptFunction("map")
 internal class MapFunctionHandler : MapFunctionHandlerBase() {
-  override fun getTargetList(expr1: VimList) = expr1
-  override fun getTargetDictionary(expr1: VimDictionary) = expr1
+  override fun <T : VimDataType> getSource(expr1: T) = expr1
+  override fun <T : VimDataType> getTarget(expr1: T) = expr1
 }
 
 @VimscriptFunction("mapnew")
 internal class MapNewFunctionHandler : MapFunctionHandlerBase() {
-  override fun getTargetList(expr1: VimList): VimList = expr1.copy()
-  override fun getTargetDictionary(expr1: VimDictionary): VimDictionary = expr1.copy()
+  override fun <T : VimDataType> getSource(expr1: T) = expr1
+  override fun <T : VimDataType> getTarget(expr1: T): T {
+    @Suppress("UNCHECKED_CAST")
+    return expr1.copy() as T
+  }
 }
 
-internal abstract class MapFunctionHandlerBase : BinaryFunctionHandler<VimDataType>() {
+internal abstract class MapFunctionHandlerBase : MapFilterFunctionHandlerBase() {
+  override fun processItem(
+    key: VimDataType,
+    value: VimDataType,
+    funcref: VimFuncref?,
+    expression: Expression?,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext,
+  ): VimDataType {
+    try {
+      KeyVariable.key = key
+      ValueVariable.value = value
+
+      return funcref?.execute(
+        listOf(SimpleExpression(key), SimpleExpression(value)),
+        range = null,
+        editor,
+        context,
+        vimContext
+      )
+        ?: expression?.evaluate(editor, context, vimContext)
+        ?: error("Funcref and expression should not both be null")
+    }
+    finally {
+      KeyVariable.key = null
+      ValueVariable.value = null
+    }
+  }
+}
+
+@VimscriptFunction("filter")
+internal class FilterFunctionHandler : MapFilterFunctionHandlerBase() {
+  override fun <T : VimDataType> getSource(expr1: T): T {
+    // Return a copy of the source expression, so we can safely modify source while iterating over the copy
+    @Suppress("UNCHECKED_CAST")
+    return expr1.copy() as T
+  }
+
+  override fun <T : VimDataType> getTarget(expr1: T) = expr1
+
+  override fun processItem(
+    key: VimDataType,
+    value: VimDataType,
+    funcref: VimFuncref?,
+    expression: Expression?,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext,
+  ): VimDataType? {
+    try {
+      KeyVariable.key = key
+      ValueVariable.value = value
+
+      val result = funcref?.execute(
+        listOf(SimpleExpression(key), SimpleExpression(value)),
+        range = null,
+        editor,
+        context,
+        vimContext
+      )
+        ?: expression?.evaluate(editor, context, vimContext)
+        ?: error("Funcref and expression should not both be null")
+
+      return if (result.toVimNumber().booleanValue) value else null
+    }
+    finally {
+      KeyVariable.key = null
+      ValueVariable.value = null
+    }
+  }
+}
+
+internal abstract class MapFilterFunctionHandlerBase : BinaryFunctionHandler<VimDataType>() {
   override fun doFunction(
     arguments: Arguments,
     editor: VimEditor,
@@ -73,34 +149,48 @@ internal abstract class MapFunctionHandlerBase : BinaryFunctionHandler<VimDataTy
 
     when (expr1) {
       is VimList -> {
-        val target = getTargetList(expr1)
+        val source = getSource(expr1)
+        val target = getTarget(expr1)
         if (target.isLocked) {
           throw exExceptionMessage("E741", "${name}() argument")
         }
 
-        for ((index, value) in expr1.values.withIndex()) {
-          val result = mapItem(VimInt(index), value, funcref, expression, editor, context, vimContext)
-          if (target.values.size > index && target.values[index].isLocked) {
-            throw exExceptionMessage("E741", "${name}() argument")
+        var writeIndex = 0
+        for ((index, value) in source.values.withIndex()) {
+          val result = processItem(VimInt(index), value, funcref, expression, editor, context, vimContext)
+          if (result != null) {
+            if (target.values.size > index && target.values[index].isLocked) {
+              throw exExceptionMessage("E741", "${name}() argument")
+            }
+            target.values[writeIndex++] = result
           }
-          target.values[index] = result
+          else {
+            // TODO: Validate index values
+            target.values.removeAt(writeIndex)
+          }
         }
 
         return target
       }
 
       is VimDictionary -> {
-        val target = getTargetDictionary(expr1)
+        val source = getSource(expr1)
+        val target = getTarget(expr1)
         if (target.isLocked) {
           throw exExceptionMessage("E741", "${name}() argument")
         }
 
-        for ((k, v) in expr1.dictionary.entries) {
-          val result = mapItem(k, v, funcref, expression, editor, context, vimContext)
-          if (target.dictionary[k]?.isLocked == true) {
-            throw exExceptionMessage("E741", "${name}() argument")
+        for ((k, v) in source.dictionary.entries) {
+          val result = processItem(k, v, funcref, expression, editor, context, vimContext)
+          if (result != null) {
+            if (target.dictionary[k]?.isLocked == true) {
+              throw exExceptionMessage("E741", "${name}() argument")
+            }
+            target.dictionary[k] = result
           }
-          target.dictionary[k] = result
+          else {
+            target.dictionary.remove(k)
+          }
         }
 
         return target
@@ -108,13 +198,16 @@ internal abstract class MapFunctionHandlerBase : BinaryFunctionHandler<VimDataTy
 
       is VimString -> {
         val string = buildString {
+          // We don't need to use getSource here - we'll never modify expr1
           for ((index, ch) in expr1.value.withIndex()) {
             val result =
-              mapItem(VimInt(index), VimString(ch.toString()), funcref, expression, editor, context, vimContext)
-            if (result !is VimString) {
-              throw exExceptionMessage("E928")
+              processItem(VimInt(index), VimString(ch.toString()), funcref, expression, editor, context, vimContext)
+            if (result != null) {
+              if (result !is VimString) {
+                throw exExceptionMessage("E928")
+              }
+              append(result.value)
             }
-            append(result.value)
           }
         }
 
@@ -126,7 +219,7 @@ internal abstract class MapFunctionHandlerBase : BinaryFunctionHandler<VimDataTy
     }
   }
 
-  private fun mapItem(
+  protected abstract fun processItem(
     key: VimDataType,
     value: VimDataType,
     funcref: VimFuncref?,
@@ -134,27 +227,8 @@ internal abstract class MapFunctionHandlerBase : BinaryFunctionHandler<VimDataTy
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
-  ): VimDataType {
-    try {
-      KeyVariable.key = key
-      ValueVariable.value = value
+  ) : VimDataType?
 
-      return funcref?.execute(
-        listOf(SimpleExpression(key), SimpleExpression(value)),
-        range = null,
-        editor,
-        context,
-        vimContext
-      )
-        ?: expression?.evaluate(editor, context, vimContext)
-        ?: error("Funcref and expression should not both be null")
-    }
-    finally {
-      KeyVariable.key = null
-      ValueVariable.value = null
-    }
-  }
-
-  abstract fun getTargetList(expr1: VimList): VimList
-  abstract fun getTargetDictionary(expr1: VimDictionary): VimDictionary
+  abstract fun <T : VimDataType> getSource(expr1: T): T
+  abstract fun <T : VimDataType> getTarget(expr1: T): T
 }

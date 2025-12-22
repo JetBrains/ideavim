@@ -22,6 +22,7 @@
     "exp": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.ExpFunctionHandler",
     "extend": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.ExtendFunctionHandler",
     "extendnew": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.ExtendNewFunctionHandler",
+    "filter": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.FilterFunctionHandler",
     "flatten": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.listFunctions.FlattenFunctionHandler",
     "flattennew": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.listFunctions.FlattenNewFunctionHandler",
     "float2nr": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.Float2NrFunctionHandler",
