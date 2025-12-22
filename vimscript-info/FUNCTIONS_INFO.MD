@@ -98,7 +98,7 @@ See `:help list-functions`.
 | ✅      | `remove()`     | remove one or more items from a List                          |
 | ✅      | `copy()`       | make a shallow copy of a List                                 |
 | ✅      | `deepcopy()`   | make a full copy of a List                                    |
-|        | `filter()`     | remove selected items from a List                             |
+| ✅      | `filter()`     | remove selected items from a List                             |
 | ✅      | `map()`        | change each List item                                         |
 | ✅      | `mapnew()`     | make a new List with changed items                            |
 | ✅      | `foreach()`    | apply function to List items                                  |
@@ -135,7 +135,7 @@ See `:help dict-functions`.
 | ✅      | `remove()`    | remove an entry from a Dictionary             |
 | ✅      | `extend()`    | add entries from one Dictionary to another    |
 | ✅      | `extendnew()` | make a new Dictionary and append items        |
-|        | `filter()`    | remove selected entries from a Dictionary     |
+| ✅      | `filter()`    | remove selected entries from a Dictionary     |
 | ✅      | `map()`       | change each Dictionary entry                  |
 | ✅      | `mapnew()`    | make a new Dictionary with changed items      |
 | ✅      | `foreach()`   | apply function to Dictionary items            |
