@@ -4,34 +4,6 @@ IdeaVim is an open source project created by 130+ contributors. Would you like t
 
 This page is created to help you start contributing. And who knows, maybe in a few days this project will be brighter than ever!
 
-# Awards for Quality Contributions
-
-In February 2025, we’re starting a program to award one-year All Products Pack subscriptions to the implementers of quality contributions to the IdeaVim project. The program will continue for all of 2025 and may be prolonged.
-
-Subscriptions can be awarded for merged pull requests that meet the following requirements:
-
-
-- The change should be non-trivial, though there might be exceptions — for example, where a trivial fix requires a complicated investigation.
-- The change should fully implement a feature or fix the root cause of a bug. Workarounds or hacks are not accepted.
-- If applicable, the change should be properly covered with unit tests.
-- The work should be performed by the contributor, though the IdeaVim team is happy to review it and give feedback.
-- The change should fix an issue or implement a feature filed by another user. If you want to file an issue and provide a solution to it, your request for a license should be explicitly discussed with the IdeaVim team in the ticket comments.
-
-
-We'd like to make sure this award program is helpful and fair. Since we just started it and still fine-tuning the details, the final say on giving licenses remains with the IdeaVim team and the requirements might evolve over time.
-
-
-Also, a few notes:
-
-
-- If you have any doubts about whether your change or fix is eligible for the award, get in touch with us in the comments on YouTrack or in any other way.
-- Please mention this program in the pull request text. This is not an absolute requirement, but it will help ensure we know you would like to be considered for an award, but this is not required.
-- During 2025, a single person may only receive a single subscription. Even if you make multiple contributions, you will not be eligible for multiple awards.
-- Any delays caused by the IdeaVim team will not affect eligibility for an award if the other requirements are met.
-- Draft pull requests will not be reviewed unless explicitly requested.
-- Tickets with the [ideavim-bounty](https://youtrack.jetbrains.com/issues?q=tag:%20%7BIdeaVim-bounty%7D) tag are good candidates for this award.
-
-
 ## Before you begin
 
 - The project is primarily written in Kotlin with a few Java files. When contributing to the project, use Kotlin unless

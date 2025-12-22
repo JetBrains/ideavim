@@ -300,9 +300,6 @@ intellijPlatform {
     name = "IdeaVim"
     changeNotes.set(
       """
-        We’ve launched a program to reward quality contributions with a one-year All Products Pack subscription. Learn more at: <a href="https://github.com/JetBrains/ideavim/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a> .
-        <br/>
-        <br/>
         <a href="https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20Fix%20versions:%20${version.get()}">Changelog</a>
         """.trimIndent()
     )
