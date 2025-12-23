@@ -80,4 +80,19 @@ class LenFunctionTest : VimTestCase() {
     enterCommand("echo len(4.2)")
     assertPluginErrorMessage("E701: Invalid type for len()")
   }
+
+  @Test
+  fun `test len with blob causes error`() {
+    enterCommand("echo len(0z)")
+    assertPluginError(true)
+  }
+
+  @Test
+  fun `test len with multibyte characters`() {
+    // Note: In real Vim, len() returns byte count, but IdeaVim returns character count
+    // This test documents the current behavior
+    assertCommandOutput("echo len('日本')", "2")
+    assertCommandOutput("echo len('hello世界')", "7")
+    assertCommandOutput("echo len('🎉')", "1")
+  }
 }
