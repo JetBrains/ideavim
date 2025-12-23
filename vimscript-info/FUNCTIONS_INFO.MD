@@ -104,7 +104,7 @@ See `:help list-functions`.
 | ✅      | `foreach()`    | apply function to List items                                  |
 | ✅      | `reduce()`     | reduce a List to a value                                      |
 | ✅      | `slice()`      | take a slice of a List                                        |
-|        | `sort()`       | sort a List                                                   |
+| ✅      | `sort()`       | sort a List                                                   |
 | ✅      | `reverse()`    | reverse the order of items in a List                          |
 |        | `uniq()`       | remove copies of repeated adjacent items                      |
 | ✅      | `split()`      | split a String into a List                                    |
