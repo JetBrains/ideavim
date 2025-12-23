@@ -36,6 +36,11 @@ object ReleaseEap : IdeaVimBuildType({
       "credentialsJSON:2479995b-7b60-4fbb-b095-f0bafae7f622",
       display = ParameterDisplay.HIDDEN
     )
+    password(
+      "env.ANTHROPIC_API_KEY",
+      "credentialsJSON:712a6516-4f43-41dc-b9e9-e32b1453dde8",
+      label = "Anthropic API Key"
+    )
   }
 
   vcs {
@@ -91,6 +96,42 @@ object ReleaseEap : IdeaVimBuildType({
       name = "YouTrack post release actions"
       tasks = "scripts:eapReleaseActions"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
+    }
+    script {
+      name = "Slack Notification"
+      scriptContent = """
+        # Install Claude Code CLI if not present
+        if ! command -v claude &> /dev/null; then
+          echo "Installing Claude Code CLI..."
+          npm install -g @anthropic-ai/claude-code
+        fi
+
+        claude -p "$(cat <<'PROMPT'
+        Send a Slack notification for IdeaVim EAP release to the internal team.
+
+        TASK:
+        1. Read CHANGES.md and extract the changelog. For EAP releases, include the "To Be Released" or "Unreleased" section if present, as EAP versions contain upcoming changes.
+        2. Generate a valid Slack Block Kit JSON message for IdeaVim EAP version %build.number%
+        3. Send it to the Slack webhook URL stored in env var ORG_GRADLE_PROJECT_slackUrl
+        4. If Slack returns an error, analyze the error and fix the JSON, then retry (max 3 attempts)
+
+        TONE AND STYLE:
+        - This is an internal team notification, use a calm, professional tone
+        - No excitement, no emojis, no celebratory language
+        - Simple factual announcement: "IdeaVim EAP %build.number% has been released"
+        - List key changes briefly
+
+        SLACK MESSAGE FORMAT:
+        - Valid JSON: { "text": "...", "blocks": [...] }
+        - Use Slack mrkdwn: *bold*, _italic_, <url|text> for links
+        - Keep it concise and informative
+
+        Use the Bash tool with curl to POST the JSON to the webhook URL.
+        The webhook URL is available in the ORG_GRADLE_PROJECT_slackUrl environment variable.
+        Report success or failure at the end.
+        PROMPT
+        )"
+      """.trimIndent()
     }
   }
 
