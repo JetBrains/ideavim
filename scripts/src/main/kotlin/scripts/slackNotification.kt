@@ -113,7 +113,7 @@ fun main(args: Array<String>) {
   val changesFile = args.getOrNull(2) ?: error("Changes file path not provided")
   val dryRun = args.getOrNull(3)?.toBoolean() ?: false
 
-  if (version.last() != '0') {
+  if (!dryRun && version.last() != '0') {
     println("Skipping Slack notification for non-release version: $version")
     return
   }
