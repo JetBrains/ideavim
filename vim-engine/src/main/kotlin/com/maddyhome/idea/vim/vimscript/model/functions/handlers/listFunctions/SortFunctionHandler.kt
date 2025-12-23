@@ -28,7 +28,28 @@ import com.maddyhome.idea.vim.vimscript.model.functions.BuiltinFunctionHandler
 import java.text.Collator
 
 @VimscriptFunction(name = "sort")
-internal class SortFunctionHandler : BuiltinFunctionHandler<VimList>(minArity = 1, maxArity = 3) {
+internal class SortFunctionHandler : SortUniqFunctionHandlerBase() {
+  override fun processList(list: VimList, comparator: Comparator<in VimDataType>) {
+    list.values.sortWith(comparator)
+  }
+}
+
+@VimscriptFunction(name = "uniq")
+internal class UniqFunctionHandler : SortUniqFunctionHandlerBase() {
+  override fun processList(list: VimList, comparator: Comparator<in VimDataType>) {
+    var last: VimDataType? = null
+    val iterator = list.values.iterator()
+    while (iterator.hasNext()) {
+      val next = iterator.next()
+      if (last != null && comparator.compare(last, next) == 0) {
+        iterator.remove()
+      }
+      last = next
+    }
+  }
+}
+
+internal abstract class SortUniqFunctionHandlerBase : BuiltinFunctionHandler<VimList>(minArity = 1, maxArity = 3) {
   override fun doFunction(
     arguments: Arguments,
     editor: VimEditor,
@@ -37,11 +58,11 @@ internal class SortFunctionHandler : BuiltinFunctionHandler<VimList>(minArity = 
   ): VimList {
     val list = arguments[0]
     if (list !is VimList) {
-      throw exExceptionMessage("E686", "sort()")
+      throw exExceptionMessage("E686", "${name}()")
     }
 
     if (list.isLocked) {
-      throw exExceptionMessage("E741", "sort() argument")
+      throw exExceptionMessage("E741", "${name}() argument")
     }
 
     val how = arguments.getOrNull(1)?.let { it as? VimFuncref ?: it.toVimString() }
@@ -110,7 +131,7 @@ internal class SortFunctionHandler : BuiltinFunctionHandler<VimList>(minArity = 
       else -> throw exExceptionMessage("E474")
     }
 
-    list.values.sortWith(comparator)
+    processList(list, comparator)
     return list
   }
 
@@ -144,4 +165,6 @@ internal class SortFunctionHandler : BuiltinFunctionHandler<VimList>(minArity = 
     is VimInt -> toVimNumber().value.toDouble()
     else -> 0.0
   }
+
+  protected abstract fun processList(list: VimList, comparator: Comparator<in VimDataType>)
 }

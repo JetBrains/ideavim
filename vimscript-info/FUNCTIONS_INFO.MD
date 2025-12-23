@@ -106,7 +106,7 @@ See `:help list-functions`.
 | ✅      | `slice()`      | take a slice of a List                                        |
 | ✅      | `sort()`       | sort a List                                                   |
 | ✅      | `reverse()`    | reverse the order of items in a List                          |
-|        | `uniq()`       | remove copies of repeated adjacent items                      |
+| ✅      | `uniq()`       | remove copies of repeated adjacent items                      |
 | ✅      | `split()`      | split a String into a List                                    |
 | ✅      | `join()`       | join List items into a String                                 |
 | ✅      | `range()`      | return a List with a sequence of numbers                      |

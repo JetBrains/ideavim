@@ -75,6 +75,7 @@
     "toupper": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.stringFunctions.ToupperFunctionHandler",
     "trim": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.stringFunctions.TrimFunctionHandler",
     "trunc": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.TruncFunctionHandler",
+    "uniq": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.listFunctions.UniqFunctionHandler",
     "values": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.dictionaryFunctions.ValuesFunctionHandler",
     "xor": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.bitwiseFunctions.XorFunctionHandler"
 }
