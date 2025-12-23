@@ -155,7 +155,7 @@ object ReleaseEap : IdeaVimBuildType({
   }
 
   requirements {
-    equals("teamcity.agent.hardware.cpuCount", AgentSize.MEDIUM)
+    equals("teamcity.agent.hardware.cpuCount", AgentSize.XLARGE)
     equals("teamcity.agent.os.family", "Linux")
   }
 })
