@@ -107,7 +107,7 @@ object ReleaseEap : IdeaVimBuildType({
           npm install -g @anthropic-ai/claude-code
         fi
 
-        claude -p "$(cat <<'PROMPT'
+        claude -p --allowedTools "Bash(curl:*)" "$(cat <<'PROMPT'
         Send a Slack notification for IdeaVim EAP release to the internal team.
 
         TASK:

@@ -169,7 +169,7 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
           npm install -g @anthropic-ai/claude-code
         fi
 
-        claude -p "$(cat <<'PROMPT'
+        claude -p --allowedTools "Bash(curl:*)" "$(cat <<'PROMPT'
         Send a Slack notification for IdeaVim release to the internal team.
 
         TASK:
