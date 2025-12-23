@@ -20,7 +20,7 @@ import java.io.File
  * Calls Claude Code CLI with the given prompt and returns the output.
  */
 fun callClaudeCode(prompt: String): String {
-  val process = ProcessBuilder("claude", "--print", "-p", prompt)
+  val process = ProcessBuilder("claude", "-p", prompt)
     .redirectErrorStream(true)
     .start()
 
