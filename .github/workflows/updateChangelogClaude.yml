@@ -34,7 +34,7 @@ jobs:
             
             You need to review the latest commits and maintain the changelog file (CHANGES.md) with meaningful changes.
             
-            Please follow the detailed changelog maintenance instructions in `.claude/changelog-instructions.md`.
+            Use the changelog skill to load the detailed changelog maintenance instructions.
             
             If you find changes that need documenting, update CHANGES.md and create a pull request with:
             - Title: "Update changelog: <super short summary>"
