@@ -35,7 +35,23 @@ object SlackNotificationTest : IdeaVimBuildType({
     script {
       name = "Test Slack Notification (dry run)"
       scriptContent = """
-        ./gradlew slackNotificationTest
+        claude -p "$(cat <<'PROMPT'
+        You need to generate a Slack notification message for IdeaVim release.
+
+        TASK:
+        1. Read CHANGES.md and extract the latest version section (first ## header that is not "Unreleased")
+        2. Generate a valid Slack Block Kit JSON message announcing the release
+        3. This is a DRY RUN - just print the generated JSON, do not send it
+
+        SLACK MESSAGE RULES:
+        - Output valid JSON with structure: { "text": "...", "blocks": [...] }
+        - Use Slack mrkdwn format: *bold*, _italic_, <url|text> for links
+        - Keep it concise - summarize if changelog is long
+        - Include version number in the announcement
+
+        Print the generated JSON message.
+        PROMPT
+        )"
       """.trimIndent()
     }
   }

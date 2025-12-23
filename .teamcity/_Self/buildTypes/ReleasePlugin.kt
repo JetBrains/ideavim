@@ -154,10 +154,36 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       gradleParams = "--no-configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
-//    gradle {
-//      name = "Slack Notification"
-//      tasks = "slackNotification"
-//    }
+    script {
+      name = "Slack Notification"
+      scriptContent = """
+        # Install Claude Code CLI if not present
+        if ! command -v claude &> /dev/null; then
+          echo "Installing Claude Code CLI..."
+          npm install -g @anthropic-ai/claude-code
+        fi
+
+        claude -p "$(cat <<'PROMPT'
+        You need to send a Slack notification for IdeaVim release.
+
+        TASK:
+        1. Read CHANGES.md and extract the latest version section (first ## header that is not "Unreleased")
+        2. Generate a valid Slack Block Kit JSON message announcing IdeaVim version %build.number%
+        3. Send it to the Slack webhook URL stored in env var ORG_GRADLE_PROJECT_slackUrl
+        4. If Slack returns an error, analyze the error and fix the JSON, then retry (max 3 attempts)
+
+        SLACK MESSAGE RULES:
+        - Valid JSON structure: { "text": "...", "blocks": [...] }
+        - Use Slack mrkdwn: *bold*, _italic_, <url|text> for links
+        - Keep it concise
+
+        Use the Bash tool with curl to POST the JSON to the webhook URL.
+        The webhook URL is available in the ORG_GRADLE_PROJECT_slackUrl environment variable.
+        Report success or failure at the end.
+        PROMPT
+        )"
+      """.trimIndent()
+    }
   }
 
   features {
