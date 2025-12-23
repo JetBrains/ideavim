@@ -38,6 +38,12 @@ object Project : Project({
   buildType(Compatibility)
 })
 
+// Agent size configurations (CPU count)
+object AgentSize {
+  const val MEDIUM = "4"
+  const val XLARGE = "16"
+}
+
 // Common build type for all configurations
 abstract class IdeaVimBuildType(init: BuildType.() -> Unit) : BuildType({
   artifactRules = """
@@ -51,10 +57,9 @@ abstract class IdeaVimBuildType(init: BuildType.() -> Unit) : BuildType({
   init()
 
   requirements {
-    // These requirements define Linux-Medium configuration.
     // Unfortunately, requirement by name (teamcity.agent.name) doesn't work
     //   IDK the reason for it, but on our agents this property is empty
-    equals("teamcity.agent.hardware.cpuCount", "16")
+    equals("teamcity.agent.hardware.cpuCount", AgentSize.MEDIUM)
     equals("teamcity.agent.os.family", "Linux")
   }
 
