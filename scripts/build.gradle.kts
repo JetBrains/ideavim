@@ -23,6 +23,9 @@ repositories {
 dependencies {
   compileOnly("org.jetbrains.kotlin:kotlin-stdlib:2.2.21")
 
+  testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+  testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
   implementation("io.ktor:ktor-client-core:3.3.3")
   implementation("io.ktor:ktor-client-cio:3.3.3")
   implementation("io.ktor:ktor-client-content-negotiation:3.3.3")
@@ -185,4 +188,8 @@ tasks.register("integrationsTest", JavaExec::class) {
   classpath = sourceSets["main"].runtimeClasspath
   args = listOf(rootProject.rootDir.toString())
   environment("YOUTRACK_TOKEN", youtrackToken)
+}
+
+tasks.test {
+  useJUnitPlatform()
 }
