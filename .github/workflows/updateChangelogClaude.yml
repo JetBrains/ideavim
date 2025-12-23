@@ -37,6 +37,7 @@ jobs:
           fi
 
       - name: Run Claude Code to Update Changelog
+        id: claude
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
@@ -60,6 +61,7 @@ jobs:
           claude_args: '--allowed-tools "Skill,Read,Edit,Bash(git:*),Bash(gh:*),WebSearch,WebFetch(domain:plugins.jetbrains.com),WebFetch(domain:youtrack.jetbrains.com),WebFetch(domain:github.com)"'
 
       - name: Update workflow-changelog tag
+        if: success()
         run: |
           git tag --delete workflow-changelog 2>/dev/null || true
           git push origin :refs/tags/workflow-changelog 2>/dev/null || true
