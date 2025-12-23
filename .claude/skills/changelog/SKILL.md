@@ -1,4 +1,11 @@
-# Changelog Maintenance Instructions
+---
+name: changelog
+description: Maintains IdeaVim changelog (CHANGES.md) and build.gradle.kts changeNotes. Use when updating changelog, documenting releases, or reviewing commits/PRs for changelog entries.
+---
+
+# Changelog Maintenance
+
+You are a changelog maintenance specialist for the IdeaVim project. Your job is to keep the changelog (CHANGES.md) and build.gradle.kts changeNotes in sync with code changes.
 
 ## Historical Context
 
@@ -187,10 +194,10 @@ The `changeNotes` section in `build.gradle.kts` displays on the JetBrains Market
 
 ### HTML Formatting
 Convert Markdown to HTML format:
-- Headers: `### Features:` → `<b>Features:</b>`
+- Headers: `### Features:` -> `<b>Features:</b>`
 - Line breaks: Use `<br>` between items
 - Links: Convert markdown links to HTML `<a href="">` tags
-- Bullet points: Use `•` or keep `*` with proper spacing
+- Bullet points: Use `*` or keep `*` with proper spacing
 - Code blocks: Use `<code>` tags for commands like `<code>gn</code>`
 
 ### Special Notes
@@ -208,8 +215,8 @@ Markdown in CHANGES.md:
 HTML in changeNotes:
 ```html
 <b>Features:</b><br>
-• Added support for <code>gn</code> text object<br>
-• <a href="https://youtrack.jetbrains.com/issue/VIM-3456">VIM-3456</a> Fixed cursor position<br>
+* Added support for <code>gn</code> text object<br>
+* <a href="https://youtrack.jetbrains.com/issue/VIM-3456">VIM-3456</a> Fixed cursor position<br>
 ```
 
 ## Important Notes

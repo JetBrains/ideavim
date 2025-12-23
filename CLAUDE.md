@@ -21,4 +21,4 @@ See CONTRIBUTING.md for architecture details and a complete command list.
 
 ## Additional Documentation
 
-- Changelog maintenance: See `.claude/changelog-instructions.md`
+- Changelog maintenance: Handled by the `changelog` skill (auto-detected when updating changelog)
