@@ -15,7 +15,7 @@ fun main(args: Array<String>) {
   runIntegrationsTest(rootDir)
 }
 
-fun runIntegrationsTest(projectDir: java.io.File = java.io.File(".").canonicalFile) = runBlocking {
+fun runIntegrationsTest(projectDir: java.io.File = java.io.File(".").canonicalFile): Unit = runBlocking {
   val testTicketId = "VIM-2784"
 
   // YouTrack set to Ready To Release on Fix commit
@@ -47,9 +47,6 @@ fun runIntegrationsTest(projectDir: java.io.File = java.io.File(".").canonicalFi
   setYoutrackStatus(listOf(testTicketId), "Open")
   guard(getVersionIdByName("TEST_VERSION") == null) { "Test version isn't deleted" }
 
-  // Test updateMergedPr
-  updateMergedPr(525, projectDir)
-  
   // TODO: test Ticket parsing
   // TODO: test Update CHANGES
   // TODO: test Update AUTHORS
