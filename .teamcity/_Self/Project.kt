@@ -7,7 +7,6 @@ import _Self.buildTypes.PluginVerifier
 import _Self.buildTypes.PropertyBased
 import _Self.buildTypes.RandomOrderTests
 import _Self.buildTypes.TestingBuildType
-import _Self.buildTypes.YoutrackTest
 import _Self.subprojects.GitHub
 import _Self.subprojects.Releases
 import _Self.vcsRoots.GitHubPullRequest
@@ -36,8 +35,6 @@ object Project : Project({
   buildType(Nvim)
   buildType(PluginVerifier)
   buildType(Compatibility)
-
-  buildType(YoutrackTest)
 })
 
 // Agent size configurations (CPU count)

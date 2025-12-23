@@ -159,14 +159,6 @@ tasks.register("integrationsTest", JavaExec::class) {
   environment("YOUTRACK_TOKEN", youtrackToken)
 }
 
-tasks.register("testYoutrackConnection", JavaExec::class) {
-  group = "verification"
-  description = "Test YouTrack API connection"
-  mainClass.set("scripts.YoutrackConnectionTestKt")
-  classpath = sourceSets["main"].runtimeClasspath
-  environment("YOUTRACK_TOKEN", youtrackToken)
-}
-
 tasks.test {
   useJUnitPlatform()
 }
