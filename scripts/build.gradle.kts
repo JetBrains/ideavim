@@ -136,24 +136,6 @@ tasks.register("updateYoutrackOnCommit", JavaExec::class) {
   environment("YOUTRACK_TOKEN", youtrackToken)
 }
 
-tasks.register("slackNotification", JavaExec::class) {
-  group = "other"
-  mainClass.set("scripts.SlackNotificationKt")
-  classpath = sourceSets["main"].runtimeClasspath
-  val slackUrl = project.findProperty("slackUrl") as String? ?: ""
-  val changesFile = rootProject.file("CHANGES.md").toString()
-  args = listOf(project.version.toString(), slackUrl, changesFile, "false")
-}
-
-tasks.register("slackNotificationTest", JavaExec::class) {
-  group = "other"
-  description = "Test Slack notification - generates message but doesn't send"
-  mainClass.set("scripts.SlackNotificationKt")
-  classpath = sourceSets["main"].runtimeClasspath
-  val changesFile = rootProject.file("CHANGES.md").toString()
-  args = listOf(project.version.toString(), "", changesFile, "true")
-}
-
 tasks.register("updateAuthors", JavaExec::class) {
   group = "other"
   mainClass.set("scripts.UpdateAuthorsKt")

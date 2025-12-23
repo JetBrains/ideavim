@@ -6,7 +6,6 @@ import _Self.buildTypes.ReleaseEap
 import _Self.buildTypes.ReleaseMajor
 import _Self.buildTypes.ReleaseMinor
 import _Self.buildTypes.ReleasePatch
-import _Self.buildTypes.SlackNotificationTest
 import jetbrains.buildServer.configs.kotlin.v2019_2.ParameterDisplay
 import jetbrains.buildServer.configs.kotlin.v2019_2.Project
 
@@ -39,5 +38,4 @@ object Releases : Project({
   buildType(ReleaseEap)
   buildType(ReleaseDev)
   buildType(PublishVimEngine)
-  buildType(SlackNotificationTest)
 })
