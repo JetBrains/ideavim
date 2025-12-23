@@ -175,7 +175,7 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
         TASK:
         1. Read CHANGES.md and extract the latest version section (first ## header that is not "Unreleased")
         2. Generate a valid Slack Block Kit JSON message for IdeaVim version %build.number%
-        3. Send it to the Slack webhook URL stored in env var ORG_GRADLE_PROJECT_slackUrl
+        3. Send it IMMEDIATELY to the Slack webhook URL stored in env var ORG_GRADLE_PROJECT_slackUrl - do NOT ask for confirmation
         4. If Slack returns an error, analyze the error and fix the JSON, then retry (max 3 attempts)
 
         TONE AND STYLE:
