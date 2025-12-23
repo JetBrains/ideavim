@@ -1,5 +1,6 @@
 package _Self.buildTypes
 
+import _Self.AgentSize
 import _Self.Constants.LONG_RUNNING_TESTS
 import _Self.IdeaVimBuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
@@ -43,5 +44,10 @@ object LongRunning : IdeaVimBuildType({
         hour = 5
       }
     }
+  }
+
+  requirements {
+    equals("teamcity.agent.hardware.cpuCount", AgentSize.MEDIUM)
+    equals("teamcity.agent.os.family", "Linux")
   }
 })

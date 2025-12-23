@@ -1,5 +1,6 @@
 package _Self.buildTypes
 
+import _Self.AgentSize
 import _Self.Constants.EAP_CHANNEL
 import _Self.Constants.RELEASE_EAP
 import _Self.IdeaVimBuildType
@@ -154,10 +155,7 @@ object ReleaseEap : IdeaVimBuildType({
   }
 
   requirements {
-    // These requirements define Linux-XLarge configuration.
-    // Unfortunately, requirement by name (teamcity.agent.name) doesn't work
-    //   IDK the reason for it, but on our agents this property is empty
-//    equals("teamcity.agent.hardware.cpuCount", "16")
-//    equals("teamcity.agent.os.family", "Linux")
+    equals("teamcity.agent.hardware.cpuCount", AgentSize.MEDIUM)
+    equals("teamcity.agent.os.family", "Linux")
   }
 })

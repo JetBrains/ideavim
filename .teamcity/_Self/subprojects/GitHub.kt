@@ -1,5 +1,6 @@
 package _Self.subprojects
 
+import _Self.AgentSize
 import _Self.IdeaVimBuildType
 import _Self.vcsRoots.GitHubPullRequest
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
@@ -73,5 +74,10 @@ class GithubBuildType(command: String, desc: String) : IdeaVimBuildType({
       }
       param("github_oauth_user", "AlexPl292")
     }
+  }
+
+  requirements {
+    equals("teamcity.agent.hardware.cpuCount", AgentSize.MEDIUM)
+    equals("teamcity.agent.os.family", "Linux")
   }
 })

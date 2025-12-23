@@ -56,13 +56,6 @@ abstract class IdeaVimBuildType(init: BuildType.() -> Unit) : BuildType({
 
   init()
 
-  requirements {
-    // Unfortunately, requirement by name (teamcity.agent.name) doesn't work
-    //   IDK the reason for it, but on our agents this property is empty
-    equals("teamcity.agent.hardware.cpuCount", AgentSize.MEDIUM)
-    equals("teamcity.agent.os.family", "Linux")
-  }
-
   failureConditions {
     // Disable detection of the java OOM
     javaCrash = false

@@ -1,5 +1,6 @@
 package _Self.buildTypes
 
+import _Self.AgentSize
 import _Self.Constants.PROPERTY_TESTS
 import _Self.IdeaVimBuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
@@ -36,5 +37,10 @@ object PropertyBased : IdeaVimBuildType({
     vcs {
       branchFilter = "+:<default>"
     }
+  }
+
+  requirements {
+    equals("teamcity.agent.hardware.cpuCount", AgentSize.MEDIUM)
+    equals("teamcity.agent.os.family", "Linux")
   }
 })

@@ -8,6 +8,7 @@
 
 package _Self.buildTypes
 
+import _Self.AgentSize
 import _Self.Constants.DEFAULT_CHANNEL
 import _Self.Constants.DEV_CHANNEL
 import _Self.Constants.EAP_CHANNEL
@@ -201,5 +202,10 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
     sshAgent {
       teamcitySshKey = "IdeaVim ssh keys"
     }
+  }
+
+  requirements {
+    equals("teamcity.agent.hardware.cpuCount", AgentSize.MEDIUM)
+    equals("teamcity.agent.os.family", "Linux")
   }
 })
