@@ -64,6 +64,7 @@
     "sin": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.SinFunctionHandler",
     "sinh": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.SinhFunctionHandler",
     "slice": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.SliceFunctionHandler",
+    "sort": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.listFunctions.SortFunctionHandler",
     "split": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.listFunctions.SplitFunctionHandler",
     "sqrt": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.SqrtFunctionHandler",
     "string": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.StringFunctionHandler",
