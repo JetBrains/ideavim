@@ -37,9 +37,6 @@ dependencies {
   implementation("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:7.4.0.202509020913-r")
   implementation("com.vdurmont:semver4j:3.1.0")
   
-  // For SlackNotification
-  implementation("com.github.AlexPl292:mark-down-to-slack:1.1.2")
-  
   // For updateAuthors
   implementation("org.kohsuke:github-api:1.305")
 }
@@ -145,7 +142,16 @@ tasks.register("slackNotification", JavaExec::class) {
   classpath = sourceSets["main"].runtimeClasspath
   val slackUrl = project.findProperty("slackUrl") as String? ?: ""
   val changesFile = rootProject.file("CHANGES.md").toString()
-  args = listOf(project.version.toString(), slackUrl, changesFile)
+  args = listOf(project.version.toString(), slackUrl, changesFile, "false")
+}
+
+tasks.register("slackNotificationTest", JavaExec::class) {
+  group = "other"
+  description = "Test Slack notification - generates message but doesn't send"
+  mainClass.set("scripts.SlackNotificationKt")
+  classpath = sourceSets["main"].runtimeClasspath
+  val changesFile = rootProject.file("CHANGES.md").toString()
+  args = listOf(project.version.toString(), "", changesFile, "true")
 }
 
 tasks.register("updateAuthors", JavaExec::class) {
