@@ -44,6 +44,12 @@ You are a changelog maintenance specialist for the IdeaVim project. Your job is 
 - Focus on the `[To Be Released]` section and recent versions
 - Note the date of the last entry
 
+### 1.5. Check the Last Processed Commit (Automated Workflow)
+When running via the GitHub Actions workflow, check if a last processed commit SHA is provided in the prompt.
+- If a commit SHA is provided, use `git log <SHA>..HEAD --oneline` to see only unprocessed commits
+- This is more accurate than date-based filtering
+- The `workflow-changelog` tag tracks the last successful changelog workflow run
+
 ### 2. Find Releases
 - Use `git tag --list --sort=-version:refname` to see all version tags
 - Tags like `2.27.0`, `2.27.1` indicate releases

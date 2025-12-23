@@ -17,29 +17,51 @@ jobs:
       id-token: write
       issues: read
       actions: read
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Need full history to analyze commits and tags
-      
+
+      - name: Get last processed commit
+        id: last_commit
+        run: |
+          # Get the commit SHA from the workflow-changelog tag (if it exists)
+          LAST_COMMIT=$(git rev-list -n 1 tags/workflow-changelog 2>/dev/null || echo "")
+          echo "sha=$LAST_COMMIT" >> $GITHUB_OUTPUT
+          if [ -n "$LAST_COMMIT" ]; then
+            echo "Last processed commit: $LAST_COMMIT"
+          else
+            echo "No workflow-changelog tag found, will analyze recent commits"
+          fi
+
       - name: Run Claude Code to Update Changelog
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          
+
           prompt: |
             ## Task: Update the CHANGES.md Changelog File
-            
+
             You need to review the latest commits and maintain the changelog file (CHANGES.md) with meaningful changes.
-            
+
             Use the changelog skill to load the detailed changelog maintenance instructions.
-            
+
+            **Important**: The last processed commit is: ${{ steps.last_commit.outputs.sha || 'not set - analyze commits from the last documented version in CHANGES.md' }}
+            Use `git log ${{ steps.last_commit.outputs.sha }}..HEAD --oneline` to see commits since the last changelog update (if the commit SHA is available).
+
             If you find changes that need documenting, update CHANGES.md and create a pull request with:
             - Title: "Update changelog: <super short summary>"
               Example: "Update changelog: Add gn text object, fix visual mode issues"
             - Body: Brief summary of what was added
-          
+
           # Allow Claude to use git, GitHub CLI, and web access for checking releases and tickets
           claude_args: '--allowed-tools "Skill,Read,Edit,Bash(git:*),Bash(gh:*),WebSearch,WebFetch(domain:plugins.jetbrains.com),WebFetch(domain:youtrack.jetbrains.com),WebFetch(domain:github.com)"'
+
+      - name: Update workflow-changelog tag
+        run: |
+          git tag --delete workflow-changelog 2>/dev/null || true
+          git push origin :refs/tags/workflow-changelog 2>/dev/null || true
+          git tag workflow-changelog
+          git push origin workflow-changelog

@@ -42,7 +42,6 @@ dependencies {
   
   // For updateAuthors
   implementation("org.kohsuke:github-api:1.305")
-  implementation("org.jetbrains:markdown:0.7.3")
 }
 
 val releaseType: String? by project
@@ -154,24 +153,6 @@ tasks.register("updateAuthors", JavaExec::class) {
   mainClass.set("scripts.UpdateAuthorsKt")
   classpath = sourceSets["main"].runtimeClasspath
   args = listOf(rootProject.rootDir.toString())
-}
-
-tasks.register("updateMergedPr", JavaExec::class) {
-  group = "other"
-  mainClass.set("scripts.UpdateMergedPrKt")
-  classpath = sourceSets["main"].runtimeClasspath
-  doFirst {
-    val prId = project.findProperty("prId") as String? ?: error("prId property not provided")
-    args = listOf(prId, rootProject.rootDir.toString())
-  }
-}
-
-tasks.register("updateChangelog", JavaExec::class) {
-  group = "other"
-  mainClass.set("scripts.UpdateChangelogKt")
-  classpath = sourceSets["main"].runtimeClasspath
-  args = listOf(rootProject.rootDir.toString())
-  environment("YOUTRACK_TOKEN", youtrackToken)
 }
 
 tasks.register("releaseActions", JavaExec::class) {
