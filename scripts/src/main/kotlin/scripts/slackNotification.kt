@@ -18,14 +18,21 @@ import java.io.File
 
 /**
  * Calls Claude Code CLI with the given prompt and returns the output.
+ * Times out after 60 seconds.
  */
 fun callClaudeCode(prompt: String): String {
   val process = ProcessBuilder("claude", "-p", prompt)
     .redirectErrorStream(true)
     .start()
 
+  val completed = process.waitFor(60, java.util.concurrent.TimeUnit.SECONDS)
+  if (!completed) {
+    process.destroyForcibly()
+    error("Claude Code timed out after 60 seconds")
+  }
+
   val output = process.inputStream.bufferedReader().readText()
-  val exitCode = process.waitFor()
+  val exitCode = process.exitValue()
 
   if (exitCode != 0) {
     error("Claude Code failed with exit code $exitCode: $output")
