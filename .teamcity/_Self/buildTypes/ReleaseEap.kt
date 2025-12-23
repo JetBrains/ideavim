@@ -34,7 +34,7 @@ object ReleaseEap : IdeaVimBuildType({
     )
     password(
       "env.YOUTRACK_TOKEN",
-      "credentialsJSON:2479995b-7b60-4fbb-b095-f0bafae7f622",
+      "credentialsJSON:eedfa0eb-c329-462a-b7b4-bc263bda8c01",
       display = ParameterDisplay.HIDDEN
     )
     password(
