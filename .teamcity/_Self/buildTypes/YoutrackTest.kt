@@ -13,7 +13,7 @@ object YoutrackTest : IdeaVimBuildType({
 
   params {
     password(
-      "env.YOUTRACK_TOKEN",
+      "env.ORG_GRADLE_PROJECT_youtrackToken",
       "credentialsJSON:eedfa0eb-c329-462a-b7b4-bc263bda8c01",
       display = ParameterDisplay.HIDDEN
     )
