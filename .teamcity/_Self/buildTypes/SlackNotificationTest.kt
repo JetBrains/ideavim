@@ -34,6 +34,38 @@ object SlackNotificationTest : IdeaVimBuildType({
 
   steps {
     script {
+      name = "Debug API Key"
+      scriptContent = """
+        echo "Checking ANTHROPIC_API_KEY..."
+        if [ -z "${'$'}ANTHROPIC_API_KEY" ]; then
+          echo "ERROR: ANTHROPIC_API_KEY is empty!"
+          exit 1
+        fi
+        echo "ANTHROPIC_API_KEY is set (length: ${'$'}{#ANTHROPIC_API_KEY} chars)"
+        echo "First 10 chars: ${'$'}{ANTHROPIC_API_KEY:0:10}..."
+
+        echo ""
+        echo "Testing API key with simple request..."
+        response=${'$'}(curl -s -w "\n%{http_code}" https://api.anthropic.com/v1/messages \
+          -H "Content-Type: application/json" \
+          -H "x-api-key: ${'$'}ANTHROPIC_API_KEY" \
+          -H "anthropic-version: 2023-06-01" \
+          -d '{"model":"claude-sonnet-4-20250514","max_tokens":10,"messages":[{"role":"user","content":"hi"}]}')
+
+        http_code=${'$'}(echo "${'$'}response" | tail -n1)
+        body=${'$'}(echo "${'$'}response" | sed '${'$'}d')
+
+        echo "HTTP Code: ${'$'}http_code"
+        echo "Response: ${'$'}body"
+
+        if [ "${'$'}http_code" != "200" ]; then
+          echo "API key validation failed!"
+          exit 1
+        fi
+        echo "API key is valid!"
+      """.trimIndent()
+    }
+    script {
       name = "Generate Changelog JSON"
       scriptContent = """
         # Install Claude Code CLI if not present
