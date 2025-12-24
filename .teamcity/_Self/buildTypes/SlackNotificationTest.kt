@@ -36,6 +36,7 @@ object SlackNotificationTest : IdeaVimBuildType({
     script {
       name = "Debug API Key"
       scriptContent = """
+        #!/bin/bash
         echo "Checking ANTHROPIC_API_KEY..."
         if [ -z "${'$'}ANTHROPIC_API_KEY" ]; then
           echo "ERROR: ANTHROPIC_API_KEY is empty!"
