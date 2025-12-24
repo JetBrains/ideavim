@@ -49,7 +49,6 @@ class GithubBuildType(command: String, desc: String) : IdeaVimBuildType({
 
   triggers {
     vcs {
-      enabled = false
       quietPeriodMode = VcsTrigger.QuietPeriodMode.USE_DEFAULT
       branchFilter = ""
     }

@@ -32,7 +32,6 @@ object PluginVerifier : IdeaVimBuildType({
 
   triggers {
     vcs {
-      enabled = false
       branchFilter = "+:<default>"
     }
   }

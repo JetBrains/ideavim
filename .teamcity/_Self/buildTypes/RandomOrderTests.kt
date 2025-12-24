@@ -39,7 +39,6 @@ object RandomOrderTests : IdeaVimBuildType({
 
   triggers {
     vcs {
-      enabled = false
       branchFilter = "+:<default>"
     }
   }

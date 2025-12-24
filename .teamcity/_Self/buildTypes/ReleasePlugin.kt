@@ -45,17 +45,12 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
     password(
       "env.ORG_GRADLE_PROJECT_slackUrl",
       "credentialsJSON:a8ab8150-e6f8-4eaf-987c-bcd65eac50b5",
-      label = "Slack Token"
+      label = "Slack URL"
     )
     password(
       "env.ORG_GRADLE_PROJECT_youtrackToken",
       "credentialsJSON:7bc0eb3a-b86a-4ebd-b622-d4ef12d7e1d3",
       display = ParameterDisplay.HIDDEN
-    )
-    password(
-      "env.ANTHROPIC_API_KEY",
-      "credentialsJSON:712a6516-4f43-41dc-b9e9-e32b1453dde8",
-      label = "Anthropic API Key"
     )
     param("env.ORG_GRADLE_PROJECT_releaseType", releaseType)
   }
@@ -159,42 +154,6 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       tasks = "releaseActions"
       gradleParams = "--no-configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
-    }
-    script {
-      name = "Slack Notification"
-      scriptContent = """
-        # Install Claude Code CLI if not present
-        if ! command -v claude &> /dev/null; then
-          echo "Installing Claude Code CLI..."
-          npm install -g @anthropic-ai/claude-code
-        fi
-
-        claude -p --allowedTools "Bash(curl:*)" "$(cat <<'PROMPT'
-        Send a Slack notification for IdeaVim release to the internal team.
-
-        TASK:
-        1. Read CHANGES.md and extract the latest version section (first ## header that is not "Unreleased")
-        2. Generate a valid Slack Block Kit JSON message for IdeaVim version %build.number%
-        3. Send it IMMEDIATELY to the Slack webhook URL stored in env var ORG_GRADLE_PROJECT_slackUrl - do NOT ask for confirmation
-        4. If Slack returns an error, analyze the error and fix the JSON, then retry (max 3 attempts)
-
-        TONE AND STYLE:
-        - This is an internal team notification, use a calm, professional tone
-        - No excitement, no emojis, no celebratory language
-        - Simple factual announcement: "IdeaVim X.Y.Z has been released"
-        - List key changes briefly
-
-        SLACK MESSAGE FORMAT:
-        - Valid JSON: { "text": "...", "blocks": [...] }
-        - Use Slack mrkdwn: *bold*, _italic_, <url|text> for links
-        - Keep it concise and informative
-
-        Use the Bash tool with curl to POST the JSON to the webhook URL.
-        The webhook URL is available in the ORG_GRADLE_PROJECT_slackUrl environment variable.
-        Report success or failure at the end.
-        PROMPT
-        )"
-      """.trimIndent()
     }
   }
 
