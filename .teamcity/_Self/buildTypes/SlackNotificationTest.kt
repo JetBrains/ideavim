@@ -100,6 +100,7 @@ object SlackNotificationTest : IdeaVimBuildType({
     script {
       name = "Send Slack Notification"
       scriptContent = """
+        #!/bin/bash
         echo "Sending Slack notification..."
 
         if [ ! -f /tmp/slack_message.json ]; then
@@ -107,10 +108,20 @@ object SlackNotificationTest : IdeaVimBuildType({
           exit 1
         fi
 
+        echo "Slack message content:"
+        cat /tmp/slack_message.json
+        echo ""
+
+        if [ -z "${'$'}ORG_GRADLE_PROJECT_slackUrl" ]; then
+          echo "ERROR: ORG_GRADLE_PROJECT_slackUrl is empty!"
+          exit 1
+        fi
+        echo "Slack URL is set (length: ${'$'}{#ORG_GRADLE_PROJECT_slackUrl} chars)"
+
         # Send to Slack
-        response=${'$'}(curl -s -w "\n%{http_code}" -X POST -H "Content-Type: application/json" \
+        response=${'$'}(curl -v -s -w "\n%{http_code}" -X POST -H "Content-Type: application/json" \
           -d @/tmp/slack_message.json \
-          "${'$'}ORG_GRADLE_PROJECT_slackUrl")
+          "${'$'}ORG_GRADLE_PROJECT_slackUrl" 2>&1)
 
         http_code=${'$'}(echo "${'$'}response" | tail -n1)
         body=${'$'}(echo "${'$'}response" | sed '${'$'}d')
