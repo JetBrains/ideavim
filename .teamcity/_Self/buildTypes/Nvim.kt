@@ -49,6 +49,7 @@ object Nvim : IdeaVimBuildType({
 
   triggers {
     vcs {
+      enabled = false
       branchFilter = "+:<default>"
     }
   }

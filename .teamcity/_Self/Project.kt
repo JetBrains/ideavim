@@ -6,6 +6,7 @@ import _Self.buildTypes.Nvim
 import _Self.buildTypes.PluginVerifier
 import _Self.buildTypes.PropertyBased
 import _Self.buildTypes.RandomOrderTests
+import _Self.buildTypes.SlackNotificationTest
 import _Self.buildTypes.TestingBuildType
 import _Self.subprojects.GitHub
 import _Self.subprojects.Releases
@@ -35,6 +36,8 @@ object Project : Project({
   buildType(Nvim)
   buildType(PluginVerifier)
   buildType(Compatibility)
+
+  buildType(SlackNotificationTest)
 })
 
 // Agent size configurations (CPU count)

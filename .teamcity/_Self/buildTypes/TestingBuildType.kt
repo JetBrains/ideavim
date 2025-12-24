@@ -50,6 +50,7 @@ open class TestingBuildType(
 
   triggers {
     vcs {
+      enabled = false
       branchFilter = "+:$branch"
     }
   }
