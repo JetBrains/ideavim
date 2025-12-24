@@ -7,9 +7,7 @@ import _Self.buildTypes.PluginVerifier
 import _Self.buildTypes.PropertyBased
 import _Self.buildTypes.RandomOrderTests
 import _Self.buildTypes.TestingBuildType
-import _Self.subprojects.GitHub
 import _Self.subprojects.Releases
-import _Self.vcsRoots.GitHubPullRequest
 import _Self.vcsRoots.ReleasesVcsRoot
 import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.Project
@@ -18,10 +16,8 @@ object Project : Project({
   description = "Vim engine for JetBrains IDEs"
 
   subProject(Releases)
-  subProject(GitHub)
 
   // VCS roots
-  vcsRoot(GitHubPullRequest)
   vcsRoot(ReleasesVcsRoot)
 
   // Active tests
