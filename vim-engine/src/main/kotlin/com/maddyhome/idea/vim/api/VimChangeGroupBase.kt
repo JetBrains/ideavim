@@ -1998,15 +1998,18 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       }
     } else {
       // Shift non-blockwise selection
+      val indentSize = indentConfig.getIndentSize(1)
       for (l in sline..eline) {
         val soff = editor.getLineStartOffset(l)
         val eoff = editor.getLineEndOffset(l, true)
         val woff = injector.motion.moveCaretToLineStartSkipLeading(editor, l)
         val col = editor.offsetToBufferPosition(woff).column
-        val limit = max(0.0, (col + dir * indentConfig.getIndentSize(count)).toDouble())
-          .toInt()
+        // Calculate the current indent depth (floor division)
+        val currentDepth = col / indentSize
+        // Calculate the new depth after shifting
+        val newDepth = max(0, currentDepth + dir * count)
         if (col > 0 || soff != eoff) {
-          val indent = indentConfig.createIndentBySize(limit)
+          val indent = indentConfig.createIndentByDepth(newDepth)
           replaceText(editor, caret, soff, woff, indent)
         }
       }
