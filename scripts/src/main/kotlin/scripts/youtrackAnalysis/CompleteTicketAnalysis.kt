@@ -47,15 +47,15 @@ fun main(args: Array<String>) = runBlocking {
   setTag(ticketId, claudeAnalyzedTagId)
   println("Ticket tagged successfully")
 
-  // Only add comment if suitable (PR created) or error occurred
-  // For "unsuitable" tickets, we just tag without commenting
-  if (analysisResult != "unsuitable") {
+  // Only add comment if explicitly "suitable" (PR created) or "error"
+  // For "unsuitable" or unknown results, we just tag without commenting
+  if (analysisResult == "suitable" || analysisResult == "error") {
     val comment = buildComment(analysisResult, prUrl)
     println("Adding comment to ticket...")
     addComment(ticketId, comment)
     println("Comment added successfully")
   } else {
-    println("Ticket marked as unsuitable, skipping comment")
+    println("Result is '$analysisResult', skipping comment (only tag)")
   }
 
   println("Analysis completion finished for $ticketId")
