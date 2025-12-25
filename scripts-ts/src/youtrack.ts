@@ -4,6 +4,7 @@
 
 const YOUTRACK_BASE_URL = "https://youtrack.jetbrains.com/api";
 const CLAUDE_ANALYZED_TAG_ID = "68-507461";
+const JETBRAINS_TEAM_GROUP_ID = "10-3";
 
 export interface TicketDetails {
   id: string;
@@ -91,13 +92,23 @@ export async function setTag(ticketId: string, tagId: string): Promise<void> {
 
 export async function addComment(
   ticketId: string,
-  text: string
+  text: string,
+  isPrivate: boolean = false
 ): Promise<void> {
-  console.log(`Adding comment to ${ticketId}...`);
+  console.log(`Adding ${isPrivate ? "private " : ""}comment to ${ticketId}...`);
+
+  const body: Record<string, unknown> = { text };
+
+  if (isPrivate) {
+    body.visibility = {
+      $type: "LimitedVisibility",
+      permittedGroups: [{ id: JETBRAINS_TEAM_GROUP_ID }],
+    };
+  }
 
   await youtrackFetch(`/issues/${ticketId}/comments`, {
     method: "POST",
-    body: JSON.stringify({ text }),
+    body: JSON.stringify(body),
   });
 
   console.log(`Comment added successfully`);

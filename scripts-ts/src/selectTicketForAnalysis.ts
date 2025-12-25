@@ -26,8 +26,10 @@ async function main(): Promise<void> {
 
   console.log("Searching for open YouTrack tickets not yet analyzed by Claude...");
 
-  // Query: Open state, excluding tickets with "claude-analyzed" tag
-  const query = "State: Open tag: -claude-analyzed";
+  // Query: Open state, excluding:
+  // - tickets with "claude-analyzed" tag
+  // - tickets with Area "Remote Dev" or "Gateway" (not relevant to IdeaVim core)
+  const query = 'State: Open tag: -claude-analyzed Area: -"Remote Dev" Area: -Gateway';
   const tickets = await getTicketsByQuery(query);
 
   console.log(`Found ${tickets.length} unanalyzed open tickets`);

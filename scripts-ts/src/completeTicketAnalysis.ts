@@ -64,8 +64,8 @@ async function main(): Promise<void> {
   // For "unsuitable" or unknown results, we just tag without commenting
   if (analysisResult === "suitable" || analysisResult === "error") {
     const comment = buildComment(analysisResult, prUrl);
-    console.log("Adding comment to ticket...");
-    await addComment(ticketId, comment);
+    console.log("Adding private comment to ticket...");
+    await addComment(ticketId, comment, true); // Private comment (JetBrains team only)
     console.log("Comment added successfully");
   } else {
     console.log(`Result is '${analysisResult}', skipping comment (only tag)`);
