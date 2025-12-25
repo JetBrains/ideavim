@@ -21,20 +21,21 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          java-version: '21'
-          distribution: 'corretto'
+          node-version: '20'
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+      - name: Install dependencies
+        run: npm install
+        working-directory: scripts-ts
 
       - name: Select ticket for analysis
         id: select-ticket
-        run: ./gradlew --no-configuration-cache :scripts:selectTicketForAnalysis
+        run: npx tsx src/selectTicketForAnalysis.ts ..
+        working-directory: scripts-ts
         env:
-          ORG_GRADLE_PROJECT_youtrackToken: ${{ secrets.YOUTRACK_TOKEN }}
+          YOUTRACK_TOKEN: ${{ secrets.YOUTRACK_TOKEN }}
 
       - name: Check if ticket was found
         id: check-ticket
@@ -47,6 +48,17 @@ jobs:
             echo "Selected ticket: $TICKET_ID"
             echo "has_ticket=true" >> $GITHUB_OUTPUT
           fi
+
+      - name: Set up JDK 21
+        if: steps.check-ticket.outputs.has_ticket == 'true'
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+
+      - name: Setup Gradle
+        if: steps.check-ticket.outputs.has_ticket == 'true'
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Run Claude Code for Ticket Analysis
         if: steps.check-ticket.outputs.has_ticket == 'true'
@@ -119,12 +131,13 @@ jobs:
       - name: Complete ticket analysis
         if: steps.check-ticket.outputs.has_ticket == 'true'
         run: |
-          ./gradlew --no-configuration-cache :scripts:completeTicketAnalysis \
-            -PticketId="${{ steps.select-ticket.outputs.ticket_id }}" \
-            -PanalysisResult="${{ steps.parse-output.outputs.analysis_result }}" \
-            -PprUrl="${{ steps.parse-output.outputs.pr_url }}"
+          npx tsx src/completeTicketAnalysis.ts \
+            "${{ steps.select-ticket.outputs.ticket_id }}" \
+            "${{ steps.parse-output.outputs.analysis_result }}" \
+            "${{ steps.parse-output.outputs.pr_url }}"
+        working-directory: scripts-ts
         env:
-          ORG_GRADLE_PROJECT_youtrackToken: ${{ secrets.YOUTRACK_TOKEN }}
+          YOUTRACK_TOKEN: ${{ secrets.YOUTRACK_TOKEN }}
 
       - name: Workflow summary
         if: always()
