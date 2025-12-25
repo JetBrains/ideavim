@@ -79,7 +79,7 @@ jobs:
             Analyze the ticket and determine if it meets ALL these criteria:
             1. **Easy to understand**: The problem or feature request is clearly described
             2. **Reproducible** (for bugs): A unit test CAN be written to reproduce the issue
-            3. **Small scope**: The fix will NOT require big refactoring (ideally < 100 lines changed)
+            3. **Small scope**: Smaller changes are preferred, but bigger changes are OK if you're confident about them
             4. **Testable**: Tests can be written that pass after your changes
 
             ### Step 2: Document Your Analysis
