@@ -27,9 +27,38 @@ import kotlinx.serialization.json.putJsonObject
 // YouTrack tag "IdeaVim Released In EAP"
 const val releasedInEapTagId = "68-385032"
 
+// YouTrack tag "claude-analyzed" for automated ticket analysis
+const val claudeAnalyzedTagId = "68-507461"
+
 const val VIM_PROJECT_ID = "22-43"
 const val FIX_VERSIONS_FIELD_ID = "123-285"
 const val FIX_VERSIONS_ELEMENT_TYPE = "VersionBundleElement"
+
+data class TicketDetails(
+  val id: String,
+  val summary: String,
+  val description: String?,
+  val state: String,
+)
+
+suspend fun getTicketDetails(ticketId: String): TicketDetails {
+  val client = httpClient()
+  val response = client.get("https://youtrack.jetbrains.com/api/issues/$ticketId?fields=idReadable,summary,description,customFields(name,value(name))")
+  val json = response.body<JsonObject>()
+
+  val id = json["idReadable"]!!.jsonPrimitive.content
+  val summary = json["summary"]!!.jsonPrimitive.content
+  val description = json["description"]?.jsonPrimitive?.content
+
+  val state = json["customFields"]!!.jsonArray
+    .firstOrNull { it.jsonObject["name"]?.jsonPrimitive?.content == "State" }
+    ?.jsonObject?.get("value")
+    ?.jsonObject?.get("name")
+    ?.jsonPrimitive?.content
+    ?: "Unknown"
+
+  return TicketDetails(id, summary, description, state)
+}
 
 suspend fun setYoutrackStatus(tickets: Collection<String>, status: String) {
   val client = httpClient()

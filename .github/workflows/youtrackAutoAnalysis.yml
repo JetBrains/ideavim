@@ -1,0 +1,143 @@
+name: YouTrack Auto-Analysis with Claude
+
+on:
+  workflow_dispatch:  # Manual trigger only for experimentation
+
+jobs:
+  analyze-ticket:
+    runs-on: ubuntu-latest
+    if: github.repository == 'JetBrains/ideavim'
+
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+      issues: read
+      actions: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Select ticket for analysis
+        id: select-ticket
+        run: ./gradlew --no-configuration-cache :scripts:selectTicketForAnalysis
+        env:
+          ORG_GRADLE_PROJECT_youtrackToken: ${{ secrets.YOUTRACK_TOKEN }}
+
+      - name: Check if ticket was found
+        id: check-ticket
+        run: |
+          TICKET_ID="${{ steps.select-ticket.outputs.ticket_id }}"
+          if [ -z "$TICKET_ID" ]; then
+            echo "No tickets available for analysis"
+            echo "has_ticket=false" >> $GITHUB_OUTPUT
+          else
+            echo "Selected ticket: $TICKET_ID"
+            echo "has_ticket=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run Claude Code for Ticket Analysis
+        if: steps.check-ticket.outputs.has_ticket == 'true'
+        id: claude-analysis
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+
+          prompt: |
+            ## Task: Analyze YouTrack Ticket and Potentially Fix It
+
+            Read the ticket details from `ticket_details.md` in the repository root.
+
+            ### Step 1: Evaluate Suitability
+
+            Analyze the ticket and determine if it meets ALL these criteria:
+            1. **Easy to understand**: The problem or feature request is clearly described
+            2. **Reproducible** (for bugs): A unit test CAN be written to reproduce the issue
+            3. **Small scope**: The fix will NOT require big refactoring (ideally < 100 lines changed)
+            4. **Testable**: Tests can be written that pass after your changes
+
+            ### Step 2: Document Your Analysis
+
+            Create a file `analysis_result.md` with:
+            - Whether you consider this suitable (yes/no)
+            - Brief reasoning for each criterion
+            - Any concerns or uncertainties
+
+            ### Step 3: If Suitable - Implement the Fix
+
+            If ALL criteria are met:
+            1. Write a failing test that reproduces the issue (if it's a bug)
+            2. Implement the fix
+            3. Verify tests pass: `./gradlew test -x :tests:property-tests:test -x :tests:long-running-tests:test`
+            4. Create a PR with:
+               - Title: "Fix VIM-XXXX: <brief description>" (use the actual ticket ID)
+               - Body: Include the ticket link and a summary of changes
+
+            ### Step 4: Output Results
+
+            At the very end of your response, output exactly ONE of these lines (this is important for parsing):
+            - `ANALYSIS_RESULT=suitable` (if you created a PR)
+            - `ANALYSIS_RESULT=unsuitable` (if criteria not met)
+            - `ANALYSIS_RESULT=error` (if something went wrong)
+
+            If you created a PR, also output on a separate line:
+            - `PR_URL=<the full PR URL>`
+
+          claude_args: '--allowed-tools "Read,Edit,Write,Glob,Grep,Bash(git:*),Bash(gh:*),Bash(./gradlew:*),Bash(find:*)"'
+
+      - name: Parse Claude output
+        if: steps.check-ticket.outputs.has_ticket == 'true'
+        id: parse-output
+        run: |
+          # Claude's response is in the step output
+          RESPONSE="${{ steps.claude-analysis.outputs.response }}"
+
+          # Extract ANALYSIS_RESULT
+          ANALYSIS_RESULT=$(echo "$RESPONSE" | grep -oP 'ANALYSIS_RESULT=\K\w+' | tail -1 || echo "unknown")
+          echo "analysis_result=$ANALYSIS_RESULT" >> $GITHUB_OUTPUT
+          echo "Analysis result: $ANALYSIS_RESULT"
+
+          # Extract PR_URL if present
+          PR_URL=$(echo "$RESPONSE" | grep -oP 'PR_URL=\K\S+' | tail -1 || echo "")
+          echo "pr_url=$PR_URL" >> $GITHUB_OUTPUT
+          if [ -n "$PR_URL" ]; then
+            echo "PR URL: $PR_URL"
+          fi
+
+      - name: Complete ticket analysis
+        if: steps.check-ticket.outputs.has_ticket == 'true'
+        run: |
+          ./gradlew --no-configuration-cache :scripts:completeTicketAnalysis \
+            -PticketId="${{ steps.select-ticket.outputs.ticket_id }}" \
+            -PanalysisResult="${{ steps.parse-output.outputs.analysis_result }}" \
+            -PprUrl="${{ steps.parse-output.outputs.pr_url }}"
+        env:
+          ORG_GRADLE_PROJECT_youtrackToken: ${{ secrets.YOUTRACK_TOKEN }}
+
+      - name: Workflow summary
+        if: always()
+        run: |
+          echo "## YouTrack Auto-Analysis Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.check-ticket.outputs.has_ticket }}" == "true" ]; then
+            echo "- **Ticket:** ${{ steps.select-ticket.outputs.ticket_id }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Summary:** ${{ steps.select-ticket.outputs.ticket_summary }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Result:** ${{ steps.parse-output.outputs.analysis_result }}" >> $GITHUB_STEP_SUMMARY
+            if [ -n "${{ steps.parse-output.outputs.pr_url }}" ]; then
+              echo "- **PR:** ${{ steps.parse-output.outputs.pr_url }}" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "No unanalyzed tickets were found." >> $GITHUB_STEP_SUMMARY
+          fi
