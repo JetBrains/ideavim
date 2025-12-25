@@ -29,7 +29,7 @@ async function main(): Promise<void> {
   // Query: Open state, excluding:
   // - tickets with "claude-analyzed" tag
   // - tickets with Area "Remote Dev" or "Gateway" (not relevant to IdeaVim core)
-  const query = 'State: Open tag: -claude-analyzed Area: -"Remote Dev" Area: -Gateway';
+  const query = "State: Open tag: -claude-analyzed Area: -{Remote Dev} Area: -Gateway";
   const tickets = await getTicketsByQuery(query);
 
   console.log(`Found ${tickets.length} unanalyzed open tickets`);
