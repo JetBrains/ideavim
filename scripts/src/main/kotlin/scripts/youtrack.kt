@@ -103,7 +103,10 @@ fun getYoutrackTicketsByQuery(query: String): Set<String> {
   val client = httpClient()
 
   return runBlocking {
-    val response = client.get("https://youtrack.jetbrains.com/api/issues/?fields=idReadable&query=project:VIM+$query")
+    val response = client.get("https://youtrack.jetbrains.com/api/issues/") {
+      parameter("fields", "idReadable")
+      parameter("query", "project:VIM $query")
+    }
     response.body<JsonArray>().mapTo(HashSet()) { it.jsonObject.getValue("idReadable").jsonPrimitive.content }
   }
 }
