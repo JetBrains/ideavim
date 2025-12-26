@@ -11,6 +11,7 @@ export interface TicketDetails {
   summary: string;
   description: string | null;
   state: string;
+  created: string;
 }
 
 export interface TicketComment {
@@ -72,7 +73,7 @@ export async function getTicketDetails(
   ticketId: string
 ): Promise<TicketDetails> {
   const params = new URLSearchParams({
-    fields: "idReadable,summary,description,customFields(name,value(name))",
+    fields: "idReadable,summary,description,created,customFields(name,value(name))",
   });
 
   const response = await youtrackFetch(`/issues/${ticketId}?${params}`);
@@ -88,6 +89,7 @@ export async function getTicketDetails(
     summary: data.summary,
     description: data.description ?? null,
     state,
+    created: new Date(data.created).toISOString(),
   };
 }
 

@@ -87,6 +87,9 @@ ${details.description ?? "No description provided"}
 ## Current State
 ${details.state}
 
+## Created
+${details.created}
+
 ## URL
 https://youtrack.jetbrains.com/issue/${details.id}
 ${commentsSection}${attachmentsSection}`;
