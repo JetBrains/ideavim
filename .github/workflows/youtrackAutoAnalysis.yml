@@ -153,9 +153,18 @@ jobs:
             ### Step 5: If Suitable - Implement the Fix
 
             #### For Bugs (TDD approach - this order is mandatory):
-            1. **Write a failing test first** that reproduces the bug
-            2. **Run the test** to confirm it fails: `./gradlew test --tests "YourTestClass.yourTestMethod"`
-            3. **Understand the bug's origin** before implementing a fix:
+            1. **Check if the bug is already fixed** before writing any code:
+               - Review the related source code to see if the reported issue has been addressed
+               - Check git history for recent changes that might have fixed it
+               - If the code clearly shows the bug is already fixed, post a PRIVATE YouTrack comment mentioning `@Aleksei.Plate`
+                 explaining your findings, then output `ANALYSIS_RESULT=already_fixed` and stop.
+            2. **Write a test that reproduces the bug**
+            3. **Run the test** to confirm the bug still exists: `./gradlew test --tests "YourTestClass.yourTestMethod"`
+               - **If the test PASSES** (bug is already fixed): The issue may have been fixed incidentally or the reporter forgot to close it.
+                 Post a PRIVATE YouTrack comment mentioning `@Aleksei.Plate` explaining that the bug appears to be already fixed,
+                 include which test you wrote and its result. Then output `ANALYSIS_RESULT=already_fixed` and stop.
+               - **If the test FAILS** (bug confirmed): Continue to the next step.
+            4. **Understand the bug's origin** before implementing a fix:
                - Some bugs are accidental (copy-paste errors, typos) - these are safe to fix directly
                - Other bugs were introduced while fixing a previous bug or implementing a feature - **be extremely careful** with these, as your fix might re-introduce the original issue
                - Example: if you need to change a boolean from `false` to `true`, investigate WHY it was `false` in the first place
@@ -166,16 +175,16 @@ jobs:
                  - Use `git blame <file>` to find when specific lines were changed and why
                  - Read the commit messages that introduced the code
                - If the bug appears to be a deliberate trade-off from a previous fix, document this in your PR and consider whether both issues can be solved together
-            4. **Implement the fix**
-            5. **Run the same test again** to confirm it now passes
-            6. **Run tests for verification**:
+            5. **Implement the fix**
+            6. **Run the same test again** to confirm it now passes
+            7. **Run tests for verification**:
                - Running all tests takes a while, so prefer running specific related tests for faster execution
                - Try to identify tests related to your changes and run those: `./gradlew test --tests "TestClass.testMethod"`
                - Only run the full test suite for core changes: `./gradlew test -x :tests:property-tests:test -x :tests:long-running-tests:test`
                - All tests will run automatically on the PR anyway, so focus on quick feedback during development
-            7. **Code review**: Use the `code-reviewer` subagent to review your changes before committing. Address any issues it finds.
-            8. **Update changelog**: Use the `changelog` skill to add an entry for this fix
-            9. Create a PR with:
+            8. **Code review**: Use the `code-reviewer` subagent to review your changes before committing. Address any issues it finds.
+            9. **Update changelog**: Use the `changelog` skill to add an entry for this fix
+            10. Create a PR with:
                - Title: "Fix(VIM-XXXX): <brief description>" (use the actual ticket ID)
                - Body: Include the ticket link, a summary of changes, and a link to this workflow run:
                  `$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID`
@@ -201,6 +210,7 @@ jobs:
             - `ANALYSIS_RESULT=suitable` (if you created a PR)
             - `ANALYSIS_RESULT=unsuitable` (if criteria not met)
             - `ANALYSIS_RESULT=outdated` (if ticket is outdated/irrelevant and you posted a private comment)
+            - `ANALYSIS_RESULT=already_fixed` (if the bug is already fixed and you posted a private comment)
             - `ANALYSIS_RESULT=attention_required` (if maintainer attention is needed - see below)
             - `ANALYSIS_RESULT=error` (if something went wrong)
 
