@@ -70,9 +70,22 @@ class FileGroup : VimFileBase() {
         return true
       }
     } else {
-      injector.messages.showStatusBarMessage(null, injector.messages.message("message.open.file.not.found", filename))
+      // File not found - create a new blank buffer like gVim does
+      if (logger.isDebugEnabled) {
+        logger.debug("file not found, creating blank buffer: $filename")
+      }
 
-      return false
+      // Extract just the filename from the path for the buffer name
+      val bufferName = filename.substringAfterLast('/')
+
+      // Create an in-memory light virtual file
+      val lightVirtualFile = com.intellij.testFramework.LightVirtualFile(bufferName)
+
+      // Open the new blank buffer in the editor
+      val fem = FileEditorManager.getInstance(project)
+      fem.openFile(lightVirtualFile, true)
+
+      return true
     }
   }
 
