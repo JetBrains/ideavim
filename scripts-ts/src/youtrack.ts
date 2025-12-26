@@ -162,4 +162,34 @@ export async function addComment(
   console.log(`Comment added successfully`);
 }
 
+export async function downloadAttachment(
+  attachmentUrl: string,
+  localPath: string
+): Promise<boolean> {
+  try {
+    console.log(`Downloading attachment to ${localPath}...`);
+
+    const response = await fetch(attachmentUrl, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+
+    if (!response.ok) {
+      console.error(`Failed to download attachment: ${response.status}`);
+      return false;
+    }
+
+    const buffer = await response.arrayBuffer();
+    const { writeFileSync } = await import("fs");
+    writeFileSync(localPath, Buffer.from(buffer));
+
+    console.log(`Downloaded attachment successfully`);
+    return true;
+  } catch (error) {
+    console.error(`Error downloading attachment: ${error}`);
+    return false;
+  }
+}
+
 export { CLAUDE_ANALYZED_TAG_ID };

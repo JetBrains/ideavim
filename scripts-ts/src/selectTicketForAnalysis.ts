@@ -9,8 +9,9 @@
  * - GitHub Actions outputs: ticket_id, ticket_summary (via GITHUB_OUTPUT)
  */
 
-import { writeFileSync, appendFileSync } from "fs";
-import { getTicketsByQuery, getTicketDetails, getTicketComments, getTicketAttachments } from "./youtrack.js";
+import { writeFileSync, appendFileSync, mkdirSync, existsSync } from "fs";
+import { getTicketsByQuery, getTicketDetails, getTicketComments, getTicketAttachments, downloadAttachment } from "./youtrack.js";
+import { join } from "path";
 
 function writeGitHubOutput(name: string, value: string): void {
   const outputFile = process.env.GITHUB_OUTPUT;
@@ -64,13 +65,37 @@ async function main(): Promise<void> {
     }
   }
 
-  // Format attachments section
+  // Download image attachments and format attachments section
   let attachmentsSection = "";
   if (attachments.length > 0) {
+    const attachmentsDir = join(projectDir, "attachments");
+
+    // Create attachments directory if needed
+    if (!existsSync(attachmentsDir)) {
+      mkdirSync(attachmentsDir, { recursive: true });
+    }
+
     attachmentsSection = "\n## Attachments\n\n";
+
     for (const attachment of attachments) {
       const mimeInfo = attachment.mimeType ? ` (${attachment.mimeType})` : "";
-      attachmentsSection += `- [${attachment.name}](${attachment.url})${mimeInfo}\n`;
+      const isImage = attachment.mimeType?.startsWith("image/") ?? false;
+
+      if (isImage) {
+        // Download image attachment locally
+        const localPath = join(attachmentsDir, attachment.name);
+        const relativePath = `./attachments/${attachment.name}`;
+        const downloaded = await downloadAttachment(attachment.url, localPath);
+
+        if (downloaded) {
+          attachmentsSection += `- [${attachment.name}](${relativePath})${mimeInfo} - **LOCAL FILE: Use Read tool to view**\n`;
+        } else {
+          attachmentsSection += `- [${attachment.name}](${attachment.url})${mimeInfo} (download failed)\n`;
+        }
+      } else {
+        // Non-image attachments: keep as URL
+        attachmentsSection += `- [${attachment.name}](${attachment.url})${mimeInfo}\n`;
+      }
     }
   }
 
