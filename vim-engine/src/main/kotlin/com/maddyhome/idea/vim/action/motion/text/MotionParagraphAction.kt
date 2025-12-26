@@ -48,6 +48,6 @@ class MotionParagraphNextAction : MotionParagraphAction(Direction.FORWARDS)
 class MotionParagraphPreviousAction : MotionParagraphAction(Direction.BACKWARDS)
 
 private fun moveCaretToNextParagraph(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion {
-  val res = injector.searchHelper.findNextParagraph(editor, caret, count, false) ?: return Motion.Error
+  val res = injector.searchHelper.findNextParagraph(editor, caret, count, true) ?: return Motion.Error
   return editor.normalizeOffset(res, true).toMotion()
 }
