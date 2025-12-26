@@ -184,10 +184,14 @@ jobs:
                - All tests will run automatically on the PR anyway, so focus on quick feedback during development
             8. **Code review**: Use the `code-reviewer` subagent to review your changes before committing. Address any issues it finds.
             9. **Update changelog**: Use the `changelog` skill to add an entry for this fix
-            10. Create a PR with:
-               - Title: "Fix(VIM-XXXX): <brief description>" (use the actual ticket ID)
-               - Body: Include the ticket link, a summary of changes, and a link to this workflow run:
-                 `$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID`
+            10. Create a PR:
+               - Create a new branch: `git checkout -b fix/vim-XXXX-short-description`
+               - Commit your changes
+               - Push the branch: `git push origin <branch-name>`
+               - Create PR with `gh pr create`:
+                 - Title: "Fix(VIM-XXXX): <brief description>" (use the actual ticket ID)
+                 - Body: Include the ticket link, a summary of changes, and a link to this workflow run:
+                   `$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID`
 
             #### For Feature Requests:
             1. Implement the feature
@@ -199,10 +203,14 @@ jobs:
                - All tests will run automatically on the PR anyway, so focus on quick feedback during development
             4. **Code review**: Use the `code-reviewer` subagent to review your changes before committing. Address any issues it finds.
             5. **Update changelog**: Use the `changelog` skill to add an entry for this feature
-            6. Create a PR with:
-               - Title: "Add(VIM-XXXX): <brief description>" (use the actual ticket ID)
-               - Body: Include the ticket link, a summary of changes, and a link to this workflow run:
-                 `$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID`
+            6. Create a PR:
+               - Create a new branch: `git checkout -b add/vim-XXXX-short-description`
+               - Commit your changes
+               - Push the branch: `git push origin <branch-name>`
+               - Create PR with `gh pr create`:
+                 - Title: "Add(VIM-XXXX): <brief description>" (use the actual ticket ID)
+                 - Body: Include the ticket link, a summary of changes, and a link to this workflow run:
+                   `$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID`
 
             ### Step 6: Output Results
 
@@ -220,6 +228,7 @@ jobs:
             - The YouTrack API behaves unexpectedly or returns errors you cannot handle
             - You discover a bug or limitation in this workflow that should be fixed
             - The ticket requires capabilities you don't have (e.g., needs visual inspection of screenshots)
+            - **PR creation fails** for any reason (push rejected, gh pr create error, branch issues, etc.)
             - Any situation where you believe a human should review and potentially improve this workflow
 
             When using `attention_required`, also output on a separate line:
