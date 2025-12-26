@@ -186,7 +186,19 @@ jobs:
             - `ANALYSIS_RESULT=suitable` (if you created a PR)
             - `ANALYSIS_RESULT=unsuitable` (if criteria not met)
             - `ANALYSIS_RESULT=outdated` (if ticket is outdated/irrelevant and you posted a private comment)
+            - `ANALYSIS_RESULT=attention_required` (if maintainer attention is needed - see below)
             - `ANALYSIS_RESULT=error` (if something went wrong)
+
+            **When to use `attention_required`:**
+            Use this status when you encounter issues that require workflow maintainer attention:
+            - A tool you need is not in the allowed tools list (permission denied)
+            - The YouTrack API behaves unexpectedly or returns errors you cannot handle
+            - You discover a bug or limitation in this workflow that should be fixed
+            - The ticket requires capabilities you don't have (e.g., needs visual inspection of screenshots)
+            - Any situation where you believe a human should review and potentially improve this workflow
+
+            When using `attention_required`, also output on a separate line:
+            - `ATTENTION_REASON=<brief description of what went wrong and what might need to be fixed>`
 
             If you created a PR, also output on a separate line:
             - `PR_URL=<the full PR URL>`
@@ -216,6 +228,13 @@ jobs:
             echo "PR URL: $PR_URL"
           fi
 
+          # Extract ATTENTION_REASON if present
+          ATTENTION_REASON=$(echo "$RESPONSE" | grep -oP 'ATTENTION_REASON=\K.+' | tail -1 || echo "")
+          echo "attention_reason=$ATTENTION_REASON" >> $GITHUB_OUTPUT
+          if [ -n "$ATTENTION_REASON" ]; then
+            echo "Attention reason: $ATTENTION_REASON"
+          fi
+
       - name: Complete ticket analysis
         if: steps.check-ticket.outputs.has_ticket == 'true'
         run: |
@@ -239,6 +258,15 @@ jobs:
             if [ -n "${{ steps.parse-output.outputs.pr_url }}" ]; then
               echo "- **PR:** ${{ steps.parse-output.outputs.pr_url }}" >> $GITHUB_STEP_SUMMARY
             fi
+            if [ -n "${{ steps.parse-output.outputs.attention_reason }}" ]; then
+              echo "- **Attention Required:** ${{ steps.parse-output.outputs.attention_reason }}" >> $GITHUB_STEP_SUMMARY
+            fi
           else
             echo "No unanalyzed tickets were found." >> $GITHUB_STEP_SUMMARY
           fi
+
+      - name: Fail if maintainer attention required
+        if: steps.parse-output.outputs.analysis_result == 'attention_required'
+        run: |
+          echo "::error::Maintainer attention required: ${{ steps.parse-output.outputs.attention_reason }}"
+          exit 1
