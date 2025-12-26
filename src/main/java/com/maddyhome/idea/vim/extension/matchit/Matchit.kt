@@ -348,6 +348,80 @@ private object FileTypePatterns {
  * Helper search functions.
  */
 
+/**
+ * Reads and parses the b:match_words buffer variable to create custom matching patterns.
+ * The format is "opening:closing,opening2:closing2" or "opening:middle:closing".
+ */
+private fun getCustomMatchWords(editor: Editor): LanguagePatterns? {
+  val vimEditor = editor.vim
+
+  // Try to read b:match_words variable
+  val matchWordsVar = try {
+    val scope = com.maddyhome.idea.vim.vimscript.model.expressions.Scope.BUFFER_VARIABLE
+    val variable = com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression(scope, "match_words")
+
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val vimContext = com.maddyhome.idea.vim.vimscript.model.Script(mutableListOf())
+
+    injector.variableService.getNullableVariableValue(variable, vimEditor, context, vimContext)
+  } catch (e: Exception) {
+    null
+  }
+
+  // Extract the string value
+  val matchWordsString = when (matchWordsVar) {
+    is com.maddyhome.idea.vim.vimscript.model.datatypes.VimString -> matchWordsVar.value
+    else -> return null
+  }
+
+  if (matchWordsString.isBlank()) {
+    return null
+  }
+
+  // Parse the match_words string
+  // Format: "opening:closing,opening2:closing2" or "opening:middle:closing"
+  val pairGroups = matchWordsString.split(',')
+
+  var combinedPatterns: LanguagePatterns? = null
+
+  for (pairGroup in pairGroups) {
+    val parts = pairGroup.trim().split(':')
+
+    when (parts.size) {
+      2 -> {
+        // Simple opening:closing pair
+        val opening = parts[0].trim()
+        val closing = parts[1].trim()
+        if (opening.isNotEmpty() && closing.isNotEmpty()) {
+          val newPattern = LanguagePatterns(opening, closing)
+          combinedPatterns = if (combinedPatterns == null) {
+            newPattern
+          } else {
+            combinedPatterns + newPattern
+          }
+        }
+      }
+      3 -> {
+        // opening:middle:closing pattern
+        val opening = parts[0].trim()
+        val middle = parts[1].trim()
+        val closing = parts[2].trim()
+        if (opening.isNotEmpty() && middle.isNotEmpty() && closing.isNotEmpty()) {
+          val newPattern = LanguagePatterns(opening, middle, closing)
+          combinedPatterns = if (combinedPatterns == null) {
+            newPattern
+          } else {
+            combinedPatterns + newPattern
+          }
+        }
+      }
+      // Ignore invalid patterns
+    }
+  }
+
+  return combinedPatterns
+}
+
 private val DEFAULT_PAIRS = setOf('(', ')', '[', ']', '{', '}')
 
 private fun getMatchitOffset(editor: Editor, caret: Caret, count0: Int, isInOpPending: Boolean, reverse: Boolean): Int {
@@ -371,7 +445,16 @@ private fun getMatchitOffset(editor: Editor, caret: Caret, count0: Int, isInOpPe
     if (DEFAULT_PAIRS.contains(currentChar)) {
       motionOffset = getMotionOffset(VimPlugin.getMotion().moveCaretToMatchingPair(editor.vim, caret.vim))
     } else {
-      val matchitPatterns = FileTypePatterns.getMatchitPatterns(virtualFile)
+      // Combine file-type patterns with custom b:match_words patterns
+      val fileTypePatterns = FileTypePatterns.getMatchitPatterns(virtualFile)
+      val customPatterns = getCustomMatchWords(editor)
+      val matchitPatterns = when {
+        fileTypePatterns != null && customPatterns != null -> fileTypePatterns + customPatterns
+        fileTypePatterns != null -> fileTypePatterns
+        customPatterns != null -> customPatterns
+        else -> null
+      }
+
       if (matchitPatterns != null) {
         motionOffset = if (reverse) {
           findMatchingPair(editor, caretOffset, isInOpPending, matchitPatterns.reversedOpenings, matchitPatterns.reversedClosings)
