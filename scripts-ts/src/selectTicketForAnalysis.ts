@@ -10,7 +10,7 @@
  */
 
 import { writeFileSync, appendFileSync } from "fs";
-import { getTicketsByQuery, getTicketDetails } from "./youtrack.js";
+import { getTicketsByQuery, getTicketDetails, getTicketComments, getTicketAttachments } from "./youtrack.js";
 
 function writeGitHubOutput(name: string, value: string): void {
   const outputFile = process.env.GITHUB_OUTPUT;
@@ -45,10 +45,34 @@ async function main(): Promise<void> {
   const randomTicketId = tickets[Math.floor(Math.random() * tickets.length)];
   console.log(`Selected random ticket: ${randomTicketId}`);
 
-  // Fetch ticket details
+  // Fetch ticket details, comments, and attachments
   const details = await getTicketDetails(randomTicketId);
+  const comments = await getTicketComments(randomTicketId);
+  const attachments = await getTicketAttachments(randomTicketId);
+
   console.log(`Ticket summary: ${details.summary}`);
   console.log(`Ticket state: ${details.state}`);
+  console.log(`Found ${comments.length} comments`);
+  console.log(`Found ${attachments.length} attachments`);
+
+  // Format comments section
+  let commentsSection = "";
+  if (comments.length > 0) {
+    commentsSection = "\n## Comments\n\n";
+    for (const comment of comments) {
+      commentsSection += `### ${comment.author} (${comment.created})\n\n${comment.text}\n\n---\n\n`;
+    }
+  }
+
+  // Format attachments section
+  let attachmentsSection = "";
+  if (attachments.length > 0) {
+    attachmentsSection = "\n## Attachments\n\n";
+    for (const attachment of attachments) {
+      const mimeInfo = attachment.mimeType ? ` (${attachment.mimeType})` : "";
+      attachmentsSection += `- [${attachment.name}](${attachment.url})${mimeInfo}\n`;
+    }
+  }
 
   // Write ticket details to file for Claude to read
   const ticketDetailsPath = `${projectDir}/ticket_details.md`;
@@ -65,7 +89,7 @@ ${details.state}
 
 ## URL
 https://youtrack.jetbrains.com/issue/${details.id}
-`;
+${commentsSection}${attachmentsSection}`;
 
   writeFileSync(ticketDetailsPath, ticketDetailsContent);
   console.log(`Wrote ticket details to ${ticketDetailsPath}`);

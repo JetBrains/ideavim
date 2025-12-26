@@ -13,6 +13,18 @@ export interface TicketDetails {
   state: string;
 }
 
+export interface TicketComment {
+  author: string;
+  text: string;
+  created: string;
+}
+
+export interface TicketAttachment {
+  name: string;
+  url: string;
+  mimeType: string | null;
+}
+
 function getToken(): string {
   const token = process.env.YOUTRACK_TOKEN;
   if (!token) {
@@ -77,6 +89,40 @@ export async function getTicketDetails(
     description: data.description ?? null,
     state,
   };
+}
+
+export async function getTicketComments(
+  ticketId: string
+): Promise<TicketComment[]> {
+  const params = new URLSearchParams({
+    fields: "author(name),text,created",
+  });
+
+  const response = await youtrackFetch(`/issues/${ticketId}/comments?${params}`);
+  const data = await response.json();
+
+  return data.map((comment: { author?: { name?: string }; text: string; created: number }) => ({
+    author: comment.author?.name ?? "Unknown",
+    text: comment.text,
+    created: new Date(comment.created).toISOString(),
+  }));
+}
+
+export async function getTicketAttachments(
+  ticketId: string
+): Promise<TicketAttachment[]> {
+  const params = new URLSearchParams({
+    fields: "name,url,mimeType",
+  });
+
+  const response = await youtrackFetch(`/issues/${ticketId}/attachments?${params}`);
+  const data = await response.json();
+
+  return data.map((attachment: { name: string; url: string; mimeType?: string }) => ({
+    name: attachment.name,
+    url: `https://youtrack.jetbrains.com${attachment.url}`,
+    mimeType: attachment.mimeType ?? null,
+  }));
 }
 
 export async function setTag(ticketId: string, tagId: string): Promise<void> {
