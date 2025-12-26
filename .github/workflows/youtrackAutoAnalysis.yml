@@ -108,7 +108,8 @@ jobs:
             3. **Implement the fix**
             4. **Run the same test again** to confirm it now passes
             5. **Run full test suite**: `./gradlew test -x :tests:property-tests:test -x :tests:long-running-tests:test`
-            6. Create a PR with:
+            6. **Code review**: Use the `code-reviewer` subagent to review your changes before committing. Address any issues it finds.
+            7. Create a PR with:
                - Title: "Fix(VIM-XXXX): <brief description>" (use the actual ticket ID)
                - Body: Include the ticket link and a summary of changes
 
@@ -116,7 +117,8 @@ jobs:
             1. Implement the feature
             2. Write tests to verify the feature works correctly
             3. Verify tests pass: `./gradlew test -x :tests:property-tests:test -x :tests:long-running-tests:test`
-            4. Create a PR with:
+            4. **Code review**: Use the `code-reviewer` subagent to review your changes before committing. Address any issues it finds.
+            5. Create a PR with:
                - Title: "Add(VIM-XXXX): <brief description>" (use the actual ticket ID)
                - Body: Include the ticket link and a summary of changes
 
@@ -130,7 +132,7 @@ jobs:
             If you created a PR, also output on a separate line:
             - `PR_URL=<the full PR URL>`
 
-          claude_args: '--allowed-tools "Read,Edit,Write,Glob,Grep,Bash(git:*),Bash(gh:*),Bash(./gradlew:*),Bash(find:*)"'
+          claude_args: '--allowed-tools "Read,Edit,Write,Glob,Grep,Task,Bash(git:*),Bash(gh:*),Bash(./gradlew:*),Bash(find:*)"'
 
       - name: Parse Claude output
         if: steps.check-ticket.outputs.has_ticket == 'true'
