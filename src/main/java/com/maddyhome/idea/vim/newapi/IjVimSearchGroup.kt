@@ -47,6 +47,8 @@ open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateComponent<Ele
     private val logger by lazy { vimLogger<IjVimSearchGroup>() }
   }
 
+  private var showSearchHighlight: Boolean = false
+
   init {
     // We use the global option listener instead of the effective listener that gets called for each affected editor
     // because we handle updating the affected editors ourselves (e.g., we can filter for visible windows).
@@ -62,9 +64,10 @@ open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateComponent<Ele
     }
     VimPlugin.getOptionGroup().addGlobalOptionChangeListener(Options.ignorecase, updateHighlightsIfVisible)
     VimPlugin.getOptionGroup().addGlobalOptionChangeListener(Options.smartcase, updateHighlightsIfVisible)
-  }
 
-  private var showSearchHighlight: Boolean = injector.globalOptions().hlsearch
+    // Initialize showSearchHighlight after injector is guaranteed to be available
+    showSearchHighlight = injector.globalOptions().hlsearch
+  }
 
   override fun highlightSearchLines(
     editor: VimEditor,
