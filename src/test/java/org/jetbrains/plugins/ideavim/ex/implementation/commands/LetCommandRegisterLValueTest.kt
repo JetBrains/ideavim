@@ -125,4 +125,22 @@ class LetCommandRegisterLValueTest : VimTestCase("\n") {
     enterCommand("let @a.=1.23")
     assertCommandOutput("echo string(@a)", "'hello1.23'")
   }
+
+  @Test
+  fun `test assign register to register preserves newlines`() {
+    // Reproduce VIM-2603: When using a register in a let expression, newlines should be preserved
+    // Start with simple text and yank multi-line content into register a
+    configureByText("aaaa\nbbbb\n")
+    typeText("ggVG\"ay")
+
+    // Copy register a to register b using let command
+    enterCommand("let @b=@a")
+
+    // Paste from register b should produce the same multi-line text
+    // Move to end and paste
+    typeText("G\"bp")
+
+    // The pasted text should contain actual newlines, not NULL characters
+    assertState("aaaa\nbbbb\naaaa\nbbbb\n")
+  }
 }
