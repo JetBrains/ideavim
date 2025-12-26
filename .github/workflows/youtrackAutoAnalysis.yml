@@ -74,32 +74,53 @@ jobs:
 
             Read the ticket details from `ticket_details.md` in the repository root.
 
-            ### Step 1: Evaluate Suitability
+            ### Step 1: Determine Ticket Type
 
+            First, determine if this is a **Bug** or a **Feature Request**.
+
+            ### Step 2: Evaluate Suitability
+
+            #### For Bugs:
             Analyze the ticket and determine if it meets ALL these criteria:
-            1. **Easy to understand**: The problem or feature request is clearly described
-            2. **Reproducible** (for bugs): A unit test CAN be written to reproduce the issue
+            1. **Easy to understand**: The problem is clearly described
+            2. **Reproducible via test**: A unit test CAN be written to reproduce the issue. If you cannot write a test that fails before the fix and passes after, DO NOT attempt to fix this bug - mark it as unsuitable.
             3. **Small scope**: Smaller changes are preferred, but bigger changes are OK if you're confident about them
-            4. **Testable**: Tests can be written that pass after your changes
 
-            ### Step 2: Document Your Analysis
+            #### For Feature Requests:
+            Analyze the ticket and determine if it meets ALL these criteria:
+            1. **Easy to understand**: The feature request is clearly described
+            2. **Small scope**: Smaller changes are preferred, but bigger changes are OK if you're confident about them
+            3. **Testable**: Tests can be written to verify the feature works correctly
+
+            ### Step 3: Document Your Analysis
 
             Create a file `analysis_result.md` with:
+            - Ticket type (Bug or Feature)
             - Whether you consider this suitable (yes/no)
             - Brief reasoning for each criterion
             - Any concerns or uncertainties
 
-            ### Step 3: If Suitable - Implement the Fix
+            ### Step 4: If Suitable - Implement the Fix
 
-            If ALL criteria are met:
-            1. Write a failing test that reproduces the issue (if it's a bug)
-            2. Implement the fix
-            3. Verify tests pass: `./gradlew test -x :tests:property-tests:test -x :tests:long-running-tests:test`
-            4. Create a PR with:
-               - Title: "Fix VIM-XXXX: <brief description>" (use the actual ticket ID)
+            #### For Bugs (TDD approach - this order is mandatory):
+            1. **Write a failing test first** that reproduces the bug
+            2. **Run the test** to confirm it fails: `./gradlew test --tests "YourTestClass.yourTestMethod"`
+            3. **Implement the fix**
+            4. **Run the same test again** to confirm it now passes
+            5. **Run full test suite**: `./gradlew test -x :tests:property-tests:test -x :tests:long-running-tests:test`
+            6. Create a PR with:
+               - Title: "Fix(VIM-XXXX): <brief description>" (use the actual ticket ID)
                - Body: Include the ticket link and a summary of changes
 
-            ### Step 4: Output Results
+            #### For Feature Requests:
+            1. Implement the feature
+            2. Write tests to verify the feature works correctly
+            3. Verify tests pass: `./gradlew test -x :tests:property-tests:test -x :tests:long-running-tests:test`
+            4. Create a PR with:
+               - Title: "Add(VIM-XXXX): <brief description>" (use the actual ticket ID)
+               - Body: Include the ticket link and a summary of changes
+
+            ### Step 5: Output Results
 
             At the very end of your response, output exactly ONE of these lines (this is important for parsing):
             - `ANALYSIS_RESULT=suitable` (if you created a PR)
