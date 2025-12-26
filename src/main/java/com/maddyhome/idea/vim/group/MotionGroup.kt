@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.anyNonWhitespace
 import com.maddyhome.idea.vim.api.getLeadingCharacterOffset
+import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.getVisualLineCount
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.lineLength
@@ -106,7 +107,33 @@ internal class MotionGroup : VimMotionGroupBase() {
     allowEnd: Boolean,
   ): Motion {
     val col = EditorHelper.getVisualColumnAtRightOfDisplay(editor.ij, caret.getVisualPosition().line)
-    return moveCaretToColumn(editor, caret, col, allowEnd)
+    val motion = moveCaretToColumn(editor, caret, col, allowEnd)
+
+    // Skip trailing whitespace to find last non-blank character (Vim patch 9.0.1753)
+    if (motion is Motion.AbsoluteOffset) {
+      val offset = motion.offset
+      val bufferLine = editor.offsetToBufferPosition(offset).line
+      val lineStart = editor.getLineStartOffset(bufferLine)
+      val lineEnd = editor.getLineEndOffset(bufferLine, true)
+      val chars = editor.text()
+
+      // Search backwards from line end to find last non-blank character
+      var pos = lineStart
+      for (currentOffset in lineEnd downTo lineStart) {
+        if (currentOffset >= chars.length) {
+          continue
+        }
+
+        if (!Character.isWhitespace(chars[currentOffset])) {
+          pos = currentOffset
+          break
+        }
+      }
+
+      return Motion.AbsoluteOffset(pos)
+    }
+
+    return motion
   }
 
   /**
