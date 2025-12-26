@@ -2,7 +2,7 @@ name: YouTrack Auto-Analysis with Claude
 
 on:
   schedule:
-    - cron: '*/5 * * * *'  # Every 5 minutes
+    - cron: '0 9 * * 1'  # Every Monday at 9:00 UTC
   workflow_dispatch:  # Allow manual trigger
 
 jobs:
