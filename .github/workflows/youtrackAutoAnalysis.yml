@@ -169,7 +169,8 @@ jobs:
             7. **Code review**: Use the `code-reviewer` subagent to review your changes before committing. Address any issues it finds.
             8. Create a PR with:
                - Title: "Fix(VIM-XXXX): <brief description>" (use the actual ticket ID)
-               - Body: Include the ticket link and a summary of changes
+               - Body: Include the ticket link, a summary of changes, and a link to this workflow run:
+                 `$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID`
 
             #### For Feature Requests:
             1. Implement the feature
@@ -178,7 +179,8 @@ jobs:
             4. **Code review**: Use the `code-reviewer` subagent to review your changes before committing. Address any issues it finds.
             5. Create a PR with:
                - Title: "Add(VIM-XXXX): <brief description>" (use the actual ticket ID)
-               - Body: Include the ticket link and a summary of changes
+               - Body: Include the ticket link, a summary of changes, and a link to this workflow run:
+                 `$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID`
 
             ### Step 6: Output Results
 
