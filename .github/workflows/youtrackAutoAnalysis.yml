@@ -105,11 +105,22 @@ jobs:
             #### For Bugs (TDD approach - this order is mandatory):
             1. **Write a failing test first** that reproduces the bug
             2. **Run the test** to confirm it fails: `./gradlew test --tests "YourTestClass.yourTestMethod"`
-            3. **Implement the fix**
-            4. **Run the same test again** to confirm it now passes
-            5. **Run full test suite**: `./gradlew test -x :tests:property-tests:test -x :tests:long-running-tests:test`
-            6. **Code review**: Use the `code-reviewer` subagent to review your changes before committing. Address any issues it finds.
-            7. Create a PR with:
+            3. **Understand the bug's origin** before implementing a fix:
+               - Some bugs are accidental (copy-paste errors, typos) - these are safe to fix directly
+               - Other bugs were introduced while fixing a previous bug or implementing a feature - **be extremely careful** with these, as your fix might re-introduce the original issue
+               - Example: if you need to change a boolean from `false` to `true`, investigate WHY it was `false` in the first place
+               - Investigation methods:
+                 - Review surrounding code for context
+                 - Check function callers to understand usage patterns
+                 - Use `git log -p <file>` to see file history
+                 - Use `git blame <file>` to find when specific lines were changed and why
+                 - Read the commit messages that introduced the code
+               - If the bug appears to be a deliberate trade-off from a previous fix, document this in your PR and consider whether both issues can be solved together
+            4. **Implement the fix**
+            5. **Run the same test again** to confirm it now passes
+            6. **Run full test suite**: `./gradlew test -x :tests:property-tests:test -x :tests:long-running-tests:test`
+            7. **Code review**: Use the `code-reviewer` subagent to review your changes before committing. Address any issues it finds.
+            8. Create a PR with:
                - Title: "Fix(VIM-XXXX): <brief description>" (use the actual ticket ID)
                - Body: Include the ticket link and a summary of changes
 
