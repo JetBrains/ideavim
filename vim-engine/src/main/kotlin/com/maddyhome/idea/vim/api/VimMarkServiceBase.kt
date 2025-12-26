@@ -448,6 +448,51 @@ abstract class VimMarkServiceBase : VimMarkService {
     setMark(editor.primaryCaret(), LAST_BUFFER_POSITION, editor.primaryCaret().offset)
   }
 
+  /**
+   * Updates the numbered marks ring buffer (marks '0 through '9) when an edit is made.
+   * Mark '0 is the most recent edit position, '1 is the second most recent, and so on.
+   * This implements Vim's automatic numbered marks behavior.
+   *
+   * @param editor The editor where the edit occurred
+   * @param offset The offset of the edit position
+   */
+  override fun updateNumberedMarks(editor: VimEditor, offset: Int) {
+    // Numbered marks are only for the primary caret
+    val caret = editor.primaryCaret()
+
+    // Get the current mark '0 (most recent edit)
+    val currentMark0 = getGlobalMark('0')
+
+    // Only update if this is a different position than the current '0 mark
+    // This prevents duplicate entries when multiple small edits happen at the same location
+    if (currentMark0 != null) {
+      val newPosition = editor.offsetToBufferPosition(offset)
+      if (currentMark0.line == newPosition.line && currentMark0.col == newPosition.column) {
+        // Same position, don't update the ring buffer
+        return
+      }
+    }
+
+    // Rotate the numbered marks: 0->1, 1->2, ..., 8->9, 9 is discarded
+    for (i in 8 downTo 0) {
+      val mark = getGlobalMark('0' + i)
+      if (mark != null) {
+        // Create a new mark with the next number
+        val newMark = VimMark(
+          key = '0' + (i + 1),
+          line = mark.line,
+          col = mark.col,
+          filepath = mark.filepath,
+          protocol = mark.protocol
+        )
+        setGlobalMark(newMark)
+      }
+    }
+
+    // Set mark '0 to the new edit position
+    setGlobalMark(editor, '0', offset)
+  }
+
   override fun resetAllMarksForCaret(caret: ImmutableVimCaret) {
     if (caret.isPrimary) {
       filepathToLocalMarks.clear()

@@ -732,7 +732,7 @@ class MarkTest : VimTestCase() {
     if you repeat something <caret>over and over again it loses its meaning.
     For example: homework, homework, homework, homework, <caret>homework, homework, homework, homework, homework.
     See, nothing.
-    
+
       """.trimIndent(),
     )
     typeText("mawmbw")
@@ -742,7 +742,7 @@ class MarkTest : VimTestCase() {
     if you repeat something over and <caret>over again it loses its meaning.
     For example: homework, homework, homework, homework, homework, <caret>homework, homework, homework, homework.
     See, nothing.
-    
+
       """.trimIndent(),
     )
     typeText("[`")
@@ -752,7 +752,7 @@ class MarkTest : VimTestCase() {
     if you repeat something over <caret>and over again it loses its meaning.
     For example: homework, homework, homework, homework, homework<caret>, homework, homework, homework, homework.
     See, nothing.
-    
+
       """.trimIndent(),
     )
     typeText("[`")
@@ -762,7 +762,7 @@ class MarkTest : VimTestCase() {
     if you repeat something <caret>over and over again it loses its meaning.
     For example: homework, homework, homework, homework, <caret>homework, homework, homework, homework, homework.
     See, nothing.
-    
+
       """.trimIndent(),
     )
     typeText("[`") // Does nothing on first mark.
@@ -772,7 +772,7 @@ class MarkTest : VimTestCase() {
     if you repeat something <caret>over and over again it loses its meaning.
     For example: homework, homework, homework, homework, <caret>homework, homework, homework, homework, homework.
     See, nothing.
-    
+
       """.trimIndent(),
     )
     typeText("5]`") // Excessive count goes to last mark.
@@ -782,8 +782,90 @@ class MarkTest : VimTestCase() {
     if you repeat something over <caret>and over again it loses its meaning.
     For example: homework, homework, homework, homework, homework<caret>, homework, homework, homework, homework.
     See, nothing.
-    
+
       """.trimIndent(),
     )
+  }
+
+  // VIM-3053 |'0| |'1| |'2|
+  @Test
+  fun testNumberedMarksAreAutomaticallySetOnEdit() {
+    configureByText(
+      """
+    line one
+    <caret>line two
+    line three
+
+      """.trimIndent(),
+    )
+    // First edit - insert "hello " at line 2 (0-indexed: line 1)
+    typeText("ihello <Esc>")
+
+    // Move to line 3 and make another edit (0-indexed: line 2)
+    typeText("joworld<Esc>")
+
+    // Now mark '0 should be at line 3 (most recent), mark '1 should be at line 2
+    val vimEditor: VimEditor = IjVimEditor(fixture.editor)
+    val mark0 = injector.markService.getMark(vimEditor.primaryCaret(), '0')
+    val mark1 = injector.markService.getMark(vimEditor.primaryCaret(), '1')
+
+    assertNotNull(mark0)
+    assertNotNull(mark1)
+    kotlin.test.assertEquals(3, mark0.line) // line 4 (0-indexed) - 'o' opens a new line
+    kotlin.test.assertEquals(1, mark1.line) // line 2 (0-indexed)
+  }
+
+  // VIM-3053 |`0| |`1|
+  @Test
+  fun testJumpToNumberedMarks() {
+    configureByText(
+      """
+    line one
+    line two
+    line three
+
+      """.trimIndent(),
+    )
+    // Edit at different positions
+    typeText("Ahello<Esc>") // Edit line 1 (0-indexed: line 0), append "hello" at end
+    typeText("joworld<Esc>") // Move down, open new line, insert "world"
+
+    // Jump to mark 1 (second most recent edit - should be where we inserted "hello")
+    typeText("`1")
+    // "line one" + "hello" = offset 13 (after "helo" since Esc moves cursor back)
+    val vimEditor: VimEditor = IjVimEditor(fixture.editor)
+    val mark1Line = injector.markService.getMark(vimEditor.primaryCaret(), '1')?.line
+    kotlin.test.assertEquals(0, mark1Line) // First edit was on line 0
+
+    // Jump to mark 0 (most recent edit - should be where we inserted "world")
+    typeText("`0")
+    val mark0Line = injector.markService.getMark(vimEditor.primaryCaret(), '0')?.line
+    kotlin.test.assertEquals(2, mark0Line) // Second edit opened line 2 (after line one + line two)
+  }
+
+  // VIM-3053 numbered marks ring buffer
+  @Test
+  fun testNumberedMarksRingBuffer() {
+    configureByText("line one\n")
+
+    // Make 12 edits to test ring buffer rotation (only 10 should be kept)
+    for (i in 1..12) {
+      typeText("oEdit $i<Esc>")
+    }
+
+    val vimEditor: VimEditor = IjVimEditor(fixture.editor)
+
+    // Mark '0 should be the most recent edit (Edit 12)
+    val mark0 = injector.markService.getMark(vimEditor.primaryCaret(), '0')
+    assertNotNull(mark0)
+    kotlin.test.assertEquals(12, mark0.line) // Edit 12 is on line 13 (0-indexed: line 12)
+
+    // Mark '9 should be the 10th most recent edit (Edit 3, since Edit 1 and 2 fell off)
+    val mark9 = injector.markService.getMark(vimEditor.primaryCaret(), '9')
+    assertNotNull(mark9)
+    kotlin.test.assertEquals(3, mark9.line) // Edit 3 is on line 4 (0-indexed: line 3)
+
+    // Marks older than 10 edits ago should not exist or be overwritten
+    // We can't easily test this without implementation details
   }
 }

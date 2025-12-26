@@ -559,6 +559,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     val markGroup = injector.markService
     markGroup.setMark(editor, VimMarkService.INSERT_EXIT_MARK)
     markGroup.setMark(editor, MARK_CHANGE_END)
+    // Update numbered marks ring buffer when exiting insert mode
+    markGroup.updateNumberedMarks(editor, editor.primaryCaret().offset)
     if (editor.mode is Mode.REPLACE) {
       editor.insertMode = true
     }
@@ -1133,6 +1135,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     val newEnd = start + str.length
     injector.markService.setChangeMarks(caret, TextRange(start, newEnd))
     injector.markService.setMark(caret, VimMarkService.LAST_CHANGE_MARK, newEnd)
+    // Update numbered marks ring buffer for change operations
+    injector.markService.updateNumberedMarks(editor, newEnd)
   }
 
   /**

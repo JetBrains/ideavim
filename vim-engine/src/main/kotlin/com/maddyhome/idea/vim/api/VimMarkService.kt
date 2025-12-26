@@ -137,6 +137,16 @@ interface VimMarkService {
    */
   fun updateMarksFromDelete(editor: VimEditor, delStartOffset: Int, delLength: Int)
 
+  /**
+   * Updates the numbered marks ring buffer (marks '0 through '9) when an edit is made.
+   * Mark '0 is the most recent edit position, '1 is the second most recent, and so on.
+   * This implements Vim's automatic numbered marks behavior.
+   *
+   * @param editor The editor where the edit occurred
+   * @param offset The offset of the edit position
+   */
+  fun updateNumberedMarks(editor: VimEditor, offset: Int)
+
   fun editorReleased(editor: VimEditor)
 
   fun resetAllMarksForCaret(caret: ImmutableVimCaret)
