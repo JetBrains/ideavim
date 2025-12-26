@@ -165,7 +165,11 @@ jobs:
                - If the bug appears to be a deliberate trade-off from a previous fix, document this in your PR and consider whether both issues can be solved together
             4. **Implement the fix**
             5. **Run the same test again** to confirm it now passes
-            6. **Run full test suite**: `./gradlew test -x :tests:property-tests:test -x :tests:long-running-tests:test`
+            6. **Run tests for verification**:
+               - Running all tests takes a while, so prefer running specific related tests for faster execution
+               - Try to identify tests related to your changes and run those: `./gradlew test --tests "TestClass.testMethod"`
+               - Only run the full test suite for core changes: `./gradlew test -x :tests:property-tests:test -x :tests:long-running-tests:test`
+               - All tests will run automatically on the PR anyway, so focus on quick feedback during development
             7. **Code review**: Use the `code-reviewer` subagent to review your changes before committing. Address any issues it finds.
             8. Create a PR with:
                - Title: "Fix(VIM-XXXX): <brief description>" (use the actual ticket ID)
@@ -175,7 +179,11 @@ jobs:
             #### For Feature Requests:
             1. Implement the feature
             2. Write tests to verify the feature works correctly
-            3. Verify tests pass: `./gradlew test -x :tests:property-tests:test -x :tests:long-running-tests:test`
+            3. **Run tests for verification**:
+               - Running all tests takes a while, so prefer running specific related tests for faster execution
+               - Try to identify tests related to your changes and run those: `./gradlew test --tests "TestClass.testMethod"`
+               - Only run the full test suite for core changes: `./gradlew test -x :tests:property-tests:test -x :tests:long-running-tests:test`
+               - All tests will run automatically on the PR anyway, so focus on quick feedback during development
             4. **Code review**: Use the `code-reviewer` subagent to review your changes before committing. Address any issues it finds.
             5. Create a PR with:
                - Title: "Add(VIM-XXXX): <brief description>" (use the actual ticket ID)
