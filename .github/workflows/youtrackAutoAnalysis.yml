@@ -88,13 +88,20 @@ jobs:
 
             ### Check for Outdated Tickets
 
-            Before evaluating suitability, check if the ticket appears to be **outdated or no longer relevant**:
+            Before evaluating suitability, check if the ticket appears to be **outdated or no longer relevant**.
 
-            **Signs of an outdated ticket:**
-            1. Ticket is more than 2 years old (check the Created date)
-            2. Mentions removed features, settings, or APIs that no longer exist
-            3. Vague "doesn't work" reports with no environment details
-            4. No recent activity in comments
+            **IMPORTANT**: Age alone is NEVER a reason to mark a ticket as outdated. Many 10-15+ year old tickets
+            are still valid and relevant. A ticket is only outdated when it combines age with vague/environment-specific issues.
+
+            **A ticket is outdated ONLY if it has BOTH:**
+            1. Vague, environment-specific description (e.g., "doesn't work", "crashes sometimes") without
+               clear steps to reproduce or specific details about the expected behavior
+            2. AND mentions features, settings, APIs, or IDE versions that no longer exist or have changed significantly
+
+            **A ticket is NOT outdated if:**
+            - It has a clear description of expected vs actual behavior (regardless of age)
+            - It describes a specific Vim command or feature that should work a certain way
+            - The requested functionality is still relevant to IdeaVim
 
             **If you determine the ticket is outdated:**
             1. Post a PRIVATE YouTrack comment mentioning `@Aleksei.Plate`:
