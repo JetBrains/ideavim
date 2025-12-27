@@ -251,7 +251,7 @@ jobs:
             and `mcp__plugin_context7_context7__get-library-docs` to look up Vim documentation
             when you need to verify expected Vim behavior.
 
-          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,WebSearch,WebFetch,Bash(curl:*),Bash(curl -X POST:*),Bash(cat:*)"'
+          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,WebSearch,WebFetch,Bash(curl:*),Bash(curl -X POST:*),Bash(cat:*),mcp__plugin_context7_context7__resolve-library-id,mcp__plugin_context7_context7__get-library-docs"'
         env:
           YOUTRACK_TOKEN: ${{ secrets.YOUTRACK_TOKEN }}
 
@@ -384,7 +384,7 @@ jobs:
             and `mcp__plugin_context7_context7__get-library-docs` to look up Vim documentation
             when you need to verify expected Vim behavior.
 
-          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,WebSearch,WebFetch,Bash(curl:*),Bash(curl -X POST:*),Bash(git:*),Bash(git log:*),Bash(git blame:*),Bash(git diff:*),Bash(git show:*),Bash(find:*),Bash(cat:*)"'
+          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,WebSearch,WebFetch,Bash(curl:*),Bash(curl -X POST:*),Bash(git:*),Bash(git log:*),Bash(git blame:*),Bash(git diff:*),Bash(git show:*),Bash(find:*),Bash(cat:*),mcp__plugin_context7_context7__resolve-library-id,mcp__plugin_context7_context7__get-library-docs"'
         env:
           YOUTRACK_TOKEN: ${{ secrets.YOUTRACK_TOKEN }}
 
@@ -491,7 +491,7 @@ jobs:
             and `mcp__plugin_context7_context7__get-library-docs` to look up Vim documentation
             when you need to verify expected Vim behavior.
 
-          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Task,WebSearch,WebFetch,Bash(git:*),Bash(git branch:*),Bash(git log:*),Bash(git blame:*),Bash(git diff:*),Bash(git show:*),Bash(./gradlew:*),Bash(find:*),Bash(curl:*)"'
+          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Task,WebSearch,WebFetch,Bash(git:*),Bash(git branch:*),Bash(git log:*),Bash(git blame:*),Bash(git diff:*),Bash(git show:*),Bash(./gradlew:*),Bash(find:*),Bash(curl:*),mcp__plugin_context7_context7__resolve-library-id,mcp__plugin_context7_context7__get-library-docs"'
         env:
           YOUTRACK_TOKEN: ${{ secrets.YOUTRACK_TOKEN }}
 
@@ -576,7 +576,7 @@ jobs:
             and `mcp__plugin_context7_context7__get-library-docs` to look up Vim documentation
             when you need to verify expected Vim behavior.
 
-          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Task,WebSearch,WebFetch,Bash(git:*),Bash(git branch:*),Bash(git log:*),Bash(git blame:*),Bash(git diff:*),Bash(git show:*),Bash(./gradlew:*),Bash(find:*),Bash(curl:*)"'
+          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Task,WebSearch,WebFetch,Bash(git:*),Bash(git branch:*),Bash(git log:*),Bash(git blame:*),Bash(git diff:*),Bash(git show:*),Bash(./gradlew:*),Bash(find:*),Bash(curl:*),mcp__plugin_context7_context7__resolve-library-id,mcp__plugin_context7_context7__get-library-docs"'
         env:
           YOUTRACK_TOKEN: ${{ secrets.YOUTRACK_TOKEN }}
 
