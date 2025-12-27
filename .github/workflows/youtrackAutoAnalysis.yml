@@ -159,6 +159,23 @@ jobs:
             ### Step 5: If Suitable - Implement the Fix
 
             #### For Bugs (TDD approach - this order is mandatory):
+
+            **CRITICAL: Deep Root Cause Analysis**
+            Before implementing any fix, perform a thorough analysis of the actual issue:
+            - **Focus on the bug description, not the suggested solution**: Users describe symptoms and may suggest fixes that are inaccurate,
+              overly narrow, or don't fit IdeaVim's architecture. Treat suggested solutions as hints, not goals.
+            - **Find the root cause**: The user's proposed fix might address only their specific case. Understand WHY the bug happens
+              and find a solution that works correctly for all cases.
+            - **Question assumptions**: If the ticket says "just change X to Y", investigate whether that's actually the right fix.
+              The root cause might be elsewhere entirely.
+
+            **Handling Multiple Issues in One Ticket**
+            Sometimes a ticket contains multiple bugs or feature requests bundled together:
+            - **Identify separate issues**: If you find multiple distinct problems, separate them mentally.
+            - **Implement in separate commits**: Each bug fix or feature should have its own commit with a clear message.
+            - **Evaluate relevance**: Some bundled issues may be related (fix together) while others are independent (separate commits).
+            - **Keep things clean**: Don't mix unrelated fixes in a single commit. The PR can contain multiple commits if needed.
+
             1. **Check if the bug is already fixed** before writing any code:
                - Review the related source code to see if the reported issue has been addressed
                - Check git history for recent changes that might have fixed it
