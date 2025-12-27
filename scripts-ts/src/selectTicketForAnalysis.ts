@@ -34,11 +34,11 @@ async function main(): Promise<void> {
   let hasPendingClarification = false;
 
   if (pendingTickets.length > 0) {
-    // Select first pending ticket (prioritize getting answers)
-    selectedTicketId = pendingTickets[0];
+    // TESTING: Always use VIM-266 for workflow testing
+    selectedTicketId = "VIM-266";
     hasPendingClarification = true;
     console.log(`Found ${pendingTickets.length} tickets with pending clarification`);
-    console.log(`Selected pending ticket: ${selectedTicketId}`);
+    console.log(`TESTING MODE: Using fixed ticket: ${selectedTicketId} (pending clarification)`);
   } else {
     // Priority 2: Select random from unanalyzed tickets
     console.log("No pending clarification tickets, searching for unanalyzed tickets...");
@@ -55,9 +55,9 @@ async function main(): Promise<void> {
       return;
     }
 
-    // Pick a random ticket
-    selectedTicketId = tickets[Math.floor(Math.random() * tickets.length)];
-    console.log(`Selected random ticket: ${selectedTicketId}`);
+    // TESTING: Always use VIM-266 for workflow testing
+    selectedTicketId = "VIM-266";
+    console.log(`TESTING MODE: Using fixed ticket: ${selectedTicketId}`);
   }
 
   const randomTicketId = selectedTicketId;
