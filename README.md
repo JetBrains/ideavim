@@ -89,7 +89,7 @@ Here are some examples of supported vim features and commands:
 * Full Vim regexps for search and search/replace
 * Vim web help
 * `~/.ideavimrc` configuration file
-* Vim script
+* Vim script, including some [builtin functions](vimscript-info/FUNCTIONS_INFO.MD)
 * IdeaVim plugins
 
 See also:

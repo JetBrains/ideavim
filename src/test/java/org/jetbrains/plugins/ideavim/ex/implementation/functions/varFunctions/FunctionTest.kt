@@ -13,11 +13,9 @@ import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
-class FunctionTest : VimTestCase() {
-
+class FunctionTest : VimTestCase("\n") {
   @Test
   fun `test function for built-in function`() {
-    configureByText("\n")
     typeText(commandToKeys("let Ff = function('abs')"))
     typeText(commandToKeys("echo Ff(-10)"))
     assertExOutput("10")
@@ -28,7 +26,6 @@ class FunctionTest : VimTestCase() {
 
   @Test
   fun `test function with arglist`() {
-    configureByText("\n")
     typeText(commandToKeys("let Ff = function('abs', [-10])"))
     typeText(commandToKeys("echo Ff()"))
     assertExOutput("10")
@@ -40,7 +37,6 @@ class FunctionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
   @Test
   fun `test function for unknown function`() {
-    configureByText("\n")
     typeText(commandToKeys("let Ff = function('unknown')"))
     assertPluginError(true)
     assertPluginErrorMessage("E700: Unknown function: unknown")
@@ -50,7 +46,6 @@ class FunctionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
   @Test
   fun `test function with wrong function name`() {
-    configureByText("\n")
     typeText(commandToKeys("let Ff = function(32)"))
     assertPluginError(true)
     assertPluginErrorMessage("E129: Function name required")
@@ -59,7 +54,6 @@ class FunctionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
   @Test
   fun `test function with wrong second argument`() {
-    configureByText("\n")
     typeText(commandToKeys("let Ff = function('abs', 10)"))
     assertPluginError(true)
     assertPluginErrorMessage("E923: Second argument of function() must be a list or a dict")
@@ -68,15 +62,13 @@ class FunctionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
   @Test
   fun `test function with wrong third argument`() {
-    configureByText("\n")
     typeText(commandToKeys("let Ff = function('abs', [], 40)"))
     assertPluginError(true)
-    assertPluginErrorMessage("E922: Expected a dict")
+    assertPluginErrorMessage("E1206: Dictionary required for argument 3")
   }
 
   @Test
   fun `test function with arglist and dictionary`() {
-    configureByText("\n")
     typeText(
       commandToKeys(
         """
@@ -96,7 +88,6 @@ class FunctionTest : VimTestCase() {
 
   @Test
   fun `test redefining a function`() {
-    configureByText("\n")
     typeText(
       commandToKeys(
         """
@@ -128,7 +119,6 @@ class FunctionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
   @Test
   fun `test deleting function`() {
-    configureByText("\n")
     typeText(
       commandToKeys(
         """

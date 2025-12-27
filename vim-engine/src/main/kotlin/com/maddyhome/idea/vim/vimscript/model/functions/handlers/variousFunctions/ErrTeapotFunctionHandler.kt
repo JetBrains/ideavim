@@ -14,22 +14,17 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.BuiltinFunctionHandler
 
 @VimscriptFunction(name = "err_teapot")
-class ErrTeapotFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments = 0
-  override val maximumNumberOfArguments: Int? = 1
-
+class ErrTeapotFunctionHandler : BuiltinFunctionHandler<VimDataType>(minArity = 0, maxArity = 1) {
   override fun doFunction(
-    argumentValues: List<Expression>,
+    arguments: Arguments,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
   ): VimDataType {
-    val arg1 = argumentValues.getOrNull(0)?.evaluate(editor, context, vimContext)?.toVimNumber()?.booleanValue ?: false
-    if (arg1) {
+    if (arguments.getNumberOrNull(0)?.booleanValue ?: false) {
       throw exExceptionMessage("E503")
     }
     else {
