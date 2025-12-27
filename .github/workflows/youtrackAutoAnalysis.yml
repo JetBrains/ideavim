@@ -152,18 +152,40 @@ jobs:
         if: steps.check-ticket.outputs.has_ticket == 'true'
         id: parse-triage
         run: |
+          echo "=== DEBUG: All triage step outputs ==="
+          echo "execution_file: ${{ steps.triage.outputs.execution_file }}"
+          echo "structured_output: ${{ steps.triage.outputs.structured_output }}"
+          echo "session_id: ${{ steps.triage.outputs.session_id }}"
+          echo "branch_name: ${{ steps.triage.outputs.branch_name }}"
+
           EXEC_FILE="${{ steps.triage.outputs.execution_file }}"
+          echo "=== DEBUG: execution_file path: $EXEC_FILE ==="
+
           if [ -f "$EXEC_FILE" ]; then
+            echo "=== DEBUG: File exists, size: $(wc -c < "$EXEC_FILE") bytes ==="
+            echo "=== DEBUG: First 500 chars ==="
+            head -c 500 "$EXEC_FILE"
+            echo ""
+            echo "=== DEBUG: Last 1000 chars ==="
+            tail -c 1000 "$EXEC_FILE"
+            echo ""
+            echo "=== DEBUG: Trying jq to extract content ==="
+            jq -r '.content // .text // .response // .result // "jq extraction failed"' "$EXEC_FILE" 2>/dev/null | head -c 500 || echo "jq failed"
+            echo ""
             RESPONSE=$(cat "$EXEC_FILE")
           else
             echo "Warning: execution_file not found at $EXEC_FILE"
             RESPONSE=""
           fi
+
+          echo "=== DEBUG: Looking for TRIAGE_RESULT pattern ==="
+          echo "$RESPONSE" | grep -o 'TRIAGE_RESULT=[a-zA-Z_]*' || echo "Pattern not found in content"
+
           TRIAGE_RESULT=$(echo "$RESPONSE" | grep -oP 'TRIAGE_RESULT=\K\w+' | tail -1 || echo "unknown")
           ATTENTION_REASON=$(echo "$RESPONSE" | grep -oP 'ATTENTION_REASON=\K.+' | tail -1 || echo "")
           echo "triage_result=$TRIAGE_RESULT" >> $GITHUB_OUTPUT
           echo "attention_reason=$ATTENTION_REASON" >> $GITHUB_OUTPUT
-          echo "Triage result: $TRIAGE_RESULT"
+          echo "=== Final triage_result: $TRIAGE_RESULT ==="
 
       # ========== STEP 2A: BUG FIX ==========
       - name: Step 2A - Fix bug
