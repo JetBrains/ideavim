@@ -25,26 +25,42 @@ function writeGitHubOutput(name: string, value: string): void {
 async function main(): Promise<void> {
   const projectDir = process.argv[2] || ".";
 
-  console.log("Searching for open YouTrack tickets not yet analyzed by Claude...");
+  // Priority 1: Check for tickets with pending clarification (owner may have answered)
+  console.log("Checking for tickets with pending clarification...");
+  const pendingQuery = "State: Open tag: claude-pending-clarification Area: -{Remote Dev} Area: -Gateway";
+  const pendingTickets = await getTicketsByQuery(pendingQuery);
 
-  // Query: Open state, excluding:
-  // - tickets with "claude-analyzed" tag
-  // - tickets with Area "Remote Dev" or "Gateway" (not relevant to IdeaVim core)
-  const query = "State: Open tag: -claude-analyzed Area: -{Remote Dev} Area: -Gateway";
-  const tickets = await getTicketsByQuery(query);
+  let selectedTicketId: string;
+  let hasPendingClarification = false;
 
-  console.log(`Found ${tickets.length} unanalyzed open tickets`);
+  if (pendingTickets.length > 0) {
+    // Select first pending ticket (prioritize getting answers)
+    selectedTicketId = pendingTickets[0];
+    hasPendingClarification = true;
+    console.log(`Found ${pendingTickets.length} tickets with pending clarification`);
+    console.log(`Selected pending ticket: ${selectedTicketId}`);
+  } else {
+    // Priority 2: Select random from unanalyzed tickets
+    console.log("No pending clarification tickets, searching for unanalyzed tickets...");
+    const query = "State: Open tag: -claude-analyzed Area: -{Remote Dev} Area: -Gateway";
+    const tickets = await getTicketsByQuery(query);
 
-  if (tickets.length === 0) {
-    console.log("No unanalyzed tickets found");
-    writeGitHubOutput("ticket_id", "");
-    writeGitHubOutput("ticket_summary", "");
-    return;
+    console.log(`Found ${tickets.length} unanalyzed open tickets`);
+
+    if (tickets.length === 0) {
+      console.log("No unanalyzed tickets found");
+      writeGitHubOutput("ticket_id", "");
+      writeGitHubOutput("ticket_summary", "");
+      writeGitHubOutput("has_pending_clarification", "false");
+      return;
+    }
+
+    // Pick a random ticket
+    selectedTicketId = tickets[Math.floor(Math.random() * tickets.length)];
+    console.log(`Selected random ticket: ${selectedTicketId}`);
   }
 
-  // Pick a random ticket
-  const randomTicketId = tickets[Math.floor(Math.random() * tickets.length)];
-  console.log(`Selected random ticket: ${randomTicketId}`);
+  const randomTicketId = selectedTicketId;
 
   // Fetch ticket details, comments, and attachments
   const details = await getTicketDetails(randomTicketId);
@@ -127,10 +143,21 @@ ${commentsSection}${attachmentsSection}`;
   const analysisState = {
     ticket_id: details.id,
     ticket_summary: details.summary,
+    has_pending_clarification: hasPendingClarification,
     ticket_type: null,
     triage_result: null,
     triage_reason: null,
     triage_attention_reason: null,
+    check_answer: {
+      status: "pending",
+      attention_reason: null
+    },
+    planning: {
+      status: "pending",
+      plan: null,
+      questions: null,
+      attention_reason: null
+    },
     implementation: {
       status: "pending",
       changed_files: [],
@@ -160,6 +187,7 @@ ${commentsSection}${attachmentsSection}`;
   // Write GitHub Actions outputs
   writeGitHubOutput("ticket_id", details.id);
   writeGitHubOutput("ticket_summary", details.summary);
+  writeGitHubOutput("has_pending_clarification", hasPendingClarification.toString());
 }
 
 main().catch((error) => {

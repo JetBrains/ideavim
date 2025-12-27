@@ -15,9 +15,20 @@ import { setTag, addComment, CLAUDE_ANALYZED_TAG_ID } from "./youtrack.js";
 interface AnalysisState {
   ticket_id: string;
   ticket_summary: string;
+  has_pending_clarification: boolean;
   ticket_type: string | null;
   triage_result: string | null;
   triage_reason: string | null;
+  check_answer: {
+    status: string;
+    attention_reason: string | null;
+  };
+  planning: {
+    status: string;
+    plan: string | null;
+    questions: string | null;
+    attention_reason: string | null;
+  };
   implementation: {
     status: string;
     changed_files: string[];
@@ -87,10 +98,15 @@ async function main(): Promise<void> {
     console.log(`PR URL: ${prUrl}`);
   }
 
-  // Always tag the ticket to exclude from future analysis runs
-  console.log("Tagging ticket with 'claude-analyzed'...");
-  await setTag(ticketId, CLAUDE_ANALYZED_TAG_ID);
-  console.log("Ticket tagged successfully");
+  // Tag the ticket to exclude from future analysis runs
+  // EXCEPT when clarification is needed or no answer yet (so it can be picked up again)
+  if (analysisResult === "needs_clarification" || analysisResult === "no_answer") {
+    console.log(`Result is '${analysisResult}' - skipping tag so ticket can be picked up again`);
+  } else {
+    console.log("Tagging ticket with 'claude-analyzed'...");
+    await setTag(ticketId, CLAUDE_ANALYZED_TAG_ID);
+    console.log("Ticket tagged successfully");
+  }
 
   // Only add comment if explicitly "suitable" (PR created) or "error"
   // For "unsuitable" or unknown results, we just tag without commenting

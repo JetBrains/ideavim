@@ -4,6 +4,7 @@
 
 const YOUTRACK_BASE_URL = "https://youtrack.jetbrains.com/api";
 const CLAUDE_ANALYZED_TAG_ID = "68-507461";
+const CLAUDE_PENDING_CLARIFICATION_TAG_ID = "68-507582";
 const JETBRAINS_TEAM_GROUP_ID = "10-3";
 
 export interface TicketDetails {
@@ -138,6 +139,16 @@ export async function setTag(ticketId: string, tagId: string): Promise<void> {
   console.log(`Tag added successfully`);
 }
 
+export async function removeTag(ticketId: string, tagId: string): Promise<void> {
+  console.log(`Removing tag ${tagId} from ${ticketId}...`);
+
+  await youtrackFetch(`/issues/${ticketId}/tags/${tagId}`, {
+    method: "DELETE",
+  });
+
+  console.log(`Tag removed successfully`);
+}
+
 export async function addComment(
   ticketId: string,
   text: string,
@@ -192,4 +203,4 @@ export async function downloadAttachment(
   }
 }
 
-export { CLAUDE_ANALYZED_TAG_ID };
+export { CLAUDE_ANALYZED_TAG_ID, CLAUDE_PENDING_CLARIFICATION_TAG_ID };
