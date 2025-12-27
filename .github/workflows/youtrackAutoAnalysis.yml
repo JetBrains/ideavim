@@ -145,7 +145,7 @@ jobs:
             - `triage_attention_reason`: Any issues worth reporting (or leave null)
             - If unsuitable/outdated: also set `final_result` to the same value
 
-          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,WebSearch,WebFetch,Bash(curl:*),Bash(cat:*)"'
+          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,WebSearch,WebFetch,Bash(curl:*),Bash(curl -X POST:*),Bash(cat:*)"'
         env:
           YOUTRACK_TOKEN: ${{ secrets.YOUTRACK_TOKEN }}
 
