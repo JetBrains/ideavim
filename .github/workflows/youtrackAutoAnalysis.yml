@@ -481,8 +481,8 @@ jobs:
             3. Push the branch: `git push origin <branch-name>`
             4. Create PR with `gh pr create`:
                - Title: "Fix(VIM-XXXX): <brief description>" (or "Add(VIM-XXXX):" for features)
-               - Body: Include ticket link, summary of changes, and workflow run link:
-                 `$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID`
+               - Body: Include ticket link, summary of changes, and this workflow run link:
+                 ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
             ### Reporting Issues (attention_reason)
 
