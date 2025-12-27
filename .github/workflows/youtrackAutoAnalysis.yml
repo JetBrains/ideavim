@@ -105,7 +105,7 @@ jobs:
                  -d '{"text": "@Aleksei.Plate This ticket appears to be outdated: [your reasoning here]", "visibility": {"$type": "LimitedVisibility", "permittedGroups": [{"id": "10-3"}]}}'
                ```
             2. Update `analysis_state.json` with `triage_result: "outdated"` and `final_result: "outdated"`
-            3. Output `TRIAGE_RESULT=outdated` and stop
+            3. Stop (no further action needed)
 
             ### Determine Ticket Type
 
@@ -128,13 +128,13 @@ jobs:
 
             ### Reporting Issues (attention_reason)
 
-            If you encounter issues that require workflow maintainer attention, report them via `ATTENTION_REASON`
+            If you encounter issues that require workflow maintainer attention, set `triage_attention_reason`
             but **continue with the main task**. This is for issues like:
             - A tool you need is not in the allowed tools list (permission denied)
             - You discover a bug or limitation in this workflow
             - The ticket requires capabilities you don't have
 
-            The attention_reason is separate from the triage result - report both.
+            The attention_reason is separate from the triage result - set both.
 
             ### Output
 
@@ -142,10 +142,8 @@ jobs:
             - `ticket_type`: "bug" or "feature"
             - `triage_result`: "bug", "feature", "outdated", or "unsuitable"
             - `triage_reason`: Brief explanation of your decision
+            - `triage_attention_reason`: Any issues worth reporting (or leave null)
             - If unsuitable/outdated: also set `final_result` to the same value
-
-            Then output exactly: `TRIAGE_RESULT=<result>`
-            If you encountered any issues worth reporting, also output: `ATTENTION_REASON=<brief description>`
 
           claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,WebSearch,WebFetch,Bash(curl:*),Bash(cat:*)"'
         env:
@@ -155,40 +153,14 @@ jobs:
         if: steps.check-ticket.outputs.has_ticket == 'true'
         id: parse-triage
         run: |
-          echo "=== DEBUG: All triage step outputs ==="
-          echo "execution_file: ${{ steps.triage.outputs.execution_file }}"
-          echo "structured_output: ${{ steps.triage.outputs.structured_output }}"
-          echo "session_id: ${{ steps.triage.outputs.session_id }}"
-          echo "branch_name: ${{ steps.triage.outputs.branch_name }}"
-
-          EXEC_FILE="${{ steps.triage.outputs.execution_file }}"
-          echo "=== DEBUG: execution_file path: $EXEC_FILE ==="
-
-          if [ -f "$EXEC_FILE" ]; then
-            echo "=== DEBUG: File exists, size: $(wc -c < "$EXEC_FILE") bytes ==="
-            echo "=== DEBUG: First 500 chars ==="
-            head -c 500 "$EXEC_FILE"
-            echo ""
-            echo "=== DEBUG: Last 1000 chars ==="
-            tail -c 1000 "$EXEC_FILE"
-            echo ""
-            echo "=== DEBUG: Trying jq to extract content ==="
-            jq -r '.content // .text // .response // .result // "jq extraction failed"' "$EXEC_FILE" 2>/dev/null | head -c 500 || echo "jq failed"
-            echo ""
-            RESPONSE=$(cat "$EXEC_FILE")
-          else
-            echo "Warning: execution_file not found at $EXEC_FILE"
-            RESPONSE=""
-          fi
-
-          echo "=== DEBUG: Looking for TRIAGE_RESULT pattern ==="
-          echo "$RESPONSE" | grep -o 'TRIAGE_RESULT=[a-zA-Z_]*' || echo "Pattern not found in content"
-
-          TRIAGE_RESULT=$(echo "$RESPONSE" | grep -oP 'TRIAGE_RESULT=\K\w+' | tail -1 || echo "unknown")
-          ATTENTION_REASON=$(echo "$RESPONSE" | grep -oP 'ATTENTION_REASON=\K.+' | tail -1 || echo "")
+          echo "=== Reading from analysis_state.json ==="
+          cat analysis_state.json
+          echo ""
+          TRIAGE_RESULT=$(jq -r '.triage_result // "unknown"' analysis_state.json)
+          ATTENTION_REASON=$(jq -r '.triage_attention_reason // ""' analysis_state.json)
           echo "triage_result=$TRIAGE_RESULT" >> $GITHUB_OUTPUT
           echo "attention_reason=$ATTENTION_REASON" >> $GITHUB_OUTPUT
-          echo "=== Final triage_result: $TRIAGE_RESULT ==="
+          echo "Triage result: $TRIAGE_RESULT"
 
       # ========== STEP 2A: BUG FIX ==========
       - name: Step 2A - Fix bug
@@ -236,12 +208,12 @@ jobs:
 
             ### Reporting Issues (attention_reason)
 
-            If you encounter issues that require workflow maintainer attention, report them via `ATTENTION_REASON`
+            If you encounter issues that require workflow maintainer attention, set `implementation.attention_reason`
             but **continue with the main task** as best you can. This is for issues like:
             - A tool you need is not in the allowed tools list (permission denied)
             - You discover a bug or limitation in this workflow
 
-            The attention_reason is separate from the implementation status - report both.
+            The attention_reason is separate from the implementation status - set both.
 
             ### Output
 
@@ -250,10 +222,7 @@ jobs:
             - `implementation.changed_files`: List of modified source files
             - `implementation.test_files`: List of test files created/modified
             - `implementation.notes`: What was done
-            - `implementation.attention_reason`: If any issues worth reporting
-
-            Then output: `IMPLEMENTATION_STATUS=<status>`
-            If you encountered any issues worth reporting, also output: `ATTENTION_REASON=<brief description>`
+            - `implementation.attention_reason`: Any issues worth reporting (or leave null)
 
           claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Task,WebSearch,WebFetch,Bash(git:*),Bash(git branch:*),Bash(git log:*),Bash(git blame:*),Bash(git diff:*),Bash(git show:*),Bash(./gradlew:*),Bash(find:*),Bash(curl:*)"'
         env:
@@ -263,15 +232,9 @@ jobs:
         if: steps.parse-triage.outputs.triage_result == 'bug'
         id: parse-bug-fix
         run: |
-          EXEC_FILE="${{ steps.bug-fix.outputs.execution_file }}"
-          if [ -f "$EXEC_FILE" ]; then
-            RESPONSE=$(cat "$EXEC_FILE")
-          else
-            echo "Warning: execution_file not found at $EXEC_FILE"
-            RESPONSE=""
-          fi
-          IMPL_STATUS=$(echo "$RESPONSE" | grep -oP 'IMPLEMENTATION_STATUS=\K\w+' | tail -1 || echo "unknown")
-          ATTENTION_REASON=$(echo "$RESPONSE" | grep -oP 'ATTENTION_REASON=\K.+' | tail -1 || echo "")
+          echo "=== Reading from analysis_state.json ==="
+          IMPL_STATUS=$(jq -r '.implementation.status // "unknown"' analysis_state.json)
+          ATTENTION_REASON=$(jq -r '.implementation.attention_reason // ""' analysis_state.json)
           echo "implementation_status=$IMPL_STATUS" >> $GITHUB_OUTPUT
           echo "attention_reason=$ATTENTION_REASON" >> $GITHUB_OUTPUT
           echo "Implementation status: $IMPL_STATUS"
@@ -302,12 +265,12 @@ jobs:
 
             ### Reporting Issues (attention_reason)
 
-            If you encounter issues that require workflow maintainer attention, report them via `ATTENTION_REASON`
+            If you encounter issues that require workflow maintainer attention, set `implementation.attention_reason`
             but **continue with the main task** as best you can. This is for issues like:
             - A tool you need is not in the allowed tools list (permission denied)
             - You discover a bug or limitation in this workflow
 
-            The attention_reason is separate from the implementation status - report both.
+            The attention_reason is separate from the implementation status - set both.
 
             ### Output
 
@@ -316,10 +279,7 @@ jobs:
             - `implementation.changed_files`: List of modified source files
             - `implementation.test_files`: List of test files created/modified
             - `implementation.notes`: What was done
-            - `implementation.attention_reason`: If any issues worth reporting
-
-            Then output: `IMPLEMENTATION_STATUS=<status>`
-            If you encountered any issues worth reporting, also output: `ATTENTION_REASON=<brief description>`
+            - `implementation.attention_reason`: Any issues worth reporting (or leave null)
 
           claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Task,WebSearch,WebFetch,Bash(git:*),Bash(git branch:*),Bash(git log:*),Bash(git blame:*),Bash(git diff:*),Bash(git show:*),Bash(./gradlew:*),Bash(find:*),Bash(curl:*)"'
         env:
@@ -329,15 +289,9 @@ jobs:
         if: steps.parse-triage.outputs.triage_result == 'feature'
         id: parse-feature
         run: |
-          EXEC_FILE="${{ steps.feature-impl.outputs.execution_file }}"
-          if [ -f "$EXEC_FILE" ]; then
-            RESPONSE=$(cat "$EXEC_FILE")
-          else
-            echo "Warning: execution_file not found at $EXEC_FILE"
-            RESPONSE=""
-          fi
-          IMPL_STATUS=$(echo "$RESPONSE" | grep -oP 'IMPLEMENTATION_STATUS=\K\w+' | tail -1 || echo "unknown")
-          ATTENTION_REASON=$(echo "$RESPONSE" | grep -oP 'ATTENTION_REASON=\K.+' | tail -1 || echo "")
+          echo "=== Reading from analysis_state.json ==="
+          IMPL_STATUS=$(jq -r '.implementation.status // "unknown"' analysis_state.json)
+          ATTENTION_REASON=$(jq -r '.implementation.attention_reason // ""' analysis_state.json)
           echo "implementation_status=$IMPL_STATUS" >> $GITHUB_OUTPUT
           echo "attention_reason=$ATTENTION_REASON" >> $GITHUB_OUTPUT
           echo "Implementation status: $IMPL_STATUS"
@@ -365,22 +319,14 @@ jobs:
             - `review.status`: "passed" or "fixed"
             - `review.notes`: Issues found and how they were addressed
 
-            Then output: `REVIEW_STATUS=<status>`
-
           claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Task,WebSearch,WebFetch,Bash(git:*),Bash(git branch:*),Bash(git log:*),Bash(git diff:*),Bash(git status:*)"'
 
       - name: Parse review output
         if: steps.review.outcome == 'success'
         id: parse-review
         run: |
-          EXEC_FILE="${{ steps.review.outputs.execution_file }}"
-          if [ -f "$EXEC_FILE" ]; then
-            RESPONSE=$(cat "$EXEC_FILE")
-          else
-            echo "Warning: execution_file not found at $EXEC_FILE"
-            RESPONSE=""
-          fi
-          REVIEW_STATUS=$(echo "$RESPONSE" | grep -oP 'REVIEW_STATUS=\K\w+' | tail -1 || echo "unknown")
+          echo "=== Reading from analysis_state.json ==="
+          REVIEW_STATUS=$(jq -r '.review.status // "unknown"' analysis_state.json)
           echo "review_status=$REVIEW_STATUS" >> $GITHUB_OUTPUT
           echo "Review status: $REVIEW_STATUS"
 
@@ -405,8 +351,9 @@ jobs:
 
             ### Output
 
-            Then output: `CHANGELOG_STATUS=success`
-            If failed, output: `CHANGELOG_STATUS=failed` and `ATTENTION_REASON=<what went wrong>`
+            Update `analysis_state.json` with:
+            - `changelog.status`: "success" or "failed"
+            - `changelog.attention_reason`: Any issues worth reporting (or leave null)
 
           claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Skill"'
 
@@ -414,15 +361,9 @@ jobs:
         if: steps.changelog.outcome == 'success'
         id: parse-changelog
         run: |
-          EXEC_FILE="${{ steps.changelog.outputs.execution_file }}"
-          if [ -f "$EXEC_FILE" ]; then
-            RESPONSE=$(cat "$EXEC_FILE")
-          else
-            echo "Warning: execution_file not found at $EXEC_FILE"
-            RESPONSE=""
-          fi
-          CHANGELOG_STATUS=$(echo "$RESPONSE" | grep -oP 'CHANGELOG_STATUS=\K\w+' | tail -1 || echo "unknown")
-          ATTENTION_REASON=$(echo "$RESPONSE" | grep -oP 'ATTENTION_REASON=\K.+' | tail -1 || echo "")
+          echo "=== Reading from analysis_state.json ==="
+          CHANGELOG_STATUS=$(jq -r '.changelog.status // "unknown"' analysis_state.json)
+          ATTENTION_REASON=$(jq -r '.changelog.attention_reason // ""' analysis_state.json)
           echo "changelog_status=$CHANGELOG_STATUS" >> $GITHUB_OUTPUT
           echo "attention_reason=$ATTENTION_REASON" >> $GITHUB_OUTPUT
           echo "Changelog status: $CHANGELOG_STATUS"
@@ -451,12 +392,10 @@ jobs:
                - Body: Include ticket link, summary of changes, and workflow run link:
                  `$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID`
 
-            ### When to use attention_required
+            ### Reporting Issues (attention_reason)
 
-            Use this status when:
-            - Push is rejected
-            - PR creation fails
-            - gh command returns unexpected errors
+            If you encounter issues (push rejected, PR creation fails, etc.), set `pr.attention_reason`
+            but still try to complete as much as possible.
 
             ### Output
 
@@ -464,10 +403,7 @@ jobs:
             - `pr.url`: The PR URL (if successful)
             - `pr.branch`: Branch name
             - `final_result`: "suitable" (if successful) or leave as-is if failed
-            - `pr.attention_reason`: Only if PR creation failed
-
-            Then output: `PR_URL=<url>`
-            If failed, output: `ATTENTION_REASON=<what went wrong>`
+            - `pr.attention_reason`: Any issues worth reporting (or leave null)
 
           claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Bash(git:*),Bash(git branch:*),Bash(git checkout:*),Bash(git add:*),Bash(git commit:*),Bash(git push:*),Bash(git status:*),Bash(gh:*),Bash(gh pr:*)"'
 
@@ -475,15 +411,9 @@ jobs:
         if: steps.pr-creation.outcome == 'success'
         id: parse-pr
         run: |
-          EXEC_FILE="${{ steps.pr-creation.outputs.execution_file }}"
-          if [ -f "$EXEC_FILE" ]; then
-            RESPONSE=$(cat "$EXEC_FILE")
-          else
-            echo "Warning: execution_file not found at $EXEC_FILE"
-            RESPONSE=""
-          fi
-          PR_URL=$(echo "$RESPONSE" | grep -oP 'PR_URL=\K\S+' | tail -1 || echo "")
-          ATTENTION_REASON=$(echo "$RESPONSE" | grep -oP 'ATTENTION_REASON=\K.+' | tail -1 || echo "")
+          echo "=== Reading from analysis_state.json ==="
+          PR_URL=$(jq -r '.pr.url // ""' analysis_state.json)
+          ATTENTION_REASON=$(jq -r '.pr.attention_reason // ""' analysis_state.json)
           echo "pr_url=$PR_URL" >> $GITHUB_OUTPUT
           echo "attention_reason=$ATTENTION_REASON" >> $GITHUB_OUTPUT
           if [ -n "$PR_URL" ]; then

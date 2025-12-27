@@ -130,6 +130,7 @@ ${commentsSection}${attachmentsSection}`;
     ticket_type: null,
     triage_result: null,
     triage_reason: null,
+    triage_attention_reason: null,
     implementation: {
       status: "pending",
       changed_files: [],
@@ -140,6 +141,10 @@ ${commentsSection}${attachmentsSection}`;
     review: {
       status: "pending",
       notes: null
+    },
+    changelog: {
+      status: "pending",
+      attention_reason: null
     },
     pr: {
       url: null,
