@@ -119,7 +119,7 @@ class AddressTest : VimTestCase() {
     assertState("+ add\n- sub\n* mul\n")
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, description = "IdeaVim removes all content leaving empty buffer, Vim/Neovim leaves single empty line")
   @Test
   fun testAllLinesRange() {
     configureByText("1\n2\n3\n4\n5\n")
@@ -141,7 +141,7 @@ class AddressTest : VimTestCase() {
     assertState("1\n5\n")
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, description = "idk")
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, description = "IdeaVim deletes all lines from 2 onwards, but Vim/Neovim should only delete lines 2-4")
   @Test
   fun testMultipleLineNumbersWithOffsetInSecond() {
     configureByText("1\n2\n3\n4\n5\n")
