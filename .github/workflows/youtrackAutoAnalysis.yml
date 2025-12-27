@@ -370,7 +370,7 @@ jobs:
             - `planning.attention_reason`: Any issues worth reporting (or leave null)
             - If needs_clarification: also set `final_result` to "needs_clarification"
 
-          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Glob,Grep,WebSearch,WebFetch,Bash(curl:*),Bash(curl -X POST:*),Bash(git:*),Bash(git log:*),Bash(git blame:*),Bash(git diff:*),Bash(git show:*),Bash(find:*),Bash(cat:*)"'
+          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,WebSearch,WebFetch,Bash(curl:*),Bash(curl -X POST:*),Bash(git:*),Bash(git log:*),Bash(git blame:*),Bash(git diff:*),Bash(git show:*),Bash(find:*),Bash(cat:*)"'
         env:
           YOUTRACK_TOKEN: ${{ secrets.YOUTRACK_TOKEN }}
 
