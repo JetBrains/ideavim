@@ -152,7 +152,13 @@ jobs:
         if: steps.check-ticket.outputs.has_ticket == 'true'
         id: parse-triage
         run: |
-          RESPONSE="${{ steps.triage.outputs.response }}"
+          EXEC_FILE="${{ steps.triage.outputs.execution_file }}"
+          if [ -f "$EXEC_FILE" ]; then
+            RESPONSE=$(cat "$EXEC_FILE")
+          else
+            echo "Warning: execution_file not found at $EXEC_FILE"
+            RESPONSE=""
+          fi
           TRIAGE_RESULT=$(echo "$RESPONSE" | grep -oP 'TRIAGE_RESULT=\K\w+' | tail -1 || echo "unknown")
           ATTENTION_REASON=$(echo "$RESPONSE" | grep -oP 'ATTENTION_REASON=\K.+' | tail -1 || echo "")
           echo "triage_result=$TRIAGE_RESULT" >> $GITHUB_OUTPUT
@@ -230,7 +236,13 @@ jobs:
         if: steps.parse-triage.outputs.triage_result == 'bug'
         id: parse-bug-fix
         run: |
-          RESPONSE="${{ steps.bug-fix.outputs.response }}"
+          EXEC_FILE="${{ steps.bug-fix.outputs.execution_file }}"
+          if [ -f "$EXEC_FILE" ]; then
+            RESPONSE=$(cat "$EXEC_FILE")
+          else
+            echo "Warning: execution_file not found at $EXEC_FILE"
+            RESPONSE=""
+          fi
           IMPL_STATUS=$(echo "$RESPONSE" | grep -oP 'IMPLEMENTATION_STATUS=\K\w+' | tail -1 || echo "unknown")
           ATTENTION_REASON=$(echo "$RESPONSE" | grep -oP 'ATTENTION_REASON=\K.+' | tail -1 || echo "")
           echo "implementation_status=$IMPL_STATUS" >> $GITHUB_OUTPUT
@@ -288,7 +300,13 @@ jobs:
         if: steps.parse-triage.outputs.triage_result == 'feature'
         id: parse-feature
         run: |
-          RESPONSE="${{ steps.feature-impl.outputs.response }}"
+          EXEC_FILE="${{ steps.feature-impl.outputs.execution_file }}"
+          if [ -f "$EXEC_FILE" ]; then
+            RESPONSE=$(cat "$EXEC_FILE")
+          else
+            echo "Warning: execution_file not found at $EXEC_FILE"
+            RESPONSE=""
+          fi
           IMPL_STATUS=$(echo "$RESPONSE" | grep -oP 'IMPLEMENTATION_STATUS=\K\w+' | tail -1 || echo "unknown")
           ATTENTION_REASON=$(echo "$RESPONSE" | grep -oP 'ATTENTION_REASON=\K.+' | tail -1 || echo "")
           echo "implementation_status=$IMPL_STATUS" >> $GITHUB_OUTPUT
@@ -320,13 +338,19 @@ jobs:
 
             Then output: `REVIEW_STATUS=<status>`
 
-          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Task,Bash(git:*)"'
+          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Task,Bash(git:*),Bash(git branch:*),Bash(git log:*),Bash(git diff:*),Bash(git status:*)"'
 
       - name: Parse review output
         if: steps.review.outcome == 'success'
         id: parse-review
         run: |
-          RESPONSE="${{ steps.review.outputs.response }}"
+          EXEC_FILE="${{ steps.review.outputs.execution_file }}"
+          if [ -f "$EXEC_FILE" ]; then
+            RESPONSE=$(cat "$EXEC_FILE")
+          else
+            echo "Warning: execution_file not found at $EXEC_FILE"
+            RESPONSE=""
+          fi
           REVIEW_STATUS=$(echo "$RESPONSE" | grep -oP 'REVIEW_STATUS=\K\w+' | tail -1 || echo "unknown")
           echo "review_status=$REVIEW_STATUS" >> $GITHUB_OUTPUT
           echo "Review status: $REVIEW_STATUS"
@@ -376,13 +400,19 @@ jobs:
             Then output: `PR_URL=<url>`
             If failed, output: `ATTENTION_REASON=<what went wrong>`
 
-          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Skill,Bash(git:*),Bash(gh:*)"'
+          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Skill,Bash(git:*),Bash(git branch:*),Bash(git checkout:*),Bash(git add:*),Bash(git commit:*),Bash(git push:*),Bash(git status:*),Bash(gh:*),Bash(gh pr:*)"'
 
       - name: Parse PR output
         if: steps.pr-creation.outcome == 'success'
         id: parse-pr
         run: |
-          RESPONSE="${{ steps.pr-creation.outputs.response }}"
+          EXEC_FILE="${{ steps.pr-creation.outputs.execution_file }}"
+          if [ -f "$EXEC_FILE" ]; then
+            RESPONSE=$(cat "$EXEC_FILE")
+          else
+            echo "Warning: execution_file not found at $EXEC_FILE"
+            RESPONSE=""
+          fi
           PR_URL=$(echo "$RESPONSE" | grep -oP 'PR_URL=\K\S+' | tail -1 || echo "")
           ATTENTION_REASON=$(echo "$RESPONSE" | grep -oP 'ATTENTION_REASON=\K.+' | tail -1 || echo "")
           echo "pr_url=$PR_URL" >> $GITHUB_OUTPUT
