@@ -140,7 +140,8 @@ ${commentsSection}${attachmentsSection}`;
     },
     review: {
       status: "pending",
-      notes: null
+      notes: null,
+      attention_reason: null
     },
     changelog: {
       status: "pending",

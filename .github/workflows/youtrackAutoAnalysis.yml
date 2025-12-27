@@ -365,11 +365,19 @@ jobs:
             Use the `code-reviewer` subagent to review all uncommitted changes.
             Fix any issues found.
 
+            ### Reporting Issues (attention_reason)
+
+            If you encounter issues that require workflow maintainer attention, set `review.attention_reason`
+            but **continue with the main task** as best you can. This is for issues like:
+            - A tool you need is not in the allowed tools list (permission denied)
+            - You discover a bug or limitation in this workflow
+
             ### Output
 
             Update `analysis_state.json` with:
             - `review.status`: "passed" or "fixed"
             - `review.notes`: Issues found and how they were addressed
+            - `review.attention_reason`: Any issues worth reporting (or leave null)
 
           claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Task,WebSearch,WebFetch,Bash(git:*),Bash(git branch:*),Bash(git log:*),Bash(git diff:*),Bash(git status:*)"'
 
@@ -379,7 +387,24 @@ jobs:
         run: |
           echo "=== Reading from analysis_state.json ==="
           REVIEW_STATUS=$(jq -r '.review.status // "unknown"' analysis_state.json)
+          ATTENTION_REASON=$(jq -r '.review.attention_reason // ""' analysis_state.json)
+
+          # Also check execution log for permission denials
+          EXEC_FILE="${{ steps.review.outputs.execution_file }}"
+          if [ -f "$EXEC_FILE" ]; then
+            DENIALS=$(jq -r '[.[] | select(.type == "result") | .permission_denials // [] | .[].tool_name] | unique | join(", ")' "$EXEC_FILE" 2>/dev/null || echo "")
+            if [ -n "$DENIALS" ]; then
+              echo "Permission denials detected: $DENIALS"
+              if [ -n "$ATTENTION_REASON" ]; then
+                ATTENTION_REASON="$ATTENTION_REASON; Permission denials: $DENIALS"
+              else
+                ATTENTION_REASON="Permission denials: $DENIALS"
+              fi
+            fi
+          fi
+
           echo "review_status=$REVIEW_STATUS" >> $GITHUB_OUTPUT
+          echo "attention_reason=$ATTENTION_REASON" >> $GITHUB_OUTPUT
           echo "Review status: $REVIEW_STATUS"
 
       # ========== STEP 4A: CHANGELOG ==========
@@ -549,6 +574,9 @@ jobs:
             if [ -n "${{ steps.parse-feature.outputs.attention_reason }}" ]; then
               echo "- **Attention (Feature):** ${{ steps.parse-feature.outputs.attention_reason }}" >> $GITHUB_STEP_SUMMARY
             fi
+            if [ -n "${{ steps.parse-review.outputs.attention_reason }}" ]; then
+              echo "- **Attention (Review):** ${{ steps.parse-review.outputs.attention_reason }}" >> $GITHUB_STEP_SUMMARY
+            fi
             if [ -n "${{ steps.parse-changelog.outputs.attention_reason }}" ]; then
               echo "- **Attention (Changelog):** ${{ steps.parse-changelog.outputs.attention_reason }}" >> $GITHUB_STEP_SUMMARY
             fi
@@ -564,10 +592,11 @@ jobs:
           steps.parse-triage.outputs.attention_reason != '' ||
           steps.parse-bug-fix.outputs.attention_reason != '' ||
           steps.parse-feature.outputs.attention_reason != '' ||
+          steps.parse-review.outputs.attention_reason != '' ||
           steps.parse-changelog.outputs.attention_reason != '' ||
           steps.parse-pr.outputs.attention_reason != ''
         run: |
-          REASON="${{ steps.parse-triage.outputs.attention_reason }}${{ steps.parse-bug-fix.outputs.attention_reason }}${{ steps.parse-feature.outputs.attention_reason }}${{ steps.parse-changelog.outputs.attention_reason }}${{ steps.parse-pr.outputs.attention_reason }}"
+          REASON="${{ steps.parse-triage.outputs.attention_reason }}${{ steps.parse-bug-fix.outputs.attention_reason }}${{ steps.parse-feature.outputs.attention_reason }}${{ steps.parse-review.outputs.attention_reason }}${{ steps.parse-changelog.outputs.attention_reason }}${{ steps.parse-pr.outputs.attention_reason }}"
           echo "::error::Maintainer attention required: $REASON"
           exit 1
 
