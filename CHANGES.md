@@ -25,6 +25,9 @@ usual beta standards.
 
 ## [To Be Released]
 
+### Features:
+* [VIM-266](https://youtrack.jetbrains.com/issue/VIM-266) `:edit` command now creates a new buffer for non-existent files, matching standard Vim behavior
+
 ### Fixes:
 * [VIM-4097](https://youtrack.jetbrains.com/issue/VIM-4097) Fixed `<A-n>` (NextOccurrence) with text containing backslashes - e.g., selecting `\IntegerField` now works correctly
 * [VIM-4094](https://youtrack.jetbrains.com/issue/VIM-4094) Fixed UninitializedPropertyAccessException when loading history

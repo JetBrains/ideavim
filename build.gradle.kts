@@ -300,6 +300,9 @@ intellijPlatform {
     name = "IdeaVim"
     changeNotes.set(
       """
+        <b>Features:</b><br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-266">VIM-266</a> <code>:edit</code> command now creates a new buffer for non-existent files, matching standard Vim behavior<br>
+        <br>
         <b>Fixes:</b><br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4097">VIM-4097</a> Fixed <code>&lt;A-n&gt;</code> (NextOccurrence) with text containing backslashes - e.g., selecting <code>\IntegerField</code> now works correctly<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4094">VIM-4094</a> Fixed UninitializedPropertyAccessException when loading history<br>

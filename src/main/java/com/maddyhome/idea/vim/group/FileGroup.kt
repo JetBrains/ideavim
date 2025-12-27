@@ -27,6 +27,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.ProjectScope
+import com.intellij.testFramework.LightVirtualFile
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
@@ -70,9 +71,26 @@ class FileGroup : VimFileBase() {
         return true
       }
     } else {
-      injector.messages.showStatusBarMessage(null, injector.messages.message("message.open.file.not.found", filename))
+      // File not found - create a new blank buffer like Vim does.
+      // See :help :edit - "If the file does not exist, Vim will edit a new buffer."
+      if (logger.isDebugEnabled) {
+        logger.debug("file not found, creating blank buffer: $filename")
+      }
 
-      return false
+      // Extract the filename (last component of the path)
+      val bufferName = filename.substringAfterLast('/').substringAfterLast('\\')
+
+      // Create an in-memory light virtual file with the proper file type
+      // Note: We use LightVirtualFile(name, content) constructor which uses PlainTextFileType by default.
+      // This ensures the file always opens in a text editor, regardless of the file extension.
+      // The actual file type will be associated when the file is saved to disk.
+      val lightVirtualFile = LightVirtualFile(bufferName, "")
+
+      // Open the new blank buffer in the editor
+      val fem = FileEditorManager.getInstance(project)
+      fem.openFile(lightVirtualFile, true)
+
+      return true
     }
   }
 
