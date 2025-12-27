@@ -42,9 +42,9 @@ async function main(): Promise<void> {
     return;
   }
 
-  // Pick a random ticket
-  const randomTicketId = tickets[Math.floor(Math.random() * tickets.length)];
-  console.log(`Selected random ticket: ${randomTicketId}`);
+  // TESTING: Always use VIM-266 for workflow testing
+  const randomTicketId = "VIM-266";
+  console.log(`TESTING MODE: Using fixed ticket: ${randomTicketId}`);
 
   // Fetch ticket details, comments, and attachments
   const details = await getTicketDetails(randomTicketId);
