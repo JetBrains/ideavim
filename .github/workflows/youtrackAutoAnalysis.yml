@@ -222,7 +222,7 @@ jobs:
             Then output: `IMPLEMENTATION_STATUS=<status>`
             If attention_required, also output: `ATTENTION_REASON=<brief description>`
 
-          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Task,Bash(git:*),Bash(./gradlew:*),Bash(find:*),Bash(curl:*),WebFetch(domain:github.com),WebFetch(domain:raw.githubusercontent.com),WebFetch(domain:vimhelp.org),WebFetch(domain:vimdoc.sourceforge.net)"'
+          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Task,Bash(git:*),Bash(git branch:*),Bash(git log:*),Bash(git blame:*),Bash(git diff:*),Bash(git show:*),Bash(./gradlew:*),Bash(find:*),Bash(curl:*),WebFetch(domain:github.com),WebFetch(domain:raw.githubusercontent.com),WebFetch(domain:vimhelp.org),WebFetch(domain:vimdoc.sourceforge.net)"'
         env:
           YOUTRACK_TOKEN: ${{ secrets.YOUTRACK_TOKEN }}
 
@@ -280,7 +280,7 @@ jobs:
             Then output: `IMPLEMENTATION_STATUS=<status>`
             If attention_required, also output: `ATTENTION_REASON=<brief description>`
 
-          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Task,Bash(git:*),Bash(./gradlew:*),Bash(find:*),Bash(curl:*),WebFetch(domain:github.com),WebFetch(domain:raw.githubusercontent.com),WebFetch(domain:vimhelp.org),WebFetch(domain:vimdoc.sourceforge.net)"'
+          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Task,Bash(git:*),Bash(git branch:*),Bash(git log:*),Bash(git blame:*),Bash(git diff:*),Bash(git show:*),Bash(./gradlew:*),Bash(find:*),Bash(curl:*),WebFetch(domain:github.com),WebFetch(domain:raw.githubusercontent.com),WebFetch(domain:vimhelp.org),WebFetch(domain:vimdoc.sourceforge.net)"'
         env:
           YOUTRACK_TOKEN: ${{ secrets.YOUTRACK_TOKEN }}
 
