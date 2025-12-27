@@ -49,30 +49,33 @@ class FileGroup : VimFileBase() {
     val project = PlatformDataKeys.PROJECT.getData((context as IjEditorExecutionContext).context)
       ?: return false // API change - don't merge
 
-    val found = findFile(filename, project)
+    var found = findFile(filename, project)
 
-    if (found != null) {
-      if (logger.isDebugEnabled) {
-        logger.debug("found file: $found")
+    if (found == null) {
+      // File doesn't exist - try to create it (matching Vim's :edit behavior)
+      found = createFile(filename, project)
+      if (found == null) {
+        injector.messages.showStatusBarMessage(null, injector.messages.message("message.unable.to.create.file", filename))
+        return false
       }
-      // Can't open a file unless it has a known file type. The next call will return the known type.
-      // If unknown, IDEA will prompt the user to pick a type.
-      val type = FileTypeManager.getInstance().getKnownFileTypeOrAssociate(found, project)
+    }
 
-      if (type != null) {
-        val fem = FileEditorManager.getInstance(project)
-        fem.openFile(found, true)
+    if (logger.isDebugEnabled) {
+      logger.debug("found file: $found")
+    }
+    // Can't open a file unless it has a known file type. The next call will return the known type.
+    // If unknown, IDEA will prompt the user to pick a type.
+    val type = FileTypeManager.getInstance().getKnownFileTypeOrAssociate(found, project)
 
-        return true
-      } else {
-        // There was no type and user didn't pick one. Don't open the file
-        // Return true here because we found the file but the user canceled by not picking a type.
-        return true
-      }
+    if (type != null) {
+      val fem = FileEditorManager.getInstance(project)
+      fem.openFile(found, true)
+
+      return true
     } else {
-      injector.messages.showStatusBarMessage(null, injector.messages.message("message.open.file.not.found", filename))
-
-      return false
+      // There was no type and user didn't pick one. Don't open the file
+      // Return true here because we found the file but the user canceled by not picking a type.
+      return true
     }
   }
 
@@ -117,6 +120,71 @@ class FileGroup : VimFileBase() {
       }
     }
     return found
+  }
+
+  /**
+   * Creates a new file at the specified path.
+   * Supports absolute paths, home directory paths (~/), and relative paths (created in first content root).
+   *
+   * Note: This differs from Vim's behavior. In Vim, `:edit nonexistent.txt` creates a new buffer without
+   * creating the file on disk - the file is only created when explicitly written (`:w`). However, IntelliJ's
+   * editor model requires an existing file to open an editor, so IdeaVim creates the file immediately.
+   */
+  private fun createFile(filename: String, project: Project): VirtualFile? {
+    if (logger.isDebugEnabled) {
+      logger.debug("createFile($filename)")
+    }
+
+    val file: File = when {
+      filename.startsWith("~/") || filename.startsWith("~\\") -> {
+        val relativePath = filename.substring(2)
+        val dir = System.getProperty("user.home")
+        File(dir, relativePath)
+      }
+      File(filename).isAbsolute -> {
+        File(filename)
+      }
+      else -> {
+        // For relative paths, create in the first content root
+        val roots = ProjectRootManager.getInstance(project).contentRoots
+        if (roots.isEmpty()) {
+          if (logger.isDebugEnabled) {
+            logger.debug("No content roots found, cannot create relative file")
+          }
+          return null
+        }
+        File(roots[0].path, filename)
+      }
+    }
+
+    return try {
+      injector.application.runWriteAction {
+        // Create parent directories if they don't exist
+        val parentFile = file.parentFile
+        if (parentFile != null && !parentFile.exists()) {
+          if (!parentFile.mkdirs()) {
+            if (logger.isDebugEnabled) {
+              logger.debug("Failed to create parent directories for: ${file.path}")
+            }
+            return@runWriteAction null
+          }
+        }
+
+        // Create the file
+        if (!file.createNewFile()) {
+          if (logger.isDebugEnabled) {
+            logger.debug("Failed to create file: ${file.path}")
+          }
+          return@runWriteAction null
+        }
+
+        // Refresh the VFS to pick up the new file
+        LocalFileSystem.getInstance().refreshAndFindFileByIoFile(file)
+      }
+    } catch (e: Exception) {
+      logger.warn("Exception creating file '$filename': ${e.message}", e)
+      null
+    }
   }
 
   /**
