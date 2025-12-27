@@ -328,6 +328,14 @@ jobs:
           echo "::error::Maintainer attention required: ${{ steps.parse-output.outputs.attention_reason }}"
           exit 1
 
+      - name: Upload Claude execution log
+        if: always() && steps.check-ticket.outputs.has_ticket == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: claude-execution-log
+          path: /home/runner/work/_temp/claude-execution-output.json
+          if-no-files-found: ignore
+
       - name: Cleanup temporary files
         if: always()
         run: |
