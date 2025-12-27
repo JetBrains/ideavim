@@ -122,6 +122,35 @@ ${commentsSection}${attachmentsSection}`;
   writeFileSync(ticketDetailsPath, ticketDetailsContent);
   console.log(`Wrote ticket details to ${ticketDetailsPath}`);
 
+  // Write initial analysis state JSON for multi-step workflow
+  const analysisStatePath = `${projectDir}/analysis_state.json`;
+  const analysisState = {
+    ticket_id: details.id,
+    ticket_summary: details.summary,
+    ticket_type: null,
+    triage_result: null,
+    triage_reason: null,
+    implementation: {
+      status: "pending",
+      changed_files: [],
+      test_files: [],
+      notes: null,
+      attention_reason: null
+    },
+    review: {
+      status: "pending",
+      notes: null
+    },
+    pr: {
+      url: null,
+      branch: null,
+      attention_reason: null
+    },
+    final_result: null
+  };
+  writeFileSync(analysisStatePath, JSON.stringify(analysisState, null, 2));
+  console.log(`Wrote analysis state to ${analysisStatePath}`);
+
   // Write GitHub Actions outputs
   writeGitHubOutput("ticket_id", details.id);
   writeGitHubOutput("ticket_summary", details.summary);

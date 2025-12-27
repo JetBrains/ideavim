@@ -2,17 +2,40 @@
 /**
  * Completes the YouTrack ticket analysis by tagging and optionally commenting.
  *
- * Arguments:
- * - argv[2]: ticket ID (e.g., "VIM-1234")
- * - argv[3]: analysis result ("suitable", "unsuitable", or "error")
- * - argv[4]: PR URL (optional, only present if a PR was created)
+ * Reads from: analysis_state.json in the project root
  *
  * Actions:
  * - Always tags the ticket with "claude-analyzed"
  * - Adds a comment only if result is "suitable" or "error"
  */
 
+import { readFileSync, existsSync } from "fs";
 import { setTag, addComment, CLAUDE_ANALYZED_TAG_ID } from "./youtrack.js";
+
+interface AnalysisState {
+  ticket_id: string;
+  ticket_summary: string;
+  ticket_type: string | null;
+  triage_result: string | null;
+  triage_reason: string | null;
+  implementation: {
+    status: string;
+    changed_files: string[];
+    test_files: string[];
+    notes: string | null;
+    attention_reason: string | null;
+  };
+  review: {
+    status: string;
+    notes: string | null;
+  };
+  pr: {
+    url: string | null;
+    branch: string | null;
+    attention_reason: string | null;
+  };
+  final_result: string | null;
+}
 
 function buildComment(analysisResult: string, prUrl: string | null): string {
   let content = "**Claude Code Automated Analysis**\n\n";
@@ -40,12 +63,21 @@ function buildComment(analysisResult: string, prUrl: string | null): string {
 }
 
 async function main(): Promise<void> {
-  const ticketId = process.argv[2];
-  const analysisResult = process.argv[3] || "unknown";
-  const prUrl = process.argv[4] || null;
+  const projectDir = process.argv[2] || "..";
+  const statePath = `${projectDir}/analysis_state.json`;
+
+  if (!existsSync(statePath)) {
+    console.log(`No analysis_state.json found at ${statePath}, skipping completion`);
+    return;
+  }
+
+  const state: AnalysisState = JSON.parse(readFileSync(statePath, "utf-8"));
+  const ticketId = state.ticket_id;
+  const analysisResult = state.final_result || "unknown";
+  const prUrl = state.pr?.url ?? null;
 
   if (!ticketId) {
-    console.log("No ticket ID provided, skipping completion");
+    console.log("No ticket ID in analysis state, skipping completion");
     return;
   }
 
