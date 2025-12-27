@@ -244,6 +244,13 @@ jobs:
             - `triage_attention_reason`: Any issues worth reporting (or leave null)
             - If unsuitable/outdated: also set `final_result` to the same value
 
+            ### Available Resources
+
+            You have access to the **context7** plugin which can fetch up-to-date documentation
+            for various libraries and tools, including Vim. Use `mcp__plugin_context7_context7__resolve-library-id`
+            and `mcp__plugin_context7_context7__get-library-docs` to look up Vim documentation
+            when you need to verify expected Vim behavior.
+
           claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,WebSearch,WebFetch,Bash(curl:*),Bash(curl -X POST:*),Bash(cat:*)"'
         env:
           YOUTRACK_TOKEN: ${{ secrets.YOUTRACK_TOKEN }}
@@ -370,6 +377,13 @@ jobs:
             - `planning.attention_reason`: Any issues worth reporting (or leave null)
             - If needs_clarification: also set `final_result` to "needs_clarification"
 
+            ### Available Resources
+
+            You have access to the **context7** plugin which can fetch up-to-date documentation
+            for various libraries and tools, including Vim. Use `mcp__plugin_context7_context7__resolve-library-id`
+            and `mcp__plugin_context7_context7__get-library-docs` to look up Vim documentation
+            when you need to verify expected Vim behavior.
+
           claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,WebSearch,WebFetch,Bash(curl:*),Bash(curl -X POST:*),Bash(git:*),Bash(git log:*),Bash(git blame:*),Bash(git diff:*),Bash(git show:*),Bash(find:*),Bash(cat:*)"'
         env:
           YOUTRACK_TOKEN: ${{ secrets.YOUTRACK_TOKEN }}
@@ -470,6 +484,13 @@ jobs:
             - `implementation.notes`: What was done
             - `implementation.attention_reason`: Any issues worth reporting (or leave null)
 
+            ### Available Resources
+
+            You have access to the **context7** plugin which can fetch up-to-date documentation
+            for various libraries and tools, including Vim. Use `mcp__plugin_context7_context7__resolve-library-id`
+            and `mcp__plugin_context7_context7__get-library-docs` to look up Vim documentation
+            when you need to verify expected Vim behavior.
+
           claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Task,WebSearch,WebFetch,Bash(git:*),Bash(git branch:*),Bash(git log:*),Bash(git blame:*),Bash(git diff:*),Bash(git show:*),Bash(./gradlew:*),Bash(find:*),Bash(curl:*)"'
         env:
           YOUTRACK_TOKEN: ${{ secrets.YOUTRACK_TOKEN }}
@@ -547,6 +568,13 @@ jobs:
             - `implementation.test_files`: List of test files created/modified
             - `implementation.notes`: What was done
             - `implementation.attention_reason`: Any issues worth reporting (or leave null)
+
+            ### Available Resources
+
+            You have access to the **context7** plugin which can fetch up-to-date documentation
+            for various libraries and tools, including Vim. Use `mcp__plugin_context7_context7__resolve-library-id`
+            and `mcp__plugin_context7_context7__get-library-docs` to look up Vim documentation
+            when you need to verify expected Vim behavior.
 
           claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Task,WebSearch,WebFetch,Bash(git:*),Bash(git branch:*),Bash(git log:*),Bash(git blame:*),Bash(git diff:*),Bash(git show:*),Bash(./gradlew:*),Bash(find:*),Bash(curl:*)"'
         env:
