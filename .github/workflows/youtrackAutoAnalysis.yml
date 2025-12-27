@@ -144,7 +144,7 @@ jobs:
             Then output exactly: `TRIAGE_RESULT=<result>`
             If attention_required, also output: `ATTENTION_REASON=<brief description>`
 
-          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Bash(curl:*),Bash(cat:*)"'
+          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,WebSearch,WebFetch,Bash(curl:*),Bash(cat:*)"'
         env:
           YOUTRACK_TOKEN: ${{ secrets.YOUTRACK_TOKEN }}
 
@@ -250,7 +250,7 @@ jobs:
             Then output: `IMPLEMENTATION_STATUS=<status>`
             If attention_required, also output: `ATTENTION_REASON=<brief description>`
 
-          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Task,Bash(git:*),Bash(git branch:*),Bash(git log:*),Bash(git blame:*),Bash(git diff:*),Bash(git show:*),Bash(./gradlew:*),Bash(find:*),Bash(curl:*),WebFetch(domain:github.com),WebFetch(domain:raw.githubusercontent.com),WebFetch(domain:vimhelp.org),WebFetch(domain:vimdoc.sourceforge.net)"'
+          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Task,WebSearch,WebFetch,Bash(git:*),Bash(git branch:*),Bash(git log:*),Bash(git blame:*),Bash(git diff:*),Bash(git show:*),Bash(./gradlew:*),Bash(find:*),Bash(curl:*)"'
         env:
           YOUTRACK_TOKEN: ${{ secrets.YOUTRACK_TOKEN }}
 
@@ -314,7 +314,7 @@ jobs:
             Then output: `IMPLEMENTATION_STATUS=<status>`
             If attention_required, also output: `ATTENTION_REASON=<brief description>`
 
-          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Task,Bash(git:*),Bash(git branch:*),Bash(git log:*),Bash(git blame:*),Bash(git diff:*),Bash(git show:*),Bash(./gradlew:*),Bash(find:*),Bash(curl:*),WebFetch(domain:github.com),WebFetch(domain:raw.githubusercontent.com),WebFetch(domain:vimhelp.org),WebFetch(domain:vimdoc.sourceforge.net)"'
+          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Task,WebSearch,WebFetch,Bash(git:*),Bash(git branch:*),Bash(git log:*),Bash(git blame:*),Bash(git diff:*),Bash(git show:*),Bash(./gradlew:*),Bash(find:*),Bash(curl:*)"'
         env:
           YOUTRACK_TOKEN: ${{ secrets.YOUTRACK_TOKEN }}
 
@@ -360,7 +360,7 @@ jobs:
 
             Then output: `REVIEW_STATUS=<status>`
 
-          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Task,Bash(git:*),Bash(git branch:*),Bash(git log:*),Bash(git diff:*),Bash(git status:*)"'
+          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Task,WebSearch,WebFetch,Bash(git:*),Bash(git branch:*),Bash(git log:*),Bash(git diff:*),Bash(git status:*)"'
 
       - name: Parse review output
         if: steps.review.outcome == 'success'
@@ -377,11 +377,52 @@ jobs:
           echo "review_status=$REVIEW_STATUS" >> $GITHUB_OUTPUT
           echo "Review status: $REVIEW_STATUS"
 
-      # ========== STEP 4: CHANGELOG & PR ==========
-      - name: Step 4 - Changelog and PR
+      # ========== STEP 4A: CHANGELOG ==========
+      - name: Step 4A - Update changelog
         if: |
           steps.parse-review.outputs.review_status == 'passed' ||
           steps.parse-review.outputs.review_status == 'fixed'
+        id: changelog
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          settings: .claude/settings.json
+
+          prompt: |
+            ## Task: Update Changelog
+
+            Read `analysis_state.json` for ticket context.
+
+            Use the `changelog` skill to add an entry for this fix/feature.
+            The skill will update CHANGES.md appropriately.
+
+            ### Output
+
+            Then output: `CHANGELOG_STATUS=success`
+            If failed, output: `CHANGELOG_STATUS=failed` and `ATTENTION_REASON=<what went wrong>`
+
+          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Skill"'
+
+      - name: Parse changelog output
+        if: steps.changelog.outcome == 'success'
+        id: parse-changelog
+        run: |
+          EXEC_FILE="${{ steps.changelog.outputs.execution_file }}"
+          if [ -f "$EXEC_FILE" ]; then
+            RESPONSE=$(cat "$EXEC_FILE")
+          else
+            echo "Warning: execution_file not found at $EXEC_FILE"
+            RESPONSE=""
+          fi
+          CHANGELOG_STATUS=$(echo "$RESPONSE" | grep -oP 'CHANGELOG_STATUS=\K\w+' | tail -1 || echo "unknown")
+          ATTENTION_REASON=$(echo "$RESPONSE" | grep -oP 'ATTENTION_REASON=\K.+' | tail -1 || echo "")
+          echo "changelog_status=$CHANGELOG_STATUS" >> $GITHUB_OUTPUT
+          echo "attention_reason=$ATTENTION_REASON" >> $GITHUB_OUTPUT
+          echo "Changelog status: $CHANGELOG_STATUS"
+
+      # ========== STEP 4B: CREATE PR ==========
+      - name: Step 4B - Create PR
+        if: steps.parse-changelog.outputs.changelog_status == 'success'
         id: pr-creation
         uses: anthropics/claude-code-action@v1
         with:
@@ -389,17 +430,16 @@ jobs:
           settings: .claude/settings.json
 
           prompt: |
-            ## Task: Update Changelog and Create PR
+            ## Task: Create Pull Request
 
             Read `analysis_state.json` for ticket context.
 
             ### Steps
 
-            1. Use the `changelog` skill to add an entry for this fix/feature
-            2. Create a new branch: `git checkout -b fix/vim-XXXX-short-description` (or `add/` for features)
-            3. Commit all changes with a descriptive message
-            4. Push the branch: `git push origin <branch-name>`
-            5. Create PR with `gh pr create`:
+            1. Create a new branch: `git checkout -b fix/vim-XXXX-short-description` (or `add/` for features)
+            2. Commit all changes with a descriptive message
+            3. Push the branch: `git push origin <branch-name>`
+            4. Create PR with `gh pr create`:
                - Title: "Fix(VIM-XXXX): <brief description>" (or "Add(VIM-XXXX):" for features)
                - Body: Include ticket link, summary of changes, and workflow run link:
                  `$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID`
@@ -422,7 +462,7 @@ jobs:
             Then output: `PR_URL=<url>`
             If failed, output: `ATTENTION_REASON=<what went wrong>`
 
-          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Skill,Bash(git:*),Bash(git branch:*),Bash(git checkout:*),Bash(git add:*),Bash(git commit:*),Bash(git push:*),Bash(git status:*),Bash(gh:*),Bash(gh pr:*)"'
+          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Bash(git:*),Bash(git branch:*),Bash(git checkout:*),Bash(git add:*),Bash(git commit:*),Bash(git push:*),Bash(git status:*),Bash(gh:*),Bash(gh pr:*)"'
 
       - name: Parse PR output
         if: steps.pr-creation.outcome == 'success'
@@ -469,9 +509,12 @@ jobs:
               echo "- **Feature:** ${{ steps.parse-feature.outputs.implementation_status }}" >> $GITHUB_STEP_SUMMARY
             fi
 
-            # Show review and PR status if applicable
+            # Show review, changelog and PR status if applicable
             if [ -n "${{ steps.parse-review.outputs.review_status }}" ]; then
               echo "- **Review:** ${{ steps.parse-review.outputs.review_status }}" >> $GITHUB_STEP_SUMMARY
+            fi
+            if [ -n "${{ steps.parse-changelog.outputs.changelog_status }}" ]; then
+              echo "- **Changelog:** ${{ steps.parse-changelog.outputs.changelog_status }}" >> $GITHUB_STEP_SUMMARY
             fi
             if [ -n "${{ steps.parse-pr.outputs.pr_url }}" ]; then
               echo "- **PR:** ${{ steps.parse-pr.outputs.pr_url }}" >> $GITHUB_STEP_SUMMARY
@@ -487,6 +530,9 @@ jobs:
             if [ -n "${{ steps.parse-feature.outputs.attention_reason }}" ]; then
               echo "- **Attention (Feature):** ${{ steps.parse-feature.outputs.attention_reason }}" >> $GITHUB_STEP_SUMMARY
             fi
+            if [ -n "${{ steps.parse-changelog.outputs.attention_reason }}" ]; then
+              echo "- **Attention (Changelog):** ${{ steps.parse-changelog.outputs.attention_reason }}" >> $GITHUB_STEP_SUMMARY
+            fi
             if [ -n "${{ steps.parse-pr.outputs.attention_reason }}" ]; then
               echo "- **Attention (PR):** ${{ steps.parse-pr.outputs.attention_reason }}" >> $GITHUB_STEP_SUMMARY
             fi
@@ -499,9 +545,10 @@ jobs:
           steps.parse-triage.outputs.triage_result == 'attention_required' ||
           steps.parse-bug-fix.outputs.implementation_status == 'attention_required' ||
           steps.parse-feature.outputs.implementation_status == 'attention_required' ||
+          steps.parse-changelog.outputs.changelog_status == 'failed' ||
           (steps.parse-pr.outputs.attention_reason != '' && steps.parse-pr.outputs.pr_url == '')
         run: |
-          REASON="${{ steps.parse-triage.outputs.attention_reason }}${{ steps.parse-bug-fix.outputs.attention_reason }}${{ steps.parse-feature.outputs.attention_reason }}${{ steps.parse-pr.outputs.attention_reason }}"
+          REASON="${{ steps.parse-triage.outputs.attention_reason }}${{ steps.parse-bug-fix.outputs.attention_reason }}${{ steps.parse-feature.outputs.attention_reason }}${{ steps.parse-changelog.outputs.attention_reason }}${{ steps.parse-pr.outputs.attention_reason }}"
           echo "::error::Maintainer attention required: $REASON"
           exit 1
 
