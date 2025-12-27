@@ -158,6 +158,21 @@ jobs:
           echo ""
           TRIAGE_RESULT=$(jq -r '.triage_result // "unknown"' analysis_state.json)
           ATTENTION_REASON=$(jq -r '.triage_attention_reason // ""' analysis_state.json)
+
+          # Also check execution log for permission denials
+          EXEC_FILE="${{ steps.triage.outputs.execution_file }}"
+          if [ -f "$EXEC_FILE" ]; then
+            DENIALS=$(jq -r '[.[] | select(.type == "result") | .permission_denials // [] | .[].tool_name] | unique | join(", ")' "$EXEC_FILE" 2>/dev/null || echo "")
+            if [ -n "$DENIALS" ]; then
+              echo "Permission denials detected: $DENIALS"
+              if [ -n "$ATTENTION_REASON" ]; then
+                ATTENTION_REASON="$ATTENTION_REASON; Permission denials: $DENIALS"
+              else
+                ATTENTION_REASON="Permission denials: $DENIALS"
+              fi
+            fi
+          fi
+
           echo "triage_result=$TRIAGE_RESULT" >> $GITHUB_OUTPUT
           echo "attention_reason=$ATTENTION_REASON" >> $GITHUB_OUTPUT
           echo "Triage result: $TRIAGE_RESULT"
@@ -235,6 +250,21 @@ jobs:
           echo "=== Reading from analysis_state.json ==="
           IMPL_STATUS=$(jq -r '.implementation.status // "unknown"' analysis_state.json)
           ATTENTION_REASON=$(jq -r '.implementation.attention_reason // ""' analysis_state.json)
+
+          # Also check execution log for permission denials
+          EXEC_FILE="${{ steps.bug-fix.outputs.execution_file }}"
+          if [ -f "$EXEC_FILE" ]; then
+            DENIALS=$(jq -r '[.[] | select(.type == "result") | .permission_denials // [] | .[].tool_name] | unique | join(", ")' "$EXEC_FILE" 2>/dev/null || echo "")
+            if [ -n "$DENIALS" ]; then
+              echo "Permission denials detected: $DENIALS"
+              if [ -n "$ATTENTION_REASON" ]; then
+                ATTENTION_REASON="$ATTENTION_REASON; Permission denials: $DENIALS"
+              else
+                ATTENTION_REASON="Permission denials: $DENIALS"
+              fi
+            fi
+          fi
+
           echo "implementation_status=$IMPL_STATUS" >> $GITHUB_OUTPUT
           echo "attention_reason=$ATTENTION_REASON" >> $GITHUB_OUTPUT
           echo "Implementation status: $IMPL_STATUS"
@@ -292,6 +322,21 @@ jobs:
           echo "=== Reading from analysis_state.json ==="
           IMPL_STATUS=$(jq -r '.implementation.status // "unknown"' analysis_state.json)
           ATTENTION_REASON=$(jq -r '.implementation.attention_reason // ""' analysis_state.json)
+
+          # Also check execution log for permission denials
+          EXEC_FILE="${{ steps.feature-impl.outputs.execution_file }}"
+          if [ -f "$EXEC_FILE" ]; then
+            DENIALS=$(jq -r '[.[] | select(.type == "result") | .permission_denials // [] | .[].tool_name] | unique | join(", ")' "$EXEC_FILE" 2>/dev/null || echo "")
+            if [ -n "$DENIALS" ]; then
+              echo "Permission denials detected: $DENIALS"
+              if [ -n "$ATTENTION_REASON" ]; then
+                ATTENTION_REASON="$ATTENTION_REASON; Permission denials: $DENIALS"
+              else
+                ATTENTION_REASON="Permission denials: $DENIALS"
+              fi
+            fi
+          fi
+
           echo "implementation_status=$IMPL_STATUS" >> $GITHUB_OUTPUT
           echo "attention_reason=$ATTENTION_REASON" >> $GITHUB_OUTPUT
           echo "Implementation status: $IMPL_STATUS"
@@ -364,6 +409,21 @@ jobs:
           echo "=== Reading from analysis_state.json ==="
           CHANGELOG_STATUS=$(jq -r '.changelog.status // "unknown"' analysis_state.json)
           ATTENTION_REASON=$(jq -r '.changelog.attention_reason // ""' analysis_state.json)
+
+          # Also check execution log for permission denials
+          EXEC_FILE="${{ steps.changelog.outputs.execution_file }}"
+          if [ -f "$EXEC_FILE" ]; then
+            DENIALS=$(jq -r '[.[] | select(.type == "result") | .permission_denials // [] | .[].tool_name] | unique | join(", ")' "$EXEC_FILE" 2>/dev/null || echo "")
+            if [ -n "$DENIALS" ]; then
+              echo "Permission denials detected: $DENIALS"
+              if [ -n "$ATTENTION_REASON" ]; then
+                ATTENTION_REASON="$ATTENTION_REASON; Permission denials: $DENIALS"
+              else
+                ATTENTION_REASON="Permission denials: $DENIALS"
+              fi
+            fi
+          fi
+
           echo "changelog_status=$CHANGELOG_STATUS" >> $GITHUB_OUTPUT
           echo "attention_reason=$ATTENTION_REASON" >> $GITHUB_OUTPUT
           echo "Changelog status: $CHANGELOG_STATUS"
@@ -414,6 +474,21 @@ jobs:
           echo "=== Reading from analysis_state.json ==="
           PR_URL=$(jq -r '.pr.url // ""' analysis_state.json)
           ATTENTION_REASON=$(jq -r '.pr.attention_reason // ""' analysis_state.json)
+
+          # Also check execution log for permission denials
+          EXEC_FILE="${{ steps.pr-creation.outputs.execution_file }}"
+          if [ -f "$EXEC_FILE" ]; then
+            DENIALS=$(jq -r '[.[] | select(.type == "result") | .permission_denials // [] | .[].tool_name] | unique | join(", ")' "$EXEC_FILE" 2>/dev/null || echo "")
+            if [ -n "$DENIALS" ]; then
+              echo "Permission denials detected: $DENIALS"
+              if [ -n "$ATTENTION_REASON" ]; then
+                ATTENTION_REASON="$ATTENTION_REASON; Permission denials: $DENIALS"
+              else
+                ATTENTION_REASON="Permission denials: $DENIALS"
+              fi
+            fi
+          fi
+
           echo "pr_url=$PR_URL" >> $GITHUB_OUTPUT
           echo "attention_reason=$ATTENTION_REASON" >> $GITHUB_OUTPUT
           if [ -n "$PR_URL" ]; then
