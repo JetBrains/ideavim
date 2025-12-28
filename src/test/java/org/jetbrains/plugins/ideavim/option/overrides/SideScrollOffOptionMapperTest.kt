@@ -23,7 +23,10 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 
-@TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+@TestWithoutNeovim(
+  reason = SkipNeovimReason.NOT_VIM_TESTING,
+  description = "Tests integration between IdeaVim option and IntelliJ EditorSettingsExternalizable"
+)
 class SideScrollOffOptionMapperTest : VimTestCase() {
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
