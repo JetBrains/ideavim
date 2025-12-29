@@ -36,9 +36,6 @@ dependencies {
   // This is needed for jgit to connect to ssh
   implementation("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:7.4.0.202509020913-r")
   implementation("com.vdurmont:semver4j:3.1.0")
-  
-  // For updateAuthors
-  implementation("org.kohsuke:github-api:1.305")
 }
 
 val releaseType: String? by project
@@ -119,13 +116,6 @@ tasks.register("setTeamCityBuildNumber", JavaExec::class) {
   mainClass.set("scripts.release.SetTeamCityBuildNumberKt")
   classpath = sourceSets["main"].runtimeClasspath
   args = listOf(project.version.toString(), rootProject.rootDir.toString(), releaseType ?: "")
-}
-
-tasks.register("updateAuthors", JavaExec::class) {
-  group = "other"
-  mainClass.set("scripts.UpdateAuthorsKt")
-  classpath = sourceSets["main"].runtimeClasspath
-  args = listOf(rootProject.rootDir.toString())
 }
 
 tasks.register("releaseActions", JavaExec::class) {
