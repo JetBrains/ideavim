@@ -6,6 +6,9 @@ const YOUTRACK_BASE_URL = "https://youtrack.jetbrains.com/api";
 const CLAUDE_ANALYZED_TAG_ID = "68-507461";
 const CLAUDE_PENDING_CLARIFICATION_TAG_ID = "68-507582";
 const JETBRAINS_TEAM_GROUP_ID = "10-3";
+const RELEASED_IN_EAP_TAG_ID = "68-385032";
+const VIM_PROJECT_ID = "22-43";
+const FIX_VERSIONS_FIELD_ID = "123-285";
 
 export interface TicketDetails {
   id: string;
@@ -242,4 +245,112 @@ export async function downloadAttachment(
   }
 }
 
-export { CLAUDE_ANALYZED_TAG_ID, CLAUDE_PENDING_CLARIFICATION_TAG_ID };
+// Release management functions
+
+export async function createReleaseVersion(name: string): Promise<string> {
+  console.log(`Creating new release version in YouTrack: ${name}`);
+
+  const response = await youtrackFetch(
+    `/admin/projects/${VIM_PROJECT_ID}/customFields/${FIX_VERSIONS_FIELD_ID}/bundle/values?fields=id,name`,
+    {
+      method: "POST",
+      body: JSON.stringify({
+        name,
+        $type: "VersionBundleElement",
+      }),
+    }
+  );
+
+  const data = await response.json();
+  const versionId = data.id;
+
+  console.log(`Created release version "${name}" with ID: ${versionId}`);
+  return versionId;
+}
+
+export async function getVersionIdByName(name: string): Promise<string | null> {
+  console.log(`Looking up version ID for: ${name}`);
+
+  const params = new URLSearchParams({
+    fields: "id,name",
+    query: name,
+  });
+
+  const response = await youtrackFetch(
+    `/admin/projects/${VIM_PROJECT_ID}/customFields/${FIX_VERSIONS_FIELD_ID}/bundle/values?${params}`
+  );
+
+  const data = await response.json();
+
+  if (data.length === 0) {
+    console.log(`Version "${name}" not found`);
+    return null;
+  }
+
+  const versionId = data[0].id;
+  console.log(`Found version "${name}" with ID: ${versionId}`);
+  return versionId;
+}
+
+export async function deleteVersionById(id: string): Promise<void> {
+  console.log(`Deleting version with ID: ${id}`);
+
+  await youtrackFetch(
+    `/admin/projects/${VIM_PROJECT_ID}/customFields/${FIX_VERSIONS_FIELD_ID}/bundle/values/${id}`,
+    {
+      method: "DELETE",
+    }
+  );
+
+  console.log(`Version deleted successfully`);
+}
+
+export async function setFixVersion(
+  ticketId: string,
+  version: string
+): Promise<void> {
+  console.log(`Setting fix version "${version}" for ${ticketId}...`);
+
+  const response = await youtrackFetch(
+    `/issues/${ticketId}?fields=customFields(name,value(name))`,
+    {
+      method: "POST",
+      body: JSON.stringify({
+        customFields: [
+          {
+            name: "Fix versions",
+            $type: "MultiVersionIssueCustomField",
+            value: [{ name: version }],
+          },
+        ],
+      }),
+    }
+  );
+
+  const data = await response.json();
+
+  // Verify the fix version was set correctly
+  const fixVersionsField = data.customFields?.find(
+    (f: { name: string }) => f.name === "Fix versions"
+  );
+  const versions = fixVersionsField?.value ?? [];
+  const hasVersion = versions.some(
+    (v: { name: string }) => v.name === version
+  );
+
+  if (!hasVersion) {
+    throw new Error(
+      `Ticket ${ticketId} fix version not updated! Expected "${version}" to be in fix versions`
+    );
+  }
+
+  console.log(`Fix version set successfully to "${version}"`);
+}
+
+export {
+  CLAUDE_ANALYZED_TAG_ID,
+  CLAUDE_PENDING_CLARIFICATION_TAG_ID,
+  RELEASED_IN_EAP_TAG_ID,
+  VIM_PROJECT_ID,
+  FIX_VERSIONS_FIELD_ID,
+};
