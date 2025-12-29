@@ -120,7 +120,7 @@ jobs:
             - `check_answer.attention_reason`: Any issues worth reporting (or leave null)
             - If not answered: also set `final_result` to "no_answer"
 
-          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Skill,Bash(npx tsx:*)"'
+          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Skill,Bash(npx tsx:*),Bash(./gradlew:*)"'
         env:
           YOUTRACK_TOKEN: ${{ secrets.YOUTRACK_TOKEN }}
 
@@ -245,7 +245,7 @@ jobs:
             and `mcp__plugin_context7_context7__get-library-docs` to look up Vim documentation
             when you need to verify expected Vim behavior.
 
-          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,WebSearch,WebFetch,Skill,Bash(npx tsx:*),Bash(cat:*),mcp__plugin_context7_context7__resolve-library-id,mcp__plugin_context7_context7__get-library-docs"'
+          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,WebSearch,WebFetch,Skill,Bash(npx tsx:*),Bash(cat:*),Bash(./gradlew:*),mcp__plugin_context7_context7__resolve-library-id,mcp__plugin_context7_context7__get-library-docs"'
         env:
           YOUTRACK_TOKEN: ${{ secrets.YOUTRACK_TOKEN }}
 
@@ -368,7 +368,7 @@ jobs:
             and `mcp__plugin_context7_context7__get-library-docs` to look up Vim documentation
             when you need to verify expected Vim behavior.
 
-          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,WebSearch,WebFetch,Skill,Bash(npx tsx:*),Bash(git:*),Bash(git log:*),Bash(git blame:*),Bash(git diff:*),Bash(git show:*),Bash(find:*),Bash(cat:*),mcp__plugin_context7_context7__resolve-library-id,mcp__plugin_context7_context7__get-library-docs"'
+          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,WebSearch,WebFetch,Skill,Bash(npx tsx:*),Bash(git:*),Bash(git log:*),Bash(git blame:*),Bash(git diff:*),Bash(git show:*),Bash(find:*),Bash(cat:*),Bash(./gradlew:*),mcp__plugin_context7_context7__resolve-library-id,mcp__plugin_context7_context7__get-library-docs"'
         env:
           YOUTRACK_TOKEN: ${{ secrets.YOUTRACK_TOKEN }}
 
@@ -625,7 +625,7 @@ jobs:
             - `review.notes`: Issues found and how they were addressed
             - `review.attention_reason`: Any issues worth reporting (or leave null)
 
-          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Task,WebSearch,WebFetch,Bash(git:*),Bash(git branch:*),Bash(git log:*),Bash(git diff:*),Bash(git status:*)"'
+          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Task,WebSearch,WebFetch,Bash(git:*),Bash(git branch:*),Bash(git log:*),Bash(git diff:*),Bash(git status:*),Bash(./gradlew:*)"'
 
       - name: Parse review output
         if: steps.review.outcome == 'success'
@@ -678,7 +678,7 @@ jobs:
             - `changelog.status`: "success" or "failed"
             - `changelog.attention_reason`: Any issues worth reporting (or leave null)
 
-          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Skill"'
+          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Skill,Bash(./gradlew:*)"'
 
       - name: Parse changelog output
         if: steps.changelog.outcome == 'success'
@@ -743,7 +743,7 @@ jobs:
             - `final_result`: "suitable" (if successful) or leave as-is if failed
             - `pr.attention_reason`: Any issues worth reporting (or leave null)
 
-          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Bash(git:*),Bash(git branch:*),Bash(git checkout:*),Bash(git add:*),Bash(git commit:*),Bash(git push:*),Bash(git status:*),Bash(gh:*),Bash(gh pr:*)"'
+          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Edit,Write,Glob,Grep,Bash(git:*),Bash(git branch:*),Bash(git checkout:*),Bash(git add:*),Bash(git commit:*),Bash(git push:*),Bash(git status:*),Bash(gh:*),Bash(gh pr:*),Bash(./gradlew:*)"'
 
       - name: Parse PR output
         if: steps.pr-creation.outcome == 'success'
