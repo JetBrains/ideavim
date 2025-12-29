@@ -149,6 +149,45 @@ export async function removeTag(ticketId: string, tagId: string): Promise<void> 
   console.log(`Tag removed successfully`);
 }
 
+export async function setStatus(
+  ticketId: string,
+  status: string
+): Promise<void> {
+  console.log(`Setting ${ticketId} status to "${status}"...`);
+
+  const response = await youtrackFetch(
+    `/issues/${ticketId}?fields=customFields(name,value(name))`,
+    {
+      method: "POST",
+      body: JSON.stringify({
+        customFields: [
+          {
+            name: "State",
+            $type: "SingleEnumIssueCustomField",
+            value: { name: status },
+          },
+        ],
+      }),
+    }
+  );
+
+  const data = await response.json();
+
+  // Verify the status was set correctly
+  const stateField = data.customFields?.find(
+    (f: { name: string }) => f.name === "State"
+  );
+  const finalState = stateField?.value?.name;
+
+  if (finalState !== status) {
+    throw new Error(
+      `Ticket ${ticketId} status not updated! Expected "${status}", got "${finalState}"`
+    );
+  }
+
+  console.log(`Status set successfully to "${status}"`);
+}
+
 export async function addComment(
   ticketId: string,
   text: string,
