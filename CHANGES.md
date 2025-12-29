@@ -26,6 +26,7 @@ usual beta standards.
 ## [To Be Released]
 
 ### Fixes:
+* [VIM-4030](https://youtrack.jetbrains.com/issue/VIM-4030) Fixed `%` motion and block text objects (`va{`, `vi{`) to correctly ignore braces inside string literals
 * [VIM-4097](https://youtrack.jetbrains.com/issue/VIM-4097) Fixed `<A-n>` (NextOccurrence) with text containing backslashes - e.g., selecting `\IntegerField` now works correctly
 * [VIM-4094](https://youtrack.jetbrains.com/issue/VIM-4094) Fixed UninitializedPropertyAccessException when loading history
 

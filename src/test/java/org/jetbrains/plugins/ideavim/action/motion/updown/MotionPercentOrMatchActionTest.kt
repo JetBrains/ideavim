@@ -145,7 +145,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
   }
 
   @Test
-  @Disabled("It will work after implementing all of the methods in VimPsiService")
+  @Disabled("Plain text files lack PSI support for strings - see VIM-4030")
   fun `test motion outside text`() {
     doTest(
       "%",

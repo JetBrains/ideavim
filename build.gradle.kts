@@ -301,6 +301,7 @@ intellijPlatform {
     changeNotes.set(
       """
         <b>Fixes:</b><br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4030">VIM-4030</a> Fixed <code>%</code> motion and block text objects (<code>va{</code>, <code>vi{</code>) to correctly ignore braces inside string literals<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4097">VIM-4097</a> Fixed <code>&lt;A-n&gt;</code> (NextOccurrence) with text containing backslashes - e.g., selecting <code>\IntegerField</code> now works correctly<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4094">VIM-4094</a> Fixed UninitializedPropertyAccessException when loading history<br>
         <br>
