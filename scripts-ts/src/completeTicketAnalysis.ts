@@ -10,7 +10,7 @@
  */
 
 import { readFileSync, existsSync } from "fs";
-import { setTag, addComment, CLAUDE_ANALYZED_TAG_ID } from "./youtrack.js";
+import { setTag, addComment, CLAUDE_ANALYZED_TAG_ID } from "./tools/youtrack.js";
 
 interface AnalysisState {
   ticket_id: string;

@@ -10,7 +10,7 @@
  */
 
 import { writeFileSync, appendFileSync, mkdirSync, existsSync } from "fs";
-import { getTicketsByQuery, getTicketDetails, getTicketComments, getTicketAttachments, downloadAttachment } from "./youtrack.js";
+import { getTicketsByQuery, getTicketDetails, getTicketComments, getTicketAttachments, downloadAttachment } from "./tools/youtrack.js";
 import { join } from "path";
 
 function writeGitHubOutput(name: string, value: string): void {
