@@ -143,28 +143,6 @@ tasks.register("releaseActions", JavaExec::class) {
   environment("YOUTRACK_TOKEN", youtrackToken)
 }
 
-tasks.register("selectTicketForAnalysis", JavaExec::class) {
-  group = "youtrack-analysis"
-  description = "Selects a random open YouTrack ticket for Claude analysis"
-  mainClass.set("scripts.youtrackAnalysis.SelectTicketForAnalysisKt")
-  classpath = sourceSets["main"].runtimeClasspath
-  args = listOf(rootProject.rootDir.toString())
-  environment("YOUTRACK_TOKEN", youtrackToken)
-}
-
-tasks.register("completeTicketAnalysis", JavaExec::class) {
-  group = "youtrack-analysis"
-  description = "Tags YouTrack ticket and optionally adds analysis comment"
-  mainClass.set("scripts.youtrackAnalysis.CompleteTicketAnalysisKt")
-  classpath = sourceSets["main"].runtimeClasspath
-  args = listOf(
-    project.findProperty("ticketId")?.toString() ?: "",
-    project.findProperty("analysisResult")?.toString() ?: "",
-    project.findProperty("prUrl")?.toString() ?: "",
-  )
-  environment("YOUTRACK_TOKEN", youtrackToken)
-}
-
 tasks.test {
   useJUnitPlatform()
 }
