@@ -57,13 +57,6 @@ tasks.register("generateIdeaVimConfigurations", JavaExec::class) {
   classpath = sourceSets["main"].runtimeClasspath
 }
 
-tasks.register("checkNewPluginDependencies", JavaExec::class) {
-  group = "verification"
-  description = "This job tracks if there are any new plugins in marketplace we don't know about"
-  mainClass.set("scripts.CheckNewPluginDependenciesKt")
-  classpath = sourceSets["main"].runtimeClasspath
-}
-
 tasks.register("calculateNewVersion", JavaExec::class) {
   group = "release"
   mainClass.set("scripts.release.CalculateNewVersionKt")
