@@ -143,14 +143,6 @@ tasks.register("releaseActions", JavaExec::class) {
   environment("YOUTRACK_TOKEN", youtrackToken)
 }
 
-tasks.register("integrationsTest", JavaExec::class) {
-  group = "verification"
-  mainClass.set("scripts.IntegrationsTestKt")
-  classpath = sourceSets["main"].runtimeClasspath
-  args = listOf(rootProject.rootDir.toString())
-  environment("YOUTRACK_TOKEN", youtrackToken)
-}
-
 tasks.register("selectTicketForAnalysis", JavaExec::class) {
   group = "youtrack-analysis"
   description = "Selects a random open YouTrack ticket for Claude analysis"
