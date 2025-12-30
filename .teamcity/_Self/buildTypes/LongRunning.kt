@@ -11,6 +11,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
 object LongRunning : IdeaVimBuildType({
   name = "Long running tests"
+  description = "Running long-duration tests that are too slow for regular CI runs"
   params {
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
     param("env.ORG_GRADLE_PROJECT_ideaVersion", LONG_RUNNING_TESTS)
@@ -26,6 +27,7 @@ object LongRunning : IdeaVimBuildType({
 
   steps {
     gradle {
+      clearConditions()
       tasks = "clean :tests:long-running-tests:test"
       buildFile = ""
       enableStacktrace = true

@@ -10,6 +10,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
 object PropertyBased : IdeaVimBuildType({
   name = "Property based tests"
+  description = "Running property-based tests to verify Vim behavior through randomized test cases"
   params {
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
     param("env.ORG_GRADLE_PROJECT_ideaVersion", PROPERTY_TESTS)
