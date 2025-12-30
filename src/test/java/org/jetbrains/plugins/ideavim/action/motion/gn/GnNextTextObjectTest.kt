@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test
 import javax.swing.KeyStroke
 
 class GnNextTextObjectTest : VimTestCase() {
-  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "IdeaVim cursor position differs after gn deletion")
   @Test
   fun `test delete word`() {
     doTestWithSearch(
@@ -35,7 +35,7 @@ class GnNextTextObjectTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "IdeaVim cursor position differs after gn deletion")
   @Test
   fun `test delete second word`() {
     doTestWithSearch(
@@ -51,7 +51,7 @@ class GnNextTextObjectTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "IdeaVim cursor position differs after gn with repeat")
   @Test
   fun `test with repeat`() {
     doTestWithSearch(

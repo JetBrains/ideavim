@@ -113,7 +113,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
-  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "IdeaVim handles tag names with regex characters differently")
   @Test
   fun testDeleteInnerTagBlockBetweenTagWithRegex() {
     val keys = listOf("dit")
@@ -294,7 +294,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
-  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "IdeaVim handles improperly nested tags differently")
   @Test
   fun testDeleteInnerTagBlockTwoTagsWrongOrder() {
     val keys = listOf("dit")
@@ -304,7 +304,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
-  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "IdeaVim handles improperly nested tags differently")
   @Test
   fun testDeleteInnerTagBlockTwoTagsWrongOrderInClosingTag() {
     val keys = listOf("dit")
