@@ -24,6 +24,7 @@ object RandomOrderTests : IdeaVimBuildType({
 
   steps {
     gradle {
+      clearConditions()
       tasks = """
         clean test
         -x :tests:property-tests:test
