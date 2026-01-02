@@ -259,6 +259,20 @@ enum class SkipNeovimReason {
 
   BUG_IN_NEOVIM,
   PSI,
+
+  /**
+   * Test uses IdeaVim API functions that prevent proper Neovim state synchronization.
+   *
+   * This annotation is applied when tests use:
+   * - Public IdeaVim API for plugin development (e.g., VimPlugin.* methods)
+   * - Internal IdeaVim API (e.g., injector.* methods, VimEditor operations)
+   *
+   * When these APIs are called directly in tests, we cannot update the Neovim state
+   * accordingly, making it impossible to verify test behavior against Neovim.
+   *
+   * Tests should only use functions from VimTestCase for Neovim compatibility.
+   */
+  IDEAVIM_API_USED,
 }
 
 fun LogicalPosition.toVimCoords(): VimCoords {

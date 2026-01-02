@@ -41,6 +41,14 @@ jobs:
             2. Review @TestWithoutNeovim annotations - are reasons clear and documented?
             3. Check test content quality - replace meaningless strings with realistic content
 
+            ## Neovim Testing Constraints
+
+            Neovim can only test methods that use functions from VimTestCase. If a test uses
+            other API functions (public plugin API like VimPlugin.* or internal API like
+            injector.*), it cannot be tested with Neovim because we cannot properly synchronize
+            the Neovim state. In these cases, use @TestWithoutNeovim with IDEAVIM_API_USED as
+            the skip reason and provide a description of which API is being used.
+
             ## Important Guidelines
 
             - Only work on tests, never fix source code bugs
