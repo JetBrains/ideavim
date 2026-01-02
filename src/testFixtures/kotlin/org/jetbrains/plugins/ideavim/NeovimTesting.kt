@@ -110,7 +110,7 @@ object NeovimTesting {
   private fun isNeovimTestingEnabled(): Boolean {
     val property = System.getProperty("ideavim.nvim.test", "false")
     val neovimTestingEnabled = if (property.isBlank()) true else property.toBoolean()
-    return true
+    return neovimTestingEnabled
   }
 
   fun setupEditor(editor: Editor, test: TestInfo) {
