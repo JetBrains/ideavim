@@ -25,3 +25,11 @@ jobs:
         env:
           ORG_GRADLE_PROJECT_downloadIdeaSources: false
           ORG_GRADLE_PROJECT_instrumentPluginCode: false
+
+      - name: Upload problems report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: problems-report
+          path: build/reports/problems/
+          if-no-files-found: ignore
