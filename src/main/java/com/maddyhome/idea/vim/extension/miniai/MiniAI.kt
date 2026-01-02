@@ -7,23 +7,11 @@
  */
 package com.maddyhome.idea.vim.extension.miniai
 
-import com.maddyhome.idea.vim.KeyHandler
-import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.ImmutableVimCaret
-import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.TextObjectVisualType
-import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.extension.ExtensionHandler
+import com.intellij.vim.api.VimApi
+import com.intellij.vim.api.models.Range
+import com.intellij.vim.api.scopes.TextObjectRange
 import com.maddyhome.idea.vim.extension.VimExtension
-import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
-import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
-import com.maddyhome.idea.vim.handler.TextObjectActionHandler
-import com.maddyhome.idea.vim.helper.enumSetOf
-import java.util.EnumSet
+import com.maddyhome.idea.vim.extension.api
 
 /**
  * A simplified imitation of mini.ai approach for motions "aq", "iq", "ab", "ib".
@@ -38,85 +26,25 @@ import java.util.EnumSet
  */
 class MiniAI : VimExtension {
 
-  companion object {
-    // <Plug> mappings
-    private const val PLUG_AQ = "<Plug>mini-ai-aq"
-    private const val PLUG_IQ = "<Plug>mini-ai-iq"
-    private const val PLUG_AB = "<Plug>mini-ai-ab"
-    private const val PLUG_IB = "<Plug>mini-ai-ib"
-
-    // Actual user key sequences
-    private const val KEY_AQ = "aq"
-    private const val KEY_IQ = "iq"
-    private const val KEY_AB = "ab"
-    private const val KEY_IB = "ib"
-  }
-
   override fun getName() = "mini-ai"
 
   override fun init() {
-    registerMappings()
-  }
-
-  private fun registerMappings() {
-    fun createHandler(
-      rangeFunc: (VimEditor, ImmutableVimCaret, Boolean) -> TextRange?
-    ): ExtensionHandler = object : ExtensionHandler {
-      override val isRepeatable = true
-      override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
-        addAction(PortedMiniAiAction(rangeFunc))
+    val api = api()
+    api.textObjects {
+      register("aq", preserveSelectionAnchor = false) { _ ->
+        findQuoteRange(isOuter = true)
+      }
+      register("iq", preserveSelectionAnchor = false) { _ ->
+        findQuoteRange(isOuter = false)
+      }
+      register("ab", preserveSelectionAnchor = false) { _ ->
+        findBracketRange(isOuter = true)
+      }
+      register("ib", preserveSelectionAnchor = false) { _ ->
+        findBracketRange(isOuter = false)
       }
     }
-
-    listOf(
-      // Outer quotes
-      PLUG_AQ to createHandler { e, c, _ -> findQuoteRange(e, c, isOuter = true) },
-      // Inner quotes
-      PLUG_IQ to createHandler { e, c, _ -> findQuoteRange(e, c, isOuter = false) },
-      // Outer brackets
-      PLUG_AB to createHandler { e, c, _ -> findBracketRange(e, c, isOuter = true) },
-      // Inner brackets
-      PLUG_IB to createHandler { e, c, _ -> findBracketRange(e, c, isOuter = false) }
-    ).forEach { (plug, handler) ->
-      putExtensionHandlerMapping(MappingMode.XO, injector.parser.parseKeys(plug), owner, handler, false)
-    }
-
-    // Map user keys -> <Plug> keys
-    listOf(
-      KEY_AQ to PLUG_AQ,
-      KEY_IQ to PLUG_IQ,
-      KEY_AB to PLUG_AB,
-      KEY_IB to PLUG_IB
-    ).forEach { (key, plug) ->
-      putKeyMapping(MappingMode.XO, injector.parser.parseKeys(key), owner, injector.parser.parseKeys(plug), true)
-    }
   }
-}
-
-// A text object action that uses the "mini.ai-like" picking strategy.
-private class PortedMiniAiAction(
-  private val rangeFunc: (VimEditor, ImmutableVimCaret, Boolean) -> TextRange?
-) : TextObjectActionHandler() {
-
-  override val preserveSelectionAnchor: Boolean = false
-  override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
-
-  override fun getRange(
-    editor: VimEditor,
-    caret: ImmutableVimCaret,
-    context: ExecutionContext,
-    count: Int,
-    rawCount: Int
-  ): TextRange? = rangeFunc(editor, caret, true).also {
-    // We don't do 'count' expansions here. If you wanted to replicate
-    // mini.ai's multi-level expansions, you'd call the "rangeFunc" multiple
-    // times re-feeding the last output as reference, etc.
-  }
-}
-
-// Utility to register action in KeyHandler
-private fun addAction(action: TextObjectActionHandler) {
-  KeyHandler.getInstance().keyHandlerState.commandBuilder.addAction(action)
 }
 
 /* -------------------------------------------------------------------------
@@ -131,17 +59,17 @@ private fun addAction(action: TextObjectActionHandler) {
  *
  * If [isOuter] == false (i.e. 'iq'), shrink the final range by 1 char on each side.
  */
-private fun findQuoteRange(editor: VimEditor, caret: ImmutableVimCaret, isOuter: Boolean): TextRange? {
-  val text = editor.text()
-  val caretOffset = caret.offset
-  val caretLine = caret.getLine()
+private fun VimApi.findQuoteRange(isOuter: Boolean): TextObjectRange? {
+  val text = editor { read { text } }
+  val caretOffset = editor { read { withPrimaryCaret { offset } } }
+  val caretLine = editor { read { withPrimaryCaret { line.number } } }
 
   // 1) Gather quotes in *this caret's line*
-  val lineStart = editor.getLineStartOffset(caretLine)
-  val lineEnd = editor.getLineEndOffset(caretLine)
+  val lineStart = editor { read { getLineStartOffset(caretLine) } }
+  val lineEnd = editor { read { getLineEndOffset(caretLine, true) } }
   val lineText = text.substring(lineStart, lineEnd)
   val lineRanges = gatherAllQuoteRanges(lineText).map {
-    TextRange(it.startOffset + lineStart, it.endOffset + lineStart)
+    Range.Simple(it.start + lineStart, it.end + lineStart)
   }
 
   val localBest = pickBestRange(lineRanges, caretOffset)
@@ -156,11 +84,11 @@ private fun findQuoteRange(editor: VimEditor, caret: ImmutableVimCaret, isOuter:
 }
 
 /** Adjust final range if user requested 'inner' (i.e. skip bounding chars). */
-private fun adjustRangeForInnerOuter(range: TextRange, isOuter: Boolean): TextRange? {
-  if (isOuter) return range
+private fun adjustRangeForInnerOuter(range: Range.Simple, isOuter: Boolean): TextObjectRange? {
+  if (isOuter) return TextObjectRange.CharacterWise(range.start, range.end)
   // For 'inner', skip bounding chars if possible
-  if (range.endOffset - range.startOffset < 2) return null
-  return TextRange(range.startOffset + 1, range.endOffset - 1)
+  if (range.end - range.start < 2) return null
+  return TextObjectRange.CharacterWise(range.start + 1, range.end - 1)
 }
 
 /**
@@ -168,8 +96,8 @@ private fun adjustRangeForInnerOuter(range: TextRange, isOuter: Boolean): TextRa
  * For simplicity, we treat each ["]...["] or [']...['] or [`]...[`] as one range,
  * ignoring complicated cases of escaping, multi-line, etc.
  */
-private fun gatherAllQuoteRanges(text: CharSequence): List<TextRange> {
-  val results = mutableListOf<TextRange>()
+private fun gatherAllQuoteRanges(text: CharSequence): List<Range.Simple> {
+  val results = mutableListOf<Range.Simple>()
   val patterns = listOf(
     "\"([^\"]*)\"",
     "'([^']*)'",
@@ -177,7 +105,7 @@ private fun gatherAllQuoteRanges(text: CharSequence): List<TextRange> {
   )
   for (p in patterns) {
     Regex(p).findAll(text).forEach {
-      results.add(TextRange(it.range.first, it.range.last + 1))
+      results.add(Range.Simple(it.range.first, it.range.last + 1))
     }
   }
   return results
@@ -188,20 +116,20 @@ private fun gatherAllQuoteRanges(text: CharSequence): List<TextRange> {
  * We treat bracket pairs ( (), [], {}, <> ) in a naive balanced scanning way.
  * If [isOuter] is false, we shrink boundaries to skip the bracket chars.
  */
-private fun findBracketRange(editor: VimEditor, caret: ImmutableVimCaret, isOuter: Boolean): TextRange? {
-  val text = editor.text()
-  val caretOffset = caret.offset
-  val caretLine = caret.getLine()
+private fun VimApi.findBracketRange(isOuter: Boolean): TextObjectRange? {
+  val text = editor { read { text } }
+  val caretOffset = editor { read { withPrimaryCaret { offset } } }
+  val caretLine = editor { read { withPrimaryCaret { line.number } } }
 
   // 1) Gather bracket pairs in *this caret's line*
-  val lineStart = editor.getLineStartOffset(caretLine)
-  val lineEnd = editor.getLineEndOffset(caretLine)
+  val lineStart = editor { read { getLineStartOffset(caretLine) } }
+  val lineEnd = editor { read { getLineEndOffset(caretLine, false) } }
   val bracketChars = listOf('(', ')', '[', ']', '{', '}', '<', '>')
   // Gather local line bracket pairs
   val lineText = text.substring(lineStart, lineEnd)
   val lineRanges = gatherAllBracketRanges(lineText, bracketChars).map {
     // Shift each range's offsets to the global text
-    TextRange(it.startOffset + lineStart, it.endOffset + lineStart)
+    Range.Simple(it.start + lineStart, it.end + lineStart)
   }
 
   // Pick the best match on this line
@@ -224,9 +152,9 @@ private fun findBracketRange(editor: VimEditor, caret: ImmutableVimCaret, isOute
 private fun gatherAllBracketRanges(
   text: CharSequence,
   brackets: List<Char>
-): List<TextRange> {
+): List<Range.Simple> {
   val pairs = mapOf('(' to ')', '[' to ']', '{' to '}', '<' to '>')
-  val results = mutableListOf<TextRange>()
+  val results = mutableListOf<Range.Simple>()
   val stack = ArrayDeque<Int>()         // offsets of open bracket
   val bracketTypeStack = ArrayDeque<Char>() // store which bracket
 
@@ -242,7 +170,7 @@ private fun gatherAllBracketRanges(
         // Balanced pair
         val openPos = stack.removeLast()
         bracketTypeStack.removeLast()
-        results.add(TextRange(openPos, i + 1)) // i+1 for endOffset
+        results.add(Range.Simple(openPos, i + 1)) // i+1 for end
       }
     }
   }
@@ -250,40 +178,40 @@ private fun gatherAllBracketRanges(
 }
 
 /**
- * Picks best range among [candidates] in a “cover-or-next” approach:
+ * Picks best range among [candidates] in a "cover-or-next" approach:
  *   1) Among those covering [caretOffset], pick the narrowest.
  *   2) Else pick the "next" bracket whose start >= caret, if any (closest).
  *   3) Else pick the "previous" bracket whose end <= caret, if any (closest).
  */
-private fun pickBestRange(candidates: List<TextRange>, caretOffset: Int): TextRange? {
+private fun pickBestRange(candidates: List<Range.Simple>, caretOffset: Int): Range.Simple? {
   if (candidates.isEmpty()) return null
-  val covering = mutableListOf<TextRange>()
-  val nextOnes = mutableListOf<TextRange>()
-  val prevOnes = mutableListOf<TextRange>()
+  val covering = mutableListOf<Range.Simple>()
+  val nextOnes = mutableListOf<Range.Simple>()
+  val prevOnes = mutableListOf<Range.Simple>()
 
   for (r in candidates) {
-    if (r.startOffset <= caretOffset && caretOffset < r.endOffset) {
+    if (r.start <= caretOffset && caretOffset < r.end) {
       covering.add(r)
-    } else if (r.startOffset >= caretOffset) {
+    } else if (r.start >= caretOffset) {
       nextOnes.add(r)
-    } else if (r.endOffset <= caretOffset) {
+    } else if (r.end <= caretOffset) {
       prevOnes.add(r)
     }
   }
 
   // 1) Covering, smallest width
   if (covering.isNotEmpty()) {
-    return covering.minByOrNull { it.endOffset - it.startOffset }
+    return covering.minByOrNull { it.end - it.start }
   }
 
-  // 2) Next (closest by startOffset)
+  // 2) Next (closest by start)
   if (nextOnes.isNotEmpty()) {
-    return nextOnes.minByOrNull { kotlin.math.abs(it.startOffset - caretOffset) }
+    return nextOnes.minByOrNull { kotlin.math.abs(it.start - caretOffset) }
   }
 
-  // 3) Previous (closest by endOffset)
+  // 3) Previous (closest by end)
   if (prevOnes.isNotEmpty()) {
-    return prevOnes.minByOrNull { kotlin.math.abs(it.endOffset - caretOffset) }
+    return prevOnes.minByOrNull { kotlin.math.abs(it.end - caretOffset) }
   }
 
   return null
