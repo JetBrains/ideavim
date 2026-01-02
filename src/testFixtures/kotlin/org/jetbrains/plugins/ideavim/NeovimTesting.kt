@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.register.RegisterConstants.VALID_REGISTERS
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.toVimNotation
 import org.junit.jupiter.api.TestInfo
+import org.junit.jupiter.api.assertAll
 import kotlin.test.assertEquals
 
 object NeovimTesting {
@@ -108,7 +109,7 @@ object NeovimTesting {
   private fun isNeovimTestingEnabled(): Boolean {
     val property = System.getProperty("ideavim.nvim.test", "false")
     val neovimTestingEnabled = if (property.isBlank()) true else property.toBoolean()
-    return neovimTestingEnabled
+    return true
   }
 
   fun setupEditor(editor: Editor, test: TestInfo) {
@@ -138,10 +139,12 @@ object NeovimTesting {
       currentTestName = ""
       neovimTestsCounter++
     }
-    assertText(editor)
-    assertCaret(editor, test)
-    assertMode(editor)
-    assertRegisters(editor)
+    assertAll(
+      { assertText(editor) },
+      { assertCaret(editor, test) },
+      { assertMode(editor) },
+      { assertRegisters(editor) },
+    )
   }
 
   fun setRegister(register: Char, keys: String, test: TestInfo) {
@@ -161,7 +164,7 @@ object NeovimTesting {
     val vimCoords = getCaret()
     ApplicationManager.getApplication().runReadAction {
       val resultVimCoords = CharacterPosition.atCaret(editor).toVimCoords()
-      assertEquals(vimCoords.toString(), resultVimCoords.toString())
+      assertEquals(vimCoords.toString(), resultVimCoords.toString(), "Caret position differs. The expected position is vim coords")
     }
   }
 

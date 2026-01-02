@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -530,5 +531,35 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
     )
     typeText(injector.parser.parseKeys("vit"))
     assertSelection("<")
+  }
+
+  // ============== preserveSelectionAnchor behavior tests ==============
+
+  @Test
+  fun `test inner tag from middle of content`() {
+    doTest(
+      "vit",
+      "<div>foo b${c}ar baz</div>",
+      "<div>${s}foo bar ba${c}z${se}</div>",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  @VimBehaviorDiffers(
+    shouldBeFixed = false,
+    description = """
+      Vim for some operations keeps the direction and for some it doesn't.
+      However, this looks like a bug in Vim.
+      So, in IdeaVim we always keep the direction.
+    """
+  )
+  fun `test inner tag with backwards selection`() {
+    doTest(
+      listOf("v", "h", "it"),
+      "<div>foo b${c}ar baz</div>",
+      "<div>${s}${c}foo bar baz${se}</div>",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
   }
 }

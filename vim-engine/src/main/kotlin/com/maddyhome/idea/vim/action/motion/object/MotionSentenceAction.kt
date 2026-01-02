@@ -14,17 +14,14 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.TextObjectVisualType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
-import com.maddyhome.idea.vim.helper.enumSetOf
-import java.util.*
 
 @CommandOrMotion(keys = ["is"], modes = [Mode.VISUAL, Mode.OP_PENDING])
 class MotionInnerSentenceAction : TextObjectActionHandler() {
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
+  override val preserveSelectionAnchor: Boolean = false
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
@@ -42,7 +39,7 @@ class MotionInnerSentenceAction : TextObjectActionHandler() {
 @CommandOrMotion(keys = ["as"], modes = [Mode.VISUAL, Mode.OP_PENDING])
 class MotionOuterSentenceAction : TextObjectActionHandler() {
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
+  override val preserveSelectionAnchor: Boolean = false
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 

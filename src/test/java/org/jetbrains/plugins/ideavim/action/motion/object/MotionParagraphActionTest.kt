@@ -10,13 +10,14 @@ package org.jetbrains.plugins.ideavim.action.motion.`object`
 
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
 /**
- * Tests for paragraph text objects (ip, ap) which use FLAG_TEXT_BLOCK.
+ * Tests for paragraph text objects (ip, ap) which use preserveSelectionAnchor = false.
  *
- * FLAG_TEXT_BLOCK affects visual mode behavior:
+ * preserveSelectionAnchor = false affects visual mode behavior:
  * - Selection anchor is reset to block start when applying text object
  * - Entire block is selected regardless of selection direction
  */
@@ -213,6 +214,7 @@ class MotionParagraphActionTest : VimTestCase() {
   }
 
   @Test
+  @VimBehaviorDiffers(shouldBeFixed = true, description = "neovim has a different mode after that")
   fun `test outer paragraph with backwards selection`() {
     // Cursor moves up to empty line, ap selects from there
     doTest(
@@ -227,9 +229,9 @@ class MotionParagraphActionTest : VimTestCase() {
       """.trimMargin(),
       """
         |First paragraph.
-        |${s}
+        |${s}${c}
         |Second paragraph line one.
-        |${c}Second paragraph line two.
+        |Second paragraph line two.
         |${se}
         |Third paragraph.
       """.trimMargin(),

@@ -10,13 +10,14 @@ package org.jetbrains.plugins.ideavim.action.motion.`object`
 
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
 /**
- * Tests for quote text objects (i", a", i', a', i`, a`) which use FLAG_TEXT_BLOCK.
+ * Tests for quote text objects (i", a", i', a', i`, a`) which use preserveSelectionAnchor = false.
  *
- * FLAG_TEXT_BLOCK affects visual mode behavior:
+ * preserveSelectionAnchor = false affects visual mode behavior:
  * - Selection anchor is reset to block start when applying text object
  * - Entire block is selected regardless of selection direction
  */
@@ -60,12 +61,13 @@ class MotionQuoteActionTest : VimTestCase() {
     doTest(
       listOf("v", "h", "i\""),
       "foo \"bar b${c}az qux\" quux",
-      "foo \"${s}bar baz qu${c}x${se}\" quux",
+      "foo \"${s}${c}bar baz qux${se}\" quux",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
   @Test
+  @VimBehaviorDiffers(shouldBeFixed = true)
   fun `test inner double quote empty string`() {
     // IdeaVim selects the closing quote even for empty string
     doTest(
@@ -83,7 +85,7 @@ class MotionQuoteActionTest : VimTestCase() {
     doTest(
       "va\"",
       "foo \"bar b${c}az qux\" quux",
-      "foo ${s}\"bar baz qux\"${c} ${se}quux",
+      """foo $s"bar baz qux"$c ${se}quux""",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
@@ -93,7 +95,43 @@ class MotionQuoteActionTest : VimTestCase() {
     doTest(
       listOf("v", "h", "a\""),
       "foo \"bar b${c}az qux\" quux",
-      "foo ${s}\"bar baz qux\"${c} ${se}quux",
+      "foo ${s}${c}\"bar baz qux\" ${se}quux",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  // ============== Outer Quote Whitespace Handling ==============
+  // From Vim docs: "Any trailing white space is included, unless there is none, then leading white space is included"
+
+  @Test
+  fun `test outer quote with trailing whitespace includes trailing whitespace`() {
+    // Trailing whitespace exists, so it should be included (not leading)
+    doTest(
+      "va\"",
+      "before      \"hel${c}lo\"      after",
+      "before      ${s}\"hello\"     ${c} ${se}after",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test outer quote without trailing whitespace includes leading whitespace`() {
+    // No trailing whitespace (quote at end), so leading whitespace should be included
+    doTest(
+      "va\"",
+      "before      \"hel${c}lo\"",
+      "before${s}      \"hello${c}\"${se}",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test outer quote at end of word includes leading whitespace`() {
+    // Quote immediately followed by non-whitespace, so leading whitespace should be included
+    doTest(
+      "va\"",
+      "before      \"hel${c}lo\".after",
+      "before${s}      \"hello${c}\"${se}.after",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
@@ -115,7 +153,7 @@ class MotionQuoteActionTest : VimTestCase() {
     doTest(
       listOf("v", "h", "i'"),
       "foo 'bar b${c}az qux' quux",
-      "foo '${s}bar baz qu${c}x${se}' quux",
+      "foo '${s}${c}bar baz qux${se}' quux",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
@@ -137,7 +175,7 @@ class MotionQuoteActionTest : VimTestCase() {
     doTest(
       listOf("v", "h", "a'"),
       "foo 'bar b${c}az qux' quux",
-      "foo ${s}'bar baz qux'${c} ${se}quux",
+      "foo ${s}${c}'bar baz qux' ${se}quux",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
@@ -159,7 +197,7 @@ class MotionQuoteActionTest : VimTestCase() {
     doTest(
       listOf("v", "h", "i`"),
       "foo `bar b${c}az qux` quux",
-      "foo `${s}bar baz qu${c}x${se}` quux",
+      "foo `${s}${c}bar baz qux${se}` quux",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
@@ -181,7 +219,7 @@ class MotionQuoteActionTest : VimTestCase() {
     doTest(
       listOf("v", "h", "a`"),
       "foo `bar b${c}az qux` quux",
-      "foo ${s}`bar baz qux`${c} ${se}quux",
+      "foo ${s}${c}`bar baz qux` ${se}quux",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
@@ -260,5 +298,59 @@ class MotionQuoteActionTest : VimTestCase() {
   @Test
   fun `test delete inner double quote from outside quotes`() {
     doTest("di\"", "${c}print(\"hello\")", "print(\"$c\")", Mode.NORMAL())
+  }
+
+  // ============== Quote selection scenarios ==============
+
+  @Test
+  fun `test vi quote inside quoted text selects inner content`() {
+    doTest(
+      "vi\"",
+      "before \"hel${c}lo\" after",
+      "before \"${s}hell${c}o${se}\" after",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test vi quote outside jumps to quoted text on the right`() {
+    doTest(
+      "vi\"",
+      "bef${c}ore \"hello\" after",
+      "before \"${s}hell${c}o${se}\" after",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  @VimBehaviorDiffers(
+    originalVimAfter = "before \"${s}hell${c}o${se}\" after",
+    description = "IdeaVim doesn't find quote to the left when in backwards visual selection outside quotes",
+    shouldBeFixed = true
+  )
+  fun `test vi quote with backwards selection jumps to quoted text on the left`() {
+    // Start visual mode, move left, then vi" should find quote to the left
+    // IdeaVim keeps the visual selection unchanged since it doesn't find a quote
+    doTest(
+      listOf("v", "h", "h", "i\""),
+      "before \"hello\" af${c}ter",
+      "before \"hello\" ${s}${c}aft${se}er",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  @VimBehaviorDiffers(
+    description = "On second vi\" selection, we should select other of the quotes",
+    shouldBeFixed = true
+  )
+  fun `test repeated vi quote expands to outer quote in nested quotes`() {
+    // First vi" selects inner quote content, second i" expands to outer quote content
+    doTest(
+      listOf("vi\"", "i\""),
+      "outer \"first 'sec${c}ond' third\" end",
+      "outer \"${s}first 'second' thir${c}d${se}\" end",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
   }
 }

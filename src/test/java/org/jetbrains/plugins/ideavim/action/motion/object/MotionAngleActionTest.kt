@@ -10,14 +10,17 @@ package org.jetbrains.plugins.ideavim.action.motion.`object`
 
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
 /**
- * Tests for bracket text objects from MotionAngleAction.kt which use FLAG_TEXT_BLOCK.
+ * Tests for bracket text objects from MotionAngleAction.kt which use preserveSelectionAnchor = false.
  * This includes angle brackets (<>), braces ({}), square brackets ([]), and parentheses (()).
  *
- * FLAG_TEXT_BLOCK affects visual mode behavior:
+ * preserveSelectionAnchor = false affects visual mode behavior:
  * - Selection anchor is reset to block start when applying text object
  * - Entire block is selected regardless of selection direction
  */
@@ -27,6 +30,7 @@ class MotionAngleActionTest : VimTestCase() {
   // ============== Inner Angle Bracket (i<) ==============
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, description = "Because of some reason the neovim hangs when trying to get the text")
   fun `test inner angle bracket from middle of content`() {
     doTest(
       "vi<",
@@ -37,11 +41,12 @@ class MotionAngleActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, description = "Because of some reason the neovim hangs when trying to get the text")
   fun `test inner angle bracket with backwards selection`() {
     doTest(
       listOf("v", "h", "i<"),
       "foo <bar b${c}az qux> quux",
-      "foo <${s}bar baz qu${c}x${se}> quux",
+      "foo <${s}${c}bar baz qux${se}> quux",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
@@ -49,6 +54,7 @@ class MotionAngleActionTest : VimTestCase() {
   // ============== Outer Angle Bracket (a<) ==============
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, description = "Because of some reason the neovim hangs when trying to get the text")
   fun `test outer angle bracket from middle of content`() {
     doTest(
       "va<",
@@ -59,11 +65,12 @@ class MotionAngleActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, description = "Because of some reason the neovim hangs when trying to get the text")
   fun `test outer angle bracket with backwards selection`() {
     doTest(
       listOf("v", "h", "a<"),
       "foo <bar b${c}az qux> quux",
-      "foo ${s}<bar baz qux${c}>${se} quux",
+      "foo ${s}${c}<bar baz qux>${se} quux",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
@@ -81,16 +88,30 @@ class MotionAngleActionTest : VimTestCase() {
   }
 
   @Test
+  @VimBehaviorDiffers(
+    shouldBeFixed = false,
+    description = """
+      Vim for some operations keeps the direction and for some it doesn't.
+      However, this looks like a bug in Vim.
+      So, in IdeaVim we always keep the direction.
+    """
+  )
   fun `test inner brace with backwards selection`() {
     doTest(
       listOf("v", "h", "i{"),
       "foo {bar b${c}az qux} quux",
-      "foo {${s}bar baz qu${c}x${se}} quux",
+      "foo {${s}${c}bar baz qux${se}} quux",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
   @Test
+  @VimBehaviorDiffers(
+    shouldBeFixed = false,
+    description = """
+      This is a change in behavior to match a more convinient work.
+      In Vim the \n character is also selected
+    """)
   fun `test inner brace multiline`() {
     // IdeaVim selects content starting after newline following opening brace
     doTest(
@@ -124,11 +145,19 @@ class MotionAngleActionTest : VimTestCase() {
   }
 
   @Test
+  @VimBehaviorDiffers(
+    shouldBeFixed = false,
+    description = """
+      Vim for some operations keeps the direction and for some it doesn't.
+      However, this looks like a bug in Vim.
+      So, in IdeaVim we always keep the direction.
+    """
+  )
   fun `test outer brace with backwards selection`() {
     doTest(
       listOf("v", "h", "a{"),
       "foo {bar b${c}az qux} quux",
-      "foo ${s}{bar baz qux${c}}${se} quux",
+      "foo ${s}${c}{bar baz qux}${se} quux",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
@@ -146,11 +175,19 @@ class MotionAngleActionTest : VimTestCase() {
   }
 
   @Test
+  @VimBehaviorDiffers(
+    shouldBeFixed = false,
+    description = """
+      Vim for some operations keeps the direction and for some it doesn't.
+      However, this looks like a bug in Vim.
+      So, in IdeaVim we always keep the direction.
+    """
+  )
   fun `test inner square bracket with backwards selection`() {
     doTest(
       listOf("v", "h", "i["),
       "foo [bar b${c}az qux] quux",
-      "foo [${s}bar baz qu${c}x${se}] quux",
+      "foo [${s}${c}bar baz qux${se}] quux",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
@@ -168,11 +205,19 @@ class MotionAngleActionTest : VimTestCase() {
   }
 
   @Test
+  @VimBehaviorDiffers(
+    shouldBeFixed = false,
+    description = """
+      Vim for some operations keeps the direction and for some it doesn't.
+      However, this looks like a bug in Vim.
+      So, in IdeaVim we always keep the direction.
+    """
+  )
   fun `test outer square bracket with backwards selection`() {
     doTest(
       listOf("v", "h", "a["),
       "foo [bar b${c}az qux] quux",
-      "foo ${s}[bar baz qux${c}]${se} quux",
+      "foo ${s}${c}[bar baz qux]${se} quux",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
@@ -180,6 +225,7 @@ class MotionAngleActionTest : VimTestCase() {
   // ============== Delete operations ==============
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, description = "Because of some reason the neovim hangs when trying to get the text")
   fun `test delete inner angle bracket`() {
     doTest(
       "di<",
@@ -190,6 +236,7 @@ class MotionAngleActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, description = "Because of some reason the neovim hangs when trying to get the text")
   fun `test delete outer angle bracket`() {
     doTest(
       "da<",

@@ -40,12 +40,13 @@ internal class TextObjectScopeImpl(
   override fun register(
     keys: String,
     registerDefaultMapping: Boolean,
+    preserveSelectionAnchor: Boolean,
     rangeProvider: VimApi.(count: Int) -> TextObjectRange?,
   ) {
     val plugKeys = "<Plug>($pluginName-$keys)"
 
     // Create the extension handler that wraps the text object logic
-    val extensionHandler = TextObjectExtensionHandler(listenerOwner, mappingOwner, rangeProvider)
+    val extensionHandler = TextObjectExtensionHandler(listenerOwner, mappingOwner, preserveSelectionAnchor, rangeProvider)
 
     // Register the <Plug> mapping in visual and operator-pending modes
     injector.keyGroup.putKeyMapping(
@@ -86,6 +87,7 @@ internal class TextObjectScopeImpl(
 private class TextObjectExtensionHandler(
   private val listenerOwner: ListenerOwner,
   private val mappingOwner: MappingOwner,
+  private val preserveSelectionAnchor: Boolean,
   private val rangeProvider: VimApi.(count: Int) -> TextObjectRange?,
 ) : ExtensionHandler {
 
@@ -100,7 +102,7 @@ private class TextObjectExtensionHandler(
     val count = operatorArguments.count1
 
     // Create a TextObjectActionHandler that computes the range
-    val textObjectHandler = ApiTextObjectActionHandler(listenerOwner, mappingOwner, rangeProvider)
+    val textObjectHandler = ApiTextObjectActionHandler(listenerOwner, mappingOwner, preserveSelectionAnchor, rangeProvider)
 
     if (editor.mode !is Mode.OP_PENDING) {
       // In visual or normal mode: directly execute the selection for each caret
@@ -127,6 +129,7 @@ private class TextObjectExtensionHandler(
 private class ApiTextObjectActionHandler(
   private val listenerOwner: ListenerOwner,
   private val mappingOwner: MappingOwner,
+  override val preserveSelectionAnchor: Boolean,
   private val rangeProvider: VimApi.(count: Int) -> TextObjectRange?,
 ) : TextObjectActionHandler() {
 

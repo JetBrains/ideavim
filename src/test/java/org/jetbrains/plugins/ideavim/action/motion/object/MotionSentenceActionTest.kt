@@ -15,9 +15,9 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
 /**
- * Tests for sentence text objects (is, as) which use FLAG_TEXT_BLOCK.
+ * Tests for sentence text objects (is, as) which use preserveSelectionAnchor = false.
  *
- * FLAG_TEXT_BLOCK affects visual mode behavior:
+ * preserveSelectionAnchor = false affects visual mode behavior:
  * - Selection anchor is reset to block start when applying text object
  * - Entire block is selected regardless of selection direction
  */
@@ -57,25 +57,27 @@ class MotionSentenceActionTest : VimTestCase() {
   }
 
   @Test
+  @VimBehaviorDiffers(shouldBeFixed = true)
   fun `test inner sentence with backwards selection`() {
     // Start visual mode, move backwards, then apply is
-    // Current IdeaVim behavior: selection extends backwards, not reset to sentence
+    // Text object selects entire sentence regardless of prior selection direction
     doTest(
       listOf("v", "b", "is"),
       "First sentence here. Second sent${c}ence here. Third sentence here.",
-      "First sentence here. S${s}${c}econd sente${se}nce here. Third sentence here.",
+      "First sentence here. S${s}econd sent${c}e${se}nce here. Third sentence here.",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 
   @Test
+  @VimBehaviorDiffers(shouldBeFixed = true)
   fun `test inner sentence with backwards selection crossing sentence boundary`() {
-    // Move cursor back into previous sentence
-    // Current IdeaVim behavior: selection extends backwards across sentence boundary
+    // Move cursor back multiple words (into first sentence), then apply is
+    // Text object selects the sentence where cursor currently is
     doTest(
       listOf("v", "b", "b", "b", "is"),
       "First sentence here. Second sent${c}ence here. Third sentence here.",
-      "F${s}${c}irst sentence here. Second sente${se}nce here. Third sentence here.",
+      "F${s}irst sentence here. Second sent${c}e${se}nce here. Third sentence here.",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
@@ -131,12 +133,13 @@ class MotionSentenceActionTest : VimTestCase() {
   }
 
   @Test
+  @VimBehaviorDiffers(shouldBeFixed = true)
   fun `test outer sentence with backwards selection`() {
-    // Current IdeaVim behavior: selection extends backwards, not reset to sentence
+    // Text object selects entire sentence regardless of prior selection direction
     doTest(
       listOf("v", "b", "as"),
       "First sentence here. Second sent${c}ence here. Third sentence here.",
-      "First sentence here. ${s}${c}Second sente${se}nce here. Third sentence here.",
+      "First sentence here. ${s}Second sent${c}e${se}nce here. Third sentence here.",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }

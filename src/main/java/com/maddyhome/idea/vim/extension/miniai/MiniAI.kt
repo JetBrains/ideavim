@@ -98,7 +98,7 @@ private class PortedMiniAiAction(
   private val rangeFunc: (VimEditor, ImmutableVimCaret, Boolean) -> TextRange?
 ) : TextObjectActionHandler() {
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
+  override val preserveSelectionAnchor: Boolean = false
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
   override fun getRange(
