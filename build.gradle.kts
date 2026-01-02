@@ -49,7 +49,6 @@ plugins {
   id("org.jetbrains.intellij.platform") version "2.10.5"
 
   id("org.jetbrains.changelog") version "2.5.0"
-  id("org.jetbrains.kotlinx.kover") version "0.6.1"
   id("com.dorongold.task-tree") version "4.0.1"
   id("com.google.devtools.ksp") version "2.2.21-2.0.4"
 }
@@ -367,12 +366,6 @@ changelog {
   headerParserRegex.set("(\\d\\.\\d+(.\\d+)?)".toRegex())
 //    header = { "${project.version}" }
 //    version = "0.60"
-}
-
-// --- Kover
-
-koverMerged {
-  enable()
 }
 
 // Uncomment to enable FUS testing mode
