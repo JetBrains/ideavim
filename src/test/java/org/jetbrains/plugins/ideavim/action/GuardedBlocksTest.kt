@@ -50,7 +50,7 @@ class GuardedBlocksTest : VimTestCase() {
   // Probably it's better to put the caret after 1
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
   @Test
-  @Disabled
+  @Disabled("Caret positioning incorrect after deleting line with guarded block extending into previous line")
   fun `test delete line with block and longer start`() {
     configureAndGuard(
       """
@@ -71,7 +71,7 @@ class GuardedBlocksTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
   @Test
-  @Disabled
+  @Disabled("Caret positioning incorrect after deleting line with guarded block extending into next line")
   fun `test delete line with block and shorter end`() {
     configureAndGuard(
       """
@@ -92,7 +92,7 @@ class GuardedBlocksTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
   @Test
-  @Disabled
+  @Disabled("Delete operation should be blocked when line is fully within guarded blocks")
   fun `test delete line fully unmodifiable`() {
     configureAndGuard(
       """
@@ -113,7 +113,7 @@ class GuardedBlocksTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
   @Test
-  @Disabled
+  @Disabled("Delete operation should be blocked when caret is in line fully within guarded blocks")
   fun `test delete line fully unmodifiable end`() {
     configureAndGuard(
       """
@@ -134,7 +134,7 @@ class GuardedBlocksTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
   @Test
-  @Disabled
+  @Disabled("Change line operation with guarded blocks needs proper implementation")
   fun `test change line with block`() {
     configureAndGuard(
       """
@@ -200,7 +200,7 @@ class GuardedBlocksTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
   @Test
-  @Disabled
+  @Disabled("Caret positioning incorrect after changing line with guarded block extending into previous line")
   fun `test change line with block with longer start`() {
     configureAndGuard(
       """
@@ -222,7 +222,7 @@ class GuardedBlocksTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
   @Test
-  @Disabled
+  @Disabled("Caret positioning incorrect after changing line with guarded block extending into next line")
   fun `test change line with block with shorter end`() {
     configureAndGuard(
       """
@@ -244,7 +244,7 @@ class GuardedBlocksTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
   @Test
-  @Disabled
+  @Disabled("Change line operation with guarded block at end needs proper implementation")
   fun `test change line with block at the end`() {
     configureAndGuard(
       """
@@ -283,7 +283,7 @@ class GuardedBlocksTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
   @Test
-  @Disabled
+  @Disabled("Caret positioning incorrect after deleting line adjacent to guarded block with line above")
   fun `test delete line near the guard with line above`() {
     configureAndGuard(
       """
