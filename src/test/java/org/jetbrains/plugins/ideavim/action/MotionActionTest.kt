@@ -469,7 +469,7 @@ class MotionActionTest : VimTestCase() {
   fun testDeleteOuterDoubleQuoteString() {
     val keys = listOf("da\"")
     val before = "foo = \"bar b${c}az\";\n"
-    val after = "foo = ;\n"
+    val after = "foo =;\n"
     doTest(keys, before, after, Mode.NORMAL())
   }
 
@@ -583,7 +583,7 @@ class MotionActionTest : VimTestCase() {
   fun testDeleteOuterSingleQuoteString() {
     val keys = listOf("da'")
     val before = "foo = 'bar b${c}az';\n"
-    val after = "foo = ;\n"
+    val after = "foo =;\n"
     doTest(keys, before, after, Mode.NORMAL())
   }
 
@@ -593,7 +593,7 @@ class MotionActionTest : VimTestCase() {
   fun testDeleteOuterBackQuoteString() {
     val keys = listOf("da`")
     val before = "foo = `bar b${c}az`;\n"
-    val after = "foo = ;\n"
+    val after = "foo =;\n"
     doTest(keys, before, after, Mode.NORMAL())
   }
 
