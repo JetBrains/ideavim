@@ -15,6 +15,7 @@ import com.intellij.vim.api.scopes.MappingScope
 import com.intellij.vim.api.scopes.ModalInput
 import com.intellij.vim.api.scopes.OptionScope
 import com.intellij.vim.api.scopes.OutputPanelScope
+import com.intellij.vim.api.scopes.TextObjectScope
 import com.intellij.vim.api.scopes.VimApiDsl
 import com.intellij.vim.api.scopes.commandline.CommandLineScope
 import com.intellij.vim.api.scopes.editor.EditorScope
@@ -152,6 +153,25 @@ interface VimApi {
    * @param block The code block to execute within the mapping scope
    */
   fun mappings(block: MappingScope.() -> Unit)
+
+  /**
+   * Provides access to text object registration.
+   *
+   * Text objects are selections that can be used with operators (like `d`, `c`, `y`)
+   * or in visual mode. Examples include `iw` (inner word), `ap` (a paragraph), etc.
+   *
+   * Example usage:
+   * ```kotlin
+   * textObjects {
+   *     register("ae") { count ->
+   *         TextObjectRange.CharacterWise(0, editor { read { textLength.toInt() } })
+   *     }
+   * }
+   * ```
+   *
+   * @param block The code block to execute within the text object scope
+   */
+  fun textObjects(block: TextObjectScope.() -> Unit)
 
 //  /**
 //   * Provides access to event listener functionality.
