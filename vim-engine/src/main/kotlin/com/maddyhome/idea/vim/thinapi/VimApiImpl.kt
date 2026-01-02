@@ -150,15 +150,17 @@ class VimApiImpl(
     }
   }
 
-  override fun mappings(block: MappingScope.() -> Unit) {
+  override fun mappings(block: MappingScope.() -> Unit): MappingScope {
     val mappingScope = MappingScopeImpl(listenerOwner, mappingOwner)
     mappingScope.block()
+    return mappingScope
   }
 
-  override fun textObjects(block: TextObjectScope.() -> Unit) {
+  override fun textObjects(block: TextObjectScope.() -> Unit): TextObjectScope {
     val pluginName = (mappingOwner as? MappingOwner.Plugin)?.name ?: "unknown"
     val textObjectScope = TextObjectScopeImpl(pluginName, listenerOwner, mappingOwner)
     textObjectScope.block()
+    return textObjectScope
   }
 
 //  override fun listeners(block: ListenersScope.() -> Unit) {
@@ -166,26 +168,29 @@ class VimApiImpl(
 //    listenersScope.block()
 //  }
 
-  override fun outputPanel(block: OutputPanelScope.() -> Unit) {
+  override fun outputPanel(block: OutputPanelScope.() -> Unit): OutputPanelScope {
     val outputPanelScope = OutputPanelScopeImpl
     outputPanelScope.block()
+    return outputPanelScope
   }
 
   override fun modalInput(): ModalInput {
     return ModalInputImpl(listenerOwner, mappingOwner)
   }
 
-  override fun commandLine(block: CommandLineScope.() -> Unit) {
+  override fun commandLine(block: CommandLineScope.() -> Unit): CommandLineScope {
     val commandLineScope = CommandLineScopeImpl(listenerOwner, mappingOwner)
     commandLineScope.block()
+    return commandLineScope
   }
 
   override fun <T> option(block: OptionScope.() -> T): T {
     return OptionScopeImpl.block()
   }
 
-  override fun digraph(block: DigraphScope.() -> Unit) {
+  override fun digraph(block: DigraphScope.() -> Unit): DigraphScope {
     DigraphScopeImpl.block()
+    return DigraphScopeImpl
   }
 
   override val tabCount: Int
