@@ -87,13 +87,14 @@ object NeovimTesting {
 
   private fun neovimEnabled(test: TestInfo, editor: Editor? = null): Boolean {
     val method = test.testMethod.get()
+    val testClass = test.testClass.get()
     val noBehaviourDiffers = !method.isAnnotationPresent(VimBehaviorDiffers::class.java)
     val noTestingWithoutNeovim = !method.isAnnotationPresent(TestWithoutNeovim::class.java) &&
-      !test.javaClass.isAnnotationPresent(TestWithoutNeovim::class.java)
+      !testClass.isAnnotationPresent(TestWithoutNeovim::class.java)
     val neovimTestingEnabled = isNeovimTestingEnabled()
-    val notParserTest = "org.jetbrains.plugins.ideavim.ex.parser" !in test.javaClass.packageName
-    val notScriptImplementation = "org.jetbrains.plugins.ideavim.ex.implementation" !in test.javaClass.packageName
-    val notExtension = "org.jetbrains.plugins.ideavim.extension" !in test.javaClass.packageName
+    val notParserTest = "org.jetbrains.plugins.ideavim.ex.parser" !in testClass.packageName
+    val notScriptImplementation = "org.jetbrains.plugins.ideavim.ex.implementation" !in testClass.packageName
+    val notExtension = "org.jetbrains.plugins.ideavim.extension" !in testClass.packageName
     if (singleCaret) {
       singleCaret = editor == null || editor.caretModel.caretCount == 1
     }
