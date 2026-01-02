@@ -15,21 +15,14 @@ import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
-import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.jetbrains.plugins.ideavim.impl.OptionTest
-import org.jetbrains.plugins.ideavim.impl.TraceOptions
-import org.jetbrains.plugins.ideavim.impl.VimOption
+import org.junit.jupiter.api.Test
 import kotlin.test.assertTrue
 
-@TraceOptions(TestOptionConstants.keymodel, TestOptionConstants.selectmode)
 class MotionShiftHomeActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, doesntAffectTest = true),
-    VimOption(TestOptionConstants.selectmode, doesntAffectTest = true),
-  )
+  @Test
   fun `test simple home`() {
     val keys = listOf("<S-Home>")
     val before = """
@@ -51,20 +44,14 @@ class MotionShiftHomeActionTest : VimTestCase() {
     doTest(keys, before, after, Mode.NORMAL())
   }
 
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, doesntAffectTest = true),
-    VimOption(TestOptionConstants.selectmode, doesntAffectTest = true),
-  )
+  @Test
   fun `test default continueselect`() {
     val keymodel = optionsNoEditor().keymodel
     assertTrue(OptionConstants.keymodel_continueselect in keymodel)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
-    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
-  )
+  @Test
   fun `test start visual`() {
     val keys = listOf("<S-Home>")
     val before = """
@@ -83,14 +70,14 @@ class MotionShiftHomeActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    doTest(keys, before, after, Mode.VISUAL(SelectionType.CHARACTER_WISE)) {
+      enterCommand("set keymodel=startsel")
+      enterCommand("set selectmode=")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
-    VimOption(TestOptionConstants.selectmode, limitedValues = [OptionConstants.selectmode_key]),
-  )
+  @Test
   fun `test start select`() {
     val keys = listOf("<S-Home>")
     val before = """
@@ -109,14 +96,14 @@ class MotionShiftHomeActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, Mode.SELECT(SelectionType.CHARACTER_WISE))
+    doTest(keys, before, after, Mode.SELECT(SelectionType.CHARACTER_WISE)) {
+      enterCommand("set keymodel=startsel")
+      enterCommand("set selectmode=key")
+    }
   }
 
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [""]),
-    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
-  )
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test continue visual`() {
     val before = """
             A Discovery
@@ -135,6 +122,8 @@ class MotionShiftHomeActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
+    enterCommand("set keymodel=")
+    enterCommand("set selectmode=")
     typeText(injector.parser.parseKeys("<S-Home>"))
     assertState(Mode.NORMAL())
     typeText(injector.parser.parseKeys("\$v" + "<S-Home>"))
@@ -142,11 +131,8 @@ class MotionShiftHomeActionTest : VimTestCase() {
     assertState(Mode.VISUAL(SelectionType.CHARACTER_WISE))
   }
 
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [""]),
-    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
-  )
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test continue select`() {
     val before = """
             A Discovery
@@ -165,6 +151,8 @@ class MotionShiftHomeActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
+    enterCommand("set keymodel=")
+    enterCommand("set selectmode=")
     typeText(injector.parser.parseKeys("<S-Home>"))
     assertState(Mode.NORMAL())
     typeText(injector.parser.parseKeys("\$gh" + "<S-Home>"))

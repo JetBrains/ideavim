@@ -10,24 +10,16 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
-import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
-import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.jetbrains.plugins.ideavim.impl.OptionTest
-import org.jetbrains.plugins.ideavim.impl.TraceOptions
-import org.jetbrains.plugins.ideavim.impl.VimOption
+import org.junit.jupiter.api.Test
 
-@TraceOptions(TestOptionConstants.selectmode, TestOptionConstants.keymodel)
 class MotionShiftUpActionHandlerTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
-    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
-  )
+  @Test
   fun `test visual up`() {
     doTest(
       listOf("<S-Up>"),
@@ -48,14 +40,14 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
-    )
+    ) {
+      enterCommand("set keymodel=startsel")
+      enterCommand("set selectmode=")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
-    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
-  )
+  @Test
   fun `test visual up twice`() {
     doTest(
       listOf("<S-Up><S-Up>"),
@@ -76,14 +68,14 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
-    )
+    ) {
+      enterCommand("set keymodel=startsel")
+      enterCommand("set selectmode=")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
-    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
-  )
+  @Test
   fun `test save column`() {
     doTest(
       listOf("<S-Up><S-Up><S-Up>"),
@@ -104,14 +96,14 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.[addition${se}al chars]
       """.trimIndent(),
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
-    )
+    ) {
+      enterCommand("set keymodel=startsel")
+      enterCommand("set selectmode=")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
-    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
-  )
+  @Test
   fun `test Visual shift up in Insert mode enters Insert Visual mode`() {
     doTest(
       listOf("i<S-Up>"),
@@ -132,14 +124,14 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       Mode.VISUAL(SelectionType.CHARACTER_WISE, returnTo = Mode.INSERT),
-    )
+    ) {
+      enterCommand("set keymodel=startsel")
+      enterCommand("set selectmode=")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
-    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
-  )
+  @Test
   fun `test Visual shift up in Replace mode enters Replace Visual mode`() {
     doTest(
       listOf("R<S-Up>"),
@@ -160,14 +152,14 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       Mode.VISUAL(SelectionType.CHARACTER_WISE, returnTo = Mode.REPLACE),
-    )
+    ) {
+      enterCommand("set keymodel=startsel")
+      enterCommand("set selectmode=")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
-    VimOption(TestOptionConstants.selectmode, limitedValues = [OptionConstants.selectmode_key]),
-  )
+  @Test
   fun `test select up`() {
     doTest(
       listOf("<S-Up>"),
@@ -188,14 +180,14 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       Mode.SELECT(SelectionType.CHARACTER_WISE)
-    )
+    ) {
+      enterCommand("set keymodel=startsel")
+      enterCommand("set selectmode=key")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
-    VimOption(TestOptionConstants.selectmode, limitedValues = [OptionConstants.selectmode_key]),
-  )
+  @Test
   fun `test select up twice`() {
     doTest(
       listOf("<S-Up><S-Up>"),
@@ -216,14 +208,14 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       Mode.SELECT(SelectionType.CHARACTER_WISE)
-    )
+    ) {
+      enterCommand("set keymodel=startsel")
+      enterCommand("set selectmode=key")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
-    VimOption(TestOptionConstants.selectmode, limitedValues = [OptionConstants.selectmode_key]),
-  )
+  @Test
   fun `test Select shift up in Insert mode enters Insert Select mode`() {
     doTest(
       listOf("i<S-Up>"),
@@ -244,14 +236,14 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       Mode.SELECT(SelectionType.CHARACTER_WISE, returnTo = Mode.INSERT),
-    )
+    ) {
+      enterCommand("set keymodel=startsel")
+      enterCommand("set selectmode=key")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
-    VimOption(TestOptionConstants.selectmode, limitedValues = [OptionConstants.selectmode_key]),
-  )
+  @Test
   fun `test Select shift up in Replace mode enters Replace Select mode`() {
     doTest(
       listOf("R<S-Up>"),
@@ -272,14 +264,14 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       Mode.SELECT(SelectionType.CHARACTER_WISE, returnTo = Mode.REPLACE),
-    )
+    ) {
+      enterCommand("set keymodel=startsel")
+      enterCommand("set selectmode=key")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
-    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
-  )
+  @Test
   fun `test char mode simple motion`() {
     doTest(
       listOf("gh", "<S-Up>"),
@@ -300,14 +292,14 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       Mode.SELECT(SelectionType.CHARACTER_WISE)
-    )
+    ) {
+      enterCommand("set keymodel=continueselect")
+      enterCommand("set selectmode=")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
-    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
-  )
+  @Test
   fun `test char mode to empty line`() {
     doTest(
       listOf("gh", "<S-Up>"),
@@ -328,14 +320,14 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       Mode.SELECT(SelectionType.CHARACTER_WISE)
-    )
+    ) {
+      enterCommand("set keymodel=continueselect")
+      enterCommand("set selectmode=")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
-    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
-  )
+  @Test
   fun `test char mode from empty line`() {
     doTest(
       listOf("gh", "<S-Up>"),
@@ -356,14 +348,14 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       Mode.SELECT(SelectionType.CHARACTER_WISE)
-    )
+    ) {
+      enterCommand("set keymodel=continueselect")
+      enterCommand("set selectmode=")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
-    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
-  )
+  @Test
   fun `test char mode on file start`() {
     doTest(
       listOf("gh", "<S-Up>"),
@@ -384,14 +376,14 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       Mode.SELECT(SelectionType.CHARACTER_WISE)
-    )
+    ) {
+      enterCommand("set keymodel=continueselect")
+      enterCommand("set selectmode=")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
-    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
-  )
+  @Test
   fun `test char mode multicaret`() {
     doTest(
       listOf("gh", "<S-Up>"),
@@ -412,14 +404,14 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       Mode.SELECT(SelectionType.CHARACTER_WISE)
-    )
+    ) {
+      enterCommand("set keymodel=continueselect")
+      enterCommand("set selectmode=")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
-    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
-  )
+  @Test
   fun `test line mode simple motion`() {
     doTest(
       listOf("gH", "<S-Up>"),
@@ -440,14 +432,14 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       Mode.SELECT(SelectionType.LINE_WISE),
-    )
+    ) {
+      enterCommand("set keymodel=continueselect")
+      enterCommand("set selectmode=")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
-    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
-  )
+  @Test
   fun `test line mode to empty line`() {
     doTest(
       listOf("gH", "<S-Up>"),
@@ -468,14 +460,14 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       Mode.SELECT(SelectionType.LINE_WISE),
-    )
+    ) {
+      enterCommand("set keymodel=continueselect")
+      enterCommand("set selectmode=")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
-    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
-  )
+  @Test
   fun `test line mode from empty line`() {
     doTest(
       listOf("gH", "<S-Up>"),
@@ -496,14 +488,14 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       Mode.SELECT(SelectionType.LINE_WISE),
-    )
+    ) {
+      enterCommand("set keymodel=continueselect")
+      enterCommand("set selectmode=")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
-    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
-  )
+  @Test
   fun `test line mode to line start`() {
     doTest(
       listOf("gH", "<S-Up>"),
@@ -524,14 +516,14 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       Mode.SELECT(SelectionType.LINE_WISE),
-    )
+    ) {
+      enterCommand("set keymodel=continueselect")
+      enterCommand("set selectmode=")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
-    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
-  )
+  @Test
   fun `test line mode multicaret`() {
     doTest(
       listOf("gH", "<S-Up>"),
@@ -552,14 +544,14 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       Mode.SELECT(SelectionType.LINE_WISE),
-    )
+    ) {
+      enterCommand("set keymodel=continueselect")
+      enterCommand("set selectmode=")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
-    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
-  )
+  @Test
   fun `test block mode simple motion`() {
     doTest(
       listOf("g<C-H>", "<S-Up>"),
@@ -580,14 +572,14 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       Mode.SELECT(SelectionType.BLOCK_WISE),
-    )
+    ) {
+      enterCommand("set keymodel=continueselect")
+      enterCommand("set selectmode=")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
-    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
-  )
+  @Test
   fun `test block mode to empty line`() {
     doTest(
       listOf("g<C-H>", "<S-Up>"),
@@ -608,14 +600,14 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       Mode.SELECT(SelectionType.BLOCK_WISE),
-    )
+    ) {
+      enterCommand("set keymodel=continueselect")
+      enterCommand("set selectmode=")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
-    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
-  )
+  @Test
   fun `test block mode from empty line`() {
     doTest(
       listOf("g<C-H>", "<S-Up>"),
@@ -636,14 +628,14 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       Mode.SELECT(SelectionType.BLOCK_WISE),
-    )
+    ) {
+      enterCommand("set keymodel=continueselect")
+      enterCommand("set selectmode=")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_continueselect]),
-    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
-  )
+  @Test
   fun `test block mode to line start`() {
     doTest(
       listOf("g<C-H>", "<S-Up>"),
@@ -664,6 +656,9 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       Mode.SELECT(SelectionType.BLOCK_WISE),
-    )
+    ) {
+      enterCommand("set keymodel=continueselect")
+      enterCommand("set selectmode=")
+    }
   }
 }

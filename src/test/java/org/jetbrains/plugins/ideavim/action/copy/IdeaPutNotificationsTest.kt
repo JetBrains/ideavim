@@ -17,16 +17,12 @@ import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.jetbrains.plugins.ideavim.impl.OptionTest
-import org.jetbrains.plugins.ideavim.impl.TraceOptions
-import org.jetbrains.plugins.ideavim.impl.VimOption
 import org.jetbrains.plugins.ideavim.rangeOf
+import org.junit.jupiter.api.Test
 
-@TraceOptions(TestOptionConstants.clipboard)
 class IdeaPutNotificationsTest : VimTestCase() {
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [""]))
+  @Test
   fun `test notification exists if no ideaput`() {
     val before = "${c}I found it in a legendary land"
     configureByText(before)
@@ -56,10 +52,11 @@ class IdeaPutNotificationsTest : VimTestCase() {
     }
   }
 
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_ideaput]))
+  @Test
   fun `test no notification on ideaput`() {
     val before = "${c}I found it in a legendary land"
     configureByText(before)
+    enterCommand("set clipboard=ideaput")
     appReadySetup(false)
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
@@ -84,7 +81,7 @@ class IdeaPutNotificationsTest : VimTestCase() {
     return ActionCenter.getNotifications(fixture.project)
   }
 
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [""]))
+  @Test
   fun `test no notification if already was`() {
     val before = "${c}I found it in a legendary land"
     configureByText(before)
