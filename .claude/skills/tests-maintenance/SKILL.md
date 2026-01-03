@@ -95,6 +95,7 @@ grep -rn "@TestWithoutNeovim(SkipNeovimReason\.[A-Z_]*)" --include="*.kt" src/te
 | `PSI` | IntelliJ PSI/code intelligence features |
 | `IDEAVIM_API_USED` | Test uses IdeaVim API that prevents Neovim state sync |
 | `IDEAVIM_WORKS_INTENTIONALLY_DIFFERENT` | IdeaVim intentionally deviates from Neovim for better UX or IntelliJ integration |
+| `INTELLIJ_PLATFORM_INHERITED_DIFFERENCE` | Behavior difference inherited from IntelliJ Platform constraints |
 
 **Requirements:**
 - Add `description` parameter for non-obvious cases
@@ -109,6 +110,17 @@ grep -rn "@TestWithoutNeovim(SkipNeovimReason\.[A-Z_]*)" --include="*.kt" src/te
 - **DO NOT use based on guesswork or assumptions**
 - If uncertain, use `DIFFERENT` or `UNCLEAR` instead and investigate git history/comments
 - The `description` parameter is **mandatory** and must explain what exactly differs and why
+
+**Special requirement for `INTELLIJ_PLATFORM_INHERITED_DIFFERENCE`:**
+- Use when behavior difference is due to IntelliJ Platform's underlying implementation
+- Common cases include:
+  - Empty buffer handling (Platform editors can be empty, Neovim buffers always have a newline)
+  - Position/offset calculations for newline characters
+  - Line/column indexing differences
+- The `description` parameter is **mandatory** and must explain:
+  - What Platform behavior causes the difference
+  - How it manifests in the test
+- Evidence can be found in Platform API documentation, IdeaVim code comments, or obvious Platform limitations
 
 ### 3. Test Quality & Readability
 

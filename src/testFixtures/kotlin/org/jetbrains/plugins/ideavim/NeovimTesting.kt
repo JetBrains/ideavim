@@ -286,6 +286,24 @@ enum class SkipNeovimReason {
    * and why IdeaVim chose to deviate from standard Vim/Neovim behavior.
    */
   IDEAVIM_WORKS_INTENTIONALLY_DIFFERENT,
+
+  /**
+   * Behavior difference inherited from the IntelliJ Platform's underlying implementation.
+   *
+   * This annotation is applied when IdeaVim behavior differs from Neovim due to constraints
+   * or design decisions in the IntelliJ Platform that IdeaVim is built on top of.
+   *
+   * Examples:
+   * - Empty buffer handling: Neovim buffers always contain at least one newline character,
+   *   while IntelliJ editors can be completely empty
+   * - Position/offset calculations: IntelliJ Platform returns different values for positions
+   *   at newline characters compared to Neovim
+   * - Line/column indexing differences between IntelliJ Platform and Neovim
+   *
+   * When using this reason, the description parameter MUST explain what Platform behavior
+   * causes the difference and how it manifests in the test.
+   */
+  INTELLIJ_PLATFORM_INHERITED_DIFFERENCE,
 }
 
 fun LogicalPosition.toVimCoords(): VimCoords {
