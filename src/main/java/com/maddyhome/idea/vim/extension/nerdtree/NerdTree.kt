@@ -241,6 +241,7 @@ private fun createMappings(): Map<List<KeyStroke>, NerdTreeAction> = navigationM
     "gs",
     NerdTreeAction { event, _ ->
       val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@NerdTreeAction
+      if (file.isDirectory) return@NerdTreeAction
       val currentWindow = getSplittersCurrentWindow(event)
       currentWindow?.split(SwingConstants.VERTICAL, true, file, true)
 
@@ -253,6 +254,7 @@ private fun createMappings(): Map<List<KeyStroke>, NerdTreeAction> = navigationM
     "gi",
     NerdTreeAction { event, _ ->
       val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@NerdTreeAction
+      if (file.isDirectory) return@NerdTreeAction
       val currentWindow = getSplittersCurrentWindow(event)
       currentWindow?.split(SwingConstants.HORIZONTAL, true, file, true)
 
