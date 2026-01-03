@@ -141,7 +141,7 @@ class AddressTest : VimTestCase() {
     assertState("1\n5\n")
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, description = "IdeaVim deletes all lines from 2 onwards, but Vim/Neovim should only delete lines 2-4")
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, description = "IdeaVim deletes all lines from 2 onwards (2-5), but Vim/Neovim correctly deletes lines 2-4")
   @Test
   fun testMultipleLineNumbersWithOffsetInSecond() {
     configureByText("1\n2\n3\n4\n5\n")
