@@ -26,7 +26,9 @@ data class RegisterExpression(val char: Char) : LValueExpression() {
     // workaround until we support v:null
     val register = injector.registerGroup.getRegister(editor, context, char)
     if (register != null) {
-      return VimString(injector.parser.toPrintableString(register.keys))
+      // Use register.text instead of toPrintableString to preserve actual content (e.g., newlines)
+      // toPrintableString converts control characters for display, but we need the raw text for assignment
+      return VimString(register.text)
     }
     return VimString.EMPTY
   }
