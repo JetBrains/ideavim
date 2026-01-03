@@ -273,6 +273,19 @@ enum class SkipNeovimReason {
    * Tests should only use functions from VimTestCase for Neovim compatibility.
    */
   IDEAVIM_API_USED,
+
+  /**
+   * IdeaVim intentionally behaves differently from Neovim for better user experience.
+   *
+   * This annotation is applied when IdeaVim deliberately deviates from Neovim behavior to:
+   * - Provide more convenient user experience
+   * - Follow IntelliJ Platform conventions and patterns
+   * - Better integrate with IntelliJ IDEA features
+   *
+   * When using this reason, the description parameter MUST explain what exactly is different
+   * and why IdeaVim chose to deviate from standard Vim/Neovim behavior.
+   */
+  IDEAVIM_WORKS_INTENTIONALLY_DIFFERENT,
 }
 
 fun LogicalPosition.toVimCoords(): VimCoords {

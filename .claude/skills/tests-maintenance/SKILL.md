@@ -93,11 +93,22 @@ grep -rn "@TestWithoutNeovim(SkipNeovimReason\.[A-Z_]*)" --include="*.kt" src/te
 | `CTRL_CODES` | Control code handling |
 | `BUG_IN_NEOVIM` | Known Neovim bug (not IdeaVim issue) |
 | `PSI` | IntelliJ PSI/code intelligence features |
+| `IDEAVIM_API_USED` | Test uses IdeaVim API that prevents Neovim state sync |
+| `IDEAVIM_WORKS_INTENTIONALLY_DIFFERENT` | IdeaVim intentionally deviates from Neovim for better UX or IntelliJ integration |
 
 **Requirements:**
 - Add `description` parameter for non-obvious cases
 - Check if the reason is still valid
 - Consider if test could be split: part that works with Neovim, part that doesn't
+
+**Special requirement for `IDEAVIM_WORKS_INTENTIONALLY_DIFFERENT`:**
+- **ONLY use when you find clear evidence** of intentional deviation:
+  - Explicit commit messages explaining the intentional difference
+  - Code comments documenting why IdeaVim deviates from Vim/Neovim
+  - Absolutely obvious cases (e.g., IntelliJ-specific features not in Neovim)
+- **DO NOT use based on guesswork or assumptions**
+- If uncertain, use `DIFFERENT` or `UNCLEAR` instead and investigate git history/comments
+- The `description` parameter is **mandatory** and must explain what exactly differs and why
 
 ### 3. Test Quality & Readability
 
