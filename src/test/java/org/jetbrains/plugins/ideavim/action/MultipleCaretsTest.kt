@@ -371,19 +371,19 @@ $c  tw${c}o
   fun testMotionInnerBlockAngleAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "2i<"),
-      "<asdf<asdf<a${c}sdf>a${c}sdf>asdf> <asdf<as${c}df>asdf>",
+      "<name<type<va${c}lue>va${c}lue>name> <name<ty${c}pe>name>",
     )
-    assertState("<<selection>asdf<asdf<asdf>asdf>asdf</selection>> <<selection>asdf<asdf>asdf</selection>>")
+    assertState("<<selection>name<type<value>value>name</selection>> <<selection>name<type>name</selection>>")
   }
 
   @Test
   fun testMotionInnerBlockBackQuoteActionWithNoCount() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "i`"),
-      "`as${c}d${c}f`asdf `a${c}sdf`a${c}sdf`a${c}sdf`",
+      "`co${c}d${c}e`code `c${c}ode`c${c}ode`c${c}ode`",
     )
     assertState(
-      "`<selection>asdf</selection>`asdf `<selection>asdf</selection>`<selection>asdf</selection>`<selection>asdf</selection>`",
+      "`<selection>code</selection>`code `<selection>code</selection>`<selection>code</selection>`<selection>code</selection>`",
     )
   }
 
@@ -391,28 +391,28 @@ $c  tw${c}o
   fun testMotionInnerBlockBraceAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "2i{"),
-      "{asdf{asdf{a${c}sdf}a${c}sdf}asdf} {asdf{as${c}df}asdf}",
+      "{outer{inner{d${c}eep}d${c}eep}outer} {outer{inn${c}er}outer}",
     )
-    assertState("{<selection>asdf{asdf{asdf}asdf}asdf</selection>} {<selection>asdf{asdf}asdf</selection>}")
+    assertState("{<selection>outer{inner{deep}deep}outer</selection>} {<selection>outer{inner}outer</selection>}")
   }
 
   @Test
   fun testMotionInnerBlockBracketAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "2i["),
-      "[asdf[asdf[a${c}sdf]a${c}sdf]asdf] [asdf[as${c}df]asdf]",
+      "[outer[inner[it${c}em]it${c}em]outer] [outer[inn${c}er]outer]",
     )
-    assertState("[<selection>asdf[asdf[asdf]asdf]asdf</selection>] [<selection>asdf[asdf]asdf</selection>]")
+    assertState("[<selection>outer[inner[item]item]outer</selection>] [<selection>outer[inner]outer</selection>]")
   }
 
   @Test
   fun testMotionInnerBlockDoubleQuoteActionWithNoCount() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "i\""),
-      "\"as${c}d${c}f\"asdf \"a${c}sdf\"a${c}sdf\"a${c}sdf\"",
+      "\"te${c}x${c}t\"text \"t${c}ext\"t${c}ext\"t${c}ext\"",
     )
     assertState(
-      "\"<selection>asdf</selection>\"asdf \"<selection>asdf</selection>\"<selection>asdf</selection>\"<selection>asdf</selection>\"",
+      "\"<selection>text</selection>\"text \"<selection>text</selection>\"<selection>text</selection>\"<selection>text</selection>\"",
     )
   }
 
@@ -420,19 +420,19 @@ $c  tw${c}o
   fun testMotionInnerBlockParenAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "2i("),
-      "(asdf(asdf(a${c}sdf)a${c}sdf)asdf) (asdf(as${c}df)asdf)",
+      "(outer(inner(va${c}lue)va${c}lue)outer) (outer(inn${c}er)outer)",
     )
-    assertState("(<selection>asdf(asdf(asdf)asdf)asdf</selection>) (<selection>asdf(asdf)asdf</selection>)")
+    assertState("(<selection>outer(inner(value)value)outer</selection>) (<selection>outer(inner)outer</selection>)")
   }
 
   @Test
   fun testMotionInnerBlockSingleQuoteActionWithNoCount() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "i'"),
-      "'as${c}d${c}f'asdf 'a${c}sdf'a${c}sdf'a${c}sdf'",
+      "'wo${c}r${c}d'word 'w${c}ord'w${c}ord'w${c}ord'",
     )
     assertState(
-      "'<selection>asdf</selection>'asdf '<selection>asdf</selection>'<selection>asdf</selection>'<selection>asdf</selection>'",
+      "'<selection>word</selection>'word '<selection>word</selection>'<selection>word</selection>'<selection>word</selection>'",
     )
   }
 
@@ -441,14 +441,14 @@ $c  tw${c}o
     typeTextInFile(
       injector.parser.parseKeys("v" + "it"),
       """
-                <asdf1>qwer<asdf2>qwer<asdf3>qw${c}er</asdf3>qw${c}er</asdf2>qwer</asdf1>
-                <asdf1>qwer<asdf2>qw${c}er</asdf2>qwer</asdf1>
+                <div>text<span>text<em>te${c}xt</em>te${c}xt</span>text</div>
+                <div>text<span>te${c}xt</span>text</div>
       """.trimIndent(),
     )
     assertState(
       """
-    <asdf1>qwer<asdf2><selection>qwer<asdf3>qwer</asdf3>qwer</selection></asdf2>qwer</asdf1>
-    <asdf1>qwer<asdf2><selection>qwer</selection></asdf2>qwer</asdf1>
+    <div>text<span><selection>text<em>text</em>text</selection></span>text</div>
+    <div>text<span><selection>text</selection></span>text</div>
       """.trimIndent(),
     )
   }
@@ -492,63 +492,63 @@ $c  tw${c}o
   fun testMotionOuterBlockAngleAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "2a<"),
-      "<asdf<asdf<a${c}sdf>a${c}sdf>asdf> <asdf<a${c}sdf>asdf>",
+      "<name<type<va${c}lue>va${c}lue>name> <name<va${c}lue>name>",
     )
-    assertState("<selection><asdf<asdf<asdf>asdf>asdf></selection> <selection><asdf<asdf>asdf></selection>")
+    assertState("<selection><name<type<value>value>name></selection> <selection><name<value>name></selection>")
   }
 
   @Test
   fun testMotionOuterBlockBackQuoteAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "a`"),
-      "`asdf`asdf`a${c}sdf`a${c}sdf`asdf` `asdf`a${c}sdf`asdf`",
+      "`code`code`c${c}ode`c${c}ode`code` `code`c${c}ode`code`",
     )
-    assertState("`asdf`asdf<selection>`asdf`asdf`</selection>asdf` `asdf<selection>`asdf`</selection>asdf`")
+    assertState("`code`code<selection>`code`code`</selection>code` `code<selection>`code`</selection>code`")
   }
 
   @Test
   fun testMotionOuterBraceAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "2a{"),
-      "{asdf{asdf{a${c}sdf}a${c}sdf}asdf} {asdf{a${c}sdf}asdf}",
+      "{outer{inner{d${c}eep}d${c}eep}outer} {outer{d${c}eep}outer}",
     )
-    assertState("<selection>{asdf{asdf{asdf}asdf}asdf}</selection> <selection>{asdf{asdf}asdf}</selection>")
+    assertState("<selection>{outer{inner{deep}deep}outer}</selection> <selection>{outer{deep}outer}</selection>")
   }
 
   @Test
   fun testMotionOuterBlockBracketAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "2a["),
-      "[asdf[asdf[a${c}sdf]a${c}sdf]asdf] [asdf[a${c}sdf]asdf]",
+      "[outer[inner[it${c}em]it${c}em]outer] [outer[it${c}em]outer]",
     )
-    assertState("<selection>[asdf[asdf[asdf]asdf]asdf]</selection> <selection>[asdf[asdf]asdf]</selection>")
+    assertState("<selection>[outer[inner[item]item]outer]</selection> <selection>[outer[item]outer]</selection>")
   }
 
   @Test
   fun testMotionOuterBlockDoubleQuoteAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "a\""),
-      "\"asdf\"asdf\"a${c}sdf\"a${c}sdf\"asdf\" \"asdf\"a${c}sdf\"asdf\"",
+      "\"text\"text\"t${c}ext\"t${c}ext\"text\" \"text\"t${c}ext\"text\"",
     )
-    assertState("\"asdf\"asdf<selection>\"asdf\"asdf\"</selection>asdf\" \"asdf<selection>\"asdf\"</selection>asdf\"")
+    assertState("\"text\"text<selection>\"text\"text\"</selection>text\" \"text<selection>\"text\"</selection>text\"")
   }
 
   @Test
   fun testMotionOuterBlockParenAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "2a("),
-      "(asdf(asdf(a${c}sdf)a${c}sdf)asdf) (asdf(a${c}sdf)asdf)",
+      "(outer(inner(va${c}lue)va${c}lue)outer) (outer(va${c}lue)outer)",
     )
-    assertState("<selection>(asdf(asdf(asdf)asdf)asdf)</selection> <selection>(asdf(asdf)asdf)</selection>")
+    assertState("<selection>(outer(inner(value)value)outer)</selection> <selection>(outer(value)outer)</selection>")
   }
 
   @Test
   fun testMotionOuterBlockSingleQuoteAction() {
     typeTextInFile(
       injector.parser.parseKeys("v" + "a'"),
-      "'asdf'asdf'a${c}sdf'a${c}sdf'asdf' 'asdf'a${c}sdf'asdf'",
+      "'word'word'w${c}ord'w${c}ord'word' 'word'w${c}ord'word'",
     )
-    assertState("'asdf'asdf<selection>'asdf'asdf'</selection>asdf' 'asdf<selection>'asdf'</selection>asdf'")
+    assertState("'word'word<selection>'word'word'</selection>word' 'word<selection>'word'</selection>word'")
   }
 
   @Test
@@ -556,28 +556,28 @@ $c  tw${c}o
     typeTextInFile(
       injector.parser.parseKeys("v" + "at"),
       """
-                <asdf1>qwer<asdf2>qwer<asdf3>qw${c}er</asdf3>qw${c}er</asdf2>qwer</asdf1>
-                <asdf1>qwer<asdf2>qw${c}er</asdf2>qwer</asdf1>
+                <div>text<span>text<em>te${c}xt</em>te${c}xt</span>text</div>
+                <div>text<span>te${c}xt</span>text</div>
       """.trimIndent(),
     )
     assertState(
       """
-    <asdf1>qwer<selection><asdf2>qwer<asdf3>qwer</asdf3>qwer</asdf2></selection>qwer</asdf1>
-    <asdf1>qwer<selection><asdf2>qwer</asdf2></selection>qwer</asdf1>
+    <div>text<selection><span>text<em>text</em>text</span></selection>text</div>
+    <div>text<selection><span>text</span></selection>text</div>
       """.trimIndent(),
     )
   }
 
   @Test
   fun testMotionOuterParagraphAction() {
-    typeTextInFile(injector.parser.parseKeys("v" + "2ap"), "a${c}sdf\n\na${c}sdf\n\nasdf\n\n")
-    assertState("<selection>asdf\n\nasdf\n\nasdf\n\n</selection>")
+    typeTextInFile(injector.parser.parseKeys("v" + "2ap"), "pa${c}ra\n\npa${c}ra\n\npara\n\n")
+    assertState("<selection>para\n\npara\n\npara\n\n</selection>")
   }
 
   @Test
   fun testMotionOuterSentenceAction() {
-    typeTextInFile(injector.parser.parseKeys("v" + "2as"), "a${c}sdf. a${c}sdf. asdf.")
-    assertState("<selection>asdf. asdf. asdf.</selection>")
+    typeTextInFile(injector.parser.parseKeys("v" + "2as"), "Se${c}nt. Se${c}nt. Sent.")
+    assertState("<selection>Sent. Sent. Sent.</selection>")
   }
 
   // com.maddyhime.idea.vim.action.visual.text
