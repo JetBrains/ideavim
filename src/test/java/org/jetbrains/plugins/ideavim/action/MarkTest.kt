@@ -8,12 +8,14 @@
 package org.jetbrains.plugins.ideavim.action
 
 import com.google.common.collect.Lists
+import com.intellij.idea.TestFor
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 import kotlin.test.assertNotNull
@@ -782,8 +784,30 @@ class MarkTest : VimTestCase() {
     if you repeat something over <caret>and over again it loses its meaning.
     For example: homework, homework, homework, homework, homework<caret>, homework, homework, homework, homework.
     See, nothing.
-    
+
       """.trimIndent(),
     )
+  }
+
+  // VIM-4107 |[| |]| |u|
+  @TestFor(issues = ["VIM-4107"])
+  @VimBehaviorDiffers(
+    originalVimAfter = "The ${c}quick brown fox jumps",
+    description = "Vim/Neovim updates change marks '[' and ']' during undo to point to the restored text. " +
+      "IdeaVim keeps them at the original change position.",
+    shouldBeFixed = true,
+  )
+  @Test
+  fun `test change marks updated after undo`() {
+    // Start with caret at position 4 (before 'quick'), move right 4 chars, delete 3 words, then undo
+    configureByText("The ${c}quick brown fox jumps")
+    typeText(injector.parser.parseKeys("4ld3wu"))
+
+    val vimEditor: VimEditor = IjVimEditor(fixture.editor)
+    val changeMark = injector.markService.getMark(vimEditor.primaryCaret(), '[')
+    assertNotNull(changeMark)
+    // IdeaVim behavior: marks stay at delete position
+    // Vim/Neovim behavior: marks are updated to undo position (column 0)
+    kotlin.test.assertEquals(8, changeMark.col)
   }
 }

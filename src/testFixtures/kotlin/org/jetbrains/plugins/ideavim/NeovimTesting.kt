@@ -16,6 +16,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.VimMarkService
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.CharacterPosition
 import com.maddyhome.idea.vim.newapi.vim
@@ -32,6 +33,7 @@ import com.maddyhome.idea.vim.state.mode.toVimNotation
 import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.assertAll
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 object NeovimTesting {
   private lateinit var neovimApi: NeovimApi
@@ -145,6 +147,7 @@ object NeovimTesting {
       { assertCaret(editor, test) },
       { assertMode(editor) },
       { assertRegisters(editor) },
+      { assertMarks(editor) },
     )
   }
 
@@ -215,6 +218,61 @@ object NeovimTesting {
         val neovimChar = neovimRegisterType.getOrNull(0)?.toString() ?: ""
         assertEquals(expectedType, neovimChar, "Register '$register'")
       }
+    }
+  }
+
+  // Marks to check: local (a-z), global (A-Z), numbered (0-9), and special marks
+  // Note: '.' (last change mark) excluded because we set up Neovim by modifying the buffer
+  // which affects the '.' mark, but IdeaVim doesn't have this mark set during test setup
+  // Note: '[' and ']' (change marks) excluded - see VIM-4107 for undo behavior difference
+  private val marksToCheck =
+    VimMarkService.LOWERCASE_MARKS +
+    VimMarkService.UPPERCASE_MARKS +
+    VimMarkService.NUMBERED_MARKS +
+    "<>'^\"" // Special marks: visual selection, jump mark, insert exit, last buffer position
+
+  private fun assertMarks(editor: Editor) {
+    for (markChar in marksToCheck) {
+      if (markChar in VimTestCase.Checks.neoVim.ignoredMarks) continue
+
+      // Get mark position from Neovim using getpos()
+      // Returns [bufnum, lnum, col, off] where lnum and col are 1-based
+      val neovimMarkPos = try {
+        neovimApi.callFunction("getpos", listOf("'$markChar")).get()
+      } catch (e: Exception) {
+        continue // Mark doesn't exist in Neovim
+      }
+
+      // Parse the position list
+      val posList = neovimMarkPos as? List<*> ?: continue
+      if (posList.size < 4) continue
+
+      val bufnum = (posList[0] as? Number)?.toInt() ?: continue
+      val neovimLine = (posList[1] as? Number)?.toInt() ?: continue
+      val neovimCol = (posList[2] as? Number)?.toInt() ?: continue
+
+      // If mark is not set in Neovim (position is [0, 0, 0, 0])
+      if (bufnum == 0 && neovimLine == 0 && neovimCol == 0) {
+        // Verify it's also not set in IdeaVim
+        val vimEditor = editor.vim
+        val ideavimMark = injector.markService.getMark(vimEditor.primaryCaret(), markChar)
+        assertEquals(null, ideavimMark, "Mark '$markChar' should not be set")
+        continue
+      }
+
+      // Get mark from IdeaVim
+      val vimEditor = editor.vim
+      val ideavimMark = injector.markService.getMark(vimEditor.primaryCaret(), markChar)
+
+      // Verify mark exists in IdeaVim
+      assertNotNull(ideavimMark, "Mark '$markChar' should exist in IdeaVim")
+
+      // Convert Neovim's 1-based line/col to 0-based for comparison
+      val expectedLine = neovimLine - 1
+      val expectedCol = neovimCol - 1
+
+      assertEquals(expectedLine, ideavimMark.line, "Mark '$markChar' line position")
+      assertEquals(expectedCol, ideavimMark.col, "Mark '$markChar' column position")
     }
   }
 

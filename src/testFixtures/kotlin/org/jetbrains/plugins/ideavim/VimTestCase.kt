@@ -1062,10 +1062,12 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
 
     class NeoVim {
       var ignoredRegisters: Set<Char> = setOf()
+      var ignoredMarks: Set<Char> = setOf()
       var exitOnTearDown = true
 
       fun reset() {
         ignoredRegisters = setOf()
+        ignoredMarks = setOf()
         exitOnTearDown = true
       }
     }
