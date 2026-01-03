@@ -31,5 +31,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: problems-report
-          path: build/reports/problems/
+          path: |
+            ideavim/build/reports/
+            ideavim/tests/java-tests/build/reports/
           if-no-files-found: ignore
