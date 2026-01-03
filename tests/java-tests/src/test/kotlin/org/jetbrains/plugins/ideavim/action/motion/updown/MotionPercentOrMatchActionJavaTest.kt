@@ -188,4 +188,136 @@ class MotionPercentOrMatchActionJavaTest : VimJavaTestCase() {
    */
       """.trimIndent())
   }
+
+  @Test
+  @TestFor(issues = ["VIM-4030"])
+  @TestWithoutNeovim(SkipNeovimReason.PSI)
+  fun `test percent skips brace inside string literal`() {
+    configureByJavaText(
+      """
+      void test() $c{
+        String json = "{\"key\":\"value\"}";
+      }
+      """.trimIndent()
+    )
+    typeText("%")
+    assertState(
+      """
+      void test() {
+        String json = "{\"key\":\"value\"}";
+      $c}
+      """.trimIndent()
+    )
+  }
+
+  @Test
+  @TestFor(issues = ["VIM-4030"])
+  @TestWithoutNeovim(SkipNeovimReason.PSI)
+  fun `test percent skips brace inside string with unbalanced quotes`() {
+    // This test specifically targets the bug: the string contains a closing brace
+    // preceded by an unescaped quote which confuses text-based detection
+    configureByJavaText(
+      """
+      void test() $c{
+        String s = "{\"}";
+      }
+      """.trimIndent()
+    )
+    typeText("%")
+    assertState(
+      """
+      void test() {
+        String s = "{\"}";
+      $c}
+      """.trimIndent()
+    )
+  }
+
+  @Test
+  @TestFor(issues = ["VIM-4030"])
+  @TestWithoutNeovim(SkipNeovimReason.PSI)
+  fun `test percent skips brace inside text block`() {
+    // Java text blocks (triple-quoted strings) should be recognized via PSI
+    // The text-based detection would misinterpret the triple quotes
+    configureByJavaText(
+      """
+      void test() $c{
+        String json = ${"\"\"\""}
+          {"key":"value"}
+          ${"\"\"\""};
+      }
+      """.trimIndent()
+    )
+    typeText("%")
+    assertState(
+      """
+      void test() {
+        String json = ${"\"\"\""}
+          {"key":"value"}
+          ${"\"\"\""};
+      $c}
+      """.trimIndent()
+    )
+  }
+
+  @Test
+  @TestFor(issues = ["VIM-4030"])
+  @TestWithoutNeovim(SkipNeovimReason.PSI)
+  fun `test percent on brace inside string stays in place`() {
+    // When cursor is on a brace inside a string, it should try to match within the string
+    // If no match is found within the string, the cursor should not move
+    configureByJavaText(
+      """
+      String s = "$c{";
+      """.trimIndent()
+    )
+    typeText("%")
+    assertState(
+      """
+      String s = "$c{";
+      """.trimIndent()
+    )
+  }
+
+  @Test
+  @TestFor(issues = ["VIM-4030"])
+  @TestWithoutNeovim(SkipNeovimReason.PSI)
+  fun `test va{ with brace inside string literal`() {
+    configureByJavaText(
+      """
+      void test() $c{
+        String json = "{\"key\":\"value\"}";
+      }
+      """.trimIndent()
+    )
+    typeText("va{")
+    assertState(
+      """
+      void test() <selection>{
+        String json = "{\"key\":\"value\"}";
+      }</selection>
+      """.trimIndent()
+    )
+  }
+
+  @Test
+  @TestFor(issues = ["VIM-4030"])
+  @TestWithoutNeovim(SkipNeovimReason.PSI)
+  fun `test vi{ with brace inside string literal`() {
+    configureByJavaText(
+      """
+      void test() $c{
+        String json = "{\"key\":\"value\"}";
+      }
+      """.trimIndent()
+    )
+    typeText("vi{")
+    assertState(
+      """
+      void test() {<selection>
+        String json = "{\"key\":\"value\"}";
+      </selection>}
+      """.trimIndent()
+    )
+  }
 }
