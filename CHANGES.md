@@ -26,6 +26,7 @@ usual beta standards.
 ## [To Be Released]
 
 ### Fixes:
+* [VIM-4105](https://youtrack.jetbrains.com/issue/VIM-4105) Fixed `a"` `a'` `a\`` text objects to include surrounding whitespace per Vim spec
 * [VIM-4097](https://youtrack.jetbrains.com/issue/VIM-4097) Fixed `<A-n>` (NextOccurrence) with text containing backslashes - e.g., selecting `\IntegerField` now works correctly
 * [VIM-4094](https://youtrack.jetbrains.com/issue/VIM-4094) Fixed UninitializedPropertyAccessException when loading history
 
