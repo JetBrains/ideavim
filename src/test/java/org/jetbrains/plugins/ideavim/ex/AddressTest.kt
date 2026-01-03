@@ -119,7 +119,7 @@ class AddressTest : VimTestCase() {
     assertState("+ add\n- sub\n* mul\n")
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, description = "IdeaVim removes all content leaving empty buffer, Vim/Neovim leaves single empty line")
+  @TestWithoutNeovim(reason = SkipNeovimReason.INTELLIJ_PLATFORM_INHERITED_DIFFERENCE, description = "IntelliJ Platform editors can be completely empty, while Neovim buffers always contain at least one newline character")
   @Test
   fun testAllLinesRange() {
     configureByText("1\n2\n3\n4\n5\n")
