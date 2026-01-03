@@ -39,6 +39,8 @@ jobs:
 
             IMPORTANT: Be concise and write to the point. Avoid extra explanations, filler words, or compliments. Focus on actionable feedback only. Every word should add value.
 
+            NOTE: Some PRs contain only changelog updates (CHANGES.md and build.gradle.kts changeNotes). These are created automatically by the updateChangelogClaude.yml workflow. The actual implementation exists in previous commits. For such PRs, do NOT search for the implementation or report that it's missing - this is expected and correct.
+
             Use inline comments for specific issues. Use the repository's CLAUDE.md for style guidance.
 
             Use `gh pr comment` with your Bash tool to leave your review as a comment on the PR.
