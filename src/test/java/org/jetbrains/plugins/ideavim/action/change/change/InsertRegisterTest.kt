@@ -40,4 +40,28 @@ class InsertRegisterTest : VimTestCase() {
     """.trimIndent()
     doTest(keys, before, after, Mode.INSERT)
   }
+
+  @Test
+  fun `test insert named register with CTRL-R`() {
+    configureByText("\n")
+    enterCommand("let @a=\"hello world\"")
+    typeText("i<C-R>a")
+    assertState("hello world$c\n")
+  }
+
+  @Test
+  fun `test insert named register literally with CTRL-R CTRL-R`() {
+    configureByText("\n")
+    enterCommand("let @a=\"hello world\"")
+    typeText("i<C-R><C-R>a")
+    assertState("hello world$c\n")
+  }
+
+  @Test
+  fun `test insert named register literally with CTRL-R CTRL-O`() {
+    configureByText("\n")
+    enterCommand("let @a=\"hello world\"")
+    typeText("i<C-R><C-O>a")
+    assertState("hello world$c\n")
+  }
 }

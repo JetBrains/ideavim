@@ -60,6 +60,42 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
   }
 }
 
+@CommandOrMotion(keys = ["<C-R><C-R>", "<C-R><C-O>"], modes = [Mode.INSERT])
+class InsertRegisterLiterallyAction : VimActionHandler.SingleExecution() {
+  override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
+
+  override val argumentType: Argument.Type = Argument.Type.CHARACTER
+
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    val argument = cmd.argument as? Argument.Character ?: return false
+    if (argument.character == '=') {
+      injector.commandLine.readInputAndProcess(editor, context, "=", finishOn = null) { input ->
+        try {
+          if (input.isNotEmpty()) {
+            val expression =
+              injector.vimscriptParser.parseExpression(input)?.evaluate(editor, context, Script(listOf()))
+                ?: throw exExceptionMessage("E15", input)
+            val textToStore = expression.toInsertableString()
+            injector.registerGroup.storeTextSpecial('=', textToStore)
+          }
+          insertRegisterLiterally(editor, context, '=')
+        } catch (e: ExException) {
+          injector.messages.indicateError()
+          injector.messages.showStatusBarMessage(editor, e.message)
+        }
+      }
+      return true
+    } else {
+      return insertRegisterLiterally(editor, context, argument.character)
+    }
+  }
+}
+
 /**
  * Inserts the contents of the specified register
  *
@@ -70,6 +106,31 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
  */
 @VimLockLabel.SelfSynchronized
 private fun insertRegister(editor: VimEditor, context: ExecutionContext, key: Char): Boolean {
+  val register: Register? = injector.registerGroup.getRegister(editor, context, key)
+  if (register != null) {
+    val textData = PutData.TextData(
+      register.name,
+      injector.clipboardManager.dumbCopiedText(register.text),
+      SelectionType.CHARACTER_WISE
+    )
+    val putData =
+      PutData(textData, null, 1, insertTextBeforeCaret = true, rawIndent = true, caretAfterInsertedText = true)
+    injector.put.putText(editor, context, putData)
+    return true
+  }
+  return false
+}
+
+/**
+ * Inserts the contents of the specified register literally without auto-indent
+ *
+ * @param editor  The editor to insert the text into
+ * @param context The data context
+ * @param key     The register name
+ * @return true if able to insert the register contents, false if not
+ */
+@VimLockLabel.SelfSynchronized
+private fun insertRegisterLiterally(editor: VimEditor, context: ExecutionContext, key: Char): Boolean {
   val register: Register? = injector.registerGroup.getRegister(editor, context, key)
   if (register != null) {
     val textData = PutData.TextData(
