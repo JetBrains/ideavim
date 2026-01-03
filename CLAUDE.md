@@ -24,7 +24,6 @@ See CONTRIBUTING.md for architecture details and a complete command list.
 This project uses **YouTrack** for issue tracking, NOT GitHub Issues.
 - Tickets are prefixed with `VIM-` (e.g., VIM-1234)
 - YouTrack URL: https://youtrack.jetbrains.com/issues/VIM
-- Use the `youtrack` skill for API operations
 - `gh issue` commands will NOT work
 
 ## Additional Documentation
