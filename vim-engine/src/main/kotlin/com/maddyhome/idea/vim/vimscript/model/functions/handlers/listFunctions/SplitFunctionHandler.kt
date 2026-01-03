@@ -13,26 +13,21 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.BuiltinFunctionHandler
 
 @VimscriptFunction(name = "split")
-internal class SplitFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments: Int = 1
-  override val maximumNumberOfArguments: Int = 3
-
+internal class SplitFunctionHandler : BuiltinFunctionHandler<VimList>(minArity = 1, maxArity = 3) {
   override fun doFunction(
-    argumentValues: List<Expression>,
+    arguments: Arguments,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
-  ): VimDataType {
-    val text = argumentValues[0].evaluate(editor, context, vimContext).toVimString().value
-    val delimiter = argumentValues.getOrNull(1)?.evaluate(editor, context, vimContext)?.toVimString()?.value ?: "\\s\\+"
-    val keepEmpty = argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext)?.toVimNumber()?.booleanValue ?: false
+  ) : VimList {
+    val text = arguments.getString(0).value
+    val delimiter = arguments.getStringOrNull(1)?.value ?: "\\s\\+"
+    val keepEmpty = arguments.getNumberOrNull(2)?.booleanValue ?: false
 
     val delimiters: List<Pair<Int, Int>> =
       injector.regexpService.getAllMatches(text, delimiter) + Pair(text.length, text.length)

@@ -14,7 +14,7 @@ class LazyVimscriptFunction(val name: String, className: String, classLoader: Cl
   LazyInstance<FunctionHandler>(className, classLoader) {
   override val instance: FunctionHandler by lazy {
     val function = super.instance
-    function.name = name
+    (function as? FunctionHandlerBase<*>)?.let { it.name = name }
     function
   }
 }

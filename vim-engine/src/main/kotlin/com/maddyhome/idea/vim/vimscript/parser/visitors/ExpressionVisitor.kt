@@ -44,7 +44,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.EnvVariableExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.FalsyExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.FuncrefCallExpression
-import com.maddyhome.idea.vim.vimscript.model.expressions.FunctionCallExpression
+import com.maddyhome.idea.vim.vimscript.model.expressions.NamedFunctionCallExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.LambdaExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.LambdaFunctionCallExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.ListExpression
@@ -132,6 +132,7 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
     val rightText: String = ctx.expr(1).text
     val operatorString = ctx.additiveOperator().text
 
+    // Concatenation is treated like an additive expression. I.e. `foo . bar` has the same precedence as `foo + bar`
     val result =
       when {
         operatorString == "."
@@ -175,7 +176,7 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
 
         operatorString == "."
           && !containsSpaces(ctx)
-          && rightExpression is FunctionCallExpression
+          && rightExpression is NamedFunctionCallExpression
           && evaluationResultCouldBeADictionary(leftExpression) -> {
 
           // Dictionary-function: mydict.len()
@@ -305,7 +306,7 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
     return result
   }
 
-  override fun visitFunctionAsMethodCall1(ctx: VimscriptParser.FunctionAsMethodCall1Context): FunctionCallExpression {
+  override fun visitFunctionAsMethodCall1(ctx: VimscriptParser.FunctionAsMethodCall1Context): NamedFunctionCallExpression {
     val functionCall = visitFunctionCall(ctx.functionCall())
     functionCall.arguments.add(0, visit(ctx.expr()))
     functionCall.originalString = ctx.text
@@ -325,6 +326,7 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
     // This can be either a function call through an expression that resolves to a funcref (i.e. `expr10(expr1, ...)`)
     // or a function call through a name (i.e. `name(expr1, ...)` or `n{am}e(expr1, ...)` - see `expr11`).
     // When it's through a (curly braces) name, the context will have a functionCall(), otherwise, we'll have an expr()
+    // such as an indexed expression or wrapped expression.
     // As a reminder, a method call (`expr10->name(expr1, ...)`) is converted into a function call though a name:
     // `expr10.name(expr1, ...)`.
     val expr = ctx.expr()
@@ -339,14 +341,14 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
     return result
   }
 
-  override fun visitFunctionCall(ctx: VimscriptParser.FunctionCallContext): FunctionCallExpression {
+  override fun visitFunctionCall(ctx: VimscriptParser.FunctionCallContext): NamedFunctionCallExpression {
     val functionName = visitCurlyBracesName(ctx.functionName().curlyBracesName())
     var scope: Scope? = null
     if (ctx.functionScope() != null) {
       scope = Scope.getByValue(ctx.functionScope().text)
     }
     val functionArguments = visitFunctionArgs(ctx.functionArguments()).toMutableList()
-    val result = FunctionCallExpression(scope, functionName, functionArguments)
+    val result = NamedFunctionCallExpression(scope, functionName, functionArguments)
     result.originalString = ctx.text
     return result
   }

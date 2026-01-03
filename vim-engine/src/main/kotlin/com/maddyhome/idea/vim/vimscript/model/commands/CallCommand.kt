@@ -11,18 +11,13 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.FuncrefCallExpression
-import com.maddyhome.idea.vim.vimscript.model.expressions.FunctionCallExpression
-import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
-import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
-import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
+import com.maddyhome.idea.vim.vimscript.model.expressions.NamedFunctionCallExpression
 
 /**
  * see "h :call"
@@ -40,43 +35,15 @@ class CallCommand(val range: Range, val functionCall: Expression) :
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
     when (functionCall) {
-      is FunctionCallExpression -> {
-        val scopePrefix = functionCall.scope?.toString() ?: ""
-        val name = functionCall.functionName.evaluate(editor, context, vimContext).value
-        val function = injector.functionService.getFunctionHandlerOrNull(functionCall.scope, name, vimContext)
-        if (function != null) {
-          if (function is DefinedFunctionHandler && function.function.flags.contains(FunctionFlag.DICT)) {
-            throw exExceptionMessage("E725", scopePrefix + name)
-          }
-          function.range = range
-          function.executeFunction(functionCall.arguments, editor, context, this)
-          return ExecutionResult.Success
-        }
-
-        val funcref = injector.variableService.getNullableVariableValue(
-          VariableExpression(functionCall.scope, functionCall.functionName),
-          editor,
-          context,
-          vimContext
-        )
-        if (funcref is VimFuncref) {
-          funcref.handler.range = range
-          funcref.execute(scopePrefix + name, functionCall.arguments, editor, context, vimContext)
-          return ExecutionResult.Success
-        }
-
-        throw exExceptionMessage("E117", scopePrefix + name)
-      }
-
-      is FuncrefCallExpression -> {
-        functionCall.evaluateWithRange(range, editor, context, vimContext)
-        return ExecutionResult.Success
-      }
+      is NamedFunctionCallExpression -> functionCall.evaluateWithRange(range, editor, context, vimContext)
+      is FuncrefCallExpression -> functionCall.evaluateWithRange(range, editor, context, vimContext)
 
       else -> {
         // todo add more exceptions
         throw exExceptionMessage("E129")
       }
     }
+
+    return ExecutionResult.Success
   }
 }

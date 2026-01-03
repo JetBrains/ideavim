@@ -9,16 +9,21 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.expressions.datatypes
 
 import com.intellij.platform.testFramework.assertion.collectionAssertion.CollectionAssertions.assertEqualsOrdered
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref.Type
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.model.functions.UnaryFunctionHandler
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertInstanceOf
 import org.junit.jupiter.api.assertThrows
-import kotlin.collections.mutableMapOf
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNotSame
@@ -125,6 +130,21 @@ class VimDictionaryTest : VimDataTypeTest() {
     assertEquals("{'key1': [1, [9, 8, 7], 3], 'key2': 2, 'key3': [1, [...], 3]}", dictionary.toOutputString())
   }
 
+  // Note that these do not test the output for dictionary functions! This only tests the output of a dictionary
+  // containing a function reference and a partial function reference.
+  @Test
+  fun `test output string for Dictionary with function entry`() {
+    val dictionary = toVimDictionary("k" to getVimFuncref(), "thing" to "bar")
+    assertEquals("{'k': function('Fake'), 'thing': 'bar'}", dictionary.toOutputString())
+  }
+
+  @Test
+  fun `test output string for Dictionary with partial function entry`() {
+    val partialDictionary = toVimDictionary("thing" to "oink")
+    val dictionary = toVimDictionary("k" to getVimFuncref(dictionary = partialDictionary), "thing" to "bar")
+    assertEquals("{'k': function('Fake', {'thing': 'oink'}), 'thing': 'bar'}", dictionary.toOutputString())
+  }
+
   @Test
   fun `test insertable string for simple Dictionary`() {
     val dictionary = toVimDictionary("key1" to 1, "key2" to "value", "key3" to 3.14, "key4" to listOf(1, 2, 3))
@@ -215,5 +235,29 @@ class VimDictionaryTest : VimDataTypeTest() {
       value.deepCopy(useReferences = false)
     }
     assertEquals("E698: Variable nested too deep for making a copy", exception.message)
+  }
+
+  private fun getVimFuncref(
+    arguments: VimList? = null,
+    dictionary: VimDictionary? = null,
+    type: Type = Type.FUNCREF,
+  ): VimFuncref {
+    return VimFuncref(FakeHandler, arguments ?: VimList(mutableListOf()), dictionary, type, isImplicitPartial = false)
+  }
+
+  // We'll never call this
+  object FakeHandler: UnaryFunctionHandler<VimDataType>() {
+    init {
+      name = "Fake"
+    }
+
+    override fun doFunction(
+      arguments: Arguments,
+      editor: VimEditor,
+      context: ExecutionContext,
+      vimContext: VimLContext,
+    ): VimDataType {
+      TODO("Not yet implemented")
+    }
   }
 }

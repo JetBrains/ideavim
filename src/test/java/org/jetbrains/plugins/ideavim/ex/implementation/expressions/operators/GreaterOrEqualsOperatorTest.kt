@@ -19,31 +19,40 @@ class GreaterOrEqualsOperatorTest : VimTestCase() {
 
   @Test
   fun `test equal numbers`() {
-    assertEquals(VimInt(1), VimscriptParser.parseExpression("1 >= 1")!!.evaluate())
+    assertEquals(VimInt.ONE, VimscriptParser.parseExpression("1 >= 1")!!.evaluate())
   }
 
   @Test
   fun `test greater number`() {
-    assertEquals(VimInt(1), VimscriptParser.parseExpression("2 >= 1")!!.evaluate())
+    assertEquals(VimInt.ONE, VimscriptParser.parseExpression("2 >= 1")!!.evaluate())
   }
 
   @Test
   fun `test smaller number`() {
-    assertEquals(VimInt(0), VimscriptParser.parseExpression("1 >= 2")!!.evaluate())
+    assertEquals(VimInt.ZERO, VimscriptParser.parseExpression("1 >= 2")!!.evaluate())
   }
 
   @Test
   fun `test equal strings`() {
-    assertEquals(VimInt(1), VimscriptParser.parseExpression("'abc' >= 'abc'")!!.evaluate())
+    assertEquals(VimInt.ONE, VimscriptParser.parseExpression("'abc' >= 'abc'")!!.evaluate())
   }
 
   @Test
   fun `test greater string`() {
-    assertEquals(VimInt(1), VimscriptParser.parseExpression("'def' >= 'abc'")!!.evaluate())
+    assertEquals(VimInt.ONE, VimscriptParser.parseExpression("'def' >= 'abc'")!!.evaluate())
   }
 
   @Test
   fun `test smaller string`() {
-    assertEquals(VimInt(0), VimscriptParser.parseExpression("'abc' >= 'def'")!!.evaluate())
+    assertEquals(VimInt.ZERO, VimscriptParser.parseExpression("'abc' >= 'def'")!!.evaluate())
+  }
+
+  @Test
+  fun `test compare String and Number compares as Number`() {
+    // The String is parsed as 0
+    assertEquals(VimInt.ZERO, VimscriptParser.parseExpression("'abc' >= 1")!!.evaluate())
+    assertEquals(VimInt.ONE, VimscriptParser.parseExpression("1 >= 'two'")!!.evaluate())
+    assertEquals(VimInt.ONE, VimscriptParser.parseExpression("2 >= '1'")!!.evaluate())
+    assertEquals(VimInt.ZERO, VimscriptParser.parseExpression("2 >= '3'")!!.evaluate())
   }
 }

@@ -63,7 +63,7 @@ class NotEqualToOperatorTest : VimTestCase("\n") {
     assertCommandOutput("echo 1 != '1'", "0")
     assertCommandOutput("echo '1' != 2", "1")
     assertCommandOutput("echo 'abc' != 1", "1")
-    assertCommandOutput("echo '1abc' != 1", "1")
+    assertCommandOutput("echo '1abc' != 1", "0")
   }
 
   @Test

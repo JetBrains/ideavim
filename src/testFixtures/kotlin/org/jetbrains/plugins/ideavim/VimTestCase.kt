@@ -234,6 +234,7 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
     injector.outputPanel.getCurrentOutputPanel()?.close()
     injector.modalInput.getCurrentModalInput()?.deactivate(refocusOwningEditor = false, resetCaret = false)
     (injector.digraphGroup as VimDigraphGroupBase).clearCustomDigraphs()
+    injector.functionService.resetUserDefinedFunctions()
 
     // Important to reset in tearDown as well as setUp, so we reset modified test options
     resetAllOptions()
