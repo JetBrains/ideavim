@@ -10,6 +10,7 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
+import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -102,5 +103,31 @@ class BufferListCommandTest : VimTestCase() {
     kotlin.test.assertEquals(DEFAULT_LS_OUTPUT, displayedLines[0])
 
     assertPluginError(false)
+  }
+
+  @Test
+  fun testEnterCommandModeAfterBuffersOutput() {
+    // VIM-2508: Command mode should stay open after pressing : following "Hit ENTER or type command to continue"
+    configureByText("\n")
+
+    // Execute buffers command which produces output
+    typeText(commandToKeys("buffers"))
+
+    // Verify output was produced
+    val output = getInstance(fixture.editor).text
+    kotlin.test.assertNotNull<Any>(output)
+
+    // Simulate pressing : to enter a new command after the output
+    // Note: This simulates the user pressing : at the "Hit ENTER or type command to continue" prompt
+    typeText(injector.parser.parseKeys(":"))
+
+    // Command mode should be active
+    kotlin.test.assertTrue(
+      ExEntryPanel.getOrCreatePanelInstance().isActive,
+      "Command mode should be active after pressing : at the output prompt"
+    )
+
+    // Cancel the command entry
+    typeText(injector.parser.parseKeys("<Esc>"))
   }
 }

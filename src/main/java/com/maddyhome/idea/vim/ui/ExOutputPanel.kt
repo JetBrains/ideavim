@@ -272,22 +272,25 @@ class ExOutputPanel private constructor(private val myEditor: Editor) : JBPanel<
 
   @JvmOverloads
   fun close(key: KeyStroke? = null) {
-    ApplicationManager.getApplication().invokeLater {
-      deactivate(true)
-      val project = myEditor.project
-      if (project != null && key != null && key.keyChar != '\n') {
-        val keys: MutableList<KeyStroke> = ArrayList(1)
-        keys.add(key)
-        if (LOG.isTrace()) {
-          LOG.trace(
-            "Adding new keys to keyStack as part of playback. State before adding keys: " +
-              getInstance().keyStack.dump()
-          )
+    deactivate(true)
+    if (key != null && key.keyChar != '\n') {
+      // Use invokeLater to ensure the output panel is fully deactivated before playing back the key
+      ApplicationManager.getApplication().invokeLater {
+        val project = myEditor.project
+        if (project != null) {
+          val keys: MutableList<KeyStroke> = ArrayList(1)
+          keys.add(key)
+          if (LOG.isTrace()) {
+            LOG.trace(
+              "Adding new keys to keyStack as part of playback. State before adding keys: " +
+                getInstance().keyStack.dump()
+            )
+          }
+          getInstance().keyStack.addKeys(keys)
+          val context: ExecutionContext =
+            injector.executionContextManager.getEditorExecutionContext(IjVimEditor(myEditor))
+          VimPlugin.getMacro().playbackKeys(IjVimEditor(myEditor), context, 1)
         }
-        getInstance().keyStack.addKeys(keys)
-        val context: ExecutionContext =
-          injector.executionContextManager.getEditorExecutionContext(IjVimEditor(myEditor))
-        VimPlugin.getMacro().playbackKeys(IjVimEditor(myEditor), context, 1)
       }
     }
   }
