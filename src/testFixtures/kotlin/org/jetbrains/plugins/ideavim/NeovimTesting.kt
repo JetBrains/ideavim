@@ -225,6 +225,18 @@ object NeovimTesting {
 annotation class TestWithoutNeovim(val reason: SkipNeovimReason, val description: String = "")
 
 enum class SkipNeovimReason {
+  /**
+   * Case-specific difference that doesn't fit into any of the standard categories.
+   *
+   * This is a catch-all reason for edge cases and unique scenarios that don't fall under
+   * any other reason category. When using this reason, the description parameter is REQUIRED
+   * and MUST provide a clear explanation of why the test cannot be compared with Neovim.
+   *
+   * Use this reason sparingly - if a pattern emerges with multiple tests using SEE_DESCRIPTION
+   * for similar reasons, consider creating a new dedicated reason instead.
+   */
+  SEE_DESCRIPTION,
+
   PLUGIN,
 
   @Suppress("unused")
@@ -247,7 +259,6 @@ enum class SkipNeovimReason {
 
   CMD,
   ACTION_COMMAND,
-  PLUG,
   FOLDING,
   TABS,
   PLUGIN_ERROR,

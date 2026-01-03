@@ -68,6 +68,7 @@ grep -rn "@TestWithoutNeovim(SkipNeovimReason\.[A-Z_]*)" --include="*.kt" src/te
 
 | Reason | When to Use |
 |--------|-------------|
+| `SEE_DESCRIPTION` | Case-specific difference that doesn't fit other categories (description required) |
 | `PLUGIN` | IdeaVim extension-specific behavior (surround, commentary, etc.) |
 | `INLAYS` | Test involves IntelliJ inlays (not present in Vim) |
 | `OPTION` | IdeaVim-specific option behavior |
@@ -84,7 +85,6 @@ grep -rn "@TestWithoutNeovim(SkipNeovimReason\.[A-Z_]*)" --include="*.kt" src/te
 | `EDITOR_MODIFICATION` | Editor-specific modifications |
 | `CMD` | Command-line mode differences |
 | `ACTION_COMMAND` | `:action` command (IDE-specific) |
-| `PLUG` | `<Plug>` mappings |
 | `FOLDING` | Code folding (IDE feature) |
 | `TABS` | Tab/window management differences |
 | `PLUGIN_ERROR` | Plugin execution error handling |
@@ -121,6 +121,12 @@ grep -rn "@TestWithoutNeovim(SkipNeovimReason\.[A-Z_]*)" --include="*.kt" src/te
   - What Platform behavior causes the difference
   - How it manifests in the test
 - Evidence can be found in Platform API documentation, IdeaVim code comments, or obvious Platform limitations
+
+**Special requirement for `SEE_DESCRIPTION`:**
+- Use as a last resort when the difference doesn't fit any standard category
+- The `description` parameter is **mandatory** and must provide a clear, specific explanation
+- Use sparingly - if multiple tests share similar reasons, consider creating a new dedicated reason
+- Always check existing reasons first before using this catch-all
 
 ### 3. Test Quality & Readability
 
