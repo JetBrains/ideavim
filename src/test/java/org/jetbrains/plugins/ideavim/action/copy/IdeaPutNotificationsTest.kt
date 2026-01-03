@@ -26,6 +26,7 @@ class IdeaPutNotificationsTest : VimTestCase() {
   fun `test notification exists if no ideaput`() {
     val before = "${c}I found it in a legendary land"
     configureByText(before)
+    enterCommand("set clipboard=")
     appReadySetup(false)
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
@@ -85,6 +86,7 @@ class IdeaPutNotificationsTest : VimTestCase() {
   fun `test no notification if already was`() {
     val before = "${c}I found it in a legendary land"
     configureByText(before)
+    enterCommand("set clipboard=")
     appReadySetup(true)
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
