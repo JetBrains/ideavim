@@ -14,7 +14,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
 class ShiftLeftTest : VimTestCase() {
-  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "Caret positioning after shift with motion")
   @Test
   fun `test shift till new line`() {
     val file = """
@@ -38,7 +38,7 @@ class ShiftLeftTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.OPTION, "Tests default startofline option behavior")
   @Test
   fun `test shift left positions caret at first non-blank char`() {
     val file = """
@@ -62,7 +62,7 @@ class ShiftLeftTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.OPTION, "Tests nostartofline option behavior")
   @Test
   fun `test shift left does not move caret with nostartofline`() {
     val file = """
@@ -88,7 +88,7 @@ class ShiftLeftTest : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.OPTION, "Tests nostartofline option with caret at end of line")
   @Test
   fun `test shift left positions caret at end of line with nostartofline`() {
     val file = """
