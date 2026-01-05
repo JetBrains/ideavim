@@ -23,6 +23,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Need full history to analyze commits and tags
+          ssh-key: ${{ secrets.PUSH_TO_PROTECTED_BRANCH_SECRET }}
 
       - name: Get last processed commit
         id: last_commit
