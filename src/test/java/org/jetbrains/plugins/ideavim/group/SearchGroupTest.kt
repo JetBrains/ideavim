@@ -401,7 +401,7 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(22)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "Behavior differs when search offset lands exactly at EOF")
   @Test
   fun `test search e+10 motion offset wraps at exactly end of file`() {
     configureByText(
@@ -453,7 +453,7 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(0)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "Behavior differs when search offset wraps to beginning of file")
   @Test
   fun `test reverse search s-20 motion offset wraps at beginning of file`() {
     configureByText(
