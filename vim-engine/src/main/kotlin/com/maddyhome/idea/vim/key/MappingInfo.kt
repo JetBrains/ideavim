@@ -271,7 +271,11 @@ class ToActionMappingInfo(
 
   override fun execute(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
     LOG.debug("Executing 'ToAction' mapping...")
-    injector.actionExecutor.executeAction(editor, name = action, context = context)
+    val count = keyState.commandBuilder.calculateCount0Snapshot().coerceAtLeast(1)
+    repeat(count) { iteration ->
+      LOG.trace { "Executing action '$action' (iteration ${iteration + 1}/$count)" }
+      injector.actionExecutor.executeAction(editor, name = action, context = context)
+    }
   }
 
   companion object {

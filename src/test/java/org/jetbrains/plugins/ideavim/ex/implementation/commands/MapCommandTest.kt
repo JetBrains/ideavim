@@ -1301,4 +1301,69 @@ class MapCommandTest : VimTestCase() {
       enterCommand("imap <S-Tab> hello")
     }
   }
+
+  @TestFor(issues = ["VIM-2431"])
+  @TestWithoutNeovim(reason = SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test Action mapping with count`() {
+    configureByText(
+      """
+      |line 1
+      |line 2
+      |line ${c}3
+      |line 4
+      |line 5
+      |line 6
+      """.trimMargin()
+    )
+    enterCommand("nmap gj <Action>(EditorCloneCaretBelow)")
+    typeText("3gj")
+    // With count 3, we expect 4 carets total (original + 3 clones)
+    kotlin.test.assertEquals(4, fixture.editor.caretModel.caretCount)
+  }
+
+  @TestFor(issues = ["VIM-2431"])
+  @TestWithoutNeovim(reason = SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test Action mapping without count executes once`() {
+    configureByText(
+      """
+      |line 1
+      |line 2
+      |line ${c}3
+      |line 4
+      |line 5
+      """.trimMargin()
+    )
+    enterCommand("nmap gj <Action>(EditorCloneCaretBelow)")
+    typeText("gj")
+    // Without count, we expect 2 carets total (original + 1 clone)
+    kotlin.test.assertEquals(2, fixture.editor.caretModel.caretCount)
+  }
+
+  @TestFor(issues = ["VIM-2431"])
+  @TestWithoutNeovim(reason = SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test Action mapping with large count`() {
+    configureByText(
+      """
+      |line ${c}1
+      |line 2
+      |line 3
+      |line 4
+      |line 5
+      |line 6
+      |line 7
+      |line 8
+      |line 9
+      |line 10
+      |line 11
+      |line 12
+      """.trimMargin()
+    )
+    enterCommand("nmap gj <Action>(EditorCloneCaretBelow)")
+    typeText("10gj")
+    // With count 10, we expect 11 carets total (original + 10 clones)
+    kotlin.test.assertEquals(11, fixture.editor.caretModel.caretCount)
+  }
 }
