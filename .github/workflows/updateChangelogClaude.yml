@@ -23,7 +23,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Need full history to analyze commits and tags
-          ssh-key: ${{ secrets.PUSH_TO_PROTECTED_BRANCH_SECRET }}
 
       - name: Get last processed commit
         id: last_commit
@@ -37,29 +36,29 @@ jobs:
             echo "No workflow-changelog tag found, will analyze recent commits"
           fi
 
-      - name: Run Claude Code to Update Changelog
-        id: claude
-        uses: anthropics/claude-code-action@v1
-        with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-
-          prompt: |
-            ## Task: Update the CHANGES.md Changelog File
-
-            You need to review the latest commits and maintain the changelog file (CHANGES.md) with meaningful changes.
-
-            Use the changelog skill to load the detailed changelog maintenance instructions.
-
-            **Important**: The last processed commit is: ${{ steps.last_commit.outputs.sha || 'not set - analyze commits from the last documented version in CHANGES.md' }}
-            Use `git log ${{ steps.last_commit.outputs.sha }}..HEAD --oneline` to see commits since the last changelog update (if the commit SHA is available).
-
-            If you find changes that need documenting, update CHANGES.md and create a pull request with:
-            - Title: "Update changelog: <super short summary>"
-              Example: "Update changelog: Add gn text object, fix visual mode issues"
-            - Body: Brief summary of what was added
-
-          # Allow Claude to use git, GitHub CLI, and web access for checking releases and tickets
-          claude_args: '--allowed-tools "Skill,Read,Edit,Bash(git:*),Bash(gh:*),WebSearch,WebFetch(domain:plugins.jetbrains.com),WebFetch(domain:youtrack.jetbrains.com),WebFetch(domain:github.com)"'
+      # - name: Run Claude Code to Update Changelog
+      #   id: claude
+      #   uses: anthropics/claude-code-action@v1
+      #   with:
+      #     claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+      #
+      #     prompt: |
+      #       ## Task: Update the CHANGES.md Changelog File
+      #
+      #       You need to review the latest commits and maintain the changelog file (CHANGES.md) with meaningful changes.
+      #
+      #       Use the changelog skill to load the detailed changelog maintenance instructions.
+      #
+      #       **Important**: The last processed commit is: ${{ steps.last_commit.outputs.sha || 'not set - analyze commits from the last documented version in CHANGES.md' }}
+      #       Use `git log ${{ steps.last_commit.outputs.sha }}..HEAD --oneline` to see commits since the last changelog update (if the commit SHA is available).
+      #
+      #       If you find changes that need documenting, update CHANGES.md and create a pull request with:
+      #       - Title: "Update changelog: <super short summary>"
+      #         Example: "Update changelog: Add gn text object, fix visual mode issues"
+      #       - Body: Brief summary of what was added
+      #
+      #     # Allow Claude to use git, GitHub CLI, and web access for checking releases and tickets
+      #     claude_args: '--allowed-tools "Skill,Read,Edit,Bash(git:*),Bash(gh:*),WebSearch,WebFetch(domain:plugins.jetbrains.com),WebFetch(domain:youtrack.jetbrains.com),WebFetch(domain:github.com)"'
 
       - name: Update workflow-changelog tag
         if: success()
