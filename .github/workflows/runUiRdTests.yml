@@ -48,7 +48,7 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          claude_args: '--allowed-tools "Read,Write,Glob,Grep,Bash(ffmpeg:*),Bash(ls:*),Bash(cat:*),Bash(grep:*),Bash(find:*)"'
+          claude_args: '--allowed-tools "Read,Write,Glob,Grep,Bash(ffmpeg:*),Bash(ffprobe:*),Bash(mkdir:*),Bash(touch:*),Bash(echo:*),Bash(ls:*),Bash(cat:*),Bash(grep:*),Bash(find:*),Bash(cd:*)" --auto-approve-tools "Write(/Users/runner/work/ideavim/ideavim/build/reports/**)"'
           prompt: |
             ## Task: Analyze UI Test Failures
 
@@ -57,6 +57,7 @@ jobs:
             Key information:
             - Test reports are located in: build/reports and tests/ui-rd-tests/build/reports
             - There is a video recording in build/reports/video that shows what happened during the tests - this video is usually very useful for understanding what went wrong visually
+            - There is also a single screenshot at tests/ui-rd-tests/build/reports/ideaVimTest.png showing the state when the test failed
             - IDE sandbox logs are in the idea-sandbox-log directory
             - ffmpeg is already installed and available - you can use it to extract frames from the video or analyze it if that would be helpful
 
