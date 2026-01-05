@@ -38,6 +38,33 @@ jobs:
       - name: Move sandbox logs
         if: always()
         run: mv build/idea-sandbox/IU-*/log_runIdeForUiTests idea-sandbox-log
+      - name: AI Analysis of Test Failures
+        if: failure()
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          # Install Claude Code CLI
+          npm install -g @anthropic-ai/claude-code
+
+          # Create analysis directory
+          mkdir -p build/reports/ai-analysis
+
+          # Run Claude Code to analyze the test failures
+          # Point it to the artifacts directory with test reports, video, and logs
+          claude-code << 'EOF' > build/reports/ai-analysis/analysis.txt 2>&1 || true
+          Please analyze the UI test failures in the current directory.
+
+          Key information:
+          - Test reports are located in: build/reports and tests/ui-ij-tests/build/reports
+          - There is a video recording in build/reports/video that shows what happened during the tests - this video is usually very useful for understanding what went wrong visually
+          - IDE sandbox logs are in the idea-sandbox-log directory
+          - ffmpeg is already installed and available - you can use it to extract frames from the video or analyze it if that would be helpful
+
+          Please provide:
+          1. A detailed analysis of what went wrong
+          2. The root cause of the failure
+          3. Potential fixes or suggestions
+          EOF
       - name: Save report
         if: always()
         uses: actions/upload-artifact@v4
