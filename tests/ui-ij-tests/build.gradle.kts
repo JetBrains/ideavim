@@ -37,6 +37,10 @@ tasks {
     group = "verification"
     useJUnitPlatform()
 
+    // Gradle 9+ requires explicit test source set configuration for custom Test tasks
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
+
     // This is needed for the robot to access the message of the exception
     // Usually these opens are provided by the intellij gradle plugin
     // https://github.com/JetBrains/gradle-intellij-plugin/blob/b21e3f382e9885948a6427001d5e64234c602613/src/main/kotlin/org/jetbrains/intellij/utils/OpenedPackages.kt#L26
