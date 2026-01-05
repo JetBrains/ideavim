@@ -27,14 +27,21 @@ jobs:
       - name: Get last processed commit
         id: last_commit
         run: |
-          # Get the commit SHA from the workflow-changelog tag (if it exists)
-          LAST_COMMIT=$(git rev-list -n 1 tags/workflow-changelog 2>/dev/null || echo "")
+          # Get the commit SHA from the last successful workflow run
+          LAST_COMMIT=$(gh run list \
+            --workflow=updateChangelogClaude.yml \
+            --status=success \
+            --limit=1 \
+            --json headSha \
+            --jq '.[0].headSha // ""')
           echo "sha=$LAST_COMMIT" >> $GITHUB_OUTPUT
           if [ -n "$LAST_COMMIT" ]; then
             echo "Last processed commit: $LAST_COMMIT"
           else
-            echo "No workflow-changelog tag found, will analyze recent commits"
+            echo "No previous successful run found, will analyze recent commits"
           fi
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       # - name: Run Claude Code to Update Changelog
       #   id: claude
@@ -59,11 +66,3 @@ jobs:
       #
       #     # Allow Claude to use git, GitHub CLI, and web access for checking releases and tickets
       #     claude_args: '--allowed-tools "Skill,Read,Edit,Bash(git:*),Bash(gh:*),WebSearch,WebFetch(domain:plugins.jetbrains.com),WebFetch(domain:youtrack.jetbrains.com),WebFetch(domain:github.com)"'
-
-      - name: Update workflow-changelog tag
-        if: success()
-        run: |
-          git tag --delete workflow-changelog 2>/dev/null || true
-          git push origin :refs/tags/workflow-changelog 2>/dev/null || true
-          git tag workflow-changelog
-          git push origin workflow-changelog

@@ -48,7 +48,7 @@ You are a changelog maintenance specialist for the IdeaVim project. Your job is 
 When running via the GitHub Actions workflow, check if a last processed commit SHA is provided in the prompt.
 - If a commit SHA is provided, use `git log <SHA>..HEAD --oneline` to see only unprocessed commits
 - This is more accurate than date-based filtering
-- The `workflow-changelog` tag tracks the last successful changelog workflow run
+- The last successful workflow run is tracked via GitHub Actions API
 
 ### 2. Find Releases
 - Use `git tag --list --sort=-version:refname` to see all version tags
