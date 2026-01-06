@@ -50,16 +50,6 @@ jobs:
             sleep 0.5
 
             osascript -e "tell application \"System Events\" to click at {$x, $y}" 2>/dev/null && echo "AppleScript succeeded" && break
-            sleep 0.5
-
-            python3 << PYEOF 2>/dev/null && echo "Python succeeded" && break
-from Quartz.CoreGraphics import CGEventCreateMouseEvent, CGEventPost, kCGMouseButtonLeft, kCGEventLeftMouseDown, kCGEventLeftMouseUp, kCGHIDEventTap
-event = CGEventCreateMouseEvent(None, kCGEventLeftMouseDown, ($x, $y), kCGMouseButtonLeft)
-CGEventPost(kCGHIDEventTap, event)
-event = CGEventCreateMouseEvent(None, kCGEventLeftMouseUp, ($x, $y), kCGMouseButtonLeft)
-CGEventPost(kCGHIDEventTap, event)
-PYEOF
-
             sleep 1
           done
         continue-on-error: true
