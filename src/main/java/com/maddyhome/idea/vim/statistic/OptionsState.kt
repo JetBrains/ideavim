@@ -54,7 +54,7 @@ internal class OptionsState : ApplicationUsagesCollector() {
 
 }
 
-private val GROUP = EventLogGroup("vim.options", 1)
+private val GROUP = EventLogGroup("vim.options", 1, "FUS", description = "Group: Information about IdeaVim options")
 private val IDEAJOIN = BooleanEventField(IjOptions.ideajoin.name)
 private val IDEAMARKS = BooleanEventField(IjOptions.ideamarks.name)
 private val IDEAREFACTOR =
@@ -68,6 +68,7 @@ private val IDEAVIMSUPPORT =
   EventFields.StringList(IjOptions.ideavimsupport.name, IjOptionConstants.ideavimsupportValues.toList())
 private val OPTIONS: VarargEventId = GROUP.registerVarargEvent(
   "vim.options",
+  "Status of the IdeaVim options",
   IDEAJOIN,
   IDEAMARKS,
   IDEAREFACTOR,

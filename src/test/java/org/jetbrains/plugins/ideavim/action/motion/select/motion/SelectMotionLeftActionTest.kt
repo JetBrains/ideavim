@@ -10,26 +10,16 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.select.motion
 
-import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
-import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.jetbrains.plugins.ideavim.impl.OptionTest
-import org.jetbrains.plugins.ideavim.impl.TraceOptions
-import org.jetbrains.plugins.ideavim.impl.VimOption
+import org.junit.jupiter.api.Test
 
-@TraceOptions(TestOptionConstants.keymodel)
 class SelectMotionLeftActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(
-      TestOptionConstants.keymodel,
-      limitedValues = [OptionConstants.keymodel_stopselect],
-    ),
-  )
+  @Test
   fun `test char select simple move`() {
     doTest(
       listOf("viw", "<C-G>", "<Left>"),
@@ -50,11 +40,13 @@ class SelectMotionLeftActionTest : VimTestCase() {
                 Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       Mode.NORMAL(),
-    )
+    ) {
+      enterCommand("set keymodel=stopsel")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopselect]))
+  @Test
   fun `test select multiple carets`() {
     doTest(
       listOf("viwo", "<C-G>", "<Left>"),
@@ -75,11 +67,13 @@ class SelectMotionLeftActionTest : VimTestCase() {
                 Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       Mode.NORMAL(),
-    )
+    ) {
+      enterCommand("set keymodel=stopsel")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(TestOptionConstants.keymodel, limitedValues = [""]))
+  @Test
   fun `test without stopsel`() {
     doTest(
       listOf("viw", "<C-G>", "<Left>"),
@@ -100,6 +94,8 @@ class SelectMotionLeftActionTest : VimTestCase() {
                 Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),
       Mode.SELECT(SelectionType.CHARACTER_WISE)
-    )
+    ) {
+      enterCommand("set keymodel=")
+    }
   }
 }

@@ -1,7 +1,4 @@
-# This workflow will build a package using Gradle and then publish it to GitHub packages when a release is created
-# For more information see: https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#Publishing-using-gradle
-
-# This workflow syncs changes from the docs folder of IdeaVim to the IdeaVim.wiki repository
+# Checks JetBrains Marketplace for new plugins that depend on IdeaVim
 
 name: Check new plugin dependencies
 
@@ -18,15 +15,17 @@ jobs:
 
     steps:
       - name: Fetch origin repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Set up JDK 21
-        uses: actions/setup-java@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          java-version: '21'
-          distribution: 'adopt'
-          server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
-          settings-path: ${{ github.workspace }} # location for the settings.xml file
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: scripts-ts
 
       - name: Check new plugins
-        run: ./gradlew scripts:checkNewPluginDependencies
+        run: npx tsx src/checkNewPluginDependencies.ts
+        working-directory: scripts-ts

@@ -1,5 +1,6 @@
 package _Self.buildTypes
 
+import _Self.AgentSize
 import _Self.Constants.PROPERTY_TESTS
 import _Self.IdeaVimBuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
@@ -9,6 +10,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
 object PropertyBased : IdeaVimBuildType({
   name = "Property based tests"
+  description = "Running property-based tests to verify Vim behavior through randomized test cases"
   params {
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
     param("env.ORG_GRADLE_PROJECT_ideaVersion", PROPERTY_TESTS)
@@ -36,5 +38,10 @@ object PropertyBased : IdeaVimBuildType({
     vcs {
       branchFilter = "+:<default>"
     }
+  }
+
+  requirements {
+    equals("teamcity.agent.hardware.cpuCount", AgentSize.MEDIUM)
+    equals("teamcity.agent.os.family", "Linux")
   }
 })

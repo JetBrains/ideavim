@@ -79,9 +79,7 @@ class DigraphScopeTest : MockTestCase() {
     val ch1 = 'a'
     val ch2 = 'b'
 
-    myVimApi.digraph {
-      getCharacter(ch1, ch2)
-    }
+    myVimApi.digraph().getCharacter(ch1, ch2)
 
     verify(injector.digraphGroup).getCharacterForDigraph(eq(ch1), eq(ch2))
   }
@@ -92,9 +90,7 @@ class DigraphScopeTest : MockTestCase() {
     val ch2 = 'b'
     val codepoint = 228
 
-    myVimApi.digraph {
-      add(ch1, ch2, codepoint)
-    }
+    myVimApi.digraph().add(ch1, ch2, codepoint)
 
     val editorCaptor = argumentCaptor<VimEditor>()
     verify(injector.digraphGroup).parseCommandLine(editorCaptor.capture(), eq("$ch1$ch2 $codepoint"))

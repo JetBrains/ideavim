@@ -15,30 +15,26 @@ import com.intellij.openapi.ide.CopyPasteManager
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
-import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.annotations.TestWithoutPrimaryClipboard
-import org.jetbrains.plugins.ideavim.impl.OptionTest
-import org.jetbrains.plugins.ideavim.impl.TraceOptions
-import org.jetbrains.plugins.ideavim.impl.VimOption
 import org.jetbrains.plugins.ideavim.rangeOf
+import org.junit.jupiter.api.Test
 import java.awt.datatransfer.StringSelection
 import java.util.*
 
 /**
  * @author Alex Plate
  */
-@TraceOptions(TestOptionConstants.clipboard)
 class PutViaIdeaTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_ideaput]))
+  @Test
   fun `test simple insert via idea`() {
     val before = "${c}Lorem ipsum dolor sit amet,"
     configureByText(before)
+    enterCommand("set clipboard=ideaput")
 
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
@@ -51,10 +47,11 @@ class PutViaIdeaTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_ideaput]))
+  @Test
   fun `test insert several times`() {
     val before = "${c}I found it in a legendary land"
     configureByText(before)
+    enterCommand("set clipboard=ideaput")
 
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
@@ -75,11 +72,12 @@ class PutViaIdeaTest : VimTestCase() {
     assertState(after)
   }
 
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_ideaput]))
+  @Test
   fun `test insert doesn't clear existing elements`() {
     val randomUUID = UUID.randomUUID()
     val before = "${c}I found it in a legendary$randomUUID land"
     configureByText(before)
+    enterCommand("set clipboard=ideaput")
 
     CopyPasteManager.getInstance().setContents(TextBlockTransferable("Fill", emptyList(), null))
     CopyPasteManager.getInstance().setContents(TextBlockTransferable("Buffer", emptyList(), null))
@@ -105,16 +103,17 @@ class PutViaIdeaTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_ideaput]))
+  @Test
   fun `test insert block with newline`() {
     val before = """
             Lorem Ipsum
             $c
             Lorem ipsum dolor sit amet,
-            
+
             Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     configureByText(before)
+    enterCommand("set clipboard=ideaput")
 
     val vimEditor = fixture.editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
@@ -145,16 +144,17 @@ class PutViaIdeaTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   @TestWithoutPrimaryClipboard
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_ideaput]))
+  @Test
   fun `test insert block w1ith newline primary selection`() {
     val before = """
             A Discovery
             $c
             I found it in a legendary land
-            
+
             hard by the torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
+    enterCommand("set clipboard=ideaput")
 
     // For this particular test, we want to set exact this type of transferable
     CopyPasteManagerEx.getInstance().setContents(StringSelection("Hello"))
@@ -171,16 +171,17 @@ class PutViaIdeaTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_ideaput]))
+  @Test
   fun `test insert block w1ith newline clipboard selection`() {
     val before = """
             A Discovery
             $c
             I found it in a legendary land
-            
+
             hard by the torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
+    enterCommand("set clipboard=ideaput")
 
     // For this particular test, we want to set exact this type of transferable
     CopyPasteManagerEx.getInstance().setContents(StringSelection("Hello"))

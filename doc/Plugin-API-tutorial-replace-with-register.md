@@ -235,11 +235,7 @@ private suspend fun CaretTransaction.replaceTextAndUpdateCaret(
 
             updateCaret(offset = startOffset)
         } else if (selectionRange is Range.Block) {
-            val selections: Array<Range.Simple> = selectionRange.ranges
-
-            selections.zip(lines).forEach { (range, lineText) ->
-                replaceText(range.start, range.end, lineText)
-            }
+            replaceTextBlockwise(selectionRange, lines)
         }
     } else {
         if (selectionRange is Range.Simple) {
@@ -250,13 +246,10 @@ private suspend fun CaretTransaction.replaceTextAndUpdateCaret(
               replaceText(selectionRange.start, selectionRange.end, text)
             }
         } else if (selectionRange is Range.Block) {
-            val selections: Array<Range.Simple> = selectionRange.ranges.sortedByDescending { it.start }.toTypedArray()
-            val lines = List(selections.size) { text }
-
-            replaceTextBlockwise(selectionRange, lines)
+            replaceTextBlockwise(selectionRange, text)
 
             vimApi.mode = Mode.NORMAL()
-            updateCaret(offset = selections.last().start)
+            updateCaret(offset = selectionRange.start)
         }
     }
 }

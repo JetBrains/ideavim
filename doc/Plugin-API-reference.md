@@ -349,7 +349,8 @@ The `CaretTransaction` interface extends `CaretRead` and provides methods for mo
 |--------|-------------|--------------|
 | `insertText(position: Int, text: String, caretAtEnd: Boolean = true, insertBeforeCaret: Boolean = false): Boolean` | Inserts text at the specified position in the document. | True if the insertion was successful, false otherwise. |
 | `replaceText(startOffset: Int, endOffset: Int, text: String): Boolean` | Replaces text between the specified offsets with new text. | True if the replacement was successful, false otherwise. |
-| `replaceTextBlockwise(range: Range.Block, text: List<String>)` | Replaces text in multiple ranges (blocks) with new text. | None |
+| `replaceTextBlockwise(range: Range.Block, text: List<String>)` | Replaces text in block selection with a list of texts (one per line). | None |
+| `replaceTextBlockwise(range: Range.Block, text: String)` | Replaces text in block selection with the same text on each line. | None |
 | `deleteText(startOffset: Int, endOffset: Int): Boolean` | Deletes text between the specified offsets. | True if the deletion was successful, false otherwise. |
 
 #### Jump Operations

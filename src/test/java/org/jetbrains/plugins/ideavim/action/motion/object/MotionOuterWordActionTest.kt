@@ -789,6 +789,7 @@ class MotionOuterWordActionTest : VimTestCase() {
   }
 
   @Test
+  @VimBehaviorDiffers(shouldBeFixed = false, description = "neovim retuns column = 1 from the API because of some reason")
   fun `test select outer word with existing right-to-left selection selects rest of word and leading whitespace at start of line`() {
     doTest(
       listOf("v", "h", "aw"),
@@ -799,6 +800,7 @@ class MotionOuterWordActionTest : VimTestCase() {
   }
 
   @Test
+  @VimBehaviorDiffers(shouldBeFixed = false, description = "neovim retuns column = 1 from the API because of some reason")
   fun `test select outer word with existing right-to-left selection on only word on line selects rest of word and leading whitespace`() {
     doTest(
       listOf("v", "h", "aw"),
@@ -1025,6 +1027,57 @@ class MotionOuterWordActionTest : VimTestCase() {
         |Lorem ipsum dolor sit amet, consectetur adipiscing ${s}elit
         |Sed${c} ${se}in orci mauris. Cras id tellus in ex imperdiet egestas.
       """.trimMargin(),
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  // ============== Basic vaw scenarios ==============
+
+  @Test
+  fun `test vaw on word selects word and trailing whitespace`() {
+    doTest(
+      "vaw",
+      "one      tw${c}o      three",
+      "one      ${s}two     ${c} ${se}three",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test vaw on whitespace selects whitespace and following word`() {
+    doTest(
+      "vaw",
+      "one   ${c}   two      three",
+      "one${s}      tw${c}o${se}      three",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  // ============== Repeated aw expands forward ==============
+
+  @Test
+  fun `test vaw then aw selects current and next word`() {
+    // First aw selects "two" and trailing whitespace
+    // Second aw extends selection to include "three" and its trailing whitespace
+    doTest(
+      listOf("vaw", "aw"),
+      "one      tw${c}o      three      four",
+      "one      ${s}two      three     ${c} ${se}four",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  // ============== vawo then aw selects backwards ==============
+
+  @Test
+  fun `test vawo then aw selects current and previous word`() {
+    // vaw selects "two" and trailing whitespace (caret at end)
+    // o moves caret to other end of selection (now backwards selection)
+    // aw extends selection backwards to include "one"
+    doTest(
+      listOf("vaw", "o", "aw"),
+      "one      tw${c}o      three      four",
+      "${s}${c}one      two      ${se}three      four",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }

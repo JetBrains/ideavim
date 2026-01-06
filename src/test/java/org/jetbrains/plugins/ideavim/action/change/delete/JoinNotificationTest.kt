@@ -17,17 +17,14 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.NotificationService
 import org.jetbrains.plugins.ideavim.TestIjOptionConstants
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.jetbrains.plugins.ideavim.impl.OptionTest
-import org.jetbrains.plugins.ideavim.impl.TraceOptions
-import org.jetbrains.plugins.ideavim.impl.VimOption
+import org.junit.jupiter.api.Test
 import kotlin.test.assertTrue
 
 /**
  * @author Alex Plate
  */
-@TraceOptions(TestIjOptionConstants.ideajoin)
 class JoinNotificationTest : VimTestCase() {
-  @OptionTest(VimOption(TestIjOptionConstants.ideajoin, limitedValues = ["false"]))
+  @Test
   fun `test notification shown for no ideajoin`() {
     val notification = newNotifications {
       val before = "I found${c} it\n in a legendary land"
@@ -45,18 +42,19 @@ class JoinNotificationTest : VimTestCase() {
     }
   }
 
-  @OptionTest(VimOption(TestIjOptionConstants.ideajoin, limitedValues = ["true"]))
+  @Test
   fun `test notification not shown for ideajoin`() {
     val notifications = newNotifications {
       val before = "I found${c} it\n in a legendary land"
       configureByText(before)
+      enterCommand("set ideajoin")
       appReadySetup(false)
       typeText(injector.parser.parseKeys("J"))
     }
     assertTrue(notifications.isEmpty() || notifications.last().isExpired || TestIjOptionConstants.ideajoin !in notifications.last().content)
   }
 
-  @OptionTest(VimOption(TestIjOptionConstants.ideajoin, limitedValues = ["false"]))
+  @Test
   fun `test notification not shown if was shown already`() {
     val notifications = newNotifications {
       val before = "I found${c} it\n in a legendary land"

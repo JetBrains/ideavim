@@ -8,6 +8,7 @@
 
 package _Self.buildTypes
 
+import _Self.AgentSize
 import _Self.Constants.DEFAULT_CHANNEL
 import _Self.Constants.DEV_CHANNEL
 import _Self.Constants.EAP_CHANNEL
@@ -44,7 +45,7 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
     password(
       "env.ORG_GRADLE_PROJECT_slackUrl",
       "credentialsJSON:a8ab8150-e6f8-4eaf-987c-bcd65eac50b5",
-      label = "Slack Token"
+      label = "Slack URL"
     )
     password(
       "env.ORG_GRADLE_PROJECT_youtrackToken",
@@ -154,15 +155,16 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       gradleParams = "--no-configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
-//    gradle {
-//      name = "Slack Notification"
-//      tasks = "slackNotification"
-//    }
   }
 
   features {
     sshAgent {
       teamcitySshKey = "IdeaVim ssh keys"
     }
+  }
+
+  requirements {
+    equals("teamcity.agent.hardware.cpuCount", AgentSize.MEDIUM)
+    equals("teamcity.agent.os.family", "Linux")
   }
 })

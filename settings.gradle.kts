@@ -8,6 +8,11 @@ pluginManagement {
   }
 }
 
+// Automatically download JDKs from Foojay API when required toolchain is not installed locally
+plugins {
+  id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
+
 rootProject.name = "IdeaVIM"
 
 include("vim-engine")

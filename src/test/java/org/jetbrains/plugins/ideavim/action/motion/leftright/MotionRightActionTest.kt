@@ -10,20 +10,15 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
-import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
-import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.jetbrains.plugins.ideavim.impl.OptionTest
-import org.jetbrains.plugins.ideavim.impl.TraceOptions
-import org.jetbrains.plugins.ideavim.impl.VimOption
+import org.junit.jupiter.api.Test
 
-@TraceOptions(TestOptionConstants.virtualedit)
 class MotionRightActionTest : VimTestCase() {
-  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
+  @Test
   fun `test simple motion`() {
     doTest(
       "l",
@@ -47,7 +42,7 @@ class MotionRightActionTest : VimTestCase() {
     )
   }
 
-  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
+  @Test
   fun `test simple motion with repeat`() {
     doTest(
       "3l",
@@ -71,7 +66,7 @@ class MotionRightActionTest : VimTestCase() {
     )
   }
 
-  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
+  @Test
   fun `test simple motion to the end`() {
     doTest(
       "3l",
@@ -96,7 +91,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(TestOptionConstants.virtualedit, limitedValues = [OptionConstants.virtualedit_onemore]))
+  @Test
   fun `test virtual edit motion to the end`() {
     doTest(
       "3l",
@@ -111,11 +106,13 @@ class MotionRightActionTest : VimTestCase() {
             The test is like that.
       """.trimIndent(),
       Mode.NORMAL(),
-    )
+    ) {
+      enterCommand("set virtualedit=onemore")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(TestOptionConstants.virtualedit, limitedValues = [OptionConstants.virtualedit_onemore]))
+  @Test
   fun `test virtual edit motion after dollar`() {
     doTest(
       "\$l",
@@ -130,18 +127,20 @@ class MotionRightActionTest : VimTestCase() {
             The test is like that.
       """.trimIndent(),
       Mode.NORMAL(),
-    )
+    ) {
+      enterCommand("set virtualedit=onemore")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NON_ASCII)
-  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
+  @Test
   fun `test simple motion non-ascii`() {
     doTest(
       "l",
       """
             Lorem Ipsum
 
-            I found it in a legendar${c}𝛁 land
+            I found it in a legendar${c}${"\uD835\uDEC1"} land
             consectetur adipiscing elit
             Sed in orci mauris.
             Cras id tellus in ex imperdiet egestas.
@@ -149,7 +148,7 @@ class MotionRightActionTest : VimTestCase() {
       """
             Lorem Ipsum
 
-            I found it in a legendar𝛁${c} land
+            I found it in a legendar${"\uD835\uDEC1"}${c} land
             consectetur adipiscing elit
             Sed in orci mauris.
             Cras id tellus in ex imperdiet egestas.
@@ -159,14 +158,14 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NON_ASCII)
-  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
+  @Test
   fun `test simple motion emoji`() {
     doTest(
       "l",
       """
             Lorem Ipsum
 
-            I found it in a legendar${c}🐔 land
+            I found it in a legendar${c}${"\uD83D\uDC14"} land
             consectetur adipiscing elit
             Sed in orci mauris.
             Cras id tellus in ex imperdiet egestas.
@@ -174,7 +173,7 @@ class MotionRightActionTest : VimTestCase() {
       """
             Lorem Ipsum
 
-            I found it in a legendar🐔${c} land
+            I found it in a legendar${"\uD83D\uDC14"}${c} land
             consectetur adipiscing elit
             Sed in orci mauris.
             Cras id tellus in ex imperdiet egestas.
@@ -184,14 +183,14 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NON_ASCII)
-  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
+  @Test
   fun `test simple motion multiple code point grapheme cluster`() {
     doTest(
       "l",
       """
             Lorem Ipsum
 
-            I found it in a legendar${c}👩‍👩‍👧‍👧 land
+            I found it in a legendar${c}${"👩‍👩‍👧‍👧"} land
             consectetur adipiscing elit
             Sed in orci mauris.
             Cras id tellus in ex imperdiet egestas.
@@ -199,7 +198,7 @@ class MotionRightActionTest : VimTestCase() {
       """
             Lorem Ipsum
 
-            I found it in a legendar👩‍👩‍👧‍👧${c} land
+            I found it in a legendar${"👩‍👩‍👧‍👧"}${c} land
             consectetur adipiscing elit
             Sed in orci mauris.
             Cras id tellus in ex imperdiet egestas.
@@ -209,7 +208,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NON_ASCII)
-  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
+  @Test
   fun `test simple motion czech`() {
     doTest(
       "l",
@@ -233,7 +232,7 @@ class MotionRightActionTest : VimTestCase() {
     )
   }
 
-  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
+  @Test
   fun `test simple motion tab`() {
     doTest(
       "l",
@@ -257,7 +256,7 @@ class MotionRightActionTest : VimTestCase() {
     )
   }
 
-  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
+  @Test
   fun `test char visual mode`() {
     doTest(
       listOf("v", "ll"),
@@ -281,7 +280,7 @@ class MotionRightActionTest : VimTestCase() {
     )
   }
 
-  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
+  @Test
   fun `test block visual mode`() {
     doTest(
       listOf("<C-V>", "ll"),
@@ -306,7 +305,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
+  @Test
   fun `test whichwrap in the same line`() {
     doTest(
       listOf("l"),
@@ -322,7 +321,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
+  @Test
   fun `test whichwrap at file end`() {
     doTest(
       listOf("l"),
@@ -338,7 +337,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
+  @Test
   fun `test whichwrap to next line`() {
     doTest(
       listOf("l"),
@@ -356,7 +355,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
+  @Test
   fun `test from empty line to empty line`() {
     doTest(
       listOf("l"),
@@ -378,7 +377,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true))
+  @Test
   fun `test d command with whichwrap`() {
     doTest(
       listOf("dl"),

@@ -17,6 +17,7 @@ import com.intellij.vim.api.scopes.MappingScope
 import com.intellij.vim.api.scopes.ModalInput
 import com.intellij.vim.api.scopes.OptionScope
 import com.intellij.vim.api.scopes.OutputPanelScope
+import com.intellij.vim.api.scopes.TextObjectScope
 import com.intellij.vim.api.scopes.commandline.CommandLineScope
 import com.intellij.vim.api.scopes.editor.EditorScope
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -64,12 +65,19 @@ class VimApiImpl(
     get() = injector.executionContextManager.getEditorExecutionContext(vimEditor)
 
   override fun <T : Any> getVariable(name: String, type: KType): T? {
-    val (name, scope) = parseVariableName(name)
+    val (variableName, scope) = parseVariableName(name)
     val variableService: VariableService = injector.variableService
-    val variable = VariableExpression(scope, name)
-    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
-    val variableValue: VimDataType? =
+
+    // For global variables, we can look them up without an editor
+    // This is important during extension initialization when there may be no focused editor
+    val variableValue: VimDataType? = if (scope == Scope.GLOBAL_VARIABLE) {
+      variableService.getGlobalVariableValue(variableName)
+    } else {
+      val variable = VariableExpression(scope, variableName)
+      val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
       variableService.getNullableVariableValue(variable, vimEditor, context, VimPluginContext)
+    }
+
     // variable does not exist
     if (variableValue == null) {
       return variableValue
@@ -142,9 +150,17 @@ class VimApiImpl(
     }
   }
 
-  override fun mappings(block: MappingScope.() -> Unit) {
+  override fun mappings(block: MappingScope.() -> Unit): MappingScope {
     val mappingScope = MappingScopeImpl(listenerOwner, mappingOwner)
     mappingScope.block()
+    return mappingScope
+  }
+
+  override fun textObjects(block: TextObjectScope.() -> Unit): TextObjectScope {
+    val pluginName = (mappingOwner as? MappingOwner.Plugin)?.name ?: "unknown"
+    val textObjectScope = TextObjectScopeImpl(pluginName, listenerOwner, mappingOwner)
+    textObjectScope.block()
+    return textObjectScope
   }
 
 //  override fun listeners(block: ListenersScope.() -> Unit) {
@@ -152,26 +168,29 @@ class VimApiImpl(
 //    listenersScope.block()
 //  }
 
-  override fun outputPanel(block: OutputPanelScope.() -> Unit) {
+  override fun outputPanel(block: OutputPanelScope.() -> Unit): OutputPanelScope {
     val outputPanelScope = OutputPanelScopeImpl
     outputPanelScope.block()
+    return outputPanelScope
   }
 
   override fun modalInput(): ModalInput {
     return ModalInputImpl(listenerOwner, mappingOwner)
   }
 
-  override fun commandLine(block: CommandLineScope.() -> Unit) {
+  override fun commandLine(block: CommandLineScope.() -> Unit): CommandLineScope {
     val commandLineScope = CommandLineScopeImpl(listenerOwner, mappingOwner)
     commandLineScope.block()
+    return commandLineScope
   }
 
   override fun <T> option(block: OptionScope.() -> T): T {
     return OptionScopeImpl.block()
   }
 
-  override fun digraph(block: DigraphScope.() -> Unit) {
+  override fun digraph(block: DigraphScope.() -> Unit): DigraphScope {
     DigraphScopeImpl.block()
+    return DigraphScopeImpl
   }
 
   override val tabCount: Int

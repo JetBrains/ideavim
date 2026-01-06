@@ -10,24 +10,16 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
-import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
-import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.jetbrains.plugins.ideavim.impl.OptionTest
-import org.jetbrains.plugins.ideavim.impl.TraceOptions
-import org.jetbrains.plugins.ideavim.impl.VimOption
+import org.junit.jupiter.api.Test
 
-@TraceOptions(TestOptionConstants.keymodel, TestOptionConstants.virtualedit)
 class MotionArrowDownActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, doesntAffectTest = true),
-    VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true),
-  )
+  @Test
   fun `test visual default options`() {
     doTest(
       listOf("v", "<Down>"),
@@ -52,10 +44,7 @@ class MotionArrowDownActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopsel]),
-    VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true),
-  )
+  @Test
   fun `test visual stopsel`() {
     doTest(
       listOf("v", "<Down>"),
@@ -75,14 +64,13 @@ class MotionArrowDownActionTest : VimTestCase() {
                 wher${c}e it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-    )
+    ) {
+      enterCommand("set keymodel=stopsel")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopselect]),
-    VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true),
-  )
+  @Test
   fun `test visual stopselect`() {
     doTest(
       listOf("v", "<Down>"),
@@ -103,14 +91,13 @@ class MotionArrowDownActionTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
-    )
+    ) {
+      enterCommand("set keymodel=stopselect")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopvisual]),
-    VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true),
-  )
+  @Test
   fun `test visual stopvisual`() {
     doTest(
       listOf("v", "<Down>"),
@@ -130,14 +117,13 @@ class MotionArrowDownActionTest : VimTestCase() {
                 wher${c}e it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-    )
+    ) {
+      enterCommand("set keymodel=stopvisual")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopvisual]),
-    VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true),
-  )
+  @Test
   fun `test visual stopvisual multicaret`() {
     doTest(
       listOf("v", "<Down>"),
@@ -157,14 +143,13 @@ class MotionArrowDownActionTest : VimTestCase() {
                 wher${c}e it was settled on some sodden sand
                 hard by the t${c}orrent of a mountain pass.
       """.trimIndent(),
-    )
+    ) {
+      enterCommand("set keymodel=stopvisual")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [""]),
-    VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true),
-  )
+  @Test
   fun `test char select stopsel`() {
     doTest(
       listOf("gh", "<Down>"),
@@ -185,14 +170,13 @@ class MotionArrowDownActionTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       Mode.SELECT(SelectionType.CHARACTER_WISE)
-    )
+    ) {
+      enterCommand("set keymodel=")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [""]),
-    VimOption(TestOptionConstants.virtualedit, limitedValues = [OptionConstants.virtualedit_onemore]),
-  )
+  @Test
   fun `test virtual edit down to shorter line`() {
     doTest(
       listOf("<Down>"),
@@ -204,14 +188,14 @@ class MotionArrowDownActionTest : VimTestCase() {
             class MyClass {
             }${c}
       """.trimIndent(),
-    )
+    ) {
+      enterCommand("set keymodel=")
+      enterCommand("set virtualedit=onemore")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [""]),
-    VimOption(TestOptionConstants.virtualedit, limitedValues = [OptionConstants.virtualedit_onemore]),
-  )
+  @Test
   fun `test virtual edit down to shorter line after dollar`() {
     doTest(
       listOf("$", "<Down>"),
@@ -223,7 +207,10 @@ class MotionArrowDownActionTest : VimTestCase() {
             class MyClass {
             ${c}}
       """.trimIndent(),
-    )
+    ) {
+      enterCommand("set keymodel=")
+      enterCommand("set virtualedit=onemore")
+    }
   }
 
   // Once you press '$', then any up or down actions stay on the end of the current line.
@@ -236,10 +223,7 @@ class MotionArrowDownActionTest : VimTestCase() {
   """.trimIndent()
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [""]),
-    VimOption(TestOptionConstants.virtualedit, limitedValues = [OptionConstants.virtualedit_onemore]),
-  )
+  @Test
   fun `test up and down after dollar`() {
     // Arrow keys
     doTest(
@@ -251,14 +235,14 @@ class MotionArrowDownActionTest : VimTestCase() {
             Lo and behold, I am the longest yet
             nope.
       """.trimIndent(),
-    )
+    ) {
+      enterCommand("set keymodel=")
+      enterCommand("set virtualedit=onemore")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [""]),
-    VimOption(TestOptionConstants.virtualedit, limitedValues = [OptionConstants.virtualedit_onemore]),
-  )
+  @Test
   fun `test up and down after dollar1`() {
     doTest(
       listOf("$", "<Down>", "<Down>"),
@@ -269,14 +253,14 @@ class MotionArrowDownActionTest : VimTestCase() {
             Lo and behold, I am the longest ye${c}t
             nope.
       """.trimIndent(),
-    )
+    ) {
+      enterCommand("set keymodel=")
+      enterCommand("set virtualedit=onemore")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [""]),
-    VimOption(TestOptionConstants.virtualedit, limitedValues = [OptionConstants.virtualedit_onemore]),
-  )
+  @Test
   fun `test up and down after dollar2`() {
     doTest(
       listOf("$", "<Down>", "<Down>", "<Down>"),
@@ -287,14 +271,14 @@ class MotionArrowDownActionTest : VimTestCase() {
             Lo and behold, I am the longest yet
             nope${c}.
       """.trimIndent(),
-    )
+    ) {
+      enterCommand("set keymodel=")
+      enterCommand("set virtualedit=onemore")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [""]),
-    VimOption(TestOptionConstants.virtualedit, limitedValues = [OptionConstants.virtualedit_onemore]),
-  )
+  @Test
   fun `test up and down after dollar3`() {
     doTest(
       listOf("$", "<Down>", "<Down>", "<Down>", "<Up>"),
@@ -305,14 +289,14 @@ class MotionArrowDownActionTest : VimTestCase() {
             Lo and behold, I am the longest ye${c}t
             nope.
       """.trimIndent(),
-    )
+    ) {
+      enterCommand("set keymodel=")
+      enterCommand("set virtualedit=onemore")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [""]),
-    VimOption(TestOptionConstants.virtualedit, limitedValues = [OptionConstants.virtualedit_onemore]),
-  )
+  @Test
   fun `test up and down after dollar4`() {
     // j k keys
 
@@ -325,14 +309,14 @@ class MotionArrowDownActionTest : VimTestCase() {
             Lo and behold, I am the longest yet
             nope.
       """.trimIndent(),
-    )
+    ) {
+      enterCommand("set keymodel=")
+      enterCommand("set virtualedit=onemore")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [""]),
-    VimOption(TestOptionConstants.virtualedit, limitedValues = [OptionConstants.virtualedit_onemore]),
-  )
+  @Test
   fun `test up and down after dollar5`() {
     doTest(
       listOf("$", "j", "j"),
@@ -343,14 +327,14 @@ class MotionArrowDownActionTest : VimTestCase() {
             Lo and behold, I am the longest ye${c}t
             nope.
       """.trimIndent(),
-    )
+    ) {
+      enterCommand("set keymodel=")
+      enterCommand("set virtualedit=onemore")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [""]),
-    VimOption(TestOptionConstants.virtualedit, limitedValues = [OptionConstants.virtualedit_onemore]),
-  )
+  @Test
   fun `test up and down after dollar6`() {
     doTest(
       listOf("$", "j", "j", "j"),
@@ -361,14 +345,14 @@ class MotionArrowDownActionTest : VimTestCase() {
             Lo and behold, I am the longest yet
             nope${c}.
       """.trimIndent(),
-    )
+    ) {
+      enterCommand("set keymodel=")
+      enterCommand("set virtualedit=onemore")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [""]),
-    VimOption(TestOptionConstants.virtualedit, limitedValues = [OptionConstants.virtualedit_onemore]),
-  )
+  @Test
   fun `test up and down after dollar7`() {
     doTest(
       listOf("$", "j", "j", "j", "k"),
@@ -379,14 +363,14 @@ class MotionArrowDownActionTest : VimTestCase() {
             Lo and behold, I am the longest ye${c}t
             nope.
       """.trimIndent(),
-    )
+    ) {
+      enterCommand("set keymodel=")
+      enterCommand("set virtualedit=onemore")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopselect]),
-    VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true),
-  )
+  @Test
   fun `test char select simple move`() {
     doTest(
       listOf("gH", "<Down>"),
@@ -406,14 +390,13 @@ class MotionArrowDownActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
-    )
+    ) {
+      enterCommand("set keymodel=stopselect")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopselect]),
-    VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true),
-  )
+  @Test
   fun `test select multiple carets`() {
     doTest(
       listOf("gH", "<Down>"),
@@ -433,14 +416,13 @@ class MotionArrowDownActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by ${c}the torrent of a mountain pass.
       """.trimIndent(),
-    )
+    ) {
+      enterCommand("set keymodel=stopselect")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, doesntAffectTest = true),
-    VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true),
-  )
+  @Test
   fun `test arrow down in insert mode scrolls caret at scrolloff`() {
     configureByPages(5)
     enterCommand("set scrolljump=10")

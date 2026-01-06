@@ -10,8 +10,8 @@ plugins {
     java
     kotlin("jvm")
 //    id("org.jlleitschuh.gradle.ktlint")
-    id("com.google.devtools.ksp") version "2.2.0-2.0.2"
-    kotlin("plugin.serialization") version "2.2.0"
+    id("com.google.devtools.ksp") version "2.2.21-2.0.4"
+    kotlin("plugin.serialization") version "2.2.21"
     `maven-publish`
     antlr
 }
@@ -82,7 +82,6 @@ tasks {
     generateGrammarSource {
         maxHeapSize = "128m"
         arguments.addAll(listOf("-package", "com.maddyhome.idea.vim.parser.generated", "-visitor"))
-        outputDirectory = file("src/main/java/com/maddyhome/idea/vim/parser/generated")
     }
 
     named("compileKotlin") {

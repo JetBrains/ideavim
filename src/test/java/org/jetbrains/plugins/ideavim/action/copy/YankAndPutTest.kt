@@ -9,23 +9,19 @@
 package org.jetbrains.plugins.ideavim.action.copy
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.options.OptionConstants
-import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.annotations.TestWithoutPrimaryClipboard
-import org.jetbrains.plugins.ideavim.impl.OptionTest
-import org.jetbrains.plugins.ideavim.impl.TraceOptions
-import org.jetbrains.plugins.ideavim.impl.VimOption
+import org.junit.jupiter.api.Test
 
-@TraceOptions(TestOptionConstants.clipboard)
 class YankAndPutTest : VimTestCase() {
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_unnamedplus]))
+  @Test
   fun `test yank to number register with unnamedplus`() {
     val before = """
             I ${c}found it in a legendary land
             consectetur adipiscing elit
     """.trimIndent()
     configureByText(before)
+    enterCommand("set clipboard=unnamedplus")
     // Select and yank first word
     typeText(injector.parser.parseKeys("vey"))
     // Replace second word
@@ -41,7 +37,7 @@ class YankAndPutTest : VimTestCase() {
     )
   }
 
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [OptionConstants.clipboard_unnamed]))
+  @Test
   @TestWithoutPrimaryClipboard
   fun `test yank to number register with unnamed`() {
     val before = """
@@ -49,6 +45,7 @@ class YankAndPutTest : VimTestCase() {
             consectetur adipiscing elit
     """.trimIndent()
     configureByText(before)
+    enterCommand("set clipboard=unnamed")
     // Select and yank first word
     typeText(injector.parser.parseKeys("vey"))
     // Replace second word
@@ -64,18 +61,14 @@ class YankAndPutTest : VimTestCase() {
     )
   }
 
-  @OptionTest(
-    VimOption(
-      TestOptionConstants.clipboard,
-      limitedValues = [OptionConstants.clipboard_unnamedplus + "," + OptionConstants.clipboard_ideaput]
-    )
-  )
+  @Test
   fun `test yank to number register with unnamedplus and ideaput`() {
     val before = """
             I ${c}found it in a legendary land
             consectetur adipiscing elit
     """.trimIndent()
     configureByText(before)
+    enterCommand("set clipboard=unnamedplus,ideaput")
     // Select and yank first word
     typeText(injector.parser.parseKeys("vey"))
     // Replace second word
@@ -91,12 +84,7 @@ class YankAndPutTest : VimTestCase() {
     )
   }
 
-  @OptionTest(
-    VimOption(
-      TestOptionConstants.clipboard,
-      limitedValues = [OptionConstants.clipboard_unnamed + "," + OptionConstants.clipboard_ideaput]
-    )
-  )
+  @Test
   @TestWithoutPrimaryClipboard
   fun `test yank to number register with unnamed and ideaput`() {
     val before = """
@@ -104,6 +92,7 @@ class YankAndPutTest : VimTestCase() {
             consectetur adipiscing elit
     """.trimIndent()
     configureByText(before)
+    enterCommand("set clipboard=unnamed,ideaput")
     // Select and yank first word
     typeText(injector.parser.parseKeys("vey"))
     // Replace second word
@@ -119,7 +108,7 @@ class YankAndPutTest : VimTestCase() {
     )
   }
 
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [""]))
+  @Test
   fun `test yank to number register`() {
     val before = """
             I ${c}found it in a legendary land

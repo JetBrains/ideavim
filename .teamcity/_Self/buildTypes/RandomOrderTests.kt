@@ -1,5 +1,6 @@
 package _Self.buildTypes
 
+import _Self.AgentSize
 import _Self.IdeaVimBuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
@@ -23,6 +24,7 @@ object RandomOrderTests : IdeaVimBuildType({
 
   steps {
     gradle {
+      clearConditions()
       tasks = """
         clean test
         -x :tests:property-tests:test
@@ -40,5 +42,10 @@ object RandomOrderTests : IdeaVimBuildType({
     vcs {
       branchFilter = "+:<default>"
     }
+  }
+
+  requirements {
+    equals("teamcity.agent.hardware.cpuCount", AgentSize.MEDIUM)
+    equals("teamcity.agent.os.family", "Linux")
   }
 })

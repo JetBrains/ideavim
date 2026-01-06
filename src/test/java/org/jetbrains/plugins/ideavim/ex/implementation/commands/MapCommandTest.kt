@@ -813,7 +813,10 @@ class MapCommandTest : VimTestCase() {
     assertState("ABcd\n")
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.PLUG)
+  @TestWithoutNeovim(
+    reason = SkipNeovimReason.SEE_DESCRIPTION,
+    description = "Neovim represents <Plug> as a single character, so the comparison of the `map` states fails"
+  )
   @Test
   fun testPlugMapping() {
     configureByText("\n")
