@@ -27,10 +27,13 @@ jobs:
         run: |
           mkdir -p build/reports
           gradle --no-configuration-cache runIdeForUiTests > build/reports/idea.log &
+      - name: List available capture devices
+        run: ffmpeg -f avfoundation -list_devices true -i "" 2>&1 || true
+        continue-on-error: true
       - name: Start screen recording
         run: |
           mkdir -p build/reports/ci-screen-recording
-          ffmpeg -f avfoundation -i "1:0" -r 30 -vcodec libx264 -pix_fmt yuv420p build/reports/ci-screen-recording/screen-recording.mp4 &
+          ffmpeg -f avfoundation -capture_cursor 1 -i "0:none" -r 30 -vcodec libx264 -pix_fmt yuv420p build/reports/ci-screen-recording/screen-recording.mp4 &
           echo $! > /tmp/ffmpeg_pid.txt
         continue-on-error: true
       - name: Wait for Idea started
