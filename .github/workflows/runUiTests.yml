@@ -27,6 +27,12 @@ jobs:
         run: |
           mkdir -p build/reports
           gradle --no-configuration-cache runIdeForUiTests > build/reports/idea.log &
+      - name: Start screen recording
+        run: |
+          mkdir -p build/reports/ci-screen-recording
+          ffmpeg -f avfoundation -i "1:0" -r 30 -vcodec libx264 -pix_fmt yuv420p build/reports/ci-screen-recording/screen-recording.mp4 &
+          echo $! > /tmp/ffmpeg_pid.txt
+        continue-on-error: true
       - name: Wait for Idea started
         uses: jtalk/url-health-check-action@v3
         with:
@@ -35,6 +41,14 @@ jobs:
           retry-delay: 10s
       - name: Tests
         run: gradle :tests:ui-ij-tests:testUi
+      - name: Stop screen recording
+        if: always()
+        run: |
+          if [ -f /tmp/ffmpeg_pid.txt ]; then
+            kill $(cat /tmp/ffmpeg_pid.txt) || true
+            sleep 2
+          fi
+        continue-on-error: true
       - name: Move video
         if: always()
         run: mv tests/ui-ij-tests/video build/reports
@@ -54,10 +68,12 @@ jobs:
 
             Key information:
             - Test reports are located in: build/reports and tests/ui-ij-tests/build/reports
-            - There is a video recording in build/reports/video that shows what happened during the tests - this video is usually very useful for understanding what went wrong visually
+            - There are TWO video recordings available:
+              1. build/reports/video - Gradle-generated test video
+              2. build/reports/ci-screen-recording/screen-recording.mp4 - Full CI screen recording from FFmpeg (covers the entire test run)
             - There is also a single screenshot at tests/ui-ij-tests/build/reports/ideaVimTest.png showing the state when the test failed
             - IDE sandbox logs are in the idea-sandbox-log directory
-            - ffmpeg is already installed and available - you can use it to extract frames from the video or analyze it if that would be helpful
+            - ffmpeg is already installed and available - you can use it to extract frames from the videos or analyze them if that would be helpful
 
             Please provide:
             1. A detailed analysis of what went wrong
