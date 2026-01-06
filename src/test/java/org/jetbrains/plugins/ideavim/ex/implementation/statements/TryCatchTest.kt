@@ -32,7 +32,7 @@ class TryCatchTest : VimTestCase() {
     assertExOutput("caught")
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR, description = "Tests uncaught exception behavior - verifies error state and message")
   @Test
   fun `test unsuccessful catch of a throw statement`() {
     configureByText("\n")
@@ -64,7 +64,7 @@ class TryCatchTest : VimTestCase() {
     assertPluginError(false)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR, description = "Tests uncaught VimScript error - verifies error state and message for undefined variable")
   @Test
   fun `test vim statement unsuccessful catch`() {
     configureByText("\n")
@@ -99,7 +99,7 @@ class TryCatchTest : VimTestCase() {
     assertNoExOutput()
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR, description = "Tests exception propagation when no catch blocks match - verifies error state")
   @Test
   fun `test no matching catch among multiple`() {
     configureByText("\n")
@@ -137,7 +137,7 @@ class TryCatchTest : VimTestCase() {
     assertExOutput("finally block")
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR, description = "Tests finally block execution with uncaught exception - verifies both error state and finally output")
   @Test
   fun `test finally after unsuccessful catch`() {
     configureByText("\n")
