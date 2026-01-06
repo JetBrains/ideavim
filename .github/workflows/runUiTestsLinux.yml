@@ -1,12 +1,12 @@
-name: Run UI Tests
+name: Run UI Tests Linux
 on:
   workflow_dispatch:
   schedule:
       - cron: '0 12 * * *'
 jobs:
-  build-for-ui-test-mac-os:
+  build-for-ui-test-linux:
     if: github.repository == 'JetBrains/ideavim'
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
@@ -18,9 +18,12 @@ jobs:
           distribution: zulu
           java-version: 21
       - name: Setup FFmpeg
-        run: brew install ffmpeg
-#      - name: Setup Gradle
-#        uses: gradle/gradle-build-action@v2.4.2
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Setup Xvfb
+        run: |
+          sudo apt-get install -y xvfb
+          Xvfb -ac :99 -screen 0 1920x1080x24 &
+          echo "DISPLAY=:99.0" >> $GITHUB_ENV
       - name: Build Plugin
         run: gradle :buildPlugin
       - name: Run Idea
@@ -69,7 +72,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ui-test-fails-report-mac
+          name: ui-test-fails-report-linux
           path: |
             build/reports
             tests/ui-ij-tests/build/reports
