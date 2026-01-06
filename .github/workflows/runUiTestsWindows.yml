@@ -25,16 +25,15 @@ jobs:
         run: gradle :buildPlugin
       - name: Run Idea
         run: |
-          New-Item -ItemType Directory -Force -Path build/reports
-          Start-Process -NoNewWindow -FilePath "gradle" -ArgumentList "runIdeForUiTests" -RedirectStandardOutput "build/reports/idea.log"
-        shell: powershell
+          mkdir -p build/reports
+          gradle runIdeForUiTests > build/reports/idea.log 2>&1 &
+        shell: bash
       - name: Start screen recording
         run: |
-          New-Item -ItemType Directory -Force -Path build/reports/ci-screen-recording
-          Start-Process -NoNewWindow -FilePath "ffmpeg" -ArgumentList "-f gdigrab -framerate 30 -i desktop -vcodec libx264 -pix_fmt yuv420p build/reports/ci-screen-recording/screen-recording.mp4"
-          Start-Sleep -Seconds 2
-          Get-Process ffmpeg | Select-Object -ExpandProperty Id | Out-File -FilePath ffmpeg_pid.txt
-        shell: powershell
+          mkdir -p build/reports/ci-screen-recording
+          ffmpeg -f gdigrab -framerate 30 -i desktop -vcodec libx264 -pix_fmt yuv420p build/reports/ci-screen-recording/screen-recording.mp4 &
+          echo $! > ffmpeg_pid.txt
+        shell: bash
         continue-on-error: true
       - name: Wait for Idea started
         uses: jtalk/url-health-check-action@v3
@@ -47,12 +46,11 @@ jobs:
       - name: Stop screen recording
         if: always()
         run: |
-          if (Test-Path ffmpeg_pid.txt) {
-            $pid = Get-Content ffmpeg_pid.txt
-            Stop-Process -Id $pid -Force -ErrorAction SilentlyContinue
-            Start-Sleep -Seconds 2
-          }
-        shell: powershell
+          if [ -f ffmpeg_pid.txt ]; then
+            kill $(cat ffmpeg_pid.txt) || true
+            sleep 2
+          fi
+        shell: bash
         continue-on-error: true
       - name: Move sandbox logs
         if: always()
