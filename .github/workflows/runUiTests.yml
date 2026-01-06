@@ -39,10 +39,36 @@ jobs:
       - name: Auto-click Allow button for screen recording permission
         run: |
           # Wait a moment for the dialog to appear
-          sleep 2
-          # Try to click the Allow button if the permission dialog appears
-          for i in {1..10}; do
-            osascript -e 'tell application "System Events" to tell application process "SecurityAgent" to click button "Allow" of window 1' 2>/dev/null && break || true
+          sleep 3
+
+          # Install cliclick
+          brew install cliclick || true
+
+          # Try multiple methods and coordinate positions
+          # Estimated coordinates based on typical dialog position
+          for coords in "512:367" "960:540" "640:400" "800:450"; do
+            x=$(echo $coords | cut -d: -f1)
+            y=$(echo $coords | cut -d: -f2)
+
+            echo "Trying coordinates: $x,$y"
+
+            # Method 1: cliclick
+            cliclick c:$x,$y 2>/dev/null && echo "cliclick succeeded" && break
+            sleep 0.5
+
+            # Method 2: AppleScript with coordinates
+            osascript -e "tell application \"System Events\" to click at {$x, $y}" 2>/dev/null && echo "AppleScript succeeded" && break
+            sleep 0.5
+
+            # Method 3: Python CGEvent
+            python3 -c "
+from Quartz.CoreGraphics import CGEventCreateMouseEvent, CGEventPost, kCGMouseButtonLeft, kCGEventLeftMouseDown, kCGEventLeftMouseUp, kCGHIDEventTap
+event = CGEventCreateMouseEvent(None, kCGEventLeftMouseDown, ($x, $y), kCGMouseButtonLeft)
+CGEventPost(kCGHIDEventTap, event)
+event = CGEventCreateMouseEvent(None, kCGEventLeftMouseUp, ($x, $y), kCGMouseButtonLeft)
+CGEventPost(kCGHIDEventTap, event)
+" 2>/dev/null && echo "Python succeeded" && break
+
             sleep 1
           done
         continue-on-error: true
