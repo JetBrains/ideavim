@@ -52,9 +52,6 @@ jobs:
             sleep 2
           fi
         continue-on-error: true
-      - name: Move video
-        if: always()
-        run: mv tests/ui-ij-tests/video build/reports
       - name: Move sandbox logs
         if: always()
         run: mv build/idea-sandbox/IU-*/log_runIdeForUiTests idea-sandbox-log
@@ -71,12 +68,15 @@ jobs:
 
             Key information:
             - Test reports are located in: build/reports and tests/ui-ij-tests/build/reports
-            - There are TWO video recordings available:
-              1. build/reports/video - Gradle-generated test video
-              2. build/reports/ci-screen-recording/screen-recording.mp4 - Full CI screen recording from FFmpeg (covers the entire test run)
+            - There is a CI screen recording at build/reports/ci-screen-recording/screen-recording.mp4 that shows what happened during the entire test run - this video is usually very useful for understanding what went wrong visually
             - There is also a single screenshot at tests/ui-ij-tests/build/reports/ideaVimTest.png showing the state when the test failed
             - IDE sandbox logs are in the idea-sandbox-log directory
-            - ffmpeg is already installed and available - you can use it to extract frames from the videos or analyze them if that would be helpful
+            - ffmpeg is already installed and available. Useful commands for video analysis:
+              * Extract frame at specific time: `ffmpeg -i video.mp4 -ss 00:01:30 -vframes 1 output.png`
+              * Extract multiple frames: `ffmpeg -i video.mp4 -vf fps=1/10 frame_%04d.png` (1 frame every 10 seconds)
+              * Get video duration: `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 video.mp4`
+              * Extract last N seconds: `ffmpeg -sseof -10 -i video.mp4 -update 1 last_frame.png` (last 10 seconds)
+              * Create thumbnail grid: `ffmpeg -i video.mp4 -vf "select='not(mod(n\,300))',scale=160:120,tile=5x5" -frames:v 1 grid.png`
 
             Please provide:
             1. A detailed analysis of what went wrong

@@ -6,7 +6,6 @@
  * https://opensource.org/licenses/MIT.
  */
 
-import com.automation.remarks.junit5.Video
 import com.intellij.remoterobot.RemoteRobot
 import com.intellij.remoterobot.fixtures.ComponentFixture
 import com.intellij.remoterobot.search.locators.byXpath
@@ -29,7 +28,6 @@ class PyCharmTest {
   private lateinit var commonSteps: CommonSteps
 
   @Test
-  @Video
   fun run() = uiTest("ideaVimTest") {
     commonSteps = CommonSteps(this)
 

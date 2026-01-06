@@ -8,7 +8,6 @@
 
 package ui
 
-import com.automation.remarks.junit5.Video
 import com.intellij.remoterobot.RemoteRobot
 import com.intellij.remoterobot.fixtures.ComponentFixture
 import com.intellij.remoterobot.fixtures.ContainerFixture
@@ -60,7 +59,6 @@ class UiTests {
               """.trimMargin()
 
   @Test
-  @Video
   fun ideaVimTest() = uiTest("ideaVimTest") {
     val sharedSteps = JavaExampleSteps(this)
     commonSteps = CommonSteps(this)

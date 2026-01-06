@@ -6,7 +6,6 @@
  * https://opensource.org/licenses/MIT.
  */
 
-import com.automation.remarks.junit5.Video
 import com.intellij.remoterobot.RemoteRobot
 import com.intellij.remoterobot.steps.CommonSteps
 import com.intellij.remoterobot.stepsProcessing.step
@@ -32,7 +31,6 @@ class RiderUiTest {
   private lateinit var commonSteps: CommonSteps
 
   @Test
-  @Video
   fun run() = uiTest("ideaVimTest") {
     commonSteps = CommonSteps(this)
 
