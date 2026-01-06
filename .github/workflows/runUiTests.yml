@@ -36,6 +36,16 @@ jobs:
           ffmpeg -f avfoundation -capture_cursor 1 -i "0:none" -r 30 -vcodec libx264 -pix_fmt yuv420p build/reports/ci-screen-recording/screen-recording.mp4 &
           echo $! > /tmp/ffmpeg_pid.txt
         continue-on-error: true
+      - name: Auto-click Allow button for screen recording permission
+        run: |
+          # Wait a moment for the dialog to appear
+          sleep 2
+          # Try to click the Allow button if the permission dialog appears
+          for i in {1..10}; do
+            osascript -e 'tell application "System Events" to tell application process "SecurityAgent" to click button "Allow" of window 1' 2>/dev/null && break || true
+            sleep 1
+          done
+        continue-on-error: true
       - name: Wait for Idea started
         uses: jtalk/url-health-check-action@v3
         with:
