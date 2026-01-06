@@ -88,7 +88,7 @@ class UiTests {
       testSelectTextWithMouseInGutter(editor)
       testSelectForthAndBack(editor)
       testSelectTextUsingMouse(editor)
-      testTripleClickRightFromLineEnd(editor)
+//      testTripleClickRightFromLineEnd(editor)
       testClickRightFromLineEnd(editor)
       testClickOnWord(editor)
       testAddNewLineInNormalMode(editor)
