@@ -29,7 +29,7 @@ jobs:
       - name: Run Idea
         run: |
           mkdir -p build/reports
-          gradle --no-configuration-cache :runIdeForUiTests -PideaType=PC > build/reports/idea.log &
+          gradle :runIdeForUiTests -PideaType=PC > build/reports/idea.log &
       - name: List available capture devices
         run: ffmpeg -f avfoundation -list_devices true -i "" 2>&1 || true
         continue-on-error: true
