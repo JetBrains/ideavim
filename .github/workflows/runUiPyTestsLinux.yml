@@ -1,12 +1,12 @@
-name: Run UI Tests macOS
+name: Run UI PyCharm Tests Linux
 on:
   workflow_dispatch:
   schedule:
       - cron: '0 12 * * *'
 jobs:
-  build-for-ui-test-mac-os:
+  build-for-ui-test-linux:
     if: github.repository == 'JetBrains/ideavim'
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
@@ -17,41 +17,29 @@ jobs:
         with:
           distribution: zulu
           java-version: 21
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
       - name: Setup FFmpeg
-        run: brew install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Build Plugin
         run: gradle :buildPlugin
+      - name: Start Xvfb
+        run: |
+          export DISPLAY=:99.0
+          Xvfb :99 -screen 0 1920x1080x24 &
+          echo "DISPLAY=:99.0" >> $GITHUB_ENV
       - name: Run Idea
         run: |
           mkdir -p build/reports
-          gradle runIdeForUiTests > build/reports/idea.log &
-      - name: List available capture devices
-        run: ffmpeg -f avfoundation -list_devices true -i "" 2>&1 || true
-        continue-on-error: true
+          gradle :runIdeForUiTests -PideaType=PC > build/reports/idea.log 2>&1 &
       - name: Start screen recording
         run: |
           mkdir -p build/reports/ci-screen-recording
-          ffmpeg -f avfoundation -capture_cursor 1 -i "0:none" -r 30 -vcodec libx264 -pix_fmt yuv420p build/reports/ci-screen-recording/screen-recording.mp4 &
+          ffmpeg -f x11grab -video_size 1920x1080 -i :99.0 -r 30 -vcodec libx264 -pix_fmt yuv420p build/reports/ci-screen-recording/screen-recording.mp4 &
           echo $! > /tmp/ffmpeg_pid.txt
-        continue-on-error: true
-      - name: Auto-click Allow button for screen recording permission
-        run: |
-          sleep 3
-          brew install cliclick || true
-
-          for coords in "512:367" "960:540" "640:400" "800:450"; do
-            x=$(echo $coords | cut -d: -f1)
-            y=$(echo $coords | cut -d: -f2)
-            echo "Trying coordinates: $x,$y"
-
-            cliclick c:$x,$y 2>/dev/null && echo "cliclick succeeded" && break
-            sleep 0.5
-
-            osascript -e "tell application \"System Events\" to click at {$x, $y}" 2>/dev/null && echo "AppleScript succeeded" && break
-            sleep 1
-          done
         continue-on-error: true
       - name: Wait for Idea started
         uses: jtalk/url-health-check-action@v3
@@ -60,7 +48,7 @@ jobs:
           max-attempts: 20
           retry-delay: 10s
       - name: Tests
-        run: gradle :tests:ui-ij-tests:testUi
+        run: gradle :tests:ui-py-tests:testUi
       - name: Stop screen recording
         if: always()
         run: |
@@ -71,7 +59,7 @@ jobs:
         continue-on-error: true
       - name: Move sandbox logs
         if: always()
-        run: mv build/idea-sandbox/IU-*/log_runIdeForUiTests idea-sandbox-log
+        run: mv build/idea-sandbox/PC-*/log_runIdeForUiTests idea-sandbox-log
       - name: AI Analysis of Test Failures
         if: failure()
         uses: anthropics/claude-code-action@v1
@@ -84,9 +72,9 @@ jobs:
             Please analyze the UI test failures in the current directory.
 
             Key information:
-            - Test reports are located in: build/reports and tests/ui-ij-tests/build/reports
+            - Test reports are located in: build/reports and tests/ui-py-tests/build/reports
             - There is a CI screen recording at build/reports/ci-screen-recording/screen-recording.mp4 that shows what happened during the entire test run - this video is usually very useful for understanding what went wrong visually
-            - There is also a single screenshot at tests/ui-ij-tests/build/reports/ideaVimTest.png showing the state when the test failed
+            - There is also a single screenshot at tests/ui-py-tests/build/reports/ideaVimTest.png showing the state when the test failed
             - IDE sandbox logs are in the idea-sandbox-log directory
             - ffmpeg is already installed and available. Useful commands for video analysis:
               * Extract frame at specific time: `ffmpeg -i video.mp4 -ss 00:01:30 -vframes 1 output.png`
@@ -111,8 +99,8 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ui-test-fails-report-mac
+          name: ui-test-fails-report-linux
           path: |
             build/reports
-            tests/ui-ij-tests/build/reports
+            tests/ui-py-tests/build/reports
             idea-sandbox-log

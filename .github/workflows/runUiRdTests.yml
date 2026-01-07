@@ -1,4 +1,4 @@
-name: Run UI Rider Tests
+name: Run UI Rider Tests macOS
 on:
   workflow_dispatch:
   schedule:

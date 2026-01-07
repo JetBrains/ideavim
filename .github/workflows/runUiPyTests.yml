@@ -1,4 +1,4 @@
-name: Run UI PyCharm Tests
+name: Run UI PyCharm Tests macOS
 on:
   workflow_dispatch:
   schedule:

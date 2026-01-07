@@ -1,4 +1,4 @@
-name: Run Non Octopus UI Tests
+name: Run Non Octopus UI Tests macOS
 on:
   workflow_dispatch:
   schedule:
