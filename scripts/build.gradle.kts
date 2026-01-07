@@ -23,7 +23,7 @@ repositories {
 dependencies {
   compileOnly("org.jetbrains.kotlin:kotlin-stdlib:2.2.21")
 
-  testImplementation("org.junit.jupiter:junit-jupiter:6.0.1")
+  testImplementation("org.junit.jupiter:junit-jupiter:6.0.2")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
   implementation("io.ktor:ktor-client-core:3.3.3")
