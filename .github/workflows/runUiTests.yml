@@ -95,6 +95,12 @@ jobs:
               * Extract last N seconds: `ffmpeg -sseof -10 -i video.mp4 -update 1 last_frame.png` (last 10 seconds)
               * Create thumbnail grid: `ffmpeg -i video.mp4 -vf "select='not(mod(n\,300))',scale=160:120,tile=5x5" -frames:v 1 grid.png`
 
+            Special troubleshooting for timeout failures:
+            - If the test fails because it waited for something to appear, but according to the video and screenshot the element actually appeared on screen, check the UI hierarchy file at build/reports/hierarchy-ideaVimTest.html
+            - This hierarchy file shows the actual structure of UI elements and their properties at the time of failure
+            - The failure may be caused by a renamed property or changed class name in the UI element
+            - If you find this is the case, suggest a new query or selector that matches the current element structure
+
             Please provide:
             1. A detailed analysis of what went wrong
             2. The root cause of the failure
