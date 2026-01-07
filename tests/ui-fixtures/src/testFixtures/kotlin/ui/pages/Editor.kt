@@ -21,8 +21,12 @@ import java.time.Duration
 
 @JvmOverloads
 fun ContainerFixture.editor(title: String, function: Editor.() -> Unit = {}): Editor {
+  // IntelliJ Platform now appends file type suffixes to accessible names for better accessibility
+  // (e.g., "MyTest.java, Java file" instead of just "MyTest.java"). Use starts-with matcher to handle
+  // both old versions (exact match) and new versions (with suffix) without accidentally matching
+  // unintended tabs.
   find<ComponentFixture>(
-    byXpath("//div[@class='EditorTabs']//div[@accessiblename='$title' and @class='SimpleColoredComponent']"),
+    byXpath("//div[@class='EditorTabs']//div[(@accessiblename='$title' or starts-with(@accessiblename,'$title,')) and @class='SimpleColoredComponent']"),
     Duration.ofSeconds(30),
   ).click()
   return find<Editor>(
