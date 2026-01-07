@@ -34,6 +34,7 @@ object RandomOrderTests : IdeaVimBuildType({
       """.trimIndent().replace("\n", " ")
       buildFile = ""
       enableStacktrace = true
+      gradleParams = "--build-cache --configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
   }
