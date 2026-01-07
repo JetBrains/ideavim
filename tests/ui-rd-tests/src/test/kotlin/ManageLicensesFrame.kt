@@ -26,8 +26,8 @@ class ManageLicensesFrame(remoteRobot: RemoteRobot, remoteComponent: RemoteCompo
 
   fun enableFreeTier() {
     radioButton("Activation code").click()
-    /// Note: The license code is obfuscated, so we use the class `W`. But a better solution is required.
-    textFields(byXpath("//div[@class='W']")).first().text = System.getenv("RIDER_LICENSE")
+    // Use accessible name instead of obfuscated class name for better stability
+    textFields(byXpath("//div[@accessiblename='Activation code']")).first().text = System.getenv("RIDER_LICENSE")
     button("Activate").click()
     button(JButtonFixture.byText("Close"), timeout = Duration.ofSeconds(20)).click()
   }
