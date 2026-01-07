@@ -34,7 +34,7 @@ jobs:
       - name: Run Idea
         run: |
           mkdir -p build/reports
-          gradle :runIdeForUiTests -PideaType=PU > build/reports/idea.log 2>&1 &
+          gradle :runIdeForUiTests -PideaType=PY > build/reports/idea.log 2>&1 &
       - name: Start screen recording
         run: |
           mkdir -p build/reports/ci-screen-recording
@@ -59,7 +59,7 @@ jobs:
         continue-on-error: true
       - name: Move sandbox logs
         if: always()
-        run: mv build/idea-sandbox/PU-*/log_runIdeForUiTests idea-sandbox-log
+        run: mv build/idea-sandbox/PY-*/log_runIdeForUiTests idea-sandbox-log
       - name: AI Analysis of Test Failures
         if: failure()
         uses: anthropics/claude-code-action@v1
