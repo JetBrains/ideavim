@@ -24,6 +24,8 @@ jobs:
         run: brew install ffmpeg
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
       - name: Build Plugin
         run: gradle :buildPlugin
       - name: Run Idea
