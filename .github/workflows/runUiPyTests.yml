@@ -39,6 +39,23 @@ jobs:
           ffmpeg -f avfoundation -capture_cursor 1 -i "0:none" -r 30 -vcodec libx264 -pix_fmt yuv420p build/reports/ci-screen-recording/screen-recording.mp4 &
           echo $! > /tmp/ffmpeg_pid.txt
         continue-on-error: true
+      - name: Auto-click Allow button for screen recording permission
+        run: |
+          sleep 3
+          brew install cliclick || true
+
+          for coords in "512:367" "960:540" "640:400" "800:450"; do
+            x=$(echo $coords | cut -d: -f1)
+            y=$(echo $coords | cut -d: -f2)
+            echo "Trying coordinates: $x,$y"
+
+            cliclick c:$x,$y 2>/dev/null && echo "cliclick succeeded" && break
+            sleep 0.5
+
+            osascript -e "tell application \"System Events\" to click at {$x, $y}" 2>/dev/null && echo "AppleScript succeeded" && break
+            sleep 1
+          done
+        continue-on-error: true
       - name: Wait for Idea started
         uses: jtalk/url-health-check-action@v3
         with:
