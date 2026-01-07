@@ -77,7 +77,7 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          claude_args: '--allowed-tools "Read,Write,Edit,Glob,Grep,Bash(ffmpeg:*),Bash(ffprobe:*),Bash(mkdir:*),Bash(touch:*),Bash(echo:*),Bash(ls:*),Bash(cat:*),Bash(grep:*),Bash(find:*),Bash(cd:*),Bash(rm:*),Bash(git:*),Bash(gh:*),Bash(gradle:*),Bash(./gradlew:*)"'
+          claude_args: '--allowed-tools "Read,Write,Edit,Glob,Grep,Bash(ffmpeg:*),Bash(ffprobe:*),Bash(mkdir:*),Bash(touch:*),Bash(echo:*),Bash(ls:*),Bash(cat:*),Bash(grep:*),Bash(find:*),Bash(cd:*),Bash(rm:*),Bash(git:*),Bash(gh:*),Bash(gradle:*),Bash(./gradlew:*),Bash(java:*),Bash(which:*)"'
           prompt: |
             ## Task: Analyze UI Test Failures
 
