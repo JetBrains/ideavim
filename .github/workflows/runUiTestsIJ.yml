@@ -1,4 +1,4 @@
-name: Run UI Tests (Unified)
+name: Run UI Tests for IntelliJ IDEA
 on:
   workflow_dispatch:
   schedule:
