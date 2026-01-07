@@ -111,6 +111,20 @@ jobs:
 
             Write your analysis to build/reports/ai-analysis.txt
 
+            ## UI Test Best Practices
+
+            When fixing UI tests, follow these principles:
+
+            **Cause-Effect Over Timeouts**: UI tests should wait for specific conditions rather than arbitrary timeouts.
+            - ✅ GOOD: Wait for a button to become visible or enabled before clicking it
+            - ✅ GOOD: Wait for specific text to appear in a component
+            - ✅ GOOD: Wait for a dialog to be present with a specific accessible name
+            - ❌ BAD: Use Thread.sleep() or fixed delays
+            - ❌ BAD: Wait for arbitrary timeouts without checking for specific conditions
+
+            Only use timeouts as a maximum wait duration with explicit condition checks (e.g., "wait up to 30 seconds for dialog to appear").
+            Tests should be deterministic and based on observable state changes in the UI, not time-based assumptions.
+
             IMPORTANT: If you have a concrete suggestion for fixing the test, ALWAYS proceed with creating a branch and PR. Never ask for permission - just do it.
 
             If you have a concrete suggestion for fixing the test:
