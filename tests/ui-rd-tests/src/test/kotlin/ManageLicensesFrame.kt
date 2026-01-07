@@ -9,6 +9,7 @@
 import com.intellij.remoterobot.RemoteRobot
 import com.intellij.remoterobot.data.RemoteComponent
 import com.intellij.remoterobot.fixtures.CommonContainerFixture
+import com.intellij.remoterobot.fixtures.ComponentFixture
 import com.intellij.remoterobot.fixtures.DefaultXpath
 import com.intellij.remoterobot.fixtures.FixtureName
 import com.intellij.remoterobot.fixtures.JButtonFixture
@@ -26,8 +27,11 @@ class ManageLicensesFrame(remoteRobot: RemoteRobot, remoteComponent: RemoteCompo
 
   fun enableFreeTier() {
     radioButton("Activation code").click()
-    // Use accessible name instead of obfuscated class name for better stability
-    textFields(byXpath("//div[@accessiblename='Activation code']")).first().text = System.getenv("RIDER_LICENSE")
+    // Find text area by accessible name using ComponentFixture, which properly supports xpath queries
+    // The textFields() helper doesn't correctly handle xpath with accessiblename attributes
+    find(ComponentFixture::class.java, byXpath("//div[@accessiblename='Activation code' and contains(@classhierarchy, 'JTextArea')]")).apply {
+      runJs("component.setText('${System.getenv("RIDER_LICENSE")}');")
+    }
     button("Activate").click()
     button(JButtonFixture.byText("Close"), timeout = Duration.ofSeconds(20)).click()
   }
