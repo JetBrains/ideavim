@@ -29,7 +29,7 @@ jobs:
       - name: Run Idea
         run: |
           mkdir -p build/reports
-          gradle :runIdeForUiTests -PideaType=PC > build/reports/idea.log &
+          gradle :runIdeForUiTests -PideaType=PU > build/reports/idea.log &
       - name: List available capture devices
         run: ffmpeg -f avfoundation -list_devices true -i "" 2>&1 || true
         continue-on-error: true
@@ -74,7 +74,7 @@ jobs:
         continue-on-error: true
       - name: Move sandbox logs
         if: always()
-        run: mv build/idea-sandbox/PC-*/log_runIdeForUiTests idea-sandbox-log
+        run: mv build/idea-sandbox/PU-*/log_runIdeForUiTests idea-sandbox-log
       - name: AI Analysis of Test Failures
         if: failure()
         uses: anthropics/claude-code-action@v1
