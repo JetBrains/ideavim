@@ -115,12 +115,17 @@ jobs:
             If you have a concrete suggestion for fixing the test:
             1. Create a new branch with a descriptive name (e.g., fix/ui-test-accessible-name)
             2. Apply your suggested fix to the codebase
-            3. Run the specific failing test to verify the fix: `gradle :tests:ui-rd-tests:testUi --tests "YourTestClassName.yourTestMethod"`
-            4. If the test passes with your fix, create a PR with:
+            3. MANDATORY: Verify compilation succeeds with your changes: `gradle compileKotlin compileTestKotlin`
+            4. MANDATORY: Run the specific failing test to verify the fix improves or resolves the issue
+               - For Rider UI tests: `gradle :tests:ui-rd-tests:testUi --tests "YourTestClassName.yourTestMethod"`
+               - To run all Rider UI tests: `gradle :tests:ui-rd-tests:testUi`
+               - The test MUST either pass completely or show clear improvement (e.g., progressing further before failure)
+            5. If the test passes or shows improvement with your fix, create a PR with:
                - Clear title describing the fix
                - Description explaining the root cause and solution
+               - Test results showing the fix works
                - Reference to the failing CI run
-            5. Use the base branch 'master' for the PR
+            6. Use the base branch 'master' for the PR
       - name: Save report
         if: always()
         uses: actions/upload-artifact@v4
