@@ -99,7 +99,12 @@ dependencies {
     // Note that it is also possible to use local("...") to compile against a locally installed IDE
     // E.g. local("/Users/{user}/Applications/IntelliJ IDEA Ultimate.app")
     // Or something like: intellijIdeaUltimate(ideaVersion)
-    create(ideaType, ideaVersion) { this.useInstaller = useInstaller }
+    // PyCharm Community uses pycharm() instead of create() since 2025.3
+    if (ideaType == "PC") {
+      pycharm(ideaVersion) { this.useInstaller = useInstaller }
+    } else {
+      create(ideaType, ideaVersion) { this.useInstaller = useInstaller }
+    }
 
     pluginVerifier()
     zipSigner()
