@@ -12,6 +12,17 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v4
+      - name: Free up disk space
+        run: |
+          echo "Disk space before cleanup:"
+          df -h
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force
+          echo "Disk space after cleanup:"
+          df -h
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -26,7 +37,7 @@ jobs:
       - name: Start Xvfb
         run: |
           export DISPLAY=:99.0
-          Xvfb :99 -screen 0 1920x1080x24 &
+          Xvfb :99 -screen 0 1280x720x24 &
           echo "DISPLAY=:99.0" >> $GITHUB_ENV
       - name: Run Idea
         run: |
@@ -35,7 +46,7 @@ jobs:
       - name: Start screen recording
         run: |
           mkdir -p build/reports/ci-screen-recording
-          ffmpeg -f x11grab -video_size 1920x1080 -i :99.0 -r 30 -vcodec libx264 -pix_fmt yuv420p build/reports/ci-screen-recording/screen-recording.mp4 &
+          ffmpeg -f x11grab -video_size 1280x720 -i :99.0 -r 15 -vcodec libx264 -preset ultrafast -crf 28 -pix_fmt yuv420p build/reports/ci-screen-recording/screen-recording.mp4 &
           echo $! > /tmp/ffmpeg_pid.txt
         continue-on-error: true
       - name: Wait for Idea started
