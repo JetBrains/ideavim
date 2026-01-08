@@ -213,9 +213,11 @@ class UiTests {
     }
 
     findText("Copy Action Id").click()
-    Thread.sleep(1000)
+
+    // Wait for tracking to be active (button changes to "Stop Tracking")
+    waitFor { hasText("Stop Tracking") }
+
     findText("Stop Tracking").click()
-    Thread.sleep(1000)
 
     editor.findText("class").click()
     remoteRobot.invokeActionJs("EditorPaste")
@@ -232,7 +234,13 @@ class UiTests {
       """.trimMargin() == editor.text
     }
 
-    waitFor { !hasText("Copy Action Id") }
+    // Explicitly dismiss any visible notifications
+    keyboard { escape() }
+
+    // Wait briefly for notification to dismiss
+    waitFor(duration = Duration.ofSeconds(3)) {
+      !hasText("Copy Action Id")
+    }
 
     vimExit()
   }
