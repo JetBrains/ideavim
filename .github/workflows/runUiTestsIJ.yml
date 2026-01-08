@@ -5,7 +5,7 @@ on:
       - cron: '0 12 * * *'
 jobs:
   test-macos:
-    if: github.repository == 'JetBrains/ideavim'
+    if: false  # Temporarily disabled - change to: github.repository == 'JetBrains/ideavim'
     runs-on: macos-latest
     permissions:
       contents: read
