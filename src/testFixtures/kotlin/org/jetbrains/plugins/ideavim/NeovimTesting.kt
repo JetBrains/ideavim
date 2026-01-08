@@ -326,6 +326,31 @@ enum class SkipNeovimReason {
   GUARDED_BLOCKS,
   CTRL_CODES,
 
+  /**
+   * Neovim RPC API cannot properly handle special keys in insert mode.
+   *
+   * This annotation is applied to tests that use special keys like backspace, delete, or arrow keys
+   * in insert mode when testing against Neovim via RPC. The nvim_input() function from the
+   * ensarsarajcic/neovim-java library (v0.2.3) does not correctly handle Neovim's internal
+   * termcode format for these special keys.
+   *
+   * Technical Details:
+   * - Special keys like `<BS>`, `<Del>`, `<Left>`, `<Right>`, `<Insert>` use Neovim's termcode format:
+   *   0x80 prefix + key code sequence
+   * - When sent via nvim_input(), these get inserted as literal text instead of executing as key commands
+   * - Simple ASCII keys like `<Esc>` (0x1B) work correctly because they don't use the termcode format
+   *
+   * Affected Keys:
+   * - `<BS>` (backspace)
+   * - `<Del>` (delete)
+   * - `<Insert>` (insert/replace mode toggle)
+   * - Arrow keys: `<Left>`, `<Right>`, `<Up>`, `<Down>`
+   * - Other special keys that use termcode format in insert mode
+   *
+   * This is a limitation of the RPC communication layer, not IdeaVim or Neovim behavior.
+   */
+  NEOVIM_RPC_SPECIAL_KEYS_INSERT_MODE,
+
   BUG_IN_NEOVIM,
   PSI,
 

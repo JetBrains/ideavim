@@ -839,7 +839,7 @@ quux
   }
 
   // |i| |i_<Insert>|
-  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, "<INS> works strange")
+  @TestWithoutNeovim(SkipNeovimReason.NEOVIM_RPC_SPECIAL_KEYS_INSERT_MODE)
   @Test
   fun testInsertModeSwitchToReplaceModeAndBack() {
     doTest(
@@ -851,7 +851,7 @@ quux
   }
 
   // VIM-511 |.|
-  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, "Backspace workspace strange")
+  @TestWithoutNeovim(SkipNeovimReason.NEOVIM_RPC_SPECIAL_KEYS_INSERT_MODE)
   @Test
   fun testRepeatWithBackspaces() {
     doTest(
