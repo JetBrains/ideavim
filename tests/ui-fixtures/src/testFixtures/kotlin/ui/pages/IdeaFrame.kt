@@ -19,8 +19,8 @@ import com.intellij.remoterobot.stepsProcessing.step
 import com.intellij.remoterobot.utils.waitFor
 import java.time.Duration
 
-fun RemoteRobot.idea(function: IdeaFrame.() -> Unit) {
-  find<IdeaFrame>(Duration.ofSeconds(60)).apply(function)
+fun RemoteRobot.idea(timeout: Duration = Duration.ofSeconds(60), function: IdeaFrame.() -> Unit) {
+  find<IdeaFrame>(timeout).apply(function)
 }
 
 @FixtureName("Idea frame")

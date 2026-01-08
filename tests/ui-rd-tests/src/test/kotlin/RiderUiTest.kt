@@ -10,6 +10,7 @@ import com.intellij.remoterobot.RemoteRobot
 import com.intellij.remoterobot.steps.CommonSteps
 import com.intellij.remoterobot.stepsProcessing.step
 import com.intellij.remoterobot.utils.keyboard
+import com.intellij.remoterobot.utils.waitFor
 import org.assertj.swing.core.MouseButton
 import org.junit.jupiter.api.Test
 import ui.pages.Editor
@@ -21,6 +22,7 @@ import ui.pages.idea
 import ui.pages.welcomeFrame
 import ui.utils.StepsLogger
 import ui.utils.uiTest
+import java.time.Duration
 import kotlin.test.assertEquals
 
 class RiderUiTest {
@@ -35,10 +37,10 @@ class RiderUiTest {
     commonSteps = CommonSteps(this)
 
     startNewProject()
-    // Wait longer for project creation to complete and IDE to open
-    Thread.sleep(5000)
 
-    idea {
+    // Wait for the IDE frame to appear after project creation
+    // Use extended timeout as project creation can take time in CI environments
+    idea(Duration.ofMinutes(2)) {
       waitSmartMode()
 
       val editor = editor("Program.cs")
@@ -129,17 +131,27 @@ class RiderUiTest {
         if (installButton.isShowing && installButton.isEnabled()) {
           step("Install .NET SDK") {
             installButton.click()
-            // Wait for SDK installation to complete and Create button to enable
-            Thread.sleep(10000)
+            // Wait for SDK installation to complete by checking when Create button becomes enabled
+            waitFor(Duration.ofSeconds(60), Duration.ofSeconds(1)) {
+              try {
+                val createBtn = button("Create")
+                createBtn.isShowing && createBtn.isEnabled()
+              } catch (e: Exception) {
+                false
+              }
+            }
           }
         }
       } catch (e: Exception) {
         // Install button not found, SDK likely already installed
       }
 
-      // Wait a bit more to ensure Create button is ready
-      Thread.sleep(2000)
-      button("Create").click()
+      // Wait for Create button to be enabled before clicking
+      val createButton = button("Create")
+      waitFor(Duration.ofSeconds(30), Duration.ofSeconds(1)) {
+        createButton.isShowing && createButton.isEnabled()
+      }
+      createButton.click()
     }
   }
 }
