@@ -35,9 +35,10 @@ class RiderUiTest {
     commonSteps = CommonSteps(this)
 
     startNewProject()
-    // Wait longer for project creation to complete and IDE to open
-    Thread.sleep(5000)
 
+    // Wait for the IDE frame to appear after project creation
+    // The new Rider startup behavior requires waiting for the welcome dialog to close
+    // and the project to fully open before we can access the IdeFrameImpl
     idea {
       waitSmartMode()
 
@@ -140,6 +141,12 @@ class RiderUiTest {
       // Wait a bit more to ensure Create button is ready
       Thread.sleep(2000)
       button("Create").click()
+
+      // Wait for the New Solution dialog to close after clicking Create
+      // This is necessary due to new Rider startup behavior
+      step("Wait for dialog to close") {
+        Thread.sleep(15000)
+      }
     }
   }
 }
