@@ -7,6 +7,7 @@
  */
 
 import com.intellij.remoterobot.RemoteRobot
+import com.intellij.remoterobot.fixtures.JButtonFixture
 import com.intellij.remoterobot.steps.CommonSteps
 import com.intellij.remoterobot.stepsProcessing.step
 import com.intellij.remoterobot.utils.keyboard
@@ -121,6 +122,24 @@ class RiderUiTest {
 
     welcomeFrame {
       createNewSolutionLink.click()
+
+      // Handle macOS network permission dialog if it appears
+      // This system dialog can block the UI and prevent access to the Create button
+      try {
+        step("Dismiss macOS network permission dialog if present") {
+          // Look for the dialog with a short timeout
+          val allowButton = button(JButtonFixture.byText("Allow"), timeout = java.time.Duration.ofSeconds(2))
+          allowButton.click()
+        }
+      } catch (e: Exception) {
+        // Dialog not present, continue normally
+        try {
+          val dontAllowButton = button(JButtonFixture.byText("Don't Allow"), timeout = java.time.Duration.ofSeconds(1))
+          dontAllowButton.click()
+        } catch (e2: Exception) {
+          // Neither button found, dialog not present
+        }
+      }
 
       // Handle .NET SDK installation if needed
       // The "Install" button appears when .NET SDK is not detected
