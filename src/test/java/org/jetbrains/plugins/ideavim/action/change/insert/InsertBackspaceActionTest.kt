@@ -14,7 +14,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
 class InsertBackspaceActionTest : VimTestCase() {
-  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "Backspace behavior in insert mode differs")
   @Test
   fun `test insert backspace`() {
     val before = "I fo${c}und it in a legendary land"
@@ -26,7 +26,7 @@ class InsertBackspaceActionTest : VimTestCase() {
     assertState(after)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.OPTION, "Tests 'sidescrolloff' and 'sidescroll' option behavior during backspace")
   @Test
   fun `test insert backspace scrolls start of line`() {
     configureByColumns(200)
