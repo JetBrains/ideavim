@@ -58,8 +58,8 @@ abstract class IdeaVimBuildType(init: BuildType.() -> Unit) : BuildType({
     buildCache {
       name = "Gradle-cache"
       rules = """
-        .gradle/caches
-        .gradle/wrapper
+        %env.HOME%/.gradle/caches
+        %env.HOME%/.gradle/wrapper
       """.trimIndent()
       publish = true
       use = true
