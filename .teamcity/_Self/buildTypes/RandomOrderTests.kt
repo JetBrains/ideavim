@@ -26,7 +26,7 @@ object RandomOrderTests : IdeaVimBuildType({
     gradle {
       clearConditions()
       tasks = """
-        clean test
+        test
         -x :tests:property-tests:test
         -x :tests:long-running-tests:test
         -Djunit.jupiter.execution.order.random.seed=default

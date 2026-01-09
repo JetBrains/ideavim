@@ -24,7 +24,7 @@ object PluginVerifier : IdeaVimBuildType({
   steps {
     gradle {
       clearConditions()
-      tasks = "clean verifyPlugin"
+      tasks = "verifyPlugin"
       buildFile = ""
       enableStacktrace = true
       gradleParams = "--build-cache --configuration-cache"
