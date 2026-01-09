@@ -32,6 +32,6 @@ jobs:
         with:
           name: problems-report
           path: |
-            ideavim/build/reports/
-            ideavim/tests/java-tests/build/reports/
+            build/reports/
+            tests/java-tests/build/reports/
           if-no-files-found: ignore
