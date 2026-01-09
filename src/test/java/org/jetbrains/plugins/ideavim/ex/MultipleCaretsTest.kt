@@ -94,7 +94,7 @@ class MultipleCaretsTest : VimTestCase() {
   }
 
   @Test
-  @Disabled
+  @Disabled("Visual mode ex commands with multiple carets not yet fully supported")
   fun testCopyVisualText() {
     val before = "qwe\n" + "${c}rty\n" + "asd\n" + "f${c}gh\n" + "zxc\n" + "vbn\n"
     configureByText(before)
@@ -300,7 +300,7 @@ class MultipleCaretsTest : VimTestCase() {
   }
 
   @Test
-  @Disabled
+  @Disabled("Visual mode ex commands with multiple carets not yet fully supported")
   fun testPutVisualLines() {
     val before = "${c}qwe\n" + "rty\n" + "as${c}d\n" + "fgh\n" + "zxc\n" + "vbn\n"
     val editor = configureByText(before)
@@ -319,7 +319,7 @@ class MultipleCaretsTest : VimTestCase() {
   }
 
   @Test
-  @Disabled
+  @Disabled("Move command with multiple carets not yet fully supported")
   fun testMoveTextBeforeCarets() {
     val before = "qwe\n" + "rty\n" + "${c}asd\n" + "fgh\n" + "z${c}xc\n" + "vbn\n"
     configureByText(before)
@@ -329,7 +329,7 @@ class MultipleCaretsTest : VimTestCase() {
   }
 
   @Test
-  @Disabled
+  @Disabled("Move command with multiple carets not yet fully supported")
   fun testMoveTextAfterCarets() {
     val before = "q${c}we\n" + "rty\n" + "${c}asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
     configureByText(before)
@@ -339,7 +339,7 @@ class MultipleCaretsTest : VimTestCase() {
   }
 
   @Test
-  @Disabled
+  @Disabled("Move command with multiple carets not yet fully supported")
   fun testMoveTextBetweenCarets() {
     val before = "q${c}we\n" + "rty\n" + "${c}asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
     configureByText(before)

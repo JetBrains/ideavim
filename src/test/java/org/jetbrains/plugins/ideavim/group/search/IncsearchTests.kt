@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test
 
 @Suppress("SpellCheckingInspection")
 class IncsearchTests : VimTestCase() {
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.OPTION, "Incsearch tests check intermediate editor state during command-line input")
   @Test
   fun `test incsearch moves caret to start of first match`() {
     configureByText(
@@ -32,7 +32,7 @@ class IncsearchTests : VimTestCase() {
     assertPosition(1, 14)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.OPTION, "Incsearch tests check intermediate editor state during command-line input")
   @Test
   fun `test incsearch + hlsearch moves caret to start of first match`() {
     configureByText(
@@ -79,7 +79,7 @@ class IncsearchTests : VimTestCase() {
     assertPosition(2, 12)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.OPTION, "Incsearch tests check intermediate editor state during command-line input")
   @Test
   fun `test incsearch + hlsearch moves caret to start of first match (backwards)`() {
     configureByText(
@@ -94,7 +94,7 @@ class IncsearchTests : VimTestCase() {
     assertPosition(0, 26)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.OPTION, "Incsearch tests check intermediate editor state during command-line input")
   @Test
   fun `test incsearch moves caret to start of first match (backwards)`() {
     configureByText(
