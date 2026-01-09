@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.functions.BuiltinFunctionHandler
 
 @VimscriptFunction(name = "remove")
-internal class RemoveFunctionHandler : BuiltinFunctionHandler<VimDataType>(minArity = 1, maxArity = 3) {
+internal class RemoveFunctionHandler : BuiltinFunctionHandler<VimDataType>(minArity = 2, maxArity = 3) {
   override fun doFunction(
     arguments: Arguments,
     editor: VimEditor,
