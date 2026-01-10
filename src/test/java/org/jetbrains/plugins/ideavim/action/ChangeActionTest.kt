@@ -67,7 +67,7 @@ class ChangeActionTest : VimTestCase() {
 
   // VIM-620 |i_CTRL-O|
   @Test
-  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR)
+  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, "Behavior differs when using 'd' after visual mode entered via <C-O>v in insert mode")
   fun testInsertSingleCommandAndNewLineInserting4() {
     doTest(
       listOf("i", "<C-O>", "v", "d"),
@@ -115,7 +115,7 @@ class ChangeActionTest : VimTestCase() {
 
   // VIM-620 |i_CTRL-O|
   @Test
-  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR)
+  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, "Behavior differs when typing 'd' after select mode entered via <C-O>gh in insert mode")
   fun testInsertSingleCommandAndNewLineInserting8() {
     doTest(
       listOf("i", "<C-O>", "gh", "d"),
@@ -127,7 +127,7 @@ class ChangeActionTest : VimTestCase() {
 
   // VIM-311 |i_CTRL-O|
   @Test
-  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR)
+  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, "Behavior differs with <C-O> followed by delete motion then continuing insert")
   fun testInsertSingleCommand() {
     doTest(
       listOf("i", "def", "<C-O>", "d2h", "x"),
@@ -1129,7 +1129,7 @@ quux
 
   @Test
   @TestFor(issues = ["VIM-2074"])
-  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR)
+  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, "Backspace behavior in replace mode differs - IdeaVim restores original characters")
   fun `backspace with replace mode`() {
     configureByText("${c}Hello world")
     typeText("R1111")

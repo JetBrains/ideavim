@@ -182,11 +182,12 @@ class InsertRegisterLiterallyActionTest : VimExTestCase() {
     assertRenderedExText("hello^M world")
   }
 
-  @Disabled
+  @Disabled("DigraphSequence converts <C-V><C-J> to `\\0` (see DigraphSequence.kt:209)")
   @Test
   fun `test insert register literally inserts CTRL-J literally`() {
     // TODO: This doesn't work. DigraphSequence converts <C-V><C-J> to `\0`
     // I don't understand the logic behind this conversion
+    // See DigraphSequence.kt:209 where char code 10 (newline/<C-J>) is explicitly converted to 0
 
     // Don't use enterCommand, it (deliberately) doesn't parse special keys!
     typeText(":let @a=\"hello<C-V><C-J> world\"<CR>")
