@@ -299,10 +299,19 @@ intellijPlatform {
     name = "IdeaVim"
     changeNotes.set(
       """
+        <b>Features:</b><br>
+        * New VimScript functions: <code>add()</code>, <code>call()</code>, <code>extend()</code>, <code>extendnew()</code>, <code>filter()</code>, <code>flatten()</code>, <code>flattennew()</code>, <code>foreach()</code>, <code>has_key()</code>, <code>indexof()</code>, <code>insert()</code>, <code>items()</code>, <code>keys()</code>, <code>map()</code>, <code>mapnew()</code>, <code>reduce()</code>, <code>remove()</code>, <code>slice()</code>, <code>sort()</code>, <code>uniq()</code>, <code>values()</code><br>
+        <br>
         <b>Fixes:</b><br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4105">VIM-4105</a> Fixed <code>a"</code> <code>a'</code> <code>a`</code> text objects to include surrounding whitespace per Vim spec<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4097">VIM-4097</a> Fixed <code>&lt;A-n&gt;</code> (NextOccurrence) with text containing backslashes - e.g., selecting <code>\IntegerField</code> now works correctly<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4094">VIM-4094</a> Fixed UninitializedPropertyAccessException when loading history<br>
+        * Fixed high CPU usage while showing command line<br>
+        * Fixed comparison of String and Number in VimScript expressions<br>
+        <br>
+        <b>Merged PRs:</b><br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1414">1414</a> by <a href="https://github.com/citizenmatt">Matt Ellis</a>: Refactor/functions<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1442">1442</a> by <a href="https://github.com/citizenmatt">Matt Ellis</a>: Fix high CPU usage while showing command line<br>
         <br>
         <a href="https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20Fix%20versions:%20${version.get()}">Changelog</a>
         """.trimIndent()
