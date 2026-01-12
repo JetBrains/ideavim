@@ -93,15 +93,38 @@ class MultipleCaretsTest : VimTestCase() {
     assertState(after)
   }
 
+  // Multiple carets with :copy command doesn't work correctly.
+  // CopyTextCommand processes carets sequentially in a loop, and each insertion shifts the document,
+  // corrupting ranges/positions for subsequent carets. Vim doesn't have multiple carets, so there's
+  // no reference behavior - this represents desired IdeaVim behavior that isn't implemented yet.
   @Test
   @Disabled
   fun testCopyVisualText() {
-    val before = "qwe\n" + "${c}rty\n" + "asd\n" + "f${c}gh\n" + "zxc\n" + "vbn\n"
+    val before = """
+      qwe
+      ${c}rty
+      asd
+      f${c}gh
+      zxc
+      vbn
+
+    """.trimIndent()
     configureByText(before)
     typeText("vj")
     typeText(commandToKeys(":co 2"))
-    val after =
-      "qwe\n" + "rty\n" + "${c}rty\n" + "asd\n" + "${c}fgh\n" + "zxc\n" + "asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
+    val after = """
+      qwe
+      rty
+      ${c}rty
+      asd
+      ${c}fgh
+      zxc
+      asd
+      fgh
+      zxc
+      vbn
+
+    """.trimIndent()
     fixture.checkResult(after)
   }
 
@@ -299,6 +322,10 @@ class MultipleCaretsTest : VimTestCase() {
     assertState(after)
   }
 
+  // Multiple carets with :put command and visual selection doesn't work correctly.
+  // Only one caret's selection gets the put, not all carets. Similar to the copy command issue -
+  // multi-caret operations that modify the document have cascading effects.
+  // Vim doesn't have multiple carets, so there's no reference behavior.
   @Test
   @Disabled
   fun testPutVisualLines() {
@@ -306,9 +333,11 @@ class MultipleCaretsTest : VimTestCase() {
     val editor = configureByText(before)
     val vimEditor = editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
-    ApplicationManager.getApplication().runWriteAction {
-      VimPlugin.getRegister()
-        .storeText(vimEditor, context, editor.vim.primaryCaret(), TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
+    ApplicationManager.getApplication().invokeAndWait {
+      ApplicationManager.getApplication().runWriteAction {
+        VimPlugin.getRegister()
+          .storeText(vimEditor, context, editor.vim.primaryCaret(), TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
+      }
     }
 
     typeText("vj")
@@ -318,6 +347,8 @@ class MultipleCaretsTest : VimTestCase() {
     fixture.checkResult(after)
   }
 
+  // MoveTextCommand explicitly doesn't support multiple carets - it throws
+  // ExException("Move command supported only for one caret at the moment").
   @Test
   @Disabled
   fun testMoveTextBeforeCarets() {
@@ -328,6 +359,8 @@ class MultipleCaretsTest : VimTestCase() {
     assertState(after)
   }
 
+  // MoveTextCommand explicitly doesn't support multiple carets - it throws
+  // ExException("Move command supported only for one caret at the moment").
   @Test
   @Disabled
   fun testMoveTextAfterCarets() {
@@ -338,6 +371,8 @@ class MultipleCaretsTest : VimTestCase() {
     assertState(after)
   }
 
+  // MoveTextCommand explicitly doesn't support multiple carets - it throws
+  // ExException("Move command supported only for one caret at the moment").
   @Test
   @Disabled
   fun testMoveTextBetweenCarets() {
