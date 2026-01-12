@@ -140,7 +140,10 @@ class SearchGroupTest : VimTestCase() {
   }
 
   // VIM-856
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @TestWithoutNeovim(
+    reason = SkipNeovimReason.DIFFERENT,
+    description = "IdeaVim's regex engine handles negative lookbehind differently - expects no match for 'a\\@<!b' in 'ab', while Neovim may find a match"
+  )
   @Test
   fun `test negative lookbehind regression`() {
     val pos = search(
@@ -150,7 +153,10 @@ class SearchGroupTest : VimTestCase() {
     assertEquals(-1, pos)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @TestWithoutNeovim(
+    reason = SkipNeovimReason.DIFFERENT,
+    description = "IdeaVim's smartcase implementation differs - searches with all lowercase should be case-insensitive when smartcase is set"
+  )
   @Test
   fun `test smart case search case insensitive`() {
     configureByText("obj.toString();\n")
@@ -739,7 +745,10 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @TestWithoutNeovim(
+    reason = SkipNeovimReason.DIFFERENT,
+    description = "IdeaVim's * command honors ignorecase setting, while Neovim's * is always case-sensitive"
+  )
   @Test
   fun `test search word honours ignorecase`() {
     configureByText("${c}editor Editor editor")
@@ -749,7 +758,10 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @TestWithoutNeovim(
+    reason = SkipNeovimReason.DIFFERENT,
+    description = "IdeaVim's * command honors ignorecase setting, while Neovim's * is always case-sensitive"
+  )
   @Test
   fun `test search next word honours ignorecase`() {
     configureByText("${c}editor Editor editor")
@@ -758,7 +770,10 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(14)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @TestWithoutNeovim(
+    reason = SkipNeovimReason.DIFFERENT,
+    description = "IdeaVim's * command honors ignorecase and ignores smartcase, while Neovim's * is always case-sensitive"
+  )
   @TestFor(classes = [SearchWholeWordForwardAction::class])
   @Test
   fun `test search word overrides smartcase`() {
@@ -769,7 +784,10 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @TestWithoutNeovim(
+    reason = SkipNeovimReason.DIFFERENT,
+    description = "IdeaVim's * command honors ignorecase and ignores smartcase, while Neovim's * is always case-sensitive"
+  )
   @Test
   fun `test search next word overrides smartcase`() {
     configureByText("${c}Editor editor editor")
