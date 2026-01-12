@@ -40,6 +40,7 @@ object NeovimTesting {
   private lateinit var neovim: Process
 
   private var neovimTestsCounter = 0
+  private var neovimEnabledMessagePrinted = false
 
   private var currentTestName = ""
   private val untested = mutableListOf<String>()
@@ -52,6 +53,10 @@ object NeovimTesting {
 
   fun setUp(test: TestInfo) {
     if (!neovimEnabled(test)) return
+    if (!neovimEnabledMessagePrinted) {
+      println("========== NEOVIM TESTING ENABLED ==========")
+      neovimEnabledMessagePrinted = true
+    }
     val nvimPath = System.getenv("ideavim.nvim.path") ?: "nvim"
 
     val pb = ProcessBuilder(

@@ -135,8 +135,11 @@ Both `DIFFERENT` and `UNCLEAR` reasons are deprecated because they're too vague.
 1. **First, try removing the annotation and running with Neovim:**
    ```bash
    # Comment out or remove @TestWithoutNeovim, then run:
-   ./gradlew test -Dideavim.nvim.test=true --tests "ClassName.testMethodName"
+   ./gradlew test -Dnvim --tests "ClassName.testMethodName"
    ```
+
+   **IMPORTANT:** Verify the output contains `NEOVIM TESTING ENABLED` to confirm Neovim testing is active.
+   If this message is not present, the test ran without Neovim verification.
 
 2. **If the test passes with Neovim:**
    - The annotation is outdated and should be removed
@@ -231,8 +234,8 @@ are excluded from Neovim verification (viewport behavior differs).
 # Run all tests in a class
 ./gradlew test --tests "ClassName"
 
-# Run tests with Neovim verification
-./gradlew test -Dideavim.nvim.test=true --tests "ClassName"
+# Run tests with Neovim verification (look for "NEOVIM TESTING ENABLED" in output)
+./gradlew test -Dnvim --tests "ClassName"
 
 # Standard test suite (excludes property and long-running)
 ./gradlew test -x :tests:property-tests:test -x :tests:long-running-tests:test
