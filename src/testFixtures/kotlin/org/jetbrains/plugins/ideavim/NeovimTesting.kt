@@ -300,7 +300,10 @@ enum class SkipNeovimReason {
   @Suppress("unused")
   INLAYS,
   OPTION,
+
+  @Deprecated("Investigate the actual difference and use a more specific reason instead.")
   UNCLEAR,
+
   NON_ASCII,
   MAPPING,
   SELECT_MODE,

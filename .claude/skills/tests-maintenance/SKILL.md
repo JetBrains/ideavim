@@ -72,7 +72,7 @@ grep -rn "@TestWithoutNeovim(SkipNeovimReason\.[A-Z_]*)" --include="*.kt" src/te
 | `PLUGIN` | IdeaVim extension-specific behavior (surround, commentary, etc.) |
 | `INLAYS` | Test involves IntelliJ inlays (not present in Vim) |
 | `OPTION` | IdeaVim-specific option behavior |
-| `UNCLEAR` | Expected behavior is unclear - needs investigation |
+| `UNCLEAR` | **DEPRECATED** - Investigate and use a more specific reason |
 | `NON_ASCII` | Non-ASCII character handling differs |
 | `MAPPING` | Mapping-specific test |
 | `SELECT_MODE` | Vim's select mode |
@@ -128,9 +128,9 @@ grep -rn "@TestWithoutNeovim(SkipNeovimReason\.[A-Z_]*)" --include="*.kt" src/te
 - Use sparingly - if multiple tests share similar reasons, consider creating a new dedicated reason
 - Always check existing reasons first before using this catch-all
 
-**Handling `DIFFERENT` (DEPRECATED):**
+**Handling `DIFFERENT` and `UNCLEAR` (DEPRECATED):**
 
-The `DIFFERENT` reason is deprecated because it's too vague. When you encounter a test with `SkipNeovimReason.DIFFERENT`, follow this process:
+Both `DIFFERENT` and `UNCLEAR` reasons are deprecated because they're too vague. When you encounter a test with either of these reasons, follow this process:
 
 1. **First, try removing the annotation and running with Neovim:**
    ```bash
