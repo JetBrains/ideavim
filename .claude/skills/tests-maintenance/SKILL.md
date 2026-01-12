@@ -77,7 +77,7 @@ grep -rn "@TestWithoutNeovim(SkipNeovimReason\.[A-Z_]*)" --include="*.kt" src/te
 | `MAPPING` | Mapping-specific test |
 | `SELECT_MODE` | Vim's select mode |
 | `VISUAL_BLOCK_MODE` | Visual block mode edge cases |
-| `DIFFERENT` | Intentionally different behavior from Vim |
+| `DIFFERENT` | **DEPRECATED** - Use a more specific reason instead |
 | `NOT_VIM_TESTING` | Test doesn't verify Vim behavior (IDE integration, etc.) |
 | `SHOW_CMD` | :showcmd related differences |
 | `SCROLL` | Scrolling behavior (viewport differs) |
@@ -127,6 +127,30 @@ grep -rn "@TestWithoutNeovim(SkipNeovimReason\.[A-Z_]*)" --include="*.kt" src/te
 - The `description` parameter is **mandatory** and must provide a clear, specific explanation
 - Use sparingly - if multiple tests share similar reasons, consider creating a new dedicated reason
 - Always check existing reasons first before using this catch-all
+
+**Handling `DIFFERENT` (DEPRECATED):**
+
+The `DIFFERENT` reason is deprecated because it's too vague. When you encounter a test with `SkipNeovimReason.DIFFERENT`, follow this process:
+
+1. **First, try removing the annotation and running with Neovim:**
+   ```bash
+   # Comment out or remove @TestWithoutNeovim, then run:
+   ./gradlew test -Dideavim.nvim.test=true --tests "ClassName.testMethodName"
+   ```
+
+2. **If the test passes with Neovim:**
+   - The annotation is outdated and should be removed
+   - IdeaVim and Neovim now behave identically for this case
+
+3. **If the test fails with Neovim:**
+   - Analyze the failure to understand WHY the behavior differs
+   - Replace `DIFFERENT` with a more specific reason:
+     - `IDEAVIM_API_USED` - if test uses VimPlugin.* or injector.* APIs directly
+     - `IDEAVIM_WORKS_INTENTIONALLY_DIFFERENT` - if IdeaVim intentionally deviates (need evidence)
+     - `INTELLIJ_PLATFORM_INHERITED_DIFFERENCE` - if difference comes from Platform constraints
+     - `SEE_DESCRIPTION` - for unique cases that don't fit other categories (description required)
+     - Or another appropriate reason from the table above
+   - Always add a `description` parameter explaining the specific difference
 
 ### 3. Test Quality & Readability
 
