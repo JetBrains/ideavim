@@ -305,6 +305,8 @@ enum class SkipNeovimReason {
   MAPPING,
   SELECT_MODE,
   VISUAL_BLOCK_MODE,
+
+  @Deprecated("Use a more specific reason instead. Consider SEE_DESCRIPTION with a detailed explanation, or create a new dedicated reason if a pattern emerges.")
   DIFFERENT,
 
   // This test doesn't check vim behaviour
