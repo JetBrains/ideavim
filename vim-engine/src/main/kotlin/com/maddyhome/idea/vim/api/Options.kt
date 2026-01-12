@@ -136,6 +136,7 @@ object Options {
       )
     )
   )
+  val maxhlduringincsearch: NumberOption = addOption(NumberOption(name="maxhlduringincsearch", GLOBAL, "maxhld", 100, -1))
   val maxmapdepth: NumberOption = addOption(NumberOption("maxmapdepth", GLOBAL, "mmd", 20))
   val more: ToggleOption = addOption(ToggleOption("more", GLOBAL, "more", true))
   val nrformats: StringListOption = addOption(

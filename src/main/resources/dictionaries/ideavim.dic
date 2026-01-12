@@ -23,6 +23,7 @@ keymodel
 lookupKeys
 mapleader
 matchpairs
+maxhlduringincsearch
 maxmapdepth
 nrformats
 operatorfunc

@@ -107,6 +107,12 @@ private fun updateSearchHighlights(
       && (currentEditor == null || it.projectId == currentEditor.projectId)
   }
 
+  val shouldIgnoreCase = pattern == null || shouldIgnoreCase(pattern, shouldIgnoreSmartCase)
+
+  var maxhlduringincsearch = injector.globalOptions().maxhlduringincsearch
+  if (maxhlduringincsearch < 0)
+    maxhlduringincsearch = Int.MAX_VALUE
+
   editors.forEach {
     val editor = it.ij
     var currentMatchOffset = -1
@@ -136,13 +142,24 @@ private fun updateSearchHighlights(
             pattern,
             searchStartLine,
             searchEndLine,
-            shouldIgnoreCase(pattern, shouldIgnoreSmartCase)
+            shouldIgnoreCase
           )
         if (results.isNotEmpty()) {
-          if (editor === currentEditor?.ij) {
-            currentMatchOffset = findClosestMatch(results, initialOffset, count1, forwards)
+          // Only in incsearch is current editor not null, then check result size
+          val showHighlightsInEditor = currentEditor == null || results.size < maxhlduringincsearch
+          if (editor == currentEditor?.ij) {
+            val currentMatchIndex = findClosestMatch(results, initialOffset, count1, forwards)
+            currentMatchOffset = if (currentMatchIndex == -1) -1 else results[currentMatchIndex].startOffset
+
+            if (!showHighlightsInEditor) {
+              // Always highlight at least the "current" match in the active editor
+              highlightSearchResults(editor, pattern, listOf(results[currentMatchIndex]), currentMatchOffset)
+            }
           }
-          highlightSearchResults(editor, pattern, results, currentMatchOffset)
+
+          if (showHighlightsInEditor) {
+            highlightSearchResults(editor, pattern, results, currentMatchOffset)
+          }
         }
       }
       editor.vimLastSearch = pattern
@@ -237,7 +254,7 @@ private fun findClosestMatch(
     return -1
   }
 
-  return sortedResults[nextIndex % results.size].startOffset
+  return nextIndex % results.size
 }
 
 internal fun highlightSearchResults(
