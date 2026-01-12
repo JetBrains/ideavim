@@ -51,6 +51,7 @@ open class GlobalOptions(scope: OptionAccessScope) : OptionsPropertiesBase(scope
 
   // IdeaVim specific options. Put any editor or IDE specific options in IjOptionProperties
   var maxhlduringincsearch: Int by optionProperty(Options.maxhlduringincsearch)
+  var showmatchcount: Boolean by optionProperty(Options.showmatchcount)
 
   // Temporary flags for work-in-progress behaviour. Hidden from the output of `:set all`
   var ideastrictmode: Boolean by optionProperty(Options.ideastrictmode)

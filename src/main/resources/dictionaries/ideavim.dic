@@ -35,6 +35,7 @@ shellcmdflag
 shellxescape
 shellxquote
 showcmd
+showmatchcount
 showmode
 sidescroll
 sidescrolloff

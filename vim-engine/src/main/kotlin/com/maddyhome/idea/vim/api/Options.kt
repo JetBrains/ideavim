@@ -183,6 +183,7 @@ object Options {
     )
   )
   val showcmd: ToggleOption = addOption(ToggleOption("showcmd", GLOBAL, "sc", true))
+  val showmatchcount: ToggleOption = addOption(ToggleOption("showmatchcount", GLOBAL, "smc", false))
   val showmode: ToggleOption = addOption(ToggleOption("showmode", GLOBAL, "smd", true))
   val sidescroll: NumberOption = addOption(UnsignedNumberOption("sidescroll", GLOBAL, "ss", 0))
   val sidescrolloff: NumberOption = addOption(
