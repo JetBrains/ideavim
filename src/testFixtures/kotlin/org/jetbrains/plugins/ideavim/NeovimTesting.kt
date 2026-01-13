@@ -325,7 +325,6 @@ enum class SkipNeovimReason {
   TEMPLATES,
   EDITOR_MODIFICATION,
 
-  CMD,
   ACTION_COMMAND,
   FOLDING,
   TABS,
