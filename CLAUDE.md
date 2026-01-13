@@ -28,6 +28,24 @@ This project uses **YouTrack** for issue tracking, NOT GitHub Issues.
 - YouTrack URL: https://youtrack.jetbrains.com/issues/VIM
 - `gh issue` commands will NOT work
 
+## Claude Code on Web
+
+When running in Claude Code on web, Gradle/Java builds require special proxy configuration.
+
+**Detection**: The environment is detected by `CLAUDE_CODE_PROXY_RESOLVES_HOSTS=true` and JWT-based `HTTP_PROXY`.
+
+**Automatic Setup**: The SessionStart hook (`.claude/hooks/session-start.sh`) automatically configures:
+- Local proxy shim on `127.0.0.1:3128`
+- Gradle and Maven proxy settings
+- `JAVA_TOOL_OPTIONS` environment variable
+
+**Running Gradle**: Always prefix with `JAVA_TOOL_OPTIONS`:
+```bash
+JAVA_TOOL_OPTIONS="-Dhttp.proxyHost=127.0.0.1 -Dhttp.proxyPort=3128 -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=3128" ./gradlew <task> --console=plain
+```
+
+**Full Documentation**: See `CLAUDE_CODE_WEB_SETUP.md` and `.claude/web-instructions.md`.
+
 ## Additional Documentation
 
 - Changelog maintenance: Handled by the `changelog` skill (auto-detected when updating changelog)
