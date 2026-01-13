@@ -2,6 +2,9 @@
 
 This file is loaded when Claude Code detects it's running in the web environment.
 
+**Known Issue**: https://github.com/anthropics/claude-code/issues/13372
+**Solution Source**: https://github.com/realgenekim/claude-code-web-bootstrap-clojure-sandbox
+
 ## Environment Detection
 
 Claude Code on web is detected by these environment variables:

@@ -2,11 +2,12 @@
 # SessionStart hook for Claude Code on web
 # Automatically configures Java/Gradle/Maven proxy when running in web environment
 #
-# The proxy shim approach is based on:
-# https://github.com/realgenekim/claude-code-web-bootstrap-clojure-sandbox
-#
 # Problem: Java/Gradle can't authenticate with Claude Code's JWT-based proxy
 # Solution: Local proxy shim that handles auth translation
+#
+# References:
+# - Issue: https://github.com/anthropics/claude-code/issues/13372
+# - Solution source: https://github.com/realgenekim/claude-code-web-bootstrap-clojure-sandbox
 
 # Detect Claude Code on web environment
 is_claude_code_web() {
@@ -32,6 +33,7 @@ cat > "$PROXY_SHIM_PATH" << 'PROXY_SCRIPT'
 """
 Local proxy shim for Claude Code web - handles auth translation for Java/Gradle/Maven.
 
+Issue: https://github.com/anthropics/claude-code/issues/13372
 Based on: https://github.com/realgenekim/claude-code-web-bootstrap-clojure-sandbox
 """
 import socket, threading, os, base64, select

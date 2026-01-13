@@ -31,6 +31,7 @@ This project uses **YouTrack** for issue tracking, NOT GitHub Issues.
 ## Claude Code on Web
 
 When running in Claude Code on web, Gradle/Java builds require special proxy configuration.
+This is a [known issue](https://github.com/anthropics/claude-code/issues/13372).
 
 **Detection**: The environment is detected by `CLAUDE_CODE_PROXY_RESOLVES_HOSTS=true` and JWT-based `HTTP_PROXY`.
 
