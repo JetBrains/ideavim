@@ -60,7 +60,7 @@ class MotionPercentOrMatchActionJavaTest : VimJavaTestCase() {
     assertState("/*$c foo */")
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR)
+  @TestWithoutNeovim(SkipNeovimReason.PSI, "Comment matching uses IntelliJ's PSI to understand Java syntax")
   @Test
   fun `test percent doesnt match before comment end`() {
     configureByJavaText("/* foo $c */")

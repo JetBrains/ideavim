@@ -276,7 +276,7 @@ class RepeatChangeActionTest : VimTestCase() {
     doTest(keys, before, after, Mode.NORMAL())
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR)
+  @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE, "Visual block mode with $ motion and repeat has edge case differences")
   @Test
   fun `test block with dollar motion`() {
     val keys = listOf("<C-V>j\$rXj^", ".")

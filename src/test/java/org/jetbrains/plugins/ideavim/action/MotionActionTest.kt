@@ -284,7 +284,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // |v_as|
-  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR)
+  @TestWithoutNeovim(SkipNeovimReason.SEE_DESCRIPTION, "Boundary behavior when sentence motion count exceeds available content")
   @Test
   fun testSentenceMotionPastStartOfFile() {
     val keys = listOf("8(")
@@ -1210,7 +1210,7 @@ two
   }
 
   // VIM-646 |gv|
-  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR)
+  @TestWithoutNeovim(SkipNeovimReason.SEE_DESCRIPTION, "Visual selection restoration with 'gv' after yank and paste operations differs")
   @Test
   fun testRestoreMultiLineSelectionAfterYank() {
     val keys = listOf("V", "j", "y", "G", "p", "gv", "d")
