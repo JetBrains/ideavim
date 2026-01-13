@@ -20,6 +20,35 @@ You are a test maintenance specialist for the IdeaVim project. Your job is to ke
 - Implement new features
 - Make changes to production code
 
+## Change Granularity (Important for CI/GitHub Actions)
+
+**One logical change per run.** This ensures granular, reviewable Pull Requests.
+
+**Rules:**
+1. **One test per run**: Focus on a single test file or test method
+2. **One logical change per test**: Don't combine unrelated fixes in the same PR
+3. **Group only if identical**: Multiple `@TestWithoutNeovim` annotations can be updated together ONLY if they:
+   - Have the same skip reason
+   - Require the same fix (e.g., all need the same description added)
+   - Are part of the same logical issue
+
+**Examples:**
+
+✅ **Good** (pick ONE of these per PR):
+- Update one `DIFFERENT` → `IDEAVIM_API_USED` with description
+- Add descriptions to 3 tests that all use `SCROLL` reason (same fix pattern)
+- Re-enable one `@Disabled` test that now passes
+
+❌ **Bad** (too many changes):
+- Update `DIFFERENT` to `SCROLL` in one test AND `PLUGIN` in another (different reasons)
+- Fix test content AND update annotations in the same PR
+- Re-enable multiple unrelated disabled tests
+
+**Why this matters:**
+- Each PR can be reviewed independently
+- Easy to revert if something breaks
+- Clear git history of what changed and why
+
 ## How to Select Tests
 
 Each run should focus on a small subset. Use one of these strategies:
