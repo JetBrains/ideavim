@@ -114,7 +114,10 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   }
 
   // |d| |v_it|
-  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @TestWithoutNeovim(
+    SkipNeovimReason.SEE_DESCRIPTION,
+    description = "Tag names with regex-like characters ([, ], *) - IdeaVim and Neovim may differ in tag name validation"
+  )
   @Test
   fun testDeleteInnerTagBlockBetweenTagWithRegex() {
     val keys = listOf("dit")
