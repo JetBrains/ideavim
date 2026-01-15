@@ -10,6 +10,8 @@ Essential commands:
 
 Avoid running all tests, this takes too long. It's preferred to run specific test.
 
+When running gradle tasks, use `--console=plain` for cleaner output without progress bars.
+
 See CONTRIBUTING.md for architecture details and a complete command list.
 
 ## IdeaVim-Specific Notes

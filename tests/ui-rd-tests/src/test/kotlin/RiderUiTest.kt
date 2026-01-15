@@ -6,7 +6,6 @@
  * https://opensource.org/licenses/MIT.
  */
 
-import com.automation.remarks.junit5.Video
 import com.intellij.remoterobot.RemoteRobot
 import com.intellij.remoterobot.steps.CommonSteps
 import com.intellij.remoterobot.stepsProcessing.step
@@ -32,12 +31,12 @@ class RiderUiTest {
   private lateinit var commonSteps: CommonSteps
 
   @Test
-  @Video
   fun run() = uiTest("ideaVimTest") {
     commonSteps = CommonSteps(this)
 
     startNewProject()
-    Thread.sleep(1000)
+    // Wait longer for project creation to complete and IDE to open
+    Thread.sleep(5000)
 
     idea {
       waitSmartMode()
@@ -111,11 +110,35 @@ class RiderUiTest {
   }
 
   private fun RemoteRobot.startNewProject() {
-    manageLicensesFrame {
-      enableFreeTier()
+    // Handle license activation if the dialog appears
+    try {
+      manageLicensesFrame {
+        enableFreeTier()
+      }
+    } catch (e: Exception) {
+      // License frame not found, likely already activated
     }
+
     welcomeFrame {
       createNewSolutionLink.click()
+
+      // Handle .NET SDK installation if needed
+      // The "Install" button appears when .NET SDK is not detected
+      try {
+        val installButton = button("Install")
+        if (installButton.isShowing && installButton.isEnabled()) {
+          step("Install .NET SDK") {
+            installButton.click()
+            // Wait for SDK installation to complete and Create button to enable
+            Thread.sleep(10000)
+          }
+        }
+      } catch (e: Exception) {
+        // Install button not found, SDK likely already installed
+      }
+
+      // Wait a bit more to ensure Create button is ready
+      Thread.sleep(2000)
       button("Create").click()
     }
   }

@@ -12,23 +12,18 @@ import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.BuiltinFunctionHandler
 
 @VimscriptFunction(name = "nr2char")
-internal class Nr2charFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments = 1
-  override val maximumNumberOfArguments = 2
-
+internal class Nr2charFunctionHandler : BuiltinFunctionHandler<VimString>(minArity = 1, maxArity = 2) {
   override fun doFunction(
-    argumentValues: List<Expression>,
+    arguments: Arguments,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
-  ): VimDataType {
-    val number = argumentValues[0].evaluate(editor, context, vimContext).toVimNumber().value
+  ): VimString {
+    val number = arguments.getNumber(0).value
 
     // Convert number to character
     // Vim returns empty string for invalid code points

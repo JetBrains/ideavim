@@ -17,43 +17,20 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 data class SublistExpression(val from: Expression?, val to: Expression?, val expression: Expression)
   : LValueExpression() {
 
   override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
     val expressionValue = expression.evaluate(editor, context, vimContext)
-    val fromValue = from?.evaluate(editor, context, vimContext)?.toVimNumber()?.value ?: 0
-    val toValue = to?.evaluate(editor, context, vimContext)?.toVimNumber()?.value ?: -1
-
-    val arraySize = when (expressionValue) {
-      is VimDictionary -> throw exExceptionMessage("E719")
-      is VimFuncref -> throw exExceptionMessage("E695")
-      is VimList -> expressionValue.values.size
-      else -> expressionValue.toVimString().value.length
-    }
-
-    val start = if (fromValue < 0) fromValue + arraySize else fromValue
-    val end = (if (toValue < 0) toValue + arraySize else toValue).coerceAtMost(arraySize - 1)
+    val start = from?.evaluate(editor, context, vimContext)?.toVimNumber()?.value ?: 0
+    val endInclusive = to?.evaluate(editor, context, vimContext)?.toVimNumber()?.value ?: -1
 
     return when (expressionValue) {
-      is VimList -> {
-        val result = mutableListOf<VimDataType>()
-        if (start >= 0 && end < arraySize) {
-          for (i in start..end) {
-            result.add(expressionValue.values[i])
-          }
-        }
-        VimList(result)
-      }
-
-      else -> {
-        when {
-          start < 0 || end < 0 || end < start -> VimString.EMPTY
-          else -> VimString(expressionValue.toVimString().value.substring(start, end + 1))
-        }
-      }
+      is VimDictionary -> throw exExceptionMessage("E719")
+      is VimFuncref -> throw exExceptionMessage("E695")
+      is VimList -> expressionValue.slice(start, endInclusive + 1)
+      else -> expressionValue.toVimString().substring(start, endInclusive + 1)
     }
   }
 

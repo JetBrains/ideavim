@@ -140,7 +140,7 @@ class SearchGroupTest : VimTestCase() {
   }
 
   // VIM-856
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @TestWithoutNeovim(reason = SkipNeovimReason.IDEAVIM_API_USED)
   @Test
   fun `test negative lookbehind regression`() {
     val pos = search(
@@ -150,7 +150,6 @@ class SearchGroupTest : VimTestCase() {
     assertEquals(-1, pos)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   @Test
   fun `test smart case search case insensitive`() {
     configureByText("obj.toString();\n")
@@ -739,7 +738,6 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   @Test
   fun `test search word honours ignorecase`() {
     configureByText("${c}editor Editor editor")
@@ -749,7 +747,6 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   @Test
   fun `test search next word honours ignorecase`() {
     configureByText("${c}editor Editor editor")
@@ -758,7 +755,6 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(14)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   @TestFor(classes = [SearchWholeWordForwardAction::class])
   @Test
   fun `test search word overrides smartcase`() {
@@ -769,7 +765,6 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   @Test
   fun `test search next word overrides smartcase`() {
     configureByText("${c}Editor editor editor")

@@ -21,39 +21,31 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.BuiltinFunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.UnaryFunctionHandler
 
 // TODO: 03.08.2021 Support second parameter
 @VimscriptFunction(name = "line")
-internal class LineFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments = 1
-  override val maximumNumberOfArguments = 2
-
+internal class LineFunctionHandler : BuiltinFunctionHandler<VimInt>(minArity = 1, maxArity = 2) {
   override fun doFunction(
-    argumentValues: List<Expression>,
+    arguments: Arguments,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
   ): VimInt {
-    val argument = argumentValues[0].evaluate(editor, context, vimContext)
-    return variableToPosition(editor, argument, true)?.first ?: VimInt.ZERO
+    return variableToPosition(editor, arguments[0], true)?.first ?: VimInt.ZERO
   }
 }
 
 @VimscriptFunction(name = "col")
-internal class ColFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments = 1
-  override val maximumNumberOfArguments = 1
-
+internal class ColFunctionHandler : UnaryFunctionHandler<VimInt>() {
   override fun doFunction(
-    argumentValues: List<Expression>,
+    arguments: Arguments,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
-  ): VimDataType {
-    val argument = argumentValues[0].evaluate(editor, context, vimContext)
-    return variableToPosition(editor, argument, false)?.second ?: VimInt.ZERO
+  ): VimInt {
+    return variableToPosition(editor, arguments[0], false)?.second ?: VimInt.ZERO
   }
 }
 

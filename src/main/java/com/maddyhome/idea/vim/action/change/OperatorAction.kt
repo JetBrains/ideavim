@@ -11,9 +11,9 @@ import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.setChangeMarks
 import com.maddyhome.idea.vim.command.Argument
@@ -28,11 +28,11 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.inRepeatMode
 import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
-import com.maddyhome.idea.vim.vimscript.model.expressions.FunctionCallExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
+import com.maddyhome.idea.vim.vimscript.model.functions.toVimFuncref
 
 // todo make it multicaret
 private fun doOperatorAction(
@@ -41,59 +41,36 @@ private fun doOperatorAction(
   textRange: TextRange,
   motionType: SelectionType,
 ): Boolean {
-  val func = injector.globalOptions().operatorfunc
-  if (func.isEmpty()) {
+  val operatorfunc = injector.optionGroup.getOptionValue(Options.operatorfunc, OptionAccessScope.GLOBAL(editor))
+  if (operatorfunc.value.isEmpty()) {
     injector.messages.showStatusBarMessage(editor, injector.messages.message("E774"))
     return false
   }
 
   val scriptContext = CommandLineVimLContext
 
-  // The option value is either a function name, which should have a handler, or it might be a lambda expression, or a
-  // `function` or `funcref` call expression, all of which will return a funcref (with a handler)
-  var handler = injector.functionService.getFunctionHandlerOrNull(null, func, scriptContext)
-  if (handler == null) {
-    val expression = injector.vimscriptParser.parseExpression(func)
-    if (expression != null) {
-      try {
-        val value = expression.evaluate(editor, context, scriptContext)
-        if (value is VimFuncref) {
-          handler = value.handler
-        }
-      } catch (_: ExException) {
-        // Get the argument for function(...) or funcref(...) for the error message
-        val functionName = if (expression is FunctionCallExpression && expression.arguments.isNotEmpty()) {
-          expression.arguments[0].evaluate(editor, context, scriptContext).toOutputString()
-        } else {
-          func
-        }
+  try {
+    val funcref = operatorfunc.toVimFuncref(editor, context, scriptContext)
 
-        injector.messages.showStatusBarMessage(editor, injector.messages.message("E117", functionName))
-        return false
-      }
+    val arg = when (motionType) {
+      SelectionType.LINE_WISE -> "line"
+      SelectionType.CHARACTER_WISE -> "char"
+      SelectionType.BLOCK_WISE -> "block"
     }
-  }
 
-  if (handler == null) {
-    injector.messages.showStatusBarMessage(editor, injector.messages.message("E117", func))
+    val saveRepeatHandler = VimRepeater.repeatHandler
+    injector.markService.setChangeMarks(editor.primaryCaret(), textRange)
+    KeyHandler.getInstance().reset(editor)
+
+    val arguments = listOf(SimpleExpression(arg))
+    funcref.execute(arguments, range = null, editor, context, scriptContext)
+
+    VimRepeater.repeatHandler = saveRepeatHandler
+    return true
+  } catch (e: ExException) {
+    injector.messages.showStatusBarMessage(editor, e.message)
     return false
   }
-
-  val arg = when (motionType) {
-    SelectionType.LINE_WISE -> "line"
-    SelectionType.CHARACTER_WISE -> "char"
-    SelectionType.BLOCK_WISE -> "block"
-  }
-
-  val saveRepeatHandler = VimRepeater.repeatHandler
-  injector.markService.setChangeMarks(editor.primaryCaret(), textRange)
-  KeyHandler.getInstance().reset(editor)
-
-  val arguments = listOf(SimpleExpression(arg))
-  handler.executeFunction(arguments, editor, context, scriptContext)
-
-  VimRepeater.repeatHandler = saveRepeatHandler
-  return true
 }
 
 @CommandOrMotion(keys = ["g@"], modes = [Mode.NORMAL])

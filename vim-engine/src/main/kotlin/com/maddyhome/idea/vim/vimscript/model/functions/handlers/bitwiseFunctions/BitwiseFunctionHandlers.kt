@@ -12,25 +12,12 @@ import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.BinaryFunctionHandler
 
-internal abstract class BinaryBitwiseFunctionHandlerBase : FunctionHandler() {
-  override val minimumNumberOfArguments = 2
-  override val maximumNumberOfArguments = 2
-
-  override fun doFunction(
-    argumentValues: List<Expression>,
-    editor: VimEditor,
-    context: ExecutionContext,
-    vimContext: VimLContext,
-  ): VimDataType {
-    val arg1 = argumentValues[0].evaluate(editor, context, vimContext)
-    val arg2 = argumentValues[1].evaluate(editor, context, vimContext)
-    return VimInt(invoke(arg1.toVimNumber().value, arg2.toVimNumber().value))
-  }
+internal abstract class BinaryBitwiseFunctionHandlerBase : BinaryFunctionHandler<VimInt>() {
+  override fun doFunction(arguments: Arguments, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext) =
+    VimInt(invoke(arguments.getNumber(0).value, arguments.getNumber(1).value))
 
   abstract fun invoke(a: Int, b: Int): Int
 }

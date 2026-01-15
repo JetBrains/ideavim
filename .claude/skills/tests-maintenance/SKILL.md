@@ -20,6 +20,35 @@ You are a test maintenance specialist for the IdeaVim project. Your job is to ke
 - Implement new features
 - Make changes to production code
 
+## Change Granularity (Important for CI/GitHub Actions)
+
+**One logical change per run.** This ensures granular, reviewable Pull Requests.
+
+**Rules:**
+1. **One test per run**: Focus on a single test file or test method
+2. **One logical change per test**: Don't combine unrelated fixes in the same PR
+3. **Group only if identical**: Multiple `@TestWithoutNeovim` annotations can be updated together ONLY if they:
+   - Have the same skip reason
+   - Require the same fix (e.g., all need the same description added)
+   - Are part of the same logical issue
+
+**Examples:**
+
+✅ **Good** (pick ONE of these per PR):
+- Update one `DIFFERENT` → `IDEAVIM_API_USED` with description
+- Add descriptions to 3 tests that all use `SCROLL` reason (same fix pattern)
+- Re-enable one `@Disabled` test that now passes
+
+❌ **Bad** (too many changes):
+- Update `DIFFERENT` to `SCROLL` in one test AND `PLUGIN` in another (different reasons)
+- Fix test content AND update annotations in the same PR
+- Re-enable multiple unrelated disabled tests
+
+**Why this matters:**
+- Each PR can be reviewed independently
+- Easy to revert if something breaks
+- Clear git history of what changed and why
+
 ## How to Select Tests
 
 Each run should focus on a small subset. Use one of these strategies:
@@ -72,12 +101,12 @@ grep -rn "@TestWithoutNeovim(SkipNeovimReason\.[A-Z_]*)" --include="*.kt" src/te
 | `PLUGIN` | IdeaVim extension-specific behavior (surround, commentary, etc.) |
 | `INLAYS` | Test involves IntelliJ inlays (not present in Vim) |
 | `OPTION` | IdeaVim-specific option behavior |
-| `UNCLEAR` | Expected behavior is unclear - needs investigation |
+| `UNCLEAR` | **DEPRECATED** - Investigate and use a more specific reason |
 | `NON_ASCII` | Non-ASCII character handling differs |
 | `MAPPING` | Mapping-specific test |
 | `SELECT_MODE` | Vim's select mode |
 | `VISUAL_BLOCK_MODE` | Visual block mode edge cases |
-| `DIFFERENT` | Intentionally different behavior from Vim |
+| `DIFFERENT` | **DEPRECATED** - Use a more specific reason instead |
 | `NOT_VIM_TESTING` | Test doesn't verify Vim behavior (IDE integration, etc.) |
 | `SHOW_CMD` | :showcmd related differences |
 | `SCROLL` | Scrolling behavior (viewport differs) |
@@ -127,6 +156,33 @@ grep -rn "@TestWithoutNeovim(SkipNeovimReason\.[A-Z_]*)" --include="*.kt" src/te
 - The `description` parameter is **mandatory** and must provide a clear, specific explanation
 - Use sparingly - if multiple tests share similar reasons, consider creating a new dedicated reason
 - Always check existing reasons first before using this catch-all
+
+**Handling `DIFFERENT` and `UNCLEAR` (DEPRECATED):**
+
+Both `DIFFERENT` and `UNCLEAR` reasons are deprecated because they're too vague. When you encounter a test with either of these reasons, follow this process:
+
+1. **First, try removing the annotation and running with Neovim:**
+   ```bash
+   # Comment out or remove @TestWithoutNeovim, then run:
+   ./gradlew test -Dnvim --tests "ClassName.testMethodName"
+   ```
+
+   **IMPORTANT:** Verify the output contains `NEOVIM TESTING ENABLED` to confirm Neovim testing is active.
+   If this message is not present, the test ran without Neovim verification.
+
+2. **If the test passes with Neovim:**
+   - The annotation is outdated and should be removed
+   - IdeaVim and Neovim now behave identically for this case
+
+3. **If the test fails with Neovim:**
+   - Analyze the failure to understand WHY the behavior differs
+   - Replace `DIFFERENT` with a more specific reason:
+     - `IDEAVIM_API_USED` - if test uses VimPlugin.* or injector.* APIs directly
+     - `IDEAVIM_WORKS_INTENTIONALLY_DIFFERENT` - if IdeaVim intentionally deviates (need evidence)
+     - `INTELLIJ_PLATFORM_INHERITED_DIFFERENCE` - if difference comes from Platform constraints
+     - `SEE_DESCRIPTION` - for unique cases that don't fit other categories (description required)
+     - Or another appropriate reason from the table above
+   - Always add a `description` parameter explaining the specific difference
 
 ### 3. Test Quality & Readability
 
@@ -207,8 +263,8 @@ are excluded from Neovim verification (viewport behavior differs).
 # Run all tests in a class
 ./gradlew test --tests "ClassName"
 
-# Run tests with Neovim verification
-./gradlew test -Dideavim.nvim.test=true --tests "ClassName"
+# Run tests with Neovim verification (look for "NEOVIM TESTING ENABLED" in output)
+./gradlew test -Dnvim --tests "ClassName"
 
 # Standard test suite (excludes property and long-running)
 ./gradlew test -x :tests:property-tests:test -x :tests:long-running-tests:test

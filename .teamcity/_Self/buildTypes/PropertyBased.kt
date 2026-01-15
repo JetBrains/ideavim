@@ -27,9 +27,10 @@ object PropertyBased : IdeaVimBuildType({
   steps {
     gradle {
       clearConditions()
-      tasks = "clean :tests:property-tests:test"
+      tasks = ":tests:property-tests:test"
       buildFile = ""
       enableStacktrace = true
+      gradleParams = "--build-cache --configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
   }

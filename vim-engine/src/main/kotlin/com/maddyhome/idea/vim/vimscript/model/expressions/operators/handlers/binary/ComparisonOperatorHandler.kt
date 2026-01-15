@@ -52,12 +52,15 @@ internal abstract class ComparisonOperatorHandler(ignoreCase: Boolean?) :
         compare(leftFloat, rightFloat)
       }
 
-      left is VimString || right is VimString -> {
-        compare(left.toVimString().value, right.toVimString().value, ignoreCase)
-      }
-
+      // Number takes precedence over String.
+      // E.g. `echo 'two' > 1` => 0, because 'two' is parsed as 0. If String took precedence, this would be true,
+      // because 't' is greater than the char '1'
       left is VimInt || right is VimInt -> {
         compare(left.toVimNumber().value, right.toVimNumber().value)
+      }
+
+      left is VimString || right is VimString -> {
+        compare(left.toVimString().value, right.toVimString().value, ignoreCase)
       }
 
       else -> throw exExceptionMessage("E474")

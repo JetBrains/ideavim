@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.CurlyBracesName
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.FalsyExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.FuncrefCallExpression
-import com.maddyhome.idea.vim.vimscript.model.expressions.FunctionCallExpression
+import com.maddyhome.idea.vim.vimscript.model.expressions.NamedFunctionCallExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.IndexedExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.SublistExpression
@@ -119,7 +119,7 @@ open class ExpressionPrecedenceTest : VimTestCase("\n") {
         if (wrapComplexExpression) append(')')
       }
 
-      is FunctionCallExpression -> buildString {
+      is NamedFunctionCallExpression -> buildString {
         if (wrapComplexExpression) append('(')
         append(formatExpression(expression.functionName))
         append('(')

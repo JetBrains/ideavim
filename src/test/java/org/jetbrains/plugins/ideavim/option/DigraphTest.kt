@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test
  */
 // TODO: 2019-06-18 VimOptionsTestCase
 class DigraphTest : VimTestCase() {
-  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, "backspace works strange")
+  @TestWithoutNeovim(SkipNeovimReason.NEOVIM_RPC_SPECIAL_KEYS_INSERT_MODE)
   @Test
   fun `test digraph`() {
     doTest(
@@ -46,7 +46,7 @@ class DigraphTest : VimTestCase() {
     }
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, "backspace works strange")
+  @TestWithoutNeovim(SkipNeovimReason.NEOVIM_RPC_SPECIAL_KEYS_INSERT_MODE)
   @Test
   fun `test digraph with custom digraph`() {
     doTest(
@@ -74,7 +74,7 @@ class DigraphTest : VimTestCase() {
     }
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, "backspace works strange")
+  @TestWithoutNeovim(SkipNeovimReason.NEOVIM_RPC_SPECIAL_KEYS_INSERT_MODE)
   @Test
   fun `test digraph stops`() {
     doTest(
@@ -101,7 +101,7 @@ class DigraphTest : VimTestCase() {
     }
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, "backspace works strange")
+  @TestWithoutNeovim(SkipNeovimReason.NEOVIM_RPC_SPECIAL_KEYS_INSERT_MODE)
   @Test
   fun `test digraph double backspace`() {
     doTest(
@@ -128,7 +128,7 @@ class DigraphTest : VimTestCase() {
     }
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, "backspace works strange")
+  @TestWithoutNeovim(SkipNeovimReason.NEOVIM_RPC_SPECIAL_KEYS_INSERT_MODE)
   @Test
   fun `test digraph backspace digraph`() {
     doTest(

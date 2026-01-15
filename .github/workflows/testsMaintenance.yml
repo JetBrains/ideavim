@@ -24,6 +24,12 @@ jobs:
         with:
           fetch-depth: 0  # Need history for context
 
+      - name: Install Neovim
+        run: |
+          wget https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
+          tar xzf nvim-linux-x86_64.tar.gz
+          echo "$PWD/nvim-linux-x86_64/bin" >> $GITHUB_PATH
+
       - name: Run Claude Code for Tests Maintenance
         uses: anthropics/claude-code-action@v1
         with:
@@ -49,6 +55,14 @@ jobs:
             the Neovim state. In these cases, use @TestWithoutNeovim with IDEAVIM_API_USED as
             the skip reason and provide a description of which API is being used.
 
+            ## Verifying Neovim Behavior
+
+            When working with @TestWithoutNeovim annotations or investigating skip reasons,
+            verify the actual behavior in Neovim by running `nvim` directly. For example:
+            - `echo "test content" | nvim -u NONE -` to test with specific content
+            - Use `:normal` commands to execute Vim commands programmatically
+            This helps ensure skip reasons are accurate and not based on assumptions.
+
             ## Important Guidelines
 
             - Only work on tests, never fix source code bugs
@@ -70,4 +84,4 @@ jobs:
             If no changes are needed, do not create a pull request.
 
           # Allow Claude to use necessary tools for test inspection and maintenance
-          claude_args: '--allowed-tools "Skill,Read,Edit,Write,Glob,Grep,Bash(git:*),Bash(gh:*),Bash(./gradlew:*),Bash(find:*),Bash(shuf:*)"'
+          claude_args: '--allowed-tools "Skill,Read,Edit,Write,Glob,Grep,Bash(git:*),Bash(gh:*),Bash(./gradlew:*),Bash(find:*),Bash(shuf:*),Bash(nvim:*),Bash(echo:*)"'
