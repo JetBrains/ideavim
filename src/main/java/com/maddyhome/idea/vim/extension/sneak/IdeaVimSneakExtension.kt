@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.util.Disposer
 import com.intellij.ui.JBColor
+import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.VimProjectService
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -39,6 +40,7 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.annotations.TestOnly
 import java.awt.Font
 import java.awt.Graphics
@@ -182,10 +184,11 @@ internal class IdeaVimSneakExtension : VimExtension {
 
         // ignore ' ' (space) and non-existing chars
         if (selectedChar == ' ' || !hintToPositionMap.containsKey(selectedChar)) {
-          VimExtensionFacade.executeNormalWithoutMapping(
-            injector.parser.parseKeys(selectedChar.toString()),
-            editor.ij,
-          )
+          val keyHandler = KeyHandler.getInstance()
+          val context = injector.executionContextManager.getEditorExecutionContext(editor)
+          injector.parser.parseKeys(selectedChar.toString()).forEach {
+            keyHandler.handleKey(editor, it, context, true, keyHandler.keyHandlerState)
+          }
           return null
         }
         val selectedPosition = hintToPositionMap[selectedChar]
