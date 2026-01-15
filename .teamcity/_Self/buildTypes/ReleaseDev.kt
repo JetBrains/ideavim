@@ -48,15 +48,18 @@ object ReleaseDev : IdeaVimBuildType({
     gradle {
       name = "Calculate new dev version"
       tasks = "scripts:calculateNewDevVersion"
+      gradleParams = "--build-cache --configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
     gradle {
       name = "Set TeamCity build number"
       tasks = "scripts:setTeamCityBuildNumber"
+      gradleParams = "--build-cache --configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
     gradle {
       tasks = "publishPlugin"
+      gradleParams = "--build-cache --configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
   }

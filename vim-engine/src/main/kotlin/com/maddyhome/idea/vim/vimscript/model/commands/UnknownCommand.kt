@@ -13,7 +13,6 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.GoalCommand
-import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.InvalidCommandException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.Range
@@ -80,7 +79,7 @@ data class UnknownCommand(val range: Range, val name: String, val modifier: Comm
         return ExecutionResult.Error
       }
     } else {
-      throw exExceptionMessage("E492")
+      throw exExceptionMessage("E492", name)
     }
   }
 }

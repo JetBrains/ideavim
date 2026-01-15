@@ -58,6 +58,13 @@ jobs:
           java-version: '21'
           distribution: 'corretto'
 
+      - name: Install Neovim
+        if: steps.check-ticket.outputs.has_ticket == 'true'
+        run: |
+          wget https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
+          tar xzf nvim-linux-x86_64.tar.gz
+          echo "$PWD/nvim-linux-x86_64/bin" >> $GITHUB_PATH
+
       - name: Setup Gradle
         if: steps.check-ticket.outputs.has_ticket == 'true'
         uses: gradle/actions/setup-gradle@v4

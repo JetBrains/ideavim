@@ -41,6 +41,30 @@ class FunctionDeclarationTest : VimTestCase() {
   }
 
   @Test
+  fun `test function arguments are eagerly evaluated left to right`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys("""
+        |function printArg(arg) |
+        |    echo "arg: " . a:arg |
+        |endfunction |
+        |function test(x, y, z) |
+        |    echo "Function call done" |
+        |endfunction |
+      """.trimMargin()
+      )
+    )
+    enterCommand("call test(printArg(1), printArg(2), printArg(3))")
+    assertExOutput("""
+        |arg: 1
+        |arg: 2
+        |arg: 3
+        |Function call done
+      """.trimMargin()
+    )
+  }
+
+  @Test
   fun `test nested function`() {
     configureByText("\n")
     typeText(

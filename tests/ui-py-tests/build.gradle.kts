@@ -23,7 +23,6 @@ dependencies {
   testImplementation("com.intellij.remoterobot:remote-robot:$remoteRobotVersion")
   testImplementation("com.intellij.remoterobot:remote-fixtures:$remoteRobotVersion")
   testImplementation("com.intellij.remoterobot:ide-launcher:$remoteRobotVersion")
-  testImplementation("com.automation-remarks:video-recorder-junit5:2.0")
 }
 
 tasks {
@@ -46,10 +45,6 @@ tasks {
     // Usually these opens are provided by the intellij gradle plugin
     // https://github.com/JetBrains/gradle-intellij-plugin/blob/b21e3f382e9885948a6427001d5e64234c602613/src/main/kotlin/org/jetbrains/intellij/utils/OpenedPackages.kt#L26
     jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED")
-
-    // Configure video recorder to use FFmpeg instead of Monte (tscc codec has decoding issues)
-    systemProperty("recorder.type", "FFMPEG")
-    systemProperty("video.frame.rate", "24")
   }
 }
 

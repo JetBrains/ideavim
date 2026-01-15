@@ -1,0 +1,149 @@
+name: Run UI PyCharm Tests Linux
+on:
+  workflow_dispatch:
+  schedule:
+      - cron: '0 12 * * *'
+jobs:
+  build-for-ui-test-linux:
+    if: github.repository == 'JetBrains/ideavim'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Free up disk space
+        run: |
+          echo "Disk space before cleanup:"
+          df -h
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force
+          echo "Disk space after cleanup:"
+          df -h
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: 21
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Setup FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: Build Plugin
+        run: gradle :buildPlugin --configuration-cache
+      - name: Start Xvfb
+        run: |
+          export DISPLAY=:99.0
+          Xvfb :99 -screen 0 1280x720x24 &
+          echo "DISPLAY=:99.0" >> $GITHUB_ENV
+      - name: Run Idea
+        run: |
+          mkdir -p build/reports
+          gradle :runIdeForUiTests -PideaType=PY > build/reports/idea.log 2>&1 &
+      - name: Start screen recording
+        run: |
+          mkdir -p build/reports/ci-screen-recording
+          ffmpeg -f x11grab -video_size 1280x720 -i :99.0 -r 15 -vcodec libx264 -preset ultrafast -crf 28 -pix_fmt yuv420p build/reports/ci-screen-recording/screen-recording.mp4 &
+          echo $! > /tmp/ffmpeg_pid.txt
+        continue-on-error: true
+      - name: Wait for Idea started
+        uses: jtalk/url-health-check-action@v3
+        with:
+          url: http://127.0.0.1:8082
+          max-attempts: 20
+          retry-delay: 10s
+      - name: Tests
+        run: gradle :tests:ui-py-tests:testUi
+      - name: Stop screen recording
+        if: always()
+        run: |
+          if [ -f /tmp/ffmpeg_pid.txt ]; then
+            kill $(cat /tmp/ffmpeg_pid.txt) || true
+            sleep 2
+          fi
+        continue-on-error: true
+      - name: Move sandbox logs
+        if: always()
+        run: mv build/idea-sandbox/PY-*/log_runIdeForUiTests idea-sandbox-log
+      - name: AI Analysis of Test Failures
+        if: failure()
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          claude_args: '--allowed-tools "Read,Write,Edit,Glob,Grep,Bash(ffmpeg:*),Bash(ffprobe:*),Bash(mkdir:*),Bash(touch:*),Bash(echo:*),Bash(ls:*),Bash(cat:*),Bash(grep:*),Bash(find:*),Bash(cd:*),Bash(rm:*),Bash(git:*),Bash(gh:*),Bash(gradle:*),Bash(./gradlew:*),Bash(java:*),Bash(which:*)"'
+          prompt: |
+            ## Task: Analyze UI Test Failures
+
+            Please analyze the UI test failures in the current directory.
+
+            Key information:
+            - Test reports are located in: build/reports and tests/ui-py-tests/build/reports
+            - There is a CI screen recording at build/reports/ci-screen-recording/screen-recording.mp4 that shows what happened during the entire test run - this video is usually very useful for understanding what went wrong visually
+            - There is also a single screenshot at tests/ui-py-tests/build/reports/ideaVimTest.png showing the state when the test failed
+            - IDE sandbox logs are in the idea-sandbox-log directory
+            - ffmpeg is already installed and available. Useful commands for video analysis:
+              * Extract frame at specific time: `ffmpeg -i video.mp4 -ss 00:01:30 -vframes 1 output.png`
+              * Extract multiple frames: `ffmpeg -i video.mp4 -vf fps=1/10 frame_%04d.png` (1 frame every 10 seconds)
+              * Get video duration: `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 video.mp4`
+              * Extract last N seconds: `ffmpeg -sseof -10 -i video.mp4 -update 1 last_frame.png` (last 10 seconds)
+              * Create thumbnail grid: `ffmpeg -i video.mp4 -vf "select='not(mod(n\,300))',scale=160:120,tile=5x5" -frames:v 1 grid.png`
+
+            Special troubleshooting for timeout failures:
+            - If the test fails because it waited for something to appear, but according to the video and screenshot the element actually appeared on screen, check the UI hierarchy file at build/reports/hierarchy-ideaVimTest.html
+            - This hierarchy file shows the actual structure of UI elements and their properties at the time of failure
+            - The failure may be caused by a renamed property or changed class name in the UI element
+            - If you find this is the case, suggest a new query or selector that matches the current element structure
+
+            Please provide:
+            1. A detailed analysis of what went wrong
+            2. The root cause of the failure
+            3. Potential fixes or suggestions
+
+            Write your analysis to build/reports/ai-analysis.txt
+
+            ## UI Test Best Practices
+
+            When fixing UI tests, follow these principles:
+
+            **Cause-Effect Over Timeouts**: UI tests should wait for specific conditions rather than arbitrary timeouts.
+            - ✅ GOOD: Wait for a button to become visible or enabled before clicking it
+            - ✅ GOOD: Wait for specific text to appear in a component
+            - ✅ GOOD: Wait for a dialog to be present with a specific accessible name
+            - ❌ BAD: Use Thread.sleep() or fixed delays
+            - ❌ BAD: Wait for arbitrary timeouts without checking for specific conditions
+
+            Only use timeouts as a maximum wait duration with explicit condition checks (e.g., "wait up to 30 seconds for dialog to appear").
+            Tests should be deterministic and based on observable state changes in the UI, not time-based assumptions.
+
+            IMPORTANT: If you have a concrete suggestion for fixing the test, ALWAYS proceed with creating a branch and PR. Never ask for permission - just do it.
+
+            If you have a concrete suggestion for fixing the test:
+            1. Create a new branch with a descriptive name (e.g., fix/ui-test-accessible-name)
+            2. Apply your suggested fix to the codebase
+            3. CRITICAL: When staging changes, NEVER use `git add -A` or `git add .`. Always add modified files explicitly by path (e.g., `git add path/to/file.kt path/to/other.kt`). This prevents accidentally staging unrelated files.
+            4. MANDATORY: Verify compilation succeeds with your changes: `gradle compileKotlin compileTestKotlin`
+            5. MANDATORY: Run the specific failing test to verify the fix improves or resolves the issue
+               - For PyCharm UI tests: `gradle :tests:ui-py-tests:testUi --tests "YourTestClassName.yourTestMethod"`
+               - To run all PyCharm UI tests: `gradle :tests:ui-py-tests:testUi`
+               - The test MUST either pass completely or show clear improvement (e.g., progressing further before failure)
+            6. If the test passes or shows improvement with your fix, create a PR with:
+               - Clear title describing the fix
+               - Description explaining the root cause and solution
+               - Test results showing the fix works
+               - Reference to the failing CI run
+            7. Use the base branch 'master' for the PR
+      - name: Save report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-test-fails-report-linux
+          path: |
+            build/reports
+            tests/ui-py-tests/build/reports
+            idea-sandbox-log

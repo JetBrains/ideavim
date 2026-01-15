@@ -12,6 +12,7 @@ import _Self.subprojects.Releases
 import _Self.vcsRoots.ReleasesVcsRoot
 import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.Project
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.buildCache
 
 object Project : Project({
   description = "Vim engine for JetBrains IDEs"
@@ -52,6 +53,18 @@ abstract class IdeaVimBuildType(init: BuildType.() -> Unit) : BuildType({
         +:tests/property-tests/build/reports => property-tests/build/reports
         +:/mnt/agent/temp/buildTmp/ => /mnt/agent/temp/buildTmp/
     """.trimIndent()
+
+  features {
+    buildCache {
+      name = "Gradle-cache"
+      rules = """
+        %env.HOME%/.gradle/caches
+        %env.HOME%/.gradle/wrapper
+      """.trimIndent()
+      publish = true
+      use = true
+    }
+  }
 
   init()
 

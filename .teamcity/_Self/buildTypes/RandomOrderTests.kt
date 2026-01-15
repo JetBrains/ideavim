@@ -26,7 +26,7 @@ object RandomOrderTests : IdeaVimBuildType({
     gradle {
       clearConditions()
       tasks = """
-        clean test
+        test
         -x :tests:property-tests:test
         -x :tests:long-running-tests:test
         -Djunit.jupiter.execution.order.random.seed=default
@@ -34,6 +34,7 @@ object RandomOrderTests : IdeaVimBuildType({
       """.trimIndent().replace("\n", " ")
       buildFile = ""
       enableStacktrace = true
+      gradleParams = "--build-cache --configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
   }

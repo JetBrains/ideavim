@@ -21,7 +21,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Run tests
-        run: ./gradlew clean test -x :tests:property-tests:test -x :tests:long-running-tests:test
+        run: ./gradlew test -x :tests:property-tests:test -x :tests:long-running-tests:test
         env:
           ORG_GRADLE_PROJECT_downloadIdeaSources: false
           ORG_GRADLE_PROJECT_instrumentPluginCode: false
@@ -32,6 +32,6 @@ jobs:
         with:
           name: problems-report
           path: |
-            ideavim/build/reports/
-            ideavim/tests/java-tests/build/reports/
+            build/reports/
+            tests/java-tests/build/reports/
           if-no-files-found: ignore

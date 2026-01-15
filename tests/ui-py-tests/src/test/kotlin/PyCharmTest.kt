@@ -6,20 +6,14 @@
  * https://opensource.org/licenses/MIT.
  */
 
-import com.automation.remarks.junit5.Video
-import com.intellij.remoterobot.RemoteRobot
-import com.intellij.remoterobot.fixtures.ComponentFixture
-import com.intellij.remoterobot.search.locators.byXpath
 import com.intellij.remoterobot.steps.CommonSteps
 import com.intellij.remoterobot.utils.keyboard
 import com.intellij.remoterobot.utils.waitFor
 import org.junit.jupiter.api.Test
 import ui.pages.IdeaFrame
 import ui.pages.idea
-import ui.pages.welcomeFrame
 import ui.utils.StepsLogger
 import ui.utils.uiTest
-import java.time.Duration
 
 class PyCharmTest {
   init {
@@ -29,13 +23,10 @@ class PyCharmTest {
   private lateinit var commonSteps: CommonSteps
 
   @Test
-  @Video
   fun run() = uiTest("ideaVimTest") {
     commonSteps = CommonSteps(this)
 
-    startNewProject()
-    Thread.sleep(1000)
-
+    // PyCharm now opens with a project directly, no need to create one
     idea {
       waitSmartMode()
 
@@ -68,15 +59,4 @@ class PyCharmTest {
     }
   }
 
-  private fun RemoteRobot.startNewProject() {
-    welcomeFrame {
-      createNewProjectLink.click()
-      waitFor(duration = Duration.ofSeconds(30)) {
-        // Waiting till the SDK will be detected by PyCharm
-        this@startNewProject.findAll<ComponentFixture>(byXpath("//div[@class='SimpleColoredComponent']"))
-          .any { it.hasText { text -> text.text.contains("/usr/local/bin/python3") } }
-      }
-      button("Create").click()
-    }
-  }
 }
