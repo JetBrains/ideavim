@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test
 // These tests are sanity tests for scrolloff and scrolljump, with actions that move the cursor. Other actions that are
 // affected by scrolloff or scrolljump should include that in the action specific tests
 class MotionGroup_scrolloff_Test : VimTestCase() {
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test move up shows no context with scrolloff=0`() {
     configureByPages(5)
@@ -30,7 +30,7 @@ class MotionGroup_scrolloff_Test : VimTestCase() {
     assertVisibleArea(24, 58)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test move up shows context line with scrolloff=1`() {
     configureByPages(5)
@@ -41,7 +41,7 @@ class MotionGroup_scrolloff_Test : VimTestCase() {
     assertVisibleArea(24, 58)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test move up shows context lines with scrolloff=10`() {
     configureByPages(5)
@@ -52,7 +52,7 @@ class MotionGroup_scrolloff_Test : VimTestCase() {
     assertVisibleArea(24, 58)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test move up when scrolloff is slightly less than half screen height`() {
     // Screen height = 35. scrolloff=15. This gives 5 possible caret lines without scrolling (48, 49, 50, 51 + 52)
@@ -82,7 +82,7 @@ class MotionGroup_scrolloff_Test : VimTestCase() {
     assertVisibleArea(32, 66)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test move up when scrolloff is slightly less than half screen height 2`() {
     // Screen height = 35. scrolloff=16. This gives 3 possible caret lines without scrolling (49, 50 + 51)
@@ -104,7 +104,7 @@ class MotionGroup_scrolloff_Test : VimTestCase() {
     assertVisibleArea(32, 66)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test move up when scrolloff is slightly less than half screen height 3`() {
     // Screen height = 34. scrolloff=16
@@ -124,7 +124,7 @@ class MotionGroup_scrolloff_Test : VimTestCase() {
     assertVisibleArea(32, 65)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   @VimBehaviorDiffers(description = "Moving up in Vim will always have 16 lines above the caret line. IdeaVim keeps 17")
   fun `test move up when scrolloff is exactly screen height`() {
@@ -145,7 +145,7 @@ class MotionGroup_scrolloff_Test : VimTestCase() {
     assertVisibleArea(32, 65)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test move up when scrolloff is slightly greater than screen height keeps cursor in centre of screen`() {
     // Page height = 35. scrolloff=17
@@ -158,7 +158,7 @@ class MotionGroup_scrolloff_Test : VimTestCase() {
     assertVisibleArea(32, 66)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test move up when scrolloff is slightly greater than screen height keeps cursor in centre of screen 2`() {
     // Page height = 35. scrolloff=17
@@ -171,7 +171,7 @@ class MotionGroup_scrolloff_Test : VimTestCase() {
     assertVisibleArea(32, 66)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test move down shows no context with scrolloff=0`() {
     configureByPages(5)
@@ -182,7 +182,7 @@ class MotionGroup_scrolloff_Test : VimTestCase() {
     assertVisibleArea(26, 60)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test move down shows context line with scrolloff=1`() {
     configureByPages(5)
@@ -193,7 +193,7 @@ class MotionGroup_scrolloff_Test : VimTestCase() {
     assertVisibleArea(26, 60)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test move down shows context lines with scrolloff=10`() {
     configureByPages(5)
@@ -204,7 +204,7 @@ class MotionGroup_scrolloff_Test : VimTestCase() {
     assertVisibleArea(26, 60)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test move down when scrolloff is slightly less than half screen height`() {
     // Screen height = 35. scrolloff=15. This gives 5 possible caret lines without scrolling (48, 49, 50, 51 + 52)
@@ -234,7 +234,7 @@ class MotionGroup_scrolloff_Test : VimTestCase() {
     assertVisibleArea(34, 68)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test move down when scrolloff is slightly less than half screen height 2`() {
     // Screen height = 35. scrolloff=16. This gives 3 possible caret lines without scrolling (49, 50 + 51)
@@ -256,7 +256,7 @@ class MotionGroup_scrolloff_Test : VimTestCase() {
     assertVisibleArea(34, 68)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test move down when scrolloff is slightly less than half screen height 3`() {
     // Screen height = 34. scrolloff=16
@@ -276,7 +276,7 @@ class MotionGroup_scrolloff_Test : VimTestCase() {
     assertVisibleArea(34, 67)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test move down when scrolloff is exactly screen height`() {
     // Page height = 34. scrolloff=17
@@ -296,7 +296,7 @@ class MotionGroup_scrolloff_Test : VimTestCase() {
     assertVisibleArea(35, 68)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test move down when scrolloff is slightly greater than half screen height keeps cursor in centre of screen`() {
     // Page height = 35. scrolloff=17
@@ -309,7 +309,7 @@ class MotionGroup_scrolloff_Test : VimTestCase() {
     assertVisibleArea(34, 68)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test move down when scrolloff is slightly greater than half screen height keeps cursor in centre of screen 2`() {
     // Page height = 35. scrolloff=17
@@ -322,7 +322,7 @@ class MotionGroup_scrolloff_Test : VimTestCase() {
     assertVisibleArea(34, 68)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test scrolloff=999 keeps cursor in centre of screen`() {
     configureByPages(5)
@@ -338,7 +338,7 @@ class MotionGroup_scrolloff_Test : VimTestCase() {
     assertVisibleArea(25, 59)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test scrolloff=999 keeps cursor in centre of screen with even screen height`() {
     configureByPages(5)
@@ -355,7 +355,7 @@ class MotionGroup_scrolloff_Test : VimTestCase() {
     assertVisibleArea(26, 59)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test reposition cursor when scrolloff is set`() {
     configureByPages(5)
@@ -369,7 +369,7 @@ class MotionGroup_scrolloff_Test : VimTestCase() {
 }
 
 class MotionGroup_scrolljump_Test : VimTestCase() {
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test move up scrolls single line with scrolljump=0`() {
     configureByPages(5)
@@ -380,7 +380,7 @@ class MotionGroup_scrolljump_Test : VimTestCase() {
     assertVisibleArea(24, 58)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test move up scrolls single line with scrolljump=1`() {
     configureByPages(5)
@@ -391,7 +391,7 @@ class MotionGroup_scrolljump_Test : VimTestCase() {
     assertVisibleArea(24, 58)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test move up scrolls multiple lines with scrolljump=10`() {
     configureByPages(5)
@@ -402,7 +402,7 @@ class MotionGroup_scrolljump_Test : VimTestCase() {
     assertVisibleArea(15, 49)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test move down scrolls single line with scrolljump=0`() {
     configureByPages(5)
@@ -413,7 +413,7 @@ class MotionGroup_scrolljump_Test : VimTestCase() {
     assertVisibleArea(26, 60)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test move down scrolls single line with scrolljump=1`() {
     configureByPages(5)
@@ -424,7 +424,7 @@ class MotionGroup_scrolljump_Test : VimTestCase() {
     assertVisibleArea(26, 60)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test move down scrolls multiple lines with scrolljump=10`() {
     configureByPages(5)
@@ -435,7 +435,7 @@ class MotionGroup_scrolljump_Test : VimTestCase() {
     assertVisibleArea(35, 69)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test negative scrolljump treated as percentage 1`() {
     configureByPages(5)
@@ -446,7 +446,7 @@ class MotionGroup_scrolljump_Test : VimTestCase() {
     assertVisibleArea(22, 56)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test negative scrolljump treated as percentage 2`() {
     configureByPages(5)
@@ -459,7 +459,7 @@ class MotionGroup_scrolljump_Test : VimTestCase() {
 }
 
 class MotionGroup_scrolloff_scrolljump_Test : VimTestCase() {
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test scroll up with scrolloff and scrolljump set`() {
     configureByPages(5)
@@ -471,7 +471,7 @@ class MotionGroup_scrolloff_scrolljump_Test : VimTestCase() {
     assertVisibleArea(40, 74)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   @Test
   fun `test scroll down with scrolloff and scrolljump set`() {
     configureByPages(5)
