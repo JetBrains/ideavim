@@ -13,17 +13,12 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.newapi.vim
-import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
-import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.jetbrains.plugins.ideavim.impl.OptionTest
-import org.jetbrains.plugins.ideavim.impl.VimOption
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import kotlin.test.assertContains
 import kotlin.test.assertNotNull
 
 class MultipleCaretsTest : VimTestCase() {
@@ -114,12 +109,10 @@ class MultipleCaretsTest : VimTestCase() {
    * This test produces different results depending on `ideaput` option.
    * Both results can be treated as correct, as the original vim doesn't have support for multicaret
    */
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["ideaput"]))
+  @Test
   fun testPutText() {
     // This test produces double ${c}zxc on 3rd line if non-idea paste is used
     // TODO: Investigate differences and reconcile
-    assertContains(optionsNoEditor().clipboard, OptionConstants.clipboard_ideaput)
-
     val before = """
           ${c}qwe
           rty
@@ -130,6 +123,7 @@ class MultipleCaretsTest : VimTestCase() {
 
     """.trimIndent()
     val editor = configureByText(before)
+    enterCommand("set clipboard=ideaput")
     val vimEditor = editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     ApplicationManager.getApplication().invokeAndWait {
@@ -164,7 +158,7 @@ class MultipleCaretsTest : VimTestCase() {
    * This test produces different results depending on `ideaput` option.
    * Both results can be treated as correct, as the original vim doesn't have support for multicaret
    */
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [""]))
+  @Test
   fun testPutTextWithoutIdeaput() {
     // This test produces double ${c}zxc on 3rd line if non-idea paste is used
     val before = """
@@ -177,6 +171,7 @@ class MultipleCaretsTest : VimTestCase() {
 
     """.trimIndent()
     val editor = configureByText(before)
+    enterCommand("set clipboard=")
     val vimEditor = editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     ApplicationManager.getApplication().invokeAndWait {
@@ -213,7 +208,7 @@ class MultipleCaretsTest : VimTestCase() {
    * Both results can be treated as correct, as the original vim doesn't have support for multicaret
    */
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "register")
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = [""]))
+  @Test
   fun testPutTextCertainLine() {
     val before = """
           ${c}qwe
@@ -225,6 +220,7 @@ class MultipleCaretsTest : VimTestCase() {
 
     """.trimIndent()
     val editor = configureByText(before)
+    enterCommand("set clipboard=")
     val vimEditor = editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     ApplicationManager.getApplication().invokeAndWait {
@@ -261,7 +257,7 @@ class MultipleCaretsTest : VimTestCase() {
    * Both results can be treated as correct, as the original vim doesn't have support for multicaret
    */
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "register")
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["ideaput"]))
+  @Test
   fun testPutTextCertainLineWithIdeaPut() {
     val before = """
           ${c}qwe
@@ -273,6 +269,7 @@ class MultipleCaretsTest : VimTestCase() {
 
     """.trimIndent()
     val editor = configureByText(before)
+    enterCommand("set clipboard=ideaput")
     val vimEditor = editor.vim
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
     ApplicationManager.getApplication().invokeAndWait {

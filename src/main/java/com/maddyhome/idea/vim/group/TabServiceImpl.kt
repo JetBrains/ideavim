@@ -23,7 +23,7 @@ internal class TabServiceImpl : TabService {
 
   override fun removeTabAt(indexToDelete: Int, indexToSelect: Int, context: ExecutionContext) {
     val tabbedPane = getTabbedPane(context)
-    tabbedPane?.removeTabAt(indexToDelete, indexToDelete)
+    tabbedPane?.removeTabAt(indexToDelete, indexToSelect)
 
     val currentTab = getCurrentTab(context) ?: return
     IdeFocusManager.findInstance().requestFocus(currentTab.component, true)

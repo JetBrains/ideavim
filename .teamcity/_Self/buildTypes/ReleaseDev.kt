@@ -1,5 +1,6 @@
 package _Self.buildTypes
 
+import _Self.AgentSize
 import _Self.Constants.DEV_CHANNEL
 import _Self.Constants.RELEASE_DEV
 import _Self.IdeaVimBuildType
@@ -86,5 +87,10 @@ object ReleaseDev : IdeaVimBuildType({
         buildRule = lastSuccessful()
       }
     }
+  }
+
+  requirements {
+    equals("teamcity.agent.hardware.cpuCount", AgentSize.MEDIUM)
+    equals("teamcity.agent.os.family", "Linux")
   }
 })

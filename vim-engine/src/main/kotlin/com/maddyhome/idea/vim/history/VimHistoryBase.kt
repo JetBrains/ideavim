@@ -69,6 +69,6 @@ open class VimHistoryBase : VimHistory {
   }
 
   companion object {
-    val logger: VimLogger = vimLogger<VimHistoryBase>()
+    val logger: VimLogger by lazy { vimLogger<VimHistoryBase>() }
   }
 }

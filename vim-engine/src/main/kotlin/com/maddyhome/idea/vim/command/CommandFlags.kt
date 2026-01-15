@@ -71,8 +71,6 @@ enum class CommandFlags {
   FLAG_START_EX,
   FLAG_END_EX,
 
-  FLAG_TEXT_BLOCK,
-
   /**
    * TODO come up with a better solution
    */

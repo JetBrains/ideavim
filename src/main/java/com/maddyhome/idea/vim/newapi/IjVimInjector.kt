@@ -40,6 +40,8 @@ import com.maddyhome.idea.vim.api.VimModalInputService
 import com.maddyhome.idea.vim.api.VimMotionGroup
 import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.VimOutputPanelService
+import com.maddyhome.idea.vim.api.VimPathExpansion
+import com.maddyhome.idea.vim.api.VimPathExpansionImpl
 import com.maddyhome.idea.vim.api.VimProcessGroup
 import com.maddyhome.idea.vim.api.VimPsiService
 import com.maddyhome.idea.vim.api.VimRedrawService
@@ -229,6 +231,8 @@ internal class IjVimInjector : VimInjectorBase() {
     get() = IjVimPluginService()
   override val highlightingService: VimHighlightingService
     get() = IjVimHighlightingService()
+
+  override val pathExpansion: VimPathExpansion = VimPathExpansionImpl()
 
   override val engineEditorHelper: EngineEditorHelper
     get() = service<IjEditorHelper>()

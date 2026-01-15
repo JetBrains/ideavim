@@ -9,6 +9,9 @@
 package org.jetbrains.plugins.ideavim.action.motion.`object`
 
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -129,5 +132,46 @@ class MotionOuterBlockParenActionTest : VimTestCase() {
       "foo(b${c}ar, baz);\n",
     )
     assertState("foo;\n")
+  }
+
+  // ============== preserveSelectionAnchor behavior tests ==============
+
+  @Test
+  fun `test outer paren from middle of content`() {
+    doTest(
+      "va)",
+      "foo (bar b${c}az qux) quux",
+      "foo ${s}(bar baz qux${c})${se} quux",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  @VimBehaviorDiffers(
+    shouldBeFixed = false,
+    description = """
+      Vim for some operations keeps the direction and for some it doesn't.
+      However, this looks like a bug in Vim.
+      So, in IdeaVim we always keep the direction.
+    """
+  )
+  fun `test outer paren with backwards selection`() {
+    doTest(
+      listOf("v", "h", "a)"),
+      "foo (bar b${c}az qux) quux",
+      "foo ${s}${c}(bar baz qux)${se} quux",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `test outer paren with backwards selection crossing boundary`() {
+    // Move selection back past opening paren
+    doTest(
+      listOf("v", "F(", "a)"),
+      "foo (bar b${c}az qux) quux",
+      "foo ${s}${c}(bar baz qux)${se} quux",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
   }
 }

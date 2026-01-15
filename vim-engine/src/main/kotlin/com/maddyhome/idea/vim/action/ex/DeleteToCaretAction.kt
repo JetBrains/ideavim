@@ -15,7 +15,10 @@ import com.maddyhome.idea.vim.api.VimCommandLine
 @CommandOrMotion(keys = ["<C-U>"], modes = [Mode.CMD_LINE])
 class DeleteToCaretAction : CommandLineActionHandler() {
   override fun execute(commandLine: VimCommandLine): Boolean {
-    commandLine.deleteText(0, commandLine.caret.offset)
+    val caretOffset = commandLine.caret.offset
+    if (caretOffset == 0) return true
+
+    commandLine.deleteText(0, caretOffset)
     return true
   }
 }

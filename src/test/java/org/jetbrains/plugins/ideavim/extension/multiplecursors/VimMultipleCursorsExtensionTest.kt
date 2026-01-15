@@ -377,6 +377,58 @@ fun getCellType(${s}pos$se: VisualPosition): CellType {
   }
 
   @Test
+  fun `test handles backslash in search pattern`() {
+    val before = "Fields${s}\\IntegerField${c}$se('ID') ssssIntegerField Fields\\IntegerField('ENTITY_ID')"
+    val editor = configureByText(before)
+    ApplicationManager.getApplication().invokeAndWait {
+      editor.vim.mode = Mode.VISUAL(SelectionType.CHARACTER_WISE)
+    }
+
+    typeText(injector.parser.parseKeys("<A-n>"))
+    val after = "Fields${s}\\IntegerField$se('ID') ssssIntegerField Fields${s}\\IntegerField$se('ENTITY_ID')"
+    assertState(after)
+  }
+
+  @Test
+  fun `test handles double backslash in search pattern`() {
+    val before = "test ${s}\\\\hello${c}$se world \\\\hello again"
+    val editor = configureByText(before)
+    ApplicationManager.getApplication().invokeAndWait {
+      editor.vim.mode = Mode.VISUAL(SelectionType.CHARACTER_WISE)
+    }
+
+    typeText(injector.parser.parseKeys("<A-n>"))
+    val after = "test ${s}\\\\hello$se world ${s}\\\\hello$se again"
+    assertState(after)
+  }
+
+  @Test
+  fun `test handles backslash at end of search pattern`() {
+    val before = "path${s}test\\${c}$se file path test\\ dir"
+    val editor = configureByText(before)
+    ApplicationManager.getApplication().invokeAndWait {
+      editor.vim.mode = Mode.VISUAL(SelectionType.CHARACTER_WISE)
+    }
+
+    typeText(injector.parser.parseKeys("<A-n>"))
+    val after = "path${s}test\\$se file path ${s}test\\$se dir"
+    assertState(after)
+  }
+
+  @Test
+  fun `test AllOccurrences with backslash`() {
+    val before = "Fields${s}\\Item${c}$se('ID') Fields\\Item('NAME') ssssItem Fields\\Item('ID2')"
+    val editor = configureByText(before)
+    ApplicationManager.getApplication().invokeAndWait {
+      editor.vim.mode = Mode.VISUAL(SelectionType.CHARACTER_WISE)
+    }
+
+    typeText(injector.parser.parseKeys("<Plug>AllOccurrences"))
+    val after = "Fields${s}\\Item$se('ID') Fields${s}\\Item$se('NAME') ssssItem Fields${s}\\Item$se('ID2')"
+    assertState(after)
+  }
+
+  @Test
   fun `test adding multicaret after linewise selection`() {
     val before = """
       ${c}Lorem ipsum dolor sit amet,

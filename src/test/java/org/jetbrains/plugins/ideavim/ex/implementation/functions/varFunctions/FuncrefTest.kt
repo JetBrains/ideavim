@@ -105,6 +105,26 @@ class FuncrefTest : VimTestCase() {
   }
 
   @Test
+  fun `test funcref with arglist and dictionary`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        """
+      function! PrintSum(x) dict |
+        return a:x + self['offset'] |
+      endfunction
+        """.trimIndent(),
+      ),
+    )
+    typeText(commandToKeys("let d = {'offset': 100}"))
+    typeText(commandToKeys("let Ff = funcref('PrintSum', [42], d)"))
+    typeText(commandToKeys("echo Ff()"))
+    assertExOutput("142")
+
+    typeText(commandToKeys("delfunction! PrintSum"))
+  }
+
+  @Test
   fun `test redefining a function`() {
     configureByText("\n")
     typeText(

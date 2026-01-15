@@ -53,12 +53,13 @@ internal class PluginState : ApplicationUsagesCollector() {
   }
 }
 
-private val GROUP = EventLogGroup("vim.common", 1)
+private val GROUP = EventLogGroup("vim.common", 1, "FUS", "Group: General information about IdeaVim")
 private val PLUGIN_ENABLED = EventFields.Boolean("is_plugin_enabled")
 private val IS_EAP = EventFields.Boolean("is_EAP_active")
 private val ENABLED_EXTENSIONS = EventFields.StringList("enabled_extensions", extensionNames)
 private val PLUGIN_STATE: VarargEventId = GROUP.registerVarargEvent(
   "vim.common",
+  "State of the IdeaVim plugin",
   PLUGIN_ENABLED,
   IS_EAP,
   ENABLED_EXTENSIONS,

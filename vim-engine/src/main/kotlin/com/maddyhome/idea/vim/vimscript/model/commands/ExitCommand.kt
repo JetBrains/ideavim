@@ -18,6 +18,9 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
  * see "h :quitall"
+ *
+ * XXX: [argument] is currently unused. When file argument support is added for `:wqall`, expand [argument] using
+ * [com.maddyhome.idea.vim.api.VimPathExpansion.expandPath] to support environment variables (`$VAR`, `${VAR}`) and tilde (`~`, `~/`).
  */
 @ExCommand(command = "qa[ll],xa[ll],wqa[ll],quita[ll]")
 data class ExitCommand(val range: Range, val modifier: CommandModifier, val argument: String) :

@@ -1,5 +1,6 @@
 package _Self.buildTypes
 
+import _Self.AgentSize
 import _Self.IdeaVimBuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
@@ -22,6 +23,7 @@ object PluginVerifier : IdeaVimBuildType({
 
   steps {
     gradle {
+      clearConditions()
       tasks = "clean verifyPlugin"
       buildFile = ""
       enableStacktrace = true
@@ -33,5 +35,10 @@ object PluginVerifier : IdeaVimBuildType({
     vcs {
       branchFilter = "+:<default>"
     }
+  }
+
+  requirements {
+    equals("teamcity.agent.hardware.cpuCount", AgentSize.MEDIUM)
+    equals("teamcity.agent.os.family", "Linux")
   }
 })

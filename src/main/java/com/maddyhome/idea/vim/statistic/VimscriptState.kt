@@ -64,7 +64,7 @@ internal class VimscriptState : ApplicationUsagesCollector() {
 
 }
 
-private val GROUP = EventLogGroup("vim.vimscript", 1)
+private val GROUP = EventLogGroup("vim.vimscript", 1, "FUS", "Group: Information about Vimscript usage")
 private val SOURCED_FILES = EventFields.RoundedInt("number_of_sourced_files")
 private val IDEAVIMRC_SIZE = EventFields.RoundedInt("ideavimrc_size")
 private val EXTENSIONS_ENABLED_BY_SET = EventFields.StringList("extensions_enabled_by_set", extensionNames)
@@ -78,6 +78,7 @@ private val IS_FUNCTION_CALL_USED = EventFields.Boolean("is_function_call_used")
 
 private val VIMSCRIPT: VarargEventId = GROUP.registerVarargEvent(
   "vim.vimscript",
+  "Information about Vimscript usage",
   SOURCED_FILES,
   IDEAVIMRC_SIZE,
   EXTENSIONS_ENABLED_BY_SET,

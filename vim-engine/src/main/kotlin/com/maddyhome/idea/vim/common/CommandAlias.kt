@@ -30,7 +30,7 @@ sealed class CommandAlias(
     val command: String,
   ) : CommandAlias(minimumNumberOfArguments, maximumNumberOfArguments, name) {
     override fun getCommand(input: String, count: Int): GoalCommand {
-      if (this.maximumNumberOfArguments == 0 && this.maximumNumberOfArguments == 0) {
+      if (this.minimumNumberOfArguments == 0 && this.maximumNumberOfArguments == 0) {
         return GoalCommand.Ex(this.command)
       }
       var compiledCommand = this.command

@@ -404,6 +404,13 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    * @param context The data context
    */
   override fun insertAfterCaret(editor: VimEditor, context: ExecutionContext) {
+    // Prevent entering insert mode in read-only files before moving the caret
+    if (!editor.isWritable()) {
+      injector.messages.showStatusBarMessage(editor, "Cannot make changes, file is read-only")
+      injector.messages.indicateError()
+      return
+    }
+
     for (caret in editor.nativeCarets()) {
       caret.moveToMotion(injector.motion.getHorizontalMotion(editor, caret, 1, true))
     }
@@ -441,6 +448,13 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    * @param mode    The mode - indicate insert or replace
    */
   override fun initInsert(editor: VimEditor, context: ExecutionContext, mode: Mode) {
+    // Prevent entering insert mode in read-only files
+    if (!editor.isWritable()) {
+      injector.messages.showStatusBarMessage(editor, "Cannot make changes, file is read-only")
+      injector.messages.indicateError()
+      return
+    }
+
     val state = injector.vimState
     injector.application.runReadAction {
       for (caret in editor.nativeCarets()) {

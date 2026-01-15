@@ -139,7 +139,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
             throw FinishException()
           }
           exceptionsCaught.add(e)
-          logger.warn("Caught exception during execution of function with [abort] flag. Exception: ${e.message}")
+          logger.warn("Caught exception during execution of function with [abort] flag. Exception: ${e.message}", e)
         }
       }
     }

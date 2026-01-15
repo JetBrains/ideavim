@@ -18,6 +18,9 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
  * see "h :write"
+ *
+ * XXX: [argument] is currently unused. When `:write {file}` support is added, expand [argument] using
+ * [VimPathExpansion.expandPath] to support environment variables (`$VAR`, `${VAR}`) and tilde (`~`, `~/`).
  */
 @ExCommand(command = "w[rite]")
 data class WriteCommand(val range: Range, val modifier: CommandModifier, val argument: String) :

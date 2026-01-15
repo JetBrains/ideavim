@@ -18,7 +18,15 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 
-internal open class IsHandler(ignoreCase: Boolean? = null) : BinaryOperatorWithIgnoreCaseOption(ignoreCase) {
+internal class IsHandler(ignoreCase: Boolean? = null) : IsHandlerBase(ignoreCase)
+internal class IsNotHandler(ignoreCase: Boolean? = null) : IsHandlerBase(ignoreCase) {
+  override fun performOperation(left: VimDataType, right: VimDataType, ignoreCase: Boolean): VimDataType {
+    val result = super.performOperation(left, right, ignoreCase) as VimInt
+    return (!result.booleanValue).asVimInt()
+  }
+}
+
+internal open class IsHandlerBase(ignoreCase: Boolean?) : BinaryOperatorWithIgnoreCaseOption(ignoreCase) {
   override fun performOperation(left: VimDataType, right: VimDataType, ignoreCase: Boolean): VimDataType {
     return when (left) {
       // Check the value is the same with simple equals. Vim does not convert between Number and String!
@@ -31,14 +39,12 @@ internal open class IsHandler(ignoreCase: Boolean? = null) : BinaryOperatorWithI
       // Check the instance is the same with reference equals
       is VimList -> left === right
       is VimDictionary -> left === right
-      is VimFuncref -> {
+      is VimFuncref if (right is VimFuncref) -> {
         // A simple "function" reference (as opposed to a "funcref" reference) is the same, as long as it's not partial
         // TODO: The name check might not be enough once we properly support script-local functions
-        if (left.type == VimFuncref.Type.FUNCTION
-          && right is VimFuncref && right.type == VimFuncref.Type.FUNCTION
-          && left.arguments.values.isEmpty() && right.arguments.values.isEmpty()
-          && left.dictionary == null && right.dictionary == null
-          && left.handler.name === right.handler.name) {
+        if (isSimpleLateBoundFunctionReference(left) && isSimpleLateBoundFunctionReference(right)
+          && left.handler.name == right.handler.name
+        ) {
           true
         }
         else {
@@ -49,11 +55,7 @@ internal open class IsHandler(ignoreCase: Boolean? = null) : BinaryOperatorWithI
       else -> false
     }.asVimInt()
   }
-}
 
-internal class IsNotHandler(ignoreCase: Boolean? = null) : IsHandler(ignoreCase) {
-  override fun performOperation(left: VimDataType, right: VimDataType, ignoreCase: Boolean): VimDataType {
-    val result = super.performOperation(left, right, ignoreCase) as VimInt
-    return (!result.booleanValue).asVimInt()
-  }
+  private fun isSimpleLateBoundFunctionReference(funcref: VimFuncref) =
+    funcref.type == VimFuncref.Type.FUNCTION && !funcref.isPartial
 }

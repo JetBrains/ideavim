@@ -31,10 +31,11 @@ data class SplitCommand(val range: Range, val argument: String, val splitType: S
     context: ExecutionContext,
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
+    val expandedPath = injector.pathExpansion.expandPath(argument)
     if (splitType == SplitType.VERTICAL) {
-      injector.window.splitWindowVertical(context, argument)
+      injector.window.splitWindowVertical(context, expandedPath)
     } else {
-      injector.window.splitWindowHorizontal(context, argument)
+      injector.window.splitWindowHorizontal(context, expandedPath)
     }
 
     return ExecutionResult.Success

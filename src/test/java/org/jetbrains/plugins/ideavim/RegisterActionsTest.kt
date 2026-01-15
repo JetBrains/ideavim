@@ -10,15 +10,10 @@ package org.jetbrains.plugins.ideavim
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.state.mode.Mode
-import org.jetbrains.plugins.ideavim.impl.OptionTest
-import org.jetbrains.plugins.ideavim.impl.VimOption
 import org.junit.jupiter.api.Test
 
 class RegisterActionsTest : VimTestCase() {
-  @OptionTest(
-    VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true),
-    VimOption(TestOptionConstants.whichwrap, doesntAffectTest = true),
-  )
+  @Test
   fun `test simple action`() {
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
@@ -43,10 +38,7 @@ class RegisterActionsTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
-  @OptionTest(
-    VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true),
-    VimOption(TestOptionConstants.whichwrap, doesntAffectTest = true),
-  )
+  @Test
   fun `test turn plugin off and on`() {
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
@@ -57,10 +49,7 @@ class RegisterActionsTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
-  @OptionTest(
-    VimOption(TestOptionConstants.virtualedit, doesntAffectTest = true),
-    VimOption(TestOptionConstants.whichwrap, doesntAffectTest = true),
-  )
+  @Test
   fun `test enable twice`() {
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"

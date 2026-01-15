@@ -13,32 +13,28 @@ The current maintainers:
 * [![icon][mail]](mailto:alexpl292@gmail.com)
   [![icon][github]](https://github.com/AlexPl292)
   &nbsp;
-  Alex Plate
+  Alex Plate (JetBrains employee)
 
 Previous maintainers:
 
 * [![icon][mail]](mailto:oleg.shpynov@jetbrains.com)
   [![icon][github]](https://github.com/olegs)
   &nbsp;
-  Oleg Shpynov
+  Oleg Shpynov (JetBrains employee)
 * [![icon][mail]](mailto:andrey.vlasovskikh@gmail.com)
   [![icon][github]](https://github.com/vlasovskikh)
   &nbsp;
-  Andrey Vlasovskikh
+  Andrey Vlasovskikh (JetBrains employee)
 
 Previous support members:
 
 * [![icon][mail]](mailto:lejia.chen@jetbrains.com)
   [![icon][github-off]](#)
   &nbsp;
-  Lejia Chen
+  Lejia Chen (JetBrains employee)
 
 Contributors:
 
-* [![icon][mail]](mailto:yole@jetbrains.com)
-  [![icon][github]](https://github.com/yole)
-  &nbsp;
-  Dmitry Jemerov
 * [![icon][mail]](mailto:tony.kay@gmail.com)
   [![icon][github]](https://github.com/awkay)
   &nbsp;
@@ -87,10 +83,6 @@ Contributors:
   [![icon][github]](https://github.com/poxu)
   &nbsp;
   poxu
-* [![icon][mail]](mailto:alexander.zolotov@jetbrains.com)
-  [![icon][github]](https://github.com/zolotov)
-  &nbsp;
-  Alexander Zolotov
 * [![icon][mail]](mailto:johnlindquist@gmail.com)
   [![icon][github]](https://github.com/johnlindquist)
   &nbsp;
@@ -167,10 +159,6 @@ Contributors:
   [![icon][github]](https://github.com/gaganis)
   &nbsp;
   Giorgos Gaganis
-* [![icon][mail]](mailto:pavel.fatin@jetbrains.com)
-  [![icon][github]](https://github.com/pavelfatin)
-  &nbsp;
-  Pavel Fatin
 * [![icon][mail]](mailto:tietyt@gmail.com)
   [![icon][github-off]](https://github.com/DanKaplanSES)
   &nbsp;
@@ -187,10 +175,6 @@ Contributors:
   [![icon][github-off]](#)
   &nbsp;
   Maximilian Luz
-* [![icon][mail]](mailto:vparfinenko@excelsior-usa.com)
-  [![icon][github]](https://github.com/cypok)
-  &nbsp;
-  Vladimir Parfinenko
 * [![icon][mail]](mailto:hassmann@hwdev.de)
   [![icon][github-off]](https://github.com/lumie1337)
   &nbsp;
@@ -215,14 +199,6 @@ Contributors:
   [![icon][github]](https://github.com/johnlinp)
   &nbsp;
   John Lin
-* [![icon][mail]](mailto:alexpl292@gmail.com)
-  [![icon][github]](https://github.com/AlexPl292)
-  &nbsp;
-  Alex Plate
-* [![icon][mail]](mailto:m.t.ellis@gmail.com)
-  [![icon][github]](https://github.com/citizenmatt)
-  &nbsp;
-  Matt Ellis
 * [![icon][mail]](mailto:johngrib82@gmail.com)
   [![icon][github]](https://github.com/johngrib)
   &nbsp;
@@ -326,10 +302,6 @@ Contributors:
   [![icon][github]](https://github.com/runforprogram)
   &nbsp;
   runforprogram
-* [![icon][mail]](mailto:valery.isaev@jetbrains.com)
-  [![icon][github]](https://github.com/valis)
-  &nbsp;
-  valis
 * [![icon][mail]](mailto:pmikulski@voleon.com)
   [![icon][github]](https://github.com/pmnoxx)
   &nbsp;
@@ -370,14 +342,6 @@ Contributors:
   [![icon][github]](https://github.com/shaunpatterson)
   &nbsp;
   Shaun Patterson
-* [![icon][mail]](mailto:vladimir.petrenko@jetbrains.com)
-  [![icon][github]](https://github.com/vladimir-petrenko)
-  &nbsp;
-  Vladimir Petrenko
-* [![icon][mail]](mailto:sergey.vorobyov@jetbrains.com)
-  [![icon][github]](https://github.com/DeveloperHacker)
-  &nbsp;
-  Sergei Vorobyov
 * [![icon][mail]](mailto:daya0576@gmail.com)
   [![icon][github]](https://github.com/daya0576)
   &nbsp;
@@ -394,14 +358,6 @@ Contributors:
   [![icon][github]](https://github.com/MichalPlacek)
   &nbsp;
   Michal Placek
-* [![icon][mail]](mailto:eugene.nizienko@jetbrains.com)
-  [![icon][github]](https://github.com/nizienko)
-  &nbsp;
-  eugene nizienko
-* [![icon][mail]](mailto:x@lipp.fi)
-  [![icon][github]](https://github.com/lippfi)
-  &nbsp;
-  Filipp Vakhitov
 * [![icon][mail]](mailto:yzeiri.1@osu.edu)
   [![icon][github]](https://github.com/myzeiri)
   &nbsp;
@@ -434,10 +390,6 @@ Contributors:
   [![icon][github]](https://github.com/lonre)
   &nbsp;
   Lonre Wang
-* [![icon][mail]](mailto:AlexPl292@gmail.com)
-  [![icon][github]](https://github.com/AlexPl292)
-  &nbsp;
-  Alex Pláte
 * [![icon][mail]](mailto:david@dadon.fr)
   [![icon][github]](https://github.com/ddadon10)
   &nbsp;
@@ -450,10 +402,6 @@ Contributors:
   [![icon][github]](https://github.com/Vvalter)
   &nbsp;
   Simon Rainer
-* [![icon][mail]](mailto:filipp.vakhitov@jetbrains.com)
-  [![icon][github]](https://github.com/lippfi)
-  &nbsp;
-  lippfi
 * [![icon][mail]](mailto:3237686+Runinho@users.noreply.github.com)
   [![icon][github]](https://github.com/Runinho)
   &nbsp;
@@ -486,10 +434,6 @@ Contributors:
   [![icon][github]](https://github.com/samabcde)
   &nbsp;
   Sam Ng
-* [![icon][mail]](mailto:ludwig.valda.vasquez@jetbrains.com)
-  [![icon][github]](https://github.com/ludwig-jb)
-  &nbsp;
-  ludwig-jb
 * [![icon][mail]](mailto:pvydmuch@gmail.com)
   [![icon][github]](https://github.com/pWydmuch)
   &nbsp;
@@ -502,10 +446,6 @@ Contributors:
   [![icon][github]](https://github.com/emanuelgestosa)
   &nbsp;
   Emanuel Gestosa
-* [![icon][mail]](mailto:81118900+lippfi@users.noreply.github.com)
-  [![icon][github]](https://github.com/lippfi)
-  &nbsp;
-  lippfi
 * [![icon][mail]](mailto:fillipser143@gmail.com)
   [![icon][github]](https://github.com/Parker7123)
   &nbsp;
@@ -546,18 +486,10 @@ Contributors:
   [![icon][github]](https://github.com/felixwiemuth)
   &nbsp;
   Felix Wiemuth
-* [![icon][mail]](mailto:kirill.karnaukhov@jetbrains.com)
-  [![icon][github]](https://github.com/kkarnauk)
-  &nbsp;
-  Kirill Karnaukhov
 * [![icon][mail]](mailto:sander.hestvik@gmail.com)
   [![icon][github]](https://github.com/SanderHestvik)
   &nbsp;
   SanderHestvik
-* [![icon][mail]](mailto:gregory.shrago@jetbrains.com)
-  [![icon][github]](https://github.com/gregsh)
-  &nbsp;
-  Greg Shrago
 * [![icon][mail]](mailto:jphalip@gmail.com)
   [![icon][github]](https://github.com/jphalip)
   &nbsp;
@@ -570,14 +502,6 @@ Contributors:
   [![icon][github]](https://github.com/justast-wix)
   &nbsp;
   Justas Trimailovas
-* [![icon][mail]](mailto:wangxinhe06@gmail.com)
-  [![icon][github]](https://github.com/wxh06)
-  &nbsp;
-  Xinhe Wang
-* [![icon][mail]](mailto:vladimir.parfinenko@jetbrains.com)
-  [![icon][github]](https://github.com/cypok)
-  &nbsp;
-  Vladimir Parfinenko
 * [![icon][mail]](mailto:sdoerner@google.com)
   [![icon][github]](https://github.com/sdoerner)
   &nbsp;
@@ -590,10 +514,6 @@ Contributors:
   [![icon][github]](https://github.com/nath)
   &nbsp;
   Nath Tumlin
-* [![icon][mail]](mailto:ilya.usov@jetbrains.com)
-  [![icon][github]](https://github.com/Iliya-usov)
-  &nbsp;
-  Ilya Usov
 * [![icon][mail]](mailto:peterHoburg@users.noreply.github.com)
   [![icon][github]](https://github.com/peterHoburg)
   &nbsp;
@@ -602,38 +522,14 @@ Contributors:
   [![icon][github]](https://github.com/erotourtes)
   &nbsp;
   Max Siryk
-* [![icon][mail]](mailto:ivan.yarkov@jetbrains.com)
-  [![icon][github]](https://github.com/MToolMakerJB)
-  &nbsp;
-  Ivan Yarkov
-* [![icon][mail]](mailto:mia.vucinic@jetbrains.com)
-  [![icon][github]](https://github.com/vumi19)
-  &nbsp;
-  Mia Vucinic
 * [![icon][mail]](mailto:canava.thomas@gmail.com)
   [![icon][github]](https://github.com/Malandril)
   &nbsp;
   Thomas Canava
-* [![icon][mail]](mailto:xinhe.wang@jetbrains.com)
-  [![icon][github]](https://github.com/wxh06)
-  &nbsp;
-  Xinhe Wang
-* [![icon][mail]](mailto:zuber.kuba@gmail.com)
-  [![icon][github]](https://github.com/zuberol)
-  &nbsp;
-  Jakub Zuber
 * [![icon][mail]](mailto:nmh9097@gmail.com)
   [![icon][github]](https://github.com/NaMinhyeok)
   &nbsp;
   Na Minhyeok
-* [![icon][mail]](mailto:201638009+jetbrains-junie[bot]@users.noreply.github.com)
-  [![icon][github]](https://github.com/apps/jetbrains-junie)
-  &nbsp;
-  jetbrains-junie[bot]
-* [![icon][mail]](mailto:4416693+magidc@users.noreply.github.com)
-  [![icon][github]](https://github.com/magidc)
-  &nbsp;
-  magidc
 * [![icon][mail]](mailto:ricardo.rodcas@gmail.com)
   [![icon][github]](https://github.com/magidc)
   &nbsp;
@@ -642,10 +538,90 @@ Contributors:
   [![icon][github]](https://github.com/azjf)
   &nbsp;
   azjf
-* [![icon][mail]](mailto:41898282+claude[bot]@users.noreply.github.com)
-  [![icon][github]](https://github.com/apps/github-actions)
+
+Contributors with JetBrains IP:
+
+*The following contributors have assigned their intellectual property rights
+to JetBrains. This includes JetBrains employees whose contributions were made
+during their employment, contractors engaged by JetBrains to work on IdeaVim,
+and contributors who have signed a Contributor License Agreement (CLA).*
+
+* [![icon][mail]](mailto:alexpl292@gmail.com)
+  [![icon][github]](https://github.com/AlexPl292)
   &nbsp;
-  github-actions[bot]
+  Alex Plate (JetBrains employee)
+* [![icon][mail]](mailto:m.t.ellis@gmail.com)
+  [![icon][github]](https://github.com/citizenmatt)
+  &nbsp;
+  Matt Ellis (JetBrains employee)
+* [![icon][mail]](mailto:yole@jetbrains.com)
+  [![icon][github]](https://github.com/yole)
+  &nbsp;
+  Dmitry Jemerov (JetBrains employee)
+* [![icon][mail]](mailto:alexander.zolotov@jetbrains.com)
+  [![icon][github]](https://github.com/zolotov)
+  &nbsp;
+  Alexander Zolotov (JetBrains employee)
+* [![icon][mail]](mailto:pavel.fatin@jetbrains.com)
+  [![icon][github]](https://github.com/pavelfatin)
+  &nbsp;
+  Pavel Fatin (JetBrains employee)
+* [![icon][mail]](mailto:valery.isaev@jetbrains.com)
+  [![icon][github]](https://github.com/valis)
+  &nbsp;
+  valis (JetBrains employee)
+* [![icon][mail]](mailto:vladimir.petrenko@jetbrains.com)
+  [![icon][github]](https://github.com/vladimir-petrenko)
+  &nbsp;
+  Vladimir Petrenko (JetBrains employee)
+* [![icon][mail]](mailto:sergey.vorobyov@jetbrains.com)
+  [![icon][github]](https://github.com/DeveloperHacker)
+  &nbsp;
+  Sergei Vorobyov (JetBrains employee)
+* [![icon][mail]](mailto:eugene.nizienko@jetbrains.com)
+  [![icon][github]](https://github.com/nizienko)
+  &nbsp;
+  eugene nizienko (JetBrains employee)
+* [![icon][mail]](mailto:filipp.vakhitov@jetbrains.com)
+  [![icon][github]](https://github.com/lippfi)
+  &nbsp;
+  Filipp Vakhitov (JetBrains employee)
+* [![icon][mail]](mailto:ludwig.valda.vasquez@jetbrains.com)
+  [![icon][github]](https://github.com/ludwig-jb)
+  &nbsp;
+  ludwig-jb (JetBrains employee)
+* [![icon][mail]](mailto:kirill.karnaukhov@jetbrains.com)
+  [![icon][github]](https://github.com/kkarnauk)
+  &nbsp;
+  Kirill Karnaukhov (JetBrains employee)
+* [![icon][mail]](mailto:gregory.shrago@jetbrains.com)
+  [![icon][github]](https://github.com/gregsh)
+  &nbsp;
+  Greg Shrago (JetBrains employee)
+* [![icon][mail]](mailto:vladimir.parfinenko@jetbrains.com)
+  [![icon][github]](https://github.com/cypok)
+  &nbsp;
+  Vladimir Parfinenko (JetBrains employee)
+* [![icon][mail]](mailto:ilya.usov@jetbrains.com)
+  [![icon][github]](https://github.com/Iliya-usov)
+  &nbsp;
+  Ilya Usov (JetBrains employee)
+* [![icon][mail]](mailto:ivan.yarkov@jetbrains.com)
+  [![icon][github]](https://github.com/MToolMakerJB)
+  &nbsp;
+  Ivan Yarkov (JetBrains employee)
+* [![icon][mail]](mailto:mia.vucinic@jetbrains.com)
+  [![icon][github]](https://github.com/vumi19)
+  &nbsp;
+  Mia Vucinic (JetBrains employee)
+* [![icon][mail]](mailto:xinhe.wang@jetbrains.com)
+  [![icon][github]](https://github.com/wxh06)
+  &nbsp;
+  Xinhe Wang (JetBrains employee)
+* [![icon][mail]](mailto:zuber.kuba@gmail.com)
+  [![icon][github]](https://github.com/zuberol)
+  &nbsp;
+  Jakub Zuber (JetBrains contractor)
 
 Previous contributors:
 

@@ -731,7 +731,15 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
 
   fun assertExOutput(expected: String, clear: Boolean = true) {
     val actual = injector.outputPanel.getCurrentOutputPanel()?.text
-    assertNotNull(actual, "No Ex output")
+    if (actual == null) {
+      // If there's no output, there's a good chance we've got an error
+      val message = "No Ex output" + if (injector.messages.isError()) {
+        ". Error reported: " + VimPlugin.getMessage()
+      }
+      else ""
+
+      assertNotNull(actual, message)
+    }
     assertEquals(expected, actual)
     NeovimTesting.typeCommand("<esc>", testInfo, fixture.editor)
     if (clear) {
@@ -1054,10 +1062,12 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
 
     class NeoVim {
       var ignoredRegisters: Set<Char> = setOf()
+      var ignoredMarks: Set<Char> = setOf()
       var exitOnTearDown = true
 
       fun reset() {
         ignoredRegisters = setOf()
+        ignoredMarks = setOf()
         exitOnTearDown = true
       }
     }

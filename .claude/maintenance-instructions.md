@@ -110,9 +110,10 @@ Don't just look at surface-level issues. Dig deeper:
 If you decide to make changes:
 
 1. **Make focused commits**: One logical change per commit
-   - If the change affects many files or is complicated, split it into multiple step-by-step commits
+   - If the change affects many files or is complicated or has multiple logical changes, split it into multiple step-by-step commits
    - This makes it easier for reviewers to understand the changes
    - Example: First commit renames a function, second commit updates callers, third commit adds new functionality
+   - This rule is important!
 2. **Write clear commit messages**: Explain why, not just what
 3. **Run tests**: `./gradlew test -x :tests:property-tests:test -x :tests:long-running-tests:test`
 
@@ -174,7 +175,6 @@ Not critical, but could be addressed in future cleanup.
   - Architecture overview and where to find specific code
   - Testing guidelines and corner cases to consider
   - Common patterns and conventions
-  - Information about awards for quality contributions
 
 ## Commands Reference
 

@@ -7,6 +7,9 @@ jobs:
   build-for-ui-test-mac-os:
     if: github.repository == 'JetBrains/ideavim'
     runs-on: macos-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - name: Setup Java
@@ -41,6 +44,30 @@ jobs:
       - name: Move sandbox logs
         if: always()
         run: mv build/idea-sandbox/PC-*/log_runIdeForUiTests idea-sandbox-log
+      - name: AI Analysis of Test Failures
+        if: failure()
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          claude_args: '--allowed-tools "Read,Write,Glob,Grep,Bash(ffmpeg:*),Bash(ffprobe:*),Bash(mkdir:*),Bash(touch:*),Bash(echo:*),Bash(ls:*),Bash(cat:*),Bash(grep:*),Bash(find:*),Bash(cd:*)"'
+          prompt: |
+            ## Task: Analyze UI Test Failures
+
+            Please analyze the UI test failures in the current directory.
+
+            Key information:
+            - Test reports are located in: build/reports and tests/ui-py-tests/build/reports
+            - There is a video recording in build/reports/video that shows what happened during the tests - this video is usually very useful for understanding what went wrong visually
+            - There is also a single screenshot at tests/ui-py-tests/build/reports/ideaVimTest.png showing the state when the test failed
+            - IDE sandbox logs are in the idea-sandbox-log directory
+            - ffmpeg is already installed and available - you can use it to extract frames from the video or analyze it if that would be helpful
+
+            Please provide:
+            1. A detailed analysis of what went wrong
+            2. The root cause of the failure
+            3. Potential fixes or suggestions
+
+            Write your analysis to build/reports/ai-analysis.txt
       - name: Save report
         if: always()
         uses: actions/upload-artifact@v4

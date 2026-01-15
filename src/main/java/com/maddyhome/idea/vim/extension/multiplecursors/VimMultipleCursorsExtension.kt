@@ -327,6 +327,8 @@ internal class VimMultipleCursorsExtension : VimExtension {
 
   private fun makePattern(text: String, whole: Boolean): String {
     // Pattern is "very nomagic" (ignore regex chars) and "force case sensitive". This is vim-multiple-cursors behaviour
-    return "\\V\\C" + if (whole) "\\<$text\\>" else text
+    // In very nomagic mode, only backslash has special meaning, so we need to escape backslashes in the text
+    val escapedText = text.replace("\\", "\\\\")
+    return "\\V\\C" + if (whole) "\\<$escapedText\\>" else escapedText
   }
 }
