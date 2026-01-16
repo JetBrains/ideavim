@@ -5,263 +5,248 @@
  * license that can be found in the LICENSE.txt file or at
  * https://opensource.org/licenses/MIT.
  */
+package com.maddyhome.idea.vim.extension.argtextobj
 
-package com.maddyhome.idea.vim.extension.argtextobj;
+import com.intellij.openapi.editor.Document
+import com.maddyhome.idea.vim.KeyHandler.Companion.getInstance
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
+import com.maddyhome.idea.vim.api.VimCaret
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.command.TextObjectVisualType
+import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.extension.ExtensionHandler
+import com.maddyhome.idea.vim.extension.VimExtension
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
+import com.maddyhome.idea.vim.group.visual.vimSetSelection
+import com.maddyhome.idea.vim.handler.TextObjectActionHandler
+import com.maddyhome.idea.vim.helper.MessageHelper
+import com.maddyhome.idea.vim.helper.VimNlsSafe
+import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
+import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
+import com.maddyhome.idea.vim.newapi.IjVimCaret
+import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.state.mode.Mode.OP_PENDING
+import com.maddyhome.idea.vim.state.mode.Mode.VISUAL
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import org.jetbrains.annotations.Nls
+import java.util.*
+import java.util.function.Consumer
+import kotlin.math.max
+import kotlin.math.min
 
-import com.intellij.openapi.editor.Document;
-import com.maddyhome.idea.vim.KeyHandler;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.api.*;
-import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.command.OperatorArguments;
-import com.maddyhome.idea.vim.command.TextObjectVisualType;
-import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.extension.ExtensionHandler;
-import com.maddyhome.idea.vim.extension.VimExtension;
-import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
-import com.maddyhome.idea.vim.helper.InlayHelperKt;
-import com.maddyhome.idea.vim.helper.MessageHelper;
-import com.maddyhome.idea.vim.helper.VimNlsSafe;
-import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
-import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
-import com.maddyhome.idea.vim.newapi.IjVimCaret;
-import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.state.KeyHandlerState;
-import com.maddyhome.idea.vim.state.mode.Mode;
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
-import org.jetbrains.annotations.Nls;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+class VimArgTextObjExtension : VimExtension {
+  override fun getName(): String = "argtextobj"
 
-import java.util.ArrayDeque;
-import java.util.Deque;
+  override fun init() {
+    putExtensionHandlerMapping(
+      MappingMode.XO,
+      injector.parser.parseKeys("<Plug>InnerArgument"),
+      owner,
+      ArgumentHandler(true),
+      false
+    )
+    putExtensionHandlerMapping(
+      MappingMode.XO,
+      injector.parser.parseKeys("<Plug>OuterArgument"),
+      owner,
+      ArgumentHandler(false),
+      false
+    )
 
-import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping;
-import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing;
-
-/**
- * @author igrekster
- */
-
-public class VimArgTextObjExtension implements VimExtension {
-
-  @Override
-  public @NotNull String getName() {
-    return "argtextobj";
-  }
-
-  @Override
-  public void init() {
-
-    putExtensionHandlerMapping(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("<Plug>InnerArgument"), getOwner(), new VimArgTextObjExtension.ArgumentHandler(true), false);
-    putExtensionHandlerMapping(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("<Plug>OuterArgument"), getOwner(), new VimArgTextObjExtension.ArgumentHandler(false), false);
-
-    putKeyMappingIfMissing(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("ia"), getOwner(), VimInjectorKt.getInjector().getParser().parseKeys("<Plug>InnerArgument"), true);
-    putKeyMappingIfMissing(MappingMode.XO, VimInjectorKt.getInjector().getParser().parseKeys("aa"), getOwner(), VimInjectorKt.getInjector().getParser().parseKeys("<Plug>OuterArgument"), true);
+    putKeyMappingIfMissing(
+      MappingMode.XO,
+      injector.parser.parseKeys("ia"),
+      owner,
+      injector.parser.parseKeys("<Plug>InnerArgument"),
+      true
+    )
+    putKeyMappingIfMissing(
+      MappingMode.XO,
+      injector.parser.parseKeys("aa"),
+      owner,
+      injector.parser.parseKeys("<Plug>OuterArgument"),
+      true
+    )
   }
 
   /**
    * The pairs of brackets that delimit different types of argument lists.
    */
-  private static class BracketPairs {
+  private class BracketPairs(openBrackets: String, closeBrackets: String) {
     // NOTE: brackets must match by the position, and ordered by rank (highest to lowest).
-    private final @NotNull String openBrackets;
-    private final @NotNull String closeBrackets;
+    private val openBrackets: String
+    private val closeBrackets: String
 
-    static class ParseException extends Exception {
-      public ParseException(@NotNull String message) {
-        super(message);
-      }
-    }
+    class ParseException(message: String) : Exception(message)
 
-    private enum ParseState {
+    private enum class ParseState {
       OPEN,
       COLON,
       CLOSE,
       COMMA,
     }
 
-    /**
-     * Constructs @ref BracketPair from a string of bracket pairs with the same syntax
-     * as VIM's @c matchpairs option: "(:),{:},[:]"
-     *
-     * @param bracketPairs comma-separated list of colon-separated bracket pairs.
-     * @throws ParseException if a syntax error is detected.
-     */
-    static @NotNull BracketPairs fromBracketPairList(final @NotNull String bracketPairs) throws ParseException {
-      StringBuilder openBrackets = new StringBuilder();
-      StringBuilder closeBrackets = new StringBuilder();
-      ParseState state = ParseState.OPEN;
-      for (char ch : bracketPairs.toCharArray()) {
-        switch (state) {
-          case OPEN:
-            openBrackets.append(ch);
-            state = ParseState.COLON;
-            break;
-          case COLON:
-            if (ch == ':') {
-              state = ParseState.CLOSE;
-            } else {
-              throw new ParseException("expecting ':', but got '" + ch + "' instead");
-            }
-            break;
-          case CLOSE:
-            final char lastOpenBracket = openBrackets.charAt(openBrackets.length() - 1);
-            if (lastOpenBracket == ch) {
-              throw new ParseException("open and close brackets must be different");
-            }
-            closeBrackets.append(ch);
-            state = ParseState.COMMA;
-            break;
-          case COMMA:
-            if (ch == ',') {
-              state = ParseState.OPEN;
-            } else {
-              throw new ParseException("expecting ',', but got '" + ch + "' instead");
-            }
-            break;
-        }
-      }
-      if (state != ParseState.COMMA) {
-        throw new ParseException("list of pairs is incomplete");
-      }
-      return new BracketPairs(openBrackets.toString(), closeBrackets.toString());
+    init {
+      assert(openBrackets.length == closeBrackets.length)
+      this.openBrackets = openBrackets
+      this.closeBrackets = closeBrackets
     }
 
-    BracketPairs(final @NotNull String openBrackets, final @NotNull String closeBrackets) {
-      assert openBrackets.length() == closeBrackets.length();
-      this.openBrackets = openBrackets;
-      this.closeBrackets = closeBrackets;
+    fun getBracketPrio(ch: Char): Int {
+      return max(openBrackets.indexOf(ch), closeBrackets.indexOf(ch))
     }
 
-    int getBracketPrio(char ch) {
-      return Math.max(openBrackets.indexOf(ch), closeBrackets.indexOf(ch));
-    }
-
-    char matchingBracket(char ch) {
-      int idx = closeBrackets.indexOf(ch);
+    fun matchingBracket(ch: Char): Char {
+      var idx = closeBrackets.indexOf(ch)
       if (idx != -1) {
-        return openBrackets.charAt(idx);
+        return openBrackets[idx]
       } else {
-        assert isOpenBracket(ch);
-        idx = openBrackets.indexOf(ch);
-        return closeBrackets.charAt(idx);
+        assert(isOpenBracket(ch.code))
+        idx = openBrackets.indexOf(ch)
+        return closeBrackets[idx]
       }
     }
 
-    boolean isCloseBracket(final int ch) {
-      return closeBrackets.indexOf(ch) != -1;
+    fun isCloseBracket(ch: Int): Boolean {
+      return closeBrackets.indexOf(ch.toChar()) != -1
     }
 
-    boolean isOpenBracket(final int ch) {
-      return openBrackets.indexOf(ch) != -1;
+    fun isOpenBracket(ch: Int): Boolean {
+      return openBrackets.indexOf(ch.toChar()) != -1
     }
-  }
 
-  private static final BracketPairs DEFAULT_BRACKET_PAIRS = new BracketPairs("(", ")");
+    companion object {
+      /**
+       * Constructs @ref BracketPair from a string of bracket pairs with the same syntax
+       * as VIM's @c matchpairs option: "(:),{:},[:]"
+       * 
+       * @param bracketPairs comma-separated list of colon-separated bracket pairs.
+       * @throws ParseException if a syntax error is detected.
+       */
+      @Throws(ParseException::class)
+      fun fromBracketPairList(bracketPairs: String): BracketPairs {
+        val openBrackets = StringBuilder()
+        val closeBrackets = StringBuilder()
+        var state = ParseState.OPEN
+        for (ch in bracketPairs.toCharArray()) {
+          when (state) {
+            ParseState.OPEN -> {
+              openBrackets.append(ch)
+              state = ParseState.COLON
+            }
 
-  private static @Nullable String bracketPairsVariable() {
-    final Object value = VimPlugin.getVariableService().getGlobalVariableValue("argtextobj_pairs");
-    if (value instanceof VimString vimValue) {
-      return vimValue.getValue();
+            ParseState.COLON -> if (ch == ':') {
+              state = ParseState.CLOSE
+            } else {
+              throw ParseException("expecting ':', but got '$ch' instead")
+            }
+
+            ParseState.CLOSE -> {
+              val lastOpenBracket = openBrackets[openBrackets.length - 1]
+              if (lastOpenBracket == ch) {
+                throw ParseException("open and close brackets must be different")
+              }
+              closeBrackets.append(ch)
+              state = ParseState.COMMA
+            }
+
+            ParseState.COMMA -> if (ch == ',') {
+              state = ParseState.OPEN
+            } else {
+              throw ParseException("expecting ',', but got '$ch' instead")
+            }
+          }
+        }
+        if (state != ParseState.COMMA) {
+          throw ParseException("list of pairs is incomplete")
+        }
+        return BracketPairs(openBrackets.toString(), closeBrackets.toString())
+      }
     }
-    return null;
   }
 
   /**
    * A text object for an argument to a function definition or a call.
    */
-  static class ArgumentHandler implements ExtensionHandler {
-    final boolean isInner;
+  internal class ArgumentHandler(val isInner: Boolean) : ExtensionHandler {
+    override val isRepeatable: Boolean
+      get() = false
 
-    ArgumentHandler(boolean isInner) {
-      super();
-      this.isInner = isInner;
-    }
-
-    @Override
-    public boolean isRepeatable() {
-      return false;
-    }
-
-    static class ArgumentTextObjectHandler extends TextObjectActionHandler {
-      private final boolean isInner;
-
-      ArgumentTextObjectHandler(boolean isInner) {
-        this.isInner = isInner;
-      }
-
-      @Override
-      public @Nullable TextRange getRange(@NotNull VimEditor editor,
-                                          @NotNull ImmutableVimCaret caret,
-                                          @NotNull ExecutionContext context,
-                                          int count,
-                                          int rawCount) {
-        BracketPairs bracketPairs = DEFAULT_BRACKET_PAIRS;
-        final String bracketPairsVar = bracketPairsVariable();
+    internal class ArgumentTextObjectHandler(private val isInner: Boolean) : TextObjectActionHandler() {
+      override fun getRange(
+        editor: VimEditor,
+        caret: ImmutableVimCaret,
+        context: ExecutionContext,
+        count: Int,
+        rawCount: Int
+      ): TextRange? {
+        var bracketPairs: BracketPairs = Util.DEFAULT_BRACKET_PAIRS
+        val bracketPairsVar: String? = Util.bracketPairsVariable()
         if (bracketPairsVar != null) {
           try {
-            bracketPairs = BracketPairs.fromBracketPairList(bracketPairsVar);
-          } catch (BracketPairs.ParseException parseException) {
-            @VimNlsSafe String message =
-              MessageHelper.message("argtextobj.error.invalid.value.of.g.argtextobj.pairs.0", parseException.getMessage());
-            VimPlugin.showMessage(message);
-            VimPlugin.indicateError();
-            return null;
+            bracketPairs = BracketPairs.fromBracketPairList(bracketPairsVar)
+          } catch (parseException: BracketPairs.ParseException) {
+            @VimNlsSafe val message =
+              MessageHelper.message("argtextobj.error.invalid.value.of.g.argtextobj.pairs.0", parseException.message!!)
+            VimPlugin.showMessage(message)
+            VimPlugin.indicateError()
+            return null
           }
         }
-        final ArgBoundsFinder finder = new ArgBoundsFinder(((IjVimEditor)editor).getEditor().getDocument(), bracketPairs);
-        int pos = ((IjVimCaret)caret).getCaret().getOffset();
+        val finder = ArgBoundsFinder((editor as IjVimEditor).editor.document, bracketPairs)
+        var pos = (caret as IjVimCaret).caret.offset
 
-        for (int i = 0; i < count; ++i) {
+        for (i in 0..<count) {
           if (!finder.findBoundsAt(pos)) {
-            VimPlugin.showMessage(finder.errorMessage());
-            VimPlugin.indicateError();
-            return null;
+            VimPlugin.showMessage(finder.errorMessage())
+            VimPlugin.indicateError()
+            return null
           }
           if (i + 1 < count) {
-            finder.extendTillNext();
+            finder.extendTillNext()
           }
 
-          pos = finder.getRightBound();
+          pos = finder.rightBound
         }
 
         if (isInner) {
-          finder.adjustForInner();
+          finder.adjustForInner()
         } else {
-          finder.adjustForOuter();
+          finder.adjustForOuter()
         }
-        return new TextRange(finder.getLeftBound(), finder.getRightBound());
+        return TextRange(finder.leftBound, finder.rightBound)
       }
 
-      @Override
-      public @NotNull TextObjectVisualType getVisualType() {
-        return TextObjectVisualType.CHARACTER_WISE;
-      }
+      override val visualType: TextObjectVisualType
+        get() = TextObjectVisualType.CHARACTER_WISE
     }
 
-    @Override
-    public void execute(@NotNull VimEditor editor, @NotNull ExecutionContext context, @NotNull OperatorArguments operatorArguments) {
-      @NotNull KeyHandlerState keyHandlerState = KeyHandler.getInstance().getKeyHandlerState();
+    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
+      val keyHandlerState = getInstance().keyHandlerState
 
-      final ArgumentTextObjectHandler textObjectHandler = new ArgumentTextObjectHandler(isInner);
-      //noinspection DuplicatedCode
-      if (!(editor.getMode() instanceof Mode.OP_PENDING)) {
-        int count0 = operatorArguments.getCount0();
-        editor.nativeCarets().forEach((VimCaret caret) -> {
-          final TextRange range = textObjectHandler.getRange(editor, caret, context, Math.max(1, count0), count0);
+      val textObjectHandler = ArgumentTextObjectHandler(isInner)
+      if (editor.mode !is OP_PENDING) {
+        val count0 = operatorArguments.count0
+        editor.nativeCarets().forEach(Consumer { caret: VimCaret ->
+          val range = textObjectHandler.getRange(editor, caret, context, max(1, count0), count0)
           if (range != null) {
-            try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
-              if (editor.getMode() instanceof Mode.VISUAL) {
-                com.maddyhome.idea.vim.group.visual.EngineVisualGroupKt.vimSetSelection(caret, range.getStartOffset(), range.getEndOffset() - 1, true);
+            SelectionVimListenerSuppressor.lock().use { _ ->
+              if (editor.mode is VISUAL) {
+                caret.vimSetSelection(range.startOffset, range.endOffset - 1, true)
               } else {
-                InlayHelperKt.moveToInlayAwareOffset(((IjVimCaret)caret).getCaret(), range.getStartOffset());
+                (caret as IjVimCaret).caret.moveToInlayAwareOffset(range.startOffset)
               }
             }
           }
-        });
+        })
       } else {
-        keyHandlerState.getCommandBuilder().addAction(textObjectHandler);
+        keyHandlerState.commandBuilder.addAction(textObjectHandler)
       }
     }
   }
@@ -270,25 +255,17 @@ public class VimArgTextObjExtension implements VimExtension {
    * Helper class to find argument boundaries starting at the specified
    * position
    */
-  private static class ArgBoundsFinder {
-    private final @NotNull CharSequence text;
-    private final @NotNull Document document;
-    private final @NotNull BracketPairs brackets;
-    private int leftBound = Integer.MAX_VALUE;
-    private int rightBound = Integer.MIN_VALUE;
-    private int leftBracket;
-    private int rightBracket;
-    private @Nls String error = null;
-    private static final String QUOTES = "\"'";
+  private class ArgBoundsFinder(private val document: Document, private val brackets: BracketPairs) {
+    private val text: CharSequence = document.immutableCharSequence
+    var leftBound: Int = Int.MAX_VALUE
+      private set
+    var rightBound: Int = Int.MIN_VALUE
+      private set
+    private var leftBracket = 0
+    private var rightBracket = 0
 
-    private static final int MAX_SEARCH_LINES = 10;
-    private static final int MAX_SEARCH_OFFSET = MAX_SEARCH_LINES * 80;
-
-    ArgBoundsFinder(@NotNull Document document, @NotNull BracketPairs bracketPairs) {
-      this.text = document.getImmutableCharSequence();
-      this.document = document;
-      this.brackets = bracketPairs;
-    }
+    @Nls
+    private var error: @Nls String? = null
 
     /**
      * Finds left and right boundaries of an argument at the specified
@@ -296,72 +273,72 @@ public class VimArgTextObjExtension implements VimExtension {
      * argument delimiter and @ref getRightBound() will point to the right
      * argument delimiter. Use @ref adjustForInner or @ref adjustForOuter to
      * fix the boundaries based on the type of text object.
-     *
+     * 
      * @param position starting position.
      */
-    boolean findBoundsAt(int position) throws IllegalStateException {
+    @Throws(IllegalStateException::class)
+    fun findBoundsAt(position: Int): Boolean {
       if (text.isEmpty()) {
-        error = "empty document";
-        return false;
+        error = "empty document"
+        return false
       }
-      leftBound = Math.min(position, leftBound);
-      rightBound = Math.max(position, rightBound);
-      getOutOfQuotedText();
+      leftBound = min(position, leftBound)
+      rightBound = max(position, rightBound)
+      this.outOfQuotedText
       if (rightBound == leftBound) {
-        if (brackets.isCloseBracket(getCharAt(rightBound))) {
-          --leftBound;
+        if (brackets.isCloseBracket(getCharAt(rightBound).code)) {
+          --leftBound
         } else {
-          ++rightBound;
+          ++rightBound
         }
       }
-      int nextLeft = leftBound;
-      int nextRight = rightBound;
-      final int leftLimit = leftLimit(position);
-      final int rightLimit = rightLimit(position);
+      var nextLeft = leftBound
+      var nextRight = rightBound
+      val leftLimit = leftLimit(position)
+      val rightLimit = rightLimit(position)
       //
       // Try to extend the bounds until one of the bounds is a comma.
       // This handles cases like: fun(a, (30 + <cursor>x) * 20, c)
       //
-      boolean bothBrackets;
+      var bothBrackets: Boolean
       do {
-        leftBracket = nextLeft;
-        rightBracket = nextRight;
+        leftBracket = nextLeft
+        rightBracket = nextRight
         if (!findOuterBrackets(leftLimit, rightLimit)) {
-          error = "not inside argument list";
-          return false;
+          error = "not inside argument list"
+          return false
         }
-        leftBound = nextLeft;
-        findLeftBound();
-        nextLeft = leftBound - 1;
-        rightBound = nextRight;
-        findRightBound();
-        nextRight = rightBound + 1;
+        leftBound = nextLeft
+        findLeftBound()
+        nextLeft = leftBound - 1
+        rightBound = nextRight
+        findRightBound()
+        nextRight = rightBound + 1
         //
         // If reached text boundaries
         //
         if (nextLeft < leftLimit || nextRight > rightLimit) {
-          error = "not an argument";
-          return false;
+          error = "not an argument"
+          return false
         }
-        bothBrackets = getCharAt(leftBound) != ',' && getCharAt(rightBound) != ',';
-        final boolean nonEmptyArg = (rightBound - leftBound) > 1;
-        if (bothBrackets && nonEmptyArg && isIdentPreceding()) {
+        bothBrackets = getCharAt(leftBound) != ',' && getCharAt(rightBound) != ','
+        val nonEmptyArg = (rightBound - leftBound) > 1
+        if (bothBrackets && nonEmptyArg && this.isIdentPreceding) {
           // Looking at a pair of brackets preceded by an
           // identifier -- single argument function call.
-          break;
+          break
         }
-      }
-      while (leftBound > leftLimit && rightBound < rightLimit && bothBrackets);
-      return true;
+      } while (leftBound > leftLimit && rightBound < rightLimit && bothBrackets)
+      return true
     }
 
     /**
      * Skip left delimiter character and any following whitespace.
      */
-    void adjustForInner() {
-      ++leftBound;
+    fun adjustForInner() {
+      ++leftBound
       while (leftBound < rightBound && Character.isWhitespace(getCharAt(leftBound))) {
-        ++leftBound;
+        ++leftBound
       }
     }
 
@@ -369,367 +346,372 @@ public class VimArgTextObjExtension implements VimExtension {
      * Exclude left bound character for the first argument, include the
      * right bound character and any following whitespace.
      */
-    void adjustForOuter() {
+    fun adjustForOuter() {
       if (getCharAt(leftBound) != ',') {
-        ++leftBound;
-        extendTillNext();
+        ++leftBound
+        extendTillNext()
       }
     }
 
     /**
      * Extend the right bound to the beginning of the next argument (if any).
      */
-    void extendTillNext() {
+    fun extendTillNext() {
       if (rightBound + 1 < rightBracket && getCharAt(rightBound) == ',') {
-        ++rightBound;
+        ++rightBound
         while (rightBound + 1 < rightBracket && Character.isWhitespace(getCharAt(rightBound))) {
-          ++rightBound;
+          ++rightBound
         }
       }
     }
 
-    int getLeftBound() {
-      return leftBound;
-    }
-
-    int getRightBound() {
-      return rightBound;
-    }
-
-    private boolean isIdentPreceding() {
-      int i = leftBound - 1;
-      final int idEnd = i;
-      while (i >= 0 && Character.isJavaIdentifierPart(getCharAt(i))) {
-        --i;
+    val isIdentPreceding: Boolean
+      get() {
+        var i = leftBound - 1
+        val idEnd = i
+        while (i >= 0 && Character.isJavaIdentifierPart(getCharAt(i))) {
+          --i
+        }
+        return (idEnd - i) > 0 && Character.isJavaIdentifierStart(getCharAt(i + 1))
       }
-      return (idEnd - i) > 0 && Character.isJavaIdentifierStart(getCharAt(i + 1));
-    }
 
-    /**
-     * Detects if current position is inside a quoted string and adjusts
-     * left and right bounds to the boundaries of the string.
-     *
-     * NOTE: Does not support line continuations for quoted string ('\' at the end of line).
-     */
-    private void getOutOfQuotedText() {
-      // TODO this method should use IdeaVim methods to determine if the current position is in the string
-      final int lineNo = document.getLineNumber(leftBound);
-      final int lineStartOffset = document.getLineStartOffset(lineNo);
-      final int lineEndOffset = document.getLineEndOffset(lineNo);
-      int i = lineStartOffset;
-      while (i <= leftBound) {
-        if (isQuote(i)) {
-          final int endOfQuotedText = skipQuotedTextForward(i, lineEndOffset);
-          if (endOfQuotedText >= leftBound) {
-            leftBound = i - 1;
-            rightBound = endOfQuotedText + 1;
-            break;
-          } else {
-            i = endOfQuotedText;
+    val outOfQuotedText: Unit
+      /**
+       * Detects if current position is inside a quoted string and adjusts
+       * left and right bounds to the boundaries of the string.
+       * 
+       * NOTE: Does not support line continuations for quoted string ('\' at the end of line).
+       */
+      get() {
+        // TODO this method should use IdeaVim methods to determine if the current position is in the string
+        val lineNo = document.getLineNumber(leftBound)
+        val lineStartOffset = document.getLineStartOffset(lineNo)
+        val lineEndOffset = document.getLineEndOffset(lineNo)
+        var i = lineStartOffset
+        while (i <= leftBound) {
+          if (isQuote(i)) {
+            val endOfQuotedText = skipQuotedTextForward(i, lineEndOffset)
+            if (endOfQuotedText >= leftBound) {
+              leftBound = i - 1
+              rightBound = endOfQuotedText + 1
+              break
+            } else {
+              i = endOfQuotedText
+            }
           }
+          ++i
         }
-        ++i;
       }
-    }
 
-    private void findRightBound() {
+    fun findRightBound() {
       while (rightBound < rightBracket) {
-        final char ch = getCharAt(rightBound);
+        val ch = getCharAt(rightBound)
         if (ch == ',') {
-          break;
+          break
         }
-        if (brackets.isOpenBracket(ch)) {
-          rightBound = skipSexp(rightBound, rightBracket, SexpDirection.forward(brackets));
+        if (brackets.isOpenBracket(ch.code)) {
+          rightBound = skipSexp(rightBound, rightBracket, SexpDirection.forward(brackets))
         } else {
-          if (isQuoteChar(ch)) {
-            rightBound = skipQuotedTextForward(rightBound, rightBracket);
+          if (isQuoteChar(ch.code)) {
+            rightBound = skipQuotedTextForward(rightBound, rightBracket)
           }
-          ++rightBound;
+          ++rightBound
         }
       }
     }
 
-    private void findLeftBound() {
+    fun findLeftBound() {
       while (leftBound > leftBracket) {
-        final char ch = getCharAt(leftBound);
+        val ch = getCharAt(leftBound)
         if (ch == ',') {
-          break;
+          break
         }
-        if (brackets.isCloseBracket(ch)) {
-          leftBound = skipSexp(leftBound, leftBracket, SexpDirection.backward(brackets));
+        if (brackets.isCloseBracket(ch.code)) {
+          leftBound = skipSexp(leftBound, leftBracket, SexpDirection.backward(brackets))
         } else {
-          if (isQuoteChar(ch)) {
-            leftBound = skipQuotedTextBackward(leftBound, leftBracket);
+          if (isQuoteChar(ch.code)) {
+            leftBound = skipQuotedTextBackward(leftBound, leftBracket)
           }
-          --leftBound;
+          --leftBound
         }
       }
     }
 
-    private boolean isQuote(final int i) {
-      return QUOTES.indexOf(getCharAt(i)) != -1;
+    fun isQuote(i: Int): Boolean {
+      return QUOTES.indexOf(getCharAt(i)) != -1
     }
 
-    private static boolean isQuoteChar(final int ch) {
-      return QUOTES.indexOf(ch) != -1;
+    fun getCharAt(logicalOffset: Int): Char {
+      assert(logicalOffset < text.length)
+      return text[logicalOffset]
     }
 
-    private char getCharAt(int logicalOffset) {
-      assert logicalOffset < text.length();
-      return text.charAt(logicalOffset);
-    }
-
-    private int skipQuotedTextForward(final int start, final int end) {
-      assert start < end;
-      final char quoteChar = getCharAt(start);
-      boolean backSlash = false;
-      int i = start + 1;
+    fun skipQuotedTextForward(start: Int, end: Int): Int {
+      assert(start < end)
+      val quoteChar = getCharAt(start)
+      var backSlash = false
+      var i = start + 1
 
       while (i <= end) {
-        final char ch = getCharAt(i);
+        val ch = getCharAt(i)
         if (ch == quoteChar && !backSlash) {
           // Found a matching quote, and it's not escaped.
-          break;
+          break
         } else {
-          backSlash = ch == '\\' && !backSlash;
+          backSlash = ch == '\\' && !backSlash
         }
-        ++i;
+        ++i
       }
-      return i;
+      return i
     }
 
-    private int skipQuotedTextBackward(final int start, final int end) {
-      assert start > end;
-      final char quoteChar = getCharAt(start);
-      int i = start - 1;
+    fun skipQuotedTextBackward(start: Int, end: Int): Int {
+      assert(start > end)
+      val quoteChar = getCharAt(start)
+      var i = start - 1
 
       while (i > end) {
-        final char ch = getCharAt(i);
-        final char prevChar = getCharAt(i - 1);
+        val ch = getCharAt(i)
+        val prevChar = getCharAt(i - 1)
         // NOTE: doesn't handle cases like \\"str", but they make no
         //       sense anyway.
         if (ch == quoteChar && prevChar != '\\') {
           // Found a matching quote, and it's not escaped.
-          break;
+          break
         }
-        --i;
+        --i
       }
-      return i;
+      return i
     }
 
-    private int leftLimit(final int pos) {
-      final int offsetLimit = Math.max(pos - MAX_SEARCH_OFFSET, 0);
-      final int lineNo = document.getLineNumber(pos);
-      final int lineOffsetLimit = document.getLineStartOffset(Math.max(0, lineNo - MAX_SEARCH_LINES));
-      return Math.max(offsetLimit, lineOffsetLimit);
+    fun leftLimit(pos: Int): Int {
+      val offsetLimit = max(pos - MAX_SEARCH_OFFSET, 0)
+      val lineNo = document.getLineNumber(pos)
+      val lineOffsetLimit = document.getLineStartOffset(max(0, lineNo - MAX_SEARCH_LINES))
+      return max(offsetLimit, lineOffsetLimit)
     }
 
-    private int rightLimit(final int pos) {
-      final int offsetLimit = Math.min(pos + MAX_SEARCH_OFFSET, text.length());
-      final int lineNo = document.getLineNumber(pos);
-      final int lineOffsetLimit = document.getLineEndOffset(Math.min(document.getLineCount() - 1, lineNo + MAX_SEARCH_LINES));
-      return Math.min(offsetLimit, lineOffsetLimit);
+    fun rightLimit(pos: Int): Int {
+      val offsetLimit = min(pos + MAX_SEARCH_OFFSET, text.length)
+      val lineNo = document.getLineNumber(pos)
+      val lineOffsetLimit = document.getLineEndOffset(min(document.lineCount - 1, lineNo + MAX_SEARCH_LINES))
+      return min(offsetLimit, lineOffsetLimit)
     }
 
-    String errorMessage() {
-      return error;
+    fun errorMessage(): String? {
+      return error
     }
 
     /**
      * Interface to parametrise S-expression traversal direction.
      */
-    abstract static class SexpDirection {
-      abstract int delta();
+    abstract class SexpDirection {
+      abstract fun delta(): Int
 
-      abstract boolean isOpenBracket(char ch);
+      abstract fun isOpenBracket(ch: Char): Boolean
 
-      abstract boolean isCloseBracket(char ch);
+      abstract fun isCloseBracket(ch: Char): Boolean
 
-      abstract int skipQuotedText(int pos, int end, ArgBoundsFinder self);
+      abstract fun skipQuotedText(pos: Int, end: Int, self: ArgBoundsFinder): Int
 
-      static SexpDirection forward(BracketPairs brackets) {
-        return new SexpDirection() {
-          @Override
-          int delta() {
-            return 1;
+      companion object {
+        fun forward(brackets: BracketPairs): SexpDirection {
+          return object : SexpDirection() {
+            override fun delta(): Int {
+              return 1
+            }
+
+            override fun isOpenBracket(ch: Char): Boolean {
+              return brackets.isOpenBracket(ch.code)
+            }
+
+            override fun isCloseBracket(ch: Char): Boolean {
+              return brackets.isCloseBracket(ch.code)
+            }
+
+            override fun skipQuotedText(pos: Int, end: Int, self: ArgBoundsFinder): Int {
+              return self.skipQuotedTextForward(pos, end)
+            }
           }
+        }
 
-          @Override
-          boolean isOpenBracket(char ch) {
-            return brackets.isOpenBracket(ch);
-          }
+        fun backward(brackets: BracketPairs): SexpDirection {
+          return object : SexpDirection() {
+            override fun delta(): Int {
+              return -1
+            }
 
-          @Override
-          boolean isCloseBracket(char ch) {
-            return brackets.isCloseBracket(ch);
-          }
+            override fun isOpenBracket(ch: Char): Boolean {
+              return brackets.isCloseBracket(ch.code)
+            }
 
-          @Override
-          int skipQuotedText(int pos, int end, ArgBoundsFinder self) {
-            return self.skipQuotedTextForward(pos, end);
-          }
-        };
-      }
+            override fun isCloseBracket(ch: Char): Boolean {
+              return brackets.isOpenBracket(ch.code)
+            }
 
-      static SexpDirection backward(BracketPairs brackets) {
-        return new SexpDirection() {
-          @Override
-          int delta() {
-            return -1;
+            override fun skipQuotedText(pos: Int, end: Int, self: ArgBoundsFinder): Int {
+              return self.skipQuotedTextBackward(pos, end)
+            }
           }
-
-          @Override
-          boolean isOpenBracket(char ch) {
-            return brackets.isCloseBracket(ch);
-          }
-
-          @Override
-          boolean isCloseBracket(char ch) {
-            return brackets.isOpenBracket(ch);
-          }
-
-          @Override
-          int skipQuotedText(int pos, int end, ArgBoundsFinder self) {
-            return self.skipQuotedTextBackward(pos, end);
-          }
-        };
+        }
       }
     }
 
     /**
      * Skip over an S-expression considering priorities when unbalanced.
-     *
+     * 
      * @param start position of the starting bracket.
      * @param end   maximum position
      * @param dir   direction instance
      * @return position after the S-expression, or the next to the start position if
      * unbalanced.
      */
-    private int skipSexp(final int start, final int end, SexpDirection dir) {
-      char lastChar = getCharAt(start);
-      assert dir.isOpenBracket(lastChar);
-      Deque<Character> bracketStack = new ArrayDeque<>();
-      bracketStack.push(lastChar);
-      int i = start + dir.delta();
+    fun skipSexp(start: Int, end: Int, dir: SexpDirection): Int {
+      val lastChar = getCharAt(start)
+      assert(dir.isOpenBracket(lastChar))
+      val bracketStack: Deque<Char?> = ArrayDeque<Char?>()
+      bracketStack.push(lastChar)
+      var i = start + dir.delta()
       while (!bracketStack.isEmpty() && i != end) {
-        final char ch = getCharAt(i);
+        val ch = getCharAt(i)
         if (dir.isOpenBracket(ch)) {
-          bracketStack.push(ch);
+          bracketStack.push(ch)
         } else {
           if (dir.isCloseBracket(ch)) {
             if (bracketStack.getLast() == brackets.matchingBracket(ch)) {
-              bracketStack.pop();
+              bracketStack.pop()
             } else {
-              //noinspection StatementWithEmptyBody
-              if (brackets.getBracketPrio(ch) < brackets.getBracketPrio(bracketStack.getLast())) {
+              if (brackets.getBracketPrio(ch) < brackets.getBracketPrio(bracketStack.getLast()!!)) {
                 // (<...) ->  (...)
-                bracketStack.pop();
+                bracketStack.pop()
                 // Retry the same character again for cases like (...<<...).
-                continue;
+                continue
               } else {                        // Unbalanced brackets -- check ranking.
                 // Ignore lower-priority closing brackets.
                 // (...> ->  (....
               }
             }
           } else {
-            if (isQuoteChar(ch)) {
-              i = dir.skipQuotedText(i, end, this);
+            if (isQuoteChar(ch.code)) {
+              i = dir.skipQuotedText(i, end, this)
             }
           }
         }
-        i += dir.delta();
+        i += dir.delta()
       }
       if (bracketStack.isEmpty()) {
-        return i;
+        return i
       } else {
-        return start + dir.delta();
+        return start + dir.delta()
       }
     }
 
     /**
      * Find a pair of brackets surrounding (leftBracket..rightBracket) block.
-     *
+     * 
      * @param start minimum position to look for
      * @param end   maximum position
      * @return true if found
      */
-    boolean findOuterBrackets(final int start, final int end) {
-      boolean hasNewBracket = findPrevOpenBracket(start) && findNextCloseBracket(end);
+    fun findOuterBrackets(start: Int, end: Int): Boolean {
+      var hasNewBracket = findPrevOpenBracket(start) && findNextCloseBracket(end)
       while (hasNewBracket) {
-        final int leftPrio = brackets.getBracketPrio(getCharAt(leftBracket));
-        final int rightPrio = brackets.getBracketPrio(getCharAt(rightBracket));
+        val leftPrio = brackets.getBracketPrio(getCharAt(leftBracket))
+        val rightPrio = brackets.getBracketPrio(getCharAt(rightBracket))
         if (leftPrio == rightPrio) {
           // matching brackets
-          return true;
+          return true
         } else {
           if (leftPrio < rightPrio) {
             if (rightBracket + 1 < end) {
-              ++rightBracket;
-              hasNewBracket = findNextCloseBracket(end);
+              ++rightBracket
+              hasNewBracket = findNextCloseBracket(end)
             } else {
-              hasNewBracket = false;
+              hasNewBracket = false
             }
           } else {
             if (leftBracket > 1) {
-              --leftBracket;
-              hasNewBracket = findPrevOpenBracket(start);
+              --leftBracket
+              hasNewBracket = findPrevOpenBracket(start)
             } else {
-              hasNewBracket = false;
+              hasNewBracket = false
             }
           }
         }
       }
-      return false;
+      return false
     }
 
     /**
      * Finds unmatched open bracket starting at @a leftBracket.
-     *
+     * 
      * @param start minimum position.
      * @return true if found
      */
-    private boolean findPrevOpenBracket(final int start) {
-      char ch;
-      while (!brackets.isOpenBracket(ch = getCharAt(leftBracket))) {
-        if (brackets.isCloseBracket(ch)) {
-          leftBracket = skipSexp(leftBracket, start, SexpDirection.backward(brackets));
+    fun findPrevOpenBracket(start: Int): Boolean {
+      var ch: Char
+      while (!brackets.isOpenBracket(getCharAt(leftBracket).also { ch = it }.code)) {
+        if (brackets.isCloseBracket(ch.code)) {
+          leftBracket = skipSexp(leftBracket, start, SexpDirection.backward(brackets))
         } else {
-          if (isQuoteChar(ch)) {
-            leftBracket = skipQuotedTextBackward(leftBracket, start);
+          if (isQuoteChar(ch.code)) {
+            leftBracket = skipQuotedTextBackward(leftBracket, start)
           } else {
             if (leftBracket == start) {
-              return false;
+              return false
             }
           }
-          --leftBracket;
+          --leftBracket
         }
       }
-      return true;
+      return true
     }
 
     /**
      * Finds unmatched close bracket starting at @a rightBracket.
-     *
+     * 
      * @param end maximum position.
      * @return true if found
      */
-    private boolean findNextCloseBracket(final int end) {
-      char ch;
-      while (!brackets.isCloseBracket(ch = getCharAt(rightBracket))) {
-        if (brackets.isOpenBracket(ch)) {
-          rightBracket = skipSexp(rightBracket, end, SexpDirection.forward(brackets));
+    fun findNextCloseBracket(end: Int): Boolean {
+      var ch: Char
+      while (!brackets.isCloseBracket(getCharAt(rightBracket).also { ch = it }.code)) {
+        if (brackets.isOpenBracket(ch.code)) {
+          rightBracket = skipSexp(rightBracket, end, SexpDirection.forward(brackets))
         } else {
-          if (isQuoteChar(ch)) {
-            rightBracket = skipQuotedTextForward(rightBracket, end);
+          if (isQuoteChar(ch.code)) {
+            rightBracket = skipQuotedTextForward(rightBracket, end)
           }
-          ++rightBracket;
+          ++rightBracket
         }
         if (rightBracket >= end) {
-          return false;
+          return false
         }
       }
-      return true;
+      return true
+    }
+
+    companion object {
+      private const val QUOTES = "\"'"
+
+      private const val MAX_SEARCH_LINES = 10
+      private val MAX_SEARCH_OFFSET: Int = MAX_SEARCH_LINES * 80
+
+      private fun isQuoteChar(ch: Int): Boolean {
+        return QUOTES.indexOf(ch.toChar()) != -1
+      }
     }
   }
 
+  private object Util {
+    val DEFAULT_BRACKET_PAIRS = BracketPairs("(", ")")
+
+    fun bracketPairsVariable(): String? {
+      val value: Any? = VimPlugin.getVariableService().getGlobalVariableValue("argtextobj_pairs")
+      if (value is VimString) {
+        return value.value
+      }
+      return null
+    }
+  }
 }
