@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test
 import javax.swing.KeyStroke
 
 class GnNextTextObjectTest : VimTestCase() {
-  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @TestWithoutNeovim(SkipNeovimReason.IDEAVIM_API_USED, description = "Uses injector.parser.parseKeys and VimPlugin.getSearch API")
   @Test
   fun `test delete word`() {
     doTestWithSearch(
