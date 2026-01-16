@@ -214,6 +214,9 @@ class UiTests {
 
     findText("Copy Action Id").click()
 
+    // Wait for the copy operation to complete and new notification to appear
+    waitFor { hasText("Action id copied: EditorEscape") }
+
     // Wait for tracking to be active (button changes to "Stop Tracking")
     waitFor { hasText("Stop Tracking") }
 
