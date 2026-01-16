@@ -538,10 +538,6 @@ Contributors:
   [![icon][github]](https://github.com/azjf)
   &nbsp;
   azjf
-* [![icon][mail]](mailto:noreply@anthropic.com)
-  [![icon][github]](https://github.com/claude)
-  &nbsp;
-  claude
 
 Contributors with JetBrains IP:
 

@@ -265,6 +265,11 @@ async function main(): Promise<void> {
       continue;
     }
 
+    if (email === "noreply@anthropic.com") {
+      console.log(`Email '${email}' is from Claude AI. Skip it`);
+      continue;
+    }
+
     const authorInfo = await getGitHubAuthorInfo(hash);
     if (!authorInfo) {
       console.log(`Can't get the commit author. Email: ${email}. Commit: ${hash}`);
