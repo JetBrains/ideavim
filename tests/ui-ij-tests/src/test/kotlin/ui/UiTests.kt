@@ -206,6 +206,15 @@ class UiTests {
   }
 
   private fun IdeaFrame.testTrackActionId(editor: Editor) {
+    // Dismiss any lingering notifications from previous tests (e.g., Alt+Enter, Ctrl+Enter mapping warnings)
+    keyboard {
+      escape()
+      escape()
+    }
+
+    // Wait briefly to ensure notifications are dismissed and don't interfere with the action tracking dialog
+    Thread.sleep(500)
+
     commonSteps.invokeAction("VimFindActionIdAction")
 
     keyboard {
