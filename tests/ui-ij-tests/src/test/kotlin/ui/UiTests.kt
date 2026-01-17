@@ -214,8 +214,10 @@ class UiTests {
 
     findText("Copy Action Id").click()
 
-    // Wait for tracking to be active (button changes to "Stop Tracking")
-    waitFor { hasText("Stop Tracking") }
+    // Wait for the copy action to complete (notification updates to show "Action id copied")
+    waitFor(duration = Duration.ofSeconds(5)) {
+      hasText("Action id copied")
+    }
 
     findText("Stop Tracking").click()
 
