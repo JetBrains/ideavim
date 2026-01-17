@@ -212,6 +212,9 @@ class UiTests {
       escape()
     }
 
+    // Wait for the notification with "Copy Action Id" to appear after tracking the escape action
+    waitFor { hasText("Copy Action Id") }
+
     findText("Copy Action Id").click()
 
     // Wait for tracking to be active (button changes to "Stop Tracking")
