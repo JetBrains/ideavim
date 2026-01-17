@@ -206,6 +206,19 @@ class UiTests {
   }
 
   private fun IdeaFrame.testTrackActionId(editor: Editor) {
+    // Wait for editor to contain the correct Java file content
+    // This ensures we're not showing stale content from the previous MyDoc.txt file
+    waitFor(Duration.ofSeconds(10)) {
+      editor.text.contains("class MyTest") && !editor.text.startsWith("Five")
+    }
+
+    // Ensure we're at the start of the file in normal mode
+    keyboard {
+      escape()
+      enterText("gg")
+      enterText("0")
+    }
+
     commonSteps.invokeAction("VimFindActionIdAction")
 
     keyboard {
