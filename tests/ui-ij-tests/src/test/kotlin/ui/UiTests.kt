@@ -473,6 +473,11 @@ class UiTests {
       enterText("l")
     }
 
+    // Wait for selection to update after keypress
+    waitFor(duration = Duration.ofSeconds(2)) {
+      editor.selectedText != "One"
+    }
+
     assertEquals("ne", editor.selectedText)
 
     vimExit()
