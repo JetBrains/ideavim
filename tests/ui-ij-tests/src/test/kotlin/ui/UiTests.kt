@@ -237,10 +237,10 @@ class UiTests {
     // Explicitly dismiss any visible notifications
     keyboard { escape() }
 
-    // Wait briefly for notification to dismiss
-    waitFor(duration = Duration.ofSeconds(3)) {
-      !hasText("Copy Action Id")
-    }
+    // Note: No need to wait for notification text to disappear from UI.
+    // The notification was already dismissed by clicking "Stop Tracking" above.
+    // Checking for text absence globally is fragile as it may persist in
+    // the Notifications tool window history.
 
     vimExit()
   }
