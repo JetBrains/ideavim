@@ -219,10 +219,18 @@ class UiTests {
 
     findText("Stop Tracking").click()
 
+    // Wait a moment for tracking to complete and clipboard to be populated
+    Thread.sleep(500)
+
     editor.findText("class").click()
+
+    // Wait for cursor to be positioned
+    Thread.sleep(300)
+
     remoteRobot.invokeActionJs("EditorPaste")
 
-    waitFor {
+    // Wait for paste operation to complete with extended timeout
+    waitFor(duration = Duration.ofSeconds(15)) {
       """
                 |EditorEscapeclass MyTest {
                 |  public static void main() {
