@@ -406,12 +406,14 @@ class UiTests {
       from.moveMouseInGutterTo(to, this)
     }
 
-    Thread.sleep(1000)
-
-    assertEquals("One Two\nThree Four\n", editor.selectedText)
+    waitFor(Duration.ofSeconds(5)) {
+      editor.selectedText == "One Two\nThree Four\n"
+    }
 
     keyboard { enterText("j") }
-    assertEquals("One Two\nThree Four\nFive", editor.selectedText)
+    waitFor(Duration.ofSeconds(5)) {
+      editor.selectedText == "One Two\nThree Four\nFive"
+    }
 
     vimExit()
   }
