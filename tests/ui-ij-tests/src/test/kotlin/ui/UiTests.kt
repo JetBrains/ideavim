@@ -217,6 +217,16 @@ class UiTests {
     // Wait for tracking to be active (button changes to "Stop Tracking")
     waitFor { hasText("Stop Tracking") }
 
+    // Perform the action we want to track (Escape key)
+    keyboard {
+      escape()
+    }
+
+    // Wait for the action ID to appear in the notification
+    waitFor(duration = Duration.ofSeconds(3)) {
+      hasText("EditorEscape")
+    }
+
     findText("Stop Tracking").click()
 
     editor.findText("class").click()
