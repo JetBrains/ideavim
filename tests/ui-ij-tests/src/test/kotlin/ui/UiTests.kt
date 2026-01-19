@@ -215,7 +215,8 @@ class UiTests {
     findText("Copy Action Id").click()
 
     // Wait for tracking to be active (button changes to "Stop Tracking")
-    waitFor { hasText("Stop Tracking") }
+    // The notification system needs time to expire the old notification and show the new one
+    waitFor(duration = Duration.ofSeconds(15)) { hasText("Stop Tracking") }
 
     findText("Stop Tracking").click()
 
