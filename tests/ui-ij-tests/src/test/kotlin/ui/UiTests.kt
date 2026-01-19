@@ -118,6 +118,12 @@ class UiTests {
       // This is a hack to wait till inline hints will appear
       Thread.sleep(5000)
       wrapWithIf(javaEditor)
+
+      // Verify that wrapWithIf succeeded before continuing
+      waitFor(Duration.ofSeconds(10)) {
+        javaEditor.text.contains("if (true)")
+      }
+
       testTrackActionId(javaEditor)
       testActionGenerate(javaEditor)
       testActionNewElementSamePlace(javaEditor)
@@ -186,7 +192,11 @@ class UiTests {
   private fun IdeaFrame.wrapWithIf(editor: Editor) {
     editor.findText("System").click()
     remoteRobot.invokeActionJs("SurroundWith")
-    Thread.sleep(1000)
+
+    // Wait for SurroundWith template to be ready
+    // The template selection popup should appear and be ready for input
+    Thread.sleep(2000)
+
     editor.keyboard { enter() }
 
 //    assertFalse(editor.isBlockCursor)
