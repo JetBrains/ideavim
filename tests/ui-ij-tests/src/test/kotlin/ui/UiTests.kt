@@ -212,10 +212,17 @@ class UiTests {
       escape()
     }
 
+    // Wait for notification to appear before interacting with it
+    waitFor(duration = Duration.ofSeconds(10)) {
+      hasText("Copy Action Id")
+    }
+
     findText("Copy Action Id").click()
 
     // Wait for tracking to be active (button changes to "Stop Tracking")
-    waitFor { hasText("Stop Tracking") }
+    waitFor(duration = Duration.ofSeconds(10)) {
+      hasText("Stop Tracking")
+    }
 
     findText("Stop Tracking").click()
 
