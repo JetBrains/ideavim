@@ -12,6 +12,7 @@ import com.intellij.codeInsight.folding.impl.FoldingUtil
 import com.intellij.execution.impl.ConsoleViewImpl
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorModificationUtil
+import com.intellij.openapi.editor.FoldRegion
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.event.CaretEvent
@@ -474,24 +475,15 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase(
 
   override fun getFoldRegionAtOffset(offset: Int): VimFoldRegion? {
     val ijFoldRegion = editor.foldingModel.getCollapsedRegionAtOffset(offset) ?: return null
-    return object : VimFoldRegion {
-      override var isExpanded: Boolean
-        get() = ijFoldRegion.isExpanded
-        set(value) {
-          editor.foldingModel.runBatchFoldingOperation {
-            ijFoldRegion.isExpanded = value
-          }
-        }
-      override val startOffset: Int
-        get() = ijFoldRegion.startOffset
-      override val endOffset: Int
-        get() = ijFoldRegion.endOffset
-
-    }
+    return toVimFoldRegion(ijFoldRegion)
   }
 
   override fun getFoldRegionAtLine(line: Int): VimFoldRegion? {
     val ijFoldRegion = FoldingUtil.findFoldRegionStartingAtLine(editor, line) ?: return null
+    return toVimFoldRegion(ijFoldRegion)
+  }
+
+  private fun toVimFoldRegion(ijFoldRegion: FoldRegion): VimFoldRegion {
     return object : VimFoldRegion {
       override var isExpanded: Boolean
         get() = ijFoldRegion.isExpanded
