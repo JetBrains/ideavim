@@ -209,7 +209,9 @@ interface VimEditor {
   }
 
   fun createIndentBySize(size: Int): String
-  fun getFoldRegionAtOffset(offset: Int): VimFoldRegion?
+  fun getCollapsedFoldRegionAtOffset(offset: Int): VimFoldRegion?
+  fun getFoldRegionsAtOffset(offset: Int): List<VimFoldRegion>
+  fun getFoldRegionAtLine(line: Int): VimFoldRegion?
 
   /**
    * Mostly related to Fleet. After the editor is modified, the carets are modified. You can't use the old caret
