@@ -169,7 +169,7 @@ class VimToggleRegionRecursively : VimActionHandler.SingleExecution() {
     operatorArguments: OperatorArguments,
   ): Boolean {
     val caret = editor.currentCaret()
-    val foldRegion = findFoldRegionAtCaret(editor, caret.offset)
+    val foldRegion = findFoldRegionAtLine(editor, caret.offset)
     val actionName = getToggleAction(foldRegion)
     injector.actionExecutor.executeAction(
       editor,
@@ -181,7 +181,7 @@ class VimToggleRegionRecursively : VimActionHandler.SingleExecution() {
   }
 }
 
-private fun findFoldRegionAtCaret(editor: VimEditor, caretOffset: Int): VimFoldRegion? {
+private fun findFoldRegionAtLine(editor: VimEditor, caretOffset: Int): VimFoldRegion? {
   val line = editor.offsetToBufferPosition(caretOffset).line
   return editor.getFoldRegionAtLine(line)
 }
