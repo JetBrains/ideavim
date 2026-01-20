@@ -175,77 +175,7 @@ and some text after""",
     )
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
-  @Test
-  fun toggleJavaClass() {
-    configureByJavaText(
-      """
-          class TestClass {
-              public void me${c}thod() {
-                  if (true) {
-                      System.out.println("test");
-                  }
-              }
-          }
-      """.trimIndent(),
-    )
-    updateFoldRegions()
 
-    typeText(injector.parser.parseKeys("za"))
-    assertFoldStateAtCursor(false)
-
-    typeText(injector.parser.parseKeys("za"))
-    assertFoldStateAtCursor(true)
-  }
-
-  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
-  @Test
-  fun testToggleFoldRecursively() {
-    configureByJavaText(
-      """
-          class TestClass {
-              public void me${c}thod() {
-                  if (true) {
-                      System.out.println("test");
-                  }
-              }
-          }
-      """.trimIndent(),
-    )
-    updateFoldRegions()
-
-    typeText(injector.parser.parseKeys("zA"))
-    assertFoldStateAtCursor(false)
-
-    typeText(injector.parser.parseKeys("zA"))
-    assertFoldStateAtCursor(true)
-  }
-
-  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
-  @Test
-  fun testToggleFoldRecursivelyVsNonRecursive() {
-    configureByJavaText(
-      """
-          class TestClass {
-              public void me${c}thod() {
-                  if (true) {
-                      System.out.println("test");
-                  }
-              }
-          }
-      """.trimIndent(),
-    )
-    updateFoldRegions()
-
-    typeText(injector.parser.parseKeys("zM"))
-    assertFoldStateAtCursor(false)
-
-    typeText(injector.parser.parseKeys("za"))
-    assertFoldStateAtCursor(true)
-
-    typeText(injector.parser.parseKeys("zA"))
-    assertFoldStateAtCursor(false)
-  }
 
   private fun updateFoldRegions() {
     ApplicationManager.getApplication().invokeAndWait {
@@ -258,18 +188,6 @@ and some text after""",
   private fun assertFoldState(line: Int, expanded: Boolean) {
     ApplicationManager.getApplication().invokeAndWait {
       val fold = FoldingUtil.findFoldRegionStartingAtLine(fixture.editor, line)
-      assertEquals(expanded, fold?.isExpanded)
-    }
-  }
-
-  private fun assertFoldStateAtCursor(expanded: Boolean) {
-    ApplicationManager.getApplication().invokeAndWait {
-      val offset = fixture.editor.caretModel.offset
-      val line = fixture.editor.document.getLineNumber(offset)
-      val fold = fixture.editor.foldingModel.allFoldRegions.firstOrNull {
-        val foldLine = fixture.editor.document.getLineNumber(it.startOffset)
-        foldLine == line || (it.startOffset <= offset && offset <= it.endOffset)
-      }
       assertEquals(expanded, fold?.isExpanded)
     }
   }

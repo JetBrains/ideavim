@@ -779,6 +779,10 @@ class VimRegex(pattern: String) {
       return null
     }
 
+    override fun getFoldRegionAtLine(line: Int): VimFoldRegion? {
+      return null
+    }
+
     override fun <T : ImmutableVimCaret> findLastVersionOfCaret(caret: T): T? {
       return null
     }

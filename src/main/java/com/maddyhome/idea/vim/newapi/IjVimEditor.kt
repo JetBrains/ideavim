@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.newapi
 
+import com.intellij.codeInsight.folding.impl.FoldingUtil
 import com.intellij.execution.impl.ConsoleViewImpl
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorModificationUtil
@@ -486,6 +487,23 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase(
       override val endOffset: Int
         get() = ijFoldRegion.endOffset
 
+    }
+  }
+
+  override fun getFoldRegionAtLine(line: Int): VimFoldRegion? {
+    val ijFoldRegion = FoldingUtil.findFoldRegionStartingAtLine(editor, line) ?: return null
+    return object : VimFoldRegion {
+      override var isExpanded: Boolean
+        get() = ijFoldRegion.isExpanded
+        set(value) {
+          editor.foldingModel.runBatchFoldingOperation {
+            ijFoldRegion.isExpanded = value
+          }
+        }
+      override val startOffset: Int
+        get() = ijFoldRegion.startOffset
+      override val endOffset: Int
+        get() = ijFoldRegion.endOffset
     }
   }
 
