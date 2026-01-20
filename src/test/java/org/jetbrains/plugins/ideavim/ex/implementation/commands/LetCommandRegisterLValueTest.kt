@@ -125,4 +125,56 @@ class LetCommandRegisterLValueTest : VimTestCase("\n") {
     enterCommand("let @a.=1.23")
     assertCommandOutput("echo string(@a)", "'hello1.23'")
   }
+
+  // Test readonly register assignment errors (E354)
+  // Readonly registers: %, :, ., #, = (though = has special behavior)
+  @Test
+  fun `test assign to current filename register reports error`() {
+    enterCommand("let @% = 'test'")
+    assertPluginError(true)
+    assertPluginErrorMessage("E354: Invalid register name: '%'")
+  }
+
+  @Test
+  fun `test assign to last command register reports error`() {
+    enterCommand("let @: = 'test'")
+    assertPluginError(true)
+    assertPluginErrorMessage("E354: Invalid register name: ':'")
+  }
+
+  @Test
+  fun `test assign to last inserted text register reports error`() {
+    enterCommand("let @. = 'test'")
+    assertPluginError(true)
+    assertPluginErrorMessage("E354: Invalid register name: '.'")
+  }
+
+  @Test
+  fun `test assign to alternate buffer register reports error`() {
+    enterCommand("let @# = 'test'")
+    assertPluginError(true)
+    assertPluginErrorMessage("E354: Invalid register name: '#'")
+  }
+
+  @Test
+  fun `test assign to expression buffer register reports error`() {
+    enterCommand("let @= = 'test'")
+    assertPluginError(true)
+    assertPluginErrorMessage("E354: Invalid register name: '='")
+  }
+
+  // Test compound assignment to readonly registers also reports E354
+  @Test
+  fun `test compound assignment to current filename register reports error`() {
+    enterCommand("let @%.='test'")
+    assertPluginError(true)
+    assertPluginErrorMessage("E354: Invalid register name: '%'")
+  }
+
+  @Test
+  fun `test compound assignment to last command register reports error`() {
+    enterCommand("let @:.='test'")
+    assertPluginError(true)
+    assertPluginErrorMessage("E354: Invalid register name: ':'")
+  }
 }
