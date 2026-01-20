@@ -208,14 +208,22 @@ class UiTests {
   private fun IdeaFrame.testTrackActionId(editor: Editor) {
     commonSteps.invokeAction("VimFindActionIdAction")
 
+    // Wait for action tracking to be enabled
+    Thread.sleep(500)
+
     keyboard {
       escape()
+    }
+
+    // Wait for the notification to appear with the action ID
+    waitFor(duration = Duration.ofSeconds(10)) {
+      hasText("Copy Action Id") || hasText("Action ID:")
     }
 
     findText("Copy Action Id").click()
 
     // Wait for tracking to be active (button changes to "Stop Tracking")
-    waitFor { hasText("Stop Tracking") }
+    waitFor(duration = Duration.ofSeconds(10)) { hasText("Stop Tracking") }
 
     findText("Stop Tracking").click()
 
