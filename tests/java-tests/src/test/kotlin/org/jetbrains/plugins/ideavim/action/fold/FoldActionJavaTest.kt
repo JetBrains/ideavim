@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.action.fold
 
 import com.intellij.codeInsight.folding.CodeFoldingManager
+import com.intellij.codeInsight.folding.impl.FoldingUtil
 import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -18,29 +19,6 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class FoldActionJavaTest : VimJavaTestCase() {
-
-  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
-  @Test
-  fun toggleJavaClass() {
-    configureByJavaText(
-      """
-          class TestClass {
-              public void me${c}thod() {
-                  if (true) {
-                      System.out.println("test");
-                  }
-              }
-          }
-      """.trimIndent(),
-    )
-    updateFoldRegions()
-
-    toggleFoldWithZa()
-    assertFoldStateAtCursor(false)
-
-    toggleFoldWithZa()
-    assertFoldStateAtCursor(true)
-  }
 
   @TestWithoutNeovim(SkipNeovimReason.FOLDING)
   @Test
@@ -155,7 +133,7 @@ class FoldActionJavaTest : VimJavaTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.FOLDING)
   @Test
-  fun testToggleFoldRecursivelyAtDifferentPositions() {
+  fun testToggleFoldRecursivelyOnMethodLine() {
     configureByJavaText(
       """
           class TestClass {
@@ -176,6 +154,24 @@ class FoldActionJavaTest : VimJavaTestCase() {
 
     toggleFoldRecursivelyWithZA()
     assertAllFoldsAreOpen()
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
+  @Test
+  fun testToggleFoldRecursivelyFromInsideNestedFold() {
+    configureByJavaText(
+      """
+          class TestClass {
+              public void me${c}thod() {
+                  if (true) {
+                      System.out.println("test");
+                  }
+              }
+          }
+      """.trimIndent(),
+    )
+    updateFoldRegions()
+    openAllFolds()
 
     // zA from inside if-block closes only if-block, method fold stays open
     moveToPrintlnLine()
@@ -185,9 +181,26 @@ class FoldActionJavaTest : VimJavaTestCase() {
 
     toggleFoldRecursivelyWithZA()
     assertAllFoldsAreOpen()
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
+  @Test
+  fun testToggleFoldRecursivelyOnNestedFoldLine() {
+    configureByJavaText(
+      """
+          class TestClass {
+              public void method() {
+                  if (tr${c}ue) {
+                      System.out.println("test");
+                  }
+              }
+          }
+      """.trimIndent(),
+    )
+    updateFoldRegions()
+    openAllFolds()
 
     // zA on if line closes if-block, method fold stays open
-    moveToIfLine()
     toggleFoldRecursivelyWithZA()
     assertMethodFoldIsOpen()
     assertNestedIfBlockIsClosed()
@@ -294,14 +307,11 @@ class FoldActionJavaTest : VimJavaTestCase() {
   }
 
 
-  private fun assertFoldStateAtCursor(expanded: Boolean) {
+  private fun assertFoldStateAtCursor(expanded: Boolean?) {
     ApplicationManager.getApplication().invokeAndWait {
       val offset = fixture.editor.caretModel.offset
       val line = fixture.editor.document.getLineNumber(offset)
-      val fold = fixture.editor.foldingModel.allFoldRegions.firstOrNull {
-        val foldLine = fixture.editor.document.getLineNumber(it.startOffset)
-        foldLine == line || (it.startOffset <= offset && offset <= it.endOffset)
-      }
+      val fold = FoldingUtil.findFoldRegionStartingAtLine(fixture.editor, line)
       assertEquals(expanded, fold?.isExpanded)
     }
   }
