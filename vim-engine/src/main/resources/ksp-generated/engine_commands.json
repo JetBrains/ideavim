@@ -2120,11 +2120,6 @@
         "modes": "NXO"
     },
     {
-        "keys": "zA",
-        "class": "com.maddyhome.idea.vim.action.fold.VimToggleRegionRecursively",
-        "modes": "NX"
-    },
-    {
         "keys": "zC",
         "class": "com.maddyhome.idea.vim.action.fold.VimCollapseRegionRecursively",
         "modes": "NX"

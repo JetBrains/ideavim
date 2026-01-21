@@ -162,9 +162,9 @@ class FoldActionJavaTest : VimJavaTestCase() {
     configureByJavaText(
       """
           class TestClass {
-              public void me${c}thod() {
+              public void method() {
                   if (true) {
-                      System.out.println("test");
+                      System.out.prin${c}tln("test");
                   }
               }
           }
@@ -174,7 +174,6 @@ class FoldActionJavaTest : VimJavaTestCase() {
     openAllFolds()
 
     // zA from inside if-block closes only if-block, method fold stays open
-    moveToPrintlnLine()
     toggleFoldRecursivelyWithZA()
     assertMethodFoldIsOpen()
     assertNestedIfBlockIsClosed()
@@ -257,18 +256,12 @@ class FoldActionJavaTest : VimJavaTestCase() {
     typeText(injector.parser.parseKeys("zA"))
   }
 
-  private fun moveToPrintlnLine() {
-    typeText(injector.parser.parseKeys("2j"))
-  }
-
-  private fun moveToIfLine() {
-    typeText(injector.parser.parseKeys("k"))
-  }
-
   private fun assertMethodFoldIsOpen() {
     ApplicationManager.getApplication().invokeAndWait {
       val allFolds = fixture.editor.foldingModel.allFoldRegions.sortedBy { it.startOffset }
-      val methodFold = allFolds.firstOrNull()
+      val methodFold = allFolds.firstOrNull {
+        fixture.editor.document.getLineNumber(it.startOffset) == 1
+      }
       assertEquals(true, methodFold?.isExpanded, "Method fold should be open")
     }
   }

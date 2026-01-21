@@ -473,9 +473,14 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase(
     return IndentConfig.create(editor).createIndentBySize(size)
   }
 
-  override fun getFoldRegionAtOffset(offset: Int): VimFoldRegion? {
+  override fun getCollapsedFoldRegionAtOffset(offset: Int): VimFoldRegion? {
     val ijFoldRegion = editor.foldingModel.getCollapsedRegionAtOffset(offset) ?: return null
     return toVimFoldRegion(ijFoldRegion)
+  }
+
+  override fun getFoldRegionsAtOffset(offset: Int): List<VimFoldRegion> {
+    val ijFoldRegions = FoldingUtil.getFoldRegionsAtOffset(editor, offset)
+    return ijFoldRegions.map { toVimFoldRegion(it) }
   }
 
   override fun getFoldRegionAtLine(line: Int): VimFoldRegion? {
