@@ -176,7 +176,6 @@ and some text after""",
   }
 
 
-
   private fun updateFoldRegions() {
     ApplicationManager.getApplication().invokeAndWait {
       fixture.editor.foldingModel.runBatchFoldingOperation {
