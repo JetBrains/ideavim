@@ -17,9 +17,9 @@ import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
- * see "h :first"
+ * see "h :first" / "h :bfirst"
  */
-@ExCommand(command = "fir[st]")
+@ExCommand(command = "fir[st],bf[irst],br[ewind]")
 data class SelectFirstFileCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 

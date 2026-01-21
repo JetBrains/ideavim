@@ -20,4 +20,16 @@ class LastCommandTest : VimTestCase() {
     val command = injector.vimscriptParser.parseCommand("last")
     assertTrue(command is SelectLastFileCommand)
   }
+
+  @Test
+  fun `command parsing blast`() {
+    val command = injector.vimscriptParser.parseCommand("blast")
+    assertTrue(command is SelectLastFileCommand)
+  }
+
+  @Test
+  fun `command parsing bl`() {
+    val command = injector.vimscriptParser.parseCommand("bl")
+    assertTrue(command is SelectLastFileCommand)
+  }
 }

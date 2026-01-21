@@ -20,4 +20,28 @@ class FirstCommandTest : VimTestCase() {
     val command = injector.vimscriptParser.parseCommand("first")
     assertTrue(command is SelectFirstFileCommand)
   }
+
+  @Test
+  fun `command parsing bfirst`() {
+    val command = injector.vimscriptParser.parseCommand("bfirst")
+    assertTrue(command is SelectFirstFileCommand)
+  }
+
+  @Test
+  fun `command parsing bf`() {
+    val command = injector.vimscriptParser.parseCommand("bf")
+    assertTrue(command is SelectFirstFileCommand)
+  }
+
+  @Test
+  fun `command parsing brewind`() {
+    val command = injector.vimscriptParser.parseCommand("brewind")
+    assertTrue(command is SelectFirstFileCommand)
+  }
+
+  @Test
+  fun `command parsing br`() {
+    val command = injector.vimscriptParser.parseCommand("br")
+    assertTrue(command is SelectFirstFileCommand)
+  }
 }
