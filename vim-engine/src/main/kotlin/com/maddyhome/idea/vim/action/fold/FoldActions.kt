@@ -12,6 +12,7 @@ import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimFoldRegion
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -154,4 +155,41 @@ class VimExpandRegionRecursively : VimActionHandler.SingleExecution() {
     )
     return true
   }
+}
+
+@CommandOrMotion(keys = ["zA"], modes = [Mode.NORMAL, Mode.VISUAL])
+class VimToggleRegionRecursively : VimActionHandler.SingleExecution() {
+
+  override val type: Command.Type = Command.Type.OTHER_READONLY
+
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    val caret = editor.currentCaret()
+    val foldRegion = findFoldRegionAtLine(editor, caret.offset) ?: return true
+    val actionName = getToggleAction(foldRegion)
+    injector.actionExecutor.executeAction(
+      editor,
+      name = actionName,
+      context = context
+    )
+
+    return true
+  }
+}
+
+private fun findFoldRegionAtLine(editor: VimEditor, caretOffset: Int): VimFoldRegion? {
+  val line = editor.offsetToBufferPosition(caretOffset).line
+  val lineRegion = editor.getFoldRegionAtLine(line)
+  if (lineRegion != null) return lineRegion
+  return editor.getFoldRegionsAtOffset(caretOffset).firstOrNull()
+}
+
+private fun getToggleAction(foldRegion: VimFoldRegion): String = if (foldRegion.isExpanded) {
+  injector.actionExecutor.ACTION_COLLAPSE_REGION_RECURSIVELY
+} else {
+  injector.actionExecutor.ACTION_EXPAND_REGION_RECURSIVELY
 }

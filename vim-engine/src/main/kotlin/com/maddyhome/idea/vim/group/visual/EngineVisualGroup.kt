@@ -151,7 +151,7 @@ val ImmutableVimCaret.vimLeadSelectionOffset: Int
       val selectionAdj = injector.visualMotionGroup.selectionAdj
       if (caretOffset != selectionStart && caretOffset != selectionEnd) {
         // Try to check if current selection is tweaked by fold region.
-        val foldRegion = editor.getFoldRegionAtOffset(caretOffset)
+        val foldRegion = editor.getCollapsedFoldRegionAtOffset(caretOffset)
         if (foldRegion != null) {
           if (foldRegion.startOffset == selectionStart) {
             return (selectionEnd - selectionAdj).coerceAtLeast(0)
