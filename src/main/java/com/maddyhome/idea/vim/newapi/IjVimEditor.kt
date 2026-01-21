@@ -488,6 +488,10 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase(
     return toVimFoldRegion(ijFoldRegion)
   }
 
+  override fun getAllFoldRegions(): List<VimFoldRegion> {
+    return editor.foldingModel.allFoldRegions.map { toVimFoldRegion(it) }
+  }
+
   private fun toVimFoldRegion(ijFoldRegion: FoldRegion): VimFoldRegion {
     return object : VimFoldRegion {
       override var isExpanded: Boolean
