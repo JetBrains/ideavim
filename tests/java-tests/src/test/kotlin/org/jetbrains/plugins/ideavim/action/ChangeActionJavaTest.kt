@@ -122,6 +122,7 @@ and some text after""",
     )
   }
 
+  // VIM-566
   @TestWithoutNeovim(SkipNeovimReason.FOLDING)
   @Test
   fun testInsertAfterToggleFold() {
