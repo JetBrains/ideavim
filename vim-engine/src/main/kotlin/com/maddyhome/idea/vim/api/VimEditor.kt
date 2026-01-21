@@ -242,6 +242,7 @@ interface VimEditor {
    * @return the fold region starting at the line, or null if no fold starts on that line
    */
   fun getFoldRegionAtLine(line: Int): VimFoldRegion?
+  fun getAllFoldRegions(): List<VimFoldRegion>
 
   /**
    * Mostly related to Fleet. After the editor is modified, the carets are modified. You can't use the old caret

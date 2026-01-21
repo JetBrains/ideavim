@@ -2195,6 +2195,11 @@
         "modes": "NX"
     },
     {
+        "keys": "zr",
+      "class": "com.maddyhome.idea.vim.action.fold.VimIncrementFoldLevel",
+        "modes": "NX"
+    },
+    {
         "keys": "zs",
         "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollFirstScreenColumnAction",
         "modes": "NXO"

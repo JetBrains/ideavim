@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -29,11 +29,7 @@ class VimCollapseAllRegions : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    injector.actionExecutor.executeAction(
-      editor,
-      name = injector.actionExecutor.ACTION_COLLAPSE_ALL_REGIONS,
-      context = context
-    )
+    FoldState.closeAllFolds(editor)
     return true
   }
 }
@@ -108,11 +104,7 @@ class VimExpandAllRegions : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    injector.actionExecutor.executeAction(
-      editor,
-      name = injector.actionExecutor.ACTION_EXPAND_ALL_REGIONS,
-      context = context
-    )
+    FoldState.openAllFolds(editor)
     return true
   }
 }
@@ -177,6 +169,24 @@ class VimToggleRegionRecursively : VimActionHandler.SingleExecution() {
       context = context
     )
 
+    return true
+  }
+}
+
+@CommandOrMotion(keys = ["zr"], modes = [Mode.NORMAL, Mode.VISUAL])
+class VimIncrementFoldLevel : VimActionHandler.SingleExecution() {
+
+  override val type: Command.Type = Command.Type.OTHER_READONLY
+
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    val count = cmd.count.coerceAtLeast(1)
+    val currentLevel = FoldState.getFoldLevel(editor)
+    FoldState.setFoldLevel(editor, currentLevel + count)
     return true
   }
 }
