@@ -129,6 +129,10 @@ class FoldActionJavaTest : VimJavaTestCase() {
     closeAllFolds()
     toggleFoldRecursivelyWithZA()
     assertAllFoldsAreOpen()
+
+    // zA (recursive) closes all nested folds
+    toggleFoldRecursivelyWithZA()
+    assertAllFoldsAreClosed()
   }
 
   @TestWithoutNeovim(SkipNeovimReason.FOLDING)
