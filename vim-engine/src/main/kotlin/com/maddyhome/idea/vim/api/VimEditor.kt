@@ -245,6 +245,26 @@ interface VimEditor {
   fun getAllFoldRegions(): List<VimFoldRegion>
 
   /**
+   * Applies a fold level to all fold regions in the editor.
+   *
+   * This method calculates the depth of each fold region and sets its expanded state
+   * based on the foldLevel. Folds with depth < foldLevel are expanded, others are collapsed.
+   * All fold state changes are applied in a single batch operation for optimal performance.
+   *
+   * @param foldLevel the fold level to apply (folds with depth < foldLevel will be expanded)
+   */
+  fun applyFoldLevel(foldLevel: Int)
+
+  /**
+   * Gets the maximum fold depth in the editor.
+   *
+   * Returns the depth of the deepest (most nested) fold region. Returns 0 if there are no folds.
+   *
+   * @return the maximum fold depth
+   */
+  fun getMaxFoldDepth(): Int
+
+  /**
    * Mostly related to Fleet. After the editor is modified, the carets are modified. You can't use the old caret
    *   instance and need to search for a new version.
    */

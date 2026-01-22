@@ -492,20 +492,71 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase(
     return editor.foldingModel.allFoldRegions.map { toVimFoldRegion(it) }
   }
 
-  private fun toVimFoldRegion(ijFoldRegion: FoldRegion): VimFoldRegion {
-    return object : VimFoldRegion {
-      override var isExpanded: Boolean
-        get() = ijFoldRegion.isExpanded
-        set(value) {
-          editor.foldingModel.runBatchFoldingOperation {
-            ijFoldRegion.isExpanded = value
-          }
-        }
-      override val startOffset: Int
-        get() = ijFoldRegion.startOffset
-      override val endOffset: Int
-        get() = ijFoldRegion.endOffset
+  override fun applyFoldLevel(foldLevel: Int) {
+    val allFolds = editor.foldingModel.allFoldRegions
+    if (allFolds.isEmpty()) return
+
+    editor.foldingModel.runBatchFoldingOperation {
+      // I'm aware it's O(n^2) comparison here,
+      // but it doesn't affect performance even on a large amount of fold
+      allFolds.forEach { fold ->
+        val depth = calculateFoldDepth(fold, allFolds)
+        fold.isExpanded = depth < foldLevel
+      }
     }
+  }
+
+  override fun getMaxFoldDepth(): Int {
+    val allFolds = editor.foldingModel.allFoldRegions
+    if (allFolds.isEmpty()) return 0
+
+    return allFolds.maxOfOrNull { fold ->
+      calculateFoldDepth(fold, allFolds)
+    } ?: 0
+  }
+
+  private fun calculateFoldDepth(fold: FoldRegion, allFolds: Array<FoldRegion>): Int {
+    return allFolds.count { otherFold ->
+      isStrictlyInsideFold(fold, otherFold)
+    }
+  }
+
+  private fun isStrictlyInsideFold(fold: FoldRegion, otherFold: FoldRegion): Boolean {
+    if (isInnerFold(otherFold, fold)) {
+      return false
+    }
+    return areDifferentFolds(otherFold, fold)
+  }
+
+  private fun areDifferentFolds(
+    otherFold: FoldRegion,
+    fold: FoldRegion,
+  ): Boolean = otherFold.startOffset != fold.startOffset || otherFold.endOffset != fold.endOffset
+
+  private fun isInnerFold(
+    otherFold: FoldRegion,
+    fold: FoldRegion,
+  ): Boolean = otherFold.startOffset > fold.startOffset || otherFold.endOffset < fold.endOffset
+
+  private fun toVimFoldRegion(ijFoldRegion: FoldRegion): VimFoldRegion {
+    return IjVimFoldRegion(ijFoldRegion, editor)
+  }
+
+  private class IjVimFoldRegion(
+    val ijFoldRegion: FoldRegion,
+    private val editor: Editor,
+  ) : VimFoldRegion {
+    override var isExpanded: Boolean
+      get() = ijFoldRegion.isExpanded
+      set(value) {
+        editor.foldingModel.runBatchFoldingOperation {
+          ijFoldRegion.isExpanded = value
+        }
+      }
+    override val startOffset: Int
+      get() = ijFoldRegion.startOffset
+    override val endOffset: Int
+      get() = ijFoldRegion.endOffset
   }
 
   override fun <T : ImmutableVimCaret> findLastVersionOfCaret(caret: T): T {
