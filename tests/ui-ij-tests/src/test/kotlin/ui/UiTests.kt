@@ -590,6 +590,11 @@ class UiTests {
     println("Run testClickRightFromLineEnd...")
     editor.findText("Two").doubleClickOnRight(40, editor)
 
+    // Wait for Visual mode to be fully established after double-click
+    waitFor(Duration.ofSeconds(2)) {
+      editor.selectedText == "Two" && editor.caretOffset == 6
+    }
+
     assertEquals("Two", editor.selectedText)
     assertEquals(6, editor.caretOffset)
 
@@ -604,6 +609,11 @@ class UiTests {
   private fun ContainerFixture.testClickOnWord(editor: Editor) {
     println("Run testClickOnWord...")
     editor.findText("One").doubleClick(MouseButton.LEFT_BUTTON)
+
+    // Wait for Visual mode to be fully established after double-click
+    waitFor(Duration.ofSeconds(2)) {
+      editor.selectedText == "One" && editor.caretOffset == 2
+    }
 
     assertEquals("One", editor.selectedText)
     assertEquals(2, editor.caretOffset)
