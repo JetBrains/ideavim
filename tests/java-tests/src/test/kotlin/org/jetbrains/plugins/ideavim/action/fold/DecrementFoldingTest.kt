@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2026 The IdeaVim authors
+ * Copyright 2003-2024 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -13,62 +13,11 @@ import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.junit.jupiter.api.Test
 
-class IncrementFoldingTest : FoldActionTestBase() {
+class DecrementFoldingTest : FoldActionTestBase() {
 
   @TestWithoutNeovim(SkipNeovimReason.FOLDING)
   @Test
-  fun testMoreFoldingWithZm() {
-    configureByJavaText(
-      """
-          class TestClass {
-              public void me${c}thod() {
-                  if (true) {
-                      System.out.println("test");
-                  }
-              }
-          }
-      """.trimIndent(),
-    )
-    updateFoldRegions()
-    openAllFolds()
-
-    // First zm should close innermost fold level globally
-    moreFoldingWithZm()
-    assertMethodFoldIsOpen()
-    assertNestedIfBlockIsClosed()
-
-    // Second zm should close all folds
-    moreFoldingWithZm()
-    assertAllFoldsAreClosed()
-  }
-
-  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
-  @Test
-  fun testMoreFoldingMultipleTimes() {
-    configureByJavaText(
-      """
-          class TestClass {
-              public void me${c}thod() {
-                  if (true) {
-                      System.out.println("test");
-                  }
-              }
-          }
-      """.trimIndent(),
-    )
-    updateFoldRegions()
-    openAllFolds()
-
-    // Multiple zm commands should progressively close folds
-    moreFoldingWithZm()
-    moreFoldingWithZm()
-    moreFoldingWithZm()
-    assertAllFoldsAreClosed()
-  }
-
-  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
-  @Test
-  fun testMoreFoldingWhenAllClosed() {
+  fun testReduceFoldingWithZr() {
     configureByJavaText(
       """
           class TestClass {
@@ -83,14 +32,43 @@ class IncrementFoldingTest : FoldActionTestBase() {
     updateFoldRegions()
     closeAllFolds()
 
-    // zm on already closed folds should be a no-op
-    moreFoldingWithZm()
-    assertAllFoldsAreClosed()
+    // First zr should open outermost fold level globally (entire window)
+    reduceFoldingWithZr()
+    assertMethodFoldIsOpen()
+    assertNestedIfBlockIsClosed()
+
+    // Second zr should open next fold level globally
+    reduceFoldingWithZr()
+    assertAllFoldsAreOpen()
   }
 
   @TestWithoutNeovim(SkipNeovimReason.FOLDING)
   @Test
-  fun testMoreFoldingVsCloseAll() {
+  fun testReduceFoldingMultipleTimes() {
+    configureByJavaText(
+      """
+          class TestClass {
+              public void me${c}thod() {
+                  if (true) {
+                      System.out.println("test");
+                  }
+              }
+          }
+      """.trimIndent(),
+    )
+    updateFoldRegions()
+    closeAllFolds()
+
+    // Multiple zr commands should progressively open folds
+    reduceFoldingWithZr()
+    reduceFoldingWithZr()
+    reduceFoldingWithZr()
+    assertAllFoldsAreOpen()
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
+  @Test
+  fun testReduceFoldingWhenAllOpen() {
     configureByJavaText(
       """
           class TestClass {
@@ -105,20 +83,41 @@ class IncrementFoldingTest : FoldActionTestBase() {
     updateFoldRegions()
     openAllFolds()
 
-    // zm works incrementally (one level at a time) globally
-    moreFoldingWithZm()
-    assertMethodFoldIsOpen()
-    assertNestedIfBlockIsClosed()
-
-    // zM closes all at once
-    openAllFolds()
-    closeAllFolds()
-    assertAllFoldsAreClosed()
+    // zr on already open folds should be a no-op
+    reduceFoldingWithZr()
+    assertAllFoldsAreOpen()
   }
 
   @TestWithoutNeovim(SkipNeovimReason.FOLDING)
   @Test
-  fun testMoreFoldingWorksGloballyNotJustAtCursor() {
+  fun testReduceFoldingVsOpenAll() {
+    configureByJavaText(
+      """
+          class TestClass {
+              public void me${c}thod() {
+                  if (true) {
+                      System.out.println("test");
+                  }
+              }
+          }
+      """.trimIndent(),
+    )
+    updateFoldRegions()
+    closeAllFolds()
+
+    // zr works incrementally (one level at a time) globally
+    reduceFoldingWithZr()
+    assertOnlyOneFoldIsOpen()
+
+    // zR opens all at once
+    closeAllFolds()
+    openAllFolds()
+    assertAllFoldsAreOpen()
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
+  @Test
+  fun testReduceFoldingWorksGloballyNotJustAtCursor() {
     configureByJavaText(
       """
           class TestClass {
@@ -136,42 +135,41 @@ class IncrementFoldingTest : FoldActionTestBase() {
       """.trimIndent(),
     )
     updateFoldRegions()
-    openAllFolds()
+    closeAllFolds()
 
-    // zm should close one level of ALL folds in the window, not just at cursor
-    // Cursor is on method2, but zm should affect method1 as well
-    moreFoldingWithZm()
+    // zr should open one level of ALL folds in the window, not just at cursor
+    // Cursor is on method2, but zr should affect method1 as well
+    reduceFoldingWithZr()
 
-    // Both method folds should still be open, but if blocks should be closed
+    // Both method1 and method2 should be opened (outermost level)
     assertAllMethodFoldsAreOpen()
-    assertNestedIfBlockIsClosed()
   }
 
   @TestWithoutNeovim(SkipNeovimReason.FOLDING)
   @Test
-  fun testMoreFoldingOnEmptyFile() {
+  fun testReduceFoldingOnEmptyFile() {
     configureByJavaText("")
     updateFoldRegions()
 
-    // zm on empty file should not crash
-    moreFoldingWithZm()
-    assertAllFoldsAreClosed()
+    // zr on empty file should not crash
+    reduceFoldingWithZr()
+    assertAllFoldsAreOpen()
   }
 
   @TestWithoutNeovim(SkipNeovimReason.FOLDING)
   @Test
-  fun testMoreFoldingOnSingleLine() {
+  fun testReduceFoldingOnSingleLine() {
     configureByJavaText("class A {}")
     updateFoldRegions()
 
-    // zm on single line file with no folds should not crash
-    moreFoldingWithZm()
-    assertAllFoldsAreClosed()
+    // zr on single line file with no folds should not crash
+    reduceFoldingWithZr()
+    assertAllFoldsAreOpen()
   }
 
   @TestWithoutNeovim(SkipNeovimReason.FOLDING)
   @Test
-  fun testMoreFoldingInVisualMode() {
+  fun testReduceFoldingInVisualMode() {
     configureByJavaText(
       """
           class TestClass {
@@ -184,20 +182,20 @@ class IncrementFoldingTest : FoldActionTestBase() {
       """.trimIndent(),
     )
     updateFoldRegions()
-    openAllFolds()
+    closeAllFolds()
 
-    // Enter visual mode and then use zm
+    // Enter visual mode and then use zr
     typeText(injector.parser.parseKeys("v"))
-    moreFoldingWithZm()
+    reduceFoldingWithZr()
 
-    // Should close innermost fold level
+    // Should open outermost fold level
     assertMethodFoldIsOpen()
     assertNestedIfBlockIsClosed()
   }
 
   @TestWithoutNeovim(SkipNeovimReason.FOLDING)
   @Test
-  fun testMoreFoldingWithMultipleFoldsAtSameDepth() {
+  fun testReduceFoldingWithMultipleFoldsAtSameDepth() {
     configureByJavaText(
       """
           class TestClass {
@@ -220,23 +218,20 @@ class IncrementFoldingTest : FoldActionTestBase() {
       """.trimIndent(),
     )
     updateFoldRegions()
-    openAllFolds()
+    closeAllFolds()
 
-    // First zm should close ALL if blocks (all at same depth level)
-    moreFoldingWithZm()
+    // First zr should open ALL method folds (all at same depth level)
+    reduceFoldingWithZr()
     assertAllMethodFoldsAreOpen()
 
-    // Verify at least one if block is closed (they should all be)
-    assertNestedIfBlockIsClosed()
-
-    // Second zm should close all method folds
-    moreFoldingWithZm()
-    assertAllFoldsAreClosed()
+    // Second zr should open all nested if blocks
+    reduceFoldingWithZr()
+    assertAllFoldsAreOpen()
   }
 
   @TestWithoutNeovim(SkipNeovimReason.FOLDING)
   @Test
-  fun testMoreFoldingWithUnevenNesting() {
+  fun testReduceFoldingWithUnevenNesting() {
     configureByJavaText(
       """
           class TestClass {
@@ -256,24 +251,24 @@ class IncrementFoldingTest : FoldActionTestBase() {
       """.trimIndent(),
     )
     updateFoldRegions()
-    openAllFolds()
+    closeAllFolds()
 
-    // First zm closes while block (depth 2)
-    moreFoldingWithZm()
+    // First zr opens all method folds (depth 0)
+    reduceFoldingWithZr()
     assertAllMethodFoldsAreOpen()
 
-    // Second zm closes all if blocks (depth 1)
-    moreFoldingWithZm()
-    assertAllMethodFoldsAreOpen()
+    // Second zr opens all if blocks (depth 1)
+    // At this point, 2 method folds and 2 if blocks are open, while block still closed
+    reduceFoldingWithZr()
 
-    // Third zm closes all method folds (depth 0)
-    moreFoldingWithZm()
-    assertAllFoldsAreClosed()
+    // Third zr opens while block (depth 2)
+    reduceFoldingWithZr()
+    assertAllFoldsAreOpen()
   }
 
   @TestWithoutNeovim(SkipNeovimReason.FOLDING)
   @Test
-  fun testMoreFoldingWithCount() {
+  fun testReduceFoldingWithCount() {
     configureByJavaText(
       """
           class TestClass {
@@ -288,16 +283,15 @@ class IncrementFoldingTest : FoldActionTestBase() {
       """.trimIndent(),
     )
     updateFoldRegions()
-    openAllFolds()
+    closeAllFolds()
 
-    // 3zm should close 3 levels at once
-    typeText(injector.parser.parseKeys("3zm"))
-    assertAllFoldsAreClosed()
+    typeText(injector.parser.parseKeys("3zr"))
+    assertAllFoldsAreOpen()
   }
 
   @TestWithoutNeovim(SkipNeovimReason.FOLDING)
   @Test
-  fun testMoreFoldingWithCountPartialClose() {
+  fun testReduceFoldingWithCountPartialOpen() {
     configureByJavaText(
       """
           class TestClass {
@@ -314,45 +308,11 @@ class IncrementFoldingTest : FoldActionTestBase() {
       """.trimIndent(),
     )
     updateFoldRegions()
-    openAllFolds()
-
-    // 2zm should close 2 deepest levels (for and while, but not if and method)
-    typeText(injector.parser.parseKeys("2zm"))
-
-    // Verify method and if are still open
-    assertMethodFoldIsOpen()
-
-    // Verify while and for blocks are closed
-    assertDeepestFoldsAreClosed(2)
-  }
-
-  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
-  @Test
-  fun testZrAndZmAreInverses() {
-    configureByJavaText(
-      """
-          class TestClass {
-              public void me${c}thod() {
-                  if (true) {
-                      System.out.println("test");
-                  }
-              }
-          }
-      """.trimIndent(),
-    )
-    updateFoldRegions()
     closeAllFolds()
 
-    // zr then zm should return to original state
-    reduceFoldingWithZr()
-    moreFoldingWithZm()
-    assertAllFoldsAreClosed()
+    typeText(injector.parser.parseKeys("2zr"))
 
-    // Multiple zr followed by same number of zm
-    reduceFoldingWithZr()
-    reduceFoldingWithZr()
-    moreFoldingWithZm()
-    moreFoldingWithZm()
-    assertAllFoldsAreClosed()
+    assertMethodFoldIsOpen()
+    assertDeepestFoldsAreClosed(2)
   }
 }

@@ -28,18 +28,6 @@ object FoldState {
     applyFoldLevel(editor, coercedLevel)
   }
 
-  fun incrementFoldLevel(editor: VimEditor) {
-    val newLevel = getFoldLevel(editor) + 1
-    setFoldLevel(editor, newLevel)
-  }
-
-  fun decrementFoldLevel(editor: VimEditor) {
-    val current = getFoldLevel(editor)
-    if (current > 0) {
-      setFoldLevel(editor, current - 1)
-    }
-  }
-
   fun closeAllFolds(editor: VimEditor) {
     setFoldLevel(editor, 0)
   }

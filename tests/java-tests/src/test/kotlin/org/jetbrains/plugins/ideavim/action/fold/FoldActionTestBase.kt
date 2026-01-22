@@ -46,6 +46,10 @@ abstract class FoldActionTestBase : VimJavaTestCase() {
     typeText(injector.parser.parseKeys("zr"))
   }
 
+  protected fun moreFoldingWithZm() {
+    typeText(injector.parser.parseKeys("zm"))
+  }
+
   protected fun assertMethodFoldIsOpen() {
     ApplicationManager.getApplication().invokeAndWait {
       val allFolds = fixture.editor.foldingModel.allFoldRegions.sortedBy { it.startOffset }
