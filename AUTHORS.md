@@ -538,6 +538,10 @@ Contributors:
   [![icon][github]](https://github.com/azjf)
   &nbsp;
   azjf
+* [![icon][mail]](mailto:grzybol.k@gmail.com)
+  [![icon][github]](https://github.com/1grzyb1)
+  &nbsp;
+  1grzyb1
 
 Contributors with JetBrains IP:
 
