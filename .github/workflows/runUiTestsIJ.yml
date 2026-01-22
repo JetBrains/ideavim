@@ -2,7 +2,7 @@ name: Run UI Tests for IntelliJ IDEA
 on:
   workflow_dispatch:
   schedule:
-      - cron: '*/5 * * * *'
+      - cron: '0 6 * * *'
 jobs:
   test-macos:
     if: false  # Temporarily disabled - change to: github.repository == 'JetBrains/ideavim'
