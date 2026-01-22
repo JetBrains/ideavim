@@ -17,6 +17,63 @@ class DecrementFoldingTest : FoldActionTestBase() {
 
   @TestWithoutNeovim(SkipNeovimReason.FOLDING)
   @Test
+  fun testReduceFoldingOnNewWindow() {
+    configureByJavaText(
+      """
+          class TestClass {
+              public void me${c}thod() {
+                  if (true) {
+                      System.out.println("test");
+                  }
+              }
+          }
+      """.trimIndent(),
+    )
+    updateFoldRegions()
+
+    // On a new window, all folds should be open by default (foldlevel = max depth)
+    // zr should be a no-op because foldlevel is already at max
+    assertAllFoldsAreOpen()
+
+    reduceFoldingWithZr()
+    assertAllFoldsAreOpen()
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
+  @Test
+  fun testReduceFoldingCannotExceedMaxDepth() {
+    configureByJavaText(
+      """
+          class TestClass {
+              public void me${c}thod() {
+                  if (true) {
+                      System.out.println("test");
+                  }
+              }
+          }
+      """.trimIndent(),
+    )
+    updateFoldRegions()
+
+    // All folds already open
+    assertAllFoldsAreOpen()
+
+    // Multiple zr commands should not increase foldlevel beyond max depth
+    reduceFoldingWithZr()
+    reduceFoldingWithZr()
+    reduceFoldingWithZr()
+    reduceFoldingWithZr()
+    reduceFoldingWithZr()
+    assertAllFoldsAreOpen()
+
+    // zm should still work to close folds
+    moreFoldingWithZm()
+    assertMethodFoldIsOpen()
+    assertNestedIfBlockIsClosed()
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
+  @Test
   fun testReduceFoldingWithZr() {
     configureByJavaText(
       """

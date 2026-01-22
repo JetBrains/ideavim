@@ -791,6 +791,13 @@ class VimRegex(pattern: String) {
       return emptyList()
     }
 
+    override fun applyFoldLevel(foldLevel: Int) {
+    }
+
+    override fun getMaxFoldDepth(): Int {
+      return 0
+    }
+
     override fun <T : ImmutableVimCaret> findLastVersionOfCaret(caret: T): T? {
       return null
     }
