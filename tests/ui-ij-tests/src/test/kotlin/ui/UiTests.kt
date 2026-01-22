@@ -214,6 +214,9 @@ class UiTests {
 
     findText("Copy Action Id").click()
 
+    // Wait for old notification to disappear first (proves the transition started)
+    waitFor { !hasText("Action ID: EditorEscape") }
+
     // Wait for confirmation notification - proves the clipboard was updated
     // and the new notification is visible (old notification has expired)
     waitFor { hasText("Action id copied") }
