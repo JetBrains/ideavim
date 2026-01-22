@@ -1,5 +1,6 @@
 package _Self.buildTypes
 
+import _Self.AgentSize
 import _Self.IdeaVimBuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
@@ -23,8 +24,9 @@ object RandomOrderTests : IdeaVimBuildType({
 
   steps {
     gradle {
+      clearConditions()
       tasks = """
-        clean test
+        test
         -x :tests:property-tests:test
         -x :tests:long-running-tests:test
         -Djunit.jupiter.execution.order.random.seed=default
@@ -32,6 +34,7 @@ object RandomOrderTests : IdeaVimBuildType({
       """.trimIndent().replace("\n", " ")
       buildFile = ""
       enableStacktrace = true
+      gradleParams = "--build-cache --configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
   }
@@ -40,5 +43,10 @@ object RandomOrderTests : IdeaVimBuildType({
     vcs {
       branchFilter = "+:<default>"
     }
+  }
+
+  requirements {
+    equals("teamcity.agent.hardware.cpuCount", AgentSize.MEDIUM)
+    equals("teamcity.agent.os.family", "Linux")
   }
 })

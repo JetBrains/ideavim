@@ -209,7 +209,39 @@ interface VimEditor {
   }
 
   fun createIndentBySize(size: Int): String
-  fun getFoldRegionAtOffset(offset: Int): VimFoldRegion?
+
+  /**
+   * Returns the collapsed fold region at the specified offset, if any.
+   *
+   * This method only returns fold regions that are currently collapsed (not expanded).
+   * If multiple collapsed folds exist at the offset, returns the innermost one.
+   *
+   * @param offset the offset in the document
+   * @return the collapsed fold region at the offset, or null if no collapsed fold exists
+   */
+  fun getCollapsedFoldRegionAtOffset(offset: Int): VimFoldRegion?
+
+  /**
+   * Returns all fold regions at the specified offset, regardless of their collapsed state.
+   *
+   * This includes both expanded and collapsed fold regions. If multiple nested folds
+   * exist at the offset, all of them are returned in the list.
+   *
+   * @param offset the offset in the document
+   * @return a list of all fold regions at the offset, may be empty if no folds exist
+   */
+  fun getFoldRegionsAtOffset(offset: Int): List<VimFoldRegion>
+
+  /**
+   * Returns the fold region that starts at the specified line.
+   *
+   * This method looks for a fold region whose start position is on the given line,
+   * regardless of whether the fold is expanded or collapsed.
+   *
+   * @param line the line number (0-based)
+   * @return the fold region starting at the line, or null if no fold starts on that line
+   */
+  fun getFoldRegionAtLine(line: Int): VimFoldRegion?
 
   /**
    * Mostly related to Fleet. After the editor is modified, the carets are modified. You can't use the old caret

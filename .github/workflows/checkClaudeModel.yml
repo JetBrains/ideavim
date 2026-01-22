@@ -1,0 +1,56 @@
+name: Check Claude Model Version
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # Every Monday at 9:00 UTC (same as YouTrack analysis)
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  check-model:
+    runs-on: ubuntu-latest
+    if: github.repository == 'JetBrains/ideavim'
+
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check Claude model version
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          settings: .claude/settings.json
+          direct_prompt: |
+            Check if the YouTrack auto-analysis workflow is using the best available Claude model.
+
+            ## Steps:
+
+            1. Read the file `.github/workflows/youtrackAutoAnalysis.yml` and find the current model being used (look for `--model` in `claude_args`)
+
+            2. Fetch the latest Claude Code documentation from https://code.claude.com/docs/en/github-actions to see recommended models
+
+            3. Search the web for "Anthropic Claude latest model" to find if there are newer models available
+
+            4. Compare the current model with the latest available options
+
+            5. Output your findings:
+               - Current model in use
+               - Latest recommended model from docs
+               - Any newer models found
+               - Whether an update is recommended
+
+            If an update IS recommended:
+            1. Edit `.github/workflows/youtrackAutoAnalysis.yml` to use the new model
+            2. Create a PR with the change:
+               - Title: "Update Claude model to <new-model-id>"
+               - Body: Explain what model was found and why it's recommended
+
+            At the end, output:
+            - `UPDATE_RECOMMENDED=yes` or `UPDATE_RECOMMENDED=no`
+            - If yes: `PR_URL=<the PR URL>`
+
+          claude_args: '--model claude-haiku-3-5-20241022 --allowed-tools "Read,Edit,WebFetch,WebSearch,Bash(git:*),Bash(gh:*)"'

@@ -30,6 +30,7 @@ class ExitCommandTest : VimTestCase() {
 
     typeText(commandToKeys("qa"))
     kotlin.test.assertNull(fileManager.currentFile)
+    assertPluginError(false)
   }
 
   @Test
@@ -46,6 +47,7 @@ class ExitCommandTest : VimTestCase() {
 
     typeText(commandToKeys("qall"))
     kotlin.test.assertNull(fileManager.currentFile)
+    assertPluginError(false)
   }
 
   @Suppress("IdeaVimAssertState")
@@ -64,5 +66,108 @@ class ExitCommandTest : VimTestCase() {
 
     typeText(commandToKeys("qa"))
     kotlin.test.assertNull(fileManager.currentFile)
+    assertPluginError(false)
+  }
+
+  @Test
+  fun `test xa command`() {
+    setupChecks {
+      neoVim.exitOnTearDown = false
+    }
+    @Suppress("IdeaVimAssertState")
+    val psiFile = fixture.configureByText("A_Discovery", "Lorem ipsum dolor sit amet,")
+    ApplicationManager.getApplication().invokeAndWait {
+      fileManager.openFile(psiFile.virtualFile, false)
+    }
+    kotlin.test.assertNotNull<Any>(fileManager.currentFile)
+
+    typeText(commandToKeys("xa"))
+    kotlin.test.assertNull(fileManager.currentFile)
+    assertPluginError(false)
+  }
+
+  @Test
+  fun `test xall command`() {
+    setupChecks {
+      neoVim.exitOnTearDown = false
+    }
+    @Suppress("IdeaVimAssertState")
+    val psiFile = fixture.configureByText("A_Discovery", "Lorem ipsum dolor sit amet,")
+    ApplicationManager.getApplication().invokeAndWait {
+      fileManager.openFile(psiFile.virtualFile, false)
+    }
+    kotlin.test.assertNotNull<Any>(fileManager.currentFile)
+
+    typeText(commandToKeys("xall"))
+    kotlin.test.assertNull(fileManager.currentFile)
+    assertPluginError(false)
+  }
+
+  @Test
+  fun `test wqa command`() {
+    setupChecks {
+      neoVim.exitOnTearDown = false
+    }
+    @Suppress("IdeaVimAssertState")
+    val psiFile = fixture.configureByText("A_Discovery", "Lorem ipsum dolor sit amet,")
+    ApplicationManager.getApplication().invokeAndWait {
+      fileManager.openFile(psiFile.virtualFile, false)
+    }
+    kotlin.test.assertNotNull<Any>(fileManager.currentFile)
+
+    typeText(commandToKeys("wqa"))
+    kotlin.test.assertNull(fileManager.currentFile)
+    assertPluginError(false)
+  }
+
+  @Test
+  fun `test wqall command`() {
+    setupChecks {
+      neoVim.exitOnTearDown = false
+    }
+    @Suppress("IdeaVimAssertState")
+    val psiFile = fixture.configureByText("A_Discovery", "Lorem ipsum dolor sit amet,")
+    ApplicationManager.getApplication().invokeAndWait {
+      fileManager.openFile(psiFile.virtualFile, false)
+    }
+    kotlin.test.assertNotNull<Any>(fileManager.currentFile)
+
+    typeText(commandToKeys("wqall"))
+    kotlin.test.assertNull(fileManager.currentFile)
+    assertPluginError(false)
+  }
+
+  @Test
+  fun `test quita command`() {
+    setupChecks {
+      neoVim.exitOnTearDown = false
+    }
+    @Suppress("IdeaVimAssertState")
+    val psiFile = fixture.configureByText("A_Discovery", "Lorem ipsum dolor sit amet,")
+    ApplicationManager.getApplication().invokeAndWait {
+      fileManager.openFile(psiFile.virtualFile, false)
+    }
+    kotlin.test.assertNotNull<Any>(fileManager.currentFile)
+
+    typeText(commandToKeys("quita"))
+    kotlin.test.assertNull(fileManager.currentFile)
+    assertPluginError(false)
+  }
+
+  @Test
+  fun `test quitall command`() {
+    setupChecks {
+      neoVim.exitOnTearDown = false
+    }
+    @Suppress("IdeaVimAssertState")
+    val psiFile = fixture.configureByText("A_Discovery", "Lorem ipsum dolor sit amet,")
+    ApplicationManager.getApplication().invokeAndWait {
+      fileManager.openFile(psiFile.virtualFile, false)
+    }
+    kotlin.test.assertNotNull<Any>(fileManager.currentFile)
+
+    typeText(commandToKeys("quitall"))
+    kotlin.test.assertNull(fileManager.currentFile)
+    assertPluginError(false)
   }
 }

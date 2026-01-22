@@ -15,26 +15,21 @@ import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.UnaryFunctionHandler
 import kotlin.math.abs
 
 @VimscriptFunction(name = "abs")
-internal class AbsFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments = 1
-  override val maximumNumberOfArguments = 1
-
+internal class AbsFunctionHandler : UnaryFunctionHandler<VimDataType>() {
   override fun doFunction(
-    argumentValues: List<Expression>,
+    arguments: Arguments,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
   ): VimDataType {
-    val argument = argumentValues[0].evaluate(editor, context, vimContext)
-    return if (argument is VimFloat) {
-      VimFloat(abs(argument.value))
-    } else {
-      VimInt(abs(argument.toVimNumber().value))
+    val argument = arguments[0]
+    return when (argument) {
+      is VimFloat -> VimFloat(abs(argument.value))
+      else -> VimInt(abs(argument.toVimNumber().value))
     }
   }
 }

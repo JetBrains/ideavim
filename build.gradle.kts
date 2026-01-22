@@ -18,7 +18,7 @@ buildscript {
   }
 
   dependencies {
-    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.0")
+    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.21")
     classpath("com.github.AlexPl292:mark-down-to-slack:1.1.2")
     classpath("org.eclipse.jgit:org.eclipse.jgit:6.6.0.202305301015-r")
 
@@ -39,7 +39,7 @@ buildscript {
 
 plugins {
   java
-  kotlin("jvm") version "2.2.0"
+  kotlin("jvm") version "2.2.21"
   application
   id("java-test-fixtures")
 
@@ -49,9 +49,8 @@ plugins {
   id("org.jetbrains.intellij.platform") version "2.10.5"
 
   id("org.jetbrains.changelog") version "2.5.0"
-  id("org.jetbrains.kotlinx.kover") version "0.6.1"
   id("com.dorongold.task-tree") version "4.0.1"
-  id("com.google.devtools.ksp") version "2.2.0-2.0.2"
+  id("com.google.devtools.ksp") version "2.2.21-2.0.4"
 }
 
 val moduleSources by configurations.registering
@@ -113,16 +112,7 @@ dependencies {
 
     bundledPlugins("org.jetbrains.plugins.terminal")
 
-    // VERSION UPDATE: This module is required since 2025.2
-    if (ideaVersion == "LATEST-EAP-SNAPSHOT") {
-      bundledModule("intellij.spellchecker")
-    }
-    if (ideaVersion.startsWith("2025.2")) {
-      bundledModule("intellij.spellchecker")
-    }
-    if (ideaVersion.startsWith("2025.3")) {
-      bundledModule("intellij.spellchecker")
-    }
+    bundledModule("intellij.spellchecker")
   }
 
   moduleSources(project(":vim-engine", "sourcesJarArtifacts"))
@@ -142,7 +132,7 @@ dependencies {
   testFixturesImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
 
   // https://mvnrepository.com/artifact/org.mockito.kotlin/mockito-kotlin
-  testImplementation("org.mockito.kotlin:mockito-kotlin:6.1.0")
+  testImplementation("org.mockito.kotlin:mockito-kotlin:6.2.2")
 
   testImplementation("org.junit.jupiter:junit-jupiter-api:6.0.0")
   testImplementation("org.junit.jupiter:junit-jupiter-engine:6.0.0")
@@ -309,9 +299,20 @@ intellijPlatform {
     name = "IdeaVim"
     changeNotes.set(
       """
-        We’ve launched a program to reward quality contributions with a one-year All Products Pack subscription. Learn more at: <a href="https://github.com/JetBrains/ideavim/blob/master/CONTRIBUTING.md">CONTRIBUTING.md</a> .
-        <br/>
-        <br/>
+        <b>Features:</b><br>
+        * New VimScript functions: <code>add()</code>, <code>call()</code>, <code>extend()</code>, <code>extendnew()</code>, <code>filter()</code>, <code>flatten()</code>, <code>flattennew()</code>, <code>foreach()</code>, <code>has_key()</code>, <code>indexof()</code>, <code>insert()</code>, <code>items()</code>, <code>keys()</code>, <code>map()</code>, <code>mapnew()</code>, <code>reduce()</code>, <code>remove()</code>, <code>slice()</code>, <code>sort()</code>, <code>uniq()</code>, <code>values()</code><br>
+        <br>
+        <b>Fixes:</b><br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4105">VIM-4105</a> Fixed <code>a"</code> <code>a'</code> <code>a`</code> text objects to include surrounding whitespace per Vim spec<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4097">VIM-4097</a> Fixed <code>&lt;A-n&gt;</code> (NextOccurrence) with text containing backslashes - e.g., selecting <code>\IntegerField</code> now works correctly<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4094">VIM-4094</a> Fixed UninitializedPropertyAccessException when loading history<br>
+        * Fixed high CPU usage while showing command line<br>
+        * Fixed comparison of String and Number in VimScript expressions<br>
+        <br>
+        <b>Merged PRs:</b><br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1414">1414</a> by <a href="https://github.com/citizenmatt">Matt Ellis</a>: Refactor/functions<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1442">1442</a> by <a href="https://github.com/citizenmatt">Matt Ellis</a>: Fix high CPU usage while showing command line<br>
+        <br>
         <a href="https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20Fix%20versions:%20${version.get()}">Changelog</a>
         """.trimIndent()
     )
@@ -375,12 +376,6 @@ changelog {
   headerParserRegex.set("(\\d\\.\\d+(.\\d+)?)".toRegex())
 //    header = { "${project.version}" }
 //    version = "0.60"
-}
-
-// --- Kover
-
-koverMerged {
-  enable()
 }
 
 // Uncomment to enable FUS testing mode

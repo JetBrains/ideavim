@@ -8,7 +8,6 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import com.intellij.openapi.application.ApplicationInfo
 import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
@@ -178,84 +177,42 @@ class SetCommandTest : VimTestCase() {
   fun `test show all effective option values`() {
     // 'fileencoding' defaults to "", but is automatically detected as UTF-8
     setOsSpecificOptionsToSafeValues()
-    val version = ApplicationInfo.getInstance().build.baselineVersion
-    // VERSION UPDATE 2025.3+
-    val expected = if (version <= 252) {
-      """
-        |--- Options ---
-        |noargtextobj          ideawrite=all       scrolljump=1      notextobj-indent
-        |nobomb              noignorecase          scrolloff=0         textwidth=0
-        |nobreakindent       noincsearch           selectmode=         timeout
-        |  colorcolumn=      nolist                shellcmdflag=-x     timeoutlen=1000
-        |nocommentary        nomatchit             shellxescape=@    notrackactionids
-        |nocursorline          maxmapdepth=20      shellxquote={       undolevels=1000
-        |nodigraph           nomini-ai             showcmd             virtualedit=
-        |noexchange            more                showmode          novisualbell
-        |  fileformat=unix   nomultiple-cursors    sidescroll=0        visualdelay=100
-        |nogdefault          noNERDTree            sidescrolloff=0     whichwrap=b,s
-        |nohighlightedyank     nrformats=hex     nosmartcase           wrap
-        |  history=50        nonumber            nosneak               wrapscan
-        |nohlsearch            operatorfunc=       startofline
-        |noideajoin          norelativenumber    nosurround
-        |  ideamarks           scroll=0          notextobj-entire
-        |  clipboard=ideaput,autoselect
-        |  fileencoding=utf-8
-        |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
-        |  ide=IntelliJ IDEA Community Edition
-        |noideacopypreprocess
-        |  idearefactormode=select
-        |  ideastatusicon=enabled
-        |  ideavimsupport=dialog
-        |  isfname=@,48-57,/,\,.,-,_,+,,,#,$,%,{,},[,],:,@-@,!,~,=
-        |  iskeyword=@,48-57,_
-        |  keymodel=continueselect,stopselect
-        |  lookupkeys=<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>
-        |  matchpairs=(:),{:},[:]
-        |noNERDTreeEverywhere
-        |noReplaceWithRegister
-        |  selection=inclusive
-        |  shell=/dummy/path/to/bash
-        |novim-paragraph-motion
-        |  viminfo='100,<50,s10,h
-      """.trimMargin()
-    } else {
-      """
-        |--- Options ---
-        |noargtextobj          ideamarks           scroll=0          notextobj-entire
-        |nobomb                ideawrite=all       scrolljump=1      notextobj-indent
-        |nobreakindent       noignorecase          scrolloff=0         textwidth=0
-        |  colorcolumn=      noincsearch           selectmode=         timeout
-        |nocommentary        nolist                shellcmdflag=-x     timeoutlen=1000
-        |nocursorline        nomatchit             shellxescape=@    notrackactionids
-        |nodigraph             maxmapdepth=20      shellxquote={       undolevels=1000
-        |noexchange          nomini-ai             showcmd             virtualedit=
-        |  fileformat=unix     more                showmode          novisualbell
-        |nogdefault          nomultiple-cursors    sidescroll=0        visualdelay=100
-        |nohighlightedyank   noNERDTree            sidescrolloff=0     whichwrap=b,s
-        |  history=50          nrformats=hex     nosmartcase           wrap
-        |nohlsearch          nonumber            nosneak               wrapscan
-        |  ide=IntelliJ IDEA   operatorfunc=       startofline
-        |noideajoin          norelativenumber    nosurround
-        |  clipboard=ideaput,autoselect
-        |  fileencoding=utf-8
-        |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
-        |noideacopypreprocess
-        |  idearefactormode=select
-        |  ideastatusicon=enabled
-        |  ideavimsupport=dialog
-        |  isfname=@,48-57,/,\,.,-,_,+,,,#,$,%,{,},[,],:,@-@,!,~,=
-        |  iskeyword=@,48-57,_
-        |  keymodel=continueselect,stopselect
-        |  lookupkeys=<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>
-        |  matchpairs=(:),{:},[:]
-        |noNERDTreeEverywhere
-        |noReplaceWithRegister
-        |  selection=inclusive
-        |  shell=/dummy/path/to/bash
-        |novim-paragraph-motion
-        |  viminfo='100,<50,s10,h
-      """.trimMargin()
-    }
+    val expected = """
+      |--- Options ---
+      |noargtextobj          ideamarks           scroll=0          notextobj-entire
+      |nobomb                ideawrite=all       scrolljump=1      notextobj-indent
+      |nobreakindent       noignorecase          scrolloff=0         textwidth=0
+      |  colorcolumn=      noincsearch           selectmode=         timeout
+      |nocommentary        nolist                shellcmdflag=-x     timeoutlen=1000
+      |nocursorline        nomatchit             shellxescape=@    notrackactionids
+      |nodigraph             maxmapdepth=20      shellxquote={       undolevels=1000
+      |noexchange          nomini-ai             showcmd             virtualedit=
+      |  fileformat=unix     more                showmode          novisualbell
+      |nogdefault          nomultiple-cursors    sidescroll=0        visualdelay=100
+      |nohighlightedyank   noNERDTree            sidescrolloff=0     whichwrap=b,s
+      |  history=50          nrformats=hex     nosmartcase           wrap
+      |nohlsearch          nonumber            nosneak               wrapscan
+      |  ide=IntelliJ IDEA   operatorfunc=       startofline
+      |noideajoin          norelativenumber    nosurround
+      |  clipboard=ideaput,autoselect
+      |  fileencoding=utf-8
+      |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
+      |noideacopypreprocess
+      |  idearefactormode=select
+      |  ideastatusicon=enabled
+      |  ideavimsupport=dialog
+      |  isfname=@,48-57,/,\,.,-,_,+,,,#,$,%,{,},[,],:,@-@,!,~,=
+      |  iskeyword=@,48-57,_
+      |  keymodel=continueselect,stopselect
+      |  lookupkeys=<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>
+      |  matchpairs=(:),{:},[:]
+      |noNERDTreeEverywhere
+      |noReplaceWithRegister
+      |  selection=inclusive
+      |  shell=/dummy/path/to/bash
+      |novim-paragraph-motion
+      |  viminfo='100,<50,s10,h
+    """.trimMargin()
     assertCommandOutput("set all", expected)
   }
 
@@ -293,169 +250,85 @@ class SetCommandTest : VimTestCase() {
   fun `test show all option values in single column`() {
     // 'fileencoding' defaults to "", but is automatically detected as UTF-8
     setOsSpecificOptionsToSafeValues()
-    val version = ApplicationInfo.getInstance().build.baselineVersion
-    // VERSION UPDATE 2025.3+
-    val expected = if (version <= 252) {
-      """
-      |--- Options ---
-      |noargtextobj
-      |nobomb
-      |nobreakindent
-      |  clipboard=ideaput,autoselect
-      |  colorcolumn=
-      |nocommentary
-      |nocursorline
-      |nodigraph
-      |noexchange
-      |  fileencoding=utf-8
-      |  fileformat=unix
-      |nogdefault
-      |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
-      |nohighlightedyank
-      |  history=50
-      |nohlsearch
-      |  ide=IntelliJ IDEA Community Edition
-      |noideacopypreprocess
-      |noideajoin
-      |  ideamarks
-      |  idearefactormode=select
-      |  ideastatusicon=enabled
-      |  ideavimsupport=dialog
-      |  ideawrite=all
-      |noignorecase
-      |noincsearch
-      |  isfname=@,48-57,/,\,.,-,_,+,,,#,$,%,{,},[,],:,@-@,!,~,=
-      |  iskeyword=@,48-57,_
-      |  keymodel=continueselect,stopselect
-      |nolist
-      |  lookupkeys=<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>
-      |nomatchit
-      |  matchpairs=(:),{:},[:]
-      |  maxmapdepth=20
-      |nomini-ai
-      |  more
-      |nomultiple-cursors
-      |noNERDTree
-      |noNERDTreeEverywhere
-      |  nrformats=hex
-      |nonumber
-      |  operatorfunc=
-      |norelativenumber
-      |noReplaceWithRegister
-      |  scroll=0
-      |  scrolljump=1
-      |  scrolloff=0
-      |  selection=inclusive
-      |  selectmode=
-      |  shell=/dummy/path/to/bash
-      |  shellcmdflag=-x
-      |  shellxescape=@
-      |  shellxquote={
-      |  showcmd
-      |  showmode
-      |  sidescroll=0
-      |  sidescrolloff=0
-      |nosmartcase
-      |nosneak
-      |  startofline
-      |nosurround
-      |notextobj-entire
-      |notextobj-indent
-      |  textwidth=0
-      |  timeout
-      |  timeoutlen=1000
-      |notrackactionids
-      |  undolevels=1000
-      |novim-paragraph-motion
-      |  viminfo='100,<50,s10,h
-      |  virtualedit=
-      |novisualbell
-      |  visualdelay=100
-      |  whichwrap=b,s
-      |  wrap
-      |  wrapscan
-      """.trimMargin()
-    } else {
-      """
-      |--- Options ---
-      |noargtextobj
-      |nobomb
-      |nobreakindent
-      |  clipboard=ideaput,autoselect
-      |  colorcolumn=
-      |nocommentary
-      |nocursorline
-      |nodigraph
-      |noexchange
-      |  fileencoding=utf-8
-      |  fileformat=unix
-      |nogdefault
-      |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
-      |nohighlightedyank
-      |  history=50
-      |nohlsearch
-      |  ide=IntelliJ IDEA
-      |noideacopypreprocess
-      |noideajoin
-      |  ideamarks
-      |  idearefactormode=select
-      |  ideastatusicon=enabled
-      |  ideavimsupport=dialog
-      |  ideawrite=all
-      |noignorecase
-      |noincsearch
-      |  isfname=@,48-57,/,\,.,-,_,+,,,#,$,%,{,},[,],:,@-@,!,~,=
-      |  iskeyword=@,48-57,_
-      |  keymodel=continueselect,stopselect
-      |nolist
-      |  lookupkeys=<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>
-      |nomatchit
-      |  matchpairs=(:),{:},[:]
-      |  maxmapdepth=20
-      |nomini-ai
-      |  more
-      |nomultiple-cursors
-      |noNERDTree
-      |noNERDTreeEverywhere
-      |  nrformats=hex
-      |nonumber
-      |  operatorfunc=
-      |norelativenumber
-      |noReplaceWithRegister
-      |  scroll=0
-      |  scrolljump=1
-      |  scrolloff=0
-      |  selection=inclusive
-      |  selectmode=
-      |  shell=/dummy/path/to/bash
-      |  shellcmdflag=-x
-      |  shellxescape=@
-      |  shellxquote={
-      |  showcmd
-      |  showmode
-      |  sidescroll=0
-      |  sidescrolloff=0
-      |nosmartcase
-      |nosneak
-      |  startofline
-      |nosurround
-      |notextobj-entire
-      |notextobj-indent
-      |  textwidth=0
-      |  timeout
-      |  timeoutlen=1000
-      |notrackactionids
-      |  undolevels=1000
-      |novim-paragraph-motion
-      |  viminfo='100,<50,s10,h
-      |  virtualedit=
-      |novisualbell
-      |  visualdelay=100
-      |  whichwrap=b,s
-      |  wrap
-      |  wrapscan
-      """.trimMargin()
-    }
+    val expected = """
+    |--- Options ---
+    |noargtextobj
+    |nobomb
+    |nobreakindent
+    |  clipboard=ideaput,autoselect
+    |  colorcolumn=
+    |nocommentary
+    |nocursorline
+    |nodigraph
+    |noexchange
+    |  fileencoding=utf-8
+    |  fileformat=unix
+    |nogdefault
+    |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
+    |nohighlightedyank
+    |  history=50
+    |nohlsearch
+    |  ide=IntelliJ IDEA
+    |noideacopypreprocess
+    |noideajoin
+    |  ideamarks
+    |  idearefactormode=select
+    |  ideastatusicon=enabled
+    |  ideavimsupport=dialog
+    |  ideawrite=all
+    |noignorecase
+    |noincsearch
+    |  isfname=@,48-57,/,\,.,-,_,+,,,#,$,%,{,},[,],:,@-@,!,~,=
+    |  iskeyword=@,48-57,_
+    |  keymodel=continueselect,stopselect
+    |nolist
+    |  lookupkeys=<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>
+    |nomatchit
+    |  matchpairs=(:),{:},[:]
+    |  maxmapdepth=20
+    |nomini-ai
+    |  more
+    |nomultiple-cursors
+    |noNERDTree
+    |noNERDTreeEverywhere
+    |  nrformats=hex
+    |nonumber
+    |  operatorfunc=
+    |norelativenumber
+    |noReplaceWithRegister
+    |  scroll=0
+    |  scrolljump=1
+    |  scrolloff=0
+    |  selection=inclusive
+    |  selectmode=
+    |  shell=/dummy/path/to/bash
+    |  shellcmdflag=-x
+    |  shellxescape=@
+    |  shellxquote={
+    |  showcmd
+    |  showmode
+    |  sidescroll=0
+    |  sidescrolloff=0
+    |nosmartcase
+    |nosneak
+    |  startofline
+    |nosurround
+    |notextobj-entire
+    |notextobj-indent
+    |  textwidth=0
+    |  timeout
+    |  timeoutlen=1000
+    |notrackactionids
+    |  undolevels=1000
+    |novim-paragraph-motion
+    |  viminfo='100,<50,s10,h
+    |  virtualedit=
+    |novisualbell
+    |  visualdelay=100
+    |  whichwrap=b,s
+    |  wrap
+    |  wrapscan
+    """.trimMargin()
     assertCommandOutput("set! all", expected)
   }
 

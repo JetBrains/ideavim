@@ -10,15 +10,24 @@ Essential commands:
 
 Avoid running all tests, this takes too long. It's preferred to run specific test.
 
+When running gradle tasks, use `--console=plain` for cleaner output without progress bars.
+
 See CONTRIBUTING.md for architecture details and a complete command list.
 
 ## IdeaVim-Specific Notes
 
 - Property tests can be flaky - verify if failures relate to your changes
-- Use `<Action>` in mappings, not `:action` 
+- Use `<Action>` in mappings, not `:action`
 - Config file: `~/.ideavimrc` (XDG supported)
 - Goal: Match Vim functionality and architecture
 
+## Issue Tracking
+
+This project uses **YouTrack** for issue tracking, NOT GitHub Issues.
+- Tickets are prefixed with `VIM-` (e.g., VIM-1234)
+- YouTrack URL: https://youtrack.jetbrains.com/issues/VIM
+- `gh issue` commands will NOT work
+
 ## Additional Documentation
 
-- Changelog maintenance: See `.claude/changelog-instructions.md`
+- Changelog maintenance: Handled by the `changelog` skill (auto-detected when updating changelog)

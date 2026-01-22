@@ -12,7 +12,7 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.ui.paint.PaintUtil
 import com.intellij.util.ui.JBUI
-import com.maddyhome.idea.vim.KeyHandler.Companion.getInstance
+import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.VimCommandLine
 import com.maddyhome.idea.vim.api.VimCommandLineCaret
 import com.maddyhome.idea.vim.api.injector
@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.helper.selectEditorFont
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.options.helpers.GuiCursorAttributes
 import com.maddyhome.idea.vim.options.helpers.GuiCursorMode
-import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper.getAttributes
+import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.options.helpers.GuiCursorType
 import kotlinx.io.IOException
 import org.jetbrains.annotations.NonNls
@@ -128,15 +128,15 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
     setFontToJField(string)
   }
 
-  fun insertText(offset: Int, text: String?) {
+  fun insertText(offset: Int, newText: String?) {
     try {
       // Note that ExDocument.insertString handles overwriting, but not replace mode!
-      document.insertString(offset, text, null)
+      document.insertString(offset, newText, null)
     } catch (e: BadLocationException) {
       logger.error(e)
     }
     saveLastEntry()
-    setFontToJField(getText())
+    setFontToJField(text)
   }
 
   fun deleteText(offset: Int, length: Int) {
@@ -146,31 +146,31 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
       logger.error(e)
     }
     saveLastEntry()
-    setFontToJField(getText())
+    setFontToJField(text)
   }
 
   // VIM-570
   private fun setFontToJField(stringToDisplay: String) {
-    setFont(selectEditorFont(myParentPanel.ijEditor, stringToDisplay))
+    font = selectEditorFont(myParentPanel.ijEditor, stringToDisplay)
   }
 
   override fun setFont(f: Font?) {
     super.setFont(f)
-    val document = getDocument()
+    val document = this.document
     if (document is StyledDocument) {
       val defaultStyle = document.getStyle(StyleContext.DEFAULT_STYLE)
-      if (StyleConstants.getFontFamily(defaultStyle) != getFont().family) {
-        StyleConstants.setFontFamily(defaultStyle, getFont().family)
+      if (StyleConstants.getFontFamily(defaultStyle) != font.family) {
+        StyleConstants.setFontFamily(defaultStyle, font.family)
       }
-      if (StyleConstants.getFontSize(defaultStyle) != getFont().getSize()) {
-        StyleConstants.setFontSize(defaultStyle, getFont().getSize())
+      if (StyleConstants.getFontSize(defaultStyle) != font.size) {
+        StyleConstants.setFontSize(defaultStyle, font.size)
       }
     }
   }
 
   override fun setForeground(fg: Color?) {
     super.setForeground(fg)
-    val document = getDocument()
+    val document = this.document
     if (document is StyledDocument) {
       val defaultStyle = document.getStyle(StyleContext.DEFAULT_STYLE)
       StyleConstants.setForeground(defaultStyle, fg)
@@ -178,10 +178,7 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
   }
 
   fun setSpecialKeyForeground(fg: Color) {
-    val document = getDocument()
-    if (document is ExDocument) {
-      document.setSpecialKeyForeground(fg)
-    }
+    (document as? ExDocument)?.setSpecialKeyForeground(fg)
   }
   private var completionModePrefix: String = ""
   private var completionModeEnabled: Boolean = false
@@ -244,7 +241,7 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
     // handle them separately, as key presses, but not as typed characters.
     if (isAllowedPressedEvent(e) || isAllowedTypedEvent(e)) {
       val editor = myParentPanel.editor
-      val keyHandler = getInstance()
+      val keyHandler = KeyHandler.getInstance()
       val keyStroke = KeyStroke.getKeyStrokeForEvent(e)
       keyHandler.handleKey(
         editor, keyStroke, IjEditorExecutionContext(myParentPanel.context!!),
@@ -308,11 +305,11 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
 
 
   private fun isAllowedTypedEvent(event: KeyEvent): Boolean {
-    return event.getID() == KeyEvent.KEY_TYPED && !isKeyCharEnterOrEscape(event.getKeyChar())
+    return event.id == KeyEvent.KEY_TYPED && !isKeyCharEnterOrEscape(event.keyChar)
   }
 
   private fun isAllowedPressedEvent(event: KeyEvent): Boolean {
-    return event.getID() == KeyEvent.KEY_PRESSED && isKeyCodeEnterOrEscape(event.getKeyCode())
+    return event.id == KeyEvent.KEY_PRESSED && isKeyCodeEnterOrEscape(event.keyCode)
   }
 
   private fun isKeyCharEnterOrEscape(keyChar: Char): Boolean {
@@ -353,15 +350,13 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
     doc.toggleInsertReplace()
 
     // Hide/show the caret so its new shape is immediately visible
-    caret.setVisible(false)
+    caret.isVisible = false
     resetCaret()
-    caret.setVisible(true)
+    caret.isVisible = true
   }
 
   private fun resetCaret() {
-    if (caretPosition == super.getText().length ||
-      currentActionPromptCharacterOffset == super.getText().length - 1
-    ) {
+    if (caretPosition == text.length) {
       setNormalModeCaret()
     } else {
       val doc = document as ExDocument
@@ -379,15 +374,15 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
   // 'cr' command-line replace is hor20
   // see :help 'guicursor'
   private fun setNormalModeCaret() {
-    caret.setAttributes(getAttributes(GuiCursorMode.CMD_LINE))
+    commandLineCaret.setAttributes(GuiCursorOptionHelper.getAttributes(GuiCursorMode.CMD_LINE))
   }
 
   private fun setInsertModeCaret() {
-    caret.setAttributes(getAttributes(GuiCursorMode.CMD_LINE_INSERT))
+    commandLineCaret.setAttributes(GuiCursorOptionHelper.getAttributes(GuiCursorMode.CMD_LINE_INSERT))
   }
 
   private fun setReplaceModeCaret() {
-    caret.setAttributes(getAttributes(GuiCursorMode.CMD_LINE_REPLACE))
+    commandLineCaret.setAttributes(GuiCursorOptionHelper.getAttributes(GuiCursorMode.CMD_LINE_REPLACE))
   }
 
   private class CommandLineCaret : DefaultCaret(), VimCommandLineCaret {
@@ -409,7 +404,7 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
 
     override fun focusGained(e: FocusEvent?) {
       if (lastBlinkRate != 0) {
-        setBlinkRate(lastBlinkRate)
+        blinkRate = lastBlinkRate
         lastBlinkRate = 0
       }
       super.focusGained(e)
@@ -420,10 +415,10 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
     override fun focusLost(e: FocusEvent?) {
       // We don't call super.focusLost, which would hide the caret
       hasFocus = false
-      lastBlinkRate = getBlinkRate()
-      setBlinkRate(0)
+      lastBlinkRate = blinkRate
+      blinkRate = 0
       // Make sure the box caret is visible. If we're flashing, this might be false
-      setVisible(true)
+      isVisible = true
       repaint()
     }
 
@@ -433,29 +428,37 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
       // Take a copy of the graphics, so we can mess around with it without having to reset after
       val g2d = g.create() as Graphics2D
       try {
-        val component = getComponent()
-
-        g2d.color = component.getBackground()
+        g2d.color = component.background
         g2d.setXORMode(component.caretColor)
 
-        val r = modelToView(getDot()) ?: return
+        // Convert the caret(/model) offset to a view location. Note that this can return a zero width. AFAICT, the API
+        // is intended to return the *location* of the document offset in the view, and not its bounds. The width
+        // appears to be optional.
+        val r = modelToView(dot) ?: return
 
-        // Make sure our clip region is still up to date. It might get out of sync due to the IDE scale changing.
-        // (Note that the DefaultCaret class makes this check)
-        if (width > 0 && height > 0 && !contains(r)) {
+        // If the new caret location is not contained by the current bounds of the caret, redraw.
+        // Note that we can't use `this.contains(r)` as it will return false if `r.width` or `r.height` is zero. And
+        // since `modelToView` can return a zero width, we would continually force a repaint, repeatedly calling `paint`
+        // and causing a high CPU busy loop.
+        if (width > 0 && height > 0 && !safeContains(r)) {
+          // If the current clip region does not contain the current (old) caret bounds, force a repaint of the whole
+          // component to remove it.
           val clip = g2d.clipBounds
           if (clip != null && !clip.contains(this)) {
             repaint()
           }
-          damage(r.getBounds())
+
+          // Update the caret bounds to the new location and redraw the component
+          damage(r.bounds)
         }
 
-        // Make sure not to use the saved bounds! There is no guarantee that damage() has been called first, especially
-        // when the caret has not yet been moved or changed
-        val fm = component.getFontMetrics(component.getFont())
+        val fm = component.getFontMetrics(component.font)
+        val caretWidth = getCaretWidth(fm, r.x, thickness, hasFocus)
+
+        // Paint the caret. Make sure not to use the saved bounds! There is no guarantee that damage() has been called
+        // first, especially when the caret has not yet been moved or changed.
         if (!hasFocus) {
           val outlineThickness = PaintUtil.alignToInt(1.0, g2d).toFloat()
-          val caretWidth = getCaretWidth(fm, r.x, 100, false)
           val area = Area(Double(r.x, r.y, caretWidth, r.height))
           area.subtract(
             Area(
@@ -469,14 +472,29 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
           g2d.fill(area)
         } else {
           val caretHeight = getCaretHeight(r.height)
-          val caretWidth = getCaretWidth(fm, r.x, thickness, true)
           val rect = Double(r.x, r.y + r.height - caretHeight, caretWidth, caretHeight)
           g2d.fill(rect)
+        }
+
+        // Make sure the caret's width and height are not zero. This is important for redrawing the caret when flashing.
+        // If the bounds are zero, nothing is drawn. It's unclear who should set the initial width and height. It's
+        // updated when calling damage, but nothing sets the initial bounds
+        if (width == 0 || height == 0) {
+          width = caretWidth.toInt()
+          height = r.bounds.height
         }
       } finally {
         g2d.dispose()
       }
     }
+
+    /**
+     * Check if the given rectangle is contained within the current caret bounds
+     *
+     * This differs to [contains] in that it does not return false if the rectangle's width or height is zero.
+     */
+    private fun safeContains(r: Rectangle2D) =
+      x.toDouble() in r.x..r.x + r.width && y.toDouble() in r.y..r.y + r.height
 
     /**
      * Updates the bounds of the caret and repaints those bounds.
@@ -496,7 +514,7 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
         // round down when converting. The width is rounded up, but should also include any fraction part from x, so we
         // add one.
 
-        val fm = getComponent().getFontMetrics(getComponent().getFont())
+        val fm = component.getFontMetrics(component.font)
         x = r.x
         y = r.y
         width = ceil(getCaretWidth(fm, r.x.toDouble(), 100, false)).toInt() + 1
@@ -505,38 +523,40 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
       }
     }
 
-    fun modelToView(dot: Int): Rectangle2D? {
-      if (dot > getComponent().document.length) {
+    private fun modelToView(dot: Int): Rectangle2D? {
+      if (dot > component.document.length) {
         return null
       }
 
       return try {
-        getComponent().getUI().modelToView2D(getComponent(), dot, getDotBias())
+        component.ui.modelToView2D(component, dot, dotBias)
       } catch (_: BadLocationException) {
         null
       }
     }
 
     /**
-     * RemoveRedundantQualifierName – Kotlin's Double conflicts with double from Rectangle2D
+     * Get the width of the caret as a percentage of the current character width
+     *
+     * When [coerceCharacterWidth] is false, the caret width is based on the distance to the next character. This is
+     * the width of the rendered character and mostly used when we don't have focus so that the outline caret is drawn
+     * around the whole rendered character.
+     *
+     * When [coerceCharacterWidth] is true, the caret width will be the same as the character width. If the caret is a
+     * non-printable character, the default character width is used, which prevents the caret stretching to the full
+     * width of the rendered character representation (e.g., `^M`)
      */
     @Suppress("RemoveRedundantQualifierName")
-    fun getCaretWidth(fm: FontMetrics, dotX: kotlin.Double, widthPercentage: Int, coerceCharacterWidth: Boolean): kotlin.Double {
-      // Caret width is based on the distance to the next character. This isn't necessarily the same as the character
-      // width. E.g. when using float coordinates, the width of a grid is 8.4, while the character width is only 8. This
-      // would give us a caret that is not wide enough.
-      // We can also try to coerce to the width of the character, rather than using the View's width. This is so that
-      // non-printable characters have the same sized caret as printable characters. The only time we use full width
-      // with non-printable characters is when drawing the lost-focus caret (a box enclosing the character).
+    private fun getCaretWidth(fm: FontMetrics, dotX: kotlin.Double, widthPercentage: Int, coerceCharacterWidth: Boolean): kotlin.Double {
       val width: kotlin.Double
-      val r = modelToView(getDot() + 1)
+      val r = modelToView(dot + 1)
       if (r != null && !coerceCharacterWidth) {
         width = r.x - dotX
       } else {
         var c = ' '
         try {
-          if (getDot() < getComponent().document.length) {
-            val documentChar = getComponent().getText(getDot(), 1)[0]
+          if (dot < component.document.length) {
+            val documentChar = component.getText(dot, 1)[0]
             if (isPrintableCharacter(documentChar)) {
               c = documentChar
             }
@@ -551,7 +571,7 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
     }
 
     @Suppress("RemoveRedundantQualifierName")
-    fun getCaretHeight(fullHeight: kotlin.Double): kotlin.Double {
+    private fun getCaretHeight(fullHeight: kotlin.Double): kotlin.Double {
       if (mode == GuiCursorType.HOR) {
         return max(1.0, fullHeight * thickness / 100.0)
       }
@@ -559,37 +579,33 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
     }
 
     override var offset: Int
-      get() = getDot()
+      get() = dot
       set(i) {
-        setDot(i)
+        dot = i
       }
   }
 
   @get:TestOnly
   val caretShape: @NonNls String
-    get() {
-      val caret = caret
-      return String.format("%s %d", caret.mode, caret.thickness)
-    }
+    get() = String.format("%s %d", commandLineCaret.mode, commandLineCaret.thickness)
 
   // We need to store this in a field because we can't trust getCaret(), as it will return an instance of
   // ComposedTextCaret when working with dead keys or input methods
-  private val caret: CommandLineCaret = CommandLineCaret()
-  var currentActionPromptCharacterOffset: Int = -1
+  private val commandLineCaret: CommandLineCaret = CommandLineCaret()
 
   init {
-    caret.setBlinkRate(caret.blinkRate)
-    setCaret(caret)
+    commandLineCaret.blinkRate = caret.blinkRate
+    caret = commandLineCaret
     setNormalModeCaret()
 
     val defaultStyle = (document as StyledDocument).getStyle(StyleContext.DEFAULT_STYLE)
-    StyleConstants.setForeground(defaultStyle, getForeground())
+    StyleConstants.setForeground(defaultStyle, foreground)
 
     addCaretListener { _: CaretEvent? -> resetCaret() }
   }
 
   companion object {
-    private val logger = Logger.getInstance(ExTextField::class.java.getName())
+    private val logger = Logger.getInstance(ExTextField::class.java.name)
     private val supportedTabCompletionCommands = setOf("e", "edit", "w", "write")
   }
 }

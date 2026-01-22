@@ -8,6 +8,7 @@
 
 package _Self.buildTypes
 
+import _Self.AgentSize
 import _Self.Constants.DEFAULT_CHANNEL
 import _Self.Constants.DEV_CHANNEL
 import _Self.Constants.EAP_CHANNEL
@@ -44,7 +45,7 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
     password(
       "env.ORG_GRADLE_PROJECT_slackUrl",
       "credentialsJSON:a8ab8150-e6f8-4eaf-987c-bcd65eac50b5",
-      label = "Slack Token"
+      label = "Slack URL"
     )
     password(
       "env.ORG_GRADLE_PROJECT_youtrackToken",
@@ -93,11 +94,13 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
     gradle {
       name = "Calculate new version"
       tasks = "scripts:calculateNewVersion"
+      gradleParams = "--build-cache --configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
     gradle {
       name = "Set TeamCity build number"
       tasks = "scripts:setTeamCityBuildNumber"
+      gradleParams = "--build-cache --configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
 //    gradle {
@@ -111,15 +114,17 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
     gradle {
       name = "Add release tag"
       tasks = "scripts:addReleaseTag"
+      gradleParams = "--build-cache --configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
     script {
       name = "Run tests"
-      scriptContent = "./gradlew test -x :tests:property-tests:test -x :tests:long-running-tests:test"
+      scriptContent = "./gradlew test -x :tests:property-tests:test -x :tests:long-running-tests:test --build-cache --configuration-cache"
     }
     gradle {
       name = "Publish release"
       tasks = "publishPlugin"
+      gradleParams = "--build-cache --configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
 //    script {
@@ -151,18 +156,19 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
     gradle {
       name = "Run Integrations"
       tasks = "releaseActions"
-      gradleParams = "--no-configuration-cache"
+      gradleParams = "--build-cache --configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
-//    gradle {
-//      name = "Slack Notification"
-//      tasks = "slackNotification"
-//    }
   }
 
   features {
     sshAgent {
       teamcitySshKey = "IdeaVim ssh keys"
     }
+  }
+
+  requirements {
+    equals("teamcity.agent.hardware.cpuCount", AgentSize.MEDIUM)
+    equals("teamcity.agent.os.family", "Linux")
   }
 })

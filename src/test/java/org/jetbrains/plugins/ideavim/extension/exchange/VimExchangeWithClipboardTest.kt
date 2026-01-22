@@ -12,16 +12,12 @@ import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.extension.exchange.VimExchangeExtension
 import com.maddyhome.idea.vim.state.mode.Mode
-import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.jetbrains.plugins.ideavim.impl.OptionTest
-import org.jetbrains.plugins.ideavim.impl.TraceOptions
-import org.jetbrains.plugins.ideavim.impl.VimOption
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 
-@TraceOptions(TestOptionConstants.clipboard)
 class VimExchangeWithClipboardTest : VimTestCase() {
   @Throws(Exception::class)
   @BeforeEach
@@ -31,62 +27,72 @@ class VimExchangeWithClipboardTest : VimTestCase() {
   }
 
   // |cx|
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @Test
   fun `test exchange words left to right`() {
     doTest(
       listOf("cxe", "w", "cxe"),
       "The quick ${c}brown fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
       Mode.NORMAL(),
-    )
+    ) {
+      enterCommand("set clipboard=unnamed")
+    }
   }
 
   // |cx|
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @Test
   fun `test exchange words dot repeat`() {
     doTest(
       listOf("cxiw", "w", "."),
       "The quick ${c}brown fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
       Mode.NORMAL(),
-    )
+    ) {
+      enterCommand("set clipboard=unnamed")
+    }
   }
 
   // |cx|
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @Test
   fun `test exchange words right to left`() {
     doTest(
       listOf("cxe", "b", "cxe"),
       "The quick brown ${c}fox catch over the lazy dog",
       "The quick ${c}fox brown catch over the lazy dog",
       Mode.NORMAL(),
-    )
+    ) {
+      enterCommand("set clipboard=unnamed")
+    }
   }
 
   // |cx|
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @Test
   fun `test exchange words right to left with dot`() {
     doTest(
       listOf("cxe", "b", "."),
       "The quick brown ${c}fox catch over the lazy dog",
       "The quick ${c}fox brown catch over the lazy dog",
       Mode.NORMAL(),
-    )
+    ) {
+      enterCommand("set clipboard=unnamed")
+    }
   }
 
   // |X|
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @Test
   fun `test visual exchange words left to right`() {
     doTest(
       listOf("veX", "w", "veX"),
       "The quick ${c}brown fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
       Mode.NORMAL(),
-    )
+    ) {
+      enterCommand("set clipboard=unnamed")
+    }
   }
 
   // |X|
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @Test
   @VimBehaviorDiffers(
     originalVimAfter = "The ${c}brown catch over the lazy dog",
     shouldBeFixed = true,
@@ -101,7 +107,7 @@ class VimExchangeWithClipboardTest : VimTestCase() {
   }
 
   // |X|
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @Test
   @VimBehaviorDiffers(
     originalVimAfter = "The brown ${c}catch over the lazy dog",
     shouldBeFixed = true,
@@ -112,11 +118,13 @@ class VimExchangeWithClipboardTest : VimTestCase() {
       "The ${c}quick brown fox catch over the lazy dog",
       "The brow${c}n catch over the lazy dog",
       Mode.NORMAL(),
-    )
+    ) {
+      enterCommand("set clipboard=unnamed")
+    }
   }
 
   // |cxx|
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @Test
   @VimBehaviorDiffers(
     originalVimAfter =
       """The quick
@@ -140,11 +148,13 @@ class VimExchangeWithClipboardTest : VimTestCase() {
          the lazy dog
       """.trimIndent(),
       Mode.NORMAL(),
-    )
+    ) {
+      enterCommand("set clipboard=unnamed")
+    }
   }
 
   // |cxx|
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @Test
   @VimBehaviorDiffers(
     originalVimAfter =
       """The quick
@@ -168,10 +178,12 @@ class VimExchangeWithClipboardTest : VimTestCase() {
          the lazy dog
       """.trimIndent(),
       Mode.NORMAL(),
-    )
+    ) {
+      enterCommand("set clipboard=unnamed")
+    }
   }
 
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @Test
   @VimBehaviorDiffers(
     originalVimAfter = """
          The quick
@@ -194,10 +206,12 @@ class VimExchangeWithClipboardTest : VimTestCase() {
          fox lazy dog
       """.trimIndent(),
       Mode.NORMAL(),
-    )
+    ) {
+      enterCommand("set clipboard=unnamed")
+    }
   }
 
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @Test
   @VimBehaviorDiffers(
     originalVimAfter =
       """
@@ -222,13 +236,15 @@ class VimExchangeWithClipboardTest : VimTestCase() {
          the lazy dog
          The quick
          brown fox
-         
+
       """.trimIndent(),
       Mode.NORMAL(),
-    )
+    ) {
+      enterCommand("set clipboard=unnamed")
+    }
   }
 
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @Test
   fun `test visual char highlighter`() {
     val before = """
          The ${c}quick
@@ -237,6 +253,7 @@ class VimExchangeWithClipboardTest : VimTestCase() {
          the lazy dog
     """.trimIndent()
     configureByText(before)
+    enterCommand("set clipboard=unnamed")
     typeText(injector.parser.parseKeys("vlll" + "X"))
 
     assertHighlighter(4, 8, HighlighterTargetArea.EXACT_RANGE)
@@ -245,7 +262,7 @@ class VimExchangeWithClipboardTest : VimTestCase() {
     exitExchange()
   }
 
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @Test
   fun `test visual line highdhitligthhter`() {
     val before = """
          The ${c}quick
@@ -254,6 +271,7 @@ class VimExchangeWithClipboardTest : VimTestCase() {
          the lazy dog
     """.trimIndent()
     configureByText(before)
+    enterCommand("set clipboard=unnamed")
     typeText(injector.parser.parseKeys("Vj" + "X"))
 
     assertHighlighter(0, 19, HighlighterTargetArea.LINES_IN_RANGE)
@@ -262,13 +280,14 @@ class VimExchangeWithClipboardTest : VimTestCase() {
     exitExchange()
   }
 
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @Test
   fun `test till the line end highlighter`() {
     val before = """
          The ${c}quick
          brown fox
     """.trimIndent()
     configureByText(before)
+    enterCommand("set clipboard=unnamed")
     typeText(injector.parser.parseKeys("v$" + "X"))
 
     assertHighlighter(4, 10, HighlighterTargetArea.EXACT_RANGE)
@@ -277,13 +296,14 @@ class VimExchangeWithClipboardTest : VimTestCase() {
     exitExchange()
   }
 
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @Test
   fun `test pre line end highlighter`() {
     val before = """
          The ${c}quick
          brown fox
     """.trimIndent()
     configureByText(before)
+    enterCommand("set clipboard=unnamed")
     typeText(injector.parser.parseKeys("v\$h" + "X"))
 
     assertHighlighter(4, 9, HighlighterTargetArea.EXACT_RANGE)
@@ -292,13 +312,14 @@ class VimExchangeWithClipboardTest : VimTestCase() {
     exitExchange()
   }
 
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @Test
   fun `test pre pre line end highlighter`() {
     val before = """
          The ${c}quick
          brown fox
     """.trimIndent()
     configureByText(before)
+    enterCommand("set clipboard=unnamed")
     typeText(injector.parser.parseKeys("v\$hh" + "X"))
 
     assertHighlighter(4, 8, HighlighterTargetArea.EXACT_RANGE)
@@ -307,13 +328,14 @@ class VimExchangeWithClipboardTest : VimTestCase() {
     exitExchange()
   }
 
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @Test
   fun `test to file end highlighter`() {
     val before = """
          The quick
          brown ${c}fox
     """.trimIndent()
     configureByText(before)
+    enterCommand("set clipboard=unnamed")
     typeText(
       injector.parser.parseKeys(
         buildString {
@@ -329,14 +351,15 @@ class VimExchangeWithClipboardTest : VimTestCase() {
     exitExchange()
   }
 
-  @OptionTest(VimOption(TestOptionConstants.clipboard, limitedValues = ["unnamed"]))
+  @Test
   fun `test to file end with new line highlighter`() {
     val before = """
          The quick
          brown ${c}fox
-         
+
     """.trimIndent()
     configureByText(before)
+    enterCommand("set clipboard=unnamed")
     typeText(
       injector.parser.parseKeys(
         buildString {

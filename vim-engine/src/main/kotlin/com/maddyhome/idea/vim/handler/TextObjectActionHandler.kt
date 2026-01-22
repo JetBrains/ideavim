@@ -14,7 +14,6 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.TextObjectVisualType
 import com.maddyhome.idea.vim.common.TextRange
@@ -45,6 +44,32 @@ abstract class TextObjectActionHandler : EditorActionHandlerBase(true) {
    */
   abstract val visualType: TextObjectVisualType
 
+  /**
+   * Controls what happens when the current selection anchor is outside the target text object range.
+   *
+   * **When `true` (extend selection):**
+   * If the selection anchor is not included in the target range, the selection will be extended
+   * from the current anchor to include the text object. The anchor stays where it was.
+   * Use for text objects like `aw` (a word) where extending makes semantic sense.
+   * Commands: `iw`, `aw`, `iW`, `aW`
+   *
+   * **When `false` (jump to new location):**
+   * If the selection anchor is not included in the target range, the selection will jump
+   * to the new location, resetting the anchor to the start of the text object.
+   * Use for bounded structures where the entire block should be selected.
+   * Commands: `i(`, `a(`, `a]`, `i<`, `a>`, `i"`, `a"`, `i'`, `a'`,
+   *           `is`, `as`, `ip`, `ap`, `it`, `at`
+   *
+   * **Example:**
+   * Text: `one (two three) four` with selection anchor at 'o' of "one" and cursor inside parens.
+   * Target range for `i(` is "two three".
+   * - `preserveSelectionAnchor = true`: Selection extends from 'o' to include "two three"
+   * - `preserveSelectionAnchor = false`: Selection jumps to select only "two three"
+   *
+   * Default is `true` (extend) for backwards compatibility.
+   */
+  open val preserveSelectionAnchor: Boolean = true
+
   abstract fun getRange(
     editor: VimEditor,
     caret: ImmutableVimCaret,
@@ -67,11 +92,15 @@ abstract class TextObjectActionHandler : EditorActionHandlerBase(true) {
 
     val range = getRange(editor, caret, context, operatorArguments.count1, operatorArguments.count0) ?: return false
 
-    val block = CommandFlags.FLAG_TEXT_BLOCK in cmd.flags
-    val newstart = if (block || caret.offset >= caret.vimSelectionStart) range.startOffset else range.endOffsetInclusive
-    val newend = if (block || caret.offset >= caret.vimSelectionStart) range.endOffsetInclusive else range.startOffset
+    val newstart = if (caret.offset >= caret.vimSelectionStart) range.startOffset else range.endOffsetInclusive
+    val newend = if (caret.offset >= caret.vimSelectionStart) range.endOffsetInclusive else range.startOffset
 
-    if (caret.vimSelectionStart == caret.offset || block) {
+    /**
+     * There are two cases when the selection changes it's origin:
+     * - When we have a type of selection when we always select the target range
+     * - Or if the selection start is inside of the new range
+     */
+    if (!preserveSelectionAnchor || caret.vimSelectionStart in range) {
       caret.vimSetSelection(newstart, newstart, false)
     }
 

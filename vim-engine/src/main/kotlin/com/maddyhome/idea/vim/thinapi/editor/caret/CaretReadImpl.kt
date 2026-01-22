@@ -50,9 +50,11 @@ class CaretReadImpl(
       val isVisualBlockMode = mode is Mode.VISUAL && mode.selectionType == SelectionType.BLOCK_WISE
 
       return if (isVisualBlockMode) {
-        val ranges = vimEditor.nativeCarets().map { Range.Simple(it.selectionStart, it.selectionEnd) }
-          .toTypedArray()
-        Range.Block(ranges)
+        // For block selection, gather all carets' selections and use min start / max end
+        val allCarets = vimEditor.nativeCarets()
+        val start = allCarets.minOf { it.selectionStart }
+        val end = allCarets.maxOf { it.selectionEnd }
+        Range.Block(start, end)
       } else {
         Range.Simple(vimCaret.selectionStart, vimCaret.selectionEnd)
       }
@@ -107,11 +109,8 @@ class CaretReadImpl(
       val isVisualBlockMode = mode is Mode.VISUAL && mode.selectionType == SelectionType.BLOCK_WISE
 
       return if (isVisualBlockMode) {
-        val ranges = vimEditor.nativeCarets().mapNotNull { 
-          val marks = injector.markService.getVisualSelectionMarks(it) ?: return@mapNotNull null
-          Range.Simple(marks.startOffset, marks.endOffset)
-        }.toTypedArray()
-        Range.Block(ranges)
+        val marks = injector.markService.getVisualSelectionMarks(vimEditor.primaryCaret()) ?: return null
+        Range.Block(marks.startOffset, marks.endOffset)
       } else {
         val visualSelectionMarks = injector.markService.getVisualSelectionMarks(vimCaret) ?: return null
         visualSelectionMarks.toRange()

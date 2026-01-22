@@ -14,17 +14,14 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.TextObjectVisualType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
-import com.maddyhome.idea.vim.helper.enumSetOf
-import java.util.*
 
 @CommandOrMotion(keys = ["i`"], modes = [Mode.VISUAL, Mode.OP_PENDING])
 class MotionInnerBlockBackQuoteAction : TextObjectActionHandler() {
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
+  override val preserveSelectionAnchor: Boolean = false
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
@@ -42,7 +39,7 @@ class MotionInnerBlockBackQuoteAction : TextObjectActionHandler() {
 @CommandOrMotion(keys = ["i\""], modes = [Mode.VISUAL, Mode.OP_PENDING])
 class MotionInnerBlockDoubleQuoteAction : TextObjectActionHandler() {
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
+  override val preserveSelectionAnchor: Boolean = false
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
@@ -60,7 +57,7 @@ class MotionInnerBlockDoubleQuoteAction : TextObjectActionHandler() {
 @CommandOrMotion(keys = ["i'"], modes = [Mode.VISUAL, Mode.OP_PENDING])
 class MotionInnerBlockSingleQuoteAction : TextObjectActionHandler() {
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
+  override val preserveSelectionAnchor: Boolean = false
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
@@ -78,7 +75,7 @@ class MotionInnerBlockSingleQuoteAction : TextObjectActionHandler() {
 @CommandOrMotion(keys = ["a`"], modes = [Mode.VISUAL, Mode.OP_PENDING])
 class MotionOuterBlockBackQuoteAction : TextObjectActionHandler() {
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
+  override val preserveSelectionAnchor: Boolean = false
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
@@ -96,7 +93,7 @@ class MotionOuterBlockBackQuoteAction : TextObjectActionHandler() {
 @CommandOrMotion(keys = ["a\""], modes = [Mode.VISUAL, Mode.OP_PENDING])
 class MotionOuterBlockDoubleQuoteAction : TextObjectActionHandler() {
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
+  override val preserveSelectionAnchor: Boolean = false
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
@@ -114,7 +111,7 @@ class MotionOuterBlockDoubleQuoteAction : TextObjectActionHandler() {
 @CommandOrMotion(keys = ["a'"], modes = [Mode.VISUAL, Mode.OP_PENDING])
 class MotionOuterBlockSingleQuoteAction : TextObjectActionHandler() {
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
+  override val preserveSelectionAnchor: Boolean = false
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 

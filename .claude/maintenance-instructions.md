@@ -175,7 +175,6 @@ Not critical, but could be addressed in future cleanup.
   - Architecture overview and where to find specific code
   - Testing guidelines and corner cases to consider
   - Common patterns and conventions
-  - Information about awards for quality contributions
 
 ## Commands Reference
 

@@ -80,36 +80,38 @@ class MappingScopeImpl(
     return injector.keyGroup.hasmapto(MappingMode.NORMAL, injector.parser.parseKeys(to))
   }
 
-  // ===== Visual mode (vmap/vnoremap/vunmap) =====
+  // ===== Visual and select modes (vmap/vnoremap/vunmap) =====
 
   override fun vmap(from: String, to: String) {
-    addMapping(from, to, isRecursive = true, MappingMode.VISUAL)
+    addMapping(from, to, isRecursive = true, MappingMode.VISUAL, MappingMode.SELECT)
   }
 
   override fun vmap(
     from: String,
     action: suspend VimApi.() -> Unit,
   ) {
-    addMapping(from, isRecursive = true, action, MappingMode.VISUAL)
+    addMapping(from, isRecursive = true, action, MappingMode.VISUAL, MappingMode.SELECT)
   }
 
   override fun vnoremap(from: String, to: String) {
-    addMapping(from, to, isRecursive = false, MappingMode.VISUAL)
+    addMapping(from, to, isRecursive = false, MappingMode.VISUAL, MappingMode.SELECT)
   }
 
   override fun vnoremap(from: String, action: suspend VimApi.() -> Unit) {
-    addMapping(from, isRecursive = false, action, MappingMode.VISUAL)
+    addMapping(from, isRecursive = false, action, MappingMode.VISUAL, MappingMode.SELECT)
   }
 
   override fun vunmap(keys: String) {
-    removeMapping(keys, MappingMode.VISUAL)
+    removeMapping(keys, MappingMode.VISUAL, MappingMode.SELECT)
   }
 
   override fun vhasmapto(to: String): Boolean {
-    return injector.keyGroup.hasmapto(MappingMode.VISUAL, injector.parser.parseKeys(to))
+    val toKeys = injector.parser.parseKeys(to)
+    return injector.keyGroup.hasmapto(MappingMode.VISUAL, toKeys) ||
+      injector.keyGroup.hasmapto(MappingMode.SELECT, toKeys)
   }
 
-  // ===== Visual exclusive mode (xmap/xnoremap/xunmap) =====
+  // ===== Visual mode (xmap/xnoremap/xunmap) =====
 
   override fun xmap(from: String, to: String) {
     addMapping(from, to, isRecursive = true, MappingMode.VISUAL)

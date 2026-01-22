@@ -15,6 +15,7 @@ import com.intellij.vim.api.scopes.MappingScope
 import com.intellij.vim.api.scopes.ModalInput
 import com.intellij.vim.api.scopes.OptionScope
 import com.intellij.vim.api.scopes.OutputPanelScope
+import com.intellij.vim.api.scopes.TextObjectScope
 import com.intellij.vim.api.scopes.VimApiDsl
 import com.intellij.vim.api.scopes.commandline.CommandLineScope
 import com.intellij.vim.api.scopes.editor.EditorScope
@@ -144,14 +145,45 @@ interface VimApi {
    *
    * Example usage:
    * ```kotlin
+   * // Lambda style
    * mappings {
    *    nmap("jk", "<Esc>")
    * }
+   *
+   * // Chained style
+   * mappings().nmap("jk", "<Esc>")
    * ```
    *
    * @param block The code block to execute within the mapping scope
+   * @return The MappingScope for chaining
    */
-  fun mappings(block: MappingScope.() -> Unit)
+  fun mappings(block: MappingScope.() -> Unit = {}): MappingScope
+
+  /**
+   * Provides access to text object registration.
+   *
+   * Text objects are selections that can be used with operators (like `d`, `c`, `y`)
+   * or in visual mode. Examples include `iw` (inner word), `ap` (a paragraph), etc.
+   *
+   * Example usage:
+   * ```kotlin
+   * // Lambda style
+   * textObjects {
+   *     register("ae") { count ->
+   *         TextObjectRange.CharacterWise(0, editor { read { textLength.toInt() } })
+   *     }
+   * }
+   *
+   * // Chained style
+   * textObjects().register("ae") { count ->
+   *     TextObjectRange.CharacterWise(0, editor { read { textLength.toInt() } })
+   * }
+   * ```
+   *
+   * @param block The code block to execute within the text object scope
+   * @return The TextObjectScope for chaining
+   */
+  fun textObjects(block: TextObjectScope.() -> Unit = {}): TextObjectScope
 
 //  /**
 //   * Provides access to event listener functionality.
@@ -175,15 +207,20 @@ interface VimApi {
    *
    * Example usage:
    * ```kotlin
+   * // Lambda style
    * outputPanel {
    *     // Print a message to the output panel
    *     setText("Hello from IdeaVim plugin!")
    * }
+   *
+   * // Chained style
+   * outputPanel().setText("Hello from IdeaVim plugin!")
    * ```
    *
    * @param block The code block to execute within the output panel scope
+   * @return The OutputPanelScope for chaining
    */
-  fun outputPanel(block: OutputPanelScope.() -> Unit)
+  fun outputPanel(block: OutputPanelScope.() -> Unit = {}): OutputPanelScope
 
   /**
    * Provides access to modal input functionality.
@@ -205,6 +242,7 @@ interface VimApi {
    *
    * Example usage:
    * ```kotlin
+   * // Lambda style
    * commandLine {
    *    // get current command line text
    *    read {
@@ -212,11 +250,15 @@ interface VimApi {
    *      text
    *    }
    * }
+   *
+   * // Chained style
+   * commandLine().read { text }
    * ```
    *
    * @param block The code block to execute with command line scope
+   * @return The CommandLineScope for chaining
    */
-  fun commandLine(block: CommandLineScope.() -> Unit)
+  fun commandLine(block: CommandLineScope.() -> Unit = {}): CommandLineScope
 
   /**
    * Provides access to Vim's options functionality.
@@ -249,15 +291,20 @@ interface VimApi {
    *
    * Example usage:
    * ```kotlin
+   * // Lambda style
    * digraph {
    *     // Add a new digraph
    *     add("a:", 'ä')
    * }
+   *
+   * // Chained style
+   * digraph().add('a', ':', 228)
    * ```
    *
    * @param block The code block to execute within the digraph scope
+   * @return The DigraphScope for chaining
    */
-  fun digraph(block: DigraphScope.() -> Unit)
+  fun digraph(block: DigraphScope.() -> Unit = {}): DigraphScope
 
   /**
    * Gets the number of tabs in the current window.

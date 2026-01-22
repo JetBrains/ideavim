@@ -773,4 +773,48 @@ class ReplaceWithRegisterTest : VimTestCase() {
     assertState(expected)
   }
 
+  @TestFor(issues = ["VIM-3798"])
+  @Test
+  fun `test replace inside empty braces`() {
+    val text = "function${c}()"
+
+    configureByText(text)
+    VimPlugin.getRegister().storeTextSpecial(UNNAMED_REGISTER, "yanked_text")
+    typeText(injector.parser.parseKeys("grib"))
+    assertState("function(${c}yanked_text)")
+  }
+
+  @TestFor(issues = ["VIM-3798"])
+  @Test
+  fun `test replace inside empty quotes`() {
+    val text = "function(${c}\"\")"
+
+    configureByText(text)
+    VimPlugin.getRegister().storeTextSpecial(UNNAMED_REGISTER, "yanked_text")
+    typeText(injector.parser.parseKeys("gri\""))
+    assertState("function(\"${c}yanked_text\")")
+  }
+
+  @TestFor(issues = ["VIM-3798"])
+  @Test
+  fun `test replace inside empty parentheses`() {
+    val text = "function${c}()"
+
+    configureByText(text)
+    VimPlugin.getRegister().storeTextSpecial(UNNAMED_REGISTER, "args")
+    typeText(injector.parser.parseKeys("gri("))
+    assertState("function(${c}args)")
+  }
+
+  @TestFor(issues = ["VIM-3798"])
+  @Test
+  fun `test replace inside empty square brackets`() {
+    val text = "array${c}[]"
+
+    configureByText(text)
+    VimPlugin.getRegister().storeTextSpecial(UNNAMED_REGISTER, "0")
+    typeText(injector.parser.parseKeys("gri["))
+    assertState("array[${c}0]")
+  }
+
 }

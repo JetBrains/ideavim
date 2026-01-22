@@ -1,5 +1,6 @@
 package _Self.buildTypes
 
+import _Self.AgentSize
 import _Self.Constants.DEV_CHANNEL
 import _Self.Constants.RELEASE_DEV
 import _Self.IdeaVimBuildType
@@ -47,15 +48,18 @@ object ReleaseDev : IdeaVimBuildType({
     gradle {
       name = "Calculate new dev version"
       tasks = "scripts:calculateNewDevVersion"
+      gradleParams = "--build-cache --configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
     gradle {
       name = "Set TeamCity build number"
       tasks = "scripts:setTeamCityBuildNumber"
+      gradleParams = "--build-cache --configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
     gradle {
       tasks = "publishPlugin"
+      gradleParams = "--build-cache --configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
   }
@@ -86,5 +90,10 @@ object ReleaseDev : IdeaVimBuildType({
         buildRule = lastSuccessful()
       }
     }
+  }
+
+  requirements {
+    equals("teamcity.agent.hardware.cpuCount", AgentSize.MEDIUM)
+    equals("teamcity.agent.os.family", "Linux")
   }
 })

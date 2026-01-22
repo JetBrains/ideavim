@@ -13,18 +13,15 @@ import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.TextObjectVisualType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.findBlockRange
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
-import com.maddyhome.idea.vim.helper.enumSetOf
-import java.util.*
 
 @CommandOrMotion(keys = ["i>", "i<lt>"], modes = [Mode.VISUAL, Mode.OP_PENDING])
 class MotionInnerBlockAngleAction : TextObjectActionHandler() {
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
+  override val preserveSelectionAnchor: Boolean = false
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
@@ -42,7 +39,7 @@ class MotionInnerBlockAngleAction : TextObjectActionHandler() {
 @CommandOrMotion(keys = ["iB", "i{", "i}"], modes = [Mode.VISUAL, Mode.OP_PENDING])
 class MotionInnerBlockBraceAction : TextObjectActionHandler() {
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
+  override val preserveSelectionAnchor: Boolean = false
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
@@ -60,7 +57,7 @@ class MotionInnerBlockBraceAction : TextObjectActionHandler() {
 @CommandOrMotion(keys = ["i[", "i]"], modes = [Mode.VISUAL, Mode.OP_PENDING])
 class MotionInnerBlockBracketAction : TextObjectActionHandler() {
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
+  override val preserveSelectionAnchor: Boolean = false
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
@@ -78,7 +75,7 @@ class MotionInnerBlockBracketAction : TextObjectActionHandler() {
 @CommandOrMotion(keys = ["ib", "i(", "i)"], modes = [Mode.VISUAL, Mode.OP_PENDING])
 class MotionInnerBlockParenAction : TextObjectActionHandler() {
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
+  override val preserveSelectionAnchor: Boolean = false
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
@@ -96,7 +93,7 @@ class MotionInnerBlockParenAction : TextObjectActionHandler() {
 @CommandOrMotion(keys = ["a<", "a>"], modes = [Mode.VISUAL, Mode.OP_PENDING])
 class MotionOuterBlockAngleAction : TextObjectActionHandler() {
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
+  override val preserveSelectionAnchor: Boolean = false
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
@@ -114,7 +111,7 @@ class MotionOuterBlockAngleAction : TextObjectActionHandler() {
 @CommandOrMotion(keys = ["aB", "a{", "a}"], modes = [Mode.VISUAL, Mode.OP_PENDING])
 class MotionOuterBlockBraceAction : TextObjectActionHandler() {
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
+  override val preserveSelectionAnchor: Boolean = false
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
@@ -132,7 +129,7 @@ class MotionOuterBlockBraceAction : TextObjectActionHandler() {
 @CommandOrMotion(keys = ["a[", "a]"], modes = [Mode.VISUAL, Mode.OP_PENDING])
 class MotionOuterBlockBracketAction : TextObjectActionHandler() {
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
+  override val preserveSelectionAnchor: Boolean = false
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
@@ -150,7 +147,7 @@ class MotionOuterBlockBracketAction : TextObjectActionHandler() {
 @CommandOrMotion(keys = ["ab", "a(", "a)"], modes = [Mode.VISUAL, Mode.OP_PENDING])
 class MotionOuterBlockParenAction : TextObjectActionHandler() {
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
+  override val preserveSelectionAnchor: Boolean = false
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 

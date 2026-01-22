@@ -266,7 +266,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
       resultOffset = editor.normalizeOffset(resultOffset, false)
     }
 
-    val foldRegion = editor.getFoldRegionAtOffset(resultOffset)
+    val foldRegion = editor.getCollapsedFoldRegionAtOffset(resultOffset)
     if (foldRegion != null && !foldRegion.isExpanded) {
       if (keepFold) {
         resultOffset = foldRegion.startOffset

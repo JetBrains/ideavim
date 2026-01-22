@@ -8,9 +8,11 @@
 
 package com.maddyhome.idea.vim.newapi
 
+import com.intellij.codeInsight.folding.impl.FoldingUtil
 import com.intellij.execution.impl.ConsoleViewImpl
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorModificationUtil
+import com.intellij.openapi.editor.FoldRegion
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.event.CaretEvent
@@ -471,8 +473,22 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase(
     return IndentConfig.create(editor).createIndentBySize(size)
   }
 
-  override fun getFoldRegionAtOffset(offset: Int): VimFoldRegion? {
+  override fun getCollapsedFoldRegionAtOffset(offset: Int): VimFoldRegion? {
     val ijFoldRegion = editor.foldingModel.getCollapsedRegionAtOffset(offset) ?: return null
+    return toVimFoldRegion(ijFoldRegion)
+  }
+
+  override fun getFoldRegionsAtOffset(offset: Int): List<VimFoldRegion> {
+    val ijFoldRegions = FoldingUtil.getFoldRegionsAtOffset(editor, offset)
+    return ijFoldRegions.map { toVimFoldRegion(it) }
+  }
+
+  override fun getFoldRegionAtLine(line: Int): VimFoldRegion? {
+    val ijFoldRegion = FoldingUtil.findFoldRegionStartingAtLine(editor, line) ?: return null
+    return toVimFoldRegion(ijFoldRegion)
+  }
+
+  private fun toVimFoldRegion(ijFoldRegion: FoldRegion): VimFoldRegion {
     return object : VimFoldRegion {
       override var isExpanded: Boolean
         get() = ijFoldRegion.isExpanded
@@ -485,7 +501,6 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase(
         get() = ijFoldRegion.startOffset
       override val endOffset: Int
         get() = ijFoldRegion.endOffset
-
     }
   }
 

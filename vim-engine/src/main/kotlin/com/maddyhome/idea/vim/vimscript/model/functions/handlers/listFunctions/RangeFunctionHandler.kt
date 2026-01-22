@@ -16,23 +16,19 @@ import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.BuiltinFunctionHandler
 
 @VimscriptFunction(name = "range")
-internal class RangeFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments = 1
-  override val maximumNumberOfArguments = 3
-
+internal class RangeFunctionHandler : BuiltinFunctionHandler<VimList>(minArity = 1, maxArity = 3) {
   override fun doFunction(
-    argumentValues: List<Expression>,
+    arguments: Arguments,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
-  ): VimDataType {
-    val expr = argumentValues[0].evaluate(editor, context, vimContext).toVimNumber().value
+  ): VimList {
+    val expr = arguments.getNumber(0).value
 
-    if (argumentValues.size == 1) {
+    if (arguments.size == 1) {
       // range(n) produces [0, 1, ..., n-1]
       if (expr <= 0) {
         return VimList(mutableListOf())
@@ -41,12 +37,12 @@ internal class RangeFunctionHandler : FunctionHandler() {
       return VimList(result)
     }
 
-    val max = argumentValues[1].evaluate(editor, context, vimContext).toVimNumber().value
-    val stride = if (argumentValues.size > 2) {
-      val s = argumentValues[2].evaluate(editor, context, vimContext).toVimNumber().value
+    val max = arguments.getNumber(1).value
+    val stride = if (arguments.size > 2) {
+      val s = arguments.getNumber(2).value
       // Check for invalid stride
       if (s == 0) {
-        throw exExceptionMessage("E726") // E726: Stride is zero
+        throw exExceptionMessage("E726")
       }
       s
     } else {
@@ -55,7 +51,7 @@ internal class RangeFunctionHandler : FunctionHandler() {
 
     // Check for invalid range (max more than one before start)
     if ((stride > 0 && max < expr - 1) || (stride < 0 && max > expr + 1)) {
-      throw exExceptionMessage("E727") // E727: Start past end
+      throw exExceptionMessage("E727")
     }
 
     // When maximum is one before start, return empty list

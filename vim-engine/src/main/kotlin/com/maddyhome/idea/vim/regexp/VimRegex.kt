@@ -775,7 +775,15 @@ class VimRegex(pattern: String) {
       TODO("Not yet implemented")
     }
 
-    override fun getFoldRegionAtOffset(offset: Int): VimFoldRegion? {
+    override fun getCollapsedFoldRegionAtOffset(offset: Int): VimFoldRegion? {
+      return null
+    }
+
+    override fun getFoldRegionsAtOffset(offset: Int): List<VimFoldRegion> {
+      return listOf()
+    }
+
+    override fun getFoldRegionAtLine(line: Int): VimFoldRegion? {
       return null
     }
 

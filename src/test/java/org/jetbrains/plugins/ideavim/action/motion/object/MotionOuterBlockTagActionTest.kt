@@ -9,6 +9,9 @@
 package org.jetbrains.plugins.ideavim.action.motion.`object`
 
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -156,9 +159,13 @@ class MotionOuterBlockTagActionTest : VimTestCase() {
 
   // |d| |v_it|
   @Test
+  @VimBehaviorDiffers(shouldBeFixed = true)
   fun testDeleteInnerTagAngleBrackets() {
-    typeTextInFile(injector.parser.parseKeys("dit"), "<div ${c}hello=\"d > hsj < akl\"></div>")
-    assertState("<div hello=\"d ></div>")
+    doTest(
+      "dit",
+      "<div ${c}hello=\"d > hsj < akl\"></div>",
+      "<div hello=\"d ></div>",
+    )
   }
 
   // VIM-1090 |d| |v_at|
@@ -304,6 +311,36 @@ class MotionOuterBlockTagActionTest : VimTestCase() {
       "<t>Outer\n" +
         "   <t>Inner</t>\n" +
         "</t>",
+    )
+  }
+
+  // ============== preserveSelectionAnchor behavior tests ==============
+
+  @Test
+  fun `test outer tag from middle of content`() {
+    doTest(
+      "vat",
+      "<div>foo b${c}ar baz</div>",
+      "${s}<div>foo bar baz</div${c}>${se}",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  @VimBehaviorDiffers(
+    shouldBeFixed = false,
+    description = """
+      Vim for some operations keeps the direction and for some it doesn't.
+      However, this looks like a bug in Vim.
+      So, in IdeaVim we always keep the direction.
+    """
+  )
+  fun `test outer tag with backwards selection`() {
+    doTest(
+      listOf("v", "h", "at"),
+      "<div>foo b${c}ar baz</div>",
+      "${s}${c}<div>foo bar baz</div>${se}",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 }

@@ -13,22 +13,15 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
-import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 
 data class DictionaryExpression(val dictionary: LinkedHashMap<Expression, Expression>) : Expression() {
 
   override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimDataType {
     val dict = VimDictionary(linkedMapOf())
-    for ((key, value) in dictionary) {
-      val evaluatedVal = value.evaluate(editor, context, vimContext)
-      var newFuncref = evaluatedVal
-      if (evaluatedVal is VimFuncref && evaluatedVal.handler is DefinedFunctionHandler && !evaluatedVal.isSelfFixed) {
-        // TODO: Not sure I like this...
-        newFuncref = evaluatedVal.deepCopy(useReferences = true) as VimFuncref
-        newFuncref.dictionary = dict
-      }
-      dict.dictionary[key.evaluate(editor, context, vimContext).toVimString()] = newFuncref
+    for ((k, v) in dictionary) {
+      val key = k.evaluate(editor, context, vimContext).toVimString()
+      val value = v.evaluate(editor, context, vimContext)
+      dict.dictionary[key] = value
     }
     return dict
   }

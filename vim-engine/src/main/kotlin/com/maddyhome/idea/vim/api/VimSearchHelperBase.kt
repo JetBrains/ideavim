@@ -751,6 +751,30 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     if (!isOuter) {
       leftQuote++
       rightQuote--
+    } else {
+      // For outer quotes: include trailing whitespace, or leading whitespace if no trailing
+      // See :help a" - "Any trailing white space is included, unless there is none, then leading white space is included"
+      val text = editor.text()
+      var trailingEnd = rightQuote + 1
+
+      // Check for trailing whitespace (on same line)
+      while (trailingEnd < text.length && text[trailingEnd] == ' ') {
+        trailingEnd++
+      }
+
+      if (trailingEnd > rightQuote + 1) {
+        // Found trailing whitespace, include it
+        rightQuote = trailingEnd - 1
+      } else {
+        // No trailing whitespace, check for leading whitespace
+        var leadingStart = leftQuote
+        while (leadingStart > 0 && text[leadingStart - 1] == ' ') {
+          leadingStart--
+        }
+        if (leadingStart < leftQuote) {
+          leftQuote = leadingStart
+        }
+      }
     }
     return TextRange(leftQuote, rightQuote + 1)
   }

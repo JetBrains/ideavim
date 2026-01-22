@@ -12,27 +12,22 @@ import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.BuiltinFunctionHandler
 
 @VimscriptFunction(name = "index")
-internal class IndexFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments = 2
-  override val maximumNumberOfArguments = 4
-
+internal class IndexFunctionHandler : BuiltinFunctionHandler<VimInt>(minArity = 2, maxArity = 4) {
   override fun doFunction(
-    argumentValues: List<Expression>,
+    arguments: Arguments,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
-  ): VimDataType {
-    val obj = argumentValues[0].evaluate(editor, context, vimContext)
-    val expr = argumentValues[1].evaluate(editor, context, vimContext)
-    val start = argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext)?.toVimNumber()?.value ?: 0
-    val ic = argumentValues.getOrNull(3)?.evaluate(editor, context, vimContext)?.toVimNumber()?.value != 0
+  ): VimInt {
+    val obj = arguments[0]
+    val expr = arguments[1]
+    val start = arguments.getNumberOrNull(2)?.value ?: 0
+    val ic = arguments.getNumberOrNull(3)?.booleanValue ?: false
 
     if (obj !is VimList) {
       return VimInt.MINUS_ONE

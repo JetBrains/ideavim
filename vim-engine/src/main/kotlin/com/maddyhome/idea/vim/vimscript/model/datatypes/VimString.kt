@@ -26,6 +26,23 @@ import com.maddyhome.idea.vim.ex.exExceptionMessage
  * octal, or binary integer, and trailing characters are ignored. If the value can't be parsed, it is treated as zero.
  */
 data class VimString(val value: String) : VimDataType("string") {
+  /**
+   * Returns a substring of the current string based on the specified range.
+   *
+   * The [start] and [endExclusive] indices are zero-based, and can be negative to count from the end of the string.
+   * Note that since the end index is exclusive, a value of zero represents the last character in the string.
+   */
+  fun substring(start: Int, endExclusive: Int): VimString {
+    val s = if (start < 0) start + value.length else start
+    val e = (if (endExclusive <= 0) endExclusive + value.length else endExclusive).coerceAtMost(value.length)
+    return if (s < 0 || e < 0 || e < s) {
+      EMPTY
+    }
+    else {
+      VimString(value.substring(s, e))
+    }
+  }
+
   override fun toVimFloat(): VimFloat {
     throw exExceptionMessage("E892")
   }
