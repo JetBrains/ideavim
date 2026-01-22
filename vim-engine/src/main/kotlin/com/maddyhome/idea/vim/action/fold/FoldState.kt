@@ -8,10 +8,11 @@
 
 package com.maddyhome.idea.vim.action.fold
 
-import com.maddyhome.idea.vim.api.Key
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.getOrPutWindowData
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.options.OptionAccessScope
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 
 /**
  * Manages fold state and fold level for editors.
@@ -22,8 +23,6 @@ import com.maddyhome.idea.vim.api.injector
  * are collapsed.
  */
 object FoldState {
-
-  private val foldLevelKey = Key<Int>("foldlevel")
 
   /**
    * Gets the current fold level for the editor window.
@@ -36,9 +35,7 @@ object FoldState {
    * @return the current fold level
    */
   fun getFoldLevel(editor: VimEditor): Int {
-    return injector.vimStorageService.getOrPutWindowData(editor, foldLevelKey) {
-      editor.getMaxFoldDepth()
-    }
+    return injector.optionGroup.getOptionValue(Options.foldlevel, OptionAccessScope.EFFECTIVE(editor)).value
   }
 
   /**
@@ -52,11 +49,7 @@ object FoldState {
    * @param level the fold level to set (0 = all folds closed, maxDepth + 1 = all folds open)
    */
   fun setFoldLevel(editor: VimEditor, level: Int) {
-    val maxDepth = editor.getMaxFoldDepth()
-    val coercedLevel = level.coerceIn(0, maxDepth + 1)
-
-    injector.vimStorageService.putDataToWindow(editor, foldLevelKey, coercedLevel)
-    editor.applyFoldLevel(coercedLevel)
+    injector.optionGroup.setOptionValue(Options.foldlevel, OptionAccessScope.EFFECTIVE(editor), VimInt(level))
   }
 
   /**

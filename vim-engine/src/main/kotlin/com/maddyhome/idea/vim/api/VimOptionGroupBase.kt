@@ -866,12 +866,19 @@ abstract class GlobalLocalOptionToGlobalLocalExternalSettingMapper<T : VimDataTy
  */
 sealed class OptionValue<T : VimDataType>(open val value: T) {
   /**
+   * Creates a new [OptionValue] of the same type but with a different value.
+   */
+  abstract fun <R : VimDataType> withValue(newValue: R): OptionValue<R>
+
+  /**
    * The option value has been set as a default value by IdeaVim
    *
    * When setting an option, the value is a Vim default value. When getting a default option, the value might come from
    * an IDE setting, but still uses the [Default] wrapper type.
    */
-  class Default<T : VimDataType>(override val value: T) : OptionValue<T>(value)
+  class Default<T : VimDataType>(override val value: T) : OptionValue<T>(value) {
+    override fun <R : VimDataType> withValue(newValue: R) = Default(newValue)
+  }
 
   /**
    * The option has been set explicitly, by the user as part of the initial evaluation of `~/.ideavimrc`.
@@ -890,7 +897,9 @@ sealed class OptionValue<T : VimDataType>(open val value: T) {
    * evaluated in the context of the current window, and existing window/buffer options are not updated (as per Vim).
    * Therefore, any options set during this subsequent evaluation are considered to be [User].
    */
-  class InitVimRc<T : VimDataType>(override val value: T) : OptionValue<T>(value)
+  class InitVimRc<T : VimDataType>(override val value: T) : OptionValue<T>(value) {
+    override fun <R : VimDataType> withValue(newValue: R) = InitVimRc(newValue)
+  }
 
   /**
    * The option value has been explicitly set by the user, by Vim commands
@@ -898,7 +907,9 @@ sealed class OptionValue<T : VimDataType>(open val value: T) {
    * The value has been set using the `:set` commands. When getting a value, this type is used if the value has been
    * explicitly set by the user and the corresponding IDE setting (if any) still has the same value.
    */
-  class User<T : VimDataType>(override val value: T) : OptionValue<T>(value)
+  class User<T : VimDataType>(override val value: T) : OptionValue<T>(value) {
+    override fun <R : VimDataType> withValue(newValue: R) = User(newValue)
+  }
 
   /**
    * The option value has been explicitly set by the user, but changed through the IDE
@@ -912,7 +923,9 @@ sealed class OptionValue<T : VimDataType>(open val value: T) {
    * case, only the local value of the IDE setting is considered. Changes to the IDE setting's global value do not
    * override the local value unless some other mechanism resets the IDE setting's local value.
    */
-  class External<T : VimDataType>(override val value: T) : OptionValue<T>(value)
+  class External<T : VimDataType>(override val value: T) : OptionValue<T>(value) {
+    override fun <R : VimDataType> withValue(newValue: R) = External(newValue)
+  }
 
   override fun equals(other: Any?): Boolean {
     // For equality, we don't care about how the value is set. We're only interested in the wrapped value.

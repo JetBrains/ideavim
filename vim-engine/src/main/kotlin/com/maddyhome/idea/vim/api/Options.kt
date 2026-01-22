@@ -103,6 +103,7 @@ object Options {
 
   // Simple options, sorted by name
   val digraph: ToggleOption = addOption(ToggleOption("digraph", GLOBAL, "dg", false))
+  val foldlevel: NumberOption = addOption(NumberOption("foldlevel", LOCAL_TO_WINDOW, "fdl", 999))
   val gdefault: ToggleOption = addOption(ToggleOption("gdefault", GLOBAL, "gd", false))
   val history: UnsignedNumberOption = addOption(UnsignedNumberOption("history", GLOBAL, "hi", 50))
   val hlsearch: ToggleOption = addOption(ToggleOption("hlsearch", GLOBAL, "hls", false))

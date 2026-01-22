@@ -108,6 +108,9 @@ internal class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup, InternalOpt
     addOptionValueOverride(Options.scrolloff, ScrollOffOptionMapper(Options.scrolloff, this))
     addOptionValueOverride(Options.sidescrolloff, SideScrollOffOptionMapper(Options.sidescrolloff, this))
 
+    // Apply fold level when foldlevel option changes
+    addOptionValueOverride(Options.foldlevel, FoldLevelOptionMapper())
+
     // When a global editor setting changes, try to update the equivalent Vim option. We don't always update the Vim
     // option when the IDE setting changes. Typically, if the user has explicitly set the Vim option, we don't reset it.
     // The exception is if the option was set in ~/.ideavimrc. This is kind of like setting a global value, so it's
@@ -1322,6 +1325,41 @@ private class WrapOptionMapper(wrapOption: ToggleOption, internalOptionValueAcce
     ) {
       doOnGlobalIdeaValueChanged()
     }
+  }
+}
+
+
+/**
+ * Maps the `'foldlevel'` local-to-window Vim option to apply fold levels
+ *
+ * This mapper ensures that whenever the foldlevel option is changed, the fold state is immediately
+ * applied to the editor. It coerces the value to valid bounds and handles the case where the value
+ * is set to the same level (e.g., zM when foldlevel is already 0).
+ */
+private class FoldLevelOptionMapper : LocalOptionValueOverride<VimInt> {
+  override fun getLocalValue(storedValue: OptionValue<VimInt>?, editor: VimEditor): OptionValue<VimInt> {
+    val maxDepth = editor.getMaxFoldDepth()
+
+    if (storedValue == null) {
+      return OptionValue.Default(VimInt(maxDepth + 1))
+    }
+
+    val coercedLevel = storedValue.value.value.coerceIn(0, maxDepth + 1)
+
+    return storedValue.withValue(VimInt(coercedLevel))
+  }
+
+  override fun setLocalValue(
+    storedValue: OptionValue<VimInt>?,
+    newValue: OptionValue<VimInt>,
+    editor: VimEditor,
+  ): Boolean {
+    val maxDepth = editor.getMaxFoldDepth()
+    val coercedLevel = newValue.value.value.coerceIn(0, maxDepth + 1)
+
+    editor.applyFoldLevel(coercedLevel)
+
+    return storedValue?.value?.value != coercedLevel
   }
 }
 
