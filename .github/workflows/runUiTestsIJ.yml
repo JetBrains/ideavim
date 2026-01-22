@@ -254,6 +254,28 @@ jobs:
             Only use timeouts as a maximum wait duration with explicit condition checks (e.g., "wait up to 30 seconds for dialog to appear").
             Tests should be deterministic and based on observable state changes in the UI, not time-based assumptions.
 
+            **Flaky Test = Race Condition**: A test that sometimes passes and sometimes fails has a race condition.
+            The fix must ELIMINATE the race, not make it less likely. Increasing timeouts is almost never the correct fix.
+
+            **Wait for UNIQUE State Identifiers**: When waiting for a state transition, find something that:
+            - Only exists in the TARGET state (not in previous or intermediate states)
+            - Proves the operation COMPLETED (not just started)
+            Example: After clicking a button that triggers a notification change, don't wait for an element that exists
+            in BOTH the old and new notification. Wait for text/element unique to the NEW state.
+
+            **Understand Framework Built-in Waits**: Before adding explicit waits, check what the framework already does.
+            `findText()` already waits up to 5 seconds for elements. Adding `waitFor { hasText(...) }` before `findText()`
+            is redundant and indicates misunderstanding of the actual problem.
+
+            **Trace Causality Backwards**: If the failure shows wrong data (e.g., wrong text pasted), trace backwards:
+            - Where did the data come from? (e.g., clipboard)
+            - When was that data set? (e.g., during a prior click operation)
+            - What proves that operation completed? → THIS is your wait condition
+
+            **State Transitions Have Intermediate States**: UI operations often involve: Old State → Transition → New State.
+            Elements may briefly exist in both old and new states during transition. Wait for something that proves
+            you're in the NEW state, not just that a transition started.
+
             IMPORTANT: If you have a concrete suggestion for fixing the test, ALWAYS proceed with creating a branch and PR. Never ask for permission - just do it.
 
             If you have a concrete suggestion for fixing the test:
