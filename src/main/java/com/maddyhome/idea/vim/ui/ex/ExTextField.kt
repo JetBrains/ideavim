@@ -40,6 +40,7 @@ import java.awt.geom.Rectangle2D
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
+import java.util.stream.Stream
 import javax.swing.JTextField
 import javax.swing.KeyStroke
 import javax.swing.event.CaretEvent
@@ -50,8 +51,8 @@ import javax.swing.text.JTextComponent
 import javax.swing.text.StyleConstants
 import javax.swing.text.StyleContext
 import javax.swing.text.StyledDocument
-import kotlin.io.path.exists
 import kotlin.io.path.isDirectory
+import kotlin.io.path.pathString
 import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
@@ -180,8 +181,8 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
   fun setSpecialKeyForeground(fg: Color) {
     (document as? ExDocument)?.setSpecialKeyForeground(fg)
   }
-  private var completionModePrefix: String = ""
-  private var completionModeEnabled: Boolean = false
+
+  private var commandLoopIterator: LoopIterator? = null
 
   /**
    * Finish handling the keystroke
@@ -204,11 +205,11 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
     // what it will do with the keystroke)
     if (stroke.keyChar != KeyEvent.CHAR_UNDEFINED) {
       replaceSelection(stroke.keyChar.toString())
-      completionModeEnabled = false
+      commandLoopIterator = null
     }
     else {
       if (stroke.keyCode != KeyEvent.VK_TAB || !executeTabCompletionIfPossible()) {
-        completionModeEnabled = false
+        commandLoopIterator = null
         val event = KeyEvent(
           this, stroke.keyEventType, (Date()).time, stroke.modifiers,
           stroke.keyCode, stroke.keyChar
@@ -249,60 +250,64 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
       )
       e.consume()
     } else {
-      completionModeEnabled = false
+      commandLoopIterator = null
       super.processKeyEvent(e)
     }
   }
 
   private fun executeTabCompletionIfPossible(): Boolean {
-    val parts = getText().split(" ", limit = 2)
-    if (parts.size < 2) return false
-    val command = parts[0]
-    // If more commands require TAB action handling, a more sophisticated check and delegation is needed
-    if (!supportedTabCompletionCommands.contains(command)) return false
+    if (null == commandLoopIterator || commandLoopIterator!!.size() == 1) {
+      val parts = getText().split(" ", limit = 2).takeIf { it.size > 1 } ?: return false
+      // If more commands require TAB action handling, a more sophisticated check and delegation is needed
+      val command = parts[0].takeIf { supportedTabCompletionCommands.contains(it) } ?: return false
+      val input = parts[1]
 
-    val input = parts[1]
-    val project = (parent as ExEntryPanel).context?.getData<Project>(DataKey.create("project"))
-    val projectBasePath = project?.basePath?.let { Path.of(it) } ?: return false
-    val inputPath = projectBasePath.resolve(input)
-    val inputPathString = inputPath.toString()
-    val searchPrefix = if (completionModeEnabled) completionModePrefix else inputPathString
+      val project = (parent as ExEntryPanel).context?.getData<Project>(DataKey.create("project"))
+      val projectBasePath = project?.basePath?.let { Path.of(it) } ?: return false
+      val inputPath = projectBasePath.resolve(input)
+      val searchPrefix = inputPath.pathString
+      val basePrefix = searchPrefix + if((input.isBlank() || input.endsWith("/")) && !searchPrefix.endsWith("/")) "/" else ""
 
-    // Would it be useful to ignore file path case?
-    try {
-      val filePaths = (
-        if (inputPath.exists()) {
-          if (inputPath.isDirectory() && !completionModeEnabled)
-            Files.list(inputPath)
-          else
-            Files.list(inputPath.parent)
-        } else if (inputPath.isAbsolute || inputPath.exists()) Files.list(inputPath.parent)
-        else Files.list(projectBasePath)
-        ).filter { it.toString().startsWith(searchPrefix) }.sorted().toList()
+      // Would it be useful to ignore file path case?
+      try {
+        val root =
+          (if (input.endsWith("/")) inputPath
+          else if (inputPath == projectBasePath) projectBasePath
+          else inputPath.parent) ?: return false
 
-      if (filePaths.isEmpty()) return false
+        val specialPaths =
+          if(input.endsWith(".."))
+            Stream.of("/")
+          else if(input.endsWith("."))
+            Stream.of("./","/")
+          else Stream.empty()
 
-      val suggestion =
-        if (filePaths.contains(inputPath))
-          filePaths[(filePaths.indexOf(inputPath) + 1) % filePaths.size]
-        else
-          filePaths.first()
+        val commands = Stream.concat(specialPaths, (root.let { Files.list(it) }
+          .filter { it.pathString.startsWith(searchPrefix) }
+          .sorted()
+          .map { if (it.isDirectory()) "$it/" else it.pathString }))
+          .map { input + it.removePrefix(basePrefix) }
+          .map { String.format("%s %s", command, it) }
+          .toList().takeIf { it.isNotEmpty() } ?: return false
 
-      // If a suggested file is descendant of project base path, use relative path. Else, use absolute path.
-      val isDir = suggestion.isDirectory()
-      val effectivePath = if (projectBasePath > suggestion) suggestion else projectBasePath.relativize(suggestion)
-      updateText(String.format("%s %s%s", command, effectivePath, if (isDir) "/" else ""))
-      if(!completionModeEnabled) {
-        completionModeEnabled = true
-        completionModePrefix = inputPathString
+        commandLoopIterator = LoopIterator(commands)
+      } catch (e: IOException) {
+        logger.error(e)
+        commandLoopIterator = null
       }
-      return true
-    } catch (e: IOException) {
-      logger.error(e)
-      return false
     }
+    return commandLoopIterator?.let { updateText(it.next()); true } ?: false
   }
 
+  private class LoopIterator(val commands: List<String>) : Iterator<String> {
+    private var currentIdx = 0
+    override fun next(): String {
+      currentIdx = if (currentIdx >= commands.size - 1) 0 else currentIdx + 1
+      return commands[currentIdx]
+    }
+    fun size(): Int = commands.size
+    override fun hasNext(): Boolean = true
+  }
 
   private fun isAllowedTypedEvent(event: KeyEvent): Boolean {
     return event.id == KeyEvent.KEY_TYPED && !isKeyCharEnterOrEscape(event.keyChar)
