@@ -2190,6 +2190,11 @@
         "modes": "NXO"
     },
     {
+      "keys": "zm",
+      "class": "com.maddyhome.idea.vim.action.fold.VimDecrementFoldLevel",
+      "modes": "NX"
+    },
+  {
         "keys": "zo",
         "class": "com.maddyhome.idea.vim.action.fold.VimExpandRegion",
         "modes": "NX"

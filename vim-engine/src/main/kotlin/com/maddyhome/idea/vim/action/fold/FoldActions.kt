@@ -191,6 +191,25 @@ class VimIncrementFoldLevel : VimActionHandler.SingleExecution() {
   }
 }
 
+@CommandOrMotion(keys = ["zm"], modes = [Mode.NORMAL, Mode.VISUAL])
+class VimDecrementFoldLevel : VimActionHandler.SingleExecution() {
+
+  override val type: Command.Type = Command.Type.OTHER_READONLY
+
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    val count = cmd.count.coerceAtLeast(1)
+    val currentLevel = FoldState.getFoldLevel(editor)
+    val newLevel = (currentLevel - count).coerceAtLeast(0)
+    FoldState.setFoldLevel(editor, newLevel)
+    return true
+  }
+}
+
 private fun findFoldRegionAtLine(editor: VimEditor, caretOffset: Int): VimFoldRegion? {
   val line = editor.offsetToBufferPosition(caretOffset).line
   val lineRegion = editor.getFoldRegionAtLine(line)
