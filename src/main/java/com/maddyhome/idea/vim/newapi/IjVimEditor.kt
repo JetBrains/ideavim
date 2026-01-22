@@ -517,26 +517,20 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase(
 
   private fun calculateFoldDepth(fold: FoldRegion, allFolds: Array<FoldRegion>): Int {
     return allFolds.count { otherFold ->
-      isStrictlyInsideFold(fold, otherFold)
+      isWrappedBy(fold, otherFold)
     }
   }
 
-  private fun isStrictlyInsideFold(fold: FoldRegion, otherFold: FoldRegion): Boolean {
-    if (isInnerFold(otherFold, fold)) {
-      return false
-    }
-    return areDifferentFolds(otherFold, fold)
+  private fun isWrappedBy(inner: FoldRegion, outer: FoldRegion): Boolean {
+    return outer.startOffset <= inner.startOffset &&
+      outer.endOffset >= inner.endOffset &&
+      areDifferentFolds(inner, outer)
   }
 
   private fun areDifferentFolds(
-    otherFold: FoldRegion,
-    fold: FoldRegion,
-  ): Boolean = otherFold.startOffset != fold.startOffset || otherFold.endOffset != fold.endOffset
-
-  private fun isInnerFold(
-    otherFold: FoldRegion,
-    fold: FoldRegion,
-  ): Boolean = otherFold.startOffset > fold.startOffset || otherFold.endOffset < fold.endOffset
+    first: FoldRegion,
+    second: FoldRegion,
+  ): Boolean = first.startOffset != second.startOffset || first.endOffset != second.endOffset
 
   private fun toVimFoldRegion(ijFoldRegion: FoldRegion): VimFoldRegion {
     return IjVimFoldRegion(ijFoldRegion, editor)
