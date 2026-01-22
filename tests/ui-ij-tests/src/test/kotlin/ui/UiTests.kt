@@ -216,7 +216,8 @@ class UiTests {
 
     // Wait for confirmation notification - proves the clipboard was updated
     // and the new notification is visible (old notification has expired)
-    waitFor { hasText("Action id copied") }
+    // The notification shows the specific action ID that was copied
+    waitFor { hasText("Action id copied: EditorEscape") }
 
     findText("Stop Tracking").click()
 
