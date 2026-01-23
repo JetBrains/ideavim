@@ -242,6 +242,15 @@ interface VimEditor {
    * @return the fold region starting at the line, or null if no fold starts on that line
    */
   fun getFoldRegionAtLine(line: Int): VimFoldRegion?
+
+  /**
+   * Returns all fold regions in the editor.
+   *
+   * This method returns every fold region in the editor, regardless of their expanded/collapsed
+   * state or nesting level. The list includes both top-level folds and nested folds.
+   *
+   * @return a list of all fold regions in the editor, may be empty if no folds exist
+   */
   fun getAllFoldRegions(): List<VimFoldRegion>
 
   /**

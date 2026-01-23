@@ -202,9 +202,8 @@ class VimDecrementFoldLevel : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    val count = cmd.count.coerceAtLeast(1)
     val currentLevel = FoldState.getFoldLevel(editor)
-    val newLevel = (currentLevel - count).coerceAtLeast(0)
+    val newLevel = (currentLevel - cmd.count).coerceAtLeast(0)
     FoldState.setFoldLevel(editor, newLevel)
     return true
   }

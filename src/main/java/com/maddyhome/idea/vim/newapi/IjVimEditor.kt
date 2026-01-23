@@ -521,6 +521,10 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase(
     }
   }
 
+  /**
+   * Returns true if the inner fold is completely contained by the outer fold (allowing matching boundaries)
+   * but excludes identical folds.
+   */
   private fun isWrappedBy(inner: FoldRegion, outer: FoldRegion): Boolean {
     return outer.startOffset <= inner.startOffset &&
       outer.endOffset >= inner.endOffset &&
