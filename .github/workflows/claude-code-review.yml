@@ -1,23 +1,29 @@
 name: Claude Code Review
 
 on:
-  pull_request:
-    types: [opened, synchronize]
+  issue_comment:
+    types: [ created ]
 
 jobs:
   claude-review:
-    # Run only for PRs originating from the same repository (not from forks)
-    if: ${{ github.event.pull_request.head.repo.full_name == 'JetBrains/ideavim' }}
+    # Run only when:
+    # 1. Comment is on a PR (not an issue)
+    # 2. Comment contains the trigger phrase
+    # Note: Only users with write access can trigger workflows via comments, which prevents fork abuse
+    if: |
+      github.event.issue.pull_request &&
+      contains(github.event.comment.body, '/claude-review')
     runs-on: ubuntu-latest
     permissions:
       contents: read
       pull-requests: write
       id-token: write
-    
+
     steps:
-      - name: Checkout repository
+      - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
+          ref: refs/pull/${{ github.event.issue.number }}/head
           fetch-depth: 1
 
       - name: Run Claude Code Review
@@ -27,8 +33,9 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |
             REPO: ${{ github.repository }}
-            PR NUMBER: ${{ github.event.pull_request.number }}
-            CONTRIBUTOR: ${{ github.event.pull_request.user.login }}
+            PR NUMBER: ${{ github.event.issue.number }}
+            CONTRIBUTOR: ${{ github.event.issue.user.login }}
+            REQUESTED BY: ${{ github.event.comment.user.login }}
 
             Review this PR for:
             - Bugs and issues
@@ -40,6 +47,8 @@ jobs:
             IMPORTANT: Be concise and write to the point. Avoid extra explanations, filler words, or compliments. Focus on actionable feedback only. Every word should add value.
 
             NOTE: Some PRs contain only changelog updates (CHANGES.md and build.gradle.kts changeNotes). These are created automatically by the updateChangelogClaude.yml workflow. The actual implementation exists in previous commits. For such PRs, do NOT search for the implementation or report that it's missing - this is expected and correct.
+
+            IMPORTANT: Before conducting your review, use `gh pr view ${{ github.event.issue.number }} --comments` to read existing PR comments and feedback. Consider this context in your review - avoid repeating points already raised, and address any specific concerns mentioned by reviewers or the contributor.
 
             Use inline comments for specific issues. Use the repository's CLAUDE.md for style guidance.
 
