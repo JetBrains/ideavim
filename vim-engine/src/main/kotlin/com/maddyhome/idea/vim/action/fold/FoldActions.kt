@@ -11,15 +11,19 @@ package com.maddyhome.idea.vim.action.fold
 import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimFoldRegion
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.visual.VimSelection
+import com.maddyhome.idea.vim.handler.Motion
+import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 
@@ -310,89 +314,82 @@ private fun getToggleAction(foldRegion: VimFoldRegion): String = if (foldRegion.
   injector.actionExecutor.ACTION_EXPAND_REGION_RECURSIVELY
 }
 
-@CommandOrMotion(keys = ["zj"], modes = [Mode.NORMAL, Mode.VISUAL])
-class VimNextFold : VimActionHandler.SingleExecution() {
+@CommandOrMotion(keys = ["zj"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+class VimNextFold : MotionActionHandler.ForEachCaret() {
 
-  override val type: Command.Type = Command.Type.OTHER_READONLY
+  override val motionType: MotionType = MotionType.LINE_WISE
 
-  override fun execute(
+  override fun getOffset(
     editor: VimEditor,
+    caret: ImmutableVimCaret,
     context: ExecutionContext,
-    cmd: Command,
+    argument: Argument?,
     operatorArguments: OperatorArguments,
-  ): Boolean {
-    val count = cmd.count.coerceAtLeast(1)
-    val caret = editor.currentCaret()
+  ): Motion {
     val currentLine = editor.offsetToBufferPosition(caret.offset).line
-
     val foldStartLines = findFoldStartLines(editor, currentLine)
+    val count = operatorArguments.count1
 
     if (foldStartLines.size < count) {
-      return true
+      return Motion.NoMotion
     }
 
     val targetLine = foldStartLines[count - 1]
-    caret.moveToLineStart(editor, targetLine)
-    return true
+    return Motion.AbsoluteOffset(editor.getLineStartOffset(targetLine))
   }
+}
 
-  private fun findFoldStartLines(
+@CommandOrMotion(keys = ["zk"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
+class VimPreviousFold : MotionActionHandler.ForEachCaret() {
+
+  override val motionType: MotionType = MotionType.LINE_WISE
+
+  override fun getOffset(
     editor: VimEditor,
-    currentLine: Int,
-  ): List<Int> = editor.getAllFoldRegions()
-    .map { fold -> getFoldLine(fold, editor) }
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
+  ): Motion {
+    val currentLine = editor.offsetToBufferPosition(caret.offset).line
+    val foldEndLines = findFoldEndLines(editor, currentLine)
+    val count = operatorArguments.count1
+
+    if (foldEndLines.size < count) {
+      return Motion.NoMotion
+    }
+
+    val targetLine = foldEndLines[count - 1]
+    return Motion.AbsoluteOffset(editor.getLineStartOffset(targetLine))
+  }
+}
+
+private fun findFoldStartLines(editor: VimEditor, currentLine: Int): List<Int> =
+  editor.getAllFoldRegions()
+    .map { fold -> getFoldStartLine(fold, editor) }
     .filter { it > currentLine }
     .distinct()
     .sorted()
 
-  private fun getFoldLine(
-    fold: VimFoldRegion,
-    editor: VimEditor,
-  ): Int = if (fold.startOffset > 0) {
-    editor.offsetToBufferPosition(fold.startOffset - 1).line
-  } else {
-    editor.offsetToBufferPosition(fold.startOffset).line
-  }
-}
 
-@CommandOrMotion(keys = ["zk"], modes = [Mode.NORMAL, Mode.VISUAL])
-class VimPreviousFold : VimActionHandler.SingleExecution() {
-
-  override val type: Command.Type = Command.Type.OTHER_READONLY
-
-  override fun execute(
-    editor: VimEditor,
-    context: ExecutionContext,
-    cmd: Command,
-    operatorArguments: OperatorArguments,
-  ): Boolean {
-    val count = cmd.count.coerceAtLeast(1)
-    val caret = editor.currentCaret()
-    val currentLine = editor.offsetToBufferPosition(caret.offset).line
-
-    val foldEndLines = getFoldEndLines(editor, currentLine)
-
-    if (foldEndLines.size < count) {
-      return true
-    }
-
-    val targetLine = foldEndLines[count - 1]
-    caret.moveToLineStart(editor, targetLine)
-    return true
-  }
-
-
-  private fun getFoldEndLines(
-    editor: VimEditor,
-    currentLine: Int,
-  ): List<Int> = editor.getAllFoldRegions()
+private fun findFoldEndLines(editor: VimEditor, currentLine: Int): List<Int> =
+  editor.getAllFoldRegions()
     .map { editor.offsetToBufferPosition(it.endOffset).line }
     .filter { it < currentLine }
     .distinct()
     .sortedDescending()
-}
 
-private fun VimCaret.moveToLineStart(editor: VimEditor, line: Int) {
-  val targetOffset = editor.getLineStartOffset(line)
-  moveToOffset(targetOffset)
-}
+/**
+ * Gets the line number where a fold visually starts.
+ *
+ * IDE fold regions typically have their startOffset at the first character of the folded content
+ * (e.g., the newline after `{`), not at the fold marker itself. Subtracting 1 from the offset
+ * ensures we get the line containing the fold marker (e.g., the line with `{`), which matches
+ * Vim's behavior where `zj` navigates to the line where the fold starts visually.
+ */
+private fun getFoldStartLine(fold: VimFoldRegion, editor: VimEditor): Int =
+  if (fold.startOffset > 0) {
+    editor.offsetToBufferPosition(fold.startOffset - 1).line
+  } else {
+    editor.offsetToBufferPosition(fold.startOffset).line
+  }
