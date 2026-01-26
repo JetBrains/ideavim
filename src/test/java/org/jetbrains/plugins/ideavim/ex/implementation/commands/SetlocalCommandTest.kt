@@ -448,7 +448,8 @@ class SetlocalCommandTest : VimTestCase() {
     assertCommandOutput(
       "setlocal", """
       |--- Local option values ---
-      |--ideajoin            idearefactormode=   scrolloff=-1        sidescrolloff=-1
+      |  foldlevel=1         idearefactormode=   sidescrolloff=-1
+      |--ideajoin            scrolloff=-1
       |  fileencoding=utf-8
       |--ideacopypreprocess
       |  undolevels=-123456
@@ -467,8 +468,8 @@ class SetlocalCommandTest : VimTestCase() {
     assertCommandOutput(
       "setlocal", """
       |--- Local option values ---
+      |  foldlevel=1         idearefactormode=   relativenumber      sidescrolloff=10
       |--ideajoin            number              scrolloff=10
-      |  idearefactormode=   relativenumber      sidescrolloff=10
       |  fileencoding=utf-8
       |--ideacopypreprocess
       |  nrformats=alpha,hex,octal
@@ -483,21 +484,21 @@ class SetlocalCommandTest : VimTestCase() {
     setOsSpecificOptionsToSafeValues()
     val expected = """
     |--- Local option values ---
-    |noargtextobj          ideamarks         norelativenumber    nosurround
-    |nobomb                idearefactormode=   scroll=0          notextobj-entire
-    |nobreakindent         ideawrite=all       scrolljump=1      notextobj-indent
-    |  colorcolumn=      noignorecase          scrolloff=-1        textwidth=0
-    |nocommentary        noincsearch           selectmode=         timeout
-    |nocursorline        nolist                shellcmdflag=-x     timeoutlen=1000
-    |nodigraph           nomatchit             shellxescape=@    notrackactionids
-    |noexchange            maxmapdepth=20      shellxquote={       virtualedit=
-    |  fileformat=unix   nomini-ai             showcmd           novisualbell
+    |noargtextobj        --ideajoin            operatorfunc=       startofline
+    |nobomb                ideamarks         norelativenumber    nosurround
+    |nobreakindent         idearefactormode=   scroll=0          notextobj-entire
+    |  colorcolumn=        ideawrite=all       scrolljump=1      notextobj-indent
+    |nocommentary        noignorecase          scrolloff=-1        textwidth=0
+    |nocursorline        noincsearch           selectmode=         timeout
+    |nodigraph           nolist                shellcmdflag=-x     timeoutlen=1000
+    |noexchange          nomatchit             shellxescape=@    notrackactionids
+    |  fileformat=unix     maxmapdepth=20      shellxquote={       virtualedit=
+    |  foldlevel=1       nomini-ai             showcmd           novisualbell
     |nogdefault            more                showmode            visualdelay=100
     |nohighlightedyank   nomultiple-cursors    sidescroll=0        whichwrap=b,s
     |  history=50        noNERDTree            sidescrolloff=-1    wrap
     |nohlsearch            nrformats=hex     nosmartcase           wrapscan
     |  ide=IntelliJ IDEA nonumber            nosneak
-    |--ideajoin            operatorfunc=       startofline
     |  clipboard=ideaput,autoselect
     |  fileencoding=utf-8
     |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
@@ -540,6 +541,7 @@ class SetlocalCommandTest : VimTestCase() {
       "setlocal!", """
       |--- Local option values ---
       |  fileencoding=utf-8
+      |  foldlevel=1
       |--ideacopypreprocess
       |--ideajoin
       |  idearefactormode=
@@ -567,6 +569,7 @@ class SetlocalCommandTest : VimTestCase() {
     |noexchange
     |  fileencoding=utf-8
     |  fileformat=unix
+    |  foldlevel=1
     |nogdefault
     |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
     |nohighlightedyank

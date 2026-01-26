@@ -432,21 +432,21 @@ class SetglobalCommandTest : VimTestCase() {
     setOsSpecificOptionsToSafeValues()
     val expected = """
     |--- Global option values ---
-    |noargtextobj        noideajoin          norelativenumber    nosurround
-    |nobomb                ideamarks           scroll=0          notextobj-entire
-    |nobreakindent         ideawrite=all       scrolljump=1      notextobj-indent
-    |  colorcolumn=      noignorecase          scrolloff=0         textwidth=0
-    |nocommentary        noincsearch           selectmode=         timeout
-    |nocursorline        nolist                shellcmdflag=-x     timeoutlen=1000
-    |nodigraph           nomatchit             shellxescape=@    notrackactionids
-    |noexchange            maxmapdepth=20      shellxquote={       undolevels=1000
-    |  fileencoding=     nomini-ai             showcmd             virtualedit=
-    |  fileformat=unix     more                showmode          novisualbell
+    |noargtextobj          ide=IntelliJ IDEA   operatorfunc=       startofline
+    |nobomb              noideajoin          norelativenumber    nosurround
+    |nobreakindent         ideamarks           scroll=0          notextobj-entire
+    |  colorcolumn=        ideawrite=all       scrolljump=1      notextobj-indent
+    |nocommentary        noignorecase          scrolloff=0         textwidth=0
+    |nocursorline        noincsearch           selectmode=         timeout
+    |nodigraph           nolist                shellcmdflag=-x     timeoutlen=1000
+    |noexchange          nomatchit             shellxescape=@    notrackactionids
+    |  fileencoding=       maxmapdepth=20      shellxquote={       undolevels=1000
+    |  fileformat=unix   nomini-ai             showcmd             virtualedit=
+    |  foldlevel=999       more                showmode          novisualbell
     |nogdefault          nomultiple-cursors    sidescroll=0        visualdelay=100
     |nohighlightedyank   noNERDTree            sidescrolloff=0     whichwrap=b,s
     |  history=50          nrformats=hex     nosmartcase           wrap
     |nohlsearch          nonumber            nosneak               wrapscan
-    |  ide=IntelliJ IDEA   operatorfunc=       startofline
     |  clipboard=ideaput,autoselect
     |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
     |noideacopypreprocess
@@ -517,6 +517,7 @@ class SetglobalCommandTest : VimTestCase() {
     |noexchange
     |  fileencoding=
     |  fileformat=unix
+    |  foldlevel=999
     |nogdefault
     |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
     |nohighlightedyank
