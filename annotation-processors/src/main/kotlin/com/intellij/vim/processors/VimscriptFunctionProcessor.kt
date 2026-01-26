@@ -18,31 +18,19 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.intellij.vim.annotations.VimscriptFunction
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import java.nio.file.Files
-import kotlin.io.path.Path
-import kotlin.io.path.writeText
 
 class VimscriptFunctionProcessor(private val environment: SymbolProcessorEnvironment) : SymbolProcessor {
   private val visitor = VimscriptFunctionVisitor()
   private val nameToClass = mutableMapOf<String, String>()
-
-  private val json = Json { prettyPrint = true }
+  private val fileWriter = JsonFileWriter(environment)
 
   override fun process(resolver: Resolver): List<KSAnnotated> {
-    val vimscriptFunctionsFile = environment.options["vimscript_functions_file"]
-    if (vimscriptFunctionsFile == null) return emptyList()
+    val vimscriptFunctionsFile = environment.options["vimscript_functions_file"] ?: return emptyList()
 
     resolver.getAllFiles().forEach { it.accept(visitor, Unit) }
 
-    val generatedDirPath = Path(environment.options["generated_directory"]!!)
-    Files.createDirectories(generatedDirPath)
-
-    val filePath = generatedDirPath.resolve(vimscriptFunctionsFile)
     val sortedNameToClass = nameToClass.toList().sortedWith(compareBy({ it.first }, { it.second })).toMap()
-    val fileContent = json.encodeToString(sortedNameToClass)
-    filePath.writeText(fileContent)
+    fileWriter.write(vimscriptFunctionsFile, sortedNameToClass)
 
     return emptyList()
   }

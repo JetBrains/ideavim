@@ -18,31 +18,19 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.intellij.vim.annotations.CommandOrMotion
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import java.nio.file.Files
-import kotlin.io.path.Path
-import kotlin.io.path.writeText
 
-class CommandOrMotionProcessor(private val environment: SymbolProcessorEnvironment): SymbolProcessor {
+class CommandOrMotionProcessor(private val environment: SymbolProcessorEnvironment) : SymbolProcessor {
   private val visitor = CommandOrMotionVisitor()
   private val commands = mutableListOf<CommandBean>()
-
-  private val json = Json { prettyPrint = true }
+  private val fileWriter = JsonFileWriter(environment)
 
   override fun process(resolver: Resolver): List<KSAnnotated> {
-    val commandsFile = environment.options["commands_file"]
-    if (commandsFile == null) return emptyList()
+    val commandsFile = environment.options["commands_file"] ?: return emptyList()
 
     resolver.getAllFiles().forEach { it.accept(visitor, Unit) }
 
-    val generatedDirPath = Path(environment.options["generated_directory"]!!)
-    Files.createDirectories(generatedDirPath)
-
-    val filePath = generatedDirPath.resolve(commandsFile)
     val sortedCommands = commands.sortedWith(compareBy({ it.keys }, { it.`class` }))
-    val fileContent = json.encodeToString(sortedCommands)
-    filePath.writeText(fileContent)
+    fileWriter.write(commandsFile, sortedCommands)
 
     return emptyList()
   }
