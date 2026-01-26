@@ -14,38 +14,24 @@ import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSAnnotated
-import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.intellij.vim.api.VimPlugin
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import java.nio.file.Files
-import kotlin.io.path.Path
-import kotlin.io.path.writeText
 
 // Used for processing VimPlugin annotations
 class ExtensionsProcessor(private val environment: SymbolProcessorEnvironment) : SymbolProcessor {
   private val visitor = ExtensionsVisitor()
   private val declaredExtensions = mutableListOf<KspExtensionBean>()
-
-  private val json = Json { prettyPrint = true }
+  private val fileWriter = JsonFileWriter(environment)
 
   override fun process(resolver: Resolver): List<KSAnnotated> {
-    val extensionsFile = environment.options["extensions_file"]
-    if (extensionsFile == null) return emptyList()
+    val extensionsFile = environment.options["extensions_file"] ?: return emptyList()
 
     resolver.getAllFiles().forEach { it.accept(visitor, Unit) }
 
-    val generatedDirPath = Path(environment.options["generated_directory"]!!)
-    Files.createDirectories(generatedDirPath)
-
-    val filePath = generatedDirPath.resolve(environment.options["extensions_file"]!!)
-    val sortedExtensions = declaredExtensions.toList().sortedWith(compareBy { it.extensionName })
-
-    val fileContent = json.encodeToString(sortedExtensions)
-    filePath.writeText(fileContent)
+    val sortedExtensions = declaredExtensions.sortedWith(compareBy { it.extensionName })
+    fileWriter.write(extensionsFile, sortedExtensions)
 
     return emptyList()
   }
