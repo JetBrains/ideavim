@@ -1,2193 +1,2193 @@
 [
-    {
-        "keys": "!",
-        "class": "com.maddyhome.idea.vim.action.change.change.FilterMotionAction",
-        "modes": "N"
-    },
-    {
-        "keys": "!",
-        "class": "com.maddyhome.idea.vim.action.change.change.FilterVisualLinesAction",
-        "modes": "X"
-    },
-    {
-        "keys": "#",
-        "class": "com.maddyhome.idea.vim.action.motion.search.SearchWholeWordBackwardAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "$",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionLastColumnAction",
-        "modes": "NX"
-    },
-    {
-        "keys": "$",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionLastColumnOpPendingAction",
-        "modes": "O"
-    },
-    {
-        "keys": "%",
-        "class": "com.maddyhome.idea.vim.action.motion.updown.MotionPercentOrMatchAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "&",
-        "class": "com.maddyhome.idea.vim.action.change.change.ChangeLastSearchReplaceAction",
-        "modes": "N"
-    },
-    {
-        "keys": "'",
-        "class": "com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkLineAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "'",
-        "class": "com.maddyhome.idea.vim.action.motion.mark.MotionGotoMarkLineAction",
-        "modes": "N"
-    },
-    {
-        "keys": "(",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionSentencePreviousStartAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": ")",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionSentenceNextStartAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "*",
-        "class": "com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "+",
-        "class": "com.maddyhome.idea.vim.action.motion.updown.MotionDownFirstNonSpaceAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": ",",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionLastMatchCharReverseAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "-",
-        "class": "com.maddyhome.idea.vim.action.motion.updown.MotionUpFirstNonSpaceAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "/",
-        "class": "com.maddyhome.idea.vim.action.motion.search.SearchEntryFwdAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "0",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionFirstColumnAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": ":",
-        "class": "com.maddyhome.idea.vim.action.ex.ExEntryAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": ";",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionLastMatchCharAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "<",
-        "class": "com.maddyhome.idea.vim.action.change.shift.ShiftLeftMotionAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<",
-        "class": "com.maddyhome.idea.vim.action.change.shift.ShiftLeftVisualAction",
-        "modes": "X"
-    },
-    {
-        "keys": "<BS>",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertBackspaceAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<BS>",
-        "class": "com.maddyhome.idea.vim.action.ex.DeletePreviousCharAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<BS>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionBackspaceAction",
-        "modes": "NX"
-    },
-    {
-        "keys": "<BS>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionBackspaceOpPendingModeAction",
-        "modes": "O"
-    },
-    {
-        "keys": "<BS>",
-        "class": "com.maddyhome.idea.vim.action.motion.select.SelectBackspaceAction",
-        "modes": "S"
-    },
-    {
-        "keys": "<C-2>",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertPreviousInsertExitAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<C-6>",
-        "class": "com.maddyhome.idea.vim.action.file.FilePreviousAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-@>",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertPreviousInsertExitAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<C-A>",
-        "class": "com.maddyhome.idea.vim.action.change.change.number.ChangeNumberIncAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-A>",
-        "class": "com.maddyhome.idea.vim.action.change.change.number.ChangeVisualNumberIncAction",
-        "modes": "X"
-    },
-    {
-        "keys": "<C-A>",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertPreviousInsertAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<C-B>",
-        "class": "com.maddyhome.idea.vim.action.ex.MoveCaretToLineStart",
-        "modes": "C"
-    },
-    {
-        "keys": "<C-B>",
-        "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageUpAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "<C-C>",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<C-C>",
-        "class": "com.maddyhome.idea.vim.action.ex.LeaveCommandLineAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<C-C>",
-        "class": "com.maddyhome.idea.vim.action.motion.visual.VisualExitModeAction",
-        "modes": "X"
-    },
-    {
-        "keys": "<C-D>",
-        "class": "com.maddyhome.idea.vim.action.change.shift.ShiftLeftLinesAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<C-D>",
-        "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollHalfPageDownAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "<C-Down>",
-        "class": "com.maddyhome.idea.vim.action.motion.scroll.CtrlDownAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-E>",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertCharacterBelowCursorAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<C-E>",
-        "class": "com.maddyhome.idea.vim.action.ex.MoveCaretToLineEnd",
-        "modes": "C"
-    },
-    {
-        "keys": "<C-E>",
-        "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLineDownAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "<C-End>",
-        "class": "com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineLastEndAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "<C-End>",
-        "class": "com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineLastEndInsertAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<C-F>",
-        "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageDownAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "<C-G>",
-        "class": "com.maddyhome.idea.vim.action.file.FileGetFileInfoAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-G>",
-        "class": "com.maddyhome.idea.vim.action.motion.select.SelectToggleVisualMode",
-        "modes": "XS"
-    },
-    {
-        "keys": "<C-G>u",
-        "class": "com.maddyhome.idea.vim.action.change.BreakUndoSequenceAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<C-H>",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertBackspaceAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<C-H>",
-        "class": "com.maddyhome.idea.vim.action.ex.DeletePreviousCharAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<C-H>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionBackspaceAction",
-        "modes": "NX"
-    },
-    {
-        "keys": "<C-H>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionBackspaceOpPendingModeAction",
-        "modes": "O"
-    },
-    {
-        "keys": "<C-Home>",
-        "class": "com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineFirstAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "<C-Home>",
-        "class": "com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineFirstInsertAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<C-I>",
-        "class": "com.maddyhome.idea.vim.action.motion.mark.MotionJumpNextAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-J>",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertEnterAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<C-J>",
-        "class": "com.maddyhome.idea.vim.action.ex.ProcessExEntryAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<C-J>",
-        "class": "com.maddyhome.idea.vim.action.motion.select.SelectEnterAction",
-        "modes": "S"
-    },
-    {
-        "keys": "<C-J>",
-        "class": "com.maddyhome.idea.vim.action.motion.updown.MotionDownAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "<C-K>",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertCompletedDigraphAction",
-        "modes": "IC"
-    },
-    {
-        "keys": "<C-Left>",
-        "class": "com.maddyhome.idea.vim.action.ex.MoveCaretToPreviousBigWordAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<C-Left>",
-        "class": "com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionBigWordLeftAction",
-        "modes": "S"
-    },
-    {
-        "keys": "<C-Left>",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionBigWordLeftAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "<C-Left>",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionWordLeftInsertAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<C-M>",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertEnterAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<C-M>",
-        "class": "com.maddyhome.idea.vim.action.ex.ProcessExEntryAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<C-M>",
-        "class": "com.maddyhome.idea.vim.action.motion.select.SelectEnterAction",
-        "modes": "S"
-    },
-    {
-        "keys": "<C-M>",
-        "class": "com.maddyhome.idea.vim.action.motion.updown.MotionDownFirstNonSpaceAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "<C-N>",
-        "class": "com.maddyhome.idea.vim.action.ex.SelectNewerHistoryAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<C-N>",
-        "class": "com.maddyhome.idea.vim.action.motion.updown.MotionDownCtrlNAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "<C-N>",
-        "class": "com.maddyhome.idea.vim.action.window.LookupDownAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<C-O>",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertSingleCommandAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<C-O>",
-        "class": "com.maddyhome.idea.vim.action.motion.mark.MotionJumpPreviousAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-O>",
-        "class": "com.maddyhome.idea.vim.action.motion.select.SelectToggleSingleVisualCommandAction",
-        "modes": "SX"
-    },
-    {
-        "keys": "<C-P>",
-        "class": "com.maddyhome.idea.vim.action.ex.SelectOlderHistoryAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<C-P>",
-        "class": "com.maddyhome.idea.vim.action.motion.updown.MotionUpCtrlPAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "<C-P>",
-        "class": "com.maddyhome.idea.vim.action.window.LookupUpAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<C-PageDown>",
-        "class": "com.maddyhome.idea.vim.action.window.tabs.InsertNextTabAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<C-PageDown>",
-        "class": "com.maddyhome.idea.vim.action.window.tabs.NextTabAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "<C-PageUp>",
-        "class": "com.maddyhome.idea.vim.action.window.tabs.InsertPreviousTabAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<C-PageUp>",
-        "class": "com.maddyhome.idea.vim.action.window.tabs.PreviousTabAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "<C-Q>",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertCompletedLiteralAction",
-        "modes": "IC"
-    },
-    {
-        "keys": "<C-R>",
-        "class": "com.maddyhome.idea.vim.action.change.RedoAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-R>",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertRegisterAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<C-R>",
-        "class": "com.maddyhome.idea.vim.action.ex.InsertRegisterAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<C-R><C-A>",
-        "class": "com.maddyhome.idea.vim.action.ex.InsertBigWordUnderCaretAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<C-R><C-F>",
-        "class": "com.maddyhome.idea.vim.action.ex.InsertFilenameUnderCaretAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<C-R><C-L>",
-        "class": "com.maddyhome.idea.vim.action.ex.InsertCurrentLineAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<C-R><C-O>",
-        "class": "com.maddyhome.idea.vim.action.ex.InsertRegisterLiterallyAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<C-R><C-O><C-A>",
-        "class": "com.maddyhome.idea.vim.action.ex.InsertBigWordUnderCaretLiterallyAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<C-R><C-O><C-F>",
-        "class": "com.maddyhome.idea.vim.action.ex.InsertFilenameUnderCaretAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<C-R><C-O><C-L>",
-        "class": "com.maddyhome.idea.vim.action.ex.InsertCurrentLineLiterallyAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<C-R><C-O><C-W>",
-        "class": "com.maddyhome.idea.vim.action.ex.InsertWordUnderCaretAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<C-R><C-R>",
-        "class": "com.maddyhome.idea.vim.action.ex.InsertRegisterLiterallyAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<C-R><C-R><C-A>",
-        "class": "com.maddyhome.idea.vim.action.ex.InsertBigWordUnderCaretLiterallyAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<C-R><C-R><C-F>",
-        "class": "com.maddyhome.idea.vim.action.ex.InsertFilenameUnderCaretAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<C-R><C-R><C-L>",
-        "class": "com.maddyhome.idea.vim.action.ex.InsertCurrentLineLiterallyAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<C-R><C-R><C-W>",
-        "class": "com.maddyhome.idea.vim.action.ex.InsertWordUnderCaretAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<C-R><C-W>",
-        "class": "com.maddyhome.idea.vim.action.ex.InsertWordUnderCaretAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<C-Right>",
-        "class": "com.maddyhome.idea.vim.action.ex.MoveCaretToNextBigWordAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<C-Right>",
-        "class": "com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionBigWordRightAction",
-        "modes": "S"
-    },
-    {
-        "keys": "<C-Right>",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionBigWordRightAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "<C-Right>",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionWordRightInsertAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<C-S-2>",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertPreviousInsertExitAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<C-S-6>",
-        "class": "com.maddyhome.idea.vim.action.file.FilePreviousAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-T>",
-        "class": "com.maddyhome.idea.vim.action.change.shift.ShiftRightLinesAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<C-T>",
-        "class": "com.maddyhome.idea.vim.action.motion.mark.MotionJumpPreviousAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-U>",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertDeleteInsertedTextAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<C-U>",
-        "class": "com.maddyhome.idea.vim.action.ex.DeleteToCaretAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<C-U>",
-        "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollHalfPageUpAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "<C-Up>",
-        "class": "com.maddyhome.idea.vim.action.motion.scroll.CtrlUpAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-V>",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertCompletedLiteralAction",
-        "modes": "IC"
-    },
-    {
-        "keys": "<C-W>",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertDeletePreviousWordAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<C-W>",
-        "class": "com.maddyhome.idea.vim.action.ex.DeletePreviousWordAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<C-W><C-H>",
-        "class": "com.maddyhome.idea.vim.action.window.WindowLeftAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-W><C-J>",
-        "class": "com.maddyhome.idea.vim.action.window.WindowDownAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-W><C-K>",
-        "class": "com.maddyhome.idea.vim.action.window.WindowUpAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-W><C-L>",
-        "class": "com.maddyhome.idea.vim.action.window.WindowRightAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-W><C-O>",
-        "class": "com.maddyhome.idea.vim.action.window.WindowOnlyAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-W><C-S>",
-        "class": "com.maddyhome.idea.vim.action.window.HorizontalSplitAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-W><C-V>",
-        "class": "com.maddyhome.idea.vim.action.window.VerticalSplitAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-W><C-W>",
-        "class": "com.maddyhome.idea.vim.action.window.WindowNextAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-W><Down>",
-        "class": "com.maddyhome.idea.vim.action.window.WindowDownAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-W><Left>",
-        "class": "com.maddyhome.idea.vim.action.window.WindowLeftAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-W><Right>",
-        "class": "com.maddyhome.idea.vim.action.window.WindowRightAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-W><Up>",
-        "class": "com.maddyhome.idea.vim.action.window.WindowUpAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-W>S",
-        "class": "com.maddyhome.idea.vim.action.window.HorizontalSplitAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-W>W",
-        "class": "com.maddyhome.idea.vim.action.window.WindowPrevAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-W>c",
-        "class": "com.maddyhome.idea.vim.action.window.CloseWindowAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-W>h",
-        "class": "com.maddyhome.idea.vim.action.window.WindowLeftAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-W>j",
-        "class": "com.maddyhome.idea.vim.action.window.WindowDownAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-W>k",
-        "class": "com.maddyhome.idea.vim.action.window.WindowUpAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-W>l",
-        "class": "com.maddyhome.idea.vim.action.window.WindowRightAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-W>o",
-        "class": "com.maddyhome.idea.vim.action.window.WindowOnlyAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-W>s",
-        "class": "com.maddyhome.idea.vim.action.window.HorizontalSplitAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-W>v",
-        "class": "com.maddyhome.idea.vim.action.window.VerticalSplitAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-W>w",
-        "class": "com.maddyhome.idea.vim.action.window.WindowNextAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-X>",
-        "class": "com.maddyhome.idea.vim.action.change.change.number.ChangeNumberDecAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-X>",
-        "class": "com.maddyhome.idea.vim.action.change.change.number.ChangeVisualNumberDecAction",
-        "modes": "X"
-    },
-    {
-        "keys": "<C-Y>",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertCharacterAboveCursorAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<C-Y>",
-        "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLineUpAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "<C-[>",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<C-[>",
-        "class": "com.maddyhome.idea.vim.action.ex.LeaveCommandLineAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<C-[>",
-        "class": "com.maddyhome.idea.vim.action.motion.visual.VisualExitModeAction",
-        "modes": "X"
-    },
-    {
-        "keys": "<C-\\><C-N>",
-        "class": "com.maddyhome.idea.vim.action.ResetModeAction",
-        "modes": "NXSOIC"
-    },
-    {
-        "keys": "<C-]>",
-        "class": "com.maddyhome.idea.vim.action.motion.search.GotoDeclarationAction",
-        "modes": "NX"
-    },
-    {
-        "keys": "<C-^>",
-        "class": "com.maddyhome.idea.vim.action.file.FilePreviousAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-kLeft>",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionWordLeftInsertAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<C-kRight>",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionWordRightInsertAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<C-q>",
-        "class": "com.maddyhome.idea.vim.action.motion.visual.VisualToggleBlockModeAction",
-        "modes": "NX"
-    },
-    {
-        "keys": "<C-v>",
-        "class": "com.maddyhome.idea.vim.action.motion.visual.VisualToggleBlockModeAction",
-        "modes": "NX"
-    },
-    {
-        "keys": "<CR>",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertEnterAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<CR>",
-        "class": "com.maddyhome.idea.vim.action.ex.ProcessExEntryAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<CR>",
-        "class": "com.maddyhome.idea.vim.action.motion.select.SelectEnterAction",
-        "modes": "S"
-    },
-    {
-        "keys": "<CR>",
-        "class": "com.maddyhome.idea.vim.action.motion.updown.EnterNormalAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "<DEL>",
-        "class": "com.maddyhome.idea.vim.action.ex.DeleteNextCharAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<DEL>",
-        "class": "com.maddyhome.idea.vim.action.motion.select.SelectDeleteAction",
-        "modes": "S"
-    },
-    {
-        "keys": "<Del>",
-        "class": "com.maddyhome.idea.vim.action.change.delete.DeleteCharacterAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<Del>",
-        "class": "com.maddyhome.idea.vim.action.change.delete.DeleteVisualAction",
-        "modes": "X"
-    },
-    {
-        "keys": "<Down>",
-        "class": "com.maddyhome.idea.vim.action.ex.SelectNewerHistoryFilteredAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<Down>",
-        "class": "com.maddyhome.idea.vim.action.motion.updown.MotionArrowDownAction",
-        "modes": "NXSO"
-    },
-    {
-        "keys": "<End>",
-        "class": "com.maddyhome.idea.vim.action.ex.MoveCaretToLineEnd",
-        "modes": "C"
-    },
-    {
-        "keys": "<End>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionEndAction",
-        "modes": "NXSO"
-    },
-    {
-        "keys": "<End>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionLastColumnInsertAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<Esc>",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<Esc>",
-        "class": "com.maddyhome.idea.vim.action.ex.LeaveCommandLineAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<Esc>",
-        "class": "com.maddyhome.idea.vim.action.motion.select.SelectEscapeAction",
-        "modes": "S"
-    },
-    {
-        "keys": "<Esc>",
-        "class": "com.maddyhome.idea.vim.action.motion.visual.VisualExitModeAction",
-        "modes": "X"
-    },
-    {
-        "keys": "<Home>",
-        "class": "com.maddyhome.idea.vim.action.ex.MoveCaretToLineStart",
-        "modes": "C"
-    },
-    {
-        "keys": "<Home>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionFirstColumnInsertModeAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<Home>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionHomeAction",
-        "modes": "NXS"
-    },
-    {
-        "keys": "<Insert>",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertBeforeCursorAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<Insert>",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertInsertAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<Insert>",
-        "class": "com.maddyhome.idea.vim.action.ex.ToggleInsertModeAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<Left>",
-        "class": "com.maddyhome.idea.vim.action.ex.MoveCaretLeftAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<Left>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowLeftAction",
-        "modes": "NX"
-    },
-    {
-        "keys": "<Left>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowLeftInsertModeAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<Left>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowLeftOpPendingAction",
-        "modes": "O"
-    },
-    {
-        "keys": "<Left>",
-        "class": "com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionArrowLeftAction",
-        "modes": "S"
-    },
-    {
-        "keys": "<PageDown>",
-        "class": "com.maddyhome.idea.vim.action.ex.SelectNewerHistoryAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<PageDown>",
-        "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageDownAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "<PageDown>",
-        "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageDownInsertModeAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<PageUp>",
-        "class": "com.maddyhome.idea.vim.action.ex.SelectOlderHistoryAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<PageUp>",
-        "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageUpAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "<PageUp>",
-        "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageUpInsertModeAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<Right>",
-        "class": "com.maddyhome.idea.vim.action.ex.MoveCaretRightAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<Right>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowRightAction",
-        "modes": "NX"
-    },
-    {
-        "keys": "<Right>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowRightInsertModeAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<Right>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowRightOpPendingAction",
-        "modes": "O"
-    },
-    {
-        "keys": "<Right>",
-        "class": "com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionArrowRightAction",
-        "modes": "S"
-    },
-    {
-        "keys": "<S-Down>",
-        "class": "com.maddyhome.idea.vim.action.ex.SelectNewerHistoryAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<S-Down>",
-        "class": "com.maddyhome.idea.vim.action.motion.updown.MotionShiftDownAction",
-        "modes": "INXS"
-    },
-    {
-        "keys": "<S-End>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionShiftEndAction",
-        "modes": "INXS"
-    },
-    {
-        "keys": "<S-Enter>",
-        "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageDownAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "<S-Home>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionShiftHomeAction",
-        "modes": "INXS"
-    },
-    {
-        "keys": "<S-Left>",
-        "class": "com.maddyhome.idea.vim.action.ex.MoveCaretToPreviousBigWordAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<S-Left>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionShiftArrowLeftAction",
-        "modes": "INXS"
-    },
-    {
-        "keys": "<S-Right>",
-        "class": "com.maddyhome.idea.vim.action.ex.MoveCaretToNextBigWordAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<S-Right>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionShiftArrowRightAction",
-        "modes": "INXS"
-    },
-    {
-        "keys": "<S-Up>",
-        "class": "com.maddyhome.idea.vim.action.ex.SelectOlderHistoryAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<S-Up>",
-        "class": "com.maddyhome.idea.vim.action.motion.updown.MotionShiftUpAction",
-        "modes": "INXS"
-    },
-    {
-        "keys": "<Space>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionSpaceAction",
-        "modes": "NX"
-    },
-    {
-        "keys": "<Space>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionSpaceOpPendingModeAction",
-        "modes": "O"
-    },
-    {
-        "keys": "<Tab>",
-        "class": "com.maddyhome.idea.vim.action.motion.mark.MotionJumpNextAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<Undo>",
-        "class": "com.maddyhome.idea.vim.action.change.UndoAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<Up>",
-        "class": "com.maddyhome.idea.vim.action.ex.SelectOlderHistoryFilteredAction",
-        "modes": "C"
-    },
-    {
-        "keys": "<Up>",
-        "class": "com.maddyhome.idea.vim.action.motion.updown.MotionArrowUpAction",
-        "modes": "NXSO"
-    },
-    {
-        "keys": "<kDown>",
-        "class": "com.maddyhome.idea.vim.action.motion.updown.MotionArrowDownAction",
-        "modes": "NXSO"
-    },
-    {
-        "keys": "<kLeft>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowLeftAction",
-        "modes": "NX"
-    },
-    {
-        "keys": "<kLeft>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowLeftInsertModeAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<kLeft>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowLeftOpPendingAction",
-        "modes": "O"
-    },
-    {
-        "keys": "<kRight>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowRightAction",
-        "modes": "NX"
-    },
-    {
-        "keys": "<kRight>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowRightInsertModeAction",
-        "modes": "I"
-    },
-    {
-        "keys": "<kRight>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowRightOpPendingAction",
-        "modes": "O"
-    },
-    {
-        "keys": "<kUp>",
-        "class": "com.maddyhome.idea.vim.action.motion.updown.MotionArrowUpAction",
-        "modes": "NXSO"
-    },
-    {
-        "keys": "=",
-        "class": "com.maddyhome.idea.vim.action.change.change.AutoIndentLinesVisualAction",
-        "modes": "X"
-    },
-    {
-        "keys": "=",
-        "class": "com.maddyhome.idea.vim.action.change.shift.AutoIndentMotionAction",
-        "modes": "N"
-    },
-    {
-        "keys": ">",
-        "class": "com.maddyhome.idea.vim.action.change.shift.ShiftRightMotionAction",
-        "modes": "N"
-    },
-    {
-        "keys": ">",
-        "class": "com.maddyhome.idea.vim.action.change.shift.ShiftRightVisualAction",
-        "modes": "X"
-    },
-    {
-        "keys": "?",
-        "class": "com.maddyhome.idea.vim.action.motion.search.SearchEntryRevAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "@",
-        "class": "com.maddyhome.idea.vim.action.macro.PlaybackRegisterAction",
-        "modes": "N"
-    },
-    {
-        "keys": "A",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertAfterLineEndAction",
-        "modes": "N"
-    },
-    {
-        "keys": "A",
-        "class": "com.maddyhome.idea.vim.action.change.insert.VisualBlockAppendAction",
-        "modes": "X"
-    },
-    {
-        "keys": "B",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionBigWordLeftAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "C",
-        "class": "com.maddyhome.idea.vim.action.change.change.ChangeEndOfLineAction",
-        "modes": "N"
-    },
-    {
-        "keys": "C",
-        "class": "com.maddyhome.idea.vim.action.change.change.ChangeVisualLinesEndAction",
-        "modes": "X"
-    },
-    {
-        "keys": "D",
-        "class": "com.maddyhome.idea.vim.action.change.delete.DeleteEndOfLineAction",
-        "modes": "N"
-    },
-    {
-        "keys": "D",
-        "class": "com.maddyhome.idea.vim.action.change.delete.DeleteVisualLinesEndAction",
-        "modes": "X"
-    },
-    {
-        "keys": "E",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionBigWordEndRightAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "F",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionLeftMatchCharAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "G",
-        "class": "com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineLastAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "H",
-        "class": "com.maddyhome.idea.vim.action.motion.screen.MotionFirstScreenLineAction",
-        "modes": "NX"
-    },
-    {
-        "keys": "H",
-        "class": "com.maddyhome.idea.vim.action.motion.screen.MotionOpPendingFirstScreenLineAction",
-        "modes": "O"
-    },
-    {
-        "keys": "I",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertBeforeFirstNonBlankAction",
-        "modes": "N"
-    },
-    {
-        "keys": "I",
-        "class": "com.maddyhome.idea.vim.action.change.insert.VisualInsertAction",
-        "modes": "X"
-    },
-    {
-        "keys": "L",
-        "class": "com.maddyhome.idea.vim.action.motion.screen.MotionLastScreenLineAction",
-        "modes": "NX"
-    },
-    {
-        "keys": "L",
-        "class": "com.maddyhome.idea.vim.action.motion.screen.MotionOpPendingLastScreenLineAction",
-        "modes": "O"
-    },
-    {
-        "keys": "M",
-        "class": "com.maddyhome.idea.vim.action.motion.screen.MotionMiddleScreenLineAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "N",
-        "class": "com.maddyhome.idea.vim.action.motion.search.SearchAgainPreviousAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "O",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertNewLineAboveAction",
-        "modes": "N"
-    },
-    {
-        "keys": "O",
-        "class": "com.maddyhome.idea.vim.action.motion.visual.VisualSwapEndsBlockAction",
-        "modes": "X"
-    },
-    {
-        "keys": "P",
-        "class": "com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorAction",
-        "modes": "N"
-    },
-    {
-        "keys": "P",
-        "class": "com.maddyhome.idea.vim.action.copy.PutVisualTextBeforeCursorAction",
-        "modes": "X"
-    },
-    {
-        "keys": "R",
-        "class": "com.maddyhome.idea.vim.action.change.change.ChangeReplaceAction",
-        "modes": "N"
-    },
-    {
-        "keys": "R",
-        "class": "com.maddyhome.idea.vim.action.change.change.ChangeVisualLinesAction",
-        "modes": "X"
-    },
-    {
-        "keys": "S",
-        "class": "com.maddyhome.idea.vim.action.change.change.ChangeLineAction",
-        "modes": "N"
-    },
-    {
-        "keys": "S",
-        "class": "com.maddyhome.idea.vim.action.change.change.ChangeVisualLinesAction",
-        "modes": "X"
-    },
-    {
-        "keys": "T",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionLeftTillMatchCharAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "U",
-        "class": "com.maddyhome.idea.vim.action.change.change.ChangeCaseUpperVisualAction",
-        "modes": "X"
-    },
-    {
-        "keys": "V",
-        "class": "com.maddyhome.idea.vim.action.motion.visual.VisualToggleLineModeAction",
-        "modes": "NX"
-    },
-    {
-        "keys": "W",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionBigWordRightAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "X",
-        "class": "com.maddyhome.idea.vim.action.change.delete.DeleteCharacterLeftAction",
-        "modes": "N"
-    },
-    {
-        "keys": "X",
-        "class": "com.maddyhome.idea.vim.action.change.delete.DeleteVisualLinesAction",
-        "modes": "X"
-    },
-    {
-        "keys": "Y",
-        "class": "com.maddyhome.idea.vim.action.copy.YankLineAction",
-        "modes": "N"
-    },
-    {
-        "keys": "Y",
-        "class": "com.maddyhome.idea.vim.action.copy.YankVisualLinesAction",
-        "modes": "X"
-    },
-    {
-        "keys": "ZQ",
-        "class": "com.maddyhome.idea.vim.action.file.FileCloseAction",
-        "modes": "N"
-    },
-    {
-        "keys": "ZZ",
-        "class": "com.maddyhome.idea.vim.action.file.FileSaveCloseAction",
-        "modes": "N"
-    },
-    {
-        "keys": "[(",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionUnmatchedParenOpenAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "[M",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionMethodPreviousEndAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "[P",
-        "class": "com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorNoIndentAction",
-        "modes": "N"
-    },
-    {
-        "keys": "[P",
-        "class": "com.maddyhome.idea.vim.action.copy.PutVisualTextBeforeCursorNoIndentAction",
-        "modes": "X"
-    },
-    {
-        "keys": "[[",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionSectionBackwardStartAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "[]",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionSectionBackwardEndAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "[`",
-        "class": "com.maddyhome.idea.vim.action.motion.mark.MotionGotoPreviousMarkAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "[b",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionCamelLeftAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "[m",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionMethodPreviousStartAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "[p",
-        "class": "com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorNoIndentAction",
-        "modes": "N"
-    },
-    {
-        "keys": "[p",
-        "class": "com.maddyhome.idea.vim.action.copy.PutVisualTextAfterCursorNoIndentAction",
-        "modes": "X"
-    },
-    {
-        "keys": "[s",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionMisspelledWordPreviousAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "[w",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionCamelRightAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "[{",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionUnmatchedBraceOpenAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "])",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionUnmatchedParenCloseAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "]M",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionMethodNextEndAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "]P",
-        "class": "com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorNoIndentAction",
-        "modes": "N"
-    },
-    {
-        "keys": "]P",
-        "class": "com.maddyhome.idea.vim.action.copy.PutVisualTextBeforeCursorNoIndentAction",
-        "modes": "X"
-    },
-    {
-        "keys": "][",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionSectionForwardEndAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "]]",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionSectionForwardStartAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "]`",
-        "class": "com.maddyhome.idea.vim.action.motion.mark.MotionGotoNextMarkAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "]b",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionCamelEndLeftAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "]m",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionMethodNextStartAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "]p",
-        "class": "com.maddyhome.idea.vim.action.copy.PutTextAfterCursorNoIndentAction",
-        "modes": "N"
-    },
-    {
-        "keys": "]p",
-        "class": "com.maddyhome.idea.vim.action.copy.PutVisualTextAfterCursorNoIndentAction",
-        "modes": "X"
-    },
-    {
-        "keys": "]s",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionMisspelledWordNextAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "]w",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionCamelEndRightAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "]}",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionUnmatchedBraceCloseAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "^",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionFirstNonSpaceAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "_",
-        "class": "com.maddyhome.idea.vim.action.motion.updown.MotionDownLess1FirstNonSpaceAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "`",
-        "class": "com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "`",
-        "class": "com.maddyhome.idea.vim.action.motion.mark.MotionGotoMarkAction",
-        "modes": "N"
-    },
-    {
-        "keys": "a",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertAfterCursorAction",
-        "modes": "N"
-    },
-    {
-        "keys": "a\"",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockDoubleQuoteAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "a'",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockSingleQuoteAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "a(",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockParenAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "a)",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockParenAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "a<",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockAngleAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "a>",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockAngleAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "aB",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockBraceAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "aW",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterBigWordAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "a[",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockBracketAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "a]",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockBracketAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "a`",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockBackQuoteAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "ab",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockParenAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "ap",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterParagraphAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "as",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterSentenceAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "at",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockTagAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "aw",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterWordAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "a{",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockBraceAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "a}",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockBraceAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "b",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionWordLeftAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "c",
-        "class": "com.maddyhome.idea.vim.action.change.change.ChangeMotionAction",
-        "modes": "N"
-    },
-    {
-        "keys": "c",
-        "class": "com.maddyhome.idea.vim.action.change.change.ChangeVisualAction",
-        "modes": "X"
-    },
-    {
-        "keys": "d",
-        "class": "com.maddyhome.idea.vim.action.change.delete.DeleteMotionAction",
-        "modes": "N"
-    },
-    {
-        "keys": "d",
-        "class": "com.maddyhome.idea.vim.action.change.delete.DeleteVisualAction",
-        "modes": "X"
-    },
-    {
-        "keys": "e",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionWordEndRightAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "f",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionRightMatchCharAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "g#",
-        "class": "com.maddyhome.idea.vim.action.motion.search.SearchWordBackwardAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "g$",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionLastScreenColumnAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "g&",
-        "class": "com.maddyhome.idea.vim.action.change.change.ChangeLastGlobalSearchReplaceAction",
-        "modes": "N"
-    },
-    {
-        "keys": "g'",
-        "class": "com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkLineNoSaveJumpAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "g'",
-        "class": "com.maddyhome.idea.vim.action.motion.mark.MotionGotoMarkLineNoSaveJumpAction",
-        "modes": "N"
-    },
-    {
-        "keys": "g(",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionSentencePreviousEndAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "g)",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionSentenceNextEndAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "g*",
-        "class": "com.maddyhome.idea.vim.action.motion.search.SearchWordForwardAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "g0",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionFirstScreenColumnAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "g8",
-        "class": "com.maddyhome.idea.vim.action.file.FileGetHexAction",
-        "modes": "N"
-    },
-    {
-        "keys": "g<C-A>",
-        "class": "com.maddyhome.idea.vim.action.change.change.number.ChangeVisualNumberAvalancheIncAction",
-        "modes": "X"
-    },
-    {
-        "keys": "g<C-G>",
-        "class": "com.maddyhome.idea.vim.action.file.FileGetLocationInfoAction",
-        "modes": "NX"
-    },
-    {
-        "keys": "g<C-X>",
-        "class": "com.maddyhome.idea.vim.action.change.change.number.ChangeVisualNumberAvalancheDecAction",
-        "modes": "X"
-    },
-    {
-        "keys": "g<C-h>",
-        "class": "com.maddyhome.idea.vim.action.motion.select.SelectEnableBlockModeAction",
-        "modes": "N"
-    },
-    {
-        "keys": "g<Down>",
-        "class": "com.maddyhome.idea.vim.action.motion.updown.MotionDownNotLineWiseAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "g<End>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionLastScreenColumnAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "g<Home>",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionFirstScreenColumnAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "g<Up>",
-        "class": "com.maddyhome.idea.vim.action.motion.updown.MotionUpNotLineWiseAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "g?",
-        "class": "com.maddyhome.idea.vim.action.change.change.ChangeRot13MotionAction",
-        "modes": "N"
-    },
-    {
-        "keys": "g?",
-        "class": "com.maddyhome.idea.vim.action.change.change.ChangeRot13VisualAction",
-        "modes": "X"
-    },
-    {
-        "keys": "gD",
-        "class": "com.maddyhome.idea.vim.action.motion.search.GotoDeclarationAction",
-        "modes": "NX"
-    },
-    {
-        "keys": "gE",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionBigWordEndLeftAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "gH",
-        "class": "com.maddyhome.idea.vim.action.motion.select.SelectEnableLineModeAction",
-        "modes": "N"
-    },
-    {
-        "keys": "gI",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertLineStartAction",
-        "modes": "N"
-    },
-    {
-        "keys": "gN",
-        "class": "com.maddyhome.idea.vim.action.motion.gn.GnPreviousTextObject",
-        "modes": "O"
-    },
-    {
-        "keys": "gN",
-        "class": "com.maddyhome.idea.vim.action.motion.gn.VisualSelectPreviousSearch",
-        "modes": "NX"
-    },
-    {
-        "keys": "gP",
-        "class": "com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorActionMoveCursor",
-        "modes": "N"
-    },
-    {
-        "keys": "gP",
-        "class": "com.maddyhome.idea.vim.action.copy.PutVisualTextBeforeCursorMoveCursorAction",
-        "modes": "X"
-    },
-    {
-        "keys": "gT",
-        "class": "com.maddyhome.idea.vim.action.window.tabs.PreviousTabAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "gU",
-        "class": "com.maddyhome.idea.vim.action.change.change.ChangeCaseUpperMotionAction",
-        "modes": "N"
-    },
-    {
-        "keys": "gU",
-        "class": "com.maddyhome.idea.vim.action.change.change.ChangeCaseUpperVisualAction",
-        "modes": "X"
-    },
-    {
-        "keys": "g^",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionFirstScreenNonSpaceAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "g_",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionLastNonSpaceAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "g`",
-        "class": "com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkNoSaveJumpAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "g`",
-        "class": "com.maddyhome.idea.vim.action.motion.mark.MotionGotoMarkNoSaveJumpAction",
-        "modes": "N"
-    },
-    {
-        "keys": "ga",
-        "class": "com.maddyhome.idea.vim.action.file.FileGetAsciiAction",
-        "modes": "N"
-    },
-    {
-        "keys": "gd",
-        "class": "com.maddyhome.idea.vim.action.motion.search.GotoDeclarationAction",
-        "modes": "NX"
-    },
-    {
-        "keys": "ge",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionWordEndLeftAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "gg",
-        "class": "com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineFirstAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "gh",
-        "class": "com.maddyhome.idea.vim.action.motion.select.SelectEnableCharacterModeAction",
-        "modes": "N"
-    },
-    {
-        "keys": "gi",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertAtPreviousInsertAction",
-        "modes": "N"
-    },
-    {
-        "keys": "gj",
-        "class": "com.maddyhome.idea.vim.action.motion.updown.MotionDownNotLineWiseAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "gk",
-        "class": "com.maddyhome.idea.vim.action.motion.updown.MotionUpNotLineWiseAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "gm",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionMiddleColumnAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "gn",
-        "class": "com.maddyhome.idea.vim.action.motion.gn.GnNextTextObject",
-        "modes": "O"
-    },
-    {
-        "keys": "gn",
-        "class": "com.maddyhome.idea.vim.action.motion.gn.VisualSelectNextSearch",
-        "modes": "NX"
-    },
-    {
-        "keys": "go",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionNthCharacterAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "gp",
-        "class": "com.maddyhome.idea.vim.action.copy.PutTextAfterCursorActionMoveCursor",
-        "modes": "N"
-    },
-    {
-        "keys": "gp",
-        "class": "com.maddyhome.idea.vim.action.copy.PutVisualTextAfterCursorMoveCursorAction",
-        "modes": "X"
-    },
-    {
-        "keys": "gq",
-        "class": "com.maddyhome.idea.vim.action.change.change.ReformatCodeMotionAction",
-        "modes": "N"
-    },
-    {
-        "keys": "gq",
-        "class": "com.maddyhome.idea.vim.action.change.change.ReformatCodeVisualAction",
-        "modes": "X"
-    },
-    {
-        "keys": "gt",
-        "class": "com.maddyhome.idea.vim.action.window.tabs.NextTabAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "gu",
-        "class": "com.maddyhome.idea.vim.action.change.change.ChangeCaseLowerMotionAction",
-        "modes": "N"
-    },
-    {
-        "keys": "gu",
-        "class": "com.maddyhome.idea.vim.action.change.change.ChangeCaseLowerVisualAction",
-        "modes": "X"
-    },
-    {
-        "keys": "gv",
-        "class": "com.maddyhome.idea.vim.action.motion.visual.VisualSelectPreviousAction",
-        "modes": "N"
-    },
-    {
-        "keys": "gv",
-        "class": "com.maddyhome.idea.vim.action.motion.visual.VisualSwapSelectionsAction",
-        "modes": "X"
-    },
-    {
-        "keys": "g~",
-        "class": "com.maddyhome.idea.vim.action.change.change.ChangeCaseToggleMotionAction",
-        "modes": "N"
-    },
-    {
-        "keys": "h",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionLeftAction",
-        "modes": "NX"
-    },
-    {
-        "keys": "h",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionLeftOpPendingModeAction",
-        "modes": "O"
-    },
-    {
-        "keys": "i",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertBeforeCursorAction",
-        "modes": "N"
-    },
-    {
-        "keys": "i\"",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockDoubleQuoteAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "i'",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockSingleQuoteAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "i(",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockParenAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "i)",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockParenAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "i<lt>",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockAngleAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "i>",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockAngleAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "iB",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockBraceAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "iW",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerBigWordAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "i[",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockBracketAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "i]",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockBracketAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "i`",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockBackQuoteAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "ib",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockParenAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "ip",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerParagraphAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "is",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerSentenceAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "it",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockTagAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "iw",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerWordAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "i{",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockBraceAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "i}",
-        "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockBraceAction",
-        "modes": "XO"
-    },
-    {
-        "keys": "j",
-        "class": "com.maddyhome.idea.vim.action.motion.updown.MotionDownAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "k",
-        "class": "com.maddyhome.idea.vim.action.motion.updown.MotionUpAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "l",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionRightAction",
-        "modes": "NX"
-    },
-    {
-        "keys": "l",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionRightOpPendingAction",
-        "modes": "O"
-    },
-    {
-        "keys": "m",
-        "class": "com.maddyhome.idea.vim.action.motion.mark.MotionMarkAction",
-        "modes": "NX"
-    },
-    {
-        "keys": "n",
-        "class": "com.maddyhome.idea.vim.action.motion.search.SearchAgainNextAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "o",
-        "class": "com.maddyhome.idea.vim.action.change.insert.InsertNewLineBelowAction",
-        "modes": "N"
-    },
-    {
-        "keys": "o",
-        "class": "com.maddyhome.idea.vim.action.motion.visual.VisualSwapEndsAction",
-        "modes": "X"
-    },
-    {
-        "keys": "p",
-        "class": "com.maddyhome.idea.vim.action.copy.PutTextAfterCursorAction",
-        "modes": "N"
-    },
-    {
-        "keys": "p",
-        "class": "com.maddyhome.idea.vim.action.copy.PutVisualTextAfterCursorAction",
-        "modes": "X"
-    },
-    {
-        "keys": "q",
-        "class": "com.maddyhome.idea.vim.action.macro.ToggleRecordingAction",
-        "modes": "NX"
-    },
-    {
-        "keys": "r",
-        "class": "com.maddyhome.idea.vim.action.change.change.ChangeCharacterAction",
-        "modes": "N"
-    },
-    {
-        "keys": "r",
-        "class": "com.maddyhome.idea.vim.action.change.change.ChangeVisualCharacterAction",
-        "modes": "X"
-    },
-    {
-        "keys": "s",
-        "class": "com.maddyhome.idea.vim.action.change.change.ChangeCharactersAction",
-        "modes": "N"
-    },
-    {
-        "keys": "s",
-        "class": "com.maddyhome.idea.vim.action.change.change.ChangeVisualAction",
-        "modes": "X"
-    },
-    {
-        "keys": "t",
-        "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionRightTillMatchCharAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "u",
-        "class": "com.maddyhome.idea.vim.action.change.UndoAction",
-        "modes": "N"
-    },
-    {
-        "keys": "u",
-        "class": "com.maddyhome.idea.vim.action.change.change.ChangeCaseLowerVisualAction",
-        "modes": "X"
-    },
-    {
-        "keys": "v",
-        "class": "com.maddyhome.idea.vim.action.motion.visual.VisualToggleCharacterModeAction",
-        "modes": "NX"
-    },
-    {
-        "keys": "w",
-        "class": "com.maddyhome.idea.vim.action.motion.text.MotionWordRightAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "x",
-        "class": "com.maddyhome.idea.vim.action.change.delete.DeleteCharacterRightAction",
-        "modes": "N"
-    },
-    {
-        "keys": "x",
-        "class": "com.maddyhome.idea.vim.action.change.delete.DeleteVisualAction",
-        "modes": "X"
-    },
-    {
-        "keys": "y",
-        "class": "com.maddyhome.idea.vim.action.copy.YankMotionAction",
-        "modes": "N"
-    },
-    {
-        "keys": "y",
-        "class": "com.maddyhome.idea.vim.action.copy.YankVisualAction",
-        "modes": "X"
-    },
-    {
-        "keys": "z+",
-        "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollFirstScreenLinePageStartAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "z-",
-        "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenLineStartAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "z.",
-        "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollMiddleScreenLineStartAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "z<CR>",
-        "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollFirstScreenLineStartAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "z<Left>",
-        "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollColumnRightAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "z<Right>",
-        "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollColumnLeftAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "zA",
-        "class": "com.maddyhome.idea.vim.action.fold.VimToggleRegionRecursively",
-        "modes": "NX"
-    },
-    {
-        "keys": "zC",
-        "class": "com.maddyhome.idea.vim.action.fold.VimCollapseRegionRecursively",
-        "modes": "NX"
-    },
-    {
-        "keys": "zD",
+  {
+    "keys": "!",
+    "class": "com.maddyhome.idea.vim.action.change.change.FilterMotionAction",
+    "modes": "N"
+  },
+  {
+    "keys": "!",
+    "class": "com.maddyhome.idea.vim.action.change.change.FilterVisualLinesAction",
+    "modes": "X"
+  },
+  {
+    "keys": "#",
+    "class": "com.maddyhome.idea.vim.action.motion.search.SearchWholeWordBackwardAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "$",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionLastColumnAction",
+    "modes": "NX"
+  },
+  {
+    "keys": "$",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionLastColumnOpPendingAction",
+    "modes": "O"
+  },
+  {
+    "keys": "%",
+    "class": "com.maddyhome.idea.vim.action.motion.updown.MotionPercentOrMatchAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "&",
+    "class": "com.maddyhome.idea.vim.action.change.change.ChangeLastSearchReplaceAction",
+    "modes": "N"
+  },
+  {
+    "keys": "'",
+    "class": "com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkLineAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "'",
+    "class": "com.maddyhome.idea.vim.action.motion.mark.MotionGotoMarkLineAction",
+    "modes": "N"
+  },
+  {
+    "keys": "(",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionSentencePreviousStartAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": ")",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionSentenceNextStartAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "*",
+    "class": "com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "+",
+    "class": "com.maddyhome.idea.vim.action.motion.updown.MotionDownFirstNonSpaceAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": ",",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionLastMatchCharReverseAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "-",
+    "class": "com.maddyhome.idea.vim.action.motion.updown.MotionUpFirstNonSpaceAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "/",
+    "class": "com.maddyhome.idea.vim.action.motion.search.SearchEntryFwdAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "0",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionFirstColumnAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": ":",
+    "class": "com.maddyhome.idea.vim.action.ex.ExEntryAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": ";",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionLastMatchCharAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "<",
+    "class": "com.maddyhome.idea.vim.action.change.shift.ShiftLeftMotionAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<",
+    "class": "com.maddyhome.idea.vim.action.change.shift.ShiftLeftVisualAction",
+    "modes": "X"
+  },
+  {
+    "keys": "<BS>",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertBackspaceAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<BS>",
+    "class": "com.maddyhome.idea.vim.action.ex.DeletePreviousCharAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<BS>",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionBackspaceAction",
+    "modes": "NX"
+  },
+  {
+    "keys": "<BS>",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionBackspaceOpPendingModeAction",
+    "modes": "O"
+  },
+  {
+    "keys": "<BS>",
+    "class": "com.maddyhome.idea.vim.action.motion.select.SelectBackspaceAction",
+    "modes": "S"
+  },
+  {
+    "keys": "<C-2>",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertPreviousInsertExitAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<C-6>",
+    "class": "com.maddyhome.idea.vim.action.file.FilePreviousAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-@>",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertPreviousInsertExitAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<C-A>",
+    "class": "com.maddyhome.idea.vim.action.change.change.number.ChangeNumberIncAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-A>",
+    "class": "com.maddyhome.idea.vim.action.change.change.number.ChangeVisualNumberIncAction",
+    "modes": "X"
+  },
+  {
+    "keys": "<C-A>",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertPreviousInsertAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<C-B>",
+    "class": "com.maddyhome.idea.vim.action.ex.MoveCaretToLineStart",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-B>",
+    "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageUpAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "<C-C>",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<C-C>",
+    "class": "com.maddyhome.idea.vim.action.ex.LeaveCommandLineAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-C>",
+    "class": "com.maddyhome.idea.vim.action.motion.visual.VisualExitModeAction",
+    "modes": "X"
+  },
+  {
+    "keys": "<C-D>",
+    "class": "com.maddyhome.idea.vim.action.change.shift.ShiftLeftLinesAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<C-D>",
+    "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollHalfPageDownAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "<C-Down>",
+    "class": "com.maddyhome.idea.vim.action.motion.scroll.CtrlDownAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-E>",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertCharacterBelowCursorAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<C-E>",
+    "class": "com.maddyhome.idea.vim.action.ex.MoveCaretToLineEnd",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-E>",
+    "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLineDownAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "<C-End>",
+    "class": "com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineLastEndAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "<C-End>",
+    "class": "com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineLastEndInsertAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<C-F>",
+    "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageDownAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "<C-G>",
+    "class": "com.maddyhome.idea.vim.action.file.FileGetFileInfoAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-G>",
+    "class": "com.maddyhome.idea.vim.action.motion.select.SelectToggleVisualMode",
+    "modes": "XS"
+  },
+  {
+    "keys": "<C-G>u",
+    "class": "com.maddyhome.idea.vim.action.change.BreakUndoSequenceAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<C-H>",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertBackspaceAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<C-H>",
+    "class": "com.maddyhome.idea.vim.action.ex.DeletePreviousCharAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-H>",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionBackspaceAction",
+    "modes": "NX"
+  },
+  {
+    "keys": "<C-H>",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionBackspaceOpPendingModeAction",
+    "modes": "O"
+  },
+  {
+    "keys": "<C-Home>",
+    "class": "com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineFirstAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "<C-Home>",
+    "class": "com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineFirstInsertAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<C-I>",
+    "class": "com.maddyhome.idea.vim.action.motion.mark.MotionJumpNextAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-J>",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertEnterAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<C-J>",
+    "class": "com.maddyhome.idea.vim.action.ex.ProcessExEntryAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-J>",
+    "class": "com.maddyhome.idea.vim.action.motion.select.SelectEnterAction",
+    "modes": "S"
+  },
+  {
+    "keys": "<C-J>",
+    "class": "com.maddyhome.idea.vim.action.motion.updown.MotionDownAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "<C-K>",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertCompletedDigraphAction",
+    "modes": "IC"
+  },
+  {
+    "keys": "<C-Left>",
+    "class": "com.maddyhome.idea.vim.action.ex.MoveCaretToPreviousBigWordAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-Left>",
+    "class": "com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionBigWordLeftAction",
+    "modes": "S"
+  },
+  {
+    "keys": "<C-Left>",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionBigWordLeftAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "<C-Left>",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionWordLeftInsertAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<C-M>",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertEnterAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<C-M>",
+    "class": "com.maddyhome.idea.vim.action.ex.ProcessExEntryAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-M>",
+    "class": "com.maddyhome.idea.vim.action.motion.select.SelectEnterAction",
+    "modes": "S"
+  },
+  {
+    "keys": "<C-M>",
+    "class": "com.maddyhome.idea.vim.action.motion.updown.MotionDownFirstNonSpaceAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "<C-N>",
+    "class": "com.maddyhome.idea.vim.action.ex.SelectNewerHistoryAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-N>",
+    "class": "com.maddyhome.idea.vim.action.motion.updown.MotionDownCtrlNAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "<C-N>",
+    "class": "com.maddyhome.idea.vim.action.window.LookupDownAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<C-O>",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertSingleCommandAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<C-O>",
+    "class": "com.maddyhome.idea.vim.action.motion.mark.MotionJumpPreviousAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-O>",
+    "class": "com.maddyhome.idea.vim.action.motion.select.SelectToggleSingleVisualCommandAction",
+    "modes": "SX"
+  },
+  {
+    "keys": "<C-P>",
+    "class": "com.maddyhome.idea.vim.action.ex.SelectOlderHistoryAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-P>",
+    "class": "com.maddyhome.idea.vim.action.motion.updown.MotionUpCtrlPAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "<C-P>",
+    "class": "com.maddyhome.idea.vim.action.window.LookupUpAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<C-PageDown>",
+    "class": "com.maddyhome.idea.vim.action.window.tabs.InsertNextTabAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<C-PageDown>",
+    "class": "com.maddyhome.idea.vim.action.window.tabs.NextTabAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "<C-PageUp>",
+    "class": "com.maddyhome.idea.vim.action.window.tabs.InsertPreviousTabAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<C-PageUp>",
+    "class": "com.maddyhome.idea.vim.action.window.tabs.PreviousTabAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "<C-Q>",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertCompletedLiteralAction",
+    "modes": "IC"
+  },
+  {
+    "keys": "<C-R>",
+    "class": "com.maddyhome.idea.vim.action.change.RedoAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-R>",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertRegisterAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<C-R>",
+    "class": "com.maddyhome.idea.vim.action.ex.InsertRegisterAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-R><C-A>",
+    "class": "com.maddyhome.idea.vim.action.ex.InsertBigWordUnderCaretAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-R><C-F>",
+    "class": "com.maddyhome.idea.vim.action.ex.InsertFilenameUnderCaretAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-R><C-L>",
+    "class": "com.maddyhome.idea.vim.action.ex.InsertCurrentLineAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-R><C-O>",
+    "class": "com.maddyhome.idea.vim.action.ex.InsertRegisterLiterallyAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-R><C-O><C-A>",
+    "class": "com.maddyhome.idea.vim.action.ex.InsertBigWordUnderCaretLiterallyAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-R><C-O><C-F>",
+    "class": "com.maddyhome.idea.vim.action.ex.InsertFilenameUnderCaretAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-R><C-O><C-L>",
+    "class": "com.maddyhome.idea.vim.action.ex.InsertCurrentLineLiterallyAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-R><C-O><C-W>",
+    "class": "com.maddyhome.idea.vim.action.ex.InsertWordUnderCaretAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-R><C-R>",
+    "class": "com.maddyhome.idea.vim.action.ex.InsertRegisterLiterallyAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-R><C-R><C-A>",
+    "class": "com.maddyhome.idea.vim.action.ex.InsertBigWordUnderCaretLiterallyAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-R><C-R><C-F>",
+    "class": "com.maddyhome.idea.vim.action.ex.InsertFilenameUnderCaretAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-R><C-R><C-L>",
+    "class": "com.maddyhome.idea.vim.action.ex.InsertCurrentLineLiterallyAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-R><C-R><C-W>",
+    "class": "com.maddyhome.idea.vim.action.ex.InsertWordUnderCaretAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-R><C-W>",
+    "class": "com.maddyhome.idea.vim.action.ex.InsertWordUnderCaretAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-Right>",
+    "class": "com.maddyhome.idea.vim.action.ex.MoveCaretToNextBigWordAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-Right>",
+    "class": "com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionBigWordRightAction",
+    "modes": "S"
+  },
+  {
+    "keys": "<C-Right>",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionBigWordRightAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "<C-Right>",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionWordRightInsertAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<C-S-2>",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertPreviousInsertExitAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<C-S-6>",
+    "class": "com.maddyhome.idea.vim.action.file.FilePreviousAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-T>",
+    "class": "com.maddyhome.idea.vim.action.change.shift.ShiftRightLinesAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<C-T>",
+    "class": "com.maddyhome.idea.vim.action.motion.mark.MotionJumpPreviousAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-U>",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertDeleteInsertedTextAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<C-U>",
+    "class": "com.maddyhome.idea.vim.action.ex.DeleteToCaretAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-U>",
+    "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollHalfPageUpAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "<C-Up>",
+    "class": "com.maddyhome.idea.vim.action.motion.scroll.CtrlUpAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-V>",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertCompletedLiteralAction",
+    "modes": "IC"
+  },
+  {
+    "keys": "<C-W>",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertDeletePreviousWordAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<C-W>",
+    "class": "com.maddyhome.idea.vim.action.ex.DeletePreviousWordAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-W><C-H>",
+    "class": "com.maddyhome.idea.vim.action.window.WindowLeftAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-W><C-J>",
+    "class": "com.maddyhome.idea.vim.action.window.WindowDownAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-W><C-K>",
+    "class": "com.maddyhome.idea.vim.action.window.WindowUpAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-W><C-L>",
+    "class": "com.maddyhome.idea.vim.action.window.WindowRightAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-W><C-O>",
+    "class": "com.maddyhome.idea.vim.action.window.WindowOnlyAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-W><C-S>",
+    "class": "com.maddyhome.idea.vim.action.window.HorizontalSplitAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-W><C-V>",
+    "class": "com.maddyhome.idea.vim.action.window.VerticalSplitAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-W><C-W>",
+    "class": "com.maddyhome.idea.vim.action.window.WindowNextAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-W><Down>",
+    "class": "com.maddyhome.idea.vim.action.window.WindowDownAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-W><Left>",
+    "class": "com.maddyhome.idea.vim.action.window.WindowLeftAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-W><Right>",
+    "class": "com.maddyhome.idea.vim.action.window.WindowRightAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-W><Up>",
+    "class": "com.maddyhome.idea.vim.action.window.WindowUpAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-W>S",
+    "class": "com.maddyhome.idea.vim.action.window.HorizontalSplitAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-W>W",
+    "class": "com.maddyhome.idea.vim.action.window.WindowPrevAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-W>c",
+    "class": "com.maddyhome.idea.vim.action.window.CloseWindowAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-W>h",
+    "class": "com.maddyhome.idea.vim.action.window.WindowLeftAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-W>j",
+    "class": "com.maddyhome.idea.vim.action.window.WindowDownAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-W>k",
+    "class": "com.maddyhome.idea.vim.action.window.WindowUpAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-W>l",
+    "class": "com.maddyhome.idea.vim.action.window.WindowRightAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-W>o",
+    "class": "com.maddyhome.idea.vim.action.window.WindowOnlyAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-W>s",
+    "class": "com.maddyhome.idea.vim.action.window.HorizontalSplitAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-W>v",
+    "class": "com.maddyhome.idea.vim.action.window.VerticalSplitAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-W>w",
+    "class": "com.maddyhome.idea.vim.action.window.WindowNextAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-X>",
+    "class": "com.maddyhome.idea.vim.action.change.change.number.ChangeNumberDecAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-X>",
+    "class": "com.maddyhome.idea.vim.action.change.change.number.ChangeVisualNumberDecAction",
+    "modes": "X"
+  },
+  {
+    "keys": "<C-Y>",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertCharacterAboveCursorAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<C-Y>",
+    "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLineUpAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "<C-[>",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<C-[>",
+    "class": "com.maddyhome.idea.vim.action.ex.LeaveCommandLineAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-[>",
+    "class": "com.maddyhome.idea.vim.action.motion.visual.VisualExitModeAction",
+    "modes": "X"
+  },
+  {
+    "keys": "<C-\\><C-N>",
+    "class": "com.maddyhome.idea.vim.action.ResetModeAction",
+    "modes": "NXSOIC"
+  },
+  {
+    "keys": "<C-]>",
+    "class": "com.maddyhome.idea.vim.action.motion.search.GotoDeclarationAction",
+    "modes": "NX"
+  },
+  {
+    "keys": "<C-^>",
+    "class": "com.maddyhome.idea.vim.action.file.FilePreviousAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-kLeft>",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionWordLeftInsertAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<C-kRight>",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionWordRightInsertAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<C-q>",
+    "class": "com.maddyhome.idea.vim.action.motion.visual.VisualToggleBlockModeAction",
+    "modes": "NX"
+  },
+  {
+    "keys": "<C-v>",
+    "class": "com.maddyhome.idea.vim.action.motion.visual.VisualToggleBlockModeAction",
+    "modes": "NX"
+  },
+  {
+    "keys": "<CR>",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertEnterAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<CR>",
+    "class": "com.maddyhome.idea.vim.action.ex.ProcessExEntryAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<CR>",
+    "class": "com.maddyhome.idea.vim.action.motion.select.SelectEnterAction",
+    "modes": "S"
+  },
+  {
+    "keys": "<CR>",
+    "class": "com.maddyhome.idea.vim.action.motion.updown.EnterNormalAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "<DEL>",
+    "class": "com.maddyhome.idea.vim.action.ex.DeleteNextCharAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<DEL>",
+    "class": "com.maddyhome.idea.vim.action.motion.select.SelectDeleteAction",
+    "modes": "S"
+  },
+  {
+    "keys": "<Del>",
+    "class": "com.maddyhome.idea.vim.action.change.delete.DeleteCharacterAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<Del>",
+    "class": "com.maddyhome.idea.vim.action.change.delete.DeleteVisualAction",
+    "modes": "X"
+  },
+  {
+    "keys": "<Down>",
+    "class": "com.maddyhome.idea.vim.action.ex.SelectNewerHistoryFilteredAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<Down>",
+    "class": "com.maddyhome.idea.vim.action.motion.updown.MotionArrowDownAction",
+    "modes": "NXSO"
+  },
+  {
+    "keys": "<End>",
+    "class": "com.maddyhome.idea.vim.action.ex.MoveCaretToLineEnd",
+    "modes": "C"
+  },
+  {
+    "keys": "<End>",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionEndAction",
+    "modes": "NXSO"
+  },
+  {
+    "keys": "<End>",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionLastColumnInsertAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<Esc>",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<Esc>",
+    "class": "com.maddyhome.idea.vim.action.ex.LeaveCommandLineAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<Esc>",
+    "class": "com.maddyhome.idea.vim.action.motion.select.SelectEscapeAction",
+    "modes": "S"
+  },
+  {
+    "keys": "<Esc>",
+    "class": "com.maddyhome.idea.vim.action.motion.visual.VisualExitModeAction",
+    "modes": "X"
+  },
+  {
+    "keys": "<Home>",
+    "class": "com.maddyhome.idea.vim.action.ex.MoveCaretToLineStart",
+    "modes": "C"
+  },
+  {
+    "keys": "<Home>",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionFirstColumnInsertModeAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<Home>",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionHomeAction",
+    "modes": "NXS"
+  },
+  {
+    "keys": "<Insert>",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertBeforeCursorAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<Insert>",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertInsertAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<Insert>",
+    "class": "com.maddyhome.idea.vim.action.ex.ToggleInsertModeAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<Left>",
+    "class": "com.maddyhome.idea.vim.action.ex.MoveCaretLeftAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<Left>",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowLeftAction",
+    "modes": "NX"
+  },
+  {
+    "keys": "<Left>",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowLeftInsertModeAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<Left>",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowLeftOpPendingAction",
+    "modes": "O"
+  },
+  {
+    "keys": "<Left>",
+    "class": "com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionArrowLeftAction",
+    "modes": "S"
+  },
+  {
+    "keys": "<PageDown>",
+    "class": "com.maddyhome.idea.vim.action.ex.SelectNewerHistoryAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<PageDown>",
+    "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageDownAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "<PageDown>",
+    "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageDownInsertModeAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<PageUp>",
+    "class": "com.maddyhome.idea.vim.action.ex.SelectOlderHistoryAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<PageUp>",
+    "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageUpAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "<PageUp>",
+    "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageUpInsertModeAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<Right>",
+    "class": "com.maddyhome.idea.vim.action.ex.MoveCaretRightAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<Right>",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowRightAction",
+    "modes": "NX"
+  },
+  {
+    "keys": "<Right>",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowRightInsertModeAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<Right>",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowRightOpPendingAction",
+    "modes": "O"
+  },
+  {
+    "keys": "<Right>",
+    "class": "com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionArrowRightAction",
+    "modes": "S"
+  },
+  {
+    "keys": "<S-Down>",
+    "class": "com.maddyhome.idea.vim.action.ex.SelectNewerHistoryAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<S-Down>",
+    "class": "com.maddyhome.idea.vim.action.motion.updown.MotionShiftDownAction",
+    "modes": "INXS"
+  },
+  {
+    "keys": "<S-End>",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionShiftEndAction",
+    "modes": "INXS"
+  },
+  {
+    "keys": "<S-Enter>",
+    "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageDownAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "<S-Home>",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionShiftHomeAction",
+    "modes": "INXS"
+  },
+  {
+    "keys": "<S-Left>",
+    "class": "com.maddyhome.idea.vim.action.ex.MoveCaretToPreviousBigWordAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<S-Left>",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionShiftArrowLeftAction",
+    "modes": "INXS"
+  },
+  {
+    "keys": "<S-Right>",
+    "class": "com.maddyhome.idea.vim.action.ex.MoveCaretToNextBigWordAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<S-Right>",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionShiftArrowRightAction",
+    "modes": "INXS"
+  },
+  {
+    "keys": "<S-Up>",
+    "class": "com.maddyhome.idea.vim.action.ex.SelectOlderHistoryAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<S-Up>",
+    "class": "com.maddyhome.idea.vim.action.motion.updown.MotionShiftUpAction",
+    "modes": "INXS"
+  },
+  {
+    "keys": "<Space>",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionSpaceAction",
+    "modes": "NX"
+  },
+  {
+    "keys": "<Space>",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionSpaceOpPendingModeAction",
+    "modes": "O"
+  },
+  {
+    "keys": "<Tab>",
+    "class": "com.maddyhome.idea.vim.action.motion.mark.MotionJumpNextAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<Undo>",
+    "class": "com.maddyhome.idea.vim.action.change.UndoAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<Up>",
+    "class": "com.maddyhome.idea.vim.action.ex.SelectOlderHistoryFilteredAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<Up>",
+    "class": "com.maddyhome.idea.vim.action.motion.updown.MotionArrowUpAction",
+    "modes": "NXSO"
+  },
+  {
+    "keys": "<kDown>",
+    "class": "com.maddyhome.idea.vim.action.motion.updown.MotionArrowDownAction",
+    "modes": "NXSO"
+  },
+  {
+    "keys": "<kLeft>",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowLeftAction",
+    "modes": "NX"
+  },
+  {
+    "keys": "<kLeft>",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowLeftInsertModeAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<kLeft>",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowLeftOpPendingAction",
+    "modes": "O"
+  },
+  {
+    "keys": "<kRight>",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowRightAction",
+    "modes": "NX"
+  },
+  {
+    "keys": "<kRight>",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowRightInsertModeAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<kRight>",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionArrowRightOpPendingAction",
+    "modes": "O"
+  },
+  {
+    "keys": "<kUp>",
+    "class": "com.maddyhome.idea.vim.action.motion.updown.MotionArrowUpAction",
+    "modes": "NXSO"
+  },
+  {
+    "keys": "=",
+    "class": "com.maddyhome.idea.vim.action.change.change.AutoIndentLinesVisualAction",
+    "modes": "X"
+  },
+  {
+    "keys": "=",
+    "class": "com.maddyhome.idea.vim.action.change.shift.AutoIndentMotionAction",
+    "modes": "N"
+  },
+  {
+    "keys": ">",
+    "class": "com.maddyhome.idea.vim.action.change.shift.ShiftRightMotionAction",
+    "modes": "N"
+  },
+  {
+    "keys": ">",
+    "class": "com.maddyhome.idea.vim.action.change.shift.ShiftRightVisualAction",
+    "modes": "X"
+  },
+  {
+    "keys": "?",
+    "class": "com.maddyhome.idea.vim.action.motion.search.SearchEntryRevAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "@",
+    "class": "com.maddyhome.idea.vim.action.macro.PlaybackRegisterAction",
+    "modes": "N"
+  },
+  {
+    "keys": "A",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertAfterLineEndAction",
+    "modes": "N"
+  },
+  {
+    "keys": "A",
+    "class": "com.maddyhome.idea.vim.action.change.insert.VisualBlockAppendAction",
+    "modes": "X"
+  },
+  {
+    "keys": "B",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionBigWordLeftAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "C",
+    "class": "com.maddyhome.idea.vim.action.change.change.ChangeEndOfLineAction",
+    "modes": "N"
+  },
+  {
+    "keys": "C",
+    "class": "com.maddyhome.idea.vim.action.change.change.ChangeVisualLinesEndAction",
+    "modes": "X"
+  },
+  {
+    "keys": "D",
+    "class": "com.maddyhome.idea.vim.action.change.delete.DeleteEndOfLineAction",
+    "modes": "N"
+  },
+  {
+    "keys": "D",
+    "class": "com.maddyhome.idea.vim.action.change.delete.DeleteVisualLinesEndAction",
+    "modes": "X"
+  },
+  {
+    "keys": "E",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionBigWordEndRightAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "F",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionLeftMatchCharAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "G",
+    "class": "com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineLastAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "H",
+    "class": "com.maddyhome.idea.vim.action.motion.screen.MotionFirstScreenLineAction",
+    "modes": "NX"
+  },
+  {
+    "keys": "H",
+    "class": "com.maddyhome.idea.vim.action.motion.screen.MotionOpPendingFirstScreenLineAction",
+    "modes": "O"
+  },
+  {
+    "keys": "I",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertBeforeFirstNonBlankAction",
+    "modes": "N"
+  },
+  {
+    "keys": "I",
+    "class": "com.maddyhome.idea.vim.action.change.insert.VisualInsertAction",
+    "modes": "X"
+  },
+  {
+    "keys": "L",
+    "class": "com.maddyhome.idea.vim.action.motion.screen.MotionLastScreenLineAction",
+    "modes": "NX"
+  },
+  {
+    "keys": "L",
+    "class": "com.maddyhome.idea.vim.action.motion.screen.MotionOpPendingLastScreenLineAction",
+    "modes": "O"
+  },
+  {
+    "keys": "M",
+    "class": "com.maddyhome.idea.vim.action.motion.screen.MotionMiddleScreenLineAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "N",
+    "class": "com.maddyhome.idea.vim.action.motion.search.SearchAgainPreviousAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "O",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertNewLineAboveAction",
+    "modes": "N"
+  },
+  {
+    "keys": "O",
+    "class": "com.maddyhome.idea.vim.action.motion.visual.VisualSwapEndsBlockAction",
+    "modes": "X"
+  },
+  {
+    "keys": "P",
+    "class": "com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorAction",
+    "modes": "N"
+  },
+  {
+    "keys": "P",
+    "class": "com.maddyhome.idea.vim.action.copy.PutVisualTextBeforeCursorAction",
+    "modes": "X"
+  },
+  {
+    "keys": "R",
+    "class": "com.maddyhome.idea.vim.action.change.change.ChangeReplaceAction",
+    "modes": "N"
+  },
+  {
+    "keys": "R",
+    "class": "com.maddyhome.idea.vim.action.change.change.ChangeVisualLinesAction",
+    "modes": "X"
+  },
+  {
+    "keys": "S",
+    "class": "com.maddyhome.idea.vim.action.change.change.ChangeLineAction",
+    "modes": "N"
+  },
+  {
+    "keys": "S",
+    "class": "com.maddyhome.idea.vim.action.change.change.ChangeVisualLinesAction",
+    "modes": "X"
+  },
+  {
+    "keys": "T",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionLeftTillMatchCharAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "U",
+    "class": "com.maddyhome.idea.vim.action.change.change.ChangeCaseUpperVisualAction",
+    "modes": "X"
+  },
+  {
+    "keys": "V",
+    "class": "com.maddyhome.idea.vim.action.motion.visual.VisualToggleLineModeAction",
+    "modes": "NX"
+  },
+  {
+    "keys": "W",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionBigWordRightAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "X",
+    "class": "com.maddyhome.idea.vim.action.change.delete.DeleteCharacterLeftAction",
+    "modes": "N"
+  },
+  {
+    "keys": "X",
+    "class": "com.maddyhome.idea.vim.action.change.delete.DeleteVisualLinesAction",
+    "modes": "X"
+  },
+  {
+    "keys": "Y",
+    "class": "com.maddyhome.idea.vim.action.copy.YankLineAction",
+    "modes": "N"
+  },
+  {
+    "keys": "Y",
+    "class": "com.maddyhome.idea.vim.action.copy.YankVisualLinesAction",
+    "modes": "X"
+  },
+  {
+    "keys": "ZQ",
+    "class": "com.maddyhome.idea.vim.action.file.FileCloseAction",
+    "modes": "N"
+  },
+  {
+    "keys": "ZZ",
+    "class": "com.maddyhome.idea.vim.action.file.FileSaveCloseAction",
+    "modes": "N"
+  },
+  {
+    "keys": "[(",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionUnmatchedParenOpenAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "[M",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionMethodPreviousEndAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "[P",
+    "class": "com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorNoIndentAction",
+    "modes": "N"
+  },
+  {
+    "keys": "[P",
+    "class": "com.maddyhome.idea.vim.action.copy.PutVisualTextBeforeCursorNoIndentAction",
+    "modes": "X"
+  },
+  {
+    "keys": "[[",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionSectionBackwardStartAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "[]",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionSectionBackwardEndAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "[`",
+    "class": "com.maddyhome.idea.vim.action.motion.mark.MotionGotoPreviousMarkAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "[b",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionCamelLeftAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "[m",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionMethodPreviousStartAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "[p",
+    "class": "com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorNoIndentAction",
+    "modes": "N"
+  },
+  {
+    "keys": "[p",
+    "class": "com.maddyhome.idea.vim.action.copy.PutVisualTextAfterCursorNoIndentAction",
+    "modes": "X"
+  },
+  {
+    "keys": "[s",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionMisspelledWordPreviousAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "[w",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionCamelRightAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "[{",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionUnmatchedBraceOpenAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "])",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionUnmatchedParenCloseAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "]M",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionMethodNextEndAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "]P",
+    "class": "com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorNoIndentAction",
+    "modes": "N"
+  },
+  {
+    "keys": "]P",
+    "class": "com.maddyhome.idea.vim.action.copy.PutVisualTextBeforeCursorNoIndentAction",
+    "modes": "X"
+  },
+  {
+    "keys": "][",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionSectionForwardEndAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "]]",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionSectionForwardStartAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "]`",
+    "class": "com.maddyhome.idea.vim.action.motion.mark.MotionGotoNextMarkAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "]b",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionCamelEndLeftAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "]m",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionMethodNextStartAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "]p",
+    "class": "com.maddyhome.idea.vim.action.copy.PutTextAfterCursorNoIndentAction",
+    "modes": "N"
+  },
+  {
+    "keys": "]p",
+    "class": "com.maddyhome.idea.vim.action.copy.PutVisualTextAfterCursorNoIndentAction",
+    "modes": "X"
+  },
+  {
+    "keys": "]s",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionMisspelledWordNextAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "]w",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionCamelEndRightAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "]}",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionUnmatchedBraceCloseAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "^",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionFirstNonSpaceAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "_",
+    "class": "com.maddyhome.idea.vim.action.motion.updown.MotionDownLess1FirstNonSpaceAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "`",
+    "class": "com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "`",
+    "class": "com.maddyhome.idea.vim.action.motion.mark.MotionGotoMarkAction",
+    "modes": "N"
+  },
+  {
+    "keys": "a",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertAfterCursorAction",
+    "modes": "N"
+  },
+  {
+    "keys": "a\"",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockDoubleQuoteAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "a'",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockSingleQuoteAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "a(",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockParenAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "a)",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockParenAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "a<",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockAngleAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "a>",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockAngleAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "aB",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockBraceAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "aW",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterBigWordAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "a[",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockBracketAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "a]",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockBracketAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "a`",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockBackQuoteAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "ab",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockParenAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "ap",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterParagraphAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "as",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterSentenceAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "at",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockTagAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "aw",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterWordAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "a{",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockBraceAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "a}",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockBraceAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "b",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionWordLeftAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "c",
+    "class": "com.maddyhome.idea.vim.action.change.change.ChangeMotionAction",
+    "modes": "N"
+  },
+  {
+    "keys": "c",
+    "class": "com.maddyhome.idea.vim.action.change.change.ChangeVisualAction",
+    "modes": "X"
+  },
+  {
+    "keys": "d",
+    "class": "com.maddyhome.idea.vim.action.change.delete.DeleteMotionAction",
+    "modes": "N"
+  },
+  {
+    "keys": "d",
+    "class": "com.maddyhome.idea.vim.action.change.delete.DeleteVisualAction",
+    "modes": "X"
+  },
+  {
+    "keys": "e",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionWordEndRightAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "f",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionRightMatchCharAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "g#",
+    "class": "com.maddyhome.idea.vim.action.motion.search.SearchWordBackwardAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "g$",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionLastScreenColumnAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "g&",
+    "class": "com.maddyhome.idea.vim.action.change.change.ChangeLastGlobalSearchReplaceAction",
+    "modes": "N"
+  },
+  {
+    "keys": "g'",
+    "class": "com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkLineNoSaveJumpAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "g'",
+    "class": "com.maddyhome.idea.vim.action.motion.mark.MotionGotoMarkLineNoSaveJumpAction",
+    "modes": "N"
+  },
+  {
+    "keys": "g(",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionSentencePreviousEndAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "g)",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionSentenceNextEndAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "g*",
+    "class": "com.maddyhome.idea.vim.action.motion.search.SearchWordForwardAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "g0",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionFirstScreenColumnAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "g8",
+    "class": "com.maddyhome.idea.vim.action.file.FileGetHexAction",
+    "modes": "N"
+  },
+  {
+    "keys": "g<C-A>",
+    "class": "com.maddyhome.idea.vim.action.change.change.number.ChangeVisualNumberAvalancheIncAction",
+    "modes": "X"
+  },
+  {
+    "keys": "g<C-G>",
+    "class": "com.maddyhome.idea.vim.action.file.FileGetLocationInfoAction",
+    "modes": "NX"
+  },
+  {
+    "keys": "g<C-X>",
+    "class": "com.maddyhome.idea.vim.action.change.change.number.ChangeVisualNumberAvalancheDecAction",
+    "modes": "X"
+  },
+  {
+    "keys": "g<C-h>",
+    "class": "com.maddyhome.idea.vim.action.motion.select.SelectEnableBlockModeAction",
+    "modes": "N"
+  },
+  {
+    "keys": "g<Down>",
+    "class": "com.maddyhome.idea.vim.action.motion.updown.MotionDownNotLineWiseAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "g<End>",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionLastScreenColumnAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "g<Home>",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionFirstScreenColumnAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "g<Up>",
+    "class": "com.maddyhome.idea.vim.action.motion.updown.MotionUpNotLineWiseAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "g?",
+    "class": "com.maddyhome.idea.vim.action.change.change.ChangeRot13MotionAction",
+    "modes": "N"
+  },
+  {
+    "keys": "g?",
+    "class": "com.maddyhome.idea.vim.action.change.change.ChangeRot13VisualAction",
+    "modes": "X"
+  },
+  {
+    "keys": "gD",
+    "class": "com.maddyhome.idea.vim.action.motion.search.GotoDeclarationAction",
+    "modes": "NX"
+  },
+  {
+    "keys": "gE",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionBigWordEndLeftAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "gH",
+    "class": "com.maddyhome.idea.vim.action.motion.select.SelectEnableLineModeAction",
+    "modes": "N"
+  },
+  {
+    "keys": "gI",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertLineStartAction",
+    "modes": "N"
+  },
+  {
+    "keys": "gN",
+    "class": "com.maddyhome.idea.vim.action.motion.gn.GnPreviousTextObject",
+    "modes": "O"
+  },
+  {
+    "keys": "gN",
+    "class": "com.maddyhome.idea.vim.action.motion.gn.VisualSelectPreviousSearch",
+    "modes": "NX"
+  },
+  {
+    "keys": "gP",
+    "class": "com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorActionMoveCursor",
+    "modes": "N"
+  },
+  {
+    "keys": "gP",
+    "class": "com.maddyhome.idea.vim.action.copy.PutVisualTextBeforeCursorMoveCursorAction",
+    "modes": "X"
+  },
+  {
+    "keys": "gT",
+    "class": "com.maddyhome.idea.vim.action.window.tabs.PreviousTabAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "gU",
+    "class": "com.maddyhome.idea.vim.action.change.change.ChangeCaseUpperMotionAction",
+    "modes": "N"
+  },
+  {
+    "keys": "gU",
+    "class": "com.maddyhome.idea.vim.action.change.change.ChangeCaseUpperVisualAction",
+    "modes": "X"
+  },
+  {
+    "keys": "g^",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionFirstScreenNonSpaceAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "g_",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionLastNonSpaceAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "g`",
+    "class": "com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkNoSaveJumpAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "g`",
+    "class": "com.maddyhome.idea.vim.action.motion.mark.MotionGotoMarkNoSaveJumpAction",
+    "modes": "N"
+  },
+  {
+    "keys": "ga",
+    "class": "com.maddyhome.idea.vim.action.file.FileGetAsciiAction",
+    "modes": "N"
+  },
+  {
+    "keys": "gd",
+    "class": "com.maddyhome.idea.vim.action.motion.search.GotoDeclarationAction",
+    "modes": "NX"
+  },
+  {
+    "keys": "ge",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionWordEndLeftAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "gg",
+    "class": "com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineFirstAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "gh",
+    "class": "com.maddyhome.idea.vim.action.motion.select.SelectEnableCharacterModeAction",
+    "modes": "N"
+  },
+  {
+    "keys": "gi",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertAtPreviousInsertAction",
+    "modes": "N"
+  },
+  {
+    "keys": "gj",
+    "class": "com.maddyhome.idea.vim.action.motion.updown.MotionDownNotLineWiseAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "gk",
+    "class": "com.maddyhome.idea.vim.action.motion.updown.MotionUpNotLineWiseAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "gm",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionMiddleColumnAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "gn",
+    "class": "com.maddyhome.idea.vim.action.motion.gn.GnNextTextObject",
+    "modes": "O"
+  },
+  {
+    "keys": "gn",
+    "class": "com.maddyhome.idea.vim.action.motion.gn.VisualSelectNextSearch",
+    "modes": "NX"
+  },
+  {
+    "keys": "go",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionNthCharacterAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "gp",
+    "class": "com.maddyhome.idea.vim.action.copy.PutTextAfterCursorActionMoveCursor",
+    "modes": "N"
+  },
+  {
+    "keys": "gp",
+    "class": "com.maddyhome.idea.vim.action.copy.PutVisualTextAfterCursorMoveCursorAction",
+    "modes": "X"
+  },
+  {
+    "keys": "gq",
+    "class": "com.maddyhome.idea.vim.action.change.change.ReformatCodeMotionAction",
+    "modes": "N"
+  },
+  {
+    "keys": "gq",
+    "class": "com.maddyhome.idea.vim.action.change.change.ReformatCodeVisualAction",
+    "modes": "X"
+  },
+  {
+    "keys": "gt",
+    "class": "com.maddyhome.idea.vim.action.window.tabs.NextTabAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "gu",
+    "class": "com.maddyhome.idea.vim.action.change.change.ChangeCaseLowerMotionAction",
+    "modes": "N"
+  },
+  {
+    "keys": "gu",
+    "class": "com.maddyhome.idea.vim.action.change.change.ChangeCaseLowerVisualAction",
+    "modes": "X"
+  },
+  {
+    "keys": "gv",
+    "class": "com.maddyhome.idea.vim.action.motion.visual.VisualSelectPreviousAction",
+    "modes": "N"
+  },
+  {
+    "keys": "gv",
+    "class": "com.maddyhome.idea.vim.action.motion.visual.VisualSwapSelectionsAction",
+    "modes": "X"
+  },
+  {
+    "keys": "g~",
+    "class": "com.maddyhome.idea.vim.action.change.change.ChangeCaseToggleMotionAction",
+    "modes": "N"
+  },
+  {
+    "keys": "h",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionLeftAction",
+    "modes": "NX"
+  },
+  {
+    "keys": "h",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionLeftOpPendingModeAction",
+    "modes": "O"
+  },
+  {
+    "keys": "i",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertBeforeCursorAction",
+    "modes": "N"
+  },
+  {
+    "keys": "i\"",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockDoubleQuoteAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "i'",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockSingleQuoteAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "i(",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockParenAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "i)",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockParenAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "i<lt>",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockAngleAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "i>",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockAngleAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "iB",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockBraceAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "iW",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerBigWordAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "i[",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockBracketAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "i]",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockBracketAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "i`",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockBackQuoteAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "ib",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockParenAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "ip",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerParagraphAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "is",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerSentenceAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "it",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockTagAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "iw",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerWordAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "i{",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockBraceAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "i}",
+    "class": "com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockBraceAction",
+    "modes": "XO"
+  },
+  {
+    "keys": "j",
+    "class": "com.maddyhome.idea.vim.action.motion.updown.MotionDownAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "k",
+    "class": "com.maddyhome.idea.vim.action.motion.updown.MotionUpAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "l",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionRightAction",
+    "modes": "NX"
+  },
+  {
+    "keys": "l",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionRightOpPendingAction",
+    "modes": "O"
+  },
+  {
+    "keys": "m",
+    "class": "com.maddyhome.idea.vim.action.motion.mark.MotionMarkAction",
+    "modes": "NX"
+  },
+  {
+    "keys": "n",
+    "class": "com.maddyhome.idea.vim.action.motion.search.SearchAgainNextAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "o",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertNewLineBelowAction",
+    "modes": "N"
+  },
+  {
+    "keys": "o",
+    "class": "com.maddyhome.idea.vim.action.motion.visual.VisualSwapEndsAction",
+    "modes": "X"
+  },
+  {
+    "keys": "p",
+    "class": "com.maddyhome.idea.vim.action.copy.PutTextAfterCursorAction",
+    "modes": "N"
+  },
+  {
+    "keys": "p",
+    "class": "com.maddyhome.idea.vim.action.copy.PutVisualTextAfterCursorAction",
+    "modes": "X"
+  },
+  {
+    "keys": "q",
+    "class": "com.maddyhome.idea.vim.action.macro.ToggleRecordingAction",
+    "modes": "NX"
+  },
+  {
+    "keys": "r",
+    "class": "com.maddyhome.idea.vim.action.change.change.ChangeCharacterAction",
+    "modes": "N"
+  },
+  {
+    "keys": "r",
+    "class": "com.maddyhome.idea.vim.action.change.change.ChangeVisualCharacterAction",
+    "modes": "X"
+  },
+  {
+    "keys": "s",
+    "class": "com.maddyhome.idea.vim.action.change.change.ChangeCharactersAction",
+    "modes": "N"
+  },
+  {
+    "keys": "s",
+    "class": "com.maddyhome.idea.vim.action.change.change.ChangeVisualAction",
+    "modes": "X"
+  },
+  {
+    "keys": "t",
+    "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionRightTillMatchCharAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "u",
+    "class": "com.maddyhome.idea.vim.action.change.UndoAction",
+    "modes": "N"
+  },
+  {
+    "keys": "u",
+    "class": "com.maddyhome.idea.vim.action.change.change.ChangeCaseLowerVisualAction",
+    "modes": "X"
+  },
+  {
+    "keys": "v",
+    "class": "com.maddyhome.idea.vim.action.motion.visual.VisualToggleCharacterModeAction",
+    "modes": "NX"
+  },
+  {
+    "keys": "w",
+    "class": "com.maddyhome.idea.vim.action.motion.text.MotionWordRightAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "x",
+    "class": "com.maddyhome.idea.vim.action.change.delete.DeleteCharacterRightAction",
+    "modes": "N"
+  },
+  {
+    "keys": "x",
+    "class": "com.maddyhome.idea.vim.action.change.delete.DeleteVisualAction",
+    "modes": "X"
+  },
+  {
+    "keys": "y",
+    "class": "com.maddyhome.idea.vim.action.copy.YankMotionAction",
+    "modes": "N"
+  },
+  {
+    "keys": "y",
+    "class": "com.maddyhome.idea.vim.action.copy.YankVisualAction",
+    "modes": "X"
+  },
+  {
+    "keys": "z+",
+    "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollFirstScreenLinePageStartAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "z-",
+    "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenLineStartAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "z.",
+    "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollMiddleScreenLineStartAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "z<CR>",
+    "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollFirstScreenLineStartAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "z<Left>",
+    "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollColumnRightAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "z<Right>",
+    "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollColumnLeftAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "zA",
+    "class": "com.maddyhome.idea.vim.action.fold.VimToggleRegionRecursively",
+    "modes": "NX"
+  },
+  {
+    "keys": "zC",
+    "class": "com.maddyhome.idea.vim.action.fold.VimCollapseRegionRecursively",
+    "modes": "NX"
+  },
+  {
+    "keys": "zD",
     "class": "com.maddyhome.idea.vim.action.fold.VimDeleteFoldsRecursivelyAtCursor",
     "modes": "NX"
   },
   {
     "keys": "zH",
-        "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollHalfWidthRightAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "zL",
-        "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollHalfWidthLeftAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "zM",
-        "class": "com.maddyhome.idea.vim.action.fold.VimCollapseAllRegions",
-        "modes": "NX"
-    },
-    {
-        "keys": "zO",
-        "class": "com.maddyhome.idea.vim.action.fold.VimExpandRegionRecursively",
-        "modes": "NX"
-    },
-    {
-        "keys": "zR",
-        "class": "com.maddyhome.idea.vim.action.fold.VimExpandAllRegions",
-        "modes": "NX"
-    },
-    {
-        "keys": "z^",
-        "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenLinePageStartAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "za",
-        "class": "com.maddyhome.idea.vim.action.fold.VimExpandCollapseToggleRegion",
-        "modes": "NX"
-    },
-    {
-        "keys": "zb",
-        "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenLineAction",
-        "modes": "NXO"
-    },
-    {
-        "keys": "zc",
-        "class": "com.maddyhome.idea.vim.action.fold.VimCollapseRegion",
+    "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollHalfWidthRightAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "zL",
+    "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollHalfWidthLeftAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "zM",
+    "class": "com.maddyhome.idea.vim.action.fold.VimCollapseAllRegions",
+    "modes": "NX"
+  },
+  {
+    "keys": "zO",
+    "class": "com.maddyhome.idea.vim.action.fold.VimExpandRegionRecursively",
+    "modes": "NX"
+  },
+  {
+    "keys": "zR",
+    "class": "com.maddyhome.idea.vim.action.fold.VimExpandAllRegions",
+    "modes": "NX"
+  },
+  {
+    "keys": "z^",
+    "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenLinePageStartAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "za",
+    "class": "com.maddyhome.idea.vim.action.fold.VimExpandCollapseToggleRegion",
+    "modes": "NX"
+  },
+  {
+    "keys": "zb",
+    "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenLineAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "zc",
+    "class": "com.maddyhome.idea.vim.action.fold.VimCollapseRegion",
     "modes": "NX"
   },
   {
     "keys": "zd",
     "class": "com.maddyhome.idea.vim.action.fold.VimDeleteFoldAtCursor",
-        "modes": "NX"
-    },
-    {
-        "keys": "ze",
-        "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenColumnAction",
-        "modes": "NXO"
+    "modes": "NX"
+  },
+  {
+    "keys": "ze",
+    "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenColumnAction",
+    "modes": "NXO"
   },
   {
     "keys": "zf",
@@ -2198,24 +2198,24 @@
     "keys": "zf",
     "class": "com.maddyhome.idea.vim.action.fold.VimCreateFoldVisualAction",
     "modes": "X"
-    },
-    {
-        "keys": "zh",
-        "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollColumnRightAction",
-        "modes": "NXO"
-    },
-    {
-      "keys": "zj",
-      "class": "com.maddyhome.idea.vim.action.fold.VimNextFold",
-      "modes": "NX"
-    },
+  },
+  {
+    "keys": "zh",
+    "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollColumnRightAction",
+    "modes": "NXO"
+  },
+  {
+    "keys": "zj",
+    "class": "com.maddyhome.idea.vim.action.fold.VimNextFold",
+    "modes": "NXO"
+  },
   {
     "keys": "zk",
     "class": "com.maddyhome.idea.vim.action.fold.VimPreviousFold",
-    "modes": "NX"
+    "modes": "NXO"
   },
   {
-        "keys": "zl",
+    "keys": "zl",
     "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollColumnLeftAction",
     "modes": "NXO"
   },

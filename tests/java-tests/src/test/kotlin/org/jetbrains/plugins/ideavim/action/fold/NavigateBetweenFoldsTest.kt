@@ -8,9 +8,13 @@
 
 package org.jetbrains.plugins.ideavim.action.fold
 
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
 
 class NavigateBetweenFoldsTest : FoldActionTestBase() {
 
@@ -521,11 +525,173 @@ class NavigateBetweenFoldsTest : FoldActionTestBase() {
     assertCaretOnLine(4)
   }
 
-  // ============ Helper methods ============
+  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
+  @Test
+  fun `test dzj deletes from cursor to next fold`() {
+    configureByJavaText(
+      """
+          class TestClass {
+              ${c}int x = 5;
+              int y = 10;
+              public void method() {
+                  System.out.println("a");
+                  System.out.println("b");
+              }
+          }
+      """.trimIndent(),
+    )
+    updateFoldRegions()
+
+    typeText("dzj")
+
+    // Linewise delete includes the target line (method declaration)
+    assertState(
+      """
+          class TestClass {
+                  System.out.println("a");
+                  System.out.println("b");
+              }
+          }
+      """.trimIndent(),
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
+  @Test
+  fun `test dzk deletes from cursor to previous fold end`() {
+    configureByJavaText(
+      """
+          class TestClass {
+              public void method() {
+                  System.out.println("a");
+                  System.out.println("b");
+              }
+              ${c}int x = 5;
+              int y = 10;
+          }
+      """.trimIndent(),
+    )
+    updateFoldRegions()
+
+    typeText("dzk")
+
+    // Linewise delete includes the target line (closing brace of method)
+    assertState(
+      """
+          class TestClass {
+              public void method() {
+                  System.out.println("a");
+                  System.out.println("b");
+              ${c}int y = 10;
+          }
+      """.trimIndent(),
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
+  @Test
+  fun `test yzj yanks from cursor to next fold`() {
+    configureByJavaText(
+      """
+          class TestClass {
+              ${c}int x = 5;
+              int y = 10;
+              public void method() {
+                  System.out.println("a");
+                  System.out.println("b");
+              }
+          }
+      """.trimIndent(),
+    )
+    updateFoldRegions()
+
+    typeText("yzj")
+
+    val context = injector.executionContextManager.getEditorExecutionContext(fixture.editor.vim)
+    val regText = injector.registerGroup.getRegister(fixture.editor.vim, context, '0')!!.text
+    // Linewise yank includes all lines from cursor to fold start (inclusive)
+    assertEquals(true, regText.contains("int x = 5"))
+    assertEquals(true, regText.contains("int y = 10"))
+    assertEquals(true, regText.contains("public void method()"))
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
+  @Test
+  fun `test czj changes from cursor to next fold`() {
+    configureByJavaText(
+      """
+          class TestClass {
+              ${c}int x = 5;
+              int y = 10;
+              public void method() {
+                  System.out.println("a");
+                  System.out.println("b");
+              }
+          }
+      """.trimIndent(),
+    )
+    updateFoldRegions()
+
+    typeText("czj")
+
+    // Linewise change deletes lines and enters insert mode
+    assertState(
+      """
+        class TestClass {
+            ${c}
+                System.out.println("a");
+                System.out.println("b");
+            }
+        }
+      """.trimIndent(),
+    )
+    assertMode(Mode.INSERT)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
+  @Test
+  fun `test d2zj deletes to second next fold`() {
+    configureByJavaText(
+      """
+          ${c}class TestClass {
+              public void method1() {
+                  System.out.println("a");
+                  System.out.println("b");
+              }
+              public void method2() {
+                  System.out.println("a");
+                  System.out.println("b");
+              }
+              public void method3() {
+                  System.out.println("a");
+                  System.out.println("b");
+              }
+          }
+      """.trimIndent(),
+    )
+    updateFoldRegions()
+
+    typeText("d2zj")
+
+    // Deletes from class declaration to method2 (inclusive)
+    assertState(
+      """
+                  System.out.println("a");
+                  System.out.println("b");
+              }
+              public void method3() {
+                  System.out.println("a");
+                  System.out.println("b");
+              }
+          }
+      """.trimIndent(),
+    )
+  }
+
 
   private fun assertCaretOnLine(expectedLine: Int) {
     val actualLine = fixture.editor.caretModel.logicalPosition.line
-    kotlin.test.assertEquals(
+    assertEquals(
       expectedLine,
       actualLine,
       "Caret should be on line $expectedLine but was on line $actualLine"
