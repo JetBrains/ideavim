@@ -11,10 +11,12 @@ package org.jetbrains.plugins.ideavim.action.fold
 import com.intellij.codeInsight.folding.CodeFoldingManager
 import com.intellij.codeInsight.folding.impl.FoldingUtil
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.editor.FoldRegion
 import com.intellij.openapi.util.TextRange
 import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimJavaTestCase
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 abstract class FoldActionTestBase : VimJavaTestCase() {
 
@@ -52,10 +54,7 @@ abstract class FoldActionTestBase : VimJavaTestCase() {
 
   protected fun assertMethodFoldIsOpen() {
     ApplicationManager.getApplication().invokeAndWait {
-      val allFolds = fixture.editor.foldingModel.allFoldRegions.sortedBy { it.startOffset }
-      val methodFold = allFolds.firstOrNull {
-        fixture.editor.document.getLineNumber(it.startOffset) == 1
-      }
+      val methodFold = findFoldAtLine(1)
       assertEquals(true, methodFold?.isExpanded, "Method fold should be open")
     }
   }
@@ -122,6 +121,38 @@ abstract class FoldActionTestBase : VimJavaTestCase() {
       deepFolds.forEach { fold ->
         assertEquals(false, fold.isExpanded, "Deep folds should still be closed")
       }
+    }
+  }
+
+  protected fun findFoldAtLine(line: Int): FoldRegion? {
+    return fixture.editor.foldingModel.allFoldRegions.firstOrNull {
+      fixture.editor.document.getLineNumber(it.startOffset) == line
+    }
+  }
+
+  protected fun assertFoldExists(startLine: Int, endLine: Int) {
+    ApplicationManager.getApplication().invokeAndWait {
+      val fold = findFoldAtLine(startLine)
+      assertNotNull(fold, "Expected fold to exist starting at line $startLine")
+      val foldEndLine = fixture.editor.document.getLineNumber(fold.endOffset)
+      assertEquals(endLine, foldEndLine, "Fold should end at line $endLine")
+    }
+  }
+
+  protected fun assertFoldExistsAndClosed(startLine: Int, endLine: Int) {
+    ApplicationManager.getApplication().invokeAndWait {
+      val fold = findFoldAtLine(startLine)
+      assertNotNull(fold, "Expected fold to exist starting at line $startLine")
+      val foldEndLine = fixture.editor.document.getLineNumber(fold.endOffset)
+      assertEquals(endLine, foldEndLine, "Fold should end at line $endLine")
+      assertEquals(false, fold.isExpanded, "Fold should be closed")
+    }
+  }
+
+  protected fun assertNoFoldAtLine(line: Int) {
+    ApplicationManager.getApplication().invokeAndWait {
+      val fold = findFoldAtLine(line)
+      assertEquals(null, fold, "Expected no fold at line $line but found one")
     }
   }
 }

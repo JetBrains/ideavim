@@ -11,12 +11,17 @@ package com.maddyhome.idea.vim.action.fold
 import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimFoldRegion
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VimActionHandler
+import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 
 @CommandOrMotion(keys = ["zM"], modes = [Mode.NORMAL, Mode.VISUAL])
 class VimCollapseAllRegions : VimActionHandler.SingleExecution() {
@@ -206,6 +211,89 @@ class VimDecrementFoldLevel : VimActionHandler.SingleExecution() {
     val newLevel = (currentLevel - cmd.count).coerceAtLeast(0)
     FoldState.setFoldLevel(editor, newLevel)
     return true
+  }
+}
+
+@CommandOrMotion(keys = ["zf"], modes = [Mode.NORMAL])
+class VimCreateFoldMotionAction : VimActionHandler.SingleExecution() {
+
+  override val type: Command.Type = Command.Type.OTHER_WRITABLE
+  override val argumentType: Argument.Type = Argument.Type.MOTION
+
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    val argument = cmd.argument ?: return false
+    val range = injector.motion.getMotionRange(editor, editor.primaryCaret(), context, argument, operatorArguments)
+      ?: return false
+    val endOffset = getEndOffset(range, argument, editor)
+
+    editor.createFoldRegion(range.startOffset, endOffset, collapse = true)
+    return true
+  }
+
+  private fun getEndOffset(
+    range: TextRange,
+    argument: Argument,
+    editor: VimEditor,
+  ): Int {
+    // if last char is \n we want to exclude it so next line won't be collapsed
+    if ((argument as Argument.Motion).isLinewiseMotion() && editor.charAt(range.endOffset - 1) == '\n') {
+      return range.endOffset - 1
+    }
+    return range.endOffset
+  }
+}
+
+@CommandOrMotion(keys = ["zf"], modes = [Mode.VISUAL])
+class VimCreateFoldVisualAction : VisualOperatorActionHandler.ForEachCaret() {
+
+  override val type: Command.Type = Command.Type.OTHER_WRITABLE
+
+  override fun executeAction(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    cmd: Command,
+    range: VimSelection,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    val textRange = range.toVimTextRange(true)
+    editor.createFoldRegion(textRange.startOffset, textRange.endOffset, collapse = true)
+    return true
+  }
+}
+
+@CommandOrMotion(keys = ["zd"], modes = [Mode.NORMAL, Mode.VISUAL])
+class VimDeleteFoldAtCursor : VimActionHandler.SingleExecution() {
+
+  override val type: Command.Type = Command.Type.OTHER_WRITABLE
+
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    return editor.deleteFoldRegionAtOffset(editor.currentCaret().offset)
+  }
+}
+
+@CommandOrMotion(keys = ["zD"], modes = [Mode.NORMAL, Mode.VISUAL])
+class VimDeleteFoldsRecursivelyAtCursor : VimActionHandler.SingleExecution() {
+
+  override val type: Command.Type = Command.Type.OTHER_WRITABLE
+
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    return editor.deleteFoldRegionsRecursivelyAtOffset(editor.currentCaret().offset)
   }
 }
 

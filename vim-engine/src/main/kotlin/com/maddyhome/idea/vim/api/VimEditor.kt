@@ -274,6 +274,45 @@ interface VimEditor {
   fun getMaxFoldDepth(): Int
 
   /**
+   * Creates a new fold region in the editor.
+   *
+   * This method creates a manual fold region covering the specified range. The fold is created
+   * in a collapsed state by default (matching Vim's zf behavior).
+   *
+   * @param startOffset the start offset of the fold region (must be less than endOffset)
+   * @param endOffset the end offset of the fold region (must be greater than startOffset)
+   * @param collapse whether the fold should be collapsed after creation (default: true)
+   * @return the created fold region, or null if the fold could not be created
+   * @throws IllegalArgumentException if startOffset >= endOffset
+   */
+  fun createFoldRegion(startOffset: Int, endOffset: Int, collapse: Boolean = true): VimFoldRegion?
+
+  /**
+   * Deletes the fold region at the specified offset.
+   *
+   * This method finds and removes the innermost fold region containing the given offset.
+   * Only the immediate fold is deleted; nested folds are preserved.
+   *
+   * Note: This can remove any type of folds, including those created by IntelliJ itself.
+   * However, IntelliJ automatically recreates its folds (e.g., code folding regions) when needed.
+   *
+   * @param offset the offset where the fold should be deleted
+   * @return true if a fold was deleted, false if no fold was found at the offset
+   */
+  fun deleteFoldRegionAtOffset(offset: Int): Boolean
+
+  /**
+   * Deletes the fold region at the specified offset and all nested folds recursively.
+   *
+   * This method finds and removes the innermost fold region containing the given offset,
+   * as well as all folds nested within it.
+   *
+   * @param offset the offset where folds should be deleted
+   * @return true if any folds were deleted, false if no fold was found at the offset
+   */
+  fun deleteFoldRegionsRecursivelyAtOffset(offset: Int): Boolean
+
+  /**
    * Mostly related to Fleet. After the editor is modified, the carets are modified. You can't use the old caret
    *   instance and need to search for a new version.
    */
