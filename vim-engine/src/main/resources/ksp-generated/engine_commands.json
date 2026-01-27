@@ -2130,6 +2130,11 @@
     "modes": "NX"
   },
   {
+    "keys": "zD",
+    "class": "com.maddyhome.idea.vim.action.fold.VimDeleteFoldsRecursivelyAtCursor",
+    "modes": "NX"
+  },
+  {
     "keys": "zH",
     "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollHalfWidthRightAction",
     "modes": "NXO"
@@ -2175,9 +2180,24 @@
     "modes": "NX"
   },
   {
+    "keys": "zd",
+    "class": "com.maddyhome.idea.vim.action.fold.VimDeleteFoldAtCursor",
+    "modes": "NX"
+  },
+  {
     "keys": "ze",
     "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenColumnAction",
     "modes": "NXO"
+  },
+  {
+    "keys": "zf",
+    "class": "com.maddyhome.idea.vim.action.fold.VimCreateFoldMotionAction",
+    "modes": "N"
+  },
+  {
+    "keys": "zf",
+    "class": "com.maddyhome.idea.vim.action.fold.VimCreateFoldVisualAction",
+    "modes": "X"
   },
   {
     "keys": "zh",

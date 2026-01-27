@@ -798,6 +798,22 @@ class VimRegex(pattern: String) {
       return 0
     }
 
+    override fun createFoldRegion(
+      startOffset: Int,
+      endOffset: Int,
+      collapse: Boolean,
+    ): VimFoldRegion? {
+      return null
+    }
+
+    override fun deleteFoldRegionAtOffset(offset: Int): Boolean {
+      return false
+    }
+
+    override fun deleteFoldRegionsRecursivelyAtOffset(offset: Int): Boolean {
+      return false
+    }
+
     override fun <T : ImmutableVimCaret> findLastVersionOfCaret(caret: T): T? {
       return null
     }
