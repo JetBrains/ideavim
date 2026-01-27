@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -223,7 +223,7 @@ class SearchGroupTest : VimTestCase() {
     ) {
       enterCommand("set nowrapscan")
     }
-    assertPluginError(false)
+    assertPluginError(true)
     assertPluginErrorMessage("E385: Search hit BOTTOM without match for: one")
   }
 
@@ -242,7 +242,7 @@ class SearchGroupTest : VimTestCase() {
         three
       """.trimIndent()
     )
-    assertPluginError(false)
+    assertPluginError(true)
     assertPluginErrorMessage("E486: Pattern not found: banana")
   }
 
@@ -282,7 +282,7 @@ class SearchGroupTest : VimTestCase() {
     ) {
       enterCommand("set nowrapscan")
     }
-    assertPluginError(false)
+    assertPluginError(true)
     assertPluginErrorMessage("E384: Search hit TOP without match for: three")
   }
 
@@ -301,7 +301,7 @@ class SearchGroupTest : VimTestCase() {
         three
       """.trimIndent()
     )
-    assertPluginError(false)
+    assertPluginError(true)
     assertPluginErrorMessage("E486: Pattern not found: banana")
   }
 
@@ -615,7 +615,7 @@ class SearchGroupTest : VimTestCase() {
     )
     enterCommand("set nowrapscan")
     typeText("10", "/", searchCommand("one"))
-    assertPluginError(false)
+    assertPluginError(true)
     assertPluginErrorMessage("E385: Search hit BOTTOM without match for: one")
     assertPosition(2, 0)
   }
@@ -679,7 +679,7 @@ class SearchGroupTest : VimTestCase() {
     )
     enterCommand("set nowrapscan")
     typeText("12", "?one<CR>")
-    assertPluginError(false)
+    assertPluginError(true)
     assertPluginErrorMessage("E384: Search hit TOP without match for: one")
     assertPosition(8, 0)
   }

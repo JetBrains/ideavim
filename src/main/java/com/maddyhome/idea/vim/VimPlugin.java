@@ -37,7 +37,6 @@ import com.maddyhome.idea.vim.helper.MacKeyRepeat;
 import com.maddyhome.idea.vim.listener.VimListenerManager;
 import com.maddyhome.idea.vim.newapi.IjVimInjectorKt;
 import com.maddyhome.idea.vim.newapi.IjVimSearchGroup;
-import com.maddyhome.idea.vim.thinapi.IjPluginExtensionsScanner;
 import com.maddyhome.idea.vim.ui.StatusBarIconFactory;
 import com.maddyhome.idea.vim.vimscript.services.VariableService;
 import com.maddyhome.idea.vim.yank.YankGroupBase;
@@ -248,7 +247,10 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static void showMessage(@Nls(capitalization = Nls.Capitalization.Sentence) @Nullable String msg) {
-    VimInjectorKt.getInjector().getMessages().showErrorMessage(null, msg);
+    VimEditor editor = VimInjectorKt.getInjector().getEditorGroup().getFocusedEditor();
+    if (editor != null) {
+      VimInjectorKt.getInjector().getMessages().showErrorMessage(editor, msg);
+    }
   }
 
   public static @NotNull VimPlugin getInstance() {

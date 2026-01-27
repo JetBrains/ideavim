@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2024 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,9 +8,15 @@
 
 package com.maddyhome.idea.vim.api
 
+import java.awt.Color
 import javax.swing.KeyStroke
 
 interface VimOutputPanel {
+  /**
+   * Whether the output panel is currently active and visible.
+   */
+  val isActive: Boolean
+
   /**
    * The current text displayed in the output panel.
    * The actual text may be different (if we called the [addText] method and did not call [show] afterward)
@@ -30,8 +36,9 @@ interface VimOutputPanel {
    *
    * @param text The text to append.
    * @param isNewLine Whether to start the appended text on a new line. Defaults to true.
+   * @param color Optional color for the text. If null, uses default foreground color.
    */
-  fun addText(text: String, isNewLine: Boolean = true)
+  fun addText(text: String, isNewLine: Boolean = true, color: Color? = null)
 
   /**
    * This method shows the text output or updates the output text if the panel was already shown

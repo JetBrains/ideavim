@@ -250,13 +250,13 @@ abstract class VimSearchGroupBase : VimSearchGroup {
      *   "\&": use previous substitute pattern.
      */
     if (argument.isEmpty()) {
-      messages.showErrorMessage(null, messages.message("E148"))
+      injector.editorGroup.getFocusedEditor()?.let { messages.showErrorMessage(it, messages.message("E148")) }
       messages.indicateError()
       return null
     } else if (cmd.charAt() == '\\') {
       cmd.inc()
       if ("/?&".indexOf(cmd.charAt()) == -1) {
-        messages.showErrorMessage(null, messages.message("E10"))
+        injector.editorGroup.getFocusedEditor()?.let { messages.showErrorMessage(it, messages.message("E10")) }
         return null
       }
       whichPat = if (cmd.charAt() == '&') 1 /* RE_SUBST */ else 0 /* RE_SEARCH */
@@ -396,7 +396,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
         isNewPattern = true
         pattern = lastSubstitutePattern
         if (pattern.isNullOrEmpty()) {
-          injector.messages.showErrorMessage(null, "E35: No previous regular expression")
+          injector.messages.showErrorMessage(editor, "E35: No previous regular expression")
           return null
         }
       }
@@ -645,7 +645,8 @@ abstract class VimSearchGroupBase : VimSearchGroup {
       )
       if (lineToNextSubstitute == null) {
         injector.messages.indicateError()
-        injector.messages.showErrorMessage(null, "E486: Pattern not found: $pattern")
+        injector.editorGroup.getFocusedEditor()
+          ?.let { injector.messages.showErrorMessage(it, "E486: Pattern not found: $pattern") }
         return true
       }
       val (line, nextSubstitute) = lineToNextSubstitute
@@ -854,7 +855,8 @@ abstract class VimSearchGroupBase : VimSearchGroup {
       if (lastMatchLine != -1) {
         caret.moveToOffset(injector.motion.moveCaretToLineStartSkipLeading(editor, lastMatchLine))
       } else {
-        injector.messages.showErrorMessage(null, "E486: Pattern not found: $pattern")
+        injector.editorGroup.getFocusedEditor()
+          ?.let { injector.messages.showErrorMessage(it, "E486: Pattern not found: $pattern") }
       }
     }
 
@@ -863,7 +865,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     // todo throw multiple exceptions at once
     if (exceptions.isNotEmpty()) {
       injector.messages.indicateError()
-      injector.messages.showErrorMessage(null, exceptions[0].message)
+      injector.editorGroup.getFocusedEditor()?.let { injector.messages.showErrorMessage(it, exceptions[0].message) }
     }
   }
 
@@ -1062,7 +1064,8 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     ) {
       // don't accept alphanumeric for separator
       if (exarg.first().isLetter()) {
-        injector.messages.showErrorMessage(null, "E146: Regular expressions can't be delimited by letters")
+        injector.editorGroup.getFocusedEditor()
+          ?.let { injector.messages.showErrorMessage(it, "E146: Regular expressions can't be delimited by letters") }
         return null
       }
 
@@ -1074,7 +1077,8 @@ abstract class VimSearchGroupBase : VimSearchGroup {
       var substituteStringStartIndex = 0
       if (exarg.first() == '\\') {
         if (exarg.length < 2 || !"/?&".contains(exarg[1])) {
-          injector.messages.showErrorMessage(null, "E10: \\ should be followed by /, ? or &")
+          injector.editorGroup.getFocusedEditor()
+            ?.let { injector.messages.showErrorMessage(it, "E10: \\ should be followed by /, ? or &") }
           return null
         }
         if (exarg[1] != '&') {
@@ -1114,7 +1118,8 @@ abstract class VimSearchGroupBase : VimSearchGroup {
       // use previous pattern and substitution
       if (lastSubstituteString == null) {
         // there is no previous command
-        injector.messages.showErrorMessage(null, "E33: No previous substitute regular expression")
+        injector.editorGroup.getFocusedEditor()
+          ?.let { injector.messages.showErrorMessage(it, "E33: No previous substitute regular expression") }
         return null
       }
       pattern = null
@@ -1176,7 +1181,8 @@ abstract class VimSearchGroupBase : VimSearchGroup {
         trailingOptionsEndIndex++
       }
       if (count <= 0 && doError) {
-        injector.messages.showErrorMessage(null, injector.messages.message("command.substitute.zero.count"))
+        injector.editorGroup.getFocusedEditor()
+          ?.let { injector.messages.showErrorMessage(it, injector.messages.message("command.substitute.zero.count")) }
         return null
       }
       line1 = line2
@@ -1186,14 +1192,24 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     // check for trailing command or garbage
     if (trailingOptionsEndIndex < exarg.length && exarg[trailingOptionsEndIndex] != '"') {
       // if not end-of-line or comment
-      injector.messages.showErrorMessage(null, injector.messages.message("command.substitute.trailing.characters"))
+      injector.editorGroup.getFocusedEditor()?.let {
+        injector.messages.showErrorMessage(
+          it,
+          injector.messages.message("command.substitute.trailing.characters")
+        )
+      }
       return null
     }
 
     // check for trailing command or garbage
     if (trailingOptionsEndIndex < exarg.length && exarg[trailingOptionsEndIndex] != '"') {
       // if not end-of-line or comment
-      injector.messages.showErrorMessage(null, injector.messages.message("command.substitute.trailing.characters"))
+      injector.editorGroup.getFocusedEditor()?.let {
+        injector.messages.showErrorMessage(
+          it,
+          injector.messages.message("command.substitute.trailing.characters")
+        )
+      }
       return null
     }
 
@@ -1217,7 +1233,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
 
       // Pattern was never defined
       if (pattern == null) {
-        injector.messages.showErrorMessage(null, errorMessage)
+        injector.editorGroup.getFocusedEditor()?.let { injector.messages.showErrorMessage(it, errorMessage) }
         return null
       }
     }
@@ -1385,7 +1401,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
 
     val pattern = getLastUsedPattern()
     if (!pattern.isNullOrEmpty()) {
-      injector.messages.showErrorMessage(editor, (if (dir === Direction.FORWARDS) "/" else "?") + pattern)
+      injector.messages.showMessage(editor, (if (dir === Direction.FORWARDS) "/" else "?") + pattern)
     }
 
     // Uses last pattern. We know this is always set before being called

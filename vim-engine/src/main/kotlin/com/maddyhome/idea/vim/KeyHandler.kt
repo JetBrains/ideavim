@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -22,8 +22,8 @@ import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.key.KeyStack
 import com.maddyhome.idea.vim.key.consumers.CharArgumentConsumer
-import com.maddyhome.idea.vim.key.consumers.CommandKeyConsumer
 import com.maddyhome.idea.vim.key.consumers.CommandCountConsumer
+import com.maddyhome.idea.vim.key.consumers.CommandKeyConsumer
 import com.maddyhome.idea.vim.key.consumers.DeleteCommandCountConsumer
 import com.maddyhome.idea.vim.key.consumers.DigraphConsumer
 import com.maddyhome.idea.vim.key.consumers.EditorResetConsumer

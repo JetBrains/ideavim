@@ -349,7 +349,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     if (result is VimMatchResult.Failure && wrapscan) {
       if (showMessages) {
         // search hit BOTTOM, continuing at TOP
-        injector.messages.showErrorMessage(editor, injector.messages.message("message.search.hit.bottom"))
+        injector.messages.showMessage(editor, injector.messages.message("message.search.hit.bottom"))
       }
       // Start searching from the start of the file, but accept a match at the start offset
       val newOptions = options.clone().also { it.add(VimRegexOptions.CAN_MATCH_START_LOCATION) }
@@ -370,7 +370,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     if (result is VimMatchResult.Failure && wrapscan) {
       if (showMessages) {
         // search hit TOP, continuing at BOTTOM
-        injector.messages.showErrorMessage(editor, injector.messages.message("message.search.hit.top"))
+        injector.messages.showMessage(editor, injector.messages.message("message.search.hit.top"))
       }
       return regex.findPrevious(editor, editor.fileSize().toInt() - 1, options)
     }

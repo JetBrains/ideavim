@@ -19,7 +19,7 @@ import kotlin.math.ceil
 
 private val logger = vimLogger<VimDigraphGroup>()
 
-open class VimDigraphGroupBase() : VimDigraphGroup {
+open class VimDigraphGroupBase : VimDigraphGroup {
 
   override fun getCharacterForDigraph(ch1: Char, ch2: Char): Int {
     fun getCodepoint(ch1: Char, ch2: Char, digraphs: Map<String, Int>): Int? {
@@ -49,7 +49,7 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     val digraphText = if (digraph == null) "" else ", Digr $digraph"
 
     if (codepoint < 0x100) {
-      injector.messages.showErrorMessage(
+      injector.messages.showMessage(
         editor,
         String.format(
           "<%s>  %d,  Hex %02x,  Oct %03o%s",
@@ -61,7 +61,7 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
         ),
       )
     } else {
-      injector.messages.showErrorMessage(
+      injector.messages.showMessage(
         editor,
         String.format(
           "<%s> %d, Hex %04x, Oct %o%s",

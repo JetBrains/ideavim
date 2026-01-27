@@ -70,7 +70,9 @@ class FileGroup : VimFileBase() {
         return true
       }
     } else {
-      injector.messages.showErrorMessage(null, injector.messages.message("message.open.file.not.found", filename))
+      injector.editorGroup.getFocusedEditor()?.let { editor ->
+        injector.messages.showErrorMessage(editor, injector.messages.message("message.open.file.not.found", filename))
+      }
 
       return false
     }

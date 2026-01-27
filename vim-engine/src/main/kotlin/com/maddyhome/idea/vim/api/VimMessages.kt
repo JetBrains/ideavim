@@ -12,7 +12,18 @@ import com.maddyhome.idea.vim.helper.EngineMessageHelper
 import org.jetbrains.annotations.PropertyKey
 
 interface VimMessages {
-  fun showErrorMessage(editor: VimEditor?, message: String?)
+  /**
+   * Displays an informational message to the user.
+   * The message panel closes on any keystroke and passes the key through to the editor.
+   */
+  fun showMessage(editor: VimEditor, message: String?)
+
+  /**
+   * Displays an error message to the user (typically in red).
+   * The message panel closes on any keystroke and passes the key through to the editor.
+   */
+  fun showErrorMessage(editor: VimEditor, message: String?)
+
   fun getStatusBarMessage(): String?
   fun clearStatusBarMessage()
   fun indicateError()

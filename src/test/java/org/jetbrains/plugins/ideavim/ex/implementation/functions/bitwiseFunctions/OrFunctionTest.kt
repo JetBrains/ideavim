@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2025 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -43,7 +43,6 @@ class OrFunctionTest : VimTestCase() {
   @Test
   fun `test or function with list causes error`() {
     enterCommand("echo or([1, 2, 3], [2, 3, 4])")
-    assertNoOutput()
     assertPluginError(true)
     assertPluginErrorMessage("E745: Using a List as a Number")
   }
@@ -51,7 +50,6 @@ class OrFunctionTest : VimTestCase() {
   @Test
   fun `test or function with dict causes error`() {
     enterCommand("echo or({1: 2, 3: 4}, {3: 4, 5: 6})")
-    assertNoOutput()
     assertPluginError(true)
     assertPluginErrorMessage("E728: Using a Dictionary as a Number")
   }
@@ -59,7 +57,6 @@ class OrFunctionTest : VimTestCase() {
   @Test
   fun `test or function with float causes error`() {
     enterCommand("echo or(1.5, 2.5)")
-    assertNoOutput()
     assertPluginError(true)
     assertPluginErrorMessage("E805: Using a Float as a Number")
   }

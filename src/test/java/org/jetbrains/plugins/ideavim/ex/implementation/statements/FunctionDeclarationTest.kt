@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -55,7 +55,8 @@ class FunctionDeclarationTest : VimTestCase() {
       )
     )
     enterCommand("call test(printArg(1), printArg(2), printArg(3))")
-    assertOutput("""
+    assertOutput(
+      """
         |arg: 1
         |arg: 2
         |arg: 3
@@ -207,7 +208,12 @@ class FunctionDeclarationTest : VimTestCase() {
     typeText(commandToKeys("echo F1()"))
     assertPluginError(true)
     assertPluginErrorMessage("E121: Undefined variable: x")
-    assertOutput("0")
+    assertOutput(
+      """
+      E121: Undefined variable: x
+      0
+    """.trimIndent()
+    )
 
     typeText(commandToKeys("delf! F1"))
     typeText(commandToKeys("delf! F2"))
