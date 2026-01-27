@@ -19,6 +19,7 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.impl.EditorComponentImpl
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.DumbAware
@@ -29,12 +30,14 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.handler.enableOctopus
 import com.maddyhome.idea.vim.handler.isOctopusEnabled
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.HandlerInjector
+import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.helper.isPrimaryEditor
@@ -98,7 +101,7 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
   }
 
   // There is a chance that we can use BGT, but we call for isCell inside the update.
-  // Not sure if can can use BGT with this call. Let's use EDT for now.
+  // Not sure if we can use BGT with this call. Let's use EDT for now.
   override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.EDT
 
   override fun update(e: AnActionEvent) {
@@ -173,6 +176,24 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
       }
     }
 
+    if (keyCode == KeyEvent.VK_TAB && editor.inInsertMode) {
+      // IdeaVim will handle Tab, and in Insert mode, will invoke the platform's TabAction to insert the tab character.
+      // (Other Tab features are handled by IDE actions called before VimShortcutKeyAction).
+      // Single line editors or editors hosted in a dialog/tool window do not accept/insert Tab, and TabAction is
+      // disabled. In fact, all actions are disabled and normal Swing handling will move the focus to the next
+      // component. Disable this action in the same circumstances, unless the user explicitly maps Tab.
+      // TODO: Should this also ignore Tab in Normal mode?
+      // This is a valid Vim action (navigating jump list), but unlikely in a single line or embedded editor.
+      if (injector.keyGroup.getKeyMapping(MappingMode.INSERT).get(listOf(keyStroke)) == null) {
+        if (editor.isOneLineMode || (editor as? EditorEx)?.isEmbeddedIntoDialogWrapper == true || editor.isViewer) {
+          return ActionEnableStatus.no(
+            "Tab should be ignored when editor is in one line mode, embedded into a dialog wrapper or is a readonly viewer",
+            LogLevel.INFO
+          )
+        }
+      }
+    }
+
     if (keyStroke in VIM_ONLY_EDITOR_KEYS) {
       return ActionEnableStatus.yes("Vim only editor keys", LogLevel.INFO)
     }
@@ -186,7 +207,7 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
 
       ShortcutOwner.IDE -> {
         if (!isShortcutConflict(keyStroke)) {
-          ActionEnableStatus.yes("Owner is IDE, but no actionve shortcut conflict", LogLevel.DEBUG)
+          ActionEnableStatus.yes("Owner is IDE, but no actions have shortcut conflict", LogLevel.DEBUG)
         } else {
           ActionEnableStatus.no("Owner is IDE", LogLevel.DEBUG)
         }
@@ -252,7 +273,7 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
    *   <C-W> by IdeaVim.
    *
    * The list of keys that should be processed by IDE is stored in the "lookupKeys" option. So, we should search
-   *   if the pressed key is presented in this list. The caches are used to speedup the process.
+   *   if the pressed key is presented in this list. The caches are used to speed up the process.
    */
   private object LookupKeys {
     fun isEnabledForLookup(keyStroke: KeyStroke): Boolean {
