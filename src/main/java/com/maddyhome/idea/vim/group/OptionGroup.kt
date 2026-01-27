@@ -1357,10 +1357,22 @@ private class FoldLevelOptionMapper : LocalOptionValueOverride<VimInt> {
     val maxDepth = editor.getMaxFoldDepth()
     val coercedLevel = newValue.value.value.coerceIn(0, maxDepth + 1)
 
-    editor.applyFoldLevel(coercedLevel)
+    // When a new window opens, setLocalValue is called twice: first from copyLocalToWindowLocalValues,
+    // then from initialiseLocalToWindowOptions. We skip applyFoldLevel in both cases to preserve
+    // IntelliJ's default fold state. The first call has storedValue=null, and the second has both
+    // storedValue and newValue as Default - these conditions define initialization.
+    if (!isInitializing(storedValue, newValue)) {
+      editor.applyFoldLevel(coercedLevel)
+    }
 
     return storedValue?.value?.value != coercedLevel
   }
+
+  private fun isInitializing(
+    storedValue: OptionValue<VimInt>?,
+    newValue: OptionValue<VimInt>,
+  ): Boolean = storedValue == null ||
+    (storedValue is OptionValue.Default && newValue is OptionValue.Default)
 }
 
 
