@@ -1,4 +1,4 @@
 {
-    "has": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.HasFunctionHandler",
-    "pumvisible": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.PopupMenuVisibleFunctionHandler"
+  "has": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.HasFunctionHandler",
+  "pumvisible": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.PopupMenuVisibleFunctionHandler"
 }

@@ -1,82 +1,82 @@
 [
-    {
-        "keys": ".",
-        "class": "com.maddyhome.idea.vim.action.change.RepeatChangeAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<C-I>",
-        "class": "com.maddyhome.idea.vim.action.editor.VimEditorTab",
-        "modes": "I"
-    },
-    {
-        "keys": "<C-L>",
-        "class": "com.maddyhome.idea.vim.action.RedrawAction",
-        "modes": "N"
-    },
-    {
-        "keys": "<Del>",
-        "class": "com.maddyhome.idea.vim.action.editor.VimEditorDelete",
-        "modes": "I"
-    },
-    {
-        "keys": "<Down>",
-        "class": "com.maddyhome.idea.vim.action.editor.VimEditorDown",
-        "modes": "I"
-    },
-    {
-        "keys": "<Tab>",
-        "class": "com.maddyhome.idea.vim.action.editor.VimEditorTab",
-        "modes": "I"
-    },
-    {
-        "keys": "<Up>",
-        "class": "com.maddyhome.idea.vim.action.editor.VimEditorUp",
-        "modes": "I"
-    },
-    {
-        "keys": "<kDown>",
-        "class": "com.maddyhome.idea.vim.action.editor.VimEditorDown",
-        "modes": "I"
-    },
-    {
-        "keys": "<kUp>",
-        "class": "com.maddyhome.idea.vim.action.editor.VimEditorUp",
-        "modes": "I"
-    },
-    {
-        "keys": "J",
-        "class": "com.maddyhome.idea.vim.action.change.delete.DeleteJoinLinesSpacesAction",
-        "modes": "N"
-    },
-    {
-        "keys": "J",
-        "class": "com.maddyhome.idea.vim.action.change.delete.DeleteJoinVisualLinesSpacesAction",
-        "modes": "X"
-    },
-    {
-        "keys": "K",
-        "class": "com.maddyhome.idea.vim.action.editor.VimQuickJavaDoc",
-        "modes": "N"
-    },
-    {
-        "keys": "g@",
-        "class": "com.maddyhome.idea.vim.action.change.OperatorAction",
-        "modes": "N"
-    },
-    {
-        "keys": "g@",
-        "class": "com.maddyhome.idea.vim.action.change.VisualOperatorAction",
-        "modes": "X"
-    },
-    {
-        "keys": "gJ",
-        "class": "com.maddyhome.idea.vim.action.change.delete.DeleteJoinLinesAction",
-        "modes": "N"
-    },
-    {
-        "keys": "gJ",
-        "class": "com.maddyhome.idea.vim.action.change.delete.DeleteJoinVisualLinesAction",
-        "modes": "X"
-    }
+  {
+    "keys": ".",
+    "class": "com.maddyhome.idea.vim.action.change.RepeatChangeAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-I>",
+    "class": "com.maddyhome.idea.vim.action.editor.VimEditorTab",
+    "modes": "I"
+  },
+  {
+    "keys": "<C-L>",
+    "class": "com.maddyhome.idea.vim.action.RedrawAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<Del>",
+    "class": "com.maddyhome.idea.vim.action.editor.VimEditorDelete",
+    "modes": "I"
+  },
+  {
+    "keys": "<Down>",
+    "class": "com.maddyhome.idea.vim.action.editor.VimEditorDown",
+    "modes": "I"
+  },
+  {
+    "keys": "<Tab>",
+    "class": "com.maddyhome.idea.vim.action.editor.VimEditorTab",
+    "modes": "I"
+  },
+  {
+    "keys": "<Up>",
+    "class": "com.maddyhome.idea.vim.action.editor.VimEditorUp",
+    "modes": "I"
+  },
+  {
+    "keys": "<kDown>",
+    "class": "com.maddyhome.idea.vim.action.editor.VimEditorDown",
+    "modes": "I"
+  },
+  {
+    "keys": "<kUp>",
+    "class": "com.maddyhome.idea.vim.action.editor.VimEditorUp",
+    "modes": "I"
+  },
+  {
+    "keys": "J",
+    "class": "com.maddyhome.idea.vim.action.change.delete.DeleteJoinLinesSpacesAction",
+    "modes": "N"
+  },
+  {
+    "keys": "J",
+    "class": "com.maddyhome.idea.vim.action.change.delete.DeleteJoinVisualLinesSpacesAction",
+    "modes": "X"
+  },
+  {
+    "keys": "K",
+    "class": "com.maddyhome.idea.vim.action.editor.VimQuickJavaDoc",
+    "modes": "N"
+  },
+  {
+    "keys": "g@",
+    "class": "com.maddyhome.idea.vim.action.change.OperatorAction",
+    "modes": "N"
+  },
+  {
+    "keys": "g@",
+    "class": "com.maddyhome.idea.vim.action.change.VisualOperatorAction",
+    "modes": "X"
+  },
+  {
+    "keys": "gJ",
+    "class": "com.maddyhome.idea.vim.action.change.delete.DeleteJoinLinesAction",
+    "modes": "N"
+  },
+  {
+    "keys": "gJ",
+    "class": "com.maddyhome.idea.vim.action.change.delete.DeleteJoinVisualLinesAction",
+    "modes": "X"
+  }
 ]
