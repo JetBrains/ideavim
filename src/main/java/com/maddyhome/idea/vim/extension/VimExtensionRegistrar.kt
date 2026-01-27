@@ -70,6 +70,7 @@ internal object VimExtensionRegistrar : VimExtensionRegistrator {
         PluginState.Util.enabledExtensions.add(name)
       } else {
         extensionBean.instance.dispose()
+        PluginState.Util.enabledExtensions.remove(name)
       }
     }
   }
@@ -109,6 +110,7 @@ internal object VimExtensionRegistrar : VimExtensionRegistrator {
     registeredExtensions.remove(name)
     removeAliases(extension)
     extension.instance.dispose()
+    PluginState.Util.enabledExtensions.remove(name)
     VimPlugin.getOptionGroup().removeOption(name)
     remove(name)
     logger.info("IdeaVim extension '$name' disposed")
