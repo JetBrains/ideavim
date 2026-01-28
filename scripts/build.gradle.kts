@@ -26,11 +26,11 @@ dependencies {
   testImplementation("org.junit.jupiter:junit-jupiter:6.0.1")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-  implementation("io.ktor:ktor-client-core:3.3.3")
-  implementation("io.ktor:ktor-client-cio:3.3.3")
-  implementation("io.ktor:ktor-client-content-negotiation:3.3.3")
-  implementation("io.ktor:ktor-serialization-kotlinx-json:3.3.3")
-  implementation("io.ktor:ktor-client-auth:3.3.3")
+  implementation("io.ktor:ktor-client-core:3.4.0")
+  implementation("io.ktor:ktor-client-cio:3.4.0")
+  implementation("io.ktor:ktor-client-content-negotiation:3.4.0")
+  implementation("io.ktor:ktor-serialization-kotlinx-json:3.4.0")
+  implementation("io.ktor:ktor-client-auth:3.4.0")
   implementation("org.eclipse.jgit:org.eclipse.jgit:6.6.0.202305301015-r")
 
   // This is needed for jgit to connect to ssh
