@@ -17,14 +17,14 @@ import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
- * see "h :first"
+ * see "h :bfirst"
  */
-@ExCommand(command = "fir[st]")
-data class SelectFirstFileCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
+@ExCommand(command = "bf[irst],br[ewind]")
+data class BfirstCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 
   override val argFlags: CommandHandlerFlags =
-    flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+    flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)
 
   override fun processCommand(
     editor: VimEditor,
