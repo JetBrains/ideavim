@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2024 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -809,7 +809,6 @@ class TemplateTest : VimJavaTestCase() {
     waitAndAssertMode(fixture, Mode.SELECT(SelectionType.CHARACTER_WISE))
     typeText("myNewVar", "<CR>")  // Typing first char switches to Insert
 
-    // Insert ends after the symbol, then switching to Normal moves back a char
     assertState(
       """
         |class Hello {
