@@ -28,7 +28,6 @@ import com.maddyhome.idea.vim.group.visual.vimLeadSelectionOffset
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.ui.OutputModel
 import com.maddyhome.idea.vim.ui.OutputPanel
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -108,7 +107,6 @@ internal var Editor.vimInitialised: Boolean by userDataOr { false }
 internal fun unInitializeEditor(editor: Editor) {
   editor.vimLastSelectionType = null
   editor.vimMorePanel = null
-  editor.vimExOutput = null
   editor.vimLastHighlighters = null
   editor.vimInitialised = false
 }
@@ -124,7 +122,6 @@ internal var Editor.vimLastSelectionType: SelectionType? by userData()
 internal var Editor.vimEditorGroup: Boolean by userDataOr { false }
 internal var Editor.vimHasRelativeLineNumbersInstalled: Boolean by userDataOr { false }
 internal var Editor.vimMorePanel: OutputPanel? by userData()
-internal var Editor.vimExOutput: OutputModel? by userData()
 internal var Editor.vimTestInputModel: TestInputModel? by userData()
 
 internal var Editor.vimChangeActionSwitchMode: Mode? by userData()

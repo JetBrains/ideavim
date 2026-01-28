@@ -14,8 +14,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimOutputPanel
 import com.maddyhome.idea.vim.api.VimOutputPanelService
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.ui.OutputModel
-import java.lang.ref.WeakReference
+import com.maddyhome.idea.vim.ui.OutputPanel
 
 class IjOutputPanelService : VimOutputPanelService {
   private var activeOutputPanel: VimOutputPanel? = null
@@ -36,7 +35,7 @@ class IjOutputPanelService : VimOutputPanelService {
   }
 
   fun create(editor: VimEditor, context: ExecutionContext): VimOutputPanel {
-    val panel = OutputModel(WeakReference(editor.ij))
+    val panel = OutputPanel.getInstance(editor.ij)
     activeOutputPanel = panel
     return panel
   }

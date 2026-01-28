@@ -9,7 +9,7 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.ui.OutputModel.Companion.getInstance
+import com.maddyhome.idea.vim.ui.OutputPanel.Companion.getInstance
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 

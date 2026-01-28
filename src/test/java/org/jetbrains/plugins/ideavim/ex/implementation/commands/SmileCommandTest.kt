@@ -8,7 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import com.maddyhome.idea.vim.ui.OutputModel
+import com.maddyhome.idea.vim.ui.OutputPanel
 import com.maddyhome.idea.vim.vimscript.model.commands.SmileCommand
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
@@ -28,7 +28,7 @@ class SmileCommandTest : VimTestCase() {
     configureByText("\n")
     typeText(commandToKeys("smile"))
 
-    val output: String = OutputModel.getInstance(fixture.editor).text.trimEnd()
+    val output: String = OutputPanel.getInstance(fixture.editor).text.trimEnd()
     val expectedContent: String = loadResourceContent(SmileCommand.DEFAULT_RESOURCE_PATH).trimEnd()
 
     assertEquals(expectedContent, output)
@@ -40,7 +40,7 @@ class SmileCommandTest : VimTestCase() {
     configureByFileName("Test.kt")
     typeText(commandToKeys("smile"))
 
-    val output = OutputModel.getInstance(fixture.editor).text.trimEnd()
+    val output = OutputPanel.getInstance(fixture.editor).text.trimEnd()
     val expectedContent = loadResourceContent(SmileCommand.KOTLIN_RESOURCE_PATH).trimEnd()
 
     assertEquals(expectedContent, output)
@@ -52,7 +52,7 @@ class SmileCommandTest : VimTestCase() {
     configureByFileName("Test.kts")
     typeText(commandToKeys("smile"))
 
-    val output: String = OutputModel.getInstance(fixture.editor).text.trimEnd()
+    val output: String = OutputPanel.getInstance(fixture.editor).text.trimEnd()
     val expectedContent: String = loadResourceContent(SmileCommand.KOTLIN_RESOURCE_PATH).trimEnd()
 
     assertEquals(expectedContent, output)
@@ -64,7 +64,7 @@ class SmileCommandTest : VimTestCase() {
     configureByFileName("Test.java")
     typeText(commandToKeys("smile"))
 
-    val output: String = OutputModel.getInstance(fixture.editor).text.trimEnd()
+    val output: String = OutputPanel.getInstance(fixture.editor).text.trimEnd()
     val expectedContent: String = loadResourceContent(SmileCommand.JAVA_RESOURCE_PATH).trimEnd()
 
     assertEquals(expectedContent, output)
@@ -76,7 +76,7 @@ class SmileCommandTest : VimTestCase() {
     configureByFileName("Test.py")
     typeText(commandToKeys("smile"))
 
-    val output: String = OutputModel.getInstance(fixture.editor).text.trimEnd()
+    val output: String = OutputPanel.getInstance(fixture.editor).text.trimEnd()
     val expectedContent: String = loadResourceContent(SmileCommand.PYTHON_RESOURCE_PATH).trimEnd()
 
     assertEquals(expectedContent, output)
@@ -88,7 +88,7 @@ class SmileCommandTest : VimTestCase() {
     configureByFileName("Test.unknown")
     typeText(commandToKeys("smile"))
 
-    val output: String = OutputModel.getInstance(fixture.editor).text.trimEnd()
+    val output: String = OutputPanel.getInstance(fixture.editor).text.trimEnd()
     val expectedContent: String = loadResourceContent(SmileCommand.DEFAULT_RESOURCE_PATH).trimEnd()
 
     assertEquals(expectedContent, output)
@@ -100,7 +100,7 @@ class SmileCommandTest : VimTestCase() {
     configureByFileName(".gitignore")
     typeText(commandToKeys("smile"))
 
-    val output: String = OutputModel.getInstance(fixture.editor).text.trimEnd()
+    val output: String = OutputPanel.getInstance(fixture.editor).text.trimEnd()
     val expectedContent: String = loadResourceContent(SmileCommand.DEFAULT_RESOURCE_PATH).trimEnd()
 
     assertEquals(expectedContent, output)

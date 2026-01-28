@@ -83,7 +83,7 @@ import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.options.helpers.GuiCursorType
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.inBlockSelection
-import com.maddyhome.idea.vim.ui.OutputModel
+import com.maddyhome.idea.vim.ui.OutputPanel
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
@@ -752,7 +752,7 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
   }
 
   fun assertNoOutput() {
-    val actual = OutputModel.getInstance(fixture.editor).text
+    val actual = OutputPanel.getInstance(fixture.editor).text
     assertEquals("", actual)
   }
 

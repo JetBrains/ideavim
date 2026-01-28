@@ -50,29 +50,30 @@ import kotlin.math.min
  * Panel that displays text in a `more` like window overlaid on the editor.
  */
 class OutputPanel private constructor(
-  private val myEditor: Editor,
-) : JBPanel<OutputPanel>() {
+  private val editor: Editor,
+) : JBPanel<OutputPanel>(), VimOutputPanel {
 
-  private val myText = JTextPane()
-  private val myAdapter: ComponentAdapter
-  private var myDefaultForeground: Color? = null
+  private val textPane = JTextPane()
+  private val resizeAdapter: ComponentAdapter
+  private var defaultForeground: Color? = null
 
-  private var myOldGlass: JComponent? = null
-  private var myOldLayout: LayoutManager? = null
-  private var myWasOpaque = false
+  private var glassPane: JComponent? = null
+  private var originalLayout: LayoutManager? = null
+  private var wasOpaque = false
 
-  var myActive: Boolean = false
+  private var active: Boolean = false
+  private val segments = mutableListOf<TextLine>()
 
-  val myLabel: JLabel = JLabel("more")
-  private val myScrollPane: JScrollPane =
-    JBScrollPane(myText, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER)
-  private var myLineHeight = 0
-  private var isSimpleOutput = false
+  private val labelComponent: JLabel = JLabel("more")
+  private val scrollPane: JScrollPane =
+    JBScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER)
+  private var cachedLineHeight = 0
+  private var isSingleLine = false
 
   init {
-    myText.isEditable = false
+    textPane.isEditable = false
 
-    myAdapter = object : ComponentAdapter() {
+    resizeAdapter = object : ComponentAdapter() {
       override fun componentResized(e: ComponentEvent?) {
         positionPanel()
       }
@@ -83,12 +84,12 @@ class OutputPanel private constructor(
 
     // Initialize panel
     setLayout(BorderLayout(0, 0))
-    add(myScrollPane, BorderLayout.CENTER)
-    add(myLabel, BorderLayout.SOUTH)
+    add(scrollPane, BorderLayout.CENTER)
+    add(labelComponent, BorderLayout.SOUTH)
 
     val keyListener = OutputPanelKeyListener()
     addKeyListener(keyListener)
-    myText.addKeyListener(keyListener)
+    textPane.addKeyListener(keyListener)
 
     updateUI()
   }
@@ -99,40 +100,42 @@ class OutputPanel private constructor(
     setBorder(ExPanelBorder())
 
     @Suppress("SENSELESS_COMPARISON")
-    if (myText != null && myLabel != null && myScrollPane != null) {
+    if (textPane != null && labelComponent != null && scrollPane != null) {
       setFontForElements()
-      myText.setBorder(null)
-      myScrollPane.setBorder(null)
-      myLabel.setForeground(myText.getForeground())
+      textPane.setBorder(null)
+      scrollPane.setBorder(null)
+      labelComponent.setForeground(textPane.getForeground())
       positionPanel()
     }
   }
 
-  var text: String?
-    get() = myText.getText()
-    set(data) {
-      var data: String = data!!
-      if (data.isNotEmpty() && data[data.length - 1] == '\n') {
-        data = data.dropLast(1)
-      }
+  override val isActive: Boolean
+    get() = active
 
-      myText.text = data
-      myText.setFont(selectEditorFont(myEditor, data))
-      myText.setCaretPosition(0)
-      if (data.isNotEmpty()) {
-        activate()
-      }
+  override var text: String
+    get() = textPane.getText() ?: ""
+    set(value) {
+      val newValue = value.removeSuffix("\n")
+      segments.clear()
+      if (newValue.isEmpty()) return
+      segments.add(TextLine(newValue, null))
+    }
+
+  override var label: String
+    get() = labelComponent.text
+    set(value) {
+      labelComponent.text = value
     }
 
   /**
    * Sets styled text with multiple segments, each potentially having a different color.
    */
   fun setStyledText(lines: List<TextLine>) {
-    val doc = myText.styledDocument
+    val doc = textPane.styledDocument
     doc.remove(0, doc.length)
 
-    if (myDefaultForeground == null) {
-      myDefaultForeground = myText.foreground
+    if (defaultForeground == null) {
+      defaultForeground = textPane.foreground
     }
 
     if (lines.size > 1) {
@@ -142,8 +145,8 @@ class OutputPanel private constructor(
     }
 
     val fullText = doc.getText(0, doc.length)
-    myText.setFont(selectEditorFont(myEditor, fullText))
-    myText.setCaretPosition(0)
+    textPane.setFont(selectEditorFont(editor, fullText))
+    textPane.setCaretPosition(0)
     if (fullText.isNotEmpty()) {
       activate()
     }
@@ -163,45 +166,95 @@ class OutputPanel private constructor(
 
   private fun getLineColor(segment: TextLine): SimpleAttributeSet {
     val attrs = SimpleAttributeSet()
-    val color = segment.color ?: myDefaultForeground
+    val color = segment.color ?: defaultForeground
     if (color != null) {
       StyleConstants.setForeground(attrs, color)
     }
     return attrs
   }
 
+  override fun addText(text: String, isNewLine: Boolean, color: Color?) {
+    segments.add(TextLine(text, color))
+  }
+
+  override fun show() {
+    val currentPanel = injector.outputPanel.getCurrentOutputPanel()
+    if (currentPanel != null && currentPanel != this) currentPanel.close()
+
+    setStyledText(segments)
+    if (!active) {
+      activate()
+    }
+  }
+
+  override fun setContent(text: String) {
+    this.text = text
+  }
+
+  override fun clearText() {
+    segments.clear()
+  }
+
+  fun clear() {
+    text = ""
+  }
+
+  override fun handleKey(key: KeyStroke) {
+    if (isAtEnd) {
+      close(key)
+      return
+    }
+
+    when (key.keyChar) {
+      ' ' -> scrollPage()
+      'd' -> scrollHalfPage()
+      'q', '\u001b' -> close()
+      '\n' -> scrollLine()
+      KeyEvent.CHAR_UNDEFINED -> {
+        when (key.keyCode) {
+          KeyEvent.VK_ENTER -> scrollLine()
+          KeyEvent.VK_ESCAPE -> close()
+          else -> onBadKey()
+        }
+      }
+
+      else -> onBadKey()
+    }
+  }
+
   override fun getForeground(): Color? {
     @Suppress("SENSELESS_COMPARISON")
-    if (myText == null) {
+    if (textPane == null) {
       return super.getForeground()
     }
-    return myText.getForeground()
+    return textPane.getForeground()
   }
 
   override fun getBackground(): Color? {
     @Suppress("SENSELESS_COMPARISON")
-    if (myText == null) {
+    if (textPane == null) {
       return super.getBackground()
     }
-    return myText.getBackground()
+    return textPane.getBackground()
   }
 
   /**
    * Turns off the output panel and optionally puts the focus back to the original component.
    */
   fun deactivate(refocusOwningEditor: Boolean) {
-    if (!myActive) return
-    myActive = false
-    myText.text = ""
+    if (!active) return
+    active = false
+    clearText()
+    textPane.text = ""
     if (refocusOwningEditor) {
-      requestFocus(myEditor.contentComponent)
+      requestFocus(editor.contentComponent)
     }
-    if (myOldGlass != null) {
-      myOldGlass!!.removeComponentListener(myAdapter)
-      myOldGlass!!.isVisible = false
-      myOldGlass!!.remove(this)
-      myOldGlass!!.setOpaque(myWasOpaque)
-      myOldGlass!!.setLayout(myOldLayout)
+    if (glassPane != null) {
+      glassPane!!.removeComponentListener(resizeAdapter)
+      glassPane!!.isVisible = false
+      glassPane!!.remove(this)
+      glassPane!!.setOpaque(wasOpaque)
+      glassPane!!.setLayout(originalLayout)
     }
   }
 
@@ -214,61 +267,64 @@ class OutputPanel private constructor(
     setFontForElements()
     positionPanel()
 
-    if (myOldGlass != null) {
-      myOldGlass!!.isVisible = true
+    if (glassPane != null) {
+      glassPane!!.isVisible = true
     }
 
-    myActive = true
-    requestFocus(myText)
+    active = true
+    requestFocus(textPane)
   }
 
   private fun disableOldGlass() {
-    val root = SwingUtilities.getRootPane(myEditor.contentComponent) ?: return
-    myOldGlass = root.getGlassPane() as JComponent?
-    if (myOldGlass == null) {
+    val root = SwingUtilities.getRootPane(editor.contentComponent) ?: return
+    glassPane = root.getGlassPane() as JComponent?
+    if (glassPane == null) {
       return
     }
-    myOldLayout = myOldGlass!!.layout
-    myWasOpaque = myOldGlass!!.isOpaque
-    myOldGlass!!.setLayout(null)
-    myOldGlass!!.setOpaque(false)
-    myOldGlass!!.add(this)
-    myOldGlass!!.addComponentListener(myAdapter)
+    originalLayout = glassPane!!.layout
+    wasOpaque = glassPane!!.isOpaque
+    glassPane!!.setLayout(null)
+    glassPane!!.setOpaque(false)
+    glassPane!!.add(this)
+    glassPane!!.addComponentListener(resizeAdapter)
   }
 
-  @JvmOverloads
-  fun close(key: KeyStroke? = null) {
+  override fun close() {
+    close(null)
+  }
+
+  fun close(key: KeyStroke?) {
     ApplicationManager.getApplication().invokeLater {
       deactivate(true)
-      val project = myEditor.project
+      val project = editor.project
       if (project != null && key != null && key.keyChar != '\n') {
         val keys: MutableList<KeyStroke> = ArrayList(1)
         keys.add(key)
         getInstance().keyStack.addKeys(keys)
         val context: ExecutionContext =
-          injector.executionContextManager.getEditorExecutionContext(IjVimEditor(myEditor))
-        VimPlugin.getMacro().playbackKeys(IjVimEditor(myEditor), context, 1)
+          injector.executionContextManager.getEditorExecutionContext(IjVimEditor(editor))
+        VimPlugin.getMacro().playbackKeys(IjVimEditor(editor), context, 1)
       }
     }
   }
 
   private fun setFontForElements() {
-    myText.setFont(selectEditorFont(myEditor, myText.getText()))
-    myLabel.setFont(selectEditorFont(myEditor, myLabel.text))
+    textPane.setFont(selectEditorFont(editor, textPane.getText()))
+    labelComponent.setFont(selectEditorFont(editor, labelComponent.text))
   }
 
   private fun positionPanel() {
     val scroll = positionPanelStart() ?: return
-    val lineHeight = myText.getFontMetrics(myText.getFont()).height
-    val count = countLines(myText.getText())
+    val lineHeight = textPane.getFontMetrics(textPane.getFont()).height
+    val count = countLines(textPane.getText())
     val visLines = size.height / lineHeight - 1
     val lines = min(count, visLines)
 
     // Simple output: single line that fits entirely - no label needed
-    isSimpleOutput = count == 1 && count <= visLines
-    myLabel.isVisible = !isSimpleOutput
+    isSingleLine = count == 1 && count <= visLines
+    labelComponent.isVisible = !isSingleLine
 
-    val extraHeight = if (isSimpleOutput) 0 else myLabel.getPreferredSize().height
+    val extraHeight = if (isSingleLine) 0 else labelComponent.getPreferredSize().height
     setSize(
       size.width,
       lines * lineHeight + extraHeight + border.getBorderInsets(this).top * 2
@@ -277,9 +333,9 @@ class OutputPanel private constructor(
     finishPositioning(scroll)
 
     // onPositioned
-    myLineHeight = lineHeight
-    myScrollPane.getVerticalScrollBar().setValue(0)
-    if (!isSimpleOutput) {
+    cachedLineHeight = lineHeight
+    scrollPane.getVerticalScrollBar().setValue(0)
+    if (!isSingleLine) {
       if (!injector.globalOptions().more) {
         scrollOffset(100000)
       } else {
@@ -289,7 +345,7 @@ class OutputPanel private constructor(
   }
 
   private fun positionPanelStart(): JScrollPane? {
-    val contentComponent = myEditor.contentComponent
+    val contentComponent = editor.contentComponent
     val scroll = SwingUtilities.getAncestorOfClass(JScrollPane::class.java, contentComponent) as? JScrollPane
     val rootPane = SwingUtilities.getRootPane(contentComponent)
     if (scroll == null || rootPane == null) {
@@ -301,7 +357,7 @@ class OutputPanel private constructor(
   }
 
   private fun finishPositioning(scroll: JScrollPane) {
-    val rootPane = SwingUtilities.getRootPane(myEditor.contentComponent)
+    val rootPane = SwingUtilities.getRootPane(editor.contentComponent)
     val bounds = scroll.bounds
     bounds.translate(0, scroll.getHeight() - size.height)
     bounds.height = size.height
@@ -328,47 +384,50 @@ class OutputPanel private constructor(
     return count
   }
 
-  fun scrollLine() {
-    scrollOffset(myLineHeight)
+  override fun scrollLine() {
+    scrollOffset(cachedLineHeight)
   }
 
-  fun scrollPage() {
-    scrollOffset(myScrollPane.getVerticalScrollBar().visibleAmount)
+  override fun scrollPage() {
+    scrollOffset(scrollPane.getVerticalScrollBar().visibleAmount)
   }
 
-  fun scrollHalfPage() {
-    val sa = myScrollPane.getVerticalScrollBar().visibleAmount / 2.0
-    val offset = ceil(sa / myLineHeight) * myLineHeight
+  override fun scrollHalfPage() {
+    val sa = scrollPane.getVerticalScrollBar().visibleAmount / 2.0
+    val offset = ceil(sa / cachedLineHeight) * cachedLineHeight
     scrollOffset(offset.toInt())
   }
 
   fun onBadKey() {
-    myLabel.setText(injector.messages.message("message.ex.output.more.prompt.full"))
-    myLabel.setFont(selectEditorFont(myEditor, myLabel.text))
+    labelComponent.setText(injector.messages.message("message.ex.output.more.prompt.full"))
+    labelComponent.setFont(selectEditorFont(editor, labelComponent.text))
   }
 
   private fun scrollOffset(more: Int) {
-    myScrollPane.validate()
-    val scrollBar = myScrollPane.getVerticalScrollBar()
+    scrollPane.validate()
+    val scrollBar = scrollPane.getVerticalScrollBar()
     val value = scrollBar.value
     scrollBar.setValue(value + more)
-    myScrollPane.getHorizontalScrollBar().setValue(0)
+    scrollPane.getHorizontalScrollBar().setValue(0)
 
     // Check if we're at the end or if content fits entirely (nothing to scroll)
     if (isAtEnd) {
-      myLabel.setText(injector.messages.message("message.ex.output.end.prompt"))
+      labelComponent.setText(injector.messages.message("message.ex.output.end.prompt"))
     } else {
-      myLabel.setText(injector.messages.message("message.ex.output.more.prompt"))
+      labelComponent.setText(injector.messages.message("message.ex.output.more.prompt"))
     }
-    myLabel.setFont(selectEditorFont(myEditor, myLabel.text))
+    labelComponent.setFont(selectEditorFont(editor, labelComponent.text))
   }
 
   val isAtEnd: Boolean
     get() {
-      if (isSimpleOutput) return true
-      val scrollBar = myScrollPane.getVerticalScrollBar()
+      if (isSingleLine) return true
+      val scrollBar = scrollPane.getVerticalScrollBar()
       val value = scrollBar.value
-      return !scrollBar.isVisible || value >= scrollBar.maximum - scrollBar.visibleAmount ||
+      if (!scrollBar.isVisible) {
+        return true
+      }
+      return value >= scrollBar.maximum - scrollBar.visibleAmount ||
         scrollBar.maximum <= scrollBar.visibleAmount
     }
 
