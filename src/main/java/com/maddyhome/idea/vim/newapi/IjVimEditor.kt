@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -77,7 +77,6 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase(
   // Be careful: all the EditorActionHandler implementation should correctly process InjectedEditors
   // TBH, I don't like the names. Need to think a bit more about this
   val editor = editor.getTopLevelEditor()
-  val originalEditor = editor
   override var replaceMask: VimEditorReplaceMask?
     get() = editor.replaceMask
     set(value) {
@@ -150,6 +149,7 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase(
         }
       }
     }
+    if (!isWritable()) return
     editor.document.insertString(atPosition, text)
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -36,6 +36,20 @@ class InsertExitModeActionTest : VimTestCase() {
 
     assertMode(Mode.NORMAL())
     assertState("12${c}3")
+  }
+
+  @Test
+  fun `esc with insert should check if file is writable`() {
+    configureByText("12${c}3")
+    typeText("10i1")
+    fixture.editor.document.setReadOnly(true)
+
+    // escape trigger write 1 10 times
+    typeText("<Esc>")
+
+    // Should remain in normal mode
+    assertMode(Mode.NORMAL())
+    assertState("121${c}3")
   }
 
   @Test
