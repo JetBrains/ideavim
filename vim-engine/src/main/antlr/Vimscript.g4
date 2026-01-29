@@ -130,7 +130,7 @@ command:
         | ONLY
         | P_LOWERCASE | P_UPPERCASE | PACKADD | PLUG | PREVIOUS_FILE | PRINT | PROMPT_REPLACE | PROMPTFIND | PUT
         | Q_LOWERCASE | QUIT
-        | REDO
+        | R_LOWERCASE | READ | REDO
         | SET | SELECT_LAST_FILE | SELECT_FIRST_FILE | SELECT_FILE | SETGLOBAL | SETHANDLER | SETLOCAL | SHELL | SOURCE | SPLIT | SYMBOL
         | T_LOWERCASE | TABCLOSE | TABMOVE | TABNEXT | TABONLY | TABPREVIOUS
         | U_LOWERCASE | UNDO | UNLOCKVAR
@@ -543,6 +543,7 @@ existingCommands:       ACTION
                     |   PROMPT_REPLACE
                     |   PUT
                     |   QUIT
+                    |   READ
                     |   REDO
                     |   REGISTERS
                     |   RETURN
@@ -720,6 +721,7 @@ PROMPTFIND:             'pro' | 'prom' | 'promp' | 'prompt' | 'promptf' | 'promp
 PROMPT_REPLACE:         'promptr' | 'promptre' | 'promptrep' | 'promptrepl';
 PUT:                    'pu' | 'put';
 QUIT:                   'qu' | 'qui' | 'quit' | 'clo' | 'clos' | 'close' | 'hid' | 'hide';
+READ:                   're' | 'rea' | 'read';
 REDO:                   'red' | 'redo';
 REGISTERS:              'di' | 'dis' | 'disp' | 'displ' | 'displa' | 'display' | 'reg' | 'regi' | 'regis' | 'regist' | 'registe' | 'register' | 'registers';
 SELECT_FILE:            'argu' | 'argum' | 'argume' | 'argumen' | 'argument';
