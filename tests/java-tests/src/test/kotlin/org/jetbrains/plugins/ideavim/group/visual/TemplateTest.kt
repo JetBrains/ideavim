@@ -863,7 +863,7 @@ class TemplateTest : VimJavaTestCase() {
     )
     startRenaming(VariableInplaceRenameHandler())
     waitAndAssertMode(fixture, Mode.SELECT(SelectionType.CHARACTER_WISE))
-    typeText("myNewVar", "<Esc>", "viw", "<CR>")
+    typeText("myNewVar", "<Esc>", "<Esc>", "viw", "<CR>")
 
     assertState(
       """
