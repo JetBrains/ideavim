@@ -39,7 +39,7 @@ data class MarkCommand(val range: Range, val modifier: CommandModifier, val argu
     val result = if (mark.isLetter() || mark in "'`") {
       injector.markService.setMark(editor.primaryCaret(), mark, offset)
     } else {
-      injector.messages.showStatusBarMessage(editor, injector.messages.message("E191"))
+      injector.messages.showErrorMessage(editor, injector.messages.message("E191"))
       false
     }
     return if (result) ExecutionResult.Success else ExecutionResult.Error

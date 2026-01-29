@@ -29,7 +29,7 @@ internal class IjVimMessages : VimMessagesBase() {
   private var lastBeepTimeMillis = 0L
   private var allowClearStatusBarMessage = true
 
-  override fun showStatusBarMessage(editor: VimEditor?, message: String?) {
+  override fun showErrorMessage(editor: VimEditor?, message: String?) {
     fun setStatusBarMessage(project: Project, message: String?) {
       WindowManager.getInstance().getStatusBar(project)?.let {
         it.info = if (message.isNullOrBlank()) "" else "Vim - $message"

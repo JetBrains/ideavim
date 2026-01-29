@@ -406,7 +406,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   override fun insertAfterCaret(editor: VimEditor, context: ExecutionContext) {
     // Prevent entering insert mode in read-only files before moving the caret
     if (!editor.isWritable()) {
-      injector.messages.showStatusBarMessage(editor, "Cannot make changes, file is read-only")
+      injector.messages.showErrorMessage(editor, "Cannot make changes, file is read-only")
       injector.messages.indicateError()
       return
     }
@@ -450,7 +450,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   override fun initInsert(editor: VimEditor, context: ExecutionContext, mode: Mode) {
     // Prevent entering insert mode in read-only files
     if (!editor.isWritable()) {
-      injector.messages.showStatusBarMessage(editor, "Cannot make changes, file is read-only")
+      injector.messages.showErrorMessage(editor, "Cannot make changes, file is read-only")
       injector.messages.indicateError()
       return
     }

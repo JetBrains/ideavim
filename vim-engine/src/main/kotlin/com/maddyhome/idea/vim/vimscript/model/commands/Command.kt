@@ -144,7 +144,7 @@ sealed class Command(
 
     if (RangeFlag.RANGE_REQUIRED == argFlags.rangeFlag && commandRange.size() == 0) {
       // This will never be hit. The flag is used by `:[range]` and this only parses if there's an actual range
-      injector.messages.showStatusBarMessage(editor, injector.messages.message("message.command.range.required"))
+      injector.messages.showErrorMessage(editor, injector.messages.message("message.command.range.required"))
       throw MissingRangeException()
     }
 

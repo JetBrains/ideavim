@@ -43,7 +43,7 @@ private fun doOperatorAction(
 ): Boolean {
   val operatorfunc = injector.optionGroup.getOptionValue(Options.operatorfunc, OptionAccessScope.GLOBAL(editor))
   if (operatorfunc.value.isEmpty()) {
-    injector.messages.showStatusBarMessage(editor, injector.messages.message("E774"))
+    injector.messages.showErrorMessage(editor, injector.messages.message("E774"))
     return false
   }
 
@@ -68,7 +68,7 @@ private fun doOperatorAction(
     VimRepeater.repeatHandler = saveRepeatHandler
     return true
   } catch (e: ExException) {
-    injector.messages.showStatusBarMessage(editor, e.message)
+    injector.messages.showErrorMessage(editor, e.message)
     return false
   }
 }

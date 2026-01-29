@@ -50,7 +50,7 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
           insertRegister(editor, context, '=')
         } catch (e: ExException) {
           injector.messages.indicateError()
-          injector.messages.showStatusBarMessage(editor, e.message)
+          injector.messages.showErrorMessage(editor, e.message)
         }
       }
       return true

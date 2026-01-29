@@ -169,7 +169,7 @@ class KeyHandler {
       if (handleKeyRecursionCount >= maxMapDepth) {
         keyProcessResultBuilder.addExecutionStep { _, lambdaEditor, _ ->
           logger.warn("Key handling, maximum recursion of the key received. maxdepth=$maxMapDepth")
-          injector.messages.showStatusBarMessage(lambdaEditor, injector.messages.message("E223"))
+          injector.messages.showErrorMessage(lambdaEditor, injector.messages.message("E223"))
           injector.messages.indicateError()
         }
         return keyProcessResultBuilder.build()

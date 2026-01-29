@@ -120,7 +120,7 @@ class ProcessExCommandEntryAction : MotionActionHandler.SingleExecution() {
       val shouldSkipHistory = keyState.mappingState.isExecutingMap() || injector.macro.isExecutingMacro
       injector.vimscriptExecutor.execute(text, editor, context, shouldSkipHistory, true, CommandLineVimLContext)
     } catch (e: ExException) {
-      injector.messages.showStatusBarMessage(null, e.message)
+      injector.messages.showErrorMessage(null, e.message)
       injector.messages.indicateError()
     } catch (bad: Exception) {
       logger.error("Error during command execution", bad)

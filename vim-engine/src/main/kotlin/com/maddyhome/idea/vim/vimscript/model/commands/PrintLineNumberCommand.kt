@@ -56,7 +56,7 @@ data class PrintLineNumberCommand(val range: Range, val modifier: CommandModifie
     }
     else ""
 
-    injector.messages.showStatusBarMessage(editor, "$line1 $content")
+    injector.messages.showErrorMessage(editor, "$line1 $content")
     return ExecutionResult.Success
   }
 }

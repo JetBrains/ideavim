@@ -71,7 +71,7 @@ data class UnknownCommand(val range: Range, val name: String, val modifier: Comm
           }
         }
       } else {
-        injector.messages.showStatusBarMessage(
+        injector.messages.showErrorMessage(
           editor,
           injector.messages.message("E169")
         )

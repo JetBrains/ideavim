@@ -248,7 +248,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static void showMessage(@Nls(capitalization = Nls.Capitalization.Sentence) @Nullable String msg) {
-    VimInjectorKt.getInjector().getMessages().showStatusBarMessage(null, msg);
+    VimInjectorKt.getInjector().getMessages().showErrorMessage(null, msg);
   }
 
   public static @NotNull VimPlugin getInstance() {

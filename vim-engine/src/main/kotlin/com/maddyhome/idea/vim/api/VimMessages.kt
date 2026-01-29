@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.helper.EngineMessageHelper
 import org.jetbrains.annotations.PropertyKey
 
 interface VimMessages {
-  fun showStatusBarMessage(editor: VimEditor?, message: String?)
+  fun showErrorMessage(editor: VimEditor?, message: String?)
   fun getStatusBarMessage(): String?
   fun clearStatusBarMessage()
   fun indicateError()

@@ -22,7 +22,7 @@ abstract class VimFileBase : VimFile {
     val offset = editor.currentCaret().offset
     val ch = editor.text()[offset]
 
-    injector.messages.showStatusBarMessage(editor, toHexString(ch.code.toLong()))
+    injector.messages.showErrorMessage(editor, toHexString(ch.code.toLong()))
   }
 
   override fun displayLocationInfo(editor: VimEditor) {
@@ -90,7 +90,7 @@ abstract class VimFileBase : VimFile {
       }
     }
 
-    injector.messages.showStatusBarMessage(editor, msg)
+    injector.messages.showErrorMessage(editor, msg)
   }
 }
 

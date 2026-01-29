@@ -64,7 +64,7 @@ data class GlobalCommand(val range: Range, val modifier: CommandModifier, val ar
     // When nesting the command works on one line.  This allows for
     // ":g/found/v/notfound/command".
     if (globalBusy && (range.startLine != 0 || range.endLine != editor.lineCount() - 1)) {
-      messages.showStatusBarMessage(null, messages.message("E147"))
+      messages.showErrorMessage(null, messages.message("E147"))
       messages.indicateError()
       return false
     }
@@ -75,7 +75,7 @@ data class GlobalCommand(val range: Range, val modifier: CommandModifier, val ar
     val regex = try {
       search.prepareRegex(globalCommandArguments.pattern, globalCommandArguments.whichPattern, 2)
     } catch (e: VimRegexException) {
-      messages.showStatusBarMessage(editor, e.message)
+      messages.showErrorMessage(editor, e.message)
       return false
     }
 
@@ -120,15 +120,15 @@ data class GlobalCommand(val range: Range, val modifier: CommandModifier, val ar
       }
 
       if (gotInt) {
-        messages.showStatusBarMessage(null, messages.message("command.global.interrupted"))
+        messages.showErrorMessage(null, messages.message("command.global.interrupted"))
       } else if (marks.isEmpty()) {
         if (invert) {
-          messages.showStatusBarMessage(
+          messages.showErrorMessage(
             null,
             messages.message("command.global.pattern.found.in.every.line", globalCommandArguments.pattern.toString())
           )
         } else {
-          messages.showStatusBarMessage(
+          messages.showErrorMessage(
             null,
             messages.message("command.global.pattern.not.found", globalCommandArguments.pattern.toString())
           )

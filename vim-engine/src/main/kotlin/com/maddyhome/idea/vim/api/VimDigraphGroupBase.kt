@@ -49,7 +49,7 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
     val digraphText = if (digraph == null) "" else ", Digr $digraph"
 
     if (codepoint < 0x100) {
-      injector.messages.showStatusBarMessage(
+      injector.messages.showErrorMessage(
         editor,
         String.format(
           "<%s>  %d,  Hex %02x,  Oct %03o%s",
@@ -61,7 +61,7 @@ open class VimDigraphGroupBase() : VimDigraphGroup {
         ),
       )
     } else {
-      injector.messages.showStatusBarMessage(
+      injector.messages.showErrorMessage(
         editor,
         String.format(
           "<%s> %d, Hex %04x, Oct %o%s",

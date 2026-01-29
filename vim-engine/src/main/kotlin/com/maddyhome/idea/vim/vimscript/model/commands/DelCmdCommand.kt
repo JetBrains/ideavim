@@ -32,7 +32,7 @@ data class DelCmdCommand(val range: Range, val modifier: CommandModifier, val ar
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
     if (!injector.commandGroup.hasAlias(argument)) {
-      injector.messages.showStatusBarMessage(
+      injector.messages.showErrorMessage(
         editor,
         injector.messages.message("E184", argument)
       )

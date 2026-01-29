@@ -27,7 +27,7 @@ class InsertFilenameUnderCaretAction : CommandLineActionHandler() {
     val offset = injector.searchGroup.getCurrentIncsearchResultRange(editor)?.endOffset ?: editor.primaryCaret().offset
     val range = injector.searchHelper.findFilenameAtOrFollowingCursor(editor, offset)
     if (range == null) {
-      injector.messages.showStatusBarMessage(commandLine.editor, injector.messages.message("E446"))
+      injector.messages.showErrorMessage(commandLine.editor, injector.messages.message("E446"))
       return false
     }
 

@@ -223,7 +223,7 @@ internal object MappingProcessor : KeyConsumer {
       mappingState.startMapExecution()
       mappingInfo.execute(editor, context, keyState)
     } catch (e: Exception) {
-      injector.messages.showStatusBarMessage(editor, e.message)
+      injector.messages.showErrorMessage(editor, e.message)
       injector.messages.indicateError()
       log.error(
         """
@@ -233,7 +233,7 @@ internal object MappingProcessor : KeyConsumer {
         e
       )
     } catch (e: NotImplementedError) {
-      injector.messages.showStatusBarMessage(editor, e.message)
+      injector.messages.showErrorMessage(editor, e.message)
       injector.messages.indicateError()
       log.error(
         """

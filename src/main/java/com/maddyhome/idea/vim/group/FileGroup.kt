@@ -70,7 +70,7 @@ class FileGroup : VimFileBase() {
         return true
       }
     } else {
-      injector.messages.showStatusBarMessage(null, injector.messages.message("message.open.file.not.found", filename))
+      injector.messages.showErrorMessage(null, injector.messages.message("message.open.file.not.found", filename))
 
       return false
     }
