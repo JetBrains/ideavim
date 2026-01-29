@@ -30,6 +30,8 @@ usual beta standards.
 * [VIM-566](https://youtrack.jetbrains.com/issue/VIM-566) Added support for `zA` command - toggle folds recursively
 * [VIM-566](https://youtrack.jetbrains.com/issue/VIM-566) Added support for `zr` command - increase fold level to show more folds
 * [VIM-566](https://youtrack.jetbrains.com/issue/VIM-566) Added support for `zm` command - decrease fold level to hide more folds
+* [VIM-566](https://youtrack.jetbrains.com/issue/VIM-566) Added support for `zj` and `zk` commands - navigate to next/previous fold start
+* [VIM-566](https://youtrack.jetbrains.com/issue/VIM-566) Added operator-pending mode support for `zj` and `zk` - use `dzj` to delete to next fold, `yzk` to yank to previous fold
 
 ### Fixes:
 * [VIM-4105](https://youtrack.jetbrains.com/issue/VIM-4105) Fixed `a"` `a'` `a\`` text objects to include surrounding whitespace per Vim spec
