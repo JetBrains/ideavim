@@ -62,14 +62,14 @@ abstract class VimScriptExecutorBase : VimscriptExecutor {
           }
           finalResult = ExecutionResult.Error
           if (indicateErrors) {
-            injector.messages.showStatusBarMessage(editor, e.message)
+            injector.messages.showErrorMessage(editor, e.message)
             injector.messages.indicateError()
           } else {
             logger.warn("Failed while executing $unit. " + e.message)
           }
         } catch (e: NotImplementedError) {
           if (indicateErrors) {
-            injector.messages.showStatusBarMessage(editor, "Not implemented yet :(")
+            injector.messages.showErrorMessage(editor, "Not implemented yet :(")
             injector.messages.indicateError()
           }
         } catch (e: Exception) {
@@ -105,7 +105,7 @@ abstract class VimScriptExecutorBase : VimscriptExecutor {
       execute(file.readText(), editor, context, skipHistory = true, indicateErrors)
     } catch (e: IOException) {
       if (indicateErrors) {
-        injector.messages.showStatusBarMessage(editor, "Cannot read file \"${file.path}\": ${e.message}")
+        injector.messages.showErrorMessage(editor, "Cannot read file \"${file.path}\": ${e.message}")
         injector.messages.indicateError()
       } else {
         logger.warn("Failed to read file ${file.path}: ${e.message}")

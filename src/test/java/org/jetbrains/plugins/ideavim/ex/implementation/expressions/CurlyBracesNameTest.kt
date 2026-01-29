@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -18,7 +18,7 @@ class CurlyBracesNameTest : VimTestCase() {
     configureByText("\n")
     typeText(commandToKeys("let x1 = 10"))
     typeText(commandToKeys("echo x{0 + 1}"))
-    assertExOutput("10")
+    assertOutput("10")
   }
 
   @Test
@@ -28,7 +28,7 @@ class CurlyBracesNameTest : VimTestCase() {
     typeText(commandToKeys("let z = 1"))
     typeText(commandToKeys("let y1 = 'leven'"))
     typeText(commandToKeys("echo e{y{z}}"))
-    assertExOutput("11")
+    assertOutput("11")
   }
 
   @Test
@@ -41,9 +41,9 @@ class CurlyBracesNameTest : VimTestCase() {
     typeText(commandToKeys("let twelve = 42"))
 
     typeText(commandToKeys("echo {x1}{x2}{x3}"))
-    assertExOutput("twelve")
+    assertOutput("twelve")
 
     typeText(commandToKeys("echo {{x1}{x2}{x3}}"))
-    assertExOutput("42")
+    assertOutput("42")
   }
 }

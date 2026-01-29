@@ -87,7 +87,7 @@ data class CmdCommand(val range: Range, val modifier: CommandModifier, val argum
       val match = arg.find(argument)
       match?.range?.let {
         argument = argument.removeRange(it)
-        injector.messages.showStatusBarMessage(editor, "'$message' is not supported by `command`")
+        injector.messages.showErrorMessage(editor, "'$message' is not supported by `command`")
       }
     }
 
@@ -100,7 +100,7 @@ data class CmdCommand(val range: Range, val modifier: CommandModifier, val argum
       // in the actual alias being created, and we don't want to parse that one.
       val trimmedInput = argument.takeWhile { it != ' ' }
       val pattern = Regex("(?>-nargs=((|[-])\\d+|[?]|[+]|[*]))").find(trimmedInput) ?: run {
-        injector.messages.showStatusBarMessage(editor, injector.messages.message("E176"))
+        injector.messages.showErrorMessage(editor, injector.messages.message("E176"))
         return false
       }
       val nargForTrim = pattern.groupValues[0]
@@ -125,7 +125,7 @@ data class CmdCommand(val range: Range, val modifier: CommandModifier, val argum
             // I missed something, since the regex limits the value to be ? + * or
             // a valid number, its not possible (as far as I know) to have another value
             // that regex would accept that is not valid.
-            injector.messages.showStatusBarMessage(
+            injector.messages.showErrorMessage(
               editor,
               injector.messages.message("E176")
             )
@@ -136,7 +136,7 @@ data class CmdCommand(val range: Range, val modifier: CommandModifier, val argum
         // Not sure why this isn't documented, but if you try to create a command in vim
         // with an explicit number of arguments greater than 1 it returns this error.
         if (argNum > 1 || argNum < 0) {
-          injector.messages.showStatusBarMessage(editor, injector.messages.message("E176"))
+          injector.messages.showErrorMessage(editor, injector.messages.message("E176"))
           return false
         }
         minNumberOfArgs = argNum
@@ -158,7 +158,7 @@ data class CmdCommand(val range: Range, val modifier: CommandModifier, val argum
 
     // User-aliases need to begin with an uppercase character.
     if (!alias[0].isUpperCase()) {
-      injector.messages.showStatusBarMessage(
+      injector.messages.showErrorMessage(
         editor,
         injector.messages.message("E183")
       )
@@ -166,7 +166,7 @@ data class CmdCommand(val range: Range, val modifier: CommandModifier, val argum
     }
 
     if (alias in BLACKLISTED_ALIASES) {
-      injector.messages.showStatusBarMessage(
+      injector.messages.showErrorMessage(
         editor,
         injector.messages.message("E841")
       )
@@ -180,7 +180,7 @@ data class CmdCommand(val range: Range, val modifier: CommandModifier, val argum
     // If we are not over-writing existing aliases, and an alias with the same command
     // already exists then we want to do nothing.
     if (!overrideAlias && injector.commandGroup.hasAlias(alias)) {
-      injector.messages.showStatusBarMessage(
+      injector.messages.showErrorMessage(
         editor,
         injector.messages.message("E174")
       )

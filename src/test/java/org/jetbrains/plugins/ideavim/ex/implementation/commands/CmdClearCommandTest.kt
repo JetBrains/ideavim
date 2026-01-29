@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -22,7 +22,7 @@ class CmdClearCommandTest : VimTestCase() {
     configureByText("\n")
     typeText(commandToKeys("command"))
     assertPluginError(false)
-    assertExOutput("Name        Args       Definition") // There should not be any aliases.
+    assertOutput("Name        Args       Definition") // There should not be any aliases.
 
     typeText(commandToKeys("command Vs vs"))
     assertPluginError(false)
@@ -33,7 +33,7 @@ class CmdClearCommandTest : VimTestCase() {
     typeText(commandToKeys("command"))
     assertPluginError(false)
     // The added alias should be listed
-    assertExOutput(
+    assertOutput(
       """Name        Args       Definition
             |Vs          0          vs
             |Wq          0          wq
@@ -46,6 +46,6 @@ class CmdClearCommandTest : VimTestCase() {
     assertPluginError(false)
     typeText(commandToKeys("command"))
     assertPluginError(false)
-    assertExOutput("Name        Args       Definition") // There should not be any aliases.
+    assertOutput("Name        Args       Definition") // There should not be any aliases.
   }
 }

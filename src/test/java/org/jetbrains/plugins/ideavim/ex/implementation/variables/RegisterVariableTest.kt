@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2024 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -20,7 +20,7 @@ class RegisterVariableTest : VimTestCase() {
   fun `test default v register`() {
     configureByText("abcd")
     typeText(commandToKeys("echo v:register"))
-    assertExOutput("\"")
+    assertOutput("\"")
   }
 
   @Test
@@ -28,7 +28,7 @@ class RegisterVariableTest : VimTestCase() {
     configureByText("abcd")
     enterCommand("""nnoremap <expr> X ':echo v:register<CR>'""")
     typeText("X")
-    assertExOutput("\"")
+    assertOutput("\"")
   }
 
   @Test
@@ -36,7 +36,7 @@ class RegisterVariableTest : VimTestCase() {
     configureByText("abcd")
     typeText("\"w")
     typeText(commandToKeys("echo v:register"))
-    assertExOutput("w")
+    assertOutput("w")
   }
 
   @Test

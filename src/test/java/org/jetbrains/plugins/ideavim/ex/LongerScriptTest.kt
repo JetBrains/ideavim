@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -63,7 +63,7 @@ class LongerScriptTest : VimTestCase() {
     println(parsingTime)
     executeVimscript(function)
     typeText(commandToKeys("echo F('s[ubstitute]')"))
-    assertExOutput("'s' | 'su' | 'sub' | 'subs' | 'subst' | 'substi' | 'substit' | 'substitu' | 'substitut' | 'substitute';")
+    assertOutput("'s' | 'su' | 'sub' | 'subs' | 'subst' | 'substi' | 'substit' | 'substitu' | 'substitut' | 'substitute';")
   }
 
   @Test

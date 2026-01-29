@@ -46,7 +46,7 @@ internal data class BufferCommand(val range: Range, val modifier: CommandModifie
         val bufNum = buffer.toInt() - 1
 
         if (!VimPlugin.getFile().selectFile(bufNum, context)) {
-          injector.messages.showStatusBarMessage(editor, injector.messages.message("E86", bufNum))
+          injector.messages.showErrorMessage(editor, injector.messages.message("E86", bufNum))
           result = false
         }
       } else if (buffer == "#") {
@@ -56,13 +56,13 @@ internal data class BufferCommand(val range: Range, val modifier: CommandModifie
 
         when (editors.size) {
           0 -> {
-            injector.messages.showStatusBarMessage(editor, injector.messages.message("E94", buffer))
+            injector.messages.showErrorMessage(editor, injector.messages.message("E94", buffer))
             result = false
           }
 
           1 -> {
             if (EditorHelper.hasUnsavedChanges(editor.ij) && !overrideModified) {
-              injector.messages.showStatusBarMessage(editor, injector.messages.message("E37"))
+              injector.messages.showErrorMessage(editor, injector.messages.message("E37"))
               result = false
             } else {
               VimPlugin.getFile().openFile(EditorHelper.getVirtualFile(editors[0].ij)!!.name, context)
@@ -70,7 +70,7 @@ internal data class BufferCommand(val range: Range, val modifier: CommandModifie
           }
 
           else -> {
-            injector.messages.showStatusBarMessage(editor, injector.messages.message("E93", buffer))
+            injector.messages.showErrorMessage(editor, injector.messages.message("E93", buffer))
             result = false
           }
         }

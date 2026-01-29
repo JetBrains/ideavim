@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -161,7 +161,7 @@ class SetCommandTest : VimTestCase() {
 
     // 'fileencoding' defaults to "", but is automatically detected as UTF-8
     enterCommand("set number relativenumber scrolloff nrformats")
-    assertExOutput("  nrformats=hex       scrolloff=0")
+    assertOutput("  nrformats=hex       scrolloff=0")
     injector.outputPanel.getCurrentOutputPanel()?.close()
     assertCommandOutput(
       "set",
@@ -233,7 +233,7 @@ class SetCommandTest : VimTestCase() {
 
     // 'fileencoding' defaults to "", but is automatically detected as UTF-8
     enterCommand("set number relativenumber scrolloff nrformats")
-    assertExOutput("  nrformats=hex       scrolloff=0")
+    assertOutput("  nrformats=hex       scrolloff=0")
     injector.outputPanel.getCurrentOutputPanel()?.close()
     assertCommandOutput(
       "set!",

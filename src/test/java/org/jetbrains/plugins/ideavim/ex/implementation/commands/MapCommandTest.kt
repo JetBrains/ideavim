@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -1123,7 +1123,7 @@ class MapCommandTest : VimTestCase() {
     configureByText("\n")
     enterCommand("map A :echo 42<CR>")
     typeText("A")
-    assertExOutput("42")
+    assertOutput("42")
     assertEquals(
       "map A :echo 42<CR>",
       injector.historyGroup.getEntries(VimHistory.Type.Command, 0, 0).last().entry,

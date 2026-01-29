@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -228,7 +228,7 @@ class GlobalCommandTest : VimTestCase() {
     ) {
       enterCommand("set ignorecase")
     }
-    assertExOutput(
+    assertOutput(
       """
         |one test
         |three Test
@@ -288,7 +288,7 @@ class GlobalCommandTest : VimTestCase() {
       initialText,
       initialText,
     )
-    assertExOutput(
+    assertOutput(
       """
       g/found
       I found it in a legendary land""".trimIndent()
@@ -303,7 +303,7 @@ class GlobalCommandTest : VimTestCase() {
       initialText,
       initialText,
     )
-    assertExOutput(
+    assertOutput(
       """
       |g/it
       |I found it in a legendary land
@@ -321,7 +321,7 @@ class GlobalCommandTest : VimTestCase() {
       injector.options(editor).number = true
     }
     typeText(commandToKeys(":g/it"))
-    assertExOutput(
+    assertOutput(
       """
       |g/it
       |3 I found it in a legendary land
@@ -341,7 +341,7 @@ class GlobalCommandTest : VimTestCase() {
       initialText,
       initialText,
     )
-    assertExOutput(
+    assertOutput(
       """
       g/found/
       I found it in a legendary land""".trimIndent()
@@ -357,7 +357,7 @@ class GlobalCommandTest : VimTestCase() {
       injector.options(editor).number = true
     }
     typeText(commandToKeys(":g/found/"))
-    assertExOutput(
+    assertOutput(
       """
       g/found/
       3 I found it in a legendary land""".trimIndent()

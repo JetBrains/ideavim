@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -435,7 +435,7 @@ class CommandParserTest : VimTestCase() {
       ),
     )
     typeText(commandToKeys("echo x"))
-    assertExOutput("3")
+    assertOutput("3")
   }
 
   @Test
@@ -452,7 +452,7 @@ class CommandParserTest : VimTestCase() {
       ),
     )
     typeText(commandToKeys("echo x"))
-    assertExOutput("42")
+    assertOutput("42")
   }
 
   @Test

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2024 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,11 +9,6 @@
 package com.maddyhome.idea.vim.api
 
 interface VimOutputPanelService {
-  /**
-   * Creates a new VimOutputPanel instance for building output without affecting the current panel until displayed.
-   */
-  // TODO make it possible to pass null instead of editor
-  fun create(editor: VimEditor, context: ExecutionContext): VimOutputPanel
 
   /**
    * Retrieves the current VimOutputPanel or creates a new one if none exists.
@@ -26,8 +21,14 @@ interface VimOutputPanelService {
   fun getCurrentOutputPanel(): VimOutputPanel?
 
   /**
-   * Appends text to the existing output panel or creates a new one with the given text.
-   * Basic method that should be sufficient in most cases.
+   * Displays text in the output panel.
+   *
+   * @param messageType The type of message (STANDARD or ERROR) - affects display color
    */
-  fun output(editor: VimEditor, context: ExecutionContext, text: String)
+  fun output(
+    editor: VimEditor,
+    context: ExecutionContext,
+    text: String,
+    messageType: MessageType = MessageType.STANDARD,
+  )
 }
