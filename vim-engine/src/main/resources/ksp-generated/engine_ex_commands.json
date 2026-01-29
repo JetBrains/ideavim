@@ -83,6 +83,7 @@
   "q[uit]": "com.maddyhome.idea.vim.vimscript.model.commands.QuitCommand",
   "qa[ll]": "com.maddyhome.idea.vim.vimscript.model.commands.ExitCommand",
   "quita[ll]": "com.maddyhome.idea.vim.vimscript.model.commands.ExitCommand",
+  "r[ead]": "com.maddyhome.idea.vim.vimscript.model.commands.ReadCommand",
   "red[o]": "com.maddyhome.idea.vim.vimscript.model.commands.RedoCommand",
   "reg[isters]": "com.maddyhome.idea.vim.vimscript.model.commands.RegistersCommand",
   "s[ubstitute]": "com.maddyhome.idea.vim.vimscript.model.commands.SubstituteCommand",
