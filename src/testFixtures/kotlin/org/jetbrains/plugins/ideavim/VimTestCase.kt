@@ -727,10 +727,10 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
 
   fun assertCommandOutput(command: String, expected: String) {
     enterCommand(command)
-    assertExOutput(expected)
+    assertOutput(expected)
   }
 
-  fun assertExOutput(expected: String, clear: Boolean = true) {
+  fun assertOutput(expected: String, clear: Boolean = true) {
     val actual = injector.outputPanel.getCurrentOutputPanel()?.text
     if (actual == null) {
       // If there's no output, there's a good chance we've got an error
@@ -751,7 +751,7 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
     }
   }
 
-  fun assertNoExOutput() {
+  fun assertNoOutput() {
     val actual = ExOutputModel.getInstance(fixture.editor).text
     assertEquals("", actual)
   }

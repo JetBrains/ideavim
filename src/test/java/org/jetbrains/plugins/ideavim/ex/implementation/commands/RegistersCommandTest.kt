@@ -23,7 +23,7 @@ class RegistersCommandTest : VimTestCase() {
   fun `test list empty registers`() {
     configureByText("")
     enterCommand("registers")
-    assertExOutput("Type Name Content")
+    assertOutput("Type Name Content")
   }
 
   @Test
@@ -36,7 +36,7 @@ class RegistersCommandTest : VimTestCase() {
     }
 
     enterCommand("registers abc")
-    assertExOutput(
+    assertOutput(
       """Type Name Content
       |  c  "a   Content for register a
       |  c  "b   Content for register b
@@ -55,7 +55,7 @@ class RegistersCommandTest : VimTestCase() {
     }
 
     enterCommand("registers hello world")
-    assertExOutput(
+    assertOutput(
       """Type Name Content
       |  c  "d   Content for register d
       |  c  "e   Content for register e
@@ -78,7 +78,7 @@ class RegistersCommandTest : VimTestCase() {
     }
 
     enterCommand("registers Z")
-    assertExOutput("Type Name Content")
+    assertOutput("Type Name Content")
   }
 
   @Test
@@ -92,7 +92,7 @@ class RegistersCommandTest : VimTestCase() {
 
     // Does not trim whitespace
     enterCommand("registers a")
-    assertExOutput(
+    assertOutput(
       """
         |Type Name Content
         |  c  "a   ${(indent + text).take(200)}
@@ -107,7 +107,7 @@ class RegistersCommandTest : VimTestCase() {
     VimPlugin.getRegister().setKeys('a', injector.parser.parseKeys("<Tab>Hello<Space>World<CR><Esc>"))
 
     enterCommand("registers")
-    assertExOutput(
+    assertOutput(
       """
         |Type Name Content
         |  c  "a   ^IHello World^J^[
@@ -125,7 +125,7 @@ class RegistersCommandTest : VimTestCase() {
     }
 
     enterCommand("display abc")
-    assertExOutput(
+    assertOutput(
       """
         |Type Name Content
         |  c  "a   Content for register a
@@ -187,7 +187,7 @@ class RegistersCommandTest : VimTestCase() {
     // "# alternate file name
     // "= expression register
     enterCommand("registers")
-    assertExOutput(
+    assertOutput(
       """
         |Type Name Content
         |  c  ""   s
@@ -252,7 +252,7 @@ class RegistersCommandTest : VimTestCase() {
     typeText("V<Esc>")
 
     enterCommand("registers")
-    assertExOutput(
+    assertOutput(
       """
         |Type Name Content
         |  c  "*   clipboard content
@@ -268,7 +268,7 @@ class RegistersCommandTest : VimTestCase() {
     typeText("ye")
 
     enterCommand("registers")
-    assertExOutput(
+    assertOutput(
       """
         |Type Name Content
         |  c  ""   line
@@ -288,7 +288,7 @@ class RegistersCommandTest : VimTestCase() {
     typeText("de")
 
     enterCommand("registers")
-    assertExOutput(
+    assertOutput(
       """
         |Type Name Content
         |  c  ""   line
@@ -308,7 +308,7 @@ class RegistersCommandTest : VimTestCase() {
     typeText("de")
 
     enterCommand("registers")
-    assertExOutput(
+    assertOutput(
       """
         |Type Name Content
         |  c  ""   line
@@ -325,7 +325,7 @@ class RegistersCommandTest : VimTestCase() {
   fun `test list empty registers linux`() {
     configureByText("")
     enterCommand("registers")
-    assertExOutput("Type Name Content\n  c  \"*   ")
+    assertOutput("Type Name Content\n  c  \"*   ")
   }
 
   @TestWithPrimaryClipboard
@@ -335,7 +335,7 @@ class RegistersCommandTest : VimTestCase() {
     VimPlugin.getRegister().setKeys('a', injector.parser.parseKeys("<Tab>Hello<Space>World<CR><Esc>"))
 
     enterCommand("registers")
-    assertExOutput(
+    assertOutput(
       """
         |Type Name Content
         |  c  "a   ^IHello World^J^[
@@ -397,7 +397,7 @@ class RegistersCommandTest : VimTestCase() {
     // "# alternate file name
     // "= expression register
     enterCommand("registers")
-    assertExOutput(
+    assertOutput(
       """
         |Type Name Content
         |  c  ""   s
@@ -463,7 +463,7 @@ class RegistersCommandTest : VimTestCase() {
     typeText("V<Esc>")
 
     enterCommand("registers")
-    assertExOutput(
+    assertOutput(
       """
         |Type Name Content
         |  c  "*   line 0 
@@ -480,7 +480,7 @@ class RegistersCommandTest : VimTestCase() {
     typeText("ye")
 
     enterCommand("registers")
-    assertExOutput(
+    assertOutput(
       """
         |Type Name Content
         |  c  ""   line
@@ -501,7 +501,7 @@ class RegistersCommandTest : VimTestCase() {
     typeText("de")
 
     enterCommand("registers")
-    assertExOutput(
+    assertOutput(
       """
         |Type Name Content
         |  c  ""   line

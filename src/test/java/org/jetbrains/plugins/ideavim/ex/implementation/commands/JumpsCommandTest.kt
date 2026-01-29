@@ -17,7 +17,7 @@ class JumpsCommandTest : VimTestCase() {
   fun `test shows empty list`() {
     configureByText("")
     enterCommand("jumps")
-    assertExOutput(" jump line  col file/text\n>")
+    assertOutput(" jump line  col file/text\n>")
   }
 
   @Test
@@ -41,7 +41,7 @@ class JumpsCommandTest : VimTestCase() {
     enterSearch("underside")
 
     enterCommand("jumps")
-    assertExOutput(
+    assertOutput(
       """ jump line  col file/text
                      |   4     1    8 I found it in a legendary land
                      |   3     3   29 where it was settled on some sodden sand
@@ -75,7 +75,7 @@ class JumpsCommandTest : VimTestCase() {
     typeText(injector.parser.parseKeys("<C-O>" + "<C-O>"))
 
     enterCommand("jumps")
-    assertExOutput(
+    assertOutput(
       """ jump line  col file/text
                      |   2     1    8 I found it in a legendary land
                      |   1     3   29 where it was settled on some sodden sand
@@ -95,7 +95,7 @@ class JumpsCommandTest : VimTestCase() {
     enterSearch("long")
 
     enterCommand("jumps")
-    assertExOutput(
+    assertOutput(
       """ jump line  col file/text
                      |   1     1    0 ${text.substring(0, 200)}
                      |>
@@ -110,7 +110,7 @@ class JumpsCommandTest : VimTestCase() {
     typeText(injector.parser.parseKeys("G"))
 
     enterCommand("jumps")
-    assertExOutput(
+    assertOutput(
       """
         | jump line  col file/text
         |   1     1    0 Hello^FWorld^?

@@ -21,7 +21,7 @@ class OptionTest : VimTestCase() {
     configureByText("\n")
     enterCommand("set ignorecase") // Default is off
     typeText(commandToKeys("if &ic | echo 'ignore case is on' | else | echo 'ignore case is off' | endif"))
-    assertExOutput("ignore case is on")
+    assertOutput("ignore case is on")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
@@ -31,7 +31,7 @@ class OptionTest : VimTestCase() {
     enterCommand("set ignorecase") // Default is off
     enterCommand("set noignorecase")
     typeText(commandToKeys("if &ic | echo 'ignore case is on' | else | echo 'ignore case is off' | endif"))
-    assertExOutput("ignore case is off")
+    assertOutput("ignore case is off")
   }
 
   @Test
@@ -39,8 +39,8 @@ class OptionTest : VimTestCase() {
     configureByText("\n")
     enterCommand("set ignorecase digraph") // Both off by default
     typeText(commandToKeys("if &ic | echo 'ignore case is on' | else | echo 'ignore case is off' | endif"))
-    assertExOutput("ignore case is on")
+    assertOutput("ignore case is on")
     typeText(commandToKeys("if &dg | echo 'digraph is on' | else | echo 'digraph is off' | endif"))
-    assertExOutput("digraph is on")
+    assertOutput("digraph is on")
   }
 }

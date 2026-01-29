@@ -156,7 +156,7 @@ class MarksCommandTest : VimTestCase() {
   fun `test list empty marks`() {
     configureByText("")
     enterCommand("marks")
-    assertExOutput("mark line  col file/text")
+    assertOutput("mark line  col file/text")
   }
 
   @Test
@@ -171,7 +171,7 @@ class MarksCommandTest : VimTestCase() {
     typeText(injector.parser.parseKeys("ma"))
 
     enterCommand("marks")
-    assertExOutput(
+    assertOutput(
       """
         |mark line  col file/text
         | a      3    8 where it was settled on some sodden sand
@@ -191,7 +191,7 @@ class MarksCommandTest : VimTestCase() {
     typeText(injector.parser.parseKeys("ma"))
 
     enterCommand("marks")
-    assertExOutput(
+    assertOutput(
       """
         |mark line  col file/text
         | a      1    0 Lorem ipsum dolor sit amet,
@@ -214,7 +214,7 @@ class MarksCommandTest : VimTestCase() {
     typeText(injector.parser.parseKeys("md"))
 
     enterCommand("marks")
-    assertExOutput(
+    assertOutput(
       """
         |mark line  col file/text
         | a      1    8 I found it in a legendary land
@@ -238,7 +238,7 @@ class MarksCommandTest : VimTestCase() {
     typeText(injector.parser.parseKeys("mB"))
 
     enterCommand("marks")
-    assertExOutput(
+    assertOutput(
       """
         |mark line  col file/text
         | A      1    8 I found it in a legendary land
@@ -262,7 +262,7 @@ class MarksCommandTest : VimTestCase() {
     typeText(injector.parser.parseKeys("mD"))
 
     enterCommand("marks bdD")
-    assertExOutput(
+    assertOutput(
       """
         |mark line  col file/text
         | b      2    9 consectetur adipiscing elit
@@ -282,7 +282,7 @@ class MarksCommandTest : VimTestCase() {
     )
     typeText(injector.parser.parseKeys("ma" + "jl"))
     enterCommand("marks b")
-    assertExOutput("mark line  col file/text")
+    assertOutput("mark line  col file/text")
   }
 
   @Test
@@ -297,7 +297,7 @@ class MarksCommandTest : VimTestCase() {
     val vimEditor = fixture.editor.vim
     injector.markService.setMark(vimEditor.primaryCaret(), 'a', 100000)
     enterCommand("marks")
-    assertExOutput(
+    assertOutput(
       """
         |mark line  col file/text
         | a      4   39 Cras id tellus in ex imperdiet egestas.
@@ -310,7 +310,7 @@ class MarksCommandTest : VimTestCase() {
     configureByText("$c\u0009Hello world\n\u0006\n\u007f")
     typeText(injector.parser.parseKeys("ma" + "j" + "mb" + "j" + "mc"))
     enterCommand("marks abc")
-    assertExOutput(
+    assertOutput(
       """
         |mark line  col file/text
         | a      1    0 Hello world
@@ -327,7 +327,7 @@ class MarksCommandTest : VimTestCase() {
     configureByText(indent + c + text)
     typeText(injector.parser.parseKeys("ma"))
     enterCommand("marks a")
-    assertExOutput(
+    assertOutput(
       """
         |mark line  col file/text
         | a      1  100 ${text.substring(0, 200)}
@@ -366,7 +366,7 @@ class MarksCommandTest : VimTestCase() {
     // Vim does not list the (, ), { or } marks. See :help :marks
     // Can't easily test 0-9 or " (locations of previously closed files from vim-info)
     enterCommand("marks")
-    assertExOutput(
+    assertOutput(
       """
         |mark line  col file/text
         | '      8   20 akin replaced content its blue,

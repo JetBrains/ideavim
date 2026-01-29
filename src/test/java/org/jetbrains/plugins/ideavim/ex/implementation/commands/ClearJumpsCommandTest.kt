@@ -34,7 +34,7 @@ class ClearJumpsCommandTest : VimTestCase() {
     enterSearch("underside")
 
     enterCommand("jumps")
-    assertExOutput(
+    assertOutput(
       """
         | jump line  col file/text
         |   4     1    8 I found it in a legendary land
@@ -48,7 +48,7 @@ class ClearJumpsCommandTest : VimTestCase() {
     enterCommand("clearjumps")
 
     enterCommand("jumps")
-    assertExOutput(
+    assertOutput(
       """
         | jump line  col file/text
         |>
@@ -78,7 +78,7 @@ class ClearJumpsCommandTest : VimTestCase() {
     enterSearch("underside")
 
     enterCommand("jumps")
-    assertExOutput(
+    assertOutput(
       """
         | jump line  col file/text
         |   4     1    8 I found it in a legendary land
@@ -92,7 +92,7 @@ class ClearJumpsCommandTest : VimTestCase() {
     enterCommand("clearju")
 
     enterCommand("jumps")
-    assertExOutput(
+    assertOutput(
       """
       | jump line  col file/text
       |>

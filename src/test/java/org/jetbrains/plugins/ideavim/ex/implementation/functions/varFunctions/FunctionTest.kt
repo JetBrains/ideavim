@@ -18,20 +18,20 @@ class FunctionTest : VimTestCase("\n") {
   fun `test function for built-in function`() {
     typeText(commandToKeys("let Ff = function('abs')"))
     typeText(commandToKeys("echo Ff(-10)"))
-    assertExOutput("10")
+    assertOutput("10")
 
     typeText(commandToKeys("echo Ff"))
-    assertExOutput("abs")
+    assertOutput("abs")
   }
 
   @Test
   fun `test function with arglist`() {
     typeText(commandToKeys("let Ff = function('abs', [-10])"))
     typeText(commandToKeys("echo Ff()"))
-    assertExOutput("10")
+    assertOutput("10")
 
     typeText(commandToKeys("echo Ff"))
-    assertExOutput("function('abs', [-10])")
+    assertOutput("function('abs', [-10])")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
@@ -81,7 +81,7 @@ class FunctionTest : VimTestCase("\n") {
     typeText(commandToKeys("let d = {'offset': 100}"))
     typeText(commandToKeys("let Ff = function('PrintSum', [42], d)"))
     typeText(commandToKeys("echo Ff()"))
-    assertExOutput("142")
+    assertOutput("142")
 
     typeText(commandToKeys("delfunction! PrintSum"))
   }
@@ -99,7 +99,7 @@ class FunctionTest : VimTestCase("\n") {
     )
     typeText(commandToKeys("let Ff = function('SayHi')"))
     typeText(commandToKeys("call Ff()"))
-    assertExOutput("hello")
+    assertOutput("hello")
 
     typeText(
       commandToKeys(
@@ -111,7 +111,7 @@ class FunctionTest : VimTestCase("\n") {
       ),
     )
     typeText(commandToKeys("call Ff()"))
-    assertExOutput("hi")
+    assertOutput("hi")
 
     typeText(commandToKeys("delfunction! SayHi"))
   }

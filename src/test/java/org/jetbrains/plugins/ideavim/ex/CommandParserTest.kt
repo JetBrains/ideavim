@@ -435,7 +435,7 @@ class CommandParserTest : VimTestCase() {
       ),
     )
     typeText(commandToKeys("echo x"))
-    assertExOutput("3")
+    assertOutput("3")
   }
 
   @Test
@@ -452,7 +452,7 @@ class CommandParserTest : VimTestCase() {
       ),
     )
     typeText(commandToKeys("echo x"))
-    assertExOutput("42")
+    assertOutput("42")
   }
 
   @Test

@@ -26,7 +26,7 @@ class LambdaTest : VimTestCase() {
         """.trimIndent(),
       ),
     )
-    assertExOutput("hello from an empty function")
+    assertOutput("hello from an empty function")
   }
 
   @Test
@@ -40,7 +40,7 @@ class LambdaTest : VimTestCase() {
         """.trimIndent(),
       ),
     )
-    assertExOutput("42")
+    assertOutput("42")
   }
 
   @Test
@@ -54,7 +54,7 @@ class LambdaTest : VimTestCase() {
         """.trimIndent(),
       ),
     )
-    assertExOutput("42")
+    assertOutput("42")
   }
 
   @Test
@@ -69,10 +69,10 @@ class LambdaTest : VimTestCase() {
         """.trimIndent(),
       ),
     )
-    assertExOutput("function('<lambda>0')")
+    assertOutput("function('<lambda>0')")
 
     typeText(commandToKeys("echo Subtraction"))
-    assertExOutput("function('<lambda>1')")
+    assertOutput("function('<lambda>1')")
   }
 
   @Test
@@ -90,7 +90,7 @@ class LambdaTest : VimTestCase() {
         """.trimIndent(),
       ),
     )
-    assertExOutput("5 - 2 = 3")
+    assertOutput("5 - 2 = 3")
   }
 
   @Test
@@ -105,7 +105,7 @@ class LambdaTest : VimTestCase() {
       ),
     )
     assertPluginError(false)
-    assertExOutput("42")
+    assertOutput("42")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
@@ -128,13 +128,13 @@ class LambdaTest : VimTestCase() {
   fun `test lambda function call with no args`() {
     configureByText("\n")
     typeText(commandToKeys("echo {-> 'hello from an empty function'}()"))
-    assertExOutput("hello from an empty function")
+    assertOutput("hello from an empty function")
   }
 
   @Test
   fun `test lambda function call with args`() {
     configureByText("\n")
     typeText(commandToKeys("echo {x, y -> x*y}(6, 7)"))
-    assertExOutput("42")
+    assertOutput("42")
   }
 }

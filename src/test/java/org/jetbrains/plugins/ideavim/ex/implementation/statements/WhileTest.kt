@@ -26,7 +26,7 @@ class WhileTest : VimTestCase() {
       ),
     )
     typeText(commandToKeys("echo x"))
-    assertExOutput("103")
+    assertOutput("103")
   }
 
   @Test
@@ -46,7 +46,7 @@ class WhileTest : VimTestCase() {
       ),
     )
     typeText(commandToKeys("echo x"))
-    assertExOutput("13")
+    assertOutput("13")
   }
 
   @Test
@@ -67,6 +67,6 @@ class WhileTest : VimTestCase() {
       ),
     )
     typeText(commandToKeys("echo evenNumbers"))
-    assertExOutput("50")
+    assertOutput("50")
   }
 }

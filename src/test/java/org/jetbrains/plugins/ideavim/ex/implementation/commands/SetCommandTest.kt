@@ -161,7 +161,7 @@ class SetCommandTest : VimTestCase() {
 
     // 'fileencoding' defaults to "", but is automatically detected as UTF-8
     enterCommand("set number relativenumber scrolloff nrformats")
-    assertExOutput("  nrformats=hex       scrolloff=0")
+    assertOutput("  nrformats=hex       scrolloff=0")
     injector.outputPanel.getCurrentOutputPanel()?.close()
     assertCommandOutput(
       "set",
@@ -233,7 +233,7 @@ class SetCommandTest : VimTestCase() {
 
     // 'fileencoding' defaults to "", but is automatically detected as UTF-8
     enterCommand("set number relativenumber scrolloff nrformats")
-    assertExOutput("  nrformats=hex       scrolloff=0")
+    assertOutput("  nrformats=hex       scrolloff=0")
     injector.outputPanel.getCurrentOutputPanel()?.close()
     assertCommandOutput(
       "set!",

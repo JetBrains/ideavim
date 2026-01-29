@@ -35,10 +35,10 @@ class FuncrefTest : VimTestCase("\n") {
     )
     typeText(commandToKeys("let Ff = funcref('Abs', [-10])"))
     typeText(commandToKeys("echo Ff()"))
-    assertExOutput("10")
+    assertOutput("10")
 
     typeText(commandToKeys("echo Ff"))
-    assertExOutput("function('Abs', [-10])")
+    assertOutput("function('Abs', [-10])")
 
     typeText(commandToKeys("delfunction! Abs"))
   }
@@ -111,7 +111,7 @@ class FuncrefTest : VimTestCase("\n") {
     typeText(commandToKeys("let d = {'offset': 100}"))
     typeText(commandToKeys("let Ff = funcref('PrintSum', [42], d)"))
     typeText(commandToKeys("echo Ff()"))
-    assertExOutput("142")
+    assertOutput("142")
 
     typeText(commandToKeys("delfunction! PrintSum"))
   }
@@ -129,7 +129,7 @@ class FuncrefTest : VimTestCase("\n") {
     )
     typeText(commandToKeys("let Ff = funcref('SayHi')"))
     typeText(commandToKeys("call Ff()"))
-    assertExOutput("hello")
+    assertOutput("hello")
 
     typeText(
       commandToKeys(
@@ -141,7 +141,7 @@ class FuncrefTest : VimTestCase("\n") {
       ),
     )
     typeText(commandToKeys("call Ff()"))
-    assertExOutput("hello")
+    assertOutput("hello")
 
     typeText(commandToKeys("delfunction! SayHi"))
   }

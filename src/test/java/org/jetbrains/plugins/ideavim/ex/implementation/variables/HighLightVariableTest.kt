@@ -24,7 +24,7 @@ class HighLightVariableTest : VimTestCase() {
     )
     enterCommand("set hlsearch")
     enterCommand("echo v:hlsearch")
-    assertExOutput("0")
+    assertOutput("0")
   }
 
   @Test
@@ -39,7 +39,7 @@ class HighLightVariableTest : VimTestCase() {
     enterCommand("set hlsearch")
     enterSearch("one")
     enterCommand("echo v:hlsearch")
-    assertExOutput("1")
+    assertOutput("1")
   }
 
   @Test
@@ -54,7 +54,7 @@ class HighLightVariableTest : VimTestCase() {
     enterCommand("set hlsearch")
     enterSearch("xyz")
     enterCommand("echo v:hlsearch")
-    assertExOutput("0")
+    assertOutput("0")
   }
 
   @Test
@@ -70,7 +70,7 @@ class HighLightVariableTest : VimTestCase() {
     enterSearch("one")
     enterCommand("nohlsearch")
     enterCommand("echo v:hlsearch")
-    assertExOutput("0")
+    assertOutput("0")
   }
 
   @Test
@@ -87,7 +87,7 @@ class HighLightVariableTest : VimTestCase() {
     enterCommand("nohlsearch")
     typeText("n")
     enterCommand("echo v:hlsearch")
-    assertExOutput("1")
+    assertOutput("1")
   }
 
 

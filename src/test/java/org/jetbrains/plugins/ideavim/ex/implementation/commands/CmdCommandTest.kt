@@ -35,7 +35,7 @@ class CmdCommandTest : VimTestCase() {
     configureByText("\n")
     typeText(commandToKeys("command"))
     assertPluginError(false)
-    assertExOutput("Name        Args       Definition") // There should not be any aliases.
+    assertOutput("Name        Args       Definition") // There should not be any aliases.
 
     typeText(commandToKeys("command Vs vs"))
     assertPluginError(false)
@@ -54,7 +54,7 @@ class CmdCommandTest : VimTestCase() {
     typeText(commandToKeys("command"))
     assertPluginError(false)
     // The added alias should be listed
-    assertExOutput(
+    assertOutput(
       """Name        Args       Definition
             |Test1       *          echo
             |Test2       ?          echo
@@ -69,7 +69,7 @@ class CmdCommandTest : VimTestCase() {
     typeText(commandToKeys("command W"))
     assertPluginError(false)
     // The filtered aliases should be listed
-    assertExOutput(
+    assertOutput(
       """Name        Args       Definition
             |Wq          0          wq
             |WQ          0          wq
@@ -201,13 +201,13 @@ class CmdCommandTest : VimTestCase() {
     assertPluginError(false)
     typeText(commandToKeys("Error test"))
     assertPluginError(false)
-    assertExOutput("Hello!")
+    assertOutput("Hello!")
 
     typeText(commandToKeys("command! -nargs=1 Error echo <q-args>"))
     assertPluginError(false)
     typeText(commandToKeys("Error test message"))
     assertPluginError(false)
-    assertExOutput("test message")
+    assertOutput("test message")
   }
 
   @Test
@@ -220,7 +220,7 @@ class CmdCommandTest : VimTestCase() {
     assertPluginError(false)
     typeText(commandToKeys("Show test"))
     assertPluginError(false)
-    assertExOutput("test")
+    assertOutput("test")
   }
 
   @Test

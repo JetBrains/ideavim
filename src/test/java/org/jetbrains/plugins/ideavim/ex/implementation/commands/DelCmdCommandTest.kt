@@ -22,7 +22,7 @@ class DelCmdCommandTest : VimTestCase() {
     configureByText("\n")
     typeText(commandToKeys("command"))
     assertPluginError(false)
-    assertExOutput("Name        Args       Definition") // There should not be any aliases.
+    assertOutput("Name        Args       Definition") // There should not be any aliases.
 
     typeText(commandToKeys("command Vs vs"))
     assertPluginError(false)
@@ -33,7 +33,7 @@ class DelCmdCommandTest : VimTestCase() {
     typeText(commandToKeys("command"))
     assertPluginError(false)
     // The added alias should be listed
-    assertExOutput(
+    assertOutput(
       """Name        Args       Definition
             |Vs          0          vs
             |Wq          0          wq
@@ -44,7 +44,7 @@ class DelCmdCommandTest : VimTestCase() {
     typeText(commandToKeys("command W"))
     assertPluginError(false)
     // The filtered aliases should be listed
-    assertExOutput(
+    assertOutput(
       """Name        Args       Definition
             |Wq          0          wq
             |WQ          0          wq
@@ -56,7 +56,7 @@ class DelCmdCommandTest : VimTestCase() {
     assertPluginError(false)
     typeText(commandToKeys("command"))
     assertPluginError(false)
-    assertExOutput(
+    assertOutput(
       """Name        Args       Definition
             |Vs          0          vs
             |WQ          0          wq

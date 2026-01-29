@@ -33,7 +33,7 @@ class ToUpperFunctionTest : VimTestCase() {
   @Test
   fun `test toupper with list causes error`() {
     enterCommand("echo toupper([1, 2, 3])")
-    assertNoExOutput()
+    assertNoOutput()
     assertPluginError(true)
     assertPluginErrorMessage("E730: Using a List as a String")
   }
@@ -41,7 +41,7 @@ class ToUpperFunctionTest : VimTestCase() {
   @Test
   fun `test toupper with dict causes error`() {
     enterCommand("echo toupper({1: 2, 3: 4})")
-    assertNoExOutput()
+    assertNoOutput()
     assertPluginError(true)
     assertPluginErrorMessage("E731: Using a Dictionary as a String")
   }

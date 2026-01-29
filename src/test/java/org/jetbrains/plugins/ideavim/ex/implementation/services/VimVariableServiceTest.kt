@@ -17,7 +17,7 @@ class VimVariableServiceTest : VimTestCase() {
     configureByText("\n")
     enterCommand("""nnoremap <expr> n ':echo ' .. v:count .. "\<CR>"""")
     typeText("n")
-    assertExOutput("0")
+    assertOutput("0")
   }
 
   @Test
@@ -25,7 +25,7 @@ class VimVariableServiceTest : VimTestCase() {
     configureByText("\n")
     enterCommand("""nnoremap <expr> n ':' .. "\<C-u>" .. 'echo ' .. v:count .. "\<CR>"""")
     typeText("5n")
-    assertExOutput("5")
+    assertOutput("5")
   }
 
   @Test
@@ -33,7 +33,7 @@ class VimVariableServiceTest : VimTestCase() {
     configureByText("\n")
     enterCommand("""nnoremap <expr> n ':' .. "\<C-u>" .. 'echo ' .. v:count .. "\<CR>"""")
     typeText("2\"a5n")
-    assertExOutput("10")
+    assertOutput("10")
   }
 
   @Test
@@ -41,7 +41,7 @@ class VimVariableServiceTest : VimTestCase() {
     configureByText("\n")
     enterCommand("""nnoremap <expr> n ':' .. "\<C-u>" .. 'echo ' .. v:count .. "\<CR>"""")
     typeText("2\"a3\"b4\"c5n")
-    assertExOutput("120")
+    assertOutput("120")
   }
 
   @Test
@@ -49,7 +49,7 @@ class VimVariableServiceTest : VimTestCase() {
     configureByText("\n")
     enterCommand("""nnoremap <expr> n ':echo ' .. v:count1 .. "\<CR>"""")
     typeText("n")
-    assertExOutput("1")
+    assertOutput("1")
   }
 
   @Test
@@ -57,7 +57,7 @@ class VimVariableServiceTest : VimTestCase() {
     configureByText("\n")
     enterCommand("""nnoremap <expr> n ':' .. "\<C-u>" .. 'echo ' .. v:count1 .. "\<CR>"""")
     typeText("5n")
-    assertExOutput("5")
+    assertOutput("5")
   }
 
   @Test
@@ -65,7 +65,7 @@ class VimVariableServiceTest : VimTestCase() {
     configureByText("\n")
     enterCommand("""nnoremap <expr> n ':' .. "\<C-u>" .. 'echo ' .. v:count1 .. "\<CR>"""")
     typeText("2\"a5n")
-    assertExOutput("10")
+    assertOutput("10")
   }
 
   @Test
@@ -73,7 +73,7 @@ class VimVariableServiceTest : VimTestCase() {
     configureByText("\n")
     enterCommand("""nnoremap <expr> n ':' .. "\<C-u>" .. 'echo ' .. v:count1 .. "\<CR>"""")
     typeText("2\"a3\"b4\"c5n")
-    assertExOutput("120")
+    assertOutput("120")
   }
 
   @Test

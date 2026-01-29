@@ -19,7 +19,7 @@ class FunctionCallTest : VimTestCase() {
   fun `test function as method call`() {
     configureByText("\n")
     typeText(commandToKeys("echo -4->abs()"))
-    assertExOutput("4")
+    assertOutput("4")
   }
 
   @Test
@@ -35,7 +35,7 @@ class FunctionCallTest : VimTestCase() {
         """.trimIndent(),
       ),
     )
-    assertExOutput("81")
+    assertOutput("81")
 
     typeText(commandToKeys("delfunction! Power2"))
   }
@@ -53,7 +53,7 @@ class FunctionCallTest : VimTestCase() {
         """.trimIndent(),
       ),
     )
-    assertExOutput("42")
+    assertOutput("42")
 
     typeText(commandToKeys("delfunction! Subtraction"))
   }
@@ -62,7 +62,7 @@ class FunctionCallTest : VimTestCase() {
   fun `test function as method call with lambda`() {
     configureByText("\n")
     typeText(commandToKeys("echo 52->{x,y -> x-y}(10)"))
-    assertExOutput("42")
+    assertOutput("42")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
@@ -99,7 +99,7 @@ class FunctionCallTest : VimTestCase() {
     )
     typeText(commandToKeys("let dict = {'power': function('Power2')}"))
     typeText(commandToKeys("echo dict.power(9)"))
-    assertExOutput("81")
+    assertOutput("81")
 
     typeText(commandToKeys("delfunction! Power2"))
   }
