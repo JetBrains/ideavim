@@ -212,6 +212,16 @@ interface VimChangeGroup {
 
   fun reformatCodeSelection(editor: VimEditor, caret: VimCaret, range: VimSelection)
 
+  fun reformatCodeMotionPreserveCursor(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    argument: Argument,
+    operatorArguments: OperatorArguments,
+  ): Boolean
+
+  fun reformatCodeSelectionPreserveCursor(editor: VimEditor, caret: VimCaret, range: VimSelection)
+
   fun autoIndentMotion(
     editor: VimEditor,
     caret: VimCaret,

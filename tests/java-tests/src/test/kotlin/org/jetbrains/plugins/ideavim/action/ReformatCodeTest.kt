@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2024 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -13,91 +13,456 @@ import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimJavaTestCase
 import org.junit.jupiter.api.Test
 
-@Suppress("unused")
+@TestWithoutNeovim(
+  reason = SkipNeovimReason.SEE_DESCRIPTION,
+  description = "IdeaVim uses IDE code formatter instead of Vim's text formatting based on textwidth",
+)
 class ReformatCodeTest : VimJavaTestCase() {
   @Test
   fun testEmpty() {
-    configureByJavaText("<caret>")
+    configureByJavaText(c)
     typeText(injector.parser.parseKeys("gqq"))
-    assertState("<caret>")
+    assertState(c)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   @Test
   fun testWithCount() {
-    configureByJavaText("class C {\n\tint a;\n\tint <caret>b;\n\tint c;\n\tint d;\n}\n")
+    configureByJavaText(
+      """
+      class C {
+      	int a;
+      	int ${c}b;
+      	int c;
+      	int d;
+      }
+      """.trimIndent(),
+    )
     typeText(injector.parser.parseKeys("2gqq"))
-    assertState("class C {\n" + "\tint a;\n" + "    <caret>int b;\n" + "    int c;\n" + "\tint d;\n" + "}\n")
-  }
-
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
-  @Test
-  fun testWithUpMotion() {
-    configureByJavaText("class C {\n" + "\tint a;\n" + "\tint b;\n" + "\tint <caret>c;\n" + "\tint d;\n" + "}\n")
-    typeText(injector.parser.parseKeys("gqk"))
-    assertState("class C {\n" + "\tint a;\n" + "    <caret>int b;\n" + "    int c;\n" + "\tint d;\n" + "}\n")
-  }
-
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
-  @Test
-  fun testWithRightMotion() {
-    configureByJavaText("class C {\n" + "\tint a;\n" + "\tint <caret>b;\n" + "\tint c;\n" + "}\n")
-    typeText(injector.parser.parseKeys("gql"))
-    assertState("class C {\n" + "\tint a;\n" + "    <caret>int b;\n" + "\tint c;\n" + "}\n")
-  }
-
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
-  @Test
-  fun testWithTextObject() {
-    configureByJavaText("class C {\n" + "\tint a;\n" + "\tint <caret>b;\n" + "\tint c;\n" + "}\n")
-    typeText(injector.parser.parseKeys("gqi{"))
     assertState(
-      """class C {
-    <caret>int a;
-    int b;
-    int c;
-}
-""",
+      """
+      class C {
+      	int a;
+          ${c}int b;
+          int c;
+      	int d;
+      }
+      """.trimIndent(),
     )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @Test
+  fun testWithUpMotion() {
+    configureByJavaText(
+      """
+      class C {
+      	int a;
+      	int b;
+      	int ${c}c;
+      	int d;
+      }
+      """.trimIndent(),
+    )
+    typeText(injector.parser.parseKeys("gqk"))
+    assertState(
+      """
+      class C {
+      	int a;
+          ${c}int b;
+          int c;
+      	int d;
+      }
+      """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun testWithRightMotion() {
+    configureByJavaText(
+      """
+      class C {
+      	int a;
+      	int ${c}b;
+      	int c;
+      }
+      """.trimIndent(),
+    )
+    typeText(injector.parser.parseKeys("gql"))
+    assertState(
+      """
+      class C {
+      	int a;
+          ${c}int b;
+      	int c;
+      }
+      """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun testWithTextObject() {
+    configureByJavaText(
+      """
+      class C {
+      	int a;
+      	int ${c}b;
+      	int c;
+      }
+      """.trimIndent(),
+    )
+    typeText(injector.parser.parseKeys("gqi{"))
+    assertState(
+      """
+      class C {
+          ${c}int a;
+          int b;
+          int c;
+      }
+      """.trimIndent(),
+    )
+  }
+
   @Test
   fun testWithCountsAndDownMotion() {
-    configureByJavaText("class C {\n" + "\tint <caret>a;\n" + "\tint b;\n" + "\tint c;\n" + "\tint d;\n" + "}\n")
+    configureByJavaText(
+      """
+      class C {
+      	int ${c}a;
+      	int b;
+      	int c;
+      	int d;
+      }
+      """.trimIndent(),
+    )
     typeText(injector.parser.parseKeys("2gqj"))
-    assertState("class C {\n" + "    <caret>int a;\n" + "    int b;\n" + "    int c;\n" + "\tint d;\n" + "}\n")
+    assertState(
+      """
+      class C {
+          ${c}int a;
+          int b;
+          int c;
+      	int d;
+      }
+      """.trimIndent(),
+    )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   @Test
   fun testVisual() {
-    configureByJavaText("class C {\n" + "\tint a;\n" + "\tint <caret>b;\n" + "\tint c;\n" + "}\n")
-    typeText(injector.parser.parseKeys("v" + "l" + "gq"))
-    assertState("class C {\n" + "\tint a;\n" + "    <caret>int b;\n" + "\tint c;\n" + "}\n")
+    configureByJavaText(
+      """
+      class C {
+      	int a;
+      	int ${c}b;
+      	int c;
+      }
+      """.trimIndent(),
+    )
+    typeText(injector.parser.parseKeys("vlgq"))
+    assertState(
+      """
+      class C {
+      	int a;
+          ${c}int b;
+      	int c;
+      }
+      """.trimIndent(),
+    )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   @Test
   fun testLinewiseVisual() {
-    configureByJavaText("class C {\n" + "\tint a;\n" + "\tint <caret>b;\n" + "\tint c;\n" + "}\n")
-    typeText(injector.parser.parseKeys("V" + "l" + "gq"))
-    assertState("class C {\n" + "\tint a;\n" + "    <caret>int b;\n" + "\tint c;\n" + "}\n")
+    configureByJavaText(
+      """
+      class C {
+      	int a;
+      	int ${c}b;
+      	int c;
+      }
+      """.trimIndent(),
+    )
+    typeText(injector.parser.parseKeys("Vlgq"))
+    assertState(
+      """
+      class C {
+      	int a;
+          ${c}int b;
+      	int c;
+      }
+      """.trimIndent(),
+    )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   @Test
   fun testVisualMultiline() {
-    configureByJavaText("class C {\n" + "\tint a;\n" + "\tint <caret>b;\n" + "\tint c;\n" + "\tint d;\n" + "}\n")
-    typeText(injector.parser.parseKeys("v" + "j" + "gq"))
-    assertState("class C {\n" + "\tint a;\n" + "    <caret>int b;\n" + "    int c;\n" + "\tint d;\n" + "}\n")
+    configureByJavaText(
+      """
+      class C {
+      	int a;
+      	int ${c}b;
+      	int c;
+      	int d;
+      }
+      """.trimIndent(),
+    )
+    typeText(injector.parser.parseKeys("vjgq"))
+    assertState(
+      """
+      class C {
+      	int a;
+          ${c}int b;
+          int c;
+      	int d;
+      }
+      """.trimIndent(),
+    )
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   @Test
   fun testVisualBlock() {
-    configureByJavaText("class C {\n" + "\tint a;\n" + "\tint <caret>b;\n" + "\tint c;\n" + "\tint d;\n" + "}\n")
-    typeText(injector.parser.parseKeys("<C-V>" + "j" + "gq"))
-    assertState("class C {\n" + "\tint a;\n" + "    <caret>int b;\n" + "    int c;\n" + "\tint d;\n" + "}\n")
+    configureByJavaText(
+      """
+      class C {
+      	int a;
+      	int ${c}b;
+      	int c;
+      	int d;
+      }
+      """.trimIndent(),
+    )
+    typeText(injector.parser.parseKeys("<C-V>jgq"))
+    assertState(
+      """
+      class C {
+      	int a;
+          ${c}int b;
+          int c;
+      	int d;
+      }
+      """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun testGwEmpty() {
+    configureByJavaText(c)
+    typeText(injector.parser.parseKeys("gww"))
+    assertState(c)
+  }
+
+  @Test
+  fun testGwWithCount() {
+    configureByJavaText(
+      """
+      class C {
+      	int a;
+      	int ${c}b;
+      	int c;
+      	int d;
+      }
+      """.trimIndent(),
+    )
+    typeText(injector.parser.parseKeys("2gww"))
+    assertState(
+      """
+      class C {
+      	int a;
+          int ${c}b;
+          int c;
+      	int d;
+      }
+      """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun testGwWithUpMotion() {
+    configureByJavaText(
+      """
+      class C {
+      	int a;
+      	int b;
+      	int ${c}c;
+      	int d;
+      }
+      """.trimIndent(),
+    )
+    typeText(injector.parser.parseKeys("gwk"))
+    assertState(
+      """
+      class C {
+      	int a;
+          int b;
+          int ${c}c;
+      	int d;
+      }
+      """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun testGwWithRightMotion() {
+    configureByJavaText(
+      """
+      class C {
+      	int a;
+      	int ${c}b;
+      	int c;
+      }
+      """.trimIndent(),
+    )
+    typeText(injector.parser.parseKeys("gwl"))
+    assertState(
+      """
+      class C {
+      	int a;
+          int ${c}b;
+      	int c;
+      }
+      """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun testGwWithTextObject() {
+    configureByJavaText(
+      """
+      class C {
+      	int a;
+      	int ${c}b;
+      	int c;
+      }
+      """.trimIndent(),
+    )
+    typeText(injector.parser.parseKeys("gwi{"))
+    assertState(
+      """
+      class C {
+          int a;
+          int ${c}b;
+          int c;
+      }
+      """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun testGwWithCountsAndDownMotion() {
+    configureByJavaText(
+      """
+      class C {
+      	int ${c}a;
+      	int b;
+      	int c;
+      	int d;
+      }
+      """.trimIndent(),
+    )
+    typeText(injector.parser.parseKeys("2gwj"))
+    assertState(
+      """
+      class C {
+          int ${c}a;
+          int b;
+          int c;
+      	int d;
+      }
+      """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun testGwVisual() {
+    configureByJavaText(
+      """
+      class C {
+      	int a;
+      	int ${c}b;
+      	int c;
+      }
+      """.trimIndent(),
+    )
+    typeText(injector.parser.parseKeys("vlgw"))
+    assertState(
+      """
+      class C {
+      	int a;
+          int ${c}b;
+      	int c;
+      }
+      """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun testGwLinewiseVisual() {
+    configureByJavaText(
+      """
+      class C {
+      	int a;
+      	int ${c}b;
+      	int c;
+      }
+      """.trimIndent(),
+    )
+    typeText(injector.parser.parseKeys("Vgw"))
+    assertState(
+      """
+      class C {
+      	int a;
+          int ${c}b;
+      	int c;
+      }
+      """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun testGwVisualMultiline() {
+    configureByJavaText(
+      """
+      class C {
+      	int a;
+      	int ${c}b;
+      	int c;
+      	int d;
+      }
+      """.trimIndent(),
+    )
+    typeText(injector.parser.parseKeys("vjgw"))
+    assertState(
+      """
+      class C {
+      	int a;
+          int ${c}b;
+          int c;
+      	int d;
+      }
+      """.trimIndent(),
+    )
+  }
+
+  @Test
+  fun testGwVisualBlock() {
+    configureByJavaText(
+      """
+      class C {
+      	int a;
+      	int ${c}b;
+      	int c;
+      	int d;
+      }
+      """.trimIndent(),
+    )
+    typeText(injector.parser.parseKeys("<C-V>jgw"))
+    assertState(
+      """
+      class C {
+      	int a;
+          int ${c}b;
+          int c;
+      	int d;
+      }
+      """.trimIndent(),
+    )
   }
 }
