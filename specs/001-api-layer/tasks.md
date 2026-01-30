@@ -36,21 +36,21 @@
 
 **Independent Test**: Can be tested by reviewing each open question, making a decision, implementing the resolution, and documenting the final design
 
-### K1: State Update Safety
+### K1: Editor Context Fix
 
-- [ ] T004 [US4] Implement enterInsertMode() safe combined operation in api/src/main/kotlin/com/intellij/vim/api/VimApi.kt
-- [ ] T005 [US4] Implement enterNormalMode() safe combined operation in api/src/main/kotlin/com/intellij/vim/api/VimApi.kt
-- [ ] T006 [US4] Implement enterVisualMode(type) safe combined operation in api/src/main/kotlin/com/intellij/vim/api/VimApi.kt
-- [ ] T007 [US4] Deprecate var mode: Mode setter in VimApi.kt (add @Deprecated annotation)
-- [ ] T008 [US4] Implement combined operations in VimApiImpl in src/main/java/com/maddyhome/idea/vim/thinapi/VimApiImpl.kt
+- [ ] T004 [US4] Define if the API works everywhere in IDE, or in editor context only (decision document)
+- [ ] T005 [US4] Design two-phase API: init phase (no editor) vs execute phase (editor in context)
+- [ ] T006 [US4] Update scope implementations to accept editor as constructor parameter (not re-query focus)
+- [ ] T007 [US4] Implement captured editor pattern in VimApiImpl.kt
+- [ ] T008 [US4] Update handler infrastructure to pass captured editor to handlers
 
-### K2: Editor Context Fix
+### K2: State Update Safety
 
-- [ ] T009 [US4] Add withEditor(editor) scope method to api/src/main/kotlin/com/intellij/vim/api/VimApi.kt
-- [ ] T010 [US4] Add editorOrNull() method for safe focused editor access in VimApi.kt
-- [ ] T011 [US4] Add globalOption() scope for editor-independent option access in VimApi.kt
-- [ ] T012 [US4] Implement withEditor, editorOrNull, globalOption in VimApiImpl.kt
-- [ ] T013 [US4] Update EditorScope to support explicit editor context in api/src/main/kotlin/com/intellij/vim/api/scopes/
+- [ ] T009 [US4] Implement enterInsertMode() safe combined operation in api/src/main/kotlin/com/intellij/vim/api/VimApi.kt
+- [ ] T010 [US4] Implement enterNormalMode() safe combined operation in api/src/main/kotlin/com/intellij/vim/api/VimApi.kt
+- [ ] T011 [US4] Implement enterVisualMode(type) safe combined operation in api/src/main/kotlin/com/intellij/vim/api/VimApi.kt
+- [ ] T012 [US4] Deprecate var mode: Mode setter in VimApi.kt (add @Deprecated annotation)
+- [ ] T013 [US4] Implement combined operations in VimApiImpl in src/main/java/com/maddyhome/idea/vim/thinapi/VimApiImpl.kt
 
 ### K3: Coroutine Audit
 
