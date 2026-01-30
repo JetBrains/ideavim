@@ -1,18 +1,22 @@
 <!--
   SYNC IMPACT REPORT
   ==================
-  Version change: 0.0.0 → 1.0.0
+  Version change: 1.0.0 → 1.1.0
+
+  Modified sections:
+  - Code Quality Standards → expanded with commit clarity rules
 
   Added sections:
-  - Core Principles (4 principles)
-  - Development Standards
-  - Testing Requirements
-  - Governance
+  - V. External Contributors
+  - VI. Documentation Goals
+  - VII. Architecture Decision Records
+
+  Removed sections: None
 
   Templates requiring updates:
-  - .specify/templates/plan-template.md ✅ (Constitution Check section compatible)
-  - .specify/templates/spec-template.md ✅ (Requirements section compatible)
-  - .specify/templates/tasks-template.md ✅ (Test-first pattern compatible)
+  - .specify/templates/plan-template.md ✅ (no changes needed - Constitution Check compatible)
+  - .specify/templates/spec-template.md ✅ (no changes needed - compatible)
+  - .specify/templates/tasks-template.md ✅ (no changes needed - compatible)
 
   Follow-up TODOs: None
 -->
@@ -74,7 +78,51 @@ Code contributions MUST meet quality and documentation standards.
 - Public APIs SHOULD include KDoc/JavaDoc documentation
 - Issue tracking uses YouTrack (VIM-XXXX tickets), not GitHub Issues
 
-**Rationale**: Maintainable code with proper testing ensures long-term project health.
+**Commit Clarity**:
+
+- All commits MUST be clear, focused, and contain a single meaningful change
+- Commits MUST NOT include unrelated "dirty" changes (formatting fixes, unrelated refactoring, etc.)
+- Commit messages MUST clearly describe the change and its purpose
+- If the change relates to a YouTrack ticket, the ticket ID MUST be included in the commit message (e.g., `VIM-1234 Fix cursor position after paste`)
+
+**Rationale**: Clean, focused commits enable confident development, easier code review, and simpler bisection when
+issues arise. Clear commit history is a long-term asset for the project.
+
+### V. External Contributors
+
+IdeaVim is developed and supported by both JetBrains employees and external contributors.
+
+- External contributors are a valued part of the IdeaVim development community
+- The main development process and roadmap are controlled by JetBrains
+- All contributors (internal and external) are recognized in `Authors.md`
+- Contributions follow the same quality standards regardless of source
+
+**Rationale**: Open source collaboration strengthens IdeaVim. External perspectives catch issues, add features, and
+expand the user community. Recognizing all contributors encourages ongoing participation.
+
+### VI. Documentation Goals
+
+The current state of IdeaVim code documentation is not satisfactory and MUST be improved.
+
+- Code SHOULD include documentation explaining the semantic meaning of methods and classes
+- Complex logic SHOULD have inline comments explaining the "why", not just the "what"
+- Public APIs MUST have complete KDoc/JavaDoc documentation
+- Documentation is especially important for AI-assisted development workflows
+
+**Rationale**: Good documentation reduces onboarding time, prevents knowledge silos, and enables both human developers
+and AI tools to understand and work with the codebase effectively.
+
+### VII. Architecture Decision Records
+
+Significant architectural decisions MUST be documented in YouTrack.
+
+- ADRs are marked with `Type: Architecture Decision Record` in YouTrack
+- ADRs document the decision, context, alternatives considered, and rationale
+- Example: [VIM-4063](https://youtrack.jetbrains.com/issue/VIM-4063) Extension functions vs Interface members
+- When making architectural decisions, check existing ADRs for relevant prior decisions
+
+**Rationale**: Documenting architectural decisions preserves institutional knowledge, prevents re-litigating settled
+debates, and helps new contributors understand why the codebase is structured as it is.
 
 ## Development Standards
 
@@ -143,4 +191,4 @@ This constitution establishes the non-negotiable principles for IdeaVim developm
 - Code reviewers SHOULD verify constitution adherence
 - Violations require explicit justification and documentation
 
-**Version**: 1.0.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-01-30
+**Version**: 1.1.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-01-30
