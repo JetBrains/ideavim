@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -36,6 +36,7 @@ import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import javax.swing.JComponent
 import javax.swing.JLabel
+import javax.swing.JRootPane
 import javax.swing.JScrollPane
 import javax.swing.JTextArea
 import javax.swing.KeyStroke
@@ -167,15 +168,7 @@ class ExOutputPanel private constructor(private val myEditor: Editor) : JBPanel<
    */
   fun activate() {
     val root = SwingUtilities.getRootPane(myEditor.contentComponent)
-    myOldGlass = root.getGlassPane() as JComponent?
-    if (myOldGlass != null) {
-      myOldLayout = myOldGlass!!.layout
-      myWasOpaque = myOldGlass!!.isOpaque
-      myOldGlass!!.setLayout(null)
-      myOldGlass!!.setOpaque(false)
-      myOldGlass!!.add(this)
-      myOldGlass!!.addComponentListener(myAdapter)
-    }
+    deactivateOldGlass(root)
 
     setFontForElements()
     positionPanel()
@@ -186,6 +179,19 @@ class ExOutputPanel private constructor(private val myEditor: Editor) : JBPanel<
 
     myActive = true
     requestFocus(myText)
+  }
+
+  private fun deactivateOldGlass(root: JRootPane?) {
+    if (root == null) return
+    myOldGlass = root.getGlassPane() as JComponent?
+    if (myOldGlass != null) {
+      myOldLayout = myOldGlass!!.layout
+      myWasOpaque = myOldGlass!!.isOpaque
+      myOldGlass!!.setLayout(null)
+      myOldGlass!!.setOpaque(false)
+      myOldGlass!!.add(this)
+      myOldGlass!!.addComponentListener(myAdapter)
+    }
   }
 
   private fun setFontForElements() {
