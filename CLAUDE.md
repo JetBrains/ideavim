@@ -31,3 +31,9 @@ This project uses **YouTrack** for issue tracking, NOT GitHub Issues.
 ## Additional Documentation
 
 - Changelog maintenance: Handled by the `changelog` skill (auto-detected when updating changelog)
+
+## Active Technologies
+- Kotlin (JVM 21) + IntelliJ Platform SDK, IdeaVim vim-engine (001-api-layer)
+
+## Recent Changes
+- 001-api-layer: Added Kotlin (JVM 21) + IntelliJ Platform SDK, IdeaVim vim-engine
