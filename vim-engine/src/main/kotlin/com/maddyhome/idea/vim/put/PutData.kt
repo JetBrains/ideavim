@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.state.mode.SelectionType
 
 /**
  * [putToLine] has affect only of [insertTextBeforeCaret] is false and [visualSelection] is null
+ * [putBeforeLine] when true, inserts before the line
  */
 data class PutData(
   val textData: TextData?,
@@ -25,6 +26,7 @@ data class PutData(
   private val rawIndent: Boolean,
   val caretAfterInsertedText: Boolean,
   val putToLine: Int = -1,
+  val putBeforeLine: Boolean = false,
 ) {
   val indent: Boolean =
     if (rawIndent && textData?.typeInRegister != SelectionType.LINE_WISE && visualSelection?.typeInEditor != SelectionType.LINE_WISE) false else rawIndent
