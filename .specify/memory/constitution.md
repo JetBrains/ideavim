@@ -1,10 +1,10 @@
 <!--
   SYNC IMPACT REPORT
   ==================
-  Version change: 1.2.0 → 1.2.1
+  Version change: 1.2.1 → 1.2.2
 
   Modified sections:
-  - VIII. Trunk-Based Development → expanded with branch selection guidelines and planning requirement
+  - VIII. Trunk-Based Development → prefer feature branches with frequent rebasing
 
   Added sections: None
 
@@ -127,22 +127,23 @@ IdeaVim follows trunk-based development with the master branch as the trunk.
 
 **Core Rules**:
 
-- Most changes SHOULD be committed directly to the master branch
-- Unfinished changes MAY be committed to master if they do not break functionality
 - The master branch MUST always be in a "ready to release" state
-- Feature branches are encouraged but not mandatory
+- Unfinished changes MAY be committed to master if they do not break functionality
+- Feature branches SHOULD be used for development work
+- Small, isolated changes (bug fixes, minor tweaks) MAY be committed directly to master
 
 **Branch Selection Guidelines**:
 
-- **Long-running features** (weeks/months): Develop directly on master to avoid divergence and merge conflicts
-- **Short-lived changes** (days): MAY use a feature branch since divergence risk is low
-- When in doubt, prefer master with incremental commits that don't break functionality
+- **Feature development**: Use a feature branch (e.g., `001-api-layer`)
+- **Bug fixes and small changes**: MAY use master directly if the change is isolated and low-risk
+- When in doubt, prefer a feature branch
 
-**Planning Requirement**:
+**Frequent Rebasing Requirement**:
 
-- When planning a new feature, the scope and duration MUST be analyzed
-- Long-running features SHOULD be developed on master with incremental, non-breaking commits
-- Feature branches are appropriate for isolated, short-term work that can be rebased quickly
+- Feature branches MUST be rebased to master frequently (e.g., daily) to avoid large conflicts
+- Long-running branches that diverge significantly become painful to integrate
+- Frequent rebasing catches conflicts early when they are small and manageable
+- Before starting work each day, rebase the feature branch onto the latest master
 
 **Branch Integration**:
 
@@ -151,7 +152,8 @@ IdeaVim follows trunk-based development with the master branch as the trunk.
 - Merge commits are permitted only in specific cases where rebase is not possible
 
 **Rationale**: Trunk-based development reduces integration pain, encourages smaller incremental changes, and maintains
-a linear, comprehensible history. Rebasing keeps the commit history clean and makes bisection straightforward.
+a linear, comprehensible history. Feature branches provide isolation for work-in-progress while frequent rebasing
+prevents divergence. Rebasing keeps the commit history clean and makes bisection straightforward.
 
 ## Development Standards
 
@@ -220,4 +222,4 @@ This constitution establishes the non-negotiable principles for IdeaVim developm
 - Code reviewers SHOULD verify constitution adherence
 - Violations require explicit justification and documentation
 
-**Version**: 1.2.1 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-01-30
+**Version**: 1.2.2 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-01-30

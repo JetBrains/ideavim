@@ -1,6 +1,6 @@
 # Implementation Plan: IdeaVim Extension API Layer
 
-**Development**: `master` (trunk-based) | **Date**: 2026-01-30 | **Spec**: [spec.md](./spec.md)
+**Feature Branch**: `001-api-layer` | **Date**: 2026-01-30 | **Spec**: [spec.md](./spec.md)
 **Input**: Feature specification from `/specs/001-api-layer/spec.md`
 
 ## Summary
