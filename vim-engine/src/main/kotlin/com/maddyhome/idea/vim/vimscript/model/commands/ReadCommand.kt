@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.put.PutData
@@ -24,8 +25,9 @@ import java.io.IOException
 /**
  * see "h :read"
  *
- * Inserts the contents of a file below the current line (or specified line).
+ * Inserts the contents of a file or command output below the current line (or specified line).
  * - `:read file` - insert file contents below current line
+ * - `:read !cmd` - insert shell command output below current line
  * - `:0read file` - insert at the top of the buffer (before line 1)
  * - `:$read file` - insert at the end of the buffer
  * - `:{line}read file` - insert after the specified line number
@@ -44,8 +46,16 @@ data class ReadCommand(val range: Range, val modifier: CommandModifier, val argu
   ): ExecutionResult {
     if (editor.isOneLineMode()) return ExecutionResult.Error
 
-    val filePath = injector.pathExpansion.expandPath(commandArgument.trim())
-    val content = readFileContent(filePath)
+    // Check if this is a shell command (starts with !)
+    val content = if (commandModifier == CommandModifier.BANG) {
+      if (commandArgument.isEmpty()) {
+        throw exExceptionMessage("E471") // Argument required
+      }
+      executeShellCommand(editor, commandArgument)
+    } else {
+      val filePath = injector.pathExpansion.expandPath(commandArgument)
+      readFileContent(filePath)
+    }
 
     if (content.isEmpty()) {
       return ExecutionResult.Success
@@ -53,39 +63,41 @@ data class ReadCommand(val range: Range, val modifier: CommandModifier, val argu
 
     val line = if (range.size() == 0) -1 else getLine(editor)
     val putData = createPutData(content, line)
+    return if (injector.put.putText(editor, context, putData)) ExecutionResult.Success else ExecutionResult.Error
+  }
 
-    return if (injector.put.putText(editor, context, putData)) {
-      ExecutionResult.Success
-    } else {
-      ExecutionResult.Error
+  private fun executeShellCommand(editor: VimEditor, command: String): String {
+    try {
+      return injector.processGroup.executeCommand(editor, command, null, null) ?: ""
+    } catch (e: Exception) {
+      throw ExException("E485: Can't read file: !$command")
     }
   }
-}
 
-private fun createPutData(content: String, line: Int): PutData {
-  val copiedText = injector.clipboardManager.dumbCopiedText(content)
-  val textData = PutData.TextData(null, copiedText, SelectionType.LINE_WISE)
-  val putData = PutData(
-    textData,
-    null,
-    1,
-    insertTextBeforeCaret = false,
-    rawIndent = false,
-    caretAfterInsertedText = false,
-    putToLine = line,
-  )
-  return putData
-}
+  private fun readFileContent(filePath: String): String {
+    val file = File(filePath)
+    if (!file.exists()) {
+      throw exExceptionMessage("E484", filePath)
+    }
 
-private fun readFileContent(filePath: String): String {
-  val file = File(filePath)
-  if (!file.exists()) {
-    throw exExceptionMessage("E484", filePath)
+    return try {
+      file.readText()
+    } catch (_: IOException) {
+      throw exExceptionMessage("E484", filePath)
+    }
   }
 
-  try {
-    return file.readText()
-  } catch (_: IOException) {
-    throw exExceptionMessage("E484", filePath)
+  private fun createPutData(content: String, line: Int): PutData {
+    val copiedText = injector.clipboardManager.dumbCopiedText(content)
+    val textData = PutData.TextData(null, copiedText, SelectionType.LINE_WISE)
+    return PutData(
+      textData,
+      null,
+      1,
+      insertTextBeforeCaret = false,
+      rawIndent = false,
+      caretAfterInsertedText = false,
+      putToLine = line
+    )
   }
 }

@@ -110,8 +110,8 @@ class ReadCommandTest : VimTestCase() {
     enterCommand("0read $testFilePath")
     assertState(
       """
-      line 1
       ${c}inserted line
+      line 1
       line 2
       line 3
     """.trimIndent()
@@ -222,8 +222,8 @@ class ReadCommandTest : VimTestCase() {
     enterCommand("0read $testFilePath")
     assertState(
       """
-      line 1
       ${c}inserted content
+      line 1
       line 2
     """.trimIndent()
     )
@@ -491,8 +491,243 @@ class ReadCommandTest : VimTestCase() {
       """
       line 1
       ${c}Unicode: 你好世界 🎉 émojis
+
+    """.trimIndent()
+    )
+  }
+
+  // ============ Read from shell command (:read !command) ============
+
+  @Test
+  fun `test read from shell command inserts output below current line`() {
+    configureByText(
+      """
+      line 1
+      line ${c}2
+      line 3
+    """.trimIndent()
+    )
+    enterCommand("read! echo \"hello\"")
+    assertState(
+      """
+      line 1
+      line 2
+      ${c}hello
+      line 3
+    """.trimIndent()
+    )
+  }
+
+  @Test
+  fun `test read from shell command with multiple lines output`() {
+    configureByText(
+      """
+      line 1
+      line ${c}2
+      line 3
+    """.trimIndent()
+    )
+    enterCommand("read! echo -e 'first\\nsecond\\nthird'")
+    assertState(
+      """
+      line 1
+      line 2
+      ${c}first
+      second
+      third
+      line 3
+    """.trimIndent()
+    )
+  }
+
+  @Test
+  fun `test read from shell command at line 0`() {
+    configureByText(
+      """
+      line 1
+      line ${c}2
+      line 3
+    """.trimIndent()
+    )
+    enterCommand("0read! echo inserted")
+    assertState(
+      """
+      ${c}inserted
+      line 1
+      line 2
+      line 3
+    """.trimIndent()
+    )
+  }
+
+  @Test
+  fun `test read from shell command at end of file`() {
+    configureByText(
+      """
+      line 1
+      line ${c}2
+      line 3
+    """.trimIndent()
+    )
+    enterCommand("${'$'}read! echo inserted")
+    assertState(
+      """
+      line 1
+      line 2
+      line 3
+      ${c}inserted
       
     """.trimIndent()
     )
+  }
+
+  @Test
+  fun `test read from shell command at specific line`() {
+    configureByText(
+      """
+      line 1
+      line 2
+      line ${c}3
+      line 4
+    """.trimIndent()
+    )
+    enterCommand("1read! echo inserted")
+    assertState(
+      """
+      line 1
+      ${c}inserted
+      line 2
+      line 3
+      line 4
+    """.trimIndent()
+    )
+  }
+
+  @Test
+  fun `test read from shell command with empty output`() {
+    configureByText(
+      """
+      line 1
+      line ${c}2
+      line 3
+    """.trimIndent()
+    )
+    enterCommand("read! echo -n ''")
+    // Empty output should not change the buffer
+    assertState(
+      """
+      line 1
+      line ${c}2
+      line 3
+    """.trimIndent()
+    )
+  }
+
+  @Test
+  fun `test read from shell command can be undone`() {
+    configureByText(
+      """
+      line 1
+      line ${c}2
+      line 3
+    """.trimIndent()
+    )
+    enterCommand("read! echo inserted")
+    assertState(
+      """
+      line 1
+      line 2
+      ${c}inserted
+      line 3
+    """.trimIndent()
+    )
+
+    typeText("u")
+    assertState(
+      """
+      line 1
+      line ${c}2
+      line 3
+    """.trimIndent()
+    )
+  }
+
+  @Test
+  fun `test read from shell command with spaces in output`() {
+    configureByText(
+      """
+      line ${c}1
+      line 2
+    """.trimIndent()
+    )
+    enterCommand("read! echo '  indented with spaces'")
+    assertState(
+      """
+      line 1
+        ${c}indented with spaces
+      line 2
+    """.trimIndent()
+    )
+  }
+
+  @Test
+  fun `test read from shell command with special characters`() {
+    configureByText(
+      """
+      line ${c}1
+      line 2
+    """.trimIndent()
+    )
+    enterCommand("read! echo 'special: <>&\"'")
+    assertState(
+      """
+      line 1
+      ${c}special: <>&"
+      line 2
+    """.trimIndent()
+    )
+  }
+
+  @Test
+  fun `test r abbreviation works with shell command`() {
+    configureByText(
+      """
+      line ${c}1
+      line 2
+    """.trimIndent()
+    )
+    enterCommand("r! echo hello")
+    assertState(
+      """
+      line 1
+      ${c}hello
+      line 2
+    """.trimIndent()
+    )
+  }
+
+  @Test
+  fun `test read from shell command preserves trailing spaces in lines`() {
+    configureByText(
+      """
+      line ${c}1
+      line 2
+    """.trimIndent()
+    )
+    enterCommand("read! echo 'text with trailing space '")
+    assertState(
+      """
+      line 1
+      ${c}text with trailing space 
+      line 2
+    """.trimIndent()
+    )
+  }
+
+  @Test
+  fun `test read from failing command shows error`() {
+    configureByText("line ${c}1")
+    enterCommand("read! nonexistent_command_that_should_fail_12345")
+    assertPluginError(true)
   }
 }
