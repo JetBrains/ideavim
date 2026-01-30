@@ -34,6 +34,7 @@ import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
+import java.lang.ref.WeakReference
 import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JRootPane
@@ -45,9 +46,12 @@ import kotlin.math.ceil
 import kotlin.math.min
 
 /**
- * This panel displays text in a `more` like window.
+ * This panel displays text in a `more` like window and implements [VimOutputPanel].
  */
-class ExOutputPanel private constructor(private val myEditor: Editor) : JBPanel<ExOutputPanel?>() {
+class OutputPanel(editorRef: WeakReference<Editor>) : JBPanel<OutputPanel?>(), VimOutputPanel {
+  private val myEditorRef: WeakReference<Editor> = editorRef
+  val editor: Editor? get() = myEditorRef.get()
+
   val myLabel: JLabel = JLabel("more")
   private val myText = JTextArea()
   private val myScrollPane: JScrollPane =
@@ -60,6 +64,9 @@ class ExOutputPanel private constructor(private val myEditor: Editor) : JBPanel<
   private var myWasOpaque = false
 
   var myActive: Boolean = false
+
+  val isActive: Boolean
+    get() = myActive
 
   init {
     // Create a text editor for the text and a label for the prompt
@@ -110,21 +117,80 @@ class ExOutputPanel private constructor(private val myEditor: Editor) : JBPanel<
     }
   }
 
-  var text: String?
-    get() = myText.getText()
-    set(data) {
-      var data: String = data!!
-      if (!data.isEmpty() && data[data.length - 1] == '\n') {
-        data = data.dropLast(1)
+  override var text: String
+    get() = myText.text
+    set(value) {
+      // ExOutputPanel will strip a trailing newline. We'll do it now so that tests have the same behaviour.
+      val newValue = value.removeSuffix("\n")
+      myText.text = newValue
+      val ed = editor
+      if (ed != null) {
+        myText.setFont(selectEditorFont(ed, newValue))
       }
-
-      myText.text = data
-      myText.setFont(selectEditorFont(myEditor, data))
       myText.setCaretPosition(0)
-      if (!data.isEmpty()) {
+      if (newValue.isNotEmpty()) {
         activate()
       }
     }
+
+  override var label: String
+    get() = myLabel.text ?: ""
+    set(value) {
+      myLabel.text = value
+      val ed = editor
+      if (ed != null) {
+        myLabel.setFont(selectEditorFont(ed, value))
+      }
+    }
+
+  override fun addText(text: String, isNewLine: Boolean) {
+    if (this.text.isNotEmpty() && isNewLine) {
+      this.text += "\n$text"
+    } else {
+      this.text += text
+    }
+  }
+
+  override fun setContent(text: String) {
+    this.text = text
+  }
+
+  override fun clearText() {
+    text = ""
+  }
+
+  override fun show() {
+    editor ?: return
+    val currentPanel = injector.outputPanel.getCurrentOutputPanel()
+    if (currentPanel != null && currentPanel != this) currentPanel.close()
+
+    if (!myActive) {
+      activate()
+    }
+  }
+
+  override fun handleKey(key: KeyStroke) {
+    if (isAtEnd) {
+      close(key)
+      return
+    }
+
+    when (key.keyChar) {
+      ' ' -> scrollPage()
+      'd' -> scrollHalfPage()
+      'q', '\u001b' -> close()
+      '\n' -> scrollLine()
+      KeyEvent.CHAR_UNDEFINED -> {
+        when (key.keyCode) {
+          KeyEvent.VK_ENTER -> scrollLine()
+          KeyEvent.VK_ESCAPE -> close()
+          else -> onBadKey()
+        }
+      }
+
+      else -> onBadKey()
+    }
+  }
 
   override fun getForeground(): Color? {
     @Suppress("SENSELESS_COMPARISON")
@@ -151,8 +217,9 @@ class ExOutputPanel private constructor(private val myEditor: Editor) : JBPanel<
     if (!myActive) return
     myActive = false
     myText.text = ""
-    if (refocusOwningEditor) {
-      requestFocus(myEditor.contentComponent)
+    val ed = editor
+    if (refocusOwningEditor && ed != null) {
+      requestFocus(ed.contentComponent)
     }
     if (myOldGlass != null) {
       myOldGlass!!.removeComponentListener(myAdapter)
@@ -167,7 +234,8 @@ class ExOutputPanel private constructor(private val myEditor: Editor) : JBPanel<
    * Turns on the more window for the given editor
    */
   fun activate() {
-    val root = SwingUtilities.getRootPane(myEditor.contentComponent)
+    val ed = editor ?: return
+    val root = SwingUtilities.getRootPane(ed.contentComponent)
     deactivateOldGlass(root)
 
     setFontForElements()
@@ -195,30 +263,33 @@ class ExOutputPanel private constructor(private val myEditor: Editor) : JBPanel<
   }
 
   private fun setFontForElements() {
-    myText.setFont(selectEditorFont(myEditor, myText.getText()))
-    myLabel.setFont(selectEditorFont(myEditor, myLabel.text))
+    val ed = editor ?: return
+    myText.setFont(selectEditorFont(ed, myText.getText()))
+    myLabel.setFont(selectEditorFont(ed, myLabel.text))
   }
 
-  fun scrollLine() {
+  override fun scrollLine() {
     scrollOffset(myLineHeight)
   }
 
-  fun scrollPage() {
+  override fun scrollPage() {
     scrollOffset(myScrollPane.getVerticalScrollBar().visibleAmount)
   }
 
-  fun scrollHalfPage() {
+  override fun scrollHalfPage() {
     val sa = myScrollPane.getVerticalScrollBar().visibleAmount / 2.0
     val offset = ceil(sa / myLineHeight) * myLineHeight
     scrollOffset(offset.toInt())
   }
 
   fun onBadKey() {
+    val ed = editor ?: return
     myLabel.setText(injector.messages.message("message.ex.output.more.prompt.full"))
-    myLabel.setFont(selectEditorFont(myEditor, myLabel.text))
+    myLabel.setFont(selectEditorFont(ed, myLabel.text))
   }
 
   private fun scrollOffset(more: Int) {
+    val ed = editor ?: return
     val `val` = myScrollPane.getVerticalScrollBar().value
     myScrollPane.getVerticalScrollBar().setValue(`val` + more)
     myScrollPane.getHorizontalScrollBar().setValue(0)
@@ -229,18 +300,19 @@ class ExOutputPanel private constructor(private val myEditor: Editor) : JBPanel<
     } else {
       myLabel.setText(injector.messages.message("message.ex.output.more.prompt"))
     }
-    myLabel.setFont(selectEditorFont(myEditor, myLabel.text))
+    myLabel.setFont(selectEditorFont(ed, myLabel.text))
   }
 
   val isAtEnd: Boolean
     get() {
       val `val` = myScrollPane.getVerticalScrollBar().value
       return `val` >=
-              myScrollPane.getVerticalScrollBar().maximum - myScrollPane.getVerticalScrollBar().visibleAmount
+        myScrollPane.getVerticalScrollBar().maximum - myScrollPane.getVerticalScrollBar().visibleAmount
     }
 
   private fun positionPanel() {
-    val contentComponent = myEditor.contentComponent
+    val ed = editor ?: return
+    val contentComponent = ed.contentComponent
     val scroll = SwingUtilities.getAncestorOfClass(JScrollPane::class.java, contentComponent)
     val rootPane = SwingUtilities.getRootPane(contentComponent)
     if (scroll == null || rootPane == null) {
@@ -276,11 +348,11 @@ class ExOutputPanel private constructor(private val myEditor: Editor) : JBPanel<
     }
   }
 
-  @JvmOverloads
   fun close(key: KeyStroke? = null) {
+    val ed = editor ?: return
     ApplicationManager.getApplication().invokeLater {
       deactivate(true)
-      val project = myEditor.project
+      val project = ed.project
       if (project != null && key != null && key.keyChar != '\n') {
         val keys: MutableList<KeyStroke> = ArrayList(1)
         keys.add(key)
@@ -292,10 +364,14 @@ class ExOutputPanel private constructor(private val myEditor: Editor) : JBPanel<
         }
         getInstance().keyStack.addKeys(keys)
         val context: ExecutionContext =
-          injector.executionContextManager.getEditorExecutionContext(IjVimEditor(myEditor))
-        VimPlugin.getMacro().playbackKeys(IjVimEditor(myEditor), context, 1)
+          injector.executionContextManager.getEditorExecutionContext(IjVimEditor(ed))
+        VimPlugin.getMacro().playbackKeys(IjVimEditor(ed), context, 1)
       }
     }
+  }
+
+  override fun close() {
+    close(null)
   }
 
   private class MoreKeyListener : KeyAdapter() {
@@ -331,20 +407,20 @@ class ExOutputPanel private constructor(private val myEditor: Editor) : JBPanel<
   }
 
   companion object {
-    private val LOG: VimLogger = injector.getLogger<ExOutputPanel>(ExOutputPanel::class.java)
+    private val LOG: VimLogger = injector.getLogger<OutputPanel>(OutputPanel::class.java)
 
-    fun getNullablePanel(editor: Editor): ExOutputPanel? {
+    fun getNullablePanel(editor: Editor): OutputPanel? {
       return editor.vimMorePanel
     }
 
     fun isPanelActive(editor: Editor): Boolean {
-      return getNullablePanel(editor) != null
+      return getNullablePanel(editor)?.myActive ?: false
     }
 
-    fun getInstance(editor: Editor): ExOutputPanel {
-      var panel: ExOutputPanel? = getNullablePanel(editor)
+    fun getInstance(editor: Editor): OutputPanel {
+      var panel: OutputPanel? = getNullablePanel(editor)
       if (panel == null) {
-        panel = ExOutputPanel(editor)
+        panel = OutputPanel(WeakReference(editor))
         editor.vimMorePanel = panel
       }
       return panel

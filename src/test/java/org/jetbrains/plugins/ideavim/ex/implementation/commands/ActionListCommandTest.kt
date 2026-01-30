@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,7 +9,7 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.util.ArrayUtil
-import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
+import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 import java.util.*
@@ -21,7 +21,7 @@ class ActionListCommandTest : VimTestCase() {
   fun testListAllActions() {
     configureByText("\n")
     typeText(commandToKeys("actionlist"))
-    val output = getInstance(fixture.editor).text
+    val output = injector.outputPanel.getCurrentOutputPanel()?.text
     assertNotNull<Any>(output)
 
     // Header line
@@ -65,7 +65,7 @@ class ActionListCommandTest : VimTestCase() {
   }
 
   private fun parseActionListOutput(): Array<String> {
-    val output = getInstance(fixture.editor).text
+    val output = injector.outputPanel.getCurrentOutputPanel()?.text
     return output?.split("\n".toRegex())?.dropLastWhile { it.isEmpty() }?.toTypedArray()
       ?: ArrayUtil.EMPTY_STRING_ARRAY
   }

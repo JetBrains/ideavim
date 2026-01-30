@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2025 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,7 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import com.maddyhome.idea.vim.ex.ExOutputModel
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.vimscript.model.commands.SmileCommand
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
@@ -28,7 +28,7 @@ class SmileCommandTest : VimTestCase() {
     configureByText("\n")
     typeText(commandToKeys("smile"))
 
-    val output: String = ExOutputModel.getInstance(fixture.editor).text.trimEnd()
+    val output: String = injector.outputPanel.getCurrentOutputPanel()?.text?.trimEnd() ?: ""
     val expectedContent: String = loadResourceContent(SmileCommand.DEFAULT_RESOURCE_PATH).trimEnd()
 
     assertEquals(expectedContent, output)
@@ -40,7 +40,7 @@ class SmileCommandTest : VimTestCase() {
     configureByFileName("Test.kt")
     typeText(commandToKeys("smile"))
 
-    val output = ExOutputModel.getInstance(fixture.editor).text.trimEnd()
+    val output = injector.outputPanel.getCurrentOutputPanel()?.text?.trimEnd() ?: ""
     val expectedContent = loadResourceContent(SmileCommand.KOTLIN_RESOURCE_PATH).trimEnd()
 
     assertEquals(expectedContent, output)
@@ -52,7 +52,7 @@ class SmileCommandTest : VimTestCase() {
     configureByFileName("Test.kts")
     typeText(commandToKeys("smile"))
 
-    val output: String = ExOutputModel.getInstance(fixture.editor).text.trimEnd()
+    val output: String = injector.outputPanel.getCurrentOutputPanel()?.text?.trimEnd() ?: ""
     val expectedContent: String = loadResourceContent(SmileCommand.KOTLIN_RESOURCE_PATH).trimEnd()
 
     assertEquals(expectedContent, output)
@@ -64,7 +64,7 @@ class SmileCommandTest : VimTestCase() {
     configureByFileName("Test.java")
     typeText(commandToKeys("smile"))
 
-    val output: String = ExOutputModel.getInstance(fixture.editor).text.trimEnd()
+    val output: String = injector.outputPanel.getCurrentOutputPanel()?.text?.trimEnd() ?: ""
     val expectedContent: String = loadResourceContent(SmileCommand.JAVA_RESOURCE_PATH).trimEnd()
 
     assertEquals(expectedContent, output)
@@ -76,7 +76,7 @@ class SmileCommandTest : VimTestCase() {
     configureByFileName("Test.py")
     typeText(commandToKeys("smile"))
 
-    val output: String = ExOutputModel.getInstance(fixture.editor).text.trimEnd()
+    val output: String = injector.outputPanel.getCurrentOutputPanel()?.text?.trimEnd() ?: ""
     val expectedContent: String = loadResourceContent(SmileCommand.PYTHON_RESOURCE_PATH).trimEnd()
 
     assertEquals(expectedContent, output)
@@ -88,7 +88,7 @@ class SmileCommandTest : VimTestCase() {
     configureByFileName("Test.unknown")
     typeText(commandToKeys("smile"))
 
-    val output: String = ExOutputModel.getInstance(fixture.editor).text.trimEnd()
+    val output: String = injector.outputPanel.getCurrentOutputPanel()?.text?.trimEnd() ?: ""
     val expectedContent: String = loadResourceContent(SmileCommand.DEFAULT_RESOURCE_PATH).trimEnd()
 
     assertEquals(expectedContent, output)
@@ -100,7 +100,7 @@ class SmileCommandTest : VimTestCase() {
     configureByFileName(".gitignore")
     typeText(commandToKeys("smile"))
 
-    val output: String = ExOutputModel.getInstance(fixture.editor).text.trimEnd()
+    val output: String = injector.outputPanel.getCurrentOutputPanel()?.text?.trimEnd() ?: ""
     val expectedContent: String = loadResourceContent(SmileCommand.DEFAULT_RESOURCE_PATH).trimEnd()
 
     assertEquals(expectedContent, output)
