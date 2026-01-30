@@ -9,9 +9,11 @@
 package com.maddyhome.idea.vim.extension;
 
 import com.intellij.openapi.extensions.ExtensionPointName;
+import com.intellij.vim.api.VimApi;
 import com.maddyhome.idea.vim.api.VimInjectorKt;
 import com.maddyhome.idea.vim.helper.VimNlsSafe;
 import com.maddyhome.idea.vim.key.MappingOwner;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -51,7 +53,19 @@ public interface VimExtension {
    * `<Plug>(ExchangeLine)` and doesn't register the default cxx mapping. However, such detection requires the mapping
    * to be defined before the plugin initialization.
    */
-  void init();
+  default void init() {}
+
+  /**
+   * Initializes the extension with a pre-constructed VimApi instance.
+   * <p>
+   * The default implementation calls {@link #init()} for backward compatibility.
+   *
+   * @param api The VimApi instance for this extension
+   */
+  @ApiStatus.Experimental
+  default void init(VimApi api) {
+    init();
+  }
 
   default void dispose() {
     VimInjectorKt.getInjector().getKeyGroup().removeKeyMapping(getOwner());

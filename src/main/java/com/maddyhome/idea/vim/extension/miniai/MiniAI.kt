@@ -11,7 +11,6 @@ import com.intellij.vim.api.VimApi
 import com.intellij.vim.api.models.Range
 import com.intellij.vim.api.scopes.TextObjectRange
 import com.maddyhome.idea.vim.extension.VimExtension
-import com.maddyhome.idea.vim.extension.api
 
 /**
  * A simplified imitation of mini.ai approach for motions "aq", "iq", "ab", "ib".
@@ -28,8 +27,7 @@ class MiniAI : VimExtension {
 
   override fun getName() = "mini-ai"
 
-  override fun init() {
-    val api = api()
+  override fun init(api: VimApi) {
     api.textObjects {
       register("aq", preserveSelectionAnchor = false) { _ ->
         findQuoteRange(isOuter = true)
