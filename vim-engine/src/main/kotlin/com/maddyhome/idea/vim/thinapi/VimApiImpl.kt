@@ -42,9 +42,14 @@ import kotlinx.coroutines.runBlocking
 import kotlin.io.path.pathString
 import kotlin.reflect.KType
 
+/**
+ * [projectId] is used to properly determine the selected editor. However,
+ *   during the initialization, the projectId is null and the editor falls back to the fallback editor.
+ */
 class VimApiImpl(
   private val listenerOwner: ListenerOwner,
   private val mappingOwner: MappingOwner,
+  val projectId: String?,
 ) : VimApi {
   // Note: Setting a new mode is a complicated operation. Currently, it updates the selection under the write lock,
   //   but we don't require to run this under the write lock. Also, esc in insert mode may produce more inserts
@@ -122,7 +127,7 @@ class VimApiImpl(
         var returnValue = false
         injector.actionExecutor.executeCommand(vimEditor, {
           runBlocking {
-            returnValue = VimApiImpl(listenerOwner, mappingOwner).function()
+            returnValue = VimApiImpl(listenerOwner, mappingOwner, projectId).function()
           }
         }, "Insert Text", null)
         return returnValue
@@ -175,11 +180,11 @@ class VimApiImpl(
   }
 
   override fun modalInput(): ModalInput {
-    return ModalInputImpl(listenerOwner, mappingOwner)
+    return ModalInputImpl(listenerOwner, mappingOwner, projectId)
   }
 
   override fun commandLine(block: CommandLineScope.() -> Unit): CommandLineScope {
-    val commandLineScope = CommandLineScopeImpl(listenerOwner, mappingOwner)
+    val commandLineScope = CommandLineScopeImpl(listenerOwner, mappingOwner, projectId)
     commandLineScope.block()
     return commandLineScope
   }
@@ -274,7 +279,7 @@ class VimApiImpl(
         editor: VimEditor,
         context: ExecutionContext,
       ) {
-        val vimApi = VimApiImpl(listenerOwner, mappingOwner)
+        val vimApi = VimApiImpl(listenerOwner, mappingOwner, projectId)
         vimApi.block(command)
       }
     }

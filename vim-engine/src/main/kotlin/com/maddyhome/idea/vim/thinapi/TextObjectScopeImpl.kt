@@ -146,7 +146,7 @@ private class ApiTextObjectActionHandler(
     count: Int,
     rawCount: Int,
   ): TextRange? {
-    val vimApi = VimApiImpl(listenerOwner, mappingOwner)
+    val vimApi = VimApiImpl(listenerOwner, mappingOwner, editor.projectId)
 
     // Execute the range provider
     val apiRange = vimApi.rangeProvider(count) ?: return null

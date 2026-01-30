@@ -47,7 +47,7 @@ class IjExtensionLoader : ExtensionLoader {
   private fun createVimApi(name: String): VimApiImpl {
     val mappingOwner = MappingOwner.Plugin.get(name)
     val listenerOwner = ListenerOwner.Plugin.get(name)
-    return VimApiImpl(listenerOwner, mappingOwner)
+    return VimApiImpl(listenerOwner, mappingOwner, null)
   }
 
   /**

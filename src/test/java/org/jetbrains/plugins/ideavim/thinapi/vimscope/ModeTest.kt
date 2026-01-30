@@ -35,7 +35,7 @@ class ModeTest : VimTestCase() {
 
     val listenerOwner = ListenerOwner.Plugin.get("test")
     val mappingOwner = MappingOwner.Plugin.get("test")
-    vimApi = VimApiImpl(listenerOwner, mappingOwner)
+    vimApi = VimApiImpl(listenerOwner, mappingOwner, null)
 
     configureByText("\n")
   }

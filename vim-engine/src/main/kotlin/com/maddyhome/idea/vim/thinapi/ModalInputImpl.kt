@@ -23,6 +23,7 @@ import javax.swing.KeyStroke
 class ModalInputImpl(
   private val listenerOwner: ListenerOwner,
   private val mappingOwner: MappingOwner,
+  private val projectId: String?,
 ) : ModalInput {
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!
@@ -50,7 +51,7 @@ class ModalInputImpl(
   }
 
   override fun inputString(label: String, handler: VimApi.(String) -> Unit) {
-    val vimApi = VimApiImpl(listenerOwner, mappingOwner)
+    val vimApi = VimApiImpl(listenerOwner, mappingOwner, projectId)
     val interceptor = TextInputInterceptor(repeatCount, repeatWhileCondition, updateLabel) {
       vimApi.handler(it)
     }
@@ -59,7 +60,7 @@ class ModalInputImpl(
   }
 
   override fun inputChar(label: String, handler: VimApi.(Char) -> Unit) {
-    val vimApi = VimApiImpl(listenerOwner, mappingOwner)
+    val vimApi = VimApiImpl(listenerOwner, mappingOwner, projectId)
     val interceptor = CharInputInterceptor(repeatCount, repeatWhileCondition, updateLabel) { char ->
       vimApi.handler(char)
     }

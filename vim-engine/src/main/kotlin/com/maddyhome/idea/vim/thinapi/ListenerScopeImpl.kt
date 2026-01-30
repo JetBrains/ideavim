@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.state.mode.Mode as EngineMode
 class ListenerScopeImpl(
   private val listenerOwner: ListenerOwner,
   private val mappingOwner: MappingOwner,
+  private val projectId: String,
 ) : ListenersScope {
 
   private abstract class ListenerBase(listenerOwner: ListenerOwner) : Listener {
@@ -47,7 +48,7 @@ class ListenerScopeImpl(
         editor: VimEditor,
         oldMode: EngineMode,
       ) {
-        val vimApi = VimApiImpl(listenerOwner, mappingOwner)
+        val vimApi = VimApiImpl(listenerOwner, mappingOwner, projectId)
         launch {
           vimApi.callback(oldMode.toMode())
         }
@@ -63,7 +64,7 @@ class ListenerScopeImpl(
           caretToRange.map { (caret, range) ->
             CaretId(caret.id) to Range.Simple(range.startOffset, range.endOffset)
           }.toMap()
-        val vimApi = VimApiImpl(listenerOwner, mappingOwner)
+        val vimApi = VimApiImpl(listenerOwner, mappingOwner, projectId)
         launch {
           vimApi.callback(caretToRangeMap)
         }
@@ -75,7 +76,7 @@ class ListenerScopeImpl(
   override fun onEditorCreate(callback: suspend VimApi.() -> Unit) {
     val listener = object : EditorListener, ListenerBase(listenerOwner) {
       override fun created(editor: VimEditor) {
-        val vimApi = VimApiImpl(listenerOwner, mappingOwner)
+        val vimApi = VimApiImpl(listenerOwner, mappingOwner, projectId)
         launch {
           vimApi.callback()
         }
@@ -87,7 +88,7 @@ class ListenerScopeImpl(
   override fun onEditorRelease(callback: suspend VimApi.() -> Unit) {
     val listener = object : EditorListener, ListenerBase(listenerOwner) {
       override fun released(editor: VimEditor) {
-        val vimApi = VimApiImpl(listenerOwner, mappingOwner)
+        val vimApi = VimApiImpl(listenerOwner, mappingOwner, projectId)
         launch {
           vimApi.callback()
         }
@@ -99,7 +100,7 @@ class ListenerScopeImpl(
   override fun onEditorFocusGain(callback: suspend VimApi.() -> Unit) {
     val listener = object : EditorListener, ListenerBase(listenerOwner) {
       override fun focusGained(editor: VimEditor) {
-        val vimApi = VimApiImpl(listenerOwner, mappingOwner)
+        val vimApi = VimApiImpl(listenerOwner, mappingOwner, projectId)
         launch {
           vimApi.callback()
         }
@@ -111,7 +112,7 @@ class ListenerScopeImpl(
   override fun onEditorFocusLost(callback: suspend VimApi.() -> Unit) {
     val listener = object : EditorListener, ListenerBase(listenerOwner) {
       override fun focusLost(editor: VimEditor) {
-        val vimApi = VimApiImpl(listenerOwner, mappingOwner)
+        val vimApi = VimApiImpl(listenerOwner, mappingOwner, projectId)
         launch {
           vimApi.callback()
         }
@@ -123,7 +124,7 @@ class ListenerScopeImpl(
   override fun onMacroRecordingStart(callback: suspend VimApi.() -> Unit) {
     val listener = object : MacroRecordingListener, ListenerBase(listenerOwner) {
       override fun recordingStarted() {
-        val vimApi = VimApiImpl(listenerOwner, mappingOwner)
+        val vimApi = VimApiImpl(listenerOwner, mappingOwner, projectId)
         launch {
           vimApi.callback()
         }
@@ -143,7 +144,7 @@ class ListenerScopeImpl(
       }
 
       override fun recordingFinished() {
-        val vimApi = VimApiImpl(listenerOwner, mappingOwner)
+        val vimApi = VimApiImpl(listenerOwner, mappingOwner, projectId)
         launch {
           vimApi.callback()
         }
@@ -155,7 +156,7 @@ class ListenerScopeImpl(
   override fun onIdeaVimEnabled(callback: suspend VimApi.() -> Unit) {
     val listener = object : VimPluginListener, ListenerBase(listenerOwner) {
       override fun turnedOn() {
-        val vimApi = VimApiImpl(listenerOwner, mappingOwner)
+        val vimApi = VimApiImpl(listenerOwner, mappingOwner, projectId)
         launch {
           vimApi.callback()
         }
@@ -175,7 +176,7 @@ class ListenerScopeImpl(
       }
 
       override fun turnedOff() {
-        val vimApi = VimApiImpl(listenerOwner, mappingOwner)
+        val vimApi = VimApiImpl(listenerOwner, mappingOwner, projectId)
         launch {
           vimApi.callback()
         }

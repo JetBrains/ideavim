@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.thinapi.VimApiImpl
 class CommandLineScopeImpl(
   private val listenerOwner: ListenerOwner,
   private val mappingOwner: MappingOwner,
+  private val projectId: String?,
 ) : CommandLineScope() {
   private val vimEditor: VimEditor
     get() = injector.editorGroup.getFocusedEditor()!!
@@ -30,7 +31,7 @@ class CommandLineScopeImpl(
     get() = injector.executionContextManager.getEditorExecutionContext(vimEditor)
 
   override fun input(prompt: String, finishOn: Char?, callback: VimApi.(String) -> Unit) {
-    val vimApi = VimApiImpl(listenerOwner, mappingOwner)
+    val vimApi = VimApiImpl(listenerOwner, mappingOwner, projectId)
     injector.commandLine.readInputAndProcess(vimEditor, vimContext, prompt, finishOn) {
       vimApi.callback(it)
     }
