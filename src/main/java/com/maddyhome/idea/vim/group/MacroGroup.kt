@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim.group
 import com.intellij.codeInsight.completion.CompletionPhase
 import com.intellij.codeInsight.completion.impl.CompletionServiceImpl
 import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.util.PotemkinProgress
 import com.maddyhome.idea.vim.KeyHandler.Companion.getInstance
@@ -67,11 +66,7 @@ class MacroGroup : VimMacroBase() {
               myPotemkinProgress.fraction = (i + 1).toDouble() / total
               while (keyStack.hasStroke()) {
                 val key = keyStack.feedStroke()
-                try {
-                  myPotemkinProgress.checkCanceled()
-                } catch (e: ProcessCanceledException) {
-                  return@runnable
-                }
+                myPotemkinProgress.checkCanceled()
                 val keyHandler = getInstance()
                 ProgressManager.getInstance().executeNonCancelableSection {
                   // Prevent autocompletion during macros.
