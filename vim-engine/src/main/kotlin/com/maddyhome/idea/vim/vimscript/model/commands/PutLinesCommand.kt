@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -45,6 +45,9 @@ data class PutLinesCommand(val range: Range, val modifier: CommandModifier, val 
       registerGroup.selectRegister(registerGroup.defaultRegister)
     }
 
+    val caret = editor.currentCaret()
+    val address = if (range.addresses.isEmpty()) -1 else range.addresses.last().getLine1(editor, caret)
+
     val line = if (range.size() == 0) -1 else getLine(editor)
     val textData = registerGroup.getRegister(editor, context, registerGroup.lastRegisterChar)?.let {
       PutData.TextData(null, it.copiedText, SelectionType.LINE_WISE)
@@ -57,6 +60,7 @@ data class PutLinesCommand(val range: Range, val modifier: CommandModifier, val 
       rawIndent = false,
       caretAfterInsertedText = false,
       putToLine = line,
+      putBeforeLine = address == 0,
     )
     return if (injector.put.putText(editor, context, putData)) ExecutionResult.Success else ExecutionResult.Error
   }
