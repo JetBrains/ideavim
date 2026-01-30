@@ -14,14 +14,11 @@ import com.intellij.vim.api.scopes.nmapPluginAction
 import com.intellij.vim.api.scopes.omapPluginAction
 import com.intellij.vim.api.scopes.xmapPluginAction
 import com.maddyhome.idea.vim.extension.VimExtension
-import com.maddyhome.idea.vim.extension.api
 
 internal class ParagraphMotion : VimExtension {
   override fun getName(): String = "vim-paragraph-motion"
 
-  override fun init() {
-    val api = api()
-
+  override fun init(api: VimApi) {
     api.mappings {
       nmapPluginAction("}", "<Plug>(ParagraphNextMotion)", keepDefaultMapping = true) {
         moveParagraph(1)

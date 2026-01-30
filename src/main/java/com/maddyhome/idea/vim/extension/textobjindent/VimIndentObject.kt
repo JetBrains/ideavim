@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim.extension.textobjindent
 import com.intellij.vim.api.VimApi
 import com.intellij.vim.api.scopes.TextObjectRange
 import com.maddyhome.idea.vim.extension.VimExtension
-import com.maddyhome.idea.vim.extension.api
 
 /**
  * Port of vim-indent-object:
@@ -29,8 +28,7 @@ import com.maddyhome.idea.vim.extension.api
 class VimIndentObject : VimExtension {
   override fun getName(): String = "textobj-indent"
 
-  override fun init() {
-    val api = api()
+  override fun init(api: VimApi) {
     api.textObjects {
       register("ai") { _ -> findIndentRange(includeAbove = true, includeBelow = false) }
       register("aI") { _ -> findIndentRange(includeAbove = true, includeBelow = true) }

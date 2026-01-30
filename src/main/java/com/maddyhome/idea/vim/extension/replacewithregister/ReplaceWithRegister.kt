@@ -8,16 +8,14 @@
 
 package com.maddyhome.idea.vim.extension.replacewithregister
 
+import com.intellij.vim.api.VimApi
 import com.maddyhome.idea.vim.extension.VimExtension
-import com.maddyhome.idea.vim.extension.api
 
 internal class ReplaceWithRegister : VimExtension {
 
   override fun getName(): String = "ReplaceWithRegister"
 
-  override fun init() {
-    val api = api()
-
+  override fun init(api: VimApi) {
     api.mappings {
       // Step 1: Non-recursive <Plug> → action mappings
       nnoremap(RWR_OPERATOR) {
