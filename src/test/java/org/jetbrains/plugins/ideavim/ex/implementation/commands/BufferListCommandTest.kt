@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,7 +9,6 @@
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -26,7 +25,7 @@ class BufferListCommandTest : VimTestCase() {
     configureByText("\n")
     typeText(commandToKeys("ls"))
 
-    val output = getInstance(fixture.editor).text
+    val output = injector.outputPanel.getCurrentOutputPanel()?.text
     kotlin.test.assertNotNull<Any>(output)
     val displayedLines = output.split("\n".toRegex()).toTypedArray()
     kotlin.test.assertEquals(DEFAULT_LS_OUTPUT, displayedLines[0])
@@ -39,7 +38,7 @@ class BufferListCommandTest : VimTestCase() {
     configureByFileName("aaaaaaaaaaaaaaaaaaaaaaaaaaaaa.txt")
     typeText(commandToKeys("ls"))
 
-    val output = getInstance(fixture.editor).text
+    val output = injector.outputPanel.getCurrentOutputPanel()?.text
     kotlin.test.assertNotNull<Any>(output)
     val displayedLines = output.split("\n".toRegex()).toTypedArray()
     kotlin.test.assertEquals("   1 %a   \"/src/aaaaaaaaaaaaaaaaaaaaaaaaaaaaa.txt\" line: 1", displayedLines[0])
@@ -67,7 +66,7 @@ class BufferListCommandTest : VimTestCase() {
     configureByFileName("bbb.txt")
     typeText(injector.parser.parseKeys("aa<esc>:buffers +<enter>"))
 
-    val output = getInstance(fixture.editor).text
+    val output = injector.outputPanel.getCurrentOutputPanel()?.text
     kotlin.test.assertNotNull<Any>(output)
     val displayedLines = output.split("\n".toRegex()).toTypedArray()
 
@@ -83,7 +82,7 @@ class BufferListCommandTest : VimTestCase() {
     configureByText("\n")
     typeText(injector.parser.parseKeys("aa<esc>:buffers #<enter>"))
 
-    val output = getInstance(fixture.editor).text
+    val output = injector.outputPanel.getCurrentOutputPanel()?.text
     kotlin.test.assertNotNull<Any>(output)
     val displayedLines = output.split("\n".toRegex()).toTypedArray()
     kotlin.test.assertEquals("", displayedLines[0])
@@ -96,7 +95,7 @@ class BufferListCommandTest : VimTestCase() {
     configureByText("\n")
     typeText(commandToKeys("buffers x"))
 
-    val output = getInstance(fixture.editor).text
+    val output = injector.outputPanel.getCurrentOutputPanel()?.text
     kotlin.test.assertNotNull<Any>(output)
     val displayedLines = output.split("\n".toRegex()).toTypedArray()
     kotlin.test.assertEquals(DEFAULT_LS_OUTPUT, displayedLines[0])

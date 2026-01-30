@@ -62,7 +62,6 @@ import com.maddyhome.idea.vim.api.setToggleOption
 import com.maddyhome.idea.vim.api.visualLineToBufferLine
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.group.EffectiveIjOptions
 import com.maddyhome.idea.vim.group.GlobalIjOptions
 import com.maddyhome.idea.vim.group.IjOptions
@@ -752,7 +751,7 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
   }
 
   fun assertNoExOutput() {
-    val actual = ExOutputModel.getInstance(fixture.editor).text
+    val actual = injector.outputPanel.getCurrentOutputPanel()?.text ?: ""
     assertEquals("", actual)
   }
 
