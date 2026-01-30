@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -18,16 +18,13 @@ import javax.swing.KeyStroke
 
 // TODO: We need a nicer way to handle output, especially wrt testing, appending + clearing
 class ExOutputModel(private val myEditor: WeakReference<Editor>) : VimOutputPanelBase() {
-  private var isActiveInTestMode = false
 
   val editor get() = myEditor.get()
 
   val isActive: Boolean
-    get() = if (!ApplicationManager.getApplication().isUnitTestMode) {
+    get() =
       editor?.let { ExOutputPanel.getNullablePanel(it) }?.myActive ?: false
-    } else {
-      isActiveInTestMode
-    }
+
 
   override fun addText(text: String, isNewLine: Boolean) {
     if (this.text.isNotEmpty() && isNewLine) this.text += "\n$text" else this.text += text
@@ -41,11 +38,7 @@ class ExOutputModel(private val myEditor: WeakReference<Editor>) : VimOutputPane
     editor!!.vimExOutput = this
     val exOutputPanel = ExOutputPanel.getInstance(editor!!)
     if (!exOutputPanel.myActive) {
-      if (ApplicationManager.getApplication().isUnitTestMode) {
-        isActiveInTestMode = true
-      } else {
-        exOutputPanel.activate()
-      }
+      exOutputPanel.activate()
     }
   }
 
@@ -90,7 +83,6 @@ class ExOutputModel(private val myEditor: WeakReference<Editor>) : VimOutputPane
         editor?.let { ExOutputPanel.getInstance(it).text = newValue }
       } else {
         field = newValue
-        isActiveInTestMode = newValue.isNotEmpty()
       }
     }
   override var label: String
@@ -133,11 +125,7 @@ class ExOutputModel(private val myEditor: WeakReference<Editor>) : VimOutputPane
   }
 
   override fun close() {
-    if (!ApplicationManager.getApplication().isUnitTestMode) {
-      editor?.let { ExOutputPanel.getInstance(it).close() }
-    } else {
-      isActiveInTestMode = false
-    }
+    editor?.let { ExOutputPanel.getInstance(it).close() }
   }
 
   companion object {

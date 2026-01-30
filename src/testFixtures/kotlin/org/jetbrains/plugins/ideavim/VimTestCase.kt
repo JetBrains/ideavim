@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2024 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -553,7 +553,7 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
     return NeovimTesting.vimMode()
   }
 
-  fun register(char: String): String? {
+  fun register(char: String): String {
     return NeovimTesting.getMark(char)
   }
 
@@ -747,7 +747,7 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
       // Ex output is not cleared until the output pane is activated again (we need it to persist so that :print will
       // work when called multiple times from :global). When testing, if the previous action fails before it can
       // activate the output pane, we'll be looking at stale results.
-      ExOutputModel.getInstance(fixture.editor).clear()
+      injector.outputPanel.getCurrentOutputPanel()?.clearText()
     }
   }
 
