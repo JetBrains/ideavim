@@ -38,7 +38,7 @@
 
 ### K1: Editor Context Fix
 
-- [ ] T004 [US4] Define if the API works everywhere in IDE, or in editor context only (decision document)
+- [X] T004 [US4] Define if the API works everywhere in IDE, or in editor context only (decision document)
 - [ ] T005 [US4] Understand how to obtain the editor: focused approach is unreliable (focus can change mid-operation, is global state). Usually editor is captured at shortcut entry point. Edge cases: macros that change editors via :wincmd, API commands that switch windows. Document proper handling strategy.
 - [ ] T006 [US4] Design two-phase API: init phase (no editor) vs execute phase (editor in context)
 - [ ] T007 [US4] Update scope implementations to accept editor as constructor parameter (not re-query focus)
