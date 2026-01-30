@@ -35,8 +35,9 @@ importing from internal modules.
    access, registers) is available.
 2. **Given** all internal IdeaVim plugins are migrated to use only the API module, **When** they are tested, **Then**
    they retain full functionality without accessing internal modules.
-3. **Given** known external plugins, **When** they are migrated to the new API, **Then** they retain full functionality
-   without significant complexity increase.
+3. **Given** external plugins listed in `doc/IdeaVim Plugins.md` (re-researched before migration to ensure completeness),
+   **When** they are migrated to the new API, **Then** they retain full functionality without significant complexity
+   increase.
 4. **Given** internal modules are hidden from external access, **When** an extension attempts to import from them, *
    *Then** the build fails, ensuring extensions use only the public API.
 
@@ -87,11 +88,12 @@ mapping) using only the public API, without accessing any internal classes.
    implement common use cases (mappings, text objects, operators) without accessing internal classes.
 2. **Given** an extension built against the stable API, **When** IdeaVim releases a minor version update, **Then** the
    extension continues to work without recompilation.
-3. **Given** the old VimExtensionFacade API is deprecated, **When** an extension still uses it, **Then** clear
-   deprecation warnings guide the developer to migrate.
-4. **Given** known external plugins exist, **When** the API is finalized and internal migrations complete, **Then** the
-   IdeaVim team migrates these external plugins and provides pull requests to their maintainers, both validating the
-   API against more use cases and reducing the burden on external developers.
+3. **Given** the old VimExtensionFacade API coexists with the new API, **When** an extension uses the old API, **Then**
+   documentation guides the developer toward the new API. (Note: Formal deprecation approach to be defined after
+   successful external plugin migrations.)
+4. **Given** external plugins listed in `doc/IdeaVim Plugins.md` exist, **When** the API is finalized and internal
+   migrations complete, **Then** the IdeaVim team migrates these external plugins and provides pull requests to their
+   maintainers, both validating the API against more use cases and reducing the burden on external developers.
 
 ---
 
@@ -229,6 +231,13 @@ The following issues have been identified from prior analysis and must be resolv
 4. **API Gaps**: Missing functionality includes `findBlockTagRange`, `deleteText` with Range parameter, and ability to
    access EditorRead from CaretRead context.
 5. **Test Accessibility**: API must work in test environments, not just runtime plugin contexts.
+
+## Clarifications
+
+### Session 2026-01-30
+
+- Q: Which external plugins should be migrated? → A: Use the list from `doc/IdeaVim Plugins.md`. Before starting migration phase, re-research external plugins to ensure nothing is missed.
+- Q: Old API deprecation strategy? → A: No harsh deprecation. Deprecation approach will be defined after successful implementation and migration of external plugins.
 
 ## Out of Scope
 
