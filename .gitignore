@@ -32,3 +32,5 @@ settings.xml
 .kotlin
 
 .claude/settings.local.json
+
+.beads/sync_base.jsonl
