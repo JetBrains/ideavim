@@ -293,9 +293,7 @@ class OutputPanel(editorRef: WeakReference<Editor>) : JBPanel<OutputPanel?>(), V
     val `val` = myScrollPane.getVerticalScrollBar().value
     myScrollPane.getVerticalScrollBar().setValue(`val` + more)
     myScrollPane.getHorizontalScrollBar().setValue(0)
-    if (`val` + more >=
-      myScrollPane.getVerticalScrollBar().maximum - myScrollPane.getVerticalScrollBar().visibleAmount
-    ) {
+    if (isAtEnd) {
       myLabel.setText(injector.messages.message("message.ex.output.end.prompt"))
     } else {
       myLabel.setText(injector.messages.message("message.ex.output.more.prompt"))
@@ -305,9 +303,15 @@ class OutputPanel(editorRef: WeakReference<Editor>) : JBPanel<OutputPanel?>(), V
 
   val isAtEnd: Boolean
     get() {
-      val `val` = myScrollPane.getVerticalScrollBar().value
-      return `val` >=
-        myScrollPane.getVerticalScrollBar().maximum - myScrollPane.getVerticalScrollBar().visibleAmount
+      val isSingleLine = myText.getLineCount() == 1
+      if (isSingleLine) return true
+      val scrollBar = myScrollPane.getVerticalScrollBar()
+      val value = scrollBar.value
+      if (!scrollBar.isVisible) {
+        return true
+      }
+      return value >= scrollBar.maximum - scrollBar.visibleAmount ||
+        scrollBar.maximum <= scrollBar.visibleAmount
     }
 
   private fun positionPanel() {
