@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -1347,15 +1347,45 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     val starts = range.startOffsets
     val ends = range.endOffsets
     val firstLine = editor.offsetToBufferPosition(range.startOffset).line
+    reformatCodeRange(ends, editor, starts)
+    val newOffset = injector.motion.moveCaretToLineStartSkipLeading(editor, firstLine)
+    caret.moveToOffset(newOffset)
+    return true
+  }
+
+  override fun reformatCodeMotionPreserveCursor(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    argument: Argument,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    val range = injector.motion.getMotionRange(
+      editor, caret, context, argument,
+      operatorArguments
+    )
+    return range != null && reformatCodeRangePreserveCursor(editor, range)
+  }
+
+  override fun reformatCodeSelectionPreserveCursor(editor: VimEditor, caret: VimCaret, range: VimSelection) {
+    val textRange = range.toVimTextRange(true)
+    reformatCodeRangePreserveCursor(editor, textRange)
+  }
+
+  private fun reformatCodeRangePreserveCursor(editor: VimEditor, range: TextRange): Boolean {
+    val starts = range.startOffsets
+    val ends = range.endOffsets
+    reformatCodeRange(ends, editor, starts)
+    return true
+  }
+
+  private fun reformatCodeRange(ends: IntArray, editor: VimEditor, starts: IntArray) {
     for (i in ends.indices.reversed()) {
       val startOffset = editor.getLineStartForOffset(starts[i])
       val offset = ends[i] - if (startOffset == ends[i]) 0 else 1
       val endOffset = editor.getLineEndForOffset(offset)
       reformatCode(editor, startOffset, endOffset)
     }
-    val newOffset = injector.motion.moveCaretToLineStartSkipLeading(editor, firstLine)
-    caret.moveToOffset(newOffset)
-    return true
   }
 
   override fun autoIndentMotion(

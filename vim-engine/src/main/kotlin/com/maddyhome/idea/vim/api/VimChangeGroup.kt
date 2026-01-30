@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -211,6 +211,16 @@ interface VimChangeGroup {
   ): Boolean
 
   fun reformatCodeSelection(editor: VimEditor, caret: VimCaret, range: VimSelection)
+
+  fun reformatCodeMotionPreserveCursor(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    argument: Argument,
+    operatorArguments: OperatorArguments,
+  ): Boolean
+
+  fun reformatCodeSelectionPreserveCursor(editor: VimEditor, caret: VimCaret, range: VimSelection)
 
   fun autoIndentMotion(
     editor: VimEditor,
