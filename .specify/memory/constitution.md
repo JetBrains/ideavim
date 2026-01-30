@@ -1,15 +1,12 @@
 <!--
   SYNC IMPACT REPORT
   ==================
-  Version change: 1.0.0 → 1.1.0
+  Version change: 1.1.0 → 1.2.0
 
-  Modified sections:
-  - Code Quality Standards → expanded with commit clarity rules
+  Modified sections: None
 
   Added sections:
-  - V. External Contributors
-  - VI. Documentation Goals
-  - VII. Architecture Decision Records
+  - VIII. Trunk-Based Development
 
   Removed sections: None
 
@@ -124,6 +121,32 @@ Significant architectural decisions MUST be documented in YouTrack.
 **Rationale**: Documenting architectural decisions preserves institutional knowledge, prevents re-litigating settled
 debates, and helps new contributors understand why the codebase is structured as it is.
 
+### VIII. Trunk-Based Development
+
+IdeaVim follows trunk-based development with the master branch as the trunk.
+
+**Core Rules**:
+
+- Most changes SHOULD be committed directly to the master branch
+- Unfinished changes MAY be committed to master if they do not break functionality
+- The master branch MUST always be in a "ready to release" state
+- Feature branches are encouraged but not mandatory
+
+**When to Use Feature Branches**:
+
+- Feature branches SHOULD be used when the implementation may take significant time
+- Feature branches help avoid code conflicts when there is a significant gap between implementations
+- Unfinished work MAY be committed to master early to avoid divergence and conflicts
+
+**Branch Integration**:
+
+- Branches MUST be integrated into master using rebase, not merge
+- Rebase produces a linear history that is easy to trace and work with
+- Merge commits are permitted only in specific cases where rebase is not possible
+
+**Rationale**: Trunk-based development reduces integration pain, encourages smaller incremental changes, and maintains
+a linear, comprehensible history. Rebasing keeps the commit history clean and makes bisection straightforward.
+
 ## Development Standards
 
 ### Language and Dependencies
@@ -191,4 +214,4 @@ This constitution establishes the non-negotiable principles for IdeaVim developm
 - Code reviewers SHOULD verify constitution adherence
 - Violations require explicit justification and documentation
 
-**Version**: 1.1.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-01-30
+**Version**: 1.2.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-01-30
