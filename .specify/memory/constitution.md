@@ -1,12 +1,12 @@
 <!--
   SYNC IMPACT REPORT
   ==================
-  Version change: 1.1.0 → 1.2.0
+  Version change: 1.2.0 → 1.2.1
 
-  Modified sections: None
+  Modified sections:
+  - VIII. Trunk-Based Development → expanded with branch selection guidelines and planning requirement
 
-  Added sections:
-  - VIII. Trunk-Based Development
+  Added sections: None
 
   Removed sections: None
 
@@ -132,11 +132,17 @@ IdeaVim follows trunk-based development with the master branch as the trunk.
 - The master branch MUST always be in a "ready to release" state
 - Feature branches are encouraged but not mandatory
 
-**When to Use Feature Branches**:
+**Branch Selection Guidelines**:
 
-- Feature branches SHOULD be used when the implementation may take significant time
-- Feature branches help avoid code conflicts when there is a significant gap between implementations
-- Unfinished work MAY be committed to master early to avoid divergence and conflicts
+- **Long-running features** (weeks/months): Develop directly on master to avoid divergence and merge conflicts
+- **Short-lived changes** (days): MAY use a feature branch since divergence risk is low
+- When in doubt, prefer master with incremental commits that don't break functionality
+
+**Planning Requirement**:
+
+- When planning a new feature, the scope and duration MUST be analyzed
+- Long-running features SHOULD be developed on master with incremental, non-breaking commits
+- Feature branches are appropriate for isolated, short-term work that can be rebased quickly
 
 **Branch Integration**:
 
@@ -214,4 +220,4 @@ This constitution establishes the non-negotiable principles for IdeaVim developm
 - Code reviewers SHOULD verify constitution adherence
 - Violations require explicit justification and documentation
 
-**Version**: 1.2.0 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-01-30
+**Version**: 1.2.1 | **Ratified**: 2026-01-30 | **Last Amended**: 2026-01-30

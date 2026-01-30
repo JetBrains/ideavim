@@ -1,6 +1,6 @@
 # Feature Specification: IdeaVim Extension API Layer
 
-**Feature Branch**: `001-api-layer`
+**Development**: `master` (trunk-based, long-running feature)
 **Created**: 2026-01-30
 **Status**: Draft
 **Input**: User description: "Help me building the API layer for the IdeaVim. IdeaVim has an extensibility features: we
