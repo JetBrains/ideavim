@@ -24,9 +24,9 @@
 
 **Purpose**: Verify current state and prepare for implementation
 
-- [ ] T001 Verify API module structure in api/src/main/kotlin/com/intellij/vim/api/
-- [ ] T002 [P] Document current VimApi interface methods in api/src/main/kotlin/com/intellij/vim/api/VimApi.kt
-- [ ] T003 [P] Identify all VimExtensionFacade usages across extension/ directory
+- [X] T001 Verify API module structure in api/src/main/kotlin/com/intellij/vim/api/
+- [X] T002 [P] Document current VimApi interface methods in api/src/main/kotlin/com/intellij/vim/api/VimApi.kt
+- [X] T003 [P] Identify all VimExtensionFacade usages across extension/ directory
 
 ---
 
