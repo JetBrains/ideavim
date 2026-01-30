@@ -39,39 +39,40 @@
 ### K1: Editor Context Fix
 
 - [ ] T004 [US4] Define if the API works everywhere in IDE, or in editor context only (decision document)
-- [ ] T005 [US4] Design two-phase API: init phase (no editor) vs execute phase (editor in context)
-- [ ] T006 [US4] Update scope implementations to accept editor as constructor parameter (not re-query focus)
-- [ ] T007 [US4] Implement captured editor pattern in VimApiImpl.kt
-- [ ] T008 [US4] Update handler infrastructure to pass captured editor to handlers
+- [ ] T005 [US4] Understand how to obtain the editor: focused approach is unreliable (focus can change mid-operation, is global state). Usually editor is captured at shortcut entry point. Edge cases: macros that change editors via :wincmd, API commands that switch windows. Document proper handling strategy.
+- [ ] T006 [US4] Design two-phase API: init phase (no editor) vs execute phase (editor in context)
+- [ ] T007 [US4] Update scope implementations to accept editor as constructor parameter (not re-query focus)
+- [ ] T008 [US4] Implement captured editor pattern in VimApiImpl.kt
+- [ ] T009 [US4] Update handler infrastructure to pass captured editor to handlers
 
 ### K2: State Update Safety
 
-- [ ] T009 [US4] Implement enterInsertMode() safe combined operation in api/src/main/kotlin/com/intellij/vim/api/VimApi.kt
-- [ ] T010 [US4] Implement enterNormalMode() safe combined operation in api/src/main/kotlin/com/intellij/vim/api/VimApi.kt
-- [ ] T011 [US4] Implement enterVisualMode(type) safe combined operation in api/src/main/kotlin/com/intellij/vim/api/VimApi.kt
-- [ ] T012 [US4] Deprecate var mode: Mode setter in VimApi.kt (add @Deprecated annotation)
-- [ ] T013 [US4] Implement combined operations in VimApiImpl in src/main/java/com/maddyhome/idea/vim/thinapi/VimApiImpl.kt
+- [ ] T010 [US4] Implement enterInsertMode() safe combined operation in api/src/main/kotlin/com/intellij/vim/api/VimApi.kt
+- [ ] T011 [US4] Implement enterNormalMode() safe combined operation in api/src/main/kotlin/com/intellij/vim/api/VimApi.kt
+- [ ] T012 [US4] Implement enterVisualMode(type) safe combined operation in api/src/main/kotlin/com/intellij/vim/api/VimApi.kt
+- [ ] T013 [US4] Deprecate var mode: Mode setter in VimApi.kt (add @Deprecated annotation)
+- [ ] T014 [US4] Implement combined operations in VimApiImpl in src/main/java/com/maddyhome/idea/vim/thinapi/VimApiImpl.kt
 
 ### K3: Coroutine Audit
 
-- [ ] T014 [US4] Remove suspend from mapping handlers in MappingScope.kt that run inside locks
-- [ ] T015 [US4] Remove suspend from operator functions in VimApi.kt that run on EDT
-- [ ] T016 [US4] Add KDoc to VimApi.kt clarifying which callbacks support suspend vs require sync
+- [ ] T015 [US4] Remove suspend from mapping handlers in MappingScope.kt that run inside locks
+- [ ] T016 [US4] Remove suspend from operator functions in VimApi.kt that run on EDT
+- [ ] T017 [US4] Add KDoc to VimApi.kt clarifying which callbacks support suspend vs require sync
 
 ### K4: Test Accessibility
 
-- [ ] T017 [US4] Create VimApiTestFactory in tests/java-tests/src/test/kotlin/ for test environments
-- [ ] T018 [US4] Implement create(testName) factory method in VimApiTestFactory
-- [ ] T019 [US4] Implement createWithEditor(testName, editor) factory method in VimApiTestFactory
-- [ ] T020 [US4] Add test utilities for common extension testing scenarios
+- [ ] T018 [US4] Create VimApiTestFactory in tests/java-tests/src/test/kotlin/ for test environments
+- [ ] T019 [US4] Implement create(testName) factory method in VimApiTestFactory
+- [ ] T020 [US4] Implement createWithEditor(testName, editor) factory method in VimApiTestFactory
+- [ ] T021 [US4] Add test utilities for common extension testing scenarios
 
 ### G1-G4: API Gaps
 
-- [ ] T021 [P] [US4] Add findBlockTagRange(count, isInner) to VimApi.kt (G1)
-- [ ] T022 [P] [US4] Add deleteText(range: Range) overload to Transaction scope (G2)
-- [ ] T023 [P] [US4] Add editor property to CaretRead interface for parent access (G3)
-- [ ] T024 [P] [US4] Add CaretId type and id property to CaretRead for caret tracking (G4)
-- [ ] T025 [US4] Implement G1-G4 in VimApiImpl.kt
+- [ ] T022 [P] [US4] Add findBlockTagRange(count, isInner) to VimApi.kt (G1)
+- [ ] T023 [P] [US4] Add deleteText(range: Range) overload to Transaction scope (G2)
+- [ ] T024 [P] [US4] Add editor property to CaretRead interface for parent access (G3)
+- [ ] T025 [P] [US4] Add CaretId type and id property to CaretRead for caret tracking (G4)
+- [ ] T026 [US4] Implement G1-G4 in VimApiImpl.kt
 
 **Checkpoint**: API Design Finalization complete - all critical issues resolved, API ready for migration
 
@@ -87,26 +88,26 @@
 
 ### API Completeness - Write Tests
 
-- [ ] T026 [P] [US1] Write test: MappingScope supports all Vim modes (normal, visual, insert, operator-pending)
-- [ ] T027 [P] [US1] Write test: TextObjectScope registers and invokes custom text objects
-- [ ] T028 [P] [US1] Write test: custom operator registration and invocation via OperatorScope
-- [ ] T029 [P] [US1] Write test: EditorScope read/write access to editor state (text, caret, selection)
-- [ ] T030 [P] [US1] Write test: register access API read/write operations
-- [ ] T031 [P] [US1] Write test: option access API (get, set, append)
-- [ ] T032 [P] [US1] Write test: execute("normal! dd"), execute("set number"), execute("let g:var = 1")
-- [ ] T033 [P] [US1] Write test: getVariable/setVariable for each scope (g:, v:, b:, w:, t:)
+- [ ] T027 [P] [US1] Write test: MappingScope supports all Vim modes (normal, visual, insert, operator-pending)
+- [ ] T028 [P] [US1] Write test: TextObjectScope registers and invokes custom text objects
+- [ ] T029 [P] [US1] Write test: custom operator registration and invocation via OperatorScope
+- [ ] T030 [P] [US1] Write test: EditorScope read/write access to editor state (text, caret, selection)
+- [ ] T031 [P] [US1] Write test: register access API read/write operations
+- [ ] T032 [P] [US1] Write test: option access API (get, set, append)
+- [ ] T033 [P] [US1] Write test: execute("normal! dd"), execute("set number"), execute("let g:var = 1")
+- [ ] T034 [P] [US1] Write test: getVariable/setVariable for each scope (g:, v:, b:, w:, t:)
 
 ### API for Missing Functionality
 
-- [ ] T034 [US1] Add showMessage(text) to VimApi or OutputPanelScope for user feedback
-- [ ] T035 [US1] Add VimString type handling in variable service abstraction
-- [ ] T036 [US1] Implement showMessage in VimApiImpl.kt
+- [ ] T035 [US1] Add showMessage(text) to VimApi or OutputPanelScope for user feedback
+- [ ] T036 [US1] Add VimString type handling in variable service abstraction
+- [ ] T037 [US1] Implement showMessage in VimApiImpl.kt
 
 ### Module Visibility
 
-- [ ] T037 [US1] Add Gradle check: api/ module has no imports from vim-engine internal packages
-- [ ] T038 [US1] Configure build.gradle.kts to expose only api/ module to external plugins
-- [ ] T039 [US1] Add README section documenting module dependency configuration for plugin developers
+- [ ] T038 [US1] Add Gradle check: api/ module has no imports from vim-engine internal packages
+- [ ] T039 [US1] Configure build.gradle.kts to expose only api/ module to external plugins
+- [ ] T040 [US1] Add README section documenting module dependency configuration for plugin developers
 
 **Checkpoint**: API Module is complete - all extension functionality available through public API
 
@@ -120,37 +121,37 @@
 
 ### Finish Partial Migrations
 
-- [ ] T040 [US2] Complete argtextobj migration: replace VimPlugin.getVariableService() with api.getVariable<T>() in src/main/java/com/maddyhome/idea/vim/extension/argtextobj/
-- [ ] T041 [US2] Complete argtextobj migration: replace VimPlugin.showMessage() with api.showMessage()
-- [ ] T042 [US2] Complete argtextobj migration: remove MessageHelper usage
-- [ ] T043 [US2] Complete argtextobj migration: handle VimString type in variable API
-- [ ] T044 [US2] Run argtextobj tests and fix any failures
+- [ ] T041 [US2] Complete argtextobj migration: replace VimPlugin.getVariableService() with api.getVariable<T>() in src/main/java/com/maddyhome/idea/vim/extension/argtextobj/
+- [ ] T042 [US2] Complete argtextobj migration: replace VimPlugin.showMessage() with api.showMessage()
+- [ ] T043 [US2] Complete argtextobj migration: remove MessageHelper usage
+- [ ] T044 [US2] Complete argtextobj migration: handle VimString type in variable API
+- [ ] T045 [US2] Run argtextobj tests and fix any failures
 
-- [ ] T045 [US2] Remove old ReplaceWithRegister.kt, keep only ReplaceWithRegisterNewApi.kt
-- [ ] T046 [US2] Run ReplaceWithRegister tests and fix any failures
+- [ ] T046 [US2] Remove old ReplaceWithRegister.kt, keep only ReplaceWithRegisterNewApi.kt
+- [ ] T047 [US2] Run ReplaceWithRegister tests and fix any failures
 
 ### Extension Migrations (ordered by complexity)
 
-- [ ] T047 [US2] Migrate commentary extension in src/main/java/com/maddyhome/idea/vim/extension/commentary/
-- [ ] T048 [US2] Run commentary tests and fix any failures
+- [ ] T048 [US2] Migrate commentary extension in src/main/java/com/maddyhome/idea/vim/extension/commentary/
+- [ ] T049 [US2] Run commentary tests and fix any failures
 
-- [ ] T049 [US2] Migrate exchange extension in src/main/java/com/maddyhome/idea/vim/extension/exchange/
-- [ ] T050 [US2] Run exchange tests and fix any failures
+- [ ] T050 [US2] Migrate exchange extension in src/main/java/com/maddyhome/idea/vim/extension/exchange/
+- [ ] T051 [US2] Run exchange tests and fix any failures
 
-- [ ] T051 [US2] Migrate matchit extension in src/main/java/com/maddyhome/idea/vim/extension/matchit/
-- [ ] T052 [US2] Run matchit tests and fix any failures
+- [ ] T052 [US2] Migrate matchit extension in src/main/java/com/maddyhome/idea/vim/extension/matchit/
+- [ ] T053 [US2] Run matchit tests and fix any failures
 
-- [ ] T053 [US2] Migrate multiple-cursors extension in src/main/java/com/maddyhome/idea/vim/extension/multiplecursors/
-- [ ] T054 [US2] Run multiple-cursors tests and fix any failures
+- [ ] T054 [US2] Migrate multiple-cursors extension in src/main/java/com/maddyhome/idea/vim/extension/multiplecursors/
+- [ ] T055 [US2] Run multiple-cursors tests and fix any failures
 
-- [ ] T055 [US2] Migrate surround extension in src/main/java/com/maddyhome/idea/vim/extension/surround/
-- [ ] T056 [US2] Run surround tests and fix any failures
+- [ ] T056 [US2] Migrate surround extension in src/main/java/com/maddyhome/idea/vim/extension/surround/
+- [ ] T057 [US2] Run surround tests and fix any failures
 
-- [ ] T057 [US2] Migrate NERDTree extension in src/main/java/com/maddyhome/idea/vim/extension/nerdtree/
-- [ ] T058 [US2] Run NERDTree tests and fix any failures
+- [ ] T058 [US2] Migrate NERDTree extension in src/main/java/com/maddyhome/idea/vim/extension/nerdtree/
+- [ ] T059 [US2] Run NERDTree tests and fix any failures
 
-- [ ] T059 [US2] Skip highlightedyank migration (blocked on ListenersScope G5, deferred)
-- [ ] T060 [US2] Skip sneak migration (external AceJump dependency, deferred)
+- [ ] T060 [US2] Skip highlightedyank migration (blocked on ListenersScope G5, deferred)
+- [ ] T061 [US2] Skip sneak migration (external AceJump dependency, deferred)
 
 **Checkpoint**: All feasible internal extensions migrated - API validated through real-world usage
 
@@ -164,28 +165,28 @@
 
 ### Documentation
 
-- [ ] T061 [US3] Create doc/api/README.md with API reference documentation
-- [ ] T062 [US3] Add example code: simple mapping, mode-specific mapping in doc/api/examples/
-- [ ] T063 [US3] Add example code: custom text object, custom operator in doc/api/examples/
-- [ ] T064 [US3] Add example code: option-controlled behavior in doc/api/examples/
-- [ ] T065 [US3] Create specs/001-api-layer/migration-guide.md from VimExtensionFacade to VimApi
+- [ ] T062 [US3] Create doc/api/README.md with API reference documentation
+- [ ] T063 [US3] Add example code: simple mapping, mode-specific mapping in doc/api/examples/
+- [ ] T064 [US3] Add example code: custom text object, custom operator in doc/api/examples/
+- [ ] T065 [US3] Add example code: option-controlled behavior in doc/api/examples/
+- [ ] T066 [US3] Create specs/001-api-layer/migration-guide.md from VimExtensionFacade to VimApi
 
 ### External Plugin Migrations (IdeaVim team provides PRs)
 
-- [ ] T066 [US3] Migrate mini.ai plugin and create PR (Low complexity)
-- [ ] T067 [US3] Migrate anyobject plugin and create PR (Medium complexity - text objects)
-- [ ] T068 [US3] Migrate dial plugin and create PR (Medium complexity - increment/decrement)
-- [ ] T069 [US3] Migrate FunctionTextObj plugin and create PR (Medium complexity - text objects)
-- [ ] T070 [US3] Migrate Peekaboo plugin and create PR (Medium complexity - register display)
-- [ ] T071 [US3] Migrate Switch plugin and create PR (Medium complexity - text manipulation)
-- [ ] T072 [US3] Migrate easymotion plugin and create PR (High complexity - external dependency)
-- [ ] T073 [US3] Migrate quick-scope plugin and create PR (Medium complexity - external dependency)
-- [ ] T074 [US3] Migrate Which-Key plugin and create PR (High complexity - external dependency)
+- [ ] T067 [US3] Migrate mini.ai plugin and create PR (Low complexity)
+- [ ] T068 [US3] Migrate anyobject plugin and create PR (Medium complexity - text objects)
+- [ ] T069 [US3] Migrate dial plugin and create PR (Medium complexity - increment/decrement)
+- [ ] T070 [US3] Migrate FunctionTextObj plugin and create PR (Medium complexity - text objects)
+- [ ] T071 [US3] Migrate Peekaboo plugin and create PR (Medium complexity - register display)
+- [ ] T072 [US3] Migrate Switch plugin and create PR (Medium complexity - text manipulation)
+- [ ] T073 [US3] Migrate easymotion plugin and create PR (High complexity - external dependency)
+- [ ] T074 [US3] Migrate quick-scope plugin and create PR (Medium complexity - external dependency)
+- [ ] T075 [US3] Migrate Which-Key plugin and create PR (High complexity - external dependency)
 
 ### API Coexistence
 
-- [ ] T075 [US3] Add @Deprecated annotations to VimExtensionFacade methods with migration hints
-- [ ] T076 [US3] Update CONTRIBUTING.md with guidance on using new API
+- [ ] T076 [US3] Add @Deprecated annotations to VimExtensionFacade methods with migration hints
+- [ ] T077 [US3] Update CONTRIBUTING.md with guidance on using new API
 
 **Checkpoint**: External developers can successfully use the stable API
 
@@ -195,11 +196,11 @@
 
 **Purpose**: Final stabilization and release preparation
 
-- [ ] T077 [P] Remove @ApiStatus.Experimental from stable API methods in VimApi.kt
-- [ ] T078 [P] Update CHANGES.md with API layer release notes
-- [ ] T079 [P] Update README.md with extension development section
-- [ ] T080 Create doc/extension-quickstart.md for new extension developers
-- [ ] T081 Run full test suite to verify no regressions
+- [ ] T078 [P] Remove @ApiStatus.Experimental from stable API methods in VimApi.kt
+- [ ] T079 [P] Update CHANGES.md with API layer release notes
+- [ ] T080 [P] Update README.md with extension development section
+- [ ] T081 Create doc/extension-quickstart.md for new extension developers
+- [ ] T082 Run full test suite to verify no regressions
 
 ---
 
@@ -232,9 +233,9 @@ Note: US4 and US1 are both P1 but US4 must complete first as it resolves critica
 ### Parallel Opportunities
 
 - T002, T003 can run in parallel (Setup)
-- T021, T022, T023, T024 (API gaps) can run in parallel
-- T026-T033 (API completeness tests) can run in parallel
-- T077, T078, T079 (Polish) can run in parallel
+- T022, T023, T024, T025 (API gaps) can run in parallel
+- T027-T034 (API completeness tests) can run in parallel
+- T078, T079, T080 (Polish) can run in parallel
 
 ---
 
@@ -268,4 +269,4 @@ Note: US4 and US1 are both P1 but US4 must complete first as it resolves critica
 - sneak is deferred (external AceJump dependency)
 - Commit after each task or logical group
 - Stop at any checkpoint to validate story independently
-- Total: 81 tasks across 6 phases
+- Total: 82 tasks across 6 phases
