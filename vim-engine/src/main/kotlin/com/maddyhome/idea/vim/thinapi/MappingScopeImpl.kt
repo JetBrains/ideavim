@@ -281,7 +281,7 @@ class MappingScopeImpl(
         operatorArguments: OperatorArguments,
       ) {
         // XXX: It's not OK to call runBlocking, but let's keep it to have an API.
-        runBlocking { VimApiImpl(listenerOwner, mappingOwner).action() }
+        runBlocking { VimApiImpl(listenerOwner, mappingOwner, editor.projectId).action() }
       }
     }
 

@@ -35,7 +35,7 @@ class CaretTransactionTest : VimTestCase() {
 
     val listenerOwner = ListenerOwner.Plugin.get("test")
     val mappingOwner = MappingOwner.Plugin.get("test")
-    myVimApi = VimApiImpl(listenerOwner, mappingOwner)
+    myVimApi = VimApiImpl(listenerOwner, mappingOwner, null)
 
     configureByText("\n")
   }
