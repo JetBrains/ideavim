@@ -217,6 +217,7 @@ documenting the final design.
 - Built-in extensions represent a comprehensive sample of the functionality external extensions will need.
 - Prior analysis (documented in internal notes) has identified key issues including: state update complexity, editor
   access patterns, and coroutine usage that must be addressed during API finalization.
+- TeamCity CI has a compatibility verification task that detects API breaking changes automatically.
 
 ## Known Issues to Address
 

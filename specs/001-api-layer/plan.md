@@ -26,6 +26,7 @@ completion, not a rewrite.
 **Performance Goals**: API operations should not add measurable overhead to existing operations
 **Constraints**: Must maintain compatibility with IntelliJ Platform patterns; vim-engine must remain
 platform-independent
+**CI/CD**: TeamCity compatibility checker verifies API stability; breaking changes are detected automatically
 **Scale/Scope**: 12+ built-in extensions to migrate, 20+ external plugins documented in `doc/IdeaVim Plugins.md`
 
 ## Constitution Check

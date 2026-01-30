@@ -100,6 +100,8 @@
 
 **Independent Test**: Build an extension that uses only the API module dependency, verifying it can implement all common extension use cases (mappings, text objects, operators, editor access, registers) without importing from internal modules
 
+**Note**: API backward compatibility (FR-003) is verified by TeamCity CI automatically; no manual verification task needed.
+
 ### API Completeness Verification
 
 - [ ] T032 [US1] Verify MappingScope supports all Vim modes in api/src/main/kotlin/com/intellij/vim/api/scopes/MappingScope.kt
@@ -108,8 +110,8 @@
 - [ ] T035 [US1] Verify EditorScope provides read/write access to editor state
 - [ ] T036 [US1] Verify register access API for read/write operations
 - [ ] T037 [US1] Verify option access API (get, set, append operations)
-- [ ] T038 [US1] Verify Vimscript command execution API
-- [ ] T039 [US1] Verify variable access API (g:, v:, b:, w:, t: scopes)
+- [ ] T038 [US1] Verify Vimscript command execution API: test execute("normal! dd"), execute("set number"), execute("let g:var = 1")
+- [ ] T039 [US1] Verify variable access API: test getVariable/setVariable for each scope (g:global, v:count, b:buffer, w:window, t:tab)
 
 ### API for Missing Functionality
 
@@ -120,6 +122,7 @@
 ### Module Visibility
 
 - [ ] T043 [US1] Review api/ module dependencies to ensure no internal leakage
+- [ ] T043a [US1] Verify api/ module has no imports from vim-engine internal packages (only public vim-engine APIs)
 - [ ] T044 [US1] Verify build.gradle.kts exposes only api/ module to external plugins
 - [ ] T045 [US1] Document module dependency configuration for external plugin developers
 
