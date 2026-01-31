@@ -37,6 +37,7 @@ usual beta standards.
 * [VIM-4105](https://youtrack.jetbrains.com/issue/VIM-4105) Fixed `a"` `a'` `a\`` text objects to include surrounding whitespace per Vim spec
 * [VIM-4097](https://youtrack.jetbrains.com/issue/VIM-4097) Fixed `<A-n>` (NextOccurrence) with text containing backslashes - e.g., selecting `\IntegerField` now works correctly
 * [VIM-4094](https://youtrack.jetbrains.com/issue/VIM-4094) Fixed UninitializedPropertyAccessException when loading history
+* [VIM-4084](https://youtrack.jetbrains.com/issue/VIM-4084) Fixed insert mode to respect file's read-only state
 * Fixed high CPU usage while showing command line
 * Fixed comparison of String and Number in VimScript expressions
 
