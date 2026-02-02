@@ -6,7 +6,7 @@ grammar Vimscript;
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 script:
-    augroup? blockMember* EOF;
+    blockMember* EOF;
 
 forLoop:
     (WS | COLON)* FOR WS+ ((variableScope COLON)? variableName | (L_BRACKET argumentsDeclaration R_BRACKET)) WS+ IN WS* expr WS* ((inline_comment NEW_LINE) | (NEW_LINE | BAR)+)
@@ -80,8 +80,6 @@ auCommandArgument
   : ~(NEW_LINE)*
   ;
 
-augroup:                (WS | COLON)* AUGROUP .*? AUGROUP WS+ END WS* NEW_LINE;
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Command related rules:
@@ -119,7 +117,7 @@ command:
 
     (WS | COLON)* range? (WS | COLON)*
       name = (
-          ACTIONLIST | ACTION | ASCII | AT
+          ACTIONLIST | ACTION | ASCII | AT | AUGROUP
         | ASSIGN    // `:=` print last line number
         | B_LOWERCASE | BUFFER| BUFFER_CLOSE | BUFFER_LIST
         | CLASS | CLEARJUMPS | CMD_CLEAR | COPY
@@ -475,7 +473,6 @@ lowercaseAlphabeticChar:
 ;
 
 keyword:                ABORT
-                    |   AUGROUP
                     |   AUTOCMD
                     |   BREAK
                     |   CATCH
@@ -900,7 +897,6 @@ INLINE_SEPARATOR:       '\n' (' ' | '\t')* BACKSLASH -> skip;
 LUA_CODE:               'lua' WS* '<<' WS* 'EOF' .*? 'EOF' -> skip;
 LUA_CODE2:              'lua' WS* '<<' WS* 'END' .*? 'END' -> skip;
 IDEAVIM_IGNORE:         ('ideavim' | 'ideaVim' | 'IdeaVim') WS 'ignore' .*? ('ideavim' | 'ideaVim' | 'IdeaVim') WS 'ignore end' NEW_LINE -> skip;
-AUGROUP_SKIP:           NEW_LINE (WS|COLON)* AUGROUP .*? AUGROUP WS+ END -> skip;
 
 // All the other symbols
 UNICODE_CHAR:           '\u0000'..'\uFFFE';

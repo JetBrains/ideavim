@@ -11,7 +11,11 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.autocmd.AutoCmdEvent
 
 interface AutoCmdService {
+
   fun handleEvent(event: AutoCmdEvent)
   fun registerEventCommand(command: String, event: AutoCmdEvent)
   fun clearEvents()
+  fun startAugroup(name: String)
+  fun endAuGroup()
+  fun clearAuGroup(name: String)
 }

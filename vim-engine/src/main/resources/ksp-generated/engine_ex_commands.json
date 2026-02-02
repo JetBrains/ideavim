@@ -14,6 +14,7 @@
   "argu[ment]": "com.maddyhome.idea.vim.vimscript.model.commands.SelectFileCommand",
   "as[cii]": "com.maddyhome.idea.vim.vimscript.model.commands.AsciiCommand",
   "au[tocmd]": "com.maddyhome.idea.vim.vimscript.model.commands.AutoCmdCommand",
+  "aug[roup]": "com.maddyhome.idea.vim.vimscript.model.commands.AutogroupCommand",
   "bd[elete]": "com.maddyhome.idea.vim.vimscript.model.commands.BufferCloseCommand",
   "bn[ext]": "com.maddyhome.idea.vim.vimscript.model.commands.NextFileCommand",
   "bp[revious]": "com.maddyhome.idea.vim.vimscript.model.commands.PreviousFileCommand",

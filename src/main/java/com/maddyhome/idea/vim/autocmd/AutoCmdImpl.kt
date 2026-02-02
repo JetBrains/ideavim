@@ -13,18 +13,43 @@ import com.maddyhome.idea.vim.api.injector
 
 class AutoCmdImpl : AutoCmdService {
 
-  private val eventHandlers: MutableMap<AutoCmdEvent, MutableList<String>> = mutableMapOf()
+  private val eventHandlers: MutableMap<AutoCmdEvent, MutableList<AuCommand>> = mutableMapOf()
+  private var currentAugroup: String? = null
 
   override fun registerEventCommand(command: String, event: AutoCmdEvent) {
-    eventHandlers.getOrPut(event) { mutableListOf() }.add(command)
+    eventHandlers.getOrPut(event) { mutableListOf() }.add(AuCommand(command, currentAugroup))
   }
 
   override fun clearEvents() {
+    if (currentAugroup != null) {
+      clearAuGroup(currentAugroup!!)
+      return
+    }
     eventHandlers.clear()
   }
 
+  override fun startAugroup(name: String) {
+    currentAugroup = name
+  }
+
+  override fun endAuGroup() {
+    currentAugroup = null
+  }
+
+  override fun clearAuGroup(name: String) {
+    eventHandlers.values.forEach { handlers ->
+      val iterator = handlers.iterator()
+      while (iterator.hasNext()) {
+        val handler = iterator.next()
+        if (handler.group == name) {
+          iterator.remove()
+        }
+      }
+    }
+  }
+
   override fun handleEvent(event: AutoCmdEvent) {
-    eventHandlers[event]?.forEach { executeCommand(it) }
+    eventHandlers[event]?.forEach { executeCommand(it.command) }
   }
 
   private fun executeCommand(command: String) {
