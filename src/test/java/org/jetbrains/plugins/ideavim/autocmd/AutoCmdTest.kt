@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2025 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -117,5 +117,56 @@ class AutoCmdTest : VimTestCase() {
     typeText(injector.parser.parseKeys("<esc>"))
 
     assertNoExOutput()
+  }
+
+  @Test
+  fun `should execute InsertEnter when entering insert from visual mode with c`() {
+    configureByText("hello world")
+    enterCommand("autocmd InsertEnter * echo \"entering insert\"")
+
+    typeText(injector.parser.parseKeys("viw"))  // select word
+    typeText(injector.parser.parseKeys("c"))    // change (enters insert)
+
+    assertExOutput("entering insert")
+    assertState(Mode.INSERT)
+  }
+
+  @Test
+  fun `should execute InsertEnter when entering insert from visual mode with s`() {
+    configureByText("hello world")
+    enterCommand("autocmd InsertEnter * echo \"substitute\"")
+
+    typeText(injector.parser.parseKeys("viw"))  // select word
+    typeText(injector.parser.parseKeys("s"))    // substitute (enters insert)
+
+    assertExOutput("substitute")
+    assertState(Mode.INSERT)
+  }
+
+  @Test
+  fun `should execute InsertLeave after entering from visual mode`() {
+    configureByText("hello world")
+    enterCommand("autocmd InsertLeave * echo \"leaving insert\"")
+
+    typeText(injector.parser.parseKeys("viw"))  // select word
+    typeText(injector.parser.parseKeys("c"))    // change (enters insert)
+    typeText(injector.parser.parseKeys("<esc>"))
+
+    assertExOutput("leaving insert")
+    assertState(Mode.NORMAL())
+  }
+
+  @Test
+  fun `should execute both InsertEnter and InsertLeave from visual mode`() {
+    configureByText("hello world")
+    enterCommand("autocmd InsertEnter * echo \"enter\"")
+    enterCommand("autocmd InsertLeave * echo \"leave\"")
+
+    typeText(injector.parser.parseKeys("viw"))  // select word
+    typeText(injector.parser.parseKeys("c"))    // change (enters insert)
+    assertExOutput("enter")
+
+    typeText(injector.parser.parseKeys("<esc>"))
+    assertExOutput("leave")
   }
 }
