@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -18,11 +18,17 @@ import java.util.concurrent.ConcurrentLinkedDeque
 @Internal // please do not use this class in your plugins, API is not final and will be changed in future releases
 class VimListenersNotifier {
   val modeChangeListeners: MutableCollection<ModeChangeListener> = ConcurrentLinkedDeque()
+  val modeWillChangeListeners: MutableCollection<ModeWillChangeListener> = ConcurrentLinkedDeque()
   val myEditorListeners: MutableCollection<EditorListener> = ConcurrentLinkedDeque()
   val macroRecordingListeners: MutableCollection<MacroRecordingListener> = ConcurrentLinkedDeque()
   val vimPluginListeners: MutableCollection<VimPluginListener> = ConcurrentLinkedDeque()
   val isReplaceCharListeners: MutableCollection<IsReplaceCharListener> = ConcurrentLinkedDeque()
   val yankListeners: MutableCollection<VimYankListener> = ConcurrentLinkedDeque()
+
+  fun notifyModeWillChange(editor: VimEditor, oldMode: Mode, newMode: Mode) {
+    if (!injector.enabler.isEnabled()) return
+    modeWillChangeListeners.forEach { it.modeWillChange(editor, oldMode, newMode) }
+  }
 
   fun notifyModeChanged(editor: VimEditor, oldMode: Mode) {
     if (!injector.enabler.isEnabled()) return // we remove all the listeners when turning the plugin off, but let's do it just in case
@@ -87,6 +93,7 @@ class VimListenersNotifier {
   fun unloadListeners(listenerOwner: ListenerOwner) {
     arrayOf(
       modeChangeListeners,
+      modeWillChangeListeners,
       myEditorListeners,
       macroRecordingListeners,
       vimPluginListeners,
@@ -97,6 +104,7 @@ class VimListenersNotifier {
 
   fun reset() {
     modeChangeListeners.clear()
+    modeWillChangeListeners.clear()
     myEditorListeners.clear()
     macroRecordingListeners.clear()
     vimPluginListeners.clear()

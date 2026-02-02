@@ -66,6 +66,8 @@ import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.autocmd.AutoCmdEvent
+import com.maddyhome.idea.vim.common.ModeChangeListener
+import com.maddyhome.idea.vim.common.ModeWillChangeListener
 import com.maddyhome.idea.vim.group.ChangeGroup
 import com.maddyhome.idea.vim.group.FileGroupHelper
 import com.maddyhome.idea.vim.group.IjOptions
@@ -99,6 +101,7 @@ import com.maddyhome.idea.vim.newapi.IjVimSearchGroup
 import com.maddyhome.idea.vim.newapi.InsertTimeRecorder
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.inSelectMode
 import com.maddyhome.idea.vim.state.mode.selectionType
 import com.maddyhome.idea.vim.ui.ShowCmdOptionChangeListener
@@ -167,6 +170,9 @@ object VimListenerManager {
 
     val insertTimeRecorder = InsertTimeRecorder()
     injector.listenersNotifier.modeChangeListeners.add(insertTimeRecorder)
+
+    injector.listenersNotifier.modeWillChangeListeners.add(AutoCmdInsertEnterListener())
+    injector.listenersNotifier.modeChangeListeners.add(AutoCmdInsertLeaveListener())
 
     val modeWidgetListener = ModeWidgetListener()
     injector.listenersNotifier.modeChangeListeners.add(modeWidgetListener)
@@ -916,4 +922,20 @@ internal object VimListenerTestObject {
 private object MouseEventsDataHolder {
   const val allowedSkippedDragEvents = 3
   var dragEventCount = allowedSkippedDragEvents
+}
+
+private class AutoCmdInsertEnterListener : ModeWillChangeListener {
+  override fun modeWillChange(editor: VimEditor, oldMode: Mode, newMode: Mode) {
+    if (oldMode != Mode.INSERT && newMode == Mode.INSERT) {
+      injector.autoCmd.handleEvent(AutoCmdEvent.InsertEnter)
+    }
+  }
+}
+
+private class AutoCmdInsertLeaveListener : ModeChangeListener {
+  override fun modeChanged(editor: VimEditor, oldMode: Mode) {
+    if (oldMode == Mode.INSERT && editor.mode != Mode.INSERT) {
+      injector.autoCmd.handleEvent(AutoCmdEvent.InsertLeave)
+    }
+  }
 }
