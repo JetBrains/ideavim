@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.handler.commandContinuation
+import com.maddyhome.idea.vim.helper.CodeWrapper
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.key.KeyHandlerKeeper
 import com.maddyhome.idea.vim.listener.VimInsertListener
@@ -40,6 +41,7 @@ import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.IjVimCopiedText
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.newapi.ijOptions
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.undo.VimKeyBasedUndoService
 import com.maddyhome.idea.vim.undo.VimTimestampBasedUndoService
@@ -147,6 +149,35 @@ class ChangeGroup : VimChangeGroupBase() {
     val textRange = com.intellij.openapi.util.TextRange.create(start, end)
     injector.application.runWriteAction {
       CodeStyleManager.getInstance(project).reformatText(file, listOf(textRange))
+    }
+    wrapText(editor, start, end)
+  }
+
+  private fun wrapText(editor: IjVimEditor, start: Int, end: Int) {
+    val textwidth = injector.ijOptions(editor).textwidth
+    if (textwidth <= 0) {
+      return
+    }
+    wrapTextToWidth(editor, start, end, textwidth)
+  }
+
+  private fun wrapTextToWidth(editor: VimEditor, start: Int, end: Int, width: Int) {
+    val ijEditor = (editor as IjVimEditor).editor
+    val document = ijEditor.document
+
+    val text = document.getText(com.intellij.openapi.util.TextRange.create(start, end))
+    val wrapper = CodeWrapper(
+      width = width,
+      tabWidth = ijEditor.settings.getTabSize(ijEditor.project),
+    )
+    val wrapped = wrapper.wrap(text)
+
+    if (wrapped == text) {
+      return
+    }
+
+    injector.application.runWriteAction {
+      document.replaceString(start, end, wrapped)
     }
   }
 
