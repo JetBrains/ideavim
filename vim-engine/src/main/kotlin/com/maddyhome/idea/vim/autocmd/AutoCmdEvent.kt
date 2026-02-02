@@ -11,4 +11,6 @@ package com.maddyhome.idea.vim.autocmd
 enum class AutoCmdEvent {
   InsertEnter,
   InsertLeave,
+  BuffEnter,
+  BuffLeave,
 }

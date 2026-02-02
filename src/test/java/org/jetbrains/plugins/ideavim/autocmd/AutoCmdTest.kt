@@ -118,5 +118,4 @@ class AutoCmdTest : VimTestCase() {
 
     assertNoExOutput()
   }
-
 }
