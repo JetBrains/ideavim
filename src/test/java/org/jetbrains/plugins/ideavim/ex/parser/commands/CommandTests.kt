@@ -133,7 +133,7 @@ class CommandTests : VimTestCase() {
         augroup END
       """.trimIndent(),
     )
-    assertEquals(2, script.units.size)
+    assertEquals(4, script.units.size)
     assertTrue(script.units[0] is PlugCommand)
     assertTrue(script.units[1] is SetCommand)
   }
@@ -145,13 +145,14 @@ class CommandTests : VimTestCase() {
         augroup myCmds
           au smthing
         augroup END
-        
+
         Plug 'danilo-augusto/vim-afterglow'
         set nu rnu
       """.trimIndent(),
     )
-    assertEquals(2, script.units.size)
-    assertTrue(script.units[0] is PlugCommand)
-    assertTrue(script.units[1] is SetCommand)
+    // `augroup myCmds` and `augroup END` are two units; `au smthing` is malformed and dropped by the parser.
+    assertEquals(4, script.units.size)
+    assertTrue(script.units[2] is PlugCommand)
+    assertTrue(script.units[3] is SetCommand)
   }
 }
