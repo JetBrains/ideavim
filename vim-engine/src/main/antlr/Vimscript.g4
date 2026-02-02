@@ -72,7 +72,13 @@ functionFlag:           RANGE | ABORT | DICT | CLOSURE;
 argumentsDeclaration:   (ETC | defaultValue (WS* COMMA WS* defaultValue)* (WS* COMMA WS* ETC WS*)? | (variableName (WS* COMMA WS* variableName)* (WS* COMMA WS* defaultValue)* (WS* COMMA WS* ETC WS*)?))?;
 defaultValue:           variableName WS* ASSIGN WS* expr;
 
-autoCmd:                (WS | COLON)* AUTOCMD commandArgument = ~(NEW_LINE)*? NEW_LINE;
+autoCmd
+  : (WS | COLON)* AUTOCMD bang=BANG? auCommandArgument NEW_LINE
+  ;
+
+auCommandArgument
+  : ~(NEW_LINE)*
+  ;
 
 augroup:                (WS | COLON)* AUGROUP .*? AUGROUP WS+ END WS* NEW_LINE;
 
@@ -117,7 +123,7 @@ command:
         | ASSIGN    // `:=` print last line number
         | B_LOWERCASE | BUFFER| BUFFER_CLOSE | BUFFER_LIST
         | CLASS | CLEARJUMPS | CMD_CLEAR | COPY
-        | D_LOWERCASE | DELETE | DELCOMMAND | DELMARKS | DIGRAPHS | DUMPLINE | AUTOCMD
+        | D_LOWERCASE | DELETE | DELCOMMAND | DELMARKS | DIGRAPHS | DUMPLINE
         | E_LOWERCASE | EDIT_FILE | EXIT
         | F_LOWERCASE | FILE | FIND
         | GOTO
@@ -576,7 +582,6 @@ existingCommands:       ACTION
                     |   WRITE_PREVIOUS
                     |   WRITE_QUIT
                     |   YANK
-                    |   AUTOCMD
 ;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //

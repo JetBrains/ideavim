@@ -8,9 +8,13 @@
 
 package com.maddyhome.idea.vim.vimscript.parser.visitors
 
+import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.parser.generated.VimscriptBaseVisitor
 import com.maddyhome.idea.vim.parser.generated.VimscriptParser
 import com.maddyhome.idea.vim.vimscript.model.Executable
+import com.maddyhome.idea.vim.vimscript.model.commands.AutoCmdCommand
+import com.maddyhome.idea.vim.vimscript.model.commands.Command
+import com.maddyhome.idea.vim.vimscript.model.commands.CommandModifier
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.IndexedExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
@@ -63,8 +67,20 @@ object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
       ctx.functionDefinition() != null -> visitFunctionDefinition(ctx.functionDefinition())
       ctx.throwStatement() != null -> visitThrowStatement(ctx.throwStatement())
       ctx.tryStatement() != null -> visitTryStatement(ctx.tryStatement())
+      ctx.autoCmd() != null -> visitAutoCmd(ctx.autoCmd())
       else -> null
     }
+  }
+
+  override fun visitAutoCmd(ctx: VimscriptParser.AutoCmdContext): Command {
+    val range = Range()
+
+    val modifier = if (ctx.bang != null) CommandModifier.BANG else CommandModifier.NONE
+    val argument = ctx.auCommandArgument()?.text ?: ""
+
+    val command = AutoCmdCommand(range, modifier, argument)
+    command.rangeInScript = ctx.getTextRange()
+    return command
   }
 
   override fun visitWhileLoop(ctx: VimscriptParser.WhileLoopContext): Executable {
