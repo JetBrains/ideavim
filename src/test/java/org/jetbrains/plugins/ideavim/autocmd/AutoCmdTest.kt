@@ -169,4 +169,47 @@ class AutoCmdTest : VimTestCase() {
     typeText(injector.parser.parseKeys("<esc>"))
     assertExOutput("leave")
   }
+
+  @Test
+  fun `should register multiple events with comma-separated syntax`() {
+    enterCommand("autocmd InsertEnter,InsertLeave * echo \"triggered\"")
+
+    typeText(injector.parser.parseKeys("i"))
+    assertExOutput("triggered")
+
+    typeText(injector.parser.parseKeys("<esc>"))
+    assertExOutput("triggered")
+  }
+
+  @Test
+  fun `should handle spaces around commas in multiple events`() {
+    enterCommand("autocmd InsertEnter , InsertLeave * echo \"triggered\"")
+
+    typeText(injector.parser.parseKeys("i"))
+    assertExOutput("triggered")
+
+    typeText(injector.parser.parseKeys("<esc>"))
+    assertExOutput("triggered")
+  }
+
+  @Test
+  fun `should register three events with comma-separated syntax`() {
+    configureByText("hello")
+    enterCommand("autocmd InsertEnter,InsertLeave,BuffEnter * echo \"event\"")
+
+    // InsertEnter
+    typeText(injector.parser.parseKeys("i"))
+    assertExOutput("event")
+
+    // InsertLeave
+    typeText(injector.parser.parseKeys("<esc>"))
+    assertExOutput("event")
+  }
+
+  @Test
+  fun `should fail gracefully with invalid event in comma-separated list`() {
+    enterCommand("autocmd InsertEnter,InvalidEvent * echo \"test\"")
+    typeText(injector.parser.parseKeys("i"))
+    assertNoExOutput()
+  }
 }
