@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -33,21 +33,25 @@ data class AutoCmdCommand(val range: Range, val modifier: CommandModifier, val a
       injector.autoCmd.clearEvents()
       return ExecutionResult.Success
     }
-    val args = parseArgument(argument).onSuccess {
-      injector.autoCmd.registerEventCommand(it.second, it.first)
-    }
+    val args = parseArgument(argument)
     if (args.isFailure) return ExecutionResult.Error
+    args.onSuccess { (events, command) ->
+      events.forEach { event ->
+        injector.autoCmd.registerEventCommand(command, event)
+      }
+    }
     return ExecutionResult.Success
   }
 
-
-  fun parseArgument(argument: String): Result<Pair<AutoCmdEvent, String>> {
+  fun parseArgument(argument: String): Result<Pair<List<AutoCmdEvent>, String>> {
     val parts = argument.split('*')
+    if (parts.size < 2) return Result.failure(IllegalArgumentException("Invalid autocmd syntax"))
     try {
-      val command = AutoCmdEvent.valueOf(parts[0].trim())
-      return Result.success(Pair(command, parts[1].trim()))
+      val eventsString = parts[0].trim()
+      val events = eventsString.split(',').map { AutoCmdEvent.valueOf(it.trim()) }
+      return Result.success(Pair(events, parts[1].trim()))
     } catch (e: IllegalArgumentException) {
-     return Result.failure(e)
+      return Result.failure(e)
     }
   }
 }
