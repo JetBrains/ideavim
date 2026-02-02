@@ -147,6 +147,8 @@ interface VimInjector {
 
   val listenersNotifier: VimListenersNotifier
 
+  val autoCmd: AutoCmdService
+
   val redrawService: VimRedrawService
 
   val pluginService: VimPluginService

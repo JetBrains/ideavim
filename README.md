@@ -241,6 +241,33 @@ ShowHoverInfo - Quick Documentation and Error Description
 QuickImplementations - Quick Definition
 ```
 
+Autocmd
+----------
+
+IdeaVim provides minimal support for Vim’s `:autocmd`, allowing commands to run on specific editor events.
+
+### Syntax
+```
+autocmd {event} * {command}
+autocmd!
+````
+
+Supported events: `InsertEnter`, `InsertLeave`  
+Only the `*` pattern is supported.
+
+### Examples
+```vim
+autocmd InsertEnter * echo "Entering insert"
+autocmd InsertLeave * echo "Leaving insert"
+
+" Multiple handlers
+autocmd InsertEnter * echo "first"
+autocmd InsertEnter * echo "second"
+````
+
+`autocmd!` clears all registered handlers.
+
+
 Vim Script
 ------------
 

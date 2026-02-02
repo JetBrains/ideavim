@@ -12,6 +12,7 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.components.serviceIfCreated
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
+import com.maddyhome.idea.vim.api.AutoCmdService
 import com.maddyhome.idea.vim.api.EngineEditorHelper
 import com.maddyhome.idea.vim.api.ExecutionContextManager
 import com.maddyhome.idea.vim.api.LocalOptionInitialisationScenario
@@ -62,6 +63,7 @@ import com.maddyhome.idea.vim.api.VimscriptFunctionService
 import com.maddyhome.idea.vim.api.VimscriptParser
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.isInjectorInitialized
+import com.maddyhome.idea.vim.autocmd.AutoCmdImpl
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.extension.ExtensionLoader
 import com.maddyhome.idea.vim.extension.JsonExtensionProvider
@@ -217,6 +219,8 @@ internal class IjVimInjector : VimInjectorBase() {
     get() = service()
   override val pluginActivator: VimPluginActivator
     get() = service()
+
+  override val autoCmd: AutoCmdService get() = service<AutoCmdService>()
 }
 
 /**
