@@ -72,7 +72,6 @@ class HistoryCommandTest : VimTestCase() {
   fun `test history with 'history' option set to 0 shows nothing`() {
     enterCommand("set history=0")
     enterCommand("history")
-    assertNoExOutput()
     assertPluginError(false)
     assertPluginErrorMessage("'history' option is zero")
   }

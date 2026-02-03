@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2024 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -16,6 +16,12 @@ abstract class VimOutputPanelServiceBase : VimOutputPanelService {
   override fun output(editor: VimEditor, context: ExecutionContext, text: String) {
     val panel = getOrCreate(editor, context)
     panel.addText(text)
+    panel.show()
+  }
+
+  override fun output(editor: VimEditor, context: ExecutionContext, text: String, messageType: MessageType) {
+    val panel = getOrCreate(editor, context)
+    panel.addText(text, true, messageType.color)
     panel.show()
   }
 }
