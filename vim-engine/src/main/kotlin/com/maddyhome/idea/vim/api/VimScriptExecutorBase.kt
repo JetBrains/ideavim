@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -62,15 +62,13 @@ abstract class VimScriptExecutorBase : VimscriptExecutor {
           }
           finalResult = ExecutionResult.Error
           if (indicateErrors) {
-            injector.messages.showStatusBarMessage(editor, e.message)
-            injector.messages.indicateError()
+            injector.messages.showErrorMessage(editor, e.message)
           } else {
             logger.warn("Failed while executing $unit. " + e.message)
           }
         } catch (e: NotImplementedError) {
           if (indicateErrors) {
-            injector.messages.showStatusBarMessage(editor, "Not implemented yet :(")
-            injector.messages.indicateError()
+            injector.messages.showErrorMessage(editor, "Not implemented yet :(")
           }
         } catch (e: Exception) {
           logger.warn(e.toString())
@@ -105,8 +103,7 @@ abstract class VimScriptExecutorBase : VimscriptExecutor {
       execute(file.readText(), editor, context, skipHistory = true, indicateErrors)
     } catch (e: IOException) {
       if (indicateErrors) {
-        injector.messages.showStatusBarMessage(editor, "Cannot read file \"${file.path}\": ${e.message}")
-        injector.messages.indicateError()
+        injector.messages.showErrorMessage(editor, "Cannot read file \"${file.path}\": ${e.message}")
       } else {
         logger.warn("Failed to read file ${file.path}: ${e.message}")
       }

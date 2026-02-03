@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -22,7 +22,7 @@ abstract class VimFileBase : VimFile {
     val offset = editor.currentCaret().offset
     val ch = editor.text()[offset]
 
-    injector.messages.showStatusBarMessage(editor, toHexString(ch.code.toLong()))
+    injector.messages.showMessage(editor, toHexString(ch.code.toLong()))
   }
 
   override fun displayLocationInfo(editor: VimEditor) {
@@ -90,7 +90,7 @@ abstract class VimFileBase : VimFile {
       }
     }
 
-    injector.messages.showStatusBarMessage(editor, msg)
+    injector.messages.showMessage(editor, msg)
   }
 }
 

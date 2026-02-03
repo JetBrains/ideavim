@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -39,7 +39,7 @@ data class HistoryCommand(val range: Range, val modifier: CommandModifier, val a
     }
 
     if (injector.options(editor).history == 0) {
-      injector.messages.showStatusBarMessage(editor, injector.messages.message("command.history.option.is.zero"))
+      injector.messages.showMessage(editor, injector.messages.message("command.history.option.is.zero"))
       return ExecutionResult.Success
     }
 
