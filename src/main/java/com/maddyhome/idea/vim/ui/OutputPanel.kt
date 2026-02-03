@@ -72,6 +72,8 @@ class OutputPanel private constructor(
 
   init {
     textPane.isEditable = false
+    textPane.caret.isVisible = false
+    textPane.highlighter = null
 
     resizeAdapter = object : ComponentAdapter() {
       override fun componentResized(e: ComponentEvent?) {
@@ -294,10 +296,13 @@ class OutputPanel private constructor(
   }
 
   fun close(key: KeyStroke?) {
+    val passKeyBack = isSingleLine
     ApplicationManager.getApplication().invokeLater {
       deactivate(true)
       val project = editor.project
-      if (project != null && key != null && key.keyChar != '\n') {
+      // For single line messages, pass any key back to the editor (including Enter)
+      // For multi-line messages, don't pass Enter back (it was used to dismiss)
+      if (project != null && key != null && (passKeyBack || key.keyChar != '\n')) {
         val keys: MutableList<KeyStroke> = ArrayList(1)
         keys.add(key)
         getInstance().keyStack.addKeys(keys)
@@ -431,18 +436,27 @@ class OutputPanel private constructor(
         scrollBar.maximum <= scrollBar.visibleAmount
     }
 
-  private class OutputPanelKeyListener : KeyAdapter() {
+  private inner class OutputPanelKeyListener : KeyAdapter() {
     override fun keyTyped(e: KeyEvent) {
       val currentPanel: VimOutputPanel = injector.outputPanel.getCurrentOutputPanel() ?: return
 
-      val keyCode = e.getKeyCode()
-      val keyChar = e.getKeyChar()
+      val keyChar = e.keyChar
       val modifiers = e.modifiersEx
-      val keyStroke = if (keyChar == KeyEvent.CHAR_UNDEFINED)
-        KeyStroke.getKeyStroke(keyCode, modifiers)
-      else
-        KeyStroke.getKeyStroke(keyChar, modifiers)
+      val keyStroke = KeyStroke.getKeyStroke(keyChar, modifiers)
       currentPanel.handleKey(keyStroke)
+    }
+
+    override fun keyPressed(e: KeyEvent) {
+      // For single-line mode, pass action keys (arrows, function keys, etc.) back to the editor
+      // Character keys are handled in keyTyped
+      if (!isSingleLine) return
+      if (!e.isActionKey) return
+      val currentPanel = injector.outputPanel.getCurrentOutputPanel() as? OutputPanel ?: return
+
+      val keyCode = e.keyCode
+      val modifiers = e.modifiersEx
+      val keyStroke = KeyStroke.getKeyStroke(keyCode, modifiers)
+      currentPanel.close(keyStroke)
     }
   }
 
