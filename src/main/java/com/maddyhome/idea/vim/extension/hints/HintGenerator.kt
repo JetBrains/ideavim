@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2025 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -13,8 +13,10 @@ import com.intellij.openapi.wm.impl.status.TextPanel
 import com.intellij.ui.treeStructure.Tree
 import java.awt.Component
 import java.awt.Point
-import java.util.WeakHashMap
+import java.awt.Rectangle
+import java.util.*
 import javax.accessibility.Accessible
+import javax.swing.JComponent
 import javax.swing.SwingUtilities
 
 internal sealed class HintGenerator {
@@ -75,7 +77,10 @@ private fun collectTargets(
   val location = location + (accessible.location ?: return)
 
   accessible.size?.let { size ->
-    if (accessible.isShowing && (component.isClickable() || component is Tree || component is TextPanel)) {
+    if (accessible.isVisible &&
+      (component as? Component)?.isActuallyVisible() != false &&
+      (component.isClickable() || component is Tree || component is TextPanel)
+    ) {
       targets[component].let {
         // For some reason, the same component may appear multiple times in the accessible tree.
         if (it == null || it.depth > depth) {
@@ -104,6 +109,12 @@ private fun collectTargets(
  * @return whether the component is clickable
  */
 private fun Accessible.isClickable(): Boolean = (accessibleContext.accessibleAction?.accessibleActionCount ?: 0) > 0
+
+private fun Component.isActuallyVisible(): Boolean {
+  val visibleRect = Rectangle()
+  (this as? JComponent)?.computeVisibleRect(visibleRect)
+  return !visibleRect.isEmpty
+}
 
 private operator fun Point.plus(other: Point) = Point(x + other.x, y + other.y)
 
