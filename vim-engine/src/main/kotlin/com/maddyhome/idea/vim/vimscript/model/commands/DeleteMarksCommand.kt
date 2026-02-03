@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -57,7 +57,7 @@ data class DeleteMarksCommand(val range: Range, val modifier: CommandModifier, v
       if (index != -1) {
         val invalidIndex = if (processedArg[index] == '-') (index - 1).coerceAtLeast(0) else index
 
-        injector.messages.showStatusBarMessage(
+        injector.messages.showErrorMessage(
           editor,
           injector.messages.message("E475", processedArg.substring(invalidIndex))
         )

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -46,7 +46,7 @@ internal data class CmdFilterCommand(val range: Range, val modifier: CommandModi
           !inBackslash && c == '!' -> {
             val last = lastCommand
             if (last.isNullOrEmpty()) {
-              injector.messages.showStatusBarMessage(editor, injector.messages.message("E34"))
+              injector.messages.showErrorMessage(editor, injector.messages.message("E34"))
               return ExecutionResult.Error
             }
             append(last)
@@ -59,7 +59,7 @@ internal data class CmdFilterCommand(val range: Range, val modifier: CommandModi
               // name modifiers. (I also don't know what the :p:h means)
               // (Vim) E499: Empty file name for '%' or '#', only works with ":p:h"
               // (IdeaVim) E499: Empty file name for '%'
-              injector.messages.showStatusBarMessage(editor, injector.messages.message("E499"))
+              injector.messages.showErrorMessage(editor, injector.messages.message("E499"))
               return ExecutionResult.Error
             }
             append(virtualFile.path)
