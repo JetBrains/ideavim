@@ -89,7 +89,8 @@ open class CommandPartNode<T> internal constructor(private val trieNode: KeyStro
           val node: Node<T> = if (value.data == null) {
             CommandPartNode<T>(value)
           } else {
-            CommandNode(value.data!!)
+            // Safe to use non-null value here since we're in the else branch
+            CommandNode(value.data)
           }
           put(key, node)
         }
@@ -98,4 +99,7 @@ open class CommandPartNode<T> internal constructor(private val trieNode: KeyStro
 }
 
 @Suppress("DEPRECATION")
-internal class RootNode<T>(trieNode: KeyStrokeTrie<T>) : CommandPartNode<T>(trieNode.getTrieNode(emptyList())!!)
+internal class RootNode<T>(trieNode: KeyStrokeTrie<T>) : CommandPartNode<T>(
+  // getTrieNode(emptyList()) always returns the root node, which is guaranteed to exist
+  trieNode.getTrieNode(emptyList()) ?: error("Root node should always exist")
+)
