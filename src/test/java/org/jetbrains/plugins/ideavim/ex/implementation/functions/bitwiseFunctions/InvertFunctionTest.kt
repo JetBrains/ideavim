@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2025 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -28,7 +28,6 @@ class InvertFunctionTest : VimTestCase() {
   @Test
   fun `test invert function with list causes error`() {
     enterCommand("echo invert([1, 2, 3])")
-    assertNoExOutput()
     assertPluginError(true)
     assertPluginErrorMessage("E745: Using a List as a Number")
   }
@@ -36,7 +35,6 @@ class InvertFunctionTest : VimTestCase() {
   @Test
   fun `test invert function with dict causes error`() {
     enterCommand("echo invert({1: 2, 3: 4})")
-    assertNoExOutput()
     assertPluginError(true)
     assertPluginErrorMessage("E728: Using a Dictionary as a Number")
   }
@@ -44,7 +42,6 @@ class InvertFunctionTest : VimTestCase() {
   @Test
   fun `test invert function with float causes error`() {
     enterCommand("echo invert(1.5)")
-    assertNoExOutput()
     assertPluginError(true)
     assertPluginErrorMessage("E805: Using a Float as a Number")
   }

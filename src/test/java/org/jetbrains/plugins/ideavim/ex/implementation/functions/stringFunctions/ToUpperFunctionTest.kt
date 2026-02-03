@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2025 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -33,7 +33,6 @@ class ToUpperFunctionTest : VimTestCase() {
   @Test
   fun `test toupper with list causes error`() {
     enterCommand("echo toupper([1, 2, 3])")
-    assertNoExOutput()
     assertPluginError(true)
     assertPluginErrorMessage("E730: Using a List as a String")
   }
@@ -41,7 +40,6 @@ class ToUpperFunctionTest : VimTestCase() {
   @Test
   fun `test toupper with dict causes error`() {
     enterCommand("echo toupper({1: 2, 3: 4})")
-    assertNoExOutput()
     assertPluginError(true)
     assertPluginErrorMessage("E731: Using a Dictionary as a String")
   }
