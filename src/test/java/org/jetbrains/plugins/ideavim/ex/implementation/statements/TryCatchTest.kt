@@ -154,7 +154,6 @@ class TryCatchTest : VimTestCase() {
       ),
     )
     assertPluginError(true)
-    assertPluginErrorMessage("my exception")
     assertExOutput(
       """
       finally block

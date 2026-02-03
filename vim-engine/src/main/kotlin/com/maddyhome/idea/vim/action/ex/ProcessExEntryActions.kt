@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2024 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -120,8 +120,7 @@ class ProcessExCommandEntryAction : MotionActionHandler.SingleExecution() {
       val shouldSkipHistory = keyState.mappingState.isExecutingMap() || injector.macro.isExecutingMacro
       injector.vimscriptExecutor.execute(text, editor, context, shouldSkipHistory, true, CommandLineVimLContext)
     } catch (e: ExException) {
-      injector.messages.showStatusBarMessage(null, e.message)
-      injector.messages.indicateError()
+      injector.messages.showErrorMessage(editor, e.message)
     } catch (bad: Exception) {
       logger.error("Error during command execution", bad)
       injector.messages.indicateError()

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2025 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -27,7 +27,7 @@ class InsertFilenameUnderCaretAction : CommandLineActionHandler() {
     val offset = injector.searchGroup.getCurrentIncsearchResultRange(editor)?.endOffset ?: editor.primaryCaret().offset
     val range = injector.searchHelper.findFilenameAtOrFollowingCursor(editor, offset)
     if (range == null) {
-      injector.messages.showStatusBarMessage(commandLine.editor, injector.messages.message("E446"))
+      injector.messages.showErrorMessage(commandLine.editor, injector.messages.message("E446"))
       return false
     }
 

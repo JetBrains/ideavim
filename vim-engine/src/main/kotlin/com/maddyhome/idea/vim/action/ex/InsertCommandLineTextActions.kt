@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2024 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -154,7 +154,7 @@ open class InsertWordUnderCaretActionBase(private val isBigWord: Boolean, insert
     val editor = commandLine.editor
     val wordRange = injector.searchHelper.findWordAtOrFollowingCursor(editor, getStartOffset(editor), isBigWord)
     if (wordRange == null) {
-      injector.messages.showStatusBarMessage(editor, injector.messages.message("E348"))
+      injector.messages.showErrorMessage(editor, injector.messages.message("E348"))
       return null
     }
     return editor.getText(wordRange)

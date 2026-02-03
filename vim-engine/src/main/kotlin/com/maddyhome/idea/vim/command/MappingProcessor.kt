@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -223,8 +223,7 @@ internal object MappingProcessor : KeyConsumer {
       mappingState.startMapExecution()
       mappingInfo.execute(editor, context, keyState)
     } catch (e: Exception) {
-      injector.messages.showStatusBarMessage(editor, e.message)
-      injector.messages.indicateError()
+      injector.messages.showErrorMessage(editor, e.message)
       log.error(
         """
                   Caught exception during ${mappingInfo.getPresentableString()}
@@ -233,8 +232,7 @@ internal object MappingProcessor : KeyConsumer {
         e
       )
     } catch (e: NotImplementedError) {
-      injector.messages.showStatusBarMessage(editor, e.message)
-      injector.messages.indicateError()
+      injector.messages.showErrorMessage(editor, e.message)
       log.error(
         """
                   Caught exception during ${mappingInfo.getPresentableString()}
