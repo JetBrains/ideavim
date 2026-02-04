@@ -27,6 +27,8 @@ usual beta standards.
 
 ### Features:
 * New VimScript functions: `add()`, `call()`, `extend()`, `extendnew()`, `filter()`, `flatten()`, `flattennew()`, `foreach()`, `has_key()`, `indexof()`, `insert()`, `items()`, `keys()`, `map()`, `mapnew()`, `reduce()`, `remove()`, `slice()`, `sort()`, `uniq()`, `values()`
+* [VIM-1595](https://youtrack.jetbrains.com/issue/VIM-1595) Added support for `:read` command - insert file content below current line (e.g., `:read file.txt`, `0read file.txt`)
+* [VIM-1595](https://youtrack.jetbrains.com/issue/VIM-1595) Added support for `:read!` command - insert shell command output below current line (e.g., `:read! echo "hello"`)
 * [VIM-566](https://youtrack.jetbrains.com/issue/VIM-566) Added support for `zA` command - toggle folds recursively
 * [VIM-566](https://youtrack.jetbrains.com/issue/VIM-566) Added support for `zr` command - increase fold level to show more folds
 * [VIM-566](https://youtrack.jetbrains.com/issue/VIM-566) Added support for `zm` command - decrease fold level to hide more folds
@@ -37,6 +39,7 @@ usual beta standards.
 * [VIM-4105](https://youtrack.jetbrains.com/issue/VIM-4105) Fixed `a"` `a'` `a\`` text objects to include surrounding whitespace per Vim spec
 * [VIM-4097](https://youtrack.jetbrains.com/issue/VIM-4097) Fixed `<A-n>` (NextOccurrence) with text containing backslashes - e.g., selecting `\IntegerField` now works correctly
 * [VIM-4094](https://youtrack.jetbrains.com/issue/VIM-4094) Fixed UninitializedPropertyAccessException when loading history
+* [VIM-3948](https://youtrack.jetbrains.com/issue/VIM-3948) Improved hint generation visibility checks for better UI component detection
 * Fixed high CPU usage while showing command line
 * Fixed comparison of String and Number in VimScript expressions
 
