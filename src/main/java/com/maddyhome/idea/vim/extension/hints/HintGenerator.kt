@@ -50,7 +50,11 @@ internal sealed class HintGenerator {
         target.hint = if (preserve) {
           previousHints[target.component] ?: hintIterator.firstOrNull { candidateHint ->
             // Check if the hint is not already used by previous targets
-            !previousHints.values.any { existingHint -> existingHint.startsWith(candidateHint) || candidateHint.startsWith(existingHint) }
+            !previousHints.values.any { existingHint ->
+              existingHint.startsWith(candidateHint) || candidateHint.startsWith(
+                existingHint
+              )
+            }
           } ?: return generate(targets, false) // do not preserve previous hints if failed
         } else {
           hintIterator.next()
