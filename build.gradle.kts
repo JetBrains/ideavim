@@ -301,6 +301,8 @@ intellijPlatform {
       """
         <b>Features:</b><br>
         * New VimScript functions: <code>add()</code>, <code>call()</code>, <code>extend()</code>, <code>extendnew()</code>, <code>filter()</code>, <code>flatten()</code>, <code>flattennew()</code>, <code>foreach()</code>, <code>has_key()</code>, <code>indexof()</code>, <code>insert()</code>, <code>items()</code>, <code>keys()</code>, <code>map()</code>, <code>mapnew()</code>, <code>reduce()</code>, <code>remove()</code>, <code>slice()</code>, <code>sort()</code>, <code>uniq()</code>, <code>values()</code><br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-1595">VIM-1595</a> Added support for <code>:read</code> command - insert file content below current line (e.g., <code>:read file.txt</code>, <code>0read file.txt</code>)<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-1595">VIM-1595</a> Added support for <code>:read!</code> command - insert shell command output below current line (e.g., <code>:read! echo "hello"</code>)<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-566">VIM-566</a> Added support for <code>zA</code> command - toggle folds recursively<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-566">VIM-566</a> Added support for <code>zr</code> command - increase fold level to show more folds<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-566">VIM-566</a> Added support for <code>zm</code> command - decrease fold level to hide more folds<br>
@@ -311,6 +313,7 @@ intellijPlatform {
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4105">VIM-4105</a> Fixed <code>a"</code> <code>a'</code> <code>a`</code> text objects to include surrounding whitespace per Vim spec<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4097">VIM-4097</a> Fixed <code>&lt;A-n&gt;</code> (NextOccurrence) with text containing backslashes - e.g., selecting <code>\IntegerField</code> now works correctly<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4094">VIM-4094</a> Fixed UninitializedPropertyAccessException when loading history<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-3948">VIM-3948</a> Improved hint generation visibility checks for better UI component detection<br>
         * Fixed high CPU usage while showing command line<br>
         * Fixed comparison of String and Number in VimScript expressions<br>
         <br>
