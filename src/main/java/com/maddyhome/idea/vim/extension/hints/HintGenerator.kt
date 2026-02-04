@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.extension.hints
 
 import com.intellij.openapi.editor.impl.EditorComponentImpl
+import com.intellij.openapi.wm.impl.content.ContentTabLabel
 import com.intellij.openapi.wm.impl.status.TextPanel
 import com.intellij.ui.treeStructure.Tree
 import java.awt.Component
@@ -50,7 +51,11 @@ internal sealed class HintGenerator {
         target.hint = if (preserve) {
           previousHints[target.component] ?: hintIterator.firstOrNull { candidateHint ->
             // Check if the hint is not already used by previous targets
-            !previousHints.values.any { existingHint -> existingHint.startsWith(candidateHint) || candidateHint.startsWith(existingHint) }
+            !previousHints.values.any { existingHint ->
+              existingHint.startsWith(candidateHint) || candidateHint.startsWith(
+                existingHint
+              )
+            }
           } ?: return generate(targets, false) // do not preserve previous hints if failed
         } else {
           hintIterator.next()
@@ -79,7 +84,7 @@ private fun collectTargets(
   accessible.size?.let { size ->
     if (accessible.isVisible &&
       (component as? Component)?.isActuallyVisible() != false &&
-      (component.isClickable() || component is Tree || component is TextPanel)
+      (component.isClickable() || component is ContentTabLabel || component is Tree || component is TextPanel)
     ) {
       targets[component].let {
         // For some reason, the same component may appear multiple times in the accessible tree.
