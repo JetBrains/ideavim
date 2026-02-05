@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.extension.hints
 
 import com.intellij.openapi.editor.impl.EditorComponentImpl
 import com.intellij.openapi.wm.impl.status.TextPanel
+import com.intellij.ui.components.JBTextField
 import com.intellij.ui.treeStructure.Tree
 import java.awt.Component
 import java.awt.Point
@@ -17,7 +18,9 @@ import java.awt.Rectangle
 import java.util.*
 import javax.accessibility.Accessible
 import javax.swing.JComponent
+import javax.swing.JTabbedPane
 import javax.swing.SwingUtilities
+import javax.swing.text.JTextComponent
 
 internal sealed class HintGenerator {
   private var hints: Map<Accessible, String> = emptyMap()
@@ -81,19 +84,40 @@ private fun collectTargets(
   val location = location + (accessible.location ?: return)
 
   accessible.size?.let { size ->
-    if (accessible.isVisible &&
-      (component as? Component)?.isActuallyVisible() != false &&
-      (component.isClickable() || component is Tree || component is TextPanel)
-    ) {
+    // TextPanel (status bar widgets) may report incorrect visibility until hovered, so skip visibility check for them
+    val isTextPanel = component is TextPanel || component is JBTextField
+    val isTextComponent = component is JTextComponent
+    val isVisible = isTextPanel || (accessible.isVisible && (component as? Component)?.isActuallyVisible() != false)
+    val isInteractive = component.isClickable() || component is Tree || isTextPanel || isTextComponent
+
+    if (isVisible && isInteractive) {
       targets[component].let {
         // For some reason, the same component may appear multiple times in the accessible tree.
         if (it == null || it.depth > depth) {
           targets[component] = HintTarget(component, location, size, depth).apply {
             action = when (component) {
               is Tree, is EditorComponentImpl -> ({ component.requestFocusInWindow() })
+              is JTextComponent -> ({ component.requestFocusInWindow() })
               else -> HintTarget::clickCenter
             }
           }
+        }
+      }
+    }
+  }
+
+  // Handle JTabbedPane tabs specially - create a target for each tab
+  if (component is JTabbedPane) {
+    for (tabIndex in 0 until component.tabCount) {
+      val tabBounds = component.getBoundsAt(tabIndex) ?: continue
+      val tabLocation = Point(location.x + tabBounds.x, location.y + tabBounds.y)
+      val tabSize = tabBounds.size
+      // Use a unique key for each tab by combining tabbedPane and index
+      val tabKey = TabAccessible(component, tabIndex)
+      targets[tabKey] = HintTarget(tabKey, tabLocation, tabSize, depth + 1).apply {
+        action = {
+          component.selectedIndex = tabIndex
+          true
         }
       }
     }
@@ -107,6 +131,20 @@ private fun collectTargets(
       collectTargets(targets, it, location, depth + 1)
     }
   }
+}
+
+/**
+ * Wrapper to make each tab in a JTabbedPane a unique Accessible key
+ */
+private class TabAccessible(val tabbedPane: JTabbedPane, val tabIndex: Int) : Accessible {
+  override fun getAccessibleContext(): javax.accessibility.AccessibleContext = tabbedPane.accessibleContext
+
+  override fun equals(other: Any?): Boolean {
+    if (other !is TabAccessible) return false
+    return tabbedPane === other.tabbedPane && tabIndex == other.tabIndex
+  }
+
+  override fun hashCode(): Int = System.identityHashCode(tabbedPane) * 31 + tabIndex
 }
 
 /**

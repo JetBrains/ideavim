@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -29,6 +29,8 @@ import java.awt.Graphics
 import java.awt.Point
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import javax.accessibility.AccessibleAction
+import javax.accessibility.AccessibleContext
 import javax.swing.JComponent
 import javax.swing.SwingUtilities
 import kotlin.math.max
@@ -108,7 +110,10 @@ class VimModeWidget(val project: Project) : CustomStatusBarWidget, VimStatusBarW
     }
   }
 
-  private val label = JBLabelWiderThan(setOf(REPLACE)).apply { isOpaque = true }
+  private val label = JBLabelWiderThan(setOf(REPLACE), ::showPopup).apply {
+    isOpaque = true
+    accessibleContext.accessibleName = "Vim Mode"
+  }
 
   init {
     val mode = getFocusedEditor(project)?.vim?.mode
@@ -117,21 +122,25 @@ class VimModeWidget(val project: Project) : CustomStatusBarWidget, VimStatusBarW
     label.addMouseListener(object : MouseAdapter() {
       override fun mouseClicked(e: MouseEvent) {
         if (SwingUtilities.isLeftMouseButton(e)) {
-          val popup = ModeWidgetPopup.createPopup() ?: return
-          val dimension = popup.content.preferredSize
-
-          val widgetLocation = e.component.locationOnScreen
-          popup.show(
-            RelativePoint(
-              Point(
-                widgetLocation.x + e.component.width - dimension.width,
-                widgetLocation.y - dimension.height,
-              )
-            )
-          )
+          showPopup()
         }
       }
     })
+  }
+
+  private fun showPopup() {
+    val popup = ModeWidgetPopup.createPopup() ?: return
+    val dimension = popup.content.preferredSize
+
+    val widgetLocation = label.locationOnScreen
+    popup.show(
+      RelativePoint(
+        Point(
+          widgetLocation.x + label.width - dimension.width,
+          widgetLocation.y - dimension.height,
+        )
+      )
+    )
   }
 
   override fun ID(): String {
@@ -153,9 +162,14 @@ class VimModeWidget(val project: Project) : CustomStatusBarWidget, VimStatusBarW
   }
 
   private fun updateLabel(mode: Mode?) {
-    label.text = getModeText(mode)
+    val modeText = getModeText(mode)
+    label.text = modeText
     label.foreground = getModeForeground(mode)
     label.background = getModeBackground(mode)
+
+    label.toolTipText = "Vim Mode: ${modeText ?: "disabled"}"
+    label.accessibleContext.accessibleName = "Vim Mode"
+    label.accessibleContext.accessibleDescription = modeText ?: "IdeaVim disabled"
   }
 
   private fun getFocusedEditor(project: Project): Editor? {
@@ -163,7 +177,10 @@ class VimModeWidget(val project: Project) : CustomStatusBarWidget, VimStatusBarW
     return fileEditorManager.selectedTextEditor
   }
 
-  private class JBLabelWiderThan(private val words: Collection<String>) : JBLabel("", CENTER) {
+  private class JBLabelWiderThan(
+    private val words: Collection<String>,
+    private val onClickAction: () -> Unit,
+  ) : JBLabel("", CENTER) {
     private val wordWidth: Int
       get() {
         val fontMetrics = getFontMetrics(font)
@@ -191,6 +208,30 @@ class VimModeWidget(val project: Project) : CustomStatusBarWidget, VimStatusBarW
       // (fillRect, etc.) Since we're part of the frame, we get the modified Graphics. Get the original Graphics so our
       // background isn't overwritten.
       return IdeBackgroundUtil.getOriginalGraphics(g)
+    }
+
+    override fun getAccessibleContext(): AccessibleContext {
+      if (accessibleContext == null) {
+        accessibleContext = AccessibleJBLabelWiderThan()
+      }
+      return accessibleContext
+    }
+
+    private inner class AccessibleJBLabelWiderThan : AccessibleJLabel(), AccessibleAction {
+      override fun getAccessibleAction(): AccessibleAction = this
+
+      override fun getAccessibleActionCount(): Int = 1
+
+      override fun getAccessibleActionDescription(i: Int): String? =
+        if (i == 0) AccessibleAction.CLICK else null
+
+      override fun doAccessibleAction(i: Int): Boolean {
+        if (i == 0) {
+          onClickAction()
+          return true
+        }
+        return false
+      }
     }
   }
 }
