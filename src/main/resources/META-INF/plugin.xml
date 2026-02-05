@@ -409,7 +409,7 @@
 
   <actions>
     <action class="com.maddyhome.idea.vim.extension.hints.ToggleHintsAction" text="Toggle Hints">
-      <keyboard-shortcut keymap="$default" first-keystroke="alt F"/>
+      <keyboard-shortcut keymap="$default" first-keystroke="ctrl BACK_SLASH"/>
     </action>
   </actions>
 </idea-plugin>
