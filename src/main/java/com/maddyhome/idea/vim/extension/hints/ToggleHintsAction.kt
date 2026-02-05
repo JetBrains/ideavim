@@ -40,6 +40,12 @@ class ToggleHintsAction : DumbAwareToggleAction() {
 
   override fun isSelected(e: AnActionEvent): Boolean = cover != null
 
+  init {
+    // By default, IntelliJ disables actions while a modal dialog is open.
+    // We override this so hints can target components inside popups and dialogs (e.g., IdeaVim settings).
+    isEnabledInModalContext = true
+  }
+
   override fun setSelected(e: AnActionEvent, selected: Boolean) {
     val rootPane = SwingUtilities.getRootPane(e.getData(PlatformDataKeys.CONTEXT_COMPONENT)) ?: return
     if (!injector.globalIjOptions().vimHints) return
