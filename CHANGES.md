@@ -50,7 +50,9 @@ usual beta standards.
 ## 2.28.0, 2025-12-09
 
 ### Features:
-* Hints system for component navigation - use hint shortcuts to focus and interact with UI components
+
+* Hints system for keyboard-driven UI navigation - enable with `:set vimhints`, then press `Ctrl+\` to show hints on UI
+  components
 * [VIM-4004](https://youtrack.jetbrains.com/issue/VIM-4004) Support for `<F13>` through `<F24>` keys
 * [VIM-2143](https://youtrack.jetbrains.com/issue/VIM-2143) Environment variables expansion in `:source`, `:edit`, `:write` and other file commands (e.g., `:source $HOME/.ideavimrc`)
 * Command line `<C-R>` commands: insert register (`<C-R>{register}`), word (`<C-R><C-W>`), WORD (`<C-R><C-A>`), line (`<C-R><C-L>`), filename (`<C-R><C-F>`)
