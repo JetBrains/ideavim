@@ -18,6 +18,7 @@ import java.awt.Rectangle
 import java.util.*
 import javax.accessibility.Accessible
 import javax.swing.JComponent
+import javax.swing.JScrollPane
 import javax.swing.JTabbedPane
 import javax.swing.SwingUtilities
 import javax.swing.text.JTextComponent
@@ -87,18 +88,24 @@ private fun collectTargets(
     // TextPanel (status bar widgets) may report incorrect visibility until hovered, so skip visibility check for them
     val isTextPanel = component is TextPanel || component is JBTextField
     val isTextComponent = component is JTextComponent
+    val isEditorScrollPane = component is JScrollPane && component.viewport?.view is EditorComponentImpl
     val isVisible = isTextPanel || (accessible.isVisible && (component as? Component)?.isActuallyVisible() != false)
-    val isInteractive = component.isClickable() || component is Tree || isTextPanel || isTextComponent
+    val isInteractive =
+      component.isClickable() || component is Tree || isTextPanel || isTextComponent || isEditorScrollPane
 
     if (isVisible && isInteractive) {
       targets[component].let {
         // For some reason, the same component may appear multiple times in the accessible tree.
         if (it == null || it.depth > depth) {
           targets[component] = HintTarget(component, location, size, depth).apply {
-            action = when (component) {
-              is Tree, is EditorComponentImpl -> ({ component.requestFocusInWindow() })
-              is JTextComponent -> ({ component.requestFocusInWindow() })
+            action = when {
+              isEditorScrollPane -> ({ component.viewport?.view?.requestFocusInWindow() ?: false })
+              component is Tree || component is EditorComponentImpl -> ({ (component as Component).requestFocusInWindow() })
+              component is JTextComponent -> ({ (component as Component).requestFocusInWindow() })
               else -> HintTarget::clickCenter
+            }
+            if (isEditorScrollPane) {
+              labelPosition = HintLabelPosition.CENTER
             }
           }
         }
