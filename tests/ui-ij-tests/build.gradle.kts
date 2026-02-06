@@ -1,3 +1,11 @@
+/*
+ * Copyright 2003-2026 The IdeaVim authors
+ *
+ * Use of this source code is governed by an MIT-style
+ * license that can be found in the LICENSE.txt file or at
+ * https://opensource.org/licenses/MIT.
+ */
+
 plugins {
   java
   kotlin("jvm")
@@ -22,6 +30,9 @@ dependencies {
 
   testImplementation("com.intellij.remoterobot:remote-robot:$remoteRobotVersion")
   testImplementation("com.intellij.remoterobot:remote-fixtures:$remoteRobotVersion")
+
+  testImplementation("com.anthropic:anthropic-java:2.13.0")
+  testImplementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.2")
 }
 
 tasks {
