@@ -18,6 +18,7 @@ import java.awt.Rectangle
 import java.util.*
 import javax.accessibility.Accessible
 import javax.swing.JComponent
+import javax.swing.JScrollPane
 import javax.swing.JTabbedPane
 import javax.swing.SwingUtilities
 import javax.swing.text.JTextComponent
@@ -83,22 +84,28 @@ private fun collectTargets(
   val accessible = accessibleComponent ?: return
   val location = location + (accessible.location ?: return)
 
+  val isEditorScrollPane = component is JScrollPane && component.viewport?.view is EditorComponentImpl
   accessible.size?.let { size ->
     // TextPanel (status bar widgets) may report incorrect visibility until hovered, so skip visibility check for them
     val isTextPanel = component is TextPanel || component is JBTextField
     val isTextComponent = component is JTextComponent
     val isVisible = isTextPanel || (accessible.isVisible && (component as? Component)?.isActuallyVisible() != false)
-    val isInteractive = component.isClickable() || component is Tree || isTextPanel || isTextComponent
+    val isInteractive =
+      component.isClickable() || component is Tree || isTextPanel || isTextComponent || isEditorScrollPane
 
     if (isVisible && isInteractive) {
       targets[component].let {
         // For some reason, the same component may appear multiple times in the accessible tree.
         if (it == null || it.depth > depth) {
           targets[component] = HintTarget(component, location, size, depth).apply {
-            action = when (component) {
-              is Tree, is EditorComponentImpl -> ({ component.requestFocusInWindow() })
-              is JTextComponent -> ({ component.requestFocusInWindow() })
+            action = when {
+              isEditorScrollPane -> ({ component.viewport?.view?.requestFocusInWindow() ?: false })
+              component is Tree -> ({ (component as Component).requestFocusInWindow() })
+              component is JTextComponent -> ({ (component as Component).requestFocusInWindow() })
               else -> HintTarget::clickCenter
+            }
+            if (isEditorScrollPane) {
+              labelPosition = HintLabelPosition.CENTER
             }
           }
         }
@@ -123,8 +130,8 @@ private fun collectTargets(
     }
   }
 
-  // Skip the children of the Tree, otherwise it will easily lead to performance problems
-  if (component is Tree) return
+  // Skip the children of the Tree or scrollPane, otherwise it will easily lead to performance problems
+  if (component is Tree || isEditorScrollPane) return
   // recursively collect children
   for (i in 0..<accessibleChildrenCount) {
     getAccessibleChild(i)?.let {
