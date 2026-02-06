@@ -20,4 +20,16 @@ class NextFileCommandTest : VimTestCase() {
     val command = injector.vimscriptParser.parseCommand("next")
     assertTrue(command is NextFileCommand)
   }
+
+  @Test
+  fun `command parsing bnext`() {
+    val command = injector.vimscriptParser.parseCommand("bnext")
+    assertTrue(command is NextFileCommand)
+  }
+
+  @Test
+  fun `command parsing bn`() {
+    val command = injector.vimscriptParser.parseCommand("bn")
+    assertTrue(command is NextFileCommand)
+  }
 }
