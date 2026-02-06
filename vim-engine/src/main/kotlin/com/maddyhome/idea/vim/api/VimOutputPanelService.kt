@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2024 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -30,4 +30,9 @@ interface VimOutputPanelService {
    * Basic method that should be sufficient in most cases.
    */
   fun output(editor: VimEditor, context: ExecutionContext, text: String)
+
+  /**
+   * Appends text to the existing output panel or creates a new one with the given text and message type.
+   */
+  fun output(editor: VimEditor, context: ExecutionContext, text: String, messageType: MessageType)
 }

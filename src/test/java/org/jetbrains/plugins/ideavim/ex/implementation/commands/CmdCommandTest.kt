@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -134,7 +134,7 @@ class CmdCommandTest : VimTestCase() {
     VimPlugin.getCommand().resetAliases()
     configureByText("\n")
     typeText(commandToKeys("command! -range Error echo <args>"))
-    assertPluginError(false)
+    assertPluginError(true)
     kotlin.test.assertEquals("'-range' is not supported by `command`", injector.messages.getStatusBarMessage())
   }
 
@@ -143,7 +143,7 @@ class CmdCommandTest : VimTestCase() {
     VimPlugin.getCommand().resetAliases()
     configureByText("\n")
     typeText(commandToKeys("command! -complete=color Error echo <args>"))
-    assertPluginError(false)
+    assertPluginError(true)
     kotlin.test.assertEquals("'-complete' is not supported by `command`", injector.messages.getStatusBarMessage())
   }
 

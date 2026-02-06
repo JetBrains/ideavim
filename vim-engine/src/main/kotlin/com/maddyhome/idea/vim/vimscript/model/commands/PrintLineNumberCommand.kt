@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2025 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -56,7 +56,7 @@ data class PrintLineNumberCommand(val range: Range, val modifier: CommandModifie
     }
     else ""
 
-    injector.messages.showStatusBarMessage(editor, "$line1 $content")
+    injector.messages.showMessage(editor, "$line1 $content")
     return ExecutionResult.Success
   }
 }

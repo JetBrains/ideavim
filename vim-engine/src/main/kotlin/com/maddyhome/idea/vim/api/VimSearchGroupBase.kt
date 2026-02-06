@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -600,7 +600,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     val regex: VimRegex = try {
       VimRegex(pattern)
     } catch (e: VimRegexException) {
-      injector.messages.showStatusBarMessage(editor, e.message)
+      injector.messages.showErrorMessage(editor, e.message)
       return false
     }
 
@@ -1385,7 +1385,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
 
     val pattern = getLastUsedPattern()
     if (!pattern.isNullOrEmpty()) {
-      injector.messages.showStatusBarMessage(editor, (if (dir === Direction.FORWARDS) "/" else "?") + pattern)
+      injector.messages.showMessage(editor, (if (dir === Direction.FORWARDS) "/" else "?") + pattern)
     }
 
     // Uses last pattern. We know this is always set before being called

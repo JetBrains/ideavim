@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -65,8 +65,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) :
     val returnValue = executeFunctionBody(exceptionsCaught, editor, context)
 
     if (exceptionsCaught.isNotEmpty()) {
-      injector.messages.indicateError()
-      injector.messages.showStatusBarMessage(editor, exceptionsCaught.last().message)
+      injector.messages.showErrorMessage(editor, exceptionsCaught.last().message)
     }
     return returnValue ?: VimInt.ZERO
   }

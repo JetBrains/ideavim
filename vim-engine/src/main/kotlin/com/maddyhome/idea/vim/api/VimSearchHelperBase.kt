@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -289,7 +289,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     val regex = try {
       VimRegex(pattern)
     } catch (e: VimRegexException) {
-      injector.messages.showStatusBarMessage(editor, e.message)
+      injector.messages.showErrorMessage(editor, e.message)
       return null
     }
 
@@ -301,11 +301,11 @@ abstract class VimSearchHelperBase : VimSearchHelper {
 
     if (result is VimMatchResult.Failure) {
       if (wrap) {
-        injector.messages.showStatusBarMessage(editor, injector.messages.message("E486", pattern))
+        injector.messages.showErrorMessage(editor, injector.messages.message("E486", pattern))
       } else if (dir === Direction.FORWARDS) {
-        injector.messages.showStatusBarMessage(editor, injector.messages.message("E385", pattern))
+        injector.messages.showErrorMessage(editor, injector.messages.message("E385", pattern))
       } else {
-        injector.messages.showStatusBarMessage(editor, injector.messages.message("E384", pattern))
+        injector.messages.showErrorMessage(editor, injector.messages.message("E384", pattern))
       }
       return null
     }
@@ -325,9 +325,9 @@ abstract class VimSearchHelperBase : VimSearchHelper {
         // We know this isn't pattern not found...
         if (searchOptions.contains(SearchOptions.SHOW_MESSAGES)) {
           if (dir === Direction.FORWARDS) {
-            injector.messages.showStatusBarMessage(editor, injector.messages.message("E385", pattern))
+            injector.messages.showErrorMessage(editor, injector.messages.message("E385", pattern))
           } else {
-            injector.messages.showStatusBarMessage(editor, injector.messages.message("E384", pattern))
+            injector.messages.showErrorMessage(editor, injector.messages.message("E384", pattern))
           }
         }
         return null
@@ -349,7 +349,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     if (result is VimMatchResult.Failure && wrapscan) {
       if (showMessages) {
         // search hit BOTTOM, continuing at TOP
-        injector.messages.showStatusBarMessage(editor, injector.messages.message("message.search.hit.bottom"))
+        injector.messages.showMessage(editor, injector.messages.message("message.search.hit.bottom"))
       }
       // Start searching from the start of the file, but accept a match at the start offset
       val newOptions = options.clone().also { it.add(VimRegexOptions.CAN_MATCH_START_LOCATION) }
@@ -370,7 +370,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     if (result is VimMatchResult.Failure && wrapscan) {
       if (showMessages) {
         // search hit TOP, continuing at BOTTOM
-        injector.messages.showStatusBarMessage(editor, injector.messages.message("message.search.hit.top"))
+        injector.messages.showMessage(editor, injector.messages.message("message.search.hit.top"))
       }
       return regex.findPrevious(editor, editor.fileSize().toInt() - 1, options)
     }
@@ -390,7 +390,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     val regex = try {
       VimRegex(pattern)
     } catch (e: VimRegexException) {
-      injector.messages.showStatusBarMessage(editor, e.message)
+      injector.messages.showErrorMessage(editor, e.message)
       return emptyList()
     }
     return regex.findAll(

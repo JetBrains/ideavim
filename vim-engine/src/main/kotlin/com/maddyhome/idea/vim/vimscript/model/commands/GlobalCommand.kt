@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2024 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -75,7 +75,7 @@ data class GlobalCommand(val range: Range, val modifier: CommandModifier, val ar
     val regex = try {
       search.prepareRegex(globalCommandArguments.pattern, globalCommandArguments.whichPattern, 2)
     } catch (e: VimRegexException) {
-      messages.showStatusBarMessage(editor, e.message)
+      messages.showErrorMessage(editor, e.message)
       return false
     }
 
