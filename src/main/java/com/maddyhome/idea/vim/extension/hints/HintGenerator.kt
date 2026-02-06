@@ -84,11 +84,11 @@ private fun collectTargets(
   val accessible = accessibleComponent ?: return
   val location = location + (accessible.location ?: return)
 
+  val isEditorScrollPane = component is JScrollPane && component.viewport?.view is EditorComponentImpl
   accessible.size?.let { size ->
     // TextPanel (status bar widgets) may report incorrect visibility until hovered, so skip visibility check for them
     val isTextPanel = component is TextPanel || component is JBTextField
     val isTextComponent = component is JTextComponent
-    val isEditorScrollPane = component is JScrollPane && component.viewport?.view is EditorComponentImpl
     val isVisible = isTextPanel || (accessible.isVisible && (component as? Component)?.isActuallyVisible() != false)
     val isInteractive =
       component.isClickable() || component is Tree || isTextPanel || isTextComponent || isEditorScrollPane
@@ -100,7 +100,7 @@ private fun collectTargets(
           targets[component] = HintTarget(component, location, size, depth).apply {
             action = when {
               isEditorScrollPane -> ({ component.viewport?.view?.requestFocusInWindow() ?: false })
-              component is Tree || component is EditorComponentImpl -> ({ (component as Component).requestFocusInWindow() })
+              component is Tree -> ({ (component as Component).requestFocusInWindow() })
               component is JTextComponent -> ({ (component as Component).requestFocusInWindow() })
               else -> HintTarget::clickCenter
             }
@@ -130,8 +130,8 @@ private fun collectTargets(
     }
   }
 
-  // Skip the children of the Tree, otherwise it will easily lead to performance problems
-  if (component is Tree) return
+  // Skip the children of the Tree or scrollPane, otherwise it will easily lead to performance problems
+  if (component is Tree || isEditorScrollPane) return
   // recursively collect children
   for (i in 0..<accessibleChildrenCount) {
     getAccessibleChild(i)?.let {
