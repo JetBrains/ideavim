@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.extension.hints
 
 import com.intellij.openapi.editor.impl.EditorComponentImpl
+import com.intellij.openapi.wm.impl.content.ContentTabLabel
 import com.intellij.openapi.wm.impl.status.TextPanel
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.treeStructure.Tree
@@ -88,7 +89,7 @@ private fun collectTargets(
     val isTextPanel = component is TextPanel || component is JBTextField
     val isTextComponent = component is JTextComponent
     val isVisible = isTextPanel || (accessible.isVisible && (component as? Component)?.isActuallyVisible() != false)
-    val isInteractive = component.isClickable() || component is Tree || isTextPanel || isTextComponent
+    val isInteractive = component.isClickable() || component is ContentTabLabel || component is Tree || isTextPanel || isTextComponent
 
     if (isVisible && isInteractive) {
       targets[component].let {
