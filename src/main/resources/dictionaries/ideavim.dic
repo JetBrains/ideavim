@@ -23,6 +23,7 @@ keymodel
 lookupKeys
 mapleader
 matchpairs
+maxhlduringincsearch
 maxmapdepth
 nrformats
 operatorfunc
@@ -34,6 +35,7 @@ shellcmdflag
 shellxescape
 shellxquote
 showcmd
+showmatchcount
 showmode
 sidescroll
 sidescrolloff

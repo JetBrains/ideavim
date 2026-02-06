@@ -385,8 +385,9 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     ignoreCase: Boolean,
   ): List<TextRange> {
     val options = enumSetOf<VimRegexOptions>()
-    if (injector.globalOptions().smartcase) options.add(VimRegexOptions.SMART_CASE)
-    if (injector.globalOptions().ignorecase) options.add(VimRegexOptions.IGNORE_CASE)
+    // If we are explicitly asked to ignore case, assume that smartcase check has already taken place
+    if (injector.globalOptions().smartcase && !ignoreCase) options.add(VimRegexOptions.SMART_CASE)
+    if (injector.globalOptions().ignorecase || ignoreCase) options.add(VimRegexOptions.IGNORE_CASE)
     val regex = try {
       VimRegex(pattern)
     } catch (e: VimRegexException) {
