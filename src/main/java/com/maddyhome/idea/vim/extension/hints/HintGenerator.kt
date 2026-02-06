@@ -99,7 +99,9 @@ private fun collectTargets(
   if (component is Tree) return
   // recursively collect children
   for (i in 0..<accessibleChildrenCount) {
-    collectTargets(targets, getAccessibleChild(i), location, depth + 1)
+    getAccessibleChild(i)?.let {
+      collectTargets(targets, it, location, depth + 1)
+    }
   }
 }
 
