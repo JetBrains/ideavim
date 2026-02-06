@@ -90,6 +90,7 @@ git log --oneline <previous-tag>..<new-tag>
 - Test-only changes
 - **API module changes** (while in experimental status) - Do not log changes to the `api` module as it's currently experimental
   - Note: This exclusion should be removed once the API status is no longer experimental
+- **Vim Everywhere project** (including Hints toggle) - Do not log changes related to the Vim Everywhere project as it's not yet ready
 - **Internal code changes** - Do not log coding changes that users cannot see or experience
   - Refactoring, code cleanup, internal architecture changes
   - Performance optimizations (unless they fix a noticeable user issue)
