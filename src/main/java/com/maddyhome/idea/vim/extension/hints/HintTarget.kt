@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2025 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -15,8 +15,14 @@ import java.awt.Robot
 import java.awt.event.InputEvent
 import javax.accessibility.Accessible
 
+internal enum class HintLabelPosition {
+  TOP_LEFT_CORNER,
+  CENTER,
+}
+
 internal data class HintTarget(val component: Accessible, val location: Point, val size: Dimension, val depth: Int) {
   var hint: String = ""
+  var labelPosition: HintLabelPosition = HintLabelPosition.TOP_LEFT_CORNER
 
   val bounds: Rectangle get() = Rectangle(location, size)
 

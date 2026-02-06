@@ -115,8 +115,15 @@ internal fun HintTarget.createCover() = JPanel(null).apply {
 
   val pill = RoundedHintLabel(hint)
   val pref = pill.preferredSize
-  // Position at top-left
-  pill.setBounds(0, 0, pref.width, pref.height)
+  when (labelPosition) {
+    HintLabelPosition.TOP_LEFT_CORNER -> pill.setBounds(0, 0, pref.width, pref.height)
+    HintLabelPosition.CENTER -> pill.setBounds(
+      (bounds.width - pref.width) / 2,
+      (bounds.height - pref.height) / 2,
+      pref.width,
+      pref.height,
+    )
+  }
 
   add(pill)
 }
