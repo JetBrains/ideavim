@@ -317,6 +317,9 @@ intellijPlatform {
         * Fixed high CPU usage while showing command line<br>
         * Fixed comparison of String and Number in VimScript expressions<br>
         <br>
+        <b>Changes:</b><br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4125">VIM-4125</a> Changed Toggle Hints keyboard shortcut from <code>Alt+F</code> to <code>Ctrl+\</code><br>
+        <br>
         <b>Merged PRs:</b><br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1414">1414</a> by <a href="https://github.com/citizenmatt">Matt Ellis</a>: Refactor/functions<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1442">1442</a> by <a href="https://github.com/citizenmatt">Matt Ellis</a>: Fix high CPU usage while showing command line<br>

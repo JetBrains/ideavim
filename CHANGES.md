@@ -43,6 +43,9 @@ usual beta standards.
 * Fixed high CPU usage while showing command line
 * Fixed comparison of String and Number in VimScript expressions
 
+### Changes:
+* [VIM-4125](https://youtrack.jetbrains.com/issue/VIM-4125) Changed Toggle Hints keyboard shortcut from `Alt+F` to `Ctrl+\`
+
 ### Merged PRs:
 * [1414](https://github.com/JetBrains/ideavim/pull/1414) by [Matt Ellis](https://github.com/citizenmatt): Refactor/functions
 * [1442](https://github.com/JetBrains/ideavim/pull/1442) by [Matt Ellis](https://github.com/citizenmatt): Fix high CPU usage while showing command line
