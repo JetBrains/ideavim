@@ -36,8 +36,9 @@ class RoundedHintLabel(private val hintText: String) : JComponent() {
 
   override fun getPreferredSize(): Dimension {
     val fm = getFontMetrics(font)
-    val w = fm.stringWidth(hintText) + padX * 2
-    val h = fm.height + padY * 2
+    val strokeExtra = JBUI.scale(1) * 2
+    val w = fm.stringWidth(hintText) + padX * 2 + strokeExtra
+    val h = fm.height + padY * 2 + strokeExtra
     return Dimension(w, h)
   }
 

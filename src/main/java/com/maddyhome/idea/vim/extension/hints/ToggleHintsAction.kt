@@ -64,8 +64,9 @@ class ToggleHintsAction : DumbAwareToggleAction() {
       cover = this
       layout = null // no layout manager (absolute positioning)
       isOpaque = false
-      targets.map(HintTarget::createCover).forEach(::add)
-      size = glassPane.size
+      val containerSize = glassPane.size
+      for (target in targets) add(target.createCover(containerSize))
+      size = containerSize
     }
 
     if (highlight !in glassPane.components) glassPane.add(highlight)
@@ -94,7 +95,7 @@ class ToggleHintsAction : DumbAwareToggleAction() {
       injector.messages.indicateError()
     }, { entries ->
       cover.removeAll()
-      entries.map { it.data!! }.map(HintTarget::createCover).forEach(cover::add)
+      for (entry in entries) cover.add(entry.data!!.createCover(cover.size))
       cover.revalidate()
       cover.repaint()
     }).register(select, popup)
@@ -107,25 +108,6 @@ class ToggleHintsAction : DumbAwareToggleAction() {
     glassPane.repaint()
     cover = null
   }
-}
-
-internal fun HintTarget.createCover() = JPanel(null).apply {
-  isOpaque = false
-  bounds = this@createCover.bounds
-
-  val pill = RoundedHintLabel(hint)
-  val pref = pill.preferredSize
-  when (labelPosition) {
-    HintLabelPosition.TOP_LEFT_CORNER -> pill.setBounds(0, 0, pref.width, pref.height)
-    HintLabelPosition.CENTER -> pill.setBounds(
-      (bounds.width - pref.width) / 2,
-      (bounds.height - pref.height) / 2,
-      pref.width,
-      pref.height,
-    )
-  }
-
-  add(pill)
 }
 
 private class HighlightComponent : JPanel() {
