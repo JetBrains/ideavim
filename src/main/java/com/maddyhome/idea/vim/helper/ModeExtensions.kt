@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -17,6 +17,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.newapi.IjVimCaret
@@ -28,6 +29,9 @@ import com.maddyhome.idea.vim.state.mode.inSelectMode
 internal fun VimEditor.exitSelectMode(adjustCaretPosition: Boolean) {
   if (!this.inSelectMode) return
 
+  // Cancel any pending visual timer mode change. When the user explicitly exits SELECT mode,
+  // we don't want a delayed selection change handler to override their intent.
+  VimVisualTimer.drop()
   mode = mode.returnTo
   SelectionVimListenerSuppressor.lock().use {
     carets().forEach { vimCaret ->
@@ -47,5 +51,8 @@ internal fun VimEditor.exitSelectMode(adjustCaretPosition: Boolean) {
 }
 
 internal fun Editor.exitInsertMode(context: DataContext) {
+  // Cancel any pending visual timer mode change. When the user explicitly presses Escape to exit INSERT mode,
+  // we don't want a delayed selection change handler to override their intent and switch back to INSERT.
+  VimVisualTimer.drop()
   VimPlugin.getChange().processEscape(IjVimEditor(this), IjEditorExecutionContext(context))
 }

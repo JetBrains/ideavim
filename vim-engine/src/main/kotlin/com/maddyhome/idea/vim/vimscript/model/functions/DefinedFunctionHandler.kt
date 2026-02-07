@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.vimscript.model.functions
 
-import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -16,90 +15,68 @@ import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.FinishException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
-import com.maddyhome.idea.vim.ex.ranges.Address
-import com.maddyhome.idea.vim.ex.ranges.Range
+import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
-import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 
-data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionHandler() {
+data class DefinedFunctionHandler(val function: FunctionDeclaration) :
+  FunctionHandlerBase<VimDataType>(function.args.size, getMaxArity(function)) {
+
   private val logger = vimLogger<DefinedFunctionHandler>()
   override val scope: Scope? = function.scope
-  override val minimumNumberOfArguments: Int = function.args.size
-  override val maximumNumberOfArguments: Int? get() = if (function.hasOptionalArguments) null else function.args.size + function.defaultArgs.size
 
   init {
     name = function.name
   }
 
+  companion object {
+    fun getMaxArity(function: FunctionDeclaration) =
+      if (function.hasOptionalArguments) null else function.args.size + function.defaultArgs.size
+  }
+
+  override val handlesRange: Boolean
+    get() = function.flags.contains(FunctionFlag.RANGE)
+
   override fun doFunction(
-    argumentValues: List<Expression>,
+    arguments: Arguments,
+    range: LineRange?,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
   ): VimDataType {
-    var returnValue: VimDataType? = null
     val exceptionsCaught = mutableListOf<ExException>()
-    val isRangeGiven = (range?.size() ?: 0) > 0
+    val isRangeGiven = (range?.size ?: 0) > 0
 
-    if (!isRangeGiven) {
-      range = Range().apply {
-        addAddresses(Address.createRangeAddresses(".", 0, false)!!)
-      }
+    val lineRange = if (range == null || !isRangeGiven) {
+      LineRange(editor.currentCaret().getLine(), editor.currentCaret().getLine())
     }
-    initializeFunctionVariables(argumentValues, editor, context, vimContext)
+    else {
+      range
+    }
 
-    if (function.flags.contains(FunctionFlag.RANGE)) {
-      val line = (injector.variableService.getNonNullVariableValue(
-        VariableExpression(Scope.FUNCTION_VARIABLE, "firstline"),
-        editor,
-        context,
-        function
-      ) as VimInt).value
-      returnValue = executeBodyForLine(line, isRangeGiven, exceptionsCaught, editor, context)
-    } else {
-      val firstLine = (injector.variableService.getNonNullVariableValue(
-        VariableExpression(Scope.FUNCTION_VARIABLE, "firstline"),
-        editor,
-        context,
-        function
-      ) as VimInt).value
-      val lastLine = (injector.variableService.getNonNullVariableValue(
-        VariableExpression(Scope.FUNCTION_VARIABLE, "lastline"),
-        editor,
-        context,
-        function
-      ) as VimInt).value
-      for (line in firstLine..lastLine) {
-        returnValue = executeBodyForLine(line, isRangeGiven, exceptionsCaught, editor, context)
-      }
-    }
+    initializeFunctionVariables(arguments, lineRange, editor, context, vimContext)
+
+    val returnValue = executeFunctionBody(exceptionsCaught, editor, context)
 
     if (exceptionsCaught.isNotEmpty()) {
       injector.messages.indicateError()
       injector.messages.showStatusBarMessage(editor, exceptionsCaught.last().message)
     }
-    return returnValue ?: VimInt(0)
+    return returnValue ?: VimInt.ZERO
   }
 
-  private fun executeBodyForLine(
-    line: Int,
-    isRangeGiven: Boolean,
+  private fun executeFunctionBody(
     exceptionsCaught: MutableList<ExException>,
     editor: VimEditor,
     context: ExecutionContext,
   ): VimDataType? {
     var returnValue: VimDataType? = null
-    if (isRangeGiven) {
-      editor.currentCaret().moveToBufferPosition(BufferPosition(line - 1, 0))
-    }
     var result: ExecutionResult = ExecutionResult.Success
     if (function.flags.contains(FunctionFlag.ABORT)) {
       for (statement in function.body) {
@@ -139,7 +116,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
             throw FinishException()
           }
           exceptionsCaught.add(e)
-          logger.warn("Caught exception during execution of function with [abort] flag. Exception: ${e.message}")
+          logger.warn("Caught exception during execution of function with [abort] flag. Exception: ${e.message}", e)
         }
       }
     }
@@ -147,65 +124,39 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
   }
 
   private fun initializeFunctionVariables(
-    argumentValues: List<Expression>,
+    arguments: Arguments,
+    range: LineRange,
     editor: VimEditor,
     context: ExecutionContext,
     functionCallContext: VimLContext,
   ) {
     // non-optional function arguments
     for ((index, name) in function.args.withIndex()) {
-      injector.variableService.storeVariable(
-        VariableExpression(Scope.FUNCTION_VARIABLE, name),
-        argumentValues[index].evaluate(editor, context, functionCallContext),
-        editor,
-        context,
-        function,
-      )
+      arguments.setVariable(name, arguments[index], editor, context, function)
     }
     // optional function arguments with default values
     for (index in 0 until function.defaultArgs.size) {
-      val expressionToStore =
-        if (index + function.args.size < argumentValues.size) argumentValues[index + function.args.size] else function.defaultArgs[index].second
-      injector.variableService.storeVariable(
-        VariableExpression(Scope.FUNCTION_VARIABLE, function.defaultArgs[index].first),
-        expressionToStore.evaluate(editor, context, functionCallContext),
-        editor,
-        context,
-        function,
-      )
+      val expressionToStore = if (index + function.args.size < arguments.size) {
+        arguments[index + function.args.size]
+      } else {
+        function.defaultArgs[index].second.evaluate(editor, context, functionCallContext)
+      }
+      arguments.setVariable(function.defaultArgs[index].first, expressionToStore, editor, context, function)
     }
     // all the other optional arguments passed to function are stored in a:000 variable
     if (function.hasOptionalArguments) {
-      val remainingArgs = if (function.args.size + function.defaultArgs.size < argumentValues.size) {
-        VimList(
-          argumentValues.subList(function.args.size + function.defaultArgs.size, argumentValues.size)
-            .map { it.evaluate(editor, context, functionCallContext) }.toMutableList(),
-        )
+      val remainingArgs = if (function.args.size + function.defaultArgs.size < arguments.size) {
+        val list = mutableListOf<VimDataType>()
+        for (i in function.args.size + function.defaultArgs.size until arguments.size) {
+          list.add(arguments[i])
+        }
+        VimList(list)
       } else {
         VimList(mutableListOf())
       }
-      injector.variableService.storeVariable(
-        VariableExpression(Scope.FUNCTION_VARIABLE, "000"),
-        remainingArgs,
-        editor,
-        context,
-        function,
-      )
+      arguments.setVariable("000", remainingArgs, editor, context, function)
     }
-    val lineRange = range!!.getLineRange(editor, editor.currentCaret())
-    injector.variableService.storeVariable(
-      VariableExpression(Scope.FUNCTION_VARIABLE, "firstline"),
-      VimInt(lineRange.startLine + 1),
-      editor,
-      context,
-      function,
-    )
-    injector.variableService.storeVariable(
-      VariableExpression(Scope.FUNCTION_VARIABLE, "lastline"),
-      VimInt(lineRange.endLine + 1),
-      editor,
-      context,
-      function,
-    )
+    arguments.setVariable("firstline", VimInt(range.startLine1), editor, context, function)
+    arguments.setVariable("lastline", VimInt(range.endLine1), editor, context, function)
   }
 }

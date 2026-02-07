@@ -27,6 +27,39 @@ import kotlinx.serialization.json.putJsonObject
 // YouTrack tag "IdeaVim Released In EAP"
 const val releasedInEapTagId = "68-385032"
 
+// YouTrack tag "claude-analyzed" for automated ticket analysis
+const val claudeAnalyzedTagId = "68-507461"
+
+const val VIM_PROJECT_ID = "22-43"
+const val FIX_VERSIONS_FIELD_ID = "123-285"
+const val FIX_VERSIONS_ELEMENT_TYPE = "VersionBundleElement"
+
+data class TicketDetails(
+  val id: String,
+  val summary: String,
+  val description: String?,
+  val state: String,
+)
+
+suspend fun getTicketDetails(ticketId: String): TicketDetails {
+  val client = httpClient()
+  val response = client.get("https://youtrack.jetbrains.com/api/issues/$ticketId?fields=idReadable,summary,description,customFields(name,value(name))")
+  val json = response.body<JsonObject>()
+
+  val id = json["idReadable"]!!.jsonPrimitive.content
+  val summary = json["summary"]!!.jsonPrimitive.content
+  val description = json["description"]?.jsonPrimitive?.content
+
+  val state = json["customFields"]!!.jsonArray
+    .firstOrNull { it.jsonObject["name"]?.jsonPrimitive?.content == "State" }
+    ?.jsonObject?.get("value")
+    ?.jsonObject?.get("name")
+    ?.jsonPrimitive?.content
+    ?: "Unknown"
+
+  return TicketDetails(id, summary, description, state)
+}
+
 suspend fun setYoutrackStatus(tickets: Collection<String>, status: String) {
   val client = httpClient()
 
@@ -70,7 +103,10 @@ fun getYoutrackTicketsByQuery(query: String): Set<String> {
   val client = httpClient()
 
   return runBlocking {
-    val response = client.get("https://youtrack.jetbrains.com/api/issues/?fields=idReadable&query=project:VIM+$query")
+    val response = client.get("https://youtrack.jetbrains.com/api/issues/") {
+      parameter("fields", "idReadable")
+      parameter("query", "project:VIM $query")
+    }
     response.body<JsonArray>().mapTo(HashSet()) { it.jsonObject.getValue("idReadable").jsonPrimitive.content }
   }
 }
@@ -120,4 +156,80 @@ suspend fun addComment(issueHumanId: String, text: String) {
   if (!response.status.isSuccess()) {
     error("Request failed. $issueHumanId, ${response.body<String>()}")
   }
+}
+
+suspend fun addReleaseToYoutrack(name: String): String {
+  val client = httpClient()
+  println("Creating new release version in YouTrack: $name")
+
+  val response =
+    client.post("https://youtrack.jetbrains.com/api/admin/projects/$VIM_PROJECT_ID/customFields/$FIX_VERSIONS_FIELD_ID/bundle/values?fields=id,name") {
+      contentType(ContentType.Application.Json)
+      accept(ContentType.Application.Json)
+      val request = buildJsonObject {
+        put("name", name)
+        put("\$type", FIX_VERSIONS_ELEMENT_TYPE)
+      }
+      setBody(request)
+    }
+  return response.body<JsonObject>().getValue("id").jsonPrimitive.content
+}
+
+suspend fun getVersionIdByName(name: String): String? {
+  val client = httpClient()
+
+  val response =
+    client.get("https://youtrack.jetbrains.com/api/admin/projects/$VIM_PROJECT_ID/customFields/$FIX_VERSIONS_FIELD_ID/bundle/values?fields=id,name&query=$name")
+  return response.body<JsonArray>().singleOrNull()?.jsonObject?.get("id")?.jsonPrimitive?.content
+}
+
+suspend fun deleteVersionById(id: String) {
+  val client = httpClient()
+  client.delete("https://youtrack.jetbrains.com/api/admin/projects/$VIM_PROJECT_ID/customFields/$FIX_VERSIONS_FIELD_ID/bundle/values/$id")
+}
+
+suspend fun setYoutrackFixVersion(tickets: Collection<String>, version: String) {
+  val client = httpClient()
+
+  for (ticket in tickets) {
+    println("Try to set fix version $version for $ticket")
+    val response =
+      client.post("https://youtrack.jetbrains.com/api/issues/$ticket?fields=customFields(id,name,value(id,name))") {
+        contentType(ContentType.Application.Json)
+        accept(ContentType.Application.Json)
+        val request = buildJsonObject {
+          putJsonArray("customFields") {
+            addJsonObject {
+              put("name", "Fix versions")
+              put("\$type", "MultiVersionIssueCustomField")
+              putJsonArray("value") {
+                addJsonObject { put("name", version) }
+              }
+            }
+          }
+        }
+        setBody(request)
+      }
+    println(response)
+    println(response.body<String>())
+    if (!response.status.isSuccess()) {
+      error("Request failed. $ticket, ${response.body<String>()}")
+    }
+    val finalState = response.body<JsonObject>()["customFields"]!!.jsonArray
+      .single { it.jsonObject["name"]!!.jsonPrimitive.content == "Fix versions" }
+      .jsonObject["value"]!!
+      .jsonArray[0]
+      .jsonObject["name"]!!
+      .jsonPrimitive.content
+    if (finalState != version) {
+      error("Ticket $ticket is not updated! Expected fix version $version, but actually $finalState")
+    }
+  }
+}
+
+suspend fun getYoutrackStatus(ticket: String): String {
+  val client = httpClient()
+  val response =
+    client.get("https://youtrack.jetbrains.com/api/issues/$ticket/customFields/123-129?fields=value(name)")
+  return response.body<JsonObject>()["value"]!!.jsonObject.getValue("name").jsonPrimitive.content
 }

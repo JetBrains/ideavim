@@ -15,15 +15,11 @@ import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.createLineBookmark
 import com.maddyhome.idea.vim.group.mnemonic
-import org.jetbrains.plugins.ideavim.TestIjOptionConstants
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.jetbrains.plugins.ideavim.impl.OptionTest
-import org.jetbrains.plugins.ideavim.impl.TraceOptions
-import org.jetbrains.plugins.ideavim.impl.VimOption
+import org.junit.jupiter.api.Test
 
-@TraceOptions(TestIjOptionConstants.ideamarks)
 class MotionMarkActionTest : VimTestCase() {
-  @OptionTest(VimOption(TestIjOptionConstants.ideamarks, limitedValues = ["true"]))
+  @Test
   fun `test simple add mark`() {
     val keys = injector.parser.parseKeys("mA")
     val text = """
@@ -35,11 +31,12 @@ class MotionMarkActionTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     configureByText(text)
+    enterCommand("set ideamarks")
     typeText(keys)
     checkMarks('A' to 2)
   }
 
-  @OptionTest(VimOption(TestIjOptionConstants.ideamarks, limitedValues = ["true"]))
+  @Test
   fun `test simple add multiple marks`() {
     val keys = injector.parser.parseKeys("mAj" + "mBj" + "mC")
     val text = """
@@ -51,11 +48,12 @@ class MotionMarkActionTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     configureByText(text)
+    enterCommand("set ideamarks")
     typeText(keys)
     checkMarks('A' to 2, 'B' to 3, 'C' to 4)
   }
 
-  @OptionTest(VimOption(TestIjOptionConstants.ideamarks, limitedValues = ["true"]))
+  @Test
   fun `test simple add multiple marks on same line`() {
     val keys = injector.parser.parseKeys("mA" + "mB" + "mC")
     val text = """
@@ -67,6 +65,7 @@ class MotionMarkActionTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     configureByText(text)
+    enterCommand("set ideamarks")
     typeText(keys)
     checkMarks('A' to 2)
 
@@ -74,7 +73,7 @@ class MotionMarkActionTest : VimTestCase() {
 //    checkMarks('A' to 2, 'B' to 2, 'C' to 2)
   }
 
-  @OptionTest(VimOption(TestIjOptionConstants.ideamarks, limitedValues = ["true"]))
+  @Test
   fun `test move to another line`() {
     val keys = injector.parser.parseKeys("mAjj" + "mA")
     val text = """
@@ -86,11 +85,12 @@ class MotionMarkActionTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     configureByText(text)
+    enterCommand("set ideamarks")
     typeText(keys)
     checkMarks('A' to 4)
   }
 
-  @OptionTest(VimOption(TestIjOptionConstants.ideamarks, limitedValues = ["true"]))
+  @Test
   fun `test simple system mark`() {
     val text = """
             Lorem Ipsum
@@ -101,6 +101,7 @@ class MotionMarkActionTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     configureByText(text)
+    enterCommand("set ideamarks")
     fixture.project.createLineBookmark(fixture.editor, 2, 'A')
     ApplicationManager.getApplication().invokeAndWait {
       PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
@@ -110,7 +111,7 @@ class MotionMarkActionTest : VimTestCase() {
     kotlin.test.assertEquals('A', vimMarks.first().key)
   }
 
-  @OptionTest(VimOption(TestIjOptionConstants.ideamarks, limitedValues = ["true"]))
+  @Test
   fun `test system mark move to another line`() {
     val text = """
             Lorem Ipsum
@@ -121,6 +122,7 @@ class MotionMarkActionTest : VimTestCase() {
             Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
     configureByText(text)
+    enterCommand("set ideamarks")
 
     val bookmark = fixture.project.createLineBookmark(fixture.editor, 2, 'A')
 

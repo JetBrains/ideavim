@@ -21,15 +21,21 @@ private const val PLUGIN_NAME: String = "ReplaceWithRegisterNew"
 @VimPlugin(name = PLUGIN_NAME)
 fun VimApi.init() {
   mappings {
-    nmap(keys = "gr", actionName = RWR_OPERATOR) {
+    // Step 1: Non-recursive <Plug> → action mappings
+    nnoremap(RWR_OPERATOR) {
       rewriteMotion()
     }
-    nmap(keys = "grr", actionName = RWR_LINE) {
+    nnoremap(RWR_LINE) {
       rewriteLine()
     }
-    vmap(keys = "gr", actionName = RWR_VISUAL) {
+    vnoremap(RWR_VISUAL) {
       rewriteVisual()
     }
+
+    // Step 2: Recursive key → <Plug> mappings
+    nmap("gr", RWR_OPERATOR)
+    nmap("grr", RWR_LINE)
+    vmap("gr", RWR_VISUAL)
   }
 
   exportOperatorFunction(OPERATOR_FUNC_NAME) {
@@ -131,11 +137,7 @@ private fun CaretTransaction.replaceTextAndUpdateCaret(
 
       updateCaret(offset = startOffset)
     } else if (selectionRange is Range.Block) {
-      val selections: Array<Range.Simple> = selectionRange.ranges
-
-      selections.zip(lines).forEach { (range, lineText) ->
-        replaceText(range.start, range.end, lineText)
-      }
+      replaceTextBlockwise(selectionRange, lines)
     }
   } else {
     if (selectionRange is Range.Simple) {
@@ -146,13 +148,10 @@ private fun CaretTransaction.replaceTextAndUpdateCaret(
         replaceText(selectionRange.start, selectionRange.end, text)
       }
     } else if (selectionRange is Range.Block) {
-      val selections: Array<Range.Simple> = selectionRange.ranges.sortedByDescending { it.start }.toTypedArray()
-      val lines = List(selections.size) { text }
-
-      replaceTextBlockwise(selectionRange, lines)
+      replaceTextBlockwise(selectionRange, text)
 
       vimApi.mode = Mode.NORMAL
-      updateCaret(offset = selections.last().start)
+      updateCaret(offset = selectionRange.start)
     }
   }
 }

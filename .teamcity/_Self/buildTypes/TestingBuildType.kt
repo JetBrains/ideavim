@@ -2,6 +2,7 @@
 
 package _Self.buildTypes
 
+import _Self.AgentSize
 import _Self.IdeaVimBuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
@@ -40,9 +41,10 @@ open class TestingBuildType(
   steps {
     gradle {
       clearConditions()
-      tasks = "clean test -x :tests:property-tests:test -x :tests:long-running-tests:test"
+      tasks = "test -x :tests:property-tests:test -x :tests:long-running-tests:test"
       buildFile = ""
       enableStacktrace = true
+      gradleParams = "--build-cache --configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
   }
@@ -63,6 +65,11 @@ open class TestingBuildType(
         buildRule = lastSuccessful()
       }
     }
+  }
+
+  requirements {
+    equals("teamcity.agent.hardware.cpuCount", AgentSize.MEDIUM)
+    equals("teamcity.agent.os.family", "Linux")
   }
 })
 

@@ -1,5 +1,6 @@
 package _Self.buildTypes
 
+import _Self.AgentSize
 import _Self.Constants.NVIM_TESTS
 import _Self.IdeaVimBuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
@@ -39,9 +40,11 @@ object Nvim : IdeaVimBuildType({
               """.trimIndent()
     }
     gradle {
-      tasks = "clean test -x :tests:property-tests:test -x :tests:long-running-tests:test -Dnvim"
+      clearConditions()
+      tasks = "test -x :tests:property-tests:test -x :tests:long-running-tests:test -Dnvim"
       buildFile = ""
       enableStacktrace = true
+      gradleParams = "--build-cache --configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
   }
@@ -62,5 +65,10 @@ object Nvim : IdeaVimBuildType({
         buildRule = lastSuccessful()
       }
     }
+  }
+
+  requirements {
+    equals("teamcity.agent.hardware.cpuCount", AgentSize.MEDIUM)
+    equals("teamcity.agent.os.family", "Linux")
   }
 })

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -23,13 +23,12 @@ import com.maddyhome.idea.vim.api.LocalMarkStorage
 import com.maddyhome.idea.vim.api.SelectionInfo
 import com.maddyhome.idea.vim.common.InsertSequence
 import com.maddyhome.idea.vim.common.VimEditorReplaceMask
-import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.group.visual.VisualChange
 import com.maddyhome.idea.vim.group.visual.vimLeadSelectionOffset
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.ui.ExOutputPanel
+import com.maddyhome.idea.vim.ui.OutputPanel
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
@@ -108,7 +107,6 @@ internal var Editor.vimInitialised: Boolean by userDataOr { false }
 internal fun unInitializeEditor(editor: Editor) {
   editor.vimLastSelectionType = null
   editor.vimMorePanel = null
-  editor.vimExOutput = null
   editor.vimLastHighlighters = null
   editor.vimInitialised = false
 }
@@ -123,8 +121,7 @@ internal var Editor.vimIncsearchCurrentMatchOffset: Int? by userData()
 internal var Editor.vimLastSelectionType: SelectionType? by userData()
 internal var Editor.vimEditorGroup: Boolean by userDataOr { false }
 internal var Editor.vimHasRelativeLineNumbersInstalled: Boolean by userDataOr { false }
-internal var Editor.vimMorePanel: ExOutputPanel? by userData()
-internal var Editor.vimExOutput: ExOutputModel? by userData()
+internal var Editor.vimMorePanel: OutputPanel? by userData()
 internal var Editor.vimTestInputModel: TestInputModel? by userData()
 
 internal var Editor.vimChangeActionSwitchMode: Mode? by userData()

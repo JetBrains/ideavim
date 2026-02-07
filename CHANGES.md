@@ -23,12 +23,66 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-## End of changelog file maintenance
+## [To Be Released]
 
-Since version 2.9.0, the changelog can be found on YouTrack
+### Features:
+* New VimScript functions: `add()`, `call()`, `extend()`, `extendnew()`, `filter()`, `flatten()`, `flattennew()`, `foreach()`, `has_key()`, `indexof()`, `insert()`, `items()`, `keys()`, `map()`, `mapnew()`, `reduce()`, `remove()`, `slice()`, `sort()`, `uniq()`, `values()`
+* [VIM-1595](https://youtrack.jetbrains.com/issue/VIM-1595) Added support for `:read` command - insert file content below current line (e.g., `:read file.txt`, `0read file.txt`)
+* [VIM-1595](https://youtrack.jetbrains.com/issue/VIM-1595) Added support for `:read!` command - insert shell command output below current line (e.g., `:read! echo "hello"`)
+* [VIM-566](https://youtrack.jetbrains.com/issue/VIM-566) Added support for `zA` command - toggle folds recursively
+* [VIM-566](https://youtrack.jetbrains.com/issue/VIM-566) Added support for `zr` command - increase fold level to show more folds
+* [VIM-566](https://youtrack.jetbrains.com/issue/VIM-566) Added support for `zm` command - decrease fold level to hide more folds
+* [VIM-566](https://youtrack.jetbrains.com/issue/VIM-566) Added support for `zf` command - create fold from selection or motion
+* [VIM-566](https://youtrack.jetbrains.com/issue/VIM-566) Added support for `:set foldlevel` option - control fold visibility level
 
-* [To Be Released](https://youtrack.jetbrains.com/issues/VIM?q=%23%7BReady%20To%20Release%7D%20)
-* [Version Fixes](https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20sort%20by:%20%7BFix%20versions%7D%20asc)
+### Fixes:
+* [VIM-4105](https://youtrack.jetbrains.com/issue/VIM-4105) Fixed `a"` `a'` `a\`` text objects to include surrounding whitespace per Vim spec
+* [VIM-4097](https://youtrack.jetbrains.com/issue/VIM-4097) Fixed `<A-n>` (NextOccurrence) with text containing backslashes - e.g., selecting `\IntegerField` now works correctly
+* [VIM-4094](https://youtrack.jetbrains.com/issue/VIM-4094) Fixed UninitializedPropertyAccessException when loading history
+* [VIM-3948](https://youtrack.jetbrains.com/issue/VIM-3948) Improved hint generation visibility checks for better UI component detection
+* Fixed high CPU usage while showing command line
+* Fixed comparison of String and Number in VimScript expressions
+
+### Merged PRs:
+* [1414](https://github.com/JetBrains/ideavim/pull/1414) by [Matt Ellis](https://github.com/citizenmatt): Refactor/functions
+* [1442](https://github.com/JetBrains/ideavim/pull/1442) by [Matt Ellis](https://github.com/citizenmatt): Fix high CPU usage while showing command line
+
+## 2.28.0, 2025-12-09
+
+### Features:
+
+* Hints system for keyboard-driven UI navigation - enable with `:set vimhints`, then press `Ctrl+\` to show hints on UI
+  components
+* [VIM-4004](https://youtrack.jetbrains.com/issue/VIM-4004) Support for `<F13>` through `<F24>` keys
+* [VIM-2143](https://youtrack.jetbrains.com/issue/VIM-2143) Environment variables expansion in `:source`, `:edit`, `:write` and other file commands (e.g., `:source $HOME/.ideavimrc`)
+* Command line `<C-R>` commands: insert register (`<C-R>{register}`), word (`<C-R><C-W>`), WORD (`<C-R><C-A>`), line (`<C-R><C-L>`), filename (`<C-R><C-F>`)
+* New VimScript functions: `count()`, `index()`, `min()`, `max()`, `range()`, `repeat()`, `char2nr()`, `nr2char()`, `trim()`, `reverse()`, `getline()`, `deepcopy()`, `copy()`, `string()`
+* Support for `let` command value unpacking (e.g., `let [a, b] = [1, 2]`)
+* Support for environment variables in Vim expressions (e.g., `echo $HOME`)
+* Support for recursive values in Vim datatypes
+
+### Fixes:
+* [VIM-4072](https://youtrack.jetbrains.com/issue/VIM-4072) Fixed error log when sourcing non-existent file
+* [VIM-4073](https://youtrack.jetbrains.com/issue/VIM-4073) Fixed cursor position with inlay hints during `f`/`t` motions
+* [VIM-3981](https://youtrack.jetbrains.com/issue/VIM-3981) Fixed `:set noNERDTree` command
+* [VIM-4028](https://youtrack.jetbrains.com/issue/VIM-4028) Fixed plugin registration error that caused exceptions on startup
+* Fixed `vmap` to correctly apply to both visual and select modes
+* Fixed expression parser precedence issues for ternary and falsy operators
+
+### Changes:
+* Minimum supported IntelliJ platform version is now 2025.3
+
+### Merged PRs:
+* [1385](https://github.com/JetBrains/ideavim/pull/1385) by [Matt Ellis](https://github.com/citizenmatt): Implement unpacking of values in a let command
+* [1384](https://github.com/JetBrains/ideavim/pull/1384) by [Matt Ellis](https://github.com/citizenmatt): Evaluate environment variables as part of a Vim expression
+* [1383](https://github.com/JetBrains/ideavim/pull/1383) by [Matt Ellis](https://github.com/citizenmatt): Support recursive values in Vim datatypes
+* [1373](https://github.com/JetBrains/ideavim/pull/1373) by [Matt Ellis](https://github.com/citizenmatt): Fix some precedence issues in the expression parser
+
+---
+
+**Changelog was not maintained for versions 2.10.0 through 2.27.0**
+
+---
 
 ## 2.9.0, 2024-02-20
 

@@ -1,9 +1,9 @@
 {
-    "!": "com.maddyhome.idea.vim.vimscript.model.commands.CmdFilterCommand",
-    "actionl[ist]": "com.maddyhome.idea.vim.vimscript.model.commands.ActionListCommand",
-    "b[uffer]": "com.maddyhome.idea.vim.vimscript.model.commands.BufferCommand",
-    "buffers": "com.maddyhome.idea.vim.vimscript.model.commands.BufferListCommand",
-    "files": "com.maddyhome.idea.vim.vimscript.model.commands.BufferListCommand",
-    "h[elp]": "com.maddyhome.idea.vim.vimscript.model.commands.HelpCommand",
-    "ls": "com.maddyhome.idea.vim.vimscript.model.commands.BufferListCommand"
+  "!": "com.maddyhome.idea.vim.vimscript.model.commands.CmdFilterCommand",
+  "actionl[ist]": "com.maddyhome.idea.vim.vimscript.model.commands.ActionListCommand",
+  "b[uffer]": "com.maddyhome.idea.vim.vimscript.model.commands.BufferCommand",
+  "buffers": "com.maddyhome.idea.vim.vimscript.model.commands.BufferListCommand",
+  "files": "com.maddyhome.idea.vim.vimscript.model.commands.BufferListCommand",
+  "h[elp]": "com.maddyhome.idea.vim.vimscript.model.commands.HelpCommand",
+  "ls": "com.maddyhome.idea.vim.vimscript.model.commands.BufferListCommand"
 }

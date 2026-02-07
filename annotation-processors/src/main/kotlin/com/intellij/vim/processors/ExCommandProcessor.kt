@@ -18,31 +18,19 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.intellij.vim.annotations.ExCommand
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import java.nio.file.Files
-import kotlin.io.path.Path
-import kotlin.io.path.writeText
 
-class ExCommandProcessor(private val environment: SymbolProcessorEnvironment): SymbolProcessor {
+class ExCommandProcessor(private val environment: SymbolProcessorEnvironment) : SymbolProcessor {
   private val visitor = EXCommandVisitor()
   private val commandToClass = mutableMapOf<String, String>()
-
-  private val json = Json { prettyPrint = true }
+  private val fileWriter = JsonFileWriter(environment)
 
   override fun process(resolver: Resolver): List<KSAnnotated> {
-    val exCommandsFile = environment.options["ex_commands_file"]
-    if (exCommandsFile == null) return emptyList()
+    val exCommandsFile = environment.options["ex_commands_file"] ?: return emptyList()
 
     resolver.getAllFiles().forEach { it.accept(visitor, Unit) }
 
-    val generatedDirPath = Path(environment.options["generated_directory"]!!)
-    Files.createDirectories(generatedDirPath)
-
-    val filePath = generatedDirPath.resolve(exCommandsFile)
     val sortedCommandToClass = commandToClass.toList().sortedWith(compareBy({ it.first }, { it.second })).toMap()
-    val fileContent = json.encodeToString(sortedCommandToClass)
-    filePath.writeText(fileContent)
+    fileWriter.write(exCommandsFile, sortedCommandToClass)
 
     return emptyList()
   }

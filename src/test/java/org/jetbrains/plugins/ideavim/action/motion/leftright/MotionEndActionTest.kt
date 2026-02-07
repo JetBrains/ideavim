@@ -10,21 +10,16 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
-import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
-import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.jetbrains.plugins.ideavim.impl.OptionTest
-import org.jetbrains.plugins.ideavim.impl.TraceOptions
-import org.jetbrains.plugins.ideavim.impl.VimOption
+import org.junit.jupiter.api.Test
 
-@TraceOptions(TestOptionConstants.keymodel)
 class MotionEndActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(TestOptionConstants.keymodel, doesntAffectTest = true))
+  @Test
   fun `test motion end`() {
     val keys = listOf("<End>")
     val before = """
@@ -47,7 +42,7 @@ class MotionEndActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(TestOptionConstants.keymodel, limitedValues = [""]))
+  @Test
   fun `test continue visual`() {
     val keys = listOf("v", "<End>")
     val before = """
@@ -66,11 +61,13 @@ class MotionEndActionTest : VimTestCase() {
             Sed in orci mauris.
             Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
-    doTest(keys, before, after, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    doTest(keys, before, after, Mode.VISUAL(SelectionType.CHARACTER_WISE)) {
+      enterCommand("set keymodel=")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(TestOptionConstants.keymodel, limitedValues = [""]))
+  @Test
   fun `test continue select`() {
     val keys = listOf("gh", "<End>")
     val before = """
@@ -89,11 +86,13 @@ class MotionEndActionTest : VimTestCase() {
             Sed in orci mauris.
             Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
-    doTest(keys, before, after, Mode.SELECT(SelectionType.CHARACTER_WISE))
+    doTest(keys, before, after, Mode.SELECT(SelectionType.CHARACTER_WISE)) {
+      enterCommand("set keymodel=")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopvisual]))
+  @Test
   fun `test exit visual`() {
     val keys = listOf("v", "<End>")
     val before = """
@@ -112,11 +111,13 @@ class MotionEndActionTest : VimTestCase() {
             Sed in orci mauris.
             Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
-    doTest(keys, before, after, Mode.NORMAL())
+    doTest(keys, before, after, Mode.NORMAL()) {
+      enterCommand("set keymodel=stopvisual")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_stopselect]))
+  @Test
   fun `test exit select`() {
     val keys = listOf("gh", "<End>")
     val before = """
@@ -135,11 +136,13 @@ class MotionEndActionTest : VimTestCase() {
             Sed in orci mauris.
             Cras id tellus in ex imperdiet egestas.
     """.trimIndent()
-    doTest(keys, before, after, Mode.NORMAL())
+    doTest(keys, before, after, Mode.NORMAL()) {
+      enterCommand("set keymodel=stopselect")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(VimOption(TestOptionConstants.keymodel, doesntAffectTest = true))
+  @Test
   fun `test delete to the end`() {
     val keys = listOf("d", "<End>")
     val before = """
@@ -162,7 +165,7 @@ class MotionEndActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NON_ASCII)
-  @OptionTest(VimOption(TestOptionConstants.keymodel, doesntAffectTest = true))
+  @Test
   fun `test motion end with multiple code point grapheme cluster at the end`() {
     val keys = listOf("<End>")
     val before = """

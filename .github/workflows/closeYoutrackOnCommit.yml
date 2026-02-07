@@ -1,5 +1,4 @@
-# This workflow will build a package using Gradle and then publish it to GitHub packages when a release is created
-# For more information see: https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#Publishing-using-gradle
+# Updates YouTrack tickets to "Ready To Release" when commits with fix(VIM-XXXX): pattern are pushed
 
 name: Close YouTrack on commit
 
@@ -7,7 +6,7 @@ on:
   workflow_dispatch:
   push:
     branches: [ master ]
-    
+
 permissions:
   contents: write
 
@@ -18,18 +17,21 @@ jobs:
     if: github.repository == 'JetBrains/ideavim'
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 300
+
       - name: Get tags
         run: git fetch --tags origin
-      - name: Set up JDK 21
-        uses: actions/setup-java@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          java-version: '21'
-          distribution: 'adopt'
-          server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
-          settings-path: ${{ github.workspace }} # location for the settings.xml file
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: scripts-ts
 
         # The last successful job was marked with a tag
       - name: Get commit with last workflow
@@ -37,7 +39,8 @@ jobs:
           echo "LAST_COMMIT=$(git rev-list -n 1 tags/workflow-close-youtrack)" >> $GITHUB_ENV
 
       - name: Update YouTrack
-        run: ./gradlew --no-configuration-cache updateYoutrackOnCommit
+        run: npx tsx src/updateYoutrackOnCommit.ts ..
+        working-directory: scripts-ts
         env:
           SUCCESS_COMMIT: ${{ env.LAST_COMMIT }}
           YOUTRACK_TOKEN: ${{ secrets.YOUTRACK_TOKEN }}

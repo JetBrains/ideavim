@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2024 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -62,7 +62,6 @@ import com.maddyhome.idea.vim.api.setToggleOption
 import com.maddyhome.idea.vim.api.visualLineToBufferLine
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.group.EffectiveIjOptions
 import com.maddyhome.idea.vim.group.GlobalIjOptions
 import com.maddyhome.idea.vim.group.IjOptions
@@ -234,6 +233,7 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
     injector.outputPanel.getCurrentOutputPanel()?.close()
     injector.modalInput.getCurrentModalInput()?.deactivate(refocusOwningEditor = false, resetCaret = false)
     (injector.digraphGroup as VimDigraphGroupBase).clearCustomDigraphs()
+    injector.functionService.resetUserDefinedFunctions()
 
     // Important to reset in tearDown as well as setUp, so we reset modified test options
     resetAllOptions()
@@ -552,7 +552,7 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
     return NeovimTesting.vimMode()
   }
 
-  fun register(char: String): String? {
+  fun register(char: String): String {
     return NeovimTesting.getMark(char)
   }
 
@@ -731,19 +731,27 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
 
   fun assertExOutput(expected: String, clear: Boolean = true) {
     val actual = injector.outputPanel.getCurrentOutputPanel()?.text
-    assertNotNull(actual, "No Ex output")
+    if (actual == null) {
+      // If there's no output, there's a good chance we've got an error
+      val message = "No Ex output" + if (injector.messages.isError()) {
+        ". Error reported: " + VimPlugin.getMessage()
+      }
+      else ""
+
+      assertNotNull(actual, message)
+    }
     assertEquals(expected, actual)
     NeovimTesting.typeCommand("<esc>", testInfo, fixture.editor)
     if (clear) {
       // Ex output is not cleared until the output pane is activated again (we need it to persist so that :print will
       // work when called multiple times from :global). When testing, if the previous action fails before it can
       // activate the output pane, we'll be looking at stale results.
-      ExOutputModel.getInstance(fixture.editor).clear()
+      injector.outputPanel.getCurrentOutputPanel()?.clearText()
     }
   }
 
   fun assertNoExOutput() {
-    val actual = ExOutputModel.getInstance(fixture.editor).text
+    val actual = injector.outputPanel.getCurrentOutputPanel()?.text ?: ""
     assertEquals("", actual)
   }
 
@@ -1054,10 +1062,12 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
 
     class NeoVim {
       var ignoredRegisters: Set<Char> = setOf()
+      var ignoredMarks: Set<Char> = setOf()
       var exitOnTearDown = true
 
       fun reset() {
         ignoredRegisters = setOf()
+        ignoredMarks = setOf()
         exitOnTearDown = true
       }
     }

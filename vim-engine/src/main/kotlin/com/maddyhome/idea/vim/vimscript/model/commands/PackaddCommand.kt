@@ -19,7 +19,12 @@ import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
-// Currently support only matchit
+/**
+ * Currently supports only matchit package.
+ *
+ * XXX: When full package support is added, expand [argument] using [com.maddyhome.idea.vim.api.VimPathExpansion.expandPath]
+ * to support environment variables (`$VAR`, `${VAR}`) and tilde (`~`, `~/`).
+ */
 @ExCommand(command = "pa[ckadd]")
 class PackaddCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {

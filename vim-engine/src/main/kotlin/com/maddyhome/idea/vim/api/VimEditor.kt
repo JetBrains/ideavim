@@ -209,7 +209,108 @@ interface VimEditor {
   }
 
   fun createIndentBySize(size: Int): String
-  fun getFoldRegionAtOffset(offset: Int): VimFoldRegion?
+
+  /**
+   * Returns the collapsed fold region at the specified offset, if any.
+   *
+   * This method only returns fold regions that are currently collapsed (not expanded).
+   * If multiple collapsed folds exist at the offset, returns the innermost one.
+   *
+   * @param offset the offset in the document
+   * @return the collapsed fold region at the offset, or null if no collapsed fold exists
+   */
+  fun getCollapsedFoldRegionAtOffset(offset: Int): VimFoldRegion?
+
+  /**
+   * Returns all fold regions at the specified offset, regardless of their collapsed state.
+   *
+   * This includes both expanded and collapsed fold regions. If multiple nested folds
+   * exist at the offset, all of them are returned in the list.
+   *
+   * @param offset the offset in the document
+   * @return a list of all fold regions at the offset, may be empty if no folds exist
+   */
+  fun getFoldRegionsAtOffset(offset: Int): List<VimFoldRegion>
+
+  /**
+   * Returns the fold region that starts at the specified line.
+   *
+   * This method looks for a fold region whose start position is on the given line,
+   * regardless of whether the fold is expanded or collapsed.
+   *
+   * @param line the line number (0-based)
+   * @return the fold region starting at the line, or null if no fold starts on that line
+   */
+  fun getFoldRegionAtLine(line: Int): VimFoldRegion?
+
+  /**
+   * Returns all fold regions in the editor.
+   *
+   * This method returns every fold region in the editor, regardless of their expanded/collapsed
+   * state or nesting level. The list includes both top-level folds and nested folds.
+   *
+   * @return a list of all fold regions in the editor, may be empty if no folds exist
+   */
+  fun getAllFoldRegions(): List<VimFoldRegion>
+
+  /**
+   * Applies a fold level to all fold regions in the editor.
+   *
+   * This method calculates the depth of each fold region and sets its expanded state
+   * based on the foldLevel. Folds with depth < foldLevel are expanded, others are collapsed.
+   * All fold state changes are applied in a single batch operation for optimal performance.
+   *
+   * @param foldLevel the fold level to apply (folds with depth < foldLevel will be expanded)
+   */
+  fun applyFoldLevel(foldLevel: Int)
+
+  /**
+   * Gets the maximum fold depth in the editor.
+   *
+   * Returns the depth of the deepest (most nested) fold region. Returns 0 if there are no folds.
+   *
+   * @return the maximum fold depth
+   */
+  fun getMaxFoldDepth(): Int
+
+  /**
+   * Creates a new fold region in the editor.
+   *
+   * This method creates a manual fold region covering the specified range. The fold is created
+   * in a collapsed state by default (matching Vim's zf behavior).
+   *
+   * @param startOffset the start offset of the fold region (must be less than endOffset)
+   * @param endOffset the end offset of the fold region (must be greater than startOffset)
+   * @param collapse whether the fold should be collapsed after creation (default: true)
+   * @return the created fold region, or null if the fold could not be created
+   * @throws IllegalArgumentException if startOffset >= endOffset
+   */
+  fun createFoldRegion(startOffset: Int, endOffset: Int, collapse: Boolean = true): VimFoldRegion?
+
+  /**
+   * Deletes the fold region at the specified offset.
+   *
+   * This method finds and removes the innermost fold region containing the given offset.
+   * Only the immediate fold is deleted; nested folds are preserved.
+   *
+   * Note: This can remove any type of folds, including those created by IntelliJ itself.
+   * However, IntelliJ automatically recreates its folds (e.g., code folding regions) when needed.
+   *
+   * @param offset the offset where the fold should be deleted
+   * @return true if a fold was deleted, false if no fold was found at the offset
+   */
+  fun deleteFoldRegionAtOffset(offset: Int): Boolean
+
+  /**
+   * Deletes the fold region at the specified offset and all nested folds recursively.
+   *
+   * This method finds and removes the innermost fold region containing the given offset,
+   * as well as all folds nested within it.
+   *
+   * @param offset the offset where folds should be deleted
+   * @return true if any folds were deleted, false if no fold was found at the offset
+   */
+  fun deleteFoldRegionsRecursivelyAtOffset(offset: Int): Boolean
 
   /**
    * Mostly related to Fleet. After the editor is modified, the carets are modified. You can't use the old caret

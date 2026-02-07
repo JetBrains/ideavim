@@ -8,12 +8,17 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.expressions.datatypes
 
+import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
+import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.util.Locale
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
+import kotlin.test.assertNotSame
 
-class VimFloatTest {
+class VimFloatTest : VimTestCase() {
 
   @Test
   fun `round 6 digits`() {
@@ -34,5 +39,50 @@ class VimFloatTest {
     } finally {
       Locale.setDefault(oldLocale)
     }
+  }
+
+  @Test
+  fun `test returns self when converting to Float`() {
+    assertEquals(VimFloat(1.23), VimFloat(1.23).toVimFloat())
+  }
+
+  @Test
+  fun `test throws when trying to convert to Number`() {
+    val value = VimFloat(1.23)
+    val exception = assertThrows<ExException> {
+      value.toVimNumber()
+    }
+    assertEquals("E805: Using a Float as a Number", exception.message)
+  }
+
+  @Test
+  fun `test throws when trying to convert to String`() {
+    val value = VimFloat(1.23)
+    val exception = assertThrows<ExException> {
+      value.toVimString()
+    }
+    assertEquals("E806: Using a Float as a String", exception.message)
+  }
+
+  @Test
+  fun `test has value semantics`() {
+    assertEquals(VimFloat(1.23), VimFloat(1.23))
+    assertNotEquals(VimFloat(1.23), VimFloat(53.22))
+  }
+
+  @Test
+  fun `test copy returns new instance with same value`() {
+    val value = VimFloat(1.23)
+    val copy = value.copy()
+    assertNotSame(value, copy)
+    assertEquals(value.value, copy.value)
+  }
+
+  @Test
+  fun `test deepCopy returns new instance with same value`() {
+    val value = VimFloat(1.23)
+    val copy = value.deepCopy(useReferences = true) as VimFloat
+    assertNotSame(value, copy)
+    assertEquals(value.value, copy.value)
   }
 }

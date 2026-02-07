@@ -17,6 +17,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.statistic.PluginState.Util.enabledExtensions
 import com.maddyhome.idea.vim.statistic.PluginState.Util.extensionNames
 import com.maddyhome.idea.vim.ui.JoinEap
+import java.util.concurrent.ConcurrentHashMap
 
 internal class PluginState : ApplicationUsagesCollector() {
 
@@ -48,16 +49,17 @@ internal class PluginState : ApplicationUsagesCollector() {
       "textobj-indent",
       "mini-ai"
     )
-    internal val enabledExtensions = HashSet<String>()
+    internal val enabledExtensions = ConcurrentHashMap.newKeySet<String>()
   }
 }
 
-private val GROUP = EventLogGroup("vim.common", 1)
+private val GROUP = EventLogGroup("vim.common", 1, "FUS", "Group: General information about IdeaVim")
 private val PLUGIN_ENABLED = EventFields.Boolean("is_plugin_enabled")
 private val IS_EAP = EventFields.Boolean("is_EAP_active")
 private val ENABLED_EXTENSIONS = EventFields.StringList("enabled_extensions", extensionNames)
 private val PLUGIN_STATE: VarargEventId = GROUP.registerVarargEvent(
   "vim.common",
+  "State of the IdeaVim plugin",
   PLUGIN_ENABLED,
   IS_EAP,
   ENABLED_EXTENSIONS,

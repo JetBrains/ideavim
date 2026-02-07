@@ -19,8 +19,6 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
-import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 
 // expression[index]
 // expression.index (entry in a dictionary)
@@ -36,8 +34,16 @@ data class IndexedExpression(val index: Expression, val expression: Expression) 
 
     when (expressionValue) {
       is VimDictionary -> {
-        return expressionValue.dictionary[stringIndex]
+        val value = expressionValue.dictionary[stringIndex]
           ?: throw exExceptionMessage("E716", indexValue.toOutputString())
+
+        // If the dictionary value is a Funcref, return it as a partial so we can capture the dictionary. If it's a
+        // partially applied function that has been explicitly created by the user, continue to use it. Otherwise,
+        // create a new partial with the current dictionary and mark the new partial as implicit.
+        if (value is VimFuncref && (value.dictionary == null || value.isImplicitPartial)) {
+          return VimFuncref(value.handler, value.arguments, expressionValue, value.type, isImplicitPartial = true)
+        }
+        return value
       }
 
       is VimList -> {
@@ -101,16 +107,7 @@ data class IndexedExpression(val index: Expression, val expression: Expression) 
       throw exExceptionMessage("E741", assignmentTextForErrors)
     }
 
-    var newValue = value
-    if (value is VimFuncref
-      && !value.isSelfFixed
-      && value.handler is DefinedFunctionHandler
-      && value.handler.function.flags.contains(FunctionFlag.DICT)
-    ) {
-      newValue = value.copy()
-      newValue.dictionary = dict
-    }
-    dict.dictionary[key] = newValue
+    dict.dictionary[key] = value
   }
 
   private fun assignToListItem(

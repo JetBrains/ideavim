@@ -77,18 +77,24 @@ Now, let's add mappings to our plugin. We'll define three mappings:
 Add this code to the `init` function:
 
 ```kotlin
-@VimPlugin(name = "ReplaceWithRegister", shortPath = "username/ReplaceWithRegister")
+@VimPlugin(name = "ReplaceWithRegister")
 fun VimApi.init() {
     mappings {
-        nmap(keys = "gr", label = "ReplaceWithRegisterOperator", isRepeatable = true) {
+        // Step 1: Non-recursive <Plug> → action mappings
+        nnoremap("<Plug>ReplaceWithRegisterOperator") {
             rewriteMotion()
         }
-        nmap(keys = "grr", label = "ReplaceWithRegisterLine", isRepeatable = true) {
+        nnoremap("<Plug>ReplaceWithRegisterLine") {
             rewriteLine()
         }
-        vmap(keys = "gr", label = "ReplaceWithRegisterVisual", isRepeatable = true) {
+        vnoremap("<Plug>ReplaceWithRegisterVisual") {
             rewriteVisual()
         }
+
+        // Step 2: Recursive key → <Plug> mappings
+        nmap("gr", "<Plug>ReplaceWithRegisterOperator")
+        nmap("grr", "<Plug>ReplaceWithRegisterLine")
+        vmap("gr", "<Plug>ReplaceWithRegisterVisual")
     }
 
     exportOperatorFunction("ReplaceWithRegisterOperatorFunc") {
@@ -100,12 +106,10 @@ fun VimApi.init() {
 Let's break down what's happening:
 
 - The `mappings` block gives us access to the `MappingScope`
-- `nmap` defines a normal mode mapping, `vmap` defines a visual mode mapping
-- Each mapping has:
-  - `keys`: The key sequence to trigger the mapping
-  - `label`: A unique identifier for the mapping
-  - `isRepeatable`: Whether the mapping can be repeated with the `.` command
-- The lambda for each mapping calls a function that we'll implement next
+- We use a **2-step mapping pattern**:
+  - **Step 1**: `nnoremap`/`vnoremap` create non-recursive mappings from `<Plug>` names to actions (lambdas)
+  - **Step 2**: `nmap`/`vmap` create recursive mappings from user-facing keys (like `"gr"`) to `<Plug>` names
+- This pattern allows users to override the key mappings in their `.ideavimrc` while keeping the underlying actions available
 - `exportOperatorFunction` registers a function that will be called when the operator is used with a motion
 
 ### Step 3: Implement Core Functionality
@@ -231,11 +235,7 @@ private suspend fun CaretTransaction.replaceTextAndUpdateCaret(
 
             updateCaret(offset = startOffset)
         } else if (selectionRange is Range.Block) {
-            val selections: Array<Range.Simple> = selectionRange.ranges
-
-            selections.zip(lines).forEach { (range, lineText) ->
-                replaceText(range.start, range.end, lineText)
-            }
+            replaceTextBlockwise(selectionRange, lines)
         }
     } else {
         if (selectionRange is Range.Simple) {
@@ -246,13 +246,10 @@ private suspend fun CaretTransaction.replaceTextAndUpdateCaret(
               replaceText(selectionRange.start, selectionRange.end, text)
             }
         } else if (selectionRange is Range.Block) {
-            val selections: Array<Range.Simple> = selectionRange.ranges.sortedByDescending { it.start }.toTypedArray()
-            val lines = List(selections.size) { text }
-
-            replaceTextBlockwise(selectionRange, lines)
+            replaceTextBlockwise(selectionRange, text)
 
             vimApi.mode = Mode.NORMAL()
-            updateCaret(offset = selections.last().start)
+            updateCaret(offset = selectionRange.start)
         }
     }
 }

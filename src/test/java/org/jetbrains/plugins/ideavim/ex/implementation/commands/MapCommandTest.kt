@@ -721,6 +721,17 @@ class MapCommandTest : VimTestCase() {
     assertState("zzz\n")
   }
 
+  // VIM-650 |mapleader|
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "Bad replace of term codes")
+  @Test
+  fun testMapLeaderToCtrlSpace() {
+    configureByText("\n")
+    enterCommand("let mapleader = \"\\<C-SPACE>\"")
+    enterCommand("nmap <Leader>z izzz<Esc>")
+    typeText("<C-SPACE>z")
+    assertState("zzz\n")
+  }
+
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "bad replace term codes")
   @Test
   fun testAmbiguousMapping() {
@@ -802,7 +813,10 @@ class MapCommandTest : VimTestCase() {
     assertState("ABcd\n")
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.PLUG)
+  @TestWithoutNeovim(
+    reason = SkipNeovimReason.SEE_DESCRIPTION,
+    description = "Neovim represents <Plug> as a single character, so the comparison of the `map` states fails"
+  )
   @Test
   fun testPlugMapping() {
     configureByText("\n")

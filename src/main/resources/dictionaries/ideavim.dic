@@ -72,7 +72,6 @@ nowrap
 nowrapscan
 
 ideacopypreprocess
-ideaglobalmode
 ideajoin
 ideamarks
 idearefactormode
@@ -169,16 +168,25 @@ lmapclear
 cmapclear
 tmapclear
 
+isnot
+
+extendnew
+flattennew
 funcref
 getcmdtype
+getline
 getreg
 getregtype
+indexof
 isinf
+mapnew
 tolower
 toupper
 
 delfunction
 endfunction
+lockvar
+unlockvar
 
 consectetur
 adipiscing

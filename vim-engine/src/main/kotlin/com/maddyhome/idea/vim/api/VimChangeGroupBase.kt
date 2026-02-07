@@ -404,6 +404,13 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    * @param context The data context
    */
   override fun insertAfterCaret(editor: VimEditor, context: ExecutionContext) {
+    // Prevent entering insert mode in read-only files before moving the caret
+    if (!editor.isWritable()) {
+      injector.messages.showStatusBarMessage(editor, "Cannot make changes, file is read-only")
+      injector.messages.indicateError()
+      return
+    }
+
     for (caret in editor.nativeCarets()) {
       caret.moveToMotion(injector.motion.getHorizontalMotion(editor, caret, 1, true))
     }
@@ -441,10 +448,19 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    * @param mode    The mode - indicate insert or replace
    */
   override fun initInsert(editor: VimEditor, context: ExecutionContext, mode: Mode) {
+    // Prevent entering insert mode in read-only files
+    if (!editor.isWritable()) {
+      injector.messages.showStatusBarMessage(editor, "Cannot make changes, file is read-only")
+      injector.messages.indicateError()
+      return
+    }
+
     val state = injector.vimState
-    for (caret in editor.nativeCarets()) {
-      caret.vimInsertStart = editor.createLiveMarker(caret.offset, caret.offset)
-      injector.markService.setMark(caret, MARK_CHANGE_START, caret.offset)
+    injector.application.runReadAction {
+      for (caret in editor.nativeCarets()) {
+        caret.vimInsertStart = editor.createLiveMarker(caret.offset, caret.offset)
+        injector.markService.setMark(caret, MARK_CHANGE_START, caret.offset)
+      }
     }
     val cmd = state.executingCommand
     if (cmd != null && state.isDotRepeatInProgress) {
@@ -470,7 +486,9 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       val myChangeListener = VimChangesListener()
       vimDocumentListener = myChangeListener
       vimDocument!!.addChangeListener(myChangeListener)
-      oldOffset = editor.currentCaret().offset
+      injector.application.runReadAction {
+        oldOffset = editor.currentCaret().offset
+      }
       editor.insertMode = mode == Mode.INSERT
       editor.mode = mode
     }

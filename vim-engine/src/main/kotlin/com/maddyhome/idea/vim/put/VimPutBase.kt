@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -470,8 +470,11 @@ abstract class VimPutBase : VimPut {
       val line = if (data.putToLine < 0) vimCaret.getBufferPosition().line else data.putToLine
       when (typeInRegister) {
         SelectionType.LINE_WISE -> {
-          startOffset =
+          startOffset = if (data.putBeforeLine) {
+            injector.motion.moveCaretToLineStart(vimEditor, line)
+          } else {
             min(vimEditor.text().length, injector.motion.moveCaretToLineEnd(vimEditor, line, true) + 1)
+          }
           // At the end of a notebook cell the next symbol is a guard,
           // so we add a newline to be able to paste. Fixes VIM-2577
           if (startOffset > 0 && vimEditor.document.getOffsetGuard(startOffset) != null) {

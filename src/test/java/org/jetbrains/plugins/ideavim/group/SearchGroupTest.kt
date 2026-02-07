@@ -19,6 +19,7 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -139,7 +140,7 @@ class SearchGroupTest : VimTestCase() {
   }
 
   // VIM-856
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
+  @TestWithoutNeovim(reason = SkipNeovimReason.IDEAVIM_API_USED)
   @Test
   fun `test negative lookbehind regression`() {
     val pos = search(
@@ -149,7 +150,6 @@ class SearchGroupTest : VimTestCase() {
     assertEquals(-1, pos)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   @Test
   fun `test smart case search case insensitive`() {
     configureByText("obj.toString();\n")
@@ -401,7 +401,10 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(22)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @TestWithoutNeovim(
+    SkipNeovimReason.INTELLIJ_PLATFORM_INHERITED_DIFFERENCE,
+    "In the test the caret lands on the very last character. In Vim there is always a new line character, but in IntelliJ Platform there is not."
+  )
   @Test
   fun `test search e+10 motion offset wraps at exactly end of file`() {
     configureByText(
@@ -453,7 +456,10 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(0)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @VimBehaviorDiffers(
+    description = "IdeaVim finishes one character to the right: at the 't' of 'tufted'. I'm not sure, but requires investigation if this should be fixed.",
+    shouldBeFixed = true,
+  )
   @Test
   fun `test reverse search s-20 motion offset wraps at beginning of file`() {
     configureByText(
@@ -732,7 +738,6 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   @Test
   fun `test search word honours ignorecase`() {
     configureByText("${c}editor Editor editor")
@@ -742,7 +747,6 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   @Test
   fun `test search next word honours ignorecase`() {
     configureByText("${c}editor Editor editor")
@@ -751,7 +755,6 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(14)
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   @TestFor(classes = [SearchWholeWordForwardAction::class])
   @Test
   fun `test search word overrides smartcase`() {
@@ -762,7 +765,6 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   @Test
   fun `test search next word overrides smartcase`() {
     configureByText("${c}Editor editor editor")

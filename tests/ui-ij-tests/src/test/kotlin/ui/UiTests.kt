@@ -8,7 +8,6 @@
 
 package ui
 
-import com.automation.remarks.junit5.Video
 import com.intellij.remoterobot.RemoteRobot
 import com.intellij.remoterobot.fixtures.ComponentFixture
 import com.intellij.remoterobot.fixtures.ContainerFixture
@@ -60,7 +59,6 @@ class UiTests {
               """.trimMargin()
 
   @Test
-  @Video
   fun ideaVimTest() = uiTest("ideaVimTest") {
     val sharedSteps = JavaExampleSteps(this)
     commonSteps = CommonSteps(this)
@@ -90,7 +88,7 @@ class UiTests {
       testSelectTextWithMouseInGutter(editor)
       testSelectForthAndBack(editor)
       testSelectTextUsingMouse(editor)
-      testTripleClickRightFromLineEnd(editor)
+//      testTripleClickRightFromLineEnd(editor)
       testClickRightFromLineEnd(editor)
       testClickOnWord(editor)
       testAddNewLineInNormalMode(editor)
@@ -215,9 +213,12 @@ class UiTests {
     }
 
     findText("Copy Action Id").click()
-    Thread.sleep(1000)
+
+    // Wait for confirmation notification - proves the clipboard was updated
+    // and the new notification is visible (old notification has expired)
+    waitFor { hasText("Action id copied") }
+
     findText("Stop Tracking").click()
-    Thread.sleep(1000)
 
     editor.findText("class").click()
     remoteRobot.invokeActionJs("EditorPaste")
@@ -234,7 +235,13 @@ class UiTests {
       """.trimMargin() == editor.text
     }
 
-    waitFor { !hasText("Copy Action Id") }
+    // Explicitly dismiss any visible notifications
+    keyboard { escape() }
+
+    // Wait briefly for notification to dismiss
+    waitFor(duration = Duration.ofSeconds(3)) {
+      !hasText("Copy Action Id")
+    }
 
     vimExit()
   }

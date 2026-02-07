@@ -17,24 +17,29 @@ plugins {
 
 repositories {
   mavenCentral()
+  maven { url = uri("https://jitpack.io") }
 }
 
 dependencies {
-  compileOnly("org.jetbrains.kotlin:kotlin-stdlib:2.2.20")
+  compileOnly("org.jetbrains.kotlin:kotlin-stdlib:2.2.21")
 
-  implementation("io.ktor:ktor-client-core:3.3.0")
-  implementation("io.ktor:ktor-client-cio:3.3.0")
-  implementation("io.ktor:ktor-client-content-negotiation:3.3.0")
-  implementation("io.ktor:ktor-serialization-kotlinx-json:3.3.0")
-  implementation("io.ktor:ktor-client-auth:3.3.0")
+  testImplementation("org.junit.jupiter:junit-jupiter:6.0.1")
+  testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+  implementation("io.ktor:ktor-client-core:3.4.0")
+  implementation("io.ktor:ktor-client-cio:3.4.0")
+  implementation("io.ktor:ktor-client-content-negotiation:3.4.0")
+  implementation("io.ktor:ktor-serialization-kotlinx-json:3.4.0")
+  implementation("io.ktor:ktor-client-auth:3.4.0")
   implementation("org.eclipse.jgit:org.eclipse.jgit:6.6.0.202305301015-r")
 
   // This is needed for jgit to connect to ssh
-  implementation("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:7.3.0.202506031305-r")
+  implementation("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:7.4.0.202509020913-r")
   implementation("com.vdurmont:semver4j:3.1.0")
 }
 
 val releaseType: String? by project
+val youtrackToken: String by project
 
 kotlin {
   compilerOptions {
@@ -46,13 +51,6 @@ tasks.register("generateIdeaVimConfigurations", JavaExec::class) {
   group = "verification"
   description = "This job tracks if there are any new plugins in marketplace we don't know about"
   mainClass.set("scripts.MainKt")
-  classpath = sourceSets["main"].runtimeClasspath
-}
-
-tasks.register("checkNewPluginDependencies", JavaExec::class) {
-  group = "verification"
-  description = "This job tracks if there are any new plugins in marketplace we don't know about"
-  mainClass.set("scripts.CheckNewPluginDependenciesKt")
   classpath = sourceSets["main"].runtimeClasspath
 }
 
@@ -96,6 +94,7 @@ tasks.register("eapReleaseActions", JavaExec::class) {
   mainClass.set("scripts.releaseEap.EapReleaseActionsKt")
   classpath = sourceSets["main"].runtimeClasspath
   args = listOf(project.version.toString(), rootProject.rootDir.toString(), releaseType ?: "")
+  environment("YOUTRACK_TOKEN", youtrackToken)
 }
 
 tasks.register("calculateNewEapVersion", JavaExec::class) {
@@ -117,4 +116,16 @@ tasks.register("setTeamCityBuildNumber", JavaExec::class) {
   mainClass.set("scripts.release.SetTeamCityBuildNumberKt")
   classpath = sourceSets["main"].runtimeClasspath
   args = listOf(project.version.toString(), rootProject.rootDir.toString(), releaseType ?: "")
+}
+
+tasks.register("releaseActions", JavaExec::class) {
+  group = "other"
+  mainClass.set("scripts.ReleaseActionsKt")
+  classpath = sourceSets["main"].runtimeClasspath
+  args = listOf(project.version.toString(), releaseType ?: "")
+  environment("YOUTRACK_TOKEN", youtrackToken)
+}
+
+tasks.test {
+  useJUnitPlatform()
 }

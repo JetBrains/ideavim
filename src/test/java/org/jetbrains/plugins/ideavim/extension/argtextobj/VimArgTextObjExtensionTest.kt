@@ -543,4 +543,246 @@ ${java.lang.String.join("", Collections.nCopies(10, "   arg,\n"))}   last<caret>
       Mode.NORMAL(),
     )
   }
+
+  @Test
+  fun testChangeOuterArgument() {
+    // First argument - removes trailing comma and space
+    doTest(
+      Lists.newArrayList("caa"),
+      "function(int <caret>arg1, char* arg2)",
+      "function(<caret>char* arg2)",
+      Mode.INSERT,
+    )
+  }
+
+  @Test
+  fun testChangeOuterArgumentLast() {
+    // Last argument - removes leading comma and space
+    doTest(
+      Lists.newArrayList("caa"),
+      "function(int arg1, char<caret>* arg2)",
+      "function(int arg1<caret>)",
+      Mode.INSERT,
+    )
+  }
+
+  @Test
+  fun testSingleArgumentInner() {
+    doTest(
+      Lists.newArrayList("dia"),
+      "function(<caret>singleArg)",
+      "function(<caret>)",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun testSingleArgumentOuter() {
+    doTest(
+      Lists.newArrayList("daa"),
+      "function(<caret>singleArg)",
+      "function(<caret>)",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun testMiddleArgumentWithWhitespace() {
+    // Similar to testChangeInnerArgument - the whitespace is part of the argument
+    doTest(
+      Lists.newArrayList("dia"),
+      "function(arg1,    <caret>arg2    , arg3)",
+      "function(arg1,    <caret>, arg3)",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun testThreeArgumentsCount() {
+    doTest(
+      Lists.newArrayList("d3ia"),
+      "function(<caret>arg1, arg2, arg3)",
+      "function(<caret>)",
+      Mode.NORMAL(),
+    )
+    doTest(
+      Lists.newArrayList("d3aa"),
+      "function(<caret>arg1, arg2, arg3)",
+      "function(<caret>)",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun testVisualSelectInnerArgument() {
+    doTest(
+      Lists.newArrayList("via"),
+      "function(int <caret>arg1, char* arg2)",
+      "function(<selection>int arg1</selection>, char* arg2)",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun testVisualSelectOuterArgument() {
+    doTest(
+      Lists.newArrayList("vaa"),
+      "function(int <caret>arg1, char* arg2)",
+      "function(<selection>int arg1, </selection>char* arg2)",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun testCursorOnClosingParenthesis() {
+    // Cursor on closing paren should select the last argument
+    doTest(
+      Lists.newArrayList("dia"),
+      "function(arg1, arg2<caret>)",
+      "function(arg1, <caret>)",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun testNestedFunctionCallsInnerArgument() {
+    doTest(
+      Lists.newArrayList("dia"),
+      "outer(inner(<caret>a, b), c)",
+      "outer(inner(<caret>, b), c)",
+      Mode.NORMAL(),
+    )
+    doTest(
+      Lists.newArrayList("dia"),
+      "outer(inner(a, b), <caret>c)",
+      "outer(inner(a, b), <caret>)",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun testNestedFunctionCallsOuterArgument() {
+    doTest(
+      Lists.newArrayList("daa"),
+      "outer(inner(<caret>a, b), c)",
+      "outer(inner(<caret>b), c)",
+      Mode.NORMAL(),
+    )
+    doTest(
+      Lists.newArrayList("daa"),
+      "outer(<caret>inner(a, b), c)",
+      "outer(<caret>c)",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun testSingleQuotedStrings() {
+    doTest(
+      Lists.newArrayList("daa"),
+      "function(arg1, '<caret>a,b,c')",
+      "function(arg1<caret>)",
+      Mode.NORMAL(),
+    )
+    doTest(
+      Lists.newArrayList("daa"),
+      "function('<caret>a,b', arg2)",
+      "function(<caret>arg2)",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun testEscapedQuotes() {
+    doTest(
+      Lists.newArrayList("daa"),
+      """function(arg1, "a\"<caret>,b")""",
+      "function(arg1<caret>)",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun testMultilineArgumentWithinLimit() {
+    doTest(
+      Lists.newArrayList("dia"),
+      """function(arg1,
+         <caret>arg2,
+         arg3)""",
+      """function(arg1,
+         <caret>,
+         arg3)""",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun testArgumentInSquareBrackets() {
+    setArgTextObjPairsVariable("[:],(:)")
+    doTest(
+      Lists.newArrayList("dia"),
+      "array[<caret>index1, index2]",
+      "array[<caret>, index2]",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun testArgumentInCurlyBraces() {
+    setArgTextObjPairsVariable("{:},(:)")
+    doTest(
+      Lists.newArrayList("dia"),
+      "map{<caret>key1, key2}",
+      "map{<caret>, key2}",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun testMixedBracketTypes() {
+    setArgTextObjPairsVariable("[:],(:),{:}")
+    doTest(
+      Lists.newArrayList("dia"),
+      "outer(array[<caret>a, b], map{c, d})",
+      "outer(array[<caret>, b], map{c, d})",
+      Mode.NORMAL(),
+    )
+    doTest(
+      Lists.newArrayList("dia"),
+      "outer(array[a, b], map{<caret>c, d})",
+      "outer(array[a, b], map{<caret>, d})",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun testOperatorPendingMode() {
+    // Test that text object works correctly in operator-pending mode
+    doTest(
+      Lists.newArrayList("dia"),
+      "function(<caret>arg1)",
+      "function(<caret>)",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun testConsecutiveOperations() {
+    doTest(
+      Lists.newArrayList("dia", "u", "daa"),
+      "function(<caret>arg1, arg2)",
+      "function(<caret>arg2)",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun testUndoAfterDelete() {
+    doTest(
+      Lists.newArrayList("dia", "u"),
+      "function(<caret>arg1, arg2)",
+      "function(<caret>arg1, arg2)",
+      Mode.NORMAL(),
+    )
+  }
 }

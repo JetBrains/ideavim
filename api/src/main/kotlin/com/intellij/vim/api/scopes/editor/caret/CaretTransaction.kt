@@ -18,22 +18,20 @@ import com.intellij.vim.api.scopes.editor.EditorAccessor
 @VimApiDsl
 interface CaretTransaction : CaretRead, EditorAccessor {
   /**
-   * Updates the caret position and optionally sets a selection.
+   * Updates the caret position.
    *
-   * If a selection is provided, the caret will have this selection after moving to the new offset.
-   * If no selection is provided, any existing selection will be removed.
+   * This function is analogous to Vim's `cursor()` function.
    *
-   * The selection range is exclusive, meaning that the character at the end offset is not
-   * included in the selection. For example, a selection of (0, 3) would select the first
-   * three characters of the text.
+   * If there is an active selection, it will be extended from the anchor to the new offset.
+   * If there is no selection, the caret simply moves to the new offset without creating one.
    *
-   * @param offset The new offset (position) for the caret
-   * @param selection Optional selection range
-   * @throws IllegalArgumentException If the offset is not in the valid range [0, fileSize),
-   *                                 or if the selection range is invalid (start or end out of range,
-   *                                 or start > end)
+   * @param offset The new offset (position) for the caret.
+   *               Valid range is [0, fileSize) for modes that don't allow the caret after the last character
+   *               (e.g., normal mode), or [0, fileSize] for modes that allow it (e.g., insert mode).
+   * @throws IllegalArgumentException If the offset is outside the valid range for the current mode.
+   *                                  The caret position remains unchanged when an exception is thrown.
    */
-  fun updateCaret(offset: Int, selection: Range.Simple? = null)
+  fun updateCaret(offset: Int)
 
   /**
    * Inserts text at the specified position in the document.
@@ -76,18 +74,33 @@ interface CaretTransaction : CaretRead, EditorAccessor {
   /**
    * Replaces text in multiple ranges (blocks) with new text.
    *
-   * This function performs a blockwise replacement, replacing each range in the block
+   * This function performs a blockwise replacement, replacing each line in the block
    * with the corresponding string from the text list. The number of replacement strings
-   * must match the number of ranges in the block.
+   * must match the number of lines in the block.
    *
-   * @param range A block of ranges to be replaced
-   * @param text A list of strings to replace each range in the block
-   * @throws IllegalArgumentException If the size of the text list doesn't match the number of ranges in the block,
+   * @param range A block range defined by start and end offsets
+   * @param text A list of strings to replace each line in the block
+   * @throws IllegalArgumentException If the size of the text list doesn't match the number of lines in the block,
    *                                 or if any range in the block is invalid
    */
   fun replaceTextBlockwise(
     range: Range.Block,
     text: List<String>,
+  )
+
+  /**
+   * Replaces text in multiple ranges (blocks) with a single text.
+   *
+   * This function performs a blockwise replacement, replacing each line in the block
+   * with the same text string.
+   *
+   * @param range A block range defined by start and end offsets
+   * @param text The text to replace each line in the block with
+   * @throws IllegalArgumentException If any range in the block is invalid
+   */
+  fun replaceTextBlockwise(
+    range: Range.Block,
+    text: String,
   )
 
   /**

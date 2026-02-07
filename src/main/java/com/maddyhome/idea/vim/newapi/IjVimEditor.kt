@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,9 +8,11 @@
 
 package com.maddyhome.idea.vim.newapi
 
+import com.intellij.codeInsight.folding.impl.FoldingUtil
 import com.intellij.execution.impl.ConsoleViewImpl
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorModificationUtil
+import com.intellij.openapi.editor.FoldRegion
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.event.CaretEvent
@@ -75,7 +77,6 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase(
   // Be careful: all the EditorActionHandler implementation should correctly process InjectedEditors
   // TBH, I don't like the names. Need to think a bit more about this
   val editor = editor.getTopLevelEditor()
-  val originalEditor = editor
   override var replaceMask: VimEditorReplaceMask?
     get() = editor.replaceMask
     set(value) {
@@ -148,6 +149,7 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase(
         }
       }
     }
+    if (!isWritable()) return
     editor.document.insertString(atPosition, text)
   }
 
@@ -471,22 +473,144 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase(
     return IndentConfig.create(editor).createIndentBySize(size)
   }
 
-  override fun getFoldRegionAtOffset(offset: Int): VimFoldRegion? {
+  override fun getCollapsedFoldRegionAtOffset(offset: Int): VimFoldRegion? {
     val ijFoldRegion = editor.foldingModel.getCollapsedRegionAtOffset(offset) ?: return null
-    return object : VimFoldRegion {
-      override var isExpanded: Boolean
-        get() = ijFoldRegion.isExpanded
-        set(value) {
-          editor.foldingModel.runBatchFoldingOperation {
-            ijFoldRegion.isExpanded = value
-          }
-        }
-      override val startOffset: Int
-        get() = ijFoldRegion.startOffset
-      override val endOffset: Int
-        get() = ijFoldRegion.endOffset
+    return toVimFoldRegion(ijFoldRegion)
+  }
 
+  override fun getFoldRegionsAtOffset(offset: Int): List<VimFoldRegion> {
+    val ijFoldRegions = FoldingUtil.getFoldRegionsAtOffset(editor, offset)
+    return ijFoldRegions.map { toVimFoldRegion(it) }
+  }
+
+  override fun getFoldRegionAtLine(line: Int): VimFoldRegion? {
+    val ijFoldRegion = FoldingUtil.findFoldRegionStartingAtLine(editor, line) ?: return null
+    return toVimFoldRegion(ijFoldRegion)
+  }
+
+  override fun getAllFoldRegions(): List<VimFoldRegion> {
+    return editor.foldingModel.allFoldRegions.map { toVimFoldRegion(it) }
+  }
+
+  override fun applyFoldLevel(foldLevel: Int) {
+    val allFolds = editor.foldingModel.allFoldRegions
+    if (allFolds.isEmpty()) return
+
+    editor.foldingModel.runBatchFoldingOperation {
+      // I'm aware it's O(n^2) comparison here,
+      // but it doesn't affect performance even on a large amount of fold
+      allFolds.forEach { fold ->
+        val depth = calculateFoldDepth(fold, allFolds)
+        fold.isExpanded = depth < foldLevel
+      }
     }
+  }
+
+  override fun getMaxFoldDepth(): Int {
+    val allFolds = editor.foldingModel.allFoldRegions
+    if (allFolds.isEmpty()) return 0
+
+    return allFolds.maxOfOrNull { fold ->
+      calculateFoldDepth(fold, allFolds)
+    } ?: 0
+  }
+
+  override fun createFoldRegion(startOffset: Int, endOffset: Int, collapse: Boolean): VimFoldRegion? {
+    require(startOffset < endOffset) { "startOffset ($startOffset) must be less than endOffset ($endOffset)" }
+
+    var foldingRegion: FoldRegion? = null
+    editor.foldingModel.runBatchFoldingOperation {
+      foldingRegion = editor.foldingModel.addFoldRegion(startOffset, endOffset, "...")
+      foldingRegion?.isExpanded = !collapse
+    }
+    return foldingRegion?.let { toVimFoldRegion(it) }
+  }
+
+  override fun deleteFoldRegionAtOffset(offset: Int): Boolean {
+    val foldToDelete = findInnermostFoldAtLine(offset) ?: return false
+    editor.foldingModel.runBatchFoldingOperation {
+      editor.foldingModel.removeFoldRegion(foldToDelete)
+    }
+    return true
+  }
+
+  override fun deleteFoldRegionsRecursivelyAtOffset(offset: Int): Boolean {
+    val targetFold = findInnermostFoldAtLine(offset) ?: return false
+    val allFolds = editor.foldingModel.allFoldRegions
+    val foldsToDelete = allFolds.filter { fold ->
+      fold.isContainedIn(targetFold)
+    }
+    if (foldsToDelete.isEmpty()) return false
+    editor.foldingModel.runBatchFoldingOperation {
+      foldsToDelete.forEach { fold ->
+        editor.foldingModel.removeFoldRegion(fold)
+      }
+    }
+    return true
+  }
+
+  /**
+   * Finds the innermost fold region at the line containing the given offset.
+   *
+   * This method finds folds based on line level, not exact cursor position.
+   * A fold matches if:
+   * - The fold starts on the current line, OR
+   * - The fold contains the current line (cursor is inside the fold)
+   *
+   * If multiple folds match, returns the smallest (innermost) one.
+   */
+  private fun findInnermostFoldAtLine(offset: Int): FoldRegion? {
+    val line = editor.document.getLineNumber(offset)
+    val allFolds = editor.foldingModel.allFoldRegions
+    return allFolds
+      .filter { fold ->
+        val foldStartLine = editor.document.getLineNumber(fold.startOffset)
+        val foldEndLine = editor.document.getLineNumber(fold.endOffset)
+        foldStartLine == line || (line in foldStartLine..foldEndLine)
+      }
+      .minByOrNull { fold -> fold.endOffset - fold.startOffset }
+  }
+
+  private fun calculateFoldDepth(fold: FoldRegion, allFolds: Array<FoldRegion>): Int {
+    return allFolds.count { otherFold ->
+      isWrappedBy(fold, otherFold)
+    }
+  }
+
+  /**
+   * Returns true if the inner fold is completely contained by the outer fold (allowing matching boundaries)
+   * but excludes identical folds.
+   */
+  private fun isWrappedBy(inner: FoldRegion, outer: FoldRegion): Boolean {
+    return outer.startOffset <= inner.startOffset &&
+      outer.endOffset >= inner.endOffset &&
+      areDifferentFolds(inner, outer)
+  }
+
+  private fun areDifferentFolds(
+    first: FoldRegion,
+    second: FoldRegion,
+  ): Boolean = first.startOffset != second.startOffset || first.endOffset != second.endOffset
+
+  private fun toVimFoldRegion(ijFoldRegion: FoldRegion): VimFoldRegion {
+    return IjVimFoldRegion(ijFoldRegion, editor)
+  }
+
+  private class IjVimFoldRegion(
+    val ijFoldRegion: FoldRegion,
+    private val editor: Editor,
+  ) : VimFoldRegion {
+    override var isExpanded: Boolean
+      get() = ijFoldRegion.isExpanded
+      set(value) {
+        editor.foldingModel.runBatchFoldingOperation {
+          ijFoldRegion.isExpanded = value
+        }
+      }
+    override val startOffset: Int
+      get() = ijFoldRegion.startOffset
+    override val endOffset: Int
+      get() = ijFoldRegion.endOffset
   }
 
   override fun <T : ImmutableVimCaret> findLastVersionOfCaret(caret: T): T {
@@ -495,6 +619,10 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase(
 
   private fun Pair<Int, Int>.noGuard(editor: Editor): Boolean {
     return editor.document.getRangeGuard(this.first, this.second) == null
+  }
+
+  private fun FoldRegion.isContainedIn(other: FoldRegion): Boolean {
+    return this.startOffset >= other.startOffset && this.endOffset <= other.endOffset
   }
 
   private inline fun Pair<Int, Int>.shift(

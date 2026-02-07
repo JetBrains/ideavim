@@ -19,15 +19,21 @@ internal class ReplaceWithRegister : VimExtension {
     val api = api()
 
     api.mappings {
-      nmap(keys = "gr", actionName = RWR_OPERATOR) {
+      // Step 1: Non-recursive <Plug> → action mappings
+      nnoremap(RWR_OPERATOR) {
         rewriteMotion()
       }
-      nmap(keys = "grr", actionName = RWR_LINE) {
+      nnoremap(RWR_LINE) {
         rewriteLine()
       }
-      vmap(keys = "gr", actionName = RWR_VISUAL) {
+      vnoremap(RWR_VISUAL) {
         rewriteVisual()
       }
+
+      // Step 2: Recursive key → <Plug> mappings
+      nmap("gr", RWR_OPERATOR)
+      nmap("grr", RWR_LINE)
+      vmap("gr", RWR_VISUAL)
 
       api.exportOperatorFunction(OPERATOR_FUNC_NAME) {
         operatorFunction()

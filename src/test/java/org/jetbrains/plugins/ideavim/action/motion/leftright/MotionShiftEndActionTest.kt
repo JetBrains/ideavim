@@ -11,24 +11,16 @@
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
-import org.jetbrains.plugins.ideavim.TestOptionConstants
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.jetbrains.plugins.ideavim.impl.OptionTest
-import org.jetbrains.plugins.ideavim.impl.TraceOptions
-import org.jetbrains.plugins.ideavim.impl.VimOption
+import org.junit.jupiter.api.Test
 
-@TraceOptions(TestOptionConstants.keymodel, TestOptionConstants.selectmode)
 class MotionShiftEndActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, doesntAffectTest = true),
-    VimOption(TestOptionConstants.selectmode, doesntAffectTest = true),
-  )
+  @Test
   fun `test simple end`() {
     val keys = listOf("<S-End>")
     val before = """
@@ -51,10 +43,7 @@ class MotionShiftEndActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
-    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
-  )
+  @Test
   fun `test start visual`() {
     val keys = listOf("<S-End>")
     val before = """
@@ -73,14 +62,14 @@ class MotionShiftEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    doTest(keys, before, after, Mode.VISUAL(SelectionType.CHARACTER_WISE)) {
+      enterCommand("set keymodel=startsel")
+      enterCommand("set selectmode=")
+    }
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [OptionConstants.keymodel_startsel]),
-    VimOption(TestOptionConstants.selectmode, limitedValues = [OptionConstants.selectmode_key]),
-  )
+  @Test
   fun `test start select`() {
     val keys = listOf("<S-End>")
     val before = """
@@ -99,14 +88,14 @@ class MotionShiftEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    doTest(keys, before, after, Mode.SELECT(SelectionType.CHARACTER_WISE))
+    doTest(keys, before, after, Mode.SELECT(SelectionType.CHARACTER_WISE)) {
+      enterCommand("set keymodel=startsel")
+      enterCommand("set selectmode=key")
+    }
   }
 
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [""]),
-    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
-  )
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test continue visual`() {
     val before = """
             A Discovery
@@ -125,6 +114,8 @@ class MotionShiftEndActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
+    enterCommand("set keymodel=")
+    enterCommand("set selectmode=")
     typeText(injector.parser.parseKeys("<S-End>"))
     assertState(Mode.NORMAL())
     typeText(injector.parser.parseKeys("0v" + "<S-End>"))
@@ -132,11 +123,8 @@ class MotionShiftEndActionTest : VimTestCase() {
     assertState(Mode.VISUAL(SelectionType.CHARACTER_WISE))
   }
 
-  @OptionTest(
-    VimOption(TestOptionConstants.keymodel, limitedValues = [""]),
-    VimOption(TestOptionConstants.selectmode, limitedValues = [""]),
-  )
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test continue select`() {
     val before = """
             A Discovery
@@ -155,6 +143,8 @@ class MotionShiftEndActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
     configureByText(before)
+    enterCommand("set keymodel=")
+    enterCommand("set selectmode=")
     typeText(injector.parser.parseKeys("<S-End>"))
     assertState(Mode.NORMAL())
     typeText(injector.parser.parseKeys("0gh" + "<S-End>"))

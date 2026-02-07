@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2025 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -23,7 +23,6 @@ import com.maddyhome.idea.vim.extension.ShortcutDispatcher
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import java.awt.Color
 import javax.swing.JComponent
-import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JRootPane
 import javax.swing.SwingUtilities
@@ -40,6 +39,12 @@ class ToggleHintsAction : DumbAwareToggleAction() {
   override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
 
   override fun isSelected(e: AnActionEvent): Boolean = cover != null
+
+  init {
+    // By default, IntelliJ disables actions while a modal dialog is open.
+    // We override this so hints can target components inside popups and dialogs (e.g., IdeaVim settings).
+    isEnabledInModalContext = true
+  }
 
   override fun setSelected(e: AnActionEvent, selected: Boolean) {
     val rootPane = SwingUtilities.getRootPane(e.getData(PlatformDataKeys.CONTEXT_COMPONENT)) ?: return
@@ -66,6 +71,8 @@ class ToggleHintsAction : DumbAwareToggleAction() {
     if (highlight !in glassPane.components) glassPane.add(highlight)
     if (cover !in glassPane.components) glassPane.add(cover)
     glassPane.isVisible = true
+    glassPane.revalidate()
+    glassPane.repaint()
 
     val select = JPanel()
     val popup = JBPopupFactory.getInstance().createComponentPopupBuilder(select, select).createPopup()
@@ -78,9 +85,7 @@ class ToggleHintsAction : DumbAwareToggleAction() {
     ShortcutDispatcher("hints", targets.associateBy { it.hint.lowercase() }, { target ->
       popup.closeOk(null)
       alarm.cancelAllRequests()
-      target.component.accessibleContext?.apply {
-        if (accessibleAction?.doAccessibleAction(0) == null && !accessibleComponent.isFocusTraversable) return@apply
-        accessibleComponent.requestFocus()
+      if (target.action()) {
         highlight.setTarget(target)
         alarm.addRequest({ highlight.setTarget(null) }, highlightDuration)
       }
@@ -104,15 +109,16 @@ class ToggleHintsAction : DumbAwareToggleAction() {
   }
 }
 
-private fun HintTarget.createCover() = JPanel().apply {
+internal fun HintTarget.createCover() = JPanel(null).apply {
   isOpaque = false
   bounds = this@createCover.bounds
-  add(JLabel().apply {
-    text = hint
-    isOpaque = true
-    background = JBColor.YELLOW.let { Color(it.red, it.green, it.blue, 200) }
-    foreground = JBColor.foreground()
-  })
+
+  val pill = RoundedHintLabel(hint)
+  val pref = pill.preferredSize
+  // Position at top-left
+  pill.setBounds(0, 0, pref.width, pref.height)
+
+  add(pill)
 }
 
 private class HighlightComponent : JPanel() {

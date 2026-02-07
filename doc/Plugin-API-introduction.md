@@ -47,9 +47,10 @@ Here's a minimal plugin structure:
 fun VimApi.init() {
     // Plugin initialization code
     mappings {
-        nmap(keys = "<leader>x", label = "MyPluginAction") {
+        nnoremap("<Plug>MyPluginAction") {
             // Action implementation
         }
+        nmap("<leader>x", "<Plug>MyPluginAction")
     }
 }
 ```
@@ -77,9 +78,10 @@ editor {
 
 mappings {
   // Now in MappingScope
-  nmap(keys = "gx", label = "OpenURL") {
+  nnoremap("<Plug>OpenURL") {
     // Action implementation
   }
+  nmap("gx", "<Plug>OpenURL")
 }
 ```
 

@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright 2003-2023 The IdeaVim authors
+  ~ Copyright 2003-2026 The IdeaVim authors
   ~
   ~ Use of this source code is governed by an MIT-style
   ~ license that can be found in the LICENSE.txt file or at
@@ -10,15 +10,34 @@
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
   <description><![CDATA[
-      <p>Vim engine for JetBrains IDEs</p>
+      <p>Bring the power of Vim to your JetBrains IDE.</p>
       <br/>
-      <p>IdeaVim supports many Vim features including normal/insert/visual modes, motion keys, deletion/changing,
-      marks, registers, some Ex commands, Vim regexps, configuration via ~/.ideavimrc, macros, Vim plugins, etc.</p>
+      <p>IdeaVim is a Vim emulation plugin that lets you edit code using Vim's modal editing,
+      motions, text objects, and commands — all while keeping full access to your IDE's
+      refactoring, debugging, and navigation features.</p>
       <br/>
-      <p>See also:</p>
+      <h4>What's included</h4>
       <ul>
-        <li><a href="https://github.com/JetBrains/ideavim">GitHub repository</a>: documentation and contributing</li>
-        <li><a href="https://youtrack.jetbrains.com/issues/VIM">Issue tracker</a>: feature requests and bug reports</li>
+        <li>Normal, Insert, Visual, Select, Command-line, and Ex modes</li>
+        <li>Motions, operators, text objects, marks, registers, and macros</li>
+        <li>Key mappings and Vim script support</li>
+        <li>Full Vim regex for search and replace</li>
+        <li>Configuration via <code>~/.ideavimrc</code> (XDG paths supported)</li>
+        <li>Map any IDE action to a key with <code>&lt;Action&gt;</code></li>
+      </ul>
+      <br/>
+      <h4>Vim plugins</h4>
+      <p>Enable popular Vim plugins like surround, commentary, easymotion, sneak, NERDTree,
+      multiple-cursors, highlightedyank, which-key, and more — right from your ideavimrc.</p>
+      <br/>
+      <h4>Works everywhere</h4>
+      <p>Compatible with IntelliJ IDEA, PyCharm, WebStorm, GoLand, CLion, Rider,
+      Android Studio, and all other JetBrains IDEs.</p>
+      <br/>
+      <p>Resources:</p>
+      <ul>
+        <li><a href="https://github.com/JetBrains/ideavim">GitHub</a> — documentation, setup guides, and contributing</li>
+        <li><a href="https://youtrack.jetbrains.com/issues/VIM">Issue tracker</a> — feature requests and bug reports</li>
       </ul>
     ]]></description>
   <version>SNAPSHOT</version>
@@ -44,7 +63,7 @@
               topic="com.intellij.ide.plugins.DynamicPluginListener"/>
     <listener class="com.maddyhome.idea.vim.ui.ex.ExEntryPanel$LafListener"
               topic="com.intellij.ide.ui.LafManagerListener"/>
-    <listener class="com.maddyhome.idea.vim.ui.ExOutputPanel$LafListener"
+    <listener class="com.maddyhome.idea.vim.ui.OutputPanel$LafListener"
               topic="com.intellij.ide.ui.LafManagerListener"/>
     <listener class="com.maddyhome.idea.vim.extension.highlightedyank.HighlightColorResetter"
               topic="com.intellij.ide.ui.LafManagerListener"/>
@@ -390,7 +409,7 @@
 
   <actions>
     <action class="com.maddyhome.idea.vim.extension.hints.ToggleHintsAction" text="Toggle Hints">
-      <keyboard-shortcut keymap="$default" first-keystroke="alt F"/>
+      <keyboard-shortcut keymap="$default" first-keystroke="ctrl BACK_SLASH"/>
     </action>
   </actions>
 </idea-plugin>

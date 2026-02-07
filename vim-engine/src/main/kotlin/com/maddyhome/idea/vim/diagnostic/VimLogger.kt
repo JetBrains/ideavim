@@ -18,6 +18,7 @@ interface VimLogger {
   fun debug(data: String)
 
   fun warn(message: String)
+  fun warn(message: String, e: Throwable)
   fun error(message: String)
   fun error(message: String, e: Throwable)
   fun info(message: String)

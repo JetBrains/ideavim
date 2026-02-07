@@ -18,109 +18,71 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
+import com.maddyhome.idea.vim.vimscript.model.functions.BuiltinFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
 @VimscriptFunction(name = "function")
-internal class FunctionFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments: Int = 1
-  override val maximumNumberOfArguments: Int = 3
-
-  override fun doFunction(
-    argumentValues: List<Expression>,
-    editor: VimEditor,
-    context: ExecutionContext,
-    vimContext: VimLContext,
-  ): VimFuncref {
-    val arg1 = argumentValues[0].evaluate(editor, context, vimContext)
-    if (arg1 !is VimString) {
-      throw exExceptionMessage("E129")
-    }
-    val scopeAndName = arg1.value.extractScopeAndName()
-    val function =
-      injector.functionService.getFunctionHandlerOrNull(scopeAndName.first, scopeAndName.second, vimContext)
-        ?: throw exExceptionMessage("E700", (scopeAndName.first?.toString() ?: "") + scopeAndName.second)
-
-    var arglist: VimList? = null
-    var dictionary: VimDictionary? = null
-    val arg2 = argumentValues.getOrNull(1)?.evaluate(editor, context, vimContext)
-    val arg3 = argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext)
-
-    if (arg2 is VimDictionary && arg3 is VimDictionary) {
-      throw exExceptionMessage("E923")
-    }
-
-    if (arg2 != null) {
-      when (arg2) {
-        is VimList -> arglist = arg2
-        is VimDictionary -> dictionary = arg2
-        else -> throw exExceptionMessage("E923")
-      }
-    }
-
-    if (arg3 != null && arg3 !is VimDictionary) {
-      throw exExceptionMessage("E922")
-    }
-    val funcref = VimFuncref(function, arglist ?: VimList(mutableListOf()), dictionary, VimFuncref.Type.FUNCTION)
-    if (dictionary != null) {
-      funcref.isSelfFixed = true
-    }
-    return funcref
+internal class FunctionFunctionHandler : FunctionFunctionHandlerBase(VimFuncref.Type.FUNCTION) {
+  override fun getFunctionHandler(scope: Scope?, name: String, vimContext: VimLContext): FunctionHandler? {
+    return injector.functionService.getFunctionHandlerOrNull(scope, name, vimContext)
   }
 }
 
 @VimscriptFunction(name = "funcref")
-internal class FuncrefFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments: Int = 1
-  override val maximumNumberOfArguments: Int = 3
-
-  override fun doFunction(
-    argumentValues: List<Expression>,
-    editor: VimEditor,
-    context: ExecutionContext,
-    vimContext: VimLContext,
-  ): VimFuncref {
-    val arg1 = argumentValues[0].evaluate(editor, context, vimContext)
-    if (arg1 !is VimString) {
-      throw exExceptionMessage("E129")
-    }
-    val scopeAndName = arg1.value.extractScopeAndName()
-    val function = injector.functionService.getUserDefinedFunction(scopeAndName.first, scopeAndName.second, vimContext)
-      ?: throw exExceptionMessage("E700", (scopeAndName.first?.toString() ?: "") + scopeAndName.second)
-    val handler = DefinedFunctionHandler(function)
-
-    var arglist: VimList? = null
-    var dictionary: VimDictionary? = null
-    val arg2 = argumentValues.getOrNull(1)?.evaluate(editor, context, vimContext)
-    val arg3 = argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext)
-
-    if (arg2 is VimDictionary && arg3 is VimDictionary) {
-      throw exExceptionMessage("E923")
-    }
-
-    if (arg2 != null) {
-      when (arg2) {
-        is VimList -> arglist = arg2
-        is VimDictionary -> dictionary = arg2
-        else -> throw exExceptionMessage("E923")
-      }
-    }
-
-    if (arg3 != null && arg3 !is VimDictionary) {
-      throw exExceptionMessage("E922")
-    }
-    return VimFuncref(handler, arglist ?: VimList(mutableListOf()), dictionary, VimFuncref.Type.FUNCREF)
+internal class FuncrefFunctionHandler : FunctionFunctionHandlerBase(VimFuncref.Type.FUNCREF) {
+  override fun getFunctionHandler(scope: Scope?, name: String, vimContext: VimLContext): FunctionHandler? {
+    val declaration = injector.functionService.getUserDefinedFunction(scope, name, vimContext)
+    return if (declaration != null) DefinedFunctionHandler(declaration) else null
   }
 }
 
-private fun String.extractScopeAndName(): Pair<Scope?, String> {
-  val colonIndex = this.indexOf(":")
-  if (colonIndex == -1) {
-    return Pair(null, this)
+
+internal abstract class FunctionFunctionHandlerBase(private val funcrefType: VimFuncref.Type) :
+  BuiltinFunctionHandler<VimFuncref>(minArity = 1, maxArity = 3) {
+  override fun doFunction(
+    arguments: Arguments,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext
+  ): VimFuncref {
+    val arg1 = arguments[0]
+    if (arg1 !is VimString) {
+      throw exExceptionMessage("E129")
+    }
+
+    val scopeAndName = Scope.split(arg1.value)
+    val function = getFunctionHandler(scopeAndName.first, scopeAndName.second, vimContext)
+      ?: throw exExceptionMessage("E700", (scopeAndName.first?.toString() ?: "") + scopeAndName.second)
+
+    val arg2 = arguments.getOrNull(1)
+    val arg3 = arguments.getOrNull(2)
+
+    val argList = arg2 as? VimList
+
+    val dictionary = if (arg2 != null && arg2 !is VimList) {
+      if (arg2 !is VimDictionary) {
+        throw exExceptionMessage("E923")
+      }
+      if (arg3 != null) {
+        // If arg2 is a dictionary, arg3 must not be specific. Vim gives a slightly unintuitive error message
+        throw exExceptionMessage("E1206", 3)
+      }
+      arg2
+    }
+    else if (arg3 != null) {
+      if (arg3 !is VimDictionary) {
+        throw exExceptionMessage("E1206", 3)
+      }
+      arg3
+    }
+    else {
+      null
+    }
+
+    return VimFuncref(function, argList ?: VimList(mutableListOf()), dictionary, funcrefType, isImplicitPartial = false)
   }
-  val scopeString = this.substring(0, colonIndex)
-  val nameString = this.substring(colonIndex + 1)
-  return Pair(Scope.getByValue(scopeString), nameString)
+
+  protected abstract fun getFunctionHandler(scope: Scope?, name: String, vimContext: VimLContext): FunctionHandler?
 }

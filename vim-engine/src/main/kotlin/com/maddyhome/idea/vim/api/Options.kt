@@ -103,6 +103,12 @@ object Options {
 
   // Simple options, sorted by name
   val digraph: ToggleOption = addOption(ToggleOption("digraph", GLOBAL, "dg", false))
+
+  // Default differs from Vim (which uses 0). In Vim, foldlevel=0 means all folds are closed on window open.
+  // In an IDE context, this would be unexpected - users expect to see expanded code when opening a file.
+  // Also, with foldlevel=0, using `zr` would set it to 1 and actually close folds to level 1, which is confusing.
+  // Using a high default (coerced to maxDepth+1 by mapper) means all folds start open, matching IDE expectations.
+  val foldlevel: NumberOption = addOption(UnsignedNumberOption("foldlevel", LOCAL_TO_WINDOW, "fdl", 999))
   val gdefault: ToggleOption = addOption(ToggleOption("gdefault", GLOBAL, "gd", false))
   val history: UnsignedNumberOption = addOption(UnsignedNumberOption("history", GLOBAL, "hi", 50))
   val hlsearch: ToggleOption = addOption(ToggleOption("hlsearch", GLOBAL, "hls", false))
@@ -169,7 +175,8 @@ object Options {
       "shell",
       GLOBAL,
       "sh",
-      if (injector.systemInfoService.isWindows) "cmd.exe" else System.getenv("SHELL") ?: "sh"
+      if (injector.systemInfoService.isWindows) "cmd.exe" else System.getenv("SHELL") ?: "sh",
+      expandEnvironmentVariables = true,
     )
   )
   val shellxescape: StringOption = addOption(

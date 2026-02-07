@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.LValueExpression
@@ -28,12 +29,32 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.operators.AssignmentOp
 @ExCommand(command = "let")
 data class LetCommand(
   val range: Range,
-  val lvalue: Expression,
+  val lvalue: Expression?,
+  val unpackLValues: List<Expression>?,
+  val unpackRest: Expression?,
   val operator: AssignmentOperator,
   val expression: Expression,
   val isSyntaxSupported: Boolean,
   val assignmentTextForErrors: String
 ) : Command.SingleExecution(range, CommandModifier.NONE) {
+
+  constructor(
+    range: Range,
+    lvalue: Expression,
+    operator: AssignmentOperator,
+    expression: Expression,
+    isSyntaxSupported: Boolean,
+    assignmentTextForErrors: String,
+  ) : this(
+    range,
+    lvalue,
+    unpackLValues = null,
+    unpackRest = null,
+    operator,
+    expression,
+    isSyntaxSupported,
+    assignmentTextForErrors
+  )
 
   override val argFlags: CommandHandlerFlags =
     flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
@@ -46,26 +67,80 @@ data class LetCommand(
   ): ExecutionResult {
     if (!isSyntaxSupported) return ExecutionResult.Error
 
-    if (lvalue is LValueExpression) {
-      val currentValue =
-        if (operator != AssignmentOperator.ASSIGNMENT) lvalue.evaluate(editor, context, vimContext) else null
-      val rhs = expression.evaluate(editor, context, vimContext)
-      if (lvalue is SublistExpression && operator != AssignmentOperator.ASSIGNMENT && currentValue is VimList && rhs is VimList) {
-        // Compound assigment operators modifies each item in a sublist expression, in-place, even if an error is
-        // encountered. So we get a new sublist with all the changes up to the first error, assign it, then throw
-        val result = getNewSublistValue(currentValue, rhs, lvalue.isStronglyTyped())
-        lvalue.assign(result.first, editor, context, this, assignmentTextForErrors)
-        result.second?.let { throw it }
-      } else {
-        val newValue = operator.getNewValue(currentValue, rhs, lvalue.isStronglyTyped())
-        lvalue.assign(newValue, editor, context, this, assignmentTextForErrors)
-      }
-      return ExecutionResult.Success
+    return when {
+      unpackLValues != null -> unpack(unpackLValues, unpackRest, editor, context)
+      lvalue is LValueExpression -> assign(lvalue, expression.evaluate(editor, context, vimContext), editor, context)
+      else -> throw exExceptionMessage("E121", lvalue?.originalString ?: assignmentTextForErrors)
+    }
+  }
+
+  private fun unpack(
+    lvalues: List<Expression>,
+    rest: Expression?,
+    editor: VimEditor,
+    context: ExecutionContext,
+  ): ExecutionResult {
+    val rvalue = expression.evaluate(editor, context, this)
+    if (rvalue !is VimList) {
+      throw exExceptionMessage("E714")
     }
 
-    // TODO: EnvVariableExpression
+    if (rest != null && rest !is LValueExpression) {
+      // This doesn't completely match Vim's error message, but this actually looks like a bug
+      // `:let [a,b;'hello']=[1,2,3,4]` => "E475: Invalid argument: 'hello']=[1,2,3,4]"
+      throw exExceptionMessage("E475", rest.originalString)
+    }
 
-    throw exExceptionMessage("E121", lvalue.originalString)
+    if (rest == null && rvalue.values.size > lvalues.size) {
+      throw exExceptionMessage("E687")
+    } else if (rvalue.values.size < lvalues.size) {
+      throw exExceptionMessage("E688")
+    }
+
+    // Validate the lvalues before assigning anything
+    for (lvalue in lvalues) {
+      if (lvalue !is LValueExpression) {
+        throw exExceptionMessage("E475", lvalue.originalString)
+      }
+    }
+
+    for (i in lvalues.indices) {
+      val itemLValue = lvalues[i] as? LValueExpression ?: continue
+      assign(itemLValue, rvalue.values[i], editor, context)
+    }
+
+    if (rest != null) {
+      val restValue = if (rvalue.values.size > lvalues.size) {
+        VimList(rvalue.values.subList(lvalues.size, rvalue.values.size).toMutableList())
+      }
+      else {
+        VimList(mutableListOf())
+      }
+      assign(rest, restValue, editor, context)
+    }
+
+    return ExecutionResult.Success
+  }
+
+  private fun assign(
+    lvalue: LValueExpression,
+    rvalue: VimDataType,
+    editor: VimEditor,
+    context: ExecutionContext,
+  ): ExecutionResult.Success {
+    val currentValue =
+      if (operator != AssignmentOperator.ASSIGNMENT) lvalue.evaluate(editor, context, vimContext) else null
+    if (lvalue is SublistExpression && operator != AssignmentOperator.ASSIGNMENT && currentValue is VimList && rvalue is VimList) {
+      // Compound assigment operators modifies each item in a sublist expression, in-place, even if an error is
+      // encountered. So we get a new sublist with all the changes up to the first error, assign it, then throw
+      val result = getNewSublistValue(currentValue, rvalue, lvalue.isStronglyTyped())
+      lvalue.assign(result.first, editor, context, this, assignmentTextForErrors)
+      result.second?.let { throw it }
+    } else {
+      val newValue = operator.getNewValue(currentValue, rvalue, lvalue.isStronglyTyped())
+      lvalue.assign(newValue, editor, context, this, assignmentTextForErrors)
+    }
+    return ExecutionResult.Success
   }
 
   /**

@@ -1,5 +1,6 @@
 package _Self.buildTypes
 
+import _Self.AgentSize
 import _Self.IdeaVimBuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.golang
@@ -49,6 +50,7 @@ object Compatibility : IdeaVimBuildType({
               java -jar verifier1/verifier-cli-dev-all-2.jar check-plugin '${'$'}com.magidc.ideavim.dial' [latest-IU] -team-city
               java -jar verifier1/verifier-cli-dev-all-2.jar check-plugin '${'$'}dev.ghostflyby.ideavim.toggleIME' [latest-IU] -team-city
               java -jar verifier1/verifier-cli-dev-all-2.jar check-plugin '${'$'}com.magidc.ideavim.anyObject' [latest-IU] -team-city
+              java -jar verifier1/verifier-cli-dev-all-2.jar check-plugin '${'$'}com.yelog.ideavim.cmdfloat' [latest-IU] -team-city
             """.trimIndent()
     }
   }
@@ -68,5 +70,10 @@ object Compatibility : IdeaVimBuildType({
     golang {
       testFormat = "json"
     }
+  }
+
+  requirements {
+    equals("teamcity.agent.hardware.cpuCount", AgentSize.MEDIUM)
+    equals("teamcity.agent.os.family", "Linux")
   }
 })

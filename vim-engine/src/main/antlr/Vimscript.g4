@@ -92,7 +92,7 @@ command:
     (WS | COLON)* range? (WS | COLON)* ECHO (WS* expr)* WS* (NEW_LINE | BAR)+
     #EchoCommand|
 
-    (WS | COLON)* range? (WS | COLON)* DELF (replace = BANG)? WS+ (functionScope COLON)? functionName ((inline_comment NEW_LINE+) | (NEW_LINE | BAR)+)
+    (WS | COLON)* range? (WS | COLON)* DELFUNCTION (replace = BANG)? WS+ (functionScope COLON)? functionName ((inline_comment NEW_LINE+) | (NEW_LINE | BAR)+)
     #DelfunctionCommand|
 
     (WS | COLON)* range? (WS | COLON)* CALL WS+ expr WS* ((inline_comment NEW_LINE+) | (NEW_LINE | BAR)+)
@@ -113,17 +113,31 @@ command:
 
     (WS | COLON)* range? (WS | COLON)*
       name = (
-        Y_LOWERCASE | YANK_LINES | X_LOWERCASE | WRITE_QUIT | WRITE_PREVIOUS | WRITE_NEXT | W_LOWERCASE | WRITE
-        | WRITE_ALL | U_LOWERCASE | UNDO | TAB_ONLY | TAB_CLOSE | SOURCE | V_SPLIT | SPLIT | SHELL | SET_HANDLER | SET | SETGLOBAL | SETLOCAL
-        | SELECT_LAST_FILE | SELECT_FIRST_FILE | SELECT_FILE | AT | REDO | Q_LOWERCASE | QUIT | PUT_LINES | PROMPT_FIND
-        | PROMPT_REPLACE | P_LOWERCASE | P_UPPERCASE | PRINT | PREVIOUS_TAB | N_UPPERCASE | PREVIOUS_FILE | PLUG
-        | ONLY | NO_HL_SEARCH | NEXT_TAB | N_LOWERCASE | NEXT_FILE | M_LOWERCASE | MOVE_TEXT | MARKS | K_LOWERCASE
-        | MARK_COMMAND | JUMPS | J_LOWERCASE | JOIN_LINES | HISTORY | GO_TO_CHAR | SYMBOL | FIND | CLASS | F_LOWERCASE
-        | CLEARJUMPS
-        | FILE | EXIT | E_LOWERCASE | EDIT_FILE | DUMP_LINE | DIGRAPH | DEL_MARKS | D_LOWERCASE | DEL_LINES | DELCMD
-        | T_LOWERCASE | COPY | CMD_CLEAR | BUFFER_LIST | BUFFER_CLOSE | B_LOWERCASE | BUFFER | ASCII
-        | ACTIONLIST | ACTION | LOCKVAR | UNLOCKVAR | PACKADD | TABMOVE
+          ACTIONLIST | ACTION | ASCII | AT
         | ASSIGN    // `:=` print last line number
+        | B_LOWERCASE | BUFFER| BUFFER_CLOSE | BUFFER_LIST
+        | CLASS | CLEARJUMPS | CMD_CLEAR | COPY
+        | D_LOWERCASE | DELETE | DELCOMMAND | DELMARKS | DIGRAPHS | DUMPLINE
+        | E_LOWERCASE | EDIT_FILE | EXIT
+        | F_LOWERCASE | FILE | FIND
+        | GOTO
+        | HISTORY
+        | J_LOWERCASE | JOIN | JUMPS
+        | K_LOWERCASE
+        | LOCKVAR
+        | M_LOWERCASE | MARK | MARKS | MOVE_TEXT
+        | N_LOWERCASE | N_UPPERCASE | NEXT_FILE | NOHLSEARCH
+        | ONLY
+        | P_LOWERCASE | P_UPPERCASE | PACKADD | PLUG | PREVIOUS_FILE | PRINT | PROMPT_REPLACE | PROMPTFIND | PUT
+        | Q_LOWERCASE | QUIT
+        | R_LOWERCASE | REDO
+        | SET | SELECT_LAST_FILE | SELECT_FIRST_FILE | SELECT_FILE | SETGLOBAL | SETHANDLER | SETLOCAL | SHELL | SOURCE | SPLIT | SYMBOL
+        | T_LOWERCASE | TABCLOSE | TABMOVE | TABNEXT | TABONLY | TABPREVIOUS
+        | U_LOWERCASE | UNDO | UNLOCKVAR
+        | VSPLIT
+        | W_LOWERCASE | WRITE | WRITE_ALL | WRITE_NEXT | WRITE_PREVIOUS | WRITE_QUIT
+        | X_LOWERCASE
+        | Y_LOWERCASE | YANK
       )
       bangModifier = BANG?
     WS* ((commandArgumentWithoutBars? inline_comment NEW_LINE) | (commandArgumentWithoutBars? NEW_LINE) | (commandArgumentWithoutBars? BAR)) (NEW_LINE | BAR)*
@@ -131,7 +145,13 @@ command:
 
     (WS | COLON)* range? (WS | COLON)*
       name = (
-        MAP | MAP_CLEAR | UNMAP | SORT | REGISTERS | CMD | H_LOWERCASE | HELP | NORMAL
+          CMD
+        | H_LOWERCASE | HELP
+        | MAP | MAP_CLEAR
+        | NORMAL
+        | REGISTERS
+        | SORT
+        | UNMAP
       )
       bangModifier = BANG?
     WS* commandArgumentWithoutBars? (NEW_LINE | BAR)+
@@ -139,7 +159,13 @@ command:
 
     (WS | COLON)* range? (WS | COLON)*
       name = (
-        G_LOWERCASE | GLOBAL | V_LOWERCASE | V_GLOBAL | S_LOWERCASE | SUBSTITUTE | TILDE | AMPERSAND | BANG
+          AMPERSAND
+        | BANG
+        | G_LOWERCASE | GLOBAL
+        | R_LOWERCASE | READ
+        | V_LOWERCASE | VGLOBAL
+        | S_LOWERCASE | SUBSTITUTE
+        | TILDE
       )
       bangModifier = BANG?
     WS* commandArgumentWithBars? NEW_LINE+
@@ -154,13 +180,16 @@ lShift: LESS+;
 rShift: GREATER+;
 
 letCommands:
-    (WS | COLON)* range? (WS | COLON)* LET WS+ expr WS*
-        assignmentOperator
-        WS* expr WS* ((inline_comment NEW_LINE) | (NEW_LINE | BAR)+)
+    (WS | COLON)* range? (WS | COLON)* LET WS+ (unpack = unpackLValue | lvalue = expr) WS* assignmentOperator WS* rvalue = expr
+        WS* ((inline_comment NEW_LINE) | (NEW_LINE | BAR)+)
     #Let1Command|
 
     (WS | COLON)* range? (WS | COLON)* LET WS+ commandArgument = ~(NEW_LINE)* NEW_LINE+
     #Let2Command
+;
+
+unpackLValue:
+    L_BRACKET WS* (lvalues += expr WS* (COMMA WS* lvalues += expr WS*)*)+ (SEMI WS* rest = expr)? WS* R_BRACKET
 ;
 
 assignmentOperator:
@@ -224,40 +253,61 @@ commandName:
 //  Expressions related rules
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// These are in precedence order, from most significant to least. It reflects the precedence list in the Vim docs
+// (see `:help expression-syntax`) albeit without the nested grammar rules.
+// Note that expr10 has higher precedence than expr11 because Vim defines expr10 rules in terms of expr11 or expr10 with
+// trailing syntax. If we put expr11 higher, it will match the leading syntax and then fail to match the trailing syntax
 expr:
+                    // expr10
                         expr L_BRACKET WS* expr WS* R_BRACKET                                   #IndexedExpression
-                    |   WS* BANG WS* expr                                                       #UnaryExpression
                     |   expr L_BRACKET WS* from = expr? WS* COLON WS* to = expr? WS* R_BRACKET  #SublistExpression
-                    |   expr WS* binaryOperator1 WS* expr                                       #BinExpression1
-                    |   expr WS* binaryOperator2 WS* expr                                       #BinExpression2
-                    |   expr WS* binaryOperator3 WS* expr                                       #BinExpression3
-                    |   expr WS* binaryOperator4 WS* expr                                       #BinExpression4
-                    |   expr WS* binaryOperator5 WS* expr                                       #BinExpression5
-                    |   WS* unaryOperator = (PLUS | MINUS) WS* expr                             #UnaryExpression
+                    |   expr WS* L_PAREN WS* functionArguments WS* R_PAREN                      #FunctionCallExpression
                     |   expr WS* ARROW WS* functionCall                                         #FunctionAsMethodCall1
                     |   expr WS* ARROW WS* lambda L_PAREN WS* functionArguments WS* R_PAREN     #FunctionAsMethodCall2
-                    |   functionCall                                                            #FunctionCallExpression
-                    |   lambda L_PAREN WS* functionArguments WS* R_PAREN                        #LambdaFunctionCallExpression
-                    |   lambda                                                                  #LambdaExpression
-                    |   unsignedInt                                                             #IntExpression
-                    |   unsignedFloat                                                           #FloatExpression
+                    // TODO: expr10.name
+                    // expr11
+                    // Vim applies unary PLUS or MINUS to a numeric constant with higher precedence than to any other
+                    // expression/part expression
+                    |   unaryOperator = (PLUS | MINUS)? WS* unsignedInt                         #IntExpression
+                    |   unaryOperator = (PLUS | MINUS)? WS* unsignedFloat                       #FloatExpression
                     |   string                                                                  #StringExpression
                     |   blob                                                                    #BlobExpression
-                    |   variable                                                                #VariableExpression
-                    |   option                                                                  #OptionExpression
-                    |   envVariable                                                             #EnvVariableExpression
-                    |   register                                                                #RegisterExpression
                     |   list                                                                    #ListExpression
                     |   dictionary                                                              #DictionaryExpression
                     |   literalDictionary                                                       #LiteralDictionaryExpression
+                    |   option                                                                  #OptionExpression
                     |   L_PAREN WS* expr WS* R_PAREN                                            #WrappedExpression
-                    |   expr WS* QUESTION QUESTION WS* expr                                     #FalsyExpression
-                    |   expr WS* QUESTION WS* expr WS* COLON WS* expr                           #TernaryExpression
+                    // Make sure functionCall is before variable so foo() isn't treated as a funcref variable invocation
+                    |   functionCall                                                            #FunctionCallExpression
+                    |   variable                                                                #VariableExpression
+                    |   envVariable                                                             #EnvVariableExpression
+                    |   register                                                                #RegisterExpression
+                    |   lambda L_PAREN WS* functionArguments WS* R_PAREN                        #LambdaFunctionCallExpression
+                    |   lambda                                                                  #LambdaExpression
+                    // expr9
+                    |   unaryOperator = (BANG | PLUS | MINUS) WS* expr                          #UnaryExpression
+                    // expr8 is Vim9 typecast
+                    // expr7: * / %
+                    |   expr WS* multiplicativeOperator WS* expr                                #MultiplicativeExpression
+                    // expr6: + - . ..
+                    |   expr WS* additiveOperator WS* expr                                      #AdditiveExpression
+                    // expr5: left/right bitwise shift
+                    |   expr WS* bitwiseShiftOperator WS* expr                                  #BitwiseShiftExpression
+                    // expr4: equality/is/comparisons
+                    |   expr WS* comparisonOperator WS* expr                                    #ComparisonExpression
+                    // expr3: logical AND
+                    |   expr WS* logicalAndOperator WS* expr                                    #LogicalAndExpression
+                    // expr2: logical OR
+                    |   expr WS* logicalOrOperator WS* expr                                     #LogicalOrExpression
+                    // expr1: ternary/falsy
+                    |   <assoc=right> expr WS* QUESTION QUESTION WS* expr                       #FalsyExpression
+                    |   <assoc=right> expr WS* QUESTION WS* expr WS* COLON WS* expr             #TernaryExpression
 ;
 
-binaryOperator1:        STAR | DIV | MOD;
-binaryOperator2:        PLUS | MINUS | DOT | (DOT DOT);
-binaryOperator3:        LESS | LESS_IC | LESS_CS
+multiplicativeOperator: STAR | DIV | MOD;
+additiveOperator:       PLUS | MINUS | DOT | (DOT DOT);
+comparisonOperator:     LESS | LESS_IC | LESS_CS
                     |   GREATER | GREATER_IC | GREATER_CS
                     |   LESS_OR_EQUALS | LESS_OR_EQUALS_IC | LESS_OR_EQUALS_CS
                     |   GREATER_OR_EQUALS | GREATER_OR_EQUALS_IC | GREATER_OR_EQUALS_CS
@@ -268,8 +318,9 @@ binaryOperator3:        LESS | LESS_IC | LESS_CS
                     |   IS | IS_IC | IS_CS
                     |   IS_NOT | IS_NOT_IC | IS_NOT_CS
 ;
-binaryOperator4:        AMPERSAND AMPERSAND;
-binaryOperator5:        LOGICAL_OR;
+bitwiseShiftOperator:   LESS LESS | GREATER GREATER;
+logicalAndOperator:     AMPERSAND AMPERSAND;
+logicalOrOperator:      BAR BAR;
 
 register:               AT (DIGIT | lowercaseAlphabeticChar | uppercaseAlphabeticChar | MINUS | COLON | DOT | MOD | NUM | ASSIGN | STAR | PLUS | TILDE | UNDERSCORE | DIV | AT | QUOTE);
 // todo argumentDeclaration but without default values
@@ -346,6 +397,7 @@ anyCaseNameWithDigitsAndUnderscores:
                         lowercaseAlphabeticChar
                     |   uppercaseAlphabeticChar
                     |   keyword
+                    |   operator
                     |   IDENTIFIER_LOWERCASE
                     |   IDENTIFIER_ANY_CASE
                     |   anyCaseNameWithDigitsAndUnderscores (anyCaseNameWithDigitsAndUnderscores | DIGIT | INT | UNDERSCORE)+
@@ -416,110 +468,114 @@ lowercaseAlphabeticChar:
                     |   Z_LOWERCASE
 ;
 
-keyword:                FUNCTION
-                    |   ENDFUNCTION
-                    |   FOR
-                    |   ENDFOR
-                    |   IN
+keyword:                ABORT
+                    |   AUGROUP
+                    |   AUTOCMD
                     |   BREAK
+                    |   CATCH
+                    |   CLOSURE
                     |   CONTINUE
-                    |   WHILE
-                    |   ENDWHILE
-                    |   IF
+                    |   DICT
                     |   ELSE
                     |   ELSEIF
                     |   ENDIF
+                    |   ENDFOR
+                    |   ENDFUNCTION
+                    |   ENDTRY
+                    |   ENDWHILE
+                    |   FINALLY
+                    |   FOR
+                    |   FUNCTION
+                    |   IF
+                    |   IN
+                    |   RANGE
                     |   THROW
                     |   TRY
-                    |   CATCH
-                    |   FINALLY
-                    |   ENDTRY
-                    |   RANGE
-                    |   ABORT
-                    |   DICT
-                    |   CLOSURE
-                    |   AUTOCMD
-                    |   AUGROUP
+                    |   WHILE
                     |   existingCommands
 ;
-existingCommands:       RETURN
-                    |   LET
-                    |   ECHO
-                    |   DELF
-                    |   ACTION
+operator:               IS
+                    |   IS_NOT
+;
+existingCommands:       ACTION
                     |   ACTIONLIST
                     |   ASCII
                     |   BUFFER
                     |   BUFFER_CLOSE
                     |   BUFFER_LIST
+                    |   CALL
+                    |   CLASS
                     |   CMD
                     |   CMD_CLEAR
                     |   COPY
-                    |   DELCMD
-                    |   DEL_LINES
-                    |   DEL_MARKS
-                    |   DIGRAPH
-                    |   DUMP_LINE
+                    |   DELCOMMAND
+                    |   DELETE
+                    |   DELFUNCTION
+                    |   DELMARKS
+                    |   DIGRAPHS
+                    |   DUMPLINE
+                    |   ECHO
                     |   EDIT_FILE
+                    |   EXECUTE
                     |   EXIT
                     |   FILE
-                    |   CLASS
                     |   FIND
-                    |   SYMBOL
                     |   GLOBAL
-                    |   V_GLOBAL
-                    |   GO_TO_CHAR
+                    |   GOTO
                     |   HELP
                     |   HISTORY
-                    |   JOIN_LINES
+                    |   JOIN
                     |   JUMPS
-                    |   MARK_COMMAND
+                    |   LET
+                    |   MAP
+                    |   MAP_CLEAR
+                    |   MARK
                     |   MARKS
                     |   MOVE_TEXT
                     |   NEXT_FILE
-                    |   NEXT_TAB
-                    |   NO_HL_SEARCH
+                    |   NOHLSEARCH
+                    |   NORMAL
                     |   ONLY
                     |   PACKADD
                     |   PLUG
                     |   PREVIOUS_FILE
-                    |   PREVIOUS_TAB
                     |   PRINT
-                    |   PROMPT_FIND
+                    |   PROMPTFIND
                     |   PROMPT_REPLACE
-                    |   PUT_LINES
+                    |   PUT
                     |   QUIT
+                    |   READ
                     |   REDO
                     |   REGISTERS
+                    |   RETURN
                     |   SELECT_FILE
                     |   SELECT_FIRST_FILE
                     |   SELECT_LAST_FILE
                     |   SET
                     |   SETGLOBAL
                     |   SETLOCAL
-                    |   SET_HANDLER
+                    |   SETHANDLER
                     |   SHELL
                     |   SORT
-                    |   SPLIT
-                    |   V_SPLIT
                     |   SOURCE
+                    |   SPLIT
                     |   SUBSTITUTE
-                    |   TAB_CLOSE
-                    |   TAB_ONLY
+                    |   SYMBOL
+                    |   TABCLOSE
+                    |   TABMOVE
+                    |   TABNEXT
+                    |   TABONLY
+                    |   TABPREVIOUS
                     |   UNDO
-                    |   WRITE_ALL
+                    |   UNMAP
+                    |   VGLOBAL
+                    |   VSPLIT
                     |   WRITE
+                    |   WRITE_ALL
                     |   WRITE_NEXT
                     |   WRITE_PREVIOUS
                     |   WRITE_QUIT
-                    |   YANK_LINES
-                    |   MAP
-                    |   MAP_CLEAR
-                    |   UNMAP
-                    |   EXECUTE
-                    |   CALL
-                    |   NORMAL
-                    |   TABMOVE
+                    |   YANK
 ;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -586,37 +642,39 @@ MARK_SINGLE_QUOTED:     '\''[a-zA-Z];
 MARK_BACKTICK:          '`'[a-zA-Z];
 
 // Keywords
-FUNCTION:               'fu' | 'fun' | 'func' | 'funct' | 'functi' | 'functio' | 'function';
-ENDFUNCTION:            'endf' | 'endfu' | 'endfun' | 'endfunc' | 'endfunct' | 'endfuncti' | 'endfunctio' | 'endfunction';
-RANGE:                  'range';
 ABORT:                  'abort';
-DICT:                   'dict';
-CLOSURE:                'closure';
-FOR:                    'for';
-ENDFOR:                 'endfo' | 'endfor';
-IN:                     'in';
+AUTOCMD:                'au' | 'aut' | 'auto' | 'autoc' | 'autocm' | 'autocmd';
+AUGROUP:                'aug' | 'augr' | 'augro' | 'augrou' | 'augroup';
 BREAK:                  'brea' | 'break';
+CATCH:                  'cat' | 'catc'| 'catch';
+CLOSURE:                'closure';
 CONTINUE:               'con' | 'cont' | 'conti' | 'contin' | 'continu' | 'continue';
-FINISH:                 'fini' | 'finis' | 'finish';
-RETURN:                 'return';
-WHILE:                  'wh' | 'whi' | 'whil' | 'while';
-ENDWHILE:               'endw' | 'endwh' | 'endwhi' | 'endwhil' |'endwhile';
-IF:                     'if';
+DICT:                   'dict';
 ELSE:                   'el' | 'els' | 'else';
 ELSEIF:                 'elsei' | 'elseif';
+END:                    'END';
+ENDFOR:                 'endfo' | 'endfor';
 ENDIF:                  'en' | 'end' | 'endi' | 'endif';
-TRY:                    'try';
-CATCH:                  'cat' | 'catc'| 'catch';
-FINALLY:                'fina' | 'final' | 'finall' | 'finally';
+ENDFUNCTION:            'endf' | 'endfu' | 'endfun' | 'endfunc' | 'endfunct' | 'endfuncti' | 'endfunctio' | 'endfunction';
 ENDTRY:                 'endt' | 'endtr' | 'endtry';
+ENDWHILE:               'endw' | 'endwh' | 'endwhi' | 'endwhil' |'endwhile';
+FINALLY:                'fina' | 'final' | 'finall' | 'finally';
+FINISH:                 'fini' | 'finis' | 'finish';
+FOR:                    'for';
+FUNCTION:               'fu' | 'fun' | 'func' | 'funct' | 'functi' | 'functio' | 'function';
+IF:                     'if';
+IN:                     'in';
+RANGE:                  'range';
+RETURN:                 'return';
 THROW:                  'throw';
 SID:                    '<SID>';
 SNR:                    '<SNR>';
-AUTOCMD:                'au' | 'aut' | 'auto' | 'autoc' | 'autocm' | 'autocmd';
-AUGROUP:                'aug' | 'augr' | 'augro' | 'augrou' | 'augroup';
-END:                    'END';
+TRY:                    'try';
+WHILE:                  'wh' | 'whi' | 'whil' | 'while';
 
 // Commands
+// Keep in alphabetical order. Aim to use the name of the command as the name of the token, use underscores for clarity
+// (E.g. WRITE_ALL instead of WALL)
 ACTION:                 'action';
 ACTIONLIST:             'actionlist';
 ASCII:                  'as' | 'asc' | 'asci' | 'ascii';
@@ -629,71 +687,72 @@ CLEARJUMPS:             'cle' | 'clea' | 'clear' | 'clearj' | 'clearju' | 'clear
 CMD:                    'com' | 'comm' | 'comma' | 'comman' | 'command';
 CMD_CLEAR:              'comc' | 'comcl' | 'comcle' | 'comclea' | 'comclear';
 COPY:                   'co' | 'cop' | 'copy';
-DELCMD:                 'delc' | 'delco' | 'delcom' | 'delcomm' | 'delcomma' | 'delcomman' | 'delcommand';
-DELF:                   'delf' | 'delfu' | 'delfun' | 'delfunc'| 'delfunct' | 'delfuncti' | 'delfunctio' | 'delfunction';
-DEL_LINES:              'de' | 'del' | 'dele' | 'delet' | 'delete';
-DEL_MARKS:              'delm' | 'delma' | 'delmar' | 'delmark' | 'delmarks';
-DIGRAPH:                'dig' | 'digr' | 'digra' | 'digrap' | 'digraph' | 'digraphs';
-DUMP_LINE:              'dump' | 'dumpl' | 'dumpli' | 'dumplin' | 'dumpline';
+DELCOMMAND:             'delc' | 'delco' | 'delcom' | 'delcomm' | 'delcomma' | 'delcomman' | 'delcommand';
+DELETE:                 'de' | 'del' | 'dele' | 'delet' | 'delete';
+DELFUNCTION:            'delf' | 'delfu' | 'delfun' | 'delfunc'| 'delfunct' | 'delfuncti' | 'delfunctio' | 'delfunction';
+DELMARKS:               'delm' | 'delma' | 'delmar' | 'delmark' | 'delmarks';
+DIGRAPHS:               'dig' | 'digr' | 'digra' | 'digrap' | 'digraph' | 'digraphs';
+DUMPLINE:               'dump' | 'dumpl' | 'dumpli' | 'dumplin' | 'dumpline';
 ECHO:                   'ec' | 'ech' | 'echo';
 EDIT_FILE:              'bro' | 'brow' | 'brows' | 'browse' | 'ed' | 'edi' | 'edit';
+EXECUTE:                'exe' | 'exec' | 'execu' | 'execut' | 'execute';
 EXIT:                   'wqa' | 'wqal' | 'wqall' | 'qa' | 'qal' | 'qall' | 'xa' | 'xal' | 'xall' | 'quita' | 'quital' | 'quitall';
 FILE:                   'fi' | 'fil' | 'file';
 FIND:                   'fin' | 'find';
 GLOBAL:                 'gl' | 'glo' | 'glob' | 'globa' | 'global';
-GO_TO_CHAR:             'go' | 'got' | 'goto';
+GOTO:                   'go' | 'got' | 'goto';
 HELP:                   'he' | 'hel' | 'help';
 HISTORY:                'his' | 'hist' | 'histo' | 'histor' | 'history';
-JOIN_LINES:             'jo' | 'joi' | 'join';
+JOIN:                   'jo' | 'joi' | 'join';
 JUMPS:                  'ju' | 'jum' | 'jump' | 'jumps';
 LET:                    'let';
+LOCKVAR:                'lockv' | 'lockva' | 'lockvar';
+MARK:                   'ma' | 'mar' | 'mark';
 MARKS:                  'marks';
-MARK_COMMAND:           'ma' | 'mar' | 'mark';
 MOVE_TEXT:              'mo' | 'mov' | 'move';
 NEXT_FILE:              'ne' | 'nex' | 'next' | 'bn' | 'bne' | 'bnex' | 'bnext';
-NEXT_TAB:               'tabn' | 'tabne' | 'tabnex' | 'tabnext';
-NO_HL_SEARCH:           'noh' | 'nohl' | 'nohls' | 'nohlse' | 'nohlsea' | 'nohlsear' | 'nohlsearc' | 'nohlsearch';
+NOHLSEARCH:             'noh' | 'nohl' | 'nohls' | 'nohlse' | 'nohlsea' | 'nohlsear' | 'nohlsearc' | 'nohlsearch';
+NORMAL:                 'norm' | 'norma' | 'normal';
 ONLY:                   'on' | 'onl' | 'only';
 PACKADD:                'pa' | 'pac' | 'pack' | 'packa' | 'packad' | 'packadd';
 PLUG:                   'Plug' | 'Plugi' | 'Plugin';
 PREVIOUS_FILE:          'Ne' | 'Nex' | 'Next' | 'prev'| 'previ' | 'previo' | 'previou' | 'previous' | 'bp' | 'bpr' | 'bpre' |'bprev'| 'bprevi' | 'bprevio' | 'bpreviou' | 'bprevious';
-PREVIOUS_TAB:           'tabp' | 'tabpr' | 'tabpre' | 'tabprev' | 'tabprevi' | 'tabprevio' | 'tabpreviou' | 'tabprevious' | 'tabN' | 'tabNe' | 'tabNex' | 'tabNext';
 PRINT:                  'pr' | 'pri' | 'prin' | 'print' | 'Pr' | 'Pri' | 'Prin' | 'Print';
-PROMPT_FIND:            'pro' | 'prom' | 'promp' | 'prompt' | 'promptf' | 'promptfi' | 'promptfin' | 'promptfind';
+PROMPTFIND:             'pro' | 'prom' | 'promp' | 'prompt' | 'promptf' | 'promptfi' | 'promptfin' | 'promptfind';
 PROMPT_REPLACE:         'promptr' | 'promptre' | 'promptrep' | 'promptrepl';
-PUT_LINES:              'pu' | 'put';
+PUT:                    'pu' | 'put';
 QUIT:                   'qu' | 'qui' | 'quit' | 'clo' | 'clos' | 'close' | 'hid' | 'hide';
+READ:                   're' | 'rea' | 'read';
 REDO:                   'red' | 'redo';
 REGISTERS:              'di' | 'dis' | 'disp' | 'displ' | 'displa' | 'display' | 'reg' | 'regi' | 'regis' | 'regist' | 'registe' | 'register' | 'registers';
-SYMBOL:                 'sym' | 'symb' | 'symbo' | 'symbol';
-V_GLOBAL:               'vg' | 'vgl' | 'vglo' | 'vglob' | 'vgloba' | 'vglobal';
 SELECT_FILE:            'argu' | 'argum' | 'argume' | 'argumen' | 'argument';
 SELECT_FIRST_FILE:      'fir' | 'firs' | 'first';
 SELECT_LAST_FILE:       'la' | 'las' | 'last';
 SET:                    'se' | 'set';
 SETGLOBAL:              'setg' | 'setgl' | 'setglo' | 'setglob' | 'setgloba' | 'setglobal';
 SETLOCAL:               'setl' | 'setlo' | 'setloc' | 'setloca' | 'setlocal';
-SET_HANDLER:            'sethandler';
+SETHANDLER:             'sethandler';
 SHELL:                  'sh' | 'she' | 'shel' | 'shell';
 SORT:                   'sor' | 'sort';
-SPLIT:                  'sp' | 'spl' | 'spli' | 'split';
-V_SPLIT:                'vs' | 'vsp' | 'vspl' | 'vspli' | 'vsplit';
 SOURCE:                 'so' | 'sou' | 'sour' | 'sourc' | 'source';
+SPLIT:                  'sp' | 'spl' | 'spli' | 'split';
 SUBSTITUTE:             'su' | 'sub' | 'subs' | 'subst' | 'substi' | 'substit' | 'substitu' | 'substitut' | 'substitute';
-TAB_CLOSE:              'tabc' | 'tabcl' | 'tabclo' | 'tabclos' | 'tabclose';
-TAB_ONLY:               'tabo' | 'tabon' | 'tabonl' | 'tabonly';
+SYMBOL:                 'sym' | 'symb' | 'symbo' | 'symbol';
+TABCLOSE:               'tabc' | 'tabcl' | 'tabclo' | 'tabclos' | 'tabclose';
+TABMOVE:                'tabm' | 'tabmo' | 'tabmov' | 'tabmove';
+TABNEXT:                'tabn' | 'tabne' | 'tabnex' | 'tabnext';
+TABONLY:                'tabo' | 'tabon' | 'tabonl' | 'tabonly';
+TABPREVIOUS:            'tabp' | 'tabpr' | 'tabpre' | 'tabprev' | 'tabprevi' | 'tabprevio' | 'tabpreviou' | 'tabprevious' | 'tabN' | 'tabNe' | 'tabNex' | 'tabNext';
 UNDO:                   'un' | 'und' | 'undo';
-WRITE_ALL:              'wa' | 'wal' | 'wall';
+UNLOCKVAR:              'unlo' | 'unloc' | 'unlock' | 'unlockv' | 'unlockva' | 'unlockvar';
+VGLOBAL:                'vg' | 'vgl' | 'vglo' | 'vglob' | 'vgloba' | 'vglobal';
+VSPLIT:                 'vs' | 'vsp' | 'vspl' | 'vspli' | 'vsplit';
 WRITE:                  'wr' | 'wri' | 'writ' | 'write';
+WRITE_ALL:              'wa' | 'wal' | 'wall';
 WRITE_NEXT:             'wn' | 'wne' | 'wnex' | 'wnext';
 WRITE_PREVIOUS:         'wN' | 'wNe' | 'wNex' | 'wNext' | 'wp' | 'wpr' | 'wpre' | 'wprev' | 'wprevi' | 'wprevio' | 'wpreviou' | 'wprevious';
 WRITE_QUIT:             'wq' | 'exi' | 'exit' | 'xi' | 'xit';
-YANK_LINES:             'ya' | 'yan' | 'yank';
-MAP_CLEAR:              ('mapc' | 'nmapc' | 'vmapc' | 'xmapc' | 'smapc' | 'omapc' | 'imapc' | 'cmapc')
-                    |   (('mapc' | 'nmapc' | 'vmapc' | 'xmapc' | 'smapc' | 'omapc' | 'imapc' | 'cmapc') 'l')
-                    |   (('mapc' | 'nmapc' | 'vmapc' | 'xmapc' | 'smapc' | 'omapc' | 'imapc' | 'cmapc') 'le')
-                    |   (('mapc' | 'nmapc' | 'vmapc' | 'xmapc' | 'smapc' | 'omapc' | 'imapc' | 'cmapc') 'lea')
-                    |   (('mapc' | 'nmapc' | 'vmapc' | 'xmapc' | 'smapc' | 'omapc' | 'imapc' | 'cmapc') 'lear');
+YANK:                   'ya' | 'yan' | 'yank';
 MAP:                    'map'
                     |   'smap'
                     |   'nm' | 'vm' | 'xm' | 'om' | 'im' | 'cm'
@@ -707,16 +766,16 @@ MAP:                    'map'
                     |   (('no' | 'nno' | 'vno' | 'xno' | 'ono' | 'ino' | 'cno') 'rema')
                     |   (('no' | 'nno' | 'vno' | 'xno' | 'ono' | 'ino' | 'cno') 'remap')
                     |   ('snor' | 'snore' | 'snorem' | 'snorema' | 'snoremap');
+MAP_CLEAR:              ('mapc' | 'nmapc' | 'vmapc' | 'xmapc' | 'smapc' | 'omapc' | 'imapc' | 'cmapc')
+                    |   (('mapc' | 'nmapc' | 'vmapc' | 'xmapc' | 'smapc' | 'omapc' | 'imapc' | 'cmapc') 'l')
+                    |   (('mapc' | 'nmapc' | 'vmapc' | 'xmapc' | 'smapc' | 'omapc' | 'imapc' | 'cmapc') 'le')
+                    |   (('mapc' | 'nmapc' | 'vmapc' | 'xmapc' | 'smapc' | 'omapc' | 'imapc' | 'cmapc') 'lea')
+                    |   (('mapc' | 'nmapc' | 'vmapc' | 'xmapc' | 'smapc' | 'omapc' | 'imapc' | 'cmapc') 'lear');
 UNMAP:                  'unm' | 'nun' | 'vu' | 'xu' | 'sunm' | 'ou' | 'iu' | 'cu'
                     |   'vun' | 'xun' | 'oun' | 'iun' | 'cun'
                     |   'nunm' | 'vunm' | 'xunm' | 'ounm' | 'iunm' | 'cunm'
                     |   'unma' | 'nunma' | 'vunma' | 'xunma' | 'sunma' | 'ounma' | 'iunma' | 'cunma'
                     |   'unmap' | 'nunmap' | 'vunmap' | 'xunmap' | 'sunmap' | 'ounmap' | 'iunmap' | 'cunmap';
-EXECUTE:                'exe' | 'exec' | 'execu' | 'execut' | 'execute';
-LOCKVAR:                'lockv' | 'lockva' | 'lockvar';
-UNLOCKVAR:              'unlo' | 'unloc' | 'unlock' | 'unlockv' | 'unlockva' | 'unlockvar';
-NORMAL:                 'norm' | 'norma' | 'normal';
-TABMOVE:                'tabm' | 'tabmo' | 'tabmov' | 'tabmove';
 
 // Types
 DIGIT:                  [0-9];
@@ -732,6 +791,14 @@ QUOTE:                  '"';
 SINGLE_QUOTE:           '\'';
 ESCAPED_SINGLE_QUOTE:   '\'\'';
 ESCAPED_DOUBLE_QUOTE:   '\\"';
+
+// Alphabetic relational operators - defined before identifiers to avoid being tokenized as identifiers
+IS:                     'is';
+IS_IC:                  'is?';
+IS_CS:                  'is#';
+IS_NOT:                 'isnot';
+IS_NOT_IC:              'isnot?';
+IS_NOT_CS:              'isnot#';
 
 // Identifiers
 IDENTIFIER_LOWERCASE:   [a-z]+;
@@ -773,9 +840,6 @@ DIV:                    '/';
 MOD:                    '%';
 DOT:                    '.';
 
-// Logical operators
-LOGICAL_OR:             '||';
-
 // Relation operators
 LESS:                   '<';
 LESS_IC:                '<?';
@@ -801,12 +865,6 @@ MATCHES_CS:             '=~#';
 NOT_MATCHES:            '!~';
 NOT_MATCHES_IC:         '!~?';
 NOT_MATCHES_CS:         '!~#';
-IS:                     'is';
-IS_IC:                  'is?';
-IS_CS:                  'is#';
-IS_NOT:                 'isnot';
-IS_NOT_IC:              'isnot?';
-IS_NOT_CS:              'isnot#';
 
 
 // Assignment operators

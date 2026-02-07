@@ -1,5 +1,6 @@
 package _Self.buildTypes
 
+import _Self.AgentSize
 import _Self.Constants.LONG_RUNNING_TESTS
 import _Self.IdeaVimBuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
@@ -10,6 +11,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
 object LongRunning : IdeaVimBuildType({
   name = "Long running tests"
+  description = "Running long-duration tests that are too slow for regular CI runs"
   params {
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
     param("env.ORG_GRADLE_PROJECT_ideaVersion", LONG_RUNNING_TESTS)
@@ -25,9 +27,11 @@ object LongRunning : IdeaVimBuildType({
 
   steps {
     gradle {
-      tasks = "clean :tests:long-running-tests:test"
+      clearConditions()
+      tasks = ":tests:long-running-tests:test"
       buildFile = ""
       enableStacktrace = true
+      gradleParams = "--build-cache --configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
   }
@@ -43,5 +47,10 @@ object LongRunning : IdeaVimBuildType({
         hour = 5
       }
     }
+  }
+
+  requirements {
+    equals("teamcity.agent.hardware.cpuCount", AgentSize.MEDIUM)
+    equals("teamcity.agent.os.family", "Linux")
   }
 })

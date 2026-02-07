@@ -55,7 +55,7 @@ class WidgetState : ApplicationUsagesCollector() {
   }
 
   companion object {
-    private val GROUP = EventLogGroup("vim.widget", 1, "FUS")
+    private val GROUP = EventLogGroup("vim.widget", 1, "FUS", "Group: Information about the Mode Widget")
 
     private val IS_MODE_WIDGET_SHOWN = EventFields.Boolean("is-mode-widget-shown")
     private val MODE_WIDGET_THEME_LIGHT =
@@ -65,6 +65,7 @@ class WidgetState : ApplicationUsagesCollector() {
 
     private val WIDGET: VarargEventId = GROUP.registerVarargEvent(
       "vim.widget",
+      "Information about the Mode Widget",
       IS_MODE_WIDGET_SHOWN,
       MODE_WIDGET_THEME_LIGHT,
       MODE_WIDGET_THEME_DARK,

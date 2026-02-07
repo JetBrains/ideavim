@@ -1,5 +1,6 @@
 package _Self.buildTypes
 
+import _Self.AgentSize
 import _Self.Constants.EAP_CHANNEL
 import _Self.Constants.RELEASE_EAP
 import _Self.IdeaVimBuildType
@@ -29,11 +30,11 @@ object ReleaseEap : IdeaVimBuildType({
     password(
       "env.ORG_GRADLE_PROJECT_slackUrl",
       "credentialsJSON:a8ab8150-e6f8-4eaf-987c-bcd65eac50b5",
-      label = "Slack Token"
+      label = "Slack URL"
     )
     password(
-      "env.YOUTRACK_TOKEN",
-      "credentialsJSON:2479995b-7b60-4fbb-b095-f0bafae7f622",
+      "env.ORG_GRADLE_PROJECT_youtrackToken",
+      "credentialsJSON:eedfa0eb-c329-462a-b7b4-bc263bda8c01",
       display = ParameterDisplay.HIDDEN
     )
   }
@@ -57,21 +58,25 @@ object ReleaseEap : IdeaVimBuildType({
     gradle {
       name = "Calculate new eap version"
       tasks = "scripts:calculateNewEapVersion"
+      gradleParams = "--build-cache --configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
     gradle {
       name = "Set TeamCity build number"
       tasks = "scripts:setTeamCityBuildNumber"
+      gradleParams = "--build-cache --configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
     gradle {
       name = "Add release tag"
       tasks = "scripts:addReleaseTag"
+      gradleParams = "--build-cache --configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
     gradle {
       name = "Publish plugin"
       tasks = "publishPlugin"
+      gradleParams = "--build-cache --configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
     script {
@@ -90,6 +95,7 @@ object ReleaseEap : IdeaVimBuildType({
     gradle {
       name = "YouTrack post release actions"
       tasks = "scripts:eapReleaseActions"
+      gradleParams = "--build-cache --configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
   }
@@ -113,10 +119,7 @@ object ReleaseEap : IdeaVimBuildType({
   }
 
   requirements {
-    // These requirements define Linux-XLarge configuration.
-    // Unfortunately, requirement by name (teamcity.agent.name) doesn't work
-    //   IDK the reason for it, but on our agents this property is empty
-//    equals("teamcity.agent.hardware.cpuCount", "16")
-//    equals("teamcity.agent.os.family", "Linux")
+    equals("teamcity.agent.hardware.cpuCount", AgentSize.XLARGE)
+    equals("teamcity.agent.os.family", "Linux")
   }
 })

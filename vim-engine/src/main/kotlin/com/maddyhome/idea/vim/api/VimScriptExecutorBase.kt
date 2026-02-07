@@ -103,8 +103,13 @@ abstract class VimScriptExecutorBase : VimscriptExecutor {
       }
       ensureFileIsSaved(file)
       execute(file.readText(), editor, context, skipHistory = true, indicateErrors)
-    } catch (ignored: IOException) {
-      logger.error(ignored.toString())
+    } catch (e: IOException) {
+      if (indicateErrors) {
+        injector.messages.showStatusBarMessage(editor, "Cannot read file \"${file.path}\": ${e.message}")
+        injector.messages.indicateError()
+      } else {
+        logger.warn("Failed to read file ${file.path}: ${e.message}")
+      }
     } finally {
       if (fileIsIdeaVimRcConfig) {
         injector.vimrcFileState.saveFileState(file.absolutePath)

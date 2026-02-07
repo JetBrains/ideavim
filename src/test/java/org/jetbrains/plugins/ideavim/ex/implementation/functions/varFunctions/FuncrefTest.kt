@@ -13,12 +13,10 @@ import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
-class FuncrefTest : VimTestCase() {
-
+class FuncrefTest : VimTestCase("\n") {
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
   @Test
   fun `test funcref for built-in function`() {
-    configureByText("\n")
     typeText(commandToKeys("let Ff = funcref('abs')"))
     assertPluginError(true)
     assertPluginErrorMessage("E700: Unknown function: abs")
@@ -26,7 +24,6 @@ class FuncrefTest : VimTestCase() {
 
   @Test
   fun `test funcref with arglist`() {
-    configureByText("\n")
     typeText(
       commandToKeys(
         """
@@ -49,7 +46,6 @@ class FuncrefTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
   @Test
   fun `test funcref for unknown function`() {
-    configureByText("\n")
     typeText(commandToKeys("let Ff = funcref('Unknown')"))
     assertPluginError(true)
     assertPluginErrorMessage("E700: Unknown function: Unknown")
@@ -58,7 +54,6 @@ class FuncrefTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
   @Test
   fun `test funcref with wrong function name`() {
-    configureByText("\n")
     typeText(commandToKeys("let Ff = funcref(32)"))
     assertPluginError(true)
     assertPluginErrorMessage("E129: Function name required")
@@ -67,7 +62,6 @@ class FuncrefTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
   @Test
   fun `test funcref with wrong second argument`() {
-    configureByText("\n")
     typeText(
       commandToKeys(
         """
@@ -87,7 +81,6 @@ class FuncrefTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
   @Test
   fun `test funcref with wrong third argument`() {
-    configureByText("\n")
     typeText(
       commandToKeys(
         """
@@ -99,14 +92,32 @@ class FuncrefTest : VimTestCase() {
     )
     typeText(commandToKeys("let Ff = funcref('Abs', [], 40)"))
     assertPluginError(true)
-    assertPluginErrorMessage("E922: Expected a dict")
+    assertPluginErrorMessage("E1206: Dictionary required for argument 3")
 
     typeText(commandToKeys("delfunction! Abs"))
   }
 
   @Test
+  fun `test funcref with arglist and dictionary`() {
+    typeText(
+      commandToKeys(
+        """
+      function! PrintSum(x) dict |
+        return a:x + self['offset'] |
+      endfunction
+        """.trimIndent(),
+      ),
+    )
+    typeText(commandToKeys("let d = {'offset': 100}"))
+    typeText(commandToKeys("let Ff = funcref('PrintSum', [42], d)"))
+    typeText(commandToKeys("echo Ff()"))
+    assertExOutput("142")
+
+    typeText(commandToKeys("delfunction! PrintSum"))
+  }
+
+  @Test
   fun `test redefining a function`() {
-    configureByText("\n")
     typeText(
       commandToKeys(
         """
@@ -138,7 +149,6 @@ class FuncrefTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
   @Test
   fun `test deleting function`() {
-    configureByText("\n")
     typeText(
       commandToKeys(
         """

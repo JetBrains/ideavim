@@ -14,7 +14,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
 class InsertBackspaceActionTest : VimTestCase() {
-  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @TestWithoutNeovim(SkipNeovimReason.NEOVIM_RPC_SPECIAL_KEYS_INSERT_MODE)
   @Test
   fun `test insert backspace`() {
     val before = "I fo${c}und it in a legendary land"

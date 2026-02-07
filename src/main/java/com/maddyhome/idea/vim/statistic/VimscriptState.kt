@@ -16,6 +16,7 @@ import com.intellij.internal.statistic.service.fus.collectors.ApplicationUsagesC
 import com.maddyhome.idea.vim.newapi.initInjector
 import com.maddyhome.idea.vim.statistic.PluginState.Util.extensionNames
 import com.maddyhome.idea.vim.vimscript.services.VimRcService
+import java.util.concurrent.ConcurrentHashMap
 
 internal class VimscriptState : ApplicationUsagesCollector() {
 
@@ -44,20 +45,26 @@ internal class VimscriptState : ApplicationUsagesCollector() {
   }
 
   object Util {
-    val sourcedFiles = HashSet<String>()
-    val extensionsEnabledWithPlug = HashSet<String>()
+    val sourcedFiles = ConcurrentHashMap.newKeySet<String>()
+    val extensionsEnabledWithPlug = ConcurrentHashMap.newKeySet<String>()
 
+    @Volatile
     var isIDESpecificConfigurationUsed = false
+    @Volatile
     var isLoopUsed = false
+    @Volatile
     var isIfUsed = false
+    @Volatile
     var isMapExprUsed = false
+    @Volatile
     var isFunctionDeclarationUsed = false
+    @Volatile
     var isFunctionCallUsed = false
   }
 
 }
 
-private val GROUP = EventLogGroup("vim.vimscript", 1)
+private val GROUP = EventLogGroup("vim.vimscript", 1, "FUS", "Group: Information about Vimscript usage")
 private val SOURCED_FILES = EventFields.RoundedInt("number_of_sourced_files")
 private val IDEAVIMRC_SIZE = EventFields.RoundedInt("ideavimrc_size")
 private val EXTENSIONS_ENABLED_BY_SET = EventFields.StringList("extensions_enabled_by_set", extensionNames)
@@ -71,6 +78,7 @@ private val IS_FUNCTION_CALL_USED = EventFields.Boolean("is_function_call_used")
 
 private val VIMSCRIPT: VarargEventId = GROUP.registerVarargEvent(
   "vim.vimscript",
+  "Information about Vimscript usage",
   SOURCED_FILES,
   IDEAVIMRC_SIZE,
   EXTENSIONS_ENABLED_BY_SET,

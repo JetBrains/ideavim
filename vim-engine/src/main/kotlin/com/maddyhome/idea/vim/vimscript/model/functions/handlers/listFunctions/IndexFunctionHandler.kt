@@ -12,31 +12,25 @@ import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.functions.BuiltinFunctionHandler
 
 @VimscriptFunction(name = "index")
-internal class IndexFunctionHandler : FunctionHandler() {
-  override val minimumNumberOfArguments = 2
-  override val maximumNumberOfArguments = 4
-
+internal class IndexFunctionHandler : BuiltinFunctionHandler<VimInt>(minArity = 2, maxArity = 4) {
   override fun doFunction(
-    argumentValues: List<Expression>,
+    arguments: Arguments,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
-  ): VimDataType {
-    val obj = argumentValues[0].evaluate(editor, context, vimContext)
-    val expr = argumentValues[1].evaluate(editor, context, vimContext)
-    val start = argumentValues.getOrNull(2)?.evaluate(editor, context, vimContext)?.toVimNumber()?.value ?: 0
-    val ic = argumentValues.getOrNull(3)?.evaluate(editor, context, vimContext)?.toVimNumber()?.value != 0
+  ): VimInt {
+    val obj = arguments[0]
+    val expr = arguments[1]
+    val start = arguments.getNumberOrNull(2)?.value ?: 0
+    val ic = arguments.getNumberOrNull(3)?.booleanValue ?: false
 
     if (obj !is VimList) {
-      return VimInt(-1)
+      return VimInt.MINUS_ONE
     }
 
     val startIndex = if (start < 0) {
@@ -47,26 +41,11 @@ internal class IndexFunctionHandler : FunctionHandler() {
 
     for (i in startIndex until obj.values.size) {
       val item = obj.values[i]
-      if (compareValues(item, expr, ic)) {
+      if (item.valueEquals(expr, ic)) {
         return VimInt(i)
       }
     }
 
-    return VimInt(-1)
-  }
-
-  private fun compareValues(item: VimDataType, expr: VimDataType, ignoreCase: Boolean): Boolean {
-    return if (ignoreCase && item is VimString && expr is VimString) {
-      item.value.equals(expr.toVimString().value, ignoreCase = true)
-    } else {
-      // Direct comparison - no automatic conversion
-      // String "4" is different from Number 4
-      when {
-        item is VimInt && expr is VimInt -> item.value == expr.value
-        item is VimString && expr is VimString -> item.value == expr.value
-        item.javaClass == expr.javaClass -> item == expr
-        else -> false
-      }
-    }
+    return VimInt.MINUS_ONE
   }
 }

@@ -775,8 +775,43 @@ class VimRegex(pattern: String) {
       TODO("Not yet implemented")
     }
 
-    override fun getFoldRegionAtOffset(offset: Int): VimFoldRegion? {
+    override fun getCollapsedFoldRegionAtOffset(offset: Int): VimFoldRegion? {
       return null
+    }
+
+    override fun getFoldRegionsAtOffset(offset: Int): List<VimFoldRegion> {
+      return listOf()
+    }
+
+    override fun getFoldRegionAtLine(line: Int): VimFoldRegion? {
+      return null
+    }
+
+    override fun getAllFoldRegions(): List<VimFoldRegion> {
+      return emptyList()
+    }
+
+    override fun applyFoldLevel(foldLevel: Int) {
+    }
+
+    override fun getMaxFoldDepth(): Int {
+      return 0
+    }
+
+    override fun createFoldRegion(
+      startOffset: Int,
+      endOffset: Int,
+      collapse: Boolean,
+    ): VimFoldRegion? {
+      return null
+    }
+
+    override fun deleteFoldRegionAtOffset(offset: Int): Boolean {
+      return false
+    }
+
+    override fun deleteFoldRegionsRecursivelyAtOffset(offset: Int): Boolean {
+      return false
     }
 
     override fun <T : ImmutableVimCaret> findLastVersionOfCaret(caret: T): T? {
