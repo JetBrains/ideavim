@@ -40,6 +40,7 @@ sealed class MappingOwner {
   /**
    * Mappings registered from plugins
    */
+  @ConsistentCopyVisibility
   @Suppress("DataClassPrivateConstructor")
   data class Plugin private constructor(val name: String) : MappingOwner() {
     companion object {

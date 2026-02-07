@@ -38,6 +38,7 @@ import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.execute
 import com.maddyhome.idea.vim.newapi.globalIjOptions
+import com.maddyhome.idea.vim.newapi.ij
 import java.io.File
 import java.util.*
 
@@ -46,7 +47,7 @@ class FileGroup : VimFileBase() {
     if (logger.isDebugEnabled) {
       logger.debug("openFile($filename)")
     }
-    val project = PlatformDataKeys.PROJECT.getData((context as IjEditorExecutionContext).context)
+    val project = context.ij.getData(PlatformDataKeys.PROJECT)
       ?: return false // API change - don't merge
 
     val found = findFile(filename, project)
@@ -123,7 +124,7 @@ class FileGroup : VimFileBase() {
    * Closes the current editor.
    */
   override fun closeFile(editor: VimEditor, context: ExecutionContext) {
-    val project = PlatformDataKeys.PROJECT.getData((context.context as DataContext))
+    val project = context.ij.getData(PlatformDataKeys.PROJECT)
     if (project != null) {
       val fileEditorManager = FileEditorManagerEx.getInstanceEx(project)
       val window = fileEditorManager.currentWindow
@@ -149,7 +150,7 @@ class FileGroup : VimFileBase() {
    * Closes editor.
    */
   override fun closeFile(number: Int, context: ExecutionContext) {
-    val project = PlatformDataKeys.PROJECT.getData((context as IjEditorExecutionContext).context) ?: return
+    val project = context.ij.getData(PlatformDataKeys.PROJECT) ?: return
     val fileEditorManager = FileEditorManagerEx.getInstanceEx(project)
     val window = fileEditorManager.currentWindow
     val editors = fileEditorManager.openFiles
@@ -188,10 +189,10 @@ class FileGroup : VimFileBase() {
    */
   override fun selectFile(count: Int, context: ExecutionContext): Boolean {
     var count = count
-    val project = PlatformDataKeys.PROJECT.getData((context as IjEditorExecutionContext).context) ?: return false
+    val project = context.ij.getData(PlatformDataKeys.PROJECT) ?: return false
     val fem = FileEditorManager.getInstance(project) // API change - don't merge
     val editors = fem.openFiles
-    if (count == 99) {
+    if (count == 999) {
       count = editors.size - 1
     }
     if (count < 0 || count >= editors.size) {
@@ -207,10 +208,10 @@ class FileGroup : VimFileBase() {
    * Selects then next or previous editor.
    */
   override fun selectNextFile(count: Int, context: ExecutionContext) {
-    val project = PlatformDataKeys.PROJECT.getData((context as IjEditorExecutionContext).context) ?: return
+    val project = context.ij.getData(PlatformDataKeys.PROJECT) ?: return
     val fem = FileEditorManager.getInstance(project) // API change - don't merge
     val editors = fem.openFiles
-    val current = fem.selectedFiles[0]
+    val current = fem.selectedFiles.firstOrNull() ?: return
     for (i in editors.indices) {
       if (editors[i] == current) {
         val pos = (i + (count % editors.size) + editors.size) % editors.size
@@ -224,7 +225,7 @@ class FileGroup : VimFileBase() {
    * Selects previous editor tab.
    */
   override fun selectPreviousTab(context: ExecutionContext) {
-    val project = PlatformDataKeys.PROJECT.getData((context.context as DataContext)) ?: return
+    val project = context.ij.getData(PlatformDataKeys.PROJECT) ?: return
     val vf = getInstance(project).lastTab
     if (vf != null && vf.isValid) {
       FileEditorManager.getInstance(project).openFile(vf, true)
@@ -293,7 +294,7 @@ class FileGroup : VimFileBase() {
 
     val lline = editor.caretModel.logicalPosition.line
     val total = IjVimEditor(editor).lineCount()
-    val pct = (lline.toFloat() / total.toFloat() * 100f + 0.5).toInt()
+    val pct = if (total > 0) (lline.toFloat() / total.toFloat() * 100f + 0.5).toInt() else 0
 
     msg.append("line ").append(lline + 1).append(" of ").append(total)
     msg.append(" --").append(pct).append("%-- ")

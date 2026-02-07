@@ -643,7 +643,7 @@ private class FileEncodingOptionMapper : LocalOptionValueOverride<VimString> {
 
     val project = editor.ij.project ?: ProjectLocator.getInstance().guessProjectForFile(virtualFile)
     return ChangeFileEncodingAction.changeTo(
-      Objects.requireNonNull<Project?>(project),
+      project!!,
       document,
       editor.ij,
       virtualFile,
