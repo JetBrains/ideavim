@@ -172,7 +172,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     val text = editor.text()
     if (text.isEmpty()) return null
 
-    val start = if (!KeywordOptionHelper.isFilename(editor, text[offset])) {
+    val start = if (offset >= text.length || !KeywordOptionHelper.isFilename(editor, text[offset])) {
       moveForwardsToStartOfFilename(editor, text, offset)
     } else {
       moveBackwardsToStartOfFilename(editor, text, offset)
