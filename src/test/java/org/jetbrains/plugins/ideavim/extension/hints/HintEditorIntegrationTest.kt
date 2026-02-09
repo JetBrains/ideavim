@@ -13,8 +13,10 @@ import com.intellij.openapi.editor.ex.EditorEx
 import com.maddyhome.idea.vim.extension.hints.HintGenerator
 import com.maddyhome.idea.vim.extension.hints.HintLabelPosition
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Assumptions.assumeFalse
 import org.junit.jupiter.api.Test
 import java.awt.Container
+import java.awt.GraphicsEnvironment
 import javax.swing.JFrame
 import javax.swing.JPanel
 import javax.swing.JScrollPane
@@ -28,6 +30,7 @@ class HintEditorIntegrationTest : VimTestCase() {
 
   @Test
   fun `test generate from editor in frame`() {
+    assumeFalse(GraphicsEnvironment.isHeadless(), "Test requires a graphical environment")
     configureByText("Hello World\nLine 2\nLine 3")
 
     ApplicationManager.getApplication().invokeAndWait {
@@ -47,6 +50,7 @@ class HintEditorIntegrationTest : VimTestCase() {
 
   @Test
   fun `test editor scroll pane gets center label position`() {
+    assumeFalse(GraphicsEnvironment.isHeadless(), "Test requires a graphical environment")
     configureByText("Hello World")
 
     ApplicationManager.getApplication().invokeAndWait {
