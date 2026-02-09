@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.extension.hints
 
+import com.intellij.openapi.options.newEditor.ConfigurableEditor
 import com.intellij.openapi.wm.impl.content.ContentTabLabel
 import com.intellij.openapi.wm.impl.status.TextPanel
 import com.intellij.ui.components.JBTextField
@@ -83,13 +84,14 @@ internal class HintGenerator(private val alphabet: List<Char>) {
     component: Accessible,
     location: Point,
     depth: Int = 0,
+    insideConfigurableEditor: Boolean = false,
   ) {
     val context = component.accessibleContext
     val accessible = context.accessibleComponent ?: return
     val currentLocation = location + (accessible.location ?: return)
     val size = accessible.size ?: return
 
-    if (isVisible(component, accessible) && isInteractive(component)) {
+    if (isVisible(component, accessible) && isInteractive(component, insideConfigurableEditor)) {
       addTarget(targets, component, currentLocation, size, depth)
     }
 
@@ -98,13 +100,14 @@ internal class HintGenerator(private val alphabet: List<Char>) {
     }
 
     // Trees are skipped as they contain a lot of elements and would generate too many hints.
-    // A similar situation is with vertical scroll panes (e.g. editors). but not horizontal.
-    // This is a heuristic that I observed that horizontal scroll doesn't have many elements and doesn't have any keyboard navigation.
-    if (component is Tree || isVerticalScrollPane(component)) return
+    // A similar situation is with vertical scroll panes (e.g. editors), but not horizontal.
+    // Exception: inside ConfigurableEditor that has a more complex view that we want to navigate with the keyboard.
+    if (component is Tree || (!insideConfigurableEditor && isVerticalScrollPane(component))) return
 
+    val childInsideConfigurableEditor = insideConfigurableEditor || component is ConfigurableEditor
     for (i in 0..<context.accessibleChildrenCount) {
       val child = context.getAccessibleChild(i) ?: continue
-      collectTargets(targets, child, currentLocation, depth + 1)
+      collectTargets(targets, child, currentLocation, depth + 1, childInsideConfigurableEditor)
     }
   }
 
@@ -159,13 +162,13 @@ internal class HintGenerator(private val alphabet: List<Char>) {
     return (component as? Component)?.isActuallyVisible() != false
   }
 
-  private fun isInteractive(component: Accessible): Boolean =
+  private fun isInteractive(component: Accessible, insideConfigurableEditor: Boolean): Boolean =
     component.isClickable() ||
       component is ContentTabLabel ||
       component is Tree ||
       isTextPanel(component) ||
       component is JTextComponent ||
-      isVerticalScrollPane(component)
+      (!insideConfigurableEditor && isVerticalScrollPane(component))
 }
 
 private class TabAccessible(val tabbedPane: JTabbedPane, val tabIndex: Int) : Accessible {
