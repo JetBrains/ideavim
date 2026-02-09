@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.extension.hints
 
 import com.intellij.openapi.wm.impl.content.ContentTabLabel
+import com.intellij.openapi.wm.impl.status.IdeStatusBarImpl
 import com.intellij.openapi.wm.impl.status.TextPanel
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.treeStructure.Tree
@@ -83,6 +84,7 @@ internal class HintGenerator(private val alphabet: List<Char>) {
     component: Accessible,
     location: Point,
     depth: Int = 0,
+    insideStatusBar: Boolean = false,
   ) {
     val context = component.accessibleContext
     val accessible = context.accessibleComponent ?: return
@@ -97,11 +99,16 @@ internal class HintGenerator(private val alphabet: List<Char>) {
       collectTabTargets(targets, component, currentLocation, depth)
     }
 
-    if (component is Tree || isEditorScrollPane(component)) return
+    /*
+      We are skipping Tree and scroll panes inside status bar as they would be a performance problem.
+      Exception is when we are inside the status bar where we want to apply hints on individual components.
+     */
+    if (component is Tree || (!insideStatusBar && isScrollPane(component))) return
 
+    val childInsideStatusBar = insideStatusBar || component is IdeStatusBarImpl
     for (i in 0..<context.accessibleChildrenCount) {
       val child = context.getAccessibleChild(i) ?: continue
-      collectTargets(targets, child, currentLocation, depth + 1)
+      collectTargets(targets, child, currentLocation, depth + 1, childInsideStatusBar)
     }
   }
 
@@ -115,8 +122,8 @@ internal class HintGenerator(private val alphabet: List<Char>) {
     val existing = targets[component]
     if (existing != null && existing.depth <= depth) return
     val target = HintTarget(component, location, size, depth)
-    target.action = resolveAction(component, isEditorScrollPane(component))
-    if (isEditorScrollPane(component) || component is Tree) target.labelPosition = HintLabelPosition.CENTER
+    target.action = resolveAction(component, isScrollPane(component))
+    if (isScrollPane(component) || component is Tree) target.labelPosition = HintLabelPosition.CENTER
     targets[component] = target
   }
 
@@ -143,7 +150,9 @@ internal class HintGenerator(private val alphabet: List<Char>) {
     else -> HintTarget::clickCenter
   }
 
-  private fun isEditorScrollPane(component: Accessible): Boolean = component is JScrollPane
+  private fun isScrollPane(component: Accessible): Boolean =
+    component is JScrollPane
+
 
   private fun isTextPanel(component: Accessible): Boolean =
     component is TextPanel || component is JBTextField
@@ -160,7 +169,7 @@ internal class HintGenerator(private val alphabet: List<Char>) {
       component is Tree ||
       isTextPanel(component) ||
       component is JTextComponent ||
-      isEditorScrollPane(component)
+      isScrollPane(component)
 }
 
 private class TabAccessible(val tabbedPane: JTabbedPane, val tabIndex: Int) : Accessible {
