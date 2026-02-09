@@ -23,6 +23,7 @@ import javax.swing.JScrollPane
 import javax.swing.JTabbedPane
 import javax.swing.SwingUtilities
 import javax.swing.text.JTextComponent
+import kotlin.math.max
 
 internal sealed class HintGenerator {
   private var hints: Map<Accessible, String> = emptyMap()
@@ -47,9 +48,9 @@ internal sealed class HintGenerator {
      * @param preserve Whether to preserve the previous hints if possible
      */
     private fun generate(targets: List<HintTarget>, preserve: Boolean) {
-      val length = generateSequence(1) { it * alphabet.size }.takeWhile {
+      val length = max(generateSequence(1) { it * alphabet.size }.takeWhile {
         it < targets.size + if (preserve) previousHints.size else 0
-      }.count()
+      }.count(), 1)
       val hintIterator = alphabet.permutations(length).map { it.joinToString("") }.iterator()
       targets.forEach { target ->
         target.hint = if (preserve) {
