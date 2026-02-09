@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.extension.hints
 
-import com.intellij.openapi.editor.impl.EditorComponentImpl
 import com.intellij.openapi.wm.impl.content.ContentTabLabel
 import com.intellij.openapi.wm.impl.status.TextPanel
 import com.intellij.ui.components.JBTextField
@@ -89,17 +88,16 @@ internal class HintGenerator(private val alphabet: List<Char>) {
     val accessible = context.accessibleComponent ?: return
     val currentLocation = location + (accessible.location ?: return)
     val size = accessible.size ?: return
-    val editorScrollPane = isEditorScrollPane(component)
 
-    if (isVisible(component, accessible) && isInteractive(component, editorScrollPane)) {
-      addTarget(targets, component, currentLocation, size, depth, editorScrollPane)
+    if (isVisible(component, accessible) && isInteractive(component)) {
+      addTarget(targets, component, currentLocation, size, depth)
     }
 
     if (component is JTabbedPane) {
       collectTabTargets(targets, component, currentLocation, depth)
     }
 
-    if (component is Tree || editorScrollPane) return
+    if (component is Tree || isEditorScrollPane(component)) return
 
     for (i in 0..<context.accessibleChildrenCount) {
       val child = context.getAccessibleChild(i) ?: continue
@@ -113,13 +111,12 @@ internal class HintGenerator(private val alphabet: List<Char>) {
     location: Point,
     size: Dimension,
     depth: Int,
-    editorScrollPane: Boolean,
   ) {
     val existing = targets[component]
     if (existing != null && existing.depth <= depth) return
     val target = HintTarget(component, location, size, depth)
-    target.action = resolveAction(component, editorScrollPane)
-    if (editorScrollPane || component is Tree) target.labelPosition = HintLabelPosition.CENTER
+    target.action = resolveAction(component, isEditorScrollPane(component))
+    if (isEditorScrollPane(component) || component is Tree) target.labelPosition = HintLabelPosition.CENTER
     targets[component] = target
   }
 
@@ -146,8 +143,7 @@ internal class HintGenerator(private val alphabet: List<Char>) {
     else -> HintTarget::clickCenter
   }
 
-  private fun isEditorScrollPane(component: Accessible): Boolean =
-    component is JScrollPane && component.viewport?.view is EditorComponentImpl
+  private fun isEditorScrollPane(component: Accessible): Boolean = component is JScrollPane
 
   private fun isTextPanel(component: Accessible): Boolean =
     component is TextPanel || component is JBTextField
@@ -158,13 +154,13 @@ internal class HintGenerator(private val alphabet: List<Char>) {
     return (component as? Component)?.isActuallyVisible() != false
   }
 
-  private fun isInteractive(component: Accessible, editorScrollPane: Boolean): Boolean =
+  private fun isInteractive(component: Accessible): Boolean =
     component.isClickable() ||
       component is ContentTabLabel ||
       component is Tree ||
       isTextPanel(component) ||
       component is JTextComponent ||
-      editorScrollPane
+      isEditorScrollPane(component)
 }
 
 private class TabAccessible(val tabbedPane: JTabbedPane, val tabIndex: Int) : Accessible {
