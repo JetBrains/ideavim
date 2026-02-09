@@ -10,7 +10,9 @@ package org.jetbrains.plugins.ideavim.extension.hints
 
 import com.maddyhome.idea.vim.extension.hints.HintGenerator
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.jupiter.api.Assumptions.assumeFalse
 import org.junit.jupiter.api.Test
+import java.awt.GraphicsEnvironment
 import javax.swing.JButton
 import javax.swing.JFrame
 import javax.swing.JPanel
@@ -42,6 +44,7 @@ class HintPreservationTest : VimTestCase() {
 
   @Test
   fun `test hints preserved when new component is added`() {
+    assumeFalse(GraphicsEnvironment.isHeadless(), "Test requires a graphical environment")
     val button1 = JButton("A").apply { setBounds(10, 10, 100, 30) }
     val button2 = JButton("B").apply { setBounds(10, 50, 100, 30) }
     val contentPane = JPanel(null)
@@ -76,6 +79,7 @@ class HintPreservationTest : VimTestCase() {
   }
 
   private fun <T> withTestFrame(vararg children: javax.swing.JComponent, action: (JFrame) -> T): T {
+    assumeFalse(GraphicsEnvironment.isHeadless(), "Test requires a graphical environment")
     val panel = JPanel(null)
     for (child in children) panel.add(child)
     val frame = JFrame().apply {
