@@ -38,8 +38,9 @@ internal data class HintTarget(val component: Accessible, val location: Point, v
   fun createCover(containerSize: Dimension) = JPanel(null).apply {
     isOpaque = false
     val pill = RoundedHintLabel(hint)
-    bounds = coverBounds(pill.preferredSize, containerSize)
-    pill.bounds = pillBounds(pill.preferredSize, bounds.size)
+    val cover = coverBounds(pill.preferredSize, containerSize)
+    bounds = cover
+    pill.bounds = pillBounds(pill.preferredSize, cover, containerSize)
     add(pill)
   }
 
@@ -58,17 +59,24 @@ internal data class HintTarget(val component: Accessible, val location: Point, v
 
   /**
    * Position the pill within the cover panel according to [labelPosition].
-   * TOP_LEFT_CORNER anchors at (0, 0); CENTER places it in the middle.
+   * TOP_LEFT_CORNER anchors at (0, 0); CENTER places it over the visible
+   * part of the component (the intersection of its bounds with the container).
    */
-  private fun pillBounds(pillSize: Dimension, coverSize: Dimension): Rectangle = when (labelPosition) {
-    HintLabelPosition.TOP_LEFT_CORNER -> Rectangle(0, 0, pillSize.width, pillSize.height)
-    HintLabelPosition.CENTER -> Rectangle(
-      (coverSize.width - pillSize.width) / 2,
-      (coverSize.height - pillSize.height) / 2,
-      pillSize.width,
-      pillSize.height,
-    )
-  }
+  private fun pillBounds(pillSize: Dimension, coverBounds: Rectangle, containerSize: Dimension): Rectangle =
+    when (labelPosition) {
+      HintLabelPosition.TOP_LEFT_CORNER -> Rectangle(0, 0, pillSize.width, pillSize.height)
+      HintLabelPosition.CENTER -> {
+        val visible = bounds.intersection(Rectangle(containerSize))
+        val visibleCenterX = visible.x + visible.width / 2
+        val visibleCenterY = visible.y + visible.height / 2
+        Rectangle(
+          (visibleCenterX - coverBounds.x - pillSize.width / 2).coerceIn(0, coverBounds.width - pillSize.width),
+          (visibleCenterY - coverBounds.y - pillSize.height / 2).coerceIn(0, coverBounds.height - pillSize.height),
+          pillSize.width,
+          pillSize.height,
+        )
+      }
+    }
 
   fun clickCenter(): Boolean {
     val robot = Robot()

@@ -119,7 +119,7 @@ internal class HintGenerator(private val alphabet: List<Char>) {
     if (existing != null && existing.depth <= depth) return
     val target = HintTarget(component, location, size, depth)
     target.action = resolveAction(component, editorScrollPane)
-    if (editorScrollPane) target.labelPosition = HintLabelPosition.CENTER
+    if (editorScrollPane || component is Tree) target.labelPosition = HintLabelPosition.CENTER
     targets[component] = target
   }
 
