@@ -33,8 +33,8 @@ class HintEditorIntegrationTest : VimTestCase() {
     ApplicationManager.getApplication().invokeAndWait {
       val editor = fixture.editor as EditorEx
       withEditorInFrame(editor) { frame ->
-        val generator = HintGenerator.Permutation(defaultAlphabet)
-        val targets = generator.generate(frame.rootPane, frame.rootPane.glassPane)
+        val generator = HintGenerator(defaultAlphabet)
+        val targets = generator.generateHints(frame.rootPane, frame.rootPane.glassPane)
 
         assertTrue(targets.isNotEmpty(), "Should find at least one target from editor hierarchy")
 
@@ -52,8 +52,8 @@ class HintEditorIntegrationTest : VimTestCase() {
     ApplicationManager.getApplication().invokeAndWait {
       val editor = fixture.editor as EditorEx
       withEditorInFrame(editor) { frame ->
-        val generator = HintGenerator.Permutation(defaultAlphabet)
-        val targets = generator.generate(frame.rootPane, frame.rootPane.glassPane)
+        val generator = HintGenerator(defaultAlphabet)
+        val targets = generator.generateHints(frame.rootPane, frame.rootPane.glassPane)
 
         val editorScrollTarget = targets.find { target ->
           target.component is JScrollPane &&

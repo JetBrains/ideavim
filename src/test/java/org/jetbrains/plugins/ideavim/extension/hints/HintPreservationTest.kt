@@ -26,15 +26,15 @@ class HintPreservationTest : VimTestCase() {
     val button1 = JButton("A").apply { setBounds(10, 10, 100, 30) }
     val button2 = JButton("B").apply { setBounds(10, 50, 100, 30) }
     withTestFrame(button1, button2) { frame ->
-      val generator = HintGenerator.Permutation(defaultAlphabet)
+      val generator = HintGenerator(defaultAlphabet)
 
-      val targets1 = generator.generate(frame.rootPane, frame.rootPane.glassPane)
+      val targets1 = generator.generateHints(frame.rootPane, frame.rootPane.glassPane)
       val hint1 = targets1.find { it.component === button1 }?.hint
       val hint2 = targets1.find { it.component === button2 }?.hint
       assertNotNull(hint1, "Button1 should have a hint")
       assertNotNull(hint2, "Button2 should have a hint")
 
-      val targets2 = generator.generate(frame.rootPane, frame.rootPane.glassPane)
+      val targets2 = generator.generateHints(frame.rootPane, frame.rootPane.glassPane)
       assertEquals(hint1, targets2.find { it.component === button1 }?.hint, "Button1 hint should be preserved")
       assertEquals(hint2, targets2.find { it.component === button2 }?.hint, "Button2 hint should be preserved")
     }
@@ -53,9 +53,9 @@ class HintPreservationTest : VimTestCase() {
       isVisible = true
     }
     try {
-      val generator = HintGenerator.Permutation(defaultAlphabet)
+      val generator = HintGenerator(defaultAlphabet)
 
-      val targets1 = generator.generate(frame.rootPane, frame.rootPane.glassPane)
+      val targets1 = generator.generateHints(frame.rootPane, frame.rootPane.glassPane)
       val hint1 = targets1.find { it.component === button1 }?.hint
       val hint2 = targets1.find { it.component === button2 }?.hint
       assertNotNull(hint1)
@@ -66,7 +66,7 @@ class HintPreservationTest : VimTestCase() {
       contentPane.add(button3)
       frame.validate()
 
-      val targets2 = generator.generate(frame.rootPane, frame.rootPane.glassPane)
+      val targets2 = generator.generateHints(frame.rootPane, frame.rootPane.glassPane)
       assertEquals(hint1, targets2.find { it.component === button1 }?.hint, "Button1 hint should be preserved")
       assertEquals(hint2, targets2.find { it.component === button2 }?.hint, "Button2 hint should be preserved")
       assertNotNull(targets2.find { it.component === button3 }?.hint, "Button3 should get a hint")

@@ -34,7 +34,7 @@ class ToggleHintsAction : DumbAwareToggleAction() {
   private val alarm = Alarm(Alarm.ThreadToUse.SWING_THREAD)
   private val highlight = HighlightComponent()
 
-  private val generator = HintGenerator.Permutation(alphabet)
+  private val generator = HintGenerator(alphabet)
 
   override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
 
@@ -58,7 +58,7 @@ class ToggleHintsAction : DumbAwareToggleAction() {
   }
 
   private fun enable(rootPane: JRootPane, glassPane: IdeGlassPaneImpl) {
-    val targets = generator.generate(rootPane, glassPane)
+    val targets = generator.generateHints(rootPane, glassPane)
 
     val cover = JPanel().apply {
       cover = this

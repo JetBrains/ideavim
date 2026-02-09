@@ -30,8 +30,8 @@ class HintTargetCollectionTest : VimTestCase() {
     val button1 = JButton("Click Me").apply { setBounds(10, 10, 100, 30) }
     val button2 = JButton("Press Me").apply { setBounds(10, 50, 100, 30) }
     withTestFrame(button1, button2) { frame ->
-      val generator = HintGenerator.Permutation(defaultAlphabet)
-      val targets = generator.generate(frame.rootPane, frame.rootPane.glassPane)
+      val generator = HintGenerator(defaultAlphabet)
+      val targets = generator.generateHints(frame.rootPane, frame.rootPane.glassPane)
 
       assertTrue(targets.any { it.component === button1 }, "Button1 should be a target")
       assertTrue(targets.any { it.component === button2 }, "Button2 should be a target")
@@ -44,8 +44,8 @@ class HintTargetCollectionTest : VimTestCase() {
     val label = JLabel("Just a label").apply { setBounds(10, 10, 100, 30) }
     val panel = JPanel().apply { setBounds(10, 50, 100, 100) }
     withTestFrame(label, panel) { frame ->
-      val generator = HintGenerator.Permutation(defaultAlphabet)
-      val targets = generator.generate(frame.rootPane, frame.rootPane.glassPane)
+      val generator = HintGenerator(defaultAlphabet)
+      val targets = generator.generateHints(frame.rootPane, frame.rootPane.glassPane)
 
       assertFalse(targets.any { it.component === label }, "JLabel should not be a target")
       assertFalse(targets.any { it.component === panel }, "Plain JPanel should not be a target")
@@ -61,8 +61,8 @@ class HintTargetCollectionTest : VimTestCase() {
       addTab("Tab 3", JPanel())
     }
     withTestFrame(tabbedPane) { frame ->
-      val generator = HintGenerator.Permutation(defaultAlphabet)
-      val targets = generator.generate(frame.rootPane, frame.rootPane.glassPane)
+      val generator = HintGenerator(defaultAlphabet)
+      val targets = generator.generateHints(frame.rootPane, frame.rootPane.glassPane)
 
       // JTabbedPane creates individual tab targets via TabAccessible wrappers
       assertTrue(targets.size >= 3, "Should have at least 3 targets for 3 tabs, got ${targets.size}")
@@ -75,8 +75,8 @@ class HintTargetCollectionTest : VimTestCase() {
       JButton("Button $i").apply { setBounds(10, i * 40, 100, 30) }
     }
     withTestFrame(*buttons.toTypedArray()) { frame ->
-      val generator = HintGenerator.Permutation(defaultAlphabet)
-      val targets = generator.generate(frame.rootPane, frame.rootPane.glassPane)
+      val generator = HintGenerator(defaultAlphabet)
+      val targets = generator.generateHints(frame.rootPane, frame.rootPane.glassPane)
 
       val hints = targets.map { it.hint }
       assertEquals(hints.toSet().size, hints.size, "All hints should be unique")
@@ -87,8 +87,8 @@ class HintTargetCollectionTest : VimTestCase() {
   fun `test target locations are non-negative`() {
     val button = JButton("Test").apply { setBounds(50, 70, 100, 30) }
     withTestFrame(button) { frame ->
-      val generator = HintGenerator.Permutation(defaultAlphabet)
-      val targets = generator.generate(frame.rootPane, frame.rootPane.glassPane)
+      val generator = HintGenerator(defaultAlphabet)
+      val targets = generator.generateHints(frame.rootPane, frame.rootPane.glassPane)
 
       targets.forEach { target ->
         assertTrue(target.location.x >= 0, "Target x should be non-negative, got ${target.location.x}")
@@ -101,8 +101,8 @@ class HintTargetCollectionTest : VimTestCase() {
   fun `test target sizes are positive`() {
     val button = JButton("Test").apply { setBounds(10, 10, 120, 35) }
     withTestFrame(button) { frame ->
-      val generator = HintGenerator.Permutation(defaultAlphabet)
-      val targets = generator.generate(frame.rootPane, frame.rootPane.glassPane)
+      val generator = HintGenerator(defaultAlphabet)
+      val targets = generator.generateHints(frame.rootPane, frame.rootPane.glassPane)
 
       val buttonTarget = targets.find { it.component === button }
       assertNotNull(buttonTarget, "Button should be a target")
