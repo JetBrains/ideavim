@@ -14,10 +14,12 @@ import com.intellij.openapi.wm.impl.status.TextPanel
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.treeStructure.Tree
 import java.awt.Component
+import java.awt.Dimension
 import java.awt.Point
 import java.awt.Rectangle
 import java.util.*
 import javax.accessibility.Accessible
+import javax.accessibility.AccessibleComponent
 import javax.swing.JComponent
 import javax.swing.JScrollPane
 import javax.swing.JTabbedPane
@@ -25,126 +27,146 @@ import javax.swing.SwingUtilities
 import javax.swing.text.JTextComponent
 import kotlin.math.max
 
-internal sealed class HintGenerator {
+internal class HintGenerator(private val alphabet: List<Char>) {
+  init {
+    require(alphabet.size > 1) { "Alphabet must contain at least two characters" }
+  }
+
   private var hints: Map<Accessible, String> = emptyMap()
-  protected val previousHints get() = hints
 
-  abstract fun generate(targets: List<HintTarget>)
+  fun generateHints(targets: List<HintTarget>) = generatePreserving(targets)
 
-  fun <T> generate(root: T, glassPane: Component): List<HintTarget> where T : Accessible, T : Component =
-    collectTargets(root, glassPane).also { targets ->
-      generate(targets)
-      hints = WeakHashMap(targets.associateBy(HintTarget::component, HintTarget::hint).filterValues(String::isNotEmpty))
-    }
-
-  class Permutation(private val alphabet: List<Char>) : HintGenerator() {
-    init {
-      require(alphabet.size > 1) { "Alphabet must contain at least two characters" }
-    }
-
-    override fun generate(targets: List<HintTarget>) = generate(targets, true)
-
-    /**
-     * @param preserve Whether to preserve the previous hints if possible
-     */
-    private fun generate(targets: List<HintTarget>, preserve: Boolean) {
-      val length = max(generateSequence(1) { it * alphabet.size }.takeWhile {
-        it < targets.size + if (preserve) previousHints.size else 0
-      }.count(), 1)
-      val hintIterator = alphabet.permutations(length).map { it.joinToString("") }.iterator()
-      targets.forEach { target ->
-        target.hint = if (preserve) {
-          previousHints[target.component] ?: hintIterator.firstOrNull { candidateHint ->
-            // Check if the hint is not already used by previous targets
-            !previousHints.values.any { existingHint ->
-              existingHint.startsWith(candidateHint) || candidateHint.startsWith(
-                existingHint
-              )
-            }
-          } ?: return generate(targets, false) // do not preserve previous hints if failed
-        } else {
-          hintIterator.next()
-        }
-      }
-    }
+  fun <T> generateHints(root: T, glassPane: Component): List<HintTarget> where T : Accessible, T : Component {
+    val targets = collectTargets(root, glassPane)
+    generateHints(targets)
+    hints = WeakHashMap(targets.associateBy(HintTarget::component, HintTarget::hint).filterValues(String::isNotEmpty))
+    return targets
   }
-}
 
-private fun <T> collectTargets(
-  component: T,
-  destination: Component,
-): List<HintTarget> where T : Accessible, T : Component = mutableMapOf<Accessible, HintTarget>().also {
-  collectTargets(it, component, SwingUtilities.convertPoint(component.parent, component.location, destination))
-}.values.toList()
-
-private fun collectTargets(
-  targets: MutableMap<Accessible, HintTarget>,
-  component: Accessible,
-  location: Point,
-  depth: Int = 0,
-): Unit = with(component.accessibleContext) {
-  val accessible = accessibleComponent ?: return
-  val location = location + (accessible.location ?: return)
-
-  val isEditorScrollPane = component is JScrollPane && component.viewport?.view is EditorComponentImpl
-  accessible.size?.let { size ->
-    // TextPanel (status bar widgets) may report incorrect visibility until hovered, so skip visibility check for them
-    val isTextPanel = component is TextPanel || component is JBTextField
-    val isTextComponent = component is JTextComponent
-    val isVisible = isTextPanel || (accessible.isVisible && (component as? Component)?.isActuallyVisible() != false)
-    val isInteractive =
-      component.isClickable() || component is ContentTabLabel || component is Tree || isTextPanel || isTextComponent || isEditorScrollPane
-
-    if (isVisible && isInteractive) {
-      targets[component].let {
-        // For some reason, the same component may appear multiple times in the accessible tree.
-        if (it == null || it.depth > depth) {
-          targets[component] = HintTarget(component, location, size, depth).apply {
-            action = when {
-              isEditorScrollPane -> ({ component.viewport?.view?.requestFocusInWindow() ?: false })
-              component is Tree -> ({ (component as Component).requestFocusInWindow() })
-              component is JTextComponent -> ({ (component as Component).requestFocusInWindow() })
-              else -> HintTarget::clickCenter
-            }
-            if (isEditorScrollPane) {
-              labelPosition = HintLabelPosition.CENTER
-            }
-          }
-        }
-      }
+  private fun generatePreserving(targets: List<HintTarget>) {
+    val length = computeHintLength(targets.size + hints.size)
+    val hintIterator = alphabet.permutations(length).map { it.joinToString("") }.iterator()
+    for (target in targets) {
+      target.hint = resolveHint(target, hintIterator) ?: return generateFresh(targets)
     }
   }
 
-  // Handle JTabbedPane tabs specially - create a target for each tab
-  if (component is JTabbedPane) {
-    for (tabIndex in 0 until component.tabCount) {
-      val tabBounds = component.getBoundsAt(tabIndex) ?: continue
+  private fun generateFresh(targets: List<HintTarget>) {
+    val length = computeHintLength(targets.size)
+    val hintIterator = alphabet.permutations(length).map { it.joinToString("") }.iterator()
+    for (target in targets) {
+      target.hint = hintIterator.next()
+    }
+  }
+
+  private fun resolveHint(target: HintTarget, hintIterator: Iterator<String>): String? {
+    val preserved = hints[target.component]
+    if (preserved != null) return preserved
+    return hintIterator.firstOrNull { !conflictsWithExisting(it) }
+  }
+
+  private fun conflictsWithExisting(candidate: String): Boolean =
+    hints.values.any { it.startsWith(candidate) || candidate.startsWith(it) }
+
+  private fun computeHintLength(targetCount: Int): Int =
+    max(generateSequence(1) { it * alphabet.size }.takeWhile { it < targetCount }.count(), 1)
+
+  private fun <T> collectTargets(root: T, glassPane: Component): List<HintTarget>
+    where T : Accessible, T : Component {
+    val targets = mutableMapOf<Accessible, HintTarget>()
+    val startLocation = SwingUtilities.convertPoint(root.parent, root.location, glassPane)
+    collectTargets(targets, root, startLocation)
+    return targets.values.toList()
+  }
+
+  private fun collectTargets(
+    targets: MutableMap<Accessible, HintTarget>,
+    component: Accessible,
+    location: Point,
+    depth: Int = 0,
+  ) {
+    val context = component.accessibleContext
+    val accessible = context.accessibleComponent ?: return
+    val currentLocation = location + (accessible.location ?: return)
+    val size = accessible.size ?: return
+    val editorScrollPane = isEditorScrollPane(component)
+
+    if (isVisible(component, accessible) && isInteractive(component, editorScrollPane)) {
+      addTarget(targets, component, currentLocation, size, depth, editorScrollPane)
+    }
+
+    if (component is JTabbedPane) {
+      collectTabTargets(targets, component, currentLocation, depth)
+    }
+
+    if (component is Tree || editorScrollPane) return
+
+    for (i in 0..<context.accessibleChildrenCount) {
+      val child = context.getAccessibleChild(i) ?: continue
+      collectTargets(targets, child, currentLocation, depth + 1)
+    }
+  }
+
+  private fun addTarget(
+    targets: MutableMap<Accessible, HintTarget>,
+    component: Accessible,
+    location: Point,
+    size: Dimension,
+    depth: Int,
+    editorScrollPane: Boolean,
+  ) {
+    val existing = targets[component]
+    if (existing != null && existing.depth <= depth) return
+    val target = HintTarget(component, location, size, depth)
+    target.action = resolveAction(component, editorScrollPane)
+    if (editorScrollPane) target.labelPosition = HintLabelPosition.CENTER
+    targets[component] = target
+  }
+
+  private fun collectTabTargets(
+    targets: MutableMap<Accessible, HintTarget>,
+    tabbedPane: JTabbedPane,
+    location: Point,
+    depth: Int,
+  ) {
+    for (tabIndex in 0 until tabbedPane.tabCount) {
+      val tabBounds = tabbedPane.getBoundsAt(tabIndex) ?: continue
       val tabLocation = Point(location.x + tabBounds.x, location.y + tabBounds.y)
-      val tabSize = tabBounds.size
-      // Use a unique key for each tab by combining tabbedPane and index
-      val tabKey = TabAccessible(component, tabIndex)
-      targets[tabKey] = HintTarget(tabKey, tabLocation, tabSize, depth + 1).apply {
-        action = {
-          component.selectedIndex = tabIndex
-          true
-        }
-      }
+      val tabKey = TabAccessible(tabbedPane, tabIndex)
+      val target = HintTarget(tabKey, tabLocation, tabBounds.size, depth + 1)
+      target.action = { tabbedPane.selectedIndex = tabIndex; true }
+      targets[tabKey] = target
     }
   }
 
-  // Skip the children of the Tree or scrollPane, otherwise it will easily lead to performance problems
-  if (component is Tree || isEditorScrollPane) return
-  // recursively collect children
-  for (i in 0..<accessibleChildrenCount) {
-    getAccessibleChild(i)?.let {
-      collectTargets(targets, it, location, depth + 1)
-    }
+  private fun resolveAction(component: Accessible, editorScrollPane: Boolean): (HintTarget) -> Boolean = when {
+    editorScrollPane -> { _ -> (component as JScrollPane).viewport?.view?.requestFocusInWindow() ?: false }
+    component is Tree -> { _ -> (component as Component).requestFocusInWindow() }
+    component is JTextComponent -> { _ -> (component as Component).requestFocusInWindow() }
+    else -> HintTarget::clickCenter
   }
+
+  private fun isEditorScrollPane(component: Accessible): Boolean =
+    component is JScrollPane && component.viewport?.view is EditorComponentImpl
+
+  private fun isTextPanel(component: Accessible): Boolean =
+    component is TextPanel || component is JBTextField
+
+  private fun isVisible(component: Accessible, accessible: AccessibleComponent): Boolean {
+    if (isTextPanel(component)) return true
+    if (!accessible.isVisible) return false
+    return (component as? Component)?.isActuallyVisible() != false
+  }
+
+  private fun isInteractive(component: Accessible, editorScrollPane: Boolean): Boolean =
+    component.isClickable() ||
+      component is ContentTabLabel ||
+      component is Tree ||
+      isTextPanel(component) ||
+      component is JTextComponent ||
+      editorScrollPane
 }
 
-/**
- * Wrapper to make each tab in a JTabbedPane a unique Accessible key
- */
 private class TabAccessible(val tabbedPane: JTabbedPane, val tabIndex: Int) : Accessible {
   override fun getAccessibleContext(): javax.accessibility.AccessibleContext = tabbedPane.accessibleContext
 
@@ -156,11 +178,6 @@ private class TabAccessible(val tabbedPane: JTabbedPane, val tabIndex: Int) : Ac
   override fun hashCode(): Int = System.identityHashCode(tabbedPane) * 31 + tabIndex
 }
 
-/**
- * Check if the component is clickable
- *
- * @return whether the component is clickable
- */
 private fun Accessible.isClickable(): Boolean = (accessibleContext.accessibleAction?.accessibleActionCount ?: 0) > 0
 
 private fun Component.isActuallyVisible(): Boolean {
