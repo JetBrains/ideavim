@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -432,21 +432,22 @@ class SetglobalCommandTest : VimTestCase() {
     setOsSpecificOptionsToSafeValues()
     val expected = """
     |--- Global option values ---
-    |noargtextobj          ide=IntelliJ IDEA   operatorfunc=       startofline
-    |nobomb              noideajoin          norelativenumber    nosurround
-    |nobreakindent         ideamarks           scroll=0          notextobj-entire
-    |  colorcolumn=        ideawrite=all       scrolljump=1      notextobj-indent
-    |nocommentary        noignorecase          scrolloff=0         textwidth=0
-    |nocursorline        noincsearch           selectmode=         timeout
-    |nodigraph           nolist                shellcmdflag=-x     timeoutlen=1000
-    |noexchange          nomatchit             shellxescape=@    notrackactionids
-    |  fileencoding=       maxmapdepth=20      shellxquote={       undolevels=1000
-    |  fileformat=unix   nomini-ai             showcmd             virtualedit=
-    |  foldlevel=999       more                showmode          novisualbell
-    |nogdefault          nomultiple-cursors    sidescroll=0        visualdelay=100
-    |nohighlightedyank   noNERDTree            sidescrolloff=0     whichwrap=b,s
-    |  history=50          nrformats=hex     nosmartcase           wrap
-    |nohlsearch          nonumber            nosneak               wrapscan
+    |noargtextobj        noideajoin            scroll=0          notextobj-indent
+    |nobomb                ideamarks           scrolljump=1        textwidth=0
+    |nobreakindent         ideawrite=all       scrolloff=0         timeout
+    |  colorcolumn=      noignorecase          selectmode=         timeoutlen=1000
+    |nocommentary        noincsearch           shellcmdflag=-x   notrackactionids
+    |nocursorline        nolist                shellxescape=@      undolevels=1000
+    |nodigraph           nomatchit             shellxquote={     novimhints
+    |noexchange            maxmapdepth=20      showcmd             virtualedit=
+    |  fileencoding=     nomini-ai             showmode          novisualbell
+    |  fileformat=unix     more                sidescroll=0        visualdelay=100
+    |  foldlevel=999     nomultiple-cursors    sidescrolloff=0     whichwrap=b,s
+    |nogdefault          noNERDTree          nosmartcase           wrap
+    |nohighlightedyank     nrformats=hex     nosneak               wrapscan
+    |  history=50        nonumber              startofline
+    |nohlsearch            operatorfunc=     nosurround
+    |  ide=IntelliJ IDEA norelativenumber    notextobj-entire
     |  clipboard=ideaput,autoselect
     |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
     |noideacopypreprocess
@@ -576,6 +577,7 @@ class SetglobalCommandTest : VimTestCase() {
     |notrackactionids
     |  undolevels=1000
     |novim-paragraph-motion
+    |novimhints
     |  viminfo='100,<50,s10,h
     |  virtualedit=
     |novisualbell
