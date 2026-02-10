@@ -244,15 +244,6 @@ Unless otherwise stated, these options do not have abbreviations.
         the action name in a notification. This action ID can then be used in
         a mapping to the action in the form <Action>(...).
 
-'vimhints'              boolean (default off)
-                        global
-        When enabled, allows using the hints system for keyboard-driven UI
-        navigation. Press Ctrl+\ to activate hints mode, which displays
-        letter labels on interactive UI components. Type the letters to
-        focus and interact with the corresponding component.
-
-        This feature is experimental and may change in future releases.
-
 'visualdelay'           number  (default 100)
                         global
         This option specifies the delay, in milliseconds before converting an
