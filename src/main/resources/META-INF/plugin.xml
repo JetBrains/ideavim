@@ -405,6 +405,13 @@
         <alias name="vim-sneak"/>
       </aliases>
     </vimExtension>
+
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.hints.VimHintsExtension" name="vimhints">
+      <aliases>
+        <alias name="vimhints"/>
+        <alias name="vim-hints"/>
+      </aliases>
+    </vimExtension>
   </extensions>
 
   <actions>

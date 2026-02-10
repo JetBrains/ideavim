@@ -617,7 +617,7 @@ because you do not have to be conscious of the cursor position (e.g. vae).
 https://github.com/kana/vim-textobj-entire/blob/master/doc/textobj-entire.txt
 
 </details>
-   
+
 <details>
 <summary><h2>Which-Key: Displays available keybindings in popup</h2></summary>
 
