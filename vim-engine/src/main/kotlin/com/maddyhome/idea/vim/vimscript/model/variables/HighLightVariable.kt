@@ -15,7 +15,16 @@ import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 
-class HighLightVariable : Variable {
+/**
+ * Represents the `v:hlsearch` variable, which indicates whether search highlighting is currently active
+ *
+ * Returns 1 if search highlighting is active (text is highlighted), 0 otherwise.
+ * This is controlled by the `:set hlsearch` option and can be temporarily disabled
+ * with `:nohlsearch`.
+ *
+ * See `:help v:hlsearch`
+ */
+internal object HighLightVariable : Variable {
 
   override fun evaluate(
     name: String,
