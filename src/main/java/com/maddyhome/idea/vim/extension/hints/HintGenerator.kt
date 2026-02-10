@@ -103,6 +103,7 @@ internal class HintGenerator(private val alphabet: List<Char>) {
     // A similar situation is with vertical scroll panes (e.g. editors), but not horizontal.
     // Exception: inside ConfigurableEditor that has a more complex view that we want to navigate with the keyboard.
     if (component is Tree || (!insideConfigurableEditor && isVerticalScrollPane(component))) return
+    if (!accessible.isVisible) return
 
     val childInsideConfigurableEditor = insideConfigurableEditor || component is ConfigurableEditor
     for (i in 0..<context.accessibleChildrenCount) {
@@ -157,7 +158,6 @@ internal class HintGenerator(private val alphabet: List<Char>) {
     component is TextPanel || component is JBTextField
 
   private fun isVisible(component: Accessible, accessible: AccessibleComponent): Boolean {
-    if (isTextPanel(component)) return true
     if (!accessible.isVisible) return false
     return (component as? Component)?.isActuallyVisible() != false
   }
