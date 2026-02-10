@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -187,13 +187,13 @@ class SetCommandTest : VimTestCase() {
       |nocursorline        nolist                shellcmdflag=-x     timeoutlen=1000
       |nodigraph           nomatchit             shellxescape=@    notrackactionids
       |noexchange            maxmapdepth=20      shellxquote={       undolevels=1000
-      |  fileformat=unix   nomini-ai             showcmd             virtualedit=
-      |  foldlevel=1         more                showmode          novisualbell
-      |nogdefault          nomultiple-cursors    sidescroll=0        visualdelay=100
-      |nohighlightedyank   noNERDTree            sidescrolloff=0     whichwrap=b,s
-      |  history=50          nrformats=hex     nosmartcase           wrap
-      |nohlsearch          nonumber            nosneak               wrapscan
-      |  ide=IntelliJ IDEA   operatorfunc=       startofline
+      |  fileformat=unix   nomini-ai             showcmd           novimhints
+      |  foldlevel=1         more                showmode            virtualedit=
+      |nogdefault          nomultiple-cursors    sidescroll=0      novisualbell
+      |nohighlightedyank   noNERDTree            sidescrolloff=0     visualdelay=100
+      |  history=50          nrformats=hex     nosmartcase           whichwrap=b,s
+      |nohlsearch          nonumber            nosneak               wrap
+      |  ide=IntelliJ IDEA   operatorfunc=       startofline         wrapscan
       |  clipboard=ideaput,autoselect
       |  fileencoding=utf-8
       |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
@@ -323,6 +323,7 @@ class SetCommandTest : VimTestCase() {
     |notrackactionids
     |  undolevels=1000
     |novim-paragraph-motion
+    |novimhints
     |  viminfo='100,<50,s10,h
     |  virtualedit=
     |novisualbell

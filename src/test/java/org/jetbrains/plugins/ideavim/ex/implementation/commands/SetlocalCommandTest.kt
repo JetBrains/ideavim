@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -492,13 +492,13 @@ class SetlocalCommandTest : VimTestCase() {
     |nocursorline        noincsearch           selectmode=         timeout
     |nodigraph           nolist                shellcmdflag=-x     timeoutlen=1000
     |noexchange          nomatchit             shellxescape=@    notrackactionids
-    |  fileformat=unix     maxmapdepth=20      shellxquote={       virtualedit=
-    |  foldlevel=1       nomini-ai             showcmd           novisualbell
-    |nogdefault            more                showmode            visualdelay=100
-    |nohighlightedyank   nomultiple-cursors    sidescroll=0        whichwrap=b,s
-    |  history=50        noNERDTree            sidescrolloff=-1    wrap
-    |nohlsearch            nrformats=hex     nosmartcase           wrapscan
-    |  ide=IntelliJ IDEA nonumber            nosneak
+    |  fileformat=unix     maxmapdepth=20      shellxquote={     novimhints
+    |  foldlevel=1       nomini-ai             showcmd             virtualedit=
+    |nogdefault            more                showmode          novisualbell
+    |nohighlightedyank   nomultiple-cursors    sidescroll=0        visualdelay=100
+    |  history=50        noNERDTree            sidescrolloff=-1    whichwrap=b,s
+    |nohlsearch            nrformats=hex     nosmartcase           wrap
+    |  ide=IntelliJ IDEA nonumber            nosneak               wrapscan
     |  clipboard=ideaput,autoselect
     |  fileencoding=utf-8
     |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
@@ -628,6 +628,7 @@ class SetlocalCommandTest : VimTestCase() {
     |notrackactionids
     |  undolevels=-123456
     |novim-paragraph-motion
+    |novimhints
     |  viminfo='100,<50,s10,h
     |  virtualedit=
     |novisualbell
