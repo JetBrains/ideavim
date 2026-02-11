@@ -9,9 +9,19 @@
 package com.maddyhome.idea.vim.extension.hints
 
 import com.maddyhome.idea.vim.extension.VimExtension
+import com.maddyhome.idea.vim.extension.nerdtree.NerdTreeEverywhere
 
 internal class VimHintsExtension : VimExtension {
+  private val nerdTreeEverywhere = NerdTreeEverywhere()
+
   override fun getName() = "vimhints"
-  override fun init() { /* no-op — ToggleHintsAction checks the option dynamically */
+
+  override fun init() {
+    nerdTreeEverywhere.init()
+  }
+
+  override fun dispose() {
+    nerdTreeEverywhere.dispose()
+    super.dispose()
   }
 }
