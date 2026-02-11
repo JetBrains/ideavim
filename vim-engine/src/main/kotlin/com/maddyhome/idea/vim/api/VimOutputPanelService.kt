@@ -26,13 +26,12 @@ interface VimOutputPanelService {
   fun getCurrentOutputPanel(): VimOutputPanel?
 
   /**
-   * Appends text to the existing output panel or creates a new one with the given text.
-   * Basic method that should be sufficient in most cases.
-   */
-  fun output(editor: VimEditor, context: ExecutionContext, text: String)
-
-  /**
    * Appends text to the existing output panel or creates a new one with the given text and message type.
    */
-  fun output(editor: VimEditor, context: ExecutionContext, text: String, messageType: MessageType)
+  fun output(
+    editor: VimEditor,
+    context: ExecutionContext,
+    text: String,
+    messageType: MessageType = MessageType.STANDARD,
+  )
 }
