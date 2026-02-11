@@ -342,6 +342,9 @@ class OutputPanel private constructor(
 
     finishPositioning(scroll)
 
+    // Force layout so that viewport sizes are valid before checking scroll state
+    validate()
+
     // onPositioned
     cachedLineHeight = lineHeight
     scrollPane.getVerticalScrollBar().setValue(0)
@@ -432,13 +435,11 @@ class OutputPanel private constructor(
   val isAtEnd: Boolean
     get() {
       if (isSingleLine) return true
+      val contentHeight = textPane.preferredSize.height
+      val viewportHeight = scrollPane.viewport.height
+      if (contentHeight <= viewportHeight) return true
       val scrollBar = scrollPane.getVerticalScrollBar()
-      val value = scrollBar.value
-      if (!scrollBar.isVisible) {
-        return true
-      }
-      return value >= scrollBar.maximum - scrollBar.visibleAmount ||
-        scrollBar.maximum <= scrollBar.visibleAmount
+      return scrollBar.value >= scrollBar.maximum - scrollBar.visibleAmount
     }
 
   private inner class OutputPanelKeyListener : KeyAdapter() {
