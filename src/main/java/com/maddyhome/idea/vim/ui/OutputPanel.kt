@@ -39,6 +39,7 @@ import javax.swing.JScrollPane
 import javax.swing.JTextPane
 import javax.swing.KeyStroke
 import javax.swing.SwingUtilities
+import javax.swing.text.DefaultCaret
 import javax.swing.text.SimpleAttributeSet
 import javax.swing.text.StyleConstants
 import javax.swing.text.StyledDocument
@@ -72,7 +73,11 @@ class OutputPanel private constructor(
 
   init {
     textPane.isEditable = false
-    textPane.caret.isVisible = false
+    textPane.caret = object : DefaultCaret() {
+      override fun setVisible(v: Boolean) {
+        super.setVisible(false)
+      }
+    }
     textPane.highlighter = null
 
     resizeAdapter = object : ComponentAdapter() {
