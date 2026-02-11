@@ -13,12 +13,14 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.wm.impl.IdeBackgroundUtil
 import com.intellij.ui.ClientProperty
+import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBPanel
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.util.IJSwingUtilities
 import com.maddyhome.idea.vim.KeyHandler.Companion.getInstance
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.MessageType
 import com.maddyhome.idea.vim.api.VimOutputPanel
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
@@ -116,7 +118,7 @@ class OutputPanel private constructor(
     }
   }
 
-  override val isVisible: Boolean
+  override val isPanelVisible: Boolean
     get() = active
 
   override var text: String
@@ -180,7 +182,11 @@ class OutputPanel private constructor(
     return attrs
   }
 
-  override fun addText(text: String, isNewLine: Boolean, color: Color?) {
+  override fun addText(text: String, isNewLine: Boolean, messageType: MessageType) {
+    val color = when (messageType) {
+      MessageType.ERROR -> JBColor.RED
+      MessageType.STANDARD -> null
+    }
     segments.add(TextLine(text, color))
   }
 

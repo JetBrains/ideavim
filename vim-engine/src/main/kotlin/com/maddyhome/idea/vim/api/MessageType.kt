@@ -8,9 +8,7 @@
 
 package com.maddyhome.idea.vim.api
 
-import java.awt.Color
-
-enum class MessageType(val color: Color?) {
-  STANDARD(null),
-  ERROR(Color.RED)
+enum class MessageType {
+  STANDARD,
+  ERROR,
 }
