@@ -31,9 +31,7 @@ class ExEntryAction : VimActionHandler.SingleExecution() {
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (editor.isOneLineMode()) return false
-    injector.outputPanel.getCurrentOutputPanel()?.close()
-    val commandLine = injector.commandLine.createCommandPrompt(editor, context, cmd.rawCount, initialText = "")
-    commandLine.focus()
+    injector.commandLine.createCommandPrompt(editor, context, cmd.rawCount, initialText = "")
     return true
   }
 }
