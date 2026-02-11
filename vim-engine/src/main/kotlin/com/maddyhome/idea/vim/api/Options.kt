@@ -142,6 +142,7 @@ object Options {
       )
     )
   )
+  val maxhlduringincsearch: NumberOption = addOption(NumberOption(name="maxhlduringincsearch", GLOBAL, "maxhld", 100, -1))
   val maxmapdepth: NumberOption = addOption(NumberOption("maxmapdepth", GLOBAL, "mmd", 20))
   val more: ToggleOption = addOption(ToggleOption("more", GLOBAL, "more", true))
   val nrformats: StringListOption = addOption(
@@ -188,6 +189,7 @@ object Options {
     )
   )
   val showcmd: ToggleOption = addOption(ToggleOption("showcmd", GLOBAL, "sc", true))
+  val showmatchcount: ToggleOption = addOption(ToggleOption("showmatchcount", GLOBAL, "smc", false))
   val showmode: ToggleOption = addOption(ToggleOption("showmode", GLOBAL, "smd", true))
   val sidescroll: NumberOption = addOption(UnsignedNumberOption("sidescroll", GLOBAL, "ss", 0))
   val sidescrolloff: NumberOption = addOption(
