@@ -34,35 +34,10 @@ interface VimOutputPanel {
    * Note: The full text content is not updated in the display until [show] is invoked.
    *
    * @param text The text to append.
-   */
-  fun addText(text: String) {
-    addText(text, true, MessageType.STANDARD)
-  }
-
-  /**
-   * Appends the specified text to the existing content of the output panel.
-   * If 'isNewLine' is true, the text will begin on a new line.
-   *
-   * Note: The full text content is not updated in the display until [show] is invoked.
-   *
-   * @param text The text to append.
-   * @param isNewLine Whether to start the appended text on a new line.
-   */
-  fun addText(text: String, isNewLine: Boolean) {
-    addText(text, isNewLine, MessageType.STANDARD)
-  }
-
-  /**
-   * Appends the specified text to the existing content of the output panel.
-   * If 'isNewLine' is true, the text will begin on a new line.
-   *
-   * Note: The full text content is not updated in the display until [show] is invoked.
-   *
-   * @param text The text to append.
    * @param isNewLine Whether to start the appended text on a new line.
    * @param messageType The type of message, used to determine text styling.
    */
-  fun addText(text: String, isNewLine: Boolean, messageType: MessageType)
+  fun addText(text: String, isNewLine: Boolean = true, messageType: MessageType = MessageType.STANDARD)
 
   /**
    * This method shows the text output or updates the output text if the panel was already shown
