@@ -8,14 +8,13 @@
 
 package com.maddyhome.idea.vim.api
 
-import java.awt.Color
 import javax.swing.KeyStroke
 
 interface VimOutputPanel {
   /**
-   * Whether the output panel is currently visible.
+   * Whether the output panel is currently active and visible.
    */
-  val isVisible: Boolean
+  val isPanelVisible: Boolean
 
   /**
    * The current text displayed in the output panel.
@@ -37,7 +36,7 @@ interface VimOutputPanel {
    * @param text The text to append.
    */
   fun addText(text: String) {
-    addText(text, true, null)
+    addText(text, true, MessageType.STANDARD)
   }
 
   /**
@@ -50,7 +49,7 @@ interface VimOutputPanel {
    * @param isNewLine Whether to start the appended text on a new line.
    */
   fun addText(text: String, isNewLine: Boolean) {
-    addText(text, isNewLine, null)
+    addText(text, isNewLine, MessageType.STANDARD)
   }
 
   /**
@@ -61,9 +60,9 @@ interface VimOutputPanel {
    *
    * @param text The text to append.
    * @param isNewLine Whether to start the appended text on a new line.
-   * @param color Optional color for the text. If null, uses default foreground color.
+   * @param messageType The type of message, used to determine text styling.
    */
-  fun addText(text: String, isNewLine: Boolean, color: Color?)
+  fun addText(text: String, isNewLine: Boolean, messageType: MessageType)
 
   /**
    * This method shows the text output or updates the output text if the panel was already shown

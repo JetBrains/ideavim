@@ -21,7 +21,7 @@ abstract class VimOutputPanelServiceBase : VimOutputPanelService {
 
   override fun output(editor: VimEditor, context: ExecutionContext, text: String, messageType: MessageType) {
     val panel = getOrCreate(editor, context)
-    panel.addText(text, true, messageType.color)
+    panel.addText(text, true, messageType)
     panel.show()
   }
 }
