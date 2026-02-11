@@ -116,7 +116,7 @@ class OutputPanel private constructor(
     }
   }
 
-  override val isActive: Boolean
+  override val isVisible: Boolean
     get() = active
 
   override var text: String
