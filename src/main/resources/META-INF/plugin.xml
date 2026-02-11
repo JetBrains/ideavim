@@ -405,10 +405,9 @@
       </aliases>
     </vimExtension>
 
-    <vimExtension implementation="com.maddyhome.idea.vim.extension.hints.VimHintsExtension" name="vimhints">
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.hints.VimHintsExtension" name="VimEverywhere">
       <aliases>
-        <alias name="vimhints"/>
-        <alias name="vim-hints"/>
+        <alias name="VimEverywhere"/>
       </aliases>
     </vimExtension>
   </extensions>
