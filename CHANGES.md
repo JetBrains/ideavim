@@ -51,7 +51,8 @@ usual beta standards.
 
 ### Features:
 
-* Hints system for keyboard-driven UI navigation - enable with `:set vimhints`, then press `Ctrl+\` to show hints on UI
+* Hints system for keyboard-driven UI navigation - enable with `:set VimEverywhere`, then press `Ctrl+\` to show hints
+  on UI
   components
 * [VIM-4004](https://youtrack.jetbrains.com/issue/VIM-4004) Support for `<F13>` through `<F24>` keys
 * [VIM-2143](https://youtrack.jetbrains.com/issue/VIM-2143) Environment variables expansion in `:source`, `:edit`, `:write` and other file commands (e.g., `:source $HOME/.ideavimrc`)

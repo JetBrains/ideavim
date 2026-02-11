@@ -187,7 +187,7 @@ class SetCommandTest : VimTestCase() {
       |nocursorline        nolist                shellcmdflag=-x     timeoutlen=1000
       |nodigraph           nomatchit             shellxescape=@    notrackactionids
       |noexchange            maxmapdepth=20      shellxquote={       undolevels=1000
-      |  fileformat=unix   nomini-ai             showcmd           novimhints
+      |  fileformat=unix   nomini-ai             showcmd           noVimEverywhere
       |  foldlevel=1         more                showmode            virtualedit=
       |nogdefault          nomultiple-cursors    sidescroll=0      novisualbell
       |nohighlightedyank   noNERDTree            sidescrolloff=0     visualdelay=100
@@ -321,7 +321,7 @@ class SetCommandTest : VimTestCase() {
     |notrackactionids
     |  undolevels=1000
     |novim-paragraph-motion
-    |novimhints
+    |noVimEverywhere
     |  viminfo='100,<50,s10,h
     |  virtualedit=
     |novisualbell

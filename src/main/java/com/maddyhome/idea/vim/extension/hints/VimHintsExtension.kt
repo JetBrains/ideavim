@@ -14,7 +14,7 @@ import com.maddyhome.idea.vim.extension.nerdtree.NerdTreeEverywhere
 internal class VimHintsExtension : VimExtension {
   private val nerdTreeEverywhere = NerdTreeEverywhere()
 
-  override fun getName() = "vimhints"
+  override fun getName() = "VimEverywhere"
 
   override fun init() {
     nerdTreeEverywhere.init()

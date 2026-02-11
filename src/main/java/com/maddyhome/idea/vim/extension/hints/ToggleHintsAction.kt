@@ -49,7 +49,7 @@ class ToggleHintsAction : DumbAwareToggleAction() {
 
   override fun setSelected(e: AnActionEvent, selected: Boolean) {
     val rootPane = SwingUtilities.getRootPane(e.getData(PlatformDataKeys.CONTEXT_COMPONENT)) ?: return
-    val option = injector.optionGroup.getOption("vimhints") as? ToggleOption ?: return
+    val option = injector.optionGroup.getOption("VimEverywhere") as? ToggleOption ?: return
     if (!injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(null)).booleanValue) return
     val glassPane = rootPane.glassPane as IdeGlassPaneImpl
     if (selected) {
