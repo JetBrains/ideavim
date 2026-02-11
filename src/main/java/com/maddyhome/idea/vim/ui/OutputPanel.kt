@@ -452,16 +452,29 @@ class OutputPanel private constructor(
     }
 
     override fun keyPressed(e: KeyEvent) {
-      // For single-line mode, pass action keys (arrows, function keys, etc.) back to the editor
-      // Character keys are handled in keyTyped
-      if (!isSingleLine) return
+      // Action keys (arrows, function keys, etc.) don't generate keyTyped events,
+      // so they must be handled here
       if (!e.isActionKey) return
       val currentPanel = injector.outputPanel.getCurrentOutputPanel() as? OutputPanel ?: return
 
       val keyCode = e.keyCode
       val modifiers = e.modifiersEx
       val keyStroke = KeyStroke.getKeyStroke(keyCode, modifiers)
-      currentPanel.close(keyStroke)
+
+      if (isSingleLine) {
+        currentPanel.close(keyStroke)
+        return
+      }
+
+      // Multi-line mode: arrow keys scroll, down/right at end closes
+      when (keyCode) {
+        KeyEvent.VK_DOWN -> if (currentPanel.isAtEnd) currentPanel.close(keyStroke) else currentPanel.scrollLine()
+        KeyEvent.VK_RIGHT -> if (currentPanel.isAtEnd) currentPanel.close(keyStroke) else currentPanel.scrollLine()
+        KeyEvent.VK_UP -> currentPanel.scrollOffset(-cachedLineHeight)
+        KeyEvent.VK_LEFT -> currentPanel.scrollOffset(-cachedLineHeight)
+        KeyEvent.VK_PAGE_DOWN -> if (currentPanel.isAtEnd) currentPanel.close(keyStroke) else currentPanel.scrollPage()
+        KeyEvent.VK_PAGE_UP -> currentPanel.scrollOffset(-scrollPane.verticalScrollBar.visibleAmount)
+      }
     }
   }
 
