@@ -64,7 +64,7 @@ class OutputPanel private constructor(
   private var originalLayout: LayoutManager? = null
   private var wasOpaque = false
 
-  private var active: Boolean = false
+  var active: Boolean = false
   private val segments = mutableListOf<TextLine>()
 
   private val labelComponent: JLabel = JLabel("more")
@@ -117,9 +117,6 @@ class OutputPanel private constructor(
       positionPanel()
     }
   }
-
-  override val isPanelVisible: Boolean
-    get() = active
 
   override var text: String
     get() = textPane.getText() ?: ""
@@ -213,6 +210,11 @@ class OutputPanel private constructor(
   }
 
   override fun handleKey(key: KeyStroke) {
+    if (key.keyChar == ':') {
+      openCommandPrompt()
+      return
+    }
+
     if (isAtEnd) {
       close(key)
       return
@@ -304,6 +306,22 @@ class OutputPanel private constructor(
 
   override fun close() {
     close(null)
+  }
+
+  private fun openCommandPrompt() {
+    // Remove the output panel from the glass pane without hiding it or restoring its state,
+    // so that ExEntryPanel.activate() can reuse it immediately in the same event cycle
+    active = false
+    clearText()
+    textPane.text = ""
+    if (glassPane != null) {
+      glassPane!!.removeComponentListener(resizeAdapter)
+      glassPane!!.remove(this)
+    }
+    val vimEditor = IjVimEditor(editor)
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val commandLine = injector.commandLine.createCommandPrompt(vimEditor, context, 0, initialText = "")
+    commandLine.focus()
   }
 
   fun close(key: KeyStroke?) {
