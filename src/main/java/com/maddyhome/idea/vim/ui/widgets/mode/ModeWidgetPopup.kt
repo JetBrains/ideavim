@@ -326,33 +326,33 @@ class ModeWidgetPopup : AnAction() {
 
     private class VimScopeBooleanVariable(private var key: String) : ReadWriteProperty<ModeColors, Boolean> {
       override fun getValue(thisRef: ModeColors, property: KProperty<*>): Boolean {
-        return injector.variableService.getVimVariable(key)?.toVimNumber()?.booleanValue ?: false
+        return injector.variableService.getGlobalVariableValue(key)?.toVimNumber()?.booleanValue ?: false
       }
 
       override fun setValue(thisRef: ModeColors, property: KProperty<*>, value: Boolean) {
-        injector.variableService.storeVimVariable(key, value.asVimInt())
+        injector.variableService.storeGlobalVariable(key, value.asVimInt())
       }
     }
 
     private class VimScopeStringVariable(private var key: String) : ReadWriteProperty<ModeColors, String> {
       override fun getValue(thisRef: ModeColors, property: KProperty<*>): String {
-        return injector.variableService.getVimVariable(key)?.toVimString()?.value ?: ""
+        return injector.variableService.getGlobalVariableValue(key)?.toVimString()?.value ?: ""
       }
 
       override fun setValue(thisRef: ModeColors, property: KProperty<*>, value: String) {
-        injector.variableService.storeVimVariable(key, VimString(value))
+        injector.variableService.storeGlobalVariable(key, VimString(value))
       }
     }
 
     private class VimScopeThemeVariable(private var key: String) : ReadWriteProperty<ModeColors, ModeWidgetTheme> {
       override fun getValue(thisRef: ModeColors, property: KProperty<*>): ModeWidgetTheme {
         val themeString =
-          injector.variableService.getVimVariable(key)?.toVimString()?.value ?: return ModeWidgetTheme.getDefaultTheme()
+          injector.variableService.getGlobalVariableValue(key)?.toVimString()?.value ?: return ModeWidgetTheme.getDefaultTheme()
         return ModeWidgetTheme.parseString(themeString) ?: ModeWidgetTheme.getDefaultTheme()
       }
 
       override fun setValue(thisRef: ModeColors, property: KProperty<*>, value: ModeWidgetTheme) {
-        injector.variableService.storeVimVariable(key, VimString(value.toString()))
+        injector.variableService.storeGlobalVariable(key, VimString(value.toString()))
       }
     }
   }

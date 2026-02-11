@@ -43,10 +43,10 @@ class WidgetState : ApplicationUsagesCollector() {
   }
 
   private fun getModeWidgetTheme(postfix: String): String {
-    if (injector.variableService.getVimVariable("widget_mode_is_full_customization$postfix")?.toVimNumber()?.booleanValue == true) {
+    if (injector.variableService.getGlobalVariableValue("widget_mode_is_full_customization$postfix")?.toVimNumber()?.booleanValue == true) {
       return "ADVANCED CUSTOMIZATION"
     }
-    val themeString = injector.variableService.getVimVariable("widget_mode_theme$postfix")?.toVimString()?.value
+    val themeString = injector.variableService.getGlobalVariableValue("widget_mode_theme$postfix")?.toVimString()?.value
     return if (themeString?.lowercase() == "colorless") {
       "COLORLESS"
     } else {
