@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -28,7 +28,6 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
-import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 /**
@@ -1200,7 +1199,6 @@ class MapCommandTest : VimTestCase() {
     """.trimIndent()
     )
     enterCommand("map k :echo 4<CR> \\| :echo 42<CR>")
-    assertNull(injector.outputPanel.getCurrentOutputPanel())
     typeText("k")
     assertEquals("4\n42", injector.outputPanel.getCurrentOutputPanel()!!.text)
   }

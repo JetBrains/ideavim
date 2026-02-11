@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2024 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -31,6 +31,7 @@ class ExEntryAction : VimActionHandler.SingleExecution() {
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (editor.isOneLineMode()) return false
+    injector.outputPanel.getCurrentOutputPanel()?.close()
     injector.commandLine.createCommandPrompt(editor, context, cmd.rawCount, initialText = "")
     return true
   }
