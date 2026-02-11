@@ -13,9 +13,9 @@ import javax.swing.KeyStroke
 
 interface VimOutputPanel {
   /**
-   * Whether the output panel is currently active and visible.
+   * Whether the output panel is currently visible.
    */
-  val isActive: Boolean
+  val isVisible: Boolean
 
   /**
    * The current text displayed in the output panel.
