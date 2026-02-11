@@ -210,10 +210,6 @@ class OutputPanel private constructor(
   }
 
   override fun handleKey(key: KeyStroke) {
-    if (key.keyChar == ':') {
-      openCommandPrompt()
-      return
-    }
 
     if (isAtEnd) {
       close(key)
@@ -306,22 +302,6 @@ class OutputPanel private constructor(
 
   override fun close() {
     close(null)
-  }
-
-  private fun openCommandPrompt() {
-    // Remove the output panel from the glass pane without hiding it or restoring its state,
-    // so that ExEntryPanel.activate() can reuse it immediately in the same event cycle
-    active = false
-    clearText()
-    textPane.text = ""
-    if (glassPane != null) {
-      glassPane!!.removeComponentListener(resizeAdapter)
-      glassPane!!.remove(this)
-    }
-    val vimEditor = IjVimEditor(editor)
-    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
-    val commandLine = injector.commandLine.createCommandPrompt(vimEditor, context, 0, initialText = "")
-    commandLine.focus()
   }
 
   fun close(key: KeyStroke?) {
@@ -496,6 +476,7 @@ class OutputPanel private constructor(
           if (currentPanel.isAtEnd) currentPanel.close() else currentPanel.scrollLine()
           e.consume()
         }
+
         KeyEvent.VK_DOWN -> if (currentPanel.isAtEnd) currentPanel.close(keyStroke) else currentPanel.scrollLine()
         KeyEvent.VK_RIGHT -> if (currentPanel.isAtEnd) currentPanel.close(keyStroke) else currentPanel.scrollLine()
         KeyEvent.VK_UP -> currentPanel.scrollOffset(-cachedLineHeight)
