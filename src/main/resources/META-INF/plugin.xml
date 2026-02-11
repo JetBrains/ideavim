@@ -212,6 +212,8 @@
                         serviceInterface="com.maddyhome.idea.vim.api.VimProcessGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.ui.ex.ExEntryPanelService"
                         serviceInterface="com.maddyhome.idea.vim.api.VimCommandLineService"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.ui.ex.ExEntryModalInputService"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimModalInputService"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.ui.ex.IjOutputPanelService"
                         serviceInterface="com.maddyhome.idea.vim.api.VimOutputPanelService"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.api.VimDigraphGroupBase"
