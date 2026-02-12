@@ -22,4 +22,16 @@ class PreviousFileCommandTest : VimTestCase() {
     assertTrue(command is PreviousFileCommand)
     assertEquals("4", command.argument)
   }
+
+  @Test
+  fun `command parsing bprevious`() {
+    val command = injector.vimscriptParser.parseCommand("bprevious")
+    assertTrue(command is PreviousFileCommand)
+  }
+
+  @Test
+  fun `command parsing bp`() {
+    val command = injector.vimscriptParser.parseCommand("bp")
+    assertTrue(command is PreviousFileCommand)
+  }
 }

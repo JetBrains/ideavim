@@ -17,14 +17,14 @@ import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
- * see "h :last"
+ * see "h :blast"
  */
-@ExCommand(command = "la[st]")
-data class SelectLastFileCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
+@ExCommand(command = "bl[ast]")
+data class BlastCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 
   override val argFlags: CommandHandlerFlags =
-    flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+    flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)
 
   override fun processCommand(
     editor: VimEditor,
