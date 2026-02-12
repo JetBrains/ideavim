@@ -233,8 +233,8 @@ abstract class VimVariableServiceBase : VariableService {
       )
 
       "key" -> KeyVariable.evaluate(name, editor, context, vimContext)
-      "hlsearch" -> HighLightVariable().evaluate(name, editor, context, vimContext)
-      "register" -> RegisterVariable().evaluate(name, editor, context, vimContext)
+      "hlsearch" -> HighLightVariable.evaluate(name, editor, context, vimContext)
+      "register" -> RegisterVariable.evaluate(name, editor, context, vimContext)
       "searchforward" -> VimInt(if (injector.searchGroup.getLastSearchDirection() == Direction.FORWARDS) 1 else 0)
       "val" -> ValueVariable.evaluate(name, editor, context, vimContext)
 
