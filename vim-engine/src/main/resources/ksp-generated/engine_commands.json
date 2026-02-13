@@ -1860,6 +1860,16 @@
     "modes": "X"
   },
   {
+    "keys": "gw",
+    "class": "com.maddyhome.idea.vim.action.change.change.ReformatCodeMotionPreserveCursorAction",
+    "modes": "N"
+  },
+  {
+    "keys": "gw",
+    "class": "com.maddyhome.idea.vim.action.change.change.ReformatCodeVisualPreserveCursorAction",
+    "modes": "X"
+  },
+  {
     "keys": "g~",
     "class": "com.maddyhome.idea.vim.action.change.change.ChangeCaseToggleMotionAction",
     "modes": "N"
