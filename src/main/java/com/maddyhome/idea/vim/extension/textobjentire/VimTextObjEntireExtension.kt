@@ -8,7 +8,7 @@
 
 package com.maddyhome.idea.vim.extension.textobjentire
 
-import com.intellij.vim.api.VimApi
+import com.intellij.vim.api.VimInitApi
 import com.intellij.vim.api.getVariable
 import com.intellij.vim.api.scopes.TextObjectRange
 import com.maddyhome.idea.vim.extension.VimExtension
@@ -28,10 +28,10 @@ internal class VimTextObjEntireExtension : VimExtension {
 
   override fun getName(): String = "textobj-entire"
 
-  override fun init(api: VimApi) {
-    val skipDefaults = api.getVariable<Boolean>("g:textobj_entire_no_default_mappings") ?: false
+  override fun init(initApi: VimInitApi) {
+    val skipDefaults = initApi.getVariable<Boolean>("g:textobj_entire_no_default_mappings") ?: false
 
-    api.textObjects {
+    initApi.textObjects {
       register("ae", registerDefaultMapping = !skipDefaults) { _ ->
         TextObjectRange.CharacterWise(0, editor { read { textLength.toInt() } })
       }

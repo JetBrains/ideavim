@@ -9,7 +9,7 @@
 package com.maddyhome.idea.vim.extension;
 
 import com.intellij.openapi.extensions.ExtensionPointName;
-import com.intellij.vim.api.VimApi;
+import com.intellij.vim.api.VimInitApi;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.VimNlsSafe;
 import com.maddyhome.idea.vim.key.MappingOwner;
@@ -56,14 +56,18 @@ public interface VimExtension {
   default void init() {}
 
   /**
-   * Initializes the extension with a pre-constructed VimApi instance.
+   * Initializes the extension with a pre-constructed VimInitApi instance.
+   * <p>
+   * VimInitApi provides only init-safe methods (mappings, text objects, variables,
+   * operator functions). Editor operations are not available during init since
+   * there is no editor context yet.
    * <p>
    * The default implementation calls {@link #init()} for backward compatibility.
    *
-   * @param api The VimApi instance for this extension
+   * @param initApi The VimInitApi instance for this extension
    */
   @ApiStatus.Experimental
-  default void init(VimApi api) {
+  default void init(VimInitApi initApi) {
     init();
   }
 

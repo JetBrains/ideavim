@@ -8,6 +8,7 @@
 package com.maddyhome.idea.vim.extension.miniai
 
 import com.intellij.vim.api.VimApi
+import com.intellij.vim.api.VimInitApi
 import com.intellij.vim.api.models.Range
 import com.intellij.vim.api.scopes.TextObjectRange
 import com.maddyhome.idea.vim.extension.VimExtension
@@ -27,8 +28,8 @@ class MiniAI : VimExtension {
 
   override fun getName() = "mini-ai"
 
-  override fun init(api: VimApi) {
-    api.textObjects {
+  override fun init(initApi: VimInitApi) {
+    initApi.textObjects {
       register("aq", preserveSelectionAnchor = false) { _ ->
         findQuoteRange(isOuter = true)
       }

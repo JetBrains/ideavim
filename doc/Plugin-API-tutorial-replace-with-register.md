@@ -59,12 +59,12 @@ First, create a Kotlin file for your plugin:
 
 ```kotlin
 @VimPlugin(name = "ReplaceWithRegister")
-fun VimApi.init() {
+fun VimInitApi.init() {
   // We'll add mappings and functionality here
 }
 ```
 
-The `init` function has a responsibility to set up our plugin within the `VimApi`.
+The `init` function has a responsibility to set up our plugin using the `VimInitApi`, which provides a restricted set of init-safe methods (mappings, text objects, variables, operator functions).
 
 ### Step 2: Define Mappings
 
@@ -78,7 +78,7 @@ Add this code to the `init` function:
 
 ```kotlin
 @VimPlugin(name = "ReplaceWithRegister")
-fun VimApi.init() {
+fun VimInitApi.init() {
     mappings {
         // Step 1: Non-recursive <Plug> → action mappings
         nnoremap("<Plug>ReplaceWithRegisterOperator") {

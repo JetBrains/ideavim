@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.extension.replacewithregister
 
 import com.intellij.vim.api.VimApi
+import com.intellij.vim.api.VimInitApi
 import com.intellij.vim.api.VimPlugin
 import com.intellij.vim.api.getVariable
 import com.intellij.vim.api.models.Mode
@@ -19,7 +20,7 @@ import com.intellij.vim.api.scopes.editor.caret.CaretTransaction
 private const val PLUGIN_NAME: String = "ReplaceWithRegisterNew"
 
 @VimPlugin(name = PLUGIN_NAME)
-fun VimApi.init() {
+fun VimInitApi.init() {
   mappings {
     // Step 1: Non-recursive <Plug> → action mappings
     nnoremap(RWR_OPERATOR) {
