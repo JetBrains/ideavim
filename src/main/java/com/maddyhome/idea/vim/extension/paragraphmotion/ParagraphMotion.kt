@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.extension.paragraphmotion
 
 import com.intellij.vim.api.VimApi
+import com.intellij.vim.api.VimInitApi
 import com.intellij.vim.api.getVariable
 import com.intellij.vim.api.scopes.nmapPluginAction
 import com.intellij.vim.api.scopes.omapPluginAction
@@ -18,8 +19,8 @@ import com.maddyhome.idea.vim.extension.VimExtension
 internal class ParagraphMotion : VimExtension {
   override fun getName(): String = "vim-paragraph-motion"
 
-  override fun init(api: VimApi) {
-    api.mappings {
+  override fun init(initApi: VimInitApi) {
+    initApi.mappings {
       nmapPluginAction("}", "<Plug>(ParagraphNextMotion)", keepDefaultMapping = true) {
         moveParagraph(1)
       }

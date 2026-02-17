@@ -8,15 +8,15 @@
 
 package com.maddyhome.idea.vim.extension.replacewithregister
 
-import com.intellij.vim.api.VimApi
+import com.intellij.vim.api.VimInitApi
 import com.maddyhome.idea.vim.extension.VimExtension
 
 internal class ReplaceWithRegister : VimExtension {
 
   override fun getName(): String = "ReplaceWithRegister"
 
-  override fun init(api: VimApi) {
-    api.mappings {
+  override fun init(initApi: VimInitApi) {
+    initApi.mappings {
       // Step 1: Non-recursive <Plug> → action mappings
       nnoremap(RWR_OPERATOR) {
         rewriteMotion()
@@ -33,7 +33,7 @@ internal class ReplaceWithRegister : VimExtension {
       nmap("grr", RWR_LINE)
       vmap("gr", RWR_VISUAL)
 
-      api.exportOperatorFunction(OPERATOR_FUNC_NAME) {
+      initApi.exportOperatorFunction(OPERATOR_FUNC_NAME) {
         operatorFunction()
       }
     }

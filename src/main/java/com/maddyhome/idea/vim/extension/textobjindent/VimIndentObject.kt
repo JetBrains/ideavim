@@ -8,6 +8,7 @@
 package com.maddyhome.idea.vim.extension.textobjindent
 
 import com.intellij.vim.api.VimApi
+import com.intellij.vim.api.VimInitApi
 import com.intellij.vim.api.scopes.TextObjectRange
 import com.maddyhome.idea.vim.extension.VimExtension
 
@@ -28,8 +29,8 @@ import com.maddyhome.idea.vim.extension.VimExtension
 class VimIndentObject : VimExtension {
   override fun getName(): String = "textobj-indent"
 
-  override fun init(api: VimApi) {
-    api.textObjects {
+  override fun init(initApi: VimInitApi) {
+    initApi.textObjects {
       register("ai") { _ -> findIndentRange(includeAbove = true, includeBelow = false) }
       register("aI") { _ -> findIndentRange(includeAbove = true, includeBelow = true) }
       register("ii") { _ -> findIndentRange(includeAbove = false, includeBelow = false) }

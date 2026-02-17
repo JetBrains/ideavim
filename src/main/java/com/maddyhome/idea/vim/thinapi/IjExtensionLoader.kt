@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.thinapi
 
 import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.extensions.PluginId
+import com.intellij.vim.api.VimInitApi
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.extension.ExtensionBean
@@ -36,18 +37,19 @@ class IjExtensionLoader : ExtensionLoader {
   private val enabledExtensions: MutableMap<String, ExtensionBean> = mutableMapOf()
 
   /**
-   * Creates a VimApi for the specified extension.
+   * Creates a VimInitApi for the specified extension.
    *
-   * The VimApi provides extension-specific context for mappings and listeners,
+   * The VimInitApi provides a restricted init-safe subset of VimApi
+   * (mappings, text objects, variables, operator functions),
    * allowing the extension to register its functionality in an isolated manner.
    *
    * @param name The name of the extension for which to create a scope.
-   * @return A [VimApiImpl] instance configured for the specified extension.
+   * @return A [VimInitApi] instance configured for the specified extension.
    */
-  private fun createVimApi(name: String): VimApiImpl {
+  private fun createVimApi(name: String): VimInitApi {
     val mappingOwner = MappingOwner.Plugin.get(name)
     val listenerOwner = ListenerOwner.Plugin.get(name)
-    return VimApiImpl(listenerOwner, mappingOwner, null)
+    return VimInitApi(VimApiImpl(listenerOwner, mappingOwner, null))
   }
 
   /**

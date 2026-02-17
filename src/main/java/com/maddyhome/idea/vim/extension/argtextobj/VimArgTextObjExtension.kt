@@ -8,6 +8,7 @@
 package com.maddyhome.idea.vim.extension.argtextobj
 
 import com.intellij.vim.api.VimApi
+import com.intellij.vim.api.VimInitApi
 import com.intellij.vim.api.scopes.TextObjectRange
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.extension.VimExtension
@@ -118,8 +119,8 @@ private class BracketPairs(openBrackets: String, closeBrackets: String) {
 class VimArgTextObjExtension : VimExtension {
   override fun getName(): String = "argtextobj"
 
-  override fun init(api: VimApi) {
-    api.textObjects {
+  override fun init(initApi: VimInitApi) {
+    initApi.textObjects {
       register("ia", preserveSelectionAnchor = false) { count ->
         findArgumentRange(isInner = true, count)
       }

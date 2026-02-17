@@ -32,7 +32,7 @@ The IdeaVim API provides a Kotlin DSL that makes it easy to create new plugins.
 ## Plugin Architecture
 
 IdeaVim plugins are built using a scope-based architecture.
-Starting scope is the `VimApi`, which provides access to various aspects of the editor and Vim functionality.
+Starting scope is `VimInitApi`, which provides init-safe methods (mappings, text objects, variables, operator functions). At runtime, callbacks receive the full `VimApi` with editor access.
 
 An IdeaVim plugin written with this API consists of:
 
@@ -44,7 +44,7 @@ Here's a minimal plugin structure:
 
 ```kotlin
 @VimPlugin(name = "MyPlugin")
-fun VimApi.init() {
+fun VimInitApi.init() {
     // Plugin initialization code
     mappings {
         nnoremap("<Plug>MyPluginAction") {
@@ -60,7 +60,7 @@ fun VimApi.init() {
 IdeaVim plugins are written in scopes.
 They provide a structured way to write code, improve readability and ensure that functions can be called only within a specific scope.
 
-The base scope is `VimApi`, which provides access to general Vim functionality. From there, plugin writers can access more specialized scopes.
+The base scope during init is `VimInitApi`, which provides registration methods. At runtime, callbacks use `VimApi` which provides full access to general Vim functionality. From there, plugin writers can access more specialized scopes.
 The list of all scopes and their functions is available in the API reference ([link](Plugin-API-reference.md)).
 
 ### Scopes example
