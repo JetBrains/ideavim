@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2025 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -16,13 +16,20 @@ import com.maddyhome.idea.vim.extension.JsonExtensionProvider
 import com.maddyhome.idea.vim.extension.KspExtensionBean
 import com.maddyhome.idea.vim.extension.toExtensionBean
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.encodeToStream
-import java.io.File
 import java.io.InputStream
-import java.io.RandomAccessFile
+import java.nio.channels.FileChannel
+import java.nio.file.Path
+import java.nio.file.StandardOpenOption
+import kotlin.io.path.Path
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.createDirectories
+import kotlin.io.path.deleteIfExists
+import kotlin.io.path.exists
+import kotlin.io.path.inputStream
+import kotlin.io.path.outputStream
 import kotlin.io.path.writeText
 
 /**
@@ -35,9 +42,14 @@ class IjJsonExtensionProvider : JsonExtensionProvider {
   private val json = Json { prettyPrint = true }
   private val logger = vimLogger<IjJsonExtensionProvider>()
 
-  private fun <T> withFileLock(file: File, mode: String, action: () -> T): T {
-    RandomAccessFile(file, mode).use { raf ->
-      val lock = raf.channel.lock()
+  private fun <T> withFileLock(path: Path, readOnly: Boolean, action: () -> T): T {
+    val options = if (readOnly) {
+      arrayOf(StandardOpenOption.READ)
+    } else {
+      arrayOf(StandardOpenOption.READ, StandardOpenOption.WRITE, StandardOpenOption.CREATE)
+    }
+    FileChannel.open(path, *options).use { channel ->
+      val lock = if (readOnly) channel.lock(0, Long.MAX_VALUE, true) else channel.lock()
       try {
         return action()
       } finally {
@@ -46,11 +58,11 @@ class IjJsonExtensionProvider : JsonExtensionProvider {
     }
   }
 
-  private fun <T> withReadLock(file: File = getConfigFile(), action: () -> T): T =
-    withFileLock(file, "r", action)
+  private fun <T> withReadLock(path: Path = getConfigFile(), action: () -> T): T =
+    withFileLock(path, readOnly = true, action)
 
-  private fun <T> withReadWriteLock(file: File = getConfigFile(), action: () -> T): T =
-    withFileLock(file, "rw", action)
+  private fun <T> withReadWriteLock(path: Path = getConfigFile(), action: () -> T): T =
+    withFileLock(path, readOnly = false, action)
 
   /**
    * Reads extensions from the JSON file.
@@ -64,7 +76,7 @@ class IjJsonExtensionProvider : JsonExtensionProvider {
         Json.decodeFromStream<List<ExtensionBean>>(inputStream)
       }
     }.getOrElse {
-      logger.error("Failed to read extensions from ${getConfigFile().absolutePath}", it)
+      logger.error("Failed to read extensions from ${getConfigFile().absolutePathString()}", it)
       emptyList()
     }
   }
@@ -76,8 +88,7 @@ class IjJsonExtensionProvider : JsonExtensionProvider {
    */
   private fun writeExtensionsToJsonConfigFile(extensions: List<ExtensionBean>) {
     val encodedExtensions = json.encodeToString(extensions)
-    val filePath = getConfigFile().toPath()
-    filePath.writeText(encodedExtensions)
+    getConfigFile().writeText(encodedExtensions)
   }
 
   /**
@@ -167,14 +178,14 @@ class IjJsonExtensionProvider : JsonExtensionProvider {
   @OptIn(ExperimentalSerializationApi::class)
   override fun init() {
     // 1) Create a new file in the extensions directory (delete the existing one)
-    val targetFile = File(ideaVimConfigPath, EXTENSION_LIST_FILE_NAME)
+    val targetFile = Path(ideaVimConfigPath, EXTENSION_LIST_FILE_NAME)
 
-    if (!targetFile.parentFile.exists()) {
-      targetFile.parentFile.mkdirs()
+    if (!targetFile.parent.exists()) {
+      targetFile.parent.createDirectories()
     }
 
     if (targetFile.exists()) {
-      targetFile.delete()
+      targetFile.deleteIfExists()
     }
 
     // 2) Copy bundled extensions into the new config file
@@ -203,9 +214,8 @@ class IjJsonExtensionProvider : JsonExtensionProvider {
    *
    * @return File object pointing to the extensions JSON file
    */
-  fun getConfigFile(): File {
-    val targetFile = File(ideaVimConfigPath, EXTENSION_LIST_FILE_NAME)
-    return targetFile
+  fun getConfigFile(): Path {
+    return Path(ideaVimConfigPath, EXTENSION_LIST_FILE_NAME)
   }
 
   /**

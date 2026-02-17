@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -19,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import java.nio.file.Files
+import kotlin.io.path.writeText
 
 class ReloadVimRcTest : VimTestCase() {
   private val editorFactory = MockEditorFactory()
@@ -118,7 +119,7 @@ class ReloadVimRcTest : VimTestCase() {
 
     VimRcFileState.saveFileState("", origFile)
 
-    val tempUpdatedFile = Files.createTempFile("xyz", ".txt").toFile()
+    val tempUpdatedFile = Files.createTempFile("xyz", ".txt")
     tempUpdatedFile.writeText(changedFile)
 
     val document = editorFactory.createDocument(changedFile)
@@ -142,7 +143,7 @@ class ReloadVimRcTest : VimTestCase() {
 
     VimRcFileState.saveFileState("", origFile)
 
-    val tempUpdatedFile = Files.createTempFile("xyz", ".txt").toFile()
+    val tempUpdatedFile = Files.createTempFile("xyz", ".txt")
     tempUpdatedFile.writeText(changedFile)
 
     val document = editorFactory.createDocument(changedFile)

@@ -12,20 +12,23 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
-import java.io.File
+import java.nio.file.Path
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.createTempFile
+import kotlin.io.path.writeText
 
 class ReadCommandTest : VimTestCase() {
 
-  private lateinit var testFile: File
+  private lateinit var testFile: Path
   private lateinit var testFilePath: String
 
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
     // Create a temporary file for testing
-    testFile = File.createTempFile("ideavim_read_test", ".txt")
-    testFile.deleteOnExit()
-    testFilePath = testFile.absolutePath
+    testFile = createTempFile("ideavim_read_test", ".txt")
+    testFile.toFile().deleteOnExit()
+    testFilePath = testFile.absolutePathString()
   }
 
   // ============ Basic :read functionality ============
@@ -456,7 +459,7 @@ class ReadCommandTest : VimTestCase() {
   fun `test read with absolute path`() {
     testFile.writeText("absolute path content")
     configureByText("line ${c}1")
-    enterCommand("read ${testFile.absolutePath}")
+    enterCommand("read ${testFile.absolutePathString()}")
     assertState(
       """
       line 1

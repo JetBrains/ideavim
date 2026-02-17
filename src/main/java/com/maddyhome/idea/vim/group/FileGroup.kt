@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -38,8 +38,8 @@ import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.execute
 import com.maddyhome.idea.vim.newapi.globalIjOptions
-import java.io.File
 import java.util.*
+import kotlin.io.path.Path
 
 class FileGroup : VimFileBase() {
   override fun openFile(filename: String, context: ExecutionContext): Boolean {
@@ -88,9 +88,9 @@ class FileGroup : VimFileBase() {
         logger.debug("home dir file")
         logger.debug("looking for $relativePath in $dir")
       }
-      found = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(File(dir, relativePath))
+      found = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(Path(dir, relativePath))
     } else {
-      found = LocalFileSystem.getInstance().findFileByIoFile(File(filename))
+      found = VirtualFileManager.getInstance().findFileByNioPath(Path(filename))
 
       if (found == null) {
         found = findByNameInContentRoots(filename, project)

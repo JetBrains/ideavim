@@ -18,8 +18,11 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
 import com.maddyhome.idea.vim.vimscript.model.commands.RepeatCommand
-import java.io.File
 import java.io.IOException
+import java.nio.file.Path
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.pathString
+import kotlin.io.path.readText
 
 abstract class VimScriptExecutorBase : VimscriptExecutor {
   private val logger = vimLogger<VimScriptExecutorBase>()
@@ -93,7 +96,7 @@ abstract class VimScriptExecutorBase : VimscriptExecutor {
 
   protected abstract fun enableDelayedExtensions()
 
-  override fun executeFile(file: File, editor: VimEditor, fileIsIdeaVimRcConfig: Boolean, indicateErrors: Boolean) {
+  override fun executeFile(file: Path, editor: VimEditor, fileIsIdeaVimRcConfig: Boolean, indicateErrors: Boolean) {
     val context = injector.executionContextManager.getEditorExecutionContext(editor)
     try {
       if (fileIsIdeaVimRcConfig) {
@@ -103,19 +106,19 @@ abstract class VimScriptExecutorBase : VimscriptExecutor {
       execute(file.readText(), editor, context, skipHistory = true, indicateErrors)
     } catch (e: IOException) {
       if (indicateErrors) {
-        injector.messages.showErrorMessage(editor, "Cannot read file \"${file.path}\": ${e.message}")
+        injector.messages.showErrorMessage(editor, "Cannot read file \"${file.pathString}\": ${e.message}")
       } else {
-        logger.warn("Failed to read file ${file.path}: ${e.message}")
+        logger.warn("Failed to read file ${file.pathString}: ${e.message}")
       }
     } finally {
       if (fileIsIdeaVimRcConfig) {
-        injector.vimrcFileState.saveFileState(file.absolutePath)
+        injector.vimrcFileState.saveFileState(file.absolutePathString())
         injector.vimscriptExecutor.executingIdeaVimRcConfiguration = false
       }
     }
   }
 
-  protected abstract fun ensureFileIsSaved(file: File)
+  protected abstract fun ensureFileIsSaved(file: Path)
 
   @Throws(ExException::class)
   override fun executeLastCommand(editor: VimEditor, context: ExecutionContext): Boolean {

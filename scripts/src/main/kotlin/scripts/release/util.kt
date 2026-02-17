@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -15,7 +15,7 @@ import org.eclipse.jgit.lib.ObjectId
 import org.eclipse.jgit.lib.Repository
 import org.eclipse.jgit.lib.RepositoryBuilder
 import org.eclipse.jgit.revwalk.RevWalk
-import java.io.File
+import kotlin.io.path.Path
 
 
 fun checkReleaseType(releaseType: String) {
@@ -43,7 +43,7 @@ internal inline fun <T> withGit(rootDir: String, action: (Git) -> T): T {
 }
 
 internal inline fun <T> withRepo(rootDir: String, action: (Repository) -> T): T {
-  return RepositoryBuilder().setGitDir(File("$rootDir/.git")).build().use {
+  return RepositoryBuilder().setGitDir(Path("$rootDir/.git").toFile()).build().use {
     return@use action(it)
   }
 }
@@ -69,7 +69,7 @@ internal fun getVersionsExistingVersionsFor(
   minorVersion: Int,
   projectDir: String,
 ): Map<Semver, ObjectId> {
-  val repository = RepositoryBuilder().setGitDir(File("$projectDir/.git")).build()
+  val repository = RepositoryBuilder().setGitDir(Path("$projectDir/.git").toFile()).build()
   val git = Git(repository)
   println(git.log().call().first())
   println(git.tagList().call().first())
@@ -90,7 +90,7 @@ internal fun getVersionsExistingVersionsFor(
 }
 
 internal fun getVersion(projectDir: String, releaseType: ReleaseType): Pair<Semver, ObjectId> {
-  val repository = RepositoryBuilder().setGitDir(File("$projectDir/.git")).build()
+  val repository = RepositoryBuilder().setGitDir(Path("$projectDir/.git").toFile()).build()
   val git = Git(repository)
   println(git.log().call().first())
   println(git.tagList().call().first())

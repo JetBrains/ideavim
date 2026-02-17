@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -18,14 +18,20 @@ import com.maddyhome.idea.vim.vimscript.model.commands.SourceCommand
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
-import java.io.File
+import java.nio.file.Path
+import kotlin.io.path.Path
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.createDirectories
+import kotlin.io.path.deleteIfExists
+import kotlin.io.path.exists
+import kotlin.io.path.writeText
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class SourceCommandTest : VimTestCase() {
   @TempDir
-  var tempDir: File? = null
+  var tempDir: Path? = null
 
   @Test
   fun `command parsing`() {
@@ -43,7 +49,7 @@ class SourceCommandTest : VimTestCase() {
       val mappingPreCheck = layerPreCheck.getLayer(listOf(key("x")))
       assertNull(mappingPreCheck) // Make sure we don't yet have a mapping from x
 
-      val file = File(tempDir, "text.txt")
+      val file = tempDir!!.resolve("text.txt")
       file.writeText(
         """
         map x y
@@ -68,7 +74,7 @@ class SourceCommandTest : VimTestCase() {
       val mappingPreCheck = layerPreCheck.getLayer(listOf(key("x")))
       assertNull(mappingPreCheck) // Make sure we don't yet have a mapping from x
 
-      val file = File(tempDir, "text.txt")
+      val file = tempDir!!.resolve("text.txt")
       file.writeText(
         """
         map x y
@@ -92,14 +98,14 @@ class SourceCommandTest : VimTestCase() {
 
     // Create a test file in a subdirectory named after PATH env var (to verify expansion)
     val testEnvVar = System.getenv("USER") ?: System.getenv("USERNAME") ?: "testuser"
-    val subDir = File(tempDir, testEnvVar)
-    subDir.mkdirs()
-    val testFile = File(subDir, "config.vim")
+    val subDir = tempDir!!.resolve(testEnvVar)
+    subDir.createDirectories()
+    val testFile = subDir.resolve("config.vim")
     testFile.writeText("map x y")
 
     try {
       // Source using $USER environment variable
-      enterCommand("source ${tempDir!!.absolutePath}/\$USER/config.vim")
+      enterCommand("source ${tempDir!!.absolutePathString()}/\$USER/config.vim")
 
       // Verify the file was sourced by checking the mapping was created
       val layer = injector.keyGroup.getKeyMappingLayer(MappingMode.NORMAL)
@@ -115,13 +121,13 @@ class SourceCommandTest : VimTestCase() {
     configureByText("")
 
     val testEnvVar = System.getenv("USER") ?: System.getenv("USERNAME") ?: "testuser"
-    val subDir = File(tempDir, testEnvVar)
-    subDir.mkdirs()
-    val testFile = File(subDir, "config.vim")
+    val subDir = tempDir!!.resolve(testEnvVar)
+    subDir.createDirectories()
+    val testFile = subDir.resolve("config.vim")
     testFile.writeText("map z w")
 
     try {
-      enterCommand("source ${tempDir!!.absolutePath}/\${USER}/config.vim")
+      enterCommand("source ${tempDir!!.absolutePathString()}/\${USER}/config.vim")
 
       val layer = injector.keyGroup.getKeyMappingLayer(MappingMode.NORMAL)
       val mapping = layer.getLayer(listOf(key("z"))) as? MappingInfo
@@ -137,7 +143,7 @@ class SourceCommandTest : VimTestCase() {
 
     // Create a test file in home directory
     val home = System.getProperty("user.home")
-    val testFile = File(home, ".ideavim_test_source.vim")
+    val testFile = Path(home, ".ideavim_test_source.vim")
     testFile.writeText("map a b")
 
     try {
@@ -148,7 +154,7 @@ class SourceCommandTest : VimTestCase() {
       assertTrue(mapping != null, "File should be sourced using tilde expansion")
     } finally {
       injector.keyGroup.removeKeyMapping(MappingMode.NXO, listOf(key("a")))
-      testFile.delete()
+      testFile.deleteIfExists()
     }
   }
 
@@ -160,9 +166,9 @@ class SourceCommandTest : VimTestCase() {
     val testEnvVar = System.getenv("USER") ?: System.getenv("USERNAME") ?: "testuser"
 
     // Create directory structure: ~/USER_VALUE/
-    val subDir = File(home, testEnvVar)
-    subDir.mkdirs()
-    val testFile = File(subDir, "test.vim")
+    val subDir = Path(home, testEnvVar)
+    subDir.createDirectories()
+    val testFile = subDir.resolve("test.vim")
     testFile.writeText("map c d")
 
     try {
@@ -173,8 +179,8 @@ class SourceCommandTest : VimTestCase() {
       assertTrue(mapping != null, "File should be sourced with both tilde and env var expanded")
     } finally {
       injector.keyGroup.removeKeyMapping(MappingMode.NXO, listOf(key("c")))
-      testFile.delete()
-      subDir.delete()
+      testFile.deleteIfExists()
+      subDir.deleteIfExists()
     }
   }
 
@@ -182,14 +188,14 @@ class SourceCommandTest : VimTestCase() {
   fun `test source non-existent file shows error message`() {
     configureByText("")
 
-    val nonExistentFile = File(tempDir, "non_existent_file.vim")
+    val nonExistentFile = tempDir!!.resolve("non_existent_file.vim")
     // Make sure the file does NOT exist
     if (nonExistentFile.exists()) {
-      nonExistentFile.delete()
+      nonExistentFile.deleteIfExists()
     }
 
     // Execute source command for non-existent file
-    enterCommand("source ${nonExistentFile.absolutePath}")
+    enterCommand("source ${nonExistentFile.absolutePathString()}")
 
     // Verify that error was indicated (no exception thrown, graceful handling)
     // The command should complete without crashing

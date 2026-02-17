@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -17,6 +17,7 @@ import com.maddyhome.idea.vim.newapi.initInjector
 import com.maddyhome.idea.vim.statistic.PluginState.Util.extensionNames
 import com.maddyhome.idea.vim.vimscript.services.VimRcService
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.io.path.readLines
 
 internal class VimscriptState : ApplicationUsagesCollector() {
 

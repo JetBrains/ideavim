@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -14,9 +14,13 @@ import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.vimscript.model.commands.IdeaPlug
 import org.jetbrains.annotations.NonNls
-import java.io.File
 import java.io.IOException
-import java.nio.file.Paths
+import java.nio.file.Path
+import kotlin.io.path.Path
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.createFile
+import kotlin.io.path.exists
+import kotlin.io.path.writeText
 
 object VimRcService {
   private val logger = vimLogger<VimRcService>()
@@ -28,15 +32,15 @@ object VimRcService {
   private val HOME_VIMRC_PATHS = arrayOf(".$VIMRC_FILE_NAME", "_$VIMRC_FILE_NAME")
 
   @NonNls
-  private val XDG_VIMRC_PATH = "ideavim" + File.separator + VIMRC_FILE_NAME
+  private val XDG_VIMRC_PATH = "ideavim/$VIMRC_FILE_NAME"
 
   @JvmStatic
-  fun findIdeaVimRc(): File? {
+  fun findIdeaVimRc(): Path? {
     // Check whether file exists in home dir
     val homeDirName = System.getProperty("user.home")
     if (homeDirName != null) {
       for (fileName in HOME_VIMRC_PATHS) {
-        val file = File(homeDirName, fileName)
+        val file = Path(homeDirName, fileName)
         if (file.exists()) {
           logger.debug { "Found ideavimrc file: $file" }
           return file
@@ -51,7 +55,7 @@ object VimRcService {
     val xdgConfigHomeProperty = System.getenv("XDG_CONFIG_HOME")
     val xdgConfig = if (xdgConfigHomeProperty == null || xdgConfigHomeProperty == "") {
       logger.debug("XDG_CONFIG_HOME is not defined. Trying to locate ~/.config/ideavim/ideavimrc file.")
-      if (homeDirName != null) Paths.get(homeDirName, ".config", XDG_VIMRC_PATH).toFile() else null
+      if (homeDirName != null) Path(homeDirName, ".config", XDG_VIMRC_PATH) else null
     } else {
       logger.debug { "XDG_CONFIG_HOME set to '$xdgConfigHomeProperty'. Trying to locate \$XDG_CONFIG_HOME/ideavim/ideavimrc file" }
       val configHome = if (xdgConfigHomeProperty.startsWith("~/") || xdgConfigHomeProperty.startsWith("~\\")) {
@@ -62,7 +66,7 @@ object VimRcService {
       else {
         xdgConfigHomeProperty
       }
-      File(configHome, XDG_VIMRC_PATH)
+      Path(configHome, XDG_VIMRC_PATH)
     }
     return xdgConfig?.let {
       if (it.exists()) {
@@ -110,7 +114,7 @@ object VimRcService {
 
   """.trimMargin()
 
-  fun findOrCreateIdeaVimRc(): File? {
+  fun findOrCreateIdeaVimRc(): Path? {
     val found = findIdeaVimRc()
     if (found != null) return found
 
@@ -119,10 +123,10 @@ object VimRcService {
     if (homeDirName != null) {
       for (fileName in HOME_VIMRC_PATHS) {
         try {
-          val file = File(homeDirName, fileName)
-          file.createNewFile()
+          val file = Path(homeDirName, fileName)
+          file.createFile()
           file.writeText(getNewIdeaVimRcTemplate(vimrc))
-          injector.vimrcFileState.filePath = file.absolutePath
+          injector.vimrcFileState.filePath = file.absolutePathString()
           return file
         } catch (ignored: IOException) {
           // Try to create one of two files
@@ -133,14 +137,14 @@ object VimRcService {
   }
 
   private fun sourceVimrc(homeDirName: String): String {
-    if (File(homeDirName, ".vimrc").exists()) {
+    if (Path(homeDirName, ".vimrc").exists()) {
       return """
         |" Source your .vimrc
         ||source ~/.vimrc
         |
       """.trimMargin()
     }
-    if (File(homeDirName, "_vimrc").exists()) {
+    if (Path(homeDirName, "_vimrc").exists()) {
       return """
         |" Source your _vimrc
         ||source ~/_vimrc
@@ -154,7 +158,7 @@ object VimRcService {
   fun executeIdeaVimRc(editor: VimEditor) {
     val ideaVimRc = findIdeaVimRc()
     if (ideaVimRc != null) {
-      logger.info("Execute ideavimrc file: " + ideaVimRc.absolutePath)
+      logger.info("Execute ideavimrc file: " + ideaVimRc.absolutePathString())
 
       // clear all previously enabled extensions
       IdeaPlug.Companion.EnabledExtensions.clearExtensions()
@@ -165,7 +169,7 @@ object VimRcService {
     }
   }
 
-  fun isIdeaVimRcFile(file: File): Boolean {
+  fun isIdeaVimRcFile(file: Path): Boolean {
     val ideaVimRc = findIdeaVimRc() ?: return false
     return ideaVimRc == file
   }

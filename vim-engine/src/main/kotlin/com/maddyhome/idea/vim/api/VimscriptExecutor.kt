@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,7 +10,7 @@ package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
-import java.io.File
+import java.nio.file.Path
 
 interface VimscriptExecutor {
 
@@ -36,7 +36,7 @@ interface VimscriptExecutor {
   ): ExecutionResult
 
   fun executeFile(
-    file: File,
+    file: Path,
     editor: VimEditor,
     fileIsIdeaVimRcConfig: Boolean,
     indicateErrors: Boolean = false,

@@ -18,8 +18,10 @@ import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.put.PutData
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
-import java.io.File
 import java.io.IOException
+import kotlin.io.path.Path
+import kotlin.io.path.exists
+import kotlin.io.path.readText
 
 /**
  * see "h :read"
@@ -71,7 +73,7 @@ data class ReadCommand(val range: Range, val modifier: CommandModifier, val argu
   }
 
   private fun readFileContent(filePath: String): String {
-    val file = File(filePath)
+    val file = Path(filePath)
     if (!file.exists()) {
       throw exExceptionMessage("E484", filePath)
     }

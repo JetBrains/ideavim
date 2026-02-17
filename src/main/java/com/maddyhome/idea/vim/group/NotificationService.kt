@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -47,8 +47,12 @@ import com.maddyhome.idea.vim.statistic.ActionTracker
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable
 import com.maddyhome.idea.vim.vimscript.services.VimRcService
 import java.awt.datatransfer.StringSelection
-import java.io.File
 import javax.swing.KeyStroke
+import kotlin.io.path.Path
+import kotlin.io.path.appendText
+import kotlin.io.path.exists
+import kotlin.io.path.isWritable
+import kotlin.io.path.pathString
 
 /**
  * @author Alex Plate
@@ -362,7 +366,7 @@ internal class NotificationService(private val project: Project?) {
       if (eventProject != null) {
         val ideaVimRc = VimRcService.findOrCreateIdeaVimRc()
         if (ideaVimRc != null) {
-          OpenFileAction.openFile(ideaVimRc.path, eventProject)
+          OpenFileAction.openFile(ideaVimRc.pathString, eventProject)
           // Do not expire a notification. The user should see what they are entering
           return
         }
@@ -395,7 +399,7 @@ internal class NotificationService(private val project: Project?) {
       enableOption()
       if (eventProject != null) {
         val ideaVimRc = VimRcService.findOrCreateIdeaVimRc()
-        if (ideaVimRc != null && ideaVimRc.canWrite()) {
+        if (ideaVimRc != null && ideaVimRc.isWritable()) {
           ideaVimRc.appendText(appendableText)
           notification.expire()
           val successNotification = Notification(
@@ -417,7 +421,7 @@ internal class NotificationService(private val project: Project?) {
     }
   }
 
-  private inner class HelpLink(val link: String) : AnAction("", "", AllIcons.Actions.Help) {
+  private class HelpLink(val link: String) : AnAction("", "", AllIcons.Actions.Help) {
     override fun actionPerformed(e: AnActionEvent) {
       BrowserUtil.browse(link)
     }
@@ -437,13 +441,13 @@ internal class NotificationService(private val project: Project?) {
         Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, message, NotificationType.WARNING)
       var actionName =
         if (SystemInfo.isMac) "Reveal Home in Finder" else "Show Home in " + RevealFileAction.getFileManagerName()
-      if (!File(System.getProperty("user.home")).exists()) {
+      if (!Path(System.getProperty("user.home")).exists()) {
         actionName = ""
       }
       notification.addAction(object : AnAction(actionName) {
         override fun actionPerformed(e: AnActionEvent) {
-          val homeDir = File(System.getProperty("user.home"))
-          RevealFileAction.openDirectory(homeDir)
+          val homeDir = Path(System.getProperty("user.home"))
+          RevealFileAction.openDirectory(homeDir.toFile())
           notification.expire()
         }
       })

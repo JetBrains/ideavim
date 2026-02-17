@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2024 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -13,8 +13,14 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
-import java.io.File
+import java.nio.file.Path
 import javax.imageio.ImageIO
+import kotlin.io.path.Path
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.createDirectories
+import kotlin.io.path.exists
+import kotlin.io.path.writeBytes
+import kotlin.io.path.writeText
 
 fun uiTest(testName: String = "test_${System.currentTimeMillis()}", url: String = "http://127.0.0.1:8082", test: RemoteRobot.() -> Unit) {
   val remoteRobot = RemoteRobot(url)
@@ -37,7 +43,7 @@ private fun BufferedImage.save(name: String) {
     ImageIO.write(this, "png", b)
     b.toByteArray()
   }
-  File("build/reports").apply { mkdirs() }.resolve("$name.png").writeBytes(bytes)
+  Path("build/reports").createDirectories().resolve("$name.png").writeBytes(bytes)
 }
 
 fun saveScreenshot(testName: String, remoteRobot: RemoteRobot) {
@@ -51,17 +57,15 @@ private fun fetchScreenShot(remoteRobot: RemoteRobot): BufferedImage {
 private fun saveHierarchy(testName: String, url: String) {
   val hierarchySnapshot =
     saveFile(url, "build/reports", "hierarchy-$testName.html")
-  if (File("build/reports/styles.css").exists().not()) {
+  if (Path("build/reports/styles.css").exists().not()) {
     saveFile("$url/styles.css", "build/reports", "styles.css")
   }
-  println("Hierarchy snapshot: ${hierarchySnapshot.absolutePath}")
+  println("Hierarchy snapshot: ${hierarchySnapshot.absolutePathString()}")
 }
 
-private fun saveFile(url: String, folder: String, name: String): File {
+private fun saveFile(url: String, folder: String, name: String): Path {
   val response = client.newCall(Request.Builder().url(url).build()).execute()
-  return File(folder).apply {
-    mkdirs()
-  }.resolve(name).apply {
-    writeText(response.body?.string() ?: "")
+  return Path(folder).createDirectories().resolve(name).also {
+    it.writeText(response.body?.string() ?: "")
   }
 }
