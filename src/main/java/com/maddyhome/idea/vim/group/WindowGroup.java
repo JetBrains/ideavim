@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -18,6 +18,8 @@ import com.intellij.openapi.fileEditor.impl.EditorTabbedContainer;
 import com.intellij.openapi.fileEditor.impl.EditorWindow;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.wm.ToolWindowType;
+import com.intellij.openapi.wm.ex.ToolWindowManagerEx;
 import com.intellij.util.concurrency.annotations.RequiresReadLock;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.api.ExecutionContext;
@@ -26,13 +28,18 @@ import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.VimLockLabel;
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext;
 import com.maddyhome.idea.vim.newapi.IjVimCaret;
+import com.maddyhome.idea.vim.options.OptionAccessScope;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+
+import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 
 public class WindowGroup extends WindowGroupBase {
   @Override
@@ -102,6 +109,144 @@ public class WindowGroup extends WindowGroupBase {
     splitWindow(SwingConstants.VERTICAL, (DataContext)context.getContext(), filename);
   }
 
+  private static @NotNull List<EditorWindow> findWindowsInRow(@NotNull Caret caret,
+                                                              @NotNull List<EditorWindow> windows,
+                                                              final boolean vertical) {
+    var anchorPoint = getCaretPoint(caret);
+    var result = new ArrayList<EditorWindow>();
+    var coord = vertical ? anchorPoint.getX() : anchorPoint.getY();
+    for (var window : windows) {
+      var rect = getSplitRectangle(window);
+      if (rect != null) {
+        var min = vertical ? rect.getX() : rect.getY();
+        var max = min + (vertical ? rect.getWidth() : rect.getHeight());
+        if (coord >= min && coord <= max) {
+          result.add(window);
+        }
+      }
+    }
+    result.sort((window1, window2) -> {
+      var rect1 = getSplitRectangle(window1);
+      var rect2 = getSplitRectangle(window2);
+      if (rect1 != null && rect2 != null) {
+        var diff = vertical ? (rect1.getY() - rect2.getY()) : (rect1.getX() - rect2.getX());
+        return diff < 0 ? -1 : diff > 0 ? 1 : 0;
+      }
+      return 0;
+    });
+    return result;
+  }
+
+  private static boolean isVimEverywhereEnabled() {
+    var option = injector.getOptionGroup().getOption("VimEverywhere");
+    if (option == null) return false;
+    var value = injector.getOptionGroup().getOptionValue(option, new OptionAccessScope.GLOBAL(null));
+    return value.toVimNumber().getBooleanValue();
+  }
+
+  private static List<NavTarget> collectNavigableWindows(@NotNull Project project) {
+    var editorTargets = collectEditorSplits(project);
+    var toolWindowTargets = collectDockedToolWindows(project);
+
+    var targets = new ArrayList<NavTarget>(editorTargets.size() + toolWindowTargets.size());
+    targets.addAll(editorTargets);
+    targets.addAll(toolWindowTargets);
+    return targets;
+  }
+
+  private static List<NavTarget> collectEditorSplits(@NotNull Project project) {
+    var fem = FileEditorManagerEx.getInstanceEx(project);
+    var targets = new ArrayList<NavTarget>();
+    for (var w : fem.getWindows()) {
+      var rect = getSplitRectangle(w);
+      if (rect != null) {
+        targets.add(new NavTarget(rect, () -> w.setAsCurrentWindow(true)));
+      }
+    }
+    return targets;
+  }
+
+  private static List<NavTarget> collectDockedToolWindows(@NotNull Project project) {
+    var twm = ToolWindowManagerEx.getInstanceEx(project);
+    var targets = new ArrayList<NavTarget>();
+    for (var id : twm.getToolWindowIds()) {
+      var tw = twm.getToolWindow(id);
+      if (tw == null || !tw.isVisible()) continue;
+      if (tw.getType() == ToolWindowType.FLOATING || tw.getType() == ToolWindowType.WINDOWED) continue;
+      var comp = tw.getComponent();
+      if (!comp.isShowing()) continue;
+      try {
+        var loc = comp.getLocationOnScreen();
+        var size = comp.getSize();
+        targets.add(new NavTarget(new Rectangle(loc, size), () -> tw.activate(null)));
+      }
+      catch (IllegalComponentStateException ignored) {
+      }
+    }
+    return targets;
+  }
+
+  /**
+   * Navigates to the nearest window in the given direction from the current position.
+   * Works uniformly for editor splits and tool windows — both are treated as screen rectangles.
+   *
+   * @param referencePoint   screen point to measure from (e.g. caret position or tool window center)
+   * @param currentBounds    screen bounds of the currently focused window
+   * @param relativePosition positive = right/down, negative = left/up
+   * @param vertical         true for up/down movement, false for left/right
+   * @return true if navigation occurred
+   */
+  public static boolean navigateInDirection(@NotNull Project project,
+                                            @NotNull Point referencePoint,
+                                            @NotNull Rectangle currentBounds,
+                                            int relativePosition,
+                                            boolean vertical) {
+    var targets = collectNavigableWindows(project);
+
+    var row = getNavTargets(referencePoint, vertical, targets);
+
+    var currentIdx = getCurrentIdx(currentBounds, row);
+    if (currentIdx == null) return false;
+
+    var targetIdx = Math.max(0, Math.min(currentIdx + relativePosition, row.size() - 1));
+    if (targetIdx == currentIdx) return false;
+
+    row.get(targetIdx).activate().run();
+    return true;
+  }
+
+  private static @Nullable Integer getCurrentIdx(@NotNull Rectangle currentBounds, ArrayList<NavTarget> row) {
+    for (int i = 0; i < row.size(); i++) {
+      if (row.get(i).bounds().intersects(currentBounds)) {
+        return i;
+      }
+    }
+    return null;
+  }
+
+  private static @NotNull ArrayList<NavTarget> getNavTargets(@NotNull Point referencePoint,
+                                                             boolean vertical,
+                                                             List<NavTarget> targets) {
+    var cord = vertical ? referencePoint.getX() : referencePoint.getY();
+    var row = new ArrayList<NavTarget>();
+    for (var target : targets) {
+      var rect = target.bounds();
+      var min = vertical ? rect.getX() : rect.getY();
+      var max = min + (vertical ? rect.getWidth() : rect.getHeight());
+      if (cord >= min && cord <= max) {
+        row.add(target);
+      }
+    }
+
+    // Sort by position in movement direction
+    row.sort((a, b) -> {
+      var posA = vertical ? a.bounds().getY() : a.bounds().getX();
+      var posB = vertical ? b.bounds().getY() : b.bounds().getX();
+      return Double.compare(posA, posB);
+    });
+    return row;
+  }
+
   @Override
   @VimLockLabel.RequiresReadLock
   @RequiresReadLock
@@ -109,55 +254,37 @@ public class WindowGroup extends WindowGroupBase {
                                 @NotNull ExecutionContext context,
                                 int relativePosition,
                                 boolean vertical) {
-    final Caret ijCaret = ((IjVimCaret)caret).getCaret();
-    final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext)context.getContext()));
-    final EditorWindow currentWindow = fileEditorManager.getCurrentWindow();
-    if (currentWindow != null) {
-      final EditorWindow[] windows = fileEditorManager.getWindows();
-      final List<EditorWindow> row = findWindowsInRow(ijCaret, currentWindow, Arrays.asList(windows), vertical);
-      selectWindow(currentWindow, row, relativePosition);
+    var dataContext = (DataContext)context.getContext();
+    var ijCaret = ((IjVimCaret)caret).getCaret();
+    var fileEditorManager = getFileEditorManager(dataContext);
+    var currentWindow = fileEditorManager.getCurrentWindow();
+    if (currentWindow == null) return;
+
+    if (isVimEverywhereEnabled()) {
+      var project = PlatformDataKeys.PROJECT.getData(dataContext);
+      if (project == null) return;
+      var currentBounds = getSplitRectangle(currentWindow);
+      if (currentBounds == null) return;
+      var refPoint = getCaretPoint(ijCaret);
+      navigateInDirection(project, refPoint, currentBounds, relativePosition, vertical);
+      return;
     }
+
+    var windows = fileEditorManager.getWindows();
+    var row = findWindowsInRow(ijCaret, Arrays.asList(windows), vertical);
+    selectWindow(currentWindow, row, relativePosition);
   }
 
   private void selectWindow(@NotNull EditorWindow currentWindow,
                             @NotNull List<EditorWindow> windows,
                             int relativePosition) {
-    final int pos = windows.indexOf(currentWindow);
-    final int selected = pos + relativePosition;
-    final int normalized = Math.max(0, Math.min(selected, windows.size() - 1));
+    var pos = windows.indexOf(currentWindow);
+    var selected = pos + relativePosition;
+    var normalized = Math.max(0, Math.min(selected, windows.size() - 1));
     windows.get(normalized).setAsCurrentWindow(true);
   }
 
-  private static @NotNull List<EditorWindow> findWindowsInRow(@NotNull Caret caret,
-                                                              @NotNull EditorWindow editorWindow,
-                                                              @NotNull List<EditorWindow> windows,
-                                                              final boolean vertical) {
-    final Point anchorPoint = getCaretPoint(caret);
-    if (anchorPoint != null) {
-      final List<EditorWindow> result = new ArrayList<>();
-      final double coord = vertical ? anchorPoint.getX() : anchorPoint.getY();
-      for (EditorWindow window : windows) {
-        final Rectangle rect = getSplitRectangle(window);
-        if (rect != null) {
-          final double min = vertical ? rect.getX() : rect.getY();
-          final double max = min + (vertical ? rect.getWidth() : rect.getHeight());
-          if (coord >= min && coord <= max) {
-            result.add(window);
-          }
-        }
-      }
-      result.sort((window1, window2) -> {
-        final Rectangle rect1 = getSplitRectangle(window1);
-        final Rectangle rect2 = getSplitRectangle(window2);
-        if (rect1 != null && rect2 != null) {
-          final double diff = vertical ? (rect1.getY() - rect2.getY()) : (rect1.getX() - rect2.getX());
-          return diff < 0 ? -1 : diff > 0 ? 1 : 0;
-        }
-        return 0;
-      });
-      return result;
-    }
-    return Collections.singletonList(editorWindow);
+  private record NavTarget(Rectangle bounds, Runnable activate) {
   }
 
   private static @NotNull FileEditorManagerEx getFileEditorManager(@NotNull DataContext context) {
