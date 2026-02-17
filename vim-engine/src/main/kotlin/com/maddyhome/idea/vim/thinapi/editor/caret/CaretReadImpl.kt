@@ -195,13 +195,15 @@ class CaretReadImpl(
     return injector.scroll.scrollHalfPage(vimEditor, vimCaret, lines, true)
   }
 
-  override fun selectWindowHorizontally(relativePosition: Int) {
-    injector.window.selectWindowInRow(vimCaret, vimContext, relativePosition, false)
-  }
-
-  override fun selectWindowInVertically(relativePosition: Int) {
-    injector.window.selectWindowInRow(vimCaret, vimContext, relativePosition, true)
-  }
+  // Window selection methods commented out — see IJPL-235369.
+  //
+  // override fun selectWindowHorizontally(relativePosition: Int) {
+  //   injector.window.selectWindowInRow(vimCaret, vimContext, relativePosition, false)
+  // }
+  //
+  // override fun selectWindowInVertically(relativePosition: Int) {
+  //   injector.window.selectWindowInRow(vimCaret, vimContext, relativePosition, true)
+  // }
 
   override fun getNextParagraphBoundOffset(count: Int, includeWhitespaceLines: Boolean): Int? {
     return injector.searchHelper.findNextParagraph(vimEditor, vimCaret, count, includeWhitespaceLines)

@@ -228,37 +228,42 @@ class VimApiImpl(
     return injector.regexpService.getAllMatches(text, pattern)
   }
 
-  override fun selectNextWindow() {
-    injector.window.selectNextWindow(vimContext)
-  }
-
-  override fun selectWindow(index: Int) {
-    injector.window.selectWindow(vimContext, index)
-  }
-
-  override fun selectPreviousWindow() {
-    injector.window.selectPreviousWindow(vimContext)
-  }
-
-  override fun splitWindowVertically(filePath: Path?) {
-    injector.window.splitWindowVertical(vimContext, filePath?.javaPath?.pathString ?: "")
-  }
-
-  override fun splitWindowHorizontally(filePath: Path?) {
-    injector.window.splitWindowHorizontal(vimContext, filePath?.javaPath?.pathString ?: "")
-  }
-
-  override fun closeAllExceptCurrentWindow() {
-    injector.window.closeAllExceptCurrent(vimContext)
-  }
-
-  override fun closeCurrentWindow() {
-    injector.window.closeCurrentWindow(vimContext)
-  }
-
-  override fun closeAllWindows() {
-    injector.window.closeAll(vimContext)
-  }
+  // Window management methods commented out — see IJPL-235369.
+  // After setAsCurrentWindow(), getSelectedTextEditor() returns stale data because
+  // the propagation is async and unobservable. Re-enable when the platform provides
+  // a synchronous or awaitable window-switching API.
+  //
+  // override fun selectNextWindow() {
+  //   injector.window.selectNextWindow(vimContext)
+  // }
+  //
+  // override fun selectWindow(index: Int) {
+  //   injector.window.selectWindow(vimContext, index)
+  // }
+  //
+  // override fun selectPreviousWindow() {
+  //   injector.window.selectPreviousWindow(vimContext)
+  // }
+  //
+  // override fun splitWindowVertically(filePath: Path?) {
+  //   injector.window.splitWindowVertical(vimContext, filePath?.javaPath?.pathString ?: "")
+  // }
+  //
+  // override fun splitWindowHorizontally(filePath: Path?) {
+  //   injector.window.splitWindowHorizontal(vimContext, filePath?.javaPath?.pathString ?: "")
+  // }
+  //
+  // override fun closeAllExceptCurrentWindow() {
+  //   injector.window.closeAllExceptCurrent(vimContext)
+  // }
+  //
+  // override fun closeCurrentWindow() {
+  //   injector.window.closeCurrentWindow(vimContext)
+  // }
+  //
+  // override fun closeAllWindows() {
+  //   injector.window.closeAll(vimContext)
+  // }
 
   override fun execute(script: String): Boolean {
     val result = injector.vimscriptExecutor.execute(

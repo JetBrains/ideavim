@@ -358,51 +358,57 @@ interface VimApi {
    */
   fun getAllMatches(text: String, pattern: String): List<Pair<Int, Int>>
 
-  /**
-   * Selects the next window in the editor.
-   */
-  fun selectNextWindow()
-
-  /**
-   * Selects the previous window in the editor.
-   */
-  fun selectPreviousWindow()
-
-  /**
-   * Selects a window by its index.
-   *
-   * @param index The index of the window to select (1-based).
-   */
-  fun selectWindow(index: Int)
-
-  /**
-   * Splits the current window vertically and optionally opens a file in the new window.
-   *
-   * @param filePath Path of the file to open in the new window. If null, the new window will show the same file.
-   */
-  fun splitWindowVertically(filePath: Path? = null)
-
-  /**
-   * Splits the current window horizontally and optionally opens a file in the new window.
-   *
-   * @param filePath Path of the file to open in the new window. If null, the new window will show the same file.
-   */
-  fun splitWindowHorizontally(filePath: Path? = null)
-
-  /**
-   * Closes all windows except the current one.
-   */
-  fun closeAllExceptCurrentWindow()
-
-  /**
-   * Closes the current window.
-   */
-  fun closeCurrentWindow()
-
-  /**
-   * Closes all windows in the editor.
-   */
-  fun closeAllWindows()
+  // Window management APIs commented out — see IJPL-235369.
+  // After switching windows, FileEditorManager.getSelectedTextEditor() does not
+  // immediately reflect the change because EditorsSplitters.currentCompositeFlow
+  // is derived asynchronously (flatMapLatest + stateIn), and there is no way to
+  // observe when the propagation completes.
+  //
+  // /**
+  //  * Selects the next window in the editor.
+  //  */
+  // fun selectNextWindow()
+  //
+  // /**
+  //  * Selects the previous window in the editor.
+  //  */
+  // fun selectPreviousWindow()
+  //
+  // /**
+  //  * Selects a window by its index.
+  //  *
+  //  * @param index The index of the window to select (1-based).
+  //  */
+  // fun selectWindow(index: Int)
+  //
+  // /**
+  //  * Splits the current window vertically and optionally opens a file in the new window.
+  //  *
+  //  * @param filePath Path of the file to open in the new window. If null, the new window will show the same file.
+  //  */
+  // fun splitWindowVertically(filePath: Path? = null)
+  //
+  // /**
+  //  * Splits the current window horizontally and optionally opens a file in the new window.
+  //  *
+  //  * @param filePath Path of the file to open in the new window. If null, the new window will show the same file.
+  //  */
+  // fun splitWindowHorizontally(filePath: Path? = null)
+  //
+  // /**
+  //  * Closes all windows except the current one.
+  //  */
+  // fun closeAllExceptCurrentWindow()
+  //
+  // /**
+  //  * Closes the current window.
+  //  */
+  // fun closeCurrentWindow()
+  //
+  // /**
+  //  * Closes all windows in the editor.
+  //  */
+  // fun closeAllWindows()
 
   /**
    * Parses and executes the given Vimscript string.
