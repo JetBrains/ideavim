@@ -39,13 +39,20 @@
 ### K1: Editor Context Fix
 
 - [X] T004 [US4] Define if the API works everywhere in IDE, or in editor context only (decision document)
-- [ ] T005 [US4] Understand how to obtain the editor: focused approach is unreliable (focus can change mid-operation, is global state). Usually editor is captured at shortcut entry point. Edge cases: macros that change editors via :wincmd, API commands that switch windows. Document proper handling strategy.
+- [X] T005 [US4] Understand how to obtain the editor: focused approach is unreliable (focus can change mid-operation, is global state). Usually editor is captured at shortcut entry point. Edge cases: macros that change editors via :wincmd, API commands that switch windows. Document proper handling strategy. — Documented in VIM-4122 ADR
 - [X] T005a [US4] Pre-construct VimApi and pass it to the init method instead of manual object creation in extension handlers
-- [ ] T005b [US4] Pass project id to VimApi to properly get the editor using getSelectedEditor(project) API
-- [ ] T006 [US4] Design two-phase API: init phase (no editor) vs execute phase (editor in context)
-- [ ] T007 [US4] Update scope implementations to accept editor as constructor parameter (not re-query focus)
-- [ ] T008 [US4] Implement captured editor pattern in VimApiImpl.kt
-- [ ] T009 [US4] Update handler infrastructure to pass captured editor to handlers
+- [X] T005b [US4] Pass project id to VimApi to properly get the editor using getSelectedEditor(project) API
+- [X] T005c [US4] Add EditorContextTest to verify getSelectedEditor tracks active editor changes after window switching
+- [ ] T006 [US4] Design two-phase API: init phase (no editor) vs execute phase (editor in context) — Deferred, separate future decision (see VIM-4121)
+- [X] T007 [US4] DROPPED — Lazy getter is correct per VIM-4122; capturing editor at construction breaks selectNextWindow()
+- [X] T008 [US4] DROPPED — projectId IS the capture mechanism (passed at VimApi construction, used in getSelectedEditor)
+- [X] T009 [US4] Update handler infrastructure to pass captured editor to handlers — Already done in MappingScopeImpl:284 and TextObjectScopeImpl:149
+
+### K1a: Window Switching Threading
+
+- [ ] T005d [US4] Investigate selectNextWindow() behavior:
+  - **Async gap**: setAsCurrentWindow updates `_currentWindowFlow` synchronously, but `getSelectedTextEditor` reads `currentCompositeFlow` which is derived via `flatMapLatest` (async coroutine flow). The caller may need to wait for propagation. Determine if this needs API-level handling (e.g., suspend function, callback) or if the platform handles it transparently in production.
+  - **EDT requirement**: in tests, `selectNextWindow()` must be wrapped in `invokeAndWait` to avoid NPE (`getCurrentWindow` returns null on BGT). Investigate whether the API should enforce EDT internally or document the threading requirement.
 
 ### K2: State Update Safety
 
