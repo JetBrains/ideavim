@@ -19,9 +19,10 @@ import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.replaceService
 import com.intellij.vim.api.VimApi
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.thinapi.VimApiImpl
 import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.key.MappingOwner
-import com.maddyhome.idea.vim.thinapi.VimApiImpl
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.waitUntil
 import org.junit.jupiter.api.BeforeEach
@@ -91,13 +92,15 @@ class EditorContextTest : VimTestCase() {
     val vimApi = createVimApi()
     assertEquals(5, vimApi.editor { read { lineCount } })
 
-    // selectNextWindow() updates _currentWindowFlow synchronously, but
-    // currentCompositeFlow (read by getSelectedTextEditor) is derived via
-    // flatMapLatest — an async coroutine flow. We need to wait for propagation.
-    // See T005d for investigation into whether this async gap needs API-level handling.
+    // Window switching via the platform API has an async gap: setAsCurrentWindow()
+    // updates _currentWindowFlow synchronously, but getSelectedTextEditor() reads
+    // from currentCompositeFlow which is derived via flatMapLatest (async).
+    // We need to wait for propagation. Tracked in IJPL-235369.
     val editorBefore = fileEditorManager.selectedTextEditor
     ApplicationManager.getApplication().invokeAndWait {
-      vimApi.selectNextWindow()
+      val editor = fileEditorManager.selectedTextEditor!!
+      val context = injector.executionContextManager.getEditorExecutionContext(editor.vim)
+      injector.window.selectNextWindow(context)
     }
     waitUntil { fileEditorManager.selectedTextEditor != editorBefore }
 

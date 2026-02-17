@@ -50,9 +50,9 @@
 
 ### K1a: Window Switching Threading
 
-- [ ] T005d [US4] Investigate selectNextWindow() behavior:
-  - **Async gap**: setAsCurrentWindow updates `_currentWindowFlow` synchronously, but `getSelectedTextEditor` reads `currentCompositeFlow` which is derived via `flatMapLatest` (async coroutine flow). The caller may need to wait for propagation. Determine if this needs API-level handling (e.g., suspend function, callback) or if the platform handles it transparently in production.
-  - **EDT requirement**: in tests, `selectNextWindow()` must be wrapped in `invokeAndWait` to avoid NPE (`getCurrentWindow` returns null on BGT). Investigate whether the API should enforce EDT internally or document the threading requirement.
+- [X] T005d [US4] Investigate selectNextWindow() behavior:
+  - **Async gap**: Investigated. setAsCurrentWindow updates `_currentWindowFlow` synchronously, but `getSelectedTextEditor` reads `currentCompositeFlow` which is derived via `flatMapLatest` + `stateIn(Lazily)` — async, with no way to observe propagation. No IJ platform code uses the "switch then read" pattern. Filed IJPL-235369 for a platform fix. Window management APIs commented out in VimApi until resolved (VIM-4138).
+  - **EDT requirement**: in tests, `selectNextWindow()` must be wrapped in `invokeAndWait` to avoid NPE (`getCurrentWindow` returns null on BGT). This is documented in the test and matches platform requirements (`@RequiresEdt` on related APIs).
 
 ### K2: State Update Safety
 

@@ -227,23 +227,25 @@ interface CaretRead {
    */
   fun scrollHalfPageDown(lines: Int): Boolean
 
-  /**
-   * Selects a window in the same row as the current window.
-   *
-   * @param relativePosition The relative position of the window to select.
-   *                        Positive values select windows to the right,
-   *                        negative values select windows to the left.
-   */
-  fun selectWindowHorizontally(relativePosition: Int)
-
-  /**
-   * Selects a window in the same column as the current window.
-   *
-   * @param relativePosition The relative position of the window to select.
-   *                        Positive values select the windows below,
-   *                        negative values select the windows above.
-   */
-  fun selectWindowInVertically(relativePosition: Int)
+  // Window selection methods commented out — see IJPL-235369.
+  //
+  // /**
+  //  * Selects a window in the same row as the current window.
+  //  *
+  //  * @param relativePosition The relative position of the window to select.
+  //  *                        Positive values select windows to the right,
+  //  *                        negative values select windows to the left.
+  //  */
+  // fun selectWindowHorizontally(relativePosition: Int)
+  //
+  // /**
+  //  * Selects a window in the same column as the current window.
+  //  *
+  //  * @param relativePosition The relative position of the window to select.
+  //  *                        Positive values select the windows below,
+  //  *                        negative values select the windows above.
+  //  */
+  // fun selectWindowInVertically(relativePosition: Int)
 
   /**
    * Finds the offset of the next paragraph boundary.
