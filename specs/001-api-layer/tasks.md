@@ -43,7 +43,7 @@
 - [X] T005a [US4] Pre-construct VimApi and pass it to the init method instead of manual object creation in extension handlers
 - [X] T005b [US4] Pass project id to VimApi to properly get the editor using getSelectedEditor(project) API
 - [X] T005c [US4] Add EditorContextTest to verify getSelectedEditor tracks active editor changes after window switching
-- [ ] T006 [US4] Design two-phase API: init phase (no editor) vs execute phase (editor in context) — Deferred, separate future decision (see VIM-4121)
+- [X] T006 [US4] Design two-phase API: init phase (no editor) vs execute phase (editor in context) — Implemented VimInitApi delegation wrapper, ADR in VIM-4137
 - [X] T007 [US4] DROPPED — Lazy getter is correct per VIM-4122; capturing editor at construction breaks selectNextWindow()
 - [X] T008 [US4] DROPPED — projectId IS the capture mechanism (passed at VimApi construction, used in getSelectedEditor)
 - [X] T009 [US4] Update handler infrastructure to pass captured editor to handlers — Already done in MappingScopeImpl:284 and TextObjectScopeImpl:149
