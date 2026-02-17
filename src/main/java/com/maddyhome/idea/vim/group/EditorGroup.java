@@ -20,6 +20,8 @@ import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.event.CaretEvent;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.editor.event.CaretListener;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
@@ -285,6 +287,19 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     }
     catch (TimeoutException | ExecutionException e) {
       return null;
+    }
+    return null;
+  }
+
+  @Override
+  public @Nullable VimEditor getSelectedEditor(@NotNull String projectId) {
+    for (Project project : ProjectManager.getInstance().getOpenProjects()) {
+      if (project.isDisposed()) continue;
+      if (!injector.getFile().getProjectId(project).equals(projectId)) continue;
+      Editor selectedEditor = FileEditorManager.getInstance(project).getSelectedTextEditor();
+      if (selectedEditor != null) {
+        return new IjVimEditor(selectedEditor);
+      }
     }
     return null;
   }

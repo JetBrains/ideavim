@@ -53,6 +53,7 @@ class ReadTest : MockTestCase() {
     Mockito.`when`(mockInjector.searchHelper).thenReturn(mockSearchHelper)
 
     vimEditor = fixture.editor.vim
+    Mockito.`when`(mockInjector.fallbackWindow).thenReturn(vimEditor)
 
     realInjector = injector
     injector = mockInjector
@@ -60,12 +61,12 @@ class ReadTest : MockTestCase() {
 
   @AfterEach
   override fun tearDown(testInfo: TestInfo) {
+    injector = realInjector
+
     super.tearDown(testInfo)
     // reset mocks
     Mockito.reset(mockSearchHelper)
     Mockito.reset(mockInjector)
-
-    injector = realInjector
   }
 
   fun assertEqualsEditor(expected: VimEditor, actual: VimEditor) {

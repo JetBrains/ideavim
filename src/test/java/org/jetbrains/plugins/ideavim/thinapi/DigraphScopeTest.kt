@@ -52,6 +52,7 @@ class DigraphScopeTest : MockTestCase() {
     Mockito.`when`(mockInjector.digraphGroup).thenReturn(digraphGroup)
 
     vimEditor = fixture.editor.vim
+    Mockito.`when`(mockInjector.fallbackWindow).thenReturn(vimEditor)
 
     realInjector = injector
     injector = mockInjector
@@ -59,12 +60,12 @@ class DigraphScopeTest : MockTestCase() {
 
   @AfterEach
   override fun tearDown(testInfo: TestInfo) {
+    injector = realInjector
+
     super.tearDown(testInfo)
     // reset mocks
     Mockito.reset(digraphGroup)
     Mockito.reset(mockInjector)
-
-    injector = realInjector
   }
 
   fun assertEqualsEditor(expected: VimEditor, actual: VimEditor) {

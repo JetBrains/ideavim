@@ -18,9 +18,11 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import kotlin.reflect.KType
 
-object OptionScopeImpl: OptionScope {
+class OptionScopeImpl(
+  private val projectId: String?,
+) : OptionScope {
   private val vimEditor: VimEditor
-    get() = injector.editorGroup.getFocusedEditor()!!
+    get() = projectId?.let { injector.editorGroup.getSelectedEditor(it) } ?: injector.fallbackWindow
 
   private val optionGroup: VimOptionGroup
     get() = injector.optionGroup

@@ -61,4 +61,16 @@ interface VimEditorGroup {
   fun updateCaretsVisualPosition(editor: VimEditor)
 
   fun getFocusedEditor(): VimEditor?
+
+  /**
+   * Get the currently selected editor from the internal model.
+   *
+   * This uses FileEditorManager's selected editor, which updates when window-switching
+   * commands like :wincmd execute, even before focus changes.
+   *
+   * @param projectId The project identifier to get the editor from.
+   * @return The selected editor, or null if no editor is selected. Null can also be returned during the
+   *   project initialization. If the null is returned, fallback to `injector.fallbackWindow`
+   */
+  fun getSelectedEditor(projectId: String): VimEditor?
 }

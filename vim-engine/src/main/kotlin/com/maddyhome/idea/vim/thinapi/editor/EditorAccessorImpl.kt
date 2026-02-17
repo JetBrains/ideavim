@@ -29,9 +29,11 @@ import com.maddyhome.idea.vim.thinapi.toApiJump
 import com.maddyhome.idea.vim.thinapi.toApiMark
 import com.maddyhome.idea.vim.thinapi.toRange
 
-open class EditorAccessorImpl : EditorAccessor {
+open class EditorAccessorImpl(
+  private val projectId: String?,
+) : EditorAccessor {
   private val vimEditor: VimEditor
-    get() = injector.editorGroup.getFocusedEditor()!!
+    get() = projectId?.let { injector.editorGroup.getSelectedEditor(it) } ?: injector.fallbackWindow
 
   override val textLength: Long
     get() = vimEditor.fileSize()

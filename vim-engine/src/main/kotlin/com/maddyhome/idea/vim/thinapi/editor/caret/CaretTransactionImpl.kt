@@ -30,10 +30,11 @@ import com.maddyhome.idea.vim.thinapi.editor.EditorAccessorImpl
 import com.maddyhome.idea.vim.mark.Jump as EngineJump
 
 class CaretTransactionImpl(
+  private val projectId: String?,
   override val caretId: CaretId,
-) : CaretTransaction, CaretRead by CaretReadImpl(caretId), EditorAccessor by EditorAccessorImpl() {
+) : CaretTransaction, CaretRead by CaretReadImpl(projectId, caretId), EditorAccessor by EditorAccessorImpl(projectId) {
   private val vimEditor: VimEditor
-    get() = injector.editorGroup.getFocusedEditor()!!
+    get() = projectId?.let { injector.editorGroup.getSelectedEditor(it) } ?: injector.fallbackWindow
 
   private val executionContext: ExecutionContext
     get() = injector.executionContextManager.getEditorExecutionContext(vimEditor)

@@ -17,22 +17,24 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.thinapi.caretId
 import com.maddyhome.idea.vim.thinapi.editor.caret.CaretReadImpl
 
-class ReadScopeImpl : ReadScope, EditorAccessor by EditorAccessorImpl() {
+class ReadScopeImpl(
+  private val projectId: String?,
+) : ReadScope, EditorAccessor by EditorAccessorImpl(projectId) {
   private val vimEditor: VimEditor
-    get() = injector.editorGroup.getFocusedEditor()!!
+    get() = projectId?.let { injector.editorGroup.getSelectedEditor(it) } ?: injector.fallbackWindow
 
   override fun <T> forEachCaret(block: CaretRead.() -> T): List<T> {
-    return vimEditor.sortedCarets().map { caret -> CaretReadImpl(caret.caretId).block() }
+    return vimEditor.sortedCarets().map { caret -> CaretReadImpl(projectId, caret.caretId).block() }
   }
 
   override fun <T> with(
     caretId: CaretId,
     block: CaretRead.() -> T,
   ): T {
-    return CaretReadImpl(caretId).block()
+    return CaretReadImpl(projectId, caretId).block()
   }
 
   override fun <T> withPrimaryCaret(block: CaretRead.() -> T): T {
-    return CaretReadImpl(vimEditor.primaryCaret().caretId).block()
+    return CaretReadImpl(projectId, vimEditor.primaryCaret().caretId).block()
   }
 }

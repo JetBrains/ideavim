@@ -14,14 +14,17 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimOutputPanel
 import com.maddyhome.idea.vim.api.injector
 
-object OutputPanelScopeImpl : OutputPanelScope {
+class OutputPanelScopeImpl(
+  private val projectId: String?,
+) : OutputPanelScope {
   private val vimEditor: VimEditor
-    get() = injector.editorGroup.getFocusedEditor()!!
+    get() = projectId?.let { injector.editorGroup.getSelectedEditor(it) } ?: injector.fallbackWindow
 
   private val vimContext: ExecutionContext
     get() = injector.executionContextManager.getEditorExecutionContext(vimEditor)
 
-  private val outputPanel: VimOutputPanel = injector.outputPanel.getOrCreate(vimEditor, vimContext)
+  private val outputPanel: VimOutputPanel
+    get() = injector.outputPanel.getOrCreate(vimEditor, vimContext)
 
   override val text: String
     get() = outputPanel.text
