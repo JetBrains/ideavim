@@ -56,6 +56,7 @@ class TransactionTest : MockTestCase() {
     Mockito.`when`(mockInjector.jumpService).thenReturn(mockJumpService)
 
     vimEditor = fixture.editor.vim
+    Mockito.`when`(mockInjector.fallbackWindow).thenReturn(vimEditor)
 
     realInjector = injector
     injector = mockInjector
@@ -63,13 +64,13 @@ class TransactionTest : MockTestCase() {
 
   @AfterEach
   override fun tearDown(testInfo: TestInfo) {
+    injector = realInjector
+
     super.tearDown(testInfo)
     // reset mocks
     Mockito.reset(mockMarkService)
     Mockito.reset(mockJumpService)
     Mockito.reset(mockInjector)
-
-    injector = realInjector
   }
 
   fun assertEqualsEditor(expected: VimEditor, actual: VimEditor) {

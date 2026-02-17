@@ -33,11 +33,12 @@ class CaretTransactionTest : VimTestCase() {
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
 
+    configureByText("\n")
+
     val listenerOwner = ListenerOwner.Plugin.get("test")
     val mappingOwner = MappingOwner.Plugin.get("test")
-    myVimApi = VimApiImpl(listenerOwner, mappingOwner, null)
-
-    configureByText("\n")
+    val projectId = injector.file.getProjectId(fixture.project)
+    myVimApi = VimApiImpl(listenerOwner, mappingOwner, projectId)
   }
 
   fun executeAction(action: suspend () -> Unit) {

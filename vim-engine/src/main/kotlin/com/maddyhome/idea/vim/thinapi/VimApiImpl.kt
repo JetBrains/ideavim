@@ -64,7 +64,7 @@ class VimApiImpl(
     }
 
   private val vimEditor: VimEditor
-    get() = injector.editorGroup.getFocusedEditor()!!
+    get() = projectId?.let { injector.editorGroup.getSelectedEditor(it) } ?: injector.fallbackWindow
 
   private val vimContext: ExecutionContext
     get() = injector.executionContextManager.getEditorExecutionContext(vimEditor)
@@ -125,9 +125,9 @@ class VimApiImpl(
         selectionType: SelectionType?,
       ): Boolean {
         var returnValue = false
-        injector.actionExecutor.executeCommand(vimEditor, {
+        injector.actionExecutor.executeCommand(editor, {
           runBlocking {
-            returnValue = VimApiImpl(listenerOwner, mappingOwner, projectId).function()
+            returnValue = VimApiImpl(listenerOwner, mappingOwner, editor.projectId).function()
           }
         }, "Insert Text", null)
         return returnValue
@@ -145,12 +145,12 @@ class VimApiImpl(
   }
 
   override fun <T> editor(block: EditorScope.() -> T): T {
-    return EditorScopeImpl().block()
+    return EditorScopeImpl(projectId).block()
   }
 
   override fun <T> forEachEditor(block: EditorScope.() -> T): List<T> {
     return injector.editorGroup.getEditors().map { editor ->
-      val editorScope = EditorScopeImpl()
+      val editorScope = EditorScopeImpl(projectId)
       editorScope.block()
     }
   }
@@ -174,7 +174,7 @@ class VimApiImpl(
 //  }
 
   override fun outputPanel(block: OutputPanelScope.() -> Unit): OutputPanelScope {
-    val outputPanelScope = OutputPanelScopeImpl
+    val outputPanelScope = OutputPanelScopeImpl(projectId)
     outputPanelScope.block()
     return outputPanelScope
   }
@@ -190,12 +190,13 @@ class VimApiImpl(
   }
 
   override fun <T> option(block: OptionScope.() -> T): T {
-    return OptionScopeImpl.block()
+    return OptionScopeImpl(projectId).block()
   }
 
   override fun digraph(block: DigraphScope.() -> Unit): DigraphScope {
-    DigraphScopeImpl.block()
-    return DigraphScopeImpl
+    val digraphScope = DigraphScopeImpl(projectId)
+    digraphScope.block()
+    return digraphScope
   }
 
   override val tabCount: Int

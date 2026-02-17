@@ -75,8 +75,8 @@ class ModalInputTest : MockTestCase() {
     executionContext = mock()
 
     editorGroup = mock()
-    Mockito.`when`(editorGroup.getFocusedEditor()).thenReturn(vimEditor)
     Mockito.`when`(mockInjector.editorGroup).thenReturn(editorGroup)
+    Mockito.`when`(mockInjector.fallbackWindow).thenReturn(vimEditor)
 
     executionContextManager = mock()
     Mockito.`when`(executionContextManager.getEditorExecutionContext(vimEditor)).thenReturn(executionContext)
@@ -90,6 +90,10 @@ class ModalInputTest : MockTestCase() {
 
   @AfterEach
   override fun tearDown(testInfo: TestInfo) {
+    // Restore real injector before tearDown to avoid EDT access violations
+    // (mocked fallbackWindow returns the fixture editor which requires EDT for option resets)
+    injector = realInjector
+
     super.tearDown(testInfo)
     // reset mocks
     Mockito.reset(modalInputService)
@@ -99,8 +103,6 @@ class ModalInputTest : MockTestCase() {
     Mockito.reset(editorGroup)
     Mockito.reset(executionContextManager)
     Mockito.reset(mockInjector)
-
-    injector = realInjector
   }
 
   fun assertEqualsEditor(expected: VimEditor, actual: VimEditor) {

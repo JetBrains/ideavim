@@ -27,10 +27,11 @@ import com.maddyhome.idea.vim.thinapi.toTextSelectionType
 
 
 class CaretReadImpl(
+  private val projectId: String?,
   override val caretId: CaretId,
 ) : CaretRead {
   private val vimEditor: VimEditor
-    get() = injector.editorGroup.getFocusedEditor()!!
+    get() = projectId?.let { injector.editorGroup.getSelectedEditor(it) } ?: injector.fallbackWindow
 
   private val vimContext: ExecutionContext
     get() = injector.executionContextManager.getEditorExecutionContext(vimEditor)

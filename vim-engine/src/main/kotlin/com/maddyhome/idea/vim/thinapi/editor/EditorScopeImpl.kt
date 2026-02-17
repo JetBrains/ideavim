@@ -13,10 +13,12 @@ import com.intellij.vim.api.scopes.editor.ReadScope
 import com.intellij.vim.api.scopes.editor.Transaction
 import com.maddyhome.idea.vim.api.injector
 
-class EditorScopeImpl : EditorScope() {
+class EditorScopeImpl(
+  private val projectId: String?,
+) : EditorScope() {
   override fun <T> ideRead(block: ReadScope.() -> T): T {
     return injector.application.runReadAction {
-      val readScope = ReadScopeImpl()
+      val readScope = ReadScopeImpl(projectId)
       block(readScope)
     }
   }
@@ -24,7 +26,7 @@ class EditorScopeImpl : EditorScope() {
   override fun ideChange(block: Transaction.() -> Unit) {
     injector.application.invokeAndWait {
       injector.application.runWriteAction {
-        val transaction = TransactionImpl()
+        val transaction = TransactionImpl(projectId)
         transaction.block()
       }
     }
