@@ -110,15 +110,7 @@
   <extensions defaultExtensionNs="com.intellij">
     <applicationConfigurable groupId="editor" instance="com.maddyhome.idea.vim.ui.VimEmulationConfigurable"/>
     <projectService serviceImplementation="com.maddyhome.idea.vim.group.LastTabService"/>
-    <statusBarWidgetFactory id="IdeaVimMode" implementation="com.maddyhome.idea.vim.ui.widgets.mode.ModeWidgetFactory" order="last, before Memory"/>
-    <!-- [VERSION UPDATE: 2025.1+]
-         Rider's dotCover status indicator sets itself as "last" which pushes the IdeaVim widgets out
-         Hopefully this will be fixed in Rider 2025.1. Once this is the minimum supported version, we can remove this
-         https://youtrack.jetbrains.com/issue/DCVR-13021/dotCover-status-bar-indicator-in-Rider-incorrect-position
-    -->
-    <statusBarWidgetFactory id="IdeaVim-Icon" implementation="com.maddyhome.idea.vim.ui.StatusBarIconFactory" order="last, before IdeaVimMode, after dotCoverIndicator"/>
-    <statusBarWidgetFactory id="IdeaVimShowCmd" implementation="com.maddyhome.idea.vim.ui.ShowCmdStatusBarWidgetFactory" order="first"/>
-    <statusBarWidgetFactory id="IdeaVimMacro" implementation="com.maddyhome.idea.vim.ui.widgets.macro.MacroWidgetFactory" order="first, after IdeaVimShowCmd"/>
+    <!-- Status bar widgets moved to IdeaVIM.ideavim-frontend module -->
 
     <applicationService serviceImplementation="com.maddyhome.idea.vim.VimPlugin"/>
 
@@ -258,8 +250,7 @@
     <action id="VimInternalAddInlineInlays" class="com.maddyhome.idea.vim.action.internal.AddInlineInlaysAction" text="Add Test Inline Inlays | IdeaVim Internal" internal="true"/>
 
     <action id="VimShortcutKeyAction" class="com.maddyhome.idea.vim.action.VimShortcutKeyAction"/>
-    <action id="VimActions" class="com.maddyhome.idea.vim.ui.VimActions"/>
-    <action id="CustomizeModeWidget" class="com.maddyhome.idea.vim.ui.widgets.mode.ModeWidgetPopup"/>
+    <!-- VimActions and CustomizeModeWidget moved to IdeaVIM.ideavim-frontend module -->
 
     <group id="IdeaVim.ReloadVimRc.group" class="com.maddyhome.idea.vim.ui.ReloadFloatingToolbarActionGroup">
       <action id="IdeaVim.ReloadVimRc.reload" class="com.maddyhome.idea.vim.ui.ReloadVimRc"
