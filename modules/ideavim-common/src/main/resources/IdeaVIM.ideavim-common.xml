@@ -1,0 +1,12 @@
+<!--
+  ~ Copyright 2003-2026 The IdeaVim authors
+  ~
+  ~ Use of this source code is governed by an MIT-style
+  ~ license that can be found in the LICENSE.txt file or at
+  ~ https://opensource.org/licenses/MIT.
+  -->
+
+<idea-plugin>
+  <!-- Common module: loads in all modes (monolith, backend, and frontend) -->
+  <!-- Shared code that both backend and frontend modules depend on -->
+</idea-plugin>

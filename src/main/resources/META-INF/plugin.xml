@@ -52,6 +52,9 @@
     <module name="IdeaVIM.ideavim-rider"/>
     <module name="IdeaVIM.ideavim-clion-nova"/>
     <module name="IdeaVIM.ideavim-terminal"/>
+    <module name="IdeaVIM.ideavim-common"/>
+    <module name="IdeaVIM.ideavim-backend"/>
+    <module name="IdeaVIM.ideavim-frontend"/>
   </content>
 
   <applicationListeners>
