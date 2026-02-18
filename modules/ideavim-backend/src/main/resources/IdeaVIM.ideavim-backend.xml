@@ -12,4 +12,48 @@
   <dependencies>
     <module name="IdeaVIM.ideavim-common"/>
   </dependencies>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <!-- FileGroup uses PSI FilenameIndex and ProjectScope for file navigation -->
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.FileGroup"/>
+
+    <!-- Spellchecker dictionary provider - backend infrastructure -->
+    <spellchecker.bundledDictionaryProvider implementation="com.maddyhome.idea.vim.VimBundledDictionaryProvider"/>
+
+    <!-- NerdTree uses ProjectView, ToolWindowManagerEx - backend-only APIs -->
+    <postStartupActivity implementation="com.maddyhome.idea.vim.extension.nerdtree.NerdTree$NerdStartupActivity"/>
+  </extensions>
+
+  <!-- PSI-dependent Vim extensions -->
+  <extensions defaultExtensionNs="IdeaVIM">
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.commentary.CommentaryExtension" name="commentary">
+      <aliases>
+        <alias name="https://github.com/tpope/vim-commentary"/>
+        <alias name="tpope/vim-commentary"/>
+        <alias name="vim-commentary"/>
+        <alias name="https://www.vim.org/scripts/script.php?script_id=3695"/>
+        <alias name="https://github.com/tomtom/tcomment_vim"/>
+        <alias name="tomtom/tcomment_vim"/>
+        <alias name="tcomment_vim"/>
+        <alias name="https://www.vim.org/scripts/script.php?script_id=1173"/>
+      </aliases>
+    </vimExtension>
+
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.nerdtree.NerdTree" name="NERDTree">
+      <aliases>
+        <alias name="https://github.com/preservim/nerdtree"/>
+        <alias name="preservim/nerdtree"/>
+        <alias name="https://github.com/scrooloose/nerdtree"/>
+        <alias name="scrooloose/nerdtree"/>
+        <alias name="nerdtree"/>
+      </aliases>
+    </vimExtension>
+
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.matchit.Matchit" name="matchit">
+      <aliases>
+        <alias name="vim-matchit"/>
+        <alias name="chrisbra/matchit"/>
+      </aliases>
+    </vimExtension>
+  </extensions>
 </idea-plugin>

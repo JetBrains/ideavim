@@ -126,7 +126,7 @@
 
     <actionPromoter implementation="com.maddyhome.idea.vim.key.VimActionsPromoter" order="last"/>
 
-    <spellchecker.bundledDictionaryProvider implementation="com.maddyhome.idea.vim.VimBundledDictionaryProvider"/>
+    <!-- Spellchecker dictionary moved to IdeaVIM.ideavim-backend module -->
 
     <notificationGroup displayType="STICKY_BALLOON" id="ideavim-sticky"/>
 
@@ -187,7 +187,7 @@
 
     <dependencySupport coordinate="configuration" kind="vim" displayName="IdeaVim"/>
 
-    <postStartupActivity implementation="com.maddyhome.idea.vim.extension.nerdtree.NerdTree$NerdStartupActivity"/>
+    <!-- NerdTree startup activity moved to IdeaVIM.ideavim-backend module -->
 
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.ScrollGroup"
                         serviceInterface="com.maddyhome.idea.vim.api.VimScrollGroup"/>
@@ -199,7 +199,7 @@
                         serviceInterface="com.maddyhome.idea.vim.api.VimJumpService"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.RegisterGroup"
                         serviceInterface="com.maddyhome.idea.vim.register.VimRegisterGroup"/>
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.FileGroup"/>
+    <!-- FileGroup service moved to IdeaVIM.ideavim-backend module (uses PSI/VFS) -->
     <applicationService serviceImplementation="com.maddyhome.idea.vim.newapi.IjVimSearchGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.ProcessGroup"
                         serviceInterface="com.maddyhome.idea.vim.api.VimProcessGroup"/>
@@ -280,18 +280,7 @@
       </aliases>
     </vimExtension>
 
-    <vimExtension implementation="com.maddyhome.idea.vim.extension.commentary.CommentaryExtension" name="commentary">
-      <aliases>
-        <alias name="https://github.com/tpope/vim-commentary"/>
-        <alias name="tpope/vim-commentary"/>
-        <alias name="vim-commentary"/>
-        <alias name="https://www.vim.org/scripts/script.php?script_id=3695"/>
-        <alias name="https://github.com/tomtom/tcomment_vim"/>
-        <alias name="tomtom/tcomment_vim"/>
-        <alias name="tcomment_vim"/>
-        <alias name="https://www.vim.org/scripts/script.php?script_id=1173"/>
-      </aliases>
-    </vimExtension>
+    <!-- Commentary extension moved to IdeaVIM.ideavim-backend module (uses PSI) -->
 
     <vimExtension implementation="com.maddyhome.idea.vim.extension.textobjentire.VimTextObjEntireExtension"
                   name="textobj-entire">
@@ -352,15 +341,7 @@
       </aliases>
     </vimExtension>
 
-    <vimExtension implementation="com.maddyhome.idea.vim.extension.nerdtree.NerdTree" name="NERDTree">
-      <aliases>
-        <alias name="https://github.com/preservim/nerdtree"/>
-        <alias name="preservim/nerdtree"/>
-        <alias name="https://github.com/scrooloose/nerdtree"/>
-        <alias name="scrooloose/nerdtree"/>
-        <alias name="nerdtree"/>
-      </aliases>
-    </vimExtension>
+    <!-- NERDTree extension moved to IdeaVIM.ideavim-backend module (uses ProjectView) -->
 
     <vimExtension implementation="com.maddyhome.idea.vim.extension.paragraphmotion.ParagraphMotion"
                   name="vim-paragraph-motion">
@@ -382,12 +363,7 @@
       </aliases>
     </vimExtension>
 
-    <vimExtension implementation="com.maddyhome.idea.vim.extension.matchit.Matchit" name="matchit">
-      <aliases>
-        <alias name="vim-matchit"/>
-        <alias name="chrisbra/matchit"/>
-      </aliases>
-    </vimExtension>
+    <!-- Matchit extension moved to IdeaVIM.ideavim-backend module (uses PSI) -->
 
     <vimExtension implementation="com.maddyhome.idea.vim.extension.sneak.IdeaVimSneakExtension" name="sneak">
       <aliases>
