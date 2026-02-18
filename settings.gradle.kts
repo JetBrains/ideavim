@@ -1,3 +1,11 @@
+/*
+ * Copyright 2003-2026 The IdeaVim authors
+ *
+ * Use of this source code is governed by an MIT-style
+ * license that can be found in the LICENSE.txt file or at
+ * https://opensource.org/licenses/MIT.
+ */
+
 // Set repository for snapshot versions of gradle plugin
 pluginManagement {
   repositories {
@@ -26,4 +34,8 @@ include("tests:ui-ij-tests")
 include("tests:ui-py-tests")
 include("tests:ui-fixtures")
 include("api")
+include("modules:ideavim-acejump")
+include("modules:ideavim-rider")
+include("modules:ideavim-clion-nova")
+include("modules:ideavim-terminal")
 include("tests:ui-rd-tests")

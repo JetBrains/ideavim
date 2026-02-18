@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2025 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -19,7 +19,7 @@ import org.jetbrains.plugins.terminal.block.util.TerminalDataContextUtils.isProm
 /**
  * The only implementation is defined right here.
  */
-internal class IdeaVimTerminalDisablerExtension : IdeaVimDisablerExtensionPoint {
+class IdeaVimTerminalDisablerExtension : IdeaVimDisablerExtensionPoint {
   override fun isDisabledForEditor(editor: Editor): Boolean {
     return editor.isPromptEditor || editor.isOutputEditor || editor.isAlternateBufferEditor
       || editor.isOutputModelEditor || editor.isAlternateBufferModelEditor

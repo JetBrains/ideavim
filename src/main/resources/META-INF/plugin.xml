@@ -47,14 +47,12 @@
   <depends>com.intellij.modules.platform</depends>
   <resource-bundle>messages.IdeaVimBundle</resource-bundle>
 
-  <!--  https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html#exploring-module-and-plugin-apis-->
-  <!-- IDE-Specific configurations -->
-  <!--suppress PluginXmlValidity -->
-  <depends optional="true" config-file="ides/ideavim-withRider.xml">com.intellij.modules.rider</depends>
-  <!--suppress PluginXmlValidity -->
-  <depends optional="true" config-file="ides/ideavim-withClionNova.xml">org.jetbrains.plugins.clion.radler</depends>
-  <depends optional="true" config-file="ideavim-withAceJump.xml">AceJump</depends>
-  <depends optional="true" config-file="features/ideavim-withTerminal.xml">org.jetbrains.plugins.terminal</depends>
+  <content>
+    <module name="IdeaVIM.ideavim-acejump"/>
+    <module name="IdeaVIM.ideavim-rider"/>
+    <module name="IdeaVIM.ideavim-clion-nova"/>
+    <module name="IdeaVIM.ideavim-terminal"/>
+  </content>
 
   <applicationListeners>
     <listener class="com.maddyhome.idea.vim.PyNotebooksCloseWorkaround"

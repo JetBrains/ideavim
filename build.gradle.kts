@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -107,10 +107,10 @@ dependencies {
     testFramework(TestFrameworkType.Platform)
     testFramework(TestFrameworkType.JUnit5)
 
-    // AceJump is an optional dependency. We use their SessionManager class to check if it's active
-    plugin("AceJump", "3.8.19")
-
-    bundledPlugins("org.jetbrains.plugins.terminal")
+    pluginModule(runtimeOnly(project(":modules:ideavim-acejump")))
+    pluginModule(runtimeOnly(project(":modules:ideavim-rider")))
+    pluginModule(runtimeOnly(project(":modules:ideavim-clion-nova")))
+    pluginModule(runtimeOnly(project(":modules:ideavim-terminal")))
 
     bundledModule("intellij.spellchecker")
   }

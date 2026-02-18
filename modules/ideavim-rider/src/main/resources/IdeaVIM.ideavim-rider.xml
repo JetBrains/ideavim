@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright 2003-2024 The IdeaVim authors
+  ~ Copyright 2003-2026 The IdeaVim authors
   ~
   ~ Use of this source code is governed by an MIT-style
   ~ license that can be found in the LICENSE.txt file or at
@@ -7,13 +7,20 @@
   -->
 
 <idea-plugin>
+  <dependencies>
+    <module name="com.intellij.modules.rider"/>
+  </dependencies>
+  <projectListeners>
+    <listener class="com.maddyhome.idea.vim.listener.RiderActionListener"
+              topic="com.intellij.openapi.actionSystem.ex.AnActionListener"/>
+  </projectListeners>
   <extensions defaultExtensionNs="com.intellij">
     <editorActionHandler action="EditorEscape"
                          implementationClass="com.maddyhome.idea.vim.handler.VimEscForRiderHandler"
-                         id="ideavim-clion-nova-esc"
+                         id="ideavim-rider-esc"
                          order="first, before idea.only.escape"/>
   </extensions>
   <extensions defaultExtensionNs="IdeaVIM">
-    <clionNovaProvider implementation="com.maddyhome.idea.vim.ide.ClionNovaProviderImpl"/>
+    <riderProvider implementation="com.maddyhome.idea.vim.ide.RiderProviderImpl"/>
   </extensions>
 </idea-plugin>

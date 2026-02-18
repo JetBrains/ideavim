@@ -10,6 +10,11 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/annotation-processors" />
             <option value="$PROJECT_DIR$/api" />
+            <option value="$PROJECT_DIR$/modules" />
+            <option value="$PROJECT_DIR$/modules/ideavim-acejump" />
+            <option value="$PROJECT_DIR$/modules/ideavim-clion-nova" />
+            <option value="$PROJECT_DIR$/modules/ideavim-rider" />
+            <option value="$PROJECT_DIR$/modules/ideavim-terminal" />
             <option value="$PROJECT_DIR$/scripts" />
             <option value="$PROJECT_DIR$/tests" />
             <option value="$PROJECT_DIR$/tests/java-tests" />
