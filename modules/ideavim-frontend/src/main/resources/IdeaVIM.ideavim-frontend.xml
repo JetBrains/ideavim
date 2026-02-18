@@ -13,6 +13,22 @@
     <module name="IdeaVIM.ideavim-common"/>
   </dependencies>
 
+  <!-- Frontend-only application listeners -->
+  <applicationListeners>
+    <!-- Look & Feel listeners for UI theming -->
+    <listener class="com.maddyhome.idea.vim.ui.ex.ExEntryPanel$LafListener"
+              topic="com.intellij.ide.ui.LafManagerListener"/>
+    <listener class="com.maddyhome.idea.vim.ui.OutputPanel$LafListener"
+              topic="com.intellij.ide.ui.LafManagerListener"/>
+    <listener class="com.maddyhome.idea.vim.extension.highlightedyank.HighlightColorResetter"
+              topic="com.intellij.ide.ui.LafManagerListener"/>
+    <!-- Keymap change listeners for input handling -->
+    <listener class="com.maddyhome.idea.vim.handler.IdeaVimKeymapChangedListener"
+              topic="com.intellij.openapi.keymap.KeymapManagerListener"/>
+    <listener class="com.maddyhome.idea.vim.handler.IdeaVimCorrectorKeymapChangedListener"
+              topic="com.intellij.openapi.keymap.KeymapManagerListener"/>
+  </applicationListeners>
+
   <extensions defaultExtensionNs="com.intellij">
     <!-- Status bar widgets -->
     <statusBarWidgetFactory id="IdeaVimMode" implementation="com.maddyhome.idea.vim.ui.widgets.mode.ModeWidgetFactory"
@@ -32,6 +48,14 @@
 
     <!-- Settings UI -->
     <applicationConfigurable groupId="editor" instance="com.maddyhome.idea.vim.ui.VimEmulationConfigurable"/>
+
+    <!-- UI-facing services (command line, modal input, output panel) -->
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.ui.ex.ExEntryPanelService"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimCommandLineService"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.ui.ex.ExEntryModalInputService"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimModalInputService"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.ui.ex.IjOutputPanelService"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimOutputPanelService"/>
 
     <!-- Keymap and input startup activities -->
     <postStartupActivity implementation="com.maddyhome.idea.vim.handler.EditorHandlersChainLogger"/>

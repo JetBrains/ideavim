@@ -58,20 +58,12 @@
   </content>
 
   <applicationListeners>
+    <!-- Shared application listeners (needed in all modes) -->
     <listener class="com.maddyhome.idea.vim.PyNotebooksCloseWorkaround"
               topic="com.intellij.openapi.project.ProjectManagerListener"/>
     <listener class="com.maddyhome.idea.vim.thinapi.IjPluginListener"
               topic="com.intellij.ide.plugins.DynamicPluginListener"/>
-    <listener class="com.maddyhome.idea.vim.ui.ex.ExEntryPanel$LafListener"
-              topic="com.intellij.ide.ui.LafManagerListener"/>
-    <listener class="com.maddyhome.idea.vim.ui.OutputPanel$LafListener"
-              topic="com.intellij.ide.ui.LafManagerListener"/>
-    <listener class="com.maddyhome.idea.vim.extension.highlightedyank.HighlightColorResetter"
-              topic="com.intellij.ide.ui.LafManagerListener"/>
-    <listener class="com.maddyhome.idea.vim.handler.IdeaVimKeymapChangedListener"
-              topic="com.intellij.openapi.keymap.KeymapManagerListener"/>
-    <listener class="com.maddyhome.idea.vim.handler.IdeaVimCorrectorKeymapChangedListener"
-              topic="com.intellij.openapi.keymap.KeymapManagerListener"/>
+    <!-- LAF and keymap listeners moved to IdeaVIM.ideavim-frontend module -->
   </applicationListeners>
 
   <projectListeners>
@@ -171,12 +163,7 @@
     <applicationService serviceImplementation="com.maddyhome.idea.vim.newapi.IjVimSearchGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.ProcessGroup"
                         serviceInterface="com.maddyhome.idea.vim.api.VimProcessGroup"/>
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.ui.ex.ExEntryPanelService"
-                        serviceInterface="com.maddyhome.idea.vim.api.VimCommandLineService"/>
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.ui.ex.ExEntryModalInputService"
-                        serviceInterface="com.maddyhome.idea.vim.api.VimModalInputService"/>
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.ui.ex.IjOutputPanelService"
-                        serviceInterface="com.maddyhome.idea.vim.api.VimOutputPanelService"/>
+    <!-- UI services (ExEntryPanel, ModalInput, OutputPanel) moved to IdeaVIM.ideavim-frontend module -->
     <applicationService serviceImplementation="com.maddyhome.idea.vim.api.VimDigraphGroupBase"
                         serviceInterface="com.maddyhome.idea.vim.api.VimDigraphGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.HistoryGroup"/>
