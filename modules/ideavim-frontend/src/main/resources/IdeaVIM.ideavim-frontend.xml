@@ -14,6 +14,7 @@
   </dependencies>
 
   <extensions defaultExtensionNs="com.intellij">
+    <!-- Status bar widgets -->
     <statusBarWidgetFactory id="IdeaVimMode" implementation="com.maddyhome.idea.vim.ui.widgets.mode.ModeWidgetFactory"
                             order="last, before Memory"/>
     <!-- [VERSION UPDATE: 2025.1+]
@@ -28,10 +29,82 @@
     <statusBarWidgetFactory id="IdeaVimMacro"
                             implementation="com.maddyhome.idea.vim.ui.widgets.macro.MacroWidgetFactory"
                             order="first, after IdeaVimShowCmd"/>
+
+    <!-- Settings UI -->
+    <applicationConfigurable groupId="editor" instance="com.maddyhome.idea.vim.ui.VimEmulationConfigurable"/>
+
+    <!-- Keymap and input startup activities -->
+    <postStartupActivity implementation="com.maddyhome.idea.vim.handler.EditorHandlersChainLogger"/>
+    <postStartupActivity implementation="com.maddyhome.idea.vim.handler.KeymapChecker"/>
+    <postStartupActivity implementation="com.maddyhome.idea.vim.handler.CopilotKeymapCorrector"/>
+
+    <!-- Floating toolbar for .ideavimrc reload -->
+    <editorFloatingToolbarProvider implementation="com.maddyhome.idea.vim.ui.ReloadFloatingToolbar"/>
+
+    <!-- Action promoter for Vim shortcut priority -->
+    <actionPromoter implementation="com.maddyhome.idea.vim.key.VimActionsPromoter" order="last"/>
+
+    <!-- Editor action handlers for Enter/Esc/NewLine input -->
+    <!--    Do not care about red handlers in order. They are necessary for proper ordering, and they'll be resolved when needed -->
+    <editorActionHandler action="EditorEnter" implementationClass="com.maddyhome.idea.vim.handler.VimEnterHandler"
+                         id="ideavim-enter"
+                         order="before editorEnter, before inline.completion.enter, before rd.client.editor.enter, after smart-step-into-enter, after AceHandlerEnter, after jupyterCommandModeEnterKeyHandler, after swift.placeholder.enter"/>
+    <editorActionHandler action="EditorEnter"
+                         implementationClass="com.maddyhome.idea.vim.handler.CaretShapeEnterEditorHandler"
+                         id="ideavim-enter-shape"
+                         order="before jupyterCommandModeEnterKeyHandler"/>
+
+    <!--    "first" is not defined for this handler as it leads to "unsatisfied ordering exception". Not sure exectly why, but it appears in tests-->
+    <editorActionHandler action="EditorEscape" implementationClass="com.maddyhome.idea.vim.handler.VimEscHandler"
+                         id="ideavim-esc"
+                         order="after smart-step-into-escape, after AceHandlerEscape, before jupyterCommandModeEscKeyHandler, before templateEscape, before backend.escape"/>
+    <editorActionHandler action="EditorEscape" implementationClass="com.maddyhome.idea.vim.handler.VimEscLoggerHandler"
+                         id="ideavim-esc-logger"
+                         order="first"/>
+    <editorActionHandler action="EditorEnter" implementationClass="com.maddyhome.idea.vim.handler.VimEnterLoggerHandler"
+                         id="ideavim-enter-logger"
+                         order="first"/>
+    <editorActionHandler action="EditorStartNewLine"
+                         implementationClass="com.maddyhome.idea.vim.handler.StartNewLineDetector"
+                         id="ideavim-start-new-line-detector"
+                         order="first"/>
+    <editorActionHandler action="EditorStartNewLineBefore"
+                         implementationClass="com.maddyhome.idea.vim.handler.StartNewLineBeforeCurrentDetector"
+                         id="ideavim-start-new-line-before-current-detector"
+                         order="first"/>
+
+    <!-- Editor notification for accidental install detection -->
+    <editorNotificationProvider
+        implementation="com.maddyhome.idea.vim.troubleshooting.AccidentalInstallDetectorEditorNotificationProvider"/>
   </extensions>
 
   <actions resource-bundle="messages.IdeaVimBundle">
+    <action id="VimPluginToggle" class="com.maddyhome.idea.vim.action.VimPluginToggleAction">
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+    </action>
+
+    <!-- Internal -->
+    <!--suppress PluginXmlI18n -->
+    <action id="VimInternalAddBlockInlays" class="com.maddyhome.idea.vim.action.internal.AddBlockInlaysAction"
+            text="Add Test Block Inlays | IdeaVim Internal" internal="true"/>
+    <!--suppress PluginXmlI18n -->
+    <action id="VimInternalAddInlineInlays" class="com.maddyhome.idea.vim.action.internal.AddInlineInlaysAction"
+            text="Add Test Inline Inlays | IdeaVim Internal" internal="true"/>
+
+    <action id="VimShortcutKeyAction" class="com.maddyhome.idea.vim.action.VimShortcutKeyAction"/>
     <action id="VimActions" class="com.maddyhome.idea.vim.ui.VimActions"/>
     <action id="CustomizeModeWidget" class="com.maddyhome.idea.vim.ui.widgets.mode.ModeWidgetPopup"/>
+
+    <group id="IdeaVim.ReloadVimRc.group" class="com.maddyhome.idea.vim.ui.ReloadFloatingToolbarActionGroup">
+      <action id="IdeaVim.ReloadVimRc.reload" class="com.maddyhome.idea.vim.ui.ReloadVimRc"
+              use-shortcut-of="ExternalSystem.ProjectRefreshAction">
+      </action>
+    </group>
+
+    <action id="VimFindActionIdAction" class="com.maddyhome.idea.vim.listener.FindActionIdAction"/>
+
+    <action class="com.maddyhome.idea.vim.extension.hints.ToggleHintsAction" text="Toggle Hints">
+      <keyboard-shortcut keymap="$default" first-keystroke="ctrl BACK_SLASH"/>
+    </action>
   </actions>
 </idea-plugin>

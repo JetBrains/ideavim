@@ -108,7 +108,7 @@
   </extensionPoints>
 
   <extensions defaultExtensionNs="com.intellij">
-    <applicationConfigurable groupId="editor" instance="com.maddyhome.idea.vim.ui.VimEmulationConfigurable"/>
+    <!-- Settings UI moved to IdeaVIM.ideavim-frontend module -->
     <projectService serviceImplementation="com.maddyhome.idea.vim.group.LastTabService"/>
     <!-- Status bar widgets moved to IdeaVIM.ideavim-frontend module -->
 
@@ -118,13 +118,7 @@
          which (at least for 2020.1) has some long running activities that block other startup extensions. None of the
          core platform activities have IDs, so we can't use "before ID". We have to use "first" -->
     <postStartupActivity implementation="com.maddyhome.idea.vim.PluginStartup" order="first"/>
-    <postStartupActivity implementation="com.maddyhome.idea.vim.handler.EditorHandlersChainLogger"/>
-    <postStartupActivity implementation="com.maddyhome.idea.vim.handler.KeymapChecker"/>
-    <postStartupActivity implementation="com.maddyhome.idea.vim.handler.CopilotKeymapCorrector"/>
-
-    <editorFloatingToolbarProvider implementation="com.maddyhome.idea.vim.ui.ReloadFloatingToolbar"/>
-
-    <actionPromoter implementation="com.maddyhome.idea.vim.key.VimActionsPromoter" order="last"/>
+    <!-- Input handling, keymap checkers, toolbar, and action promoter moved to IdeaVIM.ideavim-frontend module -->
 
     <!-- Spellchecker dictionary moved to IdeaVIM.ideavim-backend module -->
 
@@ -149,32 +143,7 @@
 <!--                     enabledByDefault="true" level="WARNING"-->
 <!--                     implementationClass="com.maddyhome.idea.vim.inspections.UsePlugSyntaxInspection"/>-->
 
-<!--    Do not care about red handlers in order. They are necessary for proper ordering, and they'll be resolved when needed -->
-    <editorActionHandler action="EditorEnter" implementationClass="com.maddyhome.idea.vim.handler.VimEnterHandler"
-                         id="ideavim-enter"
-                         order="before editorEnter, before inline.completion.enter, before rd.client.editor.enter, after smart-step-into-enter, after AceHandlerEnter, after jupyterCommandModeEnterKeyHandler, after swift.placeholder.enter"/>
-    <editorActionHandler action="EditorEnter" implementationClass="com.maddyhome.idea.vim.handler.CaretShapeEnterEditorHandler"
-                         id="ideavim-enter-shape"
-                         order="before jupyterCommandModeEnterKeyHandler"/>
-
-<!--    "first" is not defined for this handler as it leads to "unsatisfied ordering exception". Not sure exectly why, but it appears in tests-->
-    <editorActionHandler action="EditorEscape" implementationClass="com.maddyhome.idea.vim.handler.VimEscHandler"
-                         id="ideavim-esc"
-                         order="after smart-step-into-escape, after AceHandlerEscape, before jupyterCommandModeEscKeyHandler, before templateEscape, before backend.escape"/>
-    <editorActionHandler action="EditorEscape" implementationClass="com.maddyhome.idea.vim.handler.VimEscLoggerHandler"
-                         id="ideavim-esc-logger"
-                         order="first"/>
-    <editorActionHandler action="EditorEnter" implementationClass="com.maddyhome.idea.vim.handler.VimEnterLoggerHandler"
-                         id="ideavim-enter-logger"
-                         order="first"/>
-    <editorActionHandler action="EditorStartNewLine"
-                         implementationClass="com.maddyhome.idea.vim.handler.StartNewLineDetector"
-                         id="ideavim-start-new-line-detector"
-                         order="first"/>
-    <editorActionHandler action="EditorStartNewLineBefore"
-                         implementationClass="com.maddyhome.idea.vim.handler.StartNewLineBeforeCurrentDetector"
-                         id="ideavim-start-new-line-before-current-detector"
-                         order="first"/>
+    <!-- Editor action handlers (Enter/Esc/NewLine) moved to IdeaVIM.ideavim-frontend module -->
     <editorFactoryDocumentListener
         implementation="com.maddyhome.idea.vim.listener.VimListenerManager$VimDocumentListener"/>
     <registryKey defaultValue="true" description="Enable IdeaVim only in editor component and project tree"
@@ -182,8 +151,7 @@
     <registryKey defaultValue="false" description="Old action execution mechanism" key="ideavim.old.action.execution"
                  restartRequired="false"/>
 
-    <editorNotificationProvider
-        implementation="com.maddyhome.idea.vim.troubleshooting.AccidentalInstallDetectorEditorNotificationProvider"/>
+    <!-- Editor notification provider moved to IdeaVIM.ideavim-frontend module -->
 
     <dependencySupport coordinate="configuration" kind="vim" displayName="IdeaVim"/>
 
@@ -238,28 +206,7 @@
                         serviceInterface="com.maddyhome.idea.vim.api.VimRedrawService"/>
   </extensions>
 
-  <actions resource-bundle="messages.IdeaVimBundle">
-    <action id="VimPluginToggle" class="com.maddyhome.idea.vim.action.VimPluginToggleAction">
-      <add-to-group group-id="ToolsMenu" anchor="last"/>
-    </action>
-
-    <!-- Internal -->
-    <!--suppress PluginXmlI18n -->
-    <action id="VimInternalAddBlockInlays" class="com.maddyhome.idea.vim.action.internal.AddBlockInlaysAction" text="Add Test Block Inlays | IdeaVim Internal" internal="true"/>
-    <!--suppress PluginXmlI18n -->
-    <action id="VimInternalAddInlineInlays" class="com.maddyhome.idea.vim.action.internal.AddInlineInlaysAction" text="Add Test Inline Inlays | IdeaVim Internal" internal="true"/>
-
-    <action id="VimShortcutKeyAction" class="com.maddyhome.idea.vim.action.VimShortcutKeyAction"/>
-    <!-- VimActions and CustomizeModeWidget moved to IdeaVIM.ideavim-frontend module -->
-
-    <group id="IdeaVim.ReloadVimRc.group" class="com.maddyhome.idea.vim.ui.ReloadFloatingToolbarActionGroup">
-      <action id="IdeaVim.ReloadVimRc.reload" class="com.maddyhome.idea.vim.ui.ReloadVimRc"
-              use-shortcut-of="ExternalSystem.ProjectRefreshAction">
-      </action>
-    </group>
-
-    <action id="VimFindActionIdAction" class="com.maddyhome.idea.vim.listener.FindActionIdAction"/>
-  </actions>
+  <!-- All actions moved to IdeaVIM.ideavim-frontend module -->
 
   <extensions defaultExtensionNs="IdeaVIM">
     <vimExtension implementation="com.maddyhome.idea.vim.extension.surround.VimSurroundExtension" name="surround">
@@ -380,9 +327,5 @@
     </vimExtension>
   </extensions>
 
-  <actions>
-    <action class="com.maddyhome.idea.vim.extension.hints.ToggleHintsAction" text="Toggle Hints">
-      <keyboard-shortcut keymap="$default" first-keystroke="ctrl BACK_SLASH"/>
-    </action>
-  </actions>
+  <!-- ToggleHintsAction moved to IdeaVIM.ideavim-frontend module -->
 </idea-plugin>
