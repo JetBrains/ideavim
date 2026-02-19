@@ -11,6 +11,7 @@
   <!-- Contains PSI-dependent and VFS/Index-dependent code -->
   <dependencies>
     <module name="IdeaVIM.ideavim-common"/>
+    <!--    <module name="intellij.platform.backend"/>-->
   </dependencies>
 
   <extensions defaultExtensionNs="com.intellij">

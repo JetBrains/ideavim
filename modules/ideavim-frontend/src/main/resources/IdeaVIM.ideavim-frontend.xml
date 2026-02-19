@@ -11,6 +11,7 @@
   <!-- Contains UI components, input handling, and visual feedback -->
   <dependencies>
     <module name="IdeaVIM.ideavim-common"/>
+    <module name="intellij.platform.frontend"/>
   </dependencies>
 
   <!-- Frontend-only application listeners -->
