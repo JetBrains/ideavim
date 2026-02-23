@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -22,8 +22,8 @@ import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.key.KeyStack
 import com.maddyhome.idea.vim.key.consumers.CharArgumentConsumer
-import com.maddyhome.idea.vim.key.consumers.CommandKeyConsumer
 import com.maddyhome.idea.vim.key.consumers.CommandCountConsumer
+import com.maddyhome.idea.vim.key.consumers.CommandKeyConsumer
 import com.maddyhome.idea.vim.key.consumers.DeleteCommandCountConsumer
 import com.maddyhome.idea.vim.key.consumers.DigraphConsumer
 import com.maddyhome.idea.vim.key.consumers.EditorResetConsumer
@@ -61,6 +61,7 @@ class KeyHandler {
     ModeInputConsumer()   // Must be last to accept the keystroke as typed input
   )
   private var handleKeyRecursionCount = 0
+  internal var maxMapDepthReached = false
 
   private var commandListener: ConcurrentLinkedDeque<() -> Unit> = ConcurrentLinkedDeque()
 
@@ -167,6 +168,7 @@ class KeyHandler {
       logger.trace { "Mode = ${editor.mode}" }
       val maxMapDepth = injector.globalOptions().maxmapdepth
       if (handleKeyRecursionCount >= maxMapDepth) {
+        maxMapDepthReached = true
         keyProcessResultBuilder.addExecutionStep { _, lambdaEditor, _ ->
           logger.warn("Key handling, maximum recursion of the key received. maxdepth=$maxMapDepth")
           injector.messages.showStatusBarMessage(lambdaEditor, injector.messages.message("E223"))
@@ -176,6 +178,9 @@ class KeyHandler {
       }
 
       injector.messages.clearError()
+      if (handleKeyRecursionCount == 0) {
+        maxMapDepthReached = false
+      }
       // We only record unmapped keystrokes. If we've recursed to handle mapping, don't record anything.
       val shouldRecord = handleKeyRecursionCount == 0 && injector.registerGroup.isRecording
 
