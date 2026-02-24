@@ -32,21 +32,23 @@ import kotlin.reflect.typeOf
 @VimApiDsl
 interface VimApi {
   /**
-   * Represents the current mode in Vim.
+   * Represents the current mode in Vim (read-only).
+   *
+   * To change modes, use [normal] with the appropriate key sequence:
+   * - `normal("i")` — enter Insert mode
+   * - `normal("<Esc>")` — exit to Normal mode (like pressing Escape)
+   * - `normal("v")` — enter Visual character mode
+   * - `normal("V")` — enter Visual line mode
    *
    * Example usage:
-   *
-   * **Getting the Current Mode**
    * ```kotlin
    * val currentMode = mode
-   * println("Current Vim Mode: $currentMode")
+   * if (currentMode == Mode.INSERT) {
+   *   normal("<Esc>")  // exit to normal
+   * }
    * ```
-   *
-   * The set of mode is currently an experimental operation as the contracts of it are getting polished.
-   *   We suggest currently not using it.
    */
-  @set:ApiStatus.Experimental
-  var mode: Mode
+  val mode: Mode
 
   /**
    * Retrieves a variable of the specified type and name.
@@ -94,12 +96,17 @@ interface VimApi {
   /**
    * Executes normal mode commands as if they were typed.
    *
-   * In Vim, this is equivalent to the `:normal` command.
+   * In Vim, this is equivalent to the `:normal!` command (without remapping).
+   * Supports Vim key notation: `<Esc>`, `<CR>`, `<C-O>`, `<C-V>`, etc.
    *
    * Example usage:
    * ```kotlin
-   * normal("gg")  // Go to the first line
-   * normal("dw")  // Delete word
+   * normal("gg")     // Go to the first line
+   * normal("dw")     // Delete word
+   * normal("i")      // Enter Insert mode
+   * normal("<Esc>")  // Exit to Normal mode (like pressing Escape)
+   * normal("v")      // Enter Visual character mode
+   * normal("V")      // Enter Visual line mode
    * ```
    *
    * @param command The normal mode command string to execute

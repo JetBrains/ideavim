@@ -95,7 +95,7 @@ internal fun VimApi.rewriteVisual() {
       }
     }
   }
-  mode = Mode.NORMAL
+  normal("<Esc>")
 }
 
 private fun CaretTransaction.prepareRegisterData(): Pair<String, TextType>? {
@@ -151,7 +151,7 @@ private fun CaretTransaction.replaceTextAndUpdateCaret(
     } else if (selectionRange is Range.Block) {
       replaceTextBlockwise(selectionRange, text)
 
-      vimApi.mode = Mode.NORMAL
+      vimApi.normal("<Esc>")
       updateCaret(offset = selectionRange.start)
     }
   }

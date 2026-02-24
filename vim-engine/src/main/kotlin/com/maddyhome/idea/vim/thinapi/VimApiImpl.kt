@@ -51,17 +51,8 @@ class VimApiImpl(
   private val mappingOwner: MappingOwner,
   val projectId: String?,
 ) : VimApi {
-  // Note: Setting a new mode is a complicated operation. Currently, it updates the selection under the write lock,
-  //   but we don't require to run this under the write lock. Also, esc in insert mode may produce more inserts
-  //   when the insert was started with the number: `3iabc<esc>`
-  // It'll be necessary to review how the set of mode should be presented in the API.
-  override var mode: Mode
-    get() {
-      return injector.vimState.mode.toMode()
-    }
-    set(value) {
-      changeMode(value, vimEditor)
-    }
+  override val mode: Mode
+    get() = injector.vimState.mode.toMode()
 
   private val vimEditor: VimEditor
     get() = projectId?.let { injector.editorGroup.getSelectedEditor(it) } ?: injector.fallbackWindow

@@ -9,15 +9,6 @@
 package com.maddyhome.idea.vim.thinapi
 
 import com.intellij.vim.api.models.Mode
-import com.maddyhome.idea.vim.api.VimCaret
-import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.common.forgetAllReplaceMasks
-import com.maddyhome.idea.vim.impl.state.VimStateMachineImpl
-import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
-import com.maddyhome.idea.vim.state.mode.inBlockSelection
-import com.maddyhome.idea.vim.state.mode.inCommandLineModeWithVisual
-import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.state.mode.Mode as EngineMode
 
 fun EngineMode.toMode(): Mode {
@@ -142,41 +133,3 @@ fun Mode.toEngineMode(): EngineMode {
   }
 }
 
-fun changeMode(value: Mode, vimEditor: VimEditor?) {
-  val vimState = injector.vimState
-  val currentMode: EngineMode = vimState.mode
-  if (currentMode == value.toEngineMode()) return
-
-  val oldValue: EngineMode = vimState.mode
-  if (oldValue == EngineMode.REPLACE) {
-    forgetAllReplaceMasks()
-  } else if (oldValue is EngineMode.VISUAL && vimEditor != null) {
-    val selectionType = oldValue.selectionType
-
-    // remove carets and selection
-    SelectionVimListenerSuppressor.lock().use {
-      injector.application.runWriteAction {
-        if (vimEditor.inBlockSelection) {
-          vimEditor.removeSecondaryCarets()
-        }
-        vimEditor.nativeCarets().forEach(VimCaret::removeSelection)
-      }
-    }
-
-    // set selection marks
-    if (vimEditor.inVisualMode || vimEditor.inCommandLineModeWithVisual) {
-      vimEditor.vimLastSelectionType = selectionType
-      injector.application.runReadAction {
-        injector.markService.setVisualSelectionMarks(vimEditor)
-      }
-      injector.application.runWriteAction {
-        vimEditor.nativeCarets().forEach { it.vimSelectionStartClear() }
-      }
-    }
-  }
-
-  (injector.vimState as VimStateMachineImpl).mode = value.toEngineMode()
-  val editor = vimEditor ?: injector.fallbackWindow
-
-  injector.listenersNotifier.notifyModeChanged(editor, oldValue)
-}
