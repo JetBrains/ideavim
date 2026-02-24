@@ -56,11 +56,7 @@
 
 ### K2: State Update Safety
 
-- [ ] T010 [US4] Implement enterInsertMode() safe combined operation in api/src/main/kotlin/com/intellij/vim/api/VimApi.kt
-- [ ] T011 [US4] Implement enterNormalMode() safe combined operation in api/src/main/kotlin/com/intellij/vim/api/VimApi.kt
-- [ ] T012 [US4] Implement enterVisualMode(type) safe combined operation in api/src/main/kotlin/com/intellij/vim/api/VimApi.kt
-- [ ] T013 [US4] Deprecate var mode: Mode setter in VimApi.kt (add @Deprecated annotation)
-- [ ] T014 [US4] Implement combined operations in VimApiImpl in src/main/java/com/maddyhome/idea/vim/thinapi/VimApiImpl.kt
+- [X] T010-T014 [US4] RESOLVED: Removed enterInsertMode/enterNormalMode/enterVisualMode — mode changes use normal() instead (matching Vim plugin patterns). Mode property is val (read-only). See VIM-4143 for future proper mode-changing API design.
 
 ### K3: Coroutine Audit
 
