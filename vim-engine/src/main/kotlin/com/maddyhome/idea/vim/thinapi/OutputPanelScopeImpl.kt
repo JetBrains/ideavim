@@ -21,7 +21,8 @@ object OutputPanelScopeImpl : OutputPanelScope {
   private val vimContext: ExecutionContext
     get() = injector.executionContextManager.getEditorExecutionContext(vimEditor)
 
-  private val outputPanel: VimOutputPanel = injector.outputPanel.getOrCreate(vimEditor, vimContext)
+  private val outputPanel: VimOutputPanel
+    get() = injector.outputPanel.getOrCreate(vimEditor, vimContext)
 
   override val text: String
     get() = outputPanel.text
