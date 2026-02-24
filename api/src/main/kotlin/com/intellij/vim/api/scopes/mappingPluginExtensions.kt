@@ -29,7 +29,7 @@ fun MappingScope.mapPluginAction(
   from: String,
   intermediateMappingLabel: String,
   keepDefaultMapping: Boolean,
-  action: suspend VimApi.() -> Unit,
+  action: VimApi.() -> Unit,
 ) {
   require(intermediateMappingLabel.startsWith("<Plug>")) { "Intermediate mapping label must start with <Plug>" }
 
@@ -71,7 +71,7 @@ fun MappingScope.nmapPluginAction(
   from: String,
   intermediateMappingLabel: String,
   keepDefaultMapping: Boolean,
-  action: suspend VimApi.() -> Unit,
+  action: VimApi.() -> Unit,
 ) {
   require(intermediateMappingLabel.startsWith("<Plug>")) { "Intermediate mapping label must start with <Plug>" }
 
@@ -103,7 +103,7 @@ fun MappingScope.vmapPluginAction(
   from: String,
   intermediateMappingLabel: String,
   keepDefaultMapping: Boolean,
-  action: suspend VimApi.() -> Unit,
+  action: VimApi.() -> Unit,
 ) {
   require(intermediateMappingLabel.startsWith("<Plug>")) { "Intermediate mapping label must start with <Plug>" }
 
@@ -139,7 +139,7 @@ fun MappingScope.xmapPluginAction(
   from: String,
   intermediateMappingLabel: String,
   keepDefaultMapping: Boolean,
-  action: suspend VimApi.() -> Unit,
+  action: VimApi.() -> Unit,
 ) {
   require(intermediateMappingLabel.startsWith("<Plug>")) { "Intermediate mapping label must start with <Plug>" }
 
@@ -171,7 +171,7 @@ fun MappingScope.smapPluginAction(
   from: String,
   intermediateMappingLabel: String,
   keepDefaultMapping: Boolean,
-  action: suspend VimApi.() -> Unit,
+  action: VimApi.() -> Unit,
 ) {
   require(intermediateMappingLabel.startsWith("<Plug>")) { "Intermediate mapping label must start with <Plug>" }
 
@@ -203,7 +203,7 @@ fun MappingScope.omapPluginAction(
   from: String,
   intermediateMappingLabel: String,
   keepDefaultMapping: Boolean,
-  action: suspend VimApi.() -> Unit,
+  action: VimApi.() -> Unit,
 ) {
   require(intermediateMappingLabel.startsWith("<Plug>")) { "Intermediate mapping label must start with <Plug>" }
 
@@ -235,7 +235,7 @@ fun MappingScope.imapPluginAction(
   from: String,
   intermediateMappingLabel: String,
   keepDefaultMapping: Boolean,
-  action: suspend VimApi.() -> Unit,
+  action: VimApi.() -> Unit,
 ) {
   require(intermediateMappingLabel.startsWith("<Plug>")) { "Intermediate mapping label must start with <Plug>" }
 
@@ -267,7 +267,7 @@ fun MappingScope.cmapPluginAction(
   from: String,
   intermediateMappingLabel: String,
   keepDefaultMapping: Boolean,
-  action: suspend VimApi.() -> Unit,
+  action: VimApi.() -> Unit,
 ) {
   require(intermediateMappingLabel.startsWith("<Plug>")) { "Intermediate mapping label must start with <Plug>" }
 

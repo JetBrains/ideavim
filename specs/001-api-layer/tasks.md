@@ -60,9 +60,9 @@
 
 ### K3: Coroutine Audit
 
-- [ ] T015 [US4] Remove suspend from mapping handlers in MappingScope.kt that run inside locks
-- [ ] T016 [US4] Remove suspend from operator functions in VimApi.kt that run on EDT
-- [ ] T017 [US4] Add KDoc to VimApi.kt clarifying which callbacks support suspend vs require sync
+- [X] T015 [US4] Remove suspend from mapping handlers in MappingScope.kt that run inside locks
+- [X] T016 [US4] Remove suspend from operator functions in VimApi.kt that run on EDT — also removed suspend from ListenersScope, CommandLineTransaction, mappingPluginExtensions, VimInitApi; removed all runBlocking from thinapi implementations
+- [X] T017 [US4] Add KDoc to VimApi.kt clarifying which callbacks support suspend vs require sync — ADR in VIM-4144
 
 ### K4: Test Accessibility
 

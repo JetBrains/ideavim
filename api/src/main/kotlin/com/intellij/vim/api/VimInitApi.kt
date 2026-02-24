@@ -31,7 +31,7 @@ class VimInitApi(private val delegate: VimApi) {
 
   fun textObjects(block: TextObjectScope.() -> Unit = {}): TextObjectScope = delegate.textObjects(block)
 
-  fun exportOperatorFunction(name: String, function: suspend VimApi.() -> Boolean) =
+  fun exportOperatorFunction(name: String, function: VimApi.() -> Boolean) =
     delegate.exportOperatorFunction(name, function)
 }
 

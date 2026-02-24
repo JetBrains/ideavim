@@ -38,7 +38,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.VariableExpression
 import com.maddyhome.idea.vim.vimscript.services.VariableService
-import kotlinx.coroutines.runBlocking
+
 import kotlin.io.path.pathString
 import kotlin.reflect.KType
 
@@ -108,7 +108,7 @@ class VimApiImpl(
     return variableName to Scope.getByValue(prefix)
   }
 
-  override fun exportOperatorFunction(name: String, function: suspend VimApi.() -> Boolean) {
+  override fun exportOperatorFunction(name: String, function: VimApi.() -> Boolean) {
     val operatorFunction: OperatorFunction = object : OperatorFunction {
       override fun apply(
         editor: VimEditor,
@@ -117,9 +117,7 @@ class VimApiImpl(
       ): Boolean {
         var returnValue = false
         injector.actionExecutor.executeCommand(editor, {
-          runBlocking {
-            returnValue = VimApiImpl(listenerOwner, mappingOwner, editor.projectId).function()
-          }
+          returnValue = VimApiImpl(listenerOwner, mappingOwner, editor.projectId).function()
         }, "Insert Text", null)
         return returnValue
       }

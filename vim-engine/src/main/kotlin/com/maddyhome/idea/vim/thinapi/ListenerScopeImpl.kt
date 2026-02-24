@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.VimPluginListener
 import com.maddyhome.idea.vim.common.VimYankListener
 import com.maddyhome.idea.vim.key.MappingOwner
-import kotlinx.coroutines.runBlocking
+
 import com.maddyhome.idea.vim.state.mode.Mode as EngineMode
 
 class ListenerScopeImpl(
@@ -37,12 +37,12 @@ class ListenerScopeImpl(
   private abstract class ListenerBase(listenerOwner: ListenerOwner) : Listener {
     final override val owner: ListenerOwner = listenerOwner
 
-    fun launch(block: suspend () -> Unit) {
-      runBlocking { block() }
+    fun launch(block: () -> Unit) {
+      block()
     }
   }
 
-  override fun onModeChange(callback: suspend VimApi.(Mode) -> Unit) {
+  override fun onModeChange(callback: VimApi.(Mode) -> Unit) {
     val listener = object : ModeChangeListener, ListenerBase(listenerOwner) {
       override fun modeChanged(
         editor: VimEditor,
@@ -57,7 +57,7 @@ class ListenerScopeImpl(
     injector.listenersNotifier.modeChangeListeners.add(listener)
   }
 
-  override fun onYank(callback: suspend VimApi.(Map<CaretId, Range.Simple>) -> Unit) {
+  override fun onYank(callback: VimApi.(Map<CaretId, Range.Simple>) -> Unit) {
     val listener = object : VimYankListener, ListenerBase(listenerOwner) {
       override fun yankPerformed(caretToRange: Map<ImmutableVimCaret, TextRange>) {
         val caretToRangeMap: Map<CaretId, Range.Simple> =
@@ -73,7 +73,7 @@ class ListenerScopeImpl(
     injector.listenersNotifier.yankListeners.add(listener)
   }
 
-  override fun onEditorCreate(callback: suspend VimApi.() -> Unit) {
+  override fun onEditorCreate(callback: VimApi.() -> Unit) {
     val listener = object : EditorListener, ListenerBase(listenerOwner) {
       override fun created(editor: VimEditor) {
         val vimApi = VimApiImpl(listenerOwner, mappingOwner, projectId)
@@ -85,7 +85,7 @@ class ListenerScopeImpl(
     injector.listenersNotifier.myEditorListeners.add(listener)
   }
 
-  override fun onEditorRelease(callback: suspend VimApi.() -> Unit) {
+  override fun onEditorRelease(callback: VimApi.() -> Unit) {
     val listener = object : EditorListener, ListenerBase(listenerOwner) {
       override fun released(editor: VimEditor) {
         val vimApi = VimApiImpl(listenerOwner, mappingOwner, projectId)
@@ -97,7 +97,7 @@ class ListenerScopeImpl(
     injector.listenersNotifier.myEditorListeners.add(listener)
   }
 
-  override fun onEditorFocusGain(callback: suspend VimApi.() -> Unit) {
+  override fun onEditorFocusGain(callback: VimApi.() -> Unit) {
     val listener = object : EditorListener, ListenerBase(listenerOwner) {
       override fun focusGained(editor: VimEditor) {
         val vimApi = VimApiImpl(listenerOwner, mappingOwner, projectId)
@@ -109,7 +109,7 @@ class ListenerScopeImpl(
     injector.listenersNotifier.myEditorListeners.add(listener)
   }
 
-  override fun onEditorFocusLost(callback: suspend VimApi.() -> Unit) {
+  override fun onEditorFocusLost(callback: VimApi.() -> Unit) {
     val listener = object : EditorListener, ListenerBase(listenerOwner) {
       override fun focusLost(editor: VimEditor) {
         val vimApi = VimApiImpl(listenerOwner, mappingOwner, projectId)
@@ -121,7 +121,7 @@ class ListenerScopeImpl(
     injector.listenersNotifier.myEditorListeners.add(listener)
   }
 
-  override fun onMacroRecordingStart(callback: suspend VimApi.() -> Unit) {
+  override fun onMacroRecordingStart(callback: VimApi.() -> Unit) {
     val listener = object : MacroRecordingListener, ListenerBase(listenerOwner) {
       override fun recordingStarted() {
         val vimApi = VimApiImpl(listenerOwner, mappingOwner, projectId)
@@ -137,7 +137,7 @@ class ListenerScopeImpl(
     injector.listenersNotifier.macroRecordingListeners.add(listener)
   }
 
-  override fun onMacroRecordingFinish(callback: suspend VimApi.() -> Unit) {
+  override fun onMacroRecordingFinish(callback: VimApi.() -> Unit) {
     val listener = object : MacroRecordingListener, ListenerBase(listenerOwner) {
       override fun recordingStarted() {
         // Not used in this listener
@@ -153,7 +153,7 @@ class ListenerScopeImpl(
     injector.listenersNotifier.macroRecordingListeners.add(listener)
   }
 
-  override fun onIdeaVimEnabled(callback: suspend VimApi.() -> Unit) {
+  override fun onIdeaVimEnabled(callback: VimApi.() -> Unit) {
     val listener = object : VimPluginListener, ListenerBase(listenerOwner) {
       override fun turnedOn() {
         val vimApi = VimApiImpl(listenerOwner, mappingOwner, projectId)
@@ -169,7 +169,7 @@ class ListenerScopeImpl(
     injector.listenersNotifier.vimPluginListeners.add(listener)
   }
 
-  override fun onIdeaVimDisabled(callback: suspend VimApi.() -> Unit) {
+  override fun onIdeaVimDisabled(callback: VimApi.() -> Unit) {
     val listener = object : VimPluginListener, ListenerBase(listenerOwner) {
       override fun turnedOn() {
         // Not used in this listener

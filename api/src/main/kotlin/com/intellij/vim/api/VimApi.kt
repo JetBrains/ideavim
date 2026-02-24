@@ -24,9 +24,20 @@ import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
 /**
- * Entry point of the Vim API
+ * Entry point of the Vim API.
  *
  * The API is currently in experimental status and not suggested to be used.
+ *
+ * ## Threading model
+ *
+ * All callbacks and handlers registered through this API (mapping actions, operator functions,
+ * text object providers, command handlers) execute synchronously on the EDT (Event Dispatch Thread).
+ * They are **not** suspend functions and must not block for extended periods.
+ *
+ * To perform editor read/write operations, use [editor] with [com.intellij.vim.api.scopes.editor.EditorScope.read]
+ * and [com.intellij.vim.api.scopes.editor.EditorScope.change], which acquire the appropriate locks.
+ *
+ * See [VIM-4144](https://youtrack.jetbrains.com/issue/VIM-4144) for the design rationale.
  */
 @ApiStatus.Experimental
 @VimApiDsl
@@ -68,6 +79,7 @@ interface VimApi {
    * Exports a function that can be used as an operator function in Vim.
    *
    * In Vim, operator functions are used with the `g@` operator to create custom operators.
+   * The [function] runs synchronously on EDT inside a command action.
    *
    * Example usage:
    * ```kotlin
@@ -80,9 +92,9 @@ interface VimApi {
    * ```
    *
    * @param name The name to register the function under
-   * @param function The function to execute when the operator is invoked
+   * @param function The function to execute when the operator is invoked. Runs on EDT.
    */
-  fun exportOperatorFunction(name: String, function: suspend VimApi.() -> Boolean)
+  fun exportOperatorFunction(name: String, function: VimApi.() -> Boolean)
 
   /**
    * Sets the current operator function to use with the `g@` operator.
