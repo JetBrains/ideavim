@@ -18,11 +18,11 @@ class DigraphScopeImpl(
   private val vimEditor: VimEditor
     get() = projectId?.let { injector.editorGroup.getSelectedEditor(it) } ?: injector.fallbackWindow
 
-  override fun getCharacter(ch1: Char, ch2: Char): Int {
+  override suspend fun getCharacter(ch1: Char, ch2: Char): Int {
     return injector.digraphGroup.getCharacterForDigraph(ch1, ch2)
   }
 
-  override fun add(ch1: Char, ch2: Char, codepoint: Int) {
+  override suspend fun add(ch1: Char, ch2: Char, codepoint: Int) {
     val args = "$ch1$ch2 $codepoint"
     injector.digraphGroup.parseCommandLine(vimEditor, args)
   }

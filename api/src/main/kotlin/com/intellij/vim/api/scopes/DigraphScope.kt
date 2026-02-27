@@ -23,7 +23,7 @@ interface DigraphScope {
    * @param ch2 The second character of the digraph
    * @return The Unicode codepoint of the character represented by the digraph, or the codepoint of ch2 if no digraph is found
    */
-  fun getCharacter(ch1: Char, ch2: Char): Int
+  suspend fun getCharacter(ch1: Char, ch2: Char): Int
 
   /**
    * Adds a custom digraph.
@@ -35,5 +35,5 @@ interface DigraphScope {
    * @param ch2 The second character of the digraph
    * @param codepoint The Unicode codepoint of the character to associate with the digraph
    */
-  fun add(ch1: Char, ch2: Char, codepoint: Int)
+  suspend fun add(ch1: Char, ch2: Char, codepoint: Int)
 }

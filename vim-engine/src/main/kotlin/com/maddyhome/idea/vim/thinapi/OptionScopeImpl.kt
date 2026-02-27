@@ -27,7 +27,7 @@ class OptionScopeImpl(
   private val optionGroup: VimOptionGroup
     get() = injector.optionGroup
 
-  override fun <T> getOptionValue(name: String, type: KType): T {
+  override suspend fun <T> getOptionValue(name: String, type: KType): T {
     val option = optionGroup.getOption(name) ?: throw IllegalArgumentException("Option $name not found")
 
     val optionValue = optionGroup.getOptionValue(option, OptionAccessScope.EFFECTIVE(vimEditor))
@@ -65,7 +65,7 @@ class OptionScopeImpl(
     return kotlinValue as T
   }
 
-  override fun <T> setOption(name: String, value: T, type: KType, scope: String) {
+  override suspend fun <T> setOption(name: String, value: T, type: KType, scope: String) {
     val option = optionGroup.getOption(name) ?: throw IllegalArgumentException("Option $name not found")
 
     val optionValue = when (type.classifier) {
@@ -88,7 +88,7 @@ class OptionScopeImpl(
     }
   }
 
-  override fun reset(name: String) {
+  override suspend fun reset(name: String) {
     val option = optionGroup.getOption(name) ?: throw IllegalArgumentException("Option $name not found")
     optionGroup.resetToDefaultValue(option, OptionAccessScope.EFFECTIVE(vimEditor))
   }

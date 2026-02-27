@@ -36,7 +36,7 @@ interface OptionScope {
    * @return The value of the option
    * @throws IllegalArgumentException if the type is wrong or the option doesn't exist
    */
-  fun <T> getOptionValue(name: String, type: KType): T
+  suspend fun <T> getOptionValue(name: String, type: KType): T
 
   /**
    * Sets an option value with the specified scope.
@@ -60,7 +60,7 @@ interface OptionScope {
    * @param scope The scope to set the option in ("global", "local", or "effective")
    * @throws IllegalArgumentException if the option doesn't exist or the type is wrong
    */
-  fun <T> setOption(name: String, value: T, type: KType, scope: String)
+  suspend fun <T> setOption(name: String, value: T, type: KType, scope: String)
 
   /**
    * Resets an option to its default value.
@@ -72,7 +72,7 @@ interface OptionScope {
    *
    * @throws IllegalArgumentException if the option doesn't exist
    */
-  fun reset(name: String)
+  suspend fun reset(name: String)
 
   /**
    * Extension function to split a comma-separated option value into a list.
@@ -101,7 +101,7 @@ interface OptionScope {
  * @return The value of the option
  * @throws IllegalArgumentException if the type is wrong or the option doesn't exist
  */
-inline fun <reified T> OptionScope.get(name: String): T {
+suspend inline fun <reified T> OptionScope.get(name: String): T {
   val kType: KType = typeOf<T>()
   return getOptionValue(name, kType)
 }
@@ -117,7 +117,7 @@ inline fun <reified T> OptionScope.get(name: String): T {
  *
  * @throws IllegalArgumentException if the option doesn't exist or the type is wrong
  */
-inline fun <reified T> OptionScope.setGlobal(name: String, value: T) {
+suspend inline fun <reified T> OptionScope.setGlobal(name: String, value: T) {
   val kType: KType = typeOf<T>()
   setOption(name, value, kType, "global")
 }
@@ -133,7 +133,7 @@ inline fun <reified T> OptionScope.setGlobal(name: String, value: T) {
  *
  * @throws IllegalArgumentException if the option doesn't exist or the type is wrong
  */
-inline fun <reified T> OptionScope.setLocal(name: String, value: T) {
+suspend inline fun <reified T> OptionScope.setLocal(name: String, value: T) {
   val kType: KType = typeOf<T>()
   setOption(name, value, kType, "local")
 }
@@ -149,7 +149,7 @@ inline fun <reified T> OptionScope.setLocal(name: String, value: T) {
  *
  * @throws IllegalArgumentException if the option doesn't exist or the type is wrong
  */
-inline fun <reified T> OptionScope.set(name: String, value: T) {
+suspend inline fun <reified T> OptionScope.set(name: String, value: T) {
   val kType: KType = typeOf<T>()
   setOption(name, value, kType, "effective")
 }
@@ -166,7 +166,7 @@ inline fun <reified T> OptionScope.set(name: String, value: T) {
  *
  * @param name The name of the boolean option to toggle
  */
-fun OptionScope.toggle(name: String) {
+suspend fun OptionScope.toggle(name: String) {
   val current = get<Boolean>(name)
   set(name, !current)
 }
@@ -188,7 +188,7 @@ fun OptionScope.toggle(name: String) {
  * @param name The name of the list option
  * @param values The values to append (duplicates will be ignored)
  */
-fun OptionScope.append(name: String, vararg values: String) {
+suspend fun OptionScope.append(name: String, vararg values: String) {
   val current = get<String>(name)
   val currentList = if (current.isEmpty()) emptyList() else current.split()
   val valuesToAdd = values.filterNot { it in currentList }
@@ -213,7 +213,7 @@ fun OptionScope.append(name: String, vararg values: String) {
  * @param name The name of the list option
  * @param values The values to prepend (duplicates will be ignored)
  */
-fun OptionScope.prepend(name: String, vararg values: String) {
+suspend fun OptionScope.prepend(name: String, vararg values: String) {
   val current = get<String>(name)
   val currentList = if (current.isEmpty()) emptyList() else current.split()
   val valuesToAdd = values.filterNot { it in currentList }
@@ -236,7 +236,7 @@ fun OptionScope.prepend(name: String, vararg values: String) {
  * @param name The name of the list option
  * @param values The values to remove
  */
-fun OptionScope.remove(name: String, vararg values: String) {
+suspend fun OptionScope.remove(name: String, vararg values: String) {
   val current = get<String>(name)
   val currentList = if (current.isEmpty()) emptyList() else current.split()
   val newList = currentList.filterNot { it in values }
