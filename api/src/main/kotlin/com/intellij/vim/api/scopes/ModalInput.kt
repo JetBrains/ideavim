@@ -119,7 +119,7 @@ interface ModalInput {
    * @param label The label to display in the dialog
    * @param handler A function that will be called when the user enters input and presses ENTER
    */
-  fun inputString(label: String, handler: VimApi.(String) -> Unit)
+  fun inputString(label: String, handler: suspend VimApi.(String) -> Unit)
 
   /**
    * Creates a modal input dialog for collecting a single character from the user.
@@ -154,7 +154,7 @@ interface ModalInput {
    * @param label The label to display in the dialog
    * @param handler A function that will be called when the user enters a character
    */
-  fun inputChar(label: String, handler: VimApi.(Char) -> Unit)
+  fun inputChar(label: String, handler: suspend VimApi.(Char) -> Unit)
 
   /**
    * Closes the current modal input dialog, if one is active.

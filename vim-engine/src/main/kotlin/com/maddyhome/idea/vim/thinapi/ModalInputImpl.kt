@@ -50,19 +50,19 @@ class ModalInputImpl(
     return this
   }
 
-  override fun inputString(label: String, handler: VimApi.(String) -> Unit) {
+  override fun inputString(label: String, handler: suspend VimApi.(String) -> Unit) {
     val vimApi = VimApiImpl(listenerOwner, mappingOwner, projectId)
     val interceptor = TextInputInterceptor(projectId, repeatCount, repeatWhileCondition, updateLabel) {
-      vimApi.handler(it)
+      kotlinx.coroutines.runBlocking { vimApi.handler(it) }
     }
     val modalInput = injector.modalInput.create(vimEditor, vimContext, label, interceptor)
     interceptor.modalInput = modalInput
   }
 
-  override fun inputChar(label: String, handler: VimApi.(Char) -> Unit) {
+  override fun inputChar(label: String, handler: suspend VimApi.(Char) -> Unit) {
     val vimApi = VimApiImpl(listenerOwner, mappingOwner, projectId)
     val interceptor = CharInputInterceptor(projectId, repeatCount, repeatWhileCondition, updateLabel) { char ->
-      vimApi.handler(char)
+      kotlinx.coroutines.runBlocking { vimApi.handler(char) }
     }
     val modalInput = injector.modalInput.create(vimEditor, vimContext, label, interceptor)
     interceptor.modalInput = modalInput
