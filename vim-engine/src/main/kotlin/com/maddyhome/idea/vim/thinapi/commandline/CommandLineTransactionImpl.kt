@@ -16,19 +16,19 @@ class CommandLineTransactionImpl : CommandLineTransaction {
   private val activeCommandLine: VimCommandLine?
     get() = injector.commandLine.getActiveCommandLine()
 
-  override suspend fun setText(text: String) {
+  override fun setText(text: String) {
     activeCommandLine?.setText(text)
   }
 
-  override suspend fun insertText(offset: Int, text: String) {
+  override fun insertText(offset: Int, text: String) {
     activeCommandLine?.insertText(offset, text)
   }
 
-  override suspend fun setCaretPosition(position: Int) {
+  override fun setCaretPosition(position: Int) {
     activeCommandLine?.caret?.offset = position
   }
 
-  override suspend fun close(refocusEditor: Boolean): Boolean {
+  override fun close(refocusEditor: Boolean): Boolean {
     val commandLine = activeCommandLine ?: return false
     commandLine.close(refocusEditor, true)
     return true

@@ -20,7 +20,7 @@ interface CommandLineTransaction {
    *
    * @param text The new text to display in the command line.
    */
-  suspend fun setText(text: String)
+  fun setText(text: String)
 
   /**
    * Inserts text at the specified position in the command line.
@@ -28,14 +28,14 @@ interface CommandLineTransaction {
    * @param offset The position at which to insert the text.
    * @param text The text to insert.
    */
-  suspend fun insertText(offset: Int, text: String)
+  fun insertText(offset: Int, text: String)
 
   /**
    * Sets the caret position in the command line.
    *
    * @param position The new position for the caret.
    */
-  suspend fun setCaretPosition(position: Int)
+  fun setCaretPosition(position: Int)
 
   /**
    * Closes the command line.
@@ -43,5 +43,5 @@ interface CommandLineTransaction {
    * @param refocusEditor Whether to refocus the editor after closing the command line.
    * @return True if the command line was closed, false if it was not active.
    */
-  suspend fun close(refocusEditor: Boolean = true): Boolean
+  fun close(refocusEditor: Boolean = true): Boolean
 }
