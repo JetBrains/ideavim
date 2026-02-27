@@ -8,6 +8,7 @@
 package com.maddyhome.idea.vim.extension.commentary
 
 import com.intellij.openapi.editor.impl.editorId
+import com.intellij.vim.api.VimInitApi
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
@@ -80,7 +81,7 @@ internal class CommentaryExtension : VimExtension {
 
   override fun getName() = "commentary"
 
-  override fun init() {
+  override fun init(initApi: VimInitApi) {
     val plugCommentaryKeys = injector.parser.parseKeys("<Plug>Commentary")
     val plugCommentaryLineKeys = injector.parser.parseKeys("<Plug>CommentaryLine")
     putExtensionHandlerMapping(MappingMode.NX, plugCommentaryKeys, owner, CommentaryOperatorHandler(), false)
