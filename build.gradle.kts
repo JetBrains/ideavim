@@ -79,13 +79,17 @@ repositories {
 }
 
 dependencies {
+  // Main source code has moved to :modules:ideavim-common.
+  // These api() deps remain for transitive visibility to test fixtures and tests.
   api(project(":vim-engine"))
   api(project(":api"))
-  ksp(project(":annotation-processors"))
-  compileOnly(project(":annotation-processors"))
 
   compileOnly("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
   compileOnly("org.jetbrains:annotations:26.0.2-1")
+
+  // Test fixtures need access to the plugin classes (now in ideavim-common and ideavim-frontend)
+  testFixturesApi(project(":modules:ideavim-common"))
+  testFixturesApi(project(":modules:ideavim-frontend"))
 
   intellijPlatform {
     // Snapshots don't use installers
@@ -107,6 +111,11 @@ dependencies {
     testFramework(TestFrameworkType.Platform)
     testFramework(TestFrameworkType.JUnit5)
 
+    pluginModule(runtimeOnly(project(":modules:ideavim-common")))
+    pluginModule(runtimeOnly(project(":modules:ideavim-frontend")))
+    pluginModule(runtimeOnly(project(":modules:ideavim-backend")))
+    pluginModule(runtimeOnly(project(":modules:ideavim-frontend-split")))
+    pluginModule(runtimeOnly(project(":modules:ideavim-backend-split")))
     pluginModule(runtimeOnly(project(":modules:ideavim-acejump")))
     pluginModule(runtimeOnly(project(":modules:ideavim-rider")))
     pluginModule(runtimeOnly(project(":modules:ideavim-clion-nova")))
@@ -234,7 +243,7 @@ tasks {
 
   val runIdeSplitMode by intellijPlatformTesting.runIde.registering {
     splitMode = true
-    splitModeTarget = SplitModeAware.SplitModeTarget.FRONTEND
+    splitModeTarget = SplitModeAware.SplitModeTarget.BOTH
   }
 
   // Add plugin open API sources to the plugin ZIP
@@ -358,19 +367,37 @@ intellijPlatform {
   instrumentCode.set(instrumentPluginCode.toBoolean())
 }
 
-ksp {
-  arg("generated_directory", "$projectDir/src/main/resources/ksp-generated")
-  arg("vimscript_functions_file", "intellij_vimscript_functions.json")
-  arg("ex_commands_file", "intellij_ex_commands.json")
-  arg("commands_file", "intellij_commands.json")
-  arg("extensions_file", "ideavim_extensions.json")
-}
+// KSP has moved to :modules:ideavim-common (where the annotated source files live)
 
 afterEvaluate {
-//  tasks.named("kspKotlin").configure { dependsOn("clean") }
-  tasks.named("kspTestFixturesKotlin").configure { enabled = false }
+  tasks.named("kspKotlin").configure { enabled = false }
   tasks.named("kspTestFixturesKotlin").configure { enabled = false }
   tasks.named("kspTestKotlin").configure { enabled = false }
+}
+
+// Allow test and testFixtures sources to access `internal` members from :modules:ideavim-common
+// and :modules:ideavim-frontend.
+// This is needed because plugin source code was split across common and frontend modules during the
+// plugin split, but tests remain in the root project. Kotlin's -Xfriend-paths compiler flag grants
+// internal visibility across module boundaries for testing purposes.
+// We add both the class directory and the JAR because the IntelliJ Platform Gradle plugin may resolve
+// classes from the composed/instrumented JAR rather than raw class files.
+val commonProject = project(":modules:ideavim-common")
+val commonClassesDir = commonProject.layout.buildDirectory.dir("classes/kotlin/main").get().asFile
+val commonLibsDir = commonProject.layout.buildDirectory.dir("libs").get().asFile
+val frontendProject = project(":modules:ideavim-frontend")
+val frontendClassesDir = frontendProject.layout.buildDirectory.dir("classes/kotlin/main").get().asFile
+tasks.named<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>("compileTestKotlin") {
+  friendPaths.from(commonClassesDir)
+  friendPaths.from(commonProject.layout.buildDirectory.dir("libs"))
+  friendPaths.from(frontendClassesDir)
+  friendPaths.from(frontendProject.layout.buildDirectory.dir("libs"))
+}
+tasks.named<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>("compileTestFixturesKotlin") {
+  friendPaths.from(commonClassesDir)
+  friendPaths.from(commonProject.layout.buildDirectory.dir("libs"))
+  friendPaths.from(frontendClassesDir)
+  friendPaths.from(frontendProject.layout.buildDirectory.dir("libs"))
 }
 
 

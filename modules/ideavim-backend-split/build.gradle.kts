@@ -28,6 +28,8 @@ repositories {
 dependencies {
   compileOnly(project(":"))
   compileOnly(project(":modules:ideavim-common"))
+  compileOnly(project(":vim-engine"))
+  compileOnly(project(":api"))
   compileOnly("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
 
   intellijPlatform {
