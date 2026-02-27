@@ -60,8 +60,9 @@ class HintEditorIntegrationTest : VimTestCase() {
         val targets = generator.generateHints(frame.rootPane, frame.rootPane.glassPane)
 
         val editorScrollTarget = targets.find { target ->
-          target.component is JScrollPane &&
-            target.component.viewport?.view?.javaClass?.simpleName == "EditorComponentImpl"
+          val comp = target.component
+          comp is JScrollPane &&
+            comp.viewport?.view?.javaClass?.simpleName == "EditorComponentImpl"
         }
         assertNotNull(editorScrollTarget, "Editor scroll pane should be found as a target")
         assertEquals(
