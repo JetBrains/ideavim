@@ -60,9 +60,7 @@
 
 ### K3: Coroutine Audit
 
-- [ ] T015 [US4] Remove suspend from mapping handlers in MappingScope.kt that run inside locks
-- [ ] T016 [US4] Remove suspend from operator functions in VimApi.kt that run on EDT
-- [ ] T017 [US4] Add KDoc to VimApi.kt clarifying which callbacks support suspend vs require sync
+- [X] T015-T017 [US4] Per-group coroutine audit completed — see VIM-4144 ADR for decisions. Handler lambdas, scope openers, flat VimApi methods, and non-locking scope methods are suspend. Lock-bound code (read/change blocks, caret scopes, CommandLineTransaction) stays non-suspend. Init and registration stays non-suspend. Added command() to VimInitApi.
 
 ### K4: Test Accessibility
 

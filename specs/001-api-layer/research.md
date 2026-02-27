@@ -170,89 +170,33 @@ interface VimApi {
 
 ---
 
-## K3: Coroutine Usage
+## K3: Coroutine Usage — Per-Group Suspend Audit
 
-### Problem Statement
+**Status**: Completed — see [VIM-4144](https://youtrack.jetbrains.com/issue/VIM-4144) for the full ADR.
 
-The API uses suspend functions in places where IntelliJ Platform doesn't support coroutines:
+### Design Principle: Lock Boundary
 
-- Inside read locks
-- Inside write locks
-- In modal input handlers
+Suspend outside locks, synchronous inside locks. Matches the IJ platform's own `readAction`/`writeAction`
+pattern from `com.intellij.openapi.application.coroutines.kt`.
 
-From the logseq notes:
-> "We should not have suspend functions inside of the read/write functions as IJ doesn't support them."
+### Per-Group Decisions
 
-### Current State Analysis
+| # | Group | Decision |
+|---|-------|---------|
+| 1 | Init function and registration block lambdas (`mappings { }`, `textObjects { }`) | **Not suspend** — purely declarative bookkeeping. |
+| 3a-g | All handler lambdas (mappings, text objects, operators, commands, listeners, modal input, commandline input) | **Suspend** — operations inside may become suspend due to RemDev. |
+| 4 | Scope-opening functions (`editor { }`, `forEachEditor { }`, `commandLine { }`, `option { }`, `outputPanel { }`, `digraph { }`) | **Suspend** — both function and block parameter. |
+| 5 | Lock-acquiring openers (`read { }`, `change { }`) | **Suspend function, non-suspend block.** Contracts removed to enable suspend. |
+| 5' | CommandLineTransaction methods | **Not suspend** — inside a lock. |
+| 6 | Caret sub-scopes | **Not suspend** — inside a lock. |
+| 7 | Flat VimApi methods (`normal()`, `execute()`, etc.) | **Suspend** — except properties and `getVariable`/`setVariable`. |
+| 8a | Methods inside lock-bound scopes | **Not suspend** — inside locks. |
+| 8b | Methods inside non-locking scopes (OptionScope, DigraphScope, OutputPanelScope) | **Suspend** — may be async over RemDev. |
 
-Suspend functions appear in:
+### API Evolution Note
 
-1. `ListenersScope` callbacks (e.g., `onModeChange: suspend VimApi.() -> Unit`)
-2. Mapping handlers
-3. Operator functions
-
-The `addMapping` function calls suspend function from `runBlocking`:
-> "`addMapping` function calls suspend function from the `runBlocking` – Why and how to fix it?"
-
-### Research Findings
-
-IntelliJ Platform threading model:
-
-- Read actions run on any thread but block write actions
-- Write actions run on EDT and are not reentrant
-- Suspend inside these contexts can cause deadlocks
-
-Kotlin coroutines + IntelliJ:
-
-- `runBlocking` inside read/write action can deadlock
-- Suspend functions should be called outside of locks
-- Use `withContext(Dispatchers.Default)` for CPU-bound work
-
-### Decision
-
-**Remove suspend from lock-sensitive code paths; use callbacks instead.**
-
-1. **Listener callbacks**: Keep suspend for background-safe listeners, but document constraints
-2. **Mapping handlers**: Use regular functions, not suspend
-3. **Operator functions**: Use regular functions; provide async variants if needed
-
-### API Changes
-
-```kotlin
-// Before
-fun onModeChange(callback: suspend VimApi.(Mode) -> Unit)
-
-// After - for handlers that run on EDT
-fun onModeChange(callback: VimApi.(Mode) -> Unit)
-
-// For async operations, provide explicit async variant
-fun onModeChangeAsync(callback: suspend VimApi.(Mode) -> Unit)
-```
-
-### Rationale
-
-1. **Predictable behavior**: Sync callbacks run immediately, no deadlock risk
-2. **Platform compatibility**: Matches IntelliJ Platform's threading model
-3. **Explicit async**: When async is needed, it's explicitly requested
-
-### Alternatives Considered
-
-| Alternative                          | Rejected Because                              |
-|--------------------------------------|-----------------------------------------------|
-| Keep all suspend, document carefully | Users will still hit deadlocks                |
-| Use `runBlocking` everywhere         | Can deadlock; poor performance                |
-| Redesign around coroutines           | Too invasive; doesn't match IJ Platform model |
-
-### Implementation Notes
-
-- Audit all `suspend` in `api/` module
-- Identify which are called from EDT or inside locks
-- Replace with sync versions or move suspend outside lock scope
-
-### Status
-
-**Decision**: Approved
-**Implementation**: Pending (requires audit)
+Changing suspend status is always a breaking change in Kotlin. The `@ApiStatus.Experimental` annotation
+provides a window for changes before the API is stabilized.
 
 ---
 
