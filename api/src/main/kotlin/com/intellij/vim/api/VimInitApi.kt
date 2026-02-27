@@ -34,7 +34,7 @@ class VimInitApi(private val delegate: VimApi) {
   fun exportOperatorFunction(name: String, function: suspend VimApi.() -> Boolean) =
     delegate.exportOperatorFunction(name, function)
 
-  fun command(command: String, block: suspend VimApi.(String) -> Unit) =
+  fun command(command: String, block: suspend VimApi.(commandText: String, startLine: Int, endLine: Int) -> Unit) =
     delegate.command(command, block)
 }
 

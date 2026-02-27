@@ -430,16 +430,17 @@ interface VimApi {
    *
    * Example usage:
    * ```
-   * command("MyCommand") { cmd ->
-   *     println("Command executed: $cmd")
+   * command("MyCommand") { cmd, startLine, endLine ->
+   *     println("Command executed: $cmd on lines $startLine-$endLine")
    * }
    * ```
    *
    * @param command The name of the command to register, as entered by the user.
    * @param block The logic to execute when the command is invoked. Receives the command name
-   *              entered by the user as a parameter.
+   *              entered by the user, and the 0-based start and end line numbers of the
+   *              ex-command range (e.g., from `:1,3MyCommand` or `:g/pattern/MyCommand`).
    */
-  fun command(command: String, block: suspend VimApi.(String) -> Unit)
+  fun command(command: String, block: suspend VimApi.(commandText: String, startLine: Int, endLine: Int) -> Unit)
 
   /**
    * Gets keyed data from a Vim window.
