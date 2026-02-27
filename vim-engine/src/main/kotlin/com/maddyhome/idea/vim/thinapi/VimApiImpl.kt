@@ -267,7 +267,7 @@ class VimApiImpl(
 
   override fun command(
     command: String,
-    block: VimApi.(String) -> Unit,
+    block: suspend VimApi.(String) -> Unit,
   ) {
     val commandHandler = object : CommandAliasHandler {
       override fun execute(
@@ -277,7 +277,7 @@ class VimApiImpl(
         context: ExecutionContext,
       ) {
         val vimApi = VimApiImpl(listenerOwner, mappingOwner, projectId)
-        vimApi.block(command)
+        kotlinx.coroutines.runBlocking { vimApi.block(command) }
       }
     }
     injector.pluginService.addCommand(command, commandHandler)

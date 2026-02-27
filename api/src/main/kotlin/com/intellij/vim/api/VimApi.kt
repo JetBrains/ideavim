@@ -439,7 +439,7 @@ interface VimApi {
    * @param block The logic to execute when the command is invoked. Receives the command name
    *              entered by the user as a parameter.
    */
-  fun command(command: String, block: VimApi.(String) -> Unit)
+  fun command(command: String, block: suspend VimApi.(String) -> Unit)
 
   /**
    * Gets keyed data from a Vim window.
