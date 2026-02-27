@@ -9,9 +9,6 @@
 package com.intellij.vim.api.scopes.editor
 
 import com.intellij.vim.api.scopes.VimApiDsl
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
 
 /**
  * Scope that provides access to editor functions.
@@ -21,27 +18,23 @@ abstract class EditorScope {
   /**
    * Executes a read-only operation on the editor.
    *
-   * This function provides access to read-only operations through the [EditorAccessor] interface.
+   * This function provides access to read-only operations through the [ReadScope] interface.
    * It runs the provided block under a read lock to ensure thread safety when accessing editor state.
-   * The operation is executed asynchronously and returns a [kotlinx.coroutines.Deferred] that can be awaited for the result.
    *
    * Example usage:
    * ```
    * editor {
    *   val text = read {
    *     text // Access the editor's text content
-   *   }.await()
+   *   }
    * }
    * ```
    *
-   * @param block A suspending lambda with [EditorAccessor] receiver that contains the read operations to perform
-   * @return A [kotlinx.coroutines.Deferred] that completes with the result of the block execution
+   * @param block A lambda with [ReadScope] receiver that contains the read operations to perform.
+   *              The block is non-suspend because it runs inside a read lock.
+   * @return The result of the block execution
    */
-  @OptIn(ExperimentalContracts::class)
-  fun <T> read(block: ReadScope.() -> T): T {
-    contract {
-      callsInPlace(block, InvocationKind.EXACTLY_ONCE)
-    }
+  suspend fun <T> read(block: ReadScope.() -> T): T {
     return this.ideRead(block)
   }
 
@@ -50,30 +43,24 @@ abstract class EditorScope {
    *
    * This function provides access to write operations through the [Transaction] interface.
    * It runs the provided block under a write lock to ensure thread safety when modifying editor state.
-   * The operation is executed asynchronously and returns a [kotlinx.coroutines.Job] that can be joined to wait for completion.
    *
    * Example usage:
    * ```
    * editor {
-   *   val job = change {
+   *   change {
    *     // Modify editor content
    *     replaceText(startOffset, endOffset, newText)
    *
    *     // Add highlights
    *     val highlightId = addHighlight(startOffset, endOffset, backgroundColor, foregroundColor)
    *   }
-   *   job.join() // Wait for the changes to complete
    * }
    * ```
    *
-   * @param block A suspending lambda with [Transaction] receiver that contains the write operations to perform
-   * @return A [kotlinx.coroutines.Job] that completes when all write operations are finished
+   * @param block A lambda with [Transaction] receiver that contains the write operations to perform.
+   *              The block is non-suspend because it runs inside a write lock.
    */
-  @OptIn(ExperimentalContracts::class)
-  fun change(block: Transaction.() -> Unit) {
-    contract {
-      callsInPlace(block, InvocationKind.EXACTLY_ONCE)
-    }
+  suspend fun change(block: Transaction.() -> Unit) {
     return ideChange(block)
   }
 

@@ -10,9 +10,6 @@ package com.intellij.vim.api.scopes.commandline
 
 import com.intellij.vim.api.VimApi
 import com.intellij.vim.api.scopes.VimApiDsl
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
 
 /**
  * Scope for interacting with the Vim command line.
@@ -41,13 +38,10 @@ abstract class CommandLineScope {
    * ```
    *
    * @param block A function with CommandLineRead receiver that contains the read operations to perform.
-   * @return A Deferred that will complete with the result of the block execution.
+   *              The block is non-suspend because it runs inside a read lock.
+   * @return The result of the block execution.
    */
-  @OptIn(ExperimentalContracts::class)
-  fun <T> read(block: CommandLineRead.() -> T): T {
-    contract {
-      callsInPlace(block, InvocationKind.EXACTLY_ONCE)
-    }
+  suspend fun <T> read(block: CommandLineRead.() -> T): T {
     return this.ideRead(block)
   }
 
@@ -65,13 +59,9 @@ abstract class CommandLineScope {
    * ```
    *
    * @param block A function with CommandLineTransaction receiver that contains the write operations to perform.
-   * @return A Job that represents the ongoing execution of the block.
+   *              The block is non-suspend because it runs inside a write lock.
    */
-  @OptIn(ExperimentalContracts::class)
-  fun change(block: CommandLineTransaction.() -> Unit) {
-    contract {
-      callsInPlace(block, InvocationKind.EXACTLY_ONCE)
-    }
+  suspend fun change(block: CommandLineTransaction.() -> Unit) {
     ideChange(block)
   }
 
