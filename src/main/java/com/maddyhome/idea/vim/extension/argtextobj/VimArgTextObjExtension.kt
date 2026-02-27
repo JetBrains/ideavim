@@ -151,10 +151,10 @@ private class ArgBoundsFinder(
   private var error: @Nls String? = null
 
   // Line info methods that call VimApi directly
-  private fun getLineNumber(offset: Int) = api.editor { read { getLine(offset).number } }
-  private fun getLineStartOffset(lineNo: Int) = api.editor { read { getLineStartOffset(lineNo) } }
-  private fun getLineEndOffset(lineNo: Int) = api.editor { read { getLineEndOffset(lineNo, true) } }
-  private fun getLineCount() = api.editor { read { lineCount } }
+  private suspend fun getLineNumber(offset: Int) = api.editor { read { getLine(offset).number } }
+  private suspend fun getLineStartOffset(lineNo: Int) = api.editor { read { getLineStartOffset(lineNo) } }
+  private suspend fun getLineEndOffset(lineNo: Int) = api.editor { read { getLineEndOffset(lineNo, true) } }
+  private suspend fun getLineCount() = api.editor { read { lineCount } }
 
   /**
    * Finds left and right boundaries of an argument at the specified
@@ -166,14 +166,14 @@ private class ArgBoundsFinder(
    * @param position starting position.
    */
   @Throws(IllegalStateException::class)
-  fun findBoundsAt(position: Int): Boolean {
+  suspend fun findBoundsAt(position: Int): Boolean {
     if (text.isEmpty()) {
       error = "empty document"
       return false
     }
     leftBound = min(position, leftBound)
     rightBound = max(position, rightBound)
-    this.outOfQuotedText
+    this.adjustForQuotedText()
     if (rightBound == leftBound) {
       if (brackets.isCloseBracket(getCharAt(rightBound).code)) {
         --leftBound
@@ -264,14 +264,13 @@ private class ArgBoundsFinder(
       return (idEnd - i) > 0 && Character.isJavaIdentifierStart(getCharAt(i + 1))
     }
 
-  val outOfQuotedText: Unit
-    /**
-     * Detects if current position is inside a quoted string and adjusts
-     * left and right bounds to the boundaries of the string.
-     *
-     * NOTE: Does not support line continuations for quoted string ('\' at the end of line).
-     */
-    get() {
+  /**
+   * Detects if current position is inside a quoted string and adjusts
+   * left and right bounds to the boundaries of the string.
+   *
+   * NOTE: Does not support line continuations for quoted string ('\' at the end of line).
+   */
+  suspend fun adjustForQuotedText() {
       // TODO this method should use IdeaVim methods to determine if the current position is in the string
       val lineNo = getLineNumber(leftBound)
       val lineStartOffset = getLineStartOffset(lineNo)
@@ -375,14 +374,14 @@ private class ArgBoundsFinder(
     return i
   }
 
-  private fun leftLimit(pos: Int): Int {
+  private suspend fun leftLimit(pos: Int): Int {
     val offsetLimit = max(pos - MAX_SEARCH_OFFSET, 0)
     val lineNo = getLineNumber(pos)
     val lineOffsetLimit = getLineStartOffset(max(0, lineNo - MAX_SEARCH_LINES))
     return max(offsetLimit, lineOffsetLimit)
   }
 
-  private fun rightLimit(pos: Int): Int {
+  private suspend fun rightLimit(pos: Int): Int {
     val offsetLimit = min(pos + MAX_SEARCH_OFFSET, text.length)
     val lineNo = getLineNumber(pos)
     val lineOffsetLimit = getLineEndOffset(min(getLineCount() - 1, lineNo + MAX_SEARCH_LINES))
@@ -611,7 +610,7 @@ private object ArgTextObjUtil {
 /**
  * Find argument range using the new VimApi.
  */
-private fun VimApi.findArgumentRange(isInner: Boolean, count: Int): TextObjectRange? {
+private suspend fun VimApi.findArgumentRange(isInner: Boolean, count: Int): TextObjectRange? {
   var bracketPairs: BracketPairs = ArgTextObjUtil.DEFAULT_BRACKET_PAIRS
   val bracketPairsVar: String? = ArgTextObjUtil.bracketPairsVariable()
   if (bracketPairsVar != null) {

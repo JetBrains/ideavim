@@ -91,7 +91,7 @@ interface VimApi {
    *
    * @param name The name of the previously exported operator function
    */
-  fun setOperatorFunction(name: String)
+  suspend fun setOperatorFunction(name: String)
 
   /**
    * Executes normal mode commands as if they were typed.
@@ -111,7 +111,7 @@ interface VimApi {
    *
    * @param command The normal mode command string to execute
    */
-  fun normal(command: String)
+  suspend fun normal(command: String)
 
   /**
    * Executes a block of code in the context of the currently focused editor.
@@ -128,7 +128,7 @@ interface VimApi {
    * @param block The code block to execute within editor scope
    * @return The result of the block execution
    */
-  fun <T> editor(block: EditorScope.() -> T): T
+  suspend fun <T> editor(block: suspend EditorScope.() -> T): T
 
   /**
    * Executes a block of code for each editor.
@@ -145,7 +145,7 @@ interface VimApi {
    * @param block The code block to execute for each editor
    * @return A list containing the results of executing the block on each editor
    */
-  fun <T> forEachEditor(block: EditorScope.() -> T): List<T>
+  suspend fun <T> forEachEditor(block: suspend EditorScope.() -> T): List<T>
 
   /**
    * Provides access to key mapping functionality.
@@ -227,7 +227,7 @@ interface VimApi {
    * @param block The code block to execute within the output panel scope
    * @return The OutputPanelScope for chaining
    */
-  fun outputPanel(block: OutputPanelScope.() -> Unit = {}): OutputPanelScope
+  suspend fun outputPanel(block: suspend OutputPanelScope.() -> Unit = {}): OutputPanelScope
 
   /**
    * Provides access to modal input functionality.
@@ -242,7 +242,7 @@ interface VimApi {
    *
    * @return A ModalInput instance that can be used to request user input
    */
-  fun modalInput(): ModalInput
+  suspend fun modalInput(): ModalInput
 
   /**
    * Provides access to Vim's command line functionality.
@@ -265,7 +265,7 @@ interface VimApi {
    * @param block The code block to execute with command line scope
    * @return The CommandLineScope for chaining
    */
-  fun commandLine(block: CommandLineScope.() -> Unit = {}): CommandLineScope
+  suspend fun commandLine(block: suspend CommandLineScope.() -> Unit = {}): CommandLineScope
 
   /**
    * Provides access to Vim's options functionality.
@@ -291,7 +291,7 @@ interface VimApi {
    * @param block The code block to execute within the option scope
    * @return The result of the block execution
    */
-  fun <T> option(block: OptionScope.() -> T): T
+  suspend fun <T> option(block: suspend OptionScope.() -> T): T
 
   /**
    * Provides access to Vim's digraph functionality.
@@ -311,7 +311,7 @@ interface VimApi {
    * @param block The code block to execute within the digraph scope
    * @return The DigraphScope for chaining
    */
-  fun digraph(block: DigraphScope.() -> Unit = {}): DigraphScope
+  suspend fun digraph(block: suspend DigraphScope.() -> Unit = {}): DigraphScope
 
   /**
    * Gets the number of tabs in the current window.
@@ -329,7 +329,7 @@ interface VimApi {
    * @param indexToDelete The index of the tab to delete
    * @param indexToSelect The index of the tab to select after deletion
    */
-  fun removeTabAt(indexToDelete: Int, indexToSelect: Int)
+  suspend fun removeTabAt(indexToDelete: Int, indexToSelect: Int)
 
   /**
    * Moves the current tab to the specified index.
@@ -337,14 +337,14 @@ interface VimApi {
    * @param index The index to move the current tab to
    * @throws IllegalStateException if there is no tab selected or no tabs are open
    */
-  fun moveCurrentTabToIndex(index: Int)
+  suspend fun moveCurrentTabToIndex(index: Int)
 
   /**
    * Closes all tabs except the current one.
    *
    * @throws IllegalStateException if there is no tab selected
    */
-  fun closeAllExceptCurrentTab()
+  suspend fun closeAllExceptCurrentTab()
 
   /**
    * Checks if a pattern matches a text.
@@ -354,7 +354,7 @@ interface VimApi {
    * @param ignoreCase Whether to ignore case when matching
    * @return True if the pattern matches the text, false otherwise
    */
-  fun matches(pattern: String, text: String, ignoreCase: Boolean = false): Boolean
+  suspend fun matches(pattern: String, text: String, ignoreCase: Boolean = false): Boolean
 
   /**
    * Finds all matches of a pattern in a text.
@@ -363,7 +363,7 @@ interface VimApi {
    * @param pattern The regular expression pattern to search for
    * @return A list of pairs representing the start and end offsets of each match
    */
-  fun getAllMatches(text: String, pattern: String): List<Pair<Int, Int>>
+  suspend fun getAllMatches(text: String, pattern: String): List<Pair<Int, Int>>
 
   // Window management APIs commented out — see IJPL-235369.
   // After switching windows, FileEditorManager.getSelectedTextEditor() does not
@@ -423,7 +423,7 @@ interface VimApi {
    * @param script The Vimscript string to execute
    * @return The result of the execution, which can be Success or Error
    */
-  fun execute(script: String): Boolean
+  suspend fun execute(script: String): Boolean
 
   /**
    * Registers a new Vim command.
@@ -447,7 +447,7 @@ interface VimApi {
    * @param key The key to retrieve data for
    * @return The data associated with the key, or null if no data is found
    */
-  fun <T> getDataFromWindow(key: String): T?
+  suspend fun <T> getDataFromWindow(key: String): T?
 
   /**
    * Stores keyed user data in a Vim window.
@@ -455,7 +455,7 @@ interface VimApi {
    * @param key The key to store data for
    * @param data The data to store
    */
-  fun <T> putDataToWindow(key: String, data: T)
+  suspend fun <T> putDataToWindow(key: String, data: T)
 
   /**
    * Gets data from buffer.
@@ -463,7 +463,7 @@ interface VimApi {
    * @param key The key to retrieve data for
    * @return The data associated with the key, or null if no data is found
    */
-  fun <T> getDataFromBuffer(key: String): T?
+  suspend fun <T> getDataFromBuffer(key: String): T?
 
   /**
    * Puts data to buffer.
@@ -471,7 +471,7 @@ interface VimApi {
    * @param key The key to store data for
    * @param data The data to store
    */
-  fun <T> putDataToBuffer(key: String, data: T)
+  suspend fun <T> putDataToBuffer(key: String, data: T)
 
   /**
    * Gets data from tab (group of windows).
@@ -479,7 +479,7 @@ interface VimApi {
    * @param key The key to retrieve data for
    * @return The data associated with the key, or null if no data is found
    */
-  fun <T> getDataFromTab(key: String): T?
+  suspend fun <T> getDataFromTab(key: String): T?
 
   /**
    * Puts data to tab (group of windows).
@@ -487,7 +487,7 @@ interface VimApi {
    * @param key The key to store data for
    * @param data The data to store
    */
-  fun <T> putDataToTab(key: String, data: T)
+  suspend fun <T> putDataToTab(key: String, data: T)
 
   /**
    * Gets data from window or puts it if it doesn't exist.
@@ -496,7 +496,7 @@ interface VimApi {
    * @param provider A function that provides the data if it doesn't exist
    * @return The existing data or the newly created data
    */
-  fun <T> getOrPutWindowData(key: String, provider: () -> T): T =
+  suspend fun <T> getOrPutWindowData(key: String, provider: () -> T): T =
     getDataFromWindow(key) ?: provider().also { putDataToWindow(key, it) }
 
   /**
@@ -506,7 +506,7 @@ interface VimApi {
    * @param provider A function that provides the data if it doesn't exist
    * @return The existing data or the newly created data
    */
-  fun <T> getOrPutBufferData(key: String, provider: () -> T): T =
+  suspend fun <T> getOrPutBufferData(key: String, provider: () -> T): T =
     getDataFromBuffer(key) ?: provider().also { putDataToBuffer(key, it) }
 
   /**
@@ -516,18 +516,18 @@ interface VimApi {
    * @param provider A function that provides the data if it doesn't exist
    * @return The existing data or the newly created data
    */
-  fun <T> getOrPutTabData(key: String, provider: () -> T): T =
+  suspend fun <T> getOrPutTabData(key: String, provider: () -> T): T =
     getDataFromTab(key) ?: provider().also { putDataToTab(key, it) }
 
   /**
    * Saves the current file.
    */
-  fun saveFile()
+  suspend fun saveFile()
 
   /**
    * Closes the current file.
    */
-  fun closeFile()
+  suspend fun closeFile()
 
   /**
    * Finds the start offset of the next word in camel case or snake case text.
@@ -537,7 +537,7 @@ interface VimApi {
    * @param count Find the [count]-th occurrence. Must be greater than 0.
    * @return The offset of the next word start, or null if not found
    */
-  fun getNextCamelStartOffset(chars: CharSequence, startIndex: Int, count: Int = 1): Int?
+  suspend fun getNextCamelStartOffset(chars: CharSequence, startIndex: Int, count: Int = 1): Int?
 
   /**
    * Finds the start offset of the previous word in camel case or snake case text.
@@ -547,7 +547,7 @@ interface VimApi {
    * @param count Find the [count]-th occurrence. Must be greater than 0.
    * @return The offset of the previous word start, or null if not found
    */
-  fun getPreviousCamelStartOffset(chars: CharSequence, endIndex: Int, count: Int = 1): Int?
+  suspend fun getPreviousCamelStartOffset(chars: CharSequence, endIndex: Int, count: Int = 1): Int?
 
   /**
    * Finds the end offset of the next word in camel case or snake case text.
@@ -557,7 +557,7 @@ interface VimApi {
    * @param count Find the [count]-th occurrence. Must be greater than 0.
    * @return The offset of the next word end, or null if not found
    */
-  fun getNextCamelEndOffset(chars: CharSequence, startIndex: Int, count: Int = 1): Int?
+  suspend fun getNextCamelEndOffset(chars: CharSequence, startIndex: Int, count: Int = 1): Int?
 
   /**
    * Finds the end offset of the previous word in camel case or snake case text.
@@ -567,7 +567,7 @@ interface VimApi {
    * @param count Find the [count]-th occurrence. Must be greater than 0.
    * @return The offset of the previous word end, or null if not found
    */
-  fun getPreviousCamelEndOffset(chars: CharSequence, endIndex: Int, count: Int = 1): Int?
+  suspend fun getPreviousCamelEndOffset(chars: CharSequence, endIndex: Int, count: Int = 1): Int?
 }
 
 /**

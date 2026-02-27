@@ -58,7 +58,7 @@ class MiniAI : VimExtension {
  *
  * If [isOuter] == false (i.e. 'iq'), shrink the final range by 1 char on each side.
  */
-private fun VimApi.findQuoteRange(isOuter: Boolean): TextObjectRange? {
+private suspend fun VimApi.findQuoteRange(isOuter: Boolean): TextObjectRange? {
   val text = editor { read { text } }
   val caretOffset = editor { read { withPrimaryCaret { offset } } }
   val caretLine = editor { read { withPrimaryCaret { line.number } } }
@@ -115,7 +115,7 @@ private fun gatherAllQuoteRanges(text: CharSequence): List<Range.Simple> {
  * We treat bracket pairs ( (), [], {}, <> ) in a naive balanced scanning way.
  * If [isOuter] is false, we shrink boundaries to skip the bracket chars.
  */
-private fun VimApi.findBracketRange(isOuter: Boolean): TextObjectRange? {
+private suspend fun VimApi.findBracketRange(isOuter: Boolean): TextObjectRange? {
   val text = editor { read { text } }
   val caretOffset = editor { read { withPrimaryCaret { offset } } }
   val caretLine = editor { read { withPrimaryCaret { line.number } } }

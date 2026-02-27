@@ -44,7 +44,7 @@ fun VimInitApi.init() {
   }
 }
 
-internal fun VimApi.operatorFunction(): Boolean {
+internal suspend fun VimApi.operatorFunction(): Boolean {
   fun CaretTransaction.getSelection(): Range? {
     return when {
       this@operatorFunction.mode == Mode.NORMAL -> changeMarks
@@ -65,12 +65,12 @@ internal fun VimApi.operatorFunction(): Boolean {
   return true
 }
 
-internal fun VimApi.rewriteMotion() {
+internal suspend fun VimApi.rewriteMotion() {
   setOperatorFunction(OPERATOR_FUNC_NAME)
   normal("g@")
 }
 
-internal fun VimApi.rewriteLine() {
+internal suspend fun VimApi.rewriteLine() {
   val count1 = getVariable<Int>("v:count1") ?: 1
   editor {
     change {
@@ -85,7 +85,7 @@ internal fun VimApi.rewriteLine() {
   }
 }
 
-internal fun VimApi.rewriteVisual() {
+internal suspend fun VimApi.rewriteVisual() {
   editor {
     change {
       forEachCaret {
@@ -151,7 +151,7 @@ private fun CaretTransaction.replaceTextAndUpdateCaret(
     } else if (selectionRange is Range.Block) {
       replaceTextBlockwise(selectionRange, text)
 
-      vimApi.normal("<Esc>")
+      kotlinx.coroutines.runBlocking { vimApi.normal("<Esc>") }
       updateCaret(offset = selectionRange.start)
     }
   }

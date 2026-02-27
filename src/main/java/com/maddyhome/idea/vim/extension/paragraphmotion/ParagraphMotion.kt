@@ -43,7 +43,7 @@ internal class ParagraphMotion : VimExtension {
   }
 }
 
-internal fun VimApi.moveParagraph(direction: Int) {
+internal suspend fun VimApi.moveParagraph(direction: Int) {
   val count = getVariable<Int>("v:count1") ?: 1
   val actualCount = count * direction
 

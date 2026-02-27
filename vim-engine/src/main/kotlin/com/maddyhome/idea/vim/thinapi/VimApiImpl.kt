@@ -127,19 +127,19 @@ class VimApiImpl(
     injector.pluginService.exportOperatorFunction(name, operatorFunction)
   }
 
-  override fun setOperatorFunction(name: String) {
+  override suspend fun setOperatorFunction(name: String) {
     injector.globalOptions().operatorfunc = name
   }
 
-  override fun normal(command: String) {
+  override suspend fun normal(command: String) {
     injector.pluginService.executeNormalWithoutMapping(command, vimEditor)
   }
 
-  override fun <T> editor(block: EditorScope.() -> T): T {
+  override suspend fun <T> editor(block: suspend EditorScope.() -> T): T {
     return EditorScopeImpl(projectId).block()
   }
 
-  override fun <T> forEachEditor(block: EditorScope.() -> T): List<T> {
+  override suspend fun <T> forEachEditor(block: suspend EditorScope.() -> T): List<T> {
     return injector.editorGroup.getEditors().map { editor ->
       val editorScope = EditorScopeImpl(projectId)
       editorScope.block()
@@ -164,27 +164,27 @@ class VimApiImpl(
 //    listenersScope.block()
 //  }
 
-  override fun outputPanel(block: OutputPanelScope.() -> Unit): OutputPanelScope {
+  override suspend fun outputPanel(block: suspend OutputPanelScope.() -> Unit): OutputPanelScope {
     val outputPanelScope = OutputPanelScopeImpl(projectId)
     outputPanelScope.block()
     return outputPanelScope
   }
 
-  override fun modalInput(): ModalInput {
+  override suspend fun modalInput(): ModalInput {
     return ModalInputImpl(listenerOwner, mappingOwner, projectId)
   }
 
-  override fun commandLine(block: CommandLineScope.() -> Unit): CommandLineScope {
+  override suspend fun commandLine(block: suspend CommandLineScope.() -> Unit): CommandLineScope {
     val commandLineScope = CommandLineScopeImpl(listenerOwner, mappingOwner, projectId)
     commandLineScope.block()
     return commandLineScope
   }
 
-  override fun <T> option(block: OptionScope.() -> T): T {
+  override suspend fun <T> option(block: suspend OptionScope.() -> T): T {
     return OptionScopeImpl(projectId).block()
   }
 
-  override fun digraph(block: DigraphScope.() -> Unit): DigraphScope {
+  override suspend fun digraph(block: suspend DigraphScope.() -> Unit): DigraphScope {
     val digraphScope = DigraphScopeImpl(projectId)
     digraphScope.block()
     return digraphScope
@@ -196,23 +196,23 @@ class VimApiImpl(
   override val currentTabIndex: Int?
     get() = injector.tabService.getCurrentTabIndex(vimContext)
 
-  override fun removeTabAt(indexToDelete: Int, indexToSelect: Int) {
+  override suspend fun removeTabAt(indexToDelete: Int, indexToSelect: Int) {
     injector.tabService.removeTabAt(indexToDelete, indexToSelect, vimContext)
   }
 
-  override fun moveCurrentTabToIndex(index: Int) {
+  override suspend fun moveCurrentTabToIndex(index: Int) {
     injector.tabService.moveCurrentTabToIndex(index, vimContext)
   }
 
-  override fun closeAllExceptCurrentTab() {
+  override suspend fun closeAllExceptCurrentTab() {
     injector.tabService.closeAllExceptCurrentTab(vimContext)
   }
 
-  override fun matches(pattern: String, text: String, ignoreCase: Boolean): Boolean {
+  override suspend fun matches(pattern: String, text: String, ignoreCase: Boolean): Boolean {
     return injector.regexpService.matches(pattern, text, ignoreCase)
   }
 
-  override fun getAllMatches(
+  override suspend fun getAllMatches(
     text: String,
     pattern: String,
   ): List<Pair<Int, Int>> {
@@ -256,7 +256,7 @@ class VimApiImpl(
   //   injector.window.closeAll(vimContext)
   // }
 
-  override fun execute(script: String): Boolean {
+  override suspend fun execute(script: String): Boolean {
     val result = injector.vimscriptExecutor.execute(
       script, vimEditor, vimContext,
       skipHistory = true,
@@ -283,57 +283,57 @@ class VimApiImpl(
     injector.pluginService.addCommand(command, commandHandler)
   }
 
-  override fun <T> getDataFromWindow(key: String): T? {
+  override suspend fun <T> getDataFromWindow(key: String): T? {
     val storageKey = Key<T>(key)
     return injector.vimStorageService.getDataFromWindow(vimEditor, storageKey)
   }
 
-  override fun <T> putDataToWindow(key: String, data: T) {
+  override suspend fun <T> putDataToWindow(key: String, data: T) {
     val storageKey = Key<T>(key)
     injector.vimStorageService.putDataToWindow(vimEditor, storageKey, data)
   }
 
-  override fun <T> getDataFromBuffer(key: String): T? {
+  override suspend fun <T> getDataFromBuffer(key: String): T? {
     val storageKey = Key<T>(key)
     return injector.vimStorageService.getDataFromBuffer(vimEditor, storageKey)
   }
 
-  override fun <T> putDataToBuffer(key: String, data: T) {
+  override suspend fun <T> putDataToBuffer(key: String, data: T) {
     val storageKey = Key<T>(key)
     injector.vimStorageService.putDataToBuffer(vimEditor, storageKey, data)
   }
 
-  override fun <T> getDataFromTab(key: String): T? {
+  override suspend fun <T> getDataFromTab(key: String): T? {
     val storageKey = Key<T>(key)
     return injector.vimStorageService.getDataFromTab(vimEditor, storageKey)
   }
 
-  override fun <T> putDataToTab(key: String, data: T) {
+  override suspend fun <T> putDataToTab(key: String, data: T) {
     val storageKey = Key<T>(key)
     injector.vimStorageService.putDataToTab(vimEditor, storageKey, data)
   }
 
-  override fun saveFile() {
+  override suspend fun saveFile() {
     injector.file.saveFile(vimEditor, vimContext)
   }
 
-  override fun closeFile() {
+  override suspend fun closeFile() {
     injector.file.closeFile(vimEditor, vimContext)
   }
 
-  override fun getNextCamelStartOffset(chars: CharSequence, startIndex: Int, count: Int): Int? {
+  override suspend fun getNextCamelStartOffset(chars: CharSequence, startIndex: Int, count: Int): Int? {
     return injector.searchHelper.findNextCamelStart(chars, startIndex, count)
   }
 
-  override fun getPreviousCamelStartOffset(chars: CharSequence, endIndex: Int, count: Int): Int? {
+  override suspend fun getPreviousCamelStartOffset(chars: CharSequence, endIndex: Int, count: Int): Int? {
     return injector.searchHelper.findPreviousCamelStart(chars, endIndex, count)
   }
 
-  override fun getNextCamelEndOffset(chars: CharSequence, startIndex: Int, count: Int): Int? {
+  override suspend fun getNextCamelEndOffset(chars: CharSequence, startIndex: Int, count: Int): Int? {
     return injector.searchHelper.findNextCamelEnd(chars, startIndex, count)
   }
 
-  override fun getPreviousCamelEndOffset(chars: CharSequence, endIndex: Int, count: Int): Int? {
+  override suspend fun getPreviousCamelEndOffset(chars: CharSequence, endIndex: Int, count: Int): Int? {
     return injector.searchHelper.findPreviousCamelEnd(chars, endIndex, count)
   }
 }
