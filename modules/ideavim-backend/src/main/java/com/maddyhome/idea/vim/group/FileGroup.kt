@@ -12,7 +12,6 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
@@ -31,11 +30,10 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimFileBase
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
-import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.execute
 import com.maddyhome.idea.vim.newapi.globalIjOptions
+import com.maddyhome.idea.vim.newapi.vim
 import java.util.*
 import kotlin.io.path.Path
 
@@ -156,7 +154,10 @@ class FileGroup : VimFileBase() {
         }
       } else {
         // Split mode fallback: no focused window, close by editor's virtual file
-        val vf = EditorHelper.getVirtualFile((editor as IjVimEditor).editor)
+        val vimVf = editor.getVirtualFile()
+        val vf = vimVf?.let {
+          VirtualFileManager.getInstance().getFileSystem(it.protocol)?.findFileByPath(it.path)
+        }
         if (vf != null) {
           fileEditorManager.closeFile(vf)
         }
@@ -268,25 +269,26 @@ class FileGroup : VimFileBase() {
   }
 
   override fun displayFileInfo(vimEditor: VimEditor, fullPath: Boolean) {
-    val editor = (vimEditor as IjVimEditor).editor
-    VimPlugin.showMessage(buildFileInfoMessage(editor, fullPath))
+    VimPlugin.showMessage(buildFileInfoMessage(vimEditor, fullPath))
   }
 
   /**
    * Builds the `:file` / Ctrl-G message string for the given editor.
    * Used by [displayFileInfo] (monolith) and [FileRemoteApiImpl] (split mode RPC).
    */
-  fun buildFileInfoMessage(editor: Editor, fullPath: Boolean): String {
+  fun buildFileInfoMessage(vimEditor: VimEditor, fullPath: Boolean): String {
     val msg = StringBuilder()
-    val vf = EditorHelper.getVirtualFile(editor)
+    val vf = vimEditor.getVirtualFile()
     if (vf != null) {
       msg.append('"')
       if (fullPath) {
         msg.append(vf.path)
       } else {
-        val project = editor.project
+        val project = ProjectManager.getInstance().openProjects
+          .firstOrNull { injector.file.getProjectId(it) == vimEditor.projectId }
         if (project != null) {
-          val root = ProjectRootManager.getInstance(project).fileIndex.getContentRootForFile(vf)
+          val virtualFile = VirtualFileManager.getInstance().getFileSystem(vf.protocol)?.findFileByPath(vf.path)
+          val root = virtualFile?.let { ProjectRootManager.getInstance(project).fileIndex.getContentRootForFile(it) }
           if (root != null) {
             msg.append(vf.path.substring(root.path.length + 1))
           } else {
@@ -299,27 +301,24 @@ class FileGroup : VimFileBase() {
       msg.append("\"[No File]\" ")
     }
 
-    val doc = editor.document
-    if (!doc.isWritable) {
+    if (!vimEditor.isDocumentWritable()) {
       msg.append("[RO] ")
-    } else if (FileDocumentManager.getInstance().isDocumentUnsaved(doc)) {
+    } else if (vimEditor.hasUnsavedChanges()) {
       msg.append("[+] ")
     }
 
-    val lline = editor.caretModel.logicalPosition.line
-    val total = IjVimEditor(editor).lineCount()
+    val caret = vimEditor.currentCaret()
+    val bufferPosition = caret.getBufferPosition()
+    val lline = bufferPosition.line
+    val total = vimEditor.lineCount()
     val pct = (lline.toFloat() / total.toFloat() * 100f + 0.5).toInt()
 
     msg.append("line ").append(lline + 1).append(" of ").append(total)
     msg.append(" --").append(pct).append("%-- ")
 
-    val lp = editor.caretModel.logicalPosition
-    val col = editor.caretModel.offset - doc.getLineStartOffset(lline)
+    val col = bufferPosition.column
 
     msg.append("col ").append(col + 1)
-    if (col != lp.column) {
-      msg.append("-").append(lp.column + 1)
-    }
 
     return msg.toString()
   }
@@ -333,7 +332,7 @@ class FileGroup : VimFileBase() {
       .findFirst().orElseThrow()
 
     val editor = selectEditor(project, virtualFile) ?: return null
-    return IjVimEditor(editor)
+    return editor.vim
   }
 
   override fun getProjectId(project: Any): String {

@@ -17,10 +17,13 @@ import com.intellij.openapi.components.RoamingType
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.util.text.StringUtil
+import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.util.asSafely
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEditor
@@ -31,7 +34,6 @@ import com.maddyhome.idea.vim.group.SystemMarks.Companion.createOrGetSystemMark
 import com.maddyhome.idea.vim.mark.IntellijMark
 import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.mark.VimMark.Companion.create
-import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import org.jdom.Element
 import java.util.*
@@ -45,8 +47,23 @@ import java.util.*
   storages = [Storage(value = "\$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)]
 )
 internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateComponent<Element?> {
+  private fun findEditorForVimEditor(vimEditor: VimEditor): Editor? {
+    val vf = vimEditor.getVirtualFile() ?: return null
+    val virtualFile =
+      VirtualFileManager.getInstance().getFileSystem(vf.protocol)?.findFileByPath(vf.path) ?: return null
+    for (project in ProjectManager.getInstance().openProjects) {
+      if (injector.file.getProjectId(project) != vimEditor.projectId) continue
+      val editor = FileEditorManager.getInstance(project)
+        .getAllEditors(virtualFile)
+        .filterIsInstance<TextEditor>()
+        .firstOrNull()?.editor
+      if (editor != null) return editor
+    }
+    return null
+  }
+
   private fun createOrGetSystemMark(ch: Char, line: Int, col: Int, editor: VimEditor): Mark? {
-    val ijEditor = (editor as IjVimEditor).editor
+    val ijEditor = findEditorForVimEditor(editor) ?: return null
     val systemMark = createOrGetSystemMark(ch, line, ijEditor) ?: return null
     return IntellijMark(systemMark, col, ijEditor.project)
   }

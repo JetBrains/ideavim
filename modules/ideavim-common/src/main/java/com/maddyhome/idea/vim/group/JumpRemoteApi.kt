@@ -25,7 +25,7 @@ import org.jetbrains.annotations.ApiStatus
 @Rpc
 @ApiStatus.Internal
 interface JumpRemoteApi : RemoteApi<Unit> {
-  suspend fun includeCurrentCommandAsNavigation(projectBasePath: String?)
+  suspend fun includeCurrentCommandAsNavigation(projectId: String?)
 
   companion object {
     @JvmStatic

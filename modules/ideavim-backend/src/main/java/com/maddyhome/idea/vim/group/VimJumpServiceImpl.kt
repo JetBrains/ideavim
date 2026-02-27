@@ -16,15 +16,14 @@ import com.intellij.openapi.fileEditor.ex.IdeDocumentHistory
 import com.intellij.openapi.fileEditor.impl.IdeDocumentHistoryImpl.PlaceInfo
 import com.intellij.openapi.fileEditor.impl.IdeDocumentHistoryImpl.RecentPlacesListener
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.util.text.StringUtil
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimJumpServiceBase
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.mark.Jump
-import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.globalIjOptions
-import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.initInjector
 import org.jdom.Element
 
@@ -40,10 +39,9 @@ internal class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateCompone
   override var lastJumpTimeStamp: Long = 0
 
   override fun includeCurrentCommandAsNavigation(editor: VimEditor) {
-    val project = (editor as IjVimEditor).editor.project
-    if (project != null) {
-      IdeDocumentHistory.getInstance(project).includeCurrentCommandAsNavigation()
-    }
+    val project = ProjectManager.getInstance().openProjects
+      .firstOrNull { injector.file.getProjectId(it) == editor.projectId } ?: return
+    IdeDocumentHistory.getInstance(project).includeCurrentCommandAsNavigation()
   }
 
   // We do not delete old project records.
@@ -124,7 +122,8 @@ internal class JumpsListener(val project: Project) : RecentPlacesListener {
   }
 
   private fun buildJump(place: PlaceInfo): Jump? {
-    val editor = injector.editorGroup.getEditors().firstOrNull { it.ij.virtualFile == place.file } ?: return null
+    val editor =
+      injector.editorGroup.getEditors().firstOrNull { it.getVirtualFile()?.path == place.file.path } ?: return null
     val offset = place.caretPosition?.startOffset ?: return null
 
     val bufferPosition = editor.offsetToBufferPosition(offset)

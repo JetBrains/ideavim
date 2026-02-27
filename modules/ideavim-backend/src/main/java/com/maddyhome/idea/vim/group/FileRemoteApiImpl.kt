@@ -22,7 +22,7 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 import com.maddyhome.idea.vim.api.VimFile
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
-import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.vim
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -57,7 +57,7 @@ internal class FileRemoteApiImpl : FileRemoteApi {
   override suspend fun closeCurrentFile(projectBasePath: String?, filePath: String?) = withContext(Dispatchers.EDT) {
     val project = findProject(projectBasePath) ?: return@withContext
     val editor = filePath?.let { findEditorByFilePath(project, it) } ?: return@withContext
-    val vimEditor = IjVimEditor(editor)
+    val vimEditor = editor.vim
     val context = buildContext(project, editor)
     fileGroup.closeFile(vimEditor, context)
   }
@@ -72,7 +72,7 @@ internal class FileRemoteApiImpl : FileRemoteApi {
     withContext(Dispatchers.EDT) {
       val project = findProject(projectBasePath) ?: return@withContext
       val editor = filePath?.let { findEditorByFilePath(project, it) } ?: return@withContext
-      val vimEditor = IjVimEditor(editor)
+      val vimEditor = editor.vim
       val context = buildContext(project, editor)
       if (saveAll) {
         fileGroup.saveFiles(vimEditor, context)
@@ -108,7 +108,7 @@ internal class FileRemoteApiImpl : FileRemoteApi {
     withContext(Dispatchers.EDT) {
       val project = findProject(projectBasePath) ?: return@withContext null
       val editor = filePath?.let { findEditorByFilePath(project, it) } ?: return@withContext null
-      fileGroup.buildFileInfoMessage(editor, fullPath)
+      fileGroup.buildFileInfoMessage(editor.vim, fullPath)
     }
 
   override suspend fun selectEditor(projectId: String, documentPath: String, protocol: String?): Boolean =

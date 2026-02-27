@@ -25,7 +25,6 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimProcessGroupBase
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.newapi.ij
 import java.io.BufferedWriter
 import java.io.IOException
 import java.io.OutputStreamWriter
@@ -42,7 +41,9 @@ class ProcessGroup : VimProcessGroupBase() {
     input: CharSequence?,
     currentDirectoryPath: String?,
   ): String? {
-    return executeCommandImpl(command, input, currentDirectoryPath, editor.ij.project)
+    val project = ProjectManager.getInstance().openProjects
+      .firstOrNull { injector.file.getProjectId(it) == editor.projectId }
+    return executeCommandImpl(command, input, currentDirectoryPath, project)
   }
 
   /**

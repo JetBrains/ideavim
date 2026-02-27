@@ -12,7 +12,6 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimJumpServiceBase
-import com.maddyhome.idea.vim.newapi.IjVimEditor
 import kotlinx.coroutines.runBlocking
 
 /**
@@ -29,10 +28,9 @@ internal class VimJumpServiceSplitClient : VimJumpServiceBase() {
   override var lastJumpTimeStamp: Long = 0
 
   override fun includeCurrentCommandAsNavigation(editor: VimEditor) {
-    val project = (editor as IjVimEditor).editor.project ?: return
     val coroutineScope = ApplicationManager.getApplication().service<CoroutineScopeProvider>().coroutineScope
     runBlocking(coroutineScope.coroutineContext) {
-      JumpRemoteApi.getInstance().includeCurrentCommandAsNavigation(project.basePath)
+      JumpRemoteApi.getInstance().includeCurrentCommandAsNavigation(editor.projectId)
     }
   }
 }
