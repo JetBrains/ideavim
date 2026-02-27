@@ -1,0 +1,22 @@
+<!--
+  ~ Copyright 2003-2026 The IdeaVim authors
+  ~
+  ~ Use of this source code is governed by an MIT-style
+  ~ license that can be found in the LICENSE.txt file or at
+  ~ https://opensource.org/licenses/MIT.
+  -->
+
+<idea-plugin>
+  <dependencies>
+    <module name="intellij.platform.backend.split"/>
+    <module name="IdeaVIM.ideavim-common"/>
+  </dependencies>
+
+  <!-- No-op services for split-backend mode (no editors on backend). -->
+  <extensions defaultExtensionNs="com.intellij">
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.BackendEditorGroup"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimEditorGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.BackendKeyGroup"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimKeyGroup"/>
+  </extensions>
+</idea-plugin>
