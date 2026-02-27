@@ -316,10 +316,12 @@ intellijPlatform {
         * <a href="https://youtrack.jetbrains.com/issue/VIM-3948">VIM-3948</a> Improved hint generation visibility checks for better UI component detection<br>
         * Fixed high CPU usage while showing command line<br>
         * Fixed comparison of String and Number in VimScript expressions<br>
+        * Fixed recursive key mappings (e.g., <code>map b wbb</code>) causing an apparent infinite loop - <code>maxmapdepth</code> limit now properly terminates the entire mapping chain<br>
         <br>
         <b>Merged PRs:</b><br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1414">1414</a> by <a href="https://github.com/citizenmatt">Matt Ellis</a>: Refactor/functions<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1442">1442</a> by <a href="https://github.com/citizenmatt">Matt Ellis</a>: Fix high CPU usage while showing command line<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1585">1585</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: Break in case of maximum recursion depth<br>
         <br>
         <a href="https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20Fix%20versions:%20${version.get()}">Changelog</a>
         """.trimIndent()
