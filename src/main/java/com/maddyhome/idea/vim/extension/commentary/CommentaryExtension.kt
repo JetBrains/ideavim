@@ -26,7 +26,6 @@ import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.addCommand
-import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormalWithoutMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
@@ -84,7 +83,19 @@ internal class CommentaryExtension : VimExtension {
   override fun init(initApi: VimInitApi) {
     val plugCommentaryKeys = injector.parser.parseKeys("<Plug>Commentary")
     val plugCommentaryLineKeys = injector.parser.parseKeys("<Plug>CommentaryLine")
-    putExtensionHandlerMapping(MappingMode.NX, plugCommentaryKeys, owner, CommentaryOperatorHandler(), false)
+
+    // <Plug>Commentary in Normal and Visual mode: set up operator pending motion
+    initApi.mappings {
+      nnoremap("<Plug>Commentary") {
+        setOperatorFunction(OPERATOR_FUNC)
+        normal("g@")
+      }
+      xnoremap("<Plug>Commentary") {
+        setOperatorFunction(OPERATOR_FUNC)
+        normal("g@")
+      }
+    }
+
     putExtensionHandlerMapping(MappingMode.O, plugCommentaryKeys, owner, CommentaryMappingHandler(), false)
     putKeyMappingIfMissing(MappingMode.N, plugCommentaryLineKeys, owner, injector.parser.parseKeys("gc_"), true)
 
@@ -114,21 +125,6 @@ internal class CommentaryExtension : VimExtension {
     override fun apply(editor: VimEditor, context: ExecutionContext, selectionType: SelectionType?): Boolean {
       val range = injector.markService.getChangeMarks(editor.primaryCaret()) ?: return false
       return Util.doCommentary(editor, context, range, selectionType ?: SelectionType.CHARACTER_WISE, true)
-    }
-  }
-
-  /**
-   * Sets up the operator, pending a motion
-   *
-   * E.g. handles the `gc` in `gc_`, by setting the operator function, then invoking `g@` to receive the `_` motion to
-   * invoke the operator. This object is both the mapping handler and the operator function.
-   */
-  private class CommentaryOperatorHandler : ExtensionHandler {
-    override val isRepeatable = true
-
-    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
-      injector.globalOptions().operatorfunc = OPERATOR_FUNC
-      executeNormalWithoutMapping(injector.parser.parseKeys("g@"), editor.ij)
     }
   }
 
