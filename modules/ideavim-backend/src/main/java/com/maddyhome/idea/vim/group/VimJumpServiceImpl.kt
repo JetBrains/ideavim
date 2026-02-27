@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -47,7 +47,7 @@ internal class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateCompone
   }
 
   // We do not delete old project records.
-  // Rationale: It's more likely that users will want to review their old projects and access their jump history 
+  // Rationale: It's more likely that users will want to review their old projects and access their jump history
   // (e.g., recent files), than for the 100 jumps (max number of records) to consume enough space to be noticeable.
   override fun getState(): Element {
     val projectsElem = Element("projects")
@@ -67,6 +67,10 @@ internal class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateCompone
       projectsElem.addContent(projectElement)
     }
     return projectsElem
+  }
+
+  override fun loadLegacyState(element: Any) {
+    loadState(element as Element)
   }
 
   override fun loadState(state: Element) {

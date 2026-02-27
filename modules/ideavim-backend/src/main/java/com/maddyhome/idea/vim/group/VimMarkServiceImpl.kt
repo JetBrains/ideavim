@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -17,10 +17,6 @@ import com.intellij.openapi.components.RoamingType
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.editor.Document
-import com.intellij.openapi.editor.EditorFactory
-import com.intellij.openapi.editor.event.DocumentEvent
-import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.project.Project
@@ -28,7 +24,6 @@ import com.intellij.openapi.util.text.StringUtil
 import com.intellij.util.asSafely
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.VimEditorGroup
 import com.maddyhome.idea.vim.api.VimMarkService
 import com.maddyhome.idea.vim.api.VimMarkServiceBase
 import com.maddyhome.idea.vim.api.injector
@@ -176,6 +171,10 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
     readData(state)
   }
 
+  override fun loadLegacyState(element: Any) {
+    loadState(element as Element)
+  }
+
   override fun createGlobalMark(editor: VimEditor, char: Char, offset: Int): Mark? {
     if (!injector.globalIjOptions().ideamarks) {
       return super.createGlobalMark(editor, char, offset)
@@ -192,59 +191,6 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
       mark.clear()
     }
     super.removeGlobalMark(char)
-  }
-
-  /**
-   * This class is used to listen to editor document changes
-   */
-  object MarkUpdater : DocumentListener {
-    /**
-     * This event indicates that a document is about to be changed. We use this event to update all the
-     * editor's marks if text is about to be deleted.
-     *
-     * Note that the event is fired for both local changes and changes from remote guests in Code With Me scenarios (in
-     * which case [ClientId.current] will be the remote client). We don't care who caused it, we just need to update the
-     * stored marks.
-     *
-     * @param event The change event
-     */
-    override fun beforeDocumentChange(event: DocumentEvent) {
-      if (VimPlugin.isNotEnabled()) return
-      if (logger.isDebugEnabled) logger.debug("MarkUpdater before, event = $event")
-      if (event.oldLength == 0) return
-      val doc = event.document
-      val anEditor = getAnyEditorForDocument(doc) ?: return
-      injector.markService.updateMarksFromDelete(anEditor, event.offset, event.oldLength)
-    }
-
-    /**
-     * This event indicates that a document was just changed. We use this event to update all the editor's
-     * marks if text was just added.
-     *
-     * Note that the event is fired for both local changes and changes from remote guests in Code With Me scenarios (in
-     * which case [ClientId.current] will be the remote client). We don't care who caused it, we just need to update the
-     * stored marks.
-     *
-     * @param event The change event
-     */
-    override fun documentChanged(event: DocumentEvent) {
-      if (VimPlugin.isNotEnabled()) return
-      if (logger.isDebugEnabled) logger.debug("MarkUpdater after, event = $event")
-      if (event.newLength == 0 || event.newLength == 1 && event.newFragment[0] != '\n') return
-      val doc = event.document
-      val anEditor = getAnyEditorForDocument(doc) ?: return
-      injector.markService.updateMarksFromInsert(anEditor, event.offset, event.newLength)
-    }
-
-    /**
-     * Get any editor for the given document
-     *
-     * We need an editor to help calculate offsets for marks, and it doesn't matter which one we use, because they would
-     * all return the same results. However, we cannot use [VimEditorGroup.getEditors] because the change might have
-     * come from a remote guest and there might not be an open local editor.
-     */
-    private fun getAnyEditorForDocument(doc: Document) =
-      EditorFactory.getInstance().getEditors(doc).firstOrNull()?.let { IjVimEditor(it) }
   }
 
   class VimBookmarksListener(private val myProject: Project) : BookmarksListener {

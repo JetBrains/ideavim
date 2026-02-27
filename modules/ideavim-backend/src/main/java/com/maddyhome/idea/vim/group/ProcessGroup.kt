@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -16,6 +16,8 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressIndicatorProvider
 import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.ProjectManager
 import com.intellij.util.execution.ParametersListUtil
 import com.intellij.util.text.CharSequenceReader
 import com.maddyhome.idea.vim.VimPlugin
@@ -32,12 +34,34 @@ import java.io.Writer
 
 
 class ProcessGroup : VimProcessGroupBase() {
+
   @Throws(ExecutionException::class, ProcessCanceledException::class)
   override fun executeCommand(
     editor: VimEditor,
     command: String,
     input: CharSequence?,
     currentDirectoryPath: String?,
+  ): String? {
+    return executeCommandImpl(command, input, currentDirectoryPath, editor.ij.project)
+  }
+
+  /**
+   * Entry point used by [ProcessRemoteApiImpl] for RPC calls from the thin client.
+   */
+  fun executeCommand(
+    command: String,
+    input: String?,
+    currentDirectoryPath: String?,
+  ): String? {
+    val project = ProjectManager.getInstance().openProjects.firstOrNull()
+    return executeCommandImpl(command, input, currentDirectoryPath, project)
+  }
+
+  private fun executeCommandImpl(
+    command: String,
+    input: CharSequence?,
+    currentDirectoryPath: String?,
+    project: Project?,
   ): String? {
     // This is a much simplified version of how Vim does this. We're using stdin/stdout directly, while Vim will
     // redirect to temp files ('shellredir' and 'shelltemp') or use pipes. We don't support 'shellquote', because we're
@@ -107,7 +131,7 @@ class ProcessGroup : VimProcessGroupBase() {
           VimPlugin.indicateError()
         }
         (output.stderr + output.stdout).replace("\u001B\\[[;\\d]*m".toRegex(), "")
-      }, "IdeaVim - !$command", true, editor.ij.project
+      }, "IdeaVim - !$command", true, project
     )
   }
 

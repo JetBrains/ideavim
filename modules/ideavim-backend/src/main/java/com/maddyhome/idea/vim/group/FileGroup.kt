@@ -14,7 +14,6 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
-import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.fileEditor.impl.EditorsSplitters
@@ -32,7 +31,6 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimFileBase
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.group.LastTabService.Companion.getInstance
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.newapi.IjVimEditor
@@ -42,7 +40,7 @@ import java.util.*
 import kotlin.io.path.Path
 
 class FileGroup : VimFileBase() {
-  override fun openFile(filename: String, context: ExecutionContext): Boolean {
+  override fun openFile(filename: String, context: ExecutionContext, focusEditor: Boolean): Boolean {
     if (logger.isDebugEnabled) {
       logger.debug("openFile($filename)")
     }
@@ -61,7 +59,7 @@ class FileGroup : VimFileBase() {
 
       if (type != null) {
         val fem = FileEditorManager.getInstance(project)
-        fem.openFile(found, true)
+        fem.openFile(found, focusEditor)
 
         return true
       } else {
@@ -74,6 +72,12 @@ class FileGroup : VimFileBase() {
 
       return false
     }
+  }
+
+  override fun findFile(filename: String, context: ExecutionContext): String? {
+    val project = PlatformDataKeys.PROJECT.getData((context as IjEditorExecutionContext).context)
+      ?: return null
+    return findFile(filename, project)?.path
   }
 
   fun findFile(filename: String, project: Project): VirtualFile? {
@@ -119,6 +123,15 @@ class FileGroup : VimFileBase() {
     return found
   }
 
+  private fun findByNameInProject(filename: String, project: Project): VirtualFile? {
+    val projectScope = ProjectScope.getProjectScope(project)
+    val names = FilenameIndex.getVirtualFilesByName(filename, projectScope)
+    if (!names.isEmpty()) {
+      return names.stream().findFirst().get()
+    }
+    return null
+  }
+
   /**
    * Closes the current editor.
    */
@@ -140,6 +153,12 @@ class FileGroup : VimFileBase() {
         if (!ApplicationManager.getApplication().isUnitTestMode) {
           // This thing doesn't have an implementation in test mode
           EditorsSplitters.focusDefaultComponentInSplittersIfPresent(project)
+        }
+      } else {
+        // Split mode fallback: no focused window, close by editor's virtual file
+        val vf = EditorHelper.getVirtualFile((editor as IjVimEditor).editor)
+        if (vf != null) {
+          fileEditorManager.closeFile(vf)
         }
       }
     }
@@ -225,24 +244,12 @@ class FileGroup : VimFileBase() {
    */
   override fun selectPreviousTab(context: ExecutionContext) {
     val project = PlatformDataKeys.PROJECT.getData((context.context as DataContext)) ?: return
-    val vf = getInstance(project).lastTab
+    val vf = LastTabService.getInstance(project).lastTab
     if (vf != null && vf.isValid) {
       FileEditorManager.getInstance(project).openFile(vf, true)
     } else {
       VimPlugin.indicateError()
     }
-  }
-
-  /**
-   * Returns the previous tab.
-   */
-  fun getPreviousTab(context: DataContext): VirtualFile? {
-    val project = PlatformDataKeys.PROJECT.getData(context) ?: return null
-    val vf = getInstance(project).lastTab
-    if (vf != null && vf.isValid) {
-      return vf
-    }
-    return null
   }
 
   fun selectEditor(project: Project, file: VirtualFile): Editor? {
@@ -262,6 +269,14 @@ class FileGroup : VimFileBase() {
 
   override fun displayFileInfo(vimEditor: VimEditor, fullPath: Boolean) {
     val editor = (vimEditor as IjVimEditor).editor
+    VimPlugin.showMessage(buildFileInfoMessage(editor, fullPath))
+  }
+
+  /**
+   * Builds the `:file` / Ctrl-G message string for the given editor.
+   * Used by [displayFileInfo] (monolith) and [FileRemoteApiImpl] (split mode RPC).
+   */
+  fun buildFileInfoMessage(editor: Editor, fullPath: Boolean): String {
     val msg = StringBuilder()
     val vf = EditorHelper.getVirtualFile(editor)
     if (vf != null) {
@@ -306,7 +321,7 @@ class FileGroup : VimFileBase() {
       msg.append("-").append(lp.column + 1)
     }
 
-    VimPlugin.showMessage(msg.toString())
+    return msg.toString()
   }
 
   override fun selectEditor(projectId: String, documentPath: String, protocol: String?): VimEditor? {
@@ -327,26 +342,8 @@ class FileGroup : VimFileBase() {
   }
 
   companion object {
-    private fun findByNameInProject(filename: String, project: Project): VirtualFile? {
-      val projectScope = ProjectScope.getProjectScope(project)
-      val names = FilenameIndex.getVirtualFilesByName(filename, projectScope)
-      if (!names.isEmpty()) {
-        return names.stream().findFirst().get()
-      }
-      return null
-    }
-
     private val logger = Logger.getInstance(
       FileGroup::class.java.name
     )
-
-    /**
-     * Respond to editor tab selection and remember the last used tab
-     */
-    fun fileEditorManagerSelectionChangedCallback(event: FileEditorManagerEvent) {
-      if (event.oldFile != null) {
-        getInstance(event.manager.project).lastTab = event.oldFile
-      }
-    }
   }
 }

@@ -1,0 +1,63 @@
+<!--
+  ~ Copyright 2003-2026 The IdeaVim authors
+  ~
+  ~ Use of this source code is governed by an MIT-style
+  ~ license that can be found in the LICENSE.txt file or at
+  ~ https://opensource.org/licenses/MIT.
+  -->
+
+<idea-plugin>
+  <dependencies>
+    <module name="intellij.platform.backend"/>
+    <module name="intellij.platform.kernel.backend"/>
+    <module name="IdeaVIM.ideavim-common"/>
+  </dependencies>
+
+  <!-- Backend registrations: IdeDocumentHistory, Bookmarks, ProjectView, PSI.
+       These load in backend + monolith mode only. -->
+
+  <applicationListeners>
+    <listener class="com.maddyhome.idea.vim.PyNotebooksCloseWorkaround"
+              topic="com.intellij.openapi.project.ProjectManagerListener"/>
+  </applicationListeners>
+
+  <projectListeners>
+    <listener class="com.maddyhome.idea.vim.group.JumpsListener"
+              topic="com.intellij.openapi.fileEditor.impl.IdeDocumentHistoryImpl$RecentPlacesListener"/>
+    <listener class="com.maddyhome.idea.vim.group.VimMarkServiceImpl$VimBookmarksListener"
+              topic="com.intellij.ide.bookmark.BookmarksListener"/>
+  </projectListeners>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <!-- Backend services — run in backend + monolith mode -->
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.ProcessGroup"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimProcessGroup"/>
+
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.VimJumpServiceImpl"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimJumpService"
+                        overrides="true"/>
+
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.VimMarkServiceImpl"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimMarkService"/>
+
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.FileGroup"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimFile"/>
+
+    <!-- RPC: expose ProcessGroup to thin-client frontend -->
+    <platform.rpc.backend.remoteApiProvider
+        implementation="com.maddyhome.idea.vim.group.ProcessRemoteApiProvider"/>
+
+    <!-- RPC: expose includeCurrentCommandAsNavigation to thin-client frontend -->
+    <platform.rpc.backend.remoteApiProvider
+        implementation="com.maddyhome.idea.vim.group.JumpRemoteApiProvider"/>
+
+    <!-- RPC: expose mark operations to thin-client frontend -->
+    <platform.rpc.backend.remoteApiProvider
+        implementation="com.maddyhome.idea.vim.group.MarkRemoteApiProvider"/>
+
+    <!-- RPC: expose file operations to thin-client frontend -->
+    <platform.rpc.backend.remoteApiProvider
+        implementation="com.maddyhome.idea.vim.group.FileRemoteApiProvider"/>
+
+  </extensions>
+</idea-plugin>
