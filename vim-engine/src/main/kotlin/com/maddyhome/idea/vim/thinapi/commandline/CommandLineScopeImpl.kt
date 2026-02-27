@@ -30,10 +30,10 @@ class CommandLineScopeImpl(
   private val vimContext: ExecutionContext
     get() = injector.executionContextManager.getEditorExecutionContext(vimEditor)
 
-  override fun input(prompt: String, finishOn: Char?, callback: VimApi.(String) -> Unit) {
+  override fun input(prompt: String, finishOn: Char?, callback: suspend VimApi.(String) -> Unit) {
     val vimApi = VimApiImpl(listenerOwner, mappingOwner, projectId)
     injector.commandLine.readInputAndProcess(vimEditor, vimContext, prompt, finishOn) {
-      vimApi.callback(it)
+      kotlinx.coroutines.runBlocking { vimApi.callback(it) }
     }
   }
 

@@ -26,7 +26,7 @@ abstract class CommandLineScope {
    * @param finishOn The character that, when entered, will finish the input process. If null, only Enter will finish.
    * @param callback A function that will be called with the entered text when input is complete.
    */
-  abstract fun input(prompt: String, finishOn: Char? = null, callback: VimApi.(String) -> Unit)
+  abstract fun input(prompt: String, finishOn: Char? = null, callback: suspend VimApi.(String) -> Unit)
 
   /**
    * Executes operations on the command line that require a read lock.
