@@ -113,6 +113,6 @@ interface TextObjectScope {
     keys: String,
     registerDefaultMapping: Boolean = true,
     preserveSelectionAnchor: Boolean = true,
-    rangeProvider: VimApi.(count: Int) -> TextObjectRange?,
+    rangeProvider: suspend VimApi.(count: Int) -> TextObjectRange?,
   )
 }
