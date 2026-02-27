@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -40,6 +40,12 @@ interface VimJumpService {
   fun updateJumpsFromDelete(projectId: String, startOffset: Int, length: Int)
 
   fun includeCurrentCommandAsNavigation(editor: VimEditor)
+
+  /**
+   * Loads legacy jump state from an XML element for version migration.
+   * Default no-op; overridden by implementations that support PersistentStateComponent.
+   */
+  fun loadLegacyState(element: Any) {}
 
   @TestOnly
   fun resetJumps()

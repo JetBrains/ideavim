@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -19,4 +19,10 @@ interface VimScrollGroup {
   fun scrollColumns(editor: VimEditor, columns: Int): Boolean
   fun scrollCaretColumnToDisplayLeftEdge(vimEditor: VimEditor): Boolean
   fun scrollCaretColumnToDisplayRightEdge(editor: VimEditor): Boolean
+
+  /**
+   * Called when scroll-related options (e.g. 'scrolloff') change for an editor.
+   * Implementations should ensure the caret is still visible with the new option values.
+   */
+  fun onScrollOptionChanged(editor: VimEditor) {}
 }

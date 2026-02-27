@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2024 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -33,4 +33,12 @@ interface VimPsiService {
    * NOTE: Regardless of the [isInner] value, a TextRange will be returned if the caret is positioned on a quote character.
    */
   fun getSingleQuotedString(editor: VimEditor, pos: Int, isInner: Boolean): TextRange?
+
+  /**
+   * Finds the range of contiguous comment lines around the given [cursorLine].
+   * Walks up and down from the cursor, checking each line for comment-only content via PSI.
+   *
+   * @return a [TextRange] covering the full comment block (line-wise), or null if the cursor is not on a comment line.
+   */
+  fun getCommentBlockRange(editor: VimEditor, cursorLine: Int): TextRange?
 }

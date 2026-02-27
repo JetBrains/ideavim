@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -74,4 +74,22 @@ interface VimKeyGroup {
   val savedShortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo>
 
   fun getChar(editor: VimEditor): Char?
+
+  /** Registers platform shortcut keys for the given editor so IdeaVim can intercept them. */
+  fun registerRequiredShortcutKeys(editor: VimEditor) {}
+
+  /** Unregisters platform shortcut keys for the given editor. */
+  fun unregisterShortcutKeys(editor: VimEditor) {}
+
+  /** Registers IdeaVim shortcuts on a code-completion lookup component. */
+  fun registerShortcutsForLookup(lookup: Any) {}
+
+  /** Registers a command action and its shortcut keys. */
+  fun registerCommandAction(command: LazyVimCommand) {}
+
+  /** Registers a shortcut that is handled directly by KeyHandler, rather than by an action. */
+  fun registerShortcutWithoutAction(keyStroke: KeyStroke, owner: MappingOwner) {}
+
+  /** Loads shortcut conflict data from a legacy state element. */
+  fun loadShortcutConflictsData(element: Any) {}
 }

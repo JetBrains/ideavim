@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -19,7 +19,16 @@ interface VimFile {
   fun closeFile(number: Int, context: ExecutionContext)
   fun selectFile(count: Int, context: ExecutionContext): Boolean
   fun selectNextFile(count: Int, context: ExecutionContext)
-  fun openFile(filename: String, context: ExecutionContext): Boolean
+  fun openFile(filename: String, context: ExecutionContext, focusEditor: Boolean = true): Boolean
+
+  /**
+   * Finds a file by name or path, searching home directory, absolute path, content roots, and PSI index.
+   * Returns the absolute file path as a String, or null if not found.
+   *
+   * In split (Remote Development) mode this goes via RPC to the backend where
+   * ProjectRootManager and FilenameIndex are available.
+   */
+  fun findFile(filename: String, context: ExecutionContext): String? = null
 
   fun getProjectId(project: Any): String
 

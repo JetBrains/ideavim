@@ -94,7 +94,9 @@ abstract class VimScriptExecutorBase : VimscriptExecutor {
     }
   }
 
-  protected abstract fun enableDelayedExtensions()
+  protected open fun enableDelayedExtensions() {
+    injector.extensionRegistrator.enableDelayedExtensions()
+  }
 
   override fun executeFile(file: Path, editor: VimEditor, fileIsIdeaVimRcConfig: Boolean, indicateErrors: Boolean) {
     val context = injector.executionContextManager.getEditorExecutionContext(editor)

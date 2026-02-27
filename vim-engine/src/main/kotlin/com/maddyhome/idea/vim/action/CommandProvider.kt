@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -40,7 +40,7 @@ interface CommandProvider {
   }
 
   private fun getFile(): InputStream {
-    return object {}.javaClass.classLoader.getResourceAsStream("ksp-generated/$commandListFileName")
+    return this.javaClass.classLoader.getResourceAsStream("ksp-generated/$commandListFileName")
       ?: throw RuntimeException("Failed to fetch ex commands from ${javaClass.name}")
   }
 }

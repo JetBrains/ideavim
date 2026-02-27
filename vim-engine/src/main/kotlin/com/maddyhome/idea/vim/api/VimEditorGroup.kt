@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,6 +10,27 @@ package com.maddyhome.idea.vim.api
 
 interface VimEditorGroup {
   fun notifyIdeaJoin(editor: VimEditor)
+
+  /** Called when a new editor is created and needs to be initialised by IdeaVim */
+  fun editorCreated(editor: VimEditor) {}
+
+  /** Called when an editor is being deinitialised by IdeaVim */
+  fun editorDeinit(editor: VimEditor) {}
+
+  /** Returns the current key repeat state, or null if not set (Mac-specific) */
+  fun isKeyRepeat(): Boolean? = null
+
+  /** Sets the key repeat state (Mac-specific) */
+  fun setKeyRepeat(value: Boolean?) {}
+
+  /** Closes any active editor search session for the given editor */
+  fun closeEditorSearchSession(editor: VimEditor) {}
+
+  /** Called when the 'number' or 'relativenumber' options change for the given editor */
+  fun onNumberOptionChanged(editor: VimEditor) {}
+
+  /** Loads editor state from a legacy state element */
+  fun loadEditorStateData(element: Any) {}
 
   /**
    * Get a collection of all editors, including those that have not yet been initialised.
