@@ -246,6 +246,14 @@ tasks {
     splitModeTarget = SplitModeAware.SplitModeTarget.BOTH
   }
 
+  val testIdeSplitMode by intellijPlatformTesting.testIde.registering {
+    splitMode = true
+    splitModeTarget = SplitModeAware.SplitModeTarget.BOTH
+    task {
+      useJUnitPlatform()
+    }
+  }
+
   // Add plugin open API sources to the plugin ZIP
   val sourcesJar by registering(Jar::class) {
     dependsOn(moduleSources)

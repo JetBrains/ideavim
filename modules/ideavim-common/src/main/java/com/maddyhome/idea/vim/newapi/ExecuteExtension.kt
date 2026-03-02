@@ -20,5 +20,5 @@ fun NativeAction?.execute(editor: VimEditor, context: ExecutionContext) {
   injector.actionExecutor.executeAction(editor, this, context)
 }
 
-internal val VisualPosition.vim: VimVisualPosition
+val VisualPosition.vim: VimVisualPosition
   get() = VimVisualPosition(line, column, leansRight)

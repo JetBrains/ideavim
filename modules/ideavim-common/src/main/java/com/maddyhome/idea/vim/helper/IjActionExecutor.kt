@@ -20,7 +20,6 @@ import com.intellij.openapi.actionSystem.impl.ProxyShortcutSet
 import com.intellij.openapi.application.ex.ApplicationManagerEx
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.command.UndoConfirmationPolicy
-import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.editor.actionSystem.DocCommandGroupId
 import com.intellij.openapi.progress.util.ProgressIndicatorUtils
@@ -38,7 +37,6 @@ import org.jetbrains.annotations.NonNls
 import java.awt.Component
 import javax.swing.JComponent
 
-@Service
 class IjActionExecutor : VimActionExecutor {
   override val ACTION_EDITOR_NEXT_TEMPLATE_VARIABLE: String
     get() = IdeActions.ACTION_EDITOR_NEXT_TEMPLATE_VARIABLE

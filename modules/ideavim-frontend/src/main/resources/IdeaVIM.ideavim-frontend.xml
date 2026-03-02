@@ -15,6 +15,10 @@
   <!-- Frontend registrations: UI, editor, key handling, status bar, actions.
        These load in client + monolith mode only. This is the bulk of IdeaVim. -->
   <applicationListeners>
+    <listener class="com.maddyhome.idea.vim.thinapi.IjPluginListener"
+              topic="com.intellij.ide.plugins.DynamicPluginListener"/>
+    <listener class="com.maddyhome.idea.vim.PyNotebooksCloseWorkaround"
+              topic="com.intellij.openapi.project.ProjectManagerListener"/>
     <listener class="com.maddyhome.idea.vim.ui.ex.ExEntryPanel$LafListener"
               topic="com.intellij.ide.ui.LafManagerListener"/>
     <listener class="com.maddyhome.idea.vim.ui.OutputPanel$LafListener"
@@ -52,6 +56,54 @@
     <postStartupActivity implementation="com.maddyhome.idea.vim.extension.nerdtree.NerdTree$NerdStartupActivity"/>
 
     <spellchecker.bundledDictionaryProvider implementation="com.maddyhome.idea.vim.VimBundledDictionaryProvider"/>
+
+    <applicationService serviceInterface="com.maddyhome.idea.vim.newapi.VimEditorFactory"
+                        serviceImplementation="com.maddyhome.idea.vim.newapi.IjVimEditorFactory"/>
+
+    <!-- Services moved from common (implementation classes now in frontend module) -->
+    <applicationService serviceInterface="com.maddyhome.idea.vim.api.VimMotionGroup"
+                        serviceImplementation="com.maddyhome.idea.vim.group.MotionGroup"/>
+    <applicationService serviceInterface="com.maddyhome.idea.vim.api.VimSearchGroup"
+                        serviceImplementation="com.maddyhome.idea.vim.newapi.IjVimSearchGroup"/>
+    <applicationService serviceInterface="com.maddyhome.idea.vim.api.VimSearchHelper"
+                        serviceImplementation="com.maddyhome.idea.vim.newapi.IjVimSearchHelper"/>
+    <applicationService serviceInterface="com.maddyhome.idea.vim.api.VimClipboardManager"
+                        serviceImplementation="com.maddyhome.idea.vim.newapi.IjClipboardManager"/>
+    <applicationService serviceInterface="com.maddyhome.idea.vim.api.VimApplication"
+                        serviceImplementation="com.maddyhome.idea.vim.newapi.IjVimApplication"/>
+    <applicationService serviceInterface="com.maddyhome.idea.vim.api.VimPsiService"
+                        serviceImplementation="com.maddyhome.idea.vim.group.IjVimPsiService"/>
+    <applicationService serviceInterface="com.maddyhome.idea.vim.macro.VimMacro"
+                        serviceImplementation="com.maddyhome.idea.vim.group.MacroGroup"/>
+    <applicationService serviceInterface="com.maddyhome.idea.vim.undo.VimUndoRedo"
+                        serviceImplementation="com.maddyhome.idea.vim.helper.UndoRedoHelper"/>
+    <applicationService serviceInterface="com.maddyhome.idea.vim.api.EngineEditorHelper"
+                        serviceImplementation="com.maddyhome.idea.vim.helper.IjEditorHelper"/>
+    <applicationService serviceInterface="com.maddyhome.idea.vim.api.VimCommandGroup"
+                        serviceImplementation="com.maddyhome.idea.vim.group.CommandGroup"/>
+    <applicationService serviceInterface="com.maddyhome.idea.vim.register.VimRegisterGroup"
+                        serviceImplementation="com.maddyhome.idea.vim.group.RegisterGroup"/>
+    <applicationService serviceInterface="com.maddyhome.idea.vim.history.VimHistory"
+                        serviceImplementation="com.maddyhome.idea.vim.group.HistoryGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.XMLGroup"/>
+    <applicationService serviceInterface="com.maddyhome.idea.vim.api.VimLookupManager"
+                        serviceImplementation="com.maddyhome.idea.vim.newapi.IjVimLookupManager"/>
+    <applicationService serviceInterface="com.maddyhome.idea.vim.api.VimTemplateManager"
+                        serviceImplementation="com.maddyhome.idea.vim.newapi.IjTemplateManager"/>
+    <applicationService serviceInterface="com.maddyhome.idea.vim.api.VimStringParser"
+                        serviceImplementation="com.maddyhome.idea.vim.helper.IjVimStringParser"/>
+    <applicationService serviceInterface="com.maddyhome.idea.vim.api.VimEnabler"
+                        serviceImplementation="com.maddyhome.idea.vim.newapi.IjVimEnabler"/>
+    <applicationService serviceInterface="com.maddyhome.idea.vim.extension.JsonExtensionProvider"
+                        serviceImplementation="com.maddyhome.idea.vim.thinapi.IjJsonExtensionProvider"/>
+    <applicationService serviceInterface="com.maddyhome.idea.vim.extension.ExtensionLoader"
+                        serviceImplementation="com.maddyhome.idea.vim.thinapi.IjExtensionLoader"/>
+    <applicationService serviceInterface="com.maddyhome.idea.vim.thinapi.VimPluginService"
+                        serviceImplementation="com.maddyhome.idea.vim.thinapi.IjVimPluginService"/>
+    <applicationService serviceInterface="com.maddyhome.idea.vim.thinapi.VimHighlightingService"
+                        serviceImplementation="com.maddyhome.idea.vim.thinapi.IjVimHighlightingService"/>
+    <applicationService serviceInterface="com.maddyhome.idea.vim.api.VimRedrawService"
+                        serviceImplementation="com.maddyhome.idea.vim.group.IjVimRedrawService"/>
 
     <!-- Frontend services (accessed through IjVimInjector, no backend dependencies) -->
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.ScrollGroup"
@@ -100,7 +152,8 @@
     <applicationService serviceImplementation="com.maddyhome.idea.vim.vimscript.Executor"
                         serviceInterface="com.maddyhome.idea.vim.api.VimscriptExecutor"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.newapi.IjVimMessages"
-                        serviceInterface="com.maddyhome.idea.vim.api.VimMessages"/>
+                        serviceInterface="com.maddyhome.idea.vim.api.VimMessages"
+                        overrides="true"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.NotificationService"
                         serviceInterface="com.maddyhome.idea.vim.group.VimNotifications"/>
     <projectService serviceImplementation="com.maddyhome.idea.vim.group.NotificationService"

@@ -42,7 +42,6 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.group.NotificationService
-import com.maddyhome.idea.vim.group.RegisterGroup
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
@@ -51,6 +50,7 @@ import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.initInjector
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.register.VimRegisterGroup
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.undo.VimTimestampBasedUndoService
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
@@ -185,7 +185,7 @@ internal object IdeaSpecifics {
       val originalCaretOffset: Int,
       val originalDocumentLength: Int
     ) {
-      fun recordCompletion(editor: Editor, register: RegisterGroup) {
+      fun recordCompletion(editor: Editor, register: VimRegisterGroup) {
         if (!completionStartMarker.isValid) {
           return
         }

@@ -93,12 +93,12 @@ internal class IjVimPluginActivator : VimPluginActivator {
     }
 
     // 5) Turning on should be performed after all commands registration
-    VimPlugin.getSearch().turnOn()
+    (VimPlugin.getSearch() as IjVimSearchGroup).turnOn()
     VimListenerManager.turnOn()
   }
 
   override fun deactivate(unsubscribe: Boolean) {
-    val searchGroup: IjVimSearchGroup? = VimPlugin.getSearchIfCreated()
+    val searchGroup = VimPlugin.getSearchIfCreated() as IjVimSearchGroup?
     searchGroup?.turnOff()
 
     if (unsubscribe) {

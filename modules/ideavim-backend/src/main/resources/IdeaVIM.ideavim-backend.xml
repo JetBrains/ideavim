@@ -16,11 +16,6 @@
   <!-- Backend registrations: IdeDocumentHistory, Bookmarks, ProjectView, PSI.
        These load in backend + monolith mode only. -->
 
-  <applicationListeners>
-    <listener class="com.maddyhome.idea.vim.PyNotebooksCloseWorkaround"
-              topic="com.intellij.openapi.project.ProjectManagerListener"/>
-  </applicationListeners>
-
   <projectListeners>
     <listener class="com.maddyhome.idea.vim.group.JumpsListener"
               topic="com.intellij.openapi.fileEditor.impl.IdeDocumentHistoryImpl$RecentPlacesListener"/>

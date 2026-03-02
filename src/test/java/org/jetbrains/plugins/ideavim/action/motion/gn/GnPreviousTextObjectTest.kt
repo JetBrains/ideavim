@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -11,6 +11,7 @@
 package org.jetbrains.plugins.ideavim.action.motion.gn
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.VimSearchGroupBase
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.state.mode.Mode
@@ -63,7 +64,7 @@ class GnPreviousTextObjectTest : VimTestCase() {
 
   private fun doTestWithSearch(keys: List<KeyStroke>, before: String, after: String) {
     configureByText(before)
-    VimPlugin.getSearch().setLastSearchState("test", "", Direction.FORWARDS)
+    (VimPlugin.getSearch() as VimSearchGroupBase).setLastSearchState("test", "", Direction.FORWARDS)
     typeText(keys)
     assertState(after)
     assertState(Mode.NORMAL())

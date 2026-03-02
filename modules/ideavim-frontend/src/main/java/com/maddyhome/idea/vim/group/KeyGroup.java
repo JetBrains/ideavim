@@ -103,7 +103,7 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
         final Element conflictElement = new Element(SHORTCUT_CONFLICT_ELEMENT);
         conflictElement.setAttribute(OWNER_ATTRIBUTE, owner.getOwnerName());
         final Element textElement = new Element(TEXT_ELEMENT);
-        VimPlugin.getXML().setSafeXmlText(textElement, entry.getKey().toString());
+        XMLGroup.getInstance().setSafeXmlText(textElement, entry.getKey().toString());
         conflictElement.addContent(textElement);
         conflictsElement.addContent(conflictElement);
       }
@@ -125,7 +125,7 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
         }
         final Element textElement = conflictElement.getChild(TEXT_ELEMENT);
         if (textElement != null) {
-          final String text = VimPlugin.getXML().getSafeXmlText(textElement);
+          final String text = XMLGroup.getInstance().getSafeXmlText(textElement);
           if (text != null) {
             final KeyStroke keyStroke = KeyStroke.getKeyStroke(text);
             if (keyStroke != null) {

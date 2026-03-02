@@ -66,28 +66,15 @@ import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.extension.ExtensionLoader
 import com.maddyhome.idea.vim.extension.JsonExtensionProvider
 import com.maddyhome.idea.vim.extension.VimExtensionRegistrar
-import com.maddyhome.idea.vim.group.CommandGroup
 import com.maddyhome.idea.vim.group.EffectiveIjOptions
 import com.maddyhome.idea.vim.group.GlobalIjOptions
-import com.maddyhome.idea.vim.group.HistoryGroup
 import com.maddyhome.idea.vim.group.IjVimOptionGroup
-import com.maddyhome.idea.vim.group.IjVimPsiService
-import com.maddyhome.idea.vim.group.MacroGroup
-import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.TabService
 import com.maddyhome.idea.vim.group.VimWindowGroup
-import com.maddyhome.idea.vim.helper.IjActionExecutor
-import com.maddyhome.idea.vim.helper.IjEditorHelper
-import com.maddyhome.idea.vim.helper.IjVimStringParser
-import com.maddyhome.idea.vim.helper.UndoRedoHelper
 import com.maddyhome.idea.vim.history.VimHistory
 import com.maddyhome.idea.vim.macro.VimMacro
 import com.maddyhome.idea.vim.put.VimPut
 import com.maddyhome.idea.vim.register.VimRegisterGroup
-import com.maddyhome.idea.vim.thinapi.IjExtensionLoader
-import com.maddyhome.idea.vim.thinapi.IjJsonExtensionProvider
-import com.maddyhome.idea.vim.thinapi.IjVimHighlightingService
-import com.maddyhome.idea.vim.thinapi.IjVimPluginService
 import com.maddyhome.idea.vim.thinapi.VimHighlightingService
 import com.maddyhome.idea.vim.thinapi.VimPluginService
 import com.maddyhome.idea.vim.undo.VimUndoRedo
@@ -115,33 +102,33 @@ internal class IjVimInjector : VimInjectorBase() {
   }
 
   override val actionExecutor: VimActionExecutor
-    get() = service<IjActionExecutor>()
+    get() = service()
   override val historyGroup: VimHistory
-    get() = service<HistoryGroup>()
+    get() = service()
   override val extensionRegistrator: VimExtensionRegistrator
     get() = VimExtensionRegistrar
   override val jsonExtensionProvider: JsonExtensionProvider
-    get() = service<IjJsonExtensionProvider>()
+    get() = service()
   override val extensionLoader: ExtensionLoader
-    get() = service<IjExtensionLoader>()
+    get() = service()
   override val tabService: TabService
     get() = service()
   override val regexpService: VimRegexpService
     get() = VimRegexServiceBase()
   override val clipboardManager: VimClipboardManager
-    get() = service<IjClipboardManager>()
+    get() = service()
   override val searchHelper: VimSearchHelper
-    get() = service<IjVimSearchHelper>()
+    get() = service()
   override val motion: VimMotionGroup
-    get() = service<MotionGroup>()
+    get() = service()
   override val scroll: VimScrollGroup
     get() = service()
   override val lookupManager: VimLookupManager
-    get() = service<IjVimLookupManager>()
+    get() = service()
   override val templateManager: VimTemplateManager
-    get() = service<IjTemplateManager>()
+    get() = service()
   override val searchGroup: VimSearchGroup
-    get() = service<IjVimSearchGroup>()
+    get() = service()
   override val put: VimPut
     get() = service()
   override val window: VimWindowGroup
@@ -151,13 +138,13 @@ internal class IjVimInjector : VimInjectorBase() {
   override val file: VimFile
     get() = service()
   override val macro: VimMacro
-    get() = service<MacroGroup>()
+    get() = service()
   override val undo: VimUndoRedo
-    get() = service<UndoRedoHelper>()
+    get() = service()
   override val psiService: VimPsiService
-    get() = service<IjVimPsiService>()
+    get() = service()
   override val nativeActionManager: NativeActionManager
-    get() = service<IjNativeActionManager>()
+    get() = service()
   override val messages: VimMessages
     get() = service()
   override val registerGroup: VimRegisterGroup
@@ -176,11 +163,11 @@ internal class IjVimInjector : VimInjectorBase() {
   override val jumpService: VimJumpService
     get() = service()
   override val application: VimApplication
-    get() = service<IjVimApplication>()
+    get() = service()
   override val executionContextManager: ExecutionContextManager
-    get() = service<IjExecutionContextManager>()
+    get() = service()
   override val enabler: VimEnabler
-    get() = service<IjVimEnabler>()
+    get() = service()
   override val digraphGroup: VimDigraphGroup
     get() = service()
   override val visualMotionGroup: VimVisualMotionGroup
@@ -188,7 +175,7 @@ internal class IjVimInjector : VimInjectorBase() {
   override val statisticsService: VimStatistics
     get() = service()
   override val commandGroup: VimCommandGroup
-    get() = service<CommandGroup>()
+    get() = service()
 
   override val functionService: VimscriptFunctionService
     get() = service()
@@ -210,7 +197,7 @@ internal class IjVimInjector : VimInjectorBase() {
   override val optionGroup: VimOptionGroup
     get() = service()
   override val parser: VimStringParser
-    get() = service<IjVimStringParser>()
+    get() = service()
 
   override val systemInfoService: SystemInfoService
     get() = service()
@@ -219,14 +206,14 @@ internal class IjVimInjector : VimInjectorBase() {
   override val redrawService: VimRedrawService
     get() = service()
   override val pluginService: VimPluginService
-    get() = IjVimPluginService()
+    get() = service()
   override val highlightingService: VimHighlightingService
-    get() = IjVimHighlightingService()
+    get() = service()
 
   override val pathExpansion: VimPathExpansion = VimPathExpansionImpl()
 
   override val engineEditorHelper: EngineEditorHelper
-    get() = service<IjEditorHelper>()
+    get() = service()
   override val editorGroup: VimEditorGroup
     get() = service()
   override val pluginActivator: VimPluginActivator

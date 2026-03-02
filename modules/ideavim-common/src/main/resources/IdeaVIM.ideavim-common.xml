@@ -10,11 +10,6 @@
   <!-- Shared code and extension points loaded in ALL product modes (monolith, client, backend).
        Extension point declarations must be here so both frontend and backend can contribute to them. -->
 
-  <applicationListeners>
-    <listener class="com.maddyhome.idea.vim.thinapi.IjPluginListener"
-              topic="com.intellij.ide.plugins.DynamicPluginListener"/>
-  </applicationListeners>
-
   <extensionPoints>
     <extensionPoint name="vimExtension" beanClass="com.maddyhome.idea.vim.extension.ExtensionBeanClass" dynamic="true">
       <with attribute="implementation" implements="com.maddyhome.idea.vim.extension.VimExtension"/>
@@ -35,23 +30,26 @@
          Backend-only services are registered in ideavim-backend.xml. -->
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.VimJumpServiceSplitClient"
                         serviceInterface="com.maddyhome.idea.vim.api.VimJumpService"/>
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.RegisterGroup"
-                        serviceInterface="com.maddyhome.idea.vim.register.VimRegisterGroup"/>
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.newapi.IjVimSearchGroup"/>
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.HistoryGroup"/>
+    <!-- Platform-managed coroutine scope for split-mode RPC clients -->
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.CoroutineScopeProvider"/>
 
+    <!-- Services needed by BOTH frontend and backend (implementation classes in common module) -->
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.OptionGroup"
                         serviceInterface="com.maddyhome.idea.vim.api.VimOptionGroup"/>
-    <!-- Transitive dependencies of OptionGroup (accessed during construction via VimOptionGroupBase) -->
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.newapi.IjNativeActionManager"
+                        serviceInterface="com.maddyhome.idea.vim.api.NativeActionManager"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.helper.IjActionExecutor"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimActionExecutor"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.IjVimStorageService"
                         serviceInterface="com.maddyhome.idea.vim.api.VimStorageService"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.IjVimSystemInfoService"
                         serviceInterface="com.maddyhome.idea.vim.api.SystemInfoService"/>
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.IjVimRedrawService"
-                        serviceInterface="com.maddyhome.idea.vim.api.VimRedrawService"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.newapi.IjExecutionContextManager"
+                        serviceInterface="com.maddyhome.idea.vim.api.ExecutionContextManager"/>
 
-    <!-- Platform-managed coroutine scope for split-mode RPC clients -->
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.CoroutineScopeProvider"/>
+    <!-- Default fallback services — overridden by frontend module with full UI implementations -->
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.newapi.BackendVimMessages"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimMessages"/>
 
   </extensions>
 

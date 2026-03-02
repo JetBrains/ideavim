@@ -23,8 +23,8 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimFileBase
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.globalIjOptions
+import com.maddyhome.idea.vim.newapi.vim
 import kotlinx.coroutines.runBlocking
 
 /**
@@ -113,7 +113,7 @@ internal class FileGroupSplitClient : VimFileBase() {
     val feditors = fMgr.openFile(virtualFile, true)
     if (feditors.isNotEmpty() && feditors[0] is TextEditor) {
       val editor = (feditors[0] as TextEditor).editor
-      if (!editor.isDisposed) return IjVimEditor(editor)
+      if (!editor.isDisposed) return editor.vim
     }
     return null
   }

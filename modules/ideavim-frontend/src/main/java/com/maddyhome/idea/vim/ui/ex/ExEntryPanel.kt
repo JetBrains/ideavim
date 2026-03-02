@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.api.VimCommandLine
 import com.maddyhome.idea.vim.api.VimCommandLineCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimKeyGroupBase
+import com.maddyhome.idea.vim.api.VimSearchGroupBase
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ranges.LineRange
@@ -179,7 +180,7 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
           resetCaretOffset(editor)
         }
 
-        VimPlugin.getSearch().resetIncsearchHighlights()
+        (VimPlugin.getSearch() as VimSearchGroupBase).resetIncsearchHighlights()
       }
 
       entry.deactivate()
@@ -268,7 +269,7 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
             // there is no search range (because the user entered an invalid range, e.g. mark not set).
             // E.g. Highlight `whatever`, type `:%s/foo` + highlight `foo`, delete back to `:%s/` and reset highlights
             // back to `whatever`
-            VimPlugin.getSearch().resetIncsearchHighlights()
+            (VimPlugin.getSearch() as VimSearchGroupBase).resetIncsearchHighlights()
             resetCaretOffset(editor)
             return
           }

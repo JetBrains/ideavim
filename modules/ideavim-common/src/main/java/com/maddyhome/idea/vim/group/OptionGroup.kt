@@ -46,7 +46,6 @@ import com.maddyhome.idea.vim.api.OptionValue
 import com.maddyhome.idea.vim.api.OptionValueOverride
 import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.VimOptionGroupBase
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ExException
@@ -66,18 +65,6 @@ import java.io.IOException
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.util.*
-
-internal interface IjVimOptionGroup : VimOptionGroup {
-  /**
-   * Return an accessor for options that only have a global value
-   */
-  fun getGlobalIjOptions(): GlobalIjOptions
-
-  /**
-   * Return an accessor for the effective value of local options
-   */
-  fun getEffectiveIjOptions(editor: VimEditor): EffectiveIjOptions
-}
 
 private interface InternalOptionValueAccessor {
   fun <T : VimDataType> getOptionValueInternal(option: Option<T>, scope: OptionAccessScope): OptionValue<T>
@@ -1372,33 +1359,4 @@ private class FoldLevelOptionMapper : LocalOptionValueOverride<VimInt> {
     newValue: OptionValue<VimInt>,
   ): Boolean = storedValue == null ||
     (storedValue is OptionValue.Default && newValue is OptionValue.Default)
-}
-
-
-class IjOptionConstants {
-  @Suppress("SpellCheckingInspection", "MemberVisibilityCanBePrivate", "ConstPropertyName")
-  companion object {
-
-    const val idearefactormode_keep: String = "keep"
-    const val idearefactormode_select: String = "select"
-    const val idearefactormode_visual: String = "visual"
-
-    const val ideastatusicon_enabled: String = "enabled"
-    const val ideastatusicon_gray: String = "gray"
-    const val ideastatusicon_disabled: String = "disabled"
-
-    const val ideavimsupport_dialog: String = "dialog"
-    const val ideavimsupport_singleline: String = "singleline"
-    const val ideavimsupport_dialoglegacy: String = "dialoglegacy"
-
-    const val ideawrite_all: String = "all"
-    const val ideawrite_file: String = "file"
-
-    val ideaStatusIconValues: Set<String> = setOf(ideastatusicon_enabled, ideastatusicon_gray, ideastatusicon_disabled)
-    val ideaRefactorModeValues: Set<String> =
-      setOf(idearefactormode_keep, idearefactormode_select, idearefactormode_visual)
-    val ideaWriteValues: Set<String> = setOf(ideawrite_all, ideawrite_file)
-    val ideavimsupportValues: Set<String> =
-      setOf(ideavimsupport_dialog, ideavimsupport_singleline, ideavimsupport_dialoglegacy)
-  }
 }

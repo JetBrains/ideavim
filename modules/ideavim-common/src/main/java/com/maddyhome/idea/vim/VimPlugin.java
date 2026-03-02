@@ -22,10 +22,15 @@ import com.intellij.openapi.util.Disposer;
 import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.config.VimState;
 import com.maddyhome.idea.vim.config.migration.ApplicationConfigurationMigrator;
-import com.maddyhome.idea.vim.group.*;
+import com.maddyhome.idea.vim.group.VimNotifications;
+import com.maddyhome.idea.vim.group.VimWindowGroup;
+import com.maddyhome.idea.vim.history.VimHistory;
+import com.maddyhome.idea.vim.macro.VimMacro;
 import com.maddyhome.idea.vim.newapi.IjVimInjectorKt;
-import com.maddyhome.idea.vim.newapi.IjVimSearchGroup;
+import com.maddyhome.idea.vim.newapi.VimLegacyStateLoader;
+import com.maddyhome.idea.vim.newapi.VimSearchGroupLegacyLoader;
 import com.maddyhome.idea.vim.put.VimPut;
+import com.maddyhome.idea.vim.register.VimRegisterGroup;
 import com.maddyhome.idea.vim.vimscript.services.VariableService;
 import com.maddyhome.idea.vim.yank.YankGroupBase;
 import org.jdom.Element;
@@ -81,52 +86,49 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
 
-  public static @NotNull MotionGroup getMotion() {
-    return ApplicationManager.getApplication().getService(MotionGroup.class);
-  }
-
-  public static @NotNull XMLGroup getXML() {
-    return ApplicationManager.getApplication().getService(XMLGroup.class);
+  public static @NotNull VimMotionGroup getMotion() {
+    return VimInjectorKt.getInjector().getMotion();
   }
 
   public static @NotNull VimChangeGroup getChange() {
     return VimInjectorKt.getInjector().getChangeGroup();
   }
 
-  public static @NotNull CommandGroup getCommand() {
-    return ApplicationManager.getApplication().getService(CommandGroup.class);
+  public static @NotNull VimCommandGroup getCommand() {
+    return VimInjectorKt.getInjector().getCommandGroup();
   }
 
-  public static @NotNull RegisterGroup getRegister() {
-    return ((RegisterGroup)VimInjectorKt.getInjector().getRegisterGroup());
+  public static @NotNull VimRegisterGroup getRegister() {
+    return VimInjectorKt.getInjector().getRegisterGroup();
   }
 
   public static @NotNull VimFile getFile() {
     return VimInjectorKt.getInjector().getFile();
   }
 
-  public static @NotNull IjVimSearchGroup getSearch() {
-    return ApplicationManager.getApplication().getService(IjVimSearchGroup.class);
+  public static @NotNull VimSearchGroup getSearch() {
+    return VimInjectorKt.getInjector().getSearchGroup();
   }
 
-  public static @Nullable IjVimSearchGroup getSearchIfCreated() {
-    return ApplicationManager.getApplication().getServiceIfCreated(IjVimSearchGroup.class);
+  public static @Nullable VimSearchGroup getSearchIfCreated() {
+    VimSearchGroup searchGroup = ApplicationManager.getApplication().getServiceIfCreated(VimSearchGroup.class);
+    return searchGroup;
   }
 
   public static @NotNull VimProcessGroup getProcess() {
     return VimInjectorKt.getInjector().getProcessGroup();
   }
 
-  public static @NotNull MacroGroup getMacro() {
-    return (MacroGroup)VimInjectorKt.getInjector().getMacro();
+  public static @NotNull VimMacro getMacro() {
+    return VimInjectorKt.getInjector().getMacro();
   }
 
   public static @NotNull VimDigraphGroup getDigraph() {
     return VimInjectorKt.getInjector().getDigraphGroup();
   }
 
-  public static @NotNull HistoryGroup getHistory() {
-    return ApplicationManager.getApplication().getService(HistoryGroup.class);
+  public static @NotNull VimHistory getHistory() {
+    return VimInjectorKt.getInjector().getHistoryGroup();
   }
 
   public static @NotNull VimKeyGroup getKey() {
@@ -322,9 +324,18 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
       // Migrate settings from 4 to 5 version
       VimInjectorKt.getInjector().getMarkService().loadLegacyState(element);
       VimInjectorKt.getInjector().getJumpService().loadLegacyState(element);
-      getRegister().readData(element);
-      getSearch().readData(element);
-      getHistory().readData(element);
+      VimRegisterGroup register = getRegister();
+      if (register instanceof VimLegacyStateLoader registerLoader) {
+        registerLoader.readData(element);
+      }
+      VimSearchGroup search = getSearch();
+      if (search instanceof VimSearchGroupLegacyLoader legacyLoader) {
+        legacyLoader.readData(element);
+      }
+      VimHistory history = getHistory();
+      if (history instanceof VimLegacyStateLoader historyLoader) {
+        historyLoader.readData(element);
+      }
     }
     if (element.getChild("shortcut-conflicts") != null) {
       getKey().loadShortcutConflictsData(element);
