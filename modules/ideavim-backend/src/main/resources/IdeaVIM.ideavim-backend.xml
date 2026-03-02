@@ -19,8 +19,6 @@
   <projectListeners>
     <listener class="com.maddyhome.idea.vim.group.JumpsListener"
               topic="com.intellij.openapi.fileEditor.impl.IdeDocumentHistoryImpl$RecentPlacesListener"/>
-    <listener class="com.maddyhome.idea.vim.group.VimMarkServiceImpl$VimBookmarksListener"
-              topic="com.intellij.ide.bookmark.BookmarksListener"/>
   </projectListeners>
 
   <extensions defaultExtensionNs="com.intellij">
@@ -31,9 +29,6 @@
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.VimJumpServiceImpl"
                         serviceInterface="com.maddyhome.idea.vim.api.VimJumpService"
                         overrides="true"/>
-
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.VimMarkServiceImpl"
-                        serviceInterface="com.maddyhome.idea.vim.api.VimMarkService"/>
 
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.FileGroup"
                         serviceInterface="com.maddyhome.idea.vim.api.VimFile"/>
@@ -46,13 +41,13 @@
     <platform.rpc.backend.remoteApiProvider
         implementation="com.maddyhome.idea.vim.group.JumpRemoteApiProvider"/>
 
-    <!-- RPC: expose mark operations to thin-client frontend -->
-    <platform.rpc.backend.remoteApiProvider
-        implementation="com.maddyhome.idea.vim.group.MarkRemoteApiProvider"/>
-
     <!-- RPC: expose file operations to thin-client frontend -->
     <platform.rpc.backend.remoteApiProvider
         implementation="com.maddyhome.idea.vim.group.FileRemoteApiProvider"/>
+
+    <!-- RPC: expose bookmark creation to thin-client frontend -->
+    <platform.rpc.backend.remoteApiProvider
+        implementation="com.maddyhome.idea.vim.group.BookmarkRemoteApiProvider"/>
 
   </extensions>
 </idea-plugin>

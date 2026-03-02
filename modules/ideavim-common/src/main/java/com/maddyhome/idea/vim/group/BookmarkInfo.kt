@@ -11,11 +11,11 @@ package com.maddyhome.idea.vim.group
 import kotlinx.serialization.Serializable
 
 /**
- * Serializable data transfer object for mark information over RPC.
- * All fields are primitives, so it is directly serializable by the Fleet RPC framework.
+ * Serializable data transfer object for bookmark information over RPC.
+ * Returned by [BookmarkRemoteApi.createOrGetSystemMark] to confirm bookmark creation.
  */
 @Serializable
-data class MarkInfo(
+data class BookmarkInfo(
   val key: Char,
   val line: Int,
   val col: Int,

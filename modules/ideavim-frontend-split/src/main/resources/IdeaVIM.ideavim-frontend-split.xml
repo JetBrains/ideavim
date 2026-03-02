@@ -10,11 +10,13 @@
   <dependencies>
     <module name="intellij.platform.frontend.split"/>
     <module name="IdeaVIM.ideavim-common"/>
+    <module name="IdeaVIM.ideavim-frontend"/>
   </dependencies>
 
   <extensions defaultExtensionNs="com.intellij">
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.VimMarkServiceSplitClient"
-                        serviceInterface="com.maddyhome.idea.vim.api.VimMarkService"/>
+                        serviceInterface="com.maddyhome.idea.vim.api.VimMarkService"
+                        overrides="true"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.FileGroupSplitClient"
                         serviceInterface="com.maddyhome.idea.vim.api.VimFile"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.ProcessGroupSplitClient"

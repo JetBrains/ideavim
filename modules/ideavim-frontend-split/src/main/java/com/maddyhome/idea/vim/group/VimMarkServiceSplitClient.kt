@@ -12,48 +12,81 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMarkServiceBase
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.mark.VimMark
+import com.maddyhome.idea.vim.newapi.globalIjOptions
 import kotlinx.coroutines.runBlocking
 
 /**
  * Thin-client mark service for split (Remote Development) mode.
  *
- * Extends [VimMarkServiceBase] for per-caret local state (visual selection marks,
- * change marks, mark updates on text changes). Global mark operations are forwarded
- * via [MarkRemoteApi] to the backend where `VimMarkServiceImpl` manages persistence
- * and IDE bookmark integration.
+ * Extends [VimMarkServiceBase] for all mark state management (local marks,
+ * global marks, mark updates on text changes). The only operation that needs
+ * the backend is IDE bookmark creation (`ideamarks` option), because
+ * [com.intellij.ide.bookmark.BookmarksManager] has no bookmark groups on
+ * the thin client.
  */
 internal class VimMarkServiceSplitClient : VimMarkServiceBase() {
 
+  override fun createGlobalMark(editor: VimEditor, char: Char, offset: Int): Mark? {
+    if (!injector.globalIjOptions().ideamarks) {
+      return super.createGlobalMark(editor, char, offset)
+    }
+    val lp = editor.offsetToBufferPosition(offset)
+    val virtualFile = editor.getVirtualFile() ?: return super.createGlobalMark(editor, char, offset)
+    val projectId = editor.projectId
+    val info = rpc { createOrGetSystemMark(char, lp.line, virtualFile.path, projectId) }
+      ?: return super.createGlobalMark(editor, char, offset)
+    // Use the backend's protocol (from BookmarkInfo) so cross-file navigation via
+    // selectEditor can find the file on the correct backend filesystem (file, jar, etc.).
+    return VimMark(info.key, info.line, lp.column, virtualFile.path, info.protocol)
+  }
+
   override fun getGlobalMark(char: Char): Mark? {
-    val info = rpc { getMark(null, char) } ?: return null
-    return VimMark(info.key, info.line, info.col, info.filepath, info.protocol)
+    if (!char.isGlobalMark()) return null
+
+    if (!injector.globalIjOptions().ideamarks) {
+      return super.getGlobalMark(char)
+    }
+
+    // When ideamarks is on, the backend's BookmarksManager is the source of truth.
+    // Query the backend for the current bookmark state so that IDE-UI-created
+    // bookmarks (which don't fire BookmarksListener on the thin client) are visible.
+    val info = rpc { getBookmarkForMark(char) }
+    if (info != null) {
+      val mark = VimMark(info.key, info.line, info.col, info.filepath, info.protocol)
+      globalMarks[char] = mark
+      return mark
+    }
+
+    // No IDE bookmark exists for this mark — clear stale local state if any.
+    globalMarks.remove(char)
+    return null
   }
 
   override fun getAllGlobalMarks(): Set<Mark> {
-    return rpc { getMarks(null) }.map { info ->
-      VimMark(info.key, info.line, info.col, info.filepath, info.protocol)
-    }.toSet()
-  }
+    if (!injector.globalIjOptions().ideamarks) {
+      return super.getAllGlobalMarks()
+    }
 
-  override fun setGlobalMark(mark: Mark): Boolean {
-    return rpc { setMark(null, mark.key, mark.filepath, mark.line, mark.col, mark.protocol) }
-  }
-
-  override fun setGlobalMark(editor: VimEditor, char: Char, offset: Int): Boolean {
-    val position = editor.offsetToBufferPosition(offset)
-    val filepath = editor.getVirtualFile()?.path ?: return false
-    val protocol = editor.getVirtualFile()?.protocol ?: "file"
-    return rpc { setMark(null, char, filepath, position.line, position.column, protocol) }
+    val bookmarks = rpc { getAllBookmarks() }
+    globalMarks.clear()
+    for (info in bookmarks) {
+      globalMarks[info.key] = VimMark(info.key, info.line, info.col, info.filepath, info.protocol)
+    }
+    return globalMarks.values.toSet()
   }
 
   override fun removeGlobalMark(char: Char) {
-    rpc { removeMark(null, char) }
+    if (injector.globalIjOptions().ideamarks) {
+      rpc { removeBookmark(char) }
+    }
+    super.removeGlobalMark(char)
   }
 
-  private fun <T> rpc(block: suspend MarkRemoteApi.() -> T): T {
+  private fun <T> rpc(block: suspend BookmarkRemoteApi.() -> T): T {
     val coroutineScope = ApplicationManager.getApplication().service<CoroutineScopeProvider>().coroutineScope
-    return runBlocking(coroutineScope.coroutineContext) { MarkRemoteApi.getInstance().block() }
+    return runBlocking(coroutineScope.coroutineContext) { BookmarkRemoteApi.getInstance().block() }
   }
 }

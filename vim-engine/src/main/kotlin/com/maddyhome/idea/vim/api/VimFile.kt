@@ -35,5 +35,5 @@ interface VimFile {
   /**
    * Focuses or opens a new VimEditor by [documentPath]
    */
-  fun selectEditor(projectId: String, documentPath: String, protocol: String?): VimEditor?
+  fun selectEditor(projectId: String, documentPath: String, protocol: String): VimEditor?
 }

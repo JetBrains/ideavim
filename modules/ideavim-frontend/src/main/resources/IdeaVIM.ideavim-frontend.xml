@@ -46,6 +46,7 @@
 
     <listener class="com.maddyhome.idea.vim.listener.IdeaSpecifics$LookupTopicListener"
               topic="com.intellij.codeInsight.lookup.LookupManagerListener"/>
+
   </projectListeners>
 
   <extensions defaultExtensionNs="com.intellij">
@@ -137,6 +138,9 @@
 
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.copy.PutGroup"
                         serviceInterface="com.maddyhome.idea.vim.put.VimPut"/>
+
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.VimMarkServiceImpl"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimMarkService"/>
 
     <!-- Frontend services moved from common (not used by backend) -->
     <applicationService serviceImplementation="com.maddyhome.idea.vim.api.VimDigraphGroupBase"

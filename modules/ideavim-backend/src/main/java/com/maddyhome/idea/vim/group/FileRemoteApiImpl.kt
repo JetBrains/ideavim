@@ -15,11 +15,8 @@ import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileEditorManager
-import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
-import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.openapi.vfs.VirtualFile
 import com.maddyhome.idea.vim.api.VimFile
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.newapi.vim
@@ -111,28 +108,28 @@ internal class FileRemoteApiImpl : FileRemoteApi {
       fileGroup.buildFileInfoMessage(editor.vim, fullPath)
     }
 
-  override suspend fun selectEditor(projectId: String, documentPath: String, protocol: String?): Boolean =
+  override suspend fun selectEditor(projectId: String, documentPath: String, protocol: String): Boolean =
     withContext(Dispatchers.EDT) {
-      val vimEditor = fileGroup.selectEditor(projectId, documentPath, protocol)
-      vimEditor != null
+      // Resolve VirtualFile and Project on the backend side, then call the raw
+      // selectEditor(Project, VirtualFile) overload that returns Editor?.
+      // We must NOT call the (projectId, documentPath, protocol) overload because
+      // it calls editor.vim which requires VimEditorFactory — a frontend-only service.
+      val virtualFile = findVirtualFile(documentPath, protocol) ?: return@withContext false
+      val project = findProjectById(projectId) ?: return@withContext false
+      val editor = fileGroup.selectEditor(project, virtualFile)
+      editor != null
     }
+
+  override suspend fun getProjectId(): String = withContext(Dispatchers.EDT) {
+    val project = ProjectManager.getInstance().openProjects.firstOrNull()
+      ?: error("No open projects on backend")
+    fileGroup.getProjectId(project)
+  }
 
   private fun findProject(projectBasePath: String?): Project? {
     val projects = ProjectManager.getInstance().openProjects
     if (projectBasePath == null) return projects.firstOrNull()
     return projects.firstOrNull { it.basePath == projectBasePath }
-  }
-
-  private fun findVirtualFile(filePath: String): VirtualFile? {
-    return LocalFileSystem.getInstance().findFileByPath(filePath)
-  }
-
-  private fun findEditorByFilePath(project: Project, filePath: String): Editor? {
-    val vf = findVirtualFile(filePath) ?: return null
-    return FileEditorManager.getInstance(project).getAllEditors(vf)
-      .filterIsInstance<TextEditor>()
-      .firstOrNull()
-      ?.editor
   }
 
   private fun buildContext(project: Project, editor: Editor?): IjEditorExecutionContext {

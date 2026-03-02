@@ -15,7 +15,6 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
-import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.maddyhome.idea.vim.VimPlugin
@@ -26,6 +25,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.vim
 import kotlinx.coroutines.runBlocking
+import java.nio.file.Path
 
 /**
  * Thin-client [VimFile][com.maddyhome.idea.vim.api.VimFile] for split (Remote Development) mode.
@@ -36,7 +36,7 @@ import kotlinx.coroutines.runBlocking
  *
  * Note: `projectBasePath` is always `null` because the thin client's project path
  * (sandbox path) differs from the backend's real project path. The backend resolves
- * `null` to its first open project, same as [VimMarkServiceSplitClient].
+ * `null` to its first open project.
  */
 internal class FileGroupSplitClient : VimFileBase() {
 
@@ -77,11 +77,33 @@ internal class FileGroupSplitClient : VimFileBase() {
   }
 
   override fun selectFile(count: Int, context: ExecutionContext): Boolean {
-    return rpc { selectFile(count, null) }
+    // Buffer selection is a local UI operation — the tab order lives on the thin client.
+    var idx = count
+    val project = PlatformDataKeys.PROJECT.getData(context.context as DataContext) ?: return false
+    val fem = FileEditorManager.getInstance(project)
+    val editors = fem.openFiles
+    if (idx == 99) {
+      idx = editors.size - 1
+    }
+    if (idx < 0 || idx >= editors.size) {
+      return false
+    }
+    fem.openFile(editors[idx], true)
+    return true
   }
 
   override fun selectNextFile(count: Int, context: ExecutionContext) {
-    rpc { selectNextFile(count, null) }
+    // Buffer navigation is a local UI operation — the tab order lives on the thin client.
+    val project = PlatformDataKeys.PROJECT.getData(context.context as DataContext) ?: return
+    val fem = FileEditorManager.getInstance(project)
+    val editors = fem.openFiles
+    val current = fem.selectedFiles.firstOrNull() ?: return
+    for (i in editors.indices) {
+      if (editors[i] == current) {
+        val pos = (i + (count % editors.size) + editors.size) % editors.size
+        fem.openFile(editors[pos], true)
+      }
+    }
   }
 
   override fun selectPreviousTab(context: ExecutionContext) {
@@ -99,28 +121,25 @@ internal class FileGroupSplitClient : VimFileBase() {
     }
   }
 
-  override fun selectEditor(projectId: String, documentPath: String, protocol: String?): VimEditor? {
-    // Forward to backend to open/select the file
+  override fun selectEditor(projectId: String, documentPath: String, protocol: String): VimEditor? {
+    // Ask the backend to open/focus the file (ensures it's available).
     val success = rpc { selectEditor(projectId, documentPath, protocol) }
     if (!success) return null
 
-    // Get local editor reference (platform syncs editor state from backend)
-    val fileSystem = VirtualFileManager.getInstance().getFileSystem(protocol) ?: return null
-    val virtualFile = fileSystem.findFileByPath(documentPath) ?: return null
-    val project = ProjectManager.getInstance().openProjects
-      .firstOrNull { getProjectId(it) == projectId } ?: return null
-    val fMgr = FileEditorManager.getInstance(project)
-    val feditors = fMgr.openFile(virtualFile, true)
-    if (feditors.isNotEmpty() && feditors[0] is TextEditor) {
-      val editor = (feditors[0] as TextEditor).editor
-      if (!editor.isDisposed) return editor.vim
-    }
+    val project = ProjectManager.getInstance().openProjects.firstOrNull() ?: return null
+
+    val virtualFile = VirtualFileManager.getInstance().findFileByNioPath(Path.of(documentPath))
+      ?: return null
+    val editors = FileEditorManager.getInstance(project).openFile(virtualFile, true)
+    val textEditor = editors.filterIsInstance<TextEditor>().firstOrNull()?.editor
+    if (textEditor != null && !textEditor.isDisposed) return textEditor.vim
     return null
   }
 
+  private val cachedProjectId by lazy { rpc { getProjectId() } }
+
   override fun getProjectId(project: Any): String {
-    require(project is Project)
-    return project.name + "-" + project.locationHash
+    return cachedProjectId
   }
 
   private fun <T> rpc(block: suspend FileRemoteApi.() -> T): T {

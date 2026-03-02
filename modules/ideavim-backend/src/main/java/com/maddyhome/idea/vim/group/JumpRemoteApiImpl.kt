@@ -9,19 +9,19 @@
 package com.maddyhome.idea.vim.group
 
 import com.intellij.openapi.fileEditor.ex.IdeDocumentHistory
-import com.intellij.openapi.project.ProjectManager
-import com.maddyhome.idea.vim.api.injector
 
 /**
  * RPC handler for [JumpRemoteApi].
  * Instantiated by [JumpRemoteApiProvider] during extension registration.
  * Delegates to [IdeDocumentHistory] on the backend where it is available.
+ *
+ * Note: Must NOT use [com.maddyhome.idea.vim.api.injector] — it is not initialized on the backend
+ * in split mode. Uses [findProjectById] from [BackendFileUtil] instead.
  */
 internal class JumpRemoteApiImpl : JumpRemoteApi {
   override suspend fun includeCurrentCommandAsNavigation(projectId: String?) {
     if (projectId == null) return
-    val project = ProjectManager.getInstance().openProjects
-      .firstOrNull { injector.file.getProjectId(it) == projectId } ?: return
+    val project = findProjectById(projectId) ?: return
     IdeDocumentHistory.getInstance(project).includeCurrentCommandAsNavigation()
   }
 }

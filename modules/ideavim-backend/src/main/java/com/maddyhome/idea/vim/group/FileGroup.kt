@@ -34,7 +34,6 @@ import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.newapi.execute
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.vim
-import java.util.*
 import kotlin.io.path.Path
 
 class FileGroup : VimFileBase() {
@@ -323,13 +322,16 @@ class FileGroup : VimFileBase() {
     return msg.toString()
   }
 
-  override fun selectEditor(projectId: String, documentPath: String, protocol: String?): VimEditor? {
-    val fileSystem = VirtualFileManager.getInstance().getFileSystem(protocol) ?: return null
-    val virtualFile = fileSystem.findFileByPath(documentPath) ?: return null
 
-    val project = Arrays.stream(ProjectManager.getInstance().openProjects)
-      .filter { p: Project? -> injector.file.getProjectId(p!!) == projectId }
-      .findFirst().orElseThrow()
+  override fun selectEditor(projectId: String, documentPath: String, protocol: String): VimEditor? {
+    // Try the requested protocol first, then fall back to common protocols.
+    // In split mode the thin client may pass "cwm" which doesn't exist on the backend.
+    val virtualFile = VirtualFileManager.getInstance().getFileSystem(protocol)?.findFileByPath(documentPath)
+      ?: VirtualFileManager.getInstance().getFileSystem("file")?.findFileByPath(documentPath)
+      ?: VirtualFileManager.getInstance().getFileSystem("jar")?.findFileByPath(documentPath)
+      ?: return null
+
+    val project = findProjectById(projectId) ?: return null
 
     val editor = selectEditor(project, virtualFile) ?: return null
     return editor.vim

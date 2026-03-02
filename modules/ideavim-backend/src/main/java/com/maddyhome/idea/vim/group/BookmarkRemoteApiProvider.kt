@@ -12,13 +12,13 @@ import com.intellij.platform.rpc.backend.RemoteApiProvider
 import fleet.rpc.remoteApiDescriptor
 
 /**
- * Registers [MarkRemoteApiImpl] as the backend RPC handler for [MarkRemoteApi].
+ * Registers [BookmarkRemoteApiImpl] as the backend RPC handler for [BookmarkRemoteApi].
  * Registered via `platform.rpc.backend.remoteApiProvider` extension point in ideavim-backend.xml.
  */
-internal class MarkRemoteApiProvider : RemoteApiProvider {
+internal class BookmarkRemoteApiProvider : RemoteApiProvider {
   override fun RemoteApiProvider.Sink.remoteApis() {
-    remoteApi(remoteApiDescriptor<MarkRemoteApi>()) {
-      MarkRemoteApiImpl()
+    remoteApi(remoteApiDescriptor<BookmarkRemoteApi>()) {
+      BookmarkRemoteApiImpl()
     }
   }
 }
