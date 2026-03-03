@@ -19,6 +19,7 @@ import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.waitAndAssert
 import org.junit.jupiter.api.Test
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -145,10 +146,31 @@ class CopyActionTest : VimTestCase() {
      one <caret>two
      three
      four
-     
+
       """.trimIndent(),
     )
     assertTrue(KeyHandler.getInstance().keyHandlerState.commandBuilder.isEmpty)
+  }
+
+  // Regression test: CommandBuilder.isEmpty must return false while waiting for a register character.
+  // Previously, isRegisterPending was not checked in isEmpty, so `"<Esc>` would incorrectly trigger
+  // an error indicator (beep) because EditorResetConsumer treated the builder as empty.
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
+  fun `test command builder is not empty while register is pending`() {
+    configureByText("hello world")
+    // Typing `"` starts register selection - command builder should NOT be empty
+    typeText("\"")
+    assertFalse(
+      KeyHandler.getInstance().keyHandlerState.commandBuilder.isEmpty,
+      "Command builder must not be empty while waiting for register character",
+    )
+    // Pressing Escape cancels register selection - command builder should be empty again
+    typeText("<Esc>")
+    assertTrue(
+      KeyHandler.getInstance().keyHandlerState.commandBuilder.isEmpty,
+      "Command builder must be empty after cancelling register selection",
+    )
   }
 
   @Test
