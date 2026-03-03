@@ -13,8 +13,6 @@
     <!-- Services that must be available in ALL product modes (used by both frontend and backend).
          Frontend-only services are registered in ideavim-frontend.xml.
          Backend-only services are registered in ideavim-backend.xml. -->
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.VimJumpServiceSplitClient"
-                        serviceInterface="com.maddyhome.idea.vim.api.VimJumpService"/>
     <!-- Platform-managed coroutine scope for split-mode RPC clients -->
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.CoroutineScopeProvider"/>
 

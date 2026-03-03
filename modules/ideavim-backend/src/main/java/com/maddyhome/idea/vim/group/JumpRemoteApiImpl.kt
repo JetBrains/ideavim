@@ -8,12 +8,16 @@
 
 package com.maddyhome.idea.vim.group
 
+import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.ex.IdeDocumentHistory
 
 /**
  * RPC handler for [JumpRemoteApi].
  * Instantiated by [JumpRemoteApiProvider] during extension registration.
  * Delegates to [IdeDocumentHistory] on the backend where it is available.
+ *
+ * [getListenerJumps] reads from [BackendJumpStorage] to return jumps
+ * collected by [JumpsListener] (IDE navigation events on the backend).
  *
  * Note: Must NOT use [com.maddyhome.idea.vim.api.injector] — it is not initialized on the backend
  * in split mode. Uses [findProjectById] from [BackendFileUtil] instead.
@@ -23,5 +27,12 @@ internal class JumpRemoteApiImpl : JumpRemoteApi {
     if (projectId == null) return
     val project = findProjectById(projectId) ?: return
     IdeDocumentHistory.getInstance(project).includeCurrentCommandAsNavigation()
+  }
+
+  override suspend fun getListenerJumps(projectId: String?): List<JumpInfo> {
+    if (projectId == null) return emptyList()
+    return service<BackendJumpStorage>().getJumps(projectId).map {
+      JumpInfo(it.line, it.col, it.filepath, it.protocol)
+    }
   }
 }

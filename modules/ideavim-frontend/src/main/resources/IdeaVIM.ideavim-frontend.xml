@@ -153,6 +153,9 @@
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.copy.PutGroup"
                         serviceInterface="com.maddyhome.idea.vim.put.VimPut"/>
 
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.VimJumpServiceImpl"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimJumpService"/>
+
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.VimMarkServiceImpl"
                         serviceInterface="com.maddyhome.idea.vim.api.VimMarkService"/>
 
