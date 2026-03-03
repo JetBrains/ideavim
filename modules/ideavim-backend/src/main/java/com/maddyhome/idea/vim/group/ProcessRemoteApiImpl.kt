@@ -22,7 +22,14 @@ internal class ProcessRemoteApiImpl : ProcessRemoteApi {
     command: String,
     input: String?,
     currentDirectoryPath: String?,
-  ): String? {
-    return (service<VimProcessGroup>() as ProcessGroup).executeCommand(command, input, currentDirectoryPath)
+    shell: String,
+    shellcmdflag: String,
+    shellxescape: String,
+    shellxquote: String,
+  ): ProcessResult {
+    return (service<VimProcessGroup>() as ProcessGroup).executeCommand(
+      command, input, currentDirectoryPath,
+      shell, shellcmdflag, shellxescape, shellxquote,
+    )
   }
 }

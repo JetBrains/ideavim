@@ -85,6 +85,7 @@ internal data class CmdFilterCommand(val range: Range, val modifier: CommandModi
           outputPanel.addText(it)
           outputPanel.show()
         }
+        showExitCodeMessage(editor)
         lastCommand = command
         ExecutionResult.Success
       } else {
@@ -102,6 +103,7 @@ internal data class CmdFilterCommand(val range: Range, val modifier: CommandModi
             }
           }
         }
+        showExitCodeMessage(editor)
         lastCommand = command
         ExecutionResult.Success
       }
@@ -109,6 +111,14 @@ internal data class CmdFilterCommand(val range: Range, val modifier: CommandModi
       throw ExException("Command terminated")
     } catch (e: Exception) {
       throw ExException(e.message)
+    }
+  }
+
+  private fun showExitCodeMessage(editor: VimEditor) {
+    val exitCode = injector.processGroup.lastExitCode
+    if (exitCode != null && exitCode != 0) {
+      injector.messages.showMessage(editor, "shell returned $exitCode")
+      injector.messages.indicateError()
     }
   }
 

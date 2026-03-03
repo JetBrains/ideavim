@@ -12,6 +12,8 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimProcessGroupBase
+import com.maddyhome.idea.vim.api.globalOptions
+import com.maddyhome.idea.vim.api.injector
 import kotlinx.coroutines.runBlocking
 
 /**
@@ -19,6 +21,11 @@ import kotlinx.coroutines.runBlocking
  *
  * Forwards shell command execution to the backend via [ProcessRemoteApi] RPC,
  * where the real [ProcessGroup] runs the command in the backend's environment.
+ * Shell options are read from `injector` on the frontend (where it is initialized)
+ * and passed to the backend as RPC parameters.
+ *
+ * Exit code is exposed via [lastExitCode] so callers in `ideavim-frontend`
+ * can display "shell returned X" messages — keeping message display in the frontend module.
  *
  * In monolith mode this class is never loaded — the backend's [ProcessGroup]
  * is used directly instead.
@@ -31,9 +38,15 @@ internal class ProcessGroupSplitClient : VimProcessGroupBase() {
     input: CharSequence?,
     currentDirectoryPath: String?,
   ): String? {
+    val options = injector.globalOptions()
     val coroutineScope = ApplicationManager.getApplication().service<CoroutineScopeProvider>().coroutineScope
-    return runBlocking(coroutineScope.coroutineContext) {
-      ProcessRemoteApi.getInstance().executeCommand(command, input?.toString(), currentDirectoryPath)
+    val result = runBlocking(coroutineScope.coroutineContext) {
+      ProcessRemoteApi.getInstance().executeCommand(
+        command, input?.toString(), currentDirectoryPath,
+        options.shell, options.shellcmdflag, options.shellxescape, options.shellxquote,
+      )
     }
+    lastExitCode = result.exitCode
+    return result.output
   }
 }

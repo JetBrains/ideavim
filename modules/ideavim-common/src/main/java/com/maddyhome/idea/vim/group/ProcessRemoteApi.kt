@@ -12,14 +12,27 @@ import com.intellij.platform.rpc.RemoteApiProviderService
 import fleet.rpc.RemoteApi
 import fleet.rpc.Rpc
 import fleet.rpc.remoteApiDescriptor
+import kotlinx.serialization.Serializable
 import org.jetbrains.annotations.ApiStatus
+
+/**
+ * Serializable result of a shell command execution over RPC.
+ * Carries both the command output and any status info (exit code)
+ * so the frontend can display appropriate messages.
+ */
+@Serializable
+data class ProcessResult(
+  val output: String? = null,
+  val exitCode: Int? = null,
+)
 
 /**
  * RPC interface for executing shell commands on the backend.
  * Called directly by Ex commands (`:!`, `:read !cmd`) to forward
  * shell execution to the backend where the real [ProcessGroup] runs.
  *
- * All parameters are primitives (serializable by default).
+ * Shell options (`shell`, `shellcmdflag`, etc.) are passed from the frontend
+ * because `injector` (which holds Vim options) is not initialized on the backend.
  */
 @Rpc
 @ApiStatus.Internal
@@ -28,7 +41,11 @@ interface ProcessRemoteApi : RemoteApi<Unit> {
     command: String,
     input: String?,
     currentDirectoryPath: String?,
-  ): String?
+    shell: String,
+    shellcmdflag: String,
+    shellxescape: String,
+    shellxquote: String,
+  ): ProcessResult
 
   companion object {
     @JvmStatic

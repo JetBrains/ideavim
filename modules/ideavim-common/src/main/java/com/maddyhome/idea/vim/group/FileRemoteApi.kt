@@ -30,7 +30,12 @@ import org.jetbrains.annotations.ApiStatus
 interface FileRemoteApi : RemoteApi<Unit> {
 
   suspend fun findFile(filename: String, projectBasePath: String?): String?
-  suspend fun openFile(filename: String, projectBasePath: String?, focusEditor: Boolean = true): Boolean
+
+  /**
+   * Opens a file on the backend.
+   * @return null on success, or an error message to display on the frontend
+   */
+  suspend fun openFile(filename: String, projectBasePath: String?, focusEditor: Boolean = true): String?
   suspend fun closeCurrentFile(projectBasePath: String?, filePath: String?)
   suspend fun closeFile(number: Int, projectBasePath: String?)
   suspend fun saveFile(projectBasePath: String?, filePath: String?, saveAll: Boolean)

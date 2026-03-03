@@ -25,11 +25,11 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.ProjectScope
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimFileBase
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.helper.EngineMessageHelper
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.newapi.execute
 import com.maddyhome.idea.vim.newapi.globalIjOptions
@@ -37,12 +37,12 @@ import com.maddyhome.idea.vim.newapi.vim
 import kotlin.io.path.Path
 
 class FileGroup : VimFileBase() {
-  override fun openFile(filename: String, context: ExecutionContext, focusEditor: Boolean): Boolean {
+  override fun openFile(filename: String, context: ExecutionContext, focusEditor: Boolean): String? {
     if (logger.isDebugEnabled) {
       logger.debug("openFile($filename)")
     }
     val project = PlatformDataKeys.PROJECT.getData((context as IjEditorExecutionContext).context)
-      ?: return false // API change - don't merge
+      ?: return "No project" // API change - don't merge
 
     val found = findFile(filename, project)
 
@@ -57,17 +57,12 @@ class FileGroup : VimFileBase() {
       if (type != null) {
         val fem = FileEditorManager.getInstance(project)
         fem.openFile(found, focusEditor)
-
-        return true
-      } else {
-        // There was no type and user didn't pick one. Don't open the file
-        // Return true here because we found the file but the user canceled by not picking a type.
-        return true
       }
-    } else {
-      injector.messages.showStatusBarMessage(null, injector.messages.message("message.open.file.not.found", filename))
 
-      return false
+      // Return null (success) whether we opened the file or user cancelled the type picker
+      return null
+    } else {
+      return EngineMessageHelper.message("message.open.file.not.found", filename)
     }
   }
 
@@ -242,14 +237,14 @@ class FileGroup : VimFileBase() {
   /**
    * Selects previous editor tab.
    */
-  override fun selectPreviousTab(context: ExecutionContext) {
-    val project = PlatformDataKeys.PROJECT.getData((context.context as DataContext)) ?: return
+  override fun selectPreviousTab(context: ExecutionContext): Boolean {
+    val project = PlatformDataKeys.PROJECT.getData((context.context as DataContext)) ?: return false
     val vf = LastTabService.getInstance(project).lastTab
     if (vf != null && vf.isValid) {
       FileEditorManager.getInstance(project).openFile(vf, true)
-    } else {
-      VimPlugin.indicateError()
+      return true
     }
+    return false
   }
 
   fun selectEditor(project: Project, file: VirtualFile): Editor? {
@@ -267,8 +262,8 @@ class FileGroup : VimFileBase() {
     return null
   }
 
-  override fun displayFileInfo(vimEditor: VimEditor, fullPath: Boolean) {
-    VimPlugin.showMessage(buildFileInfoMessage(vimEditor, fullPath))
+  override fun displayFileInfo(vimEditor: VimEditor, fullPath: Boolean): String {
+    return buildFileInfoMessage(vimEditor, fullPath)
   }
 
   /**

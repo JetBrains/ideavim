@@ -15,9 +15,11 @@ import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.maddyhome.idea.vim.api.VimFile
+import com.maddyhome.idea.vim.helper.EngineMessageHelper
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.newapi.vim
 import kotlinx.coroutines.Dispatchers
@@ -44,12 +46,20 @@ internal class FileRemoteApiImpl : FileRemoteApi {
     fileGroup.findFile(filename, project)?.path
   }
 
-  override suspend fun openFile(filename: String, projectBasePath: String?, focusEditor: Boolean): Boolean =
+  override suspend fun openFile(filename: String, projectBasePath: String?, focusEditor: Boolean): String? =
     withContext(Dispatchers.EDT) {
-    val project = findProject(projectBasePath) ?: return@withContext false
-    val context = buildContext(project, null)
-      fileGroup.openFile(filename, context, focusEditor)
-  }
+      val project = findProject(projectBasePath) ?: return@withContext "No project found"
+      val found = fileGroup.findFile(filename, project)
+      if (found != null) {
+        val type = FileTypeManager.getInstance().getKnownFileTypeOrAssociate(found, project)
+        if (type != null) {
+          FileEditorManager.getInstance(project).openFile(found, focusEditor)
+        }
+        null // success
+      } else {
+        EngineMessageHelper.message("message.open.file.not.found", filename)
+      }
+    }
 
   override suspend fun closeCurrentFile(projectBasePath: String?, filePath: String?) = withContext(Dispatchers.EDT) {
     val project = findProject(projectBasePath) ?: return@withContext

@@ -17,7 +17,6 @@ import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.vfs.VirtualFileManager
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimFileBase
@@ -44,7 +43,7 @@ internal class FileGroupSplitClient : VimFileBase() {
     return rpc { findFile(filename, null) }
   }
 
-  override fun openFile(filename: String, context: ExecutionContext, focusEditor: Boolean): Boolean {
+  override fun openFile(filename: String, context: ExecutionContext, focusEditor: Boolean): String? {
     return rpc { openFile(filename, null, focusEditor) }
   }
 
@@ -106,19 +105,13 @@ internal class FileGroupSplitClient : VimFileBase() {
     }
   }
 
-  override fun selectPreviousTab(context: ExecutionContext) {
-    val success = rpc { selectPreviousTab(null) }
-    if (!success) {
-      VimPlugin.indicateError()
-    }
+  override fun selectPreviousTab(context: ExecutionContext): Boolean {
+    return rpc { selectPreviousTab(null) }
   }
 
-  override fun displayFileInfo(vimEditor: VimEditor, fullPath: Boolean) {
+  override fun displayFileInfo(vimEditor: VimEditor, fullPath: Boolean): String? {
     val filePath = vimEditor.getVirtualFile()?.path
-    val message = rpc { buildFileInfoMessage(null, filePath, fullPath) }
-    if (message != null) {
-      VimPlugin.showMessage(message)
-    }
+    return rpc { buildFileInfoMessage(null, filePath, fullPath) }
   }
 
   override fun selectEditor(projectId: String, documentPath: String, protocol: String): VimEditor? {

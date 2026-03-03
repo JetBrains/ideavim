@@ -69,7 +69,13 @@ data class ReadCommand(val range: Range, val modifier: CommandModifier, val argu
   }
 
   private fun executeShellCommand(editor: VimEditor, command: String): String {
-    return injector.processGroup.executeCommand(editor, command, null, null) ?: ""
+    val output = injector.processGroup.executeCommand(editor, command, null, null) ?: ""
+    val exitCode = injector.processGroup.lastExitCode
+    if (exitCode != null && exitCode != 0) {
+      injector.messages.showMessage(editor, "shell returned $exitCode")
+      injector.messages.indicateError()
+    }
+    return output
   }
 
   private fun readFileContent(filePath: String): String {
