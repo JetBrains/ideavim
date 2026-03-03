@@ -7,10 +7,10 @@
  */
 package com.maddyhome.idea.vim.extension
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.extensions.ExtensionPointListener
 import com.intellij.openapi.extensions.PluginDescriptor
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimExtensionRegistrator
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.setToggleOption
@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.options.OptionDeclaredScope
 import com.maddyhome.idea.vim.options.ToggleOption
 import com.maddyhome.idea.vim.statistic.ExtensionTracking
 
-object VimExtensionRegistrar : VimExtensionRegistrator {
+class VimExtensionRegistrar : VimExtensionRegistrator {
   internal val registeredExtensions: MutableSet<String> = HashSet()
   internal val extensionAliases = HashMap<String, String>()
   private var extensionRegistered = false
@@ -28,7 +28,6 @@ object VimExtensionRegistrar : VimExtensionRegistrator {
 
   private val delayedExtensionEnabling = mutableListOf<ExtensionBeanClass>()
 
-  @JvmStatic
   fun registerExtensions() {
     if (extensionRegistered) return
     extensionRegistered = true
@@ -46,7 +45,7 @@ object VimExtensionRegistrar : VimExtensionRegistrator {
         }
       },
       false,
-      VimPlugin.getInstance(),
+      ApplicationManager.getApplication(),
     )
   }
 
@@ -63,8 +62,8 @@ object VimExtensionRegistrar : VimExtensionRegistrator {
     registeredExtensions.add(name)
     registerAliases(extensionBean)
     val option = ToggleOption(name, OptionDeclaredScope.GLOBAL, getAbbrev(name), false)
-    VimPlugin.getOptionGroup().addOption(option)
-    VimPlugin.getOptionGroup().addGlobalOptionChangeListener(option) {
+    injector.optionGroup.addOption(option)
+    injector.optionGroup.addGlobalOptionChangeListener(option) {
       if (injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(null)).booleanValue) {
         initExtension(extensionBean, name)
         ExtensionTracking.enabledExtensions.add(name)
@@ -108,7 +107,7 @@ object VimExtensionRegistrar : VimExtensionRegistrator {
     registeredExtensions.remove(name)
     removeAliases(extension)
     extension.instance.dispose()
-    VimPlugin.getOptionGroup().removeOption(name)
+    injector.optionGroup.removeOption(name)
     remove(name)
     logger.info("IdeaVim extension '$name' disposed")
   }

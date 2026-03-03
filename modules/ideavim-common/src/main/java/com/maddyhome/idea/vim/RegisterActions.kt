@@ -7,9 +7,12 @@
  */
 package com.maddyhome.idea.vim
 
+import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.RegisterActions.registerActions
 import com.maddyhome.idea.vim.action.CommandProvider
 import com.maddyhome.idea.vim.action.EngineCommandProvider
+import com.maddyhome.idea.vim.api.VimKeyGroup
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.key.MappingOwner
 import java.awt.event.KeyEvent
@@ -51,18 +54,18 @@ object RegisterActions {
 
   @JvmStatic
   fun unregisterActions() {
-    val keyGroup = VimPlugin.getKeyIfCreated()
+    val keyGroup = ApplicationManager.getApplication().getServiceIfCreated(VimKeyGroup::class.java)
     keyGroup?.unregisterCommandActions()
   }
 
   private fun registerVimCommandActions() {
-    val parser = VimPlugin.getKey()
+    val parser = injector.keyGroup
     EngineCommandProvider.getCommands().forEach { parser.registerCommandAction(it) }
     additionalCommandProviders.flatMap { it.getCommands() }.forEach { parser.registerCommandAction(it) }
   }
 
   private fun registerShortcutsWithoutActions() {
-    val parser = VimPlugin.getKey()
+    val parser = injector.keyGroup
 
     // The {char1} <BS> {char2} shortcut is handled directly by KeyHandler#handleKey, so doesn't have an action. But we
     // still need to register the shortcut, to make sure the editor doesn't swallow it.

@@ -36,7 +36,6 @@ import com.intellij.openapi.vfs.encoding.EncodingUtil.Magic8
 import com.intellij.util.ArrayUtil
 import com.intellij.util.LineSeparator
 import com.intellij.util.PatternUtil
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.GlobalLocalOptionToGlobalLocalExternalSettingMapper
 import com.maddyhome.idea.vim.api.GlobalOptionToGlobalLocalExternalSettingMapper
 import com.maddyhome.idea.vim.api.GlobalOptionValueOverride
@@ -165,7 +164,7 @@ class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup, InternalOptionValueA
       if (!injector.editorGroup.getEditorsRaw()
           .any { it.ij != editor && it.ij.project === project && it.ij.editorKind == EditorKind.MAIN_EDITOR }
       ) {
-        (VimPlugin.getOptionGroup() as OptionGroup).updateFallbackWindow(injector.fallbackWindow, editor.vim)
+        (injector.optionGroup as OptionGroup).updateFallbackWindow(injector.fallbackWindow, editor.vim)
       }
     }
   }
@@ -272,7 +271,7 @@ private abstract class LocalOptionToGlobalLocalIdeaSettingMapper<T : VimDataType
           is OptionValue.InitVimRc -> OptionValue.InitVimRc(globalValue)
           is OptionValue.External -> null
           is OptionValue.User -> null
-        } ?: if (VimPlugin.isNotEnabled()) OptionValue.Default(globalValue) else null
+        } ?: if (!injector.enabler.isEnabled()) OptionValue.Default(globalValue) else null
         if (newValue != null) {
           resetLocalExternalValueToGlobal(editor)
           internalOptionValueAccessor.setOptionValueInternal(

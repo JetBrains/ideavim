@@ -12,6 +12,17 @@
     <module name="IdeaVIM.ideavim-common"/>
   </dependencies>
 
+  <!-- Extension points only used by frontend -->
+  <extensionPoints>
+    <extensionPoint name="vimExtension" beanClass="com.maddyhome.idea.vim.extension.ExtensionBeanClass" dynamic="true">
+      <with attribute="implementation" implements="com.maddyhome.idea.vim.extension.VimExtension"/>
+    </extensionPoint>
+    <extensionPoint interface="com.maddyhome.idea.vim.ide.ClionNovaProvider" dynamic="true" name="clionNovaProvider"/>
+    <extensionPoint interface="com.maddyhome.idea.vim.ide.RiderProvider" dynamic="true" name="riderProvider"/>
+    <extensionPoint interface="com.maddyhome.idea.vim.key.IdeaVimDisablerExtensionPoint" dynamic="true"
+                    name="internal.disabler"/>
+  </extensionPoints>
+
   <!-- Frontend registrations: UI, editor, key handling, status bar, actions.
        These load in client + monolith mode only. This is the bulk of IdeaVim. -->
   <applicationListeners>
@@ -57,6 +68,9 @@
     <postStartupActivity implementation="com.maddyhome.idea.vim.extension.nerdtree.NerdTree$NerdStartupActivity"/>
 
     <spellchecker.bundledDictionaryProvider implementation="com.maddyhome.idea.vim.VimBundledDictionaryProvider"/>
+
+    <!-- Main plugin service (persistent state, initialisation) -->
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.VimPlugin"/>
 
     <applicationService serviceInterface="com.maddyhome.idea.vim.newapi.VimEditorFactory"
                         serviceImplementation="com.maddyhome.idea.vim.newapi.IjVimEditorFactory"/>
@@ -162,6 +176,10 @@
                         serviceInterface="com.maddyhome.idea.vim.group.VimNotifications"/>
     <projectService serviceImplementation="com.maddyhome.idea.vim.group.NotificationService"
                     serviceInterface="com.maddyhome.idea.vim.group.VimNotifications"/>
+
+    <!-- Extension registrar (VimExtensionRegistrar converted from object to service) -->
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.extension.VimExtensionRegistrar"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimExtensionRegistrator"/>
 
     <!-- UI components -->
     <applicationConfigurable groupId="editor" instance="com.maddyhome.idea.vim.ui.VimEmulationConfigurable"/>

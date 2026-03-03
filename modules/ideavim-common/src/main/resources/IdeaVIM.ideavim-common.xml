@@ -7,24 +7,9 @@
   -->
 
 <idea-plugin>
-  <!-- Shared code and extension points loaded in ALL product modes (monolith, client, backend).
-       Extension point declarations must be here so both frontend and backend can contribute to them. -->
-
-  <extensionPoints>
-    <extensionPoint name="vimExtension" beanClass="com.maddyhome.idea.vim.extension.ExtensionBeanClass" dynamic="true">
-      <with attribute="implementation" implements="com.maddyhome.idea.vim.extension.VimExtension"/>
-
-    </extensionPoint>
-    <extensionPoint interface="com.maddyhome.idea.vim.ide.ClionNovaProvider" dynamic="true" name="clionNovaProvider"/>
-    <extensionPoint interface="com.maddyhome.idea.vim.ide.RiderProvider" dynamic="true" name="riderProvider"/>
-    <extensionPoint interface="com.maddyhome.idea.vim.key.IdeaVimDisablerExtensionPoint" dynamic="true"
-                    name="internal.disabler"/>
-  </extensionPoints>
+  <!-- Shared code loaded in ALL product modes (monolith, client, backend). -->
 
   <extensions defaultExtensionNs="com.intellij">
-    <!-- Main plugin service (persistent state, initialisation) — used from common code (VimPlugin.isEnabled()) -->
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.VimPlugin"/>
-
     <!-- Services that must be available in ALL product modes (used by both frontend and backend).
          Frontend-only services are registered in ideavim-frontend.xml.
          Backend-only services are registered in ideavim-backend.xml. -->

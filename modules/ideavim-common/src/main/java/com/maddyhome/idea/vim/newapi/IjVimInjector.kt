@@ -65,7 +65,6 @@ import com.maddyhome.idea.vim.api.isInjectorInitialized
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.extension.ExtensionLoader
 import com.maddyhome.idea.vim.extension.JsonExtensionProvider
-import com.maddyhome.idea.vim.extension.VimExtensionRegistrar
 import com.maddyhome.idea.vim.group.EffectiveIjOptions
 import com.maddyhome.idea.vim.group.GlobalIjOptions
 import com.maddyhome.idea.vim.group.IjVimOptionGroup
@@ -106,7 +105,7 @@ internal class IjVimInjector : VimInjectorBase() {
   override val historyGroup: VimHistory
     get() = service()
   override val extensionRegistrator: VimExtensionRegistrator
-    get() = VimExtensionRegistrar
+    get() = service()
   override val jsonExtensionProvider: JsonExtensionProvider
     get() = service()
   override val extensionLoader: ExtensionLoader

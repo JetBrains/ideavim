@@ -73,7 +73,7 @@ internal class IjVimPluginActivator : VimPluginActivator {
     VimscriptParser.registerCommandProvider(IntellijExCommandProvider)
 
     // 2.3) Register extensions
-    VimExtensionRegistrar.registerExtensions()
+    (injector.extensionRegistrator as VimExtensionRegistrar).registerExtensions()
 
     // 2.4) Register functions
     (injector.functionService as FunctionStorage).registerFunctionProvider(IntellijFunctionProvider)
