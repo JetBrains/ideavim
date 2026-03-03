@@ -81,11 +81,7 @@ internal class FileRemoteApiImpl : FileRemoteApi {
       val editor = filePath?.let { findEditorByFilePath(project, it) } ?: return@withContext
       val vimEditor = editor.vim
       val context = buildContext(project, editor)
-      if (saveAll) {
-        fileGroup.saveFiles(vimEditor, context)
-      } else {
-        fileGroup.saveFile(vimEditor, context)
-      }
+      fileGroup.saveFile(vimEditor, context, saveAll)
     }
 
   override suspend fun selectFile(count: Int, projectBasePath: String?): Boolean = withContext(Dispatchers.EDT) {

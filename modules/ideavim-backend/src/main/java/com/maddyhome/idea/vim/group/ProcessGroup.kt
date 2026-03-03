@@ -20,9 +20,9 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.util.execution.ParametersListUtil
 import com.intellij.util.text.CharSequenceReader
+import com.maddyhome.idea.vim.api.GlobalOptions
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimProcessGroupBase
-import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import java.io.BufferedWriter
 import java.io.IOException
@@ -39,10 +39,10 @@ class ProcessGroup : VimProcessGroupBase() {
     command: String,
     input: CharSequence?,
     currentDirectoryPath: String?,
+    options: GlobalOptions,
   ): String? {
     val project = ProjectManager.getInstance().openProjects
       .firstOrNull { injector.file.getProjectId(it) == editor.projectId }
-    val options = injector.globalOptions()
     val result = executeCommandImpl(
       command, input, currentDirectoryPath, project,
       options.shell, options.shellcmdflag, options.shellxescape, options.shellxquote,

@@ -15,6 +15,7 @@ import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
@@ -77,10 +78,11 @@ internal data class CmdFilterCommand(val range: Range, val modifier: CommandModi
     }
 
     val workingDirectory = editor.ij.project?.basePath
+    val options = injector.globalOptions()
     return try {
       if (range.size() == 0) {
         // Show command output in a window
-        injector.processGroup.executeCommand(editor, command, null, workingDirectory)?.let {
+        injector.processGroup.executeCommand(editor, command, null, workingDirectory, options)?.let {
           val outputPanel = injector.outputPanel.getOrCreate(editor, context)
           outputPanel.addText(it)
           outputPanel.show()
@@ -92,7 +94,7 @@ internal data class CmdFilterCommand(val range: Range, val modifier: CommandModi
         // Filter
         val range = getLineRange(editor).toTextRange(editor)
         val input = editor.ij.document.charsSequence.subSequence(range.startOffset, range.endOffset)
-        injector.processGroup.executeCommand(editor, command, input, workingDirectory)?.let {
+        injector.processGroup.executeCommand(editor, command, input, workingDirectory, options)?.let {
           ApplicationManager.getApplication().runWriteAction {
             val start = editor.offsetToBufferPosition(range.startOffset)
             val end = editor.offsetToBufferPosition(range.endOffset)

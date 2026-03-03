@@ -180,9 +180,22 @@ class FileGroup : VimFileBase() {
 
   /**
    * Saves specific file in the project.
+   *
+   * Note: reads `ideawrite` from `injector` — this method is only called in monolith mode
+   * where `injector` is fully initialized. In split mode, [FileGroupSplitClient] reads the
+   * option on the frontend and passes `saveAll` to [FileRemoteApiImpl] via RPC.
    */
   override fun saveFile(editor: VimEditor, context: ExecutionContext) {
-    val action = if (injector.globalIjOptions().ideawrite.contains(IjOptionConstants.ideawrite_all)) {
+    val saveAll = injector.globalIjOptions().ideawrite.contains(IjOptionConstants.ideawrite_all)
+    saveFile(editor, context, saveAll)
+  }
+
+  /**
+   * Saves file(s) based on the [saveAll] flag.
+   * Entry point for [FileRemoteApiImpl] where the option is already resolved by the frontend.
+   */
+  fun saveFile(editor: VimEditor, context: ExecutionContext, saveAll: Boolean) {
+    val action = if (saveAll) {
       injector.nativeActionManager.saveAll
     } else {
       injector.nativeActionManager.saveCurrent

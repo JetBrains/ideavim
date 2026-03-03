@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.exExceptionMessage
@@ -69,7 +70,7 @@ data class ReadCommand(val range: Range, val modifier: CommandModifier, val argu
   }
 
   private fun executeShellCommand(editor: VimEditor, command: String): String {
-    val output = injector.processGroup.executeCommand(editor, command, null, null) ?: ""
+    val output = injector.processGroup.executeCommand(editor, command, null, null, injector.globalOptions()) ?: ""
     val exitCode = injector.processGroup.lastExitCode
     if (exitCode != null && exitCode != 0) {
       injector.messages.showMessage(editor, "shell returned $exitCode")

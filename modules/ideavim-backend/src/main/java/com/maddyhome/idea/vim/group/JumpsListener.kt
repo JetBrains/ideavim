@@ -29,6 +29,14 @@ import com.maddyhome.idea.vim.newapi.initInjector
  * In **split-backend mode**, [VimJumpService] is not registered (it lives in the frontend),
  * so this listener falls back to [BackendJumpStorage]. The frontend fetches those jumps
  * via [JumpRemoteApi.getListenerJumps].
+ *
+ * **Options note**: `unifyjumps` is read from `injector.globalIjOptions()`. In split-backend
+ * mode, the option has its default value (`true`) because `.ideavimrc` only runs on the
+ * frontend. This is acceptable — jumps are recorded on the backend and the frontend's
+ * [VimJumpServiceSplitClient] controls merging. If the user sets `nounifyjumps` on the
+ * frontend, the backend will still record jumps, but the frontend won't merge them
+ * (the option check would need to be added to [VimJumpServiceSplitClient.syncBackendJumps]
+ * if this edge case matters in the future).
  */
 internal class JumpsListener(val project: Project) : RecentPlacesListener {
 
