@@ -177,8 +177,8 @@ internal class NerdTree : VimExtension {
 
 private fun createMappings(): Map<List<KeyStroke>, NerdTreeAction> = navigationMappings.toMutableMap().apply {
   // File opening actions use injector.file.openFile() which routes through RPC in split mode:
-  //   monolith:    injector.file → FileGroup.openFile() → FileEditorManager.openFile()
-  //   split mode:  injector.file → FileGroupSplitClient.openFile() → RPC → FileRemoteApiImpl → FileGroup
+  //   monolith:    injector.file → IjFileGroup.openFile() → FileBackendServiceImpl.openFile()
+  //   split mode:  injector.file → IjFileGroup.openFile() → FileBackendServiceSplitClient → RPC → FileRemoteApiImpl
   register(
     "NERDTreeMapActivateNode",
     "o",

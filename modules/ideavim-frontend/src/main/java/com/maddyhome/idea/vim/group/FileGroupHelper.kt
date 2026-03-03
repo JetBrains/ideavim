@@ -14,8 +14,8 @@ import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.vfs.VirtualFile
 
 /**
- * Extracted helper methods from [FileGroup] that need to remain in the common module.
- * Used by listeners, commands, and the frontend module where [FileGroup] (backend) is not visible.
+ * Extracted helper methods for file-related operations.
+ * Used by listeners, commands, and the frontend module.
  */
 object FileGroupHelper {
 

@@ -31,8 +31,8 @@
          In monolith mode, JumpsListener writes directly to VimJumpServiceImpl instead. -->
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.BackendJumpStorage"/>
 
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.FileGroup"
-                        serviceInterface="com.maddyhome.idea.vim.api.VimFile"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.FileBackendServiceImpl"
+                        serviceInterface="com.maddyhome.idea.vim.group.FileBackendService"/>
 
     <!-- RPC: expose ProcessGroup to thin-client frontend -->
     <platform.rpc.backend.remoteApiProvider

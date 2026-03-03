@@ -20,6 +20,7 @@ import com.maddyhome.idea.vim.api.VimJumpServiceBase
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.mark.Jump
+import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.initInjector
 import org.jdom.Element
 
@@ -45,6 +46,21 @@ internal class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateCompone
   }
 
   override var lastJumpTimeStamp: Long = 0
+
+  /**
+   * Checks `unifyjumps` before recording a jump.
+   * This is the frontend-side gate for IDE navigation events that [JumpsListener]
+   * (on the backend) forwards unconditionally.
+   */
+  override fun addJump(projectId: String, jump: Jump, reset: Boolean) {
+    if (!injector.globalIjOptions().unifyjumps) return
+    super.addJump(projectId, jump, reset)
+  }
+
+  override fun removeJump(projectId: String, jump: Jump) {
+    if (!injector.globalIjOptions().unifyjumps) return
+    super.removeJump(projectId, jump)
+  }
 
   override fun includeCurrentCommandAsNavigation(editor: VimEditor) {
     val project = ProjectManager.getInstance().openProjects

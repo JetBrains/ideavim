@@ -17,11 +17,9 @@ import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
-import com.maddyhome.idea.vim.api.VimFile
-
 /**
  * Resolves a [Project] by its projectId.
- * Matches by [VimFile.getProjectId] first, falls back to the first open project.
+ * Matches by [FileBackendServiceImpl.getProjectId] first, falls back to the first open project.
  *
  * Note: Uses [service] instead of `injector.file` because `injector` is not
  * initialized on the backend in split mode.
@@ -29,8 +27,8 @@ import com.maddyhome.idea.vim.api.VimFile
 internal fun findProjectById(projectId: String?): Project? {
   val projects = ProjectManager.getInstance().openProjects
   if (projectId == null) return projects.firstOrNull()
-  val vimFile = service<VimFile>()
-  return projects.firstOrNull { vimFile.getProjectId(it) == projectId }
+  val fileBackend = service<FileBackendService>()
+  return projects.firstOrNull { fileBackend.getProjectIdForProject(it) == projectId }
     ?: projects.firstOrNull()
 }
 

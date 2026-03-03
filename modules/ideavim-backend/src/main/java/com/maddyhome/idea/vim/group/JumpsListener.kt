@@ -16,7 +16,6 @@ import com.maddyhome.idea.vim.api.VimJumpService
 import com.maddyhome.idea.vim.api.VimJumpServiceBase
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.mark.Jump
-import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.initInjector
 
 /**
@@ -24,19 +23,16 @@ import com.maddyhome.idea.vim.newapi.initInjector
  * into IdeaVim's jump list.
  *
  * In **monolith mode**, [injector.jumpService] resolves to [VimJumpServiceImpl] (frontend),
- * so jumps go directly into the main jump list.
+ * so jumps go directly into the main jump list. The `unifyjumps` option is checked
+ * there — this listener always records jumps unconditionally.
  *
  * In **split-backend mode**, [VimJumpService] is not registered (it lives in the frontend),
  * so this listener falls back to [BackendJumpStorage]. The frontend fetches those jumps
- * via [JumpRemoteApi.getListenerJumps].
+ * via [JumpRemoteApi.getListenerJumps] and checks `unifyjumps` before merging.
  *
- * **Options note**: `unifyjumps` is read from `injector.globalIjOptions()`. In split-backend
- * mode, the option has its default value (`true`) because `.ideavimrc` only runs on the
- * frontend. This is acceptable — jumps are recorded on the backend and the frontend's
- * [VimJumpServiceSplitClient] controls merging. If the user sets `nounifyjumps` on the
- * frontend, the backend will still record jumps, but the frontend won't merge them
- * (the option check would need to be added to [VimJumpServiceSplitClient.syncBackendJumps]
- * if this edge case matters in the future).
+ * **Options note**: This listener never reads options from the injector.
+ * The `unifyjumps` check is performed on the frontend side (in [VimJumpServiceImpl]
+ * for monolith mode, and in [VimJumpServiceSplitClient] for split mode).
  */
 internal class JumpsListener(val project: Project) : RecentPlacesListener {
 
@@ -57,32 +53,30 @@ internal class JumpsListener(val project: Project) : RecentPlacesListener {
 
   override fun recentPlaceAdded(changePlace: PlaceInfo, isChanged: Boolean) {
     initInjector()
-    if (!injector.globalIjOptions().unifyjumps) return
 
     val jumpStorage = resolveJumpStorage()
     if (!isChanged) {
       if (changePlace.timeStamp < jumpStorage.lastJumpTimeStamp) return // this listener is notified asynchronously, and
       // we do not want jumps that were processed before
       val jump = buildJump(changePlace) ?: return
-      jumpStorage.addJump(injector.file.getProjectId(project), jump, true)
+      jumpStorage.addJump(service<FileBackendService>().getProjectIdForProject(project), jump, true)
     }
   }
 
   override fun recentPlaceRemoved(changePlace: PlaceInfo, isChanged: Boolean) {
     initInjector()
-    if (!injector.globalIjOptions().unifyjumps) return
 
     val jumpStorage = resolveJumpStorage()
     if (!isChanged) {
       if (changePlace.timeStamp < jumpStorage.lastJumpTimeStamp) return // this listener is notified asynchronously, and
       // we do not want jumps that were processed before
       val jump = buildJump(changePlace) ?: return
-      jumpStorage.removeJump(injector.file.getProjectId(project), jump)
+      jumpStorage.removeJump(service<FileBackendService>().getProjectIdForProject(project), jump)
     }
   }
 
   private fun buildJump(place: PlaceInfo): Jump? {
-    val project = findProjectById(injector.file.getProjectId(project)) ?: return null
+    val project = findProjectById(service<FileBackendService>().getProjectIdForProject(project)) ?: return null
     val editor =
       findEditorByFilePath(project, place.file.path) ?: return null
     val offset = place.caretPosition?.startOffset ?: return null
