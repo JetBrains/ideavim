@@ -5,7 +5,7 @@
  * license that can be found in the LICENSE.txt file or at
  * https://opensource.org/licenses/MIT.
  */
-package com.maddyhome.idea.vim.group
+package com.maddyhome.idea.vim.group.file
 
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.PlatformDataKeys
@@ -28,6 +28,11 @@ import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.ProjectScope
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.group.FileBackendService
+import com.maddyhome.idea.vim.group.LastTabService
+import com.maddyhome.idea.vim.group.findEditorByFilePath
+import com.maddyhome.idea.vim.group.findProjectById
+import com.maddyhome.idea.vim.group.findVirtualFile
 import com.maddyhome.idea.vim.helper.EngineMessageHelper
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.newapi.execute

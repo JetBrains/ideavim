@@ -6,10 +6,13 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.group
+package com.maddyhome.idea.vim.group.jump
 
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.ex.IdeDocumentHistory
+import com.maddyhome.idea.vim.group.JumpInfo
+import com.maddyhome.idea.vim.group.JumpRemoteApi
+import com.maddyhome.idea.vim.group.findProjectById
 
 /**
  * RPC handler for [JumpRemoteApi].

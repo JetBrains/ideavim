@@ -6,10 +6,12 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.group
+package com.maddyhome.idea.vim.group.process
 
 import com.intellij.openapi.components.service
 import com.maddyhome.idea.vim.api.VimProcessGroup
+import com.maddyhome.idea.vim.group.ProcessRemoteApi
+import com.maddyhome.idea.vim.group.ProcessResult
 
 /**
  * RPC handler for [ProcessRemoteApi].

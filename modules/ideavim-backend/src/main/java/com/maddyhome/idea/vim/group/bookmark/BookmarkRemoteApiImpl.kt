@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.group
+package com.maddyhome.idea.vim.group.bookmark
 
 import com.intellij.ide.bookmark.BookmarkType
 import com.intellij.ide.bookmark.BookmarksManager
@@ -14,6 +14,10 @@ import com.intellij.ide.bookmark.LineBookmark
 import com.intellij.ide.bookmark.providers.LineBookmarkProvider
 import com.intellij.openapi.project.ProjectManager
 import com.maddyhome.idea.vim.api.VimMarkService
+import com.maddyhome.idea.vim.group.BookmarkInfo
+import com.maddyhome.idea.vim.group.BookmarkRemoteApi
+import com.maddyhome.idea.vim.group.findEditorByFilePath
+import com.maddyhome.idea.vim.group.findProjectById
 
 /**
  * RPC handler for [BookmarkRemoteApi].

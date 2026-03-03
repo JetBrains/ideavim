@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.group
+package com.maddyhome.idea.vim.group.jump
 
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.impl.IdeDocumentHistoryImpl.PlaceInfo
@@ -15,6 +15,9 @@ import com.intellij.openapi.project.Project
 import com.maddyhome.idea.vim.api.VimJumpService
 import com.maddyhome.idea.vim.api.VimJumpServiceBase
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.group.FileBackendService
+import com.maddyhome.idea.vim.group.findEditorByFilePath
+import com.maddyhome.idea.vim.group.findProjectById
 import com.maddyhome.idea.vim.mark.Jump
 import com.maddyhome.idea.vim.newapi.initInjector
 

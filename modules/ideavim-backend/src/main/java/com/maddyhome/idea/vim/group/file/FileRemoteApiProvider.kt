@@ -6,19 +6,20 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.group
+package com.maddyhome.idea.vim.group.file
 
 import com.intellij.platform.rpc.backend.RemoteApiProvider
+import com.maddyhome.idea.vim.group.FileRemoteApi
 import fleet.rpc.remoteApiDescriptor
 
 /**
- * Registers [ProcessRemoteApiImpl] as the backend RPC handler for [ProcessRemoteApi].
+ * Registers [FileRemoteApiImpl] as the backend RPC handler for [FileRemoteApi].
  * Registered via `platform.rpc.backend.remoteApiProvider` extension point in ideavim-backend.xml.
  */
-internal class ProcessRemoteApiProvider : RemoteApiProvider {
+internal class FileRemoteApiProvider : RemoteApiProvider {
   override fun RemoteApiProvider.Sink.remoteApis() {
-    remoteApi(remoteApiDescriptor<ProcessRemoteApi>()) {
-      ProcessRemoteApiImpl()
+    remoteApi(remoteApiDescriptor<FileRemoteApi>()) {
+      FileRemoteApiImpl()
     }
   }
 }

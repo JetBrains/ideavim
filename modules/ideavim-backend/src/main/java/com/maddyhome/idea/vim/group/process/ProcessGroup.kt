@@ -5,7 +5,7 @@
  * license that can be found in the LICENSE.txt file or at
  * https://opensource.org/licenses/MIT.
  */
-package com.maddyhome.idea.vim.group
+package com.maddyhome.idea.vim.group.process
 
 import com.intellij.execution.ExecutionException
 import com.intellij.execution.configurations.GeneralCommandLine
@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.api.GlobalOptions
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimProcessGroupBase
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.group.ProcessResult
 import java.io.BufferedWriter
 import java.io.IOException
 import java.io.OutputStreamWriter

@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.group
+package com.maddyhome.idea.vim.group.file
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.EDT
@@ -17,6 +17,12 @@ import com.intellij.openapi.fileEditor.impl.EditorsSplitters
 import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
+import com.maddyhome.idea.vim.group.FileBackendService
+import com.maddyhome.idea.vim.group.FileRemoteApi
+import com.maddyhome.idea.vim.group.LastTabService
+import com.maddyhome.idea.vim.group.findEditorByFilePath
+import com.maddyhome.idea.vim.group.findProjectById
+import com.maddyhome.idea.vim.group.findVirtualFile
 import com.maddyhome.idea.vim.helper.EngineMessageHelper
 import com.maddyhome.idea.vim.newapi.vim
 import kotlinx.coroutines.Dispatchers
