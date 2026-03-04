@@ -214,7 +214,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     final Editor ijEditor = ((IjVimEditor)editor).getEditor();
     UserDataManager.setVimInitialised(ijEditor, true);
 
-    VimPlugin.getKey().registerRequiredShortcutKeys(editor);
+    ((VimKeyGroupBase)VimPlugin.getKey()).registerRequiredShortcutKeys(editor);
 
     initLineNumbers(ijEditor);
 
@@ -233,7 +233,7 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
     final Editor ijEditor = ((IjVimEditor)editor).getEditor();
     deinitLineNumbers(ijEditor);
     UserDataManager.unInitializeEditor(ijEditor);
-    VimPlugin.getKey().unregisterShortcutKeys(editor);
+    ((VimKeyGroupBase)VimPlugin.getKey()).unregisterShortcutKeys(editor);
     CaretVisualAttributesHelperKt.removeCaretsVisualAttributes(ijEditor);
     if (ijEditor instanceof EditorEx editorEx) {
       editorEx.removePropertyChangeListener(FontSizeChangeListener.INSTANCE);

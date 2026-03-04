@@ -40,5 +40,5 @@ interface VimPsiService {
    *
    * @return a [TextRange] covering the full comment block (line-wise), or null if the cursor is not on a comment line.
    */
-  fun getCommentBlockRange(editor: VimEditor, cursorLine: Int): TextRange?
+  fun getCommentBlockRange(editor: VimEditor, cursorLine: Int): TextRange? = null
 }

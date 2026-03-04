@@ -59,9 +59,8 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
 
   private final @NotNull VimState state = new VimState();
   public Disposable onOffDisposable;
-  // Public for cross-module access from IjVimPluginActivator (frontend module)
-  public int previousStateVersion = 0;
-  public String previousKeyMap = "";
+  int previousStateVersion = 0;
+  String previousKeyMap = "";
   // It is enabled by default to avoid any special configuration after plugin installation
   private boolean enabled = true;
 
@@ -338,7 +337,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
       }
     }
     if (element.getChild("shortcut-conflicts") != null) {
-      getKey().loadShortcutConflictsData(element);
+      ((VimKeyGroupBase)getKey()).loadShortcutConflictsData(element);
     }
     if (element.getChild("editor") != null) {
       getEditor().loadEditorStateData(element);

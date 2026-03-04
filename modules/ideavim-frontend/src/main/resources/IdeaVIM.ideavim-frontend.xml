@@ -76,6 +76,10 @@
                         serviceImplementation="com.maddyhome.idea.vim.newapi.IjVimEditorFactory"/>
 
     <!-- Services moved from common (implementation classes now in frontend module) -->
+    <applicationService serviceInterface="com.maddyhome.idea.vim.api.ExecutionContextManager"
+                        serviceImplementation="com.maddyhome.idea.vim.newapi.IjExecutionContextManager"/>
+    <applicationService serviceInterface="com.maddyhome.idea.vim.api.VimStorageService"
+                        serviceImplementation="com.maddyhome.idea.vim.group.IjVimStorageService"/>
     <applicationService serviceInterface="com.maddyhome.idea.vim.api.VimActionExecutor"
                         serviceImplementation="com.maddyhome.idea.vim.helper.IjActionExecutor"/>
     <applicationService serviceInterface="com.maddyhome.idea.vim.api.VimOptionGroup"

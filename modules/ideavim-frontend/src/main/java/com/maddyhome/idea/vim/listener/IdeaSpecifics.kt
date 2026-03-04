@@ -39,6 +39,7 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimKeyGroupBase
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.group.NotificationService
@@ -339,7 +340,7 @@ internal object IdeaSpecifics {
       if (oldLookup == null && newLookup is LookupImpl) {
         if (newLookup.editor.isIdeaVimDisabledHere) return
 
-        VimPlugin.getKey().registerShortcutsForLookup(newLookup)
+        (VimPlugin.getKey() as VimKeyGroupBase).registerShortcutsForLookup(newLookup)
       }
 
       // Lookup closed
