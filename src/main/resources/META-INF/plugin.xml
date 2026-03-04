@@ -56,7 +56,6 @@
     <module name="IdeaVIM.ideavim-frontend"/>
     <module name="IdeaVIM.ideavim-backend"/>
     <module name="IdeaVIM.ideavim-frontend-split"/>
-    <module name="IdeaVIM.ideavim-backend-split"/>
     <module name="IdeaVIM.ideavim-acejump"/>
     <module name="IdeaVIM.ideavim-rider"/>
     <module name="IdeaVIM.ideavim-clion-nova"/>
