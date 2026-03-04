@@ -30,7 +30,6 @@ import com.intellij.psi.search.ProjectScope
 import com.maddyhome.idea.vim.api.NativeActionManager
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.group.FileBackendService
-import com.maddyhome.idea.vim.group.LastTabService
 import com.maddyhome.idea.vim.group.findEditorByFilePath
 import com.maddyhome.idea.vim.group.findProjectById
 import com.maddyhome.idea.vim.group.findVirtualFile
@@ -97,16 +96,6 @@ class FileBackendServiceImpl : FileBackendService {
     val vimEditor = editor.vim
     val context = buildContext(project, editor)
     saveFile(vimEditor, context, saveAll)
-  }
-
-  override fun selectPreviousTab(projectId: String?): Boolean {
-    val project = resolveProject(projectId) ?: return false
-    val vf = LastTabService.getInstance(project).lastTab
-    if (vf != null && vf.isValid) {
-      FileEditorManager.getInstance(project).openFile(vf, true)
-      return true
-    }
-    return false
   }
 
   override fun buildFileInfoMessage(projectId: String?, filePath: String?, fullPath: Boolean): String? {

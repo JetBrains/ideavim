@@ -42,8 +42,6 @@ interface FileBackendService {
    */
   fun saveFile(projectId: String?, filePath: String?, saveAll: Boolean)
 
-  fun selectPreviousTab(projectId: String?): Boolean
-
   /**
    * Builds the `:file` / Ctrl-G message string for the given file.
    * @return the message to display, or null if no info is available

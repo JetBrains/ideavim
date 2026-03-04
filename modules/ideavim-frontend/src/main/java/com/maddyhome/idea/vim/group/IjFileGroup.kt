@@ -128,7 +128,13 @@ class IjFileGroup : VimFileBase() {
   }
 
   override fun selectPreviousTab(context: ExecutionContext): Boolean {
-    return backend.selectPreviousTab(extractProjectId(context))
+    val project = PlatformDataKeys.PROJECT.getData(context.context as DataContext) ?: return false
+    val vf = LastTabService.getInstance(project).lastTab
+    if (vf != null && vf.isValid) {
+      FileEditorManager.getInstance(project).openFile(vf, true)
+      return true
+    }
+    return false
   }
 
   override fun displayFileInfo(vimEditor: VimEditor, fullPath: Boolean): String? {

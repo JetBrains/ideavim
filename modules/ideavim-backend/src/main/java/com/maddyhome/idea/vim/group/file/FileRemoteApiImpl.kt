@@ -19,7 +19,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.maddyhome.idea.vim.group.FileBackendService
 import com.maddyhome.idea.vim.group.FileRemoteApi
-import com.maddyhome.idea.vim.group.LastTabService
 import com.maddyhome.idea.vim.group.findEditorByFilePath
 import com.maddyhome.idea.vim.group.findProjectById
 import com.maddyhome.idea.vim.group.findVirtualFile
@@ -134,17 +133,6 @@ internal class FileRemoteApiImpl : FileRemoteApi {
         val pos = (i + (count % editors.size) + editors.size) % editors.size
         fem.openFile(editors[pos], true)
       }
-    }
-  }
-
-  override suspend fun selectPreviousTab(projectBasePath: String?): Boolean = withContext(Dispatchers.EDT) {
-    val project = findProject(projectBasePath) ?: return@withContext false
-    val vf = LastTabService.getInstance(project).lastTab
-    if (vf != null && vf.isValid) {
-      FileEditorManager.getInstance(project).openFile(vf, true)
-      true
-    } else {
-      false
     }
   }
 

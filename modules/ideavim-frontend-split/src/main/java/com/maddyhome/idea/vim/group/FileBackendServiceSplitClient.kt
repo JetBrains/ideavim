@@ -41,10 +41,6 @@ internal class FileBackendServiceSplitClient : FileBackendService {
     rpc { saveFile(null, filePath, saveAll) }
   }
 
-  override fun selectPreviousTab(projectId: String?): Boolean {
-    return rpc { selectPreviousTab(null) }
-  }
-
   override fun buildFileInfoMessage(projectId: String?, filePath: String?, fullPath: Boolean): String? {
     return rpc { buildFileInfoMessage(null, filePath, fullPath) }
   }
