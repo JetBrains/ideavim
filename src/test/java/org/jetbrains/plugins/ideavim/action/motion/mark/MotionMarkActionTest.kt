@@ -106,6 +106,7 @@ class MotionMarkActionTest : VimTestCase() {
     bookmarkService.createOrGetSystemMark(
       'A',
       2,
+      0,
       fixture.file.virtualFile.path,
       fixture.project.locationHash,
       fixture.file.virtualFile.fileSystem.protocol
@@ -135,6 +136,7 @@ class MotionMarkActionTest : VimTestCase() {
     bookmarkService.createOrGetSystemMark(
       'A',
       2,
+      0,
       fixture.file.virtualFile.path,
       fixture.project.locationHash,
       fixture.file.virtualFile.fileSystem.protocol
@@ -144,6 +146,7 @@ class MotionMarkActionTest : VimTestCase() {
     bookmarkService.createOrGetSystemMark(
       'A',
       4,
+      0,
       fixture.file.virtualFile.path,
       fixture.project.locationHash,
       fixture.file.virtualFile.fileSystem.protocol

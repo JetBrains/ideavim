@@ -31,11 +31,12 @@ internal class BookmarkRemoteApiImpl : BookmarkRemoteApi {
   override suspend fun createOrGetSystemMark(
     char: Char,
     line: Int,
+    col: Int,
     filePath: String,
     projectId: String?,
     protocol: String?,
   ): BookmarkInfo? = withContext(Dispatchers.EDT) {
-    bookmarkBackend.createOrGetSystemMark(char, line, filePath, projectId, protocol)
+    bookmarkBackend.createOrGetSystemMark(char, line, col, filePath, projectId, protocol)
   }
 
   override suspend fun removeBookmark(char: Char) = withContext(Dispatchers.EDT) {

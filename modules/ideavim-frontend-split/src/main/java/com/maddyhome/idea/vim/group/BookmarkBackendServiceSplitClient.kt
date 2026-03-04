@@ -23,11 +23,12 @@ internal class BookmarkBackendServiceSplitClient : BookmarkBackendService {
   override fun createOrGetSystemMark(
     char: Char,
     line: Int,
+    col: Int,
     filePath: String,
     projectId: String?,
     protocol: String?,
   ): BookmarkInfo? {
-    return rpc { createOrGetSystemMark(char, line, filePath, projectId, protocol) }
+    return rpc { createOrGetSystemMark(char, line, col, filePath, projectId, protocol) }
   }
 
   override fun removeBookmark(char: Char) {

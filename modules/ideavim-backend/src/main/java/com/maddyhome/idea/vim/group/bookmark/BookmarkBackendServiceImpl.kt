@@ -27,9 +27,13 @@ import com.maddyhome.idea.vim.group.findProjectById
  */
 internal class BookmarkBackendServiceImpl : BookmarkBackendService {
 
+  // LineBookmark doesn't store column, so we track it separately
+  private val columnByMark = mutableMapOf<Char, Int>()
+
   override fun createOrGetSystemMark(
     char: Char,
     line: Int,
+    col: Int,
     filePath: String,
     projectId: String?,
     protocol: String?,
@@ -44,10 +48,11 @@ internal class BookmarkBackendServiceImpl : BookmarkBackendService {
     val existing = bookmarksManager.getBookmark(type)
     if (existing != null) {
       if (existing is LineBookmark && existing.line == line) {
+        columnByMark[char] = col
         return BookmarkInfo(
           key = char,
           line = existing.line,
-          col = 0,
+          col = col,
           filepath = existing.file.path,
           protocol = existing.file.fileSystem.protocol,
         )
@@ -67,10 +72,11 @@ internal class BookmarkBackendServiceImpl : BookmarkBackendService {
     if (!group.canAdd(bookmark)) return null
     group.add(bookmark, type)
 
+    columnByMark[char] = col
     return BookmarkInfo(
       key = char,
       line = bookmark.line,
-      col = 0,
+      col = col,
       filepath = bookmark.file.path,
       protocol = bookmark.file.fileSystem.protocol,
     )
@@ -79,6 +85,7 @@ internal class BookmarkBackendServiceImpl : BookmarkBackendService {
   override fun removeBookmark(char: Char) {
     val type = BookmarkType.get(char)
     if (type == BookmarkType.DEFAULT) return
+    columnByMark.remove(char)
     for (project in ProjectManager.getInstance().openProjects) {
       val bookmarksManager = BookmarksManager.getInstance(project) ?: continue
       val bookmark = bookmarksManager.getBookmark(type) ?: continue
@@ -97,7 +104,7 @@ internal class BookmarkBackendServiceImpl : BookmarkBackendService {
         return BookmarkInfo(
           key = char,
           line = bookmark.line,
-          col = 0,
+          col = columnByMark[char] ?: 0,
           filepath = bookmark.file.path,
           protocol = bookmark.file.fileSystem.protocol,
         )
@@ -119,7 +126,7 @@ internal class BookmarkBackendServiceImpl : BookmarkBackendService {
             BookmarkInfo(
               key = typeChar,
               line = bookmark.line,
-              col = 0,
+              col = columnByMark[typeChar] ?: 0,
               filepath = bookmark.file.path,
               protocol = bookmark.file.fileSystem.protocol,
             )

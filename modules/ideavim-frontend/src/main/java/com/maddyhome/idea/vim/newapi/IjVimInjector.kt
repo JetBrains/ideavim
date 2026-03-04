@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.api.VimEditorGroup
 import com.maddyhome.idea.vim.api.VimEnabler
 import com.maddyhome.idea.vim.api.VimExtensionRegistrator
 import com.maddyhome.idea.vim.api.VimFile
+import com.maddyhome.idea.vim.api.VimInjector
 import com.maddyhome.idea.vim.api.VimInjectorBase
 import com.maddyhome.idea.vim.api.VimJumpService
 import com.maddyhome.idea.vim.api.VimKeyGroup
@@ -64,6 +65,9 @@ import com.maddyhome.idea.vim.api.isInjectorInitialized
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.extension.ExtensionLoader
 import com.maddyhome.idea.vim.extension.JsonExtensionProvider
+import com.maddyhome.idea.vim.group.EffectiveIjOptions
+import com.maddyhome.idea.vim.group.GlobalIjOptions
+import com.maddyhome.idea.vim.group.IjVimOptionGroup
 import com.maddyhome.idea.vim.group.TabService
 import com.maddyhome.idea.vim.group.VimWindowGroup
 import com.maddyhome.idea.vim.history.VimHistory
@@ -214,3 +218,14 @@ internal class IjVimInjector : VimInjectorBase() {
   override val pluginActivator: VimPluginActivator
     get() = service()
 }
+
+/**
+ * Convenience function to get the IntelliJ implementation specific global option accessor
+ */
+fun VimInjector.globalIjOptions(): GlobalIjOptions = (this.optionGroup as IjVimOptionGroup).getGlobalIjOptions()
+
+/**
+ * Convenience function to get the IntelliJ implementation specific option accessor for the given editor's scope
+ */
+fun VimInjector.ijOptions(editor: VimEditor): EffectiveIjOptions =
+  (this.optionGroup as IjVimOptionGroup).getEffectiveIjOptions(editor)

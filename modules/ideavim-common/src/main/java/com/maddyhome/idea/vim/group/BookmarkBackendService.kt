@@ -37,6 +37,7 @@ interface BookmarkBackendService {
   fun createOrGetSystemMark(
     char: Char,
     line: Int,
+    col: Int,
     filePath: String,
     projectId: String?,
     protocol: String? = null,
