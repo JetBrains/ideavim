@@ -33,8 +33,9 @@ internal class BookmarkRemoteApiImpl : BookmarkRemoteApi {
     line: Int,
     filePath: String,
     projectId: String?,
+    protocol: String?,
   ): BookmarkInfo? = withContext(Dispatchers.EDT) {
-    bookmarkBackend.createOrGetSystemMark(char, line, filePath, projectId)
+    bookmarkBackend.createOrGetSystemMark(char, line, filePath, projectId, protocol)
   }
 
   override suspend fun removeBookmark(char: Char) = withContext(Dispatchers.EDT) {

@@ -34,7 +34,13 @@ interface BookmarkBackendService {
    * @param projectId project identifier for resolving the correct project on backend
    * @return bookmark info if created/found, null if bookmark creation failed
    */
-  fun createOrGetSystemMark(char: Char, line: Int, filePath: String, projectId: String?): BookmarkInfo?
+  fun createOrGetSystemMark(
+    char: Char,
+    line: Int,
+    filePath: String,
+    projectId: String?,
+    protocol: String? = null,
+  ): BookmarkInfo?
 
   /**
    * Removes an IDE bookmark.

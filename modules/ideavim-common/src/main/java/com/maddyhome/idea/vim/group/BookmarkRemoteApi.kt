@@ -41,6 +41,7 @@ interface BookmarkRemoteApi : RemoteApi<Unit> {
     line: Int,
     filePath: String,
     projectId: String?,
+    protocol: String? = null,
   ): BookmarkInfo?
 
   /**

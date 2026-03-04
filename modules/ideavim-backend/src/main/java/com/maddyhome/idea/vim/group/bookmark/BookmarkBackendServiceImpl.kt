@@ -32,6 +32,7 @@ internal class BookmarkBackendServiceImpl : BookmarkBackendService {
     line: Int,
     filePath: String,
     projectId: String?,
+    protocol: String?,
   ): BookmarkInfo? {
     val type = BookmarkType.get(char)
     if (type == BookmarkType.DEFAULT) return null
@@ -55,7 +56,7 @@ internal class BookmarkBackendServiceImpl : BookmarkBackendService {
     }
 
     // Create a new line bookmark
-    val editor = findEditorByFilePath(project, filePath) ?: return null
+    val editor = findEditorByFilePath(project, filePath, protocol) ?: return null
     val lineBookmarkProvider = LineBookmarkProvider.Util.find(project) ?: return null
     val bookmark = lineBookmarkProvider.createBookmark(editor, line) as? LineBookmark ?: return null
 

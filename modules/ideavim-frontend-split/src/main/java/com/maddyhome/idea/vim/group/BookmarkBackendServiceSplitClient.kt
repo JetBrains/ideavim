@@ -20,8 +20,14 @@ import kotlinx.coroutines.runBlocking
  */
 internal class BookmarkBackendServiceSplitClient : BookmarkBackendService {
 
-  override fun createOrGetSystemMark(char: Char, line: Int, filePath: String, projectId: String?): BookmarkInfo? {
-    return rpc { createOrGetSystemMark(char, line, filePath, projectId) }
+  override fun createOrGetSystemMark(
+    char: Char,
+    line: Int,
+    filePath: String,
+    projectId: String?,
+    protocol: String?,
+  ): BookmarkInfo? {
+    return rpc { createOrGetSystemMark(char, line, filePath, projectId, protocol) }
   }
 
   override fun removeBookmark(char: Char) {

@@ -43,7 +43,7 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
     val lp = editor.offsetToBufferPosition(offset)
     val virtualFile = editor.getVirtualFile() ?: return super.createGlobalMark(editor, char, offset)
     val projectId = editor.projectId
-    val info = bookmarkBackend.createOrGetSystemMark(char, lp.line, virtualFile.path, projectId)
+    val info = bookmarkBackend.createOrGetSystemMark(char, lp.line, virtualFile.path, projectId, virtualFile.protocol)
       ?: return super.createGlobalMark(editor, char, offset)
     return VimMark(info.key, info.line, lp.column, virtualFile.path, info.protocol)
   }

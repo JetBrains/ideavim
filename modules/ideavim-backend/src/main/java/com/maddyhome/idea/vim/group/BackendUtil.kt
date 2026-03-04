@@ -40,15 +40,15 @@ internal fun findVirtualFile(filePath: String, protocol: String? = null): Virtua
   if (protocol != null) {
     VirtualFileManager.getInstance().getFileSystem(protocol)?.findFileByPath(filePath)?.let { return it }
   }
-  return LocalFileSystem.getInstance().findFileByPath(filePath)
-    ?: VirtualFileManager.getInstance().getFileSystem("jar")?.findFileByPath(filePath)
+  LocalFileSystem.getInstance().findFileByPath(filePath)?.let { return it }
+  return VirtualFileManager.getInstance().getFileSystem("jar")?.findFileByPath(filePath)
 }
 
 /**
  * Finds an open [Editor] for the given file path in the specified project.
  */
-internal fun findEditorByFilePath(project: Project, filePath: String): Editor? {
-  val vf = findVirtualFile(filePath) ?: return null
+internal fun findEditorByFilePath(project: Project, filePath: String, protocol: String? = null): Editor? {
+  val vf = findVirtualFile(filePath, protocol) ?: return null
   return FileEditorManager.getInstance(project).getAllEditors(vf)
     .filterIsInstance<TextEditor>()
     .firstOrNull()
