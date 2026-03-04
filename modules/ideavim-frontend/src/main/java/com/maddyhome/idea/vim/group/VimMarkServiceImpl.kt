@@ -17,11 +17,9 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMarkService
 import com.maddyhome.idea.vim.api.VimMarkServiceBase
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.group.SystemMarks.Companion.createOrGetSystemMark
-import com.maddyhome.idea.vim.mark.IntellijMark
 import com.maddyhome.idea.vim.mark.Mark
+import com.maddyhome.idea.vim.mark.VimMark
 import com.maddyhome.idea.vim.mark.VimMark.Companion.create
-import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import org.jdom.Element
 import java.util.*
@@ -35,10 +33,59 @@ import java.util.*
   storages = [Storage(value = "\$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)]
 )
 internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateComponent<Element?> {
-  private fun createOrGetSystemMark(ch: Char, line: Int, col: Int, editor: VimEditor): Mark? {
-    val ijEditor = (editor as IjVimEditor).editor
-    val systemMark = createOrGetSystemMark(ch, line, ijEditor) ?: return null
-    return IntellijMark(systemMark, col, ijEditor.project)
+
+  private val bookmarkBackend get() = BookmarkBackendService.getInstance()
+
+  override fun createGlobalMark(editor: VimEditor, char: Char, offset: Int): Mark? {
+    if (!injector.globalIjOptions().ideamarks) {
+      return super.createGlobalMark(editor, char, offset)
+    }
+    val lp = editor.offsetToBufferPosition(offset)
+    val virtualFile = editor.getVirtualFile() ?: return super.createGlobalMark(editor, char, offset)
+    val projectId = editor.projectId
+    val info = bookmarkBackend.createOrGetSystemMark(char, lp.line, virtualFile.path, projectId)
+      ?: return super.createGlobalMark(editor, char, offset)
+    return VimMark(info.key, info.line, lp.column, virtualFile.path, info.protocol)
+  }
+
+  override fun getGlobalMark(char: Char): Mark? {
+    if (!char.isGlobalMark()) return null
+
+    if (!injector.globalIjOptions().ideamarks) {
+      return super.getGlobalMark(char)
+    }
+
+    // When ideamarks is on, the BookmarksManager is the source of truth.
+    val info = bookmarkBackend.getBookmarkForMark(char)
+    if (info != null) {
+      val mark = VimMark(info.key, info.line, info.col, info.filepath, info.protocol)
+      globalMarks[char] = mark
+      return mark
+    }
+
+    // No IDE bookmark exists for this mark — clear stale local state if any.
+    globalMarks.remove(char)
+    return null
+  }
+
+  override fun getAllGlobalMarks(): Set<Mark> {
+    if (!injector.globalIjOptions().ideamarks) {
+      return super.getAllGlobalMarks()
+    }
+
+    val bookmarks = bookmarkBackend.getAllBookmarks()
+    globalMarks.clear()
+    for (info in bookmarks) {
+      globalMarks[info.key] = VimMark(info.key, info.line, info.col, info.filepath, info.protocol)
+    }
+    return globalMarks.values.toSet()
+  }
+
+  override fun removeGlobalMark(char: Char) {
+    if (injector.globalIjOptions().ideamarks) {
+      bookmarkBackend.removeBookmark(char)
+    }
+    super.removeGlobalMark(char)
   }
 
   private fun saveData(element: Element) {
@@ -163,24 +210,6 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
 
   override fun loadLegacyState(element: Any) {
     loadState(element as Element)
-  }
-
-  override fun createGlobalMark(editor: VimEditor, char: Char, offset: Int): Mark? {
-    if (!injector.globalIjOptions().ideamarks) {
-      return super.createGlobalMark(editor, char, offset)
-    }
-    val lp = editor.offsetToBufferPosition(offset)
-    val line = lp.line
-    val col = lp.column
-    return createOrGetSystemMark(char, line, col, editor)
-  }
-
-  override fun removeGlobalMark(char: Char) {
-    val mark = getGlobalMark(char)
-    if (mark is IntellijMark) {
-      mark.clear()
-    }
-    super.removeGlobalMark(char)
   }
 
   companion object {

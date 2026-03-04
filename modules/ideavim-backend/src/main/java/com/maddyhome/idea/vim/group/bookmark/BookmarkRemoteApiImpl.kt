@@ -8,126 +8,44 @@
 
 package com.maddyhome.idea.vim.group.bookmark
 
-import com.intellij.ide.bookmark.BookmarkType
-import com.intellij.ide.bookmark.BookmarksManager
-import com.intellij.ide.bookmark.LineBookmark
-import com.intellij.ide.bookmark.providers.LineBookmarkProvider
-import com.intellij.openapi.project.ProjectManager
-import com.maddyhome.idea.vim.api.VimMarkService
+import com.intellij.openapi.application.EDT
+import com.intellij.openapi.components.service
+import com.maddyhome.idea.vim.group.BookmarkBackendService
 import com.maddyhome.idea.vim.group.BookmarkInfo
 import com.maddyhome.idea.vim.group.BookmarkRemoteApi
-import com.maddyhome.idea.vim.group.findEditorByFilePath
-import com.maddyhome.idea.vim.group.findProjectById
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * RPC handler for [BookmarkRemoteApi].
- * Creates IDE bookmarks on the backend where [com.intellij.ide.bookmark.BookmarksManager]
- * is fully functional.
+ * Delegates to [BookmarkBackendServiceImpl] for the actual bookmark operations.
  *
- * Uses shared [findProjectById] and [findEditorByFilePath] from [BackendFileUtil]
- * for consistent project/file resolution across the backend.
+ * RPC calls arrive on a background thread, but bookmark APIs use Swing/EDT,
+ * so every delegation switches to [Dispatchers.EDT].
  */
 internal class BookmarkRemoteApiImpl : BookmarkRemoteApi {
+
+  private val bookmarkBackend: BookmarkBackendServiceImpl
+    get() = service<BookmarkBackendService>() as BookmarkBackendServiceImpl
+
   override suspend fun createOrGetSystemMark(
     char: Char,
     line: Int,
     filePath: String,
     projectId: String?,
-  ): BookmarkInfo? {
-    val type = BookmarkType.get(char)
-    if (type == BookmarkType.DEFAULT) return null
-
-    val project = findProjectById(projectId) ?: return null
-    val bookmarksManager = BookmarksManager.getInstance(project) ?: return null
-
-    // If a bookmark with this mnemonic already exists, check if it's at the right line
-    val existing = bookmarksManager.getBookmark(type)
-    if (existing != null) {
-      if (existing is LineBookmark && existing.line == line) {
-        return BookmarkInfo(
-          key = char,
-          line = existing.line,
-          col = 0,
-          filepath = existing.file.path,
-          protocol = existing.file.fileSystem.protocol,
-        )
-      }
-      bookmarksManager.remove(existing)
-    }
-
-    // Create a new line bookmark
-    val editor = findEditorByFilePath(project, filePath) ?: return null
-    val lineBookmarkProvider = LineBookmarkProvider.Util.find(project) ?: return null
-    val bookmark = lineBookmarkProvider.createBookmark(editor, line) as? LineBookmark ?: return null
-
-    val group = bookmarksManager.defaultGroup
-      ?: bookmarksManager.getGroup("IdeaVim")
-      ?: bookmarksManager.addGroup("IdeaVim", true)
-      ?: return null
-    if (!group.canAdd(bookmark)) return null
-    group.add(bookmark, type)
-
-    return BookmarkInfo(
-      key = char,
-      line = bookmark.line,
-      col = 0,
-      filepath = bookmark.file.path,
-      protocol = bookmark.file.fileSystem.protocol,
-    )
+  ): BookmarkInfo? = withContext(Dispatchers.EDT) {
+    bookmarkBackend.createOrGetSystemMark(char, line, filePath, projectId)
   }
 
-  override suspend fun removeBookmark(char: Char) {
-    val type = BookmarkType.get(char)
-    if (type == BookmarkType.DEFAULT) return
-    for (project in ProjectManager.getInstance().openProjects) {
-      val bookmarksManager = BookmarksManager.getInstance(project) ?: continue
-      val bookmark = bookmarksManager.getBookmark(type) ?: continue
-      bookmarksManager.remove(bookmark)
-      return
-    }
+  override suspend fun removeBookmark(char: Char) = withContext(Dispatchers.EDT) {
+    bookmarkBackend.removeBookmark(char)
   }
 
-  override suspend fun getBookmarkForMark(char: Char): BookmarkInfo? {
-    val type = BookmarkType.get(char)
-    if (type == BookmarkType.DEFAULT) return null
-    for (project in ProjectManager.getInstance().openProjects) {
-      val bookmarksManager = BookmarksManager.getInstance(project) ?: continue
-      val bookmark = bookmarksManager.getBookmark(type) ?: continue
-      if (bookmark is LineBookmark) {
-        return BookmarkInfo(
-          key = char,
-          line = bookmark.line,
-          col = 0,
-          filepath = bookmark.file.path,
-          protocol = bookmark.file.fileSystem.protocol,
-        )
-      }
-    }
-    return null
+  override suspend fun getBookmarkForMark(char: Char): BookmarkInfo? = withContext(Dispatchers.EDT) {
+    bookmarkBackend.getBookmarkForMark(char)
   }
 
-  override suspend fun getAllBookmarks(): List<BookmarkInfo> {
-    val result = mutableListOf<BookmarkInfo>()
-    for (project in ProjectManager.getInstance().openProjects) {
-      val bookmarksManager = BookmarksManager.getInstance(project) ?: continue
-      for (typeChar in (VimMarkService.UPPERCASE_MARKS + VimMarkService.NUMBERED_MARKS)) {
-        val type = BookmarkType.get(typeChar)
-        if (type == BookmarkType.DEFAULT) continue
-        val bookmark = bookmarksManager.getBookmark(type) ?: continue
-        if (bookmark is LineBookmark) {
-          result.add(
-            BookmarkInfo(
-              key = typeChar,
-              line = bookmark.line,
-              col = 0,
-              filepath = bookmark.file.path,
-              protocol = bookmark.file.fileSystem.protocol,
-            )
-          )
-        }
-      }
-      break // mnemonic bookmarks are per-application, first project is sufficient
-    }
-    return result
+  override suspend fun getAllBookmarks(): List<BookmarkInfo> = withContext(Dispatchers.EDT) {
+    bookmarkBackend.getAllBookmarks()
   }
 }
