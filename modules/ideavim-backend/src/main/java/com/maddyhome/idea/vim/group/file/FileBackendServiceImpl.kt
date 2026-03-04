@@ -11,6 +11,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileEditorManager
@@ -26,8 +27,8 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.ProjectScope
+import com.maddyhome.idea.vim.api.NativeActionManager
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.FileBackendService
 import com.maddyhome.idea.vim.group.LastTabService
 import com.maddyhome.idea.vim.group.findEditorByFilePath
@@ -163,10 +164,11 @@ class FileBackendServiceImpl : FileBackendService {
    * Used by [FileRemoteApiImpl] which reconstructs VimEditor/ExecutionContext from RPC params.
    */
   fun saveFile(editor: VimEditor, context: IjEditorExecutionContext, saveAll: Boolean) {
+    val nativeActionManager = service<NativeActionManager>()
     val action = if (saveAll) {
-      injector.nativeActionManager.saveAll
+      nativeActionManager.saveAll
     } else {
-      injector.nativeActionManager.saveCurrent
+      nativeActionManager.saveCurrent
     }
     action.execute(editor, context)
   }

@@ -12,6 +12,7 @@ import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.CapturingProcessHandler
 import com.intellij.execution.process.ProcessAdapter
 import com.intellij.execution.process.ProcessEvent
+import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressIndicatorProvider
@@ -23,7 +24,7 @@ import com.intellij.util.text.CharSequenceReader
 import com.maddyhome.idea.vim.api.GlobalOptions
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimProcessGroupBase
-import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.group.FileBackendService
 import com.maddyhome.idea.vim.group.ProcessResult
 import java.io.BufferedWriter
 import java.io.IOException
@@ -43,7 +44,7 @@ class ProcessGroup : VimProcessGroupBase() {
     options: GlobalOptions,
   ): String? {
     val project = ProjectManager.getInstance().openProjects
-      .firstOrNull { injector.file.getProjectId(it) == editor.projectId }
+      .firstOrNull { service<FileBackendService>().getProjectIdForProject(it) == editor.projectId }
     val result = executeCommandImpl(
       command, input, currentDirectoryPath, project,
       options.shell, options.shellcmdflag, options.shellxescape, options.shellxquote,

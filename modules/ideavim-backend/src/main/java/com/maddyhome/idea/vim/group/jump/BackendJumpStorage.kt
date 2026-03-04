@@ -12,26 +12,21 @@ import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.RoamingType
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.util.text.StringUtil
 import com.maddyhome.idea.vim.api.VimJumpServiceBase
-import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.mark.Jump
-import com.maddyhome.idea.vim.newapi.initInjector
 import org.jdom.Element
 
 /**
  * Backend-only storage for jumps collected by [JumpsListener].
  *
- * This is **not** a [VimJumpService] — it is a standalone application service registered
- * only in `ideavim-backend.xml`. It extends [VimJumpServiceBase] for its in-memory jump
- * list management and adds [PersistentStateComponent] for disk persistence.
+ * Registered as an application service in `ideavim-backend.xml`.
+ * Extends [VimJumpServiceBase] for its in-memory jump list management
+ * and adds [PersistentStateComponent] for disk persistence.
  *
- * In **split mode**, [JumpsListener] writes IDE navigation events here, and the frontend
+ * [JumpsListener] writes IDE navigation events here, and the frontend
  * fetches them via [JumpRemoteApi.getListenerJumps] → [JumpRemoteApiImpl].
- *
- * In **monolith mode**, [JumpsListener] adds jumps directly to [VimJumpServiceImpl]
- * (via `injector.jumpService`) and does NOT use this storage. This service is still
- * instantiated but unused in monolith mode.
  */
 @State(
   name = "VimBackendJumpsSettings",
@@ -39,7 +34,7 @@ import org.jdom.Element
 )
 internal class BackendJumpStorage : VimJumpServiceBase(), PersistentStateComponent<Element?> {
   companion object {
-    private val logger = vimLogger<BackendJumpStorage>()
+    private val logger = logger<BackendJumpStorage>()
   }
 
   override var lastJumpTimeStamp: Long = 0
@@ -59,7 +54,7 @@ internal class BackendJumpStorage : VimJumpServiceBase(), PersistentStateCompone
         jumpElem.setAttribute("filename", StringUtil.notNullize(jump.filepath))
         jumpElem.setAttribute("protocol", StringUtil.notNullize(jump.protocol))
         projectElement.addContent(jumpElem)
-        if (logger.isDebug()) {
+        if (logger.isDebugEnabled) {
           logger.debug("saved jump = $jump")
         }
       }
@@ -69,7 +64,6 @@ internal class BackendJumpStorage : VimJumpServiceBase(), PersistentStateCompone
   }
 
   override fun loadState(state: Element) {
-    initInjector()
     val projectElements = state.getChildren("project")
     for (projectElement in projectElements) {
       val jumps = mutableListOf<Jump>()
@@ -83,7 +77,7 @@ internal class BackendJumpStorage : VimJumpServiceBase(), PersistentStateCompone
         )
         jumps.add(jump)
       }
-      if (logger.isDebug()) {
+      if (logger.isDebugEnabled) {
         logger.debug("jumps=$jumps")
       }
       val projectId = projectElement.getAttributeValue("id")

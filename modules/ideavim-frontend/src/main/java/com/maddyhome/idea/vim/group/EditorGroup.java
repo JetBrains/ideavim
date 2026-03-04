@@ -48,7 +48,7 @@ import java.util.stream.Stream;
 import static com.intellij.openapi.editor.EditorSettings.LineNumerationType;
 import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 import static com.maddyhome.idea.vim.api.VimInjectorKt.options;
-import static com.maddyhome.idea.vim.newapi.IjVimInjectorKt.ijOptions;
+import static com.maddyhome.idea.vim.newapi.IjOptionsKt.ijOptions;
 
 /**
  * @author vlan
