@@ -17,8 +17,6 @@
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.CoroutineScopeProvider"/>
 
     <!-- Services needed by BOTH frontend and backend (implementation classes in common module) -->
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.OptionGroup"
-                        serviceInterface="com.maddyhome.idea.vim.api.VimOptionGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.newapi.IjNativeActionManager"
                         serviceInterface="com.maddyhome.idea.vim.api.NativeActionManager"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.helper.IjActionExecutor"

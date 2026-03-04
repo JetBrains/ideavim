@@ -76,6 +76,8 @@
                         serviceImplementation="com.maddyhome.idea.vim.newapi.IjVimEditorFactory"/>
 
     <!-- Services moved from common (implementation classes now in frontend module) -->
+    <applicationService serviceInterface="com.maddyhome.idea.vim.api.VimOptionGroup"
+                        serviceImplementation="com.maddyhome.idea.vim.group.OptionGroup"/>
     <applicationService serviceInterface="com.maddyhome.idea.vim.api.VimMotionGroup"
                         serviceImplementation="com.maddyhome.idea.vim.group.MotionGroup"/>
     <applicationService serviceInterface="com.maddyhome.idea.vim.api.VimSearchGroup"
