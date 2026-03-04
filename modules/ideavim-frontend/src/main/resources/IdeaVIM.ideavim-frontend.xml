@@ -76,6 +76,8 @@
                         serviceImplementation="com.maddyhome.idea.vim.newapi.IjVimEditorFactory"/>
 
     <!-- Services moved from common (implementation classes now in frontend module) -->
+    <applicationService serviceInterface="com.maddyhome.idea.vim.api.VimActionExecutor"
+                        serviceImplementation="com.maddyhome.idea.vim.helper.IjActionExecutor"/>
     <applicationService serviceInterface="com.maddyhome.idea.vim.api.VimOptionGroup"
                         serviceImplementation="com.maddyhome.idea.vim.group.OptionGroup"/>
     <applicationService serviceInterface="com.maddyhome.idea.vim.api.VimMotionGroup"
@@ -178,8 +180,7 @@
     <applicationService serviceImplementation="com.maddyhome.idea.vim.vimscript.Executor"
                         serviceInterface="com.maddyhome.idea.vim.api.VimscriptExecutor"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.newapi.IjVimMessages"
-                        serviceInterface="com.maddyhome.idea.vim.api.VimMessages"
-                        overrides="true"/>
+                        serviceInterface="com.maddyhome.idea.vim.api.VimMessages"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.NotificationService"
                         serviceInterface="com.maddyhome.idea.vim.group.VimNotifications"/>
     <projectService serviceImplementation="com.maddyhome.idea.vim.group.NotificationService"
