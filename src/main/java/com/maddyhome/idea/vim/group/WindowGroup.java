@@ -299,7 +299,8 @@ public class WindowGroup extends WindowGroupBase {
 
     VirtualFile virtualFile = null;
     if (!filename.isEmpty()) {
-      virtualFile = VimPlugin.getFile().findFile(filename, project);
+      // Try to find file relative to content roots and project scope (without current file directory resolution)
+      virtualFile = VimPlugin.getFile().findFile(filename, project, null);
       if (virtualFile == null) {
         // Vim doesn't have this error message. It will create a split with a new file, if there's not one to load
         VimPlugin.showMessage(MessageHelper.message("error.split.window.could.not.find.file.0", filename));

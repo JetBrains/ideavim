@@ -49,7 +49,8 @@ class FileGroup : VimFileBase() {
     val project = PlatformDataKeys.PROJECT.getData((context as IjEditorExecutionContext).context)
       ?: return false // API change - don't merge
 
-    val found = findFile(filename, project)
+    val vimEditor = injector.editorGroup.getEditors().firstOrNull()
+    val found = findFile(filename, project, vimEditor)
 
     if (found != null) {
       if (logger.isDebugEnabled) {
@@ -76,7 +77,7 @@ class FileGroup : VimFileBase() {
     }
   }
 
-  fun findFile(filename: String, project: Project): VirtualFile? {
+  fun findFile(filename: String, project: Project, vimEditor: VimEditor? = null): VirtualFile? {
     var found: VirtualFile?
     // Vim supports both ~/ and ~\ (tested on Mac and Windows). On Windows, it supports forward- and back-slashes, but
     // it only supports forward slash on Unix (tested on Mac)
@@ -90,17 +91,39 @@ class FileGroup : VimFileBase() {
       }
       found = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(Path(dir, relativePath))
     } else {
+      // Try absolute path first
       found = VirtualFileManager.getInstance().findFileByNioPath(Path(filename))
 
+      // If not found and filename contains a path separator, try relative to current file's directory
+      if (found == null && (filename.contains('/') || filename.contains('\\'))) {
+        found = findFileRelativeToCurrentFile(filename, vimEditor)
+      }
+
+      // Try relative to content roots
       if (found == null) {
         found = findByNameInContentRoots(filename, project)
-        if (found == null) {
-          found = findByNameInProject(filename, project)
-        }
+      }
+
+      // Try searching by filename only (ignoring path)
+      if (found == null) {
+        found = findByNameInProject(filename, project)
       }
     }
 
     return found
+  }
+
+  private fun findFileRelativeToCurrentFile(filename: String, vimEditor: VimEditor?): VirtualFile? {
+    if (vimEditor == null) return null
+
+    val currentFile = (vimEditor as? IjVimEditor)?.editor?.virtualFile ?: return null
+    val currentDir = currentFile.parent ?: return null
+
+    if (logger.isDebugEnabled) {
+      logger.debug("looking for $filename relative to ${currentDir.path}")
+    }
+
+    return currentDir.findFileByRelativePath(filename)
   }
 
   private fun findByNameInContentRoots(filename: String, project: Project): VirtualFile? {
