@@ -6,7 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.group
+package com.maddyhome.idea.vim.group.jump
 
 import com.intellij.platform.rpc.RemoteApiProviderService
 import fleet.rpc.RemoteApi

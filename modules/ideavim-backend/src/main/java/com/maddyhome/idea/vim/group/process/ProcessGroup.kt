@@ -24,8 +24,7 @@ import com.intellij.util.text.CharSequenceReader
 import com.maddyhome.idea.vim.api.GlobalOptions
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimProcessGroupBase
-import com.maddyhome.idea.vim.group.FileBackendService
-import com.maddyhome.idea.vim.group.ProcessResult
+import com.maddyhome.idea.vim.group.file.FileBackendService
 import java.io.BufferedWriter
 import java.io.IOException
 import java.io.OutputStreamWriter

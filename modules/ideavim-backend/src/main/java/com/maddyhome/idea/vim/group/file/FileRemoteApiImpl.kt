@@ -17,13 +17,10 @@ import com.intellij.openapi.fileEditor.impl.EditorsSplitters
 import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
-import com.maddyhome.idea.vim.group.FileBackendService
-import com.maddyhome.idea.vim.group.FileRemoteApi
 import com.maddyhome.idea.vim.group.findEditorByFilePath
 import com.maddyhome.idea.vim.group.findProjectById
 import com.maddyhome.idea.vim.group.findVirtualFile
 import com.maddyhome.idea.vim.helper.EngineMessageHelper
-import com.maddyhome.idea.vim.newapi.vim
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -103,9 +100,7 @@ internal class FileRemoteApiImpl : FileRemoteApi {
     withContext(Dispatchers.EDT) {
       val project = findProject(projectBasePath) ?: return@withContext
       val editor = filePath?.let { findEditorByFilePath(project, it) } ?: return@withContext
-      val vimEditor = editor.vim
-      val context = fileBackend.buildContext(project, editor)
-      fileBackend.saveFile(vimEditor, context, saveAll)
+      fileBackend.saveFile(editor, saveAll)
     }
 
   override suspend fun selectFile(count: Int, projectBasePath: String?): Boolean = withContext(Dispatchers.EDT) {
@@ -140,7 +135,7 @@ internal class FileRemoteApiImpl : FileRemoteApi {
     withContext(Dispatchers.EDT) {
       val project = findProject(projectBasePath) ?: return@withContext null
       val editor = filePath?.let { findEditorByFilePath(project, it) } ?: return@withContext null
-      fileBackend.buildFileInfoMessage(editor.vim, fullPath)
+      fileBackend.buildFileInfoMessage(editor, fullPath)
     }
 
   override suspend fun selectEditor(projectId: String, documentPath: String, protocol: String): Boolean =

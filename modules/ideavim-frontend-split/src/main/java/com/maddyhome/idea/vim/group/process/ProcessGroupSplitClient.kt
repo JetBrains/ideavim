@@ -6,13 +6,14 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.group
+package com.maddyhome.idea.vim.group.process
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
 import com.maddyhome.idea.vim.api.GlobalOptions
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimProcessGroupBase
+import com.maddyhome.idea.vim.group.CoroutineScopeProvider
 import kotlinx.coroutines.runBlocking
 
 /**

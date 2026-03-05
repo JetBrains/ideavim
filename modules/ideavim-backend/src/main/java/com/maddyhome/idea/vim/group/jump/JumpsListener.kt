@@ -12,7 +12,7 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.impl.IdeDocumentHistoryImpl.PlaceInfo
 import com.intellij.openapi.fileEditor.impl.IdeDocumentHistoryImpl.RecentPlacesListener
 import com.intellij.openapi.project.Project
-import com.maddyhome.idea.vim.group.FileBackendService
+import com.maddyhome.idea.vim.group.file.FileBackendService
 import com.maddyhome.idea.vim.group.findEditorByFilePath
 import com.maddyhome.idea.vim.group.findProjectById
 import com.maddyhome.idea.vim.mark.Jump

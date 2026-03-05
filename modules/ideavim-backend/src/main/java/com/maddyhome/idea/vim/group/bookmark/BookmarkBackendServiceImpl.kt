@@ -14,8 +14,6 @@ import com.intellij.ide.bookmark.LineBookmark
 import com.intellij.ide.bookmark.providers.LineBookmarkProvider
 import com.intellij.openapi.project.ProjectManager
 import com.maddyhome.idea.vim.api.VimMarkService
-import com.maddyhome.idea.vim.group.BookmarkBackendService
-import com.maddyhome.idea.vim.group.BookmarkInfo
 import com.maddyhome.idea.vim.group.findEditorByFilePath
 import com.maddyhome.idea.vim.group.findProjectById
 

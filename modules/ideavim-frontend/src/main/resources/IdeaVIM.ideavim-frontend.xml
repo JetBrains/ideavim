@@ -74,6 +74,8 @@
 
     <applicationService serviceInterface="com.maddyhome.idea.vim.newapi.VimEditorFactory"
                         serviceImplementation="com.maddyhome.idea.vim.newapi.IjVimEditorFactory"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.newapi.IjNativeActionManager"
+                        serviceInterface="com.maddyhome.idea.vim.api.NativeActionManager"/>
 
     <!-- Services moved from common (implementation classes now in frontend module) -->
     <applicationService serviceInterface="com.maddyhome.idea.vim.api.ExecutionContextManager"

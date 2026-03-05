@@ -7,13 +7,10 @@
  */
 package com.maddyhome.idea.vim.group.file
 
-import com.intellij.openapi.actionSystem.CommonDataKeys
-import com.intellij.openapi.actionSystem.PlatformDataKeys
-import com.intellij.openapi.actionSystem.impl.SimpleDataContext
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
@@ -27,16 +24,10 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.ProjectScope
-import com.maddyhome.idea.vim.api.NativeActionManager
-import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.group.FileBackendService
 import com.maddyhome.idea.vim.group.findEditorByFilePath
 import com.maddyhome.idea.vim.group.findProjectById
 import com.maddyhome.idea.vim.group.findVirtualFile
 import com.maddyhome.idea.vim.helper.EngineMessageHelper
-import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
-import com.maddyhome.idea.vim.newapi.execute
-import com.maddyhome.idea.vim.newapi.vim
 import kotlin.io.path.Path
 
 /**
@@ -93,15 +84,13 @@ class FileBackendServiceImpl : FileBackendService {
   override fun saveFile(projectId: String?, filePath: String?, saveAll: Boolean) {
     val project = resolveProject(projectId) ?: return
     val editor = filePath?.let { findEditorByFilePath(project, it) } ?: return
-    val vimEditor = editor.vim
-    val context = buildContext(project, editor)
-    saveFile(vimEditor, context, saveAll)
+    saveFile(editor, saveAll)
   }
 
   override fun buildFileInfoMessage(projectId: String?, filePath: String?, fullPath: Boolean): String? {
     val project = resolveProject(projectId) ?: return null
     val editor = filePath?.let { findEditorByFilePath(project, it) } ?: return null
-    return buildFileInfoMessage(editor.vim, fullPath)
+    return buildFileInfoMessage(editor, fullPath)
   }
 
   override fun selectEditor(projectId: String, documentPath: String, protocol: String): Boolean {
@@ -150,35 +139,34 @@ class FileBackendServiceImpl : FileBackendService {
 
   /**
    * Saves file(s) based on the [saveAll] flag.
-   * Used by [FileRemoteApiImpl] which reconstructs VimEditor/ExecutionContext from RPC params.
+   * Uses IntelliJ Platform APIs directly to avoid dependency on VimEditor/injector.
    */
-  fun saveFile(editor: VimEditor, context: IjEditorExecutionContext, saveAll: Boolean) {
-    val nativeActionManager = service<NativeActionManager>()
-    val action = if (saveAll) {
-      nativeActionManager.saveAll
+  fun saveFile(editor: Editor, saveAll: Boolean) {
+    if (saveAll) {
+      ApplicationManager.getApplication().saveAll()
     } else {
-      nativeActionManager.saveCurrent
+      val document = editor.document
+      val fileDocumentManager = FileDocumentManager.getInstance()
+      fileDocumentManager.saveDocument(document)
     }
-    action.execute(editor, context)
   }
 
   /**
    * Builds the `:file` / Ctrl-G message string for the given editor.
    * Used by [FileRemoteApiImpl] for split-mode RPC.
    */
-  fun buildFileInfoMessage(vimEditor: VimEditor, fullPath: Boolean): String {
+  fun buildFileInfoMessage(editor: Editor, fullPath: Boolean): String {
     val msg = StringBuilder()
-    val vf = vimEditor.getVirtualFile()
+    val vf = editor.virtualFile
     if (vf != null) {
       msg.append('"')
       if (fullPath) {
         msg.append(vf.path)
       } else {
         val project = ProjectManager.getInstance().openProjects
-          .firstOrNull { getProjectId(it) == vimEditor.projectId }
+          .firstOrNull { getProjectId(it) == getProjectId() }
         if (project != null) {
-          val virtualFile = VirtualFileManager.getInstance().getFileSystem(vf.protocol)?.findFileByPath(vf.path)
-          val root = virtualFile?.let { ProjectRootManager.getInstance(project).fileIndex.getContentRootForFile(it) }
+          val root = ProjectRootManager.getInstance(project).fileIndex.getContentRootForFile(vf)
           if (root != null) {
             msg.append(vf.path.substring(root.path.length + 1))
           } else {
@@ -191,24 +179,21 @@ class FileBackendServiceImpl : FileBackendService {
       msg.append("\"[No File]\" ")
     }
 
-    if (!vimEditor.isDocumentWritable()) {
+    if (!editor.document.isWritable) {
       msg.append("[RO] ")
-    } else if (vimEditor.hasUnsavedChanges()) {
+    } else if (FileDocumentManager.getInstance().isDocumentUnsaved(editor.document)) {
       msg.append("[+] ")
     }
 
-    val caret = vimEditor.currentCaret()
-    val bufferPosition = caret.getBufferPosition()
-    val lline = bufferPosition.line
-    val total = vimEditor.lineCount()
-    val pct = (lline.toFloat() / total.toFloat() * 100f + 0.5).toInt()
+    val logicalPosition = editor.caretModel.logicalPosition
+    val lline = logicalPosition.line
+    val total = editor.document.lineCount
+    val pct = if (total > 0) (lline.toFloat() / total.toFloat() * 100f + 0.5).toInt() else 0
 
     msg.append("line ").append(lline + 1).append(" of ").append(total)
     msg.append(" --").append(pct).append("%-- ")
 
-    val col = bufferPosition.column
-
-    msg.append("col ").append(col + 1)
+    msg.append("col ").append(logicalPosition.column + 1)
 
     return msg.toString()
   }
@@ -239,14 +224,6 @@ class FileBackendServiceImpl : FileBackendService {
     if (projectId == null) return projects.firstOrNull()
     return projects.firstOrNull { getProjectId(it) == projectId }
       ?: projects.firstOrNull()
-  }
-
-  internal fun buildContext(project: Project, editor: Editor?): IjEditorExecutionContext {
-    val dataContext = SimpleDataContext.builder()
-      .add(PlatformDataKeys.PROJECT, project)
-      .apply { if (editor != null) add(CommonDataKeys.EDITOR, editor) }
-      .build()
-    return IjEditorExecutionContext(dataContext)
   }
 
   private fun findByNameInContentRoots(filename: String, project: Project): VirtualFile? {

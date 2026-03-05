@@ -10,9 +10,6 @@ package com.maddyhome.idea.vim.group.bookmark
 
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.service
-import com.maddyhome.idea.vim.group.BookmarkBackendService
-import com.maddyhome.idea.vim.group.BookmarkInfo
-import com.maddyhome.idea.vim.group.BookmarkRemoteApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

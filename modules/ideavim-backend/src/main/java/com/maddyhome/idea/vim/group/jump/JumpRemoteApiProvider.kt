@@ -9,7 +9,6 @@
 package com.maddyhome.idea.vim.group.jump
 
 import com.intellij.platform.rpc.backend.RemoteApiProvider
-import com.maddyhome.idea.vim.group.JumpRemoteApi
 import fleet.rpc.remoteApiDescriptor
 
 /**

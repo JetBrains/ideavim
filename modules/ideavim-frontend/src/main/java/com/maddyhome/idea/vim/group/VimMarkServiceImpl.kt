@@ -17,6 +17,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMarkService
 import com.maddyhome.idea.vim.api.VimMarkServiceBase
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.group.bookmark.BookmarkBackendService
 import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.mark.VimMark
 import com.maddyhome.idea.vim.mark.VimMark.Companion.create
@@ -64,9 +65,10 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
       return mark
     }
 
-    // No IDE bookmark exists for this mark — clear stale local state if any.
-    globalMarks.remove(char)
-    return null
+    // No IDE bookmark found — fall back to in-memory mark if available.
+    // This handles cases where bookmark creation wasn't possible (e.g. temp files in tests)
+    // but the mark was still stored in-memory by setGlobalMark.
+    return super.getGlobalMark(char)
   }
 
   override fun getAllGlobalMarks(): Set<Mark> {
@@ -74,8 +76,8 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
       return super.getAllGlobalMarks()
     }
 
+    // Update in-memory marks from IDE bookmarks (bookmarks are source of truth when they exist)
     val bookmarks = bookmarkBackend.getAllBookmarks()
-    globalMarks.clear()
     for (info in bookmarks) {
       globalMarks[info.key] = VimMark(info.key, info.line, info.col, info.filepath, info.protocol)
     }

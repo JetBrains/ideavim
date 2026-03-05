@@ -6,17 +6,17 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.group
+package com.maddyhome.idea.vim.group.jump
 
 import kotlinx.serialization.Serializable
 
 /**
- * Serializable data transfer object for bookmark information over RPC.
- * Returned by [BookmarkRemoteApi.createOrGetSystemMark] to confirm bookmark creation.
+ * Serializable data transfer object for jump information over RPC.
+ * Returned by [JumpRemoteApi.getListenerJumps] to transfer backend jump list entries
+ * (collected by [JumpsListener]) to the frontend.
  */
 @Serializable
-data class BookmarkInfo(
-  val key: Char,
+data class JumpInfo(
   val line: Int,
   val col: Int,
   val filepath: String,

@@ -14,7 +14,7 @@ import com.intellij.ide.bookmark.LineBookmark
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.group.BookmarkBackendService
+import com.maddyhome.idea.vim.group.bookmark.BookmarkBackendService
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 

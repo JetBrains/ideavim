@@ -14,14 +14,14 @@
   </dependencies>
 
   <extensions defaultExtensionNs="com.intellij">
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.VimJumpServiceSplitClient"
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.jump.VimJumpServiceSplitClient"
                         serviceInterface="com.maddyhome.idea.vim.api.VimJumpService"
                         overrides="true"/>
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.FileBackendServiceSplitClient"
-                        serviceInterface="com.maddyhome.idea.vim.group.FileBackendService"/>
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.BookmarkBackendServiceSplitClient"
-                        serviceInterface="com.maddyhome.idea.vim.group.BookmarkBackendService"/>
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.ProcessGroupSplitClient"
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.file.FileBackendServiceSplitClient"
+                        serviceInterface="com.maddyhome.idea.vim.group.file.FileBackendService"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.bookmark.BookmarkBackendServiceSplitClient"
+                        serviceInterface="com.maddyhome.idea.vim.group.bookmark.BookmarkBackendService"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.process.ProcessGroupSplitClient"
                         serviceInterface="com.maddyhome.idea.vim.api.VimProcessGroup"/>
   </extensions>
 </idea-plugin>

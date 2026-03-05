@@ -6,12 +6,13 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.group
+package com.maddyhome.idea.vim.group.jump
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimJumpServiceBase
+import com.maddyhome.idea.vim.group.CoroutineScopeProvider
 import com.maddyhome.idea.vim.mark.Jump
 import kotlinx.coroutines.runBlocking
 

@@ -9,7 +9,6 @@
 package com.maddyhome.idea.vim.group.bookmark
 
 import com.intellij.platform.rpc.backend.RemoteApiProvider
-import com.maddyhome.idea.vim.group.BookmarkRemoteApi
 import fleet.rpc.remoteApiDescriptor
 
 /**

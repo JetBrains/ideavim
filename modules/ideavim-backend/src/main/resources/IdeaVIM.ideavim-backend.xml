@@ -32,10 +32,10 @@
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.jump.BackendJumpStorage"/>
 
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.file.FileBackendServiceImpl"
-                        serviceInterface="com.maddyhome.idea.vim.group.FileBackendService"/>
+                        serviceInterface="com.maddyhome.idea.vim.group.file.FileBackendService"/>
 
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.bookmark.BookmarkBackendServiceImpl"
-                        serviceInterface="com.maddyhome.idea.vim.group.BookmarkBackendService"/>
+                        serviceInterface="com.maddyhome.idea.vim.group.bookmark.BookmarkBackendService"/>
 
     <!-- RPC: expose ProcessGroup to thin-client frontend -->
     <platform.rpc.backend.remoteApiProvider
