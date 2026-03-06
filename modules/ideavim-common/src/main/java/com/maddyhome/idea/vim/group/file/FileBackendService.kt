@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.group.file
 
 import com.intellij.openapi.components.service
+import com.intellij.openapi.editor.impl.EditorId
 import com.intellij.platform.project.ProjectId
 
 /**
@@ -22,8 +23,7 @@ import com.intellij.platform.project.ProjectId
  * delegates backend-dependent operations to this service while keeping local UI operations
  * (closeFile by editor, selectFile, selectNextFile) on the frontend.
  *
- * Project identification uses platform [ProjectId] which is RPC-serializable and
- * resolves correctly across frontend/backend processes.
+ * Uses platform RPC IDs ([ProjectId], [EditorId]) for cross-process identity transfer.
  */
 interface FileBackendService {
 
@@ -40,14 +40,15 @@ interface FileBackendService {
   /**
    * Saves file(s) based on the [saveAll] flag.
    * The option is already resolved by the frontend caller.
+   * The [editorId] identifies the editor whose document should be saved.
    */
-  fun saveFile(projectId: ProjectId?, filePath: String?, saveAll: Boolean)
+  fun saveFile(editorId: EditorId, saveAll: Boolean)
 
   /**
-   * Builds the `:file` / Ctrl-G message string for the given file.
+   * Builds the `:file` / Ctrl-G message string for the given editor.
    * @return the message to display, or null if no info is available
    */
-  fun buildFileInfoMessage(projectId: ProjectId?, filePath: String?, fullPath: Boolean): String?
+  fun buildFileInfoMessage(editorId: EditorId, fullPath: Boolean): String?
 
   /**
    * Focuses or opens a file by path.

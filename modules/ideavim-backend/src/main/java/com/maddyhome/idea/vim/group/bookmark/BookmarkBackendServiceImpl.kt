@@ -12,11 +12,14 @@ import com.intellij.ide.bookmark.BookmarkType
 import com.intellij.ide.bookmark.BookmarksManager
 import com.intellij.ide.bookmark.LineBookmark
 import com.intellij.ide.bookmark.providers.LineBookmarkProvider
+import com.intellij.ide.vfs.VirtualFileId
+import com.intellij.ide.vfs.virtualFile
+import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.platform.project.ProjectId
 import com.intellij.platform.project.findProjectOrNull
 import com.maddyhome.idea.vim.api.VimMarkService
-import com.maddyhome.idea.vim.group.findEditorByFilePath
 
 /**
  * Direct [BookmarkBackendService] implementation using IntelliJ bookmark APIs.
@@ -33,9 +36,8 @@ internal class BookmarkBackendServiceImpl : BookmarkBackendService {
     char: Char,
     line: Int,
     col: Int,
-    filePath: String,
+    virtualFileId: VirtualFileId,
     projectId: ProjectId?,
-    protocol: String?,
   ): BookmarkInfo? {
     val type = BookmarkType.get(char)
     if (type == BookmarkType.DEFAULT) return null
@@ -59,8 +61,12 @@ internal class BookmarkBackendServiceImpl : BookmarkBackendService {
       bookmarksManager.remove(existing)
     }
 
-    // Create a new line bookmark
-    val editor = findEditorByFilePath(project, filePath, protocol) ?: return null
+    // Create a new line bookmark — find editor for the virtual file
+    val vf = virtualFileId.virtualFile() ?: return null
+    val editor = FileEditorManager.getInstance(project).getAllEditors(vf)
+      .filterIsInstance<TextEditor>()
+      .firstOrNull()
+      ?.editor ?: return null
     val lineBookmarkProvider = LineBookmarkProvider.Util.find(project) ?: return null
     val bookmark = lineBookmarkProvider.createBookmark(editor, line) as? LineBookmark ?: return null
 

@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.group.file
 
+import com.intellij.ide.vfs.VirtualFileId
+import com.intellij.openapi.editor.impl.EditorId
 import com.intellij.platform.project.ProjectId
 import com.intellij.platform.rpc.RemoteApiProviderService
 import fleet.rpc.RemoteApi
@@ -22,12 +24,8 @@ import org.jetbrains.annotations.ApiStatus
  * operation to the backend where [FileBackendServiceImpl] manages VFS, PSI, editors, and documents.
  * The split client is a thin proxy — it extracts serializable parameters and forwards via RPC.
  *
- * Many methods accept a [filePath] parameter because the backend in split mode has no
- * focused window/editor — the UI lives on the thin client. The thin client passes the
- * current file path so the backend can locate the correct editor and virtual file.
- *
- * Project identification uses platform [ProjectId] which is RPC-serializable and
- * resolves correctly across frontend/backend processes.
+ * Uses platform RPC IDs ([ProjectId], [EditorId], [VirtualFileId]) for cross-process
+ * identity transfer instead of string-based lookups.
  */
 @Rpc
 @ApiStatus.Internal
@@ -40,12 +38,12 @@ interface FileRemoteApi : RemoteApi<Unit> {
    * @return null on success, or an error message to display on the frontend
    */
   suspend fun openFile(filename: String, projectId: ProjectId?, focusEditor: Boolean = true): String?
-  suspend fun closeCurrentFile(projectId: ProjectId?, filePath: String?)
+  suspend fun closeCurrentFile(projectId: ProjectId?, virtualFileId: VirtualFileId?)
   suspend fun closeFile(number: Int, projectId: ProjectId?)
-  suspend fun saveFile(projectId: ProjectId?, filePath: String?, saveAll: Boolean)
+  suspend fun saveFile(editorId: EditorId, saveAll: Boolean)
   suspend fun selectFile(count: Int, projectId: ProjectId?): Boolean
   suspend fun selectNextFile(count: Int, projectId: ProjectId?)
-  suspend fun buildFileInfoMessage(projectId: ProjectId?, filePath: String?, fullPath: Boolean): String?
+  suspend fun buildFileInfoMessage(editorId: EditorId, fullPath: Boolean): String?
   suspend fun selectEditor(projectId: ProjectId, documentPath: String, protocol: String): Boolean
 
   companion object {

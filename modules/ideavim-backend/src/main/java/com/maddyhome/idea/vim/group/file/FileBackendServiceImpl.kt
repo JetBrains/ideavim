@@ -10,6 +10,8 @@ package com.maddyhome.idea.vim.group.file
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.impl.EditorId
+import com.intellij.openapi.editor.impl.findEditorOrNull
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.TextEditor
@@ -25,7 +27,6 @@ import com.intellij.platform.project.ProjectId
 import com.intellij.platform.project.findProjectOrNull
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.ProjectScope
-import com.maddyhome.idea.vim.group.findEditorByFilePath
 import com.maddyhome.idea.vim.group.findVirtualFile
 import com.maddyhome.idea.vim.helper.EngineMessageHelper
 import kotlin.io.path.Path
@@ -81,15 +82,14 @@ class FileBackendServiceImpl : FileBackendService {
     }
   }
 
-  override fun saveFile(projectId: ProjectId?, filePath: String?, saveAll: Boolean) {
-    val project = projectId?.findProjectOrNull() ?: return
-    val editor = filePath?.let { findEditorByFilePath(project, it) } ?: return
+  override fun saveFile(editorId: EditorId, saveAll: Boolean) {
+    val editor = editorId.findEditorOrNull() ?: return
     saveFile(editor, saveAll)
   }
 
-  override fun buildFileInfoMessage(projectId: ProjectId?, filePath: String?, fullPath: Boolean): String? {
-    val project = projectId?.findProjectOrNull() ?: return null
-    val editor = filePath?.let { findEditorByFilePath(project, it) } ?: return null
+  override fun buildFileInfoMessage(editorId: EditorId, fullPath: Boolean): String? {
+    val editor = editorId.findEditorOrNull() ?: return null
+    val project = editor.project ?: return null
     return buildFileInfoMessage(editor, project, fullPath)
   }
 
