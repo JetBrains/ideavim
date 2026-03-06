@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.group.bookmark
 
+import com.intellij.ide.vfs.VirtualFileId
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.service
 import com.intellij.platform.project.ProjectId
@@ -30,11 +31,10 @@ internal class BookmarkRemoteApiImpl : BookmarkRemoteApi {
     char: Char,
     line: Int,
     col: Int,
-    filePath: String,
+    virtualFileId: VirtualFileId,
     projectId: ProjectId?,
-    protocol: String?,
   ): BookmarkInfo? = withContext(Dispatchers.EDT) {
-    bookmarkBackend.createOrGetSystemMark(char, line, col, filePath, projectId, protocol)
+    bookmarkBackend.createOrGetSystemMark(char, line, col, virtualFileId, projectId)
   }
 
   override suspend fun removeBookmark(char: Char) = withContext(Dispatchers.EDT) {

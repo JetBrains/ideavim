@@ -12,6 +12,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.editor.impl.editorId
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
@@ -93,13 +94,13 @@ class IjFileGroup : VimFileBase() {
 
   override fun saveFile(editor: VimEditor, context: ExecutionContext) {
     val saveAll = injector.globalIjOptions().ideawrite.contains(IjOptionConstants.ideawrite_all)
-    val filePath = editor.getVirtualFile()?.path
-    backend.saveFile(extractProjectId(context), filePath, saveAll)
+    val editorId = (editor as IjVimEditor).editor.editorId()
+    backend.saveFile(editorId, saveAll)
   }
 
   override fun saveFiles(editor: VimEditor, context: ExecutionContext) {
-    val filePath = editor.getVirtualFile()?.path
-    backend.saveFile(extractProjectId(context), filePath, true)
+    val editorId = (editor as IjVimEditor).editor.editorId()
+    backend.saveFile(editorId, true)
   }
 
   override fun selectFile(count: Int, context: ExecutionContext): Boolean {
@@ -144,9 +145,8 @@ class IjFileGroup : VimFileBase() {
   }
 
   override fun displayFileInfo(vimEditor: VimEditor, fullPath: Boolean): String? {
-    val filePath = vimEditor.getVirtualFile()?.path
-    val projectId = (vimEditor as IjVimEditor).editor.project?.projectId()
-    return if (projectId != null) backend.buildFileInfoMessage(projectId, filePath, fullPath) else null
+    val editorId = (vimEditor as IjVimEditor).editor.editorId()
+    return backend.buildFileInfoMessage(editorId, fullPath)
   }
 
   override fun selectEditor(projectId: String, documentPath: String, protocol: String): VimEditor? {

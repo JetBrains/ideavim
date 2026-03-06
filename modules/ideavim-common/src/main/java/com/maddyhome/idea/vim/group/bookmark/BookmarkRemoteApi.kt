@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.group.bookmark
 
+import com.intellij.ide.vfs.VirtualFileId
 import com.intellij.platform.project.ProjectId
 import com.intellij.platform.rpc.RemoteApiProviderService
 import fleet.rpc.RemoteApi
@@ -33,7 +34,7 @@ interface BookmarkRemoteApi : RemoteApi<Unit> {
    *
    * @param char the mark character (e.g. 'A')
    * @param line the 0-based line number
-   * @param filePath the file path where the bookmark should be placed
+   * @param virtualFileId the file where the bookmark should be placed
    * @param projectId platform project ID for resolving the correct project on backend
    * @return bookmark info if created/found, null if bookmark creation failed
    */
@@ -41,9 +42,8 @@ interface BookmarkRemoteApi : RemoteApi<Unit> {
     char: Char,
     line: Int,
     col: Int,
-    filePath: String,
+    virtualFileId: VirtualFileId,
     projectId: ProjectId?,
-    protocol: String? = null,
   ): BookmarkInfo?
 
   /**

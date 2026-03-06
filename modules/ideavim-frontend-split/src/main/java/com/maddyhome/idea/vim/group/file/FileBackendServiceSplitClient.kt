@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.group.file
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
+import com.intellij.openapi.editor.impl.EditorId
 import com.intellij.platform.project.ProjectId
 import com.maddyhome.idea.vim.group.CoroutineScopeProvider
 import kotlinx.coroutines.runBlocking
@@ -35,12 +36,12 @@ internal class FileBackendServiceSplitClient : FileBackendService {
     rpc { closeFile(number, projectId) }
   }
 
-  override fun saveFile(projectId: ProjectId?, filePath: String?, saveAll: Boolean) {
-    rpc { saveFile(projectId, filePath, saveAll) }
+  override fun saveFile(editorId: EditorId, saveAll: Boolean) {
+    rpc { saveFile(editorId, saveAll) }
   }
 
-  override fun buildFileInfoMessage(projectId: ProjectId?, filePath: String?, fullPath: Boolean): String? {
-    return rpc { buildFileInfoMessage(projectId, filePath, fullPath) }
+  override fun buildFileInfoMessage(editorId: EditorId, fullPath: Boolean): String? {
+    return rpc { buildFileInfoMessage(editorId, fullPath) }
   }
 
   override fun selectEditor(projectId: ProjectId, documentPath: String, protocol: String): Boolean {
