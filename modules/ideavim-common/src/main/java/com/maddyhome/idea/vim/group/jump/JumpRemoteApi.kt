@@ -20,20 +20,11 @@ import org.jetbrains.annotations.ApiStatus
  * Called by [VimJumpServiceSplitClient] in split mode.
  *
  * [includeCurrentCommandAsNavigation] forwards [IdeDocumentHistory] calls to the backend.
- * [getListenerJumps] fetches jumps collected by [JumpsListener] on the backend
- * (IDE navigation events) so the frontend can merge them with its local jump list.
  */
 @Rpc
 @ApiStatus.Internal
 interface JumpRemoteApi : RemoteApi<Unit> {
   suspend fun includeCurrentCommandAsNavigation(projectId: ProjectId?)
-
-  /**
-   * Returns jumps collected by [JumpsListener] on the backend for the given project.
-   * These are IDE-initiated navigation events (e.g., Go to Declaration, Recent Places)
-   * that only fire on the backend.
-   */
-  suspend fun getListenerJumps(projectId: ProjectId?): List<JumpInfo>
 
   companion object {
     @JvmStatic

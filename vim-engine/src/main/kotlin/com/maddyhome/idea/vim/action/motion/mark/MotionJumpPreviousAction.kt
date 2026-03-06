@@ -28,9 +28,7 @@ class MotionJumpPreviousAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    val motion = injector.motion.moveCaretToJump(editor, caret, -operatorArguments.count1)
-    injector.jumpService.lastJumpTimeStamp = System.currentTimeMillis()
-    return motion
+    return injector.motion.moveCaretToJump(editor, caret, -operatorArguments.count1)
   }
 
   override val motionType: MotionType = MotionType.EXCLUSIVE
