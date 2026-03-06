@@ -1,0 +1,179 @@
+/*
+ * Copyright 2003-2026 The IdeaVim authors
+ *
+ * Use of this source code is governed by an MIT-style
+ * license that can be found in the LICENSE.txt file or at
+ * https://opensource.org/licenses/MIT.
+ */
+package com.maddyhome.idea.vim.group.process
+
+import com.intellij.execution.ExecutionException
+import com.intellij.execution.configurations.GeneralCommandLine
+import com.intellij.execution.process.CapturingProcessHandler
+import com.intellij.execution.process.ProcessAdapter
+import com.intellij.execution.process.ProcessEvent
+import com.intellij.openapi.components.service
+import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.progress.ProcessCanceledException
+import com.intellij.openapi.progress.ProgressIndicatorProvider
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.ProjectManager
+import com.intellij.util.execution.ParametersListUtil
+import com.intellij.util.text.CharSequenceReader
+import com.maddyhome.idea.vim.api.GlobalOptions
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimProcessGroupBase
+import com.maddyhome.idea.vim.group.file.FileBackendService
+import java.io.BufferedWriter
+import java.io.IOException
+import java.io.OutputStreamWriter
+import java.io.Reader
+import java.io.Writer
+
+
+class ProcessGroup : VimProcessGroupBase() {
+
+  @Throws(ExecutionException::class, ProcessCanceledException::class)
+  override fun executeCommand(
+    editor: VimEditor,
+    command: String,
+    input: CharSequence?,
+    currentDirectoryPath: String?,
+    options: GlobalOptions,
+  ): String? {
+    val project = ProjectManager.getInstance().openProjects
+      .firstOrNull { service<FileBackendService>().getProjectIdForProject(it) == editor.projectId }
+    val result = executeCommandImpl(
+      command, input, currentDirectoryPath, project,
+      options.shell, options.shellcmdflag, options.shellxescape, options.shellxquote,
+    )
+    lastExitCode = result.exitCode
+    return result.output
+  }
+
+  /**
+   * Entry point used by [ProcessRemoteApiImpl] for RPC calls from the thin client.
+   * Shell options are passed from the frontend because `injector` is not initialized
+   * on the backend in split mode.
+   */
+  fun executeCommand(
+    command: String,
+    input: String?,
+    currentDirectoryPath: String?,
+    shell: String,
+    shellcmdflag: String,
+    shellxescape: String,
+    shellxquote: String,
+  ): ProcessResult {
+    val project = ProjectManager.getInstance().openProjects.firstOrNull()
+    return executeCommandImpl(
+      command,
+      input,
+      currentDirectoryPath,
+      project,
+      shell,
+      shellcmdflag,
+      shellxescape,
+      shellxquote
+    )
+  }
+
+  private fun executeCommandImpl(
+    command: String,
+    input: CharSequence?,
+    currentDirectoryPath: String?,
+    project: Project?,
+    shell: String,
+    shellcmdflag: String,
+    shellxescape: String,
+    shellxquote: String,
+  ): ProcessResult {
+    // This is a much simplified version of how Vim does this. We're using stdin/stdout directly, while Vim will
+    // redirect to temp files ('shellredir' and 'shelltemp') or use pipes. We don't support 'shellquote', because we're
+    // not handling redirection, but we do use 'shellxquote' and 'shellxescape', because these have defaults that work
+    // better with Windows. We also don't bother using ShellExecute for Windows commands beginning with `start`.
+    // Finally, we're also not bothering with the crazy space and backslash handling of the 'shell' options content.
+
+    return ProgressManager.getInstance().runProcessWithProgressSynchronously<ProcessResult, ExecutionException>(
+      {
+        // For Win32. See :help 'shellxescape'
+        val escapedCommand = if (shellxquote == "(") doEscape(command, shellxescape, "^")
+        else command
+        // Required for Win32+cmd.exe, defaults to "(". See :help 'shellxquote'
+        val quotedCommand = if (shellxquote == "(") "($escapedCommand)"
+        else (if (shellxquote == "\"(") "\"($escapedCommand)\""
+        else shellxquote + escapedCommand + shellxquote)
+
+        val commands = ArrayList<String>()
+        commands.add(shell)
+        if (shellcmdflag.isNotEmpty()) {
+          // Note that Vim also does a simple whitespace split for multiple parameters
+          commands.addAll(ParametersListUtil.parse(shellcmdflag))
+        }
+        commands.add(quotedCommand)
+
+        if (logger.isDebugEnabled) {
+          logger.debug(String.format("shell=%s shellcmdflag=%s command=%s", shell, shellcmdflag, quotedCommand))
+        }
+
+        val commandLine = GeneralCommandLine(commands)
+        if (currentDirectoryPath != null) {
+          commandLine.setWorkDirectory(currentDirectoryPath)
+        }
+        val handler = CapturingProcessHandler(commandLine)
+        if (input != null) {
+          handler.addProcessListener(object : ProcessAdapter() {
+            override fun startNotified(event: ProcessEvent) {
+              try {
+                val charSequenceReader = CharSequenceReader(input)
+                val outputStreamWriter = BufferedWriter(OutputStreamWriter(handler.processInput))
+                copy(charSequenceReader, outputStreamWriter)
+                outputStreamWriter.close()
+              } catch (e: IOException) {
+                logger.error(e)
+              }
+            }
+          })
+        }
+
+        val progressIndicator = ProgressIndicatorProvider.getInstance().progressIndicator
+        val output = handler.runProcessWithProgressIndicator(progressIndicator)
+
+        if (output.isCancelled) {
+          // TODO: Vim will use whatever text has already been written to stdout
+          // For whatever reason, we're not getting any here, so just throw an exception
+          throw ProcessCanceledException()
+        }
+
+        ProcessResult(
+          output = (output.stderr + output.stdout).replace("\u001B\\[[;\\d]*m".toRegex(), ""),
+          exitCode = handler.exitCode,
+        )
+      }, "IdeaVim - !$command", true, project
+    )
+  }
+
+  @Suppress("SameParameterValue")
+  private fun doEscape(original: String, charsToEscape: String, escapeChar: String): String {
+    var result = original
+    for (c in charsToEscape.toCharArray()) {
+      result = result.replace("" + c, escapeChar + c)
+    }
+    return result
+  }
+
+  // TODO: Java 10 has a transferTo method we could use instead
+  @Throws(IOException::class)
+  private fun copy(from: Reader, to: Writer) {
+    val buf = CharArray(2048)
+    var cnt: Int
+    while ((from.read(buf).also { cnt = it }) != -1) {
+      to.write(buf, 0, cnt)
+    }
+  }
+
+  companion object {
+    private val logger = logger<ProcessGroup>()
+  }
+}
