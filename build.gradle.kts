@@ -247,22 +247,19 @@ tasks {
   }
 
   // Run split mode with a JDWP debug agent on the frontend (JetBrains Client) process.
-  // After the frontend window appears, connect with the "IdeaVim Frontend Debug" Remote JVM Debug
-  // run configuration (port 5006). Use suspend=y below if you need to debug frontend startup code.
+  // After the frontend window appears, run the "Split Frontend Debugger" run configuration to attach.
   val runIdeSplitModeDebugFrontend by intellijPlatformTesting.runIde.registering {
     splitMode = true
     splitModeTarget = SplitModeAware.SplitModeTarget.BOTH
 
-    task {
-      doFirst {
-        // Find and patch the JetBrains Client vmoptions in the sandbox to include the JDWP debug agent.
-        // The file is created by the IDE during sandbox setup and lives under embedded-client/.
+    prepareSandboxTask {
+      val sandboxDir = project.layout.buildDirectory.dir("idea-sandbox").map { it.asFile }
+      doLast {
         val debugLine = "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5006"
-        val sandboxDir = project.layout.buildDirectory.dir("idea-sandbox").get().asFile
-        val vmoptions = sandboxDir.walkTopDown()
+        val vmoptions = sandboxDir.get().walkTopDown()
           .filter { it.name == "jetbrains_client64.vmoptions" && it.path.contains("runIdeSplitModeDebugFrontend") }
           .firstOrNull()
-          ?: sandboxDir.walkTopDown()
+          ?: sandboxDir.get().walkTopDown()
             .filter { it.name == "jetbrains_client64.vmoptions" }
             .firstOrNull()
 
@@ -271,10 +268,8 @@ tasks {
           if (debugLine !in content) {
             vmoptions.appendText("\n$debugLine\n")
             logger.lifecycle("Patched frontend vmoptions with JDWP debug agent: ${vmoptions.absolutePath}")
-            logger.lifecycle("Connect a Remote JVM Debug configuration to localhost:5006")
-          } else {
-            logger.lifecycle("Frontend vmoptions already contain JDWP debug agent: ${vmoptions.absolutePath}")
           }
+          logger.lifecycle("Connect a Remote JVM Debug configuration to localhost:5006")
         } else {
           logger.warn(
             "Could not find jetbrains_client64.vmoptions in sandbox. " +
