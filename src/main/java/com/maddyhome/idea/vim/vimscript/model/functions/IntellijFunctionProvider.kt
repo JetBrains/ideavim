@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -9,5 +9,5 @@
 package com.maddyhome.idea.vim.vimscript.model.functions
 
 object IntellijFunctionProvider : VimscriptFunctionProvider {
-  override val functionListFileName: String = "intellij_vimscript_functions.json"
+  override val functionListFileName: String = "frontend_vimscript_functions.json"
 }

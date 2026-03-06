@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -15,6 +15,10 @@ abstract class VimJumpServiceBase : VimJumpService {
   protected val projectToJumpSpot: MutableMap<String, Int> = mutableMapOf()
 
   override fun getJump(projectId: String, count: Int): Jump? {
+    // Update timestamp to suppress Platform's recentPlaceAdded events caused by
+    // Ctrl-O/Ctrl-I cursor movements (see lastJumpTimeStamp doc).
+    // Small margin accounts for PlaceInfo being created slightly after this call.
+    lastJumpTimeStamp = System.currentTimeMillis() + JUMP_NAVIGATION_SUPPRESS_MS
     val jumps = projectToJumps[projectId] ?: mutableListOf()
     projectToJumpSpot.putIfAbsent(projectId, -1)
     val index = jumps.size - 1 - (projectToJumpSpot[projectId]!! - count)
@@ -32,7 +36,7 @@ abstract class VimJumpServiceBase : VimJumpService {
   }
 
   override fun addJump(projectId: String, jump: Jump, reset: Boolean) {
-    lastJumpTimeStamp = System.currentTimeMillis()
+    lastJumpTimeStamp = System.currentTimeMillis() + JUMP_NAVIGATION_SUPPRESS_MS
     val jumps = projectToJumps.getOrPut(projectId) { mutableListOf() }
     jumps.removeIf { it.filepath == jump.filepath && it.line == jump.line }
     jumps.add(jump)
@@ -78,5 +82,6 @@ abstract class VimJumpServiceBase : VimJumpService {
 
   companion object {
     const val SAVE_JUMP_COUNT: Int = 100
+    private const val JUMP_NAVIGATION_SUPPRESS_MS: Long = 500
   }
 }

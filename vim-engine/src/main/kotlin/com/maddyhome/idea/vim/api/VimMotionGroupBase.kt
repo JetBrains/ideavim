@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -314,7 +314,6 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     val (line, col, fileName, protocol) = jumpService.getJump(editor, count) ?: return Motion.Error
     val lp = BufferPosition(line, col, false)
     return if (editor.getPath() != fileName) {
-      // TODO [vakhitov] come up with a more gentle way to handle protocol
       injector.file.selectEditor(editor.projectId, fileName, protocol)?.let { newEditor ->
         if (spot == -1) {
           jumpService.addJump(editor, false)

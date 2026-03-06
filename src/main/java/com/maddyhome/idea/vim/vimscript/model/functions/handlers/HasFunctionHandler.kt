@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -23,7 +23,12 @@ import com.maddyhome.idea.vim.vimscript.model.functions.BuiltinFunctionHandler
 internal class HasFunctionHandler : BuiltinFunctionHandler<VimInt>(minArity = 1, maxArity = 2) {
   private val supportedFeatures = Features.discover()
 
-  override fun doFunction(arguments: Arguments, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimInt {
+  override fun doFunction(
+    arguments: Arguments,
+    editor: VimEditor,
+    context: ExecutionContext,
+    vimContext: VimLContext,
+  ): VimInt {
     val feature = arguments.getString(0).value
     if (feature == "ide") {
       VimscriptState.Util.isIDESpecificConfigurationUsed = true

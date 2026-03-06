@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -84,8 +84,7 @@ internal class VimActionsPromoter : ActionPromoter {
 
       // Returns all actions, in the order we've added them
       return ordered
-    }
-    else {
+    } else {
       // Return the action we want to promote
       return listOf(actions[vimIndex])
     }

@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.action.change.LazyVimCommand;
 import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.extension.VimExtensionFacade;
+import com.maddyhome.idea.vim.helper.ShortcutHelper;
 import com.maddyhome.idea.vim.key.*;
 import com.maddyhome.idea.vim.newapi.IjNativeAction;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
@@ -57,168 +58,8 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
   private static final @NonNls String OWNER_ATTRIBUTE = "owner";
   private static final String TEXT_ELEMENT = "text";
 
-  public void registerRequiredShortcutKeys(@NotNull VimEditor editor) {
-    EventFacade.getInstance()
-      .registerCustomShortcutSet(VimShortcutKeyAction.getInstance(), toShortcutSet(getRequiredShortcutKeys()),
-                                 ((IjVimEditor)editor).getEditor().getContentComponent());
-  }
-
-  public void registerShortcutsForLookup(@NotNull LookupImpl lookup) {
-    EventFacade.getInstance()
-      .registerCustomShortcutSet(VimShortcutKeyAction.getInstance(), toShortcutSet(getRequiredShortcutKeys()),
-                                 lookup.getComponent(), lookup);
-  }
-
-  void unregisterShortcutKeys(@NotNull VimEditor editor) {
-    EventFacade.getInstance().unregisterCustomShortcutSet(VimShortcutKeyAction.getInstance(),
-                                                          ((IjVimEditor)editor).getEditor().getContentComponent());
-  }
-
-  @Override
-  public void updateShortcutKeysRegistration() {
-    for (VimEditor editor : injector.getEditorGroup().getEditors()) {
-      unregisterShortcutKeys(editor);
-      registerRequiredShortcutKeys(editor);
-    }
-  }
-
-  public void saveData(@NotNull Element element) {
-    final Element conflictsElement = new Element(SHORTCUT_CONFLICTS_ELEMENT);
-    for (Map.Entry<KeyStroke, ShortcutOwnerInfo> entry : myShortcutConflicts.entrySet()) {
-      final ShortcutOwner owner;
-      ShortcutOwnerInfo myValue = entry.getValue();
-      if (myValue instanceof ShortcutOwnerInfo.AllModes) {
-        owner = ((ShortcutOwnerInfo.AllModes)myValue).getOwner();
-      }
-      else if (myValue instanceof ShortcutOwnerInfo.PerMode) {
-        owner = null;
-      }
-      else {
-        throw new RuntimeException();
-      }
-      if (owner != null && owner != ShortcutOwner.UNDEFINED) {
-        final Element conflictElement = new Element(SHORTCUT_CONFLICT_ELEMENT);
-        conflictElement.setAttribute(OWNER_ATTRIBUTE, owner.getOwnerName());
-        final Element textElement = new Element(TEXT_ELEMENT);
-        VimPlugin.getXML().setSafeXmlText(textElement, entry.getKey().toString());
-        conflictElement.addContent(textElement);
-        conflictsElement.addContent(conflictElement);
-      }
-    }
-    element.addContent(conflictsElement);
-  }
-
-  public void readData(@NotNull Element element) {
-    final Element conflictsElement = element.getChild(SHORTCUT_CONFLICTS_ELEMENT);
-    if (conflictsElement != null) {
-      final List<Element> conflictElements = conflictsElement.getChildren(SHORTCUT_CONFLICT_ELEMENT);
-      for (Element conflictElement : conflictElements) {
-        final String ownerValue = conflictElement.getAttributeValue(OWNER_ATTRIBUTE);
-        ShortcutOwner owner = ShortcutOwner.UNDEFINED;
-        try {
-          owner = ShortcutOwner.fromString(ownerValue);
-        }
-        catch (IllegalArgumentException ignored) {
-        }
-        final Element textElement = conflictElement.getChild(TEXT_ELEMENT);
-        if (textElement != null) {
-          final String text = VimPlugin.getXML().getSafeXmlText(textElement);
-          if (text != null) {
-            final KeyStroke keyStroke = KeyStroke.getKeyStroke(text);
-            if (keyStroke != null) {
-              myShortcutConflicts.put(keyStroke, new ShortcutOwnerInfo.AllModes(owner));
-            }
-          }
-        }
-      }
-    }
-  }
-
-  @Override
-  public @NotNull List<NativeAction> getKeymapConflicts(@NotNull KeyStroke keyStroke) {
-    final KeymapManagerEx keymapManager = KeymapManagerEx.getInstanceEx();
-    final Keymap keymap = keymapManager.getActiveKeymap();
-    final KeyboardShortcut shortcut = new KeyboardShortcut(keyStroke, null);
-    final Map<String, ? extends List<KeyboardShortcut>> conflicts = keymap.getConflicts("", shortcut);
-    final List<AnAction> actions = new ArrayList<>();
-    for (String actionId : conflicts.keySet()) {
-      final AnAction action = ActionManagerEx.getInstanceEx().getAction(actionId);
-      if (action != null) {
-        actions.add(action);
-      }
-    }
-    return actions.stream().map(IjNativeAction::new).collect(toList());
-  }
-
-  public @NotNull Map<KeyStroke, ShortcutOwnerInfo> getShortcutConflicts() {
-    final Set<RequiredShortcut> requiredShortcutKeys = this.getRequiredShortcutKeys();
-    final Map<KeyStroke, ShortcutOwnerInfo> savedConflicts = getSavedShortcutConflicts();
-    final Map<KeyStroke, ShortcutOwnerInfo> results = new HashMap<>();
-    for (RequiredShortcut requiredShortcut : requiredShortcutKeys) {
-      KeyStroke keyStroke = requiredShortcut.getKeyStroke();
-      if (!VimShortcutKeyAction.VIM_ONLY_EDITOR_KEYS.contains(keyStroke)) {
-        final List<NativeAction> conflicts = getKeymapConflicts(keyStroke);
-        if (!conflicts.isEmpty()) {
-          ShortcutOwnerInfo owner = savedConflicts.get(keyStroke);
-          if (owner == null) {
-            owner = ShortcutOwnerInfo.allUndefined;
-          }
-          results.put(keyStroke, owner);
-        }
-      }
-    }
-    return results;
-  }
-
-  /**
-   * Registers a shortcut that is handled by KeyHandler#handleKey directly, rather than by an action
-   *
-   * <p>
-   * Digraphs are handled directly by KeyHandler#handleKey instead of via an action, but we need to still make sure the
-   * shortcuts are registered, or the key handler won't see them
-   * </p>
-   *
-   * @param keyStroke The shortcut to register
-   */
-  public void registerShortcutWithoutAction(KeyStroke keyStroke, MappingOwner owner) {
-    registerRequiredShortcut(Collections.singletonList(keyStroke), owner);
-  }
-
-  public void registerCommandAction(@NotNull LazyVimCommand command) {
-    if (ApplicationManager.getApplication().isUnitTestMode()) {
-      initIdentityChecker();
-      for (List<KeyStroke> keys : command.getKeys()) {
-        checkCommand(command.getModes(), command, keys);
-      }
-    }
-
-    for (List<KeyStroke> keyStrokes : command.getKeys()) {
-      registerRequiredShortcut(keyStrokes, MappingOwner.IdeaVim.System.INSTANCE);
-
-      for (MappingMode mappingMode : command.getModes()) {
-        getBuiltinCommandsTrie(mappingMode).add(keyStrokes, command);
-      }
-    }
-  }
-
-  private void registerRequiredShortcut(@NotNull List<KeyStroke> keys, MappingOwner owner) {
-    for (KeyStroke key : keys) {
-      if (key.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
-        if (!injector.getApplication().isOctopusEnabled() ||
-            !(key.getKeyCode() == KeyEvent.VK_ESCAPE && key.getModifiers() == 0) &&
-            !(key.getKeyCode() == KeyEvent.VK_ENTER && key.getModifiers() == 0)) {
-          getRequiredShortcutKeys().add(new RequiredShortcut(key, owner));
-        }
-      }
-    }
-  }
-
   public static @NotNull ShortcutSet toShortcutSet(@NotNull Collection<RequiredShortcut> requiredShortcuts) {
-    final List<Shortcut> shortcuts = new ArrayList<>();
-    for (RequiredShortcut key : requiredShortcuts) {
-      shortcuts.add(new KeyboardShortcut(key.getKeyStroke(), null));
-    }
-    return new CustomShortcutSet(shortcuts.toArray(new Shortcut[0]));
+    return ShortcutHelper.toShortcutSet(requiredShortcuts);
   }
 
   private static @NotNull List<Pair<Set<MappingMode>, MappingInfo>> getKeyMappingRows(@NotNull Set<? extends MappingMode> modes,
@@ -299,19 +140,6 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
     return mode;
   }
 
-  private @NotNull List<AnAction> getActions(@NotNull Component component, @NotNull KeyStroke keyStroke) {
-    final List<AnAction> results = new ArrayList<>();
-    results.addAll(getLocalActions(component, keyStroke));
-    results.addAll(getKeymapActions(keyStroke));
-    return results;
-  }
-
-  @Override
-  public @NotNull List<NativeAction> getActions(@NotNull VimEditor editor, @NotNull KeyStroke keyStroke) {
-    return getActions(((IjVimEditor)editor).getEditor().getComponent(), keyStroke).stream().map(IjNativeAction::new)
-      .collect(toList());
-  }
-
   private static @NotNull List<AnAction> getLocalActions(@NotNull Component component, @NotNull KeyStroke keyStroke) {
     final List<AnAction> results = new ArrayList<>();
     final KeyboardShortcut keyStrokeShortcut = new KeyboardShortcut(keyStroke, null);
@@ -348,6 +176,186 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
       }
     }
     return results;
+  }
+
+  @Override
+  public void registerRequiredShortcutKeys(@NotNull VimEditor editor) {
+    EventFacade.getInstance().registerCustomShortcutSet(VimShortcutKeyAction.getInstance(),
+                                                        ShortcutHelper.toShortcutSet(getRequiredShortcutKeys()),
+                                                        ((IjVimEditor)editor).getEditor().getContentComponent());
+  }
+
+  @Override
+  public void registerShortcutsForLookup(@NotNull Object lookup) {
+    LookupImpl lookupImpl = (LookupImpl)lookup;
+    EventFacade.getInstance().registerCustomShortcutSet(VimShortcutKeyAction.getInstance(),
+                                                        ShortcutHelper.toShortcutSet(getRequiredShortcutKeys()),
+                                                        lookupImpl.getComponent(), lookupImpl);
+  }
+
+  @Override
+  public void updateShortcutKeysRegistration() {
+    for (VimEditor editor : injector.getEditorGroup().getEditors()) {
+      unregisterShortcutKeys(editor);
+      registerRequiredShortcutKeys(editor);
+    }
+  }
+
+  public void saveData(@NotNull Element element) {
+    final Element conflictsElement = new Element(SHORTCUT_CONFLICTS_ELEMENT);
+    for (Map.Entry<KeyStroke, ShortcutOwnerInfo> entry : myShortcutConflicts.entrySet()) {
+      final ShortcutOwner owner;
+      ShortcutOwnerInfo myValue = entry.getValue();
+      if (myValue instanceof ShortcutOwnerInfo.AllModes) {
+        owner = ((ShortcutOwnerInfo.AllModes)myValue).getOwner();
+      }
+      else if (myValue instanceof ShortcutOwnerInfo.PerMode) {
+        owner = null;
+      }
+      else {
+        throw new RuntimeException();
+      }
+      if (owner != null && owner != ShortcutOwner.UNDEFINED) {
+        final Element conflictElement = new Element(SHORTCUT_CONFLICT_ELEMENT);
+        conflictElement.setAttribute(OWNER_ATTRIBUTE, owner.getOwnerName());
+        final Element textElement = new Element(TEXT_ELEMENT);
+        XMLGroup.getInstance().setSafeXmlText(textElement, entry.getKey().toString());
+        conflictElement.addContent(textElement);
+        conflictsElement.addContent(conflictElement);
+      }
+    }
+    element.addContent(conflictsElement);
+  }
+
+  public void readData(@NotNull Element element) {
+    final Element conflictsElement = element.getChild(SHORTCUT_CONFLICTS_ELEMENT);
+    if (conflictsElement != null) {
+      final List<Element> conflictElements = conflictsElement.getChildren(SHORTCUT_CONFLICT_ELEMENT);
+      for (Element conflictElement : conflictElements) {
+        final String ownerValue = conflictElement.getAttributeValue(OWNER_ATTRIBUTE);
+        ShortcutOwner owner = ShortcutOwner.UNDEFINED;
+        try {
+          owner = ShortcutOwner.fromString(ownerValue);
+        }
+        catch (IllegalArgumentException ignored) {
+        }
+        final Element textElement = conflictElement.getChild(TEXT_ELEMENT);
+        if (textElement != null) {
+          final String text = XMLGroup.getInstance().getSafeXmlText(textElement);
+          if (text != null) {
+            final KeyStroke keyStroke = KeyStroke.getKeyStroke(text);
+            if (keyStroke != null) {
+              myShortcutConflicts.put(keyStroke, new ShortcutOwnerInfo.AllModes(owner));
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @Override
+  public void unregisterShortcutKeys(@NotNull VimEditor editor) {
+    EventFacade.getInstance().unregisterCustomShortcutSet(VimShortcutKeyAction.getInstance(),
+                                                          ((IjVimEditor)editor).getEditor().getContentComponent());
+  }
+
+  @Override
+  public @NotNull List<NativeAction> getKeymapConflicts(@NotNull KeyStroke keyStroke) {
+    final KeymapManagerEx keymapManager = KeymapManagerEx.getInstanceEx();
+    final Keymap keymap = keymapManager.getActiveKeymap();
+    final KeyboardShortcut shortcut = new KeyboardShortcut(keyStroke, null);
+    final Map<String, ? extends List<KeyboardShortcut>> conflicts = keymap.getConflicts("", shortcut);
+    final List<AnAction> actions = new ArrayList<>();
+    for (String actionId : conflicts.keySet()) {
+      final AnAction action = ActionManagerEx.getInstanceEx().getAction(actionId);
+      if (action != null) {
+        actions.add(action);
+      }
+    }
+    return actions.stream().map(IjNativeAction::new).collect(toList());
+  }
+
+  public @NotNull Map<KeyStroke, ShortcutOwnerInfo> getShortcutConflicts() {
+    final Set<RequiredShortcut> requiredShortcutKeys = this.getRequiredShortcutKeys();
+    final Map<KeyStroke, ShortcutOwnerInfo> savedConflicts = getSavedShortcutConflicts();
+    final Map<KeyStroke, ShortcutOwnerInfo> results = new HashMap<>();
+    for (RequiredShortcut requiredShortcut : requiredShortcutKeys) {
+      KeyStroke keyStroke = requiredShortcut.getKeyStroke();
+      if (!VimShortcutKeyAction.VIM_ONLY_EDITOR_KEYS.contains(keyStroke)) {
+        final List<NativeAction> conflicts = getKeymapConflicts(keyStroke);
+        if (!conflicts.isEmpty()) {
+          ShortcutOwnerInfo owner = savedConflicts.get(keyStroke);
+          if (owner == null) {
+            owner = ShortcutOwnerInfo.allUndefined;
+          }
+          results.put(keyStroke, owner);
+        }
+      }
+    }
+    return results;
+  }
+
+  @Override
+  public void loadShortcutConflictsData(@NotNull Object element) {
+    readData((Element)element);
+  }
+
+  /**
+   * Registers a shortcut that is handled by KeyHandler#handleKey directly, rather than by an action
+   *
+   * <p>
+   * Digraphs are handled directly by KeyHandler#handleKey instead of via an action, but we need to still make sure the
+   * shortcuts are registered, or the key handler won't see them
+   * </p>
+   *
+   * @param keyStroke The shortcut to register
+   */
+  @Override
+  public void registerShortcutWithoutAction(@NotNull KeyStroke keyStroke, @NotNull MappingOwner owner) {
+    registerRequiredShortcut(Collections.singletonList(keyStroke), owner);
+  }
+
+  private void registerRequiredShortcut(@NotNull List<KeyStroke> keys, MappingOwner owner) {
+    for (KeyStroke key : keys) {
+      if (key.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
+        if (!injector.getApplication().isOctopusEnabled() ||
+            !(key.getKeyCode() == KeyEvent.VK_ESCAPE && key.getModifiers() == 0) &&
+            !(key.getKeyCode() == KeyEvent.VK_ENTER && key.getModifiers() == 0)) {
+          getRequiredShortcutKeys().add(new RequiredShortcut(key, owner));
+        }
+      }
+    }
+  }
+
+  @Override
+  public void registerCommandAction(@NotNull LazyVimCommand command) {
+    if (ApplicationManager.getApplication().isUnitTestMode()) {
+      initIdentityChecker();
+      for (List<KeyStroke> keys : command.getKeys()) {
+        checkCommand(command.getModes(), command, keys);
+      }
+    }
+
+    for (List<KeyStroke> keyStrokes : command.getKeys()) {
+      registerRequiredShortcut(keyStrokes, MappingOwner.IdeaVim.System.INSTANCE);
+
+      for (MappingMode mappingMode : command.getModes()) {
+        getBuiltinCommandsTrie(mappingMode).add(keyStrokes, command);
+      }
+    }
+  }
+
+  private @NotNull List<AnAction> getActions(@NotNull Component component, @NotNull KeyStroke keyStroke) {
+    final List<AnAction> results = new ArrayList<>();
+    results.addAll(getLocalActions(component, keyStroke));
+    results.addAll(getKeymapActions(keyStroke));
+    return results;
+  }
+
+  @Override
+  public @NotNull List<NativeAction> getActions(@NotNull VimEditor editor, @NotNull KeyStroke keyStroke) {
+    return getActions(((IjVimEditor)editor).getEditor().getComponent(), keyStroke).stream().map(IjNativeAction::new)
+      .collect(toList());
   }
 
   @Nullable

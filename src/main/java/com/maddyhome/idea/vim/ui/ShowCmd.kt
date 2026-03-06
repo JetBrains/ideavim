@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -38,10 +38,10 @@ internal object ShowCmd {
   private const val SHOWCMD_COLS = 10
 
   @NonNls
-  internal const val ID = "IdeaVimShowCmd"
+  const val ID = "IdeaVimShowCmd"
 
   @NlsSafe
-  internal const val displayName = "IdeaVim showcmd"
+  const val displayName = "IdeaVim showcmd"
 
   fun update() {
     val windowManager = WindowManager.getInstance()

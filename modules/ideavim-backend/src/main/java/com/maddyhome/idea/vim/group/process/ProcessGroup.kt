@@ -1,11 +1,11 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
  * https://opensource.org/licenses/MIT.
  */
-package com.maddyhome.idea.vim.group
+package com.maddyhome.idea.vim.group.process
 
 import com.intellij.execution.ExecutionException
 import com.intellij.execution.configurations.GeneralCommandLine
@@ -16,14 +16,15 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressIndicatorProvider
 import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.ProjectManager
+import com.intellij.platform.project.ProjectId
+import com.intellij.platform.project.findProjectOrNull
 import com.intellij.util.execution.ParametersListUtil
 import com.intellij.util.text.CharSequenceReader
-import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.GlobalOptions
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimProcessGroupBase
-import com.maddyhome.idea.vim.api.globalOptions
-import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.newapi.ij
 import java.io.BufferedWriter
 import java.io.IOException
 import java.io.OutputStreamWriter
@@ -32,26 +33,73 @@ import java.io.Writer
 
 
 class ProcessGroup : VimProcessGroupBase() {
+
   @Throws(ExecutionException::class, ProcessCanceledException::class)
   override fun executeCommand(
     editor: VimEditor,
     command: String,
     input: CharSequence?,
     currentDirectoryPath: String?,
+    options: GlobalOptions,
   ): String? {
+    val project = try {
+      ProjectId.deserializeFromString(editor.projectId).findProjectOrNull()
+    } catch (_: Exception) {
+      null
+    }
+    val result = executeCommandImpl(
+      command, input, currentDirectoryPath, project,
+      options.shell, options.shellcmdflag, options.shellxescape, options.shellxquote,
+    )
+    lastExitCode = result.exitCode
+    return result.output
+  }
+
+  /**
+   * Entry point used by [ProcessRemoteApiImpl] for RPC calls from the thin client.
+   * Shell options are passed from the frontend because `injector` is not initialized
+   * on the backend in split mode.
+   */
+  fun executeCommand(
+    command: String,
+    input: String?,
+    currentDirectoryPath: String?,
+    shell: String,
+    shellcmdflag: String,
+    shellxescape: String,
+    shellxquote: String,
+  ): ProcessResult {
+    val project = ProjectManager.getInstance().openProjects.firstOrNull()
+    return executeCommandImpl(
+      command,
+      input,
+      currentDirectoryPath,
+      project,
+      shell,
+      shellcmdflag,
+      shellxescape,
+      shellxquote
+    )
+  }
+
+  private fun executeCommandImpl(
+    command: String,
+    input: CharSequence?,
+    currentDirectoryPath: String?,
+    project: Project?,
+    shell: String,
+    shellcmdflag: String,
+    shellxescape: String,
+    shellxquote: String,
+  ): ProcessResult {
     // This is a much simplified version of how Vim does this. We're using stdin/stdout directly, while Vim will
     // redirect to temp files ('shellredir' and 'shelltemp') or use pipes. We don't support 'shellquote', because we're
     // not handling redirection, but we do use 'shellxquote' and 'shellxescape', because these have defaults that work
     // better with Windows. We also don't bother using ShellExecute for Windows commands beginning with `start`.
     // Finally, we're also not bothering with the crazy space and backslash handling of the 'shell' options content.
 
-    return ProgressManager.getInstance().runProcessWithProgressSynchronously<String, ExecutionException>(
+    return ProgressManager.getInstance().runProcessWithProgressSynchronously<ProcessResult, ExecutionException>(
       {
-        val shell = injector.globalOptions().shell
-        val shellcmdflag = injector.globalOptions().shellcmdflag
-        val shellxescape = injector.globalOptions().shellxescape
-        val shellxquote = injector.globalOptions().shellxquote
-
         // For Win32. See :help 'shellxescape'
         val escapedCommand = if (shellxquote == "(") doEscape(command, shellxescape, "^")
         else command
@@ -101,13 +149,11 @@ class ProcessGroup : VimProcessGroupBase() {
           throw ProcessCanceledException()
         }
 
-        val exitCode = handler.exitCode
-        if (exitCode != null && exitCode != 0) {
-          VimPlugin.showMessage("shell returned $exitCode")
-          VimPlugin.indicateError()
-        }
-        (output.stderr + output.stdout).replace("\u001B\\[[;\\d]*m".toRegex(), "")
-      }, "IdeaVim - !$command", true, editor.ij.project
+        ProcessResult(
+          output = (output.stderr + output.stdout).replace("\u001B\\[[;\\d]*m".toRegex(), ""),
+          exitCode = handler.exitCode,
+        )
+      }, "IdeaVim - !$command", true, project
     )
   }
 

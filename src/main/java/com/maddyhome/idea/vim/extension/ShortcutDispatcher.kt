@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2025 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -21,7 +21,7 @@ import java.awt.event.KeyEvent
 import javax.swing.JComponent
 import javax.swing.KeyStroke
 
-internal open class ShortcutDispatcher<T>(
+open class ShortcutDispatcher<T>(
   name: String,
   data: Map<List<KeyStroke>, T>,
   private val listener: Listener<T>,

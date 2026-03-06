@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -7,10 +7,10 @@
  */
 package com.maddyhome.idea.vim.extension
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.extensions.ExtensionPointListener
 import com.intellij.openapi.extensions.PluginDescriptor
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimExtensionRegistrator
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.setToggleOption
@@ -18,9 +18,9 @@ import com.maddyhome.idea.vim.key.MappingOwner.Plugin.Companion.remove
 import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.options.OptionDeclaredScope
 import com.maddyhome.idea.vim.options.ToggleOption
-import com.maddyhome.idea.vim.statistic.PluginState
+import com.maddyhome.idea.vim.statistic.ExtensionTracking
 
-internal object VimExtensionRegistrar : VimExtensionRegistrator {
+class VimExtensionRegistrar : VimExtensionRegistrator {
   internal val registeredExtensions: MutableSet<String> = HashSet()
   internal val extensionAliases = HashMap<String, String>()
   private var extensionRegistered = false
@@ -28,7 +28,6 @@ internal object VimExtensionRegistrar : VimExtensionRegistrator {
 
   private val delayedExtensionEnabling = mutableListOf<ExtensionBeanClass>()
 
-  @JvmStatic
   fun registerExtensions() {
     if (extensionRegistered) return
     extensionRegistered = true
@@ -46,7 +45,7 @@ internal object VimExtensionRegistrar : VimExtensionRegistrator {
         }
       },
       false,
-      VimPlugin.getInstance(),
+      ApplicationManager.getApplication(),
     )
   }
 
@@ -63,11 +62,11 @@ internal object VimExtensionRegistrar : VimExtensionRegistrator {
     registeredExtensions.add(name)
     registerAliases(extensionBean)
     val option = ToggleOption(name, OptionDeclaredScope.GLOBAL, getAbbrev(name), false)
-    VimPlugin.getOptionGroup().addOption(option)
-    VimPlugin.getOptionGroup().addGlobalOptionChangeListener(option) {
+    injector.optionGroup.addOption(option)
+    injector.optionGroup.addGlobalOptionChangeListener(option) {
       if (injector.optionGroup.getOptionValue(option, OptionAccessScope.GLOBAL(null)).booleanValue) {
         initExtension(extensionBean, name)
-        PluginState.Util.enabledExtensions.add(name)
+        ExtensionTracking.enabledExtensions.add(name)
       } else {
         extensionBean.instance.dispose()
       }
@@ -93,8 +92,7 @@ internal object VimExtensionRegistrar : VimExtensionRegistrator {
    * In IdeaVim we don't have a separate plugins folder to load it after .ideavimrc load. However, we can collect
    *   the list of plugins mentioned in the .ideavimrc and load them after .ideavimrc execution is finished.
    */
-  @JvmStatic
-  fun enableDelayedExtensions() {
+  override fun enableDelayedExtensions() {
     delayedExtensionEnabling.forEach {
       it.instance.init()
       logger.info("IdeaVim extension '${it.name}' initialized")
@@ -109,7 +107,7 @@ internal object VimExtensionRegistrar : VimExtensionRegistrator {
     registeredExtensions.remove(name)
     removeAliases(extension)
     extension.instance.dispose()
-    VimPlugin.getOptionGroup().removeOption(name)
+    injector.optionGroup.removeOption(name)
     remove(name)
     logger.info("IdeaVim extension '$name' disposed")
   }

@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.editor.impl.CaretModelImpl
 import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.platform.project.projectId
 import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
@@ -41,7 +42,6 @@ import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.IndentConfig
 import com.maddyhome.idea.vim.common.LiveRange
-import com.maddyhome.idea.vim.common.ModeChangeListener
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.VimEditorReplaceMask
 import com.maddyhome.idea.vim.common.forgetAllReplaceMasks
@@ -66,7 +66,7 @@ import org.jetbrains.annotations.ApiStatus
 import java.lang.System.identityHashCode
 
 @ApiStatus.Internal
-internal class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase() {
+class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase() {
   companion object {
     // For cases where Editor does not have a project (for some reason)
     // It's something IJ Platform related and stored here because of this reason
@@ -384,7 +384,7 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase(
     return EditorHelper.getVirtualFile(editor)?.url?.let { VirtualFileManager.extractProtocol(it) }
   }
 
-  override val projectId = editor.project?.let { injector.file.getProjectId(it) } ?: DEFAULT_PROJECT_ID
+  override val projectId = editor.project?.projectId()?.serializeToString() ?: DEFAULT_PROJECT_ID
 
   override fun visualPositionToOffset(position: VimVisualPosition): Int {
     return editor.visualPositionToOffset(VisualPosition(position.line, position.column, position.leansRight))
@@ -649,23 +649,3 @@ internal class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase(
   }
 }
 
-val Editor.vim: VimEditor
-  get() = IjVimEditor(this)
-val VimEditor.ij: Editor
-  get() = (this as IjVimEditor).editor
-
-val com.intellij.openapi.util.TextRange.vim: TextRange
-  get() = TextRange(this.startOffset, this.endOffset)
-
-internal class InsertTimeRecorder : ModeChangeListener {
-  override fun modeChanged(editor: VimEditor, oldMode: Mode) {
-    editor as IjVimEditor
-    if (oldMode == Mode.INSERT) {
-      val undo = injector.undo as? VimTimestampBasedUndoService ?: return
-      val nanoTime = System.nanoTime()
-      injector.application.runReadAction {
-        editor.nativeCarets().forEach { undo.endInsertSequence(it, it.offset, nanoTime) }
-      }
-    }
-  }
-}

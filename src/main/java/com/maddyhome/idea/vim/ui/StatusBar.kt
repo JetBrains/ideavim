@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -174,7 +174,10 @@ private object VimActionsPopup {
         false,
         ActionPlaces.POPUP,
       )
-    popup.setAdText(MessageHelper.message("widget.vim.actions.popup.advertisement.version", VimPlugin.getVersion()), SwingConstants.CENTER)
+    popup.setAdText(
+      MessageHelper.message("widget.vim.actions.popup.advertisement.version", VimPlugin.getVersion()),
+      SwingConstants.CENTER
+    )
 
     return popup
   }

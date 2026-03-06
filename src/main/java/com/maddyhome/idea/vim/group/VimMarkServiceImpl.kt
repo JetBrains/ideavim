@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -7,34 +7,21 @@
  */
 package com.maddyhome.idea.vim.group
 
-import com.intellij.ide.bookmark.Bookmark
-import com.intellij.ide.bookmark.BookmarkGroup
-import com.intellij.ide.bookmark.BookmarksListener
-import com.intellij.ide.bookmark.BookmarksManager
-import com.intellij.ide.bookmark.LineBookmark
+import com.intellij.ide.vfs.rpcId
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.RoamingType
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.editor.Document
-import com.intellij.openapi.editor.EditorFactory
-import com.intellij.openapi.editor.event.DocumentEvent
-import com.intellij.openapi.editor.event.DocumentListener
-import com.intellij.openapi.fileEditor.FileEditorManager
-import com.intellij.openapi.fileEditor.TextEditor
-import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.text.StringUtil
-import com.intellij.util.asSafely
-import com.maddyhome.idea.vim.VimPlugin
+import com.intellij.platform.project.projectId
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.VimEditorGroup
 import com.maddyhome.idea.vim.api.VimMarkService
 import com.maddyhome.idea.vim.api.VimMarkServiceBase
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.group.SystemMarks.Companion.createOrGetSystemMark
-import com.maddyhome.idea.vim.mark.IntellijMark
+import com.maddyhome.idea.vim.group.bookmark.BookmarkBackendService
 import com.maddyhome.idea.vim.mark.Mark
+import com.maddyhome.idea.vim.mark.VimMark
 import com.maddyhome.idea.vim.mark.VimMark.Companion.create
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.globalIjOptions
@@ -50,10 +37,63 @@ import java.util.*
   storages = [Storage(value = "\$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)]
 )
 internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateComponent<Element?> {
-  private fun createOrGetSystemMark(ch: Char, line: Int, col: Int, editor: VimEditor): Mark? {
+
+  private val bookmarkBackend get() = BookmarkBackendService.getInstance()
+
+  override fun createGlobalMark(editor: VimEditor, char: Char, offset: Int): Mark? {
+    if (!injector.globalIjOptions().ideamarks) {
+      return super.createGlobalMark(editor, char, offset)
+    }
+    val lp = editor.offsetToBufferPosition(offset)
     val ijEditor = (editor as IjVimEditor).editor
-    val systemMark = createOrGetSystemMark(ch, line, ijEditor) ?: return null
-    return IntellijMark(systemMark, col, ijEditor.project)
+    val ijVirtualFile = ijEditor.virtualFile ?: return super.createGlobalMark(editor, char, offset)
+    val virtualFileId = ijVirtualFile.rpcId()
+    val projectId = ijEditor.project?.projectId()
+    val info =
+      bookmarkBackend.createOrGetSystemMark(char, lp.line, lp.column, virtualFileId, projectId)
+        ?: return super.createGlobalMark(editor, char, offset)
+    return VimMark(info.key, info.line, lp.column, ijVirtualFile.path, ijVirtualFile.fileSystem.protocol)
+  }
+
+  override fun getGlobalMark(char: Char): Mark? {
+    if (!char.isGlobalMark()) return null
+
+    if (!injector.globalIjOptions().ideamarks) {
+      return super.getGlobalMark(char)
+    }
+
+    // When ideamarks is on, the BookmarksManager is the source of truth.
+    val info = bookmarkBackend.getBookmarkForMark(char)
+    if (info != null) {
+      val mark = VimMark(info.key, info.line, info.col, info.filepath, info.protocol)
+      globalMarks[char] = mark
+      return mark
+    }
+
+    // No IDE bookmark found — fall back to in-memory mark if available.
+    // This handles cases where bookmark creation wasn't possible (e.g. temp files in tests)
+    // but the mark was still stored in-memory by setGlobalMark.
+    return super.getGlobalMark(char)
+  }
+
+  override fun getAllGlobalMarks(): Set<Mark> {
+    if (!injector.globalIjOptions().ideamarks) {
+      return super.getAllGlobalMarks()
+    }
+
+    // Update in-memory marks from IDE bookmarks (bookmarks are source of truth when they exist)
+    val bookmarks = bookmarkBackend.getAllBookmarks()
+    for (info in bookmarks) {
+      globalMarks[info.key] = VimMark(info.key, info.line, info.col, info.filepath, info.protocol)
+    }
+    return globalMarks.values.toSet()
+  }
+
+  override fun removeGlobalMark(char: Char) {
+    if (injector.globalIjOptions().ideamarks) {
+      bookmarkBackend.removeBookmark(char)
+    }
+    super.removeGlobalMark(char)
   }
 
   private fun saveData(element: Element) {
@@ -176,114 +216,8 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
     readData(state)
   }
 
-  override fun createGlobalMark(editor: VimEditor, char: Char, offset: Int): Mark? {
-    if (!injector.globalIjOptions().ideamarks) {
-      return super.createGlobalMark(editor, char, offset)
-    }
-    val lp = editor.offsetToBufferPosition(offset)
-    val line = lp.line
-    val col = lp.column
-    return createOrGetSystemMark(char, line, col, editor)
-  }
-
-  override fun removeGlobalMark(char: Char) {
-    val mark = getGlobalMark(char)
-    if (mark is IntellijMark) {
-      mark.clear()
-    }
-    super.removeGlobalMark(char)
-  }
-
-  /**
-   * This class is used to listen to editor document changes
-   */
-  object MarkUpdater : DocumentListener {
-    /**
-     * This event indicates that a document is about to be changed. We use this event to update all the
-     * editor's marks if text is about to be deleted.
-     *
-     * Note that the event is fired for both local changes and changes from remote guests in Code With Me scenarios (in
-     * which case [ClientId.current] will be the remote client). We don't care who caused it, we just need to update the
-     * stored marks.
-     *
-     * @param event The change event
-     */
-    override fun beforeDocumentChange(event: DocumentEvent) {
-      if (VimPlugin.isNotEnabled()) return
-      if (logger.isDebugEnabled) logger.debug("MarkUpdater before, event = $event")
-      if (event.oldLength == 0) return
-      val doc = event.document
-      val anEditor = getAnyEditorForDocument(doc) ?: return
-      injector.markService.updateMarksFromDelete(anEditor, event.offset, event.oldLength)
-    }
-
-    /**
-     * This event indicates that a document was just changed. We use this event to update all the editor's
-     * marks if text was just added.
-     *
-     * Note that the event is fired for both local changes and changes from remote guests in Code With Me scenarios (in
-     * which case [ClientId.current] will be the remote client). We don't care who caused it, we just need to update the
-     * stored marks.
-     *
-     * @param event The change event
-     */
-    override fun documentChanged(event: DocumentEvent) {
-      if (VimPlugin.isNotEnabled()) return
-      if (logger.isDebugEnabled) logger.debug("MarkUpdater after, event = $event")
-      if (event.newLength == 0 || event.newLength == 1 && event.newFragment[0] != '\n') return
-      val doc = event.document
-      val anEditor = getAnyEditorForDocument(doc) ?: return
-      injector.markService.updateMarksFromInsert(anEditor, event.offset, event.newLength)
-    }
-
-    /**
-     * Get any editor for the given document
-     *
-     * We need an editor to help calculate offsets for marks, and it doesn't matter which one we use, because they would
-     * all return the same results. However, we cannot use [VimEditorGroup.getEditors] because the change might have
-     * come from a remote guest and there might not be an open local editor.
-     */
-    private fun getAnyEditorForDocument(doc: Document) =
-      EditorFactory.getInstance().getEditors(doc).firstOrNull()?.let { IjVimEditor(it) }
-  }
-
-  class VimBookmarksListener(private val myProject: Project) : BookmarksListener {
-    override fun bookmarkAdded(group: BookmarkGroup, bookmark: Bookmark) {
-      if (VimPlugin.isNotEnabled()) return
-      if (!injector.globalIjOptions().ideamarks) {
-        return
-      }
-      if (bookmark !is LineBookmark) return
-      val bookmarksManager = BookmarksManager.getInstance(myProject) ?: return
-      val type = bookmarksManager.getType(bookmark) ?: return
-      val mnemonic = type.mnemonic
-      if ((VimMarkService.UPPERCASE_MARKS + VimMarkService.NUMBERED_MARKS).indexOf(mnemonic) == -1) return
-      createVimMark(bookmark)
-    }
-
-    override fun bookmarkRemoved(group: BookmarkGroup, bookmark: Bookmark) {
-      if (VimPlugin.isNotEnabled()) return
-      if (!injector.globalIjOptions().ideamarks) {
-        return
-      }
-      if (bookmark !is LineBookmark) return
-      val bookmarksManager = BookmarksManager.getInstance(myProject) ?: return
-      val type = bookmarksManager.getType(bookmark) ?: return
-      val ch = type.mnemonic
-      if ((VimMarkService.UPPERCASE_MARKS + VimMarkService.NUMBERED_MARKS).indexOf(ch) != -1) {
-        injector.markService.removeGlobalMark(ch)
-      }
-    }
-
-    private fun createVimMark(b: LineBookmark) {
-      var col = 0
-      val editor = FileEditorManager.getInstance(myProject).getSelectedEditor(b.file)
-        ?.asSafely<TextEditor>()
-        ?.editor
-      if (editor != null) col = editor.caretModel.currentCaret.logicalPosition.column
-      val mark = IntellijMark(b, col, myProject)
-      injector.markService.setGlobalMark(mark)
-    }
+  override fun loadLegacyState(element: Any) {
+    loadState(element as Element)
   }
 
   companion object {

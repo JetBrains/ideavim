@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim.config.migration
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
-import com.maddyhome.idea.vim.VimPlugin
 
 // This variable describe migrators and detectors that would be injected during production run
 private val productionMigrationComponents = MigrationComponents(
@@ -20,8 +19,11 @@ private val productionMigrationComponents = MigrationComponents(
   versionDetectors = listOf(
     `Detect versions 3, 4, 5, 6`,
   ),
-  currentVersion = VimPlugin.STATE_VERSION,
+  currentVersion = STATE_VERSION,
 )
+
+// Must match VimPlugin.STATE_VERSION
+internal const val STATE_VERSION = 7
 
 // Just a collection of migrators and collectors
 internal class MigrationComponents(

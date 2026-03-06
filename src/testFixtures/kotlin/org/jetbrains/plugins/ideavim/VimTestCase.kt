@@ -55,6 +55,7 @@ import com.maddyhome.idea.vim.api.GlobalOptions
 import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimDigraphGroupBase
 import com.maddyhome.idea.vim.api.VimOptionGroup
+import com.maddyhome.idea.vim.api.VimSearchGroupBase
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
@@ -132,7 +133,7 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
     injector.vimState.reset()
     resetAllOptions()
     VimPlugin.getKey().resetKeyMappings()
-    VimPlugin.getSearch().resetState()
+    (VimPlugin.getSearch() as VimSearchGroupBase).resetState()
     if (VimPlugin.isNotEnabled()) VimPlugin.setEnabled(true)
     injector.globalOptions().ideastrictmode = true
     Checks.reset()
@@ -223,7 +224,7 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
     VimFuncref.anonymousCounter = 0
     IdeavimErrorListener.testLogger.clear()
     VimPlugin.getRegister().resetRegisters()
-    VimPlugin.getSearch().resetState()
+    (VimPlugin.getSearch() as VimSearchGroupBase).resetState()
     injector.markService.resetAllMarks()
     injector.jumpService.resetJumps()
     injector.historyGroup.resetHistory()

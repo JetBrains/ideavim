@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.common.Direction.Companion.fromInt
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.vimLogger
+import com.maddyhome.idea.vim.group.XMLGroup
 import com.maddyhome.idea.vim.helper.addSubstitutionConfirmationHighlight
 import com.maddyhome.idea.vim.helper.highlightSearchResults
 import com.maddyhome.idea.vim.helper.shouldIgnoreCase
@@ -42,7 +43,7 @@ import org.jetbrains.annotations.TestOnly
   name = "VimSearchSettings",
   storages = [Storage(value = "\$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)]
 )
-open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateComponent<Element> {
+open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateComponent<Element>, VimSearchGroupLegacyLoader {
   companion object {
     private val logger by lazy { vimLogger<IjVimSearchGroup>() }
   }
@@ -95,7 +96,7 @@ open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateComponent<Ele
     endOffset: Int,
   ): SearchHighlight {
 
-    val ijEditor = (editor as IjVimEditor).editor
+    val ijEditor = editor.ij
     val highlighter = addSubstitutionConfirmationHighlight(
       ijEditor,
       startOffset,
@@ -140,7 +141,7 @@ open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateComponent<Ele
     updateSearchHighlights(false)
   }
 
-  fun saveData(element: Element) {
+  override fun saveData(element: Element) {
     logger.debug("saveData")
     val search = Element("search")
 
@@ -161,11 +162,11 @@ open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateComponent<Ele
 
   private fun addOptionalTextElement(element: Element, name: String, text: String?) {
     if (text != null) {
-      element.addContent(VimPlugin.getXML().setSafeXmlText(Element(name), text))
+      element.addContent(XMLGroup.getInstance().setSafeXmlText(Element(name), text))
     }
   }
 
-  fun readData(element: Element) {
+  override fun readData(element: Element) {
     logger.debug("readData")
     val search = element.getChild("search") ?: return
 
@@ -199,13 +200,13 @@ open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateComponent<Ele
 
   private fun getSafeChildText(element: Element, name: String): String? {
     val child = element.getChild(name)
-    return if (child != null) VimPlugin.getXML().getSafeXmlText(child) else null
+    return if (child != null) XMLGroup.getInstance().getSafeXmlText(child) else null
   }
 
   private fun getSafeChildText(element: Element, name: String, defaultValue: String): String {
     val child = element.getChild(name)
     if (child != null) {
-      val value = VimPlugin.getXML().getSafeXmlText(child)
+      val value = XMLGroup.getInstance().getSafeXmlText(child)
       return value ?: defaultValue
     }
     return defaultValue
@@ -258,7 +259,7 @@ open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateComponent<Ele
       // changed text. Make sure we only update local editors, though.
       val document = event.document
       for (vimEditor in injector.editorGroup.getEditors(IjVimDocument(document))) {
-        val editor = (vimEditor as IjVimEditor).editor
+        val editor = vimEditor.ij
         var existingHighlighters = editor.vimLastHighlighters ?: continue
 
         if (logger.isDebug()) {

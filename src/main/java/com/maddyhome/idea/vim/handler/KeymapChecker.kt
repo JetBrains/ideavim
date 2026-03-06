@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -21,6 +21,7 @@ import com.intellij.openapi.startup.ProjectActivity
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.key
+import com.maddyhome.idea.vim.group.NotificationService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BufferOverflow
@@ -133,7 +134,7 @@ private fun verifyKeymap() {
   }
 
   if (issues.isNotEmpty()) {
-    VimPlugin.getNotifications(null).notifyKeymapIssues(issues)
+    (VimPlugin.getNotifications(null) as NotificationService).notifyKeymapIssues(issues)
   }
 }
 

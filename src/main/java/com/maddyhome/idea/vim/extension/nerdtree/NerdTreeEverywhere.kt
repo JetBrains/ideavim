@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2025 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,10 +8,14 @@
 
 package com.maddyhome.idea.vim.extension.nerdtree
 
+import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.ui.treeStructure.Tree
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.extension.VimExtension
+import com.maddyhome.idea.vim.newapi.vim
 import java.awt.KeyboardFocusManager
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
@@ -25,7 +29,7 @@ import javax.swing.KeyStroke
  * It should be considered a "sub-plugin" of NERDTree and cannot be enabled independently,
  * i.e., should not function after the NERDTree plugin is turned off.
  */
-internal class NerdTreeEverywhere : VimExtension {
+class NerdTreeEverywhere : VimExtension {
   companion object {
     const val PLUGIN_NAME = "NERDTreeEverywhere" // This is a temporary name
   }
@@ -52,10 +56,43 @@ internal class NerdTreeEverywhere : VimExtension {
 
   @Service
   class Dispatcher : AbstractDispatcher(PLUGIN_NAME, navigationMappings.toMutableMap().apply {
-    register("NERDTreeMapActivateNode", "o", NerdTreeAction { _, tree ->
-      // TODO a more reliable way of invocation (such as double-clicking?)
-      val listener = tree.getActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0))
-      listener.actionPerformed(ActionEvent(tree, ActionEvent.ACTION_PERFORMED, null))
+    // NerdTreeEverywhere must handle all file-opening mappings that NerdTree uses.
+    // Multi-key sequences like 'gs'/'gi' add their individual keys ('s', 'i') to the
+    // CustomShortcutSet, which would capture those keys and swallow them as invalid
+    // if we don't also register standalone 's'/'i'/'t'/'T' handlers here.
+    register("NERDTreeMapActivateNode", "o", NerdTreeAction { event, tree ->
+      openFileOrSimulateEnter(event, tree)
+    })
+    register("NERDTreeMapPreview", "go", NerdTreeAction { event, _ ->
+      openFileOrSimulateEnter(event, focusEditor = false)
+    })
+    register("NERDTreeMapOpenInTab", "t", NerdTreeAction { event, tree ->
+      openFileOrSimulateEnter(event, tree)
+    })
+    register("NERDTreeMapOpenInTabSilent", "T", NerdTreeAction { event, _ ->
+      openFileOrSimulateEnter(event, focusEditor = false)
+    })
+    register("NERDTreeMapOpenVSplit", "s", NerdTreeAction { event, _ ->
+      val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@NerdTreeAction
+      if (file.isDirectory) return@NerdTreeAction
+      injector.window.splitWindowVertical(event.dataContext.vim, file.path)
+    })
+    register("NERDTreeMapOpenSplit", "i", NerdTreeAction { event, _ ->
+      val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@NerdTreeAction
+      if (file.isDirectory) return@NerdTreeAction
+      injector.window.splitWindowHorizontal(event.dataContext.vim, file.path)
+    })
+    register("NERDTreeMapPreviewVSplit", "gs", NerdTreeAction { event, tree ->
+      val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@NerdTreeAction
+      if (file.isDirectory) return@NerdTreeAction
+      injector.window.splitWindowVertical(event.dataContext.vim, file.path)
+      tree.requestFocus()
+    })
+    register("NERDTreeMapPreviewSplit", "gi", NerdTreeAction { event, tree ->
+      val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@NerdTreeAction
+      if (file.isDirectory) return@NerdTreeAction
+      injector.window.splitWindowHorizontal(event.dataContext.vim, file.path)
+      tree.requestFocus()
     })
   }) {
     init {
@@ -66,5 +103,29 @@ internal class NerdTreeEverywhere : VimExtension {
   override fun dispose() {
     KeyboardFocusManager.getCurrentKeyboardFocusManager().removePropertyChangeListener("focusOwner", focusListener)
     super.dispose()
+  }
+}
+
+/**
+ * Opens a file via [injector.file] (which routes through RPC in split mode),
+ * or simulates Enter for directories / non-file tree nodes.
+ */
+private fun openFileOrSimulateEnter(event: AnActionEvent, tree: Tree, focusEditor: Boolean = true) {
+  val file = event.getData(CommonDataKeys.VIRTUAL_FILE)
+  if (file != null && !file.isDirectory) {
+    injector.file.openFile(file.path, event.dataContext.vim, focusEditor)
+  } else {
+    val listener = tree.getActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0))
+    listener?.actionPerformed(ActionEvent(tree, ActionEvent.ACTION_PERFORMED, null))
+  }
+}
+
+/**
+ * Opens a file without focus (for preview actions). Does nothing for directories.
+ */
+private fun openFileOrSimulateEnter(event: AnActionEvent, focusEditor: Boolean) {
+  val file = event.getData(CommonDataKeys.VIRTUAL_FILE)
+  if (file != null && !file.isDirectory) {
+    injector.file.openFile(file.path, event.dataContext.vim, focusEditor)
   }
 }

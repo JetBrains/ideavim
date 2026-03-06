@@ -63,6 +63,7 @@ val ideaType: String by project
 val instrumentPluginCode: String by project
 val remoteRobotVersion: String by project
 
+val fleetRpcVersion: String by project
 val publishChannels: String by project
 val publishToken: String by project
 
@@ -73,6 +74,7 @@ val releaseType: String? by project
 
 repositories {
   mavenCentral()
+  maven("https://cache-redirector.jetbrains.com/packages.jetbrains.team/maven/p/ij/intellij-dependencies")
   intellijPlatform {
     defaultRepositories()
   }
@@ -81,11 +83,14 @@ repositories {
 dependencies {
   api(project(":vim-engine"))
   api(project(":api"))
-  ksp(project(":annotation-processors"))
-  compileOnly(project(":annotation-processors"))
+  api(project(":modules:ideavim-common"))
 
   compileOnly("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
   compileOnly("org.jetbrains:annotations:26.1.0")
+  ksp(project(":annotation-processors"))
+  compileOnly(project(":annotation-processors"))
+  kotlinCompilerPluginClasspath("org.jetbrains.kotlin:kotlin-serialization-compiler-plugin:$kotlinVersion")
+  kotlinCompilerPluginClasspath("com.jetbrains.fleet:rpc-compiler-plugin:$fleetRpcVersion")
 
   intellijPlatform {
     // Snapshots don't use installers
@@ -107,12 +112,16 @@ dependencies {
     testFramework(TestFrameworkType.Platform)
     testFramework(TestFrameworkType.JUnit5)
 
+    pluginModule(runtimeOnly(project(":modules:ideavim-common")))
+    pluginModule(runtimeOnly(project(":modules:ideavim-backend")))
+    pluginModule(runtimeOnly(project(":modules:ideavim-frontend-split")))
     pluginModule(runtimeOnly(project(":modules:ideavim-acejump")))
     pluginModule(runtimeOnly(project(":modules:ideavim-rider")))
     pluginModule(runtimeOnly(project(":modules:ideavim-clion-nova")))
     pluginModule(runtimeOnly(project(":modules:ideavim-terminal")))
 
     bundledModule("intellij.spellchecker")
+    bundledModule("intellij.platform.kernel.impl")
   }
 
   moduleSources(project(":vim-engine", "sourcesJarArtifacts"))
@@ -234,7 +243,49 @@ tasks {
 
   val runIdeSplitMode by intellijPlatformTesting.runIde.registering {
     splitMode = true
-    splitModeTarget = SplitModeAware.SplitModeTarget.FRONTEND
+    splitModeTarget = SplitModeAware.SplitModeTarget.BOTH
+  }
+
+  // Run split mode with a JDWP debug agent on the frontend (JetBrains Client) process.
+  // After the frontend window appears, run the "Split Frontend Debugger" run configuration to attach.
+  val runIdeSplitModeDebugFrontend by intellijPlatformTesting.runIde.registering {
+    splitMode = true
+    splitModeTarget = SplitModeAware.SplitModeTarget.BOTH
+
+    prepareSandboxTask {
+      val sandboxDir = project.layout.buildDirectory.dir("idea-sandbox").map { it.asFile }
+      doLast {
+        val debugLine = "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5006"
+        val vmoptions = sandboxDir.get().walkTopDown()
+          .filter { it.name == "jetbrains_client64.vmoptions" && it.path.contains("runIdeSplitModeDebugFrontend") }
+          .firstOrNull()
+          ?: sandboxDir.get().walkTopDown()
+            .filter { it.name == "jetbrains_client64.vmoptions" }
+            .firstOrNull()
+
+        if (vmoptions != null) {
+          val content = vmoptions.readText()
+          if (debugLine !in content) {
+            vmoptions.appendText("\n$debugLine\n")
+            logger.lifecycle("Patched frontend vmoptions with JDWP debug agent: ${vmoptions.absolutePath}")
+          }
+          logger.lifecycle("Connect a Remote JVM Debug configuration to localhost:5006")
+        } else {
+          logger.warn(
+            "Could not find jetbrains_client64.vmoptions in sandbox. " +
+                    "Run `./gradlew runIdeSplitMode` once first to populate the sandbox, then use this task."
+          )
+        }
+      }
+    }
+  }
+
+  val testIdeSplitMode by intellijPlatformTesting.testIde.registering {
+    splitMode = true
+    splitModeTarget = SplitModeAware.SplitModeTarget.BOTH
+    task {
+      useJUnitPlatform()
+    }
   }
 
   // Add plugin open API sources to the plugin ZIP
@@ -360,17 +411,32 @@ intellijPlatform {
 
 ksp {
   arg("generated_directory", "$projectDir/src/main/resources/ksp-generated")
-  arg("vimscript_functions_file", "intellij_vimscript_functions.json")
-  arg("ex_commands_file", "intellij_ex_commands.json")
-  arg("commands_file", "intellij_commands.json")
+  arg("commands_file", "frontend_commands.json")
+  arg("ex_commands_file", "frontend_ex_commands.json")
+  arg("vimscript_functions_file", "frontend_vimscript_functions.json")
   arg("extensions_file", "ideavim_extensions.json")
 }
 
 afterEvaluate {
-//  tasks.named("kspKotlin").configure { dependsOn("clean") }
-  tasks.named("kspTestFixturesKotlin").configure { enabled = false }
   tasks.named("kspTestFixturesKotlin").configure { enabled = false }
   tasks.named("kspTestKotlin").configure { enabled = false }
+}
+
+// Allow test and testFixtures sources to access `internal` members from :modules:ideavim-common.
+// This is needed because plugin source code was split into the common module during the
+// plugin split, but tests remain in the root project. Kotlin's -Xfriend-paths compiler flag grants
+// internal visibility across module boundaries for testing purposes.
+// We add both the class directory and the JAR because the IntelliJ Platform Gradle plugin may resolve
+// classes from the composed/instrumented JAR rather than raw class files.
+val commonProject = project(":modules:ideavim-common")
+val commonClassesDir = commonProject.layout.buildDirectory.dir("classes/kotlin/main").get().asFile
+tasks.named<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>("compileTestKotlin") {
+  friendPaths.from(commonClassesDir)
+  friendPaths.from(commonProject.layout.buildDirectory.dir("libs"))
+}
+tasks.named<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>("compileTestFixturesKotlin") {
+  friendPaths.from(commonClassesDir)
+  friendPaths.from(commonProject.layout.buildDirectory.dir("libs"))
 }
 
 

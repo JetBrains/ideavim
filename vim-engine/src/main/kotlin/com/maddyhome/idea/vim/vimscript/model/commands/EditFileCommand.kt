@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -34,14 +34,18 @@ data class EditFileCommand(val range: Range, val modifier: CommandModifier, val 
     val arg = argument
     if (arg == "#") {
       injector.jumpService.saveJumpLocation(editor)
-      injector.file.selectPreviousTab(context)
+      if (!injector.file.selectPreviousTab(context)) {
+        injector.messages.indicateError()
+      }
       return ExecutionResult.Success
     } else if (arg.isNotEmpty()) {
-      val res = injector.file.openFile(arg, context)
-      if (res) {
-        injector.jumpService.saveJumpLocation(editor)
+      val errorMessage = injector.file.openFile(arg, context)
+      if (errorMessage != null) {
+        injector.messages.showMessage(editor, errorMessage)
+        return ExecutionResult.Error
       }
-      return if (res) ExecutionResult.Success else ExecutionResult.Error
+      injector.jumpService.saveJumpLocation(editor)
+      return ExecutionResult.Success
     }
 
     // Don't open a choose file dialog under a write action
