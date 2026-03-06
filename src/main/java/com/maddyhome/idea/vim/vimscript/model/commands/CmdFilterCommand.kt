@@ -15,6 +15,7 @@ import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
@@ -77,21 +78,23 @@ internal data class CmdFilterCommand(val range: Range, val modifier: CommandModi
     }
 
     val workingDirectory = editor.ij.project?.basePath
+    val options = injector.globalOptions()
     return try {
       if (range.size() == 0) {
         // Show command output in a window
-        VimPlugin.getProcess().executeCommand(editor, command, null, workingDirectory)?.let {
+        injector.processGroup.executeCommand(editor, command, null, workingDirectory, options)?.let {
           val outputPanel = injector.outputPanel.getOrCreate(editor, context)
           outputPanel.addText(it)
           outputPanel.show()
         }
+        showExitCodeMessage(editor)
         lastCommand = command
         ExecutionResult.Success
       } else {
         // Filter
         val range = getLineRange(editor).toTextRange(editor)
         val input = editor.ij.document.charsSequence.subSequence(range.startOffset, range.endOffset)
-        VimPlugin.getProcess().executeCommand(editor, command, input, workingDirectory)?.let {
+        injector.processGroup.executeCommand(editor, command, input, workingDirectory, options)?.let {
           ApplicationManager.getApplication().runWriteAction {
             val start = editor.offsetToBufferPosition(range.startOffset)
             val end = editor.offsetToBufferPosition(range.endOffset)
@@ -102,6 +105,7 @@ internal data class CmdFilterCommand(val range: Range, val modifier: CommandModi
             }
           }
         }
+        showExitCodeMessage(editor)
         lastCommand = command
         ExecutionResult.Success
       }
@@ -109,6 +113,14 @@ internal data class CmdFilterCommand(val range: Range, val modifier: CommandModi
       throw ExException("Command terminated")
     } catch (e: Exception) {
       throw ExException(e.message)
+    }
+  }
+
+  private fun showExitCodeMessage(editor: VimEditor) {
+    val exitCode = injector.processGroup.lastExitCode
+    if (exitCode != null && exitCode != 0) {
+      injector.messages.showMessage(editor, "shell returned $exitCode")
+      injector.messages.indicateError()
     }
   }
 

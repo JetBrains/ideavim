@@ -46,7 +46,8 @@ internal class IjVariableService : VimVariableServiceBase(), PersistentStateComp
     if (scope == Scope.GLOBAL_VARIABLE) {
       val scopeForGlobalEnvironment = variable.scope?.toString() ?: ""
       VimScriptGlobalEnvironment.getInstance()
-        .variables[scopeForGlobalEnvironment + variable.name.evaluate(editor, context, vimContext).value] = value.simplify()
+        .variables[scopeForGlobalEnvironment + variable.name.evaluate(editor, context, vimContext).value] =
+        value.simplify()
     }
   }
 

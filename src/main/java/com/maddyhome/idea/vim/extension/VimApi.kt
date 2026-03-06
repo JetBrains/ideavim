@@ -13,7 +13,7 @@ import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.thinapi.VimApiImpl
 
-internal fun VimExtension.api(): VimApi = VimApiImpl(
+fun VimExtension.api(): VimApi = VimApiImpl(
   ListenerOwner.Plugin.get(this.name),
   MappingOwner.Plugin.get(this.name),
 )

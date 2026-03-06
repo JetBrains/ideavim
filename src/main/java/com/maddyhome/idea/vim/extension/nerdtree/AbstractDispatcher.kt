@@ -21,7 +21,7 @@ import javax.swing.KeyStroke
 /**
  * Handles keyboard shortcuts and delegates them to appropriate actions.
  */
-internal abstract class AbstractDispatcher(name: String, mappings: Map<List<KeyStroke>, NerdTreeAction>) :
+abstract class AbstractDispatcher(name: String, mappings: Map<List<KeyStroke>, NerdTreeAction>) :
   ShortcutDispatcher<NerdTreeAction>(name, mappings, NerdTreeListener) {
 
   private object NerdTreeListener : Listener<NerdTreeAction> {

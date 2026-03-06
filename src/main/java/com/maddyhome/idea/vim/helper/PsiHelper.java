@@ -42,7 +42,8 @@ public class PsiHelper {
     if (file == null) {
       return -1;
     }
-    StructureViewBuilder structureViewBuilder = LanguageStructureViewBuilder.getInstance().getStructureViewBuilder(file);
+    StructureViewBuilder structureViewBuilder =
+      LanguageStructureViewBuilder.getInstance().getStructureViewBuilder(file);
     if (!(structureViewBuilder instanceof TreeBasedStructureViewBuilder builder)) return -1;
     StructureViewModel model = builder.createStructureViewModel(editor);
 

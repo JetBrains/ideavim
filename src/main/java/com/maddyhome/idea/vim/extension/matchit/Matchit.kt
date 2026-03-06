@@ -57,13 +57,49 @@ internal class Matchit : VimExtension {
   override fun getName(): String = "matchit"
 
   override fun init() {
-    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys("<Plug>(MatchitMotion)"), owner, MatchitHandler(false), false)
-    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys("<Plug>(MatchitMotion)"), owner, MatchitHandler(false), false)
-    putKeyMappingIfMissing(MappingMode.NXO, injector.parser.parseKeys("%"), owner, injector.parser.parseKeys("<Plug>(MatchitMotion)"), true)
+    VimExtensionFacade.putExtensionHandlerMapping(
+      MappingMode.NXO,
+      injector.parser.parseKeys("<Plug>(MatchitMotion)"),
+      owner,
+      MatchitHandler(false),
+      false
+    )
+    VimExtensionFacade.putExtensionHandlerMapping(
+      MappingMode.NXO,
+      injector.parser.parseKeys("<Plug>(MatchitMotion)"),
+      owner,
+      MatchitHandler(false),
+      false
+    )
+    putKeyMappingIfMissing(
+      MappingMode.NXO,
+      injector.parser.parseKeys("%"),
+      owner,
+      injector.parser.parseKeys("<Plug>(MatchitMotion)"),
+      true
+    )
 
-    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys("<Plug>(ReverseMatchitMotion)"), owner, MatchitHandler(true), false)
-    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys("<Plug>(ReverseMatchitMotion)"), owner, MatchitHandler(true), false)
-    putKeyMappingIfMissing(MappingMode.NXO, injector.parser.parseKeys("g%"), owner, injector.parser.parseKeys("<Plug>(ReverseMatchitMotion)"), true)
+    VimExtensionFacade.putExtensionHandlerMapping(
+      MappingMode.NXO,
+      injector.parser.parseKeys("<Plug>(ReverseMatchitMotion)"),
+      owner,
+      MatchitHandler(true),
+      false
+    )
+    VimExtensionFacade.putExtensionHandlerMapping(
+      MappingMode.NXO,
+      injector.parser.parseKeys("<Plug>(ReverseMatchitMotion)"),
+      owner,
+      MatchitHandler(true),
+      false
+    )
+    putKeyMappingIfMissing(
+      MappingMode.NXO,
+      injector.parser.parseKeys("g%"),
+      owner,
+      injector.parser.parseKeys("<Plug>(ReverseMatchitMotion)"),
+      true
+    )
   }
 
   private class MatchitAction : MotionActionHandler.ForEachCaret() {
@@ -116,7 +152,8 @@ internal class Matchit : VimExtension {
               operatorArguments.count0,
               isInOpPending = false,
               reverse
-            ))
+            )
+          )
         }
       }
     }
@@ -178,7 +215,8 @@ private data class LanguagePatterns(
         openingPattern to Pair(openingPattern, closingPattern),
         middlePattern to Pair(openingAndMiddlePatterns, middlePattern),
       )
-      val reversedClosings = linkedMapOf(middleAndClosingPatterns to Pair(openingAndMiddlePatterns, middleAndClosingPatterns))
+      val reversedClosings =
+        linkedMapOf(middleAndClosingPatterns to Pair(openingAndMiddlePatterns, middleAndClosingPatterns))
 
       return LanguagePatterns(openings, closings, reversedOpenings, reversedClosings)
     }
@@ -267,15 +305,18 @@ private object FileTypePatterns {
 
     return (
       LanguagePatterns("<", ">") +
-        LanguagePatterns(linkedMapOf(openingTagPattern to htmlSearchPair), linkedMapOf(closingTagPattern to htmlSearchPair))
+        LanguagePatterns(
+          linkedMapOf(openingTagPattern to htmlSearchPair),
+          linkedMapOf(closingTagPattern to htmlSearchPair)
+        )
       )
   }
-  
+
   private fun createJavaPatterns(): LanguagePatterns {
     return (
-        LanguagePatterns("\\b(?<!else\\s+)if\\b", "\\belse\\s+if\\b", "\\belse(?!\\s+if)\\b") +
-          LanguagePatterns("\\bdo\\b", "\\bwhile\\b") +
-          LanguagePatterns("\\btry\\b", "\\bcatch\\b", "\\bfinally\\b")
+      LanguagePatterns("\\b(?<!else\\s+)if\\b", "\\belse\\s+if\\b", "\\belse(?!\\s+if)\\b") +
+        LanguagePatterns("\\bdo\\b", "\\bwhile\\b") +
+        LanguagePatterns("\\btry\\b", "\\bcatch\\b", "\\bfinally\\b")
       )
   }
 
@@ -308,7 +349,8 @@ private object FileTypePatterns {
     val openingDoc = "(?<=<<<)\\s*'?(\\w+)'?"
     val closingDoc = "^\\s*(\\w+)\\s*[,;]"
     val docSearchPair = Pair("(?<=<<<)\\s*'?%s'?", "%s") // %s for the captured doc string name.
-    val docPatterns = LanguagePatterns(linkedMapOf(openingDoc to docSearchPair), linkedMapOf(closingDoc to docSearchPair))
+    val docPatterns =
+      LanguagePatterns(linkedMapOf(openingDoc to docSearchPair), linkedMapOf(closingDoc to docSearchPair))
 
     return (
       LanguagePatterns("(?<=<)\\?(?:php|=)?", "\\?>") +
@@ -374,7 +416,13 @@ private fun getMatchitOffset(editor: Editor, caret: Caret, count0: Int, isInOpPe
       val matchitPatterns = FileTypePatterns.getMatchitPatterns(virtualFile)
       if (matchitPatterns != null) {
         motionOffset = if (reverse) {
-          findMatchingPair(editor, caretOffset, isInOpPending, matchitPatterns.reversedOpenings, matchitPatterns.reversedClosings)
+          findMatchingPair(
+            editor,
+            caretOffset,
+            isInOpPending,
+            matchitPatterns.reversedOpenings,
+            matchitPatterns.reversedClosings
+          )
         } else {
           findMatchingPair(editor, caretOffset, isInOpPending, matchitPatterns.openings, matchitPatterns.closings)
         }
@@ -453,7 +501,8 @@ private fun findMatchingPair(
         closestMatchStart = matchStart
         closestMatchEnd = matchEnd
         closestBackRef = if (matcher.groupCount() > 0) matcher.group(1) else null
-        direction = if (closings.isNotEmpty() && patternIndex in 0 until closings.size) Direction.BACKWARDS else Direction.FORWARDS
+        direction =
+          if (closings.isNotEmpty() && patternIndex in 0 until closings.size) Direction.BACKWARDS else Direction.FORWARDS
       }
     }
     patternIndex++
@@ -485,7 +534,14 @@ private fun findMatchingPair(
 
     val skipComments = !isComment(initialPsiElement)
     val skipQuotes = !isQuoted(initialPsiElement)
-    val searchParams = MatchitSearchParams(initialPatternStart, initialPatternEnd, targetOpeningPattern, targetClosingPattern, skipComments, skipQuotes)
+    val searchParams = MatchitSearchParams(
+      initialPatternStart,
+      initialPatternEnd,
+      targetOpeningPattern,
+      targetClosingPattern,
+      skipComments,
+      skipQuotes
+    )
 
     val matchingPairOffset = if (direction == Direction.FORWARDS) {
       findClosingPair(editor, isInOpPending, searchParams)
@@ -508,7 +564,8 @@ private fun findClosingPair(editor: Editor, isInOpPending: Boolean, searchParams
   val searchSpace = chars.subSequence(searchStartOffset, chars.length)
 
   val compiledClosingPattern = Pattern.compile(closingPattern)
-  val compiledSearchPattern = Pattern.compile(String.format("(?<opening>%s)|(?<closing>%s)", openingPattern, closingPattern))
+  val compiledSearchPattern =
+    Pattern.compile(String.format("(?<opening>%s)|(?<closing>%s)", openingPattern, closingPattern))
   val matcher = compiledSearchPattern.matcher(searchSpace)
 
   // We're looking for the first closing pair that isn't already matched by an opening.
@@ -559,7 +616,8 @@ private fun findOpeningPair(editor: Editor, searchParams: MatchitSearchParams): 
   val searchSpace = chars.subSequence(0, searchEndOffset)
 
   val compiledClosingPattern = Pattern.compile(closingPattern)
-  val compiledSearchPattern = Pattern.compile(String.format("(?<opening>%s)|(?<closing>%s)", openingPattern, closingPattern))
+  val compiledSearchPattern =
+    Pattern.compile(String.format("(?<opening>%s)|(?<closing>%s)", openingPattern, closingPattern))
   val matcher = compiledSearchPattern.matcher(searchSpace)
 
   val unmatchedOpeningPairs: Deque<Int> = ArrayDeque()

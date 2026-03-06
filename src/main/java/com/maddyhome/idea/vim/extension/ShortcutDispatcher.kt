@@ -21,7 +21,7 @@ import java.awt.event.KeyEvent
 import javax.swing.JComponent
 import javax.swing.KeyStroke
 
-internal open class ShortcutDispatcher<T>(
+open class ShortcutDispatcher<T>(
   name: String,
   data: Map<List<KeyStroke>, T>,
   private val listener: Listener<T>,

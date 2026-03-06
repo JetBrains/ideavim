@@ -95,13 +95,13 @@ internal class ExTextFieldUI(private val editorKit: ExEditorKit) : BasicTextFiel
         // edited, so replace consecutive fragments with a simple view
         if (i > 0 && i < paragraphView.viewCount - 1
           && paragraphView.getView(i - 1).element == childView.element
-          && paragraphView.getView(i + 1).element == childView.element) {
+          && paragraphView.getView(i + 1).element == childView.element
+        ) {
 
           val viewFactory = childView.viewFactory
           val elementView = viewFactory.create(childView.element)
           paragraphView.replace(i - 1, 3, arrayOf(elementView))
-        }
-        else {
+        } else {
           paragraphView.remove(i)
         }
 

@@ -482,7 +482,12 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
      * width of the rendered character representation (e.g., `^M`)
      */
     @Suppress("RemoveRedundantQualifierName")
-    private fun getCaretWidth(fm: FontMetrics, dotX: kotlin.Double, widthPercentage: Int, coerceCharacterWidth: Boolean): kotlin.Double {
+    private fun getCaretWidth(
+      fm: FontMetrics,
+      dotX: kotlin.Double,
+      widthPercentage: Int,
+      coerceCharacterWidth: Boolean,
+    ): kotlin.Double {
       val width: kotlin.Double
       val r = modelToView(dot + 1)
       if (r != null && !coerceCharacterWidth) {

@@ -75,7 +75,13 @@ internal class VimMultipleCursorsExtension : VimExtension {
   override fun getName() = "multiple-cursors"
 
   override fun init() {
-    putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys(NEXT_WHOLE_OCCURRENCE), owner, NextOccurrenceHandler(), false)
+    putExtensionHandlerMapping(
+      MappingMode.NXO,
+      injector.parser.parseKeys(NEXT_WHOLE_OCCURRENCE),
+      owner,
+      NextOccurrenceHandler(),
+      false
+    )
     putExtensionHandlerMapping(
       MappingMode.NXO,
       injector.parser.parseKeys(NEXT_OCCURRENCE),
@@ -83,7 +89,13 @@ internal class VimMultipleCursorsExtension : VimExtension {
       NextOccurrenceHandler(whole = false),
       false,
     )
-    putExtensionHandlerMapping(MappingMode.NXO, injector.parser.parseKeys(ALL_WHOLE_OCCURRENCES), owner, AllOccurrencesHandler(), false)
+    putExtensionHandlerMapping(
+      MappingMode.NXO,
+      injector.parser.parseKeys(ALL_WHOLE_OCCURRENCES),
+      owner,
+      AllOccurrencesHandler(),
+      false
+    )
     putExtensionHandlerMapping(
       MappingMode.NXO,
       injector.parser.parseKeys(ALL_OCCURRENCES),
@@ -91,13 +103,46 @@ internal class VimMultipleCursorsExtension : VimExtension {
       AllOccurrencesHandler(whole = false),
       false,
     )
-    putExtensionHandlerMapping(MappingMode.X, injector.parser.parseKeys(SKIP_OCCURRENCE), owner, SkipOccurrenceHandler(), false)
-    putExtensionHandlerMapping(MappingMode.X, injector.parser.parseKeys(REMOVE_OCCURRENCE), owner, RemoveOccurrenceHandler(), false)
+    putExtensionHandlerMapping(
+      MappingMode.X,
+      injector.parser.parseKeys(SKIP_OCCURRENCE),
+      owner,
+      SkipOccurrenceHandler(),
+      false
+    )
+    putExtensionHandlerMapping(
+      MappingMode.X, injector.parser.parseKeys(REMOVE_OCCURRENCE), owner,
+      RemoveOccurrenceHandler(), false
+    )
 
-    putKeyMappingIfMissing(MappingMode.NXO, injector.parser.parseKeys("<A-n>"), owner, injector.parser.parseKeys(NEXT_WHOLE_OCCURRENCE), true)
-    putKeyMappingIfMissing(MappingMode.NXO, injector.parser.parseKeys("g<A-n>"), owner, injector.parser.parseKeys(NEXT_OCCURRENCE), true)
-    putKeyMappingIfMissing(MappingMode.X, injector.parser.parseKeys("<A-x>"), owner, injector.parser.parseKeys(SKIP_OCCURRENCE), true)
-    putKeyMappingIfMissing(MappingMode.X, injector.parser.parseKeys("<A-p>"), owner, injector.parser.parseKeys(REMOVE_OCCURRENCE), true)
+    putKeyMappingIfMissing(
+      MappingMode.NXO,
+      injector.parser.parseKeys("<A-n>"),
+      owner,
+      injector.parser.parseKeys(NEXT_WHOLE_OCCURRENCE),
+      true
+    )
+    putKeyMappingIfMissing(
+      MappingMode.NXO,
+      injector.parser.parseKeys("g<A-n>"),
+      owner,
+      injector.parser.parseKeys(NEXT_OCCURRENCE),
+      true
+    )
+    putKeyMappingIfMissing(
+      MappingMode.X,
+      injector.parser.parseKeys("<A-x>"),
+      owner,
+      injector.parser.parseKeys(SKIP_OCCURRENCE),
+      true
+    )
+    putKeyMappingIfMissing(
+      MappingMode.X,
+      injector.parser.parseKeys("<A-p>"),
+      owner,
+      injector.parser.parseKeys(REMOVE_OCCURRENCE),
+      true
+    )
   }
 
   abstract class WriteActionHandler : ExtensionHandler {
@@ -234,7 +279,8 @@ internal class VimMultipleCursorsExtension : VimExtension {
       val text = if (editor.inVisualMode) {
         primaryCaret.selectedText ?: return
       } else {
-        val range = injector.searchHelper.findWordAtOrFollowingCursor(editor.vim, primaryCaret.vim, isBigWord = false) ?: return
+        val range =
+          injector.searchHelper.findWordAtOrFollowingCursor(editor.vim, primaryCaret.vim, isBigWord = false) ?: return
         if (range.startOffset > primaryCaret.offset) return
         IjVimEditor(editor).getText(range)
       }
@@ -280,7 +326,7 @@ internal class VimMultipleCursorsExtension : VimExtension {
     }
   }
 
-  inner class RemoveOccurrenceHandler : WriteActionHandler() {
+  class RemoveOccurrenceHandler : WriteActionHandler() {
     override fun executeInWriteAction(editor: Editor, context: DataContext) {
       val caret = editor.caretModel.primaryCaret
       if (caret.selectedText == null) return
@@ -300,7 +346,8 @@ internal class VimMultipleCursorsExtension : VimExtension {
 
   private fun selectWordUnderCaret(editor: Editor, caret: Caret): TextRange? {
     // TODO: I think vim-multiple-cursors uses a text object rather than the star operator
-    val range = injector.searchHelper.findWordAtOrFollowingCursor(editor.vim, caret.vim, isBigWord = false) ?: return null
+    val range =
+      injector.searchHelper.findWordAtOrFollowingCursor(editor.vim, caret.vim, isBigWord = false) ?: return null
     if (range.startOffset > caret.offset) return null
 
     enterVisualMode(editor.vim)
@@ -322,7 +369,13 @@ internal class VimMultipleCursorsExtension : VimExtension {
       searchOptions.add(SearchOptions.WRAP)
     }
 
-    return injector.searchHelper.findPattern(IjVimEditor(editor), makePattern(text, whole), startOffset, 1, searchOptions)?.startOffset ?: -1
+    return injector.searchHelper.findPattern(
+      IjVimEditor(editor),
+      makePattern(text, whole),
+      startOffset,
+      1,
+      searchOptions
+    )?.startOffset ?: -1
   }
 
   private fun makePattern(text: String, whole: Boolean): String {

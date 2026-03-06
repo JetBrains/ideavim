@@ -11,12 +11,10 @@ package com.maddyhome.idea.vim.newapi
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.IdeActions
-import com.intellij.openapi.components.Service
 import com.maddyhome.idea.vim.api.NativeAction
 import com.maddyhome.idea.vim.api.NativeActionManager
 
-@Service
-internal class IjNativeActionManager : NativeActionManager {
+class IjNativeActionManager : NativeActionManager {
   override val enterAction: NativeAction? by lazy { byName(IdeActions.ACTION_EDITOR_ENTER) }
   override val createLineAboveCaret: NativeAction? by lazy { byName("EditorStartNewLineBefore") }
   override val joinLines: NativeAction? by lazy { byName(IdeActions.ACTION_EDITOR_JOIN_LINES) }

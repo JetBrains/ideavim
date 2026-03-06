@@ -22,8 +22,8 @@ import java.awt.Font
 import java.awt.Color as AwtColor
 
 internal class IjHighlightId(
-  internal var ijHighlighter: RangeHighlighter
-): HighlightId
+  internal var ijHighlighter: RangeHighlighter,
+) : HighlightId
 
 private fun Color.toAwtColor(): AwtColor = AwtColor(r, g, b, a)
 

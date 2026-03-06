@@ -23,7 +23,6 @@ import com.maddyhome.idea.vim.api.VimEditor;
 import com.maddyhome.idea.vim.common.IndentConfig;
 import com.maddyhome.idea.vim.newapi.IjVimDocument;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import kotlin.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -396,8 +395,7 @@ public class EditorHelper {
   }
 
   private static int getExEntryHeight() {
-    var instance = ExEntryPanel.Companion.getInstance();
-    return instance != null && instance.isActive() ? instance.getHeight() : 0;
+    return injector.getCommandLine().getActiveCommandLineHeight();
   }
 
   private static int getHorizontalScrollbarHeight(final @NotNull Editor editor) {

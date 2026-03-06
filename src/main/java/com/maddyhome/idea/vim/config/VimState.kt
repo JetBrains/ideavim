@@ -15,7 +15,7 @@ import kotlin.reflect.KProperty
 /**
  * @author Alex Plate
  */
-internal class VimState {
+class VimState {
   var isIdeaJoinNotified by StateProperty("idea-join")
   var isIdeaPutNotified by StateProperty("idea-put")
   var wasSubscribedToEAPAutomatically by StateProperty("was-automatically-subscribed-to-eap")

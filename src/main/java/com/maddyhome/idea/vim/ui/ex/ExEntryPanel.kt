@@ -25,10 +25,11 @@ import com.maddyhome.idea.vim.api.VimCommandLine
 import com.maddyhome.idea.vim.api.VimCommandLineCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimKeyGroupBase
+import com.maddyhome.idea.vim.api.VimSearchGroupBase
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ranges.LineRange
-import com.maddyhome.idea.vim.group.KeyGroup
+import com.maddyhome.idea.vim.helper.ShortcutHelper
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.requestFocus
 import com.maddyhome.idea.vim.helper.selectEditorFont
@@ -179,7 +180,7 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
           resetCaretOffset(editor)
         }
 
-        VimPlugin.getSearch().resetIncsearchHighlights()
+        (VimPlugin.getSearch() as VimSearchGroupBase).resetIncsearchHighlights()
       }
 
       entry.deactivate()
@@ -268,7 +269,7 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
             // there is no search range (because the user entered an invalid range, e.g. mark not set).
             // E.g. Highlight `whatever`, type `:%s/foo` + highlight `foo`, delete back to `:%s/` and reset highlights
             // back to `whatever`
-            VimPlugin.getSearch().resetIncsearchHighlights()
+            (VimPlugin.getSearch() as VimSearchGroupBase).resetIncsearchHighlights()
             resetCaretOffset(editor)
             return
           }
@@ -288,7 +289,7 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
           val patternEnd: Int = injector.searchGroup.findEndOfPattern(searchText, separator, 0)
           val pattern = searchText.take(patternEnd)
 
-          VimPlugin.getEditor().closeEditorSearchSession(editor)
+          injector.editorGroup.closeEditorSearchSession(IjVimEditor(editor))
           val matchOffset =
             updateIncsearchHighlights(
               editor, pattern, count1, forwards, caretOffset,
@@ -523,7 +524,7 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
 
     // This does not need to be unregistered, it's registered as a custom UI property on this
     EventFacade.getInstance().registerCustomShortcutSet(
-      VimShortcutKeyAction.instance, KeyGroup.toShortcutSet(
+      VimShortcutKeyAction.instance, ShortcutHelper.toShortcutSet(
         (injector.keyGroup as VimKeyGroupBase).requiredShortcutKeys
       ), entry
     )

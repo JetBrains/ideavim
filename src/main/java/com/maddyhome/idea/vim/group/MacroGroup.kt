@@ -9,7 +9,6 @@ package com.maddyhome.idea.vim.group
 
 import com.intellij.codeInsight.completion.CompletionPhase
 import com.intellij.codeInsight.completion.impl.CompletionServiceImpl
-import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressManager
@@ -20,13 +19,13 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.macro.VimMacroBase
-import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.ij
 
 /**
  * Used to handle playback of macros
  */
-@Service
-internal class MacroGroup : VimMacroBase() {
+
+class MacroGroup : VimMacroBase() {
 
   // If it's null, this is the top macro (as in most cases). If it's not null, this macro is executed from top macro
   private var potemkinProgress: PotemkinProgress? = null
@@ -39,7 +38,7 @@ internal class MacroGroup : VimMacroBase() {
     context: ExecutionContext,
     total: Int,
   ) {
-    val project = (editor as IjVimEditor).editor.project
+    val project = editor.ij.project
     val keyStack = getInstance().keyStack
     if (!keyStack.hasStroke()) {
       logger.debug("done")

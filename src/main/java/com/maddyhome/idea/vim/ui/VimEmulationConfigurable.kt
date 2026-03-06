@@ -80,7 +80,7 @@ internal class VimEmulationConfigurable : Configurable {
 
   override fun disposeUIResources() {}
 
-  private class VimSettingsPanel() : JPanel() {
+  private class VimSettingsPanel : JPanel() {
 
     val model: VimShortcutConflictsTable.Model = VimShortcutConflictsTable.Model()
 

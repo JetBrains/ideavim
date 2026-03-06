@@ -19,7 +19,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Computable
 import com.intellij.util.Processor
 import com.intellij.util.application
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.inBlockSelection
 
@@ -34,10 +33,10 @@ internal inline fun Editor.vimForEachCaret(action: (caret: Caret) -> Unit) {
   }
 }
 
-internal fun Editor.getTopLevelEditor() = if (this is EditorWindow) this.delegate else this
+fun Editor.getTopLevelEditor() = if (this is EditorWindow) this.delegate else this
 
 @Suppress("IncorrectParentDisposable")
-internal fun Editor.isTemplateActive(): Boolean {
+fun Editor.isTemplateActive(): Boolean {
   val project = this.project ?: return false
   // XXX: I've disabled this check to find the stack trace where the project is disposed
 //  if (project.isDisposed) return false
@@ -69,7 +68,7 @@ private fun hasLiveTemplateHighlighter(
   markup: MarkupModelEx,
   offset: Int,
 ): Boolean {
-  var found = false;
+  var found = false
   markup.processRangeHighlightersOverlappingWith(
     offset, offset,
     Processor {
@@ -80,10 +79,3 @@ private fun hasLiveTemplateHighlighter(
   return found
 }
 
-private fun vimEnabled(editor: Editor?): Boolean {
-  if (VimPlugin.isNotEnabled()) return false
-  if (editor != null && editor.isIdeaVimDisabledHere) return false
-  return true
-}
-
-internal fun vimDisabled(editor: Editor?): Boolean = !vimEnabled(editor)

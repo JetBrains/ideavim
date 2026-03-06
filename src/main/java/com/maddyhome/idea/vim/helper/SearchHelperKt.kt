@@ -31,7 +31,7 @@ import it.unimi.dsi.fastutil.ints.IntSortedSet
  * case insensitive search, so `\<Work\>` will match `Work` and `work`. But when choosing the same pattern from search
  * history, the smartcase option is applied, and `\<Work\>` will only match `Work`.
  */
-internal fun shouldIgnoreCase(pattern: String, ignoreSmartCaseOption: Boolean): Boolean {
+fun shouldIgnoreCase(pattern: String, ignoreSmartCaseOption: Boolean): Boolean {
   val sc = injector.globalOptions().smartcase && !ignoreSmartCaseOption
   return injector.globalOptions().ignorecase && !(sc && containsUpperCase(pattern))
 }

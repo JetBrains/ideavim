@@ -38,10 +38,10 @@ internal object ShowCmd {
   private const val SHOWCMD_COLS = 10
 
   @NonNls
-  internal const val ID = "IdeaVimShowCmd"
+  const val ID = "IdeaVimShowCmd"
 
   @NlsSafe
-  internal const val displayName = "IdeaVim showcmd"
+  const val displayName = "IdeaVim showcmd"
 
   fun update() {
     val windowManager = WindowManager.getInstance()

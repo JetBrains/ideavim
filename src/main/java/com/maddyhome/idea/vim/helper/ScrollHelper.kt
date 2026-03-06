@@ -13,12 +13,12 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.newapi.vim
 
-internal fun getNormalizedScrollOffset(editor: Editor): Int {
+fun getNormalizedScrollOffset(editor: Editor): Int {
   val scrollOffset = injector.options(editor.vim).scrolloff
   return EditorHelper.normalizeScrollOffset(editor, scrollOffset)
 }
 
-internal fun getNormalizedSideScrollOffset(editor: Editor): Int {
+fun getNormalizedSideScrollOffset(editor: Editor): Int {
   val sideScrollOffset = injector.options(editor.vim).sidescrolloff
   return EditorHelper.normalizeSideScrollOffset(editor, sideScrollOffset)
 }

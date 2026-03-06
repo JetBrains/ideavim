@@ -17,6 +17,7 @@ import com.intellij.openapi.fileEditor.impl.EditorComposite;
 import com.intellij.openapi.fileEditor.impl.EditorTabbedContainer;
 import com.intellij.openapi.fileEditor.impl.EditorWindow;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindowType;
 import com.intellij.openapi.wm.ex.ToolWindowManagerEx;
@@ -42,73 +43,6 @@ import java.util.Objects;
 import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
 
 public class WindowGroup extends WindowGroupBase {
-  @Override
-  public void closeCurrentWindow(@NotNull ExecutionContext context) {
-    final FileEditorManagerEx fileEditorManager = getFileEditorManager((DataContext)context.getContext());
-    final EditorWindow window = fileEditorManager.getSplitters().getCurrentWindow();
-    if (window != null) {
-      window.closeAllExcept(null);
-    }
-  }
-
-  @Override
-  public void closeAllExceptCurrent(@NotNull ExecutionContext context) {
-    final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext)context.getContext()));
-    final EditorWindow current = fileEditorManager.getCurrentWindow();
-    for (final EditorWindow window : fileEditorManager.getWindows()) {
-      if (window != current) {
-        window.closeAllExcept(null);
-      }
-    }
-  }
-
-  public void closeAll(@NotNull ExecutionContext context) {
-    getFileEditorManager(((IjEditorExecutionContext)context).getContext()).closeAllFiles();
-  }
-
-  @Override
-  public void selectNextWindow(@NotNull ExecutionContext context) {
-    final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext)context.getContext()));
-    final EditorWindow current = fileEditorManager.getCurrentWindow();
-    if (current != null) {
-      EditorWindow nextWindow = fileEditorManager.getNextWindow(current);
-      if (nextWindow != null) {
-        nextWindow.setAsCurrentWindow(true);
-      }
-    }
-  }
-
-  @Override
-  public void selectPreviousWindow(@NotNull ExecutionContext context) {
-    final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext)context.getContext()));
-    final EditorWindow current = fileEditorManager.getCurrentWindow();
-    if (current != null) {
-      EditorWindow prevWindow = fileEditorManager.getPrevWindow(current);
-      if (prevWindow != null) {
-        prevWindow.setAsCurrentWindow(true);
-      }
-    }
-  }
-
-  @Override
-  public void selectWindow(@NotNull ExecutionContext context, int index) {
-    final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext)context.getContext()));
-    final EditorWindow[] windows = fileEditorManager.getWindows();
-    if (index - 1 < windows.length) {
-      windows[index - 1].setAsCurrentWindow(true);
-    }
-  }
-
-  @Override
-  public void splitWindowHorizontal(@NotNull ExecutionContext context, @NotNull String filename) {
-    splitWindow(SwingConstants.HORIZONTAL, (DataContext)context.getContext(), filename);
-  }
-
-  @Override
-  public void splitWindowVertical(@NotNull ExecutionContext context, @NotNull String filename) {
-    splitWindow(SwingConstants.VERTICAL, (DataContext)context.getContext(), filename);
-  }
-
   private static @NotNull List<EditorWindow> findWindowsInRow(@NotNull Caret caret,
                                                               @NotNull List<EditorWindow> windows,
                                                               final boolean vertical) {
@@ -247,6 +181,97 @@ public class WindowGroup extends WindowGroupBase {
     return row;
   }
 
+  private static @NotNull FileEditorManagerEx getFileEditorManager(@NotNull DataContext context) {
+    final Project project = PlatformDataKeys.PROJECT.getData(context);
+    return FileEditorManagerEx.getInstanceEx(Objects.requireNonNull(project));
+  }
+
+  private static @NotNull Point getCaretPoint(@NotNull Caret caret) {
+    final Editor editor = caret.getEditor();
+    final Point caretLocation = editor.logicalPositionToXY(caret.getLogicalPosition());
+    Point caretScreenLocation = editor.getContentComponent().getLocationOnScreen();
+    caretScreenLocation.translate(caretLocation.x, caretLocation.y);
+    return caretScreenLocation;
+  }
+
+  private static @Nullable Rectangle getSplitRectangle(@NotNull EditorWindow window) {
+    final EditorComposite editorComposite = window.getSelectedComposite();
+    if (editorComposite != null) {
+      final EditorTabbedContainer split = window.getTabbedPane();
+      final Point point = split.getComponent().getLocationOnScreen();
+      final Dimension dimension = split.getComponent().getSize();
+      return new Rectangle(point, dimension);
+    }
+    return null;
+  }
+
+  @Override
+  public void closeCurrentWindow(@NotNull ExecutionContext context) {
+    final FileEditorManagerEx fileEditorManager = getFileEditorManager((DataContext)context.getContext());
+    final EditorWindow window = fileEditorManager.getSplitters().getCurrentWindow();
+    if (window != null) {
+      window.closeAllExcept(null);
+    }
+  }
+
+  @Override
+  public void closeAllExceptCurrent(@NotNull ExecutionContext context) {
+    final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext)context.getContext()));
+    final EditorWindow current = fileEditorManager.getCurrentWindow();
+    for (final EditorWindow window : fileEditorManager.getWindows()) {
+      if (window != current) {
+        window.closeAllExcept(null);
+      }
+    }
+  }
+
+  public void closeAll(@NotNull ExecutionContext context) {
+    getFileEditorManager(((IjEditorExecutionContext)context).getContext()).closeAllFiles();
+  }
+
+  @Override
+  public void selectNextWindow(@NotNull ExecutionContext context) {
+    final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext)context.getContext()));
+    final EditorWindow current = fileEditorManager.getCurrentWindow();
+    if (current != null) {
+      EditorWindow nextWindow = fileEditorManager.getNextWindow(current);
+      if (nextWindow != null) {
+        nextWindow.setAsCurrentWindow(true);
+      }
+    }
+  }
+
+  @Override
+  public void selectPreviousWindow(@NotNull ExecutionContext context) {
+    final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext)context.getContext()));
+    final EditorWindow current = fileEditorManager.getCurrentWindow();
+    if (current != null) {
+      EditorWindow prevWindow = fileEditorManager.getPrevWindow(current);
+      if (prevWindow != null) {
+        prevWindow.setAsCurrentWindow(true);
+      }
+    }
+  }
+
+  @Override
+  public void selectWindow(@NotNull ExecutionContext context, int index) {
+    final FileEditorManagerEx fileEditorManager = getFileEditorManager(((DataContext)context.getContext()));
+    final EditorWindow[] windows = fileEditorManager.getWindows();
+    if (index - 1 < windows.length) {
+      windows[index - 1].setAsCurrentWindow(true);
+    }
+  }
+
+  @Override
+  public void splitWindowHorizontal(@NotNull ExecutionContext context, @NotNull String filename) {
+    splitWindow(SwingConstants.HORIZONTAL, (DataContext)context.getContext(), filename);
+  }
+
+  @Override
+  public void splitWindowVertical(@NotNull ExecutionContext context, @NotNull String filename) {
+    splitWindow(SwingConstants.VERTICAL, (DataContext)context.getContext(), filename);
+  }
+
   @Override
   @VimLockLabel.RequiresReadLock
   @RequiresReadLock
@@ -284,14 +309,6 @@ public class WindowGroup extends WindowGroupBase {
     windows.get(normalized).setAsCurrentWindow(true);
   }
 
-  private record NavTarget(Rectangle bounds, Runnable activate) {
-  }
-
-  private static @NotNull FileEditorManagerEx getFileEditorManager(@NotNull DataContext context) {
-    final Project project = PlatformDataKeys.PROJECT.getData(context);
-    return FileEditorManagerEx.getInstanceEx(Objects.requireNonNull(project));
-  }
-
   private void splitWindow(int orientation, @NotNull DataContext context, @NotNull String filename) {
     final Project project = PlatformDataKeys.PROJECT.getData(context);
     if (project == null) return;
@@ -299,7 +316,12 @@ public class WindowGroup extends WindowGroupBase {
 
     VirtualFile virtualFile = null;
     if (!filename.isEmpty()) {
-      virtualFile = VimPlugin.getFile().findFile(filename, project);
+      // File lookup uses ProjectRootManager and FilenameIndex (backend-only APIs),
+      // so it goes through VimFile interface which handles RPC in split mode.
+      var filePath = injector.getFile().findFile(filename, new IjEditorExecutionContext(context));
+      if (filePath != null) {
+        virtualFile = LocalFileSystem.getInstance().findFileByPath(filePath);
+      }
       if (virtualFile == null) {
         // Vim doesn't have this error message. It will create a split with a new file, if there's not one to load
         VimPlugin.showMessage(MessageHelper.message("error.split.window.could.not.find.file.0", filename));
@@ -313,22 +335,6 @@ public class WindowGroup extends WindowGroupBase {
     }
   }
 
-  private static @NotNull Point getCaretPoint(@NotNull Caret caret) {
-    final Editor editor = caret.getEditor();
-    final Point caretLocation = editor.logicalPositionToXY(caret.getLogicalPosition());
-    Point caretScreenLocation = editor.getContentComponent().getLocationOnScreen();
-    caretScreenLocation.translate(caretLocation.x, caretLocation.y);
-    return caretScreenLocation;
-  }
-
-  private static @Nullable Rectangle getSplitRectangle(@NotNull EditorWindow window) {
-    final EditorComposite editorComposite = window.getSelectedComposite();
-    if (editorComposite != null) {
-      final EditorTabbedContainer split = window.getTabbedPane();
-      final Point point = split.getComponent().getLocationOnScreen();
-      final Dimension dimension = split.getComponent().getSize();
-      return new Rectangle(point, dimension);
-    }
-    return null;
+  private record NavTarget(Rectangle bounds, Runnable activate) {
   }
 }

@@ -39,7 +39,7 @@ class VimIndentObject : VimExtension {
   }
 }
 
-private fun VimApi.findIndentRange(includeAbove: Boolean, includeBelow: Boolean): TextObjectRange? {
+private fun VimApi.findIndentRange(includeAbove: Boolean, includeBelow: Boolean): TextObjectRange {
   val charSequence = editor { read { text } }
   val caretOffset = editor { read { withPrimaryCaret { offset } } }
 

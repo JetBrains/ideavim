@@ -44,7 +44,7 @@ private const val DEFAULT_HIGHLIGHT_DURATION_SNEAK = 300
 
 // By [Mikhail Levchenko](https://github.com/Mishkun)
 // Original repository with the plugin: https://github.com/Mishkun/ideavim-sneak
-internal class IdeaVimSneakExtension : VimExtension {
+class IdeaVimSneakExtension : VimExtension {
   @Suppress("CompanionObjectInExtension")
   companion object {
     private var highlightHandler: HighlightHandler? = null
@@ -139,7 +139,7 @@ internal class IdeaVimSneakExtension : VimExtension {
         charSequence: CharSequence,
         position: Int,
         charone: Char,
-        chartwo: Char
+        chartwo: Char,
       ): Int? {
         for (i in (position + offset) until charSequence.length - 1) {
           if (matches(editor, charSequence, i, charone, chartwo)) {
@@ -155,7 +155,7 @@ internal class IdeaVimSneakExtension : VimExtension {
         charSequence: CharSequence,
         position: Int,
         charone: Char,
-        chartwo: Char
+        chartwo: Char,
       ): Int? {
         for (i in (position + offset) downTo 0) {
           if (matches(editor, charSequence, i, charone, chartwo)) {
@@ -288,7 +288,7 @@ internal class IdeaVimSneakExtension : VimExtension {
  *  and create mapping to <Plug>(prefix)[keys]
  */
 private fun VimExtension.mapToFunctionAndProvideKeys(
-  keys: String, handler: ExtensionHandler, mappingModes: EnumSet<MappingMode>
+  keys: String, handler: ExtensionHandler, mappingModes: EnumSet<MappingMode>,
 ) {
   VimExtensionFacade.putExtensionHandlerMapping(
     mappingModes,

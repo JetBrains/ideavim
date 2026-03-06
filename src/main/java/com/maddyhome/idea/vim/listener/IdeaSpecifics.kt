@@ -39,10 +39,10 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimKeyGroupBase
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.group.NotificationService
-import com.maddyhome.idea.vim.group.RegisterGroup
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
@@ -51,6 +51,7 @@ import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.initInjector
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.register.VimRegisterGroup
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.undo.VimTimestampBasedUndoService
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
@@ -103,14 +104,14 @@ internal object IdeaSpecifics {
           } else {
             emptyList()
           }
-         val intentionName = if (action is ApplyIntentionAction) {
+          val intentionName = if (action is ApplyIntentionAction) {
             action.name
-          }
-          else null
+          } else null
 
           // We can still get empty ID and empty candidates. Notably, for the tool window toggle buttons on the new UI.
           // We could filter out action events with `place == ActionPlaces.TOOLWINDOW_TOOLBAR_BAR`
-          VimPlugin.getNotifications(event.dataContext.getData(CommonDataKeys.PROJECT)).notifyActionId(id, candidates, intentionName)
+          VimPlugin.getNotifications(event.dataContext.getData(CommonDataKeys.PROJECT))
+            .notifyActionId(id, candidates, intentionName)
         }
       }
 
@@ -183,22 +184,25 @@ internal object IdeaSpecifics {
       val completionStartMarker: RangeMarker,
       val originalStartOffset: Int,
       val originalCaretOffset: Int,
-      val originalDocumentLength: Int
+      val originalDocumentLength: Int,
     ) {
-      fun recordCompletion(editor: Editor, register: RegisterGroup) {
+      fun recordCompletion(editor: Editor, register: VimRegisterGroup) {
         if (!completionStartMarker.isValid) {
           return
         }
 
         val completionStartOffset = completionStartMarker.startOffset
         val caretOffset = editor.caretModel.primaryCaret.offset
-        val completedCharCount = editor.document.textLength - originalDocumentLength - (completionStartOffset - originalStartOffset)
+        val completedCharCount =
+          editor.document.textLength - originalDocumentLength - (completionStartOffset - originalStartOffset)
         val completionEndOffset = completionStartOffset + completedCharCount
 
-        val completedText = editor.document.getText(TextRange(
-          completionStartOffset,
-          completionEndOffset
-        ))
+        val completedText = editor.document.getText(
+          TextRange(
+            completionStartOffset,
+            completionEndOffset
+          )
+        )
 
         register.recordText(completedText)
 
@@ -284,8 +288,7 @@ internal object IdeaSpecifics {
           // oldIndex == newIndex == -1.
           if (vimEditor.isIdeaRefactorModeKeep) {
             IdeaRefactorModeHelper.correctEditorSelection(templateState.editor)
-          }
-          else {
+          } else {
             // The editor places the caret at the exclusive end of the variable. For Visual, unless we've enabled
             // exclusive selection, move it to the inclusive end.
             // Note that "keep" does this as part of IdeaRefactorModeHelper
@@ -339,7 +342,7 @@ internal object IdeaSpecifics {
       if (oldLookup == null && newLookup is LookupImpl) {
         if (newLookup.editor.isIdeaVimDisabledHere) return
 
-        VimPlugin.getKey().registerShortcutsForLookup(newLookup)
+        (VimPlugin.getKey() as VimKeyGroupBase).registerShortcutsForLookup(newLookup)
       }
 
       // Lookup closed

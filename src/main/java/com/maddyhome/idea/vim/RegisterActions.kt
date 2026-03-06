@@ -7,14 +7,32 @@
  */
 package com.maddyhome.idea.vim
 
+import com.intellij.openapi.application.ApplicationManager
+import com.maddyhome.idea.vim.RegisterActions.registerActions
+import com.maddyhome.idea.vim.action.CommandProvider
 import com.maddyhome.idea.vim.action.EngineCommandProvider
-import com.maddyhome.idea.vim.action.IntellijCommandProvider
+import com.maddyhome.idea.vim.api.VimKeyGroup
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.key.MappingOwner
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
 object RegisterActions {
+
+  private val additionalCommandProviders = mutableListOf<CommandProvider>()
+
+  /**
+   * Registers an additional [CommandProvider] whose commands will be included
+   * during action registration. Call this before [registerActions].
+   *
+   * This allows modules like ideavim-frontend to contribute their own
+   * KSP-generated commands without a compile-time dependency from common.
+   */
+  fun registerCommandProvider(provider: CommandProvider) {
+    additionalCommandProviders.add(provider)
+  }
+
   /**
    * Register all the key/action mappings for the plugin.
    */
@@ -25,8 +43,8 @@ object RegisterActions {
   }
 
   fun findAction(id: String): EditorActionHandlerBase? {
-    val commandBean = IntellijCommandProvider.getCommands().firstOrNull { it.actionId == id }
-      ?: EngineCommandProvider.getCommands().firstOrNull { it.actionId == id } ?: return null
+    val allProviders = listOf(EngineCommandProvider) + additionalCommandProviders
+    val commandBean = allProviders.flatMap { it.getCommands() }.firstOrNull { it.actionId == id } ?: return null
     return commandBean.instance
   }
 
@@ -36,18 +54,18 @@ object RegisterActions {
 
   @JvmStatic
   fun unregisterActions() {
-    val keyGroup = VimPlugin.getKeyIfCreated()
+    val keyGroup = ApplicationManager.getApplication().getServiceIfCreated(VimKeyGroup::class.java)
     keyGroup?.unregisterCommandActions()
   }
 
   private fun registerVimCommandActions() {
-    val parser = VimPlugin.getKey()
-    IntellijCommandProvider.getCommands().forEach { parser.registerCommandAction(it) }
+    val parser = injector.keyGroup
     EngineCommandProvider.getCommands().forEach { parser.registerCommandAction(it) }
+    additionalCommandProviders.flatMap { it.getCommands() }.forEach { parser.registerCommandAction(it) }
   }
 
   private fun registerShortcutsWithoutActions() {
-    val parser = VimPlugin.getKey()
+    val parser = injector.keyGroup
 
     // The {char1} <BS> {char2} shortcut is handled directly by KeyHandler#handleKey, so doesn't have an action. But we
     // still need to register the shortcut, to make sure the editor doesn't swallow it.

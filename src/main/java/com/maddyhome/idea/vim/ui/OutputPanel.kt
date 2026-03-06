@@ -501,7 +501,7 @@ class OutputPanel private constructor(
 
   companion object {
     fun getNullablePanel(editor: Editor): OutputPanel? {
-      return editor.vimMorePanel
+      return editor.vimMorePanel as OutputPanel?
     }
 
     fun isPanelActive(editor: Editor): Boolean {

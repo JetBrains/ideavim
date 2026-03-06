@@ -31,7 +31,7 @@ import org.jetbrains.annotations.Contract
 import java.awt.Font
 import java.util.*
 
-internal fun updateSearchHighlights(
+fun updateSearchHighlights(
   pattern: String?,
   shouldIgnoreSmartCase: Boolean,
   showHighlights: Boolean,
@@ -40,7 +40,7 @@ internal fun updateSearchHighlights(
   updateSearchHighlights(null, pattern, 1, shouldIgnoreSmartCase, showHighlights, -1, null, true, forceUpdate)
 }
 
-internal fun updateIncsearchHighlights(
+fun updateIncsearchHighlights(
   editor: Editor,
   pattern: String,
   count1: Int,
@@ -67,7 +67,7 @@ internal fun updateIncsearchHighlights(
   )
 }
 
-internal fun addSubstitutionConfirmationHighlight(editor: Editor, start: Int, end: Int): RangeHighlighter {
+fun addSubstitutionConfirmationHighlight(editor: Editor, start: Int, end: Int): RangeHighlighter {
   val color = TextAttributes(
     editor.colorsScheme.getColor(EditorColors.SELECTION_FOREGROUND_COLOR),
     editor.colorsScheme.getColor(EditorColors.SELECTION_BACKGROUND_COLOR),
@@ -240,7 +240,7 @@ private fun findClosestMatch(
   return sortedResults[nextIndex % results.size].startOffset
 }
 
-internal fun highlightSearchResults(
+fun highlightSearchResults(
   editor: Editor,
   pattern: String,
   results: List<TextRange>,

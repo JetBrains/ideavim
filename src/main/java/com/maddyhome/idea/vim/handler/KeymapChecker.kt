@@ -137,7 +137,7 @@ private fun verifyKeymap() {
   }
 }
 
-internal sealed interface KeyMapIssue {
+sealed interface KeyMapIssue {
   data class AddShortcut(
     val key: String,
     val action: String,

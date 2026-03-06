@@ -12,7 +12,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.DataKey
 import com.maddyhome.idea.vim.api.ExecutionContext
 
-internal open class IjEditorExecutionContext(override val context: DataContext) : ExecutionContext
+open class IjEditorExecutionContext(override val context: DataContext) : ExecutionContext
 
 // This key is stored in data context when the action is started from vim
 internal val runFromVimKey = DataKey.create<Boolean>("RunFromVim")
@@ -20,7 +20,7 @@ internal val runFromVimKey = DataKey.create<Boolean>("RunFromVim")
 /**
  * Check if the action with this data context was started from Vim
  */
-internal val DataContext.actionStartedFromVim: Boolean
+val DataContext.actionStartedFromVim: Boolean
   get() = this.getData(runFromVimKey) == true
 
 val DataContext.vim: ExecutionContext

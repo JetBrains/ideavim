@@ -9,7 +9,6 @@
 package com.maddyhome.idea.vim.thinapi
 
 import com.intellij.ide.plugins.PluginManagerCore
-import com.intellij.openapi.components.Service
 import com.intellij.openapi.extensions.PluginId
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ListenerOwner
@@ -30,7 +29,6 @@ internal fun ExtensionBean.toLazyExtension(): LazyVimExtension? {
   return LazyVimExtension(extensionName, className, functionName, classLoader)
 }
 
-@Service(Service.Level.APP)
 class IjExtensionLoader : ExtensionLoader {
   /**
    * Registry of all currently enabled extensions, mapped by their names.
@@ -47,8 +45,8 @@ class IjExtensionLoader : ExtensionLoader {
    * @return A [VimApiImpl] instance configured for the specified extension.
    */
   private fun createVimApi(name: String): VimApiImpl {
-    val mappingOwner = MappingOwner.Plugin.Companion.get(name)
-    val listenerOwner = ListenerOwner.Plugin.Companion.get(name)
+    val mappingOwner = MappingOwner.Plugin.get(name)
+    val listenerOwner = ListenerOwner.Plugin.get(name)
     return VimApiImpl(listenerOwner, mappingOwner)
   }
 
