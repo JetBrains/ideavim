@@ -14,7 +14,7 @@ import com.intellij.notification.ActionCenter
 import com.intellij.notification.Notification
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.group.NotificationService
+import com.maddyhome.idea.vim.group.VimNotifications
 import org.jetbrains.plugins.ideavim.TestIjOptionConstants
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
@@ -34,7 +34,7 @@ class JoinNotificationTest : VimTestCase() {
     }.last()
 
     try {
-      kotlin.test.assertEquals(NotificationService.IDEAVIM_NOTIFICATION_TITLE, notification.title)
+      kotlin.test.assertEquals(VimNotifications.IDEAVIM_NOTIFICATION_TITLE, notification.title)
       assertTrue(TestIjOptionConstants.ideajoin in notification.content)
       kotlin.test.assertEquals(3, notification.actions.size)
     } finally {
