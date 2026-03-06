@@ -17,15 +17,15 @@ import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.fileEditor.impl.EditorsSplitters
 import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.platform.project.ProjectId
+import com.intellij.platform.project.findProjectOrNull
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.ProjectScope
 import com.maddyhome.idea.vim.group.findEditorByFilePath
-import com.maddyhome.idea.vim.group.findProjectById
 import com.maddyhome.idea.vim.group.findVirtualFile
 import com.maddyhome.idea.vim.helper.EngineMessageHelper
 import kotlin.io.path.Path
@@ -41,15 +41,15 @@ import kotlin.io.path.Path
  */
 class FileBackendServiceImpl : FileBackendService {
 
-  // ======================== Interface methods (serializable params) ========================
+  // ======================== Interface methods (ProjectId params) ========================
 
-  override fun findFile(filename: String, projectId: String?): String? {
-    val project = resolveProject(projectId) ?: return null
+  override fun findFile(filename: String, projectId: ProjectId?): String? {
+    val project = projectId?.findProjectOrNull() ?: return null
     return findFile(filename, project)?.path
   }
 
-  override fun openFile(filename: String, projectId: String?, focusEditor: Boolean): String? {
-    val project = resolveProject(projectId) ?: return "No project"
+  override fun openFile(filename: String, projectId: ProjectId?, focusEditor: Boolean): String? {
+    val project = projectId?.findProjectOrNull() ?: return "No project"
     val found = findFile(filename, project)
 
     if (found != null) {
@@ -66,8 +66,8 @@ class FileBackendServiceImpl : FileBackendService {
     }
   }
 
-  override fun closeFileByNumber(number: Int, projectId: String?) {
-    val project = resolveProject(projectId) ?: return
+  override fun closeFileByNumber(number: Int, projectId: ProjectId?) {
+    val project = projectId?.findProjectOrNull() ?: return
     val fileEditorManager = FileEditorManagerEx.getInstanceEx(project)
     val window = fileEditorManager.currentWindow
     val editors = fileEditorManager.openFiles
@@ -81,34 +81,23 @@ class FileBackendServiceImpl : FileBackendService {
     }
   }
 
-  override fun saveFile(projectId: String?, filePath: String?, saveAll: Boolean) {
-    val project = resolveProject(projectId) ?: return
+  override fun saveFile(projectId: ProjectId?, filePath: String?, saveAll: Boolean) {
+    val project = projectId?.findProjectOrNull() ?: return
     val editor = filePath?.let { findEditorByFilePath(project, it) } ?: return
     saveFile(editor, saveAll)
   }
 
-  override fun buildFileInfoMessage(projectId: String?, filePath: String?, fullPath: Boolean): String? {
-    val project = resolveProject(projectId) ?: return null
+  override fun buildFileInfoMessage(projectId: ProjectId?, filePath: String?, fullPath: Boolean): String? {
+    val project = projectId?.findProjectOrNull() ?: return null
     val editor = filePath?.let { findEditorByFilePath(project, it) } ?: return null
-    return buildFileInfoMessage(editor, fullPath)
+    return buildFileInfoMessage(editor, project, fullPath)
   }
 
-  override fun selectEditor(projectId: String, documentPath: String, protocol: String): Boolean {
+  override fun selectEditor(projectId: ProjectId, documentPath: String, protocol: String): Boolean {
     val virtualFile = findVirtualFile(documentPath, protocol) ?: return false
-    val project = findProjectById(projectId) ?: return false
+    val project = projectId.findProjectOrNull() ?: return false
     val editor = selectEditor(project, virtualFile)
     return editor != null
-  }
-
-  override fun getProjectId(): String {
-    val project = ProjectManager.getInstance().openProjects.firstOrNull()
-      ?: error("No open projects on backend")
-    return getProjectId(project)
-  }
-
-  override fun getProjectIdForProject(project: Any): String {
-    require(project is Project)
-    return getProjectId(project)
   }
 
   // ======================== Internal methods (for FileRemoteApiImpl) ========================
@@ -155,7 +144,7 @@ class FileBackendServiceImpl : FileBackendService {
    * Builds the `:file` / Ctrl-G message string for the given editor.
    * Used by [FileRemoteApiImpl] for split-mode RPC.
    */
-  fun buildFileInfoMessage(editor: Editor, fullPath: Boolean): String {
+  fun buildFileInfoMessage(editor: Editor, project: Project, fullPath: Boolean): String {
     val msg = StringBuilder()
     val vf = editor.virtualFile
     if (vf != null) {
@@ -163,15 +152,11 @@ class FileBackendServiceImpl : FileBackendService {
       if (fullPath) {
         msg.append(vf.path)
       } else {
-        val project = ProjectManager.getInstance().openProjects
-          .firstOrNull { getProjectId(it) == getProjectId() }
-        if (project != null) {
-          val root = ProjectRootManager.getInstance(project).fileIndex.getContentRootForFile(vf)
-          if (root != null) {
-            msg.append(vf.path.substring(root.path.length + 1))
-          } else {
-            msg.append(vf.path)
-          }
+        val root = ProjectRootManager.getInstance(project).fileIndex.getContentRootForFile(vf)
+        if (root != null) {
+          msg.append(vf.path.substring(root.path.length + 1))
+        } else {
+          msg.append(vf.path)
         }
       }
       msg.append("\" ")
@@ -213,18 +198,7 @@ class FileBackendServiceImpl : FileBackendService {
     return null
   }
 
-  fun getProjectId(project: Project): String {
-    return project.name + "-" + project.locationHash
-  }
-
   // ======================== Private helpers ========================
-
-  private fun resolveProject(projectId: String?): Project? {
-    val projects = ProjectManager.getInstance().openProjects
-    if (projectId == null) return projects.firstOrNull()
-    return projects.firstOrNull { getProjectId(it) == projectId }
-      ?: projects.firstOrNull()
-  }
 
   private fun findByNameInContentRoots(filename: String, project: Project): VirtualFile? {
     var found: VirtualFile? = null

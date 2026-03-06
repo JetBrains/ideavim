@@ -10,7 +10,8 @@ package com.maddyhome.idea.vim.group.jump
 
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.ex.IdeDocumentHistory
-import com.maddyhome.idea.vim.group.findProjectById
+import com.intellij.platform.project.ProjectId
+import com.intellij.platform.project.findProjectOrNull
 
 /**
  * RPC handler for [JumpRemoteApi].
@@ -21,18 +22,19 @@ import com.maddyhome.idea.vim.group.findProjectById
  * collected by [JumpsListener] (IDE navigation events on the backend).
  *
  * Note: Must NOT use [com.maddyhome.idea.vim.api.injector] — it is not initialized on the backend
- * in split mode. Uses [findProjectById] from [BackendFileUtil] instead.
+ * in split mode. Uses platform [ProjectId.findProjectOrNull] instead.
  */
 internal class JumpRemoteApiImpl : JumpRemoteApi {
-  override suspend fun includeCurrentCommandAsNavigation(projectId: String?) {
+  override suspend fun includeCurrentCommandAsNavigation(projectId: ProjectId?) {
     if (projectId == null) return
-    val project = findProjectById(projectId) ?: return
+    val project = projectId.findProjectOrNull() ?: return
     IdeDocumentHistory.getInstance(project).includeCurrentCommandAsNavigation()
   }
 
-  override suspend fun getListenerJumps(projectId: String?): List<JumpInfo> {
+  override suspend fun getListenerJumps(projectId: ProjectId?): List<JumpInfo> {
     if (projectId == null) return emptyList()
-    return service<BackendJumpStorage>().getJumps(projectId).map {
+    val storageKey = projectId.serializeToString()
+    return service<BackendJumpStorage>().getJumps(storageKey).map {
       JumpInfo(it.line, it.col, it.filepath, it.protocol)
     }
   }

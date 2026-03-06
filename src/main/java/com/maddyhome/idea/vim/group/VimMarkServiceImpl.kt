@@ -13,6 +13,7 @@ import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.util.text.StringUtil
+import com.intellij.platform.project.projectId
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMarkService
 import com.maddyhome.idea.vim.api.VimMarkServiceBase
@@ -21,6 +22,7 @@ import com.maddyhome.idea.vim.group.bookmark.BookmarkBackendService
 import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.mark.VimMark
 import com.maddyhome.idea.vim.mark.VimMark.Companion.create
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import org.jdom.Element
 import java.util.*
@@ -43,7 +45,7 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
     }
     val lp = editor.offsetToBufferPosition(offset)
     val virtualFile = editor.getVirtualFile() ?: return super.createGlobalMark(editor, char, offset)
-    val projectId = editor.projectId
+    val projectId = (editor as IjVimEditor).editor.project?.projectId()
     val info =
       bookmarkBackend.createOrGetSystemMark(char, lp.line, lp.column, virtualFile.path, projectId, virtualFile.protocol)
         ?: return super.createGlobalMark(editor, char, offset)

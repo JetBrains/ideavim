@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.group.file
 
 import com.intellij.openapi.components.service
+import com.intellij.platform.project.ProjectId
 
 /**
  * Backend service for file operations that require IntelliJ Platform APIs
@@ -21,49 +22,38 @@ import com.intellij.openapi.components.service
  * delegates backend-dependent operations to this service while keeping local UI operations
  * (closeFile by editor, selectFile, selectNextFile) on the frontend.
  *
- * All parameters are serializable (String, Int, Boolean) so the interface can be
- * implemented as an RPC proxy for split mode.
+ * Project identification uses platform [ProjectId] which is RPC-serializable and
+ * resolves correctly across frontend/backend processes.
  */
 interface FileBackendService {
 
-  fun findFile(filename: String, projectId: String?): String?
+  fun findFile(filename: String, projectId: ProjectId?): String?
 
   /**
    * Opens a file on the backend.
    * @return null on success, or an error message to display on the frontend
    */
-  fun openFile(filename: String, projectId: String?, focusEditor: Boolean = true): String?
+  fun openFile(filename: String, projectId: ProjectId?, focusEditor: Boolean = true): String?
 
-  fun closeFileByNumber(number: Int, projectId: String?)
+  fun closeFileByNumber(number: Int, projectId: ProjectId?)
 
   /**
    * Saves file(s) based on the [saveAll] flag.
    * The option is already resolved by the frontend caller.
    */
-  fun saveFile(projectId: String?, filePath: String?, saveAll: Boolean)
+  fun saveFile(projectId: ProjectId?, filePath: String?, saveAll: Boolean)
 
   /**
    * Builds the `:file` / Ctrl-G message string for the given file.
    * @return the message to display, or null if no info is available
    */
-  fun buildFileInfoMessage(projectId: String?, filePath: String?, fullPath: Boolean): String?
+  fun buildFileInfoMessage(projectId: ProjectId?, filePath: String?, fullPath: Boolean): String?
 
   /**
    * Focuses or opens a file by path.
    * @return true if the file was successfully opened/focused
    */
-  fun selectEditor(projectId: String, documentPath: String, protocol: String): Boolean
-
-  /**
-   * Returns the project ID for the first open project.
-   */
-  fun getProjectId(): String
-
-  /**
-   * Returns the project ID for the given project.
-   * In split mode, returns the cached backend project ID (ignoring the project param).
-   */
-  fun getProjectIdForProject(project: Any): String
+  fun selectEditor(projectId: ProjectId, documentPath: String, protocol: String): Boolean
 
   companion object {
     @JvmStatic

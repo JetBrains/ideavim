@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.group.jump
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
+import com.intellij.platform.project.ProjectId
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimJumpServiceBase
 import com.maddyhome.idea.vim.group.CoroutineScopeProvider
@@ -33,7 +34,8 @@ internal class VimJumpServiceSplitClient : VimJumpServiceBase() {
   override var lastJumpTimeStamp: Long = 0
 
   override fun includeCurrentCommandAsNavigation(editor: VimEditor) {
-    rpc { includeCurrentCommandAsNavigation(editor.projectId) }
+    val projectId = deserializeProjectId(editor.projectId) ?: return
+    rpc { includeCurrentCommandAsNavigation(projectId) }
   }
 
   override fun getJump(projectId: String, count: Int): Jump? {
@@ -51,7 +53,8 @@ internal class VimJumpServiceSplitClient : VimJumpServiceBase() {
    * Deduplicates by filepath+line, keeping existing local entries.
    */
   private fun syncBackendJumps(projectId: String) {
-    val backendJumps = rpc { getListenerJumps(projectId) }
+    val platformProjectId = deserializeProjectId(projectId) ?: return
+    val backendJumps = rpc { getListenerJumps(platformProjectId) }
       .map { Jump(it.line, it.col, it.filepath, it.protocol) }
     val localJumps = projectToJumps.getOrPut(projectId) { mutableListOf() }
     val seen = localJumps.map { it.filepath to it.line }.toSet()
@@ -62,6 +65,14 @@ internal class VimJumpServiceSplitClient : VimJumpServiceBase() {
     }
     while (localJumps.size > SAVE_JUMP_COUNT) {
       localJumps.removeFirst()
+    }
+  }
+
+  private fun deserializeProjectId(projectId: String): ProjectId? {
+    return try {
+      ProjectId.deserializeFromString(projectId)
+    } catch (_: Exception) {
+      null
     }
   }
 

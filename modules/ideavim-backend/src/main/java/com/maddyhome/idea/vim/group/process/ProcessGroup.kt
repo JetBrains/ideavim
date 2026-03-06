@@ -12,19 +12,19 @@ import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.CapturingProcessHandler
 import com.intellij.execution.process.ProcessAdapter
 import com.intellij.execution.process.ProcessEvent
-import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressIndicatorProvider
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
+import com.intellij.platform.project.ProjectId
+import com.intellij.platform.project.findProjectOrNull
 import com.intellij.util.execution.ParametersListUtil
 import com.intellij.util.text.CharSequenceReader
 import com.maddyhome.idea.vim.api.GlobalOptions
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimProcessGroupBase
-import com.maddyhome.idea.vim.group.file.FileBackendService
 import java.io.BufferedWriter
 import java.io.IOException
 import java.io.OutputStreamWriter
@@ -42,8 +42,11 @@ class ProcessGroup : VimProcessGroupBase() {
     currentDirectoryPath: String?,
     options: GlobalOptions,
   ): String? {
-    val project = ProjectManager.getInstance().openProjects
-      .firstOrNull { service<FileBackendService>().getProjectIdForProject(it) == editor.projectId }
+    val project = try {
+      ProjectId.deserializeFromString(editor.projectId).findProjectOrNull()
+    } catch (_: Exception) {
+      null
+    }
     val result = executeCommandImpl(
       command, input, currentDirectoryPath, project,
       options.shell, options.shellcmdflag, options.shellxescape, options.shellxquote,

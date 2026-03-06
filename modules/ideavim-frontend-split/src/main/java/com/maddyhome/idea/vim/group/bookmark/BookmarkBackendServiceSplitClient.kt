@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.group.bookmark
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
+import com.intellij.platform.project.ProjectId
 import com.maddyhome.idea.vim.group.CoroutineScopeProvider
 import kotlinx.coroutines.runBlocking
 
@@ -26,7 +27,7 @@ internal class BookmarkBackendServiceSplitClient : BookmarkBackendService {
     line: Int,
     col: Int,
     filePath: String,
-    projectId: String?,
+    projectId: ProjectId?,
     protocol: String?,
   ): BookmarkInfo? {
     return rpc { createOrGetSystemMark(char, line, col, filePath, projectId, protocol) }

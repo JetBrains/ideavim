@@ -13,13 +13,13 @@ import com.intellij.openapi.components.RoamingType
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.fileEditor.ex.IdeDocumentHistory
-import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.util.text.StringUtil
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimJumpServiceBase
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.mark.Jump
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.initInjector
 import org.jdom.Element
@@ -63,8 +63,7 @@ internal class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateCompone
   }
 
   override fun includeCurrentCommandAsNavigation(editor: VimEditor) {
-    val project = ProjectManager.getInstance().openProjects
-      .firstOrNull { injector.file.getProjectId(it) == editor.projectId } ?: return
+    val project = (editor as IjVimEditor).editor.project ?: return
     IdeDocumentHistory.getInstance(project).includeCurrentCommandAsNavigation()
   }
 

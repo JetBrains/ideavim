@@ -8,30 +8,13 @@
 
 package com.maddyhome.idea.vim.group
 
-import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
-import com.maddyhome.idea.vim.group.file.FileBackendService
-/**
- * Resolves a [Project] by its projectId.
- * Matches by [FileBackendServiceImpl.getProjectId] first, falls back to the first open project.
- *
- * Note: Uses [service] instead of `injector.file` because `injector` is not
- * initialized on the backend in split mode.
- */
-internal fun findProjectById(projectId: String?): Project? {
-  val projects = ProjectManager.getInstance().openProjects
-  if (projectId == null) return projects.firstOrNull()
-  val fileBackend = service<FileBackendService>()
-  return projects.firstOrNull { fileBackend.getProjectIdForProject(it) == projectId }
-    ?: projects.firstOrNull()
-}
 
 /**
  * Finds a [VirtualFile] by path, trying local filesystem first, then jar for library sources.
