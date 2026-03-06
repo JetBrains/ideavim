@@ -359,7 +359,7 @@ internal abstract class VimKeyHandler(nextHandler: EditorActionHandler?) : Octop
   }
 }
 
-internal fun isOctopusEnabled(s: KeyStroke, editor: Editor): Boolean {
+fun isOctopusEnabled(s: KeyStroke, editor: Editor): Boolean {
   if (!enableOctopus) return false
   // CMD line has a different processing mechanizm: the processing actions are registered
   //   for the input field component. These keys are not dispatched via the octopus handler.

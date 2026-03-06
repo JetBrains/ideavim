@@ -13,7 +13,6 @@ import com.intellij.openapi.components.RoamingType;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
-import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.newapi.IjVimInjectorKt;
 import com.maddyhome.idea.vim.register.Register;
 import com.maddyhome.idea.vim.register.VimRegisterGroupBase;
@@ -34,13 +33,14 @@ import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
  */
 @State(name = "VimRegisterSettings", storages = {
   @Storage(value = "$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)})
-public class RegisterGroup extends VimRegisterGroupBase implements PersistentStateComponent<Element> {
+public class RegisterGroup extends VimRegisterGroupBase
+  implements PersistentStateComponent<Element>, com.maddyhome.idea.vim.newapi.VimLegacyStateLoader {
+
+  private static final Logger logger = Logger.getInstance(RegisterGroup.class);
 
   static {
     IjVimInjectorKt.initInjector();
   }
-
-  private static final Logger logger = Logger.getInstance(RegisterGroup.class);
 
   public RegisterGroup() {
     this.initClipboardOptionListener();
@@ -64,7 +64,7 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
       if (text != null) {
         logger.trace("Save register as 'text'");
         final Element textElement = new Element("text");
-        VimPlugin.getXML().setSafeXmlText(textElement, text);
+        XMLGroup.getInstance().setSafeXmlText(textElement, text);
         registerElement.addContent(textElement);
       }
       else {
@@ -125,7 +125,7 @@ public class RegisterGroup extends VimRegisterGroupBase implements PersistentSta
         }
         if (textElement != null) {
           logger.trace("Register has 'text' element");
-          final String text = VimPlugin.getXML().getSafeXmlText(textElement);
+          final String text = XMLGroup.getInstance().getSafeXmlText(textElement);
           if (text != null) {
             logger.trace("Register data parsed");
             register = new Register(key, injector.getClipboardManager().dumbCopiedText(text), type);

@@ -8,19 +8,12 @@
 
 package com.maddyhome.idea.vim.vimscript
 
-import com.intellij.openapi.components.Service
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.maddyhome.idea.vim.api.VimScriptExecutorBase
-import com.maddyhome.idea.vim.extension.VimExtensionRegistrar
 import java.nio.file.Path
 
-@Service
 internal class Executor : VimScriptExecutorBase() {
-  override fun enableDelayedExtensions() {
-    VimExtensionRegistrar.enableDelayedExtensions()
-  }
-
   override fun ensureFileIsSaved(file: Path) {
     val documentManager = FileDocumentManager.getInstance()
 

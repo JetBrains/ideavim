@@ -58,7 +58,7 @@ import javax.swing.KeyStroke
  *
  * These keys are not passed to [com.maddyhome.idea.vim.VimTypedActionHandler] and should be handled by actions.
  */
-internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
+class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
 
   init {
     initInjector()
@@ -268,7 +268,7 @@ internal class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatib
       .toSet()
   }
 
-  internal companion object {
+  companion object {
     @JvmField
     val VIM_ONLY_EDITOR_KEYS: Set<KeyStroke> =
       ImmutableSet.builder<KeyStroke>().addAll(getKeyStrokes(KeyEvent.VK_ENTER, 0))

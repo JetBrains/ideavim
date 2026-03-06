@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.newapi
 
-import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.Logger
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -18,7 +17,7 @@ import com.maddyhome.idea.vim.helper.findMisspelledWords
 import it.unimi.dsi.fastutil.ints.IntComparator
 import it.unimi.dsi.fastutil.ints.IntComparators
 
-@Service
+
 internal class IjVimSearchHelper : VimSearchHelperBase() {
   companion object {
     private val logger = Logger.getInstance(IjVimSearchHelper::class.java.name)

@@ -22,7 +22,6 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.IdeActionHandler
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.key.VimActionsPromoter
 import com.maddyhome.idea.vim.undo.VimKeyBasedUndoService
 import com.maddyhome.idea.vim.undo.VimTimestampBasedUndoService
 import java.util.*
@@ -61,7 +60,7 @@ internal class VimEditorDown : IdeActionHandler(IdeActions.ACTION_EDITOR_MOVE_CA
  * Insert mode handler for `<Tab>` and `<C-I>`. This will invoke the IDE's "EditorTab" action, which will insert the
  * tab or the appropriate number of spaces.
  *
- * Note that `Tab` has special handling in [VimActionsPromoter]. Typically, the promoter makes sure that
+ * Note that `Tab` has special handling in [com.maddyhome.idea.vim.key.VimActionsPromoter]. Typically, the promoter makes sure that
  * [VimShortcutKeyAction] is the first action to be evaluated and potentially invoked. However, when the list of
  * possible actions for the shortcut includes [TabAction], the promoter will actually demote [VimShortcutKeyAction] so
  * that it is invoked almost last, second only to [TabAction]. This means the user has the chance to invoke context

@@ -13,7 +13,6 @@ import com.intellij.codeInsight.editorActions.CopyPastePreProcessor
 import com.intellij.codeInsight.editorActions.TextBlockTransferable
 import com.intellij.codeInsight.editorActions.TextBlockTransferableData
 import com.intellij.ide.CopyPasteManagerEx
-import com.intellij.openapi.components.Service
 import com.intellij.openapi.editor.CaretStateTransferableData
 import com.intellij.openapi.editor.RawText
 import com.intellij.openapi.editor.richcopy.view.HtmlTransferableData
@@ -37,7 +36,7 @@ import java.awt.datatransfer.Transferable
 import java.awt.datatransfer.UnsupportedFlavorException
 import java.io.IOException
 
-@Service
+
 internal class IjClipboardManager : VimClipboardManager {
   override fun getPrimaryContent(editor: VimEditor, context: ExecutionContext): IjVimCopiedText? {
     val clipboard = Toolkit.getDefaultToolkit()?.systemSelection ?: return null
@@ -154,7 +153,7 @@ internal class IjClipboardManager : VimClipboardManager {
   }
 
   override fun getTransferableData(vimEditor: VimEditor, textRange: TextRange): List<TextBlockTransferableData> {
-    val editor = (vimEditor as IjVimEditor).editor
+    val editor = vimEditor.ij
     val transferableData: MutableList<TextBlockTransferableData> = ArrayList()
     val project = editor.project ?: return emptyList()
 
@@ -201,7 +200,7 @@ internal class IjClipboardManager : VimClipboardManager {
     text: String,
     transferableData: List<*>,
   ): String {
-    val editor = (vimEditor as IjVimEditor).editor
+    val editor = vimEditor.ij
     val project = editor.project ?: return text
     val file = PsiDocumentManager.getInstance(project).getPsiFile(editor.document) ?: return text
     val rawText = TextBlockTransferable.convertLineSeparators(

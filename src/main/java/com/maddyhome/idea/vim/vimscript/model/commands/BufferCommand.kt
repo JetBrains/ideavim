@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.vim.annotations.ExCommand
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -45,12 +44,14 @@ internal data class BufferCommand(val range: Range, val modifier: CommandModifie
       if (buffer.matches(Regex("^\\d+$"))) {
         val bufNum = buffer.toInt() - 1
 
-        if (!VimPlugin.getFile().selectFile(bufNum, context)) {
+        if (!injector.file.selectFile(bufNum, context)) {
           injector.messages.showErrorMessage(editor, injector.messages.message("E86", bufNum))
           result = false
         }
       } else if (buffer == "#") {
-        VimPlugin.getFile().selectPreviousTab(context)
+        if (!injector.file.selectPreviousTab(context)) {
+          injector.messages.indicateError()
+        }
       } else {
         val editors = findPartialMatch(context, buffer)
 
@@ -65,7 +66,11 @@ internal data class BufferCommand(val range: Range, val modifier: CommandModifie
               injector.messages.showErrorMessage(editor, injector.messages.message("E37"))
               result = false
             } else {
-              VimPlugin.getFile().openFile(EditorHelper.getVirtualFile(editors[0].ij)!!.name, context)
+              val errorMessage = injector.file.openFile(EditorHelper.getVirtualFile(editors[0].ij)!!.name, context)
+              if (errorMessage != null) {
+                injector.messages.showErrorMessage(editor, errorMessage)
+                result = false
+              }
             }
           }
 

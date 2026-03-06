@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim.newapi
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
-import com.intellij.openapi.components.Service
 import com.intellij.openapi.util.Computable
 import com.intellij.util.ExceptionUtil
 import com.intellij.util.PlatformUtils
@@ -26,7 +25,7 @@ import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 import javax.swing.SwingUtilities
 
-@Service
+
 internal class IjVimApplication : VimApplicationBase() {
   override fun isMainThread(): Boolean {
     return ApplicationManager.getApplication().isDispatchThread
@@ -34,7 +33,7 @@ internal class IjVimApplication : VimApplicationBase() {
 
   override fun invokeLater(editor: VimEditor, action: () -> Unit) {
     ApplicationManager.getApplication()
-      .invokeLater(action, ModalityState.stateForComponent((editor as IjVimEditor).editor.component))
+      .invokeLater(action, ModalityState.stateForComponent(editor.ij.component))
   }
 
   override fun invokeLater(action: () -> Unit) {

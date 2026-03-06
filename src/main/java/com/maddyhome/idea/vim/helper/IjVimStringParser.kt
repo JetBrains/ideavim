@@ -8,8 +8,6 @@
 
 package com.maddyhome.idea.vim.helper
 
-import com.intellij.openapi.components.Service
 import com.maddyhome.idea.vim.api.VimStringParserBase
 
-@Service
-internal class IjVimStringParser : VimStringParserBase()
+class IjVimStringParser : VimStringParserBase()

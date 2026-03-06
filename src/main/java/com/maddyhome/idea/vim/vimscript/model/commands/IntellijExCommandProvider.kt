@@ -9,5 +9,5 @@
 package com.maddyhome.idea.vim.vimscript.model.commands
 
 object IntellijExCommandProvider : ExCommandProvider {
-  override val exCommandsFileName: String = "intellij_ex_commands.json"
+  override val exCommandsFileName: String = "frontend_ex_commands.json"
 }

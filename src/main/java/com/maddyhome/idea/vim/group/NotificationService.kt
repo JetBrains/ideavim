@@ -20,7 +20,6 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.KeyboardShortcut
-import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.keymap.KeymapUtil
@@ -60,13 +59,12 @@ import kotlin.io.path.pathString
  * This service is can be used as application level and as project level service.
  * If project is null, this means that this is an application level service and notification will be shown for all projects
  */
-@Service(Service.Level.PROJECT, Service.Level.APP)
-internal class NotificationService(private val project: Project?) {
+internal class NotificationService(private val project: Project?) : VimNotifications {
   // This constructor is used to create an applicationService
   @Suppress("unused")
   constructor() : this(null)
 
-  fun notifyAboutIdeaPut() {
+  override fun notifyAboutIdeaPut() {
     val notification = Notification(
       IDEAVIM_NOTIFICATION_ID,
       IDEAVIM_NOTIFICATION_TITLE,
@@ -91,7 +89,7 @@ internal class NotificationService(private val project: Project?) {
     notification.notify(project)
   }
 
-  fun notifyAboutIdeaJoin(editor: VimEditor) {
+  override fun notifyAboutIdeaJoin(editor: VimEditor) {
     val notification = Notification(
       IDEAVIM_NOTIFICATION_ID,
       IDEAVIM_NOTIFICATION_TITLE,
@@ -116,7 +114,7 @@ internal class NotificationService(private val project: Project?) {
     notification.notify(project)
   }
 
-  fun enableRepeatingMode() = Messages.showYesNoDialog(
+  override fun enableRepeatingMode() = Messages.showYesNoDialog(
     "Do you want to enable repeating keys in macOS on press and hold?\n\n" +
       "(You can do it manually by running 'defaults write -g " +
       "ApplePressAndHoldEnabled 0' in the console).",
@@ -124,7 +122,7 @@ internal class NotificationService(private val project: Project?) {
     Messages.getQuestionIcon(),
   )
 
-  fun noVimrcAsDefault() {
+  override fun noVimrcAsDefault() {
     val notification = IDEAVIM_STICKY_GROUP.createNotification(
       IDEAVIM_NOTIFICATION_TITLE,
       "The ~/.vimrc file is no longer read by default, use ~/.ideavimrc instead. You can read it from your " +
@@ -135,7 +133,7 @@ internal class NotificationService(private val project: Project?) {
     notification.notify(project)
   }
 
-  fun notifyAboutShortcutConflict(keyStroke: KeyStroke) {
+  override fun notifyAboutShortcutConflict(keyStroke: KeyStroke) {
     val conflicts = VimPlugin.getKey().savedShortcutConflicts
     val allValuesAreUndefined =
       conflicts.values.all { it is ShortcutOwnerInfo.PerMode || (it is ShortcutOwnerInfo.AllModes && it.owner == ShortcutOwner.UNDEFINED) }
@@ -168,7 +166,7 @@ internal class NotificationService(private val project: Project?) {
     notification.notify(project)
   }
 
-  fun notifySubscribedToEap() {
+  override fun notifySubscribedToEap() {
     Notification(
       IDEAVIM_NOTIFICATION_ID,
       IDEAVIM_NOTIFICATION_TITLE,
@@ -177,7 +175,7 @@ internal class NotificationService(private val project: Project?) {
     ).notify(project)
   }
 
-  fun notifyEapFinished() {
+  override fun notifyEapFinished() {
     Notification(
       IDEAVIM_NOTIFICATION_ID,
       IDEAVIM_NOTIFICATION_TITLE,
@@ -189,7 +187,7 @@ internal class NotificationService(private val project: Project?) {
   /**
    * Shows a notification that the user can reenable IdeaVim by clicking on the IdeaVim icon in the status bar.
    */
-  fun showReenableNotification(project: Project) {
+  override fun showReenableNotification(project: Project) {
     val notification = Notification(
       IDEAVIM_NOTIFICATION_ID,
       IDEAVIM_NOTIFICATION_TITLE,
@@ -208,11 +206,11 @@ internal class NotificationService(private val project: Project?) {
     notification.notify(project)
   }
 
-  fun notifyActionId(id: String?, candidates: List<String>? = null, intentionName: String?) {
+  override fun notifyActionId(id: String?, candidates: List<String>?, intentionName: String?) {
     ActionIdNotifier.notifyActionId(id, project, candidates, intentionName)
   }
 
-  fun notifyKeymapIssues(issues: ArrayList<KeyMapIssue>) {
+  override fun notifyKeymapIssues(issues: ArrayList<KeyMapIssue>) {
     val keymapManager = KeymapManagerEx.getInstanceEx()
     val keymap = keymapManager.activeKeymap
     val message = buildString {
@@ -287,7 +285,12 @@ internal class NotificationService(private val project: Project?) {
   object ActionIdNotifier {
     private var notification: Notification? = null
 
-    fun notifyActionId(id: String?, project: Project?, candidates: List<String>? = null, intentionName: String? = null) {
+    fun notifyActionId(
+      id: String?,
+      project: Project?,
+      candidates: List<String>? = null,
+      intentionName: String? = null,
+    ) {
       notification?.expire()
 
       val possibleIDs = candidates?.distinct()?.sorted()
@@ -296,6 +299,7 @@ internal class NotificationService(private val project: Project?) {
         possibleIDs.isNullOrEmpty() && !intentionName.isNullOrEmpty() -> {
           "Intention \"$intentionName\" does not have an action ID.<br><br>"
         }
+
         possibleIDs.isNullOrEmpty() -> "<i>Cannot detect action ID</i><br><br>"
         possibleIDs.size == 1 -> "Possible action ID: <code>${possibleIDs[0]}</code><br><br>"
         else -> {
@@ -430,8 +434,8 @@ internal class NotificationService(private val project: Project?) {
   companion object {
     val IDEAVIM_STICKY_GROUP: NotificationGroup =
       NotificationGroupManager.getInstance().getNotificationGroup("ideavim-sticky")
-    const val IDEAVIM_NOTIFICATION_ID = "ideavim"
-    const val IDEAVIM_NOTIFICATION_TITLE = "IdeaVim"
+    const val IDEAVIM_NOTIFICATION_ID = VimNotifications.IDEAVIM_NOTIFICATION_ID
+    const val IDEAVIM_NOTIFICATION_TITLE = VimNotifications.IDEAVIM_NOTIFICATION_TITLE
     const val ideajoinExamplesUrl = "https://jb.gg/f9zji9"
 
     private val LOG = logger<NotificationService>()

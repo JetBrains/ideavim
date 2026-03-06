@@ -9,7 +9,6 @@
 package com.maddyhome.idea.vim.thinapi
 
 import com.intellij.openapi.application.PathManager
-import com.intellij.openapi.components.Service
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.extension.ExtensionBean
 import com.maddyhome.idea.vim.extension.JsonExtensionProvider
@@ -37,7 +36,6 @@ import kotlin.io.path.writeText
  * This service manages IdeaVim extensions stored in a JSON file located in the IDE's config directory.
  * It provides functionality to initialize, read, write, add, and remove extensions.
  */
-@Service
 class IjJsonExtensionProvider : JsonExtensionProvider {
   private val json = Json { prettyPrint = true }
   private val logger = vimLogger<IjJsonExtensionProvider>()

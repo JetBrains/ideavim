@@ -174,7 +174,10 @@ private object VimActionsPopup {
         false,
         ActionPlaces.POPUP,
       )
-    popup.setAdText(MessageHelper.message("widget.vim.actions.popup.advertisement.version", VimPlugin.getVersion()), SwingConstants.CENTER)
+    popup.setAdText(
+      MessageHelper.message("widget.vim.actions.popup.advertisement.version", VimPlugin.getVersion()),
+      SwingConstants.CENTER
+    )
 
     return popup
   }

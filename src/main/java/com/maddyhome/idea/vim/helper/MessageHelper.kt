@@ -15,7 +15,7 @@ import org.jetbrains.annotations.PropertyKey
 @NonNls
 private const val IDEAVIM_BUNDLE = "messages.IdeaVimBundle"
 
-internal object MessageHelper : DynamicBundle(IDEAVIM_BUNDLE) {
+object MessageHelper : DynamicBundle(IDEAVIM_BUNDLE) {
 
   private const val BUNDLE = IDEAVIM_BUNDLE
 

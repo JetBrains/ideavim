@@ -14,7 +14,7 @@ import com.maddyhome.idea.vim.api.VimStorageServiceBase
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.newapi.ij
 
-internal class IjVimStorageService : VimStorageServiceBase() {
+class IjVimStorageService : VimStorageServiceBase() {
   override fun <T> getDataFromWindow(editor: VimEditor, key: com.maddyhome.idea.vim.api.Key<T>): T? {
     return editor.ij.getUserData(key.ij)
   }

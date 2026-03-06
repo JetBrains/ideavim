@@ -304,10 +304,4 @@ interface VimChangeGroup {
     UPPER,
     TOGGLE,
   }
-
-  /**
-   * Called when an editor is created and needs change-tracking listeners registered.
-   * The [disposable] will be disposed when the editor is closed.
-   */
-  fun editorCreated(editor: VimEditor, disposable: Any) {}
 }

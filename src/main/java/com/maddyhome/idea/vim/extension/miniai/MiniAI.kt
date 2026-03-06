@@ -151,7 +151,7 @@ private fun VimApi.findBracketRange(isOuter: Boolean): TextObjectRange? {
  */
 private fun gatherAllBracketRanges(
   text: CharSequence,
-  brackets: List<Char>
+  brackets: List<Char>,
 ): List<Range.Simple> {
   val pairs = mapOf('(' to ')', '[' to ']', '{' to '}', '<' to '>')
   val results = mutableListOf<Range.Simple>()

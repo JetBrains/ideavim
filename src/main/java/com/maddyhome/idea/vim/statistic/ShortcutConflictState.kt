@@ -123,7 +123,8 @@ private enum class HandledModes {
   VISUAL_AND_SELECT_VIM,
 }
 
-private val GROUP = EventLogGroup("vim.handlers", 1, "FUS", "Group: Information about Vim handlers for different shortcuts")
+private val GROUP =
+  EventLogGroup("vim.handlers", 1, "FUS", "Group: Information about Vim handlers for different shortcuts")
 private val keyStrokes = listOf(
   KeyStroke.getKeyStroke('1'.code, CTRL_DOWN_MASK),
   KeyStroke.getKeyStroke('2'.code, CTRL_DOWN_MASK),
@@ -207,4 +208,5 @@ private val keyStrokes = listOf(
 )
 private val KEY_STROKE = EventFields.String("key_stroke", keyStrokes.map { it.toReadableString() })
 private val HANDLER_MODE = EventFields.Enum<HandledModes>("handler")
-private val HANDLER = GROUP.registerEvent("vim.handler", KEY_STROKE, HANDLER_MODE, "Information about Vim handlers for different shortcuts")
+private val HANDLER =
+  GROUP.registerEvent("vim.handler", KEY_STROKE, HANDLER_MODE, "Information about Vim handlers for different shortcuts")

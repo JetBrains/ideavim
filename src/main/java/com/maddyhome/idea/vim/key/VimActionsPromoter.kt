@@ -84,8 +84,7 @@ internal class VimActionsPromoter : ActionPromoter {
 
       // Returns all actions, in the order we've added them
       return ordered
-    }
-    else {
+    } else {
       // Return the action we want to promote
       return listOf(actions[vimIndex])
     }

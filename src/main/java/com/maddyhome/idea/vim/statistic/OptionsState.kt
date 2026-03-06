@@ -40,9 +40,15 @@ internal class OptionsState : ApplicationUsagesCollector() {
       // value, which a) might be set at local scope and b) isn't accessible without an editor
       // We don't need to pass a window, since the global values will only ever be global
       OPTIONS.metric(
-        IDEAJOIN with injector.optionGroup.getOptionValue(IjOptions.ideajoin, OptionAccessScope.GLOBAL(null)).booleanValue,
+        IDEAJOIN with injector.optionGroup.getOptionValue(
+          IjOptions.ideajoin,
+          OptionAccessScope.GLOBAL(null)
+        ).booleanValue,
         IDEAMARKS with globalIjOptions.ideamarks,
-        IDEAREFACTOR with injector.optionGroup.getOptionValue(IjOptions.idearefactormode, OptionAccessScope.GLOBAL(null)).value,
+        IDEAREFACTOR with injector.optionGroup.getOptionValue(
+          IjOptions.idearefactormode,
+          OptionAccessScope.GLOBAL(null)
+        ).value,
         IDEAPUT with globalOptions.clipboard.contains(OptionConstants.clipboard_ideaput),
         IDEASTATUSICON with globalIjOptions.ideastatusicon,
         IDEAWRITE with globalIjOptions.ideawrite,
