@@ -15,10 +15,9 @@ import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.fileEditor.impl.EditorsSplitters
 import com.intellij.openapi.fileTypes.FileTypeManager
-import com.intellij.openapi.project.Project
-import com.intellij.openapi.project.ProjectManager
+import com.intellij.platform.project.ProjectId
+import com.intellij.platform.project.findProjectOrNull
 import com.maddyhome.idea.vim.group.findEditorByFilePath
-import com.maddyhome.idea.vim.group.findProjectById
 import com.maddyhome.idea.vim.group.findVirtualFile
 import com.maddyhome.idea.vim.helper.EngineMessageHelper
 import kotlinx.coroutines.Dispatchers
@@ -41,14 +40,14 @@ internal class FileRemoteApiImpl : FileRemoteApi {
   private val fileBackend: FileBackendServiceImpl
     get() = service<FileBackendService>() as FileBackendServiceImpl
 
-  override suspend fun findFile(filename: String, projectBasePath: String?): String? = withContext(Dispatchers.EDT) {
-    val project = findProject(projectBasePath) ?: return@withContext null
+  override suspend fun findFile(filename: String, projectId: ProjectId?): String? = withContext(Dispatchers.EDT) {
+    val project = projectId?.findProjectOrNull() ?: return@withContext null
     fileBackend.findFile(filename, project)?.path
   }
 
-  override suspend fun openFile(filename: String, projectBasePath: String?, focusEditor: Boolean): String? =
+  override suspend fun openFile(filename: String, projectId: ProjectId?, focusEditor: Boolean): String? =
     withContext(Dispatchers.EDT) {
-      val project = findProject(projectBasePath) ?: return@withContext "No project found"
+      val project = projectId?.findProjectOrNull() ?: return@withContext "No project found"
       val found = fileBackend.findFile(filename, project)
       if (found != null) {
         val type = FileTypeManager.getInstance().getKnownFileTypeOrAssociate(found, project)
@@ -61,8 +60,8 @@ internal class FileRemoteApiImpl : FileRemoteApi {
       }
     }
 
-  override suspend fun closeCurrentFile(projectBasePath: String?, filePath: String?) = withContext(Dispatchers.EDT) {
-    val project = findProject(projectBasePath) ?: return@withContext
+  override suspend fun closeCurrentFile(projectId: ProjectId?, filePath: String?) = withContext(Dispatchers.EDT) {
+    val project = projectId?.findProjectOrNull() ?: return@withContext
     val fileEditorManager = FileEditorManagerEx.getInstanceEx(project)
     val window = fileEditorManager.currentWindow
     val virtualFile = fileEditorManager.currentFile
@@ -81,8 +80,8 @@ internal class FileRemoteApiImpl : FileRemoteApi {
     }
   }
 
-  override suspend fun closeFile(number: Int, projectBasePath: String?) = withContext(Dispatchers.EDT) {
-    val project = findProject(projectBasePath) ?: return@withContext
+  override suspend fun closeFile(number: Int, projectId: ProjectId?) = withContext(Dispatchers.EDT) {
+    val project = projectId?.findProjectOrNull() ?: return@withContext
     val fileEditorManager = FileEditorManagerEx.getInstanceEx(project)
     val window = fileEditorManager.currentWindow
     val editors = fileEditorManager.openFiles
@@ -96,16 +95,16 @@ internal class FileRemoteApiImpl : FileRemoteApi {
     }
   }
 
-  override suspend fun saveFile(projectBasePath: String?, filePath: String?, saveAll: Boolean) =
+  override suspend fun saveFile(projectId: ProjectId?, filePath: String?, saveAll: Boolean) =
     withContext(Dispatchers.EDT) {
-      val project = findProject(projectBasePath) ?: return@withContext
+      val project = projectId?.findProjectOrNull() ?: return@withContext
       val editor = filePath?.let { findEditorByFilePath(project, it) } ?: return@withContext
       fileBackend.saveFile(editor, saveAll)
     }
 
-  override suspend fun selectFile(count: Int, projectBasePath: String?): Boolean = withContext(Dispatchers.EDT) {
+  override suspend fun selectFile(count: Int, projectId: ProjectId?): Boolean = withContext(Dispatchers.EDT) {
     var idx = count
-    val project = findProject(projectBasePath) ?: return@withContext false
+    val project = projectId?.findProjectOrNull() ?: return@withContext false
     val fem = FileEditorManager.getInstance(project)
     val editors = fem.openFiles
     if (idx == 99) {
@@ -118,8 +117,8 @@ internal class FileRemoteApiImpl : FileRemoteApi {
     true
   }
 
-  override suspend fun selectNextFile(count: Int, projectBasePath: String?) = withContext(Dispatchers.EDT) {
-    val project = findProject(projectBasePath) ?: return@withContext
+  override suspend fun selectNextFile(count: Int, projectId: ProjectId?) = withContext(Dispatchers.EDT) {
+    val project = projectId?.findProjectOrNull() ?: return@withContext
     val fem = FileEditorManager.getInstance(project)
     val editors = fem.openFiles
     val current = fem.selectedFiles.getOrNull(0) ?: return@withContext
@@ -131,30 +130,18 @@ internal class FileRemoteApiImpl : FileRemoteApi {
     }
   }
 
-  override suspend fun buildFileInfoMessage(projectBasePath: String?, filePath: String?, fullPath: Boolean): String? =
+  override suspend fun buildFileInfoMessage(projectId: ProjectId?, filePath: String?, fullPath: Boolean): String? =
     withContext(Dispatchers.EDT) {
-      val project = findProject(projectBasePath) ?: return@withContext null
+      val project = projectId?.findProjectOrNull() ?: return@withContext null
       val editor = filePath?.let { findEditorByFilePath(project, it) } ?: return@withContext null
-      fileBackend.buildFileInfoMessage(editor, fullPath)
+      fileBackend.buildFileInfoMessage(editor, project, fullPath)
     }
 
-  override suspend fun selectEditor(projectId: String, documentPath: String, protocol: String): Boolean =
+  override suspend fun selectEditor(projectId: ProjectId, documentPath: String, protocol: String): Boolean =
     withContext(Dispatchers.EDT) {
       val virtualFile = findVirtualFile(documentPath, protocol) ?: return@withContext false
-      val project = findProjectById(projectId) ?: return@withContext false
+      val project = projectId.findProjectOrNull() ?: return@withContext false
       val editor = fileBackend.selectEditor(project, virtualFile)
       editor != null
     }
-
-  override suspend fun getProjectId(): String = withContext(Dispatchers.EDT) {
-    val project = ProjectManager.getInstance().openProjects.firstOrNull()
-      ?: error("No open projects on backend")
-    fileBackend.getProjectId(project)
-  }
-
-  private fun findProject(projectBasePath: String?): Project? {
-    val projects = ProjectManager.getInstance().openProjects
-    if (projectBasePath == null) return projects.firstOrNull()
-    return projects.firstOrNull { it.basePath == projectBasePath }
-  }
 }

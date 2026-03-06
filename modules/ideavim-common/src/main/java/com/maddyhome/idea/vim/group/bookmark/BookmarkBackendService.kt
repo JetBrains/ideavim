@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.group.bookmark
 
 import com.intellij.openapi.components.service
+import com.intellij.platform.project.ProjectId
 
 /**
  * Backend service for IDE bookmark operations.
@@ -20,8 +21,8 @@ import com.intellij.openapi.components.service
  * The frontend [VimMarkServiceImpl] delegates bookmark-dependent operations to this service
  * while keeping all mark logic (ideamarks checks, VimMark creation) on the frontend.
  *
- * All parameters are serializable (Char, Int, String) so the interface can be
- * implemented as an RPC proxy for split mode.
+ * Project identification uses platform [ProjectId] which is RPC-serializable and
+ * resolves correctly across frontend/backend processes.
  */
 interface BookmarkBackendService {
 
@@ -31,7 +32,7 @@ interface BookmarkBackendService {
    * @param char the mark character (e.g. 'A')
    * @param line the 0-based line number
    * @param filePath the file path where the bookmark should be placed
-   * @param projectId project identifier for resolving the correct project on backend
+   * @param projectId platform project ID for resolving the correct project on backend
    * @return bookmark info if created/found, null if bookmark creation failed
    */
   fun createOrGetSystemMark(
@@ -39,7 +40,7 @@ interface BookmarkBackendService {
     line: Int,
     col: Int,
     filePath: String,
-    projectId: String?,
+    projectId: ProjectId?,
     protocol: String? = null,
   ): BookmarkInfo?
 

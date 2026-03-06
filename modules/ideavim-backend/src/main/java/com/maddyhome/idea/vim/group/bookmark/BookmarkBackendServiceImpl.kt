@@ -13,9 +13,10 @@ import com.intellij.ide.bookmark.BookmarksManager
 import com.intellij.ide.bookmark.LineBookmark
 import com.intellij.ide.bookmark.providers.LineBookmarkProvider
 import com.intellij.openapi.project.ProjectManager
+import com.intellij.platform.project.ProjectId
+import com.intellij.platform.project.findProjectOrNull
 import com.maddyhome.idea.vim.api.VimMarkService
 import com.maddyhome.idea.vim.group.findEditorByFilePath
-import com.maddyhome.idea.vim.group.findProjectById
 
 /**
  * Direct [BookmarkBackendService] implementation using IntelliJ bookmark APIs.
@@ -33,13 +34,13 @@ internal class BookmarkBackendServiceImpl : BookmarkBackendService {
     line: Int,
     col: Int,
     filePath: String,
-    projectId: String?,
+    projectId: ProjectId?,
     protocol: String?,
   ): BookmarkInfo? {
     val type = BookmarkType.get(char)
     if (type == BookmarkType.DEFAULT) return null
 
-    val project = findProjectById(projectId) ?: return null
+    val project = projectId?.findProjectOrNull() ?: return null
     val bookmarksManager = BookmarksManager.getInstance(project) ?: return null
 
     // If a bookmark with this mnemonic already exists, check if it's at the right line

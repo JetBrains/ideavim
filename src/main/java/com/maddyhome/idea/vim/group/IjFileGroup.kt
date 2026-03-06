@@ -16,14 +16,19 @@ import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.fileEditor.impl.EditorsSplitters
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.platform.project.ProjectId
+import com.intellij.platform.project.findProjectOrNull
+import com.intellij.platform.project.projectId
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimFileBase
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.file.FileBackendService
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.vim
 
@@ -140,12 +145,17 @@ class IjFileGroup : VimFileBase() {
 
   override fun displayFileInfo(vimEditor: VimEditor, fullPath: Boolean): String? {
     val filePath = vimEditor.getVirtualFile()?.path
-    val projectId = vimEditor.projectId
-    return backend.buildFileInfoMessage(projectId, filePath, fullPath)
+    val projectId = (vimEditor as IjVimEditor).editor.project?.projectId()
+    return if (projectId != null) backend.buildFileInfoMessage(projectId, filePath, fullPath) else null
   }
 
   override fun selectEditor(projectId: String, documentPath: String, protocol: String): VimEditor? {
-    val success = backend.selectEditor(projectId, documentPath, protocol)
+    val platformProjectId = try {
+      ProjectId.deserializeFromString(projectId)
+    } catch (_: Exception) {
+      return null
+    }
+    val success = backend.selectEditor(platformProjectId, documentPath, protocol)
     if (!success) return null
 
     // Get the opened VimEditor locally
@@ -154,8 +164,7 @@ class IjFileGroup : VimFileBase() {
       ?: VirtualFileManager.getInstance().getFileSystem("jar")?.findFileByPath(documentPath)
       ?: return null
 
-    val project = ProjectManager.getInstance().openProjects
-      .firstOrNull { backend.getProjectIdForProject(it) == projectId }
+    val project = platformProjectId.findProjectOrNull()
       ?: ProjectManager.getInstance().openProjects.firstOrNull()
       ?: return null
 
@@ -165,12 +174,13 @@ class IjFileGroup : VimFileBase() {
   }
 
   override fun getProjectId(project: Any): String {
-    return backend.getProjectIdForProject(project)
+    require(project is Project)
+    return project.projectId().serializeToString()
   }
 
-  private fun extractProjectId(context: ExecutionContext): String? {
+  private fun extractProjectId(context: ExecutionContext): ProjectId? {
     val project = PlatformDataKeys.PROJECT.getData(context.context as DataContext) ?: return null
-    return backend.getProjectIdForProject(project)
+    return project.projectId()
   }
 
   companion object {

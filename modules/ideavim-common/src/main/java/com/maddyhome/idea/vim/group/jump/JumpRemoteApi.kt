@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.group.jump
 
+import com.intellij.platform.project.ProjectId
 import com.intellij.platform.rpc.RemoteApiProviderService
 import fleet.rpc.RemoteApi
 import fleet.rpc.Rpc
@@ -25,14 +26,14 @@ import org.jetbrains.annotations.ApiStatus
 @Rpc
 @ApiStatus.Internal
 interface JumpRemoteApi : RemoteApi<Unit> {
-  suspend fun includeCurrentCommandAsNavigation(projectId: String?)
+  suspend fun includeCurrentCommandAsNavigation(projectId: ProjectId?)
 
   /**
    * Returns jumps collected by [JumpsListener] on the backend for the given project.
    * These are IDE-initiated navigation events (e.g., Go to Declaration, Recent Places)
    * that only fire on the backend.
    */
-  suspend fun getListenerJumps(projectId: String?): List<JumpInfo>
+  suspend fun getListenerJumps(projectId: ProjectId?): List<JumpInfo>
 
   companion object {
     @JvmStatic
