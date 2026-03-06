@@ -12,9 +12,8 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.impl.IdeDocumentHistoryImpl.PlaceInfo
 import com.intellij.openapi.fileEditor.impl.IdeDocumentHistoryImpl.RecentPlacesListener
 import com.intellij.openapi.project.Project
-import com.maddyhome.idea.vim.group.file.FileBackendService
+import com.intellij.platform.project.projectId
 import com.maddyhome.idea.vim.group.findEditorByFilePath
-import com.maddyhome.idea.vim.group.findProjectById
 import com.maddyhome.idea.vim.mark.Jump
 
 /**
@@ -29,6 +28,8 @@ import com.maddyhome.idea.vim.mark.Jump
  */
 internal class JumpsListener(val project: Project) : RecentPlacesListener {
 
+  private val storageKey: String by lazy { project.projectId().serializeToString() }
+
   private fun resolveJumpStorage(): BackendJumpStorage {
     return service<BackendJumpStorage>()
   }
@@ -39,7 +40,7 @@ internal class JumpsListener(val project: Project) : RecentPlacesListener {
       if (changePlace.timeStamp < jumpStorage.lastJumpTimeStamp) return // this listener is notified asynchronously, and
       // we do not want jumps that were processed before
       val jump = buildJump(changePlace) ?: return
-      jumpStorage.addJump(service<FileBackendService>().getProjectIdForProject(project), jump, true)
+      jumpStorage.addJump(storageKey, jump, true)
     }
   }
 
@@ -49,14 +50,12 @@ internal class JumpsListener(val project: Project) : RecentPlacesListener {
       if (changePlace.timeStamp < jumpStorage.lastJumpTimeStamp) return // this listener is notified asynchronously, and
       // we do not want jumps that were processed before
       val jump = buildJump(changePlace) ?: return
-      jumpStorage.removeJump(service<FileBackendService>().getProjectIdForProject(project), jump)
+      jumpStorage.removeJump(storageKey, jump)
     }
   }
 
   private fun buildJump(place: PlaceInfo): Jump? {
-    val project = findProjectById(service<FileBackendService>().getProjectIdForProject(project)) ?: return null
-    val editor =
-      findEditorByFilePath(project, place.file.path) ?: return null
+    val editor = findEditorByFilePath(project, place.file.path) ?: return null
     val offset = place.caretPosition?.startOffset ?: return null
 
     val bufferPosition = editor.offsetToLogicalPosition(offset)

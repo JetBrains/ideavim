@@ -12,6 +12,7 @@ import com.intellij.ide.bookmark.BookmarkType
 import com.intellij.ide.bookmark.BookmarksManager
 import com.intellij.ide.bookmark.LineBookmark
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.platform.project.projectId
 import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.bookmark.BookmarkBackendService
@@ -108,7 +109,7 @@ class MotionMarkActionTest : VimTestCase() {
       2,
       0,
       fixture.file.virtualFile.path,
-      fixture.project.locationHash,
+      fixture.project.projectId(),
       fixture.file.virtualFile.fileSystem.protocol
     )
     ApplicationManager.getApplication().invokeAndWait {
@@ -138,7 +139,7 @@ class MotionMarkActionTest : VimTestCase() {
       2,
       0,
       fixture.file.virtualFile.path,
-      fixture.project.locationHash,
+      fixture.project.projectId(),
       fixture.file.virtualFile.fileSystem.protocol
     )
 
@@ -148,7 +149,7 @@ class MotionMarkActionTest : VimTestCase() {
       4,
       0,
       fixture.file.virtualFile.path,
-      fixture.project.locationHash,
+      fixture.project.projectId(),
       fixture.file.virtualFile.fileSystem.protocol
     )
     ApplicationManager.getApplication().invokeAndWait {

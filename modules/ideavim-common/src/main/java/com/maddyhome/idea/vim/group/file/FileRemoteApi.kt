@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.group.file
 
+import com.intellij.platform.project.ProjectId
 import com.intellij.platform.rpc.RemoteApiProviderService
 import fleet.rpc.RemoteApi
 import fleet.rpc.Rpc
@@ -24,26 +25,28 @@ import org.jetbrains.annotations.ApiStatus
  * Many methods accept a [filePath] parameter because the backend in split mode has no
  * focused window/editor — the UI lives on the thin client. The thin client passes the
  * current file path so the backend can locate the correct editor and virtual file.
+ *
+ * Project identification uses platform [ProjectId] which is RPC-serializable and
+ * resolves correctly across frontend/backend processes.
  */
 @Rpc
 @ApiStatus.Internal
 interface FileRemoteApi : RemoteApi<Unit> {
 
-  suspend fun findFile(filename: String, projectBasePath: String?): String?
+  suspend fun findFile(filename: String, projectId: ProjectId?): String?
 
   /**
    * Opens a file on the backend.
    * @return null on success, or an error message to display on the frontend
    */
-  suspend fun openFile(filename: String, projectBasePath: String?, focusEditor: Boolean = true): String?
-  suspend fun closeCurrentFile(projectBasePath: String?, filePath: String?)
-  suspend fun closeFile(number: Int, projectBasePath: String?)
-  suspend fun saveFile(projectBasePath: String?, filePath: String?, saveAll: Boolean)
-  suspend fun selectFile(count: Int, projectBasePath: String?): Boolean
-  suspend fun selectNextFile(count: Int, projectBasePath: String?)
-  suspend fun buildFileInfoMessage(projectBasePath: String?, filePath: String?, fullPath: Boolean): String?
-  suspend fun selectEditor(projectId: String, documentPath: String, protocol: String): Boolean
-  suspend fun getProjectId(): String
+  suspend fun openFile(filename: String, projectId: ProjectId?, focusEditor: Boolean = true): String?
+  suspend fun closeCurrentFile(projectId: ProjectId?, filePath: String?)
+  suspend fun closeFile(number: Int, projectId: ProjectId?)
+  suspend fun saveFile(projectId: ProjectId?, filePath: String?, saveAll: Boolean)
+  suspend fun selectFile(count: Int, projectId: ProjectId?): Boolean
+  suspend fun selectNextFile(count: Int, projectId: ProjectId?)
+  suspend fun buildFileInfoMessage(projectId: ProjectId?, filePath: String?, fullPath: Boolean): String?
+  suspend fun selectEditor(projectId: ProjectId, documentPath: String, protocol: String): Boolean
 
   companion object {
     @JvmStatic

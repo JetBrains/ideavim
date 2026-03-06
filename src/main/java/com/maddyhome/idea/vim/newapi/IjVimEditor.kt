@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.editor.impl.CaretModelImpl
 import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.platform.project.projectId
 import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
@@ -383,7 +384,7 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase() {
     return EditorHelper.getVirtualFile(editor)?.url?.let { VirtualFileManager.extractProtocol(it) }
   }
 
-  override val projectId = editor.project?.let { injector.file.getProjectId(it) } ?: DEFAULT_PROJECT_ID
+  override val projectId = editor.project?.projectId()?.serializeToString() ?: DEFAULT_PROJECT_ID
 
   override fun visualPositionToOffset(position: VimVisualPosition): Int {
     return editor.visualPositionToOffset(VisualPosition(position.line, position.column, position.leansRight))

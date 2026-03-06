@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.group.bookmark
 
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.service
+import com.intellij.platform.project.ProjectId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -30,7 +31,7 @@ internal class BookmarkRemoteApiImpl : BookmarkRemoteApi {
     line: Int,
     col: Int,
     filePath: String,
-    projectId: String?,
+    projectId: ProjectId?,
     protocol: String?,
   ): BookmarkInfo? = withContext(Dispatchers.EDT) {
     bookmarkBackend.createOrGetSystemMark(char, line, col, filePath, projectId, protocol)

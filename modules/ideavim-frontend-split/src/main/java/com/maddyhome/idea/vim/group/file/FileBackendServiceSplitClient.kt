@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.group.file
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
+import com.intellij.platform.project.ProjectId
 import com.maddyhome.idea.vim.group.CoroutineScopeProvider
 import kotlinx.coroutines.runBlocking
 
@@ -17,48 +18,34 @@ import kotlinx.coroutines.runBlocking
  * Split-mode (thin client) [FileBackendService] implementation.
  *
  * Every operation is forwarded to the backend via [FileRemoteApi] RPC.
- * The only local state is the [cachedProjectId] which avoids an RPC
- * round-trip on every [getProjectId]/[getProjectIdForProject] call.
- *
- * Note: `projectBasePath` is always `null` in RPC calls because the thin
- * client's sandbox path differs from the backend's real project path.
- * The backend resolves `null` to its first open project.
+ * Project identification uses platform [ProjectId] which resolves correctly
+ * across frontend/backend processes — no caching or custom ID generation needed.
  */
 internal class FileBackendServiceSplitClient : FileBackendService {
 
-  override fun findFile(filename: String, projectId: String?): String? {
-    return rpc { findFile(filename, null) }
+  override fun findFile(filename: String, projectId: ProjectId?): String? {
+    return rpc { findFile(filename, projectId) }
   }
 
-  override fun openFile(filename: String, projectId: String?, focusEditor: Boolean): String? {
-    return rpc { openFile(filename, null, focusEditor) }
+  override fun openFile(filename: String, projectId: ProjectId?, focusEditor: Boolean): String? {
+    return rpc { openFile(filename, projectId, focusEditor) }
   }
 
-  override fun closeFileByNumber(number: Int, projectId: String?) {
-    rpc { closeFile(number, null) }
+  override fun closeFileByNumber(number: Int, projectId: ProjectId?) {
+    rpc { closeFile(number, projectId) }
   }
 
-  override fun saveFile(projectId: String?, filePath: String?, saveAll: Boolean) {
-    rpc { saveFile(null, filePath, saveAll) }
+  override fun saveFile(projectId: ProjectId?, filePath: String?, saveAll: Boolean) {
+    rpc { saveFile(projectId, filePath, saveAll) }
   }
 
-  override fun buildFileInfoMessage(projectId: String?, filePath: String?, fullPath: Boolean): String? {
-    return rpc { buildFileInfoMessage(null, filePath, fullPath) }
+  override fun buildFileInfoMessage(projectId: ProjectId?, filePath: String?, fullPath: Boolean): String? {
+    return rpc { buildFileInfoMessage(projectId, filePath, fullPath) }
   }
 
-  override fun selectEditor(projectId: String, documentPath: String, protocol: String): Boolean {
+  override fun selectEditor(projectId: ProjectId, documentPath: String, protocol: String): Boolean {
     return rpc { selectEditor(projectId, documentPath, protocol) }
   }
-
-  override fun getProjectId(): String {
-    return cachedProjectId
-  }
-
-  override fun getProjectIdForProject(project: Any): String {
-    return cachedProjectId
-  }
-
-  private val cachedProjectId by lazy { rpc { getProjectId() } }
 
   private fun <T> rpc(block: suspend FileRemoteApi.() -> T): T {
     val coroutineScope = ApplicationManager.getApplication().service<CoroutineScopeProvider>().coroutineScope
