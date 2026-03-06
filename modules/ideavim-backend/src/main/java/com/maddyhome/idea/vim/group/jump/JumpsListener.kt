@@ -8,53 +8,41 @@
 
 package com.maddyhome.idea.vim.group.jump
 
-import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.impl.IdeDocumentHistoryImpl.PlaceInfo
 import com.intellij.openapi.fileEditor.impl.IdeDocumentHistoryImpl.RecentPlacesListener
 import com.intellij.openapi.project.Project
-import com.intellij.platform.project.projectId
+import com.intellij.platform.rpc.topics.broadcast
 import com.maddyhome.idea.vim.group.findEditorByFilePath
-import com.maddyhome.idea.vim.mark.Jump
 
 /**
- * Listens to IntelliJ's [RecentPlacesListener] to sync IDE navigation events
- * into IdeaVim's jump list via [BackendJumpStorage].
+ * Listens to IntelliJ's [RecentPlacesListener] to capture IDE navigation events
+ * and broadcast them to the frontend via [JUMP_REMOTE_TOPIC].
  *
- * The frontend fetches stored jumps via [JumpRemoteApi.getListenerJumps]
- * and checks `unifyjumps` before merging.
+ * The frontend [JumpRemoteTopicListener] receives these events and adds/removes
+ * jumps from the active [com.maddyhome.idea.vim.api.VimJumpService].
  *
  * This listener never reads options — the `unifyjumps` check is performed
  * on the frontend side.
  */
 internal class JumpsListener(val project: Project) : RecentPlacesListener {
 
-  private val storageKey: String by lazy { project.projectId().serializeToString() }
-
-  private fun resolveJumpStorage(): BackendJumpStorage {
-    return service<BackendJumpStorage>()
-  }
-
+  @Suppress("OVERRIDE_DEPRECATION")
   override fun recentPlaceAdded(changePlace: PlaceInfo, isChanged: Boolean) {
-    val jumpStorage = resolveJumpStorage()
     if (!isChanged) {
-      if (changePlace.timeStamp < jumpStorage.lastJumpTimeStamp) return // this listener is notified asynchronously, and
-      // we do not want jumps that were processed before
-      val jump = buildJump(changePlace) ?: return
-      jumpStorage.addJump(storageKey, jump, true)
+      val jumpInfo = buildJumpInfo(changePlace, added = true) ?: return
+      JUMP_REMOTE_TOPIC.broadcast(project, jumpInfo)
     }
   }
 
+  @Suppress("OVERRIDE_DEPRECATION")
   override fun recentPlaceRemoved(changePlace: PlaceInfo, isChanged: Boolean) {
-    val jumpStorage = resolveJumpStorage()
     if (!isChanged) {
-      if (changePlace.timeStamp < jumpStorage.lastJumpTimeStamp) return // this listener is notified asynchronously, and
-      // we do not want jumps that were processed before
-      val jump = buildJump(changePlace) ?: return
-      jumpStorage.removeJump(storageKey, jump)
+      val jumpInfo = buildJumpInfo(changePlace, added = false) ?: return
+      JUMP_REMOTE_TOPIC.broadcast(project, jumpInfo)
     }
   }
 
-  private fun buildJump(place: PlaceInfo): Jump? {
+  private fun buildJumpInfo(place: PlaceInfo, added: Boolean): JumpInfo? {
     val editor = findEditorByFilePath(project, place.file.path) ?: return null
     val offset = place.caretPosition?.startOffset ?: return null
 
@@ -64,6 +52,6 @@ internal class JumpsListener(val project: Project) : RecentPlacesListener {
 
     val path = place.file.path
 
-    return Jump(line, col, path, place.file.fileSystem.protocol)
+    return JumpInfo(line, col, path, place.file.fileSystem.protocol, added, place.timeStamp)
   }
 }

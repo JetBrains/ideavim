@@ -26,11 +26,6 @@
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.process.ProcessGroup"
                         serviceInterface="com.maddyhome.idea.vim.api.VimProcessGroup"/>
 
-    <!-- Backend-only jump storage for JumpsListener (not a VimJumpService).
-         In split mode, JumpsListener writes here; frontend reads via JumpRemoteApi.
-         In monolith mode, JumpsListener writes directly to VimJumpServiceImpl instead. -->
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.jump.BackendJumpStorage"/>
-
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.file.FileBackendServiceImpl"
                         serviceInterface="com.maddyhome.idea.vim.group.file.FileBackendService"/>
 

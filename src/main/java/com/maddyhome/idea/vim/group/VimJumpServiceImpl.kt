@@ -16,20 +16,16 @@ import com.intellij.openapi.fileEditor.ex.IdeDocumentHistory
 import com.intellij.openapi.util.text.StringUtil
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimJumpServiceBase
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.mark.Jump
 import com.maddyhome.idea.vim.newapi.IjVimEditor
-import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.initInjector
 import org.jdom.Element
 
 /**
  * Full jump service with persistence and [IdeDocumentHistory] integration.
  *
- * Registered in `ideavim-frontend.xml` with `overrides="true"`, so in **monolith mode**
- * it overrides the common base [VimJumpServiceCommonImpl] and is the active [VimJumpService].
- * In **split mode** (thin client), it is further overridden by [VimJumpServiceSplitClient]
+ * In **split mode** (thin client), it is overridden by [VimJumpServiceSplitClient]
  * from `ideavim-frontend-split.xml`.
  *
  * Handles state serialization to `vim_settings_local.xml` and provides
@@ -46,21 +42,6 @@ internal class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateCompone
   }
 
   override var lastJumpTimeStamp: Long = 0
-
-  /**
-   * Checks `unifyjumps` before recording a jump.
-   * This is the frontend-side gate for IDE navigation events that [JumpsListener]
-   * (on the backend) forwards unconditionally.
-   */
-  override fun addJump(projectId: String, jump: Jump, reset: Boolean) {
-    if (!injector.globalIjOptions().unifyjumps) return
-    super.addJump(projectId, jump, reset)
-  }
-
-  override fun removeJump(projectId: String, jump: Jump) {
-    if (!injector.globalIjOptions().unifyjumps) return
-    super.removeJump(projectId, jump)
-  }
 
   override fun includeCurrentCommandAsNavigation(editor: VimEditor) {
     val project = (editor as IjVimEditor).editor.project ?: return

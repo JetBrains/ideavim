@@ -11,9 +11,8 @@ package com.maddyhome.idea.vim.group.jump
 import kotlinx.serialization.Serializable
 
 /**
- * Serializable data transfer object for jump information over RPC.
- * Returned by [JumpRemoteApi.getListenerJumps] to transfer backend jump list entries
- * (collected by [JumpsListener]) to the frontend.
+ * Serializable event for jump changes, sent via [JumpRemoteTopic]
+ * from the backend [JumpsListener] to the frontend.
  */
 @Serializable
 data class JumpInfo(
@@ -21,4 +20,6 @@ data class JumpInfo(
   val col: Int,
   val filepath: String,
   val protocol: String,
+  val added: Boolean,
+  val timestamp: Long,
 )

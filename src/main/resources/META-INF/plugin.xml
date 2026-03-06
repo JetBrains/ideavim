@@ -203,6 +203,9 @@
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.VimJumpServiceImpl"
                         serviceInterface="com.maddyhome.idea.vim.api.VimJumpService"/>
 
+    <platform.rpc.projectRemoteTopicListener
+        implementation="com.maddyhome.idea.vim.group.JumpRemoteTopicListener"/>
+
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.IjFileGroup"
                         serviceInterface="com.maddyhome.idea.vim.api.VimFile"/>
 
