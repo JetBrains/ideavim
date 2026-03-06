@@ -106,7 +106,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
    *
    * @param force Whether to force this update.
    */
-  protected abstract fun updateSearchHighlights(force: Boolean)
+  protected abstract fun updateSearchHighlights(force: Boolean, newCaretPosition: Int? = null)
 
   /**
    * Reset the search highlights to the last used pattern after highlighting incsearch results.
@@ -441,11 +441,13 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     lastPatternTrailing = ""
     lastDirection = dir
 
-    setShouldShowSearchHighlights()
-    updateSearchHighlights(true)
 
     val offset = findItOffset(editor, range.startOffset, count, lastDirection)?.first ?: -1
-    return if (offset == -1) range.startOffset else offset
+
+    val newOffset = if (offset == -1) range.startOffset else offset
+    setShouldShowSearchHighlights()
+    updateSearchHighlights(true, newOffset)
+    return newOffset
   }
 
   override fun findEndOfPattern(
@@ -518,9 +520,6 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     count: Int,
     dir: Direction,
   ): Int {
-    setShouldShowSearchHighlights()
-    updateSearchHighlights(false)
-
     val startOffset: Int = caret.offset
     var offset = findItOffset(editor, startOffset, count, dir)?.first ?: -1
     if (offset == startOffset) {
@@ -529,6 +528,9 @@ abstract class VimSearchGroupBase : VimSearchGroup {
        * in the buffer: Repeat with count + 1. */
       offset = findItOffset(editor, startOffset, count + 1, dir)?.first ?: -1
     }
+
+    setShouldShowSearchHighlights()
+    updateSearchHighlights(false, offset)
     return offset
   }
 

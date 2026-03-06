@@ -81,8 +81,8 @@ open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateComponent<Ele
     }
   }
 
-  override fun updateSearchHighlights(force: Boolean) {
-    updateSearchHighlights(getLastUsedPattern(), lastIgnoreSmartCase, showSearchHighlight, force)
+  override fun updateSearchHighlights(force: Boolean, newCaretPosition: Int?) {
+    updateSearchHighlights(getLastUsedPattern(), lastIgnoreSmartCase, showSearchHighlight, force, newCaretPosition)
   }
 
   override fun resetIncsearchHighlights() {
