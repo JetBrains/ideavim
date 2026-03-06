@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.helper
 
-import com.intellij.openapi.components.Service
 import com.intellij.openapi.editor.ReadOnlyFragmentModificationException
 import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.actionSystem.EditorActionManager
@@ -17,17 +16,16 @@ import com.maddyhome.idea.vim.api.EngineEditorHelperBase
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimRangeMarker
 import com.maddyhome.idea.vim.api.VimVisualPosition
-import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 
-@Service
-internal class IjEditorHelper : EngineEditorHelperBase() {
+
+class IjEditorHelper : EngineEditorHelperBase() {
   override fun amountOfInlaysBeforeVisualPosition(editor: VimEditor, pos: VimVisualPosition): Int {
     require(pos.line >= 0)
     require(pos.column >= 0)
     val visualPosition = VisualPosition(pos.line, pos.column, pos.leansRight)
-    return (editor as IjVimEditor).editor.amountOfInlaysBeforeVisualPosition(visualPosition)
+    return editor.ij.amountOfInlaysBeforeVisualPosition(visualPosition)
   }
 
   override fun getVisualLineAtTopOfScreen(editor: VimEditor): Int {

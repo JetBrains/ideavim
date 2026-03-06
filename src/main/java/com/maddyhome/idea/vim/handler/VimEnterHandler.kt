@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -359,7 +359,7 @@ internal abstract class VimKeyHandler(nextHandler: EditorActionHandler?) : Octop
   }
 }
 
-internal fun isOctopusEnabled(s: KeyStroke, editor: Editor): Boolean {
+fun isOctopusEnabled(s: KeyStroke, editor: Editor): Boolean {
   if (!enableOctopus) return false
   // CMD line has a different processing mechanizm: the processing actions are registered
   //   for the input field component. These keys are not dispatched via the octopus handler.

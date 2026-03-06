@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -24,7 +24,7 @@ import javax.swing.JComponent
 /**
  * Get focus reliably.
  */
-internal fun requestFocus(component: JComponent) {
+fun requestFocus(component: JComponent) {
   IdeFocusManager.findInstance().requestFocus(component, true)
 }
 
@@ -33,11 +33,11 @@ internal fun requestFocus(component: JComponent) {
  *
  * @see [requestFocus]
  */
-internal fun runAfterGotFocus(runnable: Runnable) {
+fun runAfterGotFocus(runnable: Runnable) {
   IdeFocusManager.findInstance().doWhenFocusSettlesDown(runnable, ModalityState.defaultModalityState())
 }
 
-internal fun selectEditorFont(editor: Editor?, forText: String): Font {
+fun selectEditorFont(editor: Editor?, forText: String): Font {
   val fontSize = when {
     editor is EditorImpl -> editor.fontSize2D
     UISettings.getInstance().presentationMode -> UISettingsUtils.getInstance().presentationModeFontSize

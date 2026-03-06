@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -102,7 +102,7 @@ internal class AddBlockInlaysAction : AnAction() {
       return if (text == null) 0 else fontMetrics.stringWidth(text)
     }
 
-    private inner class MyFontMetrics(editor: Editor, familyName: String?, size: Int) {
+    private class MyFontMetrics(editor: Editor, familyName: String?, size: Int) {
       val metrics: FontMetrics
       fun isActual(editor: Editor, familyName: String, size: Int): Boolean {
         val font = metrics.font

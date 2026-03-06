@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2024 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -293,13 +293,28 @@ class ModeWidgetPopup : AnAction() {
   }
 
   private class ModeColors(
-    isFullCustomizationKey: String, themeKey: String,
-    normalBgKey: String, normalFgKey: String,
-    insertBgKey: String, insertFgKey: String,
-    replaceBgKey: String, replaceFgKey: String,
-    commandBgKey: String, commandFgKey: String,
-    visualBgKey: String, visualFgKey: String, visualLineBgKey: String, visualLineFgKey: String, visualBlockBgKey: String, visualBlockFgKey: String,
-    selectBgKey: String, selectFgKey: String, selectLineBgKey: String, selectLineFgKey: String, selectBlockBgKey: String, selectBlockFgKey: String
+    isFullCustomizationKey: String,
+    themeKey: String,
+    normalBgKey: String,
+    normalFgKey: String,
+    insertBgKey: String,
+    insertFgKey: String,
+    replaceBgKey: String,
+    replaceFgKey: String,
+    commandBgKey: String,
+    commandFgKey: String,
+    visualBgKey: String,
+    visualFgKey: String,
+    visualLineBgKey: String,
+    visualLineFgKey: String,
+    visualBlockBgKey: String,
+    visualBlockFgKey: String,
+    selectBgKey: String,
+    selectFgKey: String,
+    selectLineBgKey: String,
+    selectLineFgKey: String,
+    selectBlockBgKey: String,
+    selectBlockFgKey: String,
   ) {
     var isFullCustomization: Boolean by VimScopeBooleanVariable(isFullCustomizationKey)
     var theme: ModeWidgetTheme by VimScopeThemeVariable(themeKey)
@@ -347,7 +362,8 @@ class ModeWidgetPopup : AnAction() {
     private class VimScopeThemeVariable(private var key: String) : ReadWriteProperty<ModeColors, ModeWidgetTheme> {
       override fun getValue(thisRef: ModeColors, property: KProperty<*>): ModeWidgetTheme {
         val themeString =
-          injector.variableService.getGlobalVariableValue(key)?.toVimString()?.value ?: return ModeWidgetTheme.getDefaultTheme()
+          injector.variableService.getGlobalVariableValue(key)?.toVimString()?.value
+            ?: return ModeWidgetTheme.getDefaultTheme()
         return ModeWidgetTheme.parseString(themeString) ?: ModeWidgetTheme.getDefaultTheme()
       }
 

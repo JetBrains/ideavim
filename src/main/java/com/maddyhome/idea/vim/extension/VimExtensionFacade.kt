@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -30,8 +30,6 @@ import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.ui.ModalEntry
-import com.maddyhome.idea.vim.ui.ex.ExEntryPanelService
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
@@ -169,7 +167,7 @@ object VimExtensionFacade {
     } else {
       LOG.trace("Getting char from the modal entry...")
       var ref: KeyStroke? = null
-      ModalEntry.activate(editor.vim) { stroke: KeyStroke? ->
+      injector.modalInput.activate(editor.vim) { stroke: KeyStroke ->
         ref = stroke
         false
       }
@@ -184,7 +182,8 @@ object VimExtensionFacade {
   /** Returns a string typed in the input box similar to 'input()'. */
   @JvmStatic
   fun inputString(editor: Editor, context: DataContext, prompt: String, finishOn: Char?): String {
-    return (injector.commandLine as ExEntryPanelService).inputString(editor.vim, context.vim, prompt, finishOn) ?: ""
+    @Suppress("DEPRECATION")
+    return injector.commandLine.inputString(editor.vim, context.vim, prompt, finishOn) ?: ""
   }
 
   /** Get the current contents of the given register similar to 'getreg()'. */

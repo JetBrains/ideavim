@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -14,7 +14,6 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.CaretVisualAttributes
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.EditorEx
-import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.intellij.util.concurrency.annotations.RequiresEdt
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEditor
@@ -63,28 +62,11 @@ internal fun Editor.removeCaretsVisualAttributes() {
   caretModel.allCarets.forEach { it.visualAttributes = CaretVisualAttributes.getDefault() }
 }
 
-internal fun Editor.hasBlockOrUnderscoreCaret() = isBlockCursorOverride() ||
-  GuiCursorOptionHelper.getAttributes(guicursorMode()).type.let {
-    it == GuiCursorType.BLOCK || it == GuiCursorType.HOR
-  }
-
 internal object GuicursorChangeListener : EffectiveOptionValueChangeListener {
   override fun onEffectiveValueChanged(editor: VimEditor) {
     editor.ij.updatePrimaryCaretVisualAttributes()
   }
 }
-
-private fun Editor.guicursorMode(): GuiCursorMode {
-  return GuiCursorMode.fromMode(vim.mode, injector.vimState.isReplaceCharacter)
-}
-
-/**
- * Allow the "use block caret" setting to override guicursor options - if set, we use block caret everywhere, if
- * not, we use guicursor options.
- *
- * Note that we look at the persisted value because for pre-212 at least, we modify the per-editor value.
- */
-private fun isBlockCursorOverride() = EditorSettingsExternalizable.getInstance().isBlockCursor
 
 private fun Editor.updatePrimaryCaretVisualAttributes() {
   if (VimPlugin.isNotEnabled()) thisLogger().error("The caret attributes should not be updated if the IdeaVim is disabled")
@@ -130,8 +112,7 @@ private fun getVisualAttributesForCaret(caret: Caret): CaretVisualAttributes {
       newAttributes.shape,
       newAttributes.thickness,
     )
-  }
-  else {
+  } else {
     newAttributes
   }
 }
@@ -173,7 +154,7 @@ private object AttributesCache {
 }
 
 @TestOnly
-internal fun getGuiCursorMode(editor: Editor) = editor.guicursorMode()
+fun getGuiCursorMode(editor: Editor) = editor.guicursorMode()
 
 class CaretVisualAttributesListener : IsReplaceCharListener, ModeChangeListener, EditorListener {
   override fun isReplaceCharChanged(editor: VimEditor) {

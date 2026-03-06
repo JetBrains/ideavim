@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,7 +8,6 @@
 package com.maddyhome.idea.vim.group
 
 import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.components.Service
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.VisualPosition
@@ -56,8 +55,8 @@ import kotlin.math.min
 /**
  * This handles all motion related commands and marks
  */
-@Service
-internal class MotionGroup : VimMotionGroupBase() {
+
+class MotionGroup : VimMotionGroupBase() {
   override fun moveCaretToFirstDisplayLine(
     editor: VimEditor,
     caret: ImmutableVimCaret,

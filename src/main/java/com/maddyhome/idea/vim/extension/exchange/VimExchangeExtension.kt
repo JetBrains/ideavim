@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -56,20 +56,62 @@ import org.jetbrains.annotations.NonNls
  *        It just won't work if the binding is defined after `set exchange`.
  */
 
-internal class VimExchangeExtension : VimExtension {
+class VimExchangeExtension : VimExtension {
 
   override fun getName() = "exchange"
 
   override fun init() {
-    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys(EXCHANGE_CMD), owner, ExchangeHandler(false), false)
+    putExtensionHandlerMapping(
+      MappingMode.N,
+      injector.parser.parseKeys(EXCHANGE_CMD),
+      owner,
+      ExchangeHandler(false),
+      false
+    )
     putExtensionHandlerMapping(MappingMode.X, injector.parser.parseKeys(EXCHANGE_CMD), owner, VExchangeHandler(), false)
-    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys(EXCHANGE_CLEAR_CMD), owner, ExchangeClearHandler(), false)
-    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys(EXCHANGE_LINE_CMD), owner, ExchangeHandler(true), false)
+    putExtensionHandlerMapping(
+      MappingMode.N,
+      injector.parser.parseKeys(EXCHANGE_CLEAR_CMD),
+      owner,
+      ExchangeClearHandler(),
+      false
+    )
+    putExtensionHandlerMapping(
+      MappingMode.N,
+      injector.parser.parseKeys(EXCHANGE_LINE_CMD),
+      owner,
+      ExchangeHandler(true),
+      false
+    )
 
-    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("cx"), owner, injector.parser.parseKeys(EXCHANGE_CMD), true)
-    putKeyMappingIfMissing(MappingMode.X, injector.parser.parseKeys("X"), owner, injector.parser.parseKeys(EXCHANGE_CMD), true)
-    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("cxc"), owner, injector.parser.parseKeys(EXCHANGE_CLEAR_CMD), true)
-    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("cxx"), owner, injector.parser.parseKeys(EXCHANGE_LINE_CMD), true)
+    putKeyMappingIfMissing(
+      MappingMode.N,
+      injector.parser.parseKeys("cx"),
+      owner,
+      injector.parser.parseKeys(EXCHANGE_CMD),
+      true
+    )
+    putKeyMappingIfMissing(
+      MappingMode.X,
+      injector.parser.parseKeys("X"),
+      owner,
+      injector.parser.parseKeys(EXCHANGE_CMD),
+      true
+    )
+    putKeyMappingIfMissing(
+      MappingMode.N,
+      injector.parser.parseKeys("cxc"),
+      owner,
+      injector.parser.parseKeys(EXCHANGE_CLEAR_CMD),
+      true
+    )
+    putKeyMappingIfMissing(
+      MappingMode.N,
+      injector.parser.parseKeys("cxx"),
+      owner,
+      injector.parser.parseKeys(EXCHANGE_LINE_CMD),
+      true
+    )
 
     VimExtensionFacade.exportOperatorFunction(OPERATOR_FUNC, Operator())
   }
@@ -86,10 +128,14 @@ internal class VimExchangeExtension : VimExtension {
   }
 
   companion object {
-    @NonNls private const val EXCHANGE_CMD = "<Plug>(Exchange)"
-    @NonNls private const val EXCHANGE_CLEAR_CMD = "<Plug>(ExchangeClear)"
-    @NonNls private const val EXCHANGE_LINE_CMD = "<Plug>(ExchangeLine)"
-    @NonNls private const val OPERATOR_FUNC = "ExchangeOperatorFunc"
+    @NonNls
+    private const val EXCHANGE_CMD = "<Plug>(Exchange)"
+    @NonNls
+    private const val EXCHANGE_CLEAR_CMD = "<Plug>(ExchangeClear)"
+    @NonNls
+    private const val EXCHANGE_LINE_CMD = "<Plug>(ExchangeLine)"
+    @NonNls
+    private const val OPERATOR_FUNC = "ExchangeOperatorFunc"
   }
 
   private class ExchangeHandler(private val isLine: Boolean) : ExtensionHandler {
@@ -162,14 +208,17 @@ internal class VimExchangeExtension : VimExtension {
             expand = true
             Pair(currentExchange, exchange1)
           }
+
           ExchangeCompareResult.INNER -> {
             expand = true
             Pair(exchange1, currentExchange)
           }
+
           ExchangeCompareResult.GT -> {
             reverse = true
             Pair(currentExchange, exchange1)
           }
+
           ExchangeCompareResult.LT -> {
             Pair(exchange1, currentExchange)
           }
@@ -259,9 +308,11 @@ internal class VimExchangeExtension : VimExtension {
           intersects(x, y) -> {
             ExchangeCompareResult.OVERLAP
           }
+
           x.start.col <= y.start.col -> {
             ExchangeCompareResult.LT
           }
+
           else -> {
             ExchangeCompareResult.GT
           }
@@ -305,7 +356,10 @@ internal class VimExchangeExtension : VimExtension {
         val marks = injector.markService
         val vimEditor = editor.vim
         // todo make it multicaret
-        return Pair(marks.getMark(vimEditor.primaryCaret(), startMark)!!, marks.getMark(vimEditor.primaryCaret(), endMark)!!)
+        return Pair(
+          marks.getMark(vimEditor.primaryCaret(), startMark)!!,
+          marks.getMark(vimEditor.primaryCaret(), endMark)!!
+        )
       }
 
       val unnRegText = getRegister(editor.vim, '"')
@@ -321,7 +375,11 @@ internal class VimExchangeExtension : VimExtension {
       } else {
         when (selectionType) {
           SelectionType.LINE_WISE -> executeNormalWithoutMapping(injector.parser.stringToKeys("`[V`]y"), editor)
-          SelectionType.BLOCK_WISE -> executeNormalWithoutMapping(injector.parser.stringToKeys("""`[<C-V>`]y"""), editor)
+          SelectionType.BLOCK_WISE -> executeNormalWithoutMapping(
+            injector.parser.stringToKeys("""`[<C-V>`]y"""),
+            editor
+          )
+
           SelectionType.CHARACTER_WISE -> executeNormalWithoutMapping(injector.parser.stringToKeys("`[v`]y"), editor)
         }
       }

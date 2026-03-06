@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,12 +8,18 @@
 
 package com.maddyhome.idea.vim.group
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.Service
 import org.apache.commons.codec.binary.Base64
 import org.jdom.Element
 
 @Service
-internal class XMLGroup {
+class XMLGroup {
+  companion object {
+    @JvmStatic
+    fun getInstance(): XMLGroup = ApplicationManager.getApplication().getService(XMLGroup::class.java)
+  }
+
   /**
    * Set the text of an XML element, safely encode it if needed.
    */

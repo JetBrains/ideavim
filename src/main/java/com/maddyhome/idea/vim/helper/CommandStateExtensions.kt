@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.inVisualMode
 
-internal val Mode.hasVisualSelection
+val Mode.hasVisualSelection
   get() = when (this) {
     is Mode.VISUAL, is Mode.SELECT -> true
     else -> false
@@ -33,5 +33,5 @@ val Editor.inVisualMode: Boolean
   get() = this.vim.inVisualMode
 
 @get:JvmName("inExMode")
-internal val Editor.inExMode
+val Editor.inExMode
   get() = this.vim.mode is Mode.CMD_LINE

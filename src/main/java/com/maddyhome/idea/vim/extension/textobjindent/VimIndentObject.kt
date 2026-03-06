@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -39,7 +39,7 @@ class VimIndentObject : VimExtension {
   }
 }
 
-private fun VimApi.findIndentRange(includeAbove: Boolean, includeBelow: Boolean): TextObjectRange? {
+private fun VimApi.findIndentRange(includeAbove: Boolean, includeBelow: Boolean): TextObjectRange {
   val charSequence = editor { read { text } }
   val caretOffset = editor { read { withPrimaryCaret { offset } } }
 

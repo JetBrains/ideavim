@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2025 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -151,7 +151,7 @@ private fun VimApi.findBracketRange(isOuter: Boolean): TextObjectRange? {
  */
 private fun gatherAllBracketRanges(
   text: CharSequence,
-  brackets: List<Char>
+  brackets: List<Char>,
 ): List<Range.Simple> {
   val pairs = mapOf('(' to ')', '[' to ']', '{' to '}', '<' to '>')
   val results = mutableListOf<Range.Simple>()

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -63,19 +63,80 @@ internal class VimSurroundExtension : VimExtension {
   private val NO_MAPPINGS = "surround_no_mappings"
 
   override fun init() {
-    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>YSurround"), owner, YSurroundHandler(), false)
-    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>Yssurround"), owner, YSSurroundHandler(), false)
-    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>CSurround"), owner, CSurroundHandler(), false)
-    putExtensionHandlerMapping(MappingMode.N, injector.parser.parseKeys("<Plug>DSurround"), owner, DSurroundHandler(), false)
-    putExtensionHandlerMapping(MappingMode.XO, injector.parser.parseKeys("<Plug>VSurround"), owner, VSurroundHandler(), false)
+    putExtensionHandlerMapping(
+      MappingMode.N,
+      injector.parser.parseKeys("<Plug>YSurround"),
+      owner,
+      YSurroundHandler(),
+      false
+    )
+    putExtensionHandlerMapping(
+      MappingMode.N,
+      injector.parser.parseKeys("<Plug>Yssurround"),
+      owner,
+      YSSurroundHandler(),
+      false
+    )
+    putExtensionHandlerMapping(
+      MappingMode.N,
+      injector.parser.parseKeys("<Plug>CSurround"),
+      owner,
+      CSurroundHandler(),
+      false
+    )
+    putExtensionHandlerMapping(
+      MappingMode.N,
+      injector.parser.parseKeys("<Plug>DSurround"),
+      owner,
+      DSurroundHandler(),
+      false
+    )
+    putExtensionHandlerMapping(
+      MappingMode.XO,
+      injector.parser.parseKeys("<Plug>VSurround"),
+      owner,
+      VSurroundHandler(),
+      false
+    )
 
-    val noMappings = VimPlugin.getVariableService().getGlobalVariableValue(NO_MAPPINGS)?.toVimNumber()?.booleanValue ?: false
+    val noMappings =
+      VimPlugin.getVariableService().getGlobalVariableValue(NO_MAPPINGS)?.toVimNumber()?.booleanValue ?: false
     if (!noMappings) {
-      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("ys"), owner, injector.parser.parseKeys("<Plug>YSurround"), true)
-      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("yss"), owner, injector.parser.parseKeys("<Plug>Yssurround"), true)
-      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("cs"), owner, injector.parser.parseKeys("<Plug>CSurround"), true)
-      putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys("ds"), owner, injector.parser.parseKeys("<Plug>DSurround"), true)
-      putKeyMappingIfMissing(MappingMode.XO, injector.parser.parseKeys("S"), owner, injector.parser.parseKeys("<Plug>VSurround"), true)
+      putKeyMappingIfMissing(
+        MappingMode.N,
+        injector.parser.parseKeys("ys"),
+        owner,
+        injector.parser.parseKeys("<Plug>YSurround"),
+        true
+      )
+      putKeyMappingIfMissing(
+        MappingMode.N,
+        injector.parser.parseKeys("yss"),
+        owner,
+        injector.parser.parseKeys("<Plug>Yssurround"),
+        true
+      )
+      putKeyMappingIfMissing(
+        MappingMode.N,
+        injector.parser.parseKeys("cs"),
+        owner,
+        injector.parser.parseKeys("<Plug>CSurround"),
+        true
+      )
+      putKeyMappingIfMissing(
+        MappingMode.N,
+        injector.parser.parseKeys("ds"),
+        owner,
+        injector.parser.parseKeys("<Plug>DSurround"),
+        true
+      )
+      putKeyMappingIfMissing(
+        MappingMode.XO,
+        injector.parser.parseKeys("S"),
+        owner,
+        injector.parser.parseKeys("<Plug>VSurround"),
+        true
+      )
     }
 
     VimExtensionFacade.exportOperatorFunction(OPERATOR_FUNC, Operator())
@@ -201,8 +262,10 @@ internal class VimSurroundExtension : VimExtension {
               val trimmedValue = if (newSurround.shouldTrim) innerValue.trim() else innerValue
               it.first + trimmedValue + it.second
             } ?: innerValue
-            val textData = PutData.TextData(null, injector.clipboardManager.dumbCopiedText(text), SelectionType.CHARACTER_WISE)
-            val putData = PutData(textData, null, 1, insertTextBeforeCaret = true, rawIndent = true, caretAfterInsertedText = false)
+            val textData =
+              PutData.TextData(null, injector.clipboardManager.dumbCopiedText(text), SelectionType.CHARACTER_WISE)
+            val putData =
+              PutData(textData, null, 1, insertTextBeforeCaret = true, rawIndent = true, caretAfterInsertedText = false)
 
             surrounding.caret to putData
           }.forEach {
@@ -245,6 +308,7 @@ internal class VimSurroundExtension : VimExtension {
               searchHelper.findBlockQuoteInLineRange(editor, caret, char, true)
             }
           }
+
           'p' -> searchHelper.findParagraphRange(editor, caret, 1, true)
           's' -> searchHelper.findSentenceRange(editor, caret, 1, true)
           else -> null

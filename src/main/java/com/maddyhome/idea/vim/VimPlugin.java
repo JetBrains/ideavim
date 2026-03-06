@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManagerCore;
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.application.AccessToken;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
@@ -18,38 +17,26 @@ import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.extensions.PluginId;
-import com.intellij.openapi.keymap.Keymap;
-import com.intellij.openapi.keymap.ex.KeymapManagerEx;
-import com.intellij.openapi.keymap.impl.DefaultKeymap;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Disposer;
-import com.intellij.openapi.util.SystemInfo;
-import com.intellij.util.SlowOperations;
 import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.config.VimState;
 import com.maddyhome.idea.vim.config.migration.ApplicationConfigurationMigrator;
-import com.maddyhome.idea.vim.extension.VimExtensionRegistrar;
-import com.maddyhome.idea.vim.group.*;
-import com.maddyhome.idea.vim.group.copy.PutGroup;
-import com.maddyhome.idea.vim.group.visual.VisualMotionGroup;
-import com.maddyhome.idea.vim.helper.MacKeyRepeat;
-import com.maddyhome.idea.vim.listener.VimListenerManager;
+import com.maddyhome.idea.vim.group.VimNotifications;
+import com.maddyhome.idea.vim.group.VimWindowGroup;
+import com.maddyhome.idea.vim.history.VimHistory;
+import com.maddyhome.idea.vim.macro.VimMacro;
 import com.maddyhome.idea.vim.newapi.IjVimInjectorKt;
-import com.maddyhome.idea.vim.newapi.IjVimSearchGroup;
-import com.maddyhome.idea.vim.thinapi.IjPluginExtensionsScanner;
-import com.maddyhome.idea.vim.ui.StatusBarIconFactory;
+import com.maddyhome.idea.vim.newapi.VimLegacyStateLoader;
+import com.maddyhome.idea.vim.newapi.VimSearchGroupLegacyLoader;
+import com.maddyhome.idea.vim.put.VimPut;
+import com.maddyhome.idea.vim.register.VimRegisterGroup;
 import com.maddyhome.idea.vim.vimscript.services.VariableService;
 import com.maddyhome.idea.vim.yank.YankGroupBase;
 import org.jdom.Element;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import static com.maddyhome.idea.vim.api.VimInjectorKt.injector;
-import static com.maddyhome.idea.vim.group.EditorGroup.EDITOR_STORE_ELEMENT;
-import static com.maddyhome.idea.vim.group.KeyGroup.SHORTCUT_CONFLICTS_ELEMENT;
-import static com.maddyhome.idea.vim.vimscript.services.VimRcService.executeIdeaVimRc;
 
 /**
  * This plugin attempts to emulate the key binding and general functionality of Vim and gVim. See the supplied
@@ -72,26 +59,24 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
 
   private final @NotNull VimState state = new VimState();
   public Disposable onOffDisposable;
-  private int previousStateVersion = 0;
-  private String previousKeyMap = "";
+  int previousStateVersion = 0;
+  String previousKeyMap = "";
   // It is enabled by default to avoid any special configuration after plugin installation
   private boolean enabled = true;
-  private boolean ideavimrcRegistered = false;
-  private boolean stateUpdated = false;
 
   VimPlugin() {
     ApplicationConfigurationMigrator.getInstance().migrate();
   }
 
   /**
-   * @return NotificationService as applicationService if project is null and projectService otherwise
+   * @return VimNotifications as applicationService if project is null and projectService otherwise
    */
-  public static @NotNull NotificationService getNotifications(@Nullable Project project) {
+  public static @NotNull VimNotifications getNotifications(@Nullable Project project) {
     if (project == null) {
-      return ApplicationManager.getApplication().getService(NotificationService.class);
+      return ApplicationManager.getApplication().getService(VimNotifications.class);
     }
     else {
-      return project.getService(NotificationService.class);
+      return project.getService(VimNotifications.class);
     }
   }
 
@@ -100,84 +85,81 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
 
-  public static @NotNull MotionGroup getMotion() {
-    return ApplicationManager.getApplication().getService(MotionGroup.class);
+  public static @NotNull VimMotionGroup getMotion() {
+    return VimInjectorKt.getInjector().getMotion();
   }
 
-  public static @NotNull XMLGroup getXML() {
-    return ApplicationManager.getApplication().getService(XMLGroup.class);
+  public static @NotNull VimChangeGroup getChange() {
+    return VimInjectorKt.getInjector().getChangeGroup();
   }
 
-  public static @NotNull ChangeGroup getChange() {
-    return ((ChangeGroup)VimInjectorKt.getInjector().getChangeGroup());
+  public static @NotNull VimCommandGroup getCommand() {
+    return VimInjectorKt.getInjector().getCommandGroup();
   }
 
-  public static @NotNull CommandGroup getCommand() {
-    return ApplicationManager.getApplication().getService(CommandGroup.class);
+  public static @NotNull VimRegisterGroup getRegister() {
+    return VimInjectorKt.getInjector().getRegisterGroup();
   }
 
-  public static @NotNull RegisterGroup getRegister() {
-    return ((RegisterGroup)VimInjectorKt.getInjector().getRegisterGroup());
+  public static @NotNull VimFile getFile() {
+    return VimInjectorKt.getInjector().getFile();
   }
 
-  public static @NotNull FileGroup getFile() {
-    return (FileGroup)VimInjectorKt.getInjector().getFile();
+  public static @NotNull VimSearchGroup getSearch() {
+    return VimInjectorKt.getInjector().getSearchGroup();
   }
 
-  public static @NotNull IjVimSearchGroup getSearch() {
-    return ApplicationManager.getApplication().getService(IjVimSearchGroup.class);
+  public static @Nullable VimSearchGroup getSearchIfCreated() {
+    VimSearchGroup searchGroup = ApplicationManager.getApplication().getServiceIfCreated(VimSearchGroup.class);
+    return searchGroup;
   }
 
-  public static @Nullable IjVimSearchGroup getSearchIfCreated() {
-    return ApplicationManager.getApplication().getServiceIfCreated(IjVimSearchGroup.class);
+  public static @NotNull VimProcessGroup getProcess() {
+    return VimInjectorKt.getInjector().getProcessGroup();
   }
 
-  public static @NotNull ProcessGroup getProcess() {
-    return ((ProcessGroup)VimInjectorKt.getInjector().getProcessGroup());
-  }
-
-  public static @NotNull MacroGroup getMacro() {
-    return (MacroGroup)VimInjectorKt.getInjector().getMacro();
+  public static @NotNull VimMacro getMacro() {
+    return VimInjectorKt.getInjector().getMacro();
   }
 
   public static @NotNull VimDigraphGroup getDigraph() {
     return VimInjectorKt.getInjector().getDigraphGroup();
   }
 
-  public static @NotNull HistoryGroup getHistory() {
-    return ApplicationManager.getApplication().getService(HistoryGroup.class);
+  public static @NotNull VimHistory getHistory() {
+    return VimInjectorKt.getInjector().getHistoryGroup();
   }
 
-  public static @NotNull KeyGroup getKey() {
-    return ((KeyGroup)VimInjectorKt.getInjector().getKeyGroup());
+  public static @NotNull VimKeyGroup getKey() {
+    return VimInjectorKt.getInjector().getKeyGroup();
   }
 
-  public static @Nullable KeyGroup getKeyIfCreated() {
-    return ((KeyGroup)ApplicationManager.getApplication().getServiceIfCreated(VimKeyGroup.class));
+  public static @Nullable VimKeyGroup getKeyIfCreated() {
+    return ApplicationManager.getApplication().getServiceIfCreated(VimKeyGroup.class);
   }
 
-  public static @NotNull WindowGroup getWindow() {
-    return ((WindowGroup)VimInjectorKt.getInjector().getWindow());
+  public static @NotNull VimWindowGroup getWindow() {
+    return VimInjectorKt.getInjector().getWindow();
   }
 
-  public static @NotNull EditorGroup getEditor() {
-    return ApplicationManager.getApplication().getService(EditorGroup.class);
+  public static @NotNull VimEditorGroup getEditor() {
+    return VimInjectorKt.getInjector().getEditorGroup();
   }
 
-  public static @Nullable EditorGroup getEditorIfCreated() {
-    return ApplicationManager.getApplication().getServiceIfCreated(EditorGroup.class);
+  public static @Nullable VimEditorGroup getEditorIfCreated() {
+    return ApplicationManager.getApplication().getServiceIfCreated(VimEditorGroup.class);
   }
 
-  public static @NotNull VisualMotionGroup getVisualMotion() {
-    return (VisualMotionGroup)VimInjectorKt.getInjector().getVisualMotionGroup();
+  public static @NotNull VimVisualMotionGroup getVisualMotion() {
+    return VimInjectorKt.getInjector().getVisualMotionGroup();
   }
 
   public static @NotNull YankGroupBase getYank() {
     return (YankGroupBase)VimInjectorKt.getInjector().getYank();
   }
 
-  public static @NotNull PutGroup getPut() {
-    return (PutGroup)VimInjectorKt.getInjector().getPut();
+  public static @NotNull VimPut getPut() {
+    return VimInjectorKt.getInjector().getPut();
   }
 
   public static @NotNull VariableService getVariableService() {
@@ -188,7 +170,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     return VimInjectorKt.getInjector().getOptionGroup();
   }
 
-  private static @NotNull NotificationService getNotifications() {
+  private static @NotNull VimNotifications getNotifications() {
     return getNotifications(null);
   }
 
@@ -203,10 +185,6 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
 
   public static boolean isEnabled() {
     return getInstance().enabled;
-  }
-
-  public static boolean isNotEnabled() {
-    return !isEnabled();
   }
 
   public static void setEnabled(final boolean enabled) {
@@ -229,7 +207,11 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
       getInstance().turnOnPlugin();
     }
 
-    StatusBarIconFactory.Util.INSTANCE.updateIcon();
+    VimInjectorKt.getInjector().getPluginActivator().updateStatusBarIcon();
+  }
+
+  public static boolean isNotEnabled() {
+    return !isEnabled();
   }
 
   public static String getMessage() {
@@ -262,7 +244,6 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
       Application application = ApplicationManager.getApplication();
       if (application.isUnitTestMode()) {
         turnOnPlugin();
-        //application.invokeAndWait(this::turnOnPlugin);
       }
       else {
         application.invokeLater(this::turnOnPlugin);
@@ -279,143 +260,25 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     LOG.debug("done");
   }
 
-  private void registerIdeavimrc(VimEditor editor) {
-    if (ideavimrcRegistered) return;
-    ideavimrcRegistered = true;
-
-    if (!ApplicationManager.getApplication().isUnitTestMode()) {
-      try {
-        injector.getOptionGroup().startInitVimRc();
-        executeIdeaVimRc(editor);
-      }
-      finally {
-        injector.getOptionGroup().endInitVimRc();
-      }
-    }
-  }
-
   /**
-   * IdeaVim plugin initialization.
-   * This is an important operation and some commands ordering should be preserved.
-   * Please make sure that the documentation of this function is in sync with the code
-   * <ol>
-   * <li>Update state<br>
-   * This schedules a state update. In most cases it just shows some dialogs to the user. As I know, there are
-   * no special reasons to keep this command as a first line, so it seems safe to move it.</li>
-   * <li>Command registration<br>
-   * This block should be located BEFORE ~/.ideavimrc execution. Without it the commands won't be registered
-   * and initialized, but ~/.ideavimrc file may refer or execute some commands or functions.
-   * This block DOES NOT initialize extensions, but only registers the available ones.</li>
-   * <li>Options initialisation<br>
-   * This is required to ensure that all options are correctly initialised and registered. Must be before any commands
-   * are executed.</li>
-   * <li>~/.ideavimrc execution<br>
-   * </li>
-   * <li>Components initialization<br>
-   * This should happen after ideavimrc execution because VimListenerManager accesses `number` option
-   * to init line numbers and guicaret to initialize carets.
-   * However, there is a question about listeners attaching. Listeners registration happens after the .ideavimrc
-   * execution, what theoretically may cause bugs (e.g. VIM-2540)</li>
-   * </ol>
+   * Activates the IdeaVim plugin. Creates the on/off disposable and delegates
+   * the actual activation work to VimPluginActivator.
    */
   private void turnOnPlugin() {
     onOffDisposable = Disposer.newDisposable(this, "IdeaVimOnOffDisposer");
-
-    // 1) Update state
-    ApplicationManager.getApplication().invokeLater(this::updateState);
-
-    // 2) Command registration
-    // 2.1) Register vim actions in command mode
-    RegisterActions.registerActions();
-
-    // 2.2) Register extensions
-    VimExtensionRegistrar.registerExtensions();
-
-    // 2.2.1) Register extensions with new API
-    //VimInjectorKt.getInjector().getJsonExtensionProvider().init();
-    //VimInjectorKt.getInjector()
-    //  .getJsonExtensionProvider()
-    //  .addExtensions(IjPluginExtensionsScanner.Companion.instance().scanAllPlugins());
-
-    // 2.3) Register functions
-    VimInjectorKt.getInjector().getFunctionService().registerHandlers();
-
-    // 3) Option initialisation
-    VimInjectorKt.getInjector().getOptionGroup().initialiseOptions();
-
-    // 4) ~/.ideavimrc execution
-    // Evaluate in the context of the fallback window, to capture local option state, to copy to the first editor window
-    try (AccessToken ignore = SlowOperations.knownIssue("VIM-3661")) {
-      registerIdeavimrc(VimInjectorKt.getInjector().getFallbackWindow());
-    }
-
-    // Turing on should be performed after all commands registration
-    getSearch().turnOn();
-    VimListenerManager.INSTANCE.turnOn();
+    VimInjectorKt.getInjector().getPluginActivator().activate();
   }
 
+  /**
+   * Deactivates the IdeaVim plugin. Delegates work to VimPluginActivator
+   * and disposes the on/off disposable.
+   */
   private void turnOffPlugin(boolean unsubscribe) {
-    IjVimSearchGroup searchGroup = getSearchIfCreated();
-    if (searchGroup != null) {
-      searchGroup.turnOff();
-    }
-    if (unsubscribe) {
-      VimListenerManager.INSTANCE.turnOff();
-    }
-    // Use getServiceIfCreated to avoid creating the service during the dispose (this is prohibited by the platform)
-    @Nullable VimCommandLineService service =
-      ApplicationManager.getApplication().getServiceIfCreated(VimCommandLineService.class);
-    if (service != null) {
-      service.fullReset();
-    }
-
-    // Unregister vim actions in command mode
-    RegisterActions.unregisterActions();
+    VimInjectorKt.getInjector().getPluginActivator().deactivate(unsubscribe);
 
     if (onOffDisposable != null) {
       Disposer.dispose(onOffDisposable);
       onOffDisposable = null;
-    }
-  }
-
-  private void updateState() {
-    if (stateUpdated) return;
-    if (isEnabled() && !ApplicationManager.getApplication().isUnitTestMode()) {
-      stateUpdated = true;
-      if (SystemInfo.isMac) {
-        final Boolean enabled = MacKeyRepeat.INSTANCE.isEnabled();
-        final Boolean isKeyRepeat = getEditor().isKeyRepeat();
-        if ((enabled == null || !enabled) && (isKeyRepeat == null || isKeyRepeat)) {
-          // This system property is used in IJ ui robot to hide the startup tips
-          boolean showNotification =
-            Boolean.parseBoolean(System.getProperty("ide.show.tips.on.startup.default.value", "true"));
-          LOG.info("Do not show mac repeat notification because ide.show.tips.on.startup.default.value=false");
-          if (showNotification) {
-            if (VimPlugin.getNotifications().enableRepeatingMode() == Messages.YES) {
-              getEditor().setKeyRepeat(true);
-              MacKeyRepeat.INSTANCE.setEnabled(true);
-            }
-            else {
-              getEditor().setKeyRepeat(false);
-            }
-          }
-        }
-      }
-      if (previousStateVersion > 0 && previousStateVersion < 3) {
-        final KeymapManagerEx manager = KeymapManagerEx.getInstanceEx();
-        Keymap keymap = null;
-        if (previousKeyMap != null) {
-          keymap = manager.getKeymap(previousKeyMap);
-        }
-        if (keymap == null) {
-          keymap = manager.getKeymap(DefaultKeymap.getInstance().getDefaultKeymapName());
-        }
-        assert keymap != null : "Default keymap not found";
-        manager.setActiveKeymap(keymap);
-      }
-      if (previousStateVersion > 0 && previousStateVersion < 4) {
-        VimPlugin.getNotifications().noVimrcAsDefault();
-      }
     }
   }
 
@@ -458,17 +321,26 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   private void legacyStateLoading(@NotNull Element element) {
     if (previousStateVersion > 0 && previousStateVersion < 5) {
       // Migrate settings from 4 to 5 version
-      ((VimMarkServiceImpl)VimInjectorKt.getInjector().getMarkService()).loadState(element);
-      ((VimJumpServiceImpl)VimInjectorKt.getInjector().getJumpService()).loadState(element);
-      getRegister().readData(element);
-      getSearch().readData(element);
-      getHistory().readData(element);
+      VimInjectorKt.getInjector().getMarkService().loadLegacyState(element);
+      VimInjectorKt.getInjector().getJumpService().loadLegacyState(element);
+      VimRegisterGroup register = getRegister();
+      if (register instanceof VimLegacyStateLoader registerLoader) {
+        registerLoader.readData(element);
+      }
+      VimSearchGroup search = getSearch();
+      if (search instanceof VimSearchGroupLegacyLoader legacyLoader) {
+        legacyLoader.readData(element);
+      }
+      VimHistory history = getHistory();
+      if (history instanceof VimLegacyStateLoader historyLoader) {
+        historyLoader.readData(element);
+      }
     }
-    if (element.getChild(SHORTCUT_CONFLICTS_ELEMENT) != null) {
-      getKey().readData(element);
+    if (element.getChild("shortcut-conflicts") != null) {
+      ((VimKeyGroupBase)getKey()).loadShortcutConflictsData(element);
     }
-    if (element.getChild(EDITOR_STORE_ELEMENT) != null) {
-      getEditor().readData(element);
+    if (element.getChild("editor") != null) {
+      getEditor().loadEditorStateData(element);
     }
   }
 }

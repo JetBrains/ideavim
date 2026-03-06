@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2025 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -22,8 +22,8 @@ import java.awt.Font
 import java.awt.Color as AwtColor
 
 internal class IjHighlightId(
-  internal var ijHighlighter: RangeHighlighter
-): HighlightId
+  internal var ijHighlighter: RangeHighlighter,
+) : HighlightId
 
 private fun Color.toAwtColor(): AwtColor = AwtColor(r, g, b, a)
 

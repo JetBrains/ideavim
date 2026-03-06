@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -15,7 +15,7 @@ import kotlin.reflect.KProperty
 /**
  * @author Alex Plate
  */
-internal class VimState {
+class VimState {
   var isIdeaJoinNotified by StateProperty("idea-join")
   var isIdeaPutNotified by StateProperty("idea-put")
   var wasSubscribedToEAPAutomatically by StateProperty("was-automatically-subscribed-to-eap")

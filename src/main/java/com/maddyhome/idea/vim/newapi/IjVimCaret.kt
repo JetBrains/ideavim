@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -14,7 +14,6 @@ import com.intellij.openapi.editor.VisualPosition
 import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.CaretRegisterStorage
 import com.maddyhome.idea.vim.api.CaretRegisterStorageBase
-import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.LocalMarkStorage
 import com.maddyhome.idea.vim.api.SelectionInfo
 import com.maddyhome.idea.vim.api.VimCaret
@@ -39,7 +38,7 @@ import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.helper.vimSelectionStartClear
 import com.maddyhome.idea.vim.state.mode.SelectionType
 
-internal class IjVimCaret(val caret: Caret) : VimCaretBase() {
+class IjVimCaret(val caret: Caret) : VimCaretBase() {
 
   override val registerStorage: CaretRegisterStorage
     get() {
@@ -80,7 +79,7 @@ internal class IjVimCaret(val caret: Caret) : VimCaretBase() {
   override val id: String
     get() = caret.hashCode().toString()
   override val editor: VimEditor
-    get() = IjVimEditor(caret.editor)
+    get() = caret.editor.vim
   override val offset: Int
     get() = caret.offset
   override var vimLastColumn: Int
@@ -209,11 +208,3 @@ internal class IjVimCaret(val caret: Caret) : VimCaretBase() {
 
   override fun hashCode(): Int = this.caret.hashCode()
 }
-
-val VimCaret.ij: Caret
-  get() = (this as IjVimCaret).caret
-val ImmutableVimCaret.ij: Caret
-  get() = (this as IjVimCaret).caret
-
-val Caret.vim: VimCaret
-  get() = IjVimCaret(this)
