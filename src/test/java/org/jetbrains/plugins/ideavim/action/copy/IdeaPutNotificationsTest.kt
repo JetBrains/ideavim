@@ -13,7 +13,7 @@ import com.intellij.notification.Notification
 import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.group.NotificationService
+import com.maddyhome.idea.vim.group.VimNotifications
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.state.mode.SelectionType
@@ -45,7 +45,7 @@ class IdeaPutNotificationsTest : VimTestCase() {
 
     val notification = notifications().last()
     try {
-      kotlin.test.assertEquals(NotificationService.IDEAVIM_NOTIFICATION_TITLE, notification.title)
+      kotlin.test.assertEquals(VimNotifications.IDEAVIM_NOTIFICATION_TITLE, notification.title)
       kotlin.test.assertTrue(OptionConstants.clipboard_ideaput in notification.content)
       kotlin.test.assertEquals(2, notification.actions.size)
     } finally {

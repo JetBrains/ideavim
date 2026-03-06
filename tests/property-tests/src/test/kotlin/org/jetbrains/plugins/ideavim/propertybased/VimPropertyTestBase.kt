@@ -13,6 +13,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.VimSearchGroupBase
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.jetCheck.Generator
 import org.jetbrains.jetCheck.ImperativeCommand
@@ -37,7 +38,7 @@ abstract class VimPropertyTestBase : VimTestCase() {
     VimPlugin.getRegister().resetRegisters()
     editor.caretModel.runForEachCaret { it.moveToOffset(0) }
 
-    VimPlugin.getSearch().resetState()
+    (VimPlugin.getSearch() as VimSearchGroupBase).resetState()
     VimPlugin.getChange().reset()
   }
 
