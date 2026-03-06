@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.group.bookmark
 
+import com.intellij.ide.vfs.VirtualFileId
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
 import com.intellij.platform.project.ProjectId
@@ -26,11 +27,10 @@ internal class BookmarkBackendServiceSplitClient : BookmarkBackendService {
     char: Char,
     line: Int,
     col: Int,
-    filePath: String,
+    virtualFileId: VirtualFileId,
     projectId: ProjectId?,
-    protocol: String?,
   ): BookmarkInfo? {
-    return rpc { createOrGetSystemMark(char, line, col, filePath, projectId, protocol) }
+    return rpc { createOrGetSystemMark(char, line, col, virtualFileId, projectId) }
   }
 
   override fun removeBookmark(char: Char) {

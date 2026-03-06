@@ -11,6 +11,7 @@ package org.jetbrains.plugins.ideavim.action.motion.mark
 import com.intellij.ide.bookmark.BookmarkType
 import com.intellij.ide.bookmark.BookmarksManager
 import com.intellij.ide.bookmark.LineBookmark
+import com.intellij.ide.vfs.rpcId
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.platform.project.projectId
 import com.intellij.testFramework.PlatformTestUtil
@@ -108,9 +109,8 @@ class MotionMarkActionTest : VimTestCase() {
       'A',
       2,
       0,
-      fixture.file.virtualFile.path,
+      fixture.file.virtualFile.rpcId(),
       fixture.project.projectId(),
-      fixture.file.virtualFile.fileSystem.protocol
     )
     ApplicationManager.getApplication().invokeAndWait {
       PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
@@ -138,9 +138,8 @@ class MotionMarkActionTest : VimTestCase() {
       'A',
       2,
       0,
-      fixture.file.virtualFile.path,
+      fixture.file.virtualFile.rpcId(),
       fixture.project.projectId(),
-      fixture.file.virtualFile.fileSystem.protocol
     )
 
     bookmarkService.removeBookmark('A')
@@ -148,9 +147,8 @@ class MotionMarkActionTest : VimTestCase() {
       'A',
       4,
       0,
-      fixture.file.virtualFile.path,
+      fixture.file.virtualFile.rpcId(),
       fixture.project.projectId(),
-      fixture.file.virtualFile.fileSystem.protocol
     )
     ApplicationManager.getApplication().invokeAndWait {
       PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()

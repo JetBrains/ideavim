@@ -8,16 +8,19 @@
 
 package com.maddyhome.idea.vim.group.file
 
+import com.intellij.ide.vfs.VirtualFileId
+import com.intellij.ide.vfs.virtualFile
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.service
+import com.intellij.openapi.editor.impl.EditorId
+import com.intellij.openapi.editor.impl.findEditorOrNull
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.fileEditor.impl.EditorsSplitters
 import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.platform.project.ProjectId
 import com.intellij.platform.project.findProjectOrNull
-import com.maddyhome.idea.vim.group.findEditorByFilePath
 import com.maddyhome.idea.vim.group.findVirtualFile
 import com.maddyhome.idea.vim.helper.EngineMessageHelper
 import kotlinx.coroutines.Dispatchers
@@ -60,20 +63,21 @@ internal class FileRemoteApiImpl : FileRemoteApi {
       }
     }
 
-  override suspend fun closeCurrentFile(projectId: ProjectId?, filePath: String?) = withContext(Dispatchers.EDT) {
+  override suspend fun closeCurrentFile(projectId: ProjectId?, virtualFileId: VirtualFileId?) =
+    withContext(Dispatchers.EDT) {
     val project = projectId?.findProjectOrNull() ?: return@withContext
     val fileEditorManager = FileEditorManagerEx.getInstanceEx(project)
     val window = fileEditorManager.currentWindow
-    val virtualFile = fileEditorManager.currentFile
+      val currentFile = fileEditorManager.currentFile
 
-    if (virtualFile != null && window != null) {
-      window.closeFile(virtualFile)
+      if (currentFile != null && window != null) {
+        window.closeFile(currentFile)
       window.requestFocus(true)
       if (!ApplicationManager.getApplication().isUnitTestMode) {
         EditorsSplitters.focusDefaultComponentInSplittersIfPresent(project)
       }
     } else {
-      val vf = filePath?.let { findVirtualFile(it) }
+        val vf = virtualFileId?.virtualFile()
       if (vf != null) {
         fileEditorManager.closeFile(vf)
       }
@@ -95,10 +99,9 @@ internal class FileRemoteApiImpl : FileRemoteApi {
     }
   }
 
-  override suspend fun saveFile(projectId: ProjectId?, filePath: String?, saveAll: Boolean) =
+  override suspend fun saveFile(editorId: EditorId, saveAll: Boolean) =
     withContext(Dispatchers.EDT) {
-      val project = projectId?.findProjectOrNull() ?: return@withContext
-      val editor = filePath?.let { findEditorByFilePath(project, it) } ?: return@withContext
+      val editor = editorId.findEditorOrNull() ?: return@withContext
       fileBackend.saveFile(editor, saveAll)
     }
 
@@ -130,10 +133,10 @@ internal class FileRemoteApiImpl : FileRemoteApi {
     }
   }
 
-  override suspend fun buildFileInfoMessage(projectId: ProjectId?, filePath: String?, fullPath: Boolean): String? =
+  override suspend fun buildFileInfoMessage(editorId: EditorId, fullPath: Boolean): String? =
     withContext(Dispatchers.EDT) {
-      val project = projectId?.findProjectOrNull() ?: return@withContext null
-      val editor = filePath?.let { findEditorByFilePath(project, it) } ?: return@withContext null
+      val editor = editorId.findEditorOrNull() ?: return@withContext null
+      val project = editor.project ?: return@withContext null
       fileBackend.buildFileInfoMessage(editor, project, fullPath)
     }
 

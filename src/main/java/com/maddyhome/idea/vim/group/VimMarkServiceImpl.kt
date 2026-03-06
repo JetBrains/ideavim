@@ -7,6 +7,7 @@
  */
 package com.maddyhome.idea.vim.group
 
+import com.intellij.ide.vfs.rpcId
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.RoamingType
 import com.intellij.openapi.components.State
@@ -44,12 +45,14 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
       return super.createGlobalMark(editor, char, offset)
     }
     val lp = editor.offsetToBufferPosition(offset)
-    val virtualFile = editor.getVirtualFile() ?: return super.createGlobalMark(editor, char, offset)
-    val projectId = (editor as IjVimEditor).editor.project?.projectId()
+    val ijEditor = (editor as IjVimEditor).editor
+    val ijVirtualFile = ijEditor.virtualFile ?: return super.createGlobalMark(editor, char, offset)
+    val virtualFileId = ijVirtualFile.rpcId()
+    val projectId = ijEditor.project?.projectId()
     val info =
-      bookmarkBackend.createOrGetSystemMark(char, lp.line, lp.column, virtualFile.path, projectId, virtualFile.protocol)
+      bookmarkBackend.createOrGetSystemMark(char, lp.line, lp.column, virtualFileId, projectId)
         ?: return super.createGlobalMark(editor, char, offset)
-    return VimMark(info.key, info.line, lp.column, virtualFile.path, info.protocol)
+    return VimMark(info.key, info.line, lp.column, ijVirtualFile.path, ijVirtualFile.fileSystem.protocol)
   }
 
   override fun getGlobalMark(char: Char): Mark? {
