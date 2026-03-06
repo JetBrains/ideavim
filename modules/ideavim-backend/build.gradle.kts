@@ -12,6 +12,8 @@ plugins {
   id("org.jetbrains.intellij.platform.module")
 }
 
+val fleetRpcVersion: String by project
+
 val kotlinVersion: String by project
 val ideaType: String by project
 val ideaVersion: String by project
@@ -19,6 +21,7 @@ val javaVersion: String by project
 
 repositories {
   mavenCentral()
+  maven("https://cache-redirector.jetbrains.com/packages.jetbrains.team/maven/p/ij/intellij-dependencies")
 
   intellijPlatform {
     defaultRepositories()
@@ -28,7 +31,11 @@ repositories {
 dependencies {
   compileOnly(project(":"))
   compileOnly(project(":modules:ideavim-common"))
+  compileOnly(project(":vim-engine"))
+  compileOnly(project(":api"))
   compileOnly("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
+  kotlinCompilerPluginClasspath("org.jetbrains.kotlin:kotlin-serialization-compiler-plugin:$kotlinVersion")
+  kotlinCompilerPluginClasspath("com.jetbrains.fleet:rpc-compiler-plugin:$fleetRpcVersion")
 
   intellijPlatform {
     var useInstaller = "EAP-SNAPSHOT" !in ideaVersion
@@ -37,6 +44,9 @@ dependencies {
     }
 
     create(ideaType, ideaVersion) { this.useInstaller = useInstaller }
+
+    bundledModule("intellij.platform.kernel.backend")
+    bundledModule("intellij.platform.rpc.backend")
   }
 }
 
