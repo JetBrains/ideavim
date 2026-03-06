@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -151,7 +151,7 @@ class OptionDeclaredScopeTest : VimTestCase() {
   private fun closeWindow(editor: Editor) {
     ApplicationManager.getApplication().invokeAndWait {
       // Just using fileEditorManager.closeFile(editor.virtualFile) can cause weird side effects, like opening a
-      // different buffer in an open editor. See FileGroup.closeFile
+      // different buffer in an open editor. See IjFileGroup.closeFile
       // But we can't just rely on the current EditorWindow. E.g., if we're trying to close a file that's not currently
       // open in the current window, or is open in a split while we want to close the *other* editor...
       val editorWindow = fileEditorManager.windows.first { window ->
@@ -451,7 +451,7 @@ class OptionDeclaredScopeTest : VimTestCase() {
     // If `UISettings.reuseNotModifiedTabs` is set, it will also try to close the current tab, which would have the
     // effect of looking like the current tab has been reused. It will only close the tab if it's not pinned and it's
     // not currently modified. It also checks to see if it (or a descendant) has the focus.
-    // We could change `FileGroup.openFile` to temporarily set `UISettings.reuseNotModifiedTabs` and to throw an error
+    // We could change `FileBackendServiceImpl.openFile` to temporarily set `UISettings.reuseNotModifiedTabs` and to throw an error
     // if the file is modified (`:edit! {file}`) should discard the current changes. We would also need to reset the
     // focus before trying to open the file (it's currently on the ex text field, even though that has been closed by
     // this point).

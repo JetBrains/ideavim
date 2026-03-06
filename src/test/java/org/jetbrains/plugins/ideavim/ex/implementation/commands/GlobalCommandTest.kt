@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -239,7 +239,7 @@ class GlobalCommandTest : VimTestCase() {
 
   @Test
   fun `test check history`() {
-    VimPlugin.getHistory().clear()
+    (VimPlugin.getHistory() as com.maddyhome.idea.vim.group.HistoryGroup).clear()
     val initialEntries = VimPlugin.getHistory().getEntries(VimHistory.Type.Command, 0, 0)
     doTest(
       "g/found/d",
