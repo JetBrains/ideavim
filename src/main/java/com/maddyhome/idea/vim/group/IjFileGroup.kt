@@ -158,19 +158,15 @@ class IjFileGroup : VimFileBase() {
     val success = backend.selectEditor(platformProjectId, documentPath, protocol)
     if (!success) return null
 
-    // Get the opened VimEditor locally
-    val virtualFile = VirtualFileManager.getInstance().getFileSystem(protocol)?.findFileByPath(documentPath)
-      ?: VirtualFileManager.getInstance().getFileSystem("file")?.findFileByPath(documentPath)
-      ?: VirtualFileManager.getInstance().getFileSystem("jar")?.findFileByPath(documentPath)
-      ?: return null
-
+    // The backend opened/focused the file. Find the editor it opened.
     val project = platformProjectId.findProjectOrNull()
       ?: ProjectManager.getInstance().openProjects.firstOrNull()
       ?: return null
 
-    val feditors = FileEditorManager.getInstance(project).openFile(virtualFile, true)
-    val textEditor = feditors.filterIsInstance<TextEditor>().firstOrNull()?.editor
-    return if (textEditor != null && !textEditor.isDisposed) textEditor.vim else null
+    val editor = FileEditorManager.getInstance(project).allEditors.filterIsInstance<TextEditor>()
+      .firstOrNull { it.file.path == documentPath && !it.editor.isDisposed }
+      ?.editor
+    return if (editor != null) editor.vim else null
   }
 
   override fun getProjectId(project: Any): String {
