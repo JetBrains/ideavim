@@ -26,7 +26,10 @@ class FileGetFileInfoAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    injector.file.displayFileInfo(editor, cmd.rawCount > 0)
+    val message = injector.file.displayFileInfo(editor, cmd.rawCount > 0)
+    if (message != null) {
+      injector.messages.showMessage(editor, message)
+    }
     return true
   }
 }

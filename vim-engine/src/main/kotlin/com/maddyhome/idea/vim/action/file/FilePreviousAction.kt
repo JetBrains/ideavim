@@ -25,7 +25,9 @@ class FilePreviousAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    injector.file.selectPreviousTab(context)
+    if (!injector.file.selectPreviousTab(context)) {
+      injector.messages.indicateError()
+    }
     return true
   }
 }

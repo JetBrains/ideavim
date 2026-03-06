@@ -33,12 +33,13 @@ data class FindFileCommand(val range: Range, val modifier: CommandModifier, val 
   ): ExecutionResult {
     val arg = argument
     if (arg.isNotEmpty()) {
-      val res = injector.file.openFile(arg, context)
-      if (res) {
-        injector.jumpService.saveJumpLocation(editor)
+      val errorMessage = injector.file.openFile(arg, context)
+      if (errorMessage != null) {
+        injector.messages.showMessage(editor, errorMessage)
+        return ExecutionResult.Error
       }
-
-      return if (res) ExecutionResult.Success else ExecutionResult.Error
+      injector.jumpService.saveJumpLocation(editor)
+      return ExecutionResult.Success
     }
 
     injector.application.invokeLater {

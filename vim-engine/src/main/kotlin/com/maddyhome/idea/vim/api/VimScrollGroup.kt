@@ -19,4 +19,10 @@ interface VimScrollGroup {
   fun scrollColumns(editor: VimEditor, columns: Int): Boolean
   fun scrollCaretColumnToDisplayLeftEdge(vimEditor: VimEditor): Boolean
   fun scrollCaretColumnToDisplayRightEdge(editor: VimEditor): Boolean
+
+  /**
+   * Called when scroll-related options (e.g. 'scrolloff') change for an editor.
+   * Implementations should ensure the caret is still visible with the new option values.
+   */
+  fun onScrollOptionChanged(editor: VimEditor) {}
 }
