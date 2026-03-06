@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -304,4 +304,10 @@ interface VimChangeGroup {
     UPPER,
     TOGGLE,
   }
+
+  /**
+   * Called when an editor is created and needs change-tracking listeners registered.
+   * The [disposable] will be disposed when the editor is closed.
+   */
+  fun editorCreated(editor: VimEditor, disposable: Any) {}
 }

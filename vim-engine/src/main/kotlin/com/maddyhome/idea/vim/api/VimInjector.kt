@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,8 +10,8 @@ package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.common.VimListenersNotifier
 import com.maddyhome.idea.vim.diagnostic.VimLogger
-import com.maddyhome.idea.vim.extension.JsonExtensionProvider
 import com.maddyhome.idea.vim.extension.ExtensionLoader
+import com.maddyhome.idea.vim.extension.JsonExtensionProvider
 import com.maddyhome.idea.vim.group.TabService
 import com.maddyhome.idea.vim.group.VimWindowGroup
 import com.maddyhome.idea.vim.history.VimHistory
@@ -154,6 +154,8 @@ interface VimInjector {
   val highlightingService: VimHighlightingService
 
   val pathExpansion: VimPathExpansion
+
+  val pluginActivator: VimPluginActivator
 }
 
 lateinit var injector: VimInjector

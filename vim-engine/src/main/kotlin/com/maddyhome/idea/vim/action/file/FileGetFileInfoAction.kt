@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -26,7 +26,10 @@ class FileGetFileInfoAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    injector.file.displayFileInfo(editor, cmd.rawCount > 0)
+    val message = injector.file.displayFileInfo(editor, cmd.rawCount > 0)
+    if (message != null) {
+      injector.messages.showMessage(editor, message)
+    }
     return true
   }
 }
