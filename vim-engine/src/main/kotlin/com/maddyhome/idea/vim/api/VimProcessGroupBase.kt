@@ -8,4 +8,7 @@
 
 package com.maddyhome.idea.vim.api
 
-abstract class VimProcessGroupBase : VimProcessGroup
+abstract class VimProcessGroupBase : VimProcessGroup {
+  override var lastExitCode: Int? = null
+    protected set
+}

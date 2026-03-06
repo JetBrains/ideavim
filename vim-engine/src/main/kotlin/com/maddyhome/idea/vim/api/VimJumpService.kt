@@ -41,6 +41,12 @@ interface VimJumpService {
 
   fun includeCurrentCommandAsNavigation(editor: VimEditor)
 
+  /**
+   * Loads legacy jump state from an XML element for version migration.
+   * Default no-op; overridden by implementations that support PersistentStateComponent.
+   */
+  fun loadLegacyState(element: Any) {}
+
   @TestOnly
   fun resetJumps()
 }

@@ -154,6 +154,8 @@ interface VimInjector {
   val highlightingService: VimHighlightingService
 
   val pathExpansion: VimPathExpansion
+
+  val pluginActivator: VimPluginActivator
 }
 
 lateinit var injector: VimInjector

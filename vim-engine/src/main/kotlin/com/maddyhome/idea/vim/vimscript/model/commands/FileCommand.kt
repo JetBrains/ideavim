@@ -39,7 +39,10 @@ data class FileCommand(val range: Range, val modifier: CommandModifier, val argu
       throw exExceptionMessage("E474")
     }
 
-    injector.file.displayFileInfo(editor, true)
+    val message = injector.file.displayFileInfo(editor, true)
+    if (message != null) {
+      injector.messages.showMessage(editor, message)
+    }
     return ExecutionResult.Success
   }
 }

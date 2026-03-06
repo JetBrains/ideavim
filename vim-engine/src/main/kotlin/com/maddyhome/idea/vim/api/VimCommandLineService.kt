@@ -43,5 +43,20 @@ interface VimCommandLineService {
     initialText: String,
   ): VimCommandLine
 
+  /**
+   * Collects a string from the user via a command-line prompt, blocking until input is complete.
+   * Used by extension API (input() function). Returns null if the user cancels.
+   */
+  @Deprecated("Please use readInputAndProcess")
+  fun inputString(editor: VimEditor, context: ExecutionContext, prompt: String, finishOn: Char?): String? {
+    return null
+  }
+
   fun fullReset()
+
+  /**
+   * Returns the pixel height of the active command line (e.g., the ex entry panel), or 0 if no command line is active.
+   * This is used by scroll calculations to account for the command line reducing the visible editor area.
+   */
+  fun getActiveCommandLineHeight(): Int = 0
 }

@@ -143,6 +143,12 @@ interface VimMarkService {
 
   fun resetAllMarks()
 
+  /**
+   * Loads legacy mark state from an XML element for version migration.
+   * Default no-op; overridden by implementations that support PersistentStateComponent.
+   */
+  fun loadLegacyState(element: Any) {}
+
   fun isValidMark(char: Char, operation: Operation, isCaretPrimary: Boolean): Boolean
 
   enum class Operation {

@@ -233,4 +233,19 @@ abstract class VimKeyGroupBase : VimKeyGroup {
   override fun unregisterCommandActions() {
     builtinCommands.clear()
   }
+
+  // Platform-specific methods — overridden by IJ frontend's KeyGroup implementation.
+  // Not part of the VimKeyGroup interface because they deal with IntelliJ editor/lookup shortcuts.
+
+  /** Registers platform shortcut keys for the given editor so IdeaVim can intercept them. */
+  open fun registerRequiredShortcutKeys(editor: VimEditor) {}
+
+  /** Unregisters platform shortcut keys for the given editor. */
+  open fun unregisterShortcutKeys(editor: VimEditor) {}
+
+  /** Registers IdeaVim shortcuts on a code-completion lookup component. */
+  open fun registerShortcutsForLookup(lookup: Any) {}
+
+  /** Loads shortcut conflict data from a legacy state element. */
+  open fun loadShortcutConflictsData(element: Any) {}
 }

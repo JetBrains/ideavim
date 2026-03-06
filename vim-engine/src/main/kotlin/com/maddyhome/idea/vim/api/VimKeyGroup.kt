@@ -74,4 +74,10 @@ interface VimKeyGroup {
   val savedShortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo>
 
   fun getChar(editor: VimEditor): Char?
+
+  /** Registers a command action and its shortcut keys. */
+  fun registerCommandAction(command: LazyVimCommand) {}
+
+  /** Registers a shortcut that is handled directly by KeyHandler, rather than by an action. */
+  fun registerShortcutWithoutAction(keyStroke: KeyStroke, owner: MappingOwner) {}
 }
