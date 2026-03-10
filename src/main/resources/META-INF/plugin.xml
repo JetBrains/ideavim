@@ -203,6 +203,15 @@
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.VimJumpServiceImpl"
                         serviceInterface="com.maddyhome.idea.vim.api.VimJumpService"/>
 
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.process.IjProcessGroup"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimProcessGroup"/>
+
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.file.FileBackendServiceFrontend"
+                        serviceInterface="com.maddyhome.idea.vim.group.file.FileBackendService"/>
+
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.bookmark.BookmarkBackendServiceFrontend"
+                        serviceInterface="com.maddyhome.idea.vim.group.bookmark.BookmarkBackendService"/>
+
     <platform.rpc.projectRemoteTopicListener
         implementation="com.maddyhome.idea.vim.group.JumpRemoteTopicListener"/>
 
@@ -499,7 +508,6 @@
   <content>
     <module name="IdeaVIM.ideavim-common" loading="embedded"/>
     <module name="IdeaVIM.ideavim-backend"/>
-    <module name="IdeaVIM.ideavim-frontend-split"/>
     <module name="IdeaVIM.ideavim-acejump"/>
     <module name="IdeaVIM.ideavim-rider"/>
     <module name="IdeaVIM.ideavim-clion-nova"/>

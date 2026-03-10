@@ -114,7 +114,6 @@ dependencies {
 
     pluginModule(runtimeOnly(project(":modules:ideavim-common")))
     pluginModule(runtimeOnly(project(":modules:ideavim-backend")))
-    pluginModule(runtimeOnly(project(":modules:ideavim-frontend-split")))
     pluginModule(runtimeOnly(project(":modules:ideavim-acejump")))
     pluginModule(runtimeOnly(project(":modules:ideavim-rider")))
     pluginModule(runtimeOnly(project(":modules:ideavim-clion-nova")))
