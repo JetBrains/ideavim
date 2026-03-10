@@ -16,7 +16,8 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.platform.project.projectId
 import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.group.bookmark.BookmarkBackendService
+import com.maddyhome.idea.vim.group.bookmark.BookmarkRemoteApi
+import com.maddyhome.idea.vim.group.rpc
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -104,18 +105,24 @@ class MotionMarkActionTest : VimTestCase() {
     """.trimIndent()
     configureByText(text)
     enterCommand("set ideamarks")
-    val bookmarkService = BookmarkBackendService.getInstance()
-    bookmarkService.createOrGetSystemMark(
-      'A',
-      2,
-      0,
-      fixture.file.virtualFile.rpcId(),
-      fixture.project.projectId(),
-    )
+    ApplicationManager.getApplication().invokeAndWait {
+      rpc {
+        BookmarkRemoteApi.getInstance().createOrGetSystemMark(
+          'A',
+          2,
+          0,
+          fixture.file.virtualFile.rpcId(),
+          fixture.project.projectId(),
+        )
+      }
+    }
     ApplicationManager.getApplication().invokeAndWait {
       PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     }
-    val vimMarks = injector.markService.getAllGlobalMarks()
+    var vimMarks: Set<com.maddyhome.idea.vim.mark.Mark> = emptySet()
+    ApplicationManager.getApplication().invokeAndWait {
+      vimMarks = injector.markService.getAllGlobalMarks()
+    }
     kotlin.test.assertEquals(1, vimMarks.size)
     kotlin.test.assertEquals('A', vimMarks.first().key)
   }
@@ -133,27 +140,35 @@ class MotionMarkActionTest : VimTestCase() {
     configureByText(text)
     enterCommand("set ideamarks")
 
-    val bookmarkService = BookmarkBackendService.getInstance()
-    bookmarkService.createOrGetSystemMark(
-      'A',
-      2,
-      0,
-      fixture.file.virtualFile.rpcId(),
-      fixture.project.projectId(),
-    )
+    ApplicationManager.getApplication().invokeAndWait {
+      rpc {
+        BookmarkRemoteApi.getInstance().createOrGetSystemMark(
+          'A',
+          2,
+          0,
+          fixture.file.virtualFile.rpcId(),
+          fixture.project.projectId(),
+        )
+      }
 
-    bookmarkService.removeBookmark('A')
-    bookmarkService.createOrGetSystemMark(
-      'A',
-      4,
-      0,
-      fixture.file.virtualFile.rpcId(),
-      fixture.project.projectId(),
-    )
+      rpc { BookmarkRemoteApi.getInstance().removeBookmark('A') }
+      rpc {
+        BookmarkRemoteApi.getInstance().createOrGetSystemMark(
+          'A',
+          4,
+          0,
+          fixture.file.virtualFile.rpcId(),
+          fixture.project.projectId(),
+        )
+      }
+    }
     ApplicationManager.getApplication().invokeAndWait {
       PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     }
-    val vimMarks = injector.markService.getAllGlobalMarks()
+    var vimMarks: Set<com.maddyhome.idea.vim.mark.Mark> = emptySet()
+    ApplicationManager.getApplication().invokeAndWait {
+      vimMarks = injector.markService.getAllGlobalMarks()
+    }
     kotlin.test.assertEquals(1, vimMarks.size)
     val mark = vimMarks.first()
     kotlin.test.assertEquals('A', mark.key)

@@ -20,9 +20,8 @@ import org.jetbrains.annotations.ApiStatus
 /**
  * RPC interface for all [VimFile][com.maddyhome.idea.vim.api.VimFile] operations.
  *
- * Called from [FileBackendServiceSplitClient] in thin-client mode to forward every file
- * operation to the backend where [FileBackendServiceImpl] manages VFS, PSI, editors, and documents.
- * The split client is a thin proxy — it extracts serializable parameters and forwards via RPC.
+ * Called from the frontend via [rpc] to forward file operations to the backend
+ * where [FileRemoteApiImpl] handles VFS, PSI, editors, and documents.
  *
  * Uses platform RPC IDs ([ProjectId], [EditorId], [VirtualFileId]) for cross-process
  * identity transfer instead of string-based lookups.

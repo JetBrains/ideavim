@@ -53,6 +53,7 @@ import com.maddyhome.idea.vim.action.VimShortcutKeyAction
 import com.maddyhome.idea.vim.api.EffectiveOptions
 import com.maddyhome.idea.vim.api.GlobalOptions
 import com.maddyhome.idea.vim.api.Options
+import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimDigraphGroupBase
 import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.VimSearchGroupBase
@@ -71,6 +72,7 @@ import com.maddyhome.idea.vim.handler.isOctopusEnabled
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.TestInputModel
 import com.maddyhome.idea.vim.helper.getGuiCursorMode
+import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.ToKeysMappingInfo
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
@@ -1045,6 +1047,17 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
     object UNDEFINED : CharType
     class CharDetected(val char: Char) : CharType
     class EditorAction(val name: String) : CharType
+  }
+
+  /**
+   * Retrieves a mark on EDT. Global marks go through RPC which requires EDT.
+   */
+  fun getMark(caret: VimCaret, char: Char): Mark? {
+    var mark: Mark? = null
+    ApplicationManager.getApplication().invokeAndWait {
+      mark = injector.markService.getMark(caret, char)
+    }
+    return mark
   }
 
   object Checks {

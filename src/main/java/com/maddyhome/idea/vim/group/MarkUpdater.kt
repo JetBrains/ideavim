@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.group
 
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.event.DocumentEvent
@@ -38,7 +39,7 @@ object MarkUpdater : DocumentListener {
    */
   override fun beforeDocumentChange(event: DocumentEvent) {
     if (VimPlugin.isNotEnabled()) return
-    if (logger.isDebugEnabled) logger.debug("MarkUpdater before, event = $event")
+    logger.debug { "MarkUpdater before, event = $event" }
     if (event.oldLength == 0) return
     val doc = event.document
     val anEditor = getAnyEditorForDocument(doc) ?: return
@@ -57,7 +58,7 @@ object MarkUpdater : DocumentListener {
    */
   override fun documentChanged(event: DocumentEvent) {
     if (VimPlugin.isNotEnabled()) return
-    if (logger.isDebugEnabled) logger.debug("MarkUpdater after, event = $event")
+    logger.debug { "MarkUpdater after, event = $event" }
     if (event.newLength == 0 || event.newLength == 1 && event.newFragment[0] != '\n') return
     val doc = event.document
     val anEditor = getAnyEditorForDocument(doc) ?: return

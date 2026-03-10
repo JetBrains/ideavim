@@ -12,6 +12,7 @@ import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.RoamingType
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
+import com.intellij.openapi.components.service
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.platform.project.projectId
 import com.maddyhome.idea.vim.api.VimEditor
@@ -21,6 +22,7 @@ import com.maddyhome.idea.vim.group.jump.JumpRemoteApi
 import com.maddyhome.idea.vim.mark.Jump
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.initInjector
+import kotlinx.coroutines.launch
 import org.jdom.Element
 
 /**
@@ -43,7 +45,11 @@ internal class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateCompone
   override fun includeCurrentCommandAsNavigation(editor: VimEditor) {
     val project = (editor as IjVimEditor).editor.project ?: return
     val projectId = project.projectId()
-    rpc { JumpRemoteApi.getInstance().includeCurrentCommandAsNavigation(projectId) }
+    // Fire-and-forget: this is called from write actions (motion handlers),
+    // so we can't use blocking rpc(). Launch async instead.
+    service<CoroutineScopeProvider>().coroutineScope.launch {
+      JumpRemoteApi.getInstance().includeCurrentCommandAsNavigation(projectId)
+    }
   }
 
   // We do not delete old project records.

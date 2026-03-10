@@ -8,7 +8,6 @@
 
 package com.maddyhome.idea.vim.group
 
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.EDT
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

@@ -11,42 +11,54 @@ package com.maddyhome.idea.vim.group.file
 import com.intellij.ide.vfs.VirtualFileId
 import com.intellij.ide.vfs.virtualFile
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.components.service
+import com.intellij.openapi.application.readAction
+import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.impl.EditorId
 import com.intellij.openapi.editor.impl.findEditorOrNull
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.fileEditor.impl.EditorsSplitters
 import com.intellij.openapi.fileTypes.FileTypeManager
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.ProjectRootManager
+import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.platform.project.ProjectId
 import com.intellij.platform.project.findProjectOrNull
+import com.intellij.psi.search.FilenameIndex
+import com.intellij.psi.search.ProjectScope
 import com.maddyhome.idea.vim.group.findVirtualFile
 import com.maddyhome.idea.vim.group.onEdt
 import com.maddyhome.idea.vim.helper.EngineMessageHelper
+import kotlin.io.path.Path
 
 /**
  * RPC handler for [FileRemoteApi].
- * Delegates to [FileBackendServiceImpl] for backend-dependent operations.
+ * Contains all file operation logic directly — no intermediate service layer.
  *
- * Uses [onEdt] to dispatch to EDT only when not already on it:
- * - **Monolith**: RPC resolves locally, handler runs on EDT → skip `withContext(EDT)`
- * - **Split**: RPC arrives on a background thread → `withContext(EDT)` dispatches to backend EDT
+ * Read-only methods use [readAction]; mutating methods use [onEdt].
+ *
+ * **Options are never read here** — they are resolved on the frontend and passed
+ * as explicit parameters (e.g. [saveFile]'s `saveAll` flag).
  */
 internal class FileRemoteApiImpl : FileRemoteApi {
 
-  private val fileBackend: FileBackendServiceImpl
-    get() = service()
-
-  override suspend fun findFile(filename: String, projectId: ProjectId?): String? = onEdt {
-    val project = projectId?.findProjectOrNull() ?: return@onEdt null
-    fileBackend.findFile(filename, project)?.path
+  override suspend fun findFile(filename: String, projectId: ProjectId?): String? = readAction {
+    val project = projectId?.findProjectOrNull() ?: return@readAction null
+    findFile(filename, project)?.path
   }
 
   override suspend fun openFile(filename: String, projectId: ProjectId?, focusEditor: Boolean): String? =
     onEdt {
       val project = projectId?.findProjectOrNull() ?: return@onEdt "No project found"
-      val found = fileBackend.findFile(filename, project)
+      val found = findFile(filename, project)
       if (found != null) {
+        logger.debug { "found file: $found" }
         val type = FileTypeManager.getInstance().getKnownFileTypeOrAssociate(found, project)
         if (type != null) {
           FileEditorManager.getInstance(project).openFile(found, focusEditor)
@@ -96,7 +108,13 @@ internal class FileRemoteApiImpl : FileRemoteApi {
   override suspend fun saveFile(editorId: EditorId, saveAll: Boolean) =
     onEdt {
       val editor = editorId.findEditorOrNull() ?: return@onEdt
-      fileBackend.saveFile(editor, saveAll)
+      if (saveAll) {
+        ApplicationManager.getApplication().saveAll()
+      } else {
+        val document = editor.document
+        val fileDocumentManager = FileDocumentManager.getInstance()
+        fileDocumentManager.saveDocument(document)
+      }
     }
 
   override suspend fun selectFile(count: Int, projectId: ProjectId?): Boolean = onEdt {
@@ -128,17 +146,106 @@ internal class FileRemoteApiImpl : FileRemoteApi {
   }
 
   override suspend fun buildFileInfoMessage(editorId: EditorId, fullPath: Boolean): String? =
-    onEdt {
-      val editor = editorId.findEditorOrNull() ?: return@onEdt null
-      val project = editor.project ?: return@onEdt null
-      fileBackend.buildFileInfoMessage(editor, project, fullPath)
+    readAction {
+      val editor = editorId.findEditorOrNull() ?: return@readAction null
+      val project = editor.project ?: return@readAction null
+      buildFileInfoMessage(editor, project, fullPath)
     }
 
   override suspend fun selectEditor(projectId: ProjectId, documentPath: String, protocol: String): Boolean =
     onEdt {
       val virtualFile = findVirtualFile(documentPath, protocol) ?: return@onEdt false
       val project = projectId.findProjectOrNull() ?: return@onEdt false
-      val editor = fileBackend.selectEditor(project, virtualFile)
-      editor != null
+      val fMgr = FileEditorManager.getInstance(project)
+      val feditors = fMgr.openFile(virtualFile, true)
+      val first = feditors.firstOrNull()
+      if (first is TextEditor) !first.editor.isDisposed else false
     }
+
+  // ======================== Private helpers ========================
+
+  private fun findFile(filename: String, project: Project): VirtualFile? {
+    var found: VirtualFile?
+    if (filename.startsWith("~/") || filename.startsWith("~\\")) {
+      val relativePath = filename.substring(2)
+      val dir = System.getProperty("user.home")
+      logger.debug { "home dir file" }
+      logger.debug { "looking for $relativePath in $dir" }
+      found = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(Path(dir, relativePath))
+    } else {
+      found = VirtualFileManager.getInstance().findFileByNioPath(Path(filename))
+
+      if (found == null) {
+        found = findByNameInContentRoots(filename, project)
+        if (found == null) {
+          found = findByNameInProject(filename, project)
+        }
+      }
+    }
+
+    return found
+  }
+
+  private fun buildFileInfoMessage(editor: Editor, project: Project, fullPath: Boolean): String {
+    val msg = StringBuilder()
+    val vf = editor.virtualFile
+    if (vf != null) {
+      msg.append('"')
+      if (fullPath) {
+        msg.append(vf.path)
+      } else {
+        val root = ProjectRootManager.getInstance(project).fileIndex.getContentRootForFile(vf)
+        if (root != null) {
+          msg.append(vf.path.substring(root.path.length + 1))
+        } else {
+          msg.append(vf.path)
+        }
+      }
+      msg.append("\" ")
+    } else {
+      msg.append("\"[No File]\" ")
+    }
+
+    if (!editor.document.isWritable) {
+      msg.append("[RO] ")
+    } else if (FileDocumentManager.getInstance().isDocumentUnsaved(editor.document)) {
+      msg.append("[+] ")
+    }
+
+    val logicalPosition = editor.caretModel.logicalPosition
+    val lline = logicalPosition.line
+    val total = editor.document.lineCount
+    val pct = if (total > 0) (lline.toFloat() / total.toFloat() * 100f + 0.5).toInt() else 0
+
+    msg.append("line ").append(lline + 1).append(" of ").append(total)
+    msg.append(" --").append(pct).append("%-- ")
+
+    msg.append("col ").append(logicalPosition.column + 1)
+
+    return msg.toString()
+  }
+
+  private fun findByNameInContentRoots(filename: String, project: Project): VirtualFile? {
+    var found: VirtualFile? = null
+    val prm = ProjectRootManager.getInstance(project)
+    val roots = prm.contentRoots
+    for (i in roots.indices) {
+      logger.debug { "root[$i] = ${roots[i].path}" }
+      found = roots[i].findFileByRelativePath(filename)
+      if (found != null) {
+        break
+      }
+    }
+    return found
+  }
+
+  private fun findByNameInProject(filename: String, project: Project): VirtualFile? {
+    val projectScope = ProjectScope.getProjectScope(project)
+    val names = FilenameIndex.getVirtualFilesByName(filename, projectScope)
+    return names.firstOrNull()
+  }
+
+  companion object {
+    private val logger = Logger.getInstance(FileRemoteApiImpl::class.java.name)
+  }
 }
