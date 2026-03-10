@@ -8,7 +8,6 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
@@ -29,7 +28,7 @@ class MarkCommandTest : VimTestCase() {
     )
     typeText(commandToKeys("mark a"))
     val vimEditor = fixture.editor.vim
-    injector.markService.getMark(vimEditor.primaryCaret(), 'a')?.let {
+    getMark(vimEditor.primaryCaret(), 'a')?.let {
       kotlin.test.assertEquals(2, it.line)
       kotlin.test.assertEquals(0, it.col)
     } ?: fail("Mark is null")
@@ -46,7 +45,7 @@ class MarkCommandTest : VimTestCase() {
     )
     typeText(commandToKeys("mark G"))
     val vimEditor = fixture.editor.vim
-    injector.markService.getMark(vimEditor.primaryCaret(), 'G')?.let {
+    getMark(vimEditor.primaryCaret(), 'G')?.let {
       kotlin.test.assertEquals(2, it.line)
       kotlin.test.assertEquals(0, it.col)
     } ?: fail("Mark is null")
@@ -63,7 +62,7 @@ class MarkCommandTest : VimTestCase() {
     )
     typeText(commandToKeys("k a"))
     val vimEditor = fixture.editor.vim
-    injector.markService.getMark(vimEditor.primaryCaret(), 'a')?.let {
+    getMark(vimEditor.primaryCaret(), 'a')?.let {
       kotlin.test.assertEquals(2, it.line)
       kotlin.test.assertEquals(0, it.col)
     } ?: fail("Mark is null")
@@ -80,7 +79,7 @@ class MarkCommandTest : VimTestCase() {
     )
     typeText(commandToKeys("ka"))
     val vimEditor = fixture.editor.vim
-    injector.markService.getMark(vimEditor.primaryCaret(), 'a')?.let {
+    getMark(vimEditor.primaryCaret(), 'a')?.let {
       kotlin.test.assertEquals(2, it.line)
       kotlin.test.assertEquals(0, it.col)
     } ?: fail("Mark is null")
@@ -97,7 +96,7 @@ class MarkCommandTest : VimTestCase() {
     )
     typeText(commandToKeys("1,2 mark a"))
     val vimEditor = fixture.editor.vim
-    injector.markService.getMark(vimEditor.primaryCaret(), 'a')?.let {
+    getMark(vimEditor.primaryCaret(), 'a')?.let {
       kotlin.test.assertEquals(1, it.line)
       kotlin.test.assertEquals(0, it.col)
     } ?: fail("Mark is null")

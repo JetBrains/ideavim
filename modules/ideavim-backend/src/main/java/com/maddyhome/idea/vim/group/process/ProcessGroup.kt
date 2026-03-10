@@ -12,6 +12,7 @@ import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.CapturingProcessHandler
 import com.intellij.execution.process.ProcessAdapter
 import com.intellij.execution.process.ProcessEvent
+import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressIndicatorProvider
@@ -116,9 +117,7 @@ class ProcessGroup : VimProcessGroupBase() {
         }
         commands.add(quotedCommand)
 
-        if (logger.isDebugEnabled) {
-          logger.debug(String.format("shell=%s shellcmdflag=%s command=%s", shell, shellcmdflag, quotedCommand))
-        }
+        logger.debug { "shell=$shell shellcmdflag=$shellcmdflag command=$quotedCommand" }
 
         val commandLine = GeneralCommandLine(commands)
         if (currentDirectoryPath != null) {

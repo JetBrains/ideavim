@@ -8,6 +8,7 @@
 package com.maddyhome.idea.vim.ui.ex
 
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
 import com.intellij.ui.paint.PaintUtil
 import com.intellij.util.ui.JBUI
 import com.maddyhome.idea.vim.KeyHandler
@@ -186,7 +187,7 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
    * @param stroke  The potentially mapped keystroke
    */
   fun handleKey(stroke: KeyStroke) {
-    if (logger.isDebugEnabled) logger.debug("stroke=$stroke")
+    logger.debug { "stroke=$stroke" }
 
     // Typically, we would let the super class handle the keystroke. It would use any registered keybindings to convert
     // it to an action handler, or use the default handler (we don't actually have any keybindings). The default action
@@ -209,7 +210,7 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
   }
 
   override fun processKeyEvent(e: KeyEvent) {
-    if (logger.isDebugEnabled) logger.debug("key=$e")
+    logger.debug { "key=$e" }
 
     // The user has pressed or typed a key. The text field is first notified of a KEY_PRESSED event. If it's a simple
     // text character, it will be translated to a KEY_TYPED event with a keyChar, and we'll be notified again. We'll

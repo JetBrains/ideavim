@@ -113,6 +113,7 @@ dependencies {
     testFramework(TestFrameworkType.JUnit5)
 
     pluginModule(runtimeOnly(project(":modules:ideavim-common")))
+    pluginModule(runtimeOnly(project(":modules:ideavim-frontend")))
     pluginModule(runtimeOnly(project(":modules:ideavim-backend")))
     pluginModule(runtimeOnly(project(":modules:ideavim-acejump")))
     pluginModule(runtimeOnly(project(":modules:ideavim-rider")))

@@ -33,7 +33,7 @@ class MarkTest : VimTestCase() {
 """,
     )
     val vimEditor: VimEditor = IjVimEditor(fixture.editor)
-    val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'a')
+    val mark = getMark(vimEditor.primaryCaret(), 'a')
     assertNotNull<Any>(mark)
     kotlin.test.assertEquals(1, mark.line)
     kotlin.test.assertEquals(6, mark.col)
@@ -50,7 +50,7 @@ class MarkTest : VimTestCase() {
 """,
     )
     val vimEditor: VimEditor = IjVimEditor(fixture.editor)
-    val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'G')
+    val mark = getMark(vimEditor.primaryCaret(), 'G')
     assertNotNull<Any>(mark)
     kotlin.test.assertEquals(1, mark.line)
     kotlin.test.assertEquals(6, mark.col)
@@ -67,7 +67,7 @@ class MarkTest : VimTestCase() {
 """,
     )
     val vimEditor: VimEditor = IjVimEditor(fixture.editor)
-    val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'x')
+    val mark = getMark(vimEditor.primaryCaret(), 'x')
     kotlin.test.assertNull(mark)
   }
 
@@ -84,7 +84,7 @@ class MarkTest : VimTestCase() {
       """.trimIndent(),
     )
     val vimEditor: VimEditor = IjVimEditor(fixture.editor)
-    val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'a')
+    val mark = getMark(vimEditor.primaryCaret(), 'a')
     assertNotNull<Any>(mark)
   }
 
@@ -99,7 +99,7 @@ class MarkTest : VimTestCase() {
 """,
     )
     val vimEditor: VimEditor = IjVimEditor(fixture.editor)
-    val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'a')
+    val mark = getMark(vimEditor.primaryCaret(), 'a')
     assertNotNull<Any>(mark)
   }
 
@@ -114,7 +114,7 @@ class MarkTest : VimTestCase() {
 """,
     )
     val vimEditor: VimEditor = IjVimEditor(fixture.editor)
-    val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'x')
+    val mark = getMark(vimEditor.primaryCaret(), 'x')
     assertNotNull<Any>(mark)
     kotlin.test.assertEquals(1, mark.line)
     kotlin.test.assertEquals(6, mark.col)
@@ -131,7 +131,7 @@ class MarkTest : VimTestCase() {
 """,
     )
     val vimEditor: VimEditor = IjVimEditor(fixture.editor)
-    val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'x')
+    val mark = getMark(vimEditor.primaryCaret(), 'x')
     assertNotNull<Any>(mark)
     kotlin.test.assertEquals(0, mark.line)
     kotlin.test.assertEquals(6, mark.col)
@@ -150,7 +150,7 @@ class MarkTest : VimTestCase() {
       """.trimIndent(),
     )
     val vimEditor: VimEditor = IjVimEditor(fixture.editor)
-    val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'Y')
+    val mark = getMark(vimEditor.primaryCaret(), 'Y')
     assertNotNull<Any>(mark)
     kotlin.test.assertEquals(2, mark.line)
 
@@ -170,7 +170,7 @@ class MarkTest : VimTestCase() {
 """,
     )
     val vimEditor: VimEditor = IjVimEditor(fixture.editor)
-    val mark = injector.markService.getMark(vimEditor.primaryCaret(), 'Y')
+    val mark = getMark(vimEditor.primaryCaret(), 'Y')
     assertNotNull<Any>(mark)
     kotlin.test.assertEquals(2, mark.line)
 
@@ -804,7 +804,7 @@ class MarkTest : VimTestCase() {
     typeText(injector.parser.parseKeys("4ld3wu"))
 
     val vimEditor: VimEditor = IjVimEditor(fixture.editor)
-    val changeMark = injector.markService.getMark(vimEditor.primaryCaret(), '[')
+    val changeMark = getMark(vimEditor.primaryCaret(), '[')
     assertNotNull(changeMark)
     // IdeaVim behavior: marks stay at delete position
     // Vim/Neovim behavior: marks are updated to undo position (column 0)

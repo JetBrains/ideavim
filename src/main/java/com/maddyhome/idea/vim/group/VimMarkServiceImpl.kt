@@ -13,13 +13,14 @@ import com.intellij.openapi.components.RoamingType
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.platform.project.projectId
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMarkService
 import com.maddyhome.idea.vim.api.VimMarkServiceBase
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.group.bookmark.BookmarkBackendService
+import com.maddyhome.idea.vim.group.bookmark.BookmarkRemoteApi
 import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.mark.VimMark
 import com.maddyhome.idea.vim.mark.VimMark.Companion.create
@@ -38,8 +39,6 @@ import java.util.*
 )
 internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateComponent<Element?> {
 
-  private val bookmarkBackend get() = BookmarkBackendService.getInstance()
-
   override fun createGlobalMark(editor: VimEditor, char: Char, offset: Int): Mark? {
     if (!injector.globalIjOptions().ideamarks) {
       return super.createGlobalMark(editor, char, offset)
@@ -50,7 +49,7 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
     val virtualFileId = ijVirtualFile.rpcId()
     val projectId = ijEditor.project?.projectId()
     val info =
-      bookmarkBackend.createOrGetSystemMark(char, lp.line, lp.column, virtualFileId, projectId)
+      rpc { BookmarkRemoteApi.getInstance().createOrGetSystemMark(char, lp.line, lp.column, virtualFileId, projectId) }
         ?: return super.createGlobalMark(editor, char, offset)
     return VimMark(info.key, info.line, lp.column, ijVirtualFile.path, ijVirtualFile.fileSystem.protocol)
   }
@@ -63,7 +62,7 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
     }
 
     // When ideamarks is on, the BookmarksManager is the source of truth.
-    val info = bookmarkBackend.getBookmarkForMark(char)
+    val info = rpc { BookmarkRemoteApi.getInstance().getBookmarkForMark(char) }
     if (info != null) {
       val mark = VimMark(info.key, info.line, info.col, info.filepath, info.protocol)
       globalMarks[char] = mark
@@ -82,7 +81,7 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
     }
 
     // Update in-memory marks from IDE bookmarks (bookmarks are source of truth when they exist)
-    val bookmarks = bookmarkBackend.getAllBookmarks()
+    val bookmarks = rpc { BookmarkRemoteApi.getInstance().getAllBookmarks() }
     for (info in bookmarks) {
       globalMarks[info.key] = VimMark(info.key, info.line, info.col, info.filepath, info.protocol)
     }
@@ -91,7 +90,7 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
 
   override fun removeGlobalMark(char: Char) {
     if (injector.globalIjOptions().ideamarks) {
-      bookmarkBackend.removeBookmark(char)
+      rpc { BookmarkRemoteApi.getInstance().removeBookmark(char) }
     }
     super.removeGlobalMark(char)
   }
@@ -107,9 +106,7 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
         markElem.setAttribute("filename", StringUtil.notNullize(mark.filepath))
         markElem.setAttribute("protocol", StringUtil.notNullize(mark.protocol, "file"))
         globalMarksElement.addContent(markElem)
-        if (logger.isDebugEnabled) {
-          logger.debug("saved mark = $mark")
-        }
+        logger.debug { "saved mark = $mark" }
       }
     }
     element.addContent(globalMarksElement)
@@ -171,9 +168,7 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
         }
       }
     }
-    if (logger.isDebugEnabled) {
-      logger.debug("globalMarks=$globalMarks")
-    }
+    logger.debug { "globalMarks=$globalMarks" }
     val fileMarksElem = element.getChild("localmarks")
     if (fileMarksElem != null) {
       val fileList = fileMarksElem.getChildren("file")
@@ -201,9 +196,7 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
         fmarks.setTimestamp(timestamp)
       }
     }
-    if (logger.isDebugEnabled) {
-      logger.debug("localMarks=$filepathToLocalMarks")
-    }
+    logger.debug { "localMarks=$filepathToLocalMarks" }
   }
 
   override fun getState(): Element {

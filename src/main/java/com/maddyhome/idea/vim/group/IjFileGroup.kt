@@ -12,6 +12,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.editor.impl.editorId
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.TextEditor
@@ -27,7 +28,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimFileBase
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.group.file.FileBackendService
+import com.maddyhome.idea.vim.group.file.FileRemoteApi
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.globalIjOptions
@@ -39,28 +40,22 @@ import com.maddyhome.idea.vim.newapi.vim
  * Extends [VimFileBase] for pure-engine operations (`displayHexInfo`, `displayLocationInfo`).
  *
  * Backend-dependent operations (file finding, opening, saving, file-info messages) are
- * delegated to [FileBackendService]:
- * - In **monolith mode**, [FileBackendServiceImpl] provides direct IntelliJ API access.
- * - In **split mode**, [FileBackendServiceSplitClient] forwards via [FileRemoteApi] RPC.
+ * delegated via [FileRemoteApi] RPC. Works in both monolith and split mode.
  *
  * Local UI operations that only affect window/tab state on the frontend
- * (closeFile by editor, selectFile, selectNextFile) remain in this class.
+ * (closeFile by editor) remain in this class.
  *
  * Options (e.g. `ideawrite`) are read here on the frontend, never on the backend.
  */
 class IjFileGroup : VimFileBase() {
 
-  private val backend: FileBackendService get() = FileBackendService.getInstance()
-
   override fun openFile(filename: String, context: ExecutionContext, focusEditor: Boolean): String? {
-    if (logger.isDebugEnabled) {
-      logger.debug("openFile($filename)")
-    }
-    return backend.openFile(filename, extractProjectId(context), focusEditor)
+    logger.debug { "openFile($filename)" }
+    return rpc { FileRemoteApi.getInstance().openFile(filename, extractProjectId(context), focusEditor) }
   }
 
   override fun findFile(filename: String, context: ExecutionContext): String? {
-    return backend.findFile(filename, extractProjectId(context))
+    return rpc { FileRemoteApi.getInstance().findFile(filename, extractProjectId(context)) }
   }
 
   override fun closeFile(editor: VimEditor, context: ExecutionContext) {
@@ -89,18 +84,18 @@ class IjFileGroup : VimFileBase() {
   }
 
   override fun closeFile(number: Int, context: ExecutionContext) {
-    backend.closeFileByNumber(number, extractProjectId(context))
+    rpc { FileRemoteApi.getInstance().closeFile(number, extractProjectId(context)) }
   }
 
   override fun saveFile(editor: VimEditor, context: ExecutionContext) {
     val saveAll = injector.globalIjOptions().ideawrite.contains(IjOptionConstants.ideawrite_all)
     val editorId = (editor as IjVimEditor).editor.editorId()
-    backend.saveFile(editorId, saveAll)
+    rpc { FileRemoteApi.getInstance().saveFile(editorId, saveAll) }
   }
 
   override fun saveFiles(editor: VimEditor, context: ExecutionContext) {
     val editorId = (editor as IjVimEditor).editor.editorId()
-    backend.saveFile(editorId, true)
+    rpc { FileRemoteApi.getInstance().saveFile(editorId, true) }
   }
 
   override fun selectFile(count: Int, context: ExecutionContext): Boolean {
@@ -146,7 +141,7 @@ class IjFileGroup : VimFileBase() {
 
   override fun displayFileInfo(vimEditor: VimEditor, fullPath: Boolean): String? {
     val editorId = (vimEditor as IjVimEditor).editor.editorId()
-    return backend.buildFileInfoMessage(editorId, fullPath)
+    return rpc { FileRemoteApi.getInstance().buildFileInfoMessage(editorId, fullPath) }
   }
 
   override fun selectEditor(projectId: String, documentPath: String, protocol: String): VimEditor? {
@@ -155,7 +150,7 @@ class IjFileGroup : VimFileBase() {
     } catch (_: Exception) {
       return null
     }
-    val success = backend.selectEditor(platformProjectId, documentPath, protocol)
+    val success = rpc { FileRemoteApi.getInstance().selectEditor(platformProjectId, documentPath, protocol) }
     if (!success) return null
 
     // The backend opened/focused the file. Find the editor it opened.
