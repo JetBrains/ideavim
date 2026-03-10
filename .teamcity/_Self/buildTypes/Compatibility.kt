@@ -51,6 +51,10 @@ object Compatibility : IdeaVimBuildType({
               java -jar verifier1/verifier-cli-dev-all-2.jar check-plugin '${'$'}dev.ghostflyby.ideavim.toggleIME' [latest-IU] -team-city
               java -jar verifier1/verifier-cli-dev-all-2.jar check-plugin '${'$'}com.magidc.ideavim.anyObject' [latest-IU] -team-city
               java -jar verifier1/verifier-cli-dev-all-2.jar check-plugin '${'$'}com.yelog.ideavim.cmdfloat' [latest-IU] -team-city
+              java -jar verifier1/verifier-cli-dev-all-2.jar check-plugin '${'$'}gg.ninetyfive' [latest-IU] -team-city
+              java -jar verifier1/verifier-cli-dev-all-2.jar check-plugin '${'$'}com.github.pooryam92.vimcoach' [latest-IU] -team-city
+              java -jar verifier1/verifier-cli-dev-all-2.jar check-plugin '${'$'}lazyideavim.whichkeylazy' [latest-IU] -team-city
+              java -jar verifier1/verifier-cli-dev-all-2.jar check-plugin '${'$'}com.github.vimkeysuggest' [latest-IU] -team-city
             """.trimIndent()
     }
   }

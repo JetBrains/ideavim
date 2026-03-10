@@ -40,6 +40,11 @@ const knownPlugins = new Set([
   "com.magidc.ideavim.dial",
 
   "com.yelog.ideavim.cmdfloat", // https://plugins.jetbrains.com/plugin/28732-vim-cmdfloat
+
+  "gg.ninetyfive", // https://plugins.jetbrains.com/plugin/26445-ninetyfive
+  "com.github.pooryam92.vimcoach", // https://plugins.jetbrains.com/plugin/30148-vim-coach
+  "lazyideavim.whichkeylazy", // https://plugins.jetbrains.com/plugin/30446-which-key-lazy
+  "com.github.vimkeysuggest", // https://plugins.jetbrains.com/plugin/30486-vimkeysuggest
 ]);
 
 async function getPluginLinkByXmlId(xmlId: string): Promise<string | null> {
