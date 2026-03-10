@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.group.file
 import com.intellij.ide.vfs.VirtualFileId
 import com.intellij.ide.vfs.virtualFile
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.impl.EditorId
 import com.intellij.openapi.editor.impl.findEditorOrNull
@@ -22,35 +21,30 @@ import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.platform.project.ProjectId
 import com.intellij.platform.project.findProjectOrNull
 import com.maddyhome.idea.vim.group.findVirtualFile
+import com.maddyhome.idea.vim.group.onEdt
 import com.maddyhome.idea.vim.helper.EngineMessageHelper
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 /**
  * RPC handler for [FileRemoteApi].
- * Instantiated by [FileRemoteApiProvider] during extension registration.
  * Delegates to [FileBackendServiceImpl] for backend-dependent operations.
  *
- * RPC calls arrive on a background thread, but backend APIs use Swing/EDT,
- * so every delegation switches to [Dispatchers.EDT].
- *
- * Methods that exist on the [FileBackendService] interface delegate directly.
- * Methods for local-only UI operations (selectFile, selectNextFile, closeCurrentFile)
- * are inlined here since they are not part of [FileBackendService].
+ * Uses [onEdt] to dispatch to EDT only when not already on it:
+ * - **Monolith**: RPC resolves locally, handler runs on EDT → skip `withContext(EDT)`
+ * - **Split**: RPC arrives on a background thread → `withContext(EDT)` dispatches to backend EDT
  */
 internal class FileRemoteApiImpl : FileRemoteApi {
 
   private val fileBackend: FileBackendServiceImpl
-    get() = service<FileBackendService>() as FileBackendServiceImpl
+    get() = service()
 
-  override suspend fun findFile(filename: String, projectId: ProjectId?): String? = withContext(Dispatchers.EDT) {
-    val project = projectId?.findProjectOrNull() ?: return@withContext null
+  override suspend fun findFile(filename: String, projectId: ProjectId?): String? = onEdt {
+    val project = projectId?.findProjectOrNull() ?: return@onEdt null
     fileBackend.findFile(filename, project)?.path
   }
 
   override suspend fun openFile(filename: String, projectId: ProjectId?, focusEditor: Boolean): String? =
-    withContext(Dispatchers.EDT) {
-      val project = projectId?.findProjectOrNull() ?: return@withContext "No project found"
+    onEdt {
+      val project = projectId?.findProjectOrNull() ?: return@onEdt "No project found"
       val found = fileBackend.findFile(filename, project)
       if (found != null) {
         val type = FileTypeManager.getInstance().getKnownFileTypeOrAssociate(found, project)
@@ -64,28 +58,28 @@ internal class FileRemoteApiImpl : FileRemoteApi {
     }
 
   override suspend fun closeCurrentFile(projectId: ProjectId?, virtualFileId: VirtualFileId?) =
-    withContext(Dispatchers.EDT) {
-    val project = projectId?.findProjectOrNull() ?: return@withContext
-    val fileEditorManager = FileEditorManagerEx.getInstanceEx(project)
-    val window = fileEditorManager.currentWindow
+    onEdt {
+      val project = projectId?.findProjectOrNull() ?: return@onEdt
+      val fileEditorManager = FileEditorManagerEx.getInstanceEx(project)
+      val window = fileEditorManager.currentWindow
       val currentFile = fileEditorManager.currentFile
 
       if (currentFile != null && window != null) {
         window.closeFile(currentFile)
-      window.requestFocus(true)
-      if (!ApplicationManager.getApplication().isUnitTestMode) {
-        EditorsSplitters.focusDefaultComponentInSplittersIfPresent(project)
-      }
-    } else {
+        window.requestFocus(true)
+        if (!ApplicationManager.getApplication().isUnitTestMode) {
+          EditorsSplitters.focusDefaultComponentInSplittersIfPresent(project)
+        }
+      } else {
         val vf = virtualFileId?.virtualFile()
-      if (vf != null) {
-        fileEditorManager.closeFile(vf)
+        if (vf != null) {
+          fileEditorManager.closeFile(vf)
+        }
       }
     }
-  }
 
-  override suspend fun closeFile(number: Int, projectId: ProjectId?) = withContext(Dispatchers.EDT) {
-    val project = projectId?.findProjectOrNull() ?: return@withContext
+  override suspend fun closeFile(number: Int, projectId: ProjectId?) = onEdt {
+    val project = projectId?.findProjectOrNull() ?: return@onEdt
     val fileEditorManager = FileEditorManagerEx.getInstanceEx(project)
     val window = fileEditorManager.currentWindow
     val editors = fileEditorManager.openFiles
@@ -100,31 +94,31 @@ internal class FileRemoteApiImpl : FileRemoteApi {
   }
 
   override suspend fun saveFile(editorId: EditorId, saveAll: Boolean) =
-    withContext(Dispatchers.EDT) {
-      val editor = editorId.findEditorOrNull() ?: return@withContext
+    onEdt {
+      val editor = editorId.findEditorOrNull() ?: return@onEdt
       fileBackend.saveFile(editor, saveAll)
     }
 
-  override suspend fun selectFile(count: Int, projectId: ProjectId?): Boolean = withContext(Dispatchers.EDT) {
+  override suspend fun selectFile(count: Int, projectId: ProjectId?): Boolean = onEdt {
     var idx = count
-    val project = projectId?.findProjectOrNull() ?: return@withContext false
+    val project = projectId?.findProjectOrNull() ?: return@onEdt false
     val fem = FileEditorManager.getInstance(project)
     val editors = fem.openFiles
     if (idx == 99) {
       idx = editors.size - 1
     }
     if (idx < 0 || idx >= editors.size) {
-      return@withContext false
+      return@onEdt false
     }
     fem.openFile(editors[idx], true)
     true
   }
 
-  override suspend fun selectNextFile(count: Int, projectId: ProjectId?) = withContext(Dispatchers.EDT) {
-    val project = projectId?.findProjectOrNull() ?: return@withContext
+  override suspend fun selectNextFile(count: Int, projectId: ProjectId?) = onEdt {
+    val project = projectId?.findProjectOrNull() ?: return@onEdt
     val fem = FileEditorManager.getInstance(project)
     val editors = fem.openFiles
-    val current = fem.selectedFiles.getOrNull(0) ?: return@withContext
+    val current = fem.selectedFiles.getOrNull(0) ?: return@onEdt
     for (i in editors.indices) {
       if (editors[i] == current) {
         val pos = (i + (count % editors.size) + editors.size) % editors.size
@@ -134,16 +128,16 @@ internal class FileRemoteApiImpl : FileRemoteApi {
   }
 
   override suspend fun buildFileInfoMessage(editorId: EditorId, fullPath: Boolean): String? =
-    withContext(Dispatchers.EDT) {
-      val editor = editorId.findEditorOrNull() ?: return@withContext null
-      val project = editor.project ?: return@withContext null
+    onEdt {
+      val editor = editorId.findEditorOrNull() ?: return@onEdt null
+      val project = editor.project ?: return@onEdt null
       fileBackend.buildFileInfoMessage(editor, project, fullPath)
     }
 
   override suspend fun selectEditor(projectId: ProjectId, documentPath: String, protocol: String): Boolean =
-    withContext(Dispatchers.EDT) {
-      val virtualFile = findVirtualFile(documentPath, protocol) ?: return@withContext false
-      val project = projectId.findProjectOrNull() ?: return@withContext false
+    onEdt {
+      val virtualFile = findVirtualFile(documentPath, protocol) ?: return@onEdt false
+      val project = projectId.findProjectOrNull() ?: return@onEdt false
       val editor = fileBackend.selectEditor(project, virtualFile)
       editor != null
     }

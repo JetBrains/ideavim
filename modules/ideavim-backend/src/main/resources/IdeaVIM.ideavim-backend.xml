@@ -22,15 +22,12 @@
   </projectListeners>
 
   <extensions defaultExtensionNs="com.intellij">
-    <!-- Backend services — run in backend + monolith mode -->
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.process.ProcessGroup"
-                        serviceInterface="com.maddyhome.idea.vim.api.VimProcessGroup"/>
-
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.file.FileBackendServiceImpl"
-                        serviceInterface="com.maddyhome.idea.vim.group.file.FileBackendService"/>
-
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.bookmark.BookmarkBackendServiceImpl"
-                        serviceInterface="com.maddyhome.idea.vim.group.bookmark.BookmarkBackendService"/>
+    <!-- Backend impl services — used by RPC handlers, not exposed as interface impls.
+         The unified frontend services (registered in plugin.xml) always go through RPC,
+         which resolves to these handlers in both monolith and split mode. -->
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.process.ProcessGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.file.FileBackendServiceImpl"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.bookmark.BookmarkBackendServiceImpl"/>
 
     <!-- RPC: expose ProcessGroup to thin-client frontend -->
     <platform.rpc.backend.remoteApiProvider

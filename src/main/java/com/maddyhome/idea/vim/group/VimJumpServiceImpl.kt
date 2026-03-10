@@ -12,25 +12,22 @@ import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.RoamingType
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
-import com.intellij.openapi.fileEditor.ex.IdeDocumentHistory
 import com.intellij.openapi.util.text.StringUtil
+import com.intellij.platform.project.projectId
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimJumpServiceBase
 import com.maddyhome.idea.vim.diagnostic.vimLogger
+import com.maddyhome.idea.vim.group.jump.JumpRemoteApi
 import com.maddyhome.idea.vim.mark.Jump
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.initInjector
 import org.jdom.Element
 
 /**
- * Full jump service with persistence and [IdeDocumentHistory] integration.
+ * Jump service with persistence and navigation integration via RPC.
  *
- * In **split mode** (thin client), it is overridden by [VimJumpServiceSplitClient]
- * from `ideavim-frontend-split.xml`.
- *
- * Handles state serialization to `vim_settings_local.xml` and provides
- * [includeCurrentCommandAsNavigation] which integrates with IntelliJ's
- * Recent Places navigation.
+ * [includeCurrentCommandAsNavigation] delegates to the backend via [JumpRemoteApi]
+ * where [IdeDocumentHistory] is available. Works in both monolith and split mode.
  */
 @State(
   name = "VimJumpsSettings",
@@ -45,7 +42,8 @@ internal class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateCompone
 
   override fun includeCurrentCommandAsNavigation(editor: VimEditor) {
     val project = (editor as IjVimEditor).editor.project ?: return
-    IdeDocumentHistory.getInstance(project).includeCurrentCommandAsNavigation()
+    val projectId = project.projectId()
+    rpc { JumpRemoteApi.getInstance().includeCurrentCommandAsNavigation(projectId) }
   }
 
   // We do not delete old project records.
