@@ -10,8 +10,8 @@ package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.common.VimListenersNotifier
 import com.maddyhome.idea.vim.diagnostic.VimLogger
-import com.maddyhome.idea.vim.extension.JsonExtensionProvider
 import com.maddyhome.idea.vim.extension.ExtensionLoader
+import com.maddyhome.idea.vim.extension.JsonExtensionProvider
 import com.maddyhome.idea.vim.group.TabService
 import com.maddyhome.idea.vim.group.VimWindowGroup
 import com.maddyhome.idea.vim.history.VimHistory

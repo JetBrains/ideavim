@@ -40,7 +40,7 @@ interface CommandProvider {
   }
 
   private fun getFile(): InputStream {
-    return object {}.javaClass.classLoader.getResourceAsStream("ksp-generated/$commandListFileName")
+    return this.javaClass.classLoader.getResourceAsStream("ksp-generated/$commandListFileName")
       ?: throw RuntimeException("Failed to fetch ex commands from ${javaClass.name}")
   }
 }

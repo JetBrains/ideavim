@@ -24,7 +24,7 @@ interface VimscriptFunctionProvider {
   }
 
   private fun getFile(): InputStream {
-    return object {}.javaClass.classLoader.getResourceAsStream("ksp-generated/$functionListFileName")
+    return this.javaClass.classLoader.getResourceAsStream("ksp-generated/$functionListFileName")
       ?: throw RuntimeException("Failed to fetch functions for ${javaClass.name}")
   }
 }
