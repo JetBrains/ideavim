@@ -16,8 +16,8 @@ interface VimWindowGroup {
   fun selectWindow(context: ExecutionContext, index: Int)
   fun selectPreviousWindow(context: ExecutionContext)
   fun closeAllExceptCurrent(context: ExecutionContext)
-  fun splitWindowVertical(context: ExecutionContext, filename: String)
-  fun splitWindowHorizontal(context: ExecutionContext, filename: String)
+  fun splitWindowVertical(context: ExecutionContext, filename: String, focusNew: Boolean = true)
+  fun splitWindowHorizontal(context: ExecutionContext, filename: String, focusNew: Boolean = true)
   fun closeCurrentWindow(context: ExecutionContext)
   fun closeAll(context: ExecutionContext)
 }
