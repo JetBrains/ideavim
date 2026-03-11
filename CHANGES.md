@@ -42,10 +42,12 @@ usual beta standards.
 * [VIM-3948](https://youtrack.jetbrains.com/issue/VIM-3948) Improved hint generation visibility checks for better UI component detection
 * Fixed high CPU usage while showing command line
 * Fixed comparison of String and Number in VimScript expressions
+* Fixed recursive key mappings (e.g., `map b wbb`) causing an apparent infinite loop - `maxmapdepth` limit now properly terminates the entire mapping chain
 
 ### Merged PRs:
 * [1414](https://github.com/JetBrains/ideavim/pull/1414) by [Matt Ellis](https://github.com/citizenmatt): Refactor/functions
 * [1442](https://github.com/JetBrains/ideavim/pull/1442) by [Matt Ellis](https://github.com/citizenmatt): Fix high CPU usage while showing command line
+* [1585](https://github.com/JetBrains/ideavim/pull/1585) by [1grzyb1](https://github.com/1grzyb1): Break in case of maximum recursion depth
 
 ## 2.28.0, 2025-12-09
 
