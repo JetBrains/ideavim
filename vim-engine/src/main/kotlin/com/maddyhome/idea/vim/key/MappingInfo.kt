@@ -104,7 +104,6 @@ class ToKeysMappingInfo(
         val allowKeyMappings = isRecursive && !(first && lhsIsPrefixOfRhs)
         keyHandler.handleKey(editor, keyStroke, context, allowKeyMappings, keyState)
         first = false
-        if (keyHandler.maxMapDepthReached) break
       }
     } finally {
       keyHandler.keyStack.removeFirst()
