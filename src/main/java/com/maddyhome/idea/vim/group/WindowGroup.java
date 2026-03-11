@@ -263,13 +263,13 @@ public class WindowGroup extends WindowGroupBase {
   }
 
   @Override
-  public void splitWindowHorizontal(@NotNull ExecutionContext context, @NotNull String filename) {
-    splitWindow(SwingConstants.HORIZONTAL, (DataContext)context.getContext(), filename);
+  public void splitWindowHorizontal(@NotNull ExecutionContext context, @NotNull String filename, boolean focusNew) {
+    splitWindow(SwingConstants.HORIZONTAL, (DataContext)context.getContext(), filename, focusNew);
   }
 
   @Override
-  public void splitWindowVertical(@NotNull ExecutionContext context, @NotNull String filename) {
-    splitWindow(SwingConstants.VERTICAL, (DataContext)context.getContext(), filename);
+  public void splitWindowVertical(@NotNull ExecutionContext context, @NotNull String filename, boolean focusNew) {
+    splitWindow(SwingConstants.VERTICAL, (DataContext)context.getContext(), filename, focusNew);
   }
 
   @Override
@@ -309,7 +309,7 @@ public class WindowGroup extends WindowGroupBase {
     windows.get(normalized).setAsCurrentWindow(true);
   }
 
-  private void splitWindow(int orientation, @NotNull DataContext context, @NotNull String filename) {
+  private void splitWindow(int orientation, @NotNull DataContext context, @NotNull String filename, boolean focusNew) {
     final Project project = PlatformDataKeys.PROJECT.getData(context);
     if (project == null) return;
     final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
@@ -331,7 +331,7 @@ public class WindowGroup extends WindowGroupBase {
 
     final EditorWindow editorWindow = fileEditorManager.getSplitters().getCurrentWindow();
     if (editorWindow != null) {
-      editorWindow.split(orientation, true, virtualFile, true);
+      editorWindow.split(orientation, true, virtualFile, focusNew);
     }
   }
 

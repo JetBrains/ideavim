@@ -85,13 +85,13 @@ class NerdTreeEverywhere : VimExtension {
     register("NERDTreeMapPreviewVSplit", "gs", NerdTreeAction { event, tree ->
       val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@NerdTreeAction
       if (file.isDirectory) return@NerdTreeAction
-      injector.window.splitWindowVertical(event.dataContext.vim, file.path)
+      injector.window.splitWindowVertical(event.dataContext.vim, file.path, focusNew = false)
       tree.requestFocus()
     })
     register("NERDTreeMapPreviewSplit", "gi", NerdTreeAction { event, tree ->
       val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@NerdTreeAction
       if (file.isDirectory) return@NerdTreeAction
-      injector.window.splitWindowHorizontal(event.dataContext.vim, file.path)
+      injector.window.splitWindowHorizontal(event.dataContext.vim, file.path, focusNew = false)
       tree.requestFocus()
     })
   }) {

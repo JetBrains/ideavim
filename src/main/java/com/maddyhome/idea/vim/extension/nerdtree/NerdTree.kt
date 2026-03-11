@@ -252,7 +252,7 @@ private fun createMappings(): Map<List<KeyStroke>, NerdTreeAction> = navigationM
     NerdTreeAction { event, tree ->
       val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@NerdTreeAction
       if (file.isDirectory) return@NerdTreeAction
-      injector.window.splitWindowVertical(event.dataContext.vim, file.path)
+      injector.window.splitWindowVertical(event.dataContext.vim, file.path, focusNew = false)
       tree.requestFocus()
     },
   )
@@ -262,7 +262,7 @@ private fun createMappings(): Map<List<KeyStroke>, NerdTreeAction> = navigationM
     NerdTreeAction { event, tree ->
       val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@NerdTreeAction
       if (file.isDirectory) return@NerdTreeAction
-      injector.window.splitWindowHorizontal(event.dataContext.vim, file.path)
+      injector.window.splitWindowHorizontal(event.dataContext.vim, file.path, focusNew = false)
       tree.requestFocus()
     },
   )
