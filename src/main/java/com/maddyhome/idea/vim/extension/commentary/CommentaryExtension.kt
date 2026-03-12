@@ -7,7 +7,7 @@
  */
 package com.maddyhome.idea.vim.extension.commentary
 
-import com.intellij.openapi.actionSystem.IdeActions
+import com.intellij.openapi.editor.impl.editorId
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
@@ -30,10 +30,11 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMa
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.exportOperatorFunction
+import com.maddyhome.idea.vim.group.comment.CommentaryRemoteApi
+import com.maddyhome.idea.vim.group.rpc
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.ij
-import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 
 internal class CommentaryExtension : VimExtension {
@@ -47,54 +48,29 @@ internal class CommentaryExtension : VimExtension {
       resetCaret: Boolean = true,
     ): Boolean {
       val mode = editor.mode
-      if (mode !is Mode.VISUAL) {
-        editor.ij.selectionModel.setSelection(range.startOffset, range.endOffset)
-      }
+      val ijEditor = editor.ij
+      val document = ijEditor.document
 
-      // Treat block- and character-wise selections as block comments. Fall back if the first action isn't available
-      val actions = if (selectionType === SelectionType.LINE_WISE) {
-        listOf(IdeActions.ACTION_COMMENT_LINE, IdeActions.ACTION_COMMENT_BLOCK)
+      val editorId = ijEditor.editorId()
+      val caretOffset = if (resetCaret) range.startOffset else -1
+      if (selectionType === SelectionType.LINE_WISE) {
+        val startLine = document.getLineNumber(range.startOffset)
+        var endLine = document.getLineNumber(range.endOffset)
+        // Adjust endLine if the range ends at the start of a line (don't include that line)
+        if (endLine > startLine && document.getLineStartOffset(endLine) == range.endOffset) {
+          endLine--
+        }
+        val finalEndLine = endLine
+        rpc(ijEditor.project) {
+          CommentaryRemoteApi.getInstance().toggleLineComment(editorId, startLine, finalEndLine, caretOffset)
+        }
       } else {
-        listOf(IdeActions.ACTION_COMMENT_BLOCK, IdeActions.ACTION_COMMENT_LINE)
+        rpc(ijEditor.project) {
+          CommentaryRemoteApi.getInstance()
+            .toggleBlockComment(editorId, range.startOffset, range.endOffset, caretOffset)
+        }
       }
-
-      val callback = { afterCommenting(mode, editor, resetCaret, range) }
-      return actions.any { executeActionWithCallback(editor, it, context, callback) }
-    }
-
-    private fun executeActionWithCallback(
-      editor: VimEditor,
-      action: String,
-      context: ExecutionContext,
-      callback: () -> Unit,
-    ): Boolean {
-      val result = injector.actionExecutor.executeAction(editor, name = action, context = context)
-      if (result) callback()
-      return result
-    }
-
-    private fun afterCommenting(
-      mode: Mode,
-      editor: VimEditor,
-      resetCaret: Boolean,
-      range: TextRange,
-    ) {
-      // Remove the selection, if we added it
-      if (mode !is Mode.VISUAL) {
-        editor.removeSelection()
-      }
-
-      // Put the caret back at the start of the range, as though it was moved by the operator's motion argument.
-      // This is what Vim does. If IntelliJ is configured to add comments at the start of the line, this might put
-      // the caret in the "wrong" place. E.g. gc_ should put the caret on the first non-whitespace character. This
-      // is calculated by the motion, saved in the marks, and then we insert the comment. If it's inserted at the
-      // first non-whitespace character, then the caret is in the right place. If it's inserted at the first column,
-      // then the caret is now in a bit of a weird place. We can't detect this scenario, so we just have to accept
-      // the difference
-      // TODO: If we don't move the caret to the start offset, we should maintain the current logical position
-      if (resetCaret) {
-        editor.primaryCaret().moveToOffset(range.startOffset)
-      }
+      return true
     }
   }
 
