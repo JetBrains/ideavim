@@ -55,6 +55,7 @@ class CommandBuilder private constructor(
   /** Returns true if the command builder is clean and ready to start building */
   val isEmpty
     get() = commandState == CurrentCommandState.NEW_COMMAND
+      && !isRegisterPending
       && selectedRegister == null
       && counts.size == 1 && counts[0] == 0
       && action == null
@@ -398,6 +399,7 @@ class CommandBuilder private constructor(
 
     if (keyStrokeTrie != other.keyStrokeTrie) return false
     if (counts != other.counts) return false
+    if (isRegisterPending != other.isRegisterPending) return false
     if (selectedRegister != other.selectedRegister) return false
     if (action != other.action) return false
     if (argument != other.argument) return false
@@ -412,6 +414,7 @@ class CommandBuilder private constructor(
   override fun hashCode(): Int {
     var result = keyStrokeTrie.hashCode()
     result = 31 * result + counts.hashCode()
+    result = 31 * result + isRegisterPending.hashCode()
     result = 31 * result + selectedRegister.hashCode()
     result = 31 * result + action.hashCode()
     result = 31 * result + argument.hashCode()
@@ -430,6 +433,7 @@ class CommandBuilder private constructor(
       commandKeyStrokes.toMutableList()
     )
     result.selectedRegister = selectedRegister
+    result.isRegisterPending = isRegisterPending
     result.action = action
     result.argument = argument
     result.commandState = commandState
