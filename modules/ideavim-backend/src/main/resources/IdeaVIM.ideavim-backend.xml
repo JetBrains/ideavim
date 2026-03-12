@@ -40,5 +40,9 @@
     <platform.rpc.backend.remoteApiProvider
         implementation="com.maddyhome.idea.vim.group.bookmark.BookmarkRemoteApiProvider"/>
 
+    <!-- RPC: expose commenting operations to thin-client frontend -->
+    <platform.rpc.backend.remoteApiProvider
+        implementation="com.maddyhome.idea.vim.group.comment.CommentaryRemoteApiProvider"/>
+
   </extensions>
 </idea-plugin>
