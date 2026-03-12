@@ -94,6 +94,45 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
     }
   }
 
+  private fun activateForEditor(editor: Editor) {
+    this.myLabel.setFont(selectEditorFont(editor, this.myLabel.text))
+    entry.setFont(selectEditorFont(editor, entry.text))
+    statusLabel.setFont(selectEditorFont(editor, statusLabel.text))
+
+    val foregroundColour = editor.colorsScheme.defaultForeground
+    entry.setForeground(foregroundColour)
+    // TODO: Introduce IdeaVim colour scheme for "SpecialKey"?
+    val whitespaceColour = editor.colorsScheme.getColor(EditorColors.WHITESPACES_COLOR)
+    entry.setSpecialKeyForeground(whitespaceColour ?: foregroundColour)
+    this.myLabel.setForeground(entry.getForeground())
+    this.statusLabel.setForeground(entry.getForeground())
+
+    entry.isVisible = this.isActive
+    myLabel.isVisible = this.isActive
+
+    setEditor(editor)
+    parent = editor.contentComponent
+    if (ApplicationManager.getApplication().isUnitTestMode) {
+      return
+    }
+
+    val root = SwingUtilities.getRootPane(parent) ?: return
+    val glassPane = root.getGlassPane() as JComponent
+    oldGlass = glassPane
+    oldLayout = glassPane.layout
+    wasOpaque = glassPane.isOpaque
+    glassPane.setLayout(null)
+    glassPane.setOpaque(false)
+    glassPane.add(this)
+    glassPane.addComponentListener(resizePanelListener)
+    positionPanel()
+    glassPane.isVisible = true
+
+    if (this.isActive) {
+      entry.requestFocusInWindow()
+    }
+  }
+
   /**
    * Turns on the ex entry field for the given editor
    *
@@ -105,21 +144,10 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
   fun activate(editor: Editor, context: DataContext?, label: String, initText: String) {
     logger.info("Activate ex entry panel")
     this.myLabel.setText(label)
-    this.myLabel.setFont(selectEditorFont(editor, label))
     entry.reset()
     entry.setText(initText)
-    entry.setFont(selectEditorFont(editor, initText))
-    parent = editor.contentComponent
-
-    val foregroundColour = editor.colorsScheme.defaultForeground
-    entry.setForeground(foregroundColour)
-    // TODO: Introduce IdeaVim colour scheme for "SpecialKey"?
-    val whitespaceColour = editor.colorsScheme.getColor(EditorColors.WHITESPACES_COLOR)
-    entry.setSpecialKeyForeground(whitespaceColour ?: foregroundColour)
-    this.myLabel.setForeground(entry.getForeground())
 
     this.context = context
-    setEditor(editor)
 
     histIndex = VimPlugin.getHistory().getEntries(historyType, 0, 0).size
 
@@ -131,21 +159,29 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
       horizontalOffset = editor.scrollingModel.horizontalScrollOffset
     }
 
-    if (!ApplicationManager.getApplication().isUnitTestMode) {
-      val root = SwingUtilities.getRootPane(parent) ?: return
-      val glassPane = root.getGlassPane() as JComponent
-      oldGlass = glassPane
-      oldLayout = glassPane.layout
-      wasOpaque = glassPane.isOpaque
-      glassPane.setLayout(null)
-      glassPane.setOpaque(false)
-      glassPane.add(this)
-      glassPane.addComponentListener(resizePanelListener)
-      positionPanel()
-      glassPane.isVisible = true
-      entry.requestFocusInWindow()
-    }
     this.isActive = true
+    activateForEditor(editor)
+  }
+
+  fun removeFromUI() {
+    if (!statusLabel.text.isEmpty()) {
+      // Delay removal until status text is clear as well
+      entry.isVisible = this.isActive
+      myLabel.isVisible = this.isActive
+      positionPanel()
+      return
+    }
+
+    if (!ApplicationManager.getApplication().isUnitTestMode) {
+      oldGlass!!.removeComponentListener(resizePanelListener)
+      oldGlass!!.isVisible = false
+      oldGlass!!.remove(this)
+      oldGlass!!.setOpaque(wasOpaque)
+      oldGlass!!.setLayout(oldLayout)
+    }
+
+    parent = null
+    setEditor(null)
   }
 
   fun deactivate(refocusOwningEditor: Boolean) {
@@ -190,28 +226,23 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
           requestFocus(parent!!)
         }
 
-        oldGlass!!.removeComponentListener(resizePanelListener)
-        oldGlass!!.isVisible = false
-        oldGlass!!.remove(this)
-        oldGlass!!.setOpaque(wasOpaque)
-        oldGlass!!.setLayout(oldLayout)
       }
 
-      parent = null
+      this.isActive = false
+      removeFromUI()
     }
 
     isReplaceMode = false
-    setEditor(null)
     context = null
 
     // We have this in the end, because `entry.deactivate()` communicates with active panel during deactivation
-    this.isActive = false
     finishOn = null
     this.inputInterceptor = null
     inputProcessing = null
   }
 
   private fun reset() {
+    statusLabel.text = ""
     deactivate(false)
   }
 
@@ -397,6 +428,29 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
     }
   }
 
+  fun clearStatusText() {
+    if (statusLabel.text == "") {
+      return
+    }
+    statusLabel.text = ""
+    if (!this.isActive && this.ijEditor != null) {
+      removeFromUI()
+    }
+  }
+
+  fun setStatusText(editor: Editor, text: String) {
+    if (text == statusLabel.text) {
+      return
+    }
+    if (text.isEmpty()) {
+      clearStatusText()
+      return
+    }
+
+    statusLabel.text = text
+    activateForEditor(editor)
+  }
+
   /**
    * Pass the keystroke on to the text field for handling
    *
@@ -469,6 +523,14 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
       val bounds = scroll.bounds
       bounds.translate(0, scroll.getHeight() - height)
       bounds.height = height
+
+      val statusOnly = !this.isActive && !myLabel.text.isEmpty()
+      if (statusOnly) {
+        val statusLabelWidth = statusLabel.preferredSize.width + 2
+        bounds.width = statusLabelWidth
+        bounds.translate(scroll.width - statusLabelWidth, 0)
+      }
+
       val pos = SwingUtilities.convertPoint(scroll.getParent(), bounds.location, oldGlass)
       bounds.location = pos
       setBounds(bounds)
@@ -490,6 +552,7 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
   // UI stuff
   private var parent: JComponent? = null
   private val myLabel: JLabel = JLabel(" ")
+  private val statusLabel: JLabel = JLabel("")
   val entry: ExTextField = ExTextField(this)
   private var oldGlass: JComponent? = null
   private var oldLayout: LayoutManager? = null
@@ -515,6 +578,11 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
     gbc.gridx = 0
     layout.setConstraints(this.myLabel, gbc)
     add(this.myLabel)
+
+    gbc.gridx = 2
+    layout.setConstraints(this.statusLabel, gbc)
+    add(this.statusLabel)
+
     gbc.gridx = 1
     gbc.weightx = 1.0
     gbc.fill = GridBagConstraints.HORIZONTAL

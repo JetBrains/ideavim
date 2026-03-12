@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.inCommandLineModeWithVisual
 import com.maddyhome.idea.vim.state.mode.inVisualMode
+import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import org.jetbrains.annotations.Contract
 import java.awt.Font
 import java.util.*
@@ -36,8 +37,9 @@ internal fun updateSearchHighlights(
   shouldIgnoreSmartCase: Boolean,
   showHighlights: Boolean,
   forceUpdate: Boolean,
+  newCaretPosition: Int? = null,
 ) {
-  updateSearchHighlights(null, pattern, 1, shouldIgnoreSmartCase, showHighlights, -1, null, true, forceUpdate)
+  updateSearchHighlights(null, pattern, 1, shouldIgnoreSmartCase, showHighlights, -1, null, true, forceUpdate, newCaretPosition)
 }
 
 internal fun updateIncsearchHighlights(
@@ -63,7 +65,8 @@ internal fun updateIncsearchHighlights(
     searchStartOffset,
     searchRange,
     forwards,
-    false
+    false,
+    null
   )
 }
 
@@ -84,6 +87,12 @@ internal fun addSubstitutionConfirmationHighlight(editor: Editor, start: Int, en
   )
 }
 
+enum class CountMatchesState {
+  NoCountMatches,
+  ShowCount,
+  MaybeClearCount
+}
+
 /**
  * Refreshes current search highlights for all visible editors
  */
@@ -97,6 +106,7 @@ private fun updateSearchHighlights(
   searchRange: LineRange?,
   forwards: Boolean,
   forceUpdate: Boolean,
+  newCaretPosition: Int?
 ): Int {
   var currentEditorCurrentMatchOffset = -1
 
@@ -107,15 +117,37 @@ private fun updateSearchHighlights(
       && (currentEditor == null || it.projectId == currentEditor.projectId)
   }
 
+  val countMatchesSetting = injector.globalOptions().showmatchcount
+  var editorWithSearchMatches = if (countMatchesSetting) { currentEditor?.ij } else { null }
+  if (countMatchesSetting && editorWithSearchMatches == null) {
+    editorWithSearchMatches = injector.editorGroup.getFocusedEditor()?.ij
+  }
+
+  if (!countMatchesSetting) {
+    // In case we were counting matches before clear it, the function
+    //  itself ensures nothing happens if it is cleared already
+    ExEntryPanel.getOrCreatePanelInstance().clearStatusText()
+  }
+
+  val shouldIgnoreCase = pattern == null || shouldIgnoreCase(pattern, shouldIgnoreSmartCase)
+
+  var maxhlduringincsearch = injector.globalOptions().maxhlduringincsearch
+  if (maxhlduringincsearch < 0)
+    maxhlduringincsearch = Int.MAX_VALUE
+
   editors.forEach {
     val editor = it.ij
+    val isCurrentEditor = editor == editorWithSearchMatches
+    var countMatches = if (!isCurrentEditor || !countMatchesSetting) CountMatchesState.NoCountMatches else CountMatchesState.ShowCount
+
     var currentMatchOffset = -1
 
     // Try to keep existing highlights if possible. Update if hlsearch has changed or if the pattern has changed.
     // Force update for the situations where the text is the same, but the ignore case values have changed.
     // E.g., Use `*` to search for a word (which ignores smartcase), then use `/<Up>` to search for the same pattern,
     // which will match smartcase. Or changing the smartcase/ignorecase settings
-    if (shouldRemoveSearchHighlights(editor, pattern, showHighlights) || forceUpdate) {
+    val clearHighlights = shouldRemoveSearchHighlights(editor, pattern, showHighlights)
+    if (clearHighlights || forceUpdate) {
       removeSearchHighlights(editor)
     }
 
@@ -125,23 +157,21 @@ private fun updateSearchHighlights(
       // hlsearch (+ incsearch/noincsearch)
       // Make sure the range fits this editor. Note that Vim will use the same range for all windows. E.g., given
       // `:1,5s/foo`, Vim will highlight all occurrences of `foo` in the first five lines of all visible windows
-      val vimEditor = editor.vim
-      val editorLastLine = vimEditor.lineCount() - 1
-      val searchStartLine = searchRange?.startLine ?: 0
-      val searchEndLine = (searchRange?.endLine ?: -1).coerceAtMost(editorLastLine)
-      if (searchStartLine <= editorLastLine) {
-        val results =
-          injector.searchHelper.findAll(
-            vimEditor,
-            pattern,
-            searchStartLine,
-            searchEndLine,
-            shouldIgnoreCase(pattern, shouldIgnoreSmartCase)
-          )
-        if (results.isNotEmpty()) {
-          if (editor === currentEditor?.ij) {
-            currentMatchOffset = findClosestMatch(results, initialOffset, count1, forwards)
+      val results = findAllMatches(pattern, editor.vim, searchRange,  shouldIgnoreCase)
+      if (results.isNotEmpty()) {
+        // Only in incsearch is current editor not null, then check result size
+        val showHighlightsInEditor = currentEditor == null || results.size < maxhlduringincsearch
+        if (editor == currentEditor?.ij) {
+          val currentMatchIndex = findClosestMatch(results, initialOffset, count1, forwards)
+          currentMatchOffset = if (currentMatchIndex == -1) -1 else results[currentMatchIndex].startOffset
+
+          if (!showHighlightsInEditor) {
+            // Always highlight at least the "current" match in the active editor
+            highlightSearchResults(editor, pattern, listOf(results[currentMatchIndex]), currentMatchOffset)
           }
+        }
+
+        if (showHighlightsInEditor) {
           highlightSearchResults(editor, pattern, results, currentMatchOffset)
         }
       }
@@ -172,11 +202,44 @@ private fun updateSearchHighlights(
       if (offset != null && editor === currentEditor?.ij) {
         currentMatchOffset = offset
       }
+    } else {
+      countMatches = CountMatchesState.MaybeClearCount
     }
 
-    if (editor === currentEditor?.ij) {
+    if (!isCurrentEditor)
+      return@forEach
+
+    var editorCaretOffset = editor.vim.primaryCaret().offset
+    if (currentEditor?.ij != null) {
       currentEditorCurrentMatchOffset = currentMatchOffset
+      editorCaretOffset = currentEditorCurrentMatchOffset
+    } else if (newCaretPosition != null) {
+      editorCaretOffset = newCaretPosition
     }
+
+    if (countMatches == CountMatchesState.NoCountMatches) {
+      return@forEach
+    }
+
+    // If any of the following hold we are still searching:
+    // - We just highlighted some search results (countMatches is not MaybeClear
+    // - We did not clear highlights (
+    // - We are moving towards to a new position
+    if (countMatches == CountMatchesState.MaybeClearCount && clearHighlights && newCaretPosition == null) {
+      ExEntryPanel.getOrCreatePanelInstance().clearStatusText()
+      return@forEach
+    }
+
+    // Search file for pattern, and determine total and position in results
+    val results = findAllMatches(pattern, editor.vim, searchRange,  shouldIgnoreCase)
+    val patternIndex = if (results.isEmpty()) {
+      -1
+    } else {
+      findClosestOrCurrentMatch(results, editorCaretOffset)
+    }
+
+    val countMessage = "[" + (patternIndex + 1) + "/" + results.size + "]"
+    ExEntryPanel.getOrCreatePanelInstance().setStatusText(editor, countMessage)
   }
 
   return currentEditorCurrentMatchOffset
@@ -205,6 +268,23 @@ private fun removeSearchHighlights(editor: Editor) {
 @Contract("_, _, false -> false; _, null, true -> false")
 private fun shouldAddAllSearchHighlights(editor: Editor, newPattern: String?, hlSearch: Boolean): Boolean {
   return hlSearch && newPattern != null && newPattern != editor.vimLastSearch && newPattern != ""
+}
+
+private fun findAllMatches(pattern: String, vimEditor: VimEditor, searchRange: LineRange?, shouldIgnoreCase: Boolean): List<TextRange> {
+  val editorLastLine = vimEditor.lineCount() - 1
+  val searchStartLine = searchRange?.startLine ?: 0
+  val searchEndLine = (searchRange?.endLine ?: -1).coerceAtMost(editorLastLine)
+  if (searchStartLine > editorLastLine) {
+    return listOf()
+  }
+
+  return injector.searchHelper.findAll(
+    vimEditor,
+    pattern,
+    searchStartLine,
+    searchEndLine,
+    shouldIgnoreCase
+  )
 }
 
 private fun findClosestMatch(
@@ -237,7 +317,24 @@ private fun findClosestMatch(
     return -1
   }
 
-  return sortedResults[nextIndex % results.size].startOffset
+  return nextIndex % results.size
+}
+
+private fun findClosestOrCurrentMatch(
+  results: List<TextRange>,
+  initialOffset: Int,
+): Int {
+  if (results.isEmpty() || initialOffset == -1) {
+    return -1
+  }
+
+  val firstMatch = results.filter { it.endOffset >= initialOffset }.minByOrNull { it.endOffset }
+  if (firstMatch == null) {
+    // Results is not empty but there is no match before offset, we must be past the last match
+    return results.size - 1
+  }
+  // Note that wrapping for the count does not make sense
+  return results.indexOfFirst { it.endOffset == firstMatch.endOffset }
 }
 
 internal fun highlightSearchResults(

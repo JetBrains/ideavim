@@ -90,6 +90,33 @@ class SearchHelperTest : VimTestCase() {
     kotlin.test.assertEquals(previousWordPosition, text.indexOf("second"))
   }
 
+
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
+  fun testFindAllIgnoreCaseOverwritesSmartCase() {
+    val text = "Lorem ipsum lorem ipsum"
+    configureByText(text)
+
+    val capitalMatch = TextRange(0, 5)
+    val lowerMatch = TextRange(12, 17)
+
+    val search = { ignoreCase: Boolean ->
+      injector.searchHelper.findAll(fixture.editor.vim, "\\<Lorem\\>", 0, -1, ignoreCase)
+    }
+
+    // Ensure ignore and smart case are off
+    enterCommand("set noignorecase")
+    enterCommand("set nosmartcase")
+
+    kotlin.test.assertEquals(listOf(capitalMatch), search(false))
+    // Even if both are off, ignore case should still ignore cases
+    kotlin.test.assertEquals(listOf(capitalMatch, lowerMatch), search(true))
+
+    enterCommand("set smartcase")
+    kotlin.test.assertEquals(listOf(capitalMatch), search(false))
+    kotlin.test.assertEquals(listOf(capitalMatch, lowerMatch), search(true))
+  }
+
   @Test
   fun testMotionOuterWordAction() {
     doTest(
