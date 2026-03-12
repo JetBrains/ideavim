@@ -10,14 +10,20 @@ package com.maddyhome.idea.vim.extension.sneak
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.EditorCustomElementRenderer
+import com.intellij.openapi.editor.Inlay
+import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.ScrollType
 import com.intellij.openapi.editor.colors.EditorColors
+import com.intellij.openapi.editor.colors.EditorFontType
 import com.intellij.openapi.editor.markup.EffectType
 import com.intellij.openapi.editor.markup.HighlighterLayer
 import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.util.Disposer
+import com.intellij.ui.JBColor
+import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.VimProjectService
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -34,8 +40,12 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.newapi.vim
 import org.jetbrains.annotations.TestOnly
 import java.awt.Font
+import java.awt.Graphics
+import java.awt.Point
+import java.awt.Rectangle
 import java.util.*
 import javax.swing.Timer
 
@@ -80,11 +90,23 @@ internal class IdeaVimSneakExtension : VimExtension {
     private val highlightHandler: HighlightHandler,
     private val direction: Direction,
   ) : ExtensionHandler {
+    private var useLabel: Boolean? = null
+
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
+      if (useLabel == null) {
+        useLabel = injector.variableService
+          .getGlobalVariableValue("sneak#label")
+          ?.toVimNumber()?.booleanValue
+          ?: false
+      }
       val charone = injector.keyGroup.getChar(editor) ?: return
       val chartwo = injector.keyGroup.getChar(editor) ?: return
       val range = Util.jumpTo(editor, charone, chartwo, direction)
       range?.let { highlightHandler.highlightSneakRange(editor.ij, range) }
+      if (useLabel == true) {
+        LabelUtil.jumpTo(editor, charone, chartwo, direction)
+          ?.let { highlightHandler.highlightSneakRange(editor.ij, it) }
+      }
       Util.lastSymbols = "${charone}${chartwo}"
       Util.lastSDirection = direction
     }
@@ -124,11 +146,91 @@ internal class IdeaVimSneakExtension : VimExtension {
       val position = caret.offset
       val chars = editor.text()
       val foundPosition = sneakDirection.findBiChar(editor, chars, position, charone, chartwo)
-      if (foundPosition != null) {
-        editor.primaryCaret().moveToOffset(foundPosition)
+      return jumpToPosition(editor, foundPosition)
+    }
+
+    fun jumpToPosition(editor: VimEditor, position: Int?): TextRange? {
+      if (position != null) {
+        editor.primaryCaret().moveToOffset(position)
       }
       editor.ij.scrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)
-      return foundPosition?.let { TextRange(foundPosition, foundPosition + 2) }
+      return position?.let { TextRange(position, position + 2) }
+    }
+  }
+
+  private object LabelUtil {
+    private val labels = ";sftunq/SFGHLTUNRMQZ?0".toList()
+    private val labelInlays: MutableList<Inlay<*>> = mutableListOf()
+    private val hintToPositionMap: MutableMap<Char, Int> = mutableMapOf()
+
+    fun jumpTo(editor: VimEditor, charone: Char, chartwo: Char, sneakDirection: Direction): TextRange? {
+      try {
+        val visibleMatchingPositions = findVisibleMatchingPositions(editor, charone, chartwo, sneakDirection)
+        if (visibleMatchingPositions.isEmpty()) {
+          return null
+        }
+
+        addLabelsToMatches(editor, visibleMatchingPositions)
+
+        // wait for user's input
+        val selectedChar = run {
+          val selectedChar = injector.keyGroup.getChar(editor)
+          // if the 2nd char is \n, we need to wait for the user's input again
+          if (selectedChar == null && chartwo == '\n') {
+            return@run injector.keyGroup.getChar(editor)
+          }
+          selectedChar
+        }
+
+        // ignore ' ' (space) and non-existing chars
+        if (selectedChar == ' ' || !hintToPositionMap.containsKey(selectedChar)) {
+          val keyHandler = KeyHandler.getInstance()
+          val context = injector.executionContextManager.getEditorExecutionContext(editor)
+          injector.parser.parseKeys(selectedChar.toString()).forEach {
+            keyHandler.handleKey(editor, it, context, true, keyHandler.keyHandlerState)
+          }
+          return null
+        }
+        val selectedPosition = hintToPositionMap[selectedChar]
+        clear()
+
+        return Util.jumpToPosition(editor, selectedPosition)
+      } finally {
+        clear()
+      }
+    }
+
+    private fun findVisibleMatchingPositions(
+      editor: VimEditor,
+      charone: Char,
+      chartwo: Char,
+      sneakDirection: Direction,
+    ): List<Int> {
+      val caret = editor.primaryCaret()
+      val position = caret.offset
+      return sneakDirection.findAllVisibleBiChars(editor, editor.text(), position, charone, chartwo)
+    }
+
+    private fun addLabelsToMatches(editor: VimEditor, positions: List<Int>) {
+      positions.forEachIndexed { index, position ->
+        val label = if (index >= labels.size) {
+          ' '
+        } else {
+          labels[index]
+        }
+        hintToPositionMap[label] = position
+
+        val inlay = editor.ij.inlayModel.addInlineElement(position, false, LabelRenderer(label.toString()))
+        if (inlay != null) {
+          labelInlays.add(inlay)
+        }
+      }
+    }
+
+    private fun clear() {
+      labelInlays.forEach { it.dispose() }
+      labelInlays.clear()
+      hintToPositionMap.clear()
     }
   }
 
@@ -139,7 +241,7 @@ internal class IdeaVimSneakExtension : VimExtension {
         charSequence: CharSequence,
         position: Int,
         charone: Char,
-        chartwo: Char
+        chartwo: Char,
       ): Int? {
         for (i in (position + offset) until charSequence.length - 1) {
           if (matches(editor, charSequence, i, charone, chartwo)) {
@@ -148,6 +250,23 @@ internal class IdeaVimSneakExtension : VimExtension {
         }
         return null
       }
+
+      override fun findAllVisibleBiChars(
+        editor: VimEditor,
+        charSequence: CharSequence,
+        position: Int,
+        charone: Char,
+        chartwo: Char,
+      ): List<Int> {
+        val visibleRange = editor.ij.getVisibleRangeOffset()
+        val result = mutableListOf<Int>()
+        for (i in (position + offset) until visibleRange.endOffset - 1) {
+          if (matches(editor, charSequence, i, charone, chartwo)) {
+            result.add(i)
+          }
+        }
+        return result
+      }
     },
     BACKWARD(-1) {
       override fun findBiChar(
@@ -155,7 +274,7 @@ internal class IdeaVimSneakExtension : VimExtension {
         charSequence: CharSequence,
         position: Int,
         charone: Char,
-        chartwo: Char
+        chartwo: Char,
       ): Int? {
         for (i in (position + offset) downTo 0) {
           if (matches(editor, charSequence, i, charone, chartwo)) {
@@ -163,6 +282,23 @@ internal class IdeaVimSneakExtension : VimExtension {
           }
         }
         return null
+      }
+
+      override fun findAllVisibleBiChars(
+        editor: VimEditor,
+        charSequence: CharSequence,
+        position: Int,
+        charone: Char,
+        chartwo: Char,
+      ): List<Int> {
+        val visibleRange = editor.ij.getVisibleRangeOffset()
+        val result = mutableListOf<Int>()
+        for (i in (position + offset) downTo visibleRange.startOffset) {
+          if (matches(editor, charSequence, i, charone, chartwo)) {
+            result.add(i)
+          }
+        }
+        return result
       }
 
     };
@@ -174,6 +310,14 @@ internal class IdeaVimSneakExtension : VimExtension {
       charone: Char,
       chartwo: Char,
     ): Int?
+
+    abstract fun findAllVisibleBiChars(
+      editor: VimEditor,
+      charSequence: CharSequence,
+      position: Int,
+      charone: Char,
+      chartwo: Char,
+    ): List<Int>
 
     fun matches(
       editor: VimEditor,
@@ -281,6 +425,29 @@ internal class IdeaVimSneakExtension : VimExtension {
       Font.PLAIN
     )
   }
+
+  private class LabelRenderer(
+    private val label: String,
+  ) : EditorCustomElementRenderer {
+    private fun boldFont(inlay: Inlay<*>): Font = inlay.editor.colorsScheme.getFont(EditorFontType.PLAIN).deriveFont(Font.BOLD)
+
+    override fun calcWidthInPixels(inlay: Inlay<*>): Int {
+      val font = boldFont(inlay)
+      return inlay.editor.contentComponent.getFontMetrics(font).stringWidth(label) + 4
+    }
+
+    override fun paint(inlay: Inlay<*>, g: Graphics, r: Rectangle, textAttributes: TextAttributes) {
+      val font = boldFont(inlay)
+      g.font = font
+      val fontMetrics = inlay.editor.contentComponent.getFontMetrics(font)
+      val width = fontMetrics.stringWidth(label) + 4
+
+      g.color = JBColor.YELLOW
+      g.fillRect(r.x, r.y, width, r.height)
+      g.color = JBColor.BLACK
+      g.drawString(label, r.x + 2, r.y + fontMetrics.ascent)
+    }
+  }
 }
 
 /**
@@ -331,6 +498,18 @@ private fun VimExtension.mapToFunctionAndProvideKeys(
     injector.parser.parseKeys(commandFromOriginalPlugin(keys)),
     true
   )
+}
+
+// Derived from vim-flash (https://github.com/yelog/vim-flash)
+// Original code licensed under Apache License 2.0
+fun Editor.getVisibleRangeOffset(): TextRange {
+  val scrollingModel = scrollingModel
+  val visibleArea = scrollingModel.visibleArea
+  val startLog = xyToLogicalPosition(Point(0, visibleArea.y))
+  val lastLog = xyToLogicalPosition(Point(0, visibleArea.y + visibleArea.height))
+  val startOff = logicalPositionToOffset(startLog)
+  val endOff = logicalPositionToOffset(LogicalPosition(lastLog.line + 1, lastLog.column))
+  return TextRange(startOff, endOff)
 }
 
 private fun command(keys: String) = "<Plug>(sneak-$keys)"
