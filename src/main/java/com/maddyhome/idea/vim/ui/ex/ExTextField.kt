@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2025 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -7,7 +7,9 @@
  */
 package com.maddyhome.idea.vim.ui.ex
 
+import com.intellij.openapi.actionSystem.DataKey
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.project.Project
 import com.intellij.ui.paint.PaintUtil
 import com.intellij.util.ui.JBUI
 import com.maddyhome.idea.vim.KeyHandler
@@ -21,6 +23,7 @@ import com.maddyhome.idea.vim.options.helpers.GuiCursorAttributes
 import com.maddyhome.idea.vim.options.helpers.GuiCursorMode
 import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.options.helpers.GuiCursorType
+import kotlinx.io.IOException
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.TestOnly
 import java.awt.Color
@@ -34,7 +37,10 @@ import java.awt.event.FocusEvent
 import java.awt.event.KeyEvent
 import java.awt.geom.Area
 import java.awt.geom.Rectangle2D
+import java.nio.file.Files
+import java.nio.file.Path
 import java.util.*
+import java.util.stream.Stream
 import javax.swing.JTextField
 import javax.swing.KeyStroke
 import javax.swing.event.CaretEvent
@@ -45,6 +51,8 @@ import javax.swing.text.JTextComponent
 import javax.swing.text.StyleConstants
 import javax.swing.text.StyleContext
 import javax.swing.text.StyledDocument
+import kotlin.io.path.isDirectory
+import kotlin.io.path.pathString
 import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
@@ -174,6 +182,8 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
     (document as? ExDocument)?.setSpecialKeyForeground(fg)
   }
 
+  private var commandLoopIterator: LoopIterator? = null
+
   /**
    * Finish handling the keystroke
    *
@@ -195,14 +205,19 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
     // what it will do with the keystroke)
     if (stroke.keyChar != KeyEvent.CHAR_UNDEFINED) {
       replaceSelection(stroke.keyChar.toString())
-    } else {
-      val event = KeyEvent(
-        this, stroke.keyEventType, (Date()).time, stroke.modifiers,
-        stroke.keyCode, stroke.keyChar
-      )
+      commandLoopIterator = null
+    }
+    else {
+      if (stroke.keyCode != KeyEvent.VK_TAB || !executeTabCompletionIfPossible()) {
+        commandLoopIterator = null
+        val event = KeyEvent(
+          this, stroke.keyEventType, (Date()).time, stroke.modifiers,
+          stroke.keyCode, stroke.keyChar
+        )
 
-      // Call super to avoid recursion!
-      super.processKeyEvent(event)
+        // Call super to avoid recursion!
+        super.processKeyEvent(event)
+      }
     }
 
     saveLastEntry()
@@ -235,8 +250,63 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
       )
       e.consume()
     } else {
+      commandLoopIterator = null
       super.processKeyEvent(e)
     }
+  }
+
+  private fun executeTabCompletionIfPossible(): Boolean {
+    if (null == commandLoopIterator || commandLoopIterator!!.size() == 1) {
+      val parts = getText().split(" ", limit = 2).takeIf { it.size > 1 } ?: return false
+      // If more commands require TAB action handling, a more sophisticated check and delegation is needed
+      val command = parts[0].takeIf { supportedTabCompletionCommands.contains(it) } ?: return false
+      val input = parts[1]
+
+      val project = (parent as ExEntryPanel).context?.getData<Project>(DataKey.create("project"))
+      val projectBasePath = project?.basePath?.let { Path.of(it) } ?: return false
+      val inputPath = projectBasePath.resolve(input)
+      val searchPrefix = inputPath.pathString
+      val basePrefix = searchPrefix + if((input.isBlank() || input.endsWith("/")) && !searchPrefix.endsWith("/")) "/" else ""
+
+      // Would it be useful to ignore file path case?
+      try {
+        val root =
+          (if (input.endsWith("/")) inputPath
+          else if (inputPath == projectBasePath) projectBasePath
+          else inputPath.parent) ?: return false
+
+        val specialPaths =
+          if(input.endsWith(".."))
+            Stream.of("/")
+          else if(input.endsWith("."))
+            Stream.of("./","/")
+          else Stream.empty()
+
+        val commands = Stream.concat(specialPaths, (root.let { Files.list(it) }
+          .filter { it.pathString.startsWith(searchPrefix) }
+          .sorted()
+          .map { if (it.isDirectory()) "$it/" else it.pathString }))
+          .map { input + it.removePrefix(basePrefix) }
+          .map { String.format("%s %s", command, it) }
+          .toList().takeIf { it.isNotEmpty() } ?: return false
+
+        commandLoopIterator = LoopIterator(commands)
+      } catch (e: IOException) {
+        logger.error(e)
+        commandLoopIterator = null
+      }
+    }
+    return commandLoopIterator?.let { updateText(it.next()); true } ?: false
+  }
+
+  private class LoopIterator(val commands: List<String>) : Iterator<String> {
+    private var currentIdx = 0
+    override fun next(): String {
+      currentIdx = if (currentIdx >= commands.size - 1) 0 else currentIdx + 1
+      return commands[currentIdx]
+    }
+    fun size(): Int = commands.size
+    override fun hasNext(): Boolean = true
   }
 
   private fun isAllowedTypedEvent(event: KeyEvent): Boolean {
@@ -541,5 +611,6 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
 
   companion object {
     private val logger = Logger.getInstance(ExTextField::class.java.name)
+    private val supportedTabCompletionCommands = setOf("e", "edit", "w", "write")
   }
 }
