@@ -65,14 +65,15 @@ import com.maddyhome.idea.vim.api.coerceOffset
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.group.EditorGroup
-import com.maddyhome.idea.vim.group.FileGroup
+import com.maddyhome.idea.vim.group.ChangeGroup
+import com.maddyhome.idea.vim.group.FileGroupHelper
 import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.group.IjVimRedrawService
+import com.maddyhome.idea.vim.group.MarkUpdater
 import com.maddyhome.idea.vim.group.MotionGroup
+import com.maddyhome.idea.vim.group.NumberChangeListener
 import com.maddyhome.idea.vim.group.OptionGroup
-import com.maddyhome.idea.vim.group.ScrollGroup
-import com.maddyhome.idea.vim.group.VimMarkServiceImpl
+import com.maddyhome.idea.vim.group.ScrollOptionsChangeListener
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
@@ -141,7 +142,7 @@ private fun getOpeningEditor(newEditor: Editor) = newEditor.project?.let { proje
   VimListenerManager.VimLastSelectedEditorTracker.getLastSelectedEditor(project)?.takeUnless { it == newEditor }
 }
 
-internal object VimListenerManager {
+object VimListenerManager {
 
   private val logger = Logger.getInstance(VimListenerManager::class.java)
   private val editorListenersDisposableKey = Key.create<Disposable>("IdeaVim listeners disposable")
@@ -198,12 +199,12 @@ internal object VimListenerManager {
       }
 
       val optionGroup = VimPlugin.getOptionGroup()
-      optionGroup.addEffectiveOptionValueChangeListener(Options.number, EditorGroup.NumberChangeListener.INSTANCE)
+      optionGroup.addEffectiveOptionValueChangeListener(Options.number, NumberChangeListener)
       optionGroup.addEffectiveOptionValueChangeListener(
         IjOptions.relativenumber,
-        EditorGroup.NumberChangeListener.INSTANCE
+        NumberChangeListener
       )
-      optionGroup.addEffectiveOptionValueChangeListener(Options.scrolloff, ScrollGroup.ScrollOptionsChangeListener)
+      optionGroup.addEffectiveOptionValueChangeListener(Options.scrolloff, ScrollOptionsChangeListener)
       optionGroup.addEffectiveOptionValueChangeListener(Options.guicursor, GuicursorChangeListener)
       optionGroup.addGlobalOptionChangeListener(Options.showcmd, ShowCmdOptionChangeListener)
 
@@ -225,12 +226,12 @@ internal object VimListenerManager {
       EventFacade.getInstance().restoreTypedActionHandler()
 
       val optionGroup = VimPlugin.getOptionGroup()
-      optionGroup.removeEffectiveOptionValueChangeListener(Options.number, EditorGroup.NumberChangeListener.INSTANCE)
+      optionGroup.removeEffectiveOptionValueChangeListener(Options.number, NumberChangeListener)
       optionGroup.removeEffectiveOptionValueChangeListener(
         IjOptions.relativenumber,
-        EditorGroup.NumberChangeListener.INSTANCE
+        NumberChangeListener
       )
-      optionGroup.removeEffectiveOptionValueChangeListener(Options.scrolloff, ScrollGroup.ScrollOptionsChangeListener)
+      optionGroup.removeEffectiveOptionValueChangeListener(Options.scrolloff, ScrollOptionsChangeListener)
       optionGroup.removeGlobalOptionChangeListener(Options.showcmd, ShowCmdOptionChangeListener)
       optionGroup.removeGlobalOptionChangeListener(Options.showmode, modeWidgetOptionListener)
       optionGroup.removeGlobalOptionChangeListener(Options.showmode, macroWidgetOptionListener)
@@ -321,8 +322,8 @@ internal object VimListenerManager {
       eventFacade.addComponentMouseListener(editor.contentComponent, ComponentMouseListener, perEditorDisposable)
       eventFacade.addCaretListener(editor, EditorCaretHandler, perEditorDisposable)
 
-      VimPlugin.getEditor().editorCreated(editor)
-      VimPlugin.getChange().editorCreated(editor, perEditorDisposable)
+      injector.editorGroup.editorCreated(IjVimEditor(editor))
+      (VimPlugin.getChange() as ChangeGroup).editorCreated(IjVimEditor(editor), perEditorDisposable)
 
       (editor as EditorEx).addFocusListener(VimFocusListener, perEditorDisposable)
 
@@ -330,7 +331,7 @@ internal object VimListenerManager {
 
       Disposer.register(perEditorDisposable) {
         ApplicationManager.getApplication().invokeLater {
-          VimPlugin.getEditor().editorDeinit(editor)
+          injector.editorGroup.editorDeinit(editor.vim)
         }
       }
     }
@@ -369,19 +370,19 @@ internal object VimListenerManager {
    */
   class VimDocumentListener : DocumentListener {
     override fun beforeDocumentChange(event: DocumentEvent) {
-      VimMarkServiceImpl.MarkUpdater.beforeDocumentChange(event)
+      MarkUpdater.beforeDocumentChange(event)
       IjVimSearchGroup.DocumentSearchListener.INSTANCE.beforeDocumentChange(event)
       IjVimRedrawService.RedrawListener.beforeDocumentChange(event)
     }
 
     override fun documentChanged(event: DocumentEvent) {
-      VimMarkServiceImpl.MarkUpdater.documentChanged(event)
+      MarkUpdater.documentChanged(event)
       IjVimSearchGroup.DocumentSearchListener.INSTANCE.documentChanged(event)
       IjVimRedrawService.RedrawListener.documentChanged(event)
     }
   }
 
-  internal object VimLastSelectedEditorTracker {
+  object VimLastSelectedEditorTracker {
     // This stores a weak reference to an editor against a weak reference to a project, which means there is nothing
     // keeping the project or editor from being garbage collected at any time. Stale keys are automatically expunged
     // whenever the map is used.
@@ -396,7 +397,7 @@ internal object VimListenerManager {
     }
 
     @TestOnly
-    internal fun resetLastSelectedEditor(project: Project) {
+    fun resetLastSelectedEditor(project: Project) {
       selectedEditors.remove(project)
     }
   }
@@ -413,8 +414,8 @@ internal object VimListenerManager {
 
       injector.outputPanel.getCurrentOutputPanel()?.close()
       MotionGroup.fileEditorManagerSelectionChangedCallback(event)
-      FileGroup.fileEditorManagerSelectionChangedCallback(event)
-      VimPlugin.getSearch().fileEditorManagerSelectionChangedCallback(event)
+      FileGroupHelper.fileEditorManagerSelectionChangedCallback(event)
+      (VimPlugin.getSearch() as IjVimSearchGroup).fileEditorManagerSelectionChangedCallback(event)
       IjVimRedrawService.fileEditorManagerSelectionChangedCallback(event)
       VimLastSelectedEditorTracker.setLastSelectedEditor(event.newEditor)
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -14,7 +14,6 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.command.UndoConfirmationPolicy
 import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler
 import com.intellij.openapi.editor.actions.EnterAction
 import com.intellij.openapi.editor.event.EditorMouseEvent
@@ -58,8 +57,8 @@ class ChangeGroup : VimChangeGroupBase() {
     }
   }
 
-  fun editorCreated(editor: Editor?, disposable: Disposable) {
-    EventFacade.getInstance().addEditorMouseListener(editor!!, listener, disposable)
+  fun editorCreated(editor: VimEditor, disposable: Disposable) {
+    EventFacade.getInstance().addEditorMouseListener(editor.ij, listener, disposable)
   }
 
   override fun type(vimEditor: VimEditor, context: ExecutionContext, key: Char) {

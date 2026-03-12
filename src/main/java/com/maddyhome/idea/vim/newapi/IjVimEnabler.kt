@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,12 +8,10 @@
 
 package com.maddyhome.idea.vim.newapi
 
-import com.intellij.openapi.components.Service
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEnabler
 
-@Service
-internal class IjVimEnabler : VimEnabler {
+class IjVimEnabler : VimEnabler {
   private var isNewUser = false
 
   override fun isEnabled(): Boolean {

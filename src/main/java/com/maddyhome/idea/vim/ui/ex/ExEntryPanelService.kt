@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2024 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -31,7 +31,7 @@ class ExEntryPanelService : VimCommandLineServiceBase() {
   }
 
   @Deprecated("Please use readInputAndProcess")
-  fun inputString(vimEditor: VimEditor, context: ExecutionContext, prompt: String, finishOn: Char?): String? {
+  override fun inputString(vimEditor: VimEditor, context: ExecutionContext, prompt: String, finishOn: Char?): String? {
     val editor = vimEditor.ij
     if (vimEditor.inRepeatMode) {
       val input = Extension.consumeString()
@@ -136,5 +136,10 @@ class ExEntryPanelService : VimCommandLineServiceBase() {
 
   override fun fullReset() {
     ExEntryPanel.fullReset()
+  }
+
+  override fun getActiveCommandLineHeight(): Int {
+    val instance = ExEntryPanel.instance ?: return 0
+    return if (instance.isActive) instance.height else 0
   }
 }

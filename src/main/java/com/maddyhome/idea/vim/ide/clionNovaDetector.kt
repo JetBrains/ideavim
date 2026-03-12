@@ -16,6 +16,6 @@ interface ClionNovaProvider {
   fun isClionNova(): Boolean
 }
 
-internal fun isClionNova(): Boolean {
+fun isClionNova(): Boolean {
   return clionEP.extensions.any { it.isClionNova() }
 }

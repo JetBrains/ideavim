@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -12,7 +12,6 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.command.undo.UndoManager
-import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.TextEditor
@@ -34,8 +33,8 @@ import com.maddyhome.idea.vim.undo.VimTimestampBasedUndoService
 /**
  * @author oleg
  */
-@Service
-internal class UndoRedoHelper : VimTimestampBasedUndoService {
+
+class UndoRedoHelper : VimTimestampBasedUndoService {
   companion object {
     private val logger = logger<UndoRedoHelper>()
   }

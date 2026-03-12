@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,13 +8,16 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.mark
 
+import com.intellij.ide.bookmark.BookmarkType
 import com.intellij.ide.bookmark.BookmarksManager
 import com.intellij.ide.bookmark.LineBookmark
+import com.intellij.ide.vfs.rpcId
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.platform.project.projectId
 import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.group.createLineBookmark
-import com.maddyhome.idea.vim.group.mnemonic
+import com.maddyhome.idea.vim.group.bookmark.BookmarkRemoteApi
+import com.maddyhome.idea.vim.group.rpc
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
@@ -102,11 +105,24 @@ class MotionMarkActionTest : VimTestCase() {
     """.trimIndent()
     configureByText(text)
     enterCommand("set ideamarks")
-    fixture.project.createLineBookmark(fixture.editor, 2, 'A')
+    ApplicationManager.getApplication().invokeAndWait {
+      rpc {
+        BookmarkRemoteApi.getInstance().createOrGetSystemMark(
+          'A',
+          2,
+          0,
+          fixture.file.virtualFile.rpcId(),
+          fixture.project.projectId(),
+        )
+      }
+    }
     ApplicationManager.getApplication().invokeAndWait {
       PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     }
-    val vimMarks = injector.markService.getAllGlobalMarks()
+    var vimMarks: Set<com.maddyhome.idea.vim.mark.Mark> = emptySet()
+    ApplicationManager.getApplication().invokeAndWait {
+      vimMarks = injector.markService.getAllGlobalMarks()
+    }
     kotlin.test.assertEquals(1, vimMarks.size)
     kotlin.test.assertEquals('A', vimMarks.first().key)
   }
@@ -124,14 +140,35 @@ class MotionMarkActionTest : VimTestCase() {
     configureByText(text)
     enterCommand("set ideamarks")
 
-    val bookmark = fixture.project.createLineBookmark(fixture.editor, 2, 'A')
+    ApplicationManager.getApplication().invokeAndWait {
+      rpc {
+        BookmarkRemoteApi.getInstance().createOrGetSystemMark(
+          'A',
+          2,
+          0,
+          fixture.file.virtualFile.rpcId(),
+          fixture.project.projectId(),
+        )
+      }
 
-    BookmarksManager.getInstance(fixture.project)?.remove(bookmark!!)
-    fixture.project.createLineBookmark(fixture.editor, 4, 'A')
+      rpc { BookmarkRemoteApi.getInstance().removeBookmark('A') }
+      rpc {
+        BookmarkRemoteApi.getInstance().createOrGetSystemMark(
+          'A',
+          4,
+          0,
+          fixture.file.virtualFile.rpcId(),
+          fixture.project.projectId(),
+        )
+      }
+    }
     ApplicationManager.getApplication().invokeAndWait {
       PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     }
-    val vimMarks = injector.markService.getAllGlobalMarks()
+    var vimMarks: Set<com.maddyhome.idea.vim.mark.Mark> = emptySet()
+    ApplicationManager.getApplication().invokeAndWait {
+      vimMarks = injector.markService.getAllGlobalMarks()
+    }
     kotlin.test.assertEquals(1, vimMarks.size)
     val mark = vimMarks.first()
     kotlin.test.assertEquals('A', mark.key)
@@ -140,10 +177,13 @@ class MotionMarkActionTest : VimTestCase() {
 
   private fun checkMarks(vararg marks: Pair<Char, Int>) {
     val project = fixture.project
-    val validBookmarks = BookmarksManager.getInstance(project)!!.bookmarks.sortedBy { it.mnemonic(project) }
+    val bookmarksManager = BookmarksManager.getInstance(project)!!
+    val validBookmarks = bookmarksManager.bookmarks
+      .filter { bookmarksManager.getType(it) != BookmarkType.DEFAULT }
+      .sortedBy { bookmarksManager.getType(it)!!.mnemonic }
     kotlin.test.assertEquals(marks.size, validBookmarks.size)
     marks.sortedBy { it.first }.forEachIndexed { index, (mn, line) ->
-      kotlin.test.assertEquals(mn, validBookmarks[index].mnemonic(project))
+      kotlin.test.assertEquals(mn, bookmarksManager.getType(validBookmarks[index])!!.mnemonic)
       kotlin.test.assertEquals(line, (validBookmarks[index] as LineBookmark).line)
     }
   }

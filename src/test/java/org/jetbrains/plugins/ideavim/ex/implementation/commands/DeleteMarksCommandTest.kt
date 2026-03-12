@@ -47,9 +47,9 @@ class DeleteMarksCommandTest : VimTestCase() {
     }
   }
 
-  private fun getMark(ch: Char): Mark? {
+  private fun getMarkForChar(ch: Char): Mark? {
     val vimEditor = fixture.editor.vim
-    return injector.markService.getMark(vimEditor.primaryCaret(), ch)
+    return getMark(vimEditor.primaryCaret(), ch)
   }
 
   @Test
@@ -57,7 +57,7 @@ class DeleteMarksCommandTest : VimTestCase() {
     setUpMarks("a")
     typeText(commandToKeys("delmarks a"))
 
-    assertNull(getMark('a'), "Mark was not deleted")
+    assertNull(getMarkForChar('a'), "Mark was not deleted")
   }
 
   @Test
@@ -66,10 +66,10 @@ class DeleteMarksCommandTest : VimTestCase() {
     typeText(commandToKeys("delmarks Ab"))
 
     arrayOf('A', 'b')
-      .forEach { ch -> assertNull(getMark(ch), "Mark $ch was not deleted") }
+      .forEach { ch -> assertNull(getMarkForChar(ch), "Mark $ch was not deleted") }
 
     arrayOf('a', 'B')
-      .forEach { ch -> assertNotNull(getMark(ch), "Mark $ch was unexpectedly deleted") }
+      .forEach { ch -> assertNotNull(getMarkForChar(ch), "Mark $ch was unexpectedly deleted") }
   }
 
   @Test
@@ -78,10 +78,10 @@ class DeleteMarksCommandTest : VimTestCase() {
     typeText(commandToKeys("delmarks b-d"))
 
     arrayOf('b', 'c', 'd')
-      .forEach { ch -> assertNull(getMark(ch), "Mark $ch was not deleted") }
+      .forEach { ch -> assertNull(getMarkForChar(ch), "Mark $ch was not deleted") }
 
     arrayOf('a', 'e')
-      .forEach { ch -> assertNotNull(getMark(ch), "Mark $ch was unexpectedly deleted") }
+      .forEach { ch -> assertNotNull(getMarkForChar(ch), "Mark $ch was unexpectedly deleted") }
   }
 
   @Test
@@ -90,10 +90,10 @@ class DeleteMarksCommandTest : VimTestCase() {
     typeText(commandToKeys("delmarks b-dC-E a"))
 
     arrayOf('a', 'b', 'c', 'd', 'C', 'D', 'E', 'a')
-      .forEach { ch -> assertNull(getMark(ch), "Mark $ch was not deleted") }
+      .forEach { ch -> assertNull(getMarkForChar(ch), "Mark $ch was not deleted") }
 
     arrayOf('e', 'A', 'B')
-      .forEach { ch -> assertNotNull(getMark(ch), "Mark $ch was unexpectedly deleted") }
+      .forEach { ch -> assertNotNull(getMarkForChar(ch), "Mark $ch was unexpectedly deleted") }
   }
 
   @Test
@@ -102,7 +102,7 @@ class DeleteMarksCommandTest : VimTestCase() {
     typeText(commandToKeys("delmarks a-C"))
     assertPluginError(true)
 
-    assertNotNull(getMark('a'), "Mark was deleted despite invalid command given")
+    assertNotNull(getMarkForChar('a'), "Mark was deleted despite invalid command given")
   }
 
   @Test
@@ -111,7 +111,7 @@ class DeleteMarksCommandTest : VimTestCase() {
     typeText(commandToKeys("delmarks bca# foo"))
     assertPluginError(true)
 
-    assertNotNull(getMark('a'), "Mark was deleted despite invalid command given")
+    assertNotNull(getMarkForChar('a'), "Mark was deleted despite invalid command given")
   }
 
   @Test
@@ -120,10 +120,10 @@ class DeleteMarksCommandTest : VimTestCase() {
     typeText(commandToKeys("delmarks!"))
 
     arrayOf('a', 'b', 'c')
-      .forEach { ch -> assertNull(getMark(ch), "Mark $ch was not deleted") }
+      .forEach { ch -> assertNull(getMarkForChar(ch), "Mark $ch was not deleted") }
 
     arrayOf('A', 'B', 'C')
-      .forEach { ch -> assertNotNull(getMark(ch), "Global mark $ch was deleted by delmarks!") }
+      .forEach { ch -> assertNotNull(getMarkForChar(ch), "Global mark $ch was deleted by delmarks!") }
   }
 
   @Test
@@ -133,7 +133,7 @@ class DeleteMarksCommandTest : VimTestCase() {
 
     assertPluginError(true)
     arrayOf('a', 'b', 'c', 'A', 'B', 'C')
-      .forEach { ch -> assertNotNull(getMark(ch), "Mark $ch was deleted despite invalid command given") }
+      .forEach { ch -> assertNotNull(getMarkForChar(ch), "Mark $ch was deleted despite invalid command given") }
   }
 
   @Test
@@ -142,10 +142,10 @@ class DeleteMarksCommandTest : VimTestCase() {
     typeText(commandToKeys("delmarks!   "))
 
     arrayOf('a', 'b', 'c')
-      .forEach { ch -> assertNull(getMark(ch), "Mark $ch was not deleted") }
+      .forEach { ch -> assertNull(getMarkForChar(ch), "Mark $ch was not deleted") }
 
     arrayOf('A', 'B', 'C')
-      .forEach { ch -> assertNotNull(getMark(ch), "Global mark $ch was deleted by delmarks!") }
+      .forEach { ch -> assertNotNull(getMarkForChar(ch), "Global mark $ch was deleted by delmarks!") }
   }
 
   @Test
@@ -153,15 +153,15 @@ class DeleteMarksCommandTest : VimTestCase() {
     setUpMarks("a")
     typeText(commandToKeys("delm a"))
 
-    assertNull(getMark('a'), "Mark was not deleted")
+    assertNull(getMarkForChar('a'), "Mark was not deleted")
 
     setUpMarks("aBcAbC")
     typeText(commandToKeys("delm!"))
 
     arrayOf('a', 'b', 'c')
-      .forEach { ch -> assertNull(getMark(ch), "Mark $ch was not deleted") }
+      .forEach { ch -> assertNull(getMarkForChar(ch), "Mark $ch was not deleted") }
 
     arrayOf('A', 'B', 'C')
-      .forEach { ch -> assertNotNull(getMark(ch), "Global mark $ch was deleted by delm!") }
+      .forEach { ch -> assertNotNull(getMarkForChar(ch), "Global mark $ch was deleted by delm!") }
   }
 }

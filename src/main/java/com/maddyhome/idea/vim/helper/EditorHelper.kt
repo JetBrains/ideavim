@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -16,6 +16,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.util.ui.table.JBTableRowEditor
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.StringListOptionValue
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.IjOptionConstants
@@ -24,6 +25,18 @@ import com.maddyhome.idea.vim.newapi.globalIjOptions
 import java.awt.Component
 import javax.swing.JComponent
 import javax.swing.JTable
+
+/**
+ * Get caret line in vim notation (1-based)
+ */
+internal val Caret.vimLine: Int
+  get() = this.logicalPosition.line + 1
+
+/**
+ * Get current caret line in vim notation (1-based)
+ */
+internal val Editor.vimLine: Int
+  get() = this.caretModel.currentCaret.vimLine
 
 /**
  * There is a problem with one-line editors. At the moment of the editor creation, this property is always set to false.
@@ -121,14 +134,10 @@ private inline fun findParentByCondition(c: Component?, condition: (Component?) 
   return null
 }
 
-/**
- * Get caret line in vim notation (1-based)
- */
-internal val Caret.vimLine: Int
-  get() = this.logicalPosition.line + 1
+internal fun vimDisabled(editor: Editor?): Boolean = !vimEnabled(editor)
 
-/**
- * Get current caret line in vim notation (1-based)
- */
-internal val Editor.vimLine: Int
-  get() = this.caretModel.currentCaret.vimLine
+private fun vimEnabled(editor: Editor?): Boolean {
+  if (VimPlugin.isNotEnabled()) return false
+  if (editor != null && editor.isIdeaVimDisabledHere) return false
+  return true
+}

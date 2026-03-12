@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -14,17 +14,11 @@ import com.intellij.ide.plugins.InstalledPluginsState
 import com.intellij.ide.plugins.PluginStateListener
 import com.intellij.ide.plugins.PluginStateManager
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.project.ProjectManagerListener
 import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.openapi.updateSettings.impl.UpdateSettings
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.IjVimEnabler
-import com.maddyhome.idea.vim.newapi.globalIjOptions
-import com.maddyhome.idea.vim.newapi.initInjector
 import com.maddyhome.idea.vim.ui.JoinEap
 import com.maddyhome.idea.vim.ui.JoinEap.EAP_LINK
 
@@ -67,23 +61,5 @@ internal class PluginStartup : ProjectActivity/*, LightEditCompatible*/ {
         }
       }
     })
-  }
-}
-
-// This is a temporal workaround for VIM-2487
-internal class PyNotebooksCloseWorkaround : ProjectManagerListener {
-  override fun projectClosingBeforeSave(project: Project) {
-    initInjector()
-    // TODO: Confirm context in CWM scenario
-    if (injector.globalIjOptions().closenotebooks) {
-      injector.editorGroup.getEditors().forEach { vimEditor ->
-        val editor = (vimEditor as IjVimEditor).editor
-        val virtualFile = EditorHelper.getVirtualFile(editor)
-        if (virtualFile?.extension == "ipynb") {
-          val fileEditorManager = FileEditorManagerEx.getInstanceEx(project)
-          fileEditorManager.closeFile(virtualFile)
-        }
-      }
-    }
   }
 }

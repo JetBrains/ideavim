@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -14,7 +14,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.codeStyle.CommonCodeStyleSettings.IndentOptions
 import com.maddyhome.idea.vim.api.VimIndentConfig
 
-internal class IndentConfig private constructor(indentOptions: IndentOptions) : VimIndentConfig {
+class IndentConfig private constructor(indentOptions: IndentOptions) : VimIndentConfig {
   private val indentSize = indentOptions.INDENT_SIZE
   private val tabSize = indentOptions.TAB_SIZE
   private val isUseTabs = indentOptions.USE_TAB_CHARACTER

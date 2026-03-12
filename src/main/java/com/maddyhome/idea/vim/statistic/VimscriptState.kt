@@ -14,12 +14,11 @@ import com.intellij.internal.statistic.eventLog.events.EventFields
 import com.intellij.internal.statistic.eventLog.events.VarargEventId
 import com.intellij.internal.statistic.service.fus.collectors.ApplicationUsagesCollector
 import com.maddyhome.idea.vim.newapi.initInjector
-import com.maddyhome.idea.vim.statistic.PluginState.Util.extensionNames
 import com.maddyhome.idea.vim.vimscript.services.VimRcService
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.path.readLines
 
-internal class VimscriptState : ApplicationUsagesCollector() {
+class VimscriptState : ApplicationUsagesCollector() {
 
   init {
     initInjector()
@@ -33,7 +32,7 @@ internal class VimscriptState : ApplicationUsagesCollector() {
         SOURCED_FILES with Util.sourcedFiles.size,
         IDEAVIMRC_SIZE with (VimRcService.findIdeaVimRc()?.readLines()
           ?.filter { !it.matches(Regex("\\s*\".*")) && it.isNotBlank() }?.size ?: -1),
-        EXTENSIONS_ENABLED_BY_SET with (PluginState.Util.enabledExtensions - Util.extensionsEnabledWithPlug).toList(),
+        EXTENSIONS_ENABLED_BY_SET with (ExtensionTracking.enabledExtensions - Util.extensionsEnabledWithPlug).toList(),
         EXTENSIONS_ENABLED_BY_PLUG with Util.extensionsEnabledWithPlug.toList(),
         IS_IDE_SPECIFIC_CONFIGURATION_USED with Util.isIDESpecificConfigurationUsed,
         IS_LOOP_USED with Util.isLoopUsed,
@@ -51,14 +50,19 @@ internal class VimscriptState : ApplicationUsagesCollector() {
 
     @Volatile
     var isIDESpecificConfigurationUsed = false
+
     @Volatile
     var isLoopUsed = false
+
     @Volatile
     var isIfUsed = false
+
     @Volatile
     var isMapExprUsed = false
+
     @Volatile
     var isFunctionDeclarationUsed = false
+
     @Volatile
     var isFunctionCallUsed = false
   }
@@ -68,8 +72,10 @@ internal class VimscriptState : ApplicationUsagesCollector() {
 private val GROUP = EventLogGroup("vim.vimscript", 1, "FUS", "Group: Information about Vimscript usage")
 private val SOURCED_FILES = EventFields.RoundedInt("number_of_sourced_files")
 private val IDEAVIMRC_SIZE = EventFields.RoundedInt("ideavimrc_size")
-private val EXTENSIONS_ENABLED_BY_SET = EventFields.StringList("extensions_enabled_by_set", extensionNames)
-private val EXTENSIONS_ENABLED_BY_PLUG = EventFields.StringList("extensions_enabled_by_plug", extensionNames)
+private val EXTENSIONS_ENABLED_BY_SET =
+  EventFields.StringList("extensions_enabled_by_set", ExtensionTracking.extensionNames)
+private val EXTENSIONS_ENABLED_BY_PLUG =
+  EventFields.StringList("extensions_enabled_by_plug", ExtensionTracking.extensionNames)
 private val IS_IDE_SPECIFIC_CONFIGURATION_USED = EventFields.Boolean("is_IDE-specific_configuration_used")
 private val IS_LOOP_USED = EventFields.Boolean("is_loop_used")
 private val IS_IF_USED = EventFields.Boolean("is_if_used")

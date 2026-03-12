@@ -5,5 +5,6 @@
   "buffers": "com.maddyhome.idea.vim.vimscript.model.commands.BufferListCommand",
   "files": "com.maddyhome.idea.vim.vimscript.model.commands.BufferListCommand",
   "h[elp]": "com.maddyhome.idea.vim.vimscript.model.commands.HelpCommand",
-  "ls": "com.maddyhome.idea.vim.vimscript.model.commands.BufferListCommand"
+  "ls": "com.maddyhome.idea.vim.vimscript.model.commands.BufferListCommand",
+  "r[ead]": "com.maddyhome.idea.vim.vimscript.model.commands.ReadCommand"
 }

@@ -16,6 +16,6 @@ interface RiderProvider {
   fun isRider(): Boolean
 }
 
-internal fun isRider(): Boolean {
+fun isRider(): Boolean {
   return riderEP.extensions.any { it.isRider() }
 }

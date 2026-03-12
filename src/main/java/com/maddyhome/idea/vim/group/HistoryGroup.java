@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -13,11 +13,11 @@ import com.intellij.openapi.components.RoamingType;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
-import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.history.HistoryBlock;
 import com.maddyhome.idea.vim.history.HistoryEntry;
 import com.maddyhome.idea.vim.history.VimHistory;
 import com.maddyhome.idea.vim.history.VimHistoryBase;
+import com.maddyhome.idea.vim.newapi.VimLegacyStateLoader;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,7 +27,10 @@ import java.util.List;
 
 @State(name = "VimHistorySettings", storages = {
   @Storage(value = "$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)})
-public class HistoryGroup extends VimHistoryBase implements PersistentStateComponent<Element> {
+public class HistoryGroup extends VimHistoryBase
+  implements PersistentStateComponent<Element>, VimLegacyStateLoader {
+
+  private static final Logger logger = Logger.getInstance(HistoryGroup.class.getName());
 
   public void saveData(@NotNull Element element) {
     logger.debug("saveData");
@@ -50,7 +53,7 @@ public class HistoryGroup extends VimHistoryBase implements PersistentStateCompo
 
     for (HistoryEntry entry : block.getEntries()) {
       final Element entryElement = new Element("entry");
-      VimPlugin.getXML().setSafeXmlText(entryElement, entry.getEntry());
+      XMLGroup.getInstance().setSafeXmlText(entryElement, entry.getEntry());
       root.addContent(entryElement);
     }
 
@@ -83,7 +86,7 @@ public class HistoryGroup extends VimHistoryBase implements PersistentStateCompo
     if (root != null) {
       List<Element> items = root.getChildren("entry");
       for (Element item : items) {
-        final String text = VimPlugin.getXML().getSafeXmlText(item);
+        final String text = XMLGroup.getInstance().getSafeXmlText(item);
         if (text != null) {
           block.addEntry(text);
         }
@@ -129,6 +132,4 @@ public class HistoryGroup extends VimHistoryBase implements PersistentStateCompo
   public void clear() {
     getHistories().clear();
   }
-
-  private static final Logger logger = Logger.getInstance(HistoryGroup.class.getName());
 }

@@ -1,0 +1,48 @@
+<!--
+  ~ Copyright 2003-2026 The IdeaVim authors
+  ~
+  ~ Use of this source code is governed by an MIT-style
+  ~ license that can be found in the LICENSE.txt file or at
+  ~ https://opensource.org/licenses/MIT.
+  -->
+
+<idea-plugin>
+  <dependencies>
+    <module name="intellij.platform.backend"/>
+    <module name="intellij.platform.kernel.backend"/>
+    <module name="IdeaVIM.ideavim-common"/>
+  </dependencies>
+
+  <!-- Backend registrations: IdeDocumentHistory, Bookmarks, ProjectView, PSI.
+       These load in backend + monolith mode only. -->
+
+  <projectListeners>
+    <listener class="com.maddyhome.idea.vim.group.jump.JumpsListener"
+              topic="com.intellij.openapi.fileEditor.impl.IdeDocumentHistoryImpl$RecentPlacesListener"/>
+  </projectListeners>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.process.ProcessGroup"/>
+
+    <!-- RPC: expose ProcessGroup to thin-client frontend -->
+    <platform.rpc.backend.remoteApiProvider
+        implementation="com.maddyhome.idea.vim.group.process.ProcessRemoteApiProvider"/>
+
+    <!-- RPC: expose includeCurrentCommandAsNavigation to thin-client frontend -->
+    <platform.rpc.backend.remoteApiProvider
+        implementation="com.maddyhome.idea.vim.group.jump.JumpRemoteApiProvider"/>
+
+    <!-- RPC: expose file operations to thin-client frontend -->
+    <platform.rpc.backend.remoteApiProvider
+        implementation="com.maddyhome.idea.vim.group.file.FileRemoteApiProvider"/>
+
+    <!-- RPC: expose bookmark creation to thin-client frontend -->
+    <platform.rpc.backend.remoteApiProvider
+        implementation="com.maddyhome.idea.vim.group.bookmark.BookmarkRemoteApiProvider"/>
+
+    <!-- RPC: expose commenting operations to thin-client frontend -->
+    <platform.rpc.backend.remoteApiProvider
+        implementation="com.maddyhome.idea.vim.group.comment.CommentaryRemoteApiProvider"/>
+
+  </extensions>
+</idea-plugin>

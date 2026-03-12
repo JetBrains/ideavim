@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2024 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -43,7 +43,9 @@ class WidgetState : ApplicationUsagesCollector() {
   }
 
   private fun getModeWidgetTheme(postfix: String): String {
-    if (injector.variableService.getGlobalVariableValue("widget_mode_is_full_customization$postfix")?.toVimNumber()?.booleanValue == true) {
+    if (injector.variableService.getGlobalVariableValue("widget_mode_is_full_customization$postfix")
+        ?.toVimNumber()?.booleanValue == true
+    ) {
       return "ADVANCED CUSTOMIZATION"
     }
     val themeString = injector.variableService.getGlobalVariableValue("widget_mode_theme$postfix")?.toVimString()?.value

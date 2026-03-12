@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -142,6 +142,12 @@ interface VimMarkService {
   fun resetAllMarksForCaret(caret: ImmutableVimCaret)
 
   fun resetAllMarks()
+
+  /**
+   * Loads legacy mark state from an XML element for version migration.
+   * Default no-op; overridden by implementations that support PersistentStateComponent.
+   */
+  fun loadLegacyState(element: Any) {}
 
   fun isValidMark(char: Char, operation: Operation, isCaretPrimary: Boolean): Boolean
 

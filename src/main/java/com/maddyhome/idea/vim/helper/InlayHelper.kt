@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -38,7 +38,7 @@ import com.maddyhome.idea.vim.api.injector
  * document has been changed to add an inlay at the caret position, and will move the caret appropriately.
  */
 @RequiresEdt
-internal fun Caret.moveToInlayAwareOffset(offset: Int) {
+fun Caret.moveToInlayAwareOffset(offset: Int) {
   // If the target is inside a fold, call the standard moveToOffset to expand and move
   if (editor.foldingModel.isOffsetCollapsed(offset) || !editor.hasBlockOrUnderscoreCaret()) {
     moveToOffset(offset)
@@ -50,7 +50,7 @@ internal fun Caret.moveToInlayAwareOffset(offset: Int) {
   }
 }
 
-internal fun Caret.moveToInlayAwareLogicalPosition(pos: LogicalPosition) {
+fun Caret.moveToInlayAwareLogicalPosition(pos: LogicalPosition) {
   moveToInlayAwareOffset(editor.logicalPositionToOffset(pos))
 }
 
@@ -70,7 +70,7 @@ private fun getVisualPositionForTextAtOffset(editor: Editor, offset: Int): Visua
   return pos
 }
 
-internal val Caret.inlayAwareVisualColumn: Int
+val Caret.inlayAwareVisualColumn: Int
   get() {
     // When an inlay is inserted at an offset, it is placed in a new visual column before the offset. When transforming
     // an offset to a visual position, both the visual column of the text and the visual column of the inlay are valid.
@@ -87,7 +87,7 @@ internal val Caret.inlayAwareVisualColumn: Int
     return (textVisualColumn - this.amountOfInlaysBeforeCaret).coerceAtLeast(0)
   }
 
-internal val Caret.amountOfInlaysBeforeCaret: Int
+val Caret.amountOfInlaysBeforeCaret: Int
   get() {
     // An inlay associated with an offset is placed in a visual column before the offset, regardless of if it's related
     // to preceding text or following text. When transforming an offset to a visual position, both the visual column of
@@ -96,14 +96,14 @@ internal val Caret.amountOfInlaysBeforeCaret: Int
     return this.editor.inlayModel.getInlineElementsInRange(lineStartOffset, this.offset).size
   }
 
-internal fun Editor.amountOfInlaysBeforeVisualPosition(pos: VisualPosition): Int {
+fun Editor.amountOfInlaysBeforeVisualPosition(pos: VisualPosition): Int {
   val offset = visualPositionToOffset(pos)
   val lineStartOffset = document.getLineStartOffset(visualToLogicalPosition(pos).line)
   return this.inlayModel.getInlineElementsInRange(lineStartOffset, offset).size
 }
 
 @RequiresEdt
-internal fun Editor.updateCaretsVisualPosition() {
+fun Editor.updateCaretsVisualPosition() {
   // Caret visual position depends on the current mode, especially with respect to inlays. E.g. if an inlay is
   // related to preceding text, the caret is placed between inlay and preceding text in insert mode (usually bar
   // caret) but after the inlay in normal mode (block caret).

@@ -12,6 +12,9 @@ pluginManagement {
     maven {
       url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
     }
+    maven {
+      url = uri("https://cache-redirector.jetbrains.com/packages.jetbrains.team/maven/p/ij/intellij-dependencies")
+    }
     mavenCentral()
     gradlePluginPortal()
   }
@@ -34,6 +37,9 @@ include("tests:ui-ij-tests")
 include("tests:ui-py-tests")
 include("tests:ui-fixtures")
 include("api")
+include("modules:ideavim-common")
+include("modules:ideavim-frontend")
+include("modules:ideavim-backend")
 include("modules:ideavim-acejump")
 include("modules:ideavim-rider")
 include("modules:ideavim-clion-nova")

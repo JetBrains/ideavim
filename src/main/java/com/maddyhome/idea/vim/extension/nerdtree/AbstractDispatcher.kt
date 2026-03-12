@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2025 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -21,7 +21,7 @@ import javax.swing.KeyStroke
 /**
  * Handles keyboard shortcuts and delegates them to appropriate actions.
  */
-internal abstract class AbstractDispatcher(name: String, mappings: Map<List<KeyStroke>, NerdTreeAction>) :
+abstract class AbstractDispatcher(name: String, mappings: Map<List<KeyStroke>, NerdTreeAction>) :
   ShortcutDispatcher<NerdTreeAction>(name, mappings, NerdTreeListener) {
 
   private object NerdTreeListener : Listener<NerdTreeAction> {
