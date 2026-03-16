@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -14,14 +14,6 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
 class MotionOuterSentenceActionTest : VimTestCase() {
-  @VimBehaviorDiffers(
-    originalVimAfter = """
-        Lorem ipsum dolor sit amet,
-        consectetur adipiscing elit
-        Sed in orci mauris.
-        $c
-    """,
-  )
   @Test
   fun `test on empty last line`() {
     doTest(
@@ -36,7 +28,7 @@ class MotionOuterSentenceActionTest : VimTestCase() {
         ${c}Lorem ipsum dolor sit amet,
         consectetur adipiscing elit
         Sed in orci mauris.
-        
+
       """.trimIndent(),
       Mode.NORMAL(),
     )

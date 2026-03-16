@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2024 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -134,7 +134,7 @@ y = true; // And this will not
     )
     typeText(injector.parser.parseKeys("V2j="))
     assertState(
-      """${c}public class Foo {
+      """public class Foo {
     private boolean x;
     private boolean y;
 private boolean z;

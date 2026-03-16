@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -19,26 +19,27 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
-import java.util.EnumSet
+import java.util.*
 
 /**
  * @author vlan
  */
 @CommandOrMotion(keys = ["="], modes = [Mode.VISUAL])
-class AutoIndentLinesVisualAction : VisualOperatorActionHandler.ForEachCaret() {
+class AutoIndentLinesVisualAction : VisualOperatorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.CHANGE
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE)
 
-  override fun executeAction(
+  override fun executeForAllCarets(
     editor: VimEditor,
-    caret: VimCaret,
     context: ExecutionContext,
     cmd: Command,
-    range: VimSelection,
+    caretsAndSelections: Map<VimCaret, VimSelection>,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    injector.changeGroup.autoIndentRange(editor, caret, context, range.toVimTextRange(true))
+    val carets = caretsAndSelections.keys.toList()
+    val ranges = caretsAndSelections.values.map { it.toVimTextRange(true) }
+    injector.changeGroup.autoIndentRange(editor, context, ranges, carets)
     return true
   }
 }

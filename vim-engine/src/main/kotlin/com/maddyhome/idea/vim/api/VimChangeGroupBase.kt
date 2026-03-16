@@ -1369,8 +1369,9 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     val range = injector.motion.getMotionRange(editor, caret, context, argument, operatorArguments)
     if (range != null) {
       autoIndentRange(
-        editor, caret, context,
-        TextRange(range.startOffset, range.endOffsetInclusive)
+        editor, context,
+        ranges = listOf(TextRange(range.startOffset, range.endOffsetInclusive)),
+        carets = listOf(caret),
       )
     }
   }

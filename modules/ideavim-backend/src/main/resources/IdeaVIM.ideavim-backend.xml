@@ -44,5 +44,8 @@
     <platform.rpc.backend.remoteApiProvider
         implementation="com.maddyhome.idea.vim.group.comment.CommentaryRemoteApiProvider"/>
 
+    <!-- RPC: expose format/auto-indent operations to thin-client frontend -->
+    <platform.rpc.backend.remoteApiProvider
+        implementation="com.maddyhome.idea.vim.group.format.FormatRemoteApiProvider"/>
   </extensions>
 </idea-plugin>

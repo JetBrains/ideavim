@@ -7,7 +7,6 @@
  */
 package com.maddyhome.idea.vim.group
 
-import com.intellij.codeInsight.actions.AsyncActionExecutionService
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.application.ApplicationManager
@@ -18,6 +17,7 @@ import com.intellij.openapi.editor.actionSystem.TypedActionHandler
 import com.intellij.openapi.editor.actions.EnterAction
 import com.intellij.openapi.editor.event.EditorMouseEvent
 import com.intellij.openapi.editor.event.EditorMouseListener
+import com.intellij.openapi.editor.impl.editorId
 import com.intellij.openapi.util.UserDataHolder
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.util.PsiUtilBase
@@ -26,23 +26,18 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimChangeGroupBase
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.getLineEndForOffset
-import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
+import com.maddyhome.idea.vim.group.format.FormatRemoteApi
 import com.maddyhome.idea.vim.handler.commandContinuation
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.key.KeyHandlerKeeper
 import com.maddyhome.idea.vim.listener.VimInsertListener
-import com.maddyhome.idea.vim.newapi.IjVimCaret
-import com.maddyhome.idea.vim.newapi.IjVimCopiedText
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.undo.VimKeyBasedUndoService
 import com.maddyhome.idea.vim.undo.VimTimestampBasedUndoService
-import kotlin.math.min
 
 /**
  * Provides all the insert/replace related functionality
@@ -132,14 +127,6 @@ class ChangeGroup : VimChangeGroupBase() {
     injector.scroll.scrollCaretIntoView(editor)
   }
 
-  private fun restoreCursor(editor: VimEditor, caret: VimCaret, startLine: Int) {
-    if (caret != editor.primaryCaret()) {
-      (editor as IjVimEditor).editor.caretModel.addCaret(
-        editor.editor.offsetToVisualPosition(injector.motion.moveCaretToLineStartSkipLeading(editor, startLine)), false
-      )
-    }
-  }
-
   override fun reformatCode(editor: VimEditor, start: Int, end: Int) {
     val project = (editor as IjVimEditor).editor.project ?: return
     val file = PsiUtilBase.getPsiFileInEditor(editor.editor, project) ?: return
@@ -151,55 +138,32 @@ class ChangeGroup : VimChangeGroupBase() {
 
   override fun autoIndentRange(
     editor: VimEditor,
-    caret: VimCaret,
     context: ExecutionContext,
-    range: TextRange,
+    ranges: List<TextRange>,
+    carets: List<VimCaret>,
   ) {
-    val startOffset = editor.getLineStartForOffset(range.startOffset)
-    val endOffset = editor.getLineEndForOffset(range.endOffset)
     val ijEditor = (editor as IjVimEditor).editor
+    rpc(ijEditor.project) {
+      FormatRemoteApi.getInstance().format(
+        ijEditor.editorId(),
+        ranges.map { it.startOffset },
+        ranges.map { it.endOffset },
+      )
+    }
 
-    // FIXME: Here we do selection, and it is not a good idea, because it updates primary selection in Linux
-    // FIXME: I'll leave here a dirty fix that restores primary selection, but it would be better to rewrite this method
-    var copiedText: IjVimCopiedText? = null
-    try {
-      if (injector.registerGroup.isPrimaryRegisterSupported()) {
-        copiedText = injector.clipboardManager.getPrimaryContent(editor, context) as IjVimCopiedText
-      }
-    } catch (e: Exception) {
-      // FIXME: [isPrimaryRegisterSupported()] is not implemented perfectly, so there might be thrown an exception after trying to access the primary selection
-      logger.warn("False positive X11 primary selection support")
+    for ((caret, range) in carets.zip(ranges)) {
+      moveCaretToFirstNonBlank(editor, range, caret)
     }
-    ijEditor.selectionModel.vimSetSystemSelectionSilently(startOffset, endOffset)
-    val project = ijEditor.project
-    val actionExecution = {
-      val joinLinesAction = injector.nativeActionManager.indentLines
-      if (joinLinesAction != null) {
-        injector.actionExecutor.executeAction(editor, joinLinesAction, context)
-      }
-    }
-    val afterAction = {
-      val firstLine = editor.offsetToBufferPosition(
-        min(startOffset.toDouble(), endOffset.toDouble()).toInt()
-      ).line
-      val newOffset = injector.motion.moveCaretToLineStartSkipLeading(editor, firstLine)
-      caret.moveToOffset(newOffset)
-      restoreCursor(editor, caret, (caret as IjVimCaret).caret.logicalPosition.line)
-    }
-    if (project != null) {
-      AsyncActionExecutionService.getInstance(project)
-        .withExecutionAfterAction(IdeActions.ACTION_EDITOR_AUTO_INDENT_LINES, actionExecution, afterAction)
-    } else {
-      actionExecution.invoke()
-      afterAction.invoke()
-    }
-    try {
-      if (copiedText != null) {
-        injector.clipboardManager.setPrimaryContent(editor, context, copiedText)
-      }
-    } catch (e: Exception) {
-      // FIXME: [isPrimaryRegisterSupported()] is not implemented perfectly, so there might be thrown an exception after trying to access the primary selection
-    }
+  }
+
+  private fun moveCaretToFirstNonBlank(
+    editor: IjVimEditor,
+    range: TextRange,
+    caret: VimCaret,
+  ) {
+    val firstLine = editor.offsetToBufferPosition(range.startOffset).line
+    val newOffset = injector.motion.moveCaretToLineStartSkipLeading(editor, firstLine)
+    caret.moveToOffset(newOffset)
   }
 
   @Deprecated(
