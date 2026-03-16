@@ -216,9 +216,8 @@ internal class PutGroup : VimPutBase() {
 
     VimPlugin.getChange().autoIndentRange(
       editor,
-      caret,
       context,
-      TextRange(startLineOffset, endLineOffset),
+      ranges = listOf(TextRange(startLineOffset, endLineOffset)),
     )
     return editor.getLineEndOffset(endLine, true)
   }

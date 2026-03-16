@@ -220,7 +220,12 @@ interface VimChangeGroup {
     operatorArguments: OperatorArguments,
   )
 
-  fun autoIndentRange(editor: VimEditor, caret: VimCaret, context: ExecutionContext, range: TextRange)
+  fun autoIndentRange(
+    editor: VimEditor,
+    context: ExecutionContext,
+    ranges: List<TextRange>,
+    carets: List<VimCaret> = emptyList(),
+  )
 
   fun indentLines(
     editor: VimEditor,
