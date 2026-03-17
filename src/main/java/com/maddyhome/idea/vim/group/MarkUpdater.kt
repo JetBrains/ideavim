@@ -43,7 +43,7 @@ object MarkUpdater : DocumentListener {
     if (event.oldLength == 0) return
     val doc = event.document
     val anEditor = getAnyEditorForDocument(doc) ?: return
-    injector.markService.updateMarksFromDelete(anEditor, event.offset, event.oldLength)
+    injector.markService.updateMarksFromDelete(anEditor, event.offset, event.oldLength, event.newLength)
   }
 
   /**

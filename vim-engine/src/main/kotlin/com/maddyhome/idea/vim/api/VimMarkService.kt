@@ -134,8 +134,9 @@ interface VimMarkService {
    * @param editor          The modified editor
    * @param delStartOffset  The offset within the editor where the deletion occurred
    * @param delLength       The length of the deleted text
+   * @param newLength       The length of the replacement text (0 for pure deletes)
    */
-  fun updateMarksFromDelete(editor: VimEditor, delStartOffset: Int, delLength: Int)
+  fun updateMarksFromDelete(editor: VimEditor, delStartOffset: Int, delLength: Int, newLength: Int = 0)
 
   fun editorReleased(editor: VimEditor)
 

@@ -1093,9 +1093,12 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         return i > 1
       }
       // Note that caret isn't moved here; it's only used for register + mark storage
-      deleteText(editor, context, TextRange(startOffset, endOffset), null, caret)
       if (spaces && !hasTrailingWhitespace) {
-        insertText(editor, caret, startOffset, " ")
+        // Use replaceText to combine delete+insert into a single document event,
+        // so mark adjustment correctly accounts for the replacement length
+        replaceText(editor, caret, startOffset, endOffset, " ")
+      } else {
+        deleteText(editor, context, TextRange(startOffset, endOffset), null, caret)
       }
       caret.moveToOffset(startOffset)
     }
