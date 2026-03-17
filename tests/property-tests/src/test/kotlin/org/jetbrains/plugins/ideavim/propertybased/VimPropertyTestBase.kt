@@ -34,9 +34,11 @@ abstract class VimPropertyTestBase : VimTestCase() {
     keyState.mappingState.resetMappingSequence()
     VimPlugin.getKey().resetKeyMappings()
 
-    KeyHandler.getInstance().fullReset(editor.vim)
+    if (!editor.isDisposed) {
+      KeyHandler.getInstance().fullReset(editor.vim)
+      editor.caretModel.runForEachCaret { it.moveToOffset(0) }
+    }
     VimPlugin.getRegister().resetRegisters()
-    editor.caretModel.runForEachCaret { it.moveToOffset(0) }
 
     (VimPlugin.getSearch() as VimSearchGroupBase).resetState()
     VimPlugin.getChange().reset()

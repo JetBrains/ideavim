@@ -8,6 +8,7 @@
 package com.maddyhome.idea.vim.group
 
 import com.intellij.ide.vfs.rpcId
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.RoamingType
 import com.intellij.openapi.components.State
@@ -90,9 +91,23 @@ internal class VimMarkServiceImpl : VimMarkServiceBase(), PersistentStateCompone
 
   override fun removeGlobalMark(char: Char) {
     if (injector.globalIjOptions().ideamarks) {
-      rpc { BookmarkRemoteApi.getInstance().removeBookmark(char) }
+      removeIjBookmark(char)
     }
     super.removeGlobalMark(char)
+  }
+
+  private fun removeIjBookmark(char: Char) {
+    // removeGlobalMark can be called from document listeners (e.g. MarkUpdater.beforeDocumentChange)
+    // which fire inside a write action. rpc() uses runWithModalProgressBlocking which is illegal
+    // under the write lock, so we defer the bookmark removal to run after the write action completes.
+    if (ApplicationManager.getApplication().isWriteAccessAllowed) {
+      ApplicationManager.getApplication().invokeLater {
+        rpc { BookmarkRemoteApi.getInstance().removeBookmark(char) }
+      }
+      return
+    }
+
+    rpc { BookmarkRemoteApi.getInstance().removeBookmark(char) }
   }
 
   private fun saveData(element: Element) {
