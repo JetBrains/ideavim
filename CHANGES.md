@@ -36,6 +36,8 @@ usual beta standards.
 * [VIM-566](https://youtrack.jetbrains.com/issue/VIM-566) Added support for `:set foldlevel` option - control fold visibility level
 
 ### Fixes:
+* [VIM-4134](https://youtrack.jetbrains.com/issue/VIM-4134) Fixed undo in commentary - `gcc`/`gc{motion}` changes are now properly grouped as a single undo step
+* Fixed NERDTree `gs`/`gi` preview split commands to keep focus on the tree
 * [VIM-4105](https://youtrack.jetbrains.com/issue/VIM-4105) Fixed `a"` `a'` `a\`` text objects to include surrounding whitespace per Vim spec
 * [VIM-4097](https://youtrack.jetbrains.com/issue/VIM-4097) Fixed `<A-n>` (NextOccurrence) with text containing backslashes - e.g., selecting `\IntegerField` now works correctly
 * [VIM-4094](https://youtrack.jetbrains.com/issue/VIM-4094) Fixed UninitializedPropertyAccessException when loading history
