@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2024 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -147,13 +147,15 @@ object NeovimTesting {
       currentTestName = ""
       neovimTestsCounter++
     }
-    assertAll(
-      { assertText(editor) },
-      { assertCaret(editor, test) },
-      { assertMode(editor) },
-      { assertRegisters(editor) },
-      { assertMarks(editor) },
-    )
+    ApplicationManager.getApplication().invokeAndWait {
+      assertAll(
+        { assertText(editor) },
+        { assertCaret(editor, test) },
+        { assertMode(editor) },
+        { assertRegisters(editor) },
+        { assertMarks(editor) },
+      )
+    }
   }
 
   fun setRegister(register: Char, keys: String, test: TestInfo) {
