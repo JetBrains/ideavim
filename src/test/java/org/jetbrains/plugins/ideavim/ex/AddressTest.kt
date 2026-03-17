@@ -169,4 +169,13 @@ class AddressTest : VimTestCase() {
     typeText(commandToKeys("/bar//foo/d"))
     assertState("a\nfoo\nbar\nbar\nbaz\n")
   }
+
+  @Test
+  fun testRepeatLastSearchWithNoLastSearch() {
+    // Using \/ (repeat last search forward) with no prior search should report E35, not throw NPE
+    configureByText("a\nb\nc\n")
+    typeText(commandToKeys("\\/d"))
+    assertPluginError(true)
+    assertStatusLineMessageContains("E35")
+  }
 }
