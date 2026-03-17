@@ -61,6 +61,7 @@ class KeyHandler {
     ModeInputConsumer()   // Must be last to accept the keystroke as typed input
   )
   private var handleKeyRecursionCount = 0
+  internal var maxMapDepthReached = false
 
   private var commandListener: ConcurrentLinkedDeque<() -> Unit> = ConcurrentLinkedDeque()
 
@@ -167,6 +168,7 @@ class KeyHandler {
       logger.trace { "Mode = ${editor.mode}" }
       val maxMapDepth = injector.globalOptions().maxmapdepth
       if (handleKeyRecursionCount >= maxMapDepth) {
+        maxMapDepthReached = true
         keyProcessResultBuilder.addExecutionStep { _, lambdaEditor, _ ->
           logger.warn("Key handling, maximum recursion of the key received. maxdepth=$maxMapDepth")
           injector.messages.showErrorMessage(lambdaEditor, injector.messages.message("E223"))
@@ -175,6 +177,9 @@ class KeyHandler {
       }
 
       injector.messages.clearError()
+      if (handleKeyRecursionCount == 0) {
+        maxMapDepthReached = false
+      }
       // We only record unmapped keystrokes. If we've recursed to handle mapping, don't record anything.
       val shouldRecord = handleKeyRecursionCount == 0 && injector.registerGroup.isRecording
 
