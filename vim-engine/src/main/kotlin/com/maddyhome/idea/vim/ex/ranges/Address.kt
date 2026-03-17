@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import org.jetbrains.annotations.TestOnly
-import java.util.*
+import java.util.StringTokenizer
 
 /**
  * Base for all Ex command addresses
@@ -266,7 +266,7 @@ private class SearchAddress(pattern: String, offset: Int, move: Boolean) : Addre
 
       // Note that wrapscan, ignorecase, etc. all come from current option values, as expected
       searchOffset = getSearchOffset(editor, line0, direction)
-      searchOffset = injector.searchGroup.processSearchRange(editor, pattern!!, patternOffset, searchOffset, direction)
+      searchOffset = injector.searchGroup.processSearchRange(editor, pattern ?: throw exExceptionMessage("E35"), patternOffset, searchOffset, direction)
 
       if (searchOffset == -1) {
         if (injector.options(editor).wrapscan) {
