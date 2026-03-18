@@ -34,7 +34,7 @@ dependencies {
   implementation("org.eclipse.jgit:org.eclipse.jgit:6.6.0.202305301015-r")
 
   // This is needed for jgit to connect to ssh
-  implementation("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:7.4.0.202509020913-r")
+  implementation("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:7.6.0.202603022253-r")
   implementation("com.vdurmont:semver4j:3.1.0")
 }
 
