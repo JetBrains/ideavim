@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -19,6 +19,7 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.toolbar.floating.AbstractFloatingToolbarProvider
 import com.intellij.openapi.editor.toolbar.floating.FloatingToolbarComponent
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.io.FileUtil
@@ -30,9 +31,10 @@ import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.troubleshooting.Troubleshooter
 import com.maddyhome.idea.vim.ui.ReloadFloatingToolbarActionGroup.Companion.ACTION_GROUP
+import com.maddyhome.idea.vim.vimscript.model.commands.IdeaPlug
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
+import com.maddyhome.idea.vim.vimscript.services.VimRcService
 import com.maddyhome.idea.vim.vimscript.services.VimRcService.VIMRC_FILE_NAME
-import com.maddyhome.idea.vim.vimscript.services.VimRcService.executeIdeaVimRc
 import org.jetbrains.annotations.TestOnly
 import java.nio.file.Path
 import kotlin.io.path.readText
@@ -152,8 +154,24 @@ internal class ReloadVimRc : DumbAwareAction() {
     injector.keyGroup.removeKeyMapping(MappingOwner.IdeaVim.InitScript)
     Troubleshooter.getInstance().removeByType("old-action-notation-in-mappings")
 
-    // Reload the ideavimrc in the context of the current window, as though we had called `:source ~/.ideavimrc`
-    executeIdeaVimRc(editor.vim)
+    val ideaVimRc = VimRcService.findIdeaVimRc() ?: return
+
+    // Read content from the editor document directly instead of from disk.
+    // In split mode, .ideavimrc is on the local filesystem while VFS is remote,
+    // so reading through VFS or NIO can cause File Cache Conflict dialogs.
+    val document = editor.document
+    FileDocumentManager.getInstance().saveDocumentAsIs(document)
+    val content = document.text
+
+    IdeaPlug.Companion.EnabledExtensions.clearExtensions()
+    val context = injector.executionContextManager.getEditorExecutionContext(editor.vim)
+    injector.vimscriptExecutor.executingIdeaVimRcConfiguration = true
+    try {
+      injector.vimscriptExecutor.execute(content, editor.vim, context, skipHistory = true, indicateErrors = false)
+    } finally {
+      VimRcFileState.saveFileState(ideaVimRc.toAbsolutePath().toString(), content)
+      injector.vimscriptExecutor.executingIdeaVimRcConfiguration = false
+    }
   }
 }
 
