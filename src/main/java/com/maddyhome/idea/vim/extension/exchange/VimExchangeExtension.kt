@@ -10,13 +10,11 @@ package com.maddyhome.idea.vim.extension.exchange
 
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
-import com.intellij.openapi.editor.colors.EditorColors
-import com.intellij.openapi.editor.markup.HighlighterLayer
-import com.intellij.openapi.editor.markup.HighlighterTargetArea
-import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.util.Key
 import com.intellij.vim.api.VimApi
 import com.intellij.vim.api.VimInitApi
+import com.intellij.vim.api.models.Color
+import com.intellij.vim.api.models.HighlightId
 import com.intellij.vim.api.scopes.nmapPluginAction
 import com.intellij.vim.api.scopes.xmapPluginAction
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -81,11 +79,12 @@ class VimExchangeExtension : VimExtension {
   object Util {
     val EXCHANGE_KEY = Key<Exchange>("exchange")
 
-    fun clearExchange(editor: Editor) {
-      editor.getUserData(EXCHANGE_KEY)?.getHighlighter()?.let {
-        editor.markupModel.removeHighlighter(it)
+    fun clearExchange(vimEditor: VimEditor) {
+      val ijEditor = vimEditor.ij
+      ijEditor.getUserData(EXCHANGE_KEY)?.highlightId?.let {
+        injector.highlightingService.removeHighlighter(vimEditor, it)
       }
-      editor.putUserData(EXCHANGE_KEY, null)
+      ijEditor.putUserData(EXCHANGE_KEY, null)
     }
   }
 
@@ -98,6 +97,7 @@ class VimExchangeExtension : VimExtension {
     private const val EXCHANGE_LINE_CMD = "<Plug>(ExchangeLine)"
     @NonNls
     internal const val OPERATOR_FUNC = "ExchangeOperatorFunc"
+    internal val HIGHLIGHT_COLOR = Color(255, 255, 0, 100)
   }
 
   internal class Operator(private val isVisual: Boolean = false) : OperatorFunction {
@@ -109,32 +109,21 @@ class VimExchangeExtension : VimExtension {
 
     override fun apply(editor: VimEditor, context: ExecutionContext, selectionType: SelectionType?): Boolean {
       val ijEditor = editor.ij
-      fun highlightExchange(ex: Exchange): RangeHighlighter {
-        val attributes = ijEditor.colorsScheme.getAttributes(EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES)
-        val hlArea = when (ex.type) {
-          SelectionType.LINE_WISE -> HighlighterTargetArea.LINES_IN_RANGE
-          // TODO: handle other modes
-          else -> HighlighterTargetArea.EXACT_RANGE
-        }
-        // When LINE_WISE, the highlight covers full lines so no end adjustment needed.
-        // When not LINE_WISE, hlArea is always EXACT_RANGE, so the old condition
-        // `!isVisualLine && (hlArea == EXACT_RANGE || isVisual)` was always true —
-        // the `isVisual` branch was unreachable. Simplified accordingly.
+      fun highlightExchange(ex: Exchange): HighlightId {
         val endAdj = if (ex.type != SelectionType.LINE_WISE) 1 else 0
-        return ijEditor.markupModel.addRangeHighlighter(
+        return injector.highlightingService.addHighlighter(
+          editor,
           ex.startOffset,
           (ex.endOffset + endAdj).coerceAtMost(editor.fileSize().toInt()),
-          HighlighterLayer.SELECTION - 1,
-          attributes,
-          hlArea,
+          HIGHLIGHT_COLOR,
+          null,
         )
       }
 
       val currentExchange = getExchange(ijEditor, isVisual, selectionType ?: SelectionType.CHARACTER_WISE)
       val exchange1 = ijEditor.getUserData(Util.EXCHANGE_KEY)
       if (exchange1 == null) {
-        val highlighter = highlightExchange(currentExchange)
-        currentExchange.setHighlighter(highlighter)
+        currentExchange.highlightId = highlightExchange(currentExchange)
         ijEditor.putUserData(Util.EXCHANGE_KEY, currentExchange)
         return true
       } else {
@@ -164,7 +153,7 @@ class VimExchangeExtension : VimExtension {
           }
         }
         exchange(ijEditor, ex1, ex2, reverse, expand)
-        Util.clearExchange(ijEditor)
+        Util.clearExchange(editor)
         return true
       }
     }
@@ -351,14 +340,8 @@ class VimExchangeExtension : VimExtension {
     val endCol: Int,
     val endOffset: Int,
     val text: String,
-  ) {
-    private var myHighlighter: RangeHighlighter? = null
-    fun setHighlighter(highlighter: RangeHighlighter) {
-      myHighlighter = highlighter
-    }
-
-    fun getHighlighter(): RangeHighlighter? = myHighlighter
-  }
+    var highlightId: HighlightId? = null,
+  )
 }
 
 private suspend fun VimApi.exchangeAction(isLine: Boolean) {
@@ -367,9 +350,9 @@ private suspend fun VimApi.exchangeAction(isLine: Boolean) {
 }
 
 private fun exchangeClearAction() {
-  // Bridge to old API - will be migrated to storage API later
-  val editor = injector.editorGroup.getEditors().firstOrNull()?.ij ?: return
-  VimExchangeExtension.Util.clearExchange(editor)
+  // Bridge: still uses injector to get the editor until Operator is fully migrated to VimApi
+  val vimEditor = injector.editorGroup.getEditors().firstOrNull() ?: return
+  VimExchangeExtension.Util.clearExchange(vimEditor)
 }
 
 private fun exchangeVisualAction() {
