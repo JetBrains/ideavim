@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2024 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -443,6 +443,7 @@ fun findBlockRange(
 }
 
 private fun findBlock(editor: VimEditor, pos: Int, charToMatch: Char, pairChar: Char, count: Int): Pair<Int, Int>? {
+  if (pos < 0 || pos >= editor.text().length) return null
   val blockAtPos = getStringAtPos(editor, pos, true) ?: injector.psiService.getCommentAtPos(editor, pos)?.first
 
   var blockStart: Int?
@@ -530,7 +531,7 @@ private fun getQuoteRangeNoPSI(
   isInner: Boolean,
   isSingleQuotes: Boolean,
 ): TextRange? {
-  require(currentPos in 0..chars.lastIndex) // We can't use StrictMode here because I would like to test it without an injector initialized
+  if (currentPos !in 0..chars.lastIndex) return null
 
   val start = chars.lastIndexOf('\n', currentPos) + 1
   val changes = quotesChanges(chars, start).takeWhileInclusive { it.position <= currentPos }

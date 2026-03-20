@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2024 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -134,5 +134,25 @@ class SearchGroupNoPSITests {
   fun `test inner double quotes range for position after closing quote`() {
     val text = "let myVar = \"Oh, hi Mark\" // comment"
     assertNull(getDoubleQuotesRangeNoPSI(text, 25, true))
+  }
+
+  @Test
+  fun `test returns null for position past end of text`() {
+    val text = "hello"
+    assertNull(getDoubleQuotesRangeNoPSI(text, 10, false))
+    assertNull(getSingleQuotesRangeNoPSI(text, 10, false))
+  }
+
+  @Test
+  fun `test returns null for empty text`() {
+    assertNull(getDoubleQuotesRangeNoPSI("", 0, false))
+    assertNull(getSingleQuotesRangeNoPSI("", 0, false))
+  }
+
+  @Test
+  fun `test returns null for negative position`() {
+    val text = "hello"
+    assertNull(getDoubleQuotesRangeNoPSI(text, -1, false))
+    assertNull(getSingleQuotesRangeNoPSI(text, -1, false))
   }
 }
