@@ -15,6 +15,7 @@ import com.intellij.openapi.editor.markup.HighlighterLayer
 import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.util.Key
+import com.intellij.vim.api.VimApi
 import com.intellij.vim.api.VimInitApi
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
@@ -62,13 +63,17 @@ class VimExchangeExtension : VimExtension {
   override fun getName() = "exchange"
 
   override fun init(initApi: VimInitApi) {
-    putExtensionHandlerMapping(
-      MappingMode.N,
-      injector.parser.parseKeys(EXCHANGE_CMD),
-      owner,
-      ExchangeHandler(false),
-      false
-    )
+    initApi.mappings {
+      nnoremap(EXCHANGE_CMD) {
+        exchangeAction(isLine = false)
+      }
+      nnoremap(EXCHANGE_LINE_CMD) {
+        exchangeAction(isLine = true)
+      }
+      nmap("cx", EXCHANGE_CMD)
+      nmap("cxx", EXCHANGE_LINE_CMD)
+    }
+
     putExtensionHandlerMapping(MappingMode.X, injector.parser.parseKeys(EXCHANGE_CMD), owner, VExchangeHandler(), false)
     putExtensionHandlerMapping(
       MappingMode.N,
@@ -77,21 +82,7 @@ class VimExchangeExtension : VimExtension {
       ExchangeClearHandler(),
       false
     )
-    putExtensionHandlerMapping(
-      MappingMode.N,
-      injector.parser.parseKeys(EXCHANGE_LINE_CMD),
-      owner,
-      ExchangeHandler(true),
-      false
-    )
 
-    putKeyMappingIfMissing(
-      MappingMode.N,
-      injector.parser.parseKeys("cx"),
-      owner,
-      injector.parser.parseKeys(EXCHANGE_CMD),
-      true
-    )
     putKeyMappingIfMissing(
       MappingMode.X,
       injector.parser.parseKeys("X"),
@@ -104,13 +95,6 @@ class VimExchangeExtension : VimExtension {
       injector.parser.parseKeys("cxc"),
       owner,
       injector.parser.parseKeys(EXCHANGE_CLEAR_CMD),
-      true
-    )
-    putKeyMappingIfMissing(
-      MappingMode.N,
-      injector.parser.parseKeys("cxx"),
-      owner,
-      injector.parser.parseKeys(EXCHANGE_LINE_CMD),
       true
     )
 
@@ -136,16 +120,7 @@ class VimExchangeExtension : VimExtension {
     @NonNls
     private const val EXCHANGE_LINE_CMD = "<Plug>(ExchangeLine)"
     @NonNls
-    private const val OPERATOR_FUNC = "ExchangeOperatorFunc"
-  }
-
-  private class ExchangeHandler(private val isLine: Boolean) : ExtensionHandler {
-    override val isRepeatable = true
-
-    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
-      injector.globalOptions().operatorfunc = OPERATOR_FUNC
-      executeNormalWithoutMapping(injector.parser.parseKeys(if (isLine) "g@_" else "g@"), editor.ij)
-    }
+    internal const val OPERATOR_FUNC = "ExchangeOperatorFunc"
   }
 
   private class ExchangeClearHandler : ExtensionHandler {
@@ -408,4 +383,9 @@ class VimExchangeExtension : VimExtension {
 
     fun getHighlighter(): RangeHighlighter? = myHighlighter
   }
+}
+
+private suspend fun VimApi.exchangeAction(isLine: Boolean) {
+  commands().setOperatorFunction(VimExchangeExtension.OPERATOR_FUNC)
+  normal(if (isLine) "g@_" else "g@")
 }
