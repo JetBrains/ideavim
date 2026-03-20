@@ -15,6 +15,7 @@ import com.intellij.openapi.editor.markup.HighlighterLayer
 import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.util.Key
+import com.intellij.vim.api.VimInitApi
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getOffset
@@ -60,7 +61,7 @@ class VimExchangeExtension : VimExtension {
 
   override fun getName() = "exchange"
 
-  override fun init() {
+  override fun init(initApi: VimInitApi) {
     putExtensionHandlerMapping(
       MappingMode.N,
       injector.parser.parseKeys(EXCHANGE_CMD),
