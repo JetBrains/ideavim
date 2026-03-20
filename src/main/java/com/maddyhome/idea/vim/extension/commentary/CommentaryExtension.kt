@@ -87,11 +87,11 @@ internal class CommentaryExtension : VimExtension {
     // <Plug>Commentary in Normal and Visual mode: set up operator pending motion
     initApi.mappings {
       nnoremap("<Plug>Commentary") {
-        setOperatorFunction(OPERATOR_FUNC)
+        commands().setOperatorFunction(OPERATOR_FUNC)
         normal("g@")
       }
       xnoremap("<Plug>Commentary") {
-        setOperatorFunction(OPERATOR_FUNC)
+        commands().setOperatorFunction(OPERATOR_FUNC)
         normal("g@")
       }
     }

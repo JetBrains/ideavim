@@ -32,8 +32,10 @@ internal class ReplaceWithRegister : VimExtension {
       nmap("gr", RWR_OPERATOR)
       nmap("grr", RWR_LINE)
       vmap("gr", RWR_VISUAL)
+    }
 
-      initApi.exportOperatorFunction(OPERATOR_FUNC_NAME) {
+    initApi.commands {
+      exportOperatorFunction(OPERATOR_FUNC_NAME) {
         operatorFunction()
       }
     }

@@ -39,8 +39,10 @@ fun VimInitApi.init() {
     vmap("gr", RWR_VISUAL)
   }
 
-  exportOperatorFunction(OPERATOR_FUNC_NAME) {
-    operatorFunction()
+  commands {
+    exportOperatorFunction(OPERATOR_FUNC_NAME) {
+      operatorFunction()
+    }
   }
 }
 
@@ -66,7 +68,7 @@ internal suspend fun VimApi.operatorFunction(): Boolean {
 }
 
 internal suspend fun VimApi.rewriteMotion() {
-  setOperatorFunction(OPERATOR_FUNC_NAME)
+  commands().setOperatorFunction(OPERATOR_FUNC_NAME)
   normal("g@")
 }
 
