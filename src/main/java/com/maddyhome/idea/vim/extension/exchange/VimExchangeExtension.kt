@@ -17,22 +17,19 @@ import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.util.Key
 import com.intellij.vim.api.VimApi
 import com.intellij.vim.api.VimInitApi
+import com.intellij.vim.api.scopes.nmapPluginAction
+import com.intellij.vim.api.scopes.xmapPluginAction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getOffset
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.setChangeMarks
-import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormalWithoutMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.getRegister
-import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
-import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegister
 import com.maddyhome.idea.vim.extension.exportOperatorFunction
 import com.maddyhome.idea.vim.helper.moveToInlayAwareLogicalPosition
@@ -64,39 +61,19 @@ class VimExchangeExtension : VimExtension {
 
   override fun init(initApi: VimInitApi) {
     initApi.mappings {
-      nnoremap(EXCHANGE_CMD) {
+      nmapPluginAction("cx", EXCHANGE_CMD, keepDefaultMapping = true) {
         exchangeAction(isLine = false)
       }
-      nnoremap(EXCHANGE_LINE_CMD) {
+      nmapPluginAction("cxx", EXCHANGE_LINE_CMD, keepDefaultMapping = true) {
         exchangeAction(isLine = true)
       }
-      nmap("cx", EXCHANGE_CMD)
-      nmap("cxx", EXCHANGE_LINE_CMD)
+      nmapPluginAction("cxc", EXCHANGE_CLEAR_CMD, keepDefaultMapping = true) {
+        exchangeClearAction()
+      }
+      xmapPluginAction("X", EXCHANGE_CMD, keepDefaultMapping = true) {
+        exchangeVisualAction()
+      }
     }
-
-    putExtensionHandlerMapping(MappingMode.X, injector.parser.parseKeys(EXCHANGE_CMD), owner, VExchangeHandler(), false)
-    putExtensionHandlerMapping(
-      MappingMode.N,
-      injector.parser.parseKeys(EXCHANGE_CLEAR_CMD),
-      owner,
-      ExchangeClearHandler(),
-      false
-    )
-
-    putKeyMappingIfMissing(
-      MappingMode.X,
-      injector.parser.parseKeys("X"),
-      owner,
-      injector.parser.parseKeys(EXCHANGE_CMD),
-      true
-    )
-    putKeyMappingIfMissing(
-      MappingMode.N,
-      injector.parser.parseKeys("cxc"),
-      owner,
-      injector.parser.parseKeys(EXCHANGE_CLEAR_CMD),
-      true
-    )
 
     VimExtensionFacade.exportOperatorFunction(OPERATOR_FUNC, Operator())
   }
@@ -123,22 +100,7 @@ class VimExchangeExtension : VimExtension {
     internal const val OPERATOR_FUNC = "ExchangeOperatorFunc"
   }
 
-  private class ExchangeClearHandler : ExtensionHandler {
-    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
-      Util.clearExchange(editor.ij)
-    }
-  }
-
-  private class VExchangeHandler : ExtensionHandler {
-    override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
-      val mode = editor.mode
-      // Leave visual mode to create selection marks
-      executeNormalWithoutMapping(injector.parser.parseKeys("<Esc>"), editor.ij)
-      Operator(true).apply(editor, context, mode.selectionType ?: SelectionType.CHARACTER_WISE)
-    }
-  }
-
-  private class Operator(private val isVisual: Boolean = false) : OperatorFunction {
+  internal class Operator(private val isVisual: Boolean = false) : OperatorFunction {
     fun SelectionType.getString() = when (this) {
       SelectionType.CHARACTER_WISE -> "v"
       SelectionType.LINE_WISE -> "V"
@@ -399,4 +361,19 @@ class VimExchangeExtension : VimExtension {
 private suspend fun VimApi.exchangeAction(isLine: Boolean) {
   commands().setOperatorFunction(VimExchangeExtension.OPERATOR_FUNC)
   normal(if (isLine) "g@_" else "g@")
+}
+
+private fun exchangeClearAction() {
+  // Bridge to old API - will be migrated to storage API later
+  val editor = injector.editorGroup.getEditors().firstOrNull()?.ij ?: return
+  VimExchangeExtension.Util.clearExchange(editor)
+}
+
+private fun exchangeVisualAction() {
+  // Bridge to old API - will be fully migrated later
+  val vimEditor = injector.editorGroup.getEditors().firstOrNull() ?: return
+  val mode = vimEditor.mode
+  val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+  executeNormalWithoutMapping(injector.parser.parseKeys("<Esc>"), vimEditor.ij)
+  VimExchangeExtension.Operator(true).apply(vimEditor, context, mode.selectionType ?: SelectionType.CHARACTER_WISE)
 }
