@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2025 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -25,10 +25,8 @@ class EditorScopeImpl(
 
   override fun ideChange(block: Transaction.() -> Unit) {
     injector.application.invokeAndWait {
-      injector.application.runWriteAction {
-        val transaction = TransactionImpl(projectId)
-        transaction.block()
-      }
+      val transaction = TransactionImpl(projectId)
+      transaction.block()
     }
   }
 }

@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.group
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.platform.ide.progress.runWithModalProgressBlocking
+import com.intellij.util.PlatformUtils
 
 /**
  * Executes a suspend [block] as a blocking RPC call.
@@ -27,4 +28,18 @@ internal fun <T> rpc(project: Project? = null, block: suspend () -> T): T {
     ?: ProjectManager.getInstance().openProjects.firstOrNull()
     ?: error("No open project available for RPC call")
   return runWithModalProgressBlocking(resolvedProject, "") { block() }
+}
+
+/**
+ * Executes a suspend [block] only when running in split mode (JetBrains Client).
+ * In monolith mode this is a no-op.
+ *
+ * Use this for operations that must only run on the backend in split mode,
+ * e.g. registering undo marks that would interfere with the local UndoManager
+ * if executed in the same process.
+ */
+internal fun rpcSplitModeOnly(project: Project? = null, block: suspend () -> Unit) {
+  if (PlatformUtils.isJetBrainsClient()) {
+    rpc(project, block)
+  }
 }

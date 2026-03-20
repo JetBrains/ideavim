@@ -247,31 +247,58 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     count: Int,
   ) {
     val myLastStrokes = lastStrokes ?: return
+
+    val batched = batchAdjacentTextStrokes(myLastStrokes)
+
     for (caret in editor.nativeCarets()) {
       repeat(count) {
-        for (lastStroke in myLastStrokes) {
-          when (lastStroke) {
+        for (stroke in batched) {
+          when (stroke) {
+            is String -> {
+              insertText(editor, caret, stroke)
+            }
+
             is NativeAction -> {
-              injector.actionExecutor.executeAction(editor, lastStroke, context)
-              strokes.add(lastStroke)
+              injector.actionExecutor.executeAction(editor, stroke, context)
+              strokes.add(stroke)
             }
 
             is EditorActionHandlerBase -> {
-              injector.actionExecutor.executeVimAction(editor, lastStroke, context, OperatorArguments(0, editor.mode))
-              strokes.add(lastStroke)
-            }
-
-            is CharArray -> {
-              insertText(editor, caret, String(lastStroke))
+              injector.actionExecutor.executeVimAction(editor, stroke, context, OperatorArguments(0, editor.mode))
+              strokes.add(stroke)
             }
 
             else -> {
-              throw RuntimeException("Unexpected stroke type: ${lastStroke.javaClass} $lastStroke")
+              throw RuntimeException("Unexpected stroke type: ${stroke.javaClass} $stroke")
             }
           }
         }
       }
     }
+  }
+
+  /**
+   * Merges adjacent [CharArray] entries into [String]s, leaving other stroke types as-is.
+   */
+  private fun batchAdjacentTextStrokes(strokes: List<Any>): List<Any> {
+    val result = mutableListOf<Any>()
+    val textBuffer = StringBuilder()
+
+    for (stroke in strokes) {
+      if (stroke is CharArray) {
+        textBuffer.append(stroke)
+      } else {
+        if (textBuffer.isNotEmpty()) {
+          result.add(textBuffer.toString())
+          textBuffer.clear()
+        }
+        result.add(stroke)
+      }
+    }
+    if (textBuffer.isNotEmpty()) {
+      result.add(textBuffer.toString())
+    }
+    return result
   }
 
   /**
