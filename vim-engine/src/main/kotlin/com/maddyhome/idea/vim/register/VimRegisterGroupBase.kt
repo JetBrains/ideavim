@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -82,14 +82,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
   private val onClipboardChanged: () -> Unit = {
     val clipboardOptionValue = injector.globalOptions().clipboard
     defaultRegisterChar = when {
-      "unnamedplus" in clipboardOptionValue -> {
-        if (isPrimaryRegisterSupported()) {
-          CLIPBOARD_REGISTER
-        } else {
-          PRIMARY_REGISTER // for some reason non-X systems use PRIMARY_REGISTER as a clipboard storage
-        }
-      }
-
+      "unnamedplus" in clipboardOptionValue -> CLIPBOARD_REGISTER
       "unnamed" in clipboardOptionValue -> PRIMARY_REGISTER
       else -> UNNAMED_REGISTER
     }
@@ -424,8 +417,15 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
   private fun refreshPrimaryRegister(editor: VimEditor, context: ExecutionContext): Register? {
     logger.trace("Syncing cached primary selection value..")
     if (!isPrimaryRegisterSupported()) {
+      // On non-X11 systems (macOS, Windows), * and + both map to the system clipboard.
+      // Return a Register named '*' with clipboard content.
       logger.trace("X11 primary selection is not supported. Syncing clipboard selection..")
-      return refreshClipboardRegister(editor, context)
+      val clipboardData = injector.clipboardManager.getClipboardContent(editor, context) ?: return null
+      val currentRegister = myRegisters[PRIMARY_REGISTER]
+      if (currentRegister != null && clipboardData.text == currentRegister.text) {
+        return currentRegister
+      }
+      return Register(PRIMARY_REGISTER, clipboardData, guessSelectionType(clipboardData.text))
     }
     try {
       val clipboardData = injector.clipboardManager.getPrimaryContent(editor, context) ?: return null
@@ -437,20 +437,18 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     } catch (e: Exception) {
       logger.warn("False positive X11 primary selection support")
       logger.trace("Syncing primary selection failed. Syncing clipboard selection instead")
-      return refreshClipboardRegister(editor, context)
+      val clipboardData = injector.clipboardManager.getClipboardContent(editor, context) ?: return null
+      return Register(PRIMARY_REGISTER, clipboardData, guessSelectionType(clipboardData.text))
     }
   }
 
   private fun refreshClipboardRegister(editor: VimEditor, context: ExecutionContext): Register? {
-    // for some reason non-X systems use PRIMARY_REGISTER as a clipboard storage
-    val systemAwareClipboardRegister = if (isPrimaryRegisterSupported()) CLIPBOARD_REGISTER else PRIMARY_REGISTER
-
     val clipboardData = injector.clipboardManager.getClipboardContent(editor, context) ?: return null
-    val currentRegister = myRegisters[systemAwareClipboardRegister]
+    val currentRegister = myRegisters[CLIPBOARD_REGISTER]
     if (currentRegister != null && clipboardData.text == currentRegister.text) {
       return currentRegister
     }
-    return Register(systemAwareClipboardRegister, clipboardData, guessSelectionType(clipboardData.text))
+    return Register(CLIPBOARD_REGISTER, clipboardData, guessSelectionType(clipboardData.text))
   }
 
   override fun getRegister(editor: VimEditor, context: ExecutionContext, r: Char): Register? {
@@ -469,7 +467,6 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
   override fun getRegisters(editor: VimEditor, context: ExecutionContext): List<Register> {
     val filteredRegisters = myRegisters.values.filterNot { CLIPBOARD_REGISTERS.contains(it.name) }.toMutableList()
     val clipboardRegisters = CLIPBOARD_REGISTERS
-      .filterNot { it == CLIPBOARD_REGISTER && !isPrimaryRegisterSupported() } // for some reason non-X systems use PRIMARY_REGISTER as a clipboard storage
       .mapNotNull { refreshClipboardRegister(editor, context, it) }
 
     return (filteredRegisters + clipboardRegisters).sortedWith(Register.KeySorter)
@@ -481,10 +478,6 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     if (CLIPBOARD_REGISTERS.indexOf(myR) >= 0) {
       when (myR) {
         CLIPBOARD_REGISTER -> {
-          if (!isPrimaryRegisterSupported()) {
-            // it looks wrong, but for some reason non-X systems use the * register to store the clipboard content
-            myR = PRIMARY_REGISTER
-          }
           setSystemClipboardRegisterText(editor, context, register.copiedText)
         }
 

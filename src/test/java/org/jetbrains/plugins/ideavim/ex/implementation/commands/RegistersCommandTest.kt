@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -229,6 +229,7 @@ class RegistersCommandTest : VimTestCase() {
         |  c  "z   Hello world z
         |  c  "-   s
         |  c  "*   clipboard content
+        |  c  "+   clipboard content
         |  c  ":   ascii
         |  c  "/   search pattern
       """.trimMargin(),
@@ -256,6 +257,7 @@ class RegistersCommandTest : VimTestCase() {
       """
         |Type Name Content
         |  c  "*   clipboard content
+        |  c  "+   clipboard content
       """.trimMargin(),
     )
   }
@@ -274,6 +276,7 @@ class RegistersCommandTest : VimTestCase() {
         |  c  ""   line
         |  c  "0   line
         |  c  "*   line
+        |  c  "+   line
         |  c  ":   set clipboard=unnamed,unnamedplus
       """.trimMargin(),
     )
@@ -294,6 +297,7 @@ class RegistersCommandTest : VimTestCase() {
         |  c  ""   line
         |  c  "-   line
         |  c  "*   line
+        |  c  "+   line
         |  c  ":   set clipboard=unnamed,unnamedplus
       """.trimMargin(),
     )
@@ -314,6 +318,7 @@ class RegistersCommandTest : VimTestCase() {
         |  c  ""   line
         |  c  "-   line
         |  c  "*   line
+        |  c  "+   line
         |  c  ":   set clipboard=unnamedplus
       """.trimMargin(),
     )
