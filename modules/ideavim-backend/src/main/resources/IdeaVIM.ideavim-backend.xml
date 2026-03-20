@@ -47,5 +47,9 @@
     <!-- RPC: expose format/auto-indent operations to thin-client frontend -->
     <platform.rpc.backend.remoteApiProvider
         implementation="com.maddyhome.idea.vim.group.format.FormatRemoteApiProvider"/>
+
+    <!-- RPC: expose document changes with undo grouping for split mode -->
+    <platform.rpc.backend.remoteApiProvider
+        implementation="com.maddyhome.idea.vim.group.change.ChangeRemoteApiProvider"/>
   </extensions>
 </idea-plugin>

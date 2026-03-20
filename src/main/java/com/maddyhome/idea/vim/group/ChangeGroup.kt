@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.api.VimChangeGroupBase
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.group.change.ChangeRemoteApi
 import com.maddyhome.idea.vim.group.format.FormatRemoteApi
 import com.maddyhome.idea.vim.handler.commandContinuation
 import com.maddyhome.idea.vim.helper.inInsertMode
@@ -125,6 +126,23 @@ class ChangeGroup : VimChangeGroupBase() {
   override fun processBackspace(editor: VimEditor, context: ExecutionContext) {
     injector.actionExecutor.executeAction(editor, name = IdeActions.ACTION_EDITOR_BACKSPACE, context = context)
     injector.scroll.scrollCaretIntoView(editor)
+  }
+
+  override fun repeatInsertText(editor: VimEditor, context: ExecutionContext, count: Int) {
+    val ijEditor = (editor as IjVimEditor).editor
+    val editorId = ijEditor.editorId()
+
+    // Register start/finish undo marks on the backend via RPC so that all
+    // replayed strokes (text insertions + actions like backspace) are grouped
+    // into a single undo step on both frontend and backend.
+    // We cannot use StartMarkAction locally because the UndoSpy/CmdMeta
+    // pipeline does not reliably transmit marks to the backend.
+    rpcSplitModeOnly(ijEditor.project) { ChangeRemoteApi.getInstance().startUndoMark(editorId, "Vim Repeat") }
+    try {
+      super.repeatInsertText(editor, context, count)
+    } finally {
+      rpcSplitModeOnly(ijEditor.project) { ChangeRemoteApi.getInstance().finishUndoMark(editorId) }
+    }
   }
 
   override fun reformatCode(editor: VimEditor, start: Int, end: Int) {

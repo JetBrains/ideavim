@@ -215,7 +215,7 @@ internal class VimSurroundExtension : VimExtension {
       val charTo = injector.keyGroup.getChar(editor) ?: return
 
       val newSurround = getOrInputPair(charTo, editor.ij, context.ij) ?: return
-      runWriteAction { change(editor, context, charFrom, newSurround) }
+      change(editor, context, charFrom, newSurround)
     }
 
     companion object {
@@ -338,7 +338,7 @@ internal class VimSurroundExtension : VimExtension {
       val charFrom = injector.keyGroup.getChar(editor) ?: return
       LOG.debug("DSurroundHandler: charFrom = $charFrom")
 
-      runWriteAction { CSurroundHandler.change(editor, context, charFrom, null) }
+      CSurroundHandler.change(editor, context, charFrom, null)
     }
   }
 
@@ -445,7 +445,6 @@ private fun getOrInputPair(c: Char, editor: Editor, context: DataContext): Surro
 
 
 private fun performSurround(pair: SurroundPair, range: TextRange, caret: VimCaret, tagsOnNewLines: Boolean = false) {
-  runWriteAction {
     val editor = caret.editor
     val change = VimPlugin.getChange()
     val leftSurround = pair.first + if (tagsOnNewLines) "\n" else ""
@@ -468,5 +467,4 @@ private fun performSurround(pair: SurroundPair, range: TextRange, caret: VimCare
       caret,
       TextRange(range.startOffset, range.endOffset + leftSurround.length + rightSurround.length)
     )
-  }
 }
