@@ -40,12 +40,14 @@ usual beta standards.
 * [VIM-4097](https://youtrack.jetbrains.com/issue/VIM-4097) Fixed `<A-n>` (NextOccurrence) with text containing backslashes - e.g., selecting `\IntegerField` now works correctly
 * [VIM-4094](https://youtrack.jetbrains.com/issue/VIM-4094) Fixed UninitializedPropertyAccessException when loading history
 * [VIM-3948](https://youtrack.jetbrains.com/issue/VIM-3948) Improved hint generation visibility checks for better UI component detection
+* [VIM-3473](https://youtrack.jetbrains.com/issue/VIM-3473) Fixed "Reload .ideavimrc" action in remote development (split) mode - no longer causes File Cache Conflict dialogs
 * Fixed high CPU usage while showing command line
 * Fixed comparison of String and Number in VimScript expressions
 
 ### Merged PRs:
 * [1414](https://github.com/JetBrains/ideavim/pull/1414) by [Matt Ellis](https://github.com/citizenmatt): Refactor/functions
 * [1442](https://github.com/JetBrains/ideavim/pull/1442) by [Matt Ellis](https://github.com/citizenmatt): Fix high CPU usage while showing command line
+* [1613](https://github.com/JetBrains/ideavim/pull/1613) by [1grzyb1](https://github.com/1grzyb1): VIM-3473 Sync ideavim in remdev
 
 ## 2.28.0, 2025-12-09
 
