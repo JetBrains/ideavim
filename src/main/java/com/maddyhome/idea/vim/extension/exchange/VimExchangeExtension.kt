@@ -139,7 +139,6 @@ class VimExchangeExtension : VimExtension {
   }
 
   private class Operator(private val isVisual: Boolean = false) : OperatorFunction {
-    fun Editor.getMarkOffset(mark: Mark) = IjVimEditor(this).getOffset(mark.line, mark.col)
     fun SelectionType.getString() = when (this) {
       SelectionType.CHARACTER_WISE -> "v"
       SelectionType.LINE_WISE -> "V"
@@ -158,8 +157,8 @@ class VimExchangeExtension : VimExtension {
         val isVisualLine = ex.type == SelectionType.LINE_WISE
         val endAdj = if (!(isVisualLine) && (hlArea == HighlighterTargetArea.EXACT_RANGE || isVisual)) 1 else 0
         return ijEditor.markupModel.addRangeHighlighter(
-          ijEditor.getMarkOffset(ex.start),
-          (ijEditor.getMarkOffset(ex.end) + endAdj).coerceAtMost(editor.fileSize().toInt()),
+          ex.startOffset,
+          (ex.endOffset + endAdj).coerceAtMost(editor.fileSize().toInt()),
           HighlighterLayer.SELECTION - 1,
           attributes,
           hlArea,
@@ -211,7 +210,7 @@ class VimExchangeExtension : VimExtension {
         val vimEditor = editor.vim
         injector.markService.setChangeMarks(
           vimEditor.primaryCaret(),
-          TextRange(editor.getMarkOffset(targetExchange.start), editor.getMarkOffset(targetExchange.end) + 1),
+          TextRange(targetExchange.startOffset, targetExchange.endOffset + 1),
         )
         // do this instead of direct text manipulation to set change marks
         setRegister('z', injector.parser.stringToKeys(sourceExchange.text), sourceExchange.type)
@@ -221,22 +220,22 @@ class VimExchangeExtension : VimExtension {
       fun fixCursor(ex1: Exchange, ex2: Exchange, reverse: Boolean) {
         val primaryCaret = editor.caretModel.primaryCaret
         if (reverse) {
-          primaryCaret.moveToInlayAwareOffset(editor.getMarkOffset(ex1.start))
+          primaryCaret.moveToInlayAwareOffset(ex1.startOffset)
         } else {
-          if (ex1.start.line == ex2.start.line) {
-            val horizontalOffset = ex1.end.col - ex2.end.col
+          if (ex1.startLine == ex2.startLine) {
+            val horizontalOffset = ex1.endCol - ex2.endCol
             primaryCaret.moveToInlayAwareLogicalPosition(
               LogicalPosition(
-                ex1.start.line,
-                ex1.start.col - horizontalOffset,
+                ex1.startLine,
+                ex1.startCol - horizontalOffset,
               ),
             )
-          } else if (ex1.end.line - ex1.start.line != ex2.end.line - ex2.start.line) {
-            val verticalOffset = ex1.end.line - ex2.end.line
+          } else if (ex1.endLine - ex1.startLine != ex2.endLine - ex2.startLine) {
+            val verticalOffset = ex1.endLine - ex2.endLine
             primaryCaret.moveToInlayAwareLogicalPosition(
               LogicalPosition(
-                ex1.start.line - verticalOffset,
-                ex1.start.col,
+                ex1.startLine - verticalOffset,
+                ex1.startCol,
               ),
             )
           }
@@ -267,16 +266,16 @@ class VimExchangeExtension : VimExtension {
 
     private fun compareExchanges(x: Exchange, y: Exchange): ExchangeCompareResult {
       fun intersects(x: Exchange, y: Exchange) =
-        x.end.line < y.start.line ||
-          x.start.line > y.end.line ||
-          x.end.col < y.start.col ||
-          x.start.col > y.end.col
+        x.endLine < y.startLine ||
+          x.startLine > y.endLine ||
+          x.endCol < y.startCol ||
+          x.startCol > y.endCol
 
-      fun comparePos(x: Mark, y: Mark): Int =
-        if (x.line == y.line) {
-          x.col - y.col
+      fun comparePos(xLine: Int, xCol: Int, yLine: Int, yCol: Int): Int =
+        if (xLine == yLine) {
+          xCol - yCol
         } else {
-          x.line - y.line
+          xLine - yLine
         }
 
       return if (x.type == SelectionType.BLOCK_WISE && y.type == SelectionType.BLOCK_WISE) {
@@ -285,7 +284,7 @@ class VimExchangeExtension : VimExtension {
             ExchangeCompareResult.OVERLAP
           }
 
-          x.start.col <= y.start.col -> {
+          x.startCol <= y.startCol -> {
             ExchangeCompareResult.LT
           }
 
@@ -293,16 +292,16 @@ class VimExchangeExtension : VimExtension {
             ExchangeCompareResult.GT
           }
         }
-      } else if (comparePos(x.start, y.start) <= 0 && comparePos(x.end, y.end) >= 0) {
+      } else if (comparePos(x.startLine, x.startCol, y.startLine, y.startCol) <= 0 && comparePos(x.endLine, x.endCol, y.endLine, y.endCol) >= 0) {
         ExchangeCompareResult.OUTER
-      } else if (comparePos(y.start, x.start) <= 0 && comparePos(y.end, x.end) >= 0) {
+      } else if (comparePos(y.startLine, y.startCol, x.startLine, x.startCol) <= 0 && comparePos(y.endLine, y.endCol, x.endLine, x.endCol) >= 0) {
         ExchangeCompareResult.INNER
-      } else if (comparePos(x.start, y.end) <= 0 && comparePos(y.start, x.end) <= 0 ||
-        comparePos(y.start, x.end) <= 0 && comparePos(x.start, y.end) <= 0
+      } else if (comparePos(x.startLine, x.startCol, y.endLine, y.endCol) <= 0 && comparePos(y.startLine, y.startCol, x.endLine, x.endCol) <= 0 ||
+        comparePos(y.startLine, y.startCol, x.endLine, x.endCol) <= 0 && comparePos(x.startLine, x.startCol, y.endLine, y.endCol) <= 0
       ) {
         ExchangeCompareResult.OVERLAP
       } else {
-        val cmp = comparePos(x.start, y.start)
+        val cmp = comparePos(x.startLine, x.startCol, y.startLine, y.startCol)
         when {
           cmp == 0 -> ExchangeCompareResult.OVERLAP
           cmp < 0 -> ExchangeCompareResult.LT
@@ -366,16 +365,28 @@ class VimExchangeExtension : VimExtension {
       setRegister('*', starRegText)
       setRegister('+', plusRegText)
 
-      return if (selectionStart.offset(editor.vim) <= selectionEnd.offset(editor.vim)) {
-        Exchange(selectionType, selectionStart, selectionEnd, text)
+      val vimEditor = editor.vim
+      val startOffset = selectionStart.offset(vimEditor)
+      val endOffset = selectionEnd.offset(vimEditor)
+      return if (startOffset <= endOffset) {
+        Exchange(selectionType, selectionStart.line, selectionStart.col, startOffset, selectionEnd.line, selectionEnd.col, endOffset, text)
       } else {
-        Exchange(selectionType, selectionEnd, selectionStart, text)
+        Exchange(selectionType, selectionEnd.line, selectionEnd.col, endOffset, selectionStart.line, selectionStart.col, startOffset, text)
       }
     }
   }
 
-  // End mark has always greater of eq offset than start mark
-  class Exchange(val type: SelectionType, val start: Mark, val end: Mark, val text: String) {
+  // End mark has always greater or equal offset than start mark
+  class Exchange(
+    val type: SelectionType,
+    val startLine: Int,
+    val startCol: Int,
+    val startOffset: Int,
+    val endLine: Int,
+    val endCol: Int,
+    val endOffset: Int,
+    val text: String,
+  ) {
     private var myHighlighter: RangeHighlighter? = null
     fun setHighlighter(highlighter: RangeHighlighter) {
       myHighlighter = highlighter
