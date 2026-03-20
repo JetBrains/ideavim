@@ -10,6 +10,7 @@ package org.jetbrains.plugins.ideavim.extension.exchange
 
 import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.extension.exchange.VimExchangeExtension
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -436,13 +437,11 @@ class VimExchangeExtensionTest : VimTestCase() {
     typeText(injector.parser.parseKeys("cxc"))
   }
 
-  // TODO: The `area` parameter is no longer validated because the new highlight API doesn't expose
-  //  HighlighterTargetArea. Restore area validation when the API supports it.
-  private fun assertHighlighter(start: Int, end: Int, @Suppress("UNUSED_PARAMETER") area: HighlighterTargetArea) {
-    val allHighlighters = fixture.editor.markupModel.allHighlighters
-    val highlighter = allHighlighters.lastOrNull { it.startOffset == start && it.endOffset == end }
-      ?: error("No highlighter found with start=$start, end=$end. Available: ${allHighlighters.map { "(${it.startOffset}, ${it.endOffset})" }}")
+  private fun assertHighlighter(start: Int, end: Int, area: HighlighterTargetArea) {
+    val currentExchange = fixture.editor.getUserData(VimExchangeExtension.Util.EXCHANGE_KEY)!!
+    val highlighter = currentExchange.getHighlighter()!!
     kotlin.test.assertEquals(start, highlighter.startOffset)
     kotlin.test.assertEquals(end, highlighter.endOffset)
+    kotlin.test.assertEquals(area, highlighter.targetArea)
   }
 }
