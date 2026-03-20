@@ -24,6 +24,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import org.mockito.Mockito
+import kotlinx.coroutines.runBlocking
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.spy
@@ -84,9 +85,11 @@ class TransactionTest : MockTestCase() {
   fun `test setMark calls setMark`() {
     val char = 'a'
 
-    myVimApi.editor {
-      change {
-        setMark(char)
+    runBlocking {
+      myVimApi.editor {
+        change {
+          setMark(char)
+        }
       }
     }
 
@@ -103,9 +106,11 @@ class TransactionTest : MockTestCase() {
   fun `test removeMark calls removeMark`() {
     val char = 'b'
 
-    myVimApi.editor {
-      change {
-        removeMark(char)
+    runBlocking {
+      myVimApi.editor {
+        change {
+          removeMark(char)
+        }
       }
     }
 
@@ -123,9 +128,11 @@ class TransactionTest : MockTestCase() {
     val char = 'A'
     val offset = 0
 
-    myVimApi.editor {
-      change {
-        setGlobalMark(char)
+    runBlocking {
+      myVimApi.editor {
+        change {
+          setGlobalMark(char)
+        }
       }
     }
 
@@ -143,9 +150,11 @@ class TransactionTest : MockTestCase() {
   fun `test removeGlobalMark calls removeGlobalMark`() {
     val char = 'B'
 
-    myVimApi.editor {
-      change {
-        removeGlobalMark(char)
+    runBlocking {
+      myVimApi.editor {
+        change {
+          removeGlobalMark(char)
+        }
       }
     }
 
@@ -157,9 +166,11 @@ class TransactionTest : MockTestCase() {
     val char = 'C'
     val offset = 10
 
-    myVimApi.editor {
-      change {
-        setGlobalMark(char, offset)
+    runBlocking {
+      myVimApi.editor {
+        change {
+          setGlobalMark(char, offset)
+        }
       }
     }
 
@@ -175,9 +186,11 @@ class TransactionTest : MockTestCase() {
 
   @Test
   fun `test resetAllMarks calls resetAllMarks`() {
-    myVimApi.editor {
-      change {
-        resetAllMarks()
+    runBlocking {
+      myVimApi.editor {
+        change {
+          resetAllMarks()
+        }
       }
     }
 
@@ -186,9 +199,11 @@ class TransactionTest : MockTestCase() {
 
   @Test
   fun `test dropLastJump calls dropLastJump`() {
-    myVimApi.editor {
-      change {
-        dropLastJump()
+    runBlocking {
+      myVimApi.editor {
+        change {
+          dropLastJump()
+        }
       }
     }
 
@@ -197,9 +212,11 @@ class TransactionTest : MockTestCase() {
 
   @Test
   fun `test clearJumps calls clearJumps`() {
-    myVimApi.editor {
-      change {
-        clearJumps()
+    runBlocking {
+      myVimApi.editor {
+        change {
+          clearJumps()
+        }
       }
     }
 

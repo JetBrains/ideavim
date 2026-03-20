@@ -29,6 +29,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import javax.swing.SwingConstants
+import kotlinx.coroutines.runBlocking
 import kotlin.test.assertEquals
 
 /**
@@ -90,7 +91,7 @@ class EditorContextTest : VimTestCase() {
     }
 
     val vimApi = createVimApi()
-    assertEquals(5, vimApi.editor { read { lineCount } })
+    assertEquals(5, runBlocking { vimApi.editor { read { lineCount } } })
 
     // Window switching via the platform API has an async gap: setAsCurrentWindow()
     // updates _currentWindowFlow synchronously, but getSelectedTextEditor() reads
@@ -104,7 +105,7 @@ class EditorContextTest : VimTestCase() {
     }
     waitUntil { fileEditorManager.selectedTextEditor != editorBefore }
 
-    assertEquals(3, vimApi.editor { read { lineCount } })
+    assertEquals(3, runBlocking { vimApi.editor { read { lineCount } } })
   }
 
   @Test
@@ -115,7 +116,7 @@ class EditorContextTest : VimTestCase() {
     }
 
     val vimApi = createVimApi()
-    assertEquals(3, vimApi.editor { read { lineCount } })
+    assertEquals(3, runBlocking { vimApi.editor { read { lineCount } } })
 
     // Split window and open a second file (5 lines) — simulates user opening
     // a file in another split, which makes it the active editor
@@ -135,6 +136,6 @@ class EditorContextTest : VimTestCase() {
     }
 
     // The same VimApi instance now reads from the second editor
-    assertEquals(5, vimApi.editor { read { lineCount } })
+    assertEquals(5, runBlocking { vimApi.editor { read { lineCount } } })
   }
 }

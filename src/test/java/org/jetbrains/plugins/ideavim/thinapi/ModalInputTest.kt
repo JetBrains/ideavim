@@ -36,6 +36,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.verify
+import kotlinx.coroutines.runBlocking
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -132,7 +133,7 @@ class ModalInputTest : MockTestCase() {
 
     Mockito.`when`(modalInput.label).thenReturn(label)
 
-    myVimApi.modalInput()
+    runBlocking { myVimApi.modalInput() }
       .repeat(2)
       .updateLabel { newLabel ->
         currentLabel = "$newLabel - Updated"
@@ -171,7 +172,7 @@ class ModalInputTest : MockTestCase() {
 
     Mockito.`when`(modalInput.label).thenReturn(label)
 
-    myVimApi.modalInput()
+    runBlocking { myVimApi.modalInput() }
       .repeatWhile {
         handlerCalledCount < 1
       }
@@ -207,7 +208,7 @@ class ModalInputTest : MockTestCase() {
 
     Mockito.`when`(modalInput.label).thenReturn(label)
 
-    myVimApi.modalInput()
+    runBlocking { myVimApi.modalInput() }
       .repeat(3)
       .inputChar(label) { char ->
         handlerCalledCount++
@@ -241,7 +242,7 @@ class ModalInputTest : MockTestCase() {
 
     Mockito.`when`(modalInput.label).thenReturn(label)
 
-    myVimApi.modalInput()
+    runBlocking { myVimApi.modalInput() }
       .inputString(label) { string ->
         handlerCalledCount++
         receivedString = string
@@ -274,7 +275,7 @@ class ModalInputTest : MockTestCase() {
 
     Mockito.`when`(modalInput.label).thenReturn(label)
 
-    myVimApi.modalInput()
+    runBlocking { myVimApi.modalInput() }
       .inputChar(label) { char ->
         handlerCalledCount++
         receivedChar = char
@@ -303,7 +304,7 @@ class ModalInputTest : MockTestCase() {
   fun `test closeCurrentInput with existing input`() {
     Mockito.`when`(modalInputService.getCurrentModalInput()).thenReturn(modalInput)
 
-    val result = myVimApi.modalInput().closeCurrentInput()
+    val result = runBlocking { myVimApi.modalInput() }.closeCurrentInput()
 
     verify(modalInput).deactivate(eq(true), eq(true))
 
@@ -314,7 +315,7 @@ class ModalInputTest : MockTestCase() {
   fun `test closeCurrentInput with no existing input`() {
     Mockito.`when`(modalInputService.getCurrentModalInput()).thenReturn(null)
 
-    val result = myVimApi.modalInput().closeCurrentInput()
+    val result = runBlocking { myVimApi.modalInput() }.closeCurrentInput()
 
     assertFalse(result)
   }
@@ -323,7 +324,7 @@ class ModalInputTest : MockTestCase() {
   fun `test closeCurrentInput with refocusEditor false`() {
     Mockito.`when`(modalInputService.getCurrentModalInput()).thenReturn(modalInput)
 
-    myVimApi.modalInput().closeCurrentInput(refocusEditor = false)
+    runBlocking { myVimApi.modalInput() }.closeCurrentInput(refocusEditor = false)
 
     verify(modalInput).deactivate(eq(false), eq(true))
   }

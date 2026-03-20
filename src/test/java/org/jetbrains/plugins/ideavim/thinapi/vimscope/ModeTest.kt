@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.thinapi.VimApiImpl
 import com.maddyhome.idea.vim.thinapi.toEngineMode
+import kotlinx.coroutines.runBlocking
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -23,9 +24,9 @@ import org.junit.jupiter.api.TestInfo
 class ModeTest : VimTestCase() {
   private lateinit var vimApi: VimApi
 
-  fun execute(block: () -> Unit) {
+  fun execute(block: suspend () -> Unit) {
     injector.application.invokeAndWait {
-      block()
+      runBlocking { block() }
     }
   }
 
