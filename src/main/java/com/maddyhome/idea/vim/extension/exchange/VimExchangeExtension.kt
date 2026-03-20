@@ -116,8 +116,11 @@ class VimExchangeExtension : VimExtension {
           // TODO: handle other modes
           else -> HighlighterTargetArea.EXACT_RANGE
         }
-        val isVisualLine = ex.type == SelectionType.LINE_WISE
-        val endAdj = if (!(isVisualLine) && (hlArea == HighlighterTargetArea.EXACT_RANGE || isVisual)) 1 else 0
+        // When LINE_WISE, the highlight covers full lines so no end adjustment needed.
+        // When not LINE_WISE, hlArea is always EXACT_RANGE, so the old condition
+        // `!isVisualLine && (hlArea == EXACT_RANGE || isVisual)` was always true —
+        // the `isVisual` branch was unreachable. Simplified accordingly.
+        val endAdj = if (ex.type != SelectionType.LINE_WISE) 1 else 0
         return ijEditor.markupModel.addRangeHighlighter(
           ex.startOffset,
           (ex.endOffset + endAdj).coerceAtMost(editor.fileSize().toInt()),
