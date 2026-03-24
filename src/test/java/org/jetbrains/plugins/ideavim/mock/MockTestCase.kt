@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -28,12 +28,15 @@ open class MockTestCase : VimTestCase() {
   @TestDisposable
   lateinit var disposable: Disposable
 
-  val editorStub = TextComponentEditorImpl(null, JTextArea()).vim
+  private val _editorStub = lazy { TextComponentEditorImpl(null, JTextArea()).vim }
+  val editorStub by _editorStub
   val contextStub: ExecutionContext = DataContext.EMPTY_CONTEXT.vim
 
   @AfterEach
   fun tearDown() {
-    editorStub.carets().forEach { Disposer.dispose(it.ij) }
+    if (_editorStub.isInitialized()) {
+      editorStub.carets().forEach { Disposer.dispose(it.ij) }
+    }
   }
 
   fun <T : Any> mockService(service: Class<T>): T {

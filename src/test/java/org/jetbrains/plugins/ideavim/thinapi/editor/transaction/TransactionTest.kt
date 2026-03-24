@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2025 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -18,13 +18,13 @@ import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.thinapi.VimApiImpl
+import kotlinx.coroutines.runBlocking
 import org.jetbrains.plugins.ideavim.mock.MockTestCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import org.mockito.Mockito
-import kotlinx.coroutines.runBlocking
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.spy
@@ -67,11 +67,15 @@ class TransactionTest : MockTestCase() {
   override fun tearDown(testInfo: TestInfo) {
     injector = realInjector
 
-    super.tearDown(testInfo)
-    // reset mocks
+    // Reset mocks BEFORE super.tearDown() disposes the project,
+    // otherwise Mockito's thread-local invocation records hold
+    // IjVimEditor → EditorImpl → ProjectImpl references causing a project leak.
     Mockito.reset(mockMarkService)
     Mockito.reset(mockJumpService)
     Mockito.reset(mockInjector)
+    Mockito.framework().clearInlineMocks()
+
+    super.tearDown(testInfo)
   }
 
   fun assertEqualsEditor(expected: VimEditor, actual: VimEditor) {
