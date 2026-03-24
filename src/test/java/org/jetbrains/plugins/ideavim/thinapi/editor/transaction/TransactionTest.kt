@@ -8,6 +8,10 @@
 
 package org.jetbrains.plugins.ideavim.thinapi.editor.transaction
 
+import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.util.Disposer
+import com.intellij.testFramework.replaceService
 import com.intellij.vim.api.VimApi
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimInjector
@@ -38,6 +42,7 @@ class TransactionTest : MockTestCase() {
   private lateinit var vimEditor: VimEditor
   private lateinit var mockInjector: VimInjector
   private lateinit var realInjector: VimInjector
+  private lateinit var serviceDisposable: Disposable
 
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
@@ -50,10 +55,18 @@ class TransactionTest : MockTestCase() {
 
     mockInjector = spy(injector)
 
-    mockMarkService = mockService(VimMarkService::class.java)
+    // Use a separate disposable for service replacements so we can dispose it
+    // before super.tearDown(). This prevents editor teardown from calling methods
+    // on mock services (via editorReleased), which would record invocations on
+    // the EDT's MockingProgressImpl thread-local and leak the project.
+    serviceDisposable = Disposer.newDisposable("TransactionTest services")
+
+    mockMarkService = Mockito.mock(VimMarkService::class.java)
+    ApplicationManager.getApplication().replaceService(VimMarkService::class.java, mockMarkService, serviceDisposable)
     Mockito.`when`(mockInjector.markService).thenReturn(mockMarkService)
 
-    mockJumpService = mockService(VimJumpService::class.java)
+    mockJumpService = Mockito.mock(VimJumpService::class.java)
+    ApplicationManager.getApplication().replaceService(VimJumpService::class.java, mockJumpService, serviceDisposable)
     Mockito.`when`(mockInjector.jumpService).thenReturn(mockJumpService)
 
     vimEditor = fixture.editor.vim
@@ -67,17 +80,14 @@ class TransactionTest : MockTestCase() {
   override fun tearDown(testInfo: TestInfo) {
     injector = realInjector
 
-    // Reset mocks and clear Mockito thread-local state BEFORE super.tearDown()
-    // disposes the project. Otherwise MockingProgressImpl.ongoingStubbing retains
-    // InvocationContainerImpl → InterceptedInvocation.arguments → IjVimEditor →
-    // EditorImpl → ProjectImpl, causing a leaked project.
+    // Dispose service replacements BEFORE super.tearDown() so that editor
+    // teardown (editorReleased) hits the real services, not mocks.
+    Disposer.dispose(serviceDisposable)
+
     Mockito.reset(mockMarkService)
     Mockito.reset(mockJumpService)
     Mockito.reset(mockInjector)
     Mockito.framework().clearInlineMocks()
-    // validateMockitoUsage() clears the MockingProgressImpl thread-local
-    // (ongoingStubbing, verificationMode) which reset() alone does not touch
-    Mockito.validateMockitoUsage()
 
     super.tearDown(testInfo)
   }
