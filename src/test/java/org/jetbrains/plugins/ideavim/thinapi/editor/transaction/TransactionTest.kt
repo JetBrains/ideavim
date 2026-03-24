@@ -67,13 +67,17 @@ class TransactionTest : MockTestCase() {
   override fun tearDown(testInfo: TestInfo) {
     injector = realInjector
 
-    // Reset mocks BEFORE super.tearDown() disposes the project,
-    // otherwise Mockito's thread-local invocation records hold
-    // IjVimEditor → EditorImpl → ProjectImpl references causing a project leak.
+    // Reset mocks and clear Mockito thread-local state BEFORE super.tearDown()
+    // disposes the project. Otherwise MockingProgressImpl.ongoingStubbing retains
+    // InvocationContainerImpl → InterceptedInvocation.arguments → IjVimEditor →
+    // EditorImpl → ProjectImpl, causing a leaked project.
     Mockito.reset(mockMarkService)
     Mockito.reset(mockJumpService)
     Mockito.reset(mockInjector)
     Mockito.framework().clearInlineMocks()
+    // validateMockitoUsage() clears the MockingProgressImpl thread-local
+    // (ongoingStubbing, verificationMode) which reset() alone does not touch
+    Mockito.validateMockitoUsage()
 
     super.tearDown(testInfo)
   }
