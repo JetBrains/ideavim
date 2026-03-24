@@ -169,4 +169,31 @@ class AddressTest : VimTestCase() {
     typeText(commandToKeys("/bar//foo/d"))
     assertState("a\nfoo\nbar\nbar\nbaz\n")
   }
+
+  @Test
+  fun `test backslash-slash range without previous search reports E35`() {
+    // Before this fix, using \/ with no previous search caused a NullPointerException instead of E35
+    configureByText("1\n2\n3\n")
+    typeText(commandToKeys("\\/d"))
+    assertPluginError(true)
+    assertPluginErrorMessage("E35: No previous regular expression")
+  }
+
+  @Test
+  fun `test backslash-question range without previous search reports E35`() {
+    // Before this fix, using \? with no previous search caused a NullPointerException instead of E35
+    configureByText("1\n2\n3\n")
+    typeText(commandToKeys("\\?d"))
+    assertPluginError(true)
+    assertPluginErrorMessage("E35: No previous regular expression")
+  }
+
+  @Test
+  fun `test backslash-ampersand range without previous substitute reports E33`() {
+    // Before this fix, using \& with no previous substitute caused a NullPointerException instead of E33
+    configureByText("1\n2\n3\n")
+    typeText(commandToKeys("\\&d"))
+    assertPluginError(true)
+    assertPluginErrorMessage("E33: No previous substitute regular expression")
+  }
 }
