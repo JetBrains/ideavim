@@ -61,8 +61,6 @@
   </projectListeners>
 
   <extensions defaultExtensionNs="com.intellij">
-    <dependencySupport coordinate="configuration" kind="vim" displayName="IdeaVim"/>
-
     <!-- Plugin startup (UI init, .ideavimrc, EAP subscription) — only on frontend/monolith -->
     <postStartupActivity implementation="com.maddyhome.idea.vim.PluginStartup" order="first"/>
 
