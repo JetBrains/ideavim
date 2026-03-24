@@ -204,7 +204,7 @@ private class SearchAddress(pattern: String, offset: Int, move: Boolean) : Addre
     private val logger = vimLogger<SearchAddress>()
   }
 
-  private val patterns: MutableList<String?> = mutableListOf()
+  private val patterns: MutableList<String> = mutableListOf()
   private val directions: MutableList<Direction> = mutableListOf()
 
   init {
@@ -216,17 +216,17 @@ private class SearchAddress(pattern: String, offset: Int, move: Boolean) : Addre
       var pat = tok.nextToken()
       when (pat) {
         "\\/" -> {
-          patterns.add(injector.searchGroup.lastSearchPattern)
+          patterns.add(injector.searchGroup.lastSearchPattern ?: throw exExceptionMessage("E35"))
           directions.add(Direction.FORWARDS)
         }
 
         "\\?" -> {
-          patterns.add(injector.searchGroup.lastSearchPattern)
+          patterns.add(injector.searchGroup.lastSearchPattern ?: throw exExceptionMessage("E35"))
           directions.add(Direction.BACKWARDS)
         }
 
         "\\&" -> {
-          patterns.add(injector.searchGroup.lastSubstitutePattern)
+          patterns.add(injector.searchGroup.lastSubstitutePattern ?: throw exExceptionMessage("E33"))
           directions.add(Direction.FORWARDS)
         }
 
@@ -266,7 +266,7 @@ private class SearchAddress(pattern: String, offset: Int, move: Boolean) : Addre
 
       // Note that wrapscan, ignorecase, etc. all come from current option values, as expected
       searchOffset = getSearchOffset(editor, line0, direction)
-      searchOffset = injector.searchGroup.processSearchRange(editor, pattern!!, patternOffset, searchOffset, direction)
+      searchOffset = injector.searchGroup.processSearchRange(editor, pattern, patternOffset, searchOffset, direction)
 
       if (searchOffset == -1) {
         if (injector.options(editor).wrapscan) {
