@@ -8,11 +8,12 @@
 
 package com.maddyhome.idea.vim.group.jump
 
+import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.impl.IdeDocumentHistoryImpl.PlaceInfo
 import com.intellij.openapi.fileEditor.impl.IdeDocumentHistoryImpl.RecentPlacesListener
 import com.intellij.openapi.project.Project
 import com.intellij.platform.rpc.topics.broadcast
-import com.maddyhome.idea.vim.group.findEditorByFilePath
 
 /**
  * Listens to IntelliJ's [RecentPlacesListener] to capture IDE navigation events
@@ -43,7 +44,10 @@ internal class JumpsListener(val project: Project) : RecentPlacesListener {
   }
 
   private fun buildJumpInfo(place: PlaceInfo, added: Boolean): JumpInfo? {
-    val editor = findEditorByFilePath(project, place.file.path) ?: return null
+    val editor = FileEditorManager.getInstance(project).getAllEditors(place.file)
+      .filterIsInstance<TextEditor>()
+      .firstOrNull()
+      ?.editor ?: return null
     val offset = place.caretPosition?.startOffset ?: return null
 
     val bufferPosition = editor.offsetToLogicalPosition(offset)
