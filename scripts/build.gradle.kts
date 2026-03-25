@@ -21,7 +21,7 @@ repositories {
 }
 
 dependencies {
-  compileOnly("org.jetbrains.kotlin:kotlin-stdlib:2.3.10")
+  compileOnly("org.jetbrains.kotlin:kotlin-stdlib:2.3.20-206")
 
   testImplementation("org.junit.jupiter:junit-jupiter:6.0.3")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
