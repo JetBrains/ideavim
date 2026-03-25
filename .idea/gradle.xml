@@ -23,6 +23,7 @@
             <option value="$PROJECT_DIR$/tests/java-tests" />
             <option value="$PROJECT_DIR$/tests/long-running-tests" />
             <option value="$PROJECT_DIR$/tests/property-tests" />
+            <option value="$PROJECT_DIR$/tests/split-mode-tests" />
             <option value="$PROJECT_DIR$/tests/ui-fixtures" />
             <option value="$PROJECT_DIR$/tests/ui-ij-tests" />
             <option value="$PROJECT_DIR$/tests/ui-py-tests" />
