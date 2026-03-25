@@ -34,3 +34,6 @@ settings.xml
 .claude/settings.local.json
 
 .beads/sync_base.jsonl
+
+# Split-mode test artifacts
+**/allure-results/
