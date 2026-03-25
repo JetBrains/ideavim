@@ -35,7 +35,7 @@ dependencies {
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
   // Kodein DI is required at runtime by IDE Starter
-  testImplementation("org.kodein.di:kodein-di-jvm:7.20.2")
+  testImplementation("org.kodein.di:kodein-di-jvm:7.31.0")
   testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.10.1")
 
   intellijPlatform {
