@@ -36,7 +36,7 @@ dependencies {
 
   // Kodein DI is required at runtime by IDE Starter
   testImplementation("org.kodein.di:kodein-di-jvm:7.31.0")
-  testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.10.1")
+  testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.10.2")
 
   intellijPlatform {
     var useInstaller = "EAP-SNAPSHOT" !in ideaVersion
