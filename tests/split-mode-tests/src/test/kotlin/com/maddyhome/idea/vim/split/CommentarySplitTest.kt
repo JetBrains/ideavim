@@ -14,6 +14,15 @@ import org.junit.jupiter.api.Test
 
 class CommentarySplitTest : IdeaVimStarterTestBase() {
 
+  private var commentaryInstalled = false
+
+  fun setUpCommentary() {
+    if (commentaryInstalled) return
+    pause()
+    exCommand("Plug 'tpope/vim-commentary'")
+    commentaryInstalled = true
+  }
+
   private fun javaFile(name: String) = createFile(
     "src/$name.java", """
     public class $name {
@@ -28,6 +37,7 @@ class CommentarySplitTest : IdeaVimStarterTestBase() {
   @Test
   fun `gcc comments line and undo removes it in single step`() {
     openFile(javaFile("Comment1"))
+    setUpCommentary()
     goToLine(2)
     typeVim("gcc")
 
@@ -42,6 +52,7 @@ class CommentarySplitTest : IdeaVimStarterTestBase() {
   @Test
   fun `visual multi-line comment and undo`() {
     openFile(javaFile("Comment2"))
+    setUpCommentary()
     goToLine(2)
     typeVim("Vjjgc")
 
@@ -57,6 +68,7 @@ class CommentarySplitTest : IdeaVimStarterTestBase() {
   @Test
   fun `uncomment with gcgc`() {
     openFile(javaFile("Comment3"))
+    setUpCommentary()
     goToLine(2)
     typeVim("gcc")
 
