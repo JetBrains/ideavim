@@ -6,7 +6,7 @@ import _Self.buildTypes.Nvim
 import _Self.buildTypes.PluginVerifier
 import _Self.buildTypes.PropertyBased
 import _Self.buildTypes.RandomOrderTests
-import _Self.buildTypes.SplitModeTests
+
 import _Self.buildTypes.TestingBuildType
 import _Self.buildTypes.TypeScriptTest
 import _Self.subprojects.Releases
@@ -34,9 +34,6 @@ object Project : Project({
   buildType(Nvim)
   buildType(PluginVerifier)
   buildType(Compatibility)
-
-  // Split mode (Remote Dev) tests — daily
-  buildType(SplitModeTests)
 
   // TypeScript scripts test
   buildType(TypeScriptTest)
