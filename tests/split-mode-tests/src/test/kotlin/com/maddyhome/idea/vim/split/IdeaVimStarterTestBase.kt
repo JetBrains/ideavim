@@ -147,7 +147,16 @@ abstract class IdeaVimStarterTestBase {
   /** Types an ex command (without the leading `:`). */
   protected fun exCommand(command: String) {
     driver.withContext {
-      ideFrame { codeEditor().apply { waitFound(); keyboard { typeText(":$command"); enter() } } }
+      ideFrame {
+        codeEditor().apply {
+          waitFound(); keyboard {
+          typeText(
+            ":$command",
+            delayBetweenCharsInMs = 50
+          ); enter()
+        }
+        }
+      }
     }
   }
 
@@ -259,7 +268,6 @@ abstract class IdeaVimStarterTestBase {
       (message ?: "Caret should be after line $line") + ". Actual line: $actual"
     }
   }
-
 
   companion object {
     fun resolvePluginPath(): Path {
