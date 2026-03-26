@@ -165,25 +165,27 @@ internal class FileRemoteApiImpl : FileRemoteApi {
   // ======================== Private helpers ========================
 
   private fun findFile(filename: String, project: Project): VirtualFile? {
-    var found: VirtualFile?
     if (filename.startsWith("~/") || filename.startsWith("~\\")) {
       val relativePath = filename.substring(2)
       val dir = System.getProperty("user.home")
       logger.debug { "home dir file" }
       logger.debug { "looking for $relativePath in $dir" }
-      found = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(Path(dir, relativePath))
-    } else {
-      found = VirtualFileManager.getInstance().findFileByNioPath(Path(filename))
-
-      if (found == null) {
-        found = findByNameInContentRoots(filename, project)
-        if (found == null) {
-          found = findByNameInProject(filename, project)
-        }
-      }
+      return LocalFileSystem.getInstance().refreshAndFindFileByNioFile(Path(dir, relativePath))
     }
 
-    return found
+    val basePath = project.basePath
+    if (basePath != null) {
+      val baseDir = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(Path(basePath))
+      baseDir?.findFileByRelativePath(filename)?.let { return it }
+    }
+
+    VirtualFileManager.getInstance().findFileByNioPath(Path(filename))?.let { return it }
+
+    findByNameInContentRoots(filename, project)?.let { return it }
+
+    findByNameInProject(filename, project)?.let { return it }
+
+    return null
   }
 
   private fun buildFileInfoMessage(editor: Editor, project: Project, fullPath: Boolean): String {
