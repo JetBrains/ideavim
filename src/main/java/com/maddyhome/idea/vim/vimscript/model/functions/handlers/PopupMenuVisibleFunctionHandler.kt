@@ -20,5 +20,5 @@ import com.maddyhome.idea.vim.vimscript.model.functions.BuiltinFunctionHandler
 @VimscriptFunction(name = "pumvisible")
 internal class PopupMenuVisibleFunctionHandler : BuiltinFunctionHandler<VimInt>() {
   override fun doFunction(arguments: Arguments, editor: VimEditor, context: ExecutionContext, vimContext: VimLContext) =
-    (CompletionService.getCompletionService().currentCompletion == null).asVimInt()
+    (CompletionService.getCompletionService().currentCompletion != null).asVimInt()
 }
