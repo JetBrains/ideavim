@@ -42,6 +42,7 @@ internal class JumpRemoteTopicListener : ProjectRemoteTopicListener<JumpInfo> {
 
     if (event.added) {
       jumpService.addJump(projectId, jump, true)
+      injector.markService.setJumpMark(event.filepath, event.protocol, event.line, event.col)
     } else {
       jumpService.removeJump(projectId, jump)
     }

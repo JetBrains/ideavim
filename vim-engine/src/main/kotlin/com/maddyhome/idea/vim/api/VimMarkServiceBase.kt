@@ -248,6 +248,10 @@ abstract class VimMarkServiceBase : VimMarkService {
     return setMark(caret, mark)
   }
 
+  override fun setJumpMark(filepath: String, protocol: String, line: Int, col: Int) {
+    getLocalMarks(filepath)[BEFORE_JUMP_MARK] = VimMark(BEFORE_JUMP_MARK, line, col, filepath, protocol)
+  }
+
   protected open fun createGlobalMark(editor: VimEditor, char: Char, offset: Int): Mark? {
     val markChar = char.normalizeMarkChar()
     if (!markChar.isGlobalMark()) return null
