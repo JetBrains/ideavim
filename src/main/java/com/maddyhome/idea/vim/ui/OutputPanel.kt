@@ -11,7 +11,10 @@ import com.intellij.ide.ui.LafManager
 import com.intellij.ide.ui.LafManagerListener
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.wm.ToolWindowManager
+import com.intellij.openapi.wm.ex.ToolWindowManagerListener
 import com.intellij.openapi.wm.impl.IdeBackgroundUtil
+import com.intellij.util.messages.MessageBusConnection
 import com.intellij.ui.ClientProperty
 import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBPanel
@@ -63,6 +66,7 @@ class OutputPanel private constructor(
   private var glassPane: JComponent? = null
   private var originalLayout: LayoutManager? = null
   private var wasOpaque = false
+  private var toolWindowListenerConnection: MessageBusConnection? = null
 
   var active: Boolean = false
   private val segments = mutableListOf<TextLine>()
@@ -262,6 +266,8 @@ class OutputPanel private constructor(
     }
     if (glassPane != null) {
       glassPane!!.removeComponentListener(resizeAdapter)
+      toolWindowListenerConnection?.disconnect()
+      toolWindowListenerConnection = null
       glassPane!!.isVisible = false
       glassPane!!.remove(this)
       glassPane!!.setOpaque(wasOpaque)
@@ -298,6 +304,15 @@ class OutputPanel private constructor(
     glassPane!!.setOpaque(false)
     glassPane!!.add(this)
     glassPane!!.addComponentListener(resizeAdapter)
+    val project = editor.project
+    if (project != null) {
+      toolWindowListenerConnection = project.messageBus.connect()
+      toolWindowListenerConnection!!.subscribe(ToolWindowManagerListener.TOPIC, object : ToolWindowManagerListener {
+        override fun stateChanged(toolWindowManager: ToolWindowManager) {
+          SwingUtilities.invokeLater { positionPanel() }
+        }
+      })
+    }
   }
 
   override fun close() {

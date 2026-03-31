@@ -15,6 +15,9 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.wm.IdeFocusManager
+import com.intellij.openapi.wm.ToolWindowManager
+import com.intellij.openapi.wm.ex.ToolWindowManagerListener
+import com.intellij.util.messages.MessageBusConnection
 import com.intellij.ui.DocumentAdapter
 import com.intellij.util.IJSwingUtilities
 import com.maddyhome.idea.vim.EventFacade
@@ -142,6 +145,15 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
       glassPane.setOpaque(false)
       glassPane.add(this)
       glassPane.addComponentListener(resizePanelListener)
+      val project = editor.project
+      if (project != null) {
+        toolWindowListenerConnection = project.messageBus.connect()
+        toolWindowListenerConnection!!.subscribe(ToolWindowManagerListener.TOPIC, object : ToolWindowManagerListener {
+          override fun stateChanged(toolWindowManager: ToolWindowManager) {
+            SwingUtilities.invokeLater { positionPanel() }
+          }
+        })
+      }
       positionPanel()
       glassPane.isVisible = true
       entry.requestFocusInWindow()
@@ -192,6 +204,8 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
         }
 
         oldGlass!!.removeComponentListener(resizePanelListener)
+        toolWindowListenerConnection?.disconnect()
+        toolWindowListenerConnection = null
         oldGlass!!.isVisible = false
         oldGlass!!.remove(this)
         oldGlass!!.setOpaque(wasOpaque)
@@ -506,6 +520,8 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
       positionPanel()
     }
   }
+
+  private var toolWindowListenerConnection: MessageBusConnection? = null
 
   init {
 
