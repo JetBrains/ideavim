@@ -225,17 +225,6 @@ class HistoryCommandTest : VimTestCase() {
   }
 
   @Test
-  fun `test history cmd lists empty command history`() {
-    assertCommandOutput(
-      "history cmd",
-      """
-        |      #  cmd history
-        |>     1  history cmd
-      """.trimMargin()
-    )
-  }
-
-  @Test
   fun `test history cmd lists current cmd in history`() {
     assertCommandOutput(
       "history cmd",
@@ -499,7 +488,7 @@ class HistoryCommandTest : VimTestCase() {
 
 
   @Test
-  fun `test history search with first number lists single entry from saerch history`() {
+  fun `test history search with first number lists single entry from search history`() {
     repeat(10) { i -> enterSearch("foo${i + 1}") }
     injector.outputPanel.getCurrentOutputPanel()?.clearText()
     assertCommandOutput(
