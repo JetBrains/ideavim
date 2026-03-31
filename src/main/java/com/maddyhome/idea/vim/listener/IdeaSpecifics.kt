@@ -85,9 +85,11 @@ internal object IdeaSpecifics {
 
       val actionId = ActionManager.getInstance().getId(action)
       if (actionId == IdeActions.ACTION_GOTO_BACK || actionId == IdeActions.ACTION_GOTO_FORWARD) {
+        val project = event.dataContext.getData(CommonDataKeys.PROJECT)
         val currentEditor = editor
-          ?: event.dataContext.getData(CommonDataKeys.PROJECT)
-            ?.let { FileEditorManager.getInstance(it).selectedTextEditor }
+          ?: event.dataContext.getData(CommonDataKeys.EDITOR)
+          ?: project?.let { VimListenerManager.VimLastSelectedEditorTracker.getLastSelectedEditor(it) }
+          ?: project?.let { FileEditorManager.getInstance(it).selectedTextEditor }
         if (currentEditor != null && !currentEditor.isIdeaVimDisabledHere) {
           injector.jumpService.saveJumpLocation(currentEditor.vim)
         }
