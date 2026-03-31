@@ -27,11 +27,13 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.AnActionResult
 import com.intellij.openapi.actionSystem.AnActionWrapper
 import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.actionSystem.ex.AnActionListener
 import com.intellij.openapi.actionSystem.impl.ProxyShortcutSet
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.RangeMarker
 import com.intellij.openapi.editor.actions.EnterAction
+import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.keymap.KeymapManager
 import com.intellij.openapi.project.DumbAwareToggleAction
 import com.intellij.openapi.util.TextRange
@@ -81,6 +83,16 @@ internal object IdeaSpecifics {
       val hostEditor = event.dataContext.getData(CommonDataKeys.HOST_EDITOR)
       if (hostEditor != null) {
         editor = hostEditor
+      }
+
+      val actionId = ActionManager.getInstance().getId(action)
+      if (actionId == IdeActions.ACTION_GOTO_BACK || actionId == IdeActions.ACTION_GOTO_FORWARD) {
+        val currentEditor = editor
+          ?: event.dataContext.getData(CommonDataKeys.PROJECT)
+            ?.let { FileEditorManager.getInstance(it).selectedTextEditor }
+        if (currentEditor != null && !currentEditor.isIdeaVimDisabledHere) {
+          injector.jumpService.saveJumpLocation(currentEditor.vim)
+        }
       }
 
       val isVimAction = (action as? AnActionWrapper)?.delegate is VimShortcutKeyAction
