@@ -35,6 +35,8 @@ import com.intellij.psi.search.ProjectScope
 import com.maddyhome.idea.vim.group.findVirtualFile
 import com.maddyhome.idea.vim.group.onEdt
 import com.maddyhome.idea.vim.helper.EngineMessageHelper
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlin.io.path.Path
 
 /**
@@ -48,26 +50,27 @@ import kotlin.io.path.Path
  */
 internal class FileRemoteApiImpl : FileRemoteApi {
 
-  override suspend fun findFile(filename: String, projectId: ProjectId?): String? = readAction {
-    val project = projectId?.findProjectOrNull() ?: return@readAction null
-    findFile(filename, project)?.path
+  override suspend fun findFile(filename: String, projectId: ProjectId?): String? {
+    val project = projectId?.findProjectOrNull() ?: return null
+    return findFile(filename, project)?.path
   }
 
-  override suspend fun openFile(filename: String, projectId: ProjectId?, focusEditor: Boolean): String? =
-    onEdt {
-      val project = projectId?.findProjectOrNull() ?: return@onEdt "No project found"
-      val found = findFile(filename, project)
-      if (found != null) {
-        logger.debug { "found file: $found" }
+  override suspend fun openFile(filename: String, projectId: ProjectId?, focusEditor: Boolean): String? {
+    val project = projectId?.findProjectOrNull() ?: return "No project found"
+    val found = findFile(filename, project)
+    if (found != null) {
+      logger.debug { "found file: $found" }
+      onEdt {
         val type = FileTypeManager.getInstance().getKnownFileTypeOrAssociate(found, project)
         if (type != null) {
           FileEditorManager.getInstance(project).openFile(found, focusEditor)
         }
-        null // success
-      } else {
-        EngineMessageHelper.message("message.open.file.not.found", filename)
       }
+      return null
+    } else {
+      return EngineMessageHelper.message("message.open.file.not.found", filename)
     }
+  }
 
   override suspend fun closeCurrentFile(projectId: ProjectId?, virtualFileId: VirtualFileId?) =
     onEdt {
@@ -164,26 +167,34 @@ internal class FileRemoteApiImpl : FileRemoteApi {
 
   // ======================== Private helpers ========================
 
-  private fun findFile(filename: String, project: Project): VirtualFile? {
-    var found: VirtualFile?
+  private suspend fun findFile(filename: String, project: Project): VirtualFile? {
     if (filename.startsWith("~/") || filename.startsWith("~\\")) {
       val relativePath = filename.substring(2)
       val dir = System.getProperty("user.home")
       logger.debug { "home dir file" }
       logger.debug { "looking for $relativePath in $dir" }
-      found = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(Path(dir, relativePath))
-    } else {
-      found = VirtualFileManager.getInstance().findFileByNioPath(Path(filename))
-
-      if (found == null) {
-        found = findByNameInContentRoots(filename, project)
-        if (found == null) {
-          found = findByNameInProject(filename, project)
-        }
+      return withContext(Dispatchers.IO) {
+        val file = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(Path(dir, relativePath))
+        return@withContext file
       }
     }
 
-    return found
+    val basePath = project.basePath
+    if (basePath != null) {
+      val found = withContext(Dispatchers.IO) {
+        val baseDir = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(Path(basePath))
+        baseDir?.findFileByRelativePath(filename)
+      }
+      if (found != null) return found
+    }
+
+    VirtualFileManager.getInstance().findFileByNioPath(Path(filename))?.let { return it }
+
+    findByNameInContentRoots(filename, project)?.let { return it }
+
+    findByNameInProject(filename, project)?.let { return it }
+
+    return null
   }
 
   private fun buildFileInfoMessage(editor: Editor, project: Project, fullPath: Boolean): String {
