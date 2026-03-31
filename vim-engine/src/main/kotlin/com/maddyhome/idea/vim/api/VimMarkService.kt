@@ -150,6 +150,13 @@ interface VimMarkService {
    */
   fun loadLegacyState(element: Any) {}
 
+  /**
+   * Sets the BEFORE_JUMP_MARK directly from a position, without requiring an open editor or caret.
+   * Used by jump listeners that receive position data from the IDE navigation history.
+   * Default no-op; implementations that maintain local mark state should override this.
+   */
+  fun setJumpMark(filepath: String, protocol: String, line: Int, col: Int) {}
+
   fun isValidMark(char: Char, operation: Operation, isCaretPrimary: Boolean): Boolean
 
   enum class Operation {
