@@ -194,7 +194,7 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
     // handler adds all non-control characters to the text field. We want to add all characters, so if we have an
     // actual character, just add it. Anything else, we'll pass to the super class like before (even though it's unclear
     // what it will do with the keystroke)
-    if (stroke.keyChar != KeyEvent.CHAR_UNDEFINED) {
+    if (stroke.keyChar != KeyEvent.CHAR_UNDEFINED && !isKeyCharEnterOrEscape(stroke.keyChar)) {
       replaceSelection(stroke.keyChar.toString())
     } else {
       val event = KeyEvent(
