@@ -160,7 +160,11 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     return TextRange(start, end)
   }
 
-  override fun findWordAtOrFollowingCursor(editor: VimEditor, caret: ImmutableVimCaret, isBigWord: Boolean): TextRange? {
+  override fun findWordAtOrFollowingCursor(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    isBigWord: Boolean,
+  ): TextRange? {
     val offset = caret.offset
     return findWordAtOrFollowingCursor(editor, offset, isBigWord)
   }
@@ -168,6 +172,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
   override fun findFilenameAtOrFollowingCursor(editor: VimEditor, caret: ImmutableVimCaret): TextRange? {
     return findFilenameAtOrFollowingCursor(editor, caret.offset)
   }
+
   override fun findFilenameAtOrFollowingCursor(editor: VimEditor, offset: Int): TextRange? {
     val text = editor.text()
     if (text.isEmpty()) return null
@@ -300,6 +305,9 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     }
 
     if (result is VimMatchResult.Failure) {
+      if (!showMessages) {
+        return null
+      }
       if (wrap) {
         injector.messages.showErrorMessage(editor, injector.messages.message("E486", pattern))
       } else if (dir === Direction.FORWARDS) {
@@ -307,7 +315,6 @@ abstract class VimSearchHelperBase : VimSearchHelper {
       } else {
         injector.messages.showErrorMessage(editor, injector.messages.message("E384", pattern))
       }
-      return null
     }
 
     // When trying to find the end position for a match, we're allowed to match the current position. But if we do that
@@ -332,6 +339,10 @@ abstract class VimSearchHelperBase : VimSearchHelper {
         }
         return null
       }
+    }
+
+    if (result is VimMatchResult.Failure) {
+      return null
     }
 
     return (result as VimMatchResult.Success).range
@@ -1768,7 +1779,8 @@ abstract class VimSearchHelperBase : VimSearchHelper {
 
     if (isOuter && shouldEndOnWhitespace && start > 0
       && !isWhitespace(editor, chars[end], isBig)
-      && !isWhitespace(editor, chars[start], isBig)) {
+      && !isWhitespace(editor, chars[start], isBig)
+    ) {
 
       // Outer word objects normally include following whitespace. But if there's no following whitespace to include,
       // we should extend the range to include preceding whitespace. However, Vim doesn't select whitespace at the

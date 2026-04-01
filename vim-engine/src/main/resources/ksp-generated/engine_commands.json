@@ -301,8 +301,13 @@
   },
   {
     "keys": "<C-K>",
+    "class": "com.maddyhome.idea.vim.action.change.insert.CmdLineCompletedDigraphAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-K>",
     "class": "com.maddyhome.idea.vim.action.change.insert.InsertCompletedDigraphAction",
-    "modes": "IC"
+    "modes": "I"
   },
   {
     "keys": "<C-Left>",
@@ -411,8 +416,13 @@
   },
   {
     "keys": "<C-Q>",
+    "class": "com.maddyhome.idea.vim.action.change.insert.CmdLineCompletedLiteralAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-Q>",
     "class": "com.maddyhome.idea.vim.action.change.insert.InsertCompletedLiteralAction",
-    "modes": "IC"
+    "modes": "I"
   },
   {
     "keys": "<C-R>",
@@ -561,8 +571,13 @@
   },
   {
     "keys": "<C-V>",
+    "class": "com.maddyhome.idea.vim.action.change.insert.CmdLineCompletedLiteralAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-V>",
     "class": "com.maddyhome.idea.vim.action.change.insert.InsertCompletedLiteralAction",
-    "modes": "IC"
+    "modes": "I"
   },
   {
     "keys": "<C-W>",
