@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -10,9 +10,12 @@ package org.jetbrains.plugins.ideavim.action.motion.search
 
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class SearchEntryFwdActionTest : VimTestCase() {
   @Test
@@ -108,6 +111,23 @@ class SearchEntryFwdActionTest : VimTestCase() {
     """.trimMargin(),
       Mode.INSERT,
     )
+  }
+
+  @Test
+  fun `test escape after search not found closes panel without inserting escape char`() {
+    configureByText("lorem ipsum dolor sit amet")
+    typeText("/notfound")
+
+    val panel = ExEntryPanel.getOrCreatePanelInstance()
+    assertTrue(panel.isActive)
+
+    typeText("<Esc>")
+
+    assertFalse(panel.isActive)
+    assertMode(Mode.NORMAL())
+    // The panel text should not contain ^[ (escape character written as text)
+    assertFalse(panel.text.contains("\u001B"), "Panel text should not contain escape character")
+    assertFalse(panel.text.contains("^["), "Panel text should not contain ^[ literal")
   }
 
   @Disabled("Ctrl-o doesn't work yet in select mode")
