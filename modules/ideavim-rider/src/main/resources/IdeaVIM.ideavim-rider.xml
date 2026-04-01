@@ -8,7 +8,7 @@
 
 <idea-plugin>
   <dependencies>
-    <module name="com.intellij.modules.rider"/>
+    <plugin id="com.intellij.modules.rider"/>
   </dependencies>
   <projectListeners>
     <listener class="com.maddyhome.idea.vim.listener.RiderActionListener"
