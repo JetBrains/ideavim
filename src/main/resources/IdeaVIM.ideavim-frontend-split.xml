@@ -1,0 +1,17 @@
+<!--
+  ~ Copyright 2003-2026 The IdeaVim authors
+  ~
+  ~ Use of this source code is governed by an MIT-style
+  ~ license that can be found in the LICENSE.txt file or at
+  ~ https://opensource.org/licenses/MIT.
+  -->
+
+<!-- Split-mode (Remote Dev) specific registrations.
+     This module only loads when intellij.platform.frontend.split is available,
+     which provides access to intellij.rd.client and its extension points. -->
+<idea-plugin package="com.maddyhome.idea.vim">
+  <dependencies>
+    <module name="intellij.platform.frontend.split"/>
+    <module name="IdeaVIM.ideavim-frontend"/>
+  </dependencies>
+</idea-plugin>
