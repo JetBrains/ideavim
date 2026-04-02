@@ -36,10 +36,12 @@ usual beta standards.
 * [VIM-566](https://youtrack.jetbrains.com/issue/VIM-566) Added support for `:set foldlevel` option - control fold visibility level
 
 ### Fixes:
+* [VIM-4135](https://youtrack.jetbrains.com/issue/VIM-4135) Fixed IdeaVim not loading in Rider
 * [VIM-4105](https://youtrack.jetbrains.com/issue/VIM-4105) Fixed `a"` `a'` `a\`` text objects to include surrounding whitespace per Vim spec
 * [VIM-4097](https://youtrack.jetbrains.com/issue/VIM-4097) Fixed `<A-n>` (NextOccurrence) with text containing backslashes - e.g., selecting `\IntegerField` now works correctly
 * [VIM-4094](https://youtrack.jetbrains.com/issue/VIM-4094) Fixed UninitializedPropertyAccessException when loading history
 * [VIM-3948](https://youtrack.jetbrains.com/issue/VIM-3948) Improved hint generation visibility checks for better UI component detection
+* Fixed `<Esc>` in search bar no longer inserts `^[` literal text when search is not found - panel is now properly closed
 * Fixed high CPU usage while showing command line
 * Fixed comparison of String and Number in VimScript expressions
 
