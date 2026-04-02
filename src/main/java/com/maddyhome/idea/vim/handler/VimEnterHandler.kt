@@ -241,20 +241,39 @@ internal class VimEscHandler(nextHandler: EditorActionHandler) : VimKeyHandler(n
 
 /**
  * Rider (and CLion Nova) uses a separate handler for esc to close the completion. IdeaOnlyEscapeHandlerAction is especially
- *   designer to get all the esc presses, and if there is a completion close it and do not pass the execution further.
+ *   designed to get all the esc presses, and if there is a completion close it and do not pass the execution further.
  *   This doesn't work the same as in IJ.
  * In IdeaVim, we'd like to exit insert mode on closing completion. This is a requirement as the change of this
  *   behaviour causes a lot of complaining from users. Since the rider handler gets execution control, we don't
  *    receive an event and don't exit the insert mode.
  * To fix it, this special handler exists only for rider and stands before the rider's handler. We don't execute the
  *   handler from rider because the autocompletion is closed automatically anyway.
+ *
+ * This handler intentionally does NOT extend OctopusHandler/VimKeyHandler because octopus is disabled for Rider
+ *   (see VIM-3815), but this handler must still work in Rider to intercept Escape before IdeaOnlyEscapeHandlerAction.
  */
-internal class VimEscForRiderHandler(nextHandler: EditorActionHandler) : VimKeyHandler(nextHandler) {
-  override val key: String = "<Esc>"
+internal class VimEscForRiderHandler(private val nextHandler: EditorActionHandler) : EditorActionHandler() {
+  override fun doExecute(editor: Editor, caret: Caret?, dataContext: DataContext?) {
+    if (isThisHandlerEnabled(editor)) {
+      val escKey = key("<Esc>")
+      val context = dataContext?.vim ?: injector.executionContextManager.getEditorExecutionContext(editor.vim)
+      val keyHandler = KeyHandler.getInstance()
+      keyHandler.handleKey(editor.vim, escKey, context, keyHandler.keyHandlerState)
+    } else {
+      nextHandler.execute(editor, caret, dataContext)
+    }
+  }
 
-  override fun isHandlerEnabled(editor: Editor, dataContext: DataContext?): Boolean {
-    if (!enableOctopus) return false
+  override fun isEnabledForCaret(editor: Editor, caret: Caret, dataContext: DataContext?): Boolean {
+    return isThisHandlerEnabled(editor) || nextHandler.isEnabled(editor, caret, dataContext)
+  }
+
+  private fun isThisHandlerEnabled(editor: Editor): Boolean {
+    if (VimPlugin.isNotEnabled()) return false
+    if (editor.isIdeaVimDisabledHere) return false
+    if (editor.vim.mode.inNormalMode) return false
     return LookupManager.getActiveLookup(editor) != null
+      || editor.project?.let { LookupManager.getInstance(it).activeLookup } != null
   }
 }
 
