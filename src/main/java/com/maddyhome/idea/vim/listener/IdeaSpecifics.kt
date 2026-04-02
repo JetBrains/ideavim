@@ -343,6 +343,13 @@ internal object IdeaSpecifics {
         if (newLookup.editor.isIdeaVimDisabledHere) return
 
         (VimPlugin.getKey() as VimKeyGroupBase).registerShortcutsForLookup(newLookup)
+
+        // In Rider/CLion Nova, octopus is disabled (VIM-3815) and Escape is consumed by the popup manager
+        // (due to LookupSummaryInfo popup) before the action system runs, so IdeaVim never sees it.
+        // Listen for explicit lookup cancellation (Escape) to exit insert mode.
+        if (!injector.application.isOctopusEnabled()) {
+          newLookup.addLookupListener(RiderEscLookupListener(newLookup.editor))
+        }
       }
 
       // Lookup closed
@@ -351,6 +358,19 @@ internal object IdeaSpecifics {
         if (editor.isIdeaVimDisabledHere) return
         // VIM-1858
         KeyHandler.getInstance().partialReset(editor.vim)
+      }
+    }
+  }
+
+  /**
+   * In Rider/CLion Nova, octopus is disabled (VIM-3815) and Escape is consumed by the popup manager
+   * (due to LookupSummaryInfo parameter info popup) before the action system runs, so IdeaVim never sees it.
+   * This listener exits insert mode when the lookup is explicitly cancelled (Escape).
+   */
+  private class RiderEscLookupListener(private val editor: Editor) : com.intellij.codeInsight.lookup.LookupListener {
+    override fun lookupCanceled(event: com.intellij.codeInsight.lookup.LookupEvent) {
+      if (event.isCanceledExplicitly && editor.vim.mode is Mode.INSERT) {
+        editor.vim.exitInsertMode(injector.executionContextManager.getEditorExecutionContext(editor.vim))
       }
     }
   }
