@@ -14,7 +14,6 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.common.TextRange
 
 interface VimEditorFactory {
   fun createVimEditor(editor: Editor): VimEditor
@@ -27,21 +26,3 @@ interface VimEditorFactory {
     fun getInstance(): VimEditorFactory = service()
   }
 }
-
-val Editor.vim: VimEditor
-  get() = VimEditorFactory.getInstance().createVimEditor(this)
-
-val VimEditor.ij: Editor
-  get() = VimEditorFactory.getInstance().extractEditor(this)
-
-val Caret.vim: VimCaret
-  get() = VimEditorFactory.getInstance().createVimCaret(this)
-
-val VimCaret.ij: Caret
-  get() = VimEditorFactory.getInstance().extractCaret(this)
-
-val ImmutableVimCaret.ij: Caret
-  get() = VimEditorFactory.getInstance().extractCaret(this)
-
-val com.intellij.openapi.util.TextRange.vim: TextRange
-  get() = TextRange(this.startOffset, this.endOffset)

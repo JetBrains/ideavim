@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.newapi
 
 import com.intellij.codeInsight.folding.impl.FoldingUtil
 import com.intellij.execution.impl.ConsoleViewImpl
+import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorModificationUtil
 import com.intellij.openapi.editor.FoldRegion
@@ -648,4 +649,22 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase() {
     return "IjVimEditor[$editor@${identityHashCode(editor).toString(16)}]"
   }
 }
+
+val Editor.vim: VimEditor
+  get() = VimEditorFactory.getInstance().createVimEditor(this)
+
+val VimEditor.ij: Editor
+  get() = VimEditorFactory.getInstance().extractEditor(this)
+
+val Caret.vim: VimCaret
+  get() = VimEditorFactory.getInstance().createVimCaret(this)
+
+val VimCaret.ij: Caret
+  get() = VimEditorFactory.getInstance().extractCaret(this)
+
+val ImmutableVimCaret.ij: Caret
+  get() = VimEditorFactory.getInstance().extractCaret(this)
+
+val com.intellij.openapi.util.TextRange.vim: TextRange
+  get() = TextRange(this.startOffset, this.endOffset)
 
