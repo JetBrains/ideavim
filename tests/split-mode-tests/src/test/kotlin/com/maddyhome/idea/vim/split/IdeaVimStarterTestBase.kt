@@ -177,6 +177,17 @@ abstract class IdeaVimStarterTestBase {
     }
   }
 
+  /** Triggers the IDE "Navigate > Back" action (Cmd+[ on macOS). */
+  protected fun ideaGoBack() {
+    driver.withContext {
+      ideFrame {
+        codeEditor().apply {
+          keyboard { hotKey(java.awt.event.KeyEvent.VK_META, java.awt.event.KeyEvent.VK_OPEN_BRACKET) }
+        }
+      }
+    }
+  }
+
   /** Presses Ctrl-G (file info). */
   protected fun ctrlG() {
     driver.withContext {

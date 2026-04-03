@@ -46,4 +46,21 @@ class JumpNavigationSplitTest : IdeaVimStarterTestBase() {
     pause()
     assertCaretBefore(10, "Ctrl-O should jump back near start after search")
   }
+
+  @Test
+  fun `IDE Back navigation records jump so apostrophe mark navigates back`() {
+    openFile(longFile("Jump3"))
+
+    typeVim("G")
+    pause(300)
+    assertCaretAfter(40, "G should move to end of file")
+
+    ideaGoBack()
+    pause(500)
+    assertCaretBefore(10, "IDE Back should return to start of file")
+
+    typeVim("''")
+    pause(300)
+    assertCaretAfter(40, "'' should return to position before IDE Back (end of file)")
+  }
 }
