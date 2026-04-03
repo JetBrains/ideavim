@@ -48,6 +48,8 @@ import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.hasVisualSelection
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
+import com.maddyhome.idea.vim.ide.isClionNova
+import com.maddyhome.idea.vim.ide.isRider
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.initInjector
 import com.maddyhome.idea.vim.newapi.vim
@@ -347,7 +349,10 @@ internal object IdeaSpecifics {
         // In Rider/CLion Nova, octopus is disabled (VIM-3815) and Escape is consumed by the popup manager
         // (due to LookupSummaryInfo popup) before the action system runs, so IdeaVim never sees it.
         // Listen for explicit lookup cancellation (Escape) to exit insert mode.
-        if (!injector.application.isOctopusEnabled()) {
+        // Note: we check isRider/isClionNova specifically, not !isOctopusEnabled(), because
+        // JetBrains Client (split mode) also has octopus disabled but doesn't need this workaround,
+        // and isCanceledExplicitly can be true for non-Escape keys (e.g. space) in that environment.
+        if (isRider() || isClionNova()) {
           newLookup.addLookupListener(RiderEscLookupListener(newLookup.editor))
         }
       }
