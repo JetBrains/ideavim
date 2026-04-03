@@ -11,6 +11,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.extensions.ExtensionPointListener
 import com.intellij.openapi.extensions.PluginDescriptor
+import com.intellij.vim.api.VimInitApi
 import com.maddyhome.idea.vim.api.VimExtensionRegistrator
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.setToggleOption
@@ -20,7 +21,6 @@ import com.maddyhome.idea.vim.key.MappingOwner.Plugin.Companion.remove
 import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.options.OptionDeclaredScope
 import com.maddyhome.idea.vim.options.ToggleOption
-import com.intellij.vim.api.VimInitApi
 import com.maddyhome.idea.vim.statistic.ExtensionTracking
 import com.maddyhome.idea.vim.thinapi.VimApiImpl
 
@@ -106,9 +106,13 @@ class VimExtensionRegistrar : VimExtensionRegistrator {
   override fun enableDelayedExtensions() {
     delayedExtensionEnabling.forEach {
       val name = it.name ?: it.instance.name
-      val initApi = createVimApi(name)
-      it.instance.init(initApi)
-      logger.info("IdeaVim extension '$name' initialized")
+      try {
+        val initApi = createVimApi(name)
+        it.instance.init(initApi)
+        logger.info("IdeaVim extension '$name' initialized")
+      } catch (e: Throwable) {
+        logger.error("Failed to initialize IdeaVim extension '$name'", e)
+      }
     }
     delayedExtensionEnabling.clear()
   }
