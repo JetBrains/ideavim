@@ -14,6 +14,7 @@ import com.intellij.openapi.editor.VisualPosition
 import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.CaretRegisterStorage
 import com.maddyhome.idea.vim.api.CaretRegisterStorageBase
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.LocalMarkStorage
 import com.maddyhome.idea.vim.api.SelectionInfo
 import com.maddyhome.idea.vim.api.VimCaret
@@ -208,3 +209,12 @@ class IjVimCaret(val caret: Caret) : VimCaretBase() {
 
   override fun hashCode(): Int = this.caret.hashCode()
 }
+
+val Caret.vim: VimCaret
+  get() = VimEditorFactory.getInstance().createVimCaret(this)
+
+val VimCaret.ij: Caret
+  get() = VimEditorFactory.getInstance().extractCaret(this)
+
+val ImmutableVimCaret.ij: Caret
+  get() = VimEditorFactory.getInstance().extractCaret(this)
