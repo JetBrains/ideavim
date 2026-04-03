@@ -15,8 +15,8 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.wm.IdeFocusManager
-import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.openapi.wm.ex.ToolWindowManagerListener
+import com.maddyhome.idea.vim.ui.ToolWindowPositioningListener
 import com.intellij.util.messages.MessageBusConnection
 import com.intellij.ui.DocumentAdapter
 import com.intellij.util.IJSwingUtilities
@@ -148,11 +148,7 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
       val project = editor.project
       if (project != null) {
         toolWindowListenerConnection = project.messageBus.connect()
-        toolWindowListenerConnection!!.subscribe(ToolWindowManagerListener.TOPIC, object : ToolWindowManagerListener {
-          override fun stateChanged(toolWindowManager: ToolWindowManager) {
-            SwingUtilities.invokeLater { positionPanel() }
-          }
-        })
+        toolWindowListenerConnection!!.subscribe(ToolWindowManagerListener.TOPIC, ToolWindowPositioningListener { positionPanel() })
       }
       positionPanel()
       glassPane.isVisible = true
