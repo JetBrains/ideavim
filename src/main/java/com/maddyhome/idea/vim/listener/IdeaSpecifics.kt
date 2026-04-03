@@ -376,6 +376,7 @@ internal object IdeaSpecifics {
     override fun lookupCanceled(event: com.intellij.codeInsight.lookup.LookupEvent) {
       if (event.isCanceledExplicitly && editor.vim.mode is Mode.INSERT) {
         editor.vim.exitInsertMode(injector.executionContextManager.getEditorExecutionContext(editor.vim))
+        KeyHandler.getInstance().reset(editor.vim)
       }
     }
   }
