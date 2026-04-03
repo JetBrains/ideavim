@@ -86,15 +86,8 @@ internal object IdeaSpecifics {
       }
 
       val actionId = ActionManager.getInstance().getId(action)
-      if (actionId == IdeActions.ACTION_GOTO_BACK || actionId == IdeActions.ACTION_GOTO_FORWARD) {
-        val project = event.dataContext.getData(CommonDataKeys.PROJECT)
-        val currentEditor = editor
-          ?: event.dataContext.getData(CommonDataKeys.EDITOR)
-          ?: project?.let { VimListenerManager.VimLastSelectedEditorTracker.getLastSelectedEditor(it) }
-          ?: project?.let { FileEditorManager.getInstance(it).selectedTextEditor }
-        if (currentEditor != null && !currentEditor.isIdeaVimDisabledHere) {
-          injector.jumpService.saveJumpLocation(currentEditor.vim)
-        }
+      if (isGotoAction(actionId)) {
+        saveJumpBeforeGoto(event, editor)
       }
 
       val isVimAction = (action as? AnActionWrapper)?.delegate is VimShortcutKeyAction
@@ -194,6 +187,20 @@ internal object IdeaSpecifics {
 
       this.completionData?.dispose()
       this.completionData = null
+    }
+
+    private fun isGotoAction(actionId: String?): Boolean =
+      actionId == IdeActions.ACTION_GOTO_BACK || actionId == IdeActions.ACTION_GOTO_FORWARD
+
+    private fun saveJumpBeforeGoto(event: AnActionEvent, editor: Editor?) {
+      val project = event.dataContext.getData(CommonDataKeys.PROJECT)
+      val currentEditor = editor
+        ?: event.dataContext.getData(CommonDataKeys.EDITOR)
+        ?: project?.let { VimListenerManager.VimLastSelectedEditorTracker.getLastSelectedEditor(it) }
+        ?: project?.let { FileEditorManager.getInstance(it).selectedTextEditor }
+      if (currentEditor != null && !currentEditor.isIdeaVimDisabledHere) {
+        injector.jumpService.saveJumpLocation(currentEditor.vim)
+      }
     }
 
     private data class CompletionData(
