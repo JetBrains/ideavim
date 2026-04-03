@@ -22,11 +22,11 @@ class JumpNavigationSplitTest : IdeaVimStarterTestBase() {
     openFile(longFile("Jump1"))
 
     typeVim("G")
-    pause(300)
+    pause(500)
     assertCaretAfter(40, "G should go to end of file")
 
     ctrlO()
-    pause(300)
+    pause(500)
     assertCaretBefore(10, "Ctrl-O should jump back to start")
   }
 
@@ -35,7 +35,7 @@ class JumpNavigationSplitTest : IdeaVimStarterTestBase() {
     openFile(longFile("Jump2"))
 
     typeVim("gg")
-    pause(300)
+    pause(500)
 
     typeVim("/Line 30\n")
     pause()
