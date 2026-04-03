@@ -22,6 +22,7 @@ import com.intellij.openapi.util.Disposer;
 import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.config.VimState;
 import com.maddyhome.idea.vim.config.migration.ApplicationConfigurationMigrator;
+import com.maddyhome.idea.vim.group.KeyGroup;
 import com.maddyhome.idea.vim.group.VimNotifications;
 import com.maddyhome.idea.vim.group.VimWindowGroup;
 import com.maddyhome.idea.vim.history.VimHistory;
@@ -130,12 +131,12 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     return VimInjectorKt.getInjector().getHistoryGroup();
   }
 
-  public static @NotNull VimKeyGroup getKey() {
-    return VimInjectorKt.getInjector().getKeyGroup();
+  public static @NotNull KeyGroup getKey() {
+    return ((KeyGroup)VimInjectorKt.getInjector().getKeyGroup());
   }
 
-  public static @Nullable VimKeyGroup getKeyIfCreated() {
-    return ApplicationManager.getApplication().getServiceIfCreated(VimKeyGroup.class);
+  public static @Nullable KeyGroup getKeyIfCreated() {
+    return ApplicationManager.getApplication().getServiceIfCreated(KeyGroup.class);
   }
 
   public static @NotNull VimWindowGroup getWindow() {
@@ -337,7 +338,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
       }
     }
     if (element.getChild("shortcut-conflicts") != null) {
-      ((VimKeyGroupBase)getKey()).loadShortcutConflictsData(element);
+      getKey().loadShortcutConflictsData(element);
     }
     if (element.getChild("editor") != null) {
       getEditor().loadEditorStateData(element);
