@@ -11,7 +11,6 @@ import com.intellij.ide.ui.LafManager
 import com.intellij.ide.ui.LafManagerListener
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.openapi.wm.ex.ToolWindowManagerListener
 import com.intellij.openapi.wm.impl.IdeBackgroundUtil
 import com.intellij.util.messages.MessageBusConnection
@@ -307,11 +306,7 @@ class OutputPanel private constructor(
     val project = editor.project
     if (project != null) {
       toolWindowListenerConnection = project.messageBus.connect()
-      toolWindowListenerConnection!!.subscribe(ToolWindowManagerListener.TOPIC, object : ToolWindowManagerListener {
-        override fun stateChanged(toolWindowManager: ToolWindowManager) {
-          SwingUtilities.invokeLater { positionPanel() }
-        }
-      })
+      toolWindowListenerConnection!!.subscribe(ToolWindowManagerListener.TOPIC, ToolWindowPositioningListener { positionPanel() })
     }
   }
 
