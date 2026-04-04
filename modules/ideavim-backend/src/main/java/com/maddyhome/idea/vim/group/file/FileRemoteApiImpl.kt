@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.group.file
 import com.intellij.ide.vfs.VirtualFileId
 import com.intellij.ide.vfs.virtualFile
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.application.readAction
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.diagnostic.Logger
@@ -27,6 +28,7 @@ import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.platform.project.ProjectId
@@ -56,24 +58,7 @@ internal class FileRemoteApiImpl : FileRemoteApi {
 
   override suspend fun openFile(filename: String, projectId: ProjectId?, focusEditor: Boolean): String? = onEdt {
     val project = projectId?.findProjectOrNull() ?: return@onEdt "No project found"
-    var file = findFile(filename, project)
-
-    if (file == null) {
-
-      val ioFile = resolveIoFile(filename, project)
-        ?: return@onEdt EngineMessageHelper.message(
-          "message.open.file.not.found",
-          filename
-        )
-      WriteCommandAction.runWriteCommandAction(project) {
-        ioFile.parentFile?.mkdirs()
-        if (!ioFile.exists()) {
-          ioFile.createNewFile()
-        }
-      }
-      file = LocalFileSystem.getInstance()
-        .refreshAndFindFileByIoFile(ioFile)
-    }
+    var file = findFile(filename, project) ?: createFile(filename, project)
 
     if (file != null) {
       FileEditorManager.getInstance(project)
@@ -183,26 +168,6 @@ internal class FileRemoteApiImpl : FileRemoteApi {
   }
 
   // ======================== Private helpers ========================
-
-  private fun resolveIoFile(filename: String, project: Project): java.io.File? {
-
-    // ~/path support
-    if (filename.startsWith("~/") || filename.startsWith("~\\")) {
-      val home = System.getProperty("user.home")
-      return java.io.File(home, filename.substring(2))
-    }
-
-    val file = java.io.File(filename)
-
-    // absolute path
-    if (file.isAbsolute) {
-      return file
-    }
-
-    // relative → project root
-    val basePath = project.basePath ?: return null
-    return java.io.File(basePath, filename)
-  }
   private fun findFile(filename: String, project: Project): VirtualFile? {
     if (filename.startsWith("~/") || filename.startsWith("~\\")) {
       val relativePath = filename.substring(2)
@@ -284,6 +249,31 @@ internal class FileRemoteApiImpl : FileRemoteApi {
     val projectScope = ProjectScope.getProjectScope(project)
     val names = FilenameIndex.getVirtualFilesByName(filename, projectScope)
     return names.firstOrNull()
+  }
+
+  private fun createFile(filename: String, project: Project): VirtualFile? {
+    val path = when {
+      filename.startsWith("~/") || filename.startsWith("~\\") -> {
+        val home = System.getProperty("user.home")
+        Path(home, filename.substring(2))
+      }
+      Path(filename).isAbsolute -> Path(filename)
+      else -> {
+        val basePath = project.basePath ?: return null
+        Path(basePath, filename)
+      }
+    }
+
+    return try {
+      WriteAction.compute<VirtualFile?, Exception> {
+        val parentDir = VfsUtil.createDirectoryIfMissing(path.parent.toString()) ?: return@compute null
+        logger.debug { "creating new file: $path" }
+        parentDir.createChildData(this, path.fileName.toString())
+      }
+    } catch (e: Exception) {
+      logger.warn("Failed to create file '$filename': ${e.message}")
+      null
+    }
   }
 
   companion object {
