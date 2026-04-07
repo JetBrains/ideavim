@@ -15,14 +15,12 @@ import com.maddyhome.idea.vim.helper.endOffsetInclusive
 import com.maddyhome.idea.vim.state.mode.SelectionType.CHARACTER_WISE
 import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.state.mode.selectionType
-import java.lang.Long.toHexString
-
 abstract class VimFileBase : VimFile {
   override fun displayHexInfo(editor: VimEditor) {
     val offset = editor.currentCaret().offset
     val ch = editor.text()[offset]
 
-    injector.messages.showMessage(editor, toHexString(ch.code.toLong()))
+    injector.messages.showMessage(editor, ch.code.toString(16))
   }
 
   override fun displayLocationInfo(editor: VimEditor) {
