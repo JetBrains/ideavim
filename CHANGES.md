@@ -36,19 +36,37 @@ usual beta standards.
 * [VIM-566](https://youtrack.jetbrains.com/issue/VIM-566) Added support for `:set foldlevel` option - control fold visibility level
 
 ### Fixes:
-* Fixed `pumvisible()` function returning incorrect result (was inverted)
-* Fixed `<Esc>` not properly exiting insert mode in Rider/CLion when canceling a completion lookup
-* Fixed IdeaVim entering broken state when a VimScript extension plugin fails to initialize
-* Fixed compatibility issues with external plugins (e.g., IdeaVim-EasyMotion, multicursor)
+* [VIM-4135](https://youtrack.jetbrains.com/issue/VIM-4135) Fixed IdeaVim not loading in Rider
+* [VIM-4134](https://youtrack.jetbrains.com/issue/VIM-4134) Fixed undo in commentary - `gcc`/`gc{motion}` changes are now properly grouped as a single undo step
+* [VIM-4134](https://youtrack.jetbrains.com/issue/VIM-4134) Fixed `=` (format/auto-indent) action in split mode
+* [VIM-4134](https://youtrack.jetbrains.com/issue/VIM-4134) Fixed global marks causing errors when used inside write actions (e.g., during document modifications)
 * [VIM-4105](https://youtrack.jetbrains.com/issue/VIM-4105) Fixed `a"` `a'` `a\`` text objects to include surrounding whitespace per Vim spec
 * [VIM-4097](https://youtrack.jetbrains.com/issue/VIM-4097) Fixed `<A-n>` (NextOccurrence) with text containing backslashes - e.g., selecting `\IntegerField` now works correctly
 * [VIM-4094](https://youtrack.jetbrains.com/issue/VIM-4094) Fixed UninitializedPropertyAccessException when loading history
+* [VIM-4016](https://youtrack.jetbrains.com/issue/VIM-4016) Fixed `:edit` command when project has no source roots
 * [VIM-3948](https://youtrack.jetbrains.com/issue/VIM-3948) Improved hint generation visibility checks for better UI component detection
+* [VIM-3473](https://youtrack.jetbrains.com/issue/VIM-3473) Fixed "Reload .ideavimrc" action in remote development (split) mode - no longer causes File Cache Conflict dialogs
+* [VIM-2821](https://youtrack.jetbrains.com/issue/VIM-2821) Fixed undo grouping when repeating text insertion with `.` in remote development (split mode)
+* [VIM-1705](https://youtrack.jetbrains.com/issue/VIM-1705) Fixed window-switching commands (e.g., `<C-w>h`) during macro playback
+* Fixed `pumvisible()` function returning incorrect result (was inverted)
+* Fixed `<Esc>` not properly exiting insert mode in Rider/CLion when canceling a completion lookup
+* Fixed `<Esc>` not exiting insert mode after `<C-Space>` completion in Rider
+* Fixed `<Esc>` in search bar no longer inserts `^[` literal text when search is not found - panel is now properly closed
+* Fixed IdeaVim entering broken state when a VimScript extension plugin fails to initialize
+* Fixed compatibility issues with external plugins (e.g., IdeaVim-EasyMotion, multicursor)
+* Fixed recursive key mappings (e.g., `map b wbb`) causing an apparent infinite loop - `maxmapdepth` limit now properly terminates the entire mapping chain
+* Fixed NERDTree `gs`/`gi` preview split commands to keep focus on the tree
+* Fixed visual marks (`<` and `>`) position tracking after text deletion - `gv` now re-selects correctly
+* Fixed `IndexOutOfBoundsException` when using text objects like `a)` at end of file
 * Fixed high CPU usage while showing command line
 * Fixed comparison of String and Number in VimScript expressions
 
 ### Merged PRs:
 * [1632](https://github.com/JetBrains/ideavim/pull/1632) by [chylex](https://github.com/chylex): Fix pumvisible returning opposite result
+* [1615](https://github.com/JetBrains/ideavim/pull/1615) by [1grzyb1](https://github.com/1grzyb1): Fix IndexOutOfBoundsException in findBlock when caret is at end of file
+* [1613](https://github.com/JetBrains/ideavim/pull/1613) by [1grzyb1](https://github.com/1grzyb1): VIM-3473 Sync ideavim in remdev
+* [1608](https://github.com/JetBrains/ideavim/pull/1608) by [1grzyb1](https://github.com/1grzyb1): VIM-4134 format using = action in split mode
+* [1585](https://github.com/JetBrains/ideavim/pull/1585) by [1grzyb1](https://github.com/1grzyb1): Break in case of maximum recursion depth
 * [1414](https://github.com/JetBrains/ideavim/pull/1414) by [Matt Ellis](https://github.com/citizenmatt): Refactor/functions
 * [1442](https://github.com/JetBrains/ideavim/pull/1442) by [Matt Ellis](https://github.com/citizenmatt): Fix high CPU usage while showing command line
 
