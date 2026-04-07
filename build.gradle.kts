@@ -446,19 +446,37 @@ intellijPlatform {
         * <a href="https://youtrack.jetbrains.com/issue/VIM-566">VIM-566</a> Added support for <code>:set foldlevel</code> option - control fold visibility level<br>
         <br>
         <b>Fixes:</b><br>
-        * Fixed <code>pumvisible()</code> function returning incorrect result (was inverted)<br>
-        * Fixed <code>&lt;Esc&gt;</code> not properly exiting insert mode in Rider/CLion when canceling a completion lookup<br>
-        * Fixed IdeaVim entering broken state when a VimScript extension plugin fails to initialize<br>
-        * Fixed compatibility issues with external plugins (e.g., IdeaVim-EasyMotion, multicursor)<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4135">VIM-4135</a> Fixed IdeaVim not loading in Rider<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4134">VIM-4134</a> Fixed undo in commentary - <code>gcc</code>/<code>gc{motion}</code> changes are now properly grouped as a single undo step<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4134">VIM-4134</a> Fixed <code>=</code> (format/auto-indent) action in split mode<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4134">VIM-4134</a> Fixed global marks causing errors when used inside write actions (e.g., during document modifications)<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4105">VIM-4105</a> Fixed <code>a"</code> <code>a'</code> <code>a`</code> text objects to include surrounding whitespace per Vim spec<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4097">VIM-4097</a> Fixed <code>&lt;A-n&gt;</code> (NextOccurrence) with text containing backslashes - e.g., selecting <code>\IntegerField</code> now works correctly<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4094">VIM-4094</a> Fixed UninitializedPropertyAccessException when loading history<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4016">VIM-4016</a> Fixed <code>:edit</code> command when project has no source roots<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-3948">VIM-3948</a> Improved hint generation visibility checks for better UI component detection<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-3473">VIM-3473</a> Fixed "Reload .ideavimrc" action in remote development (split) mode - no longer causes File Cache Conflict dialogs<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-2821">VIM-2821</a> Fixed undo grouping when repeating text insertion with <code>.</code> in remote development (split mode)<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-1705">VIM-1705</a> Fixed window-switching commands (e.g., <code>&lt;C-w&gt;h</code>) during macro playback<br>
+        * Fixed <code>pumvisible()</code> function returning incorrect result (was inverted)<br>
+        * Fixed <code>&lt;Esc&gt;</code> not properly exiting insert mode in Rider/CLion when canceling a completion lookup<br>
+        * Fixed <code>&lt;Esc&gt;</code> not exiting insert mode after <code>&lt;C-Space&gt;</code> completion in Rider<br>
+        * Fixed <code>&lt;Esc&gt;</code> in search bar no longer inserts <code>^[</code> literal text when search is not found - panel is now properly closed<br>
+        * Fixed IdeaVim entering broken state when a VimScript extension plugin fails to initialize<br>
+        * Fixed compatibility issues with external plugins (e.g., IdeaVim-EasyMotion, multicursor)<br>
+        * Fixed recursive key mappings (e.g., <code>map b wbb</code>) causing an apparent infinite loop - <code>maxmapdepth</code> limit now properly terminates the entire mapping chain<br>
+        * Fixed NERDTree <code>gs</code>/<code>gi</code> preview split commands to keep focus on the tree<br>
+        * Fixed visual marks (<code>&lt;</code> and <code>&gt;</code>) position tracking after text deletion - <code>gv</code> now re-selects correctly<br>
+        * Fixed <code>IndexOutOfBoundsException</code> when using text objects like <code>a)</code> at end of file<br>
         * Fixed high CPU usage while showing command line<br>
         * Fixed comparison of String and Number in VimScript expressions<br>
         <br>
         <b>Merged PRs:</b><br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1632">1632</a> by <a href="https://github.com/chylex">chylex</a>: Fix pumvisible returning opposite result<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1615">1615</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: Fix IndexOutOfBoundsException in findBlock when caret is at end of file<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1613">1613</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-3473 Sync ideavim in remdev<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1608">1608</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-4134 format using = action in split mode<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1585">1585</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: Break in case of maximum recursion depth<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1414">1414</a> by <a href="https://github.com/citizenmatt">Matt Ellis</a>: Refactor/functions<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1442">1442</a> by <a href="https://github.com/citizenmatt">Matt Ellis</a>: Fix high CPU usage while showing command line<br>
         <br>
