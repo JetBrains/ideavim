@@ -125,9 +125,30 @@ abstract class IdeaVimStarterTestBase {
 
   // ── IDE interaction helpers ─────────────────────────────────
 
-  /** Opens a file in the editor by relative path. */
+  /** Opens a file in the editor by relative path and waits until the editor is ready for input. */
   protected fun openFile(relativePath: String) {
     driver.withContext { openFile(relativePath) }
+    ensureEditorReady(relativePath)
+  }
+
+  private fun ensureEditorReady(relativePath: String, timeoutMs: Long = 10_000) {
+    val deadline = System.currentTimeMillis() + timeoutMs
+    var lastText = ""
+    while (System.currentTimeMillis() < deadline) {
+      try {
+        lastText = editorText()
+        if (lastText.isNotBlank()) break
+      } catch (_: Exception) {
+        // Editor component not yet available — retry
+      }
+      Thread.sleep(200)
+    }
+    check(lastText.isNotBlank()) {
+      "Editor for '$relativePath' did not become ready within ${timeoutMs}ms"
+    }
+    clickEditor()
+    // Small pause to let IdeaVim's key handler attach after the editor is connected
+    Thread.sleep(500)
   }
 
   /** Types vim keys in the active editor. */
