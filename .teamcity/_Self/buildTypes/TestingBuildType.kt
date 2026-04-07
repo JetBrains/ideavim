@@ -49,7 +49,7 @@ open class TestingBuildType(
   steps {
     gradle {
       clearConditions()
-      tasks = "test -x :tests:property-tests:test -x :tests:long-running-tests:test"
+      tasks = "clean test -x :tests:property-tests:test -x :tests:long-running-tests:test"
       buildFile = ""
       enableStacktrace = true
       gradleParams = "--no-build-cache --configuration-cache"
