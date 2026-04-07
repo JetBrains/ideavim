@@ -38,8 +38,9 @@ class RepeatUndoSplitTest : IdeaVimStarterTestBase() {
     assertEditorContains("HiHi", "Dot repeat should insert again")
 
     typeVim("u")
-    val text = editorText()
-    assertTrue(text.contains("Hi ") && !text.contains("HiHi")) {
+    var text = ""
+    val found = waitUntil { text = editorText(); text.contains("Hi ") && !text.contains("HiHi") }
+    assertTrue(found) {
       "Undo should revert dot repeat only. Actual: $text"
     }
   }
@@ -52,7 +53,8 @@ class RepeatUndoSplitTest : IdeaVimStarterTestBase() {
     assertEditorContains("HELLO", "Should have changed word")
 
     typeVim("w.")
-    val helloCount = editorText().lines().first().split("HELLO").size - 1
+    var helloCount = 0
+    waitUntil { helloCount = editorText().lines().first().split("HELLO").size - 1; helloCount >= 2 }
     assertTrue(helloCount >= 2) { "Should have two HELLOs. Actual: ${editorText()}" }
 
     typeVim("u")

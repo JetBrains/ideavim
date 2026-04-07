@@ -29,7 +29,6 @@ import com.intellij.ide.starter.plugins.PluginConfigurator
 import com.intellij.ide.starter.project.LocalProjectInfo
 import com.intellij.ide.starter.runner.Starter
 import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeAll
@@ -198,12 +197,22 @@ abstract class IdeaVimStarterTestBase {
     }
   }
 
-  /** Triggers the IDE "Navigate > Back" action (Cmd+[ on macOS). */
+  /** Triggers the IDE "Navigate > Back" action (Cmd+[ on macOS, Ctrl+Alt+Left on Linux). */
   protected fun ideaGoBack() {
     driver.withContext {
       ideFrame {
         codeEditor().apply {
-          keyboard { hotKey(java.awt.event.KeyEvent.VK_META, java.awt.event.KeyEvent.VK_OPEN_BRACKET) }
+          if (System.getProperty("os.name").lowercase().contains("mac")) {
+            keyboard { hotKey(java.awt.event.KeyEvent.VK_META, java.awt.event.KeyEvent.VK_OPEN_BRACKET) }
+          } else {
+            keyboard {
+              hotKey(
+                java.awt.event.KeyEvent.VK_CONTROL,
+                java.awt.event.KeyEvent.VK_ALT,
+                java.awt.event.KeyEvent.VK_LEFT
+              )
+            }
+          }
         }
       }
     }
@@ -239,6 +248,23 @@ abstract class IdeaVimStarterTestBase {
     Thread.sleep(ms)
   }
 
+  /**
+   * Retries [check] every [pollMs] until it returns true or [timeoutMs] elapses.
+   * Use instead of fixed pauses to handle variable split-mode RPC latency on CI.
+   */
+  protected fun waitUntil(
+    timeoutMs: Long = 5000,
+    pollMs: Long = 200,
+    check: () -> Boolean,
+  ): Boolean {
+    val deadline = System.currentTimeMillis() + timeoutMs
+    while (System.currentTimeMillis() < deadline) {
+      if (check()) return true
+      Thread.sleep(pollMs)
+    }
+    return false
+  }
+
   // ── Editor state helpers ────────────────────────────────────
 
   /** Reads the current editor text. */
@@ -261,42 +287,48 @@ abstract class IdeaVimStarterTestBase {
 
   // ── Assertions ──────────────────────────────────────────────
 
-  /** Asserts the editor contains the given text. */
+  /** Asserts the editor contains the given text, polling until timeout. */
   protected fun assertEditorContains(expected: String, message: String? = null) {
-    val text = editorText()
-    assertTrue(text.contains(expected)) {
+    var text = ""
+    val found = waitUntil { text = editorText(); text.contains(expected) }
+    assertTrue(found) {
       (message ?: "Editor should contain '$expected'") + ". Actual: $text"
     }
   }
 
-  /** Asserts the editor does NOT contain the given text. */
+  /** Asserts the editor does NOT contain the given text, polling until timeout. */
   protected fun assertEditorNotContains(unexpected: String, message: String? = null) {
+    // Give operations time to settle, then check
+    pause(1000)
     val text = editorText()
     assertFalse(text.contains(unexpected)) {
       (message ?: "Editor should not contain '$unexpected'") + ". Actual: $text"
     }
   }
 
-  /** Asserts the caret is at the given line (1-based). */
+  /** Asserts the caret is at the given line (1-based), polling until timeout. */
   protected fun assertCaretAtLine(expected: Int, message: String? = null) {
-    val actual = caretLine()
-    assertEquals(expected, actual) {
+    var actual = 0
+    val found = waitUntil { actual = caretLine(); actual == expected }
+    assertTrue(found) {
       (message ?: "Caret should be at line $expected") + ". Actual line: $actual"
     }
   }
 
-  /** Asserts the caret is before the given line. */
+  /** Asserts the caret is before the given line, polling until timeout. */
   protected fun assertCaretBefore(line: Int, message: String? = null) {
-    val actual = caretLine()
-    assertTrue(actual < line) {
+    var actual = 0
+    val found = waitUntil { actual = caretLine(); actual < line }
+    assertTrue(found) {
       (message ?: "Caret should be before line $line") + ". Actual line: $actual"
     }
   }
 
-  /** Asserts the caret is past the given line. */
+  /** Asserts the caret is past the given line, polling until timeout. */
   protected fun assertCaretAfter(line: Int, message: String? = null) {
-    val actual = caretLine()
-    assertTrue(actual > line) {
+    var actual = 0
+    val found = waitUntil { actual = caretLine(); actual > line }
+    assertTrue(found) {
       (message ?: "Caret should be after line $line") + ". Actual line: $actual"
     }
   }
