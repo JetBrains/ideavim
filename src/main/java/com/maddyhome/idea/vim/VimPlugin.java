@@ -22,6 +22,7 @@ import com.intellij.openapi.util.Disposer;
 import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.config.VimState;
 import com.maddyhome.idea.vim.config.migration.ApplicationConfigurationMigrator;
+import com.maddyhome.idea.vim.group.ChangeGroup;
 import com.maddyhome.idea.vim.group.KeyGroup;
 import com.maddyhome.idea.vim.group.VimNotifications;
 import com.maddyhome.idea.vim.group.VimWindowGroup;
@@ -90,8 +91,8 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     return VimInjectorKt.getInjector().getMotion();
   }
 
-  public static @NotNull VimChangeGroup getChange() {
-    return VimInjectorKt.getInjector().getChangeGroup();
+  public static @NotNull ChangeGroup getChange() {
+    return ((ChangeGroup)VimInjectorKt.getInjector().getChangeGroup());
   }
 
   public static @NotNull VimCommandGroup getCommand() {
