@@ -41,9 +41,7 @@ data class DelfunctionCommand(
       try {
         injector.functionService.deleteFunction(name, scope, this)
       } catch (e: ExException) {
-        if (e.message != null && e.message!!.startsWith("E130")) {
-          // "ignoreIfMissing" flag handles the "E130: Unknown function" exception
-        } else {
+        if (e.code != "E130") {
           throw e
         }
       }
