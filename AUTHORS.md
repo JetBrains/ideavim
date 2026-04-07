@@ -542,6 +542,10 @@ Contributors:
   [![icon][github]](https://github.com/1grzyb1)
   &nbsp;
   1grzyb1
+* [![icon][mail]](mailto:yury@digitalby.me)
+  [![icon][github]](https://github.com/digitalby)
+  &nbsp;
+  digitalby
 
 Contributors with JetBrains IP:
 
