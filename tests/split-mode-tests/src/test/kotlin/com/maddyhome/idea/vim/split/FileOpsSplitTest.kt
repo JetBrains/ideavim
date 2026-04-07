@@ -17,7 +17,6 @@ class FileOpsSplitTest : IdeaVimStarterTestBase() {
   @Test
   fun `save file with write command`() {
     openFile(createFile("src/Save1.txt", "Line 1\nLine 2\nLine 3\n"))
-    clickEditor()
     typeVimAndEscape("0iSAVED ")
     pause()
     exCommand("w")
