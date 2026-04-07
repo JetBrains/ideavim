@@ -1,3 +1,11 @@
+/*
+ * Copyright 2003-2026 The IdeaVim authors
+ *
+ * Use of this source code is governed by an MIT-style
+ * license that can be found in the LICENSE.txt file or at
+ * https://opensource.org/licenses/MIT.
+ */
+
 @file:Suppress("ClassName")
 
 package _Self.buildTypes
@@ -44,7 +52,7 @@ open class TestingBuildType(
       tasks = "test -x :tests:property-tests:test -x :tests:long-running-tests:test"
       buildFile = ""
       enableStacktrace = true
-      gradleParams = "--build-cache --configuration-cache"
+      gradleParams = "--no-build-cache --configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
   }
