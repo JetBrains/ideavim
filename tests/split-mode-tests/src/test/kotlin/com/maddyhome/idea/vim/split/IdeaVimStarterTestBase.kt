@@ -146,8 +146,23 @@ abstract class IdeaVimStarterTestBase {
       "Editor for '$relativePath' did not become ready within ${timeoutMs}ms"
     }
     clickEditor()
-    // Small pause to let IdeaVim's key handler attach after the editor is connected
-    Thread.sleep(500)
+
+    // Verify IdeaVim's key handler is actually attached by sending `gg` (go to first line)
+    // and checking the caret moves to line 1. This confirms vim is processing keystrokes.
+    val vimReady = waitUntil(timeoutMs = 10_000, pollMs = 500) {
+      try {
+        driver.withContext {
+          ideFrame { codeEditor().apply { waitFound(); keyboard { typeText("gg") } } }
+        }
+        Thread.sleep(300)
+        caretLine() <= 1
+      } catch (_: Exception) {
+        false
+      }
+    }
+    check(vimReady) {
+      "IdeaVim key handler did not attach for '$relativePath' within timeout"
+    }
   }
 
   /** Types vim keys in the active editor. */
