@@ -1,3 +1,11 @@
+/*
+ * Copyright 2003-2026 The IdeaVim authors
+ *
+ * Use of this source code is governed by an MIT-style
+ * license that can be found in the LICENSE.txt file or at
+ * https://opensource.org/licenses/MIT.
+ */
+
 package _Self.buildTypes
 
 import _Self.AgentSize
@@ -10,6 +18,10 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.schedule
 object Compatibility : IdeaVimBuildType({
   id("IdeaVimCompatibility")
   name = "IdeaVim compatibility with external plugins"
+
+  failureConditions {
+    executionTimeoutMin = 180
+  }
 
   vcs {
     root(DslContext.settingsRoot)
