@@ -18,4 +18,12 @@ abstract class VimOutputPanelServiceBase : VimOutputPanelService {
     panel.addText(text, true, messageType)
     panel.show()
   }
+
+  override fun clear(
+    editor: VimEditor,
+    context: ExecutionContext,
+  ) {
+    val panel = getOrCreate(editor, context)
+    panel.clearText()
+  }
 }
