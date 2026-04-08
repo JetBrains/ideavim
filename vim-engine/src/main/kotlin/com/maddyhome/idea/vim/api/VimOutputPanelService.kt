@@ -34,4 +34,9 @@ interface VimOutputPanelService {
     text: String,
     messageType: MessageType = MessageType.STANDARD,
   )
+
+  fun clear(
+    editor: VimEditor,
+    context: ExecutionContext,
+  )
 }

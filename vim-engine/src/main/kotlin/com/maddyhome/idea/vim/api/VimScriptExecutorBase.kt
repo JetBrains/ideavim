@@ -65,13 +65,13 @@ abstract class VimScriptExecutorBase : VimscriptExecutor {
           }
           finalResult = ExecutionResult.Error
           if (indicateErrors) {
-            injector.messages.showErrorMessage(editor, e.message)
+            injector.messages.appendErrorMessage(editor, e.message)
           } else {
             logger.warn("Failed while executing $unit. " + e.message)
           }
         } catch (e: NotImplementedError) {
           if (indicateErrors) {
-            injector.messages.showErrorMessage(editor, "Not implemented yet :(")
+            injector.messages.appendErrorMessage(editor, "Not implemented yet :(")
           }
         } catch (e: Exception) {
           logger.warn(e.toString())

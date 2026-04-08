@@ -29,6 +29,12 @@ internal class IjVimMessages : VimMessagesBase() {
   }
 
   override fun showErrorMessage(editor: VimEditor, message: String?) {
+    injector.outputPanel.clear(editor, injector.executionContextManager.getEditorExecutionContext(editor))
+    showMessageInternal(editor, message, MessageType.ERROR)
+    indicateError()
+  }
+
+  override fun appendErrorMessage(editor: VimEditor, message: String?) {
     showMessageInternal(editor, message, MessageType.ERROR)
     indicateError()
   }

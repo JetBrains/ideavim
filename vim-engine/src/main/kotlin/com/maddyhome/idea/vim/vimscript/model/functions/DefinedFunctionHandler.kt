@@ -65,7 +65,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) :
     val returnValue = executeFunctionBody(exceptionsCaught, editor, context)
 
     if (exceptionsCaught.isNotEmpty()) {
-      injector.messages.showErrorMessage(editor, exceptionsCaught.last().message)
+      injector.messages.appendErrorMessage(editor, exceptionsCaught.last().message)
     }
     return returnValue ?: VimInt.ZERO
   }

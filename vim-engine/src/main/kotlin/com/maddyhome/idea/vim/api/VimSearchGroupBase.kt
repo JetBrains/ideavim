@@ -653,7 +653,9 @@ abstract class VimSearchGroupBase : VimSearchGroup {
       caret.moveToOffset(matchRange.startOffset)
       val highlight = addSubstitutionConfirmationHighlight(editor, matchRange.startOffset, matchRange.endOffset)
       injector.modalInput.create(
-        editor, context, injector.messages.message("command.substitute.replace.with.prompt", lineToNextSubstitute.second.second),
+        editor,
+        context,
+        injector.messages.message("command.substitute.replace.with.prompt", lineToNextSubstitute.second.second),
         SubstituteWithAskInputInterceptor(
           editor, caret, nextSubstitute, highlight, line, 0, parent, pattern, regex,
           oldLastSubstituteString, line2, hasExpression, substituteString, options,
@@ -854,7 +856,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
       if (lastMatchLine != -1) {
         caret.moveToOffset(injector.motion.moveCaretToLineStartSkipLeading(editor, lastMatchLine))
       } else {
-        injector.messages.showStatusBarMessage(null, "E486: Pattern not found: $pattern")
+        injector.messages.showErrorMessage(editor, "E486: Pattern not found: $pattern")
       }
     }
 
@@ -863,7 +865,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     // todo throw multiple exceptions at once
     if (exceptions.isNotEmpty()) {
       injector.messages.indicateError()
-      injector.messages.showStatusBarMessage(null, exceptions[0].message)
+      injector.messages.showErrorMessage(editor, exceptions[0].message)
     }
   }
 
