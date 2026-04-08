@@ -20,10 +20,14 @@ class RepeatUndoSplitTest : IdeaVimStarterTestBase() {
     typeVimAndEscape("0sX")
     assertEditorContains("Xbcdef", "First char should be X")
 
-    typeVim("l.")
+    typeVim("l")
+    pause()
+    typeVim(".")
     assertEditorContains("XXcdef", "Second char should also be X")
 
-    typeVim("uu")
+    typeVim("u")
+    pause()
+    typeVim("u")
     assertEditorContains("Xbcdef", "First undo should revert dot-repeat only")
   }
 
@@ -52,7 +56,9 @@ class RepeatUndoSplitTest : IdeaVimStarterTestBase() {
     typeVimAndEscape("0cwHELLO")
     assertEditorContains("HELLO", "Should have changed word")
 
-    typeVim("w.")
+    typeVim("w")
+    pause()
+    typeVim(".")
     var helloCount = 0
     waitUntil { helloCount = editorText().lines().first().split("HELLO").size - 1; helloCount >= 2 }
     assertTrue(helloCount >= 2) { "Should have two HELLOs. Actual: ${editorText()}" }
