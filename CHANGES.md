@@ -60,6 +60,7 @@ usual beta standards.
 * Fixed `IndexOutOfBoundsException` when using text objects like `a)` at end of file
 * Fixed high CPU usage while showing command line
 * Fixed comparison of String and Number in VimScript expressions
+* Fixed `\/`, `\?`, and `\&` in Ex command ranges now correctly report E35/E33 errors when no previous search or substitute pattern exists, instead of crashing
 
 ### Merged PRs:
 * [1632](https://github.com/JetBrains/ideavim/pull/1632) by [chylex](https://github.com/chylex): Fix pumvisible returning opposite result
