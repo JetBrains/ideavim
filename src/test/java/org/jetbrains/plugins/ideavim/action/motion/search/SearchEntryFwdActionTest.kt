@@ -8,12 +8,14 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.search
 
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -25,6 +27,14 @@ class SearchEntryFwdActionTest : VimTestCase() {
     assertPluginErrorMessage("E486: Pattern not found: dolor")
     typeText("/")  // No <CR>
     assertStatusLineCleared()
+  }
+
+  @Test
+  fun `test search not found shows only error message on output panel`() {
+    configureByText("lorem ipsum dolor sit amet")
+    enterSearch("nonexistent")
+    val panelText = injector.outputPanel.getCurrentOutputPanel()?.text ?: ""
+    assertEquals("E486: Pattern not found: nonexistent", panelText)
   }
 
   @Test

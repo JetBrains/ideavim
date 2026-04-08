@@ -20,9 +20,17 @@ interface VimMessages {
 
   /**
    * Displays an error message to the user (typically in red).
+   * Clears any existing output panel content before showing the message.
    * The message panel closes on any keystroke and passes the key through to the editor.
    */
   fun showErrorMessage(editor: VimEditor, message: String?)
+
+  /**
+   * Appends an error message to the existing output panel content (typically in red).
+   * Unlike [showErrorMessage], this does not clear prior output.
+   * Use this when reporting errors during script execution where earlier output should be preserved.
+   */
+  fun appendErrorMessage(editor: VimEditor, message: String?)
 
   /**
    * Legacy method for displaying messages.
