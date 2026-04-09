@@ -25,6 +25,7 @@ internal class IjVimMessages : VimMessagesBase() {
   private var lastBeepTimeMillis = 0L
 
   override fun showMessage(editor: VimEditor, message: String?) {
+    injector.outputPanel.clear(editor, injector.executionContextManager.getEditorExecutionContext(editor))
     showMessageInternal(editor, message, MessageType.STANDARD)
   }
 
