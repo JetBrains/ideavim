@@ -1,3 +1,11 @@
+/*
+ * Copyright 2003-2026 The IdeaVim authors
+ *
+ * Use of this source code is governed by an MIT-style
+ * license that can be found in the LICENSE.txt file or at
+ * https://opensource.org/licenses/MIT.
+ */
+
 package _Self
 
 import _Self.buildTypes.Compatibility
@@ -6,6 +14,7 @@ import _Self.buildTypes.Nvim
 import _Self.buildTypes.PluginVerifier
 import _Self.buildTypes.PropertyBased
 import _Self.buildTypes.RandomOrderTests
+import _Self.buildTypes.SplitModeTests
 
 import _Self.buildTypes.TestingBuildType
 import _Self.buildTypes.TypeScriptTest
@@ -30,6 +39,7 @@ object Project : Project({
   buildType(PropertyBased)
   buildType(LongRunning)
   buildType(RandomOrderTests)
+  buildType(SplitModeTests)
 
   buildType(Nvim)
   buildType(PluginVerifier)
