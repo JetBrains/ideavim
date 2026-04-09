@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -63,6 +63,49 @@ class SearchWholeWordForwardActionTest : VimTestCase() {
       """.trimIndent(),
       Mode.NORMAL(),
     )
+  }
+
+  @Test
+  fun `test repeated star search wraps around`() {
+    configureByText(
+      """
+      aaa
+      abc
+      def
+      abc
+      dfg
+      abc
+      agg
+      abc
+      xyz
+      """.trimIndent(),
+    )
+    typeText("5j") // move to line 5, "abc"
+    assertPosition(5, 0)
+
+    typeText("*")
+    assertPosition(7, 0) // next "abc" forward
+
+    typeText("*")
+    assertPosition(1, 0) // wraps to first "abc"
+
+    typeText("*")
+    assertPosition(3, 0)
+
+    typeText("*")
+    assertPosition(5, 0)
+
+    typeText("*")
+    assertPosition(7, 0)
+
+    typeText("*")
+    assertPosition(1, 0) // wraps again
+
+    typeText("*")
+    assertPosition(3, 0)
+
+    typeText("*")
+    assertPosition(5, 0)
   }
 
   @Test

@@ -13,12 +13,12 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.wm.ex.ToolWindowManagerListener
 import com.intellij.openapi.wm.impl.IdeBackgroundUtil
-import com.intellij.util.messages.MessageBusConnection
 import com.intellij.ui.ClientProperty
 import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBPanel
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.util.IJSwingUtilities
+import com.intellij.util.messages.MessageBusConnection
 import com.maddyhome.idea.vim.KeyHandler.Companion.getInstance
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -288,6 +288,8 @@ class OutputPanel private constructor(
     }
 
     active = true
+    if (isSingleLine) return
+
     requestFocus(textPane)
   }
 
