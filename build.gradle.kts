@@ -471,6 +471,7 @@ intellijPlatform {
         * Fixed high CPU usage while showing command line<br>
         * Fixed comparison of String and Number in VimScript expressions<br>
         * Fixed <code>\/</code>, <code>\?</code>, and <code>\&</code> in Ex command ranges now correctly report E35/E33 errors when no previous search or substitute pattern exists, instead of crashing<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4113">VIM-4113</a> Fixed Visual mode commands (e.g., <code>:'&lt;,'&gt;sort</code>) failing when run off the Event Dispatch Thread<br>
         <br>
         <b>Merged PRs:</b><br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1632">1632</a> by <a href="https://github.com/chylex">chylex</a>: Fix pumvisible returning opposite result<br>
@@ -480,6 +481,7 @@ intellijPlatform {
         * <a href="https://github.com/JetBrains/ideavim/pull/1585">1585</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: Break in case of maximum recursion depth<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1414">1414</a> by <a href="https://github.com/citizenmatt">Matt Ellis</a>: Refactor/functions<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1442">1442</a> by <a href="https://github.com/citizenmatt">Matt Ellis</a>: Fix high CPU usage while showing command line<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1665">1665</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: Fix visual selection commands failing off-EDT due to nested write-in-read action<br>
         <br>
         <a href="https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20Fix%20versions:%20${version.get()}">Changelog</a>
         """.trimIndent()

@@ -61,6 +61,7 @@ usual beta standards.
 * Fixed high CPU usage while showing command line
 * Fixed comparison of String and Number in VimScript expressions
 * Fixed `\/`, `\?`, and `\&` in Ex command ranges now correctly report E35/E33 errors when no previous search or substitute pattern exists, instead of crashing
+* [VIM-4113](https://youtrack.jetbrains.com/issue/VIM-4113) Fixed Visual mode commands (e.g., `:'<,'>sort`) failing when run off the Event Dispatch Thread
 
 ### Merged PRs:
 * [1632](https://github.com/JetBrains/ideavim/pull/1632) by [chylex](https://github.com/chylex): Fix pumvisible returning opposite result
@@ -70,6 +71,7 @@ usual beta standards.
 * [1585](https://github.com/JetBrains/ideavim/pull/1585) by [1grzyb1](https://github.com/1grzyb1): Break in case of maximum recursion depth
 * [1414](https://github.com/JetBrains/ideavim/pull/1414) by [Matt Ellis](https://github.com/citizenmatt): Refactor/functions
 * [1442](https://github.com/JetBrains/ideavim/pull/1442) by [Matt Ellis](https://github.com/citizenmatt): Fix high CPU usage while showing command line
+* [1665](https://github.com/JetBrains/ideavim/pull/1665) by [1grzyb1](https://github.com/1grzyb1): Fix visual selection commands failing off-EDT due to nested write-in-read action
 
 ## 2.28.0, 2025-12-09
 
