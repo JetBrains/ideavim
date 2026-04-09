@@ -1,3 +1,11 @@
+/*
+ * Copyright 2003-2026 The IdeaVim authors
+ *
+ * Use of this source code is governed by an MIT-style
+ * license that can be found in the LICENSE.txt file or at
+ * https://opensource.org/licenses/MIT.
+ */
+
 package _Self.buildTypes
 
 import _Self.AgentSize
@@ -26,7 +34,7 @@ object RandomOrderTests : IdeaVimBuildType({
     gradle {
       clearConditions()
       tasks = """
-        test
+        clean test
         -x :tests:property-tests:test
         -x :tests:long-running-tests:test
         -Djunit.jupiter.execution.order.random.seed=default
@@ -34,7 +42,7 @@ object RandomOrderTests : IdeaVimBuildType({
       """.trimIndent().replace("\n", " ")
       buildFile = ""
       enableStacktrace = true
-      gradleParams = "--build-cache --configuration-cache"
+      gradleParams = "--no-build-cache --configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
   }
