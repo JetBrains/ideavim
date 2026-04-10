@@ -129,6 +129,8 @@ class ChangeGroup : VimChangeGroupBase() {
   }
 
   override fun repeatInsertText(editor: VimEditor, context: ExecutionContext, count: Int) {
+    if (count <= 0) return
+
     val ijEditor = (editor as IjVimEditor).editor
     val editorId = ijEditor.editorId()
 
