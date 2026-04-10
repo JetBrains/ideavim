@@ -446,6 +446,8 @@ intellijPlatform {
         * <a href="https://youtrack.jetbrains.com/issue/VIM-566">VIM-566</a> Added support for <code>:set foldlevel</code> option - control fold visibility level<br>
         <br>
         <b>Fixes:</b><br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4176">VIM-4176</a> Fixed race condition in single-line output panel that could cause <code>*</code> search wrapping to behave unreliably<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4175">VIM-4175</a> Fixed search "not found" showing previous "Hit ENTER" text alongside the error - panel is now cleared before displaying errors like "E486: Pattern not found"<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4135">VIM-4135</a> Fixed IdeaVim not loading in Rider<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4134">VIM-4134</a> Fixed undo in commentary - <code>gcc</code>/<code>gc{motion}</code> changes are now properly grouped as a single undo step<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4134">VIM-4134</a> Fixed <code>=</code> (format/auto-indent) action in split mode<br>

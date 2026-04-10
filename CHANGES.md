@@ -36,6 +36,8 @@ usual beta standards.
 * [VIM-566](https://youtrack.jetbrains.com/issue/VIM-566) Added support for `:set foldlevel` option - control fold visibility level
 
 ### Fixes:
+* [VIM-4176](https://youtrack.jetbrains.com/issue/VIM-4176) Fixed race condition in single-line output panel that could cause `*` search wrapping to behave unreliably
+* [VIM-4175](https://youtrack.jetbrains.com/issue/VIM-4175) Fixed search "not found" showing previous "Hit ENTER" text alongside the error - panel is now cleared before displaying errors like "E486: Pattern not found"
 * [VIM-4135](https://youtrack.jetbrains.com/issue/VIM-4135) Fixed IdeaVim not loading in Rider
 * [VIM-4134](https://youtrack.jetbrains.com/issue/VIM-4134) Fixed undo in commentary - `gcc`/`gc{motion}` changes are now properly grouped as a single undo step
 * [VIM-4134](https://youtrack.jetbrains.com/issue/VIM-4134) Fixed `=` (format/auto-indent) action in split mode
