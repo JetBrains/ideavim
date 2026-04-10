@@ -45,7 +45,7 @@ object SplitModeTests : IdeaVimBuildType({
               # Kill any leftover Xvfb from previous runs
               pkill -f 'Xvfb :99' || true
 
-              Xvfb :99 -screen 0 1920x1080x24 -nolisten tcp &
+              Xvfb :99 -screen 0 1920x1080x24 -ac -nolisten tcp &
               XVFB_PID=${'$'}!
 
               # Wait until the display is ready
