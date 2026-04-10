@@ -14,6 +14,20 @@ import org.junit.jupiter.api.Test
 class RepeatUndoSplitTest : IdeaVimStarterTestBase() {
 
   @Test
+  fun `should undo after insert text`() {
+    openFile(createFile("src/Repeat.txt", "test"))
+    typeVimAndEscape("0ddiHi ")
+    assertEditorContains("Hi ", "Should have inserted 'Hi '")
+
+    typeVim("u")
+    var text = ""
+    val found = waitUntil { text = editorText(); text.isEmpty() }
+    assertTrue(found) {
+      "Undo should revert insert. Actual: $text"
+    }
+  }
+
+  @Test
   fun `substitute repeat with dot then undo`() {
     openFile(createFile("src/Repeat1.txt", "abcdef\nghijkl\n"))
 
