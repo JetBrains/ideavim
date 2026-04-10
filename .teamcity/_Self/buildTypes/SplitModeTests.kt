@@ -13,7 +13,6 @@ import _Self.IdeaVimBuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
-import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
 object SplitModeTests : IdeaVimBuildType({
   name = "Split mode tests"
@@ -42,15 +41,10 @@ object SplitModeTests : IdeaVimBuildType({
     script {
       name = "Start Xvfb and run split mode tests"
       scriptContent = """
-              # Install Xvfb if not present
-              if ! command -v Xvfb >/dev/null 2>&1; then
-                sudo apt-get update -qq && sudo apt-get install -y -qq xvfb x11-utils >/dev/null
-              fi
-
               # Kill any leftover Xvfb from previous runs
               pkill -f 'Xvfb :99' || true
 
-              Xvfb :99 -screen 0 1920x1080x24 -ac -nolisten tcp &
+              Xvfb :99 -screen 0 1920x1080x24 -nolisten tcp &
               XVFB_PID=${'$'}!
 
               # Wait until the display is ready
@@ -76,11 +70,12 @@ object SplitModeTests : IdeaVimBuildType({
     }
   }
 
-  triggers {
-    vcs {
-      branchFilter = "+:<default>"
-    }
-  }
+  // VCS trigger disabled until Xvfb is installed on the TeamCity agent
+  // triggers {
+  //   vcs {
+  //     branchFilter = "+:<default>"
+  //   }
+  // }
 
   requirements {
     // Use a larger agent for split-mode tests — they launch two full IDE instances
