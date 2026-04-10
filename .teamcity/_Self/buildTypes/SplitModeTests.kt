@@ -42,6 +42,11 @@ object SplitModeTests : IdeaVimBuildType({
     script {
       name = "Start Xvfb and run split mode tests"
       scriptContent = """
+              # Install Xvfb if not present
+              if ! command -v Xvfb >/dev/null 2>&1; then
+                sudo apt-get update -qq && sudo apt-get install -y -qq xvfb x11-utils >/dev/null
+              fi
+
               # Kill any leftover Xvfb from previous runs
               pkill -f 'Xvfb :99' || true
 
