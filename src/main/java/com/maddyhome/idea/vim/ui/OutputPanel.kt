@@ -252,17 +252,11 @@ class OutputPanel private constructor(
     return textPane.getBackground()
   }
 
-  /**
-   * Turns off the output panel and optionally puts the focus back to the original component.
-   */
-  fun deactivate(refocusOwningEditor: Boolean) {
+  fun deactivate() {
     if (!active) return
     active = false
     clearText()
     textPane.text = ""
-    if (refocusOwningEditor) {
-      requestFocus(editor.contentComponent)
-    }
     if (glassPane != null) {
       glassPane!!.removeComponentListener(resizeAdapter)
       toolWindowListenerConnection?.disconnect()
@@ -319,7 +313,7 @@ class OutputPanel private constructor(
   fun close(key: KeyStroke?) {
     val passKeyBack = isSingleLine
     ApplicationManager.getApplication().invokeLater {
-      deactivate(true)
+      deactivate()
       val project = editor.project
       // For single line messages, pass any key back to the editor (including Enter)
       // For multi-line messages, don't pass Enter back (it was used to dismiss)
