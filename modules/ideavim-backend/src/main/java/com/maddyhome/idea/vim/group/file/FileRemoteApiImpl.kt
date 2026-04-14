@@ -162,6 +162,11 @@ internal class FileRemoteApiImpl : FileRemoteApi {
       if (first is TextEditor) !first.editor.isDisposed else false
     }
 
+  override suspend fun listFilesForCompletion(pathPrefix: String, projectId: ProjectId?): List<String> = readAction {
+    val basePath = projectId?.findProjectOrNull()?.basePath
+    FileCompletionHelper.listMatchingFiles(pathPrefix, basePath)
+  }
+
   // ======================== Private helpers ========================
 
   private fun findFile(filename: String, project: Project): VirtualFile? {

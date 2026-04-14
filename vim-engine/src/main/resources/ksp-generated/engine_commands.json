@@ -1015,6 +1015,11 @@
     "modes": "INXS"
   },
   {
+    "keys": "<S-Tab>",
+    "class": "com.maddyhome.idea.vim.action.ex.CommandLineCompletionBackwardAction",
+    "modes": "C"
+  },
+  {
     "keys": "<S-Up>",
     "class": "com.maddyhome.idea.vim.action.ex.SelectOlderHistoryAction",
     "modes": "C"
@@ -1033,6 +1038,11 @@
     "keys": "<Space>",
     "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionSpaceOpPendingModeAction",
     "modes": "O"
+  },
+  {
+    "keys": "<Tab>",
+    "class": "com.maddyhome.idea.vim.action.ex.CommandLineCompletionAction",
+    "modes": "C"
   },
   {
     "keys": "<Tab>",
