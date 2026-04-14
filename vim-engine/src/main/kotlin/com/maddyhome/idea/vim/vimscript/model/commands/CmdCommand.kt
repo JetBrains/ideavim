@@ -154,7 +154,7 @@ data class CmdCommand(val range: Range, val modifier: CommandModifier, val argum
     argument = argument.removePrefix(alias).trim()
 
     // User-aliases need to begin with an uppercase character.
-    if (!alias[0].isUpperCase()) {
+    if (alias.isEmpty() || !alias[0].isUpperCase()) {
       injector.messages.showErrorMessage(editor, injector.messages.message("E183"))
       return false
     }

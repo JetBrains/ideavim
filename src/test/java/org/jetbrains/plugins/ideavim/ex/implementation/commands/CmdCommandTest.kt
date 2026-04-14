@@ -192,6 +192,20 @@ class CmdCommandTest : VimTestCase() {
   }
 
   @Test
+  fun `test add command with nargs but missing name should not crash`() {
+    // Regression test: alias[0] on an empty string threw IndexOutOfBoundsException
+    // when only -nargs was provided without a command name (e.g. "command -nargs=0")
+    VimPlugin.getCommand().resetAliases()
+    configureByText("\n")
+    typeText(commandToKeys("command -nargs=0"))
+    assertPluginError(true)
+    typeText(commandToKeys("command! -nargs=1"))
+    assertPluginError(true)
+    typeText(commandToKeys("command -nargs=*"))
+    assertPluginError(true)
+  }
+
+  @Test
   fun `test run command with arguments`() {
     VimPlugin.getCommand().resetAliases()
     configureByText("\n")
