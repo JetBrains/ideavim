@@ -18,6 +18,7 @@ import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.createDirectories
 import kotlin.io.path.createFile
+import kotlin.test.assertEquals
 
 class CommandLineCompletionTest : VimExTestCase() {
 
@@ -39,6 +40,7 @@ class CommandLineCompletionTest : VimExTestCase() {
     tempDir.resolve("bravo.kt").createFile()
     tempDir.resolve("subdir").createDirectories()
     tempDir.resolve("subdir/nested.txt").createFile()
+    tempDir.resolve("subdir/notes.md").createFile()
 
     // Make sure VFS knows about these files
     LocalFileSystem.getInstance().refreshAndFindFileByNioFile(tempDir)
@@ -175,5 +177,255 @@ class CommandLineCompletionTest : VimExTestCase() {
   fun `test completion is case insensitive`() {
     typeText(":edit $tempPath/A<Tab>")
     assertExText("edit $tempPath/alpha.txt")
+  }
+
+  // --- Arrow key completion cycling tests ---
+
+  @Test
+  fun `test right arrow cycles forward after tab`() {
+    typeText(":edit $tempPath/b<Tab>")
+    assertExText("edit $tempPath/beta.txt")
+
+    typeText("<Right>")
+    assertExText("edit $tempPath/bravo.kt")
+  }
+
+  @Test
+  fun `test left arrow cycles backward after tab`() {
+    typeText(":edit $tempPath/b<Tab>")
+    assertExText("edit $tempPath/beta.txt")
+
+    typeText("<Left>")
+    assertExText("edit $tempPath/bravo.kt")
+  }
+
+  @Test
+  fun `test right arrow wraps around to first match`() {
+    typeText(":edit $tempPath/b<Tab>")
+    assertExText("edit $tempPath/beta.txt")
+
+    typeText("<Right>")
+    assertExText("edit $tempPath/bravo.kt")
+
+    typeText("<Right>")
+    assertExText("edit $tempPath/beta.txt")
+  }
+
+  @Test
+  fun `test left arrow wraps around to last match`() {
+    typeText(":edit $tempPath/b<Tab>")
+    assertExText("edit $tempPath/beta.txt")
+
+    typeText("<Left>")
+    assertExText("edit $tempPath/bravo.kt")
+
+    typeText("<Left>")
+    assertExText("edit $tempPath/beta.txt")
+  }
+
+  @Test
+  fun `test right then left returns to same match`() {
+    typeText(":edit $tempPath/b<Tab>")
+    assertExText("edit $tempPath/beta.txt")
+
+    typeText("<Right>")
+    assertExText("edit $tempPath/bravo.kt")
+
+    typeText("<Left>")
+    assertExText("edit $tempPath/beta.txt")
+  }
+
+  @Test
+  fun `test tab then right continues cycling`() {
+    typeText(":edit $tempPath/<Tab>")
+    assertExText("edit $tempPath/alpha.txt")
+
+    typeText("<Tab>")
+    assertExText("edit $tempPath/beta.txt")
+
+    typeText("<Right>")
+    assertExText("edit $tempPath/bravo.kt")
+  }
+
+  @Test
+  fun `test tab then left goes back`() {
+    typeText(":edit $tempPath/<Tab>")
+    assertExText("edit $tempPath/alpha.txt")
+
+    typeText("<Tab>")
+    assertExText("edit $tempPath/beta.txt")
+
+    typeText("<Left>")
+    assertExText("edit $tempPath/alpha.txt")
+  }
+
+  @Test
+  fun `test shift tab then left continues backward`() {
+    typeText(":edit $tempPath/b<S-Tab>")
+    assertExText("edit $tempPath/bravo.kt")
+
+    typeText("<Left>")
+    assertExText("edit $tempPath/beta.txt")
+  }
+
+  @Test
+  fun `test shift tab then right reverses direction`() {
+    typeText(":edit $tempPath/b<S-Tab>")
+    assertExText("edit $tempPath/bravo.kt")
+
+    typeText("<Right>")
+    assertExText("edit $tempPath/beta.txt")
+  }
+
+  @Test
+  fun `test right arrow with single match stays on same item`() {
+    typeText(":edit $tempPath/al<Tab>")
+    assertExText("edit $tempPath/alpha.txt")
+
+    typeText("<Right>")
+    assertExText("edit $tempPath/alpha.txt")
+  }
+
+  @Test
+  fun `test left arrow with single match stays on same item`() {
+    typeText(":edit $tempPath/al<Tab>")
+    assertExText("edit $tempPath/alpha.txt")
+
+    typeText("<Left>")
+    assertExText("edit $tempPath/alpha.txt")
+  }
+
+  @Test
+  fun `test right arrow without completion moves caret`() {
+    typeText(":edit foo")
+    assertExText("edit foo")
+
+    val offsetBefore = exEntryPanel.caret.offset
+    typeText("<Left>")
+    assertEquals(offsetBefore - 1, exEntryPanel.caret.offset)
+
+    typeText("<Right>")
+    assertEquals(offsetBefore, exEntryPanel.caret.offset)
+  }
+
+  @Test
+  fun `test typing after arrow completion invalidates session`() {
+    typeText(":edit $tempPath/b<Tab>")
+    assertExText("edit $tempPath/beta.txt")
+
+    typeText("<Right>")
+    assertExText("edit $tempPath/bravo.kt")
+
+    typeText("x")
+    assertExText("edit $tempPath/bravo.ktx")
+
+    // Arrow key now moves caret instead of cycling
+    val offsetBefore = exEntryPanel.caret.offset
+    typeText("<Left>")
+    assertEquals(offsetBefore - 1, exEntryPanel.caret.offset)
+  }
+
+  @Test
+  fun `test arrow keys with no matches do not change text`() {
+    typeText(":edit $tempPath/zzz<Tab>")
+    assertExText("edit $tempPath/zzz")
+
+    // No active completion, so arrows move caret
+    val offsetBefore = exEntryPanel.caret.offset
+    typeText("<Left>")
+    assertEquals(offsetBefore - 1, exEntryPanel.caret.offset)
+  }
+
+  @Test
+  fun `test mixed tab and arrow key cycling`() {
+    typeText(":edit $tempPath/<Tab>")
+    assertExText("edit $tempPath/alpha.txt")
+
+    typeText("<Right>")
+    assertExText("edit $tempPath/beta.txt")
+
+    typeText("<Tab>")
+    assertExText("edit $tempPath/bravo.kt")
+
+    typeText("<Left>")
+    assertExText("edit $tempPath/beta.txt")
+
+    typeText("<S-Tab>")
+    assertExText("edit $tempPath/alpha.txt")
+  }
+
+  @Test
+  fun `test arrow cycles through all files with empty prefix`() {
+    typeText(":edit $tempPath/<Tab>")
+    assertExText("edit $tempPath/alpha.txt")
+
+    typeText("<Right>")
+    assertExText("edit $tempPath/beta.txt")
+
+    typeText("<Right>")
+    assertExText("edit $tempPath/bravo.kt")
+
+    typeText("<Right>")
+    assertExText("edit $tempPath/subdir/")
+
+    // Wraps
+    typeText("<Right>")
+    assertExText("edit $tempPath/alpha.txt")
+  }
+
+  @Test
+  fun `test left arrow cycles all files backwards with empty prefix`() {
+    typeText(":edit $tempPath/<Tab>")
+    assertExText("edit $tempPath/alpha.txt")
+
+    typeText("<Left>")
+    assertExText("edit $tempPath/subdir/")
+
+    typeText("<Left>")
+    assertExText("edit $tempPath/bravo.kt")
+
+    typeText("<Left>")
+    assertExText("edit $tempPath/beta.txt")
+
+    typeText("<Left>")
+    assertExText("edit $tempPath/alpha.txt")
+  }
+
+  // --- Subdirectory completion tests ---
+
+  @Test
+  fun `test tab completes inside subdirectory`() {
+    typeText(":edit $tempPath/subdir/ne<Tab>")
+    assertExText("edit $tempPath/subdir/nested.txt")
+  }
+
+  @Test
+  fun `test tab cycles through files in subdirectory`() {
+    typeText(":edit $tempPath/subdir/n<Tab>")
+    assertExText("edit $tempPath/subdir/nested.txt")
+
+    typeText("<Tab>")
+    assertExText("edit $tempPath/subdir/notes.md")
+  }
+
+  @Test
+  fun `test right arrow cycles in subdirectory`() {
+    typeText(":edit $tempPath/subdir/n<Tab>")
+    assertExText("edit $tempPath/subdir/nested.txt")
+
+    typeText("<Right>")
+    assertExText("edit $tempPath/subdir/notes.md")
+
+    typeText("<Right>")
+    assertExText("edit $tempPath/subdir/nested.txt")
+  }
+
+  @Test
+  fun `test left arrow cycles backwards in subdirectory`() {
+    typeText(":edit $tempPath/subdir/n<Tab>")
+    assertExText("edit $tempPath/subdir/nested.txt")
+
+    typeText("<Left>")
+    assertExText("edit $tempPath/subdir/notes.md")
   }
 }

@@ -23,7 +23,15 @@ class CommandLineCompletion(
   val completionStart: Int,
   val matches: List<String>,
 ) {
-  var currentIndex: Int = -1
+  /** File names without the directory prefix, for display in the completion bar */
+  val displayNames: List<String> = run {
+    val argument = originalText.substring(completionStart)
+    val lastSlash = argument.lastIndexOf('/')
+    if (lastSlash < 0) matches
+    else matches.map { it.substring(minOf(lastSlash + 1, it.length)) }
+  }
+
+  var currentIndex: Int? = null
     private set
 
   /** The full command-line text that was set after applying the current match */
@@ -32,14 +40,16 @@ class CommandLineCompletion(
 
   fun nextMatch(): String? {
     if (matches.isEmpty()) return null
-    currentIndex = (currentIndex + 1) % matches.size
-    return matches[currentIndex]
+    val current = currentIndex
+    currentIndex = if (current == null) 0 else (current + 1) % matches.size
+    return matches[currentIndex!!]
   }
 
   fun previousMatch(): String? {
     if (matches.isEmpty()) return null
-    currentIndex = if (currentIndex <= 0) matches.size - 1 else currentIndex - 1
-    return matches[currentIndex]
+    val current = currentIndex
+    currentIndex = if (current == null || current <= 0) matches.size - 1 else current - 1
+    return matches[currentIndex!!]
   }
 
   fun updateExpectedText(text: String) {
