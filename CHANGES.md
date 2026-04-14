@@ -34,6 +34,7 @@ usual beta standards.
 * [VIM-566](https://youtrack.jetbrains.com/issue/VIM-566) Added support for `zm` command - decrease fold level to hide more folds
 * [VIM-566](https://youtrack.jetbrains.com/issue/VIM-566) Added support for `zf` command - create fold from selection or motion
 * [VIM-566](https://youtrack.jetbrains.com/issue/VIM-566) Added support for `:set foldlevel` option - control fold visibility level
+* [VIM-1158](https://youtrack.jetbrains.com/issue/VIM-1158) Added `gw` command - reformat code like `gq` but preserving the cursor position
 
 ### Fixes:
 * [VIM-4135](https://youtrack.jetbrains.com/issue/VIM-4135) Fixed IdeaVim not loading in Rider
@@ -62,6 +63,7 @@ usual beta standards.
 * Fixed comparison of String and Number in VimScript expressions
 
 ### Merged PRs:
+* [1548](https://github.com/JetBrains/ideavim/pull/1548) by [1grzyb1](https://github.com/1grzyb1): VIM-1158 Add `gw` to reformat code with preserving the cursor position
 * [1632](https://github.com/JetBrains/ideavim/pull/1632) by [chylex](https://github.com/chylex): Fix pumvisible returning opposite result
 * [1615](https://github.com/JetBrains/ideavim/pull/1615) by [1grzyb1](https://github.com/1grzyb1): Fix IndexOutOfBoundsException in findBlock when caret is at end of file
 * [1613](https://github.com/JetBrains/ideavim/pull/1613) by [1grzyb1](https://github.com/1grzyb1): VIM-3473 Sync ideavim in remdev
