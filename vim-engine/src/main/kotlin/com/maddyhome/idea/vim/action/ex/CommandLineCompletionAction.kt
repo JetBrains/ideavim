@@ -67,7 +67,7 @@ private fun performCompletion(
   return startNewCompletion(commandLine, context, forward)
 }
 
-private fun cycleExistingCompletion(
+internal fun cycleExistingCompletion(
   commandLine: VimCommandLine,
   completion: CommandLineCompletion,
   forward: Boolean,
@@ -79,7 +79,6 @@ private fun cycleExistingCompletion(
   }
 
   applyMatch(commandLine, completion, match)
-  return
 }
 
 private fun startNewCompletion(
@@ -88,6 +87,7 @@ private fun startNewCompletion(
   forward: Boolean,
 ): Boolean {
   commandLine.activeCompletion = null
+  commandLine.hideCompletionBar()
 
   val text = commandLine.text
   val parsed = parseCommandLineForCompletion(text) ?: return false
@@ -98,8 +98,14 @@ private fun startNewCompletion(
     return true
   }
 
+  if (matches.size == 1) {
+    applySingleMatch(commandLine, text, parsed.completionStart, matches[0])
+    return true
+  }
+
   val completion = CommandLineCompletion(text, parsed.completionStart, matches)
   commandLine.activeCompletion = completion
+  commandLine.showCompletionBar(completion)
 
   val match = selectMatch(completion, forward) ?: return true
   applyMatch(commandLine, completion, match)
@@ -114,14 +120,22 @@ private fun findMatches(parsed: ParsedCommandLine, context: ExecutionContext): L
   return injector.file.listFilesForCompletion(parsed.argumentPrefix, context)
 }
 
-private fun selectMatch(completion: CommandLineCompletion, forward: Boolean): String? {
+internal fun selectMatch(completion: CommandLineCompletion, forward: Boolean): String? {
   return if (forward) completion.nextMatch() else completion.previousMatch()
 }
 
-private fun applyMatch(commandLine: VimCommandLine, completion: CommandLineCompletion, match: String) {
-  val prefix = completion.originalText.substring(0, completion.completionStart)
+private fun applySingleMatch(commandLine: VimCommandLine, originalText: String, completionStart: Int, match: String) {
+  val prefix = originalText.substring(0, completionStart)
   val newText = prefix + match
   commandLine.setText(newText)
   commandLine.caret.offset = newText.length
+}
+
+internal fun applyMatch(commandLine: VimCommandLine, completion: CommandLineCompletion, match: String) {
+  val prefix = completion.originalText.substring(0, completion.completionStart)
+  val newText = prefix + match
   completion.updateExpectedText(newText)
+  commandLine.setText(newText)
+  commandLine.caret.offset = newText.length
+  commandLine.selectCompletionItem(completion.currentIndex)
 }

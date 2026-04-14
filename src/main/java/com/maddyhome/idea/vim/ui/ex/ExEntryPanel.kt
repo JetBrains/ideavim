@@ -87,6 +87,41 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
     return getLabel().startsWith(":")
   }
 
+  override fun showCompletionBar(completion: CommandLineCompletion) {
+    if (ApplicationManager.getApplication().isUnitTestMode) return
+    val editor = this.ijEditor ?: return
+
+    completionPanel.updateColors(editor.colorsScheme.defaultForeground, entry.getBackground())
+    completionPanel.updateFont(entry.getFont())
+    completionPanel.setItems(completion.displayNames, completion.currentIndex)
+
+    if (!isCompletionBarVisible) {
+      oldGlass?.add(completionPanel)
+      isCompletionBarVisible = true
+    }
+    positionCompletionPanel()
+  }
+
+  override fun selectCompletionItem(selectedIndex: Int?) {
+    if (!isCompletionBarVisible || selectedIndex == null) return
+    completionPanel.setSelectedIndex(selectedIndex)
+  }
+
+  override fun hideCompletionBar() {
+    if (!isCompletionBarVisible) return
+    isCompletionBarVisible = false
+    oldGlass?.remove(completionPanel)
+    oldGlass?.repaint()
+  }
+
+  private fun dismissCompletionIfTextChanged() {
+    val completion = activeCompletion ?: return
+    if (text != completion.expectedText) {
+      activeCompletion = null
+      hideCompletionBar()
+    }
+  }
+
   val ijEditor: Editor?
     get() = if (weakEditor != null) weakEditor!!.get() else null
 
@@ -175,6 +210,8 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
     if (!this.isActive) return
 
     clearPromptCharacter()
+    hideCompletionBar()
+    activeCompletion = null
     try {
       entry.document.removeDocumentListener(fontListener)
       // incsearch won't change in the lifetime of this activation
@@ -255,6 +292,7 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
       }
     }
   }
+
 
   private val incSearchDocumentListener: DocumentListener = object : DocumentAdapter() {
     override fun textChanged(e: DocumentEvent) {
@@ -491,6 +529,25 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
       setBounds(bounds)
       repaint()
     }
+
+    if (isCompletionBarVisible) {
+      positionCompletionPanel()
+    }
+  }
+
+  private fun positionCompletionPanel() {
+    val myBounds = bounds
+    if (myBounds.width == 0) return
+
+    val completionHeight = completionPanel.preferredSize.height
+    completionPanel.setBounds(
+      myBounds.x,
+      myBounds.y - completionHeight,
+      myBounds.width,
+      completionHeight,
+    )
+    completionPanel.revalidate()
+    completionPanel.repaint()
   }
 
   private val isIncSearchEnabled: Boolean
@@ -511,6 +568,8 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
   private var oldGlass: JComponent? = null
   private var oldLayout: LayoutManager? = null
   private var wasOpaque = false
+  private val completionPanel = ExCompletionPanel()
+  private var isCompletionBarVisible = false
 
   // incsearch stuff
   private var verticalOffset = 0
@@ -559,10 +618,13 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
     entry.updateText(string)
     if (updateLastEntry) entry.saveLastEntry()
     caret.offset = min(offset, text.length)
+
+    dismissCompletionIfTextChanged()
   }
 
   override fun deleteText(offset: Int, length: Int) {
     entry.deleteText(offset, length)
+    dismissCompletionIfTextChanged()
   }
 
   override fun insertText(offset: Int, string: String) {
@@ -571,6 +633,7 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
       entry.deleteText(offset, string.length)
     }
     entry.insertText(offset, string)
+    dismissCompletionIfTextChanged()
   }
 
   override fun clearCurrentAction() {
