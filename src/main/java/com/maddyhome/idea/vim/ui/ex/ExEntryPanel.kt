@@ -16,14 +16,14 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.wm.IdeFocusManager
 import com.intellij.openapi.wm.ex.ToolWindowManagerListener
-import com.maddyhome.idea.vim.ui.ToolWindowPositioningListener
-import com.intellij.util.messages.MessageBusConnection
 import com.intellij.ui.DocumentAdapter
 import com.intellij.util.IJSwingUtilities
+import com.intellij.util.messages.MessageBusConnection
 import com.maddyhome.idea.vim.EventFacade
 import com.maddyhome.idea.vim.KeyHandler.Companion.getInstance
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction
+import com.maddyhome.idea.vim.api.CommandLineCompletion
 import com.maddyhome.idea.vim.api.VimCommandLine
 import com.maddyhome.idea.vim.api.VimCommandLineCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -41,6 +41,7 @@ import com.maddyhome.idea.vim.key.interceptors.VimInputInterceptor
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.ui.ExPanelBorder
+import com.maddyhome.idea.vim.ui.ToolWindowPositioningListener
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
 import com.maddyhome.idea.vim.vimscript.model.commands.GlobalCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.SubstituteCommand
@@ -80,6 +81,11 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
   var context: DataContext? = null
   override var histIndex: Int = 0
   override var lastEntry: String? = null
+  override var activeCompletion: CommandLineCompletion? = null
+
+  override fun isExCommand(): Boolean {
+    return getLabel().startsWith(":")
+  }
 
   val ijEditor: Editor?
     get() = if (weakEditor != null) weakEditor!!.get() else null
