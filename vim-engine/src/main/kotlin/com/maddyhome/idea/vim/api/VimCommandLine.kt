@@ -41,6 +41,15 @@ interface VimCommandLine {
   /** Active completion session, or null if no completion is in progress */
   var activeCompletion: CommandLineCompletion?
 
+  /** Called when a new completion session starts and candidates should be displayed */
+  fun showCompletionBar(completion: CommandLineCompletion) {}
+
+  /** Called when the selected completion item changes */
+  fun selectCompletionItem(selectedIndex: Int?) {}
+
+  /** Called when the completion bar should be hidden */
+  fun hideCompletionBar() {}
+
   fun isExCommand(): Boolean
 
   /**
