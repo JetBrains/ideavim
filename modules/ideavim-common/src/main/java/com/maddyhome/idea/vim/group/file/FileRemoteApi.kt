@@ -44,6 +44,7 @@ interface FileRemoteApi : RemoteApi<Unit> {
   suspend fun selectNextFile(count: Int, projectId: ProjectId?)
   suspend fun buildFileInfoMessage(editorId: EditorId, fullPath: Boolean): String?
   suspend fun selectEditor(projectId: ProjectId, documentPath: String, protocol: String): Boolean
+  suspend fun listFilesForCompletion(pathPrefix: String, projectId: ProjectId?): List<String>
 
   companion object {
     @JvmStatic

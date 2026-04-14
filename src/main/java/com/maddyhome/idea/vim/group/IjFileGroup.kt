@@ -164,6 +164,10 @@ class IjFileGroup : VimFileBase() {
     return if (editor != null) editor.vim else null
   }
 
+  override fun listFilesForCompletion(pathPrefix: String, context: ExecutionContext): List<String> {
+    return rpc { FileRemoteApi.getInstance().listFilesForCompletion(pathPrefix, extractProjectId(context)) }
+  }
+
   override fun getProjectId(project: Any): String {
     require(project is Project)
     return project.projectId().serializeToString()

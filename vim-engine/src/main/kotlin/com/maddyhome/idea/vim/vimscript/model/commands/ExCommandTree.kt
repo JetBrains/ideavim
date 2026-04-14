@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -30,6 +30,10 @@ class ExCommandTree {
 
   fun getCommand(command: String): LazyExCommandInstance? {
     return abbrevToCommand[command]?.let { commandToInstance[it] }
+  }
+
+  fun getFullCommandName(abbreviation: String): String? {
+    return abbrevToCommand[abbreviation]
   }
 
   private fun parseCommandPattern(commandsPattern: String): List<Pair<String, String>> {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2024 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -37,6 +37,11 @@ interface VimCommandLine {
     get() = VimHistory.Type.getTypeByLabel(getLabel())
 
   fun toggleReplaceMode()
+
+  /** Active completion session, or null if no completion is in progress */
+  var activeCompletion: CommandLineCompletion?
+
+  fun isExCommand(): Boolean
 
   /**
    * The entered text. It does not include any rendered text such as `<80>` or prompts such as `^` or `?`

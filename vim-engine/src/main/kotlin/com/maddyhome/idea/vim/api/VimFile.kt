@@ -44,6 +44,15 @@ interface VimFile {
    */
   fun findFile(filename: String, context: ExecutionContext): String? = null
 
+  /**
+   * Lists files and directories matching a partial path prefix for command-line completion.
+   *
+   * @param pathPrefix The partial path typed by the user (may be empty, relative, absolute, or start with ~/)
+   * @param context Execution context for project resolution
+   * @return List of matching file/directory paths (directories end with '/'), sorted alphabetically
+   */
+  fun listFilesForCompletion(pathPrefix: String, context: ExecutionContext): List<String> = emptyList()
+
   fun getProjectId(project: Any): String
 
   /**
