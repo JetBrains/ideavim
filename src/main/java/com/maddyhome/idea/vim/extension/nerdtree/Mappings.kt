@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2025 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -54,10 +54,13 @@ fun MutableMap<List<KeyStroke>, NerdTreeAction>.register(mapping: String, action
  */
 val navigationMappings: Map<List<KeyStroke>, NerdTreeAction> = mutableMapOf<List<KeyStroke>, NerdTreeAction>().apply {
   // TODO support going [count] lines upward/downward or to line [count]
-  register("k", NerdTreeAction.ij("Tree-selectPrevious"))
-  register("j", NerdTreeAction.ij("Tree-selectNext"))
-  register("G", NerdTreeAction.ij("Tree-selectLast"))
-  register("gg", NerdTreeAction.ij("Tree-selectFirst"))
+  // Delegate to JTree's Swing ActionMap (same path as native arrow keys via TreeAction/DefaultTreeUI).
+  // This avoids ActionManager.tryToExecute which can RPC to backend in split mode,
+  // while preserving platform features (separator skipping, cycle scrolling, loading node handling).
+  register("k", NerdTreeAction.swing("selectPrevious"))
+  register("j", NerdTreeAction.swing("selectNext"))
+  register("G", NerdTreeAction.swing("selectLast"))
+  register("gg", NerdTreeAction.swing("selectFirst"))
 
   // FIXME lazy loaded tree nodes are not expanded
   register("NERDTreeMapOpenRecursively", "O", NerdTreeAction.ij("FullyExpandTreeNode"))
@@ -102,7 +105,7 @@ val navigationMappings: Map<List<KeyStroke>, NerdTreeAction> = mutableMapOf<List
     tree.selectionPath = path
     tree.scrollPathToVisible(path)
   })
-  register("NERDTreeMapJumpParent", "p", NerdTreeAction.ij("Tree-selectParentNoCollapse"))
+  register("NERDTreeMapJumpParent", "p", NerdTreeAction.swing("selectParentNoCollapse"))
   register(
     "NERDTreeMapJumpFirstChild",
     "K",
@@ -129,8 +132,8 @@ val navigationMappings: Map<List<KeyStroke>, NerdTreeAction> = mutableMapOf<List
       tree.scrollPathToVisible(path)
     },
   )
-  register("NERDTreeMapJumpNextSibling", "<C-J>", NerdTreeAction.ij("Tree-selectNextSibling"))
-  register("NERDTreeMapJumpPrevSibling", "<C-K>", NerdTreeAction.ij("Tree-selectPreviousSibling"))
+  register("NERDTreeMapJumpNextSibling", "<C-J>", NerdTreeAction.swing("selectNextSibling"))
+  register("NERDTreeMapJumpPrevSibling", "<C-K>", NerdTreeAction.swing("selectPreviousSibling"))
 
   register("/", NerdTreeAction.ij("SpeedSearch"))
   register("<ESC>", NerdTreeAction { _, _ -> })
