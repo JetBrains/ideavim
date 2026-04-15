@@ -225,7 +225,7 @@ tasks {
 
   val runPycharm by intellijPlatformTesting.runIde.registering {
     type = IntelliJPlatformType.PyCharmProfessional
-    version = "2025.3.2"
+    version = "2026.1"
     task {
       systemProperty("octopus.handler", System.getProperty("octopus.handler") ?: true)
     }
@@ -310,7 +310,7 @@ tasks {
   }
   val runPycharmSplitMode by intellijPlatformTesting.runIde.registering {
     type = IntelliJPlatformType.PyCharmProfessional
-    version = "2025.3.2"
+    version = "2026.1"
     splitMode = true
     splitModeTarget = SplitModeAware.SplitModeTarget.BOTH
 
@@ -353,6 +353,45 @@ tasks {
           logger.warn(
             "Could not find jetbrains_client64.vmoptions in sandbox. " +
                     "Run `./gradlew runIdeSplitMode` once first to populate the sandbox, then use this task."
+          )
+        }
+      }
+    }
+  }
+
+  val runPycharmSplitModeDebugFrontend by intellijPlatformTesting.runIde.registering {
+    type = IntelliJPlatformType.PyCharmProfessional
+    version = "2026.1"
+    splitMode = true
+    splitModeTarget = SplitModeAware.SplitModeTarget.BOTH
+
+    plugins {
+      plugin("AceJump", "3.8.22")
+      plugin("org.jetbrains.IdeaVim-EasyMotion", "1.16")
+    }
+
+    prepareSandboxTask {
+      val sandboxDir = project.layout.buildDirectory.dir("idea-sandbox").map { it.asFile }
+      doLast {
+        val debugLine = "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5006"
+        val vmoptions = sandboxDir.get().walkTopDown()
+          .filter { it.name == "jetbrains_client64.vmoptions" && it.path.contains("runPycharmSplitModeDebugFrontend") }
+          .firstOrNull()
+          ?: sandboxDir.get().walkTopDown()
+            .filter { it.name == "jetbrains_client64.vmoptions" }
+            .firstOrNull()
+
+        if (vmoptions != null) {
+          val content = vmoptions.readText()
+          if (debugLine !in content) {
+            vmoptions.appendText("\n$debugLine\n")
+            logger.lifecycle("Patched frontend vmoptions with JDWP debug agent: ${vmoptions.absolutePath}")
+          }
+          logger.lifecycle("Connect a Remote JVM Debug configuration to localhost:5006")
+        } else {
+          logger.warn(
+            "Could not find jetbrains_client64.vmoptions in sandbox. " +
+                    "Run `./gradlew runPycharmSplitMode` once first to populate the sandbox, then use this task."
           )
         }
       }
