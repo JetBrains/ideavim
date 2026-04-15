@@ -49,7 +49,7 @@ internal val Editor.isIdeaVimDisabledHere: Boolean
       !ClientId.isCurrentlyUnderLocalId || // CWM-927
       (ideaVimDisabledForSingleLine(ideaVimSupportValue) && isSingleLine()) ||
       IdeaVimDisablerExtensionPoint.isDisabledForEditor(this) ||
-      isNotFileEditorExceptAllowed()
+      isNotFileEditorExceptAllowed() || EditorHelper.isPythonConsole(this)
   }
 
 /**
