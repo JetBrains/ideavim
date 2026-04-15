@@ -35,8 +35,11 @@ usual beta standards.
 * [VIM-566](https://youtrack.jetbrains.com/issue/VIM-566) Added support for `zm` command - decrease fold level to hide more folds
 * [VIM-566](https://youtrack.jetbrains.com/issue/VIM-566) Added support for `zf` command - create fold from selection or motion
 * [VIM-566](https://youtrack.jetbrains.com/issue/VIM-566) Added support for `:set foldlevel` option - control fold visibility level
+* [VIM-1158](https://youtrack.jetbrains.com/issue/VIM-1158) Added `gw` command - reformat code like `gq` but preserving the cursor position
 
 ### Fixes:
+* [VIM-4176](https://youtrack.jetbrains.com/issue/VIM-4176) Fixed race condition in single-line output panel that could cause `*` search wrapping to behave unreliably
+* [VIM-4175](https://youtrack.jetbrains.com/issue/VIM-4175) Fixed search "not found" showing previous "Hit ENTER" text alongside the error - panel is now cleared before displaying errors like "E486: Pattern not found"
 * [VIM-4135](https://youtrack.jetbrains.com/issue/VIM-4135) Fixed IdeaVim not loading in Rider
 * [VIM-4134](https://youtrack.jetbrains.com/issue/VIM-4134) Fixed undo in commentary - `gcc`/`gc{motion}` changes are now properly grouped as a single undo step
 * [VIM-4134](https://youtrack.jetbrains.com/issue/VIM-4134) Fixed `=` (format/auto-indent) action in split mode
@@ -61,8 +64,11 @@ usual beta standards.
 * Fixed `IndexOutOfBoundsException` when using text objects like `a)` at end of file
 * Fixed high CPU usage while showing command line
 * Fixed comparison of String and Number in VimScript expressions
+* Fixed `\/`, `\?`, and `\&` in Ex command ranges now correctly report E35/E33 errors when no previous search or substitute pattern exists, instead of crashing
+* [VIM-4113](https://youtrack.jetbrains.com/issue/VIM-4113) Fixed Visual mode commands (e.g., `:'<,'>sort`) failing when run off the Event Dispatch Thread
 
 ### Merged PRs:
+* [1548](https://github.com/JetBrains/ideavim/pull/1548) by [1grzyb1](https://github.com/1grzyb1): VIM-1158 Add `gw` to reformat code with preserving the cursor position
 * [1682](https://github.com/JetBrains/ideavim/pull/1682) by [1grzyb1](https://github.com/1grzyb1): VIM-268 Complete file names in edit command
 * [1632](https://github.com/JetBrains/ideavim/pull/1632) by [chylex](https://github.com/chylex): Fix pumvisible returning opposite result
 * [1615](https://github.com/JetBrains/ideavim/pull/1615) by [1grzyb1](https://github.com/1grzyb1): Fix IndexOutOfBoundsException in findBlock when caret is at end of file
@@ -71,6 +77,7 @@ usual beta standards.
 * [1585](https://github.com/JetBrains/ideavim/pull/1585) by [1grzyb1](https://github.com/1grzyb1): Break in case of maximum recursion depth
 * [1414](https://github.com/JetBrains/ideavim/pull/1414) by [Matt Ellis](https://github.com/citizenmatt): Refactor/functions
 * [1442](https://github.com/JetBrains/ideavim/pull/1442) by [Matt Ellis](https://github.com/citizenmatt): Fix high CPU usage while showing command line
+* [1665](https://github.com/JetBrains/ideavim/pull/1665) by [1grzyb1](https://github.com/1grzyb1): Fix visual selection commands failing off-EDT due to nested write-in-read action
 
 ## 2.28.0, 2025-12-09
 

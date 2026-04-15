@@ -485,8 +485,11 @@ intellijPlatform {
         * <a href="https://youtrack.jetbrains.com/issue/VIM-566">VIM-566</a> Added support for <code>zm</code> command - decrease fold level to hide more folds<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-566">VIM-566</a> Added support for <code>zf</code> command - create fold from selection or motion<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-566">VIM-566</a> Added support for <code>:set foldlevel</code> option - control fold visibility level<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-1158">VIM-1158</a> Added <code>gw</code> command - reformat code like <code>gq</code> but preserving the cursor position<br>
         <br>
         <b>Fixes:</b><br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4176">VIM-4176</a> Fixed race condition in single-line output panel that could cause <code>*</code> search wrapping to behave unreliably<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4175">VIM-4175</a> Fixed search "not found" showing previous "Hit ENTER" text alongside the error - panel is now cleared before displaying errors like "E486: Pattern not found"<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4135">VIM-4135</a> Fixed IdeaVim not loading in Rider<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4134">VIM-4134</a> Fixed undo in commentary - <code>gcc</code>/<code>gc{motion}</code> changes are now properly grouped as a single undo step<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4134">VIM-4134</a> Fixed <code>=</code> (format/auto-indent) action in split mode<br>
@@ -511,8 +514,11 @@ intellijPlatform {
         * Fixed <code>IndexOutOfBoundsException</code> when using text objects like <code>a)</code> at end of file<br>
         * Fixed high CPU usage while showing command line<br>
         * Fixed comparison of String and Number in VimScript expressions<br>
+        * Fixed <code>\/</code>, <code>\?</code>, and <code>\&</code> in Ex command ranges now correctly report E35/E33 errors when no previous search or substitute pattern exists, instead of crashing<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4113">VIM-4113</a> Fixed Visual mode commands (e.g., <code>:'&lt;,'&gt;sort</code>) failing when run off the Event Dispatch Thread<br>
         <br>
         <b>Merged PRs:</b><br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1548">1548</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-1158 Add <code>gw</code> to reformat code with preserving the cursor position<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1682">1682</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-268 Complete file names in edit command<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1632">1632</a> by <a href="https://github.com/chylex">chylex</a>: Fix pumvisible returning opposite result<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1615">1615</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: Fix IndexOutOfBoundsException in findBlock when caret is at end of file<br>
@@ -521,6 +527,7 @@ intellijPlatform {
         * <a href="https://github.com/JetBrains/ideavim/pull/1585">1585</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: Break in case of maximum recursion depth<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1414">1414</a> by <a href="https://github.com/citizenmatt">Matt Ellis</a>: Refactor/functions<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1442">1442</a> by <a href="https://github.com/citizenmatt">Matt Ellis</a>: Fix high CPU usage while showing command line<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1665">1665</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: Fix visual selection commands failing off-EDT due to nested write-in-read action<br>
         <br>
         <a href="https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20Fix%20versions:%20${version.get()}">Changelog</a>
         """.trimIndent()
