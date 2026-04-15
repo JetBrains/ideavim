@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2024 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -78,6 +78,7 @@ class UiTests {
         }
       }
       waitFor(Duration.ofMinutes(1)) { editor.findAllText("One").isNotEmpty() }
+      testVisualSort(editor)
       testSelectTextWithDelay(editor)
       testExtendSelection(editor)
       testLargerDragSelection(editor)
@@ -391,6 +392,42 @@ class UiTests {
       editor.text,
     )
 
+    vimExit()
+  }
+
+  // VIM-4172
+  private fun IdeaFrame.testVisualSort(editor: Editor) {
+    println("Run testVisualSort...")
+
+    editor.injectText(
+      """
+                |cherry
+                |banana
+                |apple
+                |date
+      """.trimMargin(),
+    )
+
+    keyboard {
+      escape()
+      enterText("gg")
+      enterText("Vjj")
+      enterText(":")
+      enterText("sort")
+      enter()
+    }
+
+    assertEquals(
+      """
+      apple
+      banana
+      cherry
+      date
+      """.trimIndent(),
+      editor.text,
+    )
+
+    editor.injectText(testTextForEditor)
     vimExit()
   }
 

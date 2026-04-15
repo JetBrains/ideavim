@@ -248,6 +248,7 @@ tasks {
   }
 
   val runIdeForUiTests by intellijPlatformTesting.runIde.registering {
+    version = "2026.1"
     task {
       jvmArgumentProviders += CommandLineArgumentProvider {
         listOf(
