@@ -22,13 +22,11 @@ import com.intellij.openapi.util.Disposer;
 import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.config.VimState;
 import com.maddyhome.idea.vim.config.migration.ApplicationConfigurationMigrator;
-import com.maddyhome.idea.vim.group.ChangeGroup;
-import com.maddyhome.idea.vim.group.KeyGroup;
-import com.maddyhome.idea.vim.group.VimNotifications;
-import com.maddyhome.idea.vim.group.VimWindowGroup;
+import com.maddyhome.idea.vim.group.*;
+import com.maddyhome.idea.vim.group.visual.VisualMotionGroup;
 import com.maddyhome.idea.vim.history.VimHistory;
-import com.maddyhome.idea.vim.macro.VimMacro;
 import com.maddyhome.idea.vim.newapi.IjVimInjectorKt;
+import com.maddyhome.idea.vim.newapi.IjVimSearchGroup;
 import com.maddyhome.idea.vim.newapi.VimLegacyStateLoader;
 import com.maddyhome.idea.vim.newapi.VimSearchGroupLegacyLoader;
 import com.maddyhome.idea.vim.put.VimPut;
@@ -87,49 +85,48 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
 
-  public static @NotNull VimMotionGroup getMotion() {
-    return VimInjectorKt.getInjector().getMotion();
+  public static @NotNull MotionGroup getMotion() {
+    return ((MotionGroup)VimInjectorKt.getInjector().getMotion());
   }
 
   public static @NotNull ChangeGroup getChange() {
     return ((ChangeGroup)VimInjectorKt.getInjector().getChangeGroup());
   }
 
-  public static @NotNull VimCommandGroup getCommand() {
-    return VimInjectorKt.getInjector().getCommandGroup();
+  public static @NotNull CommandGroup getCommand() {
+    return ((CommandGroup)VimInjectorKt.getInjector().getCommandGroup());
   }
 
-  public static @NotNull VimRegisterGroup getRegister() {
-    return VimInjectorKt.getInjector().getRegisterGroup();
+  public static @NotNull RegisterGroup getRegister() {
+    return ((RegisterGroup)VimInjectorKt.getInjector().getRegisterGroup());
   }
 
   public static @NotNull VimFile getFile() {
     return VimInjectorKt.getInjector().getFile();
   }
 
-  public static @NotNull VimSearchGroup getSearch() {
-    return VimInjectorKt.getInjector().getSearchGroup();
+  public static @NotNull IjVimSearchGroup getSearch() {
+    return ((IjVimSearchGroup)VimInjectorKt.getInjector().getSearchGroup());
   }
 
-  public static @Nullable VimSearchGroup getSearchIfCreated() {
-    VimSearchGroup searchGroup = ApplicationManager.getApplication().getServiceIfCreated(VimSearchGroup.class);
-    return searchGroup;
+  public static @Nullable IjVimSearchGroup getSearchIfCreated() {
+    return ApplicationManager.getApplication().getServiceIfCreated(IjVimSearchGroup.class);
   }
 
   public static @NotNull VimProcessGroup getProcess() {
     return VimInjectorKt.getInjector().getProcessGroup();
   }
 
-  public static @NotNull VimMacro getMacro() {
-    return VimInjectorKt.getInjector().getMacro();
+  public static @NotNull MacroGroup getMacro() {
+    return ((MacroGroup)VimInjectorKt.getInjector().getMacro());
   }
 
   public static @NotNull VimDigraphGroup getDigraph() {
     return VimInjectorKt.getInjector().getDigraphGroup();
   }
 
-  public static @NotNull VimHistory getHistory() {
-    return VimInjectorKt.getInjector().getHistoryGroup();
+  public static @NotNull HistoryGroup getHistory() {
+    return ((HistoryGroup)VimInjectorKt.getInjector().getHistoryGroup());
   }
 
   public static @NotNull KeyGroup getKey() {
@@ -140,20 +137,20 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     return ApplicationManager.getApplication().getServiceIfCreated(KeyGroup.class);
   }
 
-  public static @NotNull VimWindowGroup getWindow() {
-    return VimInjectorKt.getInjector().getWindow();
+  public static @NotNull WindowGroup getWindow() {
+    return ((WindowGroup)VimInjectorKt.getInjector().getWindow());
   }
 
-  public static @NotNull VimEditorGroup getEditor() {
-    return VimInjectorKt.getInjector().getEditorGroup();
+  public static @NotNull EditorGroup getEditor() {
+    return ((EditorGroup)VimInjectorKt.getInjector().getEditorGroup());
   }
 
-  public static @Nullable VimEditorGroup getEditorIfCreated() {
-    return ApplicationManager.getApplication().getServiceIfCreated(VimEditorGroup.class);
+  public static @Nullable EditorGroup getEditorIfCreated() {
+    return ApplicationManager.getApplication().getServiceIfCreated(EditorGroup.class);
   }
 
-  public static @NotNull VimVisualMotionGroup getVisualMotion() {
-    return VimInjectorKt.getInjector().getVisualMotionGroup();
+  public static @NotNull VisualMotionGroup getVisualMotion() {
+    return ((VisualMotionGroup)VimInjectorKt.getInjector().getVisualMotionGroup());
   }
 
   public static @NotNull YankGroupBase getYank() {
