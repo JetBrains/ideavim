@@ -476,6 +476,7 @@ intellijPlatform {
     changeNotes.set(
       """
         <b>Features:</b><br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-268">VIM-268</a> Added file name completion in ex commands - press <code>&lt;Tab&gt;</code>/<code>&lt;S-Tab&gt;</code> to cycle through file matches in <code>:edit</code>, <code>:split</code>, <code>:vsplit</code>, <code>:write</code>, <code>:read</code>, <code>:source</code>, and <code>:find</code> commands; use arrow keys to navigate the completion panel<br>
         * New VimScript functions: <code>add()</code>, <code>call()</code>, <code>extend()</code>, <code>extendnew()</code>, <code>filter()</code>, <code>flatten()</code>, <code>flattennew()</code>, <code>foreach()</code>, <code>has_key()</code>, <code>indexof()</code>, <code>insert()</code>, <code>items()</code>, <code>keys()</code>, <code>map()</code>, <code>mapnew()</code>, <code>reduce()</code>, <code>remove()</code>, <code>slice()</code>, <code>sort()</code>, <code>uniq()</code>, <code>values()</code><br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-1595">VIM-1595</a> Added support for <code>:read</code> command - insert file content below current line (e.g., <code>:read file.txt</code>, <code>0read file.txt</code>)<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-1595">VIM-1595</a> Added support for <code>:read!</code> command - insert shell command output below current line (e.g., <code>:read! echo "hello"</code>)<br>
@@ -512,6 +513,7 @@ intellijPlatform {
         * Fixed comparison of String and Number in VimScript expressions<br>
         <br>
         <b>Merged PRs:</b><br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1682">1682</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-268 Complete file names in edit command<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1632">1632</a> by <a href="https://github.com/chylex">chylex</a>: Fix pumvisible returning opposite result<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1615">1615</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: Fix IndexOutOfBoundsException in findBlock when caret is at end of file<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1613">1613</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-3473 Sync ideavim in remdev<br>

@@ -26,6 +26,7 @@ usual beta standards.
 ## [To Be Released]
 
 ### Features:
+* [VIM-268](https://youtrack.jetbrains.com/issue/VIM-268) Added file name completion in ex commands - press `<Tab>`/`<S-Tab>` to cycle through file matches in `:edit`, `:split`, `:vsplit`, `:write`, `:read`, `:source`, and `:find` commands; use arrow keys to navigate the completion panel
 * New VimScript functions: `add()`, `call()`, `extend()`, `extendnew()`, `filter()`, `flatten()`, `flattennew()`, `foreach()`, `has_key()`, `indexof()`, `insert()`, `items()`, `keys()`, `map()`, `mapnew()`, `reduce()`, `remove()`, `slice()`, `sort()`, `uniq()`, `values()`
 * [VIM-1595](https://youtrack.jetbrains.com/issue/VIM-1595) Added support for `:read` command - insert file content below current line (e.g., `:read file.txt`, `0read file.txt`)
 * [VIM-1595](https://youtrack.jetbrains.com/issue/VIM-1595) Added support for `:read!` command - insert shell command output below current line (e.g., `:read! echo "hello"`)
@@ -62,6 +63,7 @@ usual beta standards.
 * Fixed comparison of String and Number in VimScript expressions
 
 ### Merged PRs:
+* [1682](https://github.com/JetBrains/ideavim/pull/1682) by [1grzyb1](https://github.com/1grzyb1): VIM-268 Complete file names in edit command
 * [1632](https://github.com/JetBrains/ideavim/pull/1632) by [chylex](https://github.com/chylex): Fix pumvisible returning opposite result
 * [1615](https://github.com/JetBrains/ideavim/pull/1615) by [1grzyb1](https://github.com/1grzyb1): Fix IndexOutOfBoundsException in findBlock when caret is at end of file
 * [1613](https://github.com/JetBrains/ideavim/pull/1613) by [1grzyb1](https://github.com/1grzyb1): VIM-3473 Sync ideavim in remdev
