@@ -28,6 +28,8 @@ import com.maddyhome.idea.vim.action.change.LazyVimCommand;
 import com.maddyhome.idea.vim.api.*;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.extension.VimExtensionFacade;
+import com.maddyhome.idea.vim.helper.EditorHelper;
+import com.maddyhome.idea.vim.helper.EditorHelperRt;
 import com.maddyhome.idea.vim.helper.ShortcutHelper;
 import com.maddyhome.idea.vim.key.*;
 import com.maddyhome.idea.vim.newapi.IjNativeAction;
@@ -180,9 +182,15 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
 
   @Override
   public void registerRequiredShortcutKeys(@NotNull VimEditor editor) {
+    Editor ijEditor = ((IjVimEditor)editor).getEditor();
+    if (EditorHelperRt.isIdeaVimDisabledHere(ijEditor)) return;
+
+    var vf = editor.getVirtualFile();
+    if (vf != null && vf.getPath().contains(EditorHelper.PYTHON_CONSOLE_FILE_NAME)) return;
+
     EventFacade.getInstance().registerCustomShortcutSet(VimShortcutKeyAction.getInstance(),
                                                         ShortcutHelper.toShortcutSet(getRequiredShortcutKeys()),
-                                                        ((IjVimEditor)editor).getEditor().getContentComponent());
+                                                        ijEditor.getContentComponent());
   }
 
   @Override
