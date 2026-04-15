@@ -21,7 +21,6 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler
 import com.intellij.openapi.editor.actions.SplitLineAction
 import com.intellij.openapi.editor.impl.CaretModelImpl
-import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.UserDataHolder
 import com.intellij.openapi.util.removeUserData
@@ -119,11 +118,7 @@ internal abstract class OctopusHandler(private val nextHandler: EditorActionHand
 
   private fun executeInInvokeLater(editor: Editor): Boolean {
     // Currently we have a workaround for the PY console VIM-3157
-    val fileName = FileDocumentManager.getInstance().getFile(editor.document)?.name
-    if (
-      fileName == "Python Console.py" || // This is the name in 232+
-      fileName == "Python Console" // This is the name in 231
-    ) return false
+    if (EditorHelper.isPythonConsole(editor)) return false
     return (editor.caretModel as? CaretModelImpl)?.isIteratingOverCarets ?: true
   }
 

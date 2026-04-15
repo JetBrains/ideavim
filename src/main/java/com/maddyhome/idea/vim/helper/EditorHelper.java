@@ -45,6 +45,9 @@ public class EditorHelper {
   // mitigates the visible area bouncing around too much and even pushing the cursor line off screen with large
   // multiline rendered doc comments, while still providing some visibility of the block inlay (e.g. Rider's single line
   // Code Vision)
+  public static final String PYTHON_CONSOLE_FILE_NAME = "Python Console.py";
+  public static final String PYTHON_CONSOLE_TOOL_WINDOW_ID = "Python Console";
+
   private static final int BLOCK_INLAY_MAX_LINE_HEIGHT = 3;
 
   public static @NotNull Rectangle getVisibleArea(final @NotNull Editor editor) {
@@ -694,5 +697,13 @@ public class EditorHelper {
     }
 
     return false;
+  }
+
+  public static boolean isPythonConsole(@NotNull Editor editor) {
+    if (editor.getVirtualFile() == null) return false;
+    // In split mode, the projected VirtualFile may have a different getName() result,
+    // so we also check getPath() to reliably detect the Python console.
+    return editor.getVirtualFile().getName().contains(PYTHON_CONSOLE_FILE_NAME)
+           || editor.getVirtualFile().getPath().contains(PYTHON_CONSOLE_FILE_NAME);
   }
 }
