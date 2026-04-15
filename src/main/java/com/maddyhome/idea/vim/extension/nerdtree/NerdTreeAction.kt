@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2025 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.extension.nerdtree
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.ui.SwingActionDelegate
 import com.intellij.ui.treeStructure.Tree
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -47,5 +48,11 @@ class NerdTreeAction(val action: (AnActionEvent, Tree) -> Unit) {
      * @return An [NerdTreeAction] that runs the specified action when triggered.
      */
     fun ij(id: String) = NerdTreeAction { event, _ -> callAction(null, id, event.dataContext.vim) }
+
+    /**
+     * Creates an [NerdTreeAction] that delegates to the JTree's Swing ActionMap.
+     */
+    fun swing(swingActionId: String) =
+      NerdTreeAction { _, tree -> SwingActionDelegate.performAction(swingActionId, tree) }
   }
 }
