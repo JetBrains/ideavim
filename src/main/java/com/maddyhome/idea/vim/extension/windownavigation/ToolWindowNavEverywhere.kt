@@ -13,6 +13,7 @@ import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.openapi.wm.ToolWindowType
 import com.maddyhome.idea.vim.extension.VimExtension
+import com.maddyhome.idea.vim.helper.EditorHelper
 import java.awt.Component
 import java.awt.KeyboardFocusManager
 import java.beans.PropertyChangeListener
@@ -31,7 +32,7 @@ internal class ToolWindowNavEverywhere : VimExtension {
     val oldFocusOwner = evt.oldValue as? JComponent
     val dispatcher = service<ToolWindowNavDispatcher>()
 
-    if (newFocusOwner != null && isInsideToolWindow(newFocusOwner)) {
+    if (newFocusOwner != null && isInsideToolWindow(newFocusOwner) && !isPythonConsoleComponent(newFocusOwner)) {
       dispatcher.register(newFocusOwner)
     }
 
@@ -49,6 +50,18 @@ internal class ToolWindowNavEverywhere : VimExtension {
     KeyboardFocusManager.getCurrentKeyboardFocusManager()
       .removePropertyChangeListener("focusOwner", focusListener)
     super.dispose()
+  }
+
+  private fun isPythonConsoleComponent(component: Component): Boolean {
+    for (project in ProjectManager.getInstance().openProjects) {
+      if (project.isDisposed) continue
+      val toolWindowManager = ToolWindowManager.getInstance(project)
+      val tw = toolWindowManager.getToolWindow(EditorHelper.PYTHON_CONSOLE_TOOL_WINDOW_ID) ?: continue
+      if (SwingUtilities.isDescendingFrom(component, tw.component)) {
+        return true
+      }
+    }
+    return false
   }
 
   private fun isInsideToolWindow(component: Component): Boolean {
