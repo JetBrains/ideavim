@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.autocmd.AutoCmdEvent
 
 interface AutoCmdService {
 
-  fun handleEvent(event: AutoCmdEvent, filePath: String? = null)
+  fun handleEvent(event: AutoCmdEvent, filePath: String? = null, editor: VimEditor? = null)
   fun registerEventCommand(command: String, event: AutoCmdEvent, pattern: String = "*")
   fun clearEvents()
   fun startAugroup(name: String)

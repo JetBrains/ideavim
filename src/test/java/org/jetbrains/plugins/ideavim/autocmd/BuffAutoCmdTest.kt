@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2025 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -87,15 +87,15 @@ class BuffAutoCmdTest : VimTestCase() {
   }
 
   @Test
-  fun `should support BuffEnter event`() {
-    enterCommand("autocmd BuffEnter * echo 2")
+  fun `should support BufEnter event`() {
+    enterCommand("autocmd BufEnter * echo 2")
     openNewBufferWindow("test.txt")
     assertExOutput("2")
   }
 
   @Test
-  fun `should support BuffExit event`() {
-    enterCommand("autocmd BuffLeave * echo 3")
+  fun `should support BufLeave event`() {
+    enterCommand("autocmd BufLeave * echo 3")
     closeWindow(otherBufferWindow)
     assertExOutput("3")
   }

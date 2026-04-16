@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.autocmd
 
 import com.maddyhome.idea.vim.api.AutoCmdService
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
@@ -51,19 +52,17 @@ class AutoCmdImpl : AutoCmdService {
     }
   }
 
-  override fun handleEvent(event: AutoCmdEvent, filePath: String?) {
-    val editor = injector.editorGroup.getFocusedEditor() ?: return
+  override fun handleEvent(event: AutoCmdEvent, filePath: String?, editor: VimEditor?) {
+    val editor = editor ?: injector.editorGroup.getFocusedEditor() ?: return
     val path = filePath ?: editor.getPath()
-    injector.outputPanel.clear(editor, injector.executionContextManager.getEditorExecutionContext(editor))
     eventHandlers[event]?.forEach { auCommand ->
       if (auCommand.pattern.matches(path)) {
-        executeCommand(auCommand.command)
+        executeCommand(auCommand.command, editor)
       }
     }
   }
 
-  private fun executeCommand(command: String) {
-    val editor = injector.editorGroup.getFocusedEditor() ?: return
+  private fun executeCommand(command: String, editor: VimEditor) {
     val context = injector.executionContextManager.getEditorExecutionContext(editor)
     injector.vimscriptExecutor.execute(command, editor, context, skipHistory = true)
   }

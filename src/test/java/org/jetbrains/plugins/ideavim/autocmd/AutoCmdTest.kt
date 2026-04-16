@@ -195,7 +195,7 @@ class AutoCmdTest : VimTestCase() {
   @Test
   fun `should register three events with comma-separated syntax`() {
     configureByText("hello")
-    enterCommand("autocmd InsertEnter,InsertLeave,BuffEnter * echo \"event\"")
+    enterCommand("autocmd InsertEnter,InsertLeave,BufEnter * echo \"event\"")
 
     // InsertEnter
     typeText(injector.parser.parseKeys("i"))
