@@ -55,7 +55,7 @@ import static com.maddyhome.idea.vim.newapi.IjVimInjectorKt.ijOptions;
 /**
  * @author vlan
  */
-@State(name = "VimEditorSettings", storages = {@Storage(value = "$APP_CONFIG$/vim_settings.xml")})
+@State(name = "VimEditorSettings", storages = {@Storage(value = "vim_settings.xml")})
 public class EditorGroup implements PersistentStateComponent<Element>, VimEditorGroup {
   public static final @NonNls String EDITOR_STORE_ELEMENT = "editor";
   private final CaretListener myLineNumbersCaretListener = new CaretListener() {

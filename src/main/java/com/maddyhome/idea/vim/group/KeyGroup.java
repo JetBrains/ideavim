@@ -53,7 +53,7 @@ import static java.util.stream.Collectors.toList;
 /**
  * @author vlan
  */
-@State(name = "VimKeySettings", storages = {@Storage(value = "$APP_CONFIG$/vim_settings.xml")})
+@State(name = "VimKeySettings", storages = {@Storage(value = "vim_settings.xml")})
 public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponent<Element> {
   public static final @NonNls String SHORTCUT_CONFLICTS_ELEMENT = "shortcut-conflicts";
   private static final @NonNls String SHORTCUT_CONFLICT_ELEMENT = "shortcut-conflict";
