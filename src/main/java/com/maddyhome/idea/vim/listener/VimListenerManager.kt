@@ -419,9 +419,17 @@ object VimListenerManager {
       // We can't rely on being passed a non-null editor, so check for Code With Me scenarios explicitly
       if (VimPlugin.isNotEnabled() || !ClientId.isCurrentlyUnderLocalId) return
 
-      injector.outputPanel.getCurrentOutputPanel()?.close()
-      injector.autoCmd.handleEvent(AutoCmdEvent.BufLeave, event.oldFile?.path)
-      injector.autoCmd.handleEvent(AutoCmdEvent.BufEnter, event.newFile?.path)
+      // Vim order: BufLeave → WinLeave → WinEnter → BufEnter
+      // Buf events only fire when the buffer (file) actually changes
+      val bufferChanged = event.oldFile?.path != event.newFile?.path
+      if (bufferChanged) {
+        injector.autoCmd.handleEvent(AutoCmdEvent.BufLeave, event.oldFile?.path)
+      }
+      injector.autoCmd.handleEvent(AutoCmdEvent.WinLeave, event.oldFile?.path)
+      injector.autoCmd.handleEvent(AutoCmdEvent.WinEnter, event.newFile?.path)
+      if (bufferChanged) {
+        injector.autoCmd.handleEvent(AutoCmdEvent.BufEnter, event.newFile?.path)
+      }
 
       MotionGroup.fileEditorManagerSelectionChangedCallback(event)
       FileGroupHelper.fileEditorManagerSelectionChangedCallback(event)
