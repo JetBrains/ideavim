@@ -58,8 +58,8 @@ class AutoCmdTest : VimTestCase() {
   }
 
   @Test
-  fun `should do nothing when pattern is not star`() {
-    enterCommand("autocmd InsertEnter foo echo 23")
+  fun `should do nothing when pattern does not match file`() {
+    enterCommand("autocmd InsertEnter *.py echo 23")
     typeText(injector.parser.parseKeys("i"))
     assertNoExOutput()
   }
@@ -211,5 +211,97 @@ class AutoCmdTest : VimTestCase() {
     enterCommand("autocmd InsertEnter,InvalidEvent * echo \"test\"")
     typeText(injector.parser.parseKeys("i"))
     assertNoExOutput()
+  }
+
+  @Test
+  fun `should match file extension pattern`() {
+    configureByFileName("test.txt")
+    enterCommand("autocmd!")
+    enterCommand("autocmd InsertEnter *.txt echo \"matched\"")
+    typeText(injector.parser.parseKeys("i"))
+    assertExOutput("matched")
+  }
+
+  @Test
+  fun `should not match wrong file extension pattern`() {
+    configureByFileName("test.txt")
+    enterCommand("autocmd!")
+    enterCommand("autocmd InsertEnter *.py echo \"matched\"")
+    typeText(injector.parser.parseKeys("i"))
+    assertNoExOutput()
+  }
+
+  @Test
+  fun `should match brace alternation pattern`() {
+    configureByFileName("test.txt")
+    enterCommand("autocmd!")
+    enterCommand("autocmd InsertEnter *.{py,txt} echo \"matched\"")
+    typeText(injector.parser.parseKeys("i"))
+    assertExOutput("matched")
+  }
+
+  @Test
+  fun `should not match brace alternation when extension not listed`() {
+    configureByFileName("test.kt")
+    enterCommand("autocmd!")
+    enterCommand("autocmd InsertEnter *.{py,txt} echo \"matched\"")
+    typeText(injector.parser.parseKeys("i"))
+    assertNoExOutput()
+  }
+
+  @Test
+  fun `should match question mark single char pattern`() {
+    configureByFileName("test.py")
+    enterCommand("autocmd!")
+    enterCommand("autocmd InsertEnter *.?y echo \"matched\"")
+    typeText(injector.parser.parseKeys("i"))
+    assertExOutput("matched")
+  }
+
+  @Test
+  fun `should match exact filename pattern`() {
+    configureByFileName("Makefile")
+    enterCommand("autocmd!")
+    enterCommand("autocmd InsertEnter Makefile echo \"matched\"")
+    typeText(injector.parser.parseKeys("i"))
+    assertExOutput("matched")
+  }
+
+  @Test
+  fun `should not match different exact filename`() {
+    configureByFileName("Rakefile")
+    enterCommand("autocmd!")
+    enterCommand("autocmd InsertEnter Makefile echo \"matched\"")
+    typeText(injector.parser.parseKeys("i"))
+    assertNoExOutput()
+  }
+
+  @Test
+  fun `should match star pattern on any file`() {
+    configureByFileName("anything.xyz")
+    enterCommand("autocmd!")
+    enterCommand("autocmd InsertEnter * echo \"matched\"")
+    typeText(injector.parser.parseKeys("i"))
+    assertExOutput("matched")
+  }
+
+  @Test
+  fun `should execute only commands with matching pattern`() {
+    configureByFileName("test.py")
+    enterCommand("autocmd!")
+    enterCommand("autocmd InsertEnter *.py echo \"python\"")
+    enterCommand("autocmd InsertEnter *.txt echo \"text\"")
+    typeText(injector.parser.parseKeys("i"))
+    assertExOutput("python")
+  }
+
+  @Test
+  fun `should execute commands with star and specific pattern`() {
+    configureByFileName("test.py")
+    enterCommand("autocmd!")
+    enterCommand("autocmd InsertEnter * echo \"all\"")
+    enterCommand("autocmd InsertEnter *.py echo \"python\"")
+    typeText(injector.parser.parseKeys("i"))
+    assertExOutput("all\npython")
   }
 }

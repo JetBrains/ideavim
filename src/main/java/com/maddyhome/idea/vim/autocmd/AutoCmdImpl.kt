@@ -18,8 +18,9 @@ class AutoCmdImpl : AutoCmdService {
   private val eventHandlers: MutableMap<AutoCmdEvent, MutableList<AuCommand>> = ConcurrentHashMap()
   private var currentAugroup: String? = null
 
-  override fun registerEventCommand(command: String, event: AutoCmdEvent) {
-    eventHandlers.getOrPut(event) { CopyOnWriteArrayList() }.add(AuCommand(command, currentAugroup))
+  override fun registerEventCommand(command: String, event: AutoCmdEvent, pattern: String) {
+    eventHandlers.getOrPut(event) { CopyOnWriteArrayList() }
+      .add(AuCommand(command, currentAugroup, AutoCmdPattern(pattern)))
   }
 
   override fun clearEvents() {
@@ -50,8 +51,15 @@ class AutoCmdImpl : AutoCmdService {
     }
   }
 
-  override fun handleEvent(event: AutoCmdEvent) {
-    eventHandlers[event]?.forEach { executeCommand(it.command) }
+  override fun handleEvent(event: AutoCmdEvent, filePath: String?) {
+    val editor = injector.editorGroup.getFocusedEditor() ?: return
+    val path = filePath ?: editor.getPath()
+    injector.outputPanel.clear(editor, injector.executionContextManager.getEditorExecutionContext(editor))
+    eventHandlers[event]?.forEach { auCommand ->
+      if (auCommand.pattern.matches(path)) {
+        executeCommand(auCommand.command)
+      }
+    }
   }
 
   private fun executeCommand(command: String) {

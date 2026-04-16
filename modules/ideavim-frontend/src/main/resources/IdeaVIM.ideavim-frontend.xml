@@ -169,6 +169,9 @@
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.process.IjProcessGroup"
                         serviceInterface="com.maddyhome.idea.vim.api.VimProcessGroup"/>
 
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.autocmd.AutoCmdImpl"
+                        serviceInterface="com.maddyhome.idea.vim.api.AutoCmdService"/>
+
     <platform.rpc.projectRemoteTopicListener
         implementation="com.maddyhome.idea.vim.group.JumpRemoteTopicListener"/>
 

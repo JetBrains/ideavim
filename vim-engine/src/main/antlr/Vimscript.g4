@@ -73,11 +73,24 @@ argumentsDeclaration:   (ETC | defaultValue (WS* COMMA WS* defaultValue)* (WS* C
 defaultValue:           variableName WS* ASSIGN WS* expr;
 
 autoCmd
-  : (WS | COLON)* AUTOCMD bang=BANG? auCommandArgument NEW_LINE
+  : (WS | COLON)* AUTOCMD bang=BANG? WS+ auEvents WS+ auPattern WS+ auCommand NEW_LINE
+  | (WS | COLON)* AUTOCMD bang=BANG? WS* NEW_LINE
   ;
 
-auCommandArgument
-  : ~(NEW_LINE)*
+auEvents
+  : auEventName (WS* COMMA WS* auEventName)*
+  ;
+
+auEventName
+  : anyCaseNameWithDigitsAndUnderscores
+  ;
+
+auPattern
+  : ~(WS | NEW_LINE)+
+  ;
+
+auCommand
+  : ~(NEW_LINE)+
   ;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

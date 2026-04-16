@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2024 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -76,9 +76,17 @@ object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
     val range = Range()
 
     val modifier = if (ctx.bang != null) CommandModifier.BANG else CommandModifier.NONE
-    val argument = ctx.auCommandArgument()?.text ?: ""
+    val argument = buildString {
+      ctx.auEvents()?.let { append(it.text) }
+      ctx.auPattern()?.let { append(" "); append(it.text) }
+      ctx.auCommand()?.let { append(" "); append(it.text) }
+    }
 
-    val command = AutoCmdCommand(range, modifier, argument)
+    val eventNames = ctx.auEvents()?.auEventName()?.map { it.text } ?: emptyList()
+    val pattern = ctx.auPattern()?.text
+    val commandText = ctx.auCommand()?.text?.trim()
+
+    val command = AutoCmdCommand(range, modifier, argument, eventNames, pattern, commandText)
     command.rangeInScript = ctx.getTextRange()
     return command
   }

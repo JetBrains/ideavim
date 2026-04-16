@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2025 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -12,8 +12,8 @@ import com.maddyhome.idea.vim.autocmd.AutoCmdEvent
 
 interface AutoCmdService {
 
-  fun handleEvent(event: AutoCmdEvent)
-  fun registerEventCommand(command: String, event: AutoCmdEvent)
+  fun handleEvent(event: AutoCmdEvent, filePath: String? = null)
+  fun registerEventCommand(command: String, event: AutoCmdEvent, pattern: String = "*")
   fun clearEvents()
   fun startAugroup(name: String)
   fun endAuGroup()
