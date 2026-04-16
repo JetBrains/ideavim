@@ -100,6 +100,52 @@ class BuffAutoCmdTest : VimTestCase() {
     assertExOutput("3")
   }
 
+  @Test
+  fun `should fire WinEnter when switching to different file`() {
+    enterCommand("autocmd WinEnter * echo \"win\"")
+    openNewBufferWindow("test.txt")
+    assertExOutput("win")
+  }
+
+  @Test
+  fun `should fire WinLeave when switching to different file`() {
+    enterCommand("autocmd WinLeave * echo \"left\"")
+    openNewBufferWindow("test.txt")
+    assertExOutput("left")
+  }
+
+  @Test
+  fun `should not fire BufEnter when switching to different file with only WinEnter registered`() {
+    // Only WinEnter is registered — BufEnter should not produce output
+    enterCommand("autocmd WinEnter * echo \"win\"")
+    openNewBufferWindow("test.txt")
+    assertExOutput("win") // only WinEnter output, no BufEnter
+  }
+
+  @Test
+  fun `should fire events in vim order when switching to different buffer`() {
+    // Vim order: BufLeave → WinLeave → WinEnter → BufEnter
+    enterCommand("autocmd BufLeave * echo \"1-BufLeave\"")
+    enterCommand("autocmd WinLeave * echo \"2-WinLeave\"")
+    enterCommand("autocmd WinEnter * echo \"3-WinEnter\"")
+    enterCommand("autocmd BufEnter * echo \"4-BufEnter\"")
+    openNewBufferWindow("test.txt")
+    assertExOutput("1-BufLeave\n2-WinLeave\n3-WinEnter\n4-BufEnter")
+  }
+
+  @Test
+  fun `should not fire BufEnter or BufLeave when reopening same buffer`() {
+    // Opening a file that's already the current buffer should not fire Buf events
+    // (oldFile and newFile are the same path)
+    val currentFile = mainWindow.virtualFile!!
+    enterCommand("autocmd BufEnter * echo \"bufenter\"")
+    enterCommand("autocmd BufLeave * echo \"bufleave\"")
+    ApplicationManager.getApplication().invokeAndWait {
+      fileEditorManager.openFile(currentFile, true)
+    }
+    assertNoExOutput()
+  }
+
   private fun openNewBufferWindow(filename: String): Editor {
     ApplicationManager.getApplication().invokeAndWait {
       fixture.openFileInEditor(fixture.createFile(filename, "lorem ipsum"))

@@ -13,4 +13,6 @@ enum class AutoCmdEvent {
   InsertLeave,
   BufEnter,
   BufLeave,
+  WinEnter,
+  WinLeave,
 }
