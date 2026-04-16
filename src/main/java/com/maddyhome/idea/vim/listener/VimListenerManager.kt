@@ -420,6 +420,9 @@ object VimListenerManager {
       if (VimPlugin.isNotEnabled() || !ClientId.isCurrentlyUnderLocalId) return
 
       injector.outputPanel.getCurrentOutputPanel()?.close()
+      injector.autoCmd.handleEvent(AutoCmdEvent.BufLeave, event.oldFile?.path)
+      injector.autoCmd.handleEvent(AutoCmdEvent.BufEnter, event.newFile?.path)
+
       MotionGroup.fileEditorManagerSelectionChangedCallback(event)
       FileGroupHelper.fileEditorManagerSelectionChangedCallback(event)
       (VimPlugin.getSearch() as IjVimSearchGroup).fileEditorManagerSelectionChangedCallback(event)
@@ -503,7 +506,7 @@ object VimListenerManager {
       EditorListeners.remove(event.editor)
       injector.listenersNotifier.notifyEditorReleased(vimEditor)
       injector.markService.editorReleased(vimEditor)
-      injector.autoCmd.handleEvent(AutoCmdEvent.BuffLeave, event.editor.virtualFile?.path)
+      injector.autoCmd.handleEvent(AutoCmdEvent.BufLeave, event.editor.virtualFile?.path)
 
       // This ticket will have a different stack trace, but it's the same problem. Originally, we tracked the last
       // editor closing based on file selection (closing an editor would select the next editor - so a null selection
@@ -564,7 +567,6 @@ object VimListenerManager {
           EditorListeners.add(editor, openingEditor?.editor?.vim ?: injector.fallbackWindow, scenario)
           firstEditorInitialised = true
 
-          injector.autoCmd.handleEvent(AutoCmdEvent.BuffEnter, editor.virtualFile?.path)
         }
       }
     }
@@ -927,7 +929,7 @@ private object MouseEventsDataHolder {
 private class AutoCmdInsertEnterListener : ModeWillChangeListener {
   override fun modeWillChange(editor: VimEditor, oldMode: Mode, newMode: Mode) {
     if (oldMode != Mode.INSERT && newMode == Mode.INSERT) {
-      injector.autoCmd.handleEvent(AutoCmdEvent.InsertEnter, editor.getPath())
+      injector.autoCmd.handleEvent(AutoCmdEvent.InsertEnter, editor.getPath(), editor)
     }
   }
 }
@@ -935,7 +937,7 @@ private class AutoCmdInsertEnterListener : ModeWillChangeListener {
 private class AutoCmdInsertLeaveListener : ModeChangeListener {
   override fun modeChanged(editor: VimEditor, oldMode: Mode) {
     if (oldMode == Mode.INSERT && editor.mode != Mode.INSERT) {
-      injector.autoCmd.handleEvent(AutoCmdEvent.InsertLeave, editor.getPath())
+      injector.autoCmd.handleEvent(AutoCmdEvent.InsertLeave, editor.getPath(), editor)
     }
   }
 }
