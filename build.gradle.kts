@@ -515,9 +515,16 @@ intellijPlatform {
         * Fixed high CPU usage while showing command line<br>
         * Fixed comparison of String and Number in VimScript expressions<br>
         * Fixed <code>\/</code>, <code>\?</code>, and <code>\&</code> in Ex command ranges now correctly report E35/E33 errors when no previous search or substitute pattern exists, instead of crashing<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4172">VIM-4172</a> IdeaVim is now disabled in Python Console to prevent key interference<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4113">VIM-4113</a> Fixed Visual mode commands (e.g., <code>:'&lt;,'&gt;sort</code>) failing when run off the Event Dispatch Thread<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-3727">VIM-3727</a> Fixed Enter and arrow keys not working in Python Console in split mode<br>
+        * Fixed NERDTree navigation (<code>j</code>/<code>k</code>/<code>G</code>/<code>gg</code>/<code>p</code>/<code>&lt;C-J&gt;</code>/<code>&lt;C-K&gt;</code>) poor performance in split mode - navigation now uses Swing actions directly instead of going through backend RPC<br>
         <br>
         <b>Merged PRs:</b><br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1690">1690</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: Make nerdtree work without calling backend actions<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1688">1688</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-4172 Disable ideavim in Python Console<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1687">1687</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: Restore old VimPLugin method signatures<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1685">1685</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-3727 Fix Python console Enter and arrow keys in split mode<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1548">1548</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-1158 Add <code>gw</code> to reformat code with preserving the cursor position<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1682">1682</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-268 Complete file names in edit command<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1632">1632</a> by <a href="https://github.com/chylex">chylex</a>: Fix pumvisible returning opposite result<br>

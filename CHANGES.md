@@ -65,9 +65,16 @@ usual beta standards.
 * Fixed high CPU usage while showing command line
 * Fixed comparison of String and Number in VimScript expressions
 * Fixed `\/`, `\?`, and `\&` in Ex command ranges now correctly report E35/E33 errors when no previous search or substitute pattern exists, instead of crashing
+* [VIM-4172](https://youtrack.jetbrains.com/issue/VIM-4172) IdeaVim is now disabled in Python Console to prevent key interference
 * [VIM-4113](https://youtrack.jetbrains.com/issue/VIM-4113) Fixed Visual mode commands (e.g., `:'<,'>sort`) failing when run off the Event Dispatch Thread
+* [VIM-3727](https://youtrack.jetbrains.com/issue/VIM-3727) Fixed Enter and arrow keys not working in Python Console in split mode
+* Fixed NERDTree navigation (`j`/`k`/`G`/`gg`/`p`/`<C-J>`/`<C-K>`) poor performance in split mode - navigation now uses Swing actions directly instead of going through backend RPC
 
 ### Merged PRs:
+* [1690](https://github.com/JetBrains/ideavim/pull/1690) by [1grzyb1](https://github.com/1grzyb1): Make nerdtree work without calling backend actions
+* [1688](https://github.com/JetBrains/ideavim/pull/1688) by [1grzyb1](https://github.com/1grzyb1): VIM-4172 Disable ideavim in Python Console
+* [1687](https://github.com/JetBrains/ideavim/pull/1687) by [1grzyb1](https://github.com/1grzyb1): Restore old VimPLugin method signatures
+* [1685](https://github.com/JetBrains/ideavim/pull/1685) by [1grzyb1](https://github.com/1grzyb1): VIM-3727 Fix Python console Enter and arrow keys in split mode
 * [1548](https://github.com/JetBrains/ideavim/pull/1548) by [1grzyb1](https://github.com/1grzyb1): VIM-1158 Add `gw` to reformat code with preserving the cursor position
 * [1682](https://github.com/JetBrains/ideavim/pull/1682) by [1grzyb1](https://github.com/1grzyb1): VIM-268 Complete file names in edit command
 * [1632](https://github.com/JetBrains/ideavim/pull/1632) by [chylex](https://github.com/chylex): Fix pumvisible returning opposite result
