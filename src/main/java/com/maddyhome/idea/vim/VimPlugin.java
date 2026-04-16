@@ -46,7 +46,7 @@ import org.jetbrains.annotations.Nullable;
  * This is an application level plugin meaning that all open projects will share a common instance of the plugin.
  * Registers and marks are shared across open projects so you can copy and paste between files of different projects.
  */
-@State(name = "VimSettings", storages = {@Storage("$APP_CONFIG$/vim_settings.xml")})
+@State(name = "VimSettings", storages = {@Storage("vim_settings.xml")})
 public class VimPlugin implements PersistentStateComponent<Element>, Disposable {
 
   public static final int STATE_VERSION = 7;
