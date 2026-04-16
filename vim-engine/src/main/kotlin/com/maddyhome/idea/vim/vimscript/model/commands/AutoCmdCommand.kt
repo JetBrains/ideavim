@@ -18,8 +18,14 @@ import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 @ExCommand(command = "au[tocmd]")
-data class AutoCmdCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
-  Command.SingleExecution(range, modifier, argument) {
+data class AutoCmdCommand(
+  val range: Range,
+  val modifier: CommandModifier,
+  val argument: String,
+  val eventNames: List<String> = emptyList(),
+  val filePattern: String? = null,
+  val commandText: String? = null,
+) : Command.SingleExecution(range, modifier, argument) {
 
   override val argFlags: CommandHandlerFlags =
     flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
@@ -33,25 +39,17 @@ data class AutoCmdCommand(val range: Range, val modifier: CommandModifier, val a
       injector.autoCmd.clearEvents()
       return ExecutionResult.Success
     }
-    val args = parseArgument(argument)
-    if (args.isFailure) return ExecutionResult.Error
-    args.onSuccess { (events, command) ->
-      events.forEach { event ->
-        injector.autoCmd.registerEventCommand(command, event)
-      }
+    if (eventNames.isEmpty() || filePattern == null || commandText == null) {
+      return ExecutionResult.Error
+    }
+    val events = try {
+      eventNames.map { AutoCmdEvent.valueOf(it) }
+    } catch (_: IllegalArgumentException) {
+      return ExecutionResult.Error
+    }
+    events.forEach { event ->
+      injector.autoCmd.registerEventCommand(commandText, event, filePattern)
     }
     return ExecutionResult.Success
-  }
-
-  fun parseArgument(argument: String): Result<Pair<List<AutoCmdEvent>, String>> {
-    val parts = argument.split('*')
-    if (parts.size < 2) return Result.failure(IllegalArgumentException("Invalid autocmd syntax"))
-    try {
-      val eventsString = parts[0].trim()
-      val events = eventsString.split(',').map { AutoCmdEvent.valueOf(it.trim()) }
-      return Result.success(Pair(events, parts[1].trim()))
-    } catch (e: IllegalArgumentException) {
-      return Result.failure(e)
-    }
   }
 }
