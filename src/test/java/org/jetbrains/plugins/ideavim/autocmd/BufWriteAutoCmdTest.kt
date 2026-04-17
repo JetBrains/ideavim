@@ -85,9 +85,23 @@ class BufWriteAutoCmdTest : VimTestCase() {
     assertExOutput("txt")
   }
 
-  private fun openFile(filename: String): Editor {
+  @Test
+  fun `should fire autocmd against saved document, not focused editor`() {
+    // a.py: 1 line. b.py: 5 lines. Opening b.py last makes it the focused editor.
+    val aEditor = openFile("a.py", "one-line")
+    openFile("b.py", "l1\nl2\nl3\nl4\nl5")
+
+    // line('$') reports the line count of the editor the autocmd runs against.
+    enterCommand("autocmd BufWritePre * echo line('$')")
+    modifyAndSave(aEditor)
+
+    // If the handler mistakenly ran against the focused b.py, output would be "5".
+    assertExOutput("1")
+  }
+
+  private fun openFile(filename: String, content: String = "initial content"): Editor {
     ApplicationManager.getApplication().invokeAndWait {
-      val file = fixture.createFile(filename, "initial content")
+      val file = fixture.createFile(filename, content)
       // Clear newly-created marker so this isn't treated as BufNewFile.
       BufNewFileTracker.consumeIfNew(file.path)
       fixture.openFileInEditor(file)

@@ -9,14 +9,17 @@
 package com.maddyhome.idea.vim.listener
 
 import com.intellij.codeWithMe.ClientId
+import com.intellij.codeWithMe.ClientId.Companion.isLocal
 import com.intellij.ide.ui.UISettings
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.ClientEditorManager
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.EditorKind
 import com.intellij.openapi.editor.actionSystem.TypedAction
 import com.intellij.openapi.editor.event.CaretEvent
@@ -989,14 +992,23 @@ private object BufWriteListener : FileDocumentManagerListener {
 
   private fun fireWriteEvent(document: Document, pre: Boolean) {
     val virtualFile = FileDocumentManager.getInstance().getFile(document) ?: return
+    val editor = getMainEditor(document) ?: return
+    val vimEditor = IjVimEditor(editor)
     val path = virtualFile.path
     if (pre) {
-      injector.autoCmd.handleEvent(AutoCmdEvent.BufWrite, path)
-      injector.autoCmd.handleEvent(AutoCmdEvent.BufWritePre, path)
+      injector.autoCmd.handleEvent(AutoCmdEvent.BufWrite, path, vimEditor)
+      injector.autoCmd.handleEvent(AutoCmdEvent.BufWritePre, path, vimEditor)
     } else {
-      injector.autoCmd.handleEvent(AutoCmdEvent.BufWritePost, path)
+      injector.autoCmd.handleEvent(AutoCmdEvent.BufWritePost, path, vimEditor)
     }
   }
+
+  private fun getMainEditor(document: Document): Editor? = EditorFactory.getInstance().getEditors(document)
+    .firstOrNull { ed ->
+      ed.editorKind != EditorKind.CONSOLE &&
+        ed.editorKind != EditorKind.DIFF &&
+        ClientEditorManager.getClientId(ed).isLocal
+    }
 }
 
 /**
