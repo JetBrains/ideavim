@@ -42,13 +42,7 @@ class AutoCmdImpl : AutoCmdService {
 
   override fun clearAuGroup(name: String) {
     eventHandlers.values.forEach { handlers ->
-      val iterator = handlers.iterator()
-      while (iterator.hasNext()) {
-        val handler = iterator.next()
-        if (handler.group == name) {
-          iterator.remove()
-        }
-      }
+      handlers.removeAll { it.group == name }
     }
   }
 
