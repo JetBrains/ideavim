@@ -49,6 +49,7 @@ usual beta standards.
 * [VIM-4094](https://youtrack.jetbrains.com/issue/VIM-4094) Fixed UninitializedPropertyAccessException when loading history
 * [VIM-4016](https://youtrack.jetbrains.com/issue/VIM-4016) Fixed `:edit` command when project has no source roots
 * [VIM-3948](https://youtrack.jetbrains.com/issue/VIM-3948) Improved hint generation visibility checks for better UI component detection
+* [VIM-4195](https://youtrack.jetbrains.com/issue/VIM-4195) Fixed settings not being saved in remote development (split) mode
 * [VIM-3473](https://youtrack.jetbrains.com/issue/VIM-3473) Fixed "Reload .ideavimrc" action in remote development (split) mode - no longer causes File Cache Conflict dialogs
 * [VIM-2821](https://youtrack.jetbrains.com/issue/VIM-2821) Fixed undo grouping when repeating text insertion with `.` in remote development (split mode)
 * [VIM-1705](https://youtrack.jetbrains.com/issue/VIM-1705) Fixed window-switching commands (e.g., `<C-w>h`) during macro playback
