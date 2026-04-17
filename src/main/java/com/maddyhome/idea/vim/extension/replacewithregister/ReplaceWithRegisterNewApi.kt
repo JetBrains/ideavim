@@ -16,27 +16,23 @@ import com.intellij.vim.api.models.Mode
 import com.intellij.vim.api.models.Range
 import com.intellij.vim.api.models.TextType
 import com.intellij.vim.api.scopes.editor.caret.CaretTransaction
+import com.intellij.vim.api.scopes.nmapPluginAction
+import com.intellij.vim.api.scopes.vmapPluginAction
 
 private const val PLUGIN_NAME: String = "ReplaceWithRegisterNew"
 
 @VimPlugin(name = PLUGIN_NAME)
 fun VimInitApi.init() {
   mappings {
-    // Step 1: Non-recursive <Plug> → action mappings
-    nnoremap(RWR_OPERATOR) {
+    nmapPluginAction("gr", RWR_OPERATOR, keepDefaultMapping = true) {
       rewriteMotion()
     }
-    nnoremap(RWR_LINE) {
+    nmapPluginAction("grr", RWR_LINE, keepDefaultMapping = true) {
       rewriteLine()
     }
-    vnoremap(RWR_VISUAL) {
+    vmapPluginAction("gr", RWR_VISUAL, keepDefaultMapping = true) {
       rewriteVisual()
     }
-
-    // Step 2: Recursive key → <Plug> mappings
-    nmap("gr", RWR_OPERATOR)
-    nmap("grr", RWR_LINE)
-    vmap("gr", RWR_VISUAL)
   }
 
   commands {
