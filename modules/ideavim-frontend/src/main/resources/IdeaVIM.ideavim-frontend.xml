@@ -40,6 +40,8 @@
               topic="com.intellij.openapi.keymap.KeymapManagerListener"/>
     <listener class="com.maddyhome.idea.vim.handler.IdeaVimCorrectorKeymapChangedListener"
               topic="com.intellij.openapi.keymap.KeymapManagerListener"/>
+    <listener class="com.maddyhome.idea.vim.listener.VimAppActivationListener"
+              topic="com.intellij.openapi.application.ApplicationActivationListener"/>
   </applicationListeners>
 
   <projectListeners>

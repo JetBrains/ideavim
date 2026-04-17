@@ -15,4 +15,6 @@ enum class AutoCmdEvent {
   BufLeave,
   WinEnter,
   WinLeave,
+  FocusGained,
+  FocusLost,
 }
