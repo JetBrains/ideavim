@@ -244,28 +244,19 @@ QuickImplementations - Quick Definition
 Autocmd
 ----------
 
-IdeaVim provides minimal support for Vim’s `:autocmd`, allowing commands to run on specific editor events.
+IdeaVim supports Vim’s `:autocmd` for running commands on editor events, including
+`InsertEnter`/`InsertLeave`, buffer events (`BufEnter`, `BufLeave`, `BufRead`,
+`BufNewFile`, `BufWritePre`, `BufWritePost`), window events (`WinEnter`, `WinLeave`),
+focus events (`FocusGained`, `FocusLost`), and `FileType`. Full glob patterns
+(`*`, `**`, `?`, `[abc]`, `{a,b}`) and augroups are supported.
 
-### Syntax
-```
-autocmd {event} * {command}
-autocmd!
-````
-
-Supported events: `InsertEnter`, `InsertLeave`  
-Only the `*` pattern is supported.
-
-### Examples
 ```vim
-autocmd InsertEnter * echo "Entering insert"
-autocmd InsertLeave * echo "Leaving insert"
+autocmd BufWritePre *.py echo "saving python"
+autocmd FileType python setlocal shiftwidth=4
+```
 
-" Multiple handlers
-autocmd InsertEnter * echo "first"
-autocmd InsertEnter * echo "second"
-````
-
-`autocmd!` clears all registered handlers.
+See [doc/autocmd.md](doc/autocmd.md) for the full event reference, firing order, and notes on IntelliJ-specific
+differences.
 
 
 Vim Script
