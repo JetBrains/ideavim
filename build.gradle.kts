@@ -499,6 +499,7 @@ intellijPlatform {
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4094">VIM-4094</a> Fixed UninitializedPropertyAccessException when loading history<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4016">VIM-4016</a> Fixed <code>:edit</code> command when project has no source roots<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-3948">VIM-3948</a> Improved hint generation visibility checks for better UI component detection<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4195">VIM-4195</a> Fixed settings not being saved in remote development (split) mode<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-3473">VIM-3473</a> Fixed "Reload .ideavimrc" action in remote development (split) mode - no longer causes File Cache Conflict dialogs<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-2821">VIM-2821</a> Fixed undo grouping when repeating text insertion with <code>.</code> in remote development (split mode)<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-1705">VIM-1705</a> Fixed window-switching commands (e.g., <code>&lt;C-w&gt;h</code>) during macro playback<br>
