@@ -322,6 +322,18 @@ public class EditorGroup implements PersistentStateComponent<Element>, VimEditor
   }
 
   @Override
+  public @Nullable VimEditor getSelectedEditor() {
+    for (Project project : ProjectManager.getInstance().getOpenProjects()) {
+      if (project.isDisposed()) continue;
+      Editor selectedEditor = FileEditorManager.getInstance(project).getSelectedTextEditor();
+      if (selectedEditor != null) {
+        return new IjVimEditor(selectedEditor);
+      }
+    }
+    return null;
+  }
+
+  @Override
   public @NotNull Collection<VimEditor> getEditorsRaw() {
     return getLocalEditors().map(IjVimEditor::new).collect(Collectors.toList());
   }
