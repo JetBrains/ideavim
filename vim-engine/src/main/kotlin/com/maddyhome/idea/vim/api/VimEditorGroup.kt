@@ -94,4 +94,12 @@ interface VimEditorGroup {
    *   project initialization. If the null is returned, fallback to `injector.fallbackWindow`
    */
   fun getSelectedEditor(projectId: String): VimEditor?
+
+  /**
+   * Get the currently selected editor, checking any open project.
+   *
+   * Prefer this over [getFocusedEditor]: focus is a UI-model concept and unreliable when panels take focus, whereas
+   * the selection is updated by window-switching commands directly. Returns null if no project has a selected editor.
+   */
+  fun getSelectedEditor(): VimEditor?
 }

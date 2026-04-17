@@ -50,6 +50,23 @@ class AutoCmdTest : VimTestCase() {
   }
 
   @Test
+  fun `should fire InsertEnter when entering Replace mode`() {
+    enterCommand("autocmd InsertEnter * echo \"enter\"")
+    typeText(injector.parser.parseKeys("R"))
+    assertState(Mode.REPLACE)
+    assertExOutput("enter")
+  }
+
+  @Test
+  fun `should fire InsertLeave when leaving Replace mode`() {
+    enterCommand("autocmd InsertLeave * echo \"leave\"")
+    typeText(injector.parser.parseKeys("R"))
+    typeText(injector.parser.parseKeys("<esc>"))
+    assertState(Mode.NORMAL())
+    assertExOutput("leave")
+  }
+
+  @Test
   fun `should clear commands`() {
     enterCommand("autocmd InsertEnter * echo 23")
     enterCommand("autocmd!")

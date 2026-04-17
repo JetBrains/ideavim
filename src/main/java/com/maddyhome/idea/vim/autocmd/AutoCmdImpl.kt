@@ -20,13 +20,14 @@ class AutoCmdImpl : AutoCmdService {
   private var currentAugroup: String? = null
 
   override fun registerEventCommand(command: String, event: AutoCmdEvent, pattern: String) {
-    eventHandlers.getOrPut(event) { CopyOnWriteArrayList() }
+    eventHandlers.getOrPut(event.canonical) { CopyOnWriteArrayList() }
       .add(AuCommand(command, currentAugroup, AutoCmdPattern(pattern)))
   }
 
   override fun clearEvents() {
-    if (currentAugroup != null) {
-      clearAuGroup(currentAugroup!!)
+    val group = currentAugroup
+    if (group != null) {
+      clearAugroup(group)
       return
     }
     eventHandlers.clear()
@@ -36,22 +37,22 @@ class AutoCmdImpl : AutoCmdService {
     currentAugroup = name
   }
 
-  override fun endAuGroup() {
+  override fun endAugroup() {
     currentAugroup = null
   }
 
-  override fun clearAuGroup(name: String) {
+  override fun clearAugroup(name: String) {
     eventHandlers.values.forEach { handlers ->
       handlers.removeAll { it.group == name }
     }
   }
 
   override fun handleEvent(event: AutoCmdEvent, filePath: String?, editor: VimEditor?) {
-    val editor = editor ?: injector.editorGroup.getFocusedEditor() ?: return
-    val path = filePath ?: editor.getPath()
-    eventHandlers[event]?.forEach { auCommand ->
+    val resolvedEditor = editor ?: injector.editorGroup.getSelectedEditor() ?: return
+    val path = filePath ?: resolvedEditor.getPath()
+    eventHandlers[event.canonical]?.forEach { auCommand ->
       if (auCommand.pattern.matches(path)) {
-        executeCommand(auCommand.command, editor)
+        executeCommand(auCommand.command, resolvedEditor)
       }
     }
   }

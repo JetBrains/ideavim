@@ -24,4 +24,12 @@ enum class AutoCmdEvent {
   FocusGained,
   FocusLost,
   FileType,
+  ;
+
+  val canonical: AutoCmdEvent
+    get() = when (this) {
+      BufRead -> BufReadPost
+      BufWrite -> BufWritePre
+      else -> this
+    }
 }

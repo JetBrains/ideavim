@@ -953,11 +953,6 @@ private object MouseEventsDataHolder {
 
 /**
  * Fires autocmd events that correspond to Vim's "load a buffer" sequence.
- *
- * If the file was just created (tracked via [BufNewFileTracker]), fires `BufNewFile`.
- * Otherwise fires `BufRead` and `BufReadPost` (Vim treats those two as synonyms).
- * `FileType` fires in both cases. `BufEnter` is fired separately via
- * [VimListenerManager.VimFileEditorManagerListener.selectionChanged].
  */
 private fun fireBufferLoadedEvents(editor: Editor) {
   val virtualFile = editor.virtualFile ?: return
@@ -967,7 +962,6 @@ private fun fireBufferLoadedEvents(editor: Editor) {
   if (BufNewFileTracker.consumeIfNew(path)) {
     injector.autoCmd.handleEvent(AutoCmdEvent.BufNewFile, path, vimEditor)
   } else {
-    injector.autoCmd.handleEvent(AutoCmdEvent.BufRead, path, vimEditor)
     injector.autoCmd.handleEvent(AutoCmdEvent.BufReadPost, path, vimEditor)
   }
 
@@ -999,7 +993,6 @@ private object BufWriteListener : FileDocumentManagerListener {
     val vimEditor = IjVimEditor(editor)
     val path = virtualFile.path
     if (pre) {
-      injector.autoCmd.handleEvent(AutoCmdEvent.BufWrite, path, vimEditor)
       injector.autoCmd.handleEvent(AutoCmdEvent.BufWritePre, path, vimEditor)
     } else {
       injector.autoCmd.handleEvent(AutoCmdEvent.BufWritePost, path, vimEditor)
@@ -1059,7 +1052,7 @@ internal object BufNewFileTracker : BulkFileListener {
 
 private class AutoCmdInsertEnterListener : ModeWillChangeListener {
   override fun modeWillChange(editor: VimEditor, oldMode: Mode, newMode: Mode) {
-    if (oldMode != Mode.INSERT && newMode == Mode.INSERT) {
+    if (!oldMode.isInsertish && newMode.isInsertish) {
       injector.autoCmd.handleEvent(AutoCmdEvent.InsertEnter, editor.getPath(), editor)
     }
   }
@@ -1067,8 +1060,12 @@ private class AutoCmdInsertEnterListener : ModeWillChangeListener {
 
 private class AutoCmdInsertLeaveListener : ModeChangeListener {
   override fun modeChanged(editor: VimEditor, oldMode: Mode) {
-    if (oldMode == Mode.INSERT && editor.mode != Mode.INSERT) {
+    if (oldMode.isInsertish && !editor.mode.isInsertish) {
       injector.autoCmd.handleEvent(AutoCmdEvent.InsertLeave, editor.getPath(), editor)
     }
   }
 }
+
+// Vim fires InsertEnter/Leave for both Insert and Replace modes (`:help InsertEnter`).
+private val Mode.isInsertish: Boolean
+  get() = this == Mode.INSERT || this == Mode.REPLACE
