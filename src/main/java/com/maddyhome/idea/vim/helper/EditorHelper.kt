@@ -49,7 +49,7 @@ internal val Editor.isIdeaVimDisabledHere: Boolean
       !ClientId.isCurrentlyUnderLocalId || // CWM-927
       (ideaVimDisabledForSingleLine(ideaVimSupportValue) && isSingleLine()) ||
       IdeaVimDisablerExtensionPoint.isDisabledForEditor(this) ||
-      isNotFileEditorExceptAllowed() || EditorHelper.isPythonConsole(this)
+      !isAllowedFileEditor()
   }
 
 /**
@@ -61,18 +61,18 @@ internal val Editor.isIdeaVimDisabledHere: Boolean
  * Here are issues when non-file editors were supported:
  * AI Chat – VIM-3786
  * Debug evaluate console – VIM-3929
+ * Python console - VIM-4172
  *
- * However, we still support IdeaVim in a commit window because it works fine there, and removing vim from this place will
- *   be quite a visible change for users.
- * We detect the commit window by the name of the editor (Dummy.txt). If this causes issues, let's disable IdeaVim
- *   in the commit window as well.
- *
- * Also, we support IdeaVim in diff viewers.
+ * We do want to support Vim actions in some windows, such as the commit window, diff windows, and decompiled Java
+ * files. We don't support the Python console.
  */
-private fun Editor.isNotFileEditorExceptAllowed(): Boolean {
-  if (EditorHelper.getVirtualFile(this)?.name?.contains("Dummy.txt") == true) return false
-  if (EditorHelper.isDiffEditor(this)) return false
-  return !EditorHelper.isFileEditor(this)
+private fun Editor.isAllowedFileEditor(): Boolean {
+  if (EditorHelper.isPythonConsole(this)) return false
+
+  return EditorHelper.isCommitWindowEditor(this)
+    || EditorHelper.isKotlinClassDecompiledToJavaFile(this)
+    || EditorHelper.isDiffEditor(this)
+    || EditorHelper.isFileEditor(this)
 }
 
 private fun ideaVimDisabledInDialog(ideaVimSupportValue: StringListOptionValue): Boolean {

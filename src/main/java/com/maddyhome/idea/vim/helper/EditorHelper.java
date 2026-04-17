@@ -13,6 +13,7 @@ import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.ex.util.EditorUtil;
 import com.intellij.openapi.editor.impl.EditorImpl;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.registry.Registry;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -683,6 +684,48 @@ public class EditorHelper {
   }
 
   /**
+   * Checks if the editor is the Python console, so we can disable Vim features
+   */
+  public static boolean isPythonConsole(@NotNull Editor editor) {
+    if (editor.getVirtualFile() == null) return false;
+    // In split mode, the projected VirtualFile may have a different getName() result,
+    // so we also check getPath() to reliably detect the Python console.
+    return editor.getVirtualFile().getName().contains(PYTHON_CONSOLE_FILE_NAME)
+           || editor.getVirtualFile().getPath().contains(PYTHON_CONSOLE_FILE_NAME);
+  }
+
+  /**
+   * Checks if the editor is hosted in the Commit tool window, so we can enable Vim features
+   */
+  public static boolean isCommitWindowEditor(@NotNull Editor editor) {
+    // The best heuristic we have is the file name, which is Dummy.txt
+    var file = editor.getVirtualFile();
+    return file != null && file.getName().contains("Dummy.txt");
+  }
+
+  /**
+   * Checks if the editor is a Kotlin class file decompiled to a Java file, so we can enable Vim features
+   * <p>
+   *   The platform changed the implementation of decompiling a Kotlin .class file to Java in 2026.2. Previously, it
+   *   used a dummy virtual file implementation. Now it uses an instance of {@link LightVirtualFile}. Typically, this
+   *   means an in-memory file that we don't want to have Vim features for, but in this case, we do.
+   * </p>
+   * <p>
+   *   To test, open a .class file generated from a Kotlin file. Then use the "Decompile to Java" action to create a
+   *   separate (in-memory) `.decompiled.java` file. Java-based .class files are decompiled directly in the document for
+   *   the .class file, so the editor is always backed by a valid file.
+   * </p>
+   * <p>
+   *   Perhaps a future implementation would have an allow-list for {@link VirtualFile#getFileType()} and allow "JAVA"?
+   * </p>
+   */
+  public static boolean isKotlinClassDecompiledToJavaFile(@NotNull Editor editor) {
+    @SuppressWarnings("deprecation") @Nullable Key<?> key = Key.findKeyByName("IS_KOTLIN_DECOMPILED_FILE");
+    var file = editor.getVirtualFile();
+    return file != null && key != null && editor.getVirtualFile().getUserData(key) == Boolean.TRUE;
+  }
+
+  /**
    * Checks if the document in the editor is modified.
    */
   public static boolean hasUnsavedChanges(@NotNull Editor editor) {
@@ -697,13 +740,5 @@ public class EditorHelper {
     }
 
     return false;
-  }
-
-  public static boolean isPythonConsole(@NotNull Editor editor) {
-    if (editor.getVirtualFile() == null) return false;
-    // In split mode, the projected VirtualFile may have a different getName() result,
-    // so we also check getPath() to reliably detect the Python console.
-    return editor.getVirtualFile().getName().contains(PYTHON_CONSOLE_FILE_NAME)
-           || editor.getVirtualFile().getPath().contains(PYTHON_CONSOLE_FILE_NAME);
   }
 }
