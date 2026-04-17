@@ -256,6 +256,30 @@ class VimIndentObjectTest : VimTestCase() {
     )
   }
 
+  // VIM-4193: dii must operate per-caret when multiple carets are active —
+  // each caret must delete the indent block at its own location, not the
+  // primary caret's block for every caret.
+  @Test
+  fun testDeleteInnerIndentWithMultipleCarets() {
+    doTest(
+      "dii",
+      """
+        one
+          <caret>aa
+          bb
+        two
+          <caret>cc
+          dd
+        three
+      """.trimIndent(),
+      """
+        one
+        <caret>two
+        <caret>three
+      """.trimIndent(),
+    )
+  }
+
   @Test
   fun testSelectNestedTabs() {
     doTest(

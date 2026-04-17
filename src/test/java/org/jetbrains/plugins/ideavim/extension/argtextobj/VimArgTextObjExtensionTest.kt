@@ -47,6 +47,48 @@ class VimArgTextObjExtensionTest : VimTestCase() {
     )
   }
 
+  // VIM-4193: daa must operate per-caret when multiple carets are active.
+  @Test
+  fun testDeleteAnArgumentWithMultipleCarets() {
+    doTest(
+      Lists.newArrayList("daa"),
+      """
+        fun test() {
+          println(<caret>"abc", 1)
+          println(<caret>"def", 2)
+        }
+      """.trimIndent(),
+      """
+        fun test() {
+          println(<caret>1)
+          println(<caret>2)
+        }
+      """.trimIndent(),
+      Mode.NORMAL(),
+    )
+  }
+
+  // VIM-4193: dia must operate per-caret when multiple carets are active.
+  @Test
+  fun testDeleteInnerArgumentWithMultipleCarets() {
+    doTest(
+      Lists.newArrayList("dia"),
+      """
+        fun test() {
+          println(<caret>"abc", 1)
+          println(<caret>"def", 2)
+        }
+      """.trimIndent(),
+      """
+        fun test() {
+          println(<caret>, 1)
+          println(<caret>, 2)
+        }
+      """.trimIndent(),
+      Mode.NORMAL(),
+    )
+  }
+
   @Test
   fun testChangeInnerArgument() {
     doTest(
