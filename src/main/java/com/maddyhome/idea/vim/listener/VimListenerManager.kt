@@ -126,6 +126,7 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.lang.ref.WeakReference
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import javax.swing.SwingUtilities
 
 /**
@@ -256,6 +257,8 @@ object VimListenerManager {
       optionGroup.removeGlobalOptionChangeListener(Options.showmode, modeWidgetOptionListener)
       optionGroup.removeGlobalOptionChangeListener(Options.showmode, macroWidgetOptionListener)
       optionGroup.removeEffectiveOptionValueChangeListener(Options.guicursor, GuicursorChangeListener)
+
+      BufNewFileTracker.clear()
     }
   }
 
@@ -1017,17 +1020,41 @@ private object BufWriteListener : FileDocumentManagerListener {
  * set (bounded by a TTL and max size).
  */
 internal object BufNewFileTracker : BulkFileListener {
-  private val createdFiles = java.util.concurrent.ConcurrentHashMap.newKeySet<String>()
+
+  private const val ENTRY_TTL_MILLIS = 60_000L
+
+  private const val MAX_ENTRIES = 256
+
+  private val createdFiles = ConcurrentHashMap<String, Long>()
+
+  @TestOnly
+  internal var clock: () -> Long = System::currentTimeMillis
 
   override fun after(events: List<VFileEvent>) {
+    val now = clock()
     for (event in events) {
-      if (event is VFileCreateEvent && !event.isDirectory) {
-        createdFiles.add(event.path)
-      }
+      if (event !is VFileCreateEvent || event.isDirectory) continue
+      if (event.isFromRefresh || event.requestor == null) continue
+      createdFiles[event.path] = now
     }
+    if (createdFiles.size > MAX_ENTRIES) sweepStale(now)
   }
 
-  fun consumeIfNew(path: String): Boolean = createdFiles.remove(path)
+  fun consumeIfNew(path: String): Boolean {
+    val timestamp = createdFiles.remove(path) ?: return false
+    return clock() - timestamp < ENTRY_TTL_MILLIS
+  }
+
+  fun clear() {
+    createdFiles.clear()
+  }
+
+  @TestOnly
+  internal fun size(): Int = createdFiles.size
+
+  private fun sweepStale(now: Long) {
+    createdFiles.entries.removeIf { now - it.value > ENTRY_TTL_MILLIS }
+  }
 }
 
 private class AutoCmdInsertEnterListener : ModeWillChangeListener {
