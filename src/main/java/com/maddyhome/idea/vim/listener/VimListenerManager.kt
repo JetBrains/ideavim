@@ -576,7 +576,7 @@ object VimListenerManager {
           EditorListeners.add(editor, openingEditor?.editor?.vim ?: injector.fallbackWindow, scenario)
           firstEditorInitialised = true
 
-          fireFileTypeEvent(editor)
+          fireBufferLoadedEvents(editor)
         }
       }
     }
@@ -936,10 +936,26 @@ private object MouseEventsDataHolder {
   var dragEventCount = allowedSkippedDragEvents
 }
 
-private fun fireFileTypeEvent(editor: Editor) {
+/**
+ * Fires autocmd events that correspond to Vim's "read a file into a buffer" sequence.
+ * Order matches Vim: BufRead/BufReadPost → FileType. (BufEnter is fired separately via
+ * [VimFileEditorManagerListener.selectionChanged].)
+ *
+ * BufRead and BufReadPost are synonyms in Vim — both are fired so handlers registered
+ * under either name run.
+ */
+private fun fireBufferLoadedEvents(editor: Editor) {
   val virtualFile = editor.virtualFile ?: return
-  val vimFileType = IjFileTypeMapping.toVimFileType(virtualFile) ?: return
-  injector.autoCmd.handleEvent(AutoCmdEvent.FileType, vimFileType, editor.vim)
+  val vimEditor = editor.vim
+  val path = virtualFile.path
+
+  injector.autoCmd.handleEvent(AutoCmdEvent.BufRead, path, vimEditor)
+  injector.autoCmd.handleEvent(AutoCmdEvent.BufReadPost, path, vimEditor)
+
+  val vimFileType = IjFileTypeMapping.toVimFileType(virtualFile)
+  if (vimFileType != null) {
+    injector.autoCmd.handleEvent(AutoCmdEvent.FileType, vimFileType, vimEditor)
+  }
 }
 
 private class AutoCmdInsertEnterListener : ModeWillChangeListener {

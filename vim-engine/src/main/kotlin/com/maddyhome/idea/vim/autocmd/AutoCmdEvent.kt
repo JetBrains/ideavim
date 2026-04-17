@@ -13,6 +13,8 @@ enum class AutoCmdEvent {
   InsertLeave,
   BufEnter,
   BufLeave,
+  BufRead,
+  BufReadPost,
   WinEnter,
   WinLeave,
   FocusGained,
