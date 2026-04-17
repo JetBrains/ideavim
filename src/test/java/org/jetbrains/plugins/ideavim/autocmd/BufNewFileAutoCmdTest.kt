@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.autocmd
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.components.ComponentManagerEx
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileEditorManager
@@ -97,9 +98,10 @@ class BufNewFileAutoCmdTest : VimTestCase() {
 
   private fun openNewFile(filename: String): Editor {
     ApplicationManager.getApplication().invokeAndWait {
-      // fixture.createFile creates a new VirtualFile via VFS, which emits VFileCreateEvent.
-      // Then openFileInEditor opens it, triggering FileOpenedSyncListener.
-      val file = fixture.createFile(filename, "lorem ipsum")
+      val parent = fixture.tempDirFixture.getFile(".") ?: error("temp dir unavailable")
+      val file = WriteCommandAction.runWriteCommandAction<com.intellij.openapi.vfs.VirtualFile>(fixture.project) {
+        parent.createChildData(this, filename).apply { setBinaryContent("lorem ipsum".toByteArray()) }
+      }
       fixture.openFileInEditor(file)
     }
     return fixture.editor
