@@ -66,6 +66,7 @@ import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.autocmd.AutoCmdEvent
+import com.maddyhome.idea.vim.autocmd.IjFileTypeMapping
 import com.maddyhome.idea.vim.common.ModeChangeListener
 import com.maddyhome.idea.vim.common.ModeWillChangeListener
 import com.maddyhome.idea.vim.group.ChangeGroup
@@ -575,6 +576,7 @@ object VimListenerManager {
           EditorListeners.add(editor, openingEditor?.editor?.vim ?: injector.fallbackWindow, scenario)
           firstEditorInitialised = true
 
+          fireFileTypeEvent(editor)
         }
       }
     }
@@ -932,6 +934,12 @@ internal object VimListenerTestObject {
 private object MouseEventsDataHolder {
   const val allowedSkippedDragEvents = 3
   var dragEventCount = allowedSkippedDragEvents
+}
+
+private fun fireFileTypeEvent(editor: Editor) {
+  val virtualFile = editor.virtualFile ?: return
+  val vimFileType = IjFileTypeMapping.toVimFileType(virtualFile) ?: return
+  injector.autoCmd.handleEvent(AutoCmdEvent.FileType, vimFileType, editor.vim)
 }
 
 private class AutoCmdInsertEnterListener : ModeWillChangeListener {

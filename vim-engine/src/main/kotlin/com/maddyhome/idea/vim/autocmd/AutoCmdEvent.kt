@@ -17,4 +17,5 @@ enum class AutoCmdEvent {
   WinLeave,
   FocusGained,
   FocusLost,
+  FileType,
 }
