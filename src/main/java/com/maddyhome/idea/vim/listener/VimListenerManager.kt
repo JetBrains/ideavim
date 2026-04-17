@@ -51,6 +51,10 @@ import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.removeUserData
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.openapi.vfs.newvfs.BulkFileListener
+import com.intellij.openapi.vfs.newvfs.events.VFileCreateEvent
+import com.intellij.openapi.vfs.newvfs.events.VFileEvent
 import com.intellij.util.ExceptionUtil
 import com.intellij.util.SlowOperations
 import com.maddyhome.idea.vim.EventFacade
@@ -228,6 +232,7 @@ object VimListenerManager {
       val busConnection =
         ApplicationManager.getApplication().messageBus.connect(VimPlugin.getInstance().onOffDisposable)
       busConnection.subscribe(FileOpenedSyncListener.TOPIC, VimEditorFactoryListener)
+      busConnection.subscribe(VirtualFileManager.VFS_CHANGES, BufNewFileTracker)
     }
 
     fun disable() {
@@ -937,25 +942,48 @@ private object MouseEventsDataHolder {
 }
 
 /**
- * Fires autocmd events that correspond to Vim's "read a file into a buffer" sequence.
- * Order matches Vim: BufRead/BufReadPost → FileType. (BufEnter is fired separately via
- * [VimFileEditorManagerListener.selectionChanged].)
+ * Fires autocmd events that correspond to Vim's "load a buffer" sequence.
  *
- * BufRead and BufReadPost are synonyms in Vim — both are fired so handlers registered
- * under either name run.
+ * If the file was just created (tracked via [BufNewFileTracker]), fires `BufNewFile`.
+ * Otherwise fires `BufRead` and `BufReadPost` (Vim treats those two as synonyms).
+ * `FileType` fires in both cases. `BufEnter` is fired separately via
+ * [VimListenerManager.VimFileEditorManagerListener.selectionChanged].
  */
 private fun fireBufferLoadedEvents(editor: Editor) {
   val virtualFile = editor.virtualFile ?: return
   val vimEditor = editor.vim
   val path = virtualFile.path
 
-  injector.autoCmd.handleEvent(AutoCmdEvent.BufRead, path, vimEditor)
-  injector.autoCmd.handleEvent(AutoCmdEvent.BufReadPost, path, vimEditor)
+  if (BufNewFileTracker.consumeIfNew(path)) {
+    injector.autoCmd.handleEvent(AutoCmdEvent.BufNewFile, path, vimEditor)
+  } else {
+    injector.autoCmd.handleEvent(AutoCmdEvent.BufRead, path, vimEditor)
+    injector.autoCmd.handleEvent(AutoCmdEvent.BufReadPost, path, vimEditor)
+  }
 
   val vimFileType = IjFileTypeMapping.toVimFileType(virtualFile)
   if (vimFileType != null) {
     injector.autoCmd.handleEvent(AutoCmdEvent.FileType, vimFileType, vimEditor)
   }
+}
+
+/**
+ * Tracks paths of newly-created VirtualFiles so that when a file is subsequently opened
+ * we can fire Vim's `BufNewFile` event instead of `BufRead`. Entries are removed on first
+ * matching open; files created but never opened stay in the set.
+ */
+internal object BufNewFileTracker : BulkFileListener {
+  private val createdFiles = java.util.concurrent.ConcurrentHashMap.newKeySet<String>()
+
+  override fun after(events: List<VFileEvent>) {
+    for (event in events) {
+      if (event is VFileCreateEvent && !event.isDirectory) {
+        createdFiles.add(event.path)
+      }
+    }
+  }
+
+  fun consumeIfNew(path: String): Boolean = createdFiles.remove(path)
 }
 
 private class AutoCmdInsertEnterListener : ModeWillChangeListener {
