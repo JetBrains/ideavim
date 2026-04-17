@@ -15,6 +15,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorKind
 import com.intellij.openapi.editor.actionSystem.TypedAction
@@ -34,6 +35,8 @@ import com.intellij.openapi.editor.ex.DocumentEx
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.FocusChangeListener
 import com.intellij.openapi.editor.impl.EditorComponentImpl
+import com.intellij.openapi.fileEditor.FileDocumentManager
+import com.intellij.openapi.fileEditor.FileDocumentManagerListener
 import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
@@ -233,6 +236,7 @@ object VimListenerManager {
         ApplicationManager.getApplication().messageBus.connect(VimPlugin.getInstance().onOffDisposable)
       busConnection.subscribe(FileOpenedSyncListener.TOPIC, VimEditorFactoryListener)
       busConnection.subscribe(VirtualFileManager.VFS_CHANGES, BufNewFileTracker)
+      busConnection.subscribe(FileDocumentManagerListener.TOPIC, BufWriteListener)
     }
 
     fun disable() {
@@ -968,9 +972,37 @@ private fun fireBufferLoadedEvents(editor: Editor) {
 }
 
 /**
- * Tracks paths of newly-created VirtualFiles so that when a file is subsequently opened
- * we can fire Vim's `BufNewFile` event instead of `BufRead`. Entries are removed on first
- * matching open; files created but never opened stay in the set.
+ * Fires Vim's buffer write events when IntelliJ saves a document to disk.
+ *
+ * `BufWritePre` (== `BufWrite` in Vim) fires before the write; `BufWritePost` after.
+ * Note: IntelliJ auto-saves aggressively (focus loss, tab switch, build, etc.), so these
+ * fire more often than Vim's `:w`. Handlers should be idempotent.
+ */
+private object BufWriteListener : FileDocumentManagerListener {
+  override fun beforeDocumentSaving(document: Document) {
+    fireWriteEvent(document, pre = true)
+  }
+
+  override fun afterDocumentSaved(document: Document) {
+    fireWriteEvent(document, pre = false)
+  }
+
+  private fun fireWriteEvent(document: Document, pre: Boolean) {
+    val virtualFile = FileDocumentManager.getInstance().getFile(document) ?: return
+    val path = virtualFile.path
+    if (pre) {
+      injector.autoCmd.handleEvent(AutoCmdEvent.BufWrite, path)
+      injector.autoCmd.handleEvent(AutoCmdEvent.BufWritePre, path)
+    } else {
+      injector.autoCmd.handleEvent(AutoCmdEvent.BufWritePost, path)
+    }
+  }
+}
+
+/**
+ * Tracks paths of newly-created VirtualFiles so that when a file is subsequently opened we can fire Vim's `BufNewFile`
+ * event instead of `BufRead`. Entries are removed on first matching open; files created but never opened stay in the
+ * set (bounded by a TTL and max size).
  */
 internal object BufNewFileTracker : BulkFileListener {
   private val createdFiles = java.util.concurrent.ConcurrentHashMap.newKeySet<String>()
