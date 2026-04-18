@@ -70,6 +70,9 @@ usual beta standards.
 * [VIM-4113](https://youtrack.jetbrains.com/issue/VIM-4113) Fixed Visual mode commands (e.g., `:'<,'>sort`) failing when run off the Event Dispatch Thread
 * [VIM-3727](https://youtrack.jetbrains.com/issue/VIM-3727) Fixed Enter and arrow keys not working in Python Console in split mode
 * Fixed NERDTree navigation (`j`/`k`/`G`/`gg`/`p`/`<C-J>`/`<C-K>`) poor performance in split mode - navigation now uses Swing actions directly instead of going through backend RPC
+* [VIM-4180](https://youtrack.jetbrains.com/issue/VIM-4180) Fixed ReplaceWithRegister plugin's default `gr`/`grr` mappings overriding user-defined key mappings
+* Fixed `IndexOutOfBoundsException` when using `:command` with `-nargs` option but without a command name
+* Fixed spurious beep when pressing `<Esc>` to cancel register selection in normal mode (after pressing `"`)
 
 ### Merged PRs:
 * [1690](https://github.com/JetBrains/ideavim/pull/1690) by [1grzyb1](https://github.com/1grzyb1): Make nerdtree work without calling backend actions
