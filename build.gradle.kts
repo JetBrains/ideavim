@@ -520,6 +520,9 @@ intellijPlatform {
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4113">VIM-4113</a> Fixed Visual mode commands (e.g., <code>:'&lt;,'&gt;sort</code>) failing when run off the Event Dispatch Thread<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-3727">VIM-3727</a> Fixed Enter and arrow keys not working in Python Console in split mode<br>
         * Fixed NERDTree navigation (<code>j</code>/<code>k</code>/<code>G</code>/<code>gg</code>/<code>p</code>/<code>&lt;C-J&gt;</code>/<code>&lt;C-K&gt;</code>) poor performance in split mode - navigation now uses Swing actions directly instead of going through backend RPC<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4180">VIM-4180</a> Fixed ReplaceWithRegister plugin's default <code>gr</code>/<code>grr</code> mappings overriding user-defined key mappings<br>
+        * Fixed <code>IndexOutOfBoundsException</code> when using <code>:command</code> with <code>-nargs</code> option but without a command name<br>
+        * Fixed spurious beep when pressing <code>&lt;Esc&gt;</code> to cancel register selection in normal mode (after pressing <code>"</code>)<br>
         <br>
         <b>Merged PRs:</b><br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1690">1690</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: Make nerdtree work without calling backend actions<br>
