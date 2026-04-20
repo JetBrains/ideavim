@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.common.InsertSequence
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.undo.VimTimestampBasedUndoService
 
 /**
@@ -51,12 +52,15 @@ class UndoRedoHelper : VimTimestampBasedUndoService {
     val textEditor = getTextEditor(editor.ij)
     val undoManager = UndoManager.getInstance(project)
     if (undoManager.isUndoAvailable(textEditor)) {
+      val caretCountBeforeUndo = editor.ij.caretModel.allCarets.size
       val scrollingModel = editor.getScrollingModel()
       scrollingModel.accumulateViewportChanges()
 
       performUndo(editor, undoManager, textEditor)
 
       scrollingModel.flushViewportChanges()
+
+      collapseRestoredBlockVisualCarets(editor, caretCountBeforeUndo)
 
       return true
     }
@@ -194,6 +198,23 @@ class UndoRedoHelper : VimTimestampBasedUndoService {
         removeSelections(editor)
       }
     }
+  }
+
+  /**
+   * VIM-4112. IntelliJ's undo restores the pre-edit `CaretState`; for a block-visual edit that
+   * means one caret per block row. A 1 → N caret-count jump across undo uniquely identifies
+   * this, since [com.maddyhome.idea.vim.helper.exitVisualMode] is the only flow that collapses
+   * multi-carets to one. The remaining caret is placed at the block's top-left, matching Vim's
+   * convention of cursor-at-start-of-undone-change.
+   */
+  private fun collapseRestoredBlockVisualCarets(editor: VimEditor, caretCountBeforeUndo: Int) {
+    val caretModel = editor.ij.caretModel
+    val restoredExtraCarets = caretCountBeforeUndo == 1 && caretModel.allCarets.size > 1
+    if (!restoredExtraCarets || editor.mode !is Mode.NORMAL) return
+
+    val blockTopOffset = caretModel.allCarets.minOf { it.offset }
+    caretModel.removeSecondaryCarets()
+    caretModel.primaryCaret.moveToOffset(blockTopOffset)
   }
 
   private fun removeSelections(editor: VimEditor) {
