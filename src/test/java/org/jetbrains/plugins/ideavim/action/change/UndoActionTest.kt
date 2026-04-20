@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -62,6 +62,34 @@ class UndoActionTest : VimTestCase() {
       ApplicationManager.getApplication().runReadAction {
         kotlin.test.assertFalse(hasSelection())
       }
+    }
+  }
+
+  @Test
+  fun `test undo after visual block mode delete clears leftover native carets`() {
+    configureByText(
+      """
+      ${c}1. Item
+      2. Item
+      3. Item
+      """.trimIndent()
+    )
+
+    typeText("<C-V>jjllx")
+
+    typeText("u")
+    assertState(
+      """
+      ${c}1. Item
+      2. Item
+      3. Item
+      """.trimIndent()
+    )
+
+    assertMode(Mode.NORMAL())
+    ApplicationManager.getApplication().runReadAction {
+      kotlin.test.assertFalse(hasSelection())
+      kotlin.test.assertEquals(1, fixture.editor.caretModel.allCarets.size)
     }
   }
 
