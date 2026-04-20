@@ -496,12 +496,11 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase() {
     val allFolds = editor.foldingModel.allFoldRegions
     if (allFolds.isEmpty()) return
 
+    val depths = FoldDepthCalculator.computeDepths(allFolds)
+
     editor.foldingModel.runBatchFoldingOperation {
-      // I'm aware it's O(n^2) comparison here,
-      // but it doesn't affect performance even on a large amount of fold
-      allFolds.forEach { fold ->
-        val depth = calculateFoldDepth(fold, allFolds)
-        fold.isExpanded = depth < foldLevel
+      for (i in allFolds.indices) {
+        allFolds[i].isExpanded = depths[i] < foldLevel
       }
     }
   }
@@ -510,9 +509,10 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase() {
     val allFolds = editor.foldingModel.allFoldRegions
     if (allFolds.isEmpty()) return 0
 
-    return allFolds.maxOfOrNull { fold ->
-      calculateFoldDepth(fold, allFolds)
-    } ?: 0
+    val depths = FoldDepthCalculator.computeDepths(allFolds)
+    var max = 0
+    for (d in depths) if (d > max) max = d
+    return max
   }
 
   override fun createFoldRegion(startOffset: Int, endOffset: Int, collapse: Boolean): VimFoldRegion? {
@@ -570,27 +570,6 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase() {
       }
       .minByOrNull { fold -> fold.endOffset - fold.startOffset }
   }
-
-  private fun calculateFoldDepth(fold: FoldRegion, allFolds: Array<FoldRegion>): Int {
-    return allFolds.count { otherFold ->
-      isWrappedBy(fold, otherFold)
-    }
-  }
-
-  /**
-   * Returns true if the inner fold is completely contained by the outer fold (allowing matching boundaries)
-   * but excludes identical folds.
-   */
-  private fun isWrappedBy(inner: FoldRegion, outer: FoldRegion): Boolean {
-    return outer.startOffset <= inner.startOffset &&
-      outer.endOffset >= inner.endOffset &&
-      areDifferentFolds(inner, outer)
-  }
-
-  private fun areDifferentFolds(
-    first: FoldRegion,
-    second: FoldRegion,
-  ): Boolean = first.startOffset != second.startOffset || first.endOffset != second.endOffset
 
   private fun toVimFoldRegion(ijFoldRegion: FoldRegion): VimFoldRegion {
     return IjVimFoldRegion(ijFoldRegion, editor)
