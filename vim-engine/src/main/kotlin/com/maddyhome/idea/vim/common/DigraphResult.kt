@@ -20,7 +20,7 @@ sealed class DigraphResult(
 
   companion object {
     fun done(codepoint: Int?): DigraphResult {
-      // For some reason, vim does not let to insert char 10 as a digraph; it inserts 10 instead
+      // Vim maps LF (codepoint 10) to NUL (0) when inserting via digraph/literal
       return Done(if (codepoint == 10) 0 else codepoint)
     }
 

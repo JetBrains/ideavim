@@ -189,11 +189,10 @@ class DigraphSequence : Cloneable {
             injector.application.postKey(key, editor)
           }
           return done(codepoint)
-        } else if (codeCnt == 0) {
+        } else {
           digraphState = DigraphState.DIG_STATE_PENDING
           return specialKeyToCodepoint(key)?.let { done(it) } ?: done(key.keyChar.code)
         }
-        DigraphResult.Bad
       }
     }
   }
@@ -205,8 +204,7 @@ class DigraphSequence : Cloneable {
     if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) {
       val char = injector.parser.parseVimScriptString("\\" + injector.parser.toKeyNotation(key))
       if (char.length == 1) {
-        // TODO: If we get 10 here, we return 0. If we get 10 below, we return 13. Why the difference?
-        return if (char[0].code == 10) 0 else { char[0].code }
+        return char[0].code
       } else {
         logger.error("Digraph char was recognized as multiple chars: $char ($key)")
       }
