@@ -241,7 +241,7 @@ tasks {
 
   val runClion by intellijPlatformTesting.runIde.registering {
     type = IntelliJPlatformType.CLion
-    version = "2025.3.2"
+    version = "2026.1"
     task {
       systemProperty("octopus.handler", System.getProperty("octopus.handler") ?: true)
     }

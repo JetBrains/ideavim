@@ -79,4 +79,37 @@ class CommentarySplitTest : IdeaVimStarterTestBase() {
     val line2 = editorText().lines().getOrNull(1) ?: ""
     assertTrue(!line2.contains("//")) { "Line should be uncommented. Line: $line2" }
   }
+
+  @Test
+  fun `gcc returns to Normal mode after commenting`() {
+    openFile(javaFile("Comment4"))
+    setUpCommentary()
+    goToLine(2)
+    typeVim("gcc")
+
+    assertEditorContains("//", "Line should be commented")
+
+    typeVimAndEscape("Ohello")
+
+    assertEditorContains("hello", "Ohello<Esc> should insert 'hello' — proves mode is Normal")
+  }
+
+  @Test
+  fun `gcc then undo returns to Normal mode`() {
+    openFile(javaFile("Comment5"))
+    setUpCommentary()
+    goToLine(2)
+    typeVim("gcc")
+
+    assertEditorContains("//", "Line should be commented")
+
+    typeVim("u")
+
+    assertEditorNotContains("//", "Undo should remove comment completely")
+
+    typeVimAndEscape("Ohello")
+
+    assertEditorContains("hello", "Ohello<Esc> should insert 'hello' after undo — proves mode is Normal")
+    assertEditorNotContains("//", "Undo must not have left a lingering comment")
+  }
 }
