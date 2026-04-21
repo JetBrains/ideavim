@@ -476,6 +476,7 @@ intellijPlatform {
     changeNotes.set(
       """
         <b>Features:</b><br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-1693">VIM-1693</a> Added <code>:autocmd</code> command - run Ex commands on editor events such as <code>BufRead</code>, <code>BufWrite</code>, <code>BufEnter</code>, <code>BufLeave</code>, <code>InsertEnter</code>, <code>InsertLeave</code>, <code>WinEnter</code>, <code>WinLeave</code>, <code>FocusGained</code>, <code>FocusLost</code>, and <code>FileType</code>; supports <code>augroup</code> and file pattern matching (e.g., <code>autocmd BufWritePre *.py echo "saving python"</code>)<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-268">VIM-268</a> Added file name completion in ex commands - press <code>&lt;Tab&gt;</code>/<code>&lt;S-Tab&gt;</code> to cycle through file matches in <code>:edit</code>, <code>:split</code>, <code>:vsplit</code>, <code>:write</code>, <code>:read</code>, <code>:source</code>, and <code>:find</code> commands; use arrow keys to navigate the completion panel<br>
         * New VimScript functions: <code>add()</code>, <code>call()</code>, <code>extend()</code>, <code>extendnew()</code>, <code>filter()</code>, <code>flatten()</code>, <code>flattennew()</code>, <code>foreach()</code>, <code>has_key()</code>, <code>indexof()</code>, <code>insert()</code>, <code>items()</code>, <code>keys()</code>, <code>map()</code>, <code>mapnew()</code>, <code>reduce()</code>, <code>remove()</code>, <code>slice()</code>, <code>sort()</code>, <code>uniq()</code>, <code>values()</code><br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-1595">VIM-1595</a> Added support for <code>:read</code> command - insert file content below current line (e.g., <code>:read file.txt</code>, <code>0read file.txt</code>)<br>
@@ -488,6 +489,8 @@ intellijPlatform {
         * <a href="https://youtrack.jetbrains.com/issue/VIM-1158">VIM-1158</a> Added <code>gw</code> command - reformat code like <code>gq</code> but preserving the cursor position<br>
         <br>
         <b>Fixes:</b><br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4197">VIM-4197</a> Fixed Vim features (e.g., <code>f</code>, <code>w</code>, text objects) not working in Java files decompiled from Kotlin class files<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4112">VIM-4112</a> Fixed undo after block-visual edit (<code>&lt;C-V&gt;...x</code>, <code>&lt;C-V&gt;...c</code>, <code>&lt;C-V&gt;...I</code>) leaving stray carets in normal mode<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4176">VIM-4176</a> Fixed race condition in single-line output panel that could cause <code>*</code> search wrapping to behave unreliably<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4175">VIM-4175</a> Fixed search "not found" showing previous "Hit ENTER" text alongside the error - panel is now cleared before displaying errors like "E486: Pattern not found"<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4135">VIM-4135</a> Fixed IdeaVim not loading in Rider<br>
@@ -522,6 +525,9 @@ intellijPlatform {
         * Fixed NERDTree navigation (<code>j</code>/<code>k</code>/<code>G</code>/<code>gg</code>/<code>p</code>/<code>&lt;C-J&gt;</code>/<code>&lt;C-K&gt;</code>) poor performance in split mode - navigation now uses Swing actions directly instead of going through backend RPC<br>
         <br>
         <b>Merged PRs:</b><br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1699">1699</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-4112 collapse restored carets after undo of block-visual edit<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1696">1696</a> by <a href="https://github.com/citizenmatt">citizenmatt</a>: VIM-4197 Fix missing Vim features in Java files decompiled from Kotlin class files<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1695">1695</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-1693 Implement autocmd<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1690">1690</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: Make nerdtree work without calling backend actions<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1688">1688</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-4172 Disable ideavim in Python Console<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1687">1687</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: Restore old VimPLugin method signatures<br>

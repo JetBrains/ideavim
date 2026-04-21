@@ -26,6 +26,7 @@ usual beta standards.
 ## [To Be Released]
 
 ### Features:
+* [VIM-1693](https://youtrack.jetbrains.com/issue/VIM-1693) Added `:autocmd` command - run Ex commands on editor events such as `BufRead`, `BufWrite`, `BufEnter`, `BufLeave`, `InsertEnter`, `InsertLeave`, `WinEnter`, `WinLeave`, `FocusGained`, `FocusLost`, and `FileType`; supports `augroup` and file pattern matching (e.g., `autocmd BufWritePre *.py echo "saving python"`)
 * [VIM-268](https://youtrack.jetbrains.com/issue/VIM-268) Added file name completion in ex commands - press `<Tab>`/`<S-Tab>` to cycle through file matches in `:edit`, `:split`, `:vsplit`, `:write`, `:read`, `:source`, and `:find` commands; use arrow keys to navigate the completion panel
 * New VimScript functions: `add()`, `call()`, `extend()`, `extendnew()`, `filter()`, `flatten()`, `flattennew()`, `foreach()`, `has_key()`, `indexof()`, `insert()`, `items()`, `keys()`, `map()`, `mapnew()`, `reduce()`, `remove()`, `slice()`, `sort()`, `uniq()`, `values()`
 * [VIM-1595](https://youtrack.jetbrains.com/issue/VIM-1595) Added support for `:read` command - insert file content below current line (e.g., `:read file.txt`, `0read file.txt`)
@@ -38,6 +39,8 @@ usual beta standards.
 * [VIM-1158](https://youtrack.jetbrains.com/issue/VIM-1158) Added `gw` command - reformat code like `gq` but preserving the cursor position
 
 ### Fixes:
+* [VIM-4197](https://youtrack.jetbrains.com/issue/VIM-4197) Fixed Vim features (e.g., `f`, `w`, text objects) not working in Java files decompiled from Kotlin class files
+* [VIM-4112](https://youtrack.jetbrains.com/issue/VIM-4112) Fixed undo after block-visual edit (`<C-V>...x`, `<C-V>...c`, `<C-V>...I`) leaving stray carets in normal mode
 * [VIM-4176](https://youtrack.jetbrains.com/issue/VIM-4176) Fixed race condition in single-line output panel that could cause `*` search wrapping to behave unreliably
 * [VIM-4175](https://youtrack.jetbrains.com/issue/VIM-4175) Fixed search "not found" showing previous "Hit ENTER" text alongside the error - panel is now cleared before displaying errors like "E486: Pattern not found"
 * [VIM-4135](https://youtrack.jetbrains.com/issue/VIM-4135) Fixed IdeaVim not loading in Rider
@@ -72,6 +75,9 @@ usual beta standards.
 * Fixed NERDTree navigation (`j`/`k`/`G`/`gg`/`p`/`<C-J>`/`<C-K>`) poor performance in split mode - navigation now uses Swing actions directly instead of going through backend RPC
 
 ### Merged PRs:
+* [1699](https://github.com/JetBrains/ideavim/pull/1699) by [1grzyb1](https://github.com/1grzyb1): VIM-4112 collapse restored carets after undo of block-visual edit
+* [1696](https://github.com/JetBrains/ideavim/pull/1696) by [citizenmatt](https://github.com/citizenmatt): VIM-4197 Fix missing Vim features in Java files decompiled from Kotlin class files
+* [1695](https://github.com/JetBrains/ideavim/pull/1695) by [1grzyb1](https://github.com/1grzyb1): VIM-1693 Implement autocmd
 * [1690](https://github.com/JetBrains/ideavim/pull/1690) by [1grzyb1](https://github.com/1grzyb1): Make nerdtree work without calling backend actions
 * [1688](https://github.com/JetBrains/ideavim/pull/1688) by [1grzyb1](https://github.com/1grzyb1): VIM-4172 Disable ideavim in Python Console
 * [1687](https://github.com/JetBrains/ideavim/pull/1687) by [1grzyb1](https://github.com/1grzyb1): Restore old VimPLugin method signatures
