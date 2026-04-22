@@ -111,6 +111,7 @@
   "u[ndo]": "com.maddyhome.idea.vim.vimscript.model.commands.UndoCommand",
   "unlo[ckvar]": "com.maddyhome.idea.vim.vimscript.model.commands.UnlockVarCommand",
   "unm[ap]": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.UnMapCommand",
+  "up[date]": "com.maddyhome.idea.vim.vimscript.model.commands.UpdateCommand",
   "v[global]": "com.maddyhome.idea.vim.vimscript.model.commands.GlobalCommand",
   "vm[ap]": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand",
   "vmapc[lear]": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapClearCommand",
