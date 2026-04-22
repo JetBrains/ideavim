@@ -76,8 +76,13 @@ usual beta standards.
 * [VIM-4180](https://youtrack.jetbrains.com/issue/VIM-4180) Fixed ReplaceWithRegister plugin's default `gr`/`grr` mappings overriding user-defined key mappings
 * Fixed `IndexOutOfBoundsException` when using `:command` with `-nargs` option but without a command name
 * Fixed spurious beep when pressing `<Esc>` to cancel register selection in normal mode (after pressing `"`)
+* [VIM-4202](https://youtrack.jetbrains.com/issue/VIM-4202) Fixed `<S-Tab>` being intercepted by IdeaVim - users can now remap `<S-Tab>` to other IntelliJ actions
+* [VIM-4202](https://youtrack.jetbrains.com/issue/VIM-4202) Fixed `gcc`/`gc{motion}` commentary leaving editor in incorrect mode in Rider/CLion split mode
 
 ### Merged PRs:
+* [1704](https://github.com/JetBrains/ideavim/pull/1704) by [1grzyb1](https://github.com/1grzyb1): VIM-4202 Don't intercept all <S-Tab>
+* [1703](https://github.com/JetBrains/ideavim/pull/1703) by [1grzyb1](https://github.com/1grzyb1): VIM-4202 Fix state after commentary action
+* [1700](https://github.com/JetBrains/ideavim/pull/1700) by [1grzyb1](https://github.com/1grzyb1): VIM-4139 Compute nesting depth for fold regions
 * [1699](https://github.com/JetBrains/ideavim/pull/1699) by [1grzyb1](https://github.com/1grzyb1): VIM-4112 collapse restored carets after undo of block-visual edit
 * [1696](https://github.com/JetBrains/ideavim/pull/1696) by [citizenmatt](https://github.com/citizenmatt): VIM-4197 Fix missing Vim features in Java files decompiled from Kotlin class files
 * [1695](https://github.com/JetBrains/ideavim/pull/1695) by [1grzyb1](https://github.com/1grzyb1): VIM-1693 Implement autocmd
