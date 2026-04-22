@@ -526,8 +526,13 @@ intellijPlatform {
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4180">VIM-4180</a> Fixed ReplaceWithRegister plugin's default <code>gr</code>/<code>grr</code> mappings overriding user-defined key mappings<br>
         * Fixed <code>IndexOutOfBoundsException</code> when using <code>:command</code> with <code>-nargs</code> option but without a command name<br>
         * Fixed spurious beep when pressing <code>&lt;Esc&gt;</code> to cancel register selection in normal mode (after pressing <code>"</code>)<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4202">VIM-4202</a> Fixed <code>&lt;S-Tab&gt;</code> being intercepted by IdeaVim - users can now remap <code>&lt;S-Tab&gt;</code> to other IntelliJ actions<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4202">VIM-4202</a> Fixed <code>gcc</code>/<code>gc{motion}</code> commentary leaving editor in incorrect mode in Rider/CLion split mode<br>
         <br>
         <b>Merged PRs:</b><br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1704">1704</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-4202 Don't intercept all &lt;S-Tab&gt;<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1703">1703</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-4202 Fix state after commentary action<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1700">1700</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-4139 Compute nesting depth for fold regions<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1699">1699</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-4112 collapse restored carets after undo of block-visual edit<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1696">1696</a> by <a href="https://github.com/citizenmatt">citizenmatt</a>: VIM-4197 Fix missing Vim features in Java files decompiled from Kotlin class files<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1695">1695</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-1693 Implement autocmd<br>
