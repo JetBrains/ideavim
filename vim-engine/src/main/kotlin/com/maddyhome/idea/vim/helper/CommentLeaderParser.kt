@@ -76,6 +76,7 @@ data class CommentLeader(
   val isEnd: Boolean get() = Flag.END in flags
   val requiresBlank: Boolean get() = Flag.BLANK_REQUIRED in flags
   val hasNoContinuation: Boolean get() = Flag.NO_CONTINUATION in flags
+  val isNested: Boolean get() = Flag.NESTED in flags
 
   enum class Flag {
     BLANK_REQUIRED,

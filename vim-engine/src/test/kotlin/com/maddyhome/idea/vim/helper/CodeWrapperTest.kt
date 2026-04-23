@@ -797,6 +797,55 @@ class CodeWrapperTest {
       width = 22,
       leaders = "s1:/*,mb:*,ex:*/,s1:--,mb:--,ex:--",
     ),
+
+    WrapTestCase(
+      "[get_leader_len] n-flag consumes repeated leaders as a single nested leader",
+      """
+        > > quoted reply one
+        > > quoted reply two
+      """,
+      """
+        > > quoted reply one quoted reply two
+      """,
+    ),
+    WrapTestCase(
+      "[get_leader_len] n-flag supports depth-2 nesting",
+      """
+        > > > triple quote one
+        > > > triple quote two
+      """,
+      """
+        > > > triple quote one triple quote two
+      """,
+    ),
+    WrapTestCase(
+      "[same_leader] n-flag: different nesting depth splits paragraph",
+      """
+        > > depth two text
+        > depth one text
+      """,
+      """
+        > > depth two text
+        > depth one text
+      """,
+    ),
+    WrapTestCase(
+      "[get_leader_len] non-nested leader does not chain (plain // stays shallow)",
+      """
+        // // looks like two // but is single leader
+        // second line here
+      """,
+      """
+        // // looks like two // but is single leader second line here
+      """,
+    ),
+
+    WrapTestCase(
+      "[same_leader] same leader text with different leading indent still joins (Vim parity)",
+      "// outer indent\n    // deeper indent",
+      "// outer indent deeper indent",
+      trimIndent = false,
+    ),
   )
 
   @TestFactory
