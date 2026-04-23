@@ -97,6 +97,21 @@ class CodeWrapper(
     var indentEnd = 0
     while (indentEnd < line.length && isAsciiWhite(line[indentEnd])) indentEnd++
     if (indentEnd >= line.length) return null
+    val first = matchLeaderAt(line, indentEnd) ?: return null
+    if (!first.leader.isNested) return first
+    // Nested: chain while the outer leader permits it and further matches fit.
+    var leaderEnd = first.leaderEnd
+    var trailingEnd = first.trailingEnd
+    while (true) {
+      val next = matchLeaderAt(line, trailingEnd) ?: break
+      leaderEnd = next.leaderEnd
+      trailingEnd = next.trailingEnd
+      if (!next.leader.isNested) break
+    }
+    return MatchedLeader(first.leader, first.indentEnd, leaderEnd, trailingEnd)
+  }
+
+  private fun matchLeaderAt(line: String, indentEnd: Int): MatchedLeader? {
     for (leader in leadersLongestFirst) {
       if (!line.regionMatches(indentEnd, leader.text, 0, leader.text.length)) continue
       val afterLeader = indentEnd + leader.text.length
