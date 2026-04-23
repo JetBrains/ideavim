@@ -23,6 +23,7 @@ import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.util.PsiUtilBase
 import com.maddyhome.idea.vim.EventFacade
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimChangeGroupBase
 import com.maddyhome.idea.vim.api.VimEditor
@@ -31,11 +32,15 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.change.ChangeRemoteApi
 import com.maddyhome.idea.vim.group.format.FormatRemoteApi
 import com.maddyhome.idea.vim.handler.commandContinuation
+import com.maddyhome.idea.vim.helper.CodeWrapper
+import com.maddyhome.idea.vim.helper.CommentLeaderParser
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.key.KeyHandlerKeeper
 import com.maddyhome.idea.vim.listener.VimInsertListener
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
+import com.maddyhome.idea.vim.newapi.ijOptions
+import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.undo.VimKeyBasedUndoService
 import com.maddyhome.idea.vim.undo.VimTimestampBasedUndoService
@@ -153,6 +158,39 @@ class ChangeGroup : VimChangeGroupBase() {
     val textRange = com.intellij.openapi.util.TextRange.create(start, end)
     injector.application.runWriteAction {
       CodeStyleManager.getInstance(project).reformatText(file, listOf(textRange))
+    }
+    wrapText(editor, start, end)
+  }
+
+  private fun wrapText(editor: IjVimEditor, start: Int, end: Int) {
+    val textwidth = injector.ijOptions(editor).textwidth
+    if (textwidth <= 0) {
+      return
+    }
+    wrapTextToWidth(editor, start, end, textwidth)
+  }
+
+  private fun wrapTextToWidth(editor: IjVimEditor, start: Int, end: Int, width: Int) {
+    val ijEditor = editor.editor
+    val document = ijEditor.document
+
+    val text = document.getText(com.intellij.openapi.util.TextRange.create(start, end))
+    val commentsValue = injector.optionGroup
+      .getOptionValue(Options.comments, OptionAccessScope.LOCAL(editor))
+      .value
+    val wrapper = CodeWrapper(
+      width = width,
+      tabWidth = ijEditor.settings.getTabSize(ijEditor.project),
+      leaders = CommentLeaderParser.parse(commentsValue),
+    )
+    val wrapped = wrapper.wrap(text)
+
+    if (wrapped == text) {
+      return
+    }
+
+    injector.application.runWriteAction {
+      document.replaceString(start, end, wrapped)
     }
   }
 
