@@ -146,6 +146,22 @@ class OptionGroup : VimOptionGroupBase(), IjVimOptionGroup, InternalOptionValueA
     super.setOptionValueInternal(option, scope, value)
   }
 
+  /**
+   * Sets the buffer-local value of [option] as a Vim default — but only if the
+   * current value is still a [OptionValue.Default]. Preserves any value the user
+   * explicitly set via `.ideavimrc` or interactive `:set`/`:setlocal`.
+   */
+  fun <T : VimDataType> setBufferLocalDefaultIfUntouched(
+    option: Option<T>,
+    editor: VimEditor,
+    value: T,
+  ) {
+    val scope = OptionAccessScope.LOCAL(editor)
+    val current = getOptionValueInternal(option, scope)
+    if (current !is OptionValue.Default) return
+    setOptionValueInternal(option, scope, OptionValue.Default(value))
+  }
+
   companion object {
     fun editorReleased(editor: Editor) {
       // Vim always has at least one window; it's not possible to close it. Editing a new file will open a new buffer in

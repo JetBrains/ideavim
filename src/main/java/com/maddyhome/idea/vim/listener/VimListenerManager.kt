@@ -80,6 +80,7 @@ import com.maddyhome.idea.vim.autocmd.IjFileTypeMapping
 import com.maddyhome.idea.vim.common.ModeChangeListener
 import com.maddyhome.idea.vim.common.ModeWillChangeListener
 import com.maddyhome.idea.vim.group.ChangeGroup
+import com.maddyhome.idea.vim.group.CommentsOptionInitializer
 import com.maddyhome.idea.vim.group.FileGroupHelper
 import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.group.IjVimRedrawService
@@ -347,6 +348,7 @@ object VimListenerManager {
 
       injector.editorGroup.editorCreated(IjVimEditor(editor))
       (VimPlugin.getChange() as ChangeGroup).editorCreated(IjVimEditor(editor), perEditorDisposable)
+      CommentsOptionInitializer.initializeForEditor(editor)
 
       (editor as EditorEx).addFocusListener(VimFocusListener, perEditorDisposable)
 

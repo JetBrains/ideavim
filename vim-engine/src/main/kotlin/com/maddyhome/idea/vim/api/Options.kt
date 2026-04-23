@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -102,6 +102,14 @@ object Options {
    */
 
   // Simple options, sorted by name
+  val comments: StringListOption = addOption(
+    StringListOption(
+      "comments",
+      LOCAL_TO_BUFFER,
+      "com",
+      "s1:/*,mb:*,ex:*/,://,b:#,:%,:XCOMM,n:>,fb:-",
+    )
+  )
   val digraph: ToggleOption = addOption(ToggleOption("digraph", GLOBAL, "dg", false))
 
   // Default differs from Vim (which uses 0). In Vim, foldlevel=0 means all folds are closed on window open.
