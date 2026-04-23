@@ -2,6 +2,8 @@ IdeaVim project is licensed under MIT license except the following parts of it:
 
 * File [ScrollViewHelper.kt](com/maddyhome/idea/vim/helper/ScrollViewHelper.kt) is licensed under Vim License.
 * File [Tutor.kt](src/main/java/com/maddyhome/idea/vim/ui/Tutor.kt) is licensed under Vim License.
+* File [CodeWrapper.kt](vim-engine/src/main/kotlin/com/maddyhome/idea/vim/helper/CodeWrapper.kt) is licensed under Vim
+  License.
 
 ```
 VIM LICENSE

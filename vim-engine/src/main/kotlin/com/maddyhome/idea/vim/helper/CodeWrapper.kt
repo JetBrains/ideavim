@@ -5,6 +5,13 @@
  * license that can be found in the LICENSE.txt file or at
  * https://opensource.org/licenses/MIT.
  */
+
+/*
+ * This file is licensed under the Vim license
+ *
+ * Specifically, the comment-aware paragraph wrapping algorithm is based
+ * on Vim's format_lines, internal_format, get_leader_len and same_leader
+ */
 package com.maddyhome.idea.vim.helper
 
 /**
