@@ -37,6 +37,7 @@ usual beta standards.
 * [VIM-566](https://youtrack.jetbrains.com/issue/VIM-566) Added support for `zf` command - create fold from selection or motion
 * [VIM-566](https://youtrack.jetbrains.com/issue/VIM-566) Added support for `:set foldlevel` option - control fold visibility level
 * [VIM-1158](https://youtrack.jetbrains.com/issue/VIM-1158) Added `gw` command - reformat code like `gq` but preserving the cursor position
+* [VIM-186](https://youtrack.jetbrains.com/issue/VIM-186) `gq`/`gw` now reformat comment lines in a comment-aware way - comment leaders (e.g., `// `, `# `, `* `) are preserved and continued on each wrapped line; supports nested comments
 
 ### Fixes:
 * [VIM-4197](https://youtrack.jetbrains.com/issue/VIM-4197) Fixed Vim features (e.g., `f`, `w`, text objects) not working in Java files decompiled from Kotlin class files
@@ -78,6 +79,7 @@ usual beta standards.
 * Fixed spurious beep when pressing `<Esc>` to cancel register selection in normal mode (after pressing `"`)
 
 ### Merged PRs:
+* [1707](https://github.com/JetBrains/ideavim/pull/1707) by [1grzyb1](https://github.com/1grzyb1): VIM-186 Add comment aware wrapping logic
 * [1699](https://github.com/JetBrains/ideavim/pull/1699) by [1grzyb1](https://github.com/1grzyb1): VIM-4112 collapse restored carets after undo of block-visual edit
 * [1696](https://github.com/JetBrains/ideavim/pull/1696) by [citizenmatt](https://github.com/citizenmatt): VIM-4197 Fix missing Vim features in Java files decompiled from Kotlin class files
 * [1695](https://github.com/JetBrains/ideavim/pull/1695) by [1grzyb1](https://github.com/1grzyb1): VIM-1693 Implement autocmd

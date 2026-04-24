@@ -487,6 +487,7 @@ intellijPlatform {
         * <a href="https://youtrack.jetbrains.com/issue/VIM-566">VIM-566</a> Added support for <code>zf</code> command - create fold from selection or motion<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-566">VIM-566</a> Added support for <code>:set foldlevel</code> option - control fold visibility level<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-1158">VIM-1158</a> Added <code>gw</code> command - reformat code like <code>gq</code> but preserving the cursor position<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-186">VIM-186</a> <code>gq</code>/<code>gw</code> now reformat comment lines in a comment-aware way - comment leaders (e.g., <code>// </code>, <code># </code>, <code>* </code>) are preserved and continued on each wrapped line; supports nested comments<br>
         <br>
         <b>Fixes:</b><br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4197">VIM-4197</a> Fixed Vim features (e.g., <code>f</code>, <code>w</code>, text objects) not working in Java files decompiled from Kotlin class files<br>
@@ -528,6 +529,7 @@ intellijPlatform {
         * Fixed spurious beep when pressing <code>&lt;Esc&gt;</code> to cancel register selection in normal mode (after pressing <code>"</code>)<br>
         <br>
         <b>Merged PRs:</b><br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1707">1707</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-186 Add comment aware wrapping logic<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1699">1699</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-4112 collapse restored carets after undo of block-visual edit<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1696">1696</a> by <a href="https://github.com/citizenmatt">citizenmatt</a>: VIM-4197 Fix missing Vim features in Java files decompiled from Kotlin class files<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1695">1695</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-1693 Implement autocmd<br>
