@@ -142,10 +142,17 @@ internal class CommandKeyConsumer : KeyConsumer {
       }
     }
 
-    processBuilder.addExecutionStep { _, _, _ ->
+    processBuilder.addExecutionStep { lambdaKeyState, _, _ ->
       if (action.flags.contains(CommandFlags.FLAG_END_EX)) {
         logger.trace("Processing ex_string")
-        val commandLine = injector.commandLine.getActiveCommandLine()!!
+        val commandLine = injector.commandLine.getActiveCommandLine()
+        if (commandLine == null) {
+          // VIM-4115: FLAG_END_EX action matched via a stale CMD_LINE builder while the panel is gone.
+          // Clear the leftover state so subsequent keys are handled in the real mode.
+          logger.error("VIM-4115: FLAG_END_EX action '${action.id}' ran with no active command line. State: $lambdaKeyState")
+          lambdaKeyState.leaveCommandLine()
+          return@addExecutionStep
+        }
         val label = commandLine.getLabel()
         val text = commandLine.text
         val processing = commandLine.inputProcessing

@@ -106,9 +106,13 @@ internal class IjVimPluginActivator : VimPluginActivator {
     }
 
     // Use getServiceIfCreated to avoid creating the service during the dispose (this is prohibited by the platform)
-    ApplicationManager.getApplication()
+    val commandLineService = ApplicationManager.getApplication()
       .getServiceIfCreated(com.maddyhome.idea.vim.api.VimCommandLineService::class.java)
-      ?.fullReset()
+    // VIM-4115: close() clears editor mode, KeyHandlerState.commandLineCommandBuilder, and the panel
+    // together. fullReset() alone only deactivates the panel; the KeyHandler singleton retains the
+    // stale CMD_LINE builder across disable/enable and NPEs on the next Esc.
+    commandLineService?.getActiveCommandLine()?.close(refocusOwningEditor = true, resetCaret = false)
+    commandLineService?.fullReset()
 
     // Unregister vim actions in command mode
     RegisterActions.unregisterActions()

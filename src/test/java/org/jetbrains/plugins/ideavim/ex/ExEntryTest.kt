@@ -9,13 +9,20 @@
 package org.jetbrains.plugins.ideavim.ex
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.testFramework.LoggedErrorProcessor
+import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.Mode
+import org.jetbrains.plugins.ideavim.OnlyThrowLoggedErrorProcessor
 import org.jetbrains.plugins.ideavim.action.ex.VimExTestCase
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class ExEntryTest : VimExTestCase() {
@@ -209,5 +216,57 @@ class ExEntryTest : VimExTestCase() {
     configureByText("")
     typeText(":echo <C-V>x80")
     assertRenderedExText("echo <80>")
+  }
+
+  // VIM-4115: closing the command line alongside fullReset() must clear editor mode and the
+  // KeyHandler's commandLineCommandBuilder, not just deactivate the panel. Without close(), the
+  // KeyHandler singleton retains the CMD_LINE builder across plugin disable/enable and the next
+  // Esc NPEs in CommandKeyConsumer.
+  @Test
+  fun `test VIM-4115 close before fullReset clears all command line state`() {
+    typeText(":set incsearch")
+    assertExIsActive()
+    assertTrue(fixture.editor.vim.mode is Mode.CMD_LINE)
+    assertNotNull(KeyHandler.getInstance().keyHandlerState.commandLineCommandBuilder)
+
+    ApplicationManager.getApplication().invokeAndWait {
+      val commandLine = injector.commandLine
+      commandLine.getActiveCommandLine()?.close(refocusOwningEditor = true, resetCaret = false)
+      commandLine.fullReset()
+    }
+
+    assertExIsDeactivated()
+    assertFalse(fixture.editor.vim.mode is Mode.CMD_LINE)
+    assertNull(KeyHandler.getInstance().keyHandlerState.commandLineCommandBuilder)
+  }
+
+  // VIM-4115: if some other path still desyncs command-line state (panel gone but
+  // commandLineCommandBuilder set with the CMD_LINE trie), Esc in the editor must not NPE. The
+  // defensive branch logs an error and clears the leftover builder.
+  @Test
+  fun `test VIM-4115 escape with stale command line builder does not crash`() {
+    typeText(":set incsearch")
+    assertExIsActive()
+
+    // Reproduce the pre-fix plugin-disable state: panel gone, builder and mode left behind. Use
+    // INSERT (not NORMAL) so EditorResetConsumer won't claim Esc and the key actually reaches
+    // CommandKeyConsumer where the crash lives.
+    ApplicationManager.getApplication().invokeAndWait {
+      injector.commandLine.fullReset()
+      fixture.editor.vim.mode = Mode.INSERT
+    }
+    assertNotNull(KeyHandler.getInstance().keyHandlerState.commandLineCommandBuilder)
+
+    // The defensive path logs an error; rethrow it so we can assert no NPE slips through.
+    try {
+      LoggedErrorProcessor.executeWith<Throwable>(OnlyThrowLoggedErrorProcessor) {
+        assertDoesNotThrow { typeText("<Esc>") }
+      }
+    } catch (e: Throwable) {
+      val message = generateSequence(e) { it.cause }.mapNotNull { it.message }.joinToString(" / ")
+      assertTrue(message.contains("VIM-4115"), "Expected VIM-4115 logger.error, got: $message")
+    }
+
+    assertNull(KeyHandler.getInstance().keyHandlerState.commandLineCommandBuilder)
   }
 }

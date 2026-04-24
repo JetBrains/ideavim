@@ -528,6 +528,7 @@ intellijPlatform {
         * Fixed spurious beep when pressing <code>&lt;Esc&gt;</code> to cancel register selection in normal mode (after pressing <code>"</code>)<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4202">VIM-4202</a> Fixed <code>&lt;S-Tab&gt;</code> being intercepted by IdeaVim - users can now remap <code>&lt;S-Tab&gt;</code> to other IntelliJ actions<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4202">VIM-4202</a> Fixed <code>gcc</code>/<code>gc{motion}</code> commentary leaving editor in incorrect mode in Rider/CLion split mode<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4115">VIM-4115</a> Fixed NullPointerException in <code>CommandKeyConsumer</code> when pressing Esc after disabling and re-enabling IdeaVim with an open command line<br>
         <br>
         <b>Merged PRs:</b><br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1704">1704</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-4202 Don't intercept all &lt;S-Tab&gt;<br>
