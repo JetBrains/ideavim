@@ -19,6 +19,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.put.PutData
+import com.maddyhome.idea.vim.register.Register
 
 /**
  * @author vlan
@@ -59,11 +60,31 @@ sealed class PutVisualTextBaseAction(
     count: Int,
   ): PutData {
     val lastRegisterChar = injector.registerGroup.lastRegisterChar
-    val register = caret.registerStorage.getRegister(editor, context, lastRegisterChar)
-    val textData = register?.let { PutData.TextData(register) }
+    val register = resolveRegisterForVisualPaste(lastRegisterChar, caret, editor, context)
+    val textData = register?.let { PutData.TextData(it) }
     val visualSelection = selection?.let { PutData.VisualSelection(mapOf(caret to it), it.type) }
     return PutData(textData, visualSelection, count, insertTextBeforeCaret, indent, caretAfterInsertedText)
   }
+
+  private fun resolveRegisterForVisualPaste(
+    lastRegisterChar: Char,
+    caret: VimCaret,
+    editor: VimEditor,
+    context: ExecutionContext,
+  ): Register? {
+    // IntelliJ updates X11 PRIMARY on visual selection; use the last explicitly-yanked value.
+    return if (isDefaultSystemClipboard(lastRegisterChar)) {
+      injector.registerGroup.getLastExplicitlyWrittenRegister(lastRegisterChar)
+        ?: caret.registerStorage.getRegister(editor, context, lastRegisterChar)
+    } else {
+      caret.registerStorage.getRegister(editor, context, lastRegisterChar)
+    }
+  }
+
+  private fun isDefaultSystemClipboard(registerChar: Char) =
+    !injector.registerGroup.isRegisterSpecifiedExplicitly &&
+      injector.registerGroup.isSystemClipboard(registerChar) &&
+      injector.registerGroup.isPrimaryRegisterSupported()
 }
 
 @CommandOrMotion(keys = ["P"], modes = [Mode.VISUAL])
