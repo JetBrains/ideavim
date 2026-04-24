@@ -14,11 +14,9 @@ import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.command.UndoConfirmationPolicy
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler
-import com.intellij.openapi.editor.actions.EnterAction
 import com.intellij.openapi.editor.event.EditorMouseEvent
 import com.intellij.openapi.editor.event.EditorMouseListener
 import com.intellij.openapi.editor.impl.editorId
-import com.intellij.openapi.util.UserDataHolder
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.util.PsiUtilBase
 import com.maddyhome.idea.vim.EventFacade
@@ -31,7 +29,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.change.ChangeRemoteApi
 import com.maddyhome.idea.vim.group.format.FormatRemoteApi
-import com.maddyhome.idea.vim.handler.commandContinuation
 import com.maddyhome.idea.vim.helper.CodeWrapper
 import com.maddyhome.idea.vim.helper.CommentLeaderParser
 import com.maddyhome.idea.vim.helper.inInsertMode
@@ -97,35 +94,6 @@ class ChangeGroup : VimChangeGroupBase() {
       UndoConfirmationPolicy.DEFAULT, doc
     )
     injector.scroll.scrollCaretIntoView(vimEditor)
-  }
-
-  /**
-   * If this is REPLACE mode we need to turn off OVERWRITE before and then turn OVERWRITE back on after sending the
-   * "ENTER" key.
-   */
-  override fun processEnter(
-    editor: VimEditor,
-    caret: VimCaret,
-    context: ExecutionContext,
-  ) {
-    if (editor.mode is Mode.REPLACE) {
-      editor.insertMode = true
-    }
-    try {
-      val continuation = (context.context as UserDataHolder).getUserData(commandContinuation)
-      val ijEditor = editor.ij
-      val ij = context.ij
-      val ijCaret = caret.ij
-      if (continuation != null) {
-        continuation.execute(ijEditor, ijCaret, ij)
-      } else {
-        EnterAction().handler.execute(ijEditor, ijCaret, ij)
-      }
-    } finally {
-      if (editor.mode is Mode.REPLACE) {
-        editor.insertMode = false
-      }
-    }
   }
 
   override fun processBackspace(editor: VimEditor, context: ExecutionContext) {
