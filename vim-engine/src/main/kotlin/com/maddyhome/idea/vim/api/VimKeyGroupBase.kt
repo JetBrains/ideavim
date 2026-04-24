@@ -169,13 +169,7 @@ abstract class VimKeyGroupBase : VimKeyGroup {
     val oldSize = requiredShortcutKeys.size
     for (key in fromKeys) {
       if (key.keyChar == KeyEvent.CHAR_UNDEFINED) {
-        if (
-          !injector.application.isOctopusEnabled() ||
-          !(key.keyCode == KeyEvent.VK_ESCAPE && key.modifiers == 0) &&
-          !(key.keyCode == KeyEvent.VK_ENTER && key.modifiers == 0)
-        ) {
-          requiredShortcutKeys.add(RequiredShortcut(key, owner))
-        }
+        requiredShortcutKeys.add(RequiredShortcut(key, owner))
       }
     }
     if (requiredShortcutKeys.size != oldSize) {

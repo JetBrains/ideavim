@@ -46,27 +46,6 @@ class InsertEnterActionTest : VimTestCase() {
     forEachBean.action = "EditorEnter"
     forEachBean.setPluginDescriptor(PluginManagerCore.getPlugin(VimPlugin.getPluginId())!!)
 
-    if (injector.application.isOctopusEnabled()) {
-      if (repetitionInfo.currentRepetition == 1) {
-        ExtensionTestUtil.maskExtensions(
-          ExtensionPointName("com.intellij.editorActionHandler"),
-          listOf(mainBean),
-          fixture.testRootDisposable
-        )
-      } else if (repetitionInfo.currentRepetition == 2) {
-        ExtensionTestUtil.maskExtensions(
-          ExtensionPointName("com.intellij.editorActionHandler"),
-          listOf(singleBean, mainBean),
-          fixture.testRootDisposable
-        )
-      } else if (repetitionInfo.currentRepetition == 3) {
-        ExtensionTestUtil.maskExtensions(
-          ExtensionPointName("com.intellij.editorActionHandler"),
-          listOf(forEachBean, mainBean),
-          fixture.testRootDisposable
-        )
-      }
-    }
   }
 
   @RepeatedTest(3)

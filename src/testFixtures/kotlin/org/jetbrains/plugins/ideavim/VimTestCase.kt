@@ -68,7 +68,6 @@ import com.maddyhome.idea.vim.group.EffectiveIjOptions
 import com.maddyhome.idea.vim.group.GlobalIjOptions
 import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.swingTimer
-import com.maddyhome.idea.vim.handler.isOctopusEnabled
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.TestInputModel
 import com.maddyhome.idea.vim.helper.getGuiCursorMode
@@ -1027,14 +1026,6 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
 
   private fun KeyStroke.getChar(editor: Editor): CharType {
     if (keyChar != KeyEvent.CHAR_UNDEFINED) return CharType.CharDetected(keyChar)
-    if (isOctopusEnabled(this, editor)) {
-      if (keyCode in setOf(KeyEvent.VK_ENTER)) {
-        if (modifiers == 0) {
-          return CharType.CharDetected(keyCode.toChar())
-        }
-      }
-      if (keyCode == KeyEvent.VK_ESCAPE) return CharType.EditorAction("EditorEscape")
-    }
     return CharType.UNDEFINED
   }
 

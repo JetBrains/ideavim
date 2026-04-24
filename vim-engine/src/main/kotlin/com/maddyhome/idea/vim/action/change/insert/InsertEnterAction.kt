@@ -30,18 +30,7 @@ class InsertEnterAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    if (injector.application.isOctopusEnabled()) {
-      if (editor.isInForEachCaretScope()) {
-        editor.removeSecondaryCarets()
-        injector.changeGroup.processEnter(editor, editor.primaryCaret(), context)
-      } else {
-        editor.forEachNativeCaret({ caret ->
-          injector.changeGroup.processEnter(editor, caret, context)
-        })
-      }
-    } else {
-      injector.changeGroup.processEnter(editor, context)
-    }
+    injector.changeGroup.processEnter(editor, context)
     injector.scroll.scrollCaretIntoView(editor)
     return true
   }

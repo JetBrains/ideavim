@@ -31,8 +31,6 @@ import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.group.IjOptions
-import com.maddyhome.idea.vim.handler.enableOctopus
-import com.maddyhome.idea.vim.handler.isOctopusEnabled
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.HandlerInjector
 import com.maddyhome.idea.vim.helper.inNormalMode
@@ -117,15 +115,6 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
     if (keyStroke == null) return ActionEnableStatus.no("Keystroke is null", LogLevel.DEBUG)
     if (VimPlugin.isNotEnabled()) return ActionEnableStatus.no("IdeaVim is disabled", LogLevel.DEBUG)
     val editor = getEditor(e) ?: return ActionEnableStatus.no("Can't get Editor", LogLevel.DEBUG)
-
-    if (enableOctopus) {
-      if (isOctopusEnabled(keyStroke, editor)) {
-        return ActionEnableStatus.no(
-          "Processing VimShortcutKeyAction for the key that is used in the octopus handler",
-          LogLevel.ERROR
-        )
-      }
-    }
 
     if (e.dataContext.isNotSupportedContextComponent && Registry.`is`("ideavim.only.in.editor.component")) {
       // Note: Currently, IdeaVim works ONLY in the editor & ExTextField component. However, the presence of the
