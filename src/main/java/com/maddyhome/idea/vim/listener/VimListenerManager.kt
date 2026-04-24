@@ -236,6 +236,18 @@ object VimListenerManager {
       busConnection.subscribe(FileOpenedSyncListener.TOPIC, VimEditorFactoryListener)
       busConnection.subscribe(VirtualFileManager.VFS_CHANGES, BufNewFileTracker)
       busConnection.subscribe(FileDocumentManagerListener.TOPIC, BufWriteListener)
+
+      // VIM-4205: feed Esc presses to RiderEscAwtKeyTracker. Must be a preprocessor (not a dispatcher)
+      // so it fires before Rider's popup manager consumes the event.
+      if (com.maddyhome.idea.vim.ide.isRider() || com.maddyhome.idea.vim.ide.isClionNova()) {
+        com.intellij.ide.IdeEventQueue.getInstance().addPreprocessor(
+          { event ->
+            IdeaSpecifics.RiderEscAwtKeyTracker.onAwtEvent(event)
+            false
+          },
+          VimPlugin.getInstance().onOffDisposable,
+        )
+      }
     }
 
     fun disable() {

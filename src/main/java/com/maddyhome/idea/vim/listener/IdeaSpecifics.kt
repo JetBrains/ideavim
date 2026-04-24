@@ -62,6 +62,7 @@ import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHe
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.isIdeaRefactorModeKeep
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.isIdeaRefactorModeSelect
 import org.jetbrains.annotations.NonNls
+import java.awt.AWTEvent
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
@@ -388,13 +389,37 @@ internal object IdeaSpecifics {
   }
 
   /**
+   * Tracks whether the last KEY_PRESSED was Escape. Needed because [LookupEvent.isCanceledExplicitly]
+   * is also true for non-Esc keys in Rider/CLion Nova (e.g. space), so it can't be used on its own
+   * to decide whether to exit insert mode. Wired up as an IdeEventQueue preprocessor in
+   * [VimListenerManager.GlobalListeners.enable].
+   */
+  internal object RiderEscAwtKeyTracker {
+    private val LOG = com.intellij.openapi.diagnostic.Logger.getInstance(RiderEscAwtKeyTracker::class.java)
+
+    @Volatile
+    var lastKeyPressedWasEscape: Boolean = false
+      private set
+
+    fun onAwtEvent(event: AWTEvent) {
+      if (event is KeyEvent && event.id == KeyEvent.KEY_PRESSED) {
+        val isEsc = event.keyCode == KeyEvent.VK_ESCAPE
+        lastKeyPressedWasEscape = isEsc
+        if (LOG.isTraceEnabled) {
+          LOG.trace("RiderEscAwtKeyTracker KEY_PRESSED keyCode=${event.keyCode} isEsc=$isEsc")
+        }
+      }
+    }
+  }
+
+  /**
    * In Rider/CLion Nova, the popup manager (due to LookupSummaryInfo parameter info popup)
    * consumes Escape before the action system runs, so IdeaVim never sees it.
    * This listener exits insert mode when the lookup is explicitly cancelled (Escape).
    */
   private class RiderEscLookupListener(private val editor: Editor) : com.intellij.codeInsight.lookup.LookupListener {
     override fun lookupCanceled(event: com.intellij.codeInsight.lookup.LookupEvent) {
-      if (event.isCanceledExplicitly && editor.vim.mode is Mode.INSERT) {
+      if (RiderEscAwtKeyTracker.lastKeyPressedWasEscape && editor.vim.mode is Mode.INSERT) {
         editor.vim.exitInsertMode(injector.executionContextManager.getEditorExecutionContext(editor.vim))
         KeyHandler.getInstance().reset(editor.vim)
       }
