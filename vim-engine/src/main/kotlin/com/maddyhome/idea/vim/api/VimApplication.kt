@@ -24,5 +24,4 @@ interface VimApplication {
 
   fun currentStackTrace(): String
   fun runAfterGotFocus(runnable: Runnable)
-  fun isOctopusEnabled(): Boolean
 }

@@ -34,7 +34,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.handler.KeyMapIssue
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.icons.VimIcons
 import com.maddyhome.idea.vim.key.ShortcutOwner
@@ -208,78 +207,6 @@ internal class NotificationService(private val project: Project?) : VimNotificat
 
   override fun notifyActionId(id: String?, candidates: List<String>?, intentionName: String?) {
     ActionIdNotifier.notifyActionId(id, project, candidates, intentionName)
-  }
-
-  override fun notifyKeymapIssues(issues: ArrayList<KeyMapIssue>) {
-    val keymapManager = KeymapManagerEx.getInstanceEx()
-    val keymap = keymapManager.activeKeymap
-    val message = buildString {
-      appendLine("Current IDE keymap (${keymap.name}) has issues:<br/>")
-      issues.forEach {
-        when (it) {
-          is KeyMapIssue.AddShortcut -> {
-            appendLine("- ${it.key} key is not assigned to the ${it.action} action.<br/>")
-          }
-
-          is KeyMapIssue.RemoveShortcut -> {
-            appendLine("- ${it.shortcut} key is incorrectly assigned to the ${it.action} action.<br/>")
-          }
-        }
-      }
-    }
-    val notification = IDEAVIM_STICKY_GROUP.createNotification(
-      IDEAVIM_NOTIFICATION_TITLE,
-      message,
-      NotificationType.ERROR,
-    )
-    notification.subtitle = "IDE keymap misconfigured"
-    notification.addAction(object : DumbAwareAction("Fix Keymap") {
-      override fun actionPerformed(e: AnActionEvent) {
-        issues.forEach {
-          when (it) {
-            is KeyMapIssue.AddShortcut -> {
-              keymap.addShortcut(it.actionId, KeyboardShortcut(it.keyStroke, null))
-            }
-
-            is KeyMapIssue.RemoveShortcut -> {
-              keymap.removeShortcut(it.actionId, it.shortcut)
-            }
-          }
-        }
-        LOG.info("Shortcuts updated $issues")
-        notification.expire()
-        requiredShortcutsAssigned()
-      }
-    })
-    notification.addAction(object : DumbAwareAction("Open Keymap Settings") {
-      override fun actionPerformed(e: AnActionEvent) {
-        ShowSettingsUtil.getInstance().showSettingsDialog(e.project, KeymapPanel::class.java)
-        notification.hideBalloon()
-      }
-    })
-    notification.addAction(object : DumbAwareAction("Ignore") {
-      override fun actionPerformed(e: AnActionEvent) {
-        LOG.info("Ignored to update shortcuts $issues")
-        notification.hideBalloon()
-      }
-    })
-    notification.notify(project)
-  }
-
-  private fun requiredShortcutsAssigned() {
-    val notification = Notification(
-      IDEAVIM_NOTIFICATION_ID,
-      IDEAVIM_NOTIFICATION_TITLE,
-      "Keymap fixed",
-      NotificationType.INFORMATION,
-    )
-    notification.addAction(object : DumbAwareAction("Open Keymap Settings") {
-      override fun actionPerformed(e: AnActionEvent) {
-        ShowSettingsUtil.getInstance().showSettingsDialog(e.project, KeymapPanel::class.java)
-        notification.hideBalloon()
-      }
-    })
-    notification.notify(project)
   }
 
   object ActionIdNotifier {

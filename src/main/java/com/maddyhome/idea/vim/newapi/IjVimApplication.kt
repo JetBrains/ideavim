@@ -76,8 +76,6 @@ internal class IjVimApplication : VimApplicationBase() {
     com.maddyhome.idea.vim.helper.runAfterGotFocus(runnable)
   }
 
-  override fun isOctopusEnabled(): Boolean = false
-
   private fun createKeyEvent(stroke: KeyStroke, component: Component): KeyEvent {
     return KeyEvent(
       component,

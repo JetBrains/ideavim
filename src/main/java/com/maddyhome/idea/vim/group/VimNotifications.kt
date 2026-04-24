@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim.group
 
 import com.intellij.openapi.project.Project
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.handler.KeyMapIssue
 import javax.swing.KeyStroke
 
 /**
@@ -32,5 +31,4 @@ interface VimNotifications {
   fun notifyEapFinished()
   fun showReenableNotification(project: Project)
   fun notifyActionId(id: String?, candidates: List<String>? = null, intentionName: String?)
-  fun notifyKeymapIssues(issues: ArrayList<KeyMapIssue>)
 }

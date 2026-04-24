@@ -36,10 +36,6 @@
               topic="com.intellij.ide.ui.LafManagerListener"/>
     <listener class="com.maddyhome.idea.vim.extension.highlightedyank.HighlightColorResetter"
               topic="com.intellij.ide.ui.LafManagerListener"/>
-    <listener class="com.maddyhome.idea.vim.handler.IdeaVimKeymapChangedListener"
-              topic="com.intellij.openapi.keymap.KeymapManagerListener"/>
-    <listener class="com.maddyhome.idea.vim.handler.IdeaVimCorrectorKeymapChangedListener"
-              topic="com.intellij.openapi.keymap.KeymapManagerListener"/>
     <listener class="com.maddyhome.idea.vim.listener.VimAppActivationListener"
               topic="com.intellij.openapi.application.ApplicationActivationListener"/>
   </applicationListeners>
@@ -224,11 +220,6 @@
     <statusBarWidgetFactory id="IdeaVimMacro"
                             implementation="com.maddyhome.idea.vim.ui.widgets.macro.MacroWidgetFactory"
                             order="first, after IdeaVimShowCmd"/>
-
-    <!-- Editor-specific startup activities -->
-    <postStartupActivity implementation="com.maddyhome.idea.vim.handler.EditorHandlersChainLogger"/>
-    <postStartupActivity implementation="com.maddyhome.idea.vim.handler.KeymapChecker"/>
-    <postStartupActivity implementation="com.maddyhome.idea.vim.handler.CopilotKeymapCorrector"/>
 
     <editorFloatingToolbarProvider implementation="com.maddyhome.idea.vim.ui.ReloadFloatingToolbar"/>
 

@@ -92,8 +92,6 @@ import com.maddyhome.idea.vim.group.ScrollOptionsChangeListener
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
-import com.maddyhome.idea.vim.handler.correctorRequester
-import com.maddyhome.idea.vim.handler.keyCheckRequests
 import com.maddyhome.idea.vim.helper.CaretVisualAttributesListener
 import com.maddyhome.idea.vim.helper.GuicursorChangeListener
 import com.maddyhome.idea.vim.helper.StrictMode
@@ -170,8 +168,6 @@ object VimListenerManager {
     SlowOperations.knownIssue("VIM-3648, VIM-3649").use {
       EditorListeners.addAll()
     }
-    check(correctorRequester.tryEmit(Unit))
-    check(keyCheckRequests.tryEmit(Unit))
 
     val caretVisualAttributesListener = CaretVisualAttributesListener()
     injector.listenersNotifier.myEditorListeners.add(caretVisualAttributesListener)
@@ -204,8 +200,6 @@ object VimListenerManager {
     GlobalListeners.disable()
     EditorListeners.removeAll()
     injector.listenersNotifier.reset()
-
-    check(correctorRequester.tryEmit(Unit))
   }
 
   object GlobalListeners {

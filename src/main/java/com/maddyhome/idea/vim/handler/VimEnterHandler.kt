@@ -370,5 +370,4 @@ fun isOctopusEnabled(s: KeyStroke, editor: Editor): Boolean {
   return false
 }
 
-internal val enableOctopus: Boolean
-  get() = injector.application.isOctopusEnabled()
+internal const val enableOctopus: Boolean = false
