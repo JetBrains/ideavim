@@ -204,12 +204,6 @@ tasks {
     options.encoding = "UTF-8"
   }
 
-  // Note that this will run the plugin installed in the IDE specified in dependencies. To run in a different IDE, use
-  // a custom task (see below)
-  runIde {
-    systemProperty("octopus.handler", System.getProperty("octopus.handler") ?: true)
-  }
-
   // Uncomment to run the plugin in a custom IDE, rather than the IDE specified as a compile target in dependencies
   // Note that the version must be greater than the plugin's target version, for obvious reasons
   // You can also set splitMode and splitModeTarget here to test split mode in a custom IDE
@@ -226,25 +220,16 @@ tasks {
   val runPycharm by intellijPlatformTesting.runIde.registering {
     type = IntelliJPlatformType.PyCharmProfessional
     version = "2026.1"
-    task {
-      systemProperty("octopus.handler", System.getProperty("octopus.handler") ?: true)
-    }
   }
 
   val runWebstorm by intellijPlatformTesting.runIde.registering {
     type = IntelliJPlatformType.WebStorm
     version = "2025.3.2"
-    task {
-      systemProperty("octopus.handler", System.getProperty("octopus.handler") ?: true)
-    }
   }
 
   val runClion by intellijPlatformTesting.runIde.registering {
     type = IntelliJPlatformType.CLion
     version = "2026.1"
-    task {
-      systemProperty("octopus.handler", System.getProperty("octopus.handler") ?: true)
-    }
   }
 
   val runIdeForUiTests by intellijPlatformTesting.runIde.registering {
@@ -257,7 +242,6 @@ tasks {
           "-Djb.privacy.policy.text=<!--999.999-->",
           "-Djb.consents.confirmation.enabled=false",
           "-Dide.show.tips.on.startup.default.value=false",
-          "-Doctopus.handler=" + (System.getProperty("octopus.handler") ?: true),
         )
       }
     }

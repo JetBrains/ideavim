@@ -367,12 +367,11 @@ internal object IdeaSpecifics {
 
         (VimPlugin.getKey() as VimKeyGroupBase).registerShortcutsForLookup(newLookup)
 
-        // In Rider/CLion Nova, octopus is disabled (VIM-3815) and Escape is consumed by the popup manager
-        // (due to LookupSummaryInfo popup) before the action system runs, so IdeaVim never sees it.
+        // In Rider/CLion Nova, the popup manager (due to LookupSummaryInfo parameter info popup)
+        // consumes Escape before the action system runs, so IdeaVim never sees it.
         // Listen for explicit lookup cancellation (Escape) to exit insert mode.
-        // Note: we check isRider/isClionNova specifically, not !isOctopusEnabled(), because
-        // JetBrains Client (split mode) also has octopus disabled but doesn't need this workaround,
-        // and isCanceledExplicitly can be true for non-Escape keys (e.g. space) in that environment.
+        // Note: this listener must NOT be attached in JetBrains Client (split mode), because
+        // isCanceledExplicitly can be true for non-Escape keys (e.g. space) there.
         if (isRider() || isClionNova()) {
           newLookup.addLookupListener(RiderEscLookupListener(newLookup.editor))
         }
@@ -389,8 +388,8 @@ internal object IdeaSpecifics {
   }
 
   /**
-   * In Rider/CLion Nova, octopus is disabled (VIM-3815) and Escape is consumed by the popup manager
-   * (due to LookupSummaryInfo parameter info popup) before the action system runs, so IdeaVim never sees it.
+   * In Rider/CLion Nova, the popup manager (due to LookupSummaryInfo parameter info popup)
+   * consumes Escape before the action system runs, so IdeaVim never sees it.
    * This listener exits insert mode when the lookup is explicitly cancelled (Escape).
    */
   private class RiderEscLookupListener(private val editor: Editor) : com.intellij.codeInsight.lookup.LookupListener {
