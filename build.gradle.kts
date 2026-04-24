@@ -300,7 +300,7 @@ tasks {
   }
   val runCLionSplitMode by intellijPlatformTesting.runIde.registering {
     type = IntelliJPlatformType.CLion
-    version = "2025.3.2"
+    version = "2026.1"
     splitMode = true
     splitModeTarget = SplitModeAware.SplitModeTarget.BOTH
 

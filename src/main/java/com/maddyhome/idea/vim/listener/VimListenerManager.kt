@@ -220,6 +220,18 @@ object VimListenerManager {
       val busConnection =
         ApplicationManager.getApplication().messageBus.connect(VimPlugin.getInstance().onOffDisposable)
       busConnection.subscribe(FileOpenedSyncListener.TOPIC, VimEditorFactoryListener)
+
+      // VIM-4205: feed Esc presses to RiderEscAwtKeyTracker. Must be a preprocessor (not a dispatcher)
+      // so it fires before Rider's popup manager consumes the event.
+      if (com.maddyhome.idea.vim.ide.isRider() || com.maddyhome.idea.vim.ide.isClionNova()) {
+        com.intellij.ide.IdeEventQueue.getInstance().addPreprocessor(
+          { event ->
+            IdeaSpecifics.RiderEscAwtKeyTracker.onAwtEvent(event)
+            false
+          },
+          VimPlugin.getInstance().onOffDisposable,
+        )
+      }
     }
 
     fun disable() {
