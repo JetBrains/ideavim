@@ -28,6 +28,10 @@ This project uses **YouTrack** for issue tracking, NOT GitHub Issues.
 - YouTrack URL: https://youtrack.jetbrains.com/issues/VIM
 - `gh issue` commands will NOT work
 
+## Commit Messages
+
+For commits that fix a tracked issue, use the format `Fix(VIM-XXX): <description>` (e.g., `Fix(VIM-4115): NPE in CommandKeyConsumer after plugin disable/enable`).
+
 ## Additional Documentation
 
 - Changelog maintenance: Handled by the `changelog` skill (auto-detected when updating changelog)
