@@ -1,0 +1,20 @@
+name: Claude changelog auto-merge
+on: pull_request
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  claude-changelog:
+    runs-on: ubuntu-latest
+    if: >-
+      github.repository == 'JetBrains/ideavim' &&
+      github.event.pull_request.user.login == 'claude[bot]' &&
+      startsWith(github.event.pull_request.title, 'Update changelog:')
+    steps:
+      - name: Auto-merge Claude changelog PR
+        run: gh pr merge --auto --rebase "$PR_URL"
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
