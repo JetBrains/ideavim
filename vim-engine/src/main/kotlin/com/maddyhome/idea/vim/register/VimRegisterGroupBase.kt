@@ -401,6 +401,11 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     return System.getenv("DISPLAY") != null && injector.systemInfoService.isXWindow
   }
 
+  override fun getLastExplicitlyWrittenRegister(r: Char): Register? {
+    require(CLIPBOARD_REGISTERS.contains(r.lowercaseChar())) { "Only clipboard registers are supported: got '$r'" }
+    return myRegisters[r.lowercaseChar()]
+  }
+
   private fun setSystemPrimaryRegisterText(editor: VimEditor, context: ExecutionContext, copiedText: VimCopiedText) {
     logger.trace("Setting text: $copiedText to primary selection...")
     if (isPrimaryRegisterSupported()) {
@@ -428,7 +433,13 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
       return refreshClipboardRegister(editor, context)
     }
     try {
-      val clipboardData = injector.clipboardManager.getPrimaryContent(editor, context) ?: return null
+      val clipboardData = injector.clipboardManager.getPrimaryContent(editor, context)
+      if (clipboardData == null || clipboardData.text.isEmpty()) {
+        // Wayland/XWayland clears PRIMARY on focus change; prefer the last IdeaVim-written value over
+        // an empty result. Differs from Vim only when the user deliberately clears PRIMARY externally.
+        logger.trace("PRIMARY selection is unavailable or empty; falling back to in-memory register value")
+        return myRegisters[PRIMARY_REGISTER]
+      }
       val currentRegister = myRegisters[PRIMARY_REGISTER]
       if (currentRegister != null && clipboardData.text == currentRegister.text) {
         return currentRegister
