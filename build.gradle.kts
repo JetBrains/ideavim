@@ -460,6 +460,8 @@ intellijPlatform {
     changeNotes.set(
       """
         <b>Features:</b><br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4207">VIM-4207</a> Added <code>:update</code> command - like <code>:write</code> but only writes the file if it has been modified<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-186">VIM-186</a> <code>gq</code>/<code>gw</code> now wraps text comment-aware - comment prefixes (e.g., <code>//</code>, <code>#</code>, <code>*</code>) are preserved and continued across wrapped lines, following Vim's <code>'comments'</code> option<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-1693">VIM-1693</a> Added <code>:autocmd</code> command - run Ex commands on editor events such as <code>BufRead</code>, <code>BufWrite</code>, <code>BufEnter</code>, <code>BufLeave</code>, <code>InsertEnter</code>, <code>InsertLeave</code>, <code>WinEnter</code>, <code>WinLeave</code>, <code>FocusGained</code>, <code>FocusLost</code>, and <code>FileType</code>; supports <code>augroup</code> and file pattern matching (e.g., <code>autocmd BufWritePre *.py echo "saving python"</code>)<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-268">VIM-268</a> Added file name completion in ex commands - press <code>&lt;Tab&gt;</code>/<code>&lt;S-Tab&gt;</code> to cycle through file matches in <code>:edit</code>, <code>:split</code>, <code>:vsplit</code>, <code>:write</code>, <code>:read</code>, <code>:source</code>, and <code>:find</code> commands; use arrow keys to navigate the completion panel<br>
         * New VimScript functions: <code>add()</code>, <code>call()</code>, <code>extend()</code>, <code>extendnew()</code>, <code>filter()</code>, <code>flatten()</code>, <code>flattennew()</code>, <code>foreach()</code>, <code>has_key()</code>, <code>indexof()</code>, <code>insert()</code>, <code>items()</code>, <code>keys()</code>, <code>map()</code>, <code>mapnew()</code>, <code>reduce()</code>, <code>remove()</code>, <code>slice()</code>, <code>sort()</code>, <code>uniq()</code>, <code>values()</code><br>
@@ -513,8 +515,12 @@ intellijPlatform {
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4202">VIM-4202</a> Fixed <code>&lt;S-Tab&gt;</code> being intercepted by IdeaVim - users can now remap <code>&lt;S-Tab&gt;</code> to other IntelliJ actions<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4202">VIM-4202</a> Fixed <code>gcc</code>/<code>gc{motion}</code> commentary leaving editor in incorrect mode in Rider/CLion split mode<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4115">VIM-4115</a> Fixed NullPointerException in <code>CommandKeyConsumer</code> when pressing Esc after disabling and re-enabling IdeaVim with an open command line<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4184">VIM-4184</a> Fixed <code>clipboard=unnamed</code> paste losing yanked text on Wayland - uses in-memory register when PRIMARY selection is unavailable due to focus loss<br>
         <br>
         <b>Merged PRs:</b><br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1716">1716</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: FIX(VIM-4184): clipboad=unnamed paste bugs on wayland<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1707">1707</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-186 Add comment aware wrapping logic<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1706">1706</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-4207 Add support for update command<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1704">1704</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-4202 Don't intercept all &lt;S-Tab&gt;<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1703">1703</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-4202 Fix state after commentary action<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1700">1700</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-4139 Compute nesting depth for fold regions<br>
