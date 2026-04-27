@@ -71,11 +71,11 @@ import com.maddyhome.idea.vim.group.visual.VimVisualTimer.swingTimer
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.TestInputModel
 import com.maddyhome.idea.vim.helper.getGuiCursorMode
-import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.ToKeysMappingInfo
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.listener.VimListenerManager
+import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.ijOptions
 import com.maddyhome.idea.vim.newapi.vim
@@ -1026,6 +1026,10 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
 
   private fun KeyStroke.getChar(editor: Editor): CharType {
     if (keyChar != KeyEvent.CHAR_UNDEFINED) return CharType.CharDetected(keyChar)
+    if (editor.vim.mode !is Mode.CMD_LINE) {
+      if (keyCode == KeyEvent.VK_ENTER && modifiers == 0) return CharType.CharDetected(keyCode.toChar())
+      if (keyCode == KeyEvent.VK_ESCAPE) return CharType.EditorAction("EditorEscape")
+    }
     return CharType.UNDEFINED
   }
 
