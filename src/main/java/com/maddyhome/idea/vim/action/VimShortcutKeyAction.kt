@@ -89,8 +89,8 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
         // Control-flow exceptions (like ProcessCanceledException) should never be logged and should be rethrown
         // See {@link com.intellij.openapi.diagnostic.Logger.checkException}
         throw e
-      } catch (throwable: Throwable) {
-        LOG.error(throwable)
+      } catch (e: Exception) {
+        LOG.error(e)
       }
     }
   }

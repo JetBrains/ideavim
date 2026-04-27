@@ -1014,7 +1014,14 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
             ActionManager.getInstance(),
             0,
           )
-          if (ActionUtil.lastUpdateAndCheckDumb(VimShortcutKeyAction.instance, e, true)) {
+          if (!VimPlugin.isEnabled()) {
+            // VimShortcutKeyAction is a no-op when the plugin is disabled, so deliver
+            // Enter/Escape to the IDE directly.
+            when {
+              key.keyCode == KeyEvent.VK_ENTER && key.modifiers == 0 -> fixture.type('\n')
+              key.keyCode == KeyEvent.VK_ESCAPE -> fixture.performEditorAction("EditorEscape")
+            }
+          } else if (ActionUtil.lastUpdateAndCheckDumb(VimShortcutKeyAction.instance, e, true)) {
             ActionUtil.performActionDumbAwareWithCallbacks(VimShortcutKeyAction.instance, e)
           }
         }
@@ -1026,10 +1033,6 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
 
   private fun KeyStroke.getChar(editor: Editor): CharType {
     if (keyChar != KeyEvent.CHAR_UNDEFINED) return CharType.CharDetected(keyChar)
-    if (editor.vim.mode !is Mode.CMD_LINE) {
-      if (keyCode == KeyEvent.VK_ENTER && modifiers == 0) return CharType.CharDetected(keyCode.toChar())
-      if (keyCode == KeyEvent.VK_ESCAPE) return CharType.EditorAction("EditorEscape")
-    }
     return CharType.UNDEFINED
   }
 
