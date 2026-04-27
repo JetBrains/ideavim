@@ -687,11 +687,11 @@ public class EditorHelper {
    * Checks if the editor is the Python console, so we can disable Vim features
    */
   public static boolean isPythonConsole(@NotNull Editor editor) {
-    if (editor.getVirtualFile() == null) return false;
+    var file = EditorHelper.getVirtualFile(editor);
+    if (file == null) return false;
     // In split mode, the projected VirtualFile may have a different getName() result,
     // so we also check getPath() to reliably detect the Python console.
-    return editor.getVirtualFile().getName().contains(PYTHON_CONSOLE_FILE_NAME)
-           || editor.getVirtualFile().getPath().contains(PYTHON_CONSOLE_FILE_NAME);
+    return file.getName().contains(PYTHON_CONSOLE_FILE_NAME) || file.getPath().contains(PYTHON_CONSOLE_FILE_NAME);
   }
 
   /**
@@ -699,7 +699,7 @@ public class EditorHelper {
    */
   public static boolean isCommitWindowEditor(@NotNull Editor editor) {
     // The best heuristic we have is the file name, which is Dummy.txt
-    var file = editor.getVirtualFile();
+    var file = EditorHelper.getVirtualFile(editor);
     return file != null && file.getName().contains("Dummy.txt");
   }
 
@@ -721,8 +721,8 @@ public class EditorHelper {
    */
   public static boolean isKotlinClassDecompiledToJavaFile(@NotNull Editor editor) {
     @SuppressWarnings("deprecation") @Nullable Key<?> key = Key.findKeyByName("IS_KOTLIN_DECOMPILED_FILE");
-    var file = editor.getVirtualFile();
-    return file != null && key != null && editor.getVirtualFile().getUserData(key) == Boolean.TRUE;
+    var file = EditorHelper.getVirtualFile(editor);
+    return file != null && key != null && file.getUserData(key) == Boolean.TRUE;
   }
 
   /**
