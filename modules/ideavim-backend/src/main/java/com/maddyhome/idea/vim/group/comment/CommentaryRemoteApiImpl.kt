@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.group.comment
 
+import com.intellij.application.options.CodeStyle
 import com.intellij.codeInsight.actions.MultiCaretCodeInsightActionHandler
 import com.intellij.codeInsight.generation.CommentByBlockCommentHandler
 import com.intellij.codeInsight.generation.CommentByLineCommentHandler
@@ -55,22 +56,41 @@ internal class CommentaryRemoteApiImpl : CommentaryRemoteApi {
     val project = editor.project ?: return
     val psiFile = PsiDocumentManager.getInstance(project).getPsiFile(editor.document) ?: return
 
-    CommandProcessor.getInstance().executeCommand(project, {
-      ApplicationManager.getApplication().runWriteAction {
-        val caret = editor.caretModel.primaryCaret
-        caret.setSelection(startOffset, endOffset)
-        try {
-          val handler = pickHandler(psiFile, lineWise)
-          handler.invoke(project, editor, caret, psiFile)
-          handler.postInvoke()
-        } finally {
-          caret.removeSelection()
-          if (caretOffset >= 0) {
-            caret.moveToOffset(caretOffset)
+    val invokeHandler = {
+      CommandProcessor.getInstance().executeCommand(project, {
+        ApplicationManager.getApplication().runWriteAction {
+          val caret = editor.caretModel.primaryCaret
+          caret.setSelection(startOffset, endOffset)
+          try {
+            val handler = pickHandler(psiFile, lineWise)
+            handler.invoke(project, editor, caret, psiFile)
+            handler.postInvoke()
+          } finally {
+            caret.removeSelection()
+            if (caretOffset >= 0) {
+              caret.moveToOffset(caretOffset)
+            }
           }
         }
+      }, "Commentary", null)
+    }
+
+    // normally comment action goes through rider backend comment action running on .net nto jvm so we cannot call it directly.
+    // But we still want to apply space after comment as it's default bahavior there so we overrite this flag for intelij comment handler
+    if (isCFamily(psiFile)) {
+      val baseSettings = CodeStyle.getSettings(psiFile)
+      CodeStyle.runWithLocalSettings(project, baseSettings) { localSettings ->
+        localSettings.getCommonSettings(psiFile.language).LINE_COMMENT_ADD_SPACE = true
+        invokeHandler()
       }
-    }, "Commentary", null)
+    } else {
+      invokeHandler()
+    }
+  }
+
+  private fun isCFamily(psiFile: PsiFile): Boolean {
+    val fileTypeName = psiFile.fileType.name
+    return fileTypeName == "C++" || fileTypeName == "C#" || fileTypeName == "ObjectiveC"
   }
 
   private fun pickHandler(psiFile: PsiFile, lineWise: Boolean): MultiCaretCodeInsightActionHandler {
