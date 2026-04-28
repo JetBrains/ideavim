@@ -1,3 +1,11 @@
+/*
+ * Copyright 2003-2026 The IdeaVim authors
+ *
+ * Use of this source code is governed by an MIT-style
+ * license that can be found in the LICENSE.txt file or at
+ * https://opensource.org/licenses/MIT.
+ */
+
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
 /*
@@ -46,7 +54,7 @@ dependencies {
     create(ideaType, ideaVersion) { this.useInstaller = useInstaller }
     testFramework(TestFrameworkType.Platform)
     testFramework(TestFrameworkType.JUnit5)
-    bundledPlugins("com.intellij.java", "org.jetbrains.plugins.yaml")
+    bundledPlugins("com.intellij.java", "org.jetbrains.plugins.yaml", "org.jetbrains.plugins.textmate")
   }
 }
 
