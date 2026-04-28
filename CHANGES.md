@@ -79,8 +79,12 @@ usual beta standards.
 * [VIM-4202](https://youtrack.jetbrains.com/issue/VIM-4202) Fixed `<S-Tab>` being intercepted by IdeaVim - users can now remap `<S-Tab>` to other IntelliJ actions
 * [VIM-4202](https://youtrack.jetbrains.com/issue/VIM-4202) Fixed `gcc`/`gc{motion}` commentary leaving editor in incorrect mode in Rider/CLion split mode
 * [VIM-4115](https://youtrack.jetbrains.com/issue/VIM-4115) Fixed NullPointerException in `CommandKeyConsumer` when pressing Esc after disabling and re-enabling IdeaVim with an open command line
+* [VIM-4209](https://youtrack.jetbrains.com/issue/VIM-4209) Fixed `<Esc>` not exiting insert mode in Rider/CLion when a `<C-Space>` completion popup intercepts the key before IdeaVim
+* [VIM-4211](https://youtrack.jetbrains.com/issue/VIM-4211) Fixed IdeaVim not working in the Git commit window
 
 ### Merged PRs:
+* [1720](https://github.com/JetBrains/ideavim/pull/1720) by [1grzyb1](https://github.com/1grzyb1): fix: make ideavim work in commit window
+* [1717](https://github.com/JetBrains/ideavim/pull/1717) by [1grzyb1](https://github.com/1grzyb1): Fix(VIM-4209): handle esc in rider before popup
 * [1704](https://github.com/JetBrains/ideavim/pull/1704) by [1grzyb1](https://github.com/1grzyb1): VIM-4202 Don't intercept all <S-Tab>
 * [1703](https://github.com/JetBrains/ideavim/pull/1703) by [1grzyb1](https://github.com/1grzyb1): VIM-4202 Fix state after commentary action
 * [1700](https://github.com/JetBrains/ideavim/pull/1700) by [1grzyb1](https://github.com/1grzyb1): VIM-4139 Compute nesting depth for fold regions
