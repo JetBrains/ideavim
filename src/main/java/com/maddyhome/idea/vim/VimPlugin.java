@@ -183,7 +183,8 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static boolean isEnabled() {
-    return getInstance().enabled;
+    final VimPlugin instance = ApplicationManager.getApplication().getService(VimPlugin.class);
+    return instance != null && instance.enabled;
   }
 
   public static void setEnabled(final boolean enabled) {
