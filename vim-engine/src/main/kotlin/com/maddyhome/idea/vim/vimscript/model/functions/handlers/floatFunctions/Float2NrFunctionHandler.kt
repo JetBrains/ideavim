@@ -27,7 +27,7 @@ internal class Float2NrFunctionHandler : UnaryFunctionHandler<VimInt>() {
   ): VimInt {
     val argument = arguments[0]
     return when (argument) {
-      is VimFloat -> VimInt(argument.value.toInt())
+      is VimFloat -> VimInt(argument.value.coerceIn(-Int.MAX_VALUE.toDouble(), Int.MAX_VALUE.toDouble()).toInt())
       is VimInt -> VimInt(argument.value)
       else -> throw exExceptionMessage("E808")
     }
