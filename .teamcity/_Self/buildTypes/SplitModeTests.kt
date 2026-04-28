@@ -28,7 +28,6 @@ object SplitModeTests : IdeaVimBuildType({
   params {
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
     param("env.ORG_GRADLE_PROJECT_instrumentPluginCode", "false")
-    param("env.DISPLAY", ":99")
   }
 
   vcs {
@@ -41,7 +40,7 @@ object SplitModeTests : IdeaVimBuildType({
   steps {
     script {
       name = "Run split mode tests"
-      scriptContent = "./gradlew :tests:split-mode-tests:testSplitMode --console=plain --build-cache --configuration-cache --stacktrace"
+      scriptContent = "xvfb-run -a -s '-screen 0 1920x1080x24' ./gradlew :tests:split-mode-tests:testSplitMode --console=plain --build-cache --configuration-cache --stacktrace"
     }
   }
 
