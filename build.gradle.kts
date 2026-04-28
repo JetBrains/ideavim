@@ -513,8 +513,12 @@ intellijPlatform {
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4202">VIM-4202</a> Fixed <code>&lt;S-Tab&gt;</code> being intercepted by IdeaVim - users can now remap <code>&lt;S-Tab&gt;</code> to other IntelliJ actions<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4202">VIM-4202</a> Fixed <code>gcc</code>/<code>gc{motion}</code> commentary leaving editor in incorrect mode in Rider/CLion split mode<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4115">VIM-4115</a> Fixed NullPointerException in <code>CommandKeyConsumer</code> when pressing Esc after disabling and re-enabling IdeaVim with an open command line<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4209">VIM-4209</a> Fixed <code>&lt;Esc&gt;</code> not exiting insert mode in Rider/CLion when a <code>&lt;C-Space&gt;</code> completion popup intercepts the key before IdeaVim<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4211">VIM-4211</a> Fixed IdeaVim not working in the Git commit window<br>
         <br>
         <b>Merged PRs:</b><br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1720">1720</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: fix: make ideavim work in commit window<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1717">1717</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: Fix(VIM-4209): handle esc in rider before popup<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1704">1704</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-4202 Don't intercept all &lt;S-Tab&gt;<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1703">1703</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-4202 Fix state after commentary action<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1700">1700</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-4139 Compute nesting depth for fold regions<br>
