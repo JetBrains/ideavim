@@ -26,6 +26,8 @@ usual beta standards.
 ## [To Be Released]
 
 ### Features:
+* [VIM-4207](https://youtrack.jetbrains.com/issue/VIM-4207) Added `:update` command - like `:write` but only writes the file if it has been modified
+* [VIM-186](https://youtrack.jetbrains.com/issue/VIM-186) `gq`/`gw` now wraps text comment-aware - comment prefixes (e.g., `//`, `#`, `*`) are preserved and continued across wrapped lines, following Vim's `'comments'` option
 * [VIM-1693](https://youtrack.jetbrains.com/issue/VIM-1693) Added `:autocmd` command - run Ex commands on editor events such as `BufRead`, `BufWrite`, `BufEnter`, `BufLeave`, `InsertEnter`, `InsertLeave`, `WinEnter`, `WinLeave`, `FocusGained`, `FocusLost`, and `FileType`; supports `augroup` and file pattern matching (e.g., `autocmd BufWritePre *.py echo "saving python"`)
 * [VIM-268](https://youtrack.jetbrains.com/issue/VIM-268) Added file name completion in ex commands - press `<Tab>`/`<S-Tab>` to cycle through file matches in `:edit`, `:split`, `:vsplit`, `:write`, `:read`, `:source`, and `:find` commands; use arrow keys to navigate the completion panel
 * New VimScript functions: `add()`, `call()`, `extend()`, `extendnew()`, `filter()`, `flatten()`, `flattennew()`, `foreach()`, `has_key()`, `indexof()`, `insert()`, `items()`, `keys()`, `map()`, `mapnew()`, `reduce()`, `remove()`, `slice()`, `sort()`, `uniq()`, `values()`
@@ -79,8 +81,12 @@ usual beta standards.
 * [VIM-4202](https://youtrack.jetbrains.com/issue/VIM-4202) Fixed `<S-Tab>` being intercepted by IdeaVim - users can now remap `<S-Tab>` to other IntelliJ actions
 * [VIM-4202](https://youtrack.jetbrains.com/issue/VIM-4202) Fixed `gcc`/`gc{motion}` commentary leaving editor in incorrect mode in Rider/CLion split mode
 * [VIM-4115](https://youtrack.jetbrains.com/issue/VIM-4115) Fixed NullPointerException in `CommandKeyConsumer` when pressing Esc after disabling and re-enabling IdeaVim with an open command line
+* [VIM-4184](https://youtrack.jetbrains.com/issue/VIM-4184) Fixed `clipboard=unnamed` paste losing yanked text on Wayland - uses in-memory register when PRIMARY selection is unavailable due to focus loss
 
 ### Merged PRs:
+* [1716](https://github.com/JetBrains/ideavim/pull/1716) by [1grzyb1](https://github.com/1grzyb1): FIX(VIM-4184): clipboad=unnamed paste bugs on wayland
+* [1707](https://github.com/JetBrains/ideavim/pull/1707) by [1grzyb1](https://github.com/1grzyb1): VIM-186 Add comment aware wrapping logic
+* [1706](https://github.com/JetBrains/ideavim/pull/1706) by [1grzyb1](https://github.com/1grzyb1): VIM-4207 Add support for update command
 * [1704](https://github.com/JetBrains/ideavim/pull/1704) by [1grzyb1](https://github.com/1grzyb1): VIM-4202 Don't intercept all <S-Tab>
 * [1703](https://github.com/JetBrains/ideavim/pull/1703) by [1grzyb1](https://github.com/1grzyb1): VIM-4202 Fix state after commentary action
 * [1700](https://github.com/JetBrains/ideavim/pull/1700) by [1grzyb1](https://github.com/1grzyb1): VIM-4139 Compute nesting depth for fold regions
