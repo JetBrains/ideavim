@@ -425,7 +425,8 @@
 
   <actions>
     <action class="com.maddyhome.idea.vim.extension.hints.ToggleHintsAction" text="Toggle Hints">
-      <keyboard-shortcut keymap="$default" first-keystroke="ctrl BACK_SLASH"/>
+      <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift BACK_SLASH"/>
+      <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="ctrl meta BACK_SLASH"/>
     </action>
   </actions>
 </idea-plugin>
