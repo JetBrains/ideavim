@@ -294,7 +294,9 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     val regex = try {
       VimRegex(pattern)
     } catch (e: VimRegexException) {
-      injector.messages.showErrorMessage(editor, e.message)
+      if (showMessages) {
+        injector.messages.showErrorMessage(editor, e.message)
+      }
       return null
     }
 
@@ -401,7 +403,6 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     val regex = try {
       VimRegex(pattern)
     } catch (e: VimRegexException) {
-      injector.messages.showErrorMessage(editor, e.message)
       return emptyList()
     }
     return regex.findAll(

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2024 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -8,12 +8,14 @@
 
 package org.jetbrains.plugins.ideavim.group.search
 
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
+import kotlin.test.assertFalse
 
 @Suppress("SpellCheckingInspection")
 class IncsearchTests : VimTestCase() {
@@ -1016,5 +1018,37 @@ class IncsearchTests : VimTestCase() {
         |Cras id tellus in ex imperdiet egestas. 
       """.trimMargin()
     )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
+  fun `test incsearch with incomplete regex does not indicate error`() {
+    configureByText(
+      """I found it in a legendary land
+         |${c}all rocks and lavender and tufted grass,
+         |where it was settled on some sodden sand
+         |hard by the torrent of a mountain pass.
+      """.trimMargin(),
+    )
+    enterCommand("set incsearch")
+    injector.messages.clearError()
+    typeText("/", "\\(")
+    assertFalse(injector.messages.isError(), "Incomplete regex during incsearch should not trigger an error/beep")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
+  fun `test incsearch in substitute command with incomplete regex does not indicate error`() {
+    configureByText(
+      """I found it in a legendary land
+         |${c}all rocks and lavender and tufted grass,
+         |where it was settled on some sodden sand
+         |hard by the torrent of a mountain pass.
+      """.trimMargin(),
+    )
+    enterCommand("set incsearch")
+    injector.messages.clearError()
+    typeText(":", "%s/\\(")
+    assertFalse(injector.messages.isError(), "Incomplete regex during incsearch :s should not trigger an error/beep")
   }
 }
