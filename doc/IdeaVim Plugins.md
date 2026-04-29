@@ -619,6 +619,34 @@ https://github.com/kana/vim-textobj-entire/blob/master/doc/textobj-entire.txt
 </details>
 
 <details>
+<summary><h2>VimEverywhere: Keyboard-driven IDE navigation outside the editor</h2></summary>
+
+### Summary:
+Brings vim-style keyboard navigation to the rest of the IDE. Enabling `VimEverywhere` turns on three
+behaviors:
+
+- **Hints overlay.** Press `Ctrl+Shift+\` (`Ctrl+Cmd+\` on macOS) to display hint labels over
+  interactive UI components — buttons, tool window tabs, tree nodes, text fields, scroll panes, and
+  so on. Type the letters next to a target to focus or click it without touching the mouse.
+- **NERDTree-style mappings everywhere.** NERDTree file-opening mappings (`o`, `t`, `T`, `s`, `i`,
+  `go`, `gs`, `gi`) work in any focused tree, not just the Project tool window.
+- **Tool window navigation.** Vim-style window-motion keys work inside tool windows, so you can move
+  between split panes without leaving the keyboard.
+
+### Setup:
+- Install the [AceJump](https://plugins.jetbrains.com/plugin/7086-acejump/) plugin.
+- Add the following command to `~/.ideavimrc`: `set VimEverywhere`
+
+### Instructions
+
+Press `Ctrl+Shift+\` (`Ctrl+Cmd+\` on macOS) to toggle the hints overlay. Type the letters shown
+next to a target to activate it, or press `Esc` to dismiss the overlay without activating anything.
+NERDTree-style and window-nav mappings are active automatically whenever the corresponding
+component has focus.
+
+</details>
+
+<details>
 <summary><h2>Which-Key: Displays available keybindings in popup</h2></summary>
 
 Original plugin: [vim-which-key](https://github.com/liuchengxu/vim-which-key).
