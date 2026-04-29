@@ -81,8 +81,12 @@ usual beta standards.
 * [VIM-4115](https://youtrack.jetbrains.com/issue/VIM-4115) Fixed NullPointerException in `CommandKeyConsumer` when pressing Esc after disabling and re-enabling IdeaVim with an open command line
 * [VIM-4209](https://youtrack.jetbrains.com/issue/VIM-4209) Fixed `<Esc>` not exiting insert mode in Rider/CLion when a `<C-Space>` completion popup intercepts the key before IdeaVim
 * [VIM-4211](https://youtrack.jetbrains.com/issue/VIM-4211) Fixed IdeaVim not working in the Git commit window
+* [VIM-4202](https://youtrack.jetbrains.com/issue/VIM-4202) Fixed `gcc`/`gc{motion}` commentary not adding space after `//` prefix in C/C++/C# files in Rider/CLion split mode
+* [VIM-4219](https://youtrack.jetbrains.com/issue/VIM-4219) Fixed NullPointerException when IdeaVim is being disabled/unloaded
 
 ### Merged PRs:
+* [1728](https://github.com/JetBrains/ideavim/pull/1728) by [1grzyb1](https://github.com/1grzyb1): VIM-4202 Add space after c langauges comments
+* [1727](https://github.com/JetBrains/ideavim/pull/1727) by [1grzyb1](https://github.com/1grzyb1): FIX(VIM-4219) check for in VimPLugin is not null
 * [1720](https://github.com/JetBrains/ideavim/pull/1720) by [1grzyb1](https://github.com/1grzyb1): fix: make ideavim work in commit window
 * [1717](https://github.com/JetBrains/ideavim/pull/1717) by [1grzyb1](https://github.com/1grzyb1): Fix(VIM-4209): handle esc in rider before popup
 * [1704](https://github.com/JetBrains/ideavim/pull/1704) by [1grzyb1](https://github.com/1grzyb1): VIM-4202 Don't intercept all <S-Tab>

@@ -515,8 +515,12 @@ intellijPlatform {
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4115">VIM-4115</a> Fixed NullPointerException in <code>CommandKeyConsumer</code> when pressing Esc after disabling and re-enabling IdeaVim with an open command line<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4209">VIM-4209</a> Fixed <code>&lt;Esc&gt;</code> not exiting insert mode in Rider/CLion when a <code>&lt;C-Space&gt;</code> completion popup intercepts the key before IdeaVim<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4211">VIM-4211</a> Fixed IdeaVim not working in the Git commit window<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4202">VIM-4202</a> Fixed <code>gcc</code>/<code>gc{motion}</code> commentary not adding space after <code>//</code> prefix in C/C++/C# files in Rider/CLion split mode<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4219">VIM-4219</a> Fixed NullPointerException when IdeaVim is being disabled/unloaded<br>
         <br>
         <b>Merged PRs:</b><br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1728">1728</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-4202 Add space after c langauges comments<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1727">1727</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: FIX(VIM-4219) check for in VimPLugin is not null<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1720">1720</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: fix: make ideavim work in commit window<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1717">1717</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: Fix(VIM-4209): handle esc in rider before popup<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1704">1704</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-4202 Don't intercept all &lt;S-Tab&gt;<br>
