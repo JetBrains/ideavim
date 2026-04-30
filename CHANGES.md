@@ -83,8 +83,10 @@ usual beta standards.
 * [VIM-4211](https://youtrack.jetbrains.com/issue/VIM-4211) Fixed IdeaVim not working in the Git commit window
 * [VIM-4202](https://youtrack.jetbrains.com/issue/VIM-4202) Fixed `gcc`/`gc{motion}` commentary not adding space after `//` prefix in C/C++/C# files in Rider/CLion split mode
 * [VIM-4219](https://youtrack.jetbrains.com/issue/VIM-4219) Fixed NullPointerException when IdeaVim is being disabled/unloaded
+* [VIM-4221](https://youtrack.jetbrains.com/issue/VIM-4221) Fixed error sound being played on each keypress when `incsearch` is enabled and the typed pattern is an invalid regex
 
 ### Merged PRs:
+* [1730](https://github.com/JetBrains/ideavim/pull/1730) by [1grzyb1](https://github.com/1grzyb1): FIX(VIM-4221) Don't make angry sounds on search
 * [1728](https://github.com/JetBrains/ideavim/pull/1728) by [1grzyb1](https://github.com/1grzyb1): VIM-4202 Add space after c langauges comments
 * [1727](https://github.com/JetBrains/ideavim/pull/1727) by [1grzyb1](https://github.com/1grzyb1): FIX(VIM-4219) check for in VimPLugin is not null
 * [1720](https://github.com/JetBrains/ideavim/pull/1720) by [1grzyb1](https://github.com/1grzyb1): fix: make ideavim work in commit window
