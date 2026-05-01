@@ -28,18 +28,20 @@ import com.intellij.openapi.util.registry.Registry
 import com.intellij.ui.KeyStrokeAdapter
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.getFirstMappingInfoMatch
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.HandlerInjector
+import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.helper.isPrimaryEditor
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
+import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.listener.AceJumpService
@@ -173,13 +175,13 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
       // component. Disable this action in the same circumstances, unless the user explicitly maps Tab.
       // TODO: Should this also ignore Tab in Normal mode?
       // This is a valid Vim action (navigating jump list), but unlikely in a single line or embedded editor.
-      if (injector.keyGroup.getKeyMapping(MappingMode.INSERT).get(listOf(keyStroke)) == null) {
-        if (editor.isOneLineMode || (editor as? EditorEx)?.isEmbeddedIntoDialogWrapper == true || editor.isViewer) {
-          return ActionEnableStatus.no(
-            "Tab should be ignored when editor is in one line mode, embedded into a dialog wrapper or is a readonly viewer",
-            LogLevel.INFO
-          )
-        }
+      if (!hasMapping(listOf(keyStroke), editor)
+        && (editor.isOneLineMode || (editor as? EditorEx)?.isEmbeddedIntoDialogWrapper == true || editor.isViewer)
+      ) {
+        return ActionEnableStatus.no(
+          "Tab should be ignored when editor is in one line mode, embedded into a dialog wrapper or is a readonly viewer",
+          LogLevel.INFO
+        )
       }
     }
 
@@ -209,6 +211,14 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
         ActionEnableStatus.yes("Enable vim for shortcut without owner", LogLevel.DEBUG)
       }
     }
+  }
+
+  /**
+   * Returns true if there is a mapping for the given keys in the current editor mode
+   */
+  private fun hasMapping(keys: List<KeyStroke>, editor: Editor): Boolean {
+    val mode = enumSetOf(editor.vim.mode.toMappingMode())
+    return injector.keyGroup.getFirstMappingInfoMatch(keys, mode) != null
   }
 
   private fun isEnabledForEscape(editor: Editor): Boolean {
