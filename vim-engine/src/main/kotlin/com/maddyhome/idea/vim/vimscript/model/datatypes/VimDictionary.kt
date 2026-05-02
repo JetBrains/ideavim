@@ -21,6 +21,14 @@ import com.maddyhome.idea.vim.ex.exExceptionMessage
  * thrown.
  */
 class VimDictionary(val dictionary: LinkedHashMap<VimString, VimDataType>) : VimDataType("dict") {
+  val size: Int get() = dictionary.size
+
+  operator fun get(key: String): VimDataType? = dictionary[VimString(key)]
+
+  operator fun set(key: String, value: VimDataType) {
+    dictionary[VimString(key)] = value
+  }
+
   override fun toVimFloat(): VimFloat {
     throw exExceptionMessage("E894")
   }
