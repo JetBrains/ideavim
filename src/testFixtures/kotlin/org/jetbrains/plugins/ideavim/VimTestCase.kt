@@ -681,7 +681,7 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
 
   fun assertNoMapping(from: String) {
     val keys = injector.parser.parseKeys(from)
-    for (mode in MappingMode.ALL) {
+    for (mode in EnumSet.allOf(MappingMode::class.java)) {
       assertNull(VimPlugin.getKey().getKeyMapping(mode)[keys])
     }
   }

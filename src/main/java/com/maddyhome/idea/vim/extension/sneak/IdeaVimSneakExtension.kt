@@ -60,10 +60,14 @@ class IdeaVimSneakExtension : VimExtension {
   override fun init() {
     val _highlightHandler = HighlightHandler()
     highlightHandler = _highlightHandler
+
+    // TODO: vim-sneak uses `z` for Op-pending. See VIM-4225
     mapToFunctionAndProvideKeys("s", SneakHandler(_highlightHandler, Direction.FORWARD), MappingMode.NXO)
 
     // vim-sneak uses `Z` for visual mode because `S` conflict with vim-sneak plugin VIM-3330
-    mapToFunctionAndProvideKeys("S", SneakHandler(_highlightHandler, Direction.BACKWARD), MappingMode.NO)
+    mapToFunctionAndProvideKeys("S", SneakHandler(_highlightHandler, Direction.BACKWARD), MappingMode.N)
+    // TODO: vim-sneak uses `Z` for Op-pending too. See VIM-4225
+    mapToFunctionAndProvideKeys("S", SneakHandler(_highlightHandler, Direction.BACKWARD), MappingMode.O)
     mapToFunctionAndProvideKeys("Z", SneakHandler(_highlightHandler, Direction.BACKWARD), MappingMode.X)
 
     // workaround to support ; and , commands
