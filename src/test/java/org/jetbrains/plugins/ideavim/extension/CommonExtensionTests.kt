@@ -416,14 +416,28 @@ private class TestExtension : VimExtension {
       false
     )
     putExtensionHandlerMapping(
-      MappingMode.NO,
+      MappingMode.N,
       injector.parser.parseKeys("<Plug>TestDelayed"),
       owner,
       DelayedAction(),
       false
     )
     putExtensionHandlerMapping(
-      MappingMode.NO,
+      MappingMode.O,
+      injector.parser.parseKeys("<Plug>TestDelayed"),
+      owner,
+      DelayedAction(),
+      false
+    )
+    putExtensionHandlerMapping(
+      MappingMode.N,
+      injector.parser.parseKeys("<Plug>TestIncorrectDelayed"),
+      owner,
+      DelayedIncorrectAction(),
+      false
+    )
+    putExtensionHandlerMapping(
+      MappingMode.O,
       injector.parser.parseKeys("<Plug>TestIncorrectDelayed"),
       owner,
       DelayedIncorrectAction(),
@@ -466,14 +480,28 @@ private class TestExtension : VimExtension {
       true
     )
     putKeyMapping(
-      MappingMode.NO,
+      MappingMode.N,
       injector.parser.parseKeys("R"),
       owner,
       injector.parser.parseKeys("<Plug>TestDelayed"),
       true
     )
     putKeyMapping(
-      MappingMode.NO,
+      MappingMode.O,
+      injector.parser.parseKeys("R"),
+      owner,
+      injector.parser.parseKeys("<Plug>TestDelayed"),
+      true
+    )
+    putKeyMapping(
+      MappingMode.N,
+      injector.parser.parseKeys("E"),
+      owner,
+      injector.parser.parseKeys("<Plug>TestIncorrectDelayed"),
+      true
+    )
+    putKeyMapping(
+      MappingMode.O,
       injector.parser.parseKeys("E"),
       owner,
       injector.parser.parseKeys("<Plug>TestIncorrectDelayed"),

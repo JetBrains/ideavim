@@ -60,13 +60,12 @@ enum class MappingMode {
     // This requires the JvmField annotation as it is used (in Java) by an external plugin
     @JvmField val NVO: EnumSet<MappingMode> = EnumSet.of(NORMAL, VISUAL, OP_PENDING, SELECT)
 
-    // TODO: Consider removing/depracting NO, XO, NV and NXO. They're not typical Vim modes that have a map command
+    // TODO: Consider removing/depracting XO, NV and NXO. They're not typical Vim modes that have a map command
     // E.g. `xmap` is for Visual, `vmap` is for Visual and Select. `map` is NVO and `map!` is IC
-    // There are no Vim map commands for NO, XO, NV or NXO. If there isn't a Vim API for them, we shouldn't offer one
+    // There are no Vim map commands for XO, NV or NXO. If there isn't a Vim API for them, we shouldn't offer one
     // either. It could lead to confusion or incorrect mapping
     // Note that builtin commands can be valid only in NXO (Normal, Visual and Op-pending) but that doesn't mean it's
     // a valid mapping mode.
-    val NO: EnumSet<MappingMode> = EnumSet.of(NORMAL, OP_PENDING)
 
     // Used externally, by Java
     @JvmField val XO: EnumSet<MappingMode> = EnumSet.of(VISUAL, OP_PENDING)
@@ -74,8 +73,6 @@ enum class MappingMode {
     val NV: EnumSet<MappingMode> = EnumSet.of(NORMAL, VISUAL, SELECT)
     // Used externally
     val NXO: EnumSet<MappingMode> = EnumSet.of(NORMAL, VISUAL, OP_PENDING)
-
-    val ALL: EnumSet<MappingMode> = EnumSet.allOf(MappingMode::class.java)
 
     // This method is used only for single modes, not groups of them (V is not supported)
     fun parseModeChar(char: Char): MappingMode {
