@@ -632,7 +632,7 @@ See `:help mapping-functions`.
 |        | `digraph_setlist()` | register multiple digraphs         |
 |        | `hasmapto()`        | check if a mapping exists          |
 |        | `mapcheck()`        | check if a matching mapping exists |
-|        | `maparg()`          | get rhs of a mapping               |
+| ✅      | `maparg()`          | get rhs of a mapping               |
 |        | `maplist()`         | get list of all mappings           |
 |        | `mapset()`          | restore a mapping                  |
 |        | `menu_info()`       | get information about a menu item  |

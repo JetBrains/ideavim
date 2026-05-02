@@ -93,4 +93,4 @@ interface VimKeyGroup {
  * (undocumented) mapping in this scenario.
  */
 fun VimKeyGroup.getFirstMappingInfoMatch(name: List<KeyStroke>, mode: Set<MappingMode>) =
-  mode.map { getKeyMapping(it) }.map { it[name] }.firstOrNull()
+  mode.map { getKeyMapping(it) }.map { it[name] }.firstNotNullOfOrNull { it }

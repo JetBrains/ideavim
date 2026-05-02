@@ -81,5 +81,26 @@ enum class MappingMode {
         else -> throw ExException("Unexpected mode for char $char")
       }
     }
+
+    fun Set<MappingMode>.toModeString(): String {
+      if (this == MappingMode.IC) return "!"
+      if (this == MappingMode.NVO) return " "
+      if (this == MappingMode.C) return "c"
+      if (this == MappingMode.I) return "i"
+      //if (modes.equals(MappingMode.L)) return "l";
+
+      // The following modes are concatenated
+      val modes = this
+      return buildString {
+        if (modes.containsAll(MappingMode.N)) append("n")
+        if (modes.containsAll(MappingMode.O)) append("o")
+        if (modes.containsAll(MappingMode.V)) {
+          append("v")
+        } else {
+          if (modes.containsAll(MappingMode.X)) append("x")
+          if (modes.containsAll(MappingMode.S)) append("s")
+        }
+      }
+    }
   }
 }

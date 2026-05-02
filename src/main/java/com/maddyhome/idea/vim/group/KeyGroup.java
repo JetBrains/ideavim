@@ -120,28 +120,6 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
     return actualModes;
   }
 
-  private static @NotNull @NonNls String getModesStringCode(@NotNull Set<MappingMode> modes) {
-    if (modes.equals(MappingMode.IC)) return "!";
-    if (modes.equals(MappingMode.NVO)) return " ";
-    if (modes.equals(MappingMode.C)) return "c";
-    if (modes.equals(MappingMode.I)) return "i";
-    //if (modes.equals(MappingMode.L)) return "l";
-
-    // The following modes are concatenated
-    String mode = "";
-    if (modes.containsAll(MappingMode.N)) mode += "n";
-    if (modes.containsAll(MappingMode.O)) mode += "o";
-
-    if (modes.containsAll(MappingMode.V)) {
-      mode += "v";
-    }
-    else {
-      if (modes.containsAll(MappingMode.X)) mode += "x";
-      if (modes.containsAll(MappingMode.S)) mode += "s";
-    }
-    return mode;
-  }
-
   private static @NotNull List<AnAction> getLocalActions(@NotNull Component component, @NotNull KeyStroke keyStroke) {
     final List<AnAction> results = new ArrayList<>();
     final KeyboardShortcut keyStrokeShortcut = new KeyboardShortcut(keyStroke, null);
@@ -384,7 +362,7 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
     final StringBuilder builder = new StringBuilder();
     for (Pair<Set<MappingMode>, MappingInfo> row : rows) {
       MappingInfo mappingInfo = row.getSecond();
-      builder.append(StringsKt.padEnd(getModesStringCode(row.getFirst()), 3, ' '));
+      builder.append(StringsKt.padEnd(MappingMode.Companion.toModeString(row.getFirst()), 3, ' '));
       builder.append(
         StringsKt.padEnd(VimInjectorKt.getInjector().getParser().toKeyNotation(mappingInfo.getFromKeys()) + " ", 12,
                          ' '));
