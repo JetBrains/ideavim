@@ -13,7 +13,6 @@ import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.key.KeyMapping
-import com.maddyhome.idea.vim.key.KeyMappingLayer
 import com.maddyhome.idea.vim.key.KeyStrokeTrie
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.RequiredShortcut
@@ -64,9 +63,7 @@ abstract class VimKeyGroupBase : VimKeyGroup {
    * @return The root node of the builtin command trie
    */
   override fun getBuiltinCommandsTrie(mappingMode: MappingMode): KeyStrokeTrie<LazyVimCommand> =
-    builtinCommands.getOrPut(mappingMode) { KeyStrokeTrie<LazyVimCommand>(mappingMode.name[0].lowercase()) }
-
-  override fun getKeyMappingLayer(mode: MappingMode): KeyMappingLayer = getKeyMapping(mode)
+    builtinCommands.getOrPut(mappingMode) { KeyStrokeTrie(mappingMode.name[0].lowercase()) }
 
   @Deprecated("Initialization EditorActionHandlerBase for this method breaks the point of lazy initialization")
   protected fun checkCommand(
