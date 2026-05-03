@@ -633,7 +633,7 @@ See `:help mapping-functions`.
 |        | `hasmapto()`        | check if a mapping exists          |
 | ✅      | `mapcheck()`        | check if a matching mapping exists |
 | ✅      | `maparg()`          | get rhs of a mapping               |
-|        | `maplist()`         | get list of all mappings           |
+| ✅      | `maplist()`         | get list of all mappings           |
 |        | `mapset()`          | restore a mapping                  |
 |        | `menu_info()`       | get information about a menu item  |
 |        | `wildmenumode()`    | check if the wildmode is active    |

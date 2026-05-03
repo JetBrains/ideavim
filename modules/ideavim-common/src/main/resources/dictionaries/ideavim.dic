@@ -181,6 +181,7 @@ indexof
 isinf
 maparg
 mapcheck
+maplist
 mapnew
 tolower
 toupper

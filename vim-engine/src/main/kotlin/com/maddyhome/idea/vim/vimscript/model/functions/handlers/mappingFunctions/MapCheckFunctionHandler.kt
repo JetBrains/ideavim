@@ -37,7 +37,7 @@ internal class MapCheckFunctionHandler: MapFunctionHandlerBase<VimString>(minAri
     val modes = getMappingModes(mode)
     val keys = injector.parser.parseKeys(name.value)
 
-    val mappingInfo = injector.keyGroup.getFirstMappingInfoPrefix(keys, modes)
-    return mappingInfo?.getPresentableString()?.asVimString() ?: VimString.EMPTY
+    val mapping = injector.keyGroup.getFirstMappingInfoPrefix(keys, modes)
+    return mapping?.mappingInfo?.getPresentableString()?.asVimString() ?: VimString.EMPTY
   }
 }
