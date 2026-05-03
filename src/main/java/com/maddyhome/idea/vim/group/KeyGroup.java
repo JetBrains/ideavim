@@ -64,8 +64,8 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
     return ShortcutHelper.toShortcutSet(requiredShortcuts);
   }
 
-  private static @NotNull List<Pair<Set<MappingMode>, MappingInfo>> getKeyMappingRows(@NotNull Set<? extends MappingMode> modes,
-                                                                                      @NotNull List<? extends KeyStroke> prefix) {
+  private @NotNull List<Pair<Set<MappingMode>, MappingInfo>> getKeyMappingRows(@NotNull Set<? extends MappingMode> modes,
+                                                                               @NotNull List<? extends KeyStroke> prefix) {
     // Some map commands set a mapping for more than one mode (e.g. `map` sets for Normal, Visual, Select and
     // Op-pending). Vim treats this as a single mapping, and when listing all maps only lists it once, with the
     // appropriate mode indicator(s) in the first column (NVO is a space char). If the lhs mapping is changed or cleared
@@ -81,7 +81,7 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
     final List<KeyStroke> fromKeys = new ArrayList<>();
 
     for (MappingMode mode : modes) {
-      final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(mode);
+      final KeyMapping mapping = getKeyMapping(mode);
 
       // Vim includes mappings for each key in the prefix, where appropriate. That is, it doesn't just all mappings that
       // are descendants of the prefix, but includes the mappings for each key in the prefix as well.
@@ -108,11 +108,11 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
     return rows;
   }
 
-  private static @NotNull Set<MappingMode> getModesForMapping(@NotNull List<? extends KeyStroke> keyStrokes,
-                                                              @NotNull Set<MappingMode> originalMappingModes) {
+  private @NotNull Set<MappingMode> getModesForMapping(@NotNull List<? extends KeyStroke> keyStrokes,
+                                                       @NotNull Set<MappingMode> originalMappingModes) {
     final Set<MappingMode> actualModes = EnumSet.noneOf(MappingMode.class);
     for (MappingMode mode : originalMappingModes) {
-      final MappingInfo mappingInfo = VimPlugin.getKey().getKeyMapping(mode).get(keyStrokes);
+      final MappingInfo mappingInfo = VimKeyGroupKt.getMappingInfo(this, keyStrokes, mode);
       if (mappingInfo != null && mappingInfo.getOriginalModes() == originalMappingModes) {
         actualModes.add(mode);
       }

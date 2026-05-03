@@ -294,22 +294,22 @@ internal object MappingProcessor : KeyConsumer {
     log.trace("Replaying unhandled keys. Looking for mapping in subsequence")
     val keyMapping = injector.keyGroup.getKeyMapping(editor.mode.toMappingMode())
 
-    val subsequence = unhandledKeys.toMutableList()
-    while (subsequence.isNotEmpty()) {
-      val mappingInfo = keyMapping[subsequence]
+    val keys = unhandledKeys.toMutableList()
+    while (keys.isNotEmpty()) {
+      val mappingInfo = keyMapping[keys]
       if (mappingInfo != null) {
         log.trace("Found mapping. Executing it and replaying the rest of the keys")
 
         executeMappingInfo(mappingInfo, editor, context, keyState)
 
         // Replay the rest of the keys, with mapping applied, as though they were typed
-        unhandledKeys.subList(subsequence.size, unhandledKeys.size).forEach {
+        unhandledKeys.subList(keys.size, unhandledKeys.size).forEach {
           KeyHandler.getInstance().handleKey(editor, it, context, allowKeyMappings = true, keyState)
         }
         return
       }
 
-      subsequence.removeLast()
+      keys.removeLast()
     }
 
     log.trace("Replaying unhandled keys. There is no mapping in subsequence. Replaying all keys")

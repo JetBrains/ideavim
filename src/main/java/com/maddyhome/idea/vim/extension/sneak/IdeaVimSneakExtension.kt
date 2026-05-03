@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.VimProjectService
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getMappingInfo
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.command.MappingMode
@@ -321,8 +322,8 @@ private fun VimExtension.mapToFunctionAndProvideKeys(
   val filteredModes2 = mappingModes.filterNotTo(HashSet()) {
     VimPlugin.getKey().hasmapto(it, injector.parser.parseKeys(commandFromOriginalPlugin(keys)))
   }
-  val filteredFromModes = mappingModes.filterNotTo(HashSet()) {
-    injector.keyGroup.getKeyMapping(it)[fromKeys] != null
+  val filteredFromModes = mappingModes.filterNotTo(HashSet()) { mode ->
+    injector.keyGroup.getMappingInfo(fromKeys, mode) != null
   }
 
   val doubleFiltered = mappingModes

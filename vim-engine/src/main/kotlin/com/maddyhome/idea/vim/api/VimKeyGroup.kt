@@ -80,6 +80,8 @@ interface VimKeyGroup {
   fun registerShortcutWithoutAction(keyStroke: KeyStroke, owner: MappingOwner) {}
 }
 
+fun VimKeyGroup.getMappingInfo(keys: List<KeyStroke>, mode: MappingMode) = getKeyMapping(mode)[keys]
+
 /**
  * Retrieve the first mapping that is an exact match for the given LHS keystrokes in the given modes
  *
@@ -91,7 +93,7 @@ interface VimKeyGroup {
  * (undocumented) mapping in this scenario.
  */
 fun VimKeyGroup.getFirstMappingInfoMatch(name: List<KeyStroke>, mode: Set<MappingMode>) =
-  mode.map { getKeyMapping(it) }.map { it[name] }.firstNotNullOfOrNull { it }
+  mode.map { getMappingInfo(name, it) }.firstNotNullOfOrNull { it }
 
 /**
  * Retrieve the first mapping that is a prefix for the given LHS keystrokes, or has those keystrokes as a prefix, in any

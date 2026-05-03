@@ -57,6 +57,7 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimDigraphGroupBase
 import com.maddyhome.idea.vim.api.VimOptionGroup
 import com.maddyhome.idea.vim.api.VimSearchGroupBase
+import com.maddyhome.idea.vim.api.getMappingInfo
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
@@ -682,14 +683,14 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
   fun assertNoMapping(from: String) {
     val keys = injector.parser.parseKeys(from)
     for (mode in EnumSet.allOf(MappingMode::class.java)) {
-      assertNull(VimPlugin.getKey().getKeyMapping(mode)[keys])
+      assertNull(VimPlugin.getKey().getMappingInfo(keys, mode))
     }
   }
 
   fun assertNoMapping(from: String, modes: Set<MappingMode>) {
     val keys = injector.parser.parseKeys(from)
     for (mode in modes) {
-      assertNull(VimPlugin.getKey().getKeyMapping(mode)[keys], "Expected no mapping for $mode")
+      assertNull(VimPlugin.getKey().getMappingInfo(keys, mode), "Expected no mapping for $mode")
     }
   }
 
@@ -697,7 +698,7 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
     val keys = injector.parser.parseKeys(from)
     val toKeys = injector.parser.parseKeys(to)
     for (mode in modes) {
-      val info = VimPlugin.getKey().getKeyMapping(mode)[keys]
+      val info = VimPlugin.getKey().getMappingInfo(keys, mode)
       assertNotNull<Any>(info)
       if (info is ToKeysMappingInfo) {
         assertEquals(toKeys, info.toKeys)
