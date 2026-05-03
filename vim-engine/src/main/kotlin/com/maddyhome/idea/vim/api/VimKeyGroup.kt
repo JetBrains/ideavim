@@ -11,7 +11,6 @@ import com.maddyhome.idea.vim.action.change.LazyVimCommand
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.key.KeyMapping
-import com.maddyhome.idea.vim.key.KeyMappingLayer
 import com.maddyhome.idea.vim.key.KeyStrokeTrie
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
@@ -24,7 +23,6 @@ interface VimKeyGroup {
   fun getKeyRoot(mappingMode: MappingMode): com.maddyhome.idea.vim.key.CommandPartNode<LazyVimCommand>
 
   fun getBuiltinCommandsTrie(mappingMode: MappingMode): KeyStrokeTrie<LazyVimCommand>
-  fun getKeyMappingLayer(mode: MappingMode): KeyMappingLayer
   fun getActions(editor: VimEditor, keyStroke: KeyStroke): List<NativeAction>
   fun getKeymapConflicts(keyStroke: KeyStroke): List<NativeAction>
 
