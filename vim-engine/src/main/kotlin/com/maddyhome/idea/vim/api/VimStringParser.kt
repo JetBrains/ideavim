@@ -62,10 +62,5 @@ interface VimStringParser {
   fun parseVimScriptString(string: String): String
 }
 
-fun key(string: String): KeyStroke {
-  return keys(string).single()
-}
-
-fun keys(string: String): List<KeyStroke> {
-  return injector.parser.parseKeys(string)
-}
+fun key(string: String) = keys(string).single()
+fun keys(string: String) = injector.parser.parseKeys(string)
