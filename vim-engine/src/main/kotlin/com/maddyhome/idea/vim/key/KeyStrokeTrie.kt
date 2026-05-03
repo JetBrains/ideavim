@@ -143,26 +143,33 @@ class KeyStrokeTrie<T>(private val name: String) {
    * returned. E.g., given a prefix of `foo`, nodes such as `f`, `fo`, `foo`, `food` and `fool` will be returned.
    */
   fun getEntries(prefix: List<KeyStroke>? = null, includePrefixNodes: Boolean = false): Sequence<TrieNode<T>> {
-    suspend fun SequenceScope<TrieNode<T>>.yieldTrieNode(node: TrieNodeImpl<T>) {
+    suspend fun SequenceScope<TrieNode<T>>.yieldAllTrieNodes(node: TrieNodeImpl<T>) {
       if (node.data != null) yield(node)
       if (node.children.isInitialized()) {
-        node.children.value.forEach { yieldTrieNode(it.value) }
+        node.children.value.forEach { yieldAllTrieNodes(it.value) }
       }
     }
 
-    return sequence {
-      var node = root
-      prefix?.forEach {
-        if (node.children.isInitialized()) {
-          node = node.children.value[it] ?: return@forEach
-          if (node.data != null && includePrefixNodes) {
-            yield(node)
-          }
+  return sequence {
+    var node = root
+    if (prefix?.isNotEmpty() == true) {
+      // For prefix matching, yield all nodes along the path that have data, then yield the children
+      prefix.forEach {
+        if (!node.children.isInitialized()) return@forEach
+        node = node.children.value[it] ?: return@forEach
+        if (node.data != null && includePrefixNodes) {
+          yield(node)
         }
       }
-      yieldTrieNode(node)
+      if (node != root && node.children.isInitialized()) {
+        node.children.value.forEach { yieldAllTrieNodes(it.value) }
+      }
+    }
+    else {
+      yieldAllTrieNodes(node)
     }
   }
+}
 
   /**
    * Returns a sequence of nodes that contain data, starting at the given prefix
