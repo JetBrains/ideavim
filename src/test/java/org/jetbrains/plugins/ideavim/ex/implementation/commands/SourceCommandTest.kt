@@ -45,7 +45,7 @@ class SourceCommandTest : VimTestCase() {
     configureByText("")
     try {
 
-      val layerPreCheck = injector.keyGroup.getKeyMappingLayer(MappingMode.NORMAL)
+      val layerPreCheck = injector.keyGroup.getKeyMapping(MappingMode.NORMAL)
       val mappingPreCheck = layerPreCheck.getLayer(keys("x"))
       assertNull(mappingPreCheck) // Make sure we don't yet have a mapping from x
 
@@ -71,7 +71,7 @@ class SourceCommandTest : VimTestCase() {
     configureByText("")
     try {
 
-      val layerPreCheck = injector.keyGroup.getKeyMappingLayer(MappingMode.NORMAL)
+      val layerPreCheck = injector.keyGroup.getKeyMapping(MappingMode.NORMAL)
       val mappingPreCheck = layerPreCheck.getLayer(keys("x"))
       assertNull(mappingPreCheck) // Make sure we don't yet have a mapping from x
 
@@ -110,7 +110,7 @@ class SourceCommandTest : VimTestCase() {
       enterCommand("source ${tempDir!!.absolutePathString()}/\$USER/config.vim")
 
       // Verify the file was sourced by checking the mapping was created
-      val layer = injector.keyGroup.getKeyMappingLayer(MappingMode.NORMAL)
+      val layer = injector.keyGroup.getKeyMapping(MappingMode.NORMAL)
       val mapping = layer.getLayer(keys("x"))
       assertTrue(mapping != null, "Mapping should exist, proving file was sourced with env var expansion")
     } finally {
@@ -131,7 +131,7 @@ class SourceCommandTest : VimTestCase() {
     try {
       enterCommand("source ${tempDir!!.absolutePathString()}/\${USER}/config.vim")
 
-      val layer = injector.keyGroup.getKeyMappingLayer(MappingMode.NORMAL)
+      val layer = injector.keyGroup.getKeyMapping(MappingMode.NORMAL)
       val mapping = layer.getLayer(keys("z"))
       assertTrue(mapping != null, "File should be sourced using \${VAR} syntax")
     } finally {
@@ -151,7 +151,7 @@ class SourceCommandTest : VimTestCase() {
     try {
       enterCommand("source ~/.ideavim_test_source.vim")
 
-      val layer = injector.keyGroup.getKeyMappingLayer(MappingMode.NORMAL)
+      val layer = injector.keyGroup.getKeyMapping(MappingMode.NORMAL)
       val mapping = layer.getLayer(keys("a"))
       assertTrue(mapping != null, "File should be sourced using tilde expansion")
     } finally {
@@ -176,7 +176,7 @@ class SourceCommandTest : VimTestCase() {
     try {
       enterCommand("source ~/\$USER/test.vim")
 
-      val layer = injector.keyGroup.getKeyMappingLayer(MappingMode.NORMAL)
+      val layer = injector.keyGroup.getKeyMapping(MappingMode.NORMAL)
       val mapping = layer.getLayer(keys("c"))
       assertTrue(mapping != null, "File should be sourced with both tilde and env var expanded")
     } finally {
