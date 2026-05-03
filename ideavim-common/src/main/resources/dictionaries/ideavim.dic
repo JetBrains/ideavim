@@ -180,6 +180,7 @@ getregtype
 indexof
 isinf
 maparg
+mapcheck
 mapnew
 tolower
 toupper
