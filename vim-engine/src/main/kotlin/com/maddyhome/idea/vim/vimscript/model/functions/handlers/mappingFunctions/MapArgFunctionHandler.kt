@@ -13,7 +13,6 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getFirstMappingInfoMatch
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.MappingMode.Companion.toModeString
 import com.maddyhome.idea.vim.key.ToExpressionMappingInfo
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
@@ -22,10 +21,9 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
-import com.maddyhome.idea.vim.vimscript.model.functions.BuiltinFunctionHandler
 
 @VimscriptFunction("maparg")
-internal class MapArgFunctionHandler : BuiltinFunctionHandler<VimDataType>(minArity = 1, maxArity = 4) {
+internal class MapArgFunctionHandler : MapFunctionHandlerBase<VimDataType>(minArity = 1, maxArity = 4) {
   override fun doFunction(
     arguments: Arguments,
     editor: VimEditor,
@@ -42,19 +40,7 @@ internal class MapArgFunctionHandler : BuiltinFunctionHandler<VimDataType>(minAr
       return if (dict) VimDictionary(LinkedHashMap()) else VimString.EMPTY
     }
 
-    val modes = when (mode?.value?.firstOrNull()) {
-      'n' -> MappingMode.N
-      'v' -> MappingMode.V
-      'o' -> MappingMode.O
-      'i' -> MappingMode.I
-      'c' -> MappingMode.C
-      's' -> MappingMode.S
-      'x' -> MappingMode.X
-//      'l' -> MappingMode.L  // TODO: Langmap
-//      't' -> MappingMode.T  // Terminal-Job. IdeaVim is unlikely to support this
-      else -> MappingMode.NVO
-    }
-
+    val modes = getMappingModes(mode)
     val keys = injector.parser.parseKeys(name.value)
 
     val mappingInfo = injector.keyGroup.getFirstMappingInfoMatch(keys, modes)
