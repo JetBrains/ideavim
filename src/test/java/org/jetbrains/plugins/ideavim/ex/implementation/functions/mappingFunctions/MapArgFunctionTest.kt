@@ -120,6 +120,13 @@ class MapArgFunctionTest : VimTestCase("\n") {
     assertCommandOutput("echo string(maparg('x', 'n', 0, 1)['mode'])", "' '")
   }
 
+  @Test
+  fun `test maparg returns current mode after unmapping in one mode`() {
+    enterCommand("map x yy")  // NVO
+    enterCommand("nunmap x")  // Now the mapping is OV
+    assertCommandOutput("echo string(maparg('x', '', 0, 1)['mode'])", "'ov'")
+  }
+
   // TODO: More options for map?
 
   @Test

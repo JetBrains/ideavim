@@ -94,7 +94,9 @@ fun VimKeyGroup.getMappingInfo(keys: List<KeyStroke>, mode: MappingMode) = getKe
  * (undocumented) mapping in this scenario.
  */
 fun VimKeyGroup.getFirstMappingInfoMatch(name: List<KeyStroke>, mode: Set<MappingMode>) =
-  mode.map { getMappingInfo(name, it) }.firstNotNullOfOrNull { it }
+  mode.mapNotNull { getMappingInfo(name, it) }
+    .map { MappingInfoWithMode(it, getCurrentModes(name, it.originalModes)) }
+    .firstOrNull()
 
 /**
  * Retrieve the first mapping that is a prefix for the given LHS keystrokes, or has those keystrokes as a prefix, in any
@@ -106,7 +108,7 @@ fun VimKeyGroup.getFirstMappingInfoMatch(name: List<KeyStroke>, mode: Set<Mappin
  * (undocumented) mapping.
  */
 fun VimKeyGroup.getFirstMappingInfoPrefix(name: List<KeyStroke>, mode: Set<MappingMode>) =
-  mode.map { getKeyMapping(it) }.flatMap { it.getAll(name) }.map { it.mappingInfo }.firstNotNullOfOrNull { it }
+  getAllMappingInfoWithMode(name, mode).firstOrNull()
 
 data class MappingInfoWithMode(val mappingInfo: MappingInfo, val modes: Set<MappingMode>)
 
@@ -130,24 +132,6 @@ private typealias MappingModes = Set<MappingMode>
  * or use the keystroke sequence as a prefix are returned.
  */
 fun VimKeyGroup.getAllMappingInfoWithMode(prefix: List<KeyStroke>, modes: Set<MappingMode>): List<MappingInfoWithMode> {
-  /**
-   * Get the actual modes used by a given mapping
-   *
-   * The mapping can be made across multiple modes (e.g. `:map` applies to NVO). When a mapping is removed or changed
-   * from one mode, the existing mapping remains, with a different set of modes. This function returns the actual modes
-   * that a given mapping is currently defined for.
-   */
-  fun getCurrentModesForMapping(keys: KeyStrokes, originalModes: MappingModes): MappingModes {
-    if (originalModes.size == 1) return originalModes
-    val actualModes = noneOfEnum<MappingMode>()
-    originalModes.forEach {
-      val mappingInfo = getMappingInfo(keys, it)
-      if (mappingInfo != null && mappingInfo.originalModes == originalModes) {
-        actualModes.add(it)
-      }
-    }
-    return actualModes
-  }
 
   val results = mutableListOf<MappingInfoWithMode>()
   val fromKeysPool = mutableListOf<KeyStroke>()
@@ -175,7 +159,7 @@ fun VimKeyGroup.getAllMappingInfoWithMode(prefix: List<KeyStroke>, modes: Set<Ma
         entry.collectPath(fromKeysPool)
         if (multiModeMappings[fromKeysPool]?.contains(originalModes) != true) {
           multiModeMappings.computeIfAbsent(fromKeysPool.toList()) { mutableSetOf() }.add(originalModes)
-          val currentModes = getCurrentModesForMapping(fromKeysPool, originalModes)
+          val currentModes = getCurrentModes(fromKeysPool, originalModes)
           results.add(MappingInfoWithMode(mappingInfo, currentModes))
         }
       }
@@ -183,4 +167,23 @@ fun VimKeyGroup.getAllMappingInfoWithMode(prefix: List<KeyStroke>, modes: Set<Ma
   }
   results.sortWith(Comparator.comparing { it.mappingInfo })
   return results
+}
+
+/**
+ * Get the actual modes used by a given mapping
+ *
+ * The mapping can be made across multiple modes (e.g. `:map` applies to NVO). When a mapping is removed or changed
+ * from one mode, the existing mapping remains, with a different set of modes. This function returns the actual modes
+ * that a given mapping is currently defined for.
+ */
+private fun VimKeyGroup.getCurrentModes(keys: KeyStrokes, originalModes: MappingModes): Set<MappingMode> {
+  if (originalModes.size == 1) return originalModes
+  val actualModes = noneOfEnum<MappingMode>()
+  originalModes.forEach {
+    val mappingInfo = getMappingInfo(keys, it)
+    if (mappingInfo != null && mappingInfo.originalModes == originalModes) {
+      actualModes.add(it)
+    }
+  }
+  return actualModes
 }
