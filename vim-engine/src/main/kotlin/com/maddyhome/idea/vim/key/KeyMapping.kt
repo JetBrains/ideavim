@@ -58,9 +58,6 @@ class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>> {
     return null
   }
 
-  // TODO: Do we need this as well as get()?
-  fun getLayer(keys: List<KeyStroke>): MappingInfoLayer? = get(keys)
-
   @Deprecated("Use get(List<KeyStroke>) to maintain the same lookup key type and avoid unnecessary wrapping")
   operator fun get(keys: Iterable<KeyStroke>): MappingInfo? =
     get(keys as? List<KeyStroke> ?: keys.toList())
