@@ -94,3 +94,15 @@ interface VimKeyGroup {
  */
 fun VimKeyGroup.getFirstMappingInfoMatch(name: List<KeyStroke>, mode: Set<MappingMode>) =
   mode.map { getKeyMapping(it) }.map { it[name] }.firstNotNullOfOrNull { it }
+
+/**
+ * Retrieve the first mapping that is a prefix for the given LHS keystrokes, or has those keystrokes as a prefix, in any
+ * of the given modes.
+ *
+ * This function is essentially equivalent to the Vim function `mapcheck()`.
+ *
+ * There can be multiple mappings that match, but like `mapcheck()`, this function will return an arbitrary
+ * (undocumented) mapping.
+ */
+fun VimKeyGroup.getFirstMappingInfoPrefix(name: List<KeyStroke>, mode: Set<MappingMode>) =
+  mode.map { getKeyMapping(it) }.flatMap { it.getAll(name) }.map { it.mappingInfo }.firstNotNullOfOrNull { it }
