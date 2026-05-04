@@ -12,6 +12,7 @@ import com.intellij.openapi.options.advanced.AdvancedSettings
 import com.intellij.util.ui.tree.TreeUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import javax.swing.KeyStroke
 import javax.swing.tree.TreeNode
@@ -135,6 +136,9 @@ val navigationMappings: Map<List<KeyStroke>, NerdTreeAction> = mutableMapOf<List
   register("NERDTreeMapJumpNextSibling", "<C-J>", NerdTreeAction.swing("selectNextSibling"))
   register("NERDTreeMapJumpPrevSibling", "<C-K>", NerdTreeAction.swing("selectPreviousSibling"))
 
-  register("/", NerdTreeAction.ij("SpeedSearch"))
+  register("/", NerdTreeAction { event, tree ->
+    armSelectionRestoreOnEscape(tree)
+    NerdTreeAction.callAction(null, "SpeedSearch", event.dataContext.vim)
+  })
   register("<ESC>", NerdTreeAction { _, _ -> })
 }
