@@ -56,7 +56,6 @@ interface VimKeyGroup {
   fun removeKeyMapping(owner: MappingOwner)
   fun removeKeyMapping(modes: Set<MappingMode>)
   fun removeKeyMapping(modes: Set<MappingMode>, keys: List<KeyStroke>)
-  fun showKeyMappings(modes: Set<MappingMode>, prefix: List<KeyStroke>, editor: VimEditor): Boolean
   fun getKeyMapping(mode: MappingMode): KeyMapping
   fun updateShortcutKeysRegistration()
   fun unregisterCommandActions()

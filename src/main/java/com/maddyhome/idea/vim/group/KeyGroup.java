@@ -32,7 +32,6 @@ import com.maddyhome.idea.vim.helper.ShortcutHelper;
 import com.maddyhome.idea.vim.key.*;
 import com.maddyhome.idea.vim.newapi.IjNativeAction;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import kotlin.text.StringsKt;
 import org.jdom.Element;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -292,36 +291,6 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
   @Override
   public void loadState(@NotNull Element state) {
     readData(state);
-  }
-
-  @Override
-  public boolean showKeyMappings(@NotNull Set<? extends MappingMode> modes,
-                                 @NotNull List<? extends KeyStroke> prefix,
-                                 @NotNull VimEditor editor) {
-    var rows = VimKeyGroupKt.getAllMappingInfoWithMode(this, prefix, modes);
-
-    final StringBuilder builder = new StringBuilder();
-    for (MappingInfoWithMode row : rows) {
-      MappingInfo mappingInfo = row.getMappingInfo();
-      builder.append(StringsKt.padEnd(MappingMode.Companion.toModeString(row.getModes()), 3, ' '));
-      builder.append(
-        StringsKt.padEnd(VimInjectorKt.getInjector().getParser().toKeyNotation(mappingInfo.getFromKeys()) + " ", 12,
-                         ' '));
-      builder.append(mappingInfo.isRecursive() ? " " : "*");  // Or `&` if script-local mappings being recursive
-      builder.append(" ");  // Should be `@` if it's a buffer-local mapping
-      builder.append(mappingInfo.getPresentableString());
-      builder.append("\n");
-    }
-
-    if (builder.isEmpty()) {
-      builder.append("No mapping found");
-    }
-
-    VimOutputPanel outputPanel = injector.getOutputPanel()
-      .getOrCreate(editor, injector.getExecutionContextManager().getEditorExecutionContext(editor));
-    outputPanel.addText(builder.toString(), true, MessageType.STANDARD);
-    outputPanel.show();
-    return true;
   }
 
   @Override
