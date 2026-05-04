@@ -698,7 +698,8 @@ public class EditorHelper {
    * Checks if the editor is hosted in the Commit tool window, so we can enable Vim features
    */
   public static boolean isCommitWindowEditor(@NotNull Editor editor) {
-    // The best heuristic we have is the file name, which is Dummy.txt
+    @SuppressWarnings("deprecation") Key<?> dataKey = Key.findKeyByName("Vcs.CommitMessage.Panel");
+    if (dataKey != null && editor.getDocument().getUserData(dataKey) != null) return true;
     var file = EditorHelper.getVirtualFile(editor);
     return file != null && file.getName().contains("Dummy.txt");
   }
