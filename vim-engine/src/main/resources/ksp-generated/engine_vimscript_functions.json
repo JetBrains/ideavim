@@ -52,6 +52,7 @@
   "mapnew": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.collectionFunctions.MapNewFunctionHandler",
   "max": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.collectionFunctions.MaxFunctionHandler",
   "min": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.collectionFunctions.MinFunctionHandler",
+  "mode": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.variousFunctions.ModeFunctionHandler",
   "nr2char": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.stringFunctions.Nr2charFunctionHandler",
   "or": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.bitwiseFunctions.OrFunctionHandler",
   "pow": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.floatFunctions.PowFunctionHandler",
