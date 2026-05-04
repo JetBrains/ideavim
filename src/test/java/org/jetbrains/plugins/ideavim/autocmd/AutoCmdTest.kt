@@ -321,4 +321,29 @@ class AutoCmdTest : VimTestCase() {
     typeText(injector.parser.parseKeys("i"))
     assertExOutput("all\npython")
   }
+
+  @Test
+  fun `mode() in InsertEnter autocmd returns n (fires before transition)`() {
+    enterCommand("autocmd InsertEnter * echo mode()")
+    typeText(injector.parser.parseKeys("i"))
+    assertState(Mode.INSERT)
+    assertExOutput("n")
+  }
+
+  @Test
+  fun `mode() in InsertEnter autocmd for Replace returns n (fires before transition)`() {
+    enterCommand("autocmd InsertEnter * echo mode()")
+    typeText(injector.parser.parseKeys("R"))
+    assertState(Mode.REPLACE)
+    assertExOutput("n")
+  }
+
+  @Test
+  fun `mode() in InsertLeave autocmd returns n (fires after transition)`() {
+    enterCommand("autocmd InsertLeave * echo mode()")
+    typeText(injector.parser.parseKeys("i"))
+    typeText(injector.parser.parseKeys("<esc>"))
+    assertState(Mode.NORMAL())
+    assertExOutput("n")
+  }
 }
