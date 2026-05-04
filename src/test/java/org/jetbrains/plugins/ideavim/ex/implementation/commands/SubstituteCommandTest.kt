@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -1478,5 +1478,65 @@ class SubstituteCommandTest : VimTestCase() {
     } finally {
       enterCommand("set nooldundo")
     }
+  }
+
+  @Test
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test substitute with e flag suppresses pattern not found error`() {
+    configureByText("${c}Hello world\n")
+    enterCommand("s/missing//e")
+    assertPluginError(false)
+    assertStatusLineCleared()
+  }
+
+  @Test
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test substitute without e flag reports pattern not found error`() {
+    configureByText("${c}Hello world\n")
+    enterCommand("s/missing//")
+    assertPluginError(true)
+    assertPluginErrorMessage("E486: Pattern not found: missing")
+  }
+
+  @Test
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test substitute with e flag and trailing whitespace pattern`() {
+    // The classic autocmd use case: %s/\s\+$//e should not produce errors when there is no trailing whitespace
+    configureByText("${c}Hello world\n")
+    enterCommand("%s/\\s\\+$//e")
+    assertPluginError(false)
+    assertStatusLineCleared()
+  }
+
+  @Test
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test substitute with e flag combined with g flag`() {
+    configureByText("${c}Hello world\n")
+    enterCommand("s/missing//ge")
+    assertPluginError(false)
+    assertStatusLineCleared()
+  }
+
+  @Test
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test substitute with e flag still performs substitution when pattern matches`() {
+    doTest(
+      exCommand("s/world/universe/e"),
+      "${c}Hello world\n",
+      "${c}Hello universe\n",
+    )
+    assertPluginError(false)
+  }
+
+  @Test
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test substitute e flag does not persist to next substitute`() {
+    // :h :&& - flags are not kept between substitute commands
+    configureByText("${c}Hello world\n")
+    enterCommand("s/missing//e")
+    assertPluginError(false)
+    enterCommand("s/missing//")
+    assertPluginError(true)
+    assertPluginErrorMessage("E486: Pattern not found: missing")
   }
 }
