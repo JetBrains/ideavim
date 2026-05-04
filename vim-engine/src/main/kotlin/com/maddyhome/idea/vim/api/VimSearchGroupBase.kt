@@ -644,8 +644,10 @@ abstract class VimSearchGroupBase : VimSearchGroup {
         options
       )
       if (lineToNextSubstitute == null) {
-        injector.messages.indicateError()
-        injector.messages.showStatusBarMessage(null, "E486: Pattern not found: $pattern")
+        if (doError) {
+          injector.messages.indicateError()
+          injector.messages.showStatusBarMessage(null, "E486: Pattern not found: $pattern")
+        }
         return true
       }
       val (line, nextSubstitute) = lineToNextSubstitute
@@ -855,7 +857,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     if (!gotQuit) {
       if (lastMatchLine != -1) {
         caret.moveToOffset(injector.motion.moveCaretToLineStartSkipLeading(editor, lastMatchLine))
-      } else {
+      } else if (doError) {
         injector.messages.showErrorMessage(editor, "E486: Pattern not found: $pattern")
       }
     }
