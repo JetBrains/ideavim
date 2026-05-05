@@ -17,17 +17,31 @@ import com.maddyhome.idea.vim.key.MappingInfo
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
+import org.jetbrains.annotations.TestOnly
 import javax.swing.KeyStroke
 
 interface VimKeyGroup {
-  @Suppress("DEPRECATION")
-  @Deprecated("Use getBuiltinCommandTrie", ReplaceWith("getBuiltinCommandsTrie(mappingMode)"))
-  fun getKeyRoot(mappingMode: MappingMode): com.maddyhome.idea.vim.key.CommandPartNode<LazyVimCommand>
-
+  /**
+   * Returns the builtin commands for the given node in the form of a trie of keystrokes, with each command at the leaf
+   * of the keystroke
+   */
   fun getBuiltinCommandsTrie(mappingMode: MappingMode): KeyStrokeTrie<LazyVimCommand>
   fun getActions(editor: VimEditor, keyStroke: KeyStroke): List<NativeAction>
   fun getKeymapConflicts(keyStroke: KeyStroke): List<NativeAction>
 
+  /**
+   * Get an accessor class to maintain and manage maps for a specific mode
+   *
+   * The name is unfortunate, since we also use "key mapping" in the functions to add/remove a map. However, we can't
+   * rename this as it is used by external plugins.
+   *
+   * To get the details of a map for a specific mode, fetch the [KeyMapping] and use its accessor functions. To get
+   * map details for a set of modes (e.g., `NVO` when calling `:map`) use the [getAllMappingInfoWithMode] helper
+   * functions.
+   */
+  fun getKeyMapping(mode: MappingMode): KeyMapping
+
+  /** Adds or updates a new map from a key sequence to an IdeaVim extension for a given set of modes */
   fun putKeyMapping(
     modes: Set<MappingMode>,
     fromKeys: List<KeyStroke>,
@@ -36,6 +50,7 @@ interface VimKeyGroup {
     recursive: Boolean,
   )
 
+  /** Adds or updates a traditional Vim map from one key sequence to another for a give set of nodes */
   fun putKeyMapping(
     modes: Set<MappingMode>,
     fromKeys: List<KeyStroke>,
@@ -44,6 +59,7 @@ interface VimKeyGroup {
     recursive: Boolean,
   )
 
+  /** Adds or updates a traditional Vim expression map from a key sequence to an expression for a given set of modes */
   fun putKeyMapping(
     modes: Set<MappingMode>,
     fromKeys: List<KeyStroke>,
@@ -53,32 +69,56 @@ interface VimKeyGroup {
     recursive: Boolean,
   )
 
+  /** Remove all maps owned by the given owner, across all modes */
   fun removeKeyMapping(owner: MappingOwner)
+
+  /**
+   * Removes all maps for the given set of modes
+   *
+   * Typically used by the `:mapclear` family of commands.
+   */
   fun removeKeyMapping(modes: Set<MappingMode>)
+
+  /**
+   * Removes all maps matching the given keys for the given set of modes
+   *
+   * Typically used by the `:unmap` family of commands.
+   */
   fun removeKeyMapping(modes: Set<MappingMode>, keys: List<KeyStroke>)
-  fun getKeyMapping(mode: MappingMode): KeyMapping
-  fun updateShortcutKeysRegistration()
-  fun unregisterCommandActions()
+
+  @TestOnly
   fun resetKeyMappings()
 
   /**
-   * Returns true if there exists a mapping to the given left-hand side keystrokes
+   * Returns true if there exists a mapping to the given right-hand side keystrokes for the given mode
    *
    * Note that the Vim function `hasmapto()` can accept a set of modes, and checks if any mapping _contains_ the given
    * left-hand side mapping, rather than is a direct map. (It also handles abbreviations)
    */
   fun hasmapto(mode: MappingMode, toKeys: List<KeyStroke>): Boolean
 
-  val shortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo>
-  val savedShortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo>
-
+  /**
+   * Wait for a character from the user
+   *
+   * Equivalent to Vim's `getchar()` function.
+   */
   fun getChar(editor: VimEditor): Char?
 
-  /** Registers a command action and its shortcut keys. */
+  /** Registers a command action to the builtin command trie, together with its shortcut keys. */
   fun registerCommandAction(command: LazyVimCommand) {}
+  fun unregisterCommandActions()
 
   /** Registers a shortcut that is handled directly by KeyHandler, rather than by an action. */
   fun registerShortcutWithoutAction(keyStroke: KeyStroke, owner: MappingOwner) {}
+  val shortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo>
+  val savedShortcutConflicts: MutableMap<KeyStroke, ShortcutOwnerInfo>
+
+  /**
+   * Deprecated function to get the builtin commands for the given mode in a form that can be iterated over
+   */
+  @Suppress("DEPRECATION")
+  @Deprecated("Use getBuiltinCommandTrie", ReplaceWith("getBuiltinCommandsTrie(mappingMode)"))
+  fun getKeyRoot(mappingMode: MappingMode): com.maddyhome.idea.vim.key.CommandPartNode<LazyVimCommand>
 }
 
 fun VimKeyGroup.getMappingInfo(keys: List<KeyStroke>, mode: MappingMode) = getKeyMapping(mode)[keys]
