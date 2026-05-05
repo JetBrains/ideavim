@@ -36,6 +36,14 @@ class ExCommandTree {
     return abbrevToCommand[abbreviation]
   }
 
+  /**
+   * Results are sorted alphabetically; command-name Tab completion relies on this
+   * order to cycle through matches deterministically (e.g. `:set` -> `set`, `setglobal`, `sethandler`, ...).
+   */
+  fun findFullCommandsByPrefix(prefix: String): List<String> {
+    return commandToInstance.keys.filter { it.startsWith(prefix) }.sorted()
+  }
+
   private fun parseCommandPattern(commandsPattern: String): List<Pair<String, String>> {
     val result = mutableListOf<Pair<String, String>>()
     val commands = commandsPattern.split(",")

@@ -112,12 +112,23 @@ private fun startNewCompletion(
   return true
 }
 
-private fun findMatches(parsed: ParsedCommandLine, context: ExecutionContext): List<String>? {
-  val fullCommandName = injector.vimscriptParser.exCommands.getFullCommandName(parsed.commandName) ?: return null
-  val completionType = CommandCompletionTypes.getCompletionType(fullCommandName)
-  if (completionType == CommandLineCompletionType.NONE) return null
+private fun findMatches(parsed: CommandLineCompletionContext, context: ExecutionContext): List<String>? {
+  return when (parsed) {
+    is CommandNameCompletionContext -> findCommandNameMatches(parsed)
+    is ArgumentCompletionContext -> findArgumentMatches(parsed, context)
+  }
+}
 
-  return injector.file.listFilesForCompletion(parsed.argumentPrefix, context)
+private fun findCommandNameMatches(parsed: CommandNameCompletionContext): List<String> {
+  return injector.vimscriptParser.exCommands.findFullCommandsByPrefix(parsed.prefix)
+}
+
+private fun findArgumentMatches(parsed: ArgumentCompletionContext, context: ExecutionContext): List<String>? {
+  val fullCommandName = injector.vimscriptParser.exCommands.getFullCommandName(parsed.commandName) ?: return null
+  return when (CommandCompletionTypes.getCompletionType(fullCommandName)) {
+    CommandLineCompletionType.FILE -> injector.file.listFilesForCompletion(parsed.argumentPrefix, context)
+    CommandLineCompletionType.NONE -> null
+  }
 }
 
 internal fun selectMatch(completion: CommandLineCompletion, forward: Boolean): String? {
