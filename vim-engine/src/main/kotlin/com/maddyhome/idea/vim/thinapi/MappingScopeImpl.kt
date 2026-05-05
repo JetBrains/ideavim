@@ -12,6 +12,7 @@ import com.intellij.vim.api.VimApi
 import com.intellij.vim.api.scopes.MappingScope
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.hasMapTo
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -48,10 +49,7 @@ class MappingScopeImpl(
   }
 
   override fun hasmapto(to: String): Boolean {
-    val toKeys = injector.parser.parseKeys(to)
-    return MappingMode.NVO.any { mode ->
-      injector.keyGroup.hasmapto(mode, toKeys)
-    }
+    return injector.keyGroup.hasMapTo(to, MappingMode.NVO)
   }
 
   // ===== Normal mode (nmap/nnoremap/nunmap) =====
@@ -77,7 +75,7 @@ class MappingScopeImpl(
   }
 
   override fun nhasmapto(to: String): Boolean {
-    return injector.keyGroup.hasmapto(MappingMode.NORMAL, injector.parser.parseKeys(to))
+    return injector.keyGroup.hasMapTo(to, MappingMode.N)
   }
 
   // ===== Visual and select modes (vmap/vnoremap/vunmap) =====
@@ -106,9 +104,7 @@ class MappingScopeImpl(
   }
 
   override fun vhasmapto(to: String): Boolean {
-    val toKeys = injector.parser.parseKeys(to)
-    return injector.keyGroup.hasmapto(MappingMode.VISUAL, toKeys) ||
-      injector.keyGroup.hasmapto(MappingMode.SELECT, toKeys)
+    return injector.keyGroup.hasMapTo(to, MappingMode.V)
   }
 
   // ===== Visual mode (xmap/xnoremap/xunmap) =====
@@ -134,7 +130,7 @@ class MappingScopeImpl(
   }
 
   override fun xhasmapto(to: String): Boolean {
-    return injector.keyGroup.hasmapto(MappingMode.VISUAL, injector.parser.parseKeys(to))
+    return injector.keyGroup.hasMapTo(to, MappingMode.X)
   }
 
   // ===== Select mode (smap/snoremap/sunmap) =====
@@ -160,7 +156,7 @@ class MappingScopeImpl(
   }
 
   override fun shasmapto(to: String): Boolean {
-    return injector.keyGroup.hasmapto(MappingMode.SELECT, injector.parser.parseKeys(to))
+    return injector.keyGroup.hasMapTo(to, MappingMode.S)
   }
 
   // ===== Operator pending mode (omap/onoremap/ounmap) =====
@@ -186,7 +182,7 @@ class MappingScopeImpl(
   }
 
   override fun ohasmapto(to: String): Boolean {
-    return injector.keyGroup.hasmapto(MappingMode.OP_PENDING, injector.parser.parseKeys(to))
+    return injector.keyGroup.hasMapTo(to, MappingMode.O)
   }
 
   // ===== Insert mode (imap/inoremap/iunmap) =====
@@ -212,7 +208,7 @@ class MappingScopeImpl(
   }
 
   override fun ihasmapto(to: String): Boolean {
-    return injector.keyGroup.hasmapto(MappingMode.INSERT, injector.parser.parseKeys(to))
+    return injector.keyGroup.hasMapTo(to, MappingMode.I)
   }
 
   // ===== Command line mode (cmap/cnoremap/cunmap) =====
@@ -238,7 +234,7 @@ class MappingScopeImpl(
   }
 
   override fun chasmapto(to: String): Boolean {
-    return injector.keyGroup.hasmapto(MappingMode.CMD_LINE, injector.parser.parseKeys(to))
+    return injector.keyGroup.hasMapTo(to, MappingMode.C)
   }
 
   // ===== Private helper methods =====
