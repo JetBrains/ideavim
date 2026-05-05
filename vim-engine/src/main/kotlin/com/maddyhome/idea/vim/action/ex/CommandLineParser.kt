@@ -9,30 +9,69 @@
 package com.maddyhome.idea.vim.action.ex
 
 /**
- * Lightweight parser for extracting the command name and argument prefix
- * from a partially-typed ex command line. Used for Tab completion context detection.
+ * Parsed completion context for a partially-typed ex command line. Used for Tab completion
+ * context detection.
+ *
+ *  - [CommandNameCompletionContext]: the user is still typing the command name
+ *    (e.g. `:vs` -> complete to `:vsplit`).
+ *  - [ArgumentCompletionContext]: a command name plus a separator has been typed,
+ *    so completion targets the argument (e.g. `:edit foo` -> complete file paths).
  */
-internal data class ParsedCommandLine(
+internal sealed interface CommandLineCompletionContext {
+  val completionStart: Int
+}
+
+internal data class CommandNameCompletionContext(
+  val prefix: String,
+  override val completionStart: Int,
+) : CommandLineCompletionContext
+
+internal data class ArgumentCompletionContext(
   val commandName: String,
   val argumentPrefix: String,
-  val completionStart: Int,
-)
+  override val completionStart: Int,
+) : CommandLineCompletionContext
 
-internal fun parseCommandLineForCompletion(text: String): ParsedCommandLine? {
+internal fun parseCommandLineForCompletion(text: String): CommandLineCompletionContext? {
   val trimmed = text.trimStart()
   if (trimmed.isEmpty()) return null
 
   val commandName = extractCommandName(trimmed) ?: return null
-  val commandEnd = commandName.length
+  val leadingSpacesLength = text.length - trimmed.length
 
-  if (!hasArgumentSeparator(trimmed, commandEnd)) return null
-
-  val argStart = skipSpaces(trimmed, commandEnd)
-  val argPrefix = trimmed.substring(argStart)
-  val leadingSpaces = text.length - trimmed.length
-
-  return ParsedCommandLine(commandName, argPrefix, leadingSpaces + argStart)
+  return if (isCommandNameOnly(trimmed, commandName)) {
+    parseCommandNameContext(commandName, leadingSpacesLength)
+  } else {
+    parseArgumentContext(trimmed, commandName, leadingSpacesLength)
+  }
 }
+
+private fun isCommandNameOnly(trimmed: String, commandName: String): Boolean =
+  commandName.length == trimmed.length
+
+private fun parseCommandNameContext(commandName: String, leadingSpacesLength: Int): CommandNameCompletionContext? {
+  if (isExplicitBangForm(commandName)) return null
+  return CommandNameCompletionContext(commandName, leadingSpacesLength)
+}
+
+private fun parseArgumentContext(
+  trimmed: String,
+  commandName: String,
+  leadingSpacesLength: Int,
+): ArgumentCompletionContext? {
+  val commandLength = commandName.length
+  if (!hasArgumentSeparator(trimmed, commandLength)) return null
+
+  val argStart = skipSpaces(trimmed, commandLength)
+  val argPrefix = trimmed.substring(argStart)
+  return ArgumentCompletionContext(commandName, argPrefix, leadingSpacesLength + argStart)
+}
+
+/**
+ * A trailing bang means the user has committed to a specific command form;
+ * completing the name (e.g. `vs!` -> `vsplit`) would silently change their intent.
+ */
+private fun isExplicitBangForm(commandName: String): Boolean = commandName.endsWith('!')
 
 private fun extractCommandName(text: String): String? {
   var end = 0

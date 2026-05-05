@@ -135,6 +135,25 @@ class CommandLineCompletionTest : VimExTestCase() {
   }
 
   @Test
+  fun `test tab does not file-complete echo argument even when prefix matches a real file`() {
+    // The argument prefix would match `alpha.txt` if file completion ran -- it must not.
+    typeText(":echo $tempPath/a<Tab>")
+    assertExText("echo $tempPath/a")
+  }
+
+  @Test
+  fun `test tab does not file-complete let argument even when prefix matches a real file`() {
+    typeText(":let $tempPath/b<Tab>")
+    assertExText("let $tempPath/b")
+  }
+
+  @Test
+  fun `test tab does not file-complete map argument even when prefix matches a real file`() {
+    typeText(":map $tempPath/s<Tab>")
+    assertExText("map $tempPath/s")
+  }
+
+  @Test
   fun `test typing after completion invalidates session`() {
     typeText(":edit $tempPath/b<Tab>")
     assertExText("edit $tempPath/beta.txt")
@@ -427,5 +446,96 @@ class CommandLineCompletionTest : VimExTestCase() {
 
     typeText("<Left>")
     assertExText("edit $tempPath/subdir/notes.md")
+  }
+
+  @Test
+  fun `test tab completes command name from abbreviation`() {
+    typeText(":vs<Tab>")
+    assertExText("vsplit")
+  }
+
+  @Test
+  fun `test tab completes command name with single match`() {
+    typeText(":tabc<Tab>")
+    assertExText("tabclose")
+  }
+
+  @Test
+  fun `test tab on full command name with no longer match keeps it unchanged`() {
+    typeText(":edit<Tab>")
+    assertExText("edit")
+  }
+
+  @Test
+  fun `test tab cycles through command names sharing a prefix`() {
+    typeText(":set<Tab>")
+    assertExText("set")
+
+    typeText("<Tab>")
+    assertExText("setglobal")
+
+    typeText("<Tab>")
+    assertExText("sethandler")
+
+    typeText("<Tab>")
+    assertExText("setlocal")
+  }
+
+  @Test
+  fun `test tab wraps after last command name match`() {
+    typeText(":set<Tab>")
+    typeText("<Tab>")
+    typeText("<Tab>")
+    typeText("<Tab>")
+    assertExText("setlocal")
+
+    typeText("<Tab>")
+    assertExText("set")
+  }
+
+  @Test
+  fun `test shift tab cycles command names backwards`() {
+    typeText(":set<S-Tab>")
+    assertExText("setlocal")
+
+    typeText("<S-Tab>")
+    assertExText("sethandler")
+  }
+
+  @Test
+  fun `test right arrow cycles command names forward after tab`() {
+    typeText(":set<Tab>")
+    assertExText("set")
+
+    typeText("<Right>")
+    assertExText("setglobal")
+  }
+
+  @Test
+  fun `test left arrow cycles command names backward after tab`() {
+    typeText(":set<Tab>")
+    assertExText("set")
+
+    typeText("<Left>")
+    assertExText("setlocal")
+  }
+
+  @Test
+  fun `test tab on unknown command prefix does not change text`() {
+    typeText(":xyzzy<Tab>")
+    assertExText("xyzzy")
+  }
+
+  @Test
+  fun `test typing after command name completion invalidates session`() {
+    typeText(":set<Tab>")
+    assertExText("set")
+
+    typeText(" foo")
+    assertExText("set foo")
+
+    // `set` has no argument completion type registered, so Tab in argument position is a no-op.
+    typeText("<Tab>")
+    assertExText("set foo")
   }
 }
