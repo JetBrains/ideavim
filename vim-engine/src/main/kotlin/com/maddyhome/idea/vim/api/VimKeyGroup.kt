@@ -89,15 +89,7 @@ interface VimKeyGroup {
   @TestOnly
   fun resetKeyMappings()
 
-  /**
-   * Returns true if there exists a mapping to the given right-hand side keystrokes for the given mode
-   *
-   * Note that the Vim function `hasmapto()` can accept a set of modes, and checks if any mapping _contains_ the given
-   * left-hand side mapping, rather than is a direct map. (It also handles abbreviations)
-   */
-  fun hasmapto(mode: MappingMode, toKeys: List<KeyStroke>): Boolean
-
-  /**
+     /**
    * Wait for a character from the user
    *
    * Equivalent to Vim's `getchar()` function.
@@ -122,6 +114,32 @@ interface VimKeyGroup {
 }
 
 fun VimKeyGroup.getMappingInfo(keys: List<KeyStroke>, mode: MappingMode) = getKeyMapping(mode)[keys]
+
+/**
+ * Returns true if a mapping exists that contains the given key sequence somewhere in the right-hand-side of the mapping
+ *
+ * This function is essentially equivalent to Vim's `hasmapto()` function. Note that this returns true if the target
+ * mapping contains the given key sequence in any of the specified modes, and not just matches. A value `yy` will match
+ * `ddyy`.
+ */
+fun VimKeyGroup.hasMapTo(what: List<KeyStroke>, modes: Set<MappingMode>): Boolean {
+  // We convert back to a string representation of the mapping to get the canonical representation of any special keys
+  val canonicalWhat = injector.parser.toKeyNotation(what)
+  return modes.any { mode ->
+    getKeyMapping(mode).getAll(emptyList()).any { it.mappingInfo.getPresentableString().contains(canonicalWhat) }
+  }
+}
+
+/**
+ * Returns true if a mapping exists that contains the given value somewhere in the right-hand-side of the mapping
+ *
+ * This function is essentially equivalent to Vim's `hasmapto()` function.
+ *
+ * Note that the string value is converted to a `List<KeyStroke>` to produce a canonical representation of any special
+ * keys. If you already have this list, call the overload of [hasMapTo] that takes them, to avoid multiple conversions.
+ */
+fun VimKeyGroup.hasMapTo(what: String, modes: Set<MappingMode>) =
+  hasMapTo(injector.parser.parseKeys(what), modes)
 
 /**
  * Retrieve the first mapping that is an exact match for the given LHS keystrokes in the given modes

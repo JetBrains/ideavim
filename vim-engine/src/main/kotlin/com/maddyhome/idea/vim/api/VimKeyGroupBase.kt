@@ -39,10 +39,6 @@ abstract class VimKeyGroupBase : VimKeyGroup {
     modes.map { getKeyMapping(it) }.forEach { it.clear() }
   }
 
-  override fun hasmapto(mode: MappingMode, toKeys: List<KeyStroke>): Boolean {
-    return this.getKeyMapping(mode).hasmapto(toKeys)
-  }
-
   override fun getKeyMapping(mode: MappingMode): KeyMapping {
     return keyMappings.getOrPut(mode) { KeyMapping(mode) }
   }
