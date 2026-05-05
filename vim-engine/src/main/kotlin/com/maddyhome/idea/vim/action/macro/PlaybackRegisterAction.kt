@@ -33,34 +33,26 @@ class PlaybackRegisterAction : VimActionHandler.SingleExecution() {
   ): Boolean {
     val argument = cmd.argument as? Argument.Character ?: return false
     val reg = argument.character
-    val res = arrayOf(false)
-    when {
+    return when {
       reg == LAST_COMMAND_REGISTER || (reg == '@' && injector.macro.lastRegister == LAST_COMMAND_REGISTER) -> {
         try {
-          var i = 0
-          while (i < cmd.count) {
-            res[0] = injector.vimscriptExecutor.executeLastCommand(editor, context)
-            if (!res[0]) {
-              break
-            }
-            i += 1
+          var success = false
+          for (i in 0 until cmd.count) {
+            success = injector.vimscriptExecutor.executeLastCommand(editor, context)
+            if (!success) break
           }
           if (reg != '@') { // @ is not a register itself, it just tells vim to use the last register
             injector.macro.lastRegister = reg
           }
+          success
         } catch (_: ExException) {
-          res[0] = false
+          false
         }
       }
 
-      reg == '@' -> {
-        res[0] = injector.macro.playbackLastRegister(editor, context, cmd.count)
-      }
+      reg == '@' -> injector.macro.playbackLastRegister(editor, context, cmd.count)
 
-      else -> {
-        res[0] = injector.macro.playbackRegister(editor, context, reg, cmd.count)
-      }
+      else -> injector.macro.playbackRegister(editor, context, reg, cmd.count)
     }
-    return res[0]
   }
 }
