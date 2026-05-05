@@ -471,6 +471,7 @@ intellijPlatform {
         * <a href="https://youtrack.jetbrains.com/issue/VIM-566">VIM-566</a> Added support for <code>zf</code> command - create fold from selection or motion<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-566">VIM-566</a> Added support for <code>:set foldlevel</code> option - control fold visibility level<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-1158">VIM-1158</a> Added <code>gw</code> command - reformat code like <code>gq</code> but preserving the cursor position<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-3975">VIM-3975</a> Added <code>mode()</code> VimScript function - returns the current editing mode (e.g., <code>'n'</code> for normal, <code>'i'</code> for insert, <code>'v'</code> for visual, <code>'R'</code> for replace)<br>
         <br>
         <b>Fixes:</b><br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4197">VIM-4197</a> Fixed Vim features (e.g., <code>f</code>, <code>w</code>, text objects) not working in Java files decompiled from Kotlin class files<br>
@@ -518,8 +519,15 @@ intellijPlatform {
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4202">VIM-4202</a> Fixed <code>gcc</code>/<code>gc{motion}</code> commentary not adding space after <code>//</code> prefix in C/C++/C# files in Rider/CLion split mode<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4219">VIM-4219</a> Fixed NullPointerException when IdeaVim is being disabled/unloaded<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4221">VIM-4221</a> Fixed error sound being played on each keypress when <code>incsearch</code> is enabled and the typed pattern is an invalid regex<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4196">VIM-4196</a> Fixed NERDTree file selection not being restored after pressing <code>&lt;Esc&gt;</code> to cancel a <code>/</code> speed search<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4211">VIM-4211</a> Fixed IdeaVim not working in Git commit window when the Conventional Commits plugin is installed<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4224">VIM-4224</a> Fixed <code>:s</code> <code>e</code> flag now properly suppresses "Pattern not found" errors - e.g., <code>%s/\s\+$//e</code> no longer errors when there is no trailing whitespace<br>
         <br>
         <b>Merged PRs:</b><br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1741">1741</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: fix(VIM-4224): respect e flag in search patterns<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1740">1740</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: feat(VIM-3975): support vim mode() function<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1739">1739</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: fix(VIM-4196): restore file selection after esc in nerdtree<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1738">1738</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: fix(VIM-4211): commit window work with conectional commits plugin<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1730">1730</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: FIX(VIM-4221) Don't make angry sounds on search<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1728">1728</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-4202 Add space after c langauges comments<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1727">1727</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: FIX(VIM-4219) check for in VimPLugin is not null<br>

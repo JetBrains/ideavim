@@ -37,6 +37,7 @@ usual beta standards.
 * [VIM-566](https://youtrack.jetbrains.com/issue/VIM-566) Added support for `zf` command - create fold from selection or motion
 * [VIM-566](https://youtrack.jetbrains.com/issue/VIM-566) Added support for `:set foldlevel` option - control fold visibility level
 * [VIM-1158](https://youtrack.jetbrains.com/issue/VIM-1158) Added `gw` command - reformat code like `gq` but preserving the cursor position
+* [VIM-3975](https://youtrack.jetbrains.com/issue/VIM-3975) Added `mode()` VimScript function - returns the current editing mode (e.g., `'n'` for normal, `'i'` for insert, `'v'` for visual, `'R'` for replace)
 
 ### Fixes:
 * [VIM-4197](https://youtrack.jetbrains.com/issue/VIM-4197) Fixed Vim features (e.g., `f`, `w`, text objects) not working in Java files decompiled from Kotlin class files
@@ -84,8 +85,15 @@ usual beta standards.
 * [VIM-4202](https://youtrack.jetbrains.com/issue/VIM-4202) Fixed `gcc`/`gc{motion}` commentary not adding space after `//` prefix in C/C++/C# files in Rider/CLion split mode
 * [VIM-4219](https://youtrack.jetbrains.com/issue/VIM-4219) Fixed NullPointerException when IdeaVim is being disabled/unloaded
 * [VIM-4221](https://youtrack.jetbrains.com/issue/VIM-4221) Fixed error sound being played on each keypress when `incsearch` is enabled and the typed pattern is an invalid regex
+* [VIM-4196](https://youtrack.jetbrains.com/issue/VIM-4196) Fixed NERDTree file selection not being restored after pressing `<Esc>` to cancel a `/` speed search
+* [VIM-4211](https://youtrack.jetbrains.com/issue/VIM-4211) Fixed IdeaVim not working in Git commit window when the Conventional Commits plugin is installed
+* [VIM-4224](https://youtrack.jetbrains.com/issue/VIM-4224) Fixed `:s` `e` flag now properly suppresses "Pattern not found" errors - e.g., `%s/\s\+$//e` no longer errors when there is no trailing whitespace
 
 ### Merged PRs:
+* [1741](https://github.com/JetBrains/ideavim/pull/1741) by [1grzyb1](https://github.com/1grzyb1): fix(VIM-4224): respect e flag in search patterns
+* [1740](https://github.com/JetBrains/ideavim/pull/1740) by [1grzyb1](https://github.com/1grzyb1): feat(VIM-3975): support vim mode() function
+* [1739](https://github.com/JetBrains/ideavim/pull/1739) by [1grzyb1](https://github.com/1grzyb1): fix(VIM-4196): restore file selection after esc in nerdtree
+* [1738](https://github.com/JetBrains/ideavim/pull/1738) by [1grzyb1](https://github.com/1grzyb1): fix(VIM-4211): commit window work with conectional commits plugin
 * [1730](https://github.com/JetBrains/ideavim/pull/1730) by [1grzyb1](https://github.com/1grzyb1): FIX(VIM-4221) Don't make angry sounds on search
 * [1728](https://github.com/JetBrains/ideavim/pull/1728) by [1grzyb1](https://github.com/1grzyb1): VIM-4202 Add space after c langauges comments
 * [1727](https://github.com/JetBrains/ideavim/pull/1727) by [1grzyb1](https://github.com/1grzyb1): FIX(VIM-4219) check for in VimPLugin is not null
