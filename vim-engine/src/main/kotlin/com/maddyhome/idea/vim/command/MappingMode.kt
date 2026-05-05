@@ -107,5 +107,31 @@ enum class MappingMode {
         }
       }
     }
+
+    fun fromModeString(modes: String): Set<MappingMode> {
+      if (modes == "!") return MappingMode.IC
+      if (modes == " ") return MappingMode.NVO
+
+      if (modes.length == 2 && modes.contains("i") && modes.contains("c")) {
+        return MappingMode.IC
+      }
+      if (modes.length == 3 && modes.contains("n") && modes.contains("v") && modes.contains("o")) {
+        return MappingMode.NVO
+      }
+
+      return buildSet<MappingMode> {
+        modes.forEach {
+          when (it) {
+            'c' -> addAll(MappingMode.C)
+            'i' -> addAll(MappingMode.I)
+            'n' -> addAll(MappingMode.N)
+            'o' -> addAll(MappingMode.O)
+            'v' -> addAll(MappingMode.V)
+            'x' -> addAll(MappingMode.X)
+            's' -> addAll(MappingMode.S)
+          }
+        }
+      }
+    }
   }
 }

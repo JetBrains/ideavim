@@ -54,6 +54,7 @@
   "mapcheck": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.mappingFunctions.MapCheckFunctionHandler",
   "maplist": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.mappingFunctions.MapListFunctionHandler",
   "mapnew": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.collectionFunctions.MapNewFunctionHandler",
+  "mapset": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.mappingFunctions.MapSetFunctionHandler",
   "max": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.collectionFunctions.MaxFunctionHandler",
   "min": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.collectionFunctions.MinFunctionHandler",
   "mode": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.variousFunctions.ModeFunctionHandler",
