@@ -182,6 +182,8 @@ abstract class VimKeyGroupBase : VimKeyGroup {
     }
   }
 
+  protected abstract fun updateShortcutKeysRegistration()
+
   override fun removeKeyMapping(owner: MappingOwner) {
     MappingMode.entries.map { getKeyMapping(it) }.forEach { it.removeKeyMappingsByOwner(owner) }
     unregisterKeyMapping(owner)
