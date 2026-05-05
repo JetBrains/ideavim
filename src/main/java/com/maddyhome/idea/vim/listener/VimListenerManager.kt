@@ -384,11 +384,13 @@ object VimListenerManager {
    */
   private object VimFocusListener : FocusChangeListener {
     override fun focusGained(editor: Editor) {
+      if (editor.isDisposed) return
       if (vimDisabled(editor)) return
       injector.listenersNotifier.notifyEditorFocusGained(editor.vim)
     }
 
     override fun focusLost(editor: Editor) {
+      if (editor.isDisposed) return
       if (vimDisabled(editor)) return
       injector.listenersNotifier.notifyEditorFocusLost(editor.vim)
     }

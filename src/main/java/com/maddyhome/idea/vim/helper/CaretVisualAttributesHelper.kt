@@ -172,6 +172,7 @@ class CaretVisualAttributesListener : IsReplaceCharListener, ModeChangeListener,
   @RequiresEdt
   private fun updateCaretsVisual(editor: VimEditor) {
     val ijEditor = (editor as IjVimEditor).editor
+    if (ijEditor.isDisposed) return
     ijEditor.updateCaretsVisualAttributes()
     ijEditor.updateCaretsVisualPosition()
   }
