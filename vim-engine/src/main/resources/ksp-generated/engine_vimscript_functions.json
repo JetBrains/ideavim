@@ -16,6 +16,7 @@
   "count": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.collectionFunctions.CountFunctionHandler",
   "deepcopy": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.DeepCopyFunctionHandler",
   "digraph_get": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.mappingFunctions.DigraphGetFunctionHandler",
+  "digraph_getlist": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.mappingFunctions.DigraphGetListFunctionHandler",
   "empty": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.collectionFunctions.EmptyFunctionHandler",
   "err_teapot": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.variousFunctions.ErrTeapotFunctionHandler",
   "escape": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.stringFunctions.EscapeFunctionHandler",

@@ -16,6 +16,17 @@ interface VimDigraphGroup {
    * this function retuns a codepoint.
    */
   fun getCharacterForDigraph(ch1: Char, ch2: Char): Int
+
+  /**
+   * Get a list of all digraphs, including user-defined and built-in
+   */
+  fun getAllDigraphs(): List<Pair<String, Int>>
+
+  /**
+   * Get a list of user-defined digraphs
+   */
+  fun getCustomDigraphs(): List<Pair<String, Int>>
+
   fun displayAsciiInfo(editor: VimEditor)
   fun parseCommandLine(editor: VimEditor, args: String): Boolean
   fun showDigraphs(editor: VimEditor, showHeaders: Boolean)
