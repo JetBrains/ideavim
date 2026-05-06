@@ -265,11 +265,14 @@ internal class FileRemoteApiImpl : FileRemoteApi {
     }
 
     return try {
-      WriteAction.compute<VirtualFile?, Exception> {
-        val parentDir = VfsUtil.createDirectoryIfMissing(path.parent.toString()) ?: return@compute null
-        logger.debug { "creating new file: $path" }
-        parentDir.createChildData(this, path.fileName.toString())
-      }
+      WriteCommandAction.writeCommandAction(project)
+        .withName("Create File")
+        .compute<VirtualFile?, Exception> {
+          val parentDir = VfsUtil.createDirectoryIfMissing(path.parent.toString())
+            ?: return@compute null
+          logger.debug { "creating new file: $path" }
+          parentDir.createChildData(this, path.fileName.toString())
+        }
     } catch (e: Exception) {
       logger.warn("Failed to create file '$filename': ${e.message}")
       null
