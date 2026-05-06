@@ -308,6 +308,12 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     return offset.toMotionOrError()
   }
 
+  // Engine has no change list (it lives on the frontend). Frontend MotionGroup overrides.
+  override fun moveCaretToChange(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion {
+    injector.messages.showErrorMessage(editor, injector.messages.message("E664"))
+    return Motion.Error
+  }
+
   override fun moveCaretToJump(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion {
     val jumpService = injector.jumpService
     val spot = jumpService.getJumpSpot(editor)

@@ -1645,6 +1645,11 @@
     "modes": "NXO"
   },
   {
+    "keys": "g,",
+    "class": "com.maddyhome.idea.vim.action.motion.changelist.MotionGotoChangeNewerAction",
+    "modes": "N"
+  },
+  {
     "keys": "g0",
     "class": "com.maddyhome.idea.vim.action.motion.leftright.MotionFirstScreenColumnAction",
     "modes": "NXO"
@@ -1652,6 +1657,11 @@
   {
     "keys": "g8",
     "class": "com.maddyhome.idea.vim.action.file.FileGetHexAction",
+    "modes": "N"
+  },
+  {
+    "keys": "g;",
+    "class": "com.maddyhome.idea.vim.action.motion.changelist.MotionGotoChangeOlderAction",
     "modes": "N"
   },
   {

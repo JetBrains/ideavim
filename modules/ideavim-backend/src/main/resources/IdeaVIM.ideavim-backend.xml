@@ -19,6 +19,8 @@
   <projectListeners>
     <listener class="com.maddyhome.idea.vim.group.jump.JumpsListener"
               topic="com.intellij.openapi.fileEditor.impl.IdeDocumentHistoryImpl$RecentPlacesListener"/>
+    <listener class="com.maddyhome.idea.vim.group.changelist.ChangeListPlacesListener"
+              topic="com.intellij.openapi.fileEditor.impl.IdeDocumentHistoryImpl$RecentPlacesListener"/>
   </projectListeners>
 
   <extensions defaultExtensionNs="com.intellij">
