@@ -17,7 +17,7 @@ interface VimHistory {
   @TestOnly
   fun resetHistory()
 
-  sealed class Type() {
+  sealed class Type {
     data object Search : Type()
     data object Command : Type()
     data object Expression : Type()
@@ -31,6 +31,20 @@ interface VimHistory {
           "/", "?" -> Search
           "=" -> Expression
           else -> Custom(label)
+        }
+      }
+
+      fun getTypeByString(value: String): Type? {
+        if ("cmd".startsWith(value)) return Command
+        if ("search".startsWith(value)) return Search
+        if ("expression".startsWith(value)) return Expression
+        if ("input".startsWith(value)) return Input
+        return when (value) {
+          ":" -> Command
+          "/" -> Search
+          "=" -> Expression
+          "@" -> Input
+          else -> null
         }
       }
     }

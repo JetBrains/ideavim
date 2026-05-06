@@ -14,25 +14,26 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.history.VimHistory
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
-import com.maddyhome.idea.vim.vimscript.model.functions.BinaryFunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimString
+import com.maddyhome.idea.vim.vimscript.model.functions.BuiltinFunctionHandler
 
-@VimscriptFunction("histadd")
-internal class HistAddFunctionHandler : BinaryFunctionHandler<VimInt>() {
+@VimscriptFunction("histget")
+internal class HistGetFunctionHandler : BuiltinFunctionHandler<VimString>(minArity = 1, maxArity = 2) {
   override fun doFunction(
     arguments: Arguments,
     editor: VimEditor,
     context: ExecutionContext,
     vimContext: VimLContext,
-  ): VimInt {
+  ): VimString {
     val history = arguments.getString(0).value
-    val item = arguments.getString(1)
+    val index = arguments.getNumberOrNull(1)?.value
 
     val historyType = VimHistory.Type.getTypeByString(history)
       ?: injector.commandLine.getActiveCommandLine()?.historyType
-      ?: return VimInt.ZERO
+      ?: return VimString.EMPTY
 
-    injector.historyGroup.addEntry(historyType, item.value)
-    return VimInt.ONE
+    val entries = injector.historyGroup.getEntries(historyType, index ?: 0, 0)
+    return if (entries.size == 1) entries[0].entry.asVimString() else VimString.EMPTY
   }
 }
