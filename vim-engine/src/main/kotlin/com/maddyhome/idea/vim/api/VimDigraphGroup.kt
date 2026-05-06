@@ -27,6 +27,11 @@ interface VimDigraphGroup {
    */
   fun getCustomDigraphs(): List<Pair<String, Int>>
 
+  /**
+   * Add a custom digraph, potentially overwriting a builtin value
+   */
+  fun setDigraph(digraph: String, codepoint: Int)
+
   fun displayAsciiInfo(editor: VimEditor)
   fun parseCommandLine(editor: VimEditor, args: String): Boolean
   fun showDigraphs(editor: VimEditor, showHeaders: Boolean)
