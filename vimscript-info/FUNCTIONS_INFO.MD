@@ -551,7 +551,7 @@ See `:help history-functions`.
 | ✅      | `histadd()` | add an item to a history            |
 |        | `histdel()` | delete an item from a history       |
 | ✅      | `histget()` | get an item from a history          |
-|        | `histnr()`  | get highest index of a history list |
+| ✅      | `histnr()`  | get highest index of a history list |
 
 ## Interactive
 
