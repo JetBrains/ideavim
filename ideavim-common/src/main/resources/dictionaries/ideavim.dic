@@ -179,6 +179,7 @@ getreg
 getregtype
 hasmapto
 histadd
+histget
 indexof
 isinf
 maparg
