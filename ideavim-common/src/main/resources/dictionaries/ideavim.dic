@@ -180,6 +180,7 @@ getregtype
 hasmapto
 histadd
 histget
+histnr
 indexof
 isinf
 maparg
