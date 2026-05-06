@@ -627,7 +627,7 @@ See `:help mapping-functions`.
 | Status | Function            | Description                        |
 |--------|---------------------|------------------------------------|
 | ✅      | `digraph_get()`     | get digraph                        |
-|        | `digraph_getlist()` | get all digraphs                   |
+| ✅      | `digraph_getlist()` | get all digraphs                   |
 |        | `digraph_set()`     | register digraph                   |
 |        | `digraph_setlist()` | register multiple digraphs         |
 | ✅      | `hasmapto()`        | check if a mapping exists          |
