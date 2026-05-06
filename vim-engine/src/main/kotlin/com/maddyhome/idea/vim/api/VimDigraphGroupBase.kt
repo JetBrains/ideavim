@@ -47,6 +47,11 @@ open class VimDigraphGroupBase : VimDigraphGroup {
     customDigraphToCodepoint.forEach { (chars, codepoint) -> add(chars to codepoint) }
   }
 
+  override fun setDigraph(digraph: String, codepoint: Int) {
+    // Because we check custom digraphs first, setting this will "overwrite" a builtin digraph
+    addCustomDigraph(digraph, codepoint)
+  }
+
   override fun displayAsciiInfo(editor: VimEditor) {
     val offset = editor.currentCaret().offset
     val charsSequence = editor.text()
