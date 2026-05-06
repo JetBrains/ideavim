@@ -173,6 +173,12 @@
     <platform.rpc.projectRemoteTopicListener
         implementation="com.maddyhome.idea.vim.group.JumpRemoteTopicListener"/>
 
+    <!-- Frontend change-list service (g; / g,) + topic listener that mirrors
+         backend RecentPlacesListener events into it. -->
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.changelist.ChangeListService"/>
+    <platform.rpc.projectRemoteTopicListener
+        implementation="com.maddyhome.idea.vim.group.changelist.ChangeListRemoteTopicListener"/>
+
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.IjFileGroup"
                         serviceInterface="com.maddyhome.idea.vim.api.VimFile"/>
 
