@@ -20,9 +20,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.keymap.ex.KeymapManagerEx;
-import com.intellij.util.containers.MultiMap;
 import com.maddyhome.idea.vim.EventFacade;
-import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction;
 import com.maddyhome.idea.vim.action.change.LazyVimCommand;
 import com.maddyhome.idea.vim.api.*;
@@ -34,8 +32,6 @@ import com.maddyhome.idea.vim.helper.ShortcutHelper;
 import com.maddyhome.idea.vim.key.*;
 import com.maddyhome.idea.vim.newapi.IjNativeAction;
 import com.maddyhome.idea.vim.newapi.IjVimEditor;
-import kotlin.Pair;
-import kotlin.text.StringsKt;
 import org.jdom.Element;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -62,84 +58,6 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
 
   public static @NotNull ShortcutSet toShortcutSet(@NotNull Collection<RequiredShortcut> requiredShortcuts) {
     return ShortcutHelper.toShortcutSet(requiredShortcuts);
-  }
-
-  private static @NotNull List<Pair<Set<MappingMode>, MappingInfo>> getKeyMappingRows(@NotNull Set<? extends MappingMode> modes,
-                                                                                      @NotNull List<? extends KeyStroke> prefix) {
-    // Some map commands set a mapping for more than one mode (e.g. `map` sets for Normal, Visual, Select and
-    // Op-pending). Vim treats this as a single mapping, and when listing all maps only lists it once, with the
-    // appropriate mode indicator(s) in the first column (NVO is a space char). If the lhs mapping is changed or cleared
-    // for one of the modes, the original mapping is still a single map for the remaining modes, and the indicator
-    // changes. E.g. `map foo bar` followed by `sunmap foo` would result in `nox foo bar` in the output to `map`.
-    // Vim doesn't do automatic grouping - `nmap foo bar` followed by `omap foo bar` and `vmap foo bar` would result in
-    // 3 lines in the output to `map` - one for `n`, one for `o` and one for `v`.
-    // We store mappings separately per mode (to simplify lookup, especially when matching prefixes), but want to have
-    // the same behaviour as Vim in map output. So we store the original modes with the mapping and check they're still
-    // valid as we collect output
-    final List<Pair<Set<MappingMode>, MappingInfo>> rows = new ArrayList<>();
-    final MultiMap<List<? extends KeyStroke>, Set<MappingMode>> multiModeMappings = MultiMap.create();
-    final List<KeyStroke> fromKeys = new ArrayList<>();
-
-    for (MappingMode mode : modes) {
-      final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(mode);
-
-      // Vim includes mappings for each key in the prefix, where appropriate. That is, it doesn't just all mappings that
-      // are descendants of the prefix, but includes the mappings for each key in the prefix as well.
-      // E.g. `foo` will include mappings for `f` and `fo`, as well as any mappings that are descendants of `foo`.
-      final Iterator<KeyMappingEntry> iterator = mapping.getAll(prefix, true).iterator();
-      while (iterator.hasNext()) {
-        final KeyMappingEntry entry = iterator.next();
-        final MappingInfo mappingInfo = entry.getMappingInfo();
-
-        final Set<@NotNull MappingMode> originalModes = mappingInfo.getOriginalModes();
-        if (originalModes.size() == 1) {
-          rows.add(new Pair<>(originalModes, mappingInfo));
-        }
-        else {
-          entry.collectPath(fromKeys);
-          if (!multiModeMappings.get(fromKeys).contains(originalModes)) {
-            multiModeMappings.putValue(new ArrayList<>(fromKeys), originalModes);
-            rows.add(new Pair<>(getModesForMapping(fromKeys, originalModes), mappingInfo));
-          }
-        }
-      }
-    }
-    rows.sort(Comparator.comparing(Pair<Set<MappingMode>, MappingInfo>::getSecond));
-    return rows;
-  }
-
-  private static @NotNull Set<MappingMode> getModesForMapping(@NotNull List<? extends KeyStroke> keyStrokes,
-                                                              @NotNull Set<MappingMode> originalMappingModes) {
-    final Set<MappingMode> actualModes = EnumSet.noneOf(MappingMode.class);
-    for (MappingMode mode : originalMappingModes) {
-      final MappingInfo mappingInfo = VimPlugin.getKey().getKeyMapping(mode).get(keyStrokes);
-      if (mappingInfo != null && mappingInfo.getOriginalModes() == originalMappingModes) {
-        actualModes.add(mode);
-      }
-    }
-    return actualModes;
-  }
-
-  private static @NotNull @NonNls String getModesStringCode(@NotNull Set<MappingMode> modes) {
-    if (modes.equals(MappingMode.IC)) return "!";
-    if (modes.equals(MappingMode.NVO)) return " ";
-    if (modes.equals(MappingMode.C)) return "c";
-    if (modes.equals(MappingMode.I)) return "i";
-    //if (modes.equals(MappingMode.L)) return "l";
-
-    // The following modes are concatenated
-    String mode = "";
-    if (modes.containsAll(MappingMode.N)) mode += "n";
-    if (modes.containsAll(MappingMode.O)) mode += "o";
-
-    if (modes.containsAll(MappingMode.V)) {
-      mode += "v";
-    }
-    else {
-      if (modes.containsAll(MappingMode.X)) mode += "x";
-      if (modes.containsAll(MappingMode.S)) mode += "s";
-    }
-    return mode;
   }
 
   private static @NotNull List<AnAction> getLocalActions(@NotNull Component component, @NotNull KeyStroke keyStroke) {
@@ -373,36 +291,6 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
   @Override
   public void loadState(@NotNull Element state) {
     readData(state);
-  }
-
-  @Override
-  public boolean showKeyMappings(@NotNull Set<? extends MappingMode> modes,
-                                 @NotNull List<? extends KeyStroke> prefix,
-                                 @NotNull VimEditor editor) {
-    List<Pair<Set<MappingMode>, MappingInfo>> rows = getKeyMappingRows(modes, prefix);
-
-    final StringBuilder builder = new StringBuilder();
-    for (Pair<Set<MappingMode>, MappingInfo> row : rows) {
-      MappingInfo mappingInfo = row.getSecond();
-      builder.append(StringsKt.padEnd(getModesStringCode(row.getFirst()), 3, ' '));
-      builder.append(
-        StringsKt.padEnd(VimInjectorKt.getInjector().getParser().toKeyNotation(mappingInfo.getFromKeys()) + " ", 12,
-                         ' '));
-      builder.append(mappingInfo.isRecursive() ? " " : "*");  // Or `&` if script-local mappings being recursive
-      builder.append(" ");  // Should be `@` if it's a buffer-local mapping
-      builder.append(mappingInfo.getPresentableString());
-      builder.append("\n");
-    }
-
-    if (builder.isEmpty()) {
-      builder.append("No mapping found");
-    }
-
-    VimOutputPanel outputPanel = injector.getOutputPanel()
-      .getOrCreate(editor, injector.getExecutionContextManager().getEditorExecutionContext(editor));
-    outputPanel.addText(builder.toString(), true, MessageType.STANDARD);
-    outputPanel.show();
-    return true;
   }
 
   @Override

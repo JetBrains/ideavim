@@ -22,6 +22,8 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.VimProjectService
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getMappingInfo
+import com.maddyhome.idea.vim.api.hasMapTo
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.command.MappingMode
@@ -33,6 +35,7 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.helper.StrictMode
+import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.newapi.ij
 import org.jetbrains.annotations.TestOnly
 import java.awt.Font
@@ -60,11 +63,16 @@ class IdeaVimSneakExtension : VimExtension {
   override fun init() {
     val _highlightHandler = HighlightHandler()
     highlightHandler = _highlightHandler
-    mapToFunctionAndProvideKeys("s", SneakHandler(_highlightHandler, Direction.FORWARD), MappingMode.NXO)
 
-    // vim-sneak uses `Z` for visual mode because `S` conflict with vim-sneak plugin VIM-3330
-    mapToFunctionAndProvideKeys("S", SneakHandler(_highlightHandler, Direction.BACKWARD), MappingMode.NO)
+    // Note that vim-sneak uses `z` for Op-pending and `Z` for Visual and Op-pending for compatibility with surround.
+    // See VIM-3330 and VIM-4225
+    mapToFunctionAndProvideKeys("s", SneakHandler(_highlightHandler, Direction.FORWARD), MappingMode.N)
+    mapToFunctionAndProvideKeys("s", SneakHandler(_highlightHandler, Direction.FORWARD), MappingMode.X)
+    mapToFunctionAndProvideKeys("z", SneakHandler(_highlightHandler, Direction.FORWARD), MappingMode.O)
+
+    mapToFunctionAndProvideKeys("S", SneakHandler(_highlightHandler, Direction.BACKWARD), MappingMode.N)
     mapToFunctionAndProvideKeys("Z", SneakHandler(_highlightHandler, Direction.BACKWARD), MappingMode.X)
+    mapToFunctionAndProvideKeys("Z", SneakHandler(_highlightHandler, Direction.BACKWARD), MappingMode.O)
 
     // workaround to support ; and , commands
     mapToFunctionAndProvideKeys("f", SneakMemoryHandler("f"), MappingMode.NXO)
@@ -311,13 +319,13 @@ private fun VimExtension.mapToFunctionAndProvideKeys(
   //  - The shortcut should not be registered if some other shortcut for this key exists
   val fromKeys = injector.parser.parseKeys(keys)
   val filteredModes = mappingModes.filterNotTo(HashSet()) {
-    VimPlugin.getKey().hasmapto(it, injector.parser.parseKeys(command(keys)))
+    VimPlugin.getKey().hasMapTo(command(keys), enumSetOf(it))
   }
   val filteredModes2 = mappingModes.filterNotTo(HashSet()) {
-    VimPlugin.getKey().hasmapto(it, injector.parser.parseKeys(commandFromOriginalPlugin(keys)))
+    VimPlugin.getKey().hasMapTo(commandFromOriginalPlugin(keys), enumSetOf(it))
   }
-  val filteredFromModes = mappingModes.filterNotTo(HashSet()) {
-    injector.keyGroup.getKeyMapping(it).getLayer(fromKeys) != null
+  val filteredFromModes = mappingModes.filterNotTo(HashSet()) { mode ->
+    injector.keyGroup.getMappingInfo(fromKeys, mode) != null
   }
 
   val doubleFiltered = mappingModes

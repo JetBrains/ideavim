@@ -43,12 +43,12 @@ sealed class MappingInfo(
   val isRecursive: Boolean,
   val owner: MappingOwner,
   val originalModes: Set<MappingMode>,
-) : Comparable<MappingInfo>, MappingInfoLayer {
+) : Comparable<MappingInfo> {
 
   @VimNlsSafe
-  abstract override fun getPresentableString(): String
+  abstract fun getPresentableString(): String
 
-  abstract override fun execute(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState)
+  abstract fun execute(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState)
 
   override fun compareTo(other: MappingInfo): Int {
     val size = fromKeys.size

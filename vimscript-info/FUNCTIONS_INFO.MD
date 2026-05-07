@@ -1,7 +1,7 @@
 # IdeaVim Builtin Functions Status
 
 This document tracks the progress of implementing Vim's builtin functions. There are a lot of functions, and it will 
-take some time to implement them all. 
+take some time to implement them all.
 
 The builtin functions are listed below, grouped by functionality, as in `:help function-list`, with implementation
 status.
@@ -15,6 +15,8 @@ usually because it is related to a feature that is either not implemented by or 
 
 If there is no status icon, then the function is waiting to be implemented. Contributions are welcome!
 
+The list of Vim functions is up to date as of Vim 9.2.0411.
+
 ## String manipulation
 
 See `:help string-functions`.
@@ -27,7 +29,7 @@ See `:help string-functions`.
 |        | `str2list()`        | get list of numbers from a string                                |
 |        | `str2nr()`          | convert a string to a Number                                     |
 |        | `str2float()`       | convert a string to a Float                                      |
-|        | `printf()`          | format a string according to % items                             |
+|        | `printf()`          | format a string according to "%" items                           |
 | ✅      | `escape()`          | escape characters in a string with a '\'                         |
 |        | `shellescape()`     | escape a string for use with a shell command                     |
 |        | `fnameescape()`     | escape a file name for use with a Vim command                    |
@@ -81,46 +83,78 @@ See `:help string-functions`.
 |        | `ngettext()`        | lookup single/plural message translation                         |
 |        | `str2blob()`        | convert a list of strings into a blob                            |
 |        | `blob2str()`        | convert a blob into a list of strings                            |
+| ✅      | `items()`           | get List of String index-character pairs                         |
+|        | `uri_encode()`      | URI-encode a string                                              |
+|        | `uri_decode()`      | URI-decode a string                                              |
 
 ## List manipulation
 
 See `:help list-functions`.
 
-| Status | Function       | Description                                                   |
-|--------|----------------|---------------------------------------------------------------|
-| ✅      | `get()`        | get an item without error for wrong index                     |
-| ✅      | `len()`        | number of items in a List                                     |
-| ✅      | `empty()`      | check if List is empty                                        |
-| ✅      | `insert()`     | insert an item somewhere in a List                            |
-| ✅      | `add()`        | append an item to a List                                      |
-| ✅      | `extend()`     | append a List to a List                                       |
-| ✅      | `extendnew()`  | make a new List and append items                              |
-| ✅      | `remove()`     | remove one or more items from a List                          |
-| ✅      | `copy()`       | make a shallow copy of a List                                 |
-| ✅      | `deepcopy()`   | make a full copy of a List                                    |
-| ✅      | `filter()`     | remove selected items from a List                             |
-| ✅      | `map()`        | change each List item                                         |
-| ✅      | `mapnew()`     | make a new List with changed items                            |
-| ✅      | `foreach()`    | apply function to List items                                  |
-| ✅      | `reduce()`     | reduce a List to a value                                      |
-| ✅      | `slice()`      | take a slice of a List                                        |
-| ✅      | `sort()`       | sort a List                                                   |
-| ✅      | `reverse()`    | reverse the order of items in a List                          |
-| ✅      | `uniq()`       | remove copies of repeated adjacent items                      |
-| ✅      | `split()`      | split a String into a List                                    |
-| ✅      | `join()`       | join List items into a String                                 |
-| ✅      | `range()`      | return a List with a sequence of numbers                      |
-| ✅      | `string()`     | String representation of a List                               |
-| ✅      | `call()`       | call a function with List as arguments                        |
-| ✅      | `index()`      | index of a value in a List or Blob                            |
-| ✅      | `indexof()`    | index in a List or Blob where an expression evaluates to true |
-| ✅      | `max()`        | maximum value in a List                                       |
-| ✅      | `min()`        | minimum value in a List                                       |
-| ✅      | `count()`      | count number of times a value appears in a List               |
-| ✅      | `repeat()`     | repeat a List multiple times                                  |
-| ✅      | `flatten()`    | flatten a List                                                |
-| ✅      | `flattennew()` | flatten a copy of a List                                      |
-| ✅      | `items()`      | get List of List index-value pairs                            |
+| Status | Function       | Description                                           |
+|--------|----------------|-------------------------------------------------------|
+| ✅      | `get()`        | get an item without error for wrong index             |
+| ✅      | `len()`        | number of items in a List                             |
+| ✅      | `empty()`      | check if List is empty                                |
+| ✅      | `insert()`     | insert an item somewhere in a List                    |
+| ✅      | `add()`        | append an item to a List                              |
+| ✅      | `extend()`     | append a List to a List                               |
+| ✅      | `extendnew()`  | make a new List and append items                      |
+| ✅      | `remove()`     | remove one or more items from a List                  |
+| ✅      | `copy()`       | make a shallow copy of a List                         |
+| ✅      | `deepcopy()`   | make a full copy of a List                            |
+| ✅      | `filter()`     | remove selected items from a List                     |
+| ✅      | `map()`        | change each List item                                 |
+| ✅      | `mapnew()`     | make a new List with changed items                    |
+| ✅      | `foreach()`    | apply function to List items                          |
+| ✅      | `reduce()`     | reduce a List to a value                              |
+| ✅      | `slice()`      | take a slice of a List                                |
+| ✅      | `sort()`       | sort a List                                           |
+| ✅      | `reverse()`    | reverse the order of items in a List                  |
+| ✅      | `uniq()`       | remove copies of repeated adjacent items              |
+| ✅      | `split()`      | split a String into a List                            |
+| ✅      | `join()`       | join List items into a String                         |
+| ✅      | `range()`      | return a List with a sequence of numbers              |
+| ✅      | `string()`     | String representation of a List                       |
+| ✅      | `call()`       | call a function with List as arguments                |
+| ✅      | `index()`      | index of a value in a List                            |
+| ✅      | `indexof()`    | index in a List where an expression evaluates to true |
+| ✅      | `max()`        | maximum value in a List                               |
+| ✅      | `min()`        | minimum value in a List                               |
+| ✅      | `count()`      | count number of times a value appears in a List       |
+| ✅      | `repeat()`     | repeat a List multiple times                          |
+| ✅      | `flatten()`    | flatten a List                                        |
+| ✅      | `flattennew()` | flatten a copy of a List                              |
+| ✅      | `items()`      | get List of List index-value pairs                    |
+
+## Tuple manipulation
+
+Note that tuples were added in Vim 9.2 and are a feature of Vim9script, which IdeaVim does not currently support.
+
+See `:help tuple-functions`
+
+| Status | Function       | Description                                      |
+|--------|----------------|--------------------------------------------------|
+|        | `copy()`       | make a shallow copy of a Tuple                   |
+|        | `count()`      | count number of times a value appears in a Tuple |
+|        | `deepcopy()`   | make a full copy of a Tuple                      |
+|        | `empty()`      | check if Tuple is empty                          |
+|        | `foreach()`    | apply function to Tuple items                    |
+|        | `get()`        | get an item without error for wrong index        |
+|        | `index()`      | index of a value in a Tuple                      |
+|        | `indexof()`    | index in a Tuple where an expression is true     |
+|        | `items()`      | get List of Tuple index-value pairs              |
+|        | `join()`       | join Tuple items into a String                   |
+|        | `len()`        | number of items in a Tuple                       |
+|        | `list2tuple()` | convert a list of items into a Tuple             |
+|        | `max()`        | maximum value in a Tuple                         |
+|        | `min()`        | minimum value in a Tuple                         |
+|        | `reduce()`     | reduce a Tuple to a value                        |
+|        | `repeat()`     | repeat a Tuple multiple times                    |
+|        | `reverse()`    | reverse the order of items in a Tuple            |
+|        | `slice()`      | take a slice of a Tuple                          |
+|        | `string()`     | string representation of a Tuple                 |
+|        | `tuple2list()` | convert a Tuple into a List                      |
 
 ## Dictionary manipulation
 
@@ -182,13 +216,18 @@ See `:help float-functions`.
 
 ## Blob manipulation
 
+Note that IdeaVim does not currently support the Blob data type.
+
 See `help blob-functions`.
 
-| Status | Function      | Description                            |
-|--------|---------------|----------------------------------------|
-|        | `blob2list()` | get a list of numbers from a blob      |
-|        | `list2blob()` | get a blob from a list of numbers      |
-|        | `reverse()`   | reverse the order of numbers in a blob |
+| Status | Function      | Description                                 |
+|--------|---------------|---------------------------------------------|
+|        | `blob2list()` | get a list of numbers from a blob           |
+|        | `list2blob()` | get a blob from a list of numbers           |
+|        | `reverse()`   | reverse the order of numbers in a blob      |
+|        | `index()`     | index of a value in a Blob                  |
+|        | `indexof()`   | index in a Blob where an expression is true |
+|        | `items()`     | get List of Blob index-value pairs          |
 
 ## Other computation
 
@@ -383,6 +422,8 @@ See `:help buffer-functions`, `:help window-functions` and `:help arg-functions`
 |        | `tabpagebuflist()`      | return List of buffers in a tab page         |
 |        | `tabpagenr()`           | get the number of a tab page                 |
 |        | `tabpagewinnr()`        | like `winnr()` for a specified tab page      |
+| 🅾️    | `tabpanel_getinfo()`    | get current state of the tabpanel            |
+| 🅾️    | `tabpanel_scroll()`     | scroll the tabpanel                          |
 |        | `winnr()`               | get the window number for the current window |
 |        | `bufwinid()`            | get the window ID of a specific buffer       |
 |        | `bufwinnr()`            | get the window number of a specific buffer   |
@@ -412,21 +453,25 @@ See `:help buffer-functions`, `:help window-functions` and `:help arg-functions`
 
 See `:help command-line-functions`.
 
-| Status | Function            | Description                                           |
-|--------|---------------------|-------------------------------------------------------|
-|        | `getcmdcomplpat()`  | get completion pattern of the current command         |
-|        | `getcmdcompltype()` | get the type of the current command line completion   |
-|        | `getcmdline()`      | get the current command line                          |
-|        | `getcmdpos()`       | get position of the cursor in the command line        |
-|        | `getcmdscreenpos()` | get screen position of the cursor in the command line |
-|        | `setcmdline()`      | set the current command line                          |
-|        | `setcmdpos()`       | set position of the cursor in the command line        |
-| ✅      | `getcmdtype()`      | return the current command-line type                  |
-|        | `getcmdwintype()`   | return the current command-line window type           |
-|        | `getcompletion()`   | list of command-line completion matches               |
-|        | `fullcommand()`     | get full command name                                 |
+| Status | Function              | Description                                                          |
+|--------|-----------------------|----------------------------------------------------------------------|
+|        | `getcmdcomplpat()`    | get completion pattern of the current command                        |
+|        | `getcmdcompltype()`   | get the type of the current command line completion                  |
+|        | `getcmdline()`        | get the current command line                                         |
+|        | `getcmdpos()`         | get position of the cursor in the command line                       |
+|        | `getcmdscreenpos()`   | get screen position of the cursor in the command line                |
+|        | `setcmdline()`        | set the current command line                                         |
+|        | `setcmdpos()`         | set position of the cursor in the command line                       |
+| ✅      | `getcmdtype()`        | return the current command-line type                                 |
+|        | `getcmdwintype()`     | return the current command-line window type                          |
+|        | `getcompletion()`     | list of command-line completion matches                              |
+|        | `getcompletiontype()` | get the type of the command-line completion for the specified string |
+|        | `fullcommand()`       | get full command name                                                |
+|        | `cmdcomplete_info()`  | get command-line completion information                              |
 
 ## Quickfix and location lists
+
+Note that IdeaVim does currently support the quickfix feature.
 
 See `:help quickfix-functions`.
 
@@ -441,15 +486,15 @@ See `:help quickfix-functions`.
 
 See `:help completion-functions`.
 
-| Status | Function           | Description                                            |
-|--------|--------------------|--------------------------------------------------------|
-|        | `complete()`       | set found matches                                      |
-|        | `complete_add()`   | add to found matches                                   |
-|        | `complete_check()` | check if completion should be aborted                  |
-|        | `complete_info()`  | get current completion information                     |
-|        | `complete_match()` | get insert completion start match col and trigger text |
-| ✅      | `pumvisible()`     | check if the popup menu is displayed                   |
-|        | `pum_getpos()`     | position and size of popup menu if visible             |
+| Status | Function           | Description                                |
+|--------|--------------------|--------------------------------------------|
+|        | `complete()`       | set found matches                          |
+|        | `complete_add()`   | add to found matches                       |
+|        | `complete_check()` | check if completion should be aborted      |
+|        | `complete_info()`  | get current completion information         |
+|        | `preinserted()`    | check if text is inserted after cursor     |
+| ✅      | `pumvisible()`     | check if the popup menu is displayed       |
+|        | `pum_getpos()`     | position and size of popup menu if visible |
 
 ## Folding
 
@@ -531,7 +576,7 @@ See `:help interactive-functions`
 |        | `inputsave()`     | save and clear typeahead                    |
 |        | `inputrestore()`  | restore typeahead                           |
 
-## GUI:
+## GUI
 
 See `:help gui-functions`.
 
@@ -581,17 +626,18 @@ See `:help mapping-functions`.
 
 | Status | Function            | Description                        |
 |--------|---------------------|------------------------------------|
-|        | `digraph_get()`     | get `digraph`                      |
-|        | `digraph_getlist()` | get all `digraph`s                 |
-|        | `digraph_set()`     | register `digraph`                 |
-|        | `digraph_setlist()` | register multiple `digraph`s       |
-|        | `hasmapto()`        | check if a mapping exists          |
-|        | `mapcheck()`        | check if a matching mapping exists |
-|        | `maparg()`          | get rhs of a mapping               |
-|        | `maplist()`         | get list of all mappings           |
-|        | `mapset()`          | restore a mapping                  |
+|        | `digraph_get()`     | get digraph                        |
+|        | `digraph_getlist()` | get all digraphs                   |
+|        | `digraph_set()`     | register digraph                   |
+|        | `digraph_setlist()` | register multiple digraphs         |
+| ✅      | `hasmapto()`        | check if a mapping exists          |
+| ✅      | `mapcheck()`        | check if a matching mapping exists |
+| ✅      | `maparg()`          | get rhs of a mapping               |
+| ✅      | `maplist()`         | get list of all mappings           |
+| ✅      | `mapset()`          | restore a mapping                  |
 |        | `menu_info()`       | get information about a menu item  |
 |        | `wildmenumode()`    | check if the wildmode is active    |
+|        | `wildtrigger()`     | start wildcard expansion           |
 
 ## Testing
 
@@ -643,33 +689,34 @@ See `:help test-functions`.
 
 See `:help channel-functions`.
 
-| Status | Function          | Description                             |
-|--------|-------------------|-----------------------------------------|
-|        | `ch_canread()`    | check if there is something to read     |
-|        | `ch_open()`       | open a channel                          |
-|        | `ch_close()`      | close a channel                         |
-|        | `ch_close_in()`   | close the in part of a channel          |
-|        | `ch_read()`       | read a message from a channel           |
-|        | `ch_readblob()`   | read a Blob from a channel              |
-|        | `ch_readraw()`    | read a raw message from a channel       |
-|        | `ch_sendexpr()`   | send a JSON message over a channel      |
-|        | `ch_sendraw()`    | send a raw message over a channel       |
-|        | `ch_evalexpr()`   | evaluate an expression over channel     |
-|        | `ch_evalraw()`    | evaluate a raw string over channel      |
-|        | `ch_status()`     | get status of a channel                 |
-|        | `ch_getbufnr()`   | get the buffer number of a channel      |
-|        | `ch_getjob()`     | get the job associated with a channel   |
-|        | `ch_info()`       | get channel information                 |
-|        | `ch_log()`        | write a message in the channel log file |
-|        | `ch_logfile()`    | set the channel log file                |
-|        | `ch_setoptions()` | set the options for a channel           |
-|        | `json_encode()`   | encode an expression to a JSON string   |
-|        | `json_decode()`   | decode a JSON string to Vim types       |
-|        | `js_encode()`     | encode an expression to a JSON string   |
-|        | `js_decode()`     | decode a JSON string to Vim types       |
-|        | `base64_encode()` | encode a blob into a base64 string      |
-|        | `base64_decode()` | decode a base64 string into a blob      |
-|        | `err_teapot()`    | give error 418 or 503                   |
+| Status | Function          | Description                           |
+|--------|-------------------|---------------------------------------|
+|        | `ch_canread()`    | check if there is something to read   |
+|        | `ch_close()`      | close a channel                       |
+|        | `ch_close_in()`   | close the in part of a channel        |
+|        | `ch_evalexpr()`   | evaluate an expression over channel   |
+|        | `ch_evalraw()`    | evaluate a raw string over channel    |
+|        | `ch_getbufnr()`   | get the buffer number for a channel   |
+|        | `ch_getjob()`     | get the Job of a channel              |
+|        | `ch_info()`       | get information about a channel       |
+|        | `ch_listen()`     | listen on a channel                   |
+|        | `ch_log()`        | write a message in the channel log    |
+|        | `ch_logfile()`    | start logging channel activity        |
+|        | `ch_open()`       | open a channel                        |
+|        | `ch_read()`       | read a message from a channel         |
+|        | `ch_readblob()`   | read a Blob from a channel            |
+|        | `ch_readraw()`    | read a raw message from a channel     |
+|        | `ch_sendexpr()`   | send a JSON message over a channel    |
+|        | `ch_sendraw()`    | send a raw message over a channel     |
+|        | `ch_setoptions()` | set channel options                   |
+|        | `ch_status()`     | get status of a channel               |
+|        | `json_encode()`   | encode an expression to a JSON string |
+|        | `json_decode()`   | decode a JSON string to Vim types     |
+|        | `js_encode()`     | encode an expression to a JSON string |
+|        | `js_decode()`     | decode a JSON string to Vim types     |
+|        | `base64_encode()` | encode a blob into a base64 string    |
+|        | `base64_decode()` | decode a base64 string into a blob    |
+|        | `err_teapot()`    | give error 418 or 503                 |
 
 ## Jobs
 
@@ -841,41 +888,44 @@ See `:help sound-functions`.
 
 See `:help various-functions`.
 
-| Status | Function              | Description                                    |
-|--------|-----------------------|------------------------------------------------|
-|        | `mode()`              | get current editing mode                       |
-|        | `state()`             | get current busy state                         |
-|        | `visualmode()`        | last visual mode used                          |
-| ☑️     | `exists()`            | check if a variable, function, etc. exists     |
-|        | `exists_compiled()`   | like exists() but check at compile time        |
-| ☑️     | `has()`               | check if a feature is supported in Vim         |
-|        | `changenr()`          | return number of most recent change            |
-|        | `cscope_connection()` | check if a cscope connection exists            |
-|        | `did_filetype()`      | check if a FileType autocommand was used       |
-|        | `diff()`              | diff two Lists of strings                      |
-|        | `eventhandler()`      | check if invoked by an event handler           |
-|        | `getcellpixels()`     | get List of cell pixel size                    |
-|        | `getpid()`            | get process ID of Vim                          |
-|        | `getscriptinfo()`     | get list of sourced vim scripts                |
-|        | `getimstatus()`       | check if IME status is active                  |
-|        | `interrupt()`         | interrupt script execution                     |
-|        | `windowsversion()`    | get MS-Windows version                         |
-|        | `terminalprops()`     | properties of the terminal                     |
-|        | `libcall()`           | call a function in an external library         |
-|        | `libcallnr()`         | idem, returning a number                       |
-|        | `undofile()`          | get the name of the undo file                  |
-|        | `undotree()`          | return the state of the undo tree for a buffer |
-|        | `shiftwidth()`        | effective value of 'shiftwidth'                |
-|        | `wordcount()`         | get byte/word/char count of buffer             |
-|        | `id()`                | get unique string for item to use as a key     |
-|        | `luaeval()`           | evaluate `Lua` expression                      |
-|        | `mzeval()`            | evaluate `MzScheme` expression                 |
-|        | `perleval()`          | evaluate Perl expression (`+perl`)             |
-|        | `py3eval()`           | evaluate Python expression (`+python3`)        |
-|        | `pyeval()`            | evaluate Python expression (`+python`)         |
-|        | `pyxeval()`           | evaluate `python_x` expression                 |
-|        | `rubyeval()`          | evaluate `Ruby` expression                     |
-|        | `debugbreak()`        | interrupt a program being debugged             |
+| Status | Function                   | Description                                    |
+|--------|----------------------------|------------------------------------------------|
+|        | `mode()`                   | get current editing mode                       |
+|        | `state()`                  | get current busy state                         |
+|        | `visualmode()`             | last visual mode used                          |
+| ☑️     | `exists()`                 | check if a variable, function, etc. exists     |
+|        | `exists_compiled()`        | like exists() but check at compile time        |
+| ☑️     | `has()`                    | check if a feature is supported in Vim         |
+|        | `changenr()`               | return number of most recent change            |
+|        | `cscope_connection()`      | check if a cscope connection exists            |
+|        | `did_filetype()`           | check if a FileType autocommand was used       |
+|        | `diff()`                   | diff two Lists of strings                      |
+|        | `eventhandler()`           | check if invoked by an event handler           |
+|        | `getcellpixels()`          | get List of cell pixel size                    |
+|        | `getpid()`                 | get process ID of Vim                          |
+|        | `getscriptinfo()`          | get list of sourced vim scripts                |
+|        | `getstacktrace()`          | get current stack trace of Vim scripts         |
+|        | `getimstatus()`            | check if IME status is active                  |
+|        | `interrupt()`              | interrupt script execution                     |
+|        | `windowsversion()`         | get MS-Windows version                         |
+|        | `terminalprops()`          | properties of the terminal                     |
+|        | `libcall()`                | call a function in an external library         |
+|        | `libcallnr()`              | idem, returning a number                       |
+|        | `undofile()`               | get the name of the undo file                  |
+|        | `undotree()`               | return the state of the undo tree for a buffer |
+|        | `shiftwidth()`             | effective value of 'shiftwidth'                |
+|        | `wordcount()`              | get byte/word/char count of buffer             |
+|        | `id()`                     | get unique string for item to use as a key     |
+|        | `luaeval()`                | evaluate `Lua` expression                      |
+|        | `mzeval()`                 | evaluate `MzScheme` expression                 |
+|        | `perleval()`               | evaluate Perl expression (`+perl`)             |
+|        | `py3eval()`                | evaluate Python expression (`+python3`)        |
+|        | `pyeval()`                 | evaluate Python expression (`+python`)         |
+|        | `pyxeval()`                | evaluate `python_x` expression                 |
+|        | `rubyeval()`               | evaluate `Ruby` expression                     |
+|        | `debugbreak()`             | interrupt a program being debugged             |
+|        | `redraw_listener_add()`    | add callbacks to a listen for redraws          |
+|        | `redraw_listener_remove()` | remove a redraw listener                       |
 
 MacVim-specific functions
 

@@ -76,3 +76,5 @@ data class VimString(val value: String) : VimDataType("string") {
     val EMPTY: VimString = VimString("")
   }
 }
+
+fun String.asVimString() = VimString(this)
