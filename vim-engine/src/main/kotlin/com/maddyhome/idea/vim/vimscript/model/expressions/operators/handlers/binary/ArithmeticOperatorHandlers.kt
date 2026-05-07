@@ -78,7 +78,9 @@ internal object MultiplicationHandler : ArithmeticBinaryOperatorHandler() {
 internal object DivisionHandler : ArithmeticBinaryOperatorHandler() {
   override fun performOperation(left: Double, right: Double) = left / right
   override fun performOperation(left: Int, right: Int): Int {
-    // We get an exception when dividing an integer by 0. Doubles give NaN, which becomes 0 when converted to integer
+    // Avoid ArithmeticException from integer division by zero.
+    // Double division by zero produces ±Infinity (→ ±Int.MAX/MIN_VALUE) or NaN for 0/0 (→ 0),
+    // which matches Vim's specified behaviour for integer division by zero (see :help /).
     return (left.toDouble() / right.toDouble()).toInt()
   }
 }

@@ -81,7 +81,7 @@ class BitwiseLeftShiftOperatorTest : VimTestCase() {
   @Test
   fun `test bitwise left shift with bit count equal to the max bits in Vim Number returns 0`() {
     // Vim has `v:numbersize` of 64, IdeaVim's VimInt is an Int, so has a max bit size of 32
-    // E.g. in Vim: `echo 1<<64` => 0, but `echo 1<<63` returns -long.max_value
+    // E.g. in Vim: `echo 1<<64` => 0, but `echo 1<<63` returns Long.MIN_VALUE (-9223372036854775808)
     assertEquals(VimInt(Int.MIN_VALUE), VimscriptParser.parseExpression("1 << 31")!!.evaluate())
     assertEquals(VimInt(0), VimscriptParser.parseExpression("1 << 32")!!.evaluate())
     assertEquals(VimInt(0), VimscriptParser.parseExpression("1 << 33")!!.evaluate())

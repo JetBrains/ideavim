@@ -8,7 +8,6 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.functions.floatFunctions
 
-import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -26,15 +25,11 @@ class Float2NrFunctionTest : VimTestCase() {
     assertCommandOutput("echo float2nr(42)", "42")
   }
 
-  @VimBehaviorDiffers(
-    originalVimAfter = "3 -23 2147483647 -2147483647 0",
-    description = "The Vim docs say float2nr(-1.0e150) should return -2147483647 not -2147483648"
-  )
   @Test
   fun `test float2nr returns integer value for float`() {
     assertCommandOutput(
       "echo float2nr(3.95) float2nr(-23.45) float2nr(1.0e100) float2nr(-1.0e150) float2nr(1.0e-100)",
-      "3 -23 2147483647 -2147483648 0"
+      "3 -23 2147483647 -2147483647 0"
     )
   }
 
