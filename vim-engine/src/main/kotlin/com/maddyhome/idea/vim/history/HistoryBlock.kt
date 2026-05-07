@@ -11,7 +11,7 @@ package com.maddyhome.idea.vim.history
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 
-class HistoryBlock {
+internal class HistoryBlock {
   private val entries = mutableListOf<HistoryEntry>()
 
   private var counter = 0

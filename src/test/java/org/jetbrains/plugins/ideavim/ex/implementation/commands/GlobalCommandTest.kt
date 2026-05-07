@@ -239,7 +239,6 @@ class GlobalCommandTest : VimTestCase() {
 
   @Test
   fun `test check history`() {
-    (VimPlugin.getHistory() as com.maddyhome.idea.vim.group.HistoryGroup).clear()
     val initialEntries = VimPlugin.getHistory().getEntries(VimHistory.Type.Command, 0, 0)
     doTest(
       "g/found/d",

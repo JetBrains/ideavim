@@ -12,11 +12,6 @@ import org.jetbrains.annotations.TestOnly
 
 interface VimHistory {
   /**
-   * Add an item to the end of the list for the given history type
-   */
-  fun addEntry(type: Type, text: String)
-
-  /**
    * Get a list of history entries for the given history type, within the specified range
    *
    * The values of [first] and [last] can be either positive or negative. When the value is negative, it is an index
@@ -28,6 +23,11 @@ interface VimHistory {
    * [last]. If [last] is `0`, all entries after [first] are returned. If both values are `0`, all entries are returned.
    */
   fun getEntries(type: Type, first: Int, last: Int): List<HistoryEntry>
+
+  /**
+   * Add an item to the end of the list for the given history type
+   */
+  fun addEntry(type: Type, text: String)
 
   /**
    * Removes an item from the history, either by number or relative position
