@@ -28,6 +28,7 @@ object SplitModeTests : IdeaVimBuildType({
   params {
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
     param("env.ORG_GRADLE_PROJECT_instrumentPluginCode", "false")
+    param("env.DISPLAY", ":99")
   }
 
   vcs {
@@ -39,8 +40,34 @@ object SplitModeTests : IdeaVimBuildType({
 
   steps {
     script {
-      name = "Run split mode tests"
-      scriptContent = "xvfb-run -a -s '-screen 0 1920x1080x24' ./gradlew :tests:split-mode-tests:testSplitMode --console=plain --build-cache --configuration-cache --stacktrace"
+      name = "Start Xvfb and run split mode tests"
+      scriptContent = """
+              # Kill any leftover Xvfb from previous runs
+              pkill -f 'Xvfb :99' || true
+
+              Xvfb :99 -screen 0 1920x1080x24 -nolisten tcp &
+              XVFB_PID=${'$'}!
+
+              # Wait until the display is ready
+              for i in $(seq 1 30); do
+                if xdpyinfo -display :99 >/dev/null 2>&1; then
+                  echo "Xvfb is ready on :99"
+                  break
+                fi
+                sleep 1
+              done
+
+              if ! xdpyinfo -display :99 >/dev/null 2>&1; then
+                echo "ERROR: Xvfb failed to start on :99"
+                exit 1
+              fi
+
+              ./gradlew :tests:split-mode-tests:testSplitMode --console=plain --build-cache --configuration-cache --stacktrace
+              TEST_EXIT=${'$'}?
+
+              kill ${'$'}XVFB_PID 2>/dev/null || true
+              exit ${'$'}TEST_EXIT
+          """.trimIndent()
     }
   }
 
