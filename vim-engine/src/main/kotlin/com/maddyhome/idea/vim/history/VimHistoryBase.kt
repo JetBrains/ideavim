@@ -11,6 +11,9 @@ package com.maddyhome.idea.vim.history
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
+import com.maddyhome.idea.vim.ex.exExceptionMessage
+import com.maddyhome.idea.vim.regexp.VimRegex
+import com.maddyhome.idea.vim.regexp.VimRegexException
 
 open class VimHistoryBase : VimHistory {
   protected val histories: MutableMap<VimHistory.Type, HistoryBlock> = mutableMapOf()
@@ -58,6 +61,42 @@ open class VimHistoryBase : VimHistory {
     }
 
     return res
+  }
+
+  override fun removeEntry(type: VimHistory.Type, item: Int):Boolean {
+    val block = getEntriesBlockByType(type)
+    return if (item > 0) {
+      block.removeEntryByNumber(item)
+    }
+    else {
+      val entry = getEntries(type, item, 0).firstOrNull() ?: return false
+      block.removeEntryByNumber(entry.number)
+    }
+  }
+
+  override fun removeEntries(type: VimHistory.Type, pattern: String): Boolean {
+    try {
+      val block = getEntriesBlockByType(type)
+      val regex = VimRegex(pattern)
+      var result = false
+      block.getEntries().toList().forEach {
+        if (regex.containsMatchIn(it.entry)) {
+          result = result or block.removeEntryByNumber(it.number)
+        }
+      }
+      return result
+    }
+    catch (e: VimRegexException) {
+      when (e.message) {
+        "E383" -> throw exExceptionMessage("E383", pattern)
+        "E486" -> throw exExceptionMessage("E486", pattern)
+      }
+      throw e
+    }
+  }
+
+  override fun clearHistory(type: VimHistory.Type) {
+    histories.remove(type)
   }
 
   override fun resetHistory() {

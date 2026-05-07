@@ -41,6 +41,7 @@
   "has_key": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.dictionaryFunctions.HasKeyFunctionHandler",
   "hasmapto": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.mappingFunctions.HasMapToFunctionHandler",
   "histadd": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.historyFunctions.HistAddFunctionHandler",
+  "histdel": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.historyFunctions.HistDelFunctionHandler",
   "histget": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.historyFunctions.HistGetFunctionHandler",
   "histnr": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.historyFunctions.HistNrFunctionHandler",
   "index": "com.maddyhome.idea.vim.vimscript.model.functions.handlers.listFunctions.IndexFunctionHandler",
