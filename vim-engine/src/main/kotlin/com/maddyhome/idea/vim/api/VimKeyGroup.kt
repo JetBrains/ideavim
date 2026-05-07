@@ -81,3 +81,16 @@ interface VimKeyGroup {
   /** Registers a shortcut that is handled directly by KeyHandler, rather than by an action. */
   fun registerShortcutWithoutAction(keyStroke: KeyStroke, owner: MappingOwner) {}
 }
+
+/**
+ * Retrieve the first mapping that is an exact match for the given LHS keystrokes in the given modes
+ *
+ * This function is essentially equivalent to the Vim function `maparg()`.
+ *
+ * Typically, this function will be called with a single mode, in which case there will be a single result, or null.
+ * However, for `maparg()` support, it can also be called with [MappingMode.NVO], which might have the same mapping in
+ * all modes, or a different mapping in any one of the modes. This function, like `maparg()`, will return an arbitrary
+ * (undocumented) mapping in this scenario.
+ */
+fun VimKeyGroup.getFirstMappingInfoMatch(name: List<KeyStroke>, mode: Set<MappingMode>) =
+  mode.map { getKeyMapping(it) }.map { it[name] }.firstOrNull()
