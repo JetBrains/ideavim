@@ -11,7 +11,9 @@ package com.maddyhome.idea.vim.group.file
 import com.intellij.ide.vfs.VirtualFileId
 import com.intellij.ide.vfs.virtualFile
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.application.readAction
+import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.editor.Editor
@@ -26,6 +28,7 @@ import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.platform.project.ProjectId
@@ -53,21 +56,18 @@ internal class FileRemoteApiImpl : FileRemoteApi {
     findFile(filename, project)?.path
   }
 
-  override suspend fun openFile(filename: String, projectId: ProjectId?, focusEditor: Boolean): String? =
-    onEdt {
-      val project = projectId?.findProjectOrNull() ?: return@onEdt "No project found"
-      val found = findFile(filename, project)
-      if (found != null) {
-        logger.debug { "found file: $found" }
-        val type = FileTypeManager.getInstance().getKnownFileTypeOrAssociate(found, project)
-        if (type != null) {
-          FileEditorManager.getInstance(project).openFile(found, focusEditor)
-        }
-        null // success
-      } else {
-        EngineMessageHelper.message("message.open.file.not.found", filename)
-      }
+  override suspend fun openFile(filename: String, projectId: ProjectId?, focusEditor: Boolean): String? = onEdt {
+    val project = projectId?.findProjectOrNull() ?: return@onEdt "No project found"
+    var file = findFile(filename, project) ?: createFile(filename, project)
+
+    if (file != null) {
+      FileEditorManager.getInstance(project)
+        .openFile(file, focusEditor)
+      null
+    } else {
+      EngineMessageHelper.message("message.open.file.not.found", filename)
     }
+  }
 
   override suspend fun closeCurrentFile(projectId: ProjectId?, virtualFileId: VirtualFileId?) =
     onEdt {
@@ -168,7 +168,6 @@ internal class FileRemoteApiImpl : FileRemoteApi {
   }
 
   // ======================== Private helpers ========================
-
   private fun findFile(filename: String, project: Project): VirtualFile? {
     if (filename.startsWith("~/") || filename.startsWith("~\\")) {
       val relativePath = filename.substring(2)
@@ -250,6 +249,34 @@ internal class FileRemoteApiImpl : FileRemoteApi {
     val projectScope = ProjectScope.getProjectScope(project)
     val names = FilenameIndex.getVirtualFilesByName(filename, projectScope)
     return names.firstOrNull()
+  }
+
+  private fun createFile(filename: String, project: Project): VirtualFile? {
+    val path = when {
+      filename.startsWith("~/") || filename.startsWith("~\\") -> {
+        val home = System.getProperty("user.home")
+        Path(home, filename.substring(2))
+      }
+      Path(filename).isAbsolute -> Path(filename)
+      else -> {
+        val basePath = project.basePath ?: return null
+        Path(basePath, filename)
+      }
+    }
+
+    return try {
+      WriteCommandAction.writeCommandAction(project)
+        .withName("Create File")
+        .compute<VirtualFile?, Exception> {
+          val parentDir = VfsUtil.createDirectoryIfMissing(path.parent.toString())
+            ?: return@compute null
+          logger.debug { "creating new file: $path" }
+          parentDir.createChildData(this, path.fileName.toString())
+        }
+    } catch (e: Exception) {
+      logger.warn("Failed to create file '$filename': ${e.message}")
+      null
+    }
   }
 
   companion object {
