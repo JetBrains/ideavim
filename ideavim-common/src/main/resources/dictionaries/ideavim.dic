@@ -179,6 +179,7 @@ getreg
 getregtype
 hasmapto
 histadd
+histdel
 histget
 histnr
 indexof

@@ -41,6 +41,18 @@ class HistoryBlock {
     }
   }
 
+  fun removeEntryByNumber(number: Int): Boolean {
+    val index = entries.indexOfFirst { it.number == number }
+    if (index != -1) {
+      val entry = entries.removeAt(index)
+      if (entry.current) {
+        entries.removeLastOrNull()?.let { entries.add(it.copy(current = true)) }
+      }
+      return true
+    }
+    return false
+  }
+
   fun getEntries(): List<HistoryEntry> {
     return entries
   }
