@@ -375,6 +375,13 @@ class MapCommandTest : VimTestCase() {
   }
 
   @Test
+  fun `test map reports when no existing mappings match prefix`() {
+    configureByText("\n")
+    enterCommand("map quux bar")
+    assertCommandOutput("map foo", "No mapping found")
+  }
+
+  @Test
   fun `test map outputs mappings that are a prefix to arg and that have arg as a prefix`() {
     configureByText("\n")
     // Vim matches mappings that are a prefix to arg (e.g. mapping "f" matches arg "foo"),
@@ -386,6 +393,37 @@ class MapCommandTest : VimTestCase() {
       """
         |   f             bar
         |   food          baz
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test map outputs prefix and exact match mappings`() {
+    configureByText("\n")
+    enterCommand("map f bar")
+    enterCommand("map foo quux")
+    enterCommand("map food baz")
+    assertCommandOutput("map foo",
+      """
+        |   f             bar
+        |   foo           quux
+        |   food          baz
+      """.trimMargin()
+    )
+  }
+
+  @Test
+  fun `test map outputs prefix and exact match mappings when only used in single mode`() {
+    configureByText("\n")
+    // The implementation takes a simpler path if asking for the maps for a single mode. Verify this path too
+    enterCommand("nmap f bar")
+    enterCommand("nmap foo quux")
+    enterCommand("nmap food baz")
+    assertCommandOutput("nmap foo",
+      """
+        |n  f             bar
+        |n  foo           quux
+        |n  food          baz
       """.trimMargin()
     )
   }

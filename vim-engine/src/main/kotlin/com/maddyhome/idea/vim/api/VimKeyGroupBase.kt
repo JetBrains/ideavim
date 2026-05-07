@@ -13,7 +13,6 @@ import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.key.KeyMapping
-import com.maddyhome.idea.vim.key.KeyMappingLayer
 import com.maddyhome.idea.vim.key.KeyStrokeTrie
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.RequiredShortcut
@@ -40,10 +39,6 @@ abstract class VimKeyGroupBase : VimKeyGroup {
     modes.map { getKeyMapping(it) }.forEach { it.clear() }
   }
 
-  override fun hasmapto(mode: MappingMode, toKeys: List<KeyStroke>): Boolean {
-    return this.getKeyMapping(mode).hasmapto(toKeys)
-  }
-
   override fun getKeyMapping(mode: MappingMode): KeyMapping {
     return keyMappings.getOrPut(mode) { KeyMapping(mode) }
   }
@@ -64,9 +59,7 @@ abstract class VimKeyGroupBase : VimKeyGroup {
    * @return The root node of the builtin command trie
    */
   override fun getBuiltinCommandsTrie(mappingMode: MappingMode): KeyStrokeTrie<LazyVimCommand> =
-    builtinCommands.getOrPut(mappingMode) { KeyStrokeTrie<LazyVimCommand>(mappingMode.name[0].lowercase()) }
-
-  override fun getKeyMappingLayer(mode: MappingMode): KeyMappingLayer = getKeyMapping(mode)
+    builtinCommands.getOrPut(mappingMode) { KeyStrokeTrie(mappingMode.name[0].lowercase()) }
 
   @Deprecated("Initialization EditorActionHandlerBase for this method breaks the point of lazy initialization")
   protected fun checkCommand(
@@ -184,6 +177,8 @@ abstract class VimKeyGroupBase : VimKeyGroup {
       updateShortcutKeysRegistration()
     }
   }
+
+  protected abstract fun updateShortcutKeysRegistration()
 
   override fun removeKeyMapping(owner: MappingOwner) {
     MappingMode.entries.map { getKeyMapping(it) }.forEach { it.removeKeyMappingsByOwner(owner) }

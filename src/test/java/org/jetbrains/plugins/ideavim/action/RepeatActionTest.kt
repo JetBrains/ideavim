@@ -9,7 +9,7 @@
 package org.jetbrains.plugins.ideavim.action
 
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.api.key
+import com.maddyhome.idea.vim.api.keys
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.key.MappingOwner
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -104,9 +104,9 @@ class RepeatActionTest : VimTestCase() {
     ) {
       injector.keyGroup.putKeyMapping(
         MappingMode.I,
-        listOf(key("<DEL>")),
+        keys("<DEL>"),
         MappingOwner.IdeaVim.Other,
-        listOf(key("j")),
+        keys("j"),
         false
       )
     }

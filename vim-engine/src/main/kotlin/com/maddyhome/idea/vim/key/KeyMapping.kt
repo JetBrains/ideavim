@@ -39,7 +39,7 @@ data class KeyMappingEntry(private val node: TrieNode<MappingInfo>) {
  *
  * @author vlan
  */
-class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, KeyMappingLayer {
+class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>> {
   private val keysTrie = KeyStrokeTrie<MappingInfo>(mode.name)
 
   /**
@@ -57,9 +57,6 @@ class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, Key
 
     return null
   }
-
-  // TODO: Do we need this as well as get()?
-  override fun getLayer(keys: List<KeyStroke>): MappingInfoLayer? = get(keys)
 
   @Deprecated("Use get(List<KeyStroke>) to maintain the same lookup key type and avoid unnecessary wrapping")
   operator fun get(keys: Iterable<KeyStroke>): MappingInfo? =
@@ -169,7 +166,7 @@ class KeyMapping(private val mode: MappingMode) : Iterable<List<KeyStroke>>, Key
    * Used while handling unfinished mapping sequences. Note that a list of keystrokes that is both a key sequence and a
    * prefix is treated as a prefix.
    */
-  override fun isPrefix(keys: List<KeyStroke>): Boolean {
+  fun isPrefix(keys: List<KeyStroke>): Boolean {
     if (keys.isEmpty()) return false
     if (keysTrie.isPrefix(keys)) return true
 

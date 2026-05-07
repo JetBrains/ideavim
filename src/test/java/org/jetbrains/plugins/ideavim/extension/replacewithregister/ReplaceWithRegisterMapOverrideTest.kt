@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.extension.replacewithregister
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.getMappingInfo
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.key.ToKeysMappingInfo
@@ -46,9 +47,9 @@ class ReplaceWithRegisterMapOverrideTest : VimTestCase() {
     val grKeys = injector.parser.parseKeys("gr")
     val grrKeys = injector.parser.parseKeys("grr")
 
-    val nGr = VimPlugin.getKey().getKeyMapping(MappingMode.NORMAL)[grKeys]
-    val nGrr = VimPlugin.getKey().getKeyMapping(MappingMode.NORMAL)[grrKeys]
-    val vGr = VimPlugin.getKey().getKeyMapping(MappingMode.VISUAL)[grKeys]
+    val nGr = VimPlugin.getKey().getMappingInfo(grKeys, MappingMode.NORMAL)
+    val nGrr = VimPlugin.getKey().getMappingInfo(grrKeys, MappingMode.NORMAL)
+    val vGr = VimPlugin.getKey().getMappingInfo(grKeys, MappingMode.VISUAL)
 
     assertEquals(nop, (nGr as? ToKeysMappingInfo)?.toKeys, "normal gr should map to <nop>")
     assertEquals(nop, (nGrr as? ToKeysMappingInfo)?.toKeys, "normal grr should map to <nop>")

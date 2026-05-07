@@ -177,8 +177,12 @@ getcmdtype
 getline
 getreg
 getregtype
+hasmapto
 indexof
 isinf
+maparg
+mapcheck
+maplist
 mapnew
 tolower
 toupper
