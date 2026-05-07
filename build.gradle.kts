@@ -472,6 +472,8 @@ intellijPlatform {
         * <a href="https://youtrack.jetbrains.com/issue/VIM-566">VIM-566</a> Added support for <code>:set foldlevel</code> option - control fold visibility level<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-1158">VIM-1158</a> Added <code>gw</code> command - reformat code like <code>gq</code> but preserving the cursor position<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-3975">VIM-3975</a> Added <code>mode()</code> VimScript function - returns the current editing mode (e.g., <code>'n'</code> for normal, <code>'i'</code> for insert, <code>'v'</code> for visual, <code>'R'</code> for replace)<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-519">VIM-519</a> Added <code>g;</code> and <code>g,</code> commands - navigate the change list to jump to previous (<code>g;</code>) or next (<code>g,</code>) edit location<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-258">VIM-258</a> Added command name completion in ex commands - press <code>&lt;Tab&gt;</code> to cycle through matching command names (e.g., <code>:e&lt;Tab&gt;</code> shows <code>:edit</code>, <code>:earlier</code>, etc.)<br>
         <br>
         <b>Fixes:</b><br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4197">VIM-4197</a> Fixed Vim features (e.g., <code>f</code>, <code>w</code>, text objects) not working in Java files decompiled from Kotlin class files<br>
@@ -522,8 +524,12 @@ intellijPlatform {
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4196">VIM-4196</a> Fixed NERDTree file selection not being restored after pressing <code>&lt;Esc&gt;</code> to cancel a <code>/</code> speed search<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4211">VIM-4211</a> Fixed IdeaVim not working in Git commit window when the Conventional Commits plugin is installed<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4224">VIM-4224</a> Fixed <code>:s</code> <code>e</code> flag now properly suppresses "Pattern not found" errors - e.g., <code>%s/\s\+$//e</code> no longer errors when there is no trailing whitespace<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4226">VIM-4226</a> Fixed race condition crash when the editor is disposed while the ex panel is open<br>
         <br>
         <b>Merged PRs:</b><br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1747">1747</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: feat(VIM-519): cycle through recent edits with g; and g,<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1745">1745</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: feat(VIM-258): tab command completion<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1744">1744</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: fix(VIM-4226): check if editor is disposed on focus<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1741">1741</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: fix(VIM-4224): respect e flag in search patterns<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1740">1740</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: feat(VIM-3975): support vim mode() function<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1739">1739</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: fix(VIM-4196): restore file selection after esc in nerdtree<br>

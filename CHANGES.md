@@ -38,6 +38,8 @@ usual beta standards.
 * [VIM-566](https://youtrack.jetbrains.com/issue/VIM-566) Added support for `:set foldlevel` option - control fold visibility level
 * [VIM-1158](https://youtrack.jetbrains.com/issue/VIM-1158) Added `gw` command - reformat code like `gq` but preserving the cursor position
 * [VIM-3975](https://youtrack.jetbrains.com/issue/VIM-3975) Added `mode()` VimScript function - returns the current editing mode (e.g., `'n'` for normal, `'i'` for insert, `'v'` for visual, `'R'` for replace)
+* [VIM-519](https://youtrack.jetbrains.com/issue/VIM-519) Added `g;` and `g,` commands - navigate the change list to jump to previous (`g;`) or next (`g,`) edit location
+* [VIM-258](https://youtrack.jetbrains.com/issue/VIM-258) Added command name completion in ex commands - press `<Tab>` to cycle through matching command names (e.g., `:e<Tab>` shows `:edit`, `:earlier`, etc.)
 
 ### Fixes:
 * [VIM-4197](https://youtrack.jetbrains.com/issue/VIM-4197) Fixed Vim features (e.g., `f`, `w`, text objects) not working in Java files decompiled from Kotlin class files
@@ -88,8 +90,12 @@ usual beta standards.
 * [VIM-4196](https://youtrack.jetbrains.com/issue/VIM-4196) Fixed NERDTree file selection not being restored after pressing `<Esc>` to cancel a `/` speed search
 * [VIM-4211](https://youtrack.jetbrains.com/issue/VIM-4211) Fixed IdeaVim not working in Git commit window when the Conventional Commits plugin is installed
 * [VIM-4224](https://youtrack.jetbrains.com/issue/VIM-4224) Fixed `:s` `e` flag now properly suppresses "Pattern not found" errors - e.g., `%s/\s\+$//e` no longer errors when there is no trailing whitespace
+* [VIM-4226](https://youtrack.jetbrains.com/issue/VIM-4226) Fixed race condition crash when the editor is disposed while the ex panel is open
 
 ### Merged PRs:
+* [1747](https://github.com/JetBrains/ideavim/pull/1747) by [1grzyb1](https://github.com/1grzyb1): feat(VIM-519): cycle through recent edits with g; and g,
+* [1745](https://github.com/JetBrains/ideavim/pull/1745) by [1grzyb1](https://github.com/1grzyb1): feat(VIM-258): tab command completion
+* [1744](https://github.com/JetBrains/ideavim/pull/1744) by [1grzyb1](https://github.com/1grzyb1): fix(VIM-4226): check if editor is disposed on focus
 * [1741](https://github.com/JetBrains/ideavim/pull/1741) by [1grzyb1](https://github.com/1grzyb1): fix(VIM-4224): respect e flag in search patterns
 * [1740](https://github.com/JetBrains/ideavim/pull/1740) by [1grzyb1](https://github.com/1grzyb1): feat(VIM-3975): support vim mode() function
 * [1739](https://github.com/JetBrains/ideavim/pull/1739) by [1grzyb1](https://github.com/1grzyb1): fix(VIM-4196): restore file selection after esc in nerdtree
