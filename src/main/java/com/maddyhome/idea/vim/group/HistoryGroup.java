@@ -13,7 +13,6 @@ import com.intellij.openapi.components.RoamingType;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
-import com.maddyhome.idea.vim.history.HistoryBlock;
 import com.maddyhome.idea.vim.history.HistoryEntry;
 import com.maddyhome.idea.vim.history.VimHistory;
 import com.maddyhome.idea.vim.history.VimHistoryBase;
@@ -21,7 +20,6 @@ import com.maddyhome.idea.vim.newapi.VimLegacyStateLoader;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.TestOnly;
 
 import java.util.List;
 
@@ -36,7 +34,7 @@ public class HistoryGroup extends VimHistoryBase
     logger.debug("saveData");
     Element hist = new Element("history");
 
-    for (Type type : getHistories().keySet()) {
+    for (Type type : getInitialisedTypes()) {
       saveData(hist, type);
     }
 
@@ -44,14 +42,14 @@ public class HistoryGroup extends VimHistoryBase
   }
 
   private void saveData(@NotNull Element element, VimHistory.Type type) {
-    final HistoryBlock block = getHistories().get(type);
-    if (block == null) {
+    var entries = getEntries(type, 0, 0);
+    if (entries.isEmpty()) {
       return;
     }
 
     final Element root = new Element("history-" + typeToKey(type));
 
-    for (HistoryEntry entry : block.getEntries()) {
+    for (HistoryEntry entry : entries) {
       final Element entryElement = new Element("entry");
       XMLGroup.getInstance().setSafeXmlText(entryElement, entry.getEntry());
       root.addContent(entryElement);
@@ -74,13 +72,10 @@ public class HistoryGroup extends VimHistoryBase
   }
 
   private void readData(@NotNull Element element, String key) {
-    HistoryBlock block = getHistories().get(getTypeForString(key));
-    if (block != null) {
+    final Type type = getTypeForString(key);
+    if (!isInitialised(type)) {
       return;
     }
-
-    block = new HistoryBlock();
-    getHistories().put(getTypeForString(key), block);
 
     final Element root = element.getChild("history-" + key);
     if (root != null) {
@@ -88,7 +83,7 @@ public class HistoryGroup extends VimHistoryBase
       for (Element item : items) {
         final String text = XMLGroup.getInstance().getSafeXmlText(item);
         if (text != null) {
-          block.addEntry(text);
+          addEntry(type, text);
         }
       }
     }
@@ -126,10 +121,5 @@ public class HistoryGroup extends VimHistoryBase
   @Override
   public void loadState(@NotNull Element state) {
     readData(state);
-  }
-
-  @TestOnly
-  public void clear() {
-    getHistories().clear();
   }
 }

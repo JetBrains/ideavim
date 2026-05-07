@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.regexp.VimRegex
 import com.maddyhome.idea.vim.regexp.VimRegexException
 
 open class VimHistoryBase : VimHistory {
-  protected val histories: MutableMap<VimHistory.Type, HistoryBlock> = mutableMapOf()
+  private val histories: MutableMap<VimHistory.Type, HistoryBlock> = mutableMapOf()
 
   override fun addEntry(type: VimHistory.Type, text: String) {
     val block = getEntriesBlockByType(type)
@@ -105,6 +105,14 @@ open class VimHistoryBase : VimHistory {
 
   private fun getEntriesBlockByType(type: VimHistory.Type): HistoryBlock {
     return histories.getOrPut(type) { HistoryBlock() }
+  }
+
+  protected fun isInitialised(type: VimHistory.Type): Boolean {
+    return histories.contains(type)
+  }
+
+  protected fun getInitialisedTypes(): Set<VimHistory.Type> {
+    return histories.keys
   }
 
   companion object {
