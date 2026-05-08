@@ -45,6 +45,7 @@ const knownPlugins = new Set([
   "com.github.pooryam92.vimcoach", // https://plugins.jetbrains.com/plugin/30148-vim-coach
   "lazyideavim.whichkeylazy", // https://plugins.jetbrains.com/plugin/30446-which-key-lazy
   "com.github.vimkeysuggest", // https://plugins.jetbrains.com/plugin/30486-vimkeysuggest
+  "dev.ckob.lazygit", // https://plugins.jetbrains.com/plugin/30919-lazygit
 ]);
 
 async function getPluginLinkByXmlId(xmlId: string): Promise<string | null> {

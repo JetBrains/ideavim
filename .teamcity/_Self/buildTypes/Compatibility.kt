@@ -73,6 +73,7 @@ object Compatibility : IdeaVimBuildType({
               java -jar verifier1/verifier-cli-ideavim.jar check-plugin '${'$'}com.github.pooryam92.vimcoach' [latest-IU] -team-city
               java -jar verifier1/verifier-cli-ideavim.jar check-plugin '${'$'}lazyideavim.whichkeylazy' [latest-IU] -team-city
               java -jar verifier1/verifier-cli-ideavim.jar check-plugin '${'$'}com.github.vimkeysuggest' [latest-IU] -team-city
+              java -jar verifier1/verifier-cli-ideavim.jar check-plugin '${'$'}dev.ckob.lazygit' [latest-IU] -team-city
             """.trimIndent()
     }
   }
