@@ -33,6 +33,7 @@ object Project : Project({
 
   // Active tests
   buildType(TestingBuildType("Latest EAP", version = "LATEST-EAP-SNAPSHOT"))
+  buildType(TestingBuildType("2026.1"))
   buildType(TestingBuildType("2025.3"))
 
   buildType(PropertyBased)
