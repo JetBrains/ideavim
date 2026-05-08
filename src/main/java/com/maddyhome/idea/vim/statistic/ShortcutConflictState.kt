@@ -207,6 +207,6 @@ private val keyStrokes = listOf(
   KeyStroke.getKeyStroke(']'.code, CTRL_DOWN_MASK + SHIFT_DOWN_MASK),
 )
 private val KEY_STROKE = EventFields.String("key_stroke", keyStrokes.map { it.toReadableString() })
-private val HANDLER_MODE = EventFields.Enum<HandledModes>("handler")
+private val HANDLER_MODE = EventFields.Enum("handler", HandledModes::class.java)
 private val HANDLER =
   GROUP.registerEvent("vim.handler", KEY_STROKE, HANDLER_MODE, "Information about Vim handlers for different shortcuts")
