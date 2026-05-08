@@ -17,7 +17,6 @@ import _Self.buildTypes.RandomOrderTests
 import _Self.buildTypes.SplitModeTests
 
 import _Self.buildTypes.TestingBuildType
-import _Self.buildTypes.TypeScriptTest
 import _Self.subprojects.Releases
 import _Self.vcsRoots.ReleasesVcsRoot
 import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
@@ -44,9 +43,6 @@ object Project : Project({
   buildType(Nvim)
   buildType(PluginVerifier)
   buildType(Compatibility)
-
-  // TypeScript scripts test
-  buildType(TypeScriptTest)
 })
 
 // Agent size configurations (CPU count)
