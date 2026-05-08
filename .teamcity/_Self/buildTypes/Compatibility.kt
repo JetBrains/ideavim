@@ -54,7 +54,10 @@ object Compatibility : IdeaVimBuildType({
               java --version
               java -jar verifier1/verifier-cli-ideavim.jar check-plugin '${'$'}org.jetbrains.IdeaVim-EasyMotion' [latest-IU] -team-city
               java -jar verifier1/verifier-cli-ideavim.jar check-plugin '${'$'}eu.theblob42.idea.whichkey' [latest-IU] -team-city
-              java -jar verifier1/verifier-cli-ideavim.jar check-plugin '${'$'}IdeaVimExtension' [latest-IU] -team-city
+              # Disabled: IdeaVimExtension references missing bundle key "option not found" in its init() method.
+              # This is a bug in the external plugin, not IdeaVim. Re-enable once upstream is fixed.
+              # https://github.com/hadix-lin/ideavim_extension
+              # java -jar verifier1/verifier-cli-ideavim.jar check-plugin '${'$'}IdeaVimExtension' [latest-IU] -team-city
               # Outdated java -jar verifier/verifier-cli-ideavim.jar check-plugin '${'$'}github.zgqq.intellij-enhance' [latest-IU] -team-city
               # java -jar verifier1/verifier-cli-ideavim.jar check-plugin '${'$'}com.github.copilot' [latest-IU] -team-city
               java -jar verifier1/verifier-cli-ideavim.jar check-plugin '${'$'}com.github.dankinsoid.multicursor' [latest-IU] -team-city
