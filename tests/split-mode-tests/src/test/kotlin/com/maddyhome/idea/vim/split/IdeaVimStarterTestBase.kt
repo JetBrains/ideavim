@@ -20,7 +20,7 @@ import com.intellij.ide.starter.driver.engine.BackgroundRun
 import com.intellij.ide.starter.driver.engine.runIdeWithDriver
 import com.intellij.ide.starter.ide.IDERemDevTestContext
 import com.intellij.ide.starter.ide.IDETestContext
-import com.intellij.ide.starter.ide.IdeProductProvider
+import com.intellij.ide.starter.models.IdeInfo
 import com.intellij.ide.starter.models.TestCase
 import com.intellij.ide.starter.plugins.PluginConfigurator
 import com.intellij.ide.starter.project.LocalProjectInfo
@@ -67,7 +67,7 @@ abstract class IdeaVimStarterTestBase {
 
     val context = Starter.newContext(
       this::class.simpleName ?: "split-test",
-      TestCase(IdeProductProvider.IU, LocalProjectInfo(projectDir)).useEAP()
+      TestCase(IDEA_ULTIMATE, LocalProjectInfo(projectDir)).useEAP()
     )
 
     val pluginPath = resolvePluginPath()
@@ -334,6 +334,16 @@ abstract class IdeaVimStarterTestBase {
   }
 
   companion object {
+    // Inlined IdeInfo for IntelliJ IDEA Ultimate. Avoids the IdeProductProvider/IdeInfo.IdeaUltimate
+    // API that varies across IntelliJ build numbers (renamed/removed in 262 EAP).
+    private val IDEA_ULTIMATE = IdeInfo(
+      productCode = "IU",
+      platformPrefix = "idea",
+      executableFileName = "idea",
+      fullName = "IDEA",
+      qodanaProductCode = "QDJVM",
+    )
+
     fun resolvePluginPath(): Path {
       val pathStr = System.getProperty("ideavim.plugin.path")
         ?: error(
