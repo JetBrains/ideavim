@@ -592,6 +592,10 @@ intellijPlatform {
     ides {
       recommended()
     }
+    // AceJump is a third-party Marketplace plugin; the verifier doesn't have it on its classpath
+    // (only bundled IDE plugins are resolved). Suppress "Package 'org.acejump' is not found" so
+    // the optional integration in :modules:ideavim-acejump doesn't fail verification.
+    externalPrefixes.add("org.acejump")
   }
 
   instrumentCode.set(instrumentPluginCode.toBoolean())
