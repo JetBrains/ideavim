@@ -291,13 +291,13 @@ interface VimApi {
    * ```kotlin
    * // Get option value
    * val history = option { get<Int>("history") }
-   * 
+   *
    * // Set option value and return result
-   * val wasSet = option { 
+   * val wasSet = option {
    *     set("number", true)
    *     true
    * }
-   * 
+   *
    * // Multiple operations
    * option {
    *     set("ignorecase", true)
