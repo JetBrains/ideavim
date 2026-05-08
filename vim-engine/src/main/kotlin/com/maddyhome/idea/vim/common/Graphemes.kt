@@ -256,7 +256,7 @@ private fun classify(codePoint: Int): CodePointType {
       in 0x1100..0x115F, in 0xA960..0xA97C -> CodePointType.L
       in 0x1160..0x11A7, in 0xD7B0..0xD7C6 -> CodePointType.V
       in 0x11A8..0x11FF, in 0xD7CB..0xD7FB -> CodePointType.T
-      // LV is encountered every 28 characters, everything in-between is LVT. 
+      // LV is encountered every 28 characters, everything in-between is LVT.
       in 0xAC00..0xD7A3 -> if ((codePoint - 0xAC00) % 28 == 0) CodePointType.LV else CodePointType.LVT
       else -> CodePointType.OTHER
     }
