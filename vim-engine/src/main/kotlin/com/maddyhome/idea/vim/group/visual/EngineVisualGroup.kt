@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2023 The IdeaVim authors
+ * Copyright 2003-2026 The IdeaVim authors
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE.txt file or at
@@ -90,6 +90,10 @@ fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: VimCaret) 
       editor.primaryCaret().moveToInlayAwareOffset(selectionEnd)
     }
   }
+
+  // Selection-change notification for the IDE clipboard layer (vim-engine doesn't know how
+  // PRIMARY should behave on each platform). Clipboard I/O must never break visual mode setup.
+  runCatching { injector.clipboardManager.onVisualSelectionChange(caret.editor, caret) }
 }
 
 /**
