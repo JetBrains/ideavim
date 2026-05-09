@@ -426,6 +426,14 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     injector.clipboardManager.setClipboardContent(editor, context, copiedText)
   }
 
+  // Wayland's clipboard reader strips trailing newlines, so a line-wise yank cached as "foo\n"
+  // re-reads from PRIMARY as "foo". Treat the missing-trailing-newline variant as a match too,
+  // otherwise every poll of PRIMARY would overwrite our cached line-wise register with a
+  // character-wise one.
+  private fun cachedRegisterMatchesClipboard(cached: Register, clipboard: VimCopiedText): Boolean {
+    return clipboard.text == cached.text || clipboard.text + "\n" == cached.text
+  }
+
   private fun refreshPrimaryRegister(editor: VimEditor, context: ExecutionContext): Register? {
     logger.trace("Syncing cached primary selection value..")
     if (!isPrimaryRegisterSupported()) {
@@ -441,7 +449,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
         return myRegisters[PRIMARY_REGISTER]
       }
       val currentRegister = myRegisters[PRIMARY_REGISTER]
-      if (currentRegister != null && clipboardData.text == currentRegister.text) {
+      if (currentRegister != null && cachedRegisterMatchesClipboard(currentRegister, clipboardData)) {
         return currentRegister
       }
       return Register(PRIMARY_REGISTER, clipboardData, guessSelectionType(clipboardData.text))

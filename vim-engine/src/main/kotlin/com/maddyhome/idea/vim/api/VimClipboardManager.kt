@@ -27,6 +27,15 @@ interface VimClipboardManager {
   fun setClipboardContent(editor: VimEditor, context: ExecutionContext, textData: VimCopiedText): Boolean
   fun setPrimaryContent(editor: VimEditor, context: ExecutionContext, textData: VimCopiedText): Boolean
 
+  /**
+   * Fired when the user's visible visual selection changes. Whether to republish the new
+   * selection to the windowing system's PRIMARY is platform policy, so vim-engine just notifies
+   * and the IDE-specific implementation decides what (if anything) to do.
+   *
+   * Default: no-op.
+   */
+  fun onVisualSelectionChange(editor: VimEditor, caret: ImmutableVimCaret) {}
+
   @Deprecated("Please use com.maddyhome.idea.vim.api.VimClipboardManager#setClipboardContent")
   fun setClipboardText(text: String, rawText: String = text, transferableData: List<Any>): Transferable?
 
