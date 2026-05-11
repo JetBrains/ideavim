@@ -546,6 +546,10 @@ Contributors:
   [![icon][github]](https://github.com/digitalby)
   &nbsp;
   digitalby
+* [![icon][mail]](mailto:gourav.and.de@gmail.com)
+  [![icon][github]](https://github.com/AndDe-gourav)
+  &nbsp;
+  AndDe-gourav
 
 Contributors with JetBrains IP:
 
