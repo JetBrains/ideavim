@@ -797,7 +797,7 @@ class SortCommandTest : VimTestCase() {
 
   @ParameterizedTest
   @MethodSource("caseInsensitiveSortTestCases")
-  fun `test case insensive sort is case insensitive, not numeric, ascending and not unique`(
+  fun `test case insensitive sort is case insensitive, not numeric, ascending and not unique`(
     testCase: TestCase,
   ) = assertSort(testCase)
 
