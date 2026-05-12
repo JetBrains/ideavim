@@ -27,7 +27,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: zulu
-          java-version: 21
+          java-version: 25
       - name: Setup FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - name: Setup Gradle

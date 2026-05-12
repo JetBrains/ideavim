@@ -28,7 +28,7 @@ object PluginVerifier : IdeaVimBuildType({
       buildFile = ""
       enableStacktrace = true
       gradleParams = "--build-cache --configuration-cache"
-      jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
+      jdkHome = "/usr/lib/jvm/java-25-amazon-corretto"
     }
   }
 
