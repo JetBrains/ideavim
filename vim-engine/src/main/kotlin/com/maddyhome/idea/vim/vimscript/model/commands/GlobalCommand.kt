@@ -189,8 +189,6 @@ data class GlobalCommand(val range: Range, val modifier: CommandModifier, val ar
           // TODO: 26.05.2021 break check
         }
       }
-    } catch (e: Exception) {
-      throw e
     } finally {
       globalBusy = false
     }
