@@ -19,7 +19,6 @@ val javaVersion: String by project
 
 repositories {
   mavenCentral()
-  maven("https://cache-redirector.jetbrains.com/packages.jetbrains.team/maven/p/ij/intellij-dependencies")
 
   intellijPlatform {
     defaultRepositories()
@@ -28,9 +27,7 @@ repositories {
 
 dependencies {
   compileOnly(project(":"))
-  compileOnly(project(":modules:ideavim-common"))
-  compileOnly(project(":vim-engine"))
-  compileOnly(project(":api"))
+  compileOnly(project(":ideavim-common"))
   compileOnly("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
 
   intellijPlatform {
@@ -41,7 +38,7 @@ dependencies {
 
     create(ideaType, ideaVersion) { this.useInstaller = useInstaller }
 
-    bundledModule("intellij.spellchecker")
+    plugin("AceJump", "3.8.19")
   }
 }
 
@@ -54,5 +51,13 @@ java {
 kotlin {
   jvmToolchain {
     languageVersion.set(JavaLanguageVersion.of(javaVersion))
+  }
+
+  compilerOptions {
+    freeCompilerArgs = listOf(
+      // AceJump is compiled with a pre-release Kotlin version
+      "-Xskip-prerelease-check",
+      "-Xallow-unstable-dependencies",
+    )
   }
 }

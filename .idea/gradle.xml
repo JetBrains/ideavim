@@ -5,19 +5,19 @@
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleJvm" value="jbr-21" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/annotation-processors" />
             <option value="$PROJECT_DIR$/api" />
-            <option value="$PROJECT_DIR$/modules" />
-            <option value="$PROJECT_DIR$/modules/ideavim-acejump" />
-            <option value="$PROJECT_DIR$/modules/ideavim-backend" />
-            <option value="$PROJECT_DIR$/modules/ideavim-clion-nova" />
-            <option value="$PROJECT_DIR$/modules/ideavim-common" />
-            <option value="$PROJECT_DIR$/modules/ideavim-frontend" />
-            <option value="$PROJECT_DIR$/modules/ideavim-rider" />
-            <option value="$PROJECT_DIR$/modules/ideavim-terminal" />
+            <option value="$PROJECT_DIR$/ideavim-acejump" />
+            <option value="$PROJECT_DIR$/ideavim-backend" />
+            <option value="$PROJECT_DIR$/ideavim-clion-nova" />
+            <option value="$PROJECT_DIR$/ideavim-common" />
+            <option value="$PROJECT_DIR$/ideavim-frontend" />
+            <option value="$PROJECT_DIR$/ideavim-rider" />
+            <option value="$PROJECT_DIR$/ideavim-terminal" />
             <option value="$PROJECT_DIR$/scripts" />
             <option value="$PROJECT_DIR$/tests" />
             <option value="$PROJECT_DIR$/tests/java-tests" />
