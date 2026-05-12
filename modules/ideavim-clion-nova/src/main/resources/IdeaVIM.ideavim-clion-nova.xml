@@ -6,11 +6,11 @@
   ~ https://opensource.org/licenses/MIT.
   -->
 
-<idea-plugin>
+<idea-plugin package="com.maddyhome.idea.vim.clionNovaImpl">
   <dependencies>
     <plugin id="org.jetbrains.plugins.clion.radler"/>
   </dependencies>
   <extensions defaultExtensionNs="IdeaVIM">
-    <clionNovaProvider implementation="com.maddyhome.idea.vim.ide.ClionNovaProviderImpl"/>
+    <clionNovaProvider implementation="com.maddyhome.idea.vim.clionNovaImpl.ClionNovaProviderImpl"/>
   </extensions>
 </idea-plugin>

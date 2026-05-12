@@ -6,8 +6,10 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.ide
+package com.maddyhome.idea.vim.riderImpl
 
-class ClionNovaProviderImpl : ClionNovaProvider {
-  override fun isClionNova(): Boolean = true
+import com.maddyhome.idea.vim.ide.RiderProvider
+
+class RiderProviderImpl : RiderProvider {
+  override fun isRider(): Boolean = true
 }

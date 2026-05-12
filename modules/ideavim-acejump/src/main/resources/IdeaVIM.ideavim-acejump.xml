@@ -6,12 +6,12 @@
   ~ https://opensource.org/licenses/MIT.
   -->
 
-<idea-plugin>
+<idea-plugin package="com.maddyhome.idea.vim.acejump">
   <dependencies>
     <plugin id="AceJump"/>
   </dependencies>
   <extensions defaultExtensionNs="com.intellij">
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.listener.AceJumpServiceImpl"
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.acejump.AceJumpServiceImpl"
                         serviceInterface="com.maddyhome.idea.vim.listener.AceJumpService"/>
   </extensions>
 </idea-plugin>

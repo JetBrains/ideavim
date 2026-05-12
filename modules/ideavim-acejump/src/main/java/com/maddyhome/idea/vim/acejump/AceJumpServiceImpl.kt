@@ -6,9 +6,10 @@
  * https://opensource.org/licenses/MIT.
  */
 
-package com.maddyhome.idea.vim.listener
+package com.maddyhome.idea.vim.acejump
 
 import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.listener.AceJumpService
 import org.acejump.session.SessionManager
 
 class AceJumpServiceImpl : AceJumpService {
