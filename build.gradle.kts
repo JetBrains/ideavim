@@ -84,7 +84,7 @@ repositories {
 dependencies {
   api(project(":vim-engine"))
   api(project(":api"))
-  api(project(":modules:ideavim-common"))
+  api(project(":ideavim-common"))
 
   compileOnly("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
   compileOnly("org.jetbrains:annotations:26.1.0")
@@ -113,13 +113,13 @@ dependencies {
     testFramework(TestFrameworkType.Platform)
     testFramework(TestFrameworkType.JUnit5)
 
-    pluginComposedModule(runtimeOnly(project(":modules:ideavim-common")))
-    pluginComposedModule(runtimeOnly(project(":modules:ideavim-frontend")))
-    pluginComposedModule(runtimeOnly(project(":modules:ideavim-backend")))
-    pluginComposedModule(runtimeOnly(project(":modules:ideavim-acejump")))
-    pluginComposedModule(runtimeOnly(project(":modules:ideavim-rider")))
-    pluginComposedModule(runtimeOnly(project(":modules:ideavim-clion-nova")))
-    pluginComposedModule(runtimeOnly(project(":modules:ideavim-terminal")))
+    pluginComposedModule(runtimeOnly(project(":ideavim-common")))
+    pluginModule(runtimeOnly(project(":ideavim-frontend")))
+    pluginModule(runtimeOnly(project(":ideavim-backend")))
+    pluginModule(runtimeOnly(project(":ideavim-acejump")))
+    pluginModule(runtimeOnly(project(":ideavim-rider")))
+    pluginModule(runtimeOnly(project(":ideavim-clion-nova")))
+    pluginModule(runtimeOnly(project(":ideavim-terminal")))
 
     bundledModule("intellij.spellchecker")
     bundledModule("intellij.platform.kernel.impl")
@@ -594,7 +594,7 @@ intellijPlatform {
     }
     // AceJump is a third-party Marketplace plugin; the verifier doesn't have it on its classpath
     // (only bundled IDE plugins are resolved). Suppress "Package 'org.acejump' is not found" so
-    // the optional integration in :modules:ideavim-acejump doesn't fail verification.
+    // the optional integration in :ideavim-acejump doesn't fail verification.
     externalPrefixes.add("org.acejump")
   }
 
@@ -614,13 +614,13 @@ afterEvaluate {
   tasks.named("kspTestKotlin").configure { enabled = false }
 }
 
-// Allow test and testFixtures sources to access `internal` members from :modules:ideavim-common.
+// Allow test and testFixtures sources to access `internal` members from :ideavim-common.
 // This is needed because plugin source code was split into the common module during the
 // plugin split, but tests remain in the root project. Kotlin's -Xfriend-paths compiler flag grants
 // internal visibility across module boundaries for testing purposes.
 // We add both the class directory and the JAR because the IntelliJ Platform Gradle plugin may resolve
 // classes from the composed/instrumented JAR rather than raw class files.
-val commonProject = project(":modules:ideavim-common")
+val commonProject = project(":ideavim-common")
 val commonClassesDir = commonProject.layout.buildDirectory.dir("classes/kotlin/main").get().asFile
 tasks.named<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>("compileTestKotlin") {
   friendPaths.from(commonClassesDir)
