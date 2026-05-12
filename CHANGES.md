@@ -26,6 +26,7 @@ usual beta standards.
 ## [To Be Released]
 
 ### Features:
+* [VIM-266](https://youtrack.jetbrains.com/issue/VIM-266) `:edit` now creates a new file if the specified path does not exist - e.g., `:edit newfile.txt` creates and opens the file
 * [VIM-1693](https://youtrack.jetbrains.com/issue/VIM-1693) Added `:autocmd` command - run Ex commands on editor events such as `BufRead`, `BufWrite`, `BufEnter`, `BufLeave`, `InsertEnter`, `InsertLeave`, `WinEnter`, `WinLeave`, `FocusGained`, `FocusLost`, and `FileType`; supports `augroup` and file pattern matching (e.g., `autocmd BufWritePre *.py echo "saving python"`)
 * [VIM-268](https://youtrack.jetbrains.com/issue/VIM-268) Added file name completion in ex commands - press `<Tab>`/`<S-Tab>` to cycle through file matches in `:edit`, `:split`, `:vsplit`, `:write`, `:read`, `:source`, and `:find` commands; use arrow keys to navigate the completion panel
 * New VimScript functions: `add()`, `call()`, `extend()`, `extendnew()`, `filter()`, `flatten()`, `flattennew()`, `foreach()`, `has_key()`, `indexof()`, `insert()`, `items()`, `keys()`, `map()`, `mapnew()`, `reduce()`, `remove()`, `slice()`, `sort()`, `uniq()`, `values()`
@@ -93,6 +94,7 @@ usual beta standards.
 * [VIM-4226](https://youtrack.jetbrains.com/issue/VIM-4226) Fixed race condition crash when the editor is disposed while the ex panel is open
 
 ### Merged PRs:
+* [1617](https://github.com/JetBrains/ideavim/pull/1617) by [AndDe-gourav](https://github.com/AndDe-gourav): Fix :edit to create file if it does not exist (VIM-266)
 * [1747](https://github.com/JetBrains/ideavim/pull/1747) by [1grzyb1](https://github.com/1grzyb1): feat(VIM-519): cycle through recent edits with g; and g,
 * [1745](https://github.com/JetBrains/ideavim/pull/1745) by [1grzyb1](https://github.com/1grzyb1): feat(VIM-258): tab command completion
 * [1744](https://github.com/JetBrains/ideavim/pull/1744) by [1grzyb1](https://github.com/1grzyb1): fix(VIM-4226): check if editor is disposed on focus

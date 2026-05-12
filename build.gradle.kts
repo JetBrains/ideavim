@@ -460,6 +460,7 @@ intellijPlatform {
     changeNotes.set(
       """
         <b>Features:</b><br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-266">VIM-266</a> <code>:edit</code> now creates a new file if the specified path does not exist - e.g., <code>:edit newfile.txt</code> creates and opens the file<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-1693">VIM-1693</a> Added <code>:autocmd</code> command - run Ex commands on editor events such as <code>BufRead</code>, <code>BufWrite</code>, <code>BufEnter</code>, <code>BufLeave</code>, <code>InsertEnter</code>, <code>InsertLeave</code>, <code>WinEnter</code>, <code>WinLeave</code>, <code>FocusGained</code>, <code>FocusLost</code>, and <code>FileType</code>; supports <code>augroup</code> and file pattern matching (e.g., <code>autocmd BufWritePre *.py echo "saving python"</code>)<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-268">VIM-268</a> Added file name completion in ex commands - press <code>&lt;Tab&gt;</code>/<code>&lt;S-Tab&gt;</code> to cycle through file matches in <code>:edit</code>, <code>:split</code>, <code>:vsplit</code>, <code>:write</code>, <code>:read</code>, <code>:source</code>, and <code>:find</code> commands; use arrow keys to navigate the completion panel<br>
         * New VimScript functions: <code>add()</code>, <code>call()</code>, <code>extend()</code>, <code>extendnew()</code>, <code>filter()</code>, <code>flatten()</code>, <code>flattennew()</code>, <code>foreach()</code>, <code>has_key()</code>, <code>indexof()</code>, <code>insert()</code>, <code>items()</code>, <code>keys()</code>, <code>map()</code>, <code>mapnew()</code>, <code>reduce()</code>, <code>remove()</code>, <code>slice()</code>, <code>sort()</code>, <code>uniq()</code>, <code>values()</code><br>
@@ -527,6 +528,7 @@ intellijPlatform {
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4226">VIM-4226</a> Fixed race condition crash when the editor is disposed while the ex panel is open<br>
         <br>
         <b>Merged PRs:</b><br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1617">1617</a> by <a href="https://github.com/AndDe-gourav">AndDe-gourav</a>: Fix :edit to create file if it does not exist (VIM-266)<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1747">1747</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: feat(VIM-519): cycle through recent edits with g; and g,<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1745">1745</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: feat(VIM-258): tab command completion<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1744">1744</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: fix(VIM-4226): check if editor is disposed on focus<br>
