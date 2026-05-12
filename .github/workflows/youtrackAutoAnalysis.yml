@@ -51,11 +51,11 @@ jobs:
             echo "has_ticket=true" >> $GITHUB_OUTPUT
           fi
 
-      - name: Set up JDK 21
+      - name: Set up JDK 25
         if: steps.check-ticket.outputs.has_ticket == 'true'
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: '25'
           distribution: 'corretto'
 
       - name: Install Neovim

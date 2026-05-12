@@ -10,6 +10,8 @@ package com.maddyhome.idea.vim.split
 
 import com.intellij.driver.client.Driver
 import com.intellij.driver.sdk.openFile
+import com.intellij.driver.sdk.singleProject
+import com.intellij.driver.sdk.ui.requestFocusFromIde
 import com.intellij.driver.sdk.ui.components.UiComponent.Companion.waitFound
 import com.intellij.driver.sdk.ui.components.common.codeEditor
 import com.intellij.driver.sdk.ui.components.common.ideFrame
@@ -67,7 +69,9 @@ abstract class IdeaVimStarterTestBase {
 
     val context = Starter.newContext(
       this::class.simpleName ?: "split-test",
-      TestCase(IDEA_ULTIMATE, LocalProjectInfo(projectDir)).useEAP()
+      // Match the IDE version used by `runIdeSplitMode` (gradle.properties: ideaVersion=2026.1).
+      // `useEAP()` would download 262.x EAP where a platform regression broke split-mode tests.
+      TestCase(IDEA_ULTIMATE, LocalProjectInfo(projectDir)).useRelease("2026.1")
     )
 
     val pluginPath = resolvePluginPath()
@@ -153,14 +157,28 @@ abstract class IdeaVimStarterTestBase {
   /** Types vim keys in the active editor. */
   protected fun typeVim(keys: String) {
     driver.withContext {
-      ideFrame { codeEditor().apply { waitFound(); keyboard { typeText(keys) } } }
+      requestFocusFromIde(singleProject())
+      ideFrame {
+        codeEditor().apply {
+          waitFound()
+          component.requestFocus()
+          keyboard { typeText(keys) }
+        }
+      }
     }
   }
 
   /** Types vim keys followed by Escape. */
   protected fun typeVimAndEscape(keys: String) {
     driver.withContext {
-      ideFrame { codeEditor().apply { waitFound(); keyboard { typeText(keys); escape() } } }
+      requestFocusFromIde(singleProject())
+      ideFrame {
+        codeEditor().apply {
+          waitFound()
+          component.requestFocus()
+          keyboard { typeText(keys); escape() }
+        }
+      }
     }
   }
 
@@ -236,10 +254,25 @@ abstract class IdeaVimStarterTestBase {
     }
   }
 
-  /** Clicks in the editor to ensure focus. */
+  /** Forces focus on the editor.
+   *
+   * In automated split-mode tests on macOS, `Robot.click()` and Swing's `requestFocus()`
+   * alone aren't enough — the IDE window may not be the OS-focused window when keystrokes
+   * are dispatched, so `Robot.keyPress` events go elsewhere and IdeaVim never sees them.
+   * `requestFocusFromIde(project)` calls `ProjectUtil.focusProjectWindow(stealFocusIfAppInactive=true)`,
+   * which brings the IDE window to OS foreground. After that the click+component.requestFocus()
+   * pair places focus inside the editor itself.
+   */
   protected fun clickEditor() {
     driver.withContext {
-      ideFrame { codeEditor().apply { waitFound(); click() } }
+      requestFocusFromIde(singleProject())
+      ideFrame {
+        codeEditor().apply {
+          waitFound()
+          component.requestFocus()
+          click()
+        }
+      }
     }
   }
 

@@ -43,7 +43,7 @@ jobs:
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin' # See 'Supported distributions' for available options
-        java-version: '21'
+        java-version: '25'
 
     - name: Checkout repository
       uses: actions/checkout@v4
