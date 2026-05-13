@@ -6,8 +6,6 @@
  * https://opensource.org/licenses/MIT.
  */
 
-import org.jetbrains.intellij.platform.gradle.extensions.IntelliJPlatformRepositoriesExtension
-
 // Set repository for snapshot versions of gradle plugin
 pluginManagement {
   repositories {
@@ -31,24 +29,6 @@ pluginManagement {
 // Automatically download JDKs from Foojay API when required toolchain is not installed locally
 plugins {
   id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
-  id("org.jetbrains.intellij.platform.settings") version "2.16.0"
-}
-
-dependencyResolutionManagement {
-  repositoriesMode = RepositoriesMode.PREFER_SETTINGS
-  repositories {
-    maven {
-      url = uri("https://cache-redirector.jetbrains.com/repo.maven.apache.org/maven2")
-    }
-    maven {
-      url = uri("https://cache-redirector.jetbrains.com/packages.jetbrains.team/maven/p/ij/intellij-dependencies")
-    }
-    mavenCentral()
-    maven { url = uri("https://jitpack.io") }
-    val intellijPlatformExt = (this as org.gradle.api.plugins.ExtensionAware)
-      .extensions.getByName("intellijPlatform") as IntelliJPlatformRepositoriesExtension
-    intellijPlatformExt.defaultRepositories()
-  }
 }
 
 rootProject.name = "IdeaVIM"

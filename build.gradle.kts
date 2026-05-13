@@ -48,7 +48,7 @@ plugins {
   // NOTE: Unignore "test block comment falls back to line comment when not available" test
   //   After changing this version. It supposed to work on the next version of the gradle plugin
   //   Or go report to the devs that this test still fails.
-  id("org.jetbrains.intellij.platform")
+  id("org.jetbrains.intellij.platform") version "2.16.0"
 
   id("org.jetbrains.changelog") version "2.5.0"
   id("com.dorongold.task-tree") version "4.0.1"
@@ -75,6 +75,7 @@ val youtrackToken: String by project
 val releaseType: String? by project
 
 repositories {
+  maven { url = uri("https://cache-redirector.jetbrains.com/repo.maven.apache.org/maven2") }
   mavenCentral()
   maven("https://cache-redirector.jetbrains.com/packages.jetbrains.team/maven/p/ij/intellij-dependencies")
   intellijPlatform {
