@@ -62,6 +62,10 @@ abstract class IdeaVimBuildType(init: BuildType.() -> Unit) : BuildType({
         +:/mnt/agent/temp/buildTmp/ => /mnt/agent/temp/buildTmp/
     """.trimIndent()
 
+  params {
+    param("env.JAVA_HOME", "/usr/lib/jvm/java-25-amazon-corretto")
+  }
+
   features {
     buildCache {
       name = "Gradle-cache"
