@@ -71,7 +71,7 @@ dependencies {
 
     testImplementation("org.mockito.kotlin:mockito-kotlin:6.3.0")
     implementation(project(":api"))
-    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.10.2")
+    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.11.0")
 }
 
 tasks {
