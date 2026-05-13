@@ -29,10 +29,7 @@ import com.intellij.ui.dsl.builder.selected
 import com.intellij.ui.dsl.builder.toNullableProperty
 import com.intellij.ui.layout.not
 import com.intellij.util.Alarm
-import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.MessageHelper
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.FlowLayout
@@ -316,59 +313,56 @@ class ModeWidgetPopup : AnAction() {
     selectBlockBgKey: String,
     selectBlockFgKey: String,
   ) {
-    var isFullCustomization: Boolean by VimScopeBooleanVariable(isFullCustomizationKey)
-    var theme: ModeWidgetTheme by VimScopeThemeVariable(themeKey)
-    var normalBg: String by VimScopeStringVariable(normalBgKey)
-    var normalFg: String by VimScopeStringVariable(normalFgKey)
-    var insertBg: String by VimScopeStringVariable(insertBgKey)
-    var insertFg: String by VimScopeStringVariable(insertFgKey)
-    var replaceBg: String by VimScopeStringVariable(replaceBgKey)
-    var replaceFg: String by VimScopeStringVariable(replaceFgKey)
-    var commandBg: String by VimScopeStringVariable(commandBgKey)
-    var commandFg: String by VimScopeStringVariable(commandFgKey)
-    var visualBg: String by VimScopeStringVariable(visualBgKey)
-    var visualFg: String by VimScopeStringVariable(visualFgKey)
-    var visualLineBg: String by VimScopeStringVariable(visualLineBgKey)
-    var visualLineFg: String by VimScopeStringVariable(visualLineFgKey)
-    var visualBlockBg: String by VimScopeStringVariable(visualBlockBgKey)
-    var visualBlockFg: String by VimScopeStringVariable(visualBlockFgKey)
-    var selectBg: String by VimScopeStringVariable(selectBgKey)
-    var selectFg: String by VimScopeStringVariable(selectFgKey)
-    var selectLineBg: String by VimScopeStringVariable(selectLineBgKey)
-    var selectLineFg: String by VimScopeStringVariable(selectLineFgKey)
-    var selectBlockBg: String by VimScopeStringVariable(selectBlockBgKey)
-    var selectBlockFg: String by VimScopeStringVariable(selectBlockFgKey)
+    var isFullCustomization: Boolean by SettingsBoolean(isFullCustomizationKey)
+    var theme: ModeWidgetTheme by SettingsTheme(themeKey)
+    var normalBg: String by SettingsString(normalBgKey)
+    var normalFg: String by SettingsString(normalFgKey)
+    var insertBg: String by SettingsString(insertBgKey)
+    var insertFg: String by SettingsString(insertFgKey)
+    var replaceBg: String by SettingsString(replaceBgKey)
+    var replaceFg: String by SettingsString(replaceFgKey)
+    var commandBg: String by SettingsString(commandBgKey)
+    var commandFg: String by SettingsString(commandFgKey)
+    var visualBg: String by SettingsString(visualBgKey)
+    var visualFg: String by SettingsString(visualFgKey)
+    var visualLineBg: String by SettingsString(visualLineBgKey)
+    var visualLineFg: String by SettingsString(visualLineFgKey)
+    var visualBlockBg: String by SettingsString(visualBlockBgKey)
+    var visualBlockFg: String by SettingsString(visualBlockFgKey)
+    var selectBg: String by SettingsString(selectBgKey)
+    var selectFg: String by SettingsString(selectFgKey)
+    var selectLineBg: String by SettingsString(selectLineBgKey)
+    var selectLineFg: String by SettingsString(selectLineFgKey)
+    var selectBlockBg: String by SettingsString(selectBlockBgKey)
+    var selectBlockFg: String by SettingsString(selectBlockFgKey)
 
-    private class VimScopeBooleanVariable(private var key: String) : ReadWriteProperty<ModeColors, Boolean> {
-      override fun getValue(thisRef: ModeColors, property: KProperty<*>): Boolean {
-        return injector.variableService.getGlobalVariableValue(key)?.toVimNumber()?.booleanValue ?: false
-      }
+    private class SettingsBoolean(private val key: String) : ReadWriteProperty<ModeColors, Boolean> {
+      override fun getValue(thisRef: ModeColors, property: KProperty<*>): Boolean =
+        ModeWidgetSettings.getInstance().getBoolean(key)
 
       override fun setValue(thisRef: ModeColors, property: KProperty<*>, value: Boolean) {
-        injector.variableService.storeGlobalVariable(key, value.asVimInt())
+        ModeWidgetSettings.getInstance().setBoolean(key, value)
       }
     }
 
-    private class VimScopeStringVariable(private var key: String) : ReadWriteProperty<ModeColors, String> {
-      override fun getValue(thisRef: ModeColors, property: KProperty<*>): String {
-        return injector.variableService.getGlobalVariableValue(key)?.toVimString()?.value ?: ""
-      }
+    private class SettingsString(private val key: String) : ReadWriteProperty<ModeColors, String> {
+      override fun getValue(thisRef: ModeColors, property: KProperty<*>): String =
+        ModeWidgetSettings.getInstance().getString(key) ?: ""
 
       override fun setValue(thisRef: ModeColors, property: KProperty<*>, value: String) {
-        injector.variableService.storeGlobalVariable(key, VimString(value))
+        ModeWidgetSettings.getInstance().setString(key, value)
       }
     }
 
-    private class VimScopeThemeVariable(private var key: String) : ReadWriteProperty<ModeColors, ModeWidgetTheme> {
+    private class SettingsTheme(private val key: String) : ReadWriteProperty<ModeColors, ModeWidgetTheme> {
       override fun getValue(thisRef: ModeColors, property: KProperty<*>): ModeWidgetTheme {
         val themeString =
-          injector.variableService.getGlobalVariableValue(key)?.toVimString()?.value
-            ?: return ModeWidgetTheme.getDefaultTheme()
+          ModeWidgetSettings.getInstance().getString(key) ?: return ModeWidgetTheme.getDefaultTheme()
         return ModeWidgetTheme.parseString(themeString) ?: ModeWidgetTheme.getDefaultTheme()
       }
 
       override fun setValue(thisRef: ModeColors, property: KProperty<*>, value: ModeWidgetTheme) {
-        injector.variableService.storeGlobalVariable(key, VimString(value.toString()))
+        ModeWidgetSettings.getInstance().setString(key, value.toString())
       }
     }
   }

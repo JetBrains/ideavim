@@ -192,6 +192,7 @@
                         serviceInterface="com.maddyhome.idea.vim.yank.VimYankGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.vimscript.services.IjVariableService"
                         serviceInterface="com.maddyhome.idea.vim.vimscript.services.VariableService"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.ui.widgets.mode.ModeWidgetSettings"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.IjStatisticsService"
                         serviceInterface="com.maddyhome.idea.vim.api.VimStatistics"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.vimscript.services.FunctionStorage"
