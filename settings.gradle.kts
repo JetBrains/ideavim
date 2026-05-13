@@ -15,6 +15,12 @@ pluginManagement {
     maven {
       url = uri("https://cache-redirector.jetbrains.com/packages.jetbrains.team/maven/p/ij/intellij-dependencies")
     }
+    maven {
+      url = uri("https://cache-redirector.jetbrains.com/plugins.gradle.org/m2")
+    }
+    maven {
+      url = uri("https://cache-redirector.jetbrains.com/repo.maven.apache.org/maven2")
+    }
     mavenCentral()
     gradlePluginPortal()
   }
