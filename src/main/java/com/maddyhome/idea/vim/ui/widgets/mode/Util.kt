@@ -19,11 +19,8 @@ import java.awt.Color
 fun getModeBackground(mode: Mode?): Color {
   val isLight = !(LafManager.getInstance()?.currentUIThemeLookAndFeel?.isDark ?: false)
   val keyPostfix = if (isLight) "_light" else "_dark"
-  if (injector.variableService.getGlobalVariableValue("widget_mode_is_full_customization$keyPostfix")
-      ?.toVimNumber()?.booleanValue != true
-  ) {
-    val themeString =
-      injector.variableService.getGlobalVariableValue("widget_mode_theme$keyPostfix")?.toVimString()?.value ?: ""
+  if (!resolveBoolean("widget_mode_is_full_customization$keyPostfix")) {
+    val themeString = resolveString("widget_mode_theme$keyPostfix") ?: ""
     val theme = ModeWidgetTheme.parseString(themeString) ?: ModeWidgetTheme.getDefaultTheme()
     when (theme) {
       ModeWidgetTheme.TERM -> {
@@ -53,38 +50,36 @@ fun getModeBackground(mode: Mode?): Color {
     }
   } else {
     val colorString = when (mode) {
-      Mode.INSERT -> injector.variableService.getGlobalVariableValue("widget_mode_insert_background$keyPostfix")
-      Mode.REPLACE -> injector.variableService.getGlobalVariableValue("widget_mode_replace_background$keyPostfix")
-      is Mode.NORMAL -> injector.variableService.getGlobalVariableValue("widget_mode_normal_background$keyPostfix")
-      is Mode.CMD_LINE -> injector.variableService.getGlobalVariableValue("widget_mode_command_background$keyPostfix")
+      Mode.INSERT -> resolveString("widget_mode_insert_background$keyPostfix")
+      Mode.REPLACE -> resolveString("widget_mode_replace_background$keyPostfix")
+      is Mode.NORMAL -> resolveString("widget_mode_normal_background$keyPostfix")
+      is Mode.CMD_LINE -> resolveString("widget_mode_command_background$keyPostfix")
       is Mode.VISUAL -> {
-        val visualModeBackground =
-          injector.variableService.getGlobalVariableValue("widget_mode_visual_background$keyPostfix")
+        val visualModeBackground = resolveString("widget_mode_visual_background$keyPostfix")
         when (mode.selectionType) {
           SelectionType.CHARACTER_WISE -> visualModeBackground
-          SelectionType.LINE_WISE -> injector.variableService.getGlobalVariableValue("widget_mode_visual_line_background$keyPostfix")
+          SelectionType.LINE_WISE -> resolveString("widget_mode_visual_line_background$keyPostfix")
             ?: visualModeBackground
 
-          SelectionType.BLOCK_WISE -> injector.variableService.getGlobalVariableValue("widget_mode_visual_block_background$keyPostfix")
+          SelectionType.BLOCK_WISE -> resolveString("widget_mode_visual_block_background$keyPostfix")
             ?: visualModeBackground
         }
       }
 
       is Mode.SELECT -> {
-        val selectModeBackground =
-          injector.variableService.getGlobalVariableValue("widget_mode_select_background$keyPostfix")
+        val selectModeBackground = resolveString("widget_mode_select_background$keyPostfix")
         when (mode.selectionType) {
           SelectionType.CHARACTER_WISE -> selectModeBackground
-          SelectionType.LINE_WISE -> injector.variableService.getGlobalVariableValue("widget_mode_select_line_background$keyPostfix")
+          SelectionType.LINE_WISE -> resolveString("widget_mode_select_line_background$keyPostfix")
             ?: selectModeBackground
 
-          SelectionType.BLOCK_WISE -> injector.variableService.getGlobalVariableValue("widget_mode_select_block_background$keyPostfix")
+          SelectionType.BLOCK_WISE -> resolveString("widget_mode_select_block_background$keyPostfix")
             ?: selectModeBackground
         }
       }
 
       is Mode.OP_PENDING, null -> null
-    }?.toVimString()?.value
+    }
     val defaultColor = UIUtil.getPanelBackground()
     val color = when (colorString) {
       "v:status_bar_bg" -> UIUtil.getPanelBackground()
@@ -108,11 +103,8 @@ fun getModeBackground(mode: Mode?): Color {
 fun getModeForeground(mode: Mode?): Color {
   val isLight = !(LafManager.getInstance()?.currentUIThemeLookAndFeel?.isDark ?: false)
   val keyPostfix = if (isLight) "_light" else "_dark"
-  if (injector.variableService.getGlobalVariableValue("widget_mode_is_full_customization$keyPostfix")
-      ?.toVimNumber()?.booleanValue != true
-  ) {
-    val themeString =
-      injector.variableService.getGlobalVariableValue("widget_mode_theme$keyPostfix")?.toVimString()?.value ?: ""
+  if (!resolveBoolean("widget_mode_is_full_customization$keyPostfix")) {
+    val themeString = resolveString("widget_mode_theme$keyPostfix") ?: ""
     val theme = ModeWidgetTheme.parseString(themeString) ?: ModeWidgetTheme.getDefaultTheme()
     return when (theme) {
       ModeWidgetTheme.TERM -> if (isLight) JBColor.WHITE else JBColor.BLACK
@@ -121,38 +113,36 @@ fun getModeForeground(mode: Mode?): Color {
     }
   } else {
     val colorString = when (mode) {
-      Mode.INSERT -> injector.variableService.getGlobalVariableValue("widget_mode_insert_foreground$keyPostfix")
-      Mode.REPLACE -> injector.variableService.getGlobalVariableValue("widget_mode_replace_foreground$keyPostfix")
-      is Mode.NORMAL -> injector.variableService.getGlobalVariableValue("widget_mode_normal_foreground$keyPostfix")
-      is Mode.CMD_LINE -> injector.variableService.getGlobalVariableValue("widget_mode_command_foreground$keyPostfix")
+      Mode.INSERT -> resolveString("widget_mode_insert_foreground$keyPostfix")
+      Mode.REPLACE -> resolveString("widget_mode_replace_foreground$keyPostfix")
+      is Mode.NORMAL -> resolveString("widget_mode_normal_foreground$keyPostfix")
+      is Mode.CMD_LINE -> resolveString("widget_mode_command_foreground$keyPostfix")
       is Mode.VISUAL -> {
-        val visualModeBackground =
-          injector.variableService.getGlobalVariableValue("widget_mode_visual_foreground$keyPostfix")
+        val visualModeBackground = resolveString("widget_mode_visual_foreground$keyPostfix")
         when (mode.selectionType) {
           SelectionType.CHARACTER_WISE -> visualModeBackground
-          SelectionType.LINE_WISE -> injector.variableService.getGlobalVariableValue("widget_mode_visual_line_foreground$keyPostfix")
+          SelectionType.LINE_WISE -> resolveString("widget_mode_visual_line_foreground$keyPostfix")
             ?: visualModeBackground
 
-          SelectionType.BLOCK_WISE -> injector.variableService.getGlobalVariableValue("widget_mode_visual_block_foreground$keyPostfix")
+          SelectionType.BLOCK_WISE -> resolveString("widget_mode_visual_block_foreground$keyPostfix")
             ?: visualModeBackground
         }
       }
 
       is Mode.SELECT -> {
-        val selectModeBackground =
-          injector.variableService.getGlobalVariableValue("widget_mode_select_foreground$keyPostfix")
+        val selectModeBackground = resolveString("widget_mode_select_foreground$keyPostfix")
         when (mode.selectionType) {
           SelectionType.CHARACTER_WISE -> selectModeBackground
-          SelectionType.LINE_WISE -> injector.variableService.getGlobalVariableValue("widget_mode_select_line_foreground$keyPostfix")
+          SelectionType.LINE_WISE -> resolveString("widget_mode_select_line_foreground$keyPostfix")
             ?: selectModeBackground
 
-          SelectionType.BLOCK_WISE -> injector.variableService.getGlobalVariableValue("widget_mode_select_block_foreground$keyPostfix")
+          SelectionType.BLOCK_WISE -> resolveString("widget_mode_select_block_foreground$keyPostfix")
             ?: selectModeBackground
         }
       }
 
       is Mode.OP_PENDING, null -> null
-    }?.toVimString()?.value
+    }
     val defaultColor = UIUtil.getLabelForeground()
     val color = when (colorString) {
       "v:status_bar_bg" -> UIUtil.getPanelBackground()
@@ -171,4 +161,17 @@ fun getModeForeground(mode: Mode?): Color {
     }
     return color
   }
+}
+
+/**
+ * `g:` (e.g. set in `.ideavimrc`) wins; otherwise fall back to the popup-managed PSC.
+ */
+internal fun resolveString(key: String): String? {
+  injector.variableService.getGlobalVariableValue(key)?.toVimString()?.value?.let { return it }
+  return ModeWidgetSettings.getInstance().getString(key)
+}
+
+internal fun resolveBoolean(key: String): Boolean {
+  injector.variableService.getGlobalVariableValue(key)?.toVimNumber()?.booleanValue?.let { return it }
+  return ModeWidgetSettings.getInstance().getBoolean(key)
 }
