@@ -15,7 +15,6 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 buildscript {
   repositories {
     maven { url = uri("https://cache-redirector.jetbrains.com/repo.maven.apache.org/maven2") }
-    mavenCentral()
     maven { url = uri("https://jitpack.io") }
   }
 
@@ -76,7 +75,6 @@ val releaseType: String? by project
 
 repositories {
   maven { url = uri("https://cache-redirector.jetbrains.com/repo.maven.apache.org/maven2") }
-  mavenCentral()
   maven("https://cache-redirector.jetbrains.com/packages.jetbrains.team/maven/p/ij/intellij-dependencies")
   intellijPlatform {
     defaultRepositories()
@@ -165,6 +163,7 @@ configurations {
     exclude(group = "org.antlr", module = "antlr4")
   }
 }
+
 
 val currentJavaVersion = javaToolchains.launcherFor {}.get().metadata.languageVersion.toString()
 if (currentJavaVersion != javaVersion) {
