@@ -164,6 +164,19 @@ configurations {
   }
 }
 
+val toolchainJavaVersion = JavaLanguageVersion.of(javaVersion)
+allprojects {
+  afterEvaluate {
+    tasks.withType<Test>().configureEach {
+      javaLauncher.set(
+        project.extensions.getByType<JavaToolchainService>().launcherFor {
+          languageVersion.set(toolchainJavaVersion)
+        }
+      )
+    }
+  }
+}
+
 
 val currentJavaVersion = javaToolchains.launcherFor {}.get().metadata.languageVersion.toString()
 if (currentJavaVersion != javaVersion) {
