@@ -20,6 +20,7 @@ val ideaVersion: String by project
 val javaVersion: String by project
 
 repositories {
+  maven { url = uri("https://cache-redirector.jetbrains.com/repo.maven.apache.org/maven2") }
   mavenCentral()
   maven("https://cache-redirector.jetbrains.com/packages.jetbrains.team/maven/p/ij/intellij-dependencies")
 

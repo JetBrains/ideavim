@@ -16,6 +16,7 @@ plugins {
 // version 'SNAPSHOT'
 
 repositories {
+  maven { url = uri("https://cache-redirector.jetbrains.com/repo.maven.apache.org/maven2") }
   mavenCentral()
   maven { url = uri("https://jitpack.io") }
 }
