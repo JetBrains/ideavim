@@ -355,6 +355,22 @@
       </aliases>
     </vimExtension>
 
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.functextobj.VimFuncTextObjExtension"
+                  name="functextobj">
+      <aliases>
+        <alias name="https://github.com/kana/vim-textobj-function"/>
+        <alias name="kana/vim-textobj-function"/>
+        <alias name="vim-textobj-function"/>
+      </aliases>
+    </vimExtension>
+
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.classtextobj.VimClassTextObjExtension"
+                  name="classtextobj">
+      <aliases>
+        <alias name="vim-textobj-class"/>
+      </aliases>
+    </vimExtension>
+
     <vimExtension implementation="com.maddyhome.idea.vim.extension.replacewithregister.ReplaceWithRegister"
                   name="ReplaceWithRegister">
       <aliases>
