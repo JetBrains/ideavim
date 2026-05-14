@@ -484,21 +484,22 @@ class SetlocalCommandTest : VimTestCase() {
     setOsSpecificOptionsToSafeValues()
     val expected = """
     |--- Local option values ---
-    |noargtextobj        --ideajoin            operatorfunc=       startofline
-    |nobomb                ideamarks         norelativenumber    nosurround
-    |nobreakindent         idearefactormode=   scroll=0          notextobj-entire
-    |  colorcolumn=        ideawrite=all       scrolljump=1      notextobj-indent
-    |nocommentary        noignorecase          scrolloff=-1        textwidth=0
-    |nocursorline        noincsearch           selectmode=         timeout
-    |nodigraph           nolist                shellcmdflag=-x     timeoutlen=1000
-    |noexchange          nomatchit             shellxescape=@    notrackactionids
-    |  fileformat=unix     maxmapdepth=20      shellxquote={     noVimEverywhere
-    |  foldlevel=1       nomini-ai             showcmd             virtualedit=
-    |nogdefault            more                showmode          novisualbell
-    |nohighlightedyank   nomultiple-cursors    sidescroll=0        visualdelay=100
-    |  history=50        noNERDTree            sidescrolloff=-1    whichwrap=b,s
-    |nohlsearch            nrformats=hex     nosmartcase           wrap
-    |  ide=IntelliJ IDEA nonumber            nosneak               wrapscan
+    |noargtextobj          ide=IntelliJ IDEA   operatorfunc=     nosurround
+    |nobomb              --ideajoin          norelativenumber    notextobj-entire
+    |nobreakindent         ideamarks           scroll=0          notextobj-indent
+    |noclasstextobj        idearefactormode=   scrolljump=1        textwidth=0
+    |  colorcolumn=        ideawrite=all       scrolloff=-1        timeout
+    |nocommentary        noignorecase          selectmode=         timeoutlen=1000
+    |nocursorline        noincsearch           shellcmdflag=-x   notrackactionids
+    |nodigraph           nolist                shellxescape=@    noVimEverywhere
+    |noexchange          nomatchit             shellxquote={       virtualedit=
+    |  fileformat=unix     maxmapdepth=20      showcmd           novisualbell
+    |  foldlevel=1       nomini-ai             showmode            visualdelay=100
+    |nofunctextobj         more                sidescroll=0        whichwrap=b,s
+    |nogdefault          nomultiple-cursors    sidescrolloff=-1    wrap
+    |nohighlightedyank   noNERDTree          nosmartcase           wrapscan
+    |  history=50          nrformats=hex     nosneak
+    |nohlsearch          nonumber              startofline
     |  clipboard=ideaput,autoselect
     |  comments=s1:/*,mb:*,ex:*/,://,b:#,:%,:XCOMM,n:>,fb:-
     |  fileencoding=utf-8
@@ -561,6 +562,7 @@ class SetlocalCommandTest : VimTestCase() {
     |noargtextobj
     |nobomb
     |nobreakindent
+    |noclasstextobj
     |  clipboard=ideaput,autoselect
     |  colorcolumn=
     |nocommentary
@@ -571,6 +573,7 @@ class SetlocalCommandTest : VimTestCase() {
     |  fileencoding=utf-8
     |  fileformat=unix
     |  foldlevel=1
+    |nofunctextobj
     |nogdefault
     |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
     |nohighlightedyank

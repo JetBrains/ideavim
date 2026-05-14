@@ -80,6 +80,25 @@ https://www.vim.org/scripts/script.php?script_id=2699
 </details>
 
 <details>
+<summary><h2>classtextobj: Provides a text object for class definitions</h2></summary>
+
+### Summary:
+Adds the `ac` text object that selects "a class definition" — the entire class declaration and body. Works in any language whose PSI tree provides a class element (Java, Kotlin, Python, JavaScript/TypeScript, Go, Dart, PHP, Ruby, Rust).
+
+### Setup:
+- Add the following command to `~/.ideavimrc`: `set classtextobj`
+
+### Instructions
+
+| Mapping | Description |
+|---------|-------------|
+| `ac`    | A class definition (e.g. `vac`, `dac`, `cac`, `yac`) |
+
+When classes are nested, the innermost enclosing class is selected.
+
+</details>
+
+<details>
 <summary><h2>commentary: Adds mapping for quickly commenting stuff out</h2></summary>
 
 By [Daniel Leong](https://github.com/dhleong)  
@@ -193,6 +212,35 @@ Easy text exchange operator for Vim.
 ### Instructions
 
 https://github.com/tommcdo/vim-exchange/blob/master/doc/exchange.txt
+
+</details>
+
+<details>
+<summary><h2>functextobj: Provides text objects for method/function definitions</h2></summary>
+
+Inspired by [vim-textobj-function](https://github.com/kana/vim-textobj-function).
+
+### Summary:
+Adds text objects for selecting methods/functions. Three variants distinguish what is included: the signature and body, the same with JavaDoc and annotations, or just the inner body content. Works in any language whose PSI tree provides a function/method element (Java, Kotlin, Python, JavaScript/TypeScript, Go, Dart, PHP, Ruby, Rust).
+
+### Setup:
+- Add the following command to `~/.ideavimrc`: `set functextobj`
+    <details>
+      <summary>Alternative syntax</summary>
+      <code>Plug 'kana/vim-textobj-function'</code>
+      <br/>
+      <code>Plug 'vim-textobj-function'</code>
+    </details>
+
+### Instructions
+
+| Mapping | Description |
+|---------|-------------|
+| `am`    | A method definition (signature + body, excluding JavaDoc and annotations) |
+| `aM`    | A Method definition (same as `am`, but including JavaDoc and annotations) |
+| `im`    | Inner method definition (only the contents between the body braces) |
+
+Use with operators (`d`, `c`, `y`) or in visual mode — e.g. `dam`, `cim`, `vaM`. When methods are nested, the innermost enclosing method is selected.
 
 </details>
 
