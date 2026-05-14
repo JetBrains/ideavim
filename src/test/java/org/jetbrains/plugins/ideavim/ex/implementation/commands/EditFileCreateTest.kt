@@ -33,4 +33,21 @@ class EditFileCreateTest : VimTestCase() {
     val foundOnDisk = LocalFileSystem.getInstance().refreshAndFindFileByPath(currentFile.path)
     assertNotNull(foundOnDisk, "File should physically exist in the test VFS")
   }
+
+  @Test
+  fun `test edit opens file when filename has trailing whitespace`() {
+    configureByText("\n")
+
+    val fileName = "vim4229_trailing_${System.currentTimeMillis()}.txt"
+
+    typeText(commandToKeys("edit $fileName   "))
+
+    val currentFile = FileEditorManager.getInstance(fixture.project).selectedFiles.firstOrNull()
+
+    assertNotNull(currentFile, "No file is currently selected/open")
+    assertEquals(fileName, currentFile.name, "The editor should have switched to the new file, ignoring trailing whitespace")
+
+    val foundOnDisk = LocalFileSystem.getInstance().refreshAndFindFileByPath(currentFile.path)
+    assertNotNull(foundOnDisk, "File should physically exist in the test VFS")
+  }
 }
