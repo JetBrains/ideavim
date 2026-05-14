@@ -731,6 +731,7 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
   }
 
   fun assertCommandOutput(command: String, expected: String) {
+    injector.outputPanel.getCurrentOutputPanel()?.clearText()
     enterCommand(command)
     assertExOutput(expected)
   }
