@@ -8,21 +8,12 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import com.maddyhome.idea.vim.api.injector
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInfo
 
 @Suppress("SpellCheckingInspection")
-class HistoryCommandTest : VimTestCase() {
-  @BeforeEach
-  override fun setUp(testInfo: TestInfo) {
-    super.setUp(testInfo)
-    configureByText("\n")
-  }
-
+class HistoryCommandTest : VimTestCase("\n") {
   @Test
   fun `test history lists current cmd history by default`() {
     assertCommandOutput(
@@ -37,7 +28,6 @@ class HistoryCommandTest : VimTestCase() {
   @Test
   fun `test history lists all entries in cmd history by default`() {
     repeat(10) { i -> enterCommand("echo ${i + 1}") }
-    injector.outputPanel.getCurrentOutputPanel()?.clearText()
     assertCommandOutput(
       "history cmd",
       """
@@ -102,7 +92,6 @@ class HistoryCommandTest : VimTestCase() {
   fun `test history adds indicator to current entry`() {
     repeat(5) { i -> enterSearch("foo${i + 1}") }
     repeat(5) { i -> enterCommand("echo ${i + 1}") }
-    injector.outputPanel.getCurrentOutputPanel()?.clearText()
     assertCommandOutput(
       "history all",
       """
@@ -128,7 +117,6 @@ class HistoryCommandTest : VimTestCase() {
   @Test
   fun `test history does not show indicator if not including current entry`() {
     repeat(10) { i -> enterCommand("echo ${i + 1}") }
-    injector.outputPanel.getCurrentOutputPanel()?.clearText()
     assertCommandOutput(
       "history : 1,5",
       """
@@ -145,7 +133,6 @@ class HistoryCommandTest : VimTestCase() {
   @Test
   fun `test history with no name and first number lists single entry from command history`() {
     repeat(10) { i -> enterCommand("echo ${i + 1}") }
-    injector.outputPanel.getCurrentOutputPanel()?.clearText()
     assertCommandOutput(
       "history 3",
       """
@@ -158,7 +145,6 @@ class HistoryCommandTest : VimTestCase() {
   @Test
   fun `test history with no name and two numbers lists command history range`() {
     repeat(10) { i -> enterCommand("echo ${i + 1}") }
-    injector.outputPanel.getCurrentOutputPanel()?.clearText()
     assertCommandOutput(
       "history 3, 6",
       """
@@ -185,7 +171,6 @@ class HistoryCommandTest : VimTestCase() {
   @Test
   fun `test history with colon and first number lists single entry from command history`() {
     repeat(10) { i -> enterCommand("echo ${i + 1}") }
-    injector.outputPanel.getCurrentOutputPanel()?.clearText()
     assertCommandOutput(
       "history : 3",
       """
@@ -198,7 +183,6 @@ class HistoryCommandTest : VimTestCase() {
   @Test
   fun `test history with colon and no space before first number lists single entry from command history`() {
     repeat(10) { i -> enterCommand("echo ${i + 1}") }
-    injector.outputPanel.getCurrentOutputPanel()?.clearText()
     assertCommandOutput(
       "history :3",
       """
@@ -211,7 +195,6 @@ class HistoryCommandTest : VimTestCase() {
   @Test
   fun `test history with colon and two numbers lists command history range`() {
     repeat(10) { i -> enterCommand("echo ${i + 1}") }
-    injector.outputPanel.getCurrentOutputPanel()?.clearText()
     assertCommandOutput(
       "history : 3, 6",
       """
@@ -266,7 +249,6 @@ class HistoryCommandTest : VimTestCase() {
   @Test
   fun `test history cmd with first number lists single entry from command history`() {
     repeat(10) { i -> enterCommand("echo ${i + 1}") }
-    injector.outputPanel.getCurrentOutputPanel()?.clearText()
     assertCommandOutput(
       "history cmd 3",
       """
@@ -279,7 +261,6 @@ class HistoryCommandTest : VimTestCase() {
   @Test
   fun `test history cmd with no space before first number lists single entry from command history`() {
     repeat(10) { i -> enterCommand("echo ${i + 1}") }
-    injector.outputPanel.getCurrentOutputPanel()?.clearText()
     assertCommandOutput(
       "history cmd3",
       """
@@ -292,7 +273,6 @@ class HistoryCommandTest : VimTestCase() {
   @Test
   fun `test history cmd with two numbers lists command history range`() {
     repeat(10) { i -> enterCommand("echo ${i + 1}") }
-    injector.outputPanel.getCurrentOutputPanel()?.clearText()
     assertCommandOutput(
       "history cmd 3, 6",
       """
@@ -308,14 +288,12 @@ class HistoryCommandTest : VimTestCase() {
   @Test
   fun `test history cmd with two numbers incorrectly ordered lists nothing from command history range`() {
     repeat(10) { i -> enterCommand("echo ${i + 1}") }
-    injector.outputPanel.getCurrentOutputPanel()?.clearText()
     assertCommandOutput("history cmd 6,3", "      #  cmd history")
   }
 
   @Test
   fun `test history cmd with number that is no longer used`() {
     repeat(10) { i -> enterCommand("echo ${i + 1}") }
-    injector.outputPanel.getCurrentOutputPanel()?.clearText()
     // This will make "echo 1" the last used entry, remove it from position 1 and add it at position 11
     typeText(":<Up><Up><Up><Up><Up><Up><Up><Up><Up><Up><Esc>")
     assertCommandOutput("history cmd 1", "      #  cmd history")
@@ -324,7 +302,6 @@ class HistoryCommandTest : VimTestCase() {
   @Test
   fun `test history cmd with range starting from number that is no longer used`() {
     repeat(10) { i -> enterCommand("echo ${i + 1}") }
-    injector.outputPanel.getCurrentOutputPanel()?.clearText()
     // This will make "echo 1" the last used entry, remove it from position 1 and add it at position 11
     typeText(":<Up><Up><Up><Up><Up><Up><Up><Up><Up><Up><Esc>")
     assertCommandOutput(
@@ -347,7 +324,6 @@ class HistoryCommandTest : VimTestCase() {
   @Test
   fun `test history cmd -1 shows last entry`() {
     repeat(10) { i -> enterCommand("echo ${i + 1}") }
-    injector.outputPanel.getCurrentOutputPanel()?.clearText()
     assertCommandOutput(
       "history cmd -1",
       """
@@ -360,7 +336,6 @@ class HistoryCommandTest : VimTestCase() {
   @Test
   fun `test history cmd with negative number shows list of entries relative to last entry`() {
     repeat(10) { i -> enterCommand("echo ${i + 1}") }
-    injector.outputPanel.getCurrentOutputPanel()?.clearText()
     assertCommandOutput(
       "history cmd -4,-1",
       """
@@ -376,14 +351,12 @@ class HistoryCommandTest : VimTestCase() {
   @Test
   fun `test history cmd with two negative numbers incorrectly ordered lists nothing from command history range`() {
     repeat(10) { i -> enterCommand("echo ${i + 1}") }
-    injector.outputPanel.getCurrentOutputPanel()?.clearText()
     assertCommandOutput("history cmd -1,-4", "      #  cmd history")
   }
 
   @Test
   fun `test history with positive start number and negative last number`() {
     repeat(10) { i -> enterCommand("echo ${i + 1}") }
-    injector.outputPanel.getCurrentOutputPanel()?.clearText()
     assertCommandOutput(
       "history cmd 4,-3",
       """
@@ -401,7 +374,6 @@ class HistoryCommandTest : VimTestCase() {
   @Test
   fun `test history with negative start number and positive last number`() {
     repeat(10) { i -> enterCommand("echo ${i + 1}") }
-    injector.outputPanel.getCurrentOutputPanel()?.clearText()
     assertCommandOutput(
       "history cmd -8,8",
       """
@@ -490,7 +462,6 @@ class HistoryCommandTest : VimTestCase() {
   @Test
   fun `test history search with first number lists single entry from search history`() {
     repeat(10) { i -> enterSearch("foo${i + 1}") }
-    injector.outputPanel.getCurrentOutputPanel()?.clearText()
     assertCommandOutput(
       "history search 3",
       """
@@ -503,7 +474,6 @@ class HistoryCommandTest : VimTestCase() {
   @Test
   fun `test history search with no space before first number lists single entry from search history`() {
     repeat(10) { i -> enterSearch("foo${i + 1}") }
-    injector.outputPanel.getCurrentOutputPanel()?.clearText()
     assertCommandOutput(
       "history search3",
       """
@@ -516,7 +486,6 @@ class HistoryCommandTest : VimTestCase() {
   @Test
   fun `test history search with two numbers lists search history range`() {
     repeat(10) { i -> enterSearch("foo${i + 1}") }
-    injector.outputPanel.getCurrentOutputPanel()?.clearText()
     assertCommandOutput(
       "history search 3, 6",
       """
@@ -574,7 +543,6 @@ class HistoryCommandTest : VimTestCase() {
   fun `test history all includes history entries`() {
     repeat(5) { i -> enterSearch("foo${i + 1}") }
     repeat(5) { i -> enterCommand("echo ${i + 1}") }
-    injector.outputPanel.getCurrentOutputPanel()?.clearText()
     assertCommandOutput(
       "history all",
       """
@@ -601,7 +569,6 @@ class HistoryCommandTest : VimTestCase() {
   fun `test history all applies first number to all history entries`() {
     repeat(5) { i -> enterSearch("foo${i + 1}") }
     repeat(5) { i -> enterCommand("echo ${i + 1}") }
-    injector.outputPanel.getCurrentOutputPanel()?.clearText()
     assertCommandOutput(
       "history all 3",
       """
@@ -619,7 +586,6 @@ class HistoryCommandTest : VimTestCase() {
   fun `test history all applies range to all history entries`() {
     repeat(5) { i -> enterSearch("foo${i + 1}") }
     repeat(5) { i -> enterCommand("echo ${i + 1}") }
-    injector.outputPanel.getCurrentOutputPanel()?.clearText()
     assertCommandOutput(
       "history all 2,4",
       """
