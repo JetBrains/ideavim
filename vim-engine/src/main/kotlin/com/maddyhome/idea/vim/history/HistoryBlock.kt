@@ -17,6 +17,8 @@ internal class HistoryBlock {
   private var counter = 0
 
   fun addEntry(text: String) {
+    if (text.isEmpty()) return
+
     // If we have a last entry, it's no longer the current one
     if (entries.isNotEmpty()) {
       val last = entries.removeLast()

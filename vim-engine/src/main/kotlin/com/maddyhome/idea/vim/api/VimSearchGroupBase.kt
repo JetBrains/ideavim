@@ -1279,15 +1279,12 @@ abstract class VimSearchGroupBase : VimSearchGroup {
         lastSubstitutePattern = pattern
         lastPatternType = PatternType.SUBSTITUTE
       }
+
+      injector.historyGroup.addEntry(VimHistory.Type.Search, pattern)
     }
 
     // Vim never actually sets this register, but looks it up on request
     injector.registerGroup.storeTextSpecial(RegisterConstants.LAST_SEARCH_REGISTER, pattern)
-
-    // This will remove an existing entry and add it back to the end, and is expected to do so even if the string value
-    // is the same
-    injector.historyGroup.addEntry(VimHistory.Type.Search, pattern)
-
   }
 
   override fun findDecimalNumber(line: String): Int? {
