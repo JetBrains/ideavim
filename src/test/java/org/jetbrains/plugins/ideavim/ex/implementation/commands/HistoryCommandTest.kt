@@ -90,6 +90,16 @@ class HistoryCommandTest : VimTestCase("\n") {
 
   @Test
   fun `test history adds indicator to current entry`() {
+    // It doesn't seem possible to change the current history entry while not editing the command line. (Vim's command
+    // line window `q:` can interact with it, but also seems limited to while the command line is active). Essentially,
+    // when the `:history` command runs, the command line has just been completed, so a new entry has been saved, and
+    // the current entry has been reset. The search history is obviously not active either, so the last search command
+    // line would have saved a new entry and reset the current entry too. Therefore, the `:history` command always seems
+    // to use the last history entry as the current entry.
+    // Furthermore, the current entry can never actually be the last entry in this scenario. The current entry is
+    // supposed to be used to navigate _from_ when moving through history. So pressing `<S-Up>` on an empty command line
+    // will navigate to the last history entry. If the current entry was already the last entry, we would select the
+    // second to last, which is clearly wrong.
     repeat(5) { i -> enterSearch("foo${i + 1}") }
     repeat(5) { i -> enterCommand("echo ${i + 1}") }
     assertCommandOutput(
@@ -158,7 +168,7 @@ class HistoryCommandTest : VimTestCase("\n") {
   }
 
   @Test
-  fun `test history with colon lists empty cmd history`() {
+  fun `test history with colon and empty cmd history lists just invoked command`() {
     assertCommandOutput(
       "history :",
       """
@@ -208,7 +218,7 @@ class HistoryCommandTest : VimTestCase("\n") {
   }
 
   @Test
-  fun `test history cmd lists current cmd in history`() {
+  fun `test history cmd lists self in history`() {
     assertCommandOutput(
       "history cmd",
       """
@@ -292,31 +302,74 @@ class HistoryCommandTest : VimTestCase("\n") {
   }
 
   @Test
-  fun `test history cmd with number that is no longer used`() {
-    repeat(10) { i -> enterCommand("echo ${i + 1}") }
-    // This will make "echo 1" the last used entry, remove it from position 1 and add it at position 11
-    typeText(":<Up><Up><Up><Up><Up><Up><Up><Up><Up><Up><Esc>")
+  fun `test history cmd does not include duplicate entries`() {
+    enterCommand("echo 1")  // #1
+    enterCommand("echo 2")  // #2
+    enterCommand("echo 3")  // #3
+    enterCommand("echo 1")  // Removes #1 and adds as #4
+    assertCommandOutput("history cmd", """
+      |      #  cmd history
+      |      2  echo 2
+      |      3  echo 3
+      |      4  echo 1
+      |>     5  history cmd
+    """.trimMargin())
+  }
+
+  @Test
+  fun `test history cmd does not include empty commands`() {
+    enterCommand("")
+    assertCommandOutput("history cmd", """
+      |      #  cmd history
+      |>     1  history cmd
+    """.trimMargin())
+  }
+
+  @Test
+  fun `test history cmd includes cancelled commands`() {
+    enterCommand("echo 1")
+    enterCommand("echo 2")
+    typeText(":echo 'cancelled'<Esc>")  // Cancelled!
+    assertCommandOutput("history cmd", """
+      |      #  cmd history
+      |      1  echo 1
+      |      2  echo 2
+      |      3  echo 'cancelled'
+      |>     4  history cmd
+    """.trimMargin())
+  }
+
+  @Test
+  fun `test history cmd does not include empty cancelled commands`() {
+    typeText(":<Esc>")  // Cancelled!
+    assertCommandOutput("history cmd", """
+      |      #  cmd history
+      |>     1  history cmd
+    """.trimMargin())
+  }
+
+  @Test
+  fun `test history cmd with number that is no longer used outputs no entries`() {
+    enterCommand("echo 1")  // #1
+    enterCommand("echo 2")  // #2
+    enterCommand("echo 3")  // #3
+    enterCommand("echo 1")  // Removes #1 and adds as #4
     assertCommandOutput("history cmd 1", "      #  cmd history")
   }
 
   @Test
   fun `test history cmd with range starting from number that is no longer used`() {
-    repeat(10) { i -> enterCommand("echo ${i + 1}") }
-    // This will make "echo 1" the last used entry, remove it from position 1 and add it at position 11
-    typeText(":<Up><Up><Up><Up><Up><Up><Up><Up><Up><Up><Esc>")
+    enterCommand("echo 1")  // #1
+    enterCommand("echo 2")  // #2
+    enterCommand("echo 3")  // #3
+    enterCommand("echo 1")  // Removes #1 and adds as #4
     assertCommandOutput(
-      "history cmd 1,10",
+      "history cmd 1,4",
       """
         |      #  cmd history
         |      2  echo 2
         |      3  echo 3
-        |      4  echo 4
-        |      5  echo 5
-        |      6  echo 6
-        |      7  echo 7
-        |      8  echo 8
-        |      9  echo 9
-        |     10  echo 10
+        |      4  echo 1
       """.trimMargin()
     )
   }
@@ -496,6 +549,53 @@ class HistoryCommandTest : VimTestCase("\n") {
         |      6  foo6
       """.trimMargin()
     )
+  }
+
+  @Test
+  fun `test history search does not include duplicate entries`() {
+    enterSearch("foo 1")  // #1
+    enterSearch("foo 2")  // #2
+    enterSearch("foo 3")  // #3
+    enterSearch("foo 1")  // Removes #1 and adds as #4
+    assertCommandOutput("history search", """
+      |      #  search history
+      |      2  foo 2
+      |      3  foo 3
+      |>     4  foo 1
+    """.trimMargin())
+  }
+
+  @Test
+  fun `test history search does not include empty entries`() {
+    enterSearch("foo 1")
+    enterSearch("foo 2")
+    enterSearch("") // Search for last entry, but does not move #2 to #3
+    assertCommandOutput("history search", """
+      |      #  search history
+      |      1  foo 1
+      |>     2  foo 2
+    """.trimMargin())
+  }
+
+  @Test
+  fun `test history search includes cancelled commands`() {
+    enterSearch("foo 1")
+    enterSearch("foo 2")
+    typeText("/foo 'cancelled'<Esc>")  // Cancelled!
+    assertCommandOutput("history search", """
+      |      #  search history
+      |      1  foo 1
+      |      2  foo 2
+      |>     3  foo 'cancelled'
+    """.trimMargin())
+  }
+
+  @Test
+  fun `test history search does not include empty cancelled commands`() {
+    typeText("/<Esc>")  // Cancelled!
+    assertCommandOutput("history search", """
+      |      #  search history
+    """.trimMargin())
   }
 
   @Test
