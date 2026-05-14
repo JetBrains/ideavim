@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 /**
  * see "h :quit" / "h :close" / "h :quit"
  */
-@ExCommand(command = "q[uit],clo[se],hi[de]")
+@ExCommand(command = "q[uit],clo[se],hid[e]")
 data class QuitCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 
