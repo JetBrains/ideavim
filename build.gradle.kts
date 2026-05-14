@@ -539,8 +539,10 @@ intellijPlatform {
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4211">VIM-4211</a> Fixed IdeaVim not working in Git commit window when the Conventional Commits plugin is installed<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4224">VIM-4224</a> Fixed <code>:s</code> <code>e</code> flag now properly suppresses "Pattern not found" errors - e.g., <code>%s/\s\+$//e</code> no longer errors when there is no trailing whitespace<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4226">VIM-4226</a> Fixed race condition crash when the editor is disposed while the ex panel is open<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4217">VIM-4217</a> Fixed mode widget popup customization settings (colors, theme) not being persisted between IDE restarts<br>
         <br>
         <b>Merged PRs:</b><br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1761">1761</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-4217 Persist widget state<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1747">1747</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: feat(VIM-519): cycle through recent edits with g; and g,<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1745">1745</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: feat(VIM-258): tab command completion<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1744">1744</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: fix(VIM-4226): check if editor is disposed on focus<br>
