@@ -44,7 +44,7 @@
   "fir[st]": "com.maddyhome.idea.vim.vimscript.model.commands.SelectFirstFileCommand",
   "g[lobal]": "com.maddyhome.idea.vim.vimscript.model.commands.GlobalCommand",
   "go[to]": "com.maddyhome.idea.vim.vimscript.model.commands.GotoCharacterCommand",
-  "hi[de]": "com.maddyhome.idea.vim.vimscript.model.commands.QuitCommand",
+  "hid[e]": "com.maddyhome.idea.vim.vimscript.model.commands.QuitCommand",
   "his[tory]": "com.maddyhome.idea.vim.vimscript.model.commands.HistoryCommand",
   "im[ap]": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand",
   "imapc[lear]": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapClearCommand",
