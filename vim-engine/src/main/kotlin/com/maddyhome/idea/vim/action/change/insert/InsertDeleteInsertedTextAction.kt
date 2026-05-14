@@ -61,7 +61,7 @@ private fun insertDeleteInsertedText(editor: VimEditor, context: ExecutionContex
       caret,
       TextRange(deleteTo, offset),
       SelectionType.CHARACTER_WISE,
-      false,
+      true,
     )
     return true
   }
