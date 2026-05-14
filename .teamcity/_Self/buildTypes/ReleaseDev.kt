@@ -39,7 +39,11 @@ object ReleaseDev : IdeaVimBuildType({
   steps {
     script {
       name = "Pull git tags"
-      scriptContent = "git fetch --tags origin"
+      scriptContent = """
+        mkdir -p ~/.ssh && chmod 700 ~/.ssh
+        ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+        git fetch --tags origin
+      """.trimIndent()
     }
     script {
       name = "Pull git history"
