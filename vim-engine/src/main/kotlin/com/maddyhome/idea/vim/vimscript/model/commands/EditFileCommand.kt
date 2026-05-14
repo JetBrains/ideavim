@@ -31,7 +31,7 @@ data class EditFileCommand(val range: Range, val modifier: CommandModifier, val 
     context: ExecutionContext,
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
-    val arg = argument
+    val arg = argument.trim()
     if (arg == "#") {
       injector.jumpService.saveJumpLocation(editor)
       if (!injector.file.selectPreviousTab(context)) {
