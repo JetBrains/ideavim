@@ -124,4 +124,15 @@ class InsertDeleteInsertedTextActionTest : VimTestCase() {
       enterCommand("set nooldundo")
     }
   }
+
+  // VIM-768
+  @Test
+  fun `test ctrl u in insert mode preserves indentation`() {
+    doTest(
+      listOf("A", "<C-U>"),
+      "    # This is not timepass${c}",
+      "    ${c}",
+      Mode.INSERT,
+    )
+  }
 }
