@@ -69,9 +69,9 @@ abstract class IdeaVimStarterTestBase {
 
     val context = Starter.newContext(
       this::class.simpleName ?: "split-test",
-      // Match the IDE version used by `runIdeSplitMode` (gradle.properties: ideaVersion=2026.1).
-      // `useEAP()` would download 262.x EAP where a platform regression broke split-mode tests.
-      TestCase(IDEA_ULTIMATE, LocalProjectInfo(projectDir)).useRelease("2026.1")
+      // Match the IDE version used by `runIdeSplitMode` (gradle.properties: ideaVersion=2025.3).
+      // `useEAP()` would download a newer EAP where a platform regression broke split-mode tests.
+      TestCase(IDEA_ULTIMATE, LocalProjectInfo(projectDir)).useRelease("2025.3")
     )
 
     val pluginPath = resolvePluginPath()
