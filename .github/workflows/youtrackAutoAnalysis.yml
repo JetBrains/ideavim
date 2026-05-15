@@ -55,7 +55,7 @@ jobs:
         if: steps.check-ticket.outputs.has_ticket == 'true'
         uses: actions/setup-java@v4
         with:
-          java-version: '25'
+          java-version: '21'
           distribution: 'corretto'
 
       - name: Install Neovim

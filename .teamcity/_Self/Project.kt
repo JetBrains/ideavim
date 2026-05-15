@@ -63,7 +63,7 @@ abstract class IdeaVimBuildType(init: BuildType.() -> Unit) : BuildType({
     """.trimIndent()
 
   params {
-    param("env.JAVA_HOME", "/usr/lib/jvm/java-25-amazon-corretto")
+    param("env.JAVA_HOME", "/usr/lib/jvm/java-21-amazon-corretto")
   }
 
   features {

@@ -16,7 +16,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: zulu
-          java-version: 25
+          java-version: 21
       - name: Setup FFmpeg
         run: brew install ffmpeg
       - name: Setup Gradle
@@ -107,7 +107,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: zulu
-          java-version: 25
+          java-version: 21
       - name: Setup FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - name: Setup Gradle
@@ -174,7 +174,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: zulu
-          java-version: 25
+          java-version: 21
       - name: Setup FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - name: Download macOS artifacts
