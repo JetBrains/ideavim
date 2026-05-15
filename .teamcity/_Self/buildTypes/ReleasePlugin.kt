@@ -123,7 +123,11 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
     }
     script {
       name = "Run tests"
-      scriptContent = "./gradlew test -x :tests:property-tests:test -x :tests:long-running-tests:test --build-cache --configuration-cache"
+      scriptContent = """
+        export JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto
+        export PATH="${'$'}JAVA_HOME/bin:${'$'}PATH"
+        ./gradlew test -x :tests:property-tests:test -x :tests:long-running-tests:test --build-cache --configuration-cache
+      """.trimIndent()
     }
     gradle {
       name = "Publish release"
