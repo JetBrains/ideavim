@@ -16,7 +16,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: zulu
-          java-version: 25
+          java-version: 21
       - name: Setup FFmpeg
         run: brew install ffmpeg
       - name: Setup Gradle
