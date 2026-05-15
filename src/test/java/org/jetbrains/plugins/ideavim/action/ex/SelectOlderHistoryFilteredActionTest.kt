@@ -26,15 +26,16 @@ class SelectOlderHistoryFilteredActionTest : VimExTestCase() {
 
   @Test
   fun `test Up selects older command history entry filtered by typed prefix`() {
-    typeText(":set<Up>")
+    typeText(":set<Up>")    // Not filtered. Selects #3 as current entry
     assertExText("set incsearch")
 
-    // Skips "digraph" because it doesn't match the "set" prefix
-    typeText("<Up>")
+    typeText("<Up>")        // Skips #2, selects #1 as current entry
     assertExText("set digraph")
 
+    // Hit the end of history, beep and stay where we are
     typeText("<Up>")
     assertExText("set digraph")
+    assertPluginError(true)
   }
 
   @Test
@@ -48,5 +49,19 @@ class SelectOlderHistoryFilteredActionTest : VimExTestCase() {
 
     typeText("<Up>")
     assertExText("something cool")
+  }
+
+  @Test
+  fun `test Up selects next older filtered command history entry after current entry`() {
+    enterCommand("echo food_is_nice")   // #1
+    enterCommand("echo fool")           // #2
+    enterCommand("echo baz")            // #3
+    enterCommand("echo foo")            // #4
+    enterCommand("echo food_yes")       // #5
+    enterCommand("echo bar")            // #6
+    typeText(":echo f<Up><Up>") // Skip #6 and #5 and make #4 the current entry
+    assertExText("echo foo")
+    typeText("d<Up>") // Next oldest from #4 matching "echo food" -> #1
+    assertExText("echo food_is_nice")
   }
 }

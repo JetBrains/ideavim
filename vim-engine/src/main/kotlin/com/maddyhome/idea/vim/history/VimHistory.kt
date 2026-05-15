@@ -43,6 +43,60 @@ interface VimHistory {
   fun removeEntries(type: Type, pattern: String): Boolean
 
   /**
+   * Get the current history entry, if selected, or null otherwise
+   *
+   * Vim keeps track of the current entry while the user navigates through the history while editing the command line
+   * (and search/input/expression entry). When the command line is first displayed, there is no stored current history
+   * entry, only the current entry being edited. That means the current entry is initially `null`, and represents the
+   * item *after* the most recent entry, past the end of the history list.
+   *
+   * When the user navigates to an older entry with `<S-Up>` or filtered older entry with `<Up>`, the current entry is
+   * moved to the next oldest entry - starting with the last entry in the list, the most recently saved entry. When the
+   * command line is completed or canceled, the new entry is saved and the current entry is reset.
+   */
+  fun getCurrentEntry(type: Type): HistoryEntry?
+
+  /**
+   * Get the most recent history entry
+   *
+   * This function returns the most recently saved history entry, the item at the end of the history list, if available.
+   * It returns `null` if there are no saved entries.
+   *
+   * This is used to mark the current entry when displaying entries in the output of the `:history` command, when the
+   * current entry has a default value of `null` (meaning past the last entry in the history).
+   */
+  fun getMostRecentEntry(type: Type): HistoryEntry?
+
+  /**
+   * Select the next older entry from the given type's history, if possible, updating the current entry
+   *
+   * This is typically used when navigating through the history using the `<Up>` or `<S-Up>` keys. By default, the
+   * current entry starts as being the entry past the end of the history list, so pressing up will get the most recent
+   * entry. Pressing up again would get the next older entry, which would be the second most recent entry, and so on.
+   *
+   * If the filter value is given, the next older entry must start with the value.
+   *
+   * If there are no matching entries, or the start of the history is reached, the current entry will not be updated and
+   * `null` is returned.
+   */
+  fun selectOlderEntry(type: Type, filter: String?): HistoryEntry?
+
+  /**
+   * Select the next newer entry from the given type's history, if possible, updating the current entry
+   *
+   * This function is typically used when navigating through the history using the `<Down>` or `<S-Down>` keys. By
+   * default, the current entry starts as being the entry past the beginning of the history list, and there are no newer
+   * entries. If the user navigates to older entries, this function will return the next newer entry after the current
+   * entry, updating the current entry as it does.
+   *
+   * If the filter value is given, the next newer entry must start with the value.
+   *
+   * If there are no matching entries, or the end of the history is reached, the current entry will not be updated and
+   * `null` is returned.
+   */
+  fun selectNewerEntry(type: Type, filter: String?): HistoryEntry?
+
+  /**
    * Clear the entire history for the given history type
    */
   fun clearHistory(type: Type)

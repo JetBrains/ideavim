@@ -95,6 +95,16 @@ open class VimHistoryBase : VimHistory {
     }
   }
 
+  override fun getCurrentEntry(type: VimHistory.Type) = getEntriesBlockByType(type).currentEntry
+
+  override fun getMostRecentEntry(type: VimHistory.Type) = getEntriesBlockByType(type).mostRecentEntry
+
+  override fun selectNewerEntry(type: VimHistory.Type, filter: String?) =
+    getEntriesBlockByType(type).selectNewerEntry(filter)
+
+  override fun selectOlderEntry(type: VimHistory.Type, filter: String?) =
+    getEntriesBlockByType(type).selectOlderEntry(filter)
+
   override fun clearHistory(type: VimHistory.Type) {
     histories.remove(type)
   }

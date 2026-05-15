@@ -13,29 +13,34 @@ import com.maddyhome.idea.vim.api.injector
 
 internal class HistoryBlock {
   private val entries = mutableListOf<HistoryEntry>()
-
   private var counter = 0
+  private var current: HistoryEntry? = null
+
+  /**
+   * Returns the current history entry if available, or null otherwise
+   */
+  val currentEntry: HistoryEntry?
+    get() = current
+
+  /**
+   * Returns the most recent entry in the history, the last saved value, or null
+   */
+  val mostRecentEntry: HistoryEntry?
+    get() = entries.lastOrNull()
 
   fun addEntry(text: String) {
     if (text.isEmpty()) return
 
-    // If we have a last entry, it's no longer the current one
-    if (entries.isNotEmpty()) {
-      val last = entries.removeLast()
-      entries.add(HistoryEntry(last.number, last.entry, current = false))
-    }
-
     // If this entry already exists, remove it so we can add it as the newest entry
     for (i in entries.indices) {
-      val entry = entries[i]
-      if (text == entry.entry) {
+      if (text == entries[i].entry) {
         entries.removeAt(i)
         break
       }
     }
 
-    // Add the new entry as the current one
-    entries.add(HistoryEntry(++counter, text, current = true))
+    entries.add(HistoryEntry(++counter, text))
+    resetCurrentEntry()
 
     // If we're over the maximum number of entries, remove the oldest one
     if (entries.size > maxLength()) {
@@ -46,10 +51,8 @@ internal class HistoryBlock {
   fun removeEntryByNumber(number: Int): Boolean {
     val index = entries.indexOfFirst { it.number == number }
     if (index != -1) {
-      val entry = entries.removeAt(index)
-      if (entry.current) {
-        entries.removeLastOrNull()?.let { entries.add(it.copy(current = true)) }
-      }
+      entries.removeAt(index)
+      resetCurrentEntry()
       return true
     }
     return false
@@ -57,6 +60,45 @@ internal class HistoryBlock {
 
   fun getEntries(): List<HistoryEntry> {
     return entries
+  }
+
+  fun selectNewerEntry(filter: String?): HistoryEntry? {
+    if (current == null) {
+      // We're at the end of history, so there's no newer entry
+      return null
+    }
+
+    var index = entries.indexOf(current) + 1
+    while (filter != null && index != entries.size && !entries[index].entry.startsWith(filter)) {
+      index++
+    }
+
+    if (index == entries.size) {
+      current = null
+      return null
+    }
+
+    current = entries[index]
+    return current
+  }
+
+  fun selectOlderEntry(filter: String?): HistoryEntry? {
+    var index = if (current == null) (entries.size - 1) else (entries.indexOf(current) - 1)
+    while (filter != null && index >= 0 && !entries[index].entry.startsWith(filter)) {
+      index--
+    }
+
+    if (index < 0) {
+      return null
+    }
+
+    current = entries[index]
+    return current
+  }
+
+  private fun resetCurrentEntry() {
+    // Reset the current entry to null, indicating we're past the end of the history
+    current = null
   }
 
   companion object {
