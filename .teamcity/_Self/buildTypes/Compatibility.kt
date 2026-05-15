@@ -51,6 +51,8 @@ object Compatibility : IdeaVimBuildType({
               #      It builds the shadow jar and attaches it to a new GitHub Release.
               #   3. Update the release URL in the "Load Verifier" step above to point at the new jar.
 
+              export JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto
+              export PATH="${'$'}JAVA_HOME/bin:${'$'}PATH"
               java --version
               java -jar verifier1/verifier-cli-ideavim.jar check-plugin '${'$'}org.jetbrains.IdeaVim-EasyMotion' [latest-IU] -team-city
               java -jar verifier1/verifier-cli-ideavim.jar check-plugin '${'$'}eu.theblob42.idea.whichkey' [latest-IU] -team-city

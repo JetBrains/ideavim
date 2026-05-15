@@ -40,7 +40,11 @@ object SplitModeTests : IdeaVimBuildType({
   steps {
     script {
       name = "Run split mode tests"
-      scriptContent = "xvfb-run -a -s '-screen 0 1920x1080x24' ./gradlew :tests:split-mode-tests:testSplitMode --console=plain --build-cache --configuration-cache --stacktrace"
+      scriptContent = """
+        export JAVA_HOME=/usr/lib/jvm/java-21-amazon-corretto
+        export PATH="${'$'}JAVA_HOME/bin:${'$'}PATH"
+        xvfb-run -a -s '-screen 0 1920x1080x24' ./gradlew :tests:split-mode-tests:testSplitMode --console=plain --build-cache --configuration-cache --stacktrace
+      """.trimIndent()
     }
   }
 
