@@ -52,7 +52,7 @@ object ReleaseEap : IdeaVimBuildType({
       scriptContent = """
         mkdir -p ~/.ssh && chmod 700 ~/.ssh
         ssh-keyscan -H github.com >> ~/.ssh/known_hosts
-        git fetch --tags origin
+        git fetch --tags --force origin
       """.trimIndent()
     }
     script {
