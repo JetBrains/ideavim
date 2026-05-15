@@ -193,7 +193,7 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
       }
       positionPanel()
       glassPane.isVisible = true
-      entry.requestFocusInWindow()
+      SwingUtilities.invokeLater { entry.requestFocusInWindow() }
     }
     this.isActive = true
   }
