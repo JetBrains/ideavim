@@ -9,18 +9,10 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.KeyHandler
-import com.maddyhome.idea.vim.history.HistoryEntry
 import com.maddyhome.idea.vim.history.VimHistory
 import org.jetbrains.annotations.TestOnly
 import javax.swing.KeyStroke
 
-/**
- * This interface is not supposed to have any implementation logic.
- * The reason why we have implementation details here is
- * that this class extended by [ExEntryPanel] that already extends [JPanel]
- * and can't extend a base implementation of [VimCommandLine].
- * TODO: Consider creating a derived instance that has-a instance of ExEntryPanel
- */
 interface VimCommandLine {
   val inputProcessing: ((String) -> Unit)?
   val finishOn: Char?
@@ -31,7 +23,6 @@ interface VimCommandLine {
   fun getLabel(): String
   val isReplaceMode: Boolean
 
-  var histIndex: Int
   var lastEntry: String?
   val historyType: VimHistory.Type
     get() = VimHistory.Type.getTypeByLabel(getLabel())
@@ -104,7 +95,7 @@ interface VimCommandLine {
    * commands. If a keystroke is not consumed as part of a mapping or command, it is returned to the command line for
    * further processing. If it is mapped to a new keystroke, the new keystroke is passed instead. Typically, commands
    * exist for cursor movements (`<Left>` and `<Right>`) as well as for shortcuts for Vim actions (`<Up>`, `<Down>`,
-   * `<C-U>`, etc.). Typed characters are usually not mapped, and passed back to the command line component, where they
+   * `<C-U>`, etc.). Typed characters are usually not mapped and passed back to the command line component, where they
    * are added to the text content.
    */
   fun handleKey(key: KeyStroke)
@@ -139,53 +130,32 @@ interface VimCommandLine {
   // FIXME I don't want it to conflict with Swings `requestFocus` and can suggest a better name
   fun focus()
 
-  fun selectHistory(isUp: Boolean, filter: Boolean) {
-    val history = injector.historyGroup.getEntries(historyType, 0, 0)
-
-    val dir = if (isUp) -1 else 1
-    if (histIndex + dir < 0 || histIndex + dir > history.size) {
-      injector.messages.indicateError()
-
+  fun selectNewerHistory(filter: Boolean) {
+    val previousCurrent = injector.historyGroup.getCurrentEntry(historyType)
+    val newCurrent = injector.historyGroup.selectNewerEntry(historyType, if (filter) lastEntry else null)
+    if (newCurrent == null) {
+      selectHistory(lastEntry)
+      if (previousCurrent == null) {
+        injector.messages.indicateError()
+      }
       return
     }
+    selectHistory(newCurrent.entry)
+  }
 
-    if (filter) {
-      var i: Int = histIndex + dir
-      while (i >= 0 && i <= history.size) {
-        var txt: String?
-        if (i == history.size) {
-          txt = lastEntry
-        } else {
-          val entry: HistoryEntry = history[i]
-          txt = entry.entry
-        }
-
-        val myLastEntry = lastEntry
-        if (txt != null && myLastEntry != null && txt.startsWith(myLastEntry)) {
-          setText(txt, updateLastEntry = false)
-          caret.offset = txt.length
-          histIndex = i
-
-          return
-        }
-        i += dir
-      }
-
+  fun selectOlderHistory(filter: Boolean) {
+    val newCurrent = injector.historyGroup.selectOlderEntry(historyType, if (filter) lastEntry else null)
+    if (newCurrent == null) {
       injector.messages.indicateError()
-    } else {
-      histIndex += dir
-      val txt: String?
-      if (histIndex == history.size) {
-        txt = lastEntry
-      } else {
-        val entry: HistoryEntry = history[histIndex]
-        txt = entry.entry
-      }
+      return
+    }
+    selectHistory(newCurrent.entry)
+  }
 
-      if (txt != null) {
-        setText(txt, updateLastEntry = false)
-        caret.offset = txt.length
-      }
+  private fun selectHistory(entry: String?) {
+    if (entry != null) {
+      setText(entry, updateLastEntry = false)
+      caret.offset = entry.length
     }
   }
 }

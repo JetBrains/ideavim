@@ -122,8 +122,16 @@ data class HistoryCommand(val range: Range, val modifier: CommandModifier, val a
 
   private fun StringBuilder.outputHistory(name: String, type: VimHistory.Type, start: Int, end: Int) {
     append("      #  $name history")
-    injector.historyGroup.getEntries(type, start, end).forEachIndexed { index, it ->
-      val indicator = if (it.current) ">" else " "
+
+    // There appears to be no scenario in which current entry will be valid at this point. When editing, the initial
+    // current entry is the one being edited, and which has not yet been saved - the stored current entry is null. While
+    // editing, the current entry can be updated, but when this command is invoked, editing has finished and the current
+    // command has been added as a new entry and the current entry has been reset to null. It does not appear to be
+    // possible to have any value other than null for the current entry at this point. But that would mean we've got
+    // nothing to mark as current. Vim marks the most recent entry as current, which we do here.
+    val current = injector.historyGroup.getCurrentEntry(type) ?: injector.historyGroup.getMostRecentEntry(type)
+    injector.historyGroup.getEntries(type, start, end).forEach {
+      val indicator = if (it == current) ">" else " "
       val num = it.number.toString().padStart(6)
       appendLine()
       append("$indicator$num  ${it.entry}")

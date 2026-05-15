@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.api.VimCommandLine
 @CommandOrMotion(keys = ["<Up>"], modes = [Mode.CMD_LINE])
 class SelectOlderHistoryFilteredAction : CommandLineActionHandler() {
   override fun execute(commandLine: VimCommandLine): Boolean {
-    commandLine.selectHistory(isUp = true, filter = true)
+    commandLine.selectOlderHistory(filter = true)
     return true
   }
 }

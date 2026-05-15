@@ -14,7 +14,7 @@ import com.maddyhome.idea.vim.api.VimCommandLine
 @CommandOrMotion(keys = ["<S-Down>", "<C-N>", "<PageDown>"], modes = [Mode.CMD_LINE])
 class SelectNewerHistoryAction : CommandLineActionHandler() {
   override fun execute(commandLine: VimCommandLine): Boolean {
-    commandLine.selectHistory(isUp = false, filter = false)
+    commandLine.selectNewerHistory(filter = false)
     return true
   }
 }

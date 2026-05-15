@@ -8,4 +8,4 @@
 
 package com.maddyhome.idea.vim.history
 
-data class HistoryEntry(val number: Int, val entry: String, val current: Boolean)
+data class HistoryEntry(val number: Int, val entry: String)

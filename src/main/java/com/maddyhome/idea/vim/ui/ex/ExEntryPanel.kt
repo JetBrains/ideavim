@@ -79,7 +79,6 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
   var inputInterceptor: VimInputInterceptor? = null
   private var weakEditor: WeakReference<Editor?>? = null
   var context: DataContext? = null
-  override var histIndex: Int = 0
   override var lastEntry: String? = null
   override var activeCompletion: CommandLineCompletion? = null
 
@@ -165,8 +164,6 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
 
     this.context = context
     setEditor(editor)
-
-    histIndex = VimPlugin.getHistory().getEntries(historyType, 0, 0).size
 
     entry.document.addDocumentListener(fontListener)
     if (this.isIncSearchEnabled) {

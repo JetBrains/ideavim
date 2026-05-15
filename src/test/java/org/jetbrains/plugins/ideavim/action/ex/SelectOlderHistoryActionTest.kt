@@ -36,8 +36,10 @@ class SelectOlderHistoryActionTest : VimExTestCase() {
     typeText("<S-Up>")
     assertExText("set digraph")
 
+    // Hit the end of history, beep and stay where we are
     typeText("<S-Up>")
     assertExText("set digraph")
+    assertPluginError(true)
   }
 
   @Test
@@ -51,8 +53,10 @@ class SelectOlderHistoryActionTest : VimExTestCase() {
     typeText("<C-P>")
     assertExText("set digraph")
 
+    // Hit the end of history, beep and stay where we are
     typeText("<C-P>")
     assertExText("set digraph")
+    assertPluginError(true)
   }
 
   @Test
@@ -66,8 +70,34 @@ class SelectOlderHistoryActionTest : VimExTestCase() {
     typeText("<PageUp>")
     assertExText("set digraph")
 
+    // Hit the end of history, beep and stay where we are
     typeText("<PageUp>")
     assertExText("set digraph")
+    assertPluginError(true)
+  }
+
+  @Test
+  fun `test Shift-Up selects next older command history entry from current entry even after typing`() {
+    typeText(":<S-Up><S-Up>")
+    assertExText("digraph")   // #2 is the current history entry
+    typeText("22")
+    assertExText("digraph22")
+
+    typeText("<S-Up>")  // #2 ("digraph") is still the current history entry
+    assertExText("set digraph") // #1
+  }
+
+  @Test
+  fun `test Shift-Up does not maintain current history entry across command line instances`() {
+    typeText(":<S-Up><S-Up>")   // #2 is the current history entry
+    assertExText("digraph")
+
+    // Cancel the command line. This will add the current ex-entry as the newest history entry #4 (removing #2 since the
+    // text is the same) and resets the current history entry to past the end of the command history list
+    typeText("<Esc>")
+
+    typeText(":<S-Up><S-Up>") // Select #4 and then #3 as the current history entry
+    assertExText("set incsearch")
   }
 
   @Test
@@ -81,8 +111,10 @@ class SelectOlderHistoryActionTest : VimExTestCase() {
     typeText("<S-Up>")
     assertExText("something cool")
 
+    // Tries to move past the start of history. Beep, but keep the text
     typeText("<S-Up>")
     assertExText("something cool")
+    assertPluginError(true)
   }
 
   @Test
@@ -96,8 +128,10 @@ class SelectOlderHistoryActionTest : VimExTestCase() {
     typeText("<C-P>")
     assertExText("something cool")
 
+    // Tries to move past the start of history. Beep, but keep the text
     typeText("<C-P>")
     assertExText("something cool")
+    assertPluginError(true)
   }
 
   @Test
@@ -111,7 +145,33 @@ class SelectOlderHistoryActionTest : VimExTestCase() {
     typeText("<PageUp>")
     assertExText("something cool")
 
+    // Tries to move past the start of history. Beep, but keep the text
     typeText("<PageUp>")
     assertExText("something cool")
+    assertPluginError(true)
+  }
+
+  @Test
+  fun `test Shift-Up selects next older search history entry from current entry even after typing`() {
+    typeText("/<S-Up><S-Up>")
+    assertExText("not cool")    // #2 is the current entry
+    typeText("22")
+    assertExText("not cool22")
+
+    typeText("<S-Up>")  // #2 ("not cool") is still the current history entry
+    assertExText("something cool") // #1
+  }
+
+  @Test
+  fun `test Shift-Up does not maintain current history entry across search instances`() {
+    typeText("/<S-Up><S-Up>")   // #2 is the current history entry
+    assertExText("not cool")
+
+    // Cancel the command line. This will add the current ex-entry as the newest history entry #4 (removing #2 since the
+    // text is the same) and resets the current history entry to past the end of the command history list
+    typeText("<Esc>")
+
+    typeText("/<S-Up><S-Up>") // Select #4 and then #3 as the current history entry
+    assertExText("so cool")
   }
 }
