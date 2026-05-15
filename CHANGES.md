@@ -92,8 +92,14 @@ usual beta standards.
 * [VIM-4224](https://youtrack.jetbrains.com/issue/VIM-4224) Fixed `:s` `e` flag now properly suppresses "Pattern not found" errors - e.g., `%s/\s\+$//e` no longer errors when there is no trailing whitespace
 * [VIM-4226](https://youtrack.jetbrains.com/issue/VIM-4226) Fixed race condition crash when the editor is disposed while the ex panel is open
 * [VIM-4217](https://youtrack.jetbrains.com/issue/VIM-4217) Fixed mode widget popup customization settings (colors, theme) not being persisted between IDE restarts
+* [VIM-4184](https://youtrack.jetbrains.com/issue/VIM-4184) Fixed PRIMARY clipboard (middle-click paste) not updating correctly on Wayland during visual selection
+* [VIM-4229](https://youtrack.jetbrains.com/issue/VIM-4229) Fixed `:edit` command failing to open files when the filename has trailing whitespace
+* [VIM-4223](https://youtrack.jetbrains.com/issue/VIM-4223) Fixed `:hi` abbreviation incorrectly running `:hide` (closing editor) instead of `:highlight`
 
 ### Merged PRs:
+* [1771](https://github.com/JetBrains/ideavim/pull/1771) by [1grzyb1](https://github.com/1grzyb1): VIM-4229 Remove trailing spaces in edit command
+* [1770](https://github.com/JetBrains/ideavim/pull/1770) by [1grzyb1](https://github.com/1grzyb1): VIM-4223 proper hide command abbreviation
+* [1753](https://github.com/JetBrains/ideavim/pull/1753) by [1grzyb1](https://github.com/1grzyb1): Fix(VIM-4184): mirror PRIMARY on Wayland via xclip/wl-copy
 * [1761](https://github.com/JetBrains/ideavim/pull/1761) by [1grzyb1](https://github.com/1grzyb1): VIM-4217 Persist widget state
 * [1747](https://github.com/JetBrains/ideavim/pull/1747) by [1grzyb1](https://github.com/1grzyb1): feat(VIM-519): cycle through recent edits with g; and g,
 * [1745](https://github.com/JetBrains/ideavim/pull/1745) by [1grzyb1](https://github.com/1grzyb1): feat(VIM-258): tab command completion

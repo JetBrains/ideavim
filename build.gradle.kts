@@ -540,8 +540,14 @@ intellijPlatform {
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4224">VIM-4224</a> Fixed <code>:s</code> <code>e</code> flag now properly suppresses "Pattern not found" errors - e.g., <code>%s/\s\+$//e</code> no longer errors when there is no trailing whitespace<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4226">VIM-4226</a> Fixed race condition crash when the editor is disposed while the ex panel is open<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4217">VIM-4217</a> Fixed mode widget popup customization settings (colors, theme) not being persisted between IDE restarts<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4184">VIM-4184</a> Fixed PRIMARY clipboard (middle-click paste) not updating correctly on Wayland during visual selection<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4229">VIM-4229</a> Fixed <code>:edit</code> command failing to open files when the filename has trailing whitespace<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4223">VIM-4223</a> Fixed <code>:hi</code> abbreviation incorrectly running <code>:hide</code> (closing editor) instead of <code>:highlight</code><br>
         <br>
         <b>Merged PRs:</b><br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1771">1771</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-4229 Remove trailing spaces in edit command<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1770">1770</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-4223 proper hide command abbreviation<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1753">1753</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: Fix(VIM-4184): mirror PRIMARY on Wayland via xclip/wl-copy<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1761">1761</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-4217 Persist widget state<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1747">1747</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: feat(VIM-519): cycle through recent edits with g; and g,<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1745">1745</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: feat(VIM-258): tab command completion<br>
