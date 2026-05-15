@@ -53,7 +53,7 @@ open class TestingBuildType(
       buildFile = ""
       enableStacktrace = true
       gradleParams = "--no-build-cache --configuration-cache"
-      jdkHome = "/usr/lib/jvm/java-25-amazon-corretto"
+      jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
   }
 

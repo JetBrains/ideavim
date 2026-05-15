@@ -63,25 +63,25 @@ object ReleaseEap : IdeaVimBuildType({
       name = "Calculate new eap version"
       tasks = "scripts:calculateNewEapVersion"
       gradleParams = "--build-cache --configuration-cache"
-      jdkHome = "/usr/lib/jvm/java-25-amazon-corretto"
+      jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
     gradle {
       name = "Set TeamCity build number"
       tasks = "scripts:setTeamCityBuildNumber"
       gradleParams = "--build-cache --configuration-cache"
-      jdkHome = "/usr/lib/jvm/java-25-amazon-corretto"
+      jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
     gradle {
       name = "Add release tag"
       tasks = "scripts:addReleaseTag"
       gradleParams = "--build-cache --configuration-cache"
-      jdkHome = "/usr/lib/jvm/java-25-amazon-corretto"
+      jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
     gradle {
       name = "Publish plugin"
       tasks = "publishPlugin"
       gradleParams = "--build-cache --configuration-cache"
-      jdkHome = "/usr/lib/jvm/java-25-amazon-corretto"
+      jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
     script {
       name = "Push changes to the repo"
@@ -100,7 +100,7 @@ object ReleaseEap : IdeaVimBuildType({
       name = "YouTrack post release actions"
       tasks = "scripts:eapReleaseActions"
       gradleParams = "--build-cache --configuration-cache"
-      jdkHome = "/usr/lib/jvm/java-25-amazon-corretto"
+      jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
   }
 
