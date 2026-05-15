@@ -20,6 +20,7 @@ import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.put.PutData
 import com.maddyhome.idea.vim.register.Register
+import com.maddyhome.idea.vim.register.RegisterConstants.PRIMARY_REGISTER
 
 /**
  * @author vlan
@@ -73,7 +74,7 @@ sealed class PutVisualTextBaseAction(
     context: ExecutionContext,
   ): Register? {
     // IntelliJ updates X11 PRIMARY on visual selection; use the last explicitly-yanked value.
-    return if (isDefaultSystemClipboard(lastRegisterChar)) {
+    return if (isDefaultPrimaryRegister(lastRegisterChar)) {
       injector.registerGroup.getLastExplicitlyWrittenRegister(lastRegisterChar)
         ?: caret.registerStorage.getRegister(editor, context, lastRegisterChar)
     } else {
@@ -81,9 +82,9 @@ sealed class PutVisualTextBaseAction(
     }
   }
 
-  private fun isDefaultSystemClipboard(registerChar: Char) =
+  private fun isDefaultPrimaryRegister(registerChar: Char) =
     !injector.registerGroup.isRegisterSpecifiedExplicitly &&
-      injector.registerGroup.isSystemClipboard(registerChar) &&
+      registerChar == PRIMARY_REGISTER &&
       injector.registerGroup.isPrimaryRegisterSupported()
 }
 
