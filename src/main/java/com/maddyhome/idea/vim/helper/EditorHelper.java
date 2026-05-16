@@ -415,7 +415,11 @@ public class EditorHelper {
   }
 
   private static int getExEntryHeight() {
-    return injector.getCommandLine().getActiveCommandLineHeight();
+    Integer height = injector.getCommandLine().getActiveCommandLineHeight();
+    if (height != null)
+      return height;
+    height = injector.getOutputPanel().getActiveOutputPanelHeight();
+    return height != null ? height : 0;
   }
 
   private static int getHorizontalScrollbarHeight(final @NotNull Editor editor) {
