@@ -58,5 +58,5 @@ interface VimCommandLineService {
    * Returns the pixel height of the active command line (e.g., the ex entry panel), or 0 if no command line is active.
    * This is used by scroll calculations to account for the command line reducing the visible editor area.
    */
-  fun getActiveCommandLineHeight(): Int = 0
+  fun getActiveCommandLineHeight(): Int?
 }

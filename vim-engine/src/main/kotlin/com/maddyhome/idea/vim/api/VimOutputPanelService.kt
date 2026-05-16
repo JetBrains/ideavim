@@ -26,6 +26,11 @@ interface VimOutputPanelService {
   fun getCurrentOutputPanel(): VimOutputPanel?
 
   /**
+   * Returns the height of the currently active VimOutputPanel, if available.
+   */
+  fun getActiveOutputPanelHeight(): Int?
+
+  /**
    * Appends text to the existing output panel or creates a new one with the given text and message type.
    */
   fun output(
