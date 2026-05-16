@@ -26,6 +26,9 @@ usual beta standards.
 ## [To Be Released]
 
 ### Features:
+* [VIM-380](https://youtrack.jetbrains.com/issue/VIM-380) Added built-in `functextobj` extension — text objects for method/function definitions: `am` (a method), `aM` (a Method including JavaDoc/annotations), `im` (inner method body); activate with `set functextobj`
+* [VIM-380](https://youtrack.jetbrains.com/issue/VIM-380) Added built-in `classtextobj` extension — text object `ac` selects the entire class definition; activate with `set classtextobj`
+* New VimScript functions: `maparg()`, `mapcheck()`, `maplist()`, `hasmapto()`, `mapset()`
 * [VIM-1693](https://youtrack.jetbrains.com/issue/VIM-1693) Added `:autocmd` command - run Ex commands on editor events such as `BufRead`, `BufWrite`, `BufEnter`, `BufLeave`, `InsertEnter`, `InsertLeave`, `WinEnter`, `WinLeave`, `FocusGained`, `FocusLost`, and `FileType`; supports `augroup` and file pattern matching (e.g., `autocmd BufWritePre *.py echo "saving python"`)
 * [VIM-268](https://youtrack.jetbrains.com/issue/VIM-268) Added file name completion in ex commands - press `<Tab>`/`<S-Tab>` to cycle through file matches in `:edit`, `:split`, `:vsplit`, `:write`, `:read`, `:source`, and `:find` commands; use arrow keys to navigate the completion panel
 * New VimScript functions: `add()`, `call()`, `extend()`, `extendnew()`, `filter()`, `flatten()`, `flattennew()`, `foreach()`, `has_key()`, `indexof()`, `insert()`, `items()`, `keys()`, `map()`, `mapnew()`, `reduce()`, `remove()`, `slice()`, `sort()`, `uniq()`, `values()`
@@ -95,8 +98,16 @@ usual beta standards.
 * [VIM-4184](https://youtrack.jetbrains.com/issue/VIM-4184) Fixed PRIMARY clipboard (middle-click paste) not updating correctly on Wayland during visual selection
 * [VIM-4229](https://youtrack.jetbrains.com/issue/VIM-4229) Fixed `:edit` command failing to open files when the filename has trailing whitespace
 * [VIM-4223](https://youtrack.jetbrains.com/issue/VIM-4223) Fixed `:hi` abbreviation incorrectly running `:hide` (closing editor) instead of `:highlight`
+* [VIM-4225](https://youtrack.jetbrains.com/issue/VIM-4225) Fixed vim-sneak op-pending mode mappings — now uses `z`/`Z` instead of `s`/`S` to match actual vim-sneak behavior and maintain compatibility with vim-surround
+* [VIM-4231](https://youtrack.jetbrains.com/issue/VIM-4231) Fixed pasting from clipboard in visual selection
+* [VIM-4104](https://youtrack.jetbrains.com/issue/VIM-4104) Fixed `<Tab>` now moves to next component in single-line editors and embedded dialogs when not explicitly mapped
+* [VIM-4233](https://youtrack.jetbrains.com/issue/VIM-4233) Fixed race condition when typing `/` twice quickly causing focus issues in the ex entry panel
 
 ### Merged PRs:
+* [1776](https://github.com/JetBrains/ideavim/pull/1776) by [1grzyb1](https://github.com/1grzyb1): Fix(VIM-4231): pasting from clipboard in visual selection
+* [1774](https://github.com/JetBrains/ideavim/pull/1774) by [1grzyb1](https://github.com/1grzyb1): Fix(VIM-4233): focus ex entry panel race condition
+* [1772](https://github.com/JetBrains/ideavim/pull/1772) by [1grzyb1](https://github.com/1grzyb1): VIM-380 add support for a method and a class vim object
+* [1746](https://github.com/JetBrains/ideavim/pull/1746) by [citizenmatt](https://github.com/citizenmatt): Add mapping functions
 * [1771](https://github.com/JetBrains/ideavim/pull/1771) by [1grzyb1](https://github.com/1grzyb1): VIM-4229 Remove trailing spaces in edit command
 * [1770](https://github.com/JetBrains/ideavim/pull/1770) by [1grzyb1](https://github.com/1grzyb1): VIM-4223 proper hide command abbreviation
 * [1753](https://github.com/JetBrains/ideavim/pull/1753) by [1grzyb1](https://github.com/1grzyb1): Fix(VIM-4184): mirror PRIMARY on Wayland via xclip/wl-copy
