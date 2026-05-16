@@ -474,6 +474,9 @@ intellijPlatform {
     changeNotes.set(
       """
         <b>Features:</b><br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-380">VIM-380</a> Added built-in <code>functextobj</code> extension — text objects for method/function definitions: <code>am</code> (a method), <code>aM</code> (a Method including JavaDoc/annotations), <code>im</code> (inner method body); activate with <code>set functextobj</code><br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-380">VIM-380</a> Added built-in <code>classtextobj</code> extension — text object <code>ac</code> selects the entire class definition; activate with <code>set classtextobj</code><br>
+        * New VimScript functions: <code>maparg()</code>, <code>mapcheck()</code>, <code>maplist()</code>, <code>hasmapto()</code>, <code>mapset()</code><br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-1693">VIM-1693</a> Added <code>:autocmd</code> command - run Ex commands on editor events such as <code>BufRead</code>, <code>BufWrite</code>, <code>BufEnter</code>, <code>BufLeave</code>, <code>InsertEnter</code>, <code>InsertLeave</code>, <code>WinEnter</code>, <code>WinLeave</code>, <code>FocusGained</code>, <code>FocusLost</code>, and <code>FileType</code>; supports <code>augroup</code> and file pattern matching (e.g., <code>autocmd BufWritePre *.py echo "saving python"</code>)<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-268">VIM-268</a> Added file name completion in ex commands - press <code>&lt;Tab&gt;</code>/<code>&lt;S-Tab&gt;</code> to cycle through file matches in <code>:edit</code>, <code>:split</code>, <code>:vsplit</code>, <code>:write</code>, <code>:read</code>, <code>:source</code>, and <code>:find</code> commands; use arrow keys to navigate the completion panel<br>
         * New VimScript functions: <code>add()</code>, <code>call()</code>, <code>extend()</code>, <code>extendnew()</code>, <code>filter()</code>, <code>flatten()</code>, <code>flattennew()</code>, <code>foreach()</code>, <code>has_key()</code>, <code>indexof()</code>, <code>insert()</code>, <code>items()</code>, <code>keys()</code>, <code>map()</code>, <code>mapnew()</code>, <code>reduce()</code>, <code>remove()</code>, <code>slice()</code>, <code>sort()</code>, <code>uniq()</code>, <code>values()</code><br>
@@ -543,8 +546,16 @@ intellijPlatform {
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4184">VIM-4184</a> Fixed PRIMARY clipboard (middle-click paste) not updating correctly on Wayland during visual selection<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4229">VIM-4229</a> Fixed <code>:edit</code> command failing to open files when the filename has trailing whitespace<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4223">VIM-4223</a> Fixed <code>:hi</code> abbreviation incorrectly running <code>:hide</code> (closing editor) instead of <code>:highlight</code><br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4225">VIM-4225</a> Fixed vim-sneak op-pending mode mappings — now uses <code>z</code>/<code>Z</code> instead of <code>s</code>/<code>S</code> to match actual vim-sneak behavior and maintain compatibility with vim-surround<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4231">VIM-4231</a> Fixed pasting from clipboard in visual selection<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4104">VIM-4104</a> Fixed <code>&lt;Tab&gt;</code> now moves to next component in single-line editors and embedded dialogs when not explicitly mapped<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-4233">VIM-4233</a> Fixed race condition when typing <code>/</code> twice quickly causing focus issues in the ex entry panel<br>
         <br>
         <b>Merged PRs:</b><br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1776">1776</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: Fix(VIM-4231): pasting from clipboard in visual selection<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1774">1774</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: Fix(VIM-4233): focus ex entry panel race condition<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1772">1772</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-380 add support for a method and a class vim object<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1746">1746</a> by <a href="https://github.com/citizenmatt">citizenmatt</a>: Add mapping functions<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1771">1771</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-4229 Remove trailing spaces in edit command<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1770">1770</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-4223 proper hide command abbreviation<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1753">1753</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: Fix(VIM-4184): mirror PRIMARY on Wayland via xclip/wl-copy<br>
