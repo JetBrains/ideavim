@@ -65,7 +65,6 @@ internal class IjVimMessages : VimMessagesBase() {
   override fun getStatusBarMessage(): String? = message
 
   override fun clearStatusBarMessage() {
-    if (message.isNullOrEmpty()) return
     injector.outputPanel.getCurrentOutputPanel()?.close()
     message = null
   }
