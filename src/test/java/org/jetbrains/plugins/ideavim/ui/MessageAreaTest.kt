@@ -64,6 +64,7 @@ class MessageAreaTest : VimTestCase("\n") {
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
     configureByText("\n")
+    enterCommand("set nowrap")
   }
 
   @Disabled("How to test running an external command?")
@@ -576,6 +577,71 @@ class MessageAreaTest : VimTestCase("\n") {
   // Ideally, we'd have tests to verify that the single-line message area doesn't close when you hit Escape or `q`.
   // However, this only works in production because the panel is created without focus, and focus doesn't happen in
   // tests. Therefore, we can't test typing because we manually and explicitly choose where the keystrokes go.
+
+  @Test
+  fun `test hide single line message area with explicit redraw`() {
+    enterCommandForSingleLineOutput()
+    assertStaticMessageArea()
+    doTypeText("<C-L>")
+    assertExOutputClosed()
+  }
+
+  @Test
+  fun `test hide single line message area when scrolling line down`() {
+    configureByPages(3)
+    doTypeText("<C-F>")
+    enterCommandForSingleLineOutput()
+    assertStaticMessageArea()
+    doTypeText("<C-E>")
+    assertExOutputClosed()
+  }
+
+  @Test
+  fun `test hide single line message area when scrolling line up`() {
+    configureByPages(3)
+    doTypeText("<C-F>")
+    enterCommandForSingleLineOutput()
+    assertStaticMessageArea()
+    doTypeText("<C-Y>")
+    assertExOutputClosed()
+  }
+
+  @Test
+  fun `test hide single line message area when scrolling horizontally`() {
+    configureByText("1234567890".repeat(10))
+    enterCommandForSingleLineOutput()
+    assertStaticMessageArea()
+    doTypeText("$")
+    assertExOutputClosed()
+  }
+
+  @Test
+  fun `test hide single line message area when inserting line above`() {
+    configureByText("""
+      |{$c}Lorem ipsum dolor sit amet,
+      |consectetur adipiscing elit
+      |Sed in orci mauris.
+      |Cras id tellus in ex imperdiet egestas.
+    """.trimMargin())
+    enterCommandForSingleLineOutput()
+    assertStaticMessageArea()
+    doTypeText("O")
+    assertExOutputClosed()
+  }
+
+  @Test
+  fun `test hide single line message area when inserting line below`() {
+    configureByText("""
+      |{$c}Lorem ipsum dolor sit amet,
+      |consectetur adipiscing elit
+      |Sed in orci mauris.
+      |Cras id tellus in ex imperdiet egestas.
+    """.trimMargin())
+    enterCommandForSingleLineOutput()
+    assertStaticMessageArea()
+    doTypeText("o")
+    assertExOutputClosed()
+  }
 
   private fun enterCommandForSingleLineOutput() {
     enterCommand("echo 'lorem ipsum'")
