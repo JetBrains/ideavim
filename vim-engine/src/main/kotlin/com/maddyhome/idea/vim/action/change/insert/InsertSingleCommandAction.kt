@@ -12,6 +12,7 @@ import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.normalizeOffset
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -33,6 +34,14 @@ class InsertSingleCommandAction : VimActionHandler.SingleExecution() {
     operatorArguments: OperatorArguments,
   ): Boolean {
     injector.changeGroup.processSingleCommand(editor)
+
+    editor.forEachCaret { caret ->
+      val normalized = editor.normalizeOffset(caret.offset, allowEnd = false)
+      if (normalized != caret.offset) {
+        caret.moveToOffset(normalized)
+      }
+    }
+
     return true
   }
 }
