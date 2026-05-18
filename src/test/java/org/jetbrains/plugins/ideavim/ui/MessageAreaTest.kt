@@ -587,6 +587,14 @@ class MessageAreaTest : VimTestCase("\n") {
   }
 
   @Test
+  fun `test hide single line message area with escape`() {
+    enterCommandForSingleLineOutput()
+    assertStaticMessageArea()
+    doTypeText("<Esc>")
+    assertExOutputClosed()
+  }
+
+  @Test
   fun `test hide single line message area when scrolling line down`() {
     configureByPages(3)
     doTypeText("<C-F>")
