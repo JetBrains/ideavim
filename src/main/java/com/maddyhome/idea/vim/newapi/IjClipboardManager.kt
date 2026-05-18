@@ -14,6 +14,7 @@ import com.intellij.codeInsight.editorActions.TextBlockTransferable
 import com.intellij.codeInsight.editorActions.TextBlockTransferableData
 import com.intellij.ide.CopyPasteManagerEx
 import com.intellij.openapi.editor.CaretStateTransferableData
+import com.intellij.openapi.editor.RawText
 import com.intellij.openapi.editor.richcopy.view.HtmlTransferableData
 import com.intellij.openapi.editor.richcopy.view.RtfTransferableData
 import com.intellij.openapi.project.DumbService
@@ -276,4 +277,25 @@ internal class IjClipboardManager : VimClipboardManager {
 
 data class IjVimCopiedText(override val text: String, val transferableData: List<Any>) : VimCopiedText {
   override fun updateText(newText: String): VimCopiedText = IjVimCopiedText(newText, transferableData)
+}
+
+/**
+ * Builds the `TextBlockTransferable` for clipboard and PRIMARY writes. We pin a single-range
+ * `CaretStateTransferableData` so IntelliJ doesn't reshape the pasted text to match whatever
+ * multi-caret arrangement the destination editor has.
+ *
+ * Throws [HeadlessException] on a headless JVM; callers handle.
+ */
+@Suppress("UNCHECKED_CAST")
+internal fun buildIjTextTransferable(
+  text: String,
+  rawText: String,
+  transferableData: List<Any>,
+): TextBlockTransferable {
+  val mutableData = (transferableData as List<TextBlockTransferableData>).toMutableList()
+  val normalized = TextBlockTransferable.convertLineSeparators(text, "\n", mutableData)
+  if (mutableData.none { it is CaretStateTransferableData }) {
+    mutableData += CaretStateTransferableData(intArrayOf(0), intArrayOf(normalized.length))
+  }
+  return TextBlockTransferable(normalized, mutableData, RawText(rawText))
 }
