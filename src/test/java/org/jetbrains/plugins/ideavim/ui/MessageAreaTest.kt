@@ -643,6 +643,19 @@ class MessageAreaTest : VimTestCase("\n") {
     assertExOutputClosed()
   }
 
+  @Test
+  fun `test single line message area not hidden by scrolling caused by current action`() {
+    configureByPages(5)
+    doTypeText("G", "k")
+    assertPosition(174, 0)
+    enterCommandForSingleLineOutput()
+    enterSearch("ipsum")  // Move to occurrence on last line
+    assertPosition(174, 6)
+    doTypeText("n")       // Wrap and scroll to top of file. Scrolling normally closes the message area
+    assertPosition(0, 6)
+    assertStaticMessageArea("search hit BOTTOM, continuing at TOP")
+  }
+
   private fun enterCommandForSingleLineOutput() {
     enterCommand("echo 'lorem ipsum'")
   }
