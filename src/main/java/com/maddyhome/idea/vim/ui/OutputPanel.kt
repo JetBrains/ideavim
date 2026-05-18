@@ -79,6 +79,8 @@ internal class OutputPanel private constructor(
     JBScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER)
   private var cachedLineHeight = 0
 
+  private var allowClose = true
+
   @get:TestOnly
   var isSingleLine = false
     private set
@@ -199,6 +201,12 @@ internal class OutputPanel private constructor(
     if (!active) {
       activate()
     }
+
+    // Don't immediately clear the message if the action that caused it also (indirectly) causes a redraw
+    allowClose = false
+    injector.application.invokeLater {
+      allowClose = true
+    }
   }
 
   override fun clearText() {
@@ -276,7 +284,9 @@ internal class OutputPanel private constructor(
   }
 
   override fun close() {
-    close(null)
+    if (allowClose) {
+      close(null)
+    }
   }
 
   private fun close(key: KeyStroke?) {
