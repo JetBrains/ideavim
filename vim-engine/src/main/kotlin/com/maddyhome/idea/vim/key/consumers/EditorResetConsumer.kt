@@ -88,6 +88,10 @@ internal class EditorResetConsumer : KeyConsumer {
         val mode = editor.mode
         if (mode is Mode.NORMAL && (mode.isInsertPending || mode.isReplacePending)) {
           editor.mode = mode.returnTo
+        } else if (injector.outputPanel.getCurrentOutputPanel() != null) {
+          // This is not standard Vim behaviour, but our single line output panel is more intrusive than Vim's, and a
+          // natural reaction is to use Escape to dismiss something, such as highlights, etc.
+          injector.outputPanel.getCurrentOutputPanel()?.close()
         } else {
           var indicateError = true
           if (key.keyCode == KeyEvent.VK_ESCAPE) {
