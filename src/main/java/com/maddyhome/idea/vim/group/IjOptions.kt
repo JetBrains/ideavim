@@ -41,17 +41,12 @@ object IjOptions {
   // Vim options that are implemented purely by existing IntelliJ features and not used by vim-engine
   val breakindent: ToggleOption = addOption(ToggleOption("breakindent", LOCAL_TO_WINDOW, "bri", false))
   val colorcolumn: StringListOption = addOption(object : StringListOption("colorcolumn", LOCAL_TO_WINDOW, "cc", "") {
-    override fun checkIfValueValid(value: VimDataType, token: String) {
-      super.checkIfValueValid(value, token)
-      if (value is VimString && value != VimString.EMPTY) {
-        // Each element in the comma-separated string list needs to be a number. No spaces. Vim supports numbers
-        // beginning "+" or "-" to draw a highlight column relative to the 'textwidth' value. We don't fully support
-        // that, but we do automatically add "+0" because IntelliJ always displays the right margin
-        split(value.value).forEach {
-          if (!it.matches(Regex("[+-]?[0-9]+"))) {
-            throw exExceptionMessage("E474.arg", token)
-          }
-        }
+    override fun checkIfSplitValueValid(value: String, token: String) {
+      // Each element in the comma-separated string list needs to be a number. No spaces. Vim supports numbers beginning
+      // "+" or "-" to draw a highlight column relative to the 'textwidth' value. We don't fully support that, but we do
+      // automatically add "+0" because IntelliJ always displays the right margin
+      if (!value.matches(Regex("[+-]?[0-9]+"))) {
+        throw exExceptionMessage("E474.arg", token)
       }
     }
   })

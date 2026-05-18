@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.options.KeyValuePairOption
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionAccessScope
@@ -72,6 +73,13 @@ abstract class OptionsPropertiesBase(private val scope: OptionAccessScope) {
       StringListOptionValue(option, scope)
   }
 
+  private inner class KeyValuePairOptionProperty(private val option: KeyValuePairOption) :
+    ReadOnlyProperty<OptionsPropertiesBase, KeyValuePairOptionValue> {
+
+    override fun getValue(thisRef: OptionsPropertiesBase, property: KProperty<*>) =
+      KeyValuePairOptionValue(option, scope)
+  }
+
   private fun <T : VimDataType> getOptionValue(option: Option<T>) =
     injector.optionGroup.getOptionValue(option, scope)
 
@@ -97,6 +105,9 @@ abstract class OptionsPropertiesBase(private val scope: OptionAccessScope) {
 
   protected fun optionProperty(option: StringListOption): ReadOnlyProperty<OptionsPropertiesBase, StringListOptionValue> =
     StringListOptionProperty(option)
+
+  protected fun optionProperty(option: KeyValuePairOption): ReadOnlyProperty<OptionsPropertiesBase, KeyValuePairOptionValue> =
+    KeyValuePairOptionProperty(option)
 }
 
 /**
@@ -108,13 +119,13 @@ abstract class OptionsPropertiesBase(private val scope: OptionAccessScope) {
  * Note that this class should be short-lived and not cached. It assumes the underlying option value is not changed
  * except via its own methods!
  */
-class StringListOptionValue(
+open class StringListOptionValue(
   private val option: StringListOption,
   private val scope: OptionAccessScope,
 ) : AbstractList<String>() {
 
-  // We cache the value at creation time, and update whenever it's changed via one of its own methods. We lazily fetch
-  // and cache the string list. This class does not expect the value to be changed behind its back!
+  // This class is assumed to be short-live and not cached. Which means we can cache fetching the option and splitting
+  // it into separate values. It assumes that the underlying option value is not changed except via its own methods!
   private var currentValue: VimString = injector.optionGroup.getOptionValue(option, scope)
   private var stringListValues: List<String>? = null
 
@@ -152,4 +163,46 @@ class StringListOptionValue(
 
   private fun getStringListValues() =
     stringListValues ?: injector.optionGroup.getStringListValues(option, scope).also { stringListValues = it }
+}
+
+class KeyValuePairOptionValue(private val option: KeyValuePairOption, private val scope: OptionAccessScope)
+  : AbstractMap<String, String?>() {
+
+  // This class is assumed to be short-live and not cached. Which means we can cache fetching the option and splitting
+  // it into separate values. It assumes that the underlying option value is not changed except via its own methods!
+  private var currentValue: VimString = injector.optionGroup.getOptionValue(option, scope)
+  private var stringValueMap: Map<String, String?>? = null
+
+  val value: String
+    get() = currentValue.value
+
+  fun appendValue(value: String) {
+    val parsedValue = option.parseValue(value, value)
+    val newValue = option.appendValue(currentValue, parsedValue)
+    injector.optionGroup.setOptionValue(option, scope, newValue)
+  }
+
+  fun prependValue(value: String) {
+    val parsedValue = option.parseValue(value, value)
+    val newValue = option.prependValue(currentValue, parsedValue)
+    injector.optionGroup.setOptionValue(option, scope, newValue)
+  }
+
+  fun removeValue(value: String) {
+    val parsedValue = option.parseValue(value, value)
+    val newValue = option.removeValue(currentValue, parsedValue)
+    injector.optionGroup.setOptionValue(option, scope, newValue)
+  }
+
+  override val entries: Set<Map.Entry<String, String?>>
+    get() = getStringValueMap().entries
+
+  private fun getStringValueMap(): Map<String, String?> {
+    if (stringValueMap == null) {
+      stringValueMap = buildMap {
+        option.splitToPairs(value).forEach { (key, value) -> put(key, value) }
+      }
+    }
+    return stringValueMap!!
+  }
 }

@@ -49,6 +49,34 @@ However, some differences are inevitable.
 
 'matchpairs'    'mps'   Pairs of characters that "%" can match
 'maxmapdepth'   'mmd'   Maximum depth of mappings
+'messagesopt'   'mopt'  Option settings for outputting messages.
+        (default "hit-enter,history:500,wait:10000",
+                 "hit-enter,history:500" for Vim)
+        
+        It can consist of the following items. Items must be separated by 
+        a comma.
+           hit-enter    Use a |hit-enter| prompt when the message is longer
+                        than 'cmdheight' size. In IdeaVim, if a message is
+                        shorter than 'cmdheight' in lines, it is displayed in
+                        a semi-persistent popup without the hit-enter prompt.
+                        This popup can be dismissed by redrawing the screen,
+                        either explicitly with CTRL-L or implicitly by
+                        scrolling the screen. See also "wait:{n}".
+                        Note that 'cmdheight' is not currently implemented and
+                        assumed to be 1.
+
+           wait:{n}     Instead of using a |hit-enter| prompt, simply wait for
+                        {n} milliseconds so that the user has a chance to read
+                        the message.  The maximum value of {n} is 10000.  Use
+                        0 to disable the wait (but then the user may miss an
+                        important message).
+                        Unlike Vim, this item is NOT ignored when "hit-enter"
+                        is present.  It is used to delay hiding the semi-
+                        persistent message area popup used when the message is
+                        less than 'cmdheight' lines.
+
+           history:{n}  This item is currently not supported and is ignored.
+
 'more'          'more'  When on, listings pause when the whole screen is filled
 'nrformats'     'nf'    Number formats recognized for CTRL-A command
 'operatorfunc'  'opfunc'    Name of a function to call with the g@ operator
