@@ -9,6 +9,7 @@ package com.maddyhome.idea.vim.ui
 
 import com.intellij.ide.ui.LafManager
 import com.intellij.ide.ui.LafManagerListener
+import com.intellij.openapi.application.runInEdt
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.wm.ex.ToolWindowManagerListener
@@ -20,6 +21,7 @@ import com.intellij.ui.components.JBScrollPane
 import com.intellij.util.IJSwingUtilities
 import com.intellij.util.application
 import com.intellij.util.messages.MessageBusConnection
+import com.intellij.util.ui.launchOnShow
 import com.maddyhome.idea.vim.KeyHandler.Companion.getInstance
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
@@ -31,6 +33,7 @@ import com.maddyhome.idea.vim.helper.requestFocus
 import com.maddyhome.idea.vim.helper.selectEditorFont
 import com.maddyhome.idea.vim.helper.vimMorePanel
 import com.maddyhome.idea.vim.newapi.IjVimEditor
+import kotlinx.coroutines.delay
 import org.jetbrains.annotations.TestOnly
 import java.awt.BorderLayout
 import java.awt.Color
@@ -53,14 +56,13 @@ import javax.swing.text.StyleConstants
 import javax.swing.text.StyledDocument
 import kotlin.math.ceil
 import kotlin.math.min
+import kotlin.time.Duration.Companion.milliseconds
 
 
 /**
  * Panel that displays text in a `more` like window overlaid on the editor.
  */
-internal class OutputPanel private constructor(
-  private val editor: Editor,
-) : JBPanel<OutputPanel>(), VimOutputPanel {
+internal class OutputPanel private constructor(private val editor: Editor) : JBPanel<OutputPanel>(), VimOutputPanel {
 
   private val textPane = JTextPane()
   private val resizeAdapter: ComponentAdapter
@@ -113,6 +115,32 @@ internal class OutputPanel private constructor(
     textPane.addKeyListener(keyListener)
 
     updateUI()
+
+    // This is usually called in EDT, except for TabmoveTest
+    runInEdt {
+      launchOnShow("IdeaVim::HideOutputPanel") {
+        // Remember, Vim uses the pager for messages and command output only, not for external commands (e.g. "!ls -l")
+        // IdeaVim does not distinguish between messages and external command output.
+        // The 'more' option controls showing the "-- MORE --" prompt in the pager.
+        // The 'messagesopt' "hit-enter" value shows the "press ENTER" prompt regardless of pager use.
+        // The 'messagesopt' "wait" value is used when "hit-enter" is not set. Instead of showing "press ENTER", it
+        // waits before redrawing the message area. This applies messages, command and external command output. Wait can
+        // be mixed with 'nomore'.
+        // IdeaVim extends the "wait" value to automatically clear single-line output. Vim doesn't do this because the
+        // message area is less intrusive.
+        // Setting "mopt=wait:0" will disable the wait at the end of the output, closing it immediately.
+        // Setting "hit-enter,wait:0" will show the hit-enter prompt (Vim states that hit-enter takes precedence), and
+        // will disable the wait in single-line messages, leaving it open.
+        // TODO: Support "hit-enter" properly
+        if (isSingleLine /*|| !injector.globalOptions().messagesopt.contains("hit-enter")*/) {
+          val wait = injector.globalOptions().messagesopt["wait"]?.toIntOrNull()?.milliseconds
+          if (wait != null && wait > 0.milliseconds) {
+            delay(wait)
+            if (active) close()
+          }
+        }
+      }
+    }
   }
 
   override fun updateUI() {
@@ -537,23 +565,20 @@ internal class OutputPanel private constructor(
 
       for (vimEditor in injector.editorGroup.getEditors()) {
         val editor = (vimEditor as IjVimEditor).editor
-        if (!isPanelActive(editor)) continue
-        IJSwingUtilities.updateComponentTreeUI(getInstance(editor))
+        val panel = tryGetInstance(editor) ?: continue
+        IJSwingUtilities.updateComponentTreeUI(panel)
       }
     }
   }
 
   companion object {
-    fun getNullablePanel(editor: Editor): OutputPanel? {
+    fun tryGetInstance(editor: Editor): OutputPanel? {
       return editor.vimMorePanel as OutputPanel?
     }
 
-    fun isPanelActive(editor: Editor): Boolean {
-      return getNullablePanel(editor) != null
-    }
-
-    fun getInstance(editor: Editor): OutputPanel {
-      var panel: OutputPanel? = getNullablePanel(editor)
+    fun createInstance(editor: Editor): OutputPanel {
+      // This should be null, but let's check anyway
+      var panel: OutputPanel? = tryGetInstance(editor)
       if (panel == null) {
         panel = OutputPanel(editor)
         editor.vimMorePanel = panel

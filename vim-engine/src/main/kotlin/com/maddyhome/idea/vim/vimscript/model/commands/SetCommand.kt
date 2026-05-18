@@ -202,6 +202,9 @@ fun parseOptionLine(
         '-' -> removeValue(option, existingValue, value)
         else -> value
       } ?: throw exExceptionMessage("E474.arg", token)
+
+      // Setting the value will check validity, but will not have the token for the user-facing error message
+      option.checkIfValueValid(newValue, token)
       optionGroup.setOptionValue(option, scope, newValue)
     }
     if (error != null) {

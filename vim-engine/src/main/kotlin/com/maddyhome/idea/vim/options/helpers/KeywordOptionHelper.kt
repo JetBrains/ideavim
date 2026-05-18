@@ -21,12 +21,6 @@ object KeywordOptionHelper {
   private val validationPattern =
     Pattern.compile("(\\^?(([^0-9^]|[0-9]{1,3})-([^0-9]|[0-9]{1,3})|([^0-9^]|[0-9]{1,3})),)*\\^?(([^0-9^]|[0-9]{1,3})-([^0-9]|[0-9]{1,3})|([^0-9]|[0-9]{1,3})),?$")
 
-  fun isValueInvalid(value: String): Boolean {
-    val values = parseValues(value)
-    val specs = valuesToValidatedAndReversedSpecs(values)
-    return values == null || specs == null
-  }
-
   fun isFilename(editor: VimEditor, c: Char): Boolean  = isMatchingChar(editor, c, Options.isfname)
   fun isKeyword(editor: VimEditor, c: Char) = isMatchingChar(editor, c, Options.iskeyword)
 
@@ -59,9 +53,9 @@ object KeywordOptionHelper {
     val specs = valuesToValidatedAndReversedSpecs(parseValues(isKeyword)) ?: emptyList()
     return specs.map {
       it.initializeValues()
-      if (it.isAllLetters) {
+      if (it.matchAllLetters) {
         allLettersRegex
-      } else if (it.isRange) {
+      } else if (it.rangeLow != null && it.rangeHigh != null) {
         "[" + it.rangeLow!!.toChar() + "-" + it.rangeHigh!!.toChar() + "]"
       } else {
         it.rangeLow!!.toChar().toString()
@@ -127,10 +121,13 @@ object KeywordOptionHelper {
     return specs
   }
 
+  fun isValueValid(value: String): Boolean {
+    return KeywordSpec(value).isValid
+  }
+
   private class KeywordSpec(private val part: String) {
     private var negate = false
-    var isRange = false
-    var isAllLetters = false
+    var matchAllLetters = false
     var rangeLow: Int? = null
     var rangeHigh: Int? = null
     private var initialized = false
@@ -145,23 +142,28 @@ object KeywordOptionHelper {
       }
       val keywords = part.split("(?<=.)-(?=.+)".toRegex()).toTypedArray()
       if (keywords.size > 1 || keywords[0] == "@") {
-        isRange = true
         if (keywords.size > 1) {
-          rangeLow = toUnicode(keywords[0])
-          rangeHigh = toUnicode(keywords[1])
+          rangeLow = toUnicodeOrNull(keywords[0])
+          rangeHigh = toUnicodeOrNull(keywords[1])
         } else {
-          isAllLetters = true
+          matchAllLetters = true
         }
       } else {
-        val keyword = toUnicode(keywords[0])
-        rangeLow = keyword
-        rangeHigh = keyword
+        toUnicodeOrNull(keywords[0])?.let {
+          rangeLow = it
+        }
       }
     }
 
-    private fun toUnicode(str: String): Int {
-      return str.toIntOrNull() // If we have a number, it represents the Unicode code point of a letter
-        ?: str[0].code // If it's not a number we should only have strings consisting of one char
+    private fun toUnicodeOrNull(str: String): Int? {
+      // If the string is a number, it's a Unicode code point of a letter. If it's not a number, it should be a single
+      // character. Otherwise, it's invalid
+      return str.toIntOrNull()
+        ?: if (Character.codePointCount(str, 0, str.length) == 1) {
+          Character.codePointAt(str, 0)
+        } else {
+          null
+        }
     }
 
     override fun equals(other: Any?): Boolean {
@@ -178,7 +180,9 @@ object KeywordOptionHelper {
     val isValid: Boolean
       get() {
         initializeValues()
-        return !isRange || isAllLetters || rangeLow!! <= rangeHigh!!
+        val matchSingleLetter = rangeLow != null && rangeHigh == null
+        val matchRange = rangeLow != null && rangeHigh != null
+        return matchAllLetters || matchSingleLetter || (matchRange && rangeLow!! <= rangeHigh!!)
       }
 
     fun negate(): Boolean {
@@ -188,10 +192,10 @@ object KeywordOptionHelper {
 
     operator fun contains(code: Int): Boolean {
       initializeValues()
-      if (isAllLetters) {
+      if (matchAllLetters) {
         return Character.isLetter(code)
       }
-      return if (isRange) {
+      return if (rangeLow != null && rangeHigh != null) {
         code >= rangeLow!! && code <= rangeHigh!!
       } else {
         code == rangeLow

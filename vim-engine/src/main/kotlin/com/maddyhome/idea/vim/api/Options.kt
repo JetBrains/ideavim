@@ -9,8 +9,8 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.ex.exExceptionMessage
-import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.indexOfOrNull
+import com.maddyhome.idea.vim.options.KeyValuePairOption
 import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionAccessScope
@@ -27,7 +27,6 @@ import com.maddyhome.idea.vim.options.UnsignedNumberOption
 import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 @Suppress("unused", "SpellCheckingInspection")
@@ -243,37 +242,76 @@ object Options {
       "r-cr:hor20-Cursor/lCursor," +
       "sm:block-Cursor-blinkwait175-blinkoff150-blinkon175"
   ) {
-    override fun checkIfValueValid(value: VimDataType, token: String) {
-      super.checkIfValueValid(value, token)
-      val valueAsString = (value as VimString).value
-      valueAsString.split(",").forEach { GuiCursorOptionHelper.convertToken(it) }
+    override fun checkIfSplitValueValid(value: String, token: String) {
+      GuiCursorOptionHelper.convertToken(value)
     }
   })
 
   val iskeyword: StringListOption =
     addOption(object : StringListOption("iskeyword", LOCAL_TO_BUFFER, "isk", "@,48-57,_") {
-      override fun checkIfValueValid(value: VimDataType, token: String) {
-        super.checkIfValueValid(value, token)
-        if (KeywordOptionHelper.isValueInvalid((value as VimString).value)) {
-          throw exExceptionMessage("E474.arg", token)
-        }
+      override fun split(value: String): List<String> {
+        return KeywordOptionHelper.parseValues(value) ?: listOf(value)
       }
 
-      override fun split(value: String): List<String> {
-        val result = KeywordOptionHelper.parseValues(value)
-        StrictMode.assert(result != null, "Cannot split iskeyword value: $ value")
-
-        return result ?: split(defaultValue.value)
+      override fun checkIfSplitValueValid(value: String, token: String) {
+        if (!KeywordOptionHelper.isValueValid(value)) {
+          throw exExceptionMessage("E474.arg", token)
+        }
       }
     })
 
   val matchpairs: StringListOption =
     addOption(object : StringListOption("matchpairs", LOCAL_TO_BUFFER, "mps", "(:),{:},[:]") {
-      override fun checkIfValueValid(value: VimDataType, token: String) {
-        super.checkIfValueValid(value, token)
-        for (v in split((value as VimString).value)) {
-          if (!v.matches(Regex(".:."))) {
+      override fun checkIfSplitValueValid(value: String, token: String) {
+        if (!value.matches(Regex(".:."))) {
+          throw exExceptionMessage("E474.arg", token)
+        }
+      }
+    })
+
+  // The default Vim value is "hit-enter,history:500" and the "wait" value is only used when "hit-enter" is removed.
+  // IdeaVim additionally uses "wait" to automatically hide the output panel when it's showing a single-line message.
+  // Setting to 0 with "hit-enter" will behave like Vim (no waiting at the end of the pager). Setting to 0 for
+  // single-line messages will disable the wait and require dismissing the message manually.
+  val messagesopt: KeyValuePairOption =
+    addOption(object : KeyValuePairOption(
+      "messagesopt",
+      GLOBAL,
+      "mopt",
+      "hit-enter,history:500,wait:10000",
+      validKeys = listOf("history", "wait"),
+      validFlags = listOf("hit-enter")
+    ) {
+      override fun checkIfValueValid(value: VimString, token: String, isPartialValue: Boolean) {
+        super.checkIfValueValid(value, token, isPartialValue)
+        if (!isPartialValue) {
+          val values = splitToPairs(value.value).toMap()
+          // "history" is required
+          if (!values.containsKey("history")) {
             throw exExceptionMessage("E474.arg", token)
+          }
+
+          // "wait" is required if "hit-enter" is not present
+          if (!values.containsKey("hit-enter") && !values.containsKey("wait")) {
+            throw exExceptionMessage("E474.arg", token)
+          }
+        }
+      }
+
+      override fun checkIfPairValid(key: String, value: String, token: String) {
+        when (key) {
+          "wait" -> {
+            val value = value.toIntOrNull()
+            if (value == null || value < 0 || value > 10000) {
+              throw exExceptionMessage("E474.arg", token)
+            }
+          }
+
+          "history" -> {
+            val value = value.toIntOrNull()
+            if (value == null || value < 0) {
+              throw exExceptionMessage("E474.arg", token)
+            }
           }
         }
       }
@@ -303,7 +341,7 @@ object Options {
   val scrolljump: NumberOption = addOption(object : NumberOption("scrolljump", GLOBAL, "sj", 1) {
     override fun checkIfValueValid(value: VimDataType, token: String) {
       super.checkIfValueValid(value, token)
-      if ((value as VimInt).value < -100) {
+      if (value.toVimNumber().value < -100) {
         throw exExceptionMessage("E49", token)
       }
     }

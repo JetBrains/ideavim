@@ -14,6 +14,8 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import java.util.*
+import kotlin.collections.component1
+import kotlin.collections.forEach
 
 /**
  * The base class of option types
@@ -181,19 +183,35 @@ open class StringListOption(
     expandEnvironmentVariables: Boolean = false,
   ) : this(name, declaredScope, abbrev, VimString(defaultValue), boundedValues, expandEnvironmentVariables)
 
-  override fun checkIfValueValid(value: VimDataType, token: String) {
+  final override fun checkIfValueValid(value: VimDataType, token: String) {
     if (value !is VimString) {
       throw exExceptionMessage("E474.arg", token)
     }
+    checkIfValueValid(value, token, isPartialValue = false)
+  }
 
+  /**
+   * Check if the given value or partial value is valid for this option
+   *
+   * The [isPartialValue] flag indicates if it's a complete value being set, or a partial value passed through to the
+   * append/prepend/remove functions. When it's a partial value, only the validity of the given values can be checked,
+   * in isolation. When it's a complete value, the value can be checked as a whole. Specifically, checks for mutually
+   * exclusive options, or checks for missing values, etc.
+   */
+  protected open fun checkIfValueValid(value: VimString, token: String, isPartialValue: Boolean) {
     if (value.value.isEmpty()) {
       return
     }
 
-    if (boundedValues != null && split(value.value).any { !boundedValues.contains(it) }) {
+    val values = split(value.value)
+    if (boundedValues != null && values.any { !boundedValues.contains(it) }) {
       throw exExceptionMessage("E474.arg", token)
     }
+
+    values.forEach { checkIfSplitValueValid(it, token) }
   }
+
+  protected open fun checkIfSplitValueValid(value: String, token: String) {}
 
   override fun parseValue(value: String, token: String): VimString {
     // Expand environment variables and tilde according to :help expand-env
@@ -203,10 +221,10 @@ open class StringListOption(
     } else {
       value
     }
-    return VimString(expandedValue).also { checkIfValueValid(it, token) }
+    return VimString(expandedValue).also { checkIfValueValid(it, token, isPartialValue = true) }
   }
 
-  fun appendValue(currentValue: VimString, value: VimString): VimString {
+  open fun appendValue(currentValue: VimString, value: VimString): VimString {
     val valuesToAppend = split(value.value)
     val elements = split(currentValue.value).toMutableList()
     if (Collections.indexOfSubList(elements, valuesToAppend) != -1) {
@@ -215,7 +233,7 @@ open class StringListOption(
     return VimString(joinValues(currentValue.value, value.value))
   }
 
-  fun prependValue(currentValue: VimString, value: VimString): VimString {
+  open fun prependValue(currentValue: VimString, value: VimString): VimString {
     val valuesToPrepend = split(value.value)
     val elements = split(currentValue.value).toMutableList()
     if (Collections.indexOfSubList(elements, valuesToPrepend) != -1) {
@@ -224,7 +242,7 @@ open class StringListOption(
     return VimString(joinValues(value.value, currentValue.value))
   }
 
-  fun removeValue(currentValue: VimString, value: VimString): VimString {
+  open fun removeValue(currentValue: VimString, value: VimString): VimString {
     val valuesToRemove = split(value.value)
     val elements = split(currentValue.value).toMutableList()
     if (Collections.indexOfSubList(elements, valuesToRemove) != -1) {
@@ -238,6 +256,101 @@ open class StringListOption(
   private fun joinValues(first: String, second: String): String {
     val separator = if (first.isNotEmpty()) "," else ""
     return first + separator + second
+  }
+}
+
+open class KeyValuePairOption(
+  name: String,
+  declaredScope: OptionDeclaredScope,
+  abbrev: String,
+  defaultValue: VimString,
+  val validKeys: Collection<String>? = null,
+  val validFlags: Collection<String>? = null
+) : StringListOption(name, declaredScope, abbrev, defaultValue) {
+
+  constructor(
+    name: String,
+    declaredScope: OptionDeclaredScope,
+    abbrev: String,
+    defaultValue: String,
+    validKeys: Collection<String>? = null,
+    validFlags: Collection<String>? = null
+  ) : this(name, declaredScope, abbrev, VimString(defaultValue), validKeys, validFlags)
+
+  override fun checkIfValueValid(value: VimString, token: String, isPartialValue: Boolean) {
+    super.checkIfValueValid(value, token, isPartialValue)
+
+    val string = value.toVimString().value
+    if (string.isEmpty()) {
+      return
+    }
+
+    splitToPairs(string).forEach { (key, value) ->
+      if (validKeys?.contains(key) == false && validFlags?.contains(key) == false
+        || (validFlags?.contains(key) == true && value != null)
+        || (validFlags?.contains(key) == false && value == null)
+        || (validFlags?.contains(key) == true && value?.contains(':') == true)
+      ) {
+        throw exExceptionMessage("E474.arg", token)
+      }
+
+      if (value != null) {
+        checkIfPairValid(key, value, token)
+      }
+    }
+  }
+
+  protected open fun checkIfPairValid(key: String, value: String, token: String) {}
+
+  fun splitToPairs(string: String): List<Pair<String, String?>> = split(string).map {
+    val index = it.indexOf(':')
+    if (index == -1) {
+      Pair(it, null)
+    }
+    else {
+      Pair(it.substring(0, index), it.substring(index + 1))
+    }
+  }
+
+  override fun appendValue(currentValue: VimString, value: VimString): VimString {
+    val current = splitToPairs(currentValue.value).toMap(LinkedHashMap())
+    val new = splitToPairs(value.value).toMap()
+
+    // If it's a key/value pair, remove it and append it. If it's a flag, it's a no-op
+    new.forEach { (key, value) ->
+      if (current.contains(key) && validFlags?.contains(key) == true) return@forEach
+      current.putLast(key, value)
+    }
+
+    return VimString(join(current))
+  }
+
+  override fun prependValue(currentValue: VimString, value: VimString): VimString {
+    val current = splitToPairs(currentValue.value).toMap(LinkedHashMap())
+    val new = splitToPairs(value.value).toMap()
+
+    // If it's a key/value pair, remove it and append it. If it's a flag, it's a no-op.
+    // Note that this means when we prepend, key/value pairs are prepended in reverse order
+    new.forEach { (key, value) ->
+      if (current.contains(key) && validFlags?.contains(key) == true) return@forEach
+      current.putFirst(key, value)
+    }
+
+    return VimString(join(current))
+  }
+
+  override fun removeValue(currentValue: VimString, value: VimString): VimString {
+    val current = splitToPairs(currentValue.value).toMap(LinkedHashMap())
+    splitToPairs(value.value).toMap().forEach { current.remove(it.key) }
+    return VimString(join(current))
+  }
+
+  private fun join(pairs: Map<String, String?>) = pairs.entries.joinToString(separator = ",") { (key, value) ->
+    if (value == null) {
+      key
+    } else {
+      "$key:$value"
+    }
   }
 }
 
