@@ -579,6 +579,30 @@ class MessageAreaTest : VimTestCase("\n") {
   // tests. Therefore, we can't test typing because we manually and explicitly choose where the keystrokes go.
 
   @Test
+  fun `test hide single line message area when mode changes to Insert`() {
+    enterCommandForSingleLineOutput()
+    assertStaticMessageArea()
+    doTypeText("i")
+    assertExOutputClosed()
+  }
+
+  @Test
+  fun `test hide single line message area when mode changes to Replace`() {
+    enterCommandForSingleLineOutput()
+    assertStaticMessageArea()
+    doTypeText("R")
+    assertExOutputClosed()
+  }
+
+  @Test
+  fun `test hide single line message area when mode changes to Visual`() {
+    enterCommandForSingleLineOutput()
+    assertStaticMessageArea()
+    doTypeText("v")
+    assertExOutputClosed()
+  }
+
+  @Test
   fun `test hide single line message area with explicit redraw`() {
     enterCommandForSingleLineOutput()
     assertStaticMessageArea()

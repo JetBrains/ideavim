@@ -79,7 +79,6 @@ import com.maddyhome.idea.vim.autocmd.AutoCmdEvent
 import com.maddyhome.idea.vim.autocmd.IjFileTypeMapping
 import com.maddyhome.idea.vim.common.ModeChangeListener
 import com.maddyhome.idea.vim.common.ModeWillChangeListener
-import com.maddyhome.idea.vim.group.ChangeGroup
 import com.maddyhome.idea.vim.group.CommentsOptionInitializer
 import com.maddyhome.idea.vim.group.FileGroupHelper
 import com.maddyhome.idea.vim.group.IjOptions
@@ -199,6 +198,8 @@ object VimListenerManager {
 
     injector.listenersNotifier.myEditorListeners.add(IJEditorFocusListener())
     injector.listenersNotifier.myEditorListeners.add(ShowCmdWidgetUpdater())
+
+    injector.listenersNotifier.modeChangeListeners.add(IjVimRedrawService.RedrawListener)
   }
 
   fun turnOff() {
@@ -358,7 +359,7 @@ object VimListenerManager {
       eventFacade.addCaretListener(editor, EditorCaretHandler, perEditorDisposable)
 
       injector.editorGroup.editorCreated(IjVimEditor(editor))
-      (VimPlugin.getChange() as ChangeGroup).editorCreated(IjVimEditor(editor), perEditorDisposable)
+      VimPlugin.getChange().editorCreated(IjVimEditor(editor), perEditorDisposable)
       CommentsOptionInitializer.initializeForEditor(editor)
 
       (editor as EditorEx).addFocusListener(VimFocusListener, perEditorDisposable)
@@ -465,7 +466,7 @@ object VimListenerManager {
 
       MotionGroup.fileEditorManagerSelectionChangedCallback(event)
       FileGroupHelper.fileEditorManagerSelectionChangedCallback(event)
-      (VimPlugin.getSearch() as IjVimSearchGroup).fileEditorManagerSelectionChangedCallback(event)
+      VimPlugin.getSearch().fileEditorManagerSelectionChangedCallback(event)
       IjVimRedrawService.fileEditorManagerSelectionChangedCallback(event)
       VimLastSelectedEditorTracker.setLastSelectedEditor(event.newEditor)
     }
@@ -947,7 +948,7 @@ object VimListenerManager {
    */
   private object EditorCaretHandler : CaretListener {
     override fun caretPositionChanged(event: CaretEvent) {
-      event.caret?.resetVimLastColumn()
+      event.caret.resetVimLastColumn()
       val editor = event.editor
       val vimEditor = editor.vim
       if (vimEditor.mode is Mode.INSERT) {

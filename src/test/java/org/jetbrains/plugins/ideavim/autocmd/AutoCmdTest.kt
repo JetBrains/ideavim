@@ -86,12 +86,12 @@ class AutoCmdTest : VimTestCase() {
     enterCommand("autocmd InsertEnter * echo 23")
 
     typeText(injector.parser.parseKeys("i"))
-    typeText(injector.parser.parseKeys("<esc>"))
     assertExOutput("23")
+    typeText(injector.parser.parseKeys("<esc>"))
 
     typeText(injector.parser.parseKeys("i"))
-    typeText(injector.parser.parseKeys("<esc>"))
     assertExOutput("23")
+    typeText(injector.parser.parseKeys("<esc>"))
   }
 
   @Test

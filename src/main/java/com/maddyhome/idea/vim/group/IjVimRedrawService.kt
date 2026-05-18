@@ -12,8 +12,11 @@ import com.intellij.openapi.editor.event.DocumentEvent
 import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimRedrawService
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.common.ModeChangeListener
+import com.maddyhome.idea.vim.state.mode.Mode
 
 class IjVimRedrawService : VimRedrawService {
   override fun redraw() {
@@ -35,16 +38,18 @@ class IjVimRedrawService : VimRedrawService {
   }
 
   /**
-   * Simulates Vim's redraw when the document changes
-   *
-   * Only redraw if lines are added/removed.
+   * Simulate Vim's redraw when the document changes, or when the mode changes
    */
-  object RedrawListener : DocumentListener {
+  internal object RedrawListener : DocumentListener, ModeChangeListener {
     override fun documentChanged(event: DocumentEvent) {
       if (VimPlugin.isNotEnabled()) return
       if (event.newFragment.contains("\n") || event.oldFragment.contains("\n")) {
         injector.redrawService.redraw()
       }
+    }
+
+    override fun modeChanged(editor: VimEditor, oldMode: Mode) {
+      injector.redrawService.redraw()
     }
   }
 }
