@@ -70,9 +70,9 @@ enum class MappingMode {
     // Used externally, by Java
     @JvmField val XO: EnumSet<MappingMode> = EnumSet.of(VISUAL, OP_PENDING)
     // Used externally
-    val NV: EnumSet<MappingMode> = EnumSet.of(NORMAL, VISUAL, SELECT)
-    // Used externally
-    val NXO: EnumSet<MappingMode> = EnumSet.of(NORMAL, VISUAL, OP_PENDING)
+    @Suppress("unused") val NV: EnumSet<MappingMode> = EnumSet.of(NORMAL, VISUAL, SELECT)
+    // Used externally. Requires @JvmField even though used by Kotlin!
+    @JvmField val NXO: EnumSet<MappingMode> = EnumSet.of(NORMAL, VISUAL, OP_PENDING)
 
     // This method is used only for single modes, not groups of them (V is not supported)
     fun parseModeChar(char: Char): MappingMode {
