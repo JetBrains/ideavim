@@ -27,13 +27,17 @@ internal class HistGetFunctionHandler : BuiltinFunctionHandler<VimString>(minAri
     vimContext: VimLContext,
   ): VimString {
     val history = arguments.getString(0).value
-    val index = arguments.getNumberOrNull(1)?.value
+    val index = arguments.getNumberOrNull(1)?.value ?: -1
+
+    if (index == 0) {
+      return VimString.EMPTY
+    }
 
     val historyType = VimHistory.Type.getTypeByString(history)
       ?: injector.commandLine.getActiveCommandLine()?.historyType
       ?: return VimString.EMPTY
 
-    val entries = injector.historyGroup.getEntries(historyType, index ?: 0, 0)
+    val entries = injector.historyGroup.getEntries(historyType, index, 0)
     return if (entries.size == 1) entries[0].entry.asVimString() else VimString.EMPTY
   }
 }
