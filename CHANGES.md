@@ -43,6 +43,7 @@ usual beta standards.
 * [VIM-3975](https://youtrack.jetbrains.com/issue/VIM-3975) Added `mode()` VimScript function - returns the current editing mode (e.g., `'n'` for normal, `'i'` for insert, `'v'` for visual, `'R'` for replace)
 * [VIM-519](https://youtrack.jetbrains.com/issue/VIM-519) Added `g;` and `g,` commands - navigate the change list to jump to previous (`g;`) or next (`g,`) edit location
 * [VIM-258](https://youtrack.jetbrains.com/issue/VIM-258) Added command name completion in ex commands - press `<Tab>` to cycle through matching command names (e.g., `:e<Tab>` shows `:edit`, `:earlier`, etc.)
+* New VimScript functions: `digraph_get()`, `digraph_getlist()`, `digraph_set()`, `digraph_setlist()` — query and modify digraph mappings programmatically
 
 ### Fixes:
 * [VIM-4197](https://youtrack.jetbrains.com/issue/VIM-4197) Fixed Vim features (e.g., `f`, `w`, text objects) not working in Java files decompiled from Kotlin class files
@@ -95,15 +96,19 @@ usual beta standards.
 * [VIM-4224](https://youtrack.jetbrains.com/issue/VIM-4224) Fixed `:s` `e` flag now properly suppresses "Pattern not found" errors - e.g., `%s/\s\+$//e` no longer errors when there is no trailing whitespace
 * [VIM-4226](https://youtrack.jetbrains.com/issue/VIM-4226) Fixed race condition crash when the editor is disposed while the ex panel is open
 * [VIM-4217](https://youtrack.jetbrains.com/issue/VIM-4217) Fixed mode widget popup customization settings (colors, theme) not being persisted between IDE restarts
-* [VIM-4184](https://youtrack.jetbrains.com/issue/VIM-4184) Fixed PRIMARY clipboard (middle-click paste) not updating correctly on Wayland during visual selection
+* [VIM-4184](https://youtrack.jetbrains.com/issue/VIM-4184) Fixed PRIMARY clipboard (middle-click paste) on Wayland — now updates correctly during visual selection and no longer causes IDE flickering
 * [VIM-4229](https://youtrack.jetbrains.com/issue/VIM-4229) Fixed `:edit` command failing to open files when the filename has trailing whitespace
 * [VIM-4223](https://youtrack.jetbrains.com/issue/VIM-4223) Fixed `:hi` abbreviation incorrectly running `:hide` (closing editor) instead of `:highlight`
 * [VIM-4225](https://youtrack.jetbrains.com/issue/VIM-4225) Fixed vim-sneak op-pending mode mappings — now uses `z`/`Z` instead of `s`/`S` to match actual vim-sneak behavior and maintain compatibility with vim-surround
 * [VIM-4231](https://youtrack.jetbrains.com/issue/VIM-4231) Fixed pasting from clipboard in visual selection
 * [VIM-4104](https://youtrack.jetbrains.com/issue/VIM-4104) Fixed `<Tab>` now moves to next component in single-line editors and embedded dialogs when not explicitly mapped
 * [VIM-4233](https://youtrack.jetbrains.com/issue/VIM-4233) Fixed race condition when typing `/` twice quickly causing focus issues in the ex entry panel
+* [VIM-768](https://youtrack.jetbrains.com/issue/VIM-768) Fixed `<C-U>` in insert mode not preserving indentation — e.g., `A<C-U>` now correctly deletes only text typed since entering insert mode, keeping existing indentation
 
 ### Merged PRs:
+* [1784](https://github.com/JetBrains/ideavim/pull/1784) by [1grzyb1](https://github.com/1grzyb1): VIM-4184 remove wl-copy from primary writers
+* [1781](https://github.com/JetBrains/ideavim/pull/1781) by [AndDe-gourav](https://github.com/AndDe-gourav): Fix Incorrect behavior of C-u in insert mode (VIM-768)
+* [1749](https://github.com/JetBrains/ideavim/pull/1749) by [citizenmatt](https://github.com/citizenmatt): Add digraph Vim functions
 * [1776](https://github.com/JetBrains/ideavim/pull/1776) by [1grzyb1](https://github.com/1grzyb1): Fix(VIM-4231): pasting from clipboard in visual selection
 * [1774](https://github.com/JetBrains/ideavim/pull/1774) by [1grzyb1](https://github.com/1grzyb1): Fix(VIM-4233): focus ex entry panel race condition
 * [1772](https://github.com/JetBrains/ideavim/pull/1772) by [1grzyb1](https://github.com/1grzyb1): VIM-380 add support for a method and a class vim object
