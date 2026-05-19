@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimString
 
 @VimscriptFunction("mapcheck")
-internal class MapCheckFunctionHandler: MapFunctionHandlerBase<VimString>(minArity = 1, maxArity = 3) {
+internal class MapCheckFunctionHandler : MapFunctionHandlerBase<VimString>(minArity = 1, maxArity = 3) {
   override fun doFunction(
     arguments: Arguments,
     editor: VimEditor,
