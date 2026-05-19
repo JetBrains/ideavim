@@ -93,6 +93,7 @@ import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.helper.CaretVisualAttributesListener
+import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.GuicursorChangeListener
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.exitSelectMode
@@ -371,8 +372,9 @@ object VimListenerManager {
       val editorDisposable = editor.removeUserData(editorListenersDisposableKey)
       if (editorDisposable != null) {
         Disposer.dispose(editorDisposable)
-      } else {
-        // We definitely do not expect this to happen
+      } else if (!EditorHelper.isCommandHistoryWindow(editor)) {
+        // Cmdwin editors (q:, q/, q?) may bypass `add` in some test paths; that's expected.
+        // We definitely do not expect this to happen for any other editor.
         StrictMode.fail("Editor doesn't have disposable attached. $editor")
       }
     }
@@ -492,7 +494,7 @@ object VimListenerManager {
       // isn't called, so we need to initialise early.
       val openingEditor = getOpeningEditor(event.editor)
 
-      if (event.editor.virtualFile == null || event.editor.editorKind != EditorKind.MAIN_EDITOR || openingEditor == null) {
+      if (event.editor.virtualFile == null || event.editor.editorKind != EditorKind.MAIN_EDITOR || openingEditor == null || EditorHelper.isCommandHistoryWindow(event.editor)) {
         // If we don't have an opening editor, use the fallback window. If it's the first time, use the FALLBACK
         // scenario and make a full copy to get everything set in `~/.ideavimrc`. If it's not, then use EDIT, as if we
         // still had a current window and we are just replacing the buffer. If we do have an opening window, it's NEW.
@@ -537,9 +539,14 @@ object VimListenerManager {
     override fun editorReleased(event: EditorFactoryEvent) {
       if (vimDisabled(event.editor)) return
       val vimEditor = event.editor.vim
+      val isCmdwin = EditorHelper.isCommandHistoryWindow(event.editor)
       EditorListeners.remove(event.editor)
       injector.listenersNotifier.notifyEditorReleased(vimEditor)
       injector.markService.editorReleased(vimEditor)
+      if (isCmdwin) {
+        // Cmdwin is a synthetic buffer: no autocmd BufLeave and no fallback-window option capture.
+        return
+      }
       injector.autoCmd.handleEvent(AutoCmdEvent.BufLeave, event.editor.virtualFile?.path)
 
       // This ticket will have a different stack trace, but it's the same problem. Originally, we tracked the last

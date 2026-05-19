@@ -50,6 +50,7 @@ import com.maddyhome.idea.vim.api.VimRedrawService
 import com.maddyhome.idea.vim.api.VimRegexServiceBase
 import com.maddyhome.idea.vim.api.VimRegexpService
 import com.maddyhome.idea.vim.api.VimScrollGroup
+import com.maddyhome.idea.vim.api.SearchWindowGroup
 import com.maddyhome.idea.vim.api.VimSearchGroup
 import com.maddyhome.idea.vim.api.VimSearchHelper
 import com.maddyhome.idea.vim.api.VimStatistics
@@ -129,6 +130,8 @@ internal class IjVimInjector : VimInjectorBase() {
   override val templateManager: VimTemplateManager
     get() = service()
   override val searchGroup: VimSearchGroup
+    get() = service()
+  override val searchWindowGroup: SearchWindowGroup
     get() = service()
   override val put: VimPut
     get() = service()

@@ -130,6 +130,22 @@ interface VimEditor {
   fun isOneLineMode(): Boolean
 
   /**
+   * If this editor is the Vim command-line / search history window (opened by `q:`, `q/`, `q?`),
+   * returns the kind. Otherwise null. Used by `<CR>` dispatch to choose between `:` execution
+   * and `/` or `?` search.
+   */
+  fun getHistoryWindowKind(): HistoryWindowKind? = null
+
+  /** True if this editor is the cmdwin opened by `q:`, `q/` or `q?`. */
+  fun isInHistoryWindow(): Boolean = getHistoryWindowKind() != null
+
+  /**
+   * If this editor is a command-line / search history window, returns the editor that was active
+   * when it was opened. Null otherwise (or if the original editor has since been closed).
+   */
+  fun getCmdwinOriginalEditor(): VimEditor? = null
+
+  /**
    * function for refactoring, get rid of it
    */
   fun search(

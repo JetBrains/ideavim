@@ -684,6 +684,15 @@ public class EditorHelper {
   }
 
   /**
+   * Checks if the editor hosts a Vim command-line / search history window
+   * (the synthetic buffer opened by `q:`, `q/`, or `q?`).
+   */
+  public static boolean isCommandHistoryWindow(@NotNull Editor editor) {
+    final VirtualFile virtualFile = editor.getVirtualFile();
+    return virtualFile != null && virtualFile.getUserData(CmdwinKeys.KIND) != null;
+  }
+
+  /**
    * Checks if the editor is the Python console, so we can disable Vim features
    */
   public static boolean isPythonConsole(@NotNull Editor editor) {
