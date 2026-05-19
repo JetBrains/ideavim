@@ -45,7 +45,7 @@ class HistGetFunctionTest : VimTestCase("\n") {
   }
 
   @Test
-  fun `test histget returns specific cmd history entry using negative index`() {
+  fun `test histget returns cmd history entry relative to end of list when using negative index`() {
     enterCommand("call histadd('cmd', 'echo hello')")
     enterCommand("call histadd('cmd', 'echo world')")
     // History: [#1: call histadd hello, #2: echo hello, #3: call histadd world, #4: echo world]
@@ -54,11 +54,24 @@ class HistGetFunctionTest : VimTestCase("\n") {
   }
 
   @Test
-  fun `test histget returns earlier cmd history entry by positive index`() {
+  fun `test histget returns specific cmd history entry by positive index`() {
     enterCommand("call histadd('cmd', 'echo hello')")
     enterCommand("call histadd('cmd', 'echo world')")
     // "echo hello" is at index 2; "echo world" is at index 4
     assertCommandOutput("echo histget('cmd', 2)", "echo hello")
+  }
+
+  @Test
+  fun `test histget returns empty string for cmd history when index is 0`() {
+    enterCommand("call histadd('cmd', 'echo hello')") // histadd #1 + echo hello #2
+    assertCommandOutput("echo string(histget('cmd', 0))", "''")
+  }
+
+  @Test
+  fun `test histget returns most recent cmd history entry when index is omitted`() {
+    enterCommand("call histadd('cmd', 'echo hello')")
+    enterCommand("call histadd('cmd', 'echo world')")
+    assertCommandOutput("echo histget('cmd')", "echo histget('cmd')")
   }
 
   @Test
@@ -75,6 +88,9 @@ class HistGetFunctionTest : VimTestCase("\n") {
     enterCommand("call histadd('cmd', 'echo hello')")
     assertCommandOutput("echo string(histget('cmd', 99))", "''")
   }
+
+
+
 
   @Test
   fun `test histget returns entry from search history using full name`() {
@@ -102,9 +118,63 @@ class HistGetFunctionTest : VimTestCase("\n") {
   }
 
   @Test
+  fun `test histget returns search history entry relative to end of list when using negative index`() {
+    enterCommand("call histadd('search', 'foo')")
+    enterCommand("call histadd('search', 'bar')")
+    enterCommand("call histadd('search', 'baz')")
+    assertCommandOutput("echo histget('search', -2)", "bar")
+  }
+
+  @Test
+  fun `test histget returns specific search history entry by positive index`() {
+    enterCommand("call histadd('search', 'foo')")
+    enterCommand("call histadd('search', 'bar')")
+    enterCommand("call histadd('search', 'baz')")
+    assertCommandOutput("echo histget('search', 2)", "bar")
+  }
+
+  @Test
+  fun `test histget returns empty string for search history when index is 0`() {
+    enterCommand("call histadd('search', 'foo')")
+    enterCommand("call histadd('search', 'bar')")
+    enterCommand("call histadd('search', 'baz')")
+    assertCommandOutput("echo string(histget('search', 0))", "''")
+  }
+
+  @Test
+  fun `test histget returns most recent search entry when index is omitted`() {
+    enterCommand("call histadd('search', 'foo')")
+    enterCommand("call histadd('search', 'bar')")
+    enterCommand("call histadd('search', 'baz')")
+    assertCommandOutput("echo histget('search')", "baz")
+  }
+
+  @Test
   fun `test histget returns empty string for empty search history`() {
     assertCommandOutput("echo string(histget('search'))", "''")
   }
+
+  @Test
+  fun `test histget returns emptry string deleted search history entry`() {
+    enterCommand("call histadd('search', 'foo')")
+    enterCommand("call histadd('search', 'bar')")
+    enterCommand("call histadd('search', 'baz')")
+    enterCommand("call histdel('search', 2)")
+    assertCommandOutput("echo string(histget('search', 2))", "''")
+  }
+
+  @Test
+  fun `test histget returns empty string for out-of-range search history entry`() {
+    enterCommand("call histadd('search', 'foo')")
+    enterCommand("call histadd('search', 'bar')")
+    enterCommand("call histadd('search', 'baz')")
+    assertCommandOutput("echo string(histget('search', 99))", "''")
+  }
+
+
+
+
+
 
   @Test
   fun `test histget returns entry from expr history using full name`() {
@@ -164,16 +234,5 @@ class HistGetFunctionTest : VimTestCase("\n") {
   @Test
   fun `test histget returns empty string for empty input history`() {
     assertCommandOutput("echo string(histget('input'))", "''")
-  }
-
-  @Test
-  fun `test histget with no index returns most recent entry`() {
-    enterCommand("call histadd('search', 'foo')")
-    assertCommandOutput("echo histget('search')", "foo")
-  }
-
-  @Test
-  fun `test histget with no index returns empty string when history is empty`() {
-    assertCommandOutput("echo histget('search')", "")
   }
 }
