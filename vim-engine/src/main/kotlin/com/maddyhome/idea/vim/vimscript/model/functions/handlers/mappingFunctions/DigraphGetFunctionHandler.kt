@@ -32,7 +32,7 @@ internal class DigraphGetFunctionHandler : UnaryFunctionHandler<VimString>() {
       throw exExceptionMessage("E1214", chars)
     }
 
-    val codepoint =  injector.digraphGroup.getCharacterForDigraph(chars[0], chars[1])
+    val codepoint = injector.digraphGroup.getCharacterForDigraph(chars[0], chars[1])
     return String(intArrayOf(codepoint), 0, 1).asVimString()
   }
 }

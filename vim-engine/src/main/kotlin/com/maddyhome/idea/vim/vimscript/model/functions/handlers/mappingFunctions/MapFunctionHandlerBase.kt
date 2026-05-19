@@ -43,7 +43,7 @@ internal abstract class MapFunctionHandlerBase<T : VimDataType>(minArity: Int = 
     mapping: MappingInfoWithMode?,
   ): VimDictionary {
     val dictionary = VimDictionary(LinkedHashMap())
-    if (mapping!= null) {
+    if (mapping != null) {
       val mappingInfo = mapping.mappingInfo
       dictionary["lhs"] = name  // As the mapping is typed, with special keys as plain text - e.g. "foo<Tab>" or "foo<Left>"
       // TODO: This should be the keys as raw bytes, i.e. with special keys encoded

@@ -29,7 +29,6 @@ internal class MapSetFunctionHandler : BuiltinFunctionHandler<VimInt>(minArity =
     context: ExecutionContext,
     vimContext: VimLContext,
   ): VimInt {
-
     if (arguments.size > 1) {
       val mode = arguments.getString(0)
       val abbr = arguments.getNumber(1).booleanValue
@@ -41,8 +40,7 @@ internal class MapSetFunctionHandler : BuiltinFunctionHandler<VimInt>(minArity =
       }
 
       setMap(mode.value, dict)
-    }
-    else {
+    } else {
       val dict = arguments[0] as? VimDictionary ?: throw exExceptionMessage("E1206", 1)
       val mode = dict["mode"] as? VimString ?: throw exExceptionMessage("E460")
       setMap(mode.value, dict)
@@ -70,8 +68,7 @@ internal class MapSetFunctionHandler : BuiltinFunctionHandler<VimInt>(minArity =
     if (!expr) {
       val toKeys = injector.parser.parseKeys(rhs.value)
       injector.keyGroup.putKeyMapping(modes, fromKeys, owner, toKeys, !noremap)
-    }
-    else {
+    } else {
       val expression = injector.vimscriptParser.parseExpression(rhs.value) ?: throw exExceptionMessage("E460")
       injector.keyGroup.putKeyMapping(modes, fromKeys, owner, expression, rhs.value, !noremap)
     }
