@@ -48,6 +48,13 @@ class EnterNormalAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
+    if (editor.isInHistoryWindow()) {
+      // Vim's cmdwin has a single caret. Multi-caret on the cmdwin must not re-dispatch.
+      if (caret.id == editor.primaryCaret().id) {
+        injector.searchWindowGroup.executeCurrentLineAndClose(editor, caret, context)
+      }
+      return Motion.NoMotion
+    }
     val templateState = injector.templateManager.getTemplateState(editor)
     return if (templateState != null) {
       injector.actionExecutor.executeAction(

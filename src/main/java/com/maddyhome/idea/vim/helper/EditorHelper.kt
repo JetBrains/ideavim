@@ -73,6 +73,7 @@ private fun Editor.isAllowedFileEditor(): Boolean {
     || EditorHelper.isKotlinClassDecompiledToJavaFile(this)
     || EditorHelper.isDiffEditor(this)
     || EditorHelper.isFileEditor(this)
+    || EditorHelper.isCommandHistoryWindow(this)
 }
 
 private fun ideaVimDisabledInDialog(ideaVimSupportValue: StringListOptionValue): Boolean {
@@ -85,7 +86,7 @@ private fun ideaVimDisabledForSingleLine(ideaVimSupportValue: StringListOptionVa
 }
 
 private fun Editor.isInDialog(): Boolean {
-  return !this.isPrimaryEditor() && !EditorHelper.isFileEditor(this)
+  return !this.isPrimaryEditor() && !EditorHelper.isFileEditor(this) && !EditorHelper.isCommandHistoryWindow(this)
 }
 
 private fun Editor.isSingleLine(): Boolean {
@@ -113,6 +114,7 @@ internal fun Editor.isTerminalEditor(): Boolean {
     && document.isWritable
     && !EditorHelper.isFileEditor(this)
     && !EditorHelper.isDiffEditor(this)
+    && !EditorHelper.isCommandHistoryWindow(this)
 }
 
 // Optimized clone of com.intellij.ide.ui.laf.darcula.DarculaUIUtil.isTableCellEditor

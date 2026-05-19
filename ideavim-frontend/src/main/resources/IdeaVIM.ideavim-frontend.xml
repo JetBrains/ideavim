@@ -88,6 +88,8 @@
                         serviceImplementation="com.maddyhome.idea.vim.group.MotionGroup"/>
     <applicationService serviceInterface="com.maddyhome.idea.vim.api.VimSearchGroup"
                         serviceImplementation="com.maddyhome.idea.vim.newapi.IjVimSearchGroup"/>
+    <applicationService serviceInterface="com.maddyhome.idea.vim.api.SearchWindowGroup"
+                        serviceImplementation="com.maddyhome.idea.vim.group.IjSearchWindowGroup"/>
     <applicationService serviceInterface="com.maddyhome.idea.vim.api.VimSearchHelper"
                         serviceImplementation="com.maddyhome.idea.vim.newapi.IjVimSearchHelper"/>
     <applicationService serviceInterface="com.maddyhome.idea.vim.api.VimClipboardManager"

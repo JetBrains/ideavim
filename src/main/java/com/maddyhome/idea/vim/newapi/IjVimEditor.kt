@@ -26,6 +26,7 @@ import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.platform.project.projectId
 import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.HistoryWindowKind
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.LineDeleteShift
 import com.maddyhome.idea.vim.api.MutableLinearEditor
@@ -231,6 +232,20 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase() {
 
   override fun isOneLineMode(): Boolean {
     return editor.isOneLineMode
+  }
+
+  override fun getHistoryWindowKind(): HistoryWindowKind? =
+    editor.virtualFile?.getUserData(com.maddyhome.idea.vim.helper.CmdwinKeys.KIND)
+
+  override fun getCmdwinOriginalEditor(): VimEditor? {
+    val originalFile = editor.virtualFile?.getUserData(com.maddyhome.idea.vim.helper.CmdwinKeys.ORIGINAL_FILE)
+      ?: return null
+    val project = editor.project ?: return null
+    val fem = com.intellij.openapi.fileEditor.FileEditorManager.getInstance(project)
+    val textEditor = (fem.getSelectedEditor(originalFile) as? com.intellij.openapi.fileEditor.TextEditor)
+      ?: fem.getEditors(originalFile).filterIsInstance<com.intellij.openapi.fileEditor.TextEditor>().firstOrNull()
+      ?: return null
+    return textEditor.editor.vim
   }
 
   override fun getText(left: Int, right: Int): CharSequence {
