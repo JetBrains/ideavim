@@ -73,7 +73,7 @@ public class HistoryGroup extends VimHistoryBase
 
   private void readData(@NotNull Element element, String key) {
     final Type type = getTypeForString(key);
-    if (!isInitialised(type)) {
+    if (isInitialised(type)) {
       return;
     }
 
