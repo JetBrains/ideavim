@@ -91,4 +91,18 @@ class VariantDictionaryTest {
       dict,
     )
   }
+
+  @Test
+  fun `rhs alternatives cycle when the lhs has more of them`() {
+    val dict = buildVariantDictionary("{red,green,blue,yellow}", "{warm,cool}")
+    assertEquals(
+      mapOf(
+        "red" to "warm", "Red" to "Warm", "RED" to "WARM",
+        "green" to "cool", "Green" to "Cool", "GREEN" to "COOL",
+        "blue" to "warm", "Blue" to "Warm", "BLUE" to "WARM",
+        "yellow" to "cool", "Yellow" to "Cool", "YELLOW" to "COOL",
+      ),
+      dict,
+    )
+  }
 }

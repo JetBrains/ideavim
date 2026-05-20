@@ -34,8 +34,19 @@ private fun expandAllBraces(lhs: String, rhs: String): List<Pair<String, String>
 }
 
 private fun pairAlternatives(lhs: BracePattern, rhs: BracePattern): List<Pair<String, String>> {
-  val rhsVariants = if (rhs.borrowsAlternatives()) rhs.materialiseWith(lhs.alternatives) else rhs.materialise()
-  return lhs.materialise().zip(rhsVariants)
+  val lhsVariants = lhs.materialise()
+  val rhsVariants = generateRhsVariants(rhs, lhs, lhsVariants)
+  return lhsVariants.zip(rhsVariants)
+}
+
+private fun generateRhsVariants(
+  rhs: BracePattern,
+  lhs: BracePattern,
+  lhsVariants: List<String>,
+): List<String> = if (rhs.borrowsAlternatives()) {
+  rhs.materialiseWith(lhs.alternatives)
+} else {
+  rhs.materialiseCycling(lhsVariants.size)
 }
 
 private fun BracePattern.borrowsAlternatives(): Boolean = !hasSlot || alternatives == listOf("")
