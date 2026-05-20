@@ -54,7 +54,7 @@ import kotlin.math.min
 /**
  * Panel that displays text in a `more` like window overlaid on the editor.
  */
-class OutputPanel private constructor(
+internal class OutputPanel private constructor(
   private val editor: Editor,
 ) : JBPanel<OutputPanel>(), VimOutputPanel {
 
@@ -139,7 +139,7 @@ class OutputPanel private constructor(
   /**
    * Sets styled text with multiple segments, each potentially having a different color.
    */
-  fun setStyledText(lines: List<TextLine>) {
+  private fun setStyledText(lines: List<TextLine>) {
     val doc = textPane.styledDocument
     doc.remove(0, doc.length)
 
@@ -208,11 +208,7 @@ class OutputPanel private constructor(
     segments.clear()
   }
 
-  fun clear() {
-    text = ""
-  }
-
-  override fun handleKey(key: KeyStroke) {
+  private fun handleKey(key: KeyStroke) {
 
     if (isAtEnd) {
       close(key)
@@ -252,7 +248,7 @@ class OutputPanel private constructor(
     return textPane.getBackground()
   }
 
-  fun deactivate() {
+  private fun deactivate() {
     if (!active) return
     active = false
     clearText()
@@ -271,7 +267,7 @@ class OutputPanel private constructor(
   /**
    * Turns on the output panel for the given editor.
    */
-  fun activate() {
+  private fun activate() {
     disableOldGlass()
 
     setFontForElements()
@@ -310,7 +306,7 @@ class OutputPanel private constructor(
     close(null)
   }
 
-  fun close(key: KeyStroke?) {
+  private fun close(key: KeyStroke?) {
     val passKeyBack = isSingleLine
     ApplicationManager.getApplication().invokeLater {
       deactivate()
@@ -407,21 +403,21 @@ class OutputPanel private constructor(
     return count
   }
 
-  override fun scrollLine() {
+  private fun scrollLine() {
     scrollOffset(cachedLineHeight)
   }
 
-  override fun scrollPage() {
+  private fun scrollPage() {
     scrollOffset(scrollPane.getVerticalScrollBar().visibleAmount)
   }
 
-  override fun scrollHalfPage() {
+  private fun scrollHalfPage() {
     val sa = scrollPane.getVerticalScrollBar().visibleAmount / 2.0
     val offset = ceil(sa / cachedLineHeight) * cachedLineHeight
     scrollOffset(offset.toInt())
   }
 
-  fun onBadKey() {
+  private fun onBadKey() {
     labelComponent.setText(injector.messages.message("message.ex.output.more.prompt.full"))
     labelComponent.setFont(selectEditorFont(editor, labelComponent.text))
   }
@@ -442,7 +438,7 @@ class OutputPanel private constructor(
     labelComponent.setFont(selectEditorFont(editor, labelComponent.text))
   }
 
-  val isAtEnd: Boolean
+  private val isAtEnd: Boolean
     get() {
       if (isSingleLine) return true
       val contentHeight = textPane.preferredSize.height
@@ -454,12 +450,10 @@ class OutputPanel private constructor(
 
   private inner class OutputPanelKeyListener : KeyAdapter() {
     override fun keyTyped(e: KeyEvent) {
-      val currentPanel: VimOutputPanel = injector.outputPanel.getCurrentOutputPanel() ?: return
-
       val keyChar = e.keyChar
       val modifiers = e.modifiersEx
       val keyStroke = KeyStroke.getKeyStroke(keyChar, modifiers)
-      currentPanel.handleKey(keyStroke)
+      handleKey(keyStroke)
     }
 
     override fun keyPressed(e: KeyEvent) {
@@ -526,4 +520,4 @@ class OutputPanel private constructor(
 }
 
 
-data class TextLine(val text: String, val color: Color?)
+private data class TextLine(val text: String, val color: Color?)
