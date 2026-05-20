@@ -16,11 +16,6 @@ interface VimOutputPanel {
   val text: String
 
   /**
-   * The text in the bottom of the output panel, e.g. `-- MORE --`
-   */
-  var label: String
-
-  /**
    * Appends the specified text to the existing content of the output panel.
    * If 'isNewLine' is true, the text will begin on a new line.
    *
@@ -43,6 +38,5 @@ interface VimOutputPanel {
    */
   fun close()
 
-  fun setContent(text: String)
   fun clearText()
 }
