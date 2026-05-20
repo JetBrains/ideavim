@@ -112,8 +112,9 @@ private class CoercionWordHandler(private val targetStyle: CaseStyle) : Extensio
   override val isRepeatable: Boolean = true
 
   override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
+    val count = operatorArguments.count0.coerceAtLeast(1)
     // Right-to-left so an earlier caret's offsets survive a later replacement.
-    editor.sortedCarets().reversed().forEach { caret -> recaseWordAtCaret(editor, caret, targetStyle) }
+    editor.sortedCarets().reversed().forEach { caret -> recaseWordAtCaret(editor, caret, targetStyle, count) }
   }
 }
 
@@ -150,8 +151,8 @@ private object PendingCoercion {
   @Volatile var style: CaseStyle? = null
 }
 
-private fun recaseWordAtCaret(editor: VimEditor, caret: VimCaret, targetStyle: CaseStyle) {
-  val wordRange = injector.searchHelper.findWordObject(editor, caret, 1, isOuter = false, isBig = false)
+private fun recaseWordAtCaret(editor: VimEditor, caret: VimCaret, targetStyle: CaseStyle, count: Int) {
+  val wordRange = injector.searchHelper.findWordObject(editor, caret, count, isOuter = false, isBig = false)
   if (wordRange.startOffset == wordRange.endOffset) return
   val originalWord = editor.text().substring(wordRange.startOffset, wordRange.endOffset)
   val recased = targetStyle.recase(originalWord)

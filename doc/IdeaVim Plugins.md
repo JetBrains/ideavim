@@ -45,6 +45,21 @@ https://github.com/tpope/vim-abolish/blob/master/doc/abolish.txt
 
 `:Abolish` (insert-mode auto-correcting abbreviations) is not supported.
 
+By default each `cr<x>` mapping recases the inner word under the cursor.
+To get tpope-style motion support (`crsiw`, `crsap`, `crs2w`, …) remap to the
+per-style operator `<Plug>` mappings:
+
+```
+nmap crs <Plug>(abolish-coerce-snake)
+nmap crm <Plug>(abolish-coerce-pascal)
+nmap crc <Plug>(abolish-coerce-camel)
+nmap cru <Plug>(abolish-coerce-upper_snake)
+nmap cr- <Plug>(abolish-coerce-kebab)
+nmap cr. <Plug>(abolish-coerce-dot)
+nmap cr<Space> <Plug>(abolish-coerce-space)
+nmap crt <Plug>(abolish-coerce-title)
+```
+
 </details>
 
 <details>
