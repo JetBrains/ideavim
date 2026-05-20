@@ -101,4 +101,14 @@ class AbolishCoercionTest : VimTestCase() {
       Mode.NORMAL(),
     )
   }
+
+  @Test
+  fun `crs splits between a digit and an uppercase letter`() {
+    doTest(
+      "crs",
+      "let foo2Ba${c}r = 1",
+      "let ${c}foo2_bar = 1",
+      Mode.NORMAL(),
+    )
+  }
 }

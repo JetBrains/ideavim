@@ -63,4 +63,24 @@ class WordAtomsTest {
   fun `empty string is no atoms`() {
     assertEquals(emptyList(), splitIntoAtoms(""))
   }
+
+  @Test
+  fun `digit followed by uppercase is an atom boundary`() {
+    assertEquals(listOf("foo2", "Bar"), splitIntoAtoms("foo2Bar"))
+  }
+
+  @Test
+  fun `digit followed by uppercase splits even when the word starts uppercase`() {
+    assertEquals(listOf("Foo2", "Bar"), splitIntoAtoms("Foo2Bar"))
+  }
+
+  @Test
+  fun `digit followed by lowercase is not a boundary`() {
+    assertEquals(listOf("foo2bar"), splitIntoAtoms("foo2bar"))
+  }
+
+  @Test
+  fun `consecutive digits stay inside the atom they belong to`() {
+    assertEquals(listOf("v2", "Engine"), splitIntoAtoms("v2Engine"))
+  }
 }

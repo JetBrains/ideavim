@@ -29,6 +29,9 @@ internal data class BracePattern(
     if (!hasSlot) return List(foreign.size) { prefix + suffix }
     return foreign.map { prefix + it + suffix }
   }
+
+  fun materialiseCycling(count: Int): List<String> =
+    List(count) { i -> prefix + alternatives[i % alternatives.size] + suffix }
 }
 
 internal fun parseBraces(pattern: String): BracePattern {

@@ -49,6 +49,7 @@ private fun isAtomBoundary(word: String, index: Int): Boolean {
   val curr = word[index]
 
   if (prev.isLowerCase() && curr.isUpperCase()) return true
+  if (prev.isDigit() && curr.isUpperCase()) return true
 
   // Acronym end ("HTTP|Request"): a one-char lookahead distinguishes the end
   // of a run of caps from the middle of one.

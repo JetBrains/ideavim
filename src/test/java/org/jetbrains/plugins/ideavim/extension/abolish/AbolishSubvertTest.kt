@@ -101,4 +101,14 @@ class AbolishSubvertTest : VimTestCase() {
       Mode.NORMAL(),
     )
   }
+
+  @Test
+  fun `S cycles rhs alternatives when lhs has more of them`() {
+    doTest(
+      ":S /{red,green,blue,yellow}/{warm,cool}/g<CR>",
+      "${c}red green blue yellow",
+      "${c}warm cool warm cool",
+      Mode.NORMAL(),
+    )
+  }
 }
