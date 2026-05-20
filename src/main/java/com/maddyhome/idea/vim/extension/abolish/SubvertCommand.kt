@@ -8,17 +8,26 @@
 
 package com.maddyhome.idea.vim.extension.abolish
 
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.CommandAliasHandler
 import com.maddyhome.idea.vim.ex.ranges.Range
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 /**
  * `:[range]S /lhs/rhs/[flags]` — abolish's case-aware substitute, also reachable as `:Subvert`.
  *
- * Limitations vs. tpope's plugin: flags other than `g` are silently ignored;
- * the lhs is matched literally rather than as a vim regex.
+ * Delegates to vim's `:substitute` so users get every standard flag (`g`, `c`, etc.)
+ * Tpope uses the same trick: build the variant dictionary, stash it as a global,
+ * then run `:s/.../\=get(g:abolish_last_dict, submatch(0), submatch(0))/...`.
+ *
+ * The lhs is still matched literally — vim regex atoms aren't honoured, and
+ * `\1`-style backreferences in the rhs are stored verbatim in the dictionary.
+ * Abolish-specific flags `I`, `v`, `w` are silently dropped.
  */
 internal class SubvertCommand : CommandAliasHandler {
 
@@ -26,58 +35,50 @@ internal class SubvertCommand : CommandAliasHandler {
     val invocation = SubvertInvocation.parse(command) ?: return
     val dictionary = buildVariantDictionary(invocation.lhsPattern, invocation.rhsPattern)
     if (dictionary.isEmpty()) return
-    val matcher = Regex(buildAlternationPattern(dictionary.keys))
+
+    storeAsLastDict(dictionary)
     val lineRange = range.getLineRange(editor, editor.primaryCaret())
-    // One write action so the whole substitution is one undo step.
-    injector.application.runWriteAction {
-      applySubstitutionToLines(editor, lineRange.startLine, lineRange.endLine, matcher, dictionary, invocation.replaceAll)
-    }
+    val substitute = buildSubstituteCommand(dictionary.keys, invocation.flags, lineRange.startLine1, lineRange.endLine1)
+    injector.vimscriptExecutor.execute(substitute, editor, context, skipHistory = true, indicateErrors = true, null)
   }
 }
 
-private fun applySubstitutionToLines(
-  editor: VimEditor,
-  startLine: Int,
-  endLine: Int,
-  matcher: Regex,
-  dictionary: Map<String, String>,
-  replaceAll: Boolean,
-) {
-  for (line in startLine..endLine) {
-    val (lineStart, lineEnd) = editor.getLineRange(line)
-    val lineText = editor.text().substring(lineStart, lineEnd)
-    val newLineText = substituteInLine(lineText, matcher, dictionary, replaceAll) ?: continue
-    injector.changeGroup.replaceText(editor, editor.primaryCaret(), lineStart, lineEnd, newLineText)
-  }
+/** Pushes the dictionary into `g:abolish_last_dict` so `\=get(...)` can read it. */
+private fun storeAsLastDict(dictionary: Map<String, String>) {
+  val entries = LinkedHashMap<VimString, VimDataType>()
+  dictionary.forEach { (key, value) -> entries[VimString(key)] = VimString(value) }
+  VimPlugin.getVariableService().storeGlobalVariable("abolish_last_dict", VimDictionary(entries))
 }
 
-private fun substituteInLine(
-  lineText: String,
-  matcher: Regex,
-  dictionary: Map<String, String>,
-  replaceAll: Boolean,
-): String? {
-  val replaceMatch: (MatchResult) -> CharSequence = { match -> dictionary[match.value] ?: match.value }
-  val rewritten = if (replaceAll) {
-    matcher.replace(lineText, replaceMatch)
-  } else {
-    val firstMatch = matcher.find(lineText) ?: return null
-    val replacement = replaceMatch(firstMatch)
-    lineText.replaceRange(firstMatch.range, replacement)
-  }
-  return rewritten.takeIf { it != lineText }
+private fun buildSubstituteCommand(keys: Set<String>, flags: String, startLine1: Int, endLine1: Int): String {
+  val pattern = buildVimAlternationPattern(keys)
+  return "${startLine1},${endLine1}s/$pattern/\\=get(g:abolish_last_dict, submatch(0), submatch(0))/$flags"
 }
 
-// Longest-first so a prefix key (`box`) can't shadow a longer one (`boxes`).
-// `Regex.escape` keeps regex specials in user input harmless. No anchoring —
-// vim's `:substitute` doesn't anchor and neither does tpope's `:Subvert`.
-private fun buildAlternationPattern(keys: Set<String>): String =
-  keys.sortedByDescending(String::length).joinToString(separator = "|", transform = Regex::escape)
+/**
+ * Build the alternation pattern in vim's very-magic case-sensitive mode.
+ *
+ * Sort longest-first so `box` can't shadow `boxes`; escape vim regex specials
+ * with the same character set tpope uses in `s:subesc`.
+ */
+private fun buildVimAlternationPattern(keys: Set<String>): String {
+  val alternation = keys.sortedByDescending(String::length).joinToString(separator = "|", transform = ::vimEscape)
+  return "\\v\\C%($alternation)"
+}
+
+private val VIM_REGEX_SPECIALS = setOf(']', '[', '\\', '/', '.', '*', '+', '?', '~', '%', '(', ')', '&', '|')
+
+private fun vimEscape(input: String): String = buildString {
+  input.forEach { c ->
+    if (c in VIM_REGEX_SPECIALS) append('\\')
+    append(c)
+  }
+}
 
 private data class SubvertInvocation(
   val lhsPattern: String,
   val rhsPattern: String,
-  val replaceAll: Boolean,
+  val flags: String,
 ) {
   companion object {
     fun parse(commandLine: String): SubvertInvocation? {
@@ -90,7 +91,7 @@ private data class SubvertInvocation(
       val rhs = parts[1]
       val flags = parts.getOrNull(2).orEmpty()
       if (lhs.isEmpty()) return null
-      return SubvertInvocation(lhs, rhs, replaceAll = flags.contains('g'))
+      return SubvertInvocation(lhs, rhs, flags)
     }
   }
 }
