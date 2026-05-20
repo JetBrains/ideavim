@@ -50,16 +50,17 @@ internal class AbolishExtension : VimExtension {
   }
 
   private fun registerCoercion(coercion: Coercion) {
-    putExtensionHandlerMapping(
-      MappingMode.N,
-      injector.parser.parseKeys(coercion.plugOperatorName),
-      owner,
-      CoercionOperatorTrigger(coercion.style),
-      false,
-    )
+    val plugOperator = injector.parser.parseKeys(coercion.plugOperatorName)
+    putExtensionHandlerMapping(MappingMode.N, plugOperator, owner, CoercionOperatorTrigger(coercion.style), false)
+    // Same <Plug> name in visual mode: the selection is the operand, no motion needed.
+    putExtensionHandlerMapping(MappingMode.X, plugOperator, owner, CoercionVisualHandler(coercion.style), false)
+
     val plugWord = injector.parser.parseKeys(coercion.plugWordName)
     putExtensionHandlerMapping(MappingMode.N, plugWord, owner, CoercionWordHandler(coercion.style), false)
-    putKeyMappingIfMissing(MappingMode.N, injector.parser.parseKeys(coercion.keys), owner, plugWord, true)
+
+    val keys = injector.parser.parseKeys(coercion.keys)
+    putKeyMappingIfMissing(MappingMode.N, keys, owner, plugWord, true)
+    putKeyMappingIfMissing(MappingMode.X, keys, owner, plugOperator, true)
   }
 
   private data class Coercion(val keys: String, val style: CaseStyle) {
@@ -80,6 +81,28 @@ internal class AbolishExtension : VimExtension {
       Coercion("cr<Space>", CaseStyle.SPACE),
       Coercion("crt", CaseStyle.TITLE),
     )
+  }
+}
+
+/**
+ * Visual-mode coercion: the current selection is the operand. Recase, replace,
+ * exit visual back to normal with the caret at the start of the rewritten span.
+ */
+private class CoercionVisualHandler(private val style: CaseStyle) : ExtensionHandler {
+
+  override val isRepeatable: Boolean = true
+
+  override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
+    val caret = editor.primaryCaret()
+    val start = caret.selectionStart
+    val end = caret.selectionEnd
+    if (start >= end) return
+    val original = editor.text().substring(start, end)
+    val recased = style.recase(original)
+    executeNormalWithoutMapping(injector.parser.parseKeys("<Esc>"), editor.ij)
+    if (recased == original) return
+    injector.changeGroup.replaceText(editor, caret, start, end, recased)
+    caret.moveToOffset(start)
   }
 }
 
