@@ -484,6 +484,7 @@ class SetlocalCommandTest : VimTestCase() {
     setOsSpecificOptionsToSafeValues()
     val expected = """
     |--- Local option values ---
+    |noabolish           nohlsearch          nonumber              startofline
     |noargtextobj          ide=IntelliJ IDEA   operatorfunc=     nosurround
     |nobomb              --ideajoin          norelativenumber    notextobj-entire
     |nobreakindent         ideamarks           scroll=0          notextobj-indent
@@ -499,7 +500,6 @@ class SetlocalCommandTest : VimTestCase() {
     |nogdefault          nomultiple-cursors    sidescrolloff=-1    wrap
     |nohighlightedyank   noNERDTree          nosmartcase           wrapscan
     |  history=50          nrformats=hex     nosneak
-    |nohlsearch          nonumber              startofline
     |  clipboard=ideaput,autoselect
     |  comments=s1:/*,mb:*,ex:*/,://,b:#,:%,:XCOMM,n:>,fb:-
     |  fileencoding=utf-8
@@ -559,6 +559,7 @@ class SetlocalCommandTest : VimTestCase() {
     setOsSpecificOptionsToSafeValues()
     val expected = """
     |--- Local option values ---
+    |noabolish
     |noargtextobj
     |nobomb
     |nobreakindent

@@ -177,4 +177,14 @@ class AbolishCoercionTest : VimTestCase() {
   fun `crU is an alias for UPPER_SNAKE coercion`() {
     doTest("crU", "let hello_${c}world = 1", "let ${c}HELLO_WORLD = 1", Mode.NORMAL())
   }
+
+  @Test
+  fun `g abolish_coercions registers a user-defined coercion key`() {
+    configureByText("let hello_${c}world = 1")
+    enterCommand("let g:abolish_coercions = {'q': 'kebab'}")
+    enterCommand("set noabolish")
+    enterCommand("set abolish")
+    typeText("crq")
+    assertState("let ${c}hello-world = 1")
+  }
 }

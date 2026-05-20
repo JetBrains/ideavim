@@ -24,9 +24,12 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMa
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.exportOperatorFunction
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.state.mode.SelectionType
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import javax.swing.KeyStroke
 
 /**
@@ -46,9 +49,28 @@ internal class AbolishExtension : VimExtension {
   override fun init() {
     VimExtensionFacade.exportOperatorFunction(OPERATOR_FUNC, CoercionOperator())
     COERCIONS.forEach(::registerCoercion)
+    registerUserDefinedCoercions()
     val subvert = SubvertCommand()
     addCommand("Subvert", subvert)
     addCommand("S", subvert)
+  }
+
+  /**
+   * Reads `g:abolish_coercions` (a dict of single-character → built-in style name)
+   * and binds each entry as an additional `cr<char>` mapping. Values that don't
+   * match a [CaseStyle] are silently skipped — same forgiving policy tpope has
+   * for unknown letters.
+   */
+  private fun registerUserDefinedCoercions() {
+    val dict = VimPlugin.getVariableService().getGlobalVariableValue(USER_COERCIONS_VARIABLE) as? VimDictionary ?: return
+    dict.dictionary.forEach { (charKey, styleValue) ->
+      val char = charKey.value.singleOrNull() ?: return@forEach
+      val styleName = (styleValue as? VimString)?.value ?: return@forEach
+      val style = CaseStyle.entries.firstOrNull { it.name.equals(styleName, ignoreCase = true) } ?: return@forEach
+      val plugWord = injector.parser.parseKeys("<Plug>(abolish-coerce-word-${style.name.lowercase()})")
+      val plugOperator = injector.parser.parseKeys("<Plug>(abolish-coerce-${style.name.lowercase()})")
+      bindAlias("cr$char", plugWord, plugOperator)
+    }
   }
 
   private fun registerCoercion(coercion: Coercion) {
@@ -91,6 +113,7 @@ internal class AbolishExtension : VimExtension {
 
   private companion object {
     private const val OPERATOR_FUNC = "AbolishCoerce"
+    private const val USER_COERCIONS_VARIABLE = "abolish_coercions"
 
     private val COERCIONS = listOf(
       Coercion(CaseStyle.SNAKE, primaryKey = "crs", aliases = listOf("cr_")),
