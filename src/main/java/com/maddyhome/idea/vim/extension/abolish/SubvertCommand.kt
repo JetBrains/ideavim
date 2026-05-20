@@ -13,17 +13,22 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.CommandAliasHandler
+import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 /**
- * `:[range]S /lhs/rhs/[flags]` — abolish's case-aware substitute, also reachable as `:Subvert`.
+ * `:[range]S /lhs/rhs/[flags]` — abolish's case-aware substitute (also reachable as `:Subvert`).
+ * `:S /pattern/` and `:S ?pattern?` — case-aware forward / backward search.
  *
- * Delegates to vim's `:substitute` so users get every standard flag (`g`, `c`, etc.)
- * Tpope uses the same trick: build the variant dictionary, stash it as a global,
- * then run `:s/.../\=get(g:abolish_last_dict, submatch(0), submatch(0))/...`.
+ * Substitute delegates to vim's `:substitute` so the standard `:s` flag set
+ * (`g`, `c`, etc.) passes through. Tpope uses the same trick: build the variant
+ * dictionary, stash it as `g:abolish_last_dict`, then run
+ * `:s/.../\=get(g:abolish_last_dict, submatch(0), submatch(0))/...`. Search
+ * builds the same variant alternation and feeds it directly to vim's `/` and
+ * `?` machinery.
  *
  * The lhs is still matched literally — vim regex atoms aren't honoured, and
  * `\1`-style backreferences in the rhs are stored verbatim in the dictionary.
@@ -32,14 +37,34 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 internal class SubvertCommand : CommandAliasHandler {
 
   override fun execute(command: String, range: Range, editor: VimEditor, context: ExecutionContext) {
-    val invocation = SubvertInvocation.parse(command) ?: return
-    val dictionary = buildVariantDictionary(invocation.lhsPattern, invocation.rhsPattern)
-    if (dictionary.isEmpty()) return
+    when (val invocation = SubvertInvocation.parse(command) ?: return) {
+      is SubvertInvocation.Substitute -> executeSubstitute(invocation, range, editor, context)
+      is SubvertInvocation.Search -> executeSearch(invocation, editor)
+    }
+  }
+}
 
-    storeAsLastDict(dictionary)
-    val lineRange = range.getLineRange(editor, editor.primaryCaret())
-    val substitute = buildSubstituteCommand(dictionary.keys, invocation.flags, lineRange.startLine1, lineRange.endLine1)
-    injector.vimscriptExecutor.execute(substitute, editor, context, skipHistory = true, indicateErrors = true, null)
+private fun executeSubstitute(
+  invocation: SubvertInvocation.Substitute,
+  range: Range,
+  editor: VimEditor,
+  context: ExecutionContext,
+) {
+  val dictionary = buildVariantDictionary(invocation.lhsPattern, invocation.rhsPattern)
+  if (dictionary.isEmpty()) return
+  storeAsLastDict(dictionary)
+  val lineRange = range.getLineRange(editor, editor.primaryCaret())
+  val substitute = buildSubstituteCommand(dictionary.keys, invocation.flags, lineRange.startLine1, lineRange.endLine1)
+  injector.vimscriptExecutor.execute(substitute, editor, context, skipHistory = true, indicateErrors = true, null)
+}
+
+private fun executeSearch(invocation: SubvertInvocation.Search, editor: VimEditor) {
+  val dictionary = buildVariantDictionary(invocation.pattern, "")
+  if (dictionary.isEmpty()) return
+  val pattern = buildVimAlternationPattern(dictionary.keys)
+  val startOffset = editor.primaryCaret().offset
+  injector.searchGroup.processSearchCommand(editor, pattern, startOffset, 1, invocation.direction)?.let { (offset, _) ->
+    editor.primaryCaret().moveToOffset(offset)
   }
 }
 
@@ -75,23 +100,30 @@ private fun vimEscape(input: String): String = buildString {
   }
 }
 
-private data class SubvertInvocation(
-  val lhsPattern: String,
-  val rhsPattern: String,
-  val flags: String,
-) {
+private sealed interface SubvertInvocation {
+
+  data class Substitute(val lhsPattern: String, val rhsPattern: String, val flags: String) : SubvertInvocation
+
+  data class Search(val pattern: String, val direction: Direction) : SubvertInvocation
+
   companion object {
     fun parse(commandLine: String): SubvertInvocation? {
       val arguments = commandLine.trim().substringAfter(' ', missingDelimiterValue = "").trim()
       if (arguments.length < 2) return null
       val delimiter = arguments[0]
       val parts = arguments.drop(1).split(delimiter)
-      if (parts.size < 2) return null
-      val lhs = parts[0]
+      val lhs = parts.firstOrNull().orEmpty()
+      if (lhs.isEmpty()) return null
+
+      val direction = if (delimiter == '?') Direction.BACKWARDS else Direction.FORWARDS
+      if (parts.hasNoReplacement()) return Search(lhs, direction)
+
       val rhs = parts[1]
       val flags = parts.getOrNull(2).orEmpty()
-      if (lhs.isEmpty()) return null
-      return SubvertInvocation(lhs, rhs, flags)
+      return Substitute(lhs, rhs, flags)
     }
+
+    private fun List<String>.hasNoReplacement(): Boolean =
+      size == 1 || (size == 2 && this[1].isEmpty())
   }
 }
