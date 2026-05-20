@@ -338,8 +338,12 @@ internal class OutputPanel private constructor(
     return point
   }
 
-  private fun getEditorScrollPane() =
-    SwingUtilities.getAncestorOfClass(JScrollPane::class.java, editor.contentComponent) as? JScrollPane
+  private fun getEditorScrollPane(): JScrollPane? {
+    if (editor is EditorEx) {
+      return editor.scrollPane
+    }
+    return SwingUtilities.getAncestorOfClass(JScrollPane::class.java, editor.contentComponent) as? JScrollPane
+  }
 
   private fun countLines(text: String): Int {
     if (text.isEmpty()) {
