@@ -21,10 +21,10 @@ Available plugins:
 Original plugin: [vim-abolish](https://github.com/tpope/vim-abolish).
 
 ### Summary:
-Coercion mappings (`crs`, `crm`, `crc`, `cru`, `cr-`, `cr.`, `cr<Space>`, `crt`) recase the word under
-the cursor between snake_case, MixedCase, camelCase, UPPER_SNAKE, kebab-case, dot.case, space case
-and Title Case. `:Subvert` (alias `:S`) is a case-aware `:substitute` that handles all case
-variants and `{a,b,c}` brace alternatives in a single command.
+Coercion mappings (`crs`/`cr_`, `crm`/`crp`, `crc`, `cru`/`crU`, `cr-`/`crk`, `cr.`, `cr<Space>`, `crt`)
+recase the word under the cursor between snake_case, MixedCase, camelCase, UPPER_SNAKE, kebab-case,
+dot.case, space case and Title Case. `:Subvert` (alias `:S`) is a case-aware `:substitute` that
+handles all case variants and `{a,b,c}` brace alternatives in a single command.
 
 ### Setup:
 - Add the following command to `~/.ideavimrc`: `Plug 'tpope/vim-abolish'`
@@ -59,6 +59,17 @@ nmap cr. <Plug>(abolish-coerce-dot)
 nmap cr<Space> <Plug>(abolish-coerce-space)
 nmap crt <Plug>(abolish-coerce-title)
 ```
+
+To bind extra trigger characters, set `g:abolish_coercions` *before* enabling
+the plugin. Each entry maps a single character to the name of a built-in case
+style (case-insensitive: `snake`, `pascal`, `camel`, `upper_snake`, `kebab`,
+`dot`, `space`, `title`).
+
+```
+let g:abolish_coercions = {'q': 'kebab', 'x': 'upper_snake'}
+```
+
+After this, `crq` recases to kebab-case and `crx` to UPPER_SNAKE.
 
 </details>
 

@@ -179,6 +179,7 @@ class SetCommandTest : VimTestCase() {
     setOsSpecificOptionsToSafeValues()
     val expected = """
       |--- Options ---
+      |noabolish           nohlsearch            operatorfunc=     nosurround
       |noargtextobj          ide=IntelliJ IDEA norelativenumber    notextobj-entire
       |nobomb              noideajoin            scroll=0          notextobj-indent
       |nobreakindent         ideamarks           scrolljump=1        textwidth=0
@@ -194,7 +195,6 @@ class SetCommandTest : VimTestCase() {
       |nogdefault          noNERDTree          nosmartcase           wrap
       |nohighlightedyank     nrformats=hex     nosneak               wrapscan
       |  history=50        nonumber              startofline
-      |nohlsearch            operatorfunc=     nosurround
       |  clipboard=ideaput,autoselect
       |  comments=s1:/*,mb:*,ex:*/,://,b:#,:%,:XCOMM,n:>,fb:-
       |  fileencoding=utf-8
@@ -254,6 +254,7 @@ class SetCommandTest : VimTestCase() {
     setOsSpecificOptionsToSafeValues()
     val expected = """
     |--- Options ---
+    |noabolish
     |noargtextobj
     |nobomb
     |nobreakindent

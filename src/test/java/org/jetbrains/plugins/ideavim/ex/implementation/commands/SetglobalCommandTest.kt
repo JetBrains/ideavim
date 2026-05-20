@@ -432,6 +432,7 @@ class SetglobalCommandTest : VimTestCase() {
     setOsSpecificOptionsToSafeValues()
     val expected = """
     |--- Global option values ---
+    |noabolish             history=50        nonumber              startofline
     |noargtextobj        nohlsearch            operatorfunc=     nosurround
     |nobomb                ide=IntelliJ IDEA norelativenumber    notextobj-entire
     |nobreakindent       noideajoin            scroll=0          notextobj-indent
@@ -447,7 +448,6 @@ class SetglobalCommandTest : VimTestCase() {
     |nofunctextobj       nomultiple-cursors    sidescrolloff=0     whichwrap=b,s
     |nogdefault          noNERDTree          nosmartcase           wrap
     |nohighlightedyank     nrformats=hex     nosneak               wrapscan
-    |  history=50        nonumber              startofline
     |  clipboard=ideaput,autoselect
     |  comments=s1:/*,mb:*,ex:*/,://,b:#,:%,:XCOMM,n:>,fb:-
     |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
@@ -507,6 +507,7 @@ class SetglobalCommandTest : VimTestCase() {
     setOsSpecificOptionsToSafeValues()
     val expected = """
     |--- Global option values ---
+    |noabolish
     |noargtextobj
     |nobomb
     |nobreakindent
