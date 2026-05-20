@@ -1266,7 +1266,7 @@ class MapCommandTest : VimTestCase() {
     )
     enterCommand("map k :echo 4<CR> \\| :echo 42<CR>")
     typeText("k")
-    assertEquals("4\n42", injector.outputPanel.getCurrentOutputPanel()!!.text)
+    assertExOutput("4\n42")
   }
 
   @Test
