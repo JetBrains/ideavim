@@ -14,19 +14,6 @@ package com.intellij.vim.api.scopes
 @VimApiDsl
 interface OutputPanelScope {
   /**
-   * The text displayed in the output panel.
-   */
-  val text: String
-
-  /**
-   * The label text displayed at the bottom of the output panel.
-   *
-   * This is used for status information like "-- MORE --" to indicate
-   * that there is more content to scroll through.
-   */
-  val label: String
-
-  /**
    * Sets the text content of the output panel.
    *
    * This replaces any existing text in the panel with the provided text.
@@ -45,13 +32,6 @@ interface OutputPanelScope {
    *                     Defaults to false.
    */
   suspend fun appendText(text: String, startNewLine: Boolean = false)
-
-  /**
-   * Sets the label text at the bottom of the output panel.
-   *
-   * @param label The new label text to display.
-   */
-  suspend fun setLabel(label: String)
 
   /**
    * Clears all text from the output panel.

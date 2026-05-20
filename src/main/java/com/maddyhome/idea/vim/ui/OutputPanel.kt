@@ -130,12 +130,6 @@ internal class OutputPanel private constructor(
       segments.add(TextLine(newValue, null))
     }
 
-  override var label: String
-    get() = labelComponent.text
-    set(value) {
-      labelComponent.text = value
-    }
-
   /**
    * Sets styled text with multiple segments, each potentially having a different color.
    */
@@ -198,10 +192,6 @@ internal class OutputPanel private constructor(
     if (!active) {
       activate()
     }
-  }
-
-  override fun setContent(text: String) {
-    this.text = text
   }
 
   override fun clearText() {
