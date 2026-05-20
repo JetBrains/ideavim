@@ -111,4 +111,14 @@ class AbolishSubvertTest : VimTestCase() {
       Mode.NORMAL(),
     )
   }
+
+  @Test
+  fun `S accepts no space between command and pattern`() {
+    doTest(
+      ":S/foo/bar/g<CR>",
+      "${c}foo Foo FOO",
+      "${c}bar Bar BAR",
+      Mode.NORMAL(),
+    )
+  }
 }
