@@ -24,7 +24,8 @@ Original plugin: [vim-abolish](https://github.com/tpope/vim-abolish).
 Coercion mappings (`crs`/`cr_`, `crm`/`crp`, `crc`, `cru`/`crU`, `cr-`/`crk`, `cr.`, `cr<Space>`, `crt`)
 recase the word under the cursor between snake_case, MixedCase, camelCase, UPPER_SNAKE, kebab-case,
 dot.case, space case and Title Case. `:Subvert` (alias `:S`) is a case-aware `:substitute` that
-handles all case variants and `{a,b,c}` brace alternatives in a single command.
+handles all case variants and `{a,b,c}` brace alternatives in a single command. With only a pattern
+(`:S/foo/` or `:S?foo?`) it does a case-aware forward or backward search instead.
 
 ### Setup:
 - Add the following command to `~/.ideavimrc`: `Plug 'tpope/vim-abolish'`

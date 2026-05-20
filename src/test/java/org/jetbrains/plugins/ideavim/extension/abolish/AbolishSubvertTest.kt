@@ -132,4 +132,34 @@ class AbolishSubvertTest : VimTestCase() {
     )
   }
 
+  @Test
+  fun `S without rhs searches forward across case variants`() {
+    doTest(
+      ":S/foo<CR>",
+      "${c}begin FOO middle Foo end foo",
+      "begin ${c}FOO middle Foo end foo",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `S with question mark delimiter searches backward`() {
+    doTest(
+      ":S?foo<CR>",
+      "begin Foo middle FOO end ${c}some here",
+      "begin Foo middle ${c}FOO end some here",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `n key navigates to the next match after a S search`() {
+    doTest(
+      listOf(":S/foo<CR>", "n"),
+      "${c}begin FOO middle Foo end foo",
+      "begin FOO middle ${c}Foo end foo",
+      Mode.NORMAL(),
+    )
+  }
+
 }

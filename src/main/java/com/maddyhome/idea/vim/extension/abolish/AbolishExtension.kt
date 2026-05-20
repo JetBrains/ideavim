@@ -65,26 +65,31 @@ internal class AbolishExtension : VimExtension {
     val dict = VimPlugin.getVariableService().getGlobalVariableValue(USER_COERCIONS_VARIABLE) as? VimDictionary ?: return
     dict.dictionary.forEach { (charKey, styleValue) ->
       val char = charKey.value.singleOrNull() ?: return@forEach
-      val styleName = (styleValue as? VimString)?.value ?: return@forEach
-      val style = CaseStyle.entries.firstOrNull { it.name.equals(styleName, ignoreCase = true) } ?: return@forEach
-      val plugWord = injector.parser.parseKeys("<Plug>(abolish-coerce-word-${style.name.lowercase()})")
-      val plugOperator = injector.parser.parseKeys("<Plug>(abolish-coerce-${style.name.lowercase()})")
-      bindAlias("cr$char", plugWord, plugOperator)
+      val style = resolveStyleByName((styleValue as? VimString)?.value) ?: return@forEach
+      bindAlias("cr$char", plugWordKeysFor(style), plugOperatorKeysFor(style))
     }
   }
 
   private fun registerCoercion(coercion: Coercion) {
-    val plugOperator = injector.parser.parseKeys(coercion.plugOperatorName)
-    putExtensionHandlerMapping(MappingMode.N, plugOperator, owner, CoercionOperatorTrigger(coercion.style), false)
-    // Same <Plug> name in visual mode: the selection is the operand, no motion needed.
-    putExtensionHandlerMapping(MappingMode.X, plugOperator, owner, CoercionVisualHandler(coercion.style), false)
+    val plugOperator = plugOperatorKeysFor(coercion.style)
+    val plugWord = plugWordKeysFor(coercion.style)
 
-    val plugWord = injector.parser.parseKeys(coercion.plugWordName)
+    putExtensionHandlerMapping(MappingMode.N, plugOperator, owner, CoercionOperatorTrigger(coercion.style), false)
+    putExtensionHandlerMapping(MappingMode.X, plugOperator, owner, CoercionVisualHandler(coercion.style), false)
     putExtensionHandlerMapping(MappingMode.N, plugWord, owner, CoercionWordHandler(coercion.style), false)
 
     bindPrimaryKeyUnlessUserOverrode(coercion.primaryKey, plugWord, plugOperator)
     coercion.aliases.forEach { alias -> bindAlias(alias, plugWord, plugOperator) }
   }
+
+  private fun plugWordKeysFor(style: CaseStyle): List<KeyStroke> =
+    injector.parser.parseKeys("<Plug>(abolish-coerce-word-${style.name.lowercase()})")
+
+  private fun plugOperatorKeysFor(style: CaseStyle): List<KeyStroke> =
+    injector.parser.parseKeys("<Plug>(abolish-coerce-${style.name.lowercase()})")
+
+  private fun resolveStyleByName(name: String?): CaseStyle? =
+    name?.let { needle -> CaseStyle.entries.firstOrNull { it.name.equals(needle, ignoreCase = true) } }
 
   private fun bindPrimaryKeyUnlessUserOverrode(
     key: String,
@@ -106,13 +111,10 @@ internal class AbolishExtension : VimExtension {
     putKeyMapping(MappingMode.X, parsed, owner, plugOperator, true)
   }
 
-  private data class Coercion(val style: CaseStyle, val primaryKey: String, val aliases: List<String> = emptyList()) {
-    val plugWordName: String = "<Plug>(abolish-coerce-word-${style.name.lowercase()})"
-    val plugOperatorName: String = "<Plug>(abolish-coerce-${style.name.lowercase()})"
-  }
+  private data class Coercion(val style: CaseStyle, val primaryKey: String, val aliases: List<String> = emptyList())
 
-  private companion object {
-    private const val OPERATOR_FUNC = "AbolishCoerce"
+  companion object {
+    internal const val OPERATOR_FUNC = "AbolishCoerce"
     private const val USER_COERCIONS_VARIABLE = "abolish_coercions"
 
     private val COERCIONS = listOf(
@@ -128,10 +130,6 @@ internal class AbolishExtension : VimExtension {
   }
 }
 
-/**
- * Visual-mode coercion: the current selection is the operand. Recase, replace,
- * exit visual back to normal with the caret at the start of the rewritten span.
- */
 private class CoercionVisualHandler(private val style: CaseStyle) : ExtensionHandler {
 
   override val isRepeatable: Boolean = true
@@ -150,7 +148,6 @@ private class CoercionVisualHandler(private val style: CaseStyle) : ExtensionHan
   }
 }
 
-/** Default direct coercion: recase the inner word under each caret in normal mode. */
 private class CoercionWordHandler(private val targetStyle: CaseStyle) : ExtensionHandler {
 
   override val isRepeatable: Boolean = true
@@ -173,7 +170,7 @@ private class CoercionOperatorTrigger(private val style: CaseStyle) : ExtensionH
 
   override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
     PendingCoercion.style = style
-    injector.globalOptions().operatorfunc = "AbolishCoerce"
+    injector.globalOptions().operatorfunc = AbolishExtension.OPERATOR_FUNC
     executeNormalWithoutMapping(injector.parser.parseKeys("g@"), editor.ij)
   }
 }
