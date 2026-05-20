@@ -308,7 +308,8 @@ internal class OutputPanel private constructor(
     labelComponent.isVisible = !isSingleLine
 
     val extraHeight = if (isSingleLine) 0 else labelComponent.preferredSize.height
-    setSize(maxPanelSize.width, visibleLines * lineHeight + extraHeight + border.getBorderInsets(this).top * 2)
+    val borderInsets = border.getBorderInsets(this)
+    setSize(maxPanelSize.width, visibleLines * lineHeight + extraHeight + borderInsets.top + borderInsets.bottom)
     location = getPanelLocation(size.height) ?: location
 
     // Force layout so that viewport sizes are valid before checking scroll state
