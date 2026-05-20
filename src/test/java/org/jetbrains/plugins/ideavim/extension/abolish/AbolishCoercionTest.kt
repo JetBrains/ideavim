@@ -111,4 +111,20 @@ class AbolishCoercionTest : VimTestCase() {
       Mode.NORMAL(),
     )
   }
+
+  @Test
+  fun `coerce-snake plug mapping accepts a motion target`() {
+    configureByText("let helloW${c}orld = 1")
+    enterCommand("nmap gs <Plug>(abolish-coerce-snake)")
+    typeText("gsiw")
+    assertState("let ${c}hello_world = 1")
+  }
+
+  @Test
+  fun `coerce-snake plug mapping with end-of-word motion`() {
+    configureByText("${c}fooBar baz")
+    enterCommand("nmap gs <Plug>(abolish-coerce-snake)")
+    typeText("gse")
+    assertState("${c}foo_bar baz")
+  }
 }
