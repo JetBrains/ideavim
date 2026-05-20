@@ -8,8 +8,6 @@
 
 package com.maddyhome.idea.vim.api
 
-import javax.swing.KeyStroke
-
 interface VimOutputPanel {
   /**
    * The current text displayed in the output panel.
@@ -44,11 +42,6 @@ interface VimOutputPanel {
    * This may free any associated resources.
    */
   fun close()
-
-  fun handleKey(key: KeyStroke)
-  fun scrollPage()
-  fun scrollHalfPage()
-  fun scrollLine()
 
   fun setContent(text: String)
   fun clearText()
