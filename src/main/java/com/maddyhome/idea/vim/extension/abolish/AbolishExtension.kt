@@ -21,11 +21,13 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.addCommand
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormalWithoutMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.exportOperatorFunction
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.state.mode.SelectionType
+import javax.swing.KeyStroke
 
 /**
  * Emulation of [vim-abolish](https://github.com/tpope/vim-abolish): `cr<x>`
@@ -58,12 +60,31 @@ internal class AbolishExtension : VimExtension {
     val plugWord = injector.parser.parseKeys(coercion.plugWordName)
     putExtensionHandlerMapping(MappingMode.N, plugWord, owner, CoercionWordHandler(coercion.style), false)
 
-    val keys = injector.parser.parseKeys(coercion.keys)
-    putKeyMappingIfMissing(MappingMode.N, keys, owner, plugWord, true)
-    putKeyMappingIfMissing(MappingMode.X, keys, owner, plugOperator, true)
+    bindPrimaryKeyUnlessUserOverrode(coercion.primaryKey, plugWord, plugOperator)
+    coercion.aliases.forEach { alias -> bindAlias(alias, plugWord, plugOperator) }
   }
 
-  private data class Coercion(val keys: String, val style: CaseStyle) {
+  private fun bindPrimaryKeyUnlessUserOverrode(
+    key: String,
+    plugWord: List<KeyStroke>,
+    plugOperator: List<KeyStroke>,
+  ) {
+    val parsed = injector.parser.parseKeys(key)
+    putKeyMappingIfMissing(MappingMode.N, parsed, owner, plugWord, true)
+    putKeyMappingIfMissing(MappingMode.X, parsed, owner, plugOperator, true)
+  }
+
+  private fun bindAlias(
+    key: String,
+    plugWord: List<KeyStroke>,
+    plugOperator: List<KeyStroke>,
+  ) {
+    val parsed = injector.parser.parseKeys(key)
+    putKeyMapping(MappingMode.N, parsed, owner, plugWord, true)
+    putKeyMapping(MappingMode.X, parsed, owner, plugOperator, true)
+  }
+
+  private data class Coercion(val style: CaseStyle, val primaryKey: String, val aliases: List<String> = emptyList()) {
     val plugWordName: String = "<Plug>(abolish-coerce-word-${style.name.lowercase()})"
     val plugOperatorName: String = "<Plug>(abolish-coerce-${style.name.lowercase()})"
   }
@@ -72,14 +93,14 @@ internal class AbolishExtension : VimExtension {
     private const val OPERATOR_FUNC = "AbolishCoerce"
 
     private val COERCIONS = listOf(
-      Coercion("crs", CaseStyle.SNAKE),
-      Coercion("crm", CaseStyle.PASCAL),
-      Coercion("crc", CaseStyle.CAMEL),
-      Coercion("cru", CaseStyle.UPPER_SNAKE),
-      Coercion("cr-", CaseStyle.KEBAB),
-      Coercion("cr.", CaseStyle.DOT),
-      Coercion("cr<Space>", CaseStyle.SPACE),
-      Coercion("crt", CaseStyle.TITLE),
+      Coercion(CaseStyle.SNAKE, primaryKey = "crs", aliases = listOf("cr_")),
+      Coercion(CaseStyle.PASCAL, primaryKey = "crm", aliases = listOf("crp")),
+      Coercion(CaseStyle.CAMEL, primaryKey = "crc"),
+      Coercion(CaseStyle.UPPER_SNAKE, primaryKey = "cru", aliases = listOf("crU")),
+      Coercion(CaseStyle.KEBAB, primaryKey = "cr-", aliases = listOf("crk")),
+      Coercion(CaseStyle.DOT, primaryKey = "cr."),
+      Coercion(CaseStyle.SPACE, primaryKey = "cr<Space>"),
+      Coercion(CaseStyle.TITLE, primaryKey = "crt"),
     )
   }
 }

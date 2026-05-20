@@ -157,4 +157,24 @@ class AbolishCoercionTest : VimTestCase() {
       Mode.NORMAL(),
     )
   }
+
+  @Test
+  fun `crp is an alias for PascalCase coercion`() {
+    doTest("crp", "let hello_${c}world = 1", "let ${c}HelloWorld = 1", Mode.NORMAL())
+  }
+
+  @Test
+  fun `cr_ is an alias for snake_case coercion`() {
+    doTest("cr_", "let helloW${c}orld = 1", "let ${c}hello_world = 1", Mode.NORMAL())
+  }
+
+  @Test
+  fun `crk is an alias for kebab-case coercion`() {
+    doTest("crk", "let hello_${c}world = 1", "let ${c}hello-world = 1", Mode.NORMAL())
+  }
+
+  @Test
+  fun `crU is an alias for UPPER_SNAKE coercion`() {
+    doTest("crU", "let hello_${c}world = 1", "let ${c}HELLO_WORLD = 1", Mode.NORMAL())
+  }
 }
