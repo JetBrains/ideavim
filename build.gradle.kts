@@ -492,6 +492,8 @@ intellijPlatform {
         * <a href="https://youtrack.jetbrains.com/issue/VIM-519">VIM-519</a> Added <code>g;</code> and <code>g,</code> commands - navigate the change list to jump to previous (<code>g;</code>) or next (<code>g,</code>) edit location<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-258">VIM-258</a> Added command name completion in ex commands - press <code>&lt;Tab&gt;</code> to cycle through matching command names (e.g., <code>:e&lt;Tab&gt;</code> shows <code>:edit</code>, <code>:earlier</code>, etc.)<br>
         * New VimScript functions: <code>digraph_get()</code>, <code>digraph_getlist()</code>, <code>digraph_set()</code>, <code>digraph_setlist()</code> — query and modify digraph mappings programmatically<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-833">VIM-833</a> Added <code>q:</code>, <code>q/</code>, and <code>q?</code> commands — open command/search history window for editing and re-executing previous commands<br>
+        * New VimScript history functions: <code>histadd()</code>, <code>histget()</code>, <code>histnr()</code>, <code>histdel()</code> — query and modify command/search/expression history programmatically<br>
         <br>
         <b>Fixes:</b><br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4197">VIM-4197</a> Fixed Vim features (e.g., <code>f</code>, <code>w</code>, text objects) not working in Java files decompiled from Kotlin class files<br>
@@ -552,8 +554,15 @@ intellijPlatform {
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4104">VIM-4104</a> Fixed <code>&lt;Tab&gt;</code> now moves to next component in single-line editors and embedded dialogs when not explicitly mapped<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4233">VIM-4233</a> Fixed race condition when typing <code>/</code> twice quickly causing focus issues in the ex entry panel<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-768">VIM-768</a> Fixed <code>&lt;C-U&gt;</code> in insert mode not preserving indentation — e.g., <code>A&lt;C-U&gt;</code> now correctly deletes only text typed since entering insert mode, keeping existing indentation<br>
+        * Fixed command/search history not being restored after IDE restart<br>
+        * Fixed empty command line being saved to command history<br>
+        * Fixed <code>histget()</code> with omitted index — now returns the last history entry per Vim spec<br>
+        * Fixed compatibility for external plugins using <code>MappingMode.NXO</code> mapping mode constant<br>
         <br>
         <b>Merged PRs:</b><br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1788">1788</a> by <a href="https://github.com/citizenmatt">citizenmatt</a>: Restore compatibility for external plugins<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1787">1787</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-833 implement command history actions<br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1775">1775</a> by <a href="https://github.com/citizenmatt">citizenmatt</a>: Add history functions<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1776">1776</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: Fix(VIM-4231): pasting from clipboard in visual selection<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1774">1774</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: Fix(VIM-4233): focus ex entry panel race condition<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1772">1772</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-380 add support for a method and a class vim object<br>
