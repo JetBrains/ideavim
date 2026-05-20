@@ -16,6 +16,38 @@ in `~/.ideavimrc`. E.g. `set nosurround`.
 Available plugins:
 
 <details>
+<summary><h2>abolish: Case-aware substitute and coercion mappings between case styles</h2></summary>
+
+Original plugin: [vim-abolish](https://github.com/tpope/vim-abolish).
+
+### Summary:
+Coercion mappings (`crs`, `crm`, `crc`, `cru`, `cr-`, `cr.`, `cr<Space>`, `crt`) recase the word under
+the cursor between snake_case, MixedCase, camelCase, UPPER_SNAKE, kebab-case, dot.case, space case
+and Title Case. `:Subvert` (alias `:S`) is a case-aware `:substitute` that handles all case
+variants and `{a,b,c}` brace alternatives in a single command.
+
+### Setup:
+- Add the following command to `~/.ideavimrc`: `Plug 'tpope/vim-abolish'`
+    <details>
+      <summary>Alternative syntax</summary>
+      <code>Plugin 'tpope/vim-abolish'</code>
+      <br/>
+      <code>Plug 'https://github.com/tpope/vim-abolish'</code>
+      <br/>
+      <code>Plug 'vim-abolish'</code>
+      <br/>
+      <code>set abolish</code>
+      </details>
+
+### Instructions
+
+https://github.com/tpope/vim-abolish/blob/master/doc/abolish.txt
+
+`:Abolish` (insert-mode auto-correcting abbreviations) is not supported.
+
+</details>
+
+<details>
 <summary><h2>anyobject: Useful text objects like functions, arguments, classes, loops, list items, block comments, and more.</h2></summary>
 
 ### Summary:

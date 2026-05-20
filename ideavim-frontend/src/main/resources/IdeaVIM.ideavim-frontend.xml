@@ -289,6 +289,14 @@
 
   <!-- Frontend vim extensions (editor/text manipulation, no PSI/file-system dependency) -->
   <extensions defaultExtensionNs="IdeaVIM">
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.abolish.AbolishExtension" name="abolish">
+      <aliases>
+        <alias name="https://github.com/tpope/vim-abolish"/>
+        <alias name="tpope/vim-abolish"/>
+        <alias name="vim-abolish"/>
+      </aliases>
+    </vimExtension>
+
     <vimExtension implementation="com.maddyhome.idea.vim.extension.commentary.CommentaryExtension" name="commentary">
       <aliases>
         <alias name="https://github.com/tpope/vim-commentary"/>
