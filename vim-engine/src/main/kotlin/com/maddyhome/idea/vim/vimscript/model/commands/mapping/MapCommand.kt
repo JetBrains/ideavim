@@ -10,7 +10,6 @@ package com.maddyhome.idea.vim.vimscript.model.commands.mapping
 
 import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.MessageType
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getAllMappingInfoWithMode
 import com.maddyhome.idea.vim.api.injector
@@ -129,10 +128,8 @@ data class MapCommand(val range: Range, val cmd: String, val modifier: CommandMo
       }
     }
 
-    val outputPanel = injector.outputPanel
-      .getOrCreate(editor, injector.executionContextManager.getEditorExecutionContext(editor))
-    outputPanel.addText(output, true, MessageType.STANDARD)
-    outputPanel.show()
+    val context = injector.executionContextManager.getEditorExecutionContext(editor)
+    injector.outputPanel.output(editor, context, output)
 
     return true
   }

@@ -51,9 +51,7 @@ internal data class BufferListCommand(val range: Range, val modifier: CommandMod
     val filter = pruneUnsupportedFilters(arg)
     val bufferList = getBufferList(context, filter)
 
-    val outputPanel = injector.outputPanel.getOrCreate(editor, context)
-    outputPanel.addText(bufferList.joinToString(separator = "\n"))
-    outputPanel.show()
+    injector.outputPanel.output(editor, context, bufferList.joinToString(separator = "\n"))
 
     return ExecutionResult.Success
   }

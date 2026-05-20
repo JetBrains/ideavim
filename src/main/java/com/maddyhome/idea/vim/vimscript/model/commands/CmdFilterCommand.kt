@@ -83,9 +83,7 @@ internal data class CmdFilterCommand(val range: Range, val modifier: CommandModi
       if (range.size() == 0) {
         // Show command output in a window
         injector.processGroup.executeCommand(editor, command, null, workingDirectory, options)?.let {
-          val outputPanel = injector.outputPanel.getOrCreate(editor, context)
-          outputPanel.addText(it)
-          outputPanel.show()
+          injector.outputPanel.output(editor, context, it)
         }
         showExitCodeMessage(editor)
         lastCommand = command

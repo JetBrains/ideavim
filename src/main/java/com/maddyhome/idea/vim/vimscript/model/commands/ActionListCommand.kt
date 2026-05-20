@@ -53,9 +53,7 @@ internal data class ActionListCommand(val range: Range, val modifier: CommandMod
       }
     }
 
-    val outputPanel = injector.outputPanel.getOrCreate(editor, context)
-    outputPanel.addText(text)
-    outputPanel.show()
+    injector.outputPanel.output(editor, context, text)
     return ExecutionResult.Success
   }
 }
