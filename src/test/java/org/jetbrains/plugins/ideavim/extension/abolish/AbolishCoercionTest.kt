@@ -147,4 +147,14 @@ class AbolishCoercionTest : VimTestCase() {
       Mode.NORMAL(),
     )
   }
+
+  @Test
+  fun `crs with a count extends the inner-word range`() {
+    doTest(
+      "3crs",
+      "${c}fooBar bazQux end",
+      "${c}foo_bar_baz_qux end",
+      Mode.NORMAL(),
+    )
+  }
 }
