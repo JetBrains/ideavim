@@ -121,4 +121,15 @@ class AbolishSubvertTest : VimTestCase() {
       Mode.NORMAL(),
     )
   }
+
+  @Test
+  fun `S with c flag prompts before each match and applies according to user choice`() {
+    doTest(
+      listOf(":S/foo/bar/gc<CR>", "y", "n", "y"),
+      "${c}foo Foo FOO",
+      "${c}bar Foo BAR",
+      Mode.NORMAL(),
+    )
+  }
+
 }
