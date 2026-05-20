@@ -199,30 +199,6 @@ internal class OutputPanel private constructor(
     segments.clear()
   }
 
-  private fun handleKey(key: KeyStroke) {
-
-    if (isAtEnd) {
-      close(key)
-      return
-    }
-
-    when (key.keyChar) {
-      ' ' -> scrollPage()
-      'd' -> scrollHalfPage()
-      'q', '\u001b' -> close()
-      '\n' -> scrollLine()
-      KeyEvent.CHAR_UNDEFINED -> {
-        when (key.keyCode) {
-          KeyEvent.VK_ENTER -> scrollLine()
-          KeyEvent.VK_ESCAPE -> close()
-          else -> onBadKey()
-        }
-      }
-
-      else -> onBadKey()
-    }
-  }
-
   override fun getForeground(): Color? {
     @Suppress("SENSELESS_COMPARISON")
     if (textPane == null) {
@@ -429,10 +405,26 @@ internal class OutputPanel private constructor(
 
   private inner class OutputPanelKeyListener : KeyAdapter() {
     override fun keyTyped(e: KeyEvent) {
-      val keyChar = e.keyChar
-      val modifiers = e.modifiersEx
-      val keyStroke = KeyStroke.getKeyStroke(keyChar, modifiers)
-      handleKey(keyStroke)
+      if (isAtEnd) {
+        close(KeyStroke.getKeyStrokeForEvent(e))
+        return
+      }
+
+      when (e.keyChar) {
+        ' ' -> scrollPage()
+        'd' -> scrollHalfPage()
+        'q', '\u001b' -> close()
+        '\n' -> scrollLine()
+        KeyEvent.CHAR_UNDEFINED -> {
+          when (e.keyCode) {
+            KeyEvent.VK_ENTER -> scrollLine()
+            KeyEvent.VK_ESCAPE -> close()
+            else -> onBadKey()
+          }
+        }
+
+        else -> onBadKey()
+      }
     }
 
     override fun keyPressed(e: KeyEvent) {
