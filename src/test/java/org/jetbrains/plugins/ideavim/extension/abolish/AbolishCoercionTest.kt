@@ -127,4 +127,24 @@ class AbolishCoercionTest : VimTestCase() {
     typeText("gse")
     assertState("${c}foo_bar baz")
   }
+
+  @Test
+  fun `crs in visual mode recases the selected text`() {
+    doTest(
+      "viwcrs",
+      "let helloW${c}orld = 1",
+      "let ${c}hello_world = 1",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `crm in visual mode recases a multi-word selection`() {
+    doTest(
+      "v2ecrm",
+      "${c}hello world end",
+      "${c}HelloWorld end",
+      Mode.NORMAL(),
+    )
+  }
 }
