@@ -44,6 +44,8 @@ usual beta standards.
 * [VIM-519](https://youtrack.jetbrains.com/issue/VIM-519) Added `g;` and `g,` commands - navigate the change list to jump to previous (`g;`) or next (`g,`) edit location
 * [VIM-258](https://youtrack.jetbrains.com/issue/VIM-258) Added command name completion in ex commands - press `<Tab>` to cycle through matching command names (e.g., `:e<Tab>` shows `:edit`, `:earlier`, etc.)
 * New VimScript functions: `digraph_get()`, `digraph_getlist()`, `digraph_set()`, `digraph_setlist()` — query and modify digraph mappings programmatically
+* [VIM-833](https://youtrack.jetbrains.com/issue/VIM-833) Added `q:`, `q/`, and `q?` commands — open command/search history window for editing and re-executing previous commands
+* New VimScript history functions: `histadd()`, `histget()`, `histnr()`, `histdel()` — query and modify command/search/expression history programmatically
 
 ### Fixes:
 * [VIM-4197](https://youtrack.jetbrains.com/issue/VIM-4197) Fixed Vim features (e.g., `f`, `w`, text objects) not working in Java files decompiled from Kotlin class files
@@ -104,8 +106,15 @@ usual beta standards.
 * [VIM-4104](https://youtrack.jetbrains.com/issue/VIM-4104) Fixed `<Tab>` now moves to next component in single-line editors and embedded dialogs when not explicitly mapped
 * [VIM-4233](https://youtrack.jetbrains.com/issue/VIM-4233) Fixed race condition when typing `/` twice quickly causing focus issues in the ex entry panel
 * [VIM-768](https://youtrack.jetbrains.com/issue/VIM-768) Fixed `<C-U>` in insert mode not preserving indentation — e.g., `A<C-U>` now correctly deletes only text typed since entering insert mode, keeping existing indentation
+* Fixed command/search history not being restored after IDE restart
+* Fixed empty command line being saved to command history
+* Fixed `histget()` with omitted index — now returns the last history entry per Vim spec
+* Fixed compatibility for external plugins using `MappingMode.NXO` mapping mode constant
 
 ### Merged PRs:
+* [1788](https://github.com/JetBrains/ideavim/pull/1788) by [citizenmatt](https://github.com/citizenmatt): Restore compatibility for external plugins
+* [1787](https://github.com/JetBrains/ideavim/pull/1787) by [1grzyb1](https://github.com/1grzyb1): VIM-833 implement command history actions
+* [1775](https://github.com/JetBrains/ideavim/pull/1775) by [citizenmatt](https://github.com/citizenmatt): Add history functions
 * [1784](https://github.com/JetBrains/ideavim/pull/1784) by [1grzyb1](https://github.com/1grzyb1): VIM-4184 remove wl-copy from primary writers
 * [1781](https://github.com/JetBrains/ideavim/pull/1781) by [AndDe-gourav](https://github.com/AndDe-gourav): Fix Incorrect behavior of C-u in insert mode (VIM-768)
 * [1749](https://github.com/JetBrains/ideavim/pull/1749) by [citizenmatt](https://github.com/citizenmatt): Add digraph Vim functions
