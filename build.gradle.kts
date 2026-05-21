@@ -494,6 +494,7 @@ intellijPlatform {
         * New VimScript functions: <code>digraph_get()</code>, <code>digraph_getlist()</code>, <code>digraph_set()</code>, <code>digraph_setlist()</code> — query and modify digraph mappings programmatically<br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-833">VIM-833</a> Added <code>q:</code>, <code>q/</code>, and <code>q?</code> commands — open command/search history window for editing and re-executing previous commands<br>
         * New VimScript history functions: <code>histadd()</code>, <code>histget()</code>, <code>histnr()</code>, <code>histdel()</code> — query and modify command/search/expression history programmatically<br>
+        * <a href="https://youtrack.jetbrains.com/issue/VIM-1362">VIM-1362</a> Added built-in <code>abolish</code> extension — <code>cr&lt;x&gt;</code> coercions to recase words (<code>crs</code> snake_case, <code>crm</code>/<code>crp</code> MixedCase/PascalCase, <code>crc</code> camelCase, <code>cru</code>/<code>crU</code> UPPER_SNAKE, <code>cr-</code>/<code>crk</code> kebab-case, <code>cr.</code> dot.case, <code>cr&lt;Space&gt;</code> space case, <code>crt</code> Title Case); <code>:Subvert</code>/<code>:S</code> for case-aware substitution with brace alternatives (<code>{a,b,c}</code>); activate with <code>Plug 'tpope/vim-abolish'</code><br>
         <br>
         <b>Fixes:</b><br>
         * <a href="https://youtrack.jetbrains.com/issue/VIM-4197">VIM-4197</a> Fixed Vim features (e.g., <code>f</code>, <code>w</code>, text objects) not working in Java files decompiled from Kotlin class files<br>
@@ -560,6 +561,7 @@ intellijPlatform {
         * Fixed compatibility for external plugins using <code>MappingMode.NXO</code> mapping mode constant<br>
         <br>
         <b>Merged PRs:</b><br>
+        * <a href="https://github.com/JetBrains/ideavim/pull/1790">1790</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: Add Abolish plugin<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1788">1788</a> by <a href="https://github.com/citizenmatt">citizenmatt</a>: Restore compatibility for external plugins<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1787">1787</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-833 implement command history actions<br>
         * <a href="https://github.com/JetBrains/ideavim/pull/1775">1775</a> by <a href="https://github.com/citizenmatt">citizenmatt</a>: Add history functions<br>
