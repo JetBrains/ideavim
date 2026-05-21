@@ -46,6 +46,7 @@ usual beta standards.
 * New VimScript functions: `digraph_get()`, `digraph_getlist()`, `digraph_set()`, `digraph_setlist()` — query and modify digraph mappings programmatically
 * [VIM-833](https://youtrack.jetbrains.com/issue/VIM-833) Added `q:`, `q/`, and `q?` commands — open command/search history window for editing and re-executing previous commands
 * New VimScript history functions: `histadd()`, `histget()`, `histnr()`, `histdel()` — query and modify command/search/expression history programmatically
+* [VIM-1362](https://youtrack.jetbrains.com/issue/VIM-1362) Added built-in `abolish` extension — `cr<x>` coercions to recase words (`crs` snake_case, `crm`/`crp` MixedCase/PascalCase, `crc` camelCase, `cru`/`crU` UPPER_SNAKE, `cr-`/`crk` kebab-case, `cr.` dot.case, `cr<Space>` space case, `crt` Title Case); `:Subvert`/`:S` for case-aware substitution with brace alternatives (`{a,b,c}`); activate with `Plug 'tpope/vim-abolish'`
 
 ### Fixes:
 * [VIM-4197](https://youtrack.jetbrains.com/issue/VIM-4197) Fixed Vim features (e.g., `f`, `w`, text objects) not working in Java files decompiled from Kotlin class files
@@ -112,6 +113,7 @@ usual beta standards.
 * Fixed compatibility for external plugins using `MappingMode.NXO` mapping mode constant
 
 ### Merged PRs:
+* [1790](https://github.com/JetBrains/ideavim/pull/1790) by [1grzyb1](https://github.com/1grzyb1): Add Abolish plugin
 * [1788](https://github.com/JetBrains/ideavim/pull/1788) by [citizenmatt](https://github.com/citizenmatt): Restore compatibility for external plugins
 * [1787](https://github.com/JetBrains/ideavim/pull/1787) by [1grzyb1](https://github.com/1grzyb1): VIM-833 implement command history actions
 * [1775](https://github.com/JetBrains/ideavim/pull/1775) by [citizenmatt](https://github.com/citizenmatt): Add history functions
