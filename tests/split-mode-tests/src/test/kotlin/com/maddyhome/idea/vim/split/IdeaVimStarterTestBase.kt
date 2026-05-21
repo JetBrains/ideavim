@@ -18,10 +18,7 @@ import com.intellij.driver.sdk.ui.components.common.ideFrame
 import com.intellij.driver.sdk.waitForIndicators
 import com.intellij.ide.starter.config.ConfigurationStorage
 import com.intellij.ide.starter.config.splitMode
-import com.intellij.ide.starter.di.di
-import com.intellij.ide.starter.driver.driver.remoteDev.RemDevDriverRunner
 import com.intellij.ide.starter.driver.engine.BackgroundRun
-import com.intellij.ide.starter.driver.engine.DriverRunner
 import com.intellij.ide.starter.driver.engine.runIdeWithDriver
 import com.intellij.ide.starter.ide.IDERemDevTestContext
 import com.intellij.ide.starter.ide.IDETestContext
@@ -35,10 +32,6 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
-import org.kodein.di.DI
-import org.kodein.di.bindProvider
-import org.kodein.di.direct
-import org.kodein.di.instanceOrNull
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.createDirectories
@@ -76,9 +69,7 @@ abstract class IdeaVimStarterTestBase {
 
     val context = Starter.newContext(
       this::class.simpleName ?: "split-test",
-      // Match the IDE version used by `runIdeSplitMode` (gradle.properties: ideaVersion=2025.3).
-      // `useEAP()` would download a newer EAP where a platform regression broke split-mode tests.
-      TestCase(IDEA_ULTIMATE, LocalProjectInfo(projectDir)).useRelease("2025.3")
+      TestCase(IDEA_ULTIMATE, LocalProjectInfo(projectDir)).useRelease("2026.1")
     )
 
     val pluginPath = resolvePluginPath()
@@ -89,14 +80,6 @@ abstract class IdeaVimStarterTestBase {
         PluginConfigurator(context.frontendIDEContext).installPluginFromPath(pluginPath)
       }
       context.patchForMacOsSplitMode()
-
-      val hasDriverRunner = di.direct.instanceOrNull<DriverRunner>() != null
-      if (!hasDriverRunner) {
-        di = DI {
-          extend(di)
-          bindProvider<DriverRunner> { RemDevDriverRunner() }
-        }
-      }
     }
 
     configureContext(context)
