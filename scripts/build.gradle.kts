@@ -61,20 +61,6 @@ tasks.register("calculateNewVersion", JavaExec::class) {
   args = listOf("${rootProject.rootDir}", releaseType ?: "")
 }
 
-tasks.register("changelogUpdateUnreleased", JavaExec::class) {
-  group = "release"
-  mainClass.set("scripts.release.ChangelogUpdateUnreleasedKt")
-  classpath = sourceSets["main"].runtimeClasspath
-  args = listOf(project.version.toString(), rootProject.rootDir.toString(), releaseType ?: "")
-}
-
-tasks.register("commitChanges", JavaExec::class) {
-  group = "release"
-  mainClass.set("scripts.release.CommitChangesKt")
-  classpath = sourceSets["main"].runtimeClasspath
-  args = listOf(project.version.toString(), rootProject.rootDir.toString(), releaseType ?: "")
-}
-
 tasks.register("addReleaseTag", JavaExec::class) {
   group = "release"
   mainClass.set("scripts.release.AddReleaseTagKt")
