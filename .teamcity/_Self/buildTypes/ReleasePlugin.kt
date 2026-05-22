@@ -107,14 +107,28 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       gradleParams = "--build-cache --configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
-//    gradle {
-//      name = "Update change log"
-//      tasks = "scripts:changelogUpdateUnreleased"
-//    }
-//    gradle {
-//      name = "Commit preparation changes"
-//      tasks = "scripts:commitChanges"
-//    }
+    script {
+      name = "Update change log"
+      scriptContent = """
+        set -e
+        cd scripts-ts
+        npm ci --silent --no-fund --no-audit
+        npx tsx src/promoteChangelog.ts "%build.number%" "%env.ORG_GRADLE_PROJECT_releaseType%" ..
+      """.trimIndent()
+    }
+    script {
+      name = "Commit preparation changes"
+      scriptContent = """
+        set -e
+        git config user.name "IdeaVim Bot"
+        git config user.email "maintainers@ideavim.dev"
+        if git diff --quiet; then
+          echo "No changelog changes to commit"
+        else
+          git commit -am "Preparation to %build.number% release"
+        fi
+      """.trimIndent()
+    }
     gradle {
       name = "Add release tag"
       tasks = "scripts:addReleaseTag"
@@ -135,24 +149,30 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       gradleParams = "--build-cache --configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
-//    script {
-//      name = "Checkout master branch"
-//      scriptContent = """
-//        echo Checkout master
-//        git checkout master
-//      """.trimIndent()
-//    }
-//    gradle {
-//      name = "Update change log in master"
-//      tasks = "scripts:changelogUpdateUnreleased"
-//    }
-//    gradle {
-//      name = "Commit preparation changes in master"
-//      tasks = "scripts:commitChanges"
-//    }
+    script {
+      name = "Sync changelog to master"
+      scriptContent = """
+        set -e
+        git checkout master
+        cd scripts-ts
+        npx tsx src/promoteChangelog.ts "%build.number%" "%env.ORG_GRADLE_PROJECT_releaseType%" ..
+        cd ..
+        git config user.name "IdeaVim Bot"
+        git config user.email "maintainers@ideavim.dev"
+        if git diff --quiet; then
+          echo "No changelog changes to commit on master"
+        else
+          git commit -am "Preparation to %build.number% release"
+        fi
+      """.trimIndent()
+    }
     script {
       name = "Push changes to the repo"
       scriptContent = """
+      set -e
+      # Push master if it has the changelog promotion commit (soft-fail: a stale
+      # master shouldn't block the marketplace release, but log loudly).
+      git push origin master || echo "WARN: master push failed; sync manually"
       git checkout release
       echo checkout release branch
       git branch --set-upstream-to=origin/release release
