@@ -14,6 +14,7 @@ import _Self.buildTypes.Nvim
 import _Self.buildTypes.PluginVerifier
 import _Self.buildTypes.PropertyBased
 import _Self.buildTypes.RandomOrderTests
+import _Self.buildTypes.ScriptsToolingProbe
 import _Self.buildTypes.SplitModeTests
 
 import _Self.buildTypes.TestingBuildType
@@ -44,6 +45,8 @@ object Project : Project({
   buildType(Nvim)
   buildType(PluginVerifier)
   buildType(Compatibility)
+
+  buildType(ScriptsToolingProbe)
 })
 
 // Agent size configurations (CPU count)
