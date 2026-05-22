@@ -39,7 +39,6 @@ interface FileRemoteApi : RemoteApi<Unit> {
   suspend fun openFile(filename: String, projectId: ProjectId?, focusEditor: Boolean = true): String?
   suspend fun closeCurrentFile(projectId: ProjectId?, virtualFileId: VirtualFileId?)
   suspend fun closeFile(number: Int, projectId: ProjectId?)
-  suspend fun saveFile(editorId: EditorId, saveAll: Boolean)
   suspend fun selectFile(count: Int, projectId: ProjectId?): Boolean
   suspend fun selectNextFile(count: Int, projectId: ProjectId?)
   suspend fun buildFileInfoMessage(editorId: EditorId, fullPath: Boolean): String?
