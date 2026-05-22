@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimChangeGroupBase
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.change.ChangeRemoteApi
 import com.maddyhome.idea.vim.group.format.FormatRemoteApi
@@ -101,20 +102,34 @@ class ChangeGroup : VimChangeGroupBase() {
     injector.scroll.scrollCaretIntoView(editor)
   }
 
-  override fun repeatInsertText(editor: VimEditor, context: ExecutionContext, count: Int) {
-    if (count <= 0) return
+  override fun repeatInsert(editor: VimEditor, context: ExecutionContext, count: Int, started: Boolean) {
+    withVimRepeatUndoMark(editor) {
+      super.repeatInsert(editor, context, count, started)
+    }
+  }
 
+  override fun insertPreviousInsert(
+    editor: VimEditor,
+    context: ExecutionContext,
+    exit: Boolean,
+    operatorArguments: OperatorArguments,
+  ) {
+    withVimRepeatUndoMark(editor) {
+      super.insertPreviousInsert(editor, context, exit, operatorArguments)
+    }
+  }
+
+  // Register start/finish undo marks on the backend via RPC so that all
+  // replayed strokes (text insertions + actions like backspace) across every
+  // caret and repeat-line are grouped into a single undo step on both frontend
+  // and backend. We cannot use StartMarkAction locally because the UndoSpy /
+  // CmdMeta pipeline does not reliably transmit marks to the backend.
+  private inline fun withVimRepeatUndoMark(editor: VimEditor, block: () -> Unit) {
     val ijEditor = (editor as IjVimEditor).editor
     val editorId = ijEditor.editorId()
-
-    // Register start/finish undo marks on the backend via RPC so that all
-    // replayed strokes (text insertions + actions like backspace) are grouped
-    // into a single undo step on both frontend and backend.
-    // We cannot use StartMarkAction locally because the UndoSpy/CmdMeta
-    // pipeline does not reliably transmit marks to the backend.
     rpcSplitModeOnly(ijEditor.project) { ChangeRemoteApi.getInstance().startUndoMark(editorId, "Vim Repeat") }
     try {
-      super.repeatInsertText(editor, context, count)
+      block()
     } finally {
       rpcSplitModeOnly(ijEditor.project) { ChangeRemoteApi.getInstance().finishUndoMark(editorId) }
     }
