@@ -39,11 +39,11 @@ import com.maddyhome.idea.vim.newapi.vim
  *
  * Extends [VimFileBase] for pure-engine operations (`displayHexInfo`, `displayLocationInfo`).
  *
- * Backend-dependent operations (file finding, opening, saving, file-info messages) are
+ * Backend-dependent operations (file finding, opening, file-info messages) are
  * delegated via [FileRemoteApi] RPC. Works in both monolith and split mode.
  *
  * Local UI operations that only affect window/tab state on the frontend
- * (closeFile by editor) remain in this class.
+ * (closeFile by editor, saveFile via the platform action) remain in this class.
  *
  * Options (e.g. `ideawrite`) are read here on the frontend, never on the backend.
  */
@@ -87,15 +87,20 @@ class IjFileGroup : VimFileBase() {
     rpc { FileRemoteApi.getInstance().closeFile(number, extractProjectId(context)) }
   }
 
+  // Must dispatch the SaveDocument/SaveAll action, not call FileDocumentManager directly —
+  // a direct save bypasses "Actions on Save" (reformat, optimize imports). Broken in Rider split mode.
   override fun saveFile(editor: VimEditor, context: ExecutionContext) {
-    val saveAll = injector.globalIjOptions().ideawrite.contains(IjOptionConstants.ideawrite_all)
-    val editorId = (editor as IjVimEditor).editor.editorId()
-    rpc { FileRemoteApi.getInstance().saveFile(editorId, saveAll) }
+    val action = if (injector.globalIjOptions().ideawrite.contains(IjOptionConstants.ideawrite_all)) {
+      injector.nativeActionManager.saveAll
+    } else {
+      injector.nativeActionManager.saveCurrent
+    } ?: return
+    injector.actionExecutor.executeAction(editor, action, context)
   }
 
   override fun saveFiles(editor: VimEditor, context: ExecutionContext) {
-    val editorId = (editor as IjVimEditor).editor.editorId()
-    rpc { FileRemoteApi.getInstance().saveFile(editorId, true) }
+    val action = injector.nativeActionManager.saveAll ?: return
+    injector.actionExecutor.executeAction(editor, action, context)
   }
 
   override fun selectFile(count: Int, context: ExecutionContext): Boolean {

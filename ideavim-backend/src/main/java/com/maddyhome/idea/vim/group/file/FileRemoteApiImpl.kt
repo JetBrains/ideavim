@@ -105,18 +105,6 @@ internal class FileRemoteApiImpl : FileRemoteApi {
     }
   }
 
-  override suspend fun saveFile(editorId: EditorId, saveAll: Boolean) =
-    onEdt {
-      val editor = editorId.findEditorOrNull() ?: return@onEdt
-      if (saveAll) {
-        ApplicationManager.getApplication().saveAll()
-      } else {
-        val document = editor.document
-        val fileDocumentManager = FileDocumentManager.getInstance()
-        fileDocumentManager.saveDocument(document)
-      }
-    }
-
   override suspend fun selectFile(count: Int, projectId: ProjectId?): Boolean = onEdt {
     var idx = count
     val project = projectId?.findProjectOrNull() ?: return@onEdt false
