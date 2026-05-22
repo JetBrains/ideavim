@@ -25,16 +25,20 @@ usual beta standards.
 
 ## [To Be Released]
 
+## 2.36.0, 2026-05-22
+
 ### Features:
-* [VIM-380](https://youtrack.jetbrains.com/issue/VIM-380) Added built-in `functextobj` extension — text objects for method/function definitions: `am` (a method), `aM` (a Method including JavaDoc/annotations), `im` (inner method body); activate with `set functextobj`
-* [VIM-380](https://youtrack.jetbrains.com/issue/VIM-380) Added built-in `classtextobj` extension — text object `ac` selects the entire class definition; activate with `set classtextobj`
+* [VIM-480](https://youtrack.jetbrains.com/issue/VIM-480) Added built-in `functextobj` extension — text objects for method/function definitions: `am` (a method), `aM` (a Method including JavaDoc/annotations), `im` (inner method body); activate with `set functextobj`
+* [VIM-480](https://youtrack.jetbrains.com/issue/VIM-480) Added built-in `classtextobj` extension — text object `ac` selects the entire class definition; activate with `set classtextobj`
 * New VimScript functions: `maparg()`, `mapcheck()`, `maplist()`, `hasmapto()`, `mapset()`
 * New VimScript functions: `digraph_get()`, `digraph_getlist()`, `digraph_set()`, `digraph_setlist()` — query and modify digraph mappings programmatically
 * [VIM-833](https://youtrack.jetbrains.com/issue/VIM-833) Added `q:`, `q/`, and `q?` commands — open command/search history window for editing and re-executing previous commands
 * New VimScript history functions: `histadd()`, `histget()`, `histnr()`, `histdel()` — query and modify command/search/expression history programmatically
-* [VIM-1362](https://youtrack.jetbrains.com/issue/VIM-1362) Added built-in `abolish` extension — `cr<x>` coercions to recase words (`crs` snake_case, `crm`/`crp` MixedCase/PascalCase, `crc` camelCase, `cru`/`crU` UPPER_SNAKE, `cr-`/`crk` kebab-case, `cr.` dot.case, `cr<Space>` space case, `crt` Title Case); `:Subvert`/`:S` for case-aware substitution with brace alternatives (`{a,b,c}`); activate with `Plug 'tpope/vim-abolish'`
+* [VIM-1326](https://youtrack.jetbrains.com/issue/VIM-1326) Added built-in `abolish` extension — `cr<x>` coercions to recase words (`crs` snake_case, `crm`/`crp` MixedCase/PascalCase, `crc` camelCase, `cru`/`crU` UPPER_SNAKE, `cr-`/`crk` kebab-case, `cr.` dot.case, `cr<Space>` space case, `crt` Title Case); `:Subvert`/`:S` for case-aware substitution with brace alternatives (`{a,b,c}`); activate with `Plug 'tpope/vim-abolish'`
 
 ### Fixes:
+* [VIM-4245](https://youtrack.jetbrains.com/issue/VIM-4245) Fixed undo grouping for repeated insert, block insert, and dot-repeat in split mode — a single `u` now reverts one Vim command instead of stepping through intermediate backend edits
+* [VIM-4235](https://youtrack.jetbrains.com/issue/VIM-4235) Fixed `:w` in Rider/split mode not triggering IDE Actions on Save, such as Reformat Code on Save
 * [VIM-4225](https://youtrack.jetbrains.com/issue/VIM-4225) Fixed vim-sneak op-pending mode mappings — now uses `z`/`Z` instead of `s`/`S` to match actual vim-sneak behavior and maintain compatibility with vim-surround
 * [VIM-4104](https://youtrack.jetbrains.com/issue/VIM-4104) Fixed `<Tab>` now moves to next component in single-line editors and embedded dialogs when not explicitly mapped
 * [VIM-768](https://youtrack.jetbrains.com/issue/VIM-768) Fixed `<C-U>` in insert mode not preserving indentation — e.g., `A<C-U>` now correctly deletes only text typed since entering insert mode, keeping existing indentation
@@ -44,12 +48,15 @@ usual beta standards.
 * Fixed compatibility for external plugins using `MappingMode.NXO` mapping mode constant
 
 ### Merged PRs:
+* [1801](https://github.com/JetBrains/ideavim/pull/1801) by [1grzyb1](https://github.com/1grzyb1): VIM-4245 Fix repeat-insert undo grouping so one `u` reverts one logical change
+* [1800](https://github.com/JetBrains/ideavim/pull/1800) by [1grzyb1](https://github.com/1grzyb1): VIM-4235 use native saveFile action in :w
+* [1799](https://github.com/JetBrains/ideavim/pull/1799) by [1grzyb1](https://github.com/1grzyb1): VIM-4245 group repeatInsert and insertPreviousInsert into single undo
 * [1790](https://github.com/JetBrains/ideavim/pull/1790) by [1grzyb1](https://github.com/1grzyb1): Add Abolish plugin
 * [1788](https://github.com/JetBrains/ideavim/pull/1788) by [citizenmatt](https://github.com/citizenmatt): Restore compatibility for external plugins
 * [1787](https://github.com/JetBrains/ideavim/pull/1787) by [1grzyb1](https://github.com/1grzyb1): VIM-833 implement command history actions
 * [1781](https://github.com/JetBrains/ideavim/pull/1781) by [AndDe-gourav](https://github.com/AndDe-gourav): Fix Incorrect behavior of C-u in insert mode (VIM-768)
 * [1775](https://github.com/JetBrains/ideavim/pull/1775) by [citizenmatt](https://github.com/citizenmatt): Add history functions
-* [1772](https://github.com/JetBrains/ideavim/pull/1772) by [1grzyb1](https://github.com/1grzyb1): VIM-380 add support for a method and a class vim object
+* [1772](https://github.com/JetBrains/ideavim/pull/1772) by [1grzyb1](https://github.com/1grzyb1): VIM-480 add support for a method and a class vim object
 * [1749](https://github.com/JetBrains/ideavim/pull/1749) by [citizenmatt](https://github.com/citizenmatt): Add digraph Vim functions
 * [1746](https://github.com/JetBrains/ideavim/pull/1746) by [citizenmatt](https://github.com/citizenmatt): Add mapping functions
 
