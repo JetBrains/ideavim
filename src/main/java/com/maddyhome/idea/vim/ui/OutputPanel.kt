@@ -9,8 +9,8 @@ package com.maddyhome.idea.vim.ui
 
 import com.intellij.ide.ui.LafManager
 import com.intellij.ide.ui.LafManagerListener
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.wm.ex.ToolWindowManagerListener
 import com.intellij.openapi.wm.impl.IdeBackgroundUtil
 import com.intellij.ui.ClientProperty
@@ -18,6 +18,7 @@ import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBPanel
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.util.IJSwingUtilities
+import com.intellij.util.application
 import com.intellij.util.messages.MessageBusConnection
 import com.maddyhome.idea.vim.KeyHandler.Companion.getInstance
 import com.maddyhome.idea.vim.VimPlugin
@@ -30,8 +31,10 @@ import com.maddyhome.idea.vim.helper.requestFocus
 import com.maddyhome.idea.vim.helper.selectEditorFont
 import com.maddyhome.idea.vim.helper.vimMorePanel
 import com.maddyhome.idea.vim.newapi.IjVimEditor
+import org.jetbrains.annotations.TestOnly
 import java.awt.BorderLayout
 import java.awt.Color
+import java.awt.Dimension
 import java.awt.LayoutManager
 import java.awt.Point
 import java.awt.event.ComponentAdapter
@@ -71,11 +74,14 @@ internal class OutputPanel private constructor(
   var active: Boolean = false
   private val segments = mutableListOf<TextLine>()
 
-  private val labelComponent: JLabel = JLabel("more")
+  private val promptComponent: JLabel = JLabel("more")
   private val scrollPane: JScrollPane =
     JBScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER)
   private var cachedLineHeight = 0
-  private var isSingleLine = false
+
+  @get:TestOnly
+  var isSingleLine = false
+    private set
 
   init {
     textPane.isEditable = false
@@ -98,7 +104,7 @@ internal class OutputPanel private constructor(
     // Initialize panel
     layout = BorderLayout(0, 0)
     add(scrollPane, BorderLayout.CENTER)
-    add(labelComponent, BorderLayout.SOUTH)
+    add(promptComponent, BorderLayout.SOUTH)
 
     val keyListener = OutputPanelKeyListener()
     addKeyListener(keyListener)
@@ -113,11 +119,11 @@ internal class OutputPanel private constructor(
     border = ExPanelBorder()
 
     @Suppress("SENSELESS_COMPARISON")
-    if (textPane != null && labelComponent != null && scrollPane != null) {
+    if (textPane != null && promptComponent != null && scrollPane != null) {
       setFontForElements()
       textPane.border = null
       scrollPane.border = null
-      labelComponent.foreground = textPane.foreground
+      promptComponent.foreground = textPane.foreground
       positionPanel()
     }
   }
@@ -275,10 +281,10 @@ internal class OutputPanel private constructor(
 
   private fun close(key: KeyStroke?) {
     val passKeyBack = isSingleLine
-    ApplicationManager.getApplication().invokeLater {
+    val doDeactivate = {
       deactivate()
       val project = editor.project
-      // For single line messages, pass any key back to the editor (including Enter)
+      // For single-line messages, pass any key back to the editor (including Enter)
       // For multi-line messages, don't pass Enter back (it was used to dismiss)
       if (project != null && key != null && (passKeyBack || key.keyChar != '\n')) {
         val keys: MutableList<KeyStroke> = ArrayList(1)
@@ -289,31 +295,48 @@ internal class OutputPanel private constructor(
         VimPlugin.getMacro().playbackKeys(IjVimEditor(editor), context, 1)
       }
     }
+    if (application.isUnitTestMode) {
+      doDeactivate()
+    }
+    else {
+      // TODO: Document why this is invoked later
+      // It's always been like this. I think it's because when it's called with a keystroke, it's called from the
+      // component's key handler, and it's probably a bad idea to handle other keystrokes while in the middle of
+      // handling a keystroke
+      application.invokeLater(doDeactivate)
+    }
   }
 
   private fun setFontForElements() {
     textPane.font = selectEditorFont(editor, textPane.text)
-    labelComponent.font = selectEditorFont(editor, labelComponent.text)
+    promptComponent.font = selectEditorFont(editor, promptComponent.text)
   }
 
   private fun positionPanel() {
     val maxPanelSize = getMaxPanelSize() ?: return
     val lineHeight = textPane.getFontMetrics(textPane.font).height
     val lineCount = countLines(textPane.text)
-    val maxVisibleLines = maxPanelSize.height / lineHeight - 1
+    val maxVisibleLines = (maxPanelSize.height / lineHeight) - 1  // -1 to save space for prompt
     val visibleLines = min(lineCount, maxVisibleLines)
 
     // Simple output: single line that fits entirely - no label needed
     isSingleLine = lineCount == 1 && lineCount <= maxVisibleLines
-    labelComponent.isVisible = !isSingleLine
+    promptComponent.isVisible = !isSingleLine
 
-    val extraHeight = if (isSingleLine) 0 else labelComponent.preferredSize.height
+    val extraHeight = if (isSingleLine) 0 else promptComponent.preferredSize.height
     val borderInsets = border.getBorderInsets(this)
     setSize(maxPanelSize.width, visibleLines * lineHeight + extraHeight + borderInsets.top + borderInsets.bottom)
     location = getPanelLocation(size.height) ?: location
 
-    // Force layout so that viewport sizes are valid before checking scroll state
-    validate()
+    // Force layout so that viewport sizes are valid before checking the scroll state. In tests, we have to do it
+    // manually, because there isn't a real UI hierarchy.
+    if (application.isUnitTestMode) {
+      doLayout()
+      scrollPane.doLayout()
+      scrollPane.viewport.doLayout()
+    } else {
+      validate()
+    }
 
     // onPositioned
     cachedLineHeight = lineHeight
@@ -327,9 +350,26 @@ internal class OutputPanel private constructor(
     }
   }
 
-  private fun getMaxPanelSize() = getEditorScrollPane()?.size
+  private fun getMaxPanelSize(): Dimension? {
+    val scroll = getEditorScrollPane() ?: return null
+
+    // The UI is not available in unit tests, but we do explicitly set the size of the editor's scroll pane's viewport.
+    // This ignores borders and the gutter component, but it's good enough for tests.
+    return if (application.isUnitTestMode) {
+      scroll.viewport.size
+    }
+    else {
+      scroll.size
+    }
+  }
 
   private fun getPanelLocation(panelHeight: Int): Point? {
+    if (application.isUnitTestMode) {
+      // We don't care about location in unit tests, it's always going to be bottom of the editor, and we don't need to
+      // assert that.
+      return null
+    }
+
     val scroll = getEditorScrollPane() ?: return null
     val point = scroll.location
     point.translate(0, scroll.height - panelHeight)
@@ -378,8 +418,8 @@ internal class OutputPanel private constructor(
   }
 
   private fun onBadKey() {
-    labelComponent.text = injector.messages.message("message.ex.output.more.prompt.full")
-    labelComponent.font = selectEditorFont(editor, labelComponent.text)
+    promptComponent.text = injector.messages.message("message.ex.output.more.prompt.full")
+    promptComponent.font = selectEditorFont(editor, promptComponent.text)
   }
 
   private fun scrollOffset(more: Int) {
@@ -391,14 +431,14 @@ internal class OutputPanel private constructor(
 
     // Check if we're at the end or if content fits entirely (nothing to scroll)
     if (isAtEnd) {
-      labelComponent.text = injector.messages.message("message.ex.output.end.prompt")
+      promptComponent.text = injector.messages.message("message.ex.output.end.prompt")
     } else {
-      labelComponent.text = injector.messages.message("message.ex.output.more.prompt")
+      promptComponent.text = injector.messages.message("message.ex.output.more.prompt")
     }
-    labelComponent.font = selectEditorFont(editor, labelComponent.text)
+    promptComponent.font = selectEditorFont(editor, promptComponent.text)
   }
 
-  private val isAtEnd: Boolean
+  val isAtEnd: Boolean
     get() {
       if (isSingleLine) return true
       val contentHeight = textPane.preferredSize.height
@@ -407,6 +447,24 @@ internal class OutputPanel private constructor(
       val scrollBar = scrollPane.verticalScrollBar
       return scrollBar.value >= scrollBar.maximum - scrollBar.visibleAmount
     }
+
+  @get:TestOnly
+  val promptText: String
+    get() = promptComponent.text
+
+  @get:TestOnly
+  val pageSize: Int
+    get() = scrollPane.verticalScrollBar.visibleAmount / cachedLineHeight
+
+  @get:TestOnly
+  val topLine: Int
+    get() = scrollPane.verticalScrollBar.value / cachedLineHeight
+
+  @TestOnly
+  fun scrollToEnd() {
+    if (isSingleLine) return
+    scrollOffset(100000)
+  }
 
   private inner class OutputPanelKeyListener : KeyAdapter() {
     override fun keyTyped(e: KeyEvent) {

@@ -36,7 +36,8 @@ data class UnknownCommand(val range: Range, val name: String, val modifier: Comm
     context: ExecutionContext,
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
-    return processPossiblyAliasCommand("$name $argument", editor, context, MAX_RECURSION)
+    val name = name + if (argument.isEmpty()) "" else " $argument"
+    return processPossiblyAliasCommand(name, editor, context, MAX_RECURSION)
   }
 
   private fun processPossiblyAliasCommand(
@@ -71,10 +72,7 @@ data class UnknownCommand(val range: Range, val name: String, val modifier: Comm
           }
         }
       } else {
-        injector.messages.showErrorMessage(
-          editor,
-          injector.messages.message("E169")
-        )
+        injector.messages.showErrorMessage(editor, injector.messages.message("E169"))
         return ExecutionResult.Error
       }
     } else {
