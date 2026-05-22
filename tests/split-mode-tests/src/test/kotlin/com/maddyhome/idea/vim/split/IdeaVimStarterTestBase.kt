@@ -213,6 +213,17 @@ abstract class IdeaVimStarterTestBase {
     }
   }
 
+  /** Presses Ctrl-V (visual-block mode). */
+  protected fun ctrlV() {
+    driver.withContext {
+      ideFrame {
+        codeEditor().apply {
+          keyboard { hotKey(java.awt.event.KeyEvent.VK_CONTROL, java.awt.event.KeyEvent.VK_V) }
+        }
+      }
+    }
+  }
+
   /** Triggers the IDE "Navigate > Back" action (Cmd+[ on macOS, Ctrl+Alt+Left on Linux). */
   protected fun ideaGoBack() {
     driver.withContext {

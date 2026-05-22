@@ -53,7 +53,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 abstract class VimChangeGroupBase : VimChangeGroup {
-  private var repeatLines: Int = 0
+  protected var repeatLines: Int = 0
   private var repeatColumn: Int = 0
   private var repeatAppend: Boolean = false
 

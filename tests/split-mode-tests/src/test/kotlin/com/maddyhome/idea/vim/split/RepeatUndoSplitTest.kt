@@ -40,9 +40,7 @@ class RepeatUndoSplitTest : IdeaVimStarterTestBase() {
     assertEditorContains("XXcdef", "Second char should also be X")
 
     typeVim("u")
-    pause()
-    typeVim("u")
-    assertEditorContains("Xbcdef", "First undo should revert dot-repeat only")
+    assertEditorContains("Xbcdef", "Single undo should revert dot-repeat only (the dot is grouped)")
   }
 
   @Test
@@ -80,5 +78,38 @@ class RepeatUndoSplitTest : IdeaVimStarterTestBase() {
     typeVim("u")
     pause()
     assertEditorContains("HELLO", "Original change should remain")
+  }
+
+  @Test
+  fun `block insert across multiple lines undoes as single group`() {
+    // Vim block-insert: Ctrl-V <down>×9, then `I#<Esc>` prepends `#` to all 10
+    // selected lines. The vim engine replays the `#` across lines via
+    // ChangeGroup.repeatInsert; on JBC that needs to be wrapped in one undo
+    // mark group so a single `u` reverts the whole block insert.
+    val lines = (1..15).joinToString("\n") { "line $it" }
+    openFile(createFile("src/BlockInsert.txt", lines + "\n"))
+
+    typeVim("gg")
+    pause()
+    ctrlV()
+    typeVim("9j")
+    typeVim("I#")
+    esc()
+    pause(1000)
+
+    val afterInsert = editorText()
+    val firstTen = afterInsert.lines().take(10)
+    assertTrue(firstTen.all { it.startsWith("#") }) {
+      "Expected first 10 lines to start with '#' after block insert. Actual:\n$afterInsert"
+    }
+
+    typeVim("u")
+    pause(1000)
+
+    val afterUndo = editorText()
+    val firstTenAfterUndo = afterUndo.lines().take(10)
+    assertTrue(firstTenAfterUndo.none { it.startsWith("#") }) {
+      "Single `u` should undo the block insert across all 10 lines. Actual:\n$afterUndo"
+    }
   }
 }
