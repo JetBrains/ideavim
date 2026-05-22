@@ -6,6 +6,7 @@
  * https://opensource.org/licenses/MIT.
  */
 
+import org.jetbrains.changelog.Changelog
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.tasks.aware.SplitModeAware
@@ -471,44 +472,21 @@ gradle.projectsEvaluated {
 intellijPlatform {
   pluginConfiguration {
     name = "IdeaVim"
-    changeNotes.set(
-      """
-        <b>Features:</b><br>
-        * <a href="https://youtrack.jetbrains.com/issue/VIM-519">VIM-519</a> Added <code>g;</code> and <code>g,</code> commands - navigate the change list to jump to previous (<code>g;</code>) or next (<code>g,</code>) edit location<br>
-        * <a href="https://youtrack.jetbrains.com/issue/VIM-258">VIM-258</a> Added command name completion in ex commands - press <code>&lt;Tab&gt;</code> to cycle through matching command names (e.g., <code>:e&lt;Tab&gt;</code> shows <code>:edit</code>, <code>:earlier</code>, etc.)<br>
-        * <a href="https://youtrack.jetbrains.com/issue/VIM-3975">VIM-3975</a> Added <code>mode()</code> VimScript function - returns the current editing mode (e.g., <code>'n'</code> for normal, <code>'i'</code> for insert, <code>'v'</code> for visual, <code>'R'</code> for replace)<br>
-        <br>
-        <b>Fixes:</b><br>
-        * <a href="https://youtrack.jetbrains.com/issue/VIM-4217">VIM-4217</a> Fixed mode widget popup customization settings (colors, theme) not being persisted between IDE restarts<br>
-        * <a href="https://youtrack.jetbrains.com/issue/VIM-4226">VIM-4226</a> Fixed race condition crash when the editor is disposed while the ex panel is open<br>
-        * <a href="https://youtrack.jetbrains.com/issue/VIM-4224">VIM-4224</a> Fixed <code>:s</code> <code>e</code> flag now properly suppresses "Pattern not found" errors - e.g., <code>%s/\s\+$//e</code> no longer errors when there is no trailing whitespace<br>
-        * <a href="https://youtrack.jetbrains.com/issue/VIM-4196">VIM-4196</a> Fixed NERDTree file selection not being restored after pressing <code>&lt;Esc&gt;</code> to cancel a <code>/</code> speed search<br>
-        * <a href="https://youtrack.jetbrains.com/issue/VIM-4229">VIM-4229</a> Fixed <code>:edit</code> command failing to open files when the filename has trailing whitespace<br>
-        * <a href="https://youtrack.jetbrains.com/issue/VIM-4223">VIM-4223</a> Fixed <code>:hi</code> abbreviation incorrectly running <code>:hide</code> (closing editor) instead of <code>:highlight</code><br>
-        * <a href="https://youtrack.jetbrains.com/issue/VIM-4184">VIM-4184</a> Fixed PRIMARY clipboard (middle-click paste) on Wayland — now updates correctly during visual selection and no longer causes IDE flickering<br>
-        * <a href="https://youtrack.jetbrains.com/issue/VIM-4231">VIM-4231</a> Fixed pasting from clipboard in visual selection<br>
-        * <a href="https://youtrack.jetbrains.com/issue/VIM-4233">VIM-4233</a> Fixed race condition when typing <code>/</code> twice quickly causing focus issues in the ex entry panel<br>
-        * Fixed IdeaVim entering broken state when a VimScript extension plugin fails to initialize<br>
-        <br>
-        <b>Merged PRs:</b><br>
-        * <a href="https://github.com/JetBrains/ideavim/pull/1784">1784</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-4184 remove wl-copy from primary writers<br>
-        * <a href="https://github.com/JetBrains/ideavim/pull/1776">1776</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: Fix(VIM-4231): pasting from clipboard in visual selection<br>
-        * <a href="https://github.com/JetBrains/ideavim/pull/1774">1774</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: Fix(VIM-4233): focus ex entry panel race condition<br>
-        * <a href="https://github.com/JetBrains/ideavim/pull/1771">1771</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-4229 Remove trailing spaces in edit command<br>
-        * <a href="https://github.com/JetBrains/ideavim/pull/1770">1770</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-4223 proper hide command abbreviation<br>
-        * <a href="https://github.com/JetBrains/ideavim/pull/1761">1761</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: VIM-4217 Persist widget state<br>
-        * <a href="https://github.com/JetBrains/ideavim/pull/1753">1753</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: Fix(VIM-4184): mirror PRIMARY on Wayland via xclip/wl-copy<br>
-        * <a href="https://github.com/JetBrains/ideavim/pull/1747">1747</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: feat(VIM-519): cycle through recent edits with g; and g,<br>
-        * <a href="https://github.com/JetBrains/ideavim/pull/1745">1745</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: feat(VIM-258): tab command completion<br>
-        * <a href="https://github.com/JetBrains/ideavim/pull/1744">1744</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: fix(VIM-4226): check if editor is disposed on focus<br>
-        * <a href="https://github.com/JetBrains/ideavim/pull/1741">1741</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: fix(VIM-4224): respect e flag in search patterns<br>
-        * <a href="https://github.com/JetBrains/ideavim/pull/1740">1740</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: feat(VIM-3975): support vim mode() function<br>
-        * <a href="https://github.com/JetBrains/ideavim/pull/1739">1739</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: fix(VIM-4196): restore file selection after esc in nerdtree<br>
-        * <a href="https://github.com/JetBrains/ideavim/pull/1738">1738</a> by <a href="https://github.com/1grzyb1">1grzyb1</a>: fix(VIM-4211): commit window work with conectional commits plugin<br>
-        <br>
-        <a href="https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20Fix%20versions:%20${version.get()}">Changelog</a>
-        """.trimIndent()
-    )
+    // Rendered from the matching section in CHANGES.md (or the latest released
+    // section as a fallback during dev / SNAPSHOT builds), with the version
+    // header dropped — the marketplace shows the version separately.
+    changeNotes.set(provider {
+      val rendered = with(changelog) {
+        renderItem(
+          (getOrNull(project.version.toString()) ?: getLatest())
+            .withHeader(false)
+            .withEmptySections(false),
+          Changelog.OutputType.HTML,
+        )
+      }
+      val youtrackUrl = "https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20Fix%20versions:%20${project.version}"
+      "$rendered<br>\n<a href=\"$youtrackUrl\">Changelog</a>"
+    })
 
     ideaVersion {
       // Let the Gradle plugin set the since-build version. It defaults to the version of the IDE we're building against
