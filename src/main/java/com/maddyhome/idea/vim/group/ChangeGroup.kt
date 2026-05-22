@@ -26,9 +26,7 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimChangeGroupBase
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.group.change.ChangeRemoteApi
 import com.maddyhome.idea.vim.group.format.FormatRemoteApi
 import com.maddyhome.idea.vim.helper.CodeWrapper
 import com.maddyhome.idea.vim.helper.CommentLeaderParser
@@ -102,38 +100,53 @@ class ChangeGroup : VimChangeGroupBase() {
     injector.scroll.scrollCaretIntoView(editor)
   }
 
-  override fun repeatInsert(editor: VimEditor, context: ExecutionContext, count: Int, started: Boolean) {
-    withVimRepeatUndoMark(editor) {
-      super.repeatInsert(editor, context, count, started)
-    }
-  }
-
-  override fun insertPreviousInsert(
+  override fun initBlockInsert(
     editor: VimEditor,
     context: ExecutionContext,
-    exit: Boolean,
-    operatorArguments: OperatorArguments,
-  ) {
-    withVimRepeatUndoMark(editor) {
-      super.insertPreviousInsert(editor, context, exit, operatorArguments)
+    range: TextRange,
+    append: Boolean,
+  ): Boolean {
+    // Block insert spans: enter insert at top-of-block (user types `#`) → `<Esc>`
+    // triggers `repeatInsert` which replays across N-1 lines below. To group all
+    // N lines into one undo step, start the mark here (before the top-line `#`
+    // is typed) and finish it in `repeatInsert`.
+    startVimUndoGroup(editor, "Vim Block Insert")
+    blockInsertActive = true
+    return try {
+      super.initBlockInsert(editor, context, range, append)
+    } catch (t: Throwable) {
+      finishVimUndoGroup(editor)
+      blockInsertActive = false
+      throw t
     }
   }
 
-  // Register start/finish undo marks on the backend via RPC so that all
-  // replayed strokes (text insertions + actions like backspace) across every
-  // caret and repeat-line are grouped into a single undo step on both frontend
-  // and backend. We cannot use StartMarkAction locally because the UndoSpy /
-  // CmdMeta pipeline does not reliably transmit marks to the backend.
-  private inline fun withVimRepeatUndoMark(editor: VimEditor, block: () -> Unit) {
-    val ijEditor = (editor as IjVimEditor).editor
-    val editorId = ijEditor.editorId()
-    rpcSplitModeOnly(ijEditor.project) { ChangeRemoteApi.getInstance().startUndoMark(editorId, "Vim Repeat") }
-    try {
-      block()
-    } finally {
-      rpcSplitModeOnly(ijEditor.project) { ChangeRemoteApi.getInstance().finishUndoMark(editorId) }
+  override fun repeatInsert(editor: VimEditor, context: ExecutionContext, count: Int, started: Boolean) {
+    // Replay paths to group as one undo step:
+    //   • Block insert: `initBlockInsert` already opened the mark — close it.
+    //   • count > 1 (e.g. `5iHi <Esc>`) — open+close locally.
+    // Plain `iHi <Esc>` (count <= 1, no block) is NOT a replay and must not be
+    // wrapped — an empty start/finish group on the backend would swallow the
+    // first `u` (the frontend speculative-undo flicker we observed earlier).
+    // Dot-repeat (started=false) is wrapped one level up in `RepeatChangeAction`
+    // so the wrap covers the *whole* replayed command (incl. `s`/`c`'s delete).
+    when {
+      blockInsertActive -> {
+        try {
+          super.repeatInsert(editor, context, count, started)
+        } finally {
+          finishVimUndoGroup(editor)
+          blockInsertActive = false
+        }
+      }
+      count > 1 -> withVimUndoGroup(editor, "Vim Repeat") {
+        super.repeatInsert(editor, context, count, started)
+      }
+      else -> super.repeatInsert(editor, context, count, started)
     }
   }
+
+  private var blockInsertActive: Boolean = false
 
   override fun reformatCode(editor: VimEditor, start: Int, end: Int) {
     val project = (editor as IjVimEditor).editor.project ?: return
