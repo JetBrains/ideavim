@@ -46,7 +46,7 @@ jobs:
 
             IMPORTANT: Be concise and write to the point. Avoid extra explanations, filler words, or compliments. Focus on actionable feedback only. Every word should add value.
 
-            NOTE: Some PRs contain only changelog updates (CHANGES.md and build.gradle.kts changeNotes). These are created automatically by the updateChangelogClaude.yml workflow. The actual implementation exists in previous commits. For such PRs, do NOT search for the implementation or report that it's missing - this is expected and correct.
+            NOTE: Some PRs contain only CHANGES.md updates. These are created automatically by the updateChangelogClaude.yml workflow (build.gradle.kts changeNotes is auto-derived from CHANGES.md at build time, so no manual sync is needed). The actual implementation exists in previous commits. For such PRs, do NOT search for the implementation or report that it's missing - this is expected and correct.
 
             IMPORTANT: Before conducting your review, use `gh pr view ${{ github.event.issue.number }} --comments` to read existing PR comments and feedback. Consider this context in your review - avoid repeating points already raised, and address any specific concerns mentioned by reviewers or the contributor.
 
