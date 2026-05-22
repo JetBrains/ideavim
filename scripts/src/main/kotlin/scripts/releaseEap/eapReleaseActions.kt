@@ -21,7 +21,7 @@ fun main(args: Array<String>) {
 
     // Search for Ready to release, but without "IdeaVim Released In EAP" tag
     val ticketsToUpdate =
-      getYoutrackTicketsByQuery("%23%7BReady%20To%20Release%7D%20tag:%20-%7BIdeaVim%20Released%20In%20EAP%7D%20")
+      getYoutrackTicketsByQuery("#{Ready To Release} tag: -{IdeaVim Released In EAP}")
     println("Have to update the following tickets: $ticketsToUpdate")
 
     ticketsToUpdate.forEach { ticketId ->
