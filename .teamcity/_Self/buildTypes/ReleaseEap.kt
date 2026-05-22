@@ -65,11 +65,14 @@ object ReleaseEap : IdeaVimBuildType({
       gradleParams = "--build-cache --configuration-cache"
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
-    gradle {
+    script {
       name = "Set TeamCity build number"
-      tasks = "scripts:setTeamCityBuildNumber"
-      gradleParams = "--build-cache --configuration-cache"
-      jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
+      scriptContent = """
+        set -e
+        cd scripts-ts
+        npm ci --silent --no-fund --no-audit
+        npx tsx src/setTeamCityBuildNumber.ts
+      """.trimIndent()
     }
     gradle {
       name = "Add release tag"
