@@ -47,13 +47,6 @@ kotlin {
   }
 }
 
-tasks.register("generateIdeaVimConfigurations", JavaExec::class) {
-  group = "verification"
-  description = "This job tracks if there are any new plugins in marketplace we don't know about"
-  mainClass.set("scripts.MainKt")
-  classpath = sourceSets["main"].runtimeClasspath
-}
-
 tasks.register("calculateNewVersion", JavaExec::class) {
   group = "release"
   mainClass.set("scripts.release.CalculateNewVersionKt")
