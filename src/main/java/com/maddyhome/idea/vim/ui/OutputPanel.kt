@@ -40,6 +40,7 @@ import java.awt.Color
 import java.awt.Dimension
 import java.awt.LayoutManager
 import java.awt.Point
+import java.awt.Rectangle
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.awt.event.KeyAdapter
@@ -92,6 +93,12 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     textPane.caret = object : DefaultCaret() {
       override fun setVisible(v: Boolean) {
         super.setVisible(false)
+      }
+
+      override fun adjustVisibility(nloc: Rectangle?) {
+        // When the caret is moved either explicitly or by changing text, Swing will asynchronously move and repaint the
+        // caret, including calling adjustVisibility. The default implementation scrolls to make sure the caret is
+        // visible. We don't care about caret location and don't want it interfering with scroll position, so do nothing
       }
     }
     textPane.highlighter = null
@@ -186,7 +193,6 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
 
     val fullText = doc.getText(0, doc.length)
     textPane.font = selectEditorFont(editor, fullText)
-    textPane.caretPosition = 0
     if (fullText.isNotEmpty()) {
       activate()
     }
@@ -282,15 +288,14 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
 
     setFontForElements()
     positionPanel()
+    resetScroll()
 
-    if (glassPane != null) {
-      glassPane!!.isVisible = true
-    }
-
+    glassPane?.isVisible = true
     active = true
-    if (isSingleLine) return
 
-    requestFocus(textPane)
+    if (!isSingleLine) {
+      requestFocus(textPane)
+    }
   }
 
   private fun disableOldGlass() {
@@ -376,16 +381,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
       validate()
     }
 
-    // onPositioned
     cachedLineHeight = lineHeight
-    scrollPane.verticalScrollBar.value = 0
-    if (!isSingleLine) {
-      if (!injector.globalOptions().more) {
-        scrollOffset(100000)
-      } else {
-        scrollOffset(0)
-      }
-    }
   }
 
   private fun getMaxPanelSize(): Dimension? {
@@ -466,7 +462,20 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     val value = scrollBar.value
     scrollBar.value = value + more
     scrollPane.horizontalScrollBar.value = 0
+    updatePrompt()
+  }
 
+  private fun resetScroll() {
+    if (!isSingleLine && !injector.globalOptions().more) {
+      scrollPane.verticalScrollBar.value = scrollPane.verticalScrollBar.maximum
+    }
+    else {
+      scrollPane.verticalScrollBar.value = 0
+    }
+    updatePrompt()
+  }
+
+  private fun updatePrompt() {
     // Check if we're at the end or if content fits entirely (nothing to scroll)
     if (isAtEnd) {
       promptComponent.text = injector.messages.message("message.ex.output.end.prompt")

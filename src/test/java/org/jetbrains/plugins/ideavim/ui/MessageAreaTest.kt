@@ -248,7 +248,6 @@ class MessageAreaTest : VimTestCase("\n") {
     """.trimMargin())
   }
 
-  @Disabled("IdeaVim behaviour is broken")
   @Test
   fun `test multi-page content with 'nomore' option skips more-prompt for hit-enter prompt`() {
     enterCommand("set nomore")
