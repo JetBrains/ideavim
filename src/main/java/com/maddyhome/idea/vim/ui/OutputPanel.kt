@@ -511,7 +511,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
   }
 
   private fun handleHitEnterPrompt(key: KeyStroke) = when (key.keyChar) {
-    'q' -> close()
+    ' ', 'q' -> close()
     KeyEvent.CHAR_UNDEFINED -> when (key.keyCode) {
       KeyEvent.VK_ENTER -> close()
       KeyEvent.VK_UP -> scrollLine(-1)
