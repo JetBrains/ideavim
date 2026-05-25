@@ -114,9 +114,8 @@ class MessageAreaTest : VimTestCase("\n") {
     """.trimMargin())
   }
 
-  @VimBehaviorDiffers("Vim does not reuse the space key")
   @Test
-  fun `test space at single-page hit-enter prompt closes message area and reuses space`() {
+  fun `test space at single-page hit-enter prompt closes message area without reusing key`() {
     configureByText("""
       |${c}Lorem ipsum dolor sit amet,
       |consectetur adipiscing elit
@@ -131,7 +130,7 @@ class MessageAreaTest : VimTestCase("\n") {
 
     // if Space was passed through to the editor, the caret would move to the next character
     assertState("""
-      |L${c}orem ipsum dolor sit amet,
+      |${c}Lorem ipsum dolor sit amet,
       |consectetur adipiscing elit
       |Sed in orci mauris.
       |Cras id tellus in ex imperdiet egestas.
@@ -385,9 +384,8 @@ class MessageAreaTest : VimTestCase("\n") {
     """.trimMargin())
   }
 
-  @VimBehaviorDiffers("Vim does not reuse the space key")
   @Test
-  fun `test space at multipage hit-enter prompt closes message area and reuses key`() {
+  fun `test space at multipage hit-enter prompt closes message area without reusing key`() {
     configureByText("""
       |${c}Lorem ipsum dolor sit amet,
       |consectetur adipiscing elit
@@ -403,7 +401,7 @@ class MessageAreaTest : VimTestCase("\n") {
 
     // if Space was passed through to the editor, the caret would move to the next character
     assertState("""
-      |L${c}orem ipsum dolor sit amet,
+      |${c}Lorem ipsum dolor sit amet,
       |consectetur adipiscing elit
       |Sed in orci mauris.
       |Cras id tellus in ex imperdiet egestas.
