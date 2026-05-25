@@ -485,6 +485,61 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     promptComponent.font = selectEditorFont(editor, promptComponent.text)
   }
 
+  /**
+   * Handle the given keystroke to control the pager
+   *
+   * This will be called for both `KEY_TYPED` and `KEY_PRESSED` keystrokes, so will get virtual key code keystrokes for
+   * actions like `VK_UP`, control characters like `<C-F>` and Vim special keys like `<Enter>`. This matches IdeaVim's
+   * handling for commands and mappings, and means we can forward the keystroke to the editor when closing the panel.
+   *
+   * However, remember that `KEY_PRESSED` events can be followed by `KEY_TYPED`, so do not handle (at all!) typed
+   * versions of control characters and Enter, etc.
+   */
+  internal fun handleKey(key: KeyStroke) {
+    // Note that it is normally invalid to compare a virtual key code and a Unicode codepoint; however, these virtual
+    // key codes are explicitly defined to match ASCII values
+    if (key.keyChar.code == KeyEvent.VK_ENTER || key.keyChar.code == KeyEvent.VK_ESCAPE) {
+      return
+    }
+
+    if (isAtEnd) {
+      handleHitEnterPrompt(key)
+    }
+    else {
+      handleMorePrompt(key)
+    }
+  }
+
+  private fun handleHitEnterPrompt(key: KeyStroke) = when (key.keyChar) {
+    'q' -> close()
+    KeyEvent.CHAR_UNDEFINED -> when (key.keyCode) {
+      KeyEvent.VK_ENTER -> close()
+      KeyEvent.VK_UP -> scrollOffset(-cachedLineHeight)
+      KeyEvent.VK_LEFT -> scrollOffset(-cachedLineHeight)
+      KeyEvent.VK_PAGE_UP -> scrollOffset(-scrollPane.verticalScrollBar.visibleAmount)
+      else -> close(key)
+    }
+    else -> close(key)
+  }
+
+  private fun handleMorePrompt(key: KeyStroke) = when (key.keyChar) {
+    'q' -> close()
+    ' ' -> scrollPage()
+    'd' -> scrollHalfPage()
+    KeyEvent.CHAR_UNDEFINED -> when (key.keyCode) {
+      KeyEvent.VK_ESCAPE -> close()
+      KeyEvent.VK_ENTER -> scrollLine()
+      KeyEvent.VK_DOWN -> scrollLine()
+      KeyEvent.VK_RIGHT -> scrollLine()
+      KeyEvent.VK_PAGE_DOWN -> scrollPage()
+      KeyEvent.VK_UP -> scrollOffset(-cachedLineHeight)
+      KeyEvent.VK_LEFT -> scrollOffset(-cachedLineHeight)
+      KeyEvent.VK_PAGE_UP -> scrollOffset(-scrollPane.verticalScrollBar.visibleAmount)
+      else -> onBadKey()
+    }
+    else -> onBadKey()
+  }
+
   val isAtEnd: Boolean
     get() {
       if (isSingleLine) return true
@@ -515,55 +570,16 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
 
   private inner class OutputPanelKeyListener : KeyAdapter() {
     override fun keyTyped(e: KeyEvent) {
-      if (isAtEnd) {
-        close(KeyStroke.getKeyStrokeForEvent(e))
-        return
-      }
-
-      when (e.keyChar) {
-        ' ' -> scrollPage()
-        'd' -> scrollHalfPage()
-        'q', '\u001b' -> close()
-        '\n' -> scrollLine()
-        KeyEvent.CHAR_UNDEFINED -> {
-          when (e.keyCode) {
-            KeyEvent.VK_ENTER -> scrollLine()
-            KeyEvent.VK_ESCAPE -> close()
-            else -> onBadKey()
-          }
-        }
-
-        else -> onBadKey()
-      }
+      handleKey(KeyStroke.getKeyStrokeForEvent(e))
     }
 
     override fun keyPressed(e: KeyEvent) {
-      if (!e.isActionKey && e.keyCode != KeyEvent.VK_ENTER) return
-      val currentPanel = injector.outputPanel.getCurrentOutputPanel() as? OutputPanel ?: return
-
-      val keyCode = e.keyCode
-      val modifiers = e.modifiersEx
-      val keyStroke = KeyStroke.getKeyStroke(keyCode, modifiers)
-
-      if (isSingleLine) {
-        currentPanel.close(keyStroke)
-        e.consume()
-        return
-      }
-
-      // Multi-line mode: arrow keys scroll, down/right at end closes
-      when (keyCode) {
-        KeyEvent.VK_ENTER -> {
-          if (currentPanel.isAtEnd) currentPanel.close() else currentPanel.scrollLine()
-          e.consume()
-        }
-
-        KeyEvent.VK_DOWN -> if (currentPanel.isAtEnd) currentPanel.close(keyStroke) else currentPanel.scrollLine()
-        KeyEvent.VK_RIGHT -> if (currentPanel.isAtEnd) currentPanel.close(keyStroke) else currentPanel.scrollLine()
-        KeyEvent.VK_UP -> currentPanel.scrollOffset(-cachedLineHeight)
-        KeyEvent.VK_LEFT -> currentPanel.scrollOffset(-cachedLineHeight)
-        KeyEvent.VK_PAGE_DOWN -> if (currentPanel.isAtEnd) currentPanel.close(keyStroke) else currentPanel.scrollPage()
-        KeyEvent.VK_PAGE_UP -> currentPanel.scrollOffset(-scrollPane.verticalScrollBar.visibleAmount)
+      // Match IdeaVim's handling of keystrokes for commands and mappings, where we prefer virtual keycode based
+      // (i.e., KEY_PRESSED) keystrokes for the equivalent of Vim's special keys (actions like `<Up>`, control
+      // characters like `<C-F>` and special keys like `<Enter>`). Remember that after a KEY_PRESSED event, we'll
+      // typically get a KEY_TYPED event. Don't handle them twice!
+      if (e.isActionKey || e.keyCode == KeyEvent.VK_ENTER || e.keyCode == KeyEvent.VK_ESCAPE) {
+        handleKey(KeyStroke.getKeyStrokeForEvent(e))
       }
     }
   }

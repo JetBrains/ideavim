@@ -23,8 +23,6 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.assertNotNull
-import java.awt.Component
-import java.awt.event.KeyEvent
 import kotlin.math.ceil
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -422,9 +420,8 @@ class MessageAreaTest : VimTestCase("\n") {
     // TODO: How to verify that escape does nothing here? Mapping?
   }
 
-  @VimBehaviorDiffers("Vim does not reuse the 'q' key")
   @Test
-  fun `test 'q' at multipage hit-enter prompt closes message area and reuses key`() {
+  fun `test 'q' at multipage hit-enter prompt closes message area without reusing key`() {
     enterCommandForMultiPageOutput()
     scrollOutputToEnd()
     assertHitEnterPrompt()
@@ -435,7 +432,7 @@ class MessageAreaTest : VimTestCase("\n") {
     // If we pass `q` to the editor, then this would be `qa` and we'd be recording a macro. If we don't pass it through,
     // the `a` puts us in Insert mode
     doTypeText("a")
-    assertState(Mode.NORMAL())
+    assertState(Mode.INSERT)
   }
 
   @VimBehaviorDiffers("Vim does not hide the messages if the content can be scrolled")
@@ -778,43 +775,10 @@ class MessageAreaTest : VimTestCase("\n") {
     }
   }
 
-  private fun Component.fireKeys(vararg keys: String) {
+  private fun OutputPanel.fireKeys(vararg keys: String) {
     val keyStrokes = keys.flatMap { injector.parser.parseKeys(it) }
     keyStrokes.forEach { keyStroke ->
-      val e = KeyEvent(
-        this,
-        if (keyStroke.keyChar == KeyEvent.CHAR_UNDEFINED) KeyEvent.KEY_PRESSED else KeyEvent.KEY_TYPED,
-        System.currentTimeMillis(),
-        keyStroke.modifiers,
-        keyStroke.keyCode,
-        keyStroke.keyChar
-      )
-      keyListeners.forEach {
-        when (e.id) {
-          KeyEvent.KEY_PRESSED -> it.keyPressed(e)
-          KeyEvent.KEY_RELEASED -> it.keyReleased(e)
-          KeyEvent.KEY_TYPED -> it.keyTyped(e)
-        }
-      }
-
-      // TODO: This needs to be removed - VK_ESCAPE should be processed as KEY_PRESSED, not KEY_TYPED
-      if (keyStroke.keyCode == KeyEvent.VK_ESCAPE) {
-        val e = KeyEvent(
-          this,
-          KeyEvent.KEY_TYPED,
-          System.currentTimeMillis(),
-          keyStroke.modifiers,
-          KeyEvent.VK_UNDEFINED,
-          '\u001b'
-        )
-        keyListeners.forEach {
-          when (e.id) {
-            KeyEvent.KEY_PRESSED -> it.keyPressed(e)
-            KeyEvent.KEY_RELEASED -> it.keyReleased(e)
-            KeyEvent.KEY_TYPED -> it.keyTyped(e)
-          }
-        }
-      }
+      handleKey(keyStroke)
     }
   }
 }
