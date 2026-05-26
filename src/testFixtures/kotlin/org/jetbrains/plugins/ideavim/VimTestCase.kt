@@ -550,6 +550,9 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
   }
 
   fun assertState(textAfter: String) {
+    // The fixture's checkResult inspects the IJ caret model directly; under the virtual-block
+    // renderer that only holds the primary caret, so we must materialize N carets first.
+    injector.blockSelectionRenderer.materializeCarets(fixture.editor.vim)
     fixture.checkResult(textAfter)
     NeovimTesting.assertState(fixture.editor, testInfo)
   }
@@ -742,8 +745,7 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
       // If there's no output, there's a good chance we've got an error
       val message = "No Ex output" + if (injector.messages.isError()) {
         ". Error reported: " + VimPlugin.getMessage()
-      }
-      else ""
+      } else ""
 
       assertNotNull(actual, message)
     }

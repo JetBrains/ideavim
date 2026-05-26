@@ -37,7 +37,13 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
     // vimLeadSelectionOffset requires read action
     injector.application.runReadAction {
       if (selectionType == SelectionType.BLOCK_WISE) {
-        editor.primaryCaret().run { vimSelectionStart = vimLeadSelectionOffset }
+        // In virtual-block mode, the primary caret's IntelliJ selection only covers the
+        // primary's row, so vimLeadSelectionOffset would collapse the anchor onto primary's
+        // row and we'd lose the block's row span. Preserve the existing anchor here — it was
+        // set correctly when block visual / select was first entered.
+        if (!injector.blockSelectionRenderer.isEnabled(editor)) {
+          editor.primaryCaret().run { vimSelectionStart = vimLeadSelectionOffset }
+        }
       } else {
         editor.nativeCarets().forEach { it.vimSelectionStart = it.vimLeadSelectionOffset }
       }
@@ -51,14 +57,21 @@ abstract class VimVisualMotionGroupBase : VimVisualMotionGroup {
     // If we're entering from Normal, use its own returnTo, as this will handle both Normal and "Internal Normal".
     // And return back to Select if we were originally in Select and entered Visual for a single command (eg `gh<C-O>e`)
     val mode = editor.mode
+    val wasVirtualBlock = mode is Mode.VISUAL &&
+      mode.selectionType == SelectionType.BLOCK_WISE &&
+      injector.blockSelectionRenderer.isEnabled(editor)
     editor.mode = when {
       mode is Mode.VISUAL && mode.isSelectPending -> mode.returnTo
       mode is Mode.VISUAL || mode is Mode.SELECT -> Mode.SELECT(selectionType, mode.returnTo)
       mode is Mode.NORMAL -> Mode.SELECT(selectionType, mode.returnTo)
       else -> Mode.SELECT(selectionType, mode)
     }
-    injector.application.runReadAction {
-      editor.forEachCaret { it.vimSelectionStart = it.vimLeadSelectionOffset }
+    // Preserve the anchor across virtual-block transitions — see comment in enterVisualMode.
+    val preserveVirtualBlockAnchor = wasVirtualBlock && selectionType == SelectionType.BLOCK_WISE
+    if (!preserveVirtualBlockAnchor) {
+      injector.application.runReadAction {
+        editor.forEachCaret { it.vimSelectionStart = it.vimLeadSelectionOffset }
+      }
     }
     return true
   }

@@ -281,6 +281,8 @@ class KeyHandler {
     val cmdAction = command.action
     val name = cmdAction.id
     injector.actionExecutor.executeCommand(editor, action, name, action)
+    // Drives the renderer's undo-discrimination counter — see IjBlockSelectionRenderer.commandsSinceExit.
+    injector.blockSelectionRenderer.notifyCommandFinished(editor)
   }
 
   /**

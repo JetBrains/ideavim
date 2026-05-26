@@ -20,6 +20,7 @@ import com.maddyhome.idea.vim.api.NativeActionManager
 import com.maddyhome.idea.vim.api.SystemInfoService
 import com.maddyhome.idea.vim.api.VimActionExecutor
 import com.maddyhome.idea.vim.api.VimApplication
+import com.maddyhome.idea.vim.api.VimBlockSelectionRenderer
 import com.maddyhome.idea.vim.api.VimChangeGroup
 import com.maddyhome.idea.vim.api.VimClipboardManager
 import com.maddyhome.idea.vim.api.VimCommandGroup
@@ -73,6 +74,7 @@ import com.maddyhome.idea.vim.group.GlobalIjOptions
 import com.maddyhome.idea.vim.group.IjVimOptionGroup
 import com.maddyhome.idea.vim.group.TabService
 import com.maddyhome.idea.vim.group.VimWindowGroup
+import com.maddyhome.idea.vim.group.visual.IjBlockSelectionRenderer
 import com.maddyhome.idea.vim.history.VimHistory
 import com.maddyhome.idea.vim.macro.VimMacro
 import com.maddyhome.idea.vim.put.VimPut
@@ -222,6 +224,9 @@ internal class IjVimInjector : VimInjectorBase() {
     get() = service()
   override val pluginActivator: VimPluginActivator
     get() = service()
+
+  // Lazy so the renderer registers its mode-change listener after the injector is fully wired.
+  override val blockSelectionRenderer: VimBlockSelectionRenderer by lazy { IjBlockSelectionRenderer() }
 
   override val autoCmd: AutoCmdService get() = service<AutoCmdService>()
 }

@@ -15,6 +15,7 @@ import com.intellij.vim.api.models.Range
 import com.intellij.vim.api.models.TextType
 import com.intellij.vim.api.scopes.editor.caret.CaretRead
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimBlockSelectionRenderer
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -47,19 +48,42 @@ class CaretReadImpl(
 
   override val selection: Range
     get() {
-      val mode = injector.vimState.mode
-      val isVisualBlockMode = mode is Mode.VISUAL && mode.selectionType == SelectionType.BLOCK_WISE
-
-      return if (isVisualBlockMode) {
-        // For block selection, gather all carets' selections and use min start / max end
-        val allCarets = vimEditor.nativeCarets()
-        val start = allCarets.minOf { it.selectionStart }
-        val end = allCarets.maxOf { it.selectionEnd }
-        Range.Block(start, end)
-      } else {
-        Range.Simple(vimCaret.selectionStart, vimCaret.selectionEnd)
+      if (!isVisualBlockMode()) {
+        return Range.Simple(vimCaret.selectionStart, vimCaret.selectionEnd)
       }
+      val bounds = injector.blockSelectionRenderer.getBounds(vimEditor)
+        ?: return blockRangeFromNativeCarets()
+      return blockRangeFromBounds(bounds)
     }
+
+  private fun isVisualBlockMode(): Boolean {
+    val mode = injector.vimState.mode
+    return mode is Mode.VISUAL && mode.selectionType == SelectionType.BLOCK_WISE
+  }
+
+  private fun blockRangeFromBounds(bounds: VimBlockSelectionRenderer.BlockBounds): Range.Block {
+    val minLine = minOf(bounds.anchorLine, bounds.activeLine)
+    val maxLine = maxOf(bounds.anchorLine, bounds.activeLine)
+    val minCol = minOf(bounds.anchorCol, bounds.activeCol)
+    val maxCol = maxOf(bounds.anchorCol, bounds.activeCol)
+    val start = rowOffsetClampedToLineEnd(minLine, minCol)
+    val end = rowOffsetClampedToLineEnd(maxLine, maxCol)
+    return Range.Block(start, end)
+  }
+
+  private fun rowOffsetClampedToLineEnd(line: Int, column: Int): Int {
+    val rowStart = vimEditor.getLineStartOffset(line)
+    val rowEnd = vimEditor.getLineEndOffset(line)
+    return (rowStart + column).coerceAtMost(rowEnd)
+  }
+
+  // Fallback (should be rare): aggregate whatever native carets exist.
+  private fun blockRangeFromNativeCarets(): Range.Block {
+    val allCarets = vimEditor.nativeCarets()
+    val start = allCarets.minOf { it.selectionStart }
+    val end = allCarets.maxOf { it.selectionEnd }
+    return Range.Block(start, end)
+  }
 
   override val line: Line
     get() {
@@ -106,16 +130,11 @@ class CaretReadImpl(
 
   override val selectionMarks: Range?
     get() {
-      val mode = injector.vimState.mode
-      val isVisualBlockMode = mode is Mode.VISUAL && mode.selectionType == SelectionType.BLOCK_WISE
-
-      return if (isVisualBlockMode) {
+      if (isVisualBlockMode()) {
         val marks = injector.markService.getVisualSelectionMarks(vimEditor.primaryCaret()) ?: return null
-        Range.Block(marks.startOffset, marks.endOffset)
-      } else {
-        val visualSelectionMarks = injector.markService.getVisualSelectionMarks(vimCaret) ?: return null
-        visualSelectionMarks.toRange()
+        return Range.Block(marks.startOffset, marks.endOffset)
       }
+      return injector.markService.getVisualSelectionMarks(vimCaret)?.toRange()
     }
 
   override val changeMarks: Range?

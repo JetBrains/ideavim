@@ -160,6 +160,10 @@ interface VimInjector {
   val pathExpansion: VimPathExpansion
 
   val pluginActivator: VimPluginActivator
+
+  /** Experimental: renderer for block-visual selection without N native carets. */
+  val blockSelectionRenderer: VimBlockSelectionRenderer
+    get() = NoOpVimBlockSelectionRenderer
 }
 
 lateinit var injector: VimInjector

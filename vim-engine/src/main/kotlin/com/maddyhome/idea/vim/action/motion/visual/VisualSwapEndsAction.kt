@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.action.motion.visual
 
 import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
+import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -72,11 +73,18 @@ private fun swapVisualEnds(caret: VimCaret): Boolean {
 }
 
 private fun swapVisualEndsBigO(editor: VimEditor): Boolean {
+  val natives = editor.nativeCarets()
+  return if (natives.size >= 2) {
+    swapBlockEndsAcrossNativeCarets(editor, natives)
+  } else {
+    swapBlockEndsFromPrimaryLogicalBounds(editor)
+  }
+}
+
+private fun swapBlockEndsAcrossNativeCarets(editor: VimEditor, natives: List<VimCaret>): Boolean {
   val caret = editor.primaryCaret()
-  val anotherSideCaret = editor.nativeCarets().let { if (it.first() == caret) it.last() else it.first() }
-
   val adj = injector.visualMotionGroup.selectionAdj
-
+  val anotherSideCaret = if (natives.first() == caret) natives.last() else natives.first()
   if (caret.offset == caret.selectionStart) {
     caret.vimSelectionStart = anotherSideCaret.selectionStart
     caret.moveToOffset(caret.selectionEnd - adj)
@@ -84,6 +92,18 @@ private fun swapVisualEndsBigO(editor: VimEditor): Boolean {
     caret.vimSelectionStart = anotherSideCaret.selectionEnd - adj
     caret.moveToOffset(caret.selectionStart)
   }
+  return true
+}
 
+// Virtual-block path: no secondary carets exist, so swap by computing new corners from the
+// primary's logical anchor (vimSelectionStart) + active (offset).
+private fun swapBlockEndsFromPrimaryLogicalBounds(editor: VimEditor): Boolean {
+  val caret = editor.primaryCaret()
+  val anchorPos = editor.offsetToBufferPosition(caret.vimSelectionStart)
+  val activePos = caret.getBufferPosition()
+  val newAnchor = BufferPosition(anchorPos.line, activePos.column)
+  val newActive = BufferPosition(activePos.line, anchorPos.column)
+  caret.vimSelectionStart = editor.bufferPositionToOffset(newAnchor)
+  caret.moveToOffset(editor.bufferPositionToOffset(newActive))
   return true
 }

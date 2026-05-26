@@ -20,6 +20,8 @@ import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.key.KeyHandlerKeeper
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -79,6 +81,14 @@ class VimTypedActionHandler(origHandler: TypedActionHandler) : TypedActionHandle
 
     try {
       LOG.trace("Executing typed action")
+      // Select-block under the virtual renderer needs N native carets so IntelliJ's typing
+      // handler replicates the insert across rows. Visual-block goes through initBlockInsert
+      // + setInsertRepeat which doesn't need this.
+      val vimEditor = editor.vim
+      val mode = vimEditor.mode
+      if (mode is Mode.SELECT && mode.selectionType == SelectionType.BLOCK_WISE) {
+        injector.blockSelectionRenderer.materializeCarets(vimEditor)
+      }
       val modifiers = if (charTyped == ' ' && VimKeyListener.isSpaceShift) KeyEvent.SHIFT_DOWN_MASK else 0
       val keyStroke = KeyStroke.getKeyStroke(charTyped, modifiers)
       val startTime = if (traceTime) System.currentTimeMillis() else null

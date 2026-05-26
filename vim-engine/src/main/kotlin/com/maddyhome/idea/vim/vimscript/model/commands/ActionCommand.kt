@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Range
+import com.maddyhome.idea.vim.state.mode.isBlock
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
@@ -40,6 +41,12 @@ data class ActionCommand(val range: Range, val modifier: CommandModifier, val ar
     val actionName = argument.trim()
     val action = injector.actionExecutor.getAction(actionName)
       ?: throw ExException(injector.messages.message("command.action.not.found", actionName))
+    // IDE actions run per-IntelliJ-caret; the virtual-block path only has one. SAVE_SELECTION
+    // means we're already in Normal mode (active bounds gone), so re-materialize N carets
+    // from the bounds snapshot saved at block-visual exit.
+    if (editor.primaryCaret().lastSelectionInfo.selectionType.isBlock) {
+      injector.blockSelectionRenderer.materializeCaretsFromSavedExit(editor)
+    }
     if (injector.application.isUnitTest()) {
       executeAction(editor, action, context)
     } else {

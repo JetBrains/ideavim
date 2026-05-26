@@ -20,11 +20,13 @@ import com.intellij.openapi.fileEditor.impl.text.TextEditorProvider
 import com.intellij.openapi.util.registry.Registry
 import com.intellij.util.PlatformUtils
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimBlockSelectionRenderer
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ChangesListener
 import com.maddyhome.idea.vim.common.InsertSequence
+import com.maddyhome.idea.vim.group.visual.IjBlockSelectionRenderer
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.ij
@@ -61,6 +63,7 @@ class UndoRedoHelper : VimTimestampBasedUndoService {
       scrollingModel.flushViewportChanges()
 
       collapseRestoredBlockVisualCarets(editor, caretCountBeforeUndo)
+      moveCaretToVirtualBlockTopLeftIfPending(editor)
 
       return true
     }
@@ -215,6 +218,43 @@ class UndoRedoHelper : VimTimestampBasedUndoService {
     val blockTopOffset = caretModel.allCarets.minOf { it.offset }
     caretModel.removeSecondaryCarets()
     caretModel.primaryCaret.moveToOffset(blockTopOffset)
+  }
+
+  /**
+   * Virtual-block counterpart to [collapseRestoredBlockVisualCarets]. The native heuristic
+   * relies on IntelliJ's undo restoring N carets at a block-edit's command-start snapshot — but
+   * the virtual flow only ever has one caret, so that snapshot is 1, and the heuristic can't
+   * fire. Instead, position primary at the saved block top-left here.
+   *
+   * Gate: only fire when the undo we just performed is plausibly *the* immediate block edit.
+   * Without the gate, `<C-V>jjl y $ p u` would wrongly snap primary to the block top-left even
+   * though `u` is undoing the unrelated `p` paste.
+   */
+  private fun moveCaretToVirtualBlockTopLeftIfPending(editor: VimEditor) {
+    if (editor.mode !is Mode.NORMAL) return
+    val renderer = injector.blockSelectionRenderer as? IjBlockSelectionRenderer ?: return
+    if (!isUndoingImmediateBlockEdit(renderer, editor)) return
+    val bounds = renderer.consumeLastExitedBounds(editor) ?: return
+    editor.ij.caretModel.primaryCaret.moveToOffset(blockTopLeftOffset(editor.ij, bounds))
+  }
+
+  /**
+   * `commandsSinceExit` is reset to 0 when the renderer snapshots bounds on block-visual exit,
+   * then ticked by [com.maddyhome.idea.vim.KeyHandler] when the saving command finishes (→ 1).
+   * So a value of exactly 1 here means the destructive block edit is the prior command — i.e.
+   * the undo we just performed must be undoing *that* edit.
+   */
+  private fun isUndoingImmediateBlockEdit(renderer: IjBlockSelectionRenderer, editor: VimEditor): Boolean {
+    val cmdsSinceExit = renderer.commandsSinceExit(editor) ?: return false
+    return cmdsSinceExit <= 1
+  }
+
+  private fun blockTopLeftOffset(ij: Editor, bounds: VimBlockSelectionRenderer.BlockBounds): Int {
+    val topLine = minOf(bounds.anchorLine, bounds.activeLine)
+    val topCol = minOf(bounds.anchorCol, bounds.activeCol)
+    val lineStart = ij.document.getLineStartOffset(topLine)
+    val lineEnd = ij.document.getLineEndOffset(topLine)
+    return (lineStart + topCol).coerceAtMost(lineEnd)
   }
 
   private fun removeSelections(editor: VimEditor) {

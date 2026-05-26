@@ -8,14 +8,13 @@
 
 package com.maddyhome.idea.vim.group.visual
 
+import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMotionGroupBase
-import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.api.isLineEmpty
 import com.maddyhome.idea.vim.helper.VimLockLabel
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
@@ -41,59 +40,47 @@ fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: VimCaret) 
       caret.vimSetSystemSelectionSilently(nativeStart, nativeEnd)
     }
 
-    SelectionType.BLOCK_WISE -> {
-      // This will invalidate any secondary carets, but we shouldn't have any of these cached in local variables, etc.
-      editor.removeSecondaryCarets()
-
-      // Set system selection
-      val (blockStart, blockEnd) = blockToNativeSelection(editor, selectionStart, selectionEnd, mode)
-      val lastColumn = editor.primaryCaret().vimLastColumn
-
-      // WARNING! This can invalidate the primary caret! I.e. the `caret` parameter will no longer be the primary caret.
-      // Given an existing visual block selection, moving the caret will first remove all secondary carets (above) then
-      // this method will ask IntelliJ to create a new multi-caret block selection. If we're moving up (`k`) a new caret
-      // is added, and becomes the new primary caret. The current `caret` parameter remains valid, but is no longer the
-      // primary caret. Make sure to fetch the new primary caret if necessary.
-      editor.vimSetSystemBlockSelectionSilently(blockStart, blockEnd)
-
-      // We've just added secondary carets again, hide them to better emulate block selection
-      injector.editorGroup.updateCaretsVisualAttributes(editor)
-
-      for (aCaret in editor.nativeCarets()) {
-        if (!aCaret.isValid) continue
-        val line = aCaret.getBufferPosition().line
-        val lineEndOffset = editor.getLineEndOffset(line, true)
-        val lineStartOffset = editor.getLineStartOffset(line)
-
-        // Extend selection to line end if it was made with `$` command
-        if (lastColumn >= VimMotionGroupBase.LAST_COLUMN) {
-          aCaret.vimSetSystemSelectionSilently(aCaret.selectionStart, lineEndOffset)
-          val newOffset = (lineEndOffset - injector.visualMotionGroup.selectionAdj).coerceAtLeast(lineStartOffset)
-          aCaret.moveToInlayAwareOffset(newOffset)
-        }
-        val visualPosition = editor.offsetToVisualPosition(aCaret.selectionEnd)
-        if (aCaret.offset == aCaret.selectionEnd && visualPosition != aCaret.getVisualPosition()) {
-          // Put right caret position for tab character
-          aCaret.moveToVisualPosition(visualPosition)
-        }
-        if (mode !is Mode.SELECT &&
-          !editor.isLineEmpty(line, false) &&
-          aCaret.offset == aCaret.selectionEnd &&
-          aCaret.selectionEnd - 1 >= lineStartOffset &&
-          aCaret.selectionEnd - aCaret.selectionStart != 0
-        ) {
-          // Move all carets one char left in case if it's on selection end
-          aCaret.moveToVisualPosition(VimVisualPosition(visualPosition.line, visualPosition.column - 1))
-        }
-      }
-
-      editor.primaryCaret().moveToInlayAwareOffset(selectionEnd)
-    }
+    SelectionType.BLOCK_WISE -> setVirtualBlockSelection(editor, selectionStart, selectionEnd, mode)
   }
 
   // Selection-change notification for the IDE clipboard layer (vim-engine doesn't know how
   // PRIMARY should behave on each platform). Clipboard I/O must never break visual mode setup.
   runCatching { injector.clipboardManager.onVisualSelectionChange(caret.editor, caret) }
+}
+
+/**
+ * Virtual-block path: a single primary caret plus an IDE-level highlighter band, instead of
+ * N native carets. Operators read block bounds from primary's `vimSelectionStart` + `offset`
+ * (see VisualOperatorActionHandler.collectSelections). Held `j`/`k` becomes O(1) per motion
+ * instead of O(rows).
+ */
+private fun setVirtualBlockSelection(editor: VimEditor, selectionStart: Int, selectionEnd: Int, mode: Mode) {
+  val (blockStart, blockEnd) = blockToNativeSelection(editor, selectionStart, selectionEnd, mode)
+  val dollarExtension = editor.primaryCaret().vimLastColumn >= VimMotionGroupBase.LAST_COLUMN
+
+  editor.removeSecondaryCarets()
+  editor.primaryCaret().moveToInlayAwareOffset(selectionEnd)
+  setPrimaryRowSelection(editor, blockStart, blockEnd)
+
+  injector.blockSelectionRenderer.update(editor, blockStart, blockEnd, dollarExtension)
+}
+
+/**
+ * Maintain a real IntelliJ selection on the primary caret matching the block's column range
+ * *on the primary's row*. Code that reads `caret.selectionStart/End` (e.g.
+ * `adjustCaretsForSelectionPolicy` during `<C-G>` Visual<->Select toggle) needs this. We
+ * deliberately don't span the block diagonally — that would render in the IDE as a continuous
+ * character-mode selection across rows, obscuring the per-row band painted by RangeHighlighters.
+ */
+private fun setPrimaryRowSelection(editor: VimEditor, blockStart: BufferPosition, blockEnd: BufferPosition) {
+  val minCol = minOf(blockStart.column, blockEnd.column)
+  val maxCol = maxOf(blockStart.column, blockEnd.column)
+  val primaryRow = editor.primaryCaret().getBufferPosition().line
+  val rowStart = editor.getLineStartOffset(primaryRow)
+  val rowEnd = editor.getLineEndOffset(primaryRow)
+  val selStart = (rowStart + minCol).coerceAtMost(rowEnd)
+  val selEnd = (rowStart + maxCol).coerceAtMost(rowEnd)
+  editor.primaryCaret().vimSetSystemSelectionSilently(selStart, selEnd)
 }
 
 /**
