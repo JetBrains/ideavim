@@ -516,7 +516,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
       KeyEvent.VK_ENTER -> close()
       KeyEvent.VK_ESCAPE -> close()
       KeyEvent.VK_UP -> scrollLine(-1)
-      KeyEvent.VK_LEFT -> scrollLine(-1)
+      
       KeyEvent.VK_PAGE_UP -> scrollPage(-1)
       else -> close(key)
     }
@@ -531,10 +531,9 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
       KeyEvent.VK_ESCAPE -> close()
       KeyEvent.VK_ENTER -> scrollLine()
       KeyEvent.VK_DOWN -> scrollLine()
-      KeyEvent.VK_RIGHT -> scrollLine()
+      
       KeyEvent.VK_PAGE_DOWN -> scrollPage()
-      KeyEvent.VK_UP -> scrollLine(-1)
-      KeyEvent.VK_LEFT -> scrollLine(-1)
+      KeyEvent.VK_UP ->  scrollLine(-1)
       KeyEvent.VK_PAGE_UP -> scrollPage(-1)
       else -> onBadKey()
     }
