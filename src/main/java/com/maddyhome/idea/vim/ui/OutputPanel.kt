@@ -437,12 +437,12 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     return count
   }
 
-  private fun scrollLine() {
-    scrollOffset(cachedLineHeight)
+  private fun scrollLine(direction: Int = 1) {
+    scrollOffset(cachedLineHeight * direction)
   }
 
-  private fun scrollPage() {
-    scrollOffset(scrollPane.verticalScrollBar.visibleAmount)
+  private fun scrollPage(direction: Int = 1) {
+    scrollOffset(scrollPane.verticalScrollBar.visibleAmount * direction)
   }
 
   private fun scrollHalfPage() {
@@ -514,9 +514,9 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     'q' -> close()
     KeyEvent.CHAR_UNDEFINED -> when (key.keyCode) {
       KeyEvent.VK_ENTER -> close()
-      KeyEvent.VK_UP -> scrollOffset(-cachedLineHeight)
-      KeyEvent.VK_LEFT -> scrollOffset(-cachedLineHeight)
-      KeyEvent.VK_PAGE_UP -> scrollOffset(-scrollPane.verticalScrollBar.visibleAmount)
+      KeyEvent.VK_UP -> scrollLine(-1)
+      KeyEvent.VK_LEFT -> scrollLine(-1)
+      KeyEvent.VK_PAGE_UP -> scrollPage(-1)
       else -> close(key)
     }
     else -> close(key)
@@ -532,9 +532,9 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
       KeyEvent.VK_DOWN -> scrollLine()
       KeyEvent.VK_RIGHT -> scrollLine()
       KeyEvent.VK_PAGE_DOWN -> scrollPage()
-      KeyEvent.VK_UP -> scrollOffset(-cachedLineHeight)
-      KeyEvent.VK_LEFT -> scrollOffset(-cachedLineHeight)
-      KeyEvent.VK_PAGE_UP -> scrollOffset(-scrollPane.verticalScrollBar.visibleAmount)
+      KeyEvent.VK_UP -> scrollLine(-1)
+      KeyEvent.VK_LEFT -> scrollLine(-1)
+      KeyEvent.VK_PAGE_UP -> scrollPage(-1)
       else -> onBadKey()
     }
     else -> onBadKey()
