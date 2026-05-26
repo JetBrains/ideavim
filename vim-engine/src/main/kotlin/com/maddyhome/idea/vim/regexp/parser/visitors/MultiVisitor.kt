@@ -54,12 +54,7 @@ internal class MultiVisitor : RegexParserBaseVisitor<Multi>() {
         upperBoundToken.text.toInt()
       )
       else if (lowerBoundToken == null) RangeBoundary.InfiniteRangeBoundary else lowerDelimiter
-    return if (upperDelimiter is RangeBoundary.IntRangeBoundary && lowerDelimiter.i > upperDelimiter.i) Multi.RangeMulti(
-      lowerDelimiter,
-      upperDelimiter,
-      isGreedy
-    )
-    else Multi.RangeMulti(lowerDelimiter, upperDelimiter, isGreedy)
+    return Multi.RangeMulti(lowerDelimiter, upperDelimiter, isGreedy)
   }
 
   override fun visitAtomic(ctx: RegexParser.AtomicContext?): Multi {
@@ -83,12 +78,12 @@ internal class MultiVisitor : RegexParserBaseVisitor<Multi>() {
   }
 
   override fun visitPositiveLimitedLookbehind(ctx: RegexParser.PositiveLimitedLookbehindContext): Multi {
-    val limit = (Regex("\\d+").find(ctx.text))?.value?.toInt() ?: run { 0 }
+    val limit = (Regex("\\d+").find(ctx.text))?.value?.toInt() ?: 0
     return Multi.AssertionMulti(isPositive = true, isAhead = false, limit)
   }
 
   override fun visitNegativeLimitedLookbehind(ctx: RegexParser.NegativeLimitedLookbehindContext): Multi {
-    val limit = (Regex("\\d+").find(ctx.text))?.value?.toInt() ?: run { 0 }
+    val limit = (Regex("\\d+").find(ctx.text))?.value?.toInt() ?: 0
     return Multi.AssertionMulti(isPositive = false, isAhead = false, limit)
   }
 }
