@@ -514,6 +514,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     ' ', 'q' -> close()
     KeyEvent.CHAR_UNDEFINED -> when (key.keyCode) {
       KeyEvent.VK_ENTER -> close()
+      KeyEvent.VK_ESCAPE -> close()
       KeyEvent.VK_UP -> scrollLine(-1)
       KeyEvent.VK_LEFT -> scrollLine(-1)
       KeyEvent.VK_PAGE_UP -> scrollPage(-1)
