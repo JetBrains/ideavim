@@ -62,7 +62,7 @@ internal object PatternVisitor : RegexParserBaseVisitor<NFA>() {
   private val groupNumbers: HashMap<RegexParser.GroupingCaptureContext, Int> = HashMap()
 
   /**
-   * Determines whether the visited tree contains
+   * Determines whether the visited tree contains uppercase characters
    */
   internal var hasUpperCase: Boolean = false
 
