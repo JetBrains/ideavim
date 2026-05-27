@@ -33,7 +33,7 @@ dependencies {
   testRuntimeOnly("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-  testImplementation("org.kodein.di:kodein-di-jvm:7.31.0")
+  testImplementation("org.kodein.di:kodein-di-jvm:7.32.0")
   testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.10.2")
 
   intellijPlatform {
