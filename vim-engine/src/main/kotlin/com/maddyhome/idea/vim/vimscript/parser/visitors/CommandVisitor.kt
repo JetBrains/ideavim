@@ -39,10 +39,12 @@ import com.maddyhome.idea.vim.vimscript.model.commands.SplitCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.SplitType
 import com.maddyhome.idea.vim.vimscript.model.commands.SubstituteCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.UnknownCommand
+import com.maddyhome.idea.vim.vimscript.model.commands.mapping.AbbrevClearCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.mapping.AbbrevCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapClearCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.mapping.UnMapCommand
+import com.maddyhome.idea.vim.vimscript.model.commands.mapping.UnabbrevCommand
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
@@ -235,6 +237,8 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
       MapClearCommand::class -> MapClearCommand(range, commandName, modifier, argument)
       UnMapCommand::class -> UnMapCommand(range, commandName, modifier, argument)
       AbbrevCommand::class -> AbbrevCommand(range, commandName, modifier, argument)
+      UnabbrevCommand::class -> UnabbrevCommand(range, commandName, modifier, argument)
+      AbbrevClearCommand::class -> AbbrevClearCommand(range, commandName, modifier, argument)
       GlobalCommand::class -> {
         if (commandName.startsWith("v")) {
           GlobalCommand(range, modifier, argument, true)

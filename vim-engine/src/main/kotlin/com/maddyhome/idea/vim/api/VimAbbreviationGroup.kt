@@ -24,6 +24,9 @@ interface VimAbbreviationGroup {
   /** Return the abbreviation registered for [lhs] in [mode], or null. */
   fun getAbbreviation(lhs: String, mode: MappingMode): AbbreviationEntry?
 
-  /** Remove every abbreviation in every mode. */
-  fun removeAllAbbreviations()
+  /** Remove the abbreviation registered for [lhs] in each of the given [modes]. */
+  fun removeAbbreviation(lhs: String, modes: Set<MappingMode>)
+
+  /** Remove every abbreviation registered in any of the given [modes]. */
+  fun clearAbbreviations(modes: Set<MappingMode>)
 }

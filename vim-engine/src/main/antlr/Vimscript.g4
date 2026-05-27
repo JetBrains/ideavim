@@ -170,6 +170,8 @@ command:
         | SORT
         | UNMAP
         | ABBREV
+        | UNABBREV
+        | ABBREV_CLEAR
       )
       bangModifier = BANG?
     WS* commandArgumentWithoutBars? (NEW_LINE | BAR)+
@@ -586,6 +588,8 @@ existingCommands:       ACTION
                     |   UNDO
                     |   UNMAP
                     |   ABBREV
+                    |   UNABBREV
+                    |   ABBREV_CLEAR
                     |   VGLOBAL
                     |   VSPLIT
                     |   WRITE
@@ -800,6 +804,12 @@ ABBREV:                 'ab' | 'abb' | 'abbr' | 'abbre' | 'abbrev' | 'abbrevi' |
                     |   'norea' | 'noreab' | 'noreabb' | 'noreabbr' | 'noreabbre' | 'noreabbrev'
                     |   'inorea' | 'inoreab' | 'inoreabb' | 'inoreabbr' | 'inoreabbre' | 'inoreabbrev'
                     |   'cnorea' | 'cnoreab' | 'cnoreabb' | 'cnoreabbr' | 'cnoreabbre' | 'cnoreabbrev';
+UNABBREV:               'una' | 'unab' | 'unabb' | 'unabbr' | 'unabbre' | 'unabbrev' | 'unabbrevi' | 'unabbrevia' | 'unabbreviat' | 'unabbreviate'
+                    |   'iuna' | 'iunab' | 'iunabb' | 'iunabbr' | 'iunabbre' | 'iunabbrev'
+                    |   'cuna' | 'cunab' | 'cunabb' | 'cunabbr' | 'cunabbre' | 'cunabbrev';
+ABBREV_CLEAR:           'abc' | 'abcl' | 'abcle' | 'abclea' | 'abclear'
+                    |   'iabc' | 'iabcl' | 'iabcle' | 'iabclea' | 'iabclear'
+                    |   'cabc' | 'cabcl' | 'cabcle' | 'cabclea' | 'cabclear';
 
 // Types
 DIGIT:                  [0-9];

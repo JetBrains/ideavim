@@ -19,37 +19,31 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
 import com.maddyhome.idea.vim.vimscript.model.commands.CommandModifier
 
-@ExCommand(command = "ab[breviate],ia[bbrev],ca[bbrev],norea[bbrev],inorea[bbrev],cnorea[bbrev]")
-data class AbbrevCommand(val range: Range, val cmd: String, val modifier: CommandModifier, val argument: String) :
+@ExCommand(command = "abc[lear],iabc[lear],cabc[lear]")
+data class AbbrevClearCommand(val range: Range, val cmd: String, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 
   override val argFlags: CommandHandlerFlags =
-    flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+    flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)
 
   override fun processCommand(
     editor: VimEditor,
     context: ExecutionContext,
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
-    val variant = AbbrevVariant.matching(cmd) ?: return ExecutionResult.Error
-    val parsed = parseAbbrevArgument(argument)
-    if (parsed is AbbrevArgument.Definition) {
-      injector.abbreviationGroup.setAbbreviation(parsed.lhs, parsed.rhs, variant.modes, variant.recursive)
-    }
+    val variant = AbbrevClearVariant.matching(cmd) ?: return ExecutionResult.Error
+    injector.abbreviationGroup.clearAbbreviations(variant.modes)
     return ExecutionResult.Success
   }
 
-  private enum class AbbrevVariant(val prefix: String, val modes: Set<MappingMode>, val recursive: Boolean) {
-    ABBREVIATE("ab", MappingMode.IC, true),
-    IABBREV("ia", MappingMode.I, true),
-    CABBREV("ca", MappingMode.C, true),
-    NOREABBREV("norea", MappingMode.IC, false),
-    INOREABBREV("inorea", MappingMode.I, false),
-    CNOREABBREV("cnorea", MappingMode.C, false),
+  private enum class AbbrevClearVariant(val prefix: String, val modes: Set<MappingMode>) {
+    ABCLEAR("abc", MappingMode.IC),
+    IABCLEAR("iabc", MappingMode.I),
+    CABCLEAR("cabc", MappingMode.C),
     ;
 
     companion object {
-      fun matching(commandName: String): AbbrevVariant? = entries.find { commandName.startsWith(it.prefix) }
+      fun matching(commandName: String): AbbrevClearVariant? = entries.find { commandName.startsWith(it.prefix) }
     }
   }
 }

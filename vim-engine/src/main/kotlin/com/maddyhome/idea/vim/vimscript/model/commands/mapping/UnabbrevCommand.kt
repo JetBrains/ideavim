@@ -19,37 +19,32 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
 import com.maddyhome.idea.vim.vimscript.model.commands.CommandModifier
 
-@ExCommand(command = "ab[breviate],ia[bbrev],ca[bbrev],norea[bbrev],inorea[bbrev],cnorea[bbrev]")
-data class AbbrevCommand(val range: Range, val cmd: String, val modifier: CommandModifier, val argument: String) :
+@ExCommand(command = "una[bbreviate],iuna[bbrev],cuna[bbrev]")
+data class UnabbrevCommand(val range: Range, val cmd: String, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 
   override val argFlags: CommandHandlerFlags =
-    flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+    flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
 
   override fun processCommand(
     editor: VimEditor,
     context: ExecutionContext,
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
-    val variant = AbbrevVariant.matching(cmd) ?: return ExecutionResult.Error
-    val parsed = parseAbbrevArgument(argument)
-    if (parsed is AbbrevArgument.Definition) {
-      injector.abbreviationGroup.setAbbreviation(parsed.lhs, parsed.rhs, variant.modes, variant.recursive)
-    }
+    val variant = UnabbrevVariant.matching(cmd) ?: return ExecutionResult.Error
+    val lhs = argument.trim().ifEmpty { return ExecutionResult.Error }
+    injector.abbreviationGroup.removeAbbreviation(lhs, variant.modes)
     return ExecutionResult.Success
   }
 
-  private enum class AbbrevVariant(val prefix: String, val modes: Set<MappingMode>, val recursive: Boolean) {
-    ABBREVIATE("ab", MappingMode.IC, true),
-    IABBREV("ia", MappingMode.I, true),
-    CABBREV("ca", MappingMode.C, true),
-    NOREABBREV("norea", MappingMode.IC, false),
-    INOREABBREV("inorea", MappingMode.I, false),
-    CNOREABBREV("cnorea", MappingMode.C, false),
+  private enum class UnabbrevVariant(val prefix: String, val modes: Set<MappingMode>) {
+    UNABBREVIATE("una", MappingMode.IC),
+    IUNABBREV("iuna", MappingMode.I),
+    CUNABBREV("cuna", MappingMode.C),
     ;
 
     companion object {
-      fun matching(commandName: String): AbbrevVariant? = entries.find { commandName.startsWith(it.prefix) }
+      fun matching(commandName: String): UnabbrevVariant? = entries.find { commandName.startsWith(it.prefix) }
     }
   }
 }

@@ -802,22 +802,58 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   protected fun tryExpandAbbreviation(editor: VimEditor, trigger: Char) {
     if (isKeywordChar(trigger)) return
     val caret = editor.currentCaret()
-    val lhsRange = findFullIdLhsRange(editor, caret.offset) ?: return
+    val lhsRange = findAbbreviationLhsRange(editor, caret.offset) ?: return
     val lhs = editor.text().subSequence(lhsRange.startOffset, lhsRange.endOffset).toString()
     val entry = injector.abbreviationGroup.getAbbreviation(lhs, MappingMode.INSERT) ?: return
 
     replaceWithRhs(editor, caret, lhsRange, entry.rhs)
   }
 
-  private fun findFullIdLhsRange(editor: VimEditor, caretOffset: Int): TextRange? {
-    if (caretOffset == 0) return null
+  /**
+   * Find the lhs candidate immediately to the left of the cursor, per Vim's `:help abbreviations`:
+   *
+   *   * If the char before the cursor is a keyword char, the lhs covers full-id and end-id: the
+   *     trailing keyword char plus every preceding non-whitespace char that matches the class of
+   *     the char two-before-cursor.
+   *   * If the char before the cursor is a non-keyword char, the lhs covers non-id: every
+   *     contiguous non-whitespace char up to and including it.
+   */
+  private fun findAbbreviationLhsRange(editor: VimEditor, caretOffset: Int): TextRange? {
     val lineStart = editor.getLineStartOffset(editor.offsetToBufferPosition(caretOffset).line)
+    if (caretOffset <= lineStart) return null
     val text = editor.text()
-    var start = caretOffset
-    while (start > lineStart && isKeywordChar(text[start - 1])) {
+    val start = if (isKeywordChar(text[caretOffset - 1])) {
+      walkBackKeywordLhs(text, caretOffset, lineStart)
+    } else {
+      walkBackNonIdLhs(text, caretOffset, lineStart)
+    }
+    return TextRange(start, caretOffset)
+  }
+
+  /**
+   * Walk back from a keyword-ending cursor. The lhs is the trailing keyword char plus every
+   * preceding non-whitespace char of the same class as the char two-before-cursor. If there is
+   * no char two-before-cursor, the class defaults to keyword (matching Vim's full-id behavior).
+   */
+  private fun walkBackKeywordLhs(text: CharSequence, caretOffset: Int, lineStart: Int): Int {
+    val hasSecondChar = caretOffset - 1 > lineStart
+    val expectedKeywordClass = if (hasSecondChar) isKeywordChar(text[caretOffset - 2]) else true
+    var start = caretOffset - 1
+    while (start > lineStart) {
+      val c = text[start - 1]
+      if (c.isWhitespace() || isKeywordChar(c) != expectedKeywordClass) break
       start--
     }
-    return if (start < caretOffset) TextRange(start, caretOffset) else null
+    return start
+  }
+
+  /** Walk back from a non-keyword-ending cursor through every contiguous non-whitespace char. */
+  private fun walkBackNonIdLhs(text: CharSequence, caretOffset: Int, lineStart: Int): Int {
+    var start = caretOffset - 1
+    while (start > lineStart && !text[start - 1].isWhitespace()) {
+      start--
+    }
+    return start
   }
 
   private fun replaceWithRhs(editor: VimEditor, caret: VimCaret, lhsRange: TextRange, rhs: String) {
