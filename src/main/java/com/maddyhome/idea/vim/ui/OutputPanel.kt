@@ -7,6 +7,7 @@
  */
 package com.maddyhome.idea.vim.ui
 
+import com.intellij.ide.KeyboardAwareFocusOwner
 import com.intellij.ide.ui.LafManager
 import com.intellij.ide.ui.LafManagerListener
 import com.intellij.openapi.application.runInEdt
@@ -65,7 +66,18 @@ import kotlin.time.Duration.Companion.milliseconds
  */
 internal class OutputPanel private constructor(private val editor: Editor) : JBPanel<OutputPanel>(), VimOutputPanel {
 
-  private val textPane = JTextPane()
+  private val textPane = object : JTextPane(), KeyboardAwareFocusOwner {
+    /**
+     * Skip the IDE's key event dispatcher when the output panel is active
+     *
+     * This allows us to skip the standard IDE event dispatcher, so we handle our own keystrokes instead of the IDE
+     * stealing them as shortcuts.
+     */
+    override fun skipKeyEventDispatcher(event: KeyEvent): Boolean {
+      return active
+    }
+  }
+
   private val resizeAdapter: ComponentAdapter
   private var defaultForeground: Color? = null
 
