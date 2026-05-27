@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.KeyProcessResult
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.ChangesListener
 import com.maddyhome.idea.vim.common.TextRange
@@ -797,6 +798,36 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     }
     return false
   }
+
+  protected fun tryExpandAbbreviation(editor: VimEditor, trigger: Char) {
+    if (isKeywordChar(trigger)) return
+    val caret = editor.currentCaret()
+    val lhsRange = findFullIdLhsRange(editor, caret.offset) ?: return
+    val lhs = editor.text().subSequence(lhsRange.startOffset, lhsRange.endOffset).toString()
+    val entry = injector.abbreviationGroup.getAbbreviation(lhs, MappingMode.INSERT) ?: return
+
+    replaceWithRhs(editor, caret, lhsRange, entry.rhs)
+  }
+
+  private fun findFullIdLhsRange(editor: VimEditor, caretOffset: Int): TextRange? {
+    if (caretOffset == 0) return null
+    val lineStart = editor.getLineStartOffset(editor.offsetToBufferPosition(caretOffset).line)
+    val text = editor.text()
+    var start = caretOffset
+    while (start > lineStart && isKeywordChar(text[start - 1])) {
+      start--
+    }
+    return if (start < caretOffset) TextRange(start, caretOffset) else null
+  }
+
+  private fun replaceWithRhs(editor: VimEditor, caret: VimCaret, lhsRange: TextRange, rhs: String) {
+    injector.application.runWriteAction {
+      editor.deleteString(lhsRange)
+    }
+    insertText(editor, caret, lhsRange.startOffset, rhs)
+  }
+
+  private fun isKeywordChar(c: Char): Boolean = c.isLetterOrDigit() || c == '_'
 
   override fun processKeyInSelectMode(
     editor: VimEditor,

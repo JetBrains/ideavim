@@ -169,6 +169,7 @@ command:
         | REGISTERS
         | SORT
         | UNMAP
+        | ABBREV
       )
       bangModifier = BANG?
     WS* commandArgumentWithoutBars? (NEW_LINE | BAR)+
@@ -584,6 +585,7 @@ existingCommands:       ACTION
                     |   TABPREVIOUS
                     |   UNDO
                     |   UNMAP
+                    |   ABBREV
                     |   VGLOBAL
                     |   VSPLIT
                     |   WRITE
@@ -792,6 +794,12 @@ UNMAP:                  'unm' | 'nun' | 'vu' | 'xu' | 'sunm' | 'ou' | 'iu' | 'cu
                     |   'nunm' | 'vunm' | 'xunm' | 'ounm' | 'iunm' | 'cunm'
                     |   'unma' | 'nunma' | 'vunma' | 'xunma' | 'sunma' | 'ounma' | 'iunma' | 'cunma'
                     |   'unmap' | 'nunmap' | 'vunmap' | 'xunmap' | 'sunmap' | 'ounmap' | 'iunmap' | 'cunmap';
+ABBREV:                 'ab' | 'abb' | 'abbr' | 'abbre' | 'abbrev' | 'abbrevi' | 'abbrevia' | 'abbreviat' | 'abbreviate'
+                    |   'ia' | 'iab' | 'iabb' | 'iabbr' | 'iabbre' | 'iabbrev'
+                    |   'ca' | 'cab' | 'cabb' | 'cabbr' | 'cabbre' | 'cabbrev'
+                    |   'norea' | 'noreab' | 'noreabb' | 'noreabbr' | 'noreabbre' | 'noreabbrev'
+                    |   'inorea' | 'inoreab' | 'inoreabb' | 'inoreabbr' | 'inoreabbre' | 'inoreabbrev'
+                    |   'cnorea' | 'cnoreab' | 'cnoreabb' | 'cnoreabbr' | 'cnoreabbre' | 'cnoreabbrev';
 
 // Types
 DIGIT:                  [0-9];

@@ -66,6 +66,8 @@ interface VimInjector {
 
   val keyGroup: VimKeyGroup
 
+  val abbreviationGroup: VimAbbreviationGroup
+
   val markService: VimMarkService
 
   val jumpService: VimJumpService
