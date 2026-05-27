@@ -431,6 +431,11 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
       scrollPane.viewport.doLayout()
     } else {
       validate()
+      // Now that the panel hierarchy has been laid out, set the width of the text pane and revalidate it so that the
+      // wrapped lines are calculated synchronously. This would normally happen during painting, but we want it so we
+      // can accurately calculate the scroll bar maximum.
+      textPane.ui.getRootView(textPane).setSize(textPane.width.toFloat(), Int.MAX_VALUE.toFloat())
+      scrollPane.validate()
     }
 
     cachedLineHeight = lineHeight
