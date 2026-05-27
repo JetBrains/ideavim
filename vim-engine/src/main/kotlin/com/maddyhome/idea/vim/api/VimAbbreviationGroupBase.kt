@@ -26,8 +26,12 @@ open class VimAbbreviationGroupBase : VimAbbreviationGroup {
   override fun getAbbreviation(lhs: String, mode: MappingMode): AbbreviationEntry? =
     entriesByMode[mode]?.get(lhs)
 
-  override fun removeAllAbbreviations() {
-    entriesByMode.clear()
+  override fun removeAbbreviation(lhs: String, modes: Set<MappingMode>) {
+    modes.forEach { mode -> entriesByMode[mode]?.remove(lhs) }
+  }
+
+  override fun clearAbbreviations(modes: Set<MappingMode>) {
+    modes.forEach { mode -> entriesByMode.remove(mode) }
   }
 
   private fun requireValidAbbreviationLhs(lhs: String) {
