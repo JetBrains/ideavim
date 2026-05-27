@@ -8,11 +8,13 @@
 package com.maddyhome.idea.vim.ui
 
 import com.intellij.ide.KeyboardAwareFocusOwner
+import com.intellij.ide.RemoteDesktopService
 import com.intellij.ide.ui.LafManager
 import com.intellij.ide.ui.LafManagerListener
 import com.intellij.openapi.application.runInEdt
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.EditorEx
+import com.intellij.openapi.util.registry.Registry
 import com.intellij.openapi.wm.ex.ToolWindowManagerListener
 import com.intellij.openapi.wm.impl.IdeBackgroundUtil
 import com.intellij.ui.ClientProperty
@@ -20,6 +22,9 @@ import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBPanel
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.util.IJSwingUtilities
+import com.intellij.util.animation.Easing
+import com.intellij.util.animation.JBAnimator
+import com.intellij.util.animation.animation
 import com.intellij.util.application
 import com.intellij.util.messages.MessageBusConnection
 import com.intellij.util.ui.launchOnShow
@@ -56,6 +61,7 @@ import javax.swing.text.DefaultCaret
 import javax.swing.text.SimpleAttributeSet
 import javax.swing.text.StyleConstants
 import javax.swing.text.StyledDocument
+import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.min
 import kotlin.time.Duration.Companion.milliseconds
@@ -95,6 +101,8 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
   private var cachedLineHeight = 0
 
   private var allowClose = true
+
+  private val animator = JBAnimator().setPeriod(4).setName("IdeaVim output panel animator")
 
   @get:TestOnly
   var isSingleLine = false
@@ -335,6 +343,8 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
   }
 
   private fun close(key: KeyStroke?) {
+    animator.stop()
+
     val passKeyBack = isSingleLine
     val doDeactivate = {
       deactivate()
@@ -384,7 +394,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     location = getPanelLocation(size.height) ?: location
 
     // Force layout so that viewport sizes are valid before checking the scroll state. In tests, we have to do it
-    // manually, because there isn't a real UI hierarchy.
+    // manually because there isn't a real UI hierarchy.
     if (application.isUnitTestMode) {
       doLayout()
       scrollPane.doLayout()
@@ -440,7 +450,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     var pos = -1
     while ((text.indexOf('\n', pos + 1).also { pos = it }) != -1) {
       count++
-    }
+      }
 
     if (text[text.length - 1] != '\n') {
       count++
@@ -451,26 +461,26 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
 
   private fun scrollToStart() {
     if (isSingleLine) return
-    scrollOffset(-Int.MAX_VALUE)
+    scrollByOffset(-Int.MAX_VALUE)
   }
 
   private fun scrollToEnd() {
     if (isSingleLine) return
-    scrollOffset(Int.MAX_VALUE)
+    scrollByOffset(Int.MAX_VALUE)
   }
 
   private fun scrollLine(direction: Int = 1) {
-    scrollOffset(cachedLineHeight * direction)
+    scrollByOffset(cachedLineHeight * direction)
   }
 
   private fun scrollPage(direction: Int = 1) {
-    scrollOffset(scrollPane.verticalScrollBar.visibleAmount * direction)
+    scrollByOffset(scrollPane.verticalScrollBar.visibleAmount * direction)
   }
 
   private fun scrollHalfPage(direction: Int = 1) {
     val sa = scrollPane.verticalScrollBar.visibleAmount / 2.0
     val offset = ceil(sa / cachedLineHeight) * cachedLineHeight
-    scrollOffset(offset.toInt() * direction)
+    scrollByOffset(offset.toInt() * direction)
   }
 
   private fun onBadKey() {
@@ -478,23 +488,49 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     promptComponent.font = selectEditorFont(editor, promptComponent.text)
   }
 
-  private fun scrollOffset(more: Int) {
+  private fun scrollByOffset(offset: Int) {
     scrollPane.validate()
+
+    // Note that we always scroll from the current location. If we're in the middle of scrolling, this will not be the
+    // target of the last scroll. I don't think that's important
     val scrollBar = scrollPane.verticalScrollBar
     val value = scrollBar.value
-    scrollBar.value = value + more
-    scrollPane.horizontalScrollBar.value = 0
-    updatePrompt()
+
+    val duration = Registry.intValue("idea.editor.smooth.scrolling.navigation.duration")
+    if (duration > 0 && shouldAnimateScroll() && abs(offset) > cachedLineHeight) {
+      val startValue = scrollBar.value
+      val endValue = (min(startValue + offset, scrollBar.maximum - scrollBar.visibleAmount) / cachedLineHeight) * cachedLineHeight
+      val animation = animation {
+        scrollBar.value = (startValue + (endValue - startValue) * it + 0.5).toInt()
+      }
+      animation.duration = duration
+      animation.easing = Easing.EASE_OUT
+      animation.runWhenExpired {
+        // Avoid any rounding errors and make sure we're at the end
+        scrollBar.value = startValue + offset
+        updatePrompt()
+      }
+      animator.animate(animation)
+    }
+    else {
+      scrollBar.value = (min(value + offset, scrollBar.maximum - scrollBar.visibleAmount) / cachedLineHeight) * cachedLineHeight
+      scrollPane.horizontalScrollBar.value = 0
+      updatePrompt()
+    }
+  }
+
+  private fun shouldAnimateScroll(): Boolean {
+    return !application.isUnitTestMode && editor.settings.isAnimatedScrolling && !RemoteDesktopService.isRemoteSession()
   }
 
   private fun resetScroll() {
+    scrollPane.verticalScrollBar.value = 0
     if (!isSingleLine && !injector.globalOptions().more) {
-      scrollPane.verticalScrollBar.value = scrollPane.verticalScrollBar.maximum
+      scrollByOffset(Int.MAX_VALUE)
     }
     else {
-      scrollPane.verticalScrollBar.value = 0
+      updatePrompt()
     }
-    updatePrompt()
   }
 
   private fun updatePrompt() {
