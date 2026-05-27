@@ -35,6 +35,7 @@ import com.maddyhome.idea.vim.api.MessageType
 import com.maddyhome.idea.vim.api.VimOutputPanel
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.requestFocus
 import com.maddyhome.idea.vim.helper.selectEditorFont
 import com.maddyhome.idea.vim.helper.vimMorePanel
@@ -452,17 +453,18 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
       return 1
     }
 
-    var count = 0
-    var pos = -1
-    while ((text.indexOf('\n', pos + 1).also { pos = it }) != -1) {
-      count++
+    val lineWidth = (width / EditorHelper.getPlainSpaceWidthFloat(editor)).toInt()
+    var lineCount = 0
+    var last = 0
+    text.forEachIndexed { index, ch ->
+      if (ch == '\n') {
+        lineCount += ceil((index - last) / lineWidth.toDouble()).toInt()
+        last = index
       }
-
-    if (text[text.length - 1] != '\n') {
-      count++
     }
+    lineCount += ceil((text.length - last - 1) / lineWidth.toDouble()).toInt()
 
-    return count
+    return lineCount
   }
 
   private fun scrollToStart() {
