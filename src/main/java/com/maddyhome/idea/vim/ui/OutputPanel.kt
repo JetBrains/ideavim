@@ -58,10 +58,15 @@ import javax.swing.JScrollPane
 import javax.swing.JTextPane
 import javax.swing.KeyStroke
 import javax.swing.SwingUtilities
+import javax.swing.text.AbstractDocument
 import javax.swing.text.DefaultCaret
+import javax.swing.text.LabelView
 import javax.swing.text.SimpleAttributeSet
 import javax.swing.text.StyleConstants
 import javax.swing.text.StyledDocument
+import javax.swing.text.StyledEditorKit
+import javax.swing.text.View
+import javax.swing.text.ViewFactory
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.min
@@ -123,10 +128,19 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
       }
     }
     textPane.highlighter = null
+    textPane.editorKit = object : StyledEditorKit() {
+      override fun getViewFactory(): ViewFactory {
+        val factory = super.viewFactory
+        return ViewFactory { elem ->
+          if (AbstractDocument.ContentElementName == elem.name) CharacterBreakView(elem)
+          else factory.create(elem)
+        }
+      }
+    }
 
     resizeAdapter = object : ComponentAdapter() {
       override fun componentResized(e: ComponentEvent?) {
-        positionPanel()
+        positionPanel(isInitialPosition = false)
       }
     }
 
@@ -143,7 +157,9 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     textPane.addKeyListener(keyListener)
 
     scrollPane.verticalScrollBar.addAdjustmentListener { e ->
-      if (!e.valueIsAdjusting) {
+      // Update the prompt when scrolling stops, but only for non-single-line output. We will get a scroll update event
+      // if resizing the IDE frame forces the single-line output to wrap and become multi-line.
+      if (!isSingleLine && !e.valueIsAdjusting) {
         updatePrompt()
       }
     }
@@ -188,7 +204,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
       textPane.border = null
       scrollPane.border = null
       promptComponent.foreground = textPane.foreground
-      positionPanel()
+      positionPanel(isInitialPosition = false)
     }
   }
 
@@ -314,7 +330,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     disableOldGlass()
 
     setFontForElements()
-    positionPanel()
+    positionPanel(isInitialPosition = true)
     resetScroll()
 
     glassPane?.isVisible = true
@@ -338,7 +354,10 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
 
       editor.project?.let { project ->
         toolWindowListenerConnection = project.messageBus.connect()
-        toolWindowListenerConnection!!.subscribe(ToolWindowManagerListener.TOPIC, ToolWindowPositioningListener { positionPanel() })
+        toolWindowListenerConnection!!.subscribe(
+          ToolWindowManagerListener.TOPIC,
+          ToolWindowPositioningListener { positionPanel(isInitialPosition = false) }
+        )
       }
     }
   }
@@ -384,16 +403,20 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     promptComponent.font = selectEditorFont(editor, promptComponent.text)
   }
 
-  private fun positionPanel() {
+  private fun positionPanel(isInitialPosition: Boolean) {
     val maxPanelSize = getMaxPanelSize() ?: return
     val lineHeight = textPane.getFontMetrics(textPane.font).height
     val lineCount = countLines(textPane.text)
     val maxVisibleLines = (maxPanelSize.height / lineHeight) - 1  // -1 to save space for prompt
     val visibleLines = min(lineCount, maxVisibleLines)
 
-    // Simple output: single line that fits entirely - no label needed
-    isSingleLine = lineCount == 1 && lineCount <= maxVisibleLines
-    promptComponent.isVisible = !isSingleLine
+    if (isInitialPosition) {
+      // Simple output: single line that fits entirely - no label needed
+      // Don't update the flag if we're resizing. We might change text wrapping moving from/to single-line output, but
+      // we want to stay in the original mode
+      isSingleLine = lineCount == 1 && lineCount <= maxVisibleLines
+      promptComponent.isVisible = !isSingleLine
+    }
 
     val extraHeight = if (isSingleLine) 0 else promptComponent.preferredSize.height
     val borderInsets = border.getBorderInsets(this)
@@ -721,3 +744,49 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
 
 
 private data class TextLine(val text: String, val color: Color?)
+
+/**
+ * A [LabelView] that breaks at character boundaries rather than word boundaries.
+ *
+ * [getMinimumSpan] returns the width of a single character so the row layout always attempts a
+ * break, even when the text contains no spaces.
+ * [getBreakWeight] signals that any character position on the X axis is a valid break point.
+ * [breakView] finds the last character that completely fits within the available width using the
+ * view's own glyph painter, so measurement is consistent with how the view renders itself.
+ * [getPreferredSpan] is intentionally not overridden: the view reports its natural preferred width
+ * and relies solely on the break machinery to constrain it to the space given by the parent row.
+ */
+private class CharacterBreakView(elem: javax.swing.text.Element) : LabelView(elem) {
+
+  override fun getMinimumSpan(axis: Int): Float {
+    if (axis != X_AXIS) return super.getMinimumSpan(axis)
+    val p0 = startOffset
+    val p1 = endOffset
+    if (p0 >= p1) return 0f
+    return glyphPainter.getSpan(this, p0, p0 + 1, null, 0f)
+  }
+
+  override fun getBreakWeight(axis: Int, pos: Float, len: Float): Int =
+    if (axis == X_AXIS) GoodBreakWeight else BadBreakWeight
+
+  override fun breakView(axis: Int, p0: Int, pos: Float, len: Float): View {
+    if (axis != X_AXIS) return this
+    val p1 = endOffset
+    if (p0 >= p1) return this
+
+    val painter = glyphPainter
+
+    // If everything fits there is nothing to break
+    if (painter.getSpan(this, p0, p1, null, pos) <= len) return this
+
+    // Binary search for the rightmost character offset whose span still fits
+    var lo = p0
+    var hi = p1
+    while (lo < hi - 1) {
+      val mid = (lo + hi) / 2
+      if (painter.getSpan(this, p0, mid, null, pos) <= len) lo = mid else hi = mid
+    }
+
+    return if (lo > p0) createFragment(p0, lo) else this
+  }
+}
