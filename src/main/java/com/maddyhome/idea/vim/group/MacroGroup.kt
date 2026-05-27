@@ -60,6 +60,8 @@ class MacroGroup : VimMacroBase() {
     myPotemkinProgress.fraction = 0.0
     try {
       myPotemkinProgress.text2 = if (isInternalMacro) "Executing internal macro" else ""
+      val fileEditorManager = FileEditorManager.getInstance(project)
+      val initialSelectedEditor = fileEditorManager.selectedTextEditor
       val runnable = runnable@{
         try {
           // Handle one keystroke then queue up the next key
@@ -70,18 +72,17 @@ class MacroGroup : VimMacroBase() {
                 val key = keyStack.feedStroke()
                 myPotemkinProgress.checkCanceled()
                 val keyHandler = getInstance()
-                // During the macro execution, we might change the editor. After that, all
-                //  After that, the next operations should be applied to the new editor.
-                //  Because of that, we don't use the initially taken editor, but we re-request it on each
-                //  macro "step".
-                val currentEditor = FileEditorManager.getInstance(project).selectedTextEditor?.vim
-                if (currentEditor != null) {
-                  ProgressManager.getInstance().executeNonCancelableSection {
-                    // Prevent autocompletion during macros.
-                    // See https://github.com/JetBrains/ideavim/pull/772 for details
-                    CompletionServiceImpl.setCompletionPhase(CompletionPhase.NoCompletion)
-                    keyHandler.handleKey(currentEditor, key, context, keyHandler.keyHandlerState)
-                  }
+                val nowSelected = fileEditorManager.selectedTextEditor
+                val currentEditor = if (nowSelected != null && nowSelected != initialSelectedEditor) {
+                  nowSelected.vim
+                } else {
+                  editor
+                }
+                ProgressManager.getInstance().executeNonCancelableSection {
+                  // Prevent autocompletion during macros.
+                  // See https://github.com/JetBrains/ideavim/pull/772 for details
+                  CompletionServiceImpl.setCompletionPhase(CompletionPhase.NoCompletion)
+                  keyHandler.handleKey(currentEditor, key, context, keyHandler.keyHandlerState)
                 }
                 if (injector.messages.isError()) return@runnable
               }
