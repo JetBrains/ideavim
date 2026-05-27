@@ -71,7 +71,6 @@ class MessageAreaTest : VimTestCase("\n") {
     // Perhaps run a command that will definitely fail, so we show the error output in a pager?
   }
 
-  @Disabled("Fails. We currently only count actual lines, not wrapped text")
   @Test
   fun `test long wrapped single line command output uses pager`() {
     enterCommand("echo '123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890'")
