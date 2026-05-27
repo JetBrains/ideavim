@@ -59,6 +59,7 @@ class ChangeGroup : VimChangeGroupBase() {
 
   override fun type(vimEditor: VimEditor, context: ExecutionContext, key: Char) {
     doType(vimEditor, context) {
+      tryExpandAbbreviation(vimEditor, key)
       it.execute(vimEditor.ij, key, context.ij)
     }
   }

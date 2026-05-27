@@ -18,6 +18,7 @@ import com.maddyhome.idea.vim.api.ExecutionContextManager
 import com.maddyhome.idea.vim.api.LocalOptionInitialisationScenario
 import com.maddyhome.idea.vim.api.NativeActionManager
 import com.maddyhome.idea.vim.api.SystemInfoService
+import com.maddyhome.idea.vim.api.VimAbbreviationGroup
 import com.maddyhome.idea.vim.api.VimActionExecutor
 import com.maddyhome.idea.vim.api.VimApplication
 import com.maddyhome.idea.vim.api.VimChangeGroup
@@ -160,6 +161,8 @@ internal class IjVimInjector : VimInjectorBase() {
   override val processGroup: VimProcessGroup
     get() = service()
   override val keyGroup: VimKeyGroup
+    get() = service()
+  override val abbreviationGroup: VimAbbreviationGroup
     get() = service()
 
   override val markService: VimMarkService

@@ -190,6 +190,8 @@
     <!-- Frontend services moved from common (not used by backend) -->
     <applicationService serviceImplementation="com.maddyhome.idea.vim.api.VimDigraphGroupBase"
                         serviceInterface="com.maddyhome.idea.vim.api.VimDigraphGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.api.VimAbbreviationGroupBase"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimAbbreviationGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.yank.YankGroupBase"
                         serviceInterface="com.maddyhome.idea.vim.yank.VimYankGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.vimscript.services.IjVariableService"
