@@ -141,6 +141,12 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     addKeyListener(keyListener)
     textPane.addKeyListener(keyListener)
 
+    scrollPane.verticalScrollBar.addAdjustmentListener { e ->
+      if (!e.valueIsAdjusting) {
+        updatePrompt()
+      }
+    }
+
     updateUI()
 
     // This is usually called in EDT, except for TabmoveTest
