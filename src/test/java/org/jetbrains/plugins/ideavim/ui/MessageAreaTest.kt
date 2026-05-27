@@ -183,6 +183,68 @@ class MessageAreaTest : VimTestCase("\n") {
   }
 
   @Test
+  fun `test 'j' at single-page hit-enter prompt closes message area and moves caret down a line`() {
+    configureByText("""
+      |${c}Lorem ipsum dolor sit amet,
+      |consectetur adipiscing elit
+      |Sed in orci mauris.
+      |Cras id tellus in ex imperdiet egestas.
+    """.trimMargin())
+    enterCommandForMultiLineOutput()
+    assertHitEnterPrompt()
+
+    doTypeText("j")
+    assertExOutputClosed()
+
+    assertState("""
+      |Lorem ipsum dolor sit amet,
+      |${c}consectetur adipiscing elit
+      |Sed in orci mauris.
+      |Cras id tellus in ex imperdiet egestas.
+    """.trimMargin())
+  }
+
+  @Test
+  fun `test up at single-page hit-enter prompt does nothing`() {
+    enterCommandForMultiLineOutput()
+    assertHitEnterPrompt()
+
+    doTypeText("<Up>")
+    assertExOutputOpen()
+    assertPagerTopLine(0)
+  }
+
+  @Test
+  fun `test 'k' at single-page hit-enter prompt does nothing`() {
+    enterCommandForMultiLineOutput()
+    assertHitEnterPrompt()
+
+    doTypeText("<BS>")
+    assertExOutputOpen()
+    assertPagerTopLine(0)
+  }
+
+  @Test
+  fun `test backspace at single-page hit-enter prompt does nothing`() {
+    enterCommandForMultiLineOutput()
+    assertHitEnterPrompt()
+
+    doTypeText("<BS>")
+    assertExOutputOpen()
+    assertPagerTopLine(0)
+  }
+
+  @Test
+  fun `test CTRL-H at single-page hit-enter prompt does nothing`() {
+    enterCommandForMultiLineOutput()
+    assertHitEnterPrompt()
+
+    doTypeText("<C-H>")
+    assertExOutputOpen()
+    assertPagerTopLine(0)
+  }
+
+  @Test
   fun `test 'd' at single-page hit-enter prompt closes message area and reuses key`() {
     configureByText("""
       |${c}Lorem ipsum dolor sit amet,
@@ -196,7 +258,7 @@ class MessageAreaTest : VimTestCase("\n") {
     doTypeText("d")
     assertExOutputClosed()
 
-    // Reusing the key will be like we've typed `dw` in the editor
+    // If we've passed the key to the editor, it's as though we've typed `dw`
     doTypeText("w")
     assertState("""
       |${c}ipsum dolor sit amet,
@@ -204,6 +266,16 @@ class MessageAreaTest : VimTestCase("\n") {
       |Sed in orci mauris.
       |Cras id tellus in ex imperdiet egestas.
     """.trimMargin())
+  }
+
+  @Test
+  fun `test 'u' at single-page hit-enter prompt does nothing`() {
+    enterCommandForMultiLineOutput()
+    assertHitEnterPrompt()
+
+    doTypeText("u")
+    assertExOutputOpen()
+    assertPagerTopLine(0)
   }
 
   @Test
@@ -220,16 +292,118 @@ class MessageAreaTest : VimTestCase("\n") {
   }
 
   @Test
+  fun `test 'f' at single-page hit-enter prompt closes message area and reuses key`() {
+    configureByText("""
+      |${c}Lorem ipsum dolor sit amet,
+      |consectetur adipiscing elit
+      |Sed in orci mauris.
+      |Cras id tellus in ex imperdiet egestas.
+    """.trimMargin())
+    configureByPages(3)
+    enterCommandForMultiLineOutput()
+    assertHitEnterPrompt()
+
+    doTypeText("f")
+    assertExOutputClosed()
+
+    // If we're reusing the `f`, we've effectively typed `fd` in the editor
+    doTypeText("d")
+    configureByText("""
+      |Lorem ipsum ${c}dolor sit amet,
+      |consectetur adipiscing elit
+      |Sed in orci mauris.
+      |Cras id tellus in ex imperdiet egestas.
+    """.trimMargin())
+  }
+
+  @Test
+  fun `test CTRL-F at single-page hit-enter prompt closes message area and reuses key`() {
+    configureByText("""
+      |${c}Lorem ipsum dolor sit amet,
+      |consectetur adipiscing elit
+      |Sed in orci mauris.
+      |Cras id tellus in ex imperdiet egestas.
+    """.trimMargin())
+    configureByPages(3)
+    enterCommandForMultiLineOutput()
+    assertHitEnterPrompt()
+
+    doTypeText("<C-F>")
+    assertExOutputClosed()
+
+    configureByText("""
+      |Lorem ipsum dolor sit amet,
+      |consectetur adipiscing elit
+      |Sed in orci mauris.
+      |${c}Cras id tellus in ex imperdiet egestas.
+    """.trimMargin())
+  }
+
+  @Test
   fun `test page up at single-page hit-enter prompt does nothing`() {
     enterCommandForMultiLineOutput()
     assertHitEnterPrompt()
 
     doTypeText("<PageUp>")
+    assertExOutputOpen()
     assertPagerTopLine(0)
   }
 
   @Test
-  fun `test any other key at single-page hit-enter prompt closes message area and reuses key`() {
+  fun `test 'b' at single-page hit-enter prompt does nothing`() {
+    enterCommandForMultiLineOutput()
+    assertHitEnterPrompt()
+
+    doTypeText("b")
+    assertExOutputOpen()
+    assertPagerTopLine(0)
+  }
+
+  @Test
+  fun `test CTRL-B at single-page hit-enter prompt does nothing`() {
+    enterCommandForMultiLineOutput()
+    assertHitEnterPrompt()
+
+    doTypeText("<C-B>")
+    assertExOutputOpen()
+    assertPagerTopLine(0)
+  }
+
+  @Test
+  fun `test 'g' at single-page hit-enter prompt does nothing`() {
+    enterCommandForMultiLineOutput()
+    assertHitEnterPrompt()
+
+    doTypeText("g")
+    assertExOutputOpen()
+    assertPagerTopLine(0)
+  }
+
+  @Test
+  fun `test 'G' at single-page hit-enter prompt closes message area and reuses key`() {
+    configureByText("""
+      |${c}Lorem ipsum dolor sit amet,
+      |consectetur adipiscing elit
+      |Sed in orci mauris.
+      |Cras id tellus in ex imperdiet egestas.
+    """.trimMargin())
+    configureByPages(3)
+    enterCommandForMultiLineOutput()
+    assertHitEnterPrompt()
+
+    doTypeText("G")
+    assertExOutputClosed()
+
+    configureByText("""
+      |Lorem ipsum dolor sit amet,
+      |consectetur adipiscing elit
+      |Sed in orci mauris.
+      |${c}Cras id tellus in ex imperdiet egestas.
+    """.trimMargin())
+  }
+
+  @Test
+  fun `test any other (typed) key at single-page hit-enter prompt closes message area and reuses key`() {
     configureByText("""
       |${c}Lorem ipsum dolor sit amet,
     """.trimMargin())
@@ -240,6 +414,23 @@ class MessageAreaTest : VimTestCase("\n") {
     assertExOutputClosed()
 
     // `x` deletes the `L`
+    assertState("""
+      |${c}orem ipsum dolor sit amet,
+    """.trimMargin())
+  }
+
+  @Test
+  fun `test any other (pressed) key at single-page hit-enter prompt closes message area and reuses key`() {
+    configureByText("""
+      |${c}Lorem ipsum dolor sit amet,
+    """.trimMargin())
+    enterCommandForMultiLineOutput()
+    assertHitEnterPrompt()
+
+    doTypeText("<Delete>")
+    assertExOutputClosed()
+
+    // `<Delete>` deletes the `L`
     assertState("""
       |${c}orem ipsum dolor sit amet,
     """.trimMargin())
@@ -308,11 +499,46 @@ class MessageAreaTest : VimTestCase("\n") {
   }
 
   @Test
+  fun `test 'j' at more-prompt scrolls down a single line`() {
+    enterCommandForMultiPageOutput()
+    assertPagerTopLine(0)
+    doTypeText("j")
+    assertPagerTopLine(1)
+  }
+
+  @Test
   fun `test up at more-prompt scrolls up a single line`() {
     enterCommandForMultiPageOutput()
     doTypeText("<Down>")
     assertPagerTopLine(1)
     doTypeText("<Up>")
+    assertPagerTopLine(0)
+  }
+
+  @Test
+  fun `test 'k' at more-prompt scrolls up a single line`() {
+    enterCommandForMultiPageOutput()
+    doTypeText("<Down>")
+    assertPagerTopLine(1)
+    doTypeText("k")
+    assertPagerTopLine(0)
+  }
+
+  @Test
+  fun `test backspace at more-prompt scrolls up a single line`() {
+    enterCommandForMultiPageOutput()
+    doTypeText("<Down>")
+    assertPagerTopLine(1)
+    doTypeText("<BS>")
+    assertPagerTopLine(0)
+  }
+
+  @Test
+  fun `test CTRL-H at more-prompt scrolls up a single line`() {
+    enterCommandForMultiPageOutput()
+    doTypeText("<Down>")
+    assertPagerTopLine(1)
+    doTypeText("<C-H>")
     assertPagerTopLine(0)
   }
 
@@ -329,10 +555,35 @@ class MessageAreaTest : VimTestCase("\n") {
   }
 
   @Test
+  fun `test 'u' at more-prompt scrolls up half a page`() {
+    enterCommandForMultiPageOutput()
+    assertPagerTopLine(0)
+    doTypeText("d", "d")
+    doTypeText("u")
+    assertPagerTopLine(ceil(pageSize / 2.0).toInt())
+  }
+
+  @Test
   fun `test page down at more-prompt scrolls down a page`() {
     enterCommandForMultiPageOutput()
     assertMorePrompt()
     doTypeText("<PageDown>")
+    assertPagerTopLine(pageSize)
+  }
+
+  @Test
+  fun `test 'f' at more-prompt scrolls down a page`() {
+    enterCommandForMultiPageOutput()
+    assertMorePrompt()
+    doTypeText("f")
+    assertPagerTopLine(pageSize)
+  }
+
+  @Test
+  fun `test CTRL-F at more-prompt scrolls down a page`() {
+    enterCommandForMultiPageOutput()
+    assertMorePrompt()
+    doTypeText("<C-F>")
     assertPagerTopLine(pageSize)
   }
 
@@ -347,9 +598,51 @@ class MessageAreaTest : VimTestCase("\n") {
   }
 
   @Test
-  fun `test any other key at more-prompt shows verbose more-prompt`() {
+  fun `test 'b' at more-prompt scrolls up a page`() {
+    enterCommandForMultiPageOutput()
+    assertMorePrompt()
+    doTypeText("<PageDown>")
+    assertPagerTopLine(pageSize)
+    doTypeText("b")
+    assertPagerTopLine(0)
+  }
+
+  @Test
+  fun `test CTRL-B at more-prompt scrolls up a page`() {
+    enterCommandForMultiPageOutput()
+    assertMorePrompt()
+    doTypeText("<PageDown>")
+    assertPagerTopLine(pageSize)
+    doTypeText("b")
+    assertPagerTopLine(0)
+  }
+
+  @Test
+  fun `test 'g' at more-prompt scrolls to top of output`() {
+    enterCommandForMultiPageOutput()
+    scrollOutputToEnd()
+    doTypeText("g")
+    assertPagerTopLine(0)
+  }
+
+  @Test
+  fun `test 'G' at more-prompt scrolls to bottom of output`() {
+    enterCommandForMultiPageOutput()
+    doTypeText("G")
+    assertPagerTopLine(100 - pageSize + 1)
+  }
+
+  @Test
+  fun `test any other (typed) key at more-prompt shows verbose more-prompt`() {
     enterCommandForMultiPageOutput()
     doTypeText("x")
+    assertVerboseMorePrompt()
+  }
+
+  @Test
+  fun `test any other (pressed) key at more-prompt shows verbose more-prompt`() {
+    enterCommandForMultiPageOutput()
+    doTypeText("<Delete>")
     assertVerboseMorePrompt()
   }
 
@@ -457,13 +750,101 @@ class MessageAreaTest : VimTestCase("\n") {
     """.trimMargin())
   }
 
+  @VimBehaviorDiffers("Vim does not hide the messages if the content can be scrolled")
+  @Test
+  fun `test 'j' at multipage hit-enter prompt closes message area and reuses key`() {
+    configureByText("""
+      |${c}Lorem ipsum dolor sit amet,
+      |consectetur adipiscing elit
+      |Sed in orci mauris.
+      |Cras id tellus in ex imperdiet egestas.
+    """.trimMargin())
+    enterCommandForMultiPageOutput()
+    scrollOutputToEnd()
+    assertHitEnterPrompt()
+
+    doTypeText("j")
+    assertExOutputClosed()
+
+    assertState("""
+      |Lorem ipsum dolor sit amet,
+      |${c}consectetur adipiscing elit
+      |Sed in orci mauris.
+      |Cras id tellus in ex imperdiet egestas.
+    """.trimMargin())
+  }
+
   @Test
   fun `test up at multipage hit-enter prompt scrolls up a single line`() {
     enterCommandForMultiPageOutput()
     scrollOutputToEnd()
+    assertHitEnterPrompt()
     assertPagerTopLine(100 - pageSize + 1)
     doTypeText("<Up>")
     assertPagerTopLine(100 - pageSize)
+  }
+
+  @Test
+  fun `test 'k' at multipage hit-enter prompt scrolls up a single line`() {
+    enterCommandForMultiPageOutput()
+    scrollOutputToEnd()
+    assertHitEnterPrompt()
+    assertPagerTopLine(100 - pageSize + 1)
+    doTypeText("k")
+    assertPagerTopLine(100 - pageSize)
+  }
+
+  @Test
+  fun `test backspace at multipage hit-enter prompt scrolls up a single line`() {
+    enterCommandForMultiPageOutput()
+    scrollOutputToEnd()
+    assertHitEnterPrompt()
+    assertPagerTopLine(100 - pageSize + 1)
+    doTypeText("<BS>")
+    assertPagerTopLine(100 - pageSize)
+  }
+
+  @Test
+  fun `test CTRL-H at multipage hit-enter prompt scrolls up a single line`() {
+    enterCommandForMultiPageOutput()
+    scrollOutputToEnd()
+    assertPagerTopLine(100 - pageSize + 1)
+    doTypeText("<C-H>")
+    assertPagerTopLine(100 - pageSize)
+  }
+
+  @Test
+  fun `test 'd' at multipage hit-enter prompt closes message area and reuses key`() {
+    configureByText("""
+      |${c}Lorem ipsum dolor sit amet,
+      |consectetur adipiscing elit
+      |Sed in orci mauris.
+      |Cras id tellus in ex imperdiet egestas.
+    """.trimMargin())
+    enterCommandForMultiPageOutput()
+    scrollOutputToEnd()
+    assertHitEnterPrompt()
+
+    doTypeText("d")
+    assertExOutputClosed()
+
+    // If we've passed the key to the editor, it's as though we've typed `dw`
+    doTypeText("w")
+    assertState("""
+      |${c}ipsum dolor sit amet,
+      |consectetur adipiscing elit
+      |Sed in orci mauris.
+      |Cras id tellus in ex imperdiet egestas.
+    """.trimMargin())
+  }
+
+  @Test
+  fun `test 'u' at multipage hit-enter prompt scrolls up half a page`() {
+    enterCommandForMultiPageOutput()
+    scrollOutputToEnd()
+    assertPagerTopLine(100 - pageSize + 1)
+    doTypeText("u")
+    assertPagerTopLine(100 - pageSize + 1 - ceil(pageSize / 2.0).toInt())
   }
 
   @VimBehaviorDiffers("Vim does not hide the messages if the content can be scrolled")
@@ -490,8 +871,57 @@ class MessageAreaTest : VimTestCase("\n") {
     """.trimMargin())
   }
 
+  @VimBehaviorDiffers("Vim does not hide the messages if the content can be scrolled")
   @Test
-  fun `test page up at multipage hit-enter prompt scrolls up a single line`() {
+  fun `test 'f' at multipage hit-enter prompt closes message area and reuses key`() {
+    configureByText("""
+      |${c}Lorem ipsum dolor sit amet,
+      |consectetur adipiscing elit
+      |Sed in orci mauris.
+      |Cras id tellus in ex imperdiet egestas.
+    """.trimMargin())
+    enterCommandForMultiPageOutput()
+    scrollOutputToEnd()
+    assertHitEnterPrompt()
+
+    doTypeText("f")
+    assertExOutputClosed()
+
+    // If we reuse the 'f' we can search for the char
+    doTypeText("d")
+    assertState("""
+      |Lorem ipsum ${c}dolor sit amet,
+      |consectetur adipiscing elit
+      |Sed in orci mauris.
+      |Cras id tellus in ex imperdiet egestas.
+    """.trimMargin())
+  }
+
+  @VimBehaviorDiffers("Vim does not hide the messages if the content can be scrolled")
+  @Test
+  fun `test CTRL-F at multipage hit-enter prompt closes message area and reuses key`() {
+    configureByText("""
+      |${c}Lorem ipsum dolor sit amet,
+      |consectetur adipiscing elit
+      |Sed in orci mauris.
+      |Cras id tellus in ex imperdiet egestas.
+    """.trimMargin())
+    enterCommandForMultiPageOutput()
+    scrollOutputToEnd()
+    assertHitEnterPrompt()
+
+    doTypeText("<C-F>")
+    assertExOutputClosed()
+    assertState("""
+      |Lorem ipsum dolor sit amet,
+      |consectetur adipiscing elit
+      |Sed in orci mauris.
+      |${c}Cras id tellus in ex imperdiet egestas.
+    """.trimMargin())
+  }
+
+  @Test
+  fun `test page up at multipage hit-enter prompt scrolls up a page`() {
     enterCommandForMultiPageOutput()
     scrollOutputToEnd()
     assertPagerTopLine(100 - pageSize + 1)
@@ -500,7 +930,55 @@ class MessageAreaTest : VimTestCase("\n") {
   }
 
   @Test
-  fun `test any other key at multipage hit-enter prompt closes message area and reuses key`() {
+  fun `test 'b' at multipage hit-enter prompt scrolls up a page`() {
+    enterCommandForMultiPageOutput()
+    scrollOutputToEnd()
+    assertPagerTopLine(100 - pageSize + 1)
+    doTypeText("b")
+    assertPagerTopLine(100 - pageSize + 1 - pageSize)
+  }
+
+  @Test
+  fun `test CTRL-B at multipage hit-enter prompt scrolls up a page`() {
+    enterCommandForMultiPageOutput()
+    scrollOutputToEnd()
+    assertPagerTopLine(100 - pageSize + 1)
+    doTypeText("<C-B>")
+    assertPagerTopLine(100 - pageSize + 1 - pageSize)
+  }
+
+  @Test
+  fun `test 'g' at multipage hit-enter prompt scrolls to top of output`() {
+    enterCommandForMultiPageOutput()
+    scrollOutputToEnd()
+    assertPagerTopLine(100 - pageSize + 1)
+    doTypeText("g")
+    assertPagerTopLine(0)
+  }
+
+  @Test
+  fun `test 'G' at multipage hit-enter prompt closes messages are and reuses key`() {
+    configureByText("""
+      |${c}Lorem ipsum dolor sit amet,
+      |consectetur adipiscing elit
+      |Sed in orci mauris.
+      |Cras id tellus in ex imperdiet egestas.
+    """.trimMargin())
+    enterCommandForMultiPageOutput()
+    scrollOutputToEnd()
+    assertPagerTopLine(100 - pageSize + 1)
+    doTypeText("G")
+    assertExOutputClosed()
+    assertState("""
+      |Lorem ipsum dolor sit amet,
+      |consectetur adipiscing elit
+      |Sed in orci mauris.
+      |${c}Cras id tellus in ex imperdiet egestas.
+    """.trimMargin())
+  }
+
+  @Test
+  fun `test any other (typed) key at multipage hit-enter prompt closes message area and reuses key`() {
     configureByText("""
       |${c}Lorem ipsum dolor sit amet,
     """.trimMargin())
@@ -512,6 +990,24 @@ class MessageAreaTest : VimTestCase("\n") {
     assertExOutputClosed()
 
     // `x` deletes the `L`
+    assertState("""
+      |${c}orem ipsum dolor sit amet,
+    """.trimMargin())
+  }
+
+  @Test
+  fun `test any other (pressed) key at multipage hit-enter prompt closes message area and reuses key`() {
+    configureByText("""
+      |${c}Lorem ipsum dolor sit amet,
+    """.trimMargin())
+    enterCommandForMultiPageOutput()
+    scrollOutputToEnd()
+    assertHitEnterPrompt()
+
+    doTypeText("<Delete>")
+    assertExOutputClosed()
+
+    // `<Delete>` deletes the `L`
     assertState("""
       |${c}orem ipsum dolor sit amet,
     """.trimMargin())
@@ -644,7 +1140,7 @@ class MessageAreaTest : VimTestCase("\n") {
   @Test
   fun `test hide single line message area when inserting line above`() {
     configureByText("""
-      |{$c}Lorem ipsum dolor sit amet,
+      |${c}Lorem ipsum dolor sit amet,
       |consectetur adipiscing elit
       |Sed in orci mauris.
       |Cras id tellus in ex imperdiet egestas.
@@ -658,7 +1154,7 @@ class MessageAreaTest : VimTestCase("\n") {
   @Test
   fun `test hide single line message area when inserting line below`() {
     configureByText("""
-      |{$c}Lorem ipsum dolor sit amet,
+      |${c}Lorem ipsum dolor sit amet,
       |consectetur adipiscing elit
       |Sed in orci mauris.
       |Cras id tellus in ex imperdiet egestas.
@@ -695,7 +1191,7 @@ class MessageAreaTest : VimTestCase("\n") {
   }
 
   private fun scrollOutputToEnd() {
-    getOutputPanel().scrollToEnd()
+    getOutputPanel().scrollToHitEnterPrompt()
   }
 
   private fun getOutputPanel(): OutputPanel {
@@ -731,13 +1227,13 @@ class MessageAreaTest : VimTestCase("\n") {
   private fun assertMorePrompt() {
     val outputPanel = assertPager()
     assertFalse(outputPanel.isAtEnd, "Expected panel to not be at end (more-prompt)")
-    assertEquals("-- MORE --", outputPanel.promptText)
+    assertEquals("-- More --", outputPanel.promptText)
   }
 
   private fun assertVerboseMorePrompt() {
     val outputPanel = assertPager()
     assertFalse(outputPanel.isAtEnd, "Expected panel to not be at end (more-prompt)")
-    assertEquals("-- MORE -- (RET: line, SPACE: page, d: half page, q: quit)", outputPanel.promptText)
+    assertEquals("-- More -- SPACE/d/j: screen/page/line down, b/u/k: up, q: quit", outputPanel.promptText)
   }
 
   private fun assertHitEnterPrompt() {

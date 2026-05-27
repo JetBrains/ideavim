@@ -437,6 +437,16 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     return count
   }
 
+  private fun scrollToStart() {
+    if (isSingleLine) return
+    scrollOffset(-Int.MAX_VALUE)
+  }
+
+  private fun scrollToEnd() {
+    if (isSingleLine) return
+    scrollOffset(Int.MAX_VALUE)
+  }
+
   private fun scrollLine(direction: Int = 1) {
     scrollOffset(cachedLineHeight * direction)
   }
@@ -445,10 +455,10 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     scrollOffset(scrollPane.verticalScrollBar.visibleAmount * direction)
   }
 
-  private fun scrollHalfPage() {
+  private fun scrollHalfPage(direction: Int = 1) {
     val sa = scrollPane.verticalScrollBar.visibleAmount / 2.0
     val offset = ceil(sa / cachedLineHeight) * cachedLineHeight
-    scrollOffset(offset.toInt())
+    scrollOffset(offset.toInt() * direction)
   }
 
   private fun onBadKey() {
@@ -498,7 +508,9 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
   internal fun handleKey(key: KeyStroke) {
     // Note that it is normally invalid to compare a virtual key code and a Unicode codepoint; however, these virtual
     // key codes are explicitly defined to match ASCII values
-    if (key.keyChar.code == KeyEvent.VK_ENTER || key.keyChar.code == KeyEvent.VK_ESCAPE) {
+    if (key.keyChar.code == KeyEvent.VK_ENTER
+      || key.keyChar.code == KeyEvent.VK_ESCAPE
+      || key.keyChar.code == KeyEvent.VK_BACK_SPACE) {
       return
     }
 
@@ -511,30 +523,54 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
   }
 
   private fun handleHitEnterPrompt(key: KeyStroke) = when (key.keyChar) {
-    ' ', 'q' -> close()
+    'g' -> scrollToStart()
+    'G' -> close(key)
+    ' ' -> close()
+    'f' -> close(key)
+    'd' -> close(key)
+    'j' -> close(key)
+    'b' -> scrollPage(-1)
+    'u' -> scrollHalfPage(-1)
+    'k' -> scrollLine(-1)
+    'q' -> close()
     KeyEvent.CHAR_UNDEFINED -> when (key.keyCode) {
-      KeyEvent.VK_ENTER -> close()
       KeyEvent.VK_ESCAPE -> close()
+      KeyEvent.VK_ENTER -> close()
+      KeyEvent.VK_DOWN -> close(key)
+      KeyEvent.VK_PAGE_DOWN -> close(key)
+      KeyEvent.VK_F if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) -> close(key)
+      KeyEvent.VK_BACK_SPACE -> scrollLine(-1)
       KeyEvent.VK_UP -> scrollLine(-1)
-      
+      KeyEvent.VK_H if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) -> scrollLine(-1)
       KeyEvent.VK_PAGE_UP -> scrollPage(-1)
+      KeyEvent.VK_B if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) -> scrollPage(-1)
       else -> close(key)
     }
     else -> close(key)
   }
 
   private fun handleMorePrompt(key: KeyStroke) = when (key.keyChar) {
-    'q' -> close()
+    'g' -> scrollToStart()
+    'G' -> scrollToEnd()
     ' ' -> scrollPage()
+    'f' -> scrollPage()
     'd' -> scrollHalfPage()
+    'j' -> scrollLine()
+    'b' -> scrollPage(-1)
+    'u' -> scrollHalfPage(-1)
+    'k' -> scrollLine(-1)
+    'q' -> close()
     KeyEvent.CHAR_UNDEFINED -> when (key.keyCode) {
       KeyEvent.VK_ESCAPE -> close()
       KeyEvent.VK_ENTER -> scrollLine()
       KeyEvent.VK_DOWN -> scrollLine()
-      
       KeyEvent.VK_PAGE_DOWN -> scrollPage()
-      KeyEvent.VK_UP ->  scrollLine(-1)
+      KeyEvent.VK_F if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) -> scrollPage()
+      KeyEvent.VK_BACK_SPACE -> scrollLine(-1)
+      KeyEvent.VK_UP -> scrollLine(-1)
+      KeyEvent.VK_H if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) -> scrollLine(-1)
       KeyEvent.VK_PAGE_UP -> scrollPage(-1)
+      KeyEvent.VK_B if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) -> scrollPage(-1)
       else -> onBadKey()
     }
     else -> onBadKey()
@@ -563,13 +599,23 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     get() = scrollPane.verticalScrollBar.value / cachedLineHeight
 
   @TestOnly
-  fun scrollToEnd() {
-    if (isSingleLine) return
-    scrollOffset(100000)
+  fun scrollToHitEnterPrompt() {
+    scrollToEnd()
   }
 
   private inner class OutputPanelKeyListener : KeyAdapter() {
     override fun keyTyped(e: KeyEvent) {
+      // Do not try to handle KEY_TYPED versions of Enter, Escape or Delete. We've already handled them as KEY_PRESSED.
+      // We want to handle them as KEY_PRESSED keystrokes (i.e., virtual key codes, not key chars) because that's what
+      // the mapping system uses, and we need to pass these keystrokes on when the panel closes.
+      // Note that it is usually illegal to compare Unicode codepoints and virtual key codes. However, these particular
+      // values are specifically chosen to match ASCII values.
+      if (e.keyChar.code == KeyEvent.VK_ENTER
+        || e.keyChar.code == KeyEvent.VK_ESCAPE
+        || e.keyChar.code == KeyEvent.VK_BACK_SPACE) {
+        return
+      }
+
       handleKey(KeyStroke.getKeyStrokeForEvent(e))
     }
 
@@ -578,7 +624,11 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
       // (i.e., KEY_PRESSED) keystrokes for the equivalent of Vim's special keys (actions like `<Up>`, control
       // characters like `<C-F>` and special keys like `<Enter>`). Remember that after a KEY_PRESSED event, we'll
       // typically get a KEY_TYPED event. Don't handle them twice!
-      if (e.isActionKey || e.keyCode == KeyEvent.VK_ENTER || e.keyCode == KeyEvent.VK_ESCAPE) {
+     if (e.isActionKey
+        || e.keyCode == KeyEvent.VK_ENTER
+        || e.keyCode == KeyEvent.VK_ESCAPE
+        || e.keyCode == KeyEvent.VK_BACK_SPACE
+        || (e.keyCode >= KeyEvent.VK_A && e.keyCode <= KeyEvent.VK_Z && e.modifiersEx and KeyEvent.CTRL_DOWN_MASK != 0)) {
         handleKey(KeyStroke.getKeyStrokeForEvent(e))
       }
     }
