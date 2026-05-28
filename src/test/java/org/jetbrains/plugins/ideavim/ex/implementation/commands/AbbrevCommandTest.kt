@@ -7,14 +7,25 @@
  */
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
+import com.intellij.openapi.application.ApplicationManager
 import org.jetbrains.plugins.ideavim.action.ex.VimExTestCase
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class AbbrevCommandTest : VimExTestCase() {
 
+  // Both @BeforeEach and @AfterEach run a full cmdline reset: leftover ex-entry state from a
+  // preceding test can suppress the @AfterEach `abclear`, so each test must defensively isolate
+  // itself on entry as well as clean up on exit.
+  @BeforeEach
+  fun clearAbbreviationsBeforeTest() = resetCmdlineAndClearAbbreviations()
+
   @AfterEach
-  fun clearAbbreviations() {
+  fun clearAbbreviationsAfterTest() = resetCmdlineAndClearAbbreviations()
+
+  private fun resetCmdlineAndClearAbbreviations() {
+    deactivateExEntry()
     enterCommand("abclear")
   }
 
@@ -121,5 +132,85 @@ class AbbrevCommandTest : VimExTestCase() {
     typeText(":myabbrev<Left><Right><Esc>")
     typeText(":myabbrev ")
     assertExText("myexpansion ")
+  }
+
+  @Test
+  fun `iabbrev with buffer modifier expands in the current buffer`() {
+    configureByText("${c}\n")
+    enterCommand("iabbrev <buffer> foo bar")
+    typeText("i", "foo ")
+    assertState("bar \n")
+  }
+
+  @Test
+  fun `iabbrev with buffer modifier does not expand in a different buffer`() {
+    configureByText("${c}\n")
+    enterCommand("iabbrev <buffer> foo bar")
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.openFileInEditor(fixture.createFile("other.txt", "\n"))
+    }
+    typeText("0")
+    typeText("i", "foo ")
+    assertState("foo \n")
+  }
+
+  @Test
+  fun `iabbrev with buffer modifier takes precedence over global abbreviation with same lhs`() {
+    configureByText("${c}\n")
+    enterCommand("iabbrev foo global")
+    enterCommand("iabbrev <buffer> foo local")
+    typeText("i", "foo ")
+    assertState("local \n")
+  }
+
+  @Test
+  fun `iunabbrev with buffer modifier removes only the buffer-local abbreviation`() {
+    configureByText("${c}\n")
+    enterCommand("iabbrev foo global")
+    enterCommand("iabbrev <buffer> foo local")
+    enterCommand("iunabbrev <buffer> foo")
+    typeText("i", "foo ")
+    assertState("global \n")
+  }
+
+  @Test
+  fun `iabclear with buffer modifier clears only the buffer-local abbreviations`() {
+    configureByText("${c}\n")
+    enterCommand("iabbrev foo global")
+    enterCommand("iabbrev <buffer> foo local")
+    enterCommand("iabclear <buffer>")
+    typeText("i", "foo ")
+    assertState("global \n")
+  }
+
+  @Test
+  fun `iabbrev with no arguments lists all defined insert-mode abbreviations`() {
+    configureByText("${c}\n")
+    enterCommand("iabbrev foo bar")
+    enterCommand("iabbrev teh the")
+    assertCommandOutput("iabbrev", "i  foo           bar\ni  teh           the")
+  }
+
+  @Test
+  fun `iabbrev with buffer marks buffer-local entries with at sign`() {
+    configureByText("${c}\n")
+    enterCommand("iabbrev foo global")
+    enterCommand("iabbrev <buffer> baz local")
+    assertCommandOutput("iabbrev", "i @baz           local\ni  foo           global")
+  }
+
+  @Test
+  fun `iabbrev with buffer argument lists only buffer-local entries`() {
+    configureByText("${c}\n")
+    enterCommand("iabbrev foo global")
+    enterCommand("iabbrev <buffer> baz local")
+    assertCommandOutput("iabbrev <buffer>", "i @baz           local")
+  }
+
+  @Test
+  fun `cabbrev with no arguments lists only cmdline-mode abbreviations`() {
+    enterCommand("iabbrev foo bar")
+    enterCommand("cabbrev myabbrev myexpansion")
+    assertCommandOutput("cabbrev", "c  myabbrev      myexpansion")
   }
 }
