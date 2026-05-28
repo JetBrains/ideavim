@@ -15,10 +15,8 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.wm.IdeFocusManager
-import com.intellij.openapi.wm.ex.ToolWindowManagerListener
 import com.intellij.ui.DocumentAdapter
 import com.intellij.util.IJSwingUtilities
-import com.intellij.util.messages.MessageBusConnection
 import com.maddyhome.idea.vim.EventFacade
 import com.maddyhome.idea.vim.KeyHandler.Companion.getInstance
 import com.maddyhome.idea.vim.VimPlugin
@@ -41,19 +39,15 @@ import com.maddyhome.idea.vim.key.interceptors.VimInputInterceptor
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.ui.ExPanelBorder
-import com.maddyhome.idea.vim.ui.ToolWindowPositioningListener
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
 import com.maddyhome.idea.vim.vimscript.model.commands.GlobalCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.SubstituteCommand
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import org.jetbrains.annotations.Contract
+import org.jetbrains.annotations.VisibleForTesting
 import java.awt.Color
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
-import java.awt.LayoutManager
-import java.awt.event.ComponentAdapter
-import java.awt.event.ComponentEvent
-import java.awt.event.ComponentListener
 import java.lang.ref.WeakReference
 import javax.swing.JComponent
 import javax.swing.JLabel
@@ -72,9 +66,17 @@ import kotlin.math.min
  * This is used to enter ex commands such as searches and "colon" commands
  */
 class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
+  private var weakEditor: WeakReference<Editor?>? = null
+
+  private val glassPaneManager = object : GlassPaneManager() {
+    override fun onResize() = positionPanel()
+  }
+
   override var isReplaceMode: Boolean = false
   override var inputProcessing: ((String) -> Unit)? = null
   override var finishOn: Char? = null
+  override var lastEntry: String? = null
+  override var activeCompletion: CommandLineCompletion? = null
 
   override var isAbbreviationInvalidated: Boolean = false
   private var lastSeenCmdlineLength: Int = 0
@@ -88,10 +90,7 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
   }
 
   var inputInterceptor: VimInputInterceptor? = null
-  private var weakEditor: WeakReference<Editor?>? = null
   var context: DataContext? = null
-  override var lastEntry: String? = null
-  override var activeCompletion: CommandLineCompletion? = null
 
   override fun isExCommand(): Boolean {
     return getLabel().startsWith(":")
@@ -106,7 +105,7 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
     completionPanel.setItems(completion.displayNames, completion.currentIndex)
 
     if (!isCompletionBarVisible) {
-      oldGlass?.add(completionPanel)
+      glassPaneManager.glassPane?.add(completionPanel)
       isCompletionBarVisible = true
     }
     positionCompletionPanel()
@@ -120,8 +119,10 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
   override fun hideCompletionBar() {
     if (!isCompletionBarVisible) return
     isCompletionBarVisible = false
-    oldGlass?.remove(completionPanel)
-    oldGlass?.repaint()
+    glassPaneManager.glassPane?.let {
+      it.remove(completionPanel)
+      it.repaint()
+    }
   }
 
   private fun dismissCompletionIfTextChanged() {
@@ -185,27 +186,12 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
     }
 
     if (!ApplicationManager.getApplication().isUnitTestMode) {
-      val root = SwingUtilities.getRootPane(parent) ?: return
-      val glassPane = root.getGlassPane() as JComponent
-      oldGlass = glassPane
-      oldLayout = glassPane.layout
-      wasOpaque = glassPane.isOpaque
-      glassPane.setLayout(null)
-      glassPane.setOpaque(false)
-      glassPane.add(this)
-      glassPane.addComponentListener(resizePanelListener)
-      val project = editor.project
-      if (project != null) {
-        toolWindowListenerConnection = project.messageBus.connect()
-        toolWindowListenerConnection!!.subscribe(
-          ToolWindowManagerListener.TOPIC,
-          ToolWindowPositioningListener { positionPanel() })
-      }
+      glassPaneManager.activate(editor, this)
       positionPanel()
-      glassPane.isVisible = true
+      glassPaneManager.show()
       SwingUtilities.invokeLater { entry.requestFocusInWindow() }
     }
-    this.isActive = true
+    isActive = true
     // Must run last: entry.setText()/entry.reset() above fire the caret listener, which would
     // otherwise spuriously flip isAbbreviationInvalidated to true before the user has typed.
     resetAbbreviationTracking()
@@ -260,13 +246,7 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
           requestFocus(parent!!)
         }
 
-        oldGlass!!.removeComponentListener(resizePanelListener)
-        toolWindowListenerConnection?.disconnect()
-        toolWindowListenerConnection = null
-        oldGlass!!.isVisible = false
-        oldGlass!!.remove(this)
-        oldGlass!!.setOpaque(wasOpaque)
-        oldGlass!!.setLayout(oldLayout)
+        glassPaneManager.deactivate()
       }
 
       parent = null
@@ -355,7 +335,7 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
           }
         }
 
-        // Get a snapshot of the count for the in progress command, and coerce it to 1. This value will include all
+        // Get a snapshot of the count for the in-progress command and coerce it to 1. This value will include all
         // count components - selecting register(s), operator and motions. E.g. `2"a3"b4"c5d6/` will return 720.
         // If we're showing highlights for an Ex command like `:s`, the command builder will be empty, but we'll still
         // get a valid value.
@@ -430,36 +410,34 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
   override val text: String
     get() = entry.getText()
 
-  override fun getRenderedText(): String {
-    val stringBuilder = StringBuilder()
-    getRenderedText(entry.getUI().getRootView(entry), stringBuilder)
-    if (stringBuilder.get(stringBuilder.length - 1) == '\n') {
-      stringBuilder.deleteCharAt(stringBuilder.length - 1)
+  override fun getRenderedText() = buildString {
+    getRenderedText(entry.getUI().getRootView(entry))
+    if (last() == '\n') {
+      deleteCharAt(lastIndex)
     }
-    return stringBuilder.toString()
   }
 
-  private fun getRenderedText(view: View, stringBuilder: StringBuilder) {
+  private fun StringBuilder.getRenderedText(view: View) {
     if (view.element.isLeaf) {
       if (view is GlyphView) {
         val text = view.getText(view.getStartOffset(), view.getEndOffset())
-        stringBuilder.append(text)
+        append(text)
 
         // GlyphView doesn't render a trailing new line, but uses it to flush the characters in the preceding string
         // Typically, we won't get a newline in the middle of a string, but we do add the prompt to the end of the doc
-        if (stringBuilder.get(stringBuilder.length - 1) == '\n') {
-          stringBuilder.deleteCharAt(stringBuilder.length - 1)
+        if (last() == '\n') {
+          deleteCharAt(lastIndex)
         }
       } else {
-        stringBuilder.append("<Unknown leaf view. Expected GlyphView, got: ")
-        stringBuilder.append(view.javaClass.getName())
-        stringBuilder.append(">")
+        append("<Unknown leaf view. Expected GlyphView, got: ")
+        append(view.javaClass.getName())
+        append(">")
       }
     } else {
       val viewCount = view.viewCount
       for (i in 0..<viewCount) {
         val child = view.getView(i)
-        getRenderedText(child, stringBuilder)
+        getRenderedText(child)
       }
     }
   }
@@ -483,7 +461,7 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
    *
    *
    * The text field for the command line will forward a pressed or typed keystroke to the key handler, which will either
-   * consume it for mapping or a command. If it's not consumed, or if it's mapped, the keystroke is returned to the
+   * consume it for mapping or a command. If it's not consumed or if it's mapped, the keystroke is returned to the
    * command line to complete handling. This includes typed characters as well as pressed shortcuts.
    *
    *
@@ -505,7 +483,7 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
 
     setBorder(ExPanelBorder())
 
-    // Swing uses a bad pattern of calling updateUI() from the constructor. At this moment, `entry` and myLabel is null.
+    // Swing uses a bad pattern of calling updateUI() from the constructor. At this moment, `entry` and myLabel are null.
     @Suppress("SENSELESS_COMPARISON")
     if (entry != null && myLabel != null) {
       setFontForElements()
@@ -550,7 +528,7 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
       val bounds = scroll.bounds
       bounds.translate(0, scroll.getHeight() - height)
       bounds.height = height
-      val pos = SwingUtilities.convertPoint(scroll.getParent(), bounds.location, oldGlass)
+      val pos = SwingUtilities.convertPoint(scroll.getParent(), bounds.location, glassPaneManager.glassPane)
       bounds.location = pos
       setBounds(bounds)
       repaint()
@@ -588,12 +566,11 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
     private set
 
   // UI stuff
+  @VisibleForTesting
+  val entry: ExTextField = ExTextField(this)
+
   private var parent: JComponent? = null
   private val myLabel: JLabel = JLabel(" ")
-  val entry: ExTextField = ExTextField(this)
-  private var oldGlass: JComponent? = null
-  private var oldLayout: LayoutManager? = null
-  private var wasOpaque = false
   private val completionPanel = ExCompletionPanel()
   private var isCompletionBarVisible = false
 
@@ -601,14 +578,6 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
   private var verticalOffset = 0
   private var horizontalOffset = 0
   private var caretOffset = 0
-
-  private val resizePanelListener: ComponentListener = object : ComponentAdapter() {
-    override fun componentResized(e: ComponentEvent?) {
-      positionPanel()
-    }
-  }
-
-  private var toolWindowListenerConnection: MessageBusConnection? = null
 
   init {
 
@@ -639,7 +608,8 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
     get() = entry.caret as VimCommandLineCaret
 
   override fun setText(string: String, updateLastEntry: Boolean) {
-    // It's a feature of Swing that caret is moved when we set new text. However, our API is Swing independent and we do not expect this
+    // It's a feature of Swing that the caret is moved when we set a new text. However, our API is Swing independent,
+    // and we do not expect this
     val offset = caret.offset
     entry.updateText(string)
     if (updateLastEntry) entry.saveLastEntry()
