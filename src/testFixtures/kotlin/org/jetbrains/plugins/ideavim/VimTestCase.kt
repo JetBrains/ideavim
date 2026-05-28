@@ -86,6 +86,7 @@ import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.options.helpers.GuiCursorType
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.inBlockSelection
+import com.maddyhome.idea.vim.ui.OutputPanel
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
@@ -143,6 +144,9 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
 
     // Make sure the entry text field gets a bounds, or we won't be able to work out caret location
     ExEntryPanel.getOrCreatePanelInstance().entry.setBounds(0, 0, 100, 25)
+
+    // Always show the output panel, even for empty text. Normal behaviour is to hide it for single line, empty text
+    OutputPanel.allowHideEmptyText = false
 
     NeovimTesting.setUp(testInfo)
 
@@ -248,6 +252,8 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
     injector.extensionLoader.getEnabledExtensions().forEach {
       injector.extensionLoader.disableExtension(it.extensionName)
     }
+
+    OutputPanel.allowHideEmptyText = true
 
     // Tear down neovim
     NeovimTesting.tearDown(testInfo)

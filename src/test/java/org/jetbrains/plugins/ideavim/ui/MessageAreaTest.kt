@@ -61,6 +61,9 @@ class MessageAreaTest : VimTestCase("\n") {
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
+
+    OutputPanel.allowHideEmptyText = true
+
     configureByText("\n")
     enterCommand("set nowrap")
   }
@@ -1184,6 +1187,41 @@ class MessageAreaTest : VimTestCase("\n") {
     doTypeText("n")       // Wrap and scroll to top of file. Scrolling normally closes the message area
     assertPosition(0, 6)
     assertStaticMessageArea("search hit BOTTOM, continuing at TOP")
+  }
+
+  @Test
+  fun `test output empty string does not show message area`() {
+    enterCommand("echo ''")
+    assertNull(injector.outputPanel.getCurrentOutputPanel())
+  }
+
+  @Test
+  fun `test output blank string does not show message area`() {
+    enterCommand("echo '   '")
+    assertNull(injector.outputPanel.getCurrentOutputPanel())
+  }
+
+  @Test
+  fun `test message ending in newline treated as two line output`() {
+    // The trailing newline is its own line
+    enterCommand("echo \"lorem ipsum\\n\"")
+    assertPager()
+    assertHitEnterPrompt()
+    assertEquals(2, pageSize)
+  }
+
+  @Test
+  fun `test message consisting of single new line treated as two line output`() {
+    enterCommand("echo \"\\n\"")
+    assertPager()
+    assertEquals(2, pageSize)
+  }
+
+  @Test
+  fun `test message consisting of two new line treated as three line output`() {
+    enterCommand("echo \"\\n\\n\"")
+    assertPager()
+    assertEquals(3, pageSize)
   }
 
   private fun enterCommandForSingleLineOutput() {
