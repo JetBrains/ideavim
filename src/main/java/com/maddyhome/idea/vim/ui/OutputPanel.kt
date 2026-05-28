@@ -232,15 +232,9 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
 
     val fullText = doc.getText(0, doc.length)
     textPane.font = selectEditorFont(editor, fullText)
-    if (fullText.isNotEmpty()) {
-      activate()
-    }
   }
 
-  private fun setMultiLineText(
-    lines: List<TextLine>,
-    doc: StyledDocument,
-  ) {
+  private fun setMultiLineText(lines: List<TextLine>, doc: StyledDocument) {
     for ((index, line) in lines.withIndex()) {
       val text = line.text.removeSuffix("\n")
       val attrs = getLineColor(line)
@@ -271,8 +265,17 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     if (currentPanel != null && currentPanel != this) currentPanel.close()
 
     setStyledText(segments)
+
+    // Only activate (single-line or multiline) if we have text or enough empty lines to show in the pager (or testing
+    // is telling us to always show the output panel). Otherwise, clear the text
     if (!active) {
-      activate()
+      if (textPane.text.isNotBlank()
+        || (textPane.text.isBlank() && (!allowHideEmptyText || countLines(textPane.text) > injector.globalOptions().cmdheight))) {
+        activate()
+      }
+      else {
+        clearText()
+      }
     }
 
     // Don't immediately clear the message if the action that caused it also (indirectly) causes a redraw
@@ -482,11 +485,11 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     var last = 0
     text.forEachIndexed { index, ch ->
       if (ch == '\n') {
-        lineCount += ceil((index - last) / lineWidth.toDouble()).toInt()
+        lineCount += ceil((index - last) / lineWidth.toDouble()).toInt().coerceAtLeast(1)
         last = index
       }
     }
-    lineCount += ceil((text.length - last - 1) / lineWidth.toDouble()).toInt()
+    lineCount += ceil((text.length - last) / lineWidth.toDouble()).toInt()
 
     return lineCount
   }
@@ -740,6 +743,17 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
       }
       return panel
     }
+
+    /**
+     * Allow showing the output panel for empty text
+     *
+     * Normally, the output panel is not shown for single line, empty text. This is sensible UX - no intrusive popup panel
+     * showing nothing. However, it makes it very difficult for testing to verify that a command has correctly tried to
+     * output an empty string, or to verify that a command correctly does not output anything. A missing output instead of
+     * an empty output could be due to a bug or exception. This flag allows tests to ensure the behaviour is consistent.
+     */
+    @TestOnly
+    internal var allowHideEmptyText = true
   }
 }
 
