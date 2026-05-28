@@ -46,4 +46,14 @@ abstract class SingleCommandActionTest : VimTestCase() {
       mode,
     )
   }
+
+  @Test
+  fun `test ctrl-o at end of line`() {
+    doTest(
+      listOf(command, "<C-O>", "db"),
+      "first line${c}\nsecond line",
+      "first e${c}\nsecond line",
+      mode,
+    )
+  }
 }
