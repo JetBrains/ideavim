@@ -25,6 +25,12 @@ usual beta standards.
 
 ## [To Be Released]
 
+### Fixes:
+* [VIM-4238](https://youtrack.jetbrains.com/issue/VIM-4238) Fixed macro execution applying keystrokes to wrong editor when the search window changes the focused editor during macro replay
+
+### Merged PRs:
+* [1804](https://github.com/JetBrains/ideavim/pull/1804) by [1grzyb1](https://github.com/1grzyb1): VIM-4238 Track current editor in macro
+
 ## 2.36.0, 2026-05-22
 
 ### Features:
