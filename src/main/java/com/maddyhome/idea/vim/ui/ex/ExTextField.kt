@@ -542,7 +542,10 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
     val defaultStyle = (document as StyledDocument).getStyle(StyleContext.DEFAULT_STYLE)
     StyleConstants.setForeground(defaultStyle, foreground)
 
-    addCaretListener { _: CaretEvent? -> resetCaret() }
+    addCaretListener { _: CaretEvent? ->
+      resetCaret()
+      myParentPanel.noteCmdlineCaretMove(text.length)
+    }
   }
 
   companion object {
