@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.state.mode.Mode
+import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
 /**
@@ -68,6 +69,9 @@ internal class ModeInputConsumer : KeyConsumer {
         if (commandLine != null) {
           keyProcessResultBuilder.addExecutionStep { _, _, _ ->
             commandLine.focus()
+            if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {
+              commandLine.tryExpandAbbreviation(key.keyChar)
+            }
             commandLine.handleKey(key)
           }
         } else {
