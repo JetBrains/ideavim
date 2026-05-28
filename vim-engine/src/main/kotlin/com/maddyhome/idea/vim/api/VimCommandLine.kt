@@ -147,7 +147,7 @@ interface VimCommandLine {
     if (isAbbreviationInvalidated) return
     val lhsRange = findAbbreviationLhsRange(text, caret.offset, lineStart = 0) ?: return
     val lhs = text.substring(lhsRange.startOffset, lhsRange.endOffset)
-    val entry = injector.abbreviationGroup.getAbbreviation(lhs, MappingMode.CMD_LINE) ?: return
+    val entry = injector.abbreviationGroup.getAbbreviation(lhs, MappingMode.CMD_LINE, editor) ?: return
     deleteText(lhsRange.startOffset, lhs.length)
     insertText(lhsRange.startOffset, entry.rhs)
   }

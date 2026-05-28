@@ -9,7 +9,9 @@
 package com.maddyhome.idea.vim.vimscript.model.commands.mapping
 
 import com.intellij.vim.annotations.ExCommand
+import com.maddyhome.idea.vim.api.AbbreviationListing
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.MessageType
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
@@ -32,11 +34,51 @@ data class AbbrevCommand(val range: Range, val cmd: String, val modifier: Comman
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
     val variant = AbbrevVariant.matching(cmd) ?: return ExecutionResult.Error
-    val parsed = parseAbbrevArgument(argument)
-    if (parsed is AbbrevArgument.Definition) {
-      injector.abbreviationGroup.setAbbreviation(parsed.lhs, parsed.rhs, variant.modes, variant.recursive)
+    when (val parsed = parseAbbrevArgument(argument)) {
+      is AbbrevArgument.Definition -> if (parsed.bufferLocal) {
+        injector.abbreviationGroup.setBufferLocalAbbreviation(
+          parsed.lhs, parsed.rhs, variant.modes, variant.recursive, editor,
+        )
+      } else {
+        injector.abbreviationGroup.setAbbreviation(parsed.lhs, parsed.rhs, variant.modes, variant.recursive)
+      }
+
+      is AbbrevArgument.Listing -> showAbbreviations(variant.modes, parsed.bufferLocal, editor)
     }
     return ExecutionResult.Success
+  }
+
+  private fun showAbbreviations(modes: Set<MappingMode>, bufferLocalOnly: Boolean, editor: VimEditor) {
+    val listings = injector.abbreviationGroup.listAbbreviations(modes, editor, bufferLocalOnly)
+    val output = if (listings.isEmpty()) NO_ABBREVIATIONS_FOUND else listings.joinToString(separator = "\n", transform = ::formatListingLine)
+    showOutputPanel(editor, output)
+  }
+
+  private fun showOutputPanel(editor: VimEditor, text: String) {
+    val context = injector.executionContextManager.getEditorExecutionContext(editor)
+    val outputPanel = injector.outputPanel.getOrCreate(editor, context)
+    outputPanel.addText(text, true, MessageType.STANDARD)
+    outputPanel.show()
+  }
+
+  private fun formatListingLine(listing: AbbreviationListing): String {
+    val modeChar = modeCharOf(listing.mode)
+    val scopeMarker = if (listing.bufferLocal) BUFFER_LOCAL_MARKER else GLOBAL_MARKER
+    val paddedLhs = listing.entry.lhs.padEnd(LHS_COLUMN_WIDTH, ' ')
+    return "$modeChar $scopeMarker$paddedLhs ${listing.entry.rhs}"
+  }
+
+  private fun modeCharOf(mode: MappingMode): Char = when (mode) {
+    MappingMode.INSERT -> 'i'
+    MappingMode.CMD_LINE -> 'c'
+    else -> '!'
+  }
+
+  private companion object {
+    private const val LHS_COLUMN_WIDTH = 13
+    private const val BUFFER_LOCAL_MARKER = '@'
+    private const val GLOBAL_MARKER = ' '
+    private const val NO_ABBREVIATIONS_FOUND = "No abbreviations found"
   }
 
   private enum class AbbrevVariant(val prefix: String, val modes: Set<MappingMode>, val recursive: Boolean) {

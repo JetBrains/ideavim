@@ -24,7 +24,7 @@ data class AbbrevClearCommand(val range: Range, val cmd: String, val modifier: C
   Command.SingleExecution(range, modifier, argument) {
 
   override val argFlags: CommandHandlerFlags =
-    flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)
+    flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(
     editor: VimEditor,
@@ -32,7 +32,12 @@ data class AbbrevClearCommand(val range: Range, val cmd: String, val modifier: C
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
     val variant = AbbrevClearVariant.matching(cmd) ?: return ExecutionResult.Error
-    injector.abbreviationGroup.clearAbbreviations(variant.modes)
+    val (bufferLocal, _) = stripBufferModifier(argument.trim())
+    if (bufferLocal) {
+      injector.abbreviationGroup.clearBufferLocalAbbreviations(variant.modes, editor)
+    } else {
+      injector.abbreviationGroup.clearAbbreviations(variant.modes)
+    }
     return ExecutionResult.Success
   }
 
