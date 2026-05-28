@@ -7,11 +7,11 @@
  */
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.action.ex.VimExTestCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 
-class AbbrevCommandTest : VimTestCase() {
+class AbbrevCommandTest : VimExTestCase() {
 
   @AfterEach
   fun clearAbbreviations() {
@@ -66,5 +66,12 @@ class AbbrevCommandTest : VimTestCase() {
     enterCommand("iabclear")
     typeText("i", "foo teh ")
     assertState("foo teh \n")
+  }
+
+  @Test
+  fun `cabbrev expands its lhs in cmdline mode on whitespace trigger`() {
+    enterCommand("cabbrev help tab help")
+    typeText(":help ")
+    assertExText("tab help ")
   }
 }

@@ -9,7 +9,10 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.KeyHandler
+import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.history.VimHistory
+import com.maddyhome.idea.vim.key.findAbbreviationLhsRange
+import com.maddyhome.idea.vim.key.isAbbreviationKeywordChar
 import org.jetbrains.annotations.TestOnly
 import javax.swing.KeyStroke
 
@@ -125,6 +128,19 @@ interface VimCommandLine {
     editor.mode = editor.mode.returnTo
     KeyHandler.getInstance().keyHandlerState.leaveCommandLine()
     deactivate(refocusOwningEditor, resetCaret)
+  }
+
+  /**
+   * If [trigger] is a non-keyword char and the text before the caret matches a `:cabbrev`-style
+   * abbreviation, replace the matched lhs in the cmdline buffer with the abbreviation's rhs.
+   */
+  fun tryExpandAbbreviation(trigger: Char) {
+    if (isAbbreviationKeywordChar(trigger)) return
+    val lhsRange = findAbbreviationLhsRange(text, caret.offset, lineStart = 0) ?: return
+    val lhs = text.substring(lhsRange.startOffset, lhsRange.endOffset)
+    val entry = injector.abbreviationGroup.getAbbreviation(lhs, MappingMode.CMD_LINE) ?: return
+    deleteText(lhsRange.startOffset, lhs.length)
+    insertText(lhsRange.startOffset, entry.rhs)
   }
 
   // FIXME I don't want it to conflict with Swings `requestFocus` and can suggest a better name
