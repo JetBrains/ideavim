@@ -11,10 +11,13 @@ import com.intellij.ide.KeyboardAwareFocusOwner
 import com.intellij.ide.RemoteDesktopService
 import com.intellij.ide.ui.LafManager
 import com.intellij.ide.ui.LafManagerListener
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.runInEdt
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.EditorEx
+import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.registry.Registry
+import com.intellij.openapi.wm.IdeGlassPane
 import com.intellij.openapi.wm.ex.ToolWindowManagerListener
 import com.intellij.openapi.wm.impl.IdeBackgroundUtil
 import com.intellij.ui.ClientProperty
@@ -44,6 +47,7 @@ import kotlinx.coroutines.delay
 import org.jetbrains.annotations.TestOnly
 import java.awt.BorderLayout
 import java.awt.Color
+import java.awt.Cursor
 import java.awt.Dimension
 import java.awt.LayoutManager
 import java.awt.Point
@@ -52,6 +56,8 @@ import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JScrollPane
@@ -97,6 +103,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
   private var originalLayout: LayoutManager? = null
   private var wasOpaque = false
   private var toolWindowListenerConnection: MessageBusConnection? = null
+  private var cursorDisposable: Disposable? = null
 
   var active: Boolean = false
   private val segments = mutableListOf<TextLine>()
@@ -314,12 +321,16 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
       it.removeComponentListener(resizeAdapter)
       it.isVisible = false
       it.remove(this)
-      it.setOpaque(wasOpaque)
-      it.setLayout(originalLayout)
+      it.isOpaque = wasOpaque
+      it.layout = originalLayout
 
       toolWindowListenerConnection?.disconnect()
       toolWindowListenerConnection = null
+
+      cursorDisposable?.let { Disposer.dispose(it) }
+      cursorDisposable = null
     }
+    glassPane = null
   }
 
   /**
@@ -344,12 +355,31 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     val root = SwingUtilities.getRootPane(editor.contentComponent) ?: return
     glassPane = root.glassPane as JComponent?
     glassPane?.let {
-      originalLayout = glassPane!!.layout
-      wasOpaque = glassPane!!.isOpaque
+      originalLayout = it.layout
+      wasOpaque = it.isOpaque
       it.layout = null
       it.isOpaque = false
       it.add(this)
       it.addComponentListener(resizeAdapter)
+
+      (it as? IdeGlassPane)?.let { ideGlassPane ->
+        val disposable = Disposer.newDisposable()
+        ideGlassPane.addMousePreprocessor(object : MouseAdapter() {
+          override fun mouseMoved(e: MouseEvent) = updateCursor(e)
+          override fun mousePressed(e: MouseEvent) = updateCursor(e)
+          override fun mouseReleased(e: MouseEvent) = updateCursor(e)
+          override fun mouseClicked(e: MouseEvent) = updateCursor(e)
+
+          private fun updateCursor(e: MouseEvent) {
+            val point = SwingUtilities.convertPoint(e.component, e.point, this@OutputPanel)
+            if (contains(point)) {
+              val target = SwingUtilities.getDeepestComponentAt(this@OutputPanel, point.x, point.y)
+              ideGlassPane.setCursor(target?.cursor ?: Cursor.getDefaultCursor(), this)
+            }
+          }
+        }, disposable)
+        cursorDisposable = disposable
+      }
 
       editor.project?.let { project ->
         toolWindowListenerConnection = project.messageBus.connect()
