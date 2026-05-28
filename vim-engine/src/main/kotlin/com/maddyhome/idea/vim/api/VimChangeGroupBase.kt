@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.helper.endOffsetInclusive
 import com.maddyhome.idea.vim.helper.usesVirtualSpace
 import com.maddyhome.idea.vim.key.findAbbreviationLhsRange
 import com.maddyhome.idea.vim.key.isAbbreviationKeywordChar
+import com.maddyhome.idea.vim.key.isAbbreviationSessionInvalidated
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_END
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_POS
@@ -803,6 +804,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
 
   protected fun tryExpandAbbreviation(editor: VimEditor, trigger: Char) {
     if (isAbbreviationKeywordChar(trigger)) return
+    if (isAbbreviationSessionInvalidated(editor)) return
     val caret = editor.currentCaret()
     val lineStart = editor.getLineStartOffset(editor.offsetToBufferPosition(caret.offset).line)
     val lhsRange = findAbbreviationLhsRange(editor.text(), caret.offset, lineStart) ?: return

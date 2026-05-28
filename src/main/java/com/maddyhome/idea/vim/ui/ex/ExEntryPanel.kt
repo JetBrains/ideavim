@@ -76,6 +76,17 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
   override var inputProcessing: ((String) -> Unit)? = null
   override var finishOn: Char? = null
 
+  override var isAbbreviationInvalidated: Boolean = false
+  private var lastSeenCmdlineLength: Int = 0
+
+  /** Called from [ExTextField]'s caret listener whenever the cmdline caret moves. */
+  internal fun noteCmdlineCaretMove(currentLength: Int) {
+    if (currentLength == lastSeenCmdlineLength) {
+      isAbbreviationInvalidated = true
+    }
+    lastSeenCmdlineLength = currentLength
+  }
+
   var inputInterceptor: VimInputInterceptor? = null
   private var weakEditor: WeakReference<Editor?>? = null
   var context: DataContext? = null
@@ -193,6 +204,14 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
       SwingUtilities.invokeLater { entry.requestFocusInWindow() }
     }
     this.isActive = true
+    // Must run last: entry.setText()/entry.reset() above fire the caret listener, which would
+    // otherwise spuriously flip isAbbreviationInvalidated to true before the user has typed.
+    resetAbbreviationTracking()
+  }
+
+  private fun resetAbbreviationTracking() {
+    lastSeenCmdlineLength = entry.text.length
+    isAbbreviationInvalidated = false
   }
 
   fun deactivate(refocusOwningEditor: Boolean) {

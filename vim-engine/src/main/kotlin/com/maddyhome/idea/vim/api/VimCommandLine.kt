@@ -131,11 +131,20 @@ interface VimCommandLine {
   }
 
   /**
+   * Set by the cmdline impl when a pure cursor move (caret moved without the text length changing)
+   * has happened during the current cmdline session. Suppresses [tryExpandAbbreviation] until the
+   * cmdline is re-activated. Mirrors Vim's `arrow_used` for the cmdline.
+   */
+  val isAbbreviationInvalidated: Boolean
+    get() = false
+
+  /**
    * If [trigger] is a non-keyword char and the text before the caret matches a `:cabbrev`-style
    * abbreviation, replace the matched lhs in the cmdline buffer with the abbreviation's rhs.
    */
   fun tryExpandAbbreviation(trigger: Char) {
     if (isAbbreviationKeywordChar(trigger)) return
+    if (isAbbreviationInvalidated) return
     val lhsRange = findAbbreviationLhsRange(text, caret.offset, lineStart = 0) ?: return
     val lhs = text.substring(lhsRange.startOffset, lhsRange.endOffset)
     val entry = injector.abbreviationGroup.getAbbreviation(lhs, MappingMode.CMD_LINE) ?: return

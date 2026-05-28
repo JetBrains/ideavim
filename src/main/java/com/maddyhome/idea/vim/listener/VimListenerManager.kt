@@ -107,6 +107,8 @@ import com.maddyhome.idea.vim.helper.resetVimLastColumn
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.vimDisabled
 import com.maddyhome.idea.vim.helper.vimInitialised
+import com.maddyhome.idea.vim.key.noteCaretMoveInInsertSession
+import com.maddyhome.idea.vim.key.resetAbbreviationSession
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.IjVimSearchGroup
 import com.maddyhome.idea.vim.newapi.InsertTimeRecorder
@@ -180,6 +182,8 @@ object VimListenerManager {
 
     val insertTimeRecorder = InsertTimeRecorder()
     injector.listenersNotifier.modeChangeListeners.add(insertTimeRecorder)
+
+    injector.listenersNotifier.modeChangeListeners.add(AbbreviationSessionResetListener())
 
     injector.listenersNotifier.modeWillChangeListeners.add(AutoCmdInsertEnterListener())
     injector.listenersNotifier.modeChangeListeners.add(AutoCmdInsertLeaveListener())
@@ -494,7 +498,10 @@ object VimListenerManager {
       // isn't called, so we need to initialise early.
       val openingEditor = getOpeningEditor(event.editor)
 
-      if (event.editor.virtualFile == null || event.editor.editorKind != EditorKind.MAIN_EDITOR || openingEditor == null || EditorHelper.isCommandHistoryWindow(event.editor)) {
+      if (event.editor.virtualFile == null || event.editor.editorKind != EditorKind.MAIN_EDITOR || openingEditor == null || EditorHelper.isCommandHistoryWindow(
+          event.editor
+        )
+      ) {
         // If we don't have an opening editor, use the fallback window. If it's the first time, use the FALLBACK
         // scenario and make a full copy to get everything set in `~/.ideavimrc`. If it's not, then use EDIT, as if we
         // still had a current window and we are just replacing the buffer. If we do have an opening window, it's NEW.
@@ -941,6 +948,11 @@ object VimListenerManager {
   private object EditorCaretHandler : CaretListener {
     override fun caretPositionChanged(event: CaretEvent) {
       event.caret?.resetVimLastColumn()
+      val editor = event.editor
+      val vimEditor = editor.vim
+      if (vimEditor.mode is Mode.INSERT) {
+        noteCaretMoveInInsertSession(vimEditor, editor.document.modificationStamp)
+      }
     }
 
     override fun caretAdded(event: CaretEvent) {
@@ -1079,6 +1091,14 @@ private class AutoCmdInsertLeaveListener : ModeChangeListener {
   override fun modeChanged(editor: VimEditor, oldMode: Mode) {
     if (oldMode.isInsertish && !editor.mode.isInsertish) {
       injector.autoCmd.handleEvent(AutoCmdEvent.InsertLeave, editor.getPath(), editor)
+    }
+  }
+}
+
+private class AbbreviationSessionResetListener : ModeChangeListener {
+  override fun modeChanged(editor: VimEditor, oldMode: Mode) {
+    if (oldMode !is Mode.INSERT && editor.mode is Mode.INSERT) {
+      resetAbbreviationSession(editor, editor.ij.document.modificationStamp)
     }
   }
 }
