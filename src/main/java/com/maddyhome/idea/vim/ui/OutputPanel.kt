@@ -11,14 +11,10 @@ import com.intellij.ide.KeyboardAwareFocusOwner
 import com.intellij.ide.RemoteDesktopService
 import com.intellij.ide.ui.LafManager
 import com.intellij.ide.ui.LafManagerListener
-import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.runInEdt
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.EditorEx
-import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.registry.Registry
-import com.intellij.openapi.wm.IdeGlassPane
-import com.intellij.openapi.wm.ex.ToolWindowManagerListener
 import com.intellij.openapi.wm.impl.IdeBackgroundUtil
 import com.intellij.ui.ClientProperty
 import com.intellij.ui.JBColor
@@ -29,7 +25,6 @@ import com.intellij.util.animation.Easing
 import com.intellij.util.animation.JBAnimator
 import com.intellij.util.animation.animation
 import com.intellij.util.application
-import com.intellij.util.messages.MessageBusConnection
 import com.intellij.util.ui.launchOnShow
 import com.maddyhome.idea.vim.KeyHandler.Companion.getInstance
 import com.maddyhome.idea.vim.VimPlugin
@@ -43,22 +38,17 @@ import com.maddyhome.idea.vim.helper.requestFocus
 import com.maddyhome.idea.vim.helper.selectEditorFont
 import com.maddyhome.idea.vim.helper.vimMorePanel
 import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.ui.ex.GlassPaneManager
 import kotlinx.coroutines.delay
 import org.jetbrains.annotations.TestOnly
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Cursor
 import java.awt.Dimension
-import java.awt.LayoutManager
 import java.awt.Point
 import java.awt.Rectangle
-import java.awt.event.ComponentAdapter
-import java.awt.event.ComponentEvent
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
-import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JScrollPane
 import javax.swing.JTextPane
@@ -84,6 +74,10 @@ import kotlin.time.Duration.Companion.milliseconds
  */
 internal class OutputPanel private constructor(private val editor: Editor) : JBPanel<OutputPanel>(), VimOutputPanel {
 
+  private val glassPaneManager = object : GlassPaneManager() {
+    override fun onResize() = positionPanel(isInitialPosition = false)
+  }
+
   private val textPane = object : JTextPane(), KeyboardAwareFocusOwner {
     /**
      * Skip the IDE's key event dispatcher when the output panel is active
@@ -96,26 +90,19 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     }
   }
 
-  private val resizeAdapter: ComponentAdapter
-  private var defaultForeground: Color? = null
-
-  private var glassPane: JComponent? = null
-  private var originalLayout: LayoutManager? = null
-  private var wasOpaque = false
-  private var toolWindowListenerConnection: MessageBusConnection? = null
-  private var cursorDisposable: Disposable? = null
-
-  var active: Boolean = false
-  private val segments = mutableListOf<TextLine>()
-
   private val promptComponent: JLabel = JLabel("more")
   private val scrollPane: JScrollPane =
     JBScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER)
+  private var defaultForeground: Color? = null
+
+  private val segments = mutableListOf<TextLine>()
   private var cachedLineHeight = 0
 
   private var allowClose = true
 
   private val animator = JBAnimator().setPeriod(4).setName("IdeaVim output panel animator")
+
+  var active: Boolean = false
 
   @get:TestOnly
   var isSingleLine = false
@@ -144,12 +131,8 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
         }
       }
     }
-
-    resizeAdapter = object : ComponentAdapter() {
-      override fun componentResized(e: ComponentEvent?) {
-        positionPanel(isInitialPosition = false)
-      }
-    }
+    // Force the text cursor. The LAF uses the default cursor when isEditable is false
+    textPane.cursor = Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR)
 
     // Suppress the fancy frame background used in the Islands theme
     ClientProperty.putRecursive(this, IdeBackgroundUtil.NO_BACKGROUND, true)
@@ -317,77 +300,24 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     active = false
     clearText()
     textPane.text = ""
-    glassPane?.let {
-      it.removeComponentListener(resizeAdapter)
-      it.isVisible = false
-      it.remove(this)
-      it.isOpaque = wasOpaque
-      it.layout = originalLayout
-
-      toolWindowListenerConnection?.disconnect()
-      toolWindowListenerConnection = null
-
-      cursorDisposable?.let { Disposer.dispose(it) }
-      cursorDisposable = null
-    }
-    glassPane = null
+    glassPaneManager.deactivate()
   }
 
   /**
    * Turns on the output panel for the given editor.
    */
   private fun activate() {
-    disableOldGlass()
+    glassPaneManager.activate(editor, this)
 
     setFontForElements()
     positionPanel(isInitialPosition = true)
     resetScroll()
 
-    glassPane?.isVisible = true
+    glassPaneManager.show()
     active = true
 
     if (!isSingleLine) {
       requestFocus(textPane)
-    }
-  }
-
-  private fun disableOldGlass() {
-    val root = SwingUtilities.getRootPane(editor.contentComponent) ?: return
-    glassPane = root.glassPane as JComponent?
-    glassPane?.let {
-      originalLayout = it.layout
-      wasOpaque = it.isOpaque
-      it.layout = null
-      it.isOpaque = false
-      it.add(this)
-      it.addComponentListener(resizeAdapter)
-
-      (it as? IdeGlassPane)?.let { ideGlassPane ->
-        val disposable = Disposer.newDisposable()
-        ideGlassPane.addMousePreprocessor(object : MouseAdapter() {
-          override fun mouseMoved(e: MouseEvent) = updateCursor(e)
-          override fun mousePressed(e: MouseEvent) = updateCursor(e)
-          override fun mouseReleased(e: MouseEvent) = updateCursor(e)
-          override fun mouseClicked(e: MouseEvent) = updateCursor(e)
-
-          private fun updateCursor(e: MouseEvent) {
-            val point = SwingUtilities.convertPoint(e.component, e.point, this@OutputPanel)
-            if (contains(point)) {
-              val target = SwingUtilities.getDeepestComponentAt(this@OutputPanel, point.x, point.y)
-              ideGlassPane.setCursor(target?.cursor ?: Cursor.getDefaultCursor(), this)
-            }
-          }
-        }, disposable)
-        cursorDisposable = disposable
-      }
-
-      editor.project?.let { project ->
-        toolWindowListenerConnection = project.messageBus.connect()
-        toolWindowListenerConnection!!.subscribe(
-          ToolWindowManagerListener.TOPIC,
-          ToolWindowPositioningListener { positionPanel(isInitialPosition = false) }
-        )
-      }
     }
   }
 
@@ -493,8 +423,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     val scroll = getEditorScrollPane() ?: return null
     val point = scroll.location
     point.translate(0, scroll.height - panelHeight)
-    val rootPane = SwingUtilities.getRootPane(editor.contentComponent) ?: return null
-    point.location = SwingUtilities.convertPoint(scroll.parent, point.location, rootPane.glassPane)
+    point.location = SwingUtilities.convertPoint(scroll.parent, point.location, glassPaneManager.glassPane)
     return point
   }
 
