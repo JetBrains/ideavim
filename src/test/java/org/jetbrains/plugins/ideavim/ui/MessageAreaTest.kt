@@ -449,6 +449,17 @@ class MessageAreaTest : VimTestCase("\n") {
   }
 
   @Test
+  fun `test colon at single-page hit-enter prompt closes message area and opens command line`() {
+    enterCommandForMultiLineOutput()
+    assertHitEnterPrompt()
+
+    doTypeText(":")
+    assertExOutputClosed()
+
+    assertNotNull(injector.commandLine.getActiveCommandLine())
+  }
+
+  @Test
   fun `test multi-page content with 'nomore' option skips more-prompt for hit-enter prompt`() {
     enterCommand("set nomore")
     enterCommandForMultiPageOutput()
@@ -656,6 +667,17 @@ class MessageAreaTest : VimTestCase("\n") {
     enterCommandForMultiPageOutput()
     doTypeText("<Delete>")
     assertVerboseMorePrompt()
+  }
+
+  @Test
+  fun `test colon at more-prompt closes message area and opens command line`() {
+    enterCommandForMultiPageOutput()
+    assertMorePrompt()
+
+    doTypeText(":")
+    assertExOutputClosed()
+
+    assertNotNull(injector.commandLine.getActiveCommandLine())
   }
 
   @Test
@@ -1023,6 +1045,18 @@ class MessageAreaTest : VimTestCase("\n") {
     assertState("""
       |${c}orem ipsum dolor sit amet,
     """.trimMargin())
+  }
+
+  @Test
+  fun `test colon at multipage hit-enter prompt closes message area and opens command line`() {
+    enterCommandForMultiPageOutput()
+    scrollOutputToEnd()
+    assertHitEnterPrompt()
+
+    doTypeText(":")
+    assertExOutputClosed()
+
+    assertNotNull(injector.commandLine.getActiveCommandLine())
   }
 
   // Single-line output panel
