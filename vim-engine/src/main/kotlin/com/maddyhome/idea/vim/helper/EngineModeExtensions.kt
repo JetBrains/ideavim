@@ -22,10 +22,19 @@ import com.maddyhome.idea.vim.state.mode.selectionType
 fun VimEditor.exitVisualMode() {
   val selectionType = mode.selectionType ?: SelectionType.CHARACTER_WISE
   SelectionVimListenerSuppressor.lock().use {
+    val clearAllSelections = { nativeCarets().forEach(VimCaret::removeSelection) }
     if (inBlockSelection) {
-      removeSecondaryCarets()
+      // removeSecondaryCarets() fires N-1 caretRemoved events. In split mode those events drive
+      // PatchEngineEditorSynchronizer, which walks all carets and ships an RD-protocol message
+      // per event — O(N²) per exit. Run inside the all-carets-action lifecycle so the
+      // synchronizer batches the deletions into a single end-of-op snapshot.
+      runAsAllCaretsAction {
+        removeSecondaryCarets()
+        clearAllSelections()
+      }
+    } else {
+      clearAllSelections()
     }
-    nativeCarets().forEach(VimCaret::removeSelection)
   }
   if (inVisualMode || inCommandLineModeWithVisual) {
     vimLastSelectionType = selectionType

@@ -88,3 +88,14 @@ sealed class VimListenerSuppressor {
 }
 
 object SelectionVimListenerSuppressor : VimListenerSuppressor()
+
+/**
+ * Suppresses IdeaVim's per-caret `updateCaretsVisualAttributes` side-effect that normally
+ * fires from `EditorCaretHandler.caretAdded`/`caretRemoved`. That handler is O(N) (walks all
+ * carets); when IntelliJ's `setBlockSelection` adds/removes N carets it fires N events, giving
+ * O(N²) per block-visual motion and a frozen EDT on large blocks.
+ *
+ * Lock around bulk caret-replacement operations, then run `updateCaretsVisualAttributes` once
+ * at the end (see [com.maddyhome.idea.vim.group.visual.setVisualSelection]'s BLOCK_WISE branch).
+ */
+object CaretVisualAttributesListenerSuppressor : VimListenerSuppressor()
