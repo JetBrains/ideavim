@@ -32,7 +32,9 @@ data class AbbrevClearCommand(val range: Range, val cmd: String, val modifier: C
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
     val variant = AbbrevClearVariant.matching(cmd) ?: return ExecutionResult.Error
-    val (bufferLocal, _) = stripBufferModifier(argument.trim())
+    // Only <buffer> is meaningful here. A spurious <expr> is silently ignored to match
+    // Vim's lenient parsing of clear commands.
+    val (bufferLocal, _) = parseArgument(argument.trim())
     if (bufferLocal) {
       injector.abbreviationGroup.clearBufferLocalAbbreviations(variant.modes, editor)
     } else {

@@ -188,7 +188,7 @@ class AbbrevCommandTest : VimExTestCase() {
     configureByText("${c}\n")
     enterCommand("iabbrev foo bar")
     enterCommand("iabbrev teh the")
-    assertCommandOutput("iabbrev", "i  foo           bar\ni  teh           the")
+    assertCommandOutput("iabbrev", "i  foo            bar\ni  teh            the")
   }
 
   @Test
@@ -196,7 +196,7 @@ class AbbrevCommandTest : VimExTestCase() {
     configureByText("${c}\n")
     enterCommand("iabbrev foo global")
     enterCommand("iabbrev <buffer> baz local")
-    assertCommandOutput("iabbrev", "i @baz           local\ni  foo           global")
+    assertCommandOutput("iabbrev", "i @baz            local\ni  foo            global")
   }
 
   @Test
@@ -204,13 +204,85 @@ class AbbrevCommandTest : VimExTestCase() {
     configureByText("${c}\n")
     enterCommand("iabbrev foo global")
     enterCommand("iabbrev <buffer> baz local")
-    assertCommandOutput("iabbrev <buffer>", "i @baz           local")
+    assertCommandOutput("iabbrev <buffer>", "i @baz            local")
   }
 
   @Test
   fun `cabbrev with no arguments lists only cmdline-mode abbreviations`() {
     enterCommand("iabbrev foo bar")
     enterCommand("cabbrev myabbrev myexpansion")
-    assertCommandOutput("cabbrev", "c  myabbrev      myexpansion")
+    assertCommandOutput("cabbrev", "c  myabbrev       myexpansion")
+  }
+
+  @Test
+  fun `iabbrev listing marks expr entries with asterisk`() {
+    configureByText("${c}\n")
+    enterCommand("iabbrev foo bar")
+    enterCommand("iabbrev <expr> dt 1+2")
+    assertCommandOutput("iabbrev", "i  dt           * 1+2\ni  foo            bar")
+  }
+
+  @Test
+  fun `iabbrev with expr modifier evaluates rhs at expansion time`() {
+    configureByText("${c}\n")
+    enterCommand("iabbrev <expr> dt 1+2")
+    typeText("i", "dt ")
+    assertState("3 \n")
+  }
+
+  @Test
+  fun `iabbrev with expr modifier supports string expressions`() {
+    configureByText("${c}\n")
+    enterCommand("""iabbrev <expr> shout toupper("hello")""")
+    typeText("i", "shout ")
+    assertState("HELLO \n")
+  }
+
+  @Test
+  fun `iabbrev with expr re-evaluates on each expansion`() {
+    configureByText("${c}\n")
+    enterCommand("let g:n = 0")
+    enterCommand("iabbrev <expr> n g:n")
+    enterCommand("let g:n = 7")
+    typeText("i", "n ")
+    assertState("7 \n")
+  }
+
+  @Test
+  fun `iabbrev with buffer modifier before expr modifier works`() {
+    configureByText("${c}\n")
+    enterCommand("iabbrev <buffer> <expr> add 1+1")
+    typeText("i", "add ")
+    assertState("2 \n")
+  }
+
+  @Test
+  fun `iabbrev with expr modifier before buffer modifier works`() {
+    configureByText("${c}\n")
+    enterCommand("iabbrev <expr> <buffer> add 1+1")
+    typeText("i", "add ")
+    assertState("2 \n")
+  }
+
+  @Test
+  fun `iabbrev with expr accepts an invalid expression at registration time`() {
+    configureByText("\n")
+    enterCommand("iabbrev <expr> bad 1+")
+    assertPluginError(false)
+  }
+
+  @Test
+  fun `cabbrev with expr evaluates rhs in cmdline`() {
+    enterCommand("cabbrev <expr> myabbrev 1+1")
+    typeText(":myabbrev ")
+    assertExText("2 ")
+  }
+
+  @Test
+  fun `should show error when trying to evaluate an invalid expression`() {
+    configureByText("\n")
+    enterCommand("iabbrev <expr> myabbrev bad")
+    typeText("i myabbrev ")
+    assertPluginErrorMessage("E121: Undefined variable: bad")
   }
 }

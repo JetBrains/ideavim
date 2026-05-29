@@ -37,10 +37,12 @@ data class AbbrevCommand(val range: Range, val cmd: String, val modifier: Comman
     when (val parsed = parseAbbrevArgument(argument)) {
       is AbbrevArgument.Definition -> if (parsed.bufferLocal) {
         injector.abbreviationGroup.setBufferLocalAbbreviation(
-          parsed.lhs, parsed.rhs, variant.modes, variant.recursive, editor,
+          parsed.toEntry(variant.modes, variant.recursive), editor
         )
       } else {
-        injector.abbreviationGroup.setAbbreviation(parsed.lhs, parsed.rhs, variant.modes, variant.recursive)
+        injector.abbreviationGroup.setAbbreviation(
+          parsed.toEntry(variant.modes, variant.recursive)
+        )
       }
 
       is AbbrevArgument.Listing -> showAbbreviations(variant.modes, parsed.bufferLocal, editor)
@@ -50,7 +52,9 @@ data class AbbrevCommand(val range: Range, val cmd: String, val modifier: Comman
 
   private fun showAbbreviations(modes: Set<MappingMode>, bufferLocalOnly: Boolean, editor: VimEditor) {
     val listings = injector.abbreviationGroup.listAbbreviations(modes, editor, bufferLocalOnly)
-    val output = if (listings.isEmpty()) NO_ABBREVIATIONS_FOUND else listings.joinToString(separator = "\n", transform = ::formatListingLine)
+    val output = if (listings.isEmpty()) NO_ABBREVIATIONS_FOUND else listings.joinToString(
+      separator = "\n", transform = ::formatListingLine
+    )
     showOutputPanel(editor, output)
   }
 
@@ -63,9 +67,10 @@ data class AbbrevCommand(val range: Range, val cmd: String, val modifier: Comman
 
   private fun formatListingLine(listing: AbbreviationListing): String {
     val modeChar = modeCharOf(listing.mode)
-    val scopeMarker = if (listing.bufferLocal) BUFFER_LOCAL_MARKER else GLOBAL_MARKER
-    val paddedLhs = listing.entry.lhs.padEnd(LHS_COLUMN_WIDTH, ' ')
-    return "$modeChar $scopeMarker$paddedLhs ${listing.entry.rhs}"
+    val scopeMarker = if (listing.bufferLocal) BUFFER_LOCAL_MARKER else NO_MARKER
+    val exprMarker = if (listing.isExpression) EXPRESSION_MARKER else NO_MARKER
+    val paddedLhs = listing.lhs.padEnd(LHS_COLUMN_WIDTH, ' ')
+    return "$modeChar $scopeMarker$paddedLhs$exprMarker ${listing.rhs}"
   }
 
   private fun modeCharOf(mode: MappingMode): Char = when (mode) {
@@ -77,7 +82,8 @@ data class AbbrevCommand(val range: Range, val cmd: String, val modifier: Comman
   private companion object {
     private const val LHS_COLUMN_WIDTH = 13
     private const val BUFFER_LOCAL_MARKER = '@'
-    private const val GLOBAL_MARKER = ' '
+    private const val EXPRESSION_MARKER = '*'
+    private const val NO_MARKER = ' '
     private const val NO_ABBREVIATIONS_FOUND = "No abbreviations found"
   }
 
