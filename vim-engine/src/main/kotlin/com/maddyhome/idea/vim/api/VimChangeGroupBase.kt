@@ -809,9 +809,9 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     val lineStart = editor.getLineStartOffset(editor.offsetToBufferPosition(caret.offset).line)
     val lhsRange = findAbbreviationLhsRange(editor.text(), caret.offset, lineStart) ?: return
     val lhs = editor.text().subSequence(lhsRange.startOffset, lhsRange.endOffset).toString()
-    val entry = injector.abbreviationGroup.getAbbreviation(lhs, MappingMode.INSERT, editor) ?: return
+    val entry = injector.abbreviationGroup.resolveAbbreviation(lhs, MappingMode.INSERT, editor) ?: return
 
-    replaceWithRhs(editor, caret, lhsRange, entry.rhs)
+    replaceWithRhs(editor, caret, lhsRange, entry)
   }
 
   private fun replaceWithRhs(editor: VimEditor, caret: VimCaret, lhsRange: TextRange, rhs: String) {

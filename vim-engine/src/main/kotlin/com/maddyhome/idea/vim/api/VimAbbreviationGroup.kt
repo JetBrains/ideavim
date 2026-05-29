@@ -26,22 +26,16 @@ import com.maddyhome.idea.vim.key.AbbreviationEntry
  */
 interface VimAbbreviationGroup {
   /** Add or replace a global abbreviation for the given set of modes. */
-  fun setAbbreviation(lhs: String, rhs: String, modes: Set<MappingMode>, recursive: Boolean)
+  fun setAbbreviation(abbrev: AbbreviationEntry)
 
   /** Add or replace a buffer-local abbreviation in the [editor]'s document. */
-  fun setBufferLocalAbbreviation(
-    lhs: String,
-    rhs: String,
-    modes: Set<MappingMode>,
-    recursive: Boolean,
-    editor: VimEditor,
-  )
+  fun setBufferLocalAbbreviation(abbrev: AbbreviationEntry, editor: VimEditor)
 
   /**
    * Return the effective abbreviation for [lhs] in [mode]: buffer-local first (from [editor]'s
    * document), then global.
    */
-  fun getAbbreviation(lhs: String, mode: MappingMode, editor: VimEditor): AbbreviationEntry?
+  fun resolveAbbreviation(lhs: String, mode: MappingMode, editor: VimEditor): String?
 
   /** Remove the global abbreviation registered for [lhs] in each of the given [modes]. */
   fun removeAbbreviation(lhs: String, modes: Set<MappingMode>)
@@ -65,7 +59,9 @@ interface VimAbbreviationGroup {
 
 /** A single row for `:abbreviate`-family listing output. */
 data class AbbreviationListing(
-  val entry: AbbreviationEntry,
+  val lhs: String,
+  val rhs: String,
   val mode: MappingMode,
   val bufferLocal: Boolean,
+  val isExpression: Boolean,
 )

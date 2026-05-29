@@ -32,9 +32,9 @@ data class UnabbrevCommand(val range: Range, val cmd: String, val modifier: Comm
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
     val variant = UnabbrevVariant.matching(cmd) ?: return ExecutionResult.Error
-    val (bufferLocal, remaining) = stripBufferModifier(argument.trim())
-    val lhs = remaining.ifEmpty { return ExecutionResult.Error }
-    if (bufferLocal) {
+    val parsedArgument = parseArgument(argument.trim())
+    val lhs = parsedArgument.rest.ifEmpty { return ExecutionResult.Error }
+    if (parsedArgument.bufferLocal) {
       injector.abbreviationGroup.removeBufferLocalAbbreviation(lhs, variant.modes, editor)
     } else {
       injector.abbreviationGroup.removeAbbreviation(lhs, variant.modes)

@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.key.AbbreviationEntry
+import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 
 private typealias EntriesByMode = MutableMap<MappingMode, MutableMap<String, AbbreviationEntry>>
 
@@ -19,25 +20,44 @@ private val BUFFER_LOCAL_ABBREVIATIONS: Key<EntriesByMode> = Key("abbreviation.b
 open class VimAbbreviationGroupBase : VimAbbreviationGroup {
   private val globalEntriesByMode: EntriesByMode = mutableMapOf()
 
-  override fun setAbbreviation(lhs: String, rhs: String, modes: Set<MappingMode>, recursive: Boolean) {
-    requireValidAbbreviationLhs(lhs)
-    storeEntry(globalEntriesByMode, lhs, rhs, modes, recursive)
+  override fun setAbbreviation(
+    abbrev: AbbreviationEntry,
+  ) {
+    requireValidAbbreviationLhs(abbrev.lhs)
+    storeEntry(globalEntriesByMode, abbrev)
   }
 
   override fun setBufferLocalAbbreviation(
-    lhs: String,
-    rhs: String,
-    modes: Set<MappingMode>,
-    recursive: Boolean,
+    abbrev: AbbreviationEntry,
     editor: VimEditor,
   ) {
-    requireValidAbbreviationLhs(lhs)
-    storeEntry(bufferLocalEntries(editor), lhs, rhs, modes, recursive)
+    requireValidAbbreviationLhs(abbrev.lhs)
+    storeEntry(bufferLocalEntries(editor), abbrev)
   }
 
-  override fun getAbbreviation(lhs: String, mode: MappingMode, editor: VimEditor): AbbreviationEntry? =
+  override fun resolveAbbreviation(lhs: String, mode: MappingMode, editor: VimEditor): String? {
+    val entry = lookupEntry(lhs, mode, editor) ?: return null
+    return if (entry.expression) evaluateExpression(entry, editor) else entry.rhs
+  }
+
+  private fun lookupEntry(lhs: String, mode: MappingMode, editor: VimEditor): AbbreviationEntry? =
     bufferLocalEntriesIfPresent(editor)?.get(mode)?.get(lhs)
       ?: globalEntriesByMode[mode]?.get(lhs)
+
+  private fun evaluateExpression(entry: AbbreviationEntry, editor: VimEditor): String? {
+    val expression = injector.vimscriptParser.parseExpression(entry.rhs)
+    if (expression == null) {
+      injector.messages.showErrorMessage(editor, injector.messages.message("E15", entry.rhs))
+      return null
+    }
+    val context = injector.executionContextManager.getEditorExecutionContext(editor)
+    return try {
+      expression.evaluate(editor, context, CommandLineVimLContext).toOutputString()
+    } catch (e: Exception) {
+      injector.messages.showErrorMessage(editor, e.message ?: injector.messages.message("E15", entry.rhs))
+      null
+    }
+  }
 
   override fun removeAbbreviation(lhs: String, modes: Set<MappingMode>) {
     modes.forEach { mode -> globalEntriesByMode[mode]?.remove(lhs) }
@@ -65,13 +85,16 @@ open class VimAbbreviationGroupBase : VimAbbreviationGroup {
     val result = mutableListOf<AbbreviationListing>()
     val buffer = bufferLocalEntriesIfPresent(editor)
     modes.forEach { mode ->
-      buffer?.get(mode)?.values?.forEach { result.add(AbbreviationListing(it, mode, bufferLocal = true)) }
+      buffer?.get(mode)?.values?.forEach { result.add(it.toListing(mode, bufferLocal = true)) }
       if (!bufferLocalOnly) {
-        globalEntriesByMode[mode]?.values?.forEach { result.add(AbbreviationListing(it, mode, bufferLocal = false)) }
+        globalEntriesByMode[mode]?.values?.forEach { result.add(it.toListing(mode, bufferLocal = false)) }
       }
     }
-    return result.sortedBy { it.entry.lhs }
+    return result.sortedBy { it.lhs }
   }
+
+  private fun AbbreviationEntry.toListing(mode: MappingMode, bufferLocal: Boolean): AbbreviationListing =
+    AbbreviationListing(lhs, rhs, mode, bufferLocal, isExpression = expression)
 
   private fun bufferLocalEntries(editor: VimEditor): EntriesByMode =
     injector.vimStorageService.getOrPutBufferData(editor, BUFFER_LOCAL_ABBREVIATIONS) { mutableMapOf() }
@@ -81,13 +104,9 @@ open class VimAbbreviationGroupBase : VimAbbreviationGroup {
 
   private fun storeEntry(
     target: EntriesByMode,
-    lhs: String,
-    rhs: String,
-    modes: Set<MappingMode>,
-    recursive: Boolean,
+    abbrev: AbbreviationEntry,
   ) {
-    val entry = AbbreviationEntry(lhs, rhs, modes, recursive)
-    modes.forEach { mode -> target.getOrPut(mode) { mutableMapOf() }[lhs] = entry }
+    abbrev.modes.forEach { mode -> target.getOrPut(mode) { mutableMapOf() }[abbrev.lhs] = abbrev }
   }
 
   private fun requireValidAbbreviationLhs(lhs: String) {
@@ -105,8 +124,7 @@ open class VimAbbreviationGroupBase : VimAbbreviationGroup {
 
   private fun isFullId(lhs: String): Boolean = lhs.all(::isKeywordChar)
 
-  private fun isEndId(lhs: String): Boolean =
-    isKeywordChar(lhs.last()) && lhs.dropLast(1).none(::isKeywordChar)
+  private fun isEndId(lhs: String): Boolean = isKeywordChar(lhs.last()) && lhs.dropLast(1).none(::isKeywordChar)
 
   private fun isNonId(lhs: String): Boolean = !isKeywordChar(lhs.last())
 

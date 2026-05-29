@@ -15,4 +15,6 @@ data class AbbreviationEntry(
   val rhs: String,
   val modes: Set<MappingMode>,
   val recursive: Boolean,
+  val expression: Boolean,
 )
+
