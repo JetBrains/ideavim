@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.newapi
 
 import com.intellij.codeInsight.folding.impl.FoldingUtil
 import com.intellij.execution.impl.ConsoleViewImpl
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorModificationUtil
 import com.intellij.openapi.editor.FoldRegion
@@ -346,6 +347,41 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase() {
     val startPosition = LogicalPosition(start.line, start.column, start.leansForward)
     val endPosition = LogicalPosition(end.line, end.column, end.leansForward)
     editor.selectionModel.vimSetSystemBlockSelectionSilently(startPosition, endPosition)
+  }
+
+  override fun runBatchCaretOperation(runnable: () -> Unit) {
+    editor.caretModel.runBatchCaretOperation(runnable)
+  }
+
+  override fun runAsAllCaretsAction(runnable: () -> Unit) {
+    // Piggy-back on runForEachCaret to fire the CaretActionListener
+    // `beforeAllCaretsAction`/`afterAllCaretsAction` pair, which is split-mode's
+    // PatchEngineEditorSynchronizer's batching window: per-caret events fired during the
+    // runnable get swallowed (`isInsideAllCaretsAction` is true), and a single snapshot is sent
+    // over the RD protocol at the end — instead of N caret events × walk-all-N-carets
+    // serialization, which is O(N²) for block-visual motions on large blocks.
+    //
+    // The action is run exactly once regardless of caret count; we use runForEachCaret purely
+    // for its lifecycle. Caller must guarantee no nested runForEachCaret (e.g. no IDE actions);
+    // we fall back to a plain batch if that contract is broken.
+    if (ApplicationManager.getApplication().isDispatchThread()) {
+      try {
+        runOnceInsideRunForEachCaret(runnable)
+        return
+      } catch (_: IllegalStateException) {
+        // Already inside runForEachCaret — fall back to plain batch.
+      }
+    }
+    editor.caretModel.runBatchCaretOperation(runnable)
+  }
+
+  private fun runOnceInsideRunForEachCaret(runnable: () -> Unit) {
+    var alreadyRan = false
+    editor.caretModel.runForEachCaret {
+      if (alreadyRan) return@runForEachCaret
+      alreadyRan = true
+      runnable()
+    }
   }
 
   override fun getLineStartOffset(line: Int): Int {

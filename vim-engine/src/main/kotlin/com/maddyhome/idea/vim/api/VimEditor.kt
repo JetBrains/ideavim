@@ -185,6 +185,34 @@ interface VimEditor {
   fun removeSecondaryCarets()
   fun vimSetSystemBlockSelectionSilently(start: BufferPosition, end: BufferPosition)
 
+  /**
+   * Run a bulk caret-modifying operation. On IntelliJ this delegates to
+   * `CaretModel.runBatchCaretOperation`, which defers caret-merging until the runnable returns
+   * — useful when replacing many carets at once (e.g. block-visual `setBlockSelection`).
+   * Default is to just invoke the runnable; non-IDE editors don't need merging semantics.
+   *
+   * Safe to use around IDE-action replay (e.g. `repeatInsert`).
+   */
+  fun runBatchCaretOperation(runnable: () -> Unit) {
+    runnable()
+  }
+
+  /**
+   * Run a bulk caret-modifying operation inside an "all-carets-action" lifecycle. On IntelliJ
+   * this piggy-backs on `CaretModel.runForEachCaret` so the `beforeAllCaretsAction` /
+   * `afterAllCaretsAction` listener pair fires around the runnable. Split-mode's caret
+   * synchronizer uses that pair as a batching window — without it, every per-caret event ships
+   * a separate RD-protocol message, giving O(N²) per block-visual motion.
+   *
+   * IMPORTANT: the runnable must NOT execute IntelliJ actions that themselves call
+   * `runForEachCaret` (e.g. `EditorActionExecutor.executeAction(<BS>)`). Such nested calls
+   * throw `IllegalStateException("Recursive runForEachCaret invocations are not allowed")`.
+   * Use [runBatchCaretOperation] for IDE-action replay.
+   */
+  fun runAsAllCaretsAction(runnable: () -> Unit) {
+    runnable()
+  }
+
   fun getLineStartOffset(line: Int): Int
   fun getLineEndOffset(line: Int): Int
 

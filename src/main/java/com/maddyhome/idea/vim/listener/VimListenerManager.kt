@@ -955,12 +955,18 @@ object VimListenerManager {
       }
     }
 
-    override fun caretAdded(event: CaretEvent) {
-      event.editor.updateCaretsVisualAttributes()
-    }
+    override fun caretAdded(event: CaretEvent) = updateAttributesUnlessSuppressed(event)
+    override fun caretRemoved(event: CaretEvent) = updateAttributesUnlessSuppressed(event)
 
-    override fun caretRemoved(event: CaretEvent) {
-      event.editor.updateCaretsVisualAttributes()
+    // updateCaretsVisualAttributes() walks every caret in the editor. A single block-visual
+    // motion can fire caretAdded/caretRemoved N times (one per caret added/removed by
+    // setBlockSelection), giving O(N²) per motion. When wrapped in
+    // [CaretVisualAttributesListenerSuppressor], skip the walk; the bulk op runs one final
+    // update at the end.
+    private fun updateAttributesUnlessSuppressed(event: CaretEvent) {
+      if (CaretVisualAttributesListenerSuppressor.isNotLocked) {
+        event.editor.updateCaretsVisualAttributes()
+      }
     }
   }
 

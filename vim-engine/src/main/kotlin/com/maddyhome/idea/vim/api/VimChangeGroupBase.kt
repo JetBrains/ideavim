@@ -319,38 +319,46 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     count: Int,
     started: Boolean,
   ) {
-    for (caret in editor.nativeCarets()) {
-      if (repeatLines > 0) {
-        val visualLine = caret.getVisualPosition().line
-        val bufferLine = caret.getBufferPosition().line
-        val position = editor.bufferPositionToOffset(BufferPosition(bufferLine, repeatColumn, false))
-        for (i in 0 until repeatLines) {
-          if (repeatAppend &&
-            (repeatColumn < VimMotionGroupBase.LAST_COLUMN) &&
-            (injector.engineEditorHelper.getVisualLineLength(editor, visualLine + i) < repeatColumn)
-          ) {
-            val pad = injector.engineEditorHelper.pad(editor, bufferLine + i, repeatColumn)
-            if (pad.isNotEmpty()) {
-              val offset = editor.getLineEndOffset(bufferLine + i)
-              insertText(editor, caret, offset, pad)
+    // Defer caret merging across the row-by-row replay. We deliberately do NOT use
+    // `runAsAllCaretsAction` here: the replay may execute IDE actions (e.g. `<BS>` as a
+    // NativeAction stroke), and those typically call `runForEachCaret` themselves — nesting
+    // throws `IllegalStateException`. The plain batch is safe and still gives us merging
+    // deferral; the split-mode caret-event explosion is bounded by the listener gating in
+    // `EditorCaretHandler` and the wraps at the (non-replay) call sites.
+    editor.runBatchCaretOperation {
+      for (caret in editor.nativeCarets()) {
+        if (repeatLines > 0) {
+          val visualLine = caret.getVisualPosition().line
+          val bufferLine = caret.getBufferPosition().line
+          val position = editor.bufferPositionToOffset(BufferPosition(bufferLine, repeatColumn, false))
+          for (i in 0 until repeatLines) {
+            if (repeatAppend &&
+              (repeatColumn < VimMotionGroupBase.LAST_COLUMN) &&
+              (injector.engineEditorHelper.getVisualLineLength(editor, visualLine + i) < repeatColumn)
+            ) {
+              val pad = injector.engineEditorHelper.pad(editor, bufferLine + i, repeatColumn)
+              if (pad.isNotEmpty()) {
+                val offset = editor.getLineEndOffset(bufferLine + i)
+                insertText(editor, caret, offset, pad)
+              }
+            }
+            val updatedCount = if (started) (if (i == 0) count else count + 1) else count
+            if (repeatColumn >= VimMotionGroupBase.LAST_COLUMN) {
+              caret.moveToOffset(injector.motion.moveCaretToLineEnd(editor, bufferLine + i, true))
+              repeatInsertText(editor, context, updatedCount)
+            } else if (injector.engineEditorHelper.getVisualLineLength(editor, visualLine + i) >= repeatColumn) {
+              val visualPosition = VimVisualPosition(visualLine + i, repeatColumn, false)
+              val inlaysCount = injector.engineEditorHelper.amountOfInlaysBeforeVisualPosition(editor, visualPosition)
+              caret.moveToVisualPosition(VimVisualPosition(visualLine + i, repeatColumn + inlaysCount, false))
+              repeatInsertText(editor, context, updatedCount)
             }
           }
-          val updatedCount = if (started) (if (i == 0) count else count + 1) else count
-          if (repeatColumn >= VimMotionGroupBase.LAST_COLUMN) {
-            caret.moveToOffset(injector.motion.moveCaretToLineEnd(editor, bufferLine + i, true))
-            repeatInsertText(editor, context, updatedCount)
-          } else if (injector.engineEditorHelper.getVisualLineLength(editor, visualLine + i) >= repeatColumn) {
-            val visualPosition = VimVisualPosition(visualLine + i, repeatColumn, false)
-            val inlaysCount = injector.engineEditorHelper.amountOfInlaysBeforeVisualPosition(editor, visualPosition)
-            caret.moveToVisualPosition(VimVisualPosition(visualLine + i, repeatColumn + inlaysCount, false))
-            repeatInsertText(editor, context, updatedCount)
-          }
+          caret.moveToOffset(position)
+        } else {
+          repeatInsertText(editor, context, count)
+          val position = injector.motion.getHorizontalMotion(editor, caret, -1, false)
+          caret.moveToMotion(position)
         }
-        caret.moveToOffset(position)
-      } else {
-        repeatInsertText(editor, context, count)
-        val position = injector.motion.getHorizontalMotion(editor, caret, -1, false)
-        caret.moveToMotion(position)
       }
     }
     repeatLines = 0

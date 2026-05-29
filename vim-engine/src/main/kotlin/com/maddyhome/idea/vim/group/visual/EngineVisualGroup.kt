@@ -17,6 +17,7 @@ import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.isLineEmpty
 import com.maddyhome.idea.vim.helper.VimLockLabel
+import com.maddyhome.idea.vim.listener.CaretVisualAttributesListenerSuppressor
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.inBlockSelection
@@ -42,52 +43,71 @@ fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: VimCaret) 
     }
 
     SelectionType.BLOCK_WISE -> {
-      // This will invalidate any secondary carets, but we shouldn't have any of these cached in local variables, etc.
-      editor.removeSecondaryCarets()
+      // Suppress our own EditorCaretHandler during the bulk caret replacement — without this,
+      // each of the N caretAdded/caretRemoved events fired by setBlockSelection triggers an
+      // O(N) `updateCaretsVisualAttributes` walk, giving O(N²) per block-visual motion and an
+      // unresponsive EDT on large blocks. The single update at the end of this block is enough.
+      //
+      // runAsAllCaretsAction fires the all-carets-action listener pair so split mode's
+      // PatchEngineEditorSynchronizer batches its per-event protocol sends into one snapshot.
+      // Safe here because the body doesn't run any IDE actions (only Vim-internal caret moves).
+      CaretVisualAttributesListenerSuppressor.lock().use {
+        editor.runAsAllCaretsAction {
+          // This will invalidate any secondary carets, but we shouldn't have any of these cached
+          // in local variables, etc. Required for correctness: setCaretsAndSelections reuses
+          // existing carets by insertion order, and Vim's `vimSelectionStart` user-data is
+          // attached to a specific caret instance — if a different caret becomes primary
+          // (e.g. after `O`-swap then `k` shrinking the block), the anchor stored on the now-
+          // removed caret is lost. Pre-clearing ensures primary is always the same caret
+          // throughout a block-visual session.
+          editor.removeSecondaryCarets()
 
-      // Set system selection
-      val (blockStart, blockEnd) = blockToNativeSelection(editor, selectionStart, selectionEnd, mode)
-      val lastColumn = editor.primaryCaret().vimLastColumn
+          // WARNING! This can invalidate the primary caret! I.e. the `caret` parameter will no
+          // longer be the primary caret. Given an existing visual block selection, moving the
+          // caret will first remove all secondary carets (above) then this method will ask
+          // IntelliJ to create a new multi-caret block selection. If we're moving up (`k`) a new
+          // caret is added, and becomes the new primary caret. The current `caret` parameter
+          // remains valid, but is no longer the primary caret. Make sure to fetch the new
+          // primary caret if necessary.
+          val (blockStart, blockEnd) = blockToNativeSelection(editor, selectionStart, selectionEnd, mode)
+          val lastColumn = editor.primaryCaret().vimLastColumn
+          editor.vimSetSystemBlockSelectionSilently(blockStart, blockEnd)
 
-      // WARNING! This can invalidate the primary caret! I.e. the `caret` parameter will no longer be the primary caret.
-      // Given an existing visual block selection, moving the caret will first remove all secondary carets (above) then
-      // this method will ask IntelliJ to create a new multi-caret block selection. If we're moving up (`k`) a new caret
-      // is added, and becomes the new primary caret. The current `caret` parameter remains valid, but is no longer the
-      // primary caret. Make sure to fetch the new primary caret if necessary.
-      editor.vimSetSystemBlockSelectionSilently(blockStart, blockEnd)
+          for (aCaret in editor.nativeCarets()) {
+            if (!aCaret.isValid) continue
+            val line = aCaret.getBufferPosition().line
+            val lineEndOffset = editor.getLineEndOffset(line, true)
+            val lineStartOffset = editor.getLineStartOffset(line)
 
-      // We've just added secondary carets again, hide them to better emulate block selection
-      injector.editorGroup.updateCaretsVisualAttributes(editor)
+            // Extend selection to line end if it was made with `$` command
+            if (lastColumn >= VimMotionGroupBase.LAST_COLUMN) {
+              aCaret.vimSetSystemSelectionSilently(aCaret.selectionStart, lineEndOffset)
+              val newOffset = (lineEndOffset - injector.visualMotionGroup.selectionAdj).coerceAtLeast(lineStartOffset)
+              aCaret.moveToInlayAwareOffset(newOffset)
+            }
+            val visualPosition = editor.offsetToVisualPosition(aCaret.selectionEnd)
+            if (aCaret.offset == aCaret.selectionEnd && visualPosition != aCaret.getVisualPosition()) {
+              // Put right caret position for tab character
+              aCaret.moveToVisualPosition(visualPosition)
+            }
+            if (mode !is Mode.SELECT &&
+              !editor.isLineEmpty(line, false) &&
+              aCaret.offset == aCaret.selectionEnd &&
+              aCaret.selectionEnd - 1 >= lineStartOffset &&
+              aCaret.selectionEnd - aCaret.selectionStart != 0
+            ) {
+              // Move all carets one char left in case if it's on selection end
+              aCaret.moveToVisualPosition(VimVisualPosition(visualPosition.line, visualPosition.column - 1))
+            }
+          }
 
-      for (aCaret in editor.nativeCarets()) {
-        if (!aCaret.isValid) continue
-        val line = aCaret.getBufferPosition().line
-        val lineEndOffset = editor.getLineEndOffset(line, true)
-        val lineStartOffset = editor.getLineStartOffset(line)
-
-        // Extend selection to line end if it was made with `$` command
-        if (lastColumn >= VimMotionGroupBase.LAST_COLUMN) {
-          aCaret.vimSetSystemSelectionSilently(aCaret.selectionStart, lineEndOffset)
-          val newOffset = (lineEndOffset - injector.visualMotionGroup.selectionAdj).coerceAtLeast(lineStartOffset)
-          aCaret.moveToInlayAwareOffset(newOffset)
-        }
-        val visualPosition = editor.offsetToVisualPosition(aCaret.selectionEnd)
-        if (aCaret.offset == aCaret.selectionEnd && visualPosition != aCaret.getVisualPosition()) {
-          // Put right caret position for tab character
-          aCaret.moveToVisualPosition(visualPosition)
-        }
-        if (mode !is Mode.SELECT &&
-          !editor.isLineEmpty(line, false) &&
-          aCaret.offset == aCaret.selectionEnd &&
-          aCaret.selectionEnd - 1 >= lineStartOffset &&
-          aCaret.selectionEnd - aCaret.selectionStart != 0
-        ) {
-          // Move all carets one char left in case if it's on selection end
-          aCaret.moveToVisualPosition(VimVisualPosition(visualPosition.line, visualPosition.column - 1))
+          editor.primaryCaret().moveToInlayAwareOffset(selectionEnd)
         }
       }
 
-      editor.primaryCaret().moveToInlayAwareOffset(selectionEnd)
+      // Hide secondary carets to better emulate block selection (suppressor skipped this
+      // during the bulk update).
+      injector.editorGroup.updateCaretsVisualAttributes(editor)
     }
   }
 
