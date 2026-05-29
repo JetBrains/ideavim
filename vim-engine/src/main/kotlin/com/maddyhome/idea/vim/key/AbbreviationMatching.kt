@@ -8,7 +8,46 @@
 
 package com.maddyhome.idea.vim.key
 
+import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper.isKeyword
+
+/**
+ * Editor-stable inputs to the abbreviation matcher.
+ *
+ *   * [text] is the buffer (editor body or cmdline) being scanned.
+ *   * [lineStart] is the offset of the first char on the current line — `0` for cmdline, the
+ *     current line's start offset for editor buffers.
+ *   * [editor] is needed only for the `'iskeyword'` lookup.
+ */
+internal class AbbreviationContext(
+  val text: CharSequence,
+  val lineStart: Int,
+  val editor: VimEditor,
+)
+
+/** A resolved abbreviation that's ready to replace a region in the buffer. */
+internal data class AbbreviationExpansion(val lhsRange: TextRange, val rhs: String)
+
+/**
+ * Find the lhs candidate immediately to the left of [caretOffset] and, if it matches a registered
+ * abbreviation in [mode], return the range to replace plus the resolved rhs.
+ *
+ * Combines the lhs walk-back with the storage lookup so the two expansion sites (insert mode and
+ * cmdline mode) don't repeat the substring/lookup dance.
+ */
+internal fun findAndResolveAbbreviation(
+  ctx: AbbreviationContext,
+  caretOffset: Int,
+  mode: MappingMode,
+): AbbreviationExpansion? {
+  val lhsRange = findAbbreviationLhsRange(ctx, caretOffset) ?: return null
+  val lhs = ctx.text.subSequence(lhsRange.startOffset, lhsRange.endOffset).toString()
+  val rhs = injector.abbreviationGroup.resolveAbbreviation(lhs, mode, ctx.editor) ?: return null
+  return AbbreviationExpansion(lhsRange, rhs)
+}
 
 /**
  * Find the lhs candidate immediately to the left of [caretOffset], per Vim's `:help abbreviations`:
@@ -21,30 +60,29 @@ import com.maddyhome.idea.vim.common.TextRange
  *
  * Returns null when there is no preceding char on the current line.
  */
-internal fun findAbbreviationLhsRange(text: CharSequence, caretOffset: Int, lineStart: Int): TextRange? {
-  if (caretOffset <= lineStart) return null
-  val start = if (isAbbreviationKeywordChar(text[caretOffset - 1])) {
-    walkBackKeywordLhs(text, caretOffset, lineStart)
+internal fun findAbbreviationLhsRange(ctx: AbbreviationContext, caretOffset: Int): TextRange? {
+  if (caretOffset <= ctx.lineStart) return null
+  val start = if (isKeyword(ctx.editor, ctx.text[caretOffset - 1])) {
+    walkBackKeywordLhs(ctx, caretOffset)
   } else {
-    walkBackNonIdLhs(text, caretOffset, lineStart)
+    walkBackNonIdLhs(ctx.text, caretOffset, ctx.lineStart)
   }
   return TextRange(start, caretOffset)
 }
-
-internal fun isAbbreviationKeywordChar(c: Char): Boolean = c.isLetterOrDigit() || c == '_'
 
 /**
  * Walk back from a keyword-ending cursor. The lhs is the trailing keyword char plus every
  * preceding non-whitespace char of the same class as the char two-before-cursor. If there is
  * no char two-before-cursor, the class defaults to keyword (matching Vim's full-id behavior).
  */
-private fun walkBackKeywordLhs(text: CharSequence, caretOffset: Int, lineStart: Int): Int {
-  val hasSecondChar = caretOffset - 1 > lineStart
-  val expectedKeywordClass = if (hasSecondChar) isAbbreviationKeywordChar(text[caretOffset - 2]) else true
+private fun walkBackKeywordLhs(ctx: AbbreviationContext, caretOffset: Int): Int {
+  val hasSecondChar = caretOffset - 1 > ctx.lineStart
+  val expectedKeywordClass =
+    if (hasSecondChar) isKeyword(ctx.editor, ctx.text[caretOffset - 2]) else true
   var start = caretOffset - 1
-  while (start > lineStart) {
-    val c = text[start - 1]
-    if (c.isWhitespace() || isAbbreviationKeywordChar(c) != expectedKeywordClass) break
+  while (start > ctx.lineStart) {
+    val c = ctx.text[start - 1]
+    if (c.isWhitespace() || isKeyword(ctx.editor, c) != expectedKeywordClass) break
     start--
   }
   return start

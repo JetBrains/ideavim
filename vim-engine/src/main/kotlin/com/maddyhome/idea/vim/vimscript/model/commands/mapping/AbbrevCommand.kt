@@ -41,7 +41,7 @@ data class AbbrevCommand(val range: Range, val cmd: String, val modifier: Comman
         )
       } else {
         injector.abbreviationGroup.setAbbreviation(
-          parsed.toEntry(variant.modes, variant.recursive)
+          parsed.toEntry(variant.modes, variant.recursive), editor
         )
       }
 

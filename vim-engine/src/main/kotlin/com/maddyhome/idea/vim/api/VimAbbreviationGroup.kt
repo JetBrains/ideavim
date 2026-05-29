@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.key.AbbreviationEntry
  */
 interface VimAbbreviationGroup {
   /** Add or replace a global abbreviation for the given set of modes. */
-  fun setAbbreviation(abbrev: AbbreviationEntry)
+  fun setAbbreviation(abbrev: AbbreviationEntry, editor: VimEditor)
 
   /** Add or replace a buffer-local abbreviation in the [editor]'s document. */
   fun setBufferLocalAbbreviation(abbrev: AbbreviationEntry, editor: VimEditor)
