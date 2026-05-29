@@ -331,4 +331,35 @@ class AbbrevCommandTest : VimExTestCase() {
     typeText("i", "xyz-foo-bar ")
     assertState("xyz-foo-bar \n")
   }
+
+  @Test
+  fun `abbrev with no mode prefix lists entry under both modes as a single bang row`() {
+    enterCommand("abbrev foo bar")
+    assertCommandOutput("abbrev", "!  foo            bar")
+  }
+
+  @Test
+  fun `abbrev listing shows insert-only entry with i marker`() {
+    enterCommand("iabbrev foo bar")
+    assertCommandOutput("abbrev", "i  foo            bar")
+  }
+
+  @Test
+  fun `abbrev listing shows cmdline-only entry with c marker`() {
+    enterCommand("cabbrev foo bar")
+    assertCommandOutput("abbrev", "c  foo            bar")
+  }
+
+  @Test
+  fun `abbrev listing shows separate rows when insert and cmdline have different rhs for same lhs`() {
+    enterCommand("iabbrev foo insertRhs")
+    enterCommand("cabbrev foo cmdlineRhs")
+    assertCommandOutput("abbrev", "c  foo            cmdlineRhs\ni  foo            insertRhs")
+  }
+
+  @Test
+  fun `abbrev listing merges bang row even with expr modifier`() {
+    enterCommand("abbrev <expr> foo 1+1")
+    assertCommandOutput("abbrev", "!  foo          * 1+1")
+  }
 }

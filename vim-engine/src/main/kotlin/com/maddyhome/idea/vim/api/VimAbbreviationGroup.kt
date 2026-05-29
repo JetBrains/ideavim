@@ -57,11 +57,27 @@ interface VimAbbreviationGroup {
   fun listAbbreviations(modes: Set<MappingMode>, editor: VimEditor, bufferLocalOnly: Boolean): List<AbbreviationListing>
 }
 
-/** A single row for `:abbreviate`-family listing output. */
+/**
+ * A single row for `:abbreviate`-family listing output.
+ *
+ * [modes] holds every mode under which the same lhs+rhs (and same scope/expression flags) is
+ * registered, so a `:abbrev foo bar` registration that targets both Insert and Cmdline shows up
+ * as one listing with `modes = {INSERT, CMD_LINE}` and a `!` [modeChar], matching Vim.
+ */
 data class AbbreviationListing(
   val lhs: String,
   val rhs: String,
-  val mode: MappingMode,
+  val modes: Set<MappingMode>,
   val bufferLocal: Boolean,
   val isExpression: Boolean,
-)
+) {
+  /**
+   * Vim's listing prefix: `!` for both Insert and Cmdline, `i` for Insert only, `c` for Cmdline only.
+   */
+  val modeChar: Char
+    get() = when {
+      MappingMode.INSERT in modes && MappingMode.CMD_LINE in modes -> '!'
+      MappingMode.CMD_LINE in modes -> 'c'
+      else -> 'i'
+    }
+}

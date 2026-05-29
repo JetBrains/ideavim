@@ -84,19 +84,38 @@ open class VimAbbreviationGroupBase : VimAbbreviationGroup {
     editor: VimEditor,
     bufferLocalOnly: Boolean,
   ): List<AbbreviationListing> {
-    val result = mutableListOf<AbbreviationListing>()
+    val modesByKey = mutableMapOf<ListingGroupKey, MutableSet<MappingMode>>()
     val buffer = bufferLocalEntriesIfPresent(editor)
     modes.forEach { mode ->
-      buffer?.get(mode)?.values?.forEach { result.add(it.toListing(mode, bufferLocal = true)) }
+      buffer?.get(mode)?.values?.forEach { collectListing(modesByKey, it, mode, bufferLocal = true) }
       if (!bufferLocalOnly) {
-        globalEntriesByMode[mode]?.values?.forEach { result.add(it.toListing(mode, bufferLocal = false)) }
+        globalEntriesByMode[mode]?.values?.forEach { collectListing(modesByKey, it, mode, bufferLocal = false) }
       }
     }
-    return result.sortedBy { it.lhs }
+    return modesByKey
+      .map { (key, collectedModes) -> key.toListing(collectedModes) }
+      .sortedWith(compareBy({ it.lhs }, { it.modeChar }))
   }
 
-  private fun AbbreviationEntry.toListing(mode: MappingMode, bufferLocal: Boolean): AbbreviationListing =
-    AbbreviationListing(lhs, rhs, mode, bufferLocal, isExpression = expression)
+  private fun collectListing(
+    target: MutableMap<ListingGroupKey, MutableSet<MappingMode>>,
+    entry: AbbreviationEntry,
+    mode: MappingMode,
+    bufferLocal: Boolean,
+  ) {
+    val key = ListingGroupKey(entry.lhs, entry.rhs, entry.expression, bufferLocal)
+    target.getOrPut(key) { mutableSetOf() }.add(mode)
+  }
+
+  private data class ListingGroupKey(
+    val lhs: String,
+    val rhs: String,
+    val isExpression: Boolean,
+    val bufferLocal: Boolean,
+  ) {
+    fun toListing(modes: Set<MappingMode>): AbbreviationListing =
+      AbbreviationListing(lhs, rhs, modes, bufferLocal, isExpression)
+  }
 
   private fun bufferLocalEntries(editor: VimEditor): EntriesByMode =
     injector.vimStorageService.getOrPutBufferData(editor, BUFFER_LOCAL_ABBREVIATIONS) { mutableMapOf() }
