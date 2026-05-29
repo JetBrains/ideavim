@@ -66,17 +66,10 @@ data class AbbrevCommand(val range: Range, val cmd: String, val modifier: Comman
   }
 
   private fun formatListingLine(listing: AbbreviationListing): String {
-    val modeChar = modeCharOf(listing.mode)
     val scopeMarker = if (listing.bufferLocal) BUFFER_LOCAL_MARKER else NO_MARKER
     val exprMarker = if (listing.isExpression) EXPRESSION_MARKER else NO_MARKER
     val paddedLhs = listing.lhs.padEnd(LHS_COLUMN_WIDTH, ' ')
-    return "$modeChar $scopeMarker$paddedLhs$exprMarker ${listing.rhs}"
-  }
-
-  private fun modeCharOf(mode: MappingMode): Char = when (mode) {
-    MappingMode.INSERT -> 'i'
-    MappingMode.CMD_LINE -> 'c'
-    else -> '!'
+    return "${listing.modeChar} $scopeMarker$paddedLhs$exprMarker ${listing.rhs}"
   }
 
   private companion object {
