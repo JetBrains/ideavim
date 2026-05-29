@@ -53,6 +53,15 @@ interface VimCommandLine {
   val text: String
 
   /**
+   * The selected text in the command line
+   *
+   * Since this is not editor based text, it does not affect the editor's mode, and is therefore a modeless selection.
+   *
+   * See `:help modeless-selection` and `:help c_CTRL-Y`.
+   */
+  val modelessSelection: String
+
+  /**
    * @deprecated Use `text` instead
    *
    * It's now used in the com.github.dankinsoid.multicursor plugin

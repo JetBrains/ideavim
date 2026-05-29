@@ -44,6 +44,7 @@ import com.maddyhome.idea.vim.vimscript.model.commands.GlobalCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.SubstituteCommand
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import org.jetbrains.annotations.Contract
+import org.jetbrains.annotations.TestOnly
 import org.jetbrains.annotations.VisibleForTesting
 import java.awt.Color
 import java.awt.GridBagConstraints
@@ -409,6 +410,14 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
 
   override val text: String
     get() = entry.getText()
+
+  override val modelessSelection: String
+    get() = entry.selectedText ?: ""
+
+  @TestOnly
+  fun setModelessSelection(start: Int, end: Int) {
+    entry.select(start, end)
+  }
 
   override fun getRenderedText() = buildString {
     getRenderedText(entry.getUI().getRootView(entry))
