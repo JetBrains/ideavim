@@ -11,8 +11,9 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.history.VimHistory
-import com.maddyhome.idea.vim.key.findAbbreviationLhsRange
-import com.maddyhome.idea.vim.key.isAbbreviationKeywordChar
+import com.maddyhome.idea.vim.key.AbbreviationContext
+import com.maddyhome.idea.vim.key.findAndResolveAbbreviation
+import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper.isKeyword
 import org.jetbrains.annotations.TestOnly
 import javax.swing.KeyStroke
 
@@ -143,13 +144,12 @@ interface VimCommandLine {
    * abbreviation, replace the matched lhs in the cmdline buffer with the abbreviation's rhs.
    */
   fun tryExpandAbbreviation(trigger: Char) {
-    if (isAbbreviationKeywordChar(trigger)) return
+    if (isKeyword(editor, trigger)) return
     if (isAbbreviationInvalidated) return
-    val lhsRange = findAbbreviationLhsRange(text, caret.offset, lineStart = 0) ?: return
-    val lhs = text.substring(lhsRange.startOffset, lhsRange.endOffset)
-    val entry = injector.abbreviationGroup.resolveAbbreviation(lhs, MappingMode.CMD_LINE, editor) ?: return
-    deleteText(lhsRange.startOffset, lhs.length)
-    insertText(lhsRange.startOffset, entry)
+    val ctx = AbbreviationContext(text, lineStart = 0, editor)
+    val expansion = findAndResolveAbbreviation(ctx, caret.offset, MappingMode.CMD_LINE) ?: return
+    deleteText(expansion.lhsRange.startOffset, expansion.lhsRange.endOffset - expansion.lhsRange.startOffset)
+    insertText(expansion.lhsRange.startOffset, expansion.rhs)
   }
 
   // FIXME I don't want it to conflict with Swings `requestFocus` and can suggest a better name

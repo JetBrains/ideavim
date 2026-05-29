@@ -31,13 +31,14 @@ import com.maddyhome.idea.vim.helper.NumberType
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.endOffsetInclusive
 import com.maddyhome.idea.vim.helper.usesVirtualSpace
-import com.maddyhome.idea.vim.key.findAbbreviationLhsRange
-import com.maddyhome.idea.vim.key.isAbbreviationKeywordChar
+import com.maddyhome.idea.vim.key.AbbreviationContext
+import com.maddyhome.idea.vim.key.findAndResolveAbbreviation
 import com.maddyhome.idea.vim.key.isAbbreviationSessionInvalidated
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_END
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_POS
 import com.maddyhome.idea.vim.mark.VimMarkConstants.MARK_CHANGE_START
+import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper.isKeyword
 import com.maddyhome.idea.vim.regexp.VimRegex
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_INSERTED_TEXT_REGISTER
@@ -803,15 +804,13 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   }
 
   protected fun tryExpandAbbreviation(editor: VimEditor, trigger: Char) {
-    if (isAbbreviationKeywordChar(trigger)) return
+    if (isKeyword(editor, trigger)) return
     if (isAbbreviationSessionInvalidated(editor)) return
     val caret = editor.currentCaret()
     val lineStart = editor.getLineStartOffset(editor.offsetToBufferPosition(caret.offset).line)
-    val lhsRange = findAbbreviationLhsRange(editor.text(), caret.offset, lineStart) ?: return
-    val lhs = editor.text().subSequence(lhsRange.startOffset, lhsRange.endOffset).toString()
-    val entry = injector.abbreviationGroup.resolveAbbreviation(lhs, MappingMode.INSERT, editor) ?: return
-
-    replaceWithRhs(editor, caret, lhsRange, entry)
+    val ctx = AbbreviationContext(editor.text(), lineStart, editor)
+    val expansion = findAndResolveAbbreviation(ctx, caret.offset, MappingMode.INSERT) ?: return
+    replaceWithRhs(editor, caret, expansion.lhsRange, expansion.rhs)
   }
 
   private fun replaceWithRhs(editor: VimEditor, caret: VimCaret, lhsRange: TextRange, rhs: String) {

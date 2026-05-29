@@ -285,4 +285,50 @@ class AbbrevCommandTest : VimExTestCase() {
     typeText("i myabbrev ")
     assertPluginErrorMessage("E121: Undefined variable: bad")
   }
+
+  @Test
+  fun `iabbrev accepts a lhs with dash when iskeyword includes dash`() {
+    configureByText("${c}\n")
+    enterCommand("set iskeyword+=-")
+    enterCommand("iabbrev foo-bar baz")
+    assertPluginError(false)
+    typeText("i", "foo-bar ")
+    assertState("baz \n")
+  }
+
+  @Test
+  fun `iabbrev rejects a lhs with dash when iskeyword does not include dash`() {
+    configureByText("\n")
+    enterCommand("iabbrev foo-bar baz")
+    assertPluginError(true)
+  }
+
+  @Test
+  fun `iabbrev does not expand on dash trigger when iskeyword includes dash`() {
+    configureByText("${c}\n")
+    enterCommand("iabbrev foo bar")
+    enterCommand("set iskeyword+=-")
+    assertPluginError(false)
+    typeText("i", "foo-")
+    assertState("foo-\n")
+  }
+
+  @Test
+  fun `iabbrev still expands on space trigger after iskeyword change`() {
+    configureByText("${c}\n")
+    enterCommand("iabbrev foo bar")
+    enterCommand("set iskeyword+=-")
+    assertPluginError(false)
+    typeText("i", "foo ")
+    assertState("bar \n")
+  }
+
+  @Test
+  fun `iabbrev walk-back stops at whitespace when iskeyword includes dash`() {
+    configureByText("${c}\n")
+    enterCommand("set iskeyword+=-")
+    enterCommand("iabbrev foo-bar baz")
+    typeText("i", "xyz-foo-bar ")
+    assertState("xyz-foo-bar \n")
+  }
 }

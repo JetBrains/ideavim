@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.key.AbbreviationEntry
+import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper.isKeyword
 import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 
 private typealias EntriesByMode = MutableMap<MappingMode, MutableMap<String, AbbreviationEntry>>
@@ -22,8 +23,9 @@ open class VimAbbreviationGroupBase : VimAbbreviationGroup {
 
   override fun setAbbreviation(
     abbrev: AbbreviationEntry,
+    editor: VimEditor,
   ) {
-    requireValidAbbreviationLhs(abbrev.lhs)
+    requireValidAbbreviationLhs(editor, abbrev.lhs)
     storeEntry(globalEntriesByMode, abbrev)
   }
 
@@ -31,7 +33,7 @@ open class VimAbbreviationGroupBase : VimAbbreviationGroup {
     abbrev: AbbreviationEntry,
     editor: VimEditor,
   ) {
-    requireValidAbbreviationLhs(abbrev.lhs)
+    requireValidAbbreviationLhs(editor, abbrev.lhs)
     storeEntry(bufferLocalEntries(editor), abbrev)
   }
 
@@ -109,24 +111,23 @@ open class VimAbbreviationGroupBase : VimAbbreviationGroup {
     abbrev.modes.forEach { mode -> target.getOrPut(mode) { mutableMapOf() }[abbrev.lhs] = abbrev }
   }
 
-  private fun requireValidAbbreviationLhs(lhs: String) {
-    if (!isValidAbbreviationLhs(lhs)) {
+  private fun requireValidAbbreviationLhs(editor: VimEditor, lhs: String) {
+    if (!isValidAbbreviationLhs(editor, lhs)) {
       throw exExceptionMessage("E474.arg", lhs)
     }
   }
 
   /** Vim accepts only the three lhs shapes (full-id, end-id, non-id) defined in `:help abbreviations`. */
-  private fun isValidAbbreviationLhs(lhs: String): Boolean {
+  private fun isValidAbbreviationLhs(editor: VimEditor, lhs: String): Boolean {
     if (lhs.isEmpty()) return false
     if (lhs.any(Char::isWhitespace)) return false
-    return isFullId(lhs) || isEndId(lhs) || isNonId(lhs)
+    return isFullId(editor, lhs) || isEndId(editor, lhs) || isNonId(editor, lhs)
   }
 
-  private fun isFullId(lhs: String): Boolean = lhs.all(::isKeywordChar)
+  private fun isFullId(editor: VimEditor, lhs: String): Boolean = lhs.all { isKeyword(editor, it) }
 
-  private fun isEndId(lhs: String): Boolean = isKeywordChar(lhs.last()) && lhs.dropLast(1).none(::isKeywordChar)
+  private fun isEndId(editor: VimEditor, lhs: String): Boolean =
+    isKeyword(editor, lhs.last()) && lhs.dropLast(1).none { isKeyword(editor, it) }
 
-  private fun isNonId(lhs: String): Boolean = !isKeywordChar(lhs.last())
-
-  private fun isKeywordChar(c: Char): Boolean = c.isLetterOrDigit() || c == '_'
+  private fun isNonId(editor: VimEditor, lhs: String): Boolean = !isKeyword(editor, lhs.last())
 }
