@@ -362,4 +362,21 @@ class AbbrevCommandTest : VimExTestCase() {
     enterCommand("abbrev <expr> foo 1+1")
     assertCommandOutput("abbrev", "!  foo          * 1+1")
   }
+
+  @Test
+  fun `iabbrev expansion does not recurse when rhs contains the lhs`() {
+    configureByText("${c}\n")
+    enterCommand("iabbrev foo foo bar")
+    typeText("i", "foo ")
+    assertState("foo bar \n")
+  }
+
+  @Test
+  fun `iabbrev expansion does not recurse on cross-referenced abbreviations`() {
+    configureByText("${c}\n")
+    enterCommand("iabbrev foo bar")
+    enterCommand("iabbrev bar foo")
+    typeText("i", "foo ")
+    assertState("bar \n")
+  }
 }
