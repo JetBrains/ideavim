@@ -12,6 +12,7 @@ package org.jetbrains.plugins.ideavim.ui
 
 import com.intellij.util.application
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.register.RegisterConstants
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.ui.OutputPanel
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -1222,6 +1223,25 @@ class MessageAreaTest : VimTestCase("\n") {
     enterCommand("echo \"\\n\\n\"")
     assertPager()
     assertEquals(3, pageSize)
+  }
+
+  @Test
+  fun `test CTRL-Y with modeless selection copies to system clipboard`() {
+    enterCommand("echo \"Lorem ipsum\\nHello world\"")
+    assertHitEnterPrompt()
+    getOutputPanel().setModelessSelection(0, 5)
+    doTypeText("<C-Y>")
+    assertHitEnterPrompt()
+    assertRegister(RegisterConstants.CLIPBOARD_REGISTER, "Lorem")
+  }
+
+  @Test
+  fun `test CTRL-Y with no modeless selection does not copy to system clipboard`() {
+    enterCommand("echo \"Lorem ipsum\\nHello world\"")
+    assertHitEnterPrompt()
+    doTypeText("<C-Y>")
+    assertHitEnterPrompt()
+    assertRegister(RegisterConstants.CLIPBOARD_REGISTER, null)
   }
 
   private fun enterCommandForSingleLineOutput() {

@@ -38,9 +38,12 @@ import com.maddyhome.idea.vim.helper.requestFocus
 import com.maddyhome.idea.vim.helper.selectEditorFont
 import com.maddyhome.idea.vim.helper.vimMorePanel
 import com.maddyhome.idea.vim.newapi.IjVimEditor
+import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.register.RegisterConstants
 import com.maddyhome.idea.vim.ui.ex.GlassPaneManager
 import kotlinx.coroutines.delay
 import org.jetbrains.annotations.TestOnly
+import org.jetbrains.annotations.VisibleForTesting
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Cursor
@@ -104,7 +107,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
 
   var active: Boolean = false
 
-  @get:TestOnly
+  @get:VisibleForTesting
   var isSingleLine = false
     private set
 
@@ -121,7 +124,6 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
         // visible. We don't care about caret location and don't want it interfering with scroll position, so do nothing
       }
     }
-    textPane.highlighter = null
     textPane.editorKit = object : StyledEditorKit() {
       override fun getViewFactory(): ViewFactory {
         val factory = super.viewFactory
@@ -552,7 +554,9 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     // key codes are explicitly defined to match ASCII values
     if (key.keyChar.code == KeyEvent.VK_ENTER
       || key.keyChar.code == KeyEvent.VK_ESCAPE
-      || key.keyChar.code == KeyEvent.VK_BACK_SPACE) {
+      || key.keyChar.code == KeyEvent.VK_BACK_SPACE
+      || (key.keyChar != KeyEvent.CHAR_UNDEFINED && key.keyChar < '\u0020')
+    ) {
       return
     }
 
@@ -586,6 +590,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
       KeyEvent.VK_H if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) -> scrollLine(-1)
       KeyEvent.VK_PAGE_UP -> scrollPage(-1)
       KeyEvent.VK_B if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) -> scrollPage(-1)
+      KeyEvent.VK_Y if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) -> copyModelessSelection()
       else -> close(key)
     }
     else -> close(key)
@@ -613,11 +618,31 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
       KeyEvent.VK_H if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) -> scrollLine(-1)
       KeyEvent.VK_PAGE_UP -> scrollPage(-1)
       KeyEvent.VK_B if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) -> scrollPage(-1)
+      KeyEvent.VK_Y if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) -> copyModelessSelection()
       else -> onBadKey()
     }
     else -> onBadKey()
   }
 
+  /**
+   * Copy the modeless selection to the system clipboard
+   *
+   * When selecting text in the command line or at the hit-enter prompt, this does does not affect the current mode, and
+   * is known as modeless selection. Pressing `<C-Y>` will copy this selection to the system clipboard.
+   *
+   * See `:help modeless-selection` and `:help c_CTRL-Y`.
+   */
+  private fun copyModelessSelection() {
+    val selection = textPane.selectedText ?: return
+    injector.registerGroup.storeText(
+      editor.vim,
+      injector.executionContextManager.getEditorExecutionContext(editor.vim),
+      RegisterConstants.CLIPBOARD_REGISTER,
+      selection
+    )
+  }
+
+  @get:VisibleForTesting
   val isAtEnd: Boolean
     get() {
       if (isSingleLine) return true
@@ -643,6 +668,11 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
   @TestOnly
   fun scrollToHitEnterPrompt() {
     scrollToEnd()
+  }
+
+  @TestOnly
+  fun setModelessSelection(start: Int, end: Int) {
+    textPane.select(start, end)
   }
 
   private inner class OutputPanelKeyListener : KeyAdapter() {

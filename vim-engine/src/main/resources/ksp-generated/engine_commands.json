@@ -721,6 +721,11 @@
   },
   {
     "keys": "<C-Y>",
+    "class": "com.maddyhome.idea.vim.action.ex.CopyModelessSelectionAction",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-Y>",
     "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLineUpAction",
     "modes": "NXO"
   },
