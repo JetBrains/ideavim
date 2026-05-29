@@ -607,6 +607,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     'u' -> scrollHalfPage(-1)
     'k' -> scrollLine(-1)
     'q' -> close()
+    ':' -> close(key)
     KeyEvent.CHAR_UNDEFINED -> when (key.keyCode) {
       KeyEvent.VK_ESCAPE -> close()
       KeyEvent.VK_ENTER -> scrollLine()
@@ -688,7 +689,18 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
         return
       }
 
-      handleKey(KeyStroke.getKeyStrokeForEvent(e))
+      // Don't use the modifiers for key typed events. We won't get ctrl or alt for typed keys, and any character typed
+      // with shift will give us the actual key char (e.g, typing `Shift+;` will give us a key event with `Shift+:` and
+      // all we're interested in is the `:`). This is important for passing the keystroke to the editor. The command
+      // key consumer won't match `Shift+:` as `:`, so we won't be able to start a new command line.
+      // The exception is Space. There is no shifted key associated with Space so Shift+Space is treated as a separate
+      // keystroke
+      if (e.modifiersEx and KeyEvent.SHIFT_DOWN_MASK == KeyEvent.SHIFT_DOWN_MASK && e.keyChar == ' ') {
+        handleKey(KeyStroke.getKeyStrokeForEvent(e))
+      }
+      else {
+        handleKey(KeyStroke.getKeyStroke(e.keyChar))
+      }
     }
 
     override fun keyPressed(e: KeyEvent) {
