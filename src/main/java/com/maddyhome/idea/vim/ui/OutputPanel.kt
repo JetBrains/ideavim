@@ -252,7 +252,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     segments.add(TextLine(text, color))
   }
 
-  override fun show() {
+  override fun show(requireHitEnter: Boolean) {
     val currentPanel = injector.outputPanel.getCurrentOutputPanel()
     if (currentPanel != null && currentPanel != this) currentPanel.close()
 
@@ -261,13 +261,17 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     // Only activate (single-line or multiline) if we have text or enough empty lines to show in the pager (or testing
     // is telling us to always show the output panel). Otherwise, clear the text
     if (!active) {
-      if (textPane.text.isNotBlank()
+      if (requireHitEnter
+        || textPane.text.isNotBlank()
         || (textPane.text.isBlank() && (!allowHideEmptyText || countLines(textPane.text) > injector.globalOptions().cmdheight))) {
-        activate()
+        activate(requireHitEnter)
       }
       else {
         clearText()
       }
+    }
+    else {
+      positionPanel(isInitialPosition = false)
     }
 
     // Don't immediately clear the message if the action that caused it also (indirectly) causes a redraw
@@ -308,11 +312,11 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
   /**
    * Turns on the output panel for the given editor.
    */
-  private fun activate() {
+  private fun activate(requireHitEnter: Boolean) {
     glassPaneManager.activate(editor, this)
 
     setFontForElements()
-    positionPanel(isInitialPosition = true)
+    positionPanel(isInitialPosition = true, requireHitEnter)
     resetScroll()
 
     glassPaneManager.show()
@@ -364,7 +368,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     promptComponent.font = selectEditorFont(editor, promptComponent.text)
   }
 
-  private fun positionPanel(isInitialPosition: Boolean) {
+  private fun positionPanel(isInitialPosition: Boolean, requireHitEnter: Boolean = false) {
     val maxPanelSize = getMaxPanelSize() ?: return
     val lineHeight = textPane.getFontMetrics(textPane.font).height
     val lineCount = countLines(textPane.text)
@@ -375,7 +379,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
       // Simple output: single line that fits entirely - no label needed
       // Don't update the flag if we're resizing. We might change text wrapping moving from/to single-line output, but
       // we want to stay in the original mode
-      isSingleLine = lineCount <= injector.globalOptions().cmdheight && lineCount <= maxVisibleLines
+      isSingleLine = lineCount <= injector.globalOptions().cmdheight && lineCount <= maxVisibleLines && !requireHitEnter
       promptComponent.isVisible = !isSingleLine
     }
 
