@@ -81,9 +81,14 @@ internal data class CmdFilterCommand(val range: Range, val modifier: CommandModi
     val options = injector.globalOptions()
     return try {
       if (range.size() == 0) {
-        // Show command output in a window
+        // Show command output in a window. Vim always shows the hit-enter prompt when running an external command, and
+        // it always shows the command
         injector.processGroup.executeCommand(editor, command, null, workingDirectory, options)?.let {
-          injector.outputPanel.output(editor, context, it)
+          val outputPanel = injector.outputPanel.getOrCreate(editor, context)
+          outputPanel.clearText()
+          outputPanel.addText(":!$command\n")
+          outputPanel.addText(it)
+          outputPanel.show(requireHitEnter = true)
         }
         showExitCodeMessage(editor)
         lastCommand = command
@@ -117,7 +122,14 @@ internal data class CmdFilterCommand(val range: Range, val modifier: CommandModi
   private fun showExitCodeMessage(editor: VimEditor) {
     val exitCode = injector.processGroup.lastExitCode
     if (exitCode != null && exitCode != 0) {
-      injector.messages.showMessage(editor, "shell returned $exitCode")
+      val outputPanel = injector.outputPanel.getCurrentOutputPanel()
+      if (outputPanel != null) {
+        outputPanel.addText("\nShell returned $exitCode")
+        outputPanel.show()
+      }
+      else {
+        injector.messages.showMessage(editor, "shell returned $exitCode")
+      }
       injector.messages.indicateError()
     }
   }

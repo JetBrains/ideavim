@@ -30,7 +30,7 @@ interface VimOutputPanel {
   /**
    * This method shows the text output or updates the output text if the panel was already shown
    */
-  fun show()
+  fun show(requireHitEnter: Boolean = false)
 
   /**
    * Disposes or hides the output panel, depending on its implementation.
