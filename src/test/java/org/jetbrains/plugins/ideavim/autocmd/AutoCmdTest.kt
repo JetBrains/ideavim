@@ -28,7 +28,7 @@ class AutoCmdTest : VimTestCase() {
   @Test
   fun `should execute command on InsertEnter`() {
     enterCommand("autocmd InsertEnter * echo \"hi\"")
-    typeText(injector.parser.parseKeys("i"))
+    typeText("i")
     assertExOutput("hi")
   }
 
@@ -36,15 +36,15 @@ class AutoCmdTest : VimTestCase() {
   @Test
   fun `should do nothing on invalid syntax`() {
     enterCommand("autocmd InsertEnter  echo 23")
-    typeText(injector.parser.parseKeys("i"))
+    typeText("i")
     assertNoExOutput()
   }
 
   @Test
   fun `should execute command on InsertLeave`() {
     enterCommand("autocmd InsertLeave * echo 23")
-    typeText(injector.parser.parseKeys("i"))
-    typeText(injector.parser.parseKeys("<esc>"))
+    typeText("i")
+    typeText("<esc>")
     assertState(Mode.NORMAL())
     assertExOutput("23")
   }
@@ -52,7 +52,7 @@ class AutoCmdTest : VimTestCase() {
   @Test
   fun `should fire InsertEnter when entering Replace mode`() {
     enterCommand("autocmd InsertEnter * echo \"enter\"")
-    typeText(injector.parser.parseKeys("R"))
+    typeText("R")
     assertState(Mode.REPLACE)
     assertExOutput("enter")
   }
@@ -60,8 +60,8 @@ class AutoCmdTest : VimTestCase() {
   @Test
   fun `should fire InsertLeave when leaving Replace mode`() {
     enterCommand("autocmd InsertLeave * echo \"leave\"")
-    typeText(injector.parser.parseKeys("R"))
-    typeText(injector.parser.parseKeys("<esc>"))
+    typeText("R")
+    typeText("<esc>")
     assertState(Mode.NORMAL())
     assertExOutput("leave")
   }
@@ -70,14 +70,14 @@ class AutoCmdTest : VimTestCase() {
   fun `should clear commands`() {
     enterCommand("autocmd InsertEnter * echo 23")
     enterCommand("autocmd!")
-    typeText(injector.parser.parseKeys("i"))
+    typeText("i")
     assertNoExOutput()
   }
 
   @Test
   fun `should do nothing when pattern does not match file`() {
     enterCommand("autocmd InsertEnter *.py echo 23")
-    typeText(injector.parser.parseKeys("i"))
+    typeText("i")
     assertNoExOutput()
   }
 
@@ -85,19 +85,19 @@ class AutoCmdTest : VimTestCase() {
   fun `should execute command every time InsertEnter is triggered`() {
     enterCommand("autocmd InsertEnter * echo 23")
 
-    typeText(injector.parser.parseKeys("i"))
+    typeText("i")
     assertExOutput("23")
-    typeText(injector.parser.parseKeys("<esc>"))
+    typeText("<esc>")
 
-    typeText(injector.parser.parseKeys("i"))
+    typeText("i")
     assertExOutput("23")
-    typeText(injector.parser.parseKeys("<esc>"))
+    typeText("<esc>")
   }
 
   @Test
   fun `should not execute InsertLeave command if insert mode is not left`() {
     enterCommand("autocmd InsertLeave * echo 23")
-    typeText(injector.parser.parseKeys("i"))
+    typeText("i")
     assertNoExOutput()
   }
 
@@ -106,7 +106,7 @@ class AutoCmdTest : VimTestCase() {
     enterCommand("autocmd InsertEnter * echo 1")
     enterCommand("autocmd InsertEnter * echo 2")
 
-    typeText(injector.parser.parseKeys("i"))
+    typeText("i")
 
     assertExOutput("1\n2")
   }
@@ -116,10 +116,10 @@ class AutoCmdTest : VimTestCase() {
     enterCommand("autocmd InsertEnter * echo 1")
     enterCommand("autocmd InsertLeave * echo 2")
 
-    typeText(injector.parser.parseKeys("i"))
+    typeText("i")
     assertExOutput("1")
 
-    typeText(injector.parser.parseKeys("<esc>"))
+    typeText("<esc>")
     assertExOutput("2")
   }
 
@@ -130,8 +130,8 @@ class AutoCmdTest : VimTestCase() {
 
     enterCommand("autocmd!")
 
-    typeText(injector.parser.parseKeys("i"))
-    typeText(injector.parser.parseKeys("<esc>"))
+    typeText("i")
+    typeText("<esc>")
 
     assertNoExOutput()
   }
@@ -141,8 +141,8 @@ class AutoCmdTest : VimTestCase() {
     configureByText("hello world")
     enterCommand("autocmd InsertEnter * echo \"entering insert\"")
 
-    typeText(injector.parser.parseKeys("viw"))  // select word
-    typeText(injector.parser.parseKeys("c"))    // change (enters insert)
+    typeText("viw")  // select word
+    typeText("c")    // change (enters insert)
 
     assertExOutput("entering insert")
     assertState(Mode.INSERT)
@@ -153,8 +153,8 @@ class AutoCmdTest : VimTestCase() {
     configureByText("hello world")
     enterCommand("autocmd InsertEnter * echo \"substitute\"")
 
-    typeText(injector.parser.parseKeys("viw"))  // select word
-    typeText(injector.parser.parseKeys("s"))    // substitute (enters insert)
+    typeText("viw")  // select word
+    typeText("s")    // substitute (enters insert)
 
     assertExOutput("substitute")
     assertState(Mode.INSERT)
@@ -165,9 +165,9 @@ class AutoCmdTest : VimTestCase() {
     configureByText("hello world")
     enterCommand("autocmd InsertLeave * echo \"leaving insert\"")
 
-    typeText(injector.parser.parseKeys("viw"))  // select word
-    typeText(injector.parser.parseKeys("c"))    // change (enters insert)
-    typeText(injector.parser.parseKeys("<esc>"))
+    typeText("viw")  // select word
+    typeText("c")    // change (enters insert)
+    typeText("<esc>")
 
     assertExOutput("leaving insert")
     assertState(Mode.NORMAL())
@@ -179,11 +179,11 @@ class AutoCmdTest : VimTestCase() {
     enterCommand("autocmd InsertEnter * echo \"enter\"")
     enterCommand("autocmd InsertLeave * echo \"leave\"")
 
-    typeText(injector.parser.parseKeys("viw"))  // select word
-    typeText(injector.parser.parseKeys("c"))    // change (enters insert)
+    typeText("viw")  // select word
+    typeText("c")    // change (enters insert)
     assertExOutput("enter")
 
-    typeText(injector.parser.parseKeys("<esc>"))
+    typeText("<esc>")
     assertExOutput("leave")
   }
 
@@ -191,10 +191,10 @@ class AutoCmdTest : VimTestCase() {
   fun `should register multiple events with comma-separated syntax`() {
     enterCommand("autocmd InsertEnter,InsertLeave * echo \"triggered\"")
 
-    typeText(injector.parser.parseKeys("i"))
+    typeText("i")
     assertExOutput("triggered")
 
-    typeText(injector.parser.parseKeys("<esc>"))
+    typeText("<esc>")
     assertExOutput("triggered")
   }
 
@@ -202,10 +202,10 @@ class AutoCmdTest : VimTestCase() {
   fun `should handle spaces around commas in multiple events`() {
     enterCommand("autocmd InsertEnter , InsertLeave * echo \"triggered\"")
 
-    typeText(injector.parser.parseKeys("i"))
+    typeText("i")
     assertExOutput("triggered")
 
-    typeText(injector.parser.parseKeys("<esc>"))
+    typeText("<esc>")
     assertExOutput("triggered")
   }
 
@@ -215,18 +215,18 @@ class AutoCmdTest : VimTestCase() {
     enterCommand("autocmd InsertEnter,InsertLeave,BufEnter * echo \"event\"")
 
     // InsertEnter
-    typeText(injector.parser.parseKeys("i"))
+    typeText("i")
     assertExOutput("event")
 
     // InsertLeave
-    typeText(injector.parser.parseKeys("<esc>"))
+    typeText("<esc>")
     assertExOutput("event")
   }
 
   @Test
   fun `should fail gracefully with invalid event in comma-separated list`() {
     enterCommand("autocmd InsertEnter,InvalidEvent * echo \"test\"")
-    typeText(injector.parser.parseKeys("i"))
+    typeText("i")
     assertNoExOutput()
   }
 
@@ -235,7 +235,7 @@ class AutoCmdTest : VimTestCase() {
     configureByFileName("test.txt")
     enterCommand("autocmd!")
     enterCommand("autocmd InsertEnter *.txt echo \"matched\"")
-    typeText(injector.parser.parseKeys("i"))
+    typeText("i")
     assertExOutput("matched")
   }
 
@@ -244,7 +244,7 @@ class AutoCmdTest : VimTestCase() {
     configureByFileName("test.txt")
     enterCommand("autocmd!")
     enterCommand("autocmd InsertEnter *.py echo \"matched\"")
-    typeText(injector.parser.parseKeys("i"))
+    typeText("i")
     assertNoExOutput()
   }
 
@@ -253,7 +253,7 @@ class AutoCmdTest : VimTestCase() {
     configureByFileName("test.txt")
     enterCommand("autocmd!")
     enterCommand("autocmd InsertEnter *.{py,txt} echo \"matched\"")
-    typeText(injector.parser.parseKeys("i"))
+    typeText("i")
     assertExOutput("matched")
   }
 
@@ -262,7 +262,7 @@ class AutoCmdTest : VimTestCase() {
     configureByFileName("test.kt")
     enterCommand("autocmd!")
     enterCommand("autocmd InsertEnter *.{py,txt} echo \"matched\"")
-    typeText(injector.parser.parseKeys("i"))
+    typeText("i")
     assertNoExOutput()
   }
 
@@ -271,7 +271,7 @@ class AutoCmdTest : VimTestCase() {
     configureByFileName("test.py")
     enterCommand("autocmd!")
     enterCommand("autocmd InsertEnter *.?y echo \"matched\"")
-    typeText(injector.parser.parseKeys("i"))
+    typeText("i")
     assertExOutput("matched")
   }
 
@@ -280,7 +280,7 @@ class AutoCmdTest : VimTestCase() {
     configureByFileName("Makefile")
     enterCommand("autocmd!")
     enterCommand("autocmd InsertEnter Makefile echo \"matched\"")
-    typeText(injector.parser.parseKeys("i"))
+    typeText("i")
     assertExOutput("matched")
   }
 
@@ -289,7 +289,7 @@ class AutoCmdTest : VimTestCase() {
     configureByFileName("Rakefile")
     enterCommand("autocmd!")
     enterCommand("autocmd InsertEnter Makefile echo \"matched\"")
-    typeText(injector.parser.parseKeys("i"))
+    typeText("i")
     assertNoExOutput()
   }
 
@@ -298,7 +298,7 @@ class AutoCmdTest : VimTestCase() {
     configureByFileName("anything.xyz")
     enterCommand("autocmd!")
     enterCommand("autocmd InsertEnter * echo \"matched\"")
-    typeText(injector.parser.parseKeys("i"))
+    typeText("i")
     assertExOutput("matched")
   }
 
@@ -308,7 +308,7 @@ class AutoCmdTest : VimTestCase() {
     enterCommand("autocmd!")
     enterCommand("autocmd InsertEnter *.py echo \"python\"")
     enterCommand("autocmd InsertEnter *.txt echo \"text\"")
-    typeText(injector.parser.parseKeys("i"))
+    typeText("i")
     assertExOutput("python")
   }
 
@@ -318,14 +318,14 @@ class AutoCmdTest : VimTestCase() {
     enterCommand("autocmd!")
     enterCommand("autocmd InsertEnter * echo \"all\"")
     enterCommand("autocmd InsertEnter *.py echo \"python\"")
-    typeText(injector.parser.parseKeys("i"))
+    typeText("i")
     assertExOutput("all\npython")
   }
 
   @Test
   fun `mode() in InsertEnter autocmd returns n (fires before transition)`() {
     enterCommand("autocmd InsertEnter * echo mode()")
-    typeText(injector.parser.parseKeys("i"))
+    typeText("i")
     assertState(Mode.INSERT)
     assertExOutput("n")
   }
@@ -333,7 +333,7 @@ class AutoCmdTest : VimTestCase() {
   @Test
   fun `mode() in InsertEnter autocmd for Replace returns n (fires before transition)`() {
     enterCommand("autocmd InsertEnter * echo mode()")
-    typeText(injector.parser.parseKeys("R"))
+    typeText("R")
     assertState(Mode.REPLACE)
     assertExOutput("n")
   }
@@ -341,8 +341,8 @@ class AutoCmdTest : VimTestCase() {
   @Test
   fun `mode() in InsertLeave autocmd returns n (fires after transition)`() {
     enterCommand("autocmd InsertLeave * echo mode()")
-    typeText(injector.parser.parseKeys("i"))
-    typeText(injector.parser.parseKeys("<esc>"))
+    typeText("i")
+    typeText("<esc>")
     assertState(Mode.NORMAL())
     assertExOutput("n")
   }
