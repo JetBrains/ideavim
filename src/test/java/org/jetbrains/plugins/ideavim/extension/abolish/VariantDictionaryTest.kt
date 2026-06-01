@@ -105,4 +105,42 @@ class VariantDictionaryTest {
       dict,
     )
   }
+
+  @Test
+  fun `multi-word rhs preserves its spaces and only capitalises the first letter for the Pascal variant`() {
+    val dict = buildVariantDictionary("Tqbf", "The quick, brown fox")
+    assertEquals(
+      mapOf(
+        "tqbf" to "the quick, brown fox",
+        "Tqbf" to "The quick, brown fox",
+        "TQBF" to "THE QUICK, BROWN FOX",
+      ),
+      dict,
+    )
+  }
+
+  @Test
+  fun `multi-word rhs with a lowercase lhs sentence-cases the Pascal variant`() {
+    val dict = buildVariantDictionary("ssel", "several short examples")
+    assertEquals(
+      mapOf(
+        "ssel" to "several short examples",
+        "Ssel" to "Several short examples",
+        "SSEL" to "SEVERAL SHORT EXAMPLES",
+      ),
+      dict,
+    )
+  }
+
+  @Test
+  fun `brace alternatives on the lhs each map to the same multi-word rhs`() {
+    val dict = buildVariantDictionary("tn{,s}", "thank you")
+    assertEquals(
+      mapOf(
+        "tn" to "thank you", "Tn" to "Thank you", "TN" to "THANK YOU",
+        "tns" to "thank you", "Tns" to "Thank you", "TNS" to "THANK YOU",
+      ),
+      dict,
+    )
+  }
 }

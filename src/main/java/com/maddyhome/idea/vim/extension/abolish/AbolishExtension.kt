@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.extension.abolish
 
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
@@ -24,7 +25,6 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMa
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.exportOperatorFunction
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.state.mode.SelectionType
@@ -34,8 +34,9 @@ import javax.swing.KeyStroke
 
 /**
  * Emulation of [vim-abolish](https://github.com/tpope/vim-abolish): `cr<x>`
- * coercions and `:Subvert`/`:S`. `:Abolish` is not implemented — IdeaVim has
- * no `:iabbrev` infrastructure to build insert-mode auto-correct on top of.
+ * coercions, `:Subvert`/`:S` (case-aware search and substitute), and
+ * `:Abolish` (case-aware abbreviations plus `-search`/`-substitute`
+ * subcommands). `:Abolish!`-persisted save-file behaviour is not implemented.
  *
  * Each coercion exposes two `<Plug>` mappings: `<Plug>(abolish-coerce-word-X)`
  * recases the inner word under the cursor (bound to `crX` by default), and
@@ -53,6 +54,8 @@ internal class AbolishExtension : VimExtension {
     val subvert = SubvertCommand()
     addCommand("Subvert", subvert)
     addCommand("S", subvert)
+
+    addCommand("Abolish", AbolishCommand())
   }
 
   /**
@@ -62,7 +65,8 @@ internal class AbolishExtension : VimExtension {
    * for unknown letters.
    */
   private fun registerUserDefinedCoercions() {
-    val dict = VimPlugin.getVariableService().getGlobalVariableValue(USER_COERCIONS_VARIABLE) as? VimDictionary ?: return
+    val dict =
+      VimPlugin.getVariableService().getGlobalVariableValue(USER_COERCIONS_VARIABLE) as? VimDictionary ?: return
     dict.dictionary.forEach { (charKey, styleValue) ->
       val char = charKey.value.singleOrNull() ?: return@forEach
       val style = resolveStyleByName((styleValue as? VimString)?.value) ?: return@forEach
@@ -189,7 +193,8 @@ private class CoercionOperator : OperatorFunction {
 }
 
 private object PendingCoercion {
-  @Volatile var style: CaseStyle? = null
+  @Volatile
+  var style: CaseStyle? = null
 }
 
 private fun recaseWordAtCaret(editor: VimEditor, caret: VimCaret, targetStyle: CaseStyle, count: Int) {

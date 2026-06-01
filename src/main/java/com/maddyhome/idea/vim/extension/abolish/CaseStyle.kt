@@ -54,3 +54,36 @@ private fun List<String>.joinUppercase(separator: String): String =
 
 internal fun String.toTitleAtom(): String =
   if (isEmpty()) this else this[0].uppercaseChar() + substring(1).lowercase()
+
+internal fun mixedcase(word: String): String {
+  val camel = camelcase(word)
+  return if (camel.isEmpty()) camel else camel[0].uppercaseChar() + camel.substring(1)
+}
+
+/**
+ * tpope's `s:camelcase`: dashes become underscores, then either
+ *  - no separator and at least one lowercase letter → only the first character
+ *    is lowercased, the rest is left exactly as typed; or
+ *  - otherwise → lowercase everything, but drop each `_` and uppercase the
+ *    character that followed it.
+ */
+private fun camelcase(word: String): String {
+  val normalized = word.replace('-', '_')
+  if (!normalized.contains('_') && normalized.any { it.isLowerCase() }) {
+    return normalized[0].lowercaseChar() + normalized.substring(1)
+  }
+  val result = StringBuilder(normalized.length)
+  var afterUnderscore = false
+  for (ch in normalized) {
+    when {
+      ch == '_' -> afterUnderscore = true
+      afterUnderscore -> {
+        result.append(ch.uppercaseChar())
+        afterUnderscore = false
+      }
+
+      else -> result.append(ch.lowercaseChar())
+    }
+  }
+  return result.toString()
+}
