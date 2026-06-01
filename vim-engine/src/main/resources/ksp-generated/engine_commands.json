@@ -1670,6 +1670,11 @@
     "modes": "N"
   },
   {
+    "keys": "g<",
+    "class": "com.maddyhome.idea.vim.action.ShowLastOutputAction",
+    "modes": "N"
+  },
+  {
     "keys": "g<C-A>",
     "class": "com.maddyhome.idea.vim.action.change.change.number.ChangeVisualNumberAvalancheIncAction",
     "modes": "X"

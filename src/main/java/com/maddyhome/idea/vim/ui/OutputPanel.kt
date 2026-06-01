@@ -97,6 +97,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
   private val scrollPane: JScrollPane =
     JBScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER)
   private var defaultForeground: Color? = null
+  private var clearOnNextUse = false
 
   private val segments = mutableListOf<TextLine>()
   private var cachedLineHeight = 0
@@ -245,6 +246,9 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
   }
 
   override fun addText(text: String, isNewLine: Boolean, messageType: MessageType) {
+    if (clearOnNextUse) {
+      clearText()
+    }
     val color = when (messageType) {
       MessageType.ERROR -> JBColor.RED
       MessageType.STANDARD -> null
@@ -283,6 +287,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
 
   override fun clearText() {
     segments.clear()
+    clearOnNextUse = false
   }
 
   override fun getForeground(): Color? {
@@ -304,7 +309,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
   private fun deactivate() {
     if (!active) return
     active = false
-    clearText()
+    clearOnNextUse = true
     textPane.text = ""
     glassPaneManager.deactivate()
   }
