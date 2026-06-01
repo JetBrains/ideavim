@@ -16,10 +16,13 @@ package com.maddyhome.idea.vim.extension.abolish
 internal fun buildVariantDictionary(lhsPattern: String, rhsPattern: String): Map<String, String> {
   val dictionary = mutableMapOf<String, String>()
   expandAllBraces(lhsPattern, rhsPattern).forEach { (lhsWord, rhsWord) ->
-    addCaseVariants(dictionary, lhsWord, rhsWord)
+    caseVariants(lhsWord).zip(caseVariants(rhsWord)).forEach { (l, r) -> dictionary[l] = r }
   }
   return dictionary
 }
+
+internal fun buildVariantKeys(pattern: String): Set<String> =
+  expandBraces(pattern).flatMapTo(mutableSetOf()) { caseVariants(it) }
 
 /**
  * One brace per pass, then recurse — same trick as tpope's `s:expand_braces`.
@@ -31,6 +34,12 @@ private fun expandAllBraces(lhs: String, rhs: String): List<Pair<String, String>
 
   val rhsBrace = parseBraces(rhs)
   return pairAlternatives(lhsBrace, rhsBrace).flatMap { (l, r) -> expandAllBraces(l, r) }
+}
+
+private fun expandBraces(pattern: String): List<String> {
+  val brace = parseBraces(pattern)
+  if (!brace.hasSlot) return listOf(pattern)
+  return brace.materialise().flatMap { expandBraces(it) }
 }
 
 private fun pairAlternatives(lhs: BracePattern, rhs: BracePattern): List<Pair<String, String>> {
@@ -51,9 +60,5 @@ private fun generateRhsVariants(
 
 private fun BracePattern.borrowsAlternatives(): Boolean = !hasSlot || alternatives == listOf("")
 
-private fun addCaseVariants(dictionary: MutableMap<String, String>, lhs: String, rhs: String) {
-  dictionary[lhs.lowercase()] = rhs.lowercase()
-  // PascalCase variant — tpope's `mixedcase`. Snake-cased input also matches camel/Pascal occurrences.
-  dictionary[CaseStyle.PASCAL.recase(lhs)] = CaseStyle.PASCAL.recase(rhs)
-  dictionary[lhs.uppercase()] = rhs.uppercase()
-}
+private fun caseVariants(word: String): List<String> =
+  listOf(word.lowercase(), mixedcase(word), word.uppercase())

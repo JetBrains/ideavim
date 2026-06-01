@@ -40,7 +40,7 @@ usual beta standards.
 * New VimScript functions: `digraph_get()`, `digraph_getlist()`, `digraph_set()`, `digraph_setlist()` — query and modify digraph mappings programmatically
 * [VIM-833](https://youtrack.jetbrains.com/issue/VIM-833) Added `q:`, `q/`, and `q?` commands — open command/search history window for editing and re-executing previous commands
 * New VimScript history functions: `histadd()`, `histget()`, `histnr()`, `histdel()` — query and modify command/search/expression history programmatically
-* [VIM-1326](https://youtrack.jetbrains.com/issue/VIM-1326) Added built-in `abolish` extension — `cr<x>` coercions to recase words (`crs` snake_case, `crm`/`crp` MixedCase/PascalCase, `crc` camelCase, `cru`/`crU` UPPER_SNAKE, `cr-`/`crk` kebab-case, `cr.` dot.case, `cr<Space>` space case, `crt` Title Case); `:Subvert`/`:S` for case-aware substitution with brace alternatives (`{a,b,c}`); activate with `Plug 'tpope/vim-abolish'`
+* [VIM-1326](https://youtrack.jetbrains.com/issue/VIM-1326) Added built-in `abolish` extension — `cr<x>` coercions to recase words (`crs` snake_case, `crm`/`crp` MixedCase/PascalCase, `crc` camelCase, `cru`/`crU` UPPER_SNAKE, `cr-`/`crk` kebab-case, `cr.` dot.case, `cr<Space>` space case, `crt` Title Case); `:Subvert`/`:S` for case-aware substitution with brace alternatives (`{a,b,c}`); `:Abolish` for case-aware insert-mode abbreviations with `-buffer`/`-cmdline`/`-delete`/`-search`/`-substitute` subcommands; activate with `Plug 'tpope/vim-abolish'`
 
 ### Fixes:
 * [VIM-4245](https://youtrack.jetbrains.com/issue/VIM-4245) Fixed undo grouping for repeated insert, block insert, and dot-repeat in split mode — a single `u` now reverts one Vim command instead of stepping through intermediate backend edits
