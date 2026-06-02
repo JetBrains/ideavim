@@ -484,10 +484,11 @@ class SetlocalCommandTest : VimTestCase() {
     setOsSpecificOptionsToSafeValues()
     val expected = """
     |--- Local option values ---
-    |noabolish           nohlsearch          nonumber              startofline
-    |noargtextobj          ide=IntelliJ IDEA   operatorfunc=     nosurround
-    |nobomb              --ideajoin          norelativenumber    notextobj-entire
-    |nobreakindent         ideamarks           scroll=0          notextobj-indent
+    |noabolish             history=50          nrformats=hex     nosneak
+    |noargtextobj        nohlsearch          nonumber              startofline
+    |nobomb                ide=IntelliJ IDEA   operatorfunc=     nosurround
+    |nobreakindent       --ideajoin          norelativenumber    notextobj-entire
+    |noCamelCaseMotion     ideamarks           scroll=0          notextobj-indent
     |noclasstextobj        idearefactormode=   scrolljump=1        textwidth=0
     |  colorcolumn=        ideawrite=all       scrolloff=-1        timeout
     |nocommentary        noignorecase          selectmode=         timeoutlen=1000
@@ -499,7 +500,6 @@ class SetlocalCommandTest : VimTestCase() {
     |nofunctextobj         more                sidescroll=0        whichwrap=b,s
     |nogdefault          nomultiple-cursors    sidescrolloff=-1    wrap
     |nohighlightedyank   noNERDTree          nosmartcase           wrapscan
-    |  history=50          nrformats=hex     nosneak
     |  clipboard=ideaput,autoselect
     |  comments=s1:/*,mb:*,ex:*/,://,b:#,:%,:XCOMM,n:>,fb:-
     |  fileencoding=utf-8
@@ -563,6 +563,7 @@ class SetlocalCommandTest : VimTestCase() {
     |noargtextobj
     |nobomb
     |nobreakindent
+    |noCamelCaseMotion
     |noclasstextobj
     |  clipboard=ideaput,autoselect
     |  colorcolumn=

@@ -139,6 +139,70 @@ https://www.vim.org/scripts/script.php?script_id=2699
 </details>
 
 <details>
+<summary><h2>CamelCaseMotion: Motions through CamelCase and snake_case words</h2></summary>
+
+Original plugin: [CamelCaseMotion](https://github.com/bkad/CamelCaseMotion).
+
+### Summary:
+Adds `w`, `b`, `e`, `ge` style motions and `iw`/`ib`/`ie`/`ige` inner "word" text objects that move
+and select by sub-word boundaries — uppercase letters in `CamelCase` and `_`/`-` delimiters in
+`snake_case`/`kebab-case` — instead of whole words. For example, with the leader as the key,
+`<leader>w` jumps `Camel|CaseWord` → `Camel[C]aseWord`, and `ci<leader>w` changes a single chunk of
+an identifier. The motions honour `[count]`, work in normal, visual and operator-pending modes, and
+respect the `'iskeyword'` option.
+
+### Setup:
+- Add the following command to `~/.ideavimrc`: `Plug 'bkad/CamelCaseMotion'`
+    <details>
+      <summary>Alternative syntax</summary>
+      <code>Plugin 'bkad/CamelCaseMotion'</code>
+      <br/>
+      <code>Plug 'https://github.com/bkad/CamelCaseMotion'</code>
+      <br/>
+      <code>Plug 'CamelCaseMotion'</code>
+      <br/>
+      <code>set CamelCaseMotion</code>
+      </details>
+- No mappings are created until you choose a key. The most common setup is to add this to your
+  `~/.ideavimrc` (before the `Plug`/`set` line):
+
+  ```
+  let g:camelcasemotion_key = '<leader>'
+  ```
+
+  which creates `<leader>w`, `<leader>b`, `<leader>e`, `<leader>ge` and the inner objects
+  `i<leader>w`, `i<leader>b`, `i<leader>e`, `i<leader>ge`.
+
+### Instructions
+
+https://github.com/bkad/CamelCaseMotion/blob/master/README.markdown
+
+With `g:camelcasemotion_key` set to `<leader>` (the default leader is `\`):
+
+| Mapping | Description |
+|---------|-------------|
+| `<leader>w` | Move forward to the next start of a sub-word |
+| `<leader>b` | Move backward to the previous start of a sub-word |
+| `<leader>e` | Move forward to the next end of a sub-word |
+| `<leader>ge` | Move backward to the previous end of a sub-word |
+| `i<leader>w` | Inner sub-word (e.g. `ci<leader>w`, `vi<leader>w`) |
+| `i<leader>b` | Inner sub-word, extends backward with a count |
+| `i<leader>e` | Inner sub-word, excludes a trailing delimiter |
+| `i<leader>ge` | Inner sub-word, backward to the previous word end |
+
+Instead of (or in addition to) `g:camelcasemotion_key`, you can map the motion `<Plug>` targets
+directly, for example to replace the built-in `w`/`b`/`e`:
+
+```
+map <silent> w <Plug>CamelCaseMotion_w
+map <silent> b <Plug>CamelCaseMotion_b
+map <silent> e <Plug>CamelCaseMotion_e
+map <silent> ge <Plug>CamelCaseMotion_ge
+```
+
+</details>
+
+<details>
 <summary><h2>classtextobj: Provides a text object for class definitions</h2></summary>
 
 ### Summary:
