@@ -37,6 +37,22 @@ class SearchHighlightsTest : VimTestCase() {
   }
 
   @Test
+  fun `test star search with smartcase highlights case-insensitive matches`() {
+    configureByText("${c}Lorem ipsum lorem ipsum")
+    enterCommand("set hlsearch")
+    enterCommand("set ignorecase")
+    enterCommand("set smartcase")
+
+    // `*` ignores smartcase, so the lowercase occurrence must be highlighted too
+    typeText("*")
+
+    assertSearchHighlights(
+      "\\<Lorem\\>",
+      "«Lorem» ipsum «lorem» ipsum",
+    )
+  }
+
+  @Test
   fun `test search removes previous search highlights`() {
     configureByText(
       """I found it in a legendary land
