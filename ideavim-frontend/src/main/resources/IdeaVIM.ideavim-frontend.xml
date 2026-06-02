@@ -425,6 +425,15 @@
       </aliases>
     </vimExtension>
 
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.camelcasemotion.CamelCaseMotion"
+                  name="CamelCaseMotion">
+      <aliases>
+        <alias name="https://github.com/bkad/CamelCaseMotion"/>
+        <alias name="bkad/CamelCaseMotion"/>
+        <alias name="CamelCaseMotion"/>
+      </aliases>
+    </vimExtension>
+
     <vimExtension implementation="com.maddyhome.idea.vim.extension.textobjindent.VimIndentObject" name="textobj-indent">
       <aliases>
         <alias name="https://github.com/michaeljsmith/vim-indent-object"/>
