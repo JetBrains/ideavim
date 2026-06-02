@@ -99,11 +99,16 @@ object ReleaseEap : IdeaVimBuildType({
       git push origin %build.number%
       """.trimIndent()
     }
-    gradle {
+    script {
       name = "YouTrack post release actions"
-      tasks = "scripts:eapReleaseActions"
-      gradleParams = "--build-cache --configuration-cache"
-      jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
+      scriptContent = """
+        set -e
+        cd scripts-ts
+        npm ci --silent --no-fund --no-audit
+        : "${'$'}{ORG_GRADLE_PROJECT_youtrackToken:?ORG_GRADLE_PROJECT_youtrackToken is not set}"
+        export YOUTRACK_TOKEN="${'$'}ORG_GRADLE_PROJECT_youtrackToken"
+        npx tsx src/eapReleaseActions.ts "%build.number%"
+      """.trimIndent()
     }
   }
 

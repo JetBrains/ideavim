@@ -68,14 +68,6 @@ tasks.register("selectBranch", JavaExec::class) {
   args = listOf(project.version.toString(), rootProject.rootDir.toString(), releaseType ?: "")
 }
 
-tasks.register("eapReleaseActions", JavaExec::class) {
-  group = "release"
-  mainClass.set("scripts.releaseEap.EapReleaseActionsKt")
-  classpath = sourceSets["main"].runtimeClasspath
-  args = listOf(project.version.toString(), rootProject.rootDir.toString(), releaseType ?: "")
-  environment("YOUTRACK_TOKEN", youtrackToken)
-}
-
 tasks.register("calculateNewEapVersion", JavaExec::class) {
   group = "release"
   mainClass.set("scripts.release.CalculateNewEapVersionKt")
