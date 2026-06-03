@@ -77,3 +77,65 @@ class MaximizeWindowHeightAction : VimActionHandler.SingleExecution() {
     return true
   }
 }
+
+/**
+ * `CTRL-W >` - increase the current window's width by [count][Command.count] columns (default 1).
+ *
+ * see "h CTRL-W_>"
+ */
+@CommandOrMotion(keys = ["<C-W>>"], modes = [Mode.NORMAL])
+class IncreaseWindowWidthAction : VimActionHandler.SingleExecution() {
+  override val type: Command.Type = Command.Type.OTHER_READONLY
+
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    ResizeService().resizeCurrentWindowWidth(editor, ResizeArgument.Relative(cmd.count))
+    return true
+  }
+}
+
+/**
+ * `CTRL-W <` - decrease the current window's width by [count][Command.count] columns (default 1).
+ *
+ * see "h CTRL-W_<"
+ */
+@CommandOrMotion(keys = ["<C-W><lt>"], modes = [Mode.NORMAL])
+class DecreaseWindowWidthAction : VimActionHandler.SingleExecution() {
+  override val type: Command.Type = Command.Type.OTHER_READONLY
+
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    ResizeService().resizeCurrentWindowWidth(editor, ResizeArgument.Relative(-cmd.count))
+    return true
+  }
+}
+
+/**
+ * `CTRL-W |` - set the current window's width to [count][Command.rawCount] columns, or maximise it when
+ * no count is given.
+ *
+ * see "h CTRL-W_bar"
+ */
+@CommandOrMotion(keys = ["<C-W>|"], modes = [Mode.NORMAL])
+class MaximizeWindowWidthAction : VimActionHandler.SingleExecution() {
+  override val type: Command.Type = Command.Type.OTHER_READONLY
+
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    val argument = if (cmd.rawCount == 0) ResizeArgument.Maximize else ResizeArgument.Absolute(cmd.rawCount)
+    ResizeService().resizeCurrentWindowWidth(editor, argument)
+    return true
+  }
+}

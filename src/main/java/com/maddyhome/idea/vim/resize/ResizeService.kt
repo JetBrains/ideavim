@@ -8,46 +8,51 @@
 
 package com.maddyhome.idea.vim.resize
 
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.fileEditor.impl.EditorWindow
 import com.intellij.openapi.ui.Splitter
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.newapi.ij
 import java.awt.Component
+import java.awt.Rectangle
 import javax.swing.SwingUtilities
 
 /**
- * Resizes editor windows, translating Vim's row-based `:resize` semantics onto IntelliJ's
- * proportion-based [Splitter] model.
+ * Resizes editor windows, translating Vim's cell-based `:resize` / `:vertical resize` semantics onto
+ * IntelliJ's proportion-based [Splitter] model.
  */
 internal class ResizeService {
 
-  /**
-   * Sets the *height* of the window currently holding [editor] according to [argument].
-   *
-   * Does nothing if there is no enclosing top/bottom split to resize.
-   */
-  fun resizeCurrentWindowHeight(editor: VimEditor, argument: ResizeArgument) {
+  /** Sets the *height* of the window currently holding [editor] (Vim's `:resize`). */
+  fun resizeCurrentWindowHeight(editor: VimEditor, argument: ResizeArgument): Unit =
+    resize(editor, argument, Axis.HEIGHT)
+
+  /** Sets the *width* of the window currently holding [editor] (Vim's `:vertical resize`). */
+  fun resizeCurrentWindowWidth(editor: VimEditor, argument: ResizeArgument): Unit = resize(editor, argument, Axis.WIDTH)
+
+  private fun resize(editor: VimEditor, argument: ResizeArgument, axis: Axis) {
     val ijEditor = editor.ij
     val project = ijEditor.project ?: return
 
     val window = FileEditorManagerEx.getInstanceEx(project).splitters.currentWindow ?: return
 
-    val (splitter, child) = findEnclosingHeightSplitter(window) ?: return
+    val (splitter, child) = findEnclosingSplitter(window, axis.splitOrientation) ?: return
     val first = splitter.firstComponent ?: return
     val second = splitter.secondComponent ?: return
 
     // The proportion divides the area shared by the two children (the divider sits between them and is
-    // excluded), so the children's current heights sum to that usable height regardless of proportion.
-    val usableHeight = first.height + second.height
-    if (usableHeight <= 0) return
+    // excluded), so the children's current extents along this axis sum to that usable size.
+    val usable = axis.extentOf(first) + axis.extentOf(second)
+    if (usable <= 0) return
 
     val proportion = computeProportion(
       argument = argument,
-      usableHeight = usableHeight,
-      allocatedHeight = child.height, // height of the current window's slice, chrome included
-      visibleTextHeight = ijEditor.scrollingModel.visibleArea.height, // text region only, chrome excluded
-      lineHeight = ijEditor.lineHeight,
+      usable = usable,
+      allocated = axis.extentOf(child), // current window's slice, chrome included
+      visibleText = axis.extentOf(ijEditor.scrollingModel.visibleArea), // text region only, chrome excluded
+      cellSize = axis.cellSize(ijEditor),
       firstComponent = child === first,
     )
 
@@ -56,47 +61,73 @@ internal class ResizeService {
 
   private fun computeProportion(
     argument: ResizeArgument,
-    usableHeight: Int,
-    allocatedHeight: Int,
-    visibleTextHeight: Int,
-    lineHeight: Int,
+    usable: Int,
+    allocated: Int,
+    visibleText: Int,
+    cellSize: Float,
     firstComponent: Boolean,
   ): Float {
-    // Height, in pixels, the current window's slice should occupy.
-    val targetHeight = when (argument) {
+    // Size, in pixels, the current window's slice should occupy along the axis.
+    val target = when (argument) {
       ResizeArgument.Maximize -> return if (firstComponent) MAX_PROPORTION else MIN_PROPORTION
 
-      // Chrome cancels out: grow/shrink the existing slice by N line heights.
-      is ResizeArgument.Relative -> allocatedHeight + argument.rows * lineHeight.toFloat()
+      // Chrome cancels out: grow/shrink the existing slice by N cells.
+      is ResizeArgument.Relative -> allocated + argument.count * cellSize
 
-      // Add back the non-text chrome so `rows` counts visible text lines, not the whole slice.
+      // Add back the non-text chrome so the count maps to visible cells, not the whole slice.
       is ResizeArgument.Absolute -> {
-        val chrome = (allocatedHeight - visibleTextHeight).coerceAtLeast(0)
-        argument.rows * lineHeight.toFloat() + chrome
+        val chrome = (allocated - visibleText).coerceAtLeast(0)
+        argument.count * cellSize + chrome
       }
     }
 
-    return if (firstComponent) targetHeight / usableHeight else 1f - targetHeight / usableHeight
+    return if (firstComponent) target / usable else 1f - target / usable
   }
 
   /**
-   * Walks up the Swing hierarchy from [window]'s component to the nearest enclosing [Splitter] that
-   * controls the window's height, returning that splitter and the direct child the window lives inside
-   * (so the caller can tell whether it is the first or second component).
+   * Walks up the Swing hierarchy from [window]'s component to the nearest enclosing [Splitter] with the
+   * given [orientation][Splitter.getOrientation], returning that splitter and the direct child the window
+   * lives inside (so the caller can tell whether it is the first or second component).
    */
-  private fun findEnclosingHeightSplitter(window: EditorWindow): Pair<Splitter, Component>? {
-    // A vertical splitter (orientation == true) stacks its children top/bottom, so it controls height.
-    val controlsHeight = true
+  private fun findEnclosingSplitter(window: EditorWindow, orientation: Boolean): Pair<Splitter, Component>? {
     var child: Component = window.tabbedPane.component
     var parent = child.parent
     while (parent != null) {
-      if (parent is Splitter && parent.orientation == controlsHeight && SwingUtilities.isDescendingFrom(child, parent)) {
+      if (parent is Splitter && parent.orientation == orientation && SwingUtilities.isDescendingFrom(child, parent)) {
         return parent to child
       }
       child = parent
       parent = parent.parent
     }
     return null
+  }
+
+  /**
+   * The dimension a resize acts on. Vim counts rows for height and columns for width; IntelliJ measures
+   * both in pixels, so each axis knows its pixel cell size and which Swing extent / splitter to read.
+   */
+  private enum class Axis {
+    /** Window height. Stacked top/bottom by a vertical splitter (orientation == true). */
+    HEIGHT {
+      override val splitOrientation = true
+      override fun extentOf(component: Component) = component.height
+      override fun extentOf(rectangle: Rectangle) = rectangle.height
+      override fun cellSize(editor: Editor) = editor.lineHeight.toFloat()
+    },
+
+    /** Window width. Placed left/right by a horizontal splitter (orientation == false). */
+    WIDTH {
+      override val splitOrientation = false
+      override fun extentOf(component: Component) = component.width
+      override fun extentOf(rectangle: Rectangle) = rectangle.width
+      override fun cellSize(editor: Editor) = EditorHelper.getPlainSpaceWidthFloat(editor)
+    };
+
+    /** The [Splitter.getOrientation] value of the split that resizes this axis. */
+    abstract val splitOrientation: Boolean
+    abstract fun extentOf(component: Component): Int
+    abstract fun extentOf(rectangle: Rectangle): Int
+    abstract fun cellSize(editor: Editor): Float
   }
 
   companion object {

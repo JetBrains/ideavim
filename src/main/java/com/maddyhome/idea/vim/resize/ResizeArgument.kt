@@ -16,14 +16,14 @@ import com.maddyhome.idea.vim.ex.InvalidCommandException
  */
 internal sealed interface ResizeArgument {
 
-  /** `:resize` with no argument - maximise the window height. */
+  /** `:resize` with no argument - maximise the window. */
   object Maximize : ResizeArgument
 
-  /** `:resize {n}` - set the height to an absolute number of rows. */
-  data class Absolute(val rows: Int) : ResizeArgument
+  /** `:resize {n}` - set the size to an absolute number of cells (rows for height, columns for width). */
+  data class Absolute(val count: Int) : ResizeArgument
 
-  /** `:resize +{n}` / `:resize -{n}` - change the height by a signed number of rows. */
-  data class Relative(val rows: Int) : ResizeArgument
+  /** `:resize +{n}` / `:resize -{n}` - change the size by a signed number of cells. */
+  data class Relative(val count: Int) : ResizeArgument
 
   companion object {
     @Throws(ExException::class)
@@ -31,11 +31,11 @@ internal sealed interface ResizeArgument {
       val trimmed = argument.trim()
       if (trimmed.isEmpty()) return Maximize
 
-      val rows = trimmed.removePrefix("+").toIntOrNull()
+      val count = trimmed.removePrefix("+").toIntOrNull()
         ?: throw InvalidCommandException("E488: Trailing characters: $trimmed", null)
 
-      val relative = trimmed.startsWith("+") || trimmed.startsWith("-")
-      return if (relative) Relative(rows) else Absolute(rows)
+      val signed = trimmed.startsWith("+") || trimmed.startsWith("-")
+      return if (signed) Relative(count) else Absolute(count)
     }
   }
 }

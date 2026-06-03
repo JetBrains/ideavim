@@ -7,5 +7,6 @@
   "h[elp]": "com.maddyhome.idea.vim.vimscript.model.commands.HelpCommand",
   "ls": "com.maddyhome.idea.vim.vimscript.model.commands.BufferListCommand",
   "r[ead]": "com.maddyhome.idea.vim.vimscript.model.commands.ReadCommand",
-  "res[ize]": "com.maddyhome.idea.vim.resize.ResizeCommand"
+  "res[ize]": "com.maddyhome.idea.vim.resize.ResizeCommand",
+  "vert[ical]": "com.maddyhome.idea.vim.resize.VerticalCommand"
 }
