@@ -15,6 +15,26 @@
     "modes": "N"
   },
   {
+    "keys": "<C-W>+",
+    "class": "com.maddyhome.idea.vim.resize.IncreaseWindowHeightAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-W>-",
+    "class": "com.maddyhome.idea.vim.resize.DecreaseWindowHeightAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-W><C-_>",
+    "class": "com.maddyhome.idea.vim.resize.MaximizeWindowHeightAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-W>_",
+    "class": "com.maddyhome.idea.vim.resize.MaximizeWindowHeightAction",
+    "modes": "N"
+  },
+  {
     "keys": "<Del>",
     "class": "com.maddyhome.idea.vim.action.editor.VimEditorDelete",
     "modes": "I"
