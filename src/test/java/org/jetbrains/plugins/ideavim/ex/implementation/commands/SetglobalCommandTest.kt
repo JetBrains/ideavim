@@ -432,12 +432,13 @@ class SetglobalCommandTest : VimTestCase() {
     setOsSpecificOptionsToSafeValues()
     val expected = """
     |--- Global option values ---
-    |noabolish             history=50          operatorfunc=     notextobj-entire
-    |noargtextobj        nohlsearch          norelativenumber    notextobj-indent
-    |nobomb                ide=IntelliJ IDEA   scroll=0            textwidth=0
-    |nobreakindent       noideajoin            scrolljump=1        timeout
-    |noCamelCaseMotion     ideamarks           scrolloff=0         timeoutlen=1000
-    |noclasstextobj        ideawrite=all       selectmode=       notrackactionids
+    |noabolish           nohighlightedyank   nonumber            nosurround
+    |noargtextobj          history=50          operatorfunc=     notextobj-entire
+    |nobomb              nohlsearch          norelativenumber    notextobj-indent
+    |nobreakindent         ide=IntelliJ IDEA   scroll=0            textwidth=0
+    |noCamelCaseMotion   noideajoin            scrolljump=1        timeout
+    |noclasstextobj        ideamarks           scrolloff=0         timeoutlen=1000
+    |  cmdheight=1         ideawrite=all       selectmode=       notrackactionids
     |  colorcolumn=      noignorecase          shellcmdflag=-x     undolevels=1000
     |nocommentary        noincsearch           shellxescape=@    noVimEverywhere
     |nocursorline        nolist                shellxquote={       virtualedit=
@@ -448,7 +449,6 @@ class SetglobalCommandTest : VimTestCase() {
     |  foldlevel=999     nomultiple-cursors  nosmartcase           wrapscan
     |nofunctextobj       noNERDTree          nosneak             noyoucompleteme
     |nogdefault            nrformats=hex       startofline
-    |nohighlightedyank   nonumber            nosurround
     |  clipboard=ideaput,autoselect
     |  comments=s1:/*,mb:*,ex:*/,://,b:#,:%,:XCOMM,n:>,fb:-
     |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
@@ -516,6 +516,7 @@ class SetglobalCommandTest : VimTestCase() {
     |noCamelCaseMotion
     |noclasstextobj
     |  clipboard=ideaput,autoselect
+    |  cmdheight=1
     |  colorcolumn=
     |nocommentary
     |  comments=s1:/*,mb:*,ex:*/,://,b:#,:%,:XCOMM,n:>,fb:-

@@ -484,12 +484,13 @@ class SetlocalCommandTest : VimTestCase() {
     setOsSpecificOptionsToSafeValues()
     val expected = """
     |--- Local option values ---
-    |noabolish           nohlsearch            operatorfunc=     notextobj-entire
-    |noargtextobj          ide=IntelliJ IDEA norelativenumber    notextobj-indent
-    |nobomb              --ideajoin            scroll=0            textwidth=0
-    |nobreakindent         ideamarks           scrolljump=1        timeout
-    |noCamelCaseMotion     idearefactormode=   scrolloff=-1        timeoutlen=1000
-    |noclasstextobj        ideawrite=all       selectmode=       notrackactionids
+    |noabolish             history=50        nonumber            nosurround
+    |noargtextobj        nohlsearch            operatorfunc=     notextobj-entire
+    |nobomb                ide=IntelliJ IDEA norelativenumber    notextobj-indent
+    |nobreakindent       --ideajoin            scroll=0            textwidth=0
+    |noCamelCaseMotion     ideamarks           scrolljump=1        timeout
+    |noclasstextobj        idearefactormode=   scrolloff=-1        timeoutlen=1000
+    |  cmdheight=1         ideawrite=all       selectmode=       notrackactionids
     |  colorcolumn=      noignorecase          shellcmdflag=-x   noVimEverywhere
     |nocommentary        noincsearch           shellxescape=@      virtualedit=
     |nocursorline        nolist                shellxquote={     novisualbell
@@ -500,7 +501,6 @@ class SetlocalCommandTest : VimTestCase() {
     |nofunctextobj       nomultiple-cursors  nosmartcase         noyoucompleteme
     |nogdefault          noNERDTree          nosneak
     |nohighlightedyank     nrformats=hex       startofline
-    |  history=50        nonumber            nosurround
     |  clipboard=ideaput,autoselect
     |  comments=s1:/*,mb:*,ex:*/,://,b:#,:%,:XCOMM,n:>,fb:-
     |  fileencoding=utf-8
@@ -568,6 +568,7 @@ class SetlocalCommandTest : VimTestCase() {
     |noCamelCaseMotion
     |noclasstextobj
     |  clipboard=ideaput,autoselect
+    |  cmdheight=1
     |  colorcolumn=
     |nocommentary
     |  comments=s1:/*,mb:*,ex:*/,://,b:#,:%,:XCOMM,n:>,fb:-

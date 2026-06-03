@@ -85,6 +85,15 @@ class MessageAreaTest : VimTestCase("\n") {
   }
 
   @Test
+  fun `test command output less than or equal to 'cmdheight' does not use pager`() {
+    enterCommand("echo \"hello\\nworld\"")
+    assertPager()
+    enterCommand("set cmdheight=2")
+    enterCommand("echo \"hello\\nworld\"")
+    assertStaticMessageArea()
+  }
+
+  @Test
   fun `test single-page multi-line pager content immediately shows hit-enter prompt`() {
     enterCommandForMultiLineOutput()
     assertHitEnterPrompt()

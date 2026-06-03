@@ -179,12 +179,13 @@ class SetCommandTest : VimTestCase() {
     setOsSpecificOptionsToSafeValues()
     val expected = """
       |--- Options ---
-      |noabolish           nohlsearch          norelativenumber    notextobj-indent
-      |noargtextobj          ide=IntelliJ IDEA   scroll=0            textwidth=0
-      |nobomb              noideajoin            scrolljump=1        timeout
-      |nobreakindent         ideamarks           scrolloff=0         timeoutlen=1000
-      |noCamelCaseMotion     ideawrite=all       selectmode=       notrackactionids
-      |noclasstextobj      noignorecase          shellcmdflag=-x     undolevels=1000
+      |noabolish             history=50          operatorfunc=     notextobj-entire
+      |noargtextobj        nohlsearch          norelativenumber    notextobj-indent
+      |nobomb                ide=IntelliJ IDEA   scroll=0            textwidth=0
+      |nobreakindent       noideajoin            scrolljump=1        timeout
+      |noCamelCaseMotion     ideamarks           scrolloff=0         timeoutlen=1000
+      |noclasstextobj        ideawrite=all       selectmode=       notrackactionids
+      |  cmdheight=1       noignorecase          shellcmdflag=-x     undolevels=1000
       |  colorcolumn=      noincsearch           shellxescape=@    noVimEverywhere
       |nocommentary        nolist                shellxquote={       virtualedit=
       |nocursorline        nomatchit             showcmd           novisualbell
@@ -195,7 +196,6 @@ class SetCommandTest : VimTestCase() {
       |nofunctextobj       noNERDTree          nosneak             noyoucompleteme
       |nogdefault            nrformats=hex       startofline
       |nohighlightedyank   nonumber            nosurround
-      |  history=50          operatorfunc=     notextobj-entire
       |  clipboard=ideaput,autoselect
       |  comments=s1:/*,mb:*,ex:*/,://,b:#,:%,:XCOMM,n:>,fb:-
       |  fileencoding=utf-8
@@ -263,6 +263,7 @@ class SetCommandTest : VimTestCase() {
     |noCamelCaseMotion
     |noclasstextobj
     |  clipboard=ideaput,autoselect
+    |  cmdheight=1
     |  colorcolumn=
     |nocommentary
     |  comments=s1:/*,mb:*,ex:*/,://,b:#,:%,:XCOMM,n:>,fb:-

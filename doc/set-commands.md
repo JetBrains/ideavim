@@ -17,6 +17,10 @@ However, some differences are inevitable.
            ideaput      Uses the IDEs own paste implementation for put
                         operations rather than simply inserting the text
 
+'cmdheight'     'ch'    Number of screen lines to use for the output of the
+                        command-line. A larger value helps avoiding hit-enter
+                        prompts.
+        
 'digraph'       'dg'    Enable using <BS> to enter digraphs in Insert mode
 'gdefault'      'gd'    The ":substitute" flag 'g' is by default
 'guicursor'     'gcr'   Controls the shape of the cursor for different modes
@@ -62,8 +66,6 @@ However, some differences are inevitable.
                         This popup can be dismissed by redrawing the screen,
                         either explicitly with CTRL-L or implicitly by
                         scrolling the screen. See also "wait:{n}".
-                        Note that 'cmdheight' is not currently implemented and
-                        assumed to be 1.
 
            wait:{n}     Instead of using a |hit-enter| prompt, simply wait for
                         {n} milliseconds so that the user has a chance to read

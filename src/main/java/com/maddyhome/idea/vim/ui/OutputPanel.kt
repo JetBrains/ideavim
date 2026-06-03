@@ -228,11 +228,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
       defaultForeground = textPane.foreground
     }
 
-    if (lines.size > 1) {
-      setMultiLineText(lines, doc)
-    } else {
-      doc.insertString(doc.length, lines[0].text.removeSuffix("\n"), getLineColor(lines[0]))
-    }
+    setMultiLineText(lines, doc)
 
     val fullText = doc.getText(0, doc.length)
     textPane.font = selectEditorFont(editor, fullText)
@@ -414,7 +410,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
       // Simple output: single line that fits entirely - no label needed
       // Don't update the flag if we're resizing. We might change text wrapping moving from/to single-line output, but
       // we want to stay in the original mode
-      isSingleLine = lineCount == 1 && lineCount <= maxVisibleLines
+      isSingleLine = lineCount <= injector.globalOptions().cmdheight && lineCount <= maxVisibleLines
       promptComponent.isVisible = !isSingleLine
     }
 
