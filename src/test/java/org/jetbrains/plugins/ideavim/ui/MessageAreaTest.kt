@@ -155,7 +155,17 @@ class MessageAreaTest : VimTestCase("\n") {
     assertHitEnterPrompt()
     doTypeText("<Esc>")
     assertExOutputClosed()
-    // TODO: How to verify that escape does nothing here? Mapping?
+    assertMode(Mode.NORMAL())
+  }
+
+  @Test
+  fun `test CTRL-C at single-page hit-enter prompt closes message area without reusing escape`() {
+    enterCommand("nmap <C-C> a")      // CTRL-C should enter Insert mode
+    enterCommandForMultiLineOutput()
+    assertHitEnterPrompt()
+    doTypeText("<C-C>")
+    assertExOutputClosed()
+    assertMode(Mode.NORMAL())
   }
 
   @Test
@@ -500,6 +510,16 @@ class MessageAreaTest : VimTestCase("\n") {
   }
 
   @Test
+  fun `test CTRL-C at more-prompt closes message area without reusing escape`() {
+    enterCommand("nmap <C-C> a")    // CTRL-C should enter Insert mode
+    enterCommandForMultiPageOutput()
+    assertMorePrompt()
+    doTypeText("<C-C>")
+    assertExOutputClosed()
+    assertMode(Mode.NORMAL())
+  }
+
+  @Test
   fun `test 'q' at more-prompt closes message area without reusing 'q'`() {
     enterCommandForMultiPageOutput()
     assertMorePrompt()
@@ -743,6 +763,17 @@ class MessageAreaTest : VimTestCase("\n") {
     doTypeText("<Esc>")
     assertExOutputClosed()
     // TODO: How to verify that escape does nothing here? Mapping?
+  }
+
+  @Test
+  fun `test CTRL-C at multipage hit-enter prompt closes message area without reusing key`() {
+    enterCommand("nmap <C-C> a")      // CTRL-C should enter Insert mode
+    enterCommandForMultiPageOutput()
+    scrollOutputToEnd()
+    assertHitEnterPrompt()
+    doTypeText("<C-C>")
+    assertExOutputClosed()
+    assertMode(Mode.NORMAL())
   }
 
   @Test

@@ -600,6 +600,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
       KeyEvent.VK_PAGE_UP -> scrollPage(-1)
       KeyEvent.VK_B if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) -> scrollPage(-1)
       KeyEvent.VK_Y if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) -> copyModelessSelection()
+      KeyEvent.VK_C if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) -> close()
       else -> close(key)
     }
     else -> close(key)
@@ -629,6 +630,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
       KeyEvent.VK_PAGE_UP -> scrollPage(-1)
       KeyEvent.VK_B if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) -> scrollPage(-1)
       KeyEvent.VK_Y if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) -> copyModelessSelection()
+      KeyEvent.VK_C if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) -> close()
       else -> onBadKey()
     }
     else -> onBadKey()
