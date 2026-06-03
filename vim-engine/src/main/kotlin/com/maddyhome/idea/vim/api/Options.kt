@@ -233,6 +233,15 @@ object Options {
 
 
   // More complex options, with additional validation, etc.
+  val cmdheight: UnsignedNumberOption = addOption(object : UnsignedNumberOption("cmdheight", GLOBAL, "ch", 1) {
+    override fun checkIfValueValid(value: VimDataType, token: String) {
+      super.checkIfValueValid(value, token)
+      if (value.toVimNumber().value == 0) {
+        throw exExceptionMessage("E487", token)
+      }
+    }
+  })
+
   val guicursor: StringListOption = addOption(object : StringListOption(
     "guicursor", GLOBAL, "gcr",
     "n-v-c:block-Cursor/lCursor," +
