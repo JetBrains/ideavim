@@ -23,7 +23,7 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-## [To Be Released]
+## 2.37.0, 2026-06-02
 
 ### Fixes:
 * [VIM-4238](https://youtrack.jetbrains.com/issue/VIM-4238) Fixed macro execution applying keystrokes to wrong editor when the search window changes the focused editor during macro replay
