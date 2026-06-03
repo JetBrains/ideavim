@@ -484,7 +484,8 @@ intellijPlatform {
           Changelog.OutputType.HTML,
         )
       }
-      val youtrackUrl = "https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20Fix%20versions:%20${project.version}"
+      val youtrackUrl =
+        "https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20Fix%20versions:%20${project.version}"
       "$rendered<br>\n<a href=\"$youtrackUrl\">Changelog</a>"
     })
 
@@ -566,6 +567,10 @@ changelog {
   headerParserRegex.set("(\\d\\.\\d+(.\\d+)?)".toRegex())
 //    header = { "${project.version}" }
 //    version = "0.60"
+}
+
+tasks.named("publishPlugin") {
+  setDependsOn(dependsOn.filterNot { it == "patchChangelog" })
 }
 
 // Uncomment to enable FUS testing mode
