@@ -27,13 +27,13 @@ import com.maddyhome.idea.vim.vimscript.model.commands.CommandModifier
  * - `:resize -{n}` - decrease the height by `n` rows
  * - `:resize`      - maximise the window height
  *
- * `:vertical resize` (width) is not supported yet: IdeaVim does not parse the `:vertical` modifier.
+ * The width counterpart, `:vertical resize`, lives in [VerticalCommand].
  *
  * see "h :resize"
  */
 @ExCommand(command = "res[ize]")
 internal data class ResizeCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
-  Command.SingleExecution(range, modifier) {
+  Command.SingleExecution(range, modifier, argument) {
 
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
 

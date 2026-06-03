@@ -30,8 +30,23 @@
     "modes": "N"
   },
   {
+    "keys": "<C-W><lt>",
+    "class": "com.maddyhome.idea.vim.resize.DecreaseWindowWidthAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-W>>",
+    "class": "com.maddyhome.idea.vim.resize.IncreaseWindowWidthAction",
+    "modes": "N"
+  },
+  {
     "keys": "<C-W>_",
     "class": "com.maddyhome.idea.vim.resize.MaximizeWindowHeightAction",
+    "modes": "N"
+  },
+  {
+    "keys": "<C-W>|",
+    "class": "com.maddyhome.idea.vim.resize.MaximizeWindowWidthAction",
     "modes": "N"
   },
   {
