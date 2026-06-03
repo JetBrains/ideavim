@@ -35,6 +35,11 @@
     "modes": "N"
   },
   {
+    "keys": "<C-W>=",
+    "class": "com.maddyhome.idea.vim.resize.EqualizeWindowsAction",
+    "modes": "N"
+  },
+  {
     "keys": "<C-W>>",
     "class": "com.maddyhome.idea.vim.resize.IncreaseWindowWidthAction",
     "modes": "N"

@@ -139,3 +139,23 @@ class MaximizeWindowWidthAction : VimActionHandler.SingleExecution() {
     return true
   }
 }
+
+/**
+ * `CTRL-W =` - make all windows (almost) equally high and wide.
+ *
+ * see "h CTRL-W_="
+ */
+@CommandOrMotion(keys = ["<C-W>="], modes = [Mode.NORMAL])
+class EqualizeWindowsAction : VimActionHandler.SingleExecution() {
+  override val type: Command.Type = Command.Type.OTHER_READONLY
+
+  override fun execute(
+    editor: VimEditor,
+    context: ExecutionContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
+    ResizeService().equalizeWindows(editor)
+    return true
+  }
+}
