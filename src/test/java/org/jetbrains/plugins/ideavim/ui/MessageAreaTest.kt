@@ -17,7 +17,6 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.ui.OutputPanel
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
@@ -476,6 +475,18 @@ class MessageAreaTest : VimTestCase("\n") {
     assertHitEnterPrompt()
   }
 
+
+  fun `test multi-page content with 'nomore' will scroll backwards and re-enable pager`() {
+    enterCommand("set nomore")
+    enterCommandForMultiPageOutput()
+    assertHitEnterPrompt()
+    assertPagerTopLine(60)
+
+    doTypeText("b")
+    assertPagerTopLine(19)
+    assertMorePrompt()
+  }
+
   @Test
   fun `test multi-page output content shows more-prompt`() {
     enterCommandForMultiPageOutput()
@@ -791,9 +802,8 @@ class MessageAreaTest : VimTestCase("\n") {
     assertState(Mode.INSERT)
   }
 
-  @VimBehaviorDiffers("Vim does not hide the messages if the content can be scrolled")
   @Test
-  fun `test down at multipage hit-enter prompt closes message area and reuses key`() {
+  fun `test down at multipage hit-enter prompt deos not close message area`() {
     configureByText("""
       |${c}Lorem ipsum dolor sit amet,
       |consectetur adipiscing elit
@@ -805,19 +815,11 @@ class MessageAreaTest : VimTestCase("\n") {
     assertHitEnterPrompt()
 
     doTypeText("<Down>")
-    assertExOutputClosed()
-
-    assertState("""
-      |Lorem ipsum dolor sit amet,
-      |${c}consectetur adipiscing elit
-      |Sed in orci mauris.
-      |Cras id tellus in ex imperdiet egestas.
-    """.trimMargin())
+    assertExOutputOpen()
   }
 
-  @VimBehaviorDiffers("Vim does not hide the messages if the content can be scrolled")
   @Test
-  fun `test 'j' at multipage hit-enter prompt closes message area and reuses key`() {
+  fun `test 'j' at multipage hit-enter prompt does not close message area`() {
     configureByText("""
       |${c}Lorem ipsum dolor sit amet,
       |consectetur adipiscing elit
@@ -829,14 +831,7 @@ class MessageAreaTest : VimTestCase("\n") {
     assertHitEnterPrompt()
 
     doTypeText("j")
-    assertExOutputClosed()
-
-    assertState("""
-      |Lorem ipsum dolor sit amet,
-      |${c}consectetur adipiscing elit
-      |Sed in orci mauris.
-      |Cras id tellus in ex imperdiet egestas.
-    """.trimMargin())
+    assertExOutputOpen()
   }
 
   @Test
@@ -879,7 +874,7 @@ class MessageAreaTest : VimTestCase("\n") {
   }
 
   @Test
-  fun `test 'd' at multipage hit-enter prompt closes message area and reuses key`() {
+  fun `test 'd' at multipage hit-enter prompt deos not close message area`() {
     configureByText("""
       |${c}Lorem ipsum dolor sit amet,
       |consectetur adipiscing elit
@@ -891,16 +886,7 @@ class MessageAreaTest : VimTestCase("\n") {
     assertHitEnterPrompt()
 
     doTypeText("d")
-    assertExOutputClosed()
-
-    // If we've passed the key to the editor, it's as though we've typed `dw`
-    doTypeText("w")
-    assertState("""
-      |${c}ipsum dolor sit amet,
-      |consectetur adipiscing elit
-      |Sed in orci mauris.
-      |Cras id tellus in ex imperdiet egestas.
-    """.trimMargin())
+    assertExOutputOpen()
   }
 
   @Test
@@ -912,9 +898,8 @@ class MessageAreaTest : VimTestCase("\n") {
     assertPagerTopLine(100 - pageSize + 1 - ceil(pageSize / 2.0).toInt())
   }
 
-  @VimBehaviorDiffers("Vim does not hide the messages if the content can be scrolled")
   @Test
-  fun `test page down at multipage hit-enter prompt closes message area and reuses key`() {
+  fun `test page down at multipage hit-enter prompt does not close message area`() {
     configureByText("""
       |${c}Lorem ipsum dolor sit amet,
       |consectetur adipiscing elit
@@ -926,19 +911,11 @@ class MessageAreaTest : VimTestCase("\n") {
     assertHitEnterPrompt()
 
     doTypeText("<PageDown>")
-    assertExOutputClosed()
-
-    assertState("""
-      |Lorem ipsum dolor sit amet,
-      |consectetur adipiscing elit
-      |Sed in orci mauris.
-      |${c}Cras id tellus in ex imperdiet egestas.
-    """.trimMargin())
+    assertExOutputOpen()
   }
 
-  @VimBehaviorDiffers("Vim does not hide the messages if the content can be scrolled")
   @Test
-  fun `test 'f' at multipage hit-enter prompt closes message area and reuses key`() {
+  fun `test 'f' at multipage hit-enter prompt does not close message area`() {
     configureByText("""
       |${c}Lorem ipsum dolor sit amet,
       |consectetur adipiscing elit
@@ -950,21 +927,11 @@ class MessageAreaTest : VimTestCase("\n") {
     assertHitEnterPrompt()
 
     doTypeText("f")
-    assertExOutputClosed()
-
-    // If we reuse the 'f' we can search for the char
-    doTypeText("d")
-    assertState("""
-      |Lorem ipsum ${c}dolor sit amet,
-      |consectetur adipiscing elit
-      |Sed in orci mauris.
-      |Cras id tellus in ex imperdiet egestas.
-    """.trimMargin())
+    assertExOutputOpen()
   }
 
-  @VimBehaviorDiffers("Vim does not hide the messages if the content can be scrolled")
   @Test
-  fun `test CTRL-F at multipage hit-enter prompt closes message area and reuses key`() {
+  fun `test CTRL-F at multipage hit-enter prompt does not close message area`() {
     configureByText("""
       |${c}Lorem ipsum dolor sit amet,
       |consectetur adipiscing elit
@@ -976,13 +943,7 @@ class MessageAreaTest : VimTestCase("\n") {
     assertHitEnterPrompt()
 
     doTypeText("<C-F>")
-    assertExOutputClosed()
-    assertState("""
-      |Lorem ipsum dolor sit amet,
-      |consectetur adipiscing elit
-      |Sed in orci mauris.
-      |${c}Cras id tellus in ex imperdiet egestas.
-    """.trimMargin())
+    assertExOutputOpen()
   }
 
   @Test
