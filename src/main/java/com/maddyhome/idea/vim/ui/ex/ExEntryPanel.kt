@@ -197,7 +197,9 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
       val project = editor.project
       if (project != null) {
         toolWindowListenerConnection = project.messageBus.connect()
-        toolWindowListenerConnection!!.subscribe(ToolWindowManagerListener.TOPIC, ToolWindowPositioningListener { positionPanel() })
+        toolWindowListenerConnection!!.subscribe(
+          ToolWindowManagerListener.TOPIC,
+          ToolWindowPositioningListener { positionPanel() })
       }
       positionPanel()
       glassPane.isVisible = true
@@ -244,7 +246,7 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
         // of the current search results before the `NoHLSearchHandler` will remove all highlights again
         val editor = this.ijEditor
         if (editor != null && !editor.isDisposed && resetCaret) {
-          resetCaretOffset(editor)
+          resetCaret(editor)
         }
 
         (VimPlugin.getSearch() as VimSearchGroupBase).resetIncsearchHighlights()
@@ -285,12 +287,20 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
     deactivate(false)
   }
 
-  private fun resetCaretOffset(editor: Editor) {
+  private fun resetCaretOffsetAndScroll(editor: Editor) {
     // Reset the original caret, with original scroll offsets
+    resetCaret(editor)
+    resetScroll(editor)
+  }
+
+  private fun resetCaret(editor: Editor) {
     val primaryCaret = editor.caretModel.primaryCaret
     if (primaryCaret.offset != caretOffset) {
-      IjVimCaret(primaryCaret).moveToOffset(caretOffset)
+      primaryCaret.moveToOffset(caretOffset)
     }
+  }
+
+  private fun resetScroll(editor: Editor) {
     val scrollingModel = editor.scrollingModel
     if (scrollingModel.horizontalScrollOffset != horizontalOffset ||
       scrollingModel.verticalScrollOffset != verticalOffset
@@ -340,7 +350,7 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
             // E.g. Highlight `whatever`, type `:%s/foo` + highlight `foo`, delete back to `:%s/` and reset highlights
             // back to `whatever`
             (VimPlugin.getSearch() as VimSearchGroupBase).resetIncsearchHighlights()
-            resetCaretOffset(editor)
+            resetCaretOffsetAndScroll(editor)
             return
           }
         }
@@ -377,7 +387,7 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
             }
             IjVimCaret(editor.caretModel.primaryCaret).moveToOffset(matchOffset)
           } else {
-            resetCaretOffset(editor)
+            resetCaretOffsetAndScroll(editor)
           }
         }
       } catch (ex: Throwable) {
