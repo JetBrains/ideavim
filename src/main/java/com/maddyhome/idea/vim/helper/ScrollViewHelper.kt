@@ -17,6 +17,7 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.helper.EditorHelper.getApproximateScreenHeight
 import com.maddyhome.idea.vim.helper.EditorHelper.getApproximateScreenWidth
 import com.maddyhome.idea.vim.helper.EditorHelper.getNonNormalizedVisualLineAtBottomOfScreen
+import com.maddyhome.idea.vim.helper.EditorHelper.getVisibleArea
 import com.maddyhome.idea.vim.helper.EditorHelper.getVisualColumnAtLeftOfDisplay
 import com.maddyhome.idea.vim.helper.EditorHelper.getVisualColumnAtRightOfDisplay
 import com.maddyhome.idea.vim.helper.EditorHelper.getVisualLineAtBottomOfScreen
@@ -127,11 +128,22 @@ internal object ScrollViewHelper {
         scrollOffset,
         scrollJump,
         height,
+        inlayAwareMinHeightFudge,
       )
       return
     }
 
-    if (shouldScrollDownToShowCaret(caretLine, bottomBound, bottomLine, lastLine)) {
+    if (shouldScrollDownToShowCaret(
+        editor,
+        caretLine,
+        bottomBound,
+        bottomLine,
+        lastLine,
+        scrollOffset,
+        height,
+        inlayAwareMinHeightFudge,
+      )
+    ) {
       scrollCaretIntoViewVerticallyDown(
         editor,
         vimEditor,
@@ -140,24 +152,47 @@ internal object ScrollViewHelper {
         scrollOffset,
         scrollJump,
         height,
+        inlayAwareMinHeightFudge,
       )
     }
   }
+
+  private fun isScreenHeightReliableForCentering(height: Int, inlayAwareMinHeightFudge: Int): Boolean =
+    height > inlayAwareMinHeightFudge
 
   private fun shouldCenterCaretDueToLargeScrollOffset(
     height: Int,
     scrollOffset: Int,
     inlayAwareMinHeightFudge: Int,
-  ): Boolean = height > inlayAwareMinHeightFudge && scrollOffset > height / 2
+  ): Boolean = isScreenHeightReliableForCentering(height, inlayAwareMinHeightFudge) && scrollOffset > height / 2
 
   private fun isCaretAboveTopBound(caretLine: Int, topBound: Int): Boolean = caretLine < topBound
 
   private fun shouldScrollDownToShowCaret(
+    editor: Editor,
     caretLine: Int,
     bottomBound: Int,
     bottomLine: Int,
     lastLine: Int,
-  ): Boolean = caretLine > bottomBound && bottomLine < lastLine
+    scrollOffset: Int,
+    height: Int,
+    inlayAwareMinHeightFudge: Int,
+  ): Boolean {
+    if (bottomLine >= lastLine) return false
+
+    if (!isScreenHeightReliableForCentering(height, inlayAwareMinHeightFudge)) {
+      return !isCaretWithinVerticalScrollBounds(editor, caretLine, scrollOffset)
+    }
+
+    return caretLine > bottomBound
+  }
+
+  private fun isCaretWithinVerticalScrollBounds(editor: Editor, caretLine: Int, scrollOffset: Int): Boolean {
+    val visibleArea = getVisibleArea(editor)
+    val caretY = editor.visualLineToY(caretLine)
+    val bottomLimit = visibleArea.y + visibleArea.height - scrollOffset * editor.lineHeight
+    return caretY >= visibleArea.y && caretY <= bottomLimit
+  }
 
   // Scrolling up, put the cursor at the top of the window (minus scrolloff)
   private fun scrollCaretIntoViewVerticallyUp(
@@ -168,9 +203,10 @@ internal object ScrollViewHelper {
     scrollOffset: Int,
     scrollJump: Int,
     height: Int,
+    inlayAwareMinHeightFudge: Int,
   ) {
     // Initial approximation in move.c:update_topline (including same calculation for halfHeight)
-    if (shouldCenterCaretWhenScrollingUp(topLine, scrollOffset, caretLine, height)) {
+    if (shouldCenterCaretWhenScrollingUp(topLine, scrollOffset, caretLine, height, inlayAwareMinHeightFudge)) {
       scrollVisualLineToMiddleOfScreen(editor, caretLine, false)
       return
     }
@@ -189,7 +225,7 @@ internal object ScrollViewHelper {
     val usedAbove = caretLine - newTopLine
     val usedBelow = min(scrollOffset, vimEditor.getVisualLineCount() - caretLine)
     val used = 1 + usedAbove + usedBelow
-    if (doesScrollUpUsedLinesExceedScreenHeight(used, height)) {
+    if (doesScrollUpUsedLinesExceedScreenHeight(used, height, inlayAwareMinHeightFudge)) {
       scrollVisualLineToMiddleOfScreen(editor, caretLine, false)
     } else {
       scrollVisualLineToTopOfScreen(editor, newTopLine)
@@ -201,9 +237,15 @@ internal object ScrollViewHelper {
     scrollOffset: Int,
     caretLine: Int,
     height: Int,
-  ): Boolean = topLine + scrollOffset - caretLine >= max(2, height / 2 - 1)
+    inlayAwareMinHeightFudge: Int,
+  ): Boolean = isScreenHeightReliableForCentering(height, inlayAwareMinHeightFudge) &&
+    topLine + scrollOffset - caretLine >= max(2, height / 2 - 1)
 
-  private fun doesScrollUpUsedLinesExceedScreenHeight(used: Int, height: Int): Boolean = used > height
+  private fun doesScrollUpUsedLinesExceedScreenHeight(
+    used: Int,
+    height: Int,
+    inlayAwareMinHeightFudge: Int,
+  ): Boolean = isScreenHeightReliableForCentering(height, inlayAwareMinHeightFudge) && used > height
 
   // Scrolling down, put the cursor at the bottom of the window (minus scrolloff)
   // Do nothing if the bottom of the file is already above the bottom of the screen
@@ -215,10 +257,18 @@ internal object ScrollViewHelper {
     scrollOffset: Int,
     scrollJump: Int,
     height: Int,
+    inlayAwareMinHeightFudge: Int,
   ) {
     // Vim does a quick approximation before going through the full algorithm. It checks the line below the bottom
     // line in the window (bottomLine + 1). See move.c:update_topline
-    if (shouldCenterCaretOnInitialDownScrollApproximation(caretLine, bottomLine, scrollOffset, height)) {
+    if (shouldCenterCaretOnInitialDownScrollApproximation(
+        caretLine,
+        bottomLine,
+        scrollOffset,
+        height,
+        inlayAwareMinHeightFudge,
+      )
+    ) {
       scrollVisualLineToMiddleOfScreen(editor, caretLine, false)
       return
     }
@@ -241,7 +291,13 @@ internal object ScrollViewHelper {
     // If we've expanded more than a screen full, redraw with the cursor in the middle of the screen. If we're going
     // scroll more than a screen full or more than scrolloff, redraw with the cursor in the middle of the screen.
     val lineCount = if (used > height) used else scrolled
-    if (shouldCenterCaretWhenScrollDownLineCountExceeded(lineCount, height, scrollOffset)) {
+    if (shouldCenterCaretWhenScrollDownLineCountExceeded(
+        lineCount,
+        height,
+        scrollOffset,
+        inlayAwareMinHeightFudge,
+      )
+    ) {
       scrollVisualLineToMiddleOfScreen(editor, caretLine, false)
     } else {
       scrollVisualLineToBottomOfScreen(editor, caretLine + extra)
@@ -253,13 +309,17 @@ internal object ScrollViewHelper {
     bottomLine: Int,
     scrollOffset: Int,
     height: Int,
-  ): Boolean = caretLine - (bottomLine + 1) + 1 + scrollOffset > height
+    inlayAwareMinHeightFudge: Int,
+  ): Boolean = isScreenHeightReliableForCentering(height, inlayAwareMinHeightFudge) &&
+    caretLine - (bottomLine + 1) + 1 + scrollOffset > height
 
   private fun shouldCenterCaretWhenScrollDownLineCountExceeded(
     lineCount: Int,
     height: Int,
     scrollOffset: Int,
-  ): Boolean = lineCount >= height && lineCount > scrollOffset
+    inlayAwareMinHeightFudge: Int,
+  ): Boolean = isScreenHeightReliableForCentering(height, inlayAwareMinHeightFudge) &&
+    lineCount >= height && lineCount > scrollOffset
 
   private fun getScrollJump(editor: VimEditor, height: Int): Int {
     val flags = injector.vimState.executingCommandFlags
