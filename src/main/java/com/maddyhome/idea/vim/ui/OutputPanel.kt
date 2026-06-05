@@ -12,6 +12,7 @@ import com.intellij.ide.RemoteDesktopService
 import com.intellij.ide.ui.LafManager
 import com.intellij.ide.ui.LafManagerListener
 import com.intellij.openapi.application.runInEdt
+import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.util.registry.Registry
@@ -33,6 +34,7 @@ import com.maddyhome.idea.vim.api.MessageType
 import com.maddyhome.idea.vim.api.VimOutputPanel
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.group.CoroutineScopeProvider
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.requestFocus
 import com.maddyhome.idea.vim.helper.selectEditorFont
@@ -41,7 +43,9 @@ import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.register.RegisterConstants
 import com.maddyhome.idea.vim.ui.ex.GlassPaneManager
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.annotations.TestOnly
 import org.jetbrains.annotations.VisibleForTesting
 import java.awt.BorderLayout
@@ -105,6 +109,8 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
   private var allowClose = true
 
   private val animator = JBAnimator().setPeriod(4).setName("IdeaVim output panel animator")
+
+  private var autoCloseJob: Job? = null
 
   var active: Boolean = false
 
@@ -174,8 +180,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
         // Setting "mopt=wait:0" will disable the wait at the end of the output, closing it immediately.
         // Setting "hit-enter,wait:0" will show the hit-enter prompt (Vim states that hit-enter takes precedence), and
         // will disable the wait in single-line messages, leaving it open.
-        // TODO: Support "hit-enter" properly
-        if (isSingleLine /*|| !injector.globalOptions().messagesopt.contains("hit-enter")*/) {
+        if (isSingleLine) {
           val wait = injector.globalOptions().messagesopt["wait"]?.toIntOrNull()?.milliseconds
           if (wait != null && wait > 0.milliseconds) {
             delay(wait)
@@ -340,6 +345,8 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
 
   private fun close(key: KeyStroke?) {
     animator.stop()
+    autoCloseJob?.cancel()
+    autoCloseJob = null
 
     val passKeyBack = isSingleLine
     val doDeactivate = {
@@ -539,9 +546,30 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
   }
 
   private fun updatePrompt() {
+    autoCloseJob?.cancel()
+    autoCloseJob = null
+
     // Check if we're at the end or if content fits entirely (nothing to scroll)
     if (isAtEnd) {
-      promptComponent.text = injector.messages.message("message.ex.output.end.prompt")
+      if (injector.globalOptions().messagesopt.containsKey("hit-enter")) {
+        promptComponent.text = injector.messages.message("message.ex.output.end.prompt")
+      }
+      else {
+        promptComponent.text = ""
+        // Single-line auto-close is handled by the launchOnShow coroutine in init
+        if (!isSingleLine) {
+          val wait = injector.globalOptions().messagesopt["wait"]?.toIntOrNull() ?: 0
+          if (wait > 0) {
+            autoCloseJob = service<CoroutineScopeProvider>().coroutineScope.launch {
+              delay(wait.milliseconds)
+              runInEdt { if (active) close() }
+            }
+          }
+          else {
+            close()
+          }
+        }
+      }
     } else {
       promptComponent.text = injector.messages.message("message.ex.output.more.prompt")
     }
@@ -577,33 +605,51 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     }
   }
 
-  private fun handleHitEnterPrompt(key: KeyStroke) = when (key.keyChar) {
-    'g' -> scrollToStart()
-    'G' -> close(key)
-    ' ' -> close()
-    'f' -> close(key)
-    'd' -> close(key)
-    'j' -> close(key)
-    'b' -> scrollPage(-1)
-    'u' -> scrollHalfPage(-1)
-    'k' -> scrollLine(-1)
-    'q' -> close()
-    KeyEvent.CHAR_UNDEFINED -> when (key.keyCode) {
-      KeyEvent.VK_ESCAPE -> close()
-      KeyEvent.VK_ENTER -> close()
-      KeyEvent.VK_DOWN -> close(key)
-      KeyEvent.VK_PAGE_DOWN -> close(key)
-      KeyEvent.VK_F if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) -> close(key)
-      KeyEvent.VK_BACK_SPACE -> scrollLine(-1)
-      KeyEvent.VK_UP -> scrollLine(-1)
-      KeyEvent.VK_H if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) -> scrollLine(-1)
-      KeyEvent.VK_PAGE_UP -> scrollPage(-1)
-      KeyEvent.VK_B if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) -> scrollPage(-1)
-      KeyEvent.VK_Y if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) -> copyModelessSelection()
-      KeyEvent.VK_C if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) -> close()
+  private fun handleHitEnterPrompt(key: KeyStroke) {
+    // When the output is smaller than a page, scrolling up/back does nothing. Scrolling down/forward will close.
+    // When it's longer than a page, scrolling up/back will scroll. Scrolling down/forward does nothing (although Space
+    // and Enter will still close).
+    // Vim treats 'nomore' as disabling the pager. Since we're a GUI app, and because it's possible to scroll with e.g.,
+    // the mouse wheel, we'll disable the pager and automatically scroll to the end of the output. Trying to scroll
+    // down/forward will behave as normal, but scrolling up/back will re-enable the pager (assuming long content). In
+    // other words, we don't do anything special for 'nomore' other than scroll straight to the end.
+    // If 'messagesopt' is missing "hit-enter", then we should wait "wait" milliseconds and then close, instead of
+    // showing the hit-enter prompt. However, this is terrible UX - Vim makes you wait, and doesn't allow any scrolling.
+    // Like 'nomore', we want to take into consideration that we're a GUI application, so we treat missing "hit-enter"
+    // as removing the "hit-enter" prompt and  automatically close after "wait" milliseconds.
+    val contentHeight = textPane.preferredSize.height
+    val viewportHeight = scrollPane.viewport.height
+    val scrollDownMeansClose = contentHeight <= viewportHeight
+
+    when (key.keyChar) {
+      'g' -> scrollToStart()
+      'G' -> close(key) // Always closes
+      ' ' -> close()    // Always close
+      'f' -> if (scrollDownMeansClose) close(key)
+      'd' -> if (scrollDownMeansClose) close(key)
+      'j' -> if (scrollDownMeansClose) close(key)
+      'b' -> scrollPage(-1)
+      'u' -> scrollHalfPage(-1)
+      'k' -> scrollLine(-1)
+      'q' -> close()
+      KeyEvent.CHAR_UNDEFINED -> when (key.keyCode) {
+        KeyEvent.VK_ESCAPE -> close()
+        KeyEvent.VK_ENTER -> close()  // Always close
+        KeyEvent.VK_DOWN -> if (scrollDownMeansClose) close(key)
+        KeyEvent.VK_PAGE_DOWN -> if (scrollDownMeansClose) close(key)
+        KeyEvent.VK_F if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) -> if (scrollDownMeansClose) close(key)
+        KeyEvent.VK_BACK_SPACE -> scrollLine(-1)
+        KeyEvent.VK_UP -> scrollLine(-1)
+        KeyEvent.VK_H if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) -> scrollLine(-1)
+        KeyEvent.VK_PAGE_UP -> scrollPage(-1)
+        KeyEvent.VK_B if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) -> scrollPage(-1)
+        KeyEvent.VK_Y if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) -> copyModelessSelection()
+        KeyEvent.VK_C if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) -> close()
+        else -> close(key)
+      }
+
       else -> close(key)
     }
-    else -> close(key)
   }
 
   private fun handleMorePrompt(key: KeyStroke) = when (key.keyChar) {
