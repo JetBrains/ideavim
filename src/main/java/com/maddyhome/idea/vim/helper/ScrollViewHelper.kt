@@ -113,69 +113,153 @@ internal object ScrollViewHelper {
     // Note that while these calculations do the same thing that Vim does, it processes them differently. E.g. it
     // optionally checks and moves the top line, then optionally checks the bottom line. This gives us the same results
     // via the tests.
-    if (height > inlayAwareMinHeightFudge && scrollOffset > height / 2) {
+    if (shouldCenterCaretDueToLargeScrollOffset(height, scrollOffset, inlayAwareMinHeightFudge)) {
       scrollVisualLineToMiddleOfScreen(editor, caretLine, false)
-    } else if (caretLine < topBound) {
-      // Scrolling up, put the cursor at the top of the window (minus scrolloff)
-      // Initial approximation in move.c:update_topline (including same calculation for halfHeight)
-      if (topLine + scrollOffset - caretLine >= max(2, height / 2 - 1)) {
-        scrollVisualLineToMiddleOfScreen(editor, caretLine, false)
-      } else {
-        // New top line must be at least scrolloff above caretLine. If this is above current top line, we must scroll
-        // at least scrolljump. If caretLine was already above topLine, this counts as one scroll, and we scroll from
-        // here. Otherwise, we scroll from topLine
-        val scrollJumpTopLine =
-          max(0, if (caretLine < topLine) caretLine - scrollJump + 1 else topLine - scrollJump)
-        val scrollOffsetTopLine = max(0, caretLine - scrollOffset)
-        val newTopLine = min(scrollOffsetTopLine, scrollJumpTopLine)
+      return
+    }
 
-        // Used is set to the line height of caretLine (1 or how many lines soft wraps take up), and then incremented by
-        // the line heights of the lines above and below caretLine (up to scrolloff or end of file).
-        // Our implementation ignores soft wrap line heights. Folds already have a line height of 1.
-        val usedAbove = caretLine - newTopLine
-        val usedBelow = min(scrollOffset, vimEditor.getVisualLineCount() - caretLine)
-        val used = 1 + usedAbove + usedBelow
-        if (used > height) {
-          scrollVisualLineToMiddleOfScreen(editor, caretLine, false)
-        } else {
-          scrollVisualLineToTopOfScreen(editor, newTopLine)
-        }
-      }
-    } else if (caretLine > bottomBound && bottomLine < lastLine) {
-      // Scrolling down, put the cursor at the bottom of the window (minus scrolloff)
-      // Do nothing if the bottom of the file is already above the bottom of the screen
-      // Vim does a quick approximation before going through the full algorithm. It checks the line below the bottom
-      // line in the window (bottomLine + 1). See move.c:update_topline
-      var lineCount = caretLine - (bottomLine + 1) + 1 + scrollOffset
-      if (lineCount > height) {
-        scrollVisualLineToMiddleOfScreen(editor, caretLine, false)
-      } else {
-        // Vim expands out from caretLine at least scrolljump lines. It stops expanding above when it hits the
-        // current bottom line, or (because it's expanding above and below) when it's scrolled scrolljump/2. It expands
-        // above first, and the initial scroll count is 1, so we used (scrolljump+1)/2
-        val scrolledAbove = caretLine - bottomLine
-        val extra = max(scrollOffset, scrollJump - min(scrolledAbove, ((scrollJump + 1) / 2.0f).roundToInt()))
-        val scrolled = scrolledAbove + extra
+    if (isCaretAboveTopBound(caretLine, topBound)) {
+      scrollCaretIntoViewVerticallyUp(
+        editor,
+        vimEditor,
+        caretLine,
+        topLine,
+        scrollOffset,
+        scrollJump,
+        height,
+      )
+      return
+    }
 
-        // "used" is the count of lines expanded above and below. We expand below until we hit EOF (or when we've
-        // expanded over a screen full) or until we've scrolled enough, and we've expanded at least linesAbove
-        // We expand above until usedAbove + usedBelow >= height. Or until we've scrolled enough (scrolled > sj and extra > so)
-        // and we've expanded at least linesAbove (and at most, linesAbove - scrolled - scrolledAbove - 1)
-        // The minus one is for the current line
-        val usedBelow = min(vimEditor.getVisualLineCount() - caretLine, scrolledAbove - 1)
-        val used = min(height + 1, scrolledAbove + usedBelow)
-
-        // If we've expanded more than a screen full, redraw with the cursor in the middle of the screen. If we're going
-        // scroll more than a screen full or more than scrolloff, redraw with the cursor in the middle of the screen.
-        lineCount = if (used > height) used else scrolled
-        if (lineCount >= height && lineCount > scrollOffset) {
-          scrollVisualLineToMiddleOfScreen(editor, caretLine, false)
-        } else {
-          scrollVisualLineToBottomOfScreen(editor, caretLine + extra)
-        }
-      }
+    if (shouldScrollDownToShowCaret(caretLine, bottomBound, bottomLine, lastLine)) {
+      scrollCaretIntoViewVerticallyDown(
+        editor,
+        vimEditor,
+        caretLine,
+        bottomLine,
+        scrollOffset,
+        scrollJump,
+        height,
+      )
     }
   }
+
+  private fun shouldCenterCaretDueToLargeScrollOffset(
+    height: Int,
+    scrollOffset: Int,
+    inlayAwareMinHeightFudge: Int,
+  ): Boolean = height > inlayAwareMinHeightFudge && scrollOffset > height / 2
+
+  private fun isCaretAboveTopBound(caretLine: Int, topBound: Int): Boolean = caretLine < topBound
+
+  private fun shouldScrollDownToShowCaret(
+    caretLine: Int,
+    bottomBound: Int,
+    bottomLine: Int,
+    lastLine: Int,
+  ): Boolean = caretLine > bottomBound && bottomLine < lastLine
+
+  // Scrolling up, put the cursor at the top of the window (minus scrolloff)
+  private fun scrollCaretIntoViewVerticallyUp(
+    editor: Editor,
+    vimEditor: VimEditor,
+    caretLine: Int,
+    topLine: Int,
+    scrollOffset: Int,
+    scrollJump: Int,
+    height: Int,
+  ) {
+    // Initial approximation in move.c:update_topline (including same calculation for halfHeight)
+    if (shouldCenterCaretWhenScrollingUp(topLine, scrollOffset, caretLine, height)) {
+      scrollVisualLineToMiddleOfScreen(editor, caretLine, false)
+      return
+    }
+
+    // New top line must be at least scrolloff above caretLine. If this is above current top line, we must scroll
+    // at least scrolljump. If caretLine was already above topLine, this counts as one scroll, and we scroll from
+    // here. Otherwise, we scroll from topLine
+    val scrollJumpTopLine =
+      max(0, if (caretLine < topLine) caretLine - scrollJump + 1 else topLine - scrollJump)
+    val scrollOffsetTopLine = max(0, caretLine - scrollOffset)
+    val newTopLine = min(scrollOffsetTopLine, scrollJumpTopLine)
+
+    // Used is set to the line height of caretLine (1 or how many lines soft wraps take up), and then incremented by
+    // the line heights of the lines above and below caretLine (up to scrolloff or end of file).
+    // Our implementation ignores soft wrap line heights. Folds already have a line height of 1.
+    val usedAbove = caretLine - newTopLine
+    val usedBelow = min(scrollOffset, vimEditor.getVisualLineCount() - caretLine)
+    val used = 1 + usedAbove + usedBelow
+    if (doesScrollUpUsedLinesExceedScreenHeight(used, height)) {
+      scrollVisualLineToMiddleOfScreen(editor, caretLine, false)
+    } else {
+      scrollVisualLineToTopOfScreen(editor, newTopLine)
+    }
+  }
+
+  private fun shouldCenterCaretWhenScrollingUp(
+    topLine: Int,
+    scrollOffset: Int,
+    caretLine: Int,
+    height: Int,
+  ): Boolean = topLine + scrollOffset - caretLine >= max(2, height / 2 - 1)
+
+  private fun doesScrollUpUsedLinesExceedScreenHeight(used: Int, height: Int): Boolean = used > height
+
+  // Scrolling down, put the cursor at the bottom of the window (minus scrolloff)
+  // Do nothing if the bottom of the file is already above the bottom of the screen
+  private fun scrollCaretIntoViewVerticallyDown(
+    editor: Editor,
+    vimEditor: VimEditor,
+    caretLine: Int,
+    bottomLine: Int,
+    scrollOffset: Int,
+    scrollJump: Int,
+    height: Int,
+  ) {
+    // Vim does a quick approximation before going through the full algorithm. It checks the line below the bottom
+    // line in the window (bottomLine + 1). See move.c:update_topline
+    if (shouldCenterCaretOnInitialDownScrollApproximation(caretLine, bottomLine, scrollOffset, height)) {
+      scrollVisualLineToMiddleOfScreen(editor, caretLine, false)
+      return
+    }
+
+    // Vim expands out from caretLine at least scrolljump lines. It stops expanding above when it hits the
+    // current bottom line, or (because it's expanding above and below) when it's scrolled scrolljump/2. It expands
+    // above first, and the initial scroll count is 1, so we used (scrolljump+1)/2
+    val scrolledAbove = caretLine - bottomLine
+    val extra = max(scrollOffset, scrollJump - min(scrolledAbove, ((scrollJump + 1) / 2.0f).roundToInt()))
+    val scrolled = scrolledAbove + extra
+
+    // "used" is the count of lines expanded above and below. We expand below until we hit EOF (or when we've
+    // expanded over a screen full) or until we've scrolled enough, and we've expanded at least linesAbove
+    // We expand above until usedAbove + usedBelow >= height. Or until we've scrolled enough (scrolled > sj and extra > so)
+    // and we've expanded at least linesAbove (and at most, linesAbove - scrolled - scrolledAbove - 1)
+    // The minus one is for the current line
+    val usedBelow = min(vimEditor.getVisualLineCount() - caretLine, scrolledAbove - 1)
+    val used = min(height + 1, scrolledAbove + usedBelow)
+
+    // If we've expanded more than a screen full, redraw with the cursor in the middle of the screen. If we're going
+    // scroll more than a screen full or more than scrolloff, redraw with the cursor in the middle of the screen.
+    val lineCount = if (used > height) used else scrolled
+    if (shouldCenterCaretWhenScrollDownLineCountExceeded(lineCount, height, scrollOffset)) {
+      scrollVisualLineToMiddleOfScreen(editor, caretLine, false)
+    } else {
+      scrollVisualLineToBottomOfScreen(editor, caretLine + extra)
+    }
+  }
+
+  private fun shouldCenterCaretOnInitialDownScrollApproximation(
+    caretLine: Int,
+    bottomLine: Int,
+    scrollOffset: Int,
+    height: Int,
+  ): Boolean = caretLine - (bottomLine + 1) + 1 + scrollOffset > height
+
+  private fun shouldCenterCaretWhenScrollDownLineCountExceeded(
+    lineCount: Int,
+    height: Int,
+    scrollOffset: Int,
+  ): Boolean = lineCount >= height && lineCount > scrollOffset
 
   private fun getScrollJump(editor: VimEditor, height: Int): Int {
     val flags = injector.vimState.executingCommandFlags
