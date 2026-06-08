@@ -111,15 +111,12 @@ internal object ScrollViewHelper {
     // relative to other text in the file.
     val inlayAwareMinHeightFudge = getApproximateScreenHeight(editor) / 2
 
-    // Note that while these calculations do the same thing that Vim does, it processes them differently. E.g. it
-    // optionally checks and moves the top line, then optionally checks the bottom line. This gives us the same results
-    // via the tests.
     if (shouldCenterCaretDueToLargeScrollOffset(height, scrollOffset, inlayAwareMinHeightFudge)) {
       scrollVisualLineToMiddleOfScreen(editor, caretLine, false)
       return
     }
 
-    if (isCaretAboveTopBound(caretLine, topBound)) {
+    if (shouldScrollUpToShowCaret(editor, caretLine, topBound, scrollOffset, height, inlayAwareMinHeightFudge)) {
       scrollCaretIntoViewVerticallyUp(
         editor,
         vimEditor,
@@ -166,7 +163,20 @@ internal object ScrollViewHelper {
     inlayAwareMinHeightFudge: Int,
   ): Boolean = isScreenHeightReliableForCentering(height, inlayAwareMinHeightFudge) && scrollOffset > height / 2
 
-  private fun isCaretAboveTopBound(caretLine: Int, topBound: Int): Boolean = caretLine < topBound
+  private fun shouldScrollUpToShowCaret(
+    editor: Editor,
+    caretLine: Int,
+    topBound: Int,
+    scrollOffset: Int,
+    height: Int,
+    inlayAwareMinHeightFudge: Int,
+  ): Boolean {
+    if (!isScreenHeightReliableForCentering(height, inlayAwareMinHeightFudge)) {
+      return !isCaretWithinVerticalScrollBounds(editor, caretLine, scrollOffset)
+    }
+
+    return caretLine < topBound
+  }
 
   private fun shouldScrollDownToShowCaret(
     editor: Editor,
