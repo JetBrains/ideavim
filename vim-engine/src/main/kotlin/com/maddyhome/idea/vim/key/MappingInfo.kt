@@ -133,7 +133,8 @@ class ToExpressionMappingInfo(
   override fun execute(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
     LOG.debug("Executing 'ToExpression' mapping info...")
 
-    val toKeys = injector.parser.parseKeys(toExpression.evaluate(editor, context, CommandLineVimLContext).toOutputString())
+    val toKeys =
+      injector.parser.parseKeys(toExpression.evaluate(editor, context, CommandLineVimLContext).toOutputString())
 
     // TODO: Merge similar code from ToKeysMappingInfo
     // From the Vim docs: If the {rhs} starts with the {lhs}, the first character is not mapped again.
@@ -272,7 +273,11 @@ class ToActionMappingInfo(
 
   override fun execute(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
     LOG.debug("Executing 'ToAction' mapping...")
-    injector.actionExecutor.executeAction(editor, name = action, context = context)
+    val count = keyState.editorCommandBuilder.calculateCount0Snapshot().coerceAtLeast(1)
+    keyState.editorCommandBuilder.resetCount()
+    repeat(count) {
+      injector.actionExecutor.executeAction(editor, name = action, context = context)
+    }
   }
 
   companion object {

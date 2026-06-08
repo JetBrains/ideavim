@@ -1195,6 +1195,34 @@ class MapCommandTest : VimTestCase() {
     )
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test count is applied to action mapping`() {
+    configureByText(
+      """
+     ${c}line0
+     line1
+     line2
+     line3
+     line4
+     line5
+    """.trimIndent()
+    )
+    enterCommand("map gj :action EditorCloneCaretBelow<CR>")
+    typeText("5gj")
+    // The count should run the cloning action 5 times, leaving 5 cloned carets plus the original.
+    assertState(
+      """
+     ${c}line0
+     ${c}line1
+     ${c}line2
+     ${c}line3
+     ${c}line4
+     ${c}line5
+    """.trimIndent()
+    )
+  }
+
   @TestFor(issues = ["VIM-2929"])
   @TestWithoutNeovim(reason = SkipNeovimReason.ACTION_COMMAND)
   @Test
