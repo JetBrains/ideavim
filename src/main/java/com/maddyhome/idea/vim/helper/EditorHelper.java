@@ -52,7 +52,12 @@ public class EditorHelper {
   private static final int BLOCK_INLAY_MAX_LINE_HEIGHT = 3;
 
   public static @NotNull Rectangle getVisibleArea(final @NotNull Editor editor) {
-    return editor.getScrollingModel().getVisibleAreaOnScrollingFinished();
+    final Rectangle area = editor.getScrollingModel().getVisibleAreaOnScrollingFinished();
+    final int stickyLinesHeight = getStickyLinesPanelHeight(editor);
+    if (stickyLinesHeight <= 0) {
+      return area;
+    }
+    return new Rectangle(area.x, area.y + stickyLinesHeight, area.width, max(0, area.height - stickyLinesHeight));
   }
 
   public static boolean scrollVertically(@NotNull Editor editor, int verticalOffset) {
@@ -319,6 +324,7 @@ public class EditorHelper {
     final int inlayHeight = EditorUtil.getInlaysHeight(editor, visualLine, true);
     final int maxInlayHeight = BLOCK_INLAY_MAX_LINE_HEIGHT * editor.getLineHeight();
     int y = editor.visualLineToY(visualLine) - Math.min(inlayHeight, maxInlayHeight);
+    y -= getStickyLinesPanelHeight(editor);
 
     // Normalise Y so that we don't try to scroll the editor to a location it can't reach. The editor will handle this,
     // but when we ask for the target location to move the caret to match, we'll get the incorrect value.
@@ -353,7 +359,7 @@ public class EditorHelper {
     final int screenHeight = visibleArea.height;
     final int lineHeight = editor.getLineHeight();
 
-    final int offset = y - ((screenHeight - lineHeight) / lineHeight / 2 * lineHeight);
+    final int offset = y - getStickyLinesPanelHeight(editor) - ((screenHeight - lineHeight) / lineHeight / 2 * lineHeight);
     final @NotNull VimEditor editor1 = new IjVimEditor(editor);
     final int lastVisualLine = EngineEditorHelperKt.getVisualLineCount(editor1) - 1;
     final int offsetForLastLineAtBottom = getOffsetToScrollVisualLineToBottomOfScreen(editor, lastVisualLine);
@@ -391,11 +397,21 @@ public class EditorHelper {
     // end of the file.
     // Adjust available height if the ex entry text field is visible
     final int lineHeight = editor.getLineHeight();
-    final int screenHeight = getVisibleArea(editor).height - getExEntryHeight() - getHorizontalScrollbarHeight(editor);
+    // Use the full viewport height for bottom placement. Sticky lines reduce the content area at the top, but the
+    // bottom of the window is still the physical bottom of the viewport (minus ex command line and scrollbar).
+    final int screenHeight = editor.getScrollingModel().getVisibleAreaOnScrollingFinished().height
+      - getExEntryHeight() - getHorizontalScrollbarHeight(editor);
     final int inlayHeight = EditorUtil.getInlaysHeight(editor, nonNormalisedVisualLine, false);
     final int maxInlayHeight = BLOCK_INLAY_MAX_LINE_HEIGHT * lineHeight;
     final int y = editor.visualLineToY(nonNormalisedVisualLine) + lineHeight + min(inlayHeight, maxInlayHeight);
     return max(0, y - screenHeight);
+  }
+
+  private static int getStickyLinesPanelHeight(final @NotNull Editor editor) {
+    if (editor instanceof EditorImpl editorImpl) {
+      return editorImpl.getStickyLinesPanelHeight();
+    }
+    return 0;
   }
 
   private static int getExEntryHeight() {
