@@ -378,6 +378,7 @@ class MapCommandTest : VimTestCase() {
   fun `test map reports when no existing mappings match prefix`() {
     configureByText("\n")
     enterCommand("map quux bar")
+    enterCommand("map fop bop")
     assertCommandOutput("map foo", "No mapping found")
   }
 

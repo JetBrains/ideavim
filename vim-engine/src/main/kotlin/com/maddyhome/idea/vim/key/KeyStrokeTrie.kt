@@ -155,8 +155,8 @@ class KeyStrokeTrie<T>(private val name: String) {
     if (prefix?.isNotEmpty() == true) {
       // For prefix matching, yield all nodes along the path that have data, then yield the children
       prefix.forEach {
-        if (!node.children.isInitialized()) return@forEach
-        node = node.children.value[it] ?: return@forEach
+        if (!node.children.isInitialized()) return@sequence
+        node = node.children.value[it] ?: return@sequence
         if (node.data != null && includePrefixNodes) {
           yield(node)
         }
