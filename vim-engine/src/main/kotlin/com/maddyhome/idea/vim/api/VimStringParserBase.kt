@@ -48,7 +48,7 @@ abstract class VimStringParserBase : VimStringParser {
         "^" + key.keyCode.toChar()
       }
     } else if (key.keyChar == KeyEvent.CHAR_UNDEFINED && key.keyCode == KeyEvent.VK_ENTER) {
-      return "\u000D"
+      return "\n"
     }
     return key.keyCode.toChar().toString()
   }

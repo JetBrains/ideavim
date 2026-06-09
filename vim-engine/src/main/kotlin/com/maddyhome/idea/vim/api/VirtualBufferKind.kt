@@ -10,19 +10,21 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.common.Direction
 
 /**
- * Identifies which Vim command-line window the editor is hosting.
- *
- * - [Command]: `q:` window over `:` command history.
- * - [Search]: `q/` (forward) or `q?` (backward) window over `/` search history.
+ * Identifies which kind of virtual buffer the editor is hosting: a command-line / search history
+ * window (`q:`, `q/`, `q?`) or the control-chars editor.
  */
-sealed class HistoryWindowKind {
+sealed class VirtualBufferKind {
   abstract val fileName: String
 
-  data object Command : HistoryWindowKind() {
+  data object Command : VirtualBufferKind() {
     override val fileName: String = "[Command Line]"
   }
 
-  data class Search(val direction: Direction) : HistoryWindowKind() {
+  data class Search(val direction: Direction) : VirtualBufferKind() {
     override val fileName: String = "[Search Line]"
+  }
+
+  data object ControlCharsEditor : VirtualBufferKind() {
+    override val fileName: String = "[Control Chars Editor]"
   }
 }

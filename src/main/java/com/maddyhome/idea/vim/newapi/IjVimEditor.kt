@@ -27,7 +27,6 @@ import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.platform.project.projectId
 import com.maddyhome.idea.vim.api.BufferPosition
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.HistoryWindowKind
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.LineDeleteShift
 import com.maddyhome.idea.vim.api.MutableLinearEditor
@@ -41,6 +40,7 @@ import com.maddyhome.idea.vim.api.VimIndentConfig
 import com.maddyhome.idea.vim.api.VimScrollingModel
 import com.maddyhome.idea.vim.api.VimVirtualFile
 import com.maddyhome.idea.vim.api.VimVisualPosition
+import com.maddyhome.idea.vim.api.VirtualBufferKind
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.IndentConfig
 import com.maddyhome.idea.vim.common.LiveRange
@@ -235,7 +235,7 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase() {
     return editor.isOneLineMode
   }
 
-  override fun getHistoryWindowKind(): HistoryWindowKind? =
+  override fun getVirtualBufferKind(): VirtualBufferKind? =
     editor.virtualFile?.getUserData(com.maddyhome.idea.vim.helper.CmdwinKeys.KIND)
 
   override fun getCmdwinOriginalEditor(): VimEditor? {

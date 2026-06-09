@@ -9,12 +9,12 @@ package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
-import com.maddyhome.idea.vim.api.HistoryWindowKind
+import com.maddyhome.idea.vim.api.VirtualBufferKind
 
 /** User-data keys placed on the cmdwin's `LightVirtualFile`. */
 object CmdwinKeys {
   @JvmField
-  val KIND: Key<HistoryWindowKind> = Key.create("ideavim.cmdwin.kind")
+  val KIND: Key<VirtualBufferKind> = Key.create("ideavim.cmdwin.kind")
 
   @JvmField
   val ORIGINAL_FILE: Key<VirtualFile> = Key.create("ideavim.cmdwin.originalFile")

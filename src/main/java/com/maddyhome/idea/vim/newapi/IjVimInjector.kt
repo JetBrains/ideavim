@@ -17,6 +17,7 @@ import com.maddyhome.idea.vim.api.EngineEditorHelper
 import com.maddyhome.idea.vim.api.ExecutionContextManager
 import com.maddyhome.idea.vim.api.LocalOptionInitialisationScenario
 import com.maddyhome.idea.vim.api.NativeActionManager
+import com.maddyhome.idea.vim.api.SearchWindowGroup
 import com.maddyhome.idea.vim.api.SystemInfoService
 import com.maddyhome.idea.vim.api.VimAbbreviationGroup
 import com.maddyhome.idea.vim.api.VimActionExecutor
@@ -51,7 +52,6 @@ import com.maddyhome.idea.vim.api.VimRedrawService
 import com.maddyhome.idea.vim.api.VimRegexServiceBase
 import com.maddyhome.idea.vim.api.VimRegexpService
 import com.maddyhome.idea.vim.api.VimScrollGroup
-import com.maddyhome.idea.vim.api.SearchWindowGroup
 import com.maddyhome.idea.vim.api.VimSearchGroup
 import com.maddyhome.idea.vim.api.VimSearchHelper
 import com.maddyhome.idea.vim.api.VimStatistics
@@ -63,9 +63,9 @@ import com.maddyhome.idea.vim.api.VimrcFileState
 import com.maddyhome.idea.vim.api.VimscriptExecutor
 import com.maddyhome.idea.vim.api.VimscriptFunctionService
 import com.maddyhome.idea.vim.api.VimscriptParser
+import com.maddyhome.idea.vim.api.VirtualBufferGroup
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.isInjectorInitialized
-import com.maddyhome.idea.vim.autocmd.AutoCmdImpl
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.extension.ExtensionLoader
 import com.maddyhome.idea.vim.extension.JsonExtensionProvider
@@ -131,6 +131,8 @@ internal class IjVimInjector : VimInjectorBase() {
   override val templateManager: VimTemplateManager
     get() = service()
   override val searchGroup: VimSearchGroup
+    get() = service()
+  override val virtualBufferGroup: VirtualBufferGroup
     get() = service()
   override val searchWindowGroup: SearchWindowGroup
     get() = service()

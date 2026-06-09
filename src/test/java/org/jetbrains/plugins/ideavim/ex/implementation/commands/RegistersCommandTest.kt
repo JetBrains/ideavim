@@ -13,6 +13,8 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.register.Register
 import com.maddyhome.idea.vim.state.mode.SelectionType
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.annotations.TestWithPrimaryClipboard
 import org.jetbrains.plugins.ideavim.annotations.TestWithoutPrimaryClipboard
@@ -106,11 +108,28 @@ class RegistersCommandTest : VimTestCase() {
 
     VimPlugin.getRegister().setKeys('a', injector.parser.parseKeys("<Tab>Hello<Space>World<CR><Esc>"))
 
+    // <CR> is shown as ^M (carriage return, 0x0D), matching Vim/Neovim, not ^J (line feed, 0x0A)
     enterCommand("registers")
     assertExOutput(
       """
         |Type Name Content
-        |  c  "a   ^IHello World^J^[
+        |  c  "a   ^IHello World^M^[
+      """.trimMargin(),
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
+  fun `test recorded Enter key is shown as caret M`() {
+    configureByText("${c}lorem")
+
+    typeText("qa", "iX<CR>Y<Esc>", "q")
+
+    enterCommand("registers a")
+    assertExOutput(
+      """
+        |Type Name Content
+        |  c  "a   iX^MY^[
       """.trimMargin(),
     )
   }

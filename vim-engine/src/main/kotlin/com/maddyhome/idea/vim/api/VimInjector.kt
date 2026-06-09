@@ -109,6 +109,8 @@ interface VimInjector {
 
   val searchGroup: VimSearchGroup
 
+  val virtualBufferGroup: VirtualBufferGroup
+
   val searchWindowGroup: SearchWindowGroup
 
   val statisticsService: VimStatistics

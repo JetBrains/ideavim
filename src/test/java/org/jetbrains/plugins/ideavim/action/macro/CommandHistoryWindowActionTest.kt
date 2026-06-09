@@ -12,7 +12,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.vfs.VirtualFile
-import com.maddyhome.idea.vim.api.HistoryWindowKind
+import com.maddyhome.idea.vim.api.VirtualBufferKind
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.Direction
 import com.maddyhome.idea.vim.helper.CmdwinKeys
@@ -43,7 +43,7 @@ class CommandHistoryWindowActionTest : VimTestCase() {
     typeText("q:")
 
     val cmdwin = openedCmdwin()
-    assertEquals(HistoryWindowKind.Command, cmdwin.getUserData(CmdwinKeys.KIND))
+    assertEquals(VirtualBufferKind.Command, cmdwin.getUserData(CmdwinKeys.KIND))
     assertEquals("set digraph\nset incsearch", cmdwin.readContent())
     assertFalse(injector.registerGroup.isRecording)
   }
@@ -56,7 +56,7 @@ class CommandHistoryWindowActionTest : VimTestCase() {
     typeText("q/")
 
     val cmdwin = openedCmdwin()
-    assertEquals(HistoryWindowKind.Search(Direction.FORWARDS), cmdwin.getUserData(CmdwinKeys.KIND))
+    assertEquals(VirtualBufferKind.Search(Direction.FORWARDS), cmdwin.getUserData(CmdwinKeys.KIND))
     assertEquals("alpha\nbravo", cmdwin.readContent())
   }
 
@@ -67,7 +67,7 @@ class CommandHistoryWindowActionTest : VimTestCase() {
     typeText("q?")
 
     val cmdwin = openedCmdwin()
-    assertEquals(HistoryWindowKind.Search(Direction.BACKWARDS), cmdwin.getUserData(CmdwinKeys.KIND))
+    assertEquals(VirtualBufferKind.Search(Direction.BACKWARDS), cmdwin.getUserData(CmdwinKeys.KIND))
     assertEquals("alpha", cmdwin.readContent())
   }
 
@@ -81,11 +81,11 @@ class CommandHistoryWindowActionTest : VimTestCase() {
   fun `cmdwin editor reports its history window kind via the engine API`() {
     typeText("q:")
     val cmdwin = openedCmdwin()
-    var kind: HistoryWindowKind? = null
+    var kind: VirtualBufferKind? = null
     ApplicationManager.getApplication().invokeAndWait {
-      kind = openTextEditor(cmdwin).vim.getHistoryWindowKind()
+      kind = openTextEditor(cmdwin).vim.getVirtualBufferKind()
     }
-    assertEquals(HistoryWindowKind.Command, kind)
+    assertEquals(VirtualBufferKind.Command, kind)
   }
 
   @Test

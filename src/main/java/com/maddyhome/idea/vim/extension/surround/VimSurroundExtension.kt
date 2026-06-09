@@ -445,26 +445,26 @@ private fun getOrInputPair(c: Char, editor: Editor, context: DataContext): Surro
 
 
 private fun performSurround(pair: SurroundPair, range: TextRange, caret: VimCaret, tagsOnNewLines: Boolean = false) {
-    val editor = caret.editor
-    val change = VimPlugin.getChange()
-    val leftSurround = pair.first + if (tagsOnNewLines) "\n" else ""
+  val editor = caret.editor
+  val change = VimPlugin.getChange()
+  val leftSurround = pair.first + if (tagsOnNewLines) "\n" else ""
 
-    val isEOF = range.endOffset == editor.text().length
-    val hasNewLine = editor.endsWithNewLine()
-    val rightSurround = if (tagsOnNewLines) {
-      if (isEOF && !hasNewLine) {
-        "\n" + pair.second
-      } else {
-        pair.second + "\n"
-      }
+  val isEOF = range.endOffset == editor.text().length
+  val hasNewLine = editor.endsWithNewLine()
+  val rightSurround = if (tagsOnNewLines) {
+    if (isEOF && !hasNewLine) {
+      "\n" + pair.second
     } else {
-      pair.second
+      pair.second + "\n"
     }
+  } else {
+    pair.second
+  }
 
-    change.insertText(editor, caret, range.startOffset, leftSurround)
-    change.insertText(editor, caret, range.endOffset + leftSurround.length, rightSurround)
-    injector.markService.setChangeMarks(
-      caret,
-      TextRange(range.startOffset, range.endOffset + leftSurround.length + rightSurround.length)
-    )
+  change.insertText(editor, caret, range.startOffset, leftSurround)
+  change.insertText(editor, caret, range.endOffset + leftSurround.length, rightSurround)
+  injector.markService.setChangeMarks(
+    caret,
+    TextRange(range.startOffset, range.endOffset + leftSurround.length + rightSurround.length)
+  )
 }

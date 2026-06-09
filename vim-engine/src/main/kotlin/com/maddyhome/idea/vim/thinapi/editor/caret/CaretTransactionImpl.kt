@@ -60,8 +60,7 @@ class CaretTransactionImpl(
     val lineStartOffset = vimEditor.getLineStartOffset(startLine)
     val lineEndOffset = vimEditor.getLineEndOffset(endLine)
 
-    val isLine: Boolean = (startOffset == lineStartOffset && endOffset == lineEndOffset) &&
-      selectedText.endsWith("\n")
+    val isLine: Boolean = (startOffset == lineStartOffset && endOffset == lineEndOffset) && selectedText.endsWith("\n")
 
     return if (startLine == endLine) {
       if (isLine) {
@@ -94,12 +93,7 @@ class CaretTransactionImpl(
     )
 
     val result: Boolean = injector.put.putTextForCaret(
-      vimEditor,
-      vimCaret,
-      executionContext,
-      putData,
-      updateVisualMarks = false,
-      modifyRegister = false
+      vimEditor, vimCaret, executionContext, putData, updateVisualMarks = false, modifyRegister = false
     )
     return result
   }
@@ -177,13 +171,9 @@ class CaretTransactionImpl(
     val visualSelection = PutData.VisualSelection(
       mapOf(
         vimCaret to VimSelection.create(
-          startOffset,
-          endOffset - 1,
-          selectionType,
-          vimEditor
+          startOffset, endOffset - 1, selectionType, vimEditor
         )
-      ),
-      selectionType
+      ), selectionType
     )
 
     return putTextInternal(text, visualSelection, caretAfterInsertedText = false, beforeCaret = true)
@@ -218,11 +208,7 @@ class CaretTransactionImpl(
 
     for (selection in selections.withIndex()) {
       injector.changeGroup.replaceText(
-        vimEditor,
-        vimCaret,
-        selection.value.start,
-        selection.value.end,
-        listOfText[selection.index]
+        vimEditor, vimCaret, selection.value.start, selection.value.end, listOfText[selection.index]
       )
     }
   }
