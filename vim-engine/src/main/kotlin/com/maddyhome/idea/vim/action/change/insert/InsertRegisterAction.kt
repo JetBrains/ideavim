@@ -74,7 +74,8 @@ private fun insertRegister(editor: VimEditor, context: ExecutionContext, key: Ch
     val textData = PutData.TextData(
       register.name,
       injector.clipboardManager.dumbCopiedText(register.text),
-      SelectionType.CHARACTER_WISE
+      SelectionType.CHARACTER_WISE,
+      register.printableString
     )
     val putData =
       PutData(textData, null, 1, insertTextBeforeCaret = true, rawIndent = true, caretAfterInsertedText = true)

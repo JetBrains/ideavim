@@ -130,14 +130,14 @@ interface VimEditor {
   fun isOneLineMode(): Boolean
 
   /**
-   * If this editor is the Vim command-line / search history window (opened by `q:`, `q/`, `q?`),
-   * returns the kind. Otherwise null. Used by `<CR>` dispatch to choose between `:` execution
-   * and `/` or `?` search.
+   * If this editor is one of IdeaVim's virtual buffers — the command-line / search history windows
+   * (opened by `q:`, `q/`, `q?`) or the control-chars editor — returns its kind. Otherwise null.
    */
-  fun getHistoryWindowKind(): HistoryWindowKind? = null
+  fun getVirtualBufferKind(): VirtualBufferKind? = null
 
-  /** True if this editor is the cmdwin opened by `q:`, `q/` or `q?`. */
-  fun isInHistoryWindow(): Boolean = getHistoryWindowKind() != null
+  /** True if this editor is the command-line / search history window opened by `q:`, `q/` or `q?`. */
+  fun isInHistoryWindow(): Boolean =
+    getVirtualBufferKind().let { it is VirtualBufferKind.Command || it is VirtualBufferKind.Search }
 
   /**
    * If this editor is a command-line / search history window, returns the editor that was active
@@ -169,6 +169,7 @@ interface VimEditor {
   }
 
   fun getVirtualFile(): VimVirtualFile?
+
   @VimLockLabel.RequiresWriteLock
   fun deleteString(range: TextRange)
 
@@ -388,8 +389,10 @@ interface VimEditor {
 
 interface MutableVimEditor : VimEditor {
   fun addLine(atPosition: Int): Int?
+
   @VimLockLabel.RequiresWriteLock
   fun insertText(caret: VimCaret, atPosition: Int, text: CharSequence)
+
   @VimLockLabel.RequiresWriteLock
   fun replaceString(start: Int, end: Int, newString: String)
 }

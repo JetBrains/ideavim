@@ -68,7 +68,8 @@ data class MoveTextCommand(val range: Range, val modifier: CommandModifier, val 
 
     // Convert target one-based line to zero-based line. This means our special case of 0 will be represented by -1
     // We'll move the range to _after_ this target line
-    val targetLineAfterDeletion = min(editor.fileSize().toInt(), normalizeAddress(targetAddressLine1 - 1, sourceLineRange))
+    val targetLineAfterDeletion =
+      min(editor.fileSize().toInt(), normalizeAddress(targetAddressLine1 - 1, sourceLineRange))
     val linesMoved = sourceLineRange.size
     if (targetLineAfterDeletion < -1 || targetLineAfterDeletion + linesMoved >= editor.lineCount()) {
       throw exExceptionMessage("E16")
@@ -134,15 +135,13 @@ data class MoveTextCommand(val range: Range, val modifier: CommandModifier, val 
     // use moveCaretToLineWithStartOfLineOption. We have to do it manually
     val caretLine = if (targetAddressLine1 >= sourceLineRange.startLine1) {
       targetAddressLine1 - 1
-    }
-    else {
+    } else {
       targetAddressLine1 + (sourceLineRange.size) - 1
     }
     val caretOffset = if (!injector.options(editor).startofline) {
       val column = editor.normalizeColumn(caretLine, caretColumn, allowEnd = false)
       editor.bufferPositionToOffset(BufferPosition(caretLine, column))
-    }
-    else {
+    } else {
       injector.motion.moveCaretToLineStartSkipLeading(editor, caretLine)
     }
     caret.moveToOffset(caretOffset)

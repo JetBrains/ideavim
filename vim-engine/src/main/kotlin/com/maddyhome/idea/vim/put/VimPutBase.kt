@@ -13,6 +13,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.MutableVimEditor
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VirtualBufferKind
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.getText
@@ -50,7 +51,7 @@ abstract class VimPutBase : VimPut {
   ): Boolean {
     val additionalData = collectPreModificationData(editor, data)
     deleteSelectedText(editor, context, data, saveToRegister)
-    val processedText = processText(null, data) ?: return false
+    val processedText = processText(null, data, context, editor) ?: return false
     putTextAndSetCaretPosition(editor, context, processedText, data, additionalData)
 
     if (updateVisualMarks) {
@@ -128,10 +129,15 @@ abstract class VimPutBase : VimPut {
       }
   }
 
-  private fun processText(caret: VimCaret?, data: PutData): ProcessedTextData? {
-    var text = data.textData?.rawText ?: run {
-      if (caret == null) return null
-      if (data.visualSelection != null) {
+  private fun processText(
+    caret: VimCaret?,
+    data: PutData,
+    context: ExecutionContext,
+    editor: VimEditor,
+  ): ProcessedTextData? {
+    val textData = data.textData
+    if (textData == null) {
+      if (caret != null && data.visualSelection != null) {
         val offset = caret.offset
         injector.markService.setMark(caret, MARK_CHANGE_POS, offset)
         injector.markService.setChangeMarks(caret, TextRange(offset, offset + 1))
@@ -139,20 +145,26 @@ abstract class VimPutBase : VimPut {
       return null
     }
 
-    if (data.visualSelection?.typeInEditor?.isLine == true && data.textData.typeInRegister.isChar) text += "\n"
+    var text = if (editor.getVirtualBufferKind() == VirtualBufferKind.ControlCharsEditor) {
+      textData.printableString ?: textData.rawText
+    } else {
+      textData.rawText
+    }
+
+    if (data.visualSelection?.typeInEditor?.isLine == true && textData.typeInRegister.isChar) text += "\n"
 
     // TODO: shouldn't it be adjusted when we are storing the text?
-    if (data.textData.typeInRegister.isLine && text.isNotEmpty() && text.last() != '\n') text += '\n'
+    if (textData.typeInRegister.isLine && text.isNotEmpty() && text.last() != '\n') text += '\n'
 
-    if (data.textData.typeInRegister.isChar && text.lastOrNull() == '\n' && data.visualSelection?.typeInEditor?.isLine == false) {
+    if (textData.typeInRegister.isChar && text.lastOrNull() == '\n' && data.visualSelection?.typeInEditor?.isLine == false) {
       text =
         text.dropLast(1)
     }
 
     return ProcessedTextData(
-      data.textData.registerChar,
-      data.textData.copiedText.updateText(text),
-      data.textData.typeInRegister,
+      textData.registerChar,
+      textData.copiedText.updateText(text),
+      textData.typeInRegister,
     )
   }
 
@@ -553,7 +565,7 @@ abstract class VimPutBase : VimPut {
         modifyRegister,
       ) ?: return false
     }
-    val processedText = processText(currentCaret, data) ?: return false
+    val processedText = processText(currentCaret, data, context, editor) ?: return false
     currentCaret = putForCaret(editor, currentCaret, data, additionalData, context, processedText)
     if (updateVisualMarks) {
       wrapInsertedTextWithVisualMarks(currentCaret, data)

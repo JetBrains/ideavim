@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VirtualBufferKind
 import com.maddyhome.idea.vim.api.getText
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
@@ -21,6 +22,7 @@ import com.maddyhome.idea.vim.common.VimCopiedText
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
+import com.maddyhome.idea.vim.helper.EngineStringHelper
 import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.register.RegisterConstants.BLACK_HOLE_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.CLIPBOARD_REGISTER
@@ -295,7 +297,10 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
   ): Boolean {
     if (isRegisterWritable()) {
       val text = preprocessTextBeforeStoring(editor.getText(range), type)
-      return storeTextInternal(editor, context, range, text, type, lastRegisterChar, isDelete)
+      val normalized = if (editor.getVirtualBufferKind() == VirtualBufferKind.ControlCharsEditor) {
+        EngineStringHelper.fromPrintableCharacters(text)
+      } else text
+      return storeTextInternal(editor, context, range, normalized, type, lastRegisterChar, isDelete)
     }
 
     return false

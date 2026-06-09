@@ -486,4 +486,30 @@ class MacroActionTest : VimTestCase() {
     }
     assertState("start ${c}middle end")
   }
+
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
+  fun `test recorded macro with Enter replays correctly`() {
+    configureByText("${c}1\n2\n3\n4")
+    // The Enter is recorded as VK_ENTER and replayed from the raw keystrokes, so the ":d" command
+    // executes on each replay regardless of how the register text would serialize.
+    typeText("qa", ":d<CR>", "q")
+    assertState("${c}2\n3\n4")
+    typeText("@a")
+    assertState("${c}3\n4")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  @Test
+  fun `test putting a recorded macro with Enter inserts a line break`() {
+    configureByText("${c}lorem")
+    // Record "iX<CR>Y<Esc>".
+    typeText("qa", "iX<CR>Y<Esc>", "q")
+
+    // Putting the macro register inserts its stored text. The Enter is stored as a line feed
+    // (0x0A), since IntelliJ Documents reject a lone carriage return, so the put stays safe.
+    setText("")
+    typeText("\"ap")
+    assertState("iX\nY" + '\u001B')
+  }
 }

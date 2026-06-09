@@ -90,6 +90,8 @@
                         serviceImplementation="com.maddyhome.idea.vim.newapi.IjVimSearchGroup"/>
     <applicationService serviceInterface="com.maddyhome.idea.vim.api.SearchWindowGroup"
                         serviceImplementation="com.maddyhome.idea.vim.group.IjSearchWindowGroup"/>
+    <applicationService serviceInterface="com.maddyhome.idea.vim.api.VirtualBufferGroup"
+                        serviceImplementation="com.maddyhome.idea.vim.group.IjVirtualBufferGroup"/>
     <applicationService serviceInterface="com.maddyhome.idea.vim.api.VimSearchHelper"
                         serviceImplementation="com.maddyhome.idea.vim.newapi.IjVimSearchHelper"/>
     <applicationService serviceInterface="com.maddyhome.idea.vim.api.VimClipboardManager"
@@ -277,6 +279,8 @@
     <!--suppress PluginXmlI18n -->
     <action id="VimInternalAddInlineInlays" class="com.maddyhome.idea.vim.action.internal.AddInlineInlaysAction"
             text="Add Test Inline Inlays | IdeaVim Internal"/>
+
+    <action id="VimOpenControlCharsEditor" class="com.maddyhome.idea.vim.action.editor.OpenControlCharsEditorAction"/>
 
     <action id="VimShortcutKeyAction" class="com.maddyhome.idea.vim.action.VimShortcutKeyAction"/>
     <action id="VimActions" class="com.maddyhome.idea.vim.ui.VimActions"/>

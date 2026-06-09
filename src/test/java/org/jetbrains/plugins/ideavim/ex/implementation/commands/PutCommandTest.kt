@@ -99,6 +99,14 @@ class PutCommandTest : VimTestCase() {
   }
 
   @Test
+  fun `test put from macro with control charachters`() {
+    configureByText("")
+    typeText(injector.parser.parseKeys("qaiHello<Esc>q"))
+    typeText(injector.parser.parseKeys("\"ap"))
+    assertState("HelloiHello" + 27.toChar())
+  }
+
+  @Test
   fun `test put with line number and undo`() {
     configureByText(
       """

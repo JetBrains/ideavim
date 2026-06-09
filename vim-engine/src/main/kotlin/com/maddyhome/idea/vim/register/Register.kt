@@ -24,7 +24,7 @@ data class Register(
 ) {
   val text = copiedText.text
   val printableString: String =
-    EngineStringHelper.toPrintableCharacters(keys) // should be the same as [text], but we can't render control notation properly
+    EngineStringHelper.toPrintableCharacters(keys)
 
 
   constructor(name: Char, type: SelectionType, keys: List<KeyStroke>) : this(

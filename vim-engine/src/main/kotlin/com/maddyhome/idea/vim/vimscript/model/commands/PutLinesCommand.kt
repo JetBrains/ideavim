@@ -50,7 +50,7 @@ data class PutLinesCommand(val range: Range, val modifier: CommandModifier, val 
 
     val line = if (range.size() == 0) -1 else getLine(editor)
     val textData = registerGroup.getRegister(editor, context, registerGroup.lastRegisterChar)?.let {
-      PutData.TextData(null, it.copiedText, SelectionType.LINE_WISE)
+      PutData.TextData(null, it.copiedText, SelectionType.LINE_WISE, it.printableString)
     }
     val putData = PutData(
       textData,

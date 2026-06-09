@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.helper
 
+import com.maddyhome.idea.vim.helper.EngineStringHelper.toPrintableCharacters
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -37,6 +38,9 @@ object EngineStringHelper {
   fun toPrintableCharacter(key: KeyStroke): String {
     // TODO: Look at 'isprint', 'display' and 'encoding' settings
     var c = key.keyChar
+    if (c == KeyEvent.CHAR_UNDEFINED && key.keyCode == KeyEvent.VK_ENTER && key.modifiers == 0) {
+      return toPrintableCharacter('\r')
+    }
     if (c == KeyEvent.CHAR_UNDEFINED && key.modifiers == 0) {
       c = key.keyCode.toChar()
     } else if (c == KeyEvent.CHAR_UNDEFINED && key.modifiers and InputEvent.CTRL_DOWN_MASK != 0) {
@@ -79,6 +83,57 @@ object EngineStringHelper {
   fun isPrintableCharacter(c: Char) = c.code >= 32 && c.code != 127
     && !CharacterHelper.isInvisibleControlCharacter(c.code)
     && !CharacterHelper.isZeroWidthCharacter(c.code)
+
+  /**
+   * Inverse of [toPrintableCharacters]: converts a printable string that uses caret notation
+   * (e.g. `^M`, `^[`, `^?`) and `<hex>` escapes back into the raw characters they represent.
+   * Ordinary printable characters are returned unchanged. A `^` that is not followed by a valid
+   * caret token, and a `<` that does not start a valid `<hex>` escape, are treated literally.
+   */
+  fun fromPrintableCharacters(string: String): String {
+    val builder = StringBuilder()
+    var i = 0
+    while (i < string.length) {
+      val c = string[i]
+
+      // Caret notation: ^@..^_ -> 0x00..0x1F, ^? -> 0x7F
+      val caretCodepoint = if (c == '^' && i + 1 < string.length) caretTokenToCodepoint(string[i + 1]) else null
+      if (caretCodepoint != null) {
+        builder.append(caretCodepoint.toChar())
+        i += 2
+        continue
+      }
+
+      // Hex escape: <hex> for invisible / zero-width characters
+      if (c == '<') {
+        val end = string.indexOf('>', i + 1)
+        val hex = if (end != -1) string.substring(i + 1, end) else ""
+        val codepoint =
+          if (hex.isNotEmpty() && hex.length <= MAX_CODEPOINT_HEX_DIGITS && hex.all(::isHexDigit)) hex.toIntOrNull(16) else null
+        if (codepoint != null && codepoint <= Character.MAX_CODE_POINT) {
+          builder.appendCodePoint(codepoint)
+          i = end + 1
+          continue
+        }
+      }
+
+      builder.append(c)
+      i++
+    }
+    return builder.toString()
+  }
+
+  /** Maximum number of hex digits in a `<hex>` escape (a Unicode code point is at most 0x10FFFF). */
+  private const val MAX_CODEPOINT_HEX_DIGITS = 6
+
+  /** Maps the character following `^` in caret notation to its codepoint, or null if it isn't one. */
+  private fun caretTokenToCodepoint(token: Char): Int? = when {
+    token == '?' -> 127 // ^? is DEL
+    token.code in '@'.code..'_'.code -> token.code - '@'.code // ^@..^_ are 0x00..0x1F
+    else -> null
+  }
+
+  private fun isHexDigit(c: Char): Boolean = c in '0'..'9' || c in 'a'..'f' || c in 'A'..'F'
 }
 
 // https://stackoverflow.com/a/14652763/3124227
