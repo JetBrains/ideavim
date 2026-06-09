@@ -446,7 +446,7 @@ class SetglobalCommandTest : VimTestCase() {
     |  fileencoding=     nomini-ai             sidescroll=0        whichwrap=b,s
     |  fileformat=unix     more                sidescrolloff=0     wrap
     |  foldlevel=999     nomultiple-cursors  nosmartcase           wrapscan
-    |nofunctextobj       noNERDTree          nosneak
+    |nofunctextobj       noNERDTree          nosneak             noyoucompleteme
     |nogdefault            nrformats=hex       startofline
     |nohighlightedyank   nonumber            nosurround
     |  clipboard=ideaput,autoselect
@@ -590,6 +590,7 @@ class SetglobalCommandTest : VimTestCase() {
     |  whichwrap=b,s
     |  wrap
     |  wrapscan
+    |noyoucompleteme
     """.trimMargin()
     assertCommandOutput("setglobal! all", expected)
   }

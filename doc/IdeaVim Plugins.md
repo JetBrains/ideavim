@@ -834,3 +834,31 @@ vim-which-key is vim port of emacs-which-key that displays available keybindings
 https://github.com/TheBlob42/idea-which-key?tab=readme-ov-file#installation
 
 </details>
+
+<details>
+<summary><h2>youcompleteme: Cycle through code completion with Tab</h2></summary>
+
+Inspired by [YouCompleteMe](https://github.com/ycm-core/YouCompleteMe) / [SuperTab](https://github.com/ervandew/supertab).
+
+### Summary:
+Makes `<Tab>` cycle through the IDE's code completion popup, SuperTab style. While the completion
+popup (lookup) is open, `<Tab>` selects the next item and `<S-Tab>` the previous one — the same as
+the native `<C-N>`/`<C-P>` insert-mode completion keys. When no popup is open, `<Tab>` falls back to
+its normal behaviour (indentation), so ordinary tabbing is unaffected.
+
+### Setup:
+- Add the following command to `~/.ideavimrc`: `set youcompleteme`
+
+### Instructions
+
+Enabling the plugin removes `<Tab>` and `<S-Tab>` from the [`lookupkeys`](https://github.com/JetBrains/ideavim/wiki/set-commands)
+option so that IdeaVim — rather than the IDE — handles them while the completion popup is open. If
+you want to keep Vim's default insert-mode completion keys as well, they continue to work alongside
+Tab:
+
+| Mapping | Description |
+|---------|-------------|
+| `<Tab>`   | Select the next item in the completion popup (or insert a tab when none is open) |
+| `<S-Tab>` | Select the previous item in the completion popup |
+
+</details>

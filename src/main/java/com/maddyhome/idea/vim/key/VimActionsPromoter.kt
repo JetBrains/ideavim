@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.key
 
+import com.intellij.codeInsight.lookup.LookupManager
 import com.intellij.codeInsight.template.impl.editorActions.ExpandLiveTemplateByTabAction
 import com.intellij.openapi.actionSystem.ActionPromoter
 import com.intellij.openapi.actionSystem.AnAction
@@ -17,6 +18,9 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler
 import com.intellij.openapi.editor.actions.TabAction
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction
+import com.maddyhome.idea.vim.api.getFirstMappingInfoMatch
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
@@ -59,6 +63,13 @@ internal class VimActionsPromoter : ActionPromoter {
       if (editor.isIdeaVimDisabledHere) return null
       val mode = editor.vim.mode
       val vimAction = actions[vimIndex]
+
+      if ((mode == Mode.INSERT || mode == Mode.REPLACE) &&
+        LookupManager.getActiveLookup(editor) != null &&
+        injector.keyGroup.getFirstMappingInfoMatch(injector.parser.parseKeys("<Tab>"), MappingMode.I) != null
+      ) {
+        return listOf(vimAction)
+      }
 
       val ordered = mutableListOf<AnAction>()
       actions.forEach {
