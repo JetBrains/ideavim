@@ -357,6 +357,9 @@
       </aliases>
     </vimExtension>
 
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.youcompleteme.YouCompleteMeExtension"
+                  name="youcompleteme"/>
+
     <vimExtension implementation="com.maddyhome.idea.vim.extension.argtextobj.VimArgTextObjExtension"
                   name="argtextobj">
       <aliases>
