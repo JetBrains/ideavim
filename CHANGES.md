@@ -23,18 +23,14 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-## 2.37.0, 2026-06-02
+## [To Be Released]
 
 ### Features:
-* [VIM-2078](https://youtrack.jetbrains.com/issue/VIM-2078) Added abbreviations support — `:iabbrev lhs rhs` (insert mode), `:cabbrev lhs rhs` (command line), `:abbreviate lhs rhs` (both); supports `<expr>` for expression-based expansion, `-buffer` scope, `:unabbreviate`, and `:abclear`
-* [VIM-1984](https://youtrack.jetbrains.com/issue/VIM-1984) Added built-in `CamelCaseMotion` extension — sub-word motions `<leader>w`, `<leader>b`, `<leader>e`, `<leader>ge` and text objects `i<leader>w`, `i<leader>b`, `i<leader>e`, `i<leader>ge` through CamelCase and snake_case word boundaries; activate with `Plug 'bkad/CamelCaseMotion'` and `let g:camelcasemotion_key = '<leader>'`
 * [VIM-1638](https://youtrack.jetbrains.com/issue/VIM-1638) Added window resize commands — `<C-W>+`/`<C-W>-` to increase/decrease height, `<C-W>>`/`<C-W><` to increase/decrease width, `<C-W>=` to equalize all windows, `:resize [±]n` and `:vertical resize [±]n`
 * [VIM-1617](https://youtrack.jetbrains.com/issue/VIM-1617) Added built-in `youcompleteme` extension — `<Tab>` cycles through the code completion popup (`<S-Tab>` cycles backwards) while leaving normal tab behavior when no popup is open; activate with `set youcompleteme`
 * [VIM-2431](https://youtrack.jetbrains.com/issue/VIM-2431) Count prefix now repeats `<Action>` mappings the specified number of times — e.g., `5gj` with `map gj :action EditorCloneCaretBelow<CR>` runs the action 5 times
 
 ### Fixes:
-* [VIM-4245](https://youtrack.jetbrains.com/issue/VIM-4245) Fixed block-visual operations freezing the editor in split mode
-* [VIM-4238](https://youtrack.jetbrains.com/issue/VIM-4238) Fixed macro execution applying keystrokes to wrong editor when the search window changes the focused editor during macro replay
 * [VIM-3459](https://youtrack.jetbrains.com/issue/VIM-3459) Fixed `*` search highlighting not respecting case sensitivity — with `smartcase` enabled, `*` on a capitalized word now highlights only exact-case matches
 * [VIM-3301](https://youtrack.jetbrains.com/issue/VIM-3301) Fixed cursor being hidden behind sticky panels (e.g., sticky class headers) when `scrolloff=0`
 * [VIM-2501](https://youtrack.jetbrains.com/issue/VIM-2501) Fixed vertical centering (`zz`, `zt`, `zb`) when block inlay hints are present
@@ -47,6 +43,18 @@ usual beta standards.
 * [1819](https://github.com/JetBrains/ideavim/pull/1819) by [1grzyb1](https://github.com/1grzyb1): VIM-2501 take non line heights during scroll adjusting
 * [1818](https://github.com/JetBrains/ideavim/pull/1818) by [1grzyb1](https://github.com/1grzyb1): VIM-2529 Don' scroll after incremental search finish
 * [1815](https://github.com/JetBrains/ideavim/pull/1815) by [1grzyb1](https://github.com/1grzyb1): VIM-1638 Add commands to resize windows
+
+## 2.37.0, 2026-06-02
+
+### Features:
+* [VIM-2078](https://youtrack.jetbrains.com/issue/VIM-2078) Added abbreviations support — `:iabbrev lhs rhs` (insert mode), `:cabbrev lhs rhs` (command line), `:abbreviate lhs rhs` (both); supports `<expr>` for expression-based expansion, `-buffer` scope, `:unabbreviate`, and `:abclear`
+* [VIM-1984](https://youtrack.jetbrains.com/issue/VIM-1984) Added built-in `CamelCaseMotion` extension — sub-word motions `<leader>w`, `<leader>b`, `<leader>e`, `<leader>ge` and text objects `i<leader>w`, `i<leader>b`, `i<leader>e`, `i<leader>ge` through CamelCase and snake_case word boundaries; activate with `Plug 'bkad/CamelCaseMotion'` and `let g:camelcasemotion_key = '<leader>'`
+
+### Fixes:
+* [VIM-4245](https://youtrack.jetbrains.com/issue/VIM-4245) Fixed block-visual operations freezing the editor in split mode
+* [VIM-4238](https://youtrack.jetbrains.com/issue/VIM-4238) Fixed macro execution applying keystrokes to wrong editor when the search window changes the focused editor during macro replay
+
+### Merged PRs:
 * [1813](https://github.com/JetBrains/ideavim/pull/1813) by [1grzyb1](https://github.com/1grzyb1): VIM-1984 Implement CamelCaseMotion plugin
 * [1811](https://github.com/JetBrains/ideavim/pull/1811) by [1grzyb1](https://github.com/1grzyb1): Fix(VIM-4245): Batch caret events in block-visual to unfreeze split mode
 * [1810](https://github.com/JetBrains/ideavim/pull/1810) by [1grzyb1](https://github.com/1grzyb1): VIM-2078 support abbreviations in ideavim
