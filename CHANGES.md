@@ -23,7 +23,7 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-## [To Be Released]
+## 2.38.0, 2026-06-10
 
 ### Features:
 * [VIM-2078](https://youtrack.jetbrains.com/issue/VIM-2078) Added abbreviations support — `:iabbrev lhs rhs` (insert mode), `:cabbrev lhs rhs` (command line), `:abbreviate lhs rhs` (both); supports `<expr>` for expression-based expansion, `-buffer` scope, `:unabbreviate`, and `:abclear`
