@@ -34,12 +34,42 @@ object VimRcService {
   @NonNls
   private val XDG_VIMRC_PATH = "ideavim/$VIMRC_FILE_NAME"
 
+  @NonNls
+  private const val DEBUG_VIMRC_FILE_NAME: String = "debug.ideavimrc"
+
+  @NonNls
+  private val DEBUG_HOME_VIMRC_PATHS = arrayOf(".$DEBUG_VIMRC_FILE_NAME", "_$DEBUG_VIMRC_FILE_NAME")
+
+  @NonNls
+  private val DEBUG_XDG_VIMRC_PATH = "ideavim/$DEBUG_VIMRC_FILE_NAME"
+
+  /**
+   * When this system property is set to `"true"`, IdeaVim prefers the debug ideavimrc
+   * (`~/.debug.ideavimrc`) over the regular one, falling back to the regular file if the debug
+   * file does not exist. The `runIde` Gradle task sets this property so development runs can use a
+   * separate config without touching the real `~/.ideavimrc`.
+   */
+  @NonNls
+  const val USE_DEBUG_VIMRC_PROPERTY: String = "ideavim.use.debug.ideavimrc"
+
   @JvmStatic
   fun findIdeaVimRc(): Path? {
+    if (System.getProperty(USE_DEBUG_VIMRC_PROPERTY) == "true") {
+      val debugVimRc = findIdeaVimRc(DEBUG_HOME_VIMRC_PATHS, DEBUG_XDG_VIMRC_PATH)
+      if (debugVimRc != null) {
+        logger.info("Using debug ideavimrc file: " + debugVimRc.absolutePathString())
+        return debugVimRc
+      }
+      logger.info("Debug ideavimrc requested but not found, falling back to the regular ideavimrc")
+    }
+    return findIdeaVimRc(HOME_VIMRC_PATHS, XDG_VIMRC_PATH)
+  }
+
+  private fun findIdeaVimRc(homeVimrcPaths: Array<String>, xdgVimrcPath: String): Path? {
     // Check whether file exists in home dir
     val homeDirName = System.getProperty("user.home")
     if (homeDirName != null) {
-      for (fileName in HOME_VIMRC_PATHS) {
+      for (fileName in homeVimrcPaths) {
         val file = Path(homeDirName, fileName)
         if (file.exists()) {
           logger.debug { "Found ideavimrc file: $file" }
@@ -55,7 +85,7 @@ object VimRcService {
     val xdgConfigHomeProperty = System.getenv("XDG_CONFIG_HOME")
     val xdgConfig = if (xdgConfigHomeProperty == null || xdgConfigHomeProperty == "") {
       logger.debug("XDG_CONFIG_HOME is not defined. Trying to locate ~/.config/ideavim/ideavimrc file.")
-      if (homeDirName != null) Path(homeDirName, ".config", XDG_VIMRC_PATH) else null
+      if (homeDirName != null) Path(homeDirName, ".config", xdgVimrcPath) else null
     } else {
       logger.debug { "XDG_CONFIG_HOME set to '$xdgConfigHomeProperty'. Trying to locate \$XDG_CONFIG_HOME/ideavim/ideavimrc file" }
       val configHome = if (xdgConfigHomeProperty.startsWith("~/") || xdgConfigHomeProperty.startsWith("~\\")) {
@@ -66,7 +96,7 @@ object VimRcService {
       else {
         xdgConfigHomeProperty
       }
-      Path(configHome, XDG_VIMRC_PATH)
+      Path(configHome, xdgVimrcPath)
     }
     return xdgConfig?.let {
       if (it.exists()) {
