@@ -71,6 +71,7 @@ import com.maddyhome.idea.vim.VimTypedActionHandler
 import com.maddyhome.idea.vim.api.LocalOptionInitialisationScenario
 import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VirtualBufferKind
 import com.maddyhome.idea.vim.api.coerceOffset
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
@@ -81,6 +82,7 @@ import com.maddyhome.idea.vim.common.ModeChangeListener
 import com.maddyhome.idea.vim.common.ModeWillChangeListener
 import com.maddyhome.idea.vim.group.ChangeGroup
 import com.maddyhome.idea.vim.group.CommentsOptionInitializer
+import com.maddyhome.idea.vim.group.ControlCharsEditorHighlighter
 import com.maddyhome.idea.vim.group.FileGroupHelper
 import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.group.IjVimRedrawService
@@ -93,6 +95,7 @@ import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.helper.CaretVisualAttributesListener
+import com.maddyhome.idea.vim.helper.CmdwinKeys
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.GuicursorChangeListener
 import com.maddyhome.idea.vim.helper.StrictMode
@@ -364,6 +367,11 @@ object VimListenerManager {
       (editor as EditorEx).addFocusListener(VimFocusListener, perEditorDisposable)
 
       injector.listenersNotifier.notifyEditorCreated(vimEditor)
+
+      // Colour control-character tokens (^M, ^[, …) in the control-chars editor, once the editor exists.
+      if (editor.virtualFile?.getUserData(CmdwinKeys.KIND) == VirtualBufferKind.ControlCharsEditor) {
+        ControlCharsEditorHighlighter.install(editor)
+      }
 
       Disposer.register(perEditorDisposable) {
         ApplicationManager.getApplication().invokeLater {
