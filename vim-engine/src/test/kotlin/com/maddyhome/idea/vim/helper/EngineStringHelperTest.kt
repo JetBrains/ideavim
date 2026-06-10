@@ -94,6 +94,17 @@ class EngineStringHelperTest {
     assertFalse(EngineStringHelper.isPrintableCharacter(Char(0x7F))) // DEL
   }
 
+  @Test
+  fun `test containsControlCharacters`() {
+    assertFalse(EngineStringHelper.containsControlCharacters(""))
+    assertFalse(EngineStringHelper.containsControlCharacters("hello world"))
+    // Tabs and newlines are ordinary text, not "weird" control characters
+    assertFalse(EngineStringHelper.containsControlCharacters("line1" + Char(0x0A) + "line2" + Char(0x09) + "x"))
+    assertTrue(EngineStringHelper.containsControlCharacters("a" + Char(0x1B) + "b")) // Esc
+    assertTrue(EngineStringHelper.containsControlCharacters("a" + Char(0x0D))) // CR
+    assertTrue(EngineStringHelper.containsControlCharacters(Char(0x00).toString())) // NUL
+  }
+
   // --- fromPrintableCharacters -----------------------------------------------------------------
 
   @Test

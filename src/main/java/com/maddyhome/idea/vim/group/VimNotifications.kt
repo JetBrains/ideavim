@@ -24,6 +24,8 @@ interface VimNotifications {
 
   fun notifyAboutIdeaPut()
   fun notifyAboutIdeaJoin(editor: VimEditor)
+
+  fun notifyControlCharactersPasted()
   fun enableRepeatingMode(): Int
   fun noVimrcAsDefault()
   fun notifyAboutShortcutConflict(keyStroke: KeyStroke)

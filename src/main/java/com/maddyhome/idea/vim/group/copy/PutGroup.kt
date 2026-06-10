@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.api.setChangeMarks
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.EngineStringHelper
 import com.maddyhome.idea.vim.helper.VimLockLabel
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.ide.isClionNova
@@ -58,6 +59,28 @@ import com.maddyhome.idea.vim.undo.VimTimestampBasedUndoService
 import java.awt.datatransfer.DataFlavor
 
 internal class PutGroup : VimPutBase() {
+
+  @VimLockLabel.SelfSynchronized
+  override fun putText(
+    editor: VimEditor,
+    context: ExecutionContext,
+    data: PutData,
+    updateVisualMarks: Boolean,
+    modifyRegister: Boolean,
+  ): Boolean {
+    val pasted = super.putText(editor, context, data, updateVisualMarks, modifyRegister)
+    if (pasted) suggestControlCharsEditorIfNeeded(editor, data)
+    return pasted
+  }
+
+  /** After a paste, suggest the control-chars editor if the pasted text contains control characters. */
+  private fun suggestControlCharsEditorIfNeeded(editor: VimEditor, data: PutData) {
+    if (editor.getVirtualBufferKind() != null) return // the user is already editing in a virtual buffer
+    val text = data.textData?.rawText ?: return
+    if (!EngineStringHelper.containsControlCharacters(text)) return
+    val project = editor.ij.project ?: return
+    getNotifications(project).notifyControlCharactersPasted()
+  }
 
   override fun getProviderForPasteViaIde(
     editor: VimEditor,
