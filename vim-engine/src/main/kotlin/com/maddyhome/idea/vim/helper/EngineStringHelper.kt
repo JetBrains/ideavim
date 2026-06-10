@@ -85,6 +85,13 @@ object EngineStringHelper {
     && !CharacterHelper.isZeroWidthCharacter(c.code)
 
   /**
+   * True if [text] contains a control character other than tab or newline (e.g. Esc, CR, NUL) —
+   * the kind of character found in recorded macros that is hard to read and edit directly.
+   */
+  fun containsControlCharacters(text: String): Boolean =
+    text.any { it.isISOControl() && it != '\n' && it != '\t' }
+
+  /**
    * Inverse of [toPrintableCharacters]: converts a printable string that uses caret notation
    * (e.g. `^M`, `^[`, `^?`) and `<hex>` escapes back into the raw characters they represent.
    * Ordinary printable characters are returned unchanged. A `^` that is not followed by a valid

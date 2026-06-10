@@ -31,6 +31,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.SystemInfo
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.editor.OpenControlCharsEditorAction
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
@@ -85,6 +86,28 @@ internal class NotificationService(private val project: Project?) : VimNotificat
       },
     )
 
+    notification.notify(project)
+  }
+
+  // Shown at most once per service lifetime, so repeatedly pasting a macro doesn't spam the user.
+  private var controlCharactersPasteSuggested = false
+
+  override fun notifyControlCharactersPasted() {
+    if (controlCharactersPasteSuggested) return
+    controlCharactersPasteSuggested = true
+
+    val notification = Notification(
+      IDEAVIM_NOTIFICATION_ID,
+      IDEAVIM_NOTIFICATION_TITLE,
+      "The pasted text contains control characters. Open the Control Characters Editor to view and edit them in printable form.",
+      NotificationType.INFORMATION,
+    )
+    notification.addAction(object : DumbAwareAction("Open Control Characters Editor") {
+      override fun actionPerformed(e: AnActionEvent) {
+        OpenControlCharsEditorAction().actionPerformed(e)
+        notification.expire()
+      }
+    })
     notification.notify(project)
   }
 
