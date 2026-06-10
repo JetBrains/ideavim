@@ -232,6 +232,10 @@ tasks {
 //    localPath = file("/Users/{user}/Applications/WebStorm.app")
 //  }
 
+  runIde {
+    systemProperty("ideavim.use.debug.ideavimrc", "true")
+  }
+
   val runPycharm by intellijPlatformTesting.runIde.registering {
     type = IntelliJPlatformType.PyCharmProfessional
     version = "2026.1"
