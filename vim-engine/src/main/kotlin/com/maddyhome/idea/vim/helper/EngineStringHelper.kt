@@ -99,35 +99,53 @@ object EngineStringHelper {
    */
   fun fromPrintableCharacters(string: String): String {
     val builder = StringBuilder()
+    scanPrintable(
+      string,
+      onToken = { _, codepoint -> builder.appendCodePoint(codepoint) },
+      onLiteral = { _, char -> builder.append(char) },
+    )
+    return builder.toString()
+  }
+
+  fun controlTokenRanges(text: String): List<IntRange> {
+    val ranges = mutableListOf<IntRange>()
+    scanPrintable(text, onToken = { range, _ -> ranges += range }, onLiteral = { _, _ -> })
+    return ranges
+  }
+
+  private inline fun scanPrintable(
+    text: String,
+    onToken: (range: IntRange, codepoint: Int) -> Unit,
+    onLiteral: (index: Int, char: Char) -> Unit,
+  ) {
     var i = 0
-    while (i < string.length) {
-      val c = string[i]
+    while (i < text.length) {
+      val c = text[i]
 
       // Caret notation: ^@..^_ -> 0x00..0x1F, ^? -> 0x7F
-      val caretCodepoint = if (c == '^' && i + 1 < string.length) caretTokenToCodepoint(string[i + 1]) else null
+      val caretCodepoint = if (c == '^' && i + 1 < text.length) caretTokenToCodepoint(text[i + 1]) else null
       if (caretCodepoint != null) {
-        builder.append(caretCodepoint.toChar())
+        onToken(i..i + 1, caretCodepoint)
         i += 2
         continue
       }
 
       // Hex escape: <hex> for invisible / zero-width characters
       if (c == '<') {
-        val end = string.indexOf('>', i + 1)
-        val hex = if (end != -1) string.substring(i + 1, end) else ""
+        val end = text.indexOf('>', i + 1)
+        val hex = if (end != -1) text.substring(i + 1, end) else ""
         val codepoint =
           if (hex.isNotEmpty() && hex.length <= MAX_CODEPOINT_HEX_DIGITS && hex.all(::isHexDigit)) hex.toIntOrNull(16) else null
         if (codepoint != null && codepoint <= Character.MAX_CODE_POINT) {
-          builder.appendCodePoint(codepoint)
+          onToken(i..end, codepoint)
           i = end + 1
           continue
         }
       }
 
-      builder.append(c)
+      onLiteral(i, c)
       i++
     }
-    return builder.toString()
   }
 
   /** Maximum number of hex digits in a `<hex>` escape (a Unicode code point is at most 0x10FFFF). */

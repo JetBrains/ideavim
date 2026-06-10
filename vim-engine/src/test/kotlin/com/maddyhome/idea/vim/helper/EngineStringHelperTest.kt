@@ -105,6 +105,15 @@ class EngineStringHelperTest {
     assertTrue(EngineStringHelper.containsControlCharacters(Char(0x00).toString())) // NUL
   }
 
+  @Test
+  fun `test controlTokenRanges`() {
+    assertEquals(emptyList<IntRange>(), EngineStringHelper.controlTokenRanges("hello"))
+    assertEquals(listOf(2..3), EngineStringHelper.controlTokenRanges("ab^Mcd")) // ^M spans index 2..3
+    assertEquals(listOf(0..1, 3..4), EngineStringHelper.controlTokenRanges("^MX^[")) // ^M and ^[
+    assertEquals(listOf(1..6), EngineStringHelper.controlTokenRanges("a<200b>")) // <200b> spans 1..6
+    assertEquals(emptyList<IntRange>(), EngineStringHelper.controlTokenRanges("^1 <nothex>")) // no valid tokens
+  }
+
   // --- fromPrintableCharacters -----------------------------------------------------------------
 
   @Test
