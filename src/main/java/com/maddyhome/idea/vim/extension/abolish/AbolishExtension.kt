@@ -49,7 +49,9 @@ internal class AbolishExtension : VimExtension {
 
   override fun init() {
     VimExtensionFacade.exportOperatorFunction(OPERATOR_FUNC, CoercionOperator())
-    COERCIONS.forEach(::registerCoercion)
+    val noMappings =
+      VimPlugin.getVariableService().getGlobalVariableValue(NO_MAPPINGS)?.toVimNumber()?.booleanValue ?: false
+    COERCIONS.forEach { registerCoercion(it, noMappings) }
     registerUserDefinedCoercions()
     val subvert = SubvertCommand()
     addCommand("Subvert", subvert)
@@ -70,11 +72,11 @@ internal class AbolishExtension : VimExtension {
     dict.dictionary.forEach { (charKey, styleValue) ->
       val char = charKey.value.singleOrNull() ?: return@forEach
       val style = resolveStyleByName((styleValue as? VimString)?.value) ?: return@forEach
-      bindAlias("cr$char", plugWordKeysFor(style), plugOperatorKeysFor(style))
+      bindAlias("cr$char", plugWordKeysFor(style))
     }
   }
 
-  private fun registerCoercion(coercion: Coercion) {
+  private fun registerCoercion(coercion: Coercion, noMappings: Boolean) {
     val plugOperator = plugOperatorKeysFor(coercion.style)
     val plugWord = plugWordKeysFor(coercion.style)
 
@@ -82,8 +84,9 @@ internal class AbolishExtension : VimExtension {
     putExtensionHandlerMapping(MappingMode.X, plugOperator, owner, CoercionVisualHandler(coercion.style), false)
     putExtensionHandlerMapping(MappingMode.N, plugWord, owner, CoercionWordHandler(coercion.style), false)
 
-    bindPrimaryKeyUnlessUserOverrode(coercion.primaryKey, plugWord, plugOperator)
-    coercion.aliases.forEach { alias -> bindAlias(alias, plugWord, plugOperator) }
+    if (noMappings) return
+    bindPrimaryKeyUnlessUserOverrode(coercion.primaryKey, plugWord)
+    coercion.aliases.forEach { alias -> bindAlias(alias, plugWord) }
   }
 
   private fun plugWordKeysFor(style: CaseStyle): List<KeyStroke> =
@@ -95,24 +98,27 @@ internal class AbolishExtension : VimExtension {
   private fun resolveStyleByName(name: String?): CaseStyle? =
     name?.let { needle -> CaseStyle.entries.firstOrNull { it.name.equals(needle, ignoreCase = true) } }
 
+  /**
+   * Binds the default `cr<x>` key only in Normal mode, mirroring vim-abolish (`nmap cr ...`).
+   * Visual mode is deliberately left unbound: a default Visual-mode `cr<x>` mapping would make
+   * `c` an ambiguous prefix there, forcing a `timeoutlen` wait before the builtin `c` (change
+   * selection) fires (e.g. `viwc`). Users who want Visual coercion can map the `<Plug>` handler
+   * themselves, e.g. `xmap <leader>crs <Plug>(abolish-coerce-snake)`.
+   */
   private fun bindPrimaryKeyUnlessUserOverrode(
     key: String,
     plugWord: List<KeyStroke>,
-    plugOperator: List<KeyStroke>,
   ) {
     val parsed = injector.parser.parseKeys(key)
     putKeyMappingIfMissing(MappingMode.N, parsed, owner, plugWord, true)
-    putKeyMappingIfMissing(MappingMode.X, parsed, owner, plugOperator, true)
   }
 
   private fun bindAlias(
     key: String,
     plugWord: List<KeyStroke>,
-    plugOperator: List<KeyStroke>,
   ) {
     val parsed = injector.parser.parseKeys(key)
     putKeyMapping(MappingMode.N, parsed, owner, plugWord, true)
-    putKeyMapping(MappingMode.X, parsed, owner, plugOperator, true)
   }
 
   private data class Coercion(val style: CaseStyle, val primaryKey: String, val aliases: List<String> = emptyList())
@@ -120,6 +126,9 @@ internal class AbolishExtension : VimExtension {
   companion object {
     internal const val OPERATOR_FUNC = "AbolishCoerce"
     private const val USER_COERCIONS_VARIABLE = "abolish_coercions"
+
+    /** When truthy, suppress the default `cr<x>` key mappings (the `<Plug>` mappings remain). */
+    private const val NO_MAPPINGS = "abolish_no_mappings"
 
     private val COERCIONS = listOf(
       Coercion(CaseStyle.SNAKE, primaryKey = "crs", aliases = listOf("cr_")),

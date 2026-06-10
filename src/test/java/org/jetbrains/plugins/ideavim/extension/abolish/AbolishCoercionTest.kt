@@ -129,23 +129,44 @@ class AbolishCoercionTest : VimTestCase() {
   }
 
   @Test
-  fun `crs in visual mode recases the selected text`() {
+  fun `coerce-snake plug mapping in visual mode recases the selected text`() {
+    configureByText("let helloW${c}orld = 1")
+    enterCommand("xmap gs <Plug>(abolish-coerce-snake)")
+    typeText("viwgs")
+    assertState("let ${c}hello_world = 1")
+  }
+
+  @Test
+  fun `coerce-pascal plug mapping in visual mode recases a multi-word selection`() {
+    configureByText("${c}hello world end")
+    enterCommand("xmap gm <Plug>(abolish-coerce-pascal)")
+    typeText("v2egm")
+    assertState("${c}HelloWorld end")
+  }
+
+  @Test
+  fun `c in visual mode is not shadowed by a default coercion mapping`() {
+    // Regression: a default Visual-mode crX mapping made c an ambiguous prefix, forcing a
+    // timeoutlen wait before the builtin change fired. There must be no default Visual mapping.
     doTest(
-      "viwcrs",
+      "viwc",
       "let helloW${c}orld = 1",
-      "let ${c}hello_world = 1",
-      Mode.NORMAL(),
+      "let $c = 1",
+      Mode.INSERT,
     )
   }
 
   @Test
-  fun `crm in visual mode recases a multi-word selection`() {
-    doTest(
-      "v2ecrm",
-      "${c}hello world end",
-      "${c}HelloWorld end",
-      Mode.NORMAL(),
-    )
+  fun `g abolish_no_mappings keeps plug mappings working without binding default keys`() {
+    configureByText("let helloW${c}orld = 1")
+    enterCommand("let g:abolish_no_mappings = 1")
+    // Toggle the extension off and on so init() re-runs and re-reads the variable above.
+    enterCommand("set noabolish")
+    enterCommand("set abolish")
+    // Defaults are suppressed, but the <Plug> mapping is still available for manual binding.
+    enterCommand("nmap gs <Plug>(abolish-coerce-snake)")
+    typeText("gsiw")
+    assertState("let ${c}hello_world = 1")
   }
 
   @Test
