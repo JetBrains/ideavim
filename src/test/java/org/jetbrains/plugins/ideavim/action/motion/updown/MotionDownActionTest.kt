@@ -447,4 +447,32 @@ class MotionDownActionTest : VimTestCase() {
       Mode.NORMAL(),
     )
   }
+
+  @Test
+  fun `test preserve column position between kj`() {
+    doTest(
+      "kj", """
+      line
+      line${c}long
+    """.trimIndent(),
+      """
+      line
+      line${c}long
+    """.trimIndent()
+    )
+  }
+
+  @Test
+  fun `test preserve column position between kj 2 columns`() {
+    doTest(
+      "kj", """
+      line
+      linel${c}ong
+    """.trimIndent(),
+      """
+      line
+      linel${c}ong
+    """.trimIndent()
+    )
+  }
 }

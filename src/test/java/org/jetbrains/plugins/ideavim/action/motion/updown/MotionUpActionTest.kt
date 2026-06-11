@@ -47,6 +47,24 @@ class MotionUpActionTest : VimTestCase() {
     doTest(keys, before, after)
   }
 
+  @Test
+  fun `test preserve column when crossing line one column too short`() {
+    // VIM-4250: the caret is exactly one column past the end of the shorter line. Moving up then down must restore
+    // the intended column. The off-by-one used to be lost because the intended column matched the trailing newline's
+    // column, hiding the adjustment.
+    doTest(
+      "kj",
+      """
+        line
+        line${c}long
+      """.trimIndent(),
+      """
+        line
+        line${c}long
+      """.trimIndent(),
+    )
+  }
+
   @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
   @Test
   fun `test caret moved outside of IdeaVim control`() {
