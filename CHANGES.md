@@ -31,6 +31,10 @@ usual beta standards.
 * [VIM-2431](https://youtrack.jetbrains.com/issue/VIM-2431) Count prefix now repeats `<Action>` mappings the specified number of times — e.g., `5gj` with `map gj :action EditorCloneCaretBelow<CR>` runs the action 5 times
 * [VIM-1025](https://youtrack.jetbrains.com/issue/VIM-1025) Added an `IdeaVim: Edit Control Characters` action — opens a dedicated editor to view and edit registers/macros that contain control characters (shown in caret notation, e.g. `^M`, `^[`), making it possible to edit macros that include keys the IDE normally can't display
 * `abolish` extension now respects `g:abolish_no_mappings` — `let g:abolish_no_mappings = 1` suppresses the default `cr<x>` key mappings while keeping the `<Plug>` mappings available for manual binding
+* Implemented the [`g<` command](https://vimhelp.org/message.txt.html#g%3C) to redisplay the last page of output
+* Added support for the [`'cmdheight'`](https://vimhelp.org/options.txt.html#%27cmdheight%27) option — messages up to this many lines are shown in the single-line message area, larger output uses the more-prompt pager
+* Added the [`'messagesopt'`](https://vimhelp.org/options.txt.html#%27messagesopt%27) option with a `wait` value — single-line messages are now automatically hidden after a timeout (default 10 seconds; `wait:0` keeps them visible)
+* Added [modeless selection](https://vimhelp.org/gui.txt.html#modeless-selection) in the output panel and command line — select text with the mouse and copy it with [`<C-Y>`](https://vimhelp.org/cmdline.txt.html#c_CTRL-Y)
 
 ### Fixes:
 * [VIM-3459](https://youtrack.jetbrains.com/issue/VIM-3459) Fixed `*` search highlighting not respecting case sensitivity — with `smartcase` enabled, `*` on a capitalized word now highlights only exact-case matches
@@ -40,8 +44,18 @@ usual beta standards.
 * [VIM-4250](https://youtrack.jetbrains.com/issue/VIM-4250) Fixed cursor column drifting when moving up/down (`j`/`k`) between lines that differ by one column — the desired column is now preserved
 * [VIM-4249](https://youtrack.jetbrains.com/issue/VIM-4249) Fixed `c` (change) being delayed in Visual mode when the `abolish` extension is enabled — abolish no longer registers default Visual-mode coercion mappings that made `c` an ambiguous prefix
 * Fixed `:map {prefix}` incorrectly listing non-matching mappings — it now reports `No mapping found` when no mapping matches the given prefix
+* [VIM-4230](https://youtrack.jetbrains.com/issue/VIM-4230) Fixed the single-line message area staying on screen with a stale message — it is now dismissed on redraw (`<C-L>`), scrolling, mode change, `<Esc>`, or after a timeout
+* [VIM-4240](https://youtrack.jetbrains.com/issue/VIM-4240) Fixed empty or blank output showing a persistent empty output panel
+* Fixed `'nomore'` scrolling — output now correctly scrolls to the end when the more-prompt pager is disabled
+
+### Changes:
+* The more-prompt pager now supports scrolling back as well as forward (with the keyboard and mouse wheel), matching Vim's keys
+* External commands (e.g. `:!echo`) now always show the hit-enter prompt and include the typed command, matching Vim
+* Typing `:` while output is showing now starts a new command line, like Vim
+* Long output (such as `:map` listings) now wraps at the character boundary rather than at word breaks
 
 ### Merged PRs:
+* [1826](https://github.com/JetBrains/ideavim/pull/1826) by [citizenmatt](https://github.com/citizenmatt): Update handling of output panel
 * [1830](https://github.com/JetBrains/ideavim/pull/1830) by [1grzyb1](https://github.com/1grzyb1): VIM-4250 preserve cursor pistion with one column diff
 * [1827](https://github.com/JetBrains/ideavim/pull/1827) by [1grzyb1](https://github.com/1grzyb1): VIM-4249 Remove visual mapping for abolish plugin
 * [1825](https://github.com/JetBrains/ideavim/pull/1825) by [1grzyb1](https://github.com/1grzyb1): VIM-1025 Add control chars editor
