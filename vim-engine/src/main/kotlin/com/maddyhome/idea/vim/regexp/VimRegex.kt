@@ -272,10 +272,11 @@ class VimRegex(pattern: String) {
     startIndex: Int = 0,
     maxIndex: Int = editor.text().length,
     options: EnumSet<VimRegexOptions> = noneOfEnum(),
+    maxMatches: Int = Int.MAX_VALUE,
   ): List<VimMatchResult.Success> {
     var index = startIndex
     val foundMatches: MutableList<VimMatchResult.Success> = emptyList<VimMatchResult.Success>().toMutableList()
-    while (index < maxIndex) {
+    while (index < maxIndex && foundMatches.size < maxMatches) {
       val result = simulateNonExactNFA(editor, index, options)
       when (result) {
         /**

@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.options.UnsignedNumberOption
 import com.maddyhome.idea.vim.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 @Suppress("unused", "SpellCheckingInspection")
@@ -150,6 +151,17 @@ object Options {
     )
   )
   val maxmapdepth: NumberOption = addOption(NumberOption("maxmapdepth", GLOBAL, "mmd", 20))
+  val maxsearchcount: UnsignedNumberOption = addOption(
+    object : UnsignedNumberOption("maxsearchcount", GLOBAL, "msc", 999) {
+      override fun checkIfValueValid(value: VimDataType, token: String) {
+        super.checkIfValueValid(value, token)
+        val count = (value as VimInt).value
+        if (count < 1 || count > 9999) {
+          throw exExceptionMessage("E474.arg", token)
+        }
+      }
+    }
+  )
   val more: ToggleOption = addOption(ToggleOption("more", GLOBAL, "more", true))
   val nrformats: StringListOption = addOption(
     StringListOption("nrformats", LOCAL_TO_BUFFER, "nf", "hex", setOf("octal", "hex", "alpha"))

@@ -225,6 +225,7 @@ interface VimSearchHelper {
     startLine: Int,
     endLine: Int,
     ignoreCase: Boolean,
+    maxCount: Int = Int.MAX_VALUE,
   ): List<TextRange>
 
   fun findNextCharacterOnLine(
