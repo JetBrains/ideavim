@@ -223,36 +223,76 @@ fun updateSearchCount(
   currentMatchOffset: Int,
   editor: Editor,
 ) {
-  val results =
-    injector.searchHelper.findAll(
-      vimEditor,
-      pattern,
-      searchStartLine,
-      searchEndLine,
-      shouldIgnoreCase(pattern, shouldIgnoreSmartCase)
-    )
   val matchOffset = if (currentMatchOffset != -1) currentMatchOffset else editor.caretModel.offset
-  val closestMatch = findClosestOrCurrentMatch(results, matchOffset)
-  val currentMatch = closestMatch + 1
+  val maxSearchCount = injector.globalOptions().maxsearchcount
+  val searchCount = computeSearchCount(
+    vimEditor,
+    pattern,
+    searchStartLine,
+    searchEndLine,
+    shouldIgnoreCase(pattern, shouldIgnoreSmartCase),
+    matchOffset,
+    maxSearchCount,
+  )
+  if (searchCount.current <= 0) {
+    return
+  }
   injector.outputPanel.getOrCreate(
     IjVimEditor(editor),
     injector.executionContextManager.getEditorExecutionContext(IjVimEditor(editor))
-  ).statusText = "[${currentMatch}/${results.size}]"
+  ).statusText = formatSearchCountText(searchCount, maxSearchCount)
 }
 
-private fun findClosestOrCurrentMatch(
-  results: List<TextRange>,
-  initialOffset: Int,
-): Int {
-  if (results.isEmpty() || initialOffset == -1) {
-    return -1
-  }
+private data class SearchCount(val current: Int, val total: Int, val exceededMaxCount: Boolean)
 
-  val firstMatch = results.filter { it.endOffset >= initialOffset }.minByOrNull { it.endOffset }
-  if (firstMatch == null) {
-    return results.size - 1
+private fun computeSearchCount(
+  vimEditor: VimEditor,
+  pattern: String,
+  searchStartLine: Int,
+  searchEndLine: Int,
+  ignoreCase: Boolean,
+  matchOffset: Int,
+  maxSearchCount: Int,
+): SearchCount {
+  val maxMatchesToFind = if (maxSearchCount > 0) maxSearchCount + 1 else Int.MAX_VALUE
+  val results = injector.searchHelper.findAll(
+    vimEditor,
+    pattern,
+    searchStartLine,
+    searchEndLine,
+    ignoreCase,
+    maxMatchesToFind,
+  )
+  var current = 0
+  var total = 0
+  var exceededMaxCount = false
+  for (range in results) {
+    total++
+    if (range.startOffset <= matchOffset) {
+      current = total
+    }
+    if (maxSearchCount > 0 && total > maxSearchCount) {
+      exceededMaxCount = true
+      break
+    }
   }
-  return results.indexOfFirst { it.endOffset == firstMatch.endOffset }
+  if (current == 0 && total > 0) {
+    current = total
+  }
+  return SearchCount(current, total, exceededMaxCount)
+}
+
+private fun formatSearchCountText(searchCount: SearchCount, maxSearchCount: Int): String {
+  val current = searchCount.current
+  val total = searchCount.total
+  if (!searchCount.exceededMaxCount || total <= maxSearchCount) {
+    return "[$current/$total]"
+  }
+  return if (current > maxSearchCount) {
+    "[>$maxSearchCount/>$maxSearchCount]"
+  } else {
+    "[$current/>$maxSearchCount]"
+  }
 }
 
 /**

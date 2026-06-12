@@ -396,6 +396,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     startLine: Int,
     endLine: Int,
     ignoreCase: Boolean,
+    maxCount: Int,
   ): List<TextRange> {
     val options = enumSetOf<VimRegexOptions>()
     // If we are explicitly asked to ignore case, assume that smartcase check has already taken place
@@ -410,7 +411,8 @@ abstract class VimSearchHelperBase : VimSearchHelper {
       editor,
       editor.getLineStartOffset(startLine),
       editor.getLineEndOffset(if (endLine == -1) editor.lineCount() - 1 else endLine) + 1,
-      options
+      options,
+      maxCount,
     ).map { it.range }
   }
 
