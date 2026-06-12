@@ -29,14 +29,23 @@ usual beta standards.
 * [VIM-1638](https://youtrack.jetbrains.com/issue/VIM-1638) Added window resize commands — `<C-W>+`/`<C-W>-` to increase/decrease height, `<C-W>>`/`<C-W><` to increase/decrease width, `<C-W>=` to equalize all windows, `:resize [±]n` and `:vertical resize [±]n`
 * [VIM-1617](https://youtrack.jetbrains.com/issue/VIM-1617) Added built-in `youcompleteme` extension — `<Tab>` cycles through the code completion popup (`<S-Tab>` cycles backwards) while leaving normal tab behavior when no popup is open; activate with `set youcompleteme`
 * [VIM-2431](https://youtrack.jetbrains.com/issue/VIM-2431) Count prefix now repeats `<Action>` mappings the specified number of times — e.g., `5gj` with `map gj :action EditorCloneCaretBelow<CR>` runs the action 5 times
+* [VIM-1025](https://youtrack.jetbrains.com/issue/VIM-1025) Added an `IdeaVim: Edit Control Characters` action — opens a dedicated editor to view and edit registers/macros that contain control characters (shown in caret notation, e.g. `^M`, `^[`), making it possible to edit macros that include keys the IDE normally can't display
+* `abolish` extension now respects `g:abolish_no_mappings` — `let g:abolish_no_mappings = 1` suppresses the default `cr<x>` key mappings while keeping the `<Plug>` mappings available for manual binding
 
 ### Fixes:
 * [VIM-3459](https://youtrack.jetbrains.com/issue/VIM-3459) Fixed `*` search highlighting not respecting case sensitivity — with `smartcase` enabled, `*` on a capitalized word now highlights only exact-case matches
 * [VIM-3301](https://youtrack.jetbrains.com/issue/VIM-3301) Fixed cursor being hidden behind sticky panels (e.g., sticky class headers) when `scrolloff=0`
 * [VIM-2501](https://youtrack.jetbrains.com/issue/VIM-2501) Fixed vertical centering (`zz`, `zt`, `zb`) when block inlay hints are present
 * [VIM-2529](https://youtrack.jetbrains.com/issue/VIM-2529) Fixed double scroll when finishing incremental search
+* [VIM-4250](https://youtrack.jetbrains.com/issue/VIM-4250) Fixed cursor column drifting when moving up/down (`j`/`k`) between lines that differ by one column — the desired column is now preserved
+* [VIM-4249](https://youtrack.jetbrains.com/issue/VIM-4249) Fixed `c` (change) being delayed in Visual mode when the `abolish` extension is enabled — abolish no longer registers default Visual-mode coercion mappings that made `c` an ambiguous prefix
+* Fixed `:map {prefix}` incorrectly listing non-matching mappings — it now reports `No mapping found` when no mapping matches the given prefix
 
 ### Merged PRs:
+* [1830](https://github.com/JetBrains/ideavim/pull/1830) by [1grzyb1](https://github.com/1grzyb1): VIM-4250 preserve cursor pistion with one column diff
+* [1827](https://github.com/JetBrains/ideavim/pull/1827) by [1grzyb1](https://github.com/1grzyb1): VIM-4249 Remove visual mapping for abolish plugin
+* [1825](https://github.com/JetBrains/ideavim/pull/1825) by [1grzyb1](https://github.com/1grzyb1): VIM-1025 Add control chars editor
+* [1823](https://github.com/JetBrains/ideavim/pull/1823) by [citizenmatt](https://github.com/citizenmatt): Fix output of maps when prefix match fails
 * [1822](https://github.com/JetBrains/ideavim/pull/1822) by [1grzyb1](https://github.com/1grzyb1): VIM-1617 YouCompleteMe plugin support
 * [1821](https://github.com/JetBrains/ideavim/pull/1821) by [1grzyb1](https://github.com/1grzyb1): VIM-2431 use count to repeat mapped action
 * [1820](https://github.com/JetBrains/ideavim/pull/1820) by [1grzyb1](https://github.com/1grzyb1): VIM-3301 adjust cursor offset by sticky panel height
