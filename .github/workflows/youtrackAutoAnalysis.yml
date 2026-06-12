@@ -74,8 +74,13 @@ jobs:
         if: steps.check-ticket.outputs.has_ticket == 'true' && steps.select-ticket.outputs.has_pending_clarification == 'true'
         id: check-answer
         uses: anthropics/claude-code-action@v1
+        env:
+          ANTHROPIC_BASE_URL: ${{ secrets.PROXY_URL }}
+          ANTHROPIC_CUSTOM_HEADERS: |
+            Grazie-Agent: {"name":"ideavim-claude-code-action","version":"github-actions"}
+            Grazie-Authenticate-JWT: ${{ secrets.ANTHROPIC_API_KEY }}
         with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           settings: .claude/settings.json
 
           prompt: |
@@ -164,8 +169,13 @@ jobs:
         if: steps.check-ticket.outputs.has_ticket == 'true' && (steps.select-ticket.outputs.has_pending_clarification != 'true' || steps.parse-check-answer.outputs.check_answer_status == 'answered')
         id: triage
         uses: anthropics/claude-code-action@v1
+        env:
+          ANTHROPIC_BASE_URL: ${{ secrets.PROXY_URL }}
+          ANTHROPIC_CUSTOM_HEADERS: |
+            Grazie-Agent: {"name":"ideavim-claude-code-action","version":"github-actions"}
+            Grazie-Authenticate-JWT: ${{ secrets.ANTHROPIC_API_KEY }}
         with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           settings: .claude/settings.json
           plugins: |
             context7@claude-plugins-official
@@ -289,8 +299,13 @@ jobs:
         if: steps.parse-triage.outputs.triage_result == 'bug' || steps.parse-triage.outputs.triage_result == 'feature'
         id: planning
         uses: anthropics/claude-code-action@v1
+        env:
+          ANTHROPIC_BASE_URL: ${{ secrets.PROXY_URL }}
+          ANTHROPIC_CUSTOM_HEADERS: |
+            Grazie-Agent: {"name":"ideavim-claude-code-action","version":"github-actions"}
+            Grazie-Authenticate-JWT: ${{ secrets.ANTHROPIC_API_KEY }}
         with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           settings: .claude/settings.json
           plugins: |
             context7@claude-plugins-official
@@ -412,8 +427,13 @@ jobs:
         if: steps.parse-triage.outputs.triage_result == 'bug' && steps.parse-planning.outputs.planning_status == 'ready'
         id: bug-fix
         uses: anthropics/claude-code-action@v1
+        env:
+          ANTHROPIC_BASE_URL: ${{ secrets.PROXY_URL }}
+          ANTHROPIC_CUSTOM_HEADERS: |
+            Grazie-Agent: {"name":"ideavim-claude-code-action","version":"github-actions"}
+            Grazie-Authenticate-JWT: ${{ secrets.ANTHROPIC_API_KEY }}
         with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           settings: .claude/settings.json
           plugins: |
             context7@claude-plugins-official
@@ -519,8 +539,13 @@ jobs:
         if: steps.parse-triage.outputs.triage_result == 'feature' && steps.parse-planning.outputs.planning_status == 'ready'
         id: feature-impl
         uses: anthropics/claude-code-action@v1
+        env:
+          ANTHROPIC_BASE_URL: ${{ secrets.PROXY_URL }}
+          ANTHROPIC_CUSTOM_HEADERS: |
+            Grazie-Agent: {"name":"ideavim-claude-code-action","version":"github-actions"}
+            Grazie-Authenticate-JWT: ${{ secrets.ANTHROPIC_API_KEY }}
         with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           settings: .claude/settings.json
           plugins: |
             context7@claude-plugins-official
@@ -608,8 +633,13 @@ jobs:
           steps.parse-feature.outputs.implementation_status == 'success'
         id: review
         uses: anthropics/claude-code-action@v1
+        env:
+          ANTHROPIC_BASE_URL: ${{ secrets.PROXY_URL }}
+          ANTHROPIC_CUSTOM_HEADERS: |
+            Grazie-Agent: {"name":"ideavim-claude-code-action","version":"github-actions"}
+            Grazie-Authenticate-JWT: ${{ secrets.ANTHROPIC_API_KEY }}
         with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           settings: .claude/settings.json
 
           prompt: |
@@ -667,8 +697,13 @@ jobs:
           steps.parse-review.outputs.review_status == 'fixed'
         id: changelog
         uses: anthropics/claude-code-action@v1
+        env:
+          ANTHROPIC_BASE_URL: ${{ secrets.PROXY_URL }}
+          ANTHROPIC_CUSTOM_HEADERS: |
+            Grazie-Agent: {"name":"ideavim-claude-code-action","version":"github-actions"}
+            Grazie-Authenticate-JWT: ${{ secrets.ANTHROPIC_API_KEY }}
         with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           settings: .claude/settings.json
 
           prompt: |
@@ -718,8 +753,13 @@ jobs:
         if: steps.parse-changelog.outputs.changelog_status == 'success'
         id: pr-creation
         uses: anthropics/claude-code-action@v1
+        env:
+          ANTHROPIC_BASE_URL: ${{ secrets.PROXY_URL }}
+          ANTHROPIC_CUSTOM_HEADERS: |
+            Grazie-Agent: {"name":"ideavim-claude-code-action","version":"github-actions"}
+            Grazie-Authenticate-JWT: ${{ secrets.ANTHROPIC_API_KEY }}
         with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           settings: .claude/settings.json
 
           prompt: |
