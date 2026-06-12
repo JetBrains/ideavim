@@ -513,6 +513,7 @@ class SetlocalCommandTest : VimTestCase() {
     |  keymodel=continueselect,stopselect
     |  lookupkeys=<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>
     |  matchpairs=(:),{:},[:]
+    |  maxsearchcount=999
     |  messagesopt=hit-enter,history:500,wait:10000
     |noReplaceWithRegister
     |  selection=inclusive
@@ -602,6 +603,7 @@ class SetlocalCommandTest : VimTestCase() {
     |nomatchit
     |  matchpairs=(:),{:},[:]
     |  maxmapdepth=20
+    |  maxsearchcount=999
     |  messagesopt=hit-enter,history:500,wait:10000
     |nomini-ai
     |  more
