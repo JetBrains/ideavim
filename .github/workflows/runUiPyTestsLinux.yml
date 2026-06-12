@@ -74,8 +74,13 @@ jobs:
       - name: AI Analysis of Test Failures
         if: failure()
         uses: anthropics/claude-code-action@v1
+        env:
+          ANTHROPIC_BASE_URL: ${{ secrets.PROXY_URL }}
+          ANTHROPIC_CUSTOM_HEADERS: |
+            Grazie-Agent: {"name":"ideavim-claude-code-action","version":"github-actions"}
+            Grazie-Authenticate-JWT: ${{ secrets.ANTHROPIC_API_KEY }}
         with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           claude_args: '--allowed-tools "Read,Write,Edit,Glob,Grep,Bash(ffmpeg:*),Bash(ffprobe:*),Bash(mkdir:*),Bash(touch:*),Bash(echo:*),Bash(ls:*),Bash(cat:*),Bash(grep:*),Bash(find:*),Bash(cd:*),Bash(rm:*),Bash(git:*),Bash(gh:*),Bash(gradle:*),Bash(./gradlew:*),Bash(java:*),Bash(which:*)"'
           prompt: |
             ## Task: Analyze UI Test Failures
