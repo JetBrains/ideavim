@@ -231,4 +231,20 @@ class SearchEntryFwdActionTest : VimTestCase() {
     typeText("/word<CR>n")
     assertStatusLineText("[4/4]")
   }
+
+  @Test
+  fun `should clear match count when output panel shows new message`() {
+    configureByText(
+      """
+     ${c}word 1
+     word 2
+     word 3
+     word 4
+   """.trimIndent()
+    )
+    typeText("/word<CR>")
+    assertStatusLineText("[2/4]")
+    typeText(":echo hello<CR>")
+    assertStatusLineText("")
+  }
 }

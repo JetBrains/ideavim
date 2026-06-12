@@ -105,6 +105,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
   // so it's visible for single-line output (the main use case) as well as multi-line output.
   private val statusComponent: JLabel = JLabel("").apply {
     verticalAlignment = SwingConstants.TOP
+    isVisible = false
   }
 
   private val scrollPane: JScrollPane =
@@ -236,7 +237,11 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     get() = statusComponent.text ?: ""
     set(value) {
       statusComponent.text = value
+      statusComponent.isVisible = value.isNotEmpty()
       statusComponent.font = selectEditorFont(editor, value)
+      if (active) {
+        positionPanel(isInitialPosition = false)
+      }
     }
 
   /**
@@ -289,6 +294,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     val currentPanel = injector.outputPanel.getCurrentOutputPanel()
     if (currentPanel != null && currentPanel != this) currentPanel.close()
 
+    statusText = ""
     setStyledText(segments)
 
     // Only activate (single-line or multiline) if we have text or enough empty lines to show in the pager (or testing
@@ -316,6 +322,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
   override fun clearText() {
     segments.clear()
     clearOnNextUse = false
+    statusText = ""
   }
 
   override fun getForeground(): Color? {
@@ -339,6 +346,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     active = false
     clearOnNextUse = true
     textPane.text = ""
+    statusText = ""
     glassPaneManager.deactivate()
   }
 
@@ -406,7 +414,8 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
   private fun positionPanel(isInitialPosition: Boolean, requireHitEnter: Boolean = false) {
     val maxPanelSize = getMaxPanelSize() ?: return
     val lineHeight = textPane.getFontMetrics(textPane.font).height
-    val lineCount = countLines(textPane.text)
+    val textAreaWidth = getTextAreaWidth(maxPanelSize.width)
+    val lineCount = countLines(textPane.text, textAreaWidth)
     val maxVisibleLines = (maxPanelSize.height / lineHeight) - 1  // -1 to save space for prompt
     val visibleLines = min(lineCount, maxVisibleLines)
 
@@ -427,8 +436,13 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     // manually because there isn't a real UI hierarchy.
     if (application.isUnitTestMode) {
       doLayout()
+      contentPanel.doLayout()
       scrollPane.doLayout()
       scrollPane.viewport.doLayout()
+      if (textPane.width > 0) {
+        textPane.ui.getRootView(textPane).setSize(textPane.width.toFloat(), Int.MAX_VALUE.toFloat())
+        scrollPane.validate()
+      }
     } else {
       validate()
       // Now that the panel hierarchy has been laid out, set the width of the text pane and revalidate it so that the
@@ -474,12 +488,26 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     return SwingUtilities.getAncestorOfClass(JScrollPane::class.java, editor.contentComponent) as? JScrollPane
   }
 
-  private fun countLines(text: String): Int {
+  private fun getTextAreaWidth(panelWidth: Int = width): Int {
+    val availableWidth = when {
+      scrollPane.viewport.width > 0 -> scrollPane.viewport.width
+      panelWidth > 0 -> panelWidth - getStatusComponentWidth()
+      else -> width - getStatusComponentWidth()
+    }
+    return availableWidth.coerceAtLeast(1)
+  }
+
+  private fun getStatusComponentWidth(): Int {
+    if (statusText.isEmpty()) return 0
+    return statusComponent.preferredSize.width
+  }
+
+  private fun countLines(text: String, textAreaWidth: Int = getTextAreaWidth()): Int {
     if (text.isEmpty()) {
       return 1
     }
 
-    val lineWidth = (width / EditorHelper.getPlainSpaceWidthFloat(editor)).toInt()
+    val lineWidth = (textAreaWidth / EditorHelper.getPlainSpaceWidthFloat(editor)).toInt().coerceAtLeast(1)
     var lineCount = 0
     var last = 0
     text.forEachIndexed { index, ch ->
