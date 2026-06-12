@@ -407,6 +407,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     } catch (e: VimRegexException) {
       return emptyList()
     }
+    if (startLine > editor.lineCount()) return listOf()
     return regex.findAll(
       editor,
       editor.getLineStartOffset(startLine),
