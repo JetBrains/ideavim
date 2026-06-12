@@ -155,4 +155,32 @@ class SearchEntryFwdActionTest : VimTestCase() {
       Mode.SELECT(SelectionType.CHARACTER_WISE),
     )
   }
+
+  @Test
+  fun `should show match count`() {
+    configureByText(
+      """
+     ${c}word 1
+     word 2
+     word 3
+     word 4
+   """.trimIndent()
+    )
+    typeText("/word<CR>")
+    assertStatusLineText("[1/4]")
+  }
+
+  @Test
+  fun `should show next match count`() {
+    configureByText(
+      """
+     ${c}word 1
+     word 2
+     word 3
+     word 4
+   """.trimIndent()
+    )
+    typeText("/word<CR>n")
+    assertStatusLineText("[2/4]")
+  }
 }

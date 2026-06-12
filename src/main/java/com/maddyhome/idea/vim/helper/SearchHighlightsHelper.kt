@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.LineRange
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.inCommandLineModeWithVisual
@@ -121,14 +122,14 @@ private fun updateSearchHighlights(
 
     if (pattern == null) return@forEach
 
+    val vimEditor = editor.vim
+    val editorLastLine = vimEditor.lineCount() - 1
+    val searchStartLine = searchRange?.startLine ?: 0
+    val searchEndLine = (searchRange?.endLine ?: -1).coerceAtMost(editorLastLine)
     if (shouldAddAllSearchHighlights(editor, pattern, showHighlights)) {
       // hlsearch (+ incsearch/noincsearch)
       // Make sure the range fits this editor. Note that Vim will use the same range for all windows. E.g., given
       // `:1,5s/foo`, Vim will highlight all occurrences of `foo` in the first five lines of all visible windows
-      val vimEditor = editor.vim
-      val editorLastLine = vimEditor.lineCount() - 1
-      val searchStartLine = searchRange?.startLine ?: 0
-      val searchEndLine = (searchRange?.endLine ?: -1).coerceAtMost(editorLastLine)
       if (searchStartLine <= editorLastLine) {
         val results =
           injector.searchHelper.findAll(
@@ -177,9 +178,43 @@ private fun updateSearchHighlights(
     if (editor === currentEditor?.ij) {
       currentEditorCurrentMatchOffset = currentMatchOffset
     }
+
+    val results =
+      injector.searchHelper.findAll(
+        vimEditor,
+        pattern,
+        searchStartLine,
+        searchEndLine,
+        shouldIgnoreCase(pattern, shouldIgnoreSmartCase)
+      )
+    val matchOffset = if (currentMatchOffset != -1) currentMatchOffset else editor.caretModel.offset
+    val closestMatch = findClosestOrCurrentMatch(results, matchOffset)
+    val currentMatch = closestMatch + 1
+    injector.outputPanel.getOrCreate(
+      IjVimEditor(editor),
+      injector.executionContextManager.getEditorExecutionContext(IjVimEditor(editor))
+    ).statusText = "[${currentMatch}/${results.size}]"
   }
 
+
   return currentEditorCurrentMatchOffset
+}
+
+private fun findClosestOrCurrentMatch(
+  results: List<TextRange>,
+  initialOffset: Int,
+): Int {
+  if (results.isEmpty() || initialOffset == -1) {
+    return -1
+  }
+
+  val firstMatch = results.filter { it.endOffset >= initialOffset }.minByOrNull { it.endOffset }
+  if (firstMatch == null) {
+    // Results is not empty but there is no match before offset, we must be past the last match
+    return results.size - 1
+  }
+  // Note that wrapping for the count does not make sense
+  return results.indexOfFirst { it.endOffset == firstMatch.endOffset }
 }
 
 /**

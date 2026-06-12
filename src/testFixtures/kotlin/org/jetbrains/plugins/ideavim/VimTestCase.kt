@@ -768,6 +768,11 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
     assertEquals("", actual)
   }
 
+  fun assertStatusLineText(expected: String) {
+    val actual = injector.outputPanel.getCurrentOutputPanel()?.statusText
+    assertEquals(expected, actual)
+  }
+
   fun assertPluginError(isError: Boolean) {
     assertEquals(isError, injector.messages.isError(), injector.messages.getStatusBarMessage() ?: "<No error message>")
   }

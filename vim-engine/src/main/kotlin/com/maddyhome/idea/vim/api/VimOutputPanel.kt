@@ -16,6 +16,14 @@ interface VimOutputPanel {
   val text: String
 
   /**
+   * Supplementary text displayed on the right side of the panel, on the same row as the output text.
+   *
+   * Useful for showing extra information such as a search match count, mirroring the way Vim shows the 'searchcount'
+   * on the right of the command line.
+   */
+  var statusText: String
+
+  /**
    * Appends the specified text to the existing content of the output panel.
    * If 'isNewLine' is true, the text will begin on a new line.
    *

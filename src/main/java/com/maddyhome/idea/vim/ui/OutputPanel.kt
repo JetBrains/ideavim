@@ -57,9 +57,11 @@ import java.awt.Rectangle
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import javax.swing.JLabel
+import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JTextPane
 import javax.swing.KeyStroke
+import javax.swing.SwingConstants
 import javax.swing.SwingUtilities
 import javax.swing.text.AbstractDocument
 import javax.swing.text.DefaultCaret
@@ -98,8 +100,22 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
   }
 
   private val promptComponent: JLabel = JLabel("more")
+
+  // Status text shown on the right side of the panel, e.g. a search match count. It sits on the same row as the text,
+  // so it's visible for single-line output (the main use case) as well as multi-line output.
+  private val statusComponent: JLabel = JLabel("").apply {
+    verticalAlignment = SwingConstants.TOP
+  }
+
   private val scrollPane: JScrollPane =
     JBScrollPane(textPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER)
+
+  // Wraps the scrollable text on the left with the status text pinned to the right, on the same row
+  private val contentPanel: JPanel = JPanel(BorderLayout()).apply {
+    isOpaque = false
+    add(scrollPane, BorderLayout.CENTER)
+    add(statusComponent, BorderLayout.EAST)
+  }
   private var defaultForeground: Color? = null
   private var clearOnNextUse = false
 
@@ -148,7 +164,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
 
     // Initialize panel
     layout = BorderLayout(0, 0)
-    add(scrollPane, BorderLayout.CENTER)
+    add(contentPanel, BorderLayout.CENTER)
     add(promptComponent, BorderLayout.SOUTH)
 
     val keyListener = OutputPanelKeyListener()
@@ -197,11 +213,12 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     border = ExPanelBorder()
 
     @Suppress("SENSELESS_COMPARISON")
-    if (textPane != null && promptComponent != null && scrollPane != null) {
+    if (textPane != null && promptComponent != null && statusComponent != null && scrollPane != null) {
       setFontForElements()
       textPane.border = null
       scrollPane.border = null
       promptComponent.foreground = textPane.foreground
+      statusComponent.foreground = textPane.foreground
       positionPanel(isInitialPosition = false)
     }
   }
@@ -213,6 +230,13 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
       segments.clear()
       if (newValue.isEmpty()) return
       segments.add(TextLine(newValue, null))
+    }
+
+  override var statusText: String
+    get() = statusComponent.text ?: ""
+    set(value) {
+      statusComponent.text = value
+      statusComponent.font = selectEditorFont(editor, value)
     }
 
   /**
@@ -272,14 +296,13 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     if (!active) {
       if (requireHitEnter
         || textPane.text.isNotBlank()
-        || (textPane.text.isBlank() && (!allowHideEmptyText || countLines(textPane.text) > injector.globalOptions().cmdheight))) {
+        || (textPane.text.isBlank() && (!allowHideEmptyText || countLines(textPane.text) > injector.globalOptions().cmdheight))
+      ) {
         activate(requireHitEnter)
-      }
-      else {
+      } else {
         clearText()
       }
-    }
-    else {
+    } else {
       positionPanel(isInitialPosition = false)
     }
 
@@ -365,8 +388,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     }
     if (application.isUnitTestMode) {
       doDeactivate()
-    }
-    else {
+    } else {
       // TODO: Document why this is invoked later
       // It's always been like this. I think it's because when it's called with a keystroke, it's called from the
       // component's key handler, and it's probably a bad idea to handle other keystrokes while in the middle of
@@ -378,6 +400,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
   private fun setFontForElements() {
     textPane.font = selectEditorFont(editor, textPane.text)
     promptComponent.font = selectEditorFont(editor, promptComponent.text)
+    statusComponent.font = selectEditorFont(editor, statusComponent.text)
   }
 
   private fun positionPanel(isInitialPosition: Boolean, requireHitEnter: Boolean = false) {
@@ -425,8 +448,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     // This ignores borders and the gutter component, but it's good enough for tests.
     return if (application.isUnitTestMode) {
       scroll.viewport.size
-    }
-    else {
+    } else {
       scroll.size
     }
   }
@@ -511,7 +533,8 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     val duration = Registry.intValue("idea.editor.smooth.scrolling.navigation.duration")
     if (duration > 0 && shouldAnimateScroll() && abs(offset) > cachedLineHeight) {
       val startValue = scrollBar.value
-      val endValue = (min(startValue + offset, scrollBar.maximum - scrollBar.visibleAmount) / cachedLineHeight) * cachedLineHeight
+      val endValue =
+        (min(startValue + offset, scrollBar.maximum - scrollBar.visibleAmount) / cachedLineHeight) * cachedLineHeight
       val animation = animation {
         scrollBar.value = (startValue + (endValue - startValue) * it + 0.5).toInt()
       }
@@ -523,9 +546,9 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
         updatePrompt()
       }
       animator.animate(animation)
-    }
-    else {
-      scrollBar.value = (min(value + offset, scrollBar.maximum - scrollBar.visibleAmount) / cachedLineHeight) * cachedLineHeight
+    } else {
+      scrollBar.value =
+        (min(value + offset, scrollBar.maximum - scrollBar.visibleAmount) / cachedLineHeight) * cachedLineHeight
       scrollPane.horizontalScrollBar.value = 0
       updatePrompt()
     }
@@ -539,8 +562,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     scrollPane.verticalScrollBar.value = 0
     if (!isSingleLine && !injector.globalOptions().more) {
       scrollByOffset(Int.MAX_VALUE)
-    }
-    else {
+    } else {
       updatePrompt()
     }
   }
@@ -553,8 +575,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     if (isAtEnd) {
       if (injector.globalOptions().messagesopt.containsKey("hit-enter")) {
         promptComponent.text = injector.messages.message("message.ex.output.end.prompt")
-      }
-      else {
+      } else {
         promptComponent.text = ""
         // Single-line auto-close is handled by the launchOnShow coroutine in init
         if (!isSingleLine) {
@@ -564,8 +585,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
               delay(wait.milliseconds)
               runInEdt { if (active) close() }
             }
-          }
-          else {
+          } else {
             close()
           }
         }
@@ -599,8 +619,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
 
     if (isAtEnd) {
       handleHitEnterPrompt(key)
-    }
-    else {
+    } else {
       handleMorePrompt(key)
     }
   }
@@ -679,6 +698,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
       KeyEvent.VK_C if (key.modifiers and KeyEvent.CTRL_DOWN_MASK != 0) -> close()
       else -> onBadKey()
     }
+
     else -> onBadKey()
   }
 
@@ -742,7 +762,8 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
       // values are specifically chosen to match ASCII values.
       if (e.keyChar.code == KeyEvent.VK_ENTER
         || e.keyChar.code == KeyEvent.VK_ESCAPE
-        || e.keyChar.code == KeyEvent.VK_BACK_SPACE) {
+        || e.keyChar.code == KeyEvent.VK_BACK_SPACE
+      ) {
         return
       }
 
@@ -754,8 +775,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
       // keystroke
       if (e.modifiersEx and KeyEvent.SHIFT_DOWN_MASK == KeyEvent.SHIFT_DOWN_MASK && e.keyChar == ' ') {
         handleKey(KeyStroke.getKeyStrokeForEvent(e))
-      }
-      else {
+      } else {
         handleKey(KeyStroke.getKeyStroke(e.keyChar))
       }
     }
@@ -765,11 +785,12 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
       // (i.e., KEY_PRESSED) keystrokes for the equivalent of Vim's special keys (actions like `<Up>`, control
       // characters like `<C-F>` and special keys like `<Enter>`). Remember that after a KEY_PRESSED event, we'll
       // typically get a KEY_TYPED event. Don't handle them twice!
-     if (e.isActionKey
+      if (e.isActionKey
         || e.keyCode == KeyEvent.VK_ENTER
         || e.keyCode == KeyEvent.VK_ESCAPE
         || e.keyCode == KeyEvent.VK_BACK_SPACE
-        || (e.keyCode >= KeyEvent.VK_A && e.keyCode <= KeyEvent.VK_Z && e.modifiersEx and KeyEvent.CTRL_DOWN_MASK != 0)) {
+        || (e.keyCode >= KeyEvent.VK_A && e.keyCode <= KeyEvent.VK_Z && e.modifiersEx and KeyEvent.CTRL_DOWN_MASK != 0)
+      ) {
         handleKey(KeyStroke.getKeyStrokeForEvent(e))
       }
     }
