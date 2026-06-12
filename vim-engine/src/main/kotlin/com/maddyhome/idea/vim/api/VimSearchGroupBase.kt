@@ -108,6 +108,8 @@ abstract class VimSearchGroupBase : VimSearchGroup {
    */
   protected abstract fun updateSearchHighlights(force: Boolean)
 
+  protected abstract fun updateSearchCount(matchOffset: Int)
+
   /**
    * Reset the search highlights to the last used pattern after highlighting incsearch results.
    */
@@ -348,6 +350,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     updateSearchHighlights(true)
 
     val result = findItOffset(editor, startOffset, 1, lastDirection)
+    result?.first?.let { updateSearchCount(it) }
 
     // Set lastPatternOffset AFTER searching, so it doesn't affect the result
     lastPatternTrailing = if (patternOffset != 0) patternOffset.toString() else ""
@@ -416,7 +419,9 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     setShouldShowSearchHighlights()
     updateSearchHighlights(true)
 
-    return findItOffset(editor, startOffset, count1, lastDirection)
+    val result = findItOffset(editor, startOffset, count1, lastDirection)
+    result?.first?.let { updateSearchCount(it) }
+    return result
   }
 
   override fun searchWord(
@@ -445,7 +450,11 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     updateSearchHighlights(true)
 
     val offset = findItOffset(editor, range.startOffset, count, lastDirection)?.first ?: -1
-    return if (offset == -1) range.startOffset else offset
+    val resultOffset = if (offset == -1) range.startOffset else offset
+    if (resultOffset != -1) {
+      updateSearchCount(resultOffset)
+    }
+    return resultOffset
   }
 
   override fun findEndOfPattern(
@@ -528,6 +537,9 @@ abstract class VimSearchGroupBase : VimSearchGroup {
        * happen when an offset is given and the cursor is on the last char
        * in the buffer: Repeat with count + 1. */
       offset = findItOffset(editor, startOffset, count + 1, dir)?.first ?: -1
+    }
+    if (offset != -1) {
+      updateSearchCount(offset)
     }
     return offset
   }
