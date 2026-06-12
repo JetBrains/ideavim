@@ -167,7 +167,41 @@ class SearchEntryFwdActionTest : VimTestCase() {
    """.trimIndent()
     )
     typeText("/word<CR>")
-    assertStatusLineText("[1/4]")
+    assertStatusLineText("[2/4]")
+  }
+
+  @Test
+  fun `match count lags behind the caret by one jump`() {
+    configureByText(
+      """
+     ${c}word 1
+     word 2
+     word 3
+     word 4
+   """.trimIndent()
+    )
+
+    typeText("/word<CR>")
+    assertState(
+      """
+     word 1
+     ${c}word 2
+     word 3
+     word 4
+   """.trimIndent()
+    )
+    assertStatusLineText("[2/4]")
+
+    typeText("n")
+    assertState(
+      """
+     word 1
+     word 2
+     ${c}word 3
+     word 4
+   """.trimIndent()
+    )
+    assertStatusLineText("[3/4]")
   }
 
   @Test
@@ -181,6 +215,20 @@ class SearchEntryFwdActionTest : VimTestCase() {
    """.trimIndent()
     )
     typeText("/word<CR>n")
-    assertStatusLineText("[2/4]")
+    assertStatusLineText("[3/4]")
+  }
+
+  @Test
+  fun `should start search from middle of document`() {
+    configureByText(
+      """
+     word 1
+     w${c}ord 2
+     word 3
+     word 4
+   """.trimIndent()
+    )
+    typeText("/word<CR>n")
+    assertStatusLineText("[4/4]")
   }
 }

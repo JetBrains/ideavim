@@ -41,6 +41,24 @@ fun updateSearchHighlights(
   updateSearchHighlights(null, pattern, 1, shouldIgnoreSmartCase, showHighlights, -1, null, true, forceUpdate)
 }
 
+fun updateSearchCount(
+  pattern: String?,
+  shouldIgnoreSmartCase: Boolean,
+  currentMatchOffset: Int = -1,
+) {
+  if (pattern == null) return
+  val selectedEditor = injector.editorGroup.getSelectedEditor() ?: return
+  updateSearchCount(
+    selectedEditor,
+    pattern,
+    0,
+    selectedEditor.lineCount() - 1,
+    shouldIgnoreSmartCase,
+    currentMatchOffset,
+    selectedEditor.ij,
+  )
+}
+
 fun updateIncsearchHighlights(
   editor: Editor,
   pattern: String,
@@ -179,25 +197,47 @@ private fun updateSearchHighlights(
       currentEditorCurrentMatchOffset = currentMatchOffset
     }
 
-    val results =
-      injector.searchHelper.findAll(
+    if (pattern != null) {
+      updateSearchCount(
         vimEditor,
         pattern,
         searchStartLine,
         searchEndLine,
-        shouldIgnoreCase(pattern, shouldIgnoreSmartCase)
+        shouldIgnoreSmartCase,
+        currentMatchOffset,
+        editor
       )
-    val matchOffset = if (currentMatchOffset != -1) currentMatchOffset else editor.caretModel.offset
-    val closestMatch = findClosestOrCurrentMatch(results, matchOffset)
-    val currentMatch = closestMatch + 1
-    injector.outputPanel.getOrCreate(
-      IjVimEditor(editor),
-      injector.executionContextManager.getEditorExecutionContext(IjVimEditor(editor))
-    ).statusText = "[${currentMatch}/${results.size}]"
+    }
   }
 
 
   return currentEditorCurrentMatchOffset
+}
+
+fun updateSearchCount(
+  vimEditor: VimEditor,
+  pattern: String,
+  searchStartLine: Int,
+  searchEndLine: Int,
+  shouldIgnoreSmartCase: Boolean,
+  currentMatchOffset: Int,
+  editor: Editor,
+) {
+  val results =
+    injector.searchHelper.findAll(
+      vimEditor,
+      pattern,
+      searchStartLine,
+      searchEndLine,
+      shouldIgnoreCase(pattern, shouldIgnoreSmartCase)
+    )
+  val matchOffset = if (currentMatchOffset != -1) currentMatchOffset else editor.caretModel.offset
+  val closestMatch = findClosestOrCurrentMatch(results, matchOffset)
+  val currentMatch = closestMatch + 1
+  injector.outputPanel.getOrCreate(
+    IjVimEditor(editor),
+    injector.executionContextManager.getEditorExecutionContext(IjVimEditor(editor))
+  ).statusText = "[${currentMatch}/${results.size}]"
 }
 
 private fun findClosestOrCurrentMatch(
@@ -210,10 +250,8 @@ private fun findClosestOrCurrentMatch(
 
   val firstMatch = results.filter { it.endOffset >= initialOffset }.minByOrNull { it.endOffset }
   if (firstMatch == null) {
-    // Results is not empty but there is no match before offset, we must be past the last match
     return results.size - 1
   }
-  // Note that wrapping for the count does not make sense
   return results.indexOfFirst { it.endOffset == firstMatch.endOffset }
 }
 

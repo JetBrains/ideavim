@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.group.XMLGroup
 import com.maddyhome.idea.vim.helper.addSubstitutionConfirmationHighlight
 import com.maddyhome.idea.vim.helper.highlightSearchResults
 import com.maddyhome.idea.vim.helper.shouldIgnoreCase
+import com.maddyhome.idea.vim.helper.updateSearchCount
 import com.maddyhome.idea.vim.helper.updateSearchHighlights
 import com.maddyhome.idea.vim.helper.vimIncsearchCurrentMatchOffset
 import com.maddyhome.idea.vim.helper.vimLastHighlighters
@@ -84,6 +85,10 @@ open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateComponent<Ele
 
   override fun updateSearchHighlights(force: Boolean) {
     updateSearchHighlights(getLastUsedPattern(), lastIgnoreSmartCase, showSearchHighlight, force)
+  }
+
+  override fun updateSearchCount(matchOffset: Int) {
+    updateSearchCount(getLastUsedPattern(), lastIgnoreSmartCase, matchOffset)
   }
 
   override fun resetIncsearchHighlights() {

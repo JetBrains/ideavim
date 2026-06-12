@@ -451,6 +451,20 @@ end
     assertState(textAfter)
   }
 
+  @Test
+  fun `should start search from middle of document`() {
+    configureByText(
+      """
+     word 1
+     w${c}ord 2
+     word 3
+     word 4
+   """.trimIndent()
+    )
+    typeText(":g/word<CR>n")
+    assertStatusLineText("[3/4]")
+  }
+
   private fun doTest(command: String, before: String, after: String) {
     doTest(listOf(exCommand(command)), before, after)
   }
