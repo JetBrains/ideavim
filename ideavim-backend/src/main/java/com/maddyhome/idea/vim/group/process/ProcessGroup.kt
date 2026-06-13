@@ -10,8 +10,8 @@ package com.maddyhome.idea.vim.group.process
 import com.intellij.execution.ExecutionException
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.CapturingProcessHandler
-import com.intellij.execution.process.ProcessAdapter
 import com.intellij.execution.process.ProcessEvent
+import com.intellij.execution.process.ProcessListener
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.progress.ProcessCanceledException
@@ -19,6 +19,9 @@ import com.intellij.openapi.progress.ProgressIndicatorProvider
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
+import com.intellij.openapi.project.guessProjectDir
+import com.intellij.openapi.roots.ProjectRootManager
+import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.platform.project.ProjectId
 import com.intellij.platform.project.findProjectOrNull
 import com.intellij.util.execution.ParametersListUtil
@@ -29,8 +32,6 @@ import com.maddyhome.idea.vim.api.VimProcessGroupBase
 import java.io.BufferedWriter
 import java.io.IOException
 import java.io.OutputStreamWriter
-import java.io.Reader
-import java.io.Writer
 
 
 class ProcessGroup : VimProcessGroupBase() {
@@ -125,12 +126,12 @@ class ProcessGroup : VimProcessGroupBase() {
         }
         val handler = CapturingProcessHandler(commandLine)
         if (input != null) {
-          handler.addProcessListener(object : ProcessAdapter() {
+          handler.addProcessListener(object : ProcessListener {
             override fun startNotified(event: ProcessEvent) {
               try {
                 val charSequenceReader = CharSequenceReader(input)
                 val outputStreamWriter = BufferedWriter(OutputStreamWriter(handler.processInput))
-                copy(charSequenceReader, outputStreamWriter)
+                charSequenceReader.transferTo(outputStreamWriter)
                 outputStreamWriter.close()
               } catch (e: IOException) {
                 logger.error(e)
@@ -146,6 +147,11 @@ class ProcessGroup : VimProcessGroupBase() {
           // TODO: Vim will use whatever text has already been written to stdout
           // For whatever reason, we're not getting any here, so just throw an exception
           throw ProcessCanceledException()
+        }
+
+        // If the process writes to the filesystem, refresh the VFS so that the changes are visible
+        if (project != null) {
+          refreshVfs(project)
         }
 
         ProcessResult(
@@ -165,14 +171,13 @@ class ProcessGroup : VimProcessGroupBase() {
     return result
   }
 
-  // TODO: Java 10 has a transferTo method we could use instead
-  @Throws(IOException::class)
-  private fun copy(from: Reader, to: Writer) {
-    val buf = CharArray(2048)
-    var cnt: Int
-    while ((from.read(buf).also { cnt = it }) != -1) {
-      to.write(buf, 0, cnt)
-    }
+  private fun refreshVfs(project: Project) {
+    val roots = buildList {
+      project.guessProjectDir()?.let(::add)
+      addAll(ProjectRootManager.getInstance(project).contentRoots)
+    }.distinct()
+
+    VfsUtil.markDirtyAndRefresh(true, true, true, *roots.toTypedArray())
   }
 
   companion object {
