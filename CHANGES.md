@@ -35,6 +35,7 @@ usual beta standards.
 * Added support for the [`'cmdheight'`](https://vimhelp.org/options.txt.html#%27cmdheight%27) option — messages up to this many lines are shown in the single-line message area, larger output uses the more-prompt pager
 * Added the [`'messagesopt'`](https://vimhelp.org/options.txt.html#%27messagesopt%27) option with a `wait` value — single-line messages are now automatically hidden after a timeout (default 10 seconds; `wait:0` keeps them visible)
 * Added [modeless selection](https://vimhelp.org/gui.txt.html#modeless-selection) in the output panel and command line — select text with the mouse and copy it with [`<C-Y>`](https://vimhelp.org/cmdline.txt.html#c_CTRL-Y)
+* [VIM-2544](https://youtrack.jetbrains.com/issue/VIM-2544) Added [search count display](https://vimhelp.org/pattern.txt.html#search-count) — after a `/`, `?`, `n`, `N`, `*`, or `#` search, the current match index and total are shown (e.g. `[2/4]`), along with the [`'maxsearchcount'`](https://vimhelp.org/options.txt.html#%27maxsearchcount%27) option that caps the counted total (default 999), showing `>` when exceeded (e.g. `[2/>3]`)
 
 ### Fixes:
 * [VIM-3459](https://youtrack.jetbrains.com/issue/VIM-3459) Fixed `*` search highlighting not respecting case sensitivity — with `smartcase` enabled, `*` on a capitalized word now highlights only exact-case matches
@@ -55,6 +56,7 @@ usual beta standards.
 * Long output (such as `:map` listings) now wraps at the character boundary rather than at word breaks
 
 ### Merged PRs:
+* [1836](https://github.com/JetBrains/ideavim/pull/1836) by [1grzyb1](https://github.com/1grzyb1): VIM-2544 Implement search match count
 * [1826](https://github.com/JetBrains/ideavim/pull/1826) by [citizenmatt](https://github.com/citizenmatt): Update handling of output panel
 * [1830](https://github.com/JetBrains/ideavim/pull/1830) by [1grzyb1](https://github.com/1grzyb1): VIM-4250 preserve cursor pistion with one column diff
 * [1827](https://github.com/JetBrains/ideavim/pull/1827) by [1grzyb1](https://github.com/1grzyb1): VIM-4249 Remove visual mapping for abolish plugin
