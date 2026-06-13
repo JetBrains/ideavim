@@ -10,8 +10,8 @@ package com.maddyhome.idea.vim.group.process
 import com.intellij.execution.ExecutionException
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.CapturingProcessHandler
-import com.intellij.execution.process.ProcessAdapter
 import com.intellij.execution.process.ProcessEvent
+import com.intellij.execution.process.ProcessListener
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.progress.ProcessCanceledException
@@ -32,8 +32,6 @@ import com.maddyhome.idea.vim.api.VimProcessGroupBase
 import java.io.BufferedWriter
 import java.io.IOException
 import java.io.OutputStreamWriter
-import java.io.Reader
-import java.io.Writer
 
 
 class ProcessGroup : VimProcessGroupBase() {
@@ -128,12 +126,12 @@ class ProcessGroup : VimProcessGroupBase() {
         }
         val handler = CapturingProcessHandler(commandLine)
         if (input != null) {
-          handler.addProcessListener(object : ProcessAdapter() {
+          handler.addProcessListener(object : ProcessListener {
             override fun startNotified(event: ProcessEvent) {
               try {
                 val charSequenceReader = CharSequenceReader(input)
                 val outputStreamWriter = BufferedWriter(OutputStreamWriter(handler.processInput))
-                copy(charSequenceReader, outputStreamWriter)
+                charSequenceReader.transferTo(outputStreamWriter)
                 outputStreamWriter.close()
               } catch (e: IOException) {
                 logger.error(e)
@@ -171,16 +169,6 @@ class ProcessGroup : VimProcessGroupBase() {
       result = result.replace("" + c, escapeChar + c)
     }
     return result
-  }
-
-  // TODO: Java 10 has a transferTo method we could use instead
-  @Throws(IOException::class)
-  private fun copy(from: Reader, to: Writer) {
-    val buf = CharArray(2048)
-    var cnt: Int
-    while ((from.read(buf).also { cnt = it }) != -1) {
-      to.write(buf, 0, cnt)
-    }
   }
 
   private fun refreshVfs(project: Project) {
