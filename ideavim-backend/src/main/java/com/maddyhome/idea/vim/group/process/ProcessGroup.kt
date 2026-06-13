@@ -19,6 +19,9 @@ import com.intellij.openapi.progress.ProgressIndicatorProvider
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
+import com.intellij.openapi.project.guessProjectDir
+import com.intellij.openapi.roots.ProjectRootManager
+import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.platform.project.ProjectId
 import com.intellij.platform.project.findProjectOrNull
 import com.intellij.util.execution.ParametersListUtil
@@ -148,6 +151,11 @@ class ProcessGroup : VimProcessGroupBase() {
           throw ProcessCanceledException()
         }
 
+        // If the process writes to the filesystem, refresh the VFS so that the changes are visible
+        if (project != null) {
+          refreshVfs(project)
+        }
+
         ProcessResult(
           output = (output.stderr + output.stdout).replace("\u001B\\[[;\\d]*m".toRegex(), ""),
           exitCode = handler.exitCode,
@@ -173,6 +181,15 @@ class ProcessGroup : VimProcessGroupBase() {
     while ((from.read(buf).also { cnt = it }) != -1) {
       to.write(buf, 0, cnt)
     }
+  }
+
+  private fun refreshVfs(project: Project) {
+    val roots = buildList {
+      project.guessProjectDir()?.let(::add)
+      addAll(ProjectRootManager.getInstance(project).contentRoots)
+    }.distinct()
+
+    VfsUtil.markDirtyAndRefresh(true, true, true, *roots.toTypedArray())
   }
 
   companion object {
