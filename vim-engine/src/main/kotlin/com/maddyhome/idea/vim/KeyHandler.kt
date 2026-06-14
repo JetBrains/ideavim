@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.key.consumers.CommandKeyConsumer
 import com.maddyhome.idea.vim.key.consumers.DeleteCommandCountConsumer
 import com.maddyhome.idea.vim.key.consumers.DigraphConsumer
 import com.maddyhome.idea.vim.key.consumers.EditorResetConsumer
+import com.maddyhome.idea.vim.key.consumers.LangMapConsumer
 import com.maddyhome.idea.vim.key.consumers.ModalInputConsumer
 import com.maddyhome.idea.vim.key.consumers.ModeInputConsumer
 import com.maddyhome.idea.vim.key.consumers.SelectRegisterConsumer
@@ -50,6 +51,7 @@ import javax.swing.KeyStroke
 class KeyHandler {
   private val keyConsumers: List<KeyConsumer> = listOf(
     ModalInputConsumer(), // Must be first
+    LangMapConsumer(),    // Must be before MappingProcessor
     MappingProcessor,     // Must be as early in pipeline as possible
     CommandCountConsumer(),
     DeleteCommandCountConsumer(),
@@ -178,12 +180,13 @@ class KeyHandler {
         ------- Key Handler -------
         Start key processing. source: $keySource
         Key: $key
+        Mode: ${editor.mode}
+        State: ${keyProcessResultBuilder.state}
       """.trimIndent()
       }
-      logger.trace { keyProcessResultBuilder.state.toString() }
-      logger.trace { "Mode = ${editor.mode}" }
+
       val maxMapDepth = injector.globalOptions().maxmapdepth
-      if (handleKeyRecursionCount >= maxMapDepth) {
+      if (handleKeyRecursionCount >= maxMapDepth && keySource != KeySource.LANG_MAP) {
         maxMapDepthReached = true
         keyProcessResultBuilder.addExecutionStep { _, lambdaEditor, _ ->
           logger.warn("Key handling, maximum recursion of the key received. maxdepth=$maxMapDepth")
@@ -199,7 +202,14 @@ class KeyHandler {
       // We only record unmapped keystrokes. If we've recursed to handle mapping, don't record anything.
       val shouldRecord = handleKeyRecursionCount == 0 && injector.registerGroup.isRecording
 
-      handleKeyRecursionCount++
+      // Langmap mapping does not affect recursion depth. However, we can still hit infinite recursion with 'langremap',
+      // which applies 'langmap' to the output of a mapping, because the output of 'langmap' can be mapped again,
+      // recursively.
+      // E.g. `nmap b a`, `set langmap=ax`, `nmap x b`: 'b' -> 'a' (nmap) -> 'x' (langmap) -> 'b' (nmap) -> ...
+      if (keySource != KeySource.LANG_MAP) {
+        handleKeyRecursionCount++
+      }
+
       try {
         val isProcessed = keyConsumers.any {
           // These two lines are specifically formatted to allow setting a breakpoint on the consumeKey line :)
@@ -215,12 +225,15 @@ class KeyHandler {
           // Key wasn't processed by any of the consumers, so we reset our key state
           onUnknownKey(editor, keyProcessResultBuilder.state)
           updateState(keyProcessResultBuilder.state)
-          return KeyProcessResult.Unknown.apply {
-            handleKeyRecursionCount-- // because onFinish will now be executed for unknown
+          if (keySource != KeySource.LANG_MAP) {
+            handleKeyRecursionCount-- // because onFinish will not be executed for unknown
           }
+          return KeyProcessResult.Unknown
         }
       } finally {
-        keyProcessResultBuilder.onFinish = { handleKeyRecursionCount-- }
+        if (keySource != KeySource.LANG_MAP) {
+          keyProcessResultBuilder.onFinish = { handleKeyRecursionCount-- }
+        }
       }
       return keyProcessResultBuilder.build()
     }

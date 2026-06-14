@@ -15,23 +15,32 @@ enum class KeySource(val allowsKeyMapping: Boolean) {
    * The key was typed by a user
    *
    * Not to be confused with [KeyEvent.KEY_TYPED] and [KeyEvent.KEY_PRESSED]! Whether the key even is typed or pressed,
-   * the source is the user typing. The key can be mapped.
+   * the source is the user typing. The key can be mapped, both by `'langmap'` and user maps.
    */
   TYPED(true),
 
   /**
    * The key is the result of a mapping
    *
-   * Mappings are recursive by default, so this key can be mapped.
+   * Mappings are recursive by default, so this key can be mapped further with user maps. If `'langremap'` is set, then
+   * the key can be mapped again by `'langmap'`.
    */
   MAPPED(true),
 
   /**
    * The key is the result of a non-recursive mapping
    *
-   * The key will not be mapped.
+   * The key will not be mapped by user maps, but if `'langremap'` is set, then the key can be mapped again by
+   * `'langmap'`.
    */
   MAPPED_NON_RECURSIVE(false),
+
+  /**
+   * The key is a result of mapping according to `'langmap'`
+   *
+   * The key can be mapped further by user maps, but will not map with `'langmap'` again.
+   */
+  LANG_MAP(true),
 
   /**
    * The key is being replayed from the start of a mapping prefix that failed to match

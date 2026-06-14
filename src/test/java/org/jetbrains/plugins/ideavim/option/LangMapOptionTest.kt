@@ -539,8 +539,7 @@ class LangMapOptionTest : VimTestCase("\n") {
 
     // Test that, like Vim, we store a processed version of the user-entered string that simplifies the escaping. Only
     // comma, semicolon and backslash should be escaped
-    // TODO: Once we actually apply langmap, we need to type `S` instead of `:`
-    typeText(":", "set langmap?<CR>") // `S` -> `:`
+    typeText("S", "set langmap?<CR>") // `S` -> `:`
     assertExOutput(
       """  langmap='q,\,w,.e,pr,yt,fy,gu,ci,ro,lp,/[,=],aa,os,ed,uf,ig,dh,hj,tk,nl,s\;,-',\;z,qx,jc,kv,xb,bn,mm,w\,,v.,z/,[-,]=,"Q,<W,>E,PR,YT,FY,GU,CI,RO,LP,?{,+},AA,OS,ED,UF,IG,DH,HJ,TK,NL,S:,_",:Z,QX,JC,KV,XB,BN,MM,W<,V>,Z?"""
     )
