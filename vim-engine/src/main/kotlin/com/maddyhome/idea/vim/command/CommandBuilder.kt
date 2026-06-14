@@ -166,11 +166,25 @@ class CommandBuilder private constructor(
   var isRegisterPending: Boolean = false
     private set
 
+  /**
+   * Start waiting for a register name after typing `"` while entering a command. E.g. `"a2dw`
+   *
+   * This action is modifying an in-progress command by selecting a register. It should not be confused with
+   * `<C-R>{register}` which is a command that accepts a register name as an argument, and then inserts the contents of
+   * the register.
+   */
   fun startWaitingForRegister(key: KeyStroke) {
     isRegisterPending = true
     addTypedKeyStroke(key)
   }
 
+  /**
+   * Select a named register while entering a command. E.g. `"a2dw`
+   *
+   * This action is modifying an in-progress command by selecting a register. It should not be confused with
+   * `<C-R>{register}` which is a command that accepts a register name as an argument, and then inserts the contents of
+   * the register.
+   */
   fun selectRegister(register: Char) {
     logger.trace { "Selected register '$register'" }
     selectedRegister = register
