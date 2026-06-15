@@ -374,6 +374,15 @@
       </aliases>
     </vimExtension>
 
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.targets.TargetsExtension"
+                  name="targets">
+      <aliases>
+        <alias name="https://github.com/wellle/targets.vim"/>
+        <alias name="wellle/targets.vim"/>
+        <alias name="targets.vim"/>
+      </aliases>
+    </vimExtension>
+
     <vimExtension implementation="com.maddyhome.idea.vim.extension.functextobj.VimFuncTextObjExtension"
                   name="functextobj">
       <aliases>
