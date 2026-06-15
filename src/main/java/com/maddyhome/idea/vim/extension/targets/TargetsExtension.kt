@@ -41,7 +41,7 @@ internal class TargetsExtension : VimExtension {
   override fun getName(): String = "targets"
 
   override fun init() {
-    for ((trigger, source) in PAIR_TRIGGERS) {
+    for ((trigger, source) in TRIGGERS) {
       for (modifier in Modifier.entries) {
         for (which in Which.entries) {
           registerMapping(trigger, source, modifier, which)
@@ -94,14 +94,41 @@ internal class TargetsExtension : VimExtension {
     /** The target strictly larger than the span [start, end), for growing a visual selection. */
     fun growing(chars: CharSequence, start: Int, end: Int): DelimiterSpan?
 
-    /** The [count]th target after the cursor. */
-    fun next(chars: CharSequence, offset: Int, count: Int): DelimiterSpan?
+    /** The nearest target whose opening delimiter is at or after [from], or null if none. */
+    fun nearestForward(chars: CharSequence, from: Int): DelimiterSpan?
 
-    /** The [count]th target before the cursor. */
-    fun last(chars: CharSequence, offset: Int, count: Int): DelimiterSpan?
+    /** The nearest target whose closing delimiter is before [from], or null if none. */
+    fun nearestBackward(chars: CharSequence, from: Int): DelimiterSpan?
 
     /** Seek on the current line: the nearest target forward, else backward. */
     fun seek(chars: CharSequence, offset: Int, lineStart: Int, lineEnd: Int): DelimiterSpan?
+
+    /** The [count]th target after the cursor, stepping forward one [nearestForward] at a time. */
+    fun next(chars: CharSequence, offset: Int, count: Int): DelimiterSpan? =
+      step(count, offset) { from -> nearestForward(chars, from)?.let { it to it.open + 1 } }
+
+    /** The [count]th target before the cursor, stepping backward one [nearestBackward] at a time. */
+    fun last(chars: CharSequence, offset: Int, count: Int): DelimiterSpan? =
+      step(count, offset) { from -> nearestBackward(chars, from)?.let { it to it.close } }
+
+    /**
+     * Repeats [findFrom] [count] times, each step starting where the previous match told it to
+     * resume. Returns the last match, or null as soon as a step finds nothing.
+     */
+    private fun step(
+      count: Int,
+      start: Int,
+      findFrom: (from: Int) -> Pair<DelimiterSpan, Int>?,
+    ): DelimiterSpan? {
+      var from = start
+      var result: DelimiterSpan? = null
+      repeat(count) {
+        val (span, nextFrom) = findFrom(from) ?: return null
+        result = span
+        from = nextFrom
+      }
+      return result
+    }
   }
 
   /**
@@ -140,29 +167,13 @@ internal class TargetsExtension : VimExtension {
       return candidates.maxByOrNull { it.open }
     }
 
-    /** The [count]th pair whose opening delimiter is at or after [offset]. */
-    override fun next(chars: CharSequence, offset: Int, count: Int): DelimiterSpan? {
-      var result: DelimiterSpan? = null
-      var from = offset
-      repeat(count) {
-        result = pairs.mapNotNull { forwardOf(chars, from, it.first, it.second) }
-          .minByOrNull { it.open } ?: return null
-        from = result!!.open + 1
-      }
-      return result
-    }
+    /** The nearest pair whose opening delimiter is at or after [from]. */
+    override fun nearestForward(chars: CharSequence, from: Int): DelimiterSpan? =
+      pairs.mapNotNull { forwardOf(chars, from, it.first, it.second) }.minByOrNull { it.open }
 
-    /** The [count]th pair whose closing delimiter is before [offset]. */
-    override fun last(chars: CharSequence, offset: Int, count: Int): DelimiterSpan? {
-      var result: DelimiterSpan? = null
-      var from = offset
-      repeat(count) {
-        result = pairs.mapNotNull { backwardOf(chars, from, it.first, it.second) }
-          .maxByOrNull { it.close } ?: return null
-        from = result!!.close
-      }
-      return result
-    }
+    /** The nearest pair whose closing delimiter is before [from]. */
+    override fun nearestBackward(chars: CharSequence, from: Int): DelimiterSpan? =
+      pairs.mapNotNull { backwardOf(chars, from, it.first, it.second) }.maxByOrNull { it.close }
 
     /** Seek on the current line: the nearest pair forward, else backward. */
     override fun seek(chars: CharSequence, offset: Int, lineStart: Int, lineEnd: Int): DelimiterSpan? {
@@ -217,6 +228,52 @@ internal class TargetsExtension : VimExtension {
         i--
       }
       return null
+    }
+  }
+
+  /**
+   * Locates a quote target for one or more quote characters ("any quote" uses more than one).
+   *
+   * Quotes don't nest: on each line the quote characters are paired in order from the start of the
+   * line (1st with 2nd, 3rd with 4th, ...). This is what lets `ci"` skip the "false" gap between
+   * two strings and operate on the real string instead.
+   */
+  private class QuoteSource(private val quotes: List<Char>) : TargetSource {
+
+    override fun enclosing(chars: CharSequence, offset: Int, count: Int): DelimiterSpan? =
+      quotes.mapNotNull { containing(chars, offset, it) }.maxByOrNull { it.open }
+
+    // Quotes don't nest, but the first text object in visual mode must still select the quote pair
+    // enclosing the initial one-character selection. There is no larger target beyond that.
+    override fun growing(chars: CharSequence, start: Int, end: Int): DelimiterSpan? =
+      quotes.mapNotNull { quote ->
+        pairsOnLineOf(chars, start, quote).firstOrNull { it.open <= start && it.close + 1 >= end }
+      }.maxByOrNull { it.open }
+
+    override fun nearestForward(chars: CharSequence, from: Int): DelimiterSpan? =
+      quotes.mapNotNull { firstPairAfter(chars, from, it) }.minByOrNull { it.open }
+
+    override fun nearestBackward(chars: CharSequence, from: Int): DelimiterSpan? =
+      quotes.mapNotNull { firstPairBefore(chars, from, it) }.maxByOrNull { it.close }
+
+    override fun seek(chars: CharSequence, offset: Int, lineStart: Int, lineEnd: Int): DelimiterSpan? =
+      nearestForward(chars, offset) ?: nearestBackward(chars, offset)
+
+    private fun containing(chars: CharSequence, offset: Int, quote: Char): DelimiterSpan? =
+      pairsOnLineOf(chars, offset, quote).firstOrNull { offset in it.open..it.close }
+
+    private fun firstPairAfter(chars: CharSequence, from: Int, quote: Char): DelimiterSpan? =
+      pairsOnLineOf(chars, from, quote).firstOrNull { it.open >= from }
+
+    private fun firstPairBefore(chars: CharSequence, from: Int, quote: Char): DelimiterSpan? =
+      pairsOnLineOf(chars, from, quote).lastOrNull { it.close < from }
+
+    /** All quote pairs on the line containing [anchor], paired in order from the line start. */
+    private fun pairsOnLineOf(chars: CharSequence, anchor: Int, quote: Char): List<DelimiterSpan> {
+      val lineStart = lineStartOf(chars, anchor)
+      val lineEnd = lineEndOf(chars, anchor)
+      val indices = (lineStart until lineEnd).filter { chars[it] == quote }
+      return indices.chunked(2).filter { it.size == 2 }.map { DelimiterSpan(it[0], it[1]) }
     }
   }
 
@@ -290,13 +347,32 @@ internal class TargetsExtension : VimExtension {
     private val ANGLE = PairSource(listOf('<' to '>'))
     private val ANY_BLOCK = PairSource(listOf('(' to ')', '[' to ']', '{' to '}'))
 
-    private val PAIR_TRIGGERS: Map<Char, PairSource> = mapOf(
+    private val SINGLE_QUOTE = QuoteSource(listOf('\''))
+    private val DOUBLE_QUOTE = QuoteSource(listOf('"'))
+    private val BACK_TICK = QuoteSource(listOf('`'))
+    private val ANY_QUOTE = QuoteSource(listOf('\'', '"', '`'))
+
+    private val TRIGGERS: Map<Char, TargetSource> = mapOf(
       '(' to PAREN, ')' to PAREN,
       '{' to CURLY, '}' to CURLY, 'B' to CURLY,
       '[' to BRACKET, ']' to BRACKET,
       '<' to ANGLE, '>' to ANGLE,
       'b' to ANY_BLOCK,
+      '\'' to SINGLE_QUOTE, '"' to DOUBLE_QUOTE, '`' to BACK_TICK,
+      'q' to ANY_QUOTE,
     )
+
+    private fun lineStartOf(chars: CharSequence, offset: Int): Int {
+      var i = offset.coerceAtMost(chars.length)
+      while (i > 0 && chars[i - 1] != '\n') i--
+      return i
+    }
+
+    private fun lineEndOf(chars: CharSequence, offset: Int): Int {
+      var i = offset
+      while (i < chars.length && chars[i] != '\n') i++
+      return i
+    }
 
     private fun matchingClose(chars: CharSequence, openIdx: Int, open: Char, close: Char): Int? {
       var depth = 0
