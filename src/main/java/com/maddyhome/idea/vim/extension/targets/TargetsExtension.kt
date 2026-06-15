@@ -163,7 +163,7 @@ internal class TargetsExtension : VimExtension {
       var best = pairs.mapNotNull { enclosingOf(chars, offset, it.first, it.second) }
         .maxByOrNull { it.open } ?: return null
       repeat(count - 1) {
-        best = outerOf(chars, best.open) ?: return null
+        best = outerOf(chars, best) ?: return null
       }
       return best
     }
@@ -174,7 +174,7 @@ internal class TargetsExtension : VimExtension {
         var pair = enclosingOf(chars, start, open, close) ?: return@mapNotNull null
         // Step outward until the inner range is a strict superset of the current selection.
         while (pair.open + 1 >= start && pair.close <= end) {
-          pair = outerOf(chars, pair.open) ?: return@mapNotNull null
+          pair = outerOf(chars, pair) ?: return@mapNotNull null
         }
         pair
       }
@@ -215,12 +215,17 @@ internal class TargetsExtension : VimExtension {
       return if (closeIdx >= offset) DelimiterSpan(openIdx, closeIdx) else null
     }
 
-    private fun outerOf(chars: CharSequence, openIdx: Int): DelimiterSpan? {
-      val (open, close) = pairs.first { it.first == chars[openIdx] }
-      val outerOpen = unmatchedOpenBefore(chars, openIdx, open, close) ?: return null
-      val outerClose = matchingClose(chars, outerOpen, open, close) ?: return null
-      return DelimiterSpan(outerOpen, outerClose)
-    }
+    /**
+     * The innermost pair (of any configured kind) that strictly encloses [span]. For "any block"
+     * this lets a count cross bracket kinds, e.g. `2ib` from inside `()` nested in `{}` reaches the
+     * `{}`.
+     */
+    private fun outerOf(chars: CharSequence, span: DelimiterSpan): DelimiterSpan? =
+      pairs.mapNotNull { (open, close) ->
+        val outerOpen = unmatchedOpenBefore(chars, span.open, open, close) ?: return@mapNotNull null
+        val outerClose = matchingClose(chars, outerOpen, open, close) ?: return@mapNotNull null
+        if (outerClose > span.close) DelimiterSpan(outerOpen, outerClose) else null
+      }.maxByOrNull { it.open }
 
     private fun forwardOf(chars: CharSequence, from: Int, open: Char, close: Char): DelimiterSpan? {
       var i = from
