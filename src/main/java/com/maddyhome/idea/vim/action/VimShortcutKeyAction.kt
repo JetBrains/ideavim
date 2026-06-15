@@ -293,7 +293,6 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
     val VIM_ONLY_EDITOR_KEYS: Set<KeyStroke> =
       ImmutableSet.builder<KeyStroke>().addAll(getKeyStrokes(KeyEvent.VK_ENTER, 0))
         .addAll(getKeyStrokes(KeyEvent.VK_ESCAPE, 0))
-        .addAll(getKeyStrokes(KeyEvent.VK_TAB, 0))
         .addAll(getKeyStrokes(KeyEvent.VK_BACK_SPACE, 0, InputEvent.CTRL_DOWN_MASK))
         .addAll(getKeyStrokes(KeyEvent.VK_INSERT, 0))
         .addAll(getKeyStrokes(KeyEvent.VK_DELETE, 0, InputEvent.CTRL_DOWN_MASK))

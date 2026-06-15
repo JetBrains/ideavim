@@ -17,16 +17,8 @@ import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
 class VimShortcutKeyActionTest : VimTestCase() {
-
-  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
-  @Test
-  fun `plain Tab is a Vim-only editor key`() {
-    val tab = KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0)
-    assertTrue(VimShortcutKeyAction.VIM_ONLY_EDITOR_KEYS.contains(tab))
-  }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   @Test
