@@ -885,6 +885,7 @@ private class CharacterBreakView(elem: javax.swing.text.Element) : LabelView(ele
     val p0 = startOffset
     val p1 = endOffset
     if (p0 >= p1) return 0f
+    checkPainter()
     return glyphPainter.getSpan(this, p0, p0 + 1, null, 0f)
   }
 
@@ -896,6 +897,7 @@ private class CharacterBreakView(elem: javax.swing.text.Element) : LabelView(ele
     val p1 = endOffset
     if (p0 >= p1) return this
 
+    checkPainter()
     val painter = glyphPainter
 
     // If everything fits there is nothing to break
