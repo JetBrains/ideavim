@@ -71,7 +71,7 @@ class VimTargetsSeparatorTest : VimTestCase() {
     doTest(
       "va,",
       line,
-      "a , b , c , d , e$s , x $se, g , h , i , k , l",
+      "a , b , c , d , e ${s}, x $se, g , h , i , k , l",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
@@ -81,7 +81,7 @@ class VimTargetsSeparatorTest : VimTestCase() {
     doTest(
       "vA,",
       line,
-      "a , b , c , d , e$s , x , ${se}g , h , i , k , l",
+      "a , b , c , d , e ${s}, x , ${se}g , h , i , k , l",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }

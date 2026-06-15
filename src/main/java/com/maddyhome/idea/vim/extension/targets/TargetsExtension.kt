@@ -61,8 +61,14 @@ internal class TargetsExtension : VimExtension {
     )
   }
 
-  // `<` would be parsed as the start of a special key (e.g. `<CR>`); `<lt>` is the literal `<`.
-  private fun triggerKeys(trigger: Char) = if (trigger == '<') "<lt>" else trigger.toString()
+  // Some trigger characters clash with the key-notation parser and need their escaped forms:
+  // `<` starts a special key (e.g. `<CR>`), `|` separates commands, `\` is the escape character.
+  private fun triggerKeys(trigger: Char) = when (trigger) {
+    '<' -> "<lt>"
+    '|' -> "<Bar>"
+    '\\' -> "<Bslash>"
+    else -> trigger.toString()
+  }
 
   /** Whether the command operates on the target around the cursor, the next, or the last one. */
   private enum class Which(val infix: String) {
@@ -102,6 +108,14 @@ internal class TargetsExtension : VimExtension {
 
     /** Seek on the current line: the nearest target forward, else backward. */
     fun seek(chars: CharSequence, offset: Int, lineStart: Int, lineEnd: Int): DelimiterSpan?
+
+    /**
+     * Turns a located [span] into the operated range for the given [modifier]. The default is the
+     * balanced-delimiter behaviour shared by pairs and quotes (`a`/`A` include both delimiters);
+     * sources whose delimiters are not balanced (e.g. separators) override this.
+     */
+    fun toRange(chars: CharSequence, span: DelimiterSpan, modifier: Modifier): TextRange =
+      applyBalancedModifier(chars, span, modifier)
 
     /** The [count]th target after the cursor, stepping forward one [nearestForward] at a time. */
     fun next(chars: CharSequence, offset: Int, count: Int): DelimiterSpan? =
@@ -278,6 +292,51 @@ internal class TargetsExtension : VimExtension {
   }
 
   /**
+   * Locates a separator target: the text between two consecutive instances of a single separator
+   * character (`,`, `.`, `;`, ...) on the same line. Unlike pairs, the delimiters are not balanced,
+   * so the `a`/`A` modifiers include only the leading separator (leaving a proper list behind).
+   */
+  private class SeparatorSource(private val separator: Char) : TargetSource {
+
+    override fun enclosing(chars: CharSequence, offset: Int, count: Int): DelimiterSpan? =
+      pairsOnLineOf(chars, offset).firstOrNull { it.open <= offset && offset < it.close }
+
+    override fun growing(chars: CharSequence, start: Int, end: Int): DelimiterSpan? =
+      enclosing(chars, start, 1)
+
+    override fun nearestForward(chars: CharSequence, from: Int): DelimiterSpan? =
+      pairsOnLineOf(chars, from).firstOrNull { it.open >= from }
+
+    override fun nearestBackward(chars: CharSequence, from: Int): DelimiterSpan? =
+      pairsOnLineOf(chars, from).lastOrNull { it.close < from }
+
+    override fun seek(chars: CharSequence, offset: Int, lineStart: Int, lineEnd: Int): DelimiterSpan? =
+      nearestForward(chars, offset) ?: nearestBackward(chars, offset)
+
+    override fun toRange(chars: CharSequence, span: DelimiterSpan, modifier: Modifier): TextRange =
+      when (modifier) {
+        Modifier.INNER -> TextRange(span.open + 1, span.close)
+        Modifier.INNER_TRIMMED -> trimmedRange(chars, span.open + 1, span.close)
+        // An item: leading separator plus contents, but not the trailing one.
+        Modifier.AROUND -> TextRange(span.open, span.close)
+        // Both separators plus a trailing whitespace.
+        Modifier.AROUND_WHITESPACE -> TextRange(span.open, expandTrailing(chars, span.close + 1))
+      }
+
+    /**
+     * All separator-bounded spans on the line containing [anchor]. Unlike quotes, separators are
+     * not consumed when matched: every adjacent pair forms a span, so `a,b,c` yields `[a,b]` and
+     * `[b,c]` sharing the middle separator.
+     */
+    private fun pairsOnLineOf(chars: CharSequence, anchor: Int): List<DelimiterSpan> {
+      val lineStart = lineStartOf(chars, anchor)
+      val lineEnd = lineEndOf(chars, anchor)
+      val separators = (lineStart until lineEnd).filter { chars[it] == separator }
+      return separators.zipWithNext { open, close -> DelimiterSpan(open, close) }
+    }
+  }
+
+  /**
    * The text object handler. Computes the target range and either selects it (visual mode) or
    * feeds it to the pending operator.
    */
@@ -323,7 +382,7 @@ internal class TargetsExtension : VimExtension {
         }
       } ?: return null
 
-      return applyModifier(chars, pair, modifier)
+      return source.toRange(chars, pair, modifier)
     }
 
     private inner class RangeHandler(private val count: Int) : TextObjectActionHandler() {
@@ -347,6 +406,10 @@ internal class TargetsExtension : VimExtension {
     private val ANGLE = PairSource(listOf('<' to '>'))
     private val ANY_BLOCK = PairSource(listOf('(' to ')', '[' to ']', '{' to '}'))
 
+    private val SEPARATORS = listOf(
+      ',', '.', ';', ':', '+', '-', '=', '~', '_', '*', '#', '/', '|', '\\', '&', '$',
+    )
+
     private val SINGLE_QUOTE = QuoteSource(listOf('\''))
     private val DOUBLE_QUOTE = QuoteSource(listOf('"'))
     private val BACK_TICK = QuoteSource(listOf('`'))
@@ -360,7 +423,7 @@ internal class TargetsExtension : VimExtension {
       'b' to ANY_BLOCK,
       '\'' to SINGLE_QUOTE, '"' to DOUBLE_QUOTE, '`' to BACK_TICK,
       'q' to ANY_QUOTE,
-    )
+    ) + SEPARATORS.associateWith { SeparatorSource(it) }
 
     private fun lineStartOf(chars: CharSequence, offset: Int): Int {
       var i = offset.coerceAtMost(chars.length)
@@ -440,19 +503,13 @@ internal class TargetsExtension : VimExtension {
       return -1
     }
 
-    private fun applyModifier(chars: CharSequence, span: DelimiterSpan, modifier: Modifier): TextRange {
+    private fun applyBalancedModifier(chars: CharSequence, span: DelimiterSpan, modifier: Modifier): TextRange {
       val openIdx = span.open
       val closeIdx = span.close
       return when (modifier) {
         Modifier.AROUND -> TextRange(openIdx, closeIdx + 1)
         Modifier.INNER -> TextRange(openIdx + 1, closeIdx)
-        Modifier.INNER_TRIMMED -> {
-          var start = openIdx + 1
-          var end = closeIdx
-          while (start < end && chars[start].isInlineWhitespace()) start++
-          while (end > start && chars[end - 1].isInlineWhitespace()) end--
-          TextRange(start, end)
-        }
+        Modifier.INNER_TRIMMED -> trimmedRange(chars, openIdx + 1, closeIdx)
         Modifier.AROUND_WHITESPACE -> {
           var start = openIdx
           var end = closeIdx + 1
@@ -465,6 +522,15 @@ internal class TargetsExtension : VimExtension {
           TextRange(start, end)
         }
       }
+    }
+
+    /** [start, end) with any leading/trailing inline whitespace removed. */
+    private fun trimmedRange(chars: CharSequence, start: Int, end: Int): TextRange {
+      var s = start
+      var e = end
+      while (s < e && chars[s].isInlineWhitespace()) s++
+      while (e > s && chars[e - 1].isInlineWhitespace()) e--
+      return TextRange(s, e)
     }
 
     private fun expandTrailing(chars: CharSequence, end: Int): Int {
