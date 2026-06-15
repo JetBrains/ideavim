@@ -9,6 +9,7 @@ package com.maddyhome.idea.vim
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
@@ -259,6 +260,10 @@ class KeyHandler {
     val command = keyState.commandBuilder.buildCommand()
     val operatorArguments = OperatorArguments(command.rawCount, editorState.mode)
 
+    val wasOpPendingFromInsert = (editor.mode as? Mode.OP_PENDING)?.let {
+      it.returnTo is Mode.INSERT
+    } ?: false
+
     // If we were in "operator pending" mode, reset back to normal mode.
     // But opening command line should not reset operator pending mode (e.g. `d/foo`)
     if (!command.flags.contains(CommandFlags.FLAG_START_EX)) {
@@ -277,7 +282,7 @@ class KeyHandler {
       }
     }
 
-    val action: Runnable = ActionRunner(editor, context, command, keyState, operatorArguments)
+    val action: Runnable = ActionRunner(editor, context, command, keyState, operatorArguments, wasOpPendingFromInsert)
     val cmdAction = command.action
     val name = cmdAction.id
     injector.actionExecutor.executeCommand(editor, action, name, action)
@@ -354,6 +359,7 @@ class KeyHandler {
     val cmd: Command,
     val keyState: KeyHandlerState,
     val operatorArguments: OperatorArguments,
+    val wasOpPendingFromInsert: Boolean = false,
   ) : Runnable {
     override fun run() {
       val editorState = injector.vimState
@@ -363,6 +369,19 @@ class KeyHandler {
         injector.registerGroup.selectRegister(register)
       }
       injector.actionExecutor.executeVimAction(editor, cmd.action, context, operatorArguments)
+
+      //C-o followed by db, this will move the caret one past
+      if (wasOpPendingFromInsert && editorState.mode is Mode.INSERT) {
+        for (caret in editor.nativeCarets()) {
+          val line = caret.getBufferPosition().line
+          val lineEndNotAllowed = editor.getLineEndOffset(line, false)
+          val lineEndAllowed = editor.getLineEndOffset(line, true)
+          if (caret.offset == lineEndNotAllowed && lineEndAllowed != lineEndNotAllowed) {
+            caret.moveToOffset(lineEndAllowed)
+          }
+        }
+      }
+
       if (editorState.mode is Mode.INSERT || editorState.mode is Mode.REPLACE) {
         injector.changeGroup.processCommand(editor, cmd)
       }
