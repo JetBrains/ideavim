@@ -337,6 +337,58 @@ internal class TargetsExtension : VimExtension {
   }
 
   /**
+   * Locates an HTML/XML tag target. A target's [DelimiterSpan] holds the outer `<` of the opening
+   * tag and the outer `>` of the matching closing tag; [toRange] re-derives the inner boundaries
+   * from the text, so `it` is the content between the tags and `at` is the whole tag pair.
+   */
+  private object TagSource : TargetSource {
+
+    override fun enclosing(chars: CharSequence, offset: Int, count: Int): DelimiterSpan? =
+      containing(allTagPairs(chars), offset).getOrNull(count - 1)
+
+    override fun growing(chars: CharSequence, start: Int, end: Int): DelimiterSpan? {
+      val enclosingPairs = allTagPairs(chars)
+        .filter { it.open <= start && it.close >= end - 1 }
+        .sortedByDescending { it.open }
+      // The smallest enclosing tag whose interior is not already exactly the current selection.
+      return enclosingPairs.firstOrNull { pair ->
+        val (innerStart, innerEnd) = innerOf(chars, pair)
+        !(innerStart >= start && innerEnd <= end)
+      } ?: enclosingPairs.lastOrNull()
+    }
+
+    override fun nearestForward(chars: CharSequence, from: Int): DelimiterSpan? =
+      allTagPairs(chars).filter { it.open >= from }.minByOrNull { it.open }
+
+    override fun nearestBackward(chars: CharSequence, from: Int): DelimiterSpan? =
+      allTagPairs(chars).filter { it.close < from }.maxByOrNull { it.close }
+
+    override fun seek(chars: CharSequence, offset: Int, lineStart: Int, lineEnd: Int): DelimiterSpan? =
+      nearestForward(chars, offset) ?: nearestBackward(chars, offset)
+
+    override fun toRange(chars: CharSequence, span: DelimiterSpan, modifier: Modifier): TextRange {
+      val (innerStart, innerEnd) = innerOf(chars, span)
+      return when (modifier) {
+        Modifier.INNER -> TextRange(innerStart, innerEnd)
+        Modifier.INNER_TRIMMED -> trimmedRange(chars, innerStart, innerEnd)
+        Modifier.AROUND -> TextRange(span.open, span.close + 1)
+        Modifier.AROUND_WHITESPACE -> TextRange(span.open, expandTrailing(chars, span.close + 1))
+      }
+    }
+
+    /** Tag pairs ordered innermost-first that enclose [offset]. */
+    private fun containing(pairs: List<DelimiterSpan>, offset: Int): List<DelimiterSpan> =
+      pairs.filter { offset in it.open..it.close }.sortedByDescending { it.open }
+
+    /** The [innerStart, innerEnd) content range between the opening and closing tags. */
+    private fun innerOf(chars: CharSequence, span: DelimiterSpan): Pair<Int, Int> {
+      val openTagEnd = chars.indexOf('>', span.open)
+      val closeTagStart = chars.lastIndexOf('<', span.close)
+      return (openTagEnd + 1) to closeTagStart
+    }
+  }
+
+  /**
    * The text object handler. Computes the target range and either selects it (visual mode) or
    * feeds it to the pending operator.
    */
@@ -423,7 +475,54 @@ internal class TargetsExtension : VimExtension {
       'b' to ANY_BLOCK,
       '\'' to SINGLE_QUOTE, '"' to DOUBLE_QUOTE, '`' to BACK_TICK,
       'q' to ANY_QUOTE,
+      't' to TagSource,
     ) + SEPARATORS.associateWith { SeparatorSource(it) }
+
+    private data class OpenTag(val start: Int, val name: String)
+
+    /** All matched tag pairs in the buffer, each as the outer `<` and outer `>` offsets. */
+    private fun allTagPairs(chars: CharSequence): List<DelimiterSpan> {
+      val openTags = ArrayDeque<OpenTag>()
+      val pairs = ArrayList<DelimiterSpan>()
+      var i = 0
+      while (i < chars.length) {
+        if (chars[i] != '<') {
+          i++
+          continue
+        }
+        val closeAngle = chars.indexOf('>', i + 1)
+        if (closeAngle < 0) break
+        val body = chars.subSequence(i + 1, closeAngle).toString()
+        when {
+          isClosingTag(body) -> closeTag(openTags, tagName(body.substring(1)), closeAngle)?.let { pairs.add(it) }
+          isSelfClosingTag(body) -> {} // no pair
+          isOpeningTag(body) -> openTags.addLast(OpenTag(i, tagName(body)))
+        }
+        i = closeAngle + 1
+      }
+      return pairs
+    }
+
+    private fun isClosingTag(body: String): Boolean = body.startsWith("/")
+    private fun isSelfClosingTag(body: String): Boolean = body.endsWith("/")
+    private fun isOpeningTag(body: String): Boolean = body.isNotEmpty() && body[0].isLetter()
+
+    // Tag names are matched case-insensitively, like Vim's `it`/`at`.
+    private fun tagName(body: String): String =
+      body.trim().takeWhile { !it.isWhitespace() && it != '/' }.lowercase()
+
+    /**
+     * Matches the closing tag at [closeAngle] against the innermost open tag of the same [name],
+     * discarding any unclosed tags nested inside it. Returns the completed pair, or null if no open
+     * tag matches.
+     */
+    private fun closeTag(openTags: ArrayDeque<OpenTag>, name: String, closeAngle: Int): DelimiterSpan? {
+      val matchIndex = openTags.indexOfLast { it.name == name }
+      if (matchIndex < 0) return null
+      val opening = openTags[matchIndex]
+      while (openTags.size > matchIndex) openTags.removeLast()
+      return DelimiterSpan(opening.start, closeAngle)
+    }
 
     private fun lineStartOf(chars: CharSequence, offset: Int): Int {
       var i = offset.coerceAtMost(chars.length)
