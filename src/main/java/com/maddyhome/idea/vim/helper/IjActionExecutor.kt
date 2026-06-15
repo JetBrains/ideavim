@@ -90,6 +90,9 @@ class IjActionExecutor : VimActionExecutor {
     // Or if there is a specific data stored in the context. This data, however, is stored
     //   only if the run window is in focus.
     if (this is StopAction) return ActionPlaces.ACTION_SEARCH
+    // NewScratchFile (ScratchFileActions.NewFileAction) only enables itself when invoked from a
+    //   main-menu / action-search place, so it stays disabled under our default "IdeaVim" place.
+    if (ActionManager.getInstance().getId(this) == "NewScratchFile") return ActionPlaces.ACTION_SEARCH
     return "IdeaVim"
   }
 
