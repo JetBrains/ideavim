@@ -260,6 +260,7 @@ class KeyHandler {
     val command = keyState.commandBuilder.buildCommand()
     val operatorArguments = OperatorArguments(command.rawCount, editorState.mode)
 
+    //true if goes form insert to OpPending
     val wasOpPendingFromInsert = (editor.mode as? Mode.OP_PENDING)?.let {
       it.returnTo is Mode.INSERT
     } ?: false
@@ -370,6 +371,7 @@ class KeyHandler {
       }
       injector.actionExecutor.executeVimAction(editor, cmd.action, context, operatorArguments)
 
+      // this restore the caret position when use C-o then db from the end of the line
       if (wasOpPendingFromInsert && editorState.mode is Mode.INSERT) {
         restoreAllowEndCaretPosition(editor, editorState)
       }
@@ -389,11 +391,7 @@ class KeyHandler {
       // mode commands. An exception is if this command should leave us in the temporary mode such as
       // "select register"
       if (editorState.mode is Mode.NORMAL && !cmd.flags.contains(CommandFlags.FLAG_EXPECT_MORE)) {
-        val oldMode = editorState.mode as Mode.NORMAL
-        editor.mode = oldMode.returnTo
-        if (oldMode.isInsertPending || oldMode.isReplacePending) {
-          restoreAllowEndCaretPosition(editor, editorState)
-        }
+        editor.mode = editorState.mode.returnTo
       }
 
       instance.reset(keyState, editorState.mode)
