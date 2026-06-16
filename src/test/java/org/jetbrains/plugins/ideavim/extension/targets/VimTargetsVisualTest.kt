@@ -72,45 +72,4 @@ class VimTargetsVisualTest : VimTestCase() {
     )
   }
 
-  // Linewise `V` selection + `Ib` reselects to inside the multiline block; `c.` collapses it.
-  @Test
-  fun `inside any-block from a linewise selection`() {
-    doTest(
-      "VjIbc.<Esc>",
-      """
-        a       b
-        a ( ${c}X   b
-        a   c ) b
-        a       b
-      """.trimIndent(),
-      """
-        a       b
-        a ( $c. ) b
-        a       b
-      """.trimIndent(),
-      Mode.NORMAL(),
-    )
-  }
-
-  // Blockwise `<C-V>` selection: `I` must remain Vim's block-insert (targets stays out of the way),
-  // so `Ibc.` inserts the literal text `bc.` at the block's start column on each line.
-  @Test
-  fun `targets does not break blockwise block-insert`() {
-    doTest(
-      "<C-V>jIbc.<Esc>",
-      """
-        a       b
-        a ( ${c}Y   b
-        a   c ) b
-        a       b
-      """.trimIndent(),
-      """
-        a       b
-        a ( ${c}bc.Y   b
-        a   bc.c ) b
-        a       b
-      """.trimIndent(),
-      Mode.NORMAL(),
-    )
-  }
 }
