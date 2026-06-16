@@ -485,21 +485,21 @@ class SetlocalCommandTest : VimTestCase() {
     val expected = """
     |--- Local option values ---
     |noabolish             history=50        nonumber            nosurround
-    |noargtextobj        nohlsearch            operatorfunc=     notextobj-entire
-    |nobomb                ide=IntelliJ IDEA norelativenumber    notextobj-indent
-    |nobreakindent       --ideajoin            scroll=0            textwidth=0
-    |noCamelCaseMotion     ideamarks           scrolljump=1        timeout
-    |noclasstextobj        idearefactormode=   scrolloff=-1        timeoutlen=1000
-    |  cmdheight=1         ideawrite=all       selectmode=       notrackactionids
-    |  colorcolumn=      noignorecase          shellcmdflag=-x   noVimEverywhere
-    |nocommentary        noincsearch           shellxescape=@      virtualedit=
-    |nocursorline        nolist                shellxquote={     novisualbell
-    |nodigraph           nomatchit             showcmd             visualdelay=100
-    |noexchange            maxmapdepth=20      showmode            whichwrap=b,s
-    |  fileformat=unix   nomini-ai             sidescroll=0        wrap
-    |  foldlevel=1         more                sidescrolloff=-1    wrapscan
-    |nofunctextobj       nomultiple-cursors  nosmartcase         noyoucompleteme
-    |nogdefault          noNERDTree          nosneak
+    |noargtextobj        nohlsearch            operatorfunc=     notargets
+    |nobomb                ide=IntelliJ IDEA norelativenumber    notextobj-entire
+    |nobreakindent       --ideajoin            scroll=0          notextobj-indent
+    |noCamelCaseMotion     ideamarks           scrolljump=1        textwidth=0
+    |noclasstextobj        idearefactormode=   scrolloff=-1        timeout
+    |  cmdheight=1         ideawrite=all       selectmode=         timeoutlen=1000
+    |  colorcolumn=      noignorecase          shellcmdflag=-x   notrackactionids
+    |nocommentary        noincsearch           shellxescape=@    noVimEverywhere
+    |nocursorline        nolist                shellxquote={       virtualedit=
+    |nodigraph           nomatchit             showcmd           novisualbell
+    |noexchange            maxmapdepth=20      showmode            visualdelay=100
+    |  fileformat=unix   nomini-ai             sidescroll=0        whichwrap=b,s
+    |  foldlevel=1         more                sidescrolloff=-1    wrap
+    |nofunctextobj       nomultiple-cursors  nosmartcase           wrapscan
+    |nogdefault          noNERDTree          nosneak             noyoucompleteme
     |nohighlightedyank     nrformats=hex       startofline
     |  clipboard=ideaput,autoselect
     |  comments=s1:/*,mb:*,ex:*/,://,b:#,:%,:XCOMM,n:>,fb:-
@@ -631,6 +631,7 @@ class SetlocalCommandTest : VimTestCase() {
     |nosneak
     |  startofline
     |nosurround
+    |notargets
     |notextobj-entire
     |notextobj-indent
     |  textwidth=0
