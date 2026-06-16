@@ -17,6 +17,31 @@ import org.junit.jupiter.api.Test
 class InccommandTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @Test
+  fun `test inccommand nosplit highlights replaced text`() {
+    configureByText(
+      """My name is Cezary Baryka, and for the last 20 minutes I have been the owner of this glass house.
+         |${c}I'm slowly starting to regret the purchase, freezing cold at night, sweltering heat by day,
+         |zero ventilation and no plumbing are doing their job. That's right, it stinks.
+         |Ehhh..... I lied.... I didn't buy this pigsty, I won it from my father in a game of cards:
+      """.trimMargin(),
+    )
+    enterCommand("set inccommand=nosplit")
+
+    typeText(":", "%s/the/X/g")
+
+    // The replacement text in the previewed buffer should be highlighted so the user can see what changed.
+    assertSearchHighlights(
+      "the",
+      """My name is Cezary Baryka, and for «X» last 20 minutes I have been «X» owner of this glass house.
+         |I'm slowly starting to regret «X» purchase, freezing cold at night, sweltering heat by day,
+         |zero ventilation and no plumbing are doing «X»ir job. That's right, it stinks.
+         |Ehhh..... I lied.... I didn't buy this pigsty, I won it from my fa«X»r in a game of cards:
+      """.trimMargin(),
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
   fun `test inccommand nosplit previews replacement in whole file`() {
     configureByText(
       """My name is Cezary Baryka, and for the last 20 minutes I have been the owner of this glass house.
@@ -133,6 +158,8 @@ class InccommandTest : VimTestCase() {
     typeText(":", "%s/the/X/g", "<Esc>")
 
     assertState(original)
+    // Cancelling must also remove the preview highlights.
+    assertNoSearchHighlights()
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)

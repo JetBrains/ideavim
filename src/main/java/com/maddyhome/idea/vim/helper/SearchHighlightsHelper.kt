@@ -66,13 +66,14 @@ fun updateIncsearchHighlights(
   forwards: Boolean,
   caretOffset: Int,
   searchRange: LineRange?,
+  forceShowAllMatches: Boolean = false,
 ): Int {
   val searchStartOffset = if (searchRange != null && searchRange.startLine < editor.document.lineCount) {
     editor.vim.getLineStartOffset(searchRange.startLine)
   } else {
     caretOffset
   }
-  val showHighlights = injector.options(editor.vim).hlsearch
+  val showHighlights = injector.options(editor.vim).hlsearch || forceShowAllMatches
   return updateSearchHighlights(
     editor.vim,
     pattern,
@@ -101,6 +102,25 @@ fun addSubstitutionConfirmationHighlight(editor: Editor, start: Int, end: Int): 
     color,
     HighlighterTargetArea.EXACT_RANGE,
   )
+}
+
+/**
+ * Highlight a single range using the standard search-result attributes, returning the highlighter so the caller can
+ * remove it later.
+ *
+ * Unlike [highlightSearchResults], this does not touch the editor's tracked incsearch highlighters, so it is suitable
+ * for transient overlays - such as the `inccommand` preview - that manage their own highlighter lifecycle.
+ */
+fun highlightPreviewMatch(editor: Editor, start: Int, end: Int, tooltip: String): RangeHighlighter {
+  val highlighter = editor.markupModel.addRangeHighlighter(
+    EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES,
+    start,
+    end,
+    HighlighterLayer.SELECTION - 1,
+    HighlighterTargetArea.EXACT_RANGE,
+  )
+  highlighter.errorStripeTooltip = tooltip
+  return highlighter
 }
 
 /**

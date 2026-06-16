@@ -405,7 +405,10 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
     val pattern = update.searchText.take(patternEnd)
 
     injector.editorGroup.closeEditorSearchSession(IjVimEditor(editor))
-    val matchOffset = updateIncsearchHighlights(editor, pattern, count1, forwards, caretOffset, update.searchRange)
+    // A substitute/global command highlights every match in its range, even without 'hlsearch'.
+    val matchOffset = updateIncsearchHighlights(
+      editor, pattern, count1, forwards, caretOffset, update.searchRange, forceShowAllMatches = update.isExCommand
+    )
     if (matchOffset == -1) {
       resetCaretOffsetAndScroll(editor)
       return
