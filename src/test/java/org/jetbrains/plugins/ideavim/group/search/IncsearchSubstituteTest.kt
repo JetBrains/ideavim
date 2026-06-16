@@ -24,6 +24,48 @@ class IncsearchSubstituteTest : VimTestCase() {
   }
 
   @Test
+  fun `test incsearch highlights all matches for substitute command without hlsearch`() {
+    configureByText(
+      """I found it in a legendary land
+           |${c}all rocks and lavender and tufted grass,
+           |where it was settled on some sodden sand
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
+    )
+    // Note: incsearch only, no hlsearch. A substitute command should still highlight *all* matches in its range, not
+    // just the current one (this matches Vim/Neovim's incremental substitute preview).
+    enterCommand("set incsearch")
+
+    typeText(":", "%s/and")
+
+    assertSearchHighlights(
+      "and",
+      """I found it in a legendary l‷and‴
+           |all rocks «and» lavender «and» tufted grass,
+           |where it was settled on some sodden s«and»
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test cancelling substitute command clears all-match highlights without hlsearch`() {
+    configureByText(
+      """I found it in a legendary land
+           |${c}all rocks and lavender and tufted grass,
+           |where it was settled on some sodden sand
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
+    )
+    enterCommand("set incsearch")
+
+    typeText(":", "%s/and", "<Esc>")
+
+    // Without hlsearch there are no persistent highlights to fall back to, so cancelling must clear everything.
+    assertNoSearchHighlights()
+  }
+
+  @Test
   fun `test incsearch highlights for substitute command`() {
     configureByText(
       """I found it in a legendary land

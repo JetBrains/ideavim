@@ -11,11 +11,13 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.SubstitutePreviewChange
 import com.maddyhome.idea.vim.api.VimSearchGroupBase
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ranges.LineRange
+import com.maddyhome.idea.vim.helper.highlightPreviewMatch
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.vimscript.model.commands.SubstituteCommand
@@ -38,6 +40,9 @@ internal class InccommandPreview {
   /** A copy-free snapshot of the document taken before the preview was applied, used only as a revert fallback. */
   private var snapshot: CharSequence? = null
 
+  /** Highlighters drawn over the replacement text so the user can see what changed. Removed alongside [changes]. */
+  private var highlighters: List<RangeHighlighter> = emptyList()
+
   /**
    * Render a preview of [command] over [range], replacing whatever the previous preview showed.
    */
@@ -52,13 +57,18 @@ internal class InccommandPreview {
         command.vimContext = Script()
         changes = (VimPlugin.getSearch() as VimSearchGroupBase)
           .substitutePreview(vimEditor, context, range, command.command, command.argument, command)
+        // Highlight the replacement text in place so the change is visible, like Vim/Neovim's inccommand preview.
+        highlighters = changes.map { change ->
+          val end = change.startOffset + change.replacementLength
+          highlightPreviewMatch(editor, change.startOffset, end, change.originalText)
+        }
       }
     }
   }
 
   /** Revert any active preview, restoring the document to its original state. */
   fun clear(editor: Editor) {
-    if (changes.isEmpty() && snapshot == null) return
+    if (changes.isEmpty() && snapshot == null && highlighters.isEmpty()) return
     CommandProcessor.getInstance().runUndoTransparentAction {
       ApplicationManager.getApplication().runWriteAction {
         revert(editor)
@@ -76,6 +86,7 @@ internal class InccommandPreview {
   fun reset() {
     changes = emptyList()
     snapshot = null
+    highlighters = emptyList()
   }
 
   /**
@@ -87,8 +98,12 @@ internal class InccommandPreview {
   private fun revert(editor: Editor) {
     val changes = this.changes
     val snapshot = this.snapshot
+    val highlighters = this.highlighters
     this.changes = emptyList()
     this.snapshot = null
+    this.highlighters = emptyList()
+
+    highlighters.forEach { editor.markupModel.removeHighlighter(it) }
     if (changes.isEmpty()) return
 
     val document = editor.document
