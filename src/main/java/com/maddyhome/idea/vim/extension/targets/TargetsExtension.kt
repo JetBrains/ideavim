@@ -40,6 +40,15 @@ import kotlin.math.max
 internal class TargetsExtension : VimExtension {
   override fun getName(): String = "targets"
 
+  /** A target this extension produced in visual mode, remembered so a re-issue can grow it. */
+  private data class LastTarget(val selection: TextRange, val span: DelimiterSpan, val modifier: Modifier)
+
+  // What this extension last produced in visual mode. Re-issuing a text object grows the selection,
+  // continuing from the last located span (the caret has since moved to the selection end). Growth
+  // only applies when the current selection is the one we made, not a fresh `v` selection. Like
+  // targets.vim's own `s:lastRawTarget`, this is a single shared value rather than per-editor.
+  private var lastTarget: LastTarget? = null
+
   override fun init() {
     for ((trigger, source) in TRIGGERS) {
       for (modifier in Modifier.entries) {
@@ -94,11 +103,25 @@ internal class TargetsExtension : VimExtension {
    * relative to the cursor; the [Modifier] then trims it into the operated range.
    */
   private interface TargetSource {
-    /** The target around [offset], counting [count] levels outward. */
-    fun enclosing(chars: CharSequence, offset: Int, count: Int): DelimiterSpan?
+    /** The innermost target around [offset], or null if the cursor is not inside one. */
+    fun innermost(chars: CharSequence, offset: Int): DelimiterSpan?
 
-    /** The target strictly larger than the span [start, end), for growing a visual selection. */
-    fun growing(chars: CharSequence, start: Int, end: Int): DelimiterSpan?
+    /** The target one level larger than [span], or null if there is none (e.g. quotes don't nest). */
+    fun surrounding(chars: CharSequence, span: DelimiterSpan): DelimiterSpan? = null
+
+    /** The target around [offset], counting [count] levels outward, or null if it can't be reached. */
+    fun enclosing(chars: CharSequence, offset: Int, count: Int): DelimiterSpan? {
+      var span = innermost(chars, offset) ?: return null
+      repeat(count - 1) { span = surrounding(chars, span) ?: return null }
+      return span
+    }
+
+    /** Steps out [count] levels from [span], stopping early at the outermost reachable target. */
+    fun outward(chars: CharSequence, span: DelimiterSpan, count: Int): DelimiterSpan {
+      var result = span
+      repeat(count) { result = surrounding(chars, result) ?: return result }
+      return result
+    }
 
     /** The nearest target whose opening delimiter is at or after [from], or null if none. */
     fun nearestForward(chars: CharSequence, from: Int): DelimiterSpan?
@@ -158,28 +181,12 @@ internal class TargetsExtension : VimExtension {
    */
   private class PairSource(private val pairs: List<Pair<Char, Char>>) : TargetSource {
 
-    /** The smallest pair enclosing [offset], counting [count] levels outward. */
-    override fun enclosing(chars: CharSequence, offset: Int, count: Int): DelimiterSpan? {
-      var best = pairs.mapNotNull { enclosingOf(chars, offset, it.first, it.second) }
-        .maxByOrNull { it.open } ?: return null
-      repeat(count - 1) {
-        best = outerOf(chars, best) ?: return null
-      }
-      return best
-    }
+    /** The smallest pair enclosing [offset] (of any configured kind). */
+    override fun innermost(chars: CharSequence, offset: Int): DelimiterSpan? =
+      pairs.mapNotNull { enclosingOf(chars, offset, it.first, it.second) }.maxByOrNull { it.open }
 
-    /** The pair strictly larger than the span [start, end), for growing a visual selection. */
-    override fun growing(chars: CharSequence, start: Int, end: Int): DelimiterSpan? {
-      val candidates = pairs.mapNotNull { (open, close) ->
-        var pair = enclosingOf(chars, start, open, close) ?: return@mapNotNull null
-        // Step outward until the inner range is a strict superset of the current selection.
-        while (pair.open + 1 >= start && pair.close <= end) {
-          pair = outerOf(chars, pair) ?: return@mapNotNull null
-        }
-        pair
-      }
-      return candidates.maxByOrNull { it.open }
-    }
+    override fun surrounding(chars: CharSequence, span: DelimiterSpan): DelimiterSpan? =
+      outerOf(chars, span)
 
     /** The nearest pair whose opening delimiter is at or after [from]. */
     override fun nearestForward(chars: CharSequence, from: Int): DelimiterSpan? =
@@ -259,15 +266,9 @@ internal class TargetsExtension : VimExtension {
    */
   private class QuoteSource(private val quotes: List<Char>) : TargetSource {
 
-    override fun enclosing(chars: CharSequence, offset: Int, count: Int): DelimiterSpan? =
+    // Quotes don't nest, so there is no surrounding target to grow into (the default returns null).
+    override fun innermost(chars: CharSequence, offset: Int): DelimiterSpan? =
       quotes.mapNotNull { containing(chars, offset, it) }.maxByOrNull { it.open }
-
-    // Quotes don't nest, but the first text object in visual mode must still select the quote pair
-    // enclosing the initial one-character selection. There is no larger target beyond that.
-    override fun growing(chars: CharSequence, start: Int, end: Int): DelimiterSpan? =
-      quotes.mapNotNull { quote ->
-        pairsOnLineOf(chars, start, quote).firstOrNull { it.open <= start && it.close + 1 >= end }
-      }.maxByOrNull { it.open }
 
     override fun nearestForward(chars: CharSequence, from: Int): DelimiterSpan? =
       quotes.mapNotNull { firstPairAfter(chars, from, it) }.minByOrNull { it.open }
@@ -303,11 +304,9 @@ internal class TargetsExtension : VimExtension {
    */
   private class SeparatorSource(private val separator: Char) : TargetSource {
 
-    override fun enclosing(chars: CharSequence, offset: Int, count: Int): DelimiterSpan? =
+    // Separators don't nest, so there is no surrounding target (the default returns null).
+    override fun innermost(chars: CharSequence, offset: Int): DelimiterSpan? =
       pairsOnLineOf(chars, offset).firstOrNull { it.open <= offset && offset < it.close }
-
-    override fun growing(chars: CharSequence, start: Int, end: Int): DelimiterSpan? =
-      enclosing(chars, start, 1)
 
     override fun nearestForward(chars: CharSequence, from: Int): DelimiterSpan? =
       pairsOnLineOf(chars, from).firstOrNull { it.open >= from }
@@ -348,19 +347,11 @@ internal class TargetsExtension : VimExtension {
    */
   private object TagSource : TargetSource {
 
-    override fun enclosing(chars: CharSequence, offset: Int, count: Int): DelimiterSpan? =
-      containing(allTagPairs(chars), offset).getOrNull(count - 1)
+    override fun innermost(chars: CharSequence, offset: Int): DelimiterSpan? =
+      containing(allTagPairs(chars), offset).firstOrNull()
 
-    override fun growing(chars: CharSequence, start: Int, end: Int): DelimiterSpan? {
-      val enclosingPairs = allTagPairs(chars)
-        .filter { it.open <= start && it.close >= end - 1 }
-        .sortedByDescending { it.open }
-      // The smallest enclosing tag whose interior is not already exactly the current selection.
-      return enclosingPairs.firstOrNull { pair ->
-        val (innerStart, innerEnd) = innerOf(chars, pair)
-        !(innerStart >= start && innerEnd <= end)
-      } ?: enclosingPairs.lastOrNull()
-    }
+    override fun surrounding(chars: CharSequence, span: DelimiterSpan): DelimiterSpan? =
+      allTagPairs(chars).filter { it.open < span.open && it.close > span.close }.minByOrNull { span.open - it.open }
 
     override fun nearestForward(chars: CharSequence, from: Int): DelimiterSpan? =
       allTagPairs(chars).filter { it.open >= from }.minByOrNull { it.open }
@@ -406,14 +397,36 @@ internal class TargetsExtension : VimExtension {
   private object ArgumentSource : TargetSource {
     private const val SEPARATOR = ','
 
-    override fun enclosing(chars: CharSequence, offset: Int, count: Int): DelimiterSpan? {
+    override fun innermost(chars: CharSequence, offset: Int): DelimiterSpan? {
       val left = boundaryLeft(chars, offset) ?: return null
       val right = boundaryRight(chars, offset) ?: return null
       return DelimiterSpan(left, right)
     }
 
-    override fun growing(chars: CharSequence, start: Int, end: Int): DelimiterSpan? =
-      enclosing(chars, start, 1)
+    // The argument of the enclosing list that contains this whole argument's brace group.
+    override fun surrounding(chars: CharSequence, span: DelimiterSpan): DelimiterSpan? {
+      val openBrace = enclosingBraceOpen(chars, span.open) ?: return null
+      val closeBrace = matchingCloseAnyKind(chars, openBrace) ?: return null
+      val left = boundaryLeft(chars, openBrace - 1) ?: return null
+      val right = boundaryRight(chars, closeBrace + 1) ?: return null
+      return DelimiterSpan(left, right)
+    }
+
+    /** The opening brace of the list that [pos] sits in. */
+    private fun enclosingBraceOpen(chars: CharSequence, pos: Int): Int? {
+      if (isOpening(chars[pos])) return pos
+      var depth = 0
+      var i = pos - 1
+      while (i >= 0) {
+        val c = chars[i]
+        when {
+          isClosing(c) -> depth++
+          isOpening(c) -> if (depth == 0) return i else depth--
+        }
+        i--
+      }
+      return null
+    }
 
     override fun nearestForward(chars: CharSequence, from: Int): DelimiterSpan? {
       var i = from
@@ -536,21 +549,36 @@ internal class TargetsExtension : VimExtension {
     private fun computeRange(editor: VimEditor, caret: ImmutableVimCaret, count: Int): TextRange? {
       val chars = editor.text()
       val offset = caret.offset
+      val visual = editor.mode is Mode.VISUAL
 
-      val pair = when (which) {
+      val toGrow = if (which == Which.CURRENT && visual) spanToGrow(caret) else null
+      val span = (toGrow?.let { growFrom(chars, it, count) } ?: when (which) {
         Which.NEXT -> source.next(chars, offset, count)
         Which.LAST -> source.last(chars, offset, count)
-        Which.CURRENT -> {
-          if (editor.mode is Mode.VISUAL && caret.selectionStart != caret.selectionEnd) {
-            source.growing(chars, caret.selectionStart, caret.selectionEnd)
-          } else {
-            source.enclosing(chars, offset, count)
-              ?: source.seek(chars, offset, editor.getLineStartForOffset(offset), editor.getLineEndForOffset(offset))
-          }
-        }
-      } ?: return null
+        Which.CURRENT -> source.enclosing(chars, offset, count)
+          ?: source.seek(chars, offset, editor.getLineStartForOffset(offset), editor.getLineEndForOffset(offset))
+      }) ?: return null
 
-      return source.toRange(chars, pair, modifier)
+      val range = source.toRange(chars, span, modifier)
+      if (visual) lastTarget = LastTarget(range, span, modifier)
+      return range
+    }
+
+    /** The span to grow from, if the caret's selection is the one we produced last; else null. */
+    private fun spanToGrow(caret: ImmutableVimCaret): DelimiterSpan? {
+      val last = lastTarget ?: return null
+      val matches = last.selection.startOffset == caret.selectionStart &&
+        last.selection.endOffset == caret.selectionEnd
+      return if (matches) last.span else null
+    }
+
+    /**
+     * Grows outward from the previously located [span]. Re-issuing the same modifier steps out one
+     * level; a count steps out [count] - 1 further levels.
+     */
+    private fun growFrom(chars: CharSequence, span: DelimiterSpan, count: Int): DelimiterSpan {
+      val levels = if (modifier == lastTarget?.modifier) count else count - 1
+      return source.outward(chars, span, levels)
     }
 
     private inner class RangeHandler(private val count: Int) : TextObjectActionHandler() {
