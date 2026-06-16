@@ -12,8 +12,6 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
-import com.maddyhome.idea.vim.api.getLineEndForOffset
-import com.maddyhome.idea.vim.api.getLineStartForOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.OperatorArguments
@@ -129,8 +127,13 @@ internal class TargetsExtension : VimExtension {
     /** The nearest target whose closing delimiter is before [from], or null if none. */
     fun nearestBackward(chars: CharSequence, from: Int): DelimiterSpan?
 
-    /** Seek on the current line: the nearest target forward, else backward. */
-    fun seek(chars: CharSequence, offset: Int, lineStart: Int, lineEnd: Int): DelimiterSpan?
+    /**
+     * Seek to the nearest target when the cursor is not inside one: forward first, else backward.
+     * The reach is whatever [nearestForward]/[nearestBackward] cover (a line for quotes/separators
+     * on a line, the buffer for pairs/tags/arguments).
+     */
+    fun seek(chars: CharSequence, offset: Int): DelimiterSpan? =
+      nearestForward(chars, offset) ?: nearestBackward(chars, offset)
 
     /**
      * Turns a located [span] into the operated range for the given [modifier]. The default is the
@@ -195,20 +198,6 @@ internal class TargetsExtension : VimExtension {
     /** The nearest pair whose closing delimiter is before [from]. */
     override fun nearestBackward(chars: CharSequence, from: Int): DelimiterSpan? =
       pairs.mapNotNull { backwardOf(chars, from, it.first, it.second) }.maxByOrNull { it.close }
-
-    /** Seek on the current line: the nearest pair forward, else backward. */
-    override fun seek(chars: CharSequence, offset: Int, lineStart: Int, lineEnd: Int): DelimiterSpan? {
-      val forward = pairs.mapNotNull { (open, close) ->
-        val openIdx = indexOfOnLine(chars, open, offset, lineEnd)
-        if (openIdx < 0) null else matchingClose(chars, openIdx, open, close)?.let { DelimiterSpan(openIdx, it) }
-      }.minByOrNull { it.open }
-      if (forward != null) return forward
-
-      return pairs.mapNotNull { (open, close) ->
-        val closeIdx = lastIndexOfOnLine(chars, close, lineStart, offset)
-        if (closeIdx < 0) null else matchingOpen(chars, closeIdx, open, close)?.let { DelimiterSpan(it, closeIdx) }
-      }.maxByOrNull { it.close }
-    }
 
     private fun enclosingOf(chars: CharSequence, offset: Int, open: Char, close: Char): DelimiterSpan? {
       if (offset < chars.length && chars[offset] == open) {
@@ -276,9 +265,6 @@ internal class TargetsExtension : VimExtension {
     override fun nearestBackward(chars: CharSequence, from: Int): DelimiterSpan? =
       quotes.mapNotNull { firstPairBefore(chars, from, it) }.maxByOrNull { it.close }
 
-    override fun seek(chars: CharSequence, offset: Int, lineStart: Int, lineEnd: Int): DelimiterSpan? =
-      nearestForward(chars, offset) ?: nearestBackward(chars, offset)
-
     private fun containing(chars: CharSequence, offset: Int, quote: Char): DelimiterSpan? =
       pairsOnLineOf(chars, offset, quote).firstOrNull { offset in it.open..it.close }
 
@@ -324,9 +310,6 @@ internal class TargetsExtension : VimExtension {
       return DelimiterSpan(left, right)
     }
 
-    override fun seek(chars: CharSequence, offset: Int, lineStart: Int, lineEnd: Int): DelimiterSpan? =
-      nearestForward(chars, offset) ?: nearestBackward(chars, offset)
-
     override fun toRange(chars: CharSequence, span: DelimiterSpan, modifier: Modifier): TextRange =
       when (modifier) {
         Modifier.INNER -> TextRange(span.open + 1, span.close)
@@ -366,9 +349,6 @@ internal class TargetsExtension : VimExtension {
 
     override fun nearestBackward(chars: CharSequence, from: Int): DelimiterSpan? =
       allTagPairs(chars).filter { it.close < from }.maxByOrNull { it.close }
-
-    override fun seek(chars: CharSequence, offset: Int, lineStart: Int, lineEnd: Int): DelimiterSpan? =
-      nearestForward(chars, offset) ?: nearestBackward(chars, offset)
 
     override fun toRange(chars: CharSequence, span: DelimiterSpan, modifier: Modifier): TextRange {
       val (innerStart, innerEnd) = innerOf(chars, span)
@@ -459,9 +439,6 @@ internal class TargetsExtension : VimExtension {
       }
       return null
     }
-
-    override fun seek(chars: CharSequence, offset: Int, lineStart: Int, lineEnd: Int): DelimiterSpan? =
-      nearestForward(chars, offset) ?: nearestBackward(chars, offset)
 
     override fun toRange(chars: CharSequence, span: DelimiterSpan, modifier: Modifier): TextRange {
       if (modifier != Modifier.AROUND) return applyBalancedModifier(chars, span, modifier)
@@ -563,8 +540,7 @@ internal class TargetsExtension : VimExtension {
       val span = (toGrow?.let { growFrom(chars, it, count) } ?: when (which) {
         Which.NEXT -> source.next(chars, offset, count)
         Which.LAST -> source.last(chars, offset, count)
-        Which.CURRENT -> source.enclosing(chars, offset, count)
-          ?: source.seek(chars, offset, editor.getLineStartForOffset(offset), editor.getLineEndForOffset(offset))
+        Which.CURRENT -> source.enclosing(chars, offset, count) ?: source.seek(chars, offset)
       }) ?: return null
 
       val range = source.toRange(chars, span, modifier)
@@ -735,24 +711,6 @@ internal class TargetsExtension : VimExtension {
         i--
       }
       return null
-    }
-
-    private fun indexOfOnLine(chars: CharSequence, ch: Char, from: Int, lineEnd: Int): Int {
-      var i = from
-      while (i < lineEnd) {
-        if (chars[i] == ch) return i
-        i++
-      }
-      return -1
-    }
-
-    private fun lastIndexOfOnLine(chars: CharSequence, ch: Char, lineStart: Int, from: Int): Int {
-      var i = from - 1
-      while (i >= lineStart) {
-        if (chars[i] == ch) return i
-        i--
-      }
-      return -1
     }
 
     private fun applyBalancedModifier(chars: CharSequence, span: DelimiterSpan, modifier: Modifier): TextRange {
