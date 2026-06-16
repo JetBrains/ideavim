@@ -65,18 +65,18 @@ class VimTargetsMultilineTest : VimTestCase() {
     )
   }
 
-  // `cin;` seeks down to the next `;` separator block.
+  // `cin;` seeks down from one line to the next `;` separator pair on a later line.
   @Test
   fun `change inside next semicolon separator across lines`() {
     doTest(
       "cin;",
       """
         // ${c}comment
-        int b = a > 0 ? 1 : 2;
+        a ; b ; c
       """.trimIndent(),
       """
         // comment
-        int b = a > 0 ?$c: 2;
+        a ;$c; c
       """.trimIndent(),
       Mode.INSERT,
     )
