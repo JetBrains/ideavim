@@ -27,6 +27,7 @@ open class GlobalOptions(scope: OptionAccessScope) : OptionsPropertiesBase(scope
   var hlsearch: Boolean by optionProperty(Options.hlsearch)
   var ignorecase: Boolean by optionProperty(Options.ignorecase)
   var incsearch: Boolean by optionProperty(Options.incsearch)
+  var inccommand: String by optionProperty(Options.inccommand)
   val keymodel: StringListOptionValue by optionProperty(Options.keymodel)
   var maxmapdepth: Int by optionProperty(Options.maxmapdepth)
   var maxsearchcount: Int by optionProperty(Options.maxsearchcount)

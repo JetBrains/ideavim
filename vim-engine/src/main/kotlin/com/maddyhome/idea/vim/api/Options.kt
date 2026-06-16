@@ -216,6 +216,15 @@ object Options {
   val startofline: ToggleOption = addOption(ToggleOption("startofline", GLOBAL, "sol", true))
   val timeout: ToggleOption = addOption(ToggleOption("timeout", GLOBAL, "to", true))
   val timeoutlen: UnsignedNumberOption = addOption(UnsignedNumberOption("timeoutlen", GLOBAL, "tm", 1000))
+  val inccommand: StringOption = addOption(
+    StringOption(
+      "inccommand",
+      GLOBAL,
+      "icm",
+      "",
+      setOf("nosplit", "split")
+    )
+  )
   val undolevels: NumberOption = addOption(
     // -1 means no undo. Vim uses -123456 as "unset". See `:help undolevels`
     // TODO: This option doesn't appear to be used anywhere...

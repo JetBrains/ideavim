@@ -178,9 +178,14 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
     this.context = context
     setEditor(editor)
 
+    // This is a singleton panel reused across activations. Drop any inccommand preview state left over from a previous
+    // activation that was abandoned without a clean deactivate (e.g. the editor was disposed).
+    inccommandPreview.reset()
+
     entry.document.addDocumentListener(fontListener)
-    if (this.isIncSearchEnabled) {
-      entry.document.addDocumentListener(incSearchDocumentListener)
+    // The listener drives both incsearch highlighting and the inccommand preview, so attach it if either is enabled.
+    if (this.isIncSearchEnabled || this.isIncCommandEnabled) {
+      entry.document.addDocumentListener(incrementalCommandLineListener)
       caretOffset = editor.caretModel.offset
       verticalOffset = editor.scrollingModel.verticalScrollOffset
       horizontalOffset = editor.scrollingModel.horizontalScrollOffset
@@ -219,10 +224,20 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
     activeCompletion = null
     try {
       entry.document.removeDocumentListener(fontListener)
-      // incsearch won't change in the lifetime of this activation
-      if (this.isIncSearchEnabled) {
-        entry.document.removeDocumentListener(incSearchDocumentListener)
 
+      // Revert any inccommand preview before anything else. On <CR> the command line is closed (and thus deactivated)
+      // *before* the real command executes (see CommandKeyConsumer), so reverting here guarantees the real substitution
+      // runs against the original, un-previewed document - and on <Esc> it simply restores the buffer.
+      val previewEditor = this.ijEditor
+      if (previewEditor != null && !previewEditor.isDisposed) {
+        inccommandPreview.clear(previewEditor)
+      }
+
+      // incsearch/inccommand won't change in the lifetime of this activation
+      if (this.isIncSearchEnabled || this.isIncCommandEnabled) {
+        entry.document.removeDocumentListener(incrementalCommandLineListener)
+      }
+      if (this.isIncSearchEnabled) {
         // TODO: Reduce the amount of unnecessary work here
         // If incsearch and hlsearch are enabled, and if this is a search panel, we'll have all of the results correctly
         // highlighted. But because we don't know why we're being closed, and what handler is being called next, we need
@@ -301,98 +316,133 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
   }
 
 
-  private val incSearchDocumentListener: DocumentListener = object : DocumentAdapter() {
+  // Fires on every command-line edit to update the incremental UI: incsearch highlighting (when 'incsearch' is set) and
+  // the inccommand substitute preview (when 'inccommand' is set). Named generically as it covers more than search.
+  private val incrementalCommandLineListener: DocumentListener = object : DocumentAdapter() {
     override fun textChanged(e: DocumentEvent) {
+      val editor = ijEditor ?: return
       try {
-        val editor: Editor = ijEditor ?: return
-
-        val labelText: String = myLabel.text // Either '/', '?' or ':'boolean searchCommand = false;
-
-        var searchCommand = false
-        var searchRange: LineRange? = null
-        var separator = labelText[0]
-        var searchText = text
-        if (labelText == ":") {
-          if (searchText.isEmpty()) return
-          val command = getIncsearchCommand(searchText) ?: return
-          searchCommand = true
-          searchText = ""
-          val argument = command.commandArgument
-          if (argument.length > 1) {  // E.g. skip '/' in `:%s/`. `%` is range, `s` is command, `/` is argument
-            separator = argument[0]
-            searchText = argument.substring(1)
+        when (val update = parseCommandLineForPreview(editor)) {
+          is CommandLineUpdate.Renderable -> {
+            if (isIncSearchEnabled) showIncsearchHighlights(editor, update)
+            updateInccommandPreview(editor, update)
           }
-          if (!searchText.isEmpty()) {
-            searchRange = command.getLineRangeSafe(IjVimEditor(editor))
-          }
-          if (searchText.isEmpty() || searchRange == null) {
-            // Reset back to the original search highlights after deleting a search from a substitution command.Or if
-            // there is no search range (because the user entered an invalid range, e.g. mark not set).
-            // E.g. Highlight `whatever`, type `:%s/foo` + highlight `foo`, delete back to `:%s/` and reset highlights
-            // back to `whatever`
-            (VimPlugin.getSearch() as VimSearchGroupBase).resetIncsearchHighlights()
-            resetCaretOffsetAndScroll(editor)
-            return
-          }
-        }
 
-        // Get a snapshot of the count for the in-progress command and coerce it to 1. This value will include all
-        // count components - selecting register(s), operator and motions. E.g. `2"a3"b4"c5d6/` will return 720.
-        // If we're showing highlights for an Ex command like `:s`, the command builder will be empty, but we'll still
-        // get a valid value.
-        val count1 = max(
-          1, getInstance().keyHandlerState.editorCommandBuilder
-            .calculateCount0Snapshot()
-        )
+          CommandLineUpdate.ClearPreview -> inccommandPreview.clear(editor)
 
-        if (labelText == "/" || labelText == "?" || searchCommand) {
-          val forwards = labelText != "?" // :s, :g, :v are treated as forwards
-          val patternEnd: Int = injector.searchGroup.findEndOfPattern(searchText, separator, 0)
-          val pattern = searchText.take(patternEnd)
-
-          injector.editorGroup.closeEditorSearchSession(IjVimEditor(editor))
-          val matchOffset =
-            updateIncsearchHighlights(
-              editor, pattern, count1, forwards, caretOffset,
-              searchRange
-            )
-          if (matchOffset != -1) {
-            // Moving the caret will update the Visual selection, which is only valid while performing a search. We want
-            // to remove the Visual selection when the incsearch is for a command, as this is always unrelated to the
-            // current selection.
-            // E.g. `V/foo` should update the selection to the location of the search result. But `V` followed by
-            // `:<C-U>%s/foo` should remove the selection first.
-            // We're actually in Command-line with Visual pending. Exiting Visual replaces this with just Command-line
-            if (searchCommand) {
-              IjVimEditor(editor).exitVisualMode()
+          CommandLineUpdate.ResetIncsearch -> {
+            inccommandPreview.clear(editor)
+            if (isIncSearchEnabled) {
+              (VimPlugin.getSearch() as VimSearchGroupBase).resetIncsearchHighlights()
+              resetCaretOffsetAndScroll(editor)
             }
-            IjVimCaret(editor.caretModel.primaryCaret).moveToOffset(matchOffset)
-          } else {
-            resetCaretOffsetAndScroll(editor)
           }
         }
       } catch (ex: Throwable) {
         // Make sure the exception doesn't leak out of the handler, because it can break the text entry field and
-        // require the editor to be closed/reopened. The worst that will happen is no incsearch highlights
-        logger.error("Error while trying to show incsearch highlights", ex)
+        // require the editor to be closed/reopened. The worst that will happen is no incsearch highlights or preview.
+        logger.error("Error while updating the incremental command-line UI", ex)
       }
     }
+  }
 
-    @Contract("null -> null")
-    private fun getIncsearchCommand(commandText: String?): Command? {
-      if (commandText == null) return null
-      try {
-        val exCommand = VimscriptParser.parseCommand(commandText)
-        // TODO: Add smagic and snomagic here if/when the commands are supported
-        if (exCommand is SubstituteCommand || exCommand is GlobalCommand) {
-          return exCommand
-        }
-      } catch (e: Exception) {
-        logger.error("Cannot parse command for incsearch", e)
-      }
+  /** What the current command-line text means for the incremental UI (highlighting and/or substitute preview). */
+  private sealed interface CommandLineUpdate {
+    /** A renderable search (`/`, `?`) or ex command (`:s`, `:g`) with a usable pattern. */
+    class Renderable(
+      val labelText: String,
+      val separator: Char,
+      val searchText: String,
+      val isExCommand: Boolean,
+      val searchRange: LineRange?,
+      val substituteCommand: SubstituteCommand?,
+    ) : CommandLineUpdate
 
-      return null
+    /** Nothing to render - an empty or non-previewable command line. */
+    object ClearPreview : CommandLineUpdate
+
+    /** An in-progress ex command that lost its pattern/range; restore the previous incsearch highlights. */
+    object ResetIncsearch : CommandLineUpdate
+  }
+
+  private fun parseCommandLineForPreview(editor: Editor): CommandLineUpdate {
+    val labelText = myLabel.text // Either '/', '?' or ':'
+    if (labelText != ":") {
+      // A search: '/' (forwards) or '?' (backwards). The whole entry is the pattern.
+      return CommandLineUpdate.Renderable(labelText, labelText[0], text, isExCommand = false, null, null)
     }
+
+    if (text.isEmpty()) return CommandLineUpdate.ClearPreview
+    val command = getIncsearchCommand(text) ?: return CommandLineUpdate.ClearPreview
+
+    // The argument is e.g. `/foo/bar/g` for `:%s/foo/bar/g`: the first char is the separator, the rest is the pattern
+    // (plus replacement and flags). `%` is the range, `s` the command, `/` the argument separator.
+    val argument = command.commandArgument
+    var separator = labelText[0]
+    var searchText = ""
+    if (argument.length > 1) {
+      separator = argument[0]
+      searchText = argument.substring(1)
+    }
+    val searchRange = if (searchText.isNotEmpty()) command.getLineRangeSafe(IjVimEditor(editor)) else null
+    if (searchText.isEmpty() || searchRange == null) {
+      // E.g. highlight `whatever`, type `:%s/foo` (now highlighting `foo`), then delete back to `:%s/`: restore
+      // `whatever`. A null range means the user typed an invalid range (e.g. an unset mark).
+      return CommandLineUpdate.ResetIncsearch
+    }
+    return CommandLineUpdate.Renderable(
+      labelText, separator, searchText, isExCommand = true, searchRange, command as? SubstituteCommand
+    )
+  }
+
+  private fun showIncsearchHighlights(editor: Editor, update: CommandLineUpdate.Renderable) {
+    // Get a snapshot of the count for the in-progress command and coerce it to 1. This value will include all count
+    // components - selecting register(s), operator and motions. E.g. `2"a3"b4"c5d6/` will return 720. If we're showing
+    // highlights for an Ex command like `:s`, the command builder will be empty, but we'll still get a valid value.
+    val count1 = max(1, getInstance().keyHandlerState.editorCommandBuilder.calculateCount0Snapshot())
+    val forwards = update.labelText != "?" // :s, :g, :v are treated as forwards
+    val patternEnd = injector.searchGroup.findEndOfPattern(update.searchText, update.separator, 0)
+    val pattern = update.searchText.take(patternEnd)
+
+    injector.editorGroup.closeEditorSearchSession(IjVimEditor(editor))
+    val matchOffset = updateIncsearchHighlights(editor, pattern, count1, forwards, caretOffset, update.searchRange)
+    if (matchOffset == -1) {
+      resetCaretOffsetAndScroll(editor)
+      return
+    }
+
+    // Moving the caret will update the Visual selection, which is only valid while performing a search. We want to
+    // remove the Visual selection when the incsearch is for a command, as this is always unrelated to the current
+    // selection. E.g. `V/foo` should update the selection to the search result, but `V` followed by `:<C-U>%s/foo`
+    // should remove the selection first. We're in Command-line with Visual pending; exiting Visual leaves Command-line.
+    if (update.isExCommand) IjVimEditor(editor).exitVisualMode()
+    IjVimCaret(editor.caretModel.primaryCaret).moveToOffset(matchOffset)
+  }
+
+  /** Render the inccommand preview. Called after highlighting, which must see the original (un-previewed) text. */
+  private fun updateInccommandPreview(editor: Editor, update: CommandLineUpdate.Renderable) {
+    val command = update.substituteCommand
+    // Only preview once a replacement delimiter has been typed (e.g. `:%s/foo/` rather than just `:%s/foo`).
+    if (isIncCommandEnabled && command != null && update.searchRange != null && update.searchText.contains("/")) {
+      inccommandPreview.apply(editor, command, update.searchRange)
+    } else {
+      inccommandPreview.clear(editor)
+    }
+  }
+
+  @Contract("null -> null")
+  private fun getIncsearchCommand(commandText: String?): Command? {
+    if (commandText == null) return null
+    try {
+      val exCommand = VimscriptParser.parseCommand(commandText)
+      // TODO: Add smagic and snomagic here if/when the commands are supported
+      if (exCommand is SubstituteCommand || exCommand is GlobalCommand) {
+        return exCommand
+      }
+    } catch (e: Exception) {
+      logger.error("Cannot parse command for incsearch", e)
+    }
+    return null
   }
 
   /**
@@ -566,6 +616,11 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
   private val isIncSearchEnabled: Boolean
     get() = injector.globalOptions().incsearch
 
+  // 'inccommand' is a string option: "" (off), "nosplit" or "split". We currently render both non-empty values as an
+  // in-buffer preview (the "split" preview window is not yet implemented).
+  private val isIncCommandEnabled: Boolean
+    get() = injector.globalOptions().inccommand.isNotEmpty()
+
   /**
    * Checks if the ex entry panel is currently active
    *
@@ -587,6 +642,9 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
   private var verticalOffset = 0
   private var horizontalOffset = 0
   private var caretOffset = 0
+
+  // Renders the 'inccommand' preview (live :substitute) into the buffer as the command line is edited.
+  private val inccommandPreview = InccommandPreview()
 
   init {
 
