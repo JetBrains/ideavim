@@ -38,6 +38,8 @@ usual beta standards.
 * [VIM-2544](https://youtrack.jetbrains.com/issue/VIM-2544) Added [search count display](https://vimhelp.org/pattern.txt.html#search-count) — after a `/`, `?`, `n`, `N`, `*`, or `#` search, the current match index and total are shown (e.g. `[2/4]`), along with the [`'maxsearchcount'`](https://vimhelp.org/options.txt.html#%27maxsearchcount%27) option that caps the counted total (default 999), showing `>` when exceeded (e.g. `[2/>3]`)
 
 ### Fixes:
+* [VIM-1662](https://youtrack.jetbrains.com/issue/VIM-1662) Fixed the `NewScratchFile` action not working when invoked through IdeaVim (e.g. mapped with `<Action>(NewScratchFile)`) — it previously stayed disabled under IdeaVim's action context
+* [VIM-741](https://youtrack.jetbrains.com/issue/VIM-741) Fixed `<Tab>` always being captured by Vim — it is no longer a Vim-only editor key, so `sethandler <Tab> a:ide` can release it to the IDE
 * [VIM-3459](https://youtrack.jetbrains.com/issue/VIM-3459) Fixed `*` search highlighting not respecting case sensitivity — with `smartcase` enabled, `*` on a capitalized word now highlights only exact-case matches
 * [VIM-3301](https://youtrack.jetbrains.com/issue/VIM-3301) Fixed cursor being hidden behind sticky panels (e.g., sticky class headers) when `scrolloff=0`
 * [VIM-2501](https://youtrack.jetbrains.com/issue/VIM-2501) Fixed vertical centering (`zz`, `zt`, `zb`) when block inlay hints are present
@@ -56,6 +58,8 @@ usual beta standards.
 * Long output (such as `:map` listings) now wraps at the character boundary rather than at word breaks
 
 ### Merged PRs:
+* [1840](https://github.com/JetBrains/ideavim/pull/1840) by [1grzyb1](https://github.com/1grzyb1): VIM-1662 handle NewScratchFile action
+* [1839](https://github.com/JetBrains/ideavim/pull/1839) by [1grzyb1](https://github.com/1grzyb1): VIM-741 Remove tab from vim only keys
 * [1836](https://github.com/JetBrains/ideavim/pull/1836) by [1grzyb1](https://github.com/1grzyb1): VIM-2544 Implement search match count
 * [1826](https://github.com/JetBrains/ideavim/pull/1826) by [citizenmatt](https://github.com/citizenmatt): Update handling of output panel
 * [1830](https://github.com/JetBrains/ideavim/pull/1830) by [1grzyb1](https://github.com/1grzyb1): VIM-4250 preserve cursor pistion with one column diff
