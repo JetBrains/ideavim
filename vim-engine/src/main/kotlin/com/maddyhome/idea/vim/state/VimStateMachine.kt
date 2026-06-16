@@ -21,6 +21,8 @@ interface VimStateMachine {
   var isDotRepeatInProgress: Boolean
   val isReplaceCharacter: Boolean
 
+  var wasCaretAtEndOfLineBeforeInsertNormal: Boolean
+
   /**
    * The currently executing command
    *

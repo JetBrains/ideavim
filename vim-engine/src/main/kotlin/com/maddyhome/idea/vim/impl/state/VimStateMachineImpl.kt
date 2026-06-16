@@ -23,6 +23,8 @@ class VimStateMachineImpl : VimStateMachine {
   override var isDotRepeatInProgress: Boolean = false
   override var isReplaceCharacter: Boolean = false
 
+  override var wasCaretAtEndOfLineBeforeInsertNormal: Boolean = false
+
   /**
    * The currently executing command
    *
@@ -43,6 +45,7 @@ class VimStateMachineImpl : VimStateMachine {
     isDotRepeatInProgress = false
     isReplaceCharacter = false
     executingCommand = null
+    wasCaretAtEndOfLineBeforeInsertNormal = false
   }
 }
 
