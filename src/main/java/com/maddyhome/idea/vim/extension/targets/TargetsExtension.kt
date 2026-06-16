@@ -299,20 +299,30 @@ internal class TargetsExtension : VimExtension {
 
   /**
    * Locates a separator target: the text between two consecutive instances of a single separator
-   * character (`,`, `.`, `;`, ...) on the same line. Unlike pairs, the delimiters are not balanced,
-   * so the `a`/`A` modifiers include only the leading separator (leaving a proper list behind).
+   * character (`,`, `.`, `;`, ...). Like targets.vim, the search spans lines, so a separator object
+   * can cover several lines. Unlike pairs, the delimiters are not balanced, so the `a`/`A` modifiers
+   * include only the leading separator (leaving a proper list behind).
    */
   private class SeparatorSource(private val separator: Char) : TargetSource {
 
     // Separators don't nest, so there is no surrounding target (the default returns null).
-    override fun innermost(chars: CharSequence, offset: Int): DelimiterSpan? =
-      pairsOnLineOf(chars, offset).firstOrNull { it.open <= offset && offset < it.close }
+    override fun innermost(chars: CharSequence, offset: Int): DelimiterSpan? {
+      val left = previousSeparator(chars, offset) ?: return null
+      val right = nextSeparator(chars, offset) ?: return null
+      return DelimiterSpan(left, right)
+    }
 
-    override fun nearestForward(chars: CharSequence, from: Int): DelimiterSpan? =
-      pairsOnLineOf(chars, from).firstOrNull { it.open >= from }
+    override fun nearestForward(chars: CharSequence, from: Int): DelimiterSpan? {
+      val left = nextSeparator(chars, from - 1) ?: return null
+      val right = nextSeparator(chars, left) ?: return null
+      return DelimiterSpan(left, right)
+    }
 
-    override fun nearestBackward(chars: CharSequence, from: Int): DelimiterSpan? =
-      pairsOnLineOf(chars, from).lastOrNull { it.close < from }
+    override fun nearestBackward(chars: CharSequence, from: Int): DelimiterSpan? {
+      val right = previousSeparator(chars, from) ?: return null
+      val left = previousSeparator(chars, right) ?: return null
+      return DelimiterSpan(left, right)
+    }
 
     override fun seek(chars: CharSequence, offset: Int, lineStart: Int, lineEnd: Int): DelimiterSpan? =
       nearestForward(chars, offset) ?: nearestBackward(chars, offset)
@@ -327,16 +337,14 @@ internal class TargetsExtension : VimExtension {
         Modifier.AROUND_WHITESPACE -> TextRange(span.open, expandTrailing(chars, span.close + 1))
       }
 
-    /**
-     * All separator-bounded spans on the line containing [anchor]. Unlike quotes, separators are
-     * not consumed when matched: every adjacent pair forms a span, so `a,b,c` yields `[a,b]` and
-     * `[b,c]` sharing the middle separator.
-     */
-    private fun pairsOnLineOf(chars: CharSequence, anchor: Int): List<DelimiterSpan> {
-      val lineStart = lineStartOf(chars, anchor)
-      val lineEnd = lineEndOf(chars, anchor)
-      val separators = (lineStart until lineEnd).filter { chars[it] == separator }
-      return separators.zipWithNext { open, close -> DelimiterSpan(open, close) }
+    private fun nextSeparator(chars: CharSequence, after: Int): Int? {
+      val index = chars.indexOf(separator, after + 1)
+      return if (index < 0) null else index
+    }
+
+    private fun previousSeparator(chars: CharSequence, before: Int): Int? {
+      val index = chars.lastIndexOf(separator, before - 1)
+      return if (index < 0) null else index
     }
   }
 
