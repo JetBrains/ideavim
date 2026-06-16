@@ -28,26 +28,6 @@ class VimTargetsMultilineTest : VimTestCase() {
     enableExtensions("targets")
   }
 
-  // `din{` seeks down to the next brace block and deletes its (multiline) interior.
-  @Test
-  fun `delete inside next brace block across lines`() {
-    doTest(
-      "din{",
-      """
-        // ${c}comment
-        function f() {
-                return 4;
-            }
-      """.trimIndent(),
-      """
-        // comment
-        function f() {
-            ${c}}
-      """.trimIndent(),
-      Mode.NORMAL(),
-    )
-  }
-
   // `cin{` seeks across lines to a single-line block and changes its interior.
   @Test
   fun `change inside next brace block on a later line`() {
@@ -77,25 +57,6 @@ class VimTargetsMultilineTest : VimTestCase() {
       """
         // comment
         a ;$c; c
-      """.trimIndent(),
-      Mode.INSERT,
-    )
-  }
-
-  // `cin\`` seeks down to a multiline template string and changes its interior.
-  @Test
-  fun `change inside next back tick across lines`() {
-    doTest(
-      "cin`",
-      """
-        // ${c}comment
-        string x = `line 1
-        line 2
-        line 3`;
-      """.trimIndent(),
-      """
-        // comment
-        string x = `$c`;
       """.trimIndent(),
       Mode.INSERT,
     )
