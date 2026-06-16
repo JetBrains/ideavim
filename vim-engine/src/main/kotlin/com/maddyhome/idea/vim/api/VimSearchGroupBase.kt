@@ -37,6 +37,22 @@ import javax.swing.KeyStroke
 import kotlin.math.max
 import kotlin.math.min
 
+/**
+ * A single replacement applied by an `inccommand` substitute preview.
+ *
+ * The offsets are in the live document, captured at the moment the replacement was applied. To revert a list of
+ * changes, restore them in descending [startOffset] order so reverting a later change doesn't shift the offset of an
+ * earlier one.
+ */
+data class SubstitutePreviewChange(
+  /** Offset in the (live) document where the replacement text starts. */
+  val startOffset: Int,
+  /** Length of the inserted replacement text. */
+  val replacementLength: Int,
+  /** The original text that was replaced, used to restore the document on revert. */
+  val originalText: String,
+)
+
 abstract class VimSearchGroupBase : VimSearchGroup {
 
   protected companion object {
@@ -594,12 +610,50 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     exarg: String,
     parent: VimLContext,
   ): Boolean {
+    return runSubstitute(editor, caret, context, range, excmd, exarg, parent, collector = null)
+  }
+
+  /**
+   * Apply a substitute command as an `inccommand` preview, mutating the document but suppressing all the persistent
+   * side effects of a real substitution (search history, last-used pattern/replacement, messages, jumps, caret moves,
+   * `:s///c` confirmation). Returns the list of changes applied, in the order they were made, so the caller can revert
+   * them (see [SubstitutePreviewChange]).
+   */
+  fun substitutePreview(
+    editor: VimEditor,
+    context: ExecutionContext,
+    range: LineRange,
+    excmd: String,
+    exarg: String,
+    parent: VimLContext,
+  ): List<SubstitutePreviewChange> {
+    val collector = mutableListOf<SubstitutePreviewChange>()
+    runSubstitute(editor, editor.primaryCaret(), context, range, excmd, exarg, parent, collector)
+    return collector
+  }
+
+  /**
+   * Shared implementation for both a real substitution and an `inccommand` preview. Passing a [collector] switches on
+   * preview mode: the replacements are recorded into it and all persistent side effects (messages, history, jumps,
+   * caret moves, confirmation) are suppressed. A `null` collector performs a normal, committing substitution.
+   */
+  private fun runSubstitute(
+    editor: VimEditor,
+    caret: VimCaret,
+    context: ExecutionContext,
+    range: LineRange,
+    excmd: String,
+    exarg: String,
+    parent: VimLContext,
+    collector: MutableList<SubstitutePreviewChange>?,
+  ): Boolean {
+    val preview = collector != null
     // Explicitly exit visual mode here, so that visual mode marks don't change when we move the cursor to a match.
     val exceptions: MutableList<ExException> = ArrayList()
-    if (editor.inVisualMode) editor.exitVisualMode()
+    if (!preview && editor.inVisualMode) editor.exitVisualMode()
 
     // Parse Ex command and arguments to extract the pattern, substitute string, and line range
-    val substituteCommandParse = parseSubstituteCommand(editor, range, excmd, exarg) ?: return false
+    val substituteCommandParse = parseSubstituteCommand(editor, range, excmd, exarg, preview) ?: return false
     val pattern = substituteCommandParse.pattern
     val substituteString = substituteCommandParse.substituteString
     val line1 = substituteCommandParse.range.startLine
@@ -612,21 +666,24 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     val regex: VimRegex = try {
       VimRegex(pattern)
     } catch (e: VimRegexException) {
-      injector.messages.showErrorMessage(editor, e.message)
+      if (!preview) injector.messages.showErrorMessage(editor, e.message)
       return false
     }
 
     val hasExpression = substituteString.length >= 2 && substituteString[0] == '\\' && substituteString[1] == '='
 
     val oldLastSubstituteString: String = lastSubstituteString ?: ""
-    if (substituteString != "~") {
+    if (!preview && substituteString != "~") {
       lastSubstituteString = substituteString
     }
 
-    setShouldShowSearchHighlights()
-    updateSearchHighlights(true)
+    if (!preview) {
+      setShouldShowSearchHighlights()
+      updateSearchHighlights(true)
+    }
 
-    if (!doAsk) {
+    // A preview always behaves like a non-confirming substitution - we preview every match, ignoring the `c` flag.
+    if (!doAsk || preview) {
       performSubstituteInLines(
         editor,
         caret,
@@ -641,7 +698,8 @@ abstract class VimSearchGroupBase : VimSearchGroup {
         hasExpression,
         substituteString,
         exceptions,
-        options
+        options,
+        collector,
       )
     } else {
       val lineToNextSubstitute = getNextSubstitute(
@@ -712,6 +770,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     hasExpression: Boolean,
     substituteString: String,
     options: EnumSet<VimRegexOptions>,
+    preview: Boolean,
   ): SubstitutePreparationResult {
     val substituteResult =
       regex.substitute(editor, substituteString, oldLastSubstituteString, line, column, hasExpression, options)
@@ -719,7 +778,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     val matchRange = substituteResult.first.range
     val match = substituteResult.second
 
-    injector.jumpService.saveJumpLocation(editor)
+    if (!preview) injector.jumpService.saveJumpLocation(editor)
     return SubstitutePreparationResult.Prepared(match, matchRange, endLine, doReplace = true, gotQuit = false)
   }
 
@@ -749,7 +808,9 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     substituteString: String,
     exceptions: MutableList<ExException>,
     options: EnumSet<VimRegexOptions>,
+    collector: MutableList<SubstitutePreviewChange>?,
   ) {
+    val preview = collector != null
     var column = startColumn
     var line = startLine
     var line2 = endLine
@@ -764,7 +825,8 @@ abstract class VimSearchGroupBase : VimSearchGroup {
         column,
         hasExpression,
         substituteString,
-        options
+        options,
+        preview
       )
       if (preparationResult is SubstitutePreparationResult.Skip) {
         line = preparationResult.newLine
@@ -786,13 +848,14 @@ abstract class VimSearchGroupBase : VimSearchGroup {
         preparationResult.newEndLine,
         hasExpression,
         substituteString,
-        exceptions
+        exceptions,
+        collector
       )
       line = replaceResult.line
       column = replaceResult.column
       line2 = replaceResult.endLine
     }
-    postSubstitute(editor, caret, pattern, gotQuit = false, lastMatchLine, exceptions)
+    postSubstitute(editor, caret, pattern, gotQuit = false, lastMatchLine, exceptions, preview)
   }
 
   private fun performReplace(
@@ -808,9 +871,12 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     hasExpression: Boolean,
     substituteString: String,
     exceptions: MutableList<ExException>,
+    collector: MutableList<SubstitutePreviewChange>?,
   ): ReplaceResult {
-    caret.moveToOffset(matchRange.startOffset)
-    setLatestMatch(editor.getText(TextRange(matchRange.startOffset, matchRange.endOffset)))
+    val preview = collector != null
+    if (!preview) caret.moveToOffset(matchRange.startOffset)
+    val originalText = editor.getText(TextRange(matchRange.startOffset, matchRange.endOffset))
+    setLatestMatch(originalText)
     val finalMatch = if (hasExpression) evaluateExpression(
       substituteString.substring(2),
       editor,
@@ -831,6 +897,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
       injector.application.runWriteAction {
         (editor as MutableVimEditor).replaceString(matchRange.startOffset, matchRange.endOffset, finalMatch)
       }
+      collector?.add(SubstitutePreviewChange(matchRange.startOffset, finalMatch.length, originalText))
       didReplace = true
 
       val endPositionWithReplace = editor.offsetToBufferPosition(matchRange.startOffset + finalMatch.length)
@@ -865,7 +932,14 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     gotQuit: Boolean,
     lastMatchLine: Int,
     exceptions: List<ExException>,
+    preview: Boolean,
   ) {
+    // A preview must not move the caret or report errors - it's purely a visual, throwaway rendering.
+    if (preview) {
+      setLatestMatch("")
+      return
+    }
+
     if (!gotQuit) {
       if (lastMatchLine != -1) {
         caret.moveToOffset(injector.motion.moveCaretToLineStartSkipLeading(editor, lastMatchLine))
@@ -944,7 +1018,8 @@ abstract class VimSearchGroupBase : VimSearchGroup {
               hasExpression,
               substituteString,
               exceptions,
-              options
+              options,
+              collector = null
             )
             closeModalInputPrompt()
             return@executeCommand
@@ -974,7 +1049,8 @@ abstract class VimSearchGroupBase : VimSearchGroup {
           endLine,
           hasExpression,
           substituteString,
-          exceptions
+          exceptions,
+          collector = null
         )
         line = replaceResult.line
         endLine = replaceResult.endLine
@@ -1029,7 +1105,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     }
 
     private fun afterAllSubstitutes() {
-      postSubstitute(editor, caret, pattern, gotQuit, lastMatchLine, exceptions)
+      postSubstitute(editor, caret, pattern, gotQuit, lastMatchLine, exceptions, preview = false)
       closeModalInputPrompt()
     }
   }
@@ -1060,6 +1136,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     range: LineRange,
     excmd: String,
     exarg: String,
+    preview: Boolean = false,
   ): SubstituteCommandArguments? {
     var patternType = if ("~" == excmd) {
       // use last used regexp
@@ -1078,7 +1155,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     ) {
       // don't accept alphanumeric for separator
       if (exarg.first().isLetter()) {
-        injector.messages.showStatusBarMessage(null, "E146: Regular expressions can't be delimited by letters")
+        if (!preview) injector.messages.showStatusBarMessage(null, "E146: Regular expressions can't be delimited by letters")
         return null
       }
 
@@ -1090,7 +1167,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
       var substituteStringStartIndex = 0
       if (exarg.first() == '\\') {
         if (exarg.length < 2 || !"/?&".contains(exarg[1])) {
-          injector.messages.showStatusBarMessage(null, "E10: \\ should be followed by /, ? or &")
+          if (!preview) injector.messages.showStatusBarMessage(null, "E10: \\ should be followed by /, ? or &")
           return null
         }
         if (exarg[1] != '&') {
@@ -1130,7 +1207,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
       // use previous pattern and substitution
       if (lastSubstituteString == null) {
         // there is no previous command
-        injector.messages.showStatusBarMessage(null, "E33: No previous substitute regular expression")
+        if (!preview) injector.messages.showStatusBarMessage(null, "E33: No previous substitute regular expression")
         return null
       }
       pattern = null
@@ -1192,7 +1269,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
         trailingOptionsEndIndex++
       }
       if (count <= 0 && doError) {
-        injector.messages.showStatusBarMessage(null, injector.messages.message("command.substitute.zero.count"))
+        if (!preview) injector.messages.showStatusBarMessage(null, injector.messages.message("command.substitute.zero.count"))
         return null
       }
       line1 = line2
@@ -1202,14 +1279,14 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     // check for trailing command or garbage
     if (trailingOptionsEndIndex < exarg.length && exarg[trailingOptionsEndIndex] != '"') {
       // if not end-of-line or comment
-      injector.messages.showStatusBarMessage(null, injector.messages.message("command.substitute.trailing.characters"))
+      if (!preview) injector.messages.showStatusBarMessage(null, injector.messages.message("command.substitute.trailing.characters"))
       return null
     }
 
     // check for trailing command or garbage
     if (trailingOptionsEndIndex < exarg.length && exarg[trailingOptionsEndIndex] != '"') {
       // if not end-of-line or comment
-      injector.messages.showStatusBarMessage(null, injector.messages.message("command.substitute.trailing.characters"))
+      if (!preview) injector.messages.showStatusBarMessage(null, injector.messages.message("command.substitute.trailing.characters"))
       return null
     }
 
@@ -1233,14 +1310,17 @@ abstract class VimSearchGroupBase : VimSearchGroup {
 
       // Pattern was never defined
       if (pattern == null) {
-        injector.messages.showStatusBarMessage(null, errorMessage)
+        if (!preview) injector.messages.showStatusBarMessage(null, errorMessage)
         return null
       }
     }
 
-    // Set last substitute pattern, but only for explicitly typed patterns. Reused patterns are not saved/updated
-    setLastUsedPattern(pattern, PatternType.SUBSTITUTE, isNewPattern)
-    lastReplaceString = sub
+    // Set last substitute pattern, but only for explicitly typed patterns. Reused patterns are not saved/updated.
+    // A preview is throwaway, so it must not touch the search history, registers, or last-used pattern/replacement.
+    if (!preview) {
+      setLastUsedPattern(pattern, PatternType.SUBSTITUTE, isNewPattern)
+      lastReplaceString = sub
+    }
 
     // Always reset after checking, only set for nv_ident
     lastIgnoreSmartCase = false
