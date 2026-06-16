@@ -394,6 +394,117 @@ internal class TargetsExtension : VimExtension {
   }
 
   /**
+   * Locates a function-argument target: text delimited by `( [` / `] )` braces and `,` separators,
+   * respecting nested braces. Ported from targets.vim's argument source:
+   * - the current argument runs between the nearest separator-or-brace on each side (skipping nested
+   *   braces);
+   * - `next` searches forward for the next opening-or-separator and takes the argument to its right;
+   * - `last` searches backward for the next closing-or-separator and takes the argument to its left.
+   *   This naturally crosses brace levels, e.g. `ila` reaches an outer-list sibling while `2ila`
+   *   descends into it.
+   */
+  private object ArgumentSource : TargetSource {
+    private const val SEPARATOR = ','
+
+    override fun enclosing(chars: CharSequence, offset: Int, count: Int): DelimiterSpan? {
+      val left = boundaryLeft(chars, offset) ?: return null
+      val right = boundaryRight(chars, offset) ?: return null
+      return DelimiterSpan(left, right)
+    }
+
+    override fun growing(chars: CharSequence, start: Int, end: Int): DelimiterSpan? =
+      enclosing(chars, start, 1)
+
+    override fun nearestForward(chars: CharSequence, from: Int): DelimiterSpan? {
+      var i = from
+      while (i < chars.length) {
+        if (isOpening(chars[i]) || chars[i] == SEPARATOR) {
+          val right = boundaryRight(chars, i + 1)
+          if (right != null) return DelimiterSpan(i, right)
+        }
+        i++
+      }
+      return null
+    }
+
+    override fun nearestBackward(chars: CharSequence, from: Int): DelimiterSpan? {
+      var i = from - 1
+      while (i >= 0) {
+        if (isClosing(chars[i]) || chars[i] == SEPARATOR) {
+          val left = boundaryLeft(chars, i - 1)
+          if (left != null) return DelimiterSpan(left, i)
+        }
+        i--
+      }
+      return null
+    }
+
+    override fun seek(chars: CharSequence, offset: Int, lineStart: Int, lineEnd: Int): DelimiterSpan? =
+      nearestForward(chars, offset) ?: nearestBackward(chars, offset)
+
+    override fun toRange(chars: CharSequence, span: DelimiterSpan, modifier: Modifier): TextRange {
+      if (modifier != Modifier.AROUND) return applyBalancedModifier(chars, span, modifier)
+      // `a` (an argument) keeps the list valid by including exactly one delimiter: the trailing
+      // separator for the first argument, the leading separator otherwise (targets.vim's `dropa`).
+      val left = span.open
+      val right = span.close
+      val startOnBrace = chars[left] != SEPARATOR
+      val endOnBrace = chars[right] != SEPARATOR
+      return when {
+        startOnBrace && endOnBrace -> soleArgument(left, right)
+        startOnBrace -> firstArgumentWithTrailingSeparator(chars, left, right)
+        endOnBrace -> lastArgumentWithLeadingSeparator(chars, left, right)
+        else -> middleArgumentWithLeadingSeparator(left, right)
+      }
+    }
+
+    /** `( x )` — the only argument: just its contents, both braces dropped. */
+    private fun soleArgument(left: Int, right: Int) = TextRange(left + 1, right)
+
+    /** `( x , … )` — first argument: contents plus the trailing separator and its whitespace. */
+    private fun firstArgumentWithTrailingSeparator(chars: CharSequence, left: Int, right: Int) =
+      TextRange(firstNonWhitespace(chars, left + 1, right), expandTrailing(chars, right + 1))
+
+    /** `( … , x )` — last argument: the leading separator and its whitespace plus the contents. */
+    private fun lastArgumentWithLeadingSeparator(chars: CharSequence, left: Int, right: Int) =
+      TextRange(lastNonWhitespaceBefore(chars, left) + 1, lastNonWhitespaceBefore(chars, right) + 1)
+
+    /** `( … , x , … )` — middle argument: the leading separator plus the contents. */
+    private fun middleArgumentWithLeadingSeparator(left: Int, right: Int) = TextRange(left, right)
+
+    /** The argument's right delimiter (separator or closing brace) at or after [from]. */
+    private fun boundaryRight(chars: CharSequence, from: Int): Int? {
+      var i = from
+      while (i < chars.length) {
+        val c = chars[i]
+        when {
+          c == SEPARATOR || isClosing(c) -> return i
+          isOpening(c) -> i = (matchingCloseAnyKind(chars, i) ?: return null) + 1
+          else -> i++
+        }
+      }
+      return null
+    }
+
+    /** The argument's left delimiter (separator or opening brace) at or before [from]. */
+    private fun boundaryLeft(chars: CharSequence, from: Int): Int? {
+      var i = from
+      while (i >= 0) {
+        val c = chars[i]
+        when {
+          c == SEPARATOR || isOpening(c) -> return i
+          isClosing(c) -> i = (matchingOpenAnyKind(chars, i) ?: return null) - 1
+          else -> i--
+        }
+      }
+      return null
+    }
+
+    private fun isOpening(c: Char) = c == '(' || c == '['
+    private fun isClosing(c: Char) = c == ')' || c == ']'
+  }
+
+  /**
    * The text object handler. Computes the target range and either selects it (visual mode) or
    * feeds it to the pending operator.
    */
@@ -481,6 +592,7 @@ internal class TargetsExtension : VimExtension {
       '\'' to SINGLE_QUOTE, '"' to DOUBLE_QUOTE, '`' to BACK_TICK,
       'q' to ANY_QUOTE,
       't' to TagSource,
+      'a' to ArgumentSource,
     ) + SEPARATORS.associateWith { SeparatorSource(it) }
 
     private data class OpenTag(val start: Int, val name: String)
@@ -626,6 +738,52 @@ internal class TargetsExtension : VimExtension {
           TextRange(start, end)
         }
       }
+    }
+
+    /** From an opening brace, the matching closing brace (any brace kind counts toward nesting). */
+    private fun matchingCloseAnyKind(chars: CharSequence, openIdx: Int): Int? {
+      var depth = 0
+      var i = openIdx
+      while (i < chars.length) {
+        when (chars[i]) {
+          '(', '[' -> depth++
+          ')', ']' -> {
+            depth--
+            if (depth == 0) return i
+          }
+        }
+        i++
+      }
+      return null
+    }
+
+    /** From a closing brace, the matching opening brace (any brace kind counts toward nesting). */
+    private fun matchingOpenAnyKind(chars: CharSequence, closeIdx: Int): Int? {
+      var depth = 0
+      var i = closeIdx
+      while (i >= 0) {
+        when (chars[i]) {
+          ')', ']' -> depth++
+          '(', '[' -> {
+            depth--
+            if (depth == 0) return i
+          }
+        }
+        i--
+      }
+      return null
+    }
+
+    private fun firstNonWhitespace(chars: CharSequence, from: Int, limit: Int): Int {
+      var i = from
+      while (i < limit && chars[i].isInlineWhitespace()) i++
+      return i
+    }
+
+    private fun lastNonWhitespaceBefore(chars: CharSequence, idx: Int): Int {
+      var i = idx - 1
+      while (i >= 0 && chars[i].isInlineWhitespace()) i--
+      return i
     }
 
     /** [start, end) with any leading/trailing inline whitespace removed. */
