@@ -759,6 +759,52 @@ https://plugins.jetbrains.com/plugin/25899-vim-switch
 </details>
 
 <details>
+<summary><h2>targets: Adds many seeking text objects for pairs, quotes, separators, arguments and tags</h2></summary>
+
+Original plugin: [targets.vim](https://github.com/wellle/targets.vim).
+
+### Summary:
+Targets.vim expands on the built-in text objects (`di(`, `ci"`, …) to give you more targets to
+operate on and the ability to reach them without moving the cursor there first. It adds text objects
+for pairs (`( ) { } [ ] < >`, plus `b` for "any block"), quotes (`' " \``, plus `q` for "any quote"),
+separators (`, . ; : + - = ~ _ * # / | \ & $`), arguments (`a`) and tags (`t`), each available with
+four modifiers and the `n`/`l` next/last qualifiers:
+
+- `i` — inside the object (e.g. `ci(`)
+- `a` — a whole object, including its delimiters (e.g. `da,` deletes one list item and a separator)
+- `I` — inside, excluding surrounding whitespace
+- `A` — around, including adjacent whitespace
+- `in`/`il` (and `an`, `In`, `Al`, …) — operate on the next / last object without moving there, e.g.
+  `cin)` changes inside the next parentheses; a `[count]` skips further (`c2in)`).
+
+When the cursor is not inside an object, the plain commands seek to the nearest one. Quotes are
+paired by counting from the start of the line, so `ci"` skips the gap between two strings and changes
+the real one. Re-issuing a text object in visual mode grows the selection outward (`vi(i(`).
+
+### Setup:
+- Add the following command to `~/.ideavimrc`: `Plug 'wellle/targets.vim'`
+    <details>
+      <summary>Alternative syntax</summary>
+      <code>Plugin 'wellle/targets.vim'</code>
+      <br/>
+      <code>Plug 'https://github.com/wellle/targets.vim'</code>
+      <br/>
+      <code>Plug 'targets.vim'</code>
+      <br/>
+      <code>set targets</code>
+      </details>
+
+### Instructions
+
+https://github.com/wellle/targets.vim/blob/master/README.md
+(see also the [cheat sheet](https://github.com/wellle/targets.vim/blob/master/cheatsheet.md)).
+
+The settings (`g:targets_aiAI`, `g:targets_nl`, `g:targets_seekRanges`, `targets#mappings#extend`, …)
+and forced motions (`dVi-`, `d<C-V>i-`) are not currently supported.
+
+</details>
+
+<details>
 <summary><h2>textobj-entire: Adds mapping for selecting entire contents of file regardless of cursor position</h2></summary>
 
 By [Alexandre Grison](https://github.com/agrison)  
