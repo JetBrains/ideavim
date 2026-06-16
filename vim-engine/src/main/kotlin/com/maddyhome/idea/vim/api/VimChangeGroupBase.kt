@@ -722,7 +722,22 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    * @param editor The editor to put into NORMAL mode for one command
    */
   override fun processSingleCommand(editor: VimEditor) {
+
+    injector.vimState.wasCaretAtEndOfLineBeforeInsertNormal = editor.nativeCarets().any { caret ->
+      val line = caret.getBufferPosition().line
+      val lineEndAllowed = editor.getLineEndOffset(line, true)
+      val lineEndNotAllowed = editor.getLineEndOffset(line, false)
+      caret.offset == lineEndAllowed && lineEndAllowed != lineEndNotAllowed
+    }
+
     editor.mode = Mode.NORMAL(editor.mode)
+
+    editor.forEachCaret { caret ->
+      val normalized = editor.normalizeOffset(caret.offset, allowEnd = false)
+      if (normalized != caret.offset) {
+        caret.moveToOffset(normalized)
+      }
+    }
     clearStrokes(editor)
   }
 

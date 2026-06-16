@@ -15,11 +15,31 @@ import org.junit.jupiter.api.Test
 class InsertSingleCommandActionTest : SingleCommandActionTest() {
   override val command: String = "i"
   override val mode: Mode = Mode.INSERT
+
+  @Test
+  fun `test ctrl-o at end of line`() {
+    doTest(
+      listOf(command, "<C-O>", "db"),
+      "first line${c}\nsecond line",
+      "first e${c}\nsecond line",
+      mode,
+    )
+  }
 }
 
 class ReplaceSingleCommandActionTest : SingleCommandActionTest() {
   override val command: String = "R"
   override val mode: Mode = Mode.REPLACE
+
+  @Test
+  fun `test ctrl-o at end of line`() {
+    doTest(
+      listOf(command, "<C-O>", "db"),
+      "first line${c}\nsecond line",
+      "first ${c}e\nsecond line",
+      mode,
+    )
+  }
 }
 
 abstract class SingleCommandActionTest : VimTestCase() {
@@ -47,13 +67,4 @@ abstract class SingleCommandActionTest : VimTestCase() {
     )
   }
 
-  @Test
-  fun `test ctrl-o at end of line`() {
-    doTest(
-      listOf(command, "<C-O>", "db"),
-      "first line${c}\nsecond line",
-      "first e${c}\nsecond line",
-      mode,
-    )
-  }
 }

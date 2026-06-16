@@ -34,14 +34,6 @@ class InsertSingleCommandAction : VimActionHandler.SingleExecution() {
     operatorArguments: OperatorArguments,
   ): Boolean {
     injector.changeGroup.processSingleCommand(editor)
-
-    editor.forEachCaret { caret ->
-      val normalized = editor.normalizeOffset(caret.offset, allowEnd = false)
-      if (normalized != caret.offset) {
-        caret.moveToOffset(normalized)
-      }
-    }
-
     return true
   }
 }

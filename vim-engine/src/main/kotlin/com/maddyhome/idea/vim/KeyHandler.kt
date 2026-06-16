@@ -411,16 +411,8 @@ class KeyHandler {
       }
       injector.actionExecutor.executeVimAction(editor, cmd.action, context, operatorArguments)
 
-      //C-o followed by db, this will move the caret one past
       if (wasOpPendingFromInsert && editorState.mode is Mode.INSERT) {
-        for (caret in editor.nativeCarets()) {
-          val line = caret.getBufferPosition().line
-          val lineEndNotAllowed = editor.getLineEndOffset(line, false)
-          val lineEndAllowed = editor.getLineEndOffset(line, true)
-          if (caret.offset == lineEndNotAllowed && lineEndAllowed != lineEndNotAllowed) {
-            caret.moveToOffset(lineEndAllowed)
-          }
-        }
+        restoreAllowEndCaretPosition(editor, editorState)
       }
 
       if (editorState.mode is Mode.INSERT || editorState.mode is Mode.REPLACE) {
@@ -438,10 +430,27 @@ class KeyHandler {
       // mode commands. An exception is if this command should leave us in the temporary mode such as
       // "select register"
       if (editorState.mode is Mode.NORMAL && !cmd.flags.contains(CommandFlags.FLAG_EXPECT_MORE)) {
-        editor.mode = editorState.mode.returnTo
+        val oldMode = editorState.mode as Mode.NORMAL
+        editor.mode = oldMode.returnTo
+        if (oldMode.isInsertPending || oldMode.isReplacePending) {
+          restoreAllowEndCaretPosition(editor, editorState)
+        }
       }
 
       instance.reset(keyState, editorState.mode)
+    }
+
+    private fun restoreAllowEndCaretPosition(editor: VimEditor, editorState: VimStateMachine) {
+      if (!editorState.wasCaretAtEndOfLineBeforeInsertNormal) return
+      for (caret in editor.nativeCarets()) {
+        val line = caret.getBufferPosition().line
+        val lineEndNotAllowed = editor.getLineEndOffset(line, false)
+        val lineEndAllowed = editor.getLineEndOffset(line, true)
+        if (caret.offset == lineEndNotAllowed && lineEndAllowed != lineEndNotAllowed) {
+          caret.moveToOffset(lineEndAllowed)
+        }
+      }
+      editorState.wasCaretAtEndOfLineBeforeInsertNormal = false
     }
   }
 
