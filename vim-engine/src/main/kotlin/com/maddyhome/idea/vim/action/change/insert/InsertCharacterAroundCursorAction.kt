@@ -24,20 +24,27 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
 @CommandOrMotion(keys = ["<C-Y>"], modes = [Mode.INSERT])
-class InsertCharacterAboveCursorAction : ChangeEditorActionHandler.ForEachCaret() {
+class InsertCharacterAboveCursorAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
 
   override fun execute(
     editor: VimEditor,
-    caret: VimCaret,
     context: ExecutionContext,
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Boolean {
+    val activeLookup = injector.lookupManager.getActiveLookup(editor)
+    if (activeLookup != null) {
+      activeLookup.accept(editor.primaryCaret(), context)
+      return true
+    }
     return if (editor.isOneLineMode()) {
       false
     } else {
-      insertCharacterAroundCursor(editor, caret, -1)
+      editor.carets().forEach { caret ->
+        insertCharacterAroundCursor(editor, caret, -1)
+      }
+      true
     }
   }
 }
@@ -53,6 +60,10 @@ class InsertCharacterBelowCursorAction : ChangeEditorActionHandler.ForEachCaret(
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Boolean {
+    val activeLookup = injector.lookupManager.getActiveLookup(editor)
+    if (activeLookup != null) {
+      return activeLookup.close(caret, context).let { true }
+    }
     return if (editor.isOneLineMode()) {
       false
     } else {
