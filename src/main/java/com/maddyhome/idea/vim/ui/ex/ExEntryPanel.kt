@@ -22,11 +22,13 @@ import com.maddyhome.idea.vim.KeyHandler.Companion.getInstance
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction
 import com.maddyhome.idea.vim.api.CommandLineCompletion
+import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimCommandLine
 import com.maddyhome.idea.vim.api.VimCommandLineCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimKeyGroupBase
 import com.maddyhome.idea.vim.api.VimSearchGroupBase
+import com.maddyhome.idea.vim.api.VirtualBufferKind
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ranges.LineRange
@@ -328,10 +330,10 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
             updateInccommandPreview(editor, update)
           }
 
-          CommandLineUpdate.ClearPreview -> inccommandPreview.clear(editor)
+          CommandLineUpdate.ClearPreview -> inccommandPreview.clearBufferPreview(editor)
 
           CommandLineUpdate.ResetIncsearch -> {
-            inccommandPreview.clear(editor)
+            inccommandPreview.clearBufferPreview(editor)
             if (isIncSearchEnabled) {
               (VimPlugin.getSearch() as VimSearchGroupBase).resetIncsearchHighlights()
               resetCaretOffsetAndScroll(editor)
@@ -427,9 +429,38 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
     val command = update.substituteCommand
     // Only preview once a replacement delimiter has been typed (e.g. `:%s/foo/` rather than just `:%s/foo`).
     if (isIncCommandEnabled && command != null && update.searchRange != null && update.searchText.contains("/")) {
-      inccommandPreview.apply(editor, command, update.searchRange)
+      val splitContent = inccommandPreview.apply(editor, command, update.searchRange)
+      updateSplitPreviewWindow(editor, splitContent)
     } else {
-      inccommandPreview.clear(editor)
+      inccommandPreview.clearBufferPreview(editor)
+    }
+  }
+
+  private fun updateSplitPreviewWindow(editor: Editor, content: String?) {
+    if (injector.globalOptions().inccommand != "split" || content == null) return
+    val vimEditor = IjVimEditor(editor)
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    openSubstitutePreview(context, content, vimEditor)
+  }
+
+  private fun openSubstitutePreview(
+    context: ExecutionContext,
+    content: String,
+    vimEditor: IjVimEditor,
+  ) {
+    ApplicationManager.getApplication().invokeLater {
+      val virtualBufferGroup = injector.virtualBufferGroup
+      if (virtualBufferGroup.isOpen(context, VirtualBufferKind.SubstitutePreview)) {
+        virtualBufferGroup.refresh(context, VirtualBufferKind.SubstitutePreview, content)
+        return@invokeLater
+      }
+      virtualBufferGroup.open(
+        context,
+        vimEditor,
+        VirtualBufferKind.SubstitutePreview,
+        content,
+        focus = false,
+      )
     }
   }
 

@@ -74,8 +74,7 @@ class IjSearchWindowGroup : SearchWindowGroup {
         }
       }
 
-      // Only history windows execute-and-close here; the control-chars editor commits differently.
-      VirtualBufferKind.ControlCharsEditor -> {}
+      VirtualBufferKind.ControlCharsEditor, VirtualBufferKind.SubstitutePreview -> {}
     }
   }
 

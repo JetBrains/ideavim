@@ -12,9 +12,13 @@ import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.markup.RangeHighlighter
+import com.intellij.openapi.util.TextRange
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.SubstitutePreviewChange
 import com.maddyhome.idea.vim.api.VimSearchGroupBase
+import com.maddyhome.idea.vim.api.VirtualBufferKind
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.helper.highlightPreviewMatch
@@ -45,10 +49,14 @@ internal class InccommandPreview {
 
   /**
    * Render a preview of [command] over [range], replacing whatever the previous preview showed.
+   *
+   * @return split-window content when `inccommand=split` and there are affected lines, otherwise null
    */
-  fun apply(editor: Editor, command: SubstituteCommand, range: LineRange) {
+  fun apply(editor: Editor, command: SubstituteCommand, range: LineRange): String? {
     val vimEditor = IjVimEditor(editor)
     val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val splitMode = injector.globalOptions().inccommand == "split"
+    var windowContent: String? = null
     CommandProcessor.getInstance().runUndoTransparentAction {
       ApplicationManager.getApplication().runWriteAction {
         revert(editor)
@@ -62,18 +70,45 @@ internal class InccommandPreview {
           val end = change.startOffset + change.replacementLength
           highlightPreviewMatch(editor, change.startOffset, end, change.originalText)
         }
+        if (splitMode && changes.isNotEmpty()) windowContent = buildAffectedLinesPreview(editor)
       }
     }
+    return windowContent
   }
 
-  /** Revert any active preview, restoring the document to its original state. */
-  fun clear(editor: Editor) {
+  /** Revert the in-buffer preview without closing the split window. */
+  fun clearBufferPreview(editor: Editor) {
     if (changes.isEmpty() && snapshot == null && highlighters.isEmpty()) return
     CommandProcessor.getInstance().runUndoTransparentAction {
       ApplicationManager.getApplication().runWriteAction {
         revert(editor)
       }
     }
+  }
+
+  /** Revert any active preview, restoring the document to its original state and closing the preview window. */
+  fun clear(editor: Editor) {
+    val vimEditor = IjVimEditor(editor)
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    ApplicationManager.getApplication().invokeLater {
+      injector.virtualBufferGroup.close(context, VirtualBufferKind.SubstitutePreview)
+    }
+    clearBufferPreview(editor)
+  }
+
+  /**
+   * Build the `inccommand=split` window content: one entry per affected line, in line order, each prefixed with its
+   * 1-based line number and showing the replacement already applied (the document is in its previewed state here).
+   */
+  private fun buildAffectedLinesPreview(editor: Editor): String {
+    val document = editor.document
+    return changes.map { document.getLineNumber(it.startOffset) }
+      .distinct()
+      .sorted()
+      .joinToString("\n") { line ->
+        val text = document.getText(TextRange(document.getLineStartOffset(line), document.getLineEndOffset(line)))
+        "${line + 1}: $text"
+      }
   }
 
   /**
