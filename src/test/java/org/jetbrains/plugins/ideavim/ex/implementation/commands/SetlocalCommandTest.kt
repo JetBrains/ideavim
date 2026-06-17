@@ -484,23 +484,23 @@ class SetlocalCommandTest : VimTestCase() {
     setOsSpecificOptionsToSafeValues()
     val expected = """
     |--- Local option values ---
-    |noabolish             history=50        nonumber            nosurround
-    |noargtextobj        nohlsearch            operatorfunc=     notargets
-    |nobomb                ide=IntelliJ IDEA norelativenumber    notextobj-entire
-    |nobreakindent       --ideajoin            scroll=0          notextobj-indent
-    |noCamelCaseMotion     ideamarks           scrolljump=1        textwidth=0
-    |noclasstextobj        idearefactormode=   scrolloff=-1        timeout
-    |  cmdheight=1         ideawrite=all       selectmode=         timeoutlen=1000
-    |  colorcolumn=      noignorecase          shellcmdflag=-x   notrackactionids
-    |nocommentary        noincsearch           shellxescape=@    noVimEverywhere
-    |nocursorline        nolist                shellxquote={       virtualedit=
-    |nodigraph           nomatchit             showcmd           novisualbell
-    |noexchange            maxmapdepth=20      showmode            visualdelay=100
-    |  fileformat=unix   nomini-ai             sidescroll=0        whichwrap=b,s
-    |  foldlevel=1         more                sidescrolloff=-1    wrap
-    |nofunctextobj       nomultiple-cursors  nosmartcase           wrapscan
-    |nogdefault          noNERDTree          nosneak             noyoucompleteme
-    |nohighlightedyank     nrformats=hex       startofline
+    |noabolish             history=50          nrformats=hex       startofline
+    |noargtextobj        nohlsearch          nonumber            nosurround
+    |nobomb                ide=IntelliJ IDEA   operatorfunc=     notargets
+    |nobreakindent       --ideajoin          norelativenumber    notextobj-entire
+    |noCamelCaseMotion     ideamarks           scroll=0          notextobj-indent
+    |noclasstextobj        idearefactormode=   scrolljump=1        textwidth=0
+    |  cmdheight=1         ideawrite=all       scrolloff=-1        timeout
+    |  colorcolumn=      noignorecase          selectmode=         timeoutlen=1000
+    |nocommentary          inccommand=         shellcmdflag=-x   notrackactionids
+    |nocursorline        noincsearch           shellxescape=@    noVimEverywhere
+    |nodigraph           nolist                shellxquote={       virtualedit=
+    |noexchange          nomatchit             showcmd           novisualbell
+    |  fileformat=unix     maxmapdepth=20      showmode            visualdelay=100
+    |  foldlevel=1       nomini-ai             sidescroll=0        whichwrap=b,s
+    |nofunctextobj         more                sidescrolloff=-1    wrap
+    |nogdefault          nomultiple-cursors  nosmartcase           wrapscan
+    |nohighlightedyank   noNERDTree          nosneak             noyoucompleteme
     |  clipboard=ideaput,autoselect
     |  comments=s1:/*,mb:*,ex:*/,://,b:#,:%,:XCOMM,n:>,fb:-
     |  fileencoding=utf-8
@@ -594,6 +594,7 @@ class SetlocalCommandTest : VimTestCase() {
     |  ideavimsupport=dialog
     |  ideawrite=all
     |noignorecase
+    |  inccommand=
     |noincsearch
     |  isfname=@,48-57,/,\,.,-,_,+,,,#,$,%,{,},[,],:,@-@,!,~,=
     |  iskeyword=@,48-57,_
