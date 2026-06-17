@@ -474,7 +474,7 @@ class TemplateTest : VimJavaTestCase() {
     enterCommand("set idearefactormode=select")
     typeText("i")
     startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(fixture, Mode.SELECT(SelectionType.CHARACTER_WISE))
+    waitAndAssertMode(fixture, Mode.SELECT(SelectionType.CHARACTER_WISE, returnTo = Mode.INSERT))
     assertState(
       """
         |class Hello {
@@ -581,7 +581,7 @@ class TemplateTest : VimJavaTestCase() {
     enterCommand("set idearefactormode=visual")
     typeText("i")
     startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE, returnTo = Mode.INSERT))
     assertState(
       """
         |class Hello {
