@@ -21,6 +21,14 @@ val Mode.hasVisualSelection
     else -> false
   }
 
+/**
+ * The [Mode.returnTo] target when a platform selection change enters Visual or Select mode.
+ *
+ * If the editor was already in Visual or Select, return to the prior mode instead of nesting
+ * `VISUAL(returnTo = VISUAL(...))`, which is not a valid mode construction.
+ */
+fun Mode.returnToAfterSelectionChange(): Mode = if (hasVisualSelection) returnTo else this
+
 val Mode.inNormalMode: Boolean
   get() = this is Mode.NORMAL
 

@@ -12,6 +12,9 @@ import com.intellij.codeInsight.editorActions.BackspaceHandler
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.editor.LogicalPosition
+import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
+import com.maddyhome.idea.vim.helper.hasVisualSelection
+import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
@@ -25,6 +28,7 @@ import org.jetbrains.plugins.ideavim.waitAndAssert
 import org.jetbrains.plugins.ideavim.waitAndAssertMode
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 
 /**
  * @author Alex Plate
@@ -115,7 +119,7 @@ class NonVimVisualChangeTest : VimTestCase() {
       fixture.editor.selectionModel.setSelection(0, 10)
     }
 
-    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE, returnTo = Mode.INSERT))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
@@ -137,7 +141,7 @@ class NonVimVisualChangeTest : VimTestCase() {
     ApplicationManager.getApplication().invokeAndWait {
       fixture.editor.selectionModel.setSelection(range.startOffset, range.endOffset)
     }
-    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE, returnTo = Mode.INSERT))
     assertEquals(SelectionType.CHARACTER_WISE, fixture.editor.vim.mode.selectionType)
 
     val rangeLine = text.rangeOf("A Discovery\n")
@@ -145,5 +149,102 @@ class NonVimVisualChangeTest : VimTestCase() {
       fixture.editor.selectionModel.setSelection(rangeLine.startOffset, rangeLine.endOffset)
     }
     waitAndAssert { fixture.editor.vim.mode.selectionType == SelectionType.LINE_WISE }
+  }
+
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
+  fun `test mouse selection from insert mode enters Insert Visual mode and returns to Insert on deselect`() {
+    configureByText(
+      """
+            Lorem Ipsum
+
+            I ${c}found it in a legendary land
+            consectetur adipiscing elit
+            Sed in orci mauris.
+            Cras id tellus in ex imperdiet egestas.
+      """.trimIndent(),
+    )
+    typeText("i")
+    assertMode(Mode.INSERT)
+
+    val range = fixture.editor.document.text rangeOf "found"
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.selectionModel.setSelection(range.startOffset, range.endOffset)
+      IdeaSelectionControl.controlNonVimSelectionChange(
+        fixture.editor,
+        VimListenerManager.SelectionSource.MOUSE,
+      )
+    }
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE, returnTo = Mode.INSERT))
+
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.selectionModel.removeSelection()
+      IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    }
+    waitAndAssertMode(fixture, Mode.INSERT)
+  }
+
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
+  fun `test mouse selection from Insert Visual via i_CTRL-O v does not nest Visual returnTo`() {
+    configureByText(
+      """
+            Lorem Ipsum
+
+            I ${c}found it in a legendary land
+            consectetur adipiscing elit
+      """.trimIndent(),
+    )
+    typeText("i<C-O>v")
+    assertMode(Mode.VISUAL(SelectionType.CHARACTER_WISE, returnTo = Mode.INSERT))
+
+    val range = fixture.editor.document.text rangeOf "found"
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.selectionModel.setSelection(range.startOffset, range.endOffset)
+      IdeaSelectionControl.controlNonVimSelectionChange(
+        fixture.editor,
+        VimListenerManager.SelectionSource.MOUSE,
+      )
+    }
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE, returnTo = Mode.INSERT))
+    assertFalse(fixture.editor.vim.mode.returnTo.hasVisualSelection)
+
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.selectionModel.removeSelection()
+      IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    }
+    waitAndAssertMode(fixture, Mode.INSERT)
+  }
+
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
+  fun `test mouse selection from Insert Normal via i_CTRL-O preserves return chain on deselect`() {
+    configureByText(
+      """
+            Lorem Ipsum
+
+            I ${c}found it in a legendary land
+            consectetur adipiscing elit
+      """.trimIndent(),
+    )
+    typeText("i<C-O>")
+    assertMode(Mode.NORMAL(Mode.INSERT))
+
+    val range = fixture.editor.document.text rangeOf "found"
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.selectionModel.setSelection(range.startOffset, range.endOffset)
+      IdeaSelectionControl.controlNonVimSelectionChange(
+        fixture.editor,
+        VimListenerManager.SelectionSource.MOUSE,
+      )
+    }
+    waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.CHARACTER_WISE, returnTo = Mode.NORMAL(Mode.INSERT)))
+    assertFalse(fixture.editor.vim.mode.returnTo.hasVisualSelection)
+
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.selectionModel.removeSelection()
+      IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+    }
+    waitAndAssertMode(fixture, Mode.INSERT)
   }
 }
