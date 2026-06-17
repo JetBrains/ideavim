@@ -735,6 +735,11 @@
     "modes": "NXO"
   },
   {
+    "keys": "<C-Y>",
+    "class": "com.maddyhome.idea.vim.action.window.LookupAcceptAction",
+    "modes": "I"
+  },
+  {
     "keys": "<C-[>",
     "class": "com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction",
     "modes": "I"

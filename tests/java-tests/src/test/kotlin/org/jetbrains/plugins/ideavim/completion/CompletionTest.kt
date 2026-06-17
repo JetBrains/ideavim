@@ -115,6 +115,29 @@ class CompletionTest : VimJavaTestCase() {
     assertState(text)
   }
 
+  @Test
+  fun `test Ctrl-Y accepts completion`() {
+    configureByJavaText(text)
+    typeText("A")
+    completeBasic()
+    typeText("<C-Y>")
+    assertNull(activeLookup(), "Lookup should be closed after pressing <C-E>")
+    assertState(
+      """
+        |class Foo {
+        |  void fooBar() {}
+        |  void fooBaz() {}
+        |  void fooLong() {}
+        |
+        |  void test() {
+        |    fooBar();${c}
+        |  }
+        |}
+  """.trimMargin()
+
+    )
+  }
+
   private fun completeBasic() {
     ApplicationManager.getApplication().invokeAndWait {
       fixture.completeBasic()

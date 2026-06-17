@@ -38,4 +38,12 @@ class IjLookup(val lookup: Lookup) : IdeLookup {
   override fun close(caret: ImmutableVimCaret, context: ExecutionContext) {
     caret.editor.ij.project?.let { LookupManager.hideActiveLookup(it) }
   }
+
+  override fun accept(
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+  ) {
+    EditorActionManager.getInstance().getActionHandler(IdeActions.ACTION_CHOOSE_LOOKUP_ITEM)
+      .execute(caret.editor.ij, caret.ij, context.ij)
+  }
 }
