@@ -20,7 +20,10 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
+import kotlin.test.assertNull
 
 /**
  * Tests for cycling through the IntelliJ code completion lookup from Vim's insert mode.
@@ -40,6 +43,11 @@ import org.junit.jupiter.api.Test
   description = "IntelliJ code completion lookup has no Neovim equivalent that can be driven via the RPC harness",
 )
 class CompletionTest : VimJavaTestCase() {
+
+  @BeforeEach
+  fun useDirectToVim(testInfo: TestInfo) {
+    Checks.keyHandler = Checks.KeyHandlerMethod.DIRECT_TO_VIM
+  }
 
   // Three members sharing only the "foo" prefix, so completing "foo" keeps the lookup open with several
   // candidates (no extra common prefix is inserted) and we have something to cycle through.
@@ -95,6 +103,16 @@ class CompletionTest : VimJavaTestCase() {
     typeText("<C-P>") // ...and back up
 
     assertEquals(first, selectedLookupString(), "<C-P> should undo the <C-N> movement")
+  }
+
+  @Test
+  fun `test Ctrl-E closes completion`() {
+    configureByJavaText(text)
+    typeText("A")
+    completeBasic()
+    typeText("<C-E>")
+    assertNull(activeLookup(), "Lookup should be closed after pressing <C-E>")
+    assertState(text)
   }
 
   private fun completeBasic() {

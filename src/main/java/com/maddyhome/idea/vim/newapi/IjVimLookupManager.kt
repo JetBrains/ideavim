@@ -34,4 +34,8 @@ class IjLookup(val lookup: Lookup) : IdeLookup {
     EditorActionManager.getInstance().getActionHandler(IdeActions.ACTION_EDITOR_MOVE_CARET_UP)
       .execute(caret.editor.ij, caret.ij, context.ij)
   }
+
+  override fun close(caret: ImmutableVimCaret, context: ExecutionContext) {
+    caret.editor.ij.project?.let { LookupManager.hideActiveLookup(it) }
+  }
 }

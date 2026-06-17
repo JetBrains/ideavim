@@ -215,6 +215,11 @@
     "modes": "NXO"
   },
   {
+    "keys": "<C-E>",
+    "class": "com.maddyhome.idea.vim.action.window.LookupCloseAction",
+    "modes": "I"
+  },
+  {
     "keys": "<C-End>",
     "class": "com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineLastEndAction",
     "modes": "NXO"
