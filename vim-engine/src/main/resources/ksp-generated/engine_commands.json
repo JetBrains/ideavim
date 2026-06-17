@@ -215,11 +215,6 @@
     "modes": "NXO"
   },
   {
-    "keys": "<C-E>",
-    "class": "com.maddyhome.idea.vim.action.window.LookupCloseAction",
-    "modes": "I"
-  },
-  {
     "keys": "<C-End>",
     "class": "com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineLastEndAction",
     "modes": "NXO"
@@ -733,11 +728,6 @@
     "keys": "<C-Y>",
     "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLineUpAction",
     "modes": "NXO"
-  },
-  {
-    "keys": "<C-Y>",
-    "class": "com.maddyhome.idea.vim.action.window.LookupAcceptAction",
-    "modes": "I"
   },
   {
     "keys": "<C-[>",
