@@ -11,7 +11,7 @@ import com.maddyhome.idea.vim.common.Direction
 
 /**
  * Identifies which kind of virtual buffer the editor is hosting: a command-line / search history
- * window (`q:`, `q/`, `q?`) or the control-chars editor.
+ * window (`q:`, `q/`, `q?`), the control-chars editor, or the `inccommand=split` substitute preview.
  */
 sealed class VirtualBufferKind {
   abstract val fileName: String
@@ -26,5 +26,9 @@ sealed class VirtualBufferKind {
 
   data object ControlCharsEditor : VirtualBufferKind() {
     override val fileName: String = "[Control Chars Editor]"
+  }
+
+  data object SubstitutePreview : VirtualBufferKind() {
+    override val fileName: String = "[Preview Substitute]"
   }
 }

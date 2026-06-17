@@ -9,10 +9,15 @@ package com.maddyhome.idea.vim.group
 
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.command.CommandProcessor
+import com.intellij.openapi.editor.ex.EditorEx
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.fileTypes.PlainTextFileType
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.LightVirtualFile
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
@@ -31,25 +36,36 @@ class IjVirtualBufferGroup : VirtualBufferGroup {
     editor: VimEditor,
     kind: VirtualBufferKind,
     content: String,
+    focus: Boolean,
   ) {
-    if (refuseIfAlreadyOpen(context, editor)) return
-    val project = projectOf(context) ?: return
-    showFile(project, createBufferFile(editor, kind, content))
+    if (kind != VirtualBufferKind.SubstitutePreview && refuseIfAlreadyOpen(context, editor)) return
+    val project = projectOf(context) ?: (editor as IjVimEditor).editor.project ?: return
+    showFile(project, createBufferFile(editor, kind, content), kind, focus)
   }
 
   override fun close(editor: VimEditor) {
     val ijEditor = (editor as IjVimEditor).editor
     val virtualFile = ijEditor.virtualFile ?: return
     val project = ijEditor.project ?: return
-    val fem = FileEditorManagerEx.getInstanceEx(project)
-    // Close the buffer in its hosting split so the split collapses. Plain
-    // `FileEditorManager.closeFile` would leave an empty pane that the platform refills
-    // with the most-recently-active file, producing two copies of the original editor.
-    val hostingWindows = fem.windows.filter { it.selectedComposite?.file == virtualFile }
-    if (hostingWindows.isEmpty()) {
-      fem.closeFile(virtualFile)
-    } else {
-      hostingWindows.forEach { it.closeFile(virtualFile) }
+    closeFile(project, virtualFile)
+  }
+
+  override fun close(context: ExecutionContext, kind: VirtualBufferKind) {
+    val project = projectOf(context) ?: return
+    findOpenFile(project, kind)?.let { closeFile(project, it) }
+  }
+
+  override fun isOpen(context: ExecutionContext, kind: VirtualBufferKind): Boolean =
+    findOpenFile(projectOf(context), kind) != null
+
+  override fun refresh(context: ExecutionContext, kind: VirtualBufferKind, content: String) {
+    CommandProcessor.getInstance().runUndoTransparentAction {
+      ApplicationManager.getApplication().runWriteAction {
+        val project = projectOf(context) ?: return@runWriteAction
+        val file = findOpenFile(project, kind) ?: return@runWriteAction
+        val document = FileDocumentManager.getInstance().getDocument(file) ?: return@runWriteAction
+        if (!document.immutableCharSequence.contentEquals(content)) document.setText(content)
+      }
     }
   }
 
@@ -66,13 +82,22 @@ class IjVirtualBufferGroup : VirtualBufferGroup {
   private fun alreadyOpenMessage(openKind: VirtualBufferKind): String = when (openKind) {
     VirtualBufferKind.Command, is VirtualBufferKind.Search -> "E1292: Command-line window is already open"
     VirtualBufferKind.ControlCharsEditor -> "A control characters editor is already open"
+    VirtualBufferKind.SubstitutePreview -> "A substitute preview is already open"
   }
 
-  /** The kind of the currently open virtual buffer, or null if none is open. */
+  /** The kind of the currently open (nesting-restricted) virtual buffer, or null if none is open. */
   private fun openVirtualBufferKind(context: ExecutionContext): VirtualBufferKind? {
     val project = projectOf(context) ?: return null
     return FileEditorManager.getInstance(project).openFiles
-      .firstNotNullOfOrNull { it.getUserData(CmdwinKeys.KIND) }
+      .mapNotNull { it.getUserData(CmdwinKeys.KIND) }
+      // The inccommand=split preview is transient and must not block cmdwin from opening.
+      .firstOrNull { it != VirtualBufferKind.SubstitutePreview }
+  }
+
+  private fun findOpenFile(project: Project?, kind: VirtualBufferKind): VirtualFile? {
+    project ?: return null
+    return FileEditorManager.getInstance(project).openFiles
+      .firstOrNull { it.getUserData(CmdwinKeys.KIND) == kind }
   }
 
   private fun createBufferFile(editor: VimEditor, kind: VirtualBufferKind, content: String): LightVirtualFile {
@@ -82,17 +107,43 @@ class IjVirtualBufferGroup : VirtualBufferGroup {
     return file
   }
 
-  private fun showFile(project: Project, file: LightVirtualFile) {
+  private fun showFile(project: Project, file: LightVirtualFile, kind: VirtualBufferKind, focus: Boolean) {
     val fem = FileEditorManagerEx.getInstanceEx(project)
+    openSplitFile(fem, file, focus)
+    if (kind == VirtualBufferKind.SubstitutePreview) {
+      fem.getEditors(file).filterIsInstance<TextEditor>()
+        .forEach { (it.editor as? EditorEx)?.isViewer = true }
+    }
+  }
+
+  private fun openSplitFile(
+    fem: FileEditorManagerEx,
+    file: LightVirtualFile,
+    focus: Boolean,
+  ) {
+    // in unit tests there is no way to create splits
     if (ApplicationManager.getApplication().isUnitTestMode) {
       fem.openFile(file, true)
       return
     }
     val window = fem.splitters.currentWindow
-    if (window != null) {
-      window.split(SwingConstants.HORIZONTAL, true, file, true)
+    if (window == null) {
+      fem.openFile(file, focus)
+      return
+    }
+
+    window.split(SwingConstants.HORIZONTAL, true, file, focus)
+  }
+
+  // Close the buffer in its hosting split so the split collapses. Plain `FileEditorManager.closeFile` would leave an
+  // empty pane that the platform refills with the most-recently-active file, producing two copies of the original.
+  private fun closeFile(project: Project, file: VirtualFile) {
+    val fem = FileEditorManagerEx.getInstanceEx(project)
+    val hostingWindows = fem.windows.filter { it.selectedComposite?.file == file }
+    if (hostingWindows.isEmpty()) {
+      fem.closeFile(file)
     } else {
-      fem.openFile(file, true)
+      hostingWindows.forEach { it.closeFile(file) }
     }
   }
 

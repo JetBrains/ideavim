@@ -27,7 +27,9 @@ import com.maddyhome.idea.vim.api.VimMotionGroupBase
 import com.maddyhome.idea.vim.api.anyNonWhitespace
 import com.maddyhome.idea.vim.api.getLeadingCharacterOffset
 import com.maddyhome.idea.vim.api.getVisualLineCount
+import com.maddyhome.idea.vim.api.VirtualBufferKind
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.helper.CmdwinKeys
 import com.maddyhome.idea.vim.api.lineLength
 import com.maddyhome.idea.vim.api.normalizeOffset
 import com.maddyhome.idea.vim.api.normalizeVisualLine
@@ -349,6 +351,8 @@ class MotionGroup : VimMotionGroupBase() {
               }
 
               is Mode.CMD_LINE -> {
+                // in case of substitute preview we don't wont to close current command line
+                if (isOpeningSubstitutePreview(event)) return
                 val commandLine = injector.commandLine.getActiveCommandLine() ?: return
                 commandLine.close(refocusOwningEditor = false, resetCaret = false)
                 injector.outputPanel.getCurrentOutputPanel()?.close()
@@ -367,5 +371,8 @@ class MotionGroup : VimMotionGroupBase() {
         KeyHandler.getInstance().reset(keyHandler.keyHandlerState, state.mode)
       }
     }
+
+    private fun isOpeningSubstitutePreview(event: FileEditorManagerEvent): Boolean =
+      event.newFile?.getUserData(CmdwinKeys.KIND) == VirtualBufferKind.SubstitutePreview
   }
 }
