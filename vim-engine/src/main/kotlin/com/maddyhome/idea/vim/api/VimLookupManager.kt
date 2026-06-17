@@ -15,4 +15,5 @@ interface VimLookupManager {
 interface IdeLookup {
   fun down(caret: ImmutableVimCaret, context: ExecutionContext)
   fun up(caret: ImmutableVimCaret, context: ExecutionContext)
+  fun close(caret: ImmutableVimCaret, context: ExecutionContext)
 }
