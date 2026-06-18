@@ -68,7 +68,7 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.group.EffectiveIjOptions
 import com.maddyhome.idea.vim.group.GlobalIjOptions
 import com.maddyhome.idea.vim.group.IjOptions
-import com.maddyhome.idea.vim.group.visual.VimVisualTimer.swingTimer
+import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.TestInputModel
 import com.maddyhome.idea.vim.helper.getGuiCursorMode
@@ -216,8 +216,8 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
 
   @AfterEach
   open fun tearDown(testInfo: TestInfo) {
-    swingTimer?.stop()
-    swingTimer = null
+    VimVisualTimer.drop()
+    VimVisualTimer.mode = null
     val bookmarksManager = BookmarksManager.getInstance(fixture.project)
     bookmarksManager?.bookmarks?.forEach { bookmark ->
       bookmarksManager.remove(bookmark)
@@ -748,8 +748,7 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
       // If there's no output, there's a good chance we've got an error
       val message = "No Ex output" + if (injector.messages.isError()) {
         ". Error reported: " + VimPlugin.getMessage()
-      }
-      else ""
+      } else ""
 
       assertNotNull(actual, message)
     }
