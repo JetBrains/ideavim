@@ -228,6 +228,14 @@ interface VimSearchHelper {
     maxCount: Int = Int.MAX_VALUE,
   ): List<TextRange>
 
+  fun findAll(
+    editor: VimEditor,
+    pattern: String,
+    startLine: Int,
+    endLine: Int,
+    ignoreCase: Boolean,
+  ): List<TextRange>
+
   fun findNextCharacterOnLine(
     editor: VimEditor,
     caret: ImmutableVimCaret,

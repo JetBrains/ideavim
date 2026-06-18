@@ -26,7 +26,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import org.mockito.Mockito
-import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.spy
@@ -377,7 +376,6 @@ class ReadTest : MockTestCase() {
       eq(startLine),
       eq(endLine),
       eq(ignoreCase),
-      any()
     )
 
     assertEqualsEditor(vimEditor, editorCaptor.firstValue)
