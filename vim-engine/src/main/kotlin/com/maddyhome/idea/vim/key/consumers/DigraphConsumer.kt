@@ -98,20 +98,11 @@ internal class DigraphConsumer : KeyConsumer {
       is DigraphResult.Done -> {
         val commandLine = injector.commandLine.getActiveCommandLine()
         if (commandLine != null) {
-          if (key.keyCode == KeyEvent.VK_C && key.modifiers and InputEvent.CTRL_DOWN_MASK != 0) {
-            return false
-          } else {
-            keyProcessResultBuilder.addExecutionStep { _, _, _ ->
-              commandLine.clearCurrentAction()
-            }
+          keyProcessResultBuilder.addExecutionStep { _, _, _ ->
+            commandLine.clearPromptCharacter()
           }
         }
 
-        keyProcessResultBuilder.addExecutionStep { lambdaKeyState, _, _ ->
-          if (lambdaKeyState.commandBuilder.expectedArgumentType === Argument.Type.DIGRAPH) {
-            lambdaKeyState.commandBuilder.fallbackToCharacterArgument()
-          }
-        }
         val codepoint = res.codepoint ?: return false
         keyProcessResultBuilder.addExecutionStep { lambdaKeyState, lambdaEditorState, lambdaContext ->
           lambdaKeyState.commandBuilder.addTypedKeyStroke(key)
@@ -141,7 +132,7 @@ internal class DigraphConsumer : KeyConsumer {
             return false
           } else {
             keyProcessResultBuilder.addExecutionStep { _, _, _ ->
-              commandLine.clearCurrentAction()
+              commandLine.clearPromptCharacter()
             }
           }
         }
@@ -157,13 +148,6 @@ internal class DigraphConsumer : KeyConsumer {
       is DigraphResult.Unhandled -> {
         // UNHANDLED means the keystroke made no sense in the context of a digraph, but isn't an error in the current
         // state. E.g. waiting for {char} <BS> {char}. Let the key handler have a go at it.
-        if (commandBuilder.expectedArgumentType === Argument.Type.DIGRAPH) {
-          commandBuilder.fallbackToCharacterArgument()
-          keyProcessResultBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, lambdaContext ->
-            keyHandler.handleKey(lambdaEditor, key, lambdaContext, lambdaKeyState)
-          }
-          return true
-        }
         return false
       }
     }

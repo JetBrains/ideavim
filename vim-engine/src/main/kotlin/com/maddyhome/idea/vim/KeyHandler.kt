@@ -52,11 +52,13 @@ class KeyHandler {
     CommandCountConsumer(),
     DeleteCommandCountConsumer(),
     EditorResetConsumer(),
-    StartSelectRegisterConsumer(),  // Must be before command consumer, so " isn't treated as a command char
+    StartSelectRegisterConsumer(),  // Must be before command key consumer, so " isn't treated as a command char
     SelectRegisterConsumer(),
-    DigraphConsumer(),    // Must be before command key consumer so {char}<BS>{char} works.
-    // Would be a problem if a command prefix requires a DIGRAPH arg (no such command exists)
-    CommandKeyConsumer(), // Must be before argument consumers, to handle c_CTRL-R prefix
+    DigraphConsumer(),    // Must be before command key consumer, to process {char}<BS>{char}
+                          // Must be before char argument consumer, to convert and repost digraph/literal key sequences
+                          // and non-digraph/literal sequences fall through as char arguments
+    CommandKeyConsumer(), // Must be before argument consumers, because c_CTRL-R is both a command prefix and a command
+                          // expecting a character-based argument
     CharArgumentConsumer(),
     ModeInputConsumer()   // Must be last to accept the keystroke as typed input
   )

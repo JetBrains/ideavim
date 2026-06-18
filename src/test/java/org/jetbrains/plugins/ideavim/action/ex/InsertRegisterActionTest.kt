@@ -124,22 +124,12 @@ class InsertRegisterActionTest : VimExTestCase() {
 
   // According to the docs, any shortcut that cancels the command line is inserted literally - <C-C>, <Esc>, <CR>
   // In practice, this includes the synonyms <C-M> and <C-[>
-  @VimBehaviorDiffers("hello^C world")
   @Test
   fun `test insert register inserts CTRL-C literally`() {
-    // TODO: IdeaVim doesn't currently support capturing CTRL-C as a literal - it always cancels the command line
-    // So when we try to enter <C-C> as a literal, it's treated as cancel and the let command fails. We don't clear the
-    // command line until we start a new one (we currently deactivate before getting text to process, although we could
-    // easily swap that), so the command line will still have what we started to type before cancelling.
-    // Note that we also get broken behaviour if we use setKeys, because that will save the <C-C> as a keypress, not as
-    // a typed character.
-    // This test is broken, but passes. Once we support <C-V><C-C>, it will start failing and we can fix the test.
-
     // Don't use enterCommand, it (deliberately) doesn't parse special keys!
     typeText(":let @a=\"hello<C-V><C-C> world\"<CR>")
     typeText(":<C-R>a")
-//    assertRenderedExText("hello^C world")
-    assertExText("let @a=\"hello")
+    assertRenderedExText("hello^C world")
   }
 
   @Test

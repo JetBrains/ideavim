@@ -1,7 +1,6 @@
 package org.jetbrains.plugins.ideavim.action.ex
 
 import com.maddyhome.idea.vim.state.mode.Mode
-import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.junit.jupiter.api.Test
 
 @Suppress("SpellCheckingInspection")
@@ -118,14 +117,11 @@ class InsertCurrentLineLiterallyActionTest : VimExTestCase() {
 
   // According to the docs, any shortcut that cancels the command line is inserted literally - <C-C>, <Esc>, <CR>
   // In practice, this includes the synonyms <C-M> and <C-[>
-  @VimBehaviorDiffers("hello^C world")
   @Test
   fun `test insert current line literally inserts CTRL-C literally`() {
-    // The command line doesn't like `<C-V><C-C>` - it just treats it as a `<C-C>` and cancels the command line
     configureByText("hello\u0003 world")
     typeText(":<C-R><C-R><C-L>")
-//    assertRenderedExText("hello^C world")
-    assertRenderedExText("hello")
+    assertRenderedExText("hello^C world")
   }
 
   @Test
