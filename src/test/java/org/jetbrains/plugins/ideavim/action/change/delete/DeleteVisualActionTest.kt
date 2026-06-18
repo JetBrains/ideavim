@@ -8,13 +8,14 @@
 
 package org.jetbrains.plugins.ideavim.action.change.delete
 
+import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.rangeOf
 import org.jetbrains.plugins.ideavim.waitAndAssertMode
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -114,19 +115,24 @@ class DeleteVisualActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   @Test
   fun `test delete after extend selection`() {
-    // This test emulates deletion after structural selection
-    // In short, when caret is not on the selection end
-    configureByText(
-      """
+    // Emulates deletion after IDE structural selection (e.g. extend selection).
+    // Caret is inside the selection, not at the selection end.
+    val text = """
             Lorem Ipsum
 
-            ${s}Lorem ipsum dolor sit amet,
+            Lorem ipsum dolor sit amet,
             all rocks ${c}and lavender and tufted grass,
             Sed in orci mauris.
-            ${se}Cras id tellus in ex imperdiet egestas.
-      """.trimIndent(),
-    )
-    IdeaSelectionControl.controlNonVimSelectionChange(fixture.editor)
+            Cras id tellus in ex imperdiet egestas.
+    """.trimIndent()
+    configureByText(text)
+    assertMode(Mode.NORMAL())
+
+    val selectionStart = text.rangeOf("Lorem ipsum dolor sit amet,").startOffset
+    val selectionEnd = text.rangeOf("Sed in orci mauris.\n").endOffset
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.editor.selectionModel.setSelection(selectionStart, selectionEnd)
+    }
     waitAndAssertMode(fixture, Mode.VISUAL(SelectionType.LINE_WISE))
     typeText(injector.parser.parseKeys("d"))
     assertState(

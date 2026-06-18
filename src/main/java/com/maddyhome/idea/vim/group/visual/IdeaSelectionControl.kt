@@ -26,8 +26,8 @@ import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.hasVisualSelection
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inNormalMode
-import com.maddyhome.idea.vim.helper.returnToAfterSelectionChange
 import com.maddyhome.idea.vim.helper.isTemplateActive
+import com.maddyhome.idea.vim.helper.returnToAfterSelectionChange
 import com.maddyhome.idea.vim.helper.vimDisabled
 import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.newapi.vim
@@ -145,6 +145,7 @@ object IdeaSelectionControl {
         VimPlugin.getVisualMotion().enterSelectMode(editor.vim, mode.selectionType)
         editor.vim.mode = mode
       }
+
       is Mode.INSERT -> VimPlugin.getChange()
         .insertBeforeCaret(editor.vim, injector.executionContextManager.getEditorExecutionContext(editor.vim))
 
