@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.group.change
 
+import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.command.impl.FinishMarkAction
 import com.intellij.openapi.command.impl.StartMarkAction
 import com.intellij.openapi.editor.impl.EditorId
@@ -26,11 +27,13 @@ internal class ChangeRemoteApiImpl : ChangeRemoteApi {
   override suspend fun startUndoMark(editorId: EditorId, commandName: String) = onEdt {
     val editor = editorId.findEditorOrNull() ?: return@onEdt
     val project = editor.project ?: return@onEdt
-    currentStartMark = try {
-      StartMarkAction.start(editor, project, commandName)
-    } catch (_: StartMarkAction.AlreadyStartedException) {
-      null
-    }
+    CommandProcessor.getInstance().executeCommand(project, {
+      currentStartMark = try {
+        StartMarkAction.start(editor, project, commandName)
+      } catch (_: StartMarkAction.AlreadyStartedException) {
+        null
+      }
+    }, commandName, null)
   }
 
   override suspend fun finishUndoMark(editorId: EditorId) = onEdt {
@@ -38,8 +41,10 @@ internal class ChangeRemoteApiImpl : ChangeRemoteApi {
     val project = editor.project ?: return@onEdt
     val mark = currentStartMark
     currentStartMark = null
-    if (mark != null) {
-      FinishMarkAction.finish(project, editor, mark)
-    }
+    CommandProcessor.getInstance().executeCommand(project, {
+      if (mark != null) {
+        FinishMarkAction.finish(project, editor, mark)
+      }
+    }, "Finish Undo Mark", null)
   }
 }
