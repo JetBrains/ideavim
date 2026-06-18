@@ -23,7 +23,7 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-## [To Be Released]
+## 2.39.0, 2026-06-18
 
 ### Features:
 * [VIM-1638](https://youtrack.jetbrains.com/issue/VIM-1638) Added window resize commands — `<C-W>+`/`<C-W>-` to increase/decrease height, `<C-W>>`/`<C-W><` to increase/decrease width, `<C-W>=` to equalize all windows, `:resize [±]n` and `:vertical resize [±]n`
