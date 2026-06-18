@@ -37,6 +37,8 @@ usual beta standards.
 * Added [modeless selection](https://vimhelp.org/gui.txt.html#modeless-selection) in the output panel and command line — select text with the mouse and copy it with [`<C-Y>`](https://vimhelp.org/cmdline.txt.html#c_CTRL-Y)
 * [VIM-2544](https://youtrack.jetbrains.com/issue/VIM-2544) Added [search count display](https://vimhelp.org/pattern.txt.html#search-count) — after a `/`, `?`, `n`, `N`, `*`, or `#` search, the current match index and total are shown (e.g. `[2/4]`), along with the [`'maxsearchcount'`](https://vimhelp.org/options.txt.html#%27maxsearchcount%27) option that caps the counted total (default 999), showing `>` when exceeded (e.g. `[2/>3]`)
 * [VIM-1960](https://youtrack.jetbrains.com/issue/VIM-1960) Added built-in [`targets.vim`](https://github.com/wellle/targets.vim) extension — adds seeking text objects for pairs (`( ) { } [ ] < >`, plus `b` for any block), quotes (`'`, `"`, backtick, plus `q` for any quote), separators (`, . ; : + - = ~ _ * # / | \ & $`), arguments (`a`) and tags (`t`), with `i`/`a`/`I`/`A` modifiers and `n`/`l` next/last qualifiers (e.g. `cin)` changes inside the next parentheses, `da,` deletes a list item with its separator); activate with `Plug 'wellle/targets.vim'`
+* [VIM-2883](https://youtrack.jetbrains.com/issue/VIM-2883) Added the [`'inccommand'`](https://vimhelp.org/options.txt.html#%27inccommand%27) option for a live preview of the `:substitute` command — with `inccommand=nosplit` the replacement is previewed in the buffer as you type the command (and reverted if you cancel with `<Esc>`); with `inccommand=split` a preview window additionally lists each affected line
+* [VIM-3049](https://youtrack.jetbrains.com/issue/VIM-3049) Added Vim's insert-mode completion keys for the IDE popup — `<C-Y>` accepts the selected completion item and `<C-E>` closes the popup
 
 ### Fixes:
 * [VIM-1662](https://youtrack.jetbrains.com/issue/VIM-1662) Fixed the `NewScratchFile` action not working when invoked through IdeaVim (e.g. mapped with `<Action>(NewScratchFile)`) — it previously stayed disabled under IdeaVim's action context
@@ -59,6 +61,8 @@ usual beta standards.
 * Long output (such as `:map` listings) now wraps at the character boundary rather than at word breaks
 
 ### Merged PRs:
+* [1847](https://github.com/JetBrains/ideavim/pull/1847) by [1grzyb1](https://github.com/1grzyb1): Vim-3049 Command for closing completion
+* [1845](https://github.com/JetBrains/ideavim/pull/1845) by [1grzyb1](https://github.com/1grzyb1): VIM-2883 Implement inccommand for dynamic replace
 * [1843](https://github.com/JetBrains/ideavim/pull/1843) by [1grzyb1](https://github.com/1grzyb1): VIM-1960 Implement targets plugin
 * [1840](https://github.com/JetBrains/ideavim/pull/1840) by [1grzyb1](https://github.com/1grzyb1): VIM-1662 handle NewScratchFile action
 * [1839](https://github.com/JetBrains/ideavim/pull/1839) by [1grzyb1](https://github.com/1grzyb1): VIM-741 Remove tab from vim only keys
