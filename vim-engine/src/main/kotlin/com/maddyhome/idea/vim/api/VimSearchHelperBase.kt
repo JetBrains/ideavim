@@ -390,6 +390,17 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     return result
   }
 
+
+  override fun findAll(
+    editor: VimEditor,
+    pattern: String,
+    startLine: Int,
+    endLine: Int,
+    ignoreCase: Boolean,
+  ): List<TextRange> {
+    return findAll(editor, pattern, startLine, endLine, ignoreCase, Int.MAX_VALUE)
+  }
+
   override fun findAll(
     editor: VimEditor,
     pattern: String,
