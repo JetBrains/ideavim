@@ -43,6 +43,7 @@ internal class CharArgumentConsumer : KeyConsumer {
   ): Boolean {
     val expectingCharArgument =
       keyProcessResultBuilder.state.commandBuilder.expectedArgumentType === Argument.Type.CHARACTER
+        || keyProcessResultBuilder.state.commandBuilder.expectedArgumentType === Argument.Type.DIGRAPH
     logger.debug { "Expecting char argument: $expectingCharArgument" }
     return expectingCharArgument
   }

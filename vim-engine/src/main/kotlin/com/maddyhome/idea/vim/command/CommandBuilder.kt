@@ -38,7 +38,6 @@ class CommandBuilder private constructor(
   private var selectedRegister: Char? = null
   private var action: EditorActionHandlerBase? = null
   private var argument: Argument? = null
-  private var fallbackArgumentType: Argument.Type? = null
 
   private val motionArgument
     get() = argument as? Argument.Motion
@@ -60,7 +59,6 @@ class CommandBuilder private constructor(
       && counts.size == 1 && counts[0] == 0
       && action == null
       && argument == null
-      && fallbackArgumentType == null
 
   /** Returns true if the command is ready to be built and executed */
   val isReady
@@ -112,8 +110,7 @@ class CommandBuilder private constructor(
    * For digraph arguments, this can fall back to [Argument.Type.CHARACTER] if there isn't a digraph match.
    */
   val expectedArgumentType: Argument.Type?
-    get() = fallbackArgumentType
-      ?: motionArgument?.let { return it.motion.argumentType }
+    get() = motionArgument?.let { return it.motion.argumentType }
       ?: action?.argumentType
 
   /**
@@ -125,14 +122,6 @@ class CommandBuilder private constructor(
    */
   val isAwaitingArgument: Boolean
     get() = expectedArgumentType != null && (motionArgument?.let { it.argument == null } ?: (argument == null))
-
-  fun fallbackToCharacterArgument() {
-    logger.trace("fallbackToCharacterArgument is executed")
-    // Finished handling DIGRAPH. We either succeeded, in which case handle the converted character, or failed to parse,
-    // in which case try to handle input as a character argument.
-    assert(expectedArgumentType == Argument.Type.DIGRAPH) { "Cannot move state from $expectedArgumentType to CHARACTER" }
-    fallbackArgumentType = Argument.Type.CHARACTER
-  }
 
   fun isAwaitingCharOrDigraphArgument(): Boolean {
     val awaiting = expectedArgumentType == Argument.Type.CHARACTER || expectedArgumentType == Argument.Type.DIGRAPH
@@ -185,7 +174,6 @@ class CommandBuilder private constructor(
     logger.trace { "Selected register '$register'" }
     selectedRegister = register
     isRegisterPending = false
-    fallbackArgumentType = null
     counts.add(0)
   }
 
@@ -233,7 +221,6 @@ class CommandBuilder private constructor(
 
     // Push a new count component, so we get an extra count for e.g. an operator's motion
     counts.add(0)
-    fallbackArgumentType = null
 
     if (!isAwaitingArgument) {
       logger.trace("Action does not require an argument. Setting command state to READY")
@@ -255,8 +242,6 @@ class CommandBuilder private constructor(
     // If the command's action is an operator, the argument will be a motion, which might be waiting for its argument.
     // If so, update the motion argument to include the given argument
     this.argument = motionArgument?.withArgument(argument) ?: argument
-
-    fallbackArgumentType = null
 
     if (!isAwaitingArgument) {
       logger.trace("Argument is simple type, or motion with own argument. No further argument required. Setting command state to READY")
@@ -370,7 +355,6 @@ class CommandBuilder private constructor(
     action = null
     argument = null
     typedKeyStrokes.clear()
-    fallbackArgumentType = null
   }
 
   /**
@@ -406,7 +390,6 @@ class CommandBuilder private constructor(
     if (typedKeyStrokes != other.typedKeyStrokes) return false
     if (commandState != other.commandState) return false
     if (expectedArgumentType != other.expectedArgumentType) return false
-    if (fallbackArgumentType != other.fallbackArgumentType) return false
 
     return true
   }
@@ -421,7 +404,6 @@ class CommandBuilder private constructor(
     result = 31 * result + typedKeyStrokes.hashCode()
     result = 31 * result + commandState.hashCode()
     result = 31 * result + expectedArgumentType.hashCode()
-    result = 31 * result + fallbackArgumentType.hashCode()
     return result
   }
 
@@ -437,7 +419,6 @@ class CommandBuilder private constructor(
     result.action = action
     result.argument = argument
     result.commandState = commandState
-    result.fallbackArgumentType = fallbackArgumentType
     return result
   }
 
