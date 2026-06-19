@@ -203,7 +203,6 @@ class FoldMotionOperatorTest : FoldActionTestBase() {
     )
   }
 
-  @Disabled("Manual fold delete via dd not yet verified")
   @TestWithoutNeovim(SkipNeovimReason.FOLDING)
   @Test
   fun `should delete manual fold content with dd`() {
@@ -219,8 +218,6 @@ class FoldMotionOperatorTest : FoldActionTestBase() {
       """.trimIndent(),
     )
     typeText(injector.parser.parseKeys("zf2j"))
-    typeText("zc")
-    typeText("k")
     typeText("dd")
     assertState(
       """
