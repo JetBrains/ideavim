@@ -41,6 +41,7 @@ import com.maddyhome.idea.vim.api.VimScrollingModel
 import com.maddyhome.idea.vim.api.VimVirtualFile
 import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.api.VirtualBufferKind
+import com.maddyhome.idea.vim.api.getVisualStartLine
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.IndentConfig
 import com.maddyhome.idea.vim.common.LiveRange
@@ -537,6 +538,12 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase() {
   override fun getFoldRegionAtLine(line: Int): VimFoldRegion? {
     val ijFoldRegion = FoldingUtil.findFoldRegionStartingAtLine(editor, line) ?: return null
     return toVimFoldRegion(ijFoldRegion)
+  }
+
+  override fun getCollapsedFoldRegionAtVisualStartLine(line: Int): VimFoldRegion? {
+    return editor.foldingModel.allFoldRegions
+      .map { toVimFoldRegion(it) }
+      .firstOrNull { !it.isExpanded && it.getVisualStartLine(this) == line }
   }
 
   override fun getAllFoldRegions(): List<VimFoldRegion> {

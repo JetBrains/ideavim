@@ -43,6 +43,12 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
   open val keepFold: Boolean = false
 
   /**
+   * Whether operators using this motion should expand ranges to include whole collapsed folds.
+   * Fold boundary motions (`zj`, `zk`) set this to false.
+   */
+  open val expandCollapsedFolds: Boolean = true
+
+  /**
    * Base class for motion handlers.
    * This handler executes an action for each caret. That means that if you have 5 carets, [getOffset] will be
    *   called 5 times.
