@@ -434,9 +434,11 @@ abstract class VimMotionGroupBase : VimMotionGroup {
   }
 
   /**
-   * When using an operator, Vim includes a closed fold as a whole (:help fold-behavior).
-   * Expansion applies when the range starts on the fold's header line — e.g. `dd` on a
-   * closed fold.
+   * Expands operator range to include a collapsed fold when appropriate.
+   *
+   * Linewise operators on the fold header line (e.g. `dd`) expand to the whole fold.
+   * Character-wise operators expand only when the range reaches the fold boundary
+   * ([VimFoldRegion.startOffset], often the newline after `{` on the header line).
    */
   private fun expandRangeForCollapsedFolds(
     editor: VimEditor,
@@ -446,17 +448,20 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     linewise: Boolean,
   ): TextRange {
     val rangeStartLine = editor.offsetToBufferPosition(start).line
-    val collapsedFold = editor.getCollapsedFoldRegionAtVisualStartLine(rangeStartLine)
+    val collapsedFold = editor.getCollapsedFoldRegionAtVisualStartLine(rangeStartLine) ?: return TextRange(start, end)
 
-    var expandedStart = start
-    var expandedEnd = end
-    if (collapsedFold != null) {
-      expandedStart = min(start, collapsedFold.startOffset)
-      expandedEnd = max(end, collapsedFold.endOffset)
-      if (linewise) {
-        expandedStart = editor.getLineStartForOffset(expandedStart)
-        expandedEnd = normalizeLinewiseMotionEnd(editor, caret, expandedEnd)
-      }
+    val shouldExpand = linewise ||
+      start >= collapsedFold.startOffset ||
+      start + 1 >= collapsedFold.startOffset
+    if (!shouldExpand) {
+      return TextRange(start, end)
+    }
+
+    var expandedStart = min(start, collapsedFold.startOffset)
+    var expandedEnd = max(end, collapsedFold.endOffset)
+    if (linewise) {
+      expandedStart = editor.getLineStartForOffset(expandedStart)
+      expandedEnd = normalizeLinewiseMotionEnd(editor, caret, expandedEnd)
     }
 
     return TextRange(expandedStart, expandedEnd)
