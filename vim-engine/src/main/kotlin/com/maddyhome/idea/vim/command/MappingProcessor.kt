@@ -98,7 +98,7 @@ internal object MappingProcessor : KeyConsumer {
   private fun isMappingApplicable(commandBuilder: CommandBuilder, key: KeyStroke, keyState: KeyHandlerState): Boolean {
     // Mapping is not applied to character/digraph arguments (e.g. `f{char}` or register names).
     // It's also not applied partway through an existing command - e.g. `<C-W>s` does not apply any maps for `s`.
-    return !commandBuilder.isAwaitingCharOrDigraphArgument()
+    return !commandBuilder.isAwaitingCharacterBasedArgument()
       && !commandBuilder.isBuildingMultiKeyCommand()
       && !commandBuilder.isRegisterPending
       && !isTypingZeroInCommandCount(key, keyState)

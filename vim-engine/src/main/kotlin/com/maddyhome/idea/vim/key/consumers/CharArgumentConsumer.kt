@@ -41,9 +41,7 @@ internal class CharArgumentConsumer : KeyConsumer {
     allowKeyMappings: Boolean,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
-    val expectingCharArgument =
-      keyProcessResultBuilder.state.commandBuilder.expectedArgumentType === Argument.Type.CHARACTER
-        || keyProcessResultBuilder.state.commandBuilder.expectedArgumentType === Argument.Type.DIGRAPH
+    val expectingCharArgument = keyProcessResultBuilder.state.commandBuilder.isAwaitingCharacterBasedArgument()
     logger.debug { "Expecting char argument: $expectingCharArgument" }
     return expectingCharArgument
   }

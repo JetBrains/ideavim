@@ -25,9 +25,7 @@ import java.util.*
 @CommandOrMotion(keys = ["'"], modes = [Mode.VISUAL, Mode.OP_PENDING])
 class MotionGotoFileMarkLineAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
-
-  override val argumentType: Argument.Type = Argument.Type.CHARACTER
-
+  override val argumentType: Argument.Type = Argument.Type.MARK
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(

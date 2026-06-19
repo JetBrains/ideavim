@@ -78,7 +78,7 @@ internal class EditorResetConsumer : KeyConsumer {
     context: ExecutionContext,
   ) {
     val commandBuilder = keyState.commandBuilder
-    if (commandBuilder.isAwaitingCharOrDigraphArgument()) {
+    if (commandBuilder.isAwaitingCharacterBasedArgument()) {
       editor.isReplaceCharacter = false
     }
     if (commandBuilder.isEmpty) {
