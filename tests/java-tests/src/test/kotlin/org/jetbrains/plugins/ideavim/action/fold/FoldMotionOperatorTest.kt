@@ -13,7 +13,6 @@ import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import kotlin.test.assertTrue
 
@@ -229,7 +228,6 @@ class FoldMotionOperatorTest : FoldActionTestBase() {
     )
   }
 
-  @Disabled("Nested outer fold delete via dd not yet verified")
   @TestWithoutNeovim(SkipNeovimReason.FOLDING)
   @Test
   fun `should delete outer folded region with dd on outer header`() {
@@ -256,17 +254,18 @@ class FoldMotionOperatorTest : FoldActionTestBase() {
     )
   }
 
-  @Disabled("2dd on closed fold not yet verified")
   @TestWithoutNeovim(SkipNeovimReason.FOLDING)
   @Test
   fun `should delete closed fold and next line with 2dd`() {
     configureByJavaText(
       """
           class TestClass {
-              public${c} void method() {
-                  System.out.println("line 1");
+              public void method() {
+                  if ${c}(true) {
+                      System.out.println("line 1");
+                  }
+                  System.out.println("line 2");
               }
-              int x = 5;
           }
       """.trimIndent(),
     )
@@ -276,7 +275,9 @@ class FoldMotionOperatorTest : FoldActionTestBase() {
     assertState(
       """
           class TestClass {
-          ${c}}
+              public void method() {
+              }
+          }
       """.trimIndent(),
     )
   }

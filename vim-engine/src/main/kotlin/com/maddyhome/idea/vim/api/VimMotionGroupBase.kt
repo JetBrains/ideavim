@@ -469,7 +469,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
 
   private fun normalizeLinewiseMotionEnd(editor: VimEditor, caret: ImmutableVimCaret, end: Int): Int {
     return if (caret.getBufferPosition().line != editor.lineCount() - 1) {
-      min((editor.getLineEndForOffset(end) + 1).toLong(), editor.fileSize()).toInt()
+      min((editor.getLineEndForOffset(end - 1) + 1).toLong(), editor.fileSize()).toInt()
     } else {
       editor.getLineEndForOffset(end)
     }
