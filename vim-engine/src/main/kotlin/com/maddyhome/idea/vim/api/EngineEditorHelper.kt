@@ -301,6 +301,20 @@ fun VimEditor.coerceOffset(offset: Int): Int {
   return offset
 }
 
+/**
+ * The buffer line where a fold visually starts.
+ *
+ * IDE fold regions typically have their [VimFoldRegion.startOffset] at the first character of the
+ * folded content (e.g. the newline after `{`), not at the fold marker itself.
+ */
+fun VimFoldRegion.getVisualStartLine(editor: VimEditor): Int {
+  return if (startOffset > 0) {
+    editor.offsetToBufferPosition(startOffset - 1).line
+  } else {
+    editor.offsetToBufferPosition(startOffset).line
+  }
+}
+
 interface VimRangeMarker {
   val startOffset: Int
   val endOffset: Int

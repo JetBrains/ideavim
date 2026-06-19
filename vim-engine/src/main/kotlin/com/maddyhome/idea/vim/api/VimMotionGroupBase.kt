@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.state.mode.isEndAllowedIgnoringOnemore
 import org.jetbrains.annotations.Range
 import kotlin.math.abs
 import kotlin.math.absoluteValue
+import kotlin.math.max
 import kotlin.math.min
 
 abstract class VimMotionGroupBase : VimMotionGroup {
@@ -343,6 +344,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     context: ExecutionContext,
     argument: Argument,
     operatorArguments: OperatorArguments,
+    expandCollapsedFolds: Boolean,
   ): TextRange? {
     if (argument !is Argument.Motion) {
       throw RuntimeException("Unexpected argument passed to getMotionRange2: $argument")
@@ -422,7 +424,50 @@ abstract class VimMotionGroupBase : VimMotionGroup {
       }
     }
 
+    val shouldExpandCollapsedFolds = expandCollapsedFolds &&
+      (action as? MotionActionHandler)?.expandCollapsedFolds != false
+    if (shouldExpandCollapsedFolds) {
+      return expandRangeForCollapsedFolds(editor, caret, start, end, argument.isLinewiseMotion())
+    }
+
     return TextRange(start, end)
+  }
+
+  /**
+   * When using an operator, Vim includes a closed fold as a whole (:help fold-behavior).
+   * Expansion applies when the range starts on the fold's header line — e.g. `dd` on a
+   * closed fold.
+   */
+  private fun expandRangeForCollapsedFolds(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    start: Int,
+    end: Int,
+    linewise: Boolean,
+  ): TextRange {
+    val rangeStartLine = editor.offsetToBufferPosition(start).line
+    val collapsedFold = editor.getCollapsedFoldRegionAtVisualStartLine(rangeStartLine)
+
+    var expandedStart = start
+    var expandedEnd = end
+    if (collapsedFold != null) {
+      expandedStart = min(start, collapsedFold.startOffset)
+      expandedEnd = max(end, collapsedFold.endOffset)
+      if (linewise) {
+        expandedStart = editor.getLineStartForOffset(expandedStart)
+        expandedEnd = normalizeLinewiseMotionEnd(editor, caret, expandedEnd)
+      }
+    }
+
+    return TextRange(expandedStart, expandedEnd)
+  }
+
+  private fun normalizeLinewiseMotionEnd(editor: VimEditor, caret: ImmutableVimCaret, end: Int): Int {
+    return if (caret.getBufferPosition().line != editor.lineCount() - 1) {
+      min((editor.getLineEndForOffset(end) + 1).toLong(), editor.fileSize()).toInt()
+    } else {
+      editor.getLineEndForOffset(end)
+    }
   }
 
   override fun moveCaretToColumn(editor: VimEditor, caret: ImmutableVimCaret, count: Int, allowEnd: Boolean): Motion {

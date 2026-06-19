@@ -289,6 +289,17 @@ interface VimEditor {
   fun getFoldRegionAtLine(line: Int): VimFoldRegion?
 
   /**
+   * Returns the collapsed fold region whose visual start line is [line], if any.
+   *
+   * IDE fold regions may start after the visual header line (e.g. the newline after `{`), so
+   * [getFoldRegionAtLine] and [getFoldRegionsAtOffset] are not sufficient for this lookup.
+   *
+   * @param line the visual start line of the fold (0-based)
+   * @return the collapsed fold region, or null if no matching collapsed fold exists
+   */
+  fun getCollapsedFoldRegionAtVisualStartLine(line: Int): VimFoldRegion?
+
+  /**
    * Returns all fold regions in the editor.
    *
    * This method returns every fold region in the editor, regardless of their expanded/collapsed

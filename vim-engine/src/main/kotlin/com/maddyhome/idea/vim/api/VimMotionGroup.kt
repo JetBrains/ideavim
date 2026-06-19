@@ -162,6 +162,7 @@ interface VimMotionGroup {
     context: ExecutionContext,
     argument: Argument,
     operatorArguments: OperatorArguments,
+    expandCollapsedFolds: Boolean = true,
   ): TextRange?
 
   // TODO: These aren't caret motions. Should be moved to VimWindowGroup?
