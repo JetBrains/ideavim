@@ -62,8 +62,10 @@ abstract class VimMotionGroupBase : VimMotionGroup {
       throw RuntimeException("Line is " + line + " , pos.line=" + pos.line + ", count=" + count)
     }
 
-    val additionalVisualColumns = injector.engineEditorHelper
-      .amountOfInlaysBeforeVisualPosition(editor, VimVisualPosition(line, intendedColumn, false))
+    val additionalVisualColumns = injector.engineEditorHelper.amountOfInlaysBeforeVisualPosition(
+      editor,
+      VimVisualPosition(line, intendedColumn, false)
+    )
 
     val newPos = VimVisualPosition(line, intendedColumn + additionalVisualColumns, false)
     val offset = editor.visualPositionToOffset(newPos)
@@ -241,9 +243,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     val startPos = editor.currentCaret().offset
     when (lastFTCmd) {
       TillCharacterMotionType.LAST_F -> res = moveCaretToNextCharacterOnLine(editor, caret, -count, lastFTChar)
-      TillCharacterMotionType.LAST_SMALL_F ->
-        res =
-          moveCaretToNextCharacterOnLine(editor, caret, count, lastFTChar)
+      TillCharacterMotionType.LAST_SMALL_F -> res = moveCaretToNextCharacterOnLine(editor, caret, count, lastFTChar)
 
       TillCharacterMotionType.LAST_T -> {
         res = moveCaretToBeforeNextCharacterOnLine(editor, caret, -count, lastFTChar)
@@ -377,8 +377,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
 
       is TextObjectActionHandler -> {
         val range: TextRange =
-          action.getRange(editor, caret, context, operatorArguments.count1, operatorArguments.count0)
-            ?: return null
+          action.getRange(editor, caret, context, operatorArguments.count1, operatorArguments.count0) ?: return null
         start = range.startOffset
         end = range.endOffset
         if (argument.isLinewiseMotion()) end--
@@ -424,8 +423,8 @@ abstract class VimMotionGroupBase : VimMotionGroup {
       }
     }
 
-    val shouldExpandCollapsedFolds = expandCollapsedFolds &&
-      (action as? MotionActionHandler)?.expandCollapsedFolds != false
+    val shouldExpandCollapsedFolds =
+      expandCollapsedFolds && (action as? MotionActionHandler)?.expandCollapsedFolds != false
     if (shouldExpandCollapsedFolds) {
       return expandRangeForCollapsedFolds(editor, caret, start, end, argument.isLinewiseMotion())
     }
@@ -448,11 +447,13 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     linewise: Boolean,
   ): TextRange {
     val rangeStartLine = editor.offsetToBufferPosition(start).line
-    val collapsedFold = editor.getCollapsedFoldRegionAtVisualStartLine(rangeStartLine) ?: return TextRange(start, end)
+    val rangeEndLine = editor.offsetToBufferPosition(end).line - 1
+    val collapsedFold =
+      editor.getCollapsedFoldRegionAtVisualStartLine(rangeStartLine) ?: editor.getCollapsedFoldRegionAtVisualStartLine(
+        rangeEndLine
+      ) ?: return TextRange(start, end)
 
-    val shouldExpand = linewise ||
-      start >= collapsedFold.startOffset ||
-      start + 1 >= collapsedFold.startOffset
+    val shouldExpand = linewise || start + 1 >= collapsedFold.startOffset
     if (!shouldExpand) {
       return TextRange(start, end)
     }
@@ -513,8 +514,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
       editor,
       editor.normalizeLine(
         (editor.lineCount() * count.coerceIn(
-          0,
-          100
+          0, 100
         ) + 99) / 100 - 1
       ), // TODO why do we have this 99? (It is there since 2003)
       caret,

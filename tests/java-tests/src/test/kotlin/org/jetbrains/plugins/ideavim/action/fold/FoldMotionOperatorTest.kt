@@ -282,6 +282,61 @@ class FoldMotionOperatorTest : FoldActionTestBase() {
     )
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
+  @Test
+  fun `should yank collapsed inner if block with yy`() {
+    configureByJavaText(
+      """
+          class TestClass {
+              public void method() {
+                  System.out.println("before");
+                  if ${c}(true) {
+                      System.out.println("inner");
+                  }
+                  System.out.println("after");
+              }
+          }
+      """.trimIndent(),
+    )
+    updateFoldRegions()
+    typeText("zc")
+    typeText("yy")
+
+    val context = injector.executionContextManager.getEditorExecutionContext(fixture.editor.vim)
+    val regText = injector.registerGroup.getRegister(fixture.editor.vim, context, '0')!!.text
+    assertTrue(regText.contains("if (true)"))
+    assertTrue(regText.contains("inner"))
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
+  @Test
+  fun `should delete manual zf fold inside IDE fold with dd`() {
+    configureByJavaText(
+      """
+          class TestClass {
+              public void method() {
+                  System.out.println("keep");
+                  ${c}System.out.println("line 1");
+                  System.out.println("line 2");
+                  System.out.println("line 3");
+              }
+          }
+      """.trimIndent(),
+    )
+    updateFoldRegions()
+    typeText(injector.parser.parseKeys("zf2j"))
+    typeText("dd")
+    assertState(
+      """
+          class TestClass {
+              public void method() {
+                  System.out.println("keep");
+              ${c}}
+          }
+      """.trimIndent(),
+    )
+  }
+
   // ============== zj/zk boundary motion operators ==============
 
   @TestWithoutNeovim(SkipNeovimReason.FOLDING)
@@ -340,39 +395,6 @@ class FoldMotionOperatorTest : FoldActionTestBase() {
                   System.out.println("a");
                   System.out.println("b");
               ${c}int y = 10;
-          }
-      """.trimIndent(),
-    )
-  }
-
-  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
-  @Test
-  fun `should delete to fold header without expanding folded region with d2j`() {
-    configureByJavaText(
-      """
-          class TestClass {
-              ${c}int x = 5;
-              int y = 10;
-              public void method() {
-                  System.out.println("a");
-                  System.out.println("b");
-              }
-          }
-      """.trimIndent(),
-    )
-    updateFoldRegions()
-    typeText("j")
-    typeText("j")
-    typeText("zc")
-    typeText("k")
-    typeText("k")
-    typeText("d2j")
-    assertState(
-      """
-          class TestClass {
-                  ${c}System.out.println("a");
-                  System.out.println("b");
-              }
           }
       """.trimIndent(),
     )
@@ -473,5 +495,190 @@ class FoldMotionOperatorTest : FoldActionTestBase() {
           }
       """.trimIndent(),
     )
+  }
+
+  // ============== Nested / inner collapsed folds (need implementation) ==============
+
+  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
+  @Test
+  fun `d2j through collapsed inner if inside method preserves method closing brace`() {
+    configureByJavaText(
+      """
+          class TestClass {
+              public void method() {
+                  ${c}int x = 5;
+                  int y = 10;
+                  if (true) {
+                      System.out.println("a");
+                      System.out.println("b");
+                  }
+              }
+          }
+      """.trimIndent(),
+    )
+    updateFoldRegions()
+    typeText("j")
+    typeText("j")
+    typeText("zc")
+    typeText("k")
+    typeText("k")
+    typeText("d2j")
+    assertState(
+      """
+          class TestClass {
+              public void method() {
+              ${c}}
+          }
+      """.trimIndent(),
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
+  @Test
+  fun `dd on collapsed inner if header deletes entire if block`() {
+    configureByJavaText(
+      """
+          class TestClass {
+              public void method() {
+                  System.out.println("before");
+                  if ${c}(true) {
+                      System.out.println("inner");
+                  }
+                  System.out.println("after");
+              }
+          }
+      """.trimIndent(),
+    )
+    updateFoldRegions()
+    typeText("zc")
+    typeText("dd")
+    assertState(
+      """
+          class TestClass {
+              public void method() {
+                  System.out.println("before");
+                  ${c}System.out.println("after");
+              }
+          }
+      """.trimIndent(),
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
+  @Test
+  fun `cc on collapsed inner if header replaces entire if block`() {
+    configureByJavaText(
+      """
+          class TestClass {
+              public void method() {
+                  System.out.println("before");
+                  if ${c}(true) {
+                      System.out.println("inner");
+                  }
+                  System.out.println("after");
+              }
+          }
+      """.trimIndent(),
+    )
+    updateFoldRegions()
+    typeText("zc")
+    typeText("cc")
+    assertState(
+      """
+          class TestClass {
+              public void method() {
+                  System.out.println("before");
+                  ${c}
+                  System.out.println("after");
+              }
+          }
+      """.trimIndent(),
+    )
+    assertMode(Mode.INSERT)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
+  @Test
+  fun `dd on collapsed empty method deletes entire empty method`() {
+    configureByJavaText(
+      """
+          class TestClass {
+              public void empty() {
+              ${c}}
+              public void method() {
+                  System.out.println("line");
+              }
+          }
+      """.trimIndent(),
+    )
+    updateFoldRegions()
+    typeText("zc")
+    typeText("dd")
+    assertState(
+      """
+        class TestClass {
+            ${c}public void method() {
+                System.out.println("line");
+            }
+        }
+      """.trimIndent(),
+    )
+  }
+
+  // ============== zk operator variants (need implementation) ==============
+
+  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
+  @Test
+  fun `yzk yanks from cursor to previous fold end`() {
+    configureByJavaText(
+      """
+          class TestClass {
+              public void method() {
+                  System.out.println("a");
+                  System.out.println("b");
+              }
+              int x = 5;
+              ${c}int y = 10;
+          }
+      """.trimIndent(),
+    )
+    updateFoldRegions()
+    typeText("yzk")
+
+    val context = injector.executionContextManager.getEditorExecutionContext(fixture.editor.vim)
+    val regText = injector.registerGroup.getRegister(fixture.editor.vim, context, '0')!!.text
+    assertTrue(regText.contains("int x = 5"))
+    assertTrue(regText.contains("int y = 10"))
+    assertTrue(!regText.contains("public void method()"))
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
+  @Test
+  fun `czk changes from cursor to previous fold end`() {
+    configureByJavaText(
+      """
+          class TestClass {
+              public void method() {
+                  System.out.println("a");
+                  System.out.println("b");
+              }
+              int x = 5;
+              ${c}int y = 10;
+          }
+      """.trimIndent(),
+    )
+    updateFoldRegions()
+    typeText("czk")
+    assertState(
+      """
+          class TestClass {
+              public void method() {
+                  System.out.println("a");
+                  System.out.println("b");
+              
+          }
+      """.trimIndent(),
+    )
+    assertMode(Mode.INSERT)
   }
 }
