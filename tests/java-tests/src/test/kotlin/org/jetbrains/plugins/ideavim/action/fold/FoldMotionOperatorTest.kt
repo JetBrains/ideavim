@@ -120,7 +120,6 @@ class FoldMotionOperatorTest : FoldActionTestBase() {
     )
   }
 
-  @Disabled("Change operator on collapsed fold not yet supported")
   @TestWithoutNeovim(SkipNeovimReason.FOLDING)
   @Test
   fun `should change content of folded region`() {
@@ -141,16 +140,16 @@ class FoldMotionOperatorTest : FoldActionTestBase() {
     assertState(
       """
           class TestClass {
-          ${c}}
+              ${c}
+          }
       """.trimIndent(),
     )
     assertMode(Mode.INSERT)
   }
 
-  @Disabled("Character-wise delete on collapsed fold not yet supported")
   @TestWithoutNeovim(SkipNeovimReason.FOLDING)
   @Test
-  fun `should delete whole fold with dl on closed fold header`() {
+  fun `should delete only one character with dl mid-line on collapsed fold header`() {
     configureByJavaText(
       """
           class TestClass {
@@ -168,7 +167,38 @@ class FoldMotionOperatorTest : FoldActionTestBase() {
     assertState(
       """
           class TestClass {
-          ${c}}
+              public${c}void method() {
+                  System.out.println("line 1");
+                  System.out.println("line 2");
+                  System.out.println("line 3");
+              }
+          }
+      """.trimIndent(),
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
+  @Test
+  fun `should delete folded content with dl at end of collapsed fold header line`() {
+    configureByJavaText(
+      """
+          class TestClass {
+              public void method() {${c}
+                  System.out.println("line 1");
+                  System.out.println("line 2");
+                  System.out.println("line 3");
+              }
+          }
+      """.trimIndent(),
+    )
+    updateFoldRegions()
+    typeText("zc")
+    typeText("dl")
+    assertState(
+      """
+          class TestClass {
+              public void method()${c} 
+          }
       """.trimIndent(),
     )
   }
@@ -317,7 +347,6 @@ class FoldMotionOperatorTest : FoldActionTestBase() {
     )
   }
 
-  @Disabled("Non-boundary motion must not expand to whole collapsed fold")
   @TestWithoutNeovim(SkipNeovimReason.FOLDING)
   @Test
   fun `should delete to fold header without expanding folded region with d2j`() {
@@ -343,8 +372,7 @@ class FoldMotionOperatorTest : FoldActionTestBase() {
     assertState(
       """
           class TestClass {
-              public void method() {
-                  System.out.println("a");
+                  ${c}System.out.println("a");
                   System.out.println("b");
               }
           }
