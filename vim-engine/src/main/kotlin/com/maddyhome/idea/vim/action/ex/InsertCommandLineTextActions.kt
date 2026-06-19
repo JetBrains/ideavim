@@ -99,7 +99,7 @@ open class InsertCommandLineTextActionBase(private val insertLiterally: Boolean)
 }
 
 open class InsertRegisterActionBase(insertLiterally: Boolean) : InsertCommandLineTextActionBase(insertLiterally) {
-  override val argumentType = Argument.Type.CHARACTER
+  override val argumentType = Argument.Type.REGISTER
 
   override fun execute(
     commandLine: VimCommandLine,

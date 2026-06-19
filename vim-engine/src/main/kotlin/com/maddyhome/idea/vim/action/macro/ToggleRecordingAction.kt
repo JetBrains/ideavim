@@ -22,7 +22,7 @@ class ToggleRecordingAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override val argumentType: Argument.Type?
-    get() = if (!injector.registerGroup.isRecording) Argument.Type.CHARACTER else null
+    get() = if (!injector.registerGroup.isRecording) Argument.Type.REGISTER else null
 
   override fun execute(
     editor: VimEditor,

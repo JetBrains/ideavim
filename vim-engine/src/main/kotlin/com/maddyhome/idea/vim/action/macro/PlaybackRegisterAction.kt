@@ -22,8 +22,7 @@ import com.maddyhome.idea.vim.register.RegisterConstants.LAST_COMMAND_REGISTER
 @CommandOrMotion(keys = ["@"], modes = [Mode.NORMAL])
 class PlaybackRegisterAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
-
-  override val argumentType: Argument.Type = Argument.Type.CHARACTER
+  override val argumentType: Argument.Type = Argument.Type.REGISTER
 
   override fun execute(
     editor: VimEditor,

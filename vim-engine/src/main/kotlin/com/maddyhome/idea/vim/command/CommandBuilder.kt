@@ -123,9 +123,12 @@ class CommandBuilder private constructor(
   val isAwaitingArgument: Boolean
     get() = expectedArgumentType != null && (motionArgument?.let { it.argument == null } ?: (argument == null))
 
-  fun isAwaitingCharOrDigraphArgument(): Boolean {
-    val awaiting = expectedArgumentType == Argument.Type.CHARACTER || expectedArgumentType == Argument.Type.DIGRAPH
-    logger.debug { "Awaiting char or digraph: $awaiting" }
+  fun isAwaitingCharacterBasedArgument(): Boolean {
+    val awaiting = expectedArgumentType == Argument.Type.DIGRAPH
+      || expectedArgumentType == Argument.Type.CHARACTER
+      || expectedArgumentType == Argument.Type.REGISTER
+      || expectedArgumentType == Argument.Type.MARK
+    logger.debug { "Awaiting character based argument: $awaiting" }
     return awaiting
   }
 
@@ -133,8 +136,7 @@ class CommandBuilder private constructor(
     get() {
       return commandState == CurrentCommandState.NEW_COMMAND
         && !isRegisterPending
-        && expectedArgumentType != Argument.Type.CHARACTER
-        && expectedArgumentType != Argument.Type.DIGRAPH
+        && !isAwaitingCharacterBasedArgument()
         && commandKeyStrokes.isEmpty()
     }
 

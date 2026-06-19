@@ -25,9 +25,7 @@ import java.util.*
 @CommandOrMotion(keys = ["'"], modes = [Mode.NORMAL])
 class MotionGotoMarkLineAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
-
-  override val argumentType: Argument.Type = Argument.Type.CHARACTER
-
+  override val argumentType: Argument.Type = Argument.Type.MARK
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(
@@ -47,8 +45,7 @@ class MotionGotoMarkLineAction : MotionActionHandler.ForEachCaret() {
 @CommandOrMotion(keys = ["g'"], modes = [Mode.NORMAL])
 class MotionGotoMarkLineNoSaveJumpAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
-
-  override val argumentType: Argument.Type = Argument.Type.CHARACTER
+  override val argumentType: Argument.Type = Argument.Type.MARK
 
   override fun getOffset(
     editor: VimEditor,

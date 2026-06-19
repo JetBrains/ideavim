@@ -76,15 +76,35 @@ sealed class Argument {
      */
     MOTION,
 
-    /** A character argument, such as the character to move to with the `f` command. */
+    /**
+     * A character argument, which is the name of a register
+     *
+     * The character will be mapped by `'langmap'`, from the user's input language to an ASCII value.
+     */
+    REGISTER,
+
+    /**
+     * A character argument, which is the name of a mark
+     *
+     * The character will be mapped by `'langmap'`, from the user's input language to an ASCII value.
+     */
+    MARK,
+
+    /**
+     * A character argument, such as the character to move to with the `f` command.
+     *
+     * The character will not be mapped by `'langmap'`, but will be a character in the user's input language.
+     */
     CHARACTER,
 
     /**
-     * Used to represent an expected argument type rather than an actual argument type
+     * An argument that can be either a character or a digraph/literal
      *
      * When building a command, an operator can say that it expects a digraph or literal argument, in which case the key
      * handler will allow `<C-K>`, `<C-V>` and `<C-Q>`, and start the digraph state machine. The finished digraph is
      * converted into a character, and a character argument is added to the operator action.
+     *
+     * The final digraph will not be mapped by `'langmap'`.
      */
     DIGRAPH
   }
