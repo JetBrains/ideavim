@@ -302,17 +302,53 @@ fun VimEditor.coerceOffset(offset: Int): Int {
 }
 
 /**
- * The buffer line where a fold visually starts.
+ * The buffer line where a fold visually starts when collapsed.
  *
- * IDE fold regions typically have their [VimFoldRegion.startOffset] at the first character of the
- * folded content (e.g. the newline after `{`), not at the fold marker itself.
+ * IDE structural folds often place [VimFoldRegion.startOffset] on the first hidden character (e.g. the
+ * body line after `{`), while manual `zf` folds place it on the first line of the selected region.
+ * We detect the visual header by probing which line's offsets are associated with this fold region.
  */
 fun VimFoldRegion.getVisualStartLine(editor: VimEditor): Int {
-  return if (startOffset > 0) {
-    editor.offsetToBufferPosition(startOffset - 1).line
-  } else {
-    editor.offsetToBufferPosition(startOffset).line
+  val startLine = editor.offsetToBufferPosition(startOffset).line
+  val lineStart = editor.getLineStartOffset(startLine)
+
+  if (startOffset > lineStart) {
+    return startLine
   }
+
+  if (startLine == 0) {
+    return 0
+  }
+
+  val prevLine = startLine - 1
+  return detectVisualStartLine(editor, prevLine, startLine, lineStart)
+}
+
+private fun VimFoldRegion.detectVisualStartLine(
+  editor: VimEditor,
+  prevLine: Int,
+  startLine: Int,
+  startLineStart: Int,
+): Int {
+  fun matchesThisFold(offset: Int): Boolean {
+    if (offset < 0 || offset >= editor.fileSize()) return false
+    return editor.getFoldRegionsAtOffset(offset).any { fold ->
+      fold.startOffset == startOffset && fold.endOffset == endOffset
+    }
+  }
+
+  val prevLineStart = editor.getLineStartOffset(prevLine)
+  val prevLineEndOffset = (editor.getLineEndOffset(prevLine) - 1).coerceAtLeast(prevLineStart)
+
+  if (matchesThisFold(prevLineEndOffset)) {
+    return prevLine
+  }
+
+  if (matchesThisFold(startLineStart)) {
+    return startLine
+  }
+
+  return prevLine
 }
 
 interface VimRangeMarker {
