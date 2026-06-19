@@ -53,6 +53,7 @@ usual beta standards.
 * [VIM-4230](https://youtrack.jetbrains.com/issue/VIM-4230) Fixed the single-line message area staying on screen with a stale message — it is now dismissed on redraw (`<C-L>`), scrolling, mode change, `<Esc>`, or after a timeout
 * [VIM-4240](https://youtrack.jetbrains.com/issue/VIM-4240) Fixed empty or blank output showing a persistent empty output panel
 * Fixed `'nomore'` scrolling — output now correctly scrolls to the end when the more-prompt pager is disabled
+* Fixed mode after a mouse selection made while in Insert mode — deselecting now returns to Insert mode instead of Normal mode
 
 ### Changes:
 * The more-prompt pager now supports scrolling back as well as forward (with the keyboard and mouse wheel), matching Vim's keys
