@@ -29,7 +29,7 @@ import com.maddyhome.idea.vim.state.KeyHandlerState
 @CommandOrMotion(keys = ["r"], modes = [Mode.VISUAL])
 class ChangeVisualCharacterAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
-  override val argumentType: Argument.Type = Argument.Type.DIGRAPH
+  override val argumentType: Argument.Type = Argument.Type.CHARACTER
 
   override fun onStartWaitingForArgument(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
     editor.isReplaceCharacter = true

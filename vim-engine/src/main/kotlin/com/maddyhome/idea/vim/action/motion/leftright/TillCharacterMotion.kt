@@ -47,7 +47,7 @@ sealed class TillCharacterMotion(
   private val tillCharacterMotionType: TillCharacterMotionType,
   private val finishBeforeCharacter: Boolean,
 ) : MotionActionHandler.ForEachCaret() {
-  override val argumentType: Argument.Type = Argument.Type.DIGRAPH
+  override val argumentType: Argument.Type = Argument.Type.CHARACTER
   override val motionType: MotionType =
     if (direction == Direction.BACKWARDS) MotionType.EXCLUSIVE else MotionType.INCLUSIVE
 

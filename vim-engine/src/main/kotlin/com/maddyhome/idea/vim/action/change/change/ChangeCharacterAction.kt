@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.state.KeyHandlerState
 @CommandOrMotion(keys = ["r"], modes = [Mode.NORMAL])
 class ChangeCharacterAction : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
-  override val argumentType: Argument.Type = Argument.Type.DIGRAPH
+  override val argumentType: Argument.Type = Argument.Type.CHARACTER
 
   override fun onStartWaitingForArgument(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
     editor.isReplaceCharacter = true
@@ -76,11 +76,8 @@ private fun changeCharacter(editor: VimEditor, caret: VimCaret, count: Int, ch: 
     space = editor.getLeadingWhitespace(editor.offsetToBufferPosition(offset).line)
     logger.debug { "space='$space'" }
   }
-  val repl = StringBuilder(count)
-  for (i in 0 until num) {
-    repl.append(ch)
-  }
-  injector.changeGroup.replaceText(editor, caret, offset, offset + count, repl.toString())
+  val text = buildString(count) { repeat(num) { append(ch) } }
+  injector.changeGroup.replaceText(editor, caret, offset, offset + count, text)
 
   // Indent new line if we replaced with a newline
   if (ch == '\n') {

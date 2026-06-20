@@ -11,7 +11,9 @@ package com.maddyhome.idea.vim.action.change.insert
 import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.KeyHandler
+import com.maddyhome.idea.vim.action.ex.LeaveCommandLineAction
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.VimCommandLine
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
@@ -31,11 +33,7 @@ import javax.swing.KeyStroke
 @CommandOrMotion(keys = ["<C-K>"], modes = [Mode.INSERT])
 class InsertCompletedDigraphAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
-
-  // TODO: This should really just be CHARACTER
-  // The DIGRAPH type indicates that the key handler can start the digraph state machine, but we've already started it.
-  // We're waiting for it to complete and give us a CHARACTER
-  override val argumentType: Argument.Type = Argument.Type.DIGRAPH
+  override val argumentType: Argument.Type = Argument.Type.CHARACTER
 
   override fun onStartWaitingForArgument(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
     val result = keyState.digraphSequence.startDigraphSequence()
@@ -60,12 +58,13 @@ class InsertCompletedDigraphAction : VimActionHandler.SingleExecution() {
  * Command-line mode: insert a digraph character via `<C-K>`
  *
  * Control characters like Escape or Enter are inserted directly into the command line to avoid being matched as
- * commands. Other characters use [VimCommandLine.handleKey] so that overwrite mode is handled correctly.
+ * commands (e.g., [LeaveCommandLineAction]). Other characters use [VimCommandLine.handleKey] so that overwrite mode is
+ * handled correctly.
  */
 @CommandOrMotion(keys = ["<C-K>"], modes = [Mode.CMD_LINE])
 class CmdLineCompletedDigraphAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
-  override val argumentType: Argument.Type = Argument.Type.DIGRAPH
+  override val argumentType: Argument.Type = Argument.Type.CHARACTER
 
   override fun onStartWaitingForArgument(editor: VimEditor, context: ExecutionContext, keyState: KeyHandlerState) {
     val result = keyState.digraphSequence.startDigraphSequence()
