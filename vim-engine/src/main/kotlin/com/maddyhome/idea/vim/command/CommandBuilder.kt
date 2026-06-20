@@ -124,8 +124,7 @@ class CommandBuilder private constructor(
     get() = expectedArgumentType != null && (motionArgument?.let { it.argument == null } ?: (argument == null))
 
   fun isAwaitingCharacterBasedArgument(): Boolean {
-    val awaiting = expectedArgumentType == Argument.Type.DIGRAPH
-      || expectedArgumentType == Argument.Type.CHARACTER
+    val awaiting = expectedArgumentType == Argument.Type.CHARACTER
       || expectedArgumentType == Argument.Type.REGISTER
       || expectedArgumentType == Argument.Type.MARK
     logger.debug { "Awaiting character based argument: $awaiting" }

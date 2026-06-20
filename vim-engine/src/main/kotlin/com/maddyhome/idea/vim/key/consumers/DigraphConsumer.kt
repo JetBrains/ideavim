@@ -25,20 +25,16 @@ import javax.swing.KeyStroke
 /**
  * Key consumer to process digraph sequences and convert them into character keystrokes
  *
- * This consumer processes all incoming keystrokes. If the [CommandBuilder] is waiting for an [Argument.Type.DIGRAPH]
+ * This consumer processes all incoming keystrokes. If the [CommandBuilder] is waiting for an [Argument.Type.CHARACTER]
  * argument, then it will accept the `<C-K>` and `<C-V>` keystrokes to start a digraph or literal input sequence.
- * Alternatively, the command handlers for `<C-K>` and `<C-V>` can start a digraph/literal sequence if there is no
+ * Alternatively, the command handlers for `<C-K>` and `<C-V>` will start a digraph/literal sequence if there is no
  * argument waiting.
  *
  * Keystrokes are consumed until the digraph or literal sequence completes, at which point the resulting character is
- * converted to one or more keystrokes and passed back through the key handler.
+ * converted to one or more keystrokes and passed back through the key handler. Unhandled keystrokes continue through
+ * the key handler pipeline, including the character argument consumer.
  *
- * If the keystroke is unhandled, the key is not consumed and other [KeyConsumer] instances can have a go. If the
- * [CommandBuilder] is currently waiting for an [Argument.Type.DIGRAPH], then it consume the key, and then fallback to
- * an [Argument.Type.CHARACTER] and push the key through the key handler so all [KeyConsumer] instances can see it.
- *
- * The escape and cancel keys will cancel digraph/literal entry, and are consumed by literal entry. When in Command-line
- * mode, the cancel key will also cancel Command-line.
+ * The escape and cancel keys will cancel digraph/literal entry and are treated as consumed.
  */
 internal class DigraphConsumer : KeyConsumer {
   private companion object {
@@ -70,7 +66,7 @@ internal class DigraphConsumer : KeyConsumer {
     val commandBuilder = keyState.commandBuilder
     val digraphSequence = keyState.digraphSequence
 
-    if (commandBuilder.expectedArgumentType == Argument.Type.DIGRAPH) {
+    if (commandBuilder.expectedArgumentType == Argument.Type.CHARACTER) {
       logger.trace("Expected argument is digraph")
       if (digraphSequence.isDigraphStart(key)) {
         digraphSequence.startDigraphSequence()
