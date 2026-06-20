@@ -23,6 +23,14 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+## [To Be Released]
+
+### Fixes:
+* [VIM-1082](https://youtrack.jetbrains.com/issue/VIM-1082) Fixed operators (`d`, `c`, `y`) over collapsed folds — a fold is now removed only when the motion actually covers the start of the folded region, so `dd` on a collapsed fold header deletes the whole region while `dl` mid-line on the header deletes only one character
+
+### Merged PRs:
+* [1853](https://github.com/JetBrains/ideavim/pull/1853) by [1grzyb1](https://github.com/1grzyb1): VIM-1082 adjust motion for fold regions
+
 ## 2.39.0, 2026-06-18
 
 ### Features:
