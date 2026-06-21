@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.key.KeyConsumer
+import com.maddyhome.idea.vim.key.KeySource
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.state.mode.Mode
@@ -56,7 +57,7 @@ internal class CommandKeyConsumer : KeyConsumer {
   override fun isApplicable(
     key: KeyStroke,
     editor: VimEditor,
-    allowKeyMappings: Boolean,
+    keySource: KeySource,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
     // A key is a command key if there are no expected arguments (we're at the start of a command, or a multi-key
@@ -75,7 +76,7 @@ internal class CommandKeyConsumer : KeyConsumer {
   override fun consumeKey(
     key: KeyStroke,
     editor: VimEditor,
-    allowKeyMappings: Boolean,
+    keySource: KeySource,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
     logger.trace("Entered CommandConsumer")

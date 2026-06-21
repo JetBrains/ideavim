@@ -21,6 +21,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.isCommandLineActionChar
+import com.maddyhome.idea.vim.key.KeySource
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import javax.swing.KeyStroke
 
@@ -49,7 +50,7 @@ class InsertCompletedDigraphAction : VimActionHandler.SingleExecution() {
     val argument = cmd.argument as? Argument.Character ?: return false
     val keyStroke = KeyStroke.getKeyStroke(argument.character)
     val keyHandler = KeyHandler.getInstance()
-    keyHandler.handleKey(editor, keyStroke, context, keyHandler.keyHandlerState)
+    keyHandler.handleKey(editor, keyStroke, KeySource.DIGRAPH, context, keyHandler.keyHandlerState)
     return true
   }
 }

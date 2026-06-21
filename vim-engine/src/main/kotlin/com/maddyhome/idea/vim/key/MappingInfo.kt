@@ -100,9 +100,14 @@ class ToKeysMappingInfo(
     try {
       var first = true
       while (keyHandler.keyStack.hasStroke()) {
+        val keySource = if (!isRecursive || (first && lhsIsPrefixOfRhs)) {
+          KeySource.MAPPED_NON_RECURSIVE
+        }
+        else {
+          KeySource.MAPPED
+        }
         val keyStroke = keyHandler.keyStack.feedStroke()
-        val allowKeyMappings = isRecursive && !(first && lhsIsPrefixOfRhs)
-        keyHandler.handleKey(editor, keyStroke, context, allowKeyMappings, keyState)
+        keyHandler.handleKey(editor, keyStroke, keySource, context, keyState)
         first = false
         if (keyHandler.maxMapDepthReached) break
       }
@@ -143,9 +148,14 @@ class ToExpressionMappingInfo(
     val lhsIsPrefixOfRhs = KeyHandler.isPrefix(fromKeys, toKeys)
     var first = true
     for (keyStroke in toKeys) {
-      val allowKeyMappings = isRecursive && !(first && lhsIsPrefixOfRhs)
+      val keySource = if (!isRecursive || (first && lhsIsPrefixOfRhs)) {
+        KeySource.MAPPED_NON_RECURSIVE
+      }
+      else {
+        KeySource.MAPPED
+      }
       val keyHandler = KeyHandler.getInstance()
-      keyHandler.handleKey(editor, keyStroke, context, allowKeyMappings, keyState)
+      keyHandler.handleKey(editor, keyStroke, keySource, context, keyState)
       first = false
     }
   }

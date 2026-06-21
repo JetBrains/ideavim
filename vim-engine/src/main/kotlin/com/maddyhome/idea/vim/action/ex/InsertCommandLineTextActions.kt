@@ -17,6 +17,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getText
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.key.KeySource
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -56,10 +57,10 @@ open class InsertCommandLineTextActionBase(private val insertLiterally: Boolean)
       if (shouldInsertLiterally(key)) {
         // Reuse existing mechanisms to insert a control character literally by passing <C-V> first
         injector.parser.parseKeys("<C-V>").forEach {
-          keyHandler.handleKey(editor, it, context, keyHandler.keyHandlerState)
+          keyHandler.handleKey(editor, it, KeySource.SYNTHETIC_TYPED_NOT_MAPPED, context, keyHandler.keyHandlerState)
         }
       }
-      keyHandler.handleKey(editor, key, context, allowKeyMappings = false, keyHandler.keyHandlerState)
+      keyHandler.handleKey(editor, key, KeySource.SYNTHETIC_TYPED_NOT_MAPPED, context, keyHandler.keyHandlerState)
     }
   }
 

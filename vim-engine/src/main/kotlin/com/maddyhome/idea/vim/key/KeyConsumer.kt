@@ -24,7 +24,7 @@ internal interface KeyConsumer {
   fun isApplicable(
     key: KeyStroke,
     editor: VimEditor,
-    allowKeyMappings: Boolean,
+    keySource: KeySource,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean
 
@@ -38,7 +38,7 @@ internal interface KeyConsumer {
   fun consumeKey(
     key: KeyStroke,
     editor: VimEditor,
-    allowKeyMappings: Boolean,
+    keySource: KeySource,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean
 }

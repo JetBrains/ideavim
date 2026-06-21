@@ -8,6 +8,7 @@
 package com.maddyhome.idea.vim
 
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.Key
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
@@ -20,6 +21,7 @@ import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.key.KeyConsumer
+import com.maddyhome.idea.vim.key.KeySource
 import com.maddyhome.idea.vim.key.KeyStack
 import com.maddyhome.idea.vim.key.consumers.CharArgumentConsumer
 import com.maddyhome.idea.vim.key.consumers.CommandCountConsumer
@@ -99,48 +101,47 @@ class KeyHandler {
   var lastUsedEditorInfo: LastUsedEditorInfo = LastUsedEditorInfo(-1, false)
 
   /**
-   * This is the main key handler for the Vim plugin. Every keystroke not handled directly by Idea is sent here for
-   * processing.
+   * Main entry point to process every keystroke for Vim functionality
    *
-   * @param editor  The editor the key was typed into
-   * @param key     The keystroke typed by the user
-   * @param context The data context
-   */
-  fun handleKey(editor: VimEditor, key: KeyStroke, context: ExecutionContext, keyState: KeyHandlerState) {
-    commandListener.forEach { it() }
-    handleKey(editor, key, context, allowKeyMappings = true, keyState)
-  }
-
-  /**
-   * Handling input keys with additional parameters
+   * The key handler will process every keystroke according to current mode and state of e.g. command builder, mapping
+   * and digraphs. The keystroke will potentially be mapped and used as part of a Vim motion or operator, or inserted
+   * directly into the editor or current command line/search entry. The source of the keystroke is important to decide
+   * if the key should be mapped, or if `'langmap'` should be applied.
    *
-   * @param allowKeyMappings If we allow key mappings or not
+   * @param editor    The editor the key was typed into
+   * @param key       The keystroke typed by the user
+   * @param keySource Where did the keystroke come from? E.g. typed, result of a map or non-recursive map, etc.
+   * @param context   The data context
+   * @param keyState  Various state for managing the keystroke, such as command builder, mapping and digraph state
    */
   fun handleKey(
     editor: VimEditor,
     key: KeyStroke,
+    keySource: KeySource,
     context: ExecutionContext,
-    allowKeyMappings: Boolean,
     keyState: KeyHandlerState,
   ) {
-    val result = processKey(key, editor, allowKeyMappings, KeyProcessResult.SynchronousKeyProcessBuilder(keyState))
+    if (keySource == KeySource.TYPED) {
+      commandListener.forEach { it() }
+    }
+    val result = processKey(key, editor, keySource, KeyProcessResult.SynchronousKeyProcessBuilder(keyState))
     if (result is KeyProcessResult.Executable) {
       result.execute(editor, context)
     }
   }
 
-  /**
-   * Use this to execute key handling without recording them in macro
-   */
-  fun withoutRecording(unit: () -> Unit) {
-    handleKeyRecursionCount++
-    try {
-      unit()
-    } finally {
-      handleKeyRecursionCount--
-    }
+  // Deprecated. Has external usages
+  @Deprecated(
+    "Use handleKey(editor, key, keySource, context, keyState)",
+    replaceWith = ReplaceWith("handleKey(editor, key, KeySource.TYPED, context, keyState)")
+  )
+  @ApiStatus.ScheduledForRemoval
+  fun handleKey(editor: VimEditor, key: KeyStroke, context: ExecutionContext, keyState: KeyHandlerState) {
+    handleKey(editor, key, KeySource.TYPED, context, keyState)
   }
 
+  // Deprecated. Has external usages
+  @Suppress("unused")
   @Deprecated(
     "Use `handleKey(editor, key, context, allowKeyMappings, keyState)` instead.",
     replaceWith = ReplaceWith("handleKey(editor, key, context, allowKeyMappings, keyState)")
@@ -154,7 +155,8 @@ class KeyHandler {
     mappingCompleted: Boolean,
     keyState: KeyHandlerState,
   ) {
-    handleKey(editor, key, context, allowKeyMappings, keyState)
+    val keySource = if (allowKeyMappings) KeySource.TYPED else KeySource.MAPPED_NON_RECURSIVE
+    handleKey(editor, key, keySource, context, keyState)
   }
 
   /**
@@ -167,14 +169,14 @@ class KeyHandler {
   private fun processKey(
     key: KeyStroke,
     editor: VimEditor,
-    allowKeyMappings: Boolean,
+    keySource: KeySource,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): KeyProcessResult {
     synchronized(lock) {
       logger.trace {
         """
         ------- Key Handler -------
-        Start key processing. allowKeyMappings: $allowKeyMappings
+        Start key processing. source: $keySource
         Key: $key
       """.trimIndent()
       }
@@ -201,8 +203,8 @@ class KeyHandler {
       try {
         val isProcessed = keyConsumers.any {
           // These two lines are specifically formatted to allow setting a breakpoint on the consumeKey line :)
-          it.isApplicable(key, editor, allowKeyMappings, keyProcessResultBuilder)
-            && it.consumeKey(key, editor, allowKeyMappings, keyProcessResultBuilder)
+          it.isApplicable(key, editor, keySource, keyProcessResultBuilder)
+            && it.consumeKey(key, editor, keySource, keyProcessResultBuilder)
         }
         if (isProcessed) {
           logger.trace { "Key was successfully caught by consumer" }
@@ -221,6 +223,18 @@ class KeyHandler {
         keyProcessResultBuilder.onFinish = { handleKeyRecursionCount-- }
       }
       return keyProcessResultBuilder.build()
+    }
+  }
+
+  /**
+   * Use this to execute key handling without recording them in macro
+   */
+  fun withoutRecording(unit: () -> Unit) {
+    handleKeyRecursionCount++
+    try {
+      unit()
+    } finally {
+      handleKeyRecursionCount--
     }
   }
 

@@ -18,6 +18,7 @@ import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.isCloseKeyStroke
 import com.maddyhome.idea.vim.key.KeyConsumer
+import com.maddyhome.idea.vim.key.KeySource
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import com.maddyhome.idea.vim.state.mode.Mode
 import java.awt.event.KeyEvent
@@ -45,7 +46,7 @@ internal class EditorResetConsumer : KeyConsumer {
   override fun isApplicable(
     key: KeyStroke,
     editor: VimEditor,
-    allowKeyMappings: Boolean,
+    keySource: KeySource,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
     val editorReset = editor.mode is Mode.NORMAL && key.isCloseKeyStroke()
@@ -56,7 +57,7 @@ internal class EditorResetConsumer : KeyConsumer {
   override fun consumeKey(
     key: KeyStroke,
     editor: VimEditor,
-    allowKeyMappings: Boolean,
+    keySource: KeySource,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
     logger.trace { "Entered EditorResetConsumer" }

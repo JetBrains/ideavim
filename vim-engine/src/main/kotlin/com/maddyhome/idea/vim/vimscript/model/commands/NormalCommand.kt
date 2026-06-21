@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ranges.Range
+import com.maddyhome.idea.vim.key.KeySource
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
@@ -34,8 +35,6 @@ data class NormalCommand(val range: Range, val modifier: CommandModifier, val ar
     context: ExecutionContext,
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
-    val useMappings = modifier != CommandModifier.BANG
-
     val rangeSpecified = range.size() != 0
     val range = getLineRange(editor, editor.primaryCaret())
 
@@ -54,7 +53,9 @@ data class NormalCommand(val range: Range, val modifier: CommandModifier, val ar
       val keyHandler = KeyHandler.getInstance()
       keyHandler.reset(editor)
       for (key in keys) {
-        keyHandler.handleKey(editor, key, context, useMappings, keyHandler.keyHandlerState)
+        val keySource =
+          if (modifier == CommandModifier.BANG) KeySource.NORMAL_COMMAND_NOT_MAPPED else KeySource.NORMAL_COMMAND
+        keyHandler.handleKey(editor, key, keySource, context, keyHandler.keyHandlerState)
       }
 
       // Exit if state leaves as insert or cmd_line
