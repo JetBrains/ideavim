@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.command.CommandBuilder
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.key.KeyConsumer
+import com.maddyhome.idea.vim.key.KeySource
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import com.maddyhome.idea.vim.state.mode.Mode
 import javax.swing.KeyStroke
@@ -33,7 +34,7 @@ internal class StartSelectRegisterConsumer : KeyConsumer {
   override fun isApplicable(
     key: KeyStroke,
     editor: VimEditor,
-    allowKeyMappings: Boolean,
+    keySource: KeySource,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
     return isSelectRegister(key, keyProcessResultBuilder.state)
@@ -42,7 +43,7 @@ internal class StartSelectRegisterConsumer : KeyConsumer {
   override fun consumeKey(
     key: KeyStroke,
     editor: VimEditor,
-    allowKeyMappings: Boolean,
+    keySource: KeySource,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
     logger.trace { "Entered StartSelectRegisterConsumer" }

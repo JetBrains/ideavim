@@ -18,6 +18,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.MessageHelper
+import com.maddyhome.idea.vim.key.KeySource
 import com.maddyhome.idea.vim.macro.VimMacroBase
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
@@ -82,7 +83,13 @@ class MacroGroup : VimMacroBase() {
                   // Prevent autocompletion during macros.
                   // See https://github.com/JetBrains/ideavim/pull/772 for details
                   CompletionServiceImpl.setCompletionPhase(CompletionPhase.NoCompletion)
-                  keyHandler.handleKey(currentEditor, key, context, keyHandler.keyHandlerState)
+                  keyHandler.handleKey(
+                    currentEditor,
+                    key,
+                    KeySource.MACRO_PLAYBACK,
+                    context,
+                    keyHandler.keyHandlerState
+                  )
                 }
                 if (injector.messages.isError()) return@runnable
               }

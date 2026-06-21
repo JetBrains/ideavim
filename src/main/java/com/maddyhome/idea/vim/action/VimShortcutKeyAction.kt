@@ -42,6 +42,7 @@ import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.helper.isPrimaryEditor
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.impl.state.toMappingMode
+import com.maddyhome.idea.vim.key.KeySource
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.listener.AceJumpService
@@ -85,7 +86,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
       try {
         val start = if (traceTime) System.currentTimeMillis() else null
         val keyHandler = KeyHandler.getInstance()
-        keyHandler.handleKey(editor.vim, keyStroke, e.dataContext.vim, keyHandler.keyHandlerState)
+        keyHandler.handleKey(editor.vim, keyStroke, KeySource.TYPED, e.dataContext.vim, keyHandler.keyHandlerState)
         if (start != null) {
           val duration = System.currentTimeMillis() - start
           LOG.info("VimShortcut execution '$keyStroke': $duration ms")

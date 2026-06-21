@@ -20,6 +20,7 @@ import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.key.KeyMapping
+import com.maddyhome.idea.vim.key.KeySource
 import com.maddyhome.idea.vim.key.MappingInfo
 import com.maddyhome.idea.vim.state.KeyHandlerState
 import javax.swing.KeyStroke
@@ -51,15 +52,15 @@ internal object MappingProcessor : KeyConsumer {
   override fun isApplicable(
     key: KeyStroke,
     editor: VimEditor,
-    allowKeyMappings: Boolean,
+    keySource: KeySource,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
-    if (!allowKeyMappings) {
-      log.trace("Mapping not allowed for key")
+    if (!keySource.allowsKeyMapping) {
+      log.trace { "Mapping not allowed for key: $key (source: $keySource)" }
       return false
     }
     if (!isMappingApplicable(keyProcessResultBuilder.state.commandBuilder, key, keyProcessResultBuilder.state)) {
-      log.trace { "Mapping not applicable for key: $key" }
+      log.trace { "Mapping not applicable for key: $key (source: $keySource)" }
       return false
     }
     return true
@@ -68,7 +69,7 @@ internal object MappingProcessor : KeyConsumer {
   override fun consumeKey(
     key: KeyStroke,
     editor: VimEditor,
-    allowKeyMappings: Boolean,
+    keySource: KeySource,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
     log.trace { "Entered MappingProcessor with key $key" }
@@ -306,9 +307,10 @@ internal object MappingProcessor : KeyConsumer {
 
         executeMappingInfo(mappingInfo, editor, context, keyState)
 
-        // Replay the rest of the keys, with mapping applied, as though they were typed
+        // If we have any keys left unprocessed, replay them, with mappings, as though they were typed
         unhandledKeys.subList(keys.size, unhandledKeys.size).forEach {
-          KeyHandler.getInstance().handleKey(editor, it, context, allowKeyMappings = true, keyState)
+          // TODO: This isn't always typed by a user. Is there a scenario where this matters? Langmap perhaps?
+          KeyHandler.getInstance().handleKey(editor, it, KeySource.TYPED, context, keyState)
         }
         return
       }
@@ -323,7 +325,8 @@ internal object MappingProcessor : KeyConsumer {
     // though they were typed.
     val keyHandler = KeyHandler.getInstance()
     unhandledKeys.forEachIndexed { index, it ->
-      keyHandler.handleKey(editor, it, context, allowKeyMappings = index != 0, keyState)
+      val keySource = if (index == 0) KeySource.MAPPING_PREFIX_REPLAY else KeySource.TYPED
+      keyHandler.handleKey(editor, it, keySource, context, keyState)
     }
   }
 }

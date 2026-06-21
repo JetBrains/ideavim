@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.helper.TestInputModel
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.inRepeatMode
 import com.maddyhome.idea.vim.helper.noneOfEnum
+import com.maddyhome.idea.vim.key.KeySource
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.newapi.vim
@@ -148,7 +149,9 @@ object VimExtensionFacade {
   fun executeNormalWithoutMapping(keys: List<KeyStroke>, editor: Editor) {
     val context = injector.executionContextManager.getEditorExecutionContext(editor.vim)
     val keyHandler = KeyHandler.getInstance()
-    keys.forEach { keyHandler.handleKey(editor.vim, it, context, false, keyHandler.keyHandlerState) }
+    keys.forEach {
+      keyHandler.handleKey(editor.vim, it, KeySource.NORMAL_COMMAND_NOT_MAPPED, context, keyHandler.keyHandlerState)
+    }
   }
 
   /** Returns a single key stroke from the user input similar to 'getchar()'. */
