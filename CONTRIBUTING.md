@@ -29,6 +29,10 @@ Yoo hoo! You’re all set to begin contributing.
 We've prepared some useful configurations for you:
 
 - `Start IJ with IdeaVim`
+- `Start CLion with IdeaVim`
+- `Start PyCharm with IdeaVim`
+- `Start Rider with IdeaVim`
+- `Start WebStorm with IdeaVim`
 - `IdeaVim tests`
 - `IdeaVim full verification`
 
@@ -36,8 +40,12 @@ We've prepared some useful configurations for you:
 
 And here are useful gradle commands:
 
-* `./gradlew runIde` — start the dev version of IntelliJ IDEA with IdeaVim installed.
-* `./gradlew test -x :tests:property-tests:test -x :tests:long-running-tests:test` — run tests.
+* `./gradlew runIde` — start the dev version of IntelliJ IDEA with IdeaVim installed. This is called by the `Start IJ with IdeaVIM` configuration.
+* `./gradlew runClion` — start the dev version of CLion with IdeaVim installed. This is called by the `Start CLion with IdeaVIM` configuration.
+* `./gradlew runPycharm` — start the dev version of PyCharm with IdeaVim installed. This is called by the `Start PyCharm with IdeaVIM` configuration.
+* `./gradlew runRider` — start the dev version of Rider with IdeaVim installed. This is called by the `Start Rider with IdeaVIM` configuration.
+* `./gradlew runWebstorm` — start the dev version of WebStorm with IdeaVim installed. This is called by the `Start WebStorm with IdeaVIM` configuration.
+* `./gradlew test -x :tests:property-tests:test -x :tests:long-running-tests:test` — run tests. This is called by the `IdeaVim tests` configuration.
 * `./gradlew buildPlugin` — build the plugin. The result will be located in `build/distributions`. This file can be
 installed by using `Settings | Plugin | >Gear Icon< | Install Plugin from Disk...`. You can stay with your personal build
 for a few days or send it to a friend for testing.
