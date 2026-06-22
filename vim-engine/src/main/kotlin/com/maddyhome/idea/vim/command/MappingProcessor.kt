@@ -149,8 +149,7 @@ internal object MappingProcessor : KeyConsumer {
       keyProcessResultBuilder.addExecutionStep { ks, _, c ->
         ks.mappingState.startMappingTimer { onUnfinishedMappingSequenceTimeout(editor, ks, c) }
       }
-    }
-    else {
+    } else {
       log.trace("'timeout' is not set. Waiting for the next keystroke")
     }
     return true
@@ -175,7 +174,9 @@ internal object MappingProcessor : KeyConsumer {
         return@invokeLater
       }
 
-      replayUnhandledKeys(unhandledKeys, editor, context, keyState)
+      KeyHandler.getInstance().withoutRecording {
+        replayUnhandledKeys(unhandledKeys, editor, context, keyState)
+      }
     }
   }
 
@@ -266,7 +267,10 @@ internal object MappingProcessor : KeyConsumer {
 
     keyProcessResultBuilder.addExecutionStep { ks, e, c ->
       log.trace("Replaying abandoned keys")
-      replayUnhandledKeys(unhandledKeyStrokes, e, c, ks)
+      val keyHandler = KeyHandler.getInstance()
+      keyHandler.withoutRecording {
+        replayUnhandledKeys(unhandledKeyStrokes, e, c, ks)
+      }
       log.trace("Abandoned keys processed. Returning true.")
     }
     return true

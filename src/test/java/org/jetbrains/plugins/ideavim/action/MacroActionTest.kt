@@ -58,17 +58,21 @@ class MacroActionTest : VimTestCase() {
   @Test
   @TestWithoutNeovim(reason = SkipNeovimReason.ACTION_COMMAND)
   fun testMacroWithIdeAction() {
-    configureByText("""One
+    configureByText(
+      """One
       |Two
       |Three
-      |Four""".trimMargin())
+      |Four""".trimMargin()
+    )
     enterCommand("map j <Action>(EditorDown)")
     typeText(injector.parser.parseKeys("qa" + "j" + "q"))
     typeText(injector.parser.parseKeys("@a"))
-    assertState("""One
+    assertState(
+      """One
       |Two
       |${c}Three
-      |Four""".trimMargin())
+      |Four""".trimMargin()
+    )
   }
 
   @Test
@@ -511,5 +515,15 @@ class MacroActionTest : VimTestCase() {
     setText("")
     typeText("\"ap")
     assertState("iX\nY" + '\u001B')
+  }
+
+  @Test
+  fun `should not record y twice when followed by motion`() {
+    configureByText("${c}Spider man")
+    enterCommand("map ys :echo 'hi'<CR>")
+    typeText("qa", "y")
+    Thread.sleep(2000)
+    typeText("w", "q")
+    assertRegister('a', "yw")
   }
 }

@@ -55,7 +55,7 @@ class KeyHandler {
     StartSelectRegisterConsumer(),  // Must be before command consumer, so " isn't treated as a command char
     SelectRegisterConsumer(),
     DigraphConsumer(),    // Must be before command key consumer so {char}<BS>{char} works.
-                          // Would be a problem if a command prefix requires a DIGRAPH arg (no such command exists)
+    // Would be a problem if a command prefix requires a DIGRAPH arg (no such command exists)
     CommandKeyConsumer(), // Must be before argument consumers, to handle c_CTRL-R prefix
     CharArgumentConsumer(),
     ModeInputConsumer()   // Must be last to accept the keystroke as typed input
@@ -124,6 +124,18 @@ class KeyHandler {
     val result = processKey(key, editor, allowKeyMappings, KeyProcessResult.SynchronousKeyProcessBuilder(keyState))
     if (result is KeyProcessResult.Executable) {
       result.execute(editor, context)
+    }
+  }
+
+  /**
+   * Use this to execute key handling without recording them in macro
+   */
+  fun withoutRecording(unit: () -> Unit) {
+    handleKeyRecursionCount++
+    try {
+      unit()
+    } finally {
+      handleKeyRecursionCount--
     }
   }
 
