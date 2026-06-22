@@ -35,7 +35,7 @@ class ActionsTest : VimTestCase() {
       """
       Lorem Ipsum
 
-      Lorem ipsum dolor sit amet,$c
+      Lorem ipsum dolor sit amet$c,
        consectetur adipiscing elit
       Sed in orci mauris.
       Cras id tellus in ex imperdiet egestas.
