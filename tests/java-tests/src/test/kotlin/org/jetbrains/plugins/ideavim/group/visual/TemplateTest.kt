@@ -19,6 +19,9 @@ import com.intellij.ide.DataManager
 import com.intellij.injected.editor.EditorWindow
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiExpression
+import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.refactoring.introduceVariable.IntroduceVariableHandler
 import com.intellij.refactoring.rename.inplace.VariableInplaceRenameHandler
 import com.intellij.testFramework.PlatformTestUtil
 import com.intellij.testFramework.fixtures.CodeInsightTestUtil.doInlineRename
@@ -31,6 +34,7 @@ import org.jetbrains.plugins.ideavim.VimJavaTestCase
 import org.jetbrains.plugins.ideavim.assertModeDoesNotChange
 import org.jetbrains.plugins.ideavim.waitAndAssertMode
 import org.jetbrains.plugins.ideavim.waitUntilSelectionUpdated
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -1330,6 +1334,40 @@ class TemplateTest : VimJavaTestCase() {
     assertTemplateFinished()
   }
 
+  @Test
+  fun `test introduce variable with keep option places caret on last char of refactor box`() {
+    configureByJavaText(
+      """
+        |class Hello {
+        |  public static void main() {
+        |    System.out.println(${c}42);
+        |  }
+        |}
+      """.trimMargin()
+    )
+    enterCommand("set idearefactormode=keep")
+
+    ApplicationManager.getApplication().invokeAndWait {
+      var expression: PsiExpression? = null
+      ApplicationManager.getApplication().runReadAction {
+        val element = fixture.file.findElementAt(fixture.editor.caretModel.offset)
+        expression = PsiTreeUtil.getParentOfType(element, PsiExpression::class.java, false)
+      }
+      IntroduceVariableHandler().invoke(fixture.project, fixture.editor, expression!!)
+      PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
+    }
+
+    assertModeDoesNotChange(fixture.editor, Mode.NORMAL())
+    assertTemplateActive()
+
+    val templateState = TemplateManagerImpl.getTemplateState(fixture.editor)!!
+    val variableRange = templateState.currentVariableRange!!
+    // Caret must be on the last character of the variable name (inside the box), not after it
+    ApplicationManager.getApplication().runReadAction {
+      assertEquals(variableRange.endOffset - 1, fixture.editor.caretModel.offset)
+    }
+  }
+
   private fun startRenaming(handler: VariableInplaceRenameHandler) {
     val editor = if (fixture.editor is EditorWindow) (fixture.editor as EditorWindow).delegate else fixture.editor
 
@@ -1361,11 +1399,9 @@ class TemplateTest : VimJavaTestCase() {
     waitUntilSelectionUpdated(fixture.editor)
   }
 
-  private fun assertTemplateActive() =
-    assertNotNull(TemplateManagerImpl.getTemplateState(fixture.editor))
+  private fun assertTemplateActive() = assertNotNull(TemplateManagerImpl.getTemplateState(fixture.editor))
 
-  private fun assertTemplateFinished() =
-    assertNull(TemplateManagerImpl.getTemplateState(fixture.editor))
+  private fun assertTemplateFinished() = assertNull(TemplateManagerImpl.getTemplateState(fixture.editor))
 
   private val dataContext
     get() = DataManager.getInstance().getDataContext(fixture.editor.component)
