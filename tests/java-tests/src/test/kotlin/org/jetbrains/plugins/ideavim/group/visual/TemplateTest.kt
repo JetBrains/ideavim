@@ -1123,7 +1123,7 @@ class TemplateTest : VimJavaTestCase() {
 
     moveToNextVariable()
     assertMode(Mode.NORMAL())
-    assertState("var foo = 239;${c}")
+    assertState("var foo = 239${c};")
     assertTemplateFinished()
   }
 
@@ -1191,7 +1191,7 @@ class TemplateTest : VimJavaTestCase() {
     moveToNextVariable()  // V2 -> End
 
     assertMode(Mode.NORMAL())
-    assertState("var foo = 239;${c}")
+    assertState("var foo = 239${c};")
     assertTemplateFinished()
   }
 
@@ -1259,7 +1259,7 @@ class TemplateTest : VimJavaTestCase() {
 
     moveToNextVariable()
     assertMode(Mode.NORMAL())
-    assertState("var foo = 239;${c}")
+    assertState("var foo = 239${c};")
     assertTemplateFinished()
   }
 

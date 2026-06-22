@@ -43,13 +43,16 @@ import com.maddyhome.idea.vim.action.VimShortcutKeyAction
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimKeyGroupBase
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.api.normalizeOffset
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.hasVisualSelection
+import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
+import com.maddyhome.idea.vim.helper.vimInitialised
 import com.maddyhome.idea.vim.ide.isClionNova
 import com.maddyhome.idea.vim.ide.isRider
 import com.maddyhome.idea.vim.newapi.globalIjOptions
@@ -91,7 +94,7 @@ internal object IdeaSpecifics {
         saveJumpBeforeGoto(event, editor)
       }
 
-      val isVimAction = (action as? AnActionWrapper)?.delegate is VimShortcutKeyAction
+      val isVimAction = isVimAction(action)
       if (!isVimAction && injector.vimState.mode == Mode.INSERT && action !is EnterAction) {
         val undoService = injector.undo as VimTimestampBasedUndoService
         val nanoTime = System.nanoTime()
@@ -184,10 +187,32 @@ internal object IdeaSpecifics {
       }
       //endregion
 
+      if (!isVimAction(action)) {
+        normalizeCarets(editor)
+      }
+
       this.editor = null
 
       this.completionData?.dispose()
       this.completionData = null
+    }
+
+    private fun isVimAction(action: AnAction): Boolean = (action as? AnActionWrapper)?.delegate is VimShortcutKeyAction
+
+    private fun normalizeCarets(editor: Editor?) {
+      editor?.let { ij ->
+        if (!ij.vimInitialised) return@let
+        val vimEditor = ij.vim
+        if (vimEditor.isEndAllowed) {
+          return
+        }
+        for (caret in ij.caretModel.allCarets) {
+          val normalized = vimEditor.normalizeOffset(caret.offset, false)
+          if (normalized != caret.offset) {
+            caret.moveToOffset(normalized)
+          }
+        }
+      }
     }
 
     private fun isGotoAction(actionId: String?): Boolean =
