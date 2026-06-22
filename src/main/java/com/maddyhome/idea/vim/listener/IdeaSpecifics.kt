@@ -17,6 +17,7 @@ import com.intellij.codeInsight.template.Template
 import com.intellij.codeInsight.template.TemplateEditingAdapter
 import com.intellij.codeInsight.template.TemplateManagerListener
 import com.intellij.codeInsight.template.impl.TemplateImpl
+import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.intellij.codeInsight.template.impl.TemplateState
 import com.intellij.find.FindModelListener
 import com.intellij.ide.actions.ApplyIntentionAction
@@ -30,6 +31,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.actionSystem.ex.AnActionListener
 import com.intellij.openapi.actionSystem.impl.ProxyShortcutSet
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.RangeMarker
 import com.intellij.openapi.editor.actions.EnterAction
@@ -337,6 +339,7 @@ internal object IdeaSpecifics {
           // oldIndex == newIndex == -1.
           if (vimEditor.isIdeaRefactorModeKeep) {
             IdeaRefactorModeHelper.correctEditorSelection(templateState.editor)
+            adjustCaretIntoTemplateRange(vimEditor)
           } else {
             // The editor places the caret at the exclusive end of the variable. For Visual, unless we've enabled
             // exclusive selection, move it to the inclusive end.
@@ -374,6 +377,17 @@ internal object IdeaSpecifics {
                   vimEditor.mode = Mode.NORMAL()
                 }
               }
+            }
+          }
+        }
+
+        private fun adjustCaretIntoTemplateRange(vimEditor: VimEditor) {
+          ApplicationManager.getApplication().invokeLater {
+            if (editor.isDisposed) return@invokeLater
+            if (vimEditor.mode !is Mode.NORMAL) return@invokeLater
+            val range = TemplateManagerImpl.getTemplateState(editor)?.currentVariableRange ?: return@invokeLater
+            if (!range.isEmpty && editor.caretModel.offset >= range.endOffset) {
+              editor.caretModel.moveToOffset(range.endOffset - 1)
             }
           }
         }
