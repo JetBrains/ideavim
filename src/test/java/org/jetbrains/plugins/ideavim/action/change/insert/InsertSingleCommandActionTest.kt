@@ -17,11 +17,51 @@ class InsertSingleCommandActionTest : SingleCommandActionTest() {
   override val mode: Mode = Mode.INSERT
 
   @Test
-  fun `test ctrl-o at end of line`() {
+  fun `test ctrl-o db at end of line`() {
     doTest(
       listOf(command, "<C-O>", "db"),
       "first line${c}\nsecond line",
-      "first e${c}\nsecond line",
+      "first ${c}e\nsecond line",
+      mode,
+    )
+  }
+
+  @Test
+  fun `test ctrl-o x at end of line`() {
+    doTest(
+      listOf(command, "<C-O>", "x"),
+      "first line${c}\nsecond line",
+      "first lin${c}\nsecond line",
+      mode,
+    )
+  }
+
+  @Test
+  fun `test ctrl-o D at end of line`() {
+    doTest(
+      listOf(command, "<C-O>", "D"),
+      "first line${c}\nsecond line",
+      "first lin${c}\nsecond line",
+      mode,
+    )
+  }
+
+  @Test
+  fun `test ctrl-o db not at end of line`() {
+    doTest(
+      listOf(command, "<C-O>", "db"),
+      "first li${c}ne\nsecond line",
+      "first ${c}ne\nsecond line",
+      mode,
+    )
+  }
+
+  @Test
+  fun `test ctrl-o x not at end of line`() {
+    doTest(
+      listOf(command, "<C-O>", "x"),
+      "first li${c}ne\nsecond line",
+      "first l${c}ne\nsecond line",
       mode,
     )
   }
@@ -32,11 +72,31 @@ class ReplaceSingleCommandActionTest : SingleCommandActionTest() {
   override val mode: Mode = Mode.REPLACE
 
   @Test
-  fun `test ctrl-o at end of line`() {
+  fun `test ctrl-o db at end of line`() {
     doTest(
       listOf(command, "<C-O>", "db"),
       "first line${c}\nsecond line",
       "first ${c}e\nsecond line",
+      mode,
+    )
+  }
+
+  @Test
+  fun `test ctrl-o x at end of line`() {
+    doTest(
+      listOf(command, "<C-O>", "x"),
+      "first line${c}\nsecond line",
+      "first lin${c}\nsecond line",
+      mode,
+    )
+  }
+
+  @Test
+  fun `test ctrl-o x not at end of line`() {
+    doTest(
+      listOf(command, "<C-O>", "x"),
+      "first li${c}ne\nsecond line",
+      "first l${c}ne\nsecond line",
       mode,
     )
   }
