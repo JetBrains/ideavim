@@ -21,7 +21,7 @@ class InsertSingleCommandActionTest : SingleCommandActionTest() {
     doTest(
       listOf(command, "<C-O>", "db"),
       "first line${c}\nsecond line",
-      "first ${c}e\nsecond line",
+      "first e${c}\nsecond line",
       mode,
     )
   }
@@ -61,7 +61,7 @@ class InsertSingleCommandActionTest : SingleCommandActionTest() {
     doTest(
       listOf(command, "<C-O>", "x"),
       "first li${c}ne\nsecond line",
-      "first l${c}ne\nsecond line",
+      "first li${c}e\nsecond line",
       mode,
     )
   }
@@ -96,7 +96,7 @@ class ReplaceSingleCommandActionTest : SingleCommandActionTest() {
     doTest(
       listOf(command, "<C-O>", "x"),
       "first li${c}ne\nsecond line",
-      "first l${c}ne\nsecond line",
+      "first li${c}e\nsecond line",
       mode,
     )
   }
