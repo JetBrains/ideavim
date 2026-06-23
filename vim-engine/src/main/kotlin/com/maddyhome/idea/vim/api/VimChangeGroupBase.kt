@@ -86,6 +86,9 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   @JvmField
   protected var lastInsert: Command? = null
 
+  @JvmField
+  protected var processingEscape = false
+
   override fun setInsertRepeat(lines: Int, column: Int, append: Boolean) {
     repeatLines = lines
     repeatColumn = column
@@ -594,38 +597,53 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   override fun processEscape(editor: VimEditor, context: ExecutionContext?) {
     // Get the offset for marks before we exit insert mode - switching from insert to overtype subtracts one from the
     // column offset.
-    val markGroup = injector.markService
-    markGroup.setMark(editor, VimMarkService.INSERT_EXIT_MARK)
-    markGroup.setMark(editor, MARK_CHANGE_END)
-    if (editor.mode is Mode.REPLACE) {
-      editor.insertMode = true
-    }
-    val repeatCount0 = lastInsert?.let {
-      // How many times do we want to *repeat* the insert? For a simple insert or change action, this is count-1. But if
-      // the command is an operator+motion, then the count applies to the motion, not the insert/change. I.e., `2cw`
-      // changes two words, rather than inserting the change twice. This is the only place where we need to know who the
-      // count applies to
-      if (CommandFlags.FLAG_NO_REPEAT_INSERT in it.flags || it.action.argumentType == Argument.Type.MOTION) {
-        0
-      } else {
-        it.count - 1
+    ensureSingeProcessingEscape {
+      val markGroup = injector.markService
+      markGroup.setMark(editor, VimMarkService.INSERT_EXIT_MARK)
+      markGroup.setMark(editor, MARK_CHANGE_END)
+      if (editor.mode is Mode.REPLACE) {
+        editor.insertMode = true
       }
-    } ?: 0
-    if (vimDocument != null && vimDocumentListener != null) {
-      vimDocument!!.removeChangeListener(vimDocumentListener!!)
-      vimDocumentListener = null
-    }
-    lastStrokes = ArrayList(strokes)
-    if (context != null) {
-      injector.changeGroup.repeatInsert(editor, context, repeatCount0, true)
-    }
-    if (editor.mode is Mode.INSERT) {
-      updateLastInsertedTextRegister()
-    }
+      val repeatCount0 = lastInsert?.let {
+        // How many times do we want to *repeat* the insert? For a simple insert or change action, this is count-1. But if
+        // the command is an operator+motion, then the count applies to the motion, not the insert/change. I.e., `2cw`
+        // changes two words, rather than inserting the change twice. This is the only place where we need to know who the
+        // count applies to
+        if (CommandFlags.FLAG_NO_REPEAT_INSERT in it.flags || it.action.argumentType == Argument.Type.MOTION) {
+          0
+        } else {
+          it.count - 1
+        }
+      } ?: 0
+      if (vimDocument != null && vimDocumentListener != null) {
+        vimDocument!!.removeChangeListener(vimDocumentListener!!)
+        vimDocumentListener = null
+      }
+      lastStrokes = ArrayList(strokes)
+      if (context != null) {
+        injector.changeGroup.repeatInsert(editor, context, repeatCount0, true)
+      }
+      if (editor.mode is Mode.INSERT) {
+        updateLastInsertedTextRegister()
+      }
 
-    // The change pos '.' mark is the offset AFTER processing escape, and after switching to overtype
-    markGroup.setMark(editor, MARK_CHANGE_POS)
-    editor.mode = Mode.NORMAL()
+      // The change pos '.' mark is the offset AFTER processing escape, and after switching to overtype
+      markGroup.setMark(editor, MARK_CHANGE_POS)
+      editor.mode = Mode.NORMAL()
+    }
+  }
+
+  // processing escape might be entered from multiple places at once but we don't wont to repeat it.
+  // For example, it might be called from standard esc processing and
+  // Rider Escape lookup which results in duplicated text insertion
+  fun ensureSingeProcessingEscape(unit: () -> Unit) {
+    if (processingEscape) return
+    processingEscape = true
+    try {
+      unit()
+    } finally {
+      processingEscape = false
+    }
   }
 
   private fun updateLastInsertedTextRegister() {
