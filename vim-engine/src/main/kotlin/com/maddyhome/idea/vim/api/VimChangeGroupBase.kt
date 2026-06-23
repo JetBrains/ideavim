@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.helper.CharacterHelper.charType
 import com.maddyhome.idea.vim.helper.NumberType
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.endOffsetInclusive
+import com.maddyhome.idea.vim.helper.isCaretAtLineEnd
 import com.maddyhome.idea.vim.helper.usesVirtualSpace
 import com.maddyhome.idea.vim.key.AbbreviationContext
 import com.maddyhome.idea.vim.key.findAndResolveAbbreviation
@@ -723,12 +724,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    */
   override fun processSingleCommand(editor: VimEditor) {
 
-    injector.vimState.wasCaretAtEndOfLineBeforeInsertNormal = editor.nativeCarets().any { caret ->
-      val line = caret.getBufferPosition().line
-      val lineEndAllowed = editor.getLineEndOffset(line, true)
-      val lineEndNotAllowed = editor.getLineEndOffset(line, false)
-      caret.offset == lineEndAllowed && lineEndAllowed != lineEndNotAllowed
-    }
+    injector.vimState.wasCaretAtEndOfLineBeforeInsertNormal = editor.nativeCarets().any { editor.isCaretAtLineEnd(it, allowEnd = true) }
 
     editor.mode = Mode.NORMAL(editor.mode)
 

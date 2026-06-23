@@ -20,6 +20,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
+import com.maddyhome.idea.vim.helper.isCaretAtLineEnd
 import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.key.KeySource
@@ -302,9 +303,11 @@ class KeyHandler {
     val operatorArguments = OperatorArguments(command.rawCount, editorState.mode)
 
     //true if goes form insert to OpPending
-    val wasOpPendingFromInsert = (editor.mode as? Mode.OP_PENDING)?.let {
-      it.returnTo is Mode.INSERT
-    } ?: false
+    val isSingleCommandFromInsert = when (val m = editor.mode) {
+      is Mode.NORMAL -> m.isInsertPending || m.isReplacePending
+      is Mode.OP_PENDING -> m.returnTo is Mode.INSERT || m.returnTo is Mode.REPLACE
+      else -> false
+    }
 
     // If we were in "operator pending" mode, reset back to normal mode.
     // But opening command line should not reset operator pending mode (e.g. `d/foo`)
@@ -324,7 +327,7 @@ class KeyHandler {
       }
     }
 
-    val action: Runnable = ActionRunner(editor, context, command, keyState, operatorArguments, wasOpPendingFromInsert)
+    val action: Runnable = ActionRunner(editor, context, command, keyState, operatorArguments, isSingleCommandFromInsert)
     val cmdAction = command.action
     val name = cmdAction.id
     injector.actionExecutor.executeCommand(editor, action, name, action)
@@ -401,7 +404,7 @@ class KeyHandler {
     val cmd: Command,
     val keyState: KeyHandlerState,
     val operatorArguments: OperatorArguments,
-    val wasOpPendingFromInsert: Boolean = false,
+    val isSingleCommandFromInsert: Boolean = false,
   ) : Runnable {
     override fun run() {
       val editorState = injector.vimState
@@ -413,7 +416,7 @@ class KeyHandler {
       injector.actionExecutor.executeVimAction(editor, cmd.action, context, operatorArguments)
 
       // this restore the caret position when use C-o then db from the end of the line
-      if (wasOpPendingFromInsert && editorState.mode is Mode.INSERT) {
+      if (isSingleCommandFromInsert && editorState.mode is Mode.INSERT) {
         restoreAllowEndCaretPosition(editor, editorState)
       }
 
@@ -433,6 +436,9 @@ class KeyHandler {
       // "select register"
       if (editorState.mode is Mode.NORMAL && !cmd.flags.contains(CommandFlags.FLAG_EXPECT_MORE)) {
         editor.mode = editorState.mode.returnTo
+        if (isSingleCommandFromInsert) {
+          restoreAllowEndCaretPosition(editor, editorState)
+        }
       }
 
       instance.reset(keyState, editorState.mode)
@@ -441,11 +447,9 @@ class KeyHandler {
     private fun restoreAllowEndCaretPosition(editor: VimEditor, editorState: VimStateMachine) {
       if (!editorState.wasCaretAtEndOfLineBeforeInsertNormal) return
       for (caret in editor.nativeCarets()) {
-        val line = caret.getBufferPosition().line
-        val lineEndNotAllowed = editor.getLineEndOffset(line, false)
-        val lineEndAllowed = editor.getLineEndOffset(line, true)
-        if (caret.offset == lineEndNotAllowed && lineEndAllowed != lineEndNotAllowed) {
-          caret.moveToOffset(lineEndAllowed)
+        if (editor.isCaretAtLineEnd(caret, allowEnd = false)) {
+          val line = caret.getBufferPosition().line
+          caret.moveToOffset(editor.getLineEndOffset(line, true))
         }
       }
       editorState.wasCaretAtEndOfLineBeforeInsertNormal = false
