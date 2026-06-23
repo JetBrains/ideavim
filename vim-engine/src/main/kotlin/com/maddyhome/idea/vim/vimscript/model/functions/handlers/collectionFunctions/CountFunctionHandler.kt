@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.vimscript.model.functions.handlers.collectionFunc
 import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -30,7 +31,6 @@ internal class CountFunctionHandler : BuiltinFunctionHandler<VimInt>(minArity = 
     val comp = arguments[0]
     val expr = arguments[1]
     val ic = arguments.getNumberOrNull(2)?.booleanValue ?: false
-    val start = arguments.getNumberOrNull(3)?.value ?: 0
 
     return when (comp) {
       is VimString -> {
@@ -60,8 +60,15 @@ internal class CountFunctionHandler : BuiltinFunctionHandler<VimInt>(minArity = 
       }
 
       is VimList -> {
-        val items = if (start > 0 && start < comp.values.size) {
-          comp.values.subList(start, comp.values.size)
+        val start = arguments.getNumberOrNull(3)?.value
+        val items = if (start != null) {
+          val size = comp.values.size
+          // Vim allows negative start indices, counting from the end of the list
+          val index = if (start < 0) start + size else start
+          if (index < 0 || index >= size) {
+            throw exExceptionMessage("E684", start)
+          }
+          comp.values.subList(index, size)
         } else {
           comp.values
         }
