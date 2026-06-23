@@ -27,6 +27,8 @@ usual beta standards.
 
 ### Fixes:
 * [VIM-1082](https://youtrack.jetbrains.com/issue/VIM-1082) Fixed operators (`d`, `c`, `y`) over collapsed folds — a fold is now removed only when the motion actually covers the start of the folded region, so `dd` on a collapsed fold header deletes the whole region while `dl` mid-line on the header deletes only one character
+* [VIM-4255](https://youtrack.jetbrains.com/issue/VIM-4255) Fixed a key being recorded twice in a macro when it is the prefix of a mapping that times out — e.g. with `map ys ...`, recording `yw` no longer produces `yyw`
+* [VIM-4240](https://youtrack.jetbrains.com/issue/VIM-4240) Fixed filesystem changes made by a shell command (`:!`) not being visible — the virtual file system is now refreshed after the command finishes
 
 ### Merged PRs:
 * [1853](https://github.com/JetBrains/ideavim/pull/1853) by [1grzyb1](https://github.com/1grzyb1): VIM-1082 adjust motion for fold regions
