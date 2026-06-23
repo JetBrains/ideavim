@@ -8,7 +8,9 @@
 
 package com.maddyhome.idea.vim.helper
 
+import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
 import com.maddyhome.idea.vim.common.TextRange
@@ -51,6 +53,18 @@ fun VimEditor.isEndAllowed(mode: Mode): Boolean {
     Mode.INSERT, Mode.REPLACE, is Mode.VISUAL, is Mode.SELECT -> true
     is Mode.NORMAL -> if (mode.isInsertPending || mode.isReplacePending) true else usesVirtualSpace
     is Mode.CMD_LINE, is Mode.OP_PENDING -> usesVirtualSpace
+  }
+}
+
+fun VimEditor.isCaretAtLineEnd(caret: ImmutableVimCaret, allowEnd: Boolean): Boolean {
+  val line = caret.getBufferPosition().line
+  val lineEndAllowed = getLineEndOffset(line, true)
+  val lineEndNotAllowed = getLineEndOffset(line, false)
+  if (lineEndAllowed == lineEndNotAllowed) return false
+  return if (allowEnd) {
+    caret.offset == lineEndAllowed
+  } else {
+    caret.offset == lineEndNotAllowed
   }
 }
 
