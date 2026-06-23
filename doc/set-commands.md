@@ -51,6 +51,19 @@ However, some differences are inevitable.
         Special keys in this context are the cursor keys, <End>, <Home>,
         <PageUp> and <PageDown>.
 
+'langmap'       'lmap'  Enter Vim commands from a different language keyboard.
+        List of character pairs that map from a user's entered language to
+        plain ASCII. Used to enter standard ASCII-based Vim commands from the
+        user's preferred language keyboard. When in Normal or Visual mode, or
+        when entering the name of a register or mark, the typed key is mapped
+        by 'langmap'. When typing in Insert or Replace mode, or entering a
+        character to search in `f{char}`, the character is accepted as typed.
+        See the Vim docs for more infomration and an example for entering Vim
+        commands from a Greek keyboard. Dvorak examples are available 
+        elsewhere.
+
+'langnoremap'   'lnr'   See 'langremap'
+'langremap'     'lrm'   Apply 'langmap' to characters resulting from a mapping.
 'matchpairs'    'mps'   Pairs of characters that "%" can match
 'maxmapdepth'   'mmd'   Maximum depth of mappings
 'messagesopt'   'mopt'  Option settings for outputting messages.
