@@ -182,6 +182,11 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     return plugin != null ? plugin.getVersion() : "SNAPSHOT";
   }
 
+  public static @NotNull Boolean isPreRelease() {
+    var version = getVersion().toLowerCase();
+    return version.contains("dev") || version.contains("eap") || version.contains("snapshot");
+  }
+
   public static boolean isEnabled() {
     final VimPlugin instance = ApplicationManager.getApplication().getService(VimPlugin.class);
     return instance != null && instance.enabled;

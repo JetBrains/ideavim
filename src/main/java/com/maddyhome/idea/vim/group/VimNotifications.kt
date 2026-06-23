@@ -33,4 +33,5 @@ interface VimNotifications {
   fun notifyEapFinished()
   fun showReenableNotification(project: Project)
   fun notifyActionId(id: String?, candidates: List<String>? = null, intentionName: String?)
+  fun notifyAboutNewVersion(version: String)
 }

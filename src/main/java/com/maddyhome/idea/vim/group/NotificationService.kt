@@ -21,15 +21,15 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.fileEditor.impl.HTMLEditorProvider
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.keymap.KeymapUtil
-import com.intellij.openapi.keymap.ex.KeymapManagerEx
-import com.intellij.openapi.keymap.impl.ui.KeymapPanel
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.SystemInfo
+import com.intellij.util.ui.StartupUiUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.editor.OpenControlCharsEditorAction
 import com.maddyhome.idea.vim.api.VimEditor
@@ -46,6 +46,7 @@ import com.maddyhome.idea.vim.statistic.ActionTracker
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable
 import com.maddyhome.idea.vim.vimscript.services.VimRcService
 import java.awt.datatransfer.StringSelection
+import java.nio.charset.StandardCharsets
 import javax.swing.KeyStroke
 import kotlin.io.path.Path
 import kotlin.io.path.appendText
@@ -230,6 +231,36 @@ internal class NotificationService(private val project: Project?) : VimNotificat
 
   override fun notifyActionId(id: String?, candidates: List<String>?, intentionName: String?) {
     ActionIdNotifier.notifyActionId(id, project, candidates, intentionName)
+  }
+
+  override fun notifyAboutNewVersion(version: String) {
+    val notification = Notification(
+      IDEAVIM_NOTIFICATION_ID,
+      IDEAVIM_NOTIFICATION_TITLE,
+      "Welcome to IdeaVim $version see what's new in",
+      NotificationType.INFORMATION,
+    )
+    notification.icon = VimIcons.IDEAVIM
+
+    notification.addAction(object : DumbAwareAction("See What's New") {
+      override fun actionPerformed(e: AnActionEvent) {
+        if (project == null) return
+        val theme = if (StartupUiUtil.isDarkTheme) "dark" else "light"
+        val html = getVersionHtml(theme) ?: return
+        HTMLEditorProvider.openEditor(project, "What's new in $version", html)
+      }
+
+      private fun getVersionHtml(theme: String): String? =
+        (loadHtml("whatsnew-$version.html") ?: loadHtml("whatsnew-tbr.html"))
+          ?.replace("__THEME__", theme)
+          ?.replace("__VERSION__", version)
+
+      private fun loadHtml(resource: String): String? = javaClass.classLoader
+        .getResourceAsStream(resource)
+        ?.use { it.readBytes().toString(StandardCharsets.UTF_8) }
+    })
+
+    notification.notify(project)
   }
 
   object ActionIdNotifier {
