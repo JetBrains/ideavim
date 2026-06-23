@@ -59,6 +59,36 @@ class CountFunctionTest : VimTestCase("\n") {
   }
 
   @Test
+  fun `test count list with zero start index`() {
+    assertCommandOutput("echo count([1, 2, 3, 2, 1], 2, 0, 0)", "2")
+  }
+
+  @Test
+  fun `test count list with negative start index`() {
+    // Vim counts negative start indices from the end of the list, so -2 starts at the last two items [2, 1]
+    assertCommandOutput("echo count([1, 2, 3, 2, 1], 2, 0, -2)", "1")
+  }
+
+  @Test
+  fun `test count list with negative start index covering whole list`() {
+    assertCommandOutput("echo count([1, 2, 3, 2, 1], 2, 0, -5)", "2")
+  }
+
+  @Test
+  fun `test count list with out of range start index`() {
+    enterCommand("echo count([1, 2, 3, 2, 1], 2, 0, 5)")
+    assertPluginError(true)
+    assertPluginErrorMessage("E684: List index out of range: 5")
+  }
+
+  @Test
+  fun `test count list with out of range negative start index`() {
+    enterCommand("echo count([1, 2, 3, 2, 1], 2, 0, -6)")
+    assertPluginError(true)
+    assertPluginErrorMessage("E684: List index out of range: -6")
+  }
+
+  @Test
   fun `test count list with ignore case`() {
     assertCommandOutput("echo count(['A', 'a', 'B'], 'a', 1)", "2")
   }
