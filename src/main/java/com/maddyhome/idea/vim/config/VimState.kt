@@ -20,6 +20,7 @@ class VimState {
   var isIdeaPutNotified by StateProperty("idea-put")
   var wasSubscribedToEAPAutomatically by StateProperty("was-automatically-subscribed-to-eap")
   var firstIdeaVimVersion: String? by StringProperty("first-ideavim-version", null)
+  var lastIdeaVimVersion: String? by StringProperty("last-ideavim-version", null)
 
   fun readData(element: Element) {
     val notifications = element.getChild("notifications")

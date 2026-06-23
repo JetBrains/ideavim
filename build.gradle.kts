@@ -91,6 +91,7 @@ dependencies {
   compileOnly("org.jetbrains:annotations:26.1.0")
   ksp(project(":annotation-processors"))
   compileOnly(project(":annotation-processors"))
+
   kotlinCompilerPluginClasspath("org.jetbrains.kotlin:kotlin-serialization-compiler-plugin:$kotlinVersion")
   kotlinCompilerPluginClasspath("com.jetbrains.fleet:rpc-compiler-plugin:$fleetRpcVersion")
 
@@ -243,7 +244,7 @@ tasks {
 
   val runWebstorm by intellijPlatformTesting.runIde.registering {
     type = IntelliJPlatformType.WebStorm
-    version = "2025.3.2"
+    version = "2026.1"
   }
 
   val runClion by intellijPlatformTesting.runIde.registering {
