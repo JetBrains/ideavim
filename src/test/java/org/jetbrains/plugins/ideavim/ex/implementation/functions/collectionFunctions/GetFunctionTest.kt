@@ -46,6 +46,23 @@ class GetFunctionTest : VimTestCase() {
   }
 
   @Test
+  fun `test get by negative index in list`() {
+    // Vim counts negative indices from the end of the list, so -1 is the last item
+    assertCommandOutput("echo get(['one', 'two', 'three'], -1)", "three")
+    assertCommandOutput("echo get(['one', 'two', 'three'], -3)", "one")
+  }
+
+  @Test
+  fun `test get by out of range negative index in list`() {
+    assertCommandOutput("echo get(['one', 'two', 'three'], -10)", "0")
+  }
+
+  @Test
+  fun `test get by out of range negative index in list with default value`() {
+    assertCommandOutput("echo get(['one', 'two', 'three'], -10, 'null')", "null")
+  }
+
+  @Test
   fun `test get by nonexistent index in list with default value`() {
     assertCommandOutput("echo get(['one', 'two', 'three'], 10, 'null')", "null")
   }

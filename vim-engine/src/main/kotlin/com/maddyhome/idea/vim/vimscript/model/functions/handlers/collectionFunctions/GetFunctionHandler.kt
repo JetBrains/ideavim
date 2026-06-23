@@ -34,7 +34,9 @@ internal class GetFunctionHandler : BuiltinFunctionHandler<VimDataType>(minArity
     return when (container) {
       is VimList -> {
         val idx = arguments.getNumber(1).value
-        container.values.getOrElse(idx) { arguments.getOrNull(2) ?: VimInt.ZERO }
+        // Vim allows negative indices, counting from the end of the list (e.g. -1 is the last item)
+        val index = if (idx < 0) idx + container.values.size else idx
+        container.values.getOrElse(index) { arguments.getOrNull(2) ?: VimInt.ZERO }
       }
 
       is VimDictionary -> {
