@@ -26,6 +26,9 @@ usual beta standards.
 ## [To Be Released]
 
 ### Fixes:
+* [VIM-4253](https://youtrack.jetbrains.com/issue/VIM-4253) Fixed text being inserted twice when leaving Insert mode with `<Esc>` (e.g. in Rider, where Escape is processed from multiple places at once)
+* [VIM-4245](https://youtrack.jetbrains.com/issue/VIM-4245) Fixed cursor landing on a line break after an IDE action (e.g. `GenerateConstructor`), which left it in an invalid Normal-mode position and caused commands like `l` to move the cursor backwards
+* [VIM-4245](https://youtrack.jetbrains.com/issue/VIM-4245) Fixed the cursor being placed one character past the end of the refactoring template box with `idearefactormode=keep` — it now rests on the last character inside the box
 * [VIM-1082](https://youtrack.jetbrains.com/issue/VIM-1082) Fixed operators (`d`, `c`, `y`) over collapsed folds — a fold is now removed only when the motion actually covers the start of the folded region, so `dd` on a collapsed fold header deletes the whole region while `dl` mid-line on the header deletes only one character
 * [VIM-4255](https://youtrack.jetbrains.com/issue/VIM-4255) Fixed a key being recorded twice in a macro when it is the prefix of a mapping that times out — e.g. with `map ys ...`, recording `yw` no longer produces `yyw`
 * [VIM-4240](https://youtrack.jetbrains.com/issue/VIM-4240) Fixed filesystem changes made by a shell command (`:!`) not being visible — the virtual file system is now refreshed after the command finishes
