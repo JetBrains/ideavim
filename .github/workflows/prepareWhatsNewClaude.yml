@@ -1,0 +1,114 @@
+name: Prepare What's New with Claude
+
+on:
+  workflow_dispatch:  # Manually triggered by a maintainer
+
+jobs:
+  prepare-whats-new:
+    runs-on: ubuntu-latest
+    if: github.repository == 'JetBrains/ideavim'
+
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+      issues: read
+      actions: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history so the changelog can be analyzed and the PR branch pushed
+
+      - name: Run Claude Code to update the changelog and prepare the What's New page
+        id: claude
+        uses: anthropics/claude-code-action@v1
+        env:
+          ANTHROPIC_BASE_URL: ${{ secrets.PROXY_URL }}
+          ANTHROPIC_CUSTOM_HEADERS: |
+            Grazie-Agent: {"name":"ideavim-claude-code-action","version":"github-actions"}
+            Grazie-Authenticate-JWT: ${{ secrets.ANTHROPIC_API_KEY }}
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+
+          prompt: |
+            Do TWO things in order, in this single run, then open ONE pull request that
+            contains both changes. The What's New page is derived from the changelog, so the
+            changelog MUST be brought up to date first.
+
+            ## Step 1 — Update the changelog first
+            - Use the `changelog` skill to load the maintenance rules, then follow them.
+            - Review commits since the last documented version and add any missing
+              user-facing entries to the `## [To Be Released]` section of `CHANGES.md`
+              (under `### Features:`, `### Fixes:`, `### Changes:`, `### Merged PRs:`).
+            - Respect every skill rule: exclusions (Dependabot/Claude PRs, internal
+              refactors, test-only/doc-only changes, the `api` module, and the Vim Everywhere
+              / Hints project), the writing style, and "each change in exactly one subsection".
+            - Only EDIT `CHANGES.md` in the working tree here. Do NOT open a separate PR for it.
+
+            ## Step 2 — Create or update the What's New page (whatsnew-tbr.html)
+            The page for the upcoming release lives at `src/main/resources/whatsnew-tbr.html`.
+            After each release it is promoted to `whatsnew-<version>.html` and the `tbr` file is
+            gone, so USUALLY it does NOT exist when this workflow runs — only the version-specific
+            pages for older releases (`whatsnew-<version>.html`) remain.
+
+            Read the now-updated `## [To Be Released]` section of `CHANGES.md` (everything between
+            that heading and the next dated release heading, e.g. `## 2.39.0, ...`). Use only its
+            Features and Fixes; you may skip Merged PRs.
+
+            First decide what to do by checking the working tree:
+            - List `src/main/resources/whatsnew-*.html`.
+            - **If `whatsnew-tbr.html` does NOT exist (the normal case):** create it fresh,
+              describing every Feature and Fix currently under `## [To Be Released]`.
+            - **If `whatsnew-tbr.html` ALREADY exists (it was generated earlier this cycle):**
+              do NOT rebuild it from scratch. Diff it against the current `## [To Be Released]`
+              section — work out which changelog entries are NOT yet represented on the page — and
+              update the page to incorporate ONLY those new/changed items, preserving the existing
+              sections, ordering and wording already present. This is an incremental update, not a
+              rewrite. (If nothing in the changelog is new relative to the page, make no changes
+              and do not open a PR.)
+
+            - If, after Step 1, `## [To Be Released]` still has no Features or Fixes, STOP:
+              do not create or change the HTML and do not open a PR. Explain why in your final message.
+
+            ### Style — match the existing pages EXACTLY
+            Use the NEWEST version-specific page as the canonical style reference: pick
+            `src/main/resources/whatsnew-<highest-version>.html` (fall back to `whatsnew-tbr.html`
+            only if no version-specific page exists) and read it first. It is a terminal-window
+            "blog post": monospace font, a title bar with traffic-light dots, `❯`-prefixed `<h2>`
+            headings, `#`-prefixed `.kicker` labels, a `.grid` of `.mini` cards, syntax-colored
+            `<pre>` blocks (`.cm` comments, `.str` strings, `.key` keys), and a footer prompt with links.
+
+            Copy its `<head>` and entire `<style>` block VERBATIM. You MUST keep, unchanged:
+            - the `data-theme="__THEME__"` attribute on `<html>` and the `__VERSION__` token —
+              the IDE replaces both at runtime; never remove or rename them,
+            - the `:root`, `:root[data-theme="dark"]`, and
+              `@media (prefers-color-scheme: dark)` variable blocks,
+            - every existing CSS class (`.term`, `.titlebar`, `.kicker`, `.section`, `.mini`,
+              `.grid`, `pre .cm/.str/.key`, `.caret`, `footer`, etc.).
+
+            Only change the human content: the `<title>`, the title-bar `.title`, the intro
+            `.runline`/`.out` block, the feature `.section`s, the "polish & fixes" list, and
+            the footer. Lead with the most interesting Features as full `.section`s (kicker +
+            `<h2>` + paragraph, plus a `<pre>` example when the entry shows commands or
+            `set`/`map` syntax); group smaller items into a `.grid` of `.mini` cards. Render
+            the Fixes as a final "polish & fixes" `<ul>`, each `<li>` with a short bolded lead.
+            Rewrite changelog lines into concise, friendly, user-facing prose — do NOT put
+            `VIM-####` ids or raw issue URLs on the page. Escape HTML correctly inside
+            `code`/`kbd`/`pre` (`&lt;` `&gt;` `&amp;`).
+
+            ## Do NOT set the version
+            - Never hard-code a version anywhere in the page. Leave the `__VERSION__` token
+              exactly as-is wherever it appears — the release pipeline (TeamCity) and the IDE
+              substitute the real version at build/runtime.
+
+            ## Open ONE pull request
+            - Create a branch named `whatsnew-tbr` (reset it if it already exists).
+            - Include BOTH the `CHANGES.md` update and the `whatsnew-tbr.html` change.
+            - Open it against `master` with:
+              - Title: "Prepare What's New for the upcoming release"
+              - Body: a short summary of the changelog entries added and the What's New highlights.
+
+          # Changelog needs the skill + git/gh/web; the page generation needs file read/write.
+          claude_args: '--allowed-tools "Skill,Read,Write,Edit,Glob,Grep,Bash(git:*),Bash(gh:*),WebSearch,WebFetch(domain:plugins.jetbrains.com),WebFetch(domain:youtrack.jetbrains.com),WebFetch(domain:github.com)"'

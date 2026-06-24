@@ -120,13 +120,29 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       """.trimIndent()
     }
     script {
+      name = "Update what's new"
+      scriptContent = """
+        set -e
+        version=${'$'}(echo "%build.number%" | tr '[:upper:]' '[:lower:]')
+        tbr="src/main/resources/whatsnew-tbr.html"
+        target="src/main/resources/whatsnew-${'$'}version.html"
+        if [ -f "${'$'}tbr" ]; then
+          cp "${'$'}tbr" "${'$'}target"
+          git add "${'$'}target"
+          echo "Promoted whatsnew-tbr.html to whatsnew-${'$'}version.html"
+        else
+          echo "WARN: ${'$'}tbr not found; skipping What's New promotion"
+        fi
+      """.trimIndent()
+    }
+    script {
       name = "Commit preparation changes"
       scriptContent = """
         set -e
         git config user.name "IdeaVim Bot"
         git config user.email "maintainers@ideavim.dev"
-        if git diff --quiet; then
-          echo "No changelog changes to commit"
+        if git diff --quiet && git diff --cached --quiet; then
+          echo "No preparation changes to commit"
         else
           git commit -am "Preparation to %build.number% release"
         fi
@@ -153,17 +169,25 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
     }
     script {
-      name = "Sync changelog to master"
+      name = "Sync changelog and what's new to master"
       scriptContent = """
         set -e
         git checkout master
         cd scripts-ts
         npx tsx src/promoteChangelog.ts "%build.number%" "%env.ORG_GRADLE_PROJECT_releaseType%" ..
         cd ..
+        version=${'$'}(echo "%build.number%" | tr '[:upper:]' '[:lower:]')
+        tbr="src/main/resources/whatsnew-tbr.html"
+        target="src/main/resources/whatsnew-${'$'}version.html"
+        if [ -f "${'$'}tbr" ] && [ ! -f "${'$'}target" ]; then
+          cp "${'$'}tbr" "${'$'}target"
+          git add "${'$'}target"
+          echo "Promoted whatsnew-tbr.html to whatsnew-${'$'}version.html on master"
+        fi
         git config user.name "IdeaVim Bot"
         git config user.email "maintainers@ideavim.dev"
-        if git diff --quiet; then
-          echo "No changelog changes to commit on master"
+        if git diff --quiet && git diff --cached --quiet; then
+          echo "No changes to commit on master"
         else
           git commit -am "Preparation to %build.number% release"
         fi
