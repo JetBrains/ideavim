@@ -550,6 +550,10 @@ Contributors:
   [![icon][github]](https://github.com/AndDe-gourav)
   &nbsp;
   AndDe-gourav
+* [![icon][mail]](mailto:wtrebella@gmail.com)
+  [![icon][github]](https://github.com/wtrebella)
+  &nbsp;
+  wtrebella
 
 Contributors with JetBrains IP:
 
