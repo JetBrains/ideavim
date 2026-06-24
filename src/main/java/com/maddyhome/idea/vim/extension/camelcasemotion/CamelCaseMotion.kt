@@ -125,7 +125,8 @@ private class CamelMotionAction(private val motion: String) : MotionActionHandle
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    val target = nextCamelBoundary(editor.text(), caret.offset, motion, operatorArguments.count1, keywordTestFor(editor))
+    val target =
+      nextCamelBoundary(editor.text(), caret.offset, motion, operatorArguments.count1, keywordTestFor(editor))
     return (target ?: -1).toMotionOrError()
   }
 }
@@ -204,7 +205,11 @@ private fun isSubWordStart(text: CharSequence, i: Int, isKeyword: KeywordTest): 
     prev == CharClass.DIGIT && cur != CharClass.DIGIT -> true // 123Test / 123test
     (prev == CharClass.UPPER || prev == CharClass.LOWER) && cur == CharClass.DIGIT -> true // word123
     // ALLCAPS run: only a boundary when this upper starts a CamelCase word (next char is lower)
-    prev == CharClass.UPPER && cur == CharClass.UPPER -> classOf(text.getOrElse(i + 1) { ' ' }, isKeyword) == CharClass.LOWER
+    prev == CharClass.UPPER && cur == CharClass.UPPER -> classOf(
+      text.getOrElse(i + 1) { ' ' },
+      isKeyword
+    ) == CharClass.LOWER
+
     else -> false
   }
 }
@@ -225,7 +230,13 @@ private fun isSubWordEnd(text: CharSequence, i: Int, isKeyword: KeywordTest): Bo
  * Offset of the [count]-th boundary from [offset] for the given [motion]. Returns the last reachable
  * boundary if fewer than [count] exist, or null if there is none (so the caret stays put).
  */
-private fun nextCamelBoundary(text: CharSequence, offset: Int, motion: String, count: Int, isKeyword: KeywordTest): Int? {
+private fun nextCamelBoundary(
+  text: CharSequence,
+  offset: Int,
+  motion: String,
+  count: Int,
+  isKeyword: KeywordTest,
+): Int? {
   if (text.isEmpty()) return null
   val isStart = wordStartScanner(isKeyword)
   val isEnd = wordEndScanner(isKeyword)
@@ -266,7 +277,13 @@ private inline fun scan(text: CharSequence, from: Int, to: Int, predicate: (Char
  *  - `ge`: from the word start, walk `ge` (previous word-end) back [count] times, then one char left,
  *    selecting from there through the word start. Verified against the plugin.
  */
-private fun computeInnerRange(text: CharSequence, offset: Int, motion: String, count: Int, isKeyword: KeywordTest): TextObjectRange? {
+private fun computeInnerRange(
+  text: CharSequence,
+  offset: Int,
+  motion: String,
+  count: Int,
+  isKeyword: KeywordTest,
+): TextObjectRange? {
   if (text.isEmpty()) return null
   val isStart = wordStartScanner(isKeyword)
   val isEnd = wordEndScanner(isKeyword)
