@@ -72,6 +72,8 @@ interface VimInjector {
 
   val jumpService: VimJumpService
 
+  val tagStack: VimTagStackService
+
   val visualMotionGroup: VimVisualMotionGroup
 
   val engineEditorHelper: EngineEditorHelper

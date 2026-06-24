@@ -19,7 +19,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 
-@CommandOrMotion(keys = ["<C-O>", "<C-T>"], modes = [Mode.NORMAL])
+@CommandOrMotion(keys = ["<C-O>"], modes = [Mode.NORMAL])
 class MotionJumpPreviousAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,
