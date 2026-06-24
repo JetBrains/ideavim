@@ -25,7 +25,11 @@ usual beta standards.
 
 ## [To Be Released]
 
+### Features:
+* [VIM-2283](https://youtrack.jetbrains.com/issue/VIM-2283) Added support for the [`'langmap'`](https://vimhelp.org/options.txt.html#%27langmap%27) and [`'langremap'`](https://vimhelp.org/options.txt.html#%27langremap%27) options — enter Normal- and Visual-mode commands from a non-English keyboard layout (e.g. Greek or Dvorak) by mapping typed characters to plain ASCII, while text typed in Insert mode is left as-is
+
 ### Fixes:
+* [VIM-315](https://youtrack.jetbrains.com/issue/VIM-315) Fixed the caret landing past the end of the line after `<C-O>` (run one Normal-mode command from Insert mode) at the end of a line — the following command (e.g. `db`) now operates from the correct position
 * [VIM-4253](https://youtrack.jetbrains.com/issue/VIM-4253) Fixed text being inserted twice when leaving Insert mode with `<Esc>` (e.g. in Rider, where Escape is processed from multiple places at once)
 * [VIM-4245](https://youtrack.jetbrains.com/issue/VIM-4245) Fixed cursor landing on a line break after an IDE action (e.g. `GenerateConstructor`), which left it in an invalid Normal-mode position and caused commands like `l` to move the cursor backwards
 * [VIM-4245](https://youtrack.jetbrains.com/issue/VIM-4245) Fixed the cursor being placed one character past the end of the refactoring template box with `idearefactormode=keep` — it now rests on the last character inside the box
@@ -34,6 +38,8 @@ usual beta standards.
 * [VIM-4240](https://youtrack.jetbrains.com/issue/VIM-4240) Fixed filesystem changes made by a shell command (`:!`) not being visible — the virtual file system is now refreshed after the command finishes
 
 ### Merged PRs:
+* [1861](https://github.com/JetBrains/ideavim/pull/1861) by [citizenmatt](https://github.com/citizenmatt): Add 'langmap' support
+* [1809](https://github.com/JetBrains/ideavim/pull/1809) by [AndDe-gourav](https://github.com/AndDe-gourav): Fix vim 315 incorrect insert normal mode behavior
 * [1853](https://github.com/JetBrains/ideavim/pull/1853) by [1grzyb1](https://github.com/1grzyb1): VIM-1082 adjust motion for fold regions
 
 ## 2.39.0, 2026-06-18

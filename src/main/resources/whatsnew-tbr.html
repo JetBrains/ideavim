@@ -463,6 +463,17 @@
         Tune the ceiling with <code>'maxsearchcount'</code> (it shows <code>[2/&gt;3]</code> when exceeded).</p>
     </div>
 
+    <div class="section">
+      <p class="kicker">input · keyboard layouts</p>
+      <h2>Drive Vim from any keyboard layout</h2>
+      <p>The new <code>'langmap'</code> option lets you run Normal- and Visual-mode commands from a
+        non-English keyboard — Greek, Dvorak, whatever you type on — by mapping the keys you press to the
+        plain ASCII commands underneath. Text you type in Insert mode is left exactly as-is.</p>
+      <pre><span class="cm">" map a Greek home row onto the ASCII commands</span>
+<span class="str">set langmap=ασδφγηξκλ;asdfghjkl</span>
+<span class="str">set langremap</span>   <span class="cm">" also apply langmap to the result of a mapping</span></pre>
+    </div>
+
     <!-- Also worth a look -->
     <div class="section">
       <p class="kicker">also worth a look</p>
@@ -501,6 +512,24 @@
         <li><strong>Smarter * search</strong> now respects <code>smartcase</code>.</li>
         <li><strong>Steadier cursor</strong> — fixed column drift on <kbd>j</kbd>/<kbd>k</kbd>, centering with inlay
           hints, and double-scroll after incremental search.
+        </li>
+        <li><strong>No more double-typed text</strong> — leaving Insert mode with <kbd>Esc</kbd> no longer inserts
+          what you typed twice (notably in Rider).
+        </li>
+        <li><strong>Caret stays put after IDE actions</strong> — generating code or finishing a refactoring template
+          no longer leaves the cursor in an invalid Normal-mode spot.
+        </li>
+        <li><strong><kbd>C-O</kbd> at end of line</strong> — the one-shot Normal-mode command now runs from the
+          right position instead of past the line end, so <kbd>db</kbd> and friends behave.
+        </li>
+        <li><strong>Operators respect collapsed folds</strong> — <kbd>dd</kbd> on a fold header deletes the whole
+          folded region, while <kbd>dl</kbd> mid-header deletes just one character.
+        </li>
+        <li><strong>Cleaner macro recording</strong> — a key that's the prefix of a timed-out mapping is no longer
+          recorded twice.
+        </li>
+        <li><strong>Shell command changes show up</strong> — files touched by <code>:!</code> are now refreshed on
+          disk as soon as the command finishes.
         </li>
         <li>Plus the <code>g&lt;</code> command, a scroll-back more-prompt pager, and a long list of smaller fixes.</li>
       </ul>
