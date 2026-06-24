@@ -112,3 +112,45 @@ jobs:
 
           # Changelog needs the skill + git/gh/web; the page generation needs file read/write.
           claude_args: '--allowed-tools "Skill,Read,Write,Edit,Glob,Grep,Bash(git:*),Bash(gh:*),WebSearch,WebFetch(domain:plugins.jetbrains.com),WebFetch(domain:youtrack.jetbrains.com),WebFetch(domain:github.com)"'
+
+      - name: Comment rendered preview link on the PR
+        if: ${{ always() }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Only ever preview the page this workflow updates: whatsnew-tbr.html.
+            const branch = 'whatsnew-tbr';
+            const file = 'src/main/resources/whatsnew-tbr.html';
+            const { owner, repo } = context.repo;
+
+            const prs = await github.rest.pulls.list({ owner, repo, state: 'open', head: `${owner}:${branch}` });
+            if (prs.data.length === 0) {
+              core.info(`No open PR for ${branch}; nothing to preview.`);
+              return;
+            }
+            const pr = prs.data[0];
+
+            // The page is self-contained (inline CSS), so raw.githack.com renders it directly.
+            const url = `https://raw.githack.com/${owner}/${repo}/${branch}/${file}`;
+            const marker = '<!-- whatsnew-preview -->';
+            const body = [
+              marker,
+              "### 📰 What's New preview",
+              '',
+              `Rendered via raw.githack.com: [\`${file}\`](${url})`,
+              '',
+              '> Note: the live page follows the **IDE** theme. This preview follows your ' +
+              '**OS** theme (the `__THEME__` token is unresolved here), and `__VERSION__` ' +
+              'shows literally — both are substituted by the IDE at runtime.',
+            ].join('\n');
+
+            // Upsert a single sticky comment instead of spamming on re-runs.
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner, repo, issue_number: pr.number,
+            });
+            const existing = comments.find(c => c.body && c.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number: pr.number, body });
+            }
