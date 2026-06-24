@@ -28,7 +28,8 @@ object ExtensionTracking {
     "commentary",
     "matchit",
     "textobj-indent",
-    "mini-ai"
+    "mini-ai",
+    "vim-indentwise"
   )
   val enabledExtensions: MutableSet<String> = ConcurrentHashMap.newKeySet()
 }
