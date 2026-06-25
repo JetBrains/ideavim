@@ -36,21 +36,29 @@ import com.maddyhome.idea.vim.state.mode.Mode
 internal class IndentWiseExtension : VimExtension {
   override fun getName(): String = "vim-indentwise"
 
-  data class IndentAction(val indentLevel: IndentLevel, val plugName: String, val keys: String)
+  data class IndentAction(
+    val indentLevel: IndentLevel,
+    val plugName: String,
+    val keys: String,
+    val direction: IndentActionDirection,
+  )
 
   private val indentActions = listOf(
-    IndentAction(IndentLevel.LESSER, "<Plug>IndentWisePreviousLesserIndent", "[-"),
-    IndentAction(IndentLevel.GREATER, "<Plug>IndentWisePreviousGreaterIndent", "[+"),
-    IndentAction(IndentLevel.EQUAL, "<Plug>IndentWisePreviousEqualIndent", "[=")
+    IndentAction(IndentLevel.LESSER, "<Plug>IndentWisePreviousLesserIndent", "[-", IndentActionDirection.PREVIOUS),
+    IndentAction(IndentLevel.GREATER, "<Plug>IndentWisePreviousGreaterIndent", "[+", IndentActionDirection.PREVIOUS),
+    IndentAction(IndentLevel.EQUAL, "<Plug>IndentWisePreviousEqualIndent", "[=", IndentActionDirection.PREVIOUS),
+    IndentAction(IndentLevel.LESSER, "<Plug>IndentWiseNextLesserIndent", "]-", IndentActionDirection.NEXT),
+    IndentAction(IndentLevel.GREATER, "<Plug>IndentWiseNextGreaterIndent", "]+", IndentActionDirection.NEXT),
+    IndentAction(IndentLevel.EQUAL, "<Plug>IndentWiseNextEqualIndent", "]=", IndentActionDirection.NEXT)
   )
 
   override fun init() {
-    indentActions.forEach { (indentLevel, plugName, keys) ->
+    indentActions.forEach { (indentLevel, plugName, keys, direction) ->
       putExtensionHandlerMapping(
         MappingMode.NXO,
         injector.parser.parseKeys(plugName),
         owner,
-        IndentWiseLessIndentHandler(indentLevel),
+        IndentWiseLessIndentHandler(indentLevel, direction),
         false
       )
       putKeyMappingIfMissing(
@@ -69,7 +77,13 @@ internal class IndentWiseExtension : VimExtension {
     GREATER
   }
 
-  class IndentWiseLessIndentHandler(val indentLevel: IndentLevel) : ExtensionHandler {
+  enum class IndentActionDirection {
+    PREVIOUS,
+    NEXT
+  }
+
+  class IndentWiseLessIndentHandler(val indentLevel: IndentLevel, val direction: IndentActionDirection) :
+    ExtensionHandler {
     override fun execute(
       editor: VimEditor,
       context: ExecutionContext,
@@ -77,7 +91,7 @@ internal class IndentWiseExtension : VimExtension {
     ) {
       if (editor.mode is Mode.OP_PENDING) {
         val commandBuilder = KeyHandler.getInstance().keyHandlerState.commandBuilder
-        commandBuilder.addAction(IndentWiseMotionAction(indentLevel))
+        commandBuilder.addAction(IndentWiseMotionAction(indentLevel, direction))
       } else {
         editor.sortedCarets().forEach { caret ->
           repeat(operatorArguments.count1) {
@@ -88,13 +102,14 @@ internal class IndentWiseExtension : VimExtension {
     }
 
     private fun moveToPreviousIndent(editor: VimEditor) {
-      val line = IndentWiseMotionAction.prevIndent(editor, indentLevel) ?: return
+      val line = IndentWiseMotionAction.prevIndent(editor, indentLevel, direction) ?: return
       editor.currentCaret().moveToOffset(editor.getLeadingCharacterOffset(line))
     }
 
   }
 
-  private class IndentWiseMotionAction(val indentLevel: IndentLevel) : MotionActionHandler.ForEachCaret() {
+  private class IndentWiseMotionAction(val indentLevel: IndentLevel, val direction: IndentActionDirection) :
+    MotionActionHandler.ForEachCaret() {
     override val motionType: MotionType = MotionType.LINE_WISE
 
     override fun getOffset(
@@ -104,25 +119,52 @@ internal class IndentWiseExtension : VimExtension {
       argument: Argument?,
       operatorArguments: OperatorArguments,
     ): Motion {
-      val line = prevIndent(editor, indentLevel) ?: return 0.toMotionOrError()
-      val target = editor.getLeadingCharacterOffset(line + 1)
+      val line = prevIndent(editor, indentLevel, direction) ?: return 0.toMotionOrError()
+      val target = editor.getLeadingCharacterOffset(line + (if (direction == IndentActionDirection.PREVIOUS) 1 else -1))
       return target.toMotionOrError()
     }
 
     companion object {
 
-      fun prevIndent(editor: VimEditor, indentLevel: IndentLevel): Int? {
+      fun prevIndent(editor: VimEditor, indentLevel: IndentLevel, direction: IndentActionDirection): Int? {
         var line = editor.currentCaret().getLine()
         val beginningLine = line
         val indent = editor.getVisualIndent(line)
         do {
-          line--
-        } while (line > 0 && (invalidIndent(indentLevel, line, indent, editor) || editor.getLineText(line).trim()
+          line += if (direction == IndentActionDirection.PREVIOUS) -1 else 1
+        } while (validLine(editor, line, direction) && (invalidIndent(
+            indentLevel,
+            line,
+            indent,
+            editor
+          ) || editor.getLineText(line).trim()
             .isEmpty())
         )
-        if (line < 0 || line == beginningLine) return null
+        if (invalidLine(editor, line, direction) || line == beginningLine) return null
         if (invalidIndent(indentLevel, line, indent, editor)) return null
         return line
+      }
+
+      private fun validLine(
+        editor: VimEditor,
+        line: Int,
+        direction: IndentActionDirection,
+      ): Boolean {
+        return when (direction) {
+          IndentActionDirection.PREVIOUS -> line > 0
+          IndentActionDirection.NEXT -> line < editor.lineCount()
+        }
+      }
+
+      private fun invalidLine(
+        editor: VimEditor,
+        line: Int,
+        direction: IndentActionDirection,
+      ): Boolean {
+        return when (direction) {
+          IndentActionDirection.PREVIOUS -> line < 0
+          IndentActionDirection.NEXT -> line >= editor.lineCount()
+        }
       }
 
       fun invalidIndent(indentLevel: IndentLevel, line: Int, indent: Int, editor: VimEditor): Boolean {
