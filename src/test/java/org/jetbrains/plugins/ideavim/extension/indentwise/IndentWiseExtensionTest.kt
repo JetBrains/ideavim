@@ -124,9 +124,6 @@ class IndentWiseExtensionTest : VimTestCase() {
     doTest("[-", before, after, Mode.NORMAL())
   }
 
-  // Original vim-indentwise maps `[-` in operator-pending mode with a leading `V`, so the
-  // operation is LINEWISE. The exclusive flag pulls the target back one line, so the
-  // lesser-indent line itself is NOT included — only the block from the cursor up to it.
   @Test
   fun `test operator-pending delete is linewise and excludes the lesser-indent line`() {
     val before = """
@@ -144,8 +141,6 @@ class IndentWiseExtensionTest : VimTestCase() {
     doTest("d[-", before, after, Mode.NORMAL())
   }
 
-  // Original maps `[-` in visual mode via vnoremap (charwise): it moves the cursor to the
-  // first non-blank of the lesser-indent line and extends the existing selection.
   @Test
   fun `test visual mode extends charwise selection to lesser-indent line`() {
     val before = """
