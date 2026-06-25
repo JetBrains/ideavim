@@ -36,36 +36,31 @@ import com.maddyhome.idea.vim.state.mode.Mode
 internal class IndentWiseExtension : VimExtension {
   override fun getName(): String = "vim-indentwise"
 
-  override fun init() {
-    putExtensionHandlerMapping(
-      MappingMode.NXO,
-      injector.parser.parseKeys("<Plug>IndentWisePreviousLesserIndent"),
-      owner,
-      IndentWiseLessIndentHandler(IndentLevel.LESSER),
-      false
-    )
-    putKeyMappingIfMissing(
-      MappingMode.NXO,
-      injector.parser.parseKeys("[-"),
-      owner,
-      injector.parser.parseKeys("<Plug>IndentWisePreviousLesserIndent"),
-      true,
-    )
+  data class IndentAction(val indentLevel: IndentLevel, val plugName: String, val keys: String)
 
-    putExtensionHandlerMapping(
-      MappingMode.NXO,
-      injector.parser.parseKeys("<Plug>IndentWisePreviousGreaterIndent"),
-      owner,
-      IndentWiseLessIndentHandler(IndentLevel.GREATER),
-      false
-    )
-    putKeyMappingIfMissing(
-      MappingMode.NXO,
-      injector.parser.parseKeys("[+"),
-      owner,
-      injector.parser.parseKeys("<Plug>IndentWisePreviousGreaterIndent"),
-      true,
-    )
+  private val indentActions = listOf(
+    IndentAction(IndentLevel.LESSER, "<Plug>IndentWisePreviousLesserIndent", "[-"),
+    IndentAction(IndentLevel.GREATER, "<Plug>IndentWisePreviousGreaterIndent", "[+"),
+    IndentAction(IndentLevel.EQUAL, "<Plug>IndentWisePreviousEqualIndent", "[=")
+  )
+
+  override fun init() {
+    indentActions.forEach { (indentLevel, plugName, keys) ->
+      putExtensionHandlerMapping(
+        MappingMode.NXO,
+        injector.parser.parseKeys(plugName),
+        owner,
+        IndentWiseLessIndentHandler(indentLevel),
+        false
+      )
+      putKeyMappingIfMissing(
+        MappingMode.NXO,
+        injector.parser.parseKeys(keys),
+        owner,
+        injector.parser.parseKeys(plugName),
+        true,
+      )
+    }
   }
 
   enum class IndentLevel {
@@ -122,18 +117,18 @@ internal class IndentWiseExtension : VimExtension {
         val indent = editor.getVisualIndent(line)
         do {
           line--
-        } while (line > 0 && (indentApplies(indentLevel, line, indent, editor) || editor.getLineText(line).trim()
+        } while (line > 0 && (invalidIndent(indentLevel, line, indent, editor) || editor.getLineText(line).trim()
             .isEmpty())
         )
         if (line < 0 || line == beginningLine) return null
-        if (indentApplies(indentLevel, line, indent, editor)) return null
+        if (invalidIndent(indentLevel, line, indent, editor)) return null
         return line
       }
 
-      fun indentApplies(indentLevel: IndentLevel, line: Int, indent: Int, editor: VimEditor): Boolean {
+      fun invalidIndent(indentLevel: IndentLevel, line: Int, indent: Int, editor: VimEditor): Boolean {
         return when (indentLevel) {
           IndentLevel.LESSER -> editor.getVisualIndent(line) >= indent
-          IndentLevel.EQUAL -> editor.getVisualIndent(line) == indent
+          IndentLevel.EQUAL -> editor.getVisualIndent(line) != indent
           IndentLevel.GREATER -> editor.getVisualIndent(line) <= indent
         }
       }
