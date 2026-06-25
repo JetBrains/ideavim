@@ -97,6 +97,20 @@ sealed class Argument {
      * which means the handler will allow `<C-K>`, `<C-V>` and `<C-Q>` to start the digraph/literal state machine.
      * The final character will not be mapped by `'langmap'`.
      */
-    CHARACTER
+    CHARACTER;
+
+    companion object {
+      /**
+       * Backwards-compatible alias for [CHARACTER].
+       *
+       * Returns the [CHARACTER] constant so that Java code comparing with `== Argument.Type.DIGRAPH` continues to work
+       * after the `DIGRAPH` enum value was merged into `CHARACTER`.
+       *
+       * Note: this does NOT work as a `case` label in a Java `switch` statement, which requires a true enum constant.
+       */
+      @JvmField
+      @Deprecated("Use CHARACTER instead", ReplaceWith("CHARACTER"))
+      val DIGRAPH: Type = CHARACTER
+    }
   }
 }
