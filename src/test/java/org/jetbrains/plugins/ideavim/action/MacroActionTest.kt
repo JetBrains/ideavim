@@ -331,8 +331,8 @@ class MacroActionTest : VimTestCase() {
       undoCount++
     }
     assertState(initialText)
-    // Verify that multiple undos were needed (one for each macro execution)
-    assertTrue(undoCount == 2, "Expected 2 undos for 2 macro executions, but needed $undoCount")
+    // Each replayed keystroke is its own undoable change, as in Vim: 1 for the recorded `dw` plus 3 for `3@a`.
+    assertTrue(undoCount == 4, "Expected 4 undos (recording + 3 macro executions), but needed $undoCount")
   }
 
   @Test
@@ -525,5 +525,13 @@ class MacroActionTest : VimTestCase() {
     Thread.sleep(2000)
     typeText("w", "q")
     assertRegister('a', "yw")
+  }
+
+  @Test
+  fun `should execute undo in macro`() {
+    configureByText("${c}Spongebob Squarepants")
+    typeText("qa", "dwu", "q")
+    typeText("@a")
+    assertState("Spongebob Squarepants")
   }
 }

@@ -330,7 +330,13 @@ class KeyHandler {
     val action: Runnable = ActionRunner(editor, context, command, keyState, operatorArguments, isSingleCommandFromInsert)
     val cmdAction = command.action
     val name = cmdAction.id
-    injector.actionExecutor.executeCommand(editor, action, name, action)
+    if (cmdAction.executesNestedCommands) {
+      // Macro-like actions must not hold an open command while replaying keystrokes, otherwise a replayed `u` can't
+      // undo an earlier change made by the same macro. See [EditorActionHandlerBase.executesNestedCommands].
+      action.run()
+    } else {
+      injector.actionExecutor.executeCommand(editor, action, name, action)
+    }
   }
 
   /**

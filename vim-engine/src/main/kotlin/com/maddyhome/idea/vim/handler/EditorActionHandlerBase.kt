@@ -57,6 +57,20 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
    */
   abstract val type: Command.Type
 
+  /**
+   * Macro-like actions replay other keystrokes, and each replayed keystroke must form its own undoable command.
+   *
+   * If such an action were itself wrapped in an outer [com.intellij.openapi.command.CommandProcessor] command, every
+   * change made during playback would be merged into that single still-open command. A `u` replayed inside the macro
+   * could then not undo an earlier change made by the same macro: the earlier change has not been committed as a
+   * separate undo entry yet, so IntelliJ throws `UnexpectedUndoException` ("Unexpected document state") and disposes
+   * the editor.
+   *
+   * Returning `true` tells the key handler to execute this action without an outer command wrapper, so the replayed
+   * keystrokes each open their own top-level command and can be undone independently (as in Vim).
+   */
+  open val executesNestedCommands: Boolean = false
+
   open val argumentType: Argument.Type? = null
 
   /**

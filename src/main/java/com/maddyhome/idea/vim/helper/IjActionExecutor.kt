@@ -160,6 +160,12 @@ class IjActionExecutor : VimActionExecutor {
     context: ExecutionContext,
     operatorArguments: OperatorArguments,
   ) {
+    if (cmd.executesNestedCommands) {
+      // Macro-like actions replay keystrokes that must each form their own undoable command, so they must not run
+      // inside an outer command. See [EditorActionHandlerBase.executesNestedCommands].
+      cmd.execute(editor, context, operatorArguments)
+      return
+    }
     CommandProcessor.getInstance()
       .executeCommand(
         editor.ij.project,

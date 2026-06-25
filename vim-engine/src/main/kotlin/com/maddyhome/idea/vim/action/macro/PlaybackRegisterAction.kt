@@ -24,6 +24,9 @@ class PlaybackRegisterAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
   override val argumentType: Argument.Type = Argument.Type.REGISTER
 
+  // Replay each macro keystroke as its own command so a `u` inside the macro can undo earlier macro changes
+  override val executesNestedCommands: Boolean = true
+
   override fun execute(
     editor: VimEditor,
     context: ExecutionContext,
@@ -37,7 +40,12 @@ class PlaybackRegisterAction : VimActionHandler.SingleExecution() {
         try {
           var success = false
           for (i in 0 until cmd.count) {
-            success = injector.vimscriptExecutor.executeLastCommand(editor, context)
+            // Unlike `@reg`, the last-command path doesn't replay keystrokes through the key handler, so it isn't
+            // wrapped in a command by anyone (this action runs without an outer command, see [executesNestedCommands]).
+            // Give each execution its own command so the document write is valid and independently undoable, as in Vim.
+            injector.actionExecutor.executeCommand(editor, {
+              success = injector.vimscriptExecutor.executeLastCommand(editor, context)
+            }, id, null)
             if (!success) break
           }
           if (reg != '@') { // @ is not a register itself, it just tells vim to use the last register
