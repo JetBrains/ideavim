@@ -14,7 +14,6 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.ui.SwingActionDelegate
 import com.intellij.ui.treeStructure.Tree
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.MessageHelper
@@ -26,17 +25,17 @@ import com.maddyhome.idea.vim.newapi.vim
  */
 class NerdTreeAction(val action: (AnActionEvent, Tree) -> Unit) {
   companion object {
-    fun callAction(editor: VimEditor?, name: String, context: ExecutionContext) {
+    fun callAction(editor: VimEditor?, name: String) {
       val action = ActionManager.getInstance().getAction(name) ?: run {
         VimPlugin.showMessage(MessageHelper.message("nerdtree.error.action.not.found", name))
         return
       }
       val application = ApplicationManager.getApplication()
       if (application.isUnitTestMode) {
-        injector.actionExecutor.executeAction(editor, action.vim, context)
+        injector.actionExecutor.executeAction(editor, action.vim)
       } else {
         runAfterGotFocus {
-          injector.actionExecutor.executeAction(editor, action.vim, context)
+          injector.actionExecutor.executeAction(editor, action.vim)
         }
       }
     }
@@ -47,7 +46,7 @@ class NerdTreeAction(val action: (AnActionEvent, Tree) -> Unit) {
      * @param id A string representing the ID of the action to execute.
      * @return An [NerdTreeAction] that runs the specified action when triggered.
      */
-    fun ij(id: String) = NerdTreeAction { event, _ -> callAction(null, id, event.dataContext.vim) }
+    fun ij(id: String) = NerdTreeAction { event, _ -> callAction(null, id) }
 
     /**
      * Creates an [NerdTreeAction] that delegates to the JTree's Swing ActionMap.

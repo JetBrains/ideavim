@@ -33,6 +33,13 @@ interface VimActionExecutor {
   fun executeAction(editor: VimEditor?, action: NativeAction, context: ExecutionContext): Boolean
 
   /**
+   * Execute an action
+   *
+   * @param action  The action to execute
+   */
+  fun executeAction(editor: VimEditor?, action: NativeAction): Boolean
+
+  /**
    * Execute an action by name
    *
    * @param name    The name of the action to execute

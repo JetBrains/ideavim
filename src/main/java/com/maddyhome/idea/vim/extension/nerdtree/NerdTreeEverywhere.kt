@@ -114,6 +114,7 @@ private fun openFileOrSimulateEnter(event: AnActionEvent, tree: Tree, focusEdito
   val file = event.getData(CommonDataKeys.VIRTUAL_FILE)
   if (file != null && !file.isDirectory) {
     injector.file.openFile(file.path, event.dataContext.vim, focusEditor)
+    closeEditorTree()
   } else {
     val listener = tree.getActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0))
     listener?.actionPerformed(ActionEvent(tree, ActionEvent.ACTION_PERFORMED, null))
