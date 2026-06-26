@@ -456,6 +456,52 @@ https://github.com/michaeljsmith/vim-indent-object/blob/master/doc/indent-object
 </details>
 
 <details>
+<summary><h2>indentwise: Motions based on indentation depth and indent blocks</h2></summary>
+
+Original plugin: [vim-indentwise](https://github.com/jeetsukumaran/vim-indentwise).
+
+### Summary:
+Adds motions that navigate by the indentation level of lines rather than by their content. You can
+jump to the previous/next line of lesser, greater or equal indentation relative to the current line,
+and jump to the beginning/end of the current indentation block. Blank and whitespace-only lines are
+skipped, so the motions follow the visible structure of the code. The motions take a `[count]`, and
+work in normal, visual and operator-pending modes (e.g. `d]-`, `v[%`). Operator-pending and visual
+moves are line-wise.
+
+### Setup:
+- Add the following command to `~/.ideavimrc`: `Plug 'jeetsukumaran/vim-indentwise'`
+    <details>
+      <summary>Alternative syntax</summary>
+      <code>Plugin 'jeetsukumaran/vim-indentwise'</code>
+      <br/>
+      <code>Plug 'https://github.com/jeetsukumaran/vim-indentwise'</code>
+      <br/>
+      <code>Plug 'vim-indentwise'</code>
+      <br/>
+      <code>set vim-indentwise</code>
+      </details>
+
+### Instructions
+
+https://github.com/jeetsukumaran/vim-indentwise/blob/master/doc/indentwise.txt
+
+| Mapping | Description |
+|---------|-------------|
+| `[-`    | Move to the previous line of **lesser** indent |
+| `]-`    | Move to the next line of **lesser** indent |
+| `[+`    | Move to the previous line of **greater** indent |
+| `]+`    | Move to the next line of **greater** indent |
+| `[=`    | Move to the previous line of **equal** indent |
+| `]=`    | Move to the next line of **equal** indent |
+| `[%`    | Move to the **beginning** of the current indent block |
+| `]%`    | Move to the **end** of the current indent block |
+
+For the block-scope motions, a `[count]` repeats outward through enclosing blocks (e.g. `2[%`). The
+absolute-indent motions (`[_`, `]_`) from the original plugin are not currently supported.
+
+</details>
+
+<details>
 <summary><h2>matchit.vim: Extends the % key functionality</h2></summary>
 
 By [Martin Yzeiri](https://github.com/myzeiri)
