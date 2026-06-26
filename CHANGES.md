@@ -23,6 +23,14 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+## [To Be Released]
+
+### Fixes:
+* Fixed `u` (undo) inside a recorded macro not replaying — e.g. recording `dwu` (delete a word, then undo) and replaying it with `@a` now works correctly
+
+### Merged PRs:
+* [1870](https://github.com/JetBrains/ideavim/pull/1870) by [1grzyb1](https://github.com/1grzyb1): Fix undo in macro replay
+
 ## 2.40.0, 2026-06-25
 
 ### Features:
