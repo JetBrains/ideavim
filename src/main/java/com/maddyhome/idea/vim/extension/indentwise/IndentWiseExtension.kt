@@ -31,7 +31,6 @@ import com.maddyhome.idea.vim.state.mode.Mode
  * Port of vim-indentwise (https://github.com/jeetsukumaran/vim-indentwise).
  *
  * Provides motions that navigate the buffer based on the indentation level of lines.
- *
  */
 internal class IndentWiseExtension : VimExtension {
   override fun getName(): String = "vim-indentwise"
@@ -40,18 +39,18 @@ internal class IndentWiseExtension : VimExtension {
     val indentLevel: IndentLevel,
     val plugName: String,
     val keys: String,
-    val direction: IndentActionDirection,
+    val direction: Direction,
   )
 
   private val indentActions = listOf(
-    IndentAction(IndentLevel.LESSER, "<Plug>IndentWisePreviousLesserIndent", "[-", IndentActionDirection.PREVIOUS),
-    IndentAction(IndentLevel.GREATER, "<Plug>IndentWisePreviousGreaterIndent", "[+", IndentActionDirection.PREVIOUS),
-    IndentAction(IndentLevel.EQUAL, "<Plug>IndentWisePreviousEqualIndent", "[=", IndentActionDirection.PREVIOUS),
-    IndentAction(IndentLevel.LESSER, "<Plug>IndentWiseNextLesserIndent", "]-", IndentActionDirection.NEXT),
-    IndentAction(IndentLevel.GREATER, "<Plug>IndentWiseNextGreaterIndent", "]+", IndentActionDirection.NEXT),
-    IndentAction(IndentLevel.EQUAL, "<Plug>IndentWiseNextEqualIndent", "]=", IndentActionDirection.NEXT),
-    IndentAction(IndentLevel.BLOCK, "<Plug>IndentWiseBlockScopeBoundaryBegin", "[%", IndentActionDirection.PREVIOUS),
-    IndentAction(IndentLevel.BLOCK, "<Plug>IndentWiseBlockScopeBoundaryEnd", "]%", IndentActionDirection.NEXT),
+    IndentAction(IndentLevel.LESSER, "<Plug>IndentWisePreviousLesserIndent", "[-", Direction.PREVIOUS),
+    IndentAction(IndentLevel.GREATER, "<Plug>IndentWisePreviousGreaterIndent", "[+", Direction.PREVIOUS),
+    IndentAction(IndentLevel.EQUAL, "<Plug>IndentWisePreviousEqualIndent", "[=", Direction.PREVIOUS),
+    IndentAction(IndentLevel.LESSER, "<Plug>IndentWiseNextLesserIndent", "]-", Direction.NEXT),
+    IndentAction(IndentLevel.GREATER, "<Plug>IndentWiseNextGreaterIndent", "]+", Direction.NEXT),
+    IndentAction(IndentLevel.EQUAL, "<Plug>IndentWiseNextEqualIndent", "]=", Direction.NEXT),
+    IndentAction(IndentLevel.BLOCK, "<Plug>IndentWiseBlockScopeBoundaryBegin", "[%", Direction.PREVIOUS),
+    IndentAction(IndentLevel.BLOCK, "<Plug>IndentWiseBlockScopeBoundaryEnd", "]%", Direction.NEXT),
   )
 
   override fun init() {
@@ -60,7 +59,7 @@ internal class IndentWiseExtension : VimExtension {
         MappingMode.NXO,
         injector.parser.parseKeys(plugName),
         owner,
-        IndentWiseLessIndentHandler(indentLevel, direction),
+        IndentWiseMotionHandler(indentLevel, direction),
         false
       )
       putKeyMappingIfMissing(
@@ -77,52 +76,58 @@ internal class IndentWiseExtension : VimExtension {
     LESSER,
     EQUAL,
     GREATER,
-    BLOCK
+    BLOCK,
   }
 
-  enum class IndentActionDirection {
-    PREVIOUS,
-    NEXT,
+  enum class Direction(val step: Int) {
+    PREVIOUS(-1),
+    NEXT(1),
   }
 
-  class IndentWiseLessIndentHandler(val indentLevel: IndentLevel, val direction: IndentActionDirection) :
-    ExtensionHandler {
+  /**
+   * Handles the motion when invoked directly (normal/visual mode). In operator-pending mode the work is delegated to
+   * [IndentWiseMotionAction] so the operator can treat the move as a proper line-wise motion.
+   */
+  class IndentWiseMotionHandler(
+    private val indentLevel: IndentLevel,
+    private val direction: Direction,
+  ) : ExtensionHandler {
     override fun execute(
       editor: VimEditor,
       context: ExecutionContext,
       operatorArguments: OperatorArguments,
     ) {
       if (editor.mode is Mode.OP_PENDING) {
-        val commandBuilder = KeyHandler.getInstance().keyHandlerState.commandBuilder
-        commandBuilder.addAction(IndentWiseMotionAction(indentLevel, direction))
-      } else {
-        editor.sortedCarets().forEach { _ ->
-          if (indentLevel == IndentLevel.BLOCK) {
-            val line = IndentWiseMotionAction.blockBoundary(
-              editor,
-              editor.currentCaret().getLine(),
-              direction,
-              operatorArguments.count1,
-            )
-            editor.currentCaret().moveToOffset(editor.getLeadingCharacterOffset(line))
-          } else {
-            repeat(operatorArguments.count1) {
-              moveToPreviousIndent(editor)
-            }
-          }
-        }
+        KeyHandler.getInstance().keyHandlerState.commandBuilder
+          .addAction(IndentWiseMotionAction(indentLevel, direction))
+        return
       }
+      editor.sortedCarets().forEach { _ -> moveCaretToTarget(editor, operatorArguments.count1) }
     }
 
-    private fun moveToPreviousIndent(editor: VimEditor) {
-      val line = IndentWiseMotionAction.findIndentTarget(editor, indentLevel, direction) ?: return
-      editor.currentCaret().moveToOffset(editor.getLeadingCharacterOffset(line))
+    private fun moveCaretToTarget(editor: VimEditor, count: Int) {
+      val caret = editor.currentCaret()
+      val targetLine = if (indentLevel == IndentLevel.BLOCK) {
+        IndentNavigator.blockScopeBoundary(editor, caret.getLine(), direction, count)
+      } else {
+        repeatedIndentTarget(editor, caret.getLine(), count) ?: return
+      }
+      caret.moveToOffset(editor.getLeadingCharacterOffset(targetLine))
     }
 
+    private fun repeatedIndentTarget(editor: VimEditor, startLine: Int, count: Int): Int? {
+      var line = startLine
+      repeat(count) {
+        line = IndentNavigator.findIndentTarget(editor, line, indentLevel, direction) ?: return null
+      }
+      return line
+    }
   }
 
-  private class IndentWiseMotionAction(val indentLevel: IndentLevel, val direction: IndentActionDirection) :
-    MotionActionHandler.ForEachCaret() {
+  private class IndentWiseMotionAction(
+    private val indentLevel: IndentLevel,
+    private val direction: Direction,
+  ) : MotionActionHandler.ForEachCaret() {
     override val motionType: MotionType = MotionType.LINE_WISE
 
     override fun getOffset(
@@ -132,118 +137,88 @@ internal class IndentWiseExtension : VimExtension {
       argument: Argument?,
       operatorArguments: OperatorArguments,
     ): Motion {
+      val currentLine = editor.currentCaret().getLine()
       if (indentLevel == IndentLevel.BLOCK) {
-        val blockLine = blockBoundary(editor, editor.currentCaret().getLine(), direction, operatorArguments.count1)
+        val blockLine = IndentNavigator.blockScopeBoundary(editor, currentLine, direction, operatorArguments.count1)
         return editor.getLeadingCharacterOffset(blockLine).toMotionOrError()
       }
-      val line = findIndentTarget(editor, indentLevel, direction) ?: return 0.toMotionOrError()
-      val target = editor.getLeadingCharacterOffset(line + (if (direction == IndentActionDirection.PREVIOUS) 1 else -1))
-      return target.toMotionOrError()
+      val targetLine = IndentNavigator.findIndentTarget(editor, currentLine, indentLevel, direction)
+        ?: return 0.toMotionOrError()
+      return editor.getLeadingCharacterOffset(exclusiveLine(targetLine)).toMotionOrError()
     }
 
-    companion object {
+    /**
+     * The indent motions are exclusive: the target indent line itself is not part of the operated/selected range, so
+     * the motion stops on the line just inside it (one step back towards the caret's origin).
+     */
+    private fun exclusiveLine(targetLine: Int): Int = targetLine - direction.step
+  }
 
-      fun findIndentTarget(editor: VimEditor, indentLevel: IndentLevel, direction: IndentActionDirection): Int? {
-        var line = editor.currentCaret().getLine()
-        val beginningLine = line
-        val indent = editor.getVisualIndent(line)
-        do {
-          line += if (direction == IndentActionDirection.PREVIOUS) -1 else 1
-        } while (validLine(editor, line, direction) && (invalidIndent(
-            indentLevel,
-            line,
-            indent,
-            editor
-          ) || editor.getLineText(line).trim()
-            .isEmpty())
-        )
-        val invalidLine = invalidLine(editor, line, direction)
-        if (invalidLine || line == beginningLine) return null
-        if (invalidIndent(indentLevel, line, indent, editor)) return null
-
-        return line
+  private object IndentNavigator {
+    /**
+     * Finds the nearest line, scanning in [direction] from [startLine], whose indentation satisfies [indentLevel]
+     * relative to the start line. Blank lines are skipped. Returns null if no such line exists.
+     */
+    fun findIndentTarget(editor: VimEditor, startLine: Int, indentLevel: IndentLevel, direction: Direction): Int? {
+      val referenceIndent = editor.visualIndent(startLine)
+      var line = startLine + direction.step
+      while (editor.containsLine(line) && !matchesIndent(editor, line, indentLevel, referenceIndent)) {
+        line += direction.step
       }
+      if (!editor.containsLine(line)) return null
+      return line
+    }
 
-      fun blockBoundary(
-        editor: VimEditor,
-        startLine: Int,
-        direction: IndentActionDirection,
-        count: Int,
-      ): Int {
-        val step = if (direction == IndentActionDirection.PREVIOUS) -1 else 1
-        var referenceLine = startLine
-        var target = startLine
-        repeat(count) {
-          val referenceIndent = editor.getVisualIndent(referenceLine)
-          var line = referenceLine + step
-          var boundary = -1
-          while (line >= 0 && line < editor.lineCount()) {
-            if (editor.getLineText(line).trim().isEmpty()) {
-              line += step
-              continue
-            }
-            if (editor.getVisualIndent(line) < referenceIndent) {
-              boundary = line
-              break
-            }
-            line += step
-          }
-          if (boundary < 0) {
-            return fallbackLine(editor, direction)
-          }
-          target = boundary - step
-          referenceLine = boundary
-        }
-        return target
+    /**
+     * Finds the boundary of the current indentation block, scanning in [direction]. Each [count] step moves to the
+     * boundary of the enclosing block. If no enclosing block is found, falls back to the first/last non-blank line.
+     */
+    fun blockScopeBoundary(editor: VimEditor, startLine: Int, direction: Direction, count: Int): Int {
+      var referenceLine = startLine
+      var target = startLine
+      repeat(count) {
+        val boundary = firstLineWithLesserIndent(editor, referenceLine, direction)
+          ?: return outermostNonBlankLine(editor, direction)
+        target = boundary - direction.step
+        referenceLine = boundary
       }
+      return target
+    }
 
-      private fun fallbackLine(editor: VimEditor, direction: IndentActionDirection): Int {
-        return if (direction == IndentActionDirection.PREVIOUS) {
-          var line = 0
-          while (line < editor.lineCount() && editor.getLineText(line).trim().isEmpty()) line++
-          if (line < editor.lineCount()) line else 0
-        } else {
-          var line = editor.lineCount() - 1
-          while (line >= 0 && editor.getLineText(line).trim().isEmpty()) line--
-          if (line >= 0) line else editor.lineCount() - 1
-        }
+    private fun firstLineWithLesserIndent(editor: VimEditor, fromLine: Int, direction: Direction): Int? {
+      val referenceIndent = editor.visualIndent(fromLine)
+      var line = fromLine + direction.step
+      while (editor.containsLine(line)) {
+        if (!editor.isBlank(line) && editor.visualIndent(line) < referenceIndent) return line
+        line += direction.step
       }
+      return null
+    }
 
-      private fun validLine(
-        editor: VimEditor,
-        line: Int,
-        direction: IndentActionDirection,
-      ): Boolean {
-        return when (direction) {
-          IndentActionDirection.PREVIOUS -> line > 0
-          IndentActionDirection.NEXT -> line < editor.lineCount()
-        }
-      }
+    private fun outermostNonBlankLine(editor: VimEditor, direction: Direction): Int = when (direction) {
+      Direction.PREVIOUS -> (0 until editor.lineCount()).firstOrNull { !editor.isBlank(it) } ?: 0
+      Direction.NEXT -> (editor.lineCount() - 1 downTo 0).firstOrNull { !editor.isBlank(it) }
+        ?: (editor.lineCount() - 1)
+    }
 
-      private fun invalidLine(
-        editor: VimEditor,
-        line: Int,
-        direction: IndentActionDirection,
-      ): Boolean {
-        return when (direction) {
-          IndentActionDirection.PREVIOUS -> line < 0
-          IndentActionDirection.NEXT -> line >= editor.lineCount()
-        }
-      }
-
-      fun invalidIndent(indentLevel: IndentLevel, line: Int, indent: Int, editor: VimEditor): Boolean {
-        return when (indentLevel) {
-          IndentLevel.LESSER -> editor.getVisualIndent(line) >= indent
-          IndentLevel.EQUAL -> editor.getVisualIndent(line) != indent
-          IndentLevel.GREATER -> editor.getVisualIndent(line) <= indent
-          IndentLevel.BLOCK -> editor.getVisualIndent(line) == indent
-        }
-      }
-
-      fun VimEditor.getVisualIndent(line: Int): Int {
-        val leadingOffset = this.getLeadingCharacterOffset(line)
-        return this.offsetToVisualPosition(leadingOffset).column
+    private fun matchesIndent(editor: VimEditor, line: Int, indentLevel: IndentLevel, referenceIndent: Int): Boolean {
+      if (editor.isBlank(line)) return false
+      val indent = editor.visualIndent(line)
+      return when (indentLevel) {
+        IndentLevel.LESSER -> indent < referenceIndent
+        IndentLevel.EQUAL -> indent == referenceIndent
+        IndentLevel.GREATER -> indent > referenceIndent
+        IndentLevel.BLOCK -> error("BLOCK is handled by blockScopeBoundary, not findIndentTarget")
       }
     }
+  }
+
+  companion object {
+    private fun VimEditor.containsLine(line: Int): Boolean = line in 0 until lineCount()
+
+    private fun VimEditor.isBlank(line: Int): Boolean = getLineText(line).isBlank()
+
+    private fun VimEditor.visualIndent(line: Int): Int =
+      offsetToVisualPosition(getLeadingCharacterOffset(line)).column
   }
 }
