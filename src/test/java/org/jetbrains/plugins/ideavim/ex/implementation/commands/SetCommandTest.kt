@@ -188,15 +188,15 @@ class SetCommandTest : VimTestCase() {
       |  cmdheight=1         inccommand=         scrolloff=0         timeoutlen=1000
       |  colorcolumn=      noincsearch           selectmode=       notrackactionids
       |nocommentary          langmap=            shellcmdflag=-x     undolevels=1000
-      |nocursorline          langnoremap         shellxescape=@    noVimEverywhere
-      |nodigraph           nolangremap           shellxquote={       virtualedit=
-      |noexchange          nolist                showcmd           novisualbell
-      |  fileformat=unix   nomatchit             showmode            visualdelay=100
-      |  foldlevel=1         maxmapdepth=20      sidescroll=0        whichwrap=b,s
-      |nofunctextobj       nomini-ai             sidescrolloff=0     wrap
-      |nogdefault            more              nosmartcase           wrapscan
-      |nohighlightedyank   nomultiple-cursors  nosneak             noyoucompleteme
-      |  history=50        noNERDTree            startofline
+      |nocursorline          langnoremap         shellxescape=@    novim-indentwise
+      |nodigraph           nolangremap           shellxquote={     noVimEverywhere
+      |noexchange          nolist                showcmd             virtualedit=
+      |  fileformat=unix   nomatchit             showmode          novisualbell
+      |  foldlevel=1         maxmapdepth=20      sidescroll=0        visualdelay=100
+      |nofunctextobj       nomini-ai             sidescrolloff=0     whichwrap=b,s
+      |nogdefault            more              nosmartcase           wrap
+      |nohighlightedyank   nomultiple-cursors  nosneak               wrapscan
+      |  history=50        noNERDTree            startofline       noyoucompleteme
       |  clipboard=ideaput,autoselect
       |  comments=s1:/*,mb:*,ex:*/,://,b:#,:%,:XCOMM,n:>,fb:-
       |  fileencoding=utf-8
@@ -339,6 +339,7 @@ class SetCommandTest : VimTestCase() {
     |  timeoutlen=1000
     |notrackactionids
     |  undolevels=1000
+    |novim-indentwise
     |novim-paragraph-motion
     |noVimEverywhere
     |  viminfo='100,<50,s10,h
