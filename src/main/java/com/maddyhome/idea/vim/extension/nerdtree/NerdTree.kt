@@ -18,6 +18,7 @@ import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.openapi.wm.ToolWindowId
 import com.intellij.openapi.wm.ex.ToolWindowManagerEx
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -128,7 +129,7 @@ internal class NerdTree : VimExtension {
 
   class IjCommandHandler(private val actionId: String) : CommandAliasHandler {
     override fun execute(command: String, range: Range, editor: VimEditor, context: ExecutionContext) {
-      NerdTreeAction.callAction(editor, actionId, context)
+      NerdTreeAction.callAction(editor, actionId)
     }
   }
 
@@ -139,7 +140,7 @@ internal class NerdTree : VimExtension {
       if (toolWindow.isVisible) {
         toolWindow.hide()
       } else {
-        NerdTreeAction.callAction(editor, "ActivateProjectToolWindow", context)
+        NerdTreeAction.callAction(editor, "ActivateProjectToolWindow")
       }
     }
   }
@@ -191,6 +192,7 @@ private fun createMappings(): Map<List<KeyStroke>, NerdTreeAction> = navigationM
       } else {
         // File — open via injector which routes through RPC in split mode
         injector.file.openFile(file.path, event.dataContext.vim)
+        closeEditorTree()
       }
     },
   )
@@ -287,6 +289,18 @@ private fun createMappings(): Map<List<KeyStroke>, NerdTreeAction> = navigationM
     NerdTreeAction.ij("MaximizeToolWindow"),
   )
 }
+
+fun closeEditorTree() {
+  val quitOnOpen = VimPlugin.getVariableService()
+    .getGlobalVariableValue("NERDTreeQuitOnOpen")
+    ?.toVimNumber()?.value ?: 0
+  if (quitOnOpen == 1) {
+    ProjectManager.getInstance().openProjects.forEach { project ->
+      ToolWindowManagerEx.getInstanceEx(project).getToolWindow(ToolWindowId.PROJECT_VIEW)?.hide()
+    }
+  }
+}
+
 
 private val lock = ReentrantReadWriteLock()
 private var enabled = false

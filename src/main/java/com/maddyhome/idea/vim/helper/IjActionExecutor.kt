@@ -61,7 +61,7 @@ class IjActionExecutor : VimActionExecutor {
 
   var isRunningActionFromVim: Boolean = false
 
-  override fun executeAction(editor: VimEditor?, action: NativeAction, context: ExecutionContext): Boolean {
+  override fun executeAction(editor: VimEditor?, action: NativeAction): Boolean {
     val applicationEx = ApplicationManagerEx.getApplicationEx()
     if (ProgressIndicatorUtils.isWriteActionRunningOrPending(applicationEx)) {
       // This is needed for VIM-3376
@@ -81,6 +81,10 @@ class IjActionExecutor : VimActionExecutor {
     } finally {
       isRunningActionFromVim = false
     }
+  }
+
+  override fun executeAction(editor: VimEditor?, action: NativeAction, context: ExecutionContext): Boolean {
+    return executeAction(editor, action)
   }
 
   // Note: We should find a proper place for the IdeaVim actions
