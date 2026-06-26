@@ -493,15 +493,15 @@ class SetlocalCommandTest : VimTestCase() {
     |  cmdheight=1       noignorecase          scrolljump=1        timeout
     |  colorcolumn=        inccommand=         scrolloff=-1        timeoutlen=1000
     |nocommentary        noincsearch           selectmode=       notrackactionids
-    |nocursorline          langmap=            shellcmdflag=-x   noVimEverywhere
-    |nodigraph             langnoremap         shellxescape=@      virtualedit=
-    |noexchange          nolangremap           shellxquote={     novisualbell
-    |  fileformat=unix   nolist                showcmd             visualdelay=100
-    |  foldlevel=1       nomatchit             showmode            whichwrap=b,s
-    |nofunctextobj         maxmapdepth=20      sidescroll=0        wrap
-    |nogdefault          nomini-ai             sidescrolloff=-1    wrapscan
-    |nohighlightedyank     more              nosmartcase         noyoucompleteme
-    |  history=50        nomultiple-cursors  nosneak
+    |nocursorline          langmap=            shellcmdflag=-x   novim-indentwise
+    |nodigraph             langnoremap         shellxescape=@    noVimEverywhere
+    |noexchange          nolangremap           shellxquote={       virtualedit=
+    |  fileformat=unix   nolist                showcmd           novisualbell
+    |  foldlevel=1       nomatchit             showmode            visualdelay=100
+    |nofunctextobj         maxmapdepth=20      sidescroll=0        whichwrap=b,s
+    |nogdefault          nomini-ai             sidescrolloff=-1    wrap
+    |nohighlightedyank     more              nosmartcase           wrapscan
+    |  history=50        nomultiple-cursors  nosneak             noyoucompleteme
     |  clipboard=ideaput,autoselect
     |  comments=s1:/*,mb:*,ex:*/,://,b:#,:%,:XCOMM,n:>,fb:-
     |  fileencoding=utf-8
@@ -644,6 +644,7 @@ class SetlocalCommandTest : VimTestCase() {
     |  timeoutlen=1000
     |notrackactionids
     |  undolevels=-123456
+    |novim-indentwise
     |novim-paragraph-motion
     |noVimEverywhere
     |  viminfo='100,<50,s10,h
