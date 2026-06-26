@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.autocmd
 import com.maddyhome.idea.vim.api.AutoCmdService
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.state.mode.Mode
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -50,15 +51,30 @@ class AutoCmdImpl : AutoCmdService {
   override fun handleEvent(event: AutoCmdEvent, filePath: String?, editor: VimEditor?) {
     val resolvedEditor = editor ?: injector.editorGroup.getSelectedEditor() ?: return
     val path = filePath ?: resolvedEditor.getPath()
-    eventHandlers[event.canonical]?.forEach { auCommand ->
+    val handlers = eventHandlers[event.canonical] ?: return
+    val context = injector.executionContextManager.getEditorExecutionContext(resolvedEditor)
+    handlers.forEach { auCommand ->
       if (auCommand.pattern.matches(path)) {
-        executeCommand(auCommand.command, resolvedEditor)
+        // exit insert mode if event must be run from normal mode
+        if (event.runsInNormalMode && resolvedEditor.mode.isInsertOrReplace) {
+          injector.changeGroup.processEscape(resolvedEditor, context)
+        }
+        injector.vimscriptExecutor.execute(auCommand.command, resolvedEditor, context, skipHistory = true)
       }
     }
   }
-
-  private fun executeCommand(command: String, editor: VimEditor) {
-    val context = injector.executionContextManager.getEditorExecutionContext(editor)
-    injector.vimscriptExecutor.execute(command, editor, context, skipHistory = true)
-  }
 }
+
+/**
+ * Whether this event fires in Vim only while in Normal mode (so we must restore Normal mode if the IDE left us in
+ * Insert mode). Insert-mode events and focus events legitimately occur during Insert mode and must not force an exit.
+ */
+private val AutoCmdEvent.runsInNormalMode: Boolean
+  get() = when (this) {
+    AutoCmdEvent.InsertEnter, AutoCmdEvent.InsertLeave, AutoCmdEvent.FocusGained, AutoCmdEvent.FocusLost -> false
+    else -> true
+  }
+
+// Vim treats Replace mode like Insert for these purposes (`:help InsertEnter`).
+private val Mode.isInsertOrReplace: Boolean
+  get() = this is Mode.INSERT || this is Mode.REPLACE
