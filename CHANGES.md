@@ -25,10 +25,17 @@ usual beta standards.
 
 ## [To Be Released]
 
+### Features:
+* [VIM-2116](https://youtrack.jetbrains.com/issue/VIM-2116) Added built-in [`indentwise`](https://github.com/jeetsukumaran/vim-indentwise) extension — motions that navigate by indentation level: `[-`/`]-` jump to the previous/next line of lesser indent, `[+`/`]+` to greater indent, `[=`/`]=` to equal indent, and `[%`/`]%` to the beginning/end of the current indent block; activate with `Plug 'jeetsukumaran/vim-indentwise'`
+
 ### Fixes:
 * Fixed `u` (undo) inside a recorded macro not replaying — e.g. recording `dwu` (delete a word, then undo) and replaying it with `@a` now works correctly
+* [VIM-4257](https://youtrack.jetbrains.com/issue/VIM-4257) Fixed autocmd commands for Normal-mode events (e.g. `BufWritePre`) running while still in Insert mode — IdeaVim now returns to Normal mode before executing them
 
 ### Merged PRs:
+* [1873](https://github.com/JetBrains/ideavim/pull/1873) by [1grzyb1](https://github.com/1grzyb1): VIM-2116 Implement indentwise plugin
+* [1874](https://github.com/JetBrains/ideavim/pull/1874) by [1grzyb1](https://github.com/1grzyb1): VIM-4257 Ensure that autocmd runs in normal mode
+* [1871](https://github.com/JetBrains/ideavim/pull/1871) by [citizenmatt](https://github.com/citizenmatt): Restore plugin compatibility for Argument.Type
 * [1870](https://github.com/JetBrains/ideavim/pull/1870) by [1grzyb1](https://github.com/1grzyb1): Fix undo in macro replay
 
 ## 2.40.0, 2026-06-25
