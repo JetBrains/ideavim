@@ -137,6 +137,26 @@ class ChangeActionTest : VimTestCase() {
     )
   }
 
+  @Test
+  fun testDeleteUpToEndInsertSingleCommand() {
+    doTest(
+      listOf("i", "<C-O>", "D"),
+      "time${c}pass is fun",
+      "time${c}",
+      Mode.INSERT
+    )
+  }
+
+  @Test
+  fun testDeleteInsertSingleCommand() {
+    doTest(
+      listOf("i", "<C-O>", "d3w"),
+      "time${c}pass is fun",
+      "time${c}",
+      Mode.INSERT
+    )
+  }
+
   // VIM-321 |d| |count|
   @Test
   fun testDeleteEmptyRange() {
