@@ -1276,6 +1276,11 @@
   },
   {
     "keys": "U",
+    "class": "com.maddyhome.idea.vim.action.change.LineUndoAction",
+    "modes": "N"
+  },
+  {
+    "keys": "U",
     "class": "com.maddyhome.idea.vim.action.change.change.ChangeCaseUpperVisualAction",
     "modes": "X"
   },

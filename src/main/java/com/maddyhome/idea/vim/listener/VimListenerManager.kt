@@ -427,6 +427,7 @@ object VimListenerManager {
   class VimDocumentListener : DocumentListener {
     override fun beforeDocumentChange(event: DocumentEvent) {
       MarkUpdater.beforeDocumentChange(event)
+      snapshotChangedLine(event)
       IjVimSearchGroup.DocumentSearchListener.INSTANCE.beforeDocumentChange(event)
       IjVimRedrawService.RedrawListener.beforeDocumentChange(event)
     }
@@ -435,6 +436,21 @@ object VimListenerManager {
       MarkUpdater.documentChanged(event)
       IjVimSearchGroup.DocumentSearchListener.INSTANCE.documentChanged(event)
       IjVimRedrawService.RedrawListener.documentChanged(event)
+    }
+
+    /**
+     * Saves the pristine line for the "U" command before it is changed. We only work out which line
+     * is about to change here; the snapshot itself is owned by [injector.lineChange]. Only single-line
+     * changes are tracked, mirroring Vim's `u_save` (which calls `u_saveline` only for a 1-line range).
+     */
+    private fun snapshotChangedLine(event: DocumentEvent) {
+      if (VimPlugin.isNotEnabled()) return
+      val doc = event.document
+      val startLine = doc.getLineNumber(event.offset)
+      val endLine = doc.getLineNumber(event.offset + event.oldLength)
+      if (startLine != endLine || event.newFragment.contains('\n')) return
+      val editor = EditorFactory.getInstance().getEditors(doc).firstOrNull()?.let { IjVimEditor(it) } ?: return
+      injector.lineChange.snapshotLine(startLine, editor)
     }
   }
 
