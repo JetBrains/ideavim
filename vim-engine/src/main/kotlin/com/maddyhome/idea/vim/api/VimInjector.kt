@@ -21,6 +21,7 @@ import com.maddyhome.idea.vim.register.VimRegisterGroup
 import com.maddyhome.idea.vim.state.VimStateMachine
 import com.maddyhome.idea.vim.thinapi.VimHighlightingService
 import com.maddyhome.idea.vim.thinapi.VimPluginService
+import com.maddyhome.idea.vim.undo.LineChange
 import com.maddyhome.idea.vim.undo.VimUndoRedo
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 import com.maddyhome.idea.vim.yank.VimYankGroup
@@ -126,6 +127,8 @@ interface VimInjector {
   val macro: VimMacro
 
   val undo: VimUndoRedo
+
+  val lineChange: LineChange
 
   val psiService: VimPsiService
 

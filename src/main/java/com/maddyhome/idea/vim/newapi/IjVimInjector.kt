@@ -72,6 +72,7 @@ import com.maddyhome.idea.vim.extension.JsonExtensionProvider
 import com.maddyhome.idea.vim.group.EffectiveIjOptions
 import com.maddyhome.idea.vim.group.GlobalIjOptions
 import com.maddyhome.idea.vim.group.IjVimOptionGroup
+import com.maddyhome.idea.vim.group.LineChangeGroup
 import com.maddyhome.idea.vim.group.TabService
 import com.maddyhome.idea.vim.group.VimWindowGroup
 import com.maddyhome.idea.vim.history.VimHistory
@@ -80,6 +81,7 @@ import com.maddyhome.idea.vim.put.VimPut
 import com.maddyhome.idea.vim.register.VimRegisterGroup
 import com.maddyhome.idea.vim.thinapi.VimHighlightingService
 import com.maddyhome.idea.vim.thinapi.VimPluginService
+import com.maddyhome.idea.vim.undo.LineChange
 import com.maddyhome.idea.vim.undo.VimUndoRedo
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 import com.maddyhome.idea.vim.yank.VimYankGroup
@@ -148,6 +150,8 @@ internal class IjVimInjector : VimInjectorBase() {
     get() = service()
   override val undo: VimUndoRedo
     get() = service()
+  override val lineChange: LineChange
+    get() = LineChangeGroup
   override val psiService: VimPsiService
     get() = service()
   override val nativeActionManager: NativeActionManager
