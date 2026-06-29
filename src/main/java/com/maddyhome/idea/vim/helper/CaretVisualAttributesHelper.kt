@@ -146,6 +146,8 @@ private object AttributesCache {
         GuiCursorType.BLOCK -> CaretVisualAttributes.Shape.BLOCK
         GuiCursorType.VER -> CaretVisualAttributes.Shape.BAR
         GuiCursorType.HOR -> CaretVisualAttributes.Shape.UNDERSCORE
+        // 'guicursor' is empty - don't override the caret, use the IDE's native (e.g. blinking) caret
+        null -> return@getOrPut CaretVisualAttributes.getDefault()
       }
       val colour: Color? = null // Support highlight group?
       CaretVisualAttributes(colour, CaretVisualAttributes.Weight.NORMAL, shape, attributes.thickness / 100F)

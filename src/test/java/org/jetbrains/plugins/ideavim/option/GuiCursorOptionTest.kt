@@ -173,4 +173,21 @@ class GuiCursorOptionTest : VimTestCase() {
     assertEquals(75, attributes.thickness)
     assertEquals("OtherCursor", attributes.highlightGroup)
   }
+
+  @Test
+  fun `test allow empty guicursor`() {
+    enterCommand("set guicursor=")
+    assertPluginError(false)
+    assertEquals("", options().guicursor.value)
+  }
+
+  @Test
+  fun `test empty guicursor has unspecified attributes for all modes`() {
+    enterCommand("set guicursor=")
+    GuiCursorMode.entries.filter { it != GuiCursorMode.ALL }.forEach { mode ->
+      val attributes = GuiCursorOptionHelper.getAttributes(mode)
+      // A null type signals that the caret shape is not specified and should be left to the IDE
+      assertEquals(null, attributes.type, "Expected unspecified caret shape for mode $mode")
+    }
+  }
 }
