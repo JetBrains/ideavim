@@ -81,6 +81,11 @@ object GuiCursorOptionHelper {
   fun getAttributes(mode: GuiCursorMode): GuiCursorAttributes {
     val attributes = injector.optionGroup.getParsedEffectiveOptionValue(Options.guicursor, null, ::parseGuicursor)
 
+    // An empty 'guicursor' means "don't change the cursor" - we leave the caret to the IDE rather than forcing a shape
+    if (attributes.isEmpty()) {
+      return GuiCursorAttributes.UNSPECIFIED
+    }
+
     // `ve` falls back to `v` if not specified
     return attributes[mode]
       ?: (if (mode == GuiCursorMode.VISUAL_EXCLUSIVE) attributes[GuiCursorMode.VISUAL] else null)
@@ -88,7 +93,11 @@ object GuiCursorOptionHelper {
   }
 
   private fun parseGuicursor(guicursor: VimString) = GuiCursorAttributeBuilders().also { builders ->
-    // Split into entries. Each entry has a list of modes and various attributes and adds to/overrides current values
+    // An empty 'guicursor' produces no entries - getAttributes() maps the empty result to GuiCursorAttributes.UNSPECIFIED
+    if (guicursor.value.isEmpty()) {
+      return@also
+    }
+    // Split into entries. Each entry has a list of modes and various attributes and adds to/overrides current values.
     Options.guicursor.split(guicursor.value).map { convertToken(it) }
       .forEach { entry ->
         entry.modes.forEach {
@@ -209,15 +218,26 @@ class GuiCursorEntry(
 )
 
 data class GuiCursorAttributes(
-  val type: GuiCursorType,
+  /** The cursor shape, or `null` when no shape is specified and the IDE's native caret should be used */
+  val type: GuiCursorType?,
   val thickness: Int,
   val highlightGroup: String,
   val lmapHighlightGroup: String,
   val blinkModes: List<String>,
 ) {
   companion object {
+    /** Fallback for a mode with no entry in a non-empty 'guicursor'. Like Vim's GUI default, this is a block cursor */
     val DEFAULT: GuiCursorAttributes = GuiCursorAttributes(
       GuiCursorType.BLOCK,
+      thickness = 0,
+      highlightGroup = "",
+      lmapHighlightGroup = "",
+      blinkModes = emptyList()
+    )
+
+    /** Used when 'guicursor' is empty. The caret shape is not overridden, but left to the IDE */
+    val UNSPECIFIED: GuiCursorAttributes = GuiCursorAttributes(
+      type = null,
       thickness = 0,
       highlightGroup = "",
       lmapHighlightGroup = "",

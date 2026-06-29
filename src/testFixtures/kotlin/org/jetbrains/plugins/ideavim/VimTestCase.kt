@@ -806,18 +806,26 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
         assertEquals(CaretVisualAttributes.Shape.BAR, caret.visualAttributes.shape)
         assertEquals(0F, caret.visualAttributes.thickness)
       } else {
-        val shape = when (attributes.type) {
-          GuiCursorType.BLOCK -> CaretVisualAttributes.Shape.BLOCK
-          GuiCursorType.VER -> CaretVisualAttributes.Shape.BAR
-          GuiCursorType.HOR -> CaretVisualAttributes.Shape.UNDERSCORE
-        }
-        assertEquals(shape, editor.caretModel.primaryCaret.visualAttributes.shape)
-        assertEquals(
-          attributes.thickness / 100.0F,
-          editor.caretModel.primaryCaret.visualAttributes.thickness,
-        )
-        editor.caretModel.primaryCaret.visualAttributes.color?.let {
-          assertEquals(colour, it)
+        val type = attributes.type
+        if (type == null) {
+          // 'guicursor' is empty - the caret is left to the IDE (its native default caret)
+          val default = CaretVisualAttributes.getDefault()
+          assertEquals(default.shape, editor.caretModel.primaryCaret.visualAttributes.shape)
+          assertEquals(default.thickness, editor.caretModel.primaryCaret.visualAttributes.thickness)
+        } else {
+          val shape = when (type) {
+            GuiCursorType.BLOCK -> CaretVisualAttributes.Shape.BLOCK
+            GuiCursorType.VER -> CaretVisualAttributes.Shape.BAR
+            GuiCursorType.HOR -> CaretVisualAttributes.Shape.UNDERSCORE
+          }
+          assertEquals(shape, editor.caretModel.primaryCaret.visualAttributes.shape)
+          assertEquals(
+            attributes.thickness / 100.0F,
+            editor.caretModel.primaryCaret.visualAttributes.thickness,
+          )
+          editor.caretModel.primaryCaret.visualAttributes.color?.let {
+            assertEquals(colour, it)
+          }
         }
       }
     }

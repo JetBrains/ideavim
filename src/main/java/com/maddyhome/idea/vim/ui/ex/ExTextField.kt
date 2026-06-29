@@ -339,7 +339,8 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
       // See VIM-2562
 
       mode = attributes.type
-      thickness = if (mode == GuiCursorType.BLOCK) 100 else attributes.thickness
+      // A null type means 'guicursor' is empty. The command line has no IDE-native caret, so fall back to a block
+      thickness = if (mode == GuiCursorType.BLOCK || mode == null) 100 else attributes.thickness
     }
 
     override fun focusGained(e: FocusEvent?) {
