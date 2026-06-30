@@ -743,6 +743,37 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
     assertExOutput(expected)
   }
 
+  fun assertAllOptionsShown(command: String, header: String, singleColumn: Boolean) {
+    injector.outputPanel.getCurrentOutputPanel()?.clearText()
+    enterCommand(command)
+    val output = injector.outputPanel.getCurrentOutputPanel()?.text
+    assertNotNull(output, "No Ex output for command '$command'")
+
+    val lines = output.lines()
+    assertEquals(header, lines.firstOrNull(), "Unexpected header for '$command'")
+
+    // Hidden options are not shown by `:set all` (except in an internal, non-unit-test IDE), so don't expect them.
+    val shownOptions = injector.optionGroup.getAllOptions().filter { !it.isHidden }
+
+    // Each option is shown as one of: "  name", "noname", "--name" (toggles) or "  name=value" (everything else).
+    // Values never contain spaces, so splitting the body on whitespace yields one token per shown option.
+    val tokens = lines.drop(1).filter { it.isNotBlank() }.flatMap { it.trim().split(Regex("\\s+")) }.toSet()
+    for (option in shownOptions) {
+      val name = option.name
+      val shown = tokens.any { it == name || it == "no$name" || it == "--$name" || it.startsWith("$name=") }
+      assertTrue(shown, "Option '$name' is missing from the output of '$command'")
+    }
+
+    // Sanity check the column layout. ':set! all' forces one option per line; ':set all' packs them into columns.
+    val bodyLineCount = lines.drop(1).count { it.isNotBlank() }
+    val optionCount = shownOptions.size
+    if (singleColumn) {
+      assertEquals(optionCount, bodyLineCount, "Single column output should show exactly one option per line")
+    } else {
+      assertTrue(bodyLineCount < optionCount, "Multi column output should pack options into fewer lines than options")
+    }
+  }
+
   fun assertExOutput(expected: String, clear: Boolean = true) {
     val actual = injector.outputPanel.getCurrentOutputPanel()?.text
     if (actual == null) {
@@ -776,9 +807,12 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
   fun assertPluginError(isError: Boolean) {
     if (!isError) {
       assertEquals(isError, injector.messages.isError(), injector.messages.getStatusBarMessage() ?: "Unknown error")
-    }
-    else {
-      assertEquals(isError, injector.messages.isError(), injector.messages.getStatusBarMessage() ?: "<No error message>")
+    } else {
+      assertEquals(
+        isError,
+        injector.messages.isError(),
+        injector.messages.getStatusBarMessage() ?: "<No error message>"
+      )
     }
   }
 
