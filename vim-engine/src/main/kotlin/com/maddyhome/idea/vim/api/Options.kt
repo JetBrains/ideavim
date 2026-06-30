@@ -167,6 +167,16 @@ object Options {
    */
   val langremap: ToggleOption = addOption(ToggleOption("langremap", GLOBAL, "lrm", false))
 
+  val mouse: StringOption = addOption(object : StringOption("mouse", GLOBAL, "mouse", "nvi") {
+    private val validFlags = setOf('n', 'v', 'i', 'c', 'h', 'a', 'r')
+
+    override fun checkIfValueValid(value: VimDataType, token: String) {
+      super.checkIfValueValid(value, token)
+      if (value is VimString && value.value.any { it !in validFlags }) {
+        throw exExceptionMessage("E474.arg", token)
+      }
+    }
+  })
   val maxmapdepth: NumberOption = addOption(NumberOption("maxmapdepth", GLOBAL, "mmd", 20))
   val maxsearchcount: UnsignedNumberOption = addOption(
     object : UnsignedNumberOption("maxsearchcount", GLOBAL, "msc", 999) {

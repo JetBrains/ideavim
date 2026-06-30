@@ -75,6 +75,7 @@ import com.maddyhome.idea.vim.api.VirtualBufferKind
 import com.maddyhome.idea.vim.api.coerceOffset
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.autocmd.AutoCmdEvent
 import com.maddyhome.idea.vim.autocmd.IjFileTypeMapping
@@ -837,8 +838,25 @@ object VimListenerManager {
 
     override fun mousePressed(event: EditorMouseEvent) {
       if (event.editor.isIdeaVimDisabledHere) return
+      if (!isMouseMovementAllowed()) {
+        event.consume()
+        return
+      }
       MouseEventsDataHolder.dragEventCount = MouseEventsDataHolder.allowedSkippedDragEvents
       SelectionVimListenerSuppressor.reset()
+    }
+
+    private fun isMouseMovementAllowed(): Boolean {
+      val mouseOption = injector.globalOptions().mouse
+      val mode = injector.editorGroup.getSelectedEditor()?.mode
+      if (mouseOption.contains("a")) return true
+      return when (mode) {
+        Mode.INSERT, is Mode.REPLACE -> mouseOption.contains("i")
+        is Mode.NORMAL -> mouseOption.contains("n")
+        is Mode.VISUAL, is Mode.SELECT -> mouseOption.contains("v")
+        is Mode.CMD_LINE -> mouseOption.contains("c")
+        else -> true
+      }
     }
 
     /**
