@@ -26,13 +26,19 @@ usual beta standards.
 ## [To Be Released]
 
 ### Features:
+* [VIM-1346](https://youtrack.jetbrains.com/issue/VIM-1346) Implemented the [`U`](https://vimhelp.org/undo.txt.html#U) command — undo all latest changes on the most recently changed line; pressing `U` again redoes them
 * [VIM-2116](https://youtrack.jetbrains.com/issue/VIM-2116) Added built-in [`indentwise`](https://github.com/jeetsukumaran/vim-indentwise) extension — motions that navigate by indentation level: `[-`/`]-` jump to the previous/next line of lesser indent, `[+`/`]+` to greater indent, `[=`/`]=` to equal indent, and `[%`/`]%` to the beginning/end of the current indent block; activate with `Plug 'jeetsukumaran/vim-indentwise'`
+* [VIM-3004](https://youtrack.jetbrains.com/issue/VIM-3004) Added support for the `g:NERDTreeQuitOnOpen` variable in the NERDTree plugin — set `let g:NERDTreeQuitOnOpen = 1` to close the project tree after opening a file with `o`
 
 ### Fixes:
 * Fixed `u` (undo) inside a recorded macro not replaying — e.g. recording `dwu` (delete a word, then undo) and replaying it with `@a` now works correctly
 * [VIM-4257](https://youtrack.jetbrains.com/issue/VIM-4257) Fixed autocmd commands for Normal-mode events (e.g. `BufWritePre`) running while still in Insert mode — IdeaVim now returns to Normal mode before executing them
+* [VIM-4256](https://youtrack.jetbrains.com/issue/VIM-4256) Fixed an empty [`'guicursor'`](https://vimhelp.org/options.txt.html#%27guicursor%27) value — IdeaVim now falls back to the default IDE caret shape instead of breaking the caret
 
 ### Merged PRs:
+* [1878](https://github.com/JetBrains/ideavim/pull/1878) by [1grzyb1](https://github.com/1grzyb1): VIM-4256 handle empty guicursor
+* [1877](https://github.com/JetBrains/ideavim/pull/1877) by [1grzyb1](https://github.com/1grzyb1): VIM-1346 Implement undo all line command
+* [1876](https://github.com/JetBrains/ideavim/pull/1876) by [1grzyb1](https://github.com/1grzyb1): VIM-3004 support NERDTreeQuitOnOpen option
 * [1873](https://github.com/JetBrains/ideavim/pull/1873) by [1grzyb1](https://github.com/1grzyb1): VIM-2116 Implement indentwise plugin
 * [1874](https://github.com/JetBrains/ideavim/pull/1874) by [1grzyb1](https://github.com/1grzyb1): VIM-4257 Ensure that autocmd runs in normal mode
 * [1871](https://github.com/JetBrains/ideavim/pull/1871) by [citizenmatt](https://github.com/citizenmatt): Restore plugin compatibility for Argument.Type
