@@ -482,48 +482,7 @@ class SetlocalCommandTest : VimTestCase() {
   fun `test show all local option values`() {
     // 'fileencoding' defaults to "", but is automatically detected as UTF-8
     setOsSpecificOptionsToSafeValues()
-    val expected = """
-    |--- Local option values ---
-    |noabolish           nohlsearch          nomultiple-cursors  nosneak
-    |noargtextobj          ide=IntelliJ IDEA noNERDTree            startofline
-    |nobomb              --ideajoin            nrformats=hex     nosurround
-    |nobreakindent         ideamarks         nonumber            notargets
-    |noCamelCaseMotion     idearefactormode=   operatorfunc=     notextobj-entire
-    |noclasstextobj        ideawrite=all     norelativenumber    notextobj-indent
-    |  cmdheight=1       noignorecase          scroll=0            textwidth=0
-    |  colorcolumn=        inccommand=         scrolljump=1        timeout
-    |nocommentary        noincsearch           scrolloff=-1        timeoutlen=1000
-    |nocursorline        noindentwise          selectmode=       notrackactionids
-    |nodigraph             langmap=            shellcmdflag=-x   noVimEverywhere
-    |noexchange            langnoremap         shellxescape=@      virtualedit=
-    |  fileformat=unix   nolangremap           shellxquote={     novisualbell
-    |  foldlevel=1       nolist                showcmd             visualdelay=100
-    |nofunctextobj       nomatchit             showmode            whichwrap=b,s
-    |nogdefault            maxmapdepth=20      sidescroll=0        wrap
-    |nohighlightedyank   nomini-ai             sidescrolloff=-1    wrapscan
-    |  history=50          more              nosmartcase         noyoucompleteme
-    |  clipboard=ideaput,autoselect
-    |  comments=s1:/*,mb:*,ex:*/,://,b:#,:%,:XCOMM,n:>,fb:-
-    |  fileencoding=utf-8
-    |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
-    |--ideacopypreprocess
-    |  ideastatusicon=enabled
-    |  ideavimsupport=dialog
-    |  isfname=@,48-57,/,\,.,-,_,+,,,#,$,%,{,},[,],:,@-@,!,~,=
-    |  iskeyword=@,48-57,_
-    |  keymodel=continueselect,stopselect
-    |  lookupkeys=<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>
-    |  matchpairs=(:),{:},[:]
-    |  maxsearchcount=999
-    |  messagesopt=hit-enter,history:500,wait:10000
-    |noReplaceWithRegister
-    |  selection=inclusive
-    |  shell=/dummy/path/to/bash
-    |  undolevels=-123456
-    |novim-paragraph-motion
-    |  viminfo='100,<50,s10,h
-    """.trimMargin()
-    assertCommandOutput("setlocal all", expected)
+    assertAllOptionsShown("setlocal all", header = "--- Local option values ---", singleColumn = false)
   }
 
   @Test
@@ -561,102 +520,7 @@ class SetlocalCommandTest : VimTestCase() {
   fun `test show all local option values in single column`() {
     // 'fileencoding' defaults to "", but is automatically detected as UTF-8
     setOsSpecificOptionsToSafeValues()
-    val expected = """
-    |--- Local option values ---
-    |noabolish
-    |noargtextobj
-    |nobomb
-    |nobreakindent
-    |noCamelCaseMotion
-    |noclasstextobj
-    |  clipboard=ideaput,autoselect
-    |  cmdheight=1
-    |  colorcolumn=
-    |nocommentary
-    |  comments=s1:/*,mb:*,ex:*/,://,b:#,:%,:XCOMM,n:>,fb:-
-    |nocursorline
-    |nodigraph
-    |noexchange
-    |  fileencoding=utf-8
-    |  fileformat=unix
-    |  foldlevel=1
-    |nofunctextobj
-    |nogdefault
-    |  guicursor=n-v-c:block-Cursor/lCursor,ve:ver35-Cursor,o:hor50-Cursor,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor,sm:block-Cursor-blinkwait175-blinkoff150-blinkon175
-    |nohighlightedyank
-    |  history=50
-    |nohlsearch
-    |  ide=IntelliJ IDEA
-    |--ideacopypreprocess
-    |--ideajoin
-    |  ideamarks
-    |  idearefactormode=
-    |  ideastatusicon=enabled
-    |  ideavimsupport=dialog
-    |  ideawrite=all
-    |noignorecase
-    |  inccommand=
-    |noincsearch
-    |noindentwise
-    |  isfname=@,48-57,/,\,.,-,_,+,,,#,$,%,{,},[,],:,@-@,!,~,=
-    |  iskeyword=@,48-57,_
-    |  keymodel=continueselect,stopselect
-    |  langmap=
-    |  langnoremap
-    |nolangremap
-    |nolist
-    |  lookupkeys=<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>
-    |nomatchit
-    |  matchpairs=(:),{:},[:]
-    |  maxmapdepth=20
-    |  maxsearchcount=999
-    |  messagesopt=hit-enter,history:500,wait:10000
-    |nomini-ai
-    |  more
-    |nomultiple-cursors
-    |noNERDTree
-    |  nrformats=hex
-    |nonumber
-    |  operatorfunc=
-    |norelativenumber
-    |noReplaceWithRegister
-    |  scroll=0
-    |  scrolljump=1
-    |  scrolloff=-1
-    |  selection=inclusive
-    |  selectmode=
-    |  shell=/dummy/path/to/bash
-    |  shellcmdflag=-x
-    |  shellxescape=@
-    |  shellxquote={
-    |  showcmd
-    |  showmode
-    |  sidescroll=0
-    |  sidescrolloff=-1
-    |nosmartcase
-    |nosneak
-    |  startofline
-    |nosurround
-    |notargets
-    |notextobj-entire
-    |notextobj-indent
-    |  textwidth=0
-    |  timeout
-    |  timeoutlen=1000
-    |notrackactionids
-    |  undolevels=-123456
-    |novim-paragraph-motion
-    |noVimEverywhere
-    |  viminfo='100,<50,s10,h
-    |  virtualedit=
-    |novisualbell
-    |  visualdelay=100
-    |  whichwrap=b,s
-    |  wrap
-    |  wrapscan
-    |noyoucompleteme
-    """.trimMargin()
-    assertCommandOutput("setlocal! all", expected)
+    assertAllOptionsShown("setlocal! all", header = "--- Local option values ---", singleColumn = true)
   }
 
   @Test
