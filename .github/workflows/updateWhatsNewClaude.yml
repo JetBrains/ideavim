@@ -1,0 +1,80 @@
+name: Update What's New with Claude
+
+# Reacts to comments on the "What's New" PR opened by prepareWhatsNewClaude.yml.
+# That PR always lives on the `whatsnew-tbr` branch and is titled
+# "Prepare What's New for the upcoming release". When a maintainer leaves a
+# comment there, Claude reads it and updates the page / changelog accordingly,
+# then pushes back to the same branch.
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  update-whats-new:
+    runs-on: ubuntu-latest
+    # Only on the What's New PR, and never on comments left by bots (the preview
+    # bot and Claude itself comment here — reacting to those would loop).
+    if: |
+      github.repository == 'JetBrains/ideavim' &&
+      github.event.issue.pull_request &&
+      contains(github.event.issue.title, 'Prepare What''s New for the upcoming release') &&
+      github.event.comment.user.type != 'Bot'
+
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+      issues: read
+      actions: read
+
+    steps:
+      - name: Checkout the What's New PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: whatsnew-tbr
+          fetch-depth: 0  # Full history so the branch can be pushed
+
+      - name: Run Claude Code to apply the requested changes
+        id: claude
+        uses: anthropics/claude-code-action@v1
+        env:
+          ANTHROPIC_BASE_URL: ${{ secrets.PROXY_URL }}
+          ANTHROPIC_CUSTOM_HEADERS: |
+            Grazie-Agent: {"name":"ideavim-claude-code-action","version":"github-actions"}
+            Grazie-Authenticate-JWT: ${{ secrets.ANTHROPIC_API_KEY }}
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+
+          additional_permissions: |
+            actions: read
+
+          prompt: |
+            A maintainer left a comment on the "What's New" pull request (branch
+            `whatsnew-tbr`). Read the comment below and apply exactly what it asks,
+            then push the result back to the `whatsnew-tbr` branch so the PR updates.
+
+            ## The maintainer's comment
+            ${{ github.event.comment.body }}
+
+            ## What you can change
+            - The What's New page: `src/main/resources/whatsnew-tbr.html`.
+            - The changelog `## [To Be Released]` section of `CHANGES.md`, if the
+              comment asks for changelog changes (use the `changelog` skill for its rules).
+            Make the smallest change that satisfies the comment — do NOT rewrite or
+            restyle anything that wasn't asked about.
+
+            ## Hard rules for the page (keep the existing look intact)
+            - Keep the entire `<head>`/`<style>` block, every CSS class, the
+              `data-theme="__THEME__"` attribute and the `__VERSION__` token unchanged.
+            - Never hard-code a version; leave `__VERSION__` exactly as-is.
+            - Escape HTML correctly inside `code`/`kbd`/`pre` (`&lt;` `&gt;` `&amp;`).
+            - Keep the friendly, user-facing tone; no `VIM-####` ids or raw issue URLs.
+
+            ## Finish
+            - Commit your changes and push them to the `whatsnew-tbr` branch (do NOT
+              open a new PR or new branch — push to the existing one).
+            - If the comment doesn't request any actionable change to the page or
+              changelog, make no changes, push nothing, and briefly explain why.
+
+          # Page edits + changelog skill + git/gh to push to the existing branch.
+          claude_args: '--allowed-tools "Skill,Read,Write,Edit,Glob,Grep,Bash(git:*),Bash(gh:*),WebSearch,WebFetch(domain:plugins.jetbrains.com),WebFetch(domain:youtrack.jetbrains.com),WebFetch(domain:github.com)"'
