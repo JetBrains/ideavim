@@ -167,6 +167,7 @@ object Options {
    */
   val langremap: ToggleOption = addOption(ToggleOption("langremap", GLOBAL, "lrm", false))
 
+  val mouse: StringListOption = addOption(StringListOption("mouse", GLOBAL, "mouse", "nvi", setOf("n", "v", "i", "c", "h", "a", "r")))
   val maxmapdepth: NumberOption = addOption(NumberOption("maxmapdepth", GLOBAL, "mmd", 20))
   val maxsearchcount: UnsignedNumberOption = addOption(
     object : UnsignedNumberOption("maxsearchcount", GLOBAL, "msc", 999) {
