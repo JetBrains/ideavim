@@ -9,6 +9,17 @@
 package com.maddyhome.idea.vim.api
 
 interface VimFile {
+  companion object {
+    /**
+     * Sentinel [selectFile] count value meaning "select the last open file" (used by `:last`).
+     *
+     * This value must stay in sync between every caller and every implementation. It was previously
+     * a bare magic number that drifted apart (`:last` passed `999` while the implementations checked
+     * for `99`), which silently broke the `:last` command. Naming it keeps the two ends from diverging.
+     */
+    const val LAST_FILE_SENTINEL: Int = 99
+  }
+
   /**
    * Builds the `:file` / Ctrl-G message string for the given editor.
    * @return the message to display, or null if no info is available

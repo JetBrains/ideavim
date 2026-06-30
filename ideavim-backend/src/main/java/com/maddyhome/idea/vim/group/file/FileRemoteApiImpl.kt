@@ -35,6 +35,7 @@ import com.intellij.platform.project.ProjectId
 import com.intellij.platform.project.findProjectOrNull
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.ProjectScope
+import com.maddyhome.idea.vim.api.VimFile
 import com.maddyhome.idea.vim.group.findVirtualFile
 import com.maddyhome.idea.vim.group.onEdt
 import com.maddyhome.idea.vim.helper.EngineMessageHelper
@@ -110,7 +111,7 @@ internal class FileRemoteApiImpl : FileRemoteApi {
     val project = projectId?.findProjectOrNull() ?: return@onEdt false
     val fem = FileEditorManager.getInstance(project)
     val editors = fem.openFiles
-    if (idx == 99) {
+    if (idx == VimFile.LAST_FILE_SENTINEL) {
       idx = editors.size - 1
     }
     if (idx < 0 || idx >= editors.size) {
