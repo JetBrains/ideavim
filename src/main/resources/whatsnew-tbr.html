@@ -380,98 +380,32 @@
       Instead of digging through <code>CHANGES.md</code>, the highlights now come to you —
       right here in the IDE, every release. Here's what landed in <span class="v">__VERSION__</span>.</p>
 
-    <!-- VimEverywhere — the star -->
+    <!-- indentwise — the star -->
     <div class="section">
-      <p class="kicker">new plugin · vim everywhere</p>
-      <h2>VimEverywhere — Vim keys for the whole IDE</h2>
-      <p>Modal, keyboard-first navigation has always stopped at the edge of the editor. <strong>VimEverywhere</strong>
-        takes it everywhere else — tool windows, trees, and clickable UI all bend to the keyboard, no mouse required.
-        It's brand new and we'd love more people to kick the tyres.</p>
-      <pre><span class="str">set VimEverywhere</span>   <span
-          class="cm">" add this to ~/.ideavimrc and restart</span></pre>
-      <p>Three things come bundled the moment it's on:</p>
-      <div class="grid">
-        <div class="mini">
-          <h3>Hints — jump anywhere</h3>
-          <p>Press <kbd>Ctrl+Shift+\</kbd> (<kbd>Ctrl+Cmd+\</kbd> on macOS) and every clickable target gets a
-            short <code>A&#8201;S&#8201;D&#8201;F</code> label — type it to jump straight there. Buttons, tabs,
-            tool-window controls, even inside dialogs like the IdeaVim settings.</p>
-        </div>
-        <div class="mini">
-          <h3>NERDTree, everywhere</h3>
-          <p>The NERDTree keys you already know — <kbd>o</kbd>, <kbd>t</kbd>, <kbd>s</kbd>, <kbd>i</kbd>,
-            <kbd>gs</kbd>, <kbd>gi</kbd> — now work in <em>any</em> tree, not just the Project tool window.</p>
-        </div>
-        <div class="mini">
-          <h3>Hop between tool windows</h3>
-          <p><kbd>&lt;C-W&gt;h</kbd>/<kbd>j</kbd>/<kbd>k</kbd>/<kbd>l</kbd> moves focus directionally across
-            tool windows and the editor — fired from inside any tool window, just like window motions.</p>
-        </div>
-        <div class="mini">
-          <h3>Spread the word</h3>
-          <p>It's young and we want it in more hands. Turn it on, live in it for a day, and tell us what
-            should come next — feedback shapes where it goes.</p>
-        </div>
-      </div>
+      <p class="kicker">new plugin · motions</p>
+      <h2>indentwise — move by indentation</h2>
+      <p>The bundled <strong>indentwise</strong> extension adds motions that navigate by indentation level
+        instead of by line — jump to the next line that's less indented, more indented, or sits at the same
+        depth, or hop straight to the edges of the block you're in.</p>
+      <pre><span class="str">Plug 'jeetsukumaran/vim-indentwise'</span>
+
+<span class="key">[-</span>  <span class="key">]-</span>    <span class="cm">" previous / next line of LESSER indent</span>
+<span class="key">[+</span>  <span class="key">]+</span>    <span class="cm">" previous / next line of GREATER indent</span>
+<span class="key">[=</span>  <span class="key">]=</span>    <span class="cm">" previous / next line of EQUAL indent</span>
+<span class="key">[%</span>  <span class="key">]%</span>    <span class="cm">" start / end of the current indent block</span></pre>
+      <p class="note">They work as operator motions too — try <kbd>d]=</kbd> to delete down to the next
+        line at the same indent.</p>
     </div>
 
-    <!-- Headline features -->
+    <!-- U command -->
     <div class="section">
-      <p class="kicker">window management</p>
-      <h2>Resize splits from the keyboard</h2>
-      <p>Stop reaching for the mouse to balance your layout. A full set of Vim window-resize
-        commands has landed, so your splits bend to your will.</p>
-      <pre><span class="key">&lt;C-W&gt;+</span>   <span class="key">&lt;C-W&gt;-</span>     <span class="cm">" taller / shorter</span>
-<span class="key">&lt;C-W&gt;&gt;</span>   <span class="key">&lt;C-W&gt;&lt;</span>     <span class="cm">" wider / narrower</span>
-<span class="key">&lt;C-W&gt;=</span>              <span class="cm">" equalize every window</span>
-<span class="str">:resize 20</span>          <span class="cm">" or  :resize +5 / -5</span>
-<span class="str">:vertical resize 80</span> <span class="cm">" width, absolute or relative</span></pre>
-      <p class="note">Counts work too — <kbd>5&lt;C-W&gt;+</kbd> grows the window by five lines at once.</p>
-    </div>
-
-    <div class="section">
-      <p class="kicker">editing · live preview</p>
-      <h2>See your :substitute before you run it</h2>
-      <p>The new <code>'inccommand'</code> option previews replacements as you type the command —
-        and quietly reverts everything if you bail out with <kbd>Esc</kbd>.</p>
-      <pre><span class="str">set inccommand=nosplit</span>  <span class="cm">" preview inline, in the buffer</span>
-<span class="str">set inccommand=split</span>    <span class="cm">" inline preview + a window listing</span>
-                        <span class="cm">" every affected line</span></pre>
-      <p class="note">No more squinting at a regex and hoping for the best.</p>
-    </div>
-
-    <div class="section">
-      <p class="kicker">text objects</p>
-      <h2>targets.vim, built in</h2>
-      <p>Welle's beloved <code>targets.vim</code> is now bundled. It supercharges text objects with
-        <em>seeking</em> — operate on the next or last pair, quote, or argument without moving first.</p>
-      <pre><span class="str">Plug 'wellle/targets.vim'</span>
-
-<span class="key">cin)</span>   <span class="cm">" change inside the NEXT ( )</span>
-<span class="key">da,</span>    <span class="cm">" delete an argument, comma and all</span>
-<span class="key">ci"</span>    <span class="cm">" change inside the nearest quotes, even</span>
-       <span class="cm">" if the cursor isn't on them yet</span></pre>
-      <p class="note">Pairs, quotes, separators, arguments and tags — with <code>i</code>/<code>a</code>/<code>I</code>/<code>A</code>
-        modifiers and <code>n</code>/<code>l</code> next/last qualifiers.</p>
-    </div>
-
-    <div class="section">
-      <p class="kicker">search</p>
-      <h2>Always know where you are</h2>
-      <p>After <kbd>/</kbd>, <kbd>?</kbd>, <kbd>n</kbd>, <kbd>N</kbd>, <kbd>*</kbd> or <kbd>#</kbd>,
-        IdeaVim now shows the match index and total — <code>[2/4]</code> — just like Vim.
-        Tune the ceiling with <code>'maxsearchcount'</code> (it shows <code>[2/&gt;3]</code> when exceeded).</p>
-    </div>
-
-    <div class="section">
-      <p class="kicker">input · keyboard layouts</p>
-      <h2>Drive Vim from any keyboard layout</h2>
-      <p>The new <code>'langmap'</code> option lets you run Normal- and Visual-mode commands from a
-        non-English keyboard — Greek, Dvorak, whatever you type on — by mapping the keys you press to the
-        plain ASCII commands underneath. Text you type in Insert mode is left exactly as-is.</p>
-      <pre><span class="cm">" map a Greek home row onto the ASCII commands</span>
-<span class="str">set langmap=ασδφγηξκλ;asdfghjkl</span>
-<span class="str">set langremap</span>   <span class="cm">" also apply langmap to the result of a mapping</span></pre>
+      <p class="kicker">editing · undo</p>
+      <h2>Undo a whole line at once</h2>
+      <p>The classic <code>U</code> command is now implemented — it undoes every recent change you made to the
+        last-edited line in one stroke. Pressing <code>U</code> again redoes them, so it doubles as a quick
+        before/after toggle.</p>
+      <pre><span class="key">U</span>   <span class="cm">" undo all latest changes on the most recently changed line</span>
+<span class="key">U</span>   <span class="cm">" press again to redo them</span></pre>
     </div>
 
     <!-- Also worth a look -->
@@ -479,24 +413,15 @@
       <p class="kicker">also worth a look</p>
       <div class="grid">
         <div class="mini">
-          <h3>YouCompleteMe popup</h3>
-          <p>Enable <code>set youcompleteme</code> and cycle the popup with <kbd>Tab</kbd> /
-            <kbd>S-Tab</kbd> — normal tabbing stays untouched when no popup is open.</p>
+          <h3>Mouse, your way</h3>
+          <p>The new <code>'mouse'</code> option (default <code>nvi</code>) decides which modes a click moves
+            the caret in — a flag per mode (<code>n</code>/<code>v</code>/<code>i</code>/<code>c</code>),
+            <code>a</code> for all, and <code>r</code> to dismiss the more-prompt on click.</p>
         </div>
         <div class="mini">
-          <h3>IDE completion keys</h3>
-          <p><kbd>C-Y</kbd> accepts the selected completion item and <kbd>C-E</kbd> closes the
-            popup — the Vim muscle memory you already have.</p>
-        </div>
-        <div class="mini">
-          <h3>Edit control characters</h3>
-          <p>The new <em>IdeaVim: Edit Control Characters</em> action opens an editor for registers
-            and macros containing control chars (<code>^M</code>, <code>^[</code>).</p>
-        </div>
-        <div class="mini">
-          <h3>Roomier messages</h3>
-          <p><code>'cmdheight'</code> and <code>'messagesopt'</code> arrived: multi-line messages get
-            their own space, and single-line messages auto-hide after a timeout.</p>
+          <h3>NERDTree, out of the way</h3>
+          <p>Set <code>let g:NERDTreeQuitOnOpen = 1</code> and the project tree closes itself the moment you
+            open a file with <kbd>o</kbd>.</p>
         </div>
       </div>
     </div>
@@ -505,33 +430,15 @@
     <div class="section">
       <p class="kicker">polish &amp; fixes</p>
       <ul>
-        <li><strong>Modeless selection</strong> in the output panel and command line — select with the mouse, copy with
-          <kbd>C-Y</kbd>.
+        <li><strong>Undo replays inside macros</strong> — recording <kbd>dwu</kbd> (delete a word, then undo)
+          and replaying it with <kbd>@a</kbd> now works as recorded.
         </li>
-        <li><strong>Tab is free again</strong> — <code>sethandler &lt;Tab&gt; a:ide</code> can hand it to the IDE.</li>
-        <li><strong>Smarter * search</strong> now respects <code>smartcase</code>.</li>
-        <li><strong>Steadier cursor</strong> — fixed column drift on <kbd>j</kbd>/<kbd>k</kbd>, centering with inlay
-          hints, and double-scroll after incremental search.
+        <li><strong>Autocmds run in the right mode</strong> — Normal-mode events like <code>BufWritePre</code> no
+          longer fire while you're still in Insert mode; IdeaVim returns to Normal first.
         </li>
-        <li><strong>No more double-typed text</strong> — leaving Insert mode with <kbd>Esc</kbd> no longer inserts
-          what you typed twice (notably in Rider).
+        <li><strong>Empty <code>'guicursor'</code> behaves</strong> — an empty value now falls back to the
+          default IDE caret instead of breaking it.
         </li>
-        <li><strong>Caret stays put after IDE actions</strong> — generating code or finishing a refactoring template
-          no longer leaves the cursor in an invalid Normal-mode spot.
-        </li>
-        <li><strong><kbd>C-O</kbd> at end of line</strong> — the one-shot Normal-mode command now runs from the
-          right position instead of past the line end, so <kbd>db</kbd> and friends behave.
-        </li>
-        <li><strong>Operators respect collapsed folds</strong> — <kbd>dd</kbd> on a fold header deletes the whole
-          folded region, while <kbd>dl</kbd> mid-header deletes just one character.
-        </li>
-        <li><strong>Cleaner macro recording</strong> — a key that's the prefix of a timed-out mapping is no longer
-          recorded twice.
-        </li>
-        <li><strong>Shell command changes show up</strong> — files touched by <code>:!</code> are now refreshed on
-          disk as soon as the command finishes.
-        </li>
-        <li>Plus the <code>g&lt;</code> command, a scroll-back more-prompt pager, and a long list of smaller fixes.</li>
       </ul>
     </div>
 

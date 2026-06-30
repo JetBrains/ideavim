@@ -29,6 +29,7 @@ usual beta standards.
 * [VIM-1346](https://youtrack.jetbrains.com/issue/VIM-1346) Implemented the [`U`](https://vimhelp.org/undo.txt.html#U) command — undo all latest changes on the most recently changed line; pressing `U` again redoes them
 * [VIM-2116](https://youtrack.jetbrains.com/issue/VIM-2116) Added built-in [`indentwise`](https://github.com/jeetsukumaran/vim-indentwise) extension — motions that navigate by indentation level: `[-`/`]-` jump to the previous/next line of lesser indent, `[+`/`]+` to greater indent, `[=`/`]=` to equal indent, and `[%`/`]%` to the beginning/end of the current indent block; activate with `Plug 'jeetsukumaran/vim-indentwise'`
 * [VIM-3004](https://youtrack.jetbrains.com/issue/VIM-3004) Added support for the `g:NERDTreeQuitOnOpen` variable in the NERDTree plugin — set `let g:NERDTreeQuitOnOpen = 1` to close the project tree after opening a file with `o`
+* [VIM-2037](https://youtrack.jetbrains.com/issue/VIM-2037) Added the [`'mouse'`](https://vimhelp.org/options.txt.html#%27mouse%27) option (default `nvi`) — controls which modes a mouse click moves the caret in, with a flag per mode (`n` Normal, `v` Visual, `i` Insert, `c` Command-line), `a` to enable all of them, and `r` to dismiss the more-prompt/output panel on click
 
 ### Fixes:
 * Fixed `u` (undo) inside a recorded macro not replaying — e.g. recording `dwu` (delete a word, then undo) and replaying it with `@a` now works correctly
@@ -36,6 +37,8 @@ usual beta standards.
 * [VIM-4256](https://youtrack.jetbrains.com/issue/VIM-4256) Fixed an empty [`'guicursor'`](https://vimhelp.org/options.txt.html#%27guicursor%27) value — IdeaVim now falls back to the default IDE caret shape instead of breaking the caret
 
 ### Merged PRs:
+* [1882](https://github.com/JetBrains/ideavim/pull/1882) by [1grzyb1](https://github.com/1grzyb1): VIM-4267 rename vim-indentwise to indentwise plugin
+* [1881](https://github.com/JetBrains/ideavim/pull/1881) by [1grzyb1](https://github.com/1grzyb1): VIM-2037 Implement mouse option
 * [1878](https://github.com/JetBrains/ideavim/pull/1878) by [1grzyb1](https://github.com/1grzyb1): VIM-4256 handle empty guicursor
 * [1877](https://github.com/JetBrains/ideavim/pull/1877) by [1grzyb1](https://github.com/1grzyb1): VIM-1346 Implement undo all line command
 * [1876](https://github.com/JetBrains/ideavim/pull/1876) by [1grzyb1](https://github.com/1grzyb1): VIM-3004 support NERDTreeQuitOnOpen option
