@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.options.OptionAccessScope
+import com.maddyhome.idea.vim.options.StringOption
 
 /**
  * An accessor class for global options
@@ -32,7 +33,7 @@ open class GlobalOptions(scope: OptionAccessScope) : OptionsPropertiesBase(scope
   val langmap: StringListOptionValue by optionProperty(Options.langmap)
   var langnoremap: Boolean by optionProperty(Options.langnoremap)
   var langremap: Boolean by optionProperty(Options.langremap)
-  val mouse: StringListOptionValue by optionProperty(Options.mouse)
+  var mouse: String by optionProperty(Options.mouse)
   var maxmapdepth: Int by optionProperty(Options.maxmapdepth)
   var maxsearchcount: Int by optionProperty(Options.maxsearchcount)
   val messagesopt: KeyValuePairOptionValue by optionProperty(Options.messagesopt)

@@ -847,7 +847,7 @@ object VimListenerManager {
     }
 
     private fun isMouseMovementAllowed(): Boolean {
-      val mouseOption = injector.globalOptions().mouse.value
+      val mouseOption = injector.globalOptions().mouse
       val mode = injector.editorGroup.getSelectedEditor()?.mode
       if (mouseOption.contains("a")) return true
       return when (mode) {
@@ -954,7 +954,6 @@ object VimListenerManager {
     override fun mousePressed(e: MouseEvent?) {
       val editor = (e?.component as? EditorComponentImpl)?.editor ?: return
       if (editor.isIdeaVimDisabledHere) return
-      if (injector.globalOptions().mouse.value.contains("n")) return
       val predictedMode = injector.application.runReadAction {
         IdeaSelectionControl.predictMode(editor, SelectionSource.MOUSE)
       }

@@ -157,7 +157,7 @@ class MouseOptionTest : VimTestCase() {
   fun `mouse=n, command-line mode -- caret does not move`() = assertClick(mouse = "n", enterMode = ":", moves = false)
 
   @Test
-  fun `mouse=nvi (default), command-line mode -- caret does not move`() = assertClick(mouse = "nvi", enterMode = ":", moves = false)
+  fun `mouse=nvi, command-line mode -- caret does not move`() = assertClick(mouse = "nvi", enterMode = ":", moves = false)
 
   @Test
   fun `mouse=c, command-line mode -- caret moves`() = assertClick(mouse = "c", enterMode = ":", moves = true)
