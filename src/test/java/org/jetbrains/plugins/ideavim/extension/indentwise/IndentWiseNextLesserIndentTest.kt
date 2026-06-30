@@ -20,7 +20,7 @@ class IndentWiseNextLesserIndentTest : VimTestCase() {
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
-    enableExtensions("vim-indentwise")
+    enableExtensions("indentwise")
   }
 
   @Test

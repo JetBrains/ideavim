@@ -33,7 +33,7 @@ import com.maddyhome.idea.vim.state.mode.Mode
  * Provides motions that navigate the buffer based on the indentation level of lines.
  */
 internal class IndentWiseExtension : VimExtension {
-  override fun getName(): String = "vim-indentwise"
+  override fun getName(): String = "indentwise"
 
   data class IndentAction(
     val indentLevel: IndentLevel,
@@ -43,14 +43,14 @@ internal class IndentWiseExtension : VimExtension {
   )
 
   private val indentActions = listOf(
-    IndentAction(IndentLevel.LESSER, "<Plug>IndentWisePreviousLesserIndent", "[-", Direction.PREVIOUS),
-    IndentAction(IndentLevel.GREATER, "<Plug>IndentWisePreviousGreaterIndent", "[+", Direction.PREVIOUS),
-    IndentAction(IndentLevel.EQUAL, "<Plug>IndentWisePreviousEqualIndent", "[=", Direction.PREVIOUS),
-    IndentAction(IndentLevel.LESSER, "<Plug>IndentWiseNextLesserIndent", "]-", Direction.NEXT),
-    IndentAction(IndentLevel.GREATER, "<Plug>IndentWiseNextGreaterIndent", "]+", Direction.NEXT),
-    IndentAction(IndentLevel.EQUAL, "<Plug>IndentWiseNextEqualIndent", "]=", Direction.NEXT),
-    IndentAction(IndentLevel.BLOCK, "<Plug>IndentWiseBlockScopeBoundaryBegin", "[%", Direction.PREVIOUS),
-    IndentAction(IndentLevel.BLOCK, "<Plug>IndentWiseBlockScopeBoundaryEnd", "]%", Direction.NEXT),
+    IndentAction(IndentLevel.LESSER, "<Plug>(IndentWisePreviousLesserIndent)", "[-", Direction.PREVIOUS),
+    IndentAction(IndentLevel.GREATER, "<Plug>(IndentWisePreviousGreaterIndent)", "[+", Direction.PREVIOUS),
+    IndentAction(IndentLevel.EQUAL, "<Plug>(IndentWisePreviousEqualIndent)", "[=", Direction.PREVIOUS),
+    IndentAction(IndentLevel.LESSER, "<Plug>(IndentWiseNextLesserIndent)", "]-", Direction.NEXT),
+    IndentAction(IndentLevel.GREATER, "<Plug>(IndentWiseNextGreaterIndent)", "]+", Direction.NEXT),
+    IndentAction(IndentLevel.EQUAL, "<Plug>(IndentWiseNextEqualIndent)", "]=", Direction.NEXT),
+    IndentAction(IndentLevel.BLOCK, "<Plug>(IndentWiseBlockScopeBoundaryBegin)", "[%", Direction.PREVIOUS),
+    IndentAction(IndentLevel.BLOCK, "<Plug>(IndentWiseBlockScopeBoundaryEnd)", "]%", Direction.NEXT),
   )
 
   override fun init() {

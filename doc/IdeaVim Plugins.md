@@ -478,7 +478,7 @@ moves are line-wise.
       <br/>
       <code>Plug 'vim-indentwise'</code>
       <br/>
-      <code>set vim-indentwise</code>
+      <code>set indentwise</code>
       </details>
 
 ### Instructions

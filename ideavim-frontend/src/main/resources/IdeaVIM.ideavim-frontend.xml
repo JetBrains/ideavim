@@ -442,7 +442,7 @@
     </vimExtension>
 
     <vimExtension implementation="com.maddyhome.idea.vim.extension.indentwise.IndentWiseExtension"
-                  name="vim-indentwise">
+                  name="indentwise">
       <aliases>
         <alias name="https://github.com/jeetsukumaran/vim-indentwise"/>
         <alias name="jeetsukumaran/vim-indentwise"/>
