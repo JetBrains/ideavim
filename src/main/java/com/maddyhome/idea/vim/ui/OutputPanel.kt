@@ -171,6 +171,7 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     val keyListener = OutputPanelKeyListener()
     addKeyListener(keyListener)
     textPane.addKeyListener(keyListener)
+    textPane.addMouseListener(OutputPanelMouseListener())
 
     scrollPane.verticalScrollBar.addAdjustmentListener { e ->
       // Update the prompt when scrolling stops, but only for non-single-line output. We will get a scroll update event
