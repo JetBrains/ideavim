@@ -26,6 +26,7 @@ import com.intellij.platform.project.findProjectOrNull
 import com.intellij.platform.project.projectId
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimFile
 import com.maddyhome.idea.vim.api.VimFileBase
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.file.FileRemoteApi
@@ -108,7 +109,7 @@ class IjFileGroup : VimFileBase() {
     val project = PlatformDataKeys.PROJECT.getData((context as IjEditorExecutionContext).context) ?: return false
     val fem = FileEditorManager.getInstance(project)
     val editors = fem.openFiles
-    if (count == 99) {
+    if (count == VimFile.LAST_FILE_SENTINEL) {
       count = editors.size - 1
     }
     if (count < 0 || count >= editors.size) {
