@@ -75,6 +75,14 @@ import javax.swing.KeyStroke
  * @author Alex Plate
  */
 internal object IdeaSpecifics {
+
+  /**
+   * The Vim mode captured in [VimActionListener.beforeActionPerformed], before the action runs and (potentially) churns
+   * the editor selection. [VimTemplateManagerListener] restores it in `currentVariableChanged` while navigating a
+   * "keep" template, so the mode survives IntelliJ's selecting/deselecting. Cleared once the action is done.
+   */
+  private var modeBeforeAction: Mode? = null
+
   class VimActionListener : AnActionListener {
     @NonNls
     private val surrounderItems = listOf("if", "if / else", "for")
@@ -89,6 +97,13 @@ internal object IdeaSpecifics {
       val hostEditor = event.dataContext.getData(CommonDataKeys.HOST_EDITOR)
       if (hostEditor != null) {
         editor = hostEditor
+      }
+
+      // Remember the mode before the action runs, while it is still correct. For 'idearefactormode' = "keep" the mode
+      // must be preserved across the template's selection churn; VimTemplateManagerListener restores this value in
+      // currentVariableChanged (which runs synchronously during the action, so the mode is not yet corrupted here).
+      if (hostEditor != null && hostEditor.vimInitialised && hostEditor.vim.isIdeaRefactorModeKeep) {
+        modeBeforeAction = hostEditor.vim.mode
       }
 
       val actionId = ActionManager.getInstance().getId(action)
@@ -167,6 +182,10 @@ internal object IdeaSpecifics {
     }
 
     override fun afterActionPerformed(action: AnAction, event: AnActionEvent, result: AnActionResult) {
+      // Release the selection listener suppression acquired in beforeActionPerformed (if any). Done before any early
+      // return so the lock can never leak - a leaked lock would silently disable selection handling everywhere.
+      modeBeforeAction = null
+
       if (VimPlugin.isNotEnabled()) return
 
       val editor = editor
@@ -338,6 +357,12 @@ internal object IdeaSpecifics {
           // $END$ (which is treated as a segment, but not a variable). If there are no variables, it is called with
           // oldIndex == newIndex == -1.
           if (vimEditor.isIdeaRefactorModeKeep) {
+            // Restore the mode captured before the current action (see IdeaSpecifics.modeBeforeAction) in case the
+            // template's selection churn drifted it. Must run before correctEditorSelection, which syncs the editor
+            // selection to whatever the current Vim mode is.
+            modeBeforeAction?.let { savedMode ->
+              if (vimEditor.mode != savedMode) vimEditor.mode = savedMode
+            }
             IdeaRefactorModeHelper.correctEditorSelection(templateState.editor)
             adjustCaretIntoTemplateRange(vimEditor)
           } else {
