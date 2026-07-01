@@ -23,7 +23,7 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-## [To Be Released]
+## 2.41.0, 2026-07-01
 
 ### Features:
 * [VIM-1346](https://youtrack.jetbrains.com/issue/VIM-1346) Implemented the [`U`](https://vimhelp.org/undo.txt.html#U) command — undo all latest changes on the most recently changed line; pressing `U` again redoes them
