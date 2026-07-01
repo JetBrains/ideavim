@@ -23,7 +23,7 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-## [To Be Released]
+## 2.41.0, 2026-07-01
 
 ### Features:
 * [VIM-2283](https://youtrack.jetbrains.com/issue/VIM-2283) Added support for the [`'langmap'`](https://vimhelp.org/options.txt.html#%27langmap%27) and [`'langremap'`](https://vimhelp.org/options.txt.html#%27langremap%27) options — enter Normal- and Visual-mode commands from a non-English keyboard layout (e.g. Greek or Dvorak) by mapping typed characters to plain ASCII, while text typed in Insert mode is left as-is

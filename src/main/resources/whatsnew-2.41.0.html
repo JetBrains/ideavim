@@ -1,0 +1,550 @@
+<!--
+  ~ Copyright 2003-2026 The IdeaVim authors
+  ~
+  ~ Use of this source code is governed by an MIT-style
+  ~ license that can be found in the LICENSE.txt file or at
+  ~ https://opensource.org/licenses/MIT.
+  -->
+
+<!doctype html>
+<html data-theme="__THEME__" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <title>What's New in IdeaVim __VERSION__</title>
+  <style>
+      /* Light theme (default). The IDE theme is injected as data-theme on <html>;
+         prefers-color-scheme is the fallback when the page is viewed standalone. */
+      :root {
+          --bg: #eceef1;
+          --term-bg: #ffffff;
+          --titlebar: #e3e6ea;
+          --border: #d7dbe0;
+          --fg: #1a1c1f;
+          --fg-dim: #5b6168;
+          --prompt: #067d17; /* green prompt */
+          --accent: #871094; /* magenta */
+          --link: #0033b3;
+          --key: #0d6efd;
+          --string: #067d17;
+          --comment: #8c8c8c;
+          --code-bg: #f4f5f7;
+          --code-border: #e3e6ea;
+          --dot1: #ff5f56;
+          --dot2: #ffbd2e;
+          --dot3: #27c93f;
+          --shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+      }
+
+      :root[data-theme="dark"] {
+          --bg: #131417;
+          --term-bg: #1e1f22;
+          --titlebar: #2b2d30;
+          --border: #393b40;
+          --fg: #dfe1e5;
+          --fg-dim: #9aa0a6;
+          --prompt: #57965c;
+          --accent: #c77dbb;
+          --link: #56a8f5;
+          --key: #2aacb8;
+          --string: #6aab73;
+          --comment: #7a7e85;
+          --code-bg: #16171a;
+          --code-border: #393b40;
+          --dot1: #ff5f56;
+          --dot2: #ffbd2e;
+          --dot3: #27c93f;
+          --shadow: 0 12px 48px rgba(0, 0, 0, 0.55);
+      }
+
+      @media (prefers-color-scheme: dark) {
+          :root:not([data-theme="light"]) {
+              --bg: #131417;
+              --term-bg: #1e1f22;
+              --titlebar: #2b2d30;
+              --border: #393b40;
+              --fg: #dfe1e5;
+              --fg-dim: #9aa0a6;
+              --prompt: #57965c;
+              --accent: #c77dbb;
+              --link: #56a8f5;
+              --key: #2aacb8;
+              --string: #6aab73;
+              --comment: #7a7e85;
+              --code-bg: #16171a;
+              --code-border: #393b40;
+              --dot1: #ff5f56;
+              --dot2: #ffbd2e;
+              --dot3: #27c93f;
+              --shadow: 0 12px 48px rgba(0, 0, 0, 0.55);
+          }
+      }
+
+      * {
+          box-sizing: border-box;
+      }
+
+      body {
+          margin: 0;
+          background: var(--bg);
+          color: var(--fg);
+          font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+          font-size: 14.5px;
+          line-height: 1.7;
+          -webkit-font-smoothing: antialiased;
+          padding: 32px 16px 64px;
+      }
+
+      /* Terminal window -------------------------------------------------- */
+      .term {
+          max-width: 760px;
+          margin: 0 auto;
+          background: var(--term-bg);
+          border: 1px solid var(--border);
+          border-radius: 12px;
+          box-shadow: var(--shadow);
+          overflow: hidden;
+      }
+
+      .titlebar {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 11px 14px;
+          background: var(--titlebar);
+          border-bottom: 1px solid var(--border);
+      }
+
+      .dot {
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+      }
+
+      .dot.r {
+          background: var(--dot1);
+      }
+
+      .dot.y {
+          background: var(--dot2);
+      }
+
+      .dot.g {
+          background: var(--dot3);
+      }
+
+      .titlebar .title {
+          flex: 1 1 auto;
+          text-align: center;
+          font-size: 12.5px;
+          color: var(--fg-dim);
+          margin-right: 44px; /* balance the dots */
+      }
+
+      .body {
+          padding: 26px 30px 30px;
+      }
+
+      /* The intro "command" --------------------------------------------- */
+      .runline {
+          margin: 0 0 6px;
+      }
+
+      .runline .p {
+          color: var(--prompt);
+          font-weight: 700;
+      }
+
+      .runline .cmd {
+          color: var(--fg);
+      }
+
+      .runline .flag {
+          color: var(--key);
+      }
+
+      .out {
+          color: var(--fg-dim);
+          margin: 0 0 28px;
+      }
+
+      .out .v {
+          color: var(--accent);
+          font-weight: 700;
+      }
+
+      /* Blog content ----------------------------------------------------- */
+      h2 {
+          font-size: 17px;
+          font-weight: 700;
+          margin: 0px 0 4px;
+          color: var(--fg);
+          letter-spacing: -0.01em;
+      }
+
+      h2::before {
+          content: "❯ ";
+          color: var(--prompt);
+          font-weight: 700;
+      }
+
+      .kicker {
+          font-size: 12px;
+          color: var(--accent);
+          text-transform: lowercase;
+          letter-spacing: 0.04em;
+          margin: 0 0 10px;
+      }
+
+      .kicker::before {
+          content: "# ";
+          color: var(--comment);
+      }
+
+      p {
+          margin: 0 0 14px;
+      }
+
+      p.note {
+          color: var(--fg-dim);
+      }
+
+      .section {
+          margin-bottom: 30px;
+      }
+
+      .section + .section {
+          border-top: 1px dashed var(--border);
+          padding-top: 4px;
+      }
+
+      /* Inline tokens ---------------------------------------------------- */
+      code, kbd {
+          font-family: inherit;
+          font-size: 13px;
+          background: var(--code-bg);
+          border: 1px solid var(--code-border);
+          border-radius: 5px;
+          padding: 1px 6px;
+          white-space: nowrap;
+      }
+
+      kbd {
+          color: var(--key);
+      }
+
+      code {
+          color: var(--accent);
+      }
+
+      /* Terminal output / code blocks ----------------------------------- */
+      pre {
+          background: var(--code-bg);
+          border: 1px solid var(--code-border);
+          border-radius: 8px;
+          padding: 14px 16px;
+          margin: 0 0 14px;
+          overflow-x: auto;
+          line-height: 1.7;
+          font-size: 13px;
+      }
+
+      pre .cm {
+          color: var(--comment);
+      }
+
+      pre .str {
+          color: var(--string);
+      }
+
+      pre .key {
+          color: var(--key);
+      }
+
+      pre .p {
+          color: var(--prompt);
+      }
+
+      /* "Also worth a look" grid ---------------------------------------- */
+      .grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 14px;
+          margin-top: 6px;
+      }
+
+      @media (max-width: 560px) {
+          .grid {
+              grid-template-columns: 1fr;
+          }
+      }
+
+      .mini {
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          padding: 14px 16px;
+      }
+
+      .mini h3 {
+          margin: 0 0 6px;
+          font-size: 14px;
+      }
+
+      .mini h3::before {
+          content: "$ ";
+          color: var(--prompt);
+      }
+
+      .mini p {
+          margin: 0;
+          font-size: 13px;
+          color: var(--fg-dim);
+      }
+
+      /* Fixes list ------------------------------------------------------- */
+      ul {
+          margin: 4px 0 0;
+          padding: 0;
+          list-style: none;
+      }
+
+      li {
+          margin-bottom: 8px;
+          color: var(--fg-dim);
+          padding-left: 1.6em;
+          text-indent: -1.6em;
+      }
+
+      li::before {
+          content: "+ ";
+          color: var(--prompt);
+          font-weight: 700;
+      }
+
+      li strong {
+          color: var(--fg);
+          font-weight: 700;
+      }
+
+      /* Footer prompt ---------------------------------------------------- */
+      footer {
+          margin-top: 34px;
+          padding-top: 18px;
+          border-top: 1px solid var(--border);
+          color: var(--fg-dim);
+          font-size: 13px;
+      }
+
+      footer .p {
+          color: var(--prompt);
+          font-weight: 700;
+      }
+
+      footer a {
+          color: var(--link);
+          text-decoration: none;
+      }
+
+      footer a:hover {
+          text-decoration: underline;
+      }
+
+      .caret {
+          display: inline-block;
+          width: 0.6em;
+          height: 1.05em;
+          background: var(--fg);
+          vertical-align: text-bottom;
+          animation: blink 1.1s steps(1) infinite;
+      }
+
+      @keyframes blink {
+          50% {
+              background: transparent;
+          }
+      }
+  </style>
+</head>
+<body>
+
+<div class="term">
+  <div class="titlebar">
+    <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+    <span class="title">ideavim — whats-new — 80×24</span>
+  </div>
+
+  <div class="body">
+    <p class="runline"><span class="p">~ $</span> <span class="cmd">ideavim</span>
+    </p>
+    <p class="out">Welcome to a new way of hearing about IdeaVim.<br>
+      Instead of digging through <code>CHANGES.md</code>, the highlights now come to you —
+      right here in the IDE, every release. Here's what landed in <span class="v">__VERSION__</span>.</p>
+
+    <!-- VimEverywhere — the star -->
+    <div class="section">
+      <p class="kicker">new plugin · vim everywhere</p>
+      <h2>VimEverywhere — Vim keys for the whole IDE</h2>
+      <p>Modal, keyboard-first navigation has always stopped at the edge of the editor. <strong>VimEverywhere</strong>
+        takes it everywhere else — tool windows, trees, and clickable UI all bend to the keyboard, no mouse required.
+        It's brand new and we'd love more people to kick the tyres.</p>
+      <pre><span class="str">set VimEverywhere</span>   <span
+          class="cm">" add this to ~/.ideavimrc and restart</span></pre>
+      <p>Three things come bundled the moment it's on:</p>
+      <div class="grid">
+        <div class="mini">
+          <h3>Hints — jump anywhere</h3>
+          <p>Press <kbd>Ctrl+Shift+\</kbd> (<kbd>Ctrl+Cmd+\</kbd> on macOS) and every clickable target gets a
+            short <code>A&#8201;S&#8201;D&#8201;F</code> label — type it to jump straight there. Buttons, tabs,
+            tool-window controls, even inside dialogs like the IdeaVim settings.</p>
+        </div>
+        <div class="mini">
+          <h3>NERDTree, everywhere</h3>
+          <p>The NERDTree keys you already know — <kbd>o</kbd>, <kbd>t</kbd>, <kbd>s</kbd>, <kbd>i</kbd>,
+            <kbd>gs</kbd>, <kbd>gi</kbd> — now work in <em>any</em> tree, not just the Project tool window.</p>
+        </div>
+        <div class="mini">
+          <h3>Hop between tool windows</h3>
+          <p><kbd>&lt;C-W&gt;h</kbd>/<kbd>j</kbd>/<kbd>k</kbd>/<kbd>l</kbd> moves focus directionally across
+            tool windows and the editor — fired from inside any tool window, just like window motions.</p>
+        </div>
+        <div class="mini">
+          <h3>Spread the word</h3>
+          <p>It's young and we want it in more hands. Turn it on, live in it for a day, and tell us what
+            should come next — feedback shapes where it goes.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Headline features -->
+    <div class="section">
+      <p class="kicker">window management</p>
+      <h2>Resize splits from the keyboard</h2>
+      <p>Stop reaching for the mouse to balance your layout. A full set of Vim window-resize
+        commands has landed, so your splits bend to your will.</p>
+      <pre><span class="key">&lt;C-W&gt;+</span>   <span class="key">&lt;C-W&gt;-</span>     <span class="cm">" taller / shorter</span>
+<span class="key">&lt;C-W&gt;&gt;</span>   <span class="key">&lt;C-W&gt;&lt;</span>     <span class="cm">" wider / narrower</span>
+<span class="key">&lt;C-W&gt;=</span>              <span class="cm">" equalize every window</span>
+<span class="str">:resize 20</span>          <span class="cm">" or  :resize +5 / -5</span>
+<span class="str">:vertical resize 80</span> <span class="cm">" width, absolute or relative</span></pre>
+      <p class="note">Counts work too — <kbd>5&lt;C-W&gt;+</kbd> grows the window by five lines at once.</p>
+    </div>
+
+    <div class="section">
+      <p class="kicker">editing · live preview</p>
+      <h2>See your :substitute before you run it</h2>
+      <p>The new <code>'inccommand'</code> option previews replacements as you type the command —
+        and quietly reverts everything if you bail out with <kbd>Esc</kbd>.</p>
+      <pre><span class="str">set inccommand=nosplit</span>  <span class="cm">" preview inline, in the buffer</span>
+<span class="str">set inccommand=split</span>    <span class="cm">" inline preview + a window listing</span>
+                        <span class="cm">" every affected line</span></pre>
+      <p class="note">No more squinting at a regex and hoping for the best.</p>
+    </div>
+
+    <div class="section">
+      <p class="kicker">text objects</p>
+      <h2>targets.vim, built in</h2>
+      <p>Welle's beloved <code>targets.vim</code> is now bundled. It supercharges text objects with
+        <em>seeking</em> — operate on the next or last pair, quote, or argument without moving first.</p>
+      <pre><span class="str">Plug 'wellle/targets.vim'</span>
+
+<span class="key">cin)</span>   <span class="cm">" change inside the NEXT ( )</span>
+<span class="key">da,</span>    <span class="cm">" delete an argument, comma and all</span>
+<span class="key">ci"</span>    <span class="cm">" change inside the nearest quotes, even</span>
+       <span class="cm">" if the cursor isn't on them yet</span></pre>
+      <p class="note">Pairs, quotes, separators, arguments and tags — with <code>i</code>/<code>a</code>/<code>I</code>/<code>A</code>
+        modifiers and <code>n</code>/<code>l</code> next/last qualifiers.</p>
+    </div>
+
+    <div class="section">
+      <p class="kicker">search</p>
+      <h2>Always know where you are</h2>
+      <p>After <kbd>/</kbd>, <kbd>?</kbd>, <kbd>n</kbd>, <kbd>N</kbd>, <kbd>*</kbd> or <kbd>#</kbd>,
+        IdeaVim now shows the match index and total — <code>[2/4]</code> — just like Vim.
+        Tune the ceiling with <code>'maxsearchcount'</code> (it shows <code>[2/&gt;3]</code> when exceeded).</p>
+    </div>
+
+    <div class="section">
+      <p class="kicker">input · keyboard layouts</p>
+      <h2>Drive Vim from any keyboard layout</h2>
+      <p>The new <code>'langmap'</code> option lets you run Normal- and Visual-mode commands from a
+        non-English keyboard — Greek, Dvorak, whatever you type on — by mapping the keys you press to the
+        plain ASCII commands underneath. Text you type in Insert mode is left exactly as-is.</p>
+      <pre><span class="cm">" map a Greek home row onto the ASCII commands</span>
+<span class="str">set langmap=ασδφγηξκλ;asdfghjkl</span>
+<span class="str">set langremap</span>   <span class="cm">" also apply langmap to the result of a mapping</span></pre>
+    </div>
+
+    <!-- Also worth a look -->
+    <div class="section">
+      <p class="kicker">also worth a look</p>
+      <div class="grid">
+        <div class="mini">
+          <h3>YouCompleteMe popup</h3>
+          <p>Enable <code>set youcompleteme</code> and cycle the popup with <kbd>Tab</kbd> /
+            <kbd>S-Tab</kbd> — normal tabbing stays untouched when no popup is open.</p>
+        </div>
+        <div class="mini">
+          <h3>IDE completion keys</h3>
+          <p><kbd>C-Y</kbd> accepts the selected completion item and <kbd>C-E</kbd> closes the
+            popup — the Vim muscle memory you already have.</p>
+        </div>
+        <div class="mini">
+          <h3>Edit control characters</h3>
+          <p>The new <em>IdeaVim: Edit Control Characters</em> action opens an editor for registers
+            and macros containing control chars (<code>^M</code>, <code>^[</code>).</p>
+        </div>
+        <div class="mini">
+          <h3>Roomier messages</h3>
+          <p><code>'cmdheight'</code> and <code>'messagesopt'</code> arrived: multi-line messages get
+            their own space, and single-line messages auto-hide after a timeout.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Polish & fixes -->
+    <div class="section">
+      <p class="kicker">polish &amp; fixes</p>
+      <ul>
+        <li><strong>Modeless selection</strong> in the output panel and command line — select with the mouse, copy with
+          <kbd>C-Y</kbd>.
+        </li>
+        <li><strong>Tab is free again</strong> — <code>sethandler &lt;Tab&gt; a:ide</code> can hand it to the IDE.</li>
+        <li><strong>Smarter * search</strong> now respects <code>smartcase</code>.</li>
+        <li><strong>Steadier cursor</strong> — fixed column drift on <kbd>j</kbd>/<kbd>k</kbd>, centering with inlay
+          hints, and double-scroll after incremental search.
+        </li>
+        <li><strong>No more double-typed text</strong> — leaving Insert mode with <kbd>Esc</kbd> no longer inserts
+          what you typed twice (notably in Rider).
+        </li>
+        <li><strong>Caret stays put after IDE actions</strong> — generating code or finishing a refactoring template
+          no longer leaves the cursor in an invalid Normal-mode spot.
+        </li>
+        <li><strong><kbd>C-O</kbd> at end of line</strong> — the one-shot Normal-mode command now runs from the
+          right position instead of past the line end, so <kbd>db</kbd> and friends behave.
+        </li>
+        <li><strong>Operators respect collapsed folds</strong> — <kbd>dd</kbd> on a fold header deletes the whole
+          folded region, while <kbd>dl</kbd> mid-header deletes just one character.
+        </li>
+        <li><strong>Cleaner macro recording</strong> — a key that's the prefix of a timed-out mapping is no longer
+          recorded twice.
+        </li>
+        <li><strong>Shell command changes show up</strong> — files touched by <code>:!</code> are now refreshed on
+          disk as soon as the command finishes.
+        </li>
+        <li>Plus the <code>g&lt;</code> command, a scroll-back more-prompt pager, and a long list of smaller fixes.</li>
+      </ul>
+    </div>
+
+    <footer>
+      <p><span class="p">~ $</span> # thanks for using IdeaVim — happy editing<span class="caret"></span></p>
+      <p>
+        <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">full-changelog</a> ·
+        <a href="https://youtrack.jetbrains.com/issues/VIM">report-an-issue</a> ·
+        <a href="https://jb.gg/ideavim-eap">join-the-eap</a>
+      </p>
+    </footer>
+  </div>
+</div>
+
+</body>
+</html>
