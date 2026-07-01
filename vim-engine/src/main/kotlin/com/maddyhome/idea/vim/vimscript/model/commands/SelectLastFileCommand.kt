@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimFile
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ranges.Range
@@ -31,7 +32,7 @@ data class SelectLastFileCommand(val range: Range, val modifier: CommandModifier
     context: ExecutionContext,
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
-    val res = injector.file.selectFile(999, context)
+    val res = injector.file.selectFile(VimFile.LAST_FILE_SENTINEL, context)
     if (res) {
       injector.jumpService.saveJumpLocation(editor)
     }
