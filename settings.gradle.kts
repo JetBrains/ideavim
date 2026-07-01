@@ -6,23 +6,24 @@
  * https://opensource.org/licenses/MIT.
  */
 
-// Set repository for snapshot versions of gradle plugin
 pluginManagement {
   repositories {
     maven {
-      url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
-    }
-    maven {
-      url = uri("https://cache-redirector.jetbrains.com/packages.jetbrains.team/maven/p/ij/intellij-dependencies")
+      url = uri("https://cache-redirector.jetbrains.com/repo.maven.apache.org/maven2")
     }
     maven {
       url = uri("https://cache-redirector.jetbrains.com/plugins.gradle.org/m2")
     }
     maven {
-      url = uri("https://cache-redirector.jetbrains.com/repo.maven.apache.org/maven2")
+      url = uri("https://cache-redirector.jetbrains.com/packages.jetbrains.team/maven/p/ij/intellij-dependencies")
     }
     mavenCentral()
     gradlePluginPortal()
+    // Snapshot versions of gradle plugins. The legacy OSSRH endpoint below is deprecated and no longer
+    // accessible (Sonatype shut it down in July 2025), so it is kept last only as a harmless fallback.
+    maven {
+      url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
+    }
   }
 }
 
