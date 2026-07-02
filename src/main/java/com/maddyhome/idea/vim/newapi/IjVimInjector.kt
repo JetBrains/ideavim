@@ -35,6 +35,7 @@ import com.maddyhome.idea.vim.api.VimFile
 import com.maddyhome.idea.vim.api.VimInjector
 import com.maddyhome.idea.vim.api.VimInjectorBase
 import com.maddyhome.idea.vim.api.VimJumpService
+import com.maddyhome.idea.vim.api.VimTagStackService
 import com.maddyhome.idea.vim.api.VimKeyGroup
 import com.maddyhome.idea.vim.api.VimLookupManager
 import com.maddyhome.idea.vim.api.VimMarkService
@@ -174,6 +175,8 @@ internal class IjVimInjector : VimInjectorBase() {
   override val markService: VimMarkService
     get() = service()
   override val jumpService: VimJumpService
+    get() = service()
+  override val tagStack: VimTagStackService
     get() = service()
   override val application: VimApplication
     get() = service()
