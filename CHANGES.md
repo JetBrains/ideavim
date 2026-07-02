@@ -23,6 +23,11 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+## To Be Released
+
+### Fixes:
+* [VIM-4265](https://youtrack.jetbrains.com/issue/VIM-4265) Fixed being left in Visual mode after a refactoring (e.g. rename) with `idearefactormode=keep` — the mode active before the action is now restored once the template's selection changes settle
+
 ## 2.42.0, 2026-07-01
 
 ## 2.41.0, 2026-07-01
