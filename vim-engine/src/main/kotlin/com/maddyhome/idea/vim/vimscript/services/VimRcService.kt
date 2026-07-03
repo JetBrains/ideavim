@@ -66,6 +66,15 @@ object VimRcService {
   }
 
   private fun findIdeaVimRc(homeVimrcPaths: Array<String>, xdgVimrcPath: String): Path? {
+    val customVimrc = System.getenv("IDEA_VIM_CUSTOM_VIMRC")
+    if (!customVimrc.isNullOrEmpty()) {
+      val file = Path(customVimrc)
+      if (file.exists()) {
+        logger.debug { "Found ideavimrc file: $file" }
+        return file
+      }
+    }
+
     // Check whether file exists in home dir
     val homeDirName = System.getProperty("user.home")
     if (homeDirName != null) {

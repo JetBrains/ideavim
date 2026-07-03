@@ -182,6 +182,10 @@ have `-Duser.home=/my/alternate/home` then IdeaVim will source
 Alternatively, you can set up initialization commands using [XDG](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html) standard.
 Put your settings to `$XDG_CONFIG_HOME/ideavim/ideavimrc` file.
 
+You can also set a custom path for your `.ideavimrc` file using the
+`IDEA_VIM_CUSTOM_VIMRC` environment variable. If set, IdeaVim will use this path
+instead of the default locations.
+
 
 IdeaVim Plugins
 --------------------
