@@ -80,14 +80,12 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       scriptContent = """
         if [ "major" = "$releaseType" ] || [ "minor" = "$releaseType" ]
         then
-          echo Resetting the release branch because the release type is $releaseType
+          echo Resetting the release branch to the latest master because the release type is $releaseType
           git checkout master
-          latest_eap=${'$'}(git describe --tags --match="[0-9].[0-9]*.[0-9]-eap.[0-9]*" --abbrev=0 HEAD)
-          echo Latest EAP: ${'$'}latest_eap
-          commit_of_latest_eap=${'$'}(git rev-list -n 1 ${'$'}latest_eap)
-          echo Commit of latest EAP: ${'$'}commit_of_latest_eap
+          master_commit=${'$'}(git rev-parse HEAD)
+          echo Master commit: ${'$'}master_commit
           git checkout release
-          git reset --hard ${'$'}commit_of_latest_eap
+          git reset --hard ${'$'}master_commit
         else
           git checkout release
           echo Do not reset the release branch because the release type is $releaseType
