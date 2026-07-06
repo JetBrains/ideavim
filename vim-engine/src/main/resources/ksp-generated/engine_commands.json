@@ -551,6 +551,11 @@
   },
   {
     "keys": "<C-T>",
+    "class": "com.maddyhome.idea.vim.action.ex.SearchAgainPreviousActionCommandLine",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-T>",
     "class": "com.maddyhome.idea.vim.action.motion.mark.MotionJumpPreviousAction",
     "modes": "N"
   },

@@ -1096,4 +1096,59 @@ class IncsearchTests : VimTestCase() {
       """.trimMargin()
     )
   }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
+  fun `test ctrl+t moves to the previous match during incsearch`() {
+    configureByText(
+      """
+        |${c}one
+        |two
+        |one
+        |two
+        |one
+      """.trimMargin(),
+    )
+    enterCommand("set incsearch")
+    // First match is the "two" on line 1; stepping backwards wraps around to the last "two" on line 3.
+    typeText("/", "two")
+    typeText("<C-T>")
+    assertState(
+      """
+        |one
+        |two
+        |one
+        |${c}two
+        |one
+      """.trimMargin()
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
+  fun `test ctrl+t returns to the previous match after ctrl+g during incsearch`() {
+    configureByText(
+      """
+        |${c}one
+        |two
+        |one
+        |two
+        |one
+      """.trimMargin(),
+    )
+    enterCommand("set incsearch")
+    // /two -> line 1, <C-G> -> line 3, <C-T> -> back to line 1.
+    typeText("/", "two")
+    typeText("<C-G>")
+    typeText("<C-T>")
+    assertState(
+      """
+        |one
+        |${c}two
+        |one
+        |two
+        |one
+      """.trimMargin()
+    )
+  }
 }

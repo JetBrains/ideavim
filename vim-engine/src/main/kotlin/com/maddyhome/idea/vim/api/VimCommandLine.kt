@@ -128,13 +128,14 @@ interface VimCommandLine {
   fun clearCurrentAction()
 
   /**
-   * Move the incremental search preview to the next match, as with `c_CTRL-G`.
+   * Move the incremental search preview to the next ([next] == true, `c_CTRL-G`) or previous ([next] == false,
+   * `c_CTRL-T`) match.
    *
-   * Called while the command line is still active during an incsearch (`/` or `?`). It advances the "current match"
-   * highlight and caret preview to the next match without closing the command line or executing the search. Does
-   * nothing if 'incsearch' is disabled or there is no in-progress search pattern.
+   * Called while the command line is still active during an incsearch (`/` or `?`). It moves the "current match"
+   * highlight and caret preview without closing the command line or executing the search, wrapping around the ends of
+   * the buffer. Does nothing if 'incsearch' is disabled or there is no in-progress search pattern.
    */
-  fun advanceIncsearchMatch() {}
+  fun advanceIncsearchMatch(next: Boolean) {}
 
   /**
    * TODO remove me, close is safer

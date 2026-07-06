@@ -36,6 +36,7 @@ import com.maddyhome.idea.vim.helper.ShortcutHelper
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.requestFocus
 import com.maddyhome.idea.vim.helper.selectEditorFont
+import com.maddyhome.idea.vim.helper.shouldIgnoreCase
 import com.maddyhome.idea.vim.helper.updateIncsearchHighlights
 import com.maddyhome.idea.vim.key.interceptors.VimInputInterceptor
 import com.maddyhome.idea.vim.newapi.IjVimCaret
@@ -404,11 +405,20 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
     // Get a snapshot of the count for the in-progress command and coerce it to 1. This value will include all count
     // components - selecting register(s), operator and motions. E.g. `2"a3"b4"c5d6/` will return 720. If we're showing
     // highlights for an Ex command like `:s`, the command builder will be empty, but we'll still get a valid value.
-    // Include any `c_CTRL-G` advancement so the current match moves forward as the user presses <C-G>.
-    val count1 = max(1, getInstance().keyHandlerState.editorCommandBuilder.calculateCount0Snapshot()) + incsearchMatchOffset
+    // Include any `c_CTRL-G`/`c_CTRL-T` advancement so the current match moves as the user presses <C-G>/<C-T>.
     val forwards = update.labelText != "?" // :s, :g, :v are treated as forwards
     val patternEnd = injector.searchGroup.findEndOfPattern(update.searchText, update.separator, 0)
     val pattern = update.searchText.take(patternEnd)
+    val count1 = normalizeIncsearchCount(
+      editor,
+      pattern,
+      max(1, getInstance().keyHandlerState.editorCommandBuilder.calculateCount0Snapshot()) + incsearchMatchOffset,
+      update.searchRange,
+    )
+    if (count1 == null) {
+      resetCaretOffsetAndScroll(editor)
+      return
+    }
 
     injector.editorGroup.closeEditorSearchSession(IjVimEditor(editor))
     // A substitute/global command highlights every match in its range, even without 'hlsearch'.
@@ -429,17 +439,35 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
   }
 
   /**
-   * `c_CTRL-G` - advance the incsearch preview to the next match without closing the command line or running the search.
+   * `c_CTRL-G` / `c_CTRL-T` - move the incsearch preview to the next ([next] == true) or previous ([next] == false)
+   * match, without closing the command line or running the search.
    *
-   * Bumps the match offset and re-renders the current pattern. Does nothing if 'incsearch' is off or there's no usable
+   * Steps the match offset and re-renders the current pattern. Does nothing if 'incsearch' is off or there's no usable
    * pattern (e.g. an empty command line).
    */
-  override fun advanceIncsearchMatch() {
+  override fun advanceIncsearchMatch(next: Boolean) {
     if (!isIncSearchEnabled) return
     val editor = ijEditor ?: return
     val update = parseCommandLineForPreview(editor) as? CommandLineUpdate.Renderable ?: return
-    incsearchMatchOffset++
+    incsearchMatchOffset += if (next) 1 else -1
     showIncsearchHighlights(editor, update)
+  }
+
+  /**
+   * Coerce the incsearch match count into the valid `[1, matchCount]` range, wrapping around like 'wrapscan'.
+   *
+   * `c_CTRL-T` can step [count1] below 1 (before the first match); wrap it to the last match. Only recomputes the total
+   * match count when needed (i.e. the fast path of typing a pattern, where the count is already >= 1, is untouched).
+   * Returns null when the pattern has no matches, so the caller can reset the caret.
+   */
+  private fun normalizeIncsearchCount(editor: Editor, pattern: String, count1: Int, searchRange: LineRange?): Int? {
+    if (count1 >= 1) return count1
+    val startLine = searchRange?.startLine ?: 0
+    val endLine = searchRange?.endLine ?: -1
+    val ignoreCase = shouldIgnoreCase(pattern, false)
+    val total = injector.searchHelper.findAll(IjVimEditor(editor), pattern, startLine, endLine, ignoreCase).size
+    if (total == 0) return null
+    return Math.floorMod(count1 - 1, total) + 1
   }
 
   /** Render the inccommand preview. Called after highlighting, which must see the original (un-previewed) text. */
