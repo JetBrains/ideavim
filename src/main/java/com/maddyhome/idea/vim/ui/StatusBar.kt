@@ -44,6 +44,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.group.NotificationService
+import com.maddyhome.idea.vim.group.WhatsNewHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.icons.VimIcons
 import com.maddyhome.idea.vim.newapi.globalIjOptions
@@ -204,6 +205,7 @@ private object VimActionsPopup {
         AllIcons.Actions.IntentionBulb,
       ),
     )
+    actionGroup.add(WhatsNewIdeaVimAction())
     actionGroup.addSeparator(MessageHelper.message("widget.vim.actions.popup.eap.choice.active.text"))
 
     actionGroup.add(JoinEap)
@@ -266,6 +268,13 @@ private class TutorAction : DumbAwareAction("Tutor") {
     PsiManager.getInstance(project).findFile(file)?.let {
       ProjectView.getInstance(project).selectPsiElement(it, false)
     }
+  }
+}
+
+private class WhatsNewIdeaVimAction : DumbAwareAction("What's New") {
+  override fun actionPerformed(e: AnActionEvent) {
+    val project = e.project ?: return
+    WhatsNewHelper.showWhatsNew(project, VimPlugin.getVersion())
   }
 }
 
