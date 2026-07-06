@@ -23,7 +23,7 @@ fun performReleaseActions(version: String, releaseType: String?) = runBlocking {
     return@runBlocking
   }
 
-  val tickets = getYoutrackTicketsByQuery("#{Ready To Release} and tag: {IdeaVim Released In EAP}")
+  val tickets = getYoutrackTicketsByQuery("#{Ready To Release}")
   
   if (tickets.isNotEmpty()) {
     println("Updating statuses for tickets: $tickets")
