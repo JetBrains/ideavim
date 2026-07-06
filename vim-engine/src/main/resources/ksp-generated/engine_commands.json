@@ -231,6 +231,11 @@
   },
   {
     "keys": "<C-G>",
+    "class": "com.maddyhome.idea.vim.action.ex.SearchAgainNextActionCommandLine",
+    "modes": "C"
+  },
+  {
+    "keys": "<C-G>",
     "class": "com.maddyhome.idea.vim.action.file.FileGetFileInfoAction",
     "modes": "N"
   },

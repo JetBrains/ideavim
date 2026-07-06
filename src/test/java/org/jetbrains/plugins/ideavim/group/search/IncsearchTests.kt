@@ -129,7 +129,8 @@ class IncsearchTests : VimTestCase() {
     )
     enterCommand("set hlsearch incsearch")
     typeText("3", "/", "one") // No enter
-    assertSearchHighlights("one",
+    assertSearchHighlights(
+      "one",
       """
         «one»
         two
@@ -164,7 +165,8 @@ class IncsearchTests : VimTestCase() {
     )
     enterCommand("set hlsearch incsearch")
     typeText("12", "/", "one") // No enter
-    assertSearchHighlights("one",
+    assertSearchHighlights(
+      "one",
       """
         «one»
         two
@@ -201,7 +203,8 @@ class IncsearchTests : VimTestCase() {
     typeText("12", "/", "one") // No enter
 
     // No current match highlight
-    assertSearchHighlights("one",
+    assertSearchHighlights(
+      "one",
       """
         «one»
         two
@@ -225,8 +228,10 @@ class IncsearchTests : VimTestCase() {
     configureByText("lorem 1 ipsum lorem 2 ipsum lorem 3 ipsum lorem 4 ipsum lorem 5 ipsum lorem 6 ipsum lorem 7 ipsum")
     enterCommand("set hlsearch incsearch")
     typeText("2d", "3/ipsum") // No enter
-    assertSearchHighlights("ipsum",
-      "lorem 1 «ipsum» lorem 2 «ipsum» lorem 3 «ipsum» lorem 4 «ipsum» lorem 5 «ipsum» lorem 6 ‷ipsum‴ lorem 7 «ipsum»")
+    assertSearchHighlights(
+      "ipsum",
+      "lorem 1 «ipsum» lorem 2 «ipsum» lorem 3 «ipsum» lorem 4 «ipsum» lorem 5 «ipsum» lorem 6 ‷ipsum‴ lorem 7 «ipsum»"
+    )
   }
 
   @Test
@@ -247,7 +252,8 @@ class IncsearchTests : VimTestCase() {
     )
     enterCommand("set hlsearch incsearch")
     typeText("3", "?", "one") // No enter
-    assertSearchHighlights("one",
+    assertSearchHighlights(
+      "one",
       """
         «one»
         two
@@ -282,7 +288,8 @@ class IncsearchTests : VimTestCase() {
     )
     enterCommand("set hlsearch incsearch")
     typeText("12", "?", "one") // No enter
-    assertSearchHighlights("one",
+    assertSearchHighlights(
+      "one",
       """
         «one»
         two
@@ -319,7 +326,8 @@ class IncsearchTests : VimTestCase() {
     typeText("12", "?", "one") // No enter
 
     // No current match highlight
-    assertSearchHighlights("one",
+    assertSearchHighlights(
+      "one",
       """
         «one»
         two
@@ -343,8 +351,10 @@ class IncsearchTests : VimTestCase() {
     configureByText("lorem 1 ipsum lorem 2 ipsum lorem 3 ipsum lorem 4 ipsum lorem 5 ipsum lorem 6 ipsum lorem 7 ipsu${c}m")
     enterCommand("set hlsearch incsearch")
     typeText("2d", "3?ipsum") // No enter
-    assertSearchHighlights("ipsum",
-      "lorem 1 «ipsum» lorem 2 ‷ipsum‴ lorem 3 «ipsum» lorem 4 «ipsum» lorem 5 «ipsum» lorem 6 «ipsum» lorem 7 «ipsum»")
+    assertSearchHighlights(
+      "ipsum",
+      "lorem 1 «ipsum» lorem 2 ‷ipsum‴ lorem 3 «ipsum» lorem 4 «ipsum» lorem 5 «ipsum» lorem 6 «ipsum» lorem 7 «ipsum»"
+    )
   }
 
   @Test
@@ -584,7 +594,8 @@ class IncsearchTests : VimTestCase() {
     ) {
       enterCommand("set hlsearch incsearch")
     }
-    assertSearchHighlights("dolor",
+    assertSearchHighlights(
+      "dolor",
       """
         |Lorem ipsum ‷dolor‴ sit amet,
         |consectetur adipiscing elit
@@ -614,7 +625,8 @@ class IncsearchTests : VimTestCase() {
     ) {
       enterCommand("set hlsearch incsearch")
     }
-    assertSearchHighlights("ipsum",
+    assertSearchHighlights(
+      "ipsum",
       """
         |Lorem ‷ipsum‴ dolor sit amet,
         |consectetur adipiscing elit
@@ -694,7 +706,8 @@ class IncsearchTests : VimTestCase() {
       enterCommand("set selection=exclusive")
       enterCommand("set hlsearch incsearch")
     }
-    assertSearchHighlights("dolor",
+    assertSearchHighlights(
+      "dolor",
       """
         |Lorem ipsum ‷dolor‴ sit amet,
         |consectetur adipiscing elit
@@ -725,7 +738,8 @@ class IncsearchTests : VimTestCase() {
       enterCommand("set selection=exclusive")
       enterCommand("set hlsearch incsearch")
     }
-    assertSearchHighlights("ipsum",
+    assertSearchHighlights(
+      "ipsum",
       """
         |Lorem ‷ipsum‴ dolor sit amet,
         |consectetur adipiscing elit
@@ -807,7 +821,8 @@ class IncsearchTests : VimTestCase() {
     ) {
       enterCommand("set hlsearch incsearch")
     }
-    assertSearchHighlights("ip",
+    assertSearchHighlights(
+      "ip",
       """
         |Lorem ‷ip‴sum dolor sit amet,
         |consectetur ad«ip»iscing elit
@@ -839,7 +854,8 @@ class IncsearchTests : VimTestCase() {
     ) {
       enterCommand("set hlsearch incsearch")
     }
-    assertSearchHighlights("ip",
+    assertSearchHighlights(
+      "ip",
       """
         |Lorem ‷ip‴sum dolor sit amet,
         |consectetur ad«ip»iscing elit
@@ -898,7 +914,8 @@ class IncsearchTests : VimTestCase() {
       enterCommand("set selection=exclusive")
       enterCommand("set hlsearch incsearch")
     }
-    assertSearchHighlights("ip",
+    assertSearchHighlights(
+      "ip",
       """
         |Lorem ‷ip‴sum dolor sit amet,
         |consectetur ad«ip»iscing elit
@@ -931,7 +948,8 @@ class IncsearchTests : VimTestCase() {
       enterCommand("set selection=exclusive")
       enterCommand("set hlsearch incsearch")
     }
-    assertSearchHighlights("ip",
+    assertSearchHighlights(
+      "ip",
       """
         |Lorem ‷ip‴sum dolor sit amet,
         |consectetur ad«ip»iscing elit
@@ -1010,7 +1028,8 @@ class IncsearchTests : VimTestCase() {
     ) {
       enterCommand("set hlsearch incsearch")
     }
-    assertSearchHighlights("dolor",
+    assertSearchHighlights(
+      "dolor",
       """
         |Lorem ipsum ‷dolor‴ sit amet,
         |consectetur adipiscing elit
@@ -1050,5 +1069,31 @@ class IncsearchTests : VimTestCase() {
     injector.messages.clearError()
     typeText(":", "%s/\\(")
     assertFalse(injector.messages.isError(), "Incomplete regex during incsearch :s should not trigger an error/beep")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
+  fun `test ctrl+g moves to the next match during incsearch`() {
+    configureByText(
+      """
+        |${c}one
+        |two
+        |one
+        |two
+        |one
+      """.trimMargin(),
+    )
+    enterCommand("set incsearch")
+    typeText("/", "two")
+    typeText("<C-G>")
+    assertState(
+      """
+        |one
+        |two
+        |one
+        |${c}two
+        |one
+      """.trimMargin()
+    )
   }
 }
