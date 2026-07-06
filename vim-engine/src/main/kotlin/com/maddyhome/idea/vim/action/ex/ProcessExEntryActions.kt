@@ -39,6 +39,27 @@ class ProcessExEntryAction : MotionActionHandler.AmbiguousExecution() {
   }
 }
 
+/**
+ * `c_CTRL-G` - during an incremental search (`/` or `?` with 'incsearch' set), move the preview to the next match.
+ *
+ * Unlike [ProcessExEntryAction], this deliberately does not carry [CommandFlags.FLAG_END_EX]: the command line stays
+ * open and the search is not executed. It simply advances the incsearch "current match" highlight and caret preview.
+ */
+@CommandOrMotion(keys = ["<C-G>"], modes = [Mode.CMD_LINE])
+class SearchAgainNextActionCommandLine : MotionActionHandler.SingleExecution() {
+  override val motionType: MotionType = MotionType.EXCLUSIVE
+
+  override fun getOffset(
+    editor: VimEditor,
+    context: ExecutionContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments,
+  ): Motion {
+    injector.commandLine.getActiveCommandLine()?.advanceIncsearchMatch()
+    return Motion.NoMotion
+  }
+}
+
 class ExecuteDefinedInputProcessingAction : MotionActionHandler.SingleExecution() {
   override val motionType: MotionType = MotionType.LINE_WISE
 

@@ -191,6 +191,7 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
       caretOffset = editor.caretModel.offset
       verticalOffset = editor.scrollingModel.verticalScrollOffset
       horizontalOffset = editor.scrollingModel.horizontalScrollOffset
+      incsearchMatchOffset = 0
     }
 
     if (!ApplicationManager.getApplication().isUnitTestMode) {
@@ -323,6 +324,8 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
   private val incrementalCommandLineListener: DocumentListener = object : DocumentAdapter() {
     override fun textChanged(e: DocumentEvent) {
       val editor = ijEditor ?: return
+      // Editing the pattern restarts incsearch from the first match, cancelling any `c_CTRL-G` advancement.
+      incsearchMatchOffset = 0
       try {
         when (val update = parseCommandLineForPreview(editor)) {
           is CommandLineUpdate.Renderable -> {
@@ -401,7 +404,8 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
     // Get a snapshot of the count for the in-progress command and coerce it to 1. This value will include all count
     // components - selecting register(s), operator and motions. E.g. `2"a3"b4"c5d6/` will return 720. If we're showing
     // highlights for an Ex command like `:s`, the command builder will be empty, but we'll still get a valid value.
-    val count1 = max(1, getInstance().keyHandlerState.editorCommandBuilder.calculateCount0Snapshot())
+    // Include any `c_CTRL-G` advancement so the current match moves forward as the user presses <C-G>.
+    val count1 = max(1, getInstance().keyHandlerState.editorCommandBuilder.calculateCount0Snapshot()) + incsearchMatchOffset
     val forwards = update.labelText != "?" // :s, :g, :v are treated as forwards
     val patternEnd = injector.searchGroup.findEndOfPattern(update.searchText, update.separator, 0)
     val pattern = update.searchText.take(patternEnd)
@@ -422,6 +426,20 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
     // should remove the selection first. We're in Command-line with Visual pending; exiting Visual leaves Command-line.
     if (update.isExCommand) IjVimEditor(editor).exitVisualMode()
     IjVimCaret(editor.caretModel.primaryCaret).moveToOffset(matchOffset)
+  }
+
+  /**
+   * `c_CTRL-G` - advance the incsearch preview to the next match without closing the command line or running the search.
+   *
+   * Bumps the match offset and re-renders the current pattern. Does nothing if 'incsearch' is off or there's no usable
+   * pattern (e.g. an empty command line).
+   */
+  override fun advanceIncsearchMatch() {
+    if (!isIncSearchEnabled) return
+    val editor = ijEditor ?: return
+    val update = parseCommandLineForPreview(editor) as? CommandLineUpdate.Renderable ?: return
+    incsearchMatchOffset++
+    showIncsearchHighlights(editor, update)
   }
 
   /** Render the inccommand preview. Called after highlighting, which must see the original (un-previewed) text. */
@@ -676,6 +694,10 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
   private var verticalOffset = 0
   private var horizontalOffset = 0
   private var caretOffset = 0
+
+  // How many matches past the first `c_CTRL-G` has advanced the incsearch preview. Added to the command count so the
+  // "current match" moves forward as the user presses <C-G>. Reset when the panel is (re)activated or the pattern edited.
+  private var incsearchMatchOffset = 0
 
   // Renders the 'inccommand' preview (live :substitute) into the buffer as the command line is edited.
   private val inccommandPreview = InccommandPreview()
