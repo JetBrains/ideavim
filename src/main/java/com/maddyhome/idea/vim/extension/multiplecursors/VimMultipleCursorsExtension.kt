@@ -62,6 +62,14 @@ private const val ALL_WHOLE_OCCURRENCES = "<Plug>AllWholeOccurrences"
 @NlsSafe
 private const val ALL_OCCURRENCES = "<Plug>AllOccurrences"
 
+/**
+ * When set to `0`, the default key mappings are not created, allowing the user to map the `<Plug>` mappings to keys of
+ * their own choosing (e.g. mapping back to the old `<A-n>` based mappings). This matches the
+ * `g:multi_cursor_use_default_mapping` option of the original vim-multiple-cursors plugin.
+ */
+@NlsSafe
+private const val USE_DEFAULT_MAPPING = "multi_cursor_use_default_mapping"
+
 private var Editor.vimMultipleCursorsWholeWord: Boolean? by userData()
 private var Editor.vimMultipleCursorsLastSelection: TextRange? by userData()
 
@@ -115,34 +123,52 @@ internal class VimMultipleCursorsExtension : VimExtension {
       RemoveOccurrenceHandler(), false
     )
 
-    putKeyMappingIfMissing(
-      MappingMode.NXO,
-      injector.parser.parseKeys("<A-n>"),
-      owner,
-      injector.parser.parseKeys(NEXT_WHOLE_OCCURRENCE),
-      true
-    )
-    putKeyMappingIfMissing(
-      MappingMode.NXO,
-      injector.parser.parseKeys("g<A-n>"),
-      owner,
-      injector.parser.parseKeys(NEXT_OCCURRENCE),
-      true
-    )
-    putKeyMappingIfMissing(
-      MappingMode.X,
-      injector.parser.parseKeys("<A-x>"),
-      owner,
-      injector.parser.parseKeys(SKIP_OCCURRENCE),
-      true
-    )
-    putKeyMappingIfMissing(
-      MappingMode.X,
-      injector.parser.parseKeys("<A-p>"),
-      owner,
-      injector.parser.parseKeys(REMOVE_OCCURRENCE),
-      true
-    )
+    val useDefaultMapping =
+      VimPlugin.getVariableService().getGlobalVariableValue(USE_DEFAULT_MAPPING)?.toVimNumber()?.booleanValue ?: true
+    if (useDefaultMapping) {
+      putKeyMappingIfMissing(
+        MappingMode.NXO,
+        injector.parser.parseKeys("<C-n>"),
+        owner,
+        injector.parser.parseKeys(NEXT_WHOLE_OCCURRENCE),
+        true
+      )
+      putKeyMappingIfMissing(
+        MappingMode.NXO,
+        injector.parser.parseKeys("g<C-n>"),
+        owner,
+        injector.parser.parseKeys(NEXT_OCCURRENCE),
+        true
+      )
+      putKeyMappingIfMissing(
+        MappingMode.NXO,
+        injector.parser.parseKeys("<A-n>"),
+        owner,
+        injector.parser.parseKeys(ALL_WHOLE_OCCURRENCES),
+        true
+      )
+      putKeyMappingIfMissing(
+        MappingMode.NXO,
+        injector.parser.parseKeys("g<A-n>"),
+        owner,
+        injector.parser.parseKeys(ALL_OCCURRENCES),
+        true
+      )
+      putKeyMappingIfMissing(
+        MappingMode.X,
+        injector.parser.parseKeys("<C-x>"),
+        owner,
+        injector.parser.parseKeys(SKIP_OCCURRENCE),
+        true
+      )
+      putKeyMappingIfMissing(
+        MappingMode.X,
+        injector.parser.parseKeys("<C-p>"),
+        owner,
+        injector.parser.parseKeys(REMOVE_OCCURRENCE),
+        true
+      )
+    }
   }
 
   abstract class WriteActionHandler : ExtensionHandler {
