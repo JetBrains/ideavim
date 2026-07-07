@@ -25,8 +25,14 @@ usual beta standards.
 
 ## To Be Released
 
+### Features:
+* [VIM-2694](https://youtrack.jetbrains.com/issue/VIM-2694) Added [`CTRL-G`](https://vimhelp.org/cmdline.txt.html#c_CTRL-G) and [`CTRL-T`](https://vimhelp.org/cmdline.txt.html#c_CTRL-T) during incremental search — while typing a `/` or `?` pattern with `incsearch` enabled, `<C-G>` jumps to the next match and `<C-T>` to the previous one
+
 ### Fixes:
 * [VIM-4265](https://youtrack.jetbrains.com/issue/VIM-4265) Fixed being left in Visual mode after a refactoring (e.g. rename) with `idearefactormode=keep` — the mode active before the action is now restored once the template's selection changes settle
+
+### Merged PRs:
+* [1890](https://github.com/JetBrains/ideavim/pull/1890) by [1grzyb1](https://github.com/1grzyb1): VIM-2694 Add C-G and C-T  action during incsearch
 
 ## 2.42.0, 2026-07-01
 
