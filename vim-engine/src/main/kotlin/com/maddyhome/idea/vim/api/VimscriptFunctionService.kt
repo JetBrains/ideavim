@@ -22,6 +22,8 @@ interface VimscriptFunctionService {
   fun getUserDefinedFunction(scope: Scope?, name: String, vimContext: VimLContext): FunctionDeclaration?
   fun getBuiltInFunction(name: String): FunctionHandler?
   fun registerHandlers()
+  fun registerFunctionHandler(functionName: String, functionHandler: FunctionHandler)
+  fun unregisterFunctionHandler(functionName: String)
 
   @TestOnly
   fun resetUserDefinedFunctions()
