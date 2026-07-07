@@ -589,7 +589,7 @@ class ReplaceWithRegisterNewTest : VimTestCase() {
     """.trimIndent()
     configureByText(text)
     enterCommand("set clipboard+=unnamedplus")
-    typeText(injector.parser.parseKeys("ye" + "j" + "<A-n><A-n><A-n><A-n>" + "gr"))
+    typeText(injector.parser.parseKeys("ye" + "j" + "<C-n><C-n><C-n><C-n>" + "gr"))
     assertState(
       """
         copyMe
@@ -620,7 +620,7 @@ class ReplaceWithRegisterNewTest : VimTestCase() {
     enableExtensions("multiple-cursors")
     enterCommand("set clipboard+=unnamed")
 
-    typeText(injector.parser.parseKeys("yiw" + "j" + "griw" + "jj" + "<A-n><A-n><A-n><A-n>" + "gr"))
+    typeText(injector.parser.parseKeys("yiw" + "j" + "griw" + "jj" + "<C-n><C-n><C-n><C-n>" + "gr"))
     assertState(
       """
       test

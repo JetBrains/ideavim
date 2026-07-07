@@ -41,7 +41,7 @@ class VimMultipleCursorsExtensionJavaTest : VimJavaTestCase() {
 }"""
     configureByJavaText(before)
 
-    typeText(injector.parser.parseKeys("<A-n>".repeat(3)))
+    typeText(injector.parser.parseKeys("<C-n>".repeat(3)))
 
     val after = """public class ChangeLineAction extends EditorAction {
   public ChangeLineAction() {
@@ -81,7 +81,7 @@ class VimMultipleCursorsExtensionJavaTest : VimJavaTestCase() {
 }"""
     configureByJavaText(before)
 
-    typeText(injector.parser.parseKeys("<A-n>".repeat(6)))
+    typeText(injector.parser.parseKeys("<C-n>".repeat(6)))
 
     val after = """public class ChangeLineAction extends EditorAction {
   public ChangeLineAction() {
@@ -112,7 +112,7 @@ class VimMultipleCursorsExtensionJavaTest : VimJavaTestCase() {
     """.trimMargin()
     configureByJavaText(before)
 
-    typeText(injector.parser.parseKeys("<A-n>" + "<A-n>".repeat(3) + "<A-p>"))
+    typeText(injector.parser.parseKeys("<C-n>" + "<C-n>".repeat(3) + "<C-p>"))
 
     val after = """private ${s}int$se a = 0;
       |private ${s}int$se b = 1;
@@ -131,7 +131,7 @@ class VimMultipleCursorsExtensionJavaTest : VimJavaTestCase() {
     """.trimMargin()
     configureByJavaText(before)
 
-    typeText(injector.parser.parseKeys("<A-n>" + "<A-x>" + "<A-n>"))
+    typeText(injector.parser.parseKeys("<C-n>" + "<C-x>" + "<C-n>"))
 
     val after = """private int a = 0;
       |${s}private$se int b = 1;
@@ -149,7 +149,7 @@ class VimMultipleCursorsExtensionJavaTest : VimJavaTestCase() {
     """.trimMargin()
     configureByJavaText(before)
 
-    typeText(injector.parser.parseKeys("<A-n>" + "<A-x>" + "<A-n>".repeat(3)))
+    typeText(injector.parser.parseKeys("<C-n>" + "<C-x>" + "<C-n>".repeat(3)))
 
     val after = """${s}private$se int a = 0;
       |${s}private$se int b = 1;
@@ -175,7 +175,7 @@ class VimMultipleCursorsExtensionJavaTest : VimJavaTestCase() {
     """.trimMargin()
     configureByJavaText(before)
 
-    typeText(injector.parser.parseKeys("<A-n>" + "<A-x>" + "<A-n>" + "<A-n>" + "<A-n>" + "<A-p>" + "<A-n>" + "<A-x>"))
+    typeText(injector.parser.parseKeys("<C-n>" + "<C-x>" + "<C-n>" + "<C-n>" + "<C-n>" + "<C-p>" + "<C-n>" + "<C-x>"))
 
     val after = """public class Main {
       |  public static void main(String[] args) {

@@ -570,24 +570,48 @@ Original plugin: [vim-multiple-cursors](https://github.com/terryma/vim-multiple-
 
 ### Instructions
 
-At the moment, the default key binds for this plugin do not get mapped correctly in IdeaVim (see [VIM-2178](https://youtrack.jetbrains.com/issue/VIM-2178)). To enable the default key binds, add the following to your `.ideavimrc` file...
+The default key bindings match the original terryma/vim-multiple-cursors plugin:
+
+| Action                                            | Shortcut  |
+|---------------------------------------------------|-----------|
+| Start / add next occurrence (whole word)          | `<C-n>`   |
+| Start / add next occurrence (not whole word)      | `g<C-n>`  |
+| Select all occurrences in file (whole word)       | `<A-n>`   |
+| Select all occurrences in file (not whole word)   | `g<A-n>`  |
+| Skip current and select next (during selection)   | `<C-x>`   |
+| Remove current selection (during selection)       | `<C-p>`   |
+
+These map to the following `<Plug>` mappings:
 
 ```
-" Remap multiple-cursors shortcuts to match terryma/vim-multiple-cursors
 nmap <C-n> <Plug>NextWholeOccurrence
 xmap <C-n> <Plug>NextWholeOccurrence
 nmap g<C-n> <Plug>NextOccurrence
 xmap g<C-n> <Plug>NextOccurrence
+nmap <A-n> <Plug>AllWholeOccurrences
+xmap <A-n> <Plug>AllWholeOccurrences
+nmap g<A-n> <Plug>AllOccurrences
+xmap g<A-n> <Plug>AllOccurrences
 xmap <C-x> <Plug>SkipOccurrence
 xmap <C-p> <Plug>RemoveOccurrence
+```
 
-" Note that the default <A-n> and g<A-n> shortcuts don't work on Mac due to dead keys.
+### Custom mappings
+
+To use your own mappings instead of the defaults, set `g:multi_cursor_use_default_mapping` to `0` and bind the
+`<Plug>` mappings yourself. This is also how you restore the old IdeaVim `<A-n>` based mappings:
+
+```
+let g:multi_cursor_use_default_mapping = 0
+
+" Note that the <A-n> and g<A-n> shortcuts don't work on Mac due to dead keys.
 " <A-n> is used to enter accented text e.g. ñ
-" Feel free to pick your own mappings that are not affected. I like to use <leader>
-nmap <leader><C-n> <Plug>AllWholeOccurrences
-xmap <leader><C-n> <Plug>AllWholeOccurrences
-nmap <leader>g<C-n> <Plug>AllOccurrences
-xmap <leader>g<C-n> <Plug>AllOccurrences
+nmap <A-n> <Plug>NextWholeOccurrence
+xmap <A-n> <Plug>NextWholeOccurrence
+nmap g<A-n> <Plug>NextOccurrence
+xmap g<A-n> <Plug>NextOccurrence
+xmap <A-x> <Plug>SkipOccurrence
+xmap <A-p> <Plug>RemoveOccurrence
 ```
 
 </details>
