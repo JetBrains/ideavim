@@ -101,12 +101,15 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
   private fun parseRange(ctx: RangeContext?): Range {
     val range = Range()
     if (ctx?.rangeUnit() != null) {
-      val addresses = ctx.rangeUnit()
-      for (unit in addresses) {
+      val units = ctx.rangeUnit()
+      var lastProcessed = -1
+      for ((index, unit) in units.withIndex()) {
+        if (index > 0 && units[index - 1].rangeSeparator() == null) break
         range.addAddresses(parseRangeUnit(unit))
+        lastProcessed = index
       }
       // If the range ends with a dangling separator, the last address is an implied current line address
-      if (addresses.last().rangeSeparator()?.text == ",") {
+      if (lastProcessed >= 0 && units[lastProcessed].rangeSeparator()?.text == ",") {
         createRangeAddresses(".", 0, false)?.let { range.addAddresses(it) }
       }
     }
