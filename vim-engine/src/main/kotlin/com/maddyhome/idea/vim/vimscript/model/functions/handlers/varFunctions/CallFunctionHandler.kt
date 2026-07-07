@@ -32,7 +32,7 @@ internal class CallFunctionHandler : BuiltinFunctionHandler<VimDataType>(minArit
     context: ExecutionContext,
     vimContext: VimLContext,
   ): VimDataType {
-    val func= arguments[0]  // String or Funcref
+    val func = arguments[0]  // String or Funcref
     val argList = arguments[1] as? VimList ?: throw exExceptionMessage("E1211", 2)
     val dict = arguments.getOrNull(2)?.let {
       it as? VimDictionary ?: throw exExceptionMessage("E1206", 3)
