@@ -119,12 +119,53 @@ class AddressTest : VimTestCase() {
     assertState("+ add\n- sub\n* mul\n")
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.INTELLIJ_PLATFORM_INHERITED_DIFFERENCE, description = "IntelliJ Platform editors can be completely empty, while Neovim buffers always contain at least one newline character")
+  @TestWithoutNeovim(
+    reason = SkipNeovimReason.INTELLIJ_PLATFORM_INHERITED_DIFFERENCE,
+    description = "IntelliJ Platform editors can be completely empty, while Neovim buffers always contain at least one newline character"
+  )
   @Test
   fun testAllLinesRange() {
     configureByText("1\n2\n3\n4\n5\n")
     typeText(commandToKeys("%d"))
     assertState("")
+  }
+
+  @Test
+  fun `test percent after existing range does not override it`() {
+    configureByText("1\n2\n3\n4\n5\n")
+    typeText("V", "j", ":'<,'>%d<Enter>")
+    assertState("3\n4\n5\n")
+  }
+
+  @Test
+  fun `test address without separator after range is ignored`() {
+    // Vim stops parsing the range at the first address that is not preceded by a ',' or ';'
+    // separator, so the trailing '$' is ignored and only lines 2-3 are affected.
+    configureByText("1\n2\n3\n4\n5\n")
+    typeText(commandToKeys("2,3\$d"))
+    assertState("1\n4\n5\n")
+  }
+
+  @Test
+  fun `test dot without separator after range is ignored`() {
+    configureByText("1\n2\n3\n4\n5\n")
+    typeText(commandToKeys("2,3.d"))
+    assertState("1\n4\n5\n")
+  }
+
+  @Test
+  fun `test percent without separator after range is ignored`() {
+    configureByText("1\n2\n3\n4\n5\n")
+    typeText(commandToKeys("2,3%d"))
+    assertState("1\n4\n5\n")
+  }
+
+  @Test
+  fun `test last two comma-separated addresses are used`() {
+    // Vim keeps the last two addresses of a comma-separated range, so ':2,3,4d' deletes lines 3-4.
+    configureByText("1\n2\n3\n4\n5\n")
+    typeText(commandToKeys("2,3,4d"))
+    assertState("1\n2\n5\n")
   }
 
   @Test
@@ -141,7 +182,10 @@ class AddressTest : VimTestCase() {
     assertState("1\n5\n")
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, description = "IdeaVim deletes all lines from 2 onwards (2-5), but Vim/Neovim correctly deletes lines 2-4")
+  @TestWithoutNeovim(
+    reason = SkipNeovimReason.DIFFERENT,
+    description = "IdeaVim deletes all lines from 2 onwards (2-5), but Vim/Neovim correctly deletes lines 2-4"
+  )
   @Test
   fun testMultipleLineNumbersWithOffsetInSecond() {
     configureByText("1\n2\n3\n4\n5\n")
