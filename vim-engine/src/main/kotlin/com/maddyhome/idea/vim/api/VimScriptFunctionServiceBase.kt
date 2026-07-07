@@ -15,7 +15,7 @@ import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
-import com.maddyhome.idea.vim.vimscript.model.functions.LazyVimscriptFunction
+import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandlerBase
 import com.maddyhome.idea.vim.vimscript.model.functions.VimscriptFunctionProvider
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 
@@ -23,7 +23,7 @@ abstract class VimScriptFunctionServiceBase : VimscriptFunctionService {
   protected abstract val functionProviders: List<VimscriptFunctionProvider>
 
   private val globalFunctions: MutableMap<String, FunctionDeclaration> = mutableMapOf()
-  private val builtInFunctions: MutableMap<String, LazyVimscriptFunction> = mutableMapOf()
+  private val builtInFunctions: MutableMap<String, Lazy<FunctionHandler>> = mutableMapOf()
 
   override fun deleteFunction(name: String, scope: Scope?, vimContext: VimLContext) {
     if (name[0].isLowerCase() && scope != Scope.SCRIPT_VARIABLE) {
@@ -138,7 +138,19 @@ abstract class VimScriptFunctionServiceBase : VimscriptFunctionService {
   }
 
   override fun getBuiltInFunction(name: String): FunctionHandler? {
-    return builtInFunctions[name]?.instance
+    return builtInFunctions[name]?.value
+  }
+
+  override fun registerFunctionHandler(
+    functionName: String,
+    functionHandler: FunctionHandler,
+  ) {
+    if (functionHandler is FunctionHandlerBase<*>) functionHandler.name = functionName
+    builtInFunctions[functionName] = lazyOf(functionHandler)
+  }
+
+  override fun unregisterFunctionHandler(functionName: String) {
+    builtInFunctions.remove(functionName)
   }
 
   private fun storeScriptFunction(functionDeclaration: FunctionDeclaration) {
@@ -166,7 +178,7 @@ abstract class VimScriptFunctionServiceBase : VimscriptFunctionService {
   override fun registerHandlers() {
     functionProviders.forEach { provider ->
       provider.getFunctions().forEach {
-        builtInFunctions[it.name] = it
+        builtInFunctions[it.name] = lazy { it.instance }
       }
     }
   }
