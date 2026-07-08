@@ -51,6 +51,11 @@
     <module name="IdeaVIM.ideavim-common" loading="embedded"/>
     <module name="IdeaVIM.ideavim-frontend"/>
     <module name="IdeaVIM.ideavim-backend"/>
+    <!-- Two variants of the bookmark backend; each self-gates so exactly one activates per IDE:
+         -bookmarks depends on intellij.platform.bookmarks (2026.2+), -bookmarks-core uses platform
+         core (<=2026.1). loading="optional" so an unmet dependency is a clean skip. -->
+    <module name="IdeaVIM.ideavim-backend-bookmarks" loading="optional"/>
+    <module name="IdeaVIM.ideavim-backend-bookmarks-core" loading="optional"/>
     <module name="IdeaVIM.ideavim-acejump"/>
     <module name="IdeaVIM.ideavim-rider"/>
     <module name="IdeaVIM.ideavim-clion-nova"/>
