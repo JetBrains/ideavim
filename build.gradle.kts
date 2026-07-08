@@ -118,6 +118,8 @@ dependencies {
     pluginComposedModule(runtimeOnly(project(":ideavim-common")))
     pluginModule(runtimeOnly(project(":ideavim-frontend")))
     pluginModule(runtimeOnly(project(":ideavim-backend")))
+    pluginModule(runtimeOnly(project(":ideavim-backend-bookmarks")))
+    pluginModule(runtimeOnly(project(":ideavim-backend-bookmarks-core")))
     pluginModule(runtimeOnly(project(":ideavim-acejump")))
     pluginModule(runtimeOnly(project(":ideavim-rider")))
     pluginModule(runtimeOnly(project(":ideavim-clion-nova")))
@@ -293,7 +295,9 @@ tasks {
   }
   val runRider by intellijPlatformTesting.runIde.registering {
     type = IntelliJPlatformType.Rider
-    version = "2026.1"
+    version = "2026.2-EAP9-SNAPSHOT"
+    // Using Rider as a target IntelliJ Platform with `useInstaller = true` is currently not supported, please set `useInstaller = false` instead. See: https://github.com/JetBrains/intellij-platform-gradle-plugin/issues/1852
+    useInstaller = false
     task {
       systemProperty("idea.log.debug.categories", "com.maddyhome.idea.vim.handler.EditorHandlersChainLogger")
     }

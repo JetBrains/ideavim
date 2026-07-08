@@ -1,0 +1,33 @@
+<!--
+  ~ Copyright 2003-2026 The IdeaVim authors
+  ~
+  ~ Use of this source code is governed by an MIT-style
+  ~ license that can be found in the LICENSE.txt file or at
+  ~ https://opensource.org/licenses/MIT.
+  -->
+
+<!-- Bookmark-specific backend registration.
+     Split out from ideavim-backend so the bookmarks dependency does not gate the rest
+     of the backend RPC providers. Bookmarks was extracted from the platform monolith
+     into a separate plugin (intellij.platform.bookmarks) in 2026.x, so it is not
+     available in every IDE/version. Keeping it in its own content module means that
+     when the bookmarks module is absent only bookmark support is disabled - Jump /
+     Process / File / etc. RPC continues to work.
+
+     The bookmark RPC handler classes live in THIS module (not ideavim-backend) so this
+     module's classloader - which depends on intellij.platform.bookmarks - can resolve
+     com.intellij.ide.bookmark.* (BookmarksManager, LineBookmarkProvider, ...) at runtime. -->
+<idea-plugin>
+  <dependencies>
+    <module name="intellij.platform.backend"/>
+    <module name="intellij.platform.kernel.backend"/>
+    <module name="IdeaVIM.ideavim-common"/>
+    <module name="intellij.platform.bookmarks"/>
+  </dependencies>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <!-- RPC: expose bookmark creation to thin-client frontend -->
+    <platform.rpc.backend.remoteApiProvider
+        implementation="com.maddyhome.idea.vim.group.bookmark.BookmarkRemoteApiProvider"/>
+  </extensions>
+</idea-plugin>

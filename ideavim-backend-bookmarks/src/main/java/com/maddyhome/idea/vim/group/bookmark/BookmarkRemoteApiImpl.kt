@@ -21,7 +21,6 @@ import com.intellij.platform.project.ProjectId
 import com.intellij.platform.project.findProjectOrNull
 import com.intellij.openapi.application.readAction
 import com.maddyhome.idea.vim.api.VimMarkService
-import com.maddyhome.idea.vim.group.onEdt
 
 /**
  * RPC handler for [BookmarkRemoteApi].
