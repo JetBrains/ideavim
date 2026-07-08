@@ -30,6 +30,7 @@ usual beta standards.
 
 ### Fixes:
 * [VIM-4265](https://youtrack.jetbrains.com/issue/VIM-4265) Fixed being left in Visual mode after a refactoring (e.g. rename) with `idearefactormode=keep` — the mode active before the action is now restored once the template's selection changes settle
+* [VIM-4270](https://youtrack.jetbrains.com/issue/VIM-4270) Fixed a `%` (or other address) after an explicit range overriding it — e.g. selecting lines in Visual mode and running `:'<,'>%d` now deletes only the selected lines instead of the whole file, matching Vim's behaviour of ignoring an address that is not preceded by a `,` or `;` separator
 
 ### Changes:
 * [VIM-2178](https://youtrack.jetbrains.com/issue/VIM-2178) The `multiple-cursors` extension now maps its default shortcuts to match the original [vim-multiple-cursors](https://github.com/terryma/vim-multiple-cursors) plugin: `<C-n>`/`g<C-n>` add the next occurrence (whole word / any match), `<A-n>`/`g<A-n>` select all occurrences in the file, and `<C-x>`/`<C-p>` skip and remove selections. This is a breaking change from the previous `<A-n>`/`g<A-n>`/`<A-x>`/`<A-p>` mappings — set `let g:multi_cursor_use_default_mapping = 0` to disable the defaults and bind the `<Plug>` mappings yourself (for example, back to the old `<A-n>` based keys)
