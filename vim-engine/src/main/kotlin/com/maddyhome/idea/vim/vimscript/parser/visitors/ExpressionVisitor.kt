@@ -44,11 +44,11 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.EnvVariableExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.FalsyExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.FuncrefCallExpression
-import com.maddyhome.idea.vim.vimscript.model.expressions.NamedFunctionCallExpression
+import com.maddyhome.idea.vim.vimscript.model.expressions.IndexedExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.LambdaExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.LambdaFunctionCallExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.ListExpression
-import com.maddyhome.idea.vim.vimscript.model.expressions.IndexedExpression
+import com.maddyhome.idea.vim.vimscript.model.expressions.NamedFunctionCallExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.OptionExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.RegisterExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
@@ -333,8 +333,7 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
     val arguments = ctx.functionArguments()
     val result = if (expr != null && arguments != null) {
       FuncrefCallExpression(visit(expr), visitFunctionArgs(arguments))
-    }
-    else {
+    } else {
       visitFunctionCall(ctx.functionCall())
     }
     result.originalString = ctx.text
@@ -342,7 +341,10 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
   }
 
   override fun visitFunctionCall(ctx: VimscriptParser.FunctionCallContext): NamedFunctionCallExpression {
-    val functionName = visitCurlyBracesName(ctx.functionName().curlyBracesName())
+    val functionName = prependAutoloadPrefix(
+      ctx.anyCaseNameWithDigitsAndUnderscores(),
+      visitCurlyBracesName(ctx.functionName().curlyBracesName()),
+    )
     var scope: Scope? = null
     if (ctx.functionScope() != null) {
       scope = Scope.getByValue(ctx.functionScope().text)
@@ -437,6 +439,20 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
     val result = CurlyBracesName(parts)
     result.originalString = ctx.text
     return result
+  }
+
+  /**
+   * Prepends an autoload namespace prefix (e.g. `foo#bar#`) to a parsed function name. The prefix is
+   * the sequence of `anyCaseNameWithDigitsAndUnderscores` segments, each followed by `#`, that the
+   * grammar matches before the function name proper. Returns [name] unchanged when there is no prefix.
+   */
+  fun prependAutoloadPrefix(
+    prefixSegments: List<VimscriptParser.AnyCaseNameWithDigitsAndUnderscoresContext>,
+    name: CurlyBracesName,
+  ): CurlyBracesName {
+    if (prefixSegments.isEmpty()) return name
+    val prefix = prefixSegments.joinToString(separator = "") { "${it.text}#" }
+    return CurlyBracesName(listOf(SimpleExpression(prefix)) + name.parts)
   }
 
   override fun visitBlobExpression(ctx: BlobExpressionContext?): Expression {

@@ -126,7 +126,10 @@ object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
       flags.add(FunctionFlag.getByName(flag.text))
     }
     val definition = if (ctx.functionName() != null) {
-      val functionName = ctx.functionName().text
+      // Preserve the autoload namespace prefix (e.g. `foo#bar#`) so the function is stored under its
+      // full name rather than just the last segment.
+      val autoloadPrefix = ctx.anyCaseNameWithDigitsAndUnderscores().joinToString(separator = "") { "${it.text}#" }
+      val functionName = autoloadPrefix + ctx.functionName().text
       FunctionDeclaration(
         functionScope,
         functionName,

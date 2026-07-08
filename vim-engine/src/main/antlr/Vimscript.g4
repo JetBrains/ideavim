@@ -109,7 +109,7 @@ command:
     (WS | COLON)* range? (WS | COLON)* ECHO (WS* expr)* WS* (NEW_LINE | BAR)+
     #EchoCommand|
 
-    (WS | COLON)* range? (WS | COLON)* DELFUNCTION (replace = BANG)? WS+ (functionScope COLON)? functionName ((inline_comment NEW_LINE+) | (NEW_LINE | BAR)+)
+    (WS | COLON)* range? (WS | COLON)* DELFUNCTION (replace = BANG)? WS+ (anyCaseNameWithDigitsAndUnderscores NUM)* (functionScope COLON)? functionName ((inline_comment NEW_LINE+) | (NEW_LINE | BAR)+)
     #DelfunctionCommand|
 
     (WS | COLON)* range? (WS | COLON)* CALL WS+ expr WS* ((inline_comment NEW_LINE+) | (NEW_LINE | BAR)+)
