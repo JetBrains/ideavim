@@ -181,7 +181,9 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
     val range: Range = parseRange(ctx.range())
     val functionScope =
       if (ctx.functionScope() != null) Scope.getByValue(ctx.functionScope().text) else null
-    val functionName = ctx.functionName().text
+    // Preserve the autoload namespace prefix (e.g. `foo#bar#`) so deletion targets the full name.
+    val autoloadPrefix = ctx.anyCaseNameWithDigitsAndUnderscores().joinToString(separator = "") { "${it.text}#" }
+    val functionName = autoloadPrefix + ctx.functionName().text
     val ignoreIfMissing = ctx.replace != null
     val command = DelfunctionCommand(range, functionScope, functionName, ignoreIfMissing)
     command.rangeInScript = ctx.getTextRange()

@@ -26,7 +26,8 @@ abstract class VimScriptFunctionServiceBase : VimscriptFunctionService {
   private val builtInFunctions: MutableMap<String, Lazy<FunctionHandler>> = mutableMapOf()
 
   override fun deleteFunction(name: String, scope: Scope?, vimContext: VimLContext) {
-    if (name[0].isLowerCase() && scope != Scope.SCRIPT_VARIABLE) {
+    // Autoload names (containing '#') may start with a lowercase letter, like `foo#bar#baz`.
+    if (name[0].isLowerCase() && !name.contains('#') && scope != Scope.SCRIPT_VARIABLE) {
       throw exExceptionMessage("E128", name)
     }
 
