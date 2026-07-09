@@ -18,6 +18,10 @@ object LongRunning : IdeaVimBuildType({
     param("env.ORG_GRADLE_PROJECT_instrumentPluginCode", "false")
   }
 
+  failureConditions {
+    executionTimeoutMin = 300
+  }
+
   vcs {
     root(DslContext.settingsRoot)
     branchFilter = "+:<default>"
