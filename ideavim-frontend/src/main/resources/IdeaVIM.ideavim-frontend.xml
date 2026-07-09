@@ -392,6 +392,15 @@
       </aliases>
     </vimExtension>
 
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.textobjuser.VimTextObjUserExtension"
+                  name="textobj-user">
+      <aliases>
+        <alias name="https://github.com/kana/vim-textobj-user"/>
+        <alias name="kana/vim-textobj-user"/>
+        <alias name="vim-textobj-user"/>
+      </aliases>
+    </vimExtension>
+
     <vimExtension implementation="com.maddyhome.idea.vim.extension.classtextobj.VimClassTextObjExtension"
                   name="classtextobj">
       <aliases>
