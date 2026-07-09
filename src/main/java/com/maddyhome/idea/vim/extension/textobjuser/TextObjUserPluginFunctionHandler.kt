@@ -12,10 +12,10 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.command.TextObjectVisualType
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
 import com.maddyhome.idea.vim.key.MappingOwner
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
@@ -74,7 +74,7 @@ internal class TextObjUserPluginFunctionHandler(
     keys: VimDataType?,
     patterns: List<String>,
     isInner: Boolean,
-    regionType: TextObjectVisualType,
+    regionType: SelectionType,
   ) {
     val userKeys = keys.toStringList()
     if (userKeys.isEmpty()) return
@@ -112,11 +112,12 @@ internal class TextObjUserPluginFunctionHandler(
     mapUserKeys(owner, userKeys, plug, MappingMode.NXO)
   }
 
-  private fun getRegionType(spec: VimDictionary): TextObjectVisualType {
-    val regionType = spec["region-type"] as? VimString ?: return TextObjectVisualType.CHARACTER_WISE
+  private fun getRegionType(spec: VimDictionary): SelectionType {
+    val regionType = spec["region-type"] as? VimString ?: return SelectionType.CHARACTER_WISE
     return when (regionType.value) {
-      "V" -> TextObjectVisualType.LINE_WISE
-      else -> TextObjectVisualType.CHARACTER_WISE
+      "V" -> SelectionType.LINE_WISE
+      "\u0016" -> SelectionType.BLOCK_WISE // CTRL-V, i.e. "\<C-v>"
+      else -> SelectionType.CHARACTER_WISE
     }
   }
 }

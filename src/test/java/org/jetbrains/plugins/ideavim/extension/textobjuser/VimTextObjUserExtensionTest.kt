@@ -121,6 +121,34 @@ class VimTextObjUserExtensionTest : VimTestCase() {
   }
 
   /**
+   * Like [defineDatetime], but with a blockwise `region-type` (`CTRL-V`).
+   *
+   * ```vim
+   * call textobj#user#plugin('datetime', {
+   * \   'date': {
+   * \     'pattern': '\<\d\d\d\d-\d\d-\d\d\>',
+   * \     'select': ['ad', 'id'],
+   * \     'region-type': "\<C-v>",
+   * \   },
+   * \ })
+   * ```
+   */
+  private fun defineBlockwiseDatetime() {
+    executeVimscript(
+      """
+      call textobj#user#plugin('datetime', {
+      \   'date': {
+      \     'pattern': '\<\d\d\d\d-\d\d-\d\d\>',
+      \     'select': ['ad', 'id'],
+      \     'region-type': "\<C-v>",
+      \   },
+      \ })
+      """.trimIndent(),
+      true,
+    )
+  }
+
+  /**
    * Like [defineBraces], but with an explicit charwise `region-type` (the default), used to confirm `'v'` behaves like
    * omitting the key.
    */
@@ -263,6 +291,17 @@ class VimTextObjUserExtensionTest : VimTestCase() {
       </selection>third line
       """.trimIndent(),
       Mode.VISUAL(SelectionType.LINE_WISE),
+    )
+  }
+
+  @Test
+  fun `blockwise region-type selects a block in visual mode`() {
+    defineBlockwiseDatetime()
+    doTest(
+      "vad",
+      "released on 2013-<caret>03-16 today",
+      "released on <selection>2013-03-1<caret>6</selection> today",
+      Mode.VISUAL(SelectionType.BLOCK_WISE),
     )
   }
 
