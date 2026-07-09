@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.newapi.IjVimCaret
 import com.maddyhome.idea.vim.regexp.VimRegex
 import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
@@ -95,20 +96,29 @@ private class TextObjUserPluginFunctionHandler(
     // "pattern" is either a single Vim regex, or a [header, footer] pair of Vim regexes.
     val patterns = spec["pattern"].toStringList()
     if (patterns.isEmpty()) return
+    val regionType = getRegionType(spec)
 
     // A single "pattern" is wired to "select"; a [header, footer] pair is wired to "select-a" / "select-i".
-    registerMappings(spec["select"], patterns, isInner = false)
-    registerMappings(spec["select-a"], patterns, isInner = false)
-    registerMappings(spec["select-i"], patterns, isInner = true)
+    registerMappings(spec["select"], patterns, isInner = false, regionType = regionType)
+    registerMappings(spec["select-a"], patterns, isInner = false, regionType = regionType)
+    registerMappings(spec["select-i"], patterns, isInner = true, regionType = regionType)
   }
 
-  private fun registerMappings(keys: VimDataType?, patterns: List<String>, isInner: Boolean) {
+  private fun getRegionType(spec: VimDictionary): TextObjectVisualType {
+    val regionType = spec["region-type"] as? VimString ?: return TextObjectVisualType.CHARACTER_WISE
+    return when (regionType.value) {
+      "V" -> TextObjectVisualType.LINE_WISE
+      else -> TextObjectVisualType.CHARACTER_WISE
+    }
+  }
+
+  private fun registerMappings(keys: VimDataType?, patterns: List<String>, isInner: Boolean, regionType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE) {
     for (key in keys.toStringList()) {
       putExtensionHandlerMapping(
         MappingMode.XO,
         injector.parser.parseKeys(key),
         owner,
-        TextObjUserHandler(patterns, isInner),
+        TextObjUserHandler(patterns, isInner, regionType),
         false,
       )
     }
@@ -124,11 +134,12 @@ private class TextObjUserPluginFunctionHandler(
 private class TextObjUserHandler(
   private val patterns: List<String>,
   private val isInner: Boolean,
+  private val regionType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 ) : ExtensionHandler {
   override val isRepeatable: Boolean get() = false
 
   override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
-    val action = TextObjUserActionHandler(patterns, isInner)
+    val action = TextObjUserActionHandler(patterns, isInner, regionType)
     if (editor.mode is Mode.OP_PENDING) {
       KeyHandler.getInstance().keyHandlerState.commandBuilder.addAction(action)
       return
@@ -144,6 +155,9 @@ private class TextObjUserHandler(
     SelectionVimListenerSuppressor.lock().use {
       if (editor.mode is Mode.VISUAL) {
         caret.vimSetSelection(range.startOffset, range.endOffset - 1, true)
+        if (regionType == TextObjectVisualType.LINE_WISE && (editor.mode as Mode.VISUAL).selectionType != SelectionType.LINE_WISE) {
+          injector.visualMotionGroup.toggleVisual(editor, 1, 0, SelectionType.LINE_WISE)
+        }
       } else {
         (caret as IjVimCaret).caret.moveToInlayAwareOffset(range.startOffset)
       }
@@ -154,8 +168,10 @@ private class TextObjUserHandler(
 private class TextObjUserActionHandler(
   private val patterns: List<String>,
   private val isInner: Boolean,
+  private val regionType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 ) : TextObjectActionHandler() {
-  override val visualType: TextObjectVisualType get() = TextObjectVisualType.CHARACTER_WISE
+
+  override val visualType: TextObjectVisualType get() = regionType
 
   override fun getRange(
     editor: VimEditor,
