@@ -14,7 +14,6 @@ import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
-import com.maddyhome.idea.vim.command.TextObjectVisualType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
@@ -34,7 +33,7 @@ import kotlin.math.max
 internal class TextObjUserHandler(
   private val patterns: List<String>,
   private val isInner: Boolean,
-  private val regionType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE,
+  private val regionType: SelectionType = SelectionType.CHARACTER_WISE,
 ) : ExtensionHandler {
   override val isRepeatable: Boolean get() = false
 
@@ -56,8 +55,8 @@ internal class TextObjUserHandler(
     SelectionVimListenerSuppressor.lock().use {
       if (mode is Mode.VISUAL) {
         caret.vimSetSelection(range.startOffset, range.endOffset - 1, true)
-        if (regionType == TextObjectVisualType.LINE_WISE && mode.selectionType != SelectionType.LINE_WISE) {
-          injector.visualMotionGroup.toggleVisual(editor, 1, 0, SelectionType.LINE_WISE)
+        if (mode.selectionType != regionType) {
+          injector.visualMotionGroup.toggleVisual(editor, 1, 0, regionType)
         }
       } else {
         (caret as IjVimCaret).caret.moveToInlayAwareOffset(range.startOffset)

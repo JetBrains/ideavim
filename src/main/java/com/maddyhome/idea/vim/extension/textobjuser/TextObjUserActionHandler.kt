@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.command.TextObjectVisualType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.regexp.VimRegex
+import com.maddyhome.idea.vim.state.mode.SelectionType
 
 /**
  * Computes the [TextRange] of a user-defined text object for the operator/visual machinery.
@@ -22,10 +23,12 @@ import com.maddyhome.idea.vim.regexp.VimRegex
 internal class TextObjUserActionHandler(
   private val patterns: List<String>,
   private val isInner: Boolean,
-  private val regionType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE,
+  private val regionType: SelectionType = SelectionType.CHARACTER_WISE,
 ) : TextObjectActionHandler() {
 
-  override val visualType: TextObjectVisualType get() = regionType
+  // TextObjectVisualType has no blockwise value, so an operator over a blockwise object falls back to charwise.
+  override val visualType: TextObjectVisualType
+    get() = if (regionType == SelectionType.LINE_WISE) TextObjectVisualType.LINE_WISE else TextObjectVisualType.CHARACTER_WISE
 
   override fun getRange(
     editor: VimEditor,
