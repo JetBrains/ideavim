@@ -67,6 +67,10 @@ kotlin {
   }
 
   compilerOptions {
+    // Must follow javaVersion: this module inlines platform bytecode (Fleet RPC RemoteApi),
+    // which on newer platforms (2026.1 / EAP) is built for JVM target 25. A lower target here
+    // fails with "Cannot inline bytecode built with JVM target 25 into bytecode ... target 21".
+    jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget(javaVersion))
     freeCompilerArgs = listOf("-Xjvm-default=all-compatibility")
   }
 }
