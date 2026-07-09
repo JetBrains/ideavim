@@ -906,6 +906,101 @@ https://github.com/kana/vim-textobj-entire/blob/master/doc/textobj-entire.txt
 </details>
 
 <details>
+<summary><h2>textobj-user: Framework for defining your own text objects</h2></summary>
+
+Original plugin: [vim-textobj-user](https://github.com/kana/vim-textobj-user).
+
+### Summary:
+A framework that lets you declaratively define your own text objects from your `~/.ideavimrc`, without
+writing any plugin code. You describe each object with a Vim pattern and the keys that should select
+it, and `textobj-user` creates the mappings for you. For example, define `ad`/`id` to select an
+ISO date such as `2013-03-16`:
+
+```
+call textobj#user#plugin('datetime', {
+\   'date': {
+\     'pattern': '\<\d\d\d\d-\d\d-\d\d\>',
+\     'select': ['ad', 'id'],
+\   },
+\ })
+```
+
+After this, `dad` deletes the date under (or ahead of) the cursor, `vad` selects it, and so on.
+
+### Setup:
+- Add the following command to `~/.ideavimrc`: `Plug 'kana/vim-textobj-user'`
+    <details>
+      <summary>Alternative syntax</summary>
+      <code>Plugin 'kana/vim-textobj-user'</code>
+      <br/>
+      <code>Plug 'https://github.com/kana/vim-textobj-user'</code>
+      <br/>
+      <code>Plug 'vim-textobj-user'</code>
+      <br/>
+      <code>set textobj-user</code>
+      </details>
+
+### Instructions
+
+https://github.com/kana/vim-textobj-user/blob/master/doc/textobj-user.txt
+
+Define text objects by calling `textobj#user#plugin({name}, {specs})`, where `{specs}` maps an object
+name to a dictionary of properties. The following properties are supported:
+
+| Property | Description |
+|----------|-------------|
+| `pattern` | The Vim regexp for the object. A single string selects the whole match; a `[head, tail]` pair selects the region between the two delimiter patterns. |
+| `select` | Key(s) that select a single-`pattern` object (string or list of strings). |
+| `select-a` | Key(s) that select "a" region of a `[head, tail]` pair — including the delimiters. |
+| `select-i` | Key(s) that select the "inner" region of a `[head, tail]` pair — excluding the delimiters. |
+| `region-type` | Selection type: `'v'` (charwise, the default), `'V'` (linewise) or `"\<C-v>"` (blockwise). |
+| `move-n` / `move-p` | Key(s) that move the cursor to the **beginning** of the next / previous object. |
+| `move-N` / `move-P` | Key(s) that move the cursor to the **end** of the next / previous object. |
+
+Selecting objects works with operators (`d`, `c`, `y`) and in visual mode; the `move-*` mappings also
+work in normal, visual and operator-pending modes.
+
+A `[head, tail]` pair example — `aA` selects `<<…>>` including the markers, `iA` only the text between
+them:
+
+```
+call textobj#user#plugin('braces', {
+\   'angle': {
+\     'pattern': ['<<', '>>'],
+\     'select-a': 'aA',
+\     'select-i': 'iA',
+\   },
+\ })
+```
+
+Each operation also gets a remappable `<Plug>` interface mapping named
+`<Plug>(textobj-{plugin}-{object}-{operation})`, where `{operation}` is the mapping-property suffix
+(`a`, `i`, `n`, `p`, `N`, `P`, or omitted for a plain `select`). For the datetime example above that
+is `<Plug>(textobj-datetime-date)`, so you can choose your own keys:
+
+```
+omap gd <Plug>(textobj-datetime-date)
+xmap gd <Plug>(textobj-datetime-date)
+```
+
+`textobj#user#map({name}, {specs})` binds additional keys to an already-defined plugin's `<Plug>`
+names (reading only the `select` / `select-a` / `select-i` / `move-*` properties):
+
+```
+call textobj#user#map('datetime', {'date': {'select': 'gd'}})
+```
+
+The following features of the original plugin are **not** currently supported:
+- `select-function`, `select-a-function`, `select-i-function` and the `move-*-function` variants
+  (custom objects computed by a Vim function). This also means `[count]` support, which the original
+  plugin only offers through such functions, is unavailable.
+- The `scan` property (configurable search direction).
+- Blockwise `region-type` (`"\<C-v>"`) only takes effect in visual mode; an operator (e.g. `dad`)
+  over a blockwise object acts charwise.
+
+</details>
+
+<details>
 <summary><h2>VimEverywhere: Keyboard-driven IDE navigation outside the editor</h2></summary>
 
 ### Summary:
