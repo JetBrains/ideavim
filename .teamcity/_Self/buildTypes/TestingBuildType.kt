@@ -23,7 +23,9 @@ open class TestingBuildType(
   private val testName: String,
   private val branch: String = "<default>",
   private val version: String = testName,
-  private val javaVersion: String? = null,
+  // JVM used to compile & run the tests. Must match the target platform's bytecode level:
+  // 2026.1 / Latest EAP are built with JVM target 25, 2025.3 and earlier with 21.
+  private val javaVersion: String = "25",
   private val javaPlugin: Boolean = true,
 ) : IdeaVimBuildType({
   id("IdeaVimTests_${testName.vanish()}")
@@ -34,9 +36,7 @@ open class TestingBuildType(
     param("env.ORG_GRADLE_PROJECT_legacyNoJavaPlugin", javaPlugin.not().toString())
     param("env.ORG_GRADLE_PROJECT_ideaVersion", version)
     param("env.ORG_GRADLE_PROJECT_instrumentPluginCode", "false")
-    if (javaVersion != null) {
-      param("env.ORG_GRADLE_PROJECT_javaVersion", javaVersion)
-    }
+    param("env.ORG_GRADLE_PROJECT_javaVersion", javaVersion)
   }
 
   vcs {
@@ -53,7 +53,7 @@ open class TestingBuildType(
       buildFile = ""
       enableStacktrace = true
       gradleParams = "--no-build-cache --configuration-cache"
-      jdkHome = "/usr/lib/jvm/java-21-amazon-corretto"
+      jdkHome = "/usr/lib/jvm/java-$javaVersion-amazon-corretto"
     }
   }
 
