@@ -185,6 +185,18 @@ class VimTextObjUserExtensionTest : VimTestCase() {
   }
 
   @Test
+  fun `both select keys select the date`() {
+    defineDatetime()
+    // 'ad' and 'id' both map to the same <Plug> name, so both must be bound.
+    doTest(
+      "did",
+      "released on 2013-<caret>03-16 today",
+      "released on <caret> today",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
   fun `select finds the date forward from the cursor`() {
     defineDatetime()
     doTest(
@@ -328,6 +340,64 @@ class VimTextObjUserExtensionTest : VimTestCase() {
       "2013-03-16 <caret>x 2014-04-17",
       "2013-03-16 <selection>x <caret>2</selection>014-04-17",
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
+  fun `select is reachable through its Plug mapping`() {
+    defineDatetime()
+    // The bare "select" op yields <Plug>(textobj-datetime-date) (no operation suffix).
+    executeVimscript("omap gd <Plug>(textobj-datetime-date)", true)
+    doTest(
+      "dgd",
+      "released on 2013-<caret>03-16 today",
+      "released on <caret> today",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `select-a is reachable through its Plug mapping`() {
+    defineBraces()
+    executeVimscript("omap gA <Plug>(textobj-braces-angle-a)", true)
+    doTest(
+      "dgA",
+      "prefix <<in<caret>ner>> suffix",
+      "prefix <caret> suffix",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `move-n is reachable through its Plug mapping`() {
+    defineDatetimeMotions()
+    executeVimscript("nmap gn <Plug>(textobj-datetime-date-n)", true)
+    doTest(
+      "gn",
+      "2013-03-16 <caret>x 2014-04-17",
+      "2013-03-16 x <caret>2014-04-17",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `textobj#user#map binds extra keys to an existing text object`() {
+    defineDatetime()
+    executeVimscript(
+      """
+      call textobj#user#map('datetime', {
+      \   'date': {
+      \     'select': 'gd',
+      \   },
+      \ })
+      """.trimIndent(),
+      true,
+    )
+    doTest(
+      "dgd",
+      "released on 2013-<caret>03-16 today",
+      "released on <caret> today",
+      Mode.NORMAL(),
     )
   }
 }

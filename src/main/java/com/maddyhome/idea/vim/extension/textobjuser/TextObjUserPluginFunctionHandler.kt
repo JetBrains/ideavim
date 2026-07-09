@@ -19,15 +19,14 @@ import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
 /**
- * Handles `textobj#user#plugin({name}, {specs})` by registering a text object mapping for every `select` / `move-*`
- * key in the given specs.
+ * Handles `textobj#user#plugin({name}, {specs})`. For each object it defines a `<Plug>(textobj-{name}-{obj}-{op})`
+ * interface mapping bound to the handler, then maps the user's keys onto that `<Plug>` name so they can be remapped.
  */
 internal class TextObjUserPluginFunctionHandler(
   override val name: String,
@@ -42,58 +41,75 @@ internal class TextObjUserPluginFunctionHandler(
     context: ExecutionContext,
     vimContext: VimLContext,
   ): VimDataType {
+    val plugin = (arguments[0].evaluate(editor, context, vimContext) as VimString).value
     val specs = arguments[1].evaluate(editor, context, vimContext) as VimDictionary
-    for ((_, spec) in specs.dictionary) {
-      registerTextObject(spec as VimDictionary)
+    for ((obj, spec) in specs.dictionary) {
+      registerTextObject(plugin, obj.value, spec as VimDictionary)
     }
     return VimString("")
   }
 
-  private fun registerTextObject(spec: VimDictionary) {
+  private fun registerTextObject(plugin: String, obj: String, spec: VimDictionary) {
     // "pattern" is either a single Vim regex, or a [header, footer] pair of Vim regexes.
     val patterns = spec["pattern"].toStringList()
     if (patterns.isEmpty()) return
     val regionType = getRegionType(spec)
 
     // A single "pattern" is wired to "select"; a [header, footer] pair is wired to "select-a" / "select-i".
-    registerMappings(spec["select"], patterns, isInner = false, regionType = regionType)
-    registerMappings(spec["select-a"], patterns, isInner = false, regionType = regionType)
-    registerMappings(spec["select-i"], patterns, isInner = true, regionType = regionType)
+    registerSelect(plugin, obj, "select", spec["select"], patterns, isInner = false, regionType)
+    registerSelect(plugin, obj, "select-a", spec["select-a"], patterns, isInner = false, regionType)
+    registerSelect(plugin, obj, "select-i", spec["select-i"], patterns, isInner = true, regionType)
 
     // "move-*" jump to the beginning ("n"/"p") or end ("N"/"P") of the next/previous object.
-    registerMotions(spec["move-n"], patterns, Motion.NEXT_START)
-    registerMotions(spec["move-p"], patterns, Motion.PREVIOUS_START)
-    registerMotions(spec["move-N"], patterns, Motion.NEXT_END)
-    registerMotions(spec["move-P"], patterns, Motion.PREVIOUS_END)
+    registerMotion(plugin, obj, "move-n", spec["move-n"], patterns, Motion.NEXT_START)
+    registerMotion(plugin, obj, "move-p", spec["move-p"], patterns, Motion.PREVIOUS_START)
+    registerMotion(plugin, obj, "move-N", spec["move-N"], patterns, Motion.NEXT_END)
+    registerMotion(plugin, obj, "move-P", spec["move-P"], patterns, Motion.PREVIOUS_END)
   }
 
-  private fun registerMappings(
+  private fun registerSelect(
+    plugin: String,
+    obj: String,
+    specName: String,
     keys: VimDataType?,
     patterns: List<String>,
     isInner: Boolean,
     regionType: TextObjectVisualType,
   ) {
-    for (key in keys.toStringList()) {
-      putExtensionHandlerMapping(
-        MappingMode.XO,
-        injector.parser.parseKeys(key),
-        owner,
-        TextObjUserHandler(patterns, isInner, regionType),
-        false,
-      )
-    }
+    val userKeys = keys.toStringList()
+    if (userKeys.isEmpty()) return
+    // Text objects apply in Visual and Operator-pending modes.
+    val plug = plugName(plugin, obj, specName)
+    putExtensionHandlerMapping(
+      MappingMode.XO,
+      injector.parser.parseKeys(plug),
+      owner,
+      TextObjUserHandler(patterns, isInner, regionType),
+      false,
+    )
+    mapUserKeys(owner, userKeys, plug, MappingMode.XO)
   }
 
-  private fun registerMotions(keys: VimDataType?, patterns: List<String>, motion: Motion) {
-    for (key in keys.toStringList()) {
-      putExtensionHandlerMapping(
-        MappingMode.NXO,
-        injector.parser.parseKeys(key),
-        owner,
-        TextObjUserMotionHandler(patterns.first(), motion),
-        false,
-      )
-    }
+  private fun registerMotion(
+    plugin: String,
+    obj: String,
+    specName: String,
+    keys: VimDataType?,
+    patterns: List<String>,
+    motion: Motion,
+  ) {
+    val userKeys = keys.toStringList()
+    if (userKeys.isEmpty()) return
+    // Motions apply in Normal, Visual and Operator-pending modes.
+    val plug = plugName(plugin, obj, specName)
+    putExtensionHandlerMapping(
+      MappingMode.NXO,
+      injector.parser.parseKeys(plug),
+      owner,
+      TextObjUserMotionHandler(patterns.first(), motion),
+      false,
+    )
+    mapUserKeys(owner, userKeys, plug, MappingMode.NXO)
   }
 
   private fun getRegionType(spec: VimDictionary): TextObjectVisualType {
@@ -103,14 +119,4 @@ internal class TextObjUserPluginFunctionHandler(
       else -> TextObjectVisualType.CHARACTER_WISE
     }
   }
-}
-
-/**
- * Flattens a vim-textobj-user field that accepts either a single string or a list of strings (`pattern`, `select`, ...)
- * into a list. Returns an empty list when the field is absent.
- */
-private fun VimDataType?.toStringList(): List<String> = when (this) {
-  is VimString -> listOf(value)
-  is VimList -> values.map { (it as VimString).value }
-  else -> emptyList()
 }

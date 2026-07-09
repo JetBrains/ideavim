@@ -24,16 +24,22 @@ internal class VimTextObjUserExtension : VimExtension {
 
   override fun init(initApi: VimInitApi) {
     injector.functionService.registerFunctionHandler(
-      FUNCTION_NAME,
-      TextObjUserPluginFunctionHandler(FUNCTION_NAME, getOwner()),
+      PLUGIN_FUNCTION_NAME,
+      TextObjUserPluginFunctionHandler(PLUGIN_FUNCTION_NAME, getOwner()),
+    )
+    injector.functionService.registerFunctionHandler(
+      MAP_FUNCTION_NAME,
+      TextObjUserMapFunctionHandler(MAP_FUNCTION_NAME, getOwner()),
     )
   }
 
   override fun dispose() {
-    injector.functionService.unregisterFunctionHandler(FUNCTION_NAME)
+    injector.functionService.unregisterFunctionHandler(PLUGIN_FUNCTION_NAME)
+    injector.functionService.unregisterFunctionHandler(MAP_FUNCTION_NAME)
   }
 
   companion object {
-    private const val FUNCTION_NAME = "textobj#user#plugin"
+    private const val PLUGIN_FUNCTION_NAME = "textobj#user#plugin"
+    private const val MAP_FUNCTION_NAME = "textobj#user#map"
   }
 }
