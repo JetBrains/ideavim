@@ -554,6 +554,10 @@ Contributors:
   [![icon][github]](https://github.com/wtrebella)
   &nbsp;
   wtrebella
+* [![icon][mail]](mailto:ameertaweel2002@gmail.com)
+  [![icon][github]](https://github.com/ameertaweel)
+  &nbsp;
+  ameertaweel
 
 Contributors with JetBrains IP:
 
