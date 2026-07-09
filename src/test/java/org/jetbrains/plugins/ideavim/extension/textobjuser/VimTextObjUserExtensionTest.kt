@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.extension.textobjuser
 
 import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -91,6 +92,54 @@ class VimTextObjUserExtensionTest : VimTestCase() {
     )
   }
 
+  /**
+   * Like [defineDatetime], but with a linewise `region-type`, so operators act on whole lines.
+   *
+   * ```vim
+   * call textobj#user#plugin('datetime', {
+   * \   'date': {
+   * \     'pattern': '\<\d\d\d\d-\d\d-\d\d\>',
+   * \     'select': ['ad', 'id'],
+   * \     'region-type': 'V',
+   * \   },
+   * \ })
+   * ```
+   */
+  private fun defineLinewiseDatetime() {
+    executeVimscript(
+      """
+      call textobj#user#plugin('datetime', {
+      \   'date': {
+      \     'pattern': '\<\d\d\d\d-\d\d-\d\d\>',
+      \     'select': ['ad', 'id'],
+      \     'region-type': 'V',
+      \   },
+      \ })
+      """.trimIndent(),
+      true,
+    )
+  }
+
+  /**
+   * Like [defineBraces], but with an explicit charwise `region-type` (the default), used to confirm `'v'` behaves like
+   * omitting the key.
+   */
+  private fun defineCharwiseBraces() {
+    executeVimscript(
+      """
+      call textobj#user#plugin('braces', {
+      \   'angle': {
+      \     'pattern': ['<<', '>>'],
+      \     'select-a': 'aA',
+      \     'select-i': 'iA',
+      \     'region-type': 'v',
+      \   },
+      \ })
+      """.trimIndent(),
+      true,
+    )
+  }
+
   @Test
   fun `select deletes the date under the cursor`() {
     defineDatetime()
@@ -131,6 +180,54 @@ class VimTextObjUserExtensionTest : VimTestCase() {
       "diA",
       "prefix <<in<caret>ner>> suffix",
       "prefix <<<caret>>> suffix",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `linewise region-type makes the operator delete whole lines`() {
+    defineLinewiseDatetime()
+    doTest(
+      "dad",
+      """
+      first line
+      released on 2013-<caret>03-16 today
+      third line
+      """.trimIndent(),
+      """
+      first line
+      <caret>third line
+      """.trimIndent(),
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `linewise region-type selects whole lines in visual mode`() {
+    defineLinewiseDatetime()
+    doTest(
+      "vad",
+      """
+      first line
+      released on 2013-<caret>03-16 today
+      third line
+      """.trimIndent(),
+      """
+      first line
+      <selection>released on 2013-03-1<caret>6 today
+      </selection>third line
+      """.trimIndent(),
+      Mode.VISUAL(SelectionType.LINE_WISE),
+    )
+  }
+
+  @Test
+  fun `explicit charwise region-type deletes only the match`() {
+    defineCharwiseBraces()
+    doTest(
+      "daA",
+      "prefix <<in<caret>ner>> suffix",
+      "prefix <caret> suffix",
       Mode.NORMAL(),
     )
   }
