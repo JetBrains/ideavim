@@ -25,7 +25,8 @@ open class TestingBuildType(
   private val version: String = testName,
   // JVM used to compile & run the tests. Must match the target platform's bytecode level:
   // 2026.1 / Latest EAP are built with JVM target 25, 2025.3 and earlier with 21.
-  private val javaVersion: String = "25",
+  // 21 is the default (matches gradle.properties); newer platforms override to 25.
+  private val javaVersion: String = "21",
   private val javaPlugin: Boolean = true,
 ) : IdeaVimBuildType({
   id("IdeaVimTests_${testName.vanish()}")
