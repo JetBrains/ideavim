@@ -140,6 +140,39 @@ class VimTextObjUserExtensionTest : VimTestCase() {
     )
   }
 
+  /**
+   * Define motions that jump between date objects: `]d` / `[d` to the beginning of the next / previous date, and
+   * `]D` / `[D` to the end of the next / previous date.
+   *
+   * ```vim
+   * call textobj#user#plugin('datetime', {
+   * \   'date': {
+   * \     'pattern': '\<\d\d\d\d-\d\d-\d\d\>',
+   * \     'move-n': ']d',
+   * \     'move-p': '[d',
+   * \     'move-N': ']D',
+   * \     'move-P': '[D',
+   * \   },
+   * \ })
+   * ```
+   */
+  private fun defineDatetimeMotions() {
+    executeVimscript(
+      """
+      call textobj#user#plugin('datetime', {
+      \   'date': {
+      \     'pattern': '\<\d\d\d\d-\d\d-\d\d\>',
+      \     'move-n': ']d',
+      \     'move-p': '[d',
+      \     'move-N': ']D',
+      \     'move-P': '[D',
+      \   },
+      \ })
+      """.trimIndent(),
+      true,
+    )
+  }
+
   @Test
   fun `select deletes the date under the cursor`() {
     defineDatetime()
@@ -229,6 +262,72 @@ class VimTextObjUserExtensionTest : VimTestCase() {
       "prefix <<in<caret>ner>> suffix",
       "prefix <caret> suffix",
       Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `move-n jumps to the beginning of the next match`() {
+    defineDatetimeMotions()
+    doTest(
+      "]d",
+      "2013-03-16 <caret>x 2014-04-17",
+      "2013-03-16 x <caret>2014-04-17",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `move-p jumps to the beginning of the previous match`() {
+    defineDatetimeMotions()
+    doTest(
+      "[d",
+      "2013-03-16 <caret>x 2014-04-17",
+      "<caret>2013-03-16 x 2014-04-17",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `move-N jumps to the end of the next match`() {
+    defineDatetimeMotions()
+    doTest(
+      "]D",
+      "2013-03-16 <caret>x 2014-04-17",
+      "2013-03-16 x 2014-04-1<caret>7",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `move-P jumps to the end of the previous match`() {
+    defineDatetimeMotions()
+    doTest(
+      "[D",
+      "2013-03-16 <caret>x 2014-04-17",
+      "2013-03-1<caret>6 x 2014-04-17",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `move-n works as an operator motion`() {
+    defineDatetimeMotions()
+    doTest(
+      "d]d",
+      "2013-03-16 <caret>x 2014-04-17",
+      "2013-03-16 <caret>2014-04-17",
+      Mode.NORMAL(),
+    )
+  }
+
+  @Test
+  fun `move-n extends the selection in visual mode`() {
+    defineDatetimeMotions()
+    doTest(
+      "v]d",
+      "2013-03-16 <caret>x 2014-04-17",
+      "2013-03-16 <selection>x <caret>2</selection>014-04-17",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
 }
