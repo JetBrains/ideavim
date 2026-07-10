@@ -180,4 +180,94 @@ class ForcedMotionVModifierTest : VimTestCase() {
       "${c} world",
     )
   }
+
+  // ---------------------------------------------------------------------------------------------------------------
+  // `V` — force linewise
+  // ---------------------------------------------------------------------------------------------------------------
+
+  @Test
+  fun `test dVl forces charwise right motion to linewise`() {
+    // `V` forces the characterwise `l` motion to linewise, deleting the whole line
+    doTest(
+      "dVl",
+      "${c}hello\nworld",
+      "${c}world",
+    )
+  }
+
+  @Test
+  fun `test dVe forces inclusive word-end motion to linewise`() {
+    // `de` would delete just "hello"; `dVe` deletes the whole line
+    doTest(
+      "dVe",
+      "${c}hello\nworld",
+      "${c}world",
+    )
+  }
+
+  @Test
+  fun `test dV dollar forces end-of-line motion to linewise`() {
+    doTest(
+      "dV\$",
+      "${c}hello\nworld",
+      "${c}world",
+    )
+  }
+
+  @Test
+  fun `test dVj on already linewise motion stays linewise`() {
+    // `j` is already linewise, so forcing linewise is a no-op: both lines are deleted, like `dj`
+    doTest(
+      "dVj",
+      "${c}abc\ndef\nghi",
+      "${c}ghi",
+    )
+  }
+
+  @Test
+  fun `test dVk forces upward motion to linewise`() {
+    doTest(
+      "dVk",
+      "abc\n${c}def\nghi",
+      "${c}ghi",
+    )
+  }
+
+  @Test
+  fun `test dViw forces charwise text object to linewise`() {
+    // `diw` would delete just the inner word; `dViw` deletes the whole line
+    doTest(
+      "dViw",
+      "${c}hello\nworld",
+      "${c}world",
+    )
+  }
+
+  @Test
+  fun `test dV2j applies forced linewise motion with a count`() {
+    doTest(
+      "dV2j",
+      "${c}aaa\nbbb\nccc\nddd",
+      "${c}ddd",
+    )
+  }
+
+  @Test
+  fun `test cVl changes the whole line linewise`() {
+    doTest(
+      "cVlX",
+      "${c}hello\nworld",
+      "X${c}\nworld",
+      Mode.INSERT,
+    )
+  }
+
+  @Test
+  fun `test yVl yanks the whole line linewise and pastes below`() {
+    doTest(
+      "yVlp",
+      "${c}hello\nworld",
+      "hello\n${c}hello\nworld",
+    )
+  }
 }
