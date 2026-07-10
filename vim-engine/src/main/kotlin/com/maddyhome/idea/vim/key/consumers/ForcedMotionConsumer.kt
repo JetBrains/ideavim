@@ -25,13 +25,20 @@ import javax.swing.KeyStroke
  * operator pending instead of finishing it.
  */
 class ForcedMotionConsumer : KeyConsumer {
+
+  private  val chars: Map<Char, MotionType> = mapOf(
+    'v' to MotionType.INCLUSIVE,
+    'V' to MotionType.LINE_WISE,
+    '\u000C' to MotionType.LINE_WISE,
+  )
+
   override fun isApplicable(
     key: KeyStroke,
     editor: VimEditor,
     keySource: KeySource,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
-    return editor.mode is Mode.OP_PENDING && key.keyChar == 'v'
+    return editor.mode is Mode.OP_PENDING && chars.keys.contains(key.keyChar)
   }
 
   override fun consumeKey(
@@ -40,7 +47,7 @@ class ForcedMotionConsumer : KeyConsumer {
     keySource: KeySource,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
-    keyProcessResultBuilder.state.commandBuilder.forcedMotion = MotionType.INCLUSIVE
+    keyProcessResultBuilder.state.commandBuilder.forcedMotion = chars[key.keyChar]
     return true
   }
 }
