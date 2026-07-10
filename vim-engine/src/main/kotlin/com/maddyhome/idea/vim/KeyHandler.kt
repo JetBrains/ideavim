@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.key.consumers.CommandKeyConsumer
 import com.maddyhome.idea.vim.key.consumers.DeleteCommandCountConsumer
 import com.maddyhome.idea.vim.key.consumers.DigraphConsumer
 import com.maddyhome.idea.vim.key.consumers.EditorResetConsumer
+import com.maddyhome.idea.vim.key.consumers.ForcedMotionConsumer
 import com.maddyhome.idea.vim.key.consumers.LangMapConsumer
 import com.maddyhome.idea.vim.key.consumers.ModalInputConsumer
 import com.maddyhome.idea.vim.key.consumers.ModeInputConsumer
@@ -60,6 +61,7 @@ class KeyHandler {
     EditorResetConsumer(),
     StartSelectRegisterConsumer(),  // Must be before command key consumer, so " isn't treated as a command char
     SelectRegisterConsumer(),
+    ForcedMotionConsumer(),
     DigraphConsumer(),    // Must be before command key consumer, to process {char}<BS>{char}
                           // Must be before char argument consumer, to convert and repost digraph/literal key sequences
                           // and non-digraph/literal sequences fall through as char arguments

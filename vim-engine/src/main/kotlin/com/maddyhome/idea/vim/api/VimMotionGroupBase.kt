@@ -365,8 +365,8 @@ abstract class VimMotionGroupBase : VimMotionGroup {
 
         end = (motion as AbsoluteOffset).offset
 
-        // If inclusive, add the last character to the range
-        if (action.motionType === MotionType.INCLUSIVE) {
+        // If inclusive, add the last character to the range. A forced motion modifier (o_v) can override the type.
+        if (argument.getEffectiveMotionType() === MotionType.INCLUSIVE) {
           if (start > end) {
             if (start < editor.fileSize()) start++
           } else {
