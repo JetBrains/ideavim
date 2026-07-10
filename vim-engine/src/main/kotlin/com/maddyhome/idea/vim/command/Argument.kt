@@ -58,8 +58,10 @@ sealed class Argument {
   ) : Argument() {
     constructor(motion: MotionActionHandler, argument: Argument?, forcedMotion: SelectionType? = null)
       : this(motion as EditorActionHandlerBase, argument, forcedMotion)
+
     constructor(motion: TextObjectActionHandler, forcedMotion: SelectionType? = null)
       : this(motion as EditorActionHandlerBase, forcedMotion = forcedMotion)
+
     constructor(motion: ExternalActionHandler, forcedMotion: SelectionType? = null)
       : this(motion as EditorActionHandlerBase, forcedMotion = forcedMotion)
 
@@ -93,16 +95,21 @@ sealed class Argument {
      */
     fun getEffectiveMotionType(): MotionType? {
       val declared = (motion as? MotionActionHandler)?.motionType
-      return when (forcedMotion) {
-        null, SelectionType.BLOCK_WISE -> declared
-        SelectionType.LINE_WISE -> MotionType.LINE_WISE
-        // `v`: force characterwise, toggling the motion's inclusiveness
-        SelectionType.CHARACTER_WISE -> when (declared) {
-          MotionType.INCLUSIVE -> MotionType.EXCLUSIVE
-          MotionType.LINE_WISE -> MotionType.EXCLUSIVE
-          else -> MotionType.INCLUSIVE // EXCLUSIVE, or a text object with no declared type
-        }
+      if (notForcedMotion()) {
+        return declared
       }
+
+      if (forcedMotion == SelectionType.LINE_WISE) return MotionType.LINE_WISE
+
+      return when (declared) {
+        MotionType.INCLUSIVE -> MotionType.EXCLUSIVE
+        MotionType.LINE_WISE -> MotionType.EXCLUSIVE
+        else -> MotionType.INCLUSIVE // EXCLUSIVE, or a text object with no declared type
+      }
+    }
+
+    private fun notForcedMotion(): Boolean {
+      return forcedMotion == null || forcedMotion == SelectionType.BLOCK_WISE
     }
 
     fun withArgument(argument: Argument) = Motion(motion, argument, forcedMotion)
