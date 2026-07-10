@@ -1294,7 +1294,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
             kludge = true
             motionArgument = Argument.Motion(
               injector.actionExecutor.findVimActionOrDie(VIM_MOTION_WORD_END_RIGHT) as MotionActionHandler,
-              motionArgument.argument
+              motionArgument.argument,
+              motionArgument.forcedMotion,
             )
           }
 
@@ -1302,7 +1303,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
             kludge = true
             motionArgument = Argument.Motion(
               injector.actionExecutor.findVimActionOrDie(VIM_MOTION_BIG_WORD_END_RIGHT) as MotionActionHandler,
-              motionArgument.argument
+              motionArgument.argument,
+              motionArgument.forcedMotion,
             )
           }
 
@@ -1310,7 +1312,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
             kludge = true
             motionArgument = Argument.Motion(
               injector.actionExecutor.findVimActionOrDie(VIM_MOTION_CAMEL_END_RIGHT) as MotionActionHandler,
-              motionArgument.argument
+              motionArgument.argument,
+              motionArgument.forcedMotion,
             )
           }
         }

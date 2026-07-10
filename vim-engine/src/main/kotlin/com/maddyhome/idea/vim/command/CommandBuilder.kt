@@ -39,6 +39,15 @@ class CommandBuilder private constructor(
   private var action: EditorActionHandlerBase? = null
   private var argument: Argument? = null
 
+  /**
+   * A forced motion type entered with `v`/`V`/`CTRL-V` between an operator and its motion (`:help o_v`).
+   *
+   * It is set while the operator is pending (before the motion is entered) and is baked into the motion
+   * [Argument.Motion] when the motion action is added, where it overrides the motion's declared type. It is cleared
+   * when the command is reset.
+   */
+  var forcedMotion: MotionType? = null
+
   private val motionArgument
     get() = argument as? Argument.Motion
 
@@ -226,9 +235,9 @@ class CommandBuilder private constructor(
       else -> {
         StrictMode.assert(argument == null, "Command builder already has an action and a fully populated argument")
         argument = when (action) {
-          is MotionActionHandler -> Argument.Motion(action, null)
-          is TextObjectActionHandler -> Argument.Motion(action)
-          is ExternalActionHandler -> Argument.Motion(action)
+          is MotionActionHandler -> Argument.Motion(action, null, forcedMotion)
+          is TextObjectActionHandler -> Argument.Motion(action, forcedMotion)
+          is ExternalActionHandler -> Argument.Motion(action, forcedMotion)
           else -> throw RuntimeException("Unexpected action type: $action")
         }
       }
@@ -369,6 +378,7 @@ class CommandBuilder private constructor(
     selectedRegister = null
     action = null
     argument = null
+    forcedMotion = null
     typedKeyStrokes.clear()
   }
 
@@ -402,6 +412,7 @@ class CommandBuilder private constructor(
     if (selectedRegister != other.selectedRegister) return false
     if (action != other.action) return false
     if (argument != other.argument) return false
+    if (forcedMotion != other.forcedMotion) return false
     if (typedKeyStrokes != other.typedKeyStrokes) return false
     if (commandState != other.commandState) return false
     if (expectedArgumentType != other.expectedArgumentType) return false
@@ -416,6 +427,7 @@ class CommandBuilder private constructor(
     result = 31 * result + selectedRegister.hashCode()
     result = 31 * result + action.hashCode()
     result = 31 * result + argument.hashCode()
+    result = 31 * result + forcedMotion.hashCode()
     result = 31 * result + typedKeyStrokes.hashCode()
     result = 31 * result + commandState.hashCode()
     result = 31 * result + expectedArgumentType.hashCode()
@@ -433,6 +445,7 @@ class CommandBuilder private constructor(
     result.isRegisterPending = isRegisterPending
     result.action = action
     result.argument = argument
+    result.forcedMotion = forcedMotion
     result.commandState = commandState
     return result
   }

@@ -46,21 +46,57 @@ sealed class Argument {
    *
    * @see Command
    */
-  class Motion private constructor(val motion: EditorActionHandlerBase, val argument: Argument? = null) : Argument() {
-    constructor(motion: MotionActionHandler, argument: Argument?) : this(motion as EditorActionHandlerBase, argument)
-    constructor(motion: TextObjectActionHandler) : this(motion as EditorActionHandlerBase)
-    constructor(motion: ExternalActionHandler) : this(motion as EditorActionHandlerBase)
+  class Motion private constructor(
+    val motion: EditorActionHandlerBase,
+    val argument: Argument? = null,
+    val forcedMotion: MotionType? = null,
+  ) : Argument() {
+    constructor(motion: MotionActionHandler, argument: Argument?, forcedMotion: MotionType? = null)
+      : this(motion as EditorActionHandlerBase, argument, forcedMotion)
+    constructor(motion: TextObjectActionHandler, forcedMotion: MotionType? = null)
+      : this(motion as EditorActionHandlerBase, forcedMotion = forcedMotion)
+    constructor(motion: ExternalActionHandler, forcedMotion: MotionType? = null)
+      : this(motion as EditorActionHandlerBase, forcedMotion = forcedMotion)
 
     fun getMotionType() = if (isLinewiseMotion()) SelectionType.LINE_WISE else SelectionType.CHARACTER_WISE
 
-    fun isLinewiseMotion(): Boolean = when (motion) {
-      is TextObjectActionHandler -> motion.visualType == TextObjectVisualType.LINE_WISE
-      is MotionActionHandler -> motion.motionType == MotionType.LINE_WISE
-      is ExternalActionHandler -> motion.isLinewiseMotion
-      else -> error("Command is not a motion: $motion")
+    fun isLinewiseMotion(): Boolean {
+      // A forced motion modifier (:help o_v / o_V) overrides the motion's own declared type. `V` forces linewise,
+      // `v` forces characterwise (stored as a characterwise [MotionType]).
+      forcedMotion?.let { return it == MotionType.LINE_WISE }
+      return when (motion) {
+        is TextObjectActionHandler -> motion.visualType == TextObjectVisualType.LINE_WISE
+        is MotionActionHandler -> motion.motionType == MotionType.LINE_WISE
+        is ExternalActionHandler -> motion.isLinewiseMotion
+        else -> error("Command is not a motion: $motion")
+      }
     }
 
-    fun withArgument(argument: Argument) = Motion(motion, argument)
+    /**
+     * The effective [MotionType] used to decide inclusive/exclusive behaviour, honouring a forced motion modifier
+     * (`:help o_v`).
+     *
+     * `V` forces linewise. `v` forces characterwise and *toggles* the motion's inclusiveness: an inclusive motion
+     * becomes exclusive and vice versa, while a linewise motion becomes exclusive characterwise (matching Vim's
+     * "makes dvj work nice" behaviour). Without a forced modifier, the motion's own declared type is used.
+     *
+     * Returns `null` for motions that have no inclusive/exclusive concept and aren't forced (e.g. plain text objects).
+     */
+    fun getEffectiveMotionType(): MotionType? {
+      val declared = (motion as? MotionActionHandler)?.motionType
+      return when (forcedMotion) {
+        null -> declared
+        MotionType.LINE_WISE -> MotionType.LINE_WISE
+        // `v`: force characterwise, toggling the motion's inclusiveness
+        else -> when (declared) {
+          MotionType.INCLUSIVE -> MotionType.EXCLUSIVE
+          MotionType.LINE_WISE -> MotionType.EXCLUSIVE
+          else -> MotionType.INCLUSIVE // EXCLUSIVE, or a text object with no declared type
+        }
+      }
+    }
+
+    fun withArgument(argument: Argument) = Motion(motion, argument, forcedMotion)
   }
 
   /**
