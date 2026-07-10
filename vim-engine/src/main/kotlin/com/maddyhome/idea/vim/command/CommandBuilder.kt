@@ -21,6 +21,7 @@ import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.noneOfEnum
 import com.maddyhome.idea.vim.key.KeyStrokeTrie
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.annotations.TestOnly
 import javax.swing.KeyStroke
 
@@ -46,7 +47,7 @@ class CommandBuilder private constructor(
    * [Argument.Motion] when the motion action is added, where it overrides the motion's declared type. It is cleared
    * when the command is reset.
    */
-  var forcedMotion: MotionType? = null
+  var forcedMotion: SelectionType? = null
 
   private val motionArgument
     get() = argument as? Argument.Motion

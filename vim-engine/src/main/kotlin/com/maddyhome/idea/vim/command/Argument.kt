@@ -49,21 +49,28 @@ sealed class Argument {
   class Motion private constructor(
     val motion: EditorActionHandlerBase,
     val argument: Argument? = null,
-    val forcedMotion: MotionType? = null,
+    /**
+     * A forced motion type entered with the `v`/`V`/`CTRL-V` modifier between an operator and its motion
+     * (`:help o_v`). `v` forces [SelectionType.CHARACTER_WISE], `V` forces [SelectionType.LINE_WISE] and `CTRL-V`
+     * forces [SelectionType.BLOCK_WISE]. `null` means no forcing was requested.
+     */
+    val forcedMotion: SelectionType? = null,
   ) : Argument() {
-    constructor(motion: MotionActionHandler, argument: Argument?, forcedMotion: MotionType? = null)
+    constructor(motion: MotionActionHandler, argument: Argument?, forcedMotion: SelectionType? = null)
       : this(motion as EditorActionHandlerBase, argument, forcedMotion)
-    constructor(motion: TextObjectActionHandler, forcedMotion: MotionType? = null)
+    constructor(motion: TextObjectActionHandler, forcedMotion: SelectionType? = null)
       : this(motion as EditorActionHandlerBase, forcedMotion = forcedMotion)
-    constructor(motion: ExternalActionHandler, forcedMotion: MotionType? = null)
+    constructor(motion: ExternalActionHandler, forcedMotion: SelectionType? = null)
       : this(motion as EditorActionHandlerBase, forcedMotion = forcedMotion)
 
-    fun getMotionType() = if (isLinewiseMotion()) SelectionType.LINE_WISE else SelectionType.CHARACTER_WISE
+    fun getMotionType(): SelectionType = when (forcedMotion) {
+      null -> if (isLinewiseMotion()) SelectionType.LINE_WISE else SelectionType.CHARACTER_WISE
+      else -> forcedMotion
+    }
 
     fun isLinewiseMotion(): Boolean {
-      // A forced motion modifier (:help o_v / o_V) overrides the motion's own declared type. `V` forces linewise,
-      // `v` forces characterwise (stored as a characterwise [MotionType]).
-      forcedMotion?.let { return it == MotionType.LINE_WISE }
+      // A forced motion modifier (:help o_v / o_V) overrides the motion's own declared type.
+      forcedMotion?.let { return it == SelectionType.LINE_WISE }
       return when (motion) {
         is TextObjectActionHandler -> motion.visualType == TextObjectVisualType.LINE_WISE
         is MotionActionHandler -> motion.motionType == MotionType.LINE_WISE
@@ -78,17 +85,19 @@ sealed class Argument {
      *
      * `V` forces linewise. `v` forces characterwise and *toggles* the motion's inclusiveness: an inclusive motion
      * becomes exclusive and vice versa, while a linewise motion becomes exclusive characterwise (matching Vim's
-     * "makes dvj work nice" behaviour). Without a forced modifier, the motion's own declared type is used.
+     * "makes dvj work nice" behaviour). `CTRL-V` (blockwise) keeps the motion's own inclusiveness - the block's right
+     * column is handled by [com.maddyhome.idea.vim.group.visual.VimBlockSelection]. Without a forced modifier, the
+     * motion's own declared type is used.
      *
      * Returns `null` for motions that have no inclusive/exclusive concept and aren't forced (e.g. plain text objects).
      */
     fun getEffectiveMotionType(): MotionType? {
       val declared = (motion as? MotionActionHandler)?.motionType
       return when (forcedMotion) {
-        null -> declared
-        MotionType.LINE_WISE -> MotionType.LINE_WISE
+        null, SelectionType.BLOCK_WISE -> declared
+        SelectionType.LINE_WISE -> MotionType.LINE_WISE
         // `v`: force characterwise, toggling the motion's inclusiveness
-        else -> when (declared) {
+        SelectionType.CHARACTER_WISE -> when (declared) {
           MotionType.INCLUSIVE -> MotionType.EXCLUSIVE
           MotionType.LINE_WISE -> MotionType.EXCLUSIVE
           else -> MotionType.INCLUSIVE // EXCLUSIVE, or a text object with no declared type

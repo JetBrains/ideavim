@@ -270,4 +270,39 @@ class ForcedMotionVModifierTest : VimTestCase() {
       "hello\n${c}hello\nworld",
     )
   }
+
+  // ---------------------------------------------------------------------------------------------------------------
+  // `CTRL-V` — force blockwise
+  // ---------------------------------------------------------------------------------------------------------------
+
+  @Test
+  fun `test d CTRL-V l deletes a single-row block`() {
+    // On one line the block is one row high: `l` forces blockwise over columns 0..1, deleting "he"
+    doTest(
+      "d<C-V>l",
+      "${c}hello\nworld",
+      "${c}llo\nworld",
+    )
+  }
+
+  @Test
+  fun `test d CTRL-V j deletes a vertical block`() {
+    // Block from (0,0) to (1,0) - deletes the first column of both lines
+    doTest(
+      "d<C-V>j",
+      "${c}abcde\nfghij",
+      "${c}bcde\nghij",
+    )
+  }
+
+  @Test
+  fun `test c CTRL-V j changes a block on every line`() {
+    // Blockwise change deletes the block, then repeats the inserted text on every line of the block on exit
+    doTest(
+      "c<C-V>jX<Esc>",
+      "${c}abcde\nfghij",
+      "${c}Xbcde\nXghij",
+      Mode.NORMAL(),
+    )
+  }
 }
