@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.common.Graphemes
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.findMatchingPairOnCurrentLine
+import com.maddyhome.idea.vim.group.visual.VimBlockSelection
 import com.maddyhome.idea.vim.handler.ExternalActionHandler
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.Motion.AbsoluteOffset
@@ -23,6 +24,7 @@ import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.handler.toAdjustedMotionOrError
 import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.isEndAllowed
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.isEndAllowedIgnoringOnemore
 import org.jetbrains.annotations.Range
 import kotlin.math.abs
@@ -364,6 +366,12 @@ abstract class VimMotionGroupBase : VimMotionGroup {
         if (Motion.Error == motion || Motion.NoMotion == motion) return null
 
         end = (motion as AbsoluteOffset).offset
+
+        // A blockwise force (o_CTRL-V) turns the motion's two endpoints into a rectangular block. The block's own
+        // machinery (VimBlockSelection) handles the column range, including the inclusive right column.
+        if (argument.forcedMotion === SelectionType.BLOCK_WISE) {
+          return VimBlockSelection(start, end, editor, false).toVimTextRange()
+        }
 
         // If inclusive, add the last character to the range. A forced motion modifier (o_v) can override the type.
         if (argument.getEffectiveMotionType() === MotionType.INCLUSIVE) {

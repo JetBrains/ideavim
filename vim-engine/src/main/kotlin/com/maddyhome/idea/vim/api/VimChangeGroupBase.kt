@@ -999,7 +999,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     // 1) The range is across multiple lines
     // 2) There is only whitespace before the start of the range
     // 3) There is only whitespace after the end of the range
-    if (!isChange && motionType != SelectionType.LINE_WISE) {
+    if (!isChange && motionType == SelectionType.CHARACTER_WISE) {
       val start = editor.offsetToBufferPosition(range.startOffset)
       val end = editor.offsetToBufferPosition(range.endOffset)
       if (start.line != end.line
