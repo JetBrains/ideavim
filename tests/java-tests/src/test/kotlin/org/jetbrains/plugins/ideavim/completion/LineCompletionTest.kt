@@ -245,6 +245,19 @@ class LineCompletionTest : VimJavaTestCase() {
     )
   }
 
+  // In real Vim/Nvim, moving the caret while in the CTRL-X completion sub-mode ends that sub-mode and returns
+  // to standard insert mode (`i_CTRL-X`, "Move on to any other mode ... and CTRL-X mode stops").
+  @Test
+  fun `test caret movement in CTRL-X sub-mode returns to standard insert mode`() {
+    configureByJavaText(text)
+    typeText("i")
+    typeText("<C-X>")
+    assertState(Mode.INSERT)
+
+    typeText("<Left>") // any caret movement leaves the CTRL-X sub-mode
+    assertState(Mode.INSERT)
+  }
+
   private fun activeLookup(): LookupImpl? {
     var lookup: LookupImpl? = null
     ApplicationManager.getApplication().invokeAndWait {
