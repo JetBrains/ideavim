@@ -12,4 +12,5 @@ enum class CtrlXCompletionMode {
   NONE,
   NOT_DEFINED_YET,
   WHOLE_LINE,
+  FILE_PATH
 }
