@@ -9,6 +9,8 @@
 package com.maddyhome.idea.vim.newapi
 
 import com.intellij.codeInsight.lookup.Lookup
+import com.intellij.codeInsight.lookup.LookupElement
+import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.codeInsight.lookup.LookupManager
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.editor.actionSystem.EditorActionManager
@@ -21,6 +23,16 @@ import com.maddyhome.idea.vim.api.VimLookupManager
 class IjVimLookupManager : VimLookupManager {
   override fun getActiveLookup(editor: VimEditor): IjLookup? {
     return LookupManager.getActiveLookup(editor.ij)?.let { IjLookup(it) }
+  }
+
+  override fun showCustomLookup(
+    editor: VimEditor,
+    values: List<String>,
+  ) {
+    val items: Array<LookupElement> =
+      values.map { LookupElementBuilder.create(it) }.toTypedArray()
+    val lookup = editor.ij.project?.let { LookupManager.getInstance(it) }
+    lookup?.showLookup(editor.ij, *items)
   }
 }
 

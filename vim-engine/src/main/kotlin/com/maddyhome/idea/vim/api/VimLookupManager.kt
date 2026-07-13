@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.api
 
 interface VimLookupManager {
   fun getActiveLookup(editor: VimEditor): IdeLookup?
+  fun showCustomLookup(editor: VimEditor, values: List<String>)
 }
 
 interface IdeLookup {

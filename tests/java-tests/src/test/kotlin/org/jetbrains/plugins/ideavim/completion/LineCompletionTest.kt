@@ -16,8 +16,11 @@ import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimJavaTestCase
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -141,6 +144,104 @@ class LineCompletionTest : VimJavaTestCase() {
     assertTrue(
       visited.containsAll(matchingLines),
       "Cycling with <C-L> should visit every matching line $matchingLines but only saw $visited",
+    )
+  }
+
+  // Issue #1: whole-line completion is only reachable via the CTRL-X sub-mode (`i_CTRL-X_CTRL-L`). A bare
+  // `<C-L>` in ordinary insert mode is not a Vim command and must NOT open the line-completion lookup.
+  @Test
+  fun `test Ctrl-L without preceding Ctrl-X does not open a lookup`() {
+    configureByJavaText(text)
+    typeText("i") // plain insert mode, NOT the CTRL-X sub-mode
+    typeText("<C-L>")
+
+    assertNull(activeLookup(), "A bare <C-L> outside the CTRL-X sub-mode should not open line completion")
+    assertState(Mode.INSERT) // stays in plain insert mode, never enters the xCompletion sub-mode
+    assertState(text) // and the buffer is untouched
+  }
+
+  // Issue #2: Vim matches lines that begin with the text BEFORE the caret only. With the caret in the middle
+  // of a word, the text after the caret must not narrow the set of offered lines.
+  @Test
+  fun `test Ctrl-X Ctrl-L matches only the text before the caret`() {
+    val midCaretText = """
+        |fun demo() {
+        |  fooXYZ
+        |  foobar
+        |  foo${c}BAR
+        |}
+    """.trimMargin()
+    configureByJavaText(midCaretText)
+    typeText("i") // caret sits between "foo" and "BAR"
+    typeText("<C-X><C-L>")
+
+    assertNotNull(activeLookup(), "Expected <C-X><C-L> to open a completion lookup")
+    // The prefix is "foo" (text before the caret), so both "fooXYZ" and "foobar" match. If the whole line
+    // "fooBAR" were used as the prefix instead, neither would be offered.
+    assertTrue(
+      lookupStrings().containsAll(listOf("fooXYZ", "foobar")),
+      "Expected the lookup to offer lines starting with the pre-caret prefix \"foo\" but was ${lookupStrings()}",
+    )
+  }
+
+  // Issue #4: Vim omits the line being completed and collapses duplicate matches, so each distinct matching
+  // line is offered exactly once and the current line never appears.
+  @Test
+  fun `test Ctrl-X Ctrl-L excludes the current line and de-duplicates matches`() {
+    val duplicateText = """
+        |fun compute(): Int {
+        |  return value
+        |  return value
+        |  return count
+        |  return ${c}
+        |}
+    """.trimMargin()
+    configureByJavaText(duplicateText)
+    typeText("i")
+    typeText("<C-X><C-L>")
+
+    assertNotNull(activeLookup(), "Expected <C-X><C-L> to open a completion lookup")
+    val offered = lookupStrings()
+    assertFalse(
+      offered.contains("return"),
+      "The line being completed (\"return\") should not be offered as a match but was $offered",
+    )
+    assertTrue(
+      offered.containsAll(listOf("return value", "return count")),
+      "Expected the distinct matching lines to be offered but was $offered",
+    )
+    assertEquals(
+      1,
+      offered.count { it == "return value" },
+      "Duplicate matching lines should be collapsed to a single entry but was $offered",
+    )
+  }
+
+  // Issue #4 (general case): the current line must be excluded even when its full text is NOT equal to the
+  // typed prefix. With the caret in the middle of "fooBAR", the prefix is "foo" but the current line is
+  // "fooBAR" — it should still not be offered as a completion of itself.
+  @Test
+  fun `test Ctrl-X Ctrl-L excludes the current line even when it differs from the prefix`() {
+    val midCaretText = """
+        |fun demo() {
+        |  fooXYZ
+        |  foobar
+        |  foo${c}BAR
+        |}
+    """.trimMargin()
+    configureByJavaText(midCaretText)
+    typeText("i") // caret sits between "foo" and "BAR"; the current line is "fooBAR"
+    typeText("<C-X><C-L>")
+
+    assertNotNull(activeLookup(), "Expected <C-X><C-L> to open a completion lookup")
+    val offered = lookupStrings()
+    assertFalse(
+      offered.contains("fooBAR"),
+      "The line being completed (\"fooBAR\") should not be offered as a match but was $offered",
+    )
+    assertTrue(
+      offered.containsAll(listOf("fooXYZ", "foobar")),
+      "Expected the other matching lines to still be offered but was $offered",
     )
   }
 

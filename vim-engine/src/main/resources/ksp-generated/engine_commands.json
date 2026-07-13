@@ -315,6 +315,11 @@
     "modes": "I"
   },
   {
+    "keys": "<C-L>",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertLineCompletionAction",
+    "modes": "I"
+  },
+  {
     "keys": "<C-Left>",
     "class": "com.maddyhome.idea.vim.action.ex.MoveCaretToPreviousBigWordAction",
     "modes": "C"
