@@ -53,7 +53,7 @@ class VimModeWidget(val project: Project) : CustomStatusBarWidget, VimStatusBarW
 
     fun getModeText(mode: Mode?): String? {
       return when (mode) {
-        Mode.INSERT -> INSERT
+        is Mode.INSERT -> INSERT
         Mode.REPLACE -> REPLACE
         is Mode.NORMAL -> getNormalModeText(mode)
         is Mode.CMD_LINE -> COMMAND

@@ -23,7 +23,7 @@ class CommandState(private val machine: VimStateMachine) {
       val myMode = machine.mode
       return when (myMode) {
         is com.maddyhome.idea.vim.state.mode.Mode.CMD_LINE -> Mode.CMD_LINE
-        com.maddyhome.idea.vim.state.mode.Mode.INSERT -> Mode.INSERT
+        is com.maddyhome.idea.vim.state.mode.Mode.INSERT -> Mode.INSERT
         is com.maddyhome.idea.vim.state.mode.Mode.NORMAL -> Mode.COMMAND
         is com.maddyhome.idea.vim.state.mode.Mode.OP_PENDING -> Mode.OP_PENDING
         com.maddyhome.idea.vim.state.mode.Mode.REPLACE -> Mode.REPLACE

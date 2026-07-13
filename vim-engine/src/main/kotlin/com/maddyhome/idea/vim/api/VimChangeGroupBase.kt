@@ -43,6 +43,7 @@ import com.maddyhome.idea.vim.options.helpers.KeywordOptionHelper.isKeyword
 import com.maddyhome.idea.vim.regexp.VimRegex
 import com.maddyhome.idea.vim.regexp.match.VimMatchResult
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_INSERTED_TEXT_REGISTER
+import com.maddyhome.idea.vim.state.mode.CtrlXCompletionMode
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.undo.VimKeyBasedUndoService
@@ -189,7 +190,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       }
     }
 
-    val isInsertMode = editor.mode == Mode.INSERT || editor.mode == Mode.REPLACE
+    val isInsertMode = editor.mode is Mode.INSERT || editor.mode == Mode.REPLACE
     val shouldYank = type != null && !isInsertMode && saveToRegister
     if (shouldYank && !caret.registerStorage.storeText(editor, context, updatedRange, type, isDelete = true)) {
       return false
@@ -531,7 +532,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       injector.application.runReadAction {
         oldOffset = editor.currentCaret().offset
       }
-      editor.insertMode = mode == Mode.INSERT
+      editor.insertMode = mode is Mode.INSERT
+      injector.vimState.ctrlXCompletionMode = CtrlXCompletionMode.NONE
       editor.mode = mode
     }
   }
@@ -543,7 +545,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       val action = injector.nativeActionManager.enterAction
       if (action != null) {
         // We use enter action for `o`, `O` commands. If we want to undo the added \n and indent, we should record start of insert
-        if (editor.mode == Mode.INSERT) {
+        if (editor.mode is Mode.INSERT) {
           val undo = injector.undo
           when (undo) {
             is VimKeyBasedUndoService -> undo.setInsertNonMergeUndoKey()
@@ -695,7 +697,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     context: ExecutionContext,
     toSwitch: Mode,
   ) {
-    if (toSwitch == Mode.INSERT) {
+    if (toSwitch is Mode.INSERT) {
       initInsert(editor, context, Mode.INSERT)
     }
   }
@@ -724,7 +726,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    */
   override fun processSingleCommand(editor: VimEditor) {
 
-    injector.vimState.wasCaretAtEndOfLineBeforeInsertNormal = editor.nativeCarets().any { editor.isCaretAtLineEnd(it, allowEnd = true) }
+    injector.vimState.wasCaretAtEndOfLineBeforeInsertNormal =
+      editor.nativeCarets().any { editor.isCaretAtLineEnd(it, allowEnd = true) }
 
     editor.mode = Mode.NORMAL(editor.mode)
 
@@ -2132,7 +2135,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         }
       }
     }
-    if (editor.mode != Mode.INSERT) {
+    if (editor.mode !is Mode.INSERT) {
       if (!range.isMultiple) {
         // The caret has moved, so reset the intended column before trying to get the expected offset
         val newCaret = caret.setVimLastColumnAndGetCaret(intendedColumn)

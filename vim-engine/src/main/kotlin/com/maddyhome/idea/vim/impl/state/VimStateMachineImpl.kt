@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.helper.noneOfEnum
 import com.maddyhome.idea.vim.state.VimStateMachine
+import com.maddyhome.idea.vim.state.mode.CtrlXCompletionMode
 import com.maddyhome.idea.vim.state.mode.Mode
 import java.util.*
 
@@ -20,6 +21,7 @@ import java.util.*
  */
 class VimStateMachineImpl : VimStateMachine {
   override var mode: Mode = Mode.NORMAL()
+  override var ctrlXCompletionMode: CtrlXCompletionMode = CtrlXCompletionMode.NONE
   override var isDotRepeatInProgress: Boolean = false
   override var isReplaceCharacter: Boolean = false
 
@@ -42,6 +44,7 @@ class VimStateMachineImpl : VimStateMachine {
 
   override fun reset() {
     mode = Mode.NORMAL()
+    ctrlXCompletionMode = CtrlXCompletionMode.NONE
     isDotRepeatInProgress = false
     isReplaceCharacter = false
     executingCommand = null
@@ -52,7 +55,7 @@ class VimStateMachineImpl : VimStateMachine {
 fun Mode.toMappingMode(): MappingMode {
   return when (this) {
     is Mode.NORMAL -> MappingMode.NORMAL
-    Mode.INSERT, Mode.REPLACE -> MappingMode.INSERT
+    is Mode.INSERT, Mode.REPLACE -> MappingMode.INSERT
     is Mode.VISUAL -> MappingMode.VISUAL
     is Mode.SELECT -> MappingMode.SELECT
     is Mode.CMD_LINE -> MappingMode.CMD_LINE

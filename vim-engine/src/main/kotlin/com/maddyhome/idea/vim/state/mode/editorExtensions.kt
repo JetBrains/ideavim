@@ -43,4 +43,4 @@ val VimEditor.singleModeActive: Boolean
  * Check if text insertion is allowed. It's true in [Mode.INSERT] or [Mode.REPLACE].
  */
 val VimEditor.isInsertionAllowed: Boolean
-  get() = this.mode == Mode.INSERT || this.mode == Mode.REPLACE
+  get() = this.mode is Mode.INSERT || this.mode == Mode.REPLACE

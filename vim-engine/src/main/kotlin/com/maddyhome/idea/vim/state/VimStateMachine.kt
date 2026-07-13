@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.state
 
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.state.mode.CtrlXCompletionMode
 import com.maddyhome.idea.vim.state.mode.Mode
 import java.util.*
 
@@ -20,6 +21,8 @@ interface VimStateMachine {
   val mode: Mode
   var isDotRepeatInProgress: Boolean
   val isReplaceCharacter: Boolean
+
+  var ctrlXCompletionMode: CtrlXCompletionMode
 
   var wasCaretAtEndOfLineBeforeInsertNormal: Boolean
 

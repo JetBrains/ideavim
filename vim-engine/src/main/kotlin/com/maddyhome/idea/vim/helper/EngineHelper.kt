@@ -50,7 +50,7 @@ fun VimEditor.isEndAllowed(mode: Mode): Boolean {
   // Technically, we should look at the "ultimate" current mode and skip anything like Command-line or Operator-pending,
   // but for our usages, this isn't necessary
   return when (mode) {
-    Mode.INSERT, Mode.REPLACE, is Mode.VISUAL, is Mode.SELECT -> true
+    is Mode.INSERT, Mode.REPLACE, is Mode.VISUAL, is Mode.SELECT -> true
     is Mode.NORMAL -> if (mode.isInsertPending || mode.isReplacePending) true else usesVirtualSpace
     is Mode.CMD_LINE, is Mode.OP_PENDING -> usesVirtualSpace
   }

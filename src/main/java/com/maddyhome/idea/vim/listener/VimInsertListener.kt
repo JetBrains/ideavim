@@ -20,7 +20,7 @@ import com.maddyhome.idea.vim.state.mode.Mode
 )
 interface VimInsertListener : ModeChangeListener {
   override fun modeChanged(editor: VimEditor, oldMode: Mode) {
-    if (editor.mode == Mode.INSERT) {
+    if (editor.mode is Mode.INSERT) {
       insertModeStarted(editor.ij)
     }
   }

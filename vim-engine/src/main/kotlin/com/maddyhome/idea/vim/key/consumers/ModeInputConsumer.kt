@@ -53,7 +53,7 @@ internal class ModeInputConsumer : KeyConsumer {
   ): Boolean {
     logger.trace { "Entered ModeInputConsumer" }
     val isProcessed = when (editor.mode) {
-      Mode.INSERT, Mode.REPLACE -> {
+      is Mode.INSERT, Mode.REPLACE -> {
         logger.trace("Process insert or replace")
         val keyProcessed = injector.changeGroup.processKey(editor, key, keyProcessResultBuilder)
         keyProcessed

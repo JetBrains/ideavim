@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.undo.VimTimestampBasedUndoService
 internal class InsertTimeRecorder : ModeChangeListener {
   override fun modeChanged(editor: VimEditor, oldMode: Mode) {
     editor as IjVimEditor
-    if (oldMode == Mode.INSERT) {
+    if (oldMode is Mode.INSERT) {
       val undo = injector.undo as? VimTimestampBasedUndoService ?: return
       val nanoTime = System.nanoTime()
       injector.application.runReadAction {
