@@ -226,6 +226,11 @@
   },
   {
     "keys": "<C-F>",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertFilePathCompletionAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<C-F>",
     "class": "com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageDownAction",
     "modes": "NXO"
   },
