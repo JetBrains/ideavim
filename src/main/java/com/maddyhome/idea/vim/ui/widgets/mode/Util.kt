@@ -25,7 +25,7 @@ fun getModeBackground(mode: Mode?): Color {
     when (theme) {
       ModeWidgetTheme.TERM -> {
         return when (mode) {
-          Mode.INSERT -> Color.decode("#F4BF75")
+          is Mode.INSERT -> Color.decode("#F4BF75")
           Mode.REPLACE -> Color.decode("#AC4242")
           is Mode.NORMAL, is Mode.CMD_LINE -> Color.decode("#90A959")
           is Mode.VISUAL, is Mode.SELECT -> Color.decode("#6A9FB5")
@@ -35,7 +35,7 @@ fun getModeBackground(mode: Mode?): Color {
 
       ModeWidgetTheme.DRACULA -> {
         return when (mode) {
-          Mode.INSERT -> Color.decode("#50FA7B")
+          is Mode.INSERT -> Color.decode("#50FA7B")
           Mode.REPLACE -> Color.decode("#FF5555")
           is Mode.NORMAL -> Color.decode("#BD93F9")
           is Mode.CMD_LINE -> Color.decode("#FFB86C")
@@ -50,7 +50,7 @@ fun getModeBackground(mode: Mode?): Color {
     }
   } else {
     val colorString = when (mode) {
-      Mode.INSERT -> resolveString("widget_mode_insert_background$keyPostfix")
+      is Mode.INSERT -> resolveString("widget_mode_insert_background$keyPostfix")
       Mode.REPLACE -> resolveString("widget_mode_replace_background$keyPostfix")
       is Mode.NORMAL -> resolveString("widget_mode_normal_background$keyPostfix")
       is Mode.CMD_LINE -> resolveString("widget_mode_command_background$keyPostfix")
@@ -113,7 +113,7 @@ fun getModeForeground(mode: Mode?): Color {
     }
   } else {
     val colorString = when (mode) {
-      Mode.INSERT -> resolveString("widget_mode_insert_foreground$keyPostfix")
+      is Mode.INSERT -> resolveString("widget_mode_insert_foreground$keyPostfix")
       Mode.REPLACE -> resolveString("widget_mode_replace_foreground$keyPostfix")
       is Mode.NORMAL -> resolveString("widget_mode_normal_foreground$keyPostfix")
       is Mode.CMD_LINE -> resolveString("widget_mode_command_foreground$keyPostfix")

@@ -64,7 +64,7 @@ internal class VimActionsPromoter : ActionPromoter {
       val mode = editor.vim.mode
       val vimAction = actions[vimIndex]
 
-      if ((mode == Mode.INSERT || mode == Mode.REPLACE) &&
+      if ((mode is Mode.INSERT || mode == Mode.REPLACE) &&
         LookupManager.getActiveLookup(editor) != null &&
         injector.keyGroup.getFirstMappingInfoMatch(injector.parser.parseKeys("<Tab>"), MappingMode.I) != null
       ) {
@@ -87,7 +87,7 @@ internal class VimActionsPromoter : ActionPromoter {
         // invoke an action that will edit text while we're in e.g., Normal. This isn't a hard and fast rule - we don't
         // remove InsertInlineCompletionAction or Next Edit Suggestions. These are ok because there are visible prompts,
         // so modifying text in Normal is expected.
-        if (it is ExpandLiveTemplateByTabAction && mode != Mode.INSERT && mode != Mode.REPLACE && mode !is Mode.SELECT) {
+        if (it is ExpandLiveTemplateByTabAction && mode !is Mode.INSERT && mode != Mode.REPLACE && mode !is Mode.SELECT) {
           return@forEach
         }
         ordered.add(it)

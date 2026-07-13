@@ -75,7 +75,7 @@ sealed class ShortcutOwnerInfo {
         is Mode.NORMAL -> this.normal
         is Mode.VISUAL -> this.visual
         is Mode.SELECT -> this.visual
-        Mode.INSERT -> this.insert
+        is Mode.INSERT -> this.insert
         is Mode.CMD_LINE -> this.normal
         is Mode.OP_PENDING -> this.normal
         Mode.REPLACE -> this.insert

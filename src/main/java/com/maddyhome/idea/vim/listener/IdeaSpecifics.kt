@@ -112,7 +112,7 @@ internal object IdeaSpecifics {
       }
 
       val isVimAction = isVimAction(action)
-      if (!isVimAction && injector.vimState.mode == Mode.INSERT && action !is EnterAction) {
+      if (!isVimAction && injector.vimState.mode is Mode.INSERT && action !is EnterAction) {
         val undoService = injector.undo as VimTimestampBasedUndoService
         val nanoTime = System.nanoTime()
         editor?.vim?.nativeCarets()?.forEach { undoService.endInsertSequence(it, it.offset, nanoTime) }

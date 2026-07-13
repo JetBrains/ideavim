@@ -163,7 +163,7 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
   private fun updateUndoKey(editor: VimEditor, command: Command) {
     val undo = (injector.undo as? VimKeyBasedUndoService) ?: return
 
-    if (editor.mode == Mode.INSERT) return // typing handles undo on its own
+    if (editor.mode is Mode.INSERT) return // typing handles undo on its own
     if (command.flags.contains(CommandFlags.FLAG_UNDO_AWARE)) return
 
     if (command.type == Command.Type.MOTION || command.type == Command.Type.MODE_CHANGE) {

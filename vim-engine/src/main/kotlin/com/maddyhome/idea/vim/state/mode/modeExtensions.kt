@@ -116,6 +116,7 @@ fun Mode.toVimNotation(): String {
     }
 
     Mode.INSERT -> "i"
+
     is Mode.SELECT -> when (selectionType) {
       SelectionType.CHARACTER_WISE -> "s"
       SelectionType.LINE_WISE -> "S"

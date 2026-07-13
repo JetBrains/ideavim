@@ -191,7 +191,7 @@ enum class GuiCursorMode(val token: String) {
       return when (mode) {
         is Mode.NORMAL -> NORMAL
         is Mode.OP_PENDING -> OP_PENDING
-        Mode.INSERT -> INSERT
+        is Mode.INSERT -> INSERT
         Mode.REPLACE -> REPLACE
         is Mode.SELECT -> VISUAL_EXCLUSIVE  // TODO: Should match VISUAL
         is Mode.VISUAL -> if (injector.globalOptions().selection == "exclusive") VISUAL_EXCLUSIVE else VISUAL

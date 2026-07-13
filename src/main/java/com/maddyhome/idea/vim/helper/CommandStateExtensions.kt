@@ -34,7 +34,7 @@ val Mode.inNormalMode: Boolean
 
 @get:JvmName("inInsertMode")
 val Editor.inInsertMode: Boolean
-  get() = this.vim.mode == Mode.INSERT || this.vim.mode == Mode.REPLACE
+  get() = this.vim.mode is Mode.INSERT || this.vim.mode == Mode.REPLACE
 
 @get:JvmName("inVisualMode")
 val Editor.inVisualMode: Boolean

@@ -143,7 +143,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     val handler = if (this is AmbiguousExecution) this.getMotionActionHandler(cmd.argument) else this
     when (handler) {
       is SingleExecution -> run {
-        if (editor.mode == Mode.INSERT) {
+        if (editor.mode is Mode.INSERT) {
           val undo = injector.undo
           when (undo) {
             is VimKeyBasedUndoService -> undo.setMergeUndoKey()
@@ -203,7 +203,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ) {
-    if (editor.mode == Mode.INSERT) {
+    if (editor.mode is Mode.INSERT) {
       val undo = injector.undo
       when (undo) {
         is VimKeyBasedUndoService -> undo.setMergeUndoKey()

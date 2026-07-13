@@ -725,6 +725,11 @@
     "modes": "X"
   },
   {
+    "keys": "<C-X>",
+    "class": "com.maddyhome.idea.vim.action.change.insert.InsertXCompletionAction",
+    "modes": "I"
+  },
+  {
     "keys": "<C-Y>",
     "class": "com.maddyhome.idea.vim.action.change.insert.InsertCharacterAboveCursorAction",
     "modes": "I"

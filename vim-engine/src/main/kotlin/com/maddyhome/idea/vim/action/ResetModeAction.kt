@@ -44,7 +44,7 @@ class ResetModeAction : VimActionHandler.ConditionalMulticaret() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    if (modeBeforeReset == com.maddyhome.idea.vim.state.mode.Mode.INSERT) {
+    if (modeBeforeReset is com.maddyhome.idea.vim.state.mode.Mode.INSERT) {
       val position = injector.motion.getHorizontalMotion(editor, caret, -1, false)
       caret.moveToMotion(position)
     }

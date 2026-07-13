@@ -11,6 +11,8 @@ package com.maddyhome.idea.vim.vimscript.model.functions.handlers.variousFunctio
 import com.intellij.vim.annotations.VimscriptFunction
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.state.mode.CtrlXCompletionMode
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
@@ -31,7 +33,10 @@ internal class ModeFunctionHandler : BuiltinFunctionHandler<VimString>(minArity 
   private fun modeString(mode: Mode): String = when (mode) {
     is Mode.NORMAL -> "n"
     is Mode.OP_PENDING -> "no"
-    is Mode.INSERT -> "i"
+    is Mode.INSERT -> when (injector.vimState.ctrlXCompletionMode) {
+      CtrlXCompletionMode.NONE -> "i"
+      else -> "ix"
+    }
     is Mode.REPLACE -> "R"
     is Mode.VISUAL -> when (mode.selectionType) {
       SelectionType.CHARACTER_WISE -> "v"

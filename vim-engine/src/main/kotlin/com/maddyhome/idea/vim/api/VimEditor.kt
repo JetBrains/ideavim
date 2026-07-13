@@ -387,7 +387,7 @@ interface VimEditor {
   fun toggleInsertOverwrite() {
     val oldMode = this.mode
     var newMode = oldMode
-    if (oldMode == Mode.INSERT) {
+    if (oldMode is Mode.INSERT) {
       newMode = Mode.REPLACE
     } else if (oldMode == Mode.REPLACE) {
       newMode = Mode.INSERT

@@ -851,7 +851,7 @@ object VimListenerManager {
       val mode = injector.editorGroup.getSelectedEditor()?.mode
       if (mouseOption.contains("a")) return true
       return when (mode) {
-        Mode.INSERT, is Mode.REPLACE -> mouseOption.contains("i")
+        is Mode.INSERT, is Mode.REPLACE -> mouseOption.contains("i")
         is Mode.NORMAL -> mouseOption.contains("n")
         is Mode.VISUAL, is Mode.SELECT -> mouseOption.contains("v")
         is Mode.CMD_LINE -> mouseOption.contains("c")
@@ -1162,4 +1162,4 @@ private class AbbreviationSessionResetListener : ModeChangeListener {
 
 // Vim fires InsertEnter/Leave for both Insert and Replace modes (`:help InsertEnter`).
 private val Mode.isInsertish: Boolean
-  get() = this == Mode.INSERT || this == Mode.REPLACE
+  get() = this is Mode.INSERT || this == Mode.REPLACE
