@@ -119,6 +119,7 @@ import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.options.helpers.LangNoRemapChangeListener
 import com.maddyhome.idea.vim.options.helpers.LangRemapChangeListener
+import com.maddyhome.idea.vim.state.mode.CtrlXCompletionMode
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.inSelectMode
 import com.maddyhome.idea.vim.state.mode.selectionType
@@ -1002,6 +1003,8 @@ object VimListenerManager {
       val editor = event.editor
       val vimEditor = editor.vim
       if (vimEditor.mode is Mode.INSERT) {
+        // Moving the caret ends any CTRL-X completion sub-mode (:help i_CTRL-X)
+        injector.vimState.ctrlXCompletionMode = CtrlXCompletionMode.NONE
         noteCaretMoveInInsertSession(vimEditor, editor.document.modificationStamp)
       }
     }
