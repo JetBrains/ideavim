@@ -258,6 +258,30 @@ class LineCompletionTest : VimJavaTestCase() {
     assertState(Mode.INSERT)
   }
 
+  // Accepting a whole-line completion with <C-Y> replaces the typed line with the matched line (Vim inserts the
+  // whole line). The completion must REPLACE the typed prefix, not be appended after it.
+  @Test
+  fun `test Ctrl-Y accepts the selected line completion`() {
+    configureByJavaText(text)
+    typeText("i")
+    typeText("<C-X><C-L>")
+    val selected = selectedLookupString()
+    assertNotNull(selected, "There should be a selected item to accept")
+
+    typeText("<C-Y>")
+
+    assertNull(activeLookup(), "Lookup should close after accepting with <C-Y>")
+    assertState(Mode.INSERT)
+    var buffer = ""
+    ApplicationManager.getApplication().invokeAndWait { buffer = fixture.editor.document.text }
+    assertEquals("fun compute(): Int {\n" +
+      "  return result\n" +
+      "  return value\n" +
+      "  return count\n" +
+      "  return result\n" +
+      "}", buffer)
+  }
+
   private fun activeLookup(): LookupImpl? {
     var lookup: LookupImpl? = null
     ApplicationManager.getApplication().invokeAndWait {

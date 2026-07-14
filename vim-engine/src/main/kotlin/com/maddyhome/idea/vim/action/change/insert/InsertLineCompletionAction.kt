@@ -40,7 +40,7 @@ class InsertLineCompletionAction : VimActionHandler.SingleExecution() {
     val currentLine = editor.getLineText(editor.currentCaret().getLine()).trim()
     val line = getLineToMatch(editor)
     val lines = getMatchingLines(editor, line, currentLine)
-    injector.lookupManager.showCustomLookup(editor, lines)
+    injector.lookupManager.showCustomLookup(editor, lines, getReplacePrefix(editor))
     return true
   }
 
@@ -55,6 +55,12 @@ class InsertLineCompletionAction : VimActionHandler.SingleExecution() {
     val lineStartOffset = editor.getLineStartOffset(editor.currentCaret().getLine())
     val line = editor.getText(lineStartOffset, editor.currentCaret().offset).trim()
     return line
+  }
+
+  /** The typed text an accepted completion replaces: the line before the caret, keeping indentation intact. */
+  private fun getReplacePrefix(editor: VimEditor): String {
+    val lineStartOffset = editor.getLineStartOffset(editor.currentCaret().getLine())
+    return editor.getText(lineStartOffset, editor.currentCaret().offset).trimStart()
   }
 
   override val type: Command.Type

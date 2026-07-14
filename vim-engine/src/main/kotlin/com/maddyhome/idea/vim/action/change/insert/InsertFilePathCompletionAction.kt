@@ -40,7 +40,7 @@ class InsertFilePathCompletionAction : VimActionHandler.SingleExecution() {
 
     val line = getLineToMatch(editor)
     val lines = getMatchingLines(context, line)
-    injector.lookupManager.showCustomLookup(editor, lines)
+    injector.lookupManager.showCustomLookup(editor, lines, getReplacePrefix(editor))
     return true
   }
 
@@ -55,6 +55,11 @@ class InsertFilePathCompletionAction : VimActionHandler.SingleExecution() {
     val lineStartOffset = editor.getLineStartOffset(editor.currentCaret().getLine())
     val line = editor.getText(lineStartOffset, editor.currentCaret().offset).trim()
     return line
+  }
+
+  private fun getReplacePrefix(editor: VimEditor): String {
+    val lineStartOffset = editor.getLineStartOffset(editor.currentCaret().getLine())
+    return editor.getText(lineStartOffset, editor.currentCaret().offset).trimStart()
   }
 
   override val type: Command.Type

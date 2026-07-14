@@ -10,7 +10,14 @@ package com.maddyhome.idea.vim.api
 
 interface VimLookupManager {
   fun getActiveLookup(editor: VimEditor): IdeLookup?
-  fun showCustomLookup(editor: VimEditor, values: List<String>)
+
+  /**
+   * Shows a lookup with the given [values].
+   *
+   * [prefix] is the already-typed text that each accepted value replaces (the completion "leader"). When a value is
+   * accepted it replaces the [prefix] before the caret rather than being appended after it.
+   */
+  fun showCustomLookup(editor: VimEditor, values: List<String>, prefix: String)
 }
 
 interface IdeLookup {
