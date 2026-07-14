@@ -28,6 +28,7 @@ interface VimFile {
   fun closeFile(number: Int, context: ExecutionContext)
   fun selectFile(count: Int, context: ExecutionContext): Boolean
   fun selectNextFile(count: Int, context: ExecutionContext)
+  fun createFile(filename: String, context: ExecutionContext, content: String?, editor: VimEditor)
 
   /**
    * Opens a file by name or path.

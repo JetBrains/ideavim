@@ -11,16 +11,15 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 import com.intellij.vim.annotations.ExCommand
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getText
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ranges.Range
+import com.maddyhome.idea.vim.ex.ranges.toTextRange
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
  * see "h :write"
- *
- * XXX: [argument] is currently unused. When `:write {file}` support is added, expand [argument] using
- * [VimPathExpansion.expandPath] to support environment variables (`$VAR`, `${VAR}`) and tilde (`~`, `~/`).
  */
 @ExCommand(command = "w[rite]")
 data class WriteCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
@@ -34,7 +33,25 @@ data class WriteCommand(val range: Range, val modifier: CommandModifier, val arg
     context: ExecutionContext,
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
-    injector.file.saveFile(editor, context)
+    if (argument.isEmpty()) {
+      injector.file.saveFile(editor, context)
+      return ExecutionResult.Success
+    }
+    val path = injector.pathExpansion.expandPath(argument.trim())
+    val fileExists = injector.file.findFile(path, context) != null
+    if (modifier != CommandModifier.BANG && fileExists) {
+      injector.messages.showMessage(editor, "E37: File exists")
+      return ExecutionResult.Error
+    }
+    injector.file.createFile(path, context, getText(editor), editor)
     return ExecutionResult.Success
+  }
+
+  private fun getText(editor: VimEditor): String {
+    if (range.size() != 0) {
+      val tr = getLineRange(editor).toTextRange(editor)
+      return editor.getText(tr.startOffset, tr.endOffset)
+    }
+    return editor.text().toString()
   }
 }

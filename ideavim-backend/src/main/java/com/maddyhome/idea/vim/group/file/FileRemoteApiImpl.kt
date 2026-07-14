@@ -58,7 +58,7 @@ internal class FileRemoteApiImpl : FileRemoteApi {
 
   override suspend fun openFile(filename: String, projectId: ProjectId?, focusEditor: Boolean): String? = onEdt {
     val project = projectId?.findProjectOrNull() ?: return@onEdt "No project found"
-    var file = findFile(filename, project) ?: createFile(filename, project)
+    val file = findFile(filename, project) ?: createFile(filename, project)
 
     if (file != null) {
       FileEditorManager.getInstance(project)
@@ -155,6 +155,20 @@ internal class FileRemoteApiImpl : FileRemoteApi {
     FileCompletionHelper.listMatchingFiles(pathPrefix, basePath)
   }
 
+  override suspend fun createFile(
+    filename: String,
+    projectId: ProjectId?,
+    content: String?,
+  ) {
+    val project = projectId?.findProjectOrNull() ?: return
+    onEdt {
+      WriteCommandAction.runWriteCommandAction(project) {
+        val file = createFile(filename, project)
+        content?.toByteArray()?.let { file?.setBinaryContent(it) }
+      }
+    }
+  }
+
   // ======================== Private helpers ========================
   private fun findFile(filename: String, project: Project): VirtualFile? {
     if (filename.startsWith("~/") || filename.startsWith("~\\")) {
@@ -245,6 +259,7 @@ internal class FileRemoteApiImpl : FileRemoteApi {
         val home = System.getProperty("user.home")
         Path(home, filename.substring(2))
       }
+
       Path(filename).isAbsolute -> Path(filename)
       else -> {
         val basePath = project.basePath ?: return null
