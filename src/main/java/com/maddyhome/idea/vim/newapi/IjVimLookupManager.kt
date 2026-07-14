@@ -11,8 +11,11 @@ package com.maddyhome.idea.vim.newapi
 import com.intellij.codeInsight.lookup.Lookup
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.codeInsight.lookup.LookupEvent
+import com.intellij.codeInsight.lookup.LookupListener
 import com.intellij.codeInsight.lookup.LookupManager
 import com.intellij.openapi.actionSystem.IdeActions
+import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.actionSystem.EditorActionManager
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.IdeLookup
@@ -28,11 +31,25 @@ class IjVimLookupManager : VimLookupManager {
   override fun showCustomLookup(
     editor: VimEditor,
     values: List<String>,
+    prefix: String,
   ) {
-    val items: Array<LookupElement> =
-      values.map { LookupElementBuilder.create(it) }.toTypedArray()
-    val lookup = editor.ij.project?.let { LookupManager.getInstance(it) }
-    lookup?.showLookup(editor.ij, *items)
+    val ijEditor = editor.ij
+    val project = ijEditor.project ?: return
+    val prefixStart = ijEditor.caretModel.offset - prefix.length
+
+    val items: Array<LookupElement> = values.map { LookupElementBuilder.create(it) }.toTypedArray()
+
+    val lookup = LookupManager.getInstance(project).showLookup(ijEditor, *items) ?: return
+
+    lookup.addLookupListener(object : LookupListener {
+      override fun itemSelected(event: LookupEvent) {
+        val value = event.item?.lookupString ?: return
+        WriteCommandAction.runWriteCommandAction(project) {
+          ijEditor.document.replaceString(prefixStart, ijEditor.caretModel.offset, value)
+          ijEditor.caretModel.moveToOffset(prefixStart + value.length)
+        }
+      }
+    })
   }
 }
 

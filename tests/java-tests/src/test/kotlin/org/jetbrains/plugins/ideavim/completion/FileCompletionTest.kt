@@ -228,6 +228,22 @@ class FileCompletionTest : VimJavaTestCase() {
     )
   }
 
+  @Test
+  fun `test Ctrl-Y accepts the selected file completion`() {
+    createFooFiles()
+    configureByText("$tempPath/foo${c}\n")
+    typeText("i")
+    typeText("<C-X><C-F>")
+    val selected = selectedLookupString()
+    assertNotNull(selected, "There should be a selected item to accept")
+
+    typeText("<C-Y>")
+
+    assertNull(activeLookup(), "Lookup should close after accepting with <C-Y>")
+    assertState(Mode.INSERT)
+    assertState("$selected${c}\n")
+  }
+
   private fun activeLookup(): LookupImpl? {
     var lookup: LookupImpl? = null
     ApplicationManager.getApplication().invokeAndWait {
