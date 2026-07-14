@@ -61,6 +61,13 @@ dependencies {
 
     bundledModule("intellij.platform.kernel.backend")
     bundledModule("intellij.platform.rpc.backend")
+    // This module shares its sources with :ideavim-backend-bookmarks, so it references
+    // com.intellij.ide.bookmark.providers.* too and needs those classes on the compile classpath.
+    // On 2026.2+ (EAP) they live in the separate intellij.platform.bookmarks module; on 2026.1 and
+    // earlier they are in platform core (and the separate module id does not resolve). The runtime
+    // descriptor here still declares no bookmarks dependency, so on 2026.2+ this variant simply does
+    // not register - BookmarkRemoteApiProvider guards on class resolvability from its own classloader.
+    if ("EAP-SNAPSHOT" in ideaVersion) bundledModule("intellij.platform.bookmarks")
   }
 }
 

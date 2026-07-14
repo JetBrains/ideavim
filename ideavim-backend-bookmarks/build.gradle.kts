@@ -52,6 +52,11 @@ dependencies {
 
     bundledModule("intellij.platform.kernel.backend")
     bundledModule("intellij.platform.rpc.backend")
+    // On 2026.2+ (EAP) bookmarks was extracted from the platform monolith into a separate module,
+    // so com.intellij.ide.bookmark.providers.* (LineBookmarkProvider, createBookmark, ...) is only on
+    // the compile classpath when we depend on it explicitly. On 2026.1 and earlier those classes are in
+    // platform core and the separate module id does not resolve, so we must NOT declare it there.
+    if ("EAP-SNAPSHOT" in ideaVersion) bundledModule("intellij.platform.bookmarks")
   }
 }
 
