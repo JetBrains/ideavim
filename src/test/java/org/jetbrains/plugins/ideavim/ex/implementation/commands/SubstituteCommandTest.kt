@@ -1539,4 +1539,30 @@ class SubstituteCommandTest : VimTestCase() {
     assertPluginError(true)
     assertPluginErrorMessage("E486: Pattern not found: missing")
   }
+
+  @Test
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test substitute all occurrences on tab-indented line with g flag`() {
+    // Regression test: matches after the first must not be skipped on tab-indented lines. The bug was that the resume
+    // position came from a tab-expanded logical column but was reused as a raw character offset by the next search.
+    configureByText(
+      "public class TestMapper\n" +
+        "{\n" +
+        "\tpublic static Cinema ToCinema(this CinemaEntity cinemaEntity)\n" +
+        "\t{\n" +
+        "\t\treturn new Cinema(new Cinema.CinemaConstructModel\n" +
+        "\t}\n" +
+        "}\n",
+    )
+    enterCommand("%s/Cinema/Other/g")
+    assertState(
+      "public class TestMapper\n" +
+        "{\n" +
+        "\tpublic static Other ToOther(this OtherEntity cinemaEntity)\n" +
+        "\t{\n" +
+        "\t\treturn new Other(new Other.OtherConstructModel\n" +
+        "\t}\n" +
+        "}\n",
+    )
+  }
 }
