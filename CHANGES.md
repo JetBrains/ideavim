@@ -23,6 +23,8 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+## 2.43.0, 2026-07-14
+
 ## To Be Released
 
 ### Features:
