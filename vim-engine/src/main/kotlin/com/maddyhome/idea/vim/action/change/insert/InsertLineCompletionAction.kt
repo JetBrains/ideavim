@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
+import com.maddyhome.idea.vim.state.mode.CtrlXCompletionMode
 
 @CommandOrMotion(keys = ["<C-L>"], modes = [Mode.INSERT])
 class InsertLineCompletionAction : VimActionHandler.SingleExecution() {
@@ -26,10 +27,10 @@ class InsertLineCompletionAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    if (injector.vimState.ctrlXCompletionMode == com.maddyhome.idea.vim.state.mode.CtrlXCompletionMode.NONE) {
+    if (injector.vimState.ctrlXCompletionMode == CtrlXCompletionMode.NONE) {
       return false
     }
-    injector.vimState.ctrlXCompletionMode = com.maddyhome.idea.vim.state.mode.CtrlXCompletionMode.WHOLE_LINE
+    injector.vimState.ctrlXCompletionMode = CtrlXCompletionMode.WHOLE_LINE
 
     val lookup = injector.lookupManager.getActiveLookup(editor)
     if (lookup != null) {
