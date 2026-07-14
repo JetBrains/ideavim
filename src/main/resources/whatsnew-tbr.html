@@ -388,9 +388,14 @@
         and motions for you.</p>
       <pre><span class="str">Plug 'kana/vim-textobj-user'</span>
 
-<span class="cm">" declare objects from ~/.ideavimrc with</span>
-<span class="cm">" textobj#user#plugin({name}, {specs})</span>
-<span class="cm">" e.g. map 'ad' / 'id' to select an ISO date like 2013-03-16</span></pre>
+<span class="cm">" a spec maps a name to a pattern and the keys that select it</span>
+call textobj#user#plugin(<span class="str">'datetime'</span>, {
+\   <span class="str">'date'</span>: {
+\     <span class="str">'pattern'</span>: <span class="str">'\&lt;\d\d\d\d-\d\d-\d\d\&gt;'</span>,
+\     <span class="str">'select'</span>: [<span class="str">'ad'</span>, <span class="str">'id'</span>],
+\   },
+\ })
+<span class="cm">" now 'dad' deletes a date like 2013-03-16, and 'cid' changes it</span></pre>
       <p class="note">Objects support <code>select-a</code>/<code>select-i</code>, next/previous motions, a
         charwise/linewise/blockwise <code>region-type</code>, and remappable
         <code>&lt;Plug&gt;</code> mappings.</p>
