@@ -378,32 +378,45 @@
     </p>
     <p class="out">Here's what landed in <span class="v">__VERSION__</span>.</p>
 
-    <!-- indentwise — the star -->
+    <!-- textobj-user — the star -->
     <div class="section">
-      <p class="kicker">new plugin · motions</p>
-      <h2>indentwise — move by indentation</h2>
-      <p>The bundled <strong>indentwise</strong> extension adds motions that navigate by indentation level
-        instead of by line — jump to the next line that's less indented, more indented, or sits at the same
-        depth, or hop straight to the edges of the block you're in.</p>
-      <pre><span class="str">Plug 'jeetsukumaran/vim-indentwise'</span>
+      <p class="kicker">new plugin · text objects</p>
+      <h2>textobj-user — build your own text objects</h2>
+      <p>The bundled <strong>textobj-user</strong> extension lets you declare custom text objects straight from
+        your <code>~/.ideavimrc</code> — no plugin code required. Describe a pattern (or a head/tail delimiter
+        pair) and the keys that select it, and IdeaVim wires up the matching <kbd>i</kbd>/<kbd>a</kbd> objects
+        and motions for you.</p>
+      <pre><span class="str">Plug 'kana/vim-textobj-user'</span>
 
-<span class="key">[-</span>  <span class="key">]-</span>    <span class="cm">" previous / next line of LESSER indent</span>
-<span class="key">[+</span>  <span class="key">]+</span>    <span class="cm">" previous / next line of GREATER indent</span>
-<span class="key">[=</span>  <span class="key">]=</span>    <span class="cm">" previous / next line of EQUAL indent</span>
-<span class="key">[%</span>  <span class="key">]%</span>    <span class="cm">" start / end of the current indent block</span></pre>
-      <p class="note">They work as operator motions too — try <kbd>d]=</kbd> to delete down to the next
-        line at the same indent.</p>
+<span class="cm">" declare objects from ~/.ideavimrc with</span>
+<span class="cm">" textobj#user#plugin({name}, {specs})</span>
+<span class="cm">" e.g. map 'ad' / 'id' to select an ISO date like 2013-03-16</span></pre>
+      <p class="note">Objects support <code>select-a</code>/<code>select-i</code>, next/previous motions, a
+        charwise/linewise/blockwise <code>region-type</code>, and remappable
+        <code>&lt;Plug&gt;</code> mappings.</p>
     </div>
 
-    <!-- U command -->
+    <!-- forced motion -->
     <div class="section">
-      <p class="kicker">editing · undo</p>
-      <h2>Undo a whole line at once</h2>
-      <p>The classic <code>U</code> command is now implemented — it undoes every recent change you made to the
-        last-edited line in one stroke. Pressing <code>U</code> again redoes them, so it doubles as a quick
-        before/after toggle.</p>
-      <pre><span class="key">U</span>   <span class="cm">" undo all latest changes on the most recently changed line</span>
-<span class="key">U</span>   <span class="cm">" press again to redo them</span></pre>
+      <p class="kicker">operators · motions</p>
+      <h2>Force a motion's shape mid-command</h2>
+      <p>Slot <kbd>v</kbd>, <kbd>V</kbd>, or <kbd>&lt;C-V&gt;</kbd> between an operator and its motion to force
+        the range's shape. <kbd>v</kbd> forces charwise and flips the motion's inclusive/exclusive nature,
+        <kbd>V</kbd> forces linewise, and <kbd>&lt;C-V&gt;</kbd> forces blockwise.</p>
+      <pre><span class="key">dvw</span>       <span class="cm">" charwise — includes the landing char</span>
+<span class="key">dv$</span>       <span class="cm">" charwise — leaves the last char</span>
+<span class="key">dVe</span>       <span class="cm">" linewise — deletes the whole line</span>
+<span class="key">d&lt;C-V&gt;j</span>   <span class="cm">" blockwise — deletes a vertical block</span></pre>
+    </div>
+
+    <!-- insert-mode completion -->
+    <div class="section">
+      <p class="kicker">insert mode · completion</p>
+      <h2>Line and file-path completion with CTRL-X</h2>
+      <p>Vim's <kbd>&lt;C-X&gt;</kbd> completion submode arrives in Insert mode. Start it with
+        <kbd>&lt;C-X&gt;</kbd>, then complete whole lines from the current buffer or file paths from disk.</p>
+      <pre><span class="key">&lt;C-X&gt;&lt;C-L&gt;</span>   <span class="cm">" complete the current line from matching lines</span>
+<span class="key">&lt;C-X&gt;&lt;C-F&gt;</span>   <span class="cm">" complete a file path from the file system</span></pre>
     </div>
 
     <!-- Also worth a look -->
@@ -411,15 +424,15 @@
       <p class="kicker">also worth a look</p>
       <div class="grid">
         <div class="mini">
-          <h3>Mouse, your way</h3>
-          <p>The new <code>'mouse'</code> option (default <code>nvi</code>) decides which modes a click moves
-            the caret in — a flag per mode (<code>n</code>/<code>v</code>/<code>i</code>/<code>c</code>),
-            <code>a</code> for all, and <code>r</code> to dismiss the more-prompt on click.</p>
+          <h3>Jump matches while searching</h3>
+          <p>With <code>incsearch</code> on, press <kbd>&lt;C-G&gt;</kbd> to jump to the next match and
+            <kbd>&lt;C-T&gt;</kbd> to the previous one — without leaving the <kbd>/</kbd> or <kbd>?</kbd>
+            prompt.</p>
         </div>
         <div class="mini">
-          <h3>NERDTree, out of the way</h3>
-          <p>Set <code>let g:NERDTreeQuitOnOpen = 1</code> and the project tree closes itself the moment you
-            open a file with <kbd>o</kbd>.</p>
+          <h3>Your .ideavimrc, anywhere</h3>
+          <p>Set the <code>IDEA_VIM_CUSTOM_VIMRC</code> environment variable to load your
+            <code>.ideavimrc</code> from a custom path instead of the default locations.</p>
         </div>
       </div>
     </div>
@@ -428,14 +441,13 @@
     <div class="section">
       <p class="kicker">polish &amp; fixes</p>
       <ul>
-        <li><strong>Undo replays inside macros</strong> — recording <kbd>dwu</kbd> (delete a word, then undo)
-          and replaying it with <kbd>@a</kbd> now works as recorded.
+        <li><strong>No more stray Visual mode after a refactor</strong> — with
+          <code>idearefactormode=keep</code>, a rename (or similar action) no longer leaves you in Visual mode;
+          the mode you were in beforehand is restored.
         </li>
-        <li><strong>Autocmds run in the right mode</strong> — Normal-mode events like <code>BufWritePre</code> no
-          longer fire while you're still in Insert mode; IdeaVim returns to Normal first.
-        </li>
-        <li><strong>Empty <code>'guicursor'</code> behaves</strong> — an empty value now falls back to the
-          default IDE caret instead of breaking it.
+        <li><strong>Trailing <code>%</code> respects your range</strong> — running a command on a Visual
+          selection with a <code>%</code> appended (e.g. <code>:'&lt;,'&gt;%d</code>) no longer expands to the
+          whole file; the <code>%</code> is now ignored, matching Vim.
         </li>
       </ul>
     </div>
