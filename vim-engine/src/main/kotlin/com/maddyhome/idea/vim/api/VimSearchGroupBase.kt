@@ -906,16 +906,9 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     }
 
     if (doAll && matchRange.startOffset != matchRange.endOffset) {
-      if (didReplace) {
-        // if there was a replacement, we start next search from where the new string ends
-        val endPosition = editor.offsetToBufferPosition(matchRange.startOffset + finalMatch.length)
-        newLine = endPosition.line
-        newColumn = endPosition.column
-      } else {
-        // no replacement, so start next search where the match ended
-        val endPosition = editor.offsetToVisualPosition(matchRange.endOffset)
-        newColumn = endPosition.column
-      }
+      val nextSearchOffset = if (didReplace) matchRange.startOffset + finalMatch.length else matchRange.endOffset
+      newLine = editor.offsetToBufferPosition(nextSearchOffset).line
+      newColumn = nextSearchOffset - editor.getLineStartOffset(newLine)
     } else {
       newColumn = 0
       newLine++
@@ -1155,7 +1148,10 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     ) {
       // don't accept alphanumeric for separator
       if (exarg.first().isLetter()) {
-        if (!preview) injector.messages.showStatusBarMessage(null, "E146: Regular expressions can't be delimited by letters")
+        if (!preview) injector.messages.showStatusBarMessage(
+          null,
+          "E146: Regular expressions can't be delimited by letters"
+        )
         return null
       }
 
@@ -1269,7 +1265,10 @@ abstract class VimSearchGroupBase : VimSearchGroup {
         trailingOptionsEndIndex++
       }
       if (count <= 0 && doError) {
-        if (!preview) injector.messages.showStatusBarMessage(null, injector.messages.message("command.substitute.zero.count"))
+        if (!preview) injector.messages.showStatusBarMessage(
+          null,
+          injector.messages.message("command.substitute.zero.count")
+        )
         return null
       }
       line1 = line2
@@ -1279,14 +1278,20 @@ abstract class VimSearchGroupBase : VimSearchGroup {
     // check for trailing command or garbage
     if (trailingOptionsEndIndex < exarg.length && exarg[trailingOptionsEndIndex] != '"') {
       // if not end-of-line or comment
-      if (!preview) injector.messages.showStatusBarMessage(null, injector.messages.message("command.substitute.trailing.characters"))
+      if (!preview) injector.messages.showStatusBarMessage(
+        null,
+        injector.messages.message("command.substitute.trailing.characters")
+      )
       return null
     }
 
     // check for trailing command or garbage
     if (trailingOptionsEndIndex < exarg.length && exarg[trailingOptionsEndIndex] != '"') {
       // if not end-of-line or comment
-      if (!preview) injector.messages.showStatusBarMessage(null, injector.messages.message("command.substitute.trailing.characters"))
+      if (!preview) injector.messages.showStatusBarMessage(
+        null,
+        injector.messages.message("command.substitute.trailing.characters")
+      )
       return null
     }
 
