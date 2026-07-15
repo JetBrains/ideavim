@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.api.VimDigraphGroup
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimEditorGroup
 import com.maddyhome.idea.vim.api.VimEnabler
+import com.maddyhome.idea.vim.api.VimExternalOpener
 import com.maddyhome.idea.vim.api.VimExtensionRegistrator
 import com.maddyhome.idea.vim.api.VimFile
 import com.maddyhome.idea.vim.api.VimInjector
@@ -230,6 +231,8 @@ internal class IjVimInjector : VimInjectorBase() {
   override val editorGroup: VimEditorGroup
     get() = service()
   override val pluginActivator: VimPluginActivator
+    get() = service()
+  override val externalOpener: VimExternalOpener
     get() = service()
 
   override val autoCmd: AutoCmdService get() = service<AutoCmdService>()

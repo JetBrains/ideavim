@@ -167,6 +167,9 @@ interface VimInjector {
   val pathExpansion: VimPathExpansion
 
   val pluginActivator: VimPluginActivator
+
+  /** Opens the URL or file under the cursor for the `gx` command. See [VimExternalOpener]. */
+  val externalOpener: VimExternalOpener
 }
 
 lateinit var injector: VimInjector
