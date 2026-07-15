@@ -21,10 +21,11 @@ import org.mockito.kotlin.verify
  * Behavior specs for the `gx` command (VIM-1341) implemented by
  * [com.maddyhome.idea.vim.action.motion.search.GotoUrlAction].
  *
- * `gx` opens the URL under the cursor in an external browser. Because the launch is a platform side
- * effect, the command routes through the [VimExternalOpener] service; these tests replace it with
- * a mock (see [MockTestCase.mockService]) and assert which URL `gx` resolved, without ever opening a
- * real browser.
+ * `gx` opens the URL under the cursor with an external program. Because the launch is a platform
+ * side effect, the command routes through the [VimExternalOpener] service; these tests replace it
+ * with a mock (see [MockTestCase.mockService]) and assert which target and viewer `gx` resolved,
+ * without ever launching anything. The viewer argument is the value of `g:netrw_browsex_viewer`
+ * (or `null` for the OS default handler).
  */
 class GxActionTest : MockTestCase() {
 
@@ -35,7 +36,7 @@ class GxActionTest : MockTestCase() {
 
     typeText("gx")
 
-    verify(handler).open(eq("https://jetbrains.com"))
+    verify(handler).open(eq("https://jetbrains.com"), eq(null))
   }
 
   @Test
@@ -45,7 +46,7 @@ class GxActionTest : MockTestCase() {
 
     typeText("gx")
 
-    verify(handler).open(eq("https://jetbrains.com"))
+    verify(handler).open(eq("https://jetbrains.com"), eq(null))
   }
 
   @Test
@@ -55,7 +56,7 @@ class GxActionTest : MockTestCase() {
 
     typeText("gx")
 
-    verify(handler).open(eq("https://jetbrains.com"))
+    verify(handler).open(eq("https://jetbrains.com"), eq(null))
   }
 
   @Test
@@ -65,7 +66,7 @@ class GxActionTest : MockTestCase() {
 
     typeText("gx")
 
-    verify(handler).open(eq("www.jetbrains.com"))
+    verify(handler).open(eq("www.jetbrains.com"), eq(null))
   }
 
   @Test
@@ -75,7 +76,7 @@ class GxActionTest : MockTestCase() {
 
     typeText("gx")
 
-    verify(handler).open(eq("https://jetbrains.com/idea/download?os=mac"))
+    verify(handler).open(eq("https://jetbrains.com/idea/download?os=mac"), eq(null))
   }
 
   @Test
@@ -85,7 +86,7 @@ class GxActionTest : MockTestCase() {
 
     typeText("gx")
 
-    verify(handler).open(eq("ssh://git@github.com/JetBrains/ideavim.git"))
+    verify(handler).open(eq("ssh://git@github.com/JetBrains/ideavim.git"), eq(null))
   }
 
   @Test
@@ -95,7 +96,7 @@ class GxActionTest : MockTestCase() {
 
     typeText("gx")
 
-    verify(handler).open(eq("vscode://file/Users/me/project"))
+    verify(handler).open(eq("vscode://file/Users/me/project"), eq(null))
   }
 
   @Test
@@ -105,7 +106,7 @@ class GxActionTest : MockTestCase() {
 
     typeText("gx")
 
-    verify(handler, never()).open(any())
+    verify(handler, never()).open(any(), any())
   }
 
   @Test
@@ -120,7 +121,7 @@ class GxActionTest : MockTestCase() {
 
     assertState(text)
     assertMode(Mode.NORMAL())
-    verify(handler, never()).open(any())
+    verify(handler, never()).open(any(), any())
   }
 
   @Test
@@ -134,6 +135,51 @@ class GxActionTest : MockTestCase() {
 
     assertState(text)
     assertMode(Mode.NORMAL())
-    verify(handler).open(eq("https://jetbrains.com"))
+    verify(handler).open(eq("https://jetbrains.com"), eq(null))
+  }
+
+  @Test
+  fun `test gx passes g netrw_browsex_viewer as the viewer`() {
+    val handler = mockService(VimExternalOpener::class.java)
+    configureByText("See ${c}https://jetbrains.com")
+    enterCommand("let g:netrw_browsex_viewer = 'firefox'")
+
+    typeText("gx")
+
+    verify(handler).open(eq("https://jetbrains.com"), eq("firefox"))
+  }
+
+  @Test
+  fun `test gx passes a multi-word viewer command`() {
+    val handler = mockService(VimExternalOpener::class.java)
+    configureByText("See ${c}https://jetbrains.com")
+    enterCommand("let g:netrw_browsex_viewer = 'open -a Safari'")
+
+    typeText("gx")
+
+    verify(handler).open(eq("https://jetbrains.com"), eq("open -a Safari"))
+  }
+
+  @Test
+  fun `test gx treats a dash viewer as the default handler`() {
+    val handler = mockService(VimExternalOpener::class.java)
+    configureByText("See ${c}https://jetbrains.com")
+    enterCommand("let g:netrw_browsex_viewer = '-'")
+
+    typeText("gx")
+
+    // netrw uses "-" to mean "fall back to the default file handler".
+    verify(handler).open(eq("https://jetbrains.com"), eq(null))
+  }
+
+  @Test
+  fun `test gx treats an empty viewer as the default handler`() {
+    val handler = mockService(VimExternalOpener::class.java)
+    configureByText("See ${c}https://jetbrains.com")
+    enterCommand("let g:netrw_browsex_viewer = ''")
+
+    typeText("gx")
+
+    verify(handler).open(eq("https://jetbrains.com"), eq(null))
   }
 }
