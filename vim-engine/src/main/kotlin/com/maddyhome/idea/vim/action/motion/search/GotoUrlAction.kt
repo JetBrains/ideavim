@@ -35,8 +35,21 @@ class GotoUrlAction : VimActionHandler.ForEachCaret() {
   ): Boolean {
     val url = findUrl(editor, caret) ?: return false
     injector.jumpService.saveJumpLocation(editor)
-    injector.externalOpener.open(url)
+    injector.externalOpener.open(url, browsexViewer())
     return true
+  }
+
+  /**
+   * The custom viewer command from `g:netrw_browsex_viewer`, or `null` to use the OS default handler.
+   *
+   * As in Vim's netrw, the special value `"-"` (and an empty/blank value) means "use the default
+   * handler", so it is treated the same as if the variable were unset.
+   */
+  private fun browsexViewer(): String? {
+    val viewer = injector.variableService.getGlobalVariableValue("netrw_browsex_viewer")
+      ?.toVimString()?.value
+      ?.trim()
+    return viewer?.takeIf { it.isNotEmpty() && it != "-" }
   }
 
   /**

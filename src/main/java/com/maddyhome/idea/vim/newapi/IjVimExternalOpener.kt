@@ -23,20 +23,26 @@ import com.maddyhome.idea.vim.api.VimExternalOpener
  * `vim.ui.open` / `_get_open_cmd()`
  */
 internal class IjVimExternalOpener : VimExternalOpener {
-  override fun open(target: String) {
-    val command = openCommand()
+  override fun open(target: String, viewer: String?) {
+    val command = if (viewer != null) viewerCommand(viewer) + target else osOpenCommand()?.plus(target)
     if (command == null) {
       LOG.warn("gx: no external open handler found for this platform")
       return
     }
     try {
-      GeneralCommandLine(command + target).createProcess()
+      GeneralCommandLine(command).createProcess()
     } catch (e: ExecutionException) {
       LOG.warn("gx: failed to open '$target'", e)
     }
   }
 
-  private fun openCommand(): List<String>? = when {
+  /**
+   * Splits a `g:netrw_browsex_viewer` value into its executable and arguments. `gx` then appends the
+   * target as the final argument, matching netrw's `viewer viewopt fname`.
+   */
+  private fun viewerCommand(viewer: String): List<String> = viewer.trim().split(WHITESPACE)
+
+  private fun osOpenCommand(): List<String>? = when {
     SystemInfo.isMac -> listOf("open")
     SystemInfo.isWindows -> listOf("cmd.exe", "/c", "start", "")
     isExecutable("xdg-open") -> listOf("xdg-open")
@@ -51,5 +57,6 @@ internal class IjVimExternalOpener : VimExternalOpener {
 
   companion object {
     private val LOG = logger<IjVimExternalOpener>()
+    private val WHITESPACE = Regex("""\s+""")
   }
 }
