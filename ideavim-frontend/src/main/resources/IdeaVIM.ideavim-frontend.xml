@@ -131,6 +131,8 @@
                         serviceImplementation="com.maddyhome.idea.vim.thinapi.IjVimHighlightingService"/>
     <applicationService serviceInterface="com.maddyhome.idea.vim.api.VimRedrawService"
                         serviceImplementation="com.maddyhome.idea.vim.group.IjVimRedrawService"/>
+    <applicationService serviceInterface="com.maddyhome.idea.vim.api.VimExternalOpener"
+                        serviceImplementation="com.maddyhome.idea.vim.newapi.IjVimExternalOpener"/>
 
     <!-- Frontend services (accessed through IjVimInjector, no backend dependencies) -->
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.ScrollGroup"
