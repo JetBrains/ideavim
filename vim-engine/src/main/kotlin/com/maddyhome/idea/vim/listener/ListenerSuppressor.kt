@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.listener
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import com.maddyhome.idea.vim.helper.StrictMode
 import java.io.Closeable
 
 /**
@@ -68,11 +67,6 @@ sealed class VimListenerSuppressor {
     LOG.trace("Suppressor unlock")
     LOG.trace { injector.application.currentStackTrace() }
     caretListenerSuppressor--
-  }
-
-  fun reset() {
-    StrictMode.assert(caretListenerSuppressor == 0, "Listener is not zero")
-    caretListenerSuppressor = 0
   }
 
   val isNotLocked: Boolean

@@ -715,7 +715,7 @@ object VimListenerManager {
       }
       //endregion
 
-      if (SelectionVimListenerSuppressor.isNotLocked) {
+      if (SelectionVimListenerSuppressor.isNotLocked && !MouseEventsDataHolder.mouseDragging) {
         logger.debug("Adjust non vim selection change")
         IdeaSelectionControl.controlNonVimSelectionChange(editor)
       }
@@ -740,7 +740,6 @@ object VimListenerManager {
    */
   // TODO: Can we merge this with ComponentMouseListener to fully handle all mouse actions in one place?
   private object EditorMouseHandler : EditorMouseListener, EditorMouseMotionListener {
-    private var mouseDragging = false
     private var cutOffFixed = false
 
     override fun mouseDragged(e: EditorMouseEvent) {
@@ -750,7 +749,7 @@ object VimListenerManager {
 
       clearFirstSelectionEvents(e)
 
-      if (mouseDragging && caret.hasSelection()) {
+      if (MouseEventsDataHolder.mouseDragging && caret.hasSelection()) {
         /**
          * We force the bar caret while dragging because it matches IntelliJ's selection model better.
          * * Vim's drag selection is based on character bounding boxes. When 'selection' is set to "inclusive" (the
@@ -815,10 +814,7 @@ object VimListenerManager {
       if (MouseEventsDataHolder.dragEventCount > 0) {
         logger.debug("Mouse dragging")
         VimVisualTimer.swingTimer?.stop()
-        if (!mouseDragging) {
-          SelectionVimListenerSuppressor.lock()
-        }
-        mouseDragging = true
+        MouseEventsDataHolder.mouseDragging = true
 
         val caret = e.editor.caretModel.primaryCaret
         if (onLineEnd(caret)) {
@@ -844,7 +840,7 @@ object VimListenerManager {
         return
       }
       MouseEventsDataHolder.dragEventCount = MouseEventsDataHolder.allowedSkippedDragEvents
-      SelectionVimListenerSuppressor.reset()
+      MouseEventsDataHolder.mouseDragging = false
     }
 
     private fun isMouseMovementAllowed(): Boolean {
@@ -868,11 +864,10 @@ object VimListenerManager {
      */
     override fun mouseReleased(event: EditorMouseEvent) {
       if (event.editor.isIdeaVimDisabledHere) return
-      SelectionVimListenerSuppressor.unlock()
 
       clearFirstSelectionEvents(event)
       MouseEventsDataHolder.dragEventCount = MouseEventsDataHolder.allowedSkippedDragEvents
-      if (mouseDragging) {
+      if (MouseEventsDataHolder.mouseDragging) {
         logger.debug("Release mouse after dragging")
         val editor = event.editor
         SelectionVimListenerSuppressor.lock().use {
@@ -886,7 +881,7 @@ object VimListenerManager {
           editor.updateCaretsVisualAttributes()
         }
 
-        mouseDragging = false
+        MouseEventsDataHolder.mouseDragging = false
         cutOffFixed = false
       }
     }
@@ -1038,6 +1033,11 @@ internal object VimListenerTestObject {
 private object MouseEventsDataHolder {
   const val allowedSkippedDragEvents = 3
   var dragEventCount = allowedSkippedDragEvents
+
+  /**
+   * Ground-truth for "is a mouse drag currently in progress".
+   */
+  var mouseDragging = false
 }
 
 /**
