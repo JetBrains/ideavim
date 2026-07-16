@@ -34,15 +34,19 @@ usual beta standards.
 * [VIM-750](https://youtrack.jetbrains.com/issue/VIM-750) Added the forced motion modifiers [`v`](https://vimhelp.org/motion.txt.html#o_v), [`V`](https://vimhelp.org/motion.txt.html#o_V), and [`CTRL-V`](https://vimhelp.org/motion.txt.html#o_CTRL-V) between an operator and its motion — `v` forces charwise and toggles the motion's inclusive/exclusive nature (e.g. `dvw` includes the landing char, `dv$` leaves the last one), `V` forces linewise (e.g. `dVe` deletes the whole line), and `CTRL-V` forces blockwise (e.g. `d<C-V>j` deletes a vertical block)
 * [VIM-1000](https://youtrack.jetbrains.com/issue/VIM-1000) Added Insert-mode [whole-line completion](https://vimhelp.org/insert.txt.html#i_CTRL-X_CTRL-L) — press `<C-X>` to start `CTRL-X` completion, then `<C-L>` to complete the current line from other matching lines in the buffer
 * [VIM-986](https://youtrack.jetbrains.com/issue/VIM-986) Added Insert-mode [file name completion](https://vimhelp.org/insert.txt.html#i_CTRL-X_CTRL-F) — press `<C-X>` to start `CTRL-X` completion, then `<C-F>` to complete file paths from the file system
+* [VIM-1341](https://youtrack.jetbrains.com/issue/VIM-1341) Added the [`gx`](https://vimhelp.org/pi_netrw.txt.html#netrw-gx) command — press `gx` in Normal mode to open the URL under the caret (e.g. `https://example.com`, or any `scheme://…` such as `ssh://`) with the OS default handler. The program can be overridden with the `g:netrw_browsex_viewer` variable
 
 ### Fixes:
 * [VIM-4265](https://youtrack.jetbrains.com/issue/VIM-4265) Fixed being left in Visual mode after a refactoring (e.g. rename) with `idearefactormode=keep` — the mode active before the action is now restored once the template's selection changes settle
 * [VIM-4270](https://youtrack.jetbrains.com/issue/VIM-4270) Fixed a trailing `%` after an explicit range overriding it — running a command on a Visual selection with a `%` appended (e.g. `:'<,'>%d`) no longer expands to the whole file; the `%` is now ignored to match Vim
+* [VIM-4273](https://youtrack.jetbrains.com/issue/VIM-4273) Fixed `:s///g` skipping matches after the first on tab-indented lines — e.g. `%s/Cinema/Other/g` now replaces every occurrence on a line that starts with tabs
 
 ### Changes:
 * [VIM-2178](https://youtrack.jetbrains.com/issue/VIM-2178) The `multiple-cursors` extension now maps its default shortcuts to match the original [vim-multiple-cursors](https://github.com/terryma/vim-multiple-cursors) plugin: `<C-n>`/`g<C-n>` add the next occurrence (whole word / any match), `<A-n>`/`g<A-n>` select all occurrences in the file, and `<C-x>`/`<C-p>` skip and remove selections. This is a breaking change from the previous `<A-n>`/`g<A-n>`/`<A-x>`/`<A-p>` mappings — set `let g:multi_cursor_use_default_mapping = 0` to disable the defaults and bind the `<Plug>` mappings yourself (for example, back to the old `<A-n>` based keys)
 
 ### Merged PRs:
+* [1913](https://github.com/JetBrains/ideavim/pull/1913) by [1grzyb1](https://github.com/1grzyb1): VIM-1341 Implement gx command
+* [1912](https://github.com/JetBrains/ideavim/pull/1912) by [1grzyb1](https://github.com/1grzyb1): VIM-4273 recalculate next search offset after substitution
 * [1908](https://github.com/JetBrains/ideavim/pull/1908) by [1grzyb1](https://github.com/1grzyb1): VIM-1000 <C-X> completion mode
 * [1906](https://github.com/JetBrains/ideavim/pull/1906) by [1grzyb1](https://github.com/1grzyb1): VIM-750 Implement forced motion operators
 * [1904](https://github.com/JetBrains/ideavim/pull/1904) by [1grzyb1](https://github.com/1grzyb1): VIM-3100 Implement textobj user plugin
