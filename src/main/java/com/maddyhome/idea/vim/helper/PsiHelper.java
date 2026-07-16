@@ -85,6 +85,7 @@ public class PsiHelper {
     if (root instanceof StructureViewTreeElement &&
         ((StructureViewTreeElement)root).getValue() instanceof PsiElement element) {
       int offset;
+      if (element.getTextRange() == null) return;
       if (start) {
         offset = element.getTextRange().getStartOffset();
         if (element.getLanguage().getID().equals("JAVA")) {
