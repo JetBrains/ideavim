@@ -20,10 +20,10 @@ import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
  * Set selection without calling SelectionListener
  */
 fun SelectionModel.vimSetSystemSelectionSilently(start: Int, end: Int) =
-  SelectionVimListenerSuppressor.lock().use { setSelection(start, end) }
+  SelectionVimListenerSuppressor.lock { setSelection(start, end) }
 
 /**
  * Set selection without calling SelectionListener
  */
 fun SelectionModel.vimSetSystemBlockSelectionSilently(start: LogicalPosition, end: LogicalPosition) =
-  SelectionVimListenerSuppressor.lock().use { setBlockSelection(start, end) }
+  SelectionVimListenerSuppressor.lock { setBlockSelection(start, end) }

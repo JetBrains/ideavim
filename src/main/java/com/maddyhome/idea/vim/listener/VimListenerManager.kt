@@ -778,7 +778,7 @@ object VimListenerManager {
 
         if (!cutOffFixed && ComponentMouseListener.cutOffEnd) {
           cutOffFixed = true
-          SelectionVimListenerSuppressor.lock().use {
+          SelectionVimListenerSuppressor.lock {
             if (caret.selectionEnd == e.editor.document.getLineEndOffset(caret.logicalPosition.line) - 1 &&
               caret.leadSelectionOffset == caret.selectionEnd
             ) {
@@ -818,7 +818,7 @@ object VimListenerManager {
 
         val caret = e.editor.caretModel.primaryCaret
         if (onLineEnd(caret)) {
-          SelectionVimListenerSuppressor.lock().use {
+          SelectionVimListenerSuppressor.lock {
             caret.removeSelection()
             caret.forceBarCursor()
           }
@@ -870,7 +870,7 @@ object VimListenerManager {
       if (MouseEventsDataHolder.mouseDragging) {
         logger.debug("Release mouse after dragging")
         val editor = event.editor
-        SelectionVimListenerSuppressor.lock().use {
+        SelectionVimListenerSuppressor.lock {
           val predictedMode = injector.application
             .runReadAction { IdeaSelectionControl.predictMode(editor, SelectionSource.MOUSE) }
           IdeaSelectionControl.controlNonVimSelectionChange(editor, SelectionSource.MOUSE)

@@ -52,7 +52,7 @@ internal class TextObjUserHandler(
 
   private fun applyRange(editor: VimEditor, caret: VimCaret, range: TextRange) {
     val mode = editor.mode
-    SelectionVimListenerSuppressor.lock().use {
+    SelectionVimListenerSuppressor.lock {
       if (mode is Mode.VISUAL) {
         caret.vimSetSelection(range.startOffset, range.endOffset - 1, true)
         if (mode.selectionType != regionType) {

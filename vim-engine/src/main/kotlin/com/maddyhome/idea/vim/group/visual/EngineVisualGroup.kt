@@ -51,7 +51,7 @@ fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: VimCaret) 
       // runAsAllCaretsAction fires the all-carets-action listener pair so split mode's
       // PatchEngineEditorSynchronizer batches its per-event protocol sends into one snapshot.
       // Safe here because the body doesn't run any IDE actions (only Vim-internal caret moves).
-      CaretVisualAttributesListenerSuppressor.lock().use {
+      CaretVisualAttributesListenerSuppressor.lock {
         editor.runAsAllCaretsAction {
           // This will invalidate any secondary carets, but we shouldn't have any of these cached
           // in local variables, etc. Required for correctness: setCaretsAndSelections reuses

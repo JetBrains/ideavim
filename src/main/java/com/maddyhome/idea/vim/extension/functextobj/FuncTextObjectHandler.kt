@@ -46,7 +46,7 @@ internal class FuncTextObjectHandler(private val rangeKind: FuncRange) : Extensi
   }
 
   private fun applyRange(editor: VimEditor, caret: VimCaret, range: TextRange) {
-    SelectionVimListenerSuppressor.lock().use { _ ->
+    SelectionVimListenerSuppressor.lock {
       if (editor.mode is Mode.VISUAL) {
         caret.vimSetSelection(range.startOffset, range.endOffset - 1, true)
       } else {

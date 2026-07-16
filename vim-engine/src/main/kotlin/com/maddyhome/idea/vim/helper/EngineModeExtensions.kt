@@ -21,7 +21,7 @@ import com.maddyhome.idea.vim.state.mode.selectionType
 
 fun VimEditor.exitVisualMode() {
   val selectionType = mode.selectionType ?: SelectionType.CHARACTER_WISE
-  SelectionVimListenerSuppressor.lock().use {
+  SelectionVimListenerSuppressor.lock {
     val clearAllSelections = { nativeCarets().forEach(VimCaret::removeSelection) }
     if (inBlockSelection) {
       // removeSecondaryCarets() fires N-1 caretRemoved events. In split mode those events drive
