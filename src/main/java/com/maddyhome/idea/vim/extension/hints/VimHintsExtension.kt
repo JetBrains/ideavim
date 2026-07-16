@@ -15,17 +15,20 @@ import com.maddyhome.idea.vim.extension.windownavigation.ToolWindowNavEverywhere
 internal class VimHintsExtension : VimExtension {
   private val nerdTreeEverywhere = NerdTreeEverywhere()
   private val toolWindowNavEverywhere = ToolWindowNavEverywhere()
+  private val tableEverywhere = TableEverywhere()
 
   override fun getName() = "VimEverywhere"
 
   override fun init() {
     nerdTreeEverywhere.init()
     toolWindowNavEverywhere.init()
+    tableEverywhere.init()
   }
 
   override fun dispose() {
     nerdTreeEverywhere.dispose()
     toolWindowNavEverywhere.dispose()
+    tableEverywhere.dispose()
     super.dispose()
   }
 }
