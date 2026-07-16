@@ -50,7 +50,7 @@ internal object IdeaRefactorModeHelper {
           }
 
           Action.RemoveSelection -> {
-            SelectionVimListenerSuppressor.lock().use {
+            SelectionVimListenerSuppressor.lock {
               editor.selectionModel.removeSelection()
             }
           }

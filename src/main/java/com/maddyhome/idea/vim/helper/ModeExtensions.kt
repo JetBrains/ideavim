@@ -32,7 +32,7 @@ fun VimEditor.exitSelectMode(adjustCaretPosition: Boolean) {
   // we don't want a delayed selection change handler to override their intent.
   VimVisualTimer.drop()
   mode = mode.returnTo
-  SelectionVimListenerSuppressor.lock().use {
+  SelectionVimListenerSuppressor.lock {
     carets().forEach { vimCaret ->
       val caret = (vimCaret as IjVimCaret).caret
       // NOTE: I think it should be write action, but the exception shows only an absence of the read action

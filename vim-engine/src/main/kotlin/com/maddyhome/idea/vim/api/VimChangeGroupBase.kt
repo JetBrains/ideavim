@@ -866,8 +866,8 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     key: KeyStroke,
     processResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
-    var res: Boolean
-    SelectionVimListenerSuppressor.lock().use {
+    var res = false
+    SelectionVimListenerSuppressor.lock {
       res = processKey(editor, key, processResultBuilder)
       processResultBuilder.addExecutionStep { _, lambdaEditor, lambdaContext ->
         lambdaEditor.exitSelectModeNative(false)

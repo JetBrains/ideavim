@@ -236,7 +236,7 @@ class VimArgTextObjExtension : VimExtension {
         editor.nativeCarets().forEach(Consumer { caret: VimCaret ->
           val range = textObjectHandler.getRange(editor, caret, context, max(1, count0), count0)
           if (range != null) {
-            SelectionVimListenerSuppressor.lock().use { _ ->
+            SelectionVimListenerSuppressor.lock {
               if (editor.mode is VISUAL) {
                 caret.vimSetSelection(range.startOffset, range.endOffset - 1, true)
               } else {

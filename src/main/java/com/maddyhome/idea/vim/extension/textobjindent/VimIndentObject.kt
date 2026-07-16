@@ -263,7 +263,7 @@ class VimIndentObject : VimExtension {
         val count0 = operatorArguments.count0
         editor.editor.getCaretModel().runForEachCaret { caret: Caret ->
           val range = textObjectHandler.getRange(vimEditor, IjVimCaret(caret), context, max(1, count0), count0)
-          SelectionVimListenerSuppressor.lock().use { ignored ->
+          SelectionVimListenerSuppressor.lock {
             if (editor.mode is VISUAL) {
               IjVimCaret(caret).vimSetSelection(range.startOffset, range.endOffset - 1, true)
             } else {

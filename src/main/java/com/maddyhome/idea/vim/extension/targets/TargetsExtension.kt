@@ -521,7 +521,7 @@ internal class TargetsExtension : VimExtension {
       }
       editor.nativeCarets().forEach { caret ->
         val range = computeRange(editor, caret, count) ?: return@forEach
-        SelectionVimListenerSuppressor.lock().use {
+        SelectionVimListenerSuppressor.lock {
           if (editor.mode is Mode.VISUAL) {
             caret.vimSetSelection(range.startOffset, range.endOffset - 1, true)
           } else {

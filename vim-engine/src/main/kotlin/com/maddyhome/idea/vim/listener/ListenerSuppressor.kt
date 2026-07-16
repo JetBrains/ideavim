@@ -11,59 +11,60 @@ package com.maddyhome.idea.vim.listener
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import java.io.Closeable
 
 /**
  * Base class for listener suppressors.
- * Children of this class have an ability to suppress editor listeners
+ * Children of this class have the ability to suppress editor listeners for the duration of a scoped block.
+ *
+ * The suppression is a re-entrant counter, but that counter is never exposed: the only way to acquire it is via
+ * [lock], which takes a block and always releases the count in a `finally`. This makes it impossible to leak a
+ * lock - there is no bare `lock()`/`unlock()` pair a caller could unbalance.
  *
  * E.g.
  * ```
- *  CaretVimListenerSuppressor.lock()
- *  caret.moveToOffset(10) // vim's caret listener will not be executed
- *  CaretVimListenerSuppressor.unlock()
- * ````
- *
- *  Locks can be nested:
+ *  CaretVimListenerSuppressor.lock {
+ *    caret.moveToOffset(10) // vim's caret listener will not be executed
+ *  }
  * ```
- * CaretVimListenerSuppressor.lock()
- * moveCaret(caret) // vim's caret listener will not be executed
- * CaretVimListenerSuppressor.unlock()
+ *
+ * Locks can be nested - the listener is re-enabled only once the outermost block completes:
+ * ```
+ * CaretVimListenerSuppressor.lock {
+ *   moveCaret(caret) // vim's caret listener will not be executed
+ * }
  *
  * fun moveCaret(caret: Caret) {
- *     CaretVimListenerSuppressor.lock()
+ *   CaretVimListenerSuppressor.lock {
  *     caret.moveToOffset(10)
- *     CaretVimListenerSuppressor.unlock()
+ *   }
  * }
- * ```
- *
- * [Locked] implements [Closeable], so you can use try-with-resources block
- *
- * java
- * ```
- * try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
- *     ....
- * }
- * ```
- *
- * Kotlin
- * ```
- * SelectionVimListenerSuppressor.lock().use { ... }
  * ```
  */
 sealed class VimListenerSuppressor {
-  private var caretListenerSuppressor = 0
+  @PublishedApi
+  internal var caretListenerSuppressor = 0
 
-  fun lock(): Locked {
+  /**
+   * Suppress the listener for the duration of [block].
+   */
+  inline fun <T> lock(block: () -> T): T {
+    acquire()
+    try {
+      return block()
+    } finally {
+      release()
+    }
+  }
+
+  @PublishedApi
+  internal fun acquire() {
     LOG.trace("Suppressor lock")
     LOG.trace { injector.application.currentStackTrace() }
     caretListenerSuppressor++
-    return Locked()
   }
 
-  // Please try not to use lock/unlock without scoping
-  // Prefer try-with-resources
-  fun unlock() {
+  @PublishedApi
+  internal fun release() {
     LOG.trace("Suppressor unlock")
     LOG.trace { injector.application.currentStackTrace() }
     caretListenerSuppressor--
@@ -72,12 +73,10 @@ sealed class VimListenerSuppressor {
   val isNotLocked: Boolean
     get() = caretListenerSuppressor == 0
 
-  inner class Locked : Closeable {
-    override fun close(): Unit = unlock()
-  }
-
-  companion object {
-    private val LOG = vimLogger<VimListenerSuppressor>()
+  @PublishedApi
+  internal companion object {
+    @PublishedApi
+    internal val LOG = vimLogger<VimListenerSuppressor>()
   }
 }
 

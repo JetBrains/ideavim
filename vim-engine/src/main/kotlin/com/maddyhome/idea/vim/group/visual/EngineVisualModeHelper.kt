@@ -15,4 +15,4 @@ import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
  * Set selection without calling SelectionListener
  */
 fun VimCaret.vimSetSystemSelectionSilently(start: Int, end: Int): Unit =
-  SelectionVimListenerSuppressor.lock().use { this.setSelection(start, end) }
+  SelectionVimListenerSuppressor.lock { this.setSelection(start, end) }

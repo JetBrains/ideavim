@@ -224,7 +224,7 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
       bookmarksManager.remove(bookmark)
     }
     VimListenerManager.VimLastSelectedEditorTracker.resetLastSelectedEditor(fixture.project)
-    SelectionVimListenerSuppressor.lock().use { fixture.tearDown() }
+    SelectionVimListenerSuppressor.lock { fixture.tearDown() }
     ExEntryPanel.instance?.deactivate(false)
     VimPlugin.getVariableService().clear()
     VimFuncref.lambdaCounter = 0
