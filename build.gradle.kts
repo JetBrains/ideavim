@@ -295,7 +295,7 @@ tasks {
   }
   val runRider by intellijPlatformTesting.runIde.registering {
     type = IntelliJPlatformType.Rider
-    version = "2026.2-EAP9-SNAPSHOT"
+    version = "2026.1.4"
     // Using Rider as a target IntelliJ Platform with `useInstaller = true` is currently not supported, please set `useInstaller = false` instead. See: https://github.com/JetBrains/intellij-platform-gradle-plugin/issues/1852
     useInstaller = false
     task {
