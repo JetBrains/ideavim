@@ -11,6 +11,7 @@ package com.maddyhome.idea.vim.command
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.KeyProcessResult
 import com.maddyhome.idea.vim.api.ExecutionContext
+import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.api.options
@@ -22,7 +23,9 @@ import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.key.KeyMapping
 import com.maddyhome.idea.vim.key.KeySource
 import com.maddyhome.idea.vim.key.MappingInfo
+import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.state.KeyHandlerState
+import com.maddyhome.idea.vim.state.mode.Mode
 import javax.swing.KeyStroke
 
 /**
@@ -83,26 +86,42 @@ internal object MappingProcessor : KeyConsumer {
 
     val mappingMode = editor.mode.toMappingMode()
     log.trace { "Get keys for mapping mode. mode = $mappingMode" }
-    val mapping = injector.keyGroup.getKeyMapping(mappingMode)
+    val mapping = getMapping(editor, mappingMode)
 
     // Try to handle the key as part of an unfinished mapping sequence, completing a sequence or a key that terminates
     // an in-progress sequence
     val mappingProcessed =
-      tryHandleUnfinishedMappingSequence(editor, keyProcessResultBuilder, mapping)
-        || tryHandleCompletedMappingSequence(keyProcessResultBuilder, mapping)
-        || tryHandleAbandonedMappingSequence(keyProcessResultBuilder)
+      tryHandleUnfinishedMappingSequence(editor, keyProcessResultBuilder, mapping) || tryHandleCompletedMappingSequence(
+        keyProcessResultBuilder,
+        mapping
+      ) || tryHandleAbandonedMappingSequence(keyProcessResultBuilder)
     log.debug { "Finish mapping processing. Return $mappingProcessed" }
 
     return mappingProcessed
   }
 
+  private fun getMapping(
+    editor: VimEditor,
+    mappingMode: MappingMode,
+  ): KeyMapping =
+    if (isLangMapApplicable(editor)) injector.keyGroup.getKeyMapping(MappingMode.LANG) else injector.keyGroup.getKeyMapping(
+      mappingMode
+    )
+
+  private fun isLangMapApplicable(editor: VimEditor): Boolean =
+    isIminsertEnabled(editor) && (editor.mode == Mode.INSERT || editor.mode == Mode.REPLACE)
+
+  private fun isIminsertEnabled(editor: VimEditor): Boolean = injector.optionGroup.getOptionValue(
+    Options.iminsert, OptionAccessScope.LOCAL(editor)
+  ).value == 1
+
   private fun isMappingApplicable(commandBuilder: CommandBuilder, key: KeyStroke, keyState: KeyHandlerState): Boolean {
     // Mapping is not applied to character/digraph arguments (e.g. `f{char}` or register names).
     // It's also not applied partway through an existing command - e.g. `<C-W>s` does not apply any maps for `s`.
-    return !commandBuilder.isAwaitingCharacterBasedArgument()
-      && !commandBuilder.isBuildingMultiKeyCommand()
-      && !commandBuilder.isRegisterPending
-      && !isTypingZeroInCommandCount(key, keyState)
+    return !commandBuilder.isAwaitingCharacterBasedArgument() && !commandBuilder.isBuildingMultiKeyCommand() && !commandBuilder.isRegisterPending && !isTypingZeroInCommandCount(
+      key,
+      keyState
+    )
   }
 
   private fun isTypingZeroInCommandCount(key: KeyStroke, keyState: KeyHandlerState): Boolean {
@@ -230,8 +249,7 @@ internal object MappingProcessor : KeyConsumer {
         """
                   Caught exception during ${mappingInfo.getPresentableString()}
                   ${e.message}
-          """.trimIndent(),
-        e
+          """.trimIndent(), e
       )
     } catch (e: NotImplementedError) {
       injector.messages.showErrorMessage(editor, e.message)
@@ -239,8 +257,7 @@ internal object MappingProcessor : KeyConsumer {
         """
                   Caught exception during ${mappingInfo.getPresentableString()}
                   ${e.message}
-          """.trimIndent(),
-        e
+          """.trimIndent(), e
       )
     } finally {
       mappingState.stopMapExecution()

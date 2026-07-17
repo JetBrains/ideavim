@@ -8,7 +8,6 @@
 package com.maddyhome.idea.vim
 
 import com.maddyhome.idea.vim.api.ExecutionContext
-import com.maddyhome.idea.vim.api.Key
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.getLineEndOffset
 import com.maddyhome.idea.vim.api.globalOptions
@@ -63,10 +62,10 @@ class KeyHandler {
     SelectRegisterConsumer(),
     ForcedMotionConsumer(),
     DigraphConsumer(),    // Must be before command key consumer, to process {char}<BS>{char}
-                          // Must be before char argument consumer, to convert and repost digraph/literal key sequences
-                          // and non-digraph/literal sequences fall through as char arguments
+    // Must be before char argument consumer, to convert and repost digraph/literal key sequences
+    // and non-digraph/literal sequences fall through as char arguments
     CommandKeyConsumer(), // Must be before argument consumers, because c_CTRL-R is both a command prefix and a command
-                          // expecting a character-based argument
+    // expecting a character-based argument
     CharArgumentConsumer(),
     ModeInputConsumer()   // Must be last to accept the keystroke as typed input
   )
@@ -329,7 +328,8 @@ class KeyHandler {
       }
     }
 
-    val action: Runnable = ActionRunner(editor, context, command, keyState, operatorArguments, isSingleCommandFromInsert)
+    val action: Runnable =
+      ActionRunner(editor, context, command, keyState, operatorArguments, isSingleCommandFromInsert)
     val cmdAction = command.action
     val name = cmdAction.id
     if (cmdAction.executesNestedCommands) {

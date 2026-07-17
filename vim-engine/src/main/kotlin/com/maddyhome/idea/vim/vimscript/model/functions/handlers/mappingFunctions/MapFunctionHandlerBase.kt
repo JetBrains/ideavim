@@ -32,7 +32,7 @@ internal abstract class MapFunctionHandlerBase<T : VimDataType>(minArity: Int = 
       'c' -> MappingMode.C
       's' -> MappingMode.S
       'x' -> MappingMode.X
-//      'l' -> MappingMode.L  // TODO: Langmap
+      'l' -> MappingMode.L
 //      't' -> MappingMode.T  // Terminal-Job. IdeaVim is unlikely to support this
       else -> MappingMode.NVO
     }
@@ -45,7 +45,8 @@ internal abstract class MapFunctionHandlerBase<T : VimDataType>(minArity: Int = 
     val dictionary = VimDictionary(LinkedHashMap())
     if (mapping != null) {
       val mappingInfo = mapping.mappingInfo
-      dictionary["lhs"] = name  // As the mapping is typed, with special keys as plain text - e.g. "foo<Tab>" or "foo<Left>"
+      dictionary["lhs"] =
+        name  // As the mapping is typed, with special keys as plain text - e.g. "foo<Tab>" or "foo<Left>"
       // TODO: This should be the keys as raw bytes, i.e. with special keys encoded
       // Vim does this with something like "foo\t" or "foo<80>kl" ("foo<Left>")
       dictionary["lhsraw"] = name
