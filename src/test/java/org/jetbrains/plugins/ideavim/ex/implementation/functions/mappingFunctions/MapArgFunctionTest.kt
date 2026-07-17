@@ -217,4 +217,27 @@ class MapArgFunctionTest : VimTestCase("\n") {
       "{'lhs': 'x', 'lhsraw': 'x', 'rhs': 'yy', 'silent': 0, 'noremap': 0, 'script': 0, 'expr': 0, 'buffer': 0, 'mode': 'n', 'nowait': 0, 'abbr': 0}",
     )
   }
+
+  // --- Finding #4: the 'l' (language) mode must be recognised by the mapping functions ---
+  // getMappingModes() in MapFunctionHandlerBase still has 'l' commented out, so 'l' currently
+  // falls through to NVO.
+
+  @Test
+  fun `test maparg returns rhs of lmap`() {
+    enterCommand("lmap x yy")
+    assertCommandOutput("echo string(maparg('x', 'l'))", "'yy'")
+  }
+
+  @Test
+  fun `test maparg with language mode does not match a normal mapping`() {
+    // 'l' must resolve to the language mode, not fall through to NVO and match the nmap.
+    enterCommand("nmap x yy")
+    assertCommandOutput("echo string(maparg('x', 'l'))", "''")
+  }
+
+  @Test
+  fun `test maparg dict has mode l for lmap`() {
+    enterCommand("lmap x yy")
+    assertCommandOutput("echo string(maparg('x', 'l', 0, 1)['mode'])", "'l'")
+  }
 }

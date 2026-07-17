@@ -781,6 +781,11 @@
   },
   {
     "keys": "<C-^>",
+    "class": "com.maddyhome.idea.vim.action.change.insert.ToggleLanguageInsertModeAction",
+    "modes": "I"
+  },
+  {
+    "keys": "<C-^>",
     "class": "com.maddyhome.idea.vim.action.file.FilePreviousAction",
     "modes": "N"
   },

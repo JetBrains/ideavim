@@ -123,6 +123,7 @@ object Options {
   val hlsearch: ToggleOption = addOption(ToggleOption("hlsearch", GLOBAL, "hls", false))
   val ignorecase: ToggleOption = addOption(ToggleOption("ignorecase", GLOBAL, "ic", false))
   val incsearch: ToggleOption = addOption(ToggleOption("incsearch", GLOBAL, "is", false))
+  val iminsert: NumberOption = addOption(UnsignedNumberOption("iminsert", LOCAL_TO_BUFFER, "imi", 0))
   val isfname: StringListOption = addOption(
     StringListOption(
       "isfname",
@@ -353,8 +354,7 @@ object Options {
             } else {
               inBackslash = true
             }
-          }
-          else {
+          } else {
             append(c)
             inBackslash = false
           }
