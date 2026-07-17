@@ -235,8 +235,8 @@ data class MapCommand(val range: Range, val cmd: String, val modifier: CommandMo
 
   companion object {
     private val COMMAND_INFOS = arrayOf(
-      // TODO: Support lmap
       CommandInfo("map", "", MappingMode.NVO, true),
+      CommandInfo("lm", "ap", MappingMode.L, true),
       CommandInfo("map", "", MappingMode.IC, true, bang = true),
       CommandInfo("nm", "ap", MappingMode.N, true),
       CommandInfo("vm", "ap", MappingMode.V, true),
@@ -246,7 +246,7 @@ data class MapCommand(val range: Range, val cmd: String, val modifier: CommandMo
       CommandInfo("im", "ap", MappingMode.I, true),
       CommandInfo("cm", "ap", MappingMode.C, true),
 
-      // TODO: Support lnoremap
+      CommandInfo("ln", "oremap", MappingMode.L, false),
       CommandInfo("no", "remap", MappingMode.NVO, false),
       CommandInfo("no", "remap", MappingMode.IC, false, bang = true),
       CommandInfo("nn", "oremap", MappingMode.N, false),

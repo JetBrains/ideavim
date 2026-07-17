@@ -46,6 +46,11 @@ enum class MappingMode {
    */
   CMD_LINE,
 
+  /**
+   * Indicates this key mapping applies to Language mode (`:lmap`)
+   */
+  LANG,
+
   ;
 
   companion object {
@@ -54,11 +59,14 @@ enum class MappingMode {
     val O: EnumSet<MappingMode> = EnumSet.of(OP_PENDING)
     val I: EnumSet<MappingMode> = EnumSet.of(INSERT)
     val C: EnumSet<MappingMode> = EnumSet.of(CMD_LINE)
+    val L: EnumSet<MappingMode> = EnumSet.of(LANG)
     val S: EnumSet<MappingMode> = EnumSet.of(SELECT)
     val V: EnumSet<MappingMode> = EnumSet.of(VISUAL, SELECT)
     val IC: EnumSet<MappingMode> = EnumSet.of(INSERT, CMD_LINE)
+
     // This requires the JvmField annotation as it is used (in Java) by an external plugin
-    @JvmField val NVO: EnumSet<MappingMode> = EnumSet.of(NORMAL, VISUAL, OP_PENDING, SELECT)
+    @JvmField
+    val NVO: EnumSet<MappingMode> = EnumSet.of(NORMAL, VISUAL, OP_PENDING, SELECT)
 
     // TODO: Consider removing/depracting XO, NV and NXO. They're not typical Vim modes that have a map command
     // E.g. `xmap` is for Visual, `vmap` is for Visual and Select. `map` is NVO and `map!` is IC
@@ -68,11 +76,16 @@ enum class MappingMode {
     // a valid mapping mode.
 
     // Used externally, by Java
-    @JvmField val XO: EnumSet<MappingMode> = EnumSet.of(VISUAL, OP_PENDING)
+    @JvmField
+    val XO: EnumSet<MappingMode> = EnumSet.of(VISUAL, OP_PENDING)
+
     // Used externally
-    @Suppress("unused") val NV: EnumSet<MappingMode> = EnumSet.of(NORMAL, VISUAL, SELECT)
+    @Suppress("unused")
+    val NV: EnumSet<MappingMode> = EnumSet.of(NORMAL, VISUAL, SELECT)
+
     // Used externally. Requires @JvmField even though used by Kotlin!
-    @JvmField val NXO: EnumSet<MappingMode> = EnumSet.of(NORMAL, VISUAL, OP_PENDING)
+    @JvmField
+    val NXO: EnumSet<MappingMode> = EnumSet.of(NORMAL, VISUAL, OP_PENDING)
 
     // This method is used only for single modes, not groups of them (V is not supported)
     fun parseModeChar(char: Char): MappingMode {
@@ -92,6 +105,7 @@ enum class MappingMode {
       if (this == MappingMode.NVO) return " "
       if (this == MappingMode.C) return "c"
       if (this == MappingMode.I) return "i"
+      if (this == MappingMode.L) return "l"
       //if (modes.equals(MappingMode.L)) return "l";
 
       // The following modes are concatenated

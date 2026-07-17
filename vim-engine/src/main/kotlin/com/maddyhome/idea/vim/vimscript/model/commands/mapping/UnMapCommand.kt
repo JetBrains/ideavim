@@ -54,8 +54,8 @@ data class UnMapCommand(val range: Range, val cmd: String, val modifier: Command
 
   companion object {
     private val COMMAND_INFOS = arrayOf(
-      // TODO: Support lunmap
       CommandInfo("unm", "ap", MappingMode.NVO, false),
+      CommandInfo("lun", "map", MappingMode.L, false),
       CommandInfo("unm", "ap", MappingMode.IC, false, bang = true),
       CommandInfo("nun", "map", MappingMode.N, false),
       CommandInfo("vu", "nmap", MappingMode.V, false),

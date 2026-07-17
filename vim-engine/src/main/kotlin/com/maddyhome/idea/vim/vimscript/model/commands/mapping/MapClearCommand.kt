@@ -50,7 +50,7 @@ data class MapClearCommand(val range: Range, val cmd: String, val modifier: Comm
 
   companion object {
     private val COMMAND_INFOS = arrayOf(
-      // TODO: Support lmapclear
+      CommandInfo("lmapc", "lear", MappingMode.L, false),
       CommandInfo("mapc", "lear", MappingMode.NVO, false),
       CommandInfo("mapc", "lear", MappingMode.IC, false, bang = true),
       CommandInfo("nmapc", "lear", MappingMode.N, false),

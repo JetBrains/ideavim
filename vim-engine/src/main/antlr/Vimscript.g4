@@ -777,27 +777,27 @@ WRITE_QUIT:             'wq' | 'exi' | 'exit' | 'xi' | 'xit';
 YANK:                   'ya' | 'yan' | 'yank';
 MAP:                    'map'
                     |   'smap'
-                    |   'nm' | 'vm' | 'xm' | 'om' | 'im' | 'cm'
-                    |   (('nm' | 'vm' | 'xm' | 'om' | 'im' | 'cm') 'a')
-                    |   (('nm' | 'vm' | 'xm' | 'om' | 'im' | 'cm') 'ap')
-                    |   'no' | 'nn' | 'vn' | 'xn' | 'ono' | 'ino' | 'cno'
-                    |   'nno' | 'vno' | 'xno'
-                    |   (('no' | 'nno' | 'vno' | 'xno' | 'ono' | 'ino' | 'cno') 'r')
-                    |   (('no' | 'nno' | 'vno' | 'xno' | 'ono' | 'ino' | 'cno') 're')
-                    |   (('no' | 'nno' | 'vno' | 'xno' | 'ono' | 'ino' | 'cno') 'rem')
-                    |   (('no' | 'nno' | 'vno' | 'xno' | 'ono' | 'ino' | 'cno') 'rema')
-                    |   (('no' | 'nno' | 'vno' | 'xno' | 'ono' | 'ino' | 'cno') 'remap')
+                    |   'nm' | 'vm' | 'xm' | 'om' | 'im' | 'cm' | 'lm'
+                    |   (('nm' | 'vm' | 'xm' | 'om' | 'im' | 'cm' | 'lm') 'a')
+                    |   (('nm' | 'vm' | 'xm' | 'om' | 'im' | 'cm' | 'lm') 'ap')
+                    |   'no' | 'nn' | 'vn' | 'xn' | 'ono' | 'ino' | 'cno' | 'ln'
+                    |   'nno' | 'vno' | 'xno' | 'lno'
+                    |   (('no' | 'nno' | 'vno' | 'xno' | 'ono' | 'ino' | 'cno' | 'lno') 'r')
+                    |   (('no' | 'nno' | 'vno' | 'xno' | 'ono' | 'ino' | 'cno' | 'lno') 're')
+                    |   (('no' | 'nno' | 'vno' | 'xno' | 'ono' | 'ino' | 'cno' | 'lno') 'rem')
+                    |   (('no' | 'nno' | 'vno' | 'xno' | 'ono' | 'ino' | 'cno' | 'lno') 'rema')
+                    |   (('no' | 'nno' | 'vno' | 'xno' | 'ono' | 'ino' | 'cno' | 'lno') 'remap')
                     |   ('snor' | 'snore' | 'snorem' | 'snorema' | 'snoremap');
-MAP_CLEAR:              ('mapc' | 'nmapc' | 'vmapc' | 'xmapc' | 'smapc' | 'omapc' | 'imapc' | 'cmapc')
-                    |   (('mapc' | 'nmapc' | 'vmapc' | 'xmapc' | 'smapc' | 'omapc' | 'imapc' | 'cmapc') 'l')
-                    |   (('mapc' | 'nmapc' | 'vmapc' | 'xmapc' | 'smapc' | 'omapc' | 'imapc' | 'cmapc') 'le')
-                    |   (('mapc' | 'nmapc' | 'vmapc' | 'xmapc' | 'smapc' | 'omapc' | 'imapc' | 'cmapc') 'lea')
-                    |   (('mapc' | 'nmapc' | 'vmapc' | 'xmapc' | 'smapc' | 'omapc' | 'imapc' | 'cmapc') 'lear');
-UNMAP:                  'unm' | 'nun' | 'vu' | 'xu' | 'sunm' | 'ou' | 'iu' | 'cu'
-                    |   'vun' | 'xun' | 'oun' | 'iun' | 'cun'
-                    |   'nunm' | 'vunm' | 'xunm' | 'ounm' | 'iunm' | 'cunm'
-                    |   'unma' | 'nunma' | 'vunma' | 'xunma' | 'sunma' | 'ounma' | 'iunma' | 'cunma'
-                    |   'unmap' | 'nunmap' | 'vunmap' | 'xunmap' | 'sunmap' | 'ounmap' | 'iunmap' | 'cunmap';
+MAP_CLEAR:              ('mapc' | 'nmapc' | 'vmapc' | 'xmapc' | 'smapc' | 'omapc' | 'imapc' | 'cmapc' | 'lmapc')
+                    |   (('mapc' | 'nmapc' | 'vmapc' | 'xmapc' | 'smapc' | 'omapc' | 'imapc' | 'cmapc' | 'lmapc') 'l')
+                    |   (('mapc' | 'nmapc' | 'vmapc' | 'xmapc' | 'smapc' | 'omapc' | 'imapc' | 'cmapc' | 'lmapc') 'le')
+                    |   (('mapc' | 'nmapc' | 'vmapc' | 'xmapc' | 'smapc' | 'omapc' | 'imapc' | 'cmapc' | 'lmapc') 'lea')
+                    |   (('mapc' | 'nmapc' | 'vmapc' | 'xmapc' | 'smapc' | 'omapc' | 'imapc' | 'cmapc' | 'lmapc') 'lear');
+UNMAP:                  'unm' | 'nun' | 'vu' | 'xu' | 'sunm' | 'ou' | 'iu' | 'cu' | 'lu'
+                    |   'vun' | 'xun' | 'oun' | 'iun' | 'cun' | 'lun'
+                    |   'nunm' | 'vunm' | 'xunm' | 'ounm' | 'iunm' | 'cunm' | 'lunm'
+                    |   'unma' | 'nunma' | 'vunma' | 'xunma' | 'sunma' | 'ounma' | 'iunma' | 'cunma' | 'lunma'
+                    |   'unmap' | 'nunmap' | 'vunmap' | 'xunmap' | 'sunmap' | 'ounmap' | 'iunmap' | 'cunmap' | 'lunmap';
 ABBREV:                 'ab' | 'abb' | 'abbr' | 'abbre' | 'abbrev' | 'abbrevi' | 'abbrevia' | 'abbreviat' | 'abbreviate'
                     |   'ia' | 'iab' | 'iabb' | 'iabbr' | 'iabbre' | 'iabbrev'
                     |   'ca' | 'cab' | 'cabb' | 'cabbr' | 'cabbre' | 'cabbrev'
