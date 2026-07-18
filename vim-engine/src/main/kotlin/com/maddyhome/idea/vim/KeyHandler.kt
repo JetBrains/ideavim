@@ -423,9 +423,8 @@ class KeyHandler {
       }
       injector.actionExecutor.executeVimAction(editor, cmd.action, context, operatorArguments)
 
-      // this restore the caret position when use C-o then db from the end of the line
       if (isSingleCommandFromInsert && editorState.mode is Mode.INSERT) {
-        restoreAllowEndCaretPosition(editor, editorState)
+        restoreCursorAfterInsertNormal(editor, editorState)
       }
 
       if (editorState.mode is Mode.INSERT || editorState.mode is Mode.REPLACE) {
@@ -445,17 +444,16 @@ class KeyHandler {
       if (editorState.mode is Mode.NORMAL && !cmd.flags.contains(CommandFlags.FLAG_EXPECT_MORE)) {
         editor.mode = editorState.mode.returnTo
         if (isSingleCommandFromInsert) {
-          restoreAllowEndCaretPosition(editor, editorState)
+          restoreCursorAfterInsertNormal(editor, editorState)
         }
       }
 
       instance.reset(keyState, editorState.mode)
     }
 
-    private fun restoreAllowEndCaretPosition(editor: VimEditor, editorState: VimStateMachine) {
-      if (!editorState.wasCaretAtEndOfLineBeforeInsertNormal) return
+    private fun restoreCursorAfterInsertNormal(editor: VimEditor, editorState: VimStateMachine) {
       for (caret in editor.nativeCarets()) {
-        if (editor.isCaretAtLineEnd(caret, allowEnd = false)) {
+        if (editorState.wasCaretAtEndOfLineBeforeInsertNormal || caret.vimLastColumn > caret.getVisualPosition().column) {
           val line = caret.getBufferPosition().line
           caret.moveToOffset(editor.getLineEndOffset(line, true))
         }
