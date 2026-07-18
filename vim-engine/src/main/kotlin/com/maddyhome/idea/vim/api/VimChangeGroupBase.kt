@@ -771,6 +771,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         val pos = injector.motion.getHorizontalMotion(editor, caret, -1, false)
         caret.moveToMotion(pos)
       }
+      caret.setVimLastColumnAndGetCaret(VimMotionGroupBase.LAST_COLUMN)
       return res
     }
     return false
@@ -1037,6 +1038,10 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   ): Boolean {
     val intendedColumn = caret.vimLastColumn
 
+    val endLine = editor.offsetToBufferPosition(range.endOffset).line
+    val deletedToEndOfLine = type != SelectionType.LINE_WISE &&
+      range.endOffset >= editor.getLineEndOffset(endLine, true)
+
     val removeLastNewLine = removeLastNewLine(editor, range, type)
     val res = deleteText(editor, context, range, type, caret, saveToRegister)
     var processedCaret = editor.findLastVersionOfCaret(caret) ?: caret
@@ -1068,7 +1073,13 @@ abstract class VimChangeGroupBase : VimChangeGroup {
 
       // Ensure the intended column cache is invalidated - it will only happen automatically if the caret actually moves
       // If 'startofline' is true and we've just deleted text, it's likely we haven't moved
-      processedCaret.resetLastColumn()
+      if (type === SelectionType.LINE_WISE) {
+        processedCaret.setVimLastColumnAndGetCaret(intendedColumn)
+      } else if (deletedToEndOfLine) {
+        processedCaret.setVimLastColumnAndGetCaret(VimMotionGroupBase.LAST_COLUMN)
+      } else {
+        processedCaret.resetLastColumn()
+      }
     }
     return res
   }
