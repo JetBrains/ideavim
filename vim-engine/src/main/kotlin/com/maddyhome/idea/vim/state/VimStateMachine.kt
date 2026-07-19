@@ -24,7 +24,9 @@ interface VimStateMachine {
 
   var ctrlXCompletionMode: CtrlXCompletionMode
 
+  //These two variable are created for moving caret one forward when returning back to insert from one normal cmd
   var wasCaretAtEndOfLineBeforeInsertNormal: Boolean
+  var deletedToEndOfLine: Boolean
 
   /**
    * The currently executing command
