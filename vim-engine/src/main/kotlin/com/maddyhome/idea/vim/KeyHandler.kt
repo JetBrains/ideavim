@@ -453,12 +453,13 @@ class KeyHandler {
 
     private fun restoreCursorAfterInsertNormal(editor: VimEditor, editorState: VimStateMachine) {
       for (caret in editor.nativeCarets()) {
-        if (editorState.wasCaretAtEndOfLineBeforeInsertNormal || caret.vimLastColumn > caret.getVisualPosition().column) {
+        if (editorState.wasCaretAtEndOfLineBeforeInsertNormal || editorState.deletedToEndOfLine) {
           val line = caret.getBufferPosition().line
           caret.moveToOffset(editor.getLineEndOffset(line, true))
         }
       }
       editorState.wasCaretAtEndOfLineBeforeInsertNormal = false
+      editorState.deletedToEndOfLine = false
     }
   }
 

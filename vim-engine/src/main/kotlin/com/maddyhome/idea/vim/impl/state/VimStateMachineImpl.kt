@@ -26,6 +26,7 @@ class VimStateMachineImpl : VimStateMachine {
   override var isReplaceCharacter: Boolean = false
 
   override var wasCaretAtEndOfLineBeforeInsertNormal: Boolean = false
+  override var deletedToEndOfLine: Boolean = false
 
   /**
    * The currently executing command
@@ -49,6 +50,7 @@ class VimStateMachineImpl : VimStateMachine {
     isReplaceCharacter = false
     executingCommand = null
     wasCaretAtEndOfLineBeforeInsertNormal = false
+    deletedToEndOfLine = false
   }
 }
 
