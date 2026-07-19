@@ -177,7 +177,7 @@ class MotionLastColumnActionTest : VimTestCase() {
     val after = """
             A Discovery
 
-            I ${c} 
+            I ${c}
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
