@@ -26,6 +26,12 @@ interface VimscriptExecutor {
    */
   var executingIdeaVimRcConfiguration: Boolean
 
+  /**
+   * True while executing a sourced file (`:source`, the .ideavimrc, or any [executeFile] call), as opposed to a
+   * command typed on the ex-command line. Used by commands that are only valid in a sourced file, such as `:loadkeymap`.
+   */
+  var executingFile: Boolean
+
   fun execute(
     script: String,
     editor: VimEditor,

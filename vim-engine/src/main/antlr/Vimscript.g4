@@ -191,6 +191,9 @@ command:
     WS* commandArgumentWithBars? NEW_LINE+
     #CommandWithBars|
 
+    (WS | COLON)* range? (WS | COLON)* LOADKEYMAP
+    #LoadKeymapCommand|
+
     (WS | COLON)* range? (WS | COLON)* commandName (bangModifier = BANG?) WS* commandArgumentWithBars? (NEW_LINE | BAR)+
     #OtherCommand
 ;
@@ -546,6 +549,7 @@ existingCommands:       ACTION
                     |   JOIN
                     |   JUMPS
                     |   LET
+                    |   LOADKEYMAP
                     |   MAP
                     |   MAP_CLEAR
                     |   MARK
@@ -728,6 +732,10 @@ HISTORY:                'his' | 'hist' | 'histo' | 'histor' | 'history';
 JOIN:                   'jo' | 'joi' | 'join';
 JUMPS:                  'ju' | 'jum' | 'jump' | 'jumps';
 LET:                    'let';
+// `:loadkeymap` consumes the rest of the sourced script (the keymap table) as part of a single
+// token, so the following `from<Tab>to` lines are not parsed as their own commands. The command
+// name and the table are separated by the first newline. See LoadKeymapCommand.
+LOADKEYMAP:             ('loadk' | 'loadke' | 'loadkey' | 'loadkeym' | 'loadkeyma' | 'loadkeymap') .*? EOF;
 LOCKVAR:                'lockv' | 'lockva' | 'lockvar';
 MARK:                   'ma' | 'mar' | 'mark';
 MARKS:                  'marks';

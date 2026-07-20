@@ -41,6 +41,7 @@ import com.maddyhome.idea.vim.vimscript.model.commands.SubstituteCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.UnknownCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.mapping.AbbrevClearCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.mapping.AbbrevCommand
+import com.maddyhome.idea.vim.vimscript.model.commands.mapping.LoadKeymapCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapClearCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.mapping.UnMapCommand
@@ -222,6 +223,14 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
     return createCommandByCommandContext(ranges, commandName, modifier, argument, ctx)
   }
 
+  override fun visitLoadKeymapCommand(ctx: VimscriptParser.LoadKeymapCommandContext): Command {
+    val ranges = parseRange(ctx.range())
+    // The LOADKEYMAP token holds the command name plus the whole keymap table; they are separated by
+    // the first newline. Everything after it is the table (empty when `:loadkeymap` has no body).
+    val argument = ctx.LOADKEYMAP().text.substringAfter('\n', "")
+    return createCommandByCommandContext(ranges, "loadkeymap", CommandModifier.NONE, argument, ctx)
+  }
+
   override fun visitCommandWithBars(ctx: VimscriptParser.CommandWithBarsContext): Command {
     val ranges = parseRange(ctx.range())
     val commandName = ctx.name.text
@@ -238,6 +247,7 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
     ctx: ParserRuleContext,
   ): Command {
     val command = when (getCommandByName(commandName)) {
+      LoadKeymapCommand::class -> LoadKeymapCommand(range, commandName, modifier, argument)
       MapCommand::class -> MapCommand(range, commandName, modifier, argument)
       MapClearCommand::class -> MapClearCommand(range, commandName, modifier, argument)
       UnMapCommand::class -> UnMapCommand(range, commandName, modifier, argument)
