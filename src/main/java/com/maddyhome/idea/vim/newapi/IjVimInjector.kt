@@ -30,13 +30,14 @@ import com.maddyhome.idea.vim.api.VimDigraphGroup
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimEditorGroup
 import com.maddyhome.idea.vim.api.VimEnabler
-import com.maddyhome.idea.vim.api.VimExternalOpener
 import com.maddyhome.idea.vim.api.VimExtensionRegistrator
+import com.maddyhome.idea.vim.api.VimExternalOpener
 import com.maddyhome.idea.vim.api.VimFile
 import com.maddyhome.idea.vim.api.VimInjector
 import com.maddyhome.idea.vim.api.VimInjectorBase
 import com.maddyhome.idea.vim.api.VimJumpService
 import com.maddyhome.idea.vim.api.VimKeyGroup
+import com.maddyhome.idea.vim.api.VimKeymapGroup
 import com.maddyhome.idea.vim.api.VimLookupManager
 import com.maddyhome.idea.vim.api.VimMarkService
 import com.maddyhome.idea.vim.api.VimMessages
@@ -168,6 +169,8 @@ internal class IjVimInjector : VimInjectorBase() {
   override val processGroup: VimProcessGroup
     get() = service()
   override val keyGroup: VimKeyGroup
+    get() = service()
+  override val keymapGroup: VimKeymapGroup
     get() = service()
   override val abbreviationGroup: VimAbbreviationGroup
     get() = service()

@@ -100,6 +100,7 @@
   "red[o]": "com.maddyhome.idea.vim.vimscript.model.commands.RedoCommand",
   "reg[isters]": "com.maddyhome.idea.vim.vimscript.model.commands.RegistersCommand",
   "s[ubstitute]": "com.maddyhome.idea.vim.vimscript.model.commands.SubstituteCommand",
+  "scripte[ncoding]": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.ScriptEncodingCommand",
   "se[t]": "com.maddyhome.idea.vim.vimscript.model.commands.SetCommand",
   "setg[lobal]": "com.maddyhome.idea.vim.vimscript.model.commands.SetglobalCommand",
   "sethandler": "com.maddyhome.idea.vim.vimscript.model.commands.SetHandlerCommand",

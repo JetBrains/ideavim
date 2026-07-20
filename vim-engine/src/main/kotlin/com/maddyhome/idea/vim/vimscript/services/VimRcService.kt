@@ -91,27 +91,33 @@ object VimRcService {
     }
 
     // Check in XDG config directory
-    val xdgConfigHomeProperty = System.getenv("XDG_CONFIG_HOME")
-    val xdgConfig = if (xdgConfigHomeProperty == null || xdgConfigHomeProperty == "") {
-      logger.debug("XDG_CONFIG_HOME is not defined. Trying to locate ~/.config/ideavim/ideavimrc file.")
-      if (homeDirName != null) Path(homeDirName, ".config", xdgVimrcPath) else null
-    } else {
-      logger.debug { "XDG_CONFIG_HOME set to '$xdgConfigHomeProperty'. Trying to locate \$XDG_CONFIG_HOME/ideavim/ideavimrc file" }
-      val configHome = if (xdgConfigHomeProperty.startsWith("~/") || xdgConfigHomeProperty.startsWith("~\\")) {
-        val expandedConfigHome = homeDirName + xdgConfigHomeProperty.substring(1)
-        logger.debug { "Expanded \$XDG_CONFIG_HOME to '$expandedConfigHome'" }
-        expandedConfigHome
-      }
-      else {
-        xdgConfigHomeProperty
-      }
-      Path(configHome, xdgVimrcPath)
-    }
+    val xdgConfig = getXdgConfigHome()?.resolve(xdgVimrcPath)
     return xdgConfig?.let {
       if (it.exists()) {
         logger.debug { "Found ideavimrc file: $it" }
         it
       } else null
+    }
+  }
+
+  /**
+   * The base XDG config directory: `$XDG_CONFIG_HOME` if set (with a leading `~` expanded), otherwise `~/.config`.
+   * IdeaVim's own config lives under `<this>/ideavim/` — e.g. the ideavimrc (`ideavim/ideavimrc`) and keymap files
+   * (`ideavim/keymap/<name>.vim`). Returns null if the home directory can't be resolved.
+   */
+  @JvmStatic
+  fun getXdgConfigHome(): Path? {
+    val homeDirName = System.getProperty("user.home")
+    val xdgConfigHomeProperty = System.getenv("XDG_CONFIG_HOME")
+    return if (xdgConfigHomeProperty.isNullOrEmpty()) {
+      if (homeDirName != null) Path(homeDirName, ".config") else null
+    } else {
+      val configHome = if (xdgConfigHomeProperty.startsWith("~/") || xdgConfigHomeProperty.startsWith("~\\")) {
+        homeDirName + xdgConfigHomeProperty.substring(1)
+      } else {
+        xdgConfigHomeProperty
+      }
+      Path(configHome)
     }
   }
 

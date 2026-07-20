@@ -86,6 +86,7 @@ import com.maddyhome.idea.vim.group.ControlCharsEditorHighlighter
 import com.maddyhome.idea.vim.group.FileGroupHelper
 import com.maddyhome.idea.vim.group.IjOptions
 import com.maddyhome.idea.vim.group.IjVimRedrawService
+import com.maddyhome.idea.vim.group.KeymapChangeListener
 import com.maddyhome.idea.vim.group.MarkUpdater
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.NumberChangeListener
@@ -238,6 +239,7 @@ object VimListenerManager {
       optionGroup.addGlobalOptionChangeListener(Options.showcmd, ShowCmdOptionChangeListener)
       optionGroup.addGlobalOptionChangeListener(Options.showmode, modeWidgetOptionListener)
       optionGroup.addGlobalOptionChangeListener(Options.showmode, macroWidgetOptionListener)
+      optionGroup.addEffectiveOptionValueChangeListener(Options.keymap, KeymapChangeListener)
 
       // The listeners are registered _after_ ideavimrc has been evaluated, so trigger these listeners to ensure we're
       // up to date

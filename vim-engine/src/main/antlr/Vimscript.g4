@@ -148,7 +148,7 @@ command:
         | P_LOWERCASE | P_UPPERCASE | PACKADD | PLUG | PREVIOUS_FILE | PRINT | PROMPT_REPLACE | PROMPTFIND | PUT
         | Q_LOWERCASE | QUIT
         | R_LOWERCASE | REDO
-        | SET | SELECT_LAST_FILE | SELECT_FIRST_FILE | SELECT_FILE | SETGLOBAL | SETHANDLER | SETLOCAL | SHELL | SOURCE | SPLIT | SYMBOL
+        | SET | SELECT_LAST_FILE | SELECT_FIRST_FILE | SELECT_FILE | SETGLOBAL | SETHANDLER | SETLOCAL | SHELL | SCRIPT_ENCODING | SOURCE | SPLIT | SYMBOL
         | T_LOWERCASE | TABCLOSE | TABMOVE | TABNEXT | TABONLY | TABPREVIOUS
         | U_LOWERCASE | UNDO | UNLOCKVAR
         | VSPLIT
@@ -765,6 +765,7 @@ SETHANDLER:             'sethandler';
 SHELL:                  'sh' | 'she' | 'shel' | 'shell';
 SORT:                   'sor' | 'sort';
 SOURCE:                 'so' | 'sou' | 'sour' | 'sourc' | 'source';
+SCRIPT_ENCODING:        'scripte' | 'scripten' | 'scriptenc' | 'scriptenco' | 'scriptencod' | 'scriptencodi' | 'scriptencodin' | 'scriptencoding';
 SPLIT:                  'sp' | 'spl' | 'spli' | 'split';
 SUBSTITUTE:             'su' | 'sub' | 'subs' | 'subst' | 'substi' | 'substit' | 'substitu' | 'substitut' | 'substitute';
 SYMBOL:                 'sym' | 'symb' | 'symbo' | 'symbol';
