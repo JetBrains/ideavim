@@ -141,6 +141,8 @@
                         serviceInterface="com.maddyhome.idea.vim.api.VimChangeGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.KeyGroup"
                         serviceInterface="com.maddyhome.idea.vim.api.VimKeyGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.KeymapGroup"
+                        serviceInterface="com.maddyhome.idea.vim.api.VimKeymapGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.WindowGroup"
                         serviceInterface="com.maddyhome.idea.vim.group.VimWindowGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.TabServiceImpl"

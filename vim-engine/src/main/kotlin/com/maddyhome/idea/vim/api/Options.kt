@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.options.NumberOption
 import com.maddyhome.idea.vim.options.Option
 import com.maddyhome.idea.vim.options.OptionAccessScope
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.options.OptionDeclaredScope
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.GLOBAL
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_BUFFER
 import com.maddyhome.idea.vim.options.OptionDeclaredScope.GLOBAL_OR_LOCAL_TO_WINDOW
@@ -136,6 +137,8 @@ object Options {
       }
     )
   )
+  val keymap: StringOption =
+    addOption(StringOption("keymap", OptionDeclaredScope.LOCAL_TO_BUFFER, "kmp", VimString.EMPTY))
   val keymodel: StringListOption = addOption(
     StringListOption(
       "keymodel",
