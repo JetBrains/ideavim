@@ -28,6 +28,7 @@ abstract class VimScriptExecutorBase : VimscriptExecutor {
   private val logger = vimLogger<VimScriptExecutorBase>()
   override var executingVimscript = false
   override var executingIdeaVimRcConfiguration = false
+  override var executingFile = false
 
   @Throws(ExException::class)
   override fun execute(
@@ -100,6 +101,8 @@ abstract class VimScriptExecutorBase : VimscriptExecutor {
 
   override fun executeFile(file: Path, editor: VimEditor, fileIsIdeaVimRcConfig: Boolean, indicateErrors: Boolean) {
     val context = injector.executionContextManager.getEditorExecutionContext(editor)
+    val wasExecutingFile = injector.vimscriptExecutor.executingFile
+    injector.vimscriptExecutor.executingFile = true
     try {
       if (fileIsIdeaVimRcConfig) {
         injector.vimscriptExecutor.executingIdeaVimRcConfiguration = true
@@ -113,6 +116,8 @@ abstract class VimScriptExecutorBase : VimscriptExecutor {
         logger.warn("Failed to read file ${file.pathString}: ${e.message}")
       }
     } finally {
+      // Save/restore (not just reset) so a nested `:source` inside a sourced file doesn't clear the flag too early.
+      injector.vimscriptExecutor.executingFile = wasExecutingFile
       if (fileIsIdeaVimRcConfig) {
         injector.vimrcFileState.saveFileState(file.absolutePathString())
         injector.vimscriptExecutor.executingIdeaVimRcConfiguration = false

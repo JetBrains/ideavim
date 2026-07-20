@@ -68,6 +68,7 @@
   "lm[ap]": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand",
   "lmapc[lear]": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapClearCommand",
   "ln[oremap]": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand",
+  "loadk[eymap]": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.LoadKeymapCommand",
   "lockv[ar]": "com.maddyhome.idea.vim.vimscript.model.commands.LockVarCommand",
   "lu[nmap]": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.UnMapCommand",
   "m[ove]": "com.maddyhome.idea.vim.vimscript.model.commands.MoveTextCommand",
