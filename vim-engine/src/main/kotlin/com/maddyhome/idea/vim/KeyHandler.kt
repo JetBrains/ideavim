@@ -19,7 +19,6 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.diagnostic.VimLogger
 import com.maddyhome.idea.vim.diagnostic.trace
 import com.maddyhome.idea.vim.diagnostic.vimLogger
-import com.maddyhome.idea.vim.helper.isCaretAtLineEnd
 import com.maddyhome.idea.vim.impl.state.toMappingMode
 import com.maddyhome.idea.vim.key.KeyConsumer
 import com.maddyhome.idea.vim.key.KeySource
@@ -214,11 +213,7 @@ class KeyHandler {
       }
 
       try {
-        val isProcessed = keyConsumers.any {
-          // These two lines are specifically formatted to allow setting a breakpoint on the consumeKey line :)
-          it.isApplicable(key, editor, keySource, keyProcessResultBuilder)
-            && it.consumeKey(key, editor, keySource, keyProcessResultBuilder)
-        }
+        val isProcessed = processConsumer(key, editor, keySource, keyProcessResultBuilder)
         if (isProcessed) {
           logger.trace { "Key was successfully caught by consumer" }
           keyProcessResultBuilder.addExecutionStep { lambdaKeyState, lambdaEditor, lambdaContext ->
@@ -240,6 +235,21 @@ class KeyHandler {
       }
       return keyProcessResultBuilder.build()
     }
+  }
+
+  private fun processConsumer(
+    key: KeyStroke,
+    editor: VimEditor,
+    keySource: KeySource,
+    keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
+  ): Boolean {
+    keyConsumers.forEach {
+      if (!it.isApplicable(key, editor, keySource, keyProcessResultBuilder)) return@forEach
+      // This line is separated so a breakpoint can be set on consumeKey :)
+      val consumed = it.consumeKey(key, editor, keySource, keyProcessResultBuilder)
+      if (consumed) return true
+    }
+    return false
   }
 
   /**

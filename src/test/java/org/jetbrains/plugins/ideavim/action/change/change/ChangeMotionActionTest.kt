@@ -192,6 +192,11 @@ class ChangeMotionActionTest : VimTestCase() {
     doTest("cw", "fo${c}o", "fo${c}", Mode.INSERT)
   }
 
+  @Test
+  fun testChangeTillVChar() {
+    doTest("ctV", "${c}someVariable", "Variable", Mode.INSERT)
+  }
+
   // VIM-3729
   @Test
   fun `test change with count applies only to motion when repeated`() {
