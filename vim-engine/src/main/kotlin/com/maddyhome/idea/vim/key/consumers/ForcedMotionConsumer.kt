@@ -34,6 +34,7 @@ class ForcedMotionConsumer : KeyConsumer {
     keySource: KeySource,
     keyProcessResultBuilder: KeyProcessResult.KeyProcessResultBuilder,
   ): Boolean {
+    if (keyProcessResultBuilder.state.commandBuilder.isAwaitingCharacterBasedArgument()) return false
     return editor.mode is Mode.OP_PENDING && forcedTypeFor(key) != null
   }
 
