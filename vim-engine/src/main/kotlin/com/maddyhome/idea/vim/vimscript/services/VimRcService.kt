@@ -14,6 +14,7 @@ import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.vimscript.model.commands.IdeaPlug
 import org.jetbrains.annotations.NonNls
+import org.jetbrains.annotations.TestOnly
 import java.io.IOException
 import java.nio.file.Path
 import kotlin.io.path.Path
@@ -85,8 +86,7 @@ object VimRcService {
           return file
         }
       }
-    }
-    else {
+    } else {
       logger.info("User's home directory is not defined. Cannot locate ~/.ideavimrc or ~/_ideavimrc file.")
     }
 
@@ -105,10 +105,14 @@ object VimRcService {
    * IdeaVim's own config lives under `<this>/ideavim/` — e.g. the ideavimrc (`ideavim/ideavimrc`) and keymap files
    * (`ideavim/keymap/<name>.vim`). Returns null if the home directory can't be resolved.
    */
+  @TestOnly
+  @JvmField
+  var xdgConfigHomeProvider: () -> String? = { System.getenv("XDG_CONFIG_HOME") }
+
   @JvmStatic
   fun getXdgConfigHome(): Path? {
     val homeDirName = System.getProperty("user.home")
-    val xdgConfigHomeProperty = System.getenv("XDG_CONFIG_HOME")
+    val xdgConfigHomeProperty = xdgConfigHomeProvider()
     return if (xdgConfigHomeProperty.isNullOrEmpty()) {
       if (homeDirName != null) Path(homeDirName, ".config") else null
     } else {
