@@ -14,6 +14,8 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.colors.EditorColors
+import com.intellij.openapi.editor.colors.EditorColorsListener
+import com.intellij.openapi.editor.colors.EditorColorsScheme
 import com.intellij.openapi.wm.IdeFocusManager
 import com.intellij.ui.DocumentAdapter
 import com.intellij.util.IJSwingUtilities
@@ -171,12 +173,7 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
     entry.setFont(selectEditorFont(editor, initText))
     parent = editor.contentComponent
 
-    val foregroundColour = editor.colorsScheme.defaultForeground
-    entry.setForeground(foregroundColour)
-    // TODO: Introduce IdeaVim colour scheme for "SpecialKey"?
-    val whitespaceColour = editor.colorsScheme.getColor(EditorColors.WHITESPACES_COLOR)
-    entry.setSpecialKeyForeground(whitespaceColour ?: foregroundColour)
-    this.myLabel.setForeground(entry.getForeground())
+    applyColorScheme(editor)
 
     this.context = context
     setEditor(editor)
@@ -635,6 +632,30 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
     }
   }
 
+  /**
+   * Apply the colours that depend on the editor colour scheme.
+   */
+  private fun applyColorScheme(editor: Editor) {
+    val foregroundColour = editor.colorsScheme.defaultForeground
+    entry.setForeground(foregroundColour)
+    // TODO: Introduce IdeaVim colour scheme for "SpecialKey"?
+    val whitespaceColour = editor.colorsScheme.getColor(EditorColors.WHITESPACES_COLOR)
+    entry.setSpecialKeyForeground(whitespaceColour ?: foregroundColour)
+    this.myLabel.setForeground(entry.getForeground())
+  }
+
+  /**
+   * Refresh the typed text colour when the editor colour scheme changes while the command line is open.
+   *
+   * See [applyColorScheme] for why a LAF refresh alone doesn't update the entry's foreground.
+   */
+  internal fun refreshColors() {
+    val editor = ijEditor ?: return
+    @Suppress("SENSELESS_COMPARISON")
+    if (entry == null) return
+    applyColorScheme(editor)
+  }
+
   override fun getForeground(): Color? {
     @Suppress("SENSELESS_COMPARISON")
     if (entry == null) {
@@ -799,6 +820,20 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
       if (instance != null) {
         IJSwingUtilities.updateComponentTreeUI(instance)
       }
+    }
+  }
+
+  /**
+   * Refresh the typed text colour when the editor colour scheme changes.
+   *
+   * The scheme changes both when it's switched directly and when an IDE theme switch swaps in a different bundled
+   * scheme. Unlike [LafListener]'s `updateComponentTreeUI`, this re-applies the foreground of the (explicitly coloured)
+   * entry field. See [applyColorScheme].
+   */
+  class ColorSchemeListener : EditorColorsListener {
+    override fun globalSchemeChange(scheme: EditorColorsScheme?) {
+      if (VimPlugin.isNotEnabled()) return
+      instance?.refreshColors()
     }
   }
 

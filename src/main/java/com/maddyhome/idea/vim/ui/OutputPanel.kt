@@ -14,6 +14,8 @@ import com.intellij.ide.ui.LafManagerListener
 import com.intellij.openapi.application.runInEdt
 import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.colors.EditorColorsListener
+import com.intellij.openapi.editor.colors.EditorColorsScheme
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.util.registry.Registry
 import com.intellij.openapi.wm.impl.IdeBackgroundUtil
@@ -252,14 +254,34 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
     val doc = textPane.styledDocument
     doc.remove(0, doc.length)
 
-    if (defaultForeground == null) {
-      defaultForeground = textPane.foreground
+    try {
+      defaultForeground = editor.colorsScheme.defaultForeground
+      textPane.foreground = defaultForeground
+      promptComponent.foreground = defaultForeground
+      statusComponent.foreground = defaultForeground
+    } catch (e: Exception) {
+      // in tests `editor.colorScheme` is unsupported
     }
 
     setMultiLineText(lines, doc)
 
     val fullText = doc.getText(0, doc.length)
     textPane.font = selectEditorFont(editor, fullText)
+  }
+
+  /**
+   * Re-apply theme-dependent colours to text that is already on screen.
+   *
+   * The foreground colour is baked into the [StyledDocument] attributes when the text is set (see [getLineColor]). A LAF
+   * refresh via `updateComponentTreeUI` only updates LAF-derived colours such as the background, so the visible text
+   * keeps its old foreground when the theme changes while the panel is open. Rebuild the styled text so it picks up the
+   * current editor colour scheme, preserving the scroll position.
+   */
+  internal fun refreshColors() {
+    if (segments.isEmpty()) return
+    val scrollValue = scrollPane.verticalScrollBar.value
+    setStyledText(segments)
+    scrollPane.verticalScrollBar.value = scrollValue
   }
 
   private fun setMultiLineText(lines: List<TextLine>, doc: StyledDocument) {
@@ -833,6 +855,24 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
         val editor = (vimEditor as IjVimEditor).editor
         val panel = tryGetInstance(editor) ?: continue
         IJSwingUtilities.updateComponentTreeUI(panel)
+      }
+    }
+  }
+
+  /**
+   * Refresh the text colour when the editor colour scheme changes.
+   *
+   * The panel takes its text colour from the editor colour scheme (see [setStyledText]), which changes both when the
+   * scheme is switched directly and when an IDE theme switch swaps in a different bundled scheme. Unlike [LafListener]'s
+   * `updateComponentTreeUI`, this re-applies the foreground baked into the displayed text.
+   */
+  class ColorSchemeListener : EditorColorsListener {
+    override fun globalSchemeChange(scheme: EditorColorsScheme?) {
+      if (VimPlugin.isNotEnabled()) return
+
+      for (vimEditor in injector.editorGroup.getEditors()) {
+        val editor = (vimEditor as IjVimEditor).editor
+        tryGetInstance(editor)?.refreshColors()
       }
     }
   }
