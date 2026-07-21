@@ -28,4 +28,36 @@ class YankLineActionTest : VimTestCase() {
     val register = VimPlugin.getRegister().getRegister(vimEditor, context, '4')!!
     kotlin.test.assertEquals("Lorem ipsum dolor sit amet,\n", register.text)
   }
+
+  @Test
+  fun `test yank multiple lines with count`() {
+    val file = """
+            ${c}first
+            second
+            third
+    """.trimIndent()
+    doTest("2yy", file, file)
+    kotlin.test.assertEquals("first\nsecond\n", lastRegisterText())
+  }
+
+  // The count passed to yy can request more lines than remain in the file. The range must be clamped to the
+  // last line instead of running past the end of the buffer.
+  @Test
+  fun `test yank with count exceeding end of file clamps to last line`() {
+    val file = """
+            first
+            ${c}second
+            third
+    """.trimIndent()
+    doTest("5yy", file, file)
+    kotlin.test.assertEquals("second\nthird\n", lastRegisterText())
+  }
+
+  private fun lastRegisterText(): String {
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+    return registerService.getRegister(vimEditor, context, registerService.lastRegisterChar)?.text
+      ?: kotlin.test.fail("No text in the last used register")
+  }
 }
