@@ -32,8 +32,12 @@
               topic="com.intellij.openapi.project.ProjectManagerListener"/>
     <listener class="com.maddyhome.idea.vim.ui.ex.ExEntryPanel$LafListener"
               topic="com.intellij.ide.ui.LafManagerListener"/>
+    <listener class="com.maddyhome.idea.vim.ui.ex.ExEntryPanel$ColorSchemeListener"
+              topic="com.intellij.openapi.editor.colors.EditorColorsListener"/>
     <listener class="com.maddyhome.idea.vim.ui.OutputPanel$LafListener"
               topic="com.intellij.ide.ui.LafManagerListener"/>
+    <listener class="com.maddyhome.idea.vim.ui.OutputPanel$ColorSchemeListener"
+              topic="com.intellij.openapi.editor.colors.EditorColorsListener"/>
     <listener class="com.maddyhome.idea.vim.extension.highlightedyank.HighlightColorResetter"
               topic="com.intellij.ide.ui.LafManagerListener"/>
     <listener class="com.maddyhome.idea.vim.listener.VimAppActivationListener"
