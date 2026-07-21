@@ -424,6 +424,22 @@ call textobj#user#plugin(<span class="str">'datetime'</span>, {
 <span class="key">&lt;C-X&gt;&lt;C-F&gt;</span>   <span class="cm">" complete a file path from the file system</span></pre>
     </div>
 
+    <!-- keymap · language mappings -->
+    <div class="section">
+      <p class="kicker">input · keyboard layouts</p>
+      <h2>Type another language without switching layouts</h2>
+      <p>The new <code>'keymap'</code> option loads a set of language mappings so you can type non-English
+        text while your system keyboard stays on its usual layout. Choose one of the dozens of bundled
+        keymaps — from <code>russian-jcukenwin</code> to <code>greek</code>, <code>dvorak</code>, or
+        <code>accents</code> — or drop your own file into <code>~/.config/ideavim/keymap/</code>. The mappings
+        apply to typed text only while <code>'iminsert'</code> is on; toggle it any time with
+        <kbd>&lt;C-^&gt;</kbd> in Insert mode.</p>
+      <pre><span class="str">set keymap=russian-jcukenwin</span>   <span class="cm">" load a bundled keymap</span>
+<span class="str">set iminsert=1</span>                 <span class="cm">" enable it for typed text (or press &lt;C-^&gt;)</span></pre>
+      <p class="note">Also adds the <code>:loadkeymap</code> command and the <code>:lmap</code> /
+        <code>:lnoremap</code> / <code>:lunmap</code> / <code>:lmapclear</code> language-mapping commands.</p>
+    </div>
+
     <!-- Also worth a look -->
     <div class="section">
       <p class="kicker">also worth a look</p>
@@ -439,6 +455,18 @@ call textobj#user#plugin(<span class="str">'datetime'</span>, {
           <p>Set the <code>IDEA_VIM_CUSTOM_VIMRC</code> environment variable to load your
             <code>.ideavimrc</code> from a custom path instead of the default locations.</p>
         </div>
+        <div class="mini">
+          <h3>Open the link under the caret</h3>
+          <p>Press <kbd>gx</kbd> in Normal mode to open the URL under the caret with your OS default handler —
+            any <code>scheme://</code> address works, and the program is overridable via
+            <code>g:netrw_browsex_viewer</code>.</p>
+        </div>
+        <div class="mini">
+          <h3>Write to another file</h3>
+          <p><code>:w {file}</code> saves the buffer to a new path, a range like <code>:1,2w out.txt</code>
+            writes only those lines, and <code>:w!</code> overwrites while plain <code>:w</code> refuses to
+            clobber an existing file.</p>
+        </div>
       </div>
     </div>
 
@@ -453,6 +481,20 @@ call textobj#user#plugin(<span class="str">'datetime'</span>, {
         <li><strong>Trailing <code>%</code> respects your range</strong> — running a command on a Visual
           selection with a <code>%</code> appended (e.g. <code>:'&lt;,'&gt;%d</code>) no longer expands to the
           whole file; the <code>%</code> is now ignored, matching Vim.
+        </li>
+        <li><strong>Panels follow your theme</strong> — the <code>:</code> output panel and command line now
+          refresh their text colors when you switch the IDE theme or editor color scheme while they are open.
+        </li>
+        <li><strong><code>:s///g</code> on indented lines</strong> — a global substitute such as
+          <code>%s/Cinema/Other/g</code> now replaces every match on lines that start with tabs, not just the
+          first one.
+        </li>
+        <li><strong>No crash while navigating methods</strong> — <kbd>[m</kbd> and <kbd>]m</kbd> no longer
+          crash when an element in the file structure has no text range.
+        </li>
+        <li><strong>Caret after delete-to-end from <kbd>&lt;C-O&gt;</kbd></strong> — running <kbd>D</kbd>,
+          <code>d$</code>, or <code>d3w</code> after <kbd>&lt;C-O&gt;</kbd> now leaves the caret in the right
+          place when you return to Insert mode.
         </li>
       </ul>
     </div>
