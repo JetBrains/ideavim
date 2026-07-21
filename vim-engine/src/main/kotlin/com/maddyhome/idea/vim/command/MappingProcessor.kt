@@ -109,7 +109,7 @@ internal object MappingProcessor : KeyConsumer {
     )
 
   private fun isLangMapApplicable(editor: VimEditor): Boolean =
-    isIminsertEnabled(editor) && (editor.mode == Mode.INSERT || editor.mode == Mode.REPLACE)
+    (editor.mode == Mode.INSERT || editor.mode == Mode.REPLACE) && isIminsertEnabled(editor)
 
   private fun isIminsertEnabled(editor: VimEditor): Boolean = injector.optionGroup.getOptionValue(
     Options.iminsert, OptionAccessScope.LOCAL(editor)
