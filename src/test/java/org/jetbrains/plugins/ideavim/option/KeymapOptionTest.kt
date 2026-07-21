@@ -11,6 +11,7 @@ package org.jetbrains.plugins.ideavim.option
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.vimscript.services.VimRcService
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -36,11 +37,13 @@ class KeymapOptionTest : VimTestCase() {
     // is test-controlled and isolated from the developer's real config.
     originalHome = System.getProperty("user.home")
     System.setProperty("user.home", homeDir!!.toString())
+    VimRcService.xdgConfigHomeProvider = { null }
     configureByText("\n")
   }
 
   @AfterEach
   fun restoreHome() {
+    VimRcService.xdgConfigHomeProvider = { System.getenv("XDG_CONFIG_HOME") }
     val home = originalHome
     if (home != null) System.setProperty("user.home", home) else System.clearProperty("user.home")
   }
