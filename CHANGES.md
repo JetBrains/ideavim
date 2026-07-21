@@ -42,11 +42,13 @@ usual beta standards.
 * [VIM-4270](https://youtrack.jetbrains.com/issue/VIM-4270) Fixed a trailing `%` after an explicit range overriding it — running a command on a Visual selection with a `%` appended (e.g. `:'<,'>%d`) no longer expands to the whole file; the `%` is now ignored to match Vim
 * [VIM-4273](https://youtrack.jetbrains.com/issue/VIM-4273) Fixed `:s///g` skipping matches after the first on tab-indented lines — e.g. `%s/Cinema/Other/g` now replaces every occurrence on a line that starts with tabs
 * [VIM-2997](https://youtrack.jetbrains.com/issue/VIM-2997) Fixed a crash during method navigation (`[m`, `]m`) when an element in the file structure had no text range
+* [VIM-315](https://youtrack.jetbrains.com/issue/VIM-315) Fixed the caret position after deleting to the end of a line from Insert-Normal mode — running a delete-to-end command such as `D`, `d$`, or `d3w` after `<C-O>` now leaves the caret at the correct position when returning to Insert mode
 
 ### Changes:
 * [VIM-2178](https://youtrack.jetbrains.com/issue/VIM-2178) The `multiple-cursors` extension now maps its default shortcuts to match the original [vim-multiple-cursors](https://github.com/terryma/vim-multiple-cursors) plugin: `<C-n>`/`g<C-n>` add the next occurrence (whole word / any match), `<A-n>`/`g<A-n>` select all occurrences in the file, and `<C-x>`/`<C-p>` skip and remove selections. This is a breaking change from the previous `<A-n>`/`g<A-n>`/`<A-x>`/`<A-p>` mappings — set `let g:multi_cursor_use_default_mapping = 0` to disable the defaults and bind the `<Plug>` mappings yourself (for example, back to the old `<A-n>` based keys)
 
 ### Merged PRs:
+* [1903](https://github.com/JetBrains/ideavim/pull/1903) by [AndDe-gourav](https://github.com/AndDe-gourav): fix Wrong 'motion last column action test' and 'D , d$ after i_Ctrl-o' behavior
 * [1922](https://github.com/JetBrains/ideavim/pull/1922) by [1grzyb1](https://github.com/1grzyb1): VIM-2997 Handle null TextRange in PsiHelper
 * [1911](https://github.com/JetBrains/ideavim/pull/1911) by [1grzyb1](https://github.com/1grzyb1): VIM-989 Implement write command with file argument
 * [1913](https://github.com/JetBrains/ideavim/pull/1913) by [1grzyb1](https://github.com/1grzyb1): VIM-1341 Implement gx command
