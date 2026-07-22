@@ -713,7 +713,8 @@ public class EditorHelper {
   }
 
   /**
-   * Checks if the editor is the Python console, so we can disable Vim features
+   * Checks if the editor is the Python console, so we can enable Vim features while still applying the special
+   * Enter/arrow key handling it requires.
    */
   public static boolean isPythonConsole(@NotNull Editor editor) {
     var file = EditorHelper.getVirtualFile(editor);

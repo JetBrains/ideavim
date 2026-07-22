@@ -53,7 +53,7 @@ internal val Editor.isIdeaVimDisabledHere: Boolean
   }
 
 /**
- * Almost every non-file-based editor should not use Vim mode. These editors are debug watch, Python console, AI chats,
+ * Almost every non-file-based editor should not use Vim mode. These editors are debug watch, AI chats,
  *   and other fields that are smart.
  *
  * We may support IdeaVim in these editors, but this will require a focused work and a lot of testing.
@@ -61,19 +61,18 @@ internal val Editor.isIdeaVimDisabledHere: Boolean
  * Here are issues when non-file editors were supported:
  * AI Chat – VIM-3786
  * Debug evaluate console – VIM-3929
- * Python console - VIM-4172
  *
- * We do want to support Vim actions in some windows, such as the commit window, diff windows, and decompiled Java
- * files. We don't support the Python console.
+ * We do want to support Vim actions in some windows, such as the commit window, diff windows, decompiled Java
+ * files, and the Python console. Note that the Python console still needs special handling so it doesn't lose the
+ * Enter and arrow keys (see KeyGroup and ToolWindowNavEverywhere).
  */
 private fun Editor.isAllowedFileEditor(): Boolean {
-  if (EditorHelper.isPythonConsole(this)) return false
-
   return EditorHelper.isCommitWindowEditor(this)
     || EditorHelper.isKotlinClassDecompiledToJavaFile(this)
     || EditorHelper.isDiffEditor(this)
     || EditorHelper.isFileEditor(this)
     || EditorHelper.isCommandHistoryWindow(this)
+    || EditorHelper.isPythonConsole(this)
 }
 
 private fun ideaVimDisabledInDialog(ideaVimSupportValue: StringListOptionValue): Boolean {

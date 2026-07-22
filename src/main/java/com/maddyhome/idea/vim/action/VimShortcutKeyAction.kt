@@ -9,12 +9,15 @@ package com.maddyhome.idea.vim.action
 
 import com.google.common.collect.ImmutableSet
 import com.intellij.codeInsight.lookup.LookupManager
+import com.intellij.execution.console.ConsoleHistoryController
+import com.intellij.execution.console.LanguageConsoleView
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.AnActionWrapper
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.actionSystem.LangDataKeys
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.diagnostic.logger
@@ -46,6 +49,7 @@ import com.maddyhome.idea.vim.key.KeySource
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.listener.AceJumpService
+import com.maddyhome.idea.vim.newapi.IjNativeAction
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.initInjector
 import com.maddyhome.idea.vim.newapi.vim
@@ -78,6 +82,8 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
     val editor = getEditor(e)
     val keyStroke = getKeyStroke(e)
     if (editor != null && keyStroke != null) {
+      if (navigatePythonConsoleHistory(editor, keyStroke, e)) return
+
       val owner = VimPlugin.getKey().savedShortcutConflicts[keyStroke]
       if ((owner as? ShortcutOwnerInfo.AllModes)?.owner == ShortcutOwner.UNDEFINED) {
         VimPlugin.getNotifications(editor.project).notifyAboutShortcutConflict(keyStroke)
@@ -99,6 +105,29 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
         LOG.error(e)
       }
     }
+  }
+
+  /**
+   * In the Python console, Up/Down should navigate command history in every Vim mode, matching the console's native
+   * behaviour. History navigation is implemented by a per-console action created by [ConsoleHistoryController] (the
+   * global `Console.History.*` action ids are only keymap stubs with no behaviour), so we resolve the console via
+   * [LangDataKeys.CONSOLE_VIEW] and invoke the controller's real action directly. The platform binds Up to
+   * `historyNext` and Down to `historyPrev`.
+   *
+   * @return true if the keystroke was handled as history navigation (and Vim should not process it further).
+   */
+  private fun navigatePythonConsoleHistory(editor: Editor, keyStroke: KeyStroke, e: AnActionEvent): Boolean {
+    if (keyStroke.modifiers != 0) return false
+    val next = when (keyStroke.keyCode) {
+      KeyEvent.VK_UP -> true
+      KeyEvent.VK_DOWN -> false
+      else -> return false
+    }
+    if (!EditorHelper.isPythonConsole(editor)) return false
+    val consoleView = LangDataKeys.CONSOLE_VIEW.getData(e.dataContext) as? LanguageConsoleView ?: return false
+    val controller = ConsoleHistoryController.getController(consoleView) ?: return false
+    val action = if (next) controller.historyNext else controller.historyPrev
+    return injector.actionExecutor.executeAction(editor.vim, IjNativeAction(action), e.dataContext.vim)
   }
 
   // There is a chance that we can use BGT, but we call for isCell inside the update.
@@ -227,6 +256,8 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
       injector.globalIjOptions().ideavimsupport.contains(IjOptionConstants.ideavimsupport_dialog)
     return editor.isPrimaryEditor() ||
       EditorHelper.isFileEditor(editor) && !editor.vim.mode.inNormalMode ||
+      // The Python console has full Vim support, so Escape must leave Insert/Visual mode instead of defocusing it.
+      EditorHelper.isPythonConsole(editor) && !editor.vim.mode.inNormalMode ||
       ideaVimSupportDialog && !editor.vim.mode.inNormalMode
   }
 

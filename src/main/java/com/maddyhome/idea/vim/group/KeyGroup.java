@@ -103,12 +103,37 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
     Editor ijEditor = ((IjVimEditor)editor).getEditor();
     if (EditorHelperRt.isIdeaVimDisabledHere(ijEditor)) return;
 
-    var vf = editor.getVirtualFile();
-    if (vf != null && vf.getPath().contains(EditorHelper.PYTHON_CONSOLE_FILE_NAME)) return;
+    Collection<RequiredShortcut> shortcuts = getRequiredShortcutKeys();
+
+    if (EditorHelper.isPythonConsole(ijEditor)) {
+      // The Python console handles Enter (Console.Execute) and the horizontal arrow keys (caret movement within the
+      // input) itself, so we must not let Vim claim those. Up/Down are intentionally left registered so Vim receives
+      // them: VimShortcutKeyAction redirects them to the console's history navigation in every mode. Every other key
+      // - including Escape to leave Insert mode - is registered so Vim works normally in the console.
+      final List<RequiredShortcut> filtered = new ArrayList<>();
+      for (RequiredShortcut shortcut : shortcuts) {
+        if (!isPythonConsoleReservedKey(shortcut.getKeyStroke())) filtered.add(shortcut);
+      }
+      shortcuts = filtered;
+    }
 
     EventFacade.getInstance().registerCustomShortcutSet(VimShortcutKeyAction.getInstance(),
-                                                        ShortcutHelper.toShortcutSet(getRequiredShortcutKeys()),
+                                                        ShortcutHelper.toShortcutSet(shortcuts),
                                                         ijEditor.getContentComponent());
+  }
+
+  /**
+   * The Python console natively uses Enter (execute) and the horizontal arrow keys (caret movement within the input
+   * line) for its own behaviour, so Vim must leave these unmodified keystrokes to the console rather than claiming
+   * them as shortcuts. Up/Down are deliberately excluded here so Vim receives them and VimShortcutKeyAction can
+   * delegate to the console's history navigation.
+   */
+  private static boolean isPythonConsoleReservedKey(@NotNull KeyStroke keyStroke) {
+    if (keyStroke.getModifiers() != 0) return false;
+    final int code = keyStroke.getKeyCode();
+    return code == KeyEvent.VK_ENTER
+           || code == KeyEvent.VK_LEFT
+           || code == KeyEvent.VK_RIGHT;
   }
 
   @Override
