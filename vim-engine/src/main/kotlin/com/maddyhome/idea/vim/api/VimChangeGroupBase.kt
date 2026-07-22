@@ -1077,6 +1077,9 @@ abstract class VimChangeGroupBase : VimChangeGroup {
       // Ensure the intended column cache is invalidated - it will only happen automatically if the caret actually moves
       // If 'startofline' is true and we've just deleted text, it's likely we haven't moved
       processedCaret.resetLastColumn()
+      if (deletedToEndOfLine) {
+        deleteJoinLines(editor, context, caret, 1, false)
+      }
     }
     return res
   }
