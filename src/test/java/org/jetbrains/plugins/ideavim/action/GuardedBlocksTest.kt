@@ -8,11 +8,13 @@
 
 package org.jetbrains.plugins.ideavim.action
 
+import com.intellij.openapi.application.ApplicationManager
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.rangeOf
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -25,6 +27,32 @@ class GuardedBlocksTest : VimTestCase() {
     assertDoesNotThrow {
       typeText(injector.parser.parseKeys("x"))
     }
+  }
+
+  @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)
+  @Test
+  fun `test delete word does not expand into guarded collapsed fold`() {
+    // Simulate a Jupyter notebook cell: the `#%%` delimiter is rendered as a collapsed fold and is also a
+    // guarded block. A char-wise `dw` on the editable cell content must not be expanded to cover the fold,
+    // otherwise the whole delete would overlap the guard and be rejected, leaving the text untouched.
+    configureAndFold(
+      """
+      [#%%
+      ]${c}test()asdf sd
+      """.trimIndent(),
+      "",
+    )
+    val guardRange = "#%%\ntest()asdf sd" rangeOf "#%%\n"
+    ApplicationManager.getApplication().runReadAction {
+      fixture.editor.document.createGuardedBlock(guardRange.startOffset, guardRange.endOffset)
+    }
+    typeText(injector.parser.parseKeys("dw"))
+    assertState(
+      """
+      #%%
+      ${c}()asdf sd
+      """.trimIndent(),
+    )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.GUARDED_BLOCKS)

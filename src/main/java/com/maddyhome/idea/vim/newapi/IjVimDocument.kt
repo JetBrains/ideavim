@@ -43,4 +43,8 @@ class IjVimDocument(val document: Document) : VimDocument {
   override fun getOffsetGuard(offset: Int): LiveRange? {
     return document.getOffsetGuard(offset)?.vim
   }
+
+  override fun getRangeGuard(start: Int, end: Int): LiveRange? {
+    return document.getRangeGuard(start, end)?.vim
+  }
 }

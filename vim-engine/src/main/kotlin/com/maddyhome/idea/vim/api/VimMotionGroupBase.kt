@@ -461,6 +461,10 @@ abstract class VimMotionGroupBase : VimMotionGroup {
         rangeEndLine
       ) ?: return TextRange(start, end)
 
+    if (editor.document.getRangeGuard(collapsedFold.startOffset, collapsedFold.endOffset) != null) {
+      return TextRange(start, end)
+    }
+
     val shouldExpand = linewise || start + 1 >= collapsedFold.startOffset
     if (!shouldExpand) {
       return TextRange(start, end)
