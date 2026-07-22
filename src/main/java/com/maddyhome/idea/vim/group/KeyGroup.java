@@ -106,10 +106,10 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
     Collection<RequiredShortcut> shortcuts = getRequiredShortcutKeys();
 
     if (EditorHelper.isPythonConsole(ijEditor)) {
-      // The Python console handles Enter (Console.Execute) and the horizontal arrow keys (caret movement within the
-      // input) itself, so we must not let Vim claim those. Up/Down are intentionally left registered so Vim receives
-      // them: VimShortcutKeyAction redirects them to the console's history navigation in every mode. Every other key
-      // - including Escape to leave Insert mode - is registered so Vim works normally in the console.
+      // The Python console handles the horizontal arrow keys (caret movement within the input) itself, so we must not
+      // let Vim claim those. Enter and Up/Down are intentionally left registered so Vim receives them:
+      // VimShortcutKeyAction redirects them to the console's own actions (execute / history navigation) in every mode.
+      // Every other key - including Escape to leave Insert mode - is registered so Vim works normally in the console.
       final List<RequiredShortcut> filtered = new ArrayList<>();
       for (RequiredShortcut shortcut : shortcuts) {
         if (!isPythonConsoleReservedKey(shortcut.getKeyStroke())) filtered.add(shortcut);
@@ -123,16 +123,15 @@ public class KeyGroup extends VimKeyGroupBase implements PersistentStateComponen
   }
 
   /**
-   * The Python console natively uses Enter (execute) and the horizontal arrow keys (caret movement within the input
-   * line) for its own behaviour, so Vim must leave these unmodified keystrokes to the console rather than claiming
-   * them as shortcuts. Up/Down are deliberately excluded here so Vim receives them and VimShortcutKeyAction can
-   * delegate to the console's history navigation.
+   * The Python console natively uses the horizontal arrow keys (caret movement within the input line), so Vim must
+   * leave these unmodified keystrokes to the console rather than claiming them as shortcuts. Enter and Up/Down are
+   * deliberately NOT reserved here so Vim receives them and VimShortcutKeyAction can delegate to the console's own
+   * actions (execute / history navigation) in every mode.
    */
   private static boolean isPythonConsoleReservedKey(@NotNull KeyStroke keyStroke) {
     if (keyStroke.getModifiers() != 0) return false;
     final int code = keyStroke.getKeyCode();
-    return code == KeyEvent.VK_ENTER
-           || code == KeyEvent.VK_LEFT
+    return code == KeyEvent.VK_LEFT
            || code == KeyEvent.VK_RIGHT;
   }
 

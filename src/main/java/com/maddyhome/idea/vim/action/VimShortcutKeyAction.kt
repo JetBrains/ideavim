@@ -19,6 +19,8 @@ import com.intellij.openapi.actionSystem.AnActionWrapper
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.LangDataKeys
 import com.intellij.openapi.actionSystem.PlatformDataKeys
+import com.intellij.openapi.actionSystem.ex.ActionUtil
+import com.intellij.openapi.actionSystem.impl.ProxyShortcutSet
 import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
@@ -82,7 +84,9 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
     val editor = getEditor(e)
     val keyStroke = getKeyStroke(e)
     if (editor != null && keyStroke != null) {
-      if (navigatePythonConsoleHistory(editor, keyStroke, e)) return
+      // In the Python console, Enter executes and Up/Down navigate command history in every Vim mode, rather than
+      // being handled as Vim commands (newline / caret motion).
+      if (handlePythonConsoleKey(editor, keyStroke, e)) return
 
       val owner = VimPlugin.getKey().savedShortcutConflicts[keyStroke]
       if ((owner as? ShortcutOwnerInfo.AllModes)?.owner == ShortcutOwner.UNDEFINED) {
@@ -108,26 +112,37 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
   }
 
   /**
-   * In the Python console, Up/Down should navigate command history in every Vim mode, matching the console's native
-   * behaviour. History navigation is implemented by a per-console action created by [ConsoleHistoryController] (the
-   * global `Console.History.*` action ids are only keymap stubs with no behaviour), so we resolve the console via
-   * [LangDataKeys.CONSOLE_VIEW] and invoke the controller's real action directly. The platform binds Up to
-   * `historyNext` and Down to `historyPrev`.
+   * In the Python console, Enter and Up/Down should drive the console's own behaviour in every Vim mode, rather than
+   * being handled as Vim commands. These are implemented by per-console actions:
+   *  - Up/Down: history navigation, created by [ConsoleHistoryController] (Up -> `historyNext`, Down -> `historyPrev`).
+   *  - Enter: [com.intellij.execution.console.ConsoleExecuteAction], registered on the console editor component.
    *
-   * @return true if the keystroke was handled as history navigation (and Vim should not process it further).
+   * The corresponding global action ids (`Console.History.*`, `Console.Execute`) are only keymap stubs (`EmptyAction`)
+   * with no behaviour, so we resolve the console via [LangDataKeys.CONSOLE_VIEW] and invoke the real action instances.
+   *
+   * @return true if the keystroke was handled by the console (and Vim should not process it further).
    */
-  private fun navigatePythonConsoleHistory(editor: Editor, keyStroke: KeyStroke, e: AnActionEvent): Boolean {
+  private fun handlePythonConsoleKey(editor: Editor, keyStroke: KeyStroke, e: AnActionEvent): Boolean {
     if (keyStroke.modifiers != 0) return false
-    val next = when (keyStroke.keyCode) {
-      KeyEvent.VK_UP -> true
-      KeyEvent.VK_DOWN -> false
-      else -> return false
-    }
     if (!EditorHelper.isPythonConsole(editor)) return false
     val consoleView = LangDataKeys.CONSOLE_VIEW.getData(e.dataContext) as? LanguageConsoleView ?: return false
-    val controller = ConsoleHistoryController.getController(consoleView) ?: return false
-    val action = if (next) controller.historyNext else controller.historyPrev
+    val action = when (keyStroke.keyCode) {
+      KeyEvent.VK_UP -> ConsoleHistoryController.getController(consoleView)?.historyNext
+      KeyEvent.VK_DOWN -> ConsoleHistoryController.getController(consoleView)?.historyPrev
+      KeyEvent.VK_ENTER -> consoleExecuteAction(consoleView)
+      else -> null
+    } ?: return false
     return injector.actionExecutor.executeAction(editor.vim, IjNativeAction(action), e.dataContext.vim)
+  }
+
+  /**
+   * Finds the console's own execute action (bound to Enter). [ConsoleExecuteAction] is registered directly on the
+   * console editor component and carries a [ProxyShortcutSet] pointing at the `Console.Execute` keymap stub, so we
+   * match on that id.
+   */
+  private fun consoleExecuteAction(consoleView: LanguageConsoleView): AnAction? {
+    return ActionUtil.getActions(consoleView.consoleEditor.component)
+      .firstOrNull { (it.shortcutSet as? ProxyShortcutSet)?.actionId == CONSOLE_EXECUTE_ACTION_ID }
   }
 
   // There is a chance that we can use BGT, but we call for isCell inside the update.
@@ -321,6 +336,10 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
   }
 
   companion object {
+    // Keymap id of the console execute action (com.intellij.execution.console.ConsoleExecuteAction). The id constant
+    // itself is not public in the platform, so we mirror it here.
+    private const val CONSOLE_EXECUTE_ACTION_ID = "Console.Execute"
+
     @JvmField
     val VIM_ONLY_EDITOR_KEYS: Set<KeyStroke> =
       ImmutableSet.builder<KeyStroke>().addAll(getKeyStrokes(KeyEvent.VK_ENTER, 0))
