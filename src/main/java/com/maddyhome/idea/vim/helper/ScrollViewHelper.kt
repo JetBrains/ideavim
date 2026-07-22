@@ -172,6 +172,7 @@ internal object ScrollViewHelper {
     inlayAwareMinHeightFudge: Int,
   ): Boolean {
     if (!isScreenHeightReliableForCentering(height, inlayAwareMinHeightFudge)) {
+      if (isCaretBelowVisibleArea(editor, caretLine, scrollOffset)) return false
       return !isCaretWithinVerticalScrollBounds(editor, caretLine, scrollOffset)
     }
 
@@ -202,6 +203,13 @@ internal object ScrollViewHelper {
     val caretY = editor.visualLineToY(caretLine)
     val bottomLimit = visibleArea.y + visibleArea.height - scrollOffset * editor.lineHeight
     return caretY >= visibleArea.y && caretY <= bottomLimit
+  }
+
+  private fun isCaretBelowVisibleArea(editor: Editor, caretLine: Int, scrollOffset: Int): Boolean {
+    val visibleArea = getVisibleArea(editor)
+    val caretY = editor.visualLineToY(caretLine)
+    val bottomLimit = visibleArea.y + visibleArea.height - scrollOffset * editor.lineHeight
+    return caretY > bottomLimit
   }
 
   // Scrolling up, put the cursor at the top of the window (minus scrolloff)
