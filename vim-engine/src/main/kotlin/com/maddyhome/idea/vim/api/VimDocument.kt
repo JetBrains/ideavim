@@ -15,4 +15,5 @@ interface VimDocument {
   fun addChangeListener(listener: ChangesListener)
   fun removeChangeListener(listener: ChangesListener)
   fun getOffsetGuard(offset: Int): LiveRange?
+  fun getRangeGuard(start: Int, end: Int): LiveRange?
 }
