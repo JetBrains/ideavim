@@ -23,11 +23,13 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.io.FileUtil
+import com.maddyhome.idea.vim.api.MessageType
 import com.maddyhome.idea.vim.api.VimrcFileState
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.icons.VimIcons
 import com.maddyhome.idea.vim.key.MappingOwner
+import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.troubleshooting.Troubleshooter
 import com.maddyhome.idea.vim.ui.ReloadFloatingToolbarActionGroup.Companion.ACTION_GROUP
@@ -71,9 +73,7 @@ internal object VimRcFileState : VimrcFileState {
 
   override fun saveFileState(filePath: String) {
     val ideaVimRcText = Path.of(filePath).let {
-      kotlin.runCatching { it.readText() }
-        .onFailure { LOG.error(it) }
-        .getOrNull()
+      kotlin.runCatching { it.readText() }.onFailure { LOG.error(it) }.getOrNull()
     } ?: ""
     saveFileState(filePath, ideaVimRcText)
   }
@@ -167,7 +167,11 @@ internal class ReloadVimRc : DumbAwareAction() {
     val context = injector.executionContextManager.getEditorExecutionContext(editor.vim)
     injector.vimscriptExecutor.executingIdeaVimRcConfiguration = true
     try {
-      injector.vimscriptExecutor.execute(content, editor.vim, context, skipHistory = true, indicateErrors = false)
+      injector.vimscriptExecutor.execute(content, editor.vim, context, skipHistory = true, indicateErrors = true)
+    } catch (e: Exception) {
+      injector.outputPanel.output(
+        IjVimEditor(editor), context, e.message ?: "Error while executing ideavimrc file", MessageType.ERROR
+      )
     } finally {
       VimRcFileState.saveFileState(ideaVimRc.toAbsolutePath().toString(), content)
       injector.vimscriptExecutor.executingIdeaVimRcConfiguration = false

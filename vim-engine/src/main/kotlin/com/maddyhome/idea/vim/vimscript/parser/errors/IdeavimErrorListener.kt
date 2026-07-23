@@ -31,6 +31,7 @@ class IdeavimErrorListener : BaseErrorListener() {
   ) {
     injector.vimscriptParser.linesWithErrors.add(line)
     val message = "line $line:$charPositionInLine $msg"
+    injector.vimscriptParser.errorMessages.add(message)
     if (injector.application.isUnitTest()) {
       testLogger.add(message)
     } else {

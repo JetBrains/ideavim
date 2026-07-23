@@ -319,6 +319,15 @@ class CommandParserTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   @Test
+  fun `test parse error is shown to the user`() {
+    configureByText("\n")
+    enterCommand("echo (*")
+    assertPluginError(true)
+    assertStatusLineMessageContains("line 1:")
+  }
+
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test bug with caret return symbol`() {
     configureByText("----------\n1234${c}567890\n----------\n")
     injector.vimscriptExecutor.execute(

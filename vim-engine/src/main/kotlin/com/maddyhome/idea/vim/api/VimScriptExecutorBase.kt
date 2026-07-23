@@ -46,6 +46,17 @@ abstract class VimScriptExecutorBase : VimscriptExecutor {
       val myScript = injector.vimscriptParser.parse(script)
       myScript.units.forEach { it.vimContext = vimContext ?: myScript }
 
+      // Surface syntax errors from parsing. The parser recovers from these (dropping the offending lines) instead
+      // of throwing, so the executor is the place to report them. Only shown when the caller asks for it; otherwise
+      // the parser has already logged them as warnings.
+      val parseErrors = injector.vimscriptParser.lastParseErrors
+      if (parseErrors.isNotEmpty()) {
+        finalResult = ExecutionResult.Error
+        if (indicateErrors) {
+          parseErrors.forEach { injector.messages.appendErrorMessage(editor, it) }
+        }
+      }
+
       // Record the command in the history before executing it
       if (!skipHistory) {
         injector.historyGroup.addEntry(VimHistory.Type.Command, script)
