@@ -47,11 +47,15 @@ usual beta standards.
 * [VIM-4273](https://youtrack.jetbrains.com/issue/VIM-4273) Fixed `:s///g` skipping matches after the first on tab-indented lines — e.g. `%s/Cinema/Other/g` now replaces every occurrence on a line that starts with tabs
 * [VIM-2997](https://youtrack.jetbrains.com/issue/VIM-2997) Fixed a crash during method navigation (`[m`, `]m`) when an element in the file structure had no text range
 * [VIM-315](https://youtrack.jetbrains.com/issue/VIM-315) Fixed the caret position after deleting to the end of a line from Insert-Normal mode — running a delete-to-end command such as `D`, `d$`, or `d3w` after `<C-O>` now leaves the caret at the correct position when returning to Insert mode
+* [VIM-4283](https://youtrack.jetbrains.com/issue/VIM-4283) Fixed `dw` (and similar edits) doing nothing inside a Jupyter notebook cell — the delete range no longer expands into the cell's guarded, collapsed delimiter fold, so the cell content is deleted correctly
+* [VIM-4282](https://youtrack.jetbrains.com/issue/VIM-4282) Fixed the editor scrolling up unexpectedly when the caret was below the visible area
 
 ### Changes:
 * [VIM-2178](https://youtrack.jetbrains.com/issue/VIM-2178) The `multiple-cursors` extension now maps its default shortcuts to match the original [vim-multiple-cursors](https://github.com/terryma/vim-multiple-cursors) plugin: `<C-n>`/`g<C-n>` add the next occurrence (whole word / any match), `<A-n>`/`g<A-n>` select all occurrences in the file, and `<C-x>`/`<C-p>` skip and remove selections. This is a breaking change from the previous `<A-n>`/`g<A-n>`/`<A-x>`/`<A-p>` mappings — set `let g:multi_cursor_use_default_mapping = 0` to disable the defaults and bind the `<Plug>` mappings yourself (for example, back to the old `<A-n>` based keys)
 
 ### Merged PRs:
+* [1932](https://github.com/JetBrains/ideavim/pull/1932) by [1grzyb1](https://github.com/1grzyb1): VIM-4282 Don't scroll if caret below visible area
+* [1931](https://github.com/JetBrains/ideavim/pull/1931) by [1grzyb1](https://github.com/1grzyb1): VIM-4283 Fix dw in jupyter notebook cell
 * [1929](https://github.com/JetBrains/ideavim/pull/1929) by [1grzyb1](https://github.com/1grzyb1): VIM-4281 update output panel theme on change
 * [1928](https://github.com/JetBrains/ideavim/pull/1928) by [1grzyb1](https://github.com/1grzyb1): VIM-4279 fix till V motion
 * [1925](https://github.com/JetBrains/ideavim/pull/1925) by [1grzyb1](https://github.com/1grzyb1): VIM-1850 Implement keymap option
