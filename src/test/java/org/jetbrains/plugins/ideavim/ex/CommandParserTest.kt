@@ -319,6 +319,23 @@ class CommandParserTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   @Test
+  fun `test error on the last line is skipped without discarding the whole script`() {
+    configureByText("\n")
+    // A syntax error on the LAST line must only drop that line, not the entire file (VIM parser recovery).
+    val script = VimscriptParser.parse(
+      """
+        let g:x = 1
+        let g:y = 2
+        #broken
+      """.trimIndent(),
+    )
+    assertEquals(2, script.units.size)
+    assertTrue(script.units[0] is LetCommand)
+    assertTrue(script.units[1] is LetCommand)
+  }
+
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
   fun `test parse error is shown to the user`() {
     configureByText("\n")
     enterCommand("echo (*")

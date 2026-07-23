@@ -134,8 +134,10 @@ abstract class VimscriptParserBase : com.maddyhome.idea.vim.api.VimscriptParser 
     val lineNumbersToDelete = linesWithErrors.sortedDescending()
     val lines = splitToLines(text).toMutableList()
     for (lineNumber in lineNumbersToDelete) {
-      // this may happen if we have an error somewhere at the end and parser can't find any matching token till EOF (EOF's line number is lines.size)
-      if (lines.size <= lineNumber) {
+      // this may happen if we have an error somewhere at the end and parser can't find any matching token till EOF
+      // (EOF's line number is lines.size + 1). Note lineNumber is 1-based, so an error on the last line has
+      // lineNumber == lines.size and must still be removable - only skip when it points strictly past the last line.
+      if (lines.size < lineNumber) {
         logger.warn("Parsing error affects lines till EOF")
       } else {
         deletionInfo.registerDeletion(lines[lineNumber - 1].first, lines[lineNumber - 1].second.length)
