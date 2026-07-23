@@ -17,6 +17,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.EditorListener
+import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.isTerminalEditor
 import com.maddyhome.idea.vim.newapi.ij
@@ -76,6 +77,8 @@ class IJEditorFocusListener : EditorListener {
     }
     ApplicationManager.getApplication().invokeLater {
       if (ijEditor.isDisposed) return@invokeLater
+      // The Python console keeps the user's current Vim mode on focus, so don't force Insert mode here either.
+      if (EditorHelper.isPythonConsole(ijEditor)) return@invokeLater
       val consoleView: ConsoleViewImpl? = ijEditor.getUserData(ConsoleViewImpl.CONSOLE_VIEW_IN_EDITOR_VIEW)
       if (consoleView != null && consoleView.isRunning && !ijEditor.inInsertMode) {
         // Switch to Insert mode, but make sure we reset the editor to actually make it apply

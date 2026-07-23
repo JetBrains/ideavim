@@ -114,6 +114,7 @@ internal fun Editor.isTerminalEditor(): Boolean {
     && !EditorHelper.isFileEditor(this)
     && !EditorHelper.isDiffEditor(this)
     && !EditorHelper.isCommandHistoryWindow(this)
+    && !EditorHelper.isPythonConsole(this)
 }
 
 // Optimized clone of com.intellij.ide.ui.laf.darcula.DarculaUIUtil.isTableCellEditor
