@@ -1151,4 +1151,180 @@ class IncsearchTests : VimTestCase() {
       """.trimMargin()
     )
   }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
+  fun `test enter after ctrl+g lands on the advanced match`() {
+    configureByText(
+      """
+        |${c}one
+        |two
+        |one
+        |two
+        |one
+      """.trimMargin(),
+    )
+    enterCommand("set incsearch")
+    // /two -> line 1, <C-G> -> line 3. Pressing <CR> must accept the advanced match, not jump back to line 1.
+    typeText("/", "two")
+    typeText("<C-G>")
+    typeText("<CR>")
+    assertState(
+      """
+        |one
+        |two
+        |one
+        |${c}two
+        |one
+      """.trimMargin()
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
+  fun `test enter after ctrl+t lands on the previous match`() {
+    configureByText(
+      """
+        |${c}one
+        |two
+        |one
+        |two
+        |one
+      """.trimMargin(),
+    )
+    enterCommand("set incsearch")
+    // /two -> line 1, <C-T> wraps backwards to line 3. Pressing <CR> must accept that match.
+    typeText("/", "two")
+    typeText("<C-T>")
+    typeText("<CR>")
+    assertState(
+      """
+        |one
+        |two
+        |one
+        |${c}two
+        |one
+      """.trimMargin()
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
+  fun `test enter after multiple ctrl+g lands on the correct match`() {
+    configureByText(
+      """
+        |${c}one
+        |two
+        |one
+        |two
+        |one
+        |two
+        |one
+      """.trimMargin(),
+    )
+    enterCommand("set incsearch")
+    // /two -> line 1, <C-G> -> line 3, <C-G> -> line 5. Pressing <CR> must accept the twice-advanced match.
+    typeText("/", "two")
+    typeText("<C-G>")
+    typeText("<C-G>")
+    typeText("<CR>")
+    assertState(
+      """
+        |one
+        |two
+        |one
+        |two
+        |one
+        |${c}two
+        |one
+      """.trimMargin()
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
+  fun `test enter after ctrl+g then ctrl+t lands on the first match`() {
+    configureByText(
+      """
+        |${c}one
+        |two
+        |one
+        |two
+        |one
+      """.trimMargin(),
+    )
+    enterCommand("set incsearch")
+    // /two -> line 1, <C-G> -> line 3, <C-T> -> back to line 1. Pressing <CR> must accept line 1.
+    typeText("/", "two")
+    typeText("<C-G>")
+    typeText("<C-T>")
+    typeText("<CR>")
+    assertState(
+      """
+        |one
+        |${c}two
+        |one
+        |two
+        |one
+      """.trimMargin()
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
+  fun `test enter after ctrl+g during backwards incsearch lands on the advanced match`() {
+    configureByText(
+      """
+        |one
+        |two
+        |one
+        |two
+        |${c}one
+      """.trimMargin(),
+    )
+    enterCommand("set incsearch")
+    // ?two -> line 3 (first match backwards), <C-G> -> next match, i.e. line 1. Pressing <CR> must accept line 1.
+    typeText("?", "two")
+    typeText("<C-G>")
+    typeText("<CR>")
+    assertState(
+      """
+        |one
+        |${c}two
+        |one
+        |two
+        |one
+      """.trimMargin()
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
+  fun `test enter after wrapping ctrl+t with nowrapscan leaves caret unmoved`() {
+    configureByText(
+      """
+        |${c}one
+        |two
+        |one
+        |two
+        |one
+      """.trimMargin(),
+    )
+    enterCommand("set incsearch nowrapscan")
+    // Known limitation: /two -> line 1, <C-T> would wrap backwards past the first match to line 3, which the preview
+    // shows (its match count wraps unconditionally). But on <CR> the search runs in the reverse direction, and with
+    // 'nowrapscan' it cannot wrap around, so it finds nothing and the caret is left where it started (line 0).
+    typeText("/", "two")
+    typeText("<C-T>")
+    typeText("<CR>")
+    assertState(
+      """
+        |${c}one
+        |two
+        |one
+        |two
+        |one
+      """.trimMargin()
+    )
+  }
 }

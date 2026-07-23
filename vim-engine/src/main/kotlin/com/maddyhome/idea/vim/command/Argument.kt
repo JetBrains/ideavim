@@ -27,7 +27,8 @@ sealed class Argument {
   class Character(val character: Char) : Argument()
 
   /** An argument representing the user's input from the Ex command line, typically a search string */
-  class ExString(val label: Char, val string: String, val processing: ((String) -> Unit)?) : Argument()
+  class ExString(val label: Char, val string: String, val incSearchOffset: Int, val processing: ((String) -> Unit)?) :
+    Argument()
 
   /**
    * Represents an argument that is a motion. Used by operator commands

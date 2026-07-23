@@ -137,6 +137,8 @@ interface VimCommandLine {
    */
   fun advanceIncsearchMatch(next: Boolean) {}
 
+  fun getIncsearchMatchOffset(): Int = 0
+
   /**
    * TODO remove me, close is safer
    */

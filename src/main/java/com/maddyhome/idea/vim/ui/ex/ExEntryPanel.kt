@@ -102,6 +102,10 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
     return getLabel().startsWith(":")
   }
 
+  override fun getIncsearchMatchOffset(): Int {
+    return incsearchMatchOffset
+  }
+
   override fun showCompletionBar(completion: CommandLineCompletion) {
     if (ApplicationManager.getApplication().isUnitTestMode) return
     val editor = this.ijEditor ?: return

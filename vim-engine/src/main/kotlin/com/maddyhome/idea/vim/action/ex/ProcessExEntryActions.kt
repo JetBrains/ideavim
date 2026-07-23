@@ -106,25 +106,15 @@ class ProcessSearchEntryAction(private val parentAction: ProcessExEntryAction) :
     operatorArguments: OperatorArguments,
   ): Motion {
     if (argument !is Argument.ExString) return Motion.Error
-    val offsetAndMotion = when (argument.label) {
-      '/' -> injector.searchGroup.processSearchCommand(
-        editor,
-        argument.string,
-        caret.offset,
-        operatorArguments.count1,
-        Direction.FORWARDS
-      )
+    val originalDirection = if (argument.label == '/') Direction.FORWARDS else Direction.BACKWARDS
 
-      '?' -> injector.searchGroup.processSearchCommand(
-        editor,
-        argument.string,
-        caret.offset,
-        operatorArguments.count1,
-        Direction.BACKWARDS
-      )
+    val effectiveCount = operatorArguments.count1 + argument.incSearchOffset
+    val direction = if (effectiveCount >= 1) originalDirection else originalDirection.reverse()
+    val count = if (effectiveCount >= 1) effectiveCount else 1 - effectiveCount
 
-      else -> throw ExException("Unexpected search label ${argument.label}")
-    }
+    val offsetAndMotion = injector.searchGroup.processSearchCommand(
+      editor, argument.string, caret.offset, count, direction
+    )
     // Vim doesn't treat not finding something as an error, although it might report either an error or warning message
     if (offsetAndMotion == null) return Motion.NoMotion
     parentAction.motionType = offsetAndMotion.second
