@@ -119,9 +119,9 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
    *
    * We invoke the real action instance via [ActionManager.tryToExecute], passing the original key event so the
    * action's own `update` decides enablement. This preserves the console's context-aware behaviour: Up/Down only
-   * navigate history at the first/last line (moving the caret otherwise), and Enter executes or inserts a newline for
-   * an incomplete block. If the console action is disabled for the current caret position, `tryToExecute` rejects and
-   * we return false so Vim performs the normal caret movement.
+   * navigate history at the first/last line (moving the caret otherwise), and in Insert mode Enter executes or inserts
+   * a newline for an incomplete block. If the console action is disabled for the current caret position,
+   * `tryToExecute` rejects and we return false so Vim performs the normal caret movement.
    *
    * @return true if the console handled the keystroke (and Vim should not process it further).
    */
@@ -132,7 +132,15 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
     val action = when (keyStroke.keyCode) {
       KeyEvent.VK_UP -> ConsoleHistoryController.getController(consoleView)?.historyNext
       KeyEvent.VK_DOWN -> ConsoleHistoryController.getController(consoleView)?.historyPrev
-      KeyEvent.VK_ENTER -> consoleExecuteAction(consoleView)
+      KeyEvent.VK_ENTER -> {
+        // in normal mode we move caret to end of command so it will always execute command
+        if (editor.vim.mode.inNormalMode) {
+          val consoleEditor = consoleView.consoleEditor
+          consoleEditor.caretModel.moveToOffset(consoleEditor.document.textLength)
+        }
+        consoleExecuteAction(consoleView)
+      }
+
       else -> null
     } ?: return false
     val result = ActionManager.getInstance()
