@@ -16,6 +16,20 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 interface VimscriptParser {
   val linesWithErrors: MutableList<Int>
 
+  /**
+   * Human-readable syntax errors collected while parsing the *current* pass. Populated by the error listener and
+   * cleared at the start of every parse pass (including the internal error-recovery retries), so it is scratch state.
+   * Consumers that want to report parse errors should read [lastParseErrors] instead.
+   */
+  val errorMessages: MutableList<String>
+
+  /**
+   * Human-readable syntax errors from the last top-level [parse] call. Unlike [errorMessages], this survives the
+   * internal error-recovery retries and the parser reset, so it can be read after [parse] returns to report the
+   * errors to the user (e.g. when executing .ideavimrc).
+   */
+  val lastParseErrors: List<String>
+
   val exCommands: ExCommandTree
 
   fun parse(script: String): Script
