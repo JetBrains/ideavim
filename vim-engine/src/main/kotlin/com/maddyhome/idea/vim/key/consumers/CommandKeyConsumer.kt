@@ -150,9 +150,10 @@ internal class CommandKeyConsumer : KeyConsumer {
         val label = commandLine.getLabel()
         val text = commandLine.text
         val processing = commandLine.inputProcessing
+        val incSearchOffset = commandLine.getIncsearchMatchOffset()
         commandLine.close(refocusOwningEditor = true, resetCaret = true)
 
-        commandBuilder.addArgument(Argument.ExString(label[0], text, processing))
+        commandBuilder.addArgument(Argument.ExString(label[0], text, incSearchOffset, processing))
       }
     }
   }
