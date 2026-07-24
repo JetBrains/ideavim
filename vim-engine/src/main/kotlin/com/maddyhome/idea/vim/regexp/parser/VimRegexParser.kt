@@ -31,7 +31,7 @@ internal object VimRegexParser {
    */
   fun parse(pattern: String): VimRegexParserResult {
     return try {
-      val regexLexer = BailErrorLexer(CharStreams.fromString(pattern))
+      val regexLexer = BailErrorLexer(CharStreams.fromString(BracketNormalizer.normalize(pattern)))
       val tokens = CommonTokenStream(regexLexer)
       val parser = RegexParser(tokens)
       parser.errorHandler = VimRegexParserErrorStrategy()

@@ -433,6 +433,83 @@ class VimRegexEngineTest {
   }
 
   @Test
+  fun `test negated collection with literal closing bracket`() {
+    // "[^]][" behaves like "[^\]]\[": a non-']' character followed by a literal '['.
+    doTest(
+      "hea${START}p[${END}0][1]",
+      "[^]][",
+    )
+  }
+
+  @Test
+  fun `test negated collection with literal closing bracket matches non bracket`() {
+    // "[^]]" behaves like "[^\]]": matches any character that is not ']'.
+    doTest(
+      "${START}a${END}]b",
+      "[^]]",
+    )
+  }
+
+  @Test
+  fun `test collection with literal closing bracket first`() {
+    // "[]]" behaves like "[\]]": matches a literal ']'.
+    doTest(
+      "a${START}]${END}b",
+      "[]]",
+    )
+  }
+
+  @Test
+  fun `test collection with literal closing bracket and members`() {
+    // "[]abc]" is a collection of ']', 'a', 'b' and 'c'.
+    doTest(
+      "z${START}]abc${END}w",
+      "[]abc]\\+",
+    )
+  }
+
+  @Test
+  fun `test negated collection with literal closing bracket and members`() {
+    // "[^]abc]" is a negated collection of ']', 'a', 'b' and 'c'.
+    doTest(
+      "${START}q${END}]abc",
+      "[^]abc]",
+    )
+  }
+
+  @Test
+  fun `test unmatched opening bracket is literal`() {
+    doTest(
+      "${START}heap[${END}[[",
+      "heap[",
+    )
+  }
+
+  @Test
+  fun `test multiple unmatched opening brackets are literal`() {
+    doTest(
+      "heap${START}[[[${END}",
+      "[[[",
+    )
+  }
+
+  @Test
+  fun `test single unmatched opening bracket is literal`() {
+    doTest(
+      "heap${START}[${END}[[",
+      "[",
+    )
+  }
+
+  @Test
+  fun `test unmatched opening bracket is literal in very magic mode`() {
+    doTest(
+      "hea${START}p[${END}0][1]",
+      "\\v[^]][",
+    )
+  }
+
+  @Test
   fun `test collection a to z and 0`() {
     doTest(
       "${START}abcd0efg${END}1hij",
