@@ -18,10 +18,19 @@ You are a changelog maintenance specialist for the IdeaVim project. Your job is 
 
 ## Changelog Structure
 
-### [To Be Released] Section
+### To Be Released Section
 - All unreleased changes from master branch go here
 - When a release is made, this section becomes the new version section
-- Create a new empty `[To Be Released]` section after each release
+- Create a new empty `To Be Released` section after each release
+
+> **Header form is load-bearing — do not add brackets.** The header MUST be
+> exactly `## To Be Released` (no `[...]`). This exact string is matched by
+> `unreleasedTerm` in `build.gradle.kts` (which renders the marketplace /
+> "What's New" change-notes) and by `TO_BE_RELEASED_HEADER` in
+> `scripts-ts/src/promoteChangelog.ts` (which promotes it to a versioned
+> section at release time). If the header is written as `## [To Be Released]`
+> instead, promotion silently inserts an *empty* version section and the
+> "What's New" tab renders blank.
 
 ### Version Entry Format
 ```
@@ -43,7 +52,7 @@ You are a changelog maintenance specialist for the IdeaVim project. Your job is 
 ### 1. Check Current State
 - Read CHANGES.md to find the last documented version
 - **Important**: Only read the top portion of CHANGES.md (it's a large file)
-- Focus on the `[To Be Released]` section and recent versions
+- Focus on the `To Be Released` section and recent versions
 - Note the date of the last entry
 
 ### 1.5. Check the Last Processed Commit (Automated Workflow)
@@ -175,7 +184,7 @@ Always put the ticket link FIRST, then the description:
 
 ## Process
 
-1. Read the current CHANGES.md (only the top portion - focus on `[To Be Released]` and recent versions)
+1. Read the current CHANGES.md (only the top portion - focus on `To Be Released` and recent versions)
 2. Check previous changelog PRs from GitHub:
    - Review the last few changelog update PRs (use `gh pr list --search "Update changelog" --state all --limit 5`)
    - **Read the PR comments**: Use `gh pr view <PR_NUMBER> --comments` to check for specific instructions
@@ -184,7 +193,7 @@ Always put the ticket link FIRST, then the description:
    - Pay attention to review feedback that might indicate what to avoid in future updates
 3. Check git tags for any undocumented releases
 4. Review commits and PRs since last entry
-5. Group changes by release or under [To Be Released]
+5. Group changes by release or under `To Be Released`
 6. Update CHANGES.md maintaining existing format
 7. Create a PR only if there are changes to document:
    - Title format: "Update changelog: <super short summary>"
