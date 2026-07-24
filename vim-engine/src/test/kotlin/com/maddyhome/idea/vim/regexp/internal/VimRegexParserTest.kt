@@ -176,13 +176,64 @@ class VimRegexParserTest {
   }
 
   @Test
-  fun `test unclosed collection`() {
-    assertFailure("[a-z")
+  fun `test unclosed collection is treated as literal`() {
+    /**
+     * An opening bracket with no matching closing bracket is treated literally by Vim,
+     * so "[a-z" matches the literal text "[a-z" instead of raising an error.
+     */
+    assertSuccess("[a-z")
   }
 
   @Test
-  fun `test collection unescaped backslash at end`() {
-    assertFailure("[abc\\]")
+  fun `test collection unescaped backslash at end is treated as literal`() {
+    /**
+     * The trailing "\]" is an escaped literal ']', so the collection is never closed.
+     * Vim then treats the '[' as a literal, matching "[abc]".
+     */
+    assertSuccess("[abc\\]")
+  }
+
+  @Test
+  fun `test unmatched opening bracket`() {
+    assertSuccess("[")
+  }
+
+  @Test
+  fun `test unmatched opening bracket with preceding text`() {
+    assertSuccess("heap[")
+  }
+
+  @Test
+  fun `test multiple unmatched opening brackets`() {
+    assertSuccess("[[[")
+  }
+
+  @Test
+  fun `test negated collection with literal closing bracket first`() {
+    /**
+     * A ']' right after "[^" is a literal member of the collection: "[^]]" is
+     * equivalent to "[^\]]".
+     */
+    assertSuccess("[^]]")
+  }
+
+  @Test
+  fun `test collection with literal closing bracket first`() {
+    /**
+     * A ']' right after '[' is a literal member of the collection: "[]]" is
+     * equivalent to "[\]]".
+     */
+    assertSuccess("[]]")
+  }
+
+  @Test
+  fun `test negated collection with literal closing bracket and members`() {
+    assertSuccess("[^]abc]")
+  }
+
+  @Test
+  fun `test collection with literal closing bracket and members`() {
+    assertSuccess("[]abc]")
   }
 
   @Test
@@ -203,7 +254,12 @@ class VimRegexParserTest {
 
   @Test
   fun `test collection with character class expression missing closing bracket`() {
-    assertFailure("[[:alnum:]")
+    /**
+     * The outer '[' has no matching ']', so Vim treats it as a literal '[' followed by
+     * the collection "[:alnum:]" (a collection of the characters ':', 'a', 'l', 'n',
+     * 'u', 'm'). The pattern is therefore valid.
+     */
+    assertSuccess("[[:alnum:]")
   }
 
   @Test
