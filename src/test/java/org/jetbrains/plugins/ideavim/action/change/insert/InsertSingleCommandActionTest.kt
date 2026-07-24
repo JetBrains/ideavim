@@ -21,7 +21,7 @@ class InsertSingleCommandActionTest : SingleCommandActionTest() {
     doTest(
       listOf(command, "<C-O>", "db"),
       "first line${c}\nsecond line",
-      "first e${c}\nsecond line",
+      "first ${c}e\nsecond line",
       mode,
     )
   }

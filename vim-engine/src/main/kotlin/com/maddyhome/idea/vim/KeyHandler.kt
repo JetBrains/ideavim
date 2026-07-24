@@ -316,7 +316,12 @@ class KeyHandler {
     //true if goes form insert to OpPending
     val isSingleCommandFromInsert = when (val m = editor.mode) {
       is Mode.NORMAL -> m.isInsertPending || m.isReplacePending
-      is Mode.OP_PENDING -> m.returnTo is Mode.INSERT || m.returnTo is Mode.REPLACE
+      is Mode.OP_PENDING -> {
+        val returnTo = m.returnTo
+        returnTo is Mode.INSERT || returnTo is Mode.REPLACE ||
+          (returnTo is Mode.NORMAL && (returnTo.isInsertPending || returnTo.isReplacePending))
+      }
+
       else -> false
     }
 
@@ -463,12 +468,11 @@ class KeyHandler {
 
     private fun restoreCursorAfterInsertNormal(editor: VimEditor, editorState: VimStateMachine) {
       for (caret in editor.nativeCarets()) {
-        if (editorState.wasCaretAtEndOfLineBeforeInsertNormal || editorState.deletedToEndOfLine) {
+        if (editorState.deletedToEndOfLine) {
           val line = caret.getBufferPosition().line
           caret.moveToOffset(editor.getLineEndOffset(line, true))
         }
       }
-      editorState.wasCaretAtEndOfLineBeforeInsertNormal = false
       editorState.deletedToEndOfLine = false
     }
   }

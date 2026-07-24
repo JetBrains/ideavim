@@ -24,8 +24,8 @@ interface VimStateMachine {
 
   var ctrlXCompletionMode: CtrlXCompletionMode
 
-  //These two variable are created for moving caret one forward when returning back to insert from one normal cmd
-  var wasCaretAtEndOfLineBeforeInsertNormal: Boolean
+  // Set when a `<C-O>` single command deletes through to the end of the line, so that returning to insert mode can
+  // place the caret in the "append" position past the last character (matching Vim).
   var deletedToEndOfLine: Boolean
 
   /**

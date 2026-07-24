@@ -30,7 +30,6 @@ import com.maddyhome.idea.vim.helper.CharacterHelper.charType
 import com.maddyhome.idea.vim.helper.NumberType
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.helper.endOffsetInclusive
-import com.maddyhome.idea.vim.helper.isCaretAtLineEnd
 import com.maddyhome.idea.vim.helper.usesVirtualSpace
 import com.maddyhome.idea.vim.key.AbbreviationContext
 import com.maddyhome.idea.vim.key.findAndResolveAbbreviation
@@ -115,10 +114,17 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   ): Boolean {
     val endOffset = injector.motion.getHorizontalMotion(editor, caret, count, true)
     if (endOffset is AbsoluteOffset) {
+      val range = TextRange(caret.offset, endOffset.offset)
+      // If the deletion reaches the end of the line, remember it so that returning to Insert mode after a `<C-O>`
+      // single command can place the caret in the "append" position past the last character (matching Vim).
+      val endLine = editor.offsetToBufferPosition(range.endOffset).line
+      if (range.endOffset >= editor.getLineEndOffset(endLine, true)) {
+        injector.vimState.deletedToEndOfLine = true
+      }
       val res = deleteText(
         editor,
         context,
-        TextRange(caret.offset, endOffset.offset),
+        range,
         SelectionType.CHARACTER_WISE,
         caret,
       )
@@ -725,9 +731,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
    * @param editor The editor to put into NORMAL mode for one command
    */
   override fun processSingleCommand(editor: VimEditor) {
-
-    injector.vimState.wasCaretAtEndOfLineBeforeInsertNormal =
-      editor.nativeCarets().any { editor.isCaretAtLineEnd(it, allowEnd = true) }
+    injector.vimState.deletedToEndOfLine = false
 
     editor.mode = Mode.NORMAL(editor.mode)
 

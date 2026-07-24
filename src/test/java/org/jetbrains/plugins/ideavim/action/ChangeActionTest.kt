@@ -157,6 +157,28 @@ class ChangeActionTest : VimTestCase() {
     )
   }
 
+  @Test
+  fun testDeleteInsertSingleCommandPupulatesRegister() {
+    configureByText(
+      """
+        time${c}pass is fun
+      """.trimIndent()
+    )
+    typeText(injector.parser.parseKeys("i<C-O>d3w"))
+    assertRegister('-', "pass is fun")
+  }
+
+  @Test
+  fun testDeleteInsertSingleCommandPupulatesRegisterInNormalMode() {
+    configureByText(
+      """
+        time${c}pass is fun
+      """.trimIndent()
+    )
+    typeText(injector.parser.parseKeys("d3w"))
+    assertRegister('-', "pass is fun")
+  }
+
   // VIM-321 |d| |count|
   @Test
   fun testDeleteEmptyRange() {

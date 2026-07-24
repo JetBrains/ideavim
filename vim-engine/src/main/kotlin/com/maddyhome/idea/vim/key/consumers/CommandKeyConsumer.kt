@@ -171,7 +171,7 @@ internal class CommandKeyConsumer : KeyConsumer {
       if (editorState.isDotRepeatInProgress && argumentCaptured != null) {
         commandBuilder.addArgument(argumentCaptured!!)
       }
-      editor.mode = Mode.OP_PENDING(editorState.mode.returnTo)
+      editor.mode = Mode.OP_PENDING(editorState.mode)
     }
 
     action.onStartWaitingForArgument(editor, context, keyState)
