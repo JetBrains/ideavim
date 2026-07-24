@@ -1,4 +1,7 @@
 import { describe, it, expect } from "vitest";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 import { promoteChangelog, TO_BE_RELEASED_HEADER } from "./promoteChangelog.js";
 
 const today = new Date("2026-06-01T08:00:00Z");
@@ -78,6 +81,36 @@ describe("promoteChangelog", () => {
       });
       expect(result).toContain("## 3.0.0, 2026-06-01");
       expect(result).not.toContain(TO_BE_RELEASED_HEADER);
+    });
+  });
+
+  // Guards against the constant drifting from the real CHANGES.md header, which
+  // would make promotion a silent no-op and leave the "What's New" tab blank.
+  describe("real CHANGES.md", () => {
+    const changelogPath = join(
+      dirname(fileURLToPath(import.meta.url)),
+      "..",
+      "..",
+      "CHANGES.md",
+    );
+
+    it("contains the header the promoter looks for", () => {
+      const content = readFileSync(changelogPath, "utf-8");
+      expect(content).toContain(TO_BE_RELEASED_HEADER);
+    });
+
+    it("actually promotes the unreleased section (not a no-op insert)", () => {
+      const content = readFileSync(changelogPath, "utf-8");
+      const result = promoteChangelog({
+        version: "9.9.9",
+        releaseType: "minor",
+        today,
+        content,
+      });
+      // A real promotion renames the unreleased header rather than inserting a
+      // new empty one above it.
+      expect(result).not.toContain(TO_BE_RELEASED_HEADER);
+      expect(result).toContain("## 9.9.9, 2026-06-01");
     });
   });
 
