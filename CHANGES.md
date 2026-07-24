@@ -39,6 +39,7 @@ usual beta standards.
 * [VIM-986](https://youtrack.jetbrains.com/issue/VIM-986) Added Insert-mode [file name completion](https://vimhelp.org/insert.txt.html#i_CTRL-X_CTRL-F) — press `<C-X>` to start `CTRL-X` completion, then `<C-F>` to complete file paths from the file system
 * [VIM-1341](https://youtrack.jetbrains.com/issue/VIM-1341) Added the [`gx`](https://vimhelp.org/pi_netrw.txt.html#netrw-gx) command — press `gx` in Normal mode to open the URL under the caret (e.g. `https://example.com`, or any `scheme://…` such as `ssh://`) with the OS default handler. The program can be overridden with the `g:netrw_browsex_viewer` variable
 * [VIM-989](https://youtrack.jetbrains.com/issue/VIM-989) Added a file argument to [`:write`](https://vimhelp.org/editing.txt.html#:w) — `:w {file}` now saves the buffer to a new file (e.g. `:w ~/notes.txt`), a range writes only the selected lines (e.g. `:1,2w out.txt`), and `:w!` overwrites an existing file while `:w` reports an error rather than clobbering it. The path supports environment variables and `~` expansion
+* [VIM-3936](https://youtrack.jetbrains.com/issue/VIM-3936) Enabled Vim in the [Python console](https://www.jetbrains.com/help/pycharm/using-consoles.html) — Normal mode, motions, and `Esc` now work in the console input, while the console keeps handling `Enter` (execute), the `Up`/`Down` history keys, and horizontal arrow keys
 
 ### Fixes:
 * [VIM-4281](https://youtrack.jetbrains.com/issue/VIM-4281) Fixed the `:` output panel and command line keeping their old text colors after the IDE theme or editor color scheme is switched while they are open — the displayed text now updates to match the new scheme
@@ -47,11 +48,16 @@ usual beta standards.
 * [VIM-4273](https://youtrack.jetbrains.com/issue/VIM-4273) Fixed `:s///g` skipping matches after the first on tab-indented lines — e.g. `%s/Cinema/Other/g` now replaces every occurrence on a line that starts with tabs
 * [VIM-2997](https://youtrack.jetbrains.com/issue/VIM-2997) Fixed a crash during method navigation (`[m`, `]m`) when an element in the file structure had no text range
 * [VIM-315](https://youtrack.jetbrains.com/issue/VIM-315) Fixed the caret position after deleting to the end of a line from Insert-Normal mode — running a delete-to-end command such as `D`, `d$`, or `d3w` after `<C-O>` now leaves the caret at the correct position when returning to Insert mode
+* [VIM-2649](https://youtrack.jetbrains.com/issue/VIM-2649) Fixed the caret not jumping to the selected match when accepting an incremental search with `Enter` after stepping through matches with `<C-G>`/`<C-T>`
+* [VIM-4284](https://youtrack.jetbrains.com/issue/VIM-4284) Fixed vimscript parse errors being silently swallowed — errors are now shown to the user, and an error on the last line no longer causes the whole script to be rejected
 
 ### Changes:
 * [VIM-2178](https://youtrack.jetbrains.com/issue/VIM-2178) The `multiple-cursors` extension now maps its default shortcuts to match the original [vim-multiple-cursors](https://github.com/terryma/vim-multiple-cursors) plugin: `<C-n>`/`g<C-n>` add the next occurrence (whole word / any match), `<A-n>`/`g<A-n>` select all occurrences in the file, and `<C-x>`/`<C-p>` skip and remove selections. This is a breaking change from the previous `<A-n>`/`g<A-n>`/`<A-x>`/`<A-p>` mappings — set `let g:multi_cursor_use_default_mapping = 0` to disable the defaults and bind the `<Plug>` mappings yourself (for example, back to the old `<A-n>` based keys)
 
 ### Merged PRs:
+* [1940](https://github.com/JetBrains/ideavim/pull/1940) by [1grzyb1](https://github.com/1grzyb1): VIM-2649 Move carret on enter after C-G/C-t
+* [1939](https://github.com/JetBrains/ideavim/pull/1939) by [1grzyb1](https://github.com/1grzyb1): VIM-4284 Errors in vim scripts
+* [1938](https://github.com/JetBrains/ideavim/pull/1938) by [1grzyb1](https://github.com/1grzyb1): VIM-3936 enable vim in python console
 * [1929](https://github.com/JetBrains/ideavim/pull/1929) by [1grzyb1](https://github.com/1grzyb1): VIM-4281 update output panel theme on change
 * [1928](https://github.com/JetBrains/ideavim/pull/1928) by [1grzyb1](https://github.com/1grzyb1): VIM-4279 fix till V motion
 * [1925](https://github.com/JetBrains/ideavim/pull/1925) by [1grzyb1](https://github.com/1grzyb1): VIM-1850 Implement keymap option
