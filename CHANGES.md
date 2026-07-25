@@ -47,14 +47,17 @@ usual beta standards.
 * [VIM-4270](https://youtrack.jetbrains.com/issue/VIM-4270) Fixed a trailing `%` after an explicit range overriding it — running a command on a Visual selection with a `%` appended (e.g. `:'<,'>%d`) no longer expands to the whole file; the `%` is now ignored to match Vim
 * [VIM-4273](https://youtrack.jetbrains.com/issue/VIM-4273) Fixed `:s///g` skipping matches after the first on tab-indented lines — e.g. `%s/Cinema/Other/g` now replaces every occurrence on a line that starts with tabs
 * [VIM-2997](https://youtrack.jetbrains.com/issue/VIM-2997) Fixed a crash during method navigation (`[m`, `]m`) when an element in the file structure had no text range
-* [VIM-315](https://youtrack.jetbrains.com/issue/VIM-315) Fixed the caret position after deleting to the end of a line from Insert-Normal mode — running a delete-to-end command such as `D`, `d$`, or `d3w` after `<C-O>` now leaves the caret at the correct position when returning to Insert mode
+* [VIM-315](https://youtrack.jetbrains.com/issue/VIM-315) Fixed the caret position when returning to Insert mode after a `<C-O>` single command — a delete that reaches the end of the line (e.g. `D`, `d$`, or `d3w`) now leaves the caret in the append position past the last character, while other commands (e.g. `db` at the end of a line) no longer push the caret to the end of the line
 * [VIM-2649](https://youtrack.jetbrains.com/issue/VIM-2649) Fixed the caret not jumping to the selected match when accepting an incremental search with `Enter` after stepping through matches with `<C-G>`/`<C-T>`
 * [VIM-4284](https://youtrack.jetbrains.com/issue/VIM-4284) Fixed vimscript parse errors being silently swallowed — errors are now shown to the user, and an error on the last line no longer causes the whole script to be rejected
+* [VIM-4286](https://youtrack.jetbrains.com/issue/VIM-4286) Fixed search and substitute patterns with square brackets that don't form a [collection](https://vimhelp.org/pattern.txt.html#%2Fcollection) being rejected as invalid — an unmatched `[` is now a literal bracket (e.g. `/heap[`, `/[[[`, `/[a-z`) and a `]` right after `[` or `[^` is a literal member of the collection (e.g. `/[]]` matches a `]`, `/[^]]` matches anything but a `]`), matching Vim
 
 ### Changes:
 * [VIM-2178](https://youtrack.jetbrains.com/issue/VIM-2178) The `multiple-cursors` extension now maps its default shortcuts to match the original [vim-multiple-cursors](https://github.com/terryma/vim-multiple-cursors) plugin: `<C-n>`/`g<C-n>` add the next occurrence (whole word / any match), `<A-n>`/`g<A-n>` select all occurrences in the file, and `<C-x>`/`<C-p>` skip and remove selections. This is a breaking change from the previous `<A-n>`/`g<A-n>`/`<A-x>`/`<A-p>` mappings — set `let g:multi_cursor_use_default_mapping = 0` to disable the defaults and bind the `<Plug>` mappings yourself (for example, back to the old `<A-n>` based keys)
 
 ### Merged PRs:
+* [1944](https://github.com/JetBrains/ideavim/pull/1944) by [1grzyb1](https://github.com/1grzyb1): Handle `<C-O>` single command deletion to end of line correctly
+* [1943](https://github.com/JetBrains/ideavim/pull/1943) by [1grzyb1](https://github.com/1grzyb1): VIM-4286 Normalize square brackets in vim regex
 * [1940](https://github.com/JetBrains/ideavim/pull/1940) by [1grzyb1](https://github.com/1grzyb1): VIM-2649 Move carret on enter after C-G/C-t
 * [1939](https://github.com/JetBrains/ideavim/pull/1939) by [1grzyb1](https://github.com/1grzyb1): VIM-4284 Errors in vim scripts
 * [1938](https://github.com/JetBrains/ideavim/pull/1938) by [1grzyb1](https://github.com/1grzyb1): VIM-3936 enable vim in python console
