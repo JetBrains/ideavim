@@ -250,7 +250,9 @@ class YankMotionActionTest : VimTestCase() {
     assertEquals(SelectionType.LINE_WISE, firstRegister.type)
 
     val secondRegister = carets.last().registerStorage.getRegister(vimEditor, context, registerService.lastRegisterChar)
-    assertEquals("adipiscing elit\n", secondRegister!!.text)
+    // The motion is exclusive and ends in column 1, so its end moves back to the end of the previous line (:help
+    // exclusive). The trailing new line is not yanked
+    assertEquals("adipiscing elit", secondRegister!!.text)
     assertEquals(SelectionType.CHARACTER_WISE, secondRegister.type)
   }
 
@@ -293,7 +295,9 @@ class YankMotionActionTest : VimTestCase() {
     val text = register?.text ?: kotlin.test.fail()
     val type = register.type
 
-    kotlin.test.assertEquals("olor sit amet\n", text)
+    // The motion is exclusive and ends in column 1, so its end moves back to the end of the previous line (:help
+    // exclusive). The trailing new line is not yanked
+    kotlin.test.assertEquals("olor sit amet", text)
     kotlin.test.assertEquals(SelectionType.CHARACTER_WISE, type)
   }
 }

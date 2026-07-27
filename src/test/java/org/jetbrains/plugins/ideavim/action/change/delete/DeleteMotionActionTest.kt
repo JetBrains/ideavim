@@ -572,4 +572,24 @@ class DeleteMotionActionTest : VimTestCase() {
     kotlin.test.assertEquals("Lorem Ipsum\n", register.text)
     kotlin.test.assertEquals(SelectionType.LINE_WISE, register.type)
   }
+
+  @Test
+  fun `test delete paragraph keeps blank separator line`() {
+    typeTextInFile(
+      "d}",
+      """
+        o${c}ne
+        two
+
+        three
+      """.trimIndent(),
+    )
+    assertState(
+      """
+        ${c}o
+
+        three
+      """.trimIndent(),
+    )
+  }
 }

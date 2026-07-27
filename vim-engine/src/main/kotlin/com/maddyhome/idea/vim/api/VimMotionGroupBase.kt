@@ -354,6 +354,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
 
     var start: Int
     var end: Int
+    var isForwardMotion = false
 
     val action = argument.motion
     when (action) {
@@ -366,6 +367,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
         if (Motion.Error == motion || Motion.NoMotion == motion) return null
 
         end = (motion as AbsoluteOffset).offset
+        isForwardMotion = end >= start
 
         // A blockwise force (o_CTRL-V) turns the motion's two endpoints into a rectangular block. The block's own
         // machinery (VimBlockSelection) handles the column range, including the inclusive right column.
@@ -416,6 +418,21 @@ abstract class VimMotionGroupBase : VimMotionGroup {
         min((editor.getLineEndForOffset(end) + 1).toLong(), editor.fileSize()).toInt()
       } else {
         editor.getLineEndForOffset(end)
+      }
+    }
+
+    // :help exclusive - if the motion is exclusive and the end of the motion is in column 1, the end of the motion is
+    // moved to the end of the previous line and the motion becomes inclusive. If, additionally, the start of the
+    // motion was at or before the first non-blank in the line, the motion becomes linewise.
+    // The linewise half of the rule is applied by the operators (see getDeleteRangeAndType and yankMotion), which
+    // recognise it by the end of the range still being in column 1, so only adjust the end for the inclusive half.
+    // Backward motions are not adjusted. Vim skips the adjustment for the ones that would be affected in practice,
+    // e.g. <BS> and h wrapping to the previous line set CA_NO_ADJ_OP_END in nv_left
+    if (action is MotionActionHandler && action.motionType === MotionType.EXCLUSIVE && isForwardMotion) {
+      val startPosition = editor.offsetToBufferPosition(start)
+      val endPosition = editor.offsetToBufferPosition(end)
+      if (endPosition.column == 0 && endPosition.line > startPosition.line && editor.anyNonWhitespace(start, -1)) {
+        end = max(start, editor.getLineEndOffset(endPosition.line - 1))
       }
     }
 
