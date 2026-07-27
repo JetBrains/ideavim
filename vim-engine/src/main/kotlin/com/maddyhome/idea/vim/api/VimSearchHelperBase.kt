@@ -784,8 +784,9 @@ abstract class VimSearchHelperBase : VimSearchHelper {
       val text = editor.text()
       var trailingEnd = rightQuote + 1
 
-      // Check for trailing whitespace (on same line)
-      while (trailingEnd < text.length && text[trailingEnd] == ' ') {
+      // Check for trailing whitespace (on same line). Vim's in_quote uses vim_iswhite, which is a space or a tab.
+      // Note that Char.isWhitespace would also match a new line and let the scan leave the line
+      while (trailingEnd < text.length && text[trailingEnd].isSpaceOrTab()) {
         trailingEnd++
       }
 
@@ -795,7 +796,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
       } else {
         // No trailing whitespace, check for leading whitespace
         var leadingStart = leftQuote
-        while (leadingStart > 0 && text[leadingStart - 1] == ' ') {
+        while (leadingStart > 0 && text[leadingStart - 1].isSpaceOrTab()) {
           leadingStart--
         }
         if (leadingStart < leftQuote) {
@@ -2021,3 +2022,8 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     return null
   }
 }
+
+/**
+ * True if the character is a space or a tab, matching Vim's vim_iswhite
+ */
+private fun Char.isSpaceOrTab() = this == ' ' || this == '\t'
