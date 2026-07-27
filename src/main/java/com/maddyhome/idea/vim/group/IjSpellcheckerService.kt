@@ -46,4 +46,12 @@ class IjSpellcheckerService : SpellcheckerService {
       .createPopup()
       .showInBestPositionFor(editor.ij)
   }
+
+  override fun removeWordFromDictionary(word: String, editor: VimEditor) {
+    val project = editor.ij.project ?: return
+    val manager = SpellCheckerManager.getInstance(project)
+    var dictionaryWords = manager.userDictionaryWords
+    dictionaryWords = dictionaryWords - word
+    manager.updateUserDictionary(dictionaryWords)
+  }
 }
