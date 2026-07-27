@@ -20,22 +20,25 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 
 /**
- * Tests for the `zg` command (add the word under the cursor to the dictionary as a good word).
+ * Tests for the `z=` command (offer suggested replacements for the misspelled word under the cursor).
  *
- * `zg` is Vim's "good word" command: it takes the word under the caret and hands it to the IDE spellchecker so it is
- * no longer reported as misspelled.
+ * `z=` is Vim's "spelling suggestions" command: it takes the word under the caret and asks the IDE spellchecker for
+ * replacement suggestions, which are then offered to the user. Gathering and presenting suggestions is host-specific
+ * (see [SpellcheckerService], backed by `SpellCheckerManager`); here we stub that boundary with a fake so we can verify
+ * - fast and without the IDE's spellchecker engine - that `z=` identifies the correct word under the caret and asks
+ * for suggestions for it.
  */
 @Suppress("SpellCheckingInspection")
-class AddGoodWordToDictionaryActionTest : VimTestCase() {
+class SelectMisspelledWordSuggestionActionTest : VimTestCase() {
 
   private class FakeSpellcheckerService : SpellcheckerService {
-    val addedWords = mutableListOf<String>()
+    val suggestionRequests = mutableListOf<String>()
 
     override fun addWordToDictionary(word: String, editor: VimEditor) {
-      addedWords.add(word)
     }
 
     override fun selectSuggestion(word: String, editor: VimEditor, caret: VimCaret) {
+      suggestionRequests.add(word)
     }
   }
 
@@ -50,47 +53,47 @@ class AddGoodWordToDictionaryActionTest : VimTestCase() {
   }
 
   @Test
-  fun `test add word under cursor to dictionary`() {
+  fun `test suggest replacements for word under cursor`() {
     configureByText("I have a ${c}xqwzptu here")
 
-    typeText("zg")
+    typeText("z=")
 
-    assertEquals(listOf("xqwzptu"), fakeSpellcheckerService.addedWords)
+    assertEquals(listOf("xqwzptu"), fakeSpellcheckerService.suggestionRequests)
   }
 
   @Test
-  fun `test add word to dictionary with caret in the middle of the word`() {
+  fun `test suggest replacements with caret in the middle of the word`() {
     configureByText("Some qzw${c}xytp text")
 
-    typeText("zg")
+    typeText("z=")
 
-    assertEquals(listOf("qzwxytp"), fakeSpellcheckerService.addedWords, "the whole word under the cursor should be added, not just a fragment")
+    assertEquals(listOf("qzwxytp"), fakeSpellcheckerService.suggestionRequests, "suggestions should be requested for the whole word under the cursor, not just a fragment")
   }
 
   @Test
-  fun `test add word to dictionary with caret at the end of the word`() {
+  fun `test suggest replacements with caret at the end of the word`() {
     configureByText("Some vqxzpt${c}w text")
 
-    typeText("zg")
+    typeText("z=")
 
-    assertEquals(listOf("vqxzptw"), fakeSpellcheckerService.addedWords)
+    assertEquals(listOf("vqxzptw"), fakeSpellcheckerService.suggestionRequests)
   }
 
   @Test
-  fun `test add word to dictionary does not change the buffer`() {
+  fun `test suggest replacements does not change the buffer`() {
     configureByText("I have a ${c}xqwzptu here")
 
-    typeText("zg")
+    typeText("z=")
 
     assertState("I have a ${c}xqwzptu here")
   }
 
   @Test
-  fun `test only the word under the cursor is added`() {
+  fun `test suggestions are requested only for the word under the cursor`() {
     configureByText("I have a ${c}xqwzptu and vqxzptw here")
 
-    typeText("zg")
+    typeText("z=")
 
-    assertEquals(listOf("xqwzptu"), fakeSpellcheckerService.addedWords, "only the word under the cursor should be added")
+    assertEquals(listOf("xqwzptu"), fakeSpellcheckerService.suggestionRequests, "suggestions should be requested only for the word under the cursor")
   }
 }
