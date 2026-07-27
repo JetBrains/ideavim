@@ -200,4 +200,9 @@ class MotionBigWordEndRightActionTest : VimTestCase() {
       """.trimMargin().dotToSpace()
     )
   }
+
+  @Test
+  fun `test WORD end right does not stop at script boundary`() {
+    doTest("E", "${c}abcあいう def", "abcあい${c}う def")
+  }
 }

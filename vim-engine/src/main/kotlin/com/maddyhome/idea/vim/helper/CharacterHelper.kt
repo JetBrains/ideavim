@@ -18,8 +18,8 @@ object CharacterHelper {
   /**
    * This returns the type of the supplied character. The logic is as follows:<br></br>
    * If the character is whitespace, `WHITESPACE` is returned.<br></br>
-   * If the punctuation is being skipped or the character is a letter, digit, or underscore, `KEYWORD`
-   * is returned.<br></br>
+   * If the punctuation is being skipped (WORD motions), every non-blank character is `KEYWORD`.<br></br>
+   * If the character is a letter, digit, or underscore, `KEYWORD` is returned.<br></br>
    * Otherwise `PUNCTUATION` is returned.
    *
    * @param ch                   The character to analyze
@@ -28,10 +28,14 @@ object CharacterHelper {
    */
   @JvmStatic
   fun charType(editor: VimEditor, ch: Char, punctuationAsLetters: Boolean): CharacterType {
+    if (Character.isWhitespace(ch)) return CharacterType.WHITESPACE
+
+    // A WORD is a sequence of non-blank characters, separated with white space (:help WORD). Vim's cls() returns the
+    // same class for every non-blank character when cls_bigword is set, so script boundaries must not split a WORD.
+    if (punctuationAsLetters) return CharacterType.KEYWORD
+
     val block = UnicodeBlock.of(ch)
-    return if (Character.isWhitespace(ch)) {
-      CharacterType.WHITESPACE
-    } else if (block === UnicodeBlock.HIRAGANA) {
+    return if (block === UnicodeBlock.HIRAGANA) {
       CharacterType.HIRAGANA
     } else if (block === UnicodeBlock.KATAKANA) {
       CharacterType.KATAKANA
@@ -39,7 +43,7 @@ object CharacterHelper {
       CharacterType.HALF_WIDTH_KATAKANA
     } else if (block == UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS) {
       CharacterType.CJK_UNIFIED_IDEOGRAPHS
-    } else if (punctuationAsLetters || KeywordOptionHelper.isKeyword(editor, ch)) {
+    } else if (KeywordOptionHelper.isKeyword(editor, ch)) {
       CharacterType.KEYWORD
     } else {
       CharacterType.PUNCTUATION

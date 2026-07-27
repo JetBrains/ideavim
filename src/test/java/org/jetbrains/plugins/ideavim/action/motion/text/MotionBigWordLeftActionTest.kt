@@ -340,4 +340,9 @@ class MotionBigWordLeftActionTest : VimTestCase() {
       """.trimMargin().dotToSpace()
     )
   }
+
+  @Test
+  fun `test WORD left does not stop at script boundary`() {
+    doTest("B", "abcあいう ${c}def", "${c}abcあいう def")
+  }
 }
