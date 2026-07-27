@@ -265,7 +265,9 @@ fun VimEditor.anyNonWhitespace(offset: Int, dir: Int): Boolean {
     end = getLineEndForOffset(offset).coerceAtMost(fileSize - 1)
   } else {
     start = getLineStartForOffset(offset)
-    end = (offset - 1).coerceAtLeast(0)
+    // Do not coerce to 0. At offset 0 there is nothing before the caret, and the range 0..-1 is correctly empty,
+    // while 0..0 would inspect the character *under* the caret
+    end = offset - 1
   }
   val chars: CharSequence = text()
   for (i in start..end) {

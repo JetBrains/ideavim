@@ -30,7 +30,6 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
     )
   }
 
-  @VimBehaviorDiffers(originalVimAfter = c, description = "Full text is deleted")
   @Test
   fun `test remove full text with new line at the end`() {
     doTest(
@@ -40,9 +39,9 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
           consectetur adipiscing elit
           Sed in orci mauris.
           Cras id tellus in ex imperdiet egestas.
-          
+
       """.trimIndent(),
-      "$c.\n",
+      c,
       Mode.NORMAL(),
     )
   }

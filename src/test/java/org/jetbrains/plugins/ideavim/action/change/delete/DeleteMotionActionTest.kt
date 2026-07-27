@@ -12,6 +12,7 @@ package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
@@ -550,5 +551,25 @@ class DeleteMotionActionTest : VimTestCase() {
     } finally {
       enterCommand("set nooldundo")
     }
+  }
+
+  @Test
+  fun `test delete paragraph works linewise if at start of file`() {
+    typeTextInFile(
+      "d}",
+      """
+        ${c}Lorem Ipsum
+
+        I found it in a legendary land
+      """.trimIndent(),
+    )
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+    val register = registerService.getRegister(vimEditor, context, registerService.lastRegisterChar)
+      ?: kotlin.test.fail()
+
+    kotlin.test.assertEquals("Lorem Ipsum\n", register.text)
+    kotlin.test.assertEquals(SelectionType.LINE_WISE, register.type)
   }
 }

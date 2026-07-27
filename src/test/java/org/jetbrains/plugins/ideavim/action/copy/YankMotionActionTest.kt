@@ -255,6 +255,25 @@ class YankMotionActionTest : VimTestCase() {
   }
 
   @Test
+  fun `test yank block works linewise if at start of file`() {
+    val file = """
+            ${c}Lorem Ipsum
+
+            I found it in a legendary land
+    """.trimIndent()
+    typeTextInFile("y}", file)
+    val vimEditor = fixture.editor.vim
+    val context = injector.executionContextManager.getEditorExecutionContext(vimEditor)
+    val registerService = injector.registerGroup
+    val register = registerService.getRegister(vimEditor, context, registerService.lastRegisterChar)
+    val text = register?.text ?: kotlin.test.fail()
+    val type = register.type
+
+    kotlin.test.assertEquals("Lorem Ipsum\n", text)
+    kotlin.test.assertEquals(SelectionType.LINE_WISE, type)
+  }
+
+  @Test
   fun `test yank block works charwise if not at start of line`() {
     val file = """
             Lorem Ipsum

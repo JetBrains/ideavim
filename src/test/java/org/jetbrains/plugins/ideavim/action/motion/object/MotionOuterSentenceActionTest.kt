@@ -41,6 +41,8 @@ class MotionOuterSentenceActionTest : VimTestCase() {
         Sed in orci mauris.
         $c
     """,
+    description = "Vim has no empty last line, so `as` there selects nothing and the buffer is left alone. " +
+      "IdeaVim selects the whole file instead, and the delete is promoted to linewise",
   )
   @Test
   fun `test delete on empty last line`() {
@@ -52,7 +54,7 @@ class MotionOuterSentenceActionTest : VimTestCase() {
         Sed in orci mauris.
         $c
       """.trimIndent(),
-      "\n",
+      "",
       Mode.NORMAL(),
     )
   }
