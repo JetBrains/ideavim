@@ -161,4 +161,17 @@ class VimRegexEngineTest : VimTestCase() {
     }
   }
 
+  @Test
+  fun `test ignore case does not apply to character class`() {
+    configureByText("abc")
+    val result = findAll("\\c[[:upper:]]")
+    assertEquals(emptyList(), result)
+  }
+
+  @Test
+  fun `test ignore case still applies to characters and ranges in a collection`() {
+    configureByText("abc")
+    assertEquals(listOf(TextRange(0, 1)), findAll("\\c[A]"))
+    assertEquals(listOf(TextRange(0, 1)), findAll("\\c[A-A]"))
+  }
 }

@@ -43,13 +43,15 @@ internal class CollectionMatcher(
     if (includesEOL && editor.text()[index] == '\n') return MatcherResult.Success(1)
 
     val char = editor.text()[index]
+    // Ignoring case applies to the individual characters and to the ranges of a collection, but never to a character
+    // class - Vim matches [[:upper:]] against the character as it is, even with \c
     val result = if (isCaseInsensitive && !forceNoIgnoreCase) (chars.map { it.lowercaseChar() }
       .contains(char.lowercaseChar()) || ranges.any {
       it.inRange(
         char,
         true
       )
-    } || charClasses.any { it(char.lowercaseChar()) || it(char.uppercaseChar()) }) == !isNegated
+    } || charClasses.any { it(char) }) == !isNegated
     else (chars.contains(char) || ranges.any { it.inRange(char) } || charClasses.any { it(char) }) == !isNegated
     return if (result) MatcherResult.Success(1)
     else MatcherResult.Failure
