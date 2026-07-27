@@ -33,4 +33,14 @@ class MotionSentenceNextStartActionTest : VimTestCase() {
       Mode.INSERT,
     )
   }
+
+  @Test
+  fun `test sentence motion at end of file with trailing new line`() {
+    doTest("))", "${c}One. Two.\n", "One. Two${c}.\n")
+  }
+
+  @Test
+  fun `test delete sentence at end of file keeps trailing new line`() {
+    doTest("d)", "One. ${c}Two.\n", "One.${c} \n")
+  }
 }

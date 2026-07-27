@@ -1014,7 +1014,9 @@ abstract class VimSearchHelperBase : VimSearchHelper {
   ): @Range(from = 0, to = Int.MAX_VALUE.toLong()) Int? {
     // Save off the next paragraph since a paragraph is a valid sentence.
     val lline: Int = editor.offsetToBufferPosition(start).line
-    val np: Int = findNextParagraph(editor, lline, dir, false)
+    // For a file that ends with a new line, the next paragraph can be the empty last line that the IDE shows after
+    // that new line. Vim has no such line, so clamp the offset to the last character of the file
+    val np: Int = findNextParagraph(editor, lline, dir, false).let { if (it == max && max > 0) max - 1 else it }
     var end: Int?
     // start < max was added to avoid exception and it may be incorrect
     end = if (start < max && chars[start] == '\n' && !countCurrent) {
