@@ -118,6 +118,8 @@ interface VimInjector {
 
   val statisticsService: VimStatistics
 
+  val spellcheckerService: SpellcheckerService
+
   val put: VimPut
 
   val window: VimWindowGroup

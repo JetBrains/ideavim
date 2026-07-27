@@ -18,6 +18,7 @@ import com.maddyhome.idea.vim.api.ExecutionContextManager
 import com.maddyhome.idea.vim.api.LocalOptionInitialisationScenario
 import com.maddyhome.idea.vim.api.NativeActionManager
 import com.maddyhome.idea.vim.api.SearchWindowGroup
+import com.maddyhome.idea.vim.api.SpellcheckerService
 import com.maddyhome.idea.vim.api.SystemInfoService
 import com.maddyhome.idea.vim.api.VimAbbreviationGroup
 import com.maddyhome.idea.vim.api.VimActionExecutor
@@ -190,6 +191,8 @@ internal class IjVimInjector : VimInjectorBase() {
   override val visualMotionGroup: VimVisualMotionGroup
     get() = service()
   override val statisticsService: VimStatistics
+    get() = service()
+  override val spellcheckerService: SpellcheckerService
     get() = service()
   override val commandGroup: VimCommandGroup
     get() = service()

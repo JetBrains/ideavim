@@ -209,6 +209,8 @@
     <applicationService serviceImplementation="com.maddyhome.idea.vim.ui.widgets.mode.ModeWidgetSettings"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.IjStatisticsService"
                         serviceInterface="com.maddyhome.idea.vim.api.VimStatistics"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.IjSpellcheckerService"
+                        serviceInterface="com.maddyhome.idea.vim.api.SpellcheckerService"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.vimscript.services.FunctionStorage"
                         serviceInterface="com.maddyhome.idea.vim.api.VimscriptFunctionService"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.vimscript.Executor"
