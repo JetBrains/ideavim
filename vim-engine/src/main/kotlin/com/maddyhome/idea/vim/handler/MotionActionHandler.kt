@@ -49,6 +49,15 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
   open val expandCollapsedFolds: Boolean = true
 
   /**
+   * True if a failed motion should still apply a pending operator to the end of the file
+   *
+   * Vim's forward word motions fail at the end of the file, but the failure is only reported when there is no
+   * pending operator. With an operator, the operator is applied from the caret to the end of the file, so that e.g.
+   * `dw` on the last character of the file deletes that character (see `nv_wordcmd` in `normal.c`).
+   */
+  open val clampToEndOfFileWhenOperatorPending: Boolean = false
+
+  /**
    * Base class for motion handlers.
    * This handler executes an action for each caret. That means that if you have 5 carets, [getOffset] will be
    *   called 5 times.

@@ -32,4 +32,5 @@ class MotionBigWordRightAction : MotionActionHandler.ForEachCaret() {
   }
 
   override val motionType: MotionType = MotionType.EXCLUSIVE
+  override val clampToEndOfFileWhenOperatorPending: Boolean = true
 }

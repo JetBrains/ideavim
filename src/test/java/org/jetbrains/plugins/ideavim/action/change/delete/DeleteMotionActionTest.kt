@@ -592,4 +592,19 @@ class DeleteMotionActionTest : VimTestCase() {
       """.trimIndent(),
     )
   }
+
+  @Test
+  fun `test delete word at the last character of the file`() {
+    doTest("dw", "foo ba${c}r", "foo b${c}a")
+  }
+
+  @Test
+  fun `test delete word in a file with a single character`() {
+    doTest("dw", "${c}a", "")
+  }
+
+  @Test
+  fun `test delete word end at the last character of the file`() {
+    doTest("de", "foo ba${c}r", "foo b${c}a")
+  }
 }

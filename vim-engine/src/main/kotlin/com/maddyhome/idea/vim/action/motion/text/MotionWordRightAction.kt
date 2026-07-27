@@ -26,6 +26,7 @@ import java.util.*
 @CommandOrMotion(keys = ["w"], modes = [Mode.NORMAL, Mode.VISUAL, Mode.OP_PENDING])
 class MotionWordRightAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
+  override val clampToEndOfFileWhenOperatorPending: Boolean = true
 
   override fun getOffset(
     editor: VimEditor,

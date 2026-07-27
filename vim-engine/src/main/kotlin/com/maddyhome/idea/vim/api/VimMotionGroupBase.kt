@@ -364,9 +364,15 @@ abstract class VimMotionGroupBase : VimMotionGroup {
 
         // Execute the motion (without moving the cursor) and get where we end
         val motion = action.getHandlerOffset(editor, caret, context, argument.argument, operatorArguments)
-        if (Motion.Error == motion || Motion.NoMotion == motion) return null
-
-        end = (motion as AbsoluteOffset).offset
+        if (Motion.NoMotion == motion) return null
+        if (Motion.Error == motion) {
+          // A forward word motion fails at the end of the file, but with a pending operator Vim ignores the failure
+          // and applies the operator to the rest of the file instead
+          if (!action.clampToEndOfFileWhenOperatorPending) return null
+          end = editor.fileSize().toInt()
+        } else {
+          end = (motion as AbsoluteOffset).offset
+        }
         isForwardMotion = end >= start
 
         // A blockwise force (o_CTRL-V) turns the motion's two endpoints into a rectangular block. The block's own

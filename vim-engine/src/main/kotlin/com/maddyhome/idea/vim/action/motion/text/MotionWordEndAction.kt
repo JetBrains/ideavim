@@ -52,6 +52,9 @@ sealed class WordEndAction(
   }
 
   override val motionType: MotionType = MotionType.INCLUSIVE
+
+  // `ge` and `gE` beep at the start of the file, even with a pending operator
+  override val clampToEndOfFileWhenOperatorPending: Boolean = direction == Direction.FORWARDS
 }
 
 private fun moveCaretToNextWordEnd(

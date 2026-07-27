@@ -481,7 +481,8 @@ class MacroActionTest : VimTestCase() {
     configureByText(initialText)
     typeText(injector.parser.parseKeys("qa" + "w" + "dw" + "q"))
     typeText(injector.parser.parseKeys("@a"))
-    assertState("start en${c}d")
+    // `w` moves to the last character of the file, and `dw` there deletes it (:help word, nv_wordcmd)
+    assertState("start e${c}n")
     // Verify that undo can restore both text and cursor position
     var undoCount = 0
     while (fixture.editor.document.text != "start middle end" && undoCount < 10) {
