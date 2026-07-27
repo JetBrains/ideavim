@@ -569,6 +569,8 @@ internal class TargetsExtension : VimExtension {
       override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
       override val preserveSelectionAnchor: Boolean = false
 
+      override val supportsLinewiseDeletePromotion: Boolean = false
+
       override fun getRange(
         editor: VimEditor,
         caret: ImmutableVimCaret,

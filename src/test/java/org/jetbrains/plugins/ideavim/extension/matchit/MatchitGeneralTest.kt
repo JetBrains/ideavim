@@ -11,7 +11,6 @@ package org.jetbrains.plugins.ideavim.extension.matchit
 import com.intellij.ide.highlighter.HtmlFileType
 import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.state.mode.SelectionType
-import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -169,16 +168,6 @@ class MatchitGeneralTest : VimTestCase() {
     )
   }
 
-  @VimBehaviorDiffers(
-    originalVimAfter = """
-        if x == 0
-          puts "Zero"
-        $c
-          puts "Positive"
-        end
-  """,
-    description = "Our code changes the motion type to linewise, but it should not",
-  )
   @Test
   fun `test delete from elseif to else`() {
     doTest(

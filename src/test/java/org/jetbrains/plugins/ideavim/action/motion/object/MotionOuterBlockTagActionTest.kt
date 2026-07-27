@@ -175,6 +175,48 @@ class MotionOuterBlockTagActionTest : VimTestCase() {
     assertState("")
   }
 
+  // VIM-4287 |d| |v_at|
+  @Test
+  fun `test delete outer tag spanning whole lines is linewise`() {
+    doTest(
+      "dat",
+      "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+        "<a>\n" +
+        "  ${c}<b>\n" +
+        "    <c />\n" +
+        "  </b>\n" +
+        "  <b>\n" +
+        "    <c />\n" +
+        "  </b>\n" +
+        "</a>\n",
+      "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+        "<a>\n" +
+        "  ${c}<b>\n" +
+        "    <c />\n" +
+        "  </b>\n" +
+        "</a>\n",
+    )
+  }
+
+  // VIM-4287 |d| |v_at|
+  @Test
+  fun `test delete outer tag spanning whole lines with nested block is linewise`() {
+    doTest(
+      "dat",
+      "<a>\n" +
+        "  ${c}<b>\n" +
+        "    <c>\n" +
+        "      text\n" +
+        "    </c>\n" +
+        "  </b>\n" +
+        "  <d />\n" +
+        "</a>\n",
+      "<a>\n" +
+        "  ${c}<d />\n" +
+        "</a>\n",
+    )
+  }
+
   // |v_it| |v_at|
   @Test
   fun testTagSelectionSkipsWhitespaceAtStartOfLine() {

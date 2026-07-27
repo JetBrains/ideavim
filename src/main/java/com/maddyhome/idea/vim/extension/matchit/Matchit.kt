@@ -108,6 +108,8 @@ internal class Matchit : VimExtension {
 
     override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
+    override val supportsLinewiseDeletePromotion: Boolean = false
+
     override fun getOffset(
       editor: VimEditor,
       caret: ImmutableVimCaret,

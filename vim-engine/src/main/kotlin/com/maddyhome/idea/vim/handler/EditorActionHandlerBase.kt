@@ -71,6 +71,22 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
    */
   open val executesNestedCommands: Boolean = false
 
+  /**
+   * Whether a characterwise delete using this motion / text object may be promoted to a linewise delete.
+   *
+   * Vim performs this promotion in `op_delete` (see `src/nvim/ops.c`): a multi-line characterwise delete whose deleted
+   * region is bounded by whitespace becomes linewise — but only when `!oap->is_VIsual`. Vim's built-in text objects and
+   * motions (`at`, `ap`, `ip`, `}`, …) are applied directly in operator-pending mode (`is_VIsual == false`) and are
+   * subject to the promotion, while plugin text objects (vim-textobj-*, matchit, …) select their range via Visual mode
+   * first (`is_VIsual == true`) and are therefore never promoted.
+   *
+   * IdeaVim implements extension text objects as ordinary operator-pending handlers rather than Visual selections, so
+   * there is no `is_VIsual` flag to read. This property models the same distinction: it defaults to `true` for
+   * IdeaVim's built-in motions / text objects and is overridden to `false` by extension-provided handlers so that a
+   * `dam` / `die` / `d%` matches Vim (stays characterwise) while `dat` is promoted to linewise.
+   */
+  open val supportsLinewiseDeletePromotion: Boolean = true
+
   open val argumentType: Argument.Type? = null
 
   /**

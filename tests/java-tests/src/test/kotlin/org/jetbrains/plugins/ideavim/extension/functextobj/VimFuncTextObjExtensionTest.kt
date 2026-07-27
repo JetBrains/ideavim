@@ -41,15 +41,9 @@ class VimFuncTextObjExtensionTest : VimJavaTestCase() {
             }
         }
       """.trimIndent(),
-      """
-        public class Foo {
-            /**
-             * doc
-             */
-            @Override
-            $c
-        }
-      """.trimIndent(),
+      // Extension text objects are charwise (like Vim's Visual-based plugins), so the method's leading indent is left
+      // behind rather than the whole lines being removed.
+      "public class Foo {\n    /**\n     * doc\n     */\n    @Override\n${c}}",
       fileType = JavaFileType.INSTANCE,
     )
   }
@@ -69,11 +63,9 @@ class VimFuncTextObjExtensionTest : VimJavaTestCase() {
             }
         }
       """.trimIndent(),
-      """
-        public class Foo {
-            $c
-        }
-      """.trimIndent(),
+      // Extension text objects are charwise (like Vim's Visual-based plugins), so the method's leading indent is left
+      // behind rather than the whole lines being removed.
+      "public class Foo {\n${c}}",
       fileType = JavaFileType.INSTANCE,
     )
   }
@@ -133,11 +125,7 @@ class VimFuncTextObjExtensionTest : VimJavaTestCase() {
             }
         }
       """.trimIndent(),
-      """
-        public class Foo {
-            $c
-        }
-      """.trimIndent(),
+      "public class Foo {\n        ${c}\n}",
       Mode.INSERT,
       fileType = JavaFileType.INSTANCE,
     )
@@ -154,11 +142,7 @@ class VimFuncTextObjExtensionTest : VimJavaTestCase() {
             }
         }
       """.trimIndent(),
-      """
-        public class Foo {
-            $c
-        }
-      """.trimIndent(),
+      "public class Foo {\n${c}}",
       fileType = JavaFileType.INSTANCE,
     )
   }
@@ -196,11 +180,7 @@ class VimFuncTextObjExtensionTest : VimJavaTestCase() {
             }
         }
       """.trimIndent(),
-      """
-        public class Foo {
-            $c
-        }
-      """.trimIndent(),
+      "public class Foo {\n${c}}",
       fileType = JavaFileType.INSTANCE,
     )
   }
