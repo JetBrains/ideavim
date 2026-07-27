@@ -13,4 +13,6 @@ interface SpellcheckerService {
   fun addWordToDictionary(word: String, editor: VimEditor)
 
   fun selectSuggestion(word: String, editor: VimEditor, caret: VimCaret)
+
+  fun removeWordFromDictionary(word: String, editor: VimEditor)
 }

@@ -40,6 +40,9 @@ class SelectMisspelledWordSuggestionActionTest : VimTestCase() {
     override fun selectSuggestion(word: String, editor: VimEditor, caret: VimCaret) {
       suggestionRequests.add(word)
     }
+
+    override fun removeWordFromDictionary(word: String, editor: VimEditor) {
+    }
   }
 
   private lateinit var fakeSpellcheckerService: FakeSpellcheckerService
