@@ -37,4 +37,22 @@ class MotionParagraphNextActionTest : VimTestCase() {
       Mode.NORMAL(),
     )
   }
+
+  // VIM-4287: an exclusive characterwise delete promoted to linewise must remove the whole first line, including its
+  // leading whitespace, without swallowing the blank line the exclusive motion stops on.
+  @Test
+  fun `test delete paragraph with indented start is linewise`() {
+    doTest(
+      "d}",
+      "<a>\n" +
+        "  ${c}foo\n" +
+        "  bar\n" +
+        "\n" +
+        "baz\n",
+      "<a>\n" +
+        "$c\n" +
+        "baz\n",
+      Mode.NORMAL(),
+    )
+  }
 }

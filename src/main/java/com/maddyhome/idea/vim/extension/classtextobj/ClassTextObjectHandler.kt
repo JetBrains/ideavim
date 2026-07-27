@@ -55,7 +55,8 @@ internal class ClassTextObjectHandler : ExtensionHandler {
 }
 
 internal class ClassRangeActionHandler : TextObjectActionHandler() {
-  override val visualType: TextObjectVisualType get() = TextObjectVisualType.CHARACTER_WISE
+  // vim-textobj-python selects a class linewise (`['V', ...]`), so a class text object is linewise.
+  override val visualType: TextObjectVisualType get() = TextObjectVisualType.LINE_WISE
 
   override fun getRange(
     editor: VimEditor,

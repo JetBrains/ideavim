@@ -1007,7 +1007,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     // 1) The range is across multiple lines
     // 2) There is only whitespace before the start of the range
     // 3) There is only whitespace after the end of the range
-    if (!isChange && motionType == SelectionType.CHARACTER_WISE) {
+    if (!isChange && motionType == SelectionType.CHARACTER_WISE && argument.motion.supportsLinewiseDeletePromotion) {
       val start = editor.offsetToBufferPosition(range.startOffset)
       val end = editor.offsetToBufferPosition(range.endOffset)
       if (start.line != end.line
@@ -1015,9 +1015,28 @@ abstract class VimChangeGroupBase : VimChangeGroup {
         && !editor.anyNonWhitespace(range.endOffset, 1)
       ) {
         motionType = SelectionType.LINE_WISE
+        // Now that it's linewise, expand the (still characterwise) range to whole lines so the leading whitespace of
+        // the first line and the trailing newline of the last line are removed too, matching Vim.
+        return Pair(expandRangeToWholeLines(editor, range), motionType)
       }
     }
     return Pair(range, motionType)
+  }
+
+  /**
+   * Expands a characterwise range to cover the whole lines it touches, mirroring the way [VimMotionGroup.getMotionRange]
+   * normalizes a genuinely linewise motion. Used when a characterwise delete is promoted to linewise so that the leading
+   * whitespace of the first line and the trailing newline of the last line are removed too.
+   */
+  private fun expandRangeToWholeLines(editor: VimEditor, range: TextRange): TextRange {
+    val startOffset = editor.getLineStartForOffset(range.startOffset)
+    // endOffset is exclusive, so use the last actually-covered character to find the final line. This stops an
+    // exclusive motion that ends at column 1 of the following line (e.g. `d}`) from pulling in that extra line.
+    val lastCoveredOffset = (range.endOffset - 1).coerceAtLeast(range.startOffset)
+    // Include the trailing newline of the last line so whole lines are removed; on the final line (no trailing
+    // newline) this coerces back to the file size.
+    val endOffset = min((editor.getLineEndForOffset(lastCoveredOffset) + 1).toLong(), editor.fileSize()).toInt()
+    return TextRange(startOffset, endOffset)
   }
 
   /**

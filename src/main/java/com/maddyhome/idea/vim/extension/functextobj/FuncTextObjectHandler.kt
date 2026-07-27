@@ -57,7 +57,11 @@ internal class FuncTextObjectHandler(private val rangeKind: FuncRange) : Extensi
 }
 
 internal class MethodRangeActionHandler(private val rangeKind: FuncRange) : TextObjectActionHandler() {
-  override val visualType: TextObjectVisualType get() = TextObjectVisualType.CHARACTER_WISE
+  // vim-textobj-function selects a whole method linewise (`['V', ...]`). The inner object keeps IdeaVim's charwise
+  // body-span semantics (its range runs from the signature line into the closing-brace line, so promoting it to
+  // linewise would swallow those lines).
+  override val visualType: TextObjectVisualType
+    get() = if (rangeKind == FuncRange.INNER) TextObjectVisualType.CHARACTER_WISE else TextObjectVisualType.LINE_WISE
 
   override fun getRange(
     editor: VimEditor,

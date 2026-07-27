@@ -225,6 +225,8 @@ class VimArgTextObjExtension : VimExtension {
 
       override val visualType: TextObjectVisualType
         get() = TextObjectVisualType.CHARACTER_WISE
+
+      override val supportsLinewiseDeletePromotion: Boolean = false
     }
 
     override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {

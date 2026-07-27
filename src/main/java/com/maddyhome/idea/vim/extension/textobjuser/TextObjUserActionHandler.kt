@@ -30,6 +30,8 @@ internal class TextObjUserActionHandler(
   override val visualType: TextObjectVisualType
     get() = if (regionType == SelectionType.LINE_WISE) TextObjectVisualType.LINE_WISE else TextObjectVisualType.CHARACTER_WISE
 
+  override val supportsLinewiseDeletePromotion: Boolean = false
+
   override fun getRange(
     editor: VimEditor,
     caret: ImmutableVimCaret,

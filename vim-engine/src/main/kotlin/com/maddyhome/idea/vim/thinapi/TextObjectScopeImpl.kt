@@ -141,6 +141,8 @@ private class ApiTextObjectActionHandler(
   override val visualType: TextObjectVisualType
     get() = computedVisualType
 
+  override val supportsLinewiseDeletePromotion: Boolean = false
+
   override fun getRange(
     editor: VimEditor,
     caret: ImmutableVimCaret,
