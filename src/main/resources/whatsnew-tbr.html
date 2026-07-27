@@ -440,6 +440,20 @@ call textobj#user#plugin(<span class="str">'datetime'</span>, {
         <code>:lnoremap</code> / <code>:lunmap</code> / <code>:lmapclear</code> language-mapping commands.</p>
     </div>
 
+    <!-- spelling -->
+    <div class="section">
+      <p class="kicker">spelling · dictionary</p>
+      <h2>Fix a misspelling from Normal mode</h2>
+      <p>Vim's spelling commands now talk to the IDE's own spell checker. Put the caret on a word and press
+        <kbd>zg</kbd> to accept it as correctly spelled, <kbd>zw</kbd> to take it back out of your dictionary,
+        or <kbd>z=</kbd> to choose from a list of suggested replacements.</p>
+      <pre><span class="key">zg</span>   <span class="cm">" mark the word under the caret as correct</span>
+<span class="key">zw</span>   <span class="cm">" remove it from the dictionary again</span>
+<span class="key">z=</span>   <span class="cm">" pick a replacement from the suggestions</span></pre>
+      <p class="note">Accepted words go into the IDE's spelling dictionary, so the rest of the IDE stops
+        flagging them too.</p>
+    </div>
+
     <!-- Also worth a look -->
     <div class="section">
       <p class="kicker">also worth a look</p>
@@ -466,6 +480,11 @@ call textobj#user#plugin(<span class="str">'datetime'</span>, {
           <p><code>:w {file}</code> saves the buffer to a new path, a range like <code>:1,2w out.txt</code>
             writes only those lines, and <code>:w!</code> overwrites while plain <code>:w</code> refuses to
             clobber an existing file.</p>
+        </div>
+        <div class="mini">
+          <h3>Vim in the Python console</h3>
+          <p>Normal mode, motions, and <kbd>Esc</kbd> now work in the Python console input, while the console
+            keeps handling <kbd>Enter</kbd>, the history keys, and the horizontal arrows.</p>
         </div>
       </div>
     </div>
@@ -495,6 +514,18 @@ call textobj#user#plugin(<span class="str">'datetime'</span>, {
         <li><strong>Caret after delete-to-end from <kbd>&lt;C-O&gt;</kbd></strong> — running <kbd>D</kbd>,
           <code>d$</code>, or <code>d3w</code> after <kbd>&lt;C-O&gt;</kbd> now leaves the caret in the right
           place when you return to Insert mode.
+        </li>
+        <li><strong>Search lands on the match you stepped to</strong> — after walking through matches with
+          <kbd>&lt;C-G&gt;</kbd>/<kbd>&lt;C-T&gt;</kbd> during an incremental search, pressing <kbd>Enter</kbd>
+          now takes the caret to that match.
+        </li>
+        <li><strong>Vimscript errors are no longer swallowed</strong> — parse errors in your config are shown
+          instead of failing quietly, and an error on the last line no longer discards the whole script.
+        </li>
+        <li><strong>Literal square brackets in patterns</strong> — searches such as <code>/heap[</code>,
+          <code>/[[[</code>, or <code>/[a-z</code> work again: an unmatched <code>[</code> is a plain bracket,
+          and a <code>]</code> right after <code>[</code> or <code>[^</code> belongs to the collection (so
+          <code>/[]]</code> matches a <code>]</code>), just like Vim.
         </li>
       </ul>
     </div>
