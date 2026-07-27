@@ -273,4 +273,9 @@ class MotionWordRightActionTest : VimTestCase() {
       """.trimMargin().dotToSpace()
     )
   }
+
+  @Test
+  fun `test word right stops at unicode punctuation`() {
+    doTest("w", "${c}foo\u2014bar baz", "foo${c}\u2014bar baz")
+  }
 }

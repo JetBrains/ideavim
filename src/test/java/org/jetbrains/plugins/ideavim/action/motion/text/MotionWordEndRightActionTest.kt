@@ -200,4 +200,9 @@ class MotionWordEndRightActionTest : VimTestCase() {
       """.trimMargin().dotToSpace()
     )
   }
+
+  @Test
+  fun `test word end right stops at ideographic punctuation`() {
+    doTest("2e", "${c}\u3067\u3059\u3002next", "\u3067\u3059${c}\u3002next")
+  }
 }
