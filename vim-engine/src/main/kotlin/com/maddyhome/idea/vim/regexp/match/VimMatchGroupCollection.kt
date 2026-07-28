@@ -47,6 +47,12 @@ class VimMatchGroupCollection(
   private var groupCount: Int = 0
 
   /**
+   * Incremented on every change, so that a simulation can tell whether anything was captured since a given point
+   */
+  internal var version: Int = 0
+    private set
+
+  /**
    * Gets a single capture group match
    *
    * @param index The number of the capture group to get
@@ -65,6 +71,7 @@ class VimMatchGroupCollection(
    * @param startIndex  The index where the capture group match starts
    */
   internal fun setGroupStart(groupNumber: Int, startIndex: Int) {
+    version++
     groupStarts[groupNumber] = startIndex
     if (groupNumber == 0) completedGroups[groupNumber] = false
   }
@@ -79,6 +86,7 @@ class VimMatchGroupCollection(
   internal fun setGroupEnd(groupNumber: Int, endIndex: Int, text: CharSequence) {
     if (completedGroups[groupNumber] && forceEnded[groupNumber]) return
 
+    version++
     val range = TextRange(groupStarts[groupNumber], endIndex)
     groups[groupNumber] = VimMatchGroup(range, text.substring(range.startOffset, range.endOffset))
     groupCount = maxOf(groupCount, groupNumber + 1)
@@ -93,6 +101,7 @@ class VimMatchGroupCollection(
    * @param text        The text used to extract the matched string
    */
   internal fun setForceGroupEnd(groupNumber: Int, endIndex: Int, text: CharSequence) {
+    version++
     val range = TextRange(groupStarts[groupNumber], endIndex)
     groups[groupNumber] = VimMatchGroup(range, text.substring(range.startOffset, range.endOffset))
     groupCount = maxOf(groupCount, groupNumber + 1)
@@ -101,10 +110,43 @@ class VimMatchGroupCollection(
   }
 
   internal fun clear() {
+    version = 0
     groupCount = 0
     for (groupNumber in completedGroups.indices) completedGroups[groupNumber] = false
     for (groupNumber in forceEnded.indices) forceEnded[groupNumber] = false
   }
+
+  /**
+   * Takes a copy of the current state, so that it can be restored if the simulation backtracks past the point where
+   * the snapshot was taken
+   */
+  internal fun createSnapshot(): Snapshot = Snapshot(
+    groups.toMutableList(),
+    groupStarts.copyOf(),
+    completedGroups.copyOf(),
+    forceEnded.copyOf(),
+    groupCount,
+  )
+
+  /**
+   * Restores the state of a previously taken [Snapshot], undoing any captures made since
+   */
+  internal fun restoreSnapshot(snapshot: Snapshot) {
+    version++
+    for (i in groups.indices) groups[i] = snapshot.groups[i]
+    snapshot.groupStarts.copyInto(groupStarts)
+    snapshot.completedGroups.copyInto(completedGroups)
+    snapshot.forceEnded.copyInto(forceEnded)
+    groupCount = snapshot.groupCount
+  }
+
+  internal class Snapshot(
+    val groups: List<VimMatchGroup?>,
+    val groupStarts: IntArray,
+    val completedGroups: BooleanArray,
+    val forceEnded: BooleanArray,
+    val groupCount: Int,
+  )
 
   override fun contains(element: VimMatchGroup): Boolean {
     return groups.subList(0, groupCount).contains(element)

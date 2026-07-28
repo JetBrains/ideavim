@@ -174,4 +174,26 @@ class VimRegexEngineTest : VimTestCase() {
     assertEquals(listOf(TextRange(0, 1)), findAll("\\c[A]"))
     assertEquals(listOf(TextRange(0, 1)), findAll("\\c[A-A]"))
   }
+
+  @Test
+  fun `test start of match in failed alternative does not affect the match`() {
+    configureByText("ab")
+    assertEquals(listOf(TextRange(0, 2)), findAll("a\\zsc\\|ab"))
+  }
+
+  @Test
+  fun `test end of match in failed alternative does not affect the match`() {
+    configureByText("ab")
+    assertEquals(listOf(TextRange(0, 2)), findAll("a\\zec\\|ab"))
+  }
+
+  @Test
+  fun `test capture group in failed alternative is not captured`() {
+    configureByText("b")
+    var group: String? = "not set"
+    ApplicationManager.getApplication().runReadAction {
+      group = VimRegex("\\(a\\)x\\|b").findAll(fixture.editor.vim).first().groups.get(1)?.value
+    }
+    assertEquals(null, group)
+  }
 }
