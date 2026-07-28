@@ -32,7 +32,7 @@ class MotionInnerBlockBackQuoteAction : TextObjectActionHandler() {
     count: Int,
     rawCount: Int,
   ): TextRange? {
-    return injector.searchHelper.findBlockQuoteInLineRange(editor, caret, '`', false)
+    return injector.searchHelper.findBlockQuoteInLineRange(editor, caret, '`', false, includeQuotes = count == 2)
   }
 }
 
@@ -50,7 +50,7 @@ class MotionInnerBlockDoubleQuoteAction : TextObjectActionHandler() {
     count: Int,
     rawCount: Int,
   ): TextRange? {
-    return injector.searchHelper.findBlockQuoteInLineRange(editor, caret, '"', false)
+    return injector.searchHelper.findBlockQuoteInLineRange(editor, caret, '"', false, includeQuotes = count == 2)
   }
 }
 
@@ -68,7 +68,7 @@ class MotionInnerBlockSingleQuoteAction : TextObjectActionHandler() {
     count: Int,
     rawCount: Int,
   ): TextRange? {
-    return injector.searchHelper.findBlockQuoteInLineRange(editor, caret, '\'', false)
+    return injector.searchHelper.findBlockQuoteInLineRange(editor, caret, '\'', false, includeQuotes = count == 2)
   }
 }
 

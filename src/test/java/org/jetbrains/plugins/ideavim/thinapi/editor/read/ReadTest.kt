@@ -348,7 +348,8 @@ class ReadTest : MockTestCase() {
       editorCaptor.capture(),
       eq(startOffset),
       eq(quote),
-      eq(isOuter)
+      eq(isOuter),
+      eq(false)
     )
 
     assertEqualsEditor(vimEditor, editorCaptor.firstValue)

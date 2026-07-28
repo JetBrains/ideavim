@@ -347,11 +347,17 @@ interface VimSearchHelper {
     isOuter: Boolean,
   ): TextRange?
 
+  /**
+   * @param includeQuotes Include the quote characters themselves in an inner quote range. This is the special case of
+   *                      a count of 2 for i", i' and i` (:help v_iquote), which does not include the white space that
+   *                      a", a' and a` would
+   */
   fun findBlockQuoteInLineRange(
     editor: VimEditor,
     caret: ImmutableVimCaret,
     quote: Char,
     isOuter: Boolean,
+    includeQuotes: Boolean = false,
   ): TextRange?
 
   fun findBlockQuoteInLineRange(
@@ -359,6 +365,7 @@ interface VimSearchHelper {
     offset: Int,
     quote: Char,
     isOuter: Boolean,
+    includeQuotes: Boolean = false,
   ): TextRange?
 
   fun findMisspelledWord(

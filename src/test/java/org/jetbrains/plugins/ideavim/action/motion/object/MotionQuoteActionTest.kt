@@ -359,4 +359,19 @@ class MotionQuoteActionTest : VimTestCase() {
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )
   }
+
+  @Test
+  fun `test inner quote with count of 2 includes the quotes`() {
+    doTest("d2i\"", "foo \"b${c}ar\" baz", "foo ${c} baz")
+  }
+
+  @Test
+  fun `test inner quote with count of 2 does not include white space`() {
+    doTest("d2i'", "foo 'b${c}ar'   baz", "foo ${c}   baz")
+  }
+
+  @Test
+  fun `test inner quote without a count does not include the quotes`() {
+    doTest("di\"", "foo \"b${c}ar\" baz", "foo \"${c}\" baz")
+  }
 }

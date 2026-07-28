@@ -759,6 +759,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     offset: Int,
     quote: Char,
     isOuter: Boolean,
+    includeQuotes: Boolean,
   ): TextRange? {
     var leftQuote: Int
     var rightQuote: Int
@@ -776,8 +777,11 @@ abstract class VimSearchHelperBase : VimSearchHelper {
       rightQuote = quoteAfterCaret
     }
     if (!isOuter) {
-      leftQuote++
-      rightQuote--
+      // With a count of 2 the quotes are included, but no extra white space as with a", a' or a` (:help v_iquote)
+      if (!includeQuotes) {
+        leftQuote++
+        rightQuote--
+      }
     } else {
       // For outer quotes: include trailing whitespace, or leading whitespace if no trailing
       // See :help a" - "Any trailing white space is included, unless there is none, then leading white space is included"
@@ -812,9 +816,10 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     caret: ImmutableVimCaret,
     quote: Char,
     isOuter: Boolean,
+    includeQuotes: Boolean,
   ): TextRange? {
     val offset = caret.offset
-    return findBlockQuoteInLineRange(editor, offset, quote, isOuter)
+    return findBlockQuoteInLineRange(editor, offset, quote, isOuter, includeQuotes)
   }
 
   /**
