@@ -27,7 +27,7 @@ usual beta standards.
 
 ## 2.43.0, 2026-07-14
 
-## To Be Released
+## 2.45.0, 2026-07-28
 
 ### Features:
 * [VIM-1850](https://youtrack.jetbrains.com/issue/VIM-1850) Added the [`'keymap'`](https://vimhelp.org/options.txt.html#%27keymap%27) option for typing non-English text without switching your system keyboard layout — `set keymap=russian-jcukenwin` (or any of the bundled keymaps such as `accents`, `greek`, or `dvorak`) loads a set of language mappings, and your own keymap files can be dropped into `~/.config/ideavim/keymap/`. The mappings apply to text typed in Insert and Replace mode only while [`'iminsert'`](https://vimhelp.org/options.txt.html#%27iminsert%27) is on (default off, local to the buffer); press [`CTRL-^`](https://vimhelp.org/insert.txt.html#i_CTRL-%5E) in Insert mode to toggle it. Also added the [`:loadkeymap`](https://vimhelp.org/mbyte.txt.html#%3Aloadkeymap) command and the language mapping commands [`:lmap`](https://vimhelp.org/map.txt.html#%3Almap), `:lnoremap`, `:lunmap`, and `:lmapclear`
