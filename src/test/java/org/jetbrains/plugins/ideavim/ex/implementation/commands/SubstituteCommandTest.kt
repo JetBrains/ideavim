@@ -1565,4 +1565,32 @@ class SubstituteCommandTest : VimTestCase() {
         "}\n",
     )
   }
+
+  @Test
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test backslash delimiter reuses the last search pattern`() {
+    configureByText("${c}foo and bar")
+    enterSearch("and")
+    enterCommand("""s\/or/""")
+    assertPluginError(false)
+    assertState("${c}foo or bar")
+  }
+
+  @Test
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test backslash ampersand delimiter reuses the last substitute pattern`() {
+    configureByText("${c}foo and and bar")
+    enterCommand("s/and/or/")
+    enterCommand("""s\&maybe&""")
+    assertPluginError(false)
+    assertState("${c}foo or maybe bar")
+  }
+
+  @Test
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test backslash delimiter without a previous search reports E35`() {
+    configureByText("${c}foo and bar")
+    enterCommand("""s\/or/""")
+    assertPluginErrorMessage("E35: No previous regular expression")
+  }
 }

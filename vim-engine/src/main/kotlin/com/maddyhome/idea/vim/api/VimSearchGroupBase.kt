@@ -1169,6 +1169,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
         if (exarg[1] != '&') {
           patternType = PatternType.SEARCH // use last search pattern
         }
+        pattern = null // there is no pattern in the command, the last used one is reused below
         delimiter = exarg[1] // remember delimiter character
         substituteStringStartIndex += 2
       } else {
@@ -1302,12 +1303,12 @@ abstract class VimSearchGroupBase : VimSearchGroup {
       val errorMessage: String? = when (patternType) {
         PatternType.SEARCH -> {
           pattern = lastSearchPattern
-          "E33: No previous substitute regular expression"
+          "E35: No previous regular expression"
         }
 
         PatternType.SUBSTITUTE -> {
           pattern = lastSubstitutePattern
-          "E35: No previous regular expression"
+          "E33: No previous substitute regular expression"
         }
 
         else -> null
