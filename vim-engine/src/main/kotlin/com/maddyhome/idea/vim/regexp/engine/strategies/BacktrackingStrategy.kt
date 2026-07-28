@@ -73,6 +73,9 @@ internal class BacktrackingStrategy : SimulationStrategy {
    * @param isCaseInsensitive Whether the simulation should ignore case
    * @param maxIndex          The maximum index of the text that the simulation is allowed to go to
    * @param possibleCursors   The cursors that are allowed to match
+   * @param targetIndex       If set, only a match that ends exactly at this index is accepted. Reaching the target
+   *                          state at any other index does not stop the simulation, which keeps looking for another
+   *                          way for the pattern to match
    *
    * @return The result of the simulation. It tells whether it was successful, and at what index it stopped.
    */
@@ -84,6 +87,7 @@ internal class BacktrackingStrategy : SimulationStrategy {
     isCaseInsensitive: Boolean,
     possibleCursors: MutableList<VimCaret>,
     maxIndex: Int = editor.text().length,
+    targetIndex: Int? = null,
   ): NFASimulationResult {
     val stack = mutableListOf<SimulationStackFrame>()
     stack.add(SimulationStackFrame(index, state, NfaStateList.empty, groups.version))
@@ -95,7 +99,9 @@ internal class BacktrackingStrategy : SimulationStrategy {
       rollbackCaptures(currFrame.groupsVersion)
       if (currFrame.currentIndex > maxIndex) continue
       updateCaptureGroups(editor, currFrame.currentIndex, currFrame.currentState)
-      if (currFrame.currentState === targetState) return NFASimulationResult(true, currFrame.currentIndex)
+      if (currFrame.currentState === targetState && (targetIndex == null || currFrame.currentIndex == targetIndex)) {
+        return NFASimulationResult(true, currFrame.currentIndex)
+      }
       currFrame.currentState.assertion?.let {
         val assertionResult = handleAssertion(editor, currFrame.currentIndex, isCaseInsensitive, it, possibleCursors)
         if (assertionResult.simulationResult) stack.add(
@@ -227,7 +233,10 @@ internal class BacktrackingStrategy : SimulationStrategy {
         assertion.endState,
         isCaseInsensitive,
         possibleCursors,
-        maxIndex = currentIndex
+        maxIndex = currentIndex,
+        // A look behind matches only if the pattern ends exactly where the look behind started. Any other way that
+        // the pattern can match from this index is not a match of the assertion
+        targetIndex = currentIndex,
       )
       // found a match that ends before the "currentIndex"
       if (result.simulationResult && result.index == currentIndex) {

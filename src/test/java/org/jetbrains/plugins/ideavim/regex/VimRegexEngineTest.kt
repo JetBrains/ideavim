@@ -196,4 +196,16 @@ class VimRegexEngineTest : VimTestCase() {
     }
     assertEquals(null, group)
   }
+
+  @Test
+  fun `test positive look behind with alternation matches the longer alternative`() {
+    configureByText("abc")
+    assertEquals(listOf(TextRange(2, 3)), findAll("\\%(a\\|ab\\)\\@<=c"))
+  }
+
+  @Test
+  fun `test negative look behind with alternation does not match`() {
+    configureByText("abc")
+    assertEquals(emptyList(), findAll("\\%(a\\|ab\\)\\@<!c"))
+  }
 }
