@@ -349,8 +349,8 @@ interface VimSearchHelper {
 
   /**
    * @param includeQuotes Include the quote characters themselves in an inner quote range. This is the special case of
-   *                      a count of 2 for i", i' and i` (:help v_iquote), which does not include the white space that
-   *                      a", a' and a` would
+   *                      a count of 2 or more for i", i' and i` (:help v_iquote), which does not include the white
+   *                      space that a", a' and a` would
    */
   fun findBlockQuoteInLineRange(
     editor: VimEditor,

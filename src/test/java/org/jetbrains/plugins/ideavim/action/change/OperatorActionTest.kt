@@ -169,4 +169,40 @@ class OperatorActionTest : VimTestCase() {
       enterCommand("""noremap gx :set opfunc={\ arg\ ->\ execute\ "`[v`]rx"\ }<CR>g@""")
     }
   }
+
+  @Test
+  fun `test operator action applies the exclusive motion adjustment like an operator`() {
+    // `[ and `] are the marks of the operated range. Just like d}, the range must stop at the end of the last line of
+    // the paragraph, and not include the new line that separates the paragraphs (:help exclusive)
+    doTest(
+      "gx}",
+      "o${c}ne\ntwo\n\nthree\n",
+      "oxx\nxx${c}x\n\nthree\n"
+    ) {
+      executeVimscript(
+        """function! Redact(type)
+        |  execute "normal `[v`]rx"
+        |endfunction
+      """.trimMargin()
+      )
+      enterCommand("noremap gx :set opfunc=Redact<CR>g@")
+    }
+  }
+
+  @Test
+  fun `test operator action applies a word motion at the end of the file`() {
+    doTest(
+      "gxw",
+      "foo ba${c}r",
+      "foo ba${c}x"
+    ) {
+      executeVimscript(
+        """function! Redact(type)
+        |  execute "normal `[v`]rx"
+        |endfunction
+      """.trimMargin()
+      )
+      enterCommand("noremap gx :set opfunc=Redact<CR>g@")
+    }
+  }
 }

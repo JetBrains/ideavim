@@ -777,7 +777,8 @@ abstract class VimSearchHelperBase : VimSearchHelper {
       rightQuote = quoteAfterCaret
     }
     if (!isOuter) {
-      // With a count of 2 the quotes are included, but no extra white space as with a", a' or a` (:help v_iquote)
+      // With a count of 2 or more the quotes are included, but no extra white space as with a", a' or a`
+      // (:help v_iquote). Vim guards the same adjustment with "count < 2" in current_quote()
       if (!includeQuotes) {
         leftQuote++
         rightQuote--

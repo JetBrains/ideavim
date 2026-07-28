@@ -228,6 +228,7 @@ class MotionGroup : VimMotionGroupBase() {
 
       var start: Int
       var end: Int
+      var isForwardMotion = false
 
       val action = argument.motion
       when (action) {
@@ -245,9 +246,16 @@ class MotionGroup : VimMotionGroupBase() {
           )
 
           // Invalid motion
-          if (Motion.Error == motion) return null
           if (Motion.NoMotion == motion) return null
-          end = (motion as AbsoluteOffset).offset
+          if (Motion.Error == motion) {
+            // A forward word motion fails at the end of the file, but with a pending operator Vim ignores the failure
+            // and applies the operator to the rest of the file instead
+            if (!action.clampToEndOfFileWhenOperatorPending) return null
+            end = editor.vim.fileSize().toInt()
+          } else {
+            end = (motion as AbsoluteOffset).offset
+          }
+          isForwardMotion = end >= start
 
           // If inclusive, add the last character to the range
           if (action.motionType === MotionType.INCLUSIVE && end < editor.vim.fileSize()) {
@@ -279,6 +287,22 @@ class MotionGroup : VimMotionGroupBase() {
         }
 
         else -> throw RuntimeException("Commands doesn't take " + action.javaClass.simpleName + " as an operator")
+      }
+
+      // :help exclusive - if the motion is exclusive and the end of the motion is in column 1, the end of the motion is
+      // moved to the end of the previous line and the motion becomes inclusive. See VimMotionGroupBase.getMotionRange,
+      // which has to apply the same rule
+      // Only forward motions are adjusted, so the range is already in order here
+      if (action is MotionActionHandler && action.motionType === MotionType.EXCLUSIVE && isForwardMotion) {
+        val vimEditor = editor.vim
+        val startPosition = vimEditor.offsetToBufferPosition(start)
+        val endPosition = vimEditor.offsetToBufferPosition(end)
+        if (endPosition.column == 0 &&
+          endPosition.line > startPosition.line &&
+          vimEditor.anyNonWhitespace(start, -1)
+        ) {
+          end = max(start, vimEditor.getLineEndOffset(endPosition.line - 1))
+        }
       }
 
       // This is a kludge for dw, dW, and d[w. Without this kludge, an extra newline is operated when it shouldn't be.

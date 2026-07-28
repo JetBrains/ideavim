@@ -371,6 +371,11 @@ class MotionQuoteActionTest : VimTestCase() {
   }
 
   @Test
+  fun `test inner quote with a count greater than 2 includes the quotes`() {
+    doTest("d3i\"", "foo \"b${c}ar\" baz", "foo ${c} baz")
+  }
+
+  @Test
   fun `test inner quote without a count does not include the quotes`() {
     doTest("di\"", "foo \"b${c}ar\" baz", "foo \"${c}\" baz")
   }
