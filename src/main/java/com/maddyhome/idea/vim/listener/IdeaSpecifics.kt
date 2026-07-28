@@ -208,7 +208,13 @@ internal object IdeaSpecifics {
       }
       //endregion
 
-      if (!isVimAction(action)) {
+      // Do not normalize carets after native undo/redo. The platform undo (UndoRedo.execute) treats caret movement as a
+      // separate undo step by default ('ide.undo.transparent.caret.movement' = false): before reverting the document it
+      // checks whether the caret matches the state recorded with the edit, and if not, it only restores that caret and
+      // consumes the keypress. Moving the caret here, in afterActionPerformed of the undo action itself, keeps the caret
+      // perpetually mismatched, so every subsequent Ctrl+Z is spent restoring the caret and the text is never reverted
+      // (VIM-4287). Vim's own `u` is unaffected because it calls UndoManager directly with that registry flag forced on.
+      if (!isVimAction(action) && !isUndoRedoAction(ActionManager.getInstance().getId(action))) {
         normalizeCarets(editor)
       }
 
@@ -238,6 +244,9 @@ internal object IdeaSpecifics {
 
     private fun isGotoAction(actionId: String?): Boolean =
       actionId == IdeActions.ACTION_GOTO_BACK || actionId == IdeActions.ACTION_GOTO_FORWARD
+
+    private fun isUndoRedoAction(actionId: String?): Boolean =
+      actionId == IdeActions.ACTION_UNDO || actionId == IdeActions.ACTION_REDO
 
     private fun saveJumpBeforeGoto(event: AnActionEvent, editor: Editor?) {
       val project = event.dataContext.getData(CommonDataKeys.PROJECT)
