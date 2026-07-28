@@ -1593,4 +1593,42 @@ class SubstituteCommandTest : VimTestCase() {
     enterCommand("""s\/or/""")
     assertPluginErrorMessage("E35: No previous regular expression")
   }
+
+  @Test
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test n flag reports the number of matches without substituting`() {
+    configureByText("${c}axa\naxa\n")
+    enterCommand("%s/a/b/n")
+    assertPluginError(false)
+    assertState("${c}axa\naxa\n")
+    assertStatusLineMessageContains("2 matches on 2 lines")
+  }
+
+  @Test
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test n flag with g flag counts every match on a line`() {
+    configureByText("${c}axa\naxa\n")
+    enterCommand("%s/a/b/gn")
+    assertPluginError(false)
+    assertState("${c}axa\naxa\n")
+    assertStatusLineMessageContains("4 matches on 2 lines")
+  }
+
+  @Test
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test n flag uses the singular form for a single match`() {
+    configureByText("${c}axa\nbbb\n")
+    enterCommand("%s/x/y/n")
+    assertPluginError(false)
+    assertState("${c}axa\nbbb\n")
+    assertStatusLineMessageContains("1 match on 1 line")
+  }
+
+  @Test
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test n flag reports pattern not found`() {
+    configureByText("${c}axa\n")
+    enterCommand("%s/zzz/y/n")
+    assertStatusLineMessageContains("E486: Pattern not found: zzz")
+  }
 }

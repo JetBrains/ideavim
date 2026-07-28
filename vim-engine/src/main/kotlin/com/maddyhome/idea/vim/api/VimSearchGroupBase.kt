@@ -187,6 +187,11 @@ abstract class VimSearchGroupBase : VimSearchGroup {
    */
   private var doIgnorecase: Boolean? = null // ignore case flag
 
+  /**
+   * Whether to only report the number of matches, without substituting. 'n' flag.
+   */
+  private var doCount = false
+
   override var lastSearchPattern: String? = null
   override var lastSubstitutePattern: String? = null
 
@@ -682,6 +687,13 @@ abstract class VimSearchGroupBase : VimSearchGroup {
       updateSearchHighlights(true)
     }
 
+    // :help :s_flags - "n: Report the number of matches, do not actually substitute. The 'c' flag is ignored."
+    // There is nothing to preview for a counting substitute, and a preview must not report the count either
+    if (doCount) {
+      if (!preview) reportSubstituteMatchCount(editor, regex, pattern, line1, line2, options)
+      return true
+    }
+
     // A preview always behaves like a non-confirming substitution - we preview every match, ignoring the `c` flag.
     if (!doAsk || preview) {
       performSubstituteInLines(
@@ -738,6 +750,56 @@ abstract class VimSearchGroupBase : VimSearchGroup {
 
     // TODO: Support reporting number of changes (:help 'report')
     return true
+  }
+
+  /**
+   * Reports how many matches the substitute command would have replaced, for the 'n' flag
+   *
+   * The matches are counted the same way that they would be substituted, so without the 'g' flag only the first match
+   * of each line counts.
+   */
+  private fun reportSubstituteMatchCount(
+    editor: VimEditor,
+    regex: VimRegex,
+    pattern: String,
+    startLine: Int,
+    endLine: Int,
+    options: EnumSet<VimRegexOptions>,
+  ) {
+    var matchCount = 0
+    val matchedLines = mutableSetOf<Int>()
+    var line = startLine
+    var column = 0
+    while (line <= endLine) {
+      val match = regex.findInLine(editor, line, column, options)
+      if (match !is VimMatchResult.Success) {
+        line++
+        column = 0
+        continue
+      }
+      matchCount++
+      matchedLines.add(editor.offsetToBufferPosition(match.range.startOffset).line)
+      if (doAll && match.range.startOffset != match.range.endOffset) {
+        val endPosition = editor.offsetToBufferPosition(match.range.endOffset)
+        line = endPosition.line
+        column = endPosition.column
+      } else {
+        line++
+        column = 0
+      }
+    }
+
+    if (matchCount == 0) {
+      if (doError) {
+        injector.messages.indicateError()
+        injector.messages.showStatusBarMessage(null, "E486: Pattern not found: $pattern")
+      }
+      return
+    }
+
+    val matches = if (matchCount == 1) "1 match" else "$matchCount matches"
+    val lines = if (matchedLines.size == 1) "1 line" else "${matchedLines.size} lines"
+    injector.messages.showStatusBarMessage(null, "$matches on $lines")
   }
 
   private fun getNextSubstitute(
@@ -1220,6 +1282,7 @@ abstract class VimSearchGroupBase : VimSearchGroup {
       doAsk = false
       doError = true
       doIgnorecase = null
+      doCount = false
     }
     var trailingOptionsEndIndex: Int = trailingOptionsStartIndex
     for (i in trailingOptionsStartIndex until exarg.length) {
@@ -1242,9 +1305,11 @@ abstract class VimSearchGroupBase : VimSearchGroup {
       } else if (exarg[i] == 'I') {
         // don't ignore case
         doIgnorecase = false
-      } else if (exarg[i] != 'p' && exarg[i] != 'l' && exarg[i] != '#' && exarg[i] != 'n') {
+      } else if (exarg[i] == 'n') {
+        // report the number of matches, without substituting
+        doCount = true
+      } else if (exarg[i] != 'p' && exarg[i] != 'l' && exarg[i] != '#') {
         // TODO: Support printing last changed line, with options for line number/list format
-        // TODO: Support 'n' to report number of matches without substituting
         break
       }
       trailingOptionsEndIndex++
