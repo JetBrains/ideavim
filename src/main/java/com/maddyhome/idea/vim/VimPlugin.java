@@ -110,7 +110,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static @Nullable IjVimSearchGroup getSearchIfCreated() {
-    return ApplicationManager.getApplication().getServiceIfCreated(IjVimSearchGroup.class);
+    return (IjVimSearchGroup)ApplicationManager.getApplication().getServiceIfCreated(VimSearchGroup.class);
   }
 
   public static @NotNull VimProcessGroup getProcess() {

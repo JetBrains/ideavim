@@ -14,6 +14,7 @@ import com.intellij.ide.plugins.InstalledPluginsState
 import com.intellij.ide.plugins.PluginStateListener
 import com.intellij.ide.plugins.PluginStateManager
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.EDT
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.openapi.updateSettings.impl.UpdateSettings
@@ -21,6 +22,8 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.IjVimEnabler
 import com.maddyhome.idea.vim.ui.JoinEap
 import com.maddyhome.idea.vim.ui.JoinEap.EAP_LINK
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * @author Alex Plate
@@ -33,6 +36,10 @@ internal class PluginStartup : ProjectActivity/*, LightEditCompatible*/ {
   // We should migrate to some solution from https://plugins.jetbrains.com/docs/intellij/plugin-components.html#application-startup
   // If you'd like to add a new code here, please consider using one of the things described there.
   override suspend fun execute(project: Project) {
+    withContext(Dispatchers.EDT) {
+      VimPlugin.getSearchIfCreated()?.clearSearchHighlight()
+    }
+
     if (firstInitializationOccurred) return
     firstInitializationOccurred = true
 
