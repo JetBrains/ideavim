@@ -52,11 +52,15 @@ usual beta standards.
 * [VIM-2649](https://youtrack.jetbrains.com/issue/VIM-2649) Fixed the caret not jumping to the selected match when accepting an incremental search with `Enter` after stepping through matches with `<C-G>`/`<C-T>`
 * [VIM-4284](https://youtrack.jetbrains.com/issue/VIM-4284) Fixed vimscript parse errors being silently swallowed — errors are now shown to the user, and an error on the last line no longer causes the whole script to be rejected
 * [VIM-4286](https://youtrack.jetbrains.com/issue/VIM-4286) Fixed search and substitute patterns with square brackets that don't form a [collection](https://vimhelp.org/pattern.txt.html#%2Fcollection) being rejected as invalid — an unmatched `[` is now a literal bracket (e.g. `/heap[`, `/[[[`, `/[a-z`) and a `]` right after `[` or `[^` is a literal member of the collection (e.g. `/[]]` matches a `]`, `/[^]]` matches anything but a `]`), matching Vim
+* [VIM-4287](https://youtrack.jetbrains.com/issue/VIM-4287) Fixed [`dat`](https://vimhelp.org/motion.txt.html#v_at) leaving an empty indented line behind when the tag spans whole lines — deleting an indented `<b>…</b>` block now removes those lines completely and leaves the caret on the following tag. The same applies to other deletes that Vim turns linewise, such as `d}` on an indented paragraph, while text objects provided by extensions (e.g. `dam`, `die`, `d%`) stay characterwise as in Vim
+* [VIM-4301](https://youtrack.jetbrains.com/issue/VIM-4301) Fixed the IDE's own undo (`Ctrl+Z`, when undo is handled by the IDE) not reverting a change made with `S` or `C` in Normal mode — repeated presses were spent restoring the caret and the text was never brought back
 
 ### Changes:
 * [VIM-2178](https://youtrack.jetbrains.com/issue/VIM-2178) The `multiple-cursors` extension now maps its default shortcuts to match the original [vim-multiple-cursors](https://github.com/terryma/vim-multiple-cursors) plugin: `<C-n>`/`g<C-n>` add the next occurrence (whole word / any match), `<A-n>`/`g<A-n>` select all occurrences in the file, and `<C-x>`/`<C-p>` skip and remove selections. This is a breaking change from the previous `<A-n>`/`g<A-n>`/`<A-x>`/`<A-p>` mappings — set `let g:multi_cursor_use_default_mapping = 0` to disable the defaults and bind the `<Plug>` mappings yourself (for example, back to the old `<A-n>` based keys)
 
 ### Merged PRs:
+* [1949](https://github.com/JetBrains/ideavim/pull/1949) by [1grzyb1](https://github.com/1grzyb1): VIM-4301 fix native undo action
+* [1946](https://github.com/JetBrains/ideavim/pull/1946) by [1grzyb1](https://github.com/1grzyb1): VIM-4287 Expand characterwise range to whole lines when promoted to linewise delete
 * [1947](https://github.com/JetBrains/ideavim/pull/1947) by [1grzyb1](https://github.com/1grzyb1): VIM-330 Add missing spellchecker methods
 * [1944](https://github.com/JetBrains/ideavim/pull/1944) by [1grzyb1](https://github.com/1grzyb1): Handle `<C-O>` single command deletion to end of line correctly
 * [1943](https://github.com/JetBrains/ideavim/pull/1943) by [1grzyb1](https://github.com/1grzyb1): VIM-4286 Normalize square brackets in vim regex
