@@ -13,6 +13,7 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.CaretVisualAttributes
 import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
+import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.newapi.vim
@@ -335,7 +336,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
   fun `test reset caret shape when disable plugin`() {
     configureByText("Lorem ipsum dolor sit amet,")
     typeText("i")
-    VimPlugin.setEnabled(false)
+    disablePluginAndWaitForCaretReset()
     assertCaretVisualAttributes(CaretVisualAttributes.Shape.DEFAULT, 1.0f)
   }
 
@@ -344,7 +345,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
   fun `test reset caret shape when disable plugin 2`() {
     configureByText("Lorem ipsum dolor sit amet,")
     typeText("v2e")
-    VimPlugin.setEnabled(false)
+    disablePluginAndWaitForCaretReset()
     assertCaretVisualAttributes(CaretVisualAttributes.Shape.DEFAULT, 1.0f)
   }
 
@@ -353,7 +354,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
   fun `test reset caret shape when disable plugin 3`() {
     configureByText("Lorem ipsum dolor sit amet,")
     typeText("r")
-    VimPlugin.setEnabled(false)
+    disablePluginAndWaitForCaretReset()
     assertCaretVisualAttributes(CaretVisualAttributes.Shape.DEFAULT, 1.0f)
   }
 
@@ -384,6 +385,13 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
       )
       kotlin.test.assertEquals(2, fixture.editor.caretModel.caretCount)
       assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0f)
+    }
+  }
+
+  private fun disablePluginAndWaitForCaretReset() {
+    VimPlugin.setEnabled(false)
+    ApplicationManager.getApplication().invokeAndWait {
+      PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
     }
   }
 
