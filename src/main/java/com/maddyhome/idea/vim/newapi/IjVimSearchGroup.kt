@@ -194,11 +194,10 @@ open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateComponent<Ele
       lastDirection = Direction.FORWARDS
     }
 
-    val show = search.getChild("show-last")
-    val disableHighlight = injector.globalOptions().viminfo.contains("h")
-    showSearchHighlight = !disableHighlight && show.text.toBoolean()
+    val show = search.getChild("show-last")?.text?.toBoolean() ?: false
+    showSearchHighlight = show && !injector.globalOptions().viminfo.contains("h")
     if (logger.isDebug()) {
-      logger.debug("show=" + show + "(" + show.text + ")")
+      logger.debug("show=$show")
       logger.debug("showSearchHighlight=$showSearchHighlight")
     }
   }

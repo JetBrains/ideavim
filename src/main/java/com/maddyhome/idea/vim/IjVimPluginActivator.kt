@@ -22,7 +22,6 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.extension.VimExtensionRegistrar
 import com.maddyhome.idea.vim.helper.MacKeyRepeat
 import com.maddyhome.idea.vim.listener.VimListenerManager
-import com.maddyhome.idea.vim.newapi.IjVimSearchGroup
 import com.maddyhome.idea.vim.ui.StatusBarIconFactory
 import com.maddyhome.idea.vim.vimscript.model.commands.IntellijExCommandProvider
 import com.maddyhome.idea.vim.vimscript.model.functions.IntellijFunctionProvider
@@ -100,8 +99,7 @@ internal class IjVimPluginActivator : VimPluginActivator {
   }
 
   override fun deactivate(unsubscribe: Boolean) {
-    val searchGroup = VimPlugin.getSearchIfCreated() as IjVimSearchGroup?
-    searchGroup?.turnOff()
+    VimPlugin.getSearchIfCreated()?.turnOff()
 
     if (unsubscribe) {
       VimListenerManager.turnOff()
