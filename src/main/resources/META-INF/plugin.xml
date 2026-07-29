@@ -47,10 +47,6 @@
   <depends>com.intellij.modules.platform</depends>
   <resource-bundle>messages.IdeaVimBundle</resource-bundle>
 
-  <dependencies>
-    <module name="intellij.spellchecker"/>
-  </dependencies>
-
   <content>
     <module name="IdeaVIM.ideavim-common" loading="embedded"/>
     <module name="IdeaVIM.ideavim-frontend"/>
