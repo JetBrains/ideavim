@@ -34,6 +34,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 import java.nio.file.Path
 import kotlin.io.path.Path
+import kotlin.io.path.absolutePathString
 import kotlin.io.path.createDirectories
 import kotlin.io.path.writeText
 import kotlin.time.Duration.Companion.minutes
@@ -74,10 +75,13 @@ abstract class IdeaVimStarterTestBase {
 
     val pluginPath = resolvePluginPath()
     PluginConfigurator(context).installPluginFromPath(pluginPath)
+    context.useTestIdeaVimRc()
 
     if (ConfigurationStorage.splitMode()) {
       if (context is IDERemDevTestContext) {
         PluginConfigurator(context.frontendIDEContext).installPluginFromPath(pluginPath)
+        // Mappings come from the frontend, so the frontend is the context that really matters here.
+        context.frontendIDEContext.useTestIdeaVimRc()
       }
       context.patchForMacOsSplitMode()
     }
@@ -98,6 +102,27 @@ abstract class IdeaVimStarterTestBase {
 
   protected open fun beforeContextCreated() {}
   protected open fun configureContext(context: IDETestContext) {}
+
+  /**
+   * Content of the ideavimrc the launched IDE will use. Empty by default so tests run against
+   * plain Vim defaults. Override to enable options or extensions a test actually needs.
+   */
+  protected open fun ideaVimRcContent(): String = ""
+
+  /**
+   * Points the launched IDE at a test-owned ideavimrc via `IDEA_VIM_CUSTOM_VIMRC`, which
+   * [com.maddyhome.idea.vim.vimscript.services.VimRcService.findIdeaVimRc] checks before
+   * `~/.ideavimrc` and the XDG location.
+   *
+   * Without this the IDE loads the *developer's* real `~/.ideavimrc`, so results depend on whose
+   * machine the tests run on: e.g. `set sneak` rebinds `s` to the two-char sneak motion, and a test
+   * typing `0sX<Esc>` then makes no edit at all while passing on CI (which has no ideavimrc).
+   */
+  private fun IDETestContext.useTestIdeaVimRc() {
+    val vimrc = kotlin.io.path.createTempDirectory("ideavim-split-vimrc").resolve(".ideavimrc")
+    vimrc.writeText(ideaVimRcContent())
+    applyVMOptionsPatch { withEnv("IDEA_VIM_CUSTOM_VIMRC", vimrc.absolutePathString()) }
+  }
 
   // ── File helpers ────────────────────────────────────────────
 
