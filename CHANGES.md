@@ -23,6 +23,14 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+## To Be Released
+
+### Fixes:
+* [VIM-2879](https://youtrack.jetbrains.com/issue/VIM-2879) Fixed the last search term staying highlighted after an IDE restart — with [`'hlsearch'`](https://vimhelp.org/options.txt.html#%27hlsearch%27) on, every open project used to come up with the previous session's `/` match still highlighted; search highlights are now cleared on startup, as in Vim
+
+### Merged PRs:
+* [1952](https://github.com/JetBrains/ideavim/pull/1952) by [1grzyb1](https://github.com/1grzyb1): VIM-2879 clear highlights after restart
+
 ## 2.44.0, 2026-07-21
 
 ## 2.43.0, 2026-07-14
@@ -54,11 +62,13 @@ usual beta standards.
 * [VIM-4286](https://youtrack.jetbrains.com/issue/VIM-4286) Fixed search and substitute patterns with square brackets that don't form a [collection](https://vimhelp.org/pattern.txt.html#%2Fcollection) being rejected as invalid — an unmatched `[` is now a literal bracket (e.g. `/heap[`, `/[[[`, `/[a-z`) and a `]` right after `[` or `[^` is a literal member of the collection (e.g. `/[]]` matches a `]`, `/[^]]` matches anything but a `]`), matching Vim
 * [VIM-4287](https://youtrack.jetbrains.com/issue/VIM-4287) Fixed [`dat`](https://vimhelp.org/motion.txt.html#v_at) leaving an empty indented line behind when the tag spans whole lines — deleting an indented `<b>…</b>` block now removes those lines completely and leaves the caret on the following tag. The same applies to other deletes that Vim turns linewise, such as `d}` on an indented paragraph, while text objects provided by extensions (e.g. `dam`, `die`, `d%`) stay characterwise as in Vim
 * [VIM-4301](https://youtrack.jetbrains.com/issue/VIM-4301) Fixed the IDE's own undo (`Ctrl+Z`, when undo is handled by the IDE) not reverting a change made with `S` or `C` in Normal mode — repeated presses were spent restoring the caret and the text was never brought back
+* Fixed IdeaVim failing to load in split mode (the frontend/backend architecture also used by [remote development](https://www.jetbrains.com/help/idea/remote-development-overview.html)) — the new spell-checking commands declared a dependency on the IDE's spellchecker module, which the frontend does not provide
 
 ### Changes:
 * [VIM-2178](https://youtrack.jetbrains.com/issue/VIM-2178) The `multiple-cursors` extension now maps its default shortcuts to match the original [vim-multiple-cursors](https://github.com/terryma/vim-multiple-cursors) plugin: `<C-n>`/`g<C-n>` add the next occurrence (whole word / any match), `<A-n>`/`g<A-n>` select all occurrences in the file, and `<C-x>`/`<C-p>` skip and remove selections. This is a breaking change from the previous `<A-n>`/`g<A-n>`/`<A-x>`/`<A-p>` mappings — set `let g:multi_cursor_use_default_mapping = 0` to disable the defaults and bind the `<Plug>` mappings yourself (for example, back to the old `<A-n>` based keys)
 
 ### Merged PRs:
+* [1953](https://github.com/JetBrains/ideavim/pull/1953) by [1grzyb1](https://github.com/1grzyb1): Fix spllechecker in split mode and caret visual helper test
 * [1949](https://github.com/JetBrains/ideavim/pull/1949) by [1grzyb1](https://github.com/1grzyb1): VIM-4301 fix native undo action
 * [1946](https://github.com/JetBrains/ideavim/pull/1946) by [1grzyb1](https://github.com/1grzyb1): VIM-4287 Expand characterwise range to whole lines when promoted to linewise delete
 * [1947](https://github.com/JetBrains/ideavim/pull/1947) by [1grzyb1](https://github.com/1grzyb1): VIM-330 Add missing spellchecker methods
