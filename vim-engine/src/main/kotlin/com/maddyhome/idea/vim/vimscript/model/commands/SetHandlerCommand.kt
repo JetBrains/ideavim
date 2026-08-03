@@ -81,7 +81,14 @@ data class SetHandlerCommand(val range: Range, val modifier: CommandModifier, va
           "v" -> currentOwner.copy(visual = right, select = right)
           "x" -> currentOwner.copy(visual = right)
           "s" -> currentOwner.copy(select = right)
-          "a" -> currentOwner.copy(normal = right, insert = right, visual = right, select = right)
+          "c" -> currentOwner.copy(cmdLine = right)
+          "a" -> currentOwner.copy(
+            normal = right,
+            insert = right,
+            visual = right,
+            select = right,
+            cmdLine = right,
+          )
           else -> return null
         }
       }

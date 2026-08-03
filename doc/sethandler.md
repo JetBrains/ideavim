@@ -14,7 +14,9 @@ and defines the following modes:
  - n - normal mode
  - i - insert mode
  - x - visual mode
+ - s - select mode
  - v - visual and select modes
+ - c - command-line mode
  - a - all modes
 
 The `handler` is an argument that may accept the following values:
@@ -25,10 +27,21 @@ Examples:
  - `n:ide` - use IDE handler in normal mode
  - `i-v:vim` - use Vim handler in normal, visual, and select modes
  - `a:ide` - use IDE handler in all modes
+ - `a:ide c:vim` - use IDE handler everywhere except command-line mode
 
 By using `sethandler` you can define handlers:
  - For a single shortcut: `sethandler <C-A> n:vim i-x:ide` - use Vim handler in normal mode and IDE handler in insert and visual modes,
  - For all shortcuts: `sethandler n:vim i:ide` - use Vim handlers in normal mode and IDE handlers in insert mode.
+
+Later definitions override earlier ones, so `a:ide c:vim` first assigns every mode to the IDE
+and then hands command-line mode back to Vim. This is useful for keeping a `cnoremap` working
+while the IDE owns the shortcut everywhere else:
+
+```vim
+" 'Fighting Kirby' regex: capture the current word so it can be used in back references
+cnoremap <F2> \(.*\)
+sethandler <F2> a:ide c:vim
+```
 
 If the definition of the handler is missing for some mode, it defaults to `vim`:
 `sethandler <C-X> i:ide` - use IDE handler in insert mode and Vim handler in all other modes.

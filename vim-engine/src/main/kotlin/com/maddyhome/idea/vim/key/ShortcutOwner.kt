@@ -19,6 +19,7 @@ sealed class ShortcutOwnerInfo {
     val insert: ShortcutOwner,
     val visual: ShortcutOwner,
     val select: ShortcutOwner,
+    val cmdLine: ShortcutOwner,
   ) : ShortcutOwnerInfo() {
     fun toNotation(): String {
       val owners = HashMap<ShortcutOwner, MutableList<String>>()
@@ -26,6 +27,7 @@ sealed class ShortcutOwnerInfo {
       owners[insert] = (owners[insert] ?: mutableListOf()).also { it.add("i") }
       owners[visual] = (owners[visual] ?: mutableListOf()).also { it.add("x") }
       owners[select] = (owners[select] ?: mutableListOf()).also { it.add("s") }
+      owners[cmdLine] = (owners[cmdLine] ?: mutableListOf()).also { it.add("c") }
 
       if ("x" in (owners[ShortcutOwner.VIM] ?: emptyList()) && "s" in (owners[ShortcutOwner.VIM] ?: emptyList())) {
         val existing = owners[ShortcutOwner.VIM] ?: mutableListOf()
@@ -76,7 +78,7 @@ sealed class ShortcutOwnerInfo {
         is Mode.VISUAL -> this.visual
         is Mode.SELECT -> this.visual
         is Mode.INSERT -> this.insert
-        is Mode.CMD_LINE -> this.normal
+        is Mode.CMD_LINE -> this.cmdLine
         is Mode.OP_PENDING -> this.normal
         Mode.REPLACE -> this.insert
       }
@@ -89,8 +91,10 @@ sealed class ShortcutOwnerInfo {
     val allVim: AllModes = AllModes(ShortcutOwner.VIM)
     val allIde: AllModes = AllModes(ShortcutOwner.IDE)
 
-    val allPerModeVim: PerMode = PerMode(ShortcutOwner.VIM, ShortcutOwner.VIM, ShortcutOwner.VIM, ShortcutOwner.VIM)
-    val allPerModeIde: PerMode = PerMode(ShortcutOwner.IDE, ShortcutOwner.IDE, ShortcutOwner.IDE, ShortcutOwner.IDE)
+    val allPerModeVim: PerMode =
+      PerMode(ShortcutOwner.VIM, ShortcutOwner.VIM, ShortcutOwner.VIM, ShortcutOwner.VIM, ShortcutOwner.VIM)
+    val allPerModeIde: PerMode =
+      PerMode(ShortcutOwner.IDE, ShortcutOwner.IDE, ShortcutOwner.IDE, ShortcutOwner.IDE, ShortcutOwner.IDE)
 
     private val wights = mapOf(
       "a" to 0,
@@ -99,6 +103,7 @@ sealed class ShortcutOwnerInfo {
       "x" to 3,
       "s" to 4,
       "v" to 5,
+      "c" to 6,
     )
   }
 }
