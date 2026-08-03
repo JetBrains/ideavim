@@ -478,23 +478,32 @@ gradle.projectsEvaluated {
 
 // --- Intellij plugin
 
+// The rendered change notes body, plus the version whose CHANGES.md section it came from.
+// Patch releases have no section of their own (promoteChangelog.ts rolls them into the parent
+// minor), so 2.45.1 resolves to 2.45.0 - and so does its YouTrack link, because releaseActions.kt
+// only ever creates fix versions for minors. Note that getLatest() returns the first section in
+// file order, not the highest version, so CHANGES.md must stay sorted and free of empty headers.
+val changeNotesParts = provider {
+  val version = project.version.toString()
+  val parentMinor = Regex("""^(\d+\.\d+)\.\d+$""").matchEntire(version)?.let { "${it.groupValues[1]}.0" }
+  with(changelog) {
+    val item = getOrNull(version)
+      ?: parentMinor?.let { getOrNull(it) }
+      ?: getLatest()
+    val rendered = renderItem(
+      item.withHeader(false).withEmptySections(false),
+      Changelog.OutputType.HTML,
+    )
+    rendered to item.version
+  }
+}
+
 intellijPlatform {
   pluginConfiguration {
     name = "IdeaVim"
-    // Rendered from the matching section in CHANGES.md (or the latest released
-    // section as a fallback during dev / SNAPSHOT builds), with the version
-    // header dropped — the marketplace shows the version separately.
-    changeNotes.set(provider {
-      val rendered = with(changelog) {
-        renderItem(
-          (getOrNull(project.version.toString()) ?: getLatest())
-            .withHeader(false)
-            .withEmptySections(false),
-          Changelog.OutputType.HTML,
-        )
-      }
+    changeNotes.set(changeNotesParts.map { (rendered, notesVersion) ->
       val youtrackUrl =
-        "https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20Fix%20versions:%20${project.version}"
+        "https://youtrack.jetbrains.com/issues/VIM?q=State:%20Fixed%20Fix%20versions:%20$notesVersion"
       "$rendered<br>\n<a href=\"$youtrackUrl\">Changelog</a>"
     })
 
@@ -580,6 +589,26 @@ changelog {
 
 tasks.named("publishPlugin") {
   setDependsOn(dependsOn.filterNot { it == "patchChangelog" })
+}
+
+// Guard against publishing a release with no change notes. If CHANGES.md has no section for the
+// version, none for its parent minor, and the fallback section is empty, `changeNotesParts`
+// renders to nothing and the marketplace entry becomes a bare link to YouTrack — which is how
+// 2.42.1 through 2.45.1 shipped.
+tasks.named("patchPluginXml") {
+  val notes = changeNotesParts.map { it.first }
+  val version = project.version.toString()
+  // A stable release must never ship without notes. Anything else (EAP, dev, SNAPSHOT) only
+  // warns, so local builds keep working on a half-written changelog.
+  val isStableRelease = Regex("""^\d+\.\d+(\.\d+)?$""").matches(version)
+  doFirst {
+    if (notes.get().isNotBlank()) return@doFirst
+    val message = "Change notes for version '$version' are empty: CHANGES.md has no section for it " +
+            "and the fallback section has no entries. The release would be published with nothing but a " +
+            "link to YouTrack."
+    if (isStableRelease) throw GradleException(message)
+    logger.warn("WARNING: $message")
+  }
 }
 
 // Uncomment to enable FUS testing mode
