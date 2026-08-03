@@ -23,9 +23,13 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-## 2.44.0, 2026-07-21
+## To Be Released
 
-## 2.43.0, 2026-07-14
+### Fixes:
+* [VIM-2879](https://youtrack.jetbrains.com/issue/VIM-2879) Fixed the last search term staying highlighted after an IDE restart — with [`'hlsearch'`](https://vimhelp.org/options.txt.html#%27hlsearch%27) on, every open project used to come up with the previous session's `/` match still highlighted; search highlights are now cleared on startup, as in Vim
+
+### Merged PRs:
+* [1952](https://github.com/JetBrains/ideavim/pull/1952) by [1grzyb1](https://github.com/1grzyb1): VIM-2879 clear highlights after restart
 
 ## 2.45.0, 2026-07-28
 
@@ -77,8 +81,6 @@ usual beta standards.
 * [1889](https://github.com/JetBrains/ideavim/pull/1889) by [ameertaweel](https://github.com/ameertaweel): Allow Setting Custom `.ideavimrc` Path
 * [1890](https://github.com/JetBrains/ideavim/pull/1890) by [1grzyb1](https://github.com/1grzyb1): VIM-2694 Add C-G and C-T  action during incsearch
 * [1894](https://github.com/JetBrains/ideavim/pull/1894) by [1grzyb1](https://github.com/1grzyb1): VIM-4270 Ignore % after initial range
-
-## 2.42.0, 2026-07-01
 
 ## 2.41.0, 2026-07-01
 
