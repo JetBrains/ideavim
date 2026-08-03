@@ -48,6 +48,7 @@ public class EditorHelper {
   // Code Vision)
   public static final String PYTHON_CONSOLE_FILE_NAME = "Python Console.py";
   public static final String PYTHON_CONSOLE_TOOL_WINDOW_ID = "Python Console";
+  private static final String PYDEV_CONSOLE_KEY_NAME = "PYDEV_CONSOLE_KEY";
 
   private static final int BLOCK_INLAY_MAX_LINE_HEIGHT = 3;
 
@@ -359,7 +360,8 @@ public class EditorHelper {
     final int screenHeight = visibleArea.height;
     final int lineHeight = editor.getLineHeight();
 
-    final int offset = y - getStickyLinesPanelHeight(editor) - ((screenHeight - lineHeight) / lineHeight / 2 * lineHeight);
+    final int offset =
+      y - getStickyLinesPanelHeight(editor) - ((screenHeight - lineHeight) / lineHeight / 2 * lineHeight);
     final @NotNull VimEditor editor1 = new IjVimEditor(editor);
     final int lastVisualLine = EngineEditorHelperKt.getVisualLineCount(editor1) - 1;
     final int offsetForLastLineAtBottom = getOffsetToScrollVisualLineToBottomOfScreen(editor, lastVisualLine);
@@ -399,8 +401,9 @@ public class EditorHelper {
     final int lineHeight = editor.getLineHeight();
     // Use the full viewport height for bottom placement. Sticky lines reduce the content area at the top, but the
     // bottom of the window is still the physical bottom of the viewport (minus ex command line and scrollbar).
-    final int screenHeight = editor.getScrollingModel().getVisibleAreaOnScrollingFinished().height
-      - getExEntryHeight() - getHorizontalScrollbarHeight(editor);
+    final int screenHeight = editor.getScrollingModel().getVisibleAreaOnScrollingFinished().height -
+                             getExEntryHeight() -
+                             getHorizontalScrollbarHeight(editor);
     final int inlayHeight = EditorUtil.getInlaysHeight(editor, nonNormalisedVisualLine, false);
     final int maxInlayHeight = BLOCK_INLAY_MAX_LINE_HEIGHT * lineHeight;
     final int y = editor.visualLineToY(nonNormalisedVisualLine) + lineHeight + min(inlayHeight, maxInlayHeight);
@@ -416,8 +419,7 @@ public class EditorHelper {
 
   private static int getExEntryHeight() {
     Integer height = injector.getCommandLine().getActiveCommandLineHeight();
-    if (height != null)
-      return height;
+    if (height != null) return height;
     height = injector.getOutputPanel().getActiveOutputPanelHeight();
     return height != null ? height : 0;
   }
@@ -715,13 +717,29 @@ public class EditorHelper {
   /**
    * Checks if the editor is the Python console, so we can enable Vim features while still applying the special
    * Enter/arrow key handling it requires.
+   * <p>
+   * The console's virtual file is a light file named after the console title. That title is only "Python Console" for
+   * consoles started from the tool window - "Run file in Python Console" names the console after the run
+   * configuration, and the title is localised. So we primarily look for the marker the Python plugin puts on the
+   * console's virtual file ({@code PythonConsoleView.CONSOLE_KEY}), and fall back to the name.
+   * <p>
+   * The name check is still needed: the console's input editor is created inside {@code LanguageConsoleImpl}'s
+   * constructor, i.e. before {@code PythonConsoleView} gets a chance to set the marker. See
+   * {@code VimEditorFactoryListener.scheduleDeferredInitialisation} for how consoles that aren't recognisable at
+   * creation time are picked up.
    */
   public static boolean isPythonConsole(@NotNull Editor editor) {
     var file = EditorHelper.getVirtualFile(editor);
     if (file == null) return false;
+    if (isMarkedAsPythonConsole(file)) return true;
     // In split mode, the projected VirtualFile may have a different getName() result,
     // so we also check getPath() to reliably detect the Python console.
     return file.getName().contains(PYTHON_CONSOLE_FILE_NAME) || file.getPath().contains(PYTHON_CONSOLE_FILE_NAME);
+  }
+
+  private static boolean isMarkedAsPythonConsole(@NotNull VirtualFile file) {
+    @SuppressWarnings("deprecation") Key<?> consoleKey = Key.findKeyByName(PYDEV_CONSOLE_KEY_NAME);
+    return consoleKey != null && Boolean.TRUE.equals(file.getUserData(consoleKey));
   }
 
   /**
@@ -737,17 +755,17 @@ public class EditorHelper {
   /**
    * Checks if the editor is a Kotlin class file decompiled to a Java file, so we can enable Vim features
    * <p>
-   *   The platform changed the implementation of decompiling a Kotlin .class file to Java in 2026.2. Previously, it
-   *   used a dummy virtual file implementation. Now it uses an instance of {@link LightVirtualFile}. Typically, this
-   *   means an in-memory file that we don't want to have Vim features for, but in this case, we do.
+   * The platform changed the implementation of decompiling a Kotlin .class file to Java in 2026.2. Previously, it
+   * used a dummy virtual file implementation. Now it uses an instance of {@link LightVirtualFile}. Typically, this
+   * means an in-memory file that we don't want to have Vim features for, but in this case, we do.
    * </p>
    * <p>
-   *   To test, open a .class file generated from a Kotlin file. Then use the "Decompile to Java" action to create a
-   *   separate (in-memory) `.decompiled.java` file. Java-based .class files are decompiled directly in the document for
-   *   the .class file, so the editor is always backed by a valid file.
+   * To test, open a .class file generated from a Kotlin file. Then use the "Decompile to Java" action to create a
+   * separate (in-memory) `.decompiled.java` file. Java-based .class files are decompiled directly in the document for
+   * the .class file, so the editor is always backed by a valid file.
    * </p>
    * <p>
-   *   Perhaps a future implementation would have an allow-list for {@link VirtualFile#getFileType()} and allow "JAVA"?
+   * Perhaps a future implementation would have an allow-list for {@link VirtualFile#getFileType()} and allow "JAVA"?
    * </p>
    */
   public static boolean isKotlinClassDecompiledToJavaFile(@NotNull Editor editor) {

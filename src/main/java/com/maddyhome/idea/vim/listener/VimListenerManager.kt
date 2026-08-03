@@ -61,6 +61,7 @@ import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.newvfs.BulkFileListener
 import com.intellij.openapi.vfs.newvfs.events.VFileCreateEvent
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
+import com.intellij.testFramework.LightVirtualFile
 import com.intellij.util.ExceptionUtil
 import com.intellij.util.SlowOperations
 import com.maddyhome.idea.vim.EventFacade
@@ -522,8 +523,13 @@ object VimListenerManager {
 
     private val openingEditorKey: Key<OpeningEditor> = Key("IdeaVim::OpeningEditor")
 
+    private const val PYTHON_EXTENSION = "py"
+
     override fun editorCreated(event: EditorFactoryEvent) {
-      if (vimDisabled(event.editor)) return
+      if (vimDisabled(event.editor)) {
+        scheduleDeferredInitialisation(event.editor)
+        return
+      }
 
       // This callback is called when an editor is created, but we cannot completely rely on it to initialise options.
       // We can find the currently selected editor, which we can use as the opening editor, and we're given the new
@@ -539,19 +545,8 @@ object VimListenerManager {
           event.editor
         )
       ) {
-        // If we don't have an opening editor, use the fallback window. If it's the first time, use the FALLBACK
-        // scenario and make a full copy to get everything set in `~/.ideavimrc`. If it's not, then use EDIT, as if we
-        // still had a current window and we are just replacing the buffer. If we do have an opening window, it's NEW.
         // Preview and reused tabs are handled below
-        val scenario = when {
-          openingEditor == null && !firstEditorInitialised -> LocalOptionInitialisationScenario.FALLBACK
-          openingEditor == null -> LocalOptionInitialisationScenario.EDIT
-          else -> LocalOptionInitialisationScenario.NEW
-        }
-        SlowOperations.knownIssue("VIM-3648").use {
-          EditorListeners.add(event.editor, openingEditor?.vim ?: injector.fallbackWindow, scenario)
-        }
-        firstEditorInitialised = true
+        initialiseFromOpeningEditor(event.editor, openingEditor)
       } else {
         // We've got a virtual file, so FileOpenedSyncListener will be called. Save data
         val project = openingEditor.project ?: return
@@ -577,6 +572,49 @@ object VimListenerManager {
           openingEditorKey,
           OpeningEditor(openingEditor, owningEditorWindow, isPreview, canBeReused)
         )
+      }
+    }
+
+    private fun initialiseFromOpeningEditor(editor: Editor, openingEditor: Editor?) {
+      // If we don't have an opening editor, use the fallback window. If it's the first time, use the FALLBACK scenario
+      // and make a full copy to get everything set in `~/.ideavimrc`. If it's not, then use EDIT, as if we still had a
+      // current window and we are just replacing the buffer. If we do have an opening window, it's NEW.
+      val scenario = when {
+        openingEditor == null && !firstEditorInitialised -> LocalOptionInitialisationScenario.FALLBACK
+        openingEditor == null -> LocalOptionInitialisationScenario.EDIT
+        else -> LocalOptionInitialisationScenario.NEW
+      }
+      SlowOperations.knownIssue("VIM-3648").use {
+        EditorListeners.add(editor, openingEditor?.vim ?: injector.fallbackWindow, scenario)
+      }
+      firstEditorInitialised = true
+    }
+
+    /**
+     * Retries initialisation for editors that can only be recognised as supported after they've been created.
+     *
+     * The Python console's input editor is created inside `LanguageConsoleImpl`'s constructor, before
+     * `PythonConsoleView` marks the console's virtual file with `PYDEV_CONSOLE_KEY`. Consoles started by
+     * "Run file in Python Console" are named after the run configuration rather than "Python Console" (see
+     * `PydevConsoleRunnerFactory.createConsoleRunnerWithFile`), so at [editorCreated] time there is nothing to identify
+     * them by and [vimDisabled] rejects them. The console is fully constructed within a single EDT runnable, so
+     * re-checking in `invokeLater` sees the marker.
+     *
+     * Only light Python files are considered, to keep this from queueing work for every unsupported editor. Anything
+     * that still isn't supported on the second look (e.g. a Python code fragment in the debugger's evaluate window) is
+     * dropped, exactly as before.
+     */
+    private fun scheduleDeferredInitialisation(editor: Editor) {
+      if (editor.isDisposed) return
+      val file = EditorHelper.getVirtualFile(editor) ?: return
+      if (file !is LightVirtualFile || file.extension != PYTHON_EXTENSION) return
+
+      // Capture the opening editor now rather than in the callback - by then the selected editor might have changed
+      val openingEditor = getOpeningEditor(editor)
+
+      ApplicationManager.getApplication().invokeLater {
+        if (editor.isDisposed || vimDisabled(editor)) return@invokeLater
+        initialiseFromOpeningEditor(editor, openingEditor?.takeUnless { it.isDisposed })
       }
     }
 
