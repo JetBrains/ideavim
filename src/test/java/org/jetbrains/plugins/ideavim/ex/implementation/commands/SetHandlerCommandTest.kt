@@ -12,6 +12,8 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
+import com.maddyhome.idea.vim.newapi.vim
+import com.maddyhome.idea.vim.state.mode.Mode
 import com.maddyhome.idea.vim.vimscript.model.commands.SetHandlerCommand
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -28,6 +30,7 @@ class SetHandlerCommandTest : VimTestCase() {
     kotlin.test.assertEquals(ShortcutOwner.IDE, newOwner.normal)
     kotlin.test.assertEquals(ShortcutOwner.IDE, newOwner.select)
     kotlin.test.assertEquals(ShortcutOwner.IDE, newOwner.visual)
+    kotlin.test.assertEquals(ShortcutOwner.IDE, newOwner.cmdLine)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
@@ -39,6 +42,7 @@ class SetHandlerCommandTest : VimTestCase() {
     kotlin.test.assertEquals(ShortcutOwner.VIM, newOwner.normal)
     kotlin.test.assertEquals(ShortcutOwner.VIM, newOwner.select)
     kotlin.test.assertEquals(ShortcutOwner.VIM, newOwner.visual)
+    kotlin.test.assertEquals(ShortcutOwner.VIM, newOwner.cmdLine)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
@@ -50,6 +54,7 @@ class SetHandlerCommandTest : VimTestCase() {
     kotlin.test.assertEquals(ShortcutOwner.IDE, newOwner.normal)
     kotlin.test.assertEquals(ShortcutOwner.VIM, newOwner.select)
     kotlin.test.assertEquals(ShortcutOwner.VIM, newOwner.visual)
+    kotlin.test.assertEquals(ShortcutOwner.VIM, newOwner.cmdLine)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
@@ -61,6 +66,7 @@ class SetHandlerCommandTest : VimTestCase() {
     kotlin.test.assertEquals(ShortcutOwner.IDE, newOwner.normal)
     kotlin.test.assertEquals(ShortcutOwner.IDE, newOwner.select)
     kotlin.test.assertEquals(ShortcutOwner.IDE, newOwner.visual)
+    kotlin.test.assertEquals(ShortcutOwner.VIM, newOwner.cmdLine)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
@@ -72,6 +78,7 @@ class SetHandlerCommandTest : VimTestCase() {
     kotlin.test.assertEquals(ShortcutOwner.VIM, newOwner.normal)
     kotlin.test.assertEquals(ShortcutOwner.IDE, newOwner.select)
     kotlin.test.assertEquals(ShortcutOwner.IDE, newOwner.visual)
+    kotlin.test.assertEquals(ShortcutOwner.VIM, newOwner.cmdLine)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
@@ -83,6 +90,7 @@ class SetHandlerCommandTest : VimTestCase() {
     kotlin.test.assertEquals(ShortcutOwner.VIM, newOwner.normal)
     kotlin.test.assertEquals(ShortcutOwner.VIM, newOwner.select)
     kotlin.test.assertEquals(ShortcutOwner.IDE, newOwner.visual)
+    kotlin.test.assertEquals(ShortcutOwner.VIM, newOwner.cmdLine)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
@@ -94,6 +102,43 @@ class SetHandlerCommandTest : VimTestCase() {
     kotlin.test.assertEquals(ShortcutOwner.VIM, newOwner.normal)
     kotlin.test.assertEquals(ShortcutOwner.IDE, newOwner.select)
     kotlin.test.assertEquals(ShortcutOwner.VIM, newOwner.visual)
+    kotlin.test.assertEquals(ShortcutOwner.VIM, newOwner.cmdLine)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
+  fun `test c mapping`() {
+    val owner = ShortcutOwnerInfo.allPerModeVim
+    val newOwner = SetHandlerCommand.updateOwner(owner, "c:ide")!!
+    kotlin.test.assertEquals(ShortcutOwner.VIM, newOwner.insert)
+    kotlin.test.assertEquals(ShortcutOwner.VIM, newOwner.normal)
+    kotlin.test.assertEquals(ShortcutOwner.VIM, newOwner.select)
+    kotlin.test.assertEquals(ShortcutOwner.VIM, newOwner.visual)
+    kotlin.test.assertEquals(ShortcutOwner.IDE, newOwner.cmdLine)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
+  fun `test n-c mapping`() {
+    val owner = ShortcutOwnerInfo.allPerModeVim
+    val newOwner = SetHandlerCommand.updateOwner(owner, "n-c:ide")!!
+    kotlin.test.assertEquals(ShortcutOwner.VIM, newOwner.insert)
+    kotlin.test.assertEquals(ShortcutOwner.IDE, newOwner.normal)
+    kotlin.test.assertEquals(ShortcutOwner.VIM, newOwner.select)
+    kotlin.test.assertEquals(ShortcutOwner.VIM, newOwner.visual)
+    kotlin.test.assertEquals(ShortcutOwner.IDE, newOwner.cmdLine)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
+  fun `test a mapping is overridden by a later c mapping`() {
+    val owner = ShortcutOwnerInfo.allPerModeVim
+    val newOwner = SetHandlerCommand.updateOwner(SetHandlerCommand.updateOwner(owner, "a:ide"), "c:vim")!!
+    kotlin.test.assertEquals(ShortcutOwner.IDE, newOwner.insert)
+    kotlin.test.assertEquals(ShortcutOwner.IDE, newOwner.normal)
+    kotlin.test.assertEquals(ShortcutOwner.IDE, newOwner.select)
+    kotlin.test.assertEquals(ShortcutOwner.IDE, newOwner.visual)
+    kotlin.test.assertEquals(ShortcutOwner.VIM, newOwner.cmdLine)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
@@ -105,6 +150,7 @@ class SetHandlerCommandTest : VimTestCase() {
     kotlin.test.assertEquals(ShortcutOwner.IDE, newOwner.normal)
     kotlin.test.assertEquals(ShortcutOwner.IDE, newOwner.select)
     kotlin.test.assertEquals(ShortcutOwner.IDE, newOwner.visual)
+    kotlin.test.assertEquals(ShortcutOwner.VIM, newOwner.cmdLine)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
@@ -128,7 +174,7 @@ class SetHandlerCommandTest : VimTestCase() {
   fun `test to notation`() {
     var owner = ShortcutOwnerInfo.allPerModeVim
     owner = owner.copy(normal = ShortcutOwner.IDE)
-    kotlin.test.assertEquals("n:ide i-v:vim", owner.toNotation())
+    kotlin.test.assertEquals("n:ide i-v-c:vim", owner.toNotation())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
@@ -136,7 +182,7 @@ class SetHandlerCommandTest : VimTestCase() {
   fun `test to notation 2`() {
     var owner = ShortcutOwnerInfo.allPerModeVim
     owner = owner.copy(normal = ShortcutOwner.IDE, insert = ShortcutOwner.IDE)
-    kotlin.test.assertEquals("n-i:ide v:vim", owner.toNotation())
+    kotlin.test.assertEquals("n-i:ide v-c:vim", owner.toNotation())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
@@ -155,8 +201,17 @@ class SetHandlerCommandTest : VimTestCase() {
       insert = ShortcutOwner.IDE,
       visual = ShortcutOwner.IDE,
       select = ShortcutOwner.IDE,
+      cmdLine = ShortcutOwner.IDE,
     )
     kotlin.test.assertEquals("a:ide", owner.toNotation())
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
+  fun `test to notation with cmdline`() {
+    var owner = ShortcutOwnerInfo.allPerModeVim
+    owner = owner.copy(cmdLine = ShortcutOwner.IDE)
+    kotlin.test.assertEquals("c:ide n-i-v:vim", owner.toNotation())
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
@@ -183,5 +238,29 @@ class SetHandlerCommandTest : VimTestCase() {
     val owner = VimPlugin.getKey().savedShortcutConflicts.entries.single().value
     kotlin.test.assertEquals("<C-C>", injector.parser.toKeyNotation(key))
     kotlin.test.assertEquals(ShortcutOwnerInfo.allPerModeIde, owner)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
+  fun `test executing command with command-line handler`() {
+    configureByText("")
+    kotlin.test.assertTrue(VimPlugin.getKey().savedShortcutConflicts.isEmpty())
+    typeText(commandToKeys("sethandler <F2> a:ide c:vim"))
+    val owner = VimPlugin.getKey().savedShortcutConflicts.entries.single().value
+    kotlin.test.assertEquals("n-i-v:ide c:vim", (owner as ShortcutOwnerInfo.PerMode).toNotation())
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
+  fun `test command-line handler is used while the command line is active`() {
+    configureByText("")
+    typeText(commandToKeys("sethandler <F2> a:ide c:vim"))
+    val owner = VimPlugin.getKey().savedShortcutConflicts.entries.single().value
+
+    kotlin.test.assertEquals(ShortcutOwner.IDE, owner.forEditor(fixture.editor.vim))
+
+    typeText(":")
+    kotlin.test.assertTrue(fixture.editor.vim.mode is Mode.CMD_LINE)
+    kotlin.test.assertEquals(ShortcutOwner.VIM, owner.forEditor(fixture.editor.vim))
   }
 }
