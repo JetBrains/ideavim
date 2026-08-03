@@ -31,10 +31,6 @@ usual beta standards.
 ### Merged PRs:
 * [1952](https://github.com/JetBrains/ideavim/pull/1952) by [1grzyb1](https://github.com/1grzyb1): VIM-2879 clear highlights after restart
 
-## 2.44.0, 2026-07-21
-
-## 2.43.0, 2026-07-14
-
 ## 2.45.0, 2026-07-28
 
 ### Features:
@@ -91,8 +87,6 @@ usual beta standards.
 * [1889](https://github.com/JetBrains/ideavim/pull/1889) by [ameertaweel](https://github.com/ameertaweel): Allow Setting Custom `.ideavimrc` Path
 * [1890](https://github.com/JetBrains/ideavim/pull/1890) by [1grzyb1](https://github.com/1grzyb1): VIM-2694 Add C-G and C-T  action during incsearch
 * [1894](https://github.com/JetBrains/ideavim/pull/1894) by [1grzyb1](https://github.com/1grzyb1): VIM-4270 Ignore % after initial range
-
-## 2.42.0, 2026-07-01
 
 ## 2.41.0, 2026-07-01
 
