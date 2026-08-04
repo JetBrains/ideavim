@@ -139,6 +139,33 @@ class GxActionTest : MockTestCase() {
   }
 
   @Test
+  fun `test gx does not add the caret position to the jump list`() {
+    val handler = mockService(VimExternalOpener::class.java)
+    // `gx` is not a jump motion in Vim (see `:help jump-motions`) and it never moves the caret, so
+    // it must leave the jump list alone.
+    configureByText(
+      """
+      https://jetbrains.com
+      middle line
+      ${c}target line
+      """.trimIndent(),
+    )
+
+    typeText("gg") // A real jump motion: remembers "target line" as the jump origin.
+    typeText("gx")
+    typeText("<C-O>")
+
+    verify(handler).open(eq("https://jetbrains.com"), eq(null))
+    assertState(
+      """
+      https://jetbrains.com
+      middle line
+      ${c}target line
+      """.trimIndent(),
+    )
+  }
+
+  @Test
   fun `test gx passes g netrw_browsex_viewer as the viewer`() {
     val handler = mockService(VimExternalOpener::class.java)
     configureByText("See ${c}https://jetbrains.com")
