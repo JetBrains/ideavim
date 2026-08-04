@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.api.ImmutableVimCaret
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.state.mode.Mode
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import org.jetbrains.annotations.ApiStatus.Internal
 import java.util.concurrent.ConcurrentLinkedDeque
 
@@ -24,6 +25,7 @@ class VimListenersNotifier {
   val vimPluginListeners: MutableCollection<VimPluginListener> = ConcurrentLinkedDeque()
   val isReplaceCharListeners: MutableCollection<IsReplaceCharListener> = ConcurrentLinkedDeque()
   val yankListeners: MutableCollection<VimYankListener> = ConcurrentLinkedDeque()
+  val registerListeners: MutableCollection<VimRegisterListener> = ConcurrentLinkedDeque()
 
   fun notifyModeWillChange(editor: VimEditor, oldMode: Mode, newMode: Mode) {
     if (!injector.enabler.isEnabled()) return
@@ -83,6 +85,11 @@ class VimListenersNotifier {
     yankListeners.forEach { it.yankPerformed(caretToRange) }
   }
 
+  fun notifyRegisterStored(register: Char, copiedText: VimCopiedText, type: SelectionType, isDelete: Boolean) {
+    if (!injector.enabler.isEnabled()) return // we remove all the listeners when turning the plugin off, but let's do it just in case
+    registerListeners.forEach { it.registerStored(register, copiedText, type, isDelete) }
+  }
+
   /**
    * Removes listeners with a given listener owner.
    */
@@ -98,7 +105,8 @@ class VimListenersNotifier {
       macroRecordingListeners,
       vimPluginListeners,
       isReplaceCharListeners,
-      yankListeners
+      yankListeners,
+      registerListeners
     ).forEach { unloadListeners(listenerOwner, it) }
   }
 
@@ -109,5 +117,7 @@ class VimListenersNotifier {
     macroRecordingListeners.clear()
     vimPluginListeners.clear()
     isReplaceCharListeners.clear()
+    yankListeners.clear()
+    registerListeners.clear()
   }
 }

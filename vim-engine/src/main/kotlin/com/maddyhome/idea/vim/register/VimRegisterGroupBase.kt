@@ -275,6 +275,11 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
       myRegisters['0'] = Register('0', copiedText, type)
       logger.debug { "register '0' contains: \"$copiedText\"" }
     } // Yanks also go to register 0 if the default register was used
+
+    // Notified once for the whole operation, after every register above has been written. Note this
+    // is deliberately not raised for the black hole register, which returns early, nor for
+    // storeTextSpecial or `let @a = ...`, neither of which routes through here.
+    injector.listenersNotifier.notifyRegisterStored(register, copiedText, type, isDelete)
     return true
   }
 
