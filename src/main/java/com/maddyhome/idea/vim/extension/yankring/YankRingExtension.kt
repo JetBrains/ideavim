@@ -15,6 +15,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.common.VimCopiedText
 import com.maddyhome.idea.vim.common.VimRegisterListener
+import com.maddyhome.idea.vim.helper.EngineStringHelper.toPrintableCharacters
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.thinapi.toTextSelectionType
 
@@ -88,7 +89,7 @@ internal suspend fun clearYankRing() {
  * wide as the `Elem` header, then the content with newlines shown as a literal `\n`.
  */
 private fun displayElement(number: Int, entry: YankRingEntry): String {
-  val content = entry.text.replace("\n", "\\n")
+  val content = toPrintableCharacters(injector.parser.stringToKeys(entry.text.replace("\n", "\\n")))
   return number.toString().padEnd(ELEM_HEADER.length + 2) + content
 }
 
