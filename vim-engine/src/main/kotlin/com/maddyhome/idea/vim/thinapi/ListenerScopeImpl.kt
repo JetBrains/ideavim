@@ -22,10 +22,14 @@ import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.common.MacroRecordingListener
 import com.maddyhome.idea.vim.common.ModeChangeListener
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.common.VimCopiedText
 import com.maddyhome.idea.vim.common.VimPluginListener
+import com.maddyhome.idea.vim.common.VimRegisterListener
 import com.maddyhome.idea.vim.common.VimYankListener
 import com.maddyhome.idea.vim.key.MappingOwner
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import kotlinx.coroutines.runBlocking
+import com.intellij.vim.api.models.TextType
 import com.maddyhome.idea.vim.state.mode.Mode as EngineMode
 
 class ListenerScopeImpl(
@@ -71,6 +75,23 @@ class ListenerScopeImpl(
       }
     }
     injector.listenersNotifier.yankListeners.add(listener)
+  }
+
+  override fun onRegisterStore(callback: suspend VimApi.(register: Char, text: String, type: TextType, isDelete: Boolean) -> Unit) {
+    val listener = object : VimRegisterListener, ListenerBase(listenerOwner) {
+      override fun registerStored(
+        register: Char,
+        copiedText: VimCopiedText,
+        type: SelectionType,
+        isDelete: Boolean,
+      ) {
+        val vimApi = VimApiImpl(listenerOwner, mappingOwner, projectId)
+        launch {
+          vimApi.callback(register, copiedText.text, type.toTextSelectionType(), isDelete)
+        }
+      }
+    }
+    injector.listenersNotifier.registerListeners.add(listener)
   }
 
   override fun onEditorCreate(callback: suspend VimApi.() -> Unit) {

@@ -10,96 +10,46 @@ package com.maddyhome.idea.vim.history
 
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.common.VimRing
 
 internal class HistoryBlock {
-  private val entries = mutableListOf<HistoryEntry>()
+  // Entries are deduplicated by their text: the number is assigned per add, so including it in the
+  // key would make every entry unique and defeat the deduplication.
+  private val ring = VimRing<HistoryEntry>(maxSize = { maxLength() }, keyOf = { it.entry })
   private var counter = 0
-  private var current: HistoryEntry? = null
 
   /**
    * Returns the current history entry if available, or null otherwise
    */
   val currentEntry: HistoryEntry?
-    get() = current
+    get() = ring.currentEntry
 
   /**
    * Returns the most recent entry in the history, the last saved value, or null
    */
   val mostRecentEntry: HistoryEntry?
-    get() = entries.lastOrNull()
+    get() = ring.mostRecentEntry
 
   fun addEntry(text: String) {
     if (text.isEmpty()) return
 
-    // If this entry already exists, remove it so we can add it as the newest entry
-    for (i in entries.indices) {
-      if (text == entries[i].entry) {
-        entries.removeAt(i)
-        break
-      }
-    }
-
-    entries.add(HistoryEntry(++counter, text))
-    resetCurrentEntry()
-
-    // If we're over the maximum number of entries, remove the oldest one
-    if (entries.size > maxLength()) {
-      entries.removeAt(0)
-    }
+    ring.add(HistoryEntry(++counter, text))
   }
 
-  fun removeEntryByNumber(number: Int): Boolean {
-    val index = entries.indexOfFirst { it.number == number }
-    if (index != -1) {
-      entries.removeAt(index)
-      resetCurrentEntry()
-      return true
+  fun removeEntryByNumber(number: Int): Boolean = ring.remove { it.number == number }
+
+  fun getEntries(): List<HistoryEntry> = ring.getEntries()
+
+  fun selectNewerEntry(filter: String?): HistoryEntry? = ring.selectNewer(matching(filter))
+
+  fun selectOlderEntry(filter: String?): HistoryEntry? = ring.selectOlder(matching(filter))
+
+  private fun matching(filter: String?): (HistoryEntry) -> Boolean =
+    if (filter == null) {
+      { true }
+    } else {
+      { it.entry.startsWith(filter) }
     }
-    return false
-  }
-
-  fun getEntries(): List<HistoryEntry> {
-    return entries
-  }
-
-  fun selectNewerEntry(filter: String?): HistoryEntry? {
-    if (current == null) {
-      // We're at the end of history, so there's no newer entry
-      return null
-    }
-
-    var index = entries.indexOf(current) + 1
-    while (filter != null && index != entries.size && !entries[index].entry.startsWith(filter)) {
-      index++
-    }
-
-    if (index == entries.size) {
-      current = null
-      return null
-    }
-
-    current = entries[index]
-    return current
-  }
-
-  fun selectOlderEntry(filter: String?): HistoryEntry? {
-    var index = if (current == null) (entries.size - 1) else (entries.indexOf(current) - 1)
-    while (filter != null && index >= 0 && !entries[index].entry.startsWith(filter)) {
-      index--
-    }
-
-    if (index < 0) {
-      return null
-    }
-
-    current = entries[index]
-    return current
-  }
-
-  private fun resetCurrentEntry() {
-    // Reset the current entry to null, indicating we're past the end of the history
-    current = null
-  }
 
   companion object {
     private fun maxLength() = injector.globalOptions().history

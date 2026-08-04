@@ -12,6 +12,7 @@ import com.intellij.vim.api.VimApi
 import com.intellij.vim.api.models.CaretId
 import com.intellij.vim.api.models.Mode
 import com.intellij.vim.api.models.Range
+import com.intellij.vim.api.models.TextType
 
 /**
  * Scope that provides access to various listeners.
@@ -58,6 +59,32 @@ interface ListenersScope {
    * @param callback The function to execute when text is yanked
    */
   fun onYank(callback: suspend VimApi.(Map<CaretId, Range.Simple>) -> Unit)
+
+  /**
+   * Registers a callback that is invoked after text has been stored into a register.
+   *
+   * Unlike [onYank], which reports the ranges a yank covered, this reports what was actually
+   * stored, and it fires for deletes and changes as well as yanks - they all end up writing a
+   * register. It is raised once per operation, after every register the operation touches has been
+   * written, so reading a register from the callback sees the new value.
+   *
+   * It is not raised for the black hole register, nor for writes that do not come from the buffer,
+   * such as `let @a = "text"`.
+   *
+   * Example:
+   * ```kotlin
+   * listeners {
+   *   onRegisterStore { register, text, type, isDelete ->
+   *     // Record the text in a history of your own
+   *   }
+   * }
+   * ```
+   *
+   * @param callback Receives the register the operation targeted, the stored text, whether it was
+   *                 stored character-wise, line-wise or block-wise, and whether the text was
+   *                 removed from the buffer rather than merely copied.
+   */
+  fun onRegisterStore(callback: suspend VimApi.(register: Char, text: String, type: TextType, isDelete: Boolean) -> Unit)
 
   /**
    * Registers a callback that is invoked when a new editor is created.
