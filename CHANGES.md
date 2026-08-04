@@ -31,6 +31,7 @@ usual beta standards.
 ### Fixes:
 * [VIM-2879](https://youtrack.jetbrains.com/issue/VIM-2879) Fixed the last search term staying highlighted after an IDE restart — with [`'hlsearch'`](https://vimhelp.org/options.txt.html#%27hlsearch%27) on, every open project used to come up with the previous session's `/` match still highlighted; search highlights are now cleared on startup, as in Vim
 * [VIM-4302](https://youtrack.jetbrains.com/issue/VIM-4302) Fixed Vim not working in the [Python console](https://www.jetbrains.com/help/pycharm/using-consoles.html) started with "Run file in Python Console" — such a console is named after the run configuration instead of "Python Console", so it wasn't recognised; Normal mode, motions, and `Esc` now work in its input as they do in the console opened from the tool window
+* Fixed [`gx`](https://vimhelp.org/pi_netrw.txt.html#netrw-gx) adding to the [jump list](https://vimhelp.org/motion.txt.html#jumplist) — pressing `gx` used to record the caret position as a jump and overwrite the [`'`](https://vimhelp.org/motion.txt.html#%27quote) mark, so a following [`CTRL-O`](https://vimhelp.org/motion.txt.html#CTRL-O) landed back on the caret's own line instead of returning to the previous jump. As in Vim, `gx` opens the URL without touching the jump list
 
 ### Merged PRs:
 * [1958](https://github.com/JetBrains/ideavim/pull/1958) by [1grzyb1](https://github.com/1grzyb1): VIM-4304 command mode sethandler
