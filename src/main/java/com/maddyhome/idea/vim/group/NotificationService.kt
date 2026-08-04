@@ -241,7 +241,7 @@ internal class NotificationService(private val project: Project?) : VimNotificat
 
     notification.addAction(object : DumbAwareAction("See What's New") {
       override fun actionPerformed(e: AnActionEvent) {
-        WhatsNewHelper.showWhatsNew(project, version)
+        WhatsNewHelper.showWhatsNew(e.project ?: project, version)
       }
 
     })

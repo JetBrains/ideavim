@@ -39,6 +39,7 @@ import com.maddyhome.idea.vim.api.VimFile
 import com.maddyhome.idea.vim.group.findVirtualFile
 import com.maddyhome.idea.vim.group.onEdt
 import com.maddyhome.idea.vim.helper.EngineMessageHelper
+import java.nio.charset.StandardCharsets
 import kotlin.io.path.Path
 
 /**
@@ -169,6 +170,10 @@ internal class FileRemoteApiImpl : FileRemoteApi {
       }
     }
   }
+
+  override suspend fun readResource(resource: String): String? = javaClass.classLoader
+    .getResourceAsStream(resource)
+    ?.use { it.readBytes().toString(StandardCharsets.UTF_8) }
 
   // ======================== Private helpers ========================
   private fun findFile(filename: String, project: Project): VirtualFile? {

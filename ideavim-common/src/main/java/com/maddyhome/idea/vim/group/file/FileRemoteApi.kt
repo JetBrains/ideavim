@@ -46,6 +46,17 @@ interface FileRemoteApi : RemoteApi<Unit> {
   suspend fun listFilesForCompletion(pathPrefix: String, projectId: ProjectId?): List<String>
   suspend fun createFile(filename: String, projectId: ProjectId?, content: String?)
 
+  /**
+   * Reads a resource bundled with the plugin as UTF-8 text.
+   *
+   * Unlike the other methods here this does not touch the VFS — [resource] is a classpath
+   * path, not a file path. Needed because the thin-client frontend cannot read the plugin's
+   * bundled resources.
+   *
+   * @return the resource content, or null when there is no such resource
+   */
+  suspend fun readResource(resource: String): String?
+
   companion object {
     @JvmStatic
     suspend fun getInstance(): FileRemoteApi {
