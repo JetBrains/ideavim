@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.extension.yankring
 
 import com.intellij.vim.api.models.TextType
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.VimRing
 
 /**
@@ -30,16 +31,21 @@ internal data class YankRingEntry(val text: String, val type: TextType)
  * deduplication means what a user expects: yanking the same word twice leaves one entry.
  */
 internal object YankRing {
-  /**
-   * `g:yankring_max_history` in the original plugin. Not configurable yet - see the roadmap's
-   * group D.
-   */
-  private const val MAX_HISTORY: Int = 100
+  private const val MAX_HISTORY_VARIABLE: String = "yankring_max_history"
+  private const val DEFAULT_MAX_HISTORY: Int = 100
 
   private val ring = VimRing<YankRingEntry>(
-    maxSize = { MAX_HISTORY },
+    // Read on every add rather than captured once, so that changing the variable mid-session takes
+    // effect straight away - which is why VimRing takes a lambda in the first place.
+    maxSize = { maxHistory() },
     keyOf = { it.text to it.type },
   )
+
+  private fun maxHistory(): Int =
+    injector.variableService.getGlobalVariableValue(MAX_HISTORY_VARIABLE)
+      ?.toVimNumber()
+      ?.value
+      ?: DEFAULT_MAX_HISTORY
 
   fun record(text: String, type: TextType) {
     if (text.isEmpty()) return
