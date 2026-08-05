@@ -29,10 +29,12 @@ usual beta standards.
 * [VIM-4304](https://youtrack.jetbrains.com/issue/VIM-4304) Added command-line mode support to [`sethandler`](https://jb.gg/vim-sethandler) — the new `c` mode letter decides who owns a shortcut while the `:` command line is active (previously it always followed the Normal mode handler). Since later definitions override earlier ones, `sethandler <F2> a:ide c:vim` hands the shortcut to the IDE everywhere except the command line, which keeps a `cnoremap <F2> …` mapping working
 
 ### Fixes:
+* Fixed the "See What's New" action in the update notification doing nothing in split mode (the frontend/backend architecture also used by [remote development](https://www.jetbrains.com/help/idea/remote-development-overview.html)) — the release notes page is bundled with the plugin, which only the backend can read, so the page is now loaded from there and opens as expected
 * [VIM-2879](https://youtrack.jetbrains.com/issue/VIM-2879) Fixed the last search term staying highlighted after an IDE restart — with [`'hlsearch'`](https://vimhelp.org/options.txt.html#%27hlsearch%27) on, every open project used to come up with the previous session's `/` match still highlighted; search highlights are now cleared on startup, as in Vim
 * [VIM-4302](https://youtrack.jetbrains.com/issue/VIM-4302) Fixed Vim not working in the [Python console](https://www.jetbrains.com/help/pycharm/using-consoles.html) started with "Run file in Python Console" — such a console is named after the run configuration instead of "Python Console", so it wasn't recognised; Normal mode, motions, and `Esc` now work in its input as they do in the console opened from the tool window
 
 ### Merged PRs:
+* [1961](https://github.com/JetBrains/ideavim/pull/1961) by [1grzyb1](https://github.com/1grzyb1): Fix opening what's new in split mode
 * [1958](https://github.com/JetBrains/ideavim/pull/1958) by [1grzyb1](https://github.com/1grzyb1): VIM-4304 command mode sethandler
 * [1957](https://github.com/JetBrains/ideavim/pull/1957) by [1grzyb1](https://github.com/1grzyb1): VIM-4302 initlize vim editor for run in python console
 * [1952](https://github.com/JetBrains/ideavim/pull/1952) by [1grzyb1](https://github.com/1grzyb1): VIM-2879 clear highlights after restart
