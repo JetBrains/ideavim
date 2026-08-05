@@ -10,48 +10,34 @@ package com.maddyhome.idea.vim.extension.yankring
 
 import com.intellij.vim.api.VimApi
 import com.intellij.vim.api.models.Path
-import com.intellij.vim.api.scopes.editor.ReadScope
 
 /**
- * Where the last paste put its text, so that `<C-P>` / `<C-N>` know what to replace.
+ * The buffer as it looked right after a paste, and therefore the state that paste is still
+ * replaceable in.
  *
  * A paste stays replaceable only while the buffer is untouched and the caret has not wandered off
  * the pasted line. We recognise an edit by the text length - Vim would use `b:changedtick`, but
  * IdeaVim does not implement that variable yet - and a move by the caret's line, the same check
  * `s:YRReplace` makes against the `'[` mark.
  */
+internal data class BufferState(val filePath: String, val textLength: Long, val caretLine: Int)
+
+/**
+ * Where the last paste put its text, so that `<C-P>` / `<C-N>` know what to replace.
+ */
 internal object LastPaste {
 
-  /** A caret position that survives the document being rebuilt by undo. */
-  internal data class Position(val line: Int, val column: Int)
-
   internal data class Pending(
-    val filePath: String,
-    /** The key that produced the paste, `p` or `P`, so that replacing it can repeat it. */
-    val pasteCommand: String,
+    val paste: Paste,
     /** Index into [YankRing.entries] of the entry that is currently shown in the buffer. */
     val ringIndex: Int,
-    val textLength: Long,
-    val line: Int,
-    /**
-     * Where the caret sat *before* the paste ran. Replacing undoes the paste and runs it again, and
-     * `p` / `P` insert relative to the caret, so the caret has to be put back deliberately - undo
-     * does not reliably leave it where the paste started from.
-     */
-    val positionBeforePaste: Position,
+    val buffer: BufferState,
   )
 
   private var pending: Pending? = null
 
-  fun remember(
-    filePath: String,
-    pasteCommand: String,
-    ringIndex: Int,
-    textLength: Long,
-    line: Int,
-    positionBeforePaste: Position,
-  ) {
-    pending = Pending(filePath, pasteCommand, ringIndex, textLength, line, positionBeforePaste)
+  fun remember(paste: Paste, ringIndex: Int, buffer: BufferState) {
+    pending = Pending(paste, ringIndex, buffer)
   }
 
   /**
@@ -59,44 +45,25 @@ internal object LastPaste {
    * because the buffer has been edited since, because we are looking at a different file, or
    * because the caret has left the line the text was pasted on.
    */
-  fun pending(filePath: String, textLength: Long, line: Int): Pending? =
-    pending?.takeIf { it.filePath == filePath && it.textLength == textLength && it.line == line }
+  fun pendingIn(buffer: BufferState): Pending? = pending?.takeIf { it.buffer == buffer }
 
   fun clear() {
     pending = null
   }
 }
 
-internal suspend fun VimApi.rememberPaste(
-  pasteCommand: String,
-  ringIndex: Int,
-  positionBeforePaste: LastPaste.Position,
-) {
-  editor {
-    read {
-      LastPaste.remember(
-        filePath.identity,
-        pasteCommand,
-        ringIndex,
-        textLength,
-        caretLine(),
-        positionBeforePaste,
-      )
-    }
-  }
+internal suspend fun VimApi.rememberPaste(paste: Paste, ringIndex: Int) {
+  LastPaste.remember(paste, ringIndex, bufferState())
 }
 
-internal suspend fun VimApi.caretPosition(): LastPaste.Position =
+internal suspend fun VimApi.pendingPaste(): LastPaste.Pending? = LastPaste.pendingIn(bufferState())
+
+private suspend fun VimApi.bufferState(): BufferState =
   editor {
     read {
-      withPrimaryCaret { LastPaste.Position(line.number, offset - line.start) }
+      BufferState(filePath.identity, textLength, withPrimaryCaret { line.number })
     }
   }
-
-internal suspend fun VimApi.pendingPaste(): LastPaste.Pending? =
-  editor { read { LastPaste.pending(filePath.identity, textLength, caretLine()) } }
-
-private fun ReadScope.caretLine(): Int = withPrimaryCaret { line.number }
 
 /**
  * A comparable identity for an editor's file.
