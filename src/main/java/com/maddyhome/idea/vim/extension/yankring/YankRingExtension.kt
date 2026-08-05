@@ -36,6 +36,7 @@ internal class YankRingExtension : VimExtension {
     initApi.commands {
       register("YRShow") { _, _, _ -> showYankRing() }
       register("YRClear") { _, _, _ -> YankRing.clear() }
+      register(YR_REPLACE) { commandText, _, _ -> yankRingReplace(commandText) }
     }
 
     initApi.mappings {

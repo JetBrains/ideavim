@@ -54,7 +54,40 @@ internal suspend fun VimApi.pasteAndRemember(pasteCommand: String) {
  * silently did the wrong thing. `s:YRReplace` refuses the same way, with the same message.
  */
 internal suspend fun VimApi.replaceLastPaste(direction: Direction) {
-  val count = count1()
+  replaceLastPaste(direction.step * count1())
+}
+
+/**
+ * `:YRReplace {offset} {pastecommand}` - the entry point the plugin's own key mappings use:
+ *
+ * ```vim
+ * nnoremap <silent> <C-P> :<C-U>YRReplace '-1', P<CR>
+ * ```
+ *
+ * The offset counts against YankRing's oldest-first history, the opposite of [Direction.step].
+ * `<f-args>` hands `s:YRPaste` the raw `'-1',` and it digs the number out with
+ * `matchstr(a:nextvalue, '-\?\d\+')`, so quotes and the trailing comma have to be tolerated here
+ * too - anyone copying that mapping out of the plugin's docs will pass them.
+ *
+ * The second argument is **accepted and ignored**. YankRing re-pastes with whatever the mapping
+ * passed rather than with the key the user originally pasted with, because after its `normal! u`
+ * the caret happens to sit where `P` reproduces a `p`. We put the caret back deliberately instead,
+ * and repeat the paste command that was actually used, which is both simpler and correct for
+ * mappings the plugin never anticipated. The argument stays in the signature so that the
+ * documented mappings keep working.
+ */
+internal suspend fun VimApi.yankRingReplace(commandText: String) {
+  val offset = OFFSET.find(commandText.removePrefix(YR_REPLACE))?.value?.toIntOrNull()
+  if (offset == null) {
+    injector.messages.showStatusBarMessage(null, MESSAGE_MISSING_OFFSET)
+    injector.messages.indicateError()
+    return
+  }
+
+  replaceLastPaste(-offset)
+}
+
+private suspend fun VimApi.replaceLastPaste(steps: Int) {
   val entries = YankRing.entries()
   val pending = pendingPaste()
 
@@ -65,7 +98,7 @@ internal suspend fun VimApi.replaceLastPaste(direction: Direction) {
   }
 
   // Walking off either end wraps around, so that holding <C-P> keeps cycling.
-  val nextIndex = Math.floorMod(pending.ringIndex + direction.step * count, entries.size)
+  val nextIndex = Math.floorMod(pending.ringIndex + steps, entries.size)
 
   undoAndRepaste(entries[nextIndex], pending.pasteCommand, pending.positionBeforePaste)
   rememberPaste(pending.pasteCommand, nextIndex, pending.positionBeforePaste)
@@ -143,5 +176,16 @@ private suspend fun VimApi.writeUnnamedRegister(contents: RegisterContents) {
 
 private const val UNNAMED_REGISTER = '"'
 
+internal const val YR_REPLACE = "YRReplace"
+
+/** Matches the offset the way `matchstr(a:nextvalue, '-\?\d\+')` does, quotes and commas and all. */
+private val OFFSET = Regex("-?\\d+")
+
 /** Word for word what `s:YRWarningMsg` reports in the same situation. */
 private const val MESSAGE_PASTE_FIRST = "YR: You must paste text first, before you can replace"
+
+/**
+ * Not a message the plugin has: `s:YRPaste` simply blows up on a missing argument, because its
+ * command declares `-nargs=*` but the function does not treat the argument as optional.
+ */
+private const val MESSAGE_MISSING_OFFSET = "YR: YRReplace needs an offset, for example :YRReplace -1 P"
