@@ -35,8 +35,8 @@ internal class YankRingExtension : VimExtension {
     injector.listenersNotifier.registerListeners.add(YankRingRecorder)
 
     initApi.commands {
-      register("YRShow") { _, _, _ -> showYankRing() }
-      register("YRClear") { _, _, _ -> YankRing.clear() }
+      register(YR_SHOW) { _, _, _ -> showYankRing() }
+      register(YR_CLEAR) { _, _, _ -> YankRing.clear() }
       register(YR_REPLACE) { commandText, _, _ -> yankRingReplace(commandText) }
     }
 
@@ -58,12 +58,26 @@ internal class YankRingExtension : VimExtension {
     }
   }
 
+  /**
+   * Called on `set noyankring`. The default only drops the mappings, so everything else the
+   * extension registered has to be undone here - commands included, or `:YRShow` keeps working
+   * after the user has turned the plugin off.
+   *
+   * The ring itself survives. Disabling is not the same as forgetting a session's yank history, and
+   * the plugin's own runtime switch (`g:yankring_enabled`, E3) does not clear it either.
+   */
   override fun dispose() {
     injector.listenersNotifier.registerListeners.remove(YankRingRecorder)
     injector.keyGroup.removeKeyMapping(owner)
+    COMMANDS.forEach(injector.commandGroup::removeAlias)
     LastPaste.clear()
   }
 }
+
+internal const val YR_SHOW = "YRShow"
+internal const val YR_CLEAR = "YRClear"
+
+private val COMMANDS = listOf(YR_SHOW, YR_CLEAR, YR_REPLACE)
 
 private const val PREVIOUS_KEY = "<C-P>"
 private const val NEXT_KEY = "<C-N>"
