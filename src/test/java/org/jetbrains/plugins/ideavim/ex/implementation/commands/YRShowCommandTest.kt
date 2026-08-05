@@ -28,7 +28,7 @@ class YRShowCommandTest : VimTestCase() {
   @BeforeEach
   override fun setUp(testInfo: TestInfo) {
     super.setUp(testInfo)
-    enableExtensionsNewApi("YankRing")
+    enableExtensions("yankring")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)

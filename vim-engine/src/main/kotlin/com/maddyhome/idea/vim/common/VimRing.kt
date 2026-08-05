@@ -38,9 +38,9 @@ class VimRing<T>(
     get() = entries.lastOrNull()
 
   /**
-   * All entries, oldest first.
+   * A snapshot of all entries, oldest first.
    */
-  fun getEntries(): List<T> = entries
+  fun getEntries(): List<T> = entries.toList()
 
   /**
    * Adds an item as the newest entry.
@@ -87,7 +87,6 @@ class VimRing<T>(
    * command line returns to the text the user was originally typing.
    */
   fun selectNewer(predicate: (T) -> Boolean = { true }): T? {
-    // We're already past the newest entry, so there's nothing newer
     if (current == null) return null
 
     var index = entries.indexOf(current) + 1
@@ -130,7 +129,6 @@ class VimRing<T>(
   }
 
   private fun resetCurrentEntry() {
-    // Reset the current entry to null, indicating we're past the end of the ring
     current = null
   }
 }

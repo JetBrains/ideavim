@@ -3,10 +3,5 @@
     "extensionName": "ReplaceWithRegisterNew",
     "functionName": "init",
     "className": "com.maddyhome.idea.vim.extension.replacewithregister.ReplaceWithRegisterNewApiKt"
-  },
-  {
-    "extensionName": "YankRing",
-    "functionName": "init",
-    "className": "com.maddyhome.idea.vim.extension.yankring.YankRingExtensionKt"
   }
 ]

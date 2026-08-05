@@ -30,16 +30,16 @@ internal data class YankRingEntry(val text: String, val type: TextType)
  * deduplication means what a user expects: yanking the same word twice leaves one entry.
  */
 internal object YankRing {
-  private val ring = VimRing<YankRingEntry>(
-    maxSize = { maxHistory },
-    keyOf = { it.text to it.type },
-  )
-
   /**
    * `g:yankring_max_history` in the original plugin. Not configurable yet - see the roadmap's
    * group D.
    */
-  private const val maxHistory: Int = 100
+  private const val MAX_HISTORY: Int = 100
+
+  private val ring = VimRing<YankRingEntry>(
+    maxSize = { MAX_HISTORY },
+    keyOf = { it.text to it.type },
+  )
 
   fun record(text: String, type: TextType) {
     if (text.isEmpty()) return
@@ -51,6 +51,14 @@ internal object YankRing {
    * Entries newest first, which is the order `:YRShow` lists them in.
    */
   fun entries(): List<YankRingEntry> = ring.getEntries().asReversed()
+
+  /**
+   * The index into [entries] that `<C-P>` / `<C-N>` should step away from after [pastedText] has
+   * been pasted, so that they walk away from what is in the buffer rather than from the top of the
+   * ring. Text pasted from a register the ring never saw starts at the newest entry.
+   */
+  fun cycleStartIndex(pastedText: String): Int =
+    entries().indexOfFirst { it.text == pastedText }.coerceAtLeast(0)
 
   fun clear() = ring.clear()
 }

@@ -448,6 +448,17 @@
       </aliases>
     </vimExtension>
 
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.yankring.YankRingExtension"
+                  name="yankring">
+      <aliases>
+        <alias name="https://github.com/vim-scripts/YankRing.vim"/>
+        <alias name="vim-scripts/YankRing.vim"/>
+        <alias name="YankRing.vim"/>
+        <alias name="YankRing"/>
+        <alias name="https://www.vim.org/scripts/script.php?script_id=1234"/>
+      </aliases>
+    </vimExtension>
+
     <vimExtension implementation="com.maddyhome.idea.vim.extension.paragraphmotion.ParagraphMotion"
                   name="vim-paragraph-motion">
       <aliases>

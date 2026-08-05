@@ -15,18 +15,15 @@ import com.maddyhome.idea.vim.common.VimRing
 internal class HistoryBlock {
   // Entries are deduplicated by their text: the number is assigned per add, so including it in the
   // key would make every entry unique and defeat the deduplication.
-  private val ring = VimRing<HistoryEntry>(maxSize = { maxLength() }, keyOf = { it.entry })
+  private val ring = VimRing<HistoryEntry>(
+    maxSize = { injector.globalOptions().history },
+    keyOf = { it.entry },
+  )
   private var counter = 0
 
-  /**
-   * Returns the current history entry if available, or null otherwise
-   */
   val currentEntry: HistoryEntry?
     get() = ring.currentEntry
 
-  /**
-   * Returns the most recent entry in the history, the last saved value, or null
-   */
   val mostRecentEntry: HistoryEntry?
     get() = ring.mostRecentEntry
 
@@ -50,8 +47,4 @@ internal class HistoryBlock {
     } else {
       { it.entry.startsWith(filter) }
     }
-
-  companion object {
-    private fun maxLength() = injector.globalOptions().history
-  }
 }

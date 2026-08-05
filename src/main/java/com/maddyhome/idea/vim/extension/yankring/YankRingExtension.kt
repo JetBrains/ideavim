@@ -8,90 +8,67 @@
 
 package com.maddyhome.idea.vim.extension.yankring
 
-import com.intellij.vim.api.VimApi
 import com.intellij.vim.api.VimInitApi
-import com.intellij.vim.api.VimPlugin
+import com.intellij.vim.api.scopes.nmapPluginAction
 import com.maddyhome.idea.vim.api.injector
-import com.maddyhome.idea.vim.common.ListenerOwner
-import com.maddyhome.idea.vim.common.VimCopiedText
-import com.maddyhome.idea.vim.common.VimRegisterListener
-import com.maddyhome.idea.vim.helper.EngineStringHelper.toPrintableCharacters
-import com.maddyhome.idea.vim.state.mode.SelectionType
-import com.maddyhome.idea.vim.thinapi.toTextSelectionType
+import com.maddyhome.idea.vim.extension.VimExtension
+
+internal const val PLUGIN_NAME: String = "yankring"
 
 /**
  * A port of YankRing.vim (VIM-301): a history of yanks, deletes and changes, plus the ability to
  * cycle the text of the last paste through that history with `<C-P>` / `<C-N>`.
  *
+ * Enabled with `set yankring` in `~/.ideavimrc`.
+ *
  * See VIM-301-yankring-roadmap.md for the behaviours still to fill in, in order.
  */
-internal const val PLUGIN_NAME: String = "YankRing"
+internal class YankRingExtension : VimExtension {
 
-@VimPlugin(name = PLUGIN_NAME)
-fun VimInitApi.init() {
-  // Registered straight on the notifier rather than through `listeners { onRegisterStore { ... } }`,
-  // because `VimApi.listeners` is currently commented out and the scope is unreachable. Tagging the
-  // listener with our plugin owner keeps `disableExtension` able to unload it. Move this over once
-  // the listeners scope is enabled again.
-  injector.listenersNotifier.registerListeners.add(YankRingRecorder)
+  override fun getName(): String = PLUGIN_NAME
 
-  commands {
-    register("YRShow") { _, _, _ ->
-      showYankRing()
+  override fun init(initApi: VimInitApi) {
+    // Registered straight on the notifier rather than through `listeners { onRegisterStore { ... } }`,
+    // because `VimApi.listeners` is currently commented out and the scope is unreachable. Move this
+    // over once the listeners scope is enabled again.
+    injector.listenersNotifier.registerListeners.add(YankRingRecorder)
+
+    initApi.commands {
+      register("YRShow") { _, _, _ -> showYankRing() }
+      register("YRClear") { _, _, _ -> YankRing.clear() }
     }
-    register("YRClear") { _, _, _ ->
-      clearYankRing()
+
+    initApi.mappings {
+      nmapPluginAction(PREVIOUS_KEY, REPLACE_PREVIOUS, keepDefaultMapping = true) {
+        replaceLastPaste(Direction.PREVIOUS)
+      }
+      nmapPluginAction(NEXT_KEY, REPLACE_NEXT, keepDefaultMapping = true) {
+        replaceLastPaste(Direction.NEXT)
+      }
+      nmapPluginAction(PASTE_AFTER_KEY, PASTE_AFTER, keepDefaultMapping = true) {
+        pasteAndRemember(PASTE_AFTER_KEY)
+      }
+      nmapPluginAction(PASTE_BEFORE_KEY, PASTE_BEFORE, keepDefaultMapping = true) {
+        pasteAndRemember(PASTE_BEFORE_KEY)
+      }
     }
   }
-}
 
-/**
- * Feeds every yank, delete and change into the ring.
- */
-private object YankRingRecorder : VimRegisterListener {
-  override val owner: ListenerOwner = ListenerOwner.Plugin.get(PLUGIN_NAME)
-
-  override fun registerStored(
-    register: Char,
-    copiedText: VimCopiedText,
-    type: SelectionType,
-    isDelete: Boolean,
-  ) {
-    YankRing.record(copiedText.text, type.toTextSelectionType())
+  override fun dispose() {
+    injector.listenersNotifier.registerListeners.remove(YankRingRecorder)
+    injector.keyGroup.removeKeyMapping(owner)
+    LastPaste.clear()
   }
 }
 
-/**
- * Renders the ring the way `s:YRShow` does when `g:yankring_window_use_separate` is off: a banner,
- * a column header, then one line per entry. The separate window comes later.
- */
-internal suspend fun VimApi.showYankRing() {
-  val lines = mutableListOf(BANNER, "$ELEM_HEADER  Content")
-  YankRing.entries().forEachIndexed { index, entry ->
-    lines += displayElement(index + 1, entry)
-  }
+private const val PREVIOUS_KEY = "<C-P>"
+private const val NEXT_KEY = "<C-N>"
+private const val REPLACE_PREVIOUS = "<Plug>YankRingReplacePrevious"
+private const val REPLACE_NEXT = "<Plug>YankRingReplaceNext"
 
-  outputPanel {
-    setText(lines.joinToString("\n"))
-  }
-}
-
-/**
- * `:YRClear` - empties the ring.
- */
-@Suppress("unused") // Receiver keeps every command handler in the extension consistent
-internal suspend fun clearYankRing() {
-  YankRing.clear()
-}
-
-/**
- * Formats one entry the way `s:YRDisplayElem` does: the element number left-aligned in a column as
- * wide as the `Elem` header, then the content with newlines shown as a literal `\n`.
- */
-private fun displayElement(number: Int, entry: YankRingEntry): String {
-  val content = toPrintableCharacters(injector.parser.stringToKeys(entry.text.replace("\n", "\\n")))
-  return number.toString().padEnd(ELEM_HEADER.length + 2) + content
-}
-
-private const val BANNER = "--- YankRing ---"
-private const val ELEM_HEADER = "Elem"
+// YankRing maps the paste keys too (`g:yankring_paste_n_akey` / `_bkey`), because a paste is what
+// makes `<C-P>` meaningful - it has to know what was inserted and where.
+private const val PASTE_AFTER_KEY = "p"
+private const val PASTE_BEFORE_KEY = "P"
+private const val PASTE_AFTER = "<Plug>YankRingPasteAfter"
+private const val PASTE_BEFORE = "<Plug>YankRingPasteBefore"
