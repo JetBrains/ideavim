@@ -1047,6 +1047,59 @@ https://github.com/TheBlob42/idea-which-key?tab=readme-ov-file#installation
 </details>
 
 <details>
+<summary><h2>yankring: Keeps a history of yanks, deletes and changes to paste from</h2></summary>
+
+Original plugin: [YankRing.vim](https://www.vim.org/scripts/script.php?script_id=1234).
+
+### Summary:
+Vim keeps a history of deletes in `"1`-`"9`, but a yank always overwrites the last one. The yank ring
+adds the missing history - the Emacs kill ring - over yanks, deletes and changes alike. Paste with
+`p`, then press `<C-P>` to swap what you just pasted for the entry before it, and keep pressing to
+walk further back. `<C-N>` walks forward again, and a count like `2<C-P>` skips.
+
+### Setup:
+- Add the following command to `~/.ideavimrc`: `Plug 'vim-scripts/YankRing.vim'`
+    <details>
+      <summary>Alternative syntax</summary>
+      <code>Plugin 'vim-scripts/YankRing.vim'</code>
+      <br/>
+      <code>Plug 'https://github.com/vim-scripts/YankRing.vim'</code>
+      <br/>
+      <code>Plug 'YankRing'</code>
+      <br/>
+      <code>set yankring</code>
+      </details>
+
+### Instructions
+
+Cycling replaces the text of the last paste, so it works while the caret is still on the line you
+pasted onto and you have not edited the buffer since; otherwise it tells you to paste first. `p`,
+`P`, `gp`, `gP`, `]p`, `[p`, `]P` and `[P` are all tracked, in normal and visual mode, counts
+included. One `u` undoes the paste and the cycling together.
+
+`:YRShow` lists the ring newest first, `:YRClear` empties it, and `:YRReplace {offset} {p|P}` is what
+the keys call - a negative offset steps to an older entry, a positive one to a newer one.
+
+`let g:yankring_max_history = 100` caps how many entries are kept.
+
+Note that `<C-P>` and `<C-N>` stop being `k` and `j` in normal mode, as with the original plugin.
+Visual, operator-pending, insert and command-line mode are untouched. To keep the keys, map your own
+in `~/.ideavimrc`, which suppresses the defaults:
+
+```
+nmap <A-p> <Plug>YankRingReplacePrevious
+nmap <A-n> <Plug>YankRingReplaceNext
+```
+
+Not implemented yet: the ring window (`:YRShow` prints the listing instead), the other `:YR*`
+commands, every `g:yankring_*` option but the one above, persistence across restarts, and clipboard
+monitoring. Behaviour with multiple carets is undefined.
+
+https://github.com/vim-scripts/YankRing.vim/blob/master/doc/yankring.txt
+
+</details>
+
+<details>
 <summary><h2>youcompleteme: Cycle through code completion with Tab</h2></summary>
 
 Inspired by [YouCompleteMe](https://github.com/ycm-core/YouCompleteMe) / [SuperTab](https://github.com/ervandew/supertab).
