@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.action.gx
 
 import com.maddyhome.idea.vim.api.VimExternalOpener
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.mock.MockTestCase
 import org.junit.jupiter.api.Test
@@ -136,6 +137,36 @@ class GxActionTest : MockTestCase() {
     assertState(text)
     assertMode(Mode.NORMAL())
     verify(handler).open(eq("https://jetbrains.com"), eq(null))
+  }
+
+  @Test
+  fun `test gx does not add the caret position to the jump list`() {
+    val handler = mockService(VimExternalOpener::class.java)
+    // `gx` is not a jump motion in Vim (see `:help jump-motions`) and it never moves the caret, so
+    // it must leave the jump list alone. It used to save a jump location, which pushed the current
+    // (unchanged) position onto the jump list and reset the jump spot - `<C-O>` right after `gx`
+    // then bounced back to the caret's own line instead of the line the previous jump came from.
+    injector.jumpService.resetJumps()
+    configureByText(
+      """
+      https://jetbrains.com
+      middle line
+      ${c}target line
+      """.trimIndent(),
+    )
+
+    typeText("gg") // A real jump motion: remembers "target line" as the jump origin.
+    typeText("gx")
+    typeText("<C-O>")
+
+    verify(handler).open(eq("https://jetbrains.com"), eq(null))
+    assertState(
+      """
+      https://jetbrains.com
+      middle line
+      ${c}target line
+      """.trimIndent(),
+    )
   }
 
   @Test
