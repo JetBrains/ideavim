@@ -41,6 +41,7 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.requestFocus
 import com.maddyhome.idea.vim.helper.selectEditorFont
 import com.maddyhome.idea.vim.helper.vimMorePanel
+import com.maddyhome.idea.vim.listener.ModelessSelection
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.vim
 import com.maddyhome.idea.vim.register.RegisterConstants
@@ -658,6 +659,9 @@ internal class OutputPanel private constructor(private val editor: Editor) : JBP
    * versions of control characters and Enter, etc.
    */
   internal fun handleKey(key: KeyStroke) {
+    // Like the command line, this bypasses VimTypedActionHandler and VimShortcutKeyAction, so a modeless selection in
+    // the owning editor has to be dropped here too
+    ModelessSelection.clearIfOwned(editor)
     // Note that it is normally invalid to compare a virtual key code and a Unicode codepoint; however, these virtual
     // key codes are explicitly defined to match ASCII values
     if (key.keyChar.code == KeyEvent.VK_ENTER

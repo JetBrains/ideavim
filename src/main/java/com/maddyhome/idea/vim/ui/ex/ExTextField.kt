@@ -18,6 +18,7 @@ import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.helper.EngineStringHelper.isPrintableCharacter
 import com.maddyhome.idea.vim.helper.selectEditorFont
 import com.maddyhome.idea.vim.key.KeySource
+import com.maddyhome.idea.vim.listener.ModelessSelection
 import com.maddyhome.idea.vim.newapi.IjEditorExecutionContext
 import com.maddyhome.idea.vim.options.helpers.GuiCursorAttributes
 import com.maddyhome.idea.vim.options.helpers.GuiCursorMode
@@ -229,6 +230,9 @@ class ExTextField internal constructor(private val myParentPanel: ExEntryPanel) 
     // handle them separately, as key presses, but not as typed characters.
     if (isAllowedPressedEvent(e) || isAllowedTypedEvent(e)) {
       val editor = myParentPanel.editor
+      // Keys typed here bypass VimTypedActionHandler and VimShortcutKeyAction, so this is where a modeless selection in
+      // the owning editor has to be dropped. Without it, `:d` after a mouse drag would act on the dragged range
+      myParentPanel.ijEditor?.let { ModelessSelection.clearIfOwned(it) }
       val keyHandler = KeyHandler.getInstance()
       val keyStroke = KeyStroke.getKeyStrokeForEvent(e)
       keyHandler.handleKey(

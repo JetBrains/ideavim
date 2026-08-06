@@ -76,7 +76,6 @@ import com.maddyhome.idea.vim.api.VirtualBufferKind
 import com.maddyhome.idea.vim.api.coerceOffset
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
-import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.autocmd.AutoCmdEvent
 import com.maddyhome.idea.vim.autocmd.IjFileTypeMapping
@@ -785,6 +784,16 @@ object VimListenerManager {
     override fun mouseDragged(e: EditorMouseEvent) {
       val editor = e.editor
       if (editor.isIdeaVimDisabledHere) return
+
+      if (ModelessSelection.isGestureInProgress(editor)) {
+        // We consumed the press, so the platform ignores the drag - make the modeless selection ourselves. Note that we
+        // deliberately don't touch the drag bookkeeping: leaving dragEventCount alone keeps the end-of-line correction
+        // in EditorSelectionHandler away from a selection that isn't Vim's
+        ModelessSelection.extendSelection(editor, e.offset)
+        e.consume()
+        return
+      }
+
       val caret = editor.caretModel.primaryCaret
 
       clearFirstSelectionEvents(e)
@@ -875,24 +884,19 @@ object VimListenerManager {
 
     override fun mousePressed(event: EditorMouseEvent) {
       if (event.editor.isIdeaVimDisabledHere) return
-      if (!isMouseMovementAllowed()) {
-        event.consume()
-        return
-      }
+
+      // Unconditional bookkeeping first - it is not 'mouse'-dependent, and leaving it out of any early return is what
+      // keeps a stale mouseDragging from disabling IdeaSelectionControl for the rest of the session
       MouseEventsDataHolder.dragEventCount = MouseEventsDataHolder.allowedSkippedDragEvents
       MouseEventsDataHolder.mouseDragging = false
-    }
 
-    private fun isMouseMovementAllowed(): Boolean {
-      val mouseOption = injector.globalOptions().mouse
-      val mode = injector.editorGroup.getSelectedEditor()?.mode
-      if (mouseOption.contains("a")) return true
-      return when (mode) {
-        is Mode.INSERT, is Mode.REPLACE -> mouseOption.contains("i")
-        is Mode.NORMAL -> mouseOption.contains("n")
-        is Mode.VISUAL, is Mode.SELECT -> mouseOption.contains("v")
-        is Mode.CMD_LINE -> mouseOption.contains("c")
-        else -> true
+      if (!ModelessSelection.isMouseEnabled(event.editor) && ModelessSelection.appliesTo(event)) {
+        // Vim doesn't use the mouse in this mode, so the caret must not move. Consuming the press is the only way to
+        // stop the platform from placing it, which also means we make any selection ourselves. See [ModelessSelection]
+        ModelessSelection.beginGesture(event.editor, event.offset)
+        event.consume()
+      } else {
+        ModelessSelection.endGesture(event.editor)
       }
     }
 
@@ -904,6 +908,24 @@ object VimListenerManager {
      */
     override fun mouseReleased(event: EditorMouseEvent) {
       if (event.editor.isIdeaVimDisabledHere) return
+
+      if (ModelessSelection.isGestureInProgress(event.editor)) {
+        // Everything below is for turning a mouse selection into a Vim one, which is exactly what must not happen here.
+        // The modeless selection stays until a command is typed or the next gesture starts.
+        //
+        // Consume the release as well, or the platform's processMouseReleased can drop our selection: it ends with a
+        // `removeSelection()` guarded by `myKeepSelectionOnMousePress` and `myDragStarted`, and because we consumed the
+        // press, neither of those was recomputed for this gesture. Not for a popup trigger though - on Windows that is
+        // the release, and consuming it would swallow the context menu
+        if (!event.mouseEvent.isPopupTrigger) {
+          event.consume()
+        }
+        MouseEventsDataHolder.dragEventCount = MouseEventsDataHolder.allowedSkippedDragEvents
+        MouseEventsDataHolder.mouseDragging = false
+        cutOffFixed = false
+        ModelessSelection.endGesture(event.editor)
+        return
+      }
 
       clearFirstSelectionEvents(event)
       MouseEventsDataHolder.dragEventCount = MouseEventsDataHolder.allowedSkippedDragEvents
@@ -990,6 +1012,9 @@ object VimListenerManager {
     override fun mousePressed(e: MouseEvent?) {
       val editor = (e?.component as? EditorComponentImpl)?.editor ?: return
       if (editor.isIdeaVimDisabledHere) return
+      // AWT delivers consumed events to component listeners too, but everything below fixes up what the platform's own
+      // press handling did - and that was skipped for a consumed press
+      if (e.isConsumed) return
       val predictedMode = injector.application.runReadAction {
         IdeaSelectionControl.predictMode(editor, SelectionSource.MOUSE)
       }
