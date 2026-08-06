@@ -51,6 +51,7 @@ import com.maddyhome.idea.vim.key.KeySource
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.listener.AceJumpService
+import com.maddyhome.idea.vim.listener.ModelessSelection
 import com.maddyhome.idea.vim.newapi.globalIjOptions
 import com.maddyhome.idea.vim.newapi.initInjector
 import com.maddyhome.idea.vim.newapi.vim
@@ -94,6 +95,8 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
       // Should we use HelperKt.getTopLevelEditor(editor) here, as we did in former EditorKeyHandler?
       try {
         val start = if (traceTime) System.currentTimeMillis() else null
+        // Vim removes a modeless selection as soon as a command is typed
+        ModelessSelection.clearIfOwned(editor)
         val keyHandler = KeyHandler.getInstance()
         keyHandler.handleKey(editor.vim, keyStroke, KeySource.TYPED, e.dataContext.vim, keyHandler.keyHandlerState)
         if (start != null) {
