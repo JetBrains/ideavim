@@ -405,7 +405,7 @@ class IncsearchTests : VimTestCase() {
     assertSearchHighlights(
       "and",
       """I found it in a legendary l«and»
-           |all rocks «and» lavender «and» tufted grass,
+           |all rocks ‷and‴ lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.
       """.trimMargin(),
@@ -463,7 +463,7 @@ class IncsearchTests : VimTestCase() {
     assertSearchHighlights(
       "and",
       """I found it in a legendary l«and»
-           |all rocks «and» lavender «and» tufted grass,
+           |all rocks ‷and‴ lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.
       """.trimMargin(),
@@ -1147,6 +1147,69 @@ class IncsearchTests : VimTestCase() {
         |${c}two
         |one
         |two
+        |one
+      """.trimMargin()
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
+  fun `test ctrl+g moves current match highlight with hlsearch`() {
+    configureByText("${c}one two one two one two")
+    enterCommand("set hlsearch incsearch")
+
+    // The pattern doesn't change while stepping through the matches, so the all-match highlights stay as they are. Only
+    // the current match highlight moves
+    typeText("/", "two")
+    assertSearchHighlights("two", "one ‷two‴ one «two» one «two»")
+
+    typeText("<C-G>")
+    assertSearchHighlights("two", "one «two» one ‷two‴ one «two»")
+
+    typeText("<C-G>")
+    assertSearchHighlights("two", "one «two» one «two» one ‷two‴")
+
+    typeText("<C-G>") // Wraps around to the first match
+    assertSearchHighlights("two", "one ‷two‴ one «two» one «two»")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
+  fun `test ctrl+t moves current match highlight with hlsearch`() {
+    configureByText("${c}one two one two one two")
+    enterCommand("set hlsearch incsearch")
+
+    typeText("/", "two", "<C-G>")
+    assertSearchHighlights("two", "one «two» one ‷two‴ one «two»")
+
+    typeText("<C-T>")
+    assertSearchHighlights("two", "one ‷two‴ one «two» one «two»")
+
+    typeText("<C-T>") // Wraps around to the last match
+    assertSearchHighlights("two", "one «two» one «two» one ‷two‴")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @Test
+  fun `test ctrl+g moves caret with hlsearch`() {
+    configureByText(
+      """
+        |${c}one
+        |two
+        |one
+        |two
+        |one
+      """.trimMargin(),
+    )
+    enterCommand("set hlsearch incsearch")
+    typeText("/", "two")
+    typeText("<C-G>")
+    assertState(
+      """
+        |one
+        |two
+        |one
+        |${c}two
         |one
       """.trimMargin()
     )

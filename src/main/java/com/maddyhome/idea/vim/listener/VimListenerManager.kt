@@ -110,6 +110,7 @@ import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.resetVimLastColumn
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
+import com.maddyhome.idea.vim.helper.updateCurrentSearchMatchHighlight
 import com.maddyhome.idea.vim.helper.vimDisabled
 import com.maddyhome.idea.vim.helper.vimInitialised
 import com.maddyhome.idea.vim.key.noteCaretMoveInInsertSession
@@ -1036,6 +1037,10 @@ object VimListenerManager {
     override fun caretPositionChanged(event: CaretEvent) {
       event.caret.resetVimLastColumn()
       val editor = event.editor
+      // Vim highlights the match the cursor is on differently to the other matches (`hl-CurSearch`), so keep the
+      // current match highlight up to date as the caret moves
+      updateCurrentSearchMatchHighlight(editor)
+
       val vimEditor = editor.vim
       if (vimEditor.mode is Mode.INSERT) {
         // Moving the caret ends any CTRL-X completion sub-mode (:help i_CTRL-X)

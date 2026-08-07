@@ -29,7 +29,7 @@ class SearchHighlightsTest : VimTestCase() {
     assertSearchHighlights(
       pattern,
       """I found it in a legendary l«and»
-           |all rocks «and» lavender «and» tufted grass,
+           |all rocks ‷and‴ lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.
       """.trimMargin(),
@@ -48,7 +48,7 @@ class SearchHighlightsTest : VimTestCase() {
 
     assertSearchHighlights(
       "\\<Lorem\\>",
-      "«Lorem» ipsum «lorem» ipsum",
+      "«Lorem» ipsum ‷lorem‴ ipsum",
     )
   }
 
@@ -69,7 +69,7 @@ class SearchHighlightsTest : VimTestCase() {
 
     assertSearchHighlights(
       pattern,
-      """I found it in a legendary l«and»
+      """I found it in a legendary l‷and‴
            |all rocks «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.
@@ -125,7 +125,7 @@ class SearchHighlightsTest : VimTestCase() {
     assertSearchHighlights(
       pattern,
       """I found it in a legendary l«and»
-           |all rocks «and» lavender «and» tufted grass,
+           |all rocks ‷and‴ lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.
       """.trimMargin(),
@@ -151,7 +151,7 @@ class SearchHighlightsTest : VimTestCase() {
     assertSearchHighlights(
       pattern,
       """I found it in a legendary l«and»
-           |all rocks «and» lavender «and» tufted grass,
+           |all rocks «and» lavender ‷and‴ tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.
       """.trimMargin(),
@@ -180,7 +180,7 @@ class SearchHighlightsTest : VimTestCase() {
     assertSearchHighlights(
       pattern,
       """I found it in a legendary land
-        |all rocks and «lavender» and tufted grass,
+        |all rocks and ‷lavender‴ and tufted grass,
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.
       """.trimMargin(),
@@ -219,7 +219,7 @@ class SearchHighlightsTest : VimTestCase() {
     assertSearchHighlights(
       pattern,
       """I found it in a legendary l«and»
-           |all rocks «and» lavender «and» tufted grass,
+           |all rocks ‷and‴ lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.
       """.trimMargin(),
@@ -244,7 +244,7 @@ class SearchHighlightsTest : VimTestCase() {
     assertSearchHighlights(
       pattern,
       """I found it in a legendary l«and»
-           |all «and» lavender «and» tufted grass,
+           |all ‷and‴ lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.
       """.trimMargin(),
@@ -320,7 +320,7 @@ class SearchHighlightsTest : VimTestCase() {
       pattern,
       """I found it in a legendary land
            |all rocks and lavender and tufted grass,
-           |where it was «sled» on some sodden «sand»
+           |where it was ‷sled‴ on some sodden «sand»
            |hard by the torrent of a mountain pass.
       """.trimMargin(),
     )
@@ -395,7 +395,7 @@ class SearchHighlightsTest : VimTestCase() {
       pattern,
       """I found it in a legendary land
            |all rocks and lavender and tufted grass,
-           |where it was «sFOOettled» on some sodden «sand»
+           |where it was ‷sFOOettled‴ on some sodden «sand»
            |hard by the torrent of a mountain pass.
       """.trimMargin(),
     )
@@ -521,10 +521,52 @@ class SearchHighlightsTest : VimTestCase() {
       pattern,
       """I found it in a legendary land
             |all rocks and lavender and tufted grass,
-            |where it was «shuffled» on some sodden «sand»
+            |where it was ‷shuffled‴ on some sodden «sand»
             |hard by the torrent of a mountain pass.
       """.trimMargin(),
     )
+  }
+
+  @Test
+  fun `test moving caret off current match removes current match highlight`() {
+    configureByText("${c}lorem ipsum lorem ipsum")
+    enterCommand("set hlsearch")
+
+    val pattern = "lorem"
+    enterSearch(pattern) // Moves the caret to the second occurrence
+    typeText("l") // Still inside the match
+    assertSearchHighlights(pattern, "«lorem» ipsum ‷lorem‴ ipsum")
+
+    typeText("$") // Off the match
+    assertSearchHighlights(pattern, "«lorem» ipsum «lorem» ipsum")
+  }
+
+  @Test
+  fun `test moving caret onto another match moves current match highlight`() {
+    configureByText("${c}lorem ipsum lorem ipsum")
+    enterCommand("set hlsearch")
+
+    val pattern = "lorem"
+    enterSearch(pattern) // Moves the caret to the second occurrence
+    assertSearchHighlights(pattern, "«lorem» ipsum ‷lorem‴ ipsum")
+
+    typeText("gg0") // Back to the first occurrence
+    assertSearchHighlights(pattern, "‷lorem‴ ipsum «lorem» ipsum")
+  }
+
+  @Test
+  fun `test editing text moves current match highlight under caret`() {
+    configureByText("${c}lorem ipsum XXlorem ipsum")
+    enterCommand("set hlsearch")
+
+    val pattern = "lorem"
+    enterSearch(pattern) // Moves the caret to the second occurrence
+    typeText("hh") // Move to the "XX" before the match
+    assertSearchHighlights(pattern, "«lorem» ipsum XX«lorem» ipsum")
+
+    // Deleting "XX" doesn't move the caret, but it does move the match under it
+    typeText("2x")
+    assertSearchHighlights(pattern, "«lorem» ipsum ‷lorem‴ ipsum")
   }
 
   @Test
@@ -533,6 +575,6 @@ class SearchHighlightsTest : VimTestCase() {
     enterCommand("set hlsearch")
     val pattern = "foo"
     enterSearch(pattern)
-    assertSearchHighlights(pattern, "\t«foo»")
+    assertSearchHighlights(pattern, "\t‷foo‴")
   }
 }

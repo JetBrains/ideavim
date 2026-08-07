@@ -12,11 +12,13 @@ package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.colors.EditorColors
+import com.intellij.openapi.editor.ex.RangeHighlighterEx
 import com.intellij.openapi.editor.markup.EffectType
 import com.intellij.openapi.editor.markup.HighlighterLayer
 import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.editor.markup.TextAttributes
+import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
@@ -112,15 +114,7 @@ fun addSubstitutionConfirmationHighlight(editor: Editor, start: Int, end: Int): 
  * for transient overlays - such as the `inccommand` preview - that manage their own highlighter lifecycle.
  */
 fun highlightPreviewMatch(editor: Editor, start: Int, end: Int, tooltip: String): RangeHighlighter {
-  val highlighter = editor.markupModel.addRangeHighlighter(
-    EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES,
-    start,
-    end,
-    HighlighterLayer.SELECTION - 1,
-    HighlighterTargetArea.EXACT_RANGE,
-  )
-  highlighter.errorStripeTooltip = tooltip
-  return highlighter
+  return addSearchMatchHighlighter(editor, start, end, tooltip)
 }
 
 /**
@@ -142,13 +136,16 @@ private fun updateSearchHighlights(
   // Update highlights in all visible editors. We update non-visible editors when they get focus.
   // Note that this now includes all editors - main, diff windows, even toolwindows like the Commit editor and consoles
   val editors = injector.editorGroup.getEditors().filter {
-    (injector.application.isUnitTest() || it.ij.component.isShowing)
+    !it.ij.isDisposed
+      && (injector.application.isUnitTest() || it.ij.component.isShowing)
       && (currentEditor == null || it.projectId == currentEditor.projectId)
   }
 
-  editors.forEach {
-    val editor = it.ij
-    var currentMatchOffset = -1
+  val isIncsearch = isIncrementalSearchHighlights(initialOffset)
+
+  editors.forEach { vimEditor ->
+    val editor = vimEditor.ij
+    val isCurrentEditor = editor === currentEditor?.ij
 
     // Try to keep existing highlights if possible. Update if hlsearch has changed or if the pattern has changed.
     // Force update for the situations where the text is the same, but the ignore case values have changed.
@@ -160,78 +157,101 @@ private fun updateSearchHighlights(
 
     if (pattern == null) return@forEach
 
-    val vimEditor = editor.vim
-    val editorLastLine = vimEditor.lineCount() - 1
     val searchStartLine = searchRange?.startLine ?: 0
-    val searchEndLine = (searchRange?.endLine ?: -1).coerceAtMost(editorLastLine)
+    val searchEndLine = (searchRange?.endLine ?: -1).coerceAtMost(vimEditor.lineCount() - 1)
+
+    var incsearchMatchOffset = -1
     if (shouldAddAllSearchHighlights(editor, pattern, showHighlights)) {
       // hlsearch (+ incsearch/noincsearch)
-      // Make sure the range fits this editor. Note that Vim will use the same range for all windows. E.g., given
-      // `:1,5s/foo`, Vim will highlight all occurrences of `foo` in the first five lines of all visible windows
-      if (searchStartLine <= editorLastLine) {
-        val results =
-          injector.searchHelper.findAll(
-            vimEditor,
-            pattern,
-            searchStartLine,
-            searchEndLine,
-            shouldIgnoreCase(pattern, shouldIgnoreSmartCase)
-          )
-        if (results.isNotEmpty()) {
-          if (editor === currentEditor?.ij) {
-            currentMatchOffset = findClosestMatch(results, initialOffset, count1, forwards)
-          }
-          highlightSearchResults(editor, pattern, results, currentMatchOffset)
-        }
-      }
+      addAllSearchHighlights(vimEditor, pattern, searchStartLine, searchEndLine, shouldIgnoreSmartCase)
       editor.vimLastSearch = pattern
-    } else if (shouldAddCurrentMatchSearchHighlight(pattern, showHighlights, initialOffset)) {
+    } else if (isCurrentEditor && shouldAddCurrentMatchSearchHighlight(pattern, showHighlights, initialOffset)) {
       // nohlsearch + incsearch. Even though search highlights are disabled, we still show a highlight (current editor
-      // only), because 'incsearch' is active. But we don't show a search if Visual is active (behind Command-line of
-      // course), because the Visual selection is enough. We still need to find the current offset to update the
-      // selection
-      if (editor === currentEditor?.ij) {
-        val searchOptions = EnumSet.of(SearchOptions.WHOLE_FILE)
-        if (injector.globalOptions().wrapscan) searchOptions.add(SearchOptions.WRAP)
-        if (shouldIgnoreSmartCase) searchOptions.add(SearchOptions.IGNORE_SMARTCASE)
-        if (!forwards) searchOptions.add(SearchOptions.BACKWARDS)
-        val result = injector.searchHelper.findPattern(it, pattern, initialOffset, count1, searchOptions)
-        if (result != null) {
-          if (!it.inVisualMode && !it.inCommandLineModeWithVisual) {
-            val results = listOf(result)
-            highlightSearchResults(editor, pattern, results, result.startOffset)
-          }
-          currentMatchOffset = result.startOffset
-        }
-      }
-    } else if (shouldMaintainCurrentMatchOffset(pattern, initialOffset)) {
-      // incsearch. If nothing has changed (e.g., we've edited offset values in `/foo/e+2`) make sure we return the
-      // current match offset so the caret remains at the current incsarch match
-      val offset = editor.vimIncsearchCurrentMatchOffset
-      if (offset != null && editor === currentEditor?.ij) {
-        currentMatchOffset = offset
-      }
+      // only), because 'incsearch' is active
+      incsearchMatchOffset =
+        addIncsearchMatchHighlight(vimEditor, pattern, initialOffset, count1, forwards, shouldIgnoreSmartCase)
     }
 
-    if (editor === currentEditor?.ij) {
+    // The current match comes from the search while 'incsearch' is in progress - in the editor being searched only -
+    // and from the caret otherwise
+    val currentMatchOffset = when {
+      !isIncsearch -> findMatchOffsetAtCaret(editor)
+      !isCurrentEditor -> -1
+      incsearchMatchOffset != -1 -> incsearchMatchOffset
+      else -> findClosestMatch(highlightedMatches(editor), initialOffset, count1, forwards)
+    }
+    setCurrentSearchMatchHighlight(editor, currentMatchOffset)
+
+    // Only 'incsearch' has an incsearch match. The current match of an accepted search is not one, even though both are
+    // highlighted the same way - e.g. `c_CTRL-R_CTRL-W` inserts the word after the incsearch match, but the word under
+    // the caret when there is no incsearch in progress
+    editor.vimIncsearchCurrentMatchOffset = if (isIncsearch) currentMatchOffset else -1
+
+    if (isCurrentEditor) {
       currentEditorCurrentMatchOffset = currentMatchOffset
     }
 
-    if (pattern != null) {
-      updateSearchCount(
-        vimEditor,
-        pattern,
-        searchStartLine,
-        searchEndLine,
-        shouldIgnoreSmartCase,
-        currentMatchOffset,
-        editor
-      )
-    }
+    updateSearchCount(
+      vimEditor,
+      pattern,
+      searchStartLine,
+      searchEndLine,
+      shouldIgnoreSmartCase,
+      currentMatchOffset,
+      editor
+    )
   }
 
-
   return currentEditorCurrentMatchOffset
+}
+
+private fun addAllSearchHighlights(
+  editor: VimEditor,
+  pattern: String,
+  searchStartLine: Int,
+  searchEndLine: Int,
+  shouldIgnoreSmartCase: Boolean,
+) {
+  // Make sure the range fits this editor. Note that Vim will use the same range for all windows. E.g., given
+  // `:1,5s/foo`, Vim will highlight all occurrences of `foo` in the first five lines of all visible windows
+  if (searchStartLine > editor.lineCount() - 1) return
+
+  val results = injector.searchHelper.findAll(
+    editor,
+    pattern,
+    searchStartLine,
+    searchEndLine,
+    shouldIgnoreCase(pattern, shouldIgnoreSmartCase)
+  )
+
+  highlightSearchResults(editor.ij, pattern, results)
+}
+
+/**
+ * Highlight the single match that the in-progress search would move to, returning its start offset, or -1 if the
+ * pattern doesn't match.
+ */
+private fun addIncsearchMatchHighlight(
+  editor: VimEditor,
+  pattern: String,
+  initialOffset: Int,
+  count1: Int,
+  forwards: Boolean,
+  shouldIgnoreSmartCase: Boolean,
+): Int {
+  val searchOptions = EnumSet.of(SearchOptions.WHOLE_FILE)
+  if (injector.globalOptions().wrapscan) searchOptions.add(SearchOptions.WRAP)
+  if (shouldIgnoreSmartCase) searchOptions.add(SearchOptions.IGNORE_SMARTCASE)
+  if (!forwards) searchOptions.add(SearchOptions.BACKWARDS)
+
+  val result = injector.searchHelper.findPattern(editor, pattern, initialOffset, count1, searchOptions) ?: return -1
+
+  // We don't show a highlight if Visual is active (behind Command-line, of course), because the Visual selection is
+  // enough. We still return the offset, so the caller can update the selection
+  if (!editor.inVisualMode && !editor.inCommandLineModeWithVisual) {
+    highlightSearchResults(editor.ij, pattern, listOf(result))
+  }
+  return result.startOffset
 }
 
 fun updateSearchCount(
@@ -340,6 +360,33 @@ private fun shouldAddAllSearchHighlights(editor: Editor, newPattern: String?, hl
   return hlSearch && newPattern != null && newPattern != editor.vimLastSearch && newPattern != ""
 }
 
+/**
+ * The current match is deliberately derived from the existing highlights rather than from a fresh search. The highlights
+ * are only recreated when the pattern changes, but the current match can move while the pattern stays the same -
+ * `c_CTRL-G`/`c_CTRL-T` step the incsearch preview through the matches, and `hl-CurSearch` follows the caret
+ */
+private fun highlightedMatches(editor: Editor): List<TextRange> {
+  val highlighters = editor.vimLastHighlighters ?: return emptyList()
+  return highlighters.filter { it.isValid }.map { TextRange(it.startOffset, it.endOffset) }
+}
+
+/**
+ * The start offset of the highlighted match the caret is inside, or -1 if the caret isn't inside a match. This is Vim's
+ * `hl-CurSearch`, and each window highlights the match at its own caret.
+ *
+ * Note that the caret hasn't been moved to the match yet while highlighting an accepted search - the caret listener
+ * calls [updateCurrentSearchMatchHighlight] when it does
+ */
+private fun findMatchOffsetAtCaret(editor: Editor): Int {
+  val highlighters = editor.vimLastHighlighters ?: return -1
+  val caretOffset = editor.caretModel.primaryCaret.offset
+  // Scan the highlighters directly rather than going through [highlightedMatches] - this is called for every caret
+  // movement, and there can be a lot of matches
+  return highlighters.firstOrNull { it.isValid && it.containsOffset(caretOffset) }?.startOffset ?: -1
+}
+
+private fun RangeHighlighter.containsOffset(offset: Int) = offset >= startOffset && offset < endOffset
+
 private fun findClosestMatch(
   results: List<TextRange>,
   initialOffset: Int,
@@ -373,48 +420,113 @@ private fun findClosestMatch(
   return sortedResults[nextIndex % results.size].startOffset
 }
 
+/**
+ * Add and track a highlight for each of [results]. They are all added as normal matches - the current match is styled
+ * separately, by [setCurrentSearchMatchHighlight].
+ */
 fun highlightSearchResults(
   editor: Editor,
   pattern: String,
   results: List<TextRange>,
-  currentMatchOffset: Int,
 ) {
-  var highlighters = editor.vimLastHighlighters
-  if (highlighters == null) {
-    highlighters = mutableListOf()
-    editor.vimLastHighlighters = highlighters
-  }
+  // Don't start tracking highlighters for an empty list - that would make the editor look like it has search highlights
+  if (results.isEmpty()) return
+
+  val highlighters = editor.vimLastHighlighters
+    ?: mutableListOf<RangeHighlighter>().also { editor.vimLastHighlighters = it }
   for (range in results) {
-    val current = range.startOffset == currentMatchOffset
-    val highlighter = highlightMatch(editor, range.startOffset, range.endOffset, current, pattern)
-    highlighters.add(highlighter)
+    highlighters.add(addSearchMatchHighlighter(editor, range.startOffset, range.endOffset, pattern))
   }
-  editor.vimIncsearchCurrentMatchOffset = currentMatchOffset
 }
 
-private fun highlightMatch(editor: Editor, start: Int, end: Int, current: Boolean, tooltip: String): RangeHighlighter {
-  val layer = HighlighterLayer.SELECTION - 1
-  val targetArea = HighlighterTargetArea.EXACT_RANGE
-  if (!current) {
-    // If we use a text attribute key, it will update automatically when the editor's colour scheme changes
-    val highlighter =
-      editor.markupModel.addRangeHighlighter(EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES, start, end, layer, targetArea)
-    highlighter.errorStripeTooltip = tooltip
-    return highlighter
+/** Always uses a text attribute key, so the highlight updates automatically when the colour scheme changes. */
+private fun addSearchMatchHighlighter(editor: Editor, start: Int, end: Int, tooltip: String): RangeHighlighter {
+  val highlighter = editor.markupModel.addRangeHighlighter(
+    EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES,
+    start,
+    end,
+    HighlighterLayer.SELECTION - 1,
+    HighlighterTargetArea.EXACT_RANGE,
+  )
+  highlighter.errorStripeTooltip = tooltip
+  return highlighter
+}
+
+/**
+ * Refresh the current match highlight - e.g. after the caret has moved, or after the highlights have been recreated.
+ * Vim redraws the current match as the cursor moves, so we do too. Does nothing if there are no search highlights.
+ */
+fun updateCurrentSearchMatchHighlight(editor: Editor) {
+  if (editor.isDisposed) return
+  val highlighters = editor.vimLastHighlighters ?: return
+
+  // An 'incsearch' preview owns the current match highlight while the command line is open - it follows the search, and
+  // `c_CTRL-G`/`c_CTRL-T`, rather than the caret - so reapply it rather than working it out from the caret
+  val incsearchMatchOffset = editor.vimIncsearchCurrentMatchOffset?.takeIf { it != -1 }
+  if (incsearchMatchOffset != null) {
+    setCurrentSearchMatchHighlight(editor, incsearchMatchOffset)
+    return
   }
 
-  // There isn't a text attribute key for current selection. This means we won't update automatically when the editor's
-  // colour scheme changes. However, this is only used during incsearch, so it should be replaced pretty quickly. It's a
-  // small visual glitch that will fix itself quickly. Let's not bother implementing an editor colour scheme listener
-  // just for this.
-  // These are the same modifications that the Find live preview does. We could look at using LivePreviewPresentation,
-  // which might also be useful for text attributes in selection (if we supported that)
-  val attributes = editor.colorsScheme.getAttributes(EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES).clone().apply {
+  // This is called for every caret movement, so return without looking at the rest of the highlighters if the caret is
+  // still inside the current match
+  val caretOffset = editor.caretModel.primaryCaret.offset
+  val previous = highlighters.firstOrNull { it.isVimCurrentSearchMatch }
+  if (previous != null && previous.isValid && previous.containsOffset(caretOffset)) return
+
+  setCurrentSearchMatchHighlight(editor, findMatchOffsetAtCaret(editor))
+}
+
+/**
+ * Pass -1 to clear the current match highlight. Restyles the existing highlighters in place, so it does not repeat the
+ * search, and does nothing if the current match hasn't moved.
+ */
+private fun setCurrentSearchMatchHighlight(editor: Editor, currentMatchOffset: Int) {
+  val highlighters = editor.vimLastHighlighters ?: return
+  val previous = highlighters.firstOrNull { it.isVimCurrentSearchMatch }
+  val current = if (currentMatchOffset == -1) {
+    null
+  } else {
+    highlighters.firstOrNull { it.startOffset == currentMatchOffset }
+  }
+  if (previous === current) return
+
+  previous?.clearVimCurrentSearchMatch()
+  current?.setAsVimCurrentSearchMatch(editor)
+}
+
+/** True if this highlighter is for the current match, i.e. it is styled as Vim's `hl-CurSearch`. */
+val RangeHighlighter.isVimCurrentSearchMatch: Boolean
+  get() = getUserData(CURRENT_SEARCH_MATCH) == true
+
+/** Marks the highlighter of the current match, so we can find and restyle it as the caret moves. */
+private val CURRENT_SEARCH_MATCH = Key.create<Boolean>("ideavim.search.currentMatch")
+
+/** Apply the current match style - Vim's `hl-CurSearch`, as opposed to `hl-Search` for the other matches. */
+private fun RangeHighlighter.setAsVimCurrentSearchMatch(editor: Editor) {
+  val highlighter = this as? RangeHighlighterEx ?: return
+  highlighter.setTextAttributes(currentSearchMatchAttributes(editor))
+  putUserData(CURRENT_SEARCH_MATCH, true)
+}
+
+/** Remove the current match style, falling back to the text attribute key the highlighter was created with. */
+private fun RangeHighlighter.clearVimCurrentSearchMatch() {
+  val highlighter = this as? RangeHighlighterEx ?: return
+  highlighter.setTextAttributes(null)
+  putUserData(CURRENT_SEARCH_MATCH, null)
+}
+
+/**
+ * The attributes of the current match - Vim's `hl-CurSearch`. These are the same modifications that the Find live
+ * preview makes to the search result attributes.
+ *
+ * There is no text attribute key for the current match, so unlike the other matches, it won't follow a change to the
+ * editor's colour scheme until it's restyled by the next caret move or search.
+ */
+private fun currentSearchMatchAttributes(editor: Editor): TextAttributes {
+  return editor.colorsScheme.getAttributes(EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES).clone().apply {
     effectType = EffectType.ROUNDED_BOX
     effectColor = editor.colorsScheme.getColor(EditorColors.CARET_COLOR)
-  }
-  return editor.markupModel.addRangeHighlighter(start, end, layer, attributes, targetArea).apply {
-    errorStripeTooltip = tooltip
   }
 }
 
@@ -424,15 +536,6 @@ private fun highlightMatch(editor: Editor, start: Int, end: Int, current: Boolea
 @Contract("_, true, _ -> false")
 private fun shouldAddCurrentMatchSearchHighlight(pattern: String?, hlSearch: Boolean, initialOffset: Int): Boolean {
   return !hlSearch && isIncrementalSearchHighlights(initialOffset) && !pattern.isNullOrEmpty()
-}
-
-/**
- * Keep the current match offset if the pattern is still valid, and we're performing incremental search highlights
- * This will keep the caret position when editing the offset in e.g. `/foo/e+1`
- */
-@Contract("null, _ -> false")
-private fun shouldMaintainCurrentMatchOffset(pattern: String?, initialOffset: Int): Boolean {
-  return !pattern.isNullOrEmpty() && isIncrementalSearchHighlights(initialOffset)
 }
 
 /**

@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.group.XMLGroup
 import com.maddyhome.idea.vim.helper.addSubstitutionConfirmationHighlight
 import com.maddyhome.idea.vim.helper.highlightSearchResults
 import com.maddyhome.idea.vim.helper.shouldIgnoreCase
+import com.maddyhome.idea.vim.helper.updateCurrentSearchMatchHighlight
 import com.maddyhome.idea.vim.helper.updateSearchCount
 import com.maddyhome.idea.vim.helper.updateSearchHighlights
 import com.maddyhome.idea.vim.helper.vimIncsearchCurrentMatchOffset
@@ -79,7 +80,7 @@ open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateComponent<Ele
         editor, pattern, startLine, endLine,
         shouldIgnoreCase(pattern, lastIgnoreSmartCase)
       )
-      highlightSearchResults(editor.ij, pattern, results, -1)
+      highlightSearchResults(editor.ij, pattern, results)
     }
   }
 
@@ -297,6 +298,10 @@ open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateComponent<Ele
           startPosition.line,
           endPosition.line
         )
+
+        // The re-highlighted lines are all added as normal matches, and the edit might have moved a match under (or out
+        // from under) the caret, so work out the current match again
+        updateCurrentSearchMatchHighlight(editor)
 
         if (logger.isDebug()) {
           existingHighlighters = editor.vimLastHighlighters!!

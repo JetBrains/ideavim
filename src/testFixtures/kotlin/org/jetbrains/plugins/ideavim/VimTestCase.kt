@@ -72,6 +72,7 @@ import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.TestInputModel
 import com.maddyhome.idea.vim.helper.getGuiCursorMode
+import com.maddyhome.idea.vim.helper.isVimCurrentSearchMatch
 import com.maddyhome.idea.vim.key.KeySource
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.ToKeysMappingInfo
@@ -877,8 +878,7 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
     // <C-K>3" → ‷ + <C-K>3' → ‴ (current match)
     // <C-K><< → « + <C-K>>> → » (normal match)
     allHighlighters.forEach {
-      // TODO: This is not the nicest way to check for current match. Add something to the highlight's user data?
-      if (it.textAttributes?.effectType == EffectType.ROUNDED_BOX) {
+      if (it.isVimCurrentSearchMatch) {
         inserts.compute(it.startOffset) { _, v -> if (v == null) "‷" else "$v‷" }
         inserts.compute(it.endOffset) { _, v -> if (v == null) "‴" else "$v‴" }
       } else {
@@ -912,8 +912,7 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
         it.textAttributes?.foregroundColor,
         "Incorrect foreground colour for highlighter at $offsets",
       )
-      // TODO: Find a better way to identify the current match
-      if (it.textAttributes?.effectType == EffectType.ROUNDED_BOX) {
+      if (it.isVimCurrentSearchMatch) {
         assertEquals(
           EffectType.ROUNDED_BOX,
           it.textAttributes?.effectType,
