@@ -8,27 +8,36 @@
 package com.maddyhome.idea.vim.ui
 
 import com.intellij.icons.AllIcons
+import com.intellij.ide.IdeBundle
 import com.intellij.openapi.actionSystem.ActionToolbarPosition
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.KeyboardShortcut
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.keymap.KeymapUtil
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.ui.ComboBoxTableRenderer
 import com.intellij.openapi.ui.StripeTable
+import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.wm.IdeFocusManager
 import com.intellij.ui.HyperlinkLabel
 import com.intellij.ui.IdeBorderFactory
 import com.intellij.ui.JBColor
 import com.intellij.ui.TableUtil
 import com.intellij.ui.ToolbarDecorator
+import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
+import com.intellij.ui.components.panels.HorizontalLayout
 import com.intellij.util.containers.ContainerUtil
+import com.intellij.util.ui.JBUI
+import com.intellij.util.ui.RestartDialogImpl
 import com.intellij.util.ui.UIUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.helper.MacKeyRepeat
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
@@ -42,6 +51,7 @@ import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JTable
 import javax.swing.KeyStroke
+import javax.swing.SwingConstants
 import javax.swing.border.LineBorder
 import javax.swing.table.AbstractTableModel
 import javax.swing.table.TableCellEditor
@@ -53,6 +63,8 @@ import javax.swing.table.TableColumn
  */
 internal class VimEmulationConfigurable : Configurable {
   private val settingsPanel: VimSettingsPanel by lazy { VimSettingsPanel() }
+
+  private var savedKeyRepeat = false
 
   override fun getDisplayName(): String = MessageHelper.message("configurable.name.vim.emulation")
 
@@ -67,15 +79,41 @@ internal class VimEmulationConfigurable : Configurable {
   }
 
   override fun isModified(): Boolean {
-    return settingsPanel.model.isModified
+    val checkBox = settingsPanel.keyRepeatCheckBox
+    return settingsPanel.model.isModified || (checkBox != null && checkBox.isSelected != savedKeyRepeat)
   }
 
   override fun apply() {
     settingsPanel.model.apply()
+    applyKeyRepeat()
   }
 
   override fun reset() {
     settingsPanel.model.reset()
+    val checkBox = settingsPanel.keyRepeatCheckBox ?: return
+    savedKeyRepeat = MacKeyRepeat.isEnabled ?: false
+    checkBox.isSelected = savedKeyRepeat
+  }
+
+  /**
+   * Applies the key repeat checkbox. Does nothing unless the checkbox itself was changed, so that editing the shortcut
+   * conflicts alone never touches the system setting and never asks for a restart.
+   */
+  private fun applyKeyRepeat() {
+    val checkBox = settingsPanel.keyRepeatCheckBox ?: return
+    val enabled = checkBox.isSelected
+    if (enabled == savedKeyRepeat) return
+    savedKeyRepeat = enabled
+
+    VimPlugin.getEditor().setKeyRepeat(enabled)
+    ApplicationManager.getApplication().executeOnPooledThread {
+      MacKeyRepeat.isEnabled = enabled
+      // macOS reads ApplePressAndHoldEnabled when an application starts and caches it for the lifetime of the process,
+      // so the running IDE keeps the previous behaviour until it is restarted. The non-modal modality state postpones
+      // the suggestion until the settings dialog is closed.
+      ApplicationManager.getApplication()
+        .invokeLater({ RestartDialogImpl.showRestartRequired() }, ModalityState.nonModal())
+    }
   }
 
   override fun disposeUIResources() {}
@@ -83,6 +121,8 @@ internal class VimEmulationConfigurable : Configurable {
   private class VimSettingsPanel : JPanel() {
 
     val model: VimShortcutConflictsTable.Model = VimShortcutConflictsTable.Model()
+
+    val keyRepeatCheckBox: JBCheckBox? = if (SystemInfo.isMac) createKeyRepeatCheckBox() else null
 
     init {
       val shortcutConflictsTable = VimShortcutConflictsTable(model)
@@ -106,8 +146,26 @@ internal class VimEmulationConfigurable : Configurable {
       val title = MessageHelper.message("configurable.border.title.shortcut.conflicts.for.active.keymap")
       conflictsPanel.border = IdeBorderFactory.createTitledBorder(title, false)
       conflictsPanel.add(scrollPane)
+      keyRepeatCheckBox?.let { add(createKeyRepeatPanel(it), BorderLayout.NORTH) }
       add(conflictsPanel, BorderLayout.CENTER)
       addHelpLine(model)
+    }
+
+    private fun createKeyRepeatCheckBox(): JBCheckBox {
+      val checkBox = JBCheckBox(MessageHelper.message("configurable.checkbox.mac.key.repeat"))
+      checkBox.toolTipText = MessageHelper.message("configurable.checkbox.mac.key.repeat.tooltip")
+      return checkBox
+    }
+
+    private fun createKeyRepeatPanel(checkBox: JBCheckBox): JPanel {
+      val comment = JBLabel(IdeBundle.message("ide.restart.required.comment"))
+      comment.foreground = UIUtil.getInactiveTextColor()
+
+      val panel = JPanel(HorizontalLayout(4, SwingConstants.CENTER))
+      panel.add(checkBox)
+      panel.add(comment)
+      panel.border = JBUI.Borders.emptyBottom(8)
+      return panel
     }
 
     private fun getRowsToBeToggled(): MutableList<Int> {
