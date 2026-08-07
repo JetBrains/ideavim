@@ -56,6 +56,7 @@ import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimCaret
 import com.maddyhome.idea.vim.api.VimDigraphGroupBase
 import com.maddyhome.idea.vim.api.VimOptionGroup
+import com.maddyhome.idea.vim.api.VimOutputPanel
 import com.maddyhome.idea.vim.api.VimSearchGroupBase
 import com.maddyhome.idea.vim.api.getMappingInfo
 import com.maddyhome.idea.vim.api.globalOptions
@@ -738,16 +739,34 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
     assertEquals(expected, selected)
   }
 
+  /**
+   * Read a value from the current output panel, on the EDT
+   */
+  private fun <T> readOutputPanel(getter: (VimOutputPanel) -> T): T? {
+    var value: T? = null
+    ApplicationManager.getApplication().invokeAndWait {
+      value = injector.outputPanel.getCurrentOutputPanel()?.let(getter)
+    }
+    return value
+  }
+
+  /** Clear the current output panel, on the EDT. See [readOutputPanel] */
+  private fun clearOutputPanel() {
+    ApplicationManager.getApplication().invokeAndWait {
+      injector.outputPanel.getCurrentOutputPanel()?.clearText()
+    }
+  }
+
   fun assertCommandOutput(command: String, expected: String) {
-    injector.outputPanel.getCurrentOutputPanel()?.clearText()
+    clearOutputPanel()
     enterCommand(command)
     assertExOutput(expected)
   }
 
   fun assertAllOptionsShown(command: String, header: String, singleColumn: Boolean) {
-    injector.outputPanel.getCurrentOutputPanel()?.clearText()
+    clearOutputPanel()
     enterCommand(command)
-    val output = injector.outputPanel.getCurrentOutputPanel()?.text
+    val output = readOutputPanel { it.text }
     assertNotNull(output, "No Ex output for command '$command'")
 
     val lines = output.lines()
@@ -776,7 +795,7 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
   }
 
   fun assertExOutput(expected: String, clear: Boolean = true) {
-    val actual = injector.outputPanel.getCurrentOutputPanel()?.text
+    val actual = readOutputPanel { it.text }
     if (actual == null) {
       // If there's no output, there's a good chance we've got an error
       val message = "No Ex output" + if (injector.messages.isError()) {
@@ -791,17 +810,17 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
       // Ex output is not cleared until the output pane is activated again (we need it to persist so that :print will
       // work when called multiple times from :global). When testing, if the previous action fails before it can
       // activate the output pane, we'll be looking at stale results.
-      injector.outputPanel.getCurrentOutputPanel()?.clearText()
+      clearOutputPanel()
     }
   }
 
   fun assertNoExOutput() {
-    val actual = injector.outputPanel.getCurrentOutputPanel()?.text ?: ""
+    val actual = readOutputPanel { it.text } ?: ""
     assertEquals("", actual)
   }
 
   fun assertStatusLineText(expected: String) {
-    val actual = injector.outputPanel.getCurrentOutputPanel()?.statusText
+    val actual = readOutputPanel { it.statusText }
     assertEquals(expected, actual)
   }
 
