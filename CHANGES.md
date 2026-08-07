@@ -27,6 +27,7 @@ usual beta standards.
 
 ### Features:
 * [VIM-301](https://youtrack.jetbrains.com/issue/VIM-301) Added built-in [`YankRing`](https://github.com/vim-scripts/YankRing.vim) extension — enable it with `Plug 'YankRing.vim'` to keep a history of everything you yank, delete or change. Right after a paste, `<C-P>` and `<C-N>` swap the pasted text for the previous or next entry in the ring, so you can reach for something you copied a few yanks ago without going back for it; this works after `p`, `P`, `gp`, `gP` and the `]p`/`[p`/`]P`/`[P` variants. `:YRShow` lists the ring, `:YRClear` empties it, `:YRReplace {offset}` cycles by an explicit offset, and `let g:yankring_max_history = {n}` sets how many entries are kept (default 100)
+* [VIM-4275](https://youtrack.jetbrains.com/issue/VIM-4275) Added [modeless selection](https://vimhelp.org/gui.txt.html#modeless-selection) in the editor for modes that [`'mouse'`](https://vimhelp.org/options.txt.html#%27mouse%27) leaves out — dragging with the left button still selects text so you can copy it, but the selection no longer moves the caret, does not start Visual mode, and is not something operators act on; it goes away as soon as you type a command or start another selection. Turning the mouse off for a mode also no longer takes the IDE's mouse features with it: the context menu, gutter clicks, middle-click paste, and `Ctrl`/`Alt`/`Shift` gestures keep working, since only a plain left-button click over text is Vim's to interpret
 * [VIM-4304](https://youtrack.jetbrains.com/issue/VIM-4304) Added command-line mode support to [`sethandler`](https://jb.gg/vim-sethandler) — the new `c` mode letter decides who owns a shortcut while the `:` command line is active (previously it always followed the Normal mode handler). Since later definitions override earlier ones, `sethandler <F2> a:ide c:vim` hands the shortcut to the IDE everywhere except the command line, which keeps a `cnoremap <F2> …` mapping working
 
 ### Fixes:
@@ -48,6 +49,7 @@ usual beta standards.
 * [VIM-4302](https://youtrack.jetbrains.com/issue/VIM-4302) Fixed Vim not working in the [Python console](https://www.jetbrains.com/help/pycharm/using-consoles.html) started with "Run file in Python Console" — such a console is named after the run configuration instead of "Python Console", so it wasn't recognised; Normal mode, motions, and `Esc` now work in its input as they do in the console opened from the tool window
 
 ### Merged PRs:
+* [1970](https://github.com/JetBrains/ideavim/pull/1970) by [1grzyb1](https://github.com/1grzyb1): VIM-4275 implement modeless selection for the 'mouse' option
 * [1963](https://github.com/JetBrains/ideavim/pull/1963) by [1grzyb1](https://github.com/1grzyb1): VIM-301 Add yank ring extension
 * [1961](https://github.com/JetBrains/ideavim/pull/1961) by [1grzyb1](https://github.com/1grzyb1): Fix opening what's new in split mode
 * [1958](https://github.com/JetBrains/ideavim/pull/1958) by [1grzyb1](https://github.com/1grzyb1): VIM-4304 command mode sethandler
