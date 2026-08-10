@@ -20,9 +20,9 @@ import com.intellij.openapi.editor.richcopy.view.RtfTransferableData
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.IndexNotReadyException
 import com.intellij.psi.PsiDocumentManager
-import com.intellij.util.ui.EmptyClipboardOwner
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.ImmutableVimCaret
+import com.maddyhome.idea.vim.api.OwnedPrimaryContent
 import com.maddyhome.idea.vim.api.VimClipboardManager
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.injector
@@ -40,10 +40,12 @@ import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
 import java.awt.datatransfer.UnsupportedFlavorException
 import java.io.IOException
+import java.util.concurrent.atomic.AtomicReference
 
 
 internal class IjClipboardManager : VimClipboardManager {
   private val primaryWriter: PrimarySelectionWriter = primarySelectionWriter()
+  private val publishedToPrimary = AtomicReference<OwnedPrimaryContent?>()
 
   override fun getPrimaryContent(editor: VimEditor, context: ExecutionContext): IjVimCopiedText? {
     val clipboard = Toolkit.getDefaultToolkit()?.systemSelection ?: return null
@@ -108,16 +110,23 @@ internal class IjClipboardManager : VimClipboardManager {
     editor: VimEditor,
     context: ExecutionContext,
     textData: VimCopiedText,
+    selectionType: SelectionType,
   ): Boolean {
     require(textData is IjVimCopiedText)
-    return primaryWriter.write(textData.text, textData.transferableData)
+    val published = primaryWriter.write(textData.text, textData.transferableData)
+    publishedToPrimary.set(if (published) OwnedPrimaryContent(textData, selectionType) else null)
+    return published
   }
+
+  override fun getOwnedPrimaryContent(): OwnedPrimaryContent? =
+    publishedToPrimary.get()?.takeIf { primaryWriter.ownsSelection() }
 
   override fun onVisualSelectionChange(editor: VimEditor, caret: ImmutableVimCaret) {
     if (!shouldRepublishVisualSelection(editor)) return
     val text = readVisualSelectionText(editor, caret) ?: return
     val context = injector.executionContextManager.getEditorExecutionContext(editor)
-    setPrimaryContent(editor, context, dumbCopiedText(text))
+    val selectionType = editor.mode.selectionType ?: SelectionType.CHARACTER_WISE
+    setPrimaryContent(editor, context, dumbCopiedText(text), selectionType)
   }
 
   // vim-engine invokes setVisualSelection transiently from operators (yy, dd, c…), text-object

@@ -221,12 +221,12 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     if (register == CLIPBOARD_REGISTER) {
       injector.clipboardManager.setClipboardContent(editor, context, copiedText)
       if (!isRegisterSpecifiedExplicitly && !isDelete && isPrimaryRegisterSupported() && OptionConstants.clipboard_unnamedplus in injector.globalOptions().clipboard) {
-        injector.clipboardManager.setPrimaryContent(editor, context, copiedText)
+        injector.clipboardManager.setPrimaryContent(editor, context, copiedText, type)
       }
     }
     if (register == PRIMARY_REGISTER) {
       if (isPrimaryRegisterSupported()) {
-        injector.clipboardManager.setPrimaryContent(editor, context, copiedText)
+        injector.clipboardManager.setPrimaryContent(editor, context, copiedText, type)
         if (!isRegisterSpecifiedExplicitly && !isDelete && OptionConstants.clipboard_unnamed in injector.globalOptions().clipboard) {
           injector.clipboardManager.setClipboardContent(editor, context, copiedText)
         }
@@ -416,11 +416,16 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     return myRegisters[r.lowercaseChar()]
   }
 
-  private fun setSystemPrimaryRegisterText(editor: VimEditor, context: ExecutionContext, copiedText: VimCopiedText) {
+  private fun setSystemPrimaryRegisterText(
+    editor: VimEditor,
+    context: ExecutionContext,
+    copiedText: VimCopiedText,
+    selectionType: SelectionType,
+  ) {
     logger.trace("Setting text: $copiedText to primary selection...")
     if (isPrimaryRegisterSupported()) {
       try {
-        injector.clipboardManager.setPrimaryContent(editor, context, copiedText)
+        injector.clipboardManager.setPrimaryContent(editor, context, copiedText, selectionType)
       } catch (e: Exception) {
         logger.warn("False positive X11 primary selection support")
         logger.trace("Setting text to primary selection failed. Setting it to clipboard selection instead")
@@ -436,11 +441,9 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     injector.clipboardManager.setClipboardContent(editor, context, copiedText)
   }
 
-  // Wayland's clipboard reader strips trailing newlines, so a line-wise yank cached as "foo\n"
-  // re-reads from PRIMARY as "foo". Treat the missing-trailing-newline variant as a match too,
-  // otherwise every poll of PRIMARY would overwrite our cached line-wise register with a
-  // character-wise one.
-  private fun cachedRegisterMatchesClipboard(cached: Register, clipboard: VimCopiedText): Boolean {
+  // Fallback for when getOwnedPrimaryContent reports a false negative; Wayland's reader strips the
+  // trailing newline, so a line-wise "foo\n" comes back as "foo".
+  private fun matchesIgnoringStrippedTrailingNewline(cached: Register, clipboard: VimCopiedText): Boolean {
     return clipboard.text == cached.text || clipboard.text + "\n" == cached.text
   }
 
@@ -451,15 +454,23 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
       return refreshClipboardRegister(editor, context)
     }
     try {
+      val ourContent = injector.clipboardManager.getOwnedPrimaryContent()
+      if (ourContent != null) {
+        logger.trace("PRIMARY still holds what we published; reusing it instead of re-guessing its type")
+        return Register(PRIMARY_REGISTER, ourContent.copiedText, ourContent.selectionType)
+      }
       val clipboardData = injector.clipboardManager.getPrimaryContent(editor, context)
       if (clipboardData == null || clipboardData.text.isEmpty()) {
         // Wayland/XWayland clears PRIMARY on focus change; prefer the last IdeaVim-written value over
         // an empty result. Differs from Vim only when the user deliberately clears PRIMARY externally.
         logger.trace("PRIMARY selection is unavailable or empty; falling back to in-memory register value")
         return myRegisters[PRIMARY_REGISTER]
+          // Nothing cached either: a readable-but-empty PRIMARY is still a register, and reporting it
+          // as absent hides the `*` row from `:registers` entirely.
+          ?: clipboardData?.let { Register(PRIMARY_REGISTER, it, SelectionType.CHARACTER_WISE) }
       }
       val currentRegister = myRegisters[PRIMARY_REGISTER]
-      if (currentRegister != null && cachedRegisterMatchesClipboard(currentRegister, clipboardData)) {
+      if (currentRegister != null && matchesIgnoringStrippedTrailingNewline(currentRegister, clipboardData)) {
         return currentRegister
       }
       return Register(PRIMARY_REGISTER, clipboardData, guessSelectionType(clipboardData.text))
@@ -518,7 +529,7 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
         }
 
         PRIMARY_REGISTER -> {
-          setSystemPrimaryRegisterText(editor, context, register.copiedText)
+          setSystemPrimaryRegisterText(editor, context, register.copiedText, register.type)
         }
       }
     }
