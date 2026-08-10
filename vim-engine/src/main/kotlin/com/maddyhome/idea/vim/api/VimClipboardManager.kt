@@ -11,7 +11,11 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.VimCopiedText
 import com.maddyhome.idea.vim.helper.VimLockLabel
+import com.maddyhome.idea.vim.state.mode.SelectionType
 import java.awt.datatransfer.Transferable
+
+/** Text published to the PRIMARY selection, paired with the selection type PRIMARY itself cannot store. */
+data class OwnedPrimaryContent(val copiedText: VimCopiedText, val selectionType: SelectionType)
 
 /**
  * Interface representing a clipboard manager for the Vim text editor.
@@ -25,7 +29,34 @@ interface VimClipboardManager {
   fun getClipboardContent(editor: VimEditor, context: ExecutionContext): VimCopiedText?
 
   fun setClipboardContent(editor: VimEditor, context: ExecutionContext, textData: VimCopiedText): Boolean
-  fun setPrimaryContent(editor: VimEditor, context: ExecutionContext, textData: VimCopiedText): Boolean
+
+  /**
+   * Publishes [textData] to PRIMARY. [selectionType] is remembered alongside it, because the windowing
+   * system stores text only and cannot carry it — see [getOwnedPrimaryContent].
+   */
+  fun setPrimaryContent(
+    editor: VimEditor,
+    context: ExecutionContext,
+    textData: VimCopiedText,
+    selectionType: SelectionType,
+  ): Boolean
+
+  /**
+   * What we last published via [setPrimaryContent], or `null` once anything else has claimed PRIMARY.
+   *
+   * A register read back out of PRIMARY has to re-guess its selection type from the text, which turns
+   * line-wise into character-wise whenever the text is reformatted or re-published on the way. While
+   * the selection is still ours, what we published is by definition what it holds — and we still know
+   * its type. Neovim's clipboard provider works the same way, reusing the `[lines, regtype]` it last
+   * handed out for as long as the `xclip`/`wl-copy` job it spawned is alive.
+   *
+   * This deliberately reports what was *published*, not what any register happens to cache: several
+   * call sites write PRIMARY without updating the `*` register, and conflating the two hands back
+   * content the selection never held.
+   *
+   * Default: `null` — platforms without a PRIMARY selection never own one.
+   */
+  fun getOwnedPrimaryContent(): OwnedPrimaryContent? = null
 
   /**
    * Fired when the user's visible visual selection changes. Whether to republish the new

@@ -457,7 +457,7 @@ class RegistersCommandTest : VimTestCase() {
         |  c  "y   Hello world y
         |  c  "z   Hello world z
         |  c  "-   s
-        |  c  "*   mall delete register
+        |  l  "*   mall delete register^J
         |  c  "+   clipboard content
         |  c  ":   ascii
         |  c  "/   search pattern
@@ -485,7 +485,7 @@ class RegistersCommandTest : VimTestCase() {
     assertExOutput(
       """
         |Type Name Content
-        |  c  "*   line 0 
+        |  l  "*   line 0 ^J
         |  c  "+   clipboard content
       """.trimMargin(),
     )
