@@ -50,10 +50,9 @@ internal inline fun <T> withRepo(rootDir: String, action: (Repository) -> T): T 
 
 internal fun checkBranch(rootDir: String, releaseType: String) {
   val branch = withRepo(rootDir) { it.branch }
-  check(
-    releaseType in setOf("major", "minor") && branch == "master"
-      || releaseType == "patch" && branch == "release"
-  ) {
+  // Every release type publishes the release branch. Master gets there through the EAP build, which
+  // is the only thing that resets the release branch to it.
+  check(releaseType in setOf("major", "minor", "patch") && branch == "release") {
     "Incorrect branch for the release type. Release type: '$releaseType', branch '$branch'"
   }
 }
