@@ -17,10 +17,15 @@ import com.maddyhome.idea.vim.state.mode.inVisualMode
 import com.maddyhome.idea.vim.state.mode.selectionType
 abstract class VimFileBase : VimFile {
   override fun displayHexInfo(editor: VimEditor) {
+    val text = editor.text()
     val offset = editor.currentCaret().offset
-    val ch = editor.text()[offset]
 
-    injector.messages.showMessage(editor, ch.code.toString(16))
+    // Vim's cursor never sits on the line break - at the end of a line it sits on the line's terminating NUL, and
+    // there is no character under it. Vim reports "NUL" in this case. This also covers an empty file and an empty
+    // last line, where the caret offset is the end of the text and indexing into it would throw.
+    val message = if (offset >= text.length || text[offset] == '\n') "NUL" else text[offset].code.toString(16)
+
+    injector.messages.showMessage(editor, message)
   }
 
   override fun displayLocationInfo(editor: VimEditor) {
