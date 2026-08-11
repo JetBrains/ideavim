@@ -23,7 +23,7 @@ abstract class VimFileBase : VimFile {
     // Vim's cursor never sits on the line break - at the end of a line it sits on the line's terminating NUL, and
     // there is no character under it. Vim reports "NUL" in this case. This also covers an empty file and an empty
     // last line, where the caret offset is the end of the text and indexing into it would throw.
-    val message = if (offset >= text.length || text[offset] == '\n') "NUL" else text[offset].code.toString(16)
+    val message = if (offset >= text.length || text[offset] == '\n') "NUL" else formatUtf8Bytes(text, offset)
 
     injector.messages.showMessage(editor, message)
   }
@@ -95,6 +95,21 @@ abstract class VimFileBase : VimFile {
 
     injector.messages.showMessage(editor, msg)
   }
+}
+
+/**
+ * Format the UTF-8 encoding of the character at [offset] as space separated, two digit hex values.
+ *
+ * This is what Vim's `g8` reports - the bytes of the character, not its code point. A character outside the Basic
+ * Multilingual Plane is stored as a surrogate pair, so the whole code point is read rather than a single UTF-16 code
+ * unit.
+ *
+ * Note that Vim also appends the bytes of any trailing composing characters, separated by `+`. IdeaVim does not.
+ */
+private fun formatUtf8Bytes(text: CharSequence, offset: Int): String {
+  val codePoint = Character.codePointAt(text, offset)
+  return String(Character.toChars(codePoint)).toByteArray(Charsets.UTF_8)
+    .joinToString(" ") { (it.toInt() and 0xFF).toString(16).padStart(2, '0') }
 }
 
 /**

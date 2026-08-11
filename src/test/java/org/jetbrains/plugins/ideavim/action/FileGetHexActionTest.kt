@@ -31,6 +31,44 @@ class FileGetHexActionTest : VimTestCase() {
     assertEquals("63", VimPlugin.getMessage())
   }
 
+  @Test
+  fun `test get hex of two byte character`() {
+    configureByText("${c}é")
+    typeText("g8")
+    assertEquals("c3 a9", VimPlugin.getMessage())
+  }
+
+  @Test
+  fun `test get hex of three byte character`() {
+    configureByText("${c}€")
+    typeText("g8")
+    assertEquals("e2 82 ac", VimPlugin.getMessage())
+  }
+
+  @Test
+  fun `test get hex of four byte character outside the BMP`() {
+    // Stored as a surrogate pair. Vim reports all four UTF-8 bytes, not the value of a single UTF-16 code unit
+    configureByText("$c😀")
+    typeText("g8")
+    assertEquals("f0 9f 98 80", VimPlugin.getMessage())
+  }
+
+  @Test
+  fun `test get hex of tab pads the value to two digits`() {
+    configureByText("${c}\tabc")
+    typeText("g8")
+    assertEquals("09", VimPlugin.getMessage())
+  }
+
+  @Test
+  fun `test get hex of NUL byte in the buffer`() {
+    // Vim stores a NUL inside a line as a line feed and maps it back when reporting, so it prints "00" rather than
+    // treating the character as a line break
+    configureByText("a${c}\u0000b")
+    typeText("g8")
+    assertEquals("00", VimPlugin.getMessage())
+  }
+
   // Vim's cursor cannot sit on a line break - at the end of a line it sits on the line's terminating NUL. There is no
   // character under the caret, so Vim reports "NUL" rather than the value of the line break character.
   @Test
