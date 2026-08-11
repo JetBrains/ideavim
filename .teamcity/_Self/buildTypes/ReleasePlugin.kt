@@ -27,7 +27,7 @@ object ReleasePatch : ReleasePlugin("patch")
 
 sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
   name = "Publish $releaseType release"
-  description = "Build and publish IdeaVim plugin"
+  description = "Build and publish the release branch as a new IdeaVim version"
 
   artifactRules = """
         build/distributions/*
@@ -76,21 +76,11 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       scriptContent = "git fetch --unshallow"
     }
     script {
-      name = "Reset release branch"
+      name = "Checkout release branch"
       scriptContent = """
-        if [ "major" = "$releaseType" ] || [ "minor" = "$releaseType" ]
-        then
-          echo Resetting the release branch to the latest master because the release type is $releaseType
-          git checkout master
-          master_commit=${'$'}(git rev-parse HEAD)
-          echo Master commit: ${'$'}master_commit
-          git checkout release
-          git reset --hard ${'$'}master_commit
-        else
-          git checkout release
-          echo Do not reset the release branch because the release type is $releaseType
-        fi
-        echo Checked out release branch
+        set -e
+        git checkout release
+        echo Checked out release branch. It is published as is - only the EAP build moves it to master
       """.trimIndent()
     }
     gradle {
@@ -200,8 +190,9 @@ sealed class ReleasePlugin(private val releaseType: String) : IdeaVimBuildType({
       git push origin master || echo "WARN: master push failed; sync manually"
       git checkout release
       echo checkout release branch
-      git branch --set-upstream-to=origin/release release
-      git push origin --force
+      # A fast-forward: the release branch only got the preparation commit on top of what it already
+      # had. Resetting it to master is the EAP build's job, and only it needs to force-push.
+      git push origin release
       # Push tag
       git push origin %build.number%
       """.trimIndent()

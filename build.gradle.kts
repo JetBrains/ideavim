@@ -274,6 +274,7 @@ tasks {
   }
 
   val runIdeSplitMode by intellijPlatformTesting.runIde.registering {
+    version = "2026.2"
     splitMode = true
     splitModeTarget = SplitModeAware.SplitModeTarget.BOTH
 
