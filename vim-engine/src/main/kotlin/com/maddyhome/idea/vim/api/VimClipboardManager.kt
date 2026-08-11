@@ -42,21 +42,21 @@ interface VimClipboardManager {
   ): Boolean
 
   /**
-   * What we last published via [setPrimaryContent], or `null` once anything else has claimed PRIMARY.
-   *
-   * A register read back out of PRIMARY has to re-guess its selection type from the text, which turns
-   * line-wise into character-wise whenever the text is reformatted or re-published on the way. While
-   * the selection is still ours, what we published is by definition what it holds — and we still know
-   * its type. Neovim's clipboard provider works the same way, reusing the `[lines, regtype]` it last
-   * handed out for as long as the `xclip`/`wl-copy` job it spawned is alive.
-   *
-   * This deliberately reports what was *published*, not what any register happens to cache: several
-   * call sites write PRIMARY without updating the `*` register, and conflating the two hands back
-   * content the selection never held.
+   * What we last published via [setPrimaryContent], while the selection is provably still ours, so the
+   * type survives instead of being guessed from the text. Neovim's clipboard provider does the same,
+   * reusing the `[lines, regtype]` it last handed out while its `xclip`/`wl-copy` job is alive.
    *
    * Default: `null` — platforms without a PRIMARY selection never own one.
    */
   fun getOwnedPrimaryContent(): OwnedPrimaryContent? = null
+
+  /**
+   * The same value, but claiming nothing about who owns PRIMARY now — for recognising our own content
+   * after a lossy round trip. Callers must confirm the text before trusting it.
+   *
+   * Default: `null`.
+   */
+  fun getLastPublishedPrimaryContent(): OwnedPrimaryContent? = null
 
   /**
    * Fired when the user's visible visual selection changes. Whether to republish the new
