@@ -441,44 +441,86 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     injector.clipboardManager.setClipboardContent(editor, context, copiedText)
   }
 
-  // Fallback for when getOwnedPrimaryContent reports a false negative; Wayland's reader strips the
-  // trailing newline, so a line-wise "foo\n" comes back as "foo".
-  private fun matchesIgnoringStrippedTrailingNewline(cached: Register, clipboard: VimCopiedText): Boolean {
-    return clipboard.text == cached.text || clipboard.text + "\n" == cached.text
-  }
-
+  /**
+   * Resolves the `*` register, whose backing store is the windowing system's PRIMARY selection.
+   *
+   * PRIMARY holds text and nothing else, so the selection type has to be found elsewhere. Each source
+   * below is less trustworthy than the one before it, ending in a guess made from the text alone.
+   */
   private fun refreshPrimaryRegister(editor: VimEditor, context: ExecutionContext): Register? {
-    logger.trace("Syncing cached primary selection value..")
     if (!isPrimaryRegisterSupported()) {
       logger.trace("X11 primary selection is not supported. Syncing clipboard selection..")
       return refreshClipboardRegister(editor, context)
     }
-    try {
-      val ourContent = injector.clipboardManager.getOwnedPrimaryContent()
-      if (ourContent != null) {
-        logger.trace("PRIMARY still holds what we published; reusing it instead of re-guessing its type")
-        return Register(PRIMARY_REGISTER, ourContent.copiedText, ourContent.selectionType)
-      }
-      val clipboardData = injector.clipboardManager.getPrimaryContent(editor, context)
-      if (clipboardData == null || clipboardData.text.isEmpty()) {
-        // Wayland/XWayland clears PRIMARY on focus change; prefer the last IdeaVim-written value over
-        // an empty result. Differs from Vim only when the user deliberately clears PRIMARY externally.
-        logger.trace("PRIMARY selection is unavailable or empty; falling back to in-memory register value")
-        return myRegisters[PRIMARY_REGISTER]
-          // Nothing cached either: a readable-but-empty PRIMARY is still a register, and reporting it
-          // as absent hides the `*` row from `:registers` entirely.
-          ?: clipboardData?.let { Register(PRIMARY_REGISTER, it, SelectionType.CHARACTER_WISE) }
-      }
-      val currentRegister = myRegisters[PRIMARY_REGISTER]
-      if (currentRegister != null && matchesIgnoringStrippedTrailingNewline(currentRegister, clipboardData)) {
-        return currentRegister
-      }
-      return Register(PRIMARY_REGISTER, clipboardData, guessSelectionType(clipboardData.text))
+    return try {
+      registerWeStillOwn() ?: registerFor(injector.clipboardManager.getPrimaryContent(editor, context))
     } catch (e: Exception) {
       logger.warn("False positive X11 primary selection support")
-      logger.trace("Syncing primary selection failed. Syncing clipboard selection instead")
-      return refreshClipboardRegister(editor, context)
+      refreshClipboardRegister(editor, context)
     }
+  }
+
+  private fun registerWeStillOwn(): Register? =
+    injector.clipboardManager.getOwnedPrimaryContent()
+      ?.let { Register(PRIMARY_REGISTER, it.copiedText, it.selectionType) }
+
+  private fun registerFor(selection: VimCopiedText?): Register? {
+    if (selection == null || selection.text.isEmpty()) return registerForUnreadableSelection(selection)
+    // What we published is asked first: it is the record of what actually went to the selection,
+    // whereas the `*` register is only updated by the paths that write it explicitly.
+    return publishedRegisterHolding(selection)
+      ?: cachedRegisterHolding(selection)
+      ?: Register(PRIMARY_REGISTER, selection, guessSelectionType(selection.text))
+  }
+
+  /**
+   * Wayland/XWayland clears PRIMARY on focus change, so an unreadable selection is far more likely to
+   * be that than a deliberate clear — prefer the last value we held. A readable-but-empty selection is
+   * still a register: reporting it as absent would drop the `*` row from `:registers` altogether.
+   */
+  private fun registerForUnreadableSelection(selection: VimCopiedText?): Register? =
+    myRegisters[PRIMARY_REGISTER]
+      ?: selection?.let { Register(PRIMARY_REGISTER, it, SelectionType.CHARACTER_WISE) }
+
+  /**
+   * The IDE republishes the editor selection to PRIMARY on every selection change, as untyped text, so
+   * ownership is routinely lost to our own process with no foreign application involved. Recognising
+   * our own text lets the type survive that.
+   */
+  private fun publishedRegisterHolding(selection: VimCopiedText): Register? =
+    injector.clipboardManager.getLastPublishedPrimaryContent()
+      ?.let { recoverRegister(selection, it.copiedText, it.selectionType) }
+
+  private fun cachedRegisterHolding(selection: VimCopiedText): Register? =
+    myRegisters[PRIMARY_REGISTER]?.let { recoverRegister(selection, it.copiedText, it.type) }
+
+  /**
+   * Rebuilds the register from [ours] when the selection still holds that text.
+   *
+   * On an exact match our own copy is returned, keeping the transferable data collected at yank time.
+   * On a stripped match only the *type* is taken from [ours]: the selection's text is what a paste
+   * should insert, and substituting ours would hand back characters the selection never held.
+   */
+  private fun recoverRegister(selection: VimCopiedText, ours: VimCopiedText, type: SelectionType): Register? = when {
+    selection.text == ours.text -> Register(PRIMARY_REGISTER, ours, type)
+    selection.isTailStrippedFormOf(ours.text) -> Register(PRIMARY_REGISTER, selection, type)
+    else -> null
+  }
+
+  /**
+   * Whether the selection can only be [ourText] with its tail eaten in transit — the trailing newline,
+   * or that newline together with the whitespace before it. Something republishes our line reformatted
+   * (the IDE reindents a pasted range, and a formatter drops trailing whitespace), and the type has to
+   * survive that.
+   *
+   * Deliberately one-directional. Text carrying trailing whitespace of its own was not produced by
+   * stripping, so it belongs to whoever put it there; comparing both sides trimmed would also collapse
+   * every whitespace-only string to the same value and let any blank selection match any blank register.
+   */
+  private fun VimCopiedText.isTailStrippedFormOf(ourText: String): Boolean {
+    if (text + "\n" == ourText) return true
+    if (text != text.trimEnd()) return false
+    return text == ourText.trimEnd()
   }
 
   private fun refreshClipboardRegister(editor: VimEditor, context: ExecutionContext): Register? {
@@ -487,8 +529,14 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
 
     val clipboardData = injector.clipboardManager.getClipboardContent(editor, context) ?: return null
     val currentRegister = myRegisters[systemAwareClipboardRegister]
-    if (currentRegister != null && clipboardData.text == currentRegister.text) {
-      return currentRegister
+    if (currentRegister != null) {
+      // Same lossy-tail tolerance as PRIMARY: the clipboard is usually faithful, but it is re-read
+      // from the X server once another application owns it, and `+` would otherwise lose its type
+      // for exactly the same reason `*` did.
+      if (clipboardData.text == currentRegister.text) return currentRegister
+      if (clipboardData.isTailStrippedFormOf(currentRegister.text)) {
+        return Register(systemAwareClipboardRegister, clipboardData, currentRegister.type)
+      }
     }
     return Register(systemAwareClipboardRegister, clipboardData, guessSelectionType(clipboardData.text))
   }

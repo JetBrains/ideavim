@@ -34,9 +34,12 @@ internal interface PrimarySelectionWriter {
    * `true` while nothing else has claimed PRIMARY since our last [write], meaning the selection still
    * holds exactly the text we put there.
    *
-   * @see com.maddyhome.idea.vim.api.VimClipboardManager.ownsPrimaryContent
+   * @see com.maddyhome.idea.vim.api.VimClipboardManager.getOwnedPrimaryContent
    */
   fun ownsSelection(): Boolean
+
+  /** Releases anything held on behalf of the selection. Default: nothing to release. */
+  fun dispose() {}
 }
 
 internal fun primarySelectionWriter(): PrimarySelectionWriter {
@@ -46,13 +49,18 @@ internal fun primarySelectionWriter(): PrimarySelectionWriter {
 
 internal class AwtPrimarySelectionWriter : PrimarySelectionWriter {
   private val latestClaim = AtomicReference<SelectionClaim?>()
+  private val logger = vimLogger<AwtPrimarySelectionWriter>()
 
   override fun write(text: String, transferableData: List<Any>): Boolean {
     return try {
       val clipboard = Toolkit.getDefaultToolkit()?.systemSelection ?: return noClaim()
       claimSelection(clipboard, buildIjTextTransferable(text, text, transferableData))
       true
-    } catch (_: HeadlessException) {
+    } catch (e: Exception) {
+      // Any failure, not just headless: AWT throws IllegalStateException when the selection cannot be
+      // opened. Claiming optimistically and leaving the claim behind would report ownership of a write
+      // that never happened, and nothing would ever revoke it.
+      logger.debug { "Could not claim PRIMARY: ${e.message}" }
       noClaim()
     }
   }
@@ -66,8 +74,9 @@ internal class AwtPrimarySelectionWriter : PrimarySelectionWriter {
 
   private fun claimSelection(clipboard: Clipboard, content: Transferable) {
     val claim = SelectionClaim()
-    latestClaim.set(claim)
+    // Published only once `setContents` has accepted it, so a throw leaves no claim to get stuck on.
     clipboard.setContents(content, claim)
+    latestClaim.set(claim)
   }
 
   /** Per-write, because AWT revokes a superseded claim asynchronously — a shared one would be cleared late. */
@@ -94,10 +103,18 @@ internal class XclipPrimarySelectionWriter private constructor() : PrimarySelect
 
   override fun write(text: String, transferableData: List<Any>): Boolean {
     pendingText.set(text)
-    ApplicationManager.getApplication().invokeLater(
-      { executor.schedule(::drain, DEBOUNCE_MS, TimeUnit.MILLISECONDS) },
-      ModalityState.any(),
-    )
+    try {
+      ApplicationManager.getApplication().invokeLater(
+        { executor.schedule(::drain, DEBOUNCE_MS, TimeUnit.MILLISECONDS) },
+        ModalityState.any(),
+      )
+    } catch (e: Exception) {
+      // Nothing will drain the pending write now, and a pending write counts as ownership — leaving it
+      // set would report that we own PRIMARY for the rest of the session.
+      pendingText.set(null)
+      logger.debug { "Could not schedule the PRIMARY write: ${e.message}" }
+      return false
+    }
     return true
   }
 
@@ -106,6 +123,12 @@ internal class XclipPrimarySelectionWriter private constructor() : PrimarySelect
   private fun hasUnflushedWrite(): Boolean = pendingText.get() != null
 
   private fun isHoldingSelection(): Boolean = selectionHolder.get()?.isAlive == true
+
+  override fun dispose() {
+    executor.shutdownNow()
+    pendingText.set(null)
+    selectionHolder.getAndSet(null)?.destroy()
+  }
 
   private fun drain() {
     val text = pendingText.getAndSet(null) ?: return
@@ -119,6 +142,13 @@ internal class XclipPrimarySelectionWriter private constructor() : PrimarySelect
       // Closing stdin is what makes xclip claim the selection; the previous holder then releases it
       // and exits by itself.
       process.outputStream.use { it.write(text.toByteArray(Charsets.UTF_8)) }
+      if (hasFailedImmediately(process)) {
+        // xclip treats an unrecognised argument as a filename and exits without claiming anything, so
+        // this is how a bad argv or an unreachable display surfaces — both output streams are
+        // discarded, and a small payload fits the pipe buffer, so nothing else would report it.
+        logger.warn("xclip exited with ${process.exitValue()} without taking PRIMARY; is `$STAY_IN_FOREGROUND` supported?")
+        process = null
+      }
     } catch (e: Exception) {
       // The write can fail after the process started, leaving xclip to claim PRIMARY with truncated
       // text. Kill it rather than orphan a holder we no longer track.
@@ -129,8 +159,15 @@ internal class XclipPrimarySelectionWriter private constructor() : PrimarySelect
     selectionHolder.set(process)
   }
 
+  /** A healthy foreground xclip stays alive holding the selection; a quick exit means it took nothing. */
+  private fun hasFailedImmediately(process: Process): Boolean =
+    process.waitFor(STARTUP_GRACE_MS, TimeUnit.MILLISECONDS)
+
   companion object {
     private const val DEBOUNCE_MS = 20L
+
+    /** Long enough for a rejected argv or an unreachable display to exit, short enough not to stall a yank. */
+    private const val STARTUP_GRACE_MS = 50L
     private val logger = vimLogger<XclipPrimarySelectionWriter>()
 
     // Detached, xclip outlives the Process we hold, leaving us blind to ownership. In the

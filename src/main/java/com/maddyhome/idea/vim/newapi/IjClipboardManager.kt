@@ -17,6 +17,7 @@ import com.intellij.openapi.editor.CaretStateTransferableData
 import com.intellij.openapi.editor.RawText
 import com.intellij.openapi.editor.richcopy.view.HtmlTransferableData
 import com.intellij.openapi.editor.richcopy.view.RtfTransferableData
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.IndexNotReadyException
 import com.intellij.psi.PsiDocumentManager
@@ -43,9 +44,17 @@ import java.io.IOException
 import java.util.concurrent.atomic.AtomicReference
 
 
-internal class IjClipboardManager : VimClipboardManager {
+// Disposable so the PRIMARY writer's background thread and helper process are released when the
+// service goes away. That covers plugin unload as well as shutdown: IdeaVim's extension points are
+// all dynamic, so an un-disposed executor would pin the plugin classloader across a reload.
+internal class IjClipboardManager : VimClipboardManager, Disposable {
   private val primaryWriter: PrimarySelectionWriter = primarySelectionWriter()
   private val publishedToPrimary = AtomicReference<OwnedPrimaryContent?>()
+
+  override fun dispose() {
+    primaryWriter.dispose()
+    publishedToPrimary.set(null)
+  }
 
   override fun getPrimaryContent(editor: VimEditor, context: ExecutionContext): IjVimCopiedText? {
     val clipboard = Toolkit.getDefaultToolkit()?.systemSelection ?: return null
@@ -120,6 +129,8 @@ internal class IjClipboardManager : VimClipboardManager {
 
   override fun getOwnedPrimaryContent(): OwnedPrimaryContent? =
     publishedToPrimary.get()?.takeIf { primaryWriter.ownsSelection() }
+
+  override fun getLastPublishedPrimaryContent(): OwnedPrimaryContent? = publishedToPrimary.get()
 
   override fun onVisualSelectionChange(editor: VimEditor, caret: ImmutableVimCaret) {
     if (!shouldRepublishVisualSelection(editor)) return
