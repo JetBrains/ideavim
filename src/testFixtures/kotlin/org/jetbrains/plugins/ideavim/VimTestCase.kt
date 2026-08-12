@@ -248,6 +248,9 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
     (injector.digraphGroup as VimDigraphGroupBase).clearCustomDigraphs()
     injector.functionService.resetUserDefinedFunctions()
 
+    injector.autoCmd.endAugroup()
+    injector.autoCmd.clearEvents()
+
     // Important to reset in tearDown as well as setUp, so we reset modified test options
     resetAllOptions()
 

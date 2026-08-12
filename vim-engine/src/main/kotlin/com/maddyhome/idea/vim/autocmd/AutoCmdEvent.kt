@@ -8,22 +8,22 @@
 
 package com.maddyhome.idea.vim.autocmd
 
-enum class AutoCmdEvent {
-  InsertEnter,
-  InsertLeave,
-  BufEnter,
-  BufLeave,
-  BufRead,
-  BufReadPost,
-  BufNewFile,
-  BufWrite,
-  BufWritePre,
-  BufWritePost,
-  WinEnter,
-  WinLeave,
-  FocusGained,
-  FocusLost,
-  FileType,
+enum class AutoCmdEvent(val runsInNormalMode: Boolean) {
+  InsertEnter(runsInNormalMode = false),
+  InsertLeave(runsInNormalMode = false),
+  BufEnter(runsInNormalMode = false),
+  BufLeave(runsInNormalMode = false),
+  BufRead(runsInNormalMode = true),
+  BufReadPost(runsInNormalMode = true),
+  BufNewFile(runsInNormalMode = true),
+  BufWrite(runsInNormalMode = true),
+  BufWritePre(runsInNormalMode = true),
+  BufWritePost(runsInNormalMode = true),
+  WinEnter(runsInNormalMode = false),
+  WinLeave(runsInNormalMode = false),
+  FocusGained(runsInNormalMode = false),
+  FocusLost(runsInNormalMode = false),
+  FileType(runsInNormalMode = true),
   ;
 
   val canonical: AutoCmdEvent

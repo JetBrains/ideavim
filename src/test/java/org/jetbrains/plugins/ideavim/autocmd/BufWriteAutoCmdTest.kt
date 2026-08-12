@@ -13,6 +13,7 @@ import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.maddyhome.idea.vim.listener.BufNewFileTracker
+import com.maddyhome.idea.vim.state.mode.Mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -97,6 +98,38 @@ class BufWriteAutoCmdTest : VimTestCase() {
 
     // If the handler mistakenly ran against the focused b.py, output would be "5".
     assertExOutput("1")
+  }
+
+  /**
+   * IntelliJ auto-saves while the user is typing, which Vim never does - `:w` can only be issued from Normal or
+   * Command-line mode. Handlers for write events must not run against a live insert session. See VIM-4257.
+   */
+  @Test
+  fun `should return to normal mode before running handler`() {
+    val editor = openFile("hello.txt")
+    enterCommand("autocmd BufWritePre * echo \"pre\"")
+
+    typeText("i")
+    assertMode(Mode.INSERT)
+
+    modifyAndSave(editor)
+
+    assertMode(Mode.NORMAL())
+    assertExOutput("pre")
+  }
+
+  @Test
+  fun `should return to normal mode from replace mode before running handler`() {
+    val editor = openFile("hello.txt")
+    enterCommand("autocmd BufWritePre * echo \"pre\"")
+
+    typeText("R")
+    assertMode(Mode.REPLACE)
+
+    modifyAndSave(editor)
+
+    assertMode(Mode.NORMAL())
+    assertExOutput("pre")
   }
 
   private fun openFile(filename: String, content: String = "initial content"): Editor {
