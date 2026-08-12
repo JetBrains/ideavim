@@ -55,7 +55,6 @@ class AutoCmdImpl : AutoCmdService {
     val context = injector.executionContextManager.getEditorExecutionContext(resolvedEditor)
     handlers.forEach { auCommand ->
       if (auCommand.pattern.matches(path)) {
-        // exit insert mode if event must be run from normal mode
         if (event.runsInNormalMode && resolvedEditor.mode.isInsertOrReplace) {
           injector.changeGroup.processEscape(resolvedEditor, context)
         }
@@ -64,16 +63,6 @@ class AutoCmdImpl : AutoCmdService {
     }
   }
 }
-
-/**
- * Whether this event fires in Vim only while in Normal mode (so we must restore Normal mode if the IDE left us in
- * Insert mode). Insert-mode events and focus events legitimately occur during Insert mode and must not force an exit.
- */
-private val AutoCmdEvent.runsInNormalMode: Boolean
-  get() = when (this) {
-    AutoCmdEvent.InsertEnter, AutoCmdEvent.InsertLeave, AutoCmdEvent.FocusGained, AutoCmdEvent.FocusLost -> false
-    else -> true
-  }
 
 // Vim treats Replace mode like Insert for these purposes (`:help InsertEnter`).
 private val Mode.isInsertOrReplace: Boolean

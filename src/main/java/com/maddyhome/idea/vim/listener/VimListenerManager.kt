@@ -114,6 +114,7 @@ import com.maddyhome.idea.vim.helper.vimDisabled
 import com.maddyhome.idea.vim.helper.vimInitialised
 import com.maddyhome.idea.vim.key.noteCaretMoveInInsertSession
 import com.maddyhome.idea.vim.key.resetAbbreviationSession
+import com.maddyhome.idea.vim.listener.VimListenerManager.VimEditorFactoryListener.editorCreated
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import com.maddyhome.idea.vim.newapi.IjVimSearchGroup
 import com.maddyhome.idea.vim.newapi.InsertTimeRecorder
@@ -489,16 +490,18 @@ object VimListenerManager {
       // We can't rely on being passed a non-null editor, so check for Code With Me scenarios explicitly
       if (VimPlugin.isNotEnabled() || !ClientId.isCurrentlyUnderLocalId) return
 
-      // Vim order: BufLeave → WinLeave → WinEnter → BufEnter
-      // Buf events only fire when the buffer (file) actually changes
-      val bufferChanged = event.oldFile?.path != event.newFile?.path
-      if (bufferChanged) {
-        injector.autoCmd.handleEvent(AutoCmdEvent.BufLeave, event.oldFile?.path)
-      }
-      injector.autoCmd.handleEvent(AutoCmdEvent.WinLeave, event.oldFile?.path)
-      injector.autoCmd.handleEvent(AutoCmdEvent.WinEnter, event.newFile?.path)
-      if (bufferChanged) {
-        injector.autoCmd.handleEvent(AutoCmdEvent.BufEnter, event.newFile?.path)
+      if (!isVirtualBuffer(event.oldFile) && !isVirtualBuffer(event.newFile)) {
+        // Vim order: BufLeave → WinLeave → WinEnter → BufEnter
+        // Buf events only fire when the buffer (file) actually changes
+        val bufferChanged = event.oldFile?.path != event.newFile?.path
+        if (bufferChanged) {
+          injector.autoCmd.handleEvent(AutoCmdEvent.BufLeave, event.oldFile?.path)
+        }
+        injector.autoCmd.handleEvent(AutoCmdEvent.WinLeave, event.oldFile?.path)
+        injector.autoCmd.handleEvent(AutoCmdEvent.WinEnter, event.newFile?.path)
+        if (bufferChanged) {
+          injector.autoCmd.handleEvent(AutoCmdEvent.BufEnter, event.newFile?.path)
+        }
       }
 
       MotionGroup.fileEditorManagerSelectionChangedCallback(event)
@@ -629,7 +632,11 @@ object VimListenerManager {
         // Cmdwin is a synthetic buffer: no autocmd BufLeave and no fallback-window option capture.
         return
       }
-      injector.autoCmd.handleEvent(AutoCmdEvent.BufLeave, event.editor.virtualFile?.path)
+      // As above, for the other virtual buffers - the substitute preview and the control-chars editor. Unlike the
+      // cmdwin, only the event is skipped: the fallback-window option capture below still has to run.
+      if (!isVirtualBuffer(event.editor.virtualFile)) {
+        injector.autoCmd.handleEvent(AutoCmdEvent.BufLeave, event.editor.virtualFile?.path)
+      }
 
       // This ticket will have a different stack trace, but it's the same problem. Originally, we tracked the last
       // editor closing based on file selection (closing an editor would select the next editor - so a null selection
@@ -1111,10 +1118,20 @@ private object MouseEventsDataHolder {
 }
 
 /**
+ * Whether [file] hosts one of IdeaVim's virtual buffers - the cmdwin, the substitute preview, the control-chars editor.
+ *
+ * These are an implementation detail rather than a buffer the user opened, so they must not raise autocmd events. Vim
+ * takes the same care with its own scratch buffers, blocking autocommands while entering them (`block_autocmds` in
+ * `aucmd_prepbuf`).
+ */
+private fun isVirtualBuffer(file: VirtualFile?): Boolean = file?.getUserData(CmdwinKeys.KIND) != null
+
+/**
  * Fires autocmd events that correspond to Vim's "load a buffer" sequence.
  */
 private fun fireBufferLoadedEvents(editor: Editor) {
   val virtualFile = editor.virtualFile ?: return
+  if (isVirtualBuffer(virtualFile)) return
   val vimEditor = editor.vim
   val path = virtualFile.path
 

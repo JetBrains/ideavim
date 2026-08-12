@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.helper.StrictMode
 import com.maddyhome.idea.vim.state.mode.inNormalMode
 import com.maddyhome.idea.vim.state.mode.isBlock
+import com.maddyhome.idea.vim.vimscript.model.CommandLineVimLContext
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
@@ -71,7 +72,9 @@ sealed class Command(
   override fun execute(editor: VimEditor, context: ExecutionContext): ExecutionResult {
     validate(editor)
 
-    StrictMode.assert(editor.inNormalMode, "Command execution should only occur in normal mode")
+    if (!this::vimContext.isInitialized || vimContext.getFirstParentContext() is CommandLineVimLContext) {
+      StrictMode.assert(editor.inNormalMode, "Command execution should only occur in normal mode")
+    }
 
     // We are currently in Normal mode, but might still have a visual or visual block selection and/or multiple carets.
     // Vim clears Visual mode before entering Command-line, but we can't do that because some of our commands can handle

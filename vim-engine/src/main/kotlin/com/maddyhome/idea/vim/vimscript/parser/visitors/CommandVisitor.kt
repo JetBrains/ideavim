@@ -54,6 +54,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.operators.AssignmentOp
 import org.antlr.v4.runtime.ParserRuleContext
 import java.util.stream.Collectors
 import kotlin.reflect.KClass
+import kotlin.reflect.KFunction
 import kotlin.reflect.full.createType
 import kotlin.reflect.full.primaryConstructor
 
@@ -343,16 +344,34 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
       return command
     }
 
-    val commandConstructor = getCommandByName(name).constructors
+    // A bang is part of the parsed command name, not `bangModifier` - `commandName` is left-recursive over BANG, and
+    // ANTLR's left recursion is greedy, so it always wins. That is what user-defined aliases need, because they are
+    // looked up with the bang attached (see VimCommandGroupBase.getAliasName), but it means a command registered with
+    // `@ExCommand` would never see one. Retry the lookup without the bang, so that e.g. `:stopinsert!` resolves.
+    // Retrying only on failure keeps the alias path untouched. There is no ambiguity: aliases must start with an
+    // uppercase letter, and ex-command names are lowercase.
+    var commandConstructor = findCommandConstructor(name)
+    var commandModifier = modifier
+    if (commandConstructor == null && name.endsWith("!")) {
+      commandConstructor = findCommandConstructor(name.dropLast(1))
+      commandModifier = CommandModifier.BANG
+    }
+
+    // Note that the fallback keeps the original name and modifier, so alias resolution still sees the bang
+    val command = commandConstructor?.call(range, commandModifier, argument)
+      ?: UnknownCommand(range, name, modifier, argument)
+    command.rangeInScript = ctx.getTextRange()
+    return command
+  }
+
+  private fun findCommandConstructor(commandName: String): KFunction<Command>? {
+    return getCommandByName(commandName).constructors
       .filter { it.parameters.size == 3 }
       .firstOrNull {
         it.parameters[0].type == Range::class.createType()
           && it.parameters[1].type == CommandModifier::class.createType()
           && it.parameters[2].type == String::class.createType()
       }
-    val command = commandConstructor?.call(range, modifier, argument) ?: UnknownCommand(range, name, modifier, argument)
-    command.rangeInScript = ctx.getTextRange()
-    return command
   }
 
   private fun getCommandByName(commandName: String): KClass<out Command> {

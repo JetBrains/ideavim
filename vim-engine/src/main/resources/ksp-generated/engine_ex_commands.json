@@ -113,6 +113,7 @@
   "so[urce]": "com.maddyhome.idea.vim.vimscript.model.commands.SourceCommand",
   "sor[t]": "com.maddyhome.idea.vim.vimscript.model.commands.SortCommand",
   "sp[lit]": "com.maddyhome.idea.vim.vimscript.model.commands.SplitCommand",
+  "stopi[nsert]": "com.maddyhome.idea.vim.vimscript.model.commands.StopInsertCommand",
   "sunm[ap]": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.UnMapCommand",
   "t": "com.maddyhome.idea.vim.vimscript.model.commands.CopyTextCommand",
   "tabN[ext]": "com.maddyhome.idea.vim.vimscript.model.commands.PreviousTabCommand",
