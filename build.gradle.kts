@@ -51,7 +51,7 @@ plugins {
   id("org.jetbrains.intellij.platform") version "2.16.0"
 
   id("org.jetbrains.changelog") version "2.5.0"
-  id("com.dorongold.task-tree") version "4.0.1"
+  id("com.dorongold.task-tree") version "4.0.2"
   id("com.google.devtools.ksp") version "2.3.7"
 }
 
