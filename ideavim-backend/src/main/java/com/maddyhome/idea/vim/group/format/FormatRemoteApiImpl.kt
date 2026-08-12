@@ -51,7 +51,7 @@ class FormatRemoteApiImpl : FormatRemoteApi {
       for ((startLine, endLine) in sortedRanges) {
         val selStart = document.getLineStartOffset(startLine)
         val selEnd = document.getLineEndOffset(endLine)
-        editor.selectionModel.setSelection(selStart, selEnd)
+        editor.caretModel.currentCaret.setSelection(selStart, selEnd, false)
         ActionManager.getInstance().tryToExecute(action, null, editor.contentComponent, "IdeaVim", true).waitFor(5_000)
       }
       editor.selectionModel.removeSelection()
