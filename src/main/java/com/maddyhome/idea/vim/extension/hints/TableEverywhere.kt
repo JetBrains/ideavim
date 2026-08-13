@@ -17,11 +17,13 @@ import com.intellij.ui.SwingActionDelegate
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.extension.ShortcutDispatcher
 import com.maddyhome.idea.vim.extension.VimExtension
+import java.awt.Component
 import java.awt.KeyboardFocusManager
 import java.awt.event.KeyEvent
 import java.beans.PropertyChangeListener
 import javax.swing.JTable
 import javax.swing.KeyStroke
+import javax.swing.SwingUtilities
 
 /**
  * Extends Vim-style `h`/`j`/`k`/`l` cell navigation to any Swing [JTable].
@@ -55,8 +57,8 @@ internal class TableEverywhere : VimExtension {
       // h/j/k/l are typed into the cell instead. Editing is still available via Enter/F2/double-click.
       disableTypeToEdit(newFocusOwner)
     }
-    // Unregistration of the shortcut is required to make the plugin disposable
-    if (oldFocusOwner is JTable && newFocusOwner != null) {
+    // Unregistration of the shortcut is required to make the plugin disposable.
+    if (oldFocusOwner is JTable) {
       dispatcher.unregisterCustomShortcutSet(oldFocusOwner)
       restoreTypeToEdit(oldFocusOwner)
     }
@@ -86,8 +88,7 @@ internal class TableEverywhere : VimExtension {
         keyStrokes.clear()
       }
       // Don't swallow keys while a cell is being edited or while SpeedSearch is active
-      val component = e.getData(PlatformDataKeys.CONTEXT_COMPONENT)
-      if (component is JTable && component.isEditing) {
+      if (isCellEditorActive(e.getData(PlatformDataKeys.CONTEXT_COMPONENT))) {
         e.presentation.isEnabled = false
       }
       if (e.getData(PlatformDataKeys.SPEED_SEARCH_TEXT) != null) {
@@ -95,7 +96,7 @@ internal class TableEverywhere : VimExtension {
       }
     }
 
-    override fun getActionUpdateThread() = ActionUpdateThread.BGT
+    override fun getActionUpdateThread() = ActionUpdateThread.EDT
   }
 }
 
@@ -112,6 +113,13 @@ private object TableNavListener : ShortcutDispatcher.Listener<(JTable) -> Unit> 
     keyStrokes.clear()
     injector.messages.indicateError()
   }
+}
+
+private fun isCellEditorActive(component: Component?): Boolean {
+  val table = component as? JTable
+    ?: SwingUtilities.getAncestorOfClass(JTable::class.java, component) as? JTable
+    ?: return false
+  return table.isEditing
 }
 
 /** Swing client property that controls whether typing a printable char starts cell editing. */
