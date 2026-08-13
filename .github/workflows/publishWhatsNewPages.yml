@@ -1,0 +1,66 @@
+# Publishes the bundled "What's New" pages as a GitHub Pages site.
+#
+# The pages in src/main/resources/whatsnew-*.html are written for the IDE. This
+# workflow resolves their __THEME__/__VERSION__ tokens, generates an index that
+# links every release, and deploys the result. The site is rebuilt from scratch on
+# every run, so the repository stays the single source of truth (no gh-pages branch).
+#
+# One-time setup: Settings → Pages → Source: "GitHub Actions".
+
+name: Publish What's New to GitHub Pages
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - 'src/main/resources/whatsnew-*.html'
+      - 'scripts-ts/src/buildWhatsNewSite.ts'
+      - '.github/workflows/publishWhatsNewPages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# A Pages deployment is a single shared resource; never run two at once.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    if: github.repository == 'JetBrains/ideavim'
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Release dates come from the commit that added each page
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: scripts-ts
+
+      - name: Build the site
+        run: npx tsx src/buildWhatsNewSite.ts .. ../_site
+        working-directory: scripts-ts
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4
