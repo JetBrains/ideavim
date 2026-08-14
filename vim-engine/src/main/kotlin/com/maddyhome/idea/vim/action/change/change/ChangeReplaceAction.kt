@@ -40,5 +40,5 @@ class ChangeReplaceAction : ChangeEditorActionHandler.SingleExecution() {
  */
 private fun changeReplace(editor: VimEditor, context: ExecutionContext) {
   injector.changeGroup.initInsert(editor, context, com.maddyhome.idea.vim.state.mode.Mode.REPLACE)
-  editor.replaceMask = VimEditorReplaceMask()
+  editor.replaceMask = VimEditorReplaceMask(editor)
 }

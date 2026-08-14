@@ -30,15 +30,17 @@ internal class InsertBackspaceAction : VimActionHandler.SingleExecution() {
     if (editor.insertMode) {
       injector.changeGroup.processBackspace(editor, context)
     } else {
-      for (caret in editor.carets()) {
-        val offset = (caret.offset - 1).takeIf { it > 0 } ?: continue
-        val oldChar = editor.replaceMask?.popChange(editor, offset)
-        if (oldChar != null) {
-          injector.changeGroup.replaceText(editor, caret, offset, offset + 1, oldChar.toString())
-        }
-        caret.moveToOffset(offset)
-      }
+      replaceModeBackspaceAtCarets(editor)
     }
     return true
+  }
+}
+
+private fun replaceModeBackspaceAtCarets(editor: VimEditor) {
+  for (caret in editor.carets()) {
+    val previousOffset = caret.offset - 1
+    if (previousOffset >= 0) {
+      replaceModeBackspace(editor, caret, previousOffset)
+    }
   }
 }

@@ -47,7 +47,6 @@ import com.maddyhome.idea.vim.common.IndentConfig
 import com.maddyhome.idea.vim.common.LiveRange
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.VimEditorReplaceMask
-import com.maddyhome.idea.vim.common.forgetAllReplaceMasks
 import com.maddyhome.idea.vim.group.visual.vimSetSystemBlockSelectionSilently
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StrictMode
@@ -515,7 +514,6 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase() {
     get() = (editor as? EditorEx)?.isInsertMode ?: false
     set(value) {
       (editor as? EditorEx)?.isInsertMode = value
-      forgetAllReplaceMasks()
     }
 
   override val document: VimDocument

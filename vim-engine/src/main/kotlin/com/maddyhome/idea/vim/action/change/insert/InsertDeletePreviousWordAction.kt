@@ -41,15 +41,7 @@ class InsertDeletePreviousWordAction : ChangeEditorActionHandler.ForEachCaret() 
   }
 }
 
-/**
- * Deletes the text from the cursor to the start of the previous word
- *
- *
- * TODO This behavior should be configured via the `backspace` option
- *
- * @param editor The editor to delete the text from
- * @return true if able to delete text, false if not
- */
+// TODO This behavior should be configured via the `backspace` option
 private fun insertDeletePreviousWord(editor: VimEditor, context: ExecutionContext, caret: VimCaret): Boolean {
   val deleteTo: Int = if (caret.getBufferPosition().column == 0) {
     caret.offset - 1
@@ -74,6 +66,16 @@ private fun insertDeletePreviousWord(editor: VimEditor, context: ExecutionContex
     return false
   }
   val range = TextRange(deleteTo, caret.offset)
-  injector.changeGroup.deleteRange(editor, context, caret, range, SelectionType.CHARACTER_WISE, true)
+  if (editor.insertMode) {
+    injector.changeGroup.deleteRange(editor, context, caret, range, SelectionType.CHARACTER_WISE, true)
+  } else {
+    replaceModeBackspaceOverEachCharacter(editor, caret, range)
+  }
   return true
+}
+
+private fun replaceModeBackspaceOverEachCharacter(editor: VimEditor, caret: VimCaret, range: TextRange) {
+  for (offset in (range.startOffset..<range.endOffset).reversed()) {
+    replaceModeBackspace(editor, caret, offset)
+  }
 }
