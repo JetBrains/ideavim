@@ -147,6 +147,12 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
+    // Moving the caret ends the run of replaced characters, so a later backspace no longer restores them.
+    // See `start_arrow` in Vim's edit.c.
+    if (editor.mode == Mode.REPLACE) {
+      editor.replaceMask = null
+    }
+
     val blockSelectionActive = editor.inBlockSelection
 
     val handler = if (this is AmbiguousExecution) this.getMotionActionHandler(cmd.argument) else this

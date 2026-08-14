@@ -9,27 +9,63 @@
 package com.maddyhome.idea.vim.common
 
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.injector
 
-class VimEditorReplaceMask {
-  private val changedChars = mutableMapOf<LiveRange, Char>()
+sealed interface ReplaceModeEdit {
+  data class Overwrote(val original: Char) : ReplaceModeEdit
 
-  fun recordChangeAtCaret(editor: VimEditor) {
+  data object Inserted : ReplaceModeEdit
+}
+
+/**
+ * Vim's replace stack, keyed by the offset of the typed character rather than by insertion order.
+ */
+class VimEditorReplaceMask(private val editor: VimEditor) {
+  private val edits = mutableMapOf<LiveRange, ReplaceModeEdit>()
+
+  fun recordTypedCharacterAtCaret() {
     for (caret in editor.carets()) {
       val offset = caret.offset
-      if (offset < editor.fileSize()) {
-        val marker = editor.createLiveMarker(offset, offset)
-        changedChars[marker] = editor.charAt(offset)
+      if (offset < editor.getLineEndForOffset(offset)) {
+        record(offset, ReplaceModeEdit.Overwrote(editor.charAt(offset)))
+      } else {
+        record(offset, ReplaceModeEdit.Inserted)
       }
     }
   }
 
-  fun popChange(editor: VimEditor, offset: Int): Char? {
-    val marker = editor.createLiveMarker(offset, offset)
-    val change = changedChars[marker]
-    changedChars.remove(marker)
-    return change
+  fun recordLineBreakAtCaret() {
+    for (caret in editor.carets()) {
+      recordAutoIndentAndLineBreakBefore(caret.offset)
+    }
   }
+
+  private fun recordAutoIndentAndLineBreakBefore(caretOffset: Int) {
+    var offset = caretOffset - 1
+    while (offset >= 0 && isAutoIndentWhitespace(offset)) {
+      record(offset, ReplaceModeEdit.Inserted)
+      offset--
+    }
+    if (offset >= 0 && editor.charAt(offset) == '\n') {
+      record(offset, ReplaceModeEdit.Inserted)
+    }
+  }
+
+  private fun isAutoIndentWhitespace(offset: Int): Boolean {
+    val char = editor.charAt(offset)
+    return char != '\n' && char.isWhitespace()
+  }
+
+  fun popEditAt(offset: Int): ReplaceModeEdit? {
+    return edits.remove(markerAt(offset))
+  }
+
+  private fun record(offset: Int, edit: ReplaceModeEdit) {
+    edits[markerAt(offset)] = edit
+  }
+
+  private fun markerAt(offset: Int): LiveRange = editor.createLiveMarker(offset, offset)
 }
 
 fun forgetAllReplaceMasks() {

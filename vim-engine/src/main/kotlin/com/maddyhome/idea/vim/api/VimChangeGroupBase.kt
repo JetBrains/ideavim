@@ -689,6 +689,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
     }
     if (editor.mode is Mode.REPLACE) {
       editor.insertMode = false
+      editor.replaceMask?.recordLineBreakAtCaret()
     }
   }
 
@@ -823,7 +824,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
   ): Boolean {
     logger.debug { "processKey($key)" }
     if (key.keyChar != KeyEvent.CHAR_UNDEFINED) {
-      editor.replaceMask?.recordChangeAtCaret(editor)
+      editor.replaceMask?.recordTypedCharacterAtCaret()
       processResultBuilder.addExecutionStep { _, e, c ->
         type(e, c, key.keyChar)
       }
@@ -839,7 +840,7 @@ abstract class VimChangeGroupBase : VimChangeGroup {
 
     // Shift-space
     if (key.keyCode == 32 && key.modifiers and KeyEvent.SHIFT_DOWN_MASK != 0) {
-      editor.replaceMask?.recordChangeAtCaret(editor)
+      editor.replaceMask?.recordTypedCharacterAtCaret()
       processResultBuilder.addExecutionStep { _, e, c ->
         type(e, c, ' ')
       }

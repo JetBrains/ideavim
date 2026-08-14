@@ -205,4 +205,27 @@ class InsertDeletePreviousWordActionTest : VimTestCase() {
     )
     assertState("one<caret> o<caret> <caret> \n")
   }
+
+  @Test
+  fun `test replace mode delete previous word restores replaced characters`() {
+    // <C-W> in Replace mode pops the replace stack for every character it steps over, just like backspace does, so the
+    // original text comes back instead of the word being deleted.
+    doTest(
+      listOf("R", "mushroom", "<C-W>"),
+      "${c}grzyb",
+      "${c}grzyb",
+      Mode.REPLACE,
+    )
+  }
+
+  @Test
+  fun `test replace mode delete previous word with nothing replaced only moves the caret`() {
+    // Nothing has been replaced yet, so there is nothing to put back and nothing to delete - only the caret moves.
+    doTest(
+      listOf("lll", "R", "<C-W>"),
+      "${c}grzyb",
+      "${c}grzyb",
+      Mode.REPLACE,
+    )
+  }
 }
