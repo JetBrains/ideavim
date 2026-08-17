@@ -31,6 +31,7 @@ class GotoDeclarationAction : VimActionHandler.SingleExecution() {
     cmd: Command,
     operatorArguments: OperatorArguments,
   ): Boolean {
+    injector.tagStack.pushTag(editor)
     injector.jumpService.saveJumpLocation(editor)
     injector.actionExecutor.executeAction(editor, name = "GotoDeclaration", context = context)
     return true
