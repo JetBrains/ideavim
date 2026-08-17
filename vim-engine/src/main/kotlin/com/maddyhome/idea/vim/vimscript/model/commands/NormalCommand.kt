@@ -37,6 +37,10 @@ data class NormalCommand(val range: Range, val modifier: CommandModifier, val ar
   ): ExecutionResult {
     val rangeSpecified = range.size() != 0
     val range = getLineRange(editor, editor.primaryCaret())
+    val modeBefore = editor.mode
+    if (modeBefore is Mode.INSERT || modeBefore is Mode.REPLACE) {
+      editor.mode = Mode.NORMAL()
+    }
 
     for (line in range.startLine..range.endLine) {
       if (editor.lineCount() < line) {
@@ -63,6 +67,12 @@ data class NormalCommand(val range: Range, val modifier: CommandModifier, val ar
       if (mode is Mode.CMD_LINE) {
         injector.commandLine.getActiveCommandLine()?.close(refocusOwningEditor = true, resetCaret = false)
       }
+
+      if (modeBefore is Mode.INSERT || modeBefore is Mode.REPLACE) {
+        editor.mode = modeBefore
+        return ExecutionResult.Success
+      }
+
       if (mode is Mode.INSERT || mode is Mode.REPLACE) {
         editor.exitInsertMode(context)
       }
