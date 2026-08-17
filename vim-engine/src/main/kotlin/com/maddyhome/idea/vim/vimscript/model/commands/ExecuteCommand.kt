@@ -34,7 +34,7 @@ data class ExecuteCommand(val range: Range, val expressions: List<Expression>) :
   ): ExecutionResult {
     val command = expressions.joinToString(separator = " ") { it.evaluate(editor, context, this).toVimString().value }
     return injector.vimscriptExecutor.execute(
-      command,
+      asSingleCommandLine(command),
       editor,
       context,
       skipHistory = true,
@@ -42,4 +42,13 @@ data class ExecuteCommand(val range: Range, val expressions: List<Expression>) :
       this.vimContext
     )
   }
+
+  private fun asSingleCommandLine(command: String): String {
+    if (!command.contains('\n')) return command
+    val firstCommand = injector.vimscriptParser.parseCommand(command.substringBefore('\n'))
+    if (!takesRestOfCommandLine(firstCommand)) return command
+    return command.replace("\r\n", "\r").replace('\n', '\r')
+  }
+
+  private fun takesRestOfCommandLine(command: Command?) = command is NormalCommand
 }

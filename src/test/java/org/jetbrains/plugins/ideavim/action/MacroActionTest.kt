@@ -519,6 +519,15 @@ class MacroActionTest : VimTestCase() {
   }
 
   @Test
+  fun `test macro from register built with CR replays as Enter`() {
+    configureByText("${c}lorem")
+    // `\<CR>` is a carriage return (0x0D), which replays as Enter, just like a recorded Enter does
+    enterCommand("""let @q = "iX\<CR>Y\<Esc>"""")
+    typeText("@q")
+    assertState("X\n${c}Ylorem")
+  }
+
+  @Test
   fun `should not record y twice when followed by motion`() {
     configureByText("${c}Spider man")
     enterCommand("map ys :echo 'hi'<CR>")
