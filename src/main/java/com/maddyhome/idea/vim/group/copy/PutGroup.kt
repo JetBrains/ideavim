@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.group.copy
 
+import com.intellij.codeInsight.CodeInsightSettings
 import com.intellij.codeInsight.editorActions.TextBlockTransferable
 import com.intellij.ide.CopyPasteManagerEx
 import com.intellij.ide.DataManager
@@ -231,6 +232,8 @@ internal class PutGroup : VimPutBase() {
     // Temp fix for VIM-2808 for Rider and Clion. Should be removed after rider will fix it's issues
     // Disable for client due to VIM-3857
     if (isRider() || isClionNova() || PlatformUtils.isJetBrainsClient()) return endOffset
+
+    if (CodeInsightSettings.getInstance().REFORMAT_ON_PASTE == CodeInsightSettings.NO_REFORMAT) return endOffset
 
     val startLine = editor.offsetToBufferPosition(startOffset).line
     val endLine = editor.offsetToBufferPosition(endOffset - 1).line
