@@ -233,12 +233,15 @@ internal class PutGroup : VimPutBase() {
     // Disable for client due to VIM-3857
     if (isRider() || isClionNova() || PlatformUtils.isJetBrainsClient()) return endOffset
 
-    if (CodeInsightSettings.getInstance().REFORMAT_ON_PASTE == CodeInsightSettings.NO_REFORMAT) return endOffset
-
     val startLine = editor.offsetToBufferPosition(startOffset).line
     val endLine = editor.offsetToBufferPosition(endOffset - 1).line
     val startLineOffset = (editor as IjVimEditor).editor.document.getLineStartOffset(startLine)
     val endLineOffset = editor.editor.document.getLineEndOffset(endLine)
+
+    if (CodeInsightSettings.getInstance().REFORMAT_ON_PASTE == CodeInsightSettings.NO_REFORMAT) return editor.getLineEndOffset(
+      endLine,
+      true
+    )
 
     VimPlugin.getChange().autoIndentRange(
       editor,
