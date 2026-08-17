@@ -9,6 +9,7 @@
 package org.jetbrains.plugins.ideavim.ex.parser.expressions
 
 import com.maddyhome.idea.vim.api.injector
+import org.jetbrains.plugins.ideavim.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 import java.awt.event.InputEvent.CTRL_DOWN_MASK
@@ -129,6 +130,29 @@ class DoubleQuotedStringTest : VimTestCase() {
     assertEquals(injector.parser.parseVimScriptString("\\<Esk>"), "<Esk>")
     assertEquals(injector.parser.parseVimScriptString("l\\<Esc>l"), "l" + 27.toChar() + "l")
     assertEquals(injector.parser.parseVimScriptString("\\<Space>"), " ")
+  }
+
+  @Test
+  fun `test CR is a carriage return`() {
+    // Java's VK_ENTER is 10, but Vim's <CR> is 13. `char2nr("\<CR>")` is 13 in Vim
+    assertEquals(13.toChar().toString(), injector.parser.parseVimScriptString("\\<CR>"))
+    assertEquals(13.toChar().toString(), injector.parser.parseVimScriptString("\\<Enter>"))
+    assertEquals(13.toChar().toString(), injector.parser.parseVimScriptString("\\<Return>"))
+    assertEquals("a" + 13.toChar() + "b", injector.parser.parseVimScriptString("a\\<CR>b"))
+  }
+
+  @VimBehaviorDiffers(
+    originalVimAfter = "`char2nr` of each of these is 10 in Vim",
+    description = "IdeaVim represents the line feed key as NUL, like Vim does for a NUL in text. `<NL>` follows " +
+      "`<C-J>`, so that both are recognised as the same key",
+  )
+  @Test
+  fun `test NL is the same key as C-J`() {
+    val ctrlJ = injector.parser.parseVimScriptString("\\<C-J>")
+    assertEquals(ctrlJ, injector.parser.parseVimScriptString("\\<NL>"))
+    assertEquals(ctrlJ, injector.parser.parseVimScriptString("\\<NewLine>"))
+    assertEquals(ctrlJ, injector.parser.parseVimScriptString("\\<LineFeed>"))
+    assertEquals(ctrlJ, injector.parser.parseVimScriptString("\\<LF>"))
   }
 
   @Test

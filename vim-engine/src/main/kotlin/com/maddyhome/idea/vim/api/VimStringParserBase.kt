@@ -449,7 +449,7 @@ abstract class VimStringParserBase : VimStringParser {
           if (c == '>') {
             val specialKey = parseSpecialKey(specialKeyBuilder.toString(), 0)
             if (specialKey != null) {
-              var keyCode = specialKey.keyCode
+              var keyCode = virtualKeyCodeToCodepoint(specialKey.keyCode)
               var useKeyCode = true
               if (specialKey.keyCode == 0) {
                 keyCode = specialKey.keyChar.code
@@ -491,6 +491,8 @@ abstract class VimStringParserBase : VimStringParser {
     INIT, ESCAPE, OCTAL_NUMBER, HEX_NUMBER, SPECIAL
   }
 
+  private fun virtualKeyCodeToCodepoint(keyCode: Int) = if (keyCode == KeyEvent.VK_ENTER) '\r'.code else keyCode
+
   private fun octalDigitToNumber(c: Char): Int? {
     return if (c in '0'..'7') {
       c.code - '0'.code
@@ -512,6 +514,11 @@ abstract class VimStringParserBase : VimStringParser {
   // See https://vimdoc.sourceforge.net/htmldoc/intro.html#key-notation
   private fun parseSpecialKey(s: String, modifiers: Int): KeyStroke? {
     val lower = s.lowercase(Locale.getDefault())
+
+    if (lower in nlKeyNames) {
+      return parseSpecialKey("j", modifiers or InputEvent.CTRL_DOWN_MASK)
+    }
+
     val keyCode = getVimKeyName(lower)
     val typedChar = getVimTypedKeyName(lower)
     if (keyCode != null) {
@@ -632,5 +639,7 @@ abstract class VimStringParserBase : VimStringParser {
     private const val SHIFT_PREFIX = "s-"
     private const val VK_PLUG = KeyEvent.CHAR_UNDEFINED.code - 1
     private const val VK_ACTION = KeyEvent.CHAR_UNDEFINED.code - 2
+
+    private val nlKeyNames = setOf("nl", "newline", "linefeed", "lf")
   }
 }

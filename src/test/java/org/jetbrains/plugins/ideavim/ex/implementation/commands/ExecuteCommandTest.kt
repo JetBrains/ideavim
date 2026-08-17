@@ -47,4 +47,19 @@ class ExecuteCommandTest : VimTestCase() {
     typeText(commandToKeys("execute('echo '.42)"))
     assertExOutput("42")
   }
+
+  @Test
+  fun `test line feed separates commands`() {
+    configureByText("\n")
+    typeText(commandToKeys("execute \"echo 1\\necho 2\""))
+    assertExOutput("1\n2")
+  }
+
+  @Test
+  fun `test line feed separates commands other than the first`() {
+    configureByText("${c}Lorem ipsum")
+    typeText(commandToKeys("execute \"echo 1\\nnormal! x\""))
+    assertExOutput("1")
+    assertState("${c}orem ipsum")
+  }
 }
