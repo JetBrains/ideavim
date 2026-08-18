@@ -31,6 +31,7 @@ usual beta standards.
 
 ### Fixes:
 * Fixed [`gx`](https://vimhelp.org/pi_netrw.txt.html#netrw-gx) adding to the [jump list](https://vimhelp.org/motion.txt.html#jumplist) — pressing `gx` used to record the caret position as a jump and overwrite the [`'`](https://vimhelp.org/motion.txt.html#%27quote) mark, so a following [`CTRL-O`](https://vimhelp.org/motion.txt.html#CTRL-O) landed back on the caret's own line instead of returning to the previous jump. As in Vim, `gx` opens the URL without touching the jump list
+* Fixed the [word text objects](https://vimhelp.org/motion.txt.html#v_iw) throwing an exception when they reached the very start of the file — growing a right-to-left Visual selection with `iw`, `aw`, `iW` or `aW` looks one character back to decide where the previous word begins, and at offset 0 there is no such character. Starting on the second character of the file and pressing `v`, `h`, `iw` now selects back to the start of the file instead of reporting an internal error
 
 ### Merged PRs:
 * [2001](https://github.com/JetBrains/ideavim/pull/2001) by [1grzyb1](https://github.com/1grzyb1): VIM-934 support for wildmenu option
