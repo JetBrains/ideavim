@@ -23,7 +23,7 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-## To Be Released
+## 2.46.0, 2026-08-18
 
 ### Features:
 * [VIM-301](https://youtrack.jetbrains.com/issue/VIM-301) Added built-in [`YankRing`](https://github.com/vim-scripts/YankRing.vim) extension — enable it with `Plug 'YankRing.vim'` to keep a history of everything you yank, delete or change. Right after a paste, `<C-P>` and `<C-N>` swap the pasted text for the previous or next entry in the ring, so you can reach for something you copied a few yanks ago without going back for it; this works after `p`, `P`, `gp`, `gP` and the `]p`/`[p`/`]P`/`[P` variants. `:YRShow` lists the ring, `:YRClear` empties it, `:YRReplace {offset}` cycles by an explicit offset, and `let g:yankring_max_history = {n}` sets how many entries are kept (default 100)
