@@ -175,13 +175,13 @@ class InsertWordUnderCaretAction : InsertWordUnderCaretActionBase(isBigWord = fa
 
     // Get the word under the caret on the command line, so we can avoid duplicating a prefix.
     // To match Vim behaviour, we get word, not WORD
-    val offset = injector.searchHelper.findNextWord(commandLine.text, editor, commandLine.caret.offset, -1, bigWord = false)
-    val prefix = commandLine.text.substring(offset, commandLine.caret.offset)
+    val wordStart = injector.searchHelper.findNextWord(commandLine.text, editor, offset, -1, bigWord = false)
+    val prefix = commandLine.text.substring(wordStart, offset)
     if (prefix.isNotEmpty() && text.startsWith(prefix, ignoreCase = true)) {
-      commandLine.insertText(commandLine.caret.offset, text.substring(prefix.length))
+      commandLine.insertText(offset, text.substring(prefix.length))
     }
     else {
-      commandLine.insertText(commandLine.caret.offset, text)
+      commandLine.insertText(offset, text)
     }
   }
 }
