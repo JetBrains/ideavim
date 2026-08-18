@@ -31,7 +31,7 @@ data class ClearJumpsCommand(val range: Range, val modifier: CommandModifier, va
     context: ExecutionContext,
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
-    injector.jumpService.clearJumps(editor.projectId)
+    injector.jumpService.clearJumps(editor.jumpListId)
     return ExecutionResult.Success
   }
 }

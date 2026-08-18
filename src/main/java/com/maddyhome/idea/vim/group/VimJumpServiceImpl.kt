@@ -38,6 +38,9 @@ import org.jdom.Element
 internal class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateComponent<Element?> {
   companion object {
     private val logger = vimLogger<VimJumpServiceImpl>()
+
+    /** Separates the project id from the window id in a window scoped jump list's scope id */
+    private const val WINDOW_SCOPE_SEPARATOR = '/'
   }
 
   override var lastJumpTimeStamp: Long = 0
@@ -57,7 +60,7 @@ internal class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateCompone
   // (e.g., recent files), than for the 100 jumps (max number of records) to consume enough space to be noticeable.
   override fun getState(): Element {
     val projectsElem = Element("projects")
-    for ((project, jumps) in projectToJumps) {
+    for ((project, jumps) in jumpsByProject()) {
       val projectElement = Element("project").setAttribute("id", project)
       for (jump in jumps) {
         val jumpElem = Element("jump")
@@ -73,6 +76,25 @@ internal class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateCompone
       projectsElem.addContent(projectElement)
     }
     return projectsElem
+  }
+
+  /**
+   * The jump lists to persist, keyed by project id
+   *
+   * With the 'windowjumps' option set, a jump list is scoped to a window and its scope id is `"<projectId>/<windowId>"`
+   * (see [com.maddyhome.idea.vim.newapi.IjVimEditor.jumpListId]). Window ids only mean something within a session, so
+   * persisting them would write records that can never be read back, and which would accumulate over time. Instead we
+   * save one list per project, taken from the most recently used window - the closest thing to Vim's single `viminfo`
+   * jump list. [scopeToJumps] iterates from least to most recently updated, so later entries win.
+   *
+   * Without 'windowjumps' the scope id *is* the project id, and this grouping is a no-op.
+   */
+  private fun jumpsByProject(): Map<String, List<Jump>> {
+    val result = LinkedHashMap<String, List<Jump>>()
+    for ((scopeId, jumps) in scopeToJumps) {
+      result[scopeId.substringBefore(WINDOW_SCOPE_SEPARATOR)] = jumps
+    }
+    return result
   }
 
   override fun loadLegacyState(element: Any) {
@@ -98,7 +120,7 @@ internal class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateCompone
         logger.debug("jumps=$jumps")
       }
       val projectId = projectElement.getAttributeValue("id")
-      projectToJumps[projectId] = jumps
+      scopeToJumps[projectId] = jumps
     }
   }
 }

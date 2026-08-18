@@ -62,6 +62,7 @@ import com.maddyhome.idea.vim.api.VimStorageService
 import com.maddyhome.idea.vim.api.VimStringParser
 import com.maddyhome.idea.vim.api.VimTemplateManager
 import com.maddyhome.idea.vim.api.VimVisualMotionGroup
+import com.maddyhome.idea.vim.api.VimWindowIdService
 import com.maddyhome.idea.vim.api.VimrcFileState
 import com.maddyhome.idea.vim.api.VimscriptExecutor
 import com.maddyhome.idea.vim.api.VimscriptFunctionService
@@ -179,6 +180,8 @@ internal class IjVimInjector : VimInjectorBase() {
   override val markService: VimMarkService
     get() = service()
   override val jumpService: VimJumpService
+    get() = service()
+  override val windowIdService: VimWindowIdService
     get() = service()
   override val application: VimApplication
     get() = service()

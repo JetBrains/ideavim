@@ -569,7 +569,7 @@ object VimListenerManager {
 
         // Keep a track of the owner of the opening editor, so we can compare later, potentially after the opening
         // editor has been closed. This is nullable, but should always have a value
-        val owningEditorWindow = getOwningEditorWindow(openingEditor)
+        val owningEditorWindow = EditorHelper.getOwningEditorWindow(openingEditor)
 
         event.editor.putUserData(
           openingEditorKey,
@@ -675,7 +675,7 @@ object VimListenerManager {
           if (editor.vimInitialised) return@let
 
           val openingEditor = editor.removeUserData(openingEditorKey)
-          val owningEditorWindow = getOwningEditorWindow(editor)
+          val owningEditorWindow = EditorHelper.getOwningEditorWindow(editor)
           val isInSameSplit = owningEditorWindow == openingEditor?.owningEditorWindow
 
           // Sometimes the platform will not reuse a tab when you expect it to, e.g. when reuse tabs is enabled and
@@ -702,13 +702,6 @@ object VimListenerManager {
       }
     }
 
-    private fun getOwningEditorWindow(editor: Editor) = editor.project?.let { p ->
-      FileEditorManagerEx.getInstanceEx(p).windows.find { editorWindow ->
-        editorWindow.allComposites.any { composite ->
-          composite.allEditors.filterIsInstance<TextEditor>().any { it.editor == editor }
-        }
-      }
-    }
   }
 
 

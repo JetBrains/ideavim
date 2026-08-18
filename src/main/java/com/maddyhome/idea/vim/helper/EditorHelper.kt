@@ -101,6 +101,7 @@ internal fun Editor.isPrimaryEditor(): Boolean {
   return fileEditorManager.allEditors.any { fileEditor -> this == EditorUtil.getEditorEx(fileEditor) }
 }
 
+
 /**
  * Checks if the editor should be treated like a terminal. I.e. switch to Insert mode automatically
  *
