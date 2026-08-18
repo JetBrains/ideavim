@@ -39,6 +39,7 @@ open class GlobalOptions(scope: OptionAccessScope) : OptionsPropertiesBase(scope
   var more: Boolean by optionProperty(Options.more)
   var operatorfunc: String by optionProperty(Options.operatorfunc)
   var scrolljump: Int by optionProperty(Options.scrolljump)
+  var windowjumps: Boolean by optionProperty(Options.windowjumps)
   var selection: String by optionProperty(Options.selection)
   val selectmode: StringListOptionValue by optionProperty(Options.selectmode)
   var shell: String by optionProperty(Options.shell)

@@ -48,6 +48,41 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
   }
 
   @Test
+  fun `test windowjumps is off by default`() {
+    configureMainWindow()
+
+    assertCommandOutput("set windowjumps?", "nowindowjumps")
+  }
+
+  @Test
+  fun `test windowjumps can be enabled`() {
+    configureMainWindow()
+
+    enterCommand("set windowjumps")
+
+    assertCommandOutput("set windowjumps?", "  windowjumps")
+  }
+
+  @Test
+  fun `test windowjumps can be disabled again`() {
+    configureMainWindow()
+
+    enterCommand("set windowjumps")
+    enterCommand("set nowindowjumps")
+
+    assertCommandOutput("set windowjumps?", "nowindowjumps")
+  }
+
+  @Test
+  fun `test windowjumps is a global option`() {
+    configureMainWindow()
+
+    enterCommand("setlocal windowjumps")
+
+    assertCommandOutput("setglobal windowjumps?", "  windowjumps")
+  }
+
+  @Test
   fun `test jump list is shared between splits`() {
     val mainWindow = configureMainWindow()
     enterSearch("sodden")
