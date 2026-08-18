@@ -80,15 +80,15 @@ open class EditorAccessorImpl(
     get() = injector.markService.getAllGlobalMarks().map { it.toApiMark() }.toSet()
 
   override fun getJump(count: Int): Jump? {
-    val jump = injector.jumpService.getJump(vimEditor.projectId, count)
+    val jump = injector.jumpService.getJump(vimEditor.jumpListId, count)
     return jump?.toApiJump()
   }
 
   override val jumps: List<Jump>
-    get() = injector.jumpService.getJumps(vimEditor.projectId).map { it.toApiJump() }
+    get() = injector.jumpService.getJumps(vimEditor.jumpListId).map { it.toApiJump() }
 
   override val currentJumpIndex: Int
-    get() = injector.jumpService.getJumpSpot(vimEditor.projectId)
+    get() = injector.jumpService.getJumpSpot(vimEditor.jumpListId)
 
   override fun scrollCaretIntoView() {
     return injector.scroll.scrollCaretIntoView(vimEditor)

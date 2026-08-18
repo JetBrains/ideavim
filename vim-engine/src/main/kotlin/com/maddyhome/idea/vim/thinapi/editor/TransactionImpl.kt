@@ -110,21 +110,21 @@ class TransactionImpl(
     val protocol = jump.filepath.protocol
     val filePath = jump.filepath.getFilePath()
     val engineJump = EngineJump(jump.line, jump.col, filePath, protocol)
-    injector.jumpService.addJump(vimEditor.projectId, engineJump, reset)
+    injector.jumpService.addJump(vimEditor.jumpListId, engineJump, reset)
   }
 
   override fun removeJump(jump: Jump) {
     val protocol = jump.filepath.protocol
     val filePath = jump.filepath.getFilePath()
     val engineJump = EngineJump(jump.line, jump.col, filePath, protocol)
-    injector.jumpService.removeJump(vimEditor.projectId, engineJump)
+    injector.jumpService.removeJump(vimEditor.jumpListId, engineJump)
   }
 
   override fun dropLastJump() {
-    injector.jumpService.dropLastJump(vimEditor.projectId)
+    injector.jumpService.dropLastJump(vimEditor.jumpListId)
   }
 
   override fun clearJumps() {
-    injector.jumpService.clearJumps(vimEditor.projectId)
+    injector.jumpService.clearJumps(vimEditor.jumpListId)
   }
 }

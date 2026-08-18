@@ -274,7 +274,7 @@ class CaretTransactionImpl(
     val protocol = virtualFile.protocol
     val position = vimEditor.offsetToBufferPosition(vimCaret.offset)
     val jump = EngineJump(position.line, position.column, path, protocol)
-    injector.jumpService.addJump(vimEditor.projectId, jump, reset)
+    injector.jumpService.addJump(vimEditor.jumpListId, jump, reset)
   }
 
   override fun saveJumpLocation() {

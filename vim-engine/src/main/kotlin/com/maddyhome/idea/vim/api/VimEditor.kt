@@ -380,6 +380,8 @@ interface VimEditor {
     }
   }
 
+  val jumpListId: String get() = projectId
+
   /**
    * Toggles the insert/overwrite state. If currently insert, goto replace mode. If currently replace, goto insert
    * mode.

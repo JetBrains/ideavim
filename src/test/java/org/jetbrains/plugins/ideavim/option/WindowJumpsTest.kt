@@ -17,10 +17,6 @@ import org.junit.jupiter.api.Test
 
 /**
  * Tests the scope of the jump list - one list shared by the whole project, or one list per window
- *
- * IdeaVim keeps a single jump list per project, while Vim keeps one per window. These tests describe the current,
- * project-wide behaviour, which is what the (not yet implemented) `'windowjumps'` option will keep as its default.
- * See VIM-window-jumps-plan.md.
  */
 @TestWithoutNeovim(
   reason = SkipNeovimReason.SEE_DESCRIPTION,
@@ -158,6 +154,170 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
       """I found it in a legendary land
         |all rocks and lavender and tufted grass,
         |where it was settled on some ${c}sodden sand
+        |hard by the torrent of a mountain pass.
+        |
+        |The features it combines mark it as new
+        |to science: shape and shade -- the special tinge,
+        |akin to moonlight, tempering its blue,
+        |the dingy underside, the checquered fringe.
+      """.trimMargin(),
+    )
+  }
+
+
+  @Test
+  fun `test jumps recorded in one split do not appear in the other when windowjumps is set`() {
+    val mainWindow = configureMainWindow()
+    enterCommand("set windowjumps")
+    val splitWindow = openSplitWindow(mainWindow)
+
+    selectWindow(mainWindow)
+    enterSearch("sodden")
+    enterSearch("shape")
+
+    selectWindow(splitWindow)
+
+    assertCommandOutput("jumps", " jump line  col file/text\n>")
+  }
+
+  @Test
+  fun `test jumps recorded in a split stay in that split when windowjumps is set`() {
+    val mainWindow = configureMainWindow()
+    enterCommand("set windowjumps")
+    val splitWindow = openSplitWindow(mainWindow)
+
+    selectWindow(splitWindow)
+    typeText("G")
+    enterSearch("torrent")
+
+    selectWindow(mainWindow)
+
+    assertCommandOutput("jumps", " jump line  col file/text\n>")
+  }
+
+  @Test
+  fun `test control-O does not use the other split's history when windowjumps is set`() {
+    val mainWindow = configureMainWindow()
+    enterCommand("set windowjumps")
+    val splitWindow = openSplitWindow(mainWindow)
+
+    selectWindow(mainWindow)
+    enterSearch("sodden")
+    enterSearch("shape")
+
+    selectWindow(splitWindow)
+    typeText("<C-O>")
+
+    // This split has no history of its own, so there is nowhere to jump back to and the caret stays put
+    assertState(
+      """I found ${c}it in a legendary land
+        |all rocks and lavender and tufted grass,
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.
+        |
+        |The features it combines mark it as new
+        |to science: shape and shade -- the special tinge,
+        |akin to moonlight, tempering its blue,
+        |the dingy underside, the checquered fringe.
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test clearjumps only clears the current window when windowjumps is set`() {
+    val mainWindow = configureMainWindow()
+    enterCommand("set windowjumps")
+    val splitWindow = openSplitWindow(mainWindow)
+
+    selectWindow(mainWindow)
+    enterSearch("sodden")
+    enterSearch("shape")
+
+    selectWindow(splitWindow)
+    typeText("G")
+    enterSearch("torrent")
+    enterCommand("clearjumps")
+
+    selectWindow(mainWindow)
+
+    assertCommandOutput(
+      "jumps",
+      """ jump line  col file/text
+        |   2     1    8 I found it in a legendary land
+        |   1     3   29 where it was settled on some sodden sand
+        |>
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test jump list survives switching to another buffer in the same split when windowjumps is set`() {
+    val mainWindow = configureMainWindow()
+    enterCommand("set windowjumps")
+    enterSearch("sodden")
+    enterSearch("shape")
+
+    val mainWindowPath = mainWindow.virtualFile!!.path
+    val otherBufferWindow = openNewBufferWindow("bbb.txt")
+    selectWindow(otherBufferWindow)
+
+    // A Vim window keeps its jump list when the buffer it shows changes. Note that a new buffer in the same split is a
+    // new IntelliJ editor, so this only holds while the list is scoped to the editor *window*
+    assertCommandOutput(
+      "jumps",
+      """ jump line  col file/text
+        |   2     1    8 $mainWindowPath
+        |   1     3   29 $mainWindowPath
+        |>
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test control-I returns to the position control-O jumped from when windowjumps is set`() {
+    val mainWindow = configureMainWindow()
+    enterCommand("set windowjumps")
+    val splitWindow = openSplitWindow(mainWindow)
+
+    selectWindow(splitWindow)
+    typeText("G")
+    enterSearch("torrent")
+    typeText("<C-O>")
+    typeText("<C-I>")
+
+    assertState(
+      """I found it in a legendary land
+        |all rocks and lavender and tufted grass,
+        |where it was settled on some sodden sand
+        |hard by the ${c}torrent of a mountain pass.
+        |
+        |The features it combines mark it as new
+        |to science: shape and shade -- the special tinge,
+        |akin to moonlight, tempering its blue,
+        |the dingy underside, the checquered fringe.
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test control-I does not use the other split's history when windowjumps is set`() {
+    val mainWindow = configureMainWindow()
+    enterCommand("set windowjumps")
+    val splitWindow = openSplitWindow(mainWindow)
+
+    selectWindow(mainWindow)
+    enterSearch("sodden")
+    enterSearch("shape")
+    typeText("<C-O>")
+
+    // The other split has somewhere to jump forward to, this one has no history at all
+    selectWindow(splitWindow)
+    typeText("<C-I>")
+
+    assertState(
+      """I found ${c}it in a legendary land
+        |all rocks and lavender and tufted grass,
+        |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.
         |
         |The features it combines mark it as new

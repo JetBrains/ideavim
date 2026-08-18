@@ -42,6 +42,7 @@ import com.maddyhome.idea.vim.api.VimVirtualFile
 import com.maddyhome.idea.vim.api.VimVisualPosition
 import com.maddyhome.idea.vim.api.VirtualBufferKind
 import com.maddyhome.idea.vim.api.getVisualStartLine
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.IndentConfig
 import com.maddyhome.idea.vim.common.LiveRange
@@ -83,6 +84,12 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase() {
     get() = editor.replaceMask
     set(value) {
       editor.replaceMask = value
+    }
+  override val jumpListId: String
+    get() {
+      if (!injector.globalOptions().windowjumps) return projectId
+      val windowId = injector.windowIdService.getWindowId(this) ?: return projectId
+      return "$projectId/$windowId"
     }
 
   override fun updateMode(mode: Mode) {

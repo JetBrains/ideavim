@@ -13,6 +13,12 @@ import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.ex.util.EditorUtil;
 import com.intellij.openapi.editor.impl.EditorImpl;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.fileEditor.FileEditor;
+import com.intellij.openapi.fileEditor.TextEditor;
+import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
+import com.intellij.openapi.fileEditor.impl.EditorComposite;
+import com.intellij.openapi.fileEditor.impl.EditorWindow;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.registry.Registry;
@@ -59,6 +65,22 @@ public class EditorHelper {
       return area;
     }
     return new Rectangle(area.x, area.y + stickyLinesHeight, area.width, max(0, area.height - stickyLinesHeight));
+  }
+
+  public static @Nullable EditorWindow getOwningEditorWindow(@NotNull Editor editor) {
+    final Project project = editor.getProject();
+    if (project == null) return null;
+
+    for (EditorWindow editorWindow : FileEditorManagerEx.getInstanceEx(project).getWindows()) {
+      for (EditorComposite composite : editorWindow.getAllComposites()) {
+        for (FileEditor fileEditor : composite.getAllEditors()) {
+          if (fileEditor instanceof TextEditor textEditor && textEditor.getEditor() == editor) {
+            return editorWindow;
+          }
+        }
+      }
+    }
+    return null;
   }
 
   public static boolean scrollVertically(@NotNull Editor editor, int verticalOffset) {

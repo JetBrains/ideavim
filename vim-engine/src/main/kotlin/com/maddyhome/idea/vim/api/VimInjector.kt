@@ -136,6 +136,8 @@ interface VimInjector {
 
   val psiService: VimPsiService
 
+  val windowIdService: VimWindowIdService
+
   val vimscriptExecutor: VimscriptExecutor
 
   val vimscriptParser: VimscriptParser

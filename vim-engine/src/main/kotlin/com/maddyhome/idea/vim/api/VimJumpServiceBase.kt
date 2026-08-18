@@ -11,37 +11,36 @@ package com.maddyhome.idea.vim.api
 import com.maddyhome.idea.vim.mark.Jump
 
 abstract class VimJumpServiceBase : VimJumpService {
-  protected val projectToJumps: MutableMap<String, MutableList<Jump>> = mutableMapOf()
-  protected val projectToJumpSpot: MutableMap<String, Int> = mutableMapOf()
+  protected val scopeToJumps: MutableMap<String, MutableList<Jump>> = mutableMapOf()
+  protected val scopeToJumpSpot: MutableMap<String, Int> = mutableMapOf()
 
-  override fun getJump(projectId: String, count: Int): Jump? {
-    // Update timestamp to suppress Platform's recentPlaceAdded events caused by
-    // Ctrl-O/Ctrl-I cursor movements (see lastJumpTimeStamp doc).
-    // Small margin accounts for PlaceInfo being created slightly after this call.
+  override fun getJump(scopeId: String, count: Int): Jump? {
     lastJumpTimeStamp = System.currentTimeMillis() + JUMP_NAVIGATION_SUPPRESS_MS
-    val jumps = projectToJumps[projectId] ?: mutableListOf()
-    projectToJumpSpot.putIfAbsent(projectId, -1)
-    val index = jumps.size - 1 - (projectToJumpSpot[projectId]!! - count)
+    val jumps = scopeToJumps[scopeId] ?: mutableListOf()
+    scopeToJumpSpot.putIfAbsent(scopeId, -1)
+    val index = jumps.size - 1 - (scopeToJumpSpot[scopeId]!! - count)
     return jumps.getOrNull(index)?.also {
-      projectToJumpSpot[projectId] = projectToJumpSpot[projectId]!! - count
+      scopeToJumpSpot[scopeId] = scopeToJumpSpot[scopeId]!! - count
     }
   }
 
-  override fun getJumps(projectId: String): List<Jump> {
-    return projectToJumps[projectId] ?: emptyList()
+  override fun getJumps(scopeId: String): List<Jump> {
+    return scopeToJumps[scopeId] ?: emptyList()
   }
 
-  override fun getJumpSpot(projectId: String): Int {
-    return projectToJumpSpot[projectId] ?: -1
+  override fun getJumpSpot(scopeId: String): Int {
+    return scopeToJumpSpot[scopeId] ?: -1
   }
 
-  override fun addJump(projectId: String, jump: Jump, reset: Boolean) {
+  override fun addJump(scopeId: String, jump: Jump, reset: Boolean) {
     lastJumpTimeStamp = System.currentTimeMillis() + JUMP_NAVIGATION_SUPPRESS_MS
-    val jumps = projectToJumps.getOrPut(projectId) { mutableListOf() }
+    // Remove and re-insert, so that the map iterates from least to most recently updated scope
+    val jumps = scopeToJumps.remove(scopeId) ?: mutableListOf()
     jumps.removeIf { it.filepath == jump.filepath && it.line == jump.line }
     jumps.add(jump)
+    scopeToJumps[scopeId] = jumps
 
-    projectToJumpSpot[projectId] = if (reset) -1 else (projectToJumpSpot[projectId] ?: -1) + 1
+    scopeToJumpSpot[scopeId] = if (reset) -1 else (scopeToJumpSpot[scopeId] ?: -1) + 1
 
     if (jumps.size > SAVE_JUMP_COUNT) {
       jumps.removeFirst()
@@ -54,30 +53,30 @@ abstract class VimJumpServiceBase : VimJumpService {
     includeCurrentCommandAsNavigation(editor)
   }
 
-  override fun removeJump(projectId: String, jump: Jump) {
-    projectToJumps[projectId]?.removeIf { it == jump }
+  override fun removeJump(scopeId: String, jump: Jump) {
+    scopeToJumps[scopeId]?.removeIf { it == jump }
   }
 
-  override fun dropLastJump(projectId: String) {
-    projectToJumps[projectId]?.removeLastOrNull()
+  override fun dropLastJump(scopeId: String) {
+    scopeToJumps[scopeId]?.removeLastOrNull()
   }
 
-  override fun clearJumps(projectId: String) {
-    projectToJumps.remove(projectId)
-    projectToJumpSpot.remove(projectId)
+  override fun clearJumps(scopeId: String) {
+    scopeToJumps.remove(scopeId)
+    scopeToJumpSpot.remove(scopeId)
   }
 
-  override fun updateJumpsFromInsert(projectId: String, startOffset: Int, length: Int) {
+  override fun updateJumpsFromInsert(scopeId: String, startOffset: Int, length: Int) {
     TODO("Not yet implemented")
   }
 
-  override fun updateJumpsFromDelete(projectId: String, startOffset: Int, length: Int) {
+  override fun updateJumpsFromDelete(scopeId: String, startOffset: Int, length: Int) {
     TODO("Not yet implemented")
   }
 
   override fun resetJumps() {
-    projectToJumps.clear()
-    projectToJumpSpot.clear()
+    scopeToJumps.clear()
+    scopeToJumpSpot.clear()
   }
 
   companion object {
