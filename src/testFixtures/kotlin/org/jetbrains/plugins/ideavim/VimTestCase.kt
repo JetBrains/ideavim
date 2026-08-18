@@ -754,7 +754,7 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
   }
 
   /** Clear the current output panel, on the EDT. See [readOutputPanel] */
-  private fun clearOutputPanel() {
+  protected fun clearOutputPanel() {
     ApplicationManager.getApplication().invokeAndWait {
       injector.outputPanel.getCurrentOutputPanel()?.clearText()
     }
