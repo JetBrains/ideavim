@@ -378,80 +378,65 @@
     </p>
     <p class="out">Here's what landed in <span class="v">__VERSION__</span>.</p>
 
-    <!-- textobj-user — the star -->
+    <!-- YankRing — the star -->
     <div class="section">
-      <p class="kicker">new plugin · text objects</p>
-      <h2>textobj-user — build your own text objects</h2>
-      <p>The bundled <strong>textobj-user</strong> extension lets you declare custom text objects straight from
-        your <code>~/.ideavimrc</code> — no plugin code required. Describe a pattern (or a head/tail delimiter
-        pair) and the keys that select it, and IdeaVim wires up the matching <kbd>i</kbd>/<kbd>a</kbd> objects
-        and motions for you.</p>
-      <pre><span class="str">Plug 'kana/vim-textobj-user'</span>
+      <p class="kicker">new plugin · yank history</p>
+      <h2>YankRing — every yank you make is kept</h2>
+      <p>The bundled <strong>YankRing</strong> extension keeps a history of everything you yank, delete or
+        change. Right after a paste, <kbd>&lt;C-P&gt;</kbd> and <kbd>&lt;C-N&gt;</kbd> swap the pasted text for
+        the previous or next entry in the ring — so you can reach for something you copied a few yanks ago
+        without going back for it. It works after <kbd>p</kbd>, <kbd>P</kbd>, <kbd>gp</kbd>, <kbd>gP</kbd> and
+        the <code>]p</code> / <code>[p</code> / <code>]P</code> / <code>[P</code> variants.</p>
+      <pre><span class="str">Plug 'YankRing.vim'</span>
 
-<span class="cm">" a spec maps a name to a pattern and the keys that select it</span>
-call textobj#user#plugin(<span class="str">'datetime'</span>, {
-\   <span class="str">'date'</span>: {
-\     <span class="str">'pattern'</span>: <span class="str">'\&lt;\d\d\d\d-\d\d-\d\d\&gt;'</span>,
-\     <span class="str">'select'</span>: [<span class="str">'ad'</span>, <span class="str">'id'</span>],
-\   },
-\ })
-<span class="cm">" now 'dad' deletes a date like 2013-03-16, and 'cid' changes it</span></pre>
-      <p class="note">Objects support <code>select-a</code>/<code>select-i</code>, next/previous motions, a
-        charwise/linewise/blockwise <code>region-type</code>, and remappable
-        <code>&lt;Plug&gt;</code> mappings.</p>
+<span class="cm">" right after pasting, cycle the paste through your yank history</span>
+<span class="key">&lt;C-P&gt;</span>   <span class="cm">" replace it with the previous entry</span>
+<span class="key">&lt;C-N&gt;</span>   <span class="cm">" ... or the next one</span>
+
+:YRShow        <span class="cm">" list the ring</span>
+:YRClear       <span class="cm">" empty it</span>
+:YRReplace 3   <span class="cm">" cycle by an explicit offset</span>
+<span class="str">let g:yankring_max_history = 100</span>   <span class="cm">" how many entries to keep</span></pre>
     </div>
 
-    <!-- forced motion -->
+    <!-- modeless selection -->
     <div class="section">
-      <p class="kicker">operators · motions</p>
-      <h2>Force a motion's shape mid-command</h2>
-      <p>Slot <kbd>v</kbd>, <kbd>V</kbd>, or <kbd>&lt;C-V&gt;</kbd> between an operator and its motion to force
-        the range's shape. <kbd>v</kbd> forces charwise and flips the motion's inclusive/exclusive nature,
-        <kbd>V</kbd> forces linewise, and <kbd>&lt;C-V&gt;</kbd> forces blockwise.</p>
-      <pre><span class="key">dvw</span>       <span class="cm">" charwise — includes the landing char</span>
-<span class="key">dv$</span>       <span class="cm">" charwise — leaves the last char</span>
-<span class="key">dVe</span>       <span class="cm">" linewise — deletes the whole line</span>
-<span class="key">d&lt;C-V&gt;j</span>   <span class="cm">" blockwise — deletes a vertical block</span></pre>
+      <p class="kicker">mouse · selection</p>
+      <h2>Select with the mouse where Vim doesn't own it</h2>
+      <p>For the modes your <code>'mouse'</code> option leaves out, dragging with the left button now makes a
+        <strong>modeless selection</strong>: the text is selected so you can copy it, but the caret stays put,
+        Visual mode doesn't start, and operators won't act on it. It disappears as soon as you type a command
+        or start another selection.</p>
+      <pre><span class="str">set mouse=n</span>   <span class="cm">" Vim handles the mouse in Normal mode only —</span>
+              <span class="cm">" a drag anywhere else just selects text</span></pre>
+      <p class="note">Turning the mouse off for a mode no longer takes the IDE's mouse features with it: the
+        context menu, gutter clicks, middle-click paste and <kbd>Ctrl</kbd>/<kbd>Alt</kbd>/<kbd>Shift</kbd>
+        gestures keep working, since only a plain left-button click over text is Vim's to interpret.</p>
     </div>
 
-    <!-- insert-mode completion -->
+    <!-- CurSearch -->
     <div class="section">
-      <p class="kicker">insert mode · completion</p>
-      <h2>Line and file-path completion with CTRL-X</h2>
-      <p>Vim's <kbd>&lt;C-X&gt;</kbd> completion submode arrives in Insert mode. Start it with
-        <kbd>&lt;C-X&gt;</kbd>, then complete whole lines from the current buffer or file paths from disk.</p>
-      <pre><span class="key">&lt;C-X&gt;&lt;C-L&gt;</span>   <span class="cm">" complete the current line from matching lines</span>
-<span class="key">&lt;C-X&gt;&lt;C-F&gt;</span>   <span class="cm">" complete a file path from the file system</span></pre>
+      <p class="kicker">search · highlighting</p>
+      <h2>See which match you're actually on</h2>
+      <p>The match under the caret is now highlighted differently from all the others. After <code>/lorem</code>
+        or <kbd>n</kbd>, the match you land on is drawn with a box around it while the rest keep the plain
+        search highlight, and the box follows you as you move between matches. Previously only the
+        <code>'incsearch'</code> preview looked like that, so once the search was accepted every match became
+        indistinguishable.</p>
+      <pre><span class="str">set hlsearch</span>
+<span class="key">/lorem</span>   <span class="cm">" the match you land on gets the box; n and N move it</span></pre>
     </div>
 
-    <!-- keymap · language mappings -->
+    <!-- :stopinsert -->
     <div class="section">
-      <p class="kicker">input · keyboard layouts</p>
-      <h2>Type another language without switching layouts</h2>
-      <p>The new <code>'keymap'</code> option loads a set of language mappings so you can type non-English
-        text while your system keyboard stays on its usual layout. Choose one of the dozens of bundled
-        keymaps — from <code>russian-jcukenwin</code> to <code>greek</code>, <code>dvorak</code>, or
-        <code>accents</code> — or drop your own file into <code>~/.config/ideavim/keymap/</code>. The mappings
-        apply to typed text only while <code>'iminsert'</code> is on; toggle it any time with
-        <kbd>&lt;C-^&gt;</kbd> in Insert mode.</p>
-      <pre><span class="str">set keymap=russian-jcukenwin</span>   <span class="cm">" load a bundled keymap</span>
-<span class="str">set iminsert=1</span>                 <span class="cm">" enable it for typed text (or press &lt;C-^&gt;)</span></pre>
-      <p class="note">Also adds the <code>:loadkeymap</code> command and the <code>:lmap</code> /
-        <code>:lnoremap</code> / <code>:lunmap</code> / <code>:lmapclear</code> language-mapping commands.</p>
-    </div>
-
-    <!-- spelling -->
-    <div class="section">
-      <p class="kicker">spelling · dictionary</p>
-      <h2>Fix a misspelling from Normal mode</h2>
-      <p>Vim's spelling commands now talk to the IDE's own spell checker. Put the caret on a word and press
-        <kbd>zg</kbd> to accept it as correctly spelled, <kbd>zw</kbd> to take it back out of your dictionary,
-        or <kbd>z=</kbd> to choose from a list of suggested replacements.</p>
-      <pre><span class="key">zg</span>   <span class="cm">" mark the word under the caret as correct</span>
-<span class="key">zw</span>   <span class="cm">" remove it from the dictionary again</span>
-<span class="key">z=</span>   <span class="cm">" pick a replacement from the suggestions</span></pre>
-      <p class="note">Accepted words go into the IDE's spelling dictionary, so the rest of the IDE stops
-        flagging them too.</p>
+      <p class="kicker">ex commands · autocommands</p>
+      <h2>Always come back to Normal mode</h2>
+      <p>The new <code>:stopinsert</code> command leaves Insert or Replace mode as if you had pressed
+        <kbd>Esc</kbd>, and does nothing in any other mode. It is meant for an autocommand, which is Vim's
+        answer to "put me back in Normal mode whenever I switch files".</p>
+      <pre><span class="str">autocmd BufEnter * stopinsert</span>   <span class="cm">" back to Normal mode on every file you open</span></pre>
+      <p class="note">Leaving Insert mode is now something a handler has to ask for: the buffer and window
+        events no longer end an insert session merely because you registered an autocommand for them.</p>
     </div>
 
     <!-- Also worth a look -->
@@ -459,32 +444,16 @@ call textobj#user#plugin(<span class="str">'datetime'</span>, {
       <p class="kicker">also worth a look</p>
       <div class="grid">
         <div class="mini">
-          <h3>Jump matches while searching</h3>
-          <p>With <code>incsearch</code> on, press <kbd>&lt;C-G&gt;</kbd> to jump to the next match and
-            <kbd>&lt;C-T&gt;</kbd> to the previous one — without leaving the <kbd>/</kbd> or <kbd>?</kbd>
-            prompt.</p>
+          <h3>sethandler on the command line</h3>
+          <p>The new <code>c</code> mode letter says who owns a shortcut while the <kbd>:</kbd> command line is
+            active. <code>sethandler &lt;F2&gt; a:ide c:vim</code> gives it to the IDE everywhere except there,
+            which keeps a <code>cnoremap &lt;F2&gt; …</code> mapping working.</p>
         </div>
         <div class="mini">
-          <h3>Your .ideavimrc, anywhere</h3>
-          <p>Set the <code>IDEA_VIM_CUSTOM_VIMRC</code> environment variable to load your
-            <code>.ideavimrc</code> from a custom path instead of the default locations.</p>
-        </div>
-        <div class="mini">
-          <h3>Open the link under the caret</h3>
-          <p>Press <kbd>gx</kbd> in Normal mode to open the URL under the caret with your OS default handler —
-            any <code>scheme://</code> address works, and the program is overridable via
-            <code>g:netrw_browsex_viewer</code>.</p>
-        </div>
-        <div class="mini">
-          <h3>Write to another file</h3>
-          <p><code>:w {file}</code> saves the buffer to a new path, a range like <code>:1,2w out.txt</code>
-            writes only those lines, and <code>:w!</code> overwrites while plain <code>:w</code> refuses to
-            clobber an existing file.</p>
-        </div>
-        <div class="mini">
-          <h3>Vim in the Python console</h3>
-          <p>Normal mode, motions, and <kbd>Esc</kbd> now work in the Python console input, while the console
-            keeps handling <kbd>Enter</kbd>, the history keys, and the horizontal arrows.</p>
+          <h3>macOS key repeat, any time</h3>
+          <p>"Enable repeating keys in macOS on press and hold" is now a checkbox in Settings | Editor | Vim,
+            instead of a one-time question the first time IdeaVim started. macOS reads it at startup, so the IDE
+            asks to restart.</p>
         </div>
       </div>
     </div>
@@ -493,39 +462,66 @@ call textobj#user#plugin(<span class="str">'datetime'</span>, {
     <div class="section">
       <p class="kicker">polish &amp; fixes</p>
       <ul>
-        <li><strong>No more stray Visual mode after a refactor</strong> — with
-          <code>idearefactormode=keep</code>, a rename (or similar action) no longer leaves you in Visual mode;
-          the mode you were in beforehand is restored.
+        <li><strong>Backspace in Replace mode brings the text back</strong> — Vim remembers what each typed
+          character replaced, so <kbd>R</kbd>, <code>mushroom</code> and eight backspaces leave the original
+          word exactly as it was. <kbd>&lt;C-W&gt;</kbd> restores the characters it steps over too, rather than
+          deleting the word.
         </li>
-        <li><strong>Trailing <code>%</code> respects your range</strong> — running a command on a Visual
-          selection with a <code>%</code> appended (e.g. <code>:'&lt;,'&gt;%d</code>) no longer expands to the
-          whole file; the <code>%</code> is now ignored, matching Vim.
+        <li><strong>"Reformat on paste: None" is respected</strong> — a linewise paste no longer reindents the
+          pasted lines when you've turned that Smart Keys setting off, so <code>yyp</code> repeats the line as
+          it was written.
         </li>
-        <li><strong>Panels follow your theme</strong> — the <code>:</code> output panel and command line now
-          refresh their text colors when you switch the IDE theme or editor color scheme while they are open.
+        <li><strong><code>&lt;CR&gt;</code> survives <code>:execute</code></strong> —
+          <code>:exe "normal! iX\&lt;CR&gt;Y"</code> used to type only <code>X</code>; the Enter key now reaches
+          <code>:normal</code>, and a register built the same way (<code>let @q = "iX\&lt;CR&gt;Y\&lt;Esc&gt;"</code>)
+          inserts both lines.
         </li>
-        <li><strong><code>:s///g</code> on indented lines</strong> — a global substitute such as
-          <code>%s/Cinema/Other/g</code> now replaces every match on lines that start with tabs, not just the
-          first one.
+        <li><strong><code>:normal</code> gives your mode back</strong> — run from an autocommand while you are
+          typing, it executes its keys as Normal mode commands and returns you to Insert mode instead of
+          dropping you out of it.
         </li>
-        <li><strong>No crash while navigating methods</strong> — <kbd>[m</kbd> and <kbd>]m</kbd> no longer
-          crash when an element in the file structure has no text range.
+        <li><strong>Paragraph motions and the blank line between</strong> — <code>d}</code> no longer swallows
+          the blank line that separates two paragraphs, <code>y}</code> no longer yanks a trailing new line, and
+          <code>d}</code> / <code>y}</code> on the very first character of the file are linewise again.
         </li>
-        <li><strong>Caret after delete-to-end from <kbd>&lt;C-O&gt;</kbd></strong> — running <kbd>D</kbd>,
-          <code>d$</code>, or <code>d3w</code> after <kbd>&lt;C-O&gt;</kbd> now leaves the caret in the right
-          place when you return to Insert mode.
+        <li><strong>Word motions at the end of the file</strong> — <code>dw</code>, <code>dW</code> and
+          <code>de</code> on the last character of a file now delete it instead of doing nothing.
         </li>
-        <li><strong>Search lands on the match you stepped to</strong> — after walking through matches with
-          <kbd>&lt;C-G&gt;</kbd>/<kbd>&lt;C-T&gt;</kbd> during an incremental search, pressing <kbd>Enter</kbd>
-          now takes the caret to that match.
+        <li><strong>Motions across writing systems</strong> — a WORD is any run of non-blanks, so <kbd>E</kbd>
+          on <code>abcあいう def</code> lands on <code>う</code>; and non-ASCII punctuation ends a word, so
+          <kbd>w</kbd> on <code>foo—bar</code> stops at the em dash.
         </li>
-        <li><strong>Vimscript errors are no longer swallowed</strong> — parse errors in your config are shown
-          instead of failing quietly, and an error on the last line no longer discards the whole script.
+        <li><strong>Sentences and quotes</strong> — <code>)</code> no longer lands past the end of a file that
+          ends with a new line, <code>da"</code> treats a tab after the closing quote as trailing white space,
+          and a count for the inner quote object works (<code>d2i"</code> takes the quotes themselves).
         </li>
-        <li><strong>Literal square brackets in patterns</strong> — searches such as <code>/heap[</code>,
-          <code>/[[[</code>, or <code>/[a-z</code> work again: an unmatched <code>[</code> is a plain bracket,
-          and a <code>]</code> right after <code>[</code> or <code>[^</code> belongs to the collection (so
-          <code>/[]]</code> matches a <code>]</code>), just like Vim.
+        <li><strong>Counting matches with <code>:s</code></strong> — the <code>n</code> flag now only reports
+          how many matches there are (<code>:%s/foo/bar/n</code> → <code>2 matches on 2 lines</code>) and leaves
+          your text alone. A backslash delimiter no longer fails either: <code>:s\/new/</code> reuses the last
+          search pattern.
+        </li>
+        <li><strong>Regex corners</strong> — <code>\zs</code> and <code>\ze</code> in an alternative that
+          ultimately fails no longer move the match, a look-behind with alternatives of different lengths keeps
+          trying (<code>\%(a\|ab\)\@&lt;=c</code> matches in <code>abc</code>), and <code>\c</code> no longer
+          makes <code>[[:upper:]]</code> match lowercase.
+        </li>
+        <li><strong>A clean slate on startup</strong> — with <code>'hlsearch'</code> on, projects no longer
+          open with the previous session's search still highlighted.
+        </li>
+        <li><strong>Clipboard registers keep their type on Linux</strong> — a linewise yank stays linewise in
+          the <code>*</code> and <code>+</code> registers, so <code>yy</code> then <code>"*p</code> pastes on a
+          new line. And with <code>clipboard=unnamed</code>, pasting no longer overwrites the very register it
+          pasted from.
+        </li>
+        <li><strong>Vim in a console started from a file</strong> — a Python console launched with "Run file in
+          Python Console" is now recognised, so Normal mode, motions and <kbd>Esc</kbd> work in its input.
+        </li>
+        <li><strong>Autocommands ignore internal editors</strong> — the command-line window, the
+          <code>:substitute</code> preview and the control characters editor are an implementation detail, so
+          <code>autocmd BufEnter * …</code> no longer fires when one of them opens.
+        </li>
+        <li><strong>"See What's New" works in split mode</strong> — the release notes page now opens as
+          expected in the frontend/backend architecture used by remote development.
         </li>
       </ul>
     </div>
