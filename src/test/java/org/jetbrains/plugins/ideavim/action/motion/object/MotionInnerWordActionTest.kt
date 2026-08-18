@@ -349,6 +349,18 @@ class MotionInnerWordActionTest : VimTestCase() {
   }
 
   @Test
+  fun `test select word at start of file with existing right-to-left selection`() {
+    // Regression test: expanding a right-to-left selection at the very start of the file used to walk one character
+    // before the start of the text and throw IndexOutOfBoundsException
+    doTest(
+      listOf("v", "h", "iw"),
+      "Lo${c}rem ipsum dolor sit amet",
+      "${s}${c}Lor${se}em ipsum dolor sit amet",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
   fun `test select word from start of line with existing right-to-left selection`() {
     doTest(
       listOf("v", "h", "iw"),

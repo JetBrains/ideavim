@@ -789,6 +789,18 @@ class MotionOuterWordActionTest : VimTestCase() {
   }
 
   @Test
+  fun `test select outer word at start of file with existing right-to-left selection`() {
+    // Regression test: expanding a right-to-left selection while on the whitespace at the very start of the file used
+    // to walk one character before the start of the text and throw IndexOutOfBoundsException
+    doTest(
+      listOf("v", "h", "aw"),
+      " L${c}orem ipsum dolor sit amet",
+      "${s}${c} Lo${se}rem ipsum dolor sit amet",
+      Mode.VISUAL(SelectionType.CHARACTER_WISE),
+    )
+  }
+
+  @Test
   @VimBehaviorDiffers(shouldBeFixed = false, description = "neovim retuns column = 1 from the API because of some reason")
   fun `test select outer word with existing right-to-left selection selects rest of word and leading whitespace at start of line`() {
     doTest(
