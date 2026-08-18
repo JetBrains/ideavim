@@ -1,0 +1,135 @@
+/*
+ * Copyright 2003-2026 The IdeaVim authors
+ *
+ * Use of this source code is governed by an MIT-style
+ * license that can be found in the LICENSE.txt file or at
+ * https://opensource.org/licenses/MIT.
+ */
+
+package org.jetbrains.plugins.ideavim.option
+
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.editor.Editor
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
+import org.jetbrains.plugins.ideavim.VimSplitWindowTestCase
+import org.junit.jupiter.api.Test
+
+/**
+ * Tests the scope of the jump list - one list shared by the whole project, or one list per window
+ *
+ * IdeaVim keeps a single jump list per project, while Vim keeps one per window. These tests describe the current,
+ * project-wide behaviour, which is what the (not yet implemented) `'windowjumps'` option will keep as its default.
+ * See VIM-window-jumps-plan.md.
+ */
+@TestWithoutNeovim(
+  reason = SkipNeovimReason.SEE_DESCRIPTION,
+  description = "These tests need more than one window showing the same buffer. Neovim testing drives a single editor, " +
+    "so there is nothing to compare split specific behaviour against.",
+)
+class WindowJumpsTest : VimSplitWindowTestCase() {
+  private val loremText = """I found ${c}it in a legendary land
+    |all rocks and lavender and tufted grass,
+    |where it was settled on some sodden sand
+    |hard by the torrent of a mountain pass.
+    |
+    |The features it combines mark it as new
+    |to science: shape and shade -- the special tinge,
+    |akin to moonlight, tempering its blue,
+    |the dingy underside, the checquered fringe.
+  """.trimMargin()
+
+  private fun configureMainWindow(): Editor {
+    var editor: Editor? = null
+    ApplicationManager.getApplication().invokeAndWait {
+      editor = configureByText(loremText)
+    }
+    return editor!!
+  }
+
+  @Test
+  fun `test jump list is shared between splits`() {
+    val mainWindow = configureMainWindow()
+    enterSearch("sodden")
+    enterSearch("shape")
+
+    val splitWindow = openSplitWindow(mainWindow)
+    selectWindow(splitWindow)
+
+    assertCommandOutput(
+      "jumps",
+      """ jump line  col file/text
+        |   2     1    8 I found it in a legendary land
+        |   1     3   29 where it was settled on some sodden sand
+        |>
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test jumps recorded in a split are visible in the other split`() {
+    val mainWindow = configureMainWindow()
+    val splitWindow = openSplitWindow(mainWindow)
+
+    // Jump to a line that the other window's caret has never visited, so we know the entry comes from this split
+    selectWindow(splitWindow)
+    typeText("G")
+    enterSearch("torrent")
+
+    selectWindow(mainWindow)
+
+    assertCommandOutput(
+      "jumps",
+      """ jump line  col file/text
+        |   2     1    8 I found it in a legendary land
+        |   1     9    0 the dingy underside, the checquered fringe.
+        |>
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test jump list survives switching to another buffer in the same split`() {
+    val mainWindow = configureMainWindow()
+    enterSearch("sodden")
+    enterSearch("shape")
+
+    val mainWindowPath = mainWindow.virtualFile!!.path
+    val otherBufferWindow = openNewBufferWindow("bbb.txt")
+    selectWindow(otherBufferWindow)
+
+    assertCommandOutput(
+      "jumps",
+      """ jump line  col file/text
+        |   2     1    8 $mainWindowPath
+        |   1     3   29 $mainWindowPath
+        |>
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test control-O in a split walks the history recorded in the other split`() {
+    val mainWindow = configureMainWindow()
+    enterSearch("sodden")
+    enterSearch("shape")
+
+    val splitWindow = openSplitWindow(mainWindow)
+    selectWindow(splitWindow)
+    typeText("<C-O>")
+
+    // The newest entry of the shared jump list - the position the other split was at before searching for "shape"
+    assertState(
+      """I found it in a legendary land
+        |all rocks and lavender and tufted grass,
+        |where it was settled on some ${c}sodden sand
+        |hard by the torrent of a mountain pass.
+        |
+        |The features it combines mark it as new
+        |to science: shape and shade -- the special tinge,
+        |akin to moonlight, tempering its blue,
+        |the dingy underside, the checquered fringe.
+      """.trimMargin(),
+    )
+  }
+}
