@@ -488,6 +488,10 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     // Always move back one to make sure that we don't get stuck on the start of a word
     pos--
 
+    // We've moved back past the start of the text, so there is nothing left to skip. Note that we must return before
+    // looking at `chars[pos]` below, which would otherwise be an out of bounds access
+    if (pos < 0) return 0
+
     if (allowMoveFromWordStart
       || startingCharType == charType(editor, chars[pos], bigWord)
       || isWhitespace(editor, chars[pos], bigWord)
