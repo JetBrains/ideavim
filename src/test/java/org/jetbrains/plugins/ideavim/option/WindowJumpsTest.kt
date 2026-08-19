@@ -14,6 +14,8 @@ import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimSplitWindowTestCase
 import org.junit.jupiter.api.Test
+import kotlin.test.assertTrue
+import kotlin.test.assertFalse
 
 /**
  * Tests the scope of the jump list - one list shared by the whole project, or one list per window
@@ -421,5 +423,117 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
         |>
       """.trimMargin(),
     )
+  }
+
+
+  @Test
+  fun `test enabling windowjumps seeds every open window from the shared list`() {
+    val mainWindow = configureMainWindow()
+    enterSearch("sodden")
+    enterSearch("shape")
+    val splitWindow = openSplitWindow(mainWindow)
+
+    enterCommand("set windowjumps")
+
+    val expected = """ jump line  col file/text
+      |   2     1    8 I found it in a legendary land
+      |   1     3   29 where it was settled on some sodden sand
+      |>
+    """.trimMargin()
+
+    selectWindow(mainWindow)
+    assertCommandOutput("jumps", expected)
+
+    selectWindow(splitWindow)
+    assertCommandOutput("jumps", expected)
+  }
+
+  @Test
+  fun `test windows seeded when enabling windowjumps get independent copies`() {
+    val mainWindow = configureMainWindow()
+    enterSearch("sodden")
+    enterSearch("shape")
+    val splitWindow = openSplitWindow(mainWindow)
+
+    enterCommand("set windowjumps")
+
+    selectWindow(splitWindow)
+    typeText("G")
+    enterSearch("torrent")
+
+    selectWindow(mainWindow)
+
+    assertCommandOutput(
+      "jumps",
+      """ jump line  col file/text
+        |   2     1    8 I found it in a legendary land
+        |   1     3   29 where it was settled on some sodden sand
+        |>
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test disabling windowjumps keeps the focused window's list`() {
+    val mainWindow = configureMainWindow()
+    enterCommand("set windowjumps")
+    val splitWindow = openSplitWindow(mainWindow)
+
+    selectWindow(splitWindow)
+    typeText("G")
+    enterSearch("torrent")
+
+    selectWindow(mainWindow)
+    enterSearch("sodden")
+
+    // The split is the focused window when the option goes off, so its list is the one that survives
+    selectWindow(splitWindow)
+    enterCommand("set nowindowjumps")
+
+    selectWindow(mainWindow)
+
+    assertCommandOutput(
+      "jumps",
+      """ jump line  col file/text
+        |   2     1    8 I found it in a legendary land
+        |   1     9    0 the dingy underside, the checquered fringe.
+        |>
+      """.trimMargin(),
+    )
+  }
+
+  // Cycle 7 - IDE navigation reaching us through 'unifyjumps' has to be attributed to a window, not to the project.
+
+  @Test
+  fun `test IDE navigation is recorded in the window showing the file when windowjumps is set`() {
+    val mainWindow = configureMainWindow()
+    enterCommand("set windowjumps")
+    val splitWindow = openSplitWindow(mainWindow)
+
+    selectWindow(splitWindow)
+    recordPlatformJump(splitWindow, line = 5, col = 3)
+
+    // The lists cannot be asserted exactly: the platform mirrors the file being opened as a jump of its own, and when
+    // that arrives is not something the test controls. What matters is which window the navigation was recorded in
+    val recordedJump = "6    3 The features it combines mark it as new"
+    assertTrue(commandOutput("jumps").contains(recordedJump), "The navigation should be recorded in this window")
+
+    selectWindow(mainWindow)
+    assertFalse(commandOutput("jumps").contains(recordedJump), "The other window should not see it")
+  }
+
+  /** Feeds an IDE navigation event to the listener behind the `unifyjumps` sync. See `WindowJumpsPersistenceTest` */
+  private fun recordPlatformJump(editor: Editor, line: Int, col: Int) {
+    val event = com.maddyhome.idea.vim.group.jump.JumpInfo(
+      line = line,
+      col = col,
+      filepath = editor.virtualFile!!.path,
+      protocol = "file",
+      added = true,
+      timestamp = System.currentTimeMillis() + 10_000,
+    )
+    ApplicationManager.getApplication().invokeAndWait {
+      com.maddyhome.idea.vim.group.JumpRemoteTopicListener().handleEvent(fixture.project, event)
+    }
   }
 }

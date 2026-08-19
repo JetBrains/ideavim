@@ -93,6 +93,7 @@ import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.NumberChangeListener
 import com.maddyhome.idea.vim.group.OptionGroup
 import com.maddyhome.idea.vim.group.ScrollOptionsChangeListener
+import com.maddyhome.idea.vim.group.WindowJumpsChangeListener
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
@@ -243,6 +244,7 @@ object VimListenerManager {
       optionGroup.addGlobalOptionChangeListener(Options.showmode, modeWidgetOptionListener)
       optionGroup.addGlobalOptionChangeListener(Options.showmode, macroWidgetOptionListener)
       optionGroup.addEffectiveOptionValueChangeListener(Options.keymap, KeymapChangeListener)
+      optionGroup.addGlobalOptionChangeListener(Options.windowjumps, WindowJumpsChangeListener)
 
       // The listeners are registered _after_ ideavimrc has been evaluated, so trigger these listeners to ensure we're
       // up to date
@@ -288,6 +290,7 @@ object VimListenerManager {
       optionGroup.removeGlobalOptionChangeListener(Options.showcmd, ShowCmdOptionChangeListener)
       optionGroup.removeGlobalOptionChangeListener(Options.showmode, modeWidgetOptionListener)
       optionGroup.removeGlobalOptionChangeListener(Options.showmode, macroWidgetOptionListener)
+      optionGroup.removeGlobalOptionChangeListener(Options.windowjumps, WindowJumpsChangeListener)
 
       BufNewFileTracker.clear()
     }
