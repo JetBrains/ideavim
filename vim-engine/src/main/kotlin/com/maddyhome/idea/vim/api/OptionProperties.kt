@@ -56,6 +56,7 @@ open class GlobalOptions(scope: OptionAccessScope) : OptionsPropertiesBase(scope
   var visualbell: Boolean by optionProperty(Options.visualbell)
   val whichwrap: StringListOptionValue by optionProperty(Options.whichwrap)
   var wrapscan: Boolean by optionProperty(Options.wrapscan)
+  var wildmenu: Boolean by optionProperty(Options.wildmenu)
 
   // IdeaVim specific options. Put any editor or IDE specific options in IjOptionProperties
 
