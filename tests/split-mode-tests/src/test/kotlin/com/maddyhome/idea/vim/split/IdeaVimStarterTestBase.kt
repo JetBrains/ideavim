@@ -14,6 +14,7 @@ import com.intellij.driver.sdk.singleProject
 import com.intellij.driver.sdk.ui.requestFocusFromIde
 import com.intellij.driver.sdk.ui.components.UiComponent.Companion.waitFound
 import com.intellij.driver.sdk.ui.components.common.codeEditor
+import com.intellij.driver.sdk.ui.components.common.codeEditorForFile
 import com.intellij.driver.sdk.ui.components.common.ideFrame
 import com.intellij.driver.sdk.waitForIndicators
 import com.intellij.ide.starter.config.ConfigurationStorage
@@ -307,6 +308,87 @@ abstract class IdeaVimStarterTestBase {
           click()
         }
       }
+    }
+  }
+
+  // ── Helpers for more than one editor ────────────────────────
+  //
+  // `codeEditor()` requires exactly one editor component to be present, so it throws as soon as the editor is split.
+  // These variants address an editor by the file it shows, which means splits have to show *different* files to be
+  // addressable - two splits of the same buffer are indistinguishable in the component tree.
+
+  /**
+   * Opens a file in the *current* editor window, without going through [openFile]'s readiness check
+   *
+   * [openFile] waits on `codeEditor()`, which throws once the editor is split. Use this to give a split a file of its
+   * own, then address both editors with the helpers below.
+   */
+  protected fun openFileInCurrentWindow(relativePath: String, fileName: String) {
+    driver.withContext { openFile(relativePath) }
+    val opened = waitUntil(timeoutMs = 15_000, pollMs = 500) {
+      try {
+        driver.withContext { ideFrame { codeEditorForFile(fileName).apply { waitFound() } } }
+        true
+      } catch (_: Exception) {
+        false
+      }
+    }
+    check(opened) { "Editor for '$fileName' did not appear within timeout" }
+  }
+
+  /** Types vim keys in the editor showing the given file (its simple name, e.g. `Jump1.txt`). */
+  protected fun typeVimInFile(fileName: String, keys: String) {
+    driver.withContext {
+      requestFocusFromIde(singleProject())
+      ideFrame {
+        codeEditorForFile(fileName).apply {
+          waitFound()
+          // No click: clicking would move the caret of the editor under test
+          component.requestFocus()
+          keyboard { typeText(keys) }
+        }
+      }
+    }
+  }
+
+  /** Presses Ctrl-O (jump backward) in the editor showing the given file. */
+  protected fun ctrlOInFile(fileName: String) {
+    driver.withContext {
+      requestFocusFromIde(singleProject())
+      ideFrame {
+        codeEditorForFile(fileName).apply {
+          waitFound()
+          component.requestFocus()
+          keyboard { hotKey(java.awt.event.KeyEvent.VK_CONTROL, java.awt.event.KeyEvent.VK_O) }
+        }
+      }
+    }
+  }
+
+  /** Reads the caret line (1-based) of the editor showing the given file. */
+  protected fun caretLineInFile(fileName: String): Int {
+    var result = 0
+    driver.withContext {
+      ideFrame { result = codeEditorForFile(fileName).apply { waitFound() }.getCaretLine() }
+    }
+    return result
+  }
+
+  /** Asserts the caret in the given file's editor is before the given line, polling until timeout. */
+  protected fun assertCaretInFileBefore(fileName: String, line: Int, message: String? = null) {
+    var actual = 0
+    val found = waitUntil { actual = caretLineInFile(fileName); actual < line }
+    assertTrue(found) {
+      (message ?: "Caret in $fileName should be before line $line") + ". Actual line: $actual"
+    }
+  }
+
+  /** Asserts the caret in the given file's editor is past the given line, polling until timeout. */
+  protected fun assertCaretInFileAfter(fileName: String, line: Int, message: String? = null) {
+    var actual = 0
+    val found = waitUntil { actual = caretLineInFile(fileName); actual > line }
+    assertTrue(found) {
+      (message ?: "Caret in $fileName should be after line $line") + ". Actual line: $actual"
     }
   }
 
