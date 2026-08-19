@@ -41,6 +41,15 @@ interface VimJumpService {
   fun clearJumps(scopeId: String)
   fun copyJumps(fromId: String, toId: String)
 
+  /**
+   * Gives a scope that has never had a list of its own a copy of another scope's list
+   *
+   * This is what happens when a window is created: in Vim the new window inherits the jump list of the window it was
+   * split from, even when that list is empty. A scope that already has a list keeps it - selecting a file in an existing
+   * window is not a new window, and must not inherit anything.
+   */
+  fun inheritJumps(fromId: String, toId: String)
+
   fun updateJumpsFromInsert(scopeId: String, startOffset: Int, length: Int)
   fun updateJumpsFromDelete(scopeId: String, startOffset: Int, length: Int)
 

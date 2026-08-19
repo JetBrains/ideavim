@@ -10,6 +10,9 @@ package org.jetbrains.plugins.ideavim.option
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.group.jump.JumpInfo
+import com.maddyhome.idea.vim.group.JumpRemoteTopicListener
+import com.intellij.openapi.vfs.VirtualFile
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimSplitWindowTestCase
@@ -171,6 +174,7 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
   fun `test jumps recorded in one split do not appear in the other when windowjumps is set`() {
     val mainWindow = configureMainWindow()
     enterCommand("set windowjumps")
+    disableIdeNavigationMirroring()
     val splitWindow = openSplitWindow(mainWindow)
 
     selectWindow(mainWindow)
@@ -186,6 +190,7 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
   fun `test jumps recorded in a split stay in that split when windowjumps is set`() {
     val mainWindow = configureMainWindow()
     enterCommand("set windowjumps")
+    disableIdeNavigationMirroring()
     val splitWindow = openSplitWindow(mainWindow)
 
     selectWindow(splitWindow)
@@ -201,6 +206,7 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
   fun `test control-O does not use the other split's history when windowjumps is set`() {
     val mainWindow = configureMainWindow()
     enterCommand("set windowjumps")
+    disableIdeNavigationMirroring()
     val splitWindow = openSplitWindow(mainWindow)
 
     selectWindow(mainWindow)
@@ -305,6 +311,7 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
   fun `test control-I does not use the other split's history when windowjumps is set`() {
     val mainWindow = configureMainWindow()
     enterCommand("set windowjumps")
+    disableIdeNavigationMirroring()
     val splitWindow = openSplitWindow(mainWindow)
 
     selectWindow(mainWindow)
@@ -502,7 +509,6 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
     )
   }
 
-  // Cycle 7 - IDE navigation reaching us through 'unifyjumps' has to be attributed to a window, not to the project.
 
   @Test
   fun `test IDE navigation is recorded in the window showing the file when windowjumps is set`() {
@@ -522,9 +528,9 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
     assertFalse(commandOutput("jumps").contains(recordedJump), "The other window should not see it")
   }
 
-  /** Feeds an IDE navigation event to the listener behind the `unifyjumps` sync. See `WindowJumpsPersistenceTest` */
+  /** Feeds an IDE navigation event to the listener behind the `unifyjumps` sync */
   private fun recordPlatformJump(editor: Editor, line: Int, col: Int) {
-    val event = com.maddyhome.idea.vim.group.jump.JumpInfo(
+    val event = JumpInfo(
       line = line,
       col = col,
       filepath = editor.virtualFile!!.path,
@@ -533,7 +539,43 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
       timestamp = System.currentTimeMillis() + 10_000,
     )
     ApplicationManager.getApplication().invokeAndWait {
-      com.maddyhome.idea.vim.group.JumpRemoteTopicListener().handleEvent(fixture.project, event)
+      JumpRemoteTopicListener().handleEvent(fixture.project, event)
     }
+  }
+
+  @Test
+  fun `test split showing a different file also inherits the jump list when windowjumps is set`() {
+    val mainWindow = configureMainWindow()
+    enterCommand("set windowjumps")
+    enterSearch("sodden")
+    enterSearch("shape")
+
+    val mainWindowPath = mainWindow.virtualFile!!.path
+    // Vim's `:vsplit {file}` copies the jump list of the window it splits, whichever buffer ends up in the new window
+    var otherFile: VirtualFile? = null
+    ApplicationManager.getApplication().invokeAndWait {
+      otherFile = fixture.createFile("bbb.txt", "lorem ipsum\n")
+    }
+    val splitWindow = openSplitWindow(mainWindow, otherFile)
+    selectWindow(splitWindow)
+
+    assertCommandOutput(
+      "jumps",
+      """ jump line  col file/text
+        |   2     1    8 $mainWindowPath
+        |   1     3   29 $mainWindowPath
+        |>
+      """.trimMargin(),
+    )
+  }
+
+  /**
+   * Stops IDE navigation from being mirrored into the jump list
+   *
+   * The platform's "place" for opening a file reaches us asynchronously, so asserting that a window's list is empty
+   * would race with it. Mirroring has its own tests.
+   */
+  private fun disableIdeNavigationMirroring() {
+    enterCommand("set nounifyjumps")
   }
 }

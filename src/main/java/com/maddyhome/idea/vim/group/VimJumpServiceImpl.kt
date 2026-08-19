@@ -17,6 +17,7 @@ import com.intellij.openapi.util.text.StringUtil
 import com.intellij.platform.project.projectId
 import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimJumpServiceBase
+import com.maddyhome.idea.vim.api.VimWindowIdService
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.group.jump.JumpRemoteApi
 import com.maddyhome.idea.vim.mark.Jump
@@ -38,9 +39,6 @@ import org.jdom.Element
 internal class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateComponent<Element?> {
   companion object {
     private val logger = vimLogger<VimJumpServiceImpl>()
-
-    /** Separates the project id from the window id in a window scoped jump list's scope id */
-    private const val WINDOW_SCOPE_SEPARATOR = '/'
   }
 
   override var lastJumpTimeStamp: Long = 0
@@ -79,20 +77,15 @@ internal class VimJumpServiceImpl : VimJumpServiceBase(), PersistentStateCompone
   }
 
   /**
-   * The jump lists to persist, keyed by project id
+   * One jump list per project, taken from the most recently used window
    *
-   * With the 'windowjumps' option set, a jump list is scoped to a window and its scope id is `"<projectId>/<windowId>"`
-   * (see [com.maddyhome.idea.vim.newapi.IjVimEditor.jumpListId]). Window ids only mean something within a session, so
-   * persisting them would write records that can never be read back, and which would accumulate over time. Instead we
-   * save one list per project, taken from the most recently used window - the closest thing to Vim's single `viminfo`
-   * jump list. [scopeToJumps] iterates from least to most recently updated, so later entries win.
-   *
-   * Without 'windowjumps' the scope id *is* the project id, and this grouping is a no-op.
+   * Window ids mean nothing after a restart, so saving a list per window would write records that can never be read
+   * back. Vim also keeps a single list in `viminfo`.
    */
   private fun jumpsByProject(): Map<String, List<Jump>> {
     val result = LinkedHashMap<String, List<Jump>>()
     for ((scopeId, jumps) in scopeToJumps) {
-      result[scopeId.substringBefore(WINDOW_SCOPE_SEPARATOR)] = jumps
+      result[VimWindowIdService.projectIdOf(scopeId)] = jumps
     }
     return result
   }

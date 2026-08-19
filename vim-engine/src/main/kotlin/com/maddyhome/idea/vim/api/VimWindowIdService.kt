@@ -24,11 +24,9 @@ interface VimWindowIdService {
   fun getWindowId(editor: VimEditor): String?
 
   /**
-   * The scope id of the window containing the given editor, in the form `"<projectId>/<windowId>"`
+   * The scope id of the window containing the given editor, or null when the editor doesn't belong to a window
    *
-   * This is the key that scopes window local state (currently just the jump list) and it is composed here so that the
-   * format has a single home. Returns null when the editor doesn't belong to a window, in which case callers fall back
-   * to the project id.
+   * Composed and taken apart in this one place, so that the encoding has a single home. See [projectIdOf].
    */
   fun getWindowScopeId(editor: VimEditor): String? {
     val windowId = getWindowId(editor) ?: return null
@@ -36,7 +34,9 @@ interface VimWindowIdService {
   }
 
   companion object {
-    /** Separates the project id from the window id in a window scoped id */
-    const val WINDOW_SCOPE_SEPARATOR: String = "/"
+    private const val WINDOW_SCOPE_SEPARATOR: String = "/"
+
+    /** The project a scope id belongs to, whether it is a window scope id or a project id already */
+    fun projectIdOf(scopeId: String): String = scopeId.substringBeforeLast(WINDOW_SCOPE_SEPARATOR)
   }
 }

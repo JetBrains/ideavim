@@ -207,4 +207,31 @@ class WindowJumpsPersistenceTest : VimSplitWindowTestCase() {
 
     assertCommandOutput("jumps", " jump line  col file/text\n>")
   }
+
+  @Test
+  fun `test collapsing to the focused window beats the list of a window that was closed`() {
+    val mainWindow = configureMainWindow()
+    enterCommand("set windowjumps")
+    // Mirroring of IDE navigation is asynchronous and would add entries of its own, see WindowJumpsTest
+    enterCommand("set nounifyjumps")
+
+    // The project key exists first, as it does after reading the state from disk
+    loadSavedState(savedState(mainWindow, 0 to 8))
+
+    typeText("j")
+    enterSearch("torrent")
+
+    // A window with a longer list, which is then closed - nothing removes the list of a closed window
+    val splitWindow = openSplitWindow(mainWindow)
+    selectWindow(splitWindow)
+    typeText("G")
+    enterSearch("sodden")
+    closeWindow(splitWindow)
+
+    selectWindow(mainWindow)
+    enterCommand("set nowindowjumps")
+
+    // The list of the window that is actually focused has to win, not whichever scope happens to have been written last
+    assertEquals(listOf(listOf("0:8", "1:8")), persistedJumps())
+  }
 }
