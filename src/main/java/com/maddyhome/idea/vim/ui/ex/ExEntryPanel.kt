@@ -107,6 +107,7 @@ class ExEntryPanel private constructor() : JPanel(), VimCommandLine {
   }
 
   override fun showCompletionBar(completion: CommandLineCompletion) {
+    if (!injector.globalOptions().wildmenu) return
     if (ApplicationManager.getApplication().isUnitTestMode) return
     val editor = this.ijEditor ?: return
 

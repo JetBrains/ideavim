@@ -282,6 +282,7 @@ object Options {
     )
   )
   val wrapscan: ToggleOption = addOption(ToggleOption("wrapscan", GLOBAL, "ws", true))
+  val wildmenu: ToggleOption = addOption(ToggleOption("wildmenu", GLOBAL, "wmnu", true))
 
 
   // More complex options, with additional validation, etc.

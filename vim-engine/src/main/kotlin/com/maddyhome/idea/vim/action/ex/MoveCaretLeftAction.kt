@@ -11,13 +11,15 @@ package com.maddyhome.idea.vim.action.ex
 import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
 import com.maddyhome.idea.vim.api.VimCommandLine
+import com.maddyhome.idea.vim.api.globalOptions
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.Graphemes
 
 @CommandOrMotion(keys = ["<Left>"], modes = [Mode.CMD_LINE])
 class MoveCaretLeftAction : CommandLineActionHandler() {
   override fun execute(commandLine: VimCommandLine): Boolean {
     val completion = commandLine.activeCompletion
-    if (completion != null && completion.expectedText == commandLine.text) {
+    if (completion != null && completion.expectedText == commandLine.text && injector.globalOptions().wildmenu) {
       cycleExistingCompletion(commandLine, completion, forward = false)
       return true
     }
