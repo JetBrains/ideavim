@@ -13,8 +13,10 @@ import com.maddyhome.idea.vim.mark.Jump
 abstract class VimJumpServiceBase : VimJumpService {
   protected val scopeToJumps: MutableMap<String, MutableList<Jump>> = mutableMapOf()
   protected val scopeToJumpSpot: MutableMap<String, Int> = mutableMapOf()
+  private val seededScopes = mutableSetOf<String>()
 
   override fun getJump(scopeId: String, count: Int): Jump? {
+    ensureSeeded(scopeId)
     lastJumpTimeStamp = System.currentTimeMillis() + JUMP_NAVIGATION_SUPPRESS_MS
     val jumps = scopeToJumps[scopeId] ?: mutableListOf()
     scopeToJumpSpot.putIfAbsent(scopeId, -1)
@@ -25,14 +27,17 @@ abstract class VimJumpServiceBase : VimJumpService {
   }
 
   override fun getJumps(scopeId: String): List<Jump> {
+    ensureSeeded(scopeId)
     return scopeToJumps[scopeId] ?: emptyList()
   }
 
   override fun getJumpSpot(scopeId: String): Int {
+    ensureSeeded(scopeId)
     return scopeToJumpSpot[scopeId] ?: -1
   }
 
   override fun addJump(scopeId: String, jump: Jump, reset: Boolean) {
+    ensureSeeded(scopeId)
     lastJumpTimeStamp = System.currentTimeMillis() + JUMP_NAVIGATION_SUPPRESS_MS
     // Remove and re-insert, so that the map iterates from least to most recently updated scope
     val jumps = scopeToJumps.remove(scopeId) ?: mutableListOf()
@@ -62,6 +67,7 @@ abstract class VimJumpServiceBase : VimJumpService {
   }
 
   override fun clearJumps(scopeId: String) {
+    seededScopes.add(scopeId)
     scopeToJumps.remove(scopeId)
     scopeToJumpSpot.remove(scopeId)
   }
@@ -83,6 +89,14 @@ abstract class VimJumpServiceBase : VimJumpService {
   override fun resetJumps() {
     scopeToJumps.clear()
     scopeToJumpSpot.clear()
+  }
+
+  private fun ensureSeeded(scopeId: String) {
+    if (!seededScopes.add(scopeId)) return
+    if (scopeToJumps.containsKey(scopeId)) return
+    val projectId = scopeId.substringBeforeLast(VimWindowIdService.WINDOW_SCOPE_SEPARATOR)
+    if (projectId == scopeId) return
+    copyJumps(projectId, scopeId)
   }
 
   companion object {

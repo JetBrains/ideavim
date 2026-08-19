@@ -11,6 +11,7 @@ package org.jetbrains.plugins.ideavim.option
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.fileEditor.impl.EditorWindow
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.JumpRemoteTopicListener
 import com.maddyhome.idea.vim.group.jump.JumpInfo
@@ -75,6 +76,28 @@ class WindowJumpsPersistenceTest : VimSplitWindowTestCase() {
     }
   }
 
+  /** Builds the saved state of a jump list for the current project, in the format [persistedJumps] reads back */
+  private fun savedState(editor: Editor, vararg positions: Pair<Int, Int>): Element {
+    val projectElement = Element("project").setAttribute("id", injector.file.getProjectId(fixture.project))
+    for ((line, col) in positions) {
+      projectElement.addContent(
+        Element("jump")
+          .setAttribute("line", line.toString())
+          .setAttribute("column", col.toString())
+          .setAttribute("filename", editor.virtualFile!!.path)
+          .setAttribute("protocol", "file"),
+      )
+    }
+    return Element("projects").addContent(projectElement)
+  }
+
+  private fun loadSavedState(state: Element) {
+    ApplicationManager.getApplication().invokeAndWait {
+      @Suppress("UNCHECKED_CAST")
+      (injector.jumpService as PersistentStateComponent<Element>).loadState(state)
+    }
+  }
+
   /** The persisted jumps of every project in the saved state, as "line:col" */
   private fun persistedJumps(): List<List<String>> {
     var state: Element? = null
@@ -112,5 +135,76 @@ class WindowJumpsPersistenceTest : VimSplitWindowTestCase() {
 
     // With the option reset, the project id *is* the scope of the real jump list - it must still be saved
     assertEquals(listOf(listOf("0:8", "2:29")), persistedJumps())
+  }
+
+  @Test
+  fun `test window with no jumps of its own shows the list restored from disk`() {
+    val mainWindow = configureMainWindow()
+    enterCommand("set windowjumps")
+
+    // State is read at startup, before any window exists, so it can only be stored per project. A window that has no
+    // list of its own has to inherit it - the same way a window inherits the list of the window it was split from
+    loadSavedState(savedState(mainWindow, 0 to 8, 2 to 29))
+
+    assertCommandOutput(
+      "jumps",
+      """ jump line  col file/text
+        |   2     1    8 I found it in a legendary land
+        |   1     3   29 where it was settled on some sodden sand
+        |>
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test only the most recently used window's list is saved for a project`() {
+    val mainWindow = configureMainWindow()
+    enterCommand("set windowjumps")
+    enterSearch("sodden")
+    enterSearch("shape")
+
+    val splitWindow = openSplitWindow(mainWindow)
+    selectWindow(splitWindow)
+    typeText("G")
+    enterSearch("torrent")
+
+    // One list per project, taken from the window used last. Window ids mean nothing after a restart, so there is no
+    // point saving one list per window
+    assertEquals(listOf(listOf("0:8", "2:29", "6:12", "8:0")), persistedJumps())
+  }
+
+  @Test
+  fun `test window that jumps before reading its list still inherits the restored one`() {
+    val mainWindow = configureMainWindow()
+    enterCommand("set windowjumps")
+    loadSavedState(savedState(mainWindow, 0 to 8, 2 to 29))
+
+    // The first thing this window does is jump, without ever reading its list first - which is the normal case after a
+    // restart. `j` is not a jump, it just moves off the restored positions so the new entry is distinguishable
+    typeText("j")
+    enterSearch("torrent")
+
+    assertCommandOutput(
+      "jumps",
+      """ jump line  col file/text
+        |   3     1    8 I found it in a legendary land
+        |   2     3   29 where it was settled on some sodden sand
+        |   1     2    8 all rocks and lavender and tufted grass,
+        |>
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test clearjumps in a window that has not read its list is not undone by the restored list`() {
+    val mainWindow = configureMainWindow()
+    enterCommand("set windowjumps")
+    loadSavedState(savedState(mainWindow, 0 to 8, 2 to 29))
+
+    // The window has never read or written its own list, so the only list around is the project's. Clearing has to be
+    // remembered, or the next read inherits the very entries that were just cleared
+    enterCommand("clearjumps")
+
+    assertCommandOutput("jumps", " jump line  col file/text\n>")
   }
 }
