@@ -745,7 +745,7 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
   /**
    * Read a value from the current output panel, on the EDT
    */
-  private fun <T> readOutputPanel(getter: (VimOutputPanel) -> T): T? {
+  protected fun <T> readOutputPanel(getter: (VimOutputPanel) -> T): T? {
     var value: T? = null
     ApplicationManager.getApplication().invokeAndWait {
       value = injector.outputPanel.getCurrentOutputPanel()?.let(getter)

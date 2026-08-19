@@ -22,4 +22,21 @@ interface VimWindowIdService {
    * fallback window, a diff view, or a console
    */
   fun getWindowId(editor: VimEditor): String?
+
+  /**
+   * The scope id of the window containing the given editor, in the form `"<projectId>/<windowId>"`
+   *
+   * This is the key that scopes window local state (currently just the jump list) and it is composed here so that the
+   * format has a single home. Returns null when the editor doesn't belong to a window, in which case callers fall back
+   * to the project id.
+   */
+  fun getWindowScopeId(editor: VimEditor): String? {
+    val windowId = getWindowId(editor) ?: return null
+    return editor.projectId + WINDOW_SCOPE_SEPARATOR + windowId
+  }
+
+  companion object {
+    /** Separates the project id from the window id in a window scoped id */
+    const val WINDOW_SCOPE_SEPARATOR: String = "/"
+  }
 }
