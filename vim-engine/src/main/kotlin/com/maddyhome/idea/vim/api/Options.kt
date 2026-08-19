@@ -449,7 +449,7 @@ object Options {
   })
 
   val windowjumps: ToggleOption =
-    addOption(ToggleOption("windowjumps", GLOBAL, "windowjumps", false, isHidden = false))
+    addOption(ToggleOption("windowjumps", GLOBAL, "windowjumps", false, isHidden = true))
   val scrolljump: NumberOption = addOption(object : NumberOption("scrolljump", GLOBAL, "sj", 1) {
     override fun checkIfValueValid(value: VimDataType, token: String) {
       super.checkIfValueValid(value, token)
