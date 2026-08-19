@@ -39,6 +39,7 @@ interface VimJumpService {
   fun removeJump(scopeId: String, jump: Jump)
   fun dropLastJump(scopeId: String)
   fun clearJumps(scopeId: String)
+  fun copyJumps(fromId: String, toId: String)
 
   fun updateJumpsFromInsert(scopeId: String, startOffset: Int, length: Int)
   fun updateJumpsFromDelete(scopeId: String, startOffset: Int, length: Int)
