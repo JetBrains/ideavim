@@ -302,4 +302,23 @@ Unless otherwise stated, these options do not have abbreviations.
         be ignored and the current Vim mode maintained.
 
         It is not expected that this value will need to be changed.
+
+'windowjumps'           boolean (default off)
+                        global
+        When on, each window (split) has its own jump list, as in Vim. When
+        off, a single jump list is shared by every window and tab of the
+        project.
+
+        Vim scopes the jump list to a window, and a new split starts with a
+        copy of the list of the window it was split from. IdeaVim's default is
+        one list per project, which is the behaviour IdeaVim has always had.
+
+        The jump list is what `:jumps`, CTRL-O and CTRL-I work with. The IDE's
+        own Back and Forward navigation is separate, and stays project wide
+        whatever this option is set to.
+
+        Only one list per project is saved between sessions, because window
+        ids do not survive a restart. The list of the most recently used
+        window is the one saved, and a window that has no list of its own -
+        after a restart, or when it is the first window - starts from it.
 ```
