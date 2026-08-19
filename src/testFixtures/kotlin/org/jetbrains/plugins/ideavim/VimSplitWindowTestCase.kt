@@ -15,6 +15,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.impl.EditorWindow
 import com.intellij.openapi.fileEditor.impl.FileEditorManagerImpl
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.platform.util.coroutines.childScope
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
@@ -84,14 +85,16 @@ abstract class VimSplitWindowTestCase : VimTestCase() {
    * Equivalent to `<C-W>v` or `:vsplit` with the `'splitright'` option enabled in Vim. (Note that IdeaVim doesn't
    * currently support `'splitright'` or `'splitbelow'`.)
    *
+   * Pass [file] to open a different file in the new window, which is Vim's `:vsplit {file}`.
+   *
    * @return the `Editor` representing the new window
    */
-  protected fun openSplitWindow(editor: Editor): Editor {
+  protected fun openSplitWindow(editor: Editor, file: VirtualFile? = editor.virtualFile): Editor {
     // Open the split with the API, rather than Vim commands, so we get the editor
     var splitWindow: EditorWindow? = null
     ApplicationManager.getApplication().invokeAndWait {
       val currentWindow = fileEditorManager.currentWindow
-      splitWindow = currentWindow!!.split(SwingConstants.VERTICAL, true, editor.virtualFile, false)
+      splitWindow = currentWindow!!.split(SwingConstants.VERTICAL, true, file, false)
     }
 
     // Waiting till the selected editor will appear

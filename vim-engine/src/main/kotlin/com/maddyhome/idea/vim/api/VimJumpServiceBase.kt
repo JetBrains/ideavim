@@ -13,10 +13,10 @@ import com.maddyhome.idea.vim.mark.Jump
 abstract class VimJumpServiceBase : VimJumpService {
   protected val scopeToJumps: MutableMap<String, MutableList<Jump>> = mutableMapOf()
   protected val scopeToJumpSpot: MutableMap<String, Int> = mutableMapOf()
-  private val seededScopes = mutableSetOf<String>()
+  private val scopesWithOwnList = mutableSetOf<String>()
 
   override fun getJump(scopeId: String, count: Int): Jump? {
-    ensureSeeded(scopeId)
+    inheritProjectListIfNeeded(scopeId)
     lastJumpTimeStamp = System.currentTimeMillis() + JUMP_NAVIGATION_SUPPRESS_MS
     val jumps = scopeToJumps[scopeId] ?: mutableListOf()
     scopeToJumpSpot.putIfAbsent(scopeId, -1)
@@ -27,23 +27,22 @@ abstract class VimJumpServiceBase : VimJumpService {
   }
 
   override fun getJumps(scopeId: String): List<Jump> {
-    ensureSeeded(scopeId)
+    inheritProjectListIfNeeded(scopeId)
     return scopeToJumps[scopeId] ?: emptyList()
   }
 
   override fun getJumpSpot(scopeId: String): Int {
-    ensureSeeded(scopeId)
+    inheritProjectListIfNeeded(scopeId)
     return scopeToJumpSpot[scopeId] ?: -1
   }
 
   override fun addJump(scopeId: String, jump: Jump, reset: Boolean) {
-    ensureSeeded(scopeId)
+    inheritProjectListIfNeeded(scopeId)
     lastJumpTimeStamp = System.currentTimeMillis() + JUMP_NAVIGATION_SUPPRESS_MS
-    // Remove and re-insert, so that the map iterates from least to most recently updated scope
-    val jumps = scopeToJumps.remove(scopeId) ?: mutableListOf()
+    val jumps = scopeToJumps[scopeId] ?: mutableListOf()
     jumps.removeIf { it.filepath == jump.filepath && it.line == jump.line }
     jumps.add(jump)
-    scopeToJumps[scopeId] = jumps
+    putAsMostRecentlyUsed(scopeId, jumps)
 
     scopeToJumpSpot[scopeId] = if (reset) -1 else (scopeToJumpSpot[scopeId] ?: -1) + 1
 
@@ -67,14 +66,23 @@ abstract class VimJumpServiceBase : VimJumpService {
   }
 
   override fun clearJumps(scopeId: String) {
-    seededScopes.add(scopeId)
+    // An emptied list is still the scope's own, so it must not inherit the project's again
+    scopesWithOwnList.add(scopeId)
     scopeToJumps.remove(scopeId)
     scopeToJumpSpot.remove(scopeId)
   }
 
   override fun copyJumps(fromId: String, toId: String) {
     val jumps = scopeToJumps[fromId] ?: return
-    scopeToJumps[toId] = jumps.toMutableList()
+    putAsMostRecentlyUsed(toId, jumps.toMutableList())
+    scopeToJumpSpot[toId] = scopeToJumpSpot[fromId] ?: -1
+  }
+
+  override fun inheritJumps(fromId: String, toId: String) {
+    if (toId in scopesWithOwnList || scopeToJumps.containsKey(toId)) return
+    // An inherited empty list is the window's own list, as in Vim - not an absence to be filled in later
+    scopesWithOwnList.add(toId)
+    scopeToJumps[toId] = scopeToJumps[fromId]?.toMutableList() ?: mutableListOf()
     scopeToJumpSpot[toId] = scopeToJumpSpot[fromId] ?: -1
   }
 
@@ -89,14 +97,30 @@ abstract class VimJumpServiceBase : VimJumpService {
   override fun resetJumps() {
     scopeToJumps.clear()
     scopeToJumpSpot.clear()
+    scopesWithOwnList.clear()
   }
 
-  private fun ensureSeeded(scopeId: String) {
-    if (!seededScopes.add(scopeId)) return
+  /**
+   * Gives a window scope the project's list the first time it is used
+   *
+   * The list read from disk can only be stored per project - at startup there are no windows yet - so a window that has
+   * never had a list of its own starts from it, the same way a new window inherits from the window it was split from.
+   */
+  private fun inheritProjectListIfNeeded(scopeId: String) {
+    if (scopeId in scopesWithOwnList) return
+    scopesWithOwnList.add(scopeId)
     if (scopeToJumps.containsKey(scopeId)) return
-    val projectId = scopeId.substringBeforeLast(VimWindowIdService.WINDOW_SCOPE_SEPARATOR)
-    if (projectId == scopeId) return
-    copyJumps(projectId, scopeId)
+
+    val projectId = VimWindowIdService.projectIdOf(scopeId)
+    if (projectId != scopeId) {
+      copyJumps(projectId, scopeId)
+    }
+  }
+
+  /** The map iterates in this order, and the list that comes last is the one persisted for the project */
+  private fun putAsMostRecentlyUsed(scopeId: String, jumps: MutableList<Jump>) {
+    scopeToJumps.remove(scopeId)
+    scopeToJumps[scopeId] = jumps
   }
 
   companion object {

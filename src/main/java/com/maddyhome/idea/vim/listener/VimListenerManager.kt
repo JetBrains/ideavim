@@ -698,8 +698,11 @@ object VimListenerManager {
             (openingEditor.canBeReused || openingEditor.isPreview) && isInSameSplit && openingEditorIsClosed -> LocalOptionInitialisationScenario.EDIT
             else -> LocalOptionInitialisationScenario.NEW
           }
-          if (scenario == LocalOptionInitialisationScenario.SPLIT && injector.globalOptions().windowjumps) {
-            injector.jumpService.copyJumps(openingEditor?.editor?.vim?.jumpListId ?: "", editor.vim.jumpListId ?: "")
+          // Vim copies the jump list into any window created by a split, whichever buffer ends up in the new window -
+          // `:vsplit {file}`, `:vnew` and "Open in Right Split" included. The SPLIT scenario above is narrower than
+          // that: it only covers a new window showing the *same* document, so it cannot be the condition here
+          if (!isInSameSplit && openingEditor != null && injector.globalOptions().windowjumps) {
+            injector.jumpService.inheritJumps(openingEditor.editor.vim.jumpListId, editor.vim.jumpListId)
           }
           EditorListeners.add(editor, openingEditor?.editor?.vim ?: injector.fallbackWindow, scenario)
           firstEditorInitialised = true
