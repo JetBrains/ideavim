@@ -327,4 +327,99 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
       """.trimMargin(),
     )
   }
+
+  @Test
+  fun `test split copies the jump list from the opening window when windowjumps is set`() {
+    val mainWindow = configureMainWindow()
+    enterCommand("set windowjumps")
+    enterSearch("sodden")
+    enterSearch("shape")
+
+    val splitWindow = openSplitWindow(mainWindow)
+    selectWindow(splitWindow)
+
+    assertCommandOutput(
+      "jumps",
+      """ jump line  col file/text
+        |   2     1    8 I found it in a legendary land
+        |   1     3   29 where it was settled on some sodden sand
+        |>
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test split copies the current jump spot too when windowjumps is set`() {
+    val mainWindow = configureMainWindow()
+    enterCommand("set windowjumps")
+    enterSearch("sodden")
+    enterSearch("shape")
+    typeText("<C-O>")
+
+    val expected = """ jump line  col file/text
+      |   1     1    8 I found it in a legendary land
+      |>  0     3   29 where it was settled on some sodden sand
+      |   1     7   12 to science: shape and shade -- the special tinge,
+    """.trimMargin()
+
+    // The opening window has walked back one entry, so its spot is no longer at the end of the list
+    assertCommandOutput("jumps", expected)
+
+    val splitWindow = openSplitWindow(mainWindow)
+    selectWindow(splitWindow)
+
+    assertCommandOutput("jumps", expected)
+  }
+
+  @Test
+  fun `test jumps made in the new split do not leak back to the opening window when windowjumps is set`() {
+    val mainWindow = configureMainWindow()
+    enterCommand("set windowjumps")
+    enterSearch("sodden")
+    enterSearch("shape")
+
+    val splitWindow = openSplitWindow(mainWindow)
+    selectWindow(splitWindow)
+    typeText("G")
+    enterSearch("torrent")
+
+    selectWindow(mainWindow)
+
+    assertCommandOutput(
+      "jumps",
+      """ jump line  col file/text
+        |   2     1    8 I found it in a legendary land
+        |   1     3   29 where it was settled on some sodden sand
+        |>
+      """.trimMargin(),
+    )
+  }
+
+  @Test
+  fun `test reopened split starts from a fresh copy when windowjumps is set`() {
+    val mainWindow = configureMainWindow()
+    enterCommand("set windowjumps")
+    enterSearch("sodden")
+    enterSearch("shape")
+
+    val splitWindow = openSplitWindow(mainWindow)
+    selectWindow(splitWindow)
+    typeText("G")
+    enterSearch("torrent")
+    closeWindow(splitWindow)
+
+    selectWindow(mainWindow)
+    val reopenedSplitWindow = openSplitWindow(mainWindow)
+    selectWindow(reopenedSplitWindow)
+
+    // A copy of the opening window's list, with nothing left over from the split that was closed
+    assertCommandOutput(
+      "jumps",
+      """ jump line  col file/text
+        |   2     1    8 I found it in a legendary land
+        |   1     3   29 where it was settled on some sodden sand
+        |>
+      """.trimMargin(),
+    )
+  }
 }

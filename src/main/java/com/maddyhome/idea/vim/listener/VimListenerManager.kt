@@ -76,6 +76,7 @@ import com.maddyhome.idea.vim.api.VirtualBufferKind
 import com.maddyhome.idea.vim.api.coerceOffset
 import com.maddyhome.idea.vim.api.getLineEndForOffset
 import com.maddyhome.idea.vim.api.getLineStartForOffset
+import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.autocmd.AutoCmdEvent
 import com.maddyhome.idea.vim.autocmd.IjFileTypeMapping
@@ -693,6 +694,9 @@ object VimListenerManager {
             editor.document == openingEditor.editor.document -> LocalOptionInitialisationScenario.SPLIT
             (openingEditor.canBeReused || openingEditor.isPreview) && isInSameSplit && openingEditorIsClosed -> LocalOptionInitialisationScenario.EDIT
             else -> LocalOptionInitialisationScenario.NEW
+          }
+          if (scenario == LocalOptionInitialisationScenario.SPLIT && injector.globalOptions().windowjumps) {
+            injector.jumpService.copyJumps(openingEditor?.editor?.vim?.jumpListId ?: "", editor.vim.jumpListId ?: "")
           }
           EditorListeners.add(editor, openingEditor?.editor?.vim ?: injector.fallbackWindow, scenario)
           firstEditorInitialised = true

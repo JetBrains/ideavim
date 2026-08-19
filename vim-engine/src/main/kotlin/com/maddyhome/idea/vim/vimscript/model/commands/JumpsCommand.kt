@@ -66,6 +66,7 @@ data class JumpsCommand(val range: Range, val modifier: CommandModifier, val arg
       text.append(">\n")
     }
 
+    injector.outputPanel.clear(editor, context)
     injector.outputPanel.output(editor, context, text.toString())
     return ExecutionResult.Success
   }

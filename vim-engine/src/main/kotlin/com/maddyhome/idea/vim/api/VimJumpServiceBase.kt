@@ -66,6 +66,12 @@ abstract class VimJumpServiceBase : VimJumpService {
     scopeToJumpSpot.remove(scopeId)
   }
 
+  override fun copyJumps(fromId: String, toId: String) {
+    val jumps = scopeToJumps[fromId] ?: return
+    scopeToJumps[toId] = jumps.toMutableList()
+    scopeToJumpSpot[toId] = scopeToJumpSpot[fromId] ?: -1
+  }
+
   override fun updateJumpsFromInsert(scopeId: String, startOffset: Int, length: Int) {
     TODO("Not yet implemented")
   }
