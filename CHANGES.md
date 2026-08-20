@@ -23,6 +23,16 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+## To Be Released
+
+### Features:
+* [VIM-2168](https://youtrack.jetbrains.com/issue/VIM-2168) Added the `'windowjumps'` option, which gives every split its own [jump list](https://vimhelp.org/motion.txt.html#jump-motions) as in Vim. IdeaVim has always kept one list per project, so `<C-O>` in one split could take you back to a position you jumped from in another; with `:set windowjumps` a new split starts with a copy of the list of the window it was split from and the two lists then go their own ways, so `:jumps`, `<C-O>` and `<C-I>` only ever see the jumps made in the window you are in. The IDE's own Back and Forward navigation stays project wide either way. Since window ids do not survive a restart, only one list per project is saved between sessions — the list of the most recently used window, which a window with no list of its own starts from
+* [VIM-934](https://youtrack.jetbrains.com/issue/VIM-934) Added the [`'wildmenu'`](https://vimhelp.org/options.txt.html#%27wildmenu%27) option (`'wmnu'`), so the completion popup that `<Tab>` opens on the `:` command line can now be turned off with `:set nowildmenu` — previously it was always shown. With it off, `<Tab>` and `<S-Tab>` still cycle through the matches one at a time, and `<Left>` and `<Right>` move the caret instead of moving through the match list. The option is on by default, which is what IdeaVim has always done
+
+### Merged PRs:
+* [2001](https://github.com/JetBrains/ideavim/pull/2001) by [1grzyb1](https://github.com/1grzyb1): VIM-934 support for wildmenu option
+* [2000](https://github.com/JetBrains/ideavim/pull/2000) by [1grzyb1](https://github.com/1grzyb1): VIM-2168 separate history per split window
+
 ## 2.46.0, 2026-08-18
 
 ### Features:
