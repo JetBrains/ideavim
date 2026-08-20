@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.options.OptionConstants
 import com.maddyhome.idea.vim.register.RegisterConstants.BLACK_HOLE_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.CLIPBOARD_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.CLIPBOARD_REGISTERS
+import com.maddyhome.idea.vim.register.RegisterConstants.CURRENT_FILENAME_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.LAST_SEARCH_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.PLAYBACK_REGISTERS
 import com.maddyhome.idea.vim.register.RegisterConstants.PRIMARY_REGISTER
@@ -547,6 +548,11 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     if (Character.isUpperCase(myR)) {
       myR = Character.toLowerCase(myR)
     }
+
+    if (r == CURRENT_FILENAME_REGISTER) {
+      return getCurrentFileNameRegister(editor)
+    }
+
     return if (CLIPBOARD_REGISTERS.indexOf(myR) >= 0) refreshClipboardRegister(
       editor,
       context,
@@ -559,8 +565,8 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     val clipboardRegisters = CLIPBOARD_REGISTERS
       .filterNot { it == CLIPBOARD_REGISTER && !isPrimaryRegisterSupported() } // for some reason non-X systems use PRIMARY_REGISTER as a clipboard storage
       .mapNotNull { refreshClipboardRegister(editor, context, it) }
-
-    return (filteredRegisters + clipboardRegisters).sortedWith(Register.KeySorter)
+    return (filteredRegisters + clipboardRegisters + listOfNotNull(getCurrentFileNameRegister(editor)))
+      .sortedWith(Register.KeySorter)
   }
 
   override fun saveRegister(editor: VimEditor, context: ExecutionContext, r: Char, register: Register) {
@@ -649,4 +655,13 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
   override fun isSystemClipboard(register: Char): Boolean {
     return register == '+' || register == '*'
   }
+}
+
+private fun getCurrentFileNameRegister(editor: VimEditor): Register? {
+  val fileName = injector.file.bufferName(editor) ?: return null
+  return Register(
+    CURRENT_FILENAME_REGISTER,
+    injector.clipboardManager.dumbCopiedText(fileName),
+    SelectionType.CHARACTER_WISE
+  )
 }

@@ -144,6 +144,10 @@ class IjFileGroup : VimFileBase() {
     rpc { FileRemoteApi.getInstance().createFile(filename, extractProjectId(context), content) }
   }
 
+  override fun bufferName(editor: VimEditor): String? {
+    return rpc { FileRemoteApi.getInstance().getFileName((editor as IjVimEditor).editor.editorId(), fullPath = false) }
+  }
+
   override fun selectPreviousTab(context: ExecutionContext): Boolean {
     val project = PlatformDataKeys.PROJECT.getData(context.context as DataContext) ?: return false
     val vf = LastTabService.getInstance(project).lastTab
