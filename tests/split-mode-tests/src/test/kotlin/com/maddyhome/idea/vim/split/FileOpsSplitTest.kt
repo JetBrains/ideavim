@@ -33,6 +33,34 @@ class FileOpsSplitTest : IdeaVimStarterTestBase() {
   }
 
   @Test
+  fun `put file name from percent register`() {
+    openFile(createFile("src/Percent1.txt", "X\n"))
+
+    typeVim("\"%p")
+
+    // The '%' register is built on the backend (FileRemoteApi.getFileName), so this only passes if the RPC
+    // round trip works. Pasting right after the leading 'X' also pins down *what* came back: the
+    // project-relative buffer name, not an absolute path and not an empty register.
+    assertEditorContains(
+      "Xsrc/Percent1.txt",
+      "'\"%p' should paste the project-relative file name",
+    )
+  }
+
+  @Test
+  fun `list registers with percent register`() {
+    openFile(createFile("src/Percent2.txt", "Line 1\n"))
+
+    exCommand("registers")
+    pause()
+    esc()
+
+    // Listing the registers reads '%' through the same RPC, but from the ex command instead of a put.
+    // No crash means FileRemoteApi.getFileName survives both call paths.
+    assertEditorContains("Line 1", "Text should be untouched by ':registers'")
+  }
+
+  @Test
   fun `shell echo command`() {
     openFile(createFile("src/Shell1.txt", "hello world\n"))
     exCommand("!echo split-mode-test")

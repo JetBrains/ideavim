@@ -42,6 +42,7 @@ interface FileRemoteApi : RemoteApi<Unit> {
   suspend fun selectFile(count: Int, projectId: ProjectId?): Boolean
   suspend fun selectNextFile(count: Int, projectId: ProjectId?)
   suspend fun buildFileInfoMessage(editorId: EditorId, fullPath: Boolean): String?
+  suspend fun getFileName(editorId: EditorId, fullPath: Boolean): String?
   suspend fun selectEditor(projectId: ProjectId, documentPath: String, protocol: String): Boolean
   suspend fun listFilesForCompletion(pathPrefix: String, projectId: ProjectId?): List<String>
   suspend fun createFile(filename: String, projectId: ProjectId?, content: String?)
