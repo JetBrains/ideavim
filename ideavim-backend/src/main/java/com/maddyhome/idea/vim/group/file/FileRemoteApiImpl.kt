@@ -11,7 +11,6 @@ package com.maddyhome.idea.vim.group.file
 import com.intellij.ide.vfs.VirtualFileId
 import com.intellij.ide.vfs.virtualFile
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.application.readAction
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.diagnostic.Logger
@@ -24,7 +23,6 @@ import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.fileEditor.impl.EditorsSplitters
-import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.LocalFileSystem
@@ -142,6 +140,33 @@ internal class FileRemoteApiImpl : FileRemoteApi {
       buildFileInfoMessage(editor, project, fullPath)
     }
 
+  override suspend fun getFileName(
+    editorId: EditorId,
+    fullPath: Boolean,
+  ): String? {
+    return readAction {
+      val editor = editorId.findEditorOrNull() ?: return@readAction null
+      val project = editor.project ?: return@readAction null
+      val vf = editor.virtualFile ?: return@readAction null
+      bufferName(fullPath, vf, project)
+    }
+  }
+
+  private fun bufferName(
+    fullPath: Boolean,
+    vf: VirtualFile,
+    project: Project,
+  ): String {
+    if (fullPath) {
+      return vf.path
+    }
+    val root = ProjectRootManager.getInstance(project).fileIndex.getContentRootForFile(vf)
+    if (root != null) {
+      return vf.path.substring(root.path.length + 1)
+    }
+    return vf.path
+  }
+
   override suspend fun selectEditor(projectId: ProjectId, documentPath: String, protocol: String): Boolean =
     onEdt {
       val virtualFile = findVirtualFile(documentPath, protocol) ?: return@onEdt false
@@ -205,16 +230,8 @@ internal class FileRemoteApiImpl : FileRemoteApi {
     val vf = editor.virtualFile
     if (vf != null) {
       msg.append('"')
-      if (fullPath) {
-        msg.append(vf.path)
-      } else {
-        val root = ProjectRootManager.getInstance(project).fileIndex.getContentRootForFile(vf)
-        if (root != null) {
-          msg.append(vf.path.substring(root.path.length + 1))
-        } else {
-          msg.append(vf.path)
-        }
-      }
+      val fileName = bufferName(fullPath, vf, project)
+      msg.append(fileName)
       msg.append("\" ")
     } else {
       msg.append("\"[No File]\" ")

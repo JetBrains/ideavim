@@ -40,6 +40,7 @@ interface VimFile {
   fun selectFile(count: Int, context: ExecutionContext): Boolean
   fun selectNextFile(count: Int, context: ExecutionContext)
   fun createFile(filename: String, context: ExecutionContext, content: String?, editor: VimEditor)
+  fun bufferName(editor: VimEditor): String?
 
   /**
    * Opens a file by name or path.
