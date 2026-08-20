@@ -125,20 +125,21 @@ class ProcessGroup : VimProcessGroupBase() {
           commandLine.setWorkDirectory(currentDirectoryPath)
         }
         val handler = CapturingProcessHandler(commandLine)
-        if (input != null) {
-          handler.addProcessListener(object : ProcessListener {
-            override fun startNotified(event: ProcessEvent) {
-              try {
-                val charSequenceReader = CharSequenceReader(input)
-                val outputStreamWriter = BufferedWriter(OutputStreamWriter(handler.processInput))
-                charSequenceReader.transferTo(outputStreamWriter)
-                outputStreamWriter.close()
-              } catch (e: IOException) {
-                logger.error(e)
+        handler.addProcessListener(object : ProcessListener {
+          override fun startNotified(event: ProcessEvent) {
+            try {
+              // Close stdin even when there is nothing to write. Without EOF, a command that reads stdin, such as
+              // `:!sort`, would block forever. Vim hands such a command its terminal; we have none, like Neovim.
+              BufferedWriter(OutputStreamWriter(handler.processInput)).use { writer ->
+                if (input != null) {
+                  CharSequenceReader(input).transferTo(writer)
+                }
               }
+            } catch (e: IOException) {
+              logger.error(e)
             }
-          })
-        }
+          }
+        })
 
         val progressIndicator = ProgressIndicatorProvider.getInstance().progressIndicator
         val output = handler.runProcessWithProgressIndicator(progressIndicator)
