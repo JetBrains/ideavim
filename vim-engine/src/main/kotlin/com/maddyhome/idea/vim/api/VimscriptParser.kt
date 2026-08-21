@@ -17,14 +17,15 @@ interface VimscriptParser {
   val linesWithErrors: MutableList<Int>
 
   /**
-   * Human-readable syntax errors collected while parsing the *current* pass. Populated by the error listener and
-   * cleared at the start of every parse pass (including the internal error-recovery retries), so it is scratch state.
-   * Consumers that want to report parse errors should read [lastParseErrors] instead.
+   * User-facing syntax errors collected while parsing the *current* pass, in Vim's style (e.g.
+   * `E492: Not an editor command: ^`). Populated by the error listener and cleared at the start of every parse pass
+   * (including the internal error-recovery retries), so it is scratch state. Consumers that want to report parse
+   * errors should read [lastParseErrors] instead. The parser's own detailed diagnostic is logged separately.
    */
   val errorMessages: MutableList<String>
 
   /**
-   * Human-readable syntax errors from the last top-level [parse] call. Unlike [errorMessages], this survives the
+   * User-facing syntax errors from the last top-level [parse] call. Unlike [errorMessages], this survives the
    * internal error-recovery retries and the parser reset, so it can be read after [parse] returns to report the
    * errors to the user (e.g. when executing .ideavimrc).
    */
