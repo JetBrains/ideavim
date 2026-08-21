@@ -12,6 +12,7 @@ import com.intellij.vim.api.VimApi
 import com.intellij.vim.api.getVariable
 import com.intellij.vim.api.models.Range
 import com.intellij.vim.api.scopes.editor.ReadScope
+import com.maddyhome.idea.vim.api.injector
 
 /** A caret position that survives the document being rebuilt by undo. */
 internal data class CaretPosition(val line: Int, val column: Int)
@@ -71,7 +72,7 @@ private fun ReadScope.pastedText(): String? {
  */
 private fun VimApi.requestedRegisterPrefix(): String {
   val register = getVariable<String>("v:register").orEmpty()
-  if (register.isEmpty() || register == UNNAMED_REGISTER.toString()) return ""
+  if (register.isEmpty() || register == injector.registerGroup.defaultRegister.toString()) return ""
   return "\"$register"
 }
 
