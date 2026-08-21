@@ -113,6 +113,8 @@ usual beta standards.
 * [VIM-4286](https://youtrack.jetbrains.com/issue/VIM-4286) Fixed search and substitute patterns with square brackets that don't form a [collection](https://vimhelp.org/pattern.txt.html#%2Fcollection) being rejected as invalid — an unmatched `[` is now a literal bracket (e.g. `/heap[`, `/[[[`, `/[a-z`) and a `]` right after `[` or `[^` is a literal member of the collection (e.g. `/[]]` matches a `]`, `/[^]]` matches anything but a `]`), matching Vim
 * [VIM-4287](https://youtrack.jetbrains.com/issue/VIM-4287) Fixed [`dat`](https://vimhelp.org/motion.txt.html#v_at) leaving an empty indented line behind when the tag spans whole lines — deleting an indented `<b>…</b>` block now removes those lines completely and leaves the caret on the following tag. The same applies to other deletes that Vim turns linewise, such as `d}` on an indented paragraph, while text objects provided by extensions (e.g. `dam`, `die`, `d%`) stay characterwise as in Vim
 * [VIM-4301](https://youtrack.jetbrains.com/issue/VIM-4301) Fixed the IDE's own undo (`Ctrl+Z`, when undo is handled by the IDE) not reverting a change made with `S` or `C` in Normal mode — repeated presses were spent restoring the caret and the text was never brought back
+* [VIM-4283](https://youtrack.jetbrains.com/issue/VIM-4283) Fixed `dw` and similar edits doing nothing inside a Jupyter notebook cell — the text is now deleted instead of the command being silently ignored
+* [VIM-4282](https://youtrack.jetbrains.com/issue/VIM-4282) Fixed the editor scrolling unexpectedly when the caret was below the visible area
 * Fixed IdeaVim failing to load in split mode (the frontend/backend architecture also used by [remote development](https://www.jetbrains.com/help/idea/remote-development-overview.html)) — the new spell-checking commands declared a dependency on the IDE's spellchecker module, which the frontend does not provide
 
 ### Changes:
@@ -128,6 +130,8 @@ usual beta standards.
 * [1940](https://github.com/JetBrains/ideavim/pull/1940) by [1grzyb1](https://github.com/1grzyb1): VIM-2649 Move carret on enter after C-G/C-t
 * [1939](https://github.com/JetBrains/ideavim/pull/1939) by [1grzyb1](https://github.com/1grzyb1): VIM-4284 Errors in vim scripts
 * [1938](https://github.com/JetBrains/ideavim/pull/1938) by [1grzyb1](https://github.com/1grzyb1): VIM-3936 enable vim in python console
+* [1932](https://github.com/JetBrains/ideavim/pull/1932) by [1grzyb1](https://github.com/1grzyb1): VIM-4282 Don't scroll if caret below visible area
+* [1931](https://github.com/JetBrains/ideavim/pull/1931) by [1grzyb1](https://github.com/1grzyb1): VIM-4283 Fix dw in jupyter notebook cell
 * [1929](https://github.com/JetBrains/ideavim/pull/1929) by [1grzyb1](https://github.com/1grzyb1): VIM-4281 update output panel theme on change
 * [1928](https://github.com/JetBrains/ideavim/pull/1928) by [1grzyb1](https://github.com/1grzyb1): VIM-4279 fix till V motion
 * [1925](https://github.com/JetBrains/ideavim/pull/1925) by [1grzyb1](https://github.com/1grzyb1): VIM-1850 Implement keymap option
