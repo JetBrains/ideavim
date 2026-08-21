@@ -103,7 +103,10 @@ private suspend fun VimApi.undoAndRepaste(entry: YankRingEntry, paste: Paste) {
 
     restoreCaretFor(paste)
 
-    normal("${paste.count}${paste.command}")
+    // The register is named explicitly rather than left to the default, because `'clipboard'` can
+    // alias the default onto `*` or `+` (`unnamed` / `unnamedplus`) - an unprefixed paste would then
+    // read the system clipboard and put the text we are trying to replace straight back (VIM-4309).
+    normal("\"$UNNAMED_REGISTER${paste.count}${paste.command}")
   }
 }
 
