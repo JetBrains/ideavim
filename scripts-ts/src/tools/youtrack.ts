@@ -30,6 +30,19 @@ export interface TicketAttachment {
   mimeType: string | null;
 }
 
+export interface AreaValue {
+  id: string;
+  name: string;
+  description: string | null;
+  ordinal: number;
+}
+
+export interface TicketSearchResult {
+  id: string;
+  summary: string;
+  areas: string[];
+}
+
 function getToken(): string {
   const token = process.env.YOUTRACK_TOKEN;
   if (!token) {
@@ -345,6 +358,197 @@ export async function setFixVersion(
   }
 
   console.log(`Fix version set successfully to "${version}"`);
+}
+
+/**
+ * Searches VIM tickets and returns their summary and current Area values.
+ *
+ * Use this to see how an Area value is applied in practice, instead of relying
+ * on the value name alone.
+ */
+export async function searchTickets(
+  query: string
+): Promise<TicketSearchResult[]> {
+  const params = new URLSearchParams({
+    fields: "idReadable,summary,customFields(name,value(name))",
+    query: `project:VIM ${query}`,
+    $top: "50",
+  });
+
+  const response = await youtrackFetch(`/issues/?${params}`);
+  const data = await response.json();
+
+  return data.map(
+    (issue: {
+      idReadable: string;
+      summary: string;
+      customFields?: { name: string; value: unknown }[];
+    }) => {
+      const areaField = issue.customFields?.find((f) => f.name === "Area");
+      const value = areaField?.value;
+      const values = Array.isArray(value) ? value : value ? [value] : [];
+
+      return {
+        id: issue.idReadable,
+        summary: issue.summary,
+        areas: values.map((v) => (v as { name: string }).name),
+      };
+    }
+  );
+}
+
+/**
+ * Resolves the Area custom field of the VIM project to its field id and the id
+ * of the enum bundle that holds the possible values.
+ */
+async function getAreaFieldInfo(): Promise<{
+  fieldId: string;
+  bundleId: string;
+}> {
+  const params = new URLSearchParams({
+    fields: "id,field(id,name),bundle(id)",
+    $top: "1000",
+  });
+
+  const response = await youtrackFetch(
+    `/admin/projects/${VIM_PROJECT_ID}/customFields?${params}`
+  );
+  const data = await response.json();
+
+  const areaField = data.find(
+    (f: { field?: { name: string } }) => f.field?.name === "Area"
+  );
+
+  if (!areaField) {
+    throw new Error("Area field not found in the VIM project");
+  }
+
+  const fieldId = areaField.id;
+  const bundleId = areaField.bundle?.id;
+
+  if (!bundleId) {
+    throw new Error("Area field has no enum bundle");
+  }
+
+  return { fieldId, bundleId };
+}
+
+export async function getAreaValues(): Promise<AreaValue[]> {
+  const { bundleId } = await getAreaFieldInfo();
+
+  const params = new URLSearchParams({
+    fields: "id,name,description,ordinal",
+    $top: "1000",
+  });
+
+  const response = await youtrackFetch(
+    `/admin/customFieldSettings/bundles/enum/${bundleId}/values?${params}`
+  );
+  const data = await response.json();
+
+  return data
+    .map((value: { id: string; name: string; description?: string; ordinal?: number }) => ({
+      id: value.id,
+      name: value.name,
+      description: value.description ?? null,
+      ordinal: value.ordinal ?? 0,
+    }))
+    .sort((a: AreaValue, b: AreaValue) => a.ordinal - b.ordinal);
+}
+
+/**
+ * Sets the Area field of a ticket to exactly the given values.
+ *
+ * Area is a multi-value field, so every previous value is replaced. Unknown
+ * names are rejected before anything is written.
+ */
+export async function setArea(
+  ticketId: string,
+  areaNames: string[]
+): Promise<void> {
+  if (areaNames.length === 0) {
+    throw new Error("No Area values given");
+  }
+
+  const areaValues = await getAreaValues();
+  const valuesByName = new Map(areaValues.map((v) => [v.name, v]));
+
+  const unknown = areaNames.filter((name) => !valuesByName.has(name));
+  if (unknown.length > 0) {
+    throw new Error(
+      `Unknown Area value(s): ${unknown.join(", ")}. Available: ${areaValues
+        .map((v) => v.name)
+        .join(", ")}`
+    );
+  }
+
+  console.log(`Setting ${ticketId} Area to "${areaNames.join(", ")}"...`);
+
+  const { fieldId } = await getAreaFieldInfo();
+
+  await youtrackFetch(`/issues/${ticketId}/customFields/${fieldId}`, {
+    method: "POST",
+    body: JSON.stringify({
+      value: areaNames.map((name) => ({ id: valuesByName.get(name)!.id })),
+    }),
+  });
+
+  // Verify the values were set correctly
+  const params = new URLSearchParams({
+    fields: "customFields(name,value(name))",
+  });
+  const check = await youtrackFetch(`/issues/${ticketId}?${params}`);
+  const data = await check.json();
+
+  const areaField = data.customFields?.find(
+    (f: { name: string }) => f.name === "Area"
+  );
+  const finalValue = areaField?.value;
+  const finalAreas = (
+    Array.isArray(finalValue) ? finalValue : finalValue ? [finalValue] : []
+  ).map((v: { name: string }) => v.name);
+
+  const missing = areaNames.filter((name) => !finalAreas.includes(name));
+  if (missing.length > 0) {
+    throw new Error(
+      `Ticket ${ticketId} Area not updated! Expected "${areaNames.join(
+        ", "
+      )}", got "${finalAreas.join(", ")}"`
+    );
+  }
+
+  console.log(`Area set successfully to "${finalAreas.join(", ")}"`);
+}
+
+/**
+ * Resolves a tag name to its id. The tag must already exist in YouTrack.
+ */
+export async function getTagIdByName(tagName: string): Promise<string> {
+  const params = new URLSearchParams({
+    fields: "id,name",
+    query: tagName,
+  });
+
+  const response = await youtrackFetch(`/tags?${params}`);
+  const data = await response.json();
+
+  const tag = data.find((t: { name: string }) => t.name === tagName);
+
+  if (!tag) {
+    throw new Error(
+      `Tag "${tagName}" does not exist in YouTrack. Create it manually first.`
+    );
+  }
+
+  return tag.id;
+}
+
+export async function setTagByName(
+  ticketId: string,
+  tagName: string
+): Promise<void> {
+  const tagId = await getTagIdByName(tagName);
+  await setTag(ticketId, tagId);
 }
 
 export {

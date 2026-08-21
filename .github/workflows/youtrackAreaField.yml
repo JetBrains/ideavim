@@ -1,0 +1,150 @@
+name: YouTrack Area Field with Claude
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'  # Every 30 minutes
+  workflow_dispatch:  # Allow manual trigger
+    inputs:
+      ticket:
+        description: 'Ticket to process (e.g. VIM-1234). Leave empty to pick one automatically.'
+        required: false
+        type: string
+
+# One run at a time, so two runs cannot pick and process the same ticket
+concurrency:
+  group: youtrack-area-field
+  cancel-in-progress: false
+
+jobs:
+  set-area:
+    runs-on: ubuntu-latest
+    if: github.repository == 'JetBrains/ideavim'
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: scripts-ts
+
+      - name: Select ticket without Area
+        id: select-ticket
+        run: npx tsx src/selectIssueWithoutArea.ts "${{ inputs.ticket }}"
+        working-directory: scripts-ts
+        env:
+          YOUTRACK_TOKEN: ${{ secrets.YOUTRACK_TOKEN }}
+
+      - name: Determine the Area values
+        if: steps.select-ticket.outputs.has_ticket == 'true'
+        uses: anthropics/claude-code-action@v1
+        env:
+          ANTHROPIC_BASE_URL: ${{ secrets.PROXY_URL }}
+          ANTHROPIC_CUSTOM_HEADERS: |
+            Grazie-Agent: {"name":"ideavim-claude-code-action","version":"github-actions"}
+            Grazie-Authenticate-JWT: ${{ secrets.ANTHROPIC_API_KEY }}
+          YOUTRACK_TOKEN: ${{ secrets.YOUTRACK_TOKEN }}
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          settings: .claude/settings.json
+
+          prompt: |
+            ## Task: Set the Area field of a YouTrack ticket
+
+            Ticket: ${{ steps.select-ticket.outputs.ticket_id }}
+
+            The `Area` field describes which part of the IdeaVim plugin an issue belongs to.
+            Your job is to decide which Area values fit this ticket, set them, and explain why.
+
+            The commands below must be run from the `scripts-ts` directory, where the
+            dependencies are installed. Keep the `cd scripts-ts &&` prefix on every call.
+
+            ### Step 1: Gather information
+
+            1. Read the ticket, including its comments:
+               `cd scripts-ts && npx tsx src/youtrack-cli/get-ticket.ts <TICKET-ID>`
+            2. List the available Area values and their descriptions:
+               `cd scripts-ts && npx tsx src/youtrack-cli/get-area-values.ts`
+
+            ### Step 2: Verify only what you are unsure about
+
+            When the ticket clearly belongs to an Area, use that value. No further research is
+            needed.
+
+            When you are not sure, check how the value is used in practice before you rely on it:
+            `cd scripts-ts && npx tsx src/youtrack-cli/search-tickets.ts "Area: {Visual Mode}"`
+
+            Compare those tickets with the one you are triaging. If your ticket does not resemble
+            them, that Area is probably the wrong choice.
+
+            Check the other tickets when:
+            - Several Area values look plausible and you must choose between them
+            - The value name is ambiguous, so it tells you little about which tickets carry it
+            - You are about to propose a new Area value, which is only justified once you know that
+              no existing value is already used for this kind of issue
+
+            The IdeaVim source is checked out in this repository. When the ticket names a specific
+            command, motion, option, or setting, find it in the code (`Grep`, `Read`) to see which
+            part of the plugin owns it. `CONTRIBUTING.md` describes the project structure.
+
+            ### Step 3: Choose the values
+
+            The Area field accepts several values. Prefer the smallest set that describes the issue.
+
+            **Describe the problem, not the text of the ticket.** Common mistakes:
+            - The ticket reports a bug and pastes the reporter's `.ideavimrc`. The Area must reflect
+              the bug, not the contents of that file.
+            - The ticket reports a problem with the `:e` command and uses `:e ~/.ideavimrc` as an
+              example. The Area is about `:e`, not about `.ideavimrc`.
+
+            Additional rules:
+            - You may suggest creating a new Area value. Put the suggested name in your explanation
+              and mention @Aleksei.Plate so he is notified. Still set the best existing values
+              alongside it.
+            - For a performance issue, do not suggest a new Area value for performance. Instead
+              suggest setting the ticket type to "Performance Problem" and mention @Aleksei.Plate.
+
+            ### Step 4: Apply the result
+
+            **If you found suitable Area values:**
+
+            1. Set them (the names must match `get-area-values.ts` exactly):
+               `cd scripts-ts && npx tsx src/youtrack-cli/set-area.ts <TICKET-ID> "Visual Mode" "Caret position"`
+            2. Add a private comment. Keep this format, and say in the explanation which
+               tickets or which code you checked:
+
+               ```
+               [AI CHANGE] Setting Area field values
+
+               Values added: <comma-separated values>
+
+               Explanation: <why these values, and what you compared against>
+
+               This change was performed automatically by an AI assistant analyzing the issue content.
+
+               ---
+               *Questions? Contact [Alex Plate](https://jetbrains.slack.com/team/UE1MXEZNV) | [Source code](https://github.com/JetBrains/ideavim)*
+               ```
+
+               `cd scripts-ts && npx tsx src/youtrack-cli/add-comment.ts <TICKET-ID> "<comment>" --private`
+
+            **If the ticket does not contain enough information to decide:**
+
+            Add a private comment titled `[AI ANALYSIS] Unable to suggest Area field values` that
+            explains what is missing, with the same footer. Do not set the field.
+
+            **In both cases**, finish by tagging the ticket so it is not processed again:
+            `cd scripts-ts && npx tsx src/youtrack-cli/add-tag.ts <TICKET-ID> ai-area-processed`
+
+            Do not modify any other field, and do not change files in this repository.
+
+          claude_args: '--model claude-opus-4-5-20251101 --allowed-tools "Read,Glob,Grep,Bash(cd:*),Bash(npx tsx:*),Bash(cat:*),Bash(grep:*),Bash(ls:*)"'
