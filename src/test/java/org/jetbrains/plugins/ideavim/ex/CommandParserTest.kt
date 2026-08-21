@@ -496,4 +496,49 @@ class CommandParserTest : VimTestCase() {
     assertTrue(command is NormalCommand)
     assertEquals("/search\r", (command as NormalCommand).argument)
   }
+
+  @Test
+  fun `test invalid command reports concise E492 error`() {
+    configureByText("\n")
+    enterCommand("^")
+    assertPluginError(true)
+    assertPluginErrorMessage("E492: Not an editor command: ^")
+  }
+
+  @Test
+  fun `test invalid command with arguments reports the whole command in E492`() {
+    configureByText("\n")
+    enterCommand("^abc def")
+    assertPluginErrorMessage("E492: Not an editor command: ^abc def")
+  }
+
+  @Test
+  fun `test invalid command with a range reports the command without the range in E492`() {
+    configureByText("\n")
+    enterCommand("1,2^abc")
+    assertPluginErrorMessage("E492: Not an editor command: ^abc")
+  }
+
+  @Test
+  fun `test invalid command error does not expose parser diagnostic`() {
+    configureByText("\n")
+    enterCommand("^")
+    assertNoRawParserDiagnostic()
+  }
+
+  @Test
+  fun `test error inside a known command does not expose the expected token list`() {
+    configureByText("\n")
+    enterCommand("echo ^523")
+    assertPluginError(true)
+    assertNoRawParserDiagnostic()
+  }
+
+  private fun assertNoRawParserDiagnostic() {
+    val message = VimPlugin.getMessage()
+    assertFalse(
+      message.contains("expecting {"),
+      "Raw parser diagnostic leaked to the user: $message",
+    )
+  }
 }
