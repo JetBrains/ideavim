@@ -26,16 +26,30 @@ usual beta standards.
 ## To Be Released
 
 ### Features:
+* [VIM-1266](https://youtrack.jetbrains.com/issue/VIM-1266) Added the [`"%` register](https://vimhelp.org/change.txt.html#quote_%25), which holds the name of the file you are editing — `"%p` puts it into the text, and `:registers` now lists it along with the rest. Vim's `%` holds the buffer name as it was typed, which is usually a path relative to the current directory; IdeaVim has no current directory, so it reports the path relative to the content root, the same path that `CTRL-G` and `:file` already show
 * [VIM-2168](https://youtrack.jetbrains.com/issue/VIM-2168) Added the `'windowjumps'` option, which gives every split its own [jump list](https://vimhelp.org/motion.txt.html#jump-motions) as in Vim. IdeaVim has always kept one list per project, so `<C-O>` in one split could take you back to a position you jumped from in another; with `:set windowjumps` a new split starts with a copy of the list of the window it was split from and the two lists then go their own ways, so `:jumps`, `<C-O>` and `<C-I>` only ever see the jumps made in the window you are in. The IDE's own Back and Forward navigation stays project wide either way. Since window ids do not survive a restart, only one list per project is saved between sessions — the list of the most recently used window, which a window with no list of its own starts from
 * [VIM-934](https://youtrack.jetbrains.com/issue/VIM-934) Added the [`'wildmenu'`](https://vimhelp.org/options.txt.html#%27wildmenu%27) option (`'wmnu'`), so the completion popup that `<Tab>` opens on the `:` command line can now be turned off with `:set nowildmenu` — previously it was always shown. With it off, `<Tab>` and `<S-Tab>` still cycle through the matches one at a time, and `<Left>` and `<Right>` move the caret instead of moving through the match list. The option is on by default, which is what IdeaVim has always done
 
 ### Fixes:
 * Fixed [`gx`](https://vimhelp.org/pi_netrw.txt.html#netrw-gx) adding to the [jump list](https://vimhelp.org/motion.txt.html#jumplist) — pressing `gx` used to record the caret position as a jump and overwrite the [`'`](https://vimhelp.org/motion.txt.html#%27quote) mark, so a following [`CTRL-O`](https://vimhelp.org/motion.txt.html#CTRL-O) landed back on the caret's own line instead of returning to the previous jump. As in Vim, `gx` opens the URL without touching the jump list
 * Fixed the [word text objects](https://vimhelp.org/motion.txt.html#v_iw) throwing an exception when they reached the very start of the file — growing a right-to-left Visual selection with `iw`, `aw`, `iW` or `aW` looks one character back to decide where the previous word begins, and at offset 0 there is no such character. Starting on the second character of the file and pressing `v`, `h`, `iw` now selects back to the start of the file instead of reporting an internal error
+* Fixed [`g8`](https://vimhelp.org/various.txt.html#g8) reporting the hex value of a single UTF-16 code unit instead of the UTF-8 bytes of the character under the caret, which is what it is supposed to print — `é` now reports `c3 a9` rather than `e9`, and a character outside the Basic Multilingual Plane such as `😀` reports all four of its bytes rather than half of a surrogate pair. ASCII characters are unchanged. Vim also appends the bytes of any trailing composing characters, separated by `+`; IdeaVim still does not
+* Fixed `g8` throwing an exception when there is no character under the caret — in an empty file, or on an empty line, the caret sits where the line break is. As in Vim, which puts the cursor on the line's terminating NUL, `g8` now reports `NUL` instead of reporting an internal error or, on an empty line in the middle of the file, the hex value of the line feed
 
 ### Merged PRs:
+* [2007](https://github.com/JetBrains/ideavim/pull/2007) by [1grzyb1](https://github.com/1grzyb1): VIM-1266 file name from percent register
 * [2001](https://github.com/JetBrains/ideavim/pull/2001) by [1grzyb1](https://github.com/1grzyb1): VIM-934 support for wildmenu option
 * [2000](https://github.com/JetBrains/ideavim/pull/2000) by [1grzyb1](https://github.com/1grzyb1): VIM-2168 separate history per split window
+
+## 2.46.1, 2026-08-21
+
+### Fixes:
+* [VIM-4310](https://youtrack.jetbrains.com/issue/VIM-4310) Fixed an unknown `:` command reporting the parser's own diagnostic, complete with the full list of token names it was expecting — `:^` now reports `E492: Not an editor command: ^` as Vim does, and `:1,2^abc` reports the command without the range. An error inside a command that is recognised, such as `:echo ^523`, no longer lists the expected tokens either
+* [VIM-4309](https://youtrack.jetbrains.com/issue/VIM-4309) Fixed the `YankRing` extension's `<C-P>` and `<C-N>` appearing to do nothing when [`'clipboard'`](https://vimhelp.org/options.txt.html#%27clipboard%27) contains `unnamed` or `unnamedplus` — cycling to another entry in the ring re-pasted from the system clipboard, putting the text it was replacing straight back
+
+### Merged PRs:
+* [2010](https://github.com/JetBrains/ideavim/pull/2010) by [1grzyb1](https://github.com/1grzyb1): VIM-4310 Don't show full parser error message
+* [2009](https://github.com/JetBrains/ideavim/pull/2009) by [1grzyb1](https://github.com/1grzyb1): VIM-4309 cycle pastes from unnamed register
 
 ## 2.46.0, 2026-08-18
 
