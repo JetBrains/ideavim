@@ -87,7 +87,16 @@ tasks {
 
     generateGrammarSource {
         maxHeapSize = "128m"
-        arguments.addAll(listOf("-package", "com.maddyhome.idea.vim.parser.generated", "-visitor"))
+        arguments.addAll(listOf("-visitor"))
+
+        // Use `packageName` rather than passing `-package` in `arguments`. ANTLR's `-package` argument only
+        // sets the package declaration in the generated code, it does not nest the output in a matching
+        // directory. Gradle's javac invocation doesn't care, but IntelliJ resolves Java classes via the
+        // package/directory relationship under a source root, so the generated parser, lexer, listener and
+        // visitor classes appear unresolvable in the IDE. Setting `packageName` makes Gradle nest the output
+        // to match, while leaving the registered source root at `build/generated-src/antlr/main`.
+        // Passing `-package` directly is also deprecated, and becomes an error in Gradle 10.
+        packageName = "com.maddyhome.idea.vim.parser.generated"
     }
 
     named("compileKotlin") {
