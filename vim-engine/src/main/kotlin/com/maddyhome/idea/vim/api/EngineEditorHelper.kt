@@ -261,7 +261,7 @@ fun VimEditor.anyNonWhitespace(offset: Int, dir: Int): Boolean {
   val end: Int
   val fileSize = fileSize().toInt()
   if (dir > 0) {
-    start = (offset + 1).coerceAtMost(fileSize - 1)
+    start = offset.coerceAtMost(fileSize - 1)
     end = getLineEndForOffset(offset).coerceAtMost(fileSize - 1)
   } else {
     start = getLineStartForOffset(offset)

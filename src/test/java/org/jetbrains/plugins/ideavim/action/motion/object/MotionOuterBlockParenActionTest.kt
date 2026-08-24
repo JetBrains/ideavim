@@ -134,6 +134,26 @@ class MotionOuterBlockParenActionTest : VimTestCase() {
     assertState("foo;\n")
   }
 
+  @Test
+  fun `test delete outer block paren nested multiline with trailing empty line`() {
+    typeTextInFile(
+      injector.parser.parseKeys("da("),
+      """
+        |(
+        |${c}(
+        |))
+        |
+      """.trimMargin(),
+    )
+    assertState(
+      """
+        |(
+        |)
+        |
+      """.trimMargin(),
+    )
+  }
+
   // ============== preserveSelectionAnchor behavior tests ==============
 
   @Test
