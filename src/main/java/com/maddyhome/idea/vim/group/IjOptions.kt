@@ -130,6 +130,7 @@ object IjOptions {
       "<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>"
     )
   )
+  val pythonconsole: ToggleOption = addOption(ToggleOption("pythonconsole", GLOBAL, "pythonconsole", true))
   val trackactionids: ToggleOption = addOption(ToggleOption("trackactionids", GLOBAL, "tai", false))
   val visualdelay: UnsignedNumberOption = addOption(UnsignedNumberOption("visualdelay", GLOBAL, "visualdelay", 100))
 
