@@ -27,8 +27,13 @@ import com.intellij.util.ui.RegionPainter
 import com.intellij.vim.api.VimInitApi
 import com.maddyhome.idea.vim.api.VimMarkService
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.common.ListenerOwner
 import com.maddyhome.idea.vim.common.VimMarkListener
+import com.maddyhome.idea.vim.extension.ExtensionHandler
 import com.maddyhome.idea.vim.extension.VimExtension
+import com.maddyhome.idea.vim.extension.VimExtensionFacade
+import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.newapi.IjVimEditor
 import java.awt.Component
@@ -38,7 +43,8 @@ import javax.swing.Icon
 internal const val PLUGIN_NAME: String = "signature"
 
 /**
- * Gutter signs for the local marks of a file - a port of kshenoy/vim-signature (VIM-1347).
+ * Gutter signs for the local marks of a file, plus the mark commands around them - a port of kshenoy/vim-signature
+ * (VIM-1347).
  *
  * Global marks `A`-`Z` are left to the IDE: with the default `ideamarks` they are IDE bookmarks, which the platform
  * already draws in the gutter itself. Local marks `a`-`z` have no visual at all, and that is what this adds.
@@ -47,13 +53,31 @@ internal class SignatureExtension : VimExtension, VimMarkListener {
 
   override fun getName(): String = PLUGIN_NAME
 
+  // VimExtension.getOwner() and Listener.owner are both called "owner", so both are spelled out here
+  private val mappingOwner: MappingOwner get() = MappingOwner.Plugin.get(getName())
+  override val owner: ListenerOwner = ListenerOwner.Plugin.get(PLUGIN_NAME)
+
   override fun init(initApi: VimInitApi) {
     injector.listenersNotifier.markListeners.add(this)
     marksChanged(null)
+
+    val owner = mappingOwner
+    MAPPINGS.forEach { (keys, plugName, handler) ->
+      val plugKeys = injector.parser.parseKeys(plugName)
+      VimExtensionFacade.putExtensionHandlerMapping(MappingMode.NXO, plugKeys, owner, handler, false)
+      VimExtensionFacade.putKeyMappingIfMissing(
+        MappingMode.NXO,
+        injector.parser.parseKeys(keys),
+        owner,
+        plugKeys,
+        true,
+      )
+    }
   }
 
   override fun dispose() {
     injector.listenersNotifier.markListeners.remove(this)
+    injector.keyGroup.removeKeyMapping(mappingOwner)
     injector.editorGroup.getEditors().forEach { removeAllSigns((it as IjVimEditor).editor) }
   }
 
@@ -81,6 +105,20 @@ internal class SignatureExtension : VimExtension, VimMarkListener {
     }
   }
 }
+
+private data class SignatureMapping(val keys: String, val plugName: String, val handler: ExtensionHandler)
+
+/**
+ * `m,` is `m{invalid-mark}` in Vim and so free to take. It still goes through a `<Plug>` name and
+ * `putKeyMappingIfMissing`, so a user who wants a different key can map their own to the `<Plug>` name instead.
+ *
+ * The `<Plug>` names are parenthesised because `putKeyMappingIfMissing` asks `hasMapTo`, which matches the right-hand
+ * side as a *substring*: a bare `<Plug>SignaturePurgeMarks` would count as already mapped by
+ * `<Plug>SignaturePurgeMarksAtLine` and would silently never be bound.
+ */
+private val MAPPINGS: List<SignatureMapping> = listOf(
+  SignatureMapping("m,", "<Plug>(SignaturePlaceNextMark)", NextAvailableMarkCommand()),
+)
 
 private fun runOnEdt(action: () -> Unit) {
   val application = ApplicationManager.getApplication()
