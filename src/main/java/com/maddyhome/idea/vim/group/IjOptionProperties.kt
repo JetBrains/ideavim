@@ -25,6 +25,7 @@ open class GlobalIjOptions(scope: OptionAccessScope) : OptionsPropertiesBase(sco
   var ideastatusicon: String by optionProperty(IjOptions.ideastatusicon)
   val ideavimsupport: StringListOptionValue by optionProperty(IjOptions.ideavimsupport)
   var ideawrite: String by optionProperty(IjOptions.ideawrite)
+  val pythonconsole: Boolean by optionProperty(IjOptions.pythonconsole)
   val lookupkeys: StringListOptionValue by optionProperty(IjOptions.lookupkeys)
   var trackactionids: Boolean by optionProperty(IjOptions.trackactionids)
   var visualdelay: Int by optionProperty(IjOptions.visualdelay)
