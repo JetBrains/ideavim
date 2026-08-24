@@ -72,7 +72,7 @@ private fun getCaretToSectionMotion(
   } else {
     var res = injector.searchHelper.findSection(editor, caret, type, dir, count)
     if (res != -1) {
-      res = editor.normalizeOffset(res, false)
+      res = editor.normalizeOffset(res, true)
     }
     res
   }
