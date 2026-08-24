@@ -393,6 +393,51 @@ class VimSignatureTest : VimSplitWindowTestCase() {
     assertSigns(0 to "a", 2 to "c")
   }
 
+  // ----- m<Space> (delete all marks from current buffer) -----
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test m space removes all marks from the buffer`() {
+    configureByText(text)
+    typeText("ma", "jmb", "jmc", "m<Space>")
+
+    assertNoSigns()
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test m space on a buffer with no marks does nothing`() {
+    configureByText(text)
+    typeText("m<Space>")
+
+    assertNoSigns()
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test m space removes marks from all lines in the buffer`() {
+    configureByText(text)
+    typeText("ma", "jmb", "jjmc", "jmd")
+    typeText("m<Space>")
+
+    assertNoSigns()
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test m space does not affect marks in a split window of the same file`() {
+    configureByText(text)
+    val mainEditor = fixture.editor
+    typeText("jma")
+
+    val splitEditor = openSplitWindow(mainEditor)
+    selectWindow(mainEditor)
+    typeText("m<Space>")
+
+    assertNoSigns()
+    assertNoSignOnLine(splitEditor, line = 1)
+  }
+
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   @Test
   fun `test deleting one marked line leaves the signs of the other marks in place`() {
@@ -442,6 +487,18 @@ class VimSignatureTest : VimSplitWindowTestCase() {
     typeText("X")
 
     assertSigns(0 to "a")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test a key mapped to the plug name purges the marks of the buffer`() {
+    configureByText(text)
+    enterCommand("nmap X <Plug>(SignaturePurgeMarks)")
+    typeText("ma", "jmb")
+
+    typeText("X")
+
+    assertNoSigns()
   }
 
   // ----- helpers -----
