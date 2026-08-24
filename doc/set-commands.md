@@ -281,6 +281,17 @@ Unless otherwise stated, these options do not have abbreviations.
         <Enter> are used by the IDE to complete the lookup and insert text,
         but <C-W> should be passed IdeaVim to continue editing the text.
 
+'pythonconsole'         boolean (default on)
+                        global
+        When on, IdeaVim is active in the Python console tool window. The
+        console still intercepts Enter (execute) and the horizontal arrow keys
+        (caret movement within the input line) as normal; Up/Down navigate
+        command history from any Vim mode.
+
+        Set 'nopythonconsole' to revert to the console's native behaviour with
+        no Vim keybindings. The change takes effect immediately for all open
+        Python console windows.
+
 'trackactionids'        boolean (default off)
                         global
         When on, IdeaVim will try to track the current IDE action and display

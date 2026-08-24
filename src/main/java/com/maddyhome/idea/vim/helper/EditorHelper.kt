@@ -72,7 +72,7 @@ private fun Editor.isAllowedFileEditor(): Boolean {
     || EditorHelper.isDiffEditor(this)
     || EditorHelper.isFileEditor(this)
     || EditorHelper.isCommandHistoryWindow(this)
-    || EditorHelper.isPythonConsole(this)
+    || (EditorHelper.isPythonConsole(this) && injector.globalIjOptions().pythonconsole)
 }
 
 private fun ideaVimDisabledInDialog(ideaVimSupportValue: StringListOptionValue): Boolean {
