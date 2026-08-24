@@ -109,7 +109,8 @@ internal class SignatureExtension : VimExtension, VimMarkListener {
 private data class SignatureMapping(val keys: String, val plugName: String, val handler: ExtensionHandler)
 
 /**
- * `m,` and `m-` are `m{invalid-mark}` in Vim and so free to take. They still go through a `<Plug>` name and
+ * `m,`, `m-` and `m<Space>` are `m{invalid-mark}` in Vim and so free to take. They still go through a `<Plug>` name
+ * and
  * `putKeyMappingIfMissing`, so a user who wants a different key can map their own to the `<Plug>` name instead.
  *
  * The `<Plug>` names are parenthesised because `putKeyMappingIfMissing` asks `hasMapTo`, which matches the right-hand
@@ -119,6 +120,7 @@ private data class SignatureMapping(val keys: String, val plugName: String, val 
 private val MAPPINGS: List<SignatureMapping> = listOf(
   SignatureMapping("m,", "<Plug>(SignaturePlaceNextMark)", NextAvailableMarkCommand()),
   SignatureMapping("m-", "<Plug>(SignaturePurgeMarksAtLine)", RemoveLineMarkCommand()),
+  SignatureMapping("m<Space>", "<Plug>(SignaturePurgeMarks)", RemoveBufferMarksCommand()),
 )
 
 private fun runOnEdt(action: () -> Unit) {
