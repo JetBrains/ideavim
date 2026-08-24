@@ -283,6 +283,98 @@ class VimSignatureTest : VimSplitWindowTestCase() {
     assertSigns(0 to "a", 2 to "c")
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test m comma places mark a when no marks exist`() {
+    configureByText(text)
+    typeText("m,")
+
+    assertSigns(0 to "a")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test m comma places mark b when a is already used`() {
+    configureByText(text)
+    typeText("ma", "jm,")
+
+    assertSigns(0 to "a", 1 to "b")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test m comma picks the first free mark alphabetically`() {
+    configureByText(text)
+    typeText("ma", "jmc", "jjm,")
+
+    assertSigns(0 to "a", 1 to "c", 3 to "b")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test m comma advances through the alphabet with each use`() {
+    configureByText(text)
+    typeText("m,", "jm,", "jm,")
+
+    assertSigns(0 to "a", 1 to "b", 2 to "c")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test m comma skips marks used in the same buffer`() {
+    configureByText(text)
+    typeText("mb")
+    typeText("jm,")
+
+    assertSigns(0 to "b", 1 to "a")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test m comma on the same line as an existing mark places a new mark`() {
+    configureByText(text)
+    typeText("ma", "m,")
+
+    assertSigns(0 to "a", 0 to "b")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test m comma when all marks are used shows an error`() {
+    configureByText(text)
+    for (mark in 'a'..'z') {
+      typeText("m$mark")
+    }
+    typeText("m,")
+
+    assertPluginError(true)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test m comma still picks the first free mark while the file is open in a split`() {
+    configureByText(text)
+    val mainEditor = fixture.editor
+    typeText("ma")
+    openSplitWindow(mainEditor)
+    selectWindow(mainEditor)
+
+    typeText("jm,")
+
+    assertSigns(0 to "a", 1 to "b")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test a key mapped to the plug name places the next mark`() {
+    configureByText(text)
+    enterCommand("nmap X <Plug>(SignaturePlaceNextMark)")
+
+    typeText("X")
+
+    assertSigns(0 to "a")
+  }
+
   // ----- helpers -----
 
   private val text = """
