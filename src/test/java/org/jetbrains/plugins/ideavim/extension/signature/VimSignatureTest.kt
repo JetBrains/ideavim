@@ -271,17 +271,6 @@ class VimSignatureTest : VimSplitWindowTestCase() {
     assertNoSignOnLine(splitEditor, line = 2)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
-  @Test
-  fun `test deleting one marked line leaves the signs of the other marks in place`() {
-    configureByText(text)
-    typeText("ma", "jmb", "jjmc")
-    assertSigns(0 to "a", 1 to "b", 3 to "c")
-
-    typeText("gg", "j", "dd")  // removes mark b with its line, and pulls mark c up one line
-
-    assertSigns(0 to "a", 2 to "c")
-  }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   @Test
@@ -352,6 +341,72 @@ class VimSignatureTest : VimSplitWindowTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   @Test
+  fun `test m minus removes a single mark from the current line`() {
+    configureByText(text)
+    typeText("ma", "m-")
+
+    assertNoSigns()
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test m minus removes all marks from the current line`() {
+    configureByText(text)
+    typeText("ma", "\$mb", "m-")
+
+    assertNoSigns()
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test m minus does not affect marks on other lines`() {
+    configureByText(text)
+    typeText("ma", "jmb", "m-")
+
+    assertSigns(0 to "a")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test m minus on a line with no marks does nothing`() {
+    configureByText(text)
+    typeText("ma", "jm-")
+
+    assertSigns(0 to "a")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test m minus on an empty line does nothing`() {
+    configureByText(text)
+    typeText("ma", "jjm-")
+
+    assertSigns(0 to "a")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test m minus removes mark from current line but keeps marks on other lines intact`() {
+    configureByText(text)
+    typeText("ma", "jmb", "jmc", "km-")
+
+    assertSigns(0 to "a", 2 to "c")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test deleting one marked line leaves the signs of the other marks in place`() {
+    configureByText(text)
+    typeText("ma", "jmb", "jjmc")
+    assertSigns(0 to "a", 1 to "b", 3 to "c")
+
+    typeText("gg", "j", "dd")  // removes mark b with its line, and pulls mark c up one line
+
+    assertSigns(0 to "a", 2 to "c")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
   fun `test m comma still picks the first free mark while the file is open in a split`() {
     configureByText(text)
     val mainEditor = fixture.editor
@@ -364,11 +419,25 @@ class VimSignatureTest : VimSplitWindowTestCase() {
     assertSigns(0 to "a", 1 to "b")
   }
 
+  // ----- <Plug> mappings -----
+
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   @Test
   fun `test a key mapped to the plug name places the next mark`() {
     configureByText(text)
     enterCommand("nmap X <Plug>(SignaturePlaceNextMark)")
+
+    typeText("X")
+
+    assertSigns(0 to "a")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test a key mapped to the plug name purges the marks of the line`() {
+    configureByText(text)
+    enterCommand("nmap X <Plug>(SignaturePurgeMarksAtLine)")
+    typeText("ma", "jmb")
 
     typeText("X")
 
