@@ -26,6 +26,7 @@ class VimListenersNotifier {
   val isReplaceCharListeners: MutableCollection<IsReplaceCharListener> = ConcurrentLinkedDeque()
   val yankListeners: MutableCollection<VimYankListener> = ConcurrentLinkedDeque()
   val registerListeners: MutableCollection<VimRegisterListener> = ConcurrentLinkedDeque()
+  val markListeners: MutableCollection<VimMarkListener> = ConcurrentLinkedDeque()
 
   fun notifyModeWillChange(editor: VimEditor, oldMode: Mode, newMode: Mode) {
     if (!injector.enabler.isEnabled()) return
@@ -65,6 +66,15 @@ class VimListenersNotifier {
   fun notifyMacroRecordingFinished() {
     if (!injector.enabler.isEnabled()) return // we remove all the listeners when turning the plugin off, but let's do it just in case
     macroRecordingListeners.forEach { it.recordingFinished() }
+  }
+
+  /**
+   * @param markChar the mark that changed. Pass `null` only when an unknown number of marks may have changed, because
+   * listeners cannot filter on it and have to assume the worst.
+   */
+  fun notifyMarksChanges(markChar: Char?) {
+    if (!injector.enabler.isEnabled()) return
+    markListeners.forEach { it.marksChanged(markChar) }
   }
 
   fun notifyPluginTurnedOn() {

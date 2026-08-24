@@ -1,0 +1,7 @@
+# Test-only post: verifies that an exact-version file takes precedence over tbr.yaml.
+version: "9.9.9"
+title: "Exact Version Test Post"
+intro: "exact match wins"
+sections: []
+fixes: []
+links: []

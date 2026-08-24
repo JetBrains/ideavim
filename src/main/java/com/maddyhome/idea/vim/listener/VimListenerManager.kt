@@ -580,6 +580,8 @@ object VimListenerManager {
           OpeningEditor(openingEditor, owningEditorWindow, isPreview, canBeReused)
         )
       }
+
+      injector.listenersNotifier.notifyMarksChanges(null)
     }
 
     private fun initialiseFromOpeningEditor(editor: Editor, openingEditor: Editor?) {
@@ -710,8 +712,8 @@ object VimListenerManager {
           fireBufferLoadedEvents(editor)
         }
       }
+      injector.listenersNotifier.notifyMarksChanges(null)
     }
-
   }
 
 

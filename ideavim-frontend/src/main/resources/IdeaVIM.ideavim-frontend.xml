@@ -367,6 +367,16 @@
       </aliases>
     </vimExtension>
 
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.signature.SignatureExtension"
+                  name="signature">
+      <aliases>
+        <alias name="https://github.com/kshenoy/vim-signature"/>
+        <alias name="kshenoy/vim-signature"/>
+        <alias name="vim-signature"/>
+        <alias name="https://www.vim.org/scripts/script.php?script_id=2610"/>
+      </aliases>
+    </vimExtension>
+
     <vimExtension implementation="com.maddyhome.idea.vim.extension.miniai.MiniAI"
                   name="mini-ai">
       <aliases>
