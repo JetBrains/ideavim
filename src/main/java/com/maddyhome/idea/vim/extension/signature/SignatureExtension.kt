@@ -9,11 +9,21 @@
 package com.maddyhome.idea.vim.extension.signature
 
 import com.intellij.icons.AllIcons
+import com.intellij.ide.ui.UISettings
+import com.intellij.lang.LangBundle
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.colors.EditorColorsUtil
+import com.intellij.openapi.editor.colors.EditorFontType
 import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.openapi.editor.markup.HighlighterLayer
 import com.intellij.openapi.editor.markup.RangeHighlighter
+import com.intellij.ui.ExperimentalUI
+import com.intellij.ui.JBColor
+import com.intellij.ui.icons.IconReplacer
+import com.intellij.ui.icons.IconWrapperWithToolTip
+import com.intellij.util.ui.RegionPaintIcon
+import com.intellij.util.ui.RegionPainter
 import com.intellij.vim.api.VimInitApi
 import com.maddyhome.idea.vim.api.VimMarkService
 import com.maddyhome.idea.vim.api.injector
@@ -21,6 +31,8 @@ import com.maddyhome.idea.vim.common.VimMarkListener
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.mark.Mark
 import com.maddyhome.idea.vim.newapi.IjVimEditor
+import java.awt.Component
+import java.awt.Graphics2D
 import javax.swing.Icon
 
 internal const val PLUGIN_NAME: String = "signature"
@@ -127,7 +139,10 @@ private fun RangeHighlighter.isRepresentingMark(mark: Mark, ijEditor: Editor): B
 }
 
 private class MarkupGutterIconRenderer(val mark: Char) : GutterIconRenderer() {
-  override fun getIcon(): Icon = AllIcons.Gutter.Bookmark
+  // getIcon is called on every gutter repaint, so the icon is built once per mark rather than per paint.
+  private val icon: Icon = SignatureBookmarkIcon.of(mark)
+
+  override fun getIcon(): Icon = icon
   override fun getTooltipText(): String = mark.toString()
   override fun equals(obj: Any?): Boolean {
     return obj is MarkupGutterIconRenderer && mark == obj.mark
@@ -135,5 +150,68 @@ private class MarkupGutterIconRenderer(val mark: Char) : GutterIconRenderer() {
 
   override fun hashCode(): Int {
     return mark.hashCode()
+  }
+}
+
+private class SignatureMnemonicPainter(val icon: Icon, val mnemonic: String) : RegionPainter<Component?> {
+  override fun toString() = "SignatureBookmarkMnemonicIcon:$mnemonic"
+  override fun hashCode() = mnemonic.hashCode()
+  override fun equals(other: Any?): Boolean {
+    if (other === this) return true
+    val painter = other as? SignatureMnemonicPainter ?: return false
+    return painter.mnemonic == mnemonic
+  }
+
+  override fun paint(g: Graphics2D, x: Int, y: Int, width: Int, height: Int, c: Component?) {
+    icon.paintIcon(null, g, x, y)
+
+    val foreground = EditorColorsUtil.getColor(
+      null, EditorColorsUtil.createColorKey(
+        "SignatureBookmark.Mnemonic.iconForeground",
+        JBColor(0x000000, 0xBBBBBB)
+      )
+    )
+    g.paint = foreground
+    UISettings.setupAntialiasing(g)
+    val frc = g.fontRenderContext
+    val font = EditorFontType.PLAIN.globalFont
+
+    val size1 = .75f * height
+    val vector1 = font.deriveFont(size1).createGlyphVector(frc, mnemonic)
+    val bounds1 = vector1.visualBounds
+
+    val dx = x - bounds1.x + .5 * (width - bounds1.width)
+    val dy = y - bounds1.y + .5 * (height - bounds1.height)
+    g.drawGlyphVector(vector1, dx.toFloat(), dy.toFloat())
+  }
+}
+
+private class SignatureBookmarkIcon : IconWrapperWithToolTip {
+  val mnemonic: Char
+
+  private constructor(mnemonic: Char, icon: Icon) : super(icon, LangBundle.messagePointer("tooltip.bookmarked")) {
+    this.mnemonic = mnemonic
+  }
+
+  override fun replaceBy(replacer: IconReplacer): SignatureBookmarkIcon {
+    return SignatureBookmarkIcon(mnemonic, replacer.replaceIcon(retrieveIcon()))
+  }
+
+  companion object {
+    private val cache: MutableMap<Char, SignatureBookmarkIcon> = HashMap()
+
+    @Synchronized
+    fun of(mnemonic: Char): SignatureBookmarkIcon =
+      cache.getOrPut(mnemonic) { SignatureBookmarkIcon(mnemonic, createBookmarkIcon(mnemonic)) }
+
+    private fun createBookmarkIcon(mnemonic: Char): Icon {
+      if (mnemonic == 0.toChar()) {
+        return AllIcons.Gutter.Bookmark
+      }
+      val icon = AllIcons.Gutter.Mnemonic
+      val painter = SignatureMnemonicPainter(icon, mnemonic.toString())
+      val paintSize = if (ExperimentalUI.isNewUI()) 14 else 12
+      return RegionPaintIcon(paintSize, paintSize, 0, painter).withIconPreScaled(false)
+    }
   }
 }
