@@ -1627,6 +1627,93 @@ class CaretTransactionTest : VimTestCase() {
     assertTrue(actualText.contains("X"), "Expected text to contain X after block replacement")
   }
 
+  // ==================== replaceText across lines Tests ====================
+
+  /**
+   * `determineSelectionType` used to classify every range spanning more than one line as
+   * line-wise, so `replaceText` expanded the range to whole lines and silently discarded the
+   * text before [startOffset] on the first line and after [endOffset] on the last one.
+   */
+  @Test
+  fun `test replaceText across lines keeps the text outside the range`() {
+    val text = "one two three\nfour five six\nseven eight"
+    configureByText(text)
+
+    executeAction {
+      myVimApi.editor {
+        change {
+          withPrimaryCaret {
+            // Offsets 8..18 cover "three\nfour" - from the middle of line 0 to the middle of line 1
+            replaceText(8, 18, "XXX")
+          }
+        }
+      }
+    }
+
+    assertEquals("one two XXX five six\nseven eight", fixture.editor.document.text)
+  }
+
+  @Test
+  fun `test replaceText from mid line to end of next line keeps the line prefix`() {
+    val text = "one two three\nfour five six\nseven eight"
+    configureByText(text)
+
+    executeAction {
+      myVimApi.editor {
+        change {
+          withPrimaryCaret {
+            // Offsets 8..27 cover "three\nfour five six" - ends flush with line 1
+            replaceText(8, 27, "XXX")
+          }
+        }
+      }
+    }
+
+    assertEquals("one two XXX\nseven eight", fixture.editor.document.text)
+  }
+
+  /**
+   * A range that covers whole lines stays line-wise, which is what `ReplaceWithRegister`'s
+   * `2grr` relies on.
+   */
+  @Test
+  fun `test replaceText over whole lines replaces them line-wise`() {
+    val text = "one two three\nfour five six\nseven eight"
+    configureByText(text)
+
+    executeAction {
+      myVimApi.editor {
+        change {
+          withPrimaryCaret {
+            // Offsets 0..27 cover lines 0 and 1 completely
+            replaceText(0, 27, "XXX")
+          }
+        }
+      }
+    }
+
+    assertEquals("XXX\nseven eight", fixture.editor.document.text)
+  }
+
+  @Test
+  fun `test replaceText over whole lines ending at next line start replaces them line-wise`() {
+    val text = "one two three\nfour five six\nseven eight"
+    configureByText(text)
+
+    executeAction {
+      myVimApi.editor {
+        change {
+          withPrimaryCaret {
+            // Offsets 0..28 cover lines 0 and 1 including the trailing line break
+            replaceText(0, 28, "XXX")
+          }
+        }
+      }
+    }
+
+    assertEquals("XXX\nseven eight", fixture.editor.document.text)
+  }
+
   // ==================== EditorAccessor line offsets Tests ====================
 
   /**

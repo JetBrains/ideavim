@@ -22,13 +22,11 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.annotations.TestWithPrimaryClipboard
 import org.jetbrains.plugins.ideavim.rangeOf
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInfo
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-@Disabled("The test is flaky because of an unknown reason")
 class ReplaceWithRegisterNewTest : VimTestCase() {
 
   @BeforeEach
@@ -510,6 +508,25 @@ class ReplaceWithRegisterNewTest : VimTestCase() {
             where it was |I found it in a legendary land|
             |all rocks and lavender and tufted grass,$c| on some sodden sand
             hard by the torrent of a mountain pass.
+      """.trimIndent(),
+    )
+    assertMode(Mode.NORMAL())
+  }
+
+  @Test
+  fun `test visual replace across lines keeps the text outside the selection`() {
+    val text = """
+            ${c}one two three
+            four five six
+            seven eight
+    """.trimIndent()
+
+    configureByText(text)
+    typeText(injector.parser.parseKeys("yiw" + "2w" + "vj" + "gr"))
+    assertState(
+      """
+            one two on${c}e six
+            seven eight
       """.trimIndent(),
     )
     assertMode(Mode.NORMAL())
