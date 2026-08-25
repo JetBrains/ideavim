@@ -19,8 +19,8 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 
-@CommandOrMotion(keys = ["<C-O>"], modes = [Mode.NORMAL])
-class MotionJumpPreviousAction : MotionActionHandler.ForEachCaret() {
+@CommandOrMotion(keys = ["<C-T>"], modes = [Mode.NORMAL])
+class MotionTagPreviousAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
     editor: VimEditor,
     caret: ImmutableVimCaret,
@@ -28,7 +28,7 @@ class MotionJumpPreviousAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return injector.motion.moveCaretToJump(editor, caret, -operatorArguments.count1)
+    return injector.motion.moveCaretToTag(editor, caret, operatorArguments.count1)
   }
 
   override val motionType: MotionType = MotionType.EXCLUSIVE

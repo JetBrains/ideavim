@@ -340,6 +340,35 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     }
   }
 
+  /**
+   * Walks [count] entries up the tag stack, see "h CTRL-T"
+   */
+  override fun moveCaretToTag(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion {
+    val tagService = injector.tagService
+    if (tagService.getEntries(editor).isEmpty()) {
+      injector.messages.showErrorMessage(editor, injector.messages.message("E73"))
+      return Motion.Error
+    }
+
+    val entry = tagService.pop(editor, count)
+    if (entry == null) {
+      injector.messages.showErrorMessage(editor, injector.messages.message("E555"))
+      return Motion.Error
+    }
+
+    val lp = BufferPosition(entry.line, entry.col, false)
+    return if (editor.getPath() != entry.filepath) {
+      injector.file.selectEditor(editor.projectId, entry.filepath, entry.protocol)?.let { newEditor ->
+        newEditor.currentCaret()
+          .moveToOffset(newEditor.normalizeOffset(newEditor.bufferPositionToOffset(lp), false))
+      }
+      // The caret has already been moved, in the editor we switched to
+      Motion.Error
+    } else {
+      editor.bufferPositionToOffset(lp).toMotionOrError()
+    }
+  }
+
   override fun getMotionRange(
     editor: VimEditor,
     caret: ImmutableVimCaret,

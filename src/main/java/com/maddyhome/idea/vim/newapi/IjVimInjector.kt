@@ -60,6 +60,7 @@ import com.maddyhome.idea.vim.api.VimSearchHelper
 import com.maddyhome.idea.vim.api.VimStatistics
 import com.maddyhome.idea.vim.api.VimStorageService
 import com.maddyhome.idea.vim.api.VimStringParser
+import com.maddyhome.idea.vim.api.VimTagService
 import com.maddyhome.idea.vim.api.VimTemplateManager
 import com.maddyhome.idea.vim.api.VimVisualMotionGroup
 import com.maddyhome.idea.vim.api.VimWindowIdService
@@ -180,6 +181,8 @@ internal class IjVimInjector : VimInjectorBase() {
   override val markService: VimMarkService
     get() = service()
   override val jumpService: VimJumpService
+    get() = service()
+  override val tagService: VimTagService
     get() = service()
   override val windowIdService: VimWindowIdService
     get() = service()
