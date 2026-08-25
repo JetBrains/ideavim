@@ -755,6 +755,63 @@ https://github.com/vim-scripts/ReplaceWithRegister/blob/master/doc/ReplaceWithRe
 </details>
 
 <details>
+<summary><h2>signature: Shows the local marks in the gutter and adds mark commands</h2></summary>
+
+Original plugin: [vim-signature](https://github.com/kshenoy/vim-signature).
+
+### Summary:
+Draws a gutter icon for every local mark `a`-`z` of the file, so you can see where your marks are
+instead of having to remember, and adds commands to place, clear and walk through them. Global marks
+`A`-`Z` are not drawn: with the default `ideamarks` they are IDE bookmarks, which the IDE already
+shows in the gutter itself.
+
+### Setup:
+- Add the following command to `~/.ideavimrc`: `Plug 'kshenoy/vim-signature'`
+    <details>
+      <summary>Alternative syntax</summary>
+      <code>Plug 'https://github.com/kshenoy/vim-signature'</code>
+      <br/>
+      <code>Plug 'vim-signature'</code>
+      <br/>
+      <code>set signature</code>
+      </details>
+
+### Instructions
+
+| Mapping    | Description                                                       |
+|------------|-------------------------------------------------------------------|
+| `m,`       | Place the next available mark                                     |
+| `m-`       | Delete all marks of the current line                              |
+| `m<Space>` | Delete all marks of the current buffer                            |
+| `]'`       | To the next line holding a mark, on its first non-blank           |
+| `['`       | To the previous line holding a mark, on its first non-blank       |
+| `']`       | To the next mark by letter, on the first non-blank of its line    |
+| `'[`       | To the previous mark by letter, on the first non-blank of its line |
+| `` `] ``   | To the next mark by letter, on its exact position                 |
+| `` `[ ``   | To the previous mark by letter, on its exact position             |
+
+All of them take a count, and jumping to a mark is a jump, so `''` and `<C-O>` bring you back.
+
+Note that `']`, `'[`, `` `] `` and `` `[ `` stop being Vim's marks of the last change or yank, as with
+the original plugin. Every key above is a mapping to a `<Plug>(Signature*)` name, so to keep a key,
+map your own in `~/.ideavimrc`, which suppresses the default:
+
+```
+nmap <Leader>m <Plug>(SignaturePlaceNextMark)
+nmap gn        <Plug>(SignatureGotoNextSpotAlpha)
+```
+
+Unlike the original, `` ]` `` and `` [` `` are left alone: IdeaVim implements them itself as real
+motions, with a count and with Vim's behaviour of stopping rather than wrapping at the last mark.
+
+Not implemented yet: `m.`, `dm{mark}`, the markers (`m<BS>`, `]-`, `[-`, `]=`, `[=`), the `m/` and
+`m?` listings, and the `g:Signature*` options.
+
+https://github.com/kshenoy/vim-signature/blob/master/doc/signature.txt
+
+</details>
+
+<details>
 <summary><h2>sneak: Jump to any location specified by two characters</h2></summary>
 
 <img src="images/sneakIcon.svg" width="80" height="80" alt="icon"/>  
