@@ -25,6 +25,7 @@ import com.intellij.ui.icons.IconWrapperWithToolTip
 import com.intellij.util.ui.RegionPaintIcon
 import com.intellij.util.ui.RegionPainter
 import com.intellij.vim.api.VimInitApi
+import com.maddyhome.idea.vim.api.VimEditor
 import com.maddyhome.idea.vim.api.VimMarkService
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.MappingMode
@@ -52,6 +53,24 @@ internal const val PLUGIN_NAME: String = "signature"
 internal class SignatureExtension : VimExtension, VimMarkListener {
 
   override fun getName(): String = PLUGIN_NAME
+
+  companion object {
+    /**
+     * The marks of [editor] that this extension acts on, in no particular order.
+     *
+     * A file open in more than one split is reported once per split by [VimMarkService.getAllMarksForFile], and every
+     * one of those splits shares the same set of local marks, so the result has to be deduplicated - otherwise
+     * "the next mark after this one" can land on another copy of the mark we started from.
+     */
+    fun getEditorMarks(editor: VimEditor): List<Mark> {
+      return injector.markService.getAllMarksForFile(editor).flatMap { it.component2() }
+        .filter { it.key.isSignatureMark() }
+        .distinct()
+    }
+
+    private fun Char.isSignatureMark(): Boolean =
+      VimMarkService.LOWERCASE_MARKS.contains(this) || VimMarkService.UPPERCASE_MARKS.contains(this)
+  }
 
   // VimExtension.getOwner() and Listener.owner are both called "owner", so both are spelled out here
   private val mappingOwner: MappingOwner get() = MappingOwner.Plugin.get(getName())

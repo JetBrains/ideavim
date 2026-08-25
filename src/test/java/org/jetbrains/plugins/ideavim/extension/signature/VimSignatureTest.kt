@@ -504,6 +504,27 @@ class VimSignatureTest : VimSplitWindowTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   @Test
+  fun `test jump to next marked line navigates to global marks in the current file`() {
+    configureByText(text)
+    typeText("jjwmA", "gg")
+    typeText("]'")
+
+    assertPosition(2, 0)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test jump to next marked line navigates through mixed local and global marks in line order`() {
+    configureByText(text)
+    typeText("jma", "jjmA", "gg")
+    typeText("]'")
+    assertPosition(1, 0)
+    typeText("]'")
+    assertPosition(3, 0)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
   fun `test jump to prev marked line moves to start of the line`() {
     configureByText(text)
     typeText("jma", "jjmb", "jjgg")
@@ -561,6 +582,27 @@ class VimSignatureTest : VimSplitWindowTestCase() {
     typeText("G", "['")
 
     assertPosition(4, 0)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test jump to prev marked line navigates to global marks in the current file`() {
+    configureByText(text)
+    typeText("jjwmA", "G")
+    typeText("['")
+
+    assertPosition(2, 0)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test jump to prev marked line navigates through mixed local and global marks in reverse line order`() {
+    configureByText(text)
+    typeText("jma", "jjmA", "G")
+    typeText("['")
+    assertPosition(3, 0)
+    typeText("['")
+    assertPosition(1, 0)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)

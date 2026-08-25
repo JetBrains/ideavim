@@ -17,9 +17,9 @@ import com.maddyhome.idea.vim.extension.ExtensionHandler
 internal class RemoveLineMarkCommand : ExtensionHandler {
 
   override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
-    val marks = injector.markService.getAllLocalMarks(editor.primaryCaret())
+    val editorMarks = SignatureExtension.getEditorMarks(editor)
     val currentLine = editor.primaryCaret().getLine()
-    val toDelete = marks.filter { it.line == currentLine }
+    val toDelete = editorMarks.filter { it.line == currentLine }
     toDelete.forEach { injector.markService.removeMark(editor, it.key) }
   }
 }
