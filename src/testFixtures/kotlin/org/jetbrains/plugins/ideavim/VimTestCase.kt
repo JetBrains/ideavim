@@ -236,6 +236,7 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
     (VimPlugin.getSearch() as VimSearchGroupBase).resetState()
     injector.markService.resetAllMarks()
     injector.jumpService.resetJumps()
+    injector.tagService.resetTagStacks()
     ApplicationManager.getApplication()
       .getService(com.maddyhome.idea.vim.group.changelist.ChangeListService::class.java)
       ?.reset()
