@@ -438,6 +438,131 @@ class VimSignatureTest : VimSplitWindowTestCase() {
     assertNoSignOnLine(splitEditor, line = 1)
   }
 
+  // ----- ]' / [' (jump to start of next/prev line containing a mark) -----
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test jump to next marked line moves to start of the line`() {
+    configureByText(text)
+    typeText("jjwma", "gg")
+    typeText("]'")
+
+    assertPosition(2, 0)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test jump to next marked line always lands on column zero regardless of mark column`() {
+    configureByText(text)
+    typeText("jj\$ma", "gg")
+    typeText("]'")
+
+    assertPosition(2, 0)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test jump to next marked line traverses lines in order`() {
+    configureByText(text)
+    typeText("jma", "jjmb", "gg")
+    typeText("]'")
+    assertPosition(1, 0)
+    typeText("]'")
+    assertPosition(3, 0)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test jump to next marked line treats multiple marks on same line as a single stop`() {
+    configureByText(text)
+    typeText("jma", "\$mb", "jjmc", "gg")
+    typeText("]'")
+    assertPosition(1, 0)
+    typeText("]'")
+    assertPosition(3, 0)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test jump to next marked line wraps around to the first marked line`() {
+    configureByText(text)
+    typeText("jma", "jjmb", "jmb")
+    assertPosition(4, 0)
+    typeText("]'")
+
+    assertPosition(1, 0)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test jump to next marked line does nothing when no marks exist`() {
+    configureByText(text)
+    typeText("]'")
+
+    assertPosition(0, 0)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test jump to prev marked line moves to start of the line`() {
+    configureByText(text)
+    typeText("jma", "jjmb", "jjgg")
+    typeText("['")
+
+    assertPosition(3, 0)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test jump to prev marked line always lands on column zero regardless of mark column`() {
+    configureByText(text)
+    typeText("jj\$ma", "jjgg")
+    typeText("['")
+
+    assertPosition(2, 0)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test jump to prev marked line traverses lines in reverse order`() {
+    configureByText(text)
+    typeText("jma", "jjmb", "jjgg")
+    typeText("['")
+    assertPosition(3, 0)
+    typeText("['")
+    assertPosition(1, 0)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test jump to prev marked line treats multiple marks on same line as a single stop`() {
+    configureByText(text)
+    typeText("jma", "\$mb", "jjmc", "jjgg")
+    typeText("['")
+    assertPosition(3, 0)
+    typeText("['")
+    assertPosition(1, 0)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test jump to prev marked line wraps around to the last marked line`() {
+    configureByText(text)
+    typeText("jma", "jjmb", "gg")
+    typeText("['")
+
+    assertPosition(3, 0)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test jump to prev marked line does nothing when no marks exist`() {
+    configureByText(text)
+    typeText("G", "['")
+
+    assertPosition(4, 0)
+  }
+
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   @Test
   fun `test deleting one marked line leaves the signs of the other marks in place`() {
@@ -501,7 +626,151 @@ class VimSignatureTest : VimSplitWindowTestCase() {
     assertNoSigns()
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test a key mapped to the plug name jumps to the next marked line`() {
+    configureByText(text)
+    enterCommand("nmap X <Plug>(SignatureGotoNextLineByPos)")
+    typeText("jjma", "gg")
+
+    typeText("X")
+
+    assertPosition(2, 0)
+  }
+
+  // ----- ]` / [` are IdeaVim’s own motions and the extension must leave them alone -----
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test backtick bracket keeps honouring a count`() {
+    configureByText(text)
+    typeText("jma", "jmb", "jmc", "gg")
+    typeText("2]`")
+
+    assertPosition(2, 0)  // the second mark forward, not the first
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test backtick bracket does not wrap past the last mark`() {
+    configureByText(text)
+    typeText("jma", "jmb", "jmc", "G")
+    typeText("]`")
+
+    assertPosition(4, 0)  // Vim beeps here, it does not wrap round to the first mark
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test backtick bracket is still a motion an operator can use`() {
+    configureByText(text)
+    typeText("jjma", "gg")
+    typeText("d]`")
+
+    assertState(
+      """
+        ${c}Sed in orci mauris.
+        Cras id tellus in ex imperdiet egestas.
+        Nulla porta tristique.
+      """.trimIndent()
+    )
+  }
+
+  // ----- counts -----
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test count on jump to next marked line`() {
+    configureByText(text)
+    typeText("jma", "jmb", "jmc", "gg")
+    typeText("3]'")
+
+    assertPosition(3, 0)  // mark c
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test count on jump to prev marked line`() {
+    configureByText(text)
+    typeText("jma", "jmb", "jmc", "G")
+    typeText("2['")
+
+    assertPosition(2, 0)  // mark b
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test count larger than the number of marks wraps around`() {
+    configureByText(text)
+    typeText("jma", "jmb", "gg")
+    typeText("3]'")
+
+    assertPosition(1, 0)  // a, b, then round to a again
+  }
+
+  // ----- jump list -----
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test jump to a marked line can be undone with ctrl-o`() {
+    configureByText(text)
+    typeText("jjjjma", "gg")
+    typeText("]'")
+    assertPosition(4, 0)
+
+    typeText("<C-O>")
+
+    assertPosition(0, 0)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test a jump that does not move the caret adds nothing to the jump list`() {
+    configureByText(text)
+    typeText("jjma")  // the only mark is on the caret's own line
+    typeText("jj")
+    assertPosition(4, 0)
+    typeText("gg")
+
+    typeText("]'")  // wraps to the only marked line
+    assertPosition(2, 0)
+    typeText("]'")  // already there, so this must not push a new entry
+    typeText("<C-O>")
+
+    assertPosition(0, 0)
+  }
+
+  // ----- line jumps land on the first non-blank, as Vim’s mark jumps do -----
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test jump to next marked line lands on the first non-blank`() {
+    configureByText(indentedText)
+    typeText("jjma", "gg")
+    typeText("]'")
+
+    assertPosition(2, 4)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test jump to prev marked line lands on the first non-blank`() {
+    configureByText(indentedText)
+    typeText("jjma", "G")
+    typeText("['")
+
+    assertPosition(2, 4)
+  }
+
   // ----- helpers -----
+
+  private val indentedText = """
+    ${c}Lorem ipsum dolor sit amet,
+    consectetur adipiscing elit
+        Sed in orci mauris.
+    Cras id tellus in ex imperdiet egestas.
+    Nulla porta tristique.
+  """.trimIndent()
 
   private val text = """
     ${c}Lorem ipsum dolor sit amet,
