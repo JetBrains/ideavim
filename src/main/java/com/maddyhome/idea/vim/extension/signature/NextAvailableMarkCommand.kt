@@ -18,9 +18,8 @@ import com.maddyhome.idea.vim.extension.ExtensionHandler
 internal class NextAvailableMarkCommand : ExtensionHandler {
 
   override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
-    val localMarks =
-      injector.markService.getAllLocalMarks(editor.primaryCaret()).filter { it.key in VimMarkService.LOWERCASE_MARKS }
-    val availableMarks = VimMarkService.LOWERCASE_MARKS.filter { mark -> localMarks.none { it.key == mark } }
+    val editorMarks = SignatureExtension.getEditorMarks(editor)
+    val availableMarks = VimMarkService.LOWERCASE_MARKS.filter { mark -> editorMarks.none { it.key == mark } }
     if (availableMarks.isEmpty()) {
       injector.messages.indicateError()
       return

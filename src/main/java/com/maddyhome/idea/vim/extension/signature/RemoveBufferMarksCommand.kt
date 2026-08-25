@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.extension.ExtensionHandler
 internal class RemoveBufferMarksCommand : ExtensionHandler {
 
   override fun execute(editor: VimEditor, context: ExecutionContext, operatorArguments: OperatorArguments) {
-    val marks = injector.markService.getAllLocalMarks(editor.primaryCaret())
-    marks.forEach { injector.markService.removeMark(editor, it.key) }
+    val editorMarks = SignatureExtension.getEditorMarks(editor)
+    editorMarks.forEach { injector.markService.removeMark(editor, it.key) }
   }
 }
