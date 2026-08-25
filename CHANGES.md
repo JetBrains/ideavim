@@ -26,17 +26,26 @@ usual beta standards.
 ## To Be Released
 
 ### Features:
-* [VIM-4312](https://youtrack.jetbrains.com/issue/VIM-4312) Added the `'pythonconsole'` option (on by default). Set `:set nopythonconsole` in `~/.ideavimrc` to disable Vim keybindings in the Python console
 * [VIM-2168](https://youtrack.jetbrains.com/issue/VIM-2168) Added the `'windowjumps'` option, which gives every split its own [jump list](https://vimhelp.org/motion.txt.html#jump-motions) as in Vim. IdeaVim has always kept one list per project, so `<C-O>` in one split could take you back to a position you jumped from in another; with `:set windowjumps` a new split starts with a copy of the list of the window it was split from and the two lists then go their own ways, so `:jumps`, `<C-O>` and `<C-I>` only ever see the jumps made in the window you are in. The IDE's own Back and Forward navigation stays project wide either way. Since window ids do not survive a restart, only one list per project is saved between sessions — the list of the most recently used window, which a window with no list of its own starts from
 * [VIM-934](https://youtrack.jetbrains.com/issue/VIM-934) Added the [`'wildmenu'`](https://vimhelp.org/options.txt.html#%27wildmenu%27) option (`'wmnu'`), so the completion popup that `<Tab>` opens on the `:` command line can now be turned off with `:set nowildmenu` — previously it was always shown. With it off, `<Tab>` and `<S-Tab>` still cycle through the matches one at a time, and `<Left>` and `<Right>` move the caret instead of moving through the match list. The option is on by default, which is what IdeaVim has always done
 
 ### Fixes:
 * Fixed [`gx`](https://vimhelp.org/pi_netrw.txt.html#netrw-gx) adding to the [jump list](https://vimhelp.org/motion.txt.html#jumplist) — pressing `gx` used to record the caret position as a jump and overwrite the [`'`](https://vimhelp.org/motion.txt.html#%27quote) mark, so a following [`CTRL-O`](https://vimhelp.org/motion.txt.html#CTRL-O) landed back on the caret's own line instead of returning to the previous jump. As in Vim, `gx` opens the URL without touching the jump list
 * Fixed the [word text objects](https://vimhelp.org/motion.txt.html#v_iw) throwing an exception when they reached the very start of the file — growing a right-to-left Visual selection with `iw`, `aw`, `iW` or `aW` looks one character back to decide where the previous word begins, and at offset 0 there is no such character. Starting on the second character of the file and pressing `v`, `h`, `iw` now selects back to the start of the file instead of reporting an internal error
+* Fixed `da(` inside a nested block swallowing the enclosing brackets. A characterwise delete or yank spanning several lines is promoted to [linewise](https://vimhelp.org/change.txt.html#linewise) only when there is nothing but white space before its start and after its end, but the check for what comes after skipped the very first character following the range. So with an outer block opened on one line, an inner one opened on the next, and both closed by `))` on a third, `da(` on the inner `(` deleted the last two lines whole and took the outer `)` with them, instead of deleting just the inner block
 
 ### Merged PRs:
+* [2014](https://github.com/JetBrains/ideavim/pull/2014) by [1grzyb1](https://github.com/1grzyb1): VIM-4312 correct linewise delete promotion when range end has trailing non-whitespace
 * [2001](https://github.com/JetBrains/ideavim/pull/2001) by [1grzyb1](https://github.com/1grzyb1): VIM-934 support for wildmenu option
 * [2000](https://github.com/JetBrains/ideavim/pull/2000) by [1grzyb1](https://github.com/1grzyb1): VIM-2168 separate history per split window
+
+## 2.46.2, 2026-08-24
+
+### Features:
+* [VIM-4312](https://youtrack.jetbrains.com/issue/VIM-4312) Added the `'pythonconsole'` option (on by default). Set `:set nopythonconsole` in `~/.ideavimrc` to disable Vim keybindings in the Python console
+
+### Merged PRs:
+* [2013](https://github.com/JetBrains/ideavim/pull/2013) by [1grzyb1](https://github.com/1grzyb1): VIM-4312 Option to disbale vim in python console
 
 ## 2.46.0, 2026-08-18
 
