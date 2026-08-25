@@ -110,8 +110,10 @@ private data class SignatureMapping(val keys: String, val plugName: String, val 
 
 /**
  * `m,`, `m-` and `m<Space>` are `m{invalid-mark}` in Vim and so free to take. They still go through a `<Plug>` name
- * and
- * `putKeyMappingIfMissing`, so a user who wants a different key can map their own to the `<Plug>` name instead.
+ * and `putKeyMappingIfMissing`, so a user who wants a different key can map their own to the `<Plug>` name instead.
+ *
+ * `` ]` `` and `` [` `` are deliberately not mapped, unlike in the original: IdeaVim implements them natively as real
+ * motions, with a count and with Vim's no-wrap behaviour, which is better than what this extension could offer.
  *
  * The `<Plug>` names are parenthesised because `putKeyMappingIfMissing` asks `hasMapTo`, which matches the right-hand
  * side as a *substring*: a bare `<Plug>SignaturePurgeMarks` would count as already mapped by
@@ -121,6 +123,8 @@ private val MAPPINGS: List<SignatureMapping> = listOf(
   SignatureMapping("m,", "<Plug>(SignaturePlaceNextMark)", NextAvailableMarkCommand()),
   SignatureMapping("m-", "<Plug>(SignaturePurgeMarksAtLine)", RemoveLineMarkCommand()),
   SignatureMapping("m<Space>", "<Plug>(SignaturePurgeMarks)", RemoveBufferMarksCommand()),
+  SignatureMapping("]'", "<Plug>(SignatureGotoNextLineByPos)", JumpLineMarkCommand(forward = true)),
+  SignatureMapping("['", "<Plug>(SignatureGotoPrevLineByPos)", JumpLineMarkCommand(forward = false)),
 )
 
 private fun runOnEdt(action: () -> Unit) {
