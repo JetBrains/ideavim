@@ -9,7 +9,6 @@
 package com.maddyhome.idea.vim.thinapi.editor.caret
 
 import com.intellij.vim.api.models.CaretId
-import com.intellij.vim.api.models.Line
 import com.intellij.vim.api.models.Range
 import com.intellij.vim.api.scopes.editor.EditorAccessor
 import com.intellij.vim.api.scopes.editor.caret.CaretRead
@@ -250,22 +249,6 @@ class CaretTransactionImpl(
     assertOffsetInRange(offset, validRange)
 
     vimCaret.moveToOffset(offset)
-  }
-
-  override fun getLineStartOffset(line: Int): Int {
-    return vimEditor.getLineStartOffset(line)
-  }
-
-  override fun getLineEndOffset(line: Int, allowEnd: Boolean): Int {
-    return vimEditor.getLineEndOffset(line)
-  }
-
-  override fun getLine(offset: Int): Line {
-    val lineNumber = vimEditor.offsetToBufferPosition(offset).line
-    val lineText = vimEditor.getLineText(lineNumber)
-    val lineStartOffset = vimEditor.getLineStartOffset(lineNumber)
-    val lineEndOffset = vimEditor.getLineEndOffset(lineNumber)
-    return Line(lineNumber, lineText, lineStartOffset, lineEndOffset)
   }
 
   override fun addJump(reset: Boolean) {
