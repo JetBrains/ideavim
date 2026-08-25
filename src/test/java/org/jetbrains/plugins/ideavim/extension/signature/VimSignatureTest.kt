@@ -605,6 +605,217 @@ class VimSignatureTest : VimSplitWindowTestCase() {
     assertPosition(1, 0)
   }
 
+  // ----- `] / `[ (jump by alphabetical order to next/prev mark) -----
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test alpha jump to next mark when on marked line jumps alphabetically not by position`() {
+    configureByText(text)
+    // c=line1, b=line2, a=line3. Stand on mark a (line3).
+    // position-next from line3 would wrap to line1 (c), but alpha-next from a is b (line2)
+    typeText("jmc", "jmb", "jma")
+    assertPosition(3, 0)
+    typeText("`]")
+
+    assertPosition(2, 0)  // mark b — alphabetically next after a, positionally before a
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test alpha jump to next mark traverses all marks alphabetically from current`() {
+    configureByText(text)
+    // c=line1, b=line2, a=line3. Start on mark a.
+    typeText("jmc", "jmb", "jma")
+    typeText("`]")
+    assertPosition(2, 0)  // b
+    typeText("`]")
+    assertPosition(1, 0)  // c
+    typeText("`]")
+    assertPosition(3, 0)  // wraps back to a
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test alpha jump to next mark on same line moves to next mark by column`() {
+    configureByText(text)
+    typeText("jma", "\$mb", "0")  // a at col 0, b at last col — both on line 1, cursor back at col 0 = mark a
+    typeText("`]")
+
+    val lastCol = fixture.editor.document.getLineEndOffset(1) - fixture.editor.document.getLineStartOffset(1) - 1
+    assertPosition(1, lastCol)  // mark b — same line, next alphabetically
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test alpha jump to next mark when not on marked line falls back to position order`() {
+    configureByText(text)
+    // b=line1, a=line3. From gg (no mark) — falls back to GotoByPos: next position from line0 is line1
+    typeText("jmb", "jjma", "gg")
+    typeText("`]")
+
+    assertPosition(1, 0)  // positionally next (mark b), not alphabetically next (mark a)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test alpha jump to next mark does nothing when no marks exist`() {
+    configureByText(text)
+    typeText("`]")
+
+    assertPosition(0, 0)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test alpha jump to prev mark when on marked line jumps alphabetically not by position`() {
+    configureByText(text)
+    // c=line1, b=line2, a=line3. Stand on mark b (line2).
+    // position-prev from line2 is line1 (c), but alpha-prev from b is a (line3)
+    typeText("jmc", "jmb", "jma", "`b")
+    assertPosition(2, 0)
+    typeText("`[")
+
+    assertPosition(3, 0)  // mark a — alphabetically prev before b, positionally after b
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test alpha jump to prev mark traverses all marks in reverse alphabetical order`() {
+    configureByText(text)
+    // c=line1, b=line2, a=line3. Start on mark c (line1).
+    typeText("jmc", "jmb", "jma", "`c")
+    assertPosition(1, 0)
+    typeText("`[")
+    assertPosition(2, 0)  // b
+    typeText("`[")
+    assertPosition(3, 0)  // a
+    typeText("`[")
+    assertPosition(1, 0)  // wraps back to c
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test alpha jump to prev mark when not on marked line falls back to position order`() {
+    configureByText(text)
+    // b=line1, a=line3. From gg (no mark) — falls back to GotoByPos: prev position from line0 with wrap is line3
+    typeText("jmb", "jjma", "gg")
+    typeText("`[")
+
+    assertPosition(3, 0)  // positionally prev with wrap (mark a), not alphabetically prev (mark b)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test alpha jump to prev mark does nothing when no marks exist`() {
+    configureByText(text)
+    typeText("G", "`[")
+
+    assertPosition(4, 0)
+  }
+
+  // ----- '] / '[ (jump by alphabetical order to start of next/prev line having a mark) -----
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test alpha jump to next marked line when on marked line jumps alphabetically not by position`() {
+    configureByText(text)
+    typeText("jmc", "jmb", "jma")
+    assertPosition(3, 0)
+    typeText("']")
+
+    assertPosition(2, 0)  // mark b's line — alphabetically next after a
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test alpha jump to next marked line always lands on column zero`() {
+    configureByText(text)
+    typeText("jmc", "jj\$ma")  // a at end of line3, c at line1. Stand on mark a.
+    typeText("']")
+
+    assertPosition(1, 0)  // mark c's line, column 0 even though c may not be at col 0
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test alpha jump to next marked line when not on marked line falls back to position order`() {
+    configureByText(text)
+    typeText("jmb", "jjma", "gg")
+    typeText("']")
+
+    assertPosition(1, 0)  // positionally next (mark b's line)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test alpha jump to next marked line wraps from last to first alphabetically`() {
+    configureByText(text)
+    typeText("jma", "jmb", "jmc", "`c")  // stand on mark c
+    assertPosition(3, 0)
+    typeText("']")
+
+    assertPosition(1, 0)  // wraps to mark a's line
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test alpha jump to next marked line does nothing when no marks exist`() {
+    configureByText(text)
+    typeText("']")
+
+    assertPosition(0, 0)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test alpha jump to prev marked line when on marked line jumps alphabetically not by position`() {
+    configureByText(text)
+    typeText("jmc", "jmb", "jma", "`b")
+    assertPosition(2, 0)
+    typeText("'[")
+
+    assertPosition(3, 0)  // mark a's line — alphabetically prev before b
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test alpha jump to prev marked line always lands on column zero`() {
+    configureByText(text)
+    typeText("jmc", "jmb", "jma", "`b")
+    typeText("'[")
+
+    assertPosition(3, 0)  // mark a's line at col 0
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test alpha jump to prev marked line when not on marked line falls back to position order`() {
+    configureByText(text)
+    typeText("jmb", "jjma", "gg")
+    typeText("'[")
+
+    assertPosition(3, 0)  // positionally prev with wrap (mark a's line)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test alpha jump to prev marked line wraps from first to last alphabetically`() {
+    configureByText(text)
+    typeText("jma", "jmb", "jmc", "`a")  // stand on mark a
+    assertPosition(1, 0)
+    typeText("'[")
+
+    assertPosition(3, 0)  // wraps to mark c's line
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test alpha jump to prev marked line does nothing when no marks exist`() {
+    configureByText(text)
+    typeText("G", "'[")
+
+    assertPosition(4, 0)
+  }
+
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   @Test
   fun `test deleting one marked line leaves the signs of the other marks in place`() {
@@ -750,6 +961,27 @@ class VimSignatureTest : VimSplitWindowTestCase() {
     assertPosition(1, 0)  // a, b, then round to a again
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test count on alpha jump to next mark`() {
+    configureByText(text)
+    // c=line1, b=line2, a=line3, standing on a
+    typeText("jmc", "jmb", "jma")
+    typeText("2`]")
+
+    assertPosition(1, 0)  // a to b to c
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test count on alpha jump to next marked line`() {
+    configureByText(text)
+    typeText("jmc", "jmb", "jma")
+    typeText("2']")
+
+    assertPosition(1, 0)
+  }
+
   // ----- jump list -----
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
@@ -782,6 +1014,19 @@ class VimSignatureTest : VimSplitWindowTestCase() {
     assertPosition(0, 0)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test alpha jump can be undone with ctrl-o`() {
+    configureByText(text)
+    typeText("jjjjma", "gg")
+    typeText("']")
+    assertPosition(4, 0)
+
+    typeText("<C-O>")
+
+    assertPosition(0, 0)
+  }
+
   // ----- line jumps land on the first non-blank, as Vim’s mark jumps do -----
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
@@ -802,6 +1047,57 @@ class VimSignatureTest : VimSplitWindowTestCase() {
     typeText("['")
 
     assertPosition(2, 4)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test alpha jump to a marked line lands on the first non-blank`() {
+    configureByText(indentedText)
+    typeText("jjma", "gg")
+    typeText("']")
+
+    assertPosition(2, 4)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test alpha jump to a spot keeps the column of the mark`() {
+    configureByText(indentedText)
+    typeText("jj\$ma", "gg")
+    typeText("`]")
+
+    assertPosition(2, 22)
+  }
+
+  // ----- a file open in more than one split still reports each mark once -----
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test alpha jump to next mark works while the file is open in a split`() {
+    configureByText(text)
+    val mainEditor = fixture.editor
+    // c=line1, b=line2, a=line3, standing on a
+    typeText("jmc", "jmb", "jma")
+    openSplitWindow(mainEditor)
+    selectWindow(mainEditor)
+
+    typeText("`]")
+
+    assertPosition(2, 0)  // mark b, and not a second copy of mark a
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  @Test
+  fun `test alpha jump to prev mark works while the file is open in a split`() {
+    configureByText(text)
+    val mainEditor = fixture.editor
+    typeText("jmc", "jmb", "jma")
+    openSplitWindow(mainEditor)
+    selectWindow(mainEditor)
+
+    typeText("`[")
+
+    assertPosition(1, 0)  // mark c, the letter before a when wrapping backwards
   }
 
   // ----- helpers -----

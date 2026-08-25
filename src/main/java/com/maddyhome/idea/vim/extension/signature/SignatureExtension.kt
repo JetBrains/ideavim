@@ -128,8 +128,10 @@ internal class SignatureExtension : VimExtension, VimMarkListener {
 private data class SignatureMapping(val keys: String, val plugName: String, val handler: ExtensionHandler)
 
 /**
- * `m,`, `m-` and `m<Space>` are `m{invalid-mark}` in Vim and so free to take. They still go through a `<Plug>` name
- * and `putKeyMappingIfMissing`, so a user who wants a different key can map their own to the `<Plug>` name instead.
+ * `m,`, `m-` and `m<Space>` are `m{invalid-mark}` in Vim and so free to take. The jump keys are not: `']`, `'[`,
+ * `` `] `` and `` `[ `` are Vim's own change and yank marks, and the original plugin takes them over just the same,
+ * which is why every key goes through a `<Plug>` name and `putKeyMappingIfMissing` - a user who wants a different key,
+ * or who wants to keep Vim's, can map their own key to the `<Plug>` name instead.
  *
  * `` ]` `` and `` [` `` are deliberately not mapped, unlike in the original: IdeaVim implements them natively as real
  * motions, with a count and with Vim's no-wrap behaviour, which is better than what this extension could offer.
@@ -144,7 +146,13 @@ private val MAPPINGS: List<SignatureMapping> = listOf(
   SignatureMapping("m<Space>", "<Plug>(SignaturePurgeMarks)", RemoveBufferMarksCommand()),
   SignatureMapping("]'", "<Plug>(SignatureGotoNextLineByPos)", JumpLineMarkCommand(forward = true)),
   SignatureMapping("['", "<Plug>(SignatureGotoPrevLineByPos)", JumpLineMarkCommand(forward = false)),
+  SignatureMapping("']", "<Plug>(SignatureGotoNextLineAlpha)", alphaJump(forward = true, startLine = true)),
+  SignatureMapping("'[", "<Plug>(SignatureGotoPrevLineAlpha)", alphaJump(forward = false, startLine = true)),
+  SignatureMapping("`]", "<Plug>(SignatureGotoNextSpotAlpha)", alphaJump(forward = true, startLine = false)),
+  SignatureMapping("`[", "<Plug>(SignatureGotoPrevSpotAlpha)", alphaJump(forward = false, startLine = false)),
 )
+
+private fun alphaJump(forward: Boolean, startLine: Boolean) = JumpAlphabeticallyMarkCommand(forward, startLine)
 
 private fun runOnEdt(action: () -> Unit) {
   val application = ApplicationManager.getApplication()
