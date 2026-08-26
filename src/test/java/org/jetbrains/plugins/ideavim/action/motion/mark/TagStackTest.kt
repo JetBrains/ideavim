@@ -82,4 +82,93 @@ class TagStackTest : VimTestCase() {
 
     assertPosition(0, 8)
   }
+
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test ctrl-bracket records the position it was made from`() {
+    configureByText(text)
+    typeText("<C-]>")
+
+    // Not a tag jump, so the stack is untouched by it
+    typeText("G")
+
+    typeText("<C-T>")
+    assertPluginError(false)
+    assertPosition(0, 8)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test ctrl-t walks back through several tag jumps`() {
+    configureByText(text)
+    typeText("<C-]>")
+    typeText("j0")
+    typeText("<C-]>")
+    typeText("G")
+
+    typeText("<C-T>")
+    assertPosition(1, 0)
+
+    typeText("<C-T>")
+    assertPosition(0, 8)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test ctrl-t at the bottom of the tag stack reports error`() {
+    configureByText(text)
+    typeText("<C-]>")
+    typeText("G")
+
+    typeText("<C-T>")
+    assertPluginError(false)
+
+    typeText("<C-T>")
+    assertPluginError(true)
+    assertPluginErrorMessage("E555: at bottom of tag stack")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test ctrl-bracket also adds to the jump list`() {
+    configureByText(text)
+    typeText("<C-]>")
+
+    // A plain motion, so <C-O> can only work if <C-]> recorded a jump of its own
+    typeText("j")
+
+    typeText("<C-O>")
+    assertPosition(0, 8)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test gd does not touch the tag stack`() {
+    configureByText(text)
+
+    // gd is "goto local declaration", not a tag command - in Vim it does not use the tag stack
+    typeText("gd")
+    typeText("G")
+
+    typeText("<C-T>")
+    assertPluginError(true)
+    assertPluginErrorMessage("E73: tag stack empty")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test ctrl-bracket with no identifier on the line does not push`() {
+    configureByText(
+      """
+        ${c}
+        all rocks and lavender and tufted grass,
+      """.trimIndent(),
+    )
+    typeText("<C-]>")
+    typeText("G")
+
+    typeText("<C-T>")
+    assertPluginError(true)
+    assertPluginErrorMessage("E73: tag stack empty")
+  }
 }
