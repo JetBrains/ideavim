@@ -36,6 +36,7 @@ usual beta standards.
 * Fixed `da(` inside a nested block swallowing the enclosing brackets. A characterwise delete or yank spanning several lines is promoted to [linewise](https://vimhelp.org/change.txt.html#linewise) only when there is nothing but white space before its start and after its end, but the check for what comes after skipped the very first character following the range. So with an outer block opened on one line, an inner one opened on the next, and both closed by `))` on a third, `da(` on the inner `(` deleted the last two lines whole and took the outer `)` with them, instead of deleting just the inner block
 
 ### Merged PRs:
+* [2018](https://github.com/JetBrains/ideavim/pull/2018) by [1grzyb1](https://github.com/1grzyb1): VIM-1347 Implements Signature marks plugin
 * [2014](https://github.com/JetBrains/ideavim/pull/2014) by [1grzyb1](https://github.com/1grzyb1): VIM-4312 correct linewise delete promotion when range end has trailing non-whitespace
 * [2001](https://github.com/JetBrains/ideavim/pull/2001) by [1grzyb1](https://github.com/1grzyb1): VIM-934 support for wildmenu option
 * [2000](https://github.com/JetBrains/ideavim/pull/2000) by [1grzyb1](https://github.com/1grzyb1): VIM-2168 separate history per split window
