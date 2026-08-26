@@ -171,4 +171,100 @@ class TagStackTest : VimTestCase() {
     assertPluginError(true)
     assertPluginErrorMessage("E73: tag stack empty")
   }
+
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test ctrl-t with count walks several entries back`() {
+    configureByText(text)
+    typeText("<C-]>")
+    typeText("j0")
+    typeText("<C-]>")
+    typeText("j0")
+    typeText("<C-]>")
+    typeText("G")
+
+    typeText("2<C-T>")
+
+    assertPluginError(false)
+    assertPosition(1, 0)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test ctrl-t with count past the bottom reports error`() {
+    configureByText(text)
+    typeText("<C-]>")
+    typeText("G")
+
+    typeText("3<C-T>")
+
+    assertPluginError(true)
+    assertPluginErrorMessage("E555: at bottom of tag stack")
+  }
+
+  /**
+   * Leaves three entries on the stack, jumped from (0, 8), (1, 0) and (2, 0)
+   */
+  private fun configureWithThreeTagJumps() {
+    configureByText(text)
+    typeText("<C-]>")
+    typeText("j0")
+    typeText("<C-]>")
+    typeText("j0")
+    typeText("<C-]>")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test a new tag jump drops the entries walked back past`() {
+    configureWithThreeTagJumps()
+    typeText("2<C-T>")
+
+    typeText("<C-]>")
+
+    enterCommand("tags")
+    assertExOutput(
+      """  # TO tag         FROM line  in file/text
+        |  1  1 it                  1  I found it in a legendary land
+        |  2  1 all                 2  all rocks and lavender and tufted grass,
+        |>
+      """.trimMargin(),
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test walking back cannot reach a dropped entry`() {
+    configureWithThreeTagJumps()
+    typeText("2<C-T>")
+    typeText("<C-]>")
+    typeText("G")
+
+    typeText("<C-T>")
+    assertPosition(1, 0)
+
+    typeText("<C-T>")
+    assertPosition(0, 8)
+
+    typeText("<C-T>")
+    assertPluginError(true)
+    assertPluginErrorMessage("E555: at bottom of tag stack")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test a tag jump from the bottom of the stack drops everything above it`() {
+    configureWithThreeTagJumps()
+    typeText("3<C-T>")
+
+    typeText("<C-]>")
+
+    enterCommand("tags")
+    assertExOutput(
+      """  # TO tag         FROM line  in file/text
+        |  1  1 it                  1  I found it in a legendary land
+        |>
+      """.trimMargin(),
+    )
+  }
 }

@@ -92,6 +92,7 @@
   "ou[nmap]": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.UnMapCommand",
   "p[rint]": "com.maddyhome.idea.vim.vimscript.model.commands.PrintCommand",
   "pa[ckadd]": "com.maddyhome.idea.vim.vimscript.model.commands.PackaddCommand",
+  "po[p]": "com.maddyhome.idea.vim.vimscript.model.commands.PopTagsCommand",
   "prev[ious]": "com.maddyhome.idea.vim.vimscript.model.commands.PreviousFileCommand",
   "pu[t]": "com.maddyhome.idea.vim.vimscript.model.commands.PutLinesCommand",
   "q[uit]": "com.maddyhome.idea.vim.vimscript.model.commands.QuitCommand",
