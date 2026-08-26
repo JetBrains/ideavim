@@ -18,10 +18,10 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
 /**
- * see "h :pop"
+ * see "h :tag"
  */
-@ExCommand(command = "po[p]")
-data class PopTagsCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
+@ExCommand(command = "ta[g]")
+data class TagCommand(val range: Range, val modifier: CommandModifier, val argument: String) :
   Command.SingleExecution(range, modifier, argument) {
 
   override val argFlags: CommandHandlerFlags =
@@ -33,7 +33,7 @@ data class PopTagsCommand(val range: Range, val modifier: CommandModifier, val a
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
     val count = getCountFromRange(editor, editor.currentCaret())
-    val motion = injector.motion.moveCaretToTagForward(editor, editor.primaryCaret(), count)
+    val motion = injector.motion.moveCaretToTagDown(editor, editor.primaryCaret(), count)
     if (motion is Motion.AbsoluteOffset) {
       editor.primaryCaret().moveToOffset(motion.offset)
     }

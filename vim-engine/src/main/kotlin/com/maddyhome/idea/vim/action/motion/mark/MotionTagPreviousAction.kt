@@ -28,7 +28,7 @@ class MotionTagPreviousAction : MotionActionHandler.ForEachCaret() {
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    return injector.motion.moveCaretToTag(editor, caret, operatorArguments.count1)
+    return injector.motion.moveCaretToTagForward(editor, caret, operatorArguments.count1)
   }
 
   override val motionType: MotionType = MotionType.EXCLUSIVE

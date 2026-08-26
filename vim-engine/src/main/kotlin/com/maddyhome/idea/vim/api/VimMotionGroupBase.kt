@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.isEndAllowedIgnoringOnemore
+import com.maddyhome.idea.vim.tag.TagStackEntry
 import org.jetbrains.annotations.Range
 import kotlin.math.abs
 import kotlin.math.absoluteValue
@@ -343,7 +344,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
   /**
    * Walks [count] entries up the tag stack, see "h CTRL-T"
    */
-  override fun moveCaretToTag(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion {
+  override fun moveCaretToTagForward(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion {
     val tagService = injector.tagService
     if (tagService.getEntries(editor).isEmpty()) {
       injector.messages.showErrorMessage(editor, injector.messages.message("E73"))
@@ -351,8 +352,27 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     }
 
     val entry = tagService.pop(editor, count)
+    return moveCaretToTagEntry(entry, editor, "E555")
+  }
+
+  override fun moveCaretToTagDown(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion {
+    val tagService = injector.tagService
+    if (tagService.getEntries(editor).isEmpty()) {
+      injector.messages.showErrorMessage(editor, injector.messages.message("E73"))
+      return Motion.Error
+    }
+
+    val entry = tagService.moveDown(editor, count)
+    return moveCaretToTagEntry(entry, editor, "E556")
+  }
+
+  private fun moveCaretToTagEntry(
+    entry: TagStackEntry?,
+    editor: VimEditor,
+    errorCode: String,
+  ): Motion {
     if (entry == null) {
-      injector.messages.showErrorMessage(editor, injector.messages.message("E555"))
+      injector.messages.showErrorMessage(editor, injector.messages.message(errorCode))
       return Motion.Error
     }
 

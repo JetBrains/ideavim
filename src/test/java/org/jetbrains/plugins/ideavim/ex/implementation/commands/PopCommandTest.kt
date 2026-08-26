@@ -96,7 +96,7 @@ class PopCommandTest : VimTestCase() {
     enterCommand("4pop")
 
     assertPluginError(true)
-    assertPluginErrorMessage("E555: at bottom of tag stack")
+    assertPluginErrorMessage("E555: At bottom of tag stack")
     assertPosition(3, 0)
   }
 
@@ -108,7 +108,7 @@ class PopCommandTest : VimTestCase() {
     enterCommand("pop")
 
     assertPluginError(true)
-    assertPluginErrorMessage("E73: tag stack empty")
+    assertPluginErrorMessage("E73: Tag stack empty")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
