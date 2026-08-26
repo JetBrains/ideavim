@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.tag.TagStackEntry
+import com.maddyhome.idea.vim.tag.TagStackMove
 import org.jetbrains.annotations.TestOnly
 
 /**
@@ -55,11 +56,11 @@ interface VimTagService {
   /**
    * Walks [count] entries back down the stack, the opposite of [pop] - `:tag` without an argument
    *
-   * Returns the entry whose [TagStackEntry.tagName] should be resolved again, or `null` when already at the top
-   * (`E556`). Note the asymmetry with [pop], which Vim has too: walking up means going to a position we recorded,
-   * while walking down means redoing a tag lookup, because the place a tag jump landed is never stored.
+   * Redoing a tag jump records where it was redone from, so the entry's position is rewritten to
+   * [departureLine]/[departureCol] - as Vim does, so that a following [pop] comes back to the right place. The
+   * returned [TagStackMove] says whether the destination is known or the tag has to be looked up again.
    */
-  fun moveDown(scopeId: String, count: Int): TagStackEntry?
+  fun moveDown(scopeId: String, count: Int, departureLine: Int, departureCol: Int): TagStackMove
 
   fun clear(scopeId: String)
 
@@ -102,8 +103,9 @@ fun VimTagService.pop(editor: VimEditor, count: Int): TagStackEntry? {
   return pop(editor.jumpListId, count)
 }
 
-fun VimTagService.moveDown(editor: VimEditor, count: Int): TagStackEntry? {
-  return moveDown(editor.jumpListId, count)
+fun VimTagService.moveDown(editor: VimEditor, count: Int): TagStackMove {
+  val position = editor.offsetToBufferPosition(editor.currentCaret().offset)
+  return moveDown(editor.jumpListId, count, position.line, position.column)
 }
 
 fun VimTagService.clear(editor: VimEditor) {

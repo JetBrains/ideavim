@@ -15,8 +15,9 @@ package com.maddyhome.idea.vim.tag
  * to. [tagName] is the tag that was jumped to, shown in the `TO tag` column of `:tags`.
  */
 data class TagStackEntry(
-  val line: Int,
-  val col: Int,
+  // Rewritten when `:tag` redoes this jump, so <C-T> comes back to where the redo was made from
+  var line: Int,
+  var col: Int,
   val filepath: String,
   val protocol: String,
   val tagName: String,

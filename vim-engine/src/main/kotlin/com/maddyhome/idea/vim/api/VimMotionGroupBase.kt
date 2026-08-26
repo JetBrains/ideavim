@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.state.mode.SelectionType
 import com.maddyhome.idea.vim.state.mode.isEndAllowedIgnoringOnemore
 import com.maddyhome.idea.vim.tag.TagStackEntry
+import com.maddyhome.idea.vim.tag.TagStackMove
 import org.jetbrains.annotations.Range
 import kotlin.math.abs
 import kotlin.math.absoluteValue
@@ -352,31 +353,49 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     }
 
     val entry = tagService.pop(editor, count)
-    return moveCaretToTagEntry(entry, editor, "E555")
+    if (entry == null) {
+      injector.messages.showErrorMessage(editor, injector.messages.message("E555"))
+      return Motion.Error
+    }
+
+    injector.jumpService.saveJumpLocation(editor)
+    return moveCaretToTagPosition(editor, entry)
   }
 
-  override fun moveCaretToTagDown(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion {
+  /**
+   * Walks [count] entries back down the tag stack, see "h :tag"
+   */
+  override fun moveCaretToTagDown(
+    editor: VimEditor,
+    caret: ImmutableVimCaret,
+    context: ExecutionContext,
+    count: Int,
+  ): Motion {
     val tagService = injector.tagService
     if (tagService.getEntries(editor).isEmpty()) {
       injector.messages.showErrorMessage(editor, injector.messages.message("E73"))
       return Motion.Error
     }
 
-    val entry = tagService.moveDown(editor, count)
-    return moveCaretToTagEntry(entry, editor, "E556")
+    return when (val move = tagService.moveDown(editor, count)) {
+      is TagStackMove.AtTop -> {
+        injector.messages.showErrorMessage(editor, injector.messages.message("E556"))
+        Motion.Error
+      }
+
+      is TagStackMove.ToKnownPosition -> {
+        injector.jumpService.saveJumpLocation(editor)
+        moveCaretToTagPosition(editor, move.landing)
+      }
+
+      is TagStackMove.ToTag -> {
+        injector.jumpService.saveJumpLocation(editor)
+        resolveTagAgain(editor, context, move.redone)
+      }
+    }
   }
 
-  private fun moveCaretToTagEntry(
-    entry: TagStackEntry?,
-    editor: VimEditor,
-    errorCode: String,
-  ): Motion {
-    if (entry == null) {
-      injector.messages.showErrorMessage(editor, injector.messages.message(errorCode))
-      return Motion.Error
-    }
-    injector.jumpService.saveJumpLocation(editor)
-
+  private fun moveCaretToTagPosition(editor: VimEditor, entry: TagStackEntry): Motion {
     val lp = BufferPosition(entry.line, entry.col, false)
     return if (editor.getPath() != entry.filepath) {
       injector.file.selectEditor(editor.projectId, entry.filepath, entry.protocol)?.let { newEditor ->
@@ -388,6 +407,26 @@ abstract class VimMotionGroupBase : VimMotionGroup {
     } else {
       editor.bufferPositionToOffset(lp).toMotionOrError()
     }
+  }
+
+  /**
+   * Asks the IDE for the tag again, because nothing was ever recorded past this jump
+   *
+   * The IDE resolves whatever the caret is on, so the caret goes back to where the tag was originally jumped from
+   * first - that is where the identifier is.
+   */
+  private fun resolveTagAgain(editor: VimEditor, context: ExecutionContext, entry: TagStackEntry): Motion {
+    val target = if (editor.getPath() != entry.filepath) {
+      injector.file.selectEditor(editor.projectId, entry.filepath, entry.protocol)
+    } else {
+      editor
+    } ?: return Motion.Error
+
+    val lp = BufferPosition(entry.line, entry.col, false)
+    target.currentCaret().moveToOffset(target.normalizeOffset(target.bufferPositionToOffset(lp), false))
+    injector.actionExecutor.executeAction(target, name = "GotoDeclaration", context = context)
+    // The caret has already been moved
+    return Motion.Error
   }
 
   override fun getMotionRange(

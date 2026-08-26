@@ -33,7 +33,7 @@ data class TagCommand(val range: Range, val modifier: CommandModifier, val argum
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
     val count = getCountFromRange(editor, editor.currentCaret())
-    val motion = injector.motion.moveCaretToTagDown(editor, editor.primaryCaret(), count)
+    val motion = injector.motion.moveCaretToTagDown(editor, editor.primaryCaret(), context, count)
     if (motion is Motion.AbsoluteOffset) {
       editor.primaryCaret().moveToOffset(motion.offset)
     }
