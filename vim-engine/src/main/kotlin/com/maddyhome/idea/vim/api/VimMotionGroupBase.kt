@@ -375,6 +375,7 @@ abstract class VimMotionGroupBase : VimMotionGroup {
       injector.messages.showErrorMessage(editor, injector.messages.message(errorCode))
       return Motion.Error
     }
+    injector.jumpService.saveJumpLocation(editor)
 
     val lp = BufferPosition(entry.line, entry.col, false)
     return if (editor.getPath() != entry.filepath) {

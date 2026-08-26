@@ -24,6 +24,7 @@ abstract class VimTagServiceBase : VimTagService {
   }
 
   override fun push(scopeId: String, entry: TagStackEntry) {
+    if (!injector.globalOptions().tagstack) return
     scopesWithOwnStack.add(scopeId)
     val entries = scopeToEntries.getOrPut(scopeId) { mutableListOf() }
 

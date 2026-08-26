@@ -51,6 +51,7 @@ open class GlobalOptions(scope: OptionAccessScope) : OptionsPropertiesBase(scope
   var sidescroll: Int by optionProperty(Options.sidescroll)
   var smartcase: Boolean by optionProperty(Options.smartcase)
   var startofline: Boolean by optionProperty(Options.startofline)
+  val tagstack: Boolean by optionProperty(Options.tagstack)
   val timeout: Boolean by optionProperty(Options.timeout)
   var timeoutlen: Int by optionProperty(Options.timeoutlen)
   val viminfo: StringListOptionValue by optionProperty(Options.viminfo)
