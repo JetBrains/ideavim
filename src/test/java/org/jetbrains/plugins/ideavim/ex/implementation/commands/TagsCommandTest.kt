@@ -105,4 +105,22 @@ class TagsCommandTest : VimTestCase() {
       """.trimMargin(),
     )
   }
+
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test tags is not shadowed by the tag command`() {
+    configureByText(text)
+    typeText("<C-]>")
+
+    // ":tag" abbreviates to ":ta", so ":tags" has to keep resolving to this command and not to ":tag"
+    enterCommand("tags")
+
+    assertPluginError(false)
+    assertExOutput(
+      """  # TO tag         FROM line  in file/text
+        |  1  1 it                  1  I found it in a legendary land
+        |>
+      """.trimMargin(),
+    )
+  }
 }

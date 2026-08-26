@@ -33,7 +33,7 @@ class TagStackTest : VimTestCase() {
     configureByText(text)
     typeText("<C-T>")
     assertPluginError(true)
-    assertPluginErrorMessage("E73: tag stack empty")
+    assertPluginErrorMessage("E73: Tag stack empty")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
@@ -42,7 +42,7 @@ class TagStackTest : VimTestCase() {
     configureByText(text)
     typeText("2<C-T>")
     assertPluginError(true)
-    assertPluginErrorMessage("E73: tag stack empty")
+    assertPluginErrorMessage("E73: Tag stack empty")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
@@ -125,7 +125,7 @@ class TagStackTest : VimTestCase() {
 
     typeText("<C-T>")
     assertPluginError(true)
-    assertPluginErrorMessage("E555: at bottom of tag stack")
+    assertPluginErrorMessage("E555: At bottom of tag stack")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
@@ -152,7 +152,7 @@ class TagStackTest : VimTestCase() {
 
     typeText("<C-T>")
     assertPluginError(true)
-    assertPluginErrorMessage("E73: tag stack empty")
+    assertPluginErrorMessage("E73: Tag stack empty")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
@@ -169,7 +169,7 @@ class TagStackTest : VimTestCase() {
 
     typeText("<C-T>")
     assertPluginError(true)
-    assertPluginErrorMessage("E73: tag stack empty")
+    assertPluginErrorMessage("E73: Tag stack empty")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
@@ -199,7 +199,7 @@ class TagStackTest : VimTestCase() {
     typeText("3<C-T>")
 
     assertPluginError(true)
-    assertPluginErrorMessage("E555: at bottom of tag stack")
+    assertPluginErrorMessage("E555: At bottom of tag stack")
   }
 
   /**
@@ -248,7 +248,7 @@ class TagStackTest : VimTestCase() {
 
     typeText("<C-T>")
     assertPluginError(true)
-    assertPluginErrorMessage("E555: at bottom of tag stack")
+    assertPluginErrorMessage("E555: At bottom of tag stack")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
