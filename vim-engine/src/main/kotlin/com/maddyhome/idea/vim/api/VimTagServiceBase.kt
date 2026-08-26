@@ -9,6 +9,7 @@
 package com.maddyhome.idea.vim.api
 
 import com.maddyhome.idea.vim.tag.TagStackEntry
+import com.maddyhome.idea.vim.tag.TagStackMove
 
 abstract class VimTagServiceBase : VimTagService {
   protected val scopeToEntries: MutableMap<String, MutableList<TagStackEntry>> = mutableMapOf()
@@ -52,15 +53,23 @@ abstract class VimTagServiceBase : VimTagService {
     return entries[index]
   }
 
-  override fun moveDown(scopeId: String, count: Int): TagStackEntry? {
-    val entries = scopeToEntries[scopeId] ?: return null
-    if (entries.isEmpty()) return null
+  override fun moveDown(scopeId: String, count: Int, departureLine: Int, departureCol: Int): TagStackMove {
+    val entries = scopeToEntries[scopeId] ?: return TagStackMove.AtTop
+    if (entries.isEmpty()) return TagStackMove.AtTop
 
     val index = getCurrentIndex(scopeId) + count
-    if (index > entries.size) return null
+    if (index > entries.size) return TagStackMove.AtTop
 
     scopeToCurrentIndex[scopeId] = index
-    return entries[index - 1]
+
+    // Redoing a jump records where it was redone from, so keep a snapshot of where it originally started
+    val redone = entries[index - 1]
+    val originally = redone.copy()
+    redone.line = departureLine
+    redone.col = departureCol
+
+    val landing = entries.getOrNull(index)
+    return if (landing != null) TagStackMove.ToKnownPosition(landing) else TagStackMove.ToTag(originally)
   }
 
   override fun clear(scopeId: String) {

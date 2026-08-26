@@ -89,6 +89,8 @@ class TagCommandTest : VimTestCase() {
     enterCommand("tag")
     enterCommand("tag")
 
+    // Reaching the top is a successful walk down, not a failure
+    assertPluginError(false)
     enterCommand("tags")
     assertExOutput(
       """  # TO tag         FROM line  in file/text
@@ -106,11 +108,13 @@ class TagCommandTest : VimTestCase() {
 
     enterCommand("2tag")
 
+    assertPluginError(false)
     enterCommand("tags")
+    // The second entry was redone from line 1, so that is its FROM now - verified against Vim 9.1
     assertExOutput(
       """  # TO tag         FROM line  in file/text
         |  1  1 it                  1  I found it in a legendary land
-        |  2  1 all                 2  all rocks and lavender and tufted grass,
+        |  2  1 all                 1  I found it in a legendary land
         |>
       """.trimMargin(),
     )
@@ -159,5 +163,86 @@ class TagCommandTest : VimTestCase() {
         |> 2  1 all                 2  all rocks and lavender and tufted grass,
       """.trimMargin(),
     )
+  }
+
+  /**
+   * Leaves three entries on the stack, jumped from (0, 8), (1, 0) and (2, 0), and walks all the way back up
+   */
+  private fun configureAtBottomOfThreeEntryStack() {
+    configureByText(text)
+    typeText("<C-]>")
+    typeText("j0")
+    typeText("<C-]>")
+    typeText("j0")
+    typeText("<C-]>")
+    typeText("3<C-T>")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test tag moves to where the tag jump landed`() {
+    configureAtBottomOfStack()
+    assertPosition(0, 8)
+
+    enterCommand("tag")
+
+    // Walking down redoes a tag jump, so it lands where that jump ended - which is where the next one was made from,
+    // not where this one started
+    assertPosition(1, 0)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test tag walks down through the middle of the stack`() {
+    configureAtBottomOfThreeEntryStack()
+    assertPosition(0, 8)
+
+    enterCommand("tag")
+    assertPosition(1, 0)
+
+    enterCommand("tag")
+    assertPosition(2, 0)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test tag with count moves to where that tag jump landed`() {
+    configureAtBottomOfThreeEntryStack()
+
+    enterCommand("2tag")
+
+    assertPosition(2, 0)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test tag records where the jump was redone from`() {
+    configureAtBottomOfStack()
+    typeText("G")
+
+    enterCommand("tag")
+
+    // Redoing a tag jump records where it was redone from, so the first entry no longer points at line 1
+    enterCommand("tags")
+    assertExOutput(
+      """  # TO tag         FROM line  in file/text
+        |  1  1 it                  4  hard by the torrent of a mountain pass.
+        |> 2  1 all                 2  all rocks and lavender and tufted grass,
+      """.trimMargin(),
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test ctrl-t comes back to where the jump was redone from`() {
+    configureAtBottomOfStack()
+    typeText("G")
+    enterCommand("tag")
+    assertPosition(1, 0)
+
+    typeText("<C-T>")
+
+    // The whole point of rewriting the entry - we came from the last line, so that is where we go back to
+    assertPosition(3, 0)
   }
 }

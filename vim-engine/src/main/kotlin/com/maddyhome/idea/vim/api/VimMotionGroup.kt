@@ -86,7 +86,7 @@ interface VimMotionGroup {
   fun moveCaretToMarkRelative(caret: ImmutableVimCaret, count: Int): Motion
   fun moveCaretToJump(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion
   fun moveCaretToTagForward(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion
-  fun moveCaretToTagDown(editor: VimEditor, caret: ImmutableVimCaret, count: Int): Motion
+  fun moveCaretToTagDown(editor: VimEditor, caret: ImmutableVimCaret, context: ExecutionContext, count: Int): Motion
 
   /**
    * Move the caret along the change list (`g;` / `g,`). [count] is signed:
