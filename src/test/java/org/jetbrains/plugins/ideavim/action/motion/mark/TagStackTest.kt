@@ -267,4 +267,111 @@ class TagStackTest : VimTestCase() {
       """.trimMargin(),
     )
   }
+
+  /**
+   * A line per tag jump, so the stack can be filled past its limit
+   */
+  private val twentyOneLines = """
+        tag01 rocks and lavender
+        tag02 rocks and lavender
+        tag03 rocks and lavender
+        tag04 rocks and lavender
+        tag05 rocks and lavender
+        tag06 rocks and lavender
+        tag07 rocks and lavender
+        tag08 rocks and lavender
+        tag09 rocks and lavender
+        tag10 rocks and lavender
+        tag11 rocks and lavender
+        tag12 rocks and lavender
+        tag13 rocks and lavender
+        tag14 rocks and lavender
+        tag15 rocks and lavender
+        tag16 rocks and lavender
+        tag17 rocks and lavender
+        tag18 rocks and lavender
+        tag19 rocks and lavender
+        tag20 rocks and lavender
+        tag21 rocks and lavender
+  """.trimIndent()
+
+  /**
+   * Presses `<C-]>` on every line, leaving one more tag jump than the stack can hold
+   */
+  private fun fillStackPastItsLimit() {
+    configureByText(twentyOneLines)
+    typeText("<C-]>")
+    repeat(20) {
+      typeText("j0")
+      typeText("<C-]>")
+    }
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test the stack holds no more than twenty entries`() {
+    fillStackPastItsLimit()
+
+    // Twenty steps back reach the bottom, which is the second tag jump - the first one has been dropped
+    typeText("20<C-T>")
+
+    assertPluginError(false)
+    assertPosition(1, 0)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test the oldest entry is dropped once the stack is full`() {
+    fillStackPastItsLimit()
+
+    typeText("21<C-T>")
+
+    assertPluginError(true)
+    assertPluginErrorMessage("E555: At bottom of tag stack")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test the newest entry survives when the stack overflows`() {
+    fillStackPastItsLimit()
+    typeText("G")
+
+    typeText("<C-T>")
+
+    // The last tag jump was made from the twenty first line
+    assertPosition(20, 0)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test clearjumps does not clear the tag stack`() {
+    configureByText(text)
+    typeText("<C-]>")
+
+    enterCommand("clearjumps")
+
+    // The two stacks are separate in Vim, even though we scope them the same way
+    enterCommand("tags")
+    assertExOutput(
+      """  # TO tag         FROM line  in file/text
+        |  1  1 it                  1  I found it in a legendary land
+        |>
+      """.trimMargin(),
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test ctrl-t records the position it left in the jump list`() {
+    configureByText(text)
+    typeText("<C-]>")
+    typeText("G")
+
+    typeText("<C-T>")
+    assertPosition(0, 8)
+
+    // <C-T> is a jump, so <C-O> comes back to where it was pressed
+    typeText("<C-O>")
+    assertPosition(3, 0)
+  }
 }

@@ -121,4 +121,16 @@ class PopCommandTest : VimTestCase() {
     assertPluginError(false)
     assertPosition(2, 0)
   }
+
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
+  @Test
+  fun `test pop records the position it left in the jump list`() {
+    configureWithThreeTagJumps()
+
+    enterCommand("pop")
+    assertPosition(2, 0)
+
+    typeText("<C-O>")
+    assertPosition(3, 0)
+  }
 }

@@ -245,6 +245,7 @@ object Options {
   )
   val smartcase: ToggleOption = addOption(ToggleOption("smartcase", GLOBAL, "scs", false))
   val startofline: ToggleOption = addOption(ToggleOption("startofline", GLOBAL, "sol", true))
+  val tagstack: ToggleOption = addOption(ToggleOption("tagstack", GLOBAL, "ts", true))
   val timeout: ToggleOption = addOption(ToggleOption("timeout", GLOBAL, "to", true))
   val timeoutlen: UnsignedNumberOption = addOption(UnsignedNumberOption("timeoutlen", GLOBAL, "tm", 1000))
   val inccommand: StringOption = addOption(
