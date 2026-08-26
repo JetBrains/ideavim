@@ -122,6 +122,7 @@
   "tabn[ext]": "com.maddyhome.idea.vim.vimscript.model.commands.NextTabCommand",
   "tabo[nly]": "com.maddyhome.idea.vim.vimscript.model.commands.TabOnlyCommand",
   "tabp[revious]": "com.maddyhome.idea.vim.vimscript.model.commands.PreviousTabCommand",
+  "tags": "com.maddyhome.idea.vim.vimscript.model.commands.TagsCommand",
   "u[ndo]": "com.maddyhome.idea.vim.vimscript.model.commands.UndoCommand",
   "una[bbreviate]": "com.maddyhome.idea.vim.vimscript.model.commands.mapping.UnabbrevCommand",
   "unlo[ckvar]": "com.maddyhome.idea.vim.vimscript.model.commands.UnlockVarCommand",
