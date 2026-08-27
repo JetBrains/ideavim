@@ -37,3 +37,7 @@ settings.xml
 
 # Split-mode test artifacts
 **/allure-results/
+
+# Local runs of the property test auto-fix workflow
+/property_failures/
+/property_fix_result.json
