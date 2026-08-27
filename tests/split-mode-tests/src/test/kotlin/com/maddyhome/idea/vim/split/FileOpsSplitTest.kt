@@ -48,6 +48,23 @@ class FileOpsSplitTest : IdeaVimStarterTestBase() {
   }
 
   @Test
+  fun `put alternate file name from hash register`() {
+    openFile(createFile("src/Hash1.txt", "A\n"))
+    openFile(createFile("src/Hash2.txt", "B\n"))
+
+    typeVim("\"#p")
+
+    // The '#' register is built on the backend too (FileRemoteApi.getBufferName), and it cannot reuse the '%' path:
+    // the frontend only knows the alternate file as a VirtualFileId, while content roots exist on the backend only.
+    // Pasting right after the leading 'B' pins down *what* came back: the project-relative name of the file we
+    // switched away from, not an absolute path, not the current file's name and not an empty register.
+    assertEditorContains(
+      "Bsrc/Hash1.txt",
+      "'\"#p' should paste the project-relative name of the alternate file",
+    )
+  }
+
+  @Test
   fun `list registers with percent register`() {
     openFile(createFile("src/Percent2.txt", "Line 1\n"))
 
@@ -58,6 +75,20 @@ class FileOpsSplitTest : IdeaVimStarterTestBase() {
     // Listing the registers reads '%' through the same RPC, but from the ex command instead of a put.
     // No crash means FileRemoteApi.getFileName survives both call paths.
     assertEditorContains("Line 1", "Text should be untouched by ':registers'")
+  }
+
+  @Test
+  fun `list registers with hash register`() {
+    openFile(createFile("src/Hash3.txt", "Line 1\n"))
+    openFile(createFile("src/Hash4.txt", "Line 2\n"))
+
+    exCommand("registers")
+    pause()
+    esc()
+
+    // ':registers' reads '#' through getRegisters(), a different call path than the put above - and one that issues
+    // the '%' and '#' RPCs back to back. No crash means both survive it.
+    assertEditorContains("Line 2", "Text should be untouched by ':registers'")
   }
 
   @Test
