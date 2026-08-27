@@ -64,12 +64,18 @@ private fun changeCharacterRange(editor: VimEditor, caret: VimCaret, range: Text
   val chars = editor.text()
   val starts = range.startOffsets
   val ends = range.endOffsets
+  val originalStartOffset = starts.firstOrNull()
   for (j in ends.indices.reversed()) {
     for (i in starts[j] until ends[j]) {
       if (i < chars.length && '\n' != chars[i]) {
         injector.changeGroup.replaceText(editor, caret, i, i + 1, ch.toString())
       }
     }
+  }
+
+  //reset the caret position to visual start
+  if (originalStartOffset != null) {
+    caret.moveToOffset(originalStartOffset)
   }
   return true
 }
