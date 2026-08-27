@@ -379,15 +379,6 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
         )
         .addAll(
           getKeyStrokes(
-            KeyEvent.VK_END,
-            0,
-            InputEvent.CTRL_DOWN_MASK,
-            InputEvent.SHIFT_DOWN_MASK,
-            InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK,
-          ),
-        )
-        .addAll(
-          getKeyStrokes(
             KeyEvent.VK_PAGE_UP,
             0,
             InputEvent.SHIFT_DOWN_MASK,
