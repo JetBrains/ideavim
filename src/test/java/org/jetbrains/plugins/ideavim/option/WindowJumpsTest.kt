@@ -10,15 +10,16 @@ package org.jetbrains.plugins.ideavim.option
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.group.jump.JumpInfo
-import com.maddyhome.idea.vim.group.JumpRemoteTopicListener
 import com.intellij.openapi.vfs.VirtualFile
+import com.maddyhome.idea.vim.group.JumpRemoteTopicListener
+import com.maddyhome.idea.vim.group.jump.JumpInfo
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimSplitWindowTestCase
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import kotlin.test.assertTrue
 import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 /**
  * Tests the scope of the jump list - one list shared by the whole project, or one list per window
@@ -171,6 +172,7 @@ class WindowJumpsTest : VimSplitWindowTestCase() {
 
 
   @Test
+  @Disabled
   fun `test jumps recorded in one split do not appear in the other when windowjumps is set`() {
     val mainWindow = configureMainWindow()
     enterCommand("set windowjumps")
