@@ -57,11 +57,11 @@ object AgentSize {
 // Common build type for all configurations
 abstract class IdeaVimBuildType(init: BuildType.() -> Unit) : BuildType({
   artifactRules = """
-        +:build/reports => build/reports
-        +:tests/java-tests/build/reports => java-tests/build/reports
-        +:tests/long-running-tests/build/reports => long-running-tests/build/reports
-        +:tests/property-tests/build/reports => property-tests/build/reports
-        +:/mnt/agent/temp/buildTmp/ => /mnt/agent/temp/buildTmp/
+        +:build/reports => reports.zip
+        +:tests/java-tests/build/reports => java-tests-reports.zip
+        +:tests/long-running-tests/build/reports => long-running-tests-reports.zip
+        +:tests/property-tests/build/reports => property-tests-reports.zip
+        +:/mnt/agent/temp/buildTmp/ => buildTmp.zip
     """.trimIndent()
 
   params {
