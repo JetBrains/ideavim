@@ -271,8 +271,8 @@ class MotionRightActionTest : VimTestCase() {
       """
             Lorem Ipsum
 
-            I found it in a legendary lan${s}d${c}${se}
-            consectetur adipiscing elit
+            I found it in a legendary lan${s}d${c}
+            ${se}consectetur adipiscing elit
             Sed in orci mauris.
             Cras id tellus in ex imperdiet egestas.
       """.trimIndent(),

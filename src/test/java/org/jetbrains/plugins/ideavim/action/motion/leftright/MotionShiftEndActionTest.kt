@@ -57,8 +57,8 @@ class MotionShiftEndActionTest : VimTestCase() {
     val after = """
             A Discovery
 
-            I found it in a ${s}legendary land${c}${se}
-            all rocks and lavender and tufted grass,
+            I found it in a ${s}legendary land${c}
+            ${se}all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
@@ -108,8 +108,8 @@ class MotionShiftEndActionTest : VimTestCase() {
     val after = """
             A Discovery
 
-            ${s}I found it in a legendary land${c}${se}
-            all rocks and lavender and tufted grass,
+            ${s}I found it in a legendary land${c}
+            ${se}all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
