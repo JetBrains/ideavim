@@ -298,7 +298,7 @@ jobs:
 
             Do not merge anything, do not push to `master`, and do not touch other open branches.
 
-          claude_args: '--allowed-tools "Read,Edit,Write,Glob,Grep,Task,WebSearch,WebFetch,Skill,Bash(git:*),Bash(gh:*),Bash(./gradlew:*),Bash(find:*),Bash(cat:*),Bash(grep:*),Bash(head:*),Bash(ls:*),Bash(jq:*),Bash(curl:*),mcp__plugin_context7_context7__resolve-library-id,mcp__plugin_context7_context7__get-library-docs"'
+          claude_args: '--allowed-tools "Read,Edit,Write,Glob,Grep,Task,WebSearch,WebFetch,Skill,Bash,mcp__plugin_context7_context7__resolve-library-id,mcp__plugin_context7_context7__get-library-docs"'
 
       - name: Report outcome
         if: always()
