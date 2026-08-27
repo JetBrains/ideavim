@@ -177,7 +177,7 @@ class OperatorActionTest : VimTestCase() {
     doTest(
       "gx}",
       "o${c}ne\ntwo\n\nthree\n",
-      "oxx\nxx${c}x\n\nthree\n"
+      "o${c}xx\nxxx\n\nthree\n"
     ) {
       executeVimscript(
         """function! Redact(type)

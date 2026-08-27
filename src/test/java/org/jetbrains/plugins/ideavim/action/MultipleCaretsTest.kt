@@ -1359,7 +1359,7 @@ $c  tw${c}o
   @Test
   fun testChangeVisualCharacterAction() {
     typeTextInFile(injector.parser.parseKeys("v2lra"), "abcd${c}ffffff${c}abcde${c}aaaa\n")
-    assertState("abcdaa${c}afffaa${c}adeaa${c}aa\n")
+    assertState("abcd${c}aaafff${c}aaade${c}aaaa\n")
   }
 
   @Test
