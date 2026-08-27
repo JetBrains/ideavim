@@ -386,21 +386,6 @@ class MotionInnerBigWordActionTest : VimTestCase() {
     )
   }
 
-  @VimBehaviorDiffers(originalVimAfter =
-    """
-      |Lorem ipsum dolor sit amet,
-      |
-      |${s}${c}
-      |${se}
-      |
-      |consectetur adipiscing elit
-    """,
-    description = "The caret and selection should not be at the same offset. This indicates that IdeaVim is " +
-      "shortening the selection range to (incorrectly) avoid selecting the end of line char. Once IdeaVim allows " +
-      "this, both caret and selection end offset will be incorrect, indicating an off-by-ine error somewhere, " +
-      "which will need fixing." +
-      "Fix when IdeaVim supports selecting end of line char"
-  )
   @Test
   fun `test select empty line`() {
     doTest(
@@ -416,8 +401,8 @@ class MotionInnerBigWordActionTest : VimTestCase() {
       """
         |Lorem ipsum dolor sit amet,
         |
-        |${s}
-        |${c}${se}
+        |${s}${c}
+        |${se}
         |
         |consectetur adipiscing elit
       """.trimMargin(),
@@ -450,8 +435,8 @@ class MotionInnerBigWordActionTest : VimTestCase() {
         |
         |
         |
-        |${c}${se}
-        |
+        |${c}
+        |${se}
         |consectetur adipiscing elit
       """.trimMargin(),
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
@@ -772,15 +757,6 @@ class MotionInnerBigWordActionTest : VimTestCase() {
     )
   }
 
-  @VimBehaviorDiffers(originalVimAfter =
-    """
-      |Lorem ${s}Ipsum
-      |
-      |${c}
-      |${se}Lorem ipsum dolor sit amet,
-    """,
-    description = "Off by one because IdeaVim does not allow selecting a newline char"
-  )
   @Test
   fun `test repeated text object expands to multiple empty lines`() {
     doTest(
@@ -794,8 +770,8 @@ class MotionInnerBigWordActionTest : VimTestCase() {
       """
         |Lorem ${s}Ipsum
         |
-        |${c}${se}
-        |Lorem ipsum dolor sit amet,
+        |${c}
+        |${se}Lorem ipsum dolor sit amet,
       """.trimMargin(),
       Mode.VISUAL(SelectionType.CHARACTER_WISE),
     )

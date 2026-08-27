@@ -235,7 +235,7 @@ class MotionOuterBlockTagActionTest : VimTestCase() {
     // Newline must not be skipped
     configureByText("${c}\n" + "    <t>asdf</t>")
     typeText(injector.parser.parseKeys("vat"))
-    assertSelection(null)
+    assertSelection("\n")
   }
 
   @Test
