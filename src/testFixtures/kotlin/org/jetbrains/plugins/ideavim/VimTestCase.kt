@@ -69,6 +69,7 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.group.EffectiveIjOptions
 import com.maddyhome.idea.vim.group.GlobalIjOptions
 import com.maddyhome.idea.vim.group.IjOptions
+import com.maddyhome.idea.vim.group.LastTabService
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.TestInputModel
@@ -144,6 +145,7 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
     injector.globalOptions().ideastrictmode = true
     Checks.reset()
     clearClipboard()
+    clearAlternateFile()
 
     // Make sure the entry text field gets a bounds, or we won't be able to work out caret location
     ExEntryPanel.getOrCreatePanelInstance().entry.setBounds(0, 0, 100, 25)
@@ -161,6 +163,10 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
     if (defaultEditorText != null) {
       configureByText(defaultEditorText)
     }
+  }
+
+  private fun clearAlternateFile() {
+    LastTabService.getInstance(fixture.project).lastTab = null
   }
 
   private fun resetAllOptions() {

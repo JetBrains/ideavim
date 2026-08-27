@@ -68,6 +68,8 @@ class PutFileNameRegisterTest : VimTestCase() {
   }
 
   // ':registers' lists '%' in Vim, so a synthesised register has to show up in the listing as well as in a put.
+  // '#' is listed too: this test switches away from the file opened by configureByText(), which makes it the alternate
+  // buffer. See PutAlternateFileRegisterTest for the '#' register itself.
   @Test
   fun `test registers command lists the percent register`() {
     configureByText("")
@@ -78,6 +80,7 @@ class PutFileNameRegisterTest : VimTestCase() {
     assertExOutput(
       """Type Name Content
       |  c  "%   subdir/MyFile.txt
+      |  c  "#   aaa.txt
       """.trimMargin(),
     )
   }

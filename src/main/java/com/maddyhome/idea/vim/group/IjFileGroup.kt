@@ -8,6 +8,7 @@
 
 package com.maddyhome.idea.vim.group
 
+import com.intellij.ide.vfs.rpcId
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.application.ApplicationManager
@@ -148,6 +149,14 @@ class IjFileGroup : VimFileBase() {
     return rpc { FileRemoteApi.getInstance().getFileName((editor as IjVimEditor).editor.editorId(), fullPath = false) }
   }
 
+  override fun alternateBufferName(editor: VimEditor): String? {
+    val project = (editor as IjVimEditor).editor.project ?: return null
+    val alternateFile = LastTabService.getInstance(project).lastTab?.takeIf { it.isValid } ?: return null
+    return rpc(project) {
+      FileRemoteApi.getInstance().getBufferName(alternateFile.rpcId(), project.projectId(), fullPath = false)
+    }
+  }
+
   override fun selectPreviousTab(context: ExecutionContext): Boolean {
     val project = PlatformDataKeys.PROJECT.getData(context.context as DataContext) ?: return false
     val vf = LastTabService.getInstance(project).lastTab
@@ -173,13 +182,11 @@ class IjFileGroup : VimFileBase() {
     if (!success) return null
 
     // The backend opened/focused the file. Find the editor it opened.
-    val project = platformProjectId.findProjectOrNull()
-      ?: ProjectManager.getInstance().openProjects.firstOrNull()
-      ?: return null
+    val project =
+      platformProjectId.findProjectOrNull() ?: ProjectManager.getInstance().openProjects.firstOrNull() ?: return null
 
     val editor = FileEditorManager.getInstance(project).allEditors.filterIsInstance<TextEditor>()
-      .firstOrNull { it.file.path == documentPath && !it.editor.isDisposed }
-      ?.editor
+      .firstOrNull { it.file.path == documentPath && !it.editor.isDisposed }?.editor
     return if (editor != null) editor.vim else null
   }
 

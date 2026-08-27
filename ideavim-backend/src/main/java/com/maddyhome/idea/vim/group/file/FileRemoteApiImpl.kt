@@ -152,6 +152,14 @@ internal class FileRemoteApiImpl : FileRemoteApi {
     }
   }
 
+  override suspend fun getBufferName(virtualFileId: VirtualFileId, projectId: ProjectId?, fullPath: Boolean): String? {
+    return readAction {
+      val vf = virtualFileId.virtualFile() ?: return@readAction null
+      val project = projectId?.findProjectOrNull() ?: return@readAction null
+      bufferName(fullPath, vf, project)
+    }
+  }
+
   private fun bufferName(
     fullPath: Boolean,
     vf: VirtualFile,

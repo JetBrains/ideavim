@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.diagnostic.debug
 import com.maddyhome.idea.vim.diagnostic.vimLogger
 import com.maddyhome.idea.vim.helper.EngineStringHelper
 import com.maddyhome.idea.vim.options.OptionConstants
+import com.maddyhome.idea.vim.register.RegisterConstants.ALTERNATE_BUFFER_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.BLACK_HOLE_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.CLIPBOARD_REGISTER
 import com.maddyhome.idea.vim.register.RegisterConstants.CLIPBOARD_REGISTERS
@@ -553,6 +554,10 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
       return getCurrentFileNameRegister(editor)
     }
 
+    if (r == ALTERNATE_BUFFER_REGISTER) {
+      return getAlternateBufferName(editor)
+    }
+
     return if (CLIPBOARD_REGISTERS.indexOf(myR) >= 0) refreshClipboardRegister(
       editor,
       context,
@@ -565,7 +570,10 @@ abstract class VimRegisterGroupBase : VimRegisterGroup {
     val clipboardRegisters = CLIPBOARD_REGISTERS
       .filterNot { it == CLIPBOARD_REGISTER && !isPrimaryRegisterSupported() } // for some reason non-X systems use PRIMARY_REGISTER as a clipboard storage
       .mapNotNull { refreshClipboardRegister(editor, context, it) }
-    return (filteredRegisters + clipboardRegisters + listOfNotNull(getCurrentFileNameRegister(editor)))
+    return (filteredRegisters + clipboardRegisters + listOfNotNull(
+      getCurrentFileNameRegister(editor),
+      getAlternateBufferName(editor)
+    ))
       .sortedWith(Register.KeySorter)
   }
 
@@ -661,6 +669,15 @@ private fun getCurrentFileNameRegister(editor: VimEditor): Register? {
   val fileName = injector.file.bufferName(editor) ?: return null
   return Register(
     CURRENT_FILENAME_REGISTER,
+    injector.clipboardManager.dumbCopiedText(fileName),
+    SelectionType.CHARACTER_WISE
+  )
+}
+
+private fun getAlternateBufferName(editor: VimEditor): Register? {
+  val fileName = injector.file.alternateBufferName(editor) ?: return null
+  return Register(
+    ALTERNATE_BUFFER_REGISTER,
     injector.clipboardManager.dumbCopiedText(fileName),
     SelectionType.CHARACTER_WISE
   )
