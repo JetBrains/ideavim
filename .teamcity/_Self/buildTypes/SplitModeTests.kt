@@ -20,9 +20,9 @@ object SplitModeTests : IdeaVimBuildType({
   description = "Tests for IdeaVim in Remote Development split mode (backend + frontend)"
 
   artifactRules = """
-        +:tests/split-mode-tests/build/reports => split-mode-tests/build/reports
-        +:out/ide-tests/tests/**/log => out/ide-tests/log
-        +:out/ide-tests/tests/**/frontend/log => out/ide-tests/frontend-log
+        +:tests/split-mode-tests/build/reports => split-mode-tests-reports.zip
+        +:out/ide-tests/tests/**/log => ide-tests-log.zip
+        +:out/ide-tests/tests/**/frontend/log => ide-tests-frontend-log.zip
     """.trimIndent()
 
   params {
