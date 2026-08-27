@@ -26,4 +26,19 @@ class VimShortcutKeyActionTest : VimTestCase() {
     val shiftTab = KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK)
     assertFalse(VimShortcutKeyAction.VIM_ONLY_EDITOR_KEYS.contains(shiftTab))
   }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  @Test
+  fun `End is not a Vim-only editor key so sethandler can release it to the IDE`() {
+    val modifiers = listOf(
+      0,
+      InputEvent.CTRL_DOWN_MASK,
+      InputEvent.SHIFT_DOWN_MASK,
+      InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK,
+    )
+    for (modifier in modifiers) {
+      val end = KeyStroke.getKeyStroke(KeyEvent.VK_END, modifier)
+      assertFalse(VimShortcutKeyAction.VIM_ONLY_EDITOR_KEYS.contains(end), "$end should not be a Vim-only editor key")
+    }
+  }
 }
