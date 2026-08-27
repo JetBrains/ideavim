@@ -83,7 +83,6 @@ class RepeatChangeActionTest : VimTestCase() {
     doTest(keys, before, after, Mode.NORMAL())
   }
 
-  @VimBehaviorDiffers(description = "Different caret position")
   @Test
   fun `test repeat multiline`() {
     val keys = listOf("vjlrXj", ".")
@@ -99,9 +98,9 @@ class RepeatChangeActionTest : VimTestCase() {
                 A Discovery
 
                 I XXXXXXXXXXXXXXXXXXXXXXXXXXXX
-                XXXXrocks and lavender and tufted grass,
-                whe${c}XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-                XXXX by the torrent of a mountain pass.
+                XX${c}XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                XXXXe it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
     """.trimIndent()
     doTest(keys, before, after, Mode.NORMAL())
   }
@@ -172,7 +171,6 @@ class RepeatChangeActionTest : VimTestCase() {
     doTest(keys, before, after, Mode.NORMAL())
   }
 
-  @VimBehaviorDiffers(description = "Wrong caret position")
   @Test
   fun `test line motion to end`() {
     val keys = listOf("VjrX2j^", ".")
@@ -189,8 +187,8 @@ class RepeatChangeActionTest : VimTestCase() {
 
                 XXXXXXXXXXXXXXXXXXXXXXXXXXX
                 XXXXXXXXXXXXXXXXXXXXXXXXXXX
-                Sed in orci mauris.
-                ${c}XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                ${c}XXXXXXXXXXXXXXXXXXX
+                XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     """.trimIndent()
     doTest(keys, before, after, Mode.NORMAL())
   }
@@ -218,7 +216,6 @@ class RepeatChangeActionTest : VimTestCase() {
     doTest(keys, before, after, Mode.NORMAL())
   }
 
-  @VimBehaviorDiffers(description = "Wrong caret position")
   @Test
   fun `test block motion`() {
     val keys = listOf("<C-V>jerXll", ".")
@@ -233,25 +230,14 @@ class RepeatChangeActionTest : VimTestCase() {
     val after = """
                 A Discovery
 
-                XXXound it in a legendary land
-                XXX ${c}XXXks and lavender and tufted grass,
-                wherXXXt was settled on some sodden sand
+                XX${c}XXXnd it in a legendary land
+                XXXXXocks and lavender and tufted grass,
+                where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
     """.trimIndent()
     doTest(keys, before, after, Mode.NORMAL())
   }
 
-  @VimBehaviorDiffers(
-    """
-                Lorem Ipsum
-
-                XXXXXnd it in a legendary land
-                XXXXXocks and lavender and tufted grass,
-                XXXXX it was settled on some sodden sand
-                hard ${c}XXXXXe torrent of a mountain pass.
-
-    """,
-  )
   @Test
   fun `test block motion to end`() {
     val keys = listOf("<C-V>jjerXjl", ".")
@@ -268,15 +254,14 @@ class RepeatChangeActionTest : VimTestCase() {
                 A Discovery
 
                 XXXXXnd it in a legendary land
-                XXXXXocks and lavender and tufted grass,
-                XXXXX it was settled on some sodden sand
-                XXXXX${c}Xy the torrent of a mountain pass.
+                X${c}XXXXXcks and lavender and tufted grass,
+                XXXXXXit was settled on some sodden sand
+                hXXXXXy the torrent of a mountain pass.
 
     """.trimIndent()
     doTest(keys, before, after, Mode.NORMAL())
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR)
   @Test
   fun `test block with dollar motion`() {
     val keys = listOf("<C-V>j\$rXj^", ".")
@@ -292,9 +277,9 @@ class RepeatChangeActionTest : VimTestCase() {
                 A Discovery
 
                 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-                XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-                ${c}XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-                XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                ${c}XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+                hard by the torrent of a mountain pass.
     """.trimIndent()
     doTest(keys, before, after, Mode.NORMAL())
   }
