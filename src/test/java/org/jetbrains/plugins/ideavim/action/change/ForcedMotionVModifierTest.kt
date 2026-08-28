@@ -296,6 +296,26 @@ class ForcedMotionVModifierTest : VimTestCase() {
   }
 
   @Test
+  fun `test y CTRL-V j yanks a vertical block`() {
+    // Block from (0,0) to (1,0) - yanks the first column of both lines blockwise, pasted after the caret
+    doTest(
+      "y<C-V>jp",
+      "${c}abcde\nfghij",
+      "a${c}abcde\nffghij",
+    )
+  }
+
+  @Test
+  fun `test y CTRL-V l yanks a single-row block`() {
+    // On one line the block is one row high: `l` forces blockwise over columns 0..1, yanking "he"
+    doTest(
+      "y<C-V>lp",
+      "${c}hello\nworld",
+      "h${c}heello\nworld",
+    )
+  }
+
+  @Test
   fun `test c CTRL-V j changes a block on every line`() {
     // Blockwise change deletes the block, then repeats the inserted text on every line of the block on exit
     doTest(
