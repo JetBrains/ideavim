@@ -269,6 +269,21 @@ class InsertFilenameUnderCaretActionTest : VimExTestCase() {
   }
 
   @Test
+  fun `test insert filename at incsearch range ending at end of document causes error`() {
+    configureByText(
+      """
+      |Lorem ip${c}sum dolor sit amet
+      |consectetur adipiscing elit
+    """.trimMargin()
+    )
+    setUnixOption()
+    enterCommand("set incsearch")
+    typeText("/elit<C-R><C-F>")
+    assertPluginError(true)
+    assertPluginErrorMessage("E446: No file name under cursor")
+  }
+
+  @Test
   fun `test inserts filename following offset of end of incsearch range across multiple lines`() {
     configureByText(
       """

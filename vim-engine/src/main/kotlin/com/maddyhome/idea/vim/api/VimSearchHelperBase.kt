@@ -175,7 +175,10 @@ abstract class VimSearchHelperBase : VimSearchHelper {
 
   override fun findFilenameAtOrFollowingCursor(editor: VimEditor, offset: Int): TextRange? {
     val text = editor.text()
-    if (text.isEmpty()) return null
+
+    // The offset can be the end of the text, e.g. when it comes from the exclusive end offset of an incsearch match at
+    // the end of the document. There is obviously no filename at that position. Vim reports "No file name under cursor"
+    if (offset !in text.indices) return null
 
     val start = if (!KeywordOptionHelper.isFilename(editor, text[offset])) {
       moveForwardsToStartOfFilename(editor, text, offset)
