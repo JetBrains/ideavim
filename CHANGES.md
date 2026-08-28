@@ -165,6 +165,8 @@ usual beta standards.
 * [2033](https://github.com/JetBrains/ideavim/pull/2033) by [AndDe-gourav](https://github.com/AndDe-gourav): fix range of visual selection
 * [2029](https://github.com/JetBrains/ideavim/pull/2029) by [AndDe-gourav](https://github.com/AndDe-gourav): Fix caret position after change visual character
 * [2022](https://github.com/JetBrains/ideavim/pull/2022) by [1grzyb1](https://github.com/1grzyb1): Remove end from Vim only editor keys
+* [2029](https://github.com/JetBrains/ideavim/pull/2029) by [AndDe-gourav](https://github.com/AndDe-gourav): Fix caret position after change visual character
+* [2022](https://github.com/JetBrains/ideavim/pull/2022) by [1grzyb1](https://github.com/1grzyb1): Remove end from Vim only editor keys
 * [2021](https://github.com/JetBrains/ideavim/pull/2021) by [1grzyb1](https://github.com/1grzyb1): VIM-3058 alternate file name register
 * [2020](https://github.com/JetBrains/ideavim/pull/2020) by [1grzyb1](https://github.com/1grzyb1): VIM-1370 Implement tag stack in IdeaVim
 * [2018](https://github.com/JetBrains/ideavim/pull/2018) by [1grzyb1](https://github.com/1grzyb1): VIM-1347 Implements Signature marks plugin
