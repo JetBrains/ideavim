@@ -52,7 +52,8 @@ private fun swapVisualSelections(editor: VimEditor): Boolean {
   injector.markService.setVisualSelectionMarks(primaryCaret, TextRange(vimSelectionStart, primaryCaret.offset))
 
   editor.mode = mode.copy(selectionType = lastSelectionType)
-  primaryCaret.vimSetSelection(lastVisualRange.startOffset, lastVisualRange.endOffset, true)
+  // lastVisualRange.endOffset - 1 (minus one because +1 is already done in getVisualSelectionMarks above and vimSetSelection also add 1)
+  primaryCaret.vimSetSelection(lastVisualRange.startOffset, lastVisualRange.endOffset - 1, true)
 
   injector.scroll.scrollCaretIntoView(editor)
 
