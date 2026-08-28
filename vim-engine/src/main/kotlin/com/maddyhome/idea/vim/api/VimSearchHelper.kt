@@ -296,7 +296,8 @@ interface VimSearchHelper {
    * Find the filename at or following the given offset
    *
    * This function uses the `'isfname'` option to check for valid file name characters. It will find the filename under
-   * the caret, or the first filename after the caret on the current line. It will return null if no filename is found.
+   * the caret, or the first filename after the caret on the current line. It will return null if no filename is found,
+   * including when the offset is not a valid offset into the text, such as the end of the document.
    */
   fun findFilenameAtOrFollowingCursor(editor: VimEditor, offset: Int): TextRange?
 
