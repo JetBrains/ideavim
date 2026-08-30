@@ -145,7 +145,8 @@ class ParagraphMotionTest : VimTestCase() {
         |${c}Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
     """.trimMargin().dotToSpace()
-    val after = """${c}Sed in orci mauris.
+    val after = """
+        |${c}Sed in orci mauris.
         |Cras id tellus in ex imperdiet egestas.
     """.trimMargin().dotToSpace()
     doTest("d{", before, after, Mode.NORMAL())
