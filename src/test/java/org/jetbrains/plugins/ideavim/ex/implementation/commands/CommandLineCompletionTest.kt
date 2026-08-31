@@ -583,6 +583,40 @@ class CommandLineCompletionTest : VimExTestCase() {
     assertExText("e %:t")
   }
 
+  // %:r tests
+
+  // %:r strips the extension from the current file path, giving an absolute prefix.
+  // File completion then finds files whose path starts with that prefix.
+  @Test
+  fun `test percent r expands to path without extension and completes`() {
+    val currentFilePath = tempDir.resolve("current.txt")
+    currentFilePath.createFile()
+    val vFile = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(currentFilePath)!!
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.openFileInEditor(vFile)
+    }
+
+    // %:r = "/path/.../current"  →  listFilesForCompletion finds "current.txt"
+    typeText(":e %:r<Tab>")
+    assertExText("e ${currentFilePath.absolutePathString()}")
+  }
+
+  @Test
+  fun `test percent r completes to first alphabetical match when prefix matches multiple files`() {
+    val currentFilePath = tempDir.resolve("beta_current.txt")
+    currentFilePath.createFile()
+    LocalFileSystem.getInstance().refreshAndFindFileByNioFile(currentFilePath)
+    val vFile = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(currentFilePath)!!
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.openFileInEditor(vFile)
+    }
+
+    // %:r = ".../beta_current"  →  matches "beta_current.txt" and "beta.txt"
+    // alphabetically: "beta.txt" < "beta_current.txt" but prefix ".../beta_current" only matches "beta_current.txt"
+    typeText(":e %:r<Tab>")
+    assertExText("e ${currentFilePath.absolutePathString()}")
+  }
+
   // %:p tests
 
   @Test
