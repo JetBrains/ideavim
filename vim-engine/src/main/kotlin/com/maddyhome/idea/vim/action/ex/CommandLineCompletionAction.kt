@@ -27,7 +27,7 @@ class CommandLineCompletionAction : CommandLineActionHandler() {
     context: ExecutionContext,
     argument: Argument?,
   ): Boolean {
-    return performCompletion(commandLine, context, forward = true)
+    return performCompletion(commandLine, editor, context, forward = true)
   }
 
   override fun execute(commandLine: VimCommandLine): Boolean {
@@ -43,7 +43,7 @@ class CommandLineCompletionBackwardAction : CommandLineActionHandler() {
     context: ExecutionContext,
     argument: Argument?,
   ): Boolean {
-    return performCompletion(commandLine, context, forward = false)
+    return performCompletion(commandLine, editor, context, forward = false)
   }
 
   override fun execute(commandLine: VimCommandLine): Boolean {
@@ -53,6 +53,7 @@ class CommandLineCompletionBackwardAction : CommandLineActionHandler() {
 
 private fun performCompletion(
   commandLine: VimCommandLine,
+  editor: VimEditor,
   context: ExecutionContext,
   forward: Boolean,
 ): Boolean {
@@ -64,7 +65,7 @@ private fun performCompletion(
     return true
   }
 
-  return startNewCompletion(commandLine, context, forward)
+  return startNewCompletion(commandLine, editor, context, forward)
 }
 
 internal fun cycleExistingCompletion(
@@ -83,6 +84,7 @@ internal fun cycleExistingCompletion(
 
 private fun startNewCompletion(
   commandLine: VimCommandLine,
+  editor: VimEditor,
   context: ExecutionContext,
   forward: Boolean,
 ): Boolean {
@@ -91,7 +93,7 @@ private fun startNewCompletion(
 
   val text = commandLine.text
   val parsed = parseCommandLineForCompletion(text) ?: return false
-  val matches = findMatches(parsed, context) ?: return false
+  val matches = findMatches(parsed, editor, context) ?: return false
 
   if (matches.isEmpty()) {
     injector.messages.indicateError()
@@ -112,10 +114,10 @@ private fun startNewCompletion(
   return true
 }
 
-private fun findMatches(parsed: CommandLineCompletionContext, context: ExecutionContext): List<String>? {
+private fun findMatches(parsed: CommandLineCompletionContext, editor: VimEditor, context: ExecutionContext): List<String>? {
   return when (parsed) {
     is CommandNameCompletionContext -> findCommandNameMatches(parsed)
-    is ArgumentCompletionContext -> findArgumentMatches(parsed, context)
+    is ArgumentCompletionContext -> findArgumentMatches(parsed, editor, context)
   }
 }
 
@@ -123,22 +125,33 @@ private fun findCommandNameMatches(parsed: CommandNameCompletionContext): List<S
   return injector.vimscriptParser.exCommands.findFullCommandsByPrefix(parsed.prefix)
 }
 
-private fun findArgumentMatches(parsed: ArgumentCompletionContext, context: ExecutionContext): List<String>? {
+private fun findArgumentMatches(parsed: ArgumentCompletionContext, editor: VimEditor, context: ExecutionContext): List<String>? {
   val fullCommandName = injector.vimscriptParser.exCommands.getFullCommandName(parsed.commandName) ?: return null
   return when (CommandCompletionTypes.getCompletionType(fullCommandName)) {
-    CommandLineCompletionType.FILE -> completeFileName(parsed, context)
+    CommandLineCompletionType.FILE -> completeFileName(parsed, editor, context)
     CommandLineCompletionType.NONE -> null
   }
 }
 
 private fun completeFileName(
   parsed: ArgumentCompletionContext,
+  editor: VimEditor,
   context: ExecutionContext,
 ): List<String> {
-  if (parsed.argumentPrefix.trim().equals("%")) return listOf(
-    injector.editorGroup.getFocusedEditor()
-      ?.let { injector.file.fullPathBufferName(it) } ?: "")
-  return injector.file.listFilesForCompletion(parsed.argumentPrefix, context)
+  var argument = parsed.argumentPrefix
+  if (argument.startsWith("%")) {
+    argument = expandPercent(parsed.argumentPrefix, editor)
+  }
+  return injector.file.listFilesForCompletion(argument, context)
+}
+
+private fun expandPercent(argumentPrefix: String, editor: VimEditor): String {
+  val (completions, suffix) = PathCompletionArgumentParser.parse(argumentPrefix)
+  var resultPath = ""
+  for (completion in completions) {
+    resultPath = completion.complete(resultPath, editor)
+  }
+  return resultPath + suffix
 }
 
 internal fun selectMatch(completion: CommandLineCompletion, forward: Boolean): String? {
