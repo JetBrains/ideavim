@@ -50,7 +50,7 @@ internal suspend fun VimApi.moveParagraph(direction: Int) {
   editor {
     change {
       forEachCaret {
-        val newOffset = getNextParagraphBoundOffset(actualCount, includeWhitespaceLines = true)
+        val newOffset = getNextParagraphBoundOffset(actualCount, includeWhitespaceLines = false)
         if (newOffset != null) {
           updateCaret(offset = newOffset)
         }
