@@ -1387,7 +1387,7 @@ abstract class VimSearchHelperBase : VimSearchHelper {
     val line: Int = findNextParagraphLine(editor, startLine, count, allowBlanks) ?: return null
     val lineCount: Int = editor.nativeLineCount()
     return if (line == lineCount - 1) {
-      if (count > 0) editor.fileSize().toInt() else 0
+      if (count > 0) editor.fileSize().toInt() - 1 else 0
     } else {
       editor.getLineStartOffset(line)
     }
