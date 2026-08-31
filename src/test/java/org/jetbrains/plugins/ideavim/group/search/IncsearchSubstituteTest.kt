@@ -87,6 +87,7 @@ class IncsearchSubstituteTest : VimTestCase() {
       """.trimMargin(),
     )
   }
+
   @Test
   fun `test incsearch only highlights for substitute command after valid argument`() {
     configureByText(
@@ -317,7 +318,7 @@ class IncsearchSubstituteTest : VimTestCase() {
     assertSearchHighlights(
       "and",
       """I found it in a legendary l«and»
-           |all rocks ‷and‴ lavender «and» tufted grass,
+           |all rocks «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.
       """.trimMargin(),
