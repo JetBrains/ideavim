@@ -38,7 +38,7 @@ class SelectEnableCharacterModeAction : VimActionHandler.SingleExecution() {
     editor.nativeCarets().sortedByDescending { it.offset }.forEach { caret ->
       val lineEnd = editor.getLineEndForOffset(caret.offset)
       val offset = caret.offset
-      val nextOffset = (caret.offset + 1).coerceAtMost(lineEnd)
+      val nextOffset = (caret.offset + 1)
       val updatedCaret = caret.moveToInlayAwareOffset(nextOffset)
       updatedCaret.vimSetSystemSelectionSilently(offset, nextOffset)
     }
