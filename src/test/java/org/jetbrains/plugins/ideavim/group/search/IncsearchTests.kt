@@ -389,6 +389,10 @@ class IncsearchTests : VimTestCase() {
     )
   }
 
+  @TestWithoutNeovim(
+    SkipNeovimReason.SEE_DESCRIPTION,
+    description = "Neovim shows current match highlight for the previous accepted search; Vim does not",
+  )
   @Test
   fun `test incsearch does not hide previous search until first character is typed`() {
     configureByText(
@@ -402,10 +406,12 @@ class IncsearchTests : VimTestCase() {
 
     enterSearch("and")
     typeText("/")
+    // After accepting a search, no current-match highlight (‷…‴) is shown — Vim only shows it during active incsearch.
+    // The previous search matches (‷…‴ → «…») are still visible while the new command line is open and empty.
     assertSearchHighlights(
       "and",
       """I found it in a legendary l«and»
-           |all rocks ‷and‴ lavender «and» tufted grass,
+           |all rocks «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.
       """.trimMargin(),

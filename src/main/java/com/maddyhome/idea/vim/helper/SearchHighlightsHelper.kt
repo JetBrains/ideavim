@@ -453,10 +453,18 @@ private fun addSearchMatchHighlighter(editor: Editor, start: Int, end: Int, tool
 }
 
 /**
- * Refresh the current match highlight - e.g. after the caret has moved, or after the highlights have been recreated.
- * Vim redraws the current match as the cursor moves, so we do too. Does nothing if there are no search highlights.
+ * Refresh the current match highlight after the document is edited. If the edit moved a match under the caret,
+ * the highlight follows. Does nothing if there are no search highlights.
  */
 fun updateCurrentSearchMatchHighlight(editor: Editor) {
+  updateCurrentSearchMatchHighlightImpl(editor, offsetWhenCaretLeftMatch = { findMatchOffsetAtCaret(editor) })
+}
+
+fun clearCurrentSearchMatchHighlightOnCaretMove(editor: Editor) {
+  updateCurrentSearchMatchHighlightImpl(editor, offsetWhenCaretLeftMatch = { -1 })
+}
+
+private fun updateCurrentSearchMatchHighlightImpl(editor: Editor, offsetWhenCaretLeftMatch: () -> Int) {
   if (editor.isDisposed) return
   val highlighters = editor.vimLastHighlighters ?: return
 
@@ -468,13 +476,11 @@ fun updateCurrentSearchMatchHighlight(editor: Editor) {
     return
   }
 
-  // This is called for every caret movement, so return without looking at the rest of the highlighters if the caret is
-  // still inside the current match
   val caretOffset = editor.caretModel.primaryCaret.offset
   val previous = highlighters.firstOrNull { it.isVimCurrentSearchMatch }
   if (previous != null && previous.isValid && previous.containsOffset(caretOffset)) return
 
-  setCurrentSearchMatchHighlight(editor, findMatchOffsetAtCaret(editor))
+  setCurrentSearchMatchHighlight(editor, offsetWhenCaretLeftMatch())
 }
 
 /**

@@ -8,10 +8,16 @@
 
 package org.jetbrains.plugins.ideavim.group.search
 
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.jupiter.api.Test
 
 class SearchHighlightsTest : VimTestCase() {
+  @TestWithoutNeovim(
+    SkipNeovimReason.SEE_DESCRIPTION,
+    description = "Neovim highlights the match under the cursor after search; Vim does not",
+  )
   @Test
   fun `test highlight search results`() {
     configureByText(
@@ -29,13 +35,17 @@ class SearchHighlightsTest : VimTestCase() {
     assertSearchHighlights(
       pattern,
       """I found it in a legendary l«and»
-           |all rocks ‷and‴ lavender «and» tufted grass,
+           |all rocks «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.
       """.trimMargin(),
     )
   }
 
+  @TestWithoutNeovim(
+    SkipNeovimReason.SEE_DESCRIPTION,
+    description = "Neovim highlights the match under the cursor after search; Vim does not",
+  )
   @Test
   fun `test star search with smartcase highlights case-insensitive matches`() {
     configureByText("${c}Lorem ipsum lorem ipsum")
@@ -48,10 +58,14 @@ class SearchHighlightsTest : VimTestCase() {
 
     assertSearchHighlights(
       "\\<Lorem\\>",
-      "«Lorem» ipsum ‷lorem‴ ipsum",
+      "«Lorem» ipsum «lorem» ipsum",
     )
   }
 
+  @TestWithoutNeovim(
+    SkipNeovimReason.SEE_DESCRIPTION,
+    description = "Neovim highlights the match under the cursor after search; Vim does not",
+  )
   @Test
   fun `test search removes previous search highlights`() {
     configureByText(
@@ -69,7 +83,7 @@ class SearchHighlightsTest : VimTestCase() {
 
     assertSearchHighlights(
       pattern,
-      """I found it in a legendary l‷and‴
+      """I found it in a legendary l«and»
            |all rocks «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.
@@ -132,6 +146,10 @@ class SearchHighlightsTest : VimTestCase() {
     )
   }
 
+  @TestWithoutNeovim(
+    SkipNeovimReason.SEE_DESCRIPTION,
+    description = "Neovim highlights the match under the cursor after n/N; Vim does not",
+  )
   @Test
   fun `test find next after nohlsearch command shows highlights`() {
     configureByText(
@@ -151,13 +169,17 @@ class SearchHighlightsTest : VimTestCase() {
     assertSearchHighlights(
       pattern,
       """I found it in a legendary l«and»
-           |all rocks «and» lavender ‷and‴ tufted grass,
+           |all rocks «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.
       """.trimMargin(),
     )
   }
 
+  @TestWithoutNeovim(
+    SkipNeovimReason.SEE_DESCRIPTION,
+    description = "Neovim highlights the match under the cursor after n/N; Vim does not",
+  )
   @Test
   fun `test nohlsearch correctly resets incsearch highlights after deleting last occurrence`() {
     // Crazy edge case bug. With incsearch enabled, search for something with only one occurrence, delete it, call
@@ -527,31 +549,21 @@ class SearchHighlightsTest : VimTestCase() {
     )
   }
 
+  @TestWithoutNeovim(
+    SkipNeovimReason.SEE_DESCRIPTION,
+    description = "Neovim tracks caret to show current match; Vim only shows it during incsearch",
+  )
   @Test
-  fun `test moving caret off current match removes current match highlight`() {
+  fun `test moving caret does not show or move current match highlight`() {
     configureByText("${c}lorem ipsum lorem ipsum")
     enterCommand("set hlsearch")
 
     val pattern = "lorem"
     enterSearch(pattern) // Moves the caret to the second occurrence
-    typeText("l") // Still inside the match
-    assertSearchHighlights(pattern, "«lorem» ipsum ‷lorem‴ ipsum")
-
-    typeText("$") // Off the match
     assertSearchHighlights(pattern, "«lorem» ipsum «lorem» ipsum")
-  }
-
-  @Test
-  fun `test moving caret onto another match moves current match highlight`() {
-    configureByText("${c}lorem ipsum lorem ipsum")
-    enterCommand("set hlsearch")
-
-    val pattern = "lorem"
-    enterSearch(pattern) // Moves the caret to the second occurrence
-    assertSearchHighlights(pattern, "«lorem» ipsum ‷lorem‴ ipsum")
 
     typeText("gg0") // Back to the first occurrence
-    assertSearchHighlights(pattern, "‷lorem‴ ipsum «lorem» ipsum")
+    assertSearchHighlights(pattern, "«lorem» ipsum «lorem» ipsum")
   }
 
   @Test
@@ -569,12 +581,111 @@ class SearchHighlightsTest : VimTestCase() {
     assertSearchHighlights(pattern, "«lorem» ipsum ‷lorem‴ ipsum")
   }
 
+  @TestWithoutNeovim(
+    SkipNeovimReason.SEE_DESCRIPTION,
+    description = "Neovim highlights the match under the cursor after search; Vim does not",
+  )
   @Test
   fun `test search highlight with tabs`() {
     configureByText("\tfoo")
     enterCommand("set hlsearch")
     val pattern = "foo"
     enterSearch(pattern)
-    assertSearchHighlights(pattern, "\t‷foo‴")
+    assertSearchHighlights(pattern, "\t«foo»")
+  }
+
+  @TestWithoutNeovim(
+    SkipNeovimReason.SEE_DESCRIPTION,
+    description = "Neovim keeps current match highlight after search; Vim removes it on accept",
+  )
+  @Test
+  fun `accepting search should not show current match highlight`() {
+    configureByText("${c}lorem ipsum lorem ipsum")
+    enterCommand("set hlsearch")
+
+    val pattern = "lorem"
+    enterSearch(pattern)
+
+    assertSearchHighlights(pattern, "«lorem» ipsum «lorem» ipsum")
+  }
+
+  @TestWithoutNeovim(
+    SkipNeovimReason.SEE_DESCRIPTION,
+    description = "Neovim keeps current match highlight after n/N; Vim does not",
+  )
+  @Test
+  fun `n does not show current match highlight`() {
+    configureByText("${c}lorem ipsum lorem ipsum")
+    enterCommand("set hlsearch")
+
+    val pattern = "lorem"
+    enterSearch(pattern)
+    typeText("n")
+
+    assertSearchHighlights(pattern, "«lorem» ipsum «lorem» ipsum")
+  }
+
+  @TestWithoutNeovim(
+    SkipNeovimReason.SEE_DESCRIPTION,
+    description = "Neovim keeps current match highlight after n/N; Vim does not",
+  )
+  @Test
+  fun `N does not show current match highlight`() {
+    configureByText("lorem ipsum ${c}lorem ipsum")
+    enterCommand("set hlsearch")
+
+    val pattern = "lorem"
+    enterSearch(pattern)
+    typeText("N")
+
+    assertSearchHighlights(pattern, "«lorem» ipsum «lorem» ipsum")
+  }
+
+  @TestWithoutNeovim(
+    SkipNeovimReason.SEE_DESCRIPTION,
+    description = "Neovim tracks caret position to update current match; Vim does not",
+  )
+  @Test
+  fun `moving caret onto a match does not show current match highlight`() {
+    configureByText("${c}lorem ipsum lorem ipsum")
+    enterCommand("set hlsearch")
+
+    val pattern = "lorem"
+    enterSearch(pattern)
+    typeText("gg0")
+
+    assertSearchHighlights(pattern, "«lorem» ipsum «lorem» ipsum")
+  }
+
+  @TestWithoutNeovim(
+    SkipNeovimReason.SEE_DESCRIPTION,
+    description = "Neovim tracks caret position to update current match; Vim does not",
+  )
+  @Test
+  fun `moving caret off a match does not affect current match highlight`() {
+    configureByText("${c}lorem ipsum lorem ipsum")
+    enterCommand("set hlsearch")
+
+    val pattern = "lorem"
+    enterSearch(pattern)
+    typeText("$")
+
+    assertSearchHighlights(pattern, "«lorem» ipsum «lorem» ipsum")
+  }
+
+  @TestWithoutNeovim(
+    SkipNeovimReason.SEE_DESCRIPTION,
+    description = "Neovim keeps current match highlight after search; Vim removes it on accept",
+  )
+  @Test
+  fun `accepting incsearch removes current match highlight`() {
+    configureByText("${c}lorem ipsum lorem ipsum")
+    enterCommand("set hlsearch incsearch")
+
+    val pattern = "lorem"
+    typeText("/$pattern")
+    typeText("<CR>")
+
+    assertSearchHighlights(pattern, "«lorem» ipsum «lorem» ipsum")
   }
 }
