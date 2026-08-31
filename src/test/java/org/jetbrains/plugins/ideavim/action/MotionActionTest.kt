@@ -1101,6 +1101,21 @@ two
     doTest(keys, before, after, Mode.NORMAL())
   }
 
+  // |v_gv|
+  @Test
+  fun testSwapVisualSelectionsMultiLine() {
+    val keys = listOf("viw", "<Esc>", "j", "viw", "gv")
+    val before = """
+      ${c}foo bar
+      bar foo
+    """.trimIndent()
+    val after = """
+      ${s}fo${c}o${se} bar
+      bar foo
+    """.trimIndent()
+    doTest(keys, before, after, Mode.VISUAL(SelectionType.CHARACTER_WISE))
+  }
+
   // |CTRL-V|
   @Test
   fun testVisualBlockSelectionsDisplayedCorrectlyMovingRight() {
