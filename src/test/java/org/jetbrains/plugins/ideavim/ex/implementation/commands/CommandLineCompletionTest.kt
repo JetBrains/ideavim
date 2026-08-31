@@ -570,6 +570,19 @@ class CommandLineCompletionTest : VimExTestCase() {
     assertExText("e $tempPath/alpha.txt")
   }
 
+  @Test
+  fun `test percent t does not expand to full path colon t`() {
+    val currentFilePath = tempDir.resolve("current.txt")
+    currentFilePath.createFile()
+    val vFile = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(currentFilePath)!!
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.openFileInEditor(vFile)
+    }
+
+    typeText(":e %:t<Tab>")
+    assertExText("e %:t")
+  }
+
   // %:p tests
 
   @Test

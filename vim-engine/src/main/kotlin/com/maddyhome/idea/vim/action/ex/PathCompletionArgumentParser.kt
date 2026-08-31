@@ -12,7 +12,7 @@ import com.maddyhome.idea.vim.api.VimEditor
 
 object PathCompletionArgumentParser {
 
-  private val knownModifiers = listOf(AbsolutePath(), HeadDirectory())
+  private val knownModifiers = listOf(AbsolutePath(), HeadDirectory(), TailFilename())
 
   fun parse(argument: String): Pair<List<PathCompletion>, String> {
     val list = mutableListOf<PathCompletion>(AbsolutePath())
@@ -56,4 +56,12 @@ class HeadDirectory : PathCompletion {
   }
 
   override fun modifier(): String = "h"
+}
+
+class TailFilename : PathCompletion {
+  override fun complete(path: String, editor: VimEditor): String {
+    return path.substringAfterLast('/', path)
+  }
+
+  override fun modifier(): String = "t"
 }
