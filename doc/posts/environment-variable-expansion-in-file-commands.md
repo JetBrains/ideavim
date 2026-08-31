@@ -1,8 +1,10 @@
 # Environment Variable Expansion in File Commands
 
-What can be more interesting than environment variable expansion rules in Vim? Probably anything. Yet, here is what we learned about it from Vim.
+What can be more interesting than environment variable expansion rules in Vim? Probably anything. Yet, here is what we
+learned about it from Vim.
 
-Commands like `:source $HOME/.vimrc` or `:split ~/notes.txt` use environment variables and tilde in file paths. Vim expands these before opening files, but the exact rules are more nuanced than the documentation suggests.
+Commands like `:source $HOME/.vimrc` or `:split ~/notes.txt` use environment variables and tilde in file paths. Vim
+expands these before opening files, but the exact rules are more nuanced than the documentation suggests.
 
 ## Vim's File Argument Expansion
 
@@ -13,6 +15,7 @@ In Vim's source code (`src/ex_cmds.h`), commands that accept file arguments are 
 - **`EX_XFILE`** - Enable wildcard and environment variable expansion
 
 When these flags are set, Vim automatically expands:
+
 - Environment variables: `$VAR`, `${VAR}`
 - Tilde: `~`, `~/path`
 - Wildcards: `*`, `?`
@@ -32,7 +35,8 @@ Non-existent variables expand to **empty string**:
 
 ### 2. Option Settings (`:set` command)
 
-The `:help expand-env` documentation describes expansion for the `:set` command. Only **39 specific options** support expansion, controlled by the `P_EXPAND` flag (`0x10`) defined in `src/option.h`.
+The `:help expand-env` documentation describes expansion for the `:set` command. Only **39 specific options** support
+expansion, controlled by the `P_EXPAND` flag (`0x10`) defined in `src/option.h`.
 
 Options with `P_EXPAND` include: `shell`, `path`, `backupdir`, `makeprg`, `grepprg`, `runtimepath`, and others.
 
@@ -51,11 +55,31 @@ Non-existent variables are **left as-is**:
 
 This distinction was verified in both Vim 9.1 and Nvim 0.11.4.
 
+## Filename Modifiers (`%`, `%:h`, `%:t`, …)
+
+In file commands, `%` expands to the current buffer's name (path). Modifiers change what part of the path is used:
+
+| Modifier  | Name                            | Example (file: `/home/user/project/src/foo.py`) |
+|-----------|---------------------------------|-------------------------------------------------|
+| `%`       | current file (as opened)        | `src/foo.py`                                    |
+| `%:p`     | **p**ull path — absolute        | `/home/user/project/src/foo.py`                 |
+| `%:h`     | **h**ead — directory part       | `src/foo`                                       |
+| `%:p:h`   | absolute directory              | `/home/user/project/src`                        |
+| `%:t`     | **t**ail — filename only        | `foo.py`                                        |
+| `%:r`     | **r**oot — strip last extension | `src/foo`                                       |
+| `%:t:r`   | filename without extension      | `foo`                                           |
+| `%:e`     | **e**xtension                   | `py`                                            |
+| `%:p:h:h` | parent of parent (chain `:h`)   | `/home/user/project`                            |
+
+Modifiers can be chained left-to-right: `%:p:h:t` → last segment of the absolute directory (`src`).
+
 ## Vim Commands with File Argument Expansion
 
-In Vim's source code (`src/ex_cmds.h`), **92 commands** are marked with `EX_FILE1`, `EX_FILES`, or `EX_XFILE` flags to enable file argument expansion:
+In Vim's source code (`src/ex_cmds.h`), **92 commands** are marked with `EX_FILE1`, `EX_FILES`, or `EX_XFILE` flags to
+enable file argument expansion:
 
-- **File Editing (24)**: `:edit`, `:split`, `:vsplit`, `:new`, `:vnew`, `:find`, `:tabedit`, `:read`, `:write`, `:saveas`, etc.
+- **File Editing (24)**: `:edit`, `:split`, `:vsplit`, `:new`, `:vnew`, `:find`, `:tabedit`, `:read`, `:write`,
+  `:saveas`, etc.
 - **Exit/Write-Quit (7)**: `:exit`, `:xit`, `:wq`, `:wqall`, `:wnext`, etc.
 - **Argument List (8)**: `:args`, `:argadd`, `:next`, `:argedit`, etc.
 - **Directory (6)**: `:cd`, `:lcd`, `:tcd`, `:chdir`, etc.

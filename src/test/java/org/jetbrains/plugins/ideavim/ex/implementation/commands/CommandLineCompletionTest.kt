@@ -553,15 +553,36 @@ class CommandLineCompletionTest : VimExTestCase() {
     assertExText("e ${currentFilePath.absolutePathString()}")
   }
 
+  // Bug: startsWith("%") matches %:h, %:t, etc. and silently expands them to the
+  // current filename instead of their correct values (directory, tail, …).
+  // %:h should expand to the directory containing the current file.
   @Test
-  fun `test percent expands to full absolute path for in-project file`() {
-    val psiFile = fixture.addFileToProject("subdir/myfile.txt", "")
-    val vFile = psiFile.virtualFile
+  fun `test percent colon h expands to directory of current file`() {
+    val currentFilePath = tempDir.resolve("current.txt")
+    currentFilePath.createFile()
+    val vFile = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(currentFilePath)!!
     ApplicationManager.getApplication().invokeAndWait {
       fixture.openFileInEditor(vFile)
     }
 
-    typeText(":e %<Tab>")
-    assertExText("e ${vFile.path}")
+    // %:h should expand to tempPath (the parent directory), then Tab lists files there
+    typeText(":e %:h/<Tab>")
+    assertExText("e $tempPath/alpha.txt")
   }
+
+  // %:p tests
+
+  @Test
+  fun `test percent p expands to absolute path for out-of-project file`() {
+    val currentFilePath = tempDir.resolve("current.txt")
+    currentFilePath.createFile()
+    val vFile = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(currentFilePath)!!
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.openFileInEditor(vFile)
+    }
+
+    typeText(":e %:p<Tab>")
+    assertExText("e ${currentFilePath.absolutePathString()}")
+  }
+
 }
