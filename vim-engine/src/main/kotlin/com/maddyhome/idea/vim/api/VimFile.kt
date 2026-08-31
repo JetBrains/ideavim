@@ -41,6 +41,7 @@ interface VimFile {
   fun selectNextFile(count: Int, context: ExecutionContext)
   fun createFile(filename: String, context: ExecutionContext, content: String?, editor: VimEditor)
   fun bufferName(editor: VimEditor): String?
+  fun fullPathBufferName(editor: VimEditor): String?
   fun alternateBufferName(editor: VimEditor): String?
 
   /**

@@ -126,9 +126,19 @@ private fun findCommandNameMatches(parsed: CommandNameCompletionContext): List<S
 private fun findArgumentMatches(parsed: ArgumentCompletionContext, context: ExecutionContext): List<String>? {
   val fullCommandName = injector.vimscriptParser.exCommands.getFullCommandName(parsed.commandName) ?: return null
   return when (CommandCompletionTypes.getCompletionType(fullCommandName)) {
-    CommandLineCompletionType.FILE -> injector.file.listFilesForCompletion(parsed.argumentPrefix, context)
+    CommandLineCompletionType.FILE -> completeFileName(parsed, context)
     CommandLineCompletionType.NONE -> null
   }
+}
+
+private fun completeFileName(
+  parsed: ArgumentCompletionContext,
+  context: ExecutionContext,
+): List<String> {
+  if (parsed.argumentPrefix.trim().equals("%")) return listOf(
+    injector.editorGroup.getFocusedEditor()
+      ?.let { injector.file.fullPathBufferName(it) } ?: "")
+  return injector.file.listFilesForCompletion(parsed.argumentPrefix, context)
 }
 
 internal fun selectMatch(completion: CommandLineCompletion, forward: Boolean): String? {
