@@ -149,6 +149,10 @@ class IjFileGroup : VimFileBase() {
     return rpc { FileRemoteApi.getInstance().getFileName((editor as IjVimEditor).editor.editorId(), fullPath = false) }
   }
 
+  override fun fullPathBufferName(editor: VimEditor): String? {
+    return rpc { FileRemoteApi.getInstance().getFileName((editor as IjVimEditor).editor.editorId(), fullPath = true) }
+  }
+
   override fun alternateBufferName(editor: VimEditor): String? {
     val project = (editor as IjVimEditor).editor.project ?: return null
     val alternateFile = LastTabService.getInstance(project).lastTab?.takeIf { it.isValid } ?: return null

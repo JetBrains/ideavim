@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.vfs.LocalFileSystem
 import org.jetbrains.plugins.ideavim.action.ex.VimExTestCase
 import org.junit.jupiter.api.BeforeEach
@@ -537,5 +538,30 @@ class CommandLineCompletionTest : VimExTestCase() {
     // `set` has no argument completion type registered, so Tab in argument position is a no-op.
     typeText("<Tab>")
     assertExText("set foo")
+  }
+
+  @Test
+  fun `test percent expands to current file path on tab`() {
+    val currentFilePath = tempDir.resolve("current.txt")
+    currentFilePath.createFile()
+    val vFile = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(currentFilePath)!!
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.openFileInEditor(vFile)
+    }
+
+    typeText(":e %<Tab>")
+    assertExText("e ${currentFilePath.absolutePathString()}")
+  }
+
+  @Test
+  fun `test percent expands to full absolute path for in-project file`() {
+    val psiFile = fixture.addFileToProject("subdir/myfile.txt", "")
+    val vFile = psiFile.virtualFile
+    ApplicationManager.getApplication().invokeAndWait {
+      fixture.openFileInEditor(vFile)
+    }
+
+    typeText(":e %<Tab>")
+    assertExText("e ${vFile.path}")
   }
 }
