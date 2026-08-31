@@ -84,8 +84,8 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
       """.trimIndent(),
       """
                 A Discovery
-                $s$c
-                ${se}I found it in a legendary land
+                $s
+                $c${se}I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
@@ -110,8 +110,8 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
       """
                 A Discovery
 
-                I found it in a legendary ${s}land${c}
-                ${se}all rocks and lavender and tufted grass,
+                I found it in a legendary ${s}land
+                ${c}${se}all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
@@ -234,8 +234,8 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
       """.trimIndent(),
       """
                 A Discovery
-                ${s}${c}${se}
-                I found it in a legendary land
+                ${s}${c}
+                ${se}I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
