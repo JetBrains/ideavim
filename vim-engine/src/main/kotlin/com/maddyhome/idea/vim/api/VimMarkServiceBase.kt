@@ -389,32 +389,12 @@ abstract class VimMarkServiceBase : VimMarkService {
       }
     }
 
-    for (caret in editor.carets()) {
-      val selectionInfo = caret.lastSelectionInfo
-
-      val startPosition = selectionInfo.start
-      var newStartPosition = selectionInfo.start
-      if (startPosition != null && insStart.line <= startPosition.line) {
-        newStartPosition = BufferPosition(startPosition.line + lines, startPosition.column, startPosition.leansForward)
-      }
-
-      val endPosition = selectionInfo.end
-      var newEndPosition = endPosition
-      if (endPosition != null && insStart.line <= endPosition.line) {
-        newEndPosition = BufferPosition(endPosition.line + lines, endPosition.column, endPosition.leansForward)
-      }
-
-      if (newStartPosition != startPosition || newEndPosition != endPosition) {
-        caret.lastSelectionInfo = SelectionInfo(newStartPosition, newEndPosition, selectionInfo.selectionType)
-      }
-    }
-
     // No notification: this runs while the document change is still being applied, so a listener that draws in the
     // editor would draw against a half-updated document. Marks are only shifted here, never added or removed, and
     // anything anchored to the document shifts with it.
   }
 
-  override fun updateMarksFromDelete(editor: VimEditor, delStartOffset: Int, delLength: Int, newLength: Int) {
+  override fun updateMarksFromDelete(editor: VimEditor, delStartOffset: Int, delLength: Int) {
     val caretToMarks = getAllMarksForFile(editor)
     if (caretToMarks.isEmpty()) return
 
@@ -457,109 +437,67 @@ abstract class VimMarkServiceBase : VimMarkService {
       }
     }
 
-    adjustVisualSelectionMarks(editor, delStartOffset, delEndOffset, delStart, delEnd, newLength)
-
     // See the note in updateMarksFromInsert on why nothing is notified here.
   }
 
-  private fun adjustVisualSelectionMarks(
+  override fun updateVisualSelectionMarks(
     editor: VimEditor,
-    delStartOffset: Int,
-    delEndOffset: Int,
-    delStart: BufferPosition,
-    delEnd: BufferPosition,
-    newLength: Int,
+    changeOffset: Int,
+    oldLength: Int,
+    newFragment: CharSequence,
   ) {
+    val changeEndOffset = changeOffset + oldLength
+    val changeStartLine = editor.offsetToBufferPosition(changeOffset).line
+    val oldEndLine = editor.offsetToBufferPosition(changeEndOffset).line
+    val newEndLine = changeStartLine + newFragment.count { it == '\n' }
+    if (oldEndLine == newEndLine) return
+
     for (caret in editor.carets()) {
       val selectionInfo = caret.lastSelectionInfo
 
       val startPosition = selectionInfo.start
       val newStartPosition = startPosition?.let {
-        adjustPositionForDelete(
-          editor,
-          it,
-          delStartOffset,
-          delEndOffset,
-          delStart,
-          delEnd,
-          newLength
-        )
+        adjustVisualMark(editor, it, changeOffset, changeEndOffset, oldEndLine, newEndLine)
       }
 
       val endPosition = selectionInfo.end
       val newEndPosition = endPosition?.let {
-        adjustPositionForDelete(
-          editor,
-          it,
-          delStartOffset,
-          delEndOffset,
-          delStart,
-          delEnd,
-          newLength
-        )
+        adjustVisualMark(editor, it, changeOffset, changeEndOffset, oldEndLine, newEndLine)
       }
 
       if (newStartPosition != startPosition || newEndPosition != endPosition) {
         caret.lastSelectionInfo = SelectionInfo(newStartPosition, newEndPosition, selectionInfo.selectionType)
       }
     }
+
+    // See the note in updateMarksFromInsert on why nothing is notified here.
   }
 
-  private fun isVisualMark(mark: VimMark): Boolean = mark.key == SELECTION_START_MARK || mark.key == SELECTION_END_MARK
-
-  private fun adjustPositionForDelete(
+  private fun adjustVisualMark(
     editor: VimEditor,
     position: BufferPosition,
-    delStartOffset: Int,
-    delEndOffset: Int,
-    delStart: BufferPosition,
-    delEnd: BufferPosition,
-    newLength: Int,
+    changeOffset: Int,
+    changeEndOffset: Int,
+    oldEndLine: Int,
+    newEndLine: Int,
   ): BufferPosition {
-    val posOffset = editor.bufferPositionToOffset(position)
-
+    val offset = editor.bufferPositionToOffset(position)
     return when {
-      isBeforeDeletion(posOffset, delStartOffset) -> position
-      isAfterDeletionOnLaterLine(position, delEnd) -> shiftLine(position, delStart, delEnd)
-      isMultiLineMerge(position, delStart) -> mergeIntoLine(position, delStart, newLength)
-      isAfterDeletionOnSameLine(posOffset, delEndOffset) -> shiftColumn(
-        position,
-        delStartOffset,
-        delEndOffset,
-        newLength
+      offset < changeOffset -> position
+      // Note that text inserted at the mark (an empty range, i.e. changeOffset == changeEndOffset) pushes the mark
+      // down, while text replacing a range that starts at the mark leaves the mark at the start of the new text
+      offset >= changeEndOffset -> BufferPosition(
+        position.line + (newEndLine - oldEndLine),
+        position.column,
+        position.leansForward,
       )
 
-      else -> position // Within deleted range: Vim preserves visual marks
+      position.line > newEndLine -> BufferPosition(newEndLine, position.column, position.leansForward)
+      else -> position
     }
   }
 
-  private fun isBeforeDeletion(posOffset: Int, delStartOffset: Int) = posOffset <= delStartOffset
-
-  private fun isAfterDeletionOnLaterLine(position: BufferPosition, delEnd: BufferPosition) = position.line > delEnd.line
-
-  private fun isMultiLineMerge(position: BufferPosition, delStart: BufferPosition) = delStart.line < position.line
-
-  private fun isAfterDeletionOnSameLine(posOffset: Int, delEndOffset: Int) = posOffset > delEndOffset
-
-  private fun shiftLine(position: BufferPosition, delStart: BufferPosition, delEnd: BufferPosition): BufferPosition {
-    val lineShift = delEnd.line - delStart.line
-    return BufferPosition(position.line - lineShift, position.column, position.leansForward)
-  }
-
-  private fun mergeIntoLine(position: BufferPosition, delStart: BufferPosition, newLength: Int): BufferPosition {
-    return BufferPosition(delStart.line, delStart.column + newLength + position.column, position.leansForward)
-  }
-
-  private fun shiftColumn(
-    position: BufferPosition,
-    delStartOffset: Int,
-    delEndOffset: Int,
-    newLength: Int,
-  ): BufferPosition {
-    val oldLength = delEndOffset - delStartOffset + 1
-    val netShift = newLength - oldLength
-    return BufferPosition(position.line, position.column + netShift, position.leansForward)
-  }
+  private fun isVisualMark(mark: VimMark): Boolean = mark.key == SELECTION_START_MARK || mark.key == SELECTION_END_MARK
 
   override fun editorReleased(editor: VimEditor) {
     setMark(editor.primaryCaret(), LAST_BUFFER_POSITION, editor.primaryCaret().offset)
