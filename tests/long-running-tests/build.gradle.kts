@@ -47,6 +47,8 @@ tasks {
   // Note that useJUnitTestPlatform() is required to prevent red code
   test {
     useJUnitPlatform()
+
+    classpath -= classpath.filter { it.name.startsWith("localization-") && it.name.endsWith(".jar") }
   }
 }
 

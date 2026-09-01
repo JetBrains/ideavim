@@ -48,6 +48,8 @@ tasks {
   // I didn't find a better way to exclude except disabling and defining a new task with a different name
   test {
     useJUnitPlatform()
+
+    classpath -= classpath.filter { it.name.startsWith("localization-") && it.name.endsWith(".jar") }
   }
 }
 

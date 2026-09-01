@@ -137,10 +137,13 @@ dependencies {
   testApi("com.squareup.okhttp3:okhttp:5.5.0")
 
   // https://mvnrepository.com/artifact/com.ensarsarajcic.neovim.java/neovim-api
-  testImplementation("com.ensarsarajcic.neovim.java:neovim-api:0.2.3")
-  testImplementation("com.ensarsarajcic.neovim.java:core-rpc:0.2.3")
-  testFixturesImplementation("com.ensarsarajcic.neovim.java:neovim-api:0.2.3")
-  testFixturesImplementation("com.ensarsarajcic.neovim.java:core-rpc:0.2.3")
+  val excludeStaleJackson: ExternalModuleDependency.() -> Unit = {
+    exclude(group = "com.fasterxml.jackson.core")
+  }
+  testImplementation("com.ensarsarajcic.neovim.java:neovim-api:0.2.3", excludeStaleJackson)
+  testImplementation("com.ensarsarajcic.neovim.java:core-rpc:0.2.3", excludeStaleJackson)
+  testFixturesImplementation("com.ensarsarajcic.neovim.java:neovim-api:0.2.3", excludeStaleJackson)
+  testFixturesImplementation("com.ensarsarajcic.neovim.java:core-rpc:0.2.3", excludeStaleJackson)
 
   // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-test
   testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
