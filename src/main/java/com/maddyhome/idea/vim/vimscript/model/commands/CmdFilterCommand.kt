@@ -21,7 +21,6 @@ import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.ex.ranges.toTextRange
-import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.newapi.ij
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 
@@ -40,38 +39,33 @@ internal data class CmdFilterCommand(val range: Range, val modifier: CommandModi
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
     logger.debug("execute")
-    val command = buildString {
+    // `!` first, then `%`, so a `%` recalled from the previous command is expanded too. Only `%` is expanded here:
+    // Vim leaves `$VAR` and `~` in a shell command to the shell itself.
+    val withLastCommand = buildString {
       var inBackslash = false
       argument.forEach { c ->
-        when {
-          !inBackslash && c == '!' -> {
-            val last = lastCommand
-            if (last.isNullOrEmpty()) {
-              injector.messages.showErrorMessage(editor, injector.messages.message("E34"))
-              return ExecutionResult.Error
-            }
-            append(last)
+        if (!inBackslash && c == '!') {
+          val last = lastCommand
+          if (last.isNullOrEmpty()) {
+            injector.messages.showErrorMessage(editor, injector.messages.message("E34"))
+            return ExecutionResult.Error
           }
-
-          !inBackslash && c == '%' -> {
-            val virtualFile = EditorHelper.getVirtualFile(editor.ij)
-            if (virtualFile == null) {
-              // Note that we use a slightly different error message to Vim, because we don't support alternate files or file
-              // name modifiers. (I also don't know what the :p:h means)
-              // (Vim) E499: Empty file name for '%' or '#', only works with ":p:h"
-              // (IdeaVim) E499: Empty file name for '%'
-              injector.messages.showErrorMessage(editor, injector.messages.message("E499"))
-              return ExecutionResult.Error
-            }
-            append(virtualFile.path)
-          }
-
-          else -> append(c)
+          append(last)
+        } else {
+          append(c)
         }
 
         inBackslash = c == '\\'
       }
     }
+    val command = injector.pathExpansion.expandCmdlineSpecials(withLastCommand, editor)
+      ?: run {
+        // Note that we use a slightly different error message to Vim, because we don't support alternate files.
+        // (Vim) E499: Empty file name for '%' or '#', only works with ":p:h"
+        // (IdeaVim) E499: Empty file name for '%'
+        injector.messages.showErrorMessage(editor, injector.messages.message("E499"))
+        return ExecutionResult.Error
+      }
 
     if (command.isEmpty()) {
       return ExecutionResult.Error
@@ -126,8 +120,7 @@ internal data class CmdFilterCommand(val range: Range, val modifier: CommandModi
       if (outputPanel != null) {
         outputPanel.addText("\nShell returned $exitCode")
         outputPanel.show()
-      }
-      else {
+      } else {
         injector.messages.showMessage(editor, "shell returned $exitCode")
       }
       injector.messages.indicateError()

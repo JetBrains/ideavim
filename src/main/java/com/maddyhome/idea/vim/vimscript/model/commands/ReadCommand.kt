@@ -65,7 +65,7 @@ data class ReadCommand(val range: Range, val modifier: CommandModifier, val argu
     }
     executeShellCommand(editor, commandArgument)
   } else {
-    val filePath = injector.pathExpansion.expandPath(commandArgument)
+    val filePath = injector.pathExpansion.expandPath(commandArgument, editor)
     readFileContent(filePath)
   }
 

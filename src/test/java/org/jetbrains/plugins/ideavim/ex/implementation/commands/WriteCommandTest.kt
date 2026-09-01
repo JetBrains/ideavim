@@ -8,6 +8,7 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 import com.maddyhome.idea.vim.api.injector
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
+import kotlin.io.path.exists
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -97,6 +99,34 @@ class WriteCommandTest : VimTestCase() {
 
     assertPluginError(false)
     assertEquals("new content\n", readFile(targetPath))
+  }
+
+  @Test
+  fun `write with percent colon h creates sibling file in same directory`() {
+    val source = tempDir.resolve("source.txt")
+    Files.writeString(source, "original content\n")
+    val vFile = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(source)!!
+    ApplicationManager.getApplication().invokeAndWait { fixture.openFileInEditor(vFile) }
+
+    // %:h expands to tempDir — backup.txt is created alongside source.txt
+    enterCommand("w %:h/backup.txt")
+
+    assertPluginError(false)
+    assertTrue(tempDir.resolve("backup.txt").exists())
+  }
+
+  @Test
+  fun `write with percent colon p colon h creates sibling file in same directory`() {
+    val source = tempDir.resolve("source.txt")
+    Files.writeString(source, "original content\n")
+    val vFile = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(source)!!
+    ApplicationManager.getApplication().invokeAndWait { fixture.openFileInEditor(vFile) }
+
+    // %:p:h == %:h for absolute paths
+    enterCommand("w %:p:h/sibling.txt")
+
+    assertPluginError(false)
+    assertTrue(tempDir.resolve("sibling.txt").exists())
   }
 
   private fun readFile(path: String): String {

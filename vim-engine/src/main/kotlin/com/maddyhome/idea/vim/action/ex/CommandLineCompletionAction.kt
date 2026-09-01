@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.action.ex
 
 import com.intellij.vim.annotations.CommandOrMotion
 import com.intellij.vim.annotations.Mode
+import com.maddyhome.idea.vim.action.ex.PathCompletionArgumentParser.expandPercent
 import com.maddyhome.idea.vim.api.CommandCompletionTypes
 import com.maddyhome.idea.vim.api.CommandLineCompletion
 import com.maddyhome.idea.vim.api.CommandLineCompletionType
@@ -114,7 +115,11 @@ private fun startNewCompletion(
   return true
 }
 
-private fun findMatches(parsed: CommandLineCompletionContext, editor: VimEditor, context: ExecutionContext): List<String>? {
+private fun findMatches(
+  parsed: CommandLineCompletionContext,
+  editor: VimEditor,
+  context: ExecutionContext,
+): List<String>? {
   return when (parsed) {
     is CommandNameCompletionContext -> findCommandNameMatches(parsed)
     is ArgumentCompletionContext -> findArgumentMatches(parsed, editor, context)
@@ -125,7 +130,11 @@ private fun findCommandNameMatches(parsed: CommandNameCompletionContext): List<S
   return injector.vimscriptParser.exCommands.findFullCommandsByPrefix(parsed.prefix)
 }
 
-private fun findArgumentMatches(parsed: ArgumentCompletionContext, editor: VimEditor, context: ExecutionContext): List<String>? {
+private fun findArgumentMatches(
+  parsed: ArgumentCompletionContext,
+  editor: VimEditor,
+  context: ExecutionContext,
+): List<String>? {
   val fullCommandName = injector.vimscriptParser.exCommands.getFullCommandName(parsed.commandName) ?: return null
   return when (CommandCompletionTypes.getCompletionType(fullCommandName)) {
     CommandLineCompletionType.FILE -> completeFileName(parsed, editor, context)
@@ -145,14 +154,6 @@ private fun completeFileName(
   return injector.file.listFilesForCompletion(argument, context)
 }
 
-private fun expandPercent(argumentPrefix: String, editor: VimEditor): String {
-  val (completions, suffix) = PathCompletionArgumentParser.parse(argumentPrefix)
-  var resultPath = ""
-  for (completion in completions) {
-    resultPath = completion.complete(resultPath, editor)
-  }
-  return resultPath + suffix
-}
 
 internal fun selectMatch(completion: CommandLineCompletion, forward: Boolean): String? {
   return if (forward) completion.nextMatch() else completion.previousMatch()

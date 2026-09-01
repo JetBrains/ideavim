@@ -32,11 +32,26 @@ interface VimPathExpansion {
    * - Tilde expansion: `~` and `~/` expand to user's home directory
    * - Environment variables: `$VAR` and `${VAR}` expand to their values or empty
    * - Escaped dollar signs: `\$VAR` becomes literal `$VAR`
+   * - The current file name: `%` and its modifiers, when [editor] is given (see [expandCmdlineSpecials])
    *
    * @param path The string to expand
+   * @param editor The editor supplying the current file name for `%`. When null, `%` is left alone.
    * @return The expanded string
    */
-  fun expandPath(path: String): String
+  fun expandPath(path: String, editor: VimEditor? = null): String
+
+  /**
+   * Expands the command-line special `%` (the current file name) and its `:p`, `:h`, `:t`, `:r` and `:e` modifiers.
+   *
+   * A backslash removes the special meaning, so `\%` produces a literal `%`. Unlike [expandPath] this does *not*
+   * touch `$VAR` or `~`: Vim leaves those to the shell for `:!`, which is this method's main caller.
+   *
+   * See `:help cmdline-special` and `:help filename-modifiers`.
+   *
+   * @return the expanded text, or null if it needs the current file name and the buffer has none - Vim reports E499
+   *   in that case rather than running with an empty name.
+   */
+  fun expandCmdlineSpecials(text: String, editor: VimEditor): String?
 
   /**
    * Expands environment variables for use in option values (`:set` command context).
