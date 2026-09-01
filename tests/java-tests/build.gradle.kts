@@ -69,6 +69,8 @@ tasks {
     println("Project leak checks: If you experience project leaks on TeamCity that doesn't reproduce locally")
     println("Uncomment the following line in build.gradle to enable leak checks (see build.gradle config)")
 //      environment("TEAMCITY_VERSION" to "X")
+
+    classpath -= classpath.filter { it.name.startsWith("localization-") && it.name.endsWith(".jar") }
   }
 }
 
