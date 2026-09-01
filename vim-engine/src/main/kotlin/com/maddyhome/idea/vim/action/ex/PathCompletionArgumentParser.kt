@@ -9,14 +9,43 @@
 package com.maddyhome.idea.vim.action.ex
 
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 
+/**
+ * Expands `%` together with its `:p`, `:h`, `:t`, `:r` and `:e` modifiers.
+ *
+ * `%` on its own is the *buffer name*, not a full path. Vim keeps that name relative to the working directory while
+ * the file is below it, and only `:p` forces the full path (see `:help cmdline-special` and
+ * `:help filename-modifiers`). IdeaVim has no `:cd`, so the buffer name comes from
+ * [com.maddyhome.idea.vim.api.VimFile.bufferName] - the same value `:file` and the `%` register report, i.e. relative
+ * to the file's content root, and absolute for a file outside every root.
+ */
 object PathCompletionArgumentParser {
 
   private val knownModifiers = listOf(AbsolutePath(), HeadDirectory(), TailFilename(), RootFilename(), ExtensionOnly())
 
-  fun parse(argument: String): Pair<List<PathCompletion>, String> {
-    val list = mutableListOf<PathCompletion>(AbsolutePath())
-    if (argument == "%") return Pair(list, "")
+  fun expandPercent(argumentPrefix: String, editor: VimEditor): String {
+    val (expanded, consumed) = expandPercentPrefix(argumentPrefix, editor) ?: return argumentPrefix
+    return expanded + argumentPrefix.substring(consumed)
+  }
+
+  /**
+   * Expands the `%` that starts [argument], ignoring whatever follows the modifiers.
+   *
+   * @return the expanded name and the number of characters of [argument] it was built from, so a caller scanning a
+   *   longer string knows where to resume. Null if the buffer has no name, which is Vim's E499.
+   */
+  internal fun expandPercentPrefix(argument: String, editor: VimEditor): Pair<String, Int>? {
+    val (modifiers, suffix) = parse(argument)
+    var resultPath = injector.file.bufferName(editor) ?: return null
+    for (modifier in modifiers) {
+      resultPath = modifier.complete(resultPath, editor)
+    }
+    return resultPath to (argument.length - suffix.length)
+  }
+
+  internal fun parse(argument: String): Pair<List<PathCompletion>, String> {
+    val list = mutableListOf<PathCompletion>()
 
     var pos = 1 // skip leading '%'
     while (pos < argument.length && argument[pos] == ':') {
@@ -42,9 +71,16 @@ interface PathCompletion {
   fun modifier(): String
 }
 
+/**
+ * `:p` — make the file name a full path.
+ *
+ * Vim requires `:p` to be the first modifier, so the name reaching this point is always the unmodified buffer name.
+ * Rather than resolve a relative name against a working directory IdeaVim does not track, ask the platform for the
+ * buffer's full path directly.
+ */
 class AbsolutePath : PathCompletion {
   override fun complete(path: String, editor: VimEditor): String {
-    return editor.getVirtualFile()?.path ?: ""
+    return injector.file.fullPathBufferName(editor) ?: path
   }
 
   override fun modifier(): String = "p"
@@ -52,7 +88,13 @@ class AbsolutePath : PathCompletion {
 
 class HeadDirectory : PathCompletion {
   override fun complete(path: String, editor: VimEditor): String {
-    return path.substringBeforeLast('/', "")
+    val head = path.substringBeforeLast('/', "")
+    return when {
+      head.isNotEmpty() -> head
+      // Vim keeps the root separator for "/foo.txt" and turns any other empty head into "."
+      path.startsWith('/') -> "/"
+      else -> "."
+    }
   }
 
   override fun modifier(): String = "h"

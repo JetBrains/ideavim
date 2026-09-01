@@ -8,6 +8,8 @@
 
 package com.maddyhome.idea.vim.api
 
+import com.maddyhome.idea.vim.action.ex.PathCompletionArgumentParser
+
 /**
  * Implementation of path expansion for file paths in commands like `:source`.
  *
@@ -24,12 +26,48 @@ class VimPathExpansionImpl : VimPathExpansion {
     private val ENV_VAR_REGEX = Regex("""(\\?)\$(?:([A-Za-z_][A-Za-z0-9_]*)|(?:\{([A-Za-z_][A-Za-z0-9_]*)\}))""")
   }
 
-  override fun expandPath(path: String): String {
-    return doExpand(path, expandToEmptyIfNotFound = true)
+  override fun expandPath(path: String, editor: VimEditor?): String {
+    val expanded = doExpand(path, expandToEmptyIfNotFound = true)
+    if (editor == null) return expanded
+    // A buffer with no name leaves `%` alone; the command then fails on the literal name rather than on an empty one
+    return expandCmdlineSpecials(expanded, editor) ?: expanded
   }
 
   override fun expandForOption(value: String): String {
+    // No `%` expansion here: Vim's P_EXPAND covers environment variables and tilde only
     return doExpand(value, expandToEmptyIfNotFound = false)
+  }
+
+  override fun expandCmdlineSpecials(text: String, editor: VimEditor): String? {
+    if (!text.contains('%')) return text
+
+    val result = StringBuilder(text.length)
+    var i = 0
+    while (i < text.length) {
+      val c = text[i]
+      when {
+        // A backslash removes the special meaning of `%`. Vim drops the backslash and keeps the character
+        c == '\\' && i + 1 < text.length && text[i + 1] == '%' -> {
+          result.append('%')
+          i += 2
+        }
+
+        c == '%' -> {
+          val (expanded, consumed) = PathCompletionArgumentParser.expandPercentPrefix(text.substring(i), editor)
+            ?: return null
+          result.append(expanded)
+          // Resume after the modifiers only. Scanning the expanded name again would reprocess a `%` that is part
+          // of the file name, which never terminates
+          i += consumed
+        }
+
+        else -> {
+          result.append(c)
+          i++
+        }
+      }
+    }
+    return result.toString()
   }
 
   private fun doExpand(input: String, expandToEmptyIfNotFound: Boolean): String {

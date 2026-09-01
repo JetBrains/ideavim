@@ -37,7 +37,7 @@ data class WriteCommand(val range: Range, val modifier: CommandModifier, val arg
       injector.file.saveFile(editor, context)
       return ExecutionResult.Success
     }
-    val path = injector.pathExpansion.expandPath(argument.trim())
+    val path = injector.pathExpansion.expandPath(argument.trim(), editor)
     val fileExists = injector.file.findFile(path, context) != null
     if (modifier != CommandModifier.BANG && fileExists) {
       injector.messages.showMessage(editor, "E37: File exists")
