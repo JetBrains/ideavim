@@ -52,6 +52,10 @@ data class AnonymousFunctionDeclaration(
         throw exExceptionMessage("E718")
       }
     }
+
+    // Note that we don't store the anonymous function as a global function, like we do with lambda functions. This
+    // appears to be how Vim works - you can print a lambda with `:function /lambda`, but anonymous functions aren't
+    // liste normally, or with a numeric pattern
     val declaration = FunctionDeclaration(
       null,
       injector.functionService.getNextAnonymousFunctionName(),

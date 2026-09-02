@@ -18,12 +18,15 @@ import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandlerBase
 import com.maddyhome.idea.vim.vimscript.model.functions.VimscriptFunctionProvider
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
+import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
+import java.lang.ref.WeakReference
 
 abstract class VimScriptFunctionServiceBase : VimscriptFunctionService {
   protected abstract val functionProviders: List<VimscriptFunctionProvider>
 
   private val globalFunctions: MutableMap<String, FunctionDeclaration> = mutableMapOf()
   private val builtInFunctions: MutableMap<String, Lazy<FunctionHandler>> = mutableMapOf()
+  private val lambdaFunctions = mutableListOf<WeakReference<FunctionDeclaration>>()
 
   private var anonymousFunctionCounter = 1
   private var lambdaFunctionCounter = 1
@@ -78,6 +81,22 @@ abstract class VimScriptFunctionServiceBase : VimscriptFunctionService {
   }
 
   override fun storeFunction(declaration: FunctionDeclaration) {
+    if (declaration.flags.contains(FunctionFlag.CLOSURE) && declaration.name.startsWith("<lambda>")) {
+      // A lambda function is anonymous when created, but Vim gives it a unique name based on `<lambda>{counter}`. The
+      // user can see this name with `:echo string(MyLambda)`. They are not typically treated as global functions, but
+      // the `:function` command will list lambda functions when matching by name or pattern, so we need to store a
+      // reference, as though it were a global function.
+      // However, lambda functions are garbage collected when no longer referenced, for example, when a variable is
+      // reassigned. IdeaVim supports this, but non-deterministically. Lambda functions are wrapped in a VimFuncref and
+      // assigned to a variable. When the variable no longer references it, the JVM is free to GC it at some point in
+      // the future.
+      // Holding a weak reference allows us to report it in `:function` and let it be garbage collected, at the cost of
+      // some incorrect reports before GC happens.
+      lambdaFunctions.add(WeakReference(declaration))
+      lambdaFunctions.removeAll { it.get() == null }
+      return
+    }
+
     val scope: Scope = declaration.scope ?: getDefaultFunctionScope()
     when (scope) {
       Scope.GLOBAL_VARIABLE -> {
@@ -141,12 +160,13 @@ abstract class VimScriptFunctionServiceBase : VimscriptFunctionService {
     }
   }
 
-  override fun getAllUserDefinedFunctions() = globalFunctions.values.toList()
+  override fun getAllUserDefinedFunctions() = globalFunctions.values + lambdaFunctions.mapNotNull { it.get() }
 
   override fun getBuiltInFunction(name: String): FunctionHandler? {
     return builtInFunctions[name]?.value
   }
 
+  // TODO: This is incorrect. The correct API to add a function is storeFunction, and we shouldn't be adding built-ins!
   override fun registerFunctionHandler(
     functionName: String,
     functionHandler: FunctionHandler,
@@ -155,6 +175,7 @@ abstract class VimScriptFunctionServiceBase : VimscriptFunctionService {
     builtInFunctions[functionName] = lazyOf(functionHandler)
   }
 
+  // TODO: This is incorrect. We shouldn't have an API for removing a built-in function
   override fun unregisterFunctionHandler(functionName: String) {
     builtInFunctions.remove(functionName)
   }
@@ -201,9 +222,14 @@ abstract class VimScriptFunctionServiceBase : VimscriptFunctionService {
       iterator.remove()
     }
 
-    // TODO: How to remove scoped functions?
+    // Note that this is a test-only function. We don't need to remove scoped functions, because the scopes will also
+    // disappear
 
     anonymousFunctionCounter = 1
     lambdaFunctionCounter = 1
+
+    // We don't need to mark lambda functions as deleted. They're typically Funcref objects that are garbage collected
+    // when no longer referenced
+    lambdaFunctions.clear()
   }
 }

@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.vimscript.model.expressions
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.VimLContext
@@ -27,7 +28,7 @@ data class LambdaExpression(val args: List<String>, val expr: Expression) : Expr
   override fun evaluate(editor: VimEditor, context: ExecutionContext, vimContext: VimLContext): VimFuncref {
     val function = FunctionDeclaration(
       null,
-      getFunctionName(),
+      injector.functionService.getNextLambdaFunctionName(),
       args,
       listOf(),
       buildBody(),
@@ -36,11 +37,12 @@ data class LambdaExpression(val args: List<String>, val expr: Expression) : Expr
       true
     )
     function.vimContext = vimContext
-    return VimFuncref(DefinedFunctionHandler(function), VimList(mutableListOf()), null, VimFuncref.Type.LAMBDA, isImplicitPartial = false)
-  }
 
-  private fun getFunctionName(): String {
-    return "<lambda>" + VimFuncref.lambdaCounter++
+    // Lambda functions are not global functions but passed around by Funcref. However, the `:function` command will
+    // list them by matching name or pattern. (Note that the function service will hold a weak reference to the function
+    // so that it can be garbage collected when no longer referenced)
+    injector.functionService.storeFunction(function)
+    return VimFuncref(DefinedFunctionHandler(function), VimList(mutableListOf()), null, VimFuncref.Type.LAMBDA, isImplicitPartial = false)
   }
 
   private fun buildBody(): List<Executable> {
