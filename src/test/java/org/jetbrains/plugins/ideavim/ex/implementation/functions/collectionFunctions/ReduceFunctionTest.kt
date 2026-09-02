@@ -102,7 +102,7 @@ class ReduceFunctionTest : VimTestCase("\n") {
     enterCommand("let a = [1, 2, 3]")
     enterCommand("call reduce(a, { acc, val, other -> acc + val })")
     assertPluginError(true)
-    assertPluginErrorMessage("E119: Not enough arguments for function: <lambda>0")
+    assertPluginErrorMessage("E119: Not enough arguments for function: <lambda>1")
   }
 
   @Test

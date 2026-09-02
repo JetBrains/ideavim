@@ -26,6 +26,9 @@ interface VimscriptFunctionService {
   fun registerFunctionHandler(functionName: String, functionHandler: FunctionHandler)
   fun unregisterFunctionHandler(functionName: String)
 
+  fun getNextAnonymousFunctionName(): String
+  fun getNextLambdaFunctionName(): String
+
   @TestOnly
   fun resetUserDefinedFunctions()
 }

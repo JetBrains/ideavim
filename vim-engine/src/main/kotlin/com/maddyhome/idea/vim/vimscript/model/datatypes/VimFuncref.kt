@@ -62,11 +62,6 @@ class VimFuncref(
   val type: Type,
   val isImplicitPartial: Boolean = false
 ) : VimDataType("funcref") {
-  companion object {
-    var lambdaCounter: Int = 1
-    var anonymousCounter: Int = 1
-  }
-
   val isPartial: Boolean
     get() = arguments.values.isNotEmpty() || dictionary != null
 
