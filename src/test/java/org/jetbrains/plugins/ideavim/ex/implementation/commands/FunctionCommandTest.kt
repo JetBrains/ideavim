@@ -756,15 +756,76 @@ class FunctionCommandTest : VimTestCase("\n") {
     assertCommandOutput("function d.init", "function 1(arg) dict")
   }
 
-  @VimBehaviorDiffers(
-    originalVimAfter = "E126: Missing :endfunction",
-    description = "Maybe we can update the parser to handle a function command that looks like the start of the function definition, but I couldn't make it work"
-  )
   @Test
   fun `test function command with parentheses throws error`() {
     // `:function Foo()` starts a function definition, so it is not a listing, and there is no body or `endfunction`
     enterCommand("function Foo()")
     assertPluginError(true)
-    assertPluginErrorMessage("line 2:0 extraneous input '<EOF>'")
+    assertPluginErrorMessage("E126: Missing :endfunction")
+  }
+
+  @Test
+  fun `test function command with parentheses and bang modifier throws error`() {
+    enterCommand("function! Foo()")
+    assertPluginError(true)
+    assertPluginErrorMessage("E126: Missing :endfunction")
+  }
+
+  @Test
+  fun `test function command with parentheses and function flags throws error`() {
+    enterCommand("function Foo() abort closure")
+    assertPluginError(true)
+    assertPluginErrorMessage("E126: Missing :endfunction")
+  }
+
+  @Test
+  fun `test dictionary function command with parentheses throws error`() {
+    enterCommand("let g:d = {}")
+    enterCommand("function g:d.init(arg)")
+    assertPluginError(true)
+    assertPluginErrorMessage("E126: Missing :endfunction")
+  }
+
+  @Test
+  fun `test function command with body but no endfunction throws error`() {
+    executeVimscript("""
+      |let g:marker = 0
+      |function Foo()
+      |  let g:marker = 42
+    """.trimMargin())
+    assertPluginError(true)
+    assertPluginErrorMessage("E126: Missing :endfunction")
+
+    // Vim reads the lines following the definition into the function's body, so they are not executed. And because
+    // there is no `:endfunction`, the function is not defined
+    assertCommandOutput("echo g:marker", "0")
+    assertCommandOutput("function", "")
+  }
+
+  @Test
+  fun `test function definition without endfunction does not discard the rest of the script`() {
+    // The parser used to fail to parse a function definition without `:endfunction`, and because the error was
+    // reported at EOF, it couldn't remove the offending line and would eventually discard the entire script
+    executeVimscript("""
+      |let g:marker = 42
+      |function Foo()
+    """.trimMargin())
+    assertPluginError(true)
+    assertPluginErrorMessage("E126: Missing :endfunction")
+    assertCommandOutput("echo g:marker", "42")
+  }
+
+  @Test
+  fun `test nested function definition claims the only endfunction`() {
+    // Vim counts nested definitions, so the inner definition matches the `:endfunction` and the outer one reports the
+    // error. Neither function is defined
+    executeVimscript("""
+      |function Outer()
+      |  function Inner()
+      |  endfunction
+    """.trimMargin())
+    assertPluginError(true)
+    assertPluginErrorMessage("E126: Missing :endfunction")
+    assertCommandOutput("function", "")
   }
 }
