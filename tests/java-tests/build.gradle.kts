@@ -65,11 +65,19 @@ tasks {
   test {
     useJUnitPlatform()
 
+    // Without this the test IDE starts every plugin bundled with the product; a startup
+    // error in any of them is rethrown as a failure of whichever IdeaVim test ran first.
+    systemProperty(
+      "idea.load.plugins.id",
+      "com.intellij,com.intellij.java,org.jetbrains.plugins.yaml,org.jetbrains.plugins.textmate,IdeaVIM",
+    )
+
     // Set teamcity env variable locally to run additional tests for leaks.
     println("Project leak checks: If you experience project leaks on TeamCity that doesn't reproduce locally")
     println("Uncomment the following line in build.gradle to enable leak checks (see build.gradle config)")
 //      environment("TEAMCITY_VERSION" to "X")
 
+    // Their .properties files shadow, rather than complement, the originals they translate.
     classpath -= classpath.filter { it.name.startsWith("localization-") && it.name.endsWith(".jar") }
   }
 }
