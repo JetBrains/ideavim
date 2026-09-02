@@ -730,9 +730,13 @@ public class EditorHelper {
   /**
    * Checks if the editor hosts a Vim command-line / search history window
    * (the synthetic buffer opened by `q:`, `q/`, or `q?`).
+   * <p>
+   * Note that this resolves the file from the document rather than using {@code Editor.getVirtualFile()}, which is not
+   * necessarily populated yet while the editor is being created - and that is exactly when this is called, to decide
+   * whether the editor is Vim enabled and should have its local options initialised.
    */
   public static boolean isCommandHistoryWindow(@NotNull Editor editor) {
-    final VirtualFile virtualFile = editor.getVirtualFile();
+    final VirtualFile virtualFile = getVirtualFile(editor);
     return virtualFile != null && virtualFile.getUserData(CmdwinKeys.KIND) != null;
   }
 
