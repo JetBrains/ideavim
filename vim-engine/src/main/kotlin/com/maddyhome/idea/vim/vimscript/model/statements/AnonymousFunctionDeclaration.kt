@@ -10,6 +10,7 @@ package com.maddyhome.idea.vim.vimscript.model.statements
 
 import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.exExceptionMessage
 import com.maddyhome.idea.vim.vimscript.model.Executable
@@ -53,7 +54,7 @@ data class AnonymousFunctionDeclaration(
     }
     val declaration = FunctionDeclaration(
       null,
-      VimFuncref.anonymousCounter++.toString(),
+      injector.functionService.getNextAnonymousFunctionName(),
       args,
       defaultArgs,
       body,

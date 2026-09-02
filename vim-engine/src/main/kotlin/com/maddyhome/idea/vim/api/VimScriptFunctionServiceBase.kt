@@ -25,6 +25,9 @@ abstract class VimScriptFunctionServiceBase : VimscriptFunctionService {
   private val globalFunctions: MutableMap<String, FunctionDeclaration> = mutableMapOf()
   private val builtInFunctions: MutableMap<String, Lazy<FunctionHandler>> = mutableMapOf()
 
+  private var anonymousFunctionCounter = 1
+  private var lambdaFunctionCounter = 1
+
   override fun deleteFunction(name: String, scope: Scope?, vimContext: VimLContext) {
     // Autoload names (containing '#') may start with a lowercase letter, like `foo#bar#baz`.
     if (name[0].isLowerCase() && !name.contains('#') && scope != Scope.SCRIPT_VARIABLE) {
@@ -186,6 +189,9 @@ abstract class VimScriptFunctionServiceBase : VimscriptFunctionService {
     }
   }
 
+  override fun getNextAnonymousFunctionName() = anonymousFunctionCounter++.toString()
+  override fun getNextLambdaFunctionName() = "<lambda>" + lambdaFunctionCounter++
+
   override fun resetUserDefinedFunctions() {
     // Remove all global user-defined functions
     val iterator = globalFunctions.iterator()
@@ -196,5 +202,8 @@ abstract class VimScriptFunctionServiceBase : VimscriptFunctionService {
     }
 
     // TODO: How to remove scoped functions?
+
+    anonymousFunctionCounter = 1
+    lambdaFunctionCounter = 1
   }
 }
