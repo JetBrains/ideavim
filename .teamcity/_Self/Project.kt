@@ -35,6 +35,7 @@ object Project : Project({
   // Only the LATEST-EAP-SNAPSHOT platform ships JVM target 25 bytecode (its inline functions can't be
   // inlined into a Java 21 build), so EAP must run on Java 25. 2026.1 and 2025.3 build fine on Java 21.
   buildType(TestingBuildType("Latest EAP", version = "LATEST-EAP-SNAPSHOT", javaVersion = "25"))
+  buildType(TestingBuildType("2026.2", version = "2026.2", javaVersion = "25"))
   buildType(TestingBuildType("2026.1"))
   buildType(TestingBuildType("2025.3", javaVersion = "21"))
 
