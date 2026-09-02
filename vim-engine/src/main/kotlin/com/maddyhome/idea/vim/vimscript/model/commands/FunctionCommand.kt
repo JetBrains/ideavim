@@ -100,14 +100,14 @@ internal class FunctionCommand private constructor(
         // is supported inside a script context - why would you want to output a list of functions from a script?)
         throw exExceptionMessage("E81")
       }
-      else {
+      else if (!functionNamePrefix.equals("<lambda>", ignoreCase = true)) {
         // TODO: Support <SNR> prefix to list script-local functions (which are saved as global functions)
         throw exExceptionMessage("E129")
       }
     }
 
     if (pattern != null) {
-      printAllMatchingFunctions(pattern, editor, context, includeAnonymousFunctions = true)
+      printAllMatchingFunctions(pattern, editor, context)
     }
     else if (literalDictionaryKey != null && functionName != null) {
       // The text is a literal dictionary expression, but the function name is still a curly brace expression. We need
@@ -135,7 +135,8 @@ internal class FunctionCommand private constructor(
 
       printFunctions(listOf(result.handler.function), editor, context)
     } else if (functionName != null) {
-      val nameValue = functionName.evaluate(editor, context, this).value
+      val lambdaPrefix = if (functionNamePrefix.equals("<lambda>")) functionNamePrefix else ""
+      val nameValue = lambdaPrefix + functionName.evaluate(editor, context, this).value
       if (nameValue.isEmpty()) {
         printAllFunctions(editor, context)
       } else {
@@ -167,16 +168,13 @@ internal class FunctionCommand private constructor(
   }
 
   private fun printAllFunctions(editor: VimEditor, context: ExecutionContext) {
-    val functions = injector.functionService.getAllUserDefinedFunctions().sortedBy { it.name }
+    val functions = injector.functionService.getAllUserDefinedFunctions()
+      .filterNot { it.name.startsWith("<lambda>") }
+      .sortedBy { it.name }
     printFunctions(functions, editor, context)
   }
 
-  private fun printAllMatchingFunctions(
-    pattern: String,
-    editor: VimEditor,
-    context: ExecutionContext,
-    includeAnonymousFunctions: Boolean = false
-  ) {
+  private fun printAllMatchingFunctions(pattern: String, editor: VimEditor, context: ExecutionContext) {
     if (pattern.isEmpty()) {
       printAllFunctions(editor, context)
       return
@@ -204,8 +202,11 @@ internal class FunctionCommand private constructor(
   }
 
   private fun printMatchingFunction(scope: Scope?, name: String, editor: VimEditor, context: ExecutionContext) {
-    val function = injector.functionService.getUserDefinedFunction(scope, name, CommandLineVimLContext)
-      ?: throw exExceptionMessage("E123", name)
+    val function = if (name.startsWith("<lambda>")) {
+      injector.functionService.getAllUserDefinedFunctions().firstOrNull { it.name == name }
+    } else {
+      injector.functionService.getUserDefinedFunction(scope, name, CommandLineVimLContext)
+    } ?: throw exExceptionMessage("E123", name)
     printFunctions(listOf(function), editor, context)
   }
 

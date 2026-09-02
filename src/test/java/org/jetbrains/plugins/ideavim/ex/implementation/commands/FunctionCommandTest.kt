@@ -479,6 +479,7 @@ class FunctionCommandTest : VimTestCase("\n") {
     )
   }
 
+  @VimBehaviorDiffers(description = "Vim shows the body of the function")
   @Test
   fun `test function command with pattern ignores smartcase`() {
     enterCommand("set ignorecase smartcase")
@@ -499,11 +500,40 @@ class FunctionCommandTest : VimTestCase("\n") {
     assertCommandOutput("function /\\CFOO", "")
   }
 
-  @VimBehaviorDiffers(description = "Vim lists lambdas when given a pattern: `function <lambda>1(x, ...)`")
   @Test
-  fun `test function command does not list lambdas`() {
+  fun `test function command does not list lambdas unless explicitly requested`() {
     enterCommand("let Lambda = {x -> x + 1}")
-    assertCommandOutput("function /lambda", "")
+    assertCommandOutput("function", "")
+  }
+
+  @VimBehaviorDiffers(description = "Vim shows the body of the function")
+  @Test
+  fun `test function command lists lambdas by pattern`() {
+    enterCommand("let Lambda = {x -> x + 1}")
+    assertCommandOutput("function /lambda", "function <lambda>1(x, ...)")
+  }
+
+  @VimBehaviorDiffers(description = "Vim garbage collects lambdas immediately. Plus, it shows the body of the function")
+  @Test
+  fun `test function command does not list reassigned lambdas after garbage collection`() {
+    enterCommand("let Lambda = {x -> x + 1}")
+    enterCommand("let Lambda = {x -> x + 2}")
+    System.gc()
+    assertCommandOutput("function /lambda", "function <lambda>2(x, ...)")
+  }
+
+  @VimBehaviorDiffers(description = "Vim shows the body of the function")
+  @Test
+  fun `test function command lists lambdas by name`() {
+    enterCommand("let Lambda = {x -> x + 1}")
+    assertCommandOutput("function <lambda>1", "function <lambda>1(x, ...)")
+  }
+
+  @Test
+  fun `test function command with unknown lambda reports error`() {
+    enterCommand("function <lambda>42")
+    assertPluginError(true)
+    assertPluginErrorMessage("E123: Undefined function: <lambda>42")
   }
 
   @VimBehaviorDiffers(description = "Vim shows the body of the function")
