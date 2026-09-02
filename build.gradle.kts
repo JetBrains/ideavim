@@ -61,6 +61,16 @@ val moduleSources by configurations.registering
 val javaVersion: String by project
 val kotlinVersion: String by project
 val ideaVersion: String by project
+
+val ideaBranchNumber = ideaVersion.substringBefore('-').split('.').let { parts ->
+  val head = parts[0].toIntOrNull() ?: Int.MAX_VALUE // LATEST-EAP-SNAPSHOT
+  val isProductVersion = head > 1000                // 2026.2 rather than 262.8665.258
+  if (isProductVersion) (head % 100) * 10 + (parts.getOrNull(1)?.toIntOrNull() ?: 1) else head
+}
+
+// com.intellij.ide.bookmark.* left lib/app.jar for a bundled plugin in 2026.2; older
+// product-info.json files list neither the plugin id nor the module, which fails resolution.
+val bookmarksIsSeparatePlugin = ideaBranchNumber >= 262
 val ideaType: String by project
 val instrumentPluginCode: String by project
 val remoteRobotVersion: String by project
@@ -126,7 +136,7 @@ dependencies {
     pluginModule(runtimeOnly(project(":ideavim-terminal")))
 
     bundledModule("intellij.spellchecker")
-    bundledPlugin("intellij.bookmarks.plugin")
+    if (bookmarksIsSeparatePlugin) bundledPlugin("intellij.bookmarks.plugin")
     bundledModule("intellij.platform.kernel.impl")
   }
 
@@ -137,6 +147,7 @@ dependencies {
   testApi("com.squareup.okhttp3:okhttp:5.5.0")
 
   // https://mvnrepository.com/artifact/com.ensarsarajcic.neovim.java/neovim-api
+  // Its Jackson 2.9.10 shadows the platform's own on the flat test classpath.
   val excludeStaleJackson: ExternalModuleDependency.() -> Unit = {
     exclude(group = "com.fasterxml.jackson.core")
   }
@@ -202,6 +213,18 @@ if (currentJavaVersion != javaVersion) {
 tasks {
   test {
     useJUnitPlatform()
+
+    // Without this the test IDE starts every plugin bundled with the product; a startup
+    // error in any of them is rethrown as a failure of whichever IdeaVim test ran first.
+    systemProperty(
+      "idea.load.plugins.id",
+      listOfNotNull(
+        "com.intellij",
+        "IdeaVIM",
+        "AceJump",
+        "intellij.bookmarks.plugin".takeIf { bookmarksIsSeparatePlugin },
+      ).joinToString(","),
+    )
 
     // Set teamcity env variable locally to run additional tests for leaks.
     println("Project leak checks: If you experience project leaks on TeamCity that doesn't reproduce locally")

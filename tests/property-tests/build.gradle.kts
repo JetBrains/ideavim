@@ -43,12 +43,18 @@ intellijPlatform {
   buildSearchableOptions = false
 }
 
+
 tasks {
   // This task is disabled because it should be excluded from `gradle test` run (because it's slow)
   // I didn't find a better way to exclude except disabling and defining a new task with a different name
   test {
     useJUnitPlatform()
 
+    // Without this the test IDE starts every plugin bundled with the product; a startup
+    // error in any of them is rethrown as a failure of whichever IdeaVim test ran first.
+    systemProperty("idea.load.plugins.id", "com.intellij,com.intellij.java,IdeaVIM")
+
+    // Their .properties files shadow, rather than complement, the originals they translate.
     classpath -= classpath.filter { it.name.startsWith("localization-") && it.name.endsWith(".jar") }
   }
 }
