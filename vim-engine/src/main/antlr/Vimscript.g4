@@ -67,7 +67,14 @@ finallyBlock:           (WS | COLON)* FINALLY WS* ((inline_comment NEW_LINE) | (
 functionDefinition:
                         (WS | COLON)* FUNCTION (replace = BANG)? WS+ (SID | SNR)? (anyCaseNameWithDigitsAndUnderscores NUM)* (functionScope COLON)? (functionName | (literalDictionaryKey (DOT literalDictionaryKey)+)) WS* L_PAREN WS* argumentsDeclaration WS* R_PAREN WS* (functionFlag WS*)* ((inline_comment NEW_LINE) | (NEW_LINE | BAR)+)
                             blockMember*
-                        (WS | COLON)* ENDFUNCTION WS* ((inline_comment NEW_LINE) | (NEW_LINE | BAR))
+                        // Vim reads lines into the function's body until it finds `:endfunction`. If it reaches the end
+                        // of the input without finding it, it reports `E126` and doesn't define the function. We can
+                        // parse this by allowing the definition to end at EOF. See
+                        // ExecutableVisitor.visitFunctionDefinition
+                        // Note that we can't simply make `:endfunction` optional. That would allow the definition to
+                        // end at any point, which would require ANTLR to use (very slow) full context prediction for
+                        // every line in the body, in order to decide if the definition has ended
+                        (((WS | COLON)* ENDFUNCTION WS* ((inline_comment NEW_LINE) | (NEW_LINE | BAR))) | EOF)
 ;
 functionFlag:           RANGE | ABORT | DICT | CLOSURE;
 argumentsDeclaration:   (ETC | defaultValue (WS* COMMA WS* defaultValue)* (WS* COMMA WS* ETC WS*)? | (variableName (WS* COMMA WS* variableName)* (WS* COMMA WS* defaultValue)* (WS* COMMA WS* ETC WS*)?))?;
@@ -114,7 +121,8 @@ command:
     (WS | COLON)* range? (WS | COLON)* DELFUNCTION (replace = BANG)? WS+ (anyCaseNameWithDigitsAndUnderscores NUM)* (functionScope COLON)? functionName ((inline_comment NEW_LINE+) | (NEW_LINE | BAR)+)
     #DelfunctionCommand|
 
-    // Note that `function() ... endfunction` is handled as a separate construct
+    // Note that `function() ... endfunction` is handled as a separate construct, as is a function definition
+    // that is missing its `:endfunction` (which is reported as an error by this command)
     // This matches the `:function {name}` and `:function /{pattern}` commands
     (WS | COLON)* range? (WS | COLON)* FUNCTION BANG? functionCommandArgument? (WS* inline_comment? NEW_LINE | BAR)+
     #FunctionCommand|

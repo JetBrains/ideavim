@@ -37,7 +37,8 @@ internal class FunctionCommand private constructor(
   private val functionName: CurlyBracesName?,
   private val literalDictionaryKey: String?,
   private val pattern: String?,
-  private val trailingCharacters: String?
+  private val trailingCharacters: String?,
+  private val missingEndFunction: Boolean = false,
   )
   : Command.SingleExecution(range, modifier) {
 
@@ -61,6 +62,21 @@ internal class FunctionCommand private constructor(
     literalDictionaryKey = null,
     pattern = pattern,
     trailingCharacters = null
+  )
+
+  /**
+   * The text looks like the start of a function definition, but there is no matching `:endfunction`
+   */
+  constructor(range: Range, modifier: CommandModifier, missingEndFunction: Boolean)
+    : this(
+    range,
+    modifier,
+    functionNamePrefix = null,
+    functionName = null,
+    literalDictionaryKey = null,
+    pattern = null,
+    trailingCharacters = null,
+    missingEndFunction = missingEndFunction
   )
 
   constructor(
@@ -89,6 +105,10 @@ internal class FunctionCommand private constructor(
     context: ExecutionContext,
     operatorArguments: OperatorArguments,
   ): ExecutionResult {
+    if (missingEndFunction) {
+      throw exExceptionMessage("E126")
+    }
+
     if (trailingCharacters?.isNotBlank() == true && literalDictionaryKey == null) {
       throw exExceptionMessage("E488", trailingCharacters)
     }
