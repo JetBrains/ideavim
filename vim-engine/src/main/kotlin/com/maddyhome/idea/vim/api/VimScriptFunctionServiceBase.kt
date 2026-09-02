@@ -138,6 +138,8 @@ abstract class VimScriptFunctionServiceBase : VimscriptFunctionService {
     }
   }
 
+  override fun getAllUserDefinedFunctions() = globalFunctions.values.toList()
+
   override fun getBuiltInFunction(name: String): FunctionHandler? {
     return builtInFunctions[name]?.value
   }

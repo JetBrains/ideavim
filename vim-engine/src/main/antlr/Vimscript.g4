@@ -58,6 +58,7 @@ catchBlock:             (WS | COLON)* CATCH WS* pattern? WS* ((inline_comment NE
                             blockMember*
 ;
 pattern:                DIV patternBody DIV;
+// TODO: This seems wrong - BAR is part of a valid pattern
 patternBody:            ~(NEW_LINE | BAR)*?;
 finallyBlock:           (WS | COLON)* FINALLY WS* ((inline_comment NEW_LINE) | (NEW_LINE | BAR))
                             blockMember*
@@ -109,8 +110,14 @@ command:
     (WS | COLON)* range? (WS | COLON)* ECHO (WS* expr)* WS* (NEW_LINE | BAR)+
     #EchoCommand|
 
+    // TODO: delfunction should take a curlyBracesFunctionName
     (WS | COLON)* range? (WS | COLON)* DELFUNCTION (replace = BANG)? WS+ (anyCaseNameWithDigitsAndUnderscores NUM)* (functionScope COLON)? functionName ((inline_comment NEW_LINE+) | (NEW_LINE | BAR)+)
     #DelfunctionCommand|
+
+    // Note that `function() ... endfunction` is handled as a separate construct
+    // This matches the `:function {name}` and `:function /{pattern}` commands
+    (WS | COLON)* range? (WS | COLON)* FUNCTION BANG? functionCommandArgument? (WS* inline_comment? NEW_LINE | BAR)+
+    #FunctionCommand|
 
     (WS | COLON)* range? (WS | COLON)* CALL WS+ expr WS* ((inline_comment NEW_LINE+) | (NEW_LINE | BAR)+)
     #CallCommand|
@@ -203,6 +210,11 @@ commandArgumentWithBars: ~(NEW_LINE)+;
 commandArgumentWithoutBars: ~(NEW_LINE | BAR)+;
 lShift: LESS+;
 rShift: GREATER+;
+
+functionCommandArgument: (WS* DIV functionCommandPattern) | functionCommandName;
+functionCommandName: WS+ functionCommandPrefix? curlyBracesFunctionName (DOT literalDictionaryKey)* trailing+=~(QUOTE|L_PAREN)*?;
+functionCommandPrefix: SID | SNR | LESS anyCaseNameWithDigitsAndUnderscores* GREATER;
+functionCommandPattern: ~(NEW_LINE)*;
 
 letCommands:
     (WS | COLON)* range? (WS | COLON)* LET WS+ (unpack = unpackLValue | lvalue = expr) WS* assignmentOperator WS* rvalue = expr
@@ -356,7 +368,9 @@ variableName:           curlyBracesName;
 variableScope:          anyScope;
 
 curlyBracesName:        element+;
-element:                anyCaseNameWithDigitsAndUnderscores | unsignedInt | L_CURLY WS* expr WS* R_CURLY;
+curlyBracesExpression:  L_CURLY WS* expr WS* R_CURLY;
+element:                anyCaseNameWithDigitsAndUnderscores | unsignedInt | curlyBracesExpression;
+
 
 option:                 AMPERSAND (optionScope COLON)? optionName;
 optionName:             anyCaseNameWithDigitsAndUnderscores;
@@ -364,6 +378,13 @@ optionScope:            anyScope;
 
 envVariable:            DOLLAR envVariableName;
 envVariableName:        anyCaseNameWithDigitsAndUnderscores;
+
+curlyBracesFunctionName: curlyBracesFunctionNamePart+;
+curlyBracesFunctionNamePart: functionNamePart | curlyBracesExpression;
+// TODO: anyCaseNameWithDigitsAndUnderscores might need to be changed to accept a name that starts with an underscore
+// We should also be able to *define* a function that begins with an underscore
+// The `:function` command accepts a name that begins with one or more digits, but treats it as an error (not a parse error)
+functionNamePart:       DIGIT | INT | UNDERSCORE | COLON | anyCaseNameWithDigitsAndUnderscores | NUM;
 
 functionCall:           (functionScope COLON)? (anyCaseNameWithDigitsAndUnderscores NUM)* functionName WS* L_PAREN WS* functionArguments WS* R_PAREN;
 functionName:           curlyBracesName;
@@ -521,7 +542,9 @@ keyword:                ABORT
 operator:               IS
                     |   IS_NOT
 ;
-existingCommands:       ACTION
+existingCommands:       ABBREV
+                    |   ABBREV_CLEAR
+                    |   ACTION
                     |   ACTIONLIST
                     |   ASCII
                     |   BUFFER
@@ -591,11 +614,9 @@ existingCommands:       ACTION
                     |   TABNEXT
                     |   TABONLY
                     |   TABPREVIOUS
+                    |   UNABBREV
                     |   UNDO
                     |   UNMAP
-                    |   ABBREV
-                    |   UNABBREV
-                    |   ABBREV_CLEAR
                     |   VGLOBAL
                     |   VSPLIT
                     |   WRITE

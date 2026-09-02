@@ -20,6 +20,7 @@ interface VimscriptFunctionService {
   fun getFunctionHandler(scope: Scope?, name: String, vimContext: VimLContext): FunctionHandler
   fun getFunctionHandlerOrNull(scope: Scope?, name: String, vimContext: VimLContext): FunctionHandler?
   fun getUserDefinedFunction(scope: Scope?, name: String, vimContext: VimLContext): FunctionDeclaration?
+  fun getAllUserDefinedFunctions(): List<FunctionDeclaration>
   fun getBuiltInFunction(name: String): FunctionHandler?
   fun registerHandlers()
   fun registerFunctionHandler(functionName: String, functionHandler: FunctionHandler)

@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.vimscript.model.commands.CommandModifier
 import com.maddyhome.idea.vim.vimscript.model.commands.DelfunctionCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.EchoCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.ExecuteCommand
+import com.maddyhome.idea.vim.vimscript.model.commands.FunctionCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.GlobalCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.GoToLineCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.LetCommand
@@ -80,7 +81,7 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
   private fun parseRangeExpression(ctx: VimscriptParser.RangeExpressionContext?): Pair<String, Int> {
     val offset = parseRangeOffset(ctx?.rangeOffset())
     return if (ctx == null) {
-      return Pair(".", offset)
+      Pair(".", offset)
     } else if (ctx.rangeMember() == null) {
       Pair(".", offset)
     } else if (ctx.rangeMember().search() == null || ctx.rangeMember().search().isEmpty()) {
@@ -190,6 +191,26 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
     val functionName = autoloadPrefix + ctx.functionName().text
     val ignoreIfMissing = ctx.replace != null
     val command = DelfunctionCommand(range, functionScope, functionName, ignoreIfMissing)
+    command.rangeInScript = ctx.getTextRange()
+    return command
+  }
+
+  override fun visitFunctionCommand(ctx: VimscriptParser.FunctionCommandContext): Command {
+    val range: Range = parseRange(ctx.range())
+    val argument: VimscriptParser.FunctionCommandArgumentContext? = ctx.functionCommandArgument()
+    val command = argument?.functionCommandName()?.let {
+      val namePrefix: String? = it.functionCommandPrefix()?.text
+      val name = it.curlyBracesFunctionName()?.let { name -> expressionVisitor.visitCurlyBracesFunctionName(name) }
+      val trailing: String? = it.trailing?.takeIf { it.isNotEmpty() }?.joinToString("") { it.text }
+      val literalDictionaryKey = when {
+        it.literalDictionaryKey().isEmpty() && trailing?.first() == '.' -> ""
+        it.literalDictionaryKey().isEmpty() -> null
+        else -> it.literalDictionaryKey().joinToString(separator = ".") { key -> key.text }
+      }
+      FunctionCommand(range, CommandModifier.NONE, namePrefix, name, literalDictionaryKey, trailing)
+    } ?: argument?.functionCommandPattern()?.let {
+      FunctionCommand(range, CommandModifier.NONE, it.text)
+    } ?: FunctionCommand(range, CommandModifier.NONE)
     command.rangeInScript = ctx.getTextRange()
     return command
   }
