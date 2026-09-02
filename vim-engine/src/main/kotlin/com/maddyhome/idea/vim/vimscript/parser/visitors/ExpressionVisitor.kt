@@ -435,7 +435,29 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
   }
 
   override fun visitCurlyBracesName(ctx: VimscriptParser.CurlyBracesNameContext): CurlyBracesName {
-    val parts = ctx.element().map { if (it.expr() != null) visit(it.expr()) else SimpleExpression(it.text) }
+    val parts = ctx.element().map {
+      if (it.curlyBracesExpression()?.expr() != null) {
+        visit(it.curlyBracesExpression().expr())
+      } else {
+        SimpleExpression(it.text)
+      }
+    }
+    val result = CurlyBracesName(parts)
+    result.originalString = ctx.text
+    return result
+  }
+
+  /**
+   * A curly braces name that can contain the `#` character as used by an autoload function name.
+   */
+  override fun visitCurlyBracesFunctionName(ctx: VimscriptParser.CurlyBracesFunctionNameContext): CurlyBracesName {
+    val parts = ctx.curlyBracesFunctionNamePart().map {
+      if (it.curlyBracesExpression()?.expr() != null) {
+        visit(it.curlyBracesExpression().expr())
+      } else {
+        SimpleExpression(it.text)
+      }
+    }
     val result = CurlyBracesName(parts)
     result.originalString = ctx.text
     return result
