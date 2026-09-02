@@ -103,7 +103,7 @@ import com.maddyhome.idea.vim.helper.CmdwinKeys
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.GuicursorChangeListener
 import com.maddyhome.idea.vim.helper.StrictMode
-import com.maddyhome.idea.vim.helper.clearCurrentSearchMatchHighlightOnCaretMove
+import com.maddyhome.idea.vim.helper.clearCurrentSearchMatchHighlight
 import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.forceBarCursor
@@ -1077,7 +1077,9 @@ object VimListenerManager {
     override fun caretPositionChanged(event: CaretEvent) {
       event.caret.resetVimLastColumn()
       val editor = event.editor
-      clearCurrentSearchMatchHighlightOnCaretMove(editor)
+      // The current search match highlight only belongs to an in-progress 'incsearch' - moving the caret does not make
+      // a match current, it just takes the highlight away (VIM-4308)
+      clearCurrentSearchMatchHighlight(editor)
 
       val vimEditor = editor.vim
       if (vimEditor.mode is Mode.INSERT) {

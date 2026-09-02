@@ -31,7 +31,7 @@ import com.maddyhome.idea.vim.group.XMLGroup
 import com.maddyhome.idea.vim.helper.addSubstitutionConfirmationHighlight
 import com.maddyhome.idea.vim.helper.highlightSearchResults
 import com.maddyhome.idea.vim.helper.shouldIgnoreCase
-import com.maddyhome.idea.vim.helper.updateCurrentSearchMatchHighlight
+import com.maddyhome.idea.vim.helper.clearCurrentSearchMatchHighlight
 import com.maddyhome.idea.vim.helper.updateSearchCount
 import com.maddyhome.idea.vim.helper.updateSearchHighlights
 import com.maddyhome.idea.vim.helper.vimIncsearchCurrentMatchOffset
@@ -299,9 +299,9 @@ open class IjVimSearchGroup : VimSearchGroupBase(), PersistentStateComponent<Ele
           endPosition.line
         )
 
-        // The re-highlighted lines are all added as normal matches, and the edit might have moved a match under (or out
-        // from under) the caret, so work out the current match again
-        updateCurrentSearchMatchHighlight(editor)
+        // The re-highlighted lines are all added as normal matches. An edit never makes a match current - only an
+        // in-progress 'incsearch' has one, and this puts its highlight back if the edit removed it
+        clearCurrentSearchMatchHighlight(editor)
 
         if (logger.isDebug()) {
           existingHighlighters = editor.vimLastHighlighters!!
