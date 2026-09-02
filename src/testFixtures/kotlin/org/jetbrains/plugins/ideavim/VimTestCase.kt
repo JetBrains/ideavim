@@ -897,10 +897,20 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
 
   @Suppress("DEPRECATION", "SameParameterValue")
   protected fun assertSearchHighlights(tooltip: String, expected: String) {
-    val allHighlighters = fixture.editor.markupModel.allHighlighters
+    assertSearchHighlights(fixture.editor, tooltip, expected)
+  }
 
-    thisLogger().debug("Current text: ${fixture.editor.document.text}")
-    val actual = StringBuilder(fixture.editor.document.text)
+  /**
+   * Assert the search highlights of a specific editor. Vim highlights search results in all windows, and highlights the
+   * match at each window's own cursor as the current match (`hl-CurSearch`), so tests with more than one window need to
+   * assert a given window rather than just the focused one.
+   */
+  @Suppress("DEPRECATION", "SameParameterValue")
+  protected fun assertSearchHighlights(editor: Editor, tooltip: String, expected: String) {
+    val allHighlighters = editor.markupModel.allHighlighters
+
+    thisLogger().debug("Current text: ${editor.document.text}")
+    val actual = StringBuilder(editor.document.text)
     val inserts = mutableMapOf<Int, String>()
 
     // Digraphs:
@@ -964,7 +974,11 @@ abstract class VimTestCase(private val defaultEditorText: String? = null) {
   }
 
   protected fun assertNoSearchHighlights() {
-    assertEquals(0, fixture.editor.markupModel.allHighlighters.size)
+    assertNoSearchHighlights(fixture.editor)
+  }
+
+  protected fun assertNoSearchHighlights(editor: Editor) {
+    assertEquals(0, editor.markupModel.allHighlighters.size)
   }
 
   @JvmOverloads

@@ -389,10 +389,6 @@ class IncsearchTests : VimTestCase() {
     )
   }
 
-  @TestWithoutNeovim(
-    SkipNeovimReason.SEE_DESCRIPTION,
-    description = "Neovim shows current match highlight for the previous accepted search; Vim does not",
-  )
   @Test
   fun `test incsearch does not hide previous search until first character is typed`() {
     configureByText(
@@ -469,7 +465,34 @@ class IncsearchTests : VimTestCase() {
     assertSearchHighlights(
       "and",
       """I found it in a legendary l«and»
-           |all rocks ‷and‴ lavender «and» tufted grass,
+           |all rocks «and» lavender «and» tufted grass,
+           |where it was settled on some sodden s«and»
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
+    )
+  }
+
+  // VIM-4308: the caret is put on the first match by a motion rather than by a search, so cancelling must not turn
+  // that match into a current match either - there is no search in progress once the command line is closed
+  @Test
+  fun `test cancelling incsearch does not show current match highlight for match at caret`() {
+    configureByText(
+      """I found it in a legendary land
+           |${c}all rocks and lavender and tufted grass,
+           |where it was settled on some sodden sand
+           |hard by the torrent of a mountain pass.
+      """.trimMargin(),
+    )
+    enterCommand("set hlsearch incsearch")
+
+    enterSearch("and")
+    typeText("0", "fa") // Off the match, then back onto it without searching
+    typeText("/", "grass", "<Esc>")
+
+    assertSearchHighlights(
+      "and",
+      """I found it in a legendary l«and»
+           |all rocks «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.
       """.trimMargin(),
