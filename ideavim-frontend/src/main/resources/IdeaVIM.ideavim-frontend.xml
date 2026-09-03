@@ -235,7 +235,11 @@
                         serviceInterface="com.maddyhome.idea.vim.api.VimExtensionRegistrator"/>
 
     <!-- UI components -->
-    <applicationConfigurable groupId="editor" instance="com.maddyhome.idea.vim.ui.VimEmulationConfigurable"/>
+    <applicationConfigurable groupId="editor"
+                             instance="com.maddyhome.idea.vim.ui.VimEmulationConfigurable"
+                             id="com.maddyhome.idea.vim.ui.VimEmulationConfigurable"
+                             bundle="messages.IdeaVimBundle"
+                             key="configurable.name.vim.emulation"/>
     <projectService serviceImplementation="com.maddyhome.idea.vim.group.LastTabService"/>
     <statusBarWidgetFactory id="IdeaVimMode" implementation="com.maddyhome.idea.vim.ui.widgets.mode.ModeWidgetFactory"
                             order="last, before Memory"/>
