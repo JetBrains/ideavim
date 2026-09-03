@@ -14,8 +14,8 @@ import com.intellij.openapi.actionSystem.CustomShortcutSet
 import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.actionSystem.ShortcutSet
 import com.intellij.openapi.project.DumbAwareAction
-import com.intellij.ui.KeyStrokeAdapter
 import com.maddyhome.idea.vim.api.injector
+import com.maddyhome.idea.vim.helper.ActionEventKeyStrokeExtractor
 import com.maddyhome.idea.vim.key.KeyStrokeTrie
 import java.awt.event.KeyEvent
 import javax.swing.JComponent
@@ -87,32 +87,7 @@ open class ShortcutDispatcher<T>(
   fun register(component: JComponent?, parentDisposable: Disposable?) =
     registerCustomShortcutSet(shortcutSet, component, parentDisposable)
 
-  /**
-   * getDefaultKeyStroke is needed for NEO layout keyboard VIM-987
-   * but we should cache the value because on the second call (isEnabled -> actionPerformed)
-   * the event is already consumed
-   *
-   * @author Alex Plate
-   */
-  private var keyStrokeCache: Pair<KeyEvent?, KeyStroke?> = null to null
+  private val keyStrokeExtractor = ActionEventKeyStrokeExtractor()
 
-  /**
-   * @author Alex Plate
-   */
-  private fun getKeyStroke(e: AnActionEvent): KeyStroke? {
-    val inputEvent = e.inputEvent
-    if (inputEvent is KeyEvent) {
-      val defaultKeyStroke = KeyStrokeAdapter.getDefaultKeyStroke(inputEvent)
-      val strokeCache = keyStrokeCache
-      if (defaultKeyStroke != null) {
-        keyStrokeCache = inputEvent to defaultKeyStroke
-        return defaultKeyStroke
-      } else if (strokeCache.first === inputEvent) {
-        keyStrokeCache = null to null
-        return strokeCache.second
-      }
-      return KeyStroke.getKeyStrokeForEvent(inputEvent)
-    }
-    return null
-  }
+  private fun getKeyStroke(e: AnActionEvent): KeyStroke? = keyStrokeExtractor.getKeyStroke(e)
 }

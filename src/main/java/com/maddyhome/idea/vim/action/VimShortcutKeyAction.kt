@@ -30,7 +30,6 @@ import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.registry.Registry
-import com.intellij.ui.KeyStrokeAdapter
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.api.getFirstMappingInfoMatch
@@ -38,6 +37,7 @@ import com.maddyhome.idea.vim.api.globalOptions
 import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.group.IjOptionConstants
 import com.maddyhome.idea.vim.group.IjOptions
+import com.maddyhome.idea.vim.helper.ActionEventKeyStrokeExtractor
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.HandlerInjector
 import com.maddyhome.idea.vim.helper.enumSetOf
@@ -297,29 +297,9 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
     return VimPlugin.getKey().getKeymapConflicts(keyStroke).isNotEmpty()
   }
 
-  /**
-   * getDefaultKeyStroke is needed for NEO layout keyboard VIM-987
-   * but we should cache the value because on the second call (isEnabled -> actionPerformed)
-   * the event is already consumed and getDefaultKeyStroke returns null
-   */
-  private var keyStrokeCache: Pair<Long?, KeyStroke?> = null to null
+  private val keyStrokeExtractor = ActionEventKeyStrokeExtractor()
 
-  private fun getKeyStroke(e: AnActionEvent): KeyStroke? {
-    val inputEvent = e.inputEvent
-    if (inputEvent is KeyEvent) {
-      val defaultKeyStroke = KeyStrokeAdapter.getDefaultKeyStroke(inputEvent)
-      val strokeCache = keyStrokeCache
-      if (defaultKeyStroke != null) {
-        keyStrokeCache = inputEvent.`when` to defaultKeyStroke
-        return defaultKeyStroke
-      } else if (strokeCache.first == inputEvent.`when`) {
-        keyStrokeCache = null to null
-        return strokeCache.second
-      }
-      return KeyStroke.getKeyStrokeForEvent(inputEvent)
-    }
-    return null
-  }
+  private fun getKeyStroke(e: AnActionEvent): KeyStroke? = keyStrokeExtractor.getKeyStroke(e)
 
   private fun getEditor(e: AnActionEvent): Editor? {
     return e.getData(PlatformDataKeys.EDITOR)

@@ -206,6 +206,7 @@ class IjVimEditor(editor: Editor) : MutableLinearEditor, VimEditorBase() {
   }
 
   override fun isInForEachCaretScope(): Boolean {
+    if (editor.caretModel !is CaretModelImpl) return false
     return (editor.caretModel as CaretModelImpl).isIteratingOverCarets
   }
 
