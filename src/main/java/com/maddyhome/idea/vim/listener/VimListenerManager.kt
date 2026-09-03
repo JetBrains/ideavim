@@ -69,6 +69,7 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimKeyListener
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.VimTypedActionHandler
+import com.maddyhome.idea.vim.action.OutsideEditorKeyDispatcher
 import com.maddyhome.idea.vim.api.LocalOptionInitialisationScenario
 import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimEditor
@@ -264,6 +265,8 @@ object VimListenerManager {
       busConnection.subscribe(VirtualFileManager.VFS_CHANGES, BufNewFileTracker)
       busConnection.subscribe(FileDocumentManagerListener.TOPIC, BufWriteListener)
 
+      OutsideEditorKeyDispatcher.getInstance().installFocusListener()
+
       // VIM-4205: feed Esc presses to RiderEscAwtKeyTracker. Must be a preprocessor (not a dispatcher)
       // so it fires before Rider's popup manager consumes the event.
       if (com.maddyhome.idea.vim.ide.isRider() || com.maddyhome.idea.vim.ide.isClionNova()) {
@@ -279,6 +282,7 @@ object VimListenerManager {
 
     fun disable() {
       EventFacade.getInstance().restoreTypedActionHandler()
+      OutsideEditorKeyDispatcher.getInstance().removeFocusListener()
 
       val optionGroup = VimPlugin.getOptionGroup()
       optionGroup.removeEffectiveOptionValueChangeListener(Options.guicursor, GuicursorChangeListener)

@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.api.ExecutionContext
 import com.maddyhome.idea.vim.api.NativeAction
 import com.maddyhome.idea.vim.api.VimActionExecutor
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.injector
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.newapi.IjNativeAction
@@ -68,12 +69,12 @@ class IjActionExecutor : VimActionExecutor {
       thisLogger().error("Actions cannot be updated when write-action is running or pending")
     }
 
-    val ijAction = (action as IjNativeAction).action
+    return executeAction((action as IjNativeAction).action, editor?.ij?.contentComponent)
+  }
+
+  private fun executeAction(ijAction: AnAction, contextComponent: Component?): Boolean {
     try {
       isRunningActionFromVim = true
-      // The context component should be editor. This is especially important when running the `:action` commands
-      //  because at the moment of execution, the focused component is Ex Field, not editor.
-      val contextComponent = editor?.ij?.contentComponent
       val place = ijAction.choosePlace()
       val res = ActionManager.getInstance().tryToExecute(ijAction, null, contextComponent, place, true)
       res.waitFor(5_000)
@@ -84,6 +85,10 @@ class IjActionExecutor : VimActionExecutor {
   }
 
   override fun executeAction(editor: VimEditor?, action: NativeAction, context: ExecutionContext): Boolean {
+    if (editor != null && editor === injector.fallbackWindow) {
+      val contextComponent = context.ij.getData(PlatformDataKeys.CONTEXT_COMPONENT)
+      return executeAction((action as IjNativeAction).action, contextComponent)
+    }
     return executeAction(editor, action)
   }
 
