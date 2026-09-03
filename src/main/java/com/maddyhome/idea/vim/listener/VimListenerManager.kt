@@ -72,6 +72,7 @@ import com.maddyhome.idea.vim.VimTypedActionHandler
 import com.maddyhome.idea.vim.api.LocalOptionInitialisationScenario
 import com.maddyhome.idea.vim.api.Options
 import com.maddyhome.idea.vim.api.VimEditor
+import com.maddyhome.idea.vim.api.VimEditorGroup
 import com.maddyhome.idea.vim.api.VirtualBufferKind
 import com.maddyhome.idea.vim.api.coerceOffset
 import com.maddyhome.idea.vim.api.getLineEndForOffset
@@ -397,7 +398,8 @@ object VimListenerManager {
 
       Disposer.register(perEditorDisposable) {
         ApplicationManager.getApplication().invokeLater {
-          injector.editorGroup.editorDeinit(editor.vim)
+          val editorGroup = ApplicationManager.getApplication().getServiceIfCreated(VimEditorGroup::class.java)
+          editorGroup?.editorDeinit(editor.vim)
         }
       }
     }

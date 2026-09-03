@@ -59,6 +59,8 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
 
   private final @NotNull VimState state = new VimState();
   public Disposable onOffDisposable;
+
+  private boolean turnedOffForUnload = false;
   int previousStateVersion = 0;
   String previousKeyMap = "";
   // It is enabled by default to avoid any special configuration after plugin installation
@@ -261,8 +263,35 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   @Override
   public void dispose() {
     LOG.debug("disposeComponent");
-    turnOffPlugin(false);
+    // During a dynamic unload we have already been turned off by turnOffPluginBeforeUnload(), while the services were
+    // still resolvable. Repeating the teardown here would only talk to an already unregistered service container.
+    if (!turnedOffForUnload) {
+      turnOffPlugin(false);
+    }
     LOG.debug("done");
+  }
+
+  /**
+   * Deactivates the plugin while the service container is still intact.
+   * <p>
+   * The platform unregisters <em>all</em> of a module's services in one go and only then disposes the instances it
+   * created. By the time {@link #dispose()} runs as part of a dynamic unload, the injector can no longer resolve any
+   * of our sibling services - every lookup either throws "Cannot find service" or silently returns {@code null}.
+   * Teardown therefore has to happen from
+   * {@link com.intellij.ide.plugins.DynamicPluginListener#beforePluginUnload}, which the platform publishes before it
+   * touches the container.
+   *
+   * @see com.maddyhome.idea.vim.thinapi.IjPluginListener
+   */
+  public static void turnOffPluginBeforeUnload() {
+    final VimPlugin instance = ApplicationManager.getApplication().getServiceIfCreated(VimPlugin.class);
+    if (instance == null || instance.turnedOffForUnload) return;
+
+    instance.turnedOffForUnload = true;
+    // Unlike an IDE shutdown, the IDE keeps running after an unload, so we have to unsubscribe our listeners and
+    // restore the typed action handler - but only if we were actually turned on. onOffDisposable is created by
+    // turnOnPlugin and cleared by turnOffPlugin, so a null value means there is nothing subscribed.
+    instance.turnOffPlugin(instance.onOffDisposable != null);
   }
 
   /**
